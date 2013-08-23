@@ -29,18 +29,25 @@ exception NoMatch
 exception Undetermined
 
 let rec matching env t p =
-  match p.pat_node,t.t_node with
-  | Pwild, _ -> env
-  | Pvar v, _ -> bind_vs v t env
-  | Papp(ls1,pl), Tapp(ls2,tl) ->
-    if ls_equal ls1 ls2 then
-      List.fold_left2 matching env tl pl
-    else
-      if ls2.ls_constr > 0 then raise NoMatch
-      else raise Undetermined
-  | Papp _, _ -> raise Undetermined
-  | Por _, _ -> raise Undetermined
-  | Pas _, _ -> raise Undetermined
+  match p.pat_node with
+  | Pwild -> env
+  | Pvar v -> bind_vs v t env
+  | Por(p1,p2) ->
+    begin
+      try matching env t p1
+      with NoMatch -> matching env t p2
+    end
+  | Pas(p,v) -> matching (bind_vs v t env) t p
+  | Papp(ls1,pl) ->
+    match t.t_node with
+      | Tapp(ls2,tl) ->
+        if ls_equal ls1 ls2 then
+          List.fold_left2 matching env tl pl
+        else
+          if ls2.ls_constr > 0 then raise NoMatch
+          else raise Undetermined
+      | _ -> raise Undetermined
+
 
 
 (* builtin symbols *)
@@ -134,8 +141,8 @@ let term_equality t1 t2 =
       match t1.t_node,t2.t_node with
         | Ttrue, Tfalse | Tfalse, Ttrue -> Some false
         | Tapp(ls1,[]),Tapp(ls2,[]) when
-            ls_equal ls1 fs_bool_true && ls_equal ls2 fs_bool_false 
-            || ls_equal ls1 fs_bool_false && ls_equal ls2 fs_bool_true 
+            ls_equal ls1 fs_bool_true && ls_equal ls2 fs_bool_false
+            || ls_equal ls1 fs_bool_false && ls_equal ls2 fs_bool_true
             -> Some false
         | _ -> None
 
@@ -143,7 +150,7 @@ let eval_equ _ty _ls l =
   match l with
   | [t1;t2] ->
     begin match term_equality t1 t2 with
-      | Some true -> t_true 
+      | Some true -> t_true
       | Some false -> t_false
       | None -> t_equ t1 t2
     end
@@ -159,7 +166,7 @@ let eval_map_const ty ls l = t_app_infer_inst ls l ty
 
 let eval_map_get ty ls_get l =
   match l with
-    | [m;x] -> 
+    | [m;x] ->
       (* Format.eprintf "Looking for get:"; *)
       let rec find m =
         match m.t_node with
@@ -167,7 +174,7 @@ let eval_map_get ty ls_get l =
             begin match term_equality x y with
               | Some true -> (* Format.eprintf "ok!@."; *) v
               | Some false -> (* Format.eprintf "recur...@."; *) find m'
-              | None -> (* Format.eprintf "failed.@."; *) 
+              | None -> (* Format.eprintf "failed.@."; *)
                 t_app_infer_inst ls_get [m;x] ty
             end
           | Tapp(ls,[def]) when ls_equal ls !ls_map_const -> def
@@ -182,15 +189,15 @@ let eval_map_set ty ls_set l =
         match m.t_node with
           | Tapp(ls,[m';y;v']) when ls_equal ls !ls_map_set ->
             begin match term_equality x y with
-              | Some true -> 
+              | Some true ->
                 t_app_infer_inst ls_set [m';x;v] ty
-              | Some false -> 
+              | Some false ->
                 let c = compress m' in
                 t_app_infer_inst ls_set [c;y;v'] ty
-              | None -> 
+              | None ->
                 t_app_infer_inst ls_set [m;x;v] ty
             end
-          | _ -> 
+          | _ ->
             t_app_infer_inst ls_set [m;x;v] ty
       in compress m
     | _ -> assert false
@@ -234,7 +241,7 @@ let add_builtin_th env (l,n,d) =
           | None -> ()
           | Some r -> r := ls)
       d
-  with Not_found -> 
+  with Not_found ->
     Format.eprintf "[Warning] theory %s not found@." n
 
 
@@ -369,20 +376,20 @@ let p_letsym fmt lsym =
 let rec p_let fmt ld =
   fprintf fmt "@[{ let_sym =@ %a;@ let_expr =@ %a }@]"
     p_letsym ld.let_sym p_expr ld.let_expr
-  
+
 and p_expr fmt e =
   match e.e_node with
     | Elogic t -> fprintf fmt "@[Elogic(%a)@]" Pretty.print_term t
     | Evalue pvs -> fprintf fmt "@[Evalue(%a)@]" p_pvs pvs
     | Earrow ps -> fprintf fmt "@[Earrow(%a)@]" p_ps ps
-    | Eapp (e1, pvs, _) -> 
+    | Eapp (e1, pvs, _) ->
       fprintf fmt "@[Eapp(%a,@ %a,@ _)@]" p_expr e1 p_pvs pvs
-    | Elet(ldefn,e1) -> 
+    | Elet(ldefn,e1) ->
       fprintf fmt "@[Elet(%a,@ %a)@]" p_let ldefn p_expr e1
     | Erec (_, _) -> fprintf fmt "@[Erec(_,@ _,@ _)@]"
     | Eif (_, _, _) -> fprintf fmt "@[Eif(_,@ _,@ _)@]"
     | Ecase (_, _) -> fprintf fmt "@[Ecase(_,@ _)@]"
-    | Eassign (pls, e1, reg, pvs) -> 
+    | Eassign (pls, e1, reg, pvs) ->
       fprintf fmt "@[Eassign(%a,@ %a,@ %a,@ %a)@]"
         p_pls pls p_expr e1 Mlw_pretty.print_reg reg p_pvs pvs
     | Eghost _ -> fprintf fmt "@[Eghost(_)@]"
@@ -425,13 +432,13 @@ let print_state fmt _s =
 let rec eval_expr env (s:state) (e : expr) : result * state =
   match e.e_node with
   | Elogic t -> Normal (eval_term env t.t_ty t), s
-  | Evalue pvs -> 
+  | Evalue pvs ->
     begin
       try let t = Mvs.find pvs.pv_vs env.vsenv in
           Normal t,s
       with Not_found -> Irred e, s
     end
-  | Elet(ld,e1) -> 
+  | Elet(ld,e1) ->
     begin match ld.let_sym with
       | LetV pvs ->
         begin match eval_expr env s ld.let_expr with
@@ -457,7 +464,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         eval_expr env' s' lam.l_expr
       | _ -> Irred e, s
     end
-  | Earrow ps -> 
+  | Earrow ps ->
     begin
       match Mlw_decl.find_definition env.mknown ps with
         | Some d ->
@@ -481,7 +488,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
               | Tapp(ls,[]) when ls_equal ls fs_bool_false
                   -> eval_expr env s' e3
               | _ ->
-                Format.eprintf "@[Cannot interp condition of if: @[%a@]@]@."
+                Format.eprintf 
+                  "@[[Exec] Cannot decide condition of if: @[%a@]@]@."
                   Pretty.print_term t;
                 Irred e, s
           end
@@ -519,7 +527,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         | _ -> r
     end
   | Efor(pvs,(pvs1,dir,pvs2),_inv,e1) ->
-    begin 
+    begin
       try
         let a = big_int_of_term (Mvs.find pvs1.pv_vs env.vsenv) in
         let b = big_int_of_term (Mvs.find pvs2.pv_vs env.vsenv) in
