@@ -226,7 +226,9 @@ type 'key keygen = ?parent:'key -> unit -> 'key
 
 exception OutdatedSession
 
-val update_session : keygen:'a keygen ->
+val update_session :
+  ?release:bool (* default false *)  ->
+  keygen:'a keygen ->
   allow_obsolete:bool -> 'b session ->
   Env.env -> Whyconf.config -> 'a env_session * bool
 (** reload the given session with the given environnement :

@@ -1908,6 +1908,64 @@ let merge_metas_in_task ~theories env task from_metas =
   in
   Task.add_tdecl task goal,metas,to_idpos,!obsolete
 
+(** Release and recover goal task *)
+let release_task g =
+  Debug.dprintf debug "[Session] release %s@." g.goal_name.id_string;
+  g.goal_task <- None
+
+let rec release_sub_tasks g =
+  release_task g;
+  PHstr.iter (fun _ t -> List.iter release_sub_tasks t.transf_goals)
+    g.goal_transformations;
+  Mmetas_args.iter (fun _ t -> release_sub_tasks t.metas_goal) g.goal_metas
+
+exception UnrecoverableTask of Ident.ident
+
+let rec recover_sub_tasks ~theories env_session task g =
+  g.goal_task <- Some task;
+  (** Check that the sum and shape don't change (the order is kept)
+      It seems an acceptable limitation. Non-deterministic transformation seems
+      ugly.
+  *)
+  let version = env_session.session.session_shape_version in
+  let sum = Termcode.task_checksum ~version task in
+  let shape = Termcode.t_shape_task ~version task in
+  if not (Termcode.equal_checksum sum g.goal_checksum &&
+          Termcode.equal_shape shape g.goal_shape) then
+    raise (UnrecoverableTask g.goal_name);
+  PHstr.iter (fun _ t ->
+      let task = goal_task g in
+      let subgoals = Trans.apply_transform t.transf_name env_session.env task in
+      List.iter2 (recover_sub_tasks ~theories env_session) subgoals t.transf_goals)
+    g.goal_transformations;
+  Mmetas_args.iter (fun _ t ->
+      let task,_metas,_to_idpos,_obsolete =
+        merge_metas_in_task ~theories env_session task t in
+      (** It is better to keep the original metas and idpos *)
+      (** If it is obsolete the next task will see it *)
+      recover_sub_tasks ~theories env_session task t.metas_goal
+    ) g.goal_metas
+
+let recover_theory_tasks env_session th =
+  let theories = Opt.get_exn NoTask th.theory_parent.file_for_recovery in
+  let theory = Opt.get_exn NoTask th.theory_task in
+  let tasks = List.rev (Task.split_theory theory None None) in
+  List.iter2 (recover_sub_tasks ~theories env_session) tasks th.theory_goals
+
+let rec theory_goal g =
+  match g.goal_parent with
+  | Parent_theory th -> th
+  | Parent_transf t -> theory_goal t.transf_parent
+  | Parent_metas t -> theory_goal t.metas_parent
+
+let goal_task_or_recover env_session g =
+  match g.goal_task with
+  | Some task -> task
+  | None ->
+    recover_theory_tasks env_session (theory_goal g);
+    Opt.get g.goal_task
+
+(** merge session *)
 
 (** ~theories is the current theory library path empty : [] *)
 let rec merge_any_goal ~keygen ~theories env obsolete from_goal to_goal =
@@ -1978,7 +2036,8 @@ and merge_metas ~keygen ~theories env to_goal s from_metas =
 
 exception OutdatedSession
 
-let merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th =
+let merge_theory
+    ?(release=false) ~keygen ~theories env ~allow_obsolete from_th to_th =
   set_theory_expanded to_th from_th.theory_expanded;
   let from_goals = List.fold_left
     (fun from_goals g ->
@@ -1999,13 +2058,15 @@ let merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th =
             if not allow_obsolete then raise OutdatedSession;
             found_obsolete := true;
           end;
-        merge_any_goal ~keygen ~theories env goal_obsolete from_goal to_goal
+        merge_any_goal ~keygen ~theories env goal_obsolete from_goal to_goal;
+        if release then release_sub_tasks to_goal
       with
-        | Not_found when allow_obsolete -> ()
+        | Not_found when allow_obsolete ->
+          if release then release_sub_tasks to_goal
         | Not_found -> raise OutdatedSession
     ) to_th.theory_goals
 
-let merge_file ~keygen ~theories env ~allow_obsolete from_f to_f =
+let merge_file ?release ~keygen ~theories env ~allow_obsolete from_f to_f =
   dprintf debug "[Info] merge_file, shape_version = %d@\n"
     env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
@@ -2022,7 +2083,7 @@ let merge_file ~keygen ~theories env ~allow_obsolete from_f to_f =
           (* TODO: remove this later when all sessions are updated *)
           with Not_found -> Mstr.find ("WP "^name) from_theories
         in
-        merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th
+        merge_theory ?release ~keygen ~theories env ~allow_obsolete from_th to_th
       with
         | Not_found when allow_obsolete -> ()
         | Not_found -> raise OutdatedSession
@@ -2050,7 +2111,7 @@ let recompute_all_shapes session =
   session.session_shape_version <- Termcode.current_shape_version;
   PHstr.iter recompute_all_shapes_file session.session_files
 
-let update_session ~keygen ~allow_obsolete old_session env whyconf =
+let update_session ?release ~keygen ~allow_obsolete old_session env whyconf =
   dprintf debug "[Info] update_session: shape_version = %d@\n"
     old_session.session_shape_version;
   let new_session =
@@ -2074,8 +2135,9 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
         ?format:old_file.file_format old_file.file_name
       in
       let theories = Opt.get new_file.file_for_recovery in
+      dprintf debug "[Merge] file '%s'@\n" old_file.file_name;
       merge_file ~keygen ~theories
-        new_env_session ~allow_obsolete old_file new_file;
+        ?release new_env_session ~allow_obsolete old_file new_file;
       let fname =
         Filename.basename (Filename.chop_extension old_file.file_name)
       in
@@ -2219,62 +2281,6 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
   | (_, None) -> ()
   ) associated;
   to_transf
-
-(** Release and recover goal task *)
-let release_task g =
-  g.goal_task <- None
-
-let rec release_sub_tasks g =
-  release_task g;
-  PHstr.iter (fun _ t -> List.iter release_sub_tasks t.transf_goals)
-    g.goal_transformations;
-  Mmetas_args.iter (fun _ t -> release_sub_tasks t.metas_goal) g.goal_metas
-
-exception UnrecoverableTask of Ident.ident
-
-let rec recover_sub_tasks ~theories env_session task g =
-  g.goal_task <- Some task;
-  (** Check that the sum and shape don't change (the order is kept)
-      It seems an acceptable limitation. Non-deterministic transformation seems
-      ugly.
-  *)
-  let version = env_session.session.session_shape_version in
-  let sum = Termcode.task_checksum ~version task in
-  let shape = Termcode.t_shape_task ~version task in
-  if not (Termcode.equal_checksum sum g.goal_checksum &&
-          Termcode.equal_shape shape g.goal_shape) then
-    raise (UnrecoverableTask g.goal_name);
-  PHstr.iter (fun _ t ->
-      let task = goal_task g in
-      let subgoals = Trans.apply_transform t.transf_name env_session.env task in
-      List.iter2 (recover_sub_tasks ~theories env_session) subgoals t.transf_goals)
-    g.goal_transformations;
-  Mmetas_args.iter (fun _ t ->
-      let task,_metas,_to_idpos,_obsolete =
-        merge_metas_in_task ~theories env_session task t in
-      (** It is better to keep the original metas and idpos *)
-      (** If it is obsolete the next task will see it *)
-      recover_sub_tasks ~theories env_session task t.metas_goal
-    ) g.goal_metas
-
-let recover_theory_tasks env_session th =
-  let theories = Opt.get_exn NoTask th.theory_parent.file_for_recovery in
-  let theory = Opt.get_exn NoTask th.theory_task in
-  let tasks = List.rev (Task.split_theory theory None None) in
-  List.iter2 (recover_sub_tasks ~theories env_session) tasks th.theory_goals
-
-let rec theory_goal g =
-  match g.goal_parent with
-  | Parent_theory th -> th
-  | Parent_transf t -> theory_goal t.transf_parent
-  | Parent_metas t -> theory_goal t.metas_parent
-
-let goal_task_or_recover env_session g =
-  match g.goal_task with
-  | Some task -> task
-  | None ->
-    recover_theory_tasks env_session (theory_goal g);
-    Opt.get g.goal_task
 
 let get_project_dir fname =
   if not (Sys.file_exists fname) then raise Not_found;
