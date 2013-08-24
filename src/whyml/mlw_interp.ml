@@ -16,10 +16,6 @@ type env = {
 }
 
 let bind_vs v t env =
-(*
-  eprintf "adding logic variable %s in env@."
-      v.vs_name.Ident.id_string;
-*)
   { env with vsenv = Mvs.add v (None,t) env.vsenv }
 
 let multibind_vs l tl env =
@@ -28,10 +24,6 @@ let multibind_vs l tl env =
   with Invalid_argument _ -> assert false
 
 let bind_pvs pv t env =
-(*
-  eprintf "adding program variable %s in env@."
-      pv.pv_vs.vs_name.Ident.id_string;
-*)
   { env with vsenv = Mvs.add pv.pv_vs (Some pv.pv_ity,t) env.vsenv }
 
 let multibind_pvs l tl env =
@@ -47,8 +39,13 @@ let multibind_pvs l tl env =
 
 type state = term Mreg.t
 
-let print_state fmt _s =
-  Format.fprintf fmt "TODO"
+let p_reg fmt (reg,t) =
+  fprintf fmt "@[<hov 2><%a> -> %a@]" 
+    Mlw_pretty.print_reg reg Pretty.print_term t
+
+let print_state fmt s =
+  let l = Mreg.bindings s in
+  fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_reg) l
 
 
 (* evaluation of terms *)
@@ -293,7 +290,7 @@ let rec update_rec env s ity t =
               | (cs,fdl)::rem ->
                 if ls_equal cs ls then
                   begin
-                    eprintf "found constructor@.";
+                    (* eprintf "found constructor@."; *)
                   let l =
                     List.map2
                       (fun fd t ->
@@ -301,16 +298,22 @@ let rec update_rec env s ity t =
                           match fd.fd_mut with
                           | None -> t
                           | Some r ->
+(*
                             eprintf "found a mutable field, looking in store -> ";
+*)
                             let t =
                               try
                                 Mreg.find r s
                               with Not_found ->
+(*
                                 eprintf "[region <%a> not bound !] "
                                   Mlw_pretty.print_reg r;
+*)
                                 t
                             in
+(*
                             eprintf "found term %a@." Pretty.print_term t;
+*)
                             t
                         in
                         update_rec env s fd.fd_ity t)
@@ -337,10 +340,14 @@ let update env s ity t =
     (* eprintf "not calling update_rec on %a@." Pretty.print_term t; *)
     t
   | Some ity ->
+(*
     eprintf "calling update on %a, type %a: "
       Pretty.print_term t Mlw_pretty.print_ity ity;
+*)
     let t = update_rec env s ity t in
+(*
     eprintf "returns %a@." Pretty.print_term t;
+*)
     t
 
 
@@ -681,8 +688,10 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     end
   | Eassign(_pl,_e1,reg,pvs) ->
     let t = get_pvs env s pvs in
+(*
     eprintf "updating region <%a> with value %a@."
       Mlw_pretty.print_reg reg Pretty.print_term t;
+*)
     Normal t_void, Mreg.add reg t s
   | Erec _
   | Eghost _
