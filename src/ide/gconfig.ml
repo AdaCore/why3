@@ -492,7 +492,11 @@ let init () =
   Debug.dprintf debug " done.@."
 
 let show_legend_window () =
-  let dialog = GWindow.dialog ~title:"Why3: legend of icons" () in
+  let dialog =
+    GWindow.dialog
+      ~title:"Why3: legend of icons" ~icon:!why_icon
+      ()
+  in
   let vbox = dialog#vbox in
   let text = GText.view ~packing:vbox#add
     ~editable:false ~cursor_visible:false () in

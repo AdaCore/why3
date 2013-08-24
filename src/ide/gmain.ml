@@ -1566,6 +1566,44 @@ to the <b>selected goals</b>";
 
 
 
+
+(*************)
+(* Run  menu *)
+(*************)
+
+(*
+let run_menu = factory#add_submenu "_Run"
+let run_factory = new GMenu.factory run_menu ~accel_group
+
+let function_to_execute = ref ""
+
+let execute_window () =
+  let dialog = GWindow.dialog ~modal:true
+    ~title:"Why3: execute function" ~icon:!Gconfig.why_icon () 
+  in
+  let vbox = dialog#vbox in
+  let text = 
+    "Enter the function to execute under the form <module name>.<function name>"
+  in
+  let _ = GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:vbox#add () in
+  let exec_entry =
+    GEdit.entry ~text:!function_to_execute ~packing:vbox#add ()
+  in
+  let (_ : GtkSignal.id) =
+    exec_entry#connect#changed ~callback:
+      (fun () -> function_to_execute := exec_entry#text)
+  in
+  dialog#add_button "Run" `CLOSE ;
+  let ( _ : GWindow.Buttons.about) = dialog#run () in
+  dialog#destroy ()
+
+let (_ : GMenu.image_menu_item) =
+  run_factory#add_image_item
+    ~label:"Execute function"
+    ~callback:execute_window
+    ()
+*)
+
 (*************)
 (* Help menu *)
 (*************)
