@@ -599,6 +599,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
       match Mlw_decl.find_definition env.mknown ps with
         | Some d ->
           let lam = d.fun_lambda in
+          (* TODO: we need to instantiate regions in [lam]
+             with the same substitution as in Earrow *)
           Fun(ps,lam,[], List.length lam.l_args),s
         | None ->
           Format.eprintf "[Exec] definition of psymbol %s not found@."

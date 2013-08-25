@@ -238,11 +238,11 @@ val eff_is_empty : effect -> bool
 
 (** specification *)
 
-type pre = term          (* precondition: pre_fmla *)
-type post = term         (* postcondition: eps result . post_fmla *)
-type xpost = post Mexn.t (* exceptional postconditions *)
+type pre = term          (** precondition: pre_fmla *)
+type post = term         (** postcondition: eps result . post_fmla *)
+type xpost = post Mexn.t (** exceptional postconditions *)
 
-type variant = term * lsymbol option (* tau * (tau -> tau -> prop) *)
+type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
 val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term
@@ -275,13 +275,13 @@ val pv_equal : pvsymbol -> pvsymbol -> bool
 val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
 
 val restore_pv : vsymbol -> pvsymbol
-  (* raises Not_found if the argument is not a pv_vs *)
+  (** raises Not_found if the argument is not a pv_vs *)
 
 val t_pvset : Spv.t -> term -> Spv.t
-  (* raises Not_found if the term contains non-pv variables *)
+  (** raises Not_found if the term contains non-pv variables *)
 
 val spec_pvset : Spv.t -> spec -> Spv.t
-  (* raises Not_found if the spec contains non-pv variables *)
+  (** raises Not_found if the spec contains non-pv variables *)
 
 (** program types *)
 
@@ -296,35 +296,35 @@ and aty = private {
 }
 
 exception UnboundException of xsymbol
+(** every raised exception must have a postcondition in [spec.c_xpost] *)
 
-(* every raised exception must have a postcondition in [spec.c_xpost] *)
 val vty_arrow : pvsymbol list -> ?spec:spec -> vty -> aty
 
-(* this only compares the types of arguments and results, and ignores
-   the spec. In other words, only the type variables and regions in
-   [aty_vars aty] are matched. The caller should supply a "freezing"
-   substitution that covers all external type variables and regions. *)
 val aty_vars_match : ity_subst -> aty -> ity list -> ity -> ity_subst
+(** this only compares the types of arguments and results, and ignores
+    the spec. In other words, only the type variables and regions in
+    [aty_vars aty] are matched. The caller should supply a "freezing"
+    substitution that covers all external type variables and regions. *)
 
-(* the substitution must cover not only [aty_vars aty] but
-   also every type variable and every region in [aty_spec] *)
 val aty_full_inst : ity_subst -> aty -> aty
+(** the substitution must cover not only [aty_vars aty] but
+    also every type variable and every region in [aty_spec] *)
 
-(* remove from the given arrow every effect that is covered
-   neither by the arrow's arguments nor by the given pvset *)
 val aty_filter : ?ghost:bool -> Spv.t -> aty -> aty
+(** remove from the given arrow every effect that is covered
+    neither by the arrow's arguments nor by the given pvset *)
 
-(* apply a function specification to a variable argument *)
 val aty_app : aty -> pvsymbol -> spec * bool * vty
+(** apply a function specification to a variable argument *)
 
-(* verify that the spec corresponds to the result type *)
 val spec_check : ?full_xpost:bool -> spec -> vty -> unit
+(** verify that the spec corresponds to the result type *)
 
-(* convert arrows to the unit type *)
 val ity_of_vty : vty -> ity
 val ty_of_vty  : vty -> ty
+(** convert arrows to the unit type *)
 
-(* collects the type variables and regions in arguments and values,
-   but ignores the spec *)
 val aty_vars : aty -> varset
 val vty_vars : vty -> varset
+(** collect the type variables and regions in arguments and values,
+    but ignores the spec *)

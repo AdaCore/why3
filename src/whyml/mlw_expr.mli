@@ -187,7 +187,7 @@ val e_arrow : psymbol -> ity list -> ity -> expr
     and the result. The resulting expression can be applied to
     arguments using [e_app] given below.
 
-    See also [examples/use_api/use_api.ml] *)
+    See also [examples/use_api/mlw.ml] *)
 
 exception ValueExpected of expr
 exception ArrowExpected of expr
@@ -197,9 +197,9 @@ val aty_of_expr : expr -> aty
 
 val e_app : expr -> expr list -> expr
 (** [e_app e el] builds the application of [e] to arguments [el].
-    [e] is typically constructed using [e_arrow] defined above].
+    [e] is typically constructed using [e_arrow] defined above.
 
-    See also [examples/use_api/use_api.ml]
+    See also [examples/use_api/mlw.ml]
 *)
 
 val e_lapp : lsymbol -> expr list -> ity -> expr
