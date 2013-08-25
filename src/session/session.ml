@@ -227,6 +227,7 @@ type 'a env_session =
     { env : Env.env;
       mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
+      files : Theory.theory Stdlib.Mstr.t Stdlib.Mstr.t;
       session : 'a session}
 
 let update_env_session_config e c = e.whyconf <- c
@@ -2086,19 +2087,28 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
     { session = new_session;
       env = env;
       whyconf = whyconf;
+      files = Mstr.empty;
       loaded_provers = PHprover.create 5;
     }
   in
   found_obsolete := false;
-  PHstr.iter (fun _ old_file ->
-    dprintf debug "[Load] file '%s'@\n" old_file.file_name;
-    let new_file,theories = add_file_return_theories
-      ~keygen new_env_session
-      ?format:old_file.file_format old_file.file_name
-    in
-    merge_file ~keygen ~theories
-      new_env_session ~allow_obsolete old_file new_file)
-    old_session.session_files;
+  let files = 
+    PHstr.fold (fun _ old_file acc ->
+      dprintf debug "[Load] file '%s'@\n" old_file.file_name;
+      let new_file,theories = add_file_return_theories
+        ~keygen new_env_session
+        ?format:old_file.file_format old_file.file_name
+      in
+      merge_file ~keygen ~theories
+        new_env_session ~allow_obsolete old_file new_file;
+      let fname = 
+        Filename.basename (Filename.chop_extension old_file.file_name) 
+      in
+      Mstr.add fname theories acc)
+      old_session.session_files
+      Mstr.empty
+  in
+  let new_env_session = { new_env_session with files = files } in
   dprintf debug "[Info] update_session: done@\n";
   let obsolete =
     if old_session.session_shape_version <> Termcode.current_shape_version

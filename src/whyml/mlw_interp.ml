@@ -401,7 +401,9 @@ let rec eval_term env s ty t =
     let v,t2 = t_open_bound tb in
     eval_term (bind_vs v u env) s ty t2
   | Tcase(t1,tbl) ->
+(*
     eprintf "found a match ... with ...@.";
+*)
     let u = eval_rec t1 in
     eval_match env s ty u tbl
   | Tquant _

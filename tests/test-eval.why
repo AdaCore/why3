@@ -104,3 +104,16 @@ theory T
   constant z2 : int = t3[2]
 
 end
+
+
+theory Records 
+
+  use import int.Int
+
+  type pt = { x : int ; y : int }
+
+  constant pt1 : pt = { x = 3 ; y = 4 }
+
+  constant t1 : int = pt1.x + pt1.y
+
+end
