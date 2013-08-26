@@ -3,6 +3,10 @@ open Format
 
 open Term
 
+let t_app_infer_inst ls tl ty =
+  let s = ls_arg_inst ls tl in
+  t_app ls tl (Ty.oty_inst s ty)
+
 (* environment *)
 
 open Mlw_ty
