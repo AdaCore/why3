@@ -202,7 +202,7 @@ type 'a env_session = private
     { env : Env.env;
       mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
-      files : Theory.theory Stdlib.Mstr.t Stdlib.Mstr.t;
+      mutable files : Theory.theory Stdlib.Mstr.t Stdlib.Mstr.t;
       session : 'a session}
 
 val update_env_session_config : 'a env_session -> Whyconf.config -> unit

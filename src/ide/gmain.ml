@@ -1623,6 +1623,11 @@ let eval const result =
 
 let constant_to_evaluate = ref ""
 
+
+(*
+let selected_file = ref ""
+*)
+
 let evaluate_window () =
   let dialog = GWindow.dialog ~modal:true
     ~title:"Why3: evaluate constant" ~icon:!Gconfig.why_icon ()
@@ -1644,8 +1649,34 @@ let evaluate_window () =
     exec_entry#connect#changed ~callback:
       (fun () -> constant_to_evaluate := exec_entry#text)
   in
+(*
+  let hb = GPack.hbox ~homogeneous:false ~packing:vbox#pack () in
+  let e = env_session () in
+  let files_map = e.S.files in
+  let (files_combo, _) =
+    GEdit.combo_box_entry_text ~packing:hb#pack ()
+  in
+  let _,file_names =
+    Mstr.fold
+      (fun f _th (i,names) ->
+        if f = !selected_file then files_combo#set_active i;
+        (i+1, f::names))
+      files_map (0, [])
+  in
+  let (_store, column) =
+    GTree.store_of_list Gobject.Data.string file_names 
+  in
+  files_combo#set_text_column column;
+  let ( _ : GtkSignal.id) = files_combo#connect#changed
+    ~callback:(fun () ->
+      match files_combo#active_iter with
+      | None -> ()
+      | Some row ->
+        let s = files_combo#model#get ~row ~column in
+        selected_file := s)
+  in
+*)
   let b = GButton.button ~label:"Run" ~packing:vbox#add () in
-
   let text =
     "Result:"
   in
