@@ -1400,7 +1400,9 @@ let add_file ~keygen env ?format filename =
     rfile
   in
   let fname = Filename.concat env.session.session_dir filename in
+  Debug.dprintf debug "[Session] read file@\n";
   let ordered_theories,theories = read_file env.env ?format fname in
+  Debug.dprintf debug "[Session] create tasks@\n";
   let file = add_file env.session filename format ordered_theories in
   let fname =
     Filename.basename (Filename.chop_extension filename)

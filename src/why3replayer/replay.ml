@@ -363,7 +363,7 @@ let add_to_check_no_smoke config found_obs env_session sched =
         exit 1
       end
   in
-  M.check_all ~release:false ~callback env_session sched
+  M.check_all ~callback env_session sched
 
 let add_to_check_smoke env_session sched =
   let callback report =
@@ -438,7 +438,7 @@ let () =
     O.verbose := Debug.test_flag debug;
     let env_session,found_obs =
       let session = S.read_session project_dir in
-      M.update_session ~release:true ~allow_obsolete:true session env config
+      M.update_session ~allow_obsolete:true session env config
     in
     Debug.dprintf debug " done.@.";
     if !opt_obsolete_only && not found_obs 
