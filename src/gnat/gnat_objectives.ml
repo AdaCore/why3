@@ -485,7 +485,9 @@ let extract_sloc main_goal =
         | Some Gnat_expl.Gp_Subp loc -> raise (Found (loc))
         | _ -> ()
       ) label_set;
-      assert false
+      Gnat_util.abort_with_message
+        (Pp.sprintf "could not find source location for subprogram %s"
+        goal_ident.Ident.id_string)
    with Found l -> l
 
 let init_subp_vcs subp =
