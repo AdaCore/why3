@@ -251,14 +251,41 @@ theory map.Map
   syntax function set   "(store %1 %2 %3)"
 end
 
-theory ieee754.Rounding
+theory floating_point.Rounding
    meta "encoding : kept" type mode
+   meta "eliminate_algebraic" "no_inversion"
+   meta "eliminate_algebraic" "no_selector"
+   meta "eliminate_algebraic" "no_index"
 
-   syntax function rne "RNE"
-   syntax function rna "RNA"
-   syntax function rtp "RTP"
-   syntax function rtn "RTN"
-   syntax function rtz "RTZ"
+   syntax function NearestTiesToEven "RNE"
+   syntax function NearestTiesToAway "RNA"
+   syntax function Up "RTP"
+   syntax function Down "RTN"
+   syntax function ToZero "RTZ"
+end
+
+theory floating_point.GenFloat
+   remove prop Bounded_real_no_overflow
+   remove prop Round_monotonic
+   remove prop Round_idempotent
+   remove prop Round_value
+   remove prop Bounded_value
+   remove prop Exact_rounding_for_integers
+   remove prop Round_down_le
+   remove prop Round_up_ge
+   remove prop Round_down_neg
+   remove prop Round_up_neg
+
+   syntax function model "xREMOVEx"
+   syntax function exact "xREMOVEx"
+   syntax function value "xREMOVEx"
+   syntax function round "xREMOVEx"
+   syntax function round_logic "xREMOVEx"
+   syntax function round_error "xREMOVEx"
+   syntax function total_error "xREMOVEx"
+   syntax function max "xREMOVEx"
+   syntax predicate no_overflow "xREMOVEx"
+   syntax function max_representable_integer "xREMOVEx"
 
 end
 
@@ -288,6 +315,7 @@ theory ieee754.Single_RNE
    syntax function  roundToIntegral  "(roundToIntegral RNE %1)"
 
    syntax predicate fp_eq  "(fp.eq %1 %2)"
+   syntax predicate fp_neq "(not (fp.eq %1 %2))"
    syntax predicate fp_leq "(fp.leq %1 %2)"
    syntax predicate fp_lt  "(fp.lt %1 %2)"
    syntax predicate fp_geq "(fp.geq %1 %2)"
@@ -330,6 +358,7 @@ theory ieee754.Double_RNE
    syntax function  roundToIntegral  "(roundToIntegral RNE %1)"
 
    syntax predicate fp_eq  "(fp.eq %1 %2)"
+   syntax predicate fp_neq "(not (fp.eq %1 %2))"
    syntax predicate fp_leq "(fp.leq %1 %2)"
    syntax predicate fp_lt  "(fp.lt %1 %2)"
    syntax predicate fp_geq "(fp.geq %1 %2)"
