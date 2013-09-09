@@ -787,7 +787,7 @@ let t_forall_close = t_quant_close Tforall
 let t_exists_close = t_quant_close Texists
 
 let t_let_close v t1 t2 = t_let t1 (t_close_bound v t2)
-
+let t_case_close t l = t_case t (List.map (fun (p,e) -> t_close_branch p e) l)
 let t_eps_close v f = t_eps (t_close_bound v f)
 
 (* built-in symbols *)
@@ -1460,6 +1460,36 @@ let t_let_close_simp v e t =
     t_subst_single v e t
   else
     t_let_close v e t
+
+let t_case_simp t bl =
+  let e0,tl = match bl with
+    | [] -> raise EmptyCase
+    | (_,_,e0)::tl -> e0,tl in
+  let e0_true = match e0.t_node with
+    | Ttrue -> true | _ -> false in
+  let e0_false = match e0.t_node with
+    | Tfalse -> true | _ -> false in
+  let is_e0 (_,_,e) = match e.t_node with
+    | Ttrue when can_simp e -> e0_true
+    | Tfalse when can_simp e -> e0_false
+    | _ -> t_equal e e0 in
+  if can_simp t && Mvs.is_empty e0.t_vars && List.for_all is_e0 tl then e0
+  else t_case t bl
+
+let t_case_close_simp t bl =
+  let e0,tl = match bl with
+    | [] -> raise EmptyCase
+    | (_,e0)::tl -> e0,tl in
+  let e0_true = match e0.t_node with
+    | Ttrue -> true | _ -> false in
+  let e0_false = match e0.t_node with
+    | Tfalse -> true | _ -> false in
+  let is_e0 (_,e) = match e.t_node with
+    | Ttrue when can_simp e -> e0_true
+    | Tfalse when can_simp e -> e0_false
+    | _ -> t_equal e e0 in
+  if can_simp t && Mvs.is_empty e0.t_vars && List.for_all is_e0 tl then e0
+  else t_case_close t bl
 
 let v_occurs f v = Mvs.mem v f.t_vars
 let v_subset f e = Mvs.set_submap e.t_vars f.t_vars

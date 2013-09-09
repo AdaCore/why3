@@ -783,7 +783,7 @@ and print_lexpr pri info fmt e =
 
 and print_rec lr info fst fmt { fun_ps = ps ; fun_lambda = lam } =
   if ps.ps_ghost then
-    fprintf fmt "(* %s %a *)"
+    fprintf fmt "@[<hov 2>%s %a = ()@]"
       (if fst then if lr then "let rec" else "let" else "with")
       (print_ps info) ps
   else

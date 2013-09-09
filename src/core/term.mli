@@ -231,6 +231,7 @@ val t_or_asym : term -> term -> term
 
 val t_let_close : vsymbol -> term -> term -> term
 val t_eps_close : vsymbol -> term -> term
+val t_case_close : term -> (pattern * term) list -> term
 val t_quant_close : quant -> vsymbol list -> trigger -> term -> term
 val t_forall_close : vsymbol list -> trigger -> term -> term
 val t_exists_close : vsymbol list -> trigger -> term -> term
@@ -245,6 +246,7 @@ val keep_on_simp_label : label
 
 val t_if_simp : term -> term -> term -> term
 val t_let_simp : term -> term_bound -> term
+val t_case_simp : term -> term_branch list -> term
 val t_quant_simp : quant -> term_quant -> term
 val t_forall_simp : term_quant -> term
 val t_exists_simp : term_quant -> term
@@ -263,6 +265,7 @@ val t_or_asym_simp : term -> term -> term
 val t_or_asym_simp_l : term list -> term
 
 val t_let_close_simp : vsymbol -> term -> term -> term
+val t_case_close_simp : term -> (pattern * term) list -> term
 val t_quant_close_simp : quant -> vsymbol list -> trigger -> term -> term
 val t_forall_close_simp : vsymbol list -> trigger -> term -> term
 val t_exists_close_simp : vsymbol list -> trigger -> term -> term

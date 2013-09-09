@@ -44,8 +44,10 @@ type expl
 *)
 
 type task_option
-(** Currently just an option on a task, but later perhaps
-    we should be able to release a task and rebuild it when needed *)
+(** The task can be removed and later reconstructible *)
+
+type 'a hide
+(** For internal use *)
 
 
 type ident_path =
@@ -81,7 +83,7 @@ type 'a goal = private
       mutable goal_checksum : Termcode.checksum;  (** checksum of the task *)
       mutable goal_shape : Termcode.shape;  (** shape of the task *)
       mutable goal_verified : bool;
-      goal_task: task_option;
+      mutable goal_task: task_option;
       mutable goal_expanded : bool;
       goal_external_proofs : 'a proof_attempt PHprover.t;
       goal_transformations : 'a transf PHstr.t;
@@ -135,6 +137,7 @@ and 'a theory = private
       (** Not mutated after the creation *)
       mutable theory_verified : bool;
       mutable theory_expanded : bool;
+      mutable theory_task : Theory.theory hide;
     }
 
 and 'a file = private
@@ -146,6 +149,7 @@ and 'a file = private
       (** Not mutated after the creation *)
       mutable file_verified : bool;
       mutable file_expanded : bool;
+      mutable file_for_recovery : Theory.theory Mstr.t hide;
     }
 
 and 'a session = private
@@ -202,6 +206,7 @@ type 'a env_session = private
     { env : Env.env;
       mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
+      mutable files : Theory.theory Stdlib.Mstr.t Stdlib.Mstr.t;
       session : 'a session}
 
 val update_env_session_config : 'a env_session -> Whyconf.config -> unit
@@ -221,7 +226,9 @@ type 'key keygen = ?parent:'key -> unit -> 'key
 
 exception OutdatedSession
 
-val update_session : keygen:'a keygen ->
+val update_session :
+  ?release:bool (* default false *)  ->
+  keygen:'a keygen ->
   allow_obsolete:bool -> 'b session ->
   Env.env -> Whyconf.config -> 'a env_session * bool
 (** reload the given session with the given environnement :
@@ -263,7 +270,7 @@ val add_metas_to_goal :
 exception NoTask
 val goal_task : 'key goal -> Task.task
 (** Return the task of a goal. Raise NoTask if the goal doesn't contain a task
-    (equivalent to 'key = notask) *)
+    (equivalent to 'key = notask if release_task is not used) *)
 
 val goal_task_option : 'key goal -> Task.task option
 (** Return the task of a goal. *)
@@ -439,7 +446,22 @@ val add_file :
 val remove_file : 'key file -> unit
 (** Remove a file *)
 
+(** {2 Free and recover task} *)
+(** Tasks are stored inside the goals. For releasing memory you can remove
+    them. Later you can recompute them *)
 
+val release_task: 'a goal -> unit
+  (** remove the task stored in this goal*)
+
+val release_sub_tasks: 'a goal -> unit
+  (** apply the previous function on this goal and its its sub-goal *)
+
+val recover_theory_tasks: 'a env_session -> 'a theory -> unit
+  (** Recover all the sub-goal (not only strict) of this theory *)
+
+val goal_task_or_recover: 'a env_session -> 'a goal -> Task.task
+  (** same as goal_task but recover the task goal and all the one of this
+      theory if this goal task have been released *)
 
 (** {2 Iterators} *)
 
@@ -488,47 +510,6 @@ val metas_iter : ('key any -> unit) -> 'key metas -> unit
 val file_iter : ('key any -> unit) -> 'key file -> unit
 val session_iter : ('key any -> unit) -> 'key session -> unit
 val iter : ('key any -> unit) -> 'key any -> unit
-
-(** {2 Some functorized interface (not very useful...)}*)
-
-
-(* Claude: if "not very useful" then -> removed
-module AddTransf (X : sig
-  type key
-  val keygen : key keygen
-
-  type goal
-  val goal : goal -> Ident.ident * expl * Task.task
-
-  type transf
-  val fold_transf : ('a -> goal -> 'a) -> 'a -> Task.task -> transf -> 'a
-end) : sig
-  val add_transformation : X.key goal -> string -> X.transf -> X.key transf
-end
-*)
-
-(*
-module AddFile(X : sig
-  type key
-  val keygen : key keygen
-
-  type goal
-  val goal : goal -> Ident.ident * expl * Task.task
-
-  type theory
-  val fold_theory : ('a -> goal -> 'a) -> 'a -> theory -> 'a
-
-  type file
-  val fold_file :
-    ('a -> Ident.ident (** thname *) -> theory -> 'a) ->
-    'a -> file -> 'a
-
-end) : sig
-  val add_file :
-    X.key session -> string -> ?format:string -> X.file -> X.key file
-end
-*)
-
 
 (*
 Local Variables:

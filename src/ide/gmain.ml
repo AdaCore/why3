@@ -1566,6 +1566,184 @@ to the <b>selected goals</b>";
 
 
 
+
+(*************)
+(* Run  menu *)
+(*************)
+
+let run_menu = factory#add_submenu "_Run"
+let run_factory = new GMenu.factory run_menu ~accel_group
+
+let eval const result =
+  let msg =
+    match Str.split (Str.regexp "\\.") const with
+      | [f;m;i] ->
+        begin
+          let e = env_session () in
+          let files = e.S.files in
+          try
+            let fi = Mstr.find f files in
+            try
+              let th = Mstr.find m fi in
+              begin
+                try
+                  let ls = Theory.ns_find_ls th.Theory.th_export [i] in
+                  match Decl.find_logic_definition th.Theory.th_known ls with
+                    | None ->
+                      Pp.sprintf
+                        "Symbol '%s' has no definition in theory '%s.%s'" i f m
+                    | Some d ->
+                      let l,t = Decl.open_ls_defn d in
+                      match l with
+                        | [] ->
+                          let t =
+                            Mlw_interp.eval_global_term e.S.env
+                              th.Theory.th_known t
+                          in
+                          Pp.sprintf "@[<hov 2>%a@]" Pretty.print_term t
+                        | _ ->
+                          Pp.sprintf
+                            "Symbol '%s' is not a constant in theory '%s.%s'"
+                            i f m
+                with Not_found ->
+                  Pp.sprintf
+                    "Constant '%s' not found in theory '%s.%s'" i f m
+              end
+            with Not_found ->
+              Pp.sprintf "theory '%s.%s' not found" f m;
+          with Not_found ->
+            Pp.sprintf "@[<hov 2>file '%s' not found. Files are: [%a]@]" f
+              (Pp.print_list Pp.comma Pp.string)
+              (Mstr.keys files)
+        end
+      | _ ->
+        "must be of the form 'file.module.ident'";
+  in
+  result#source_buffer#set_text msg
+
+let constant_to_evaluate = ref ""
+
+
+(*
+let selected_file = ref ""
+*)
+
+let evaluate_window () =
+  let dialog = GWindow.dialog ~modal:true
+    ~title:"Why3: evaluate constant" ~icon:!Gconfig.why_icon ()
+  in
+  let vbox = dialog#vbox in
+  let frame =
+    GBin.frame ~label:"Evaluation" ~shadow_type:`ETCHED_OUT
+    ~packing:vbox#add ()
+  in
+  let vbox = GPack.vbox ~packing:frame#add () in
+  let text =
+    "Enter the constant to evaluate under the form <theory name>.<identifier>"
+  in
+  let _ = GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:vbox#add () in
+  let exec_entry =
+    GEdit.entry ~text:!constant_to_evaluate ~packing:vbox#add ()
+  in
+  let (_ : GtkSignal.id) =
+    exec_entry#connect#changed ~callback:
+      (fun () -> constant_to_evaluate := exec_entry#text)
+  in
+(*
+  let hb = GPack.hbox ~homogeneous:false ~packing:vbox#pack () in
+  let e = env_session () in
+  let files_map = e.S.files in
+  let (files_combo, _) =
+    GEdit.combo_box_entry_text ~packing:hb#pack ()
+  in
+  let _,file_names =
+    Mstr.fold
+      (fun f _th (i,names) ->
+        if f = !selected_file then files_combo#set_active i;
+        (i+1, f::names))
+      files_map (0, [])
+  in
+  let (_store, column) =
+    GTree.store_of_list Gobject.Data.string file_names 
+  in
+  files_combo#set_text_column column;
+  let ( _ : GtkSignal.id) = files_combo#connect#changed
+    ~callback:(fun () ->
+      match files_combo#active_iter with
+      | None -> ()
+      | Some row ->
+        let s = files_combo#model#get ~row ~column in
+        selected_file := s)
+  in
+*)
+  let b = GButton.button ~label:"Run" ~packing:vbox#add () in
+  let text =
+    "Result:"
+  in
+  let _input = GMisc.label ~ypad:20 ~text ~xalign:0.0 ~packing:vbox#add () in
+(*
+  let _ = input#event#connect#key_press ~callback:
+    (fun k -> if GdkEvent.Key.keyval k = GdkKeysyms._Return then
+        eval !constant_to_evaluate view;
+      true)
+  in
+*)
+ let scroll =
+   GBin.scrolled_window
+     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+     ~shadow_type:`ETCHED_OUT ~packing:vbox#add ()
+ in
+ let view =
+   GSourceView2.source_view
+     ~editable:false
+     ~packing:scroll#add
+     ~height:100
+     ()
+ in
+  let (_ : GtkSignal.id) =
+    b#connect#clicked ~callback:(fun () -> eval !constant_to_evaluate view)
+  in
+  dialog#add_button "Close" `CLOSE ;
+  let _ = dialog#run () in
+  dialog#destroy ()
+
+let (_ : GMenu.image_menu_item) =
+  run_factory#add_image_item
+    ~label:"Evaluate a logic constant"
+    ~callback:evaluate_window
+    ()
+
+let function_to_execute = ref ""
+
+let execute_window () =
+  let dialog = GWindow.dialog ~modal:true
+    ~title:"Why3: execute function" ~icon:!Gconfig.why_icon ()
+  in
+  let vbox = dialog#vbox in
+  let text =
+    "Enter the function to execute under the form <module name>.<function name>"
+  in
+  let _ = GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:vbox#add () in
+  let exec_entry =
+    GEdit.entry ~text:!function_to_execute ~packing:vbox#add ()
+  in
+  let (_ : GtkSignal.id) =
+    exec_entry#connect#changed ~callback:
+      (fun () -> function_to_execute := exec_entry#text)
+  in
+  dialog#add_button "Close" `CLOSE ;
+  let ( _ : GWindow.Buttons.about) = dialog#run () in
+  dialog#destroy ()
+
+(*
+let (_ : GMenu.image_menu_item) =
+  run_factory#add_image_item
+    ~label:"Execute a WhyML function"
+    ~callback:execute_window
+    ()
+*)
+
+
 (*************)
 (* Help menu *)
 (*************)

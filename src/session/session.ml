@@ -42,6 +42,7 @@ type proof_attempt_status =
     | InternalFailure of exn (** external proof aborted by internal error *)
 
 type task_option = Task.task option
+type 'a hide = 'a option
 
 type ident_path =
   { ip_library : string list;
@@ -145,7 +146,7 @@ type 'a goal =
     mutable goal_checksum : Tc.checksum;
     mutable goal_shape : Tc.shape;
     mutable goal_verified : bool;
-    goal_task: task_option;
+    mutable goal_task: task_option;
     mutable goal_expanded : bool;
     goal_external_proofs : 'a proof_attempt PHprover.t;
     goal_transformations : 'a transf PHstr.t;
@@ -198,6 +199,7 @@ and 'a theory =
       mutable theory_goals : 'a goal list;
       mutable theory_verified : bool;
       mutable theory_expanded : bool;
+      mutable theory_task : Theory.theory hide;
     }
 
 and 'a file =
@@ -209,6 +211,7 @@ and 'a file =
       (** Not mutated after the creation *)
       mutable file_verified : bool;
       mutable file_expanded : bool;
+      mutable file_for_recovery : Theory.theory Mstr.t hide;
     }
 
 and 'a session =
@@ -227,6 +230,7 @@ type 'a env_session =
     { env : Env.env;
       mutable whyconf : Whyconf.config;
       loaded_provers : loaded_provers;
+      mutable files : Theory.theory Stdlib.Mstr.t Stdlib.Mstr.t;
       session : 'a session}
 
 let update_env_session_config e c = e.whyconf <- c
@@ -905,6 +909,7 @@ let raw_add_theory ~(keygen:'a keygen) ~(expanded:bool) mfile thname =
               theory_goals = [];
               theory_verified = false;
               theory_expanded = expanded;
+              theory_task = None;
             }
   in
   mth
@@ -918,6 +923,7 @@ let raw_add_file ~(keygen:'a keygen) ~(expanded:bool) session f fmt =
                 file_verified = false;
                 file_expanded = expanded;
                 file_parent  = session;
+                file_for_recovery = None;
               }
   in
   PHstr.replace session.session_files f mfile;
@@ -1343,67 +1349,6 @@ let set_file_expanded f b =
     List.iter (fun th -> set_theory_expanded th b) f.file_theories
 
 
-(** raw add_file *)
-let raw_add_file ~version ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file =
-  let add_goal parent acc goal =
-    let g =
-      let name,expl,task = x_goal goal in
-      raw_add_task ~version ~keygen:x_keygen ~expanded:true
-        parent name expl task
-    in g::acc
-  in
-  let add_file session f_name fmt file =
-    let rfile =
-      raw_add_file ~keygen:x_keygen ~expanded:true session f_name fmt
-    in
-    let add_theory acc thname theory =
-      let rtheory =
-        raw_add_theory ~keygen:x_keygen ~expanded:true rfile thname
-      in
-      let parent = Parent_theory rtheory in
-      let goals = x_fold_theory (add_goal parent) [] theory in
-      rtheory.theory_goals <- List.rev goals;
-      rtheory.theory_verified <- theory_verified rtheory;
-      rtheory::acc
-    in
-    let theories = x_fold_file add_theory [] file in
-    rfile.file_theories <- List.rev theories;
-    rfile
-  in
-  add_file
-
-(** nice functor *)
-
-(* Claude: "nice" ? but not used anyway
-module AddFile(X : sig
-  type key
-  val keygen : key keygen
-
-  type goal
-  val goal : goal -> Ident.ident * string option * Task.task
-
-  type theory
-  val fold_theory : ('a -> goal -> 'a) -> 'a -> theory -> 'a
-
-  type file
-  val fold_file :
-    ('a -> Ident.ident (** thname *) -> theory -> 'a) ->
-    'a -> file -> 'a
-
-end) = (struct
-  let add_file session fn ?format f =
-    let file = raw_add_file ~x_keygen:X.keygen ~x_goal:X.goal
-      ~version:Termcode.current_shape_version
-    ~x_fold_theory:X.fold_theory ~x_fold_file:X.fold_file session
-    fn format f in
-    check_file_verified notify file;
-    file
-end : sig
-  val add_file :
-    X.key session -> string -> ?format:string -> X.file -> X.key file
-end)
-*)
-
 (* add a why file from a session *)
 (** Read file and sort theories by location *)
 let read_file env ?format fn =
@@ -1423,26 +1368,49 @@ let read_file env ?format fn =
     (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
     ltheories,theories
 
-let add_file_return_theories ~keygen env ?format filename =
-  let x_keygen = keygen in
-  let x_goal = Termcode.goal_expl_task ~root:true in
-  let x_fold_theory f acc th =
-    let tasks = List.rev (Task.split_theory th None None) in
-    List.fold_left f acc tasks in
-  let x_fold_file f acc ordered_theories =
-    List.fold_left (fun acc (_,thname,th) -> f acc thname th) acc
-      ordered_theories in
-  dprintf debug "[Load] file '%s'@\n" filename;
-  let add_file = raw_add_file ~version:env.session.session_shape_version
-    ~x_keygen ~x_goal ~x_fold_theory ~x_fold_file in
-  let fname = Filename.concat env.session.session_dir filename in
-  let ordered_theories,theories = read_file env.env ?format fname in
-  let file = add_file env.session filename format ordered_theories in
-  check_file_verified notify file;
-  file,theories
-
 let add_file ~keygen env ?format filename =
-  fst (add_file_return_theories  ~keygen env ?format filename)
+  let version = env.session.session_shape_version in
+  let add_goal parent acc goal =
+    let g =
+      let name,expl,task = Termcode.goal_expl_task ~root:true goal in
+      raw_add_task
+        ~version
+        ~keygen ~expanded:true
+        parent name expl task
+    in g::acc
+  in
+  let add_theory acc rfile thname theory =
+    let rtheory =
+      raw_add_theory ~keygen ~expanded:true rfile thname
+    in
+    let parent = Parent_theory rtheory in
+    let tasks = List.rev (Task.split_theory theory None None) in
+    let goals = List.fold_left (add_goal parent) [] tasks in
+    rtheory.theory_goals <- List.rev goals;
+    rtheory.theory_verified <- theory_verified rtheory;
+    rtheory.theory_task <- Some theory;
+    rtheory::acc
+  in
+  let add_file session f_name fmt ordered_theories =
+    let rfile = raw_add_file ~keygen ~expanded:true session f_name fmt in
+    let theories =
+      List.fold_left (fun acc (_,thname,th) -> add_theory acc rfile thname th)
+        [] ordered_theories in
+    rfile.file_theories <- List.rev theories;
+    rfile
+  in
+  let fname = Filename.concat env.session.session_dir filename in
+  Debug.dprintf debug "[Session] read file@\n";
+  let ordered_theories,theories = read_file env.env ?format fname in
+  Debug.dprintf debug "[Session] create tasks@\n";
+  let file = add_file env.session filename format ordered_theories in
+  let fname =
+    Filename.basename (Filename.chop_extension filename)
+  in
+  env.files <- Mstr.add fname theories env.files;
+  file.file_for_recovery <- Some theories;
+  check_file_verified notify file;
+  file
 
 let remove_file file =
   let s = file.file_parent in
@@ -1809,53 +1777,13 @@ exception Ts_not_found of tysymbol
 exception Ls_not_found of lsymbol
 exception Pr_not_found of prsymbol
 
-(** ~theories is the current theory library path empty : [] *)
-let rec merge_any_goal ~keygen ~theories env obsolete from_goal to_goal =
-  set_goal_expanded to_goal from_goal.goal_expanded;
-  PHprover.iter (merge_proof ~keygen obsolete to_goal)
-    from_goal.goal_external_proofs;
-  PHstr.iter (merge_trans ~keygen ~theories env to_goal)
-    from_goal.goal_transformations;
-  Mmetas_args.iter (merge_metas ~keygen ~theories env to_goal)
-    from_goal.goal_metas
 
 
-and merge_trans ~keygen ~theories env to_goal _ from_transf =
-  try
-    let from_transf_name = from_transf.transf_name in
-    let to_goal_name = to_goal.goal_name in
-    dprintf debug "[Reload] transformation %s for goal %s @\n"
-      from_transf_name to_goal_name.Ident.id_string;
-    let to_transf =
-      try
-        add_registered_transformation
-          ~keygen env from_transf_name to_goal
-      with exn when not (Debug.test_flag Debug.stack_trace) ->
-        dprintf debug "[Reload] transformation %s produce an error:%a"
-          from_transf_name Exn_printer.exn_printer exn;
-        raise Exit
-    in
-    set_transf_expanded to_transf from_transf.transf_expanded;
-    let associated =
-      dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
-        env.session.session_shape_version;
-      AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
-    List.iter (function
-    | (to_goal, Some (from_goal, obsolete)) ->
-      merge_any_goal ~keygen ~theories env obsolete  from_goal to_goal
-    | (_, None) -> ()
-    ) associated
-  with Exit -> ()
 
-
-(** convert the ident from the old task to the ident at the same
-    position in the new task *)
-and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
+let merge_metas_in_task ~theories env task from_metas =
   (** Find in the new task the new symbol (ts,ls,pr) *)
   (** We order the position bottom up and find the ident as we go
       through the task *)
-  dprintf debug "[Reload] metas for goal %s@\n"
-    to_goal.goal_name.Ident.id_string;
 
   (** hashtbl that will contain the conversion *)
   let hts = Hts.create 4 in
@@ -1976,11 +1904,118 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
       dprintf debug "Remove a meta during merge: meta %s unknown@\n" s;
       acc
   in
-  let goal,task = Task.task_separate_goal (goal_task to_goal) in
+  let goal,task = Task.task_separate_goal task in
   let metas,task =
     Mstr.fold_left add_meta (Mstr.empty,task) from_metas.metas_added
   in
-  let task = Task.add_tdecl task goal in
+  Task.add_tdecl task goal,metas,to_idpos,!obsolete
+
+(** Release and recover goal task *)
+let release_task g =
+  Debug.dprintf debug "[Session] release %s@." g.goal_name.id_string;
+  g.goal_task <- None
+
+let rec release_sub_tasks g =
+  release_task g;
+  PHstr.iter (fun _ t -> List.iter release_sub_tasks t.transf_goals)
+    g.goal_transformations;
+  Mmetas_args.iter (fun _ t -> release_sub_tasks t.metas_goal) g.goal_metas
+
+exception UnrecoverableTask of Ident.ident
+
+let rec recover_sub_tasks ~theories env_session task g =
+  g.goal_task <- Some task;
+  (** Check that the sum and shape don't change (the order is kept)
+      It seems an acceptable limitation. Non-deterministic transformation seems
+      ugly.
+  *)
+  let version = env_session.session.session_shape_version in
+  let sum = Termcode.task_checksum ~version task in
+  let shape = Termcode.t_shape_task ~version task in
+  if not (Termcode.equal_checksum sum g.goal_checksum &&
+          Termcode.equal_shape shape g.goal_shape) then
+    raise (UnrecoverableTask g.goal_name);
+  PHstr.iter (fun _ t ->
+      let task = goal_task g in
+      let subgoals = Trans.apply_transform t.transf_name env_session.env task in
+      List.iter2 (recover_sub_tasks ~theories env_session) subgoals t.transf_goals)
+    g.goal_transformations;
+  Mmetas_args.iter (fun _ t ->
+      let task,_metas,_to_idpos,_obsolete =
+        merge_metas_in_task ~theories env_session task t in
+      (** It is better to keep the original metas and idpos *)
+      (** If it is obsolete the next task will see it *)
+      recover_sub_tasks ~theories env_session task t.metas_goal
+    ) g.goal_metas
+
+let recover_theory_tasks env_session th =
+  let theories = Opt.get_exn NoTask th.theory_parent.file_for_recovery in
+  let theory = Opt.get_exn NoTask th.theory_task in
+  let tasks = List.rev (Task.split_theory theory None None) in
+  List.iter2 (recover_sub_tasks ~theories env_session) tasks th.theory_goals
+
+let rec theory_goal g =
+  match g.goal_parent with
+  | Parent_theory th -> th
+  | Parent_transf t -> theory_goal t.transf_parent
+  | Parent_metas t -> theory_goal t.metas_parent
+
+let goal_task_or_recover env_session g =
+  match g.goal_task with
+  | Some task -> task
+  | None ->
+    recover_theory_tasks env_session (theory_goal g);
+    Opt.get g.goal_task
+
+(** merge session *)
+
+(** ~theories is the current theory library path empty : [] *)
+let rec merge_any_goal ~keygen ~theories env obsolete from_goal to_goal =
+  set_goal_expanded to_goal from_goal.goal_expanded;
+  PHprover.iter (merge_proof ~keygen obsolete to_goal)
+    from_goal.goal_external_proofs;
+  PHstr.iter (merge_trans ~keygen ~theories env to_goal)
+    from_goal.goal_transformations;
+  Mmetas_args.iter (merge_metas ~keygen ~theories env to_goal)
+    from_goal.goal_metas
+
+
+and merge_trans ~keygen ~theories env to_goal _ from_transf =
+  try
+    let from_transf_name = from_transf.transf_name in
+    let to_goal_name = to_goal.goal_name in
+    dprintf debug "[Reload] transformation %s for goal %s @\n"
+      from_transf_name to_goal_name.Ident.id_string;
+    let to_transf =
+      try
+        add_registered_transformation
+          ~keygen env from_transf_name to_goal
+      with exn when not (Debug.test_flag Debug.stack_trace) ->
+        dprintf debug "[Reload] transformation %s produce an error:%a"
+          from_transf_name Exn_printer.exn_printer exn;
+        raise Exit
+    in
+    set_transf_expanded to_transf from_transf.transf_expanded;
+    let associated =
+      dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
+        env.session.session_shape_version;
+      AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
+    List.iter (function
+    | (to_goal, Some (from_goal, obsolete)) ->
+      merge_any_goal ~keygen ~theories env obsolete  from_goal to_goal
+    | (_, None) -> ()
+    ) associated
+  with Exit -> ()
+
+(** convert the ident from the old task to the ident at the same
+    position in the new task *)
+and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
+  dprintf debug "[Reload] metas for goal %s@\n"
+    to_goal.goal_name.Ident.id_string;
+
+  let task,metas,to_idpos,obsolete =
+    merge_metas_in_task ~theories env (goal_task to_goal) from_metas in
+
   let to_metas =
     raw_add_metas ~keygen ~expanded:from_metas.metas_expanded
       to_goal metas to_idpos
@@ -1992,7 +2027,7 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
   in
   to_metas.metas_goal <- to_goal;
   dprintf debug "[Reload] metas done@\n";
-  merge_any_goal ~keygen ~theories env !obsolete from_metas.metas_goal to_goal
+  merge_any_goal ~keygen ~theories env obsolete from_metas.metas_goal to_goal
 
 and merge_metas ~keygen ~theories env to_goal s from_metas =
   try
@@ -2003,7 +2038,8 @@ and merge_metas ~keygen ~theories env to_goal s from_metas =
 
 exception OutdatedSession
 
-let merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th =
+let merge_theory
+    ?(release=false) ~keygen ~theories env ~allow_obsolete from_th to_th =
   set_theory_expanded to_th from_th.theory_expanded;
   let from_goals = List.fold_left
     (fun from_goals g ->
@@ -2024,13 +2060,15 @@ let merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th =
             if not allow_obsolete then raise OutdatedSession;
             found_obsolete := true;
           end;
-        merge_any_goal ~keygen ~theories env goal_obsolete from_goal to_goal
+        merge_any_goal ~keygen ~theories env goal_obsolete from_goal to_goal;
+        if release then release_sub_tasks to_goal
       with
-        | Not_found when allow_obsolete -> ()
+        | Not_found when allow_obsolete ->
+          if release then release_sub_tasks to_goal
         | Not_found -> raise OutdatedSession
     ) to_th.theory_goals
 
-let merge_file ~keygen ~theories env ~allow_obsolete from_f to_f =
+let merge_file ?release ~keygen ~theories env ~allow_obsolete from_f to_f =
   dprintf debug "[Info] merge_file, shape_version = %d@\n"
     env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
@@ -2047,7 +2085,7 @@ let merge_file ~keygen ~theories env ~allow_obsolete from_f to_f =
           (* TODO: remove this later when all sessions are updated *)
           with Not_found -> Mstr.find ("WP "^name) from_theories
         in
-        merge_theory ~keygen ~theories env ~allow_obsolete from_th to_th
+        merge_theory ?release ~keygen ~theories env ~allow_obsolete from_th to_th
       with
         | Not_found when allow_obsolete -> ()
         | Not_found -> raise OutdatedSession
@@ -2075,7 +2113,7 @@ let recompute_all_shapes session =
   session.session_shape_version <- Termcode.current_shape_version;
   PHstr.iter recompute_all_shapes_file session.session_files
 
-let update_session ~keygen ~allow_obsolete old_session env whyconf =
+let update_session ?release ~keygen ~allow_obsolete old_session env whyconf =
   dprintf debug "[Info] update_session: shape_version = %d@\n"
     old_session.session_shape_version;
   let new_session =
@@ -2086,19 +2124,30 @@ let update_session ~keygen ~allow_obsolete old_session env whyconf =
     { session = new_session;
       env = env;
       whyconf = whyconf;
+      files = Mstr.empty;
       loaded_provers = PHprover.create 5;
     }
   in
   found_obsolete := false;
-  PHstr.iter (fun _ old_file ->
-    dprintf debug "[Load] file '%s'@\n" old_file.file_name;
-    let new_file,theories = add_file_return_theories
-      ~keygen new_env_session
-      ?format:old_file.file_format old_file.file_name
-    in
-    merge_file ~keygen ~theories
-      new_env_session ~allow_obsolete old_file new_file)
-    old_session.session_files;
+  let files =
+    PHstr.fold (fun _ old_file acc ->
+      dprintf debug "[Load] file '%s'@\n" old_file.file_name;
+      let new_file = add_file
+        ~keygen new_env_session
+        ?format:old_file.file_format old_file.file_name
+      in
+      let theories = Opt.get new_file.file_for_recovery in
+      dprintf debug "[Merge] file '%s'@\n" old_file.file_name;
+      merge_file ~keygen ~theories
+        ?release new_env_session ~allow_obsolete old_file new_file;
+      let fname =
+        Filename.basename (Filename.chop_extension old_file.file_name)
+      in
+      Mstr.add fname theories acc)
+      old_session.session_files
+      Mstr.empty
+  in
+  new_env_session.files <- files;
   dprintf debug "[Info] update_session: done@\n";
   let obsolete =
     if old_session.session_shape_version <> Termcode.current_shape_version
@@ -2235,7 +2284,6 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
   ) associated;
   to_transf
 
-
 let get_project_dir fname =
   if not (Sys.file_exists fname) then raise Not_found;
   let d =
@@ -2272,6 +2320,10 @@ let () = Exn_printer.register
         Format.fprintf fmt
           "The session@ is@ outdated@ (not@ in@ sync@ with@ the@ current@ \
            file).@ In@ this@ configuration@ it@ is@ forbidden."
+      | UnrecoverableTask id ->
+        Format.fprintf fmt
+          "A@ non-deterministic@ transformation@ is@ used,@ the@ task@ of@ \
+           the@ goal@ %s@ can't@ be@ recovered." id.id_string
       | _ -> raise exn)
 
 

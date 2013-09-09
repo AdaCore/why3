@@ -1,0 +1,136 @@
+
+
+module M
+
+  use import int.Int
+
+  let x () : int = 13 * 3 + 7 - 4
+
+  use import list.Append
+
+  let y () : list int =
+    Cons 12 (Cons 34 (Cons 56 Nil)) ++ Cons 78 (Cons 90 Nil)
+
+end
+
+module Map
+
+  use import int.Int
+  use import map.Map
+
+  exception Found int
+
+  let search (t:map int int) (len:int) (v:int) : int =
+    try
+      for i=0 to len-1 do
+        if t[i] = v then raise (Found i)
+      done;
+      -1
+    with Found i -> i
+    end
+
+  constant t : map int int = (const 0)[0 <- 12][1 <- 42][2 <- 67]
+
+  let test12 () = search t 3 12
+  let test42 () = search t 3 42
+  let test67 () = search t 3 67
+  let test0 () = search t 3 0
+
+end
+
+module Mut
+
+  use import int.Int
+
+  type t = { mutable a : int; c: int ; mutable b : int }
+
+  let e0 () =
+    let y = { a = 1; c = 43; b = 2 } in
+    y
+
+  let e1 () =
+    let y = { a = 1; c = 43; b = 2 } in
+    y.a <- 3;
+    y
+
+  let t0 () =
+    let y = { a = 1; c = 43; b = 2 } in
+    y.a + y.c
+
+  let t1 () =
+    let y = { a = 1; c = 43; b = 2 } in
+    let z = y in
+    y.a + z.b
+
+  let t2 () =
+    let y = { a = 1; c = 43; b = 2 } in
+    y.a <- 3;
+    y.a + y.b
+
+  let t3 () =
+    let y = { a = 1; c = 43; b = 2 } in
+    let z = y in
+    z.a <- 3;
+    y.a
+
+
+  type refint = { mutable i : int }
+
+  let test () =
+    let x = { i = 0 } in
+    let s = { i = 0 } in
+    while x.i <= 10 do
+      s.i <- s.i + x.i;
+      x.i <- x.i + 1
+    done;
+    s.i
+
+
+  let f m : int
+  = let x = { i = 2 } in
+    let y = { i = 8 } in
+    let sum = { i = 0 } in
+    while x.i <= m do
+      let tmp = x.i in
+      x.i <- y.i;
+      y.i <- 4 * y.i + tmp;
+      sum.i <- sum.i + tmp
+    done;
+    sum.i
+
+  let run1 () = f 10 (* should be 10 *)
+
+  let run2 () = f 4000000 (* should be 4613732 *)
+
+
+end
+
+module Ref
+
+  use import ref.Ref
+
+  let y () : ref int = { contents = 0 }
+
+  let z () : int =
+    let r = ref 0 in r := 42; !r
+
+  use import int.Int
+
+  let f m : int
+  = let x = ref 2 in
+    let y = ref 8 in
+    let sum = ref 0 in
+    while !x <= m do
+      let tmp = !x in
+      x := !y;
+      y := 4 * !y + tmp;
+      sum := !sum + tmp
+    done;
+    !sum
+
+  let run1 () = f 10 (* should be 10 *)
+
+  let run2 () = f 4000000 (* should be 4613732 *)
+
+
+end

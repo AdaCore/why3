@@ -334,10 +334,11 @@ let schedule_delayed_action t callback =
 (*  session function      *)
 (**************************)
 
-let update_session ~allow_obsolete old_session env whyconf  =
+let update_session ?release ~allow_obsolete old_session env whyconf  =
   O.reset ();
   let (env_session,_) as res =
-    update_session ~keygen:O.create ~allow_obsolete old_session env whyconf in
+    update_session ?release
+      ~keygen:O.create ~allow_obsolete old_session env whyconf in
   dprintf debug "Init_session@\n";
   init_session env_session.session;
   res
@@ -503,7 +504,7 @@ let run_external_proof_v3 eS eT a callback =
           ~driver:npc.prover_driver
           ~callback:cb
           eT
-          (goal_task a.proof_parent)
+          (goal_task_or_recover eS a.proof_parent)
       with NoFile f ->
         callback a ap 0 None (MissingFile f)
     end
@@ -713,12 +714,19 @@ let check_goal_and_children eS eT todo g =
   goal_iter_proof_attempt (check_external_proof eS eT todo) g
 *)
 
-let check_all eS eT ~callback =
+let check_all ?(release=false) eS eT ~callback =
   dprintf debug "[Sched] check all@.%a@." print_session eS.session;
  let todo = Todo.create [] push_report callback in
   Todo.start todo;
-  session_iter_proof_attempt (check_external_proof eS eT todo)
-    eS.session;
+  let check_top_goal g =
+    goal_iter_proof_attempt (check_external_proof eS eT todo) g;
+    if release then release_sub_tasks g
+  in
+  PHstr.iter (fun _ file ->
+      List.iter  (fun t ->
+          List.iter  check_top_goal t.theory_goals)
+        file.file_theories)
+    eS.session.session_files;
   Todo.stop todo
 
 
@@ -777,7 +785,8 @@ let play_all eS eT ~callback ~timelimit ~memlimit l =
 (** Transformation *)
 
 let transformation_on_goal_aux eS tr keep_dumb_transformation g =
-  let subgoals = Trans.apply_transform tr eS.env (goal_task g) in
+  let gtask = goal_task_or_recover eS g in
+  let subgoals = Trans.apply_transform tr eS.env gtask in
   let b = keep_dumb_transformation ||
     match subgoals with
       | [task] ->
@@ -791,7 +800,7 @@ let transformation_on_goal_aux eS tr keep_dumb_transformation g =
                    (Obj.magic task); *)
               (* *\) *)
               (* s1 <> s2 *)
-        not (Task.task_equal task (goal_task g))
+        not (Task.task_equal task gtask)
       | _ -> true
   in
   if b then
@@ -870,11 +879,8 @@ let edit_proof_v3 eS sched ~default_editor callback a =
         with Not_found -> default_editor
     in
     let file = update_edit_external_proof eS a in
-    dprintf debug "[Editing] goal %a with command '%s' on file %s@."
-      (fun fmt a -> pp_print_string fmt
-        (Task.task_goal (goal_task a.proof_parent))
-        . Decl.pr_name.Ident.id_string)
-      a editor file;
+    dprintf debug "[Editing] goal %s with command '%s' on file %s@."
+      a.proof_parent.goal_name.Ident.id_string editor file;
     schedule_edition sched editor file (fun res -> callback a res)
 
 let edit_proof eS sched ~default_editor a =

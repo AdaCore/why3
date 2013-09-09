@@ -33,6 +33,18 @@ theory Inorder "inorder traversal"
 
 end
 
+theory Preorder "preorder traversal"
+
+  use export Tree
+  use export list.Append
+
+  function preorder (t: tree 'a) : list 'a = match t with
+    | Empty -> Nil
+    | Node l x r -> Cons x (preorder l ++ preorder r)
+  end
+
+end
+
 theory InorderLength
 
   use import Size

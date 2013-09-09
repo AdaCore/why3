@@ -77,7 +77,7 @@ let real_const_hex i f e =
 
 (** Printing *)
 
-let any_to_dec radix s =
+let compute_any radix s =
   let n = String.length s in
   let rec compute acc i =
     if i = n then
@@ -91,7 +91,17 @@ let any_to_dec radix s =
       assert (v < radix);
       compute (add_int_big_int v (mult_int_big_int radix acc)) (i + 1)
     end in
-  string_of_big_int (compute zero_big_int 0)
+  (compute zero_big_int 0)
+
+let compute_int c =
+  match c with
+  | IConstDec s -> compute_any 10 s
+  | IConstHex s -> compute_any 16 s
+  | IConstOct s -> compute_any 8 s
+  | IConstBin s -> compute_any 2 s
+
+let any_to_dec radix s =
+  string_of_big_int (compute_any radix s)
 
 let power2 n =
   string_of_big_int (power_int_positive_int 2 n)

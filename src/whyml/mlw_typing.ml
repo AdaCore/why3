@@ -1905,6 +1905,7 @@ let add_pdecl ~wp loc uc = function
   | Dlet (id, gh, e) ->
       let id, gh = add_lemma_label ~top:true id gh in
       let e = dexpr (create_denv uc) e in
+      let uc = flush_tuples uc in
       let pd = match e.de_desc with
         | DEfun (bl, tr) ->
             let fd = expr_fun (create_lenv uc) id gh bl tr in
@@ -1918,6 +1919,7 @@ let add_pdecl ~wp loc uc = function
       add_pdecl_with_tuples ~wp uc pd
   | Dletrec fdl ->
       let fdl = dletrec ~top:true (create_denv uc) fdl in
+      let uc = flush_tuples uc in
       let fdl = expr_rec (create_lenv uc) fdl in
       let pd = create_rec_decl fdl in
       add_pdecl_with_tuples ~wp uc pd
@@ -1928,6 +1930,7 @@ let add_pdecl ~wp loc uc = function
       add_pdecl_with_tuples ~wp uc pd
   | Dparam (id, gh, tyv) ->
       let tyv, _ = dtype_v (create_denv uc) tyv in
+      let uc = flush_tuples uc in
       let tyv = type_v (create_lenv uc) Spv.empty vars_empty Stv.empty tyv in
       let lv = match tyv with
         | VTvalue v ->
