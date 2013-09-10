@@ -306,13 +306,14 @@ else
    enable_html_doc=no
 fi
 
-# checking for hevea
-if test "$enable_html_doc" = yes ; then
+# checking for hevea (note that the pdf documentation uses hevea.sty)
+if test "$enable_doc" = yes ; then
    AC_CHECK_PROG(HEVEA,hevea,hevea,no)
    if test "$HEVEA" = no ; then
+      enable_doc=no
       enable_html_doc=no
-      reason_html_doc=" (hevea not found)"
-      AC_MSG_WARN([Cannot find hevea, HTML documentation disabled.])
+      reason_doc=" (hevea not found)"
+      AC_MSG_WARN([Cannot find hevea, documentation disabled.])
    fi
 fi
 
