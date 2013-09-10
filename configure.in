@@ -391,6 +391,7 @@ if test "$enable_bench" = yes ; then
       SQLITE3LIB="+sqlite3"
       AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_bench=no)
       if test "$enable_bench" = no; then
+        reason_bench=" (sqlite3 not found)"
         AC_MSG_WARN([Lib sqlite3 not found, why3bench disabled.])
       fi
    fi
@@ -546,6 +547,7 @@ if test "$enable_hypothesis_selection" = yes; then
      OCAMLGRAPHLIB="+ocamlgraph"
      AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,,enable_hypothesis_selection=no)
      if test "$enable_hypothesis_selection" = no; then
+       reason_hypothesis_selection=" (ocamlgraph not found)"
        AC_MSG_WARN([Lib ocamlgraph not found, hypothesis selection disabled.])
      fi
    fi
@@ -698,10 +700,10 @@ echo "    Library path        : $OCAMLLIB"
 echo "    Native compilation  : $enable_native_code"
 echo "    Profiling           : $enable_profiling"
 echo "IDE                     : $enable_ide$reason_ide"
-echo "Bench tool              : $enable_bench"
-echo "Documentation           : $enable_doc"
+echo "Bench tool              : $enable_bench$reason_bench"
+echo "Documentation           : $enable_doc$reason_doc"
 if test "$enable_doc" = yes ; then
-   echo "    HTML                : $enable_html_doc"
+   echo "    HTML                : $enable_html_doc$reason_html_doc"
 fi
 echo "Coq support             : $enable_coq_support$reason_coq_support"
 if test "$enable_coq_support" = yes ; then
@@ -725,7 +727,7 @@ if test "$enable_frama_c" = yes ; then
    echo "    Share path          : $FRAMAC_SHARE"
    echo "    Library path        : $FRAMAC_LIBDIR"
 fi
-echo "Hypothesis selection    : $enable_hypothesis_selection"
+echo "Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
 if test "$enable_local" = yes ; then
    echo "Installable             : no"
 else
