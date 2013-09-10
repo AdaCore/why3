@@ -95,9 +95,6 @@ let register expl task result valid tracefile =
     tracefile     = tracefile } in
   msg_set := msg :: !msg_set
 
-let clear () =
-  msg_set := []
-
 let print_msg fmt m =
   if m.result then Format.fprintf fmt "info: ";
   Format.fprintf fmt "%a" Gnat_expl.print_reason (Gnat_expl.get_reason m.expl);
@@ -154,8 +151,6 @@ let print_statistics fmt msg =
   else if msg.time <> 0.0 then
     Format.fprintf fmt "%.2fs" msg.time
 
-let all_messages = ref []
-
 let write_proof_result_file l =
   Pp.print_in_file (fun fmt ->
     Format.fprintf fmt "[@.";
@@ -168,13 +163,12 @@ let write_proof_result_file l =
     Format.fprintf fmt "]@."
     ) (Gnat_config.unit_name ^ ".proof")
 
-let write_proof_result_file () =
-  write_proof_result_file (List.sort cmp !all_messages)
+let write_proof_result_file msg =
+  write_proof_result_file msg
 
-let print_messages_and_clear () =
-  all_messages := List.rev_append !msg_set !all_messages;
+let print_messages () =
   let l = List.sort cmp !msg_set in
-  clear ();
+  write_proof_result_file l;
   List.iter (fun msg ->
     if not msg.result || Gnat_config.report <> Gnat_config.Fail then begin
       (* we only print the message if asked for *)

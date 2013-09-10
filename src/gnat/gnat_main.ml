@@ -153,7 +153,6 @@ let normal_handle_one_subp subp =
      end);
      Gnat_objectives.do_scheduled_jobs ();
      Gnat_objectives.clear ();
-     Gnat_report.print_messages_and_clear ()
    end
 
 let all_split_subp subp =
@@ -176,7 +175,7 @@ let _ =
       | Gnat_config.Path_WP
       | Gnat_config.No_Split ->
          Gnat_objectives.iter_subps normal_handle_one_subp;
-         Gnat_report.write_proof_result_file ();
+         Gnat_report.print_messages ();
          Gnat_objectives.save_session ()
       | Gnat_config.All_Split ->
          Gnat_objectives.iter_subps all_split_subp
