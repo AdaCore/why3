@@ -13,7 +13,16 @@ let equal_line l1 l2 =
    let l1 = List.hd l1 and l2 = List.hd l2 in
    l1.line = l2.line && l1.file = l2.file
 
-let compare = Pervasives.compare
+let compare_simple = Pervasives.compare
+
+let rec compare_loc a b =
+  match a, b with
+  | [], [] -> 0
+  | [], _ -> -1
+  | _, [] -> 1
+  | x::xs, y::ys ->
+      let c = compare_simple x y in
+      if c = 0 then compare_loc xs ys else c
 
 let orig_loc l =
    (* the original source is always the last source location *)

@@ -37,7 +37,7 @@ type expl =
   }
 
 let check_compare c1 c2 =
-   let c = Gnat_loc.compare c1.loc c2.loc in
+   let c = Gnat_loc.compare_loc c1.loc c2.loc in
    if c = 0 then Pervasives.compare c1.reason c2.reason
    else c
 

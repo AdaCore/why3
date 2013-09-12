@@ -35,8 +35,6 @@ type objective = Gnat_expl.expl
 (* an objective is identified by its explanation, which contains the source
    location and the kind of the check *)
 
-type trace = Gnat_loc.loc list
-
 type status =
    | Proved
    | Not_Proved
@@ -256,21 +254,6 @@ let further_split goal =
          end
    in
    split (find_next_transformation goal)
-
-
-let why3_says_goal_is_verified goal =
-   (* this is a partial check to verify that gnatwhy3 and why3 agree. We only
-      check that Why3 says that the goal is verified (all subgoals proved),
-      however this does *not* correspond to an objective. *)
-   let main_goal =
-      if is_full_split_goal goal then
-         match goal.Session.goal_parent with
-         | Session.Parent_theory _ | Session.Parent_metas _ -> assert false
-         | Session.Parent_transf t -> t.Session.transf_parent
-      else
-         goal
-   in
-   main_goal.Session.goal_verified
 
 let register_result goal result =
    let obj = get_objective goal in
@@ -524,7 +507,7 @@ let display_progress () =
    end
 
 let compare_by_sloc subp1 subp2 =
-   Gnat_loc.compare
+   Gnat_loc.compare_loc
      subp1.subp_entity.Gnat_expl.subp_loc
      subp2.subp_entity.Gnat_expl.subp_loc
 

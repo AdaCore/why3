@@ -34,6 +34,6 @@ val orig_loc : loc -> simple_loc
 val equal_line : loc -> loc -> bool
 (* compare two locations by file and line only, ignoring the column *)
 
-val compare : loc -> loc -> int
+val compare_loc : loc -> loc -> int
 
 module S : Extset.S with type M.key = loc
