@@ -16,6 +16,7 @@ open Mlw_expr
 type env = {
   mknown : Mlw_decl.known_map;
   tknown : Decl.known_map;
+  regenv : region Mreg.t;
   vsenv : (ity option * term) Mvs.t;
 }
 
@@ -305,6 +306,14 @@ let rec update_rec env s ity t =
 (*
                             eprintf "found a mutable field, looking in store -> ";
 *)
+                            (* find if region r is a region parameter and if yes
+                               substitute it *)
+                            let r =
+                              try
+                                Mreg.find r env.regenv 
+                              with Not_found -> r
+                            in
+                            (* look for r in store *)
                             let t =
                               try
                                 Mreg.find r s
@@ -492,6 +501,7 @@ let eval_global_term env km t =
   let env =
     { mknown = Ident.Mid.empty;
       tknown = km;
+      regenv = Mreg.empty;
       vsenv = Mvs.empty;
     }
   in
@@ -589,15 +599,43 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         end
       | LetA _ -> Irred e, s
     end
-  | Eapp(e,pvs,_spec) ->
-    begin match eval_expr env s e with
+  | Eapp(e1,pvs,_spec) ->
+    begin match eval_expr env s e1 with
       | Fun(ps,lam,args,n), s' ->
         if n > 1 then
           Fun(ps,lam,pvs::args,n-1), s'
         else
-        let args = List.rev_map (fun pvs -> get_pvs env s pvs) (pvs::args) in
-        let env' = multibind_pvs lam.l_args args env in
-        eval_expr env' s' lam.l_expr
+        let args' = List.rev_map (fun pvs -> get_pvs env s pvs) (pvs::args) in
+        let env' = multibind_pvs lam.l_args args' env in
+        let args_ty = List.rev_map (fun pvs -> pvs.pv_ity) (pvs::args) in
+        let ity_result =
+          match e.e_vty with
+            | VTvalue ity -> ity
+            | VTarrow _ -> assert false
+        in
+        let subst =
+          Mlw_ty.aty_vars_match ps.ps_subst ps.ps_aty args_ty ity_result
+        in
+        let subst = subst.ity_subst_reg in
+        let env'' = { env' with regenv = 
+            Mreg.union
+              (fun _ _ -> assert false)
+              subst env'.regenv }
+        in
+        (* *)
+        eprintf "@[Evaluating function body of %s in regenv: %a@\nand state: %a@]@."
+          ps.ps_name.Ident.id_string
+          (Pp.print_list Pp.comma 
+             (fun fmt (r1,r2) ->
+               fprintf fmt "@[%a -> %a@]" 
+                 Mlw_pretty.print_reg r1
+                 Mlw_pretty.print_reg r2))
+          (Mreg.bindings env''.regenv)
+          print_state s';
+        let r,s'' = eval_expr env'' s' lam.l_expr in
+        printf "@[   -> result: %a@\nstate: %a@]@." 
+          print_result r print_state s'';
+        r,s''
       | _ -> Irred e, s
     end
   | Earrow ps ->
@@ -700,7 +738,11 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     eprintf "updating region <%a> with value %a@."
       Mlw_pretty.print_reg reg Pretty.print_term t;
 *)
-    Normal t_void, Mreg.add reg t s
+    let r = 
+      try Mreg.find reg env.regenv 
+      with Not_found -> reg
+    in
+    Normal t_void, Mreg.add r t s
   | Erec _
   | Eghost _
   | Eany _
@@ -731,7 +773,17 @@ let eval_global_expr env mkm tkm e =
   let env = {
     mknown = mkm;
     tknown = tkm;
+    regenv = Mreg.empty;
     vsenv = Mvs.empty;
   }
   in
   eval_expr env Mreg.empty e
+
+
+
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. bin/why3.byte"
+End:
+*)

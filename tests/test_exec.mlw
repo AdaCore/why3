@@ -76,6 +76,12 @@ module Mut
 
   type refint = { mutable i : int }
 
+  let y () : refint = { i = 0 }
+
+  let z () : int =
+    let r = { i = 0 } in r.i <- 42; r.i
+
+
   let test () =
     let x = { i = 0 } in
     let s = { i = 0 } in
