@@ -144,4 +144,10 @@ module FibonacciLogarithmic
   let fibo n requires { n >= 0 } ensures { result = fib n } =
     let _, b = logfib n in b
 
+
+  let test0 () = fibo 0
+  let test1 () = fibo 1
+  let test7 () = fibo 7
+  let test42 () = fibo 42
+
 end

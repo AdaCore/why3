@@ -622,7 +622,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
               (fun _ _ -> assert false)
               subst env'.regenv }
         in
-        (* *)
+        (* 
         eprintf "@[Evaluating function body of %s in regenv: %a@\nand state: %a@]@."
           ps.ps_name.Ident.id_string
           (Pp.print_list Pp.comma 
@@ -632,9 +632,12 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
                  Mlw_pretty.print_reg r2))
           (Mreg.bindings env''.regenv)
           print_state s';
+        *)
         let r,s'' = eval_expr env'' s' lam.l_expr in
+(*
         printf "@[   -> result: %a@\nstate: %a@]@." 
           print_result r print_state s'';
+*)
         r,s''
       | _ -> Irred e, s
     end
