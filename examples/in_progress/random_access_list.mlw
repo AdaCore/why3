@@ -1,0 +1,114 @@
+
+(*
+  Purely Functional Random-Access Lists
+    Chris Okasaki, FPCA, 1995.
+  (thanks to Simon Cruanes for suggesting this example)
+*)
+
+module RandomAccessList
+
+  use import int.Int
+  use import list.Append
+  use import list.HdTl
+  use import list.Nth
+
+  type tree 'a =
+    | Leaf 'a
+    | Node (tree 'a) 'a (tree 'a)
+
+  function preorder (t: tree 'a) : list 'a = match t with
+    | Leaf x -> Cons x Nil
+    | Node l x r -> Cons x (preorder l ++ preorder r)
+  end
+
+  lemma preorder_non_nil: forall t: tree 'a. preorder t <> Nil
+
+  function flatten (l: list (int, tree 'a)) : list 'a = match l with
+    | Nil -> Nil
+    | Cons (_, t) r -> preorder t ++ flatten r
+  end
+
+  function height (t: tree 'a) : int = match t with
+    | Leaf _ -> 1
+    | Node l _ _ -> 1 + height l
+  end
+
+  lemma size_pos: forall t: tree 'a. height t >= 1
+
+  (* perfect binary tree *)
+  predicate perfect (t: tree 'a) = match t with
+    | Leaf _ -> true
+    | Node l _ r -> perfect l && perfect r && height l = height r
+  end
+
+  (* increasing list of trees, starting with height at least h *)
+  predicate well_formed_aux (h: int) (l: list (int, tree 'a)) = match l with
+    | Nil ->
+        true
+    | Cons (h, t) rest ->
+        perfect t && height t = h && well_formed_aux (h + 1) rest
+  end
+
+  predicate well_formed (l: list (int, tree 'a)) = match l with
+    | Nil ->
+        true
+    | Cons (h, t) rest ->
+        perfect t && height t = h && well_formed_aux h l
+  end
+
+  lemma well_formed_tail:
+    forall l: list (int, tree 'a), h: int, t: tree 'a.
+    well_formed (Cons (h,t) l) -> well_formed l
+
+  type t 'a = { trees: list (int, tree 'a) }
+    invariant { well_formed self.trees }
+
+  function listof (t: t 'a) : list 'a = flatten t.trees
+
+  let empty () : t 'a
+    ensures { listof result = Nil }
+  = { trees = Nil }
+
+  let is_empty (t: t 'a) : bool
+    ensures { result = True <-> listof t = Nil }
+  = t.trees = Nil
+
+  let cons (x: 'a) (t: t 'a) : t 'a
+    ensures { listof result = Cons x (listof t) }
+  = match t.trees with
+    | Cons (h1, t1) (Cons (h2, t2) rest) ->
+       if h1 = h2 then
+         { trees = Cons (1+h1, Node t1 x t2) rest }
+       else
+         { trees = Cons (1, Leaf x) t.trees }
+    | _ ->
+         { trees = Cons (1, Leaf x) t.trees }
+    end
+
+  let head (t: t 'a) : option 'a
+    ensures { result = hd (listof t) }
+  = match t.trees with
+    | Nil -> None
+    | Cons (_, Leaf x) _ -> Some x
+    | Cons (_, Node _ x _) _ -> Some x
+   end
+
+  let safe_hd (l: list 'a) : list 'a
+    requires { l <> Nil } ensures { Some result = tl l }
+  = match l with Nil -> absurd | Cons _ rest -> rest end
+
+  let tail (t: t 'a) : option (t 'a)
+    ensures
+      { match result with None    -> tl (listof t) = None
+                        | Some t' -> tl (listof t) = Some (listof t') end }
+  = match t.trees with
+    | Nil ->
+        None
+    | Cons (_, Leaf _) trees' ->
+        Some { trees = trees' }
+    | Cons (h, Node l x r) rest ->
+        let h' = h - 1 in
+        Some { trees = Cons (h', l) (Cons (h', r) rest) }
+   end
+
+end

@@ -133,11 +133,12 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
 
   let arglist = Cmdline.cmdline_split command in
   let command = List.hd arglist in
+  let use_stdin = ref true in
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
   let replace s = match Str.matched_group 1 s with
     | "%" -> "%"
-    | "f" -> fin
+    | "f" -> use_stdin := false; fin
     | "t" -> on_timelimit := true; string_of_int timelimit
     | "T" -> string_of_int (16 * succ timelimit)
     | "m" -> string_of_int memlimit
@@ -162,12 +163,12 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
   let argarray = Array.of_list arglist in
 
   fun () ->
-    let fd_in = Unix.openfile fin [Unix.O_RDONLY] 0 in
+    let fd_in = if !use_stdin then Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
     let fout,cout = Filename.open_temp_file (Filename.basename fin) ".out" in
     let fd_out = Unix.descr_of_out_channel cout in
     let time = Unix.gettimeofday () in
     let pid = Unix.create_process command argarray fd_in fd_out fd_out in
-    Unix.close fd_in;
+    if !use_stdin then Unix.close fd_in;
     close_out cout;
 
     let call = fun ret ->

@@ -492,7 +492,11 @@ let init () =
   Debug.dprintf debug " done.@."
 
 let show_legend_window () =
-  let dialog = GWindow.dialog ~title:"Why3: legend of icons" () in
+  let dialog =
+    GWindow.dialog
+      ~title:"Why3: legend of icons" ~icon:!why_icon
+      ()
+  in
   let vbox = dialog#vbox in
   let text = GText.view ~packing:vbox#add
     ~editable:false ~cursor_visible:false () in
@@ -763,9 +767,17 @@ let provers_page c (notebook:GPack.notebook) =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
   in
+  let hbox = GPack.hbox ~packing:(page#pack ~fill:true ~expand:true) () in
+  let scrollview =
+  try
+    GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
+      ~packing:(hbox#pack ~fill:true ~expand:true) ()
+  with Gtk.Error _ -> assert false
+  in let () = scrollview#set_shadow_type `OUT in
+  let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
   let frame =
     GBin.frame ~label:"Provers button shown in the left toolbar"
-      ~packing:page#pack ()
+      ~packing:(vbox#pack ~fill:true ~expand:true) ()
   in
   let provers_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
@@ -789,11 +801,7 @@ let provers_page c (notebook:GPack.notebook) =
               Hashtbl.fold
               (fun l h acc -> if !h then l::acc else acc) hidden_provers [])
       in ())
-    (Whyconf.get_provers c.config);
-  let _fillbox =
-    GPack.vbox ~packing:(page#pack ~expand:true) ()
-  in
-  ()
+    (Whyconf.get_provers c.config)
 
 (* Page "Uninstalled provers" *)
 
@@ -841,8 +849,14 @@ let editors_page c (notebook:GPack.notebook) =
     GPack.vbox ~homogeneous:false ~packing:
       (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
   in
+  let hbox = GPack.hbox ~packing:(page#pack ~expand:true ~fill:true) () in
+  let scrollview =
+    GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC
+      ~packing:(hbox#pack ~fill:true ~expand:true) ()
+  in
+  let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
   let default_editor_frame =
-    GBin.frame ~label:"Default editor" ~packing:page#pack ()
+    GBin.frame ~label:"Default editor" ~packing:vbox#pack ()
   in
   let editor_entry =
    GEdit.entry ~text:c.default_editor ~packing:default_editor_frame#add ()
@@ -851,7 +865,10 @@ let editors_page c (notebook:GPack.notebook) =
     editor_entry#connect#changed ~callback:
       (fun () -> c.default_editor <- editor_entry#text)
   in
-  let frame = GBin.frame ~label:"Specific editors" ~packing:page#pack () in
+  let frame =
+    GBin.frame ~label:"Specific editors"
+      ~packing:vbox#pack ()
+  in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
   let editors = Whyconf.get_editors c.config in
   let _,strings,indexes,map =
@@ -865,7 +882,7 @@ let editors_page c (notebook:GPack.notebook) =
   let add_prover p pi =
     let text = Pp.string_of_wnl Whyconf.print_prover p in
     let hb = GPack.hbox ~homogeneous:false ~packing:box#pack () in
-    let _ = GMisc.label ~width:150 ~xalign:0.0 ~text ~packing:(hb#pack ~expand:false) () in
+    let _ = GMisc.label ~width:150 ~xalign:0.0 ~text ~packing:(hb#pack ~fill:true ~expand:true) () in
     let (combo, ((_ : GTree.list_store), column)) =
       GEdit.combo_box_text ~packing:hb#pack ~strings ()
     in
@@ -897,16 +914,12 @@ let editors_page c (notebook:GPack.notebook) =
     in
     ()
   in
-  Mprover.iter add_prover (Whyconf.get_provers c.config);
-  let _fillbox =
-    GPack.vbox ~packing:(page#pack ~expand:true) ()
-  in
-  ()
+  Mprover.iter add_prover (Whyconf.get_provers c.config)
 
 
 let preferences (c : t) =
   let dialog = GWindow.dialog
-    ~modal:true
+    ~modal:true ~icon:(!why_icon)
     ~title:"Why3: preferences" ()
   in
   let vbox = dialog#vbox in
@@ -974,12 +987,12 @@ let uninstalled_prover c eS unknown =
     in
     let vbox = dialog#vbox in
     let hb = GPack.hbox ~packing:vbox#add () in
-    let _i = GMisc.image ~stock:`DIALOG_WARNING ~packing:hb#add () in
+    let _ = GMisc.image ~stock:`DIALOG_WARNING ~packing:hb#add () in
     let text =
       Pp.sprintf "The prover %a is not installed"
         Whyconf.print_prover unknown
     in
-    let _label1 = GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add () in
+    let _ = GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:hb#add () in
     let label = "Please select a policy for associated proof attempts" in
     let policy_frame = GBin.frame ~label ~packing:vbox#add () in
     let choice = ref 0 in
@@ -1007,7 +1020,7 @@ let uninstalled_prover c eS unknown =
         let frame = GBin.frame ~label ~packing:vbox#add () in
         let box =
           GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-            ~packing:frame#add ()
+            ~packing:(vbox#pack ~fill:true ~expand:true) ()
         in
         let iter_alter prover =
           let choice =

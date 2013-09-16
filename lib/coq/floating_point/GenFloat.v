@@ -63,26 +63,45 @@ destruct x as (x,xv,xe,xm).
 destruct y as (y,yv,ye,ym).
 destruct (Req_EM_T xe ye) as [He|He]...
 destruct (Req_EM_T xm ym) as [Hm|Hm]...
-destruct x as [xs|xs| |xs xm' xe' xH] ;
-  destruct y as [ys|ys| |ys ym' ye' yH]...
-destruct (Bool.bool_dec xs ys) as [Hs|Hs].
-left.
-apply f_equal3 ; try easy.
-now apply f_equal.
+rewrite He, Hm.
+destruct x as [xs|xs|xs xm'|xs xm' xe' xH] ;
+  destruct y as [ys|ys|ys ym'|ys ym' ye' yH]...
+clear.
+destruct (Bool.bool_dec xs ys) as [->|Hs].
+now left.
 right.
 apply t_inv.
-intros H.
+intros H _ _.
 now injection H.
-destruct (Bool.bool_dec xs ys) as [Hs|Hs].
-left.
-apply f_equal3 ; try easy.
-now apply f_equal.
+clear.
+destruct (Bool.bool_dec xs ys) as [->|Hs].
+now left.
 right.
 apply t_inv.
-intros H.
+intros H _ _.
 now injection H.
+clear.
+destruct (Bool.bool_dec xs ys) as [->|Hs].
+destruct (Z_eq_dec (Zpos (projT1 xm')) (Zpos (projT1 ym'))) as [Hm'|Hm'].
 left.
-now apply f_equal3.
+apply f_equal3 ; try easy.
+apply f_equal2 ; try easy.
+destruct xm' as [xm' pxm'].
+destruct ym' as [ym' pym'].
+simpl in Hm'.
+injection Hm'.
+intros ->.
+now rewrite (eqbool_irrelevance _ pxm' pym').
+right.
+apply t_inv.
+intros H _ _.
+injection H.
+contradict Hm'.
+now rewrite Hm'.
+right.
+apply t_inv.
+intros H _ _.
+now injection H.
 destruct (Req_EM_T xv yv) as [Hv|Hv].
 left.
 apply f_equal3 ; try easy.

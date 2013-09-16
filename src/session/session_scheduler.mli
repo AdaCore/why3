@@ -112,6 +112,7 @@ module Make(O: OBSERVER) : sig
   (** {2 Save and load a state}      *)
 
   val update_session :
+    ?release:bool ->
     allow_obsolete:bool ->
     'key session ->
     Env.env -> Whyconf.config ->
@@ -265,6 +266,7 @@ module Make(O: OBSERVER) : sig
     *)
 
   val check_all:
+    ?release:bool -> (** Can all the goal be release at the end? def: false *)
     O.key env_session -> t ->
     callback:((Ident.ident * Whyconf.prover * int * report) list -> unit) ->
     unit

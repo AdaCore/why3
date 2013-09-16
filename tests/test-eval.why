@@ -1,0 +1,119 @@
+
+
+theory T
+
+  use import int.Int
+
+  constant i1 : int = 42
+
+  constant i2 : int = 2+2
+
+(* test of the 'let' *)
+
+  constant let1 : int = let x = 42 in x * x - 1
+
+(* test of the 'if' *)
+
+  constant c2 : int = if true then 1 else 2
+
+  constant c3 : int = if true /\ false then 1 else 2
+
+  constant c4 : int = if 2 = 2 then 1 else 2
+
+  constant c5 : int = if 2 = 3 then 1 else 2
+
+  constant c6 : int = if 2 < 3 /\ 5 >= 6 /\ 7 > 8 \/ 9 <= 10 then 1 else 0
+
+  use import int.Abs
+
+  constant c7 : int = abs 42 + abs (-12)
+
+  use import list.List
+
+(* test of the 'match' *)
+
+  constant l1 : list int = Cons 5 Nil
+
+  constant l2 : int = match Cons 5 Nil with Nil -> 1 | Cons _ _ -> 2 end
+
+  constant l3 : int = match Cons 5 Nil with Nil -> 1 | Cons x _ -> x end
+
+  constant l4 : list int = match Cons 5 (Cons 8 Nil) with
+    | Nil -> Nil
+    | Cons x Nil -> Nil
+    | Cons x (Cons y l) -> Cons y (Cons x l)
+    end
+
+  use import list.Append
+
+  constant l5 : list 'a = Nil ++ Nil
+
+  constant l5a : list int = (Nil : list int) ++ Nil
+
+  constant l5b : list int = Nil ++ (Nil : list int)
+
+  constant l5c : list int = (Cons 5 Nil) ++ Nil 
+
+  constant l6 : list int = 
+    Cons 12 (Cons 34 (Cons 56 Nil)) ++ Cons 78 (Cons 90 Nil)
+
+  constant l6a : int = match (Nil : list int) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end
+
+  constant l6b : int = match (Cons 5 Nil) ++ Nil with Nil -> 1 | Cons _ _ -> 2 end 
+
+  function prod (l:list int) : int =
+    match l with
+    | Nil -> 1
+    | Cons x r -> x * prod r
+    end
+
+  constant l7 : int = prod (Cons 12 (Cons 34 (Cons 56 Nil)))
+
+
+  function puiss (n:int) (l:list int) : int =
+    match l with
+    | Nil -> 1
+    | Cons _ r -> n * puiss n r
+    end
+
+  constant l8 : int = puiss 2 (Cons 12 (Cons 34 (Cons 56 Nil)))
+
+  constant l9 : int = puiss l7 (Cons 12 (Cons 34 (Cons 56 Nil)))
+
+  constant l10 : int = puiss l9 (Cons 12 (Cons 34 (Cons 56 Nil)))
+
+  constant l11 : int = puiss l10 (Cons 12 (Cons 34 (Cons 56 Nil)))
+
+  use import map.Map
+
+  constant t : map int int = (const 0)[1<-42]
+
+  constant x0 : int = t[0]
+  constant x1 : int = t[1]
+
+  constant t2 : map int int = t[2<-37]
+
+  constant y0 : int = t2[0]
+  constant y1 : int = t2[1]
+  constant y2 : int = t2[2]
+
+  constant t3 : map int int = t2[1<-12]
+
+  constant z0 : int = t3[0]
+  constant z1 : int = t3[1]
+  constant z2 : int = t3[2]
+
+end
+
+
+theory Records 
+
+  use import int.Int
+
+  type pt = { x : int ; y : int }
+
+  constant pt1 : pt = { x = 3 ; y = 4 }
+
+  constant t1 : int = pt1.x + pt1.y
+
+end

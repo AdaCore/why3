@@ -55,6 +55,7 @@ type shape = string
 let print_shape = Format.pp_print_string
 let string_of_shape x = x
 let shape_of_string x = x
+let equal_shape (x:string) y = x = y
 
 let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
