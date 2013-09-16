@@ -113,17 +113,18 @@ predicate is_longest_common_prefix (a:array int) (x y l:int) =
   is_common_prefix a x y l /\
   forall m:int. l < m -> not (is_common_prefix a x y m)
 
-(** This lemma helps for proving [lcp] (but again is not mandatory),
-    and is needed for proving [lcp_sym] and [le_trans] lemmas, and the
-    post-condition of [compare] function in the "absurd" case *)
+(** This lemma helps to proving [lcp] (but again is not mandatory),
+    and is needed for proving [lcp_sym] and [le_trans] lemmas, and
+    the post-condition of [compare] function in the "absurd" case *)
+
 lemma longest_common_prefix_succ:
- forall a:array int, x y l:int.
-  is_common_prefix a x y l /\ not (is_common_prefix a x y (l+1)) ->
-  is_longest_common_prefix a x y l
+  forall a:array int, x y l:int.
+    is_common_prefix a x y l /\ not (is_common_prefix a x y (l+1)) ->
+    is_longest_common_prefix a x y l
 
 use export ref.Refint
 
-(** the first function, that compute the longest common prefix *)
+(** the first function, that computes the longest common prefix *)
 let lcp (a:array int) (x y:int) : int
   requires { 0 <= x <= a.length }
   requires { 0 <= y <= a.length }
@@ -135,7 +136,6 @@ let lcp (a:array int) (x y:int) : int
       incr l
     done;
     !l
-
 
 end
 
