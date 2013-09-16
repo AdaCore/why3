@@ -20,6 +20,9 @@ theory IEEE_Float
    function from_real (x:real) : t
    function to_real (x:t)      : real
 
+   function from_int (x:int) : t
+   function to_int (x:t)     : int
+
    function fp_abs "inline" (x:t) : t =
       (if to_real x <. 0.0 then from_real (-. to_real x) else x)
    (* absolute value, no rounding mode *)

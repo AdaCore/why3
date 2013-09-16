@@ -297,8 +297,11 @@ theory ieee754.Single_RNE
    syntax type single "(_ FloatingPoint 8 24)"
 
    syntax function  from_real "((_ to_fp 8 24) RNE %1)"
+   syntax function  to_real   "((_ fp.to_real 8 24) %1)"
 
-   syntax function  to_real "((_ fp.to_real 8 24) %1)"
+   (* ugh... going through bitvector would be nicer? *)
+   syntax function  from_int "((_ to_fp 8 24) RNE (to_real %1))"
+   syntax function  to_int   "(to_int ((_ fp.to_real 8 24) %1))"
 
    syntax function  fp_abs  "(fp.abs %1)"
    syntax function  fp_neg  "(fp.neg %1)"
@@ -340,8 +343,11 @@ theory ieee754.Double_RNE
    syntax type double "(_ FloatingPoint 11 53)"
 
    syntax function  from_real "((_ to_fp 11 53) RNE %1)"
+   syntax function  to_real   "((_ fp.to_real 11 53) %1)"
 
-   syntax function  to_real "((_ fp.to_real 11 53) %1)"
+   (* ugh... going through bitvector would be nicer? *)
+   syntax function  from_int "((_ to_fp 11 53) RNE (to_real %1))"
+   syntax function  to_int   "(to_int ((_ fp.to_real 11 53) %1))"
 
    syntax function  fp_abs  "(fp.abs %1)"
    syntax function  fp_neg  "(fp.neg %1)"
