@@ -124,7 +124,7 @@ let print_tv fmt tv =
 let print_tv_binder fmt tv =
   tv_set := Sid.add tv.tv_name !tv_set;
   let n = id_unique iprinter tv.tv_name in
-  fprintf fmt "%s:TYPE" n
+  fprintf fmt "%s:TYPE+" n
 
 let print_params_list fmt = function
   | [] -> ()
@@ -628,7 +628,7 @@ let print_type_decl ~prev info fmt ts = ignore (prev);
         realization fmt info prev;
         fprintf fmt "@]@\n@\n"
     | Some ty ->
-        fprintf fmt "@[<hov 2>%a%a: TYPE =@ %a@]@\n@\n"
+        fprintf fmt "@[<hov 2>%a%a: TYPE+ =@ %a@]@\n@\n"
           print_ts ts print_params_list ts.ts_args
           (print_ty info) ty
   end
