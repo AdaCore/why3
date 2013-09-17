@@ -121,3 +121,19 @@ theory Double_RNE
       constant bits_in_significand = sb,
       constant rounding_mode = rm
 end
+
+theory Single_RNE_Conversion
+   use import Single_RNE
+   use import Double_RNE
+
+   function to_single_rne (x : single) : single = x
+   function to_double_rne (x : single) : double
+end
+
+theory Double_RNE_Conversion
+   use import Single_RNE
+   use import Double_RNE
+
+   function to_single_rne (x : double) : single
+   function to_double_rne (x : double) : double = x
+end

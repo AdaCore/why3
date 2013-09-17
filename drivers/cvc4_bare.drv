@@ -381,6 +381,21 @@ theory ieee754.Double_RNE
 
 end
 
+theory ieee754.Single_RNE_Conversion
+
+   syntax function to_single_rne "%1"
+   syntax function to_double_rne "((_ to_fp 11 53) RNE %1)"
+
+end
+
+theory ieee754.Double_RNE_Conversion
+
+   syntax function to_single_rne "((_ to_fp 8 24) RNE %1)"
+   syntax function to_double_rne "%1"
+
+end
+
+
 (*
 Local Variables:
 mode: why
