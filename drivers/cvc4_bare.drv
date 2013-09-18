@@ -1,10 +1,10 @@
 (* Why driver for SMTLIB2 syntax *)
 
 prelude ";;; this is a prelude for CVC4"
-prelude "(set-logic AUFNIRA)"
-(** A  : Array
-    UF : Uninterpreted Function
-    DT : Datatypes (not needed at the end ...)
+prelude "(set-logic AUFBVNIRA)"
+(** A    : Arrays
+    UF   : Uninterpreted Function
+    BV   : Bitvectors
     NIRA : NonLinear Integer Reals Arithmetic
 *)
 
@@ -28,6 +28,7 @@ transformation "simplify_formula"
 
 (* remove pointless quantifiers from the goal *)
 transformation "introduce_premises"
+transformation "eliminate_bounded_types"
 
 (* For some reason this is commented out in all drivers except gappa
 and mathematica. Why? *)
