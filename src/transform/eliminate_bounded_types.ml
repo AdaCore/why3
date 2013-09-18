@@ -32,7 +32,13 @@ let rec eliminate_type env ty =
       fst (Ty.Mts.find ts env.bounded)
     | Ty.Tyapp (ts, args) ->
       let ts = try Ty.Mts.find ts env.types
-        with Not_found -> assert false in
+        with Not_found ->
+          match env.waiting with
+            | None -> assert false
+            | Some ts2 -> if Ty.ts_equal ts ts2 then
+                failwith ("Bounded type " ^ ts2.Ty.ts_name.id_string ^
+                             " is used before its inrange function was found.")
+              else assert false in
       let args = List.map (eliminate_type env) args in
       Ty.ty_app ts args
     | Ty.Tyvar _ -> ty
