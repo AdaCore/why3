@@ -140,3 +140,35 @@ module Ref
 
 
 end
+
+
+module Array
+
+  use import int.Int
+  use import array.Array
+
+  exception Found int
+
+  let search (t:array int) (v:int) : int =
+    try
+      for i=0 to t.length - 1 do
+        if t[i] = v then raise (Found i)
+      done;
+      -1
+    with Found i -> i
+    end
+
+  let t () : array int = 
+     let t = Array.make 3 0 in
+     t[0] <- 12;
+     t[1] <- 42;
+     t[2] <- 67;
+     t
+
+  let test12 () = search (t ()) 12
+  let test42 () = search (t ()) 42
+  let test67 () = search (t ()) 67
+  let test0 () = search (t ()) 0
+
+end
+

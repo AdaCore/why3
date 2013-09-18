@@ -295,7 +295,6 @@ let rec update_rec env s ity t =
               | (cs,fdl)::rem ->
                 if ls_equal cs ls then
                   begin
-                    (* eprintf "found constructor@."; *)
                   let l =
                     List.map2
                       (fun fd t ->
@@ -303,17 +302,15 @@ let rec update_rec env s ity t =
                           match fd.fd_mut with
                           | None -> t
                           | Some r ->
-(*
-                            eprintf "found a mutable field, looking in store -> ";
-*)
-                            (* find if region r is a region parameter and if yes
-                               substitute it *)
+                            (* found a mutable field, looking in store *)
+                            (* first find if region r is a region
+                               parameter and if yes substitute it *)
                             let r =
                               try
                                 Mreg.find r env.regenv 
                               with Not_found -> r
                             in
-                            (* look for r in store *)
+                            (* then look for r in store *)
                             let t =
                               try
                                 Mreg.find r s
@@ -324,9 +321,6 @@ let rec update_rec env s ity t =
 *)
                                 t
                             in
-(*
-                            eprintf "found term %a@." Pretty.print_term t;
-*)
                             t
                         in
                         update_rec env s fd.fd_ity t)
@@ -339,32 +333,18 @@ let rec update_rec env s ity t =
             (* it must be pure, no ? *)
             assert false
             (* t *)
-(*
-            let l =
-              List.map2 (update_rec env s) ityl tl
-            in t_app ls l (Some (ty_of_ity ity))
-*)
+        (*
+          let l =
+          List.map2 (update_rec env s) ityl tl
+          in t_app ls l (Some (ty_of_ity ity))
+        *)
         end
       | _ -> assert false
 
 let update env s ity t =
   match ity with
-  | None ->
-    (* eprintf "not calling update_rec on %a@." Pretty.print_term t; *)
-    t
-  | Some ity ->
-(*
-    eprintf "calling update on %a, type %a: "
-      Pretty.print_term t Mlw_pretty.print_ity ity;
-*)
-    let t = update_rec env s ity t in
-(*
-    eprintf "returns %a@." Pretty.print_term t;
-*)
-    t
-
-
-
+  | None -> t
+  | Some ity -> update_rec env s ity t 
 
 let get_vs env s vs =
   try
@@ -565,7 +545,7 @@ type result =
   | Normal of term
   | Excep of xsymbol * term
   | Irred of expr
-  | Fun of psymbol * lambda * pvsymbol list * int
+  | Fun of psymbol * pvsymbol list * int
 
 let print_result fmt r =
   match r with
@@ -601,59 +581,37 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     end
   | Eapp(e1,pvs,_spec) ->
     begin match eval_expr env s e1 with
-      | Fun(ps,lam,args,n), s' ->
+      | Fun(ps,args,n), s' ->
         if n > 1 then
-          Fun(ps,lam,pvs::args,n-1), s'
+          Fun(ps,pvs::args,n-1), s'
         else
-        let args' = List.rev_map (fun pvs -> get_pvs env s pvs) (pvs::args) in
-        let env' = multibind_pvs lam.l_args args' env in
-        let args_ty = List.rev_map (fun pvs -> pvs.pv_ity) (pvs::args) in
-        let ity_result =
-          match e.e_vty with
-            | VTvalue ity -> ity
-            | VTarrow _ -> assert false
-        in
-        let subst =
-          Mlw_ty.aty_vars_match ps.ps_subst ps.ps_aty args_ty ity_result
-        in
-        let subst = subst.ity_subst_reg in
-        let env'' = { env' with regenv = 
-            Mreg.union
-              (fun _ _ -> assert false)
-              subst env'.regenv }
-        in
-        (* 
-        eprintf "@[Evaluating function body of %s in regenv: %a@\nand state: %a@]@."
-          ps.ps_name.Ident.id_string
-          (Pp.print_list Pp.comma 
-             (fun fmt (r1,r2) ->
-               fprintf fmt "@[%a -> %a@]" 
-                 Mlw_pretty.print_reg r1
-                 Mlw_pretty.print_reg r2))
-          (Mreg.bindings env''.regenv)
-          print_state s';
-        *)
-        let r,s'' = eval_expr env'' s' lam.l_expr in
-(*
-        printf "@[   -> result: %a@\nstate: %a@]@." 
-          print_result r print_state s'';
-*)
-        r,s''
+          let ity_result =
+            match e.e_vty with
+              | VTvalue ity -> ity
+              | VTarrow _ -> assert false
+          in
+          begin 
+            try
+              exec_app env s' ps (pvs::args) ity_result
+            with Exit -> Irred e, s
+          end
       | _ -> Irred e, s
     end
   | Earrow ps ->
+    let len = List.length ps.ps_aty.aty_args in
+    Fun(ps,[],len),s
+(*
     begin
       match Mlw_decl.find_definition env.mknown ps with
         | Some d ->
           let lam = d.fun_lambda in
-          (* TODO: we need to instantiate regions in [lam]
-             with the same substitution as in Earrow *)
-          Fun(ps,lam,[], List.length lam.l_args),s
+          Fun(ps,lam,[], len (* List.length lam.l_args*)),s
         | None ->
           Format.eprintf "[Exec] definition of psymbol %s not found@."
             ps.ps_name.Ident.id_string;
           Irred e,s
     end
+*)
   | Eif(e1,e2,e3) ->
     begin
       match eval_expr env s e1 with
@@ -769,6 +727,39 @@ and exec_match env t s ebl =
       with NoMatch -> iter rem
   in
   iter ebl
+
+and exec_app env s ps args ity_result =
+  match Mlw_decl.find_definition env.mknown ps with
+    | Some d ->
+      let lam = d.fun_lambda in
+      let args' = List.rev_map (fun pvs -> get_pvs env s pvs) args in
+      let env' = multibind_pvs lam.l_args args' env in
+      let args_ty = List.rev_map (fun pvs -> pvs.pv_ity) args in
+      let subst =
+        Mlw_ty.aty_vars_match ps.ps_subst ps.ps_aty args_ty ity_result
+      in
+      let subst = subst.ity_subst_reg in
+      let env'' = { env' with regenv = 
+          Mreg.union
+            (fun _ _ -> assert false)
+            subst env'.regenv }
+      in
+        (* 
+           eprintf "@[Evaluating function body of %s in regenv: %a@\nand state: %a@]@."
+           ps.ps_name.Ident.id_string
+          (Pp.print_list Pp.comma 
+             (fun fmt (r1,r2) ->
+               fprintf fmt "@[%a -> %a@]" 
+                 Mlw_pretty.print_reg r1
+                 Mlw_pretty.print_reg r2))
+          (Mreg.bindings env''.regenv)
+          print_state s';
+        *)
+      eval_expr env'' s lam.l_expr 
+    | None ->
+      Format.eprintf "[Exec] definition of psymbol %s not found@."
+        ps.ps_name.Ident.id_string;
+      raise Exit
 
 
 let eval_global_expr env mkm tkm e =
