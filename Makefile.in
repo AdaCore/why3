@@ -127,7 +127,8 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		encoding_sort simplify_array filter_trigger \
 		introduction abstraction close_epsilon lift_epsilon \
 		eval_match instantiate_predicate smoke_detector \
-		gnat_float rec_logic
+		gnat_float rec_logic eliminate_bounded_types \
+		gnat_split_conj gnat_split_disj
 
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs \
 		simplify gappa cvc3 yices mathematica
@@ -426,7 +427,7 @@ clean::
 # GNATWhy3
 ########
 
-GNAT_FILES = gnat_split_conj gnat_split_disj gnat_util gnat_loc gnat_config \
+GNAT_FILES = gnat_util gnat_loc gnat_config \
 	     gnat_expl gnat_objectives gnat_report gnat_main
 
 GNATMODULES = $(addprefix src/gnat/, $(GNAT_FILES))
@@ -441,9 +442,6 @@ $(GNATCMO) $(GNATCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
 
 byte: bin/gnatwhy3.byte
 opt:  bin/gnatwhy3.opt
-
-gnat_split_conj.cmx: lib/why3/why3.cmxa
-gnat_split_disj.cmx: lib/why3/why3.cmxa
 
 bin/gnatwhy3.opt: lib/why3/why3.cmxa $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
