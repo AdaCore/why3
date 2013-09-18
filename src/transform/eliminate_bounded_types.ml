@@ -200,6 +200,17 @@ let eliminate_vs_with_guards env vs (vars, vsymbols, guards) =
     | _ -> guards in
   (nvs :: vars, Term.Mvs.add vs nvs vsymbols, guards)
 
+let rec all_open_quant q b =
+  let (vl, trs, t) as res = Term.t_open_quant b in
+  if trs <> [] then res
+  else
+    match t.Term.t_node with
+      | Term.Tquant (q2, _) when q2 <> q -> res
+      | Term.Tquant (_, b) ->
+        let vl2, trs2, t2 = all_open_quant q b in
+        vl @ vl2, trs2, t2
+      | _ -> res
+
 (* Eliminate bounded types in a term of type None.
    Additionnal predicates in_range (t') are assumed as soon as possible *)
 let rec eliminate_form env pol vsymbols t =
@@ -245,7 +256,7 @@ let rec eliminate_form env pol vsymbols t =
          in_range (x) -> f (x)
          exits x : bounded. f (x) is translated as exists x : bounded.
          in_range (x) /\ f (x) *)
-      let (vsl, trs, t) = Term.t_open_quant tquant in
+      let (vsl, trs, t) = all_open_quant q tquant in
       let vsl, vsymbols, guards = List.fold_right
         (eliminate_vs_with_guards env) vsl 
         ([], vsymbols, Term.Sterm.empty) in
