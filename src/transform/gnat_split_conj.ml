@@ -1,4 +1,3 @@
-open Why3
 open Term
 open Decl
 
