@@ -69,7 +69,7 @@ theory IEEE_Float
 
    (*** comparison operators ***)
 
-   predicate fp_eq  "inline" (x:t) (y:t) = (x = y)
+   predicate fp_eq  (x:t) (y:t)
    predicate fp_neq "inline" (x:t) (y:t) = not (fp_eq x y)
    predicate fp_leq "inline" (x:t) (y:t) = (to_real x) <=. (to_real y)
    predicate fp_lt  "inline" (x:t) (y:t) = (to_real x) <. (to_real y)
