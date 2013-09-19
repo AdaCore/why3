@@ -3,6 +3,14 @@ open Decl
 open Theory
 open Task
 
+(* Boolean flag to decide if generated applications of inrange functions
+   should be inlined whenever possible *)
+let inline_inrange = true
+
+(* Boolean flag to decide if a warning should be generated when a constraint
+   is forgotten. *)
+let output_warning = true
+
 type bounded_types_env =
     { (* Map from symbols of bounded types to (ty, p)
          where ty is the base type and p (t) should be used to create
@@ -82,129 +90,42 @@ let eliminate_vs env vsymbols vs =
 
 (* Translate pattern with the appropriate types and function symbols.
    Do not generate constraints. *)
-let rec eliminate_pattern env vsymbols pat =
+let rec eliminate_pattern env vsymbols vars pat =
   match pat.Term.pat_node with
     | Term.Pwild ->
       let pat_ty = eliminate_type env pat.Term.pat_ty in
-      Term.pat_wild pat_ty, vsymbols
+      vars, Term.pat_wild pat_ty, vsymbols
     | Term.Pvar vs ->
       let nvs = eliminate_vs env vsymbols vs in
-      Term.pat_var nvs, Term.Mvs.add vs nvs vsymbols
+      Term.Svs.add nvs vars, Term.pat_var nvs, Term.Mvs.add vs nvs vsymbols
     | Term.Papp (ls, [pat]) when Term.Sls.mem ls env.conv ->
       (* Ignore conversion functions *)
-      eliminate_pattern env vsymbols pat
+      eliminate_pattern env vsymbols vars pat
     | Term.Papp (ls, pl) ->
       let nls = try Term.Mls.find ls env.funs with
           Not_found -> assert false in
-      let pl, vsymbols = List.fold_right (fun pat (pl, vsymbols) ->
-        let pat, vsymbols = eliminate_pattern env vsymbols pat in
-        (pat :: pl, vsymbols)) pl ([], vsymbols) in
+      let vars, pl, vsymbols = List.fold_right (fun pat (vars, pl, vsymbols) ->
+        let vars, pat, vsymbols = eliminate_pattern env vsymbols vars pat in
+        (vars, pat :: pl, vsymbols)) pl (vars, [], vsymbols) in
       let pat_ty = eliminate_type env pat.Term.pat_ty in
-      Term.pat_app nls pl pat_ty, vsymbols
+      vars, Term.pat_app nls pl pat_ty, vsymbols
     | Term.Por (p1, p2) ->
-        let p1, vsymbols = eliminate_pattern env vsymbols p1 in
-        let p2, vsymbols = eliminate_pattern env vsymbols p2 in
-        Term.pat_or p1 p2, vsymbols
+        let vars, p1, vsymbols = eliminate_pattern env vsymbols vars p1 in
+        let vars, p2, vsymbols = eliminate_pattern env vsymbols vars p2 in
+        vars, Term.pat_or p1 p2, vsymbols
     | Term.Pas (p, vs) ->
-      let p, vsymbols = eliminate_pattern env vsymbols p in
+      let vars, p, vsymbols = eliminate_pattern env vsymbols vars p in
       let nvs = eliminate_vs env vsymbols vs in
-      Term.pat_as p nvs, Term.Mvs.add vs nvs vsymbols
+      Term.Svs.add nvs vars, Term.pat_as p nvs, Term.Mvs.add vs nvs vsymbols
 
-(* Compute assumptions of terms of bounded types in t.
-   For each subterm t' of a bounded type in t, generates an additionnal
-   predicate in_range (t') *)
-let compute_guards =
-  let rec compute_guards guards env vsymbols t =
-    match t.Term.t_node with
-      | Term.Tvar vs -> 
-        (try Term.t_var (Term.Mvs.find vs vsymbols)
-         with Not_found -> assert false), guards
-      | Term.Tapp (ls, [t]) when Term.Sls.mem ls env.conv ->
-        (* Ignore conversion functions *)
-        compute_guards guards env vsymbols t
-      | Term.Tapp (ls, []) when is_bounded_opt_type env (ls.Term.ls_value) ->
-        (* Do not add constraints for constants *)
-        let nls = try (Term.Mls.find ls env.funs) with
-            Not_found -> assert false in
-        let ty = eliminate_opt_type env t.Term.t_ty in
-        let nt = Term.t_app nls [] ty in
-        nt, guards
-      | Term.Tapp (ls, tl) ->
-        (* If the result of the application is a bounded type,
-           add a corresponding inrange constraint over it *)
-        let tl, guards = List.fold_right (fun t (tl, guards) ->
-          let t, guards = compute_guards guards env vsymbols t in
-          t :: tl, guards) tl ([], guards) in
-        let nls = try (Term.Mls.find ls env.funs) with
-            Not_found -> assert false in
-        let ty = eliminate_opt_type env t.Term.t_ty in
-        let nt = Term.t_app nls tl ty in
-        let guards = match t.Term.t_ty with
-          | None -> guards
-          | Some ty ->
-            match ty.Ty.ty_node with
-              | Ty.Tyapp (tys, []) ->
-                (try let _, p = Ty.Mts.find tys env.bounded in
-                     Term.Sterm.add (p nt) guards
-                 with Not_found -> guards)
-              | _ -> guards in
-        nt, guards
-      | Term.Tif (t1, t2, t3) ->
-        let t1, guards = compute_guards guards env vsymbols t1 in
-        let t2, guards = compute_guards guards env vsymbols t2 in
-        let t3, guards = compute_guards guards env vsymbols t3 in
-        let t = Term.t_if t1 t2 t3 in
-        t, guards
-      | Term.Tlet (t, tbound) ->
-        let t, guards = compute_guards guards env vsymbols t in
-        let vs, t2 = Term.t_open_bound tbound in
-        let nvs = eliminate_vs env vsymbols vs in
-        let vsymbols = Term.Mvs.add vs nvs vsymbols in
-        let t2, guards = compute_guards guards env vsymbols t2 in
-        let tbound = Term.t_close_bound nvs t2 in
-        Term.t_let t tbound, guards
-      | Term.Tcase (t, tbrl) -> 
-        let t, guards = compute_guards guards env vsymbols t in
-        let tbrl, guards = List.fold_right (fun br (tbrl, guards) ->
-          let (pat, t) = Term.t_open_branch br in
-          let pat, vsymbols = eliminate_pattern env vsymbols pat in
-          let t, guards = compute_guards guards env vsymbols t in
-          (Term.t_close_branch pat t) :: tbrl, guards) tbrl ([], guards) in
-        Term.t_case t tbrl, guards
-      | Term.Teps (tbound) ->
-        let vs, t = Term.t_open_bound tbound in
-        let nvs = eliminate_vs env vsymbols vs in
-        let vsymbols = Term.Mvs.add vs nvs vsymbols in
-        let t, guards = compute_guards guards env vsymbols t in
-        let tbound = Term.t_close_bound nvs t in
-        Term.t_eps tbound, guards
-      | Term.Tconst _ -> t, guards
-      | Term.Tbinop (b, t1, t2) ->
-        let t1, guards = compute_guards guards env vsymbols t1 in
-        let t2, guards = compute_guards guards env vsymbols t2 in
-        Term.t_binary b t1 t2, guards
-      | Term.Ttrue | Term.Tfalse -> t, guards
-      | Term.Tnot t -> 
-        let t, guards = compute_guards guards env vsymbols t in
-        Term.t_not t, guards
-      | Term.Tquant _ ->
-        failwith "Quantifiers in if statements in terms not allowed in transformation eliminate_bounded_types" in
-  compute_guards Term.Sterm.empty
+let eliminate_pattern env vsymbols pat =
+  eliminate_pattern env vsymbols Term.Svs.empty pat
 
 let reconstruct pol t guards =
   if pol then
     Term.Sterm.fold Term.t_and guards t
   else
     Term.Sterm.fold Term.t_implies guards t
-
-let eliminate_vs_with_guards env vs (vars, vsymbols, guards) =
-  let nvs = eliminate_vs env vsymbols vs in
-  let guards = match vs.Term.vs_ty.Ty.ty_node with
-    | Ty.Tyapp (ts, []) when Ty.Mts.mem ts env.bounded ->
-      let _, p = Ty.Mts.find ts env.bounded in
-      Term.Sterm.add (p (Term.t_var nvs)) guards
-    | _ -> guards in
-  (nvs :: vars, Term.Mvs.add vs nvs vsymbols, guards)
 
 let rec all_open_quant q b =
   let (vl, trs, t) as res = Term.t_open_quant b in
@@ -217,90 +138,257 @@ let rec all_open_quant q b =
         vl @ vl2, trs2, t2
       | _ -> res
 
-(* Eliminate bounded types in a term of type None.
-   Additionnal predicates in_range (t') are assumed as soon as possible *)
-let rec eliminate_form env pol vsymbols t =
+let eliminate_vs_with_guards env vs (vars, vsymbols, guards) =
+  let nvs = eliminate_vs env vsymbols vs in
+  let guards = match vs.Term.vs_ty.Ty.ty_node with
+    | Ty.Tyapp (ts, []) when Ty.Mts.mem ts env.bounded ->
+      let _, p = Ty.Mts.find ts env.bounded in
+      Term.Sterm.add (p (Term.t_var nvs)) guards
+    | _ -> guards in
+  (nvs :: vars, Term.Mvs.add vs nvs vsymbols, guards)
+
+(* Mode used to specify what should be done with computed constraints.
+   - Use Inline (polarity) to inline them
+   - Use Keep (vars, with_error) to keep those which do not contain vars.
+     If with_error is true then fail when a constraint is missed. *)
+type reconstruction_mode = 
+  | Keep of (Term.Svs.t * bool) 
+  | Inline of bool
+
+let mode_keep_guards with_error mode =
+  match mode with
+    | Keep _ -> mode
+    | Inline _ -> Keep (Term.Svs.empty, with_error)
+
+let mode_add_bounded_variables vs mode =
+  match mode with
+    | Inline _ -> mode
+    | Keep (vs2, b) -> Keep (Term.Svs.union vs vs2, b)
+
+exception Unable_to_compute
+
+let new_guard suppressed mode p guards =
+  match mode with
+    | Inline _ -> suppressed, Term.Sterm.add p guards
+    | Keep (vs, b) ->
+      if Term.t_v_any (fun v -> Term.Svs.mem v vs) p then
+        if b then raise Unable_to_compute else true, guards
+      else suppressed, Term.Sterm.add p guards
+
+(* Compute assumptions for terms of bounded types in t.
+   For each subterm t' of a bounded type in t, generates an additionnal
+   constraint in_range (t') *)
+let rec compute_guards suppressed mode guards env vsymbols t =
   match t.Term.t_node with
     | Term.Tvar vs -> 
-      (try Term.t_var (Term.Mvs.find vs vsymbols)
-       with Not_found -> assert false)
-    | Term.Tapp _ ->
-      let t, guards = compute_guards env vsymbols t in
-      reconstruct pol t guards
+      suppressed, (try Term.t_var (Term.Mvs.find vs vsymbols)
+        with Not_found -> assert false), guards
+    | Term.Tapp (ls, [t]) when Term.Sls.mem ls env.conv ->
+      (* Ignore conversion functions *)
+      compute_guards suppressed mode guards env vsymbols t
+    | Term.Tapp (ls, []) when is_bounded_opt_type env (ls.Term.ls_value) ->
+      (* Do not add constraints for constants *)
+      let nls = try (Term.Mls.find ls env.funs) with
+          Not_found -> assert false in
+      let ty = eliminate_opt_type env t.Term.t_ty in
+      let nt = Term.t_app nls [] ty in
+      suppressed, nt, guards
+    | Term.Tapp (ls, tl) ->
+      (* If the result of the application is a bounded type,
+         add a corresponding inrange constraint over it *)
+      let mode = mode_keep_guards false mode in
+      let suppressed, tl, guards = List.fold_right 
+        (fun t (suppressed, tl, guards) ->
+          let suppressed, t, guards = 
+            eliminate_term suppressed mode guards env vsymbols t in
+          suppressed, t :: tl, guards) tl (suppressed, [], guards) in
+      let nls = try (Term.Mls.find ls env.funs) with
+          Not_found -> assert false in
+      let ty = eliminate_opt_type env t.Term.t_ty in
+      let nt = Term.t_app nls tl ty in
+      let suppressed, guards = match t.Term.t_ty with
+        | None -> suppressed, guards
+        | Some ty ->
+          match ty.Ty.ty_node with
+            | Ty.Tyapp (tys, []) ->
+              (try let _, p = Ty.Mts.find tys env.bounded in
+                   new_guard suppressed mode (p nt) guards
+               with Not_found -> suppressed, guards)
+            | _ -> suppressed, guards in
+      suppressed, nt, guards
     | Term.Tif (t1, t2, t3) ->
-      (* if t1 then t2 else t3 is exploded into (t1 -> t2) /\ (not t1 -> t3) *)
-      let nt1 = eliminate_form env (not pol) vsymbols (Term.t_not t1) in
-      let t1 = eliminate_form env (not pol) vsymbols t1 in
-      let t2 = eliminate_form env pol vsymbols t2 in
-      let t3 = eliminate_form env pol vsymbols t3 in
-       Term.t_and (Term.t_implies t1 t2) (Term.t_implies nt1 t3)
-    | Term.Tlet (t, tbound) -> 
-      let t1, guards = compute_guards env vsymbols t in
+      (* In if t1 then t2 else t3, t1 has both polarities.
+         If mode is inline, then try to keep the guards g1 generated for t1 
+         to output g1 /\ if t1 then t2 else t3.
+         If some constraint is lost, rather transform into
+         (t1 -> t2) /\ (not t1 -> t3) *)
+      let suppressed, t2, guards = 
+        eliminate_term suppressed mode guards env vsymbols t2 in
+      let suppressed, t3, guards = 
+        eliminate_term suppressed mode guards env vsymbols t3 in
+      (match mode with
+        | Keep _ ->
+          let suppressed, t1, guards = 
+            eliminate_term suppressed mode guards env vsymbols t1 in
+          let t = Term.t_if t1 t2 t3 in
+          suppressed, t, guards
+        | Inline pol ->
+          try 
+            let mode = mode_keep_guards true mode in
+            let suppressed, t1, guards = 
+              eliminate_term suppressed mode guards env vsymbols t1 in
+            let t = Term.t_if t1 t2 t3 in
+            suppressed, t, guards
+          with Unable_to_compute ->
+            let suppressed, nt1, guards = 
+              eliminate_term suppressed (Inline (not pol)) guards env
+                vsymbols (Term.t_not t1) in
+            let suppressed, t1, guards = 
+              eliminate_term suppressed (Inline (not pol)) guards env
+                vsymbols t1 in
+            let t = Term.t_and (Term.t_implies t1 t2) (Term.t_implies nt1 t3) in
+            suppressed, t, guards)
+    | Term.Tlet (t, tbound) ->
+      (* In let x = t1 in t2, t1 can have both polarities.
+         If mode is inline, then keep as many guards g1 generated for t1 as
+         possible and output g1 /\ let x = t1 in t2.
+         If mode is keep, replace x by t1 in the guards of t2 *)
+      let suppressed, t, guards =
+        let mode = mode_keep_guards false mode in
+        eliminate_term suppressed mode guards env vsymbols t in
       let vs, t2 = Term.t_open_bound tbound in
       let nvs = eliminate_vs env vsymbols vs in
       let vsymbols = Term.Mvs.add vs nvs vsymbols in
-      let t2 = eliminate_form env pol vsymbols t2 in
-      let tbound = Term.t_close_bound nvs (reconstruct pol t2 guards) in
-      Term.t_let t1 tbound
-    | Term.Tcase (t, tbrl) ->
-      let t, guards = compute_guards env vsymbols t in
-      let tbrl = List.map (fun br ->
-        let (pat, t) = Term.t_open_branch br in
-        let pat, vsymbols = eliminate_pattern env vsymbols pat in
-        let t = eliminate_form env pol vsymbols t in
-        Term.t_close_branch pat t) tbrl in
-      reconstruct pol (Term.t_case t tbrl) guards
+      let suppressed, t2, guards2 = 
+        eliminate_term suppressed mode Term.Sterm.empty env vsymbols t2 in
+      let guards = Term.Sterm.fold (fun p guards ->
+        let p = Term.t_subst_single nvs t p in
+        Term.Sterm.add p guards) guards2 guards in
+      let tbound = Term.t_close_bound nvs t2 in
+      suppressed, Term.t_let t tbound, guards
+    | Term.Tcase (t, tbrl) -> 
+      (* If mode is inline, then keep as many guards g generated for t as
+         possible and output g /\ match t with (p1 -> t1 ...).
+         If mode is keep, only keep guards of t1 ... that do not contain
+         variables of p1 ... *)
+      let suppressed, t, guards = 
+        let mode = mode_keep_guards false mode in
+        eliminate_term suppressed mode guards env vsymbols t in
+      let suppressed, tbrl, guards = List.fold_right 
+        (fun br (suppressed, tbrl, guards) ->
+          let (pat, t) = Term.t_open_branch br in
+          let vars, pat, vsymbols = eliminate_pattern env vsymbols pat in
+          let mode = mode_add_bounded_variables vars mode in
+          let suppressed, t, guards = 
+            eliminate_term suppressed mode guards env vsymbols t in
+          suppressed, (Term.t_close_branch pat t) :: tbrl, guards) tbrl 
+        (suppressed, [], guards) in
+      suppressed, Term.t_case t tbrl, guards
     | Term.Teps (tbound) ->
+      (* If mode is keep, only keep guards of f that do not contain
+         variables of vs *)
       let vs, t = Term.t_open_bound tbound in
       let nvs = eliminate_vs env vsymbols vs in
       let vsymbols = Term.Mvs.add vs nvs vsymbols in
-      let t = eliminate_form env pol vsymbols t in
+      let mode = mode_keep_guards false mode in
+      let suppressed, t, guards = 
+        eliminate_term suppressed mode guards env vsymbols t in
       let tbound = Term.t_close_bound nvs t in
-      Term.t_eps tbound
+      suppressed, Term.t_eps tbound, guards
+    | Term.Tconst _ -> suppressed, t, guards
+    | Term.Tbinop (b, t1, t2) ->
+      (match b, mode with
+        | Term.Timplies, Inline pol ->
+          let suppressed, t1, guards = 
+            eliminate_term suppressed (Inline (not pol)) guards env 
+              vsymbols t1 in
+          let suppressed, t2, guards = 
+            eliminate_term suppressed mode guards env vsymbols t2 in
+          suppressed, Term.t_implies t1 t2, guards
+        | Term.Tiff, Inline pol ->
+          (* In t1 <-> t2, t1 and t2 have both polarities.
+             If mode is inline, then try to keep the guards gi generated for ti 
+             to output g1 /\ g2 /\ (t1 <-> t2).
+             If some constraint is lost, rather transform into:
+             - if pol then (t1 -> t2) /\ (t2 -> t1)
+             - if not pol then (t1 /\ t2) \/ (not t1 /\ not t2) *)
+          (try
+             let mode = mode_keep_guards true mode in
+             let suppressed, t1, guards = 
+               eliminate_term suppressed mode guards env vsymbols t1 in
+             let suppressed, t2, guards = 
+               eliminate_term suppressed mode guards env vsymbols t2 in
+             suppressed, Term.t_iff t1 t2, guards
+           with Unable_to_compute ->
+             let suppressed, nt1, guards = 
+               eliminate_term suppressed mode guards env vsymbols 
+                 (Term.t_not t1) in
+             let suppressed, nt2, guards = 
+               eliminate_term suppressed mode guards env vsymbols 
+                 (Term.t_not t2) in
+             let suppressed, t1, guards = 
+               eliminate_term suppressed mode guards env vsymbols t1 in
+             let suppressed, t2, guards = 
+               eliminate_term suppressed mode guards env vsymbols t2 in
+             let t =
+               if pol then Term.t_and (Term.t_or nt1 t2) (Term.t_or t1 nt2)
+               else Term.t_or (Term.t_and t1 t2) (Term.t_and nt1 nt2) in
+             suppressed, t, guards)
+        | _, _ ->
+          let suppressed, t1, guards = 
+            eliminate_term suppressed mode guards env vsymbols t1 in
+          let suppressed, t2, guards = 
+            eliminate_term suppressed mode guards env vsymbols t2 in
+          suppressed, Term.t_binary b t1 t2, guards)
+    | Term.Ttrue | Term.Tfalse -> suppressed, t, guards
+    | Term.Tnot t -> 
+      let suppressed, t, guards = 
+        eliminate_term suppressed mode guards env vsymbols t in
+      suppressed, Term.t_not t, guards
     | Term.Tquant (q, tquant) ->
       (* forall x : bounded. f (x) is translated as forall x : bounded.
          in_range (x) -> f (x)
          exits x : bounded. f (x) is translated as exists x : bounded.
-         in_range (x) /\ f (x) *)
+         in_range (x) /\ f (x)
+         If mode is keep, only keep guards of f (x) that do not contain x *)
       let (vsl, trs, t) = all_open_quant q tquant in
-      let vsl, vsymbols, guards = List.fold_right
+      let vsl, vsymbols, q_guards = List.fold_right
         (eliminate_vs_with_guards env) vsl 
         ([], vsymbols, Term.Sterm.empty) in
-      let trs = List.map (fun l -> List.map (fun tr ->
-        let tr, _ = compute_guards env vsymbols tr in tr) l) trs in
-      let nt = eliminate_form env pol vsymbols t in
-      let nt = reconstruct (q = Term.Texists) nt guards in
-      Term.t_quant q (Term.t_close_quant vsl trs nt)
-    | Term.Tbinop (Term.Timplies, t1, t2) ->
-      let t1 = eliminate_form env (not pol) vsymbols t1 in
-      let t2 = eliminate_form env pol vsymbols t2 in
-      Term.t_implies t1 t2
-    | Term.Tbinop (Term.Tiff, t1, t2) ->
-      (* t1 <-> t2 is exploded into:
-         - if pol then (t1 -> t2) /\ (t2 -> t1)
-         - if not pol then (t1 /\ t2) \/ (not t1 /\ not t2) *)
-      let nt1 = eliminate_form env pol vsymbols (Term.t_not t1) in
-      let nt2 = eliminate_form env pol vsymbols (Term.t_not t2) in
-      let t1 = eliminate_form env pol vsymbols t1 in
-      let t2 = eliminate_form env pol vsymbols t2 in
-      if pol then
-        Term.t_and (Term.t_or nt1 t2) (Term.t_or t1 nt2)
-      else
-        Term.t_or (Term.t_and t1 t2) (Term.t_and nt1 nt2)
-    | Term.Tbinop ((Term.Tand | Term.Tor) as bo, t1, t2) ->
-      let t1 = eliminate_form env pol vsymbols t1 in
-      let t2 = eliminate_form env pol vsymbols t2 in
-      Term.t_binary bo t1 t2
-    | Term.Tnot t -> Term.t_not (eliminate_form env (not pol) vsymbols t)
-    | Term.Tconst _ | Term.Ttrue | Term.Tfalse -> t
+      let trs = 
+        let mode = mode_keep_guards false mode in
+        List.map (fun l -> List.map (fun tr ->
+          let _, tr, _ =
+            eliminate_term suppressed mode guards env vsymbols tr in
+          tr) l) trs in
+      let mode = mode_add_bounded_variables (Term.Svs.of_list vsl) mode in
+      let suppressed, nt, guards = 
+        eliminate_term suppressed mode guards env vsymbols t in
+      let nt = reconstruct (q = Term.Texists) nt q_guards in
+      suppressed, Term.t_quant q (Term.t_close_quant vsl trs nt), guards
+
+and eliminate_term suppressed mode guards env vsymbols t =
+  let suppressed, nt, guards = 
+    compute_guards suppressed mode guards env vsymbols t in
+  match mode with
+    | Inline pol -> suppressed, reconstruct pol nt guards, Term.Sterm.empty
+    | Keep _ -> suppressed,  nt, guards
 
 let eliminate_form env ?(polarity = true) ?(vsymbols = Term.Mvs.empty) t = 
-  eliminate_form env polarity vsymbols t
+  let suppressed, t, _ = 
+    eliminate_term false (Inline polarity) Term.Sterm.empty env 
+      vsymbols t in
+  if output_warning && suppressed then
+    prerr_endline "Constraints were forgotten during eliminate_bounded_types";
+  t
 
-let eliminate_term env ?(vsymbols = Term.Mvs.empty) t =
-  if t.Term.t_ty = None then 
-    eliminate_form env ~vsymbols:vsymbols t, Term.Sterm.empty
-  else compute_guards env vsymbols t
+let eliminate_term env ?(with_error = false) ?(vsymbols = Term.Mvs.empty) t =
+  let suppressed, t, guards = 
+    eliminate_term false (Keep (Term.Svs.empty, with_error)) 
+      Term.Sterm.empty env vsymbols t in
+  if output_warning && suppressed then
+    prerr_endline "Constraints were forgotten during eliminate_bounded_types";
+  t, guards
 
 (* Eliminate bounded types in a function declaration
    Keep existing function symbol if no bounded type is found
@@ -324,40 +412,36 @@ let eliminate_ls env ls =
   else ls
 
 (* Eliminate bounded types in a function definition.
-   If the function has arguments of bounded types, generate a declaration
-   and a defining axiom instead.
-   Otherwise, keep the definition and generate an additionnal axiom for
-   constraints if needed. *)
+   Try to keep the definition and generate an additionnal axiom for
+   constraints. Constraints should not be inlined in the definition.
+   If some constraint is lost, then rather translate the definition into
+   a declaration with a defining axiom. *)
 let eliminate_ls_defn env (ls, defn) nls =
   let vars, t = open_ls_defn defn in
-  let nvars, vsymbols = List.fold_right (fun vs (vars, vsymbols) ->
-    let nvs = eliminate_vs env vsymbols vs in
-    nvs :: vars, Term.Mvs.add vs nvs vsymbols) vars ([], Term.Mvs.empty) in
-  if List.exists (is_bounded_type env) ls.Term.ls_args then
+  let nvars, vsymbols, q_guards = List.fold_right (eliminate_vs_with_guards env)
+    vars ([], Term.Mvs.empty, Term.Sterm.empty) in
+  try let t, constrs =
+        eliminate_term env ~with_error:true ~vsymbols:vsymbols t in
+      let ndefn = make_ls_defn nls nvars t in
+      if Term.Sterm.is_empty constrs then
+        Some ndefn, None
+      else
+        let nargs = List.map Term.t_var nvars in
+        let napp = Term.t_app nls nargs nls.Term.ls_value in
+        let p = reconstruct true Term.t_true constrs in
+        let p_guarded = reconstruct false p q_guards in
+        let ntquant = Term.t_close_quant nvars [[napp]] p_guarded in
+        let nax = Term.t_forall ntquant in
+        Some ndefn, Some nax
+  with Unable_to_compute ->
     let args = List.map Term.t_var vars in
     let app = Term.t_app ls args ls.Term.ls_value in
     let p = if nls.Term.ls_value = None then
         Term.t_iff app t else Term.t_equ app t in
     let tquant = Term.t_close_quant vars [[app]] p in
     let ax = Term.t_forall tquant in
-    let nax = eliminate_form env ~vsymbols:vsymbols ax in
+    let nax = eliminate_form env ax in
     None, Some nax
-  else
-    (let t, guards = eliminate_term env ~vsymbols:vsymbols t in
-    let ndefn = make_ls_defn nls nvars t in
-    if Term.Sterm.is_empty guards then
-      Some ndefn, None
-    else
-      let nargs = List.map Term.t_var nvars in
-      let napp = Term.t_app nls nargs nls.Term.ls_value in
-      let p = Term.Sterm.fold Term.t_and guards Term.t_true in
-      let ntquant = Term.t_close_quant nvars [[napp]] p in
-      let nax = Term.t_forall ntquant in
-      Some ndefn, Some nax)
-
-(* Boolean flag to decide if generated applications of inrange functions
-   should be inlined whenever possible *)
-let inline_inrange = true
 
 (* Generic transformation.
    Should be called with theories of the form:
