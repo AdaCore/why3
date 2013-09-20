@@ -334,6 +334,8 @@ theory ieee754.Single_RNE
 
    syntax function fp_constant_zero "((_ to_fp 8 24) #x00000000)"
 
+   syntax function floor   "(roundToIntegral RTN %1)"
+   syntax function ceiling "(roundToIntegral RTP %1)"
 end
 
 theory ieee754.Double_RNE
@@ -380,6 +382,8 @@ theory ieee754.Double_RNE
 
    syntax function fp_constant_zero "((_ to_fp 11 53) #x0000000000000000)"
 
+   syntax function floor   "(roundToIntegral RTN %1)"
+   syntax function ceiling "(roundToIntegral RTP %1)"
 end
 
 theory ieee754.Single_RNE_Conversion
