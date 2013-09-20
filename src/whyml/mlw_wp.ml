@@ -851,7 +851,19 @@ and wp_abstract env c_eff c_q c_xq q xq =
 
 and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let lab = fresh_mark () and c = l.l_spec in
-  let add_arg sbs pv = ity_match sbs pv.pv_ity pv.pv_ity in
+  let add_arg = let seen = ref Sreg.empty in fun sbs pv ->
+    (* we only need to "havoc" the regions that occur twice in [l.l_args].
+       If a region in an argument is shared with the context, then is it
+       already frozen in [ps.ps_subst]. If a region in an argument is not
+       shared at all, the last [wp_forall] over [args] will be enough. *)
+    let rec down sbs ity = match ity.ity_node with
+      | Ityapp (_,_,rl) ->
+          let add_reg sbs r =
+            if Sreg.mem r !seen then reg_match sbs r r else
+            (seen := Sreg.add r !seen; down sbs r.reg_ity) in
+          ity_fold down (List.fold_left add_reg sbs rl) ity
+      | _ -> ity_fold down sbs ity in
+    down sbs pv.pv_ity in
   let subst = List.fold_left add_arg ps.ps_subst l.l_args in
   let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in

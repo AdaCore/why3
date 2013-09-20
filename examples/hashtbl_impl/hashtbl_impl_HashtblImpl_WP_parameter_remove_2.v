@@ -103,45 +103,32 @@ Definition size {a:Type} {a_WT:WhyType a} (v:(@t a a_WT)): Z :=
   | (mk_t x x1 x2) => x
   end.
 
-Require Import Why3. Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 3.
-
 (* Why3 goal *)
-Theorem WP_parameter_add : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
+Theorem WP_parameter_remove : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
   (h1:(@map.Map.map Z _ (list (key* a)%type) _)) (h2:(@map.Map.map
-  key key_WhyType (option a) _)) (k:key) (v:a), ((((0%Z < h)%Z /\
-  forall (i:Z), ((0%Z <= i)%Z /\ (i < h)%Z) -> (good_hash (mk_array h h1)
-  i)) /\ forall (k1:key) (v1:a), (good_data k1 v1 h2 (mk_array h h1))) /\
-  (0%Z <= h)%Z) -> forall (rho:Z) (rho1:(@map.Map.map Z _ (list (key*
-  a)%type) _)), ((((0%Z < rho)%Z /\ forall (i:Z), ((0%Z <= i)%Z /\
-  (i < rho)%Z) -> (good_hash (mk_array rho rho1) i)) /\ forall (k1:key)
-  (v1:a), (good_data k1 v1 h2 (mk_array rho rho1))) /\ (0%Z <= rho)%Z) ->
-  forall (rho2:(@map.Map.map key key_WhyType (option a) _))
-  (rho3:(@map.Map.map Z _ (list (key* a)%type) _)) (rho4:Z),
-  (((((0%Z < rho)%Z /\ forall (i:Z), ((0%Z <= i)%Z /\ (i < rho)%Z) ->
-  (good_hash (mk_array rho rho3) i)) /\ forall (k1:key) (v1:a), (good_data k1
-  v1 rho2 (mk_array rho rho3))) /\ (0%Z <= rho)%Z) /\ (((map.Map.get rho2
-  k) = None) /\ forall (k':key), (~ (k' = k)) -> ((map.Map.get rho2
-  k') = (map.Map.get h2 k')))) -> let i := (bucket k rho) in
-  (((0%Z <= i)%Z /\ (i < rho)%Z) -> (((0%Z <= i)%Z /\ (i < rho)%Z) ->
-  forall (o:(@map.Map.map Z _ (list (key* a)%type) _)), ((0%Z <= rho)%Z /\
-  (o = (map.Map.set rho3 i (cons (k, v) (map.Map.get rho3 i))))) ->
-  forall (rho5:Z), (rho5 = (rho4 + 1%Z)%Z) -> forall (rho6:(@map.Map.map
-  key key_WhyType (option a) _)), (rho6 = (map.Map.set rho2 k (Some v))) ->
-  forall (i1:Z), ((0%Z <= i1)%Z /\ (i1 < rho)%Z) -> (good_hash (mk_array rho
-  o) i1))).
-intros a a_WT rho rho1 rho2 k v (((h1,h2),h3),h4) rho3 rho4 (((h5,h6),h7),h8)
-rho5 rho6 rho7 ((((h9,h10),h11),h12),(h13,h14)) i1 (h15,h16) (h17,h18) o
-(h19,h20) rho8 h21 rho9 h22 i (h23,h24).
-subst i1.
-unfold good_hash in *.
-clear h11.
-generalize (h10 i (conj h23 h24)); clear h10; intro h10.
-subst o; unfold get; simpl.
-intros k0 v0.
-assert (h: (i = bucket k rho3) \/ (i <> bucket k rho3)%Z) by omega.
-destruct h.
-ae.
-ae.
+  key key_WhyType (option a) _)) (k:key), ((((0%Z < h)%Z /\ forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < h)%Z) -> (good_hash (mk_array h h1) i)) /\
+  forall (k1:key) (v:a), (good_data k1 v h2 (mk_array h h1))) /\
+  (0%Z <= h)%Z) -> let i := (bucket k h) in (((0%Z <= i)%Z /\ (i < h)%Z) ->
+  let l := (map.Map.get h1 i) in forall (result:(option a)),
+  match result with
+  | None => forall (v:a), ~ (list.Mem.mem (k, v) l)
+  | (Some v) => (list.Mem.mem (k, v) l)
+  end ->
+  match result with
+  | None => ((map.Map.get h2 k) = None)
+  | (Some _) => True
+  end).
+intros a a_WT rho rho1 rho2 k (((h1,h2),h3),h4) i (h5,h6) l result h7.
+subst i.
+destruct result; auto.
+subst l.
+unfold good_data in h3.
+generalize (h3 k); clear h3; intro h3.
+destruct (Map.get rho2 k); intuition.
+generalize (h3 a0); clear h3; intro h3.
+generalize (h7 a0); clear h7; intro h7.
+intuition.
 Qed.
 
 
