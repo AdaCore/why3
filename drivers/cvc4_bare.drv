@@ -1,7 +1,7 @@
 (* Why driver for SMTLIB2 syntax *)
 
 prelude ";;; this is a prelude for CVC4"
-prelude "(set-logic AUFBVNIRA)"
+prelude "(set-logic ALL_SUPPORTED)"
 (** A    : Arrays
     UF   : Uninterpreted Function
     BV   : Bitvectors
@@ -332,7 +332,7 @@ theory ieee754.Single_RNE
    syntax predicate isInfinite  "(fp.isInfinite %1)"
    syntax predicate isNaN       "(fp.isNaN %1)"
 
-   syntax function fp_constant_zero "((_ to_fp 8 24) #x00000000)"
+   syntax function fp_constant_zero "((_ to_fp_real 8 24) RNE 0.0)"
 
    syntax function floor   "(roundToIntegral RTN %1)"
    syntax function ceiling "(roundToIntegral RTP %1)"
@@ -380,7 +380,7 @@ theory ieee754.Double_RNE
    syntax predicate isInfinite  "(fp.isInfinite %1)"
    syntax predicate isNaN       "(fp.isNaN %1)"
 
-   syntax function fp_constant_zero "((_ to_fp 11 53) #x0000000000000000)"
+   syntax function fp_constant_zero "((_ to_fp_real 11 53) RNE 0.0)"
 
    syntax function floor   "(roundToIntegral RTN %1)"
    syntax function ceiling "(roundToIntegral RTP %1)"
@@ -389,13 +389,13 @@ end
 theory ieee754.Single_RNE_Conversion
 
    syntax function to_single_rne "%1"
-   syntax function to_double_rne "((_ to_fp 11 53) RNE %1)"
+   syntax function to_double_rne "((_ to_fp_fp 11 53) RNE %1)"
 
 end
 
 theory ieee754.Double_RNE_Conversion
 
-   syntax function to_single_rne "((_ to_fp 8 24) RNE %1)"
+   syntax function to_single_rne "((_ to_fp_fp 8 24) RNE %1)"
    syntax function to_double_rne "%1"
 
 end
