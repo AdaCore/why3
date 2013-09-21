@@ -158,7 +158,12 @@ module Array
     with Found i -> i
     end
 
-  let t0 () : array int = Array.make 2 0
+  let test0 () = let t = Array.make 2 21 in t[0]+t[1]
+
+  let test1 () = 
+    let t = Array.make 2 21 in 
+    t[1] <- 17;
+    t[0]+t[1]
 
   let t () : array int = 
      let t = Array.make 3 0 in
@@ -170,7 +175,7 @@ module Array
   let test12 () = search (t ()) 12
   let test42 () = search (t ()) 42
   let test67 () = search (t ()) 67
-  let test0 () = search (t ()) 0
+  let test7 () = search (t ()) 7
 
 end
 

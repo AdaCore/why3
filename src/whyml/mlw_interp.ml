@@ -46,7 +46,7 @@ let multibind_pvs l tl env =
 type state = term Mreg.t
 
 let p_reg fmt (reg,t) =
-  fprintf fmt "@[<hov 2><%a> -> %a@]" 
+  fprintf fmt "@[<hov 2><%a> -> %a@]"
     Mlw_pretty.print_reg reg Pretty.print_term t
 
 let print_state fmt s =
@@ -192,7 +192,7 @@ let eval_equ _ty _ls l =
 let ts_map = ref Ty.ts_int
 
 let builtin_map_type ts = ts_map := ts
-  
+
 let ls_map_const = ref ps_equ
 let ls_map_get = ref ps_equ
 let ls_map_set = ref ps_equ
@@ -307,8 +307,8 @@ let builtin_array_type kn its =
 
 let exec_array_make _env s args =
   match args with
-    | [n;def] -> 
-      let ty_def = match def.t_ty with 
+    | [n;def] ->
+      let ty_def = match def.t_ty with
         | None -> assert false
         | Some t -> t
       in
@@ -318,10 +318,28 @@ let exec_array_make _env s args =
       Normal t,s
     | _ -> assert false
 
+let exec_array_get _env s args =
+  match args with
+    | [t;i] ->
+      begin
+        match t.t_node with
+          | Tapp(ls,[_len;m]) when ls_equal ls !array_cons_ls ->
+            let ty = match t.t_ty with
+              | Some { Ty.ty_node = Ty.Tyapp(_,[t]) } -> t
+              | _ -> assert false
+            in
+            let t = eval_map_get (Some ty) !ls_map_get [m;i] in
+            Normal t,s
+          | _ -> assert false
+      end
+    | _ -> assert false
+
 let built_in_modules =
   [ "array","Array",
     ["array", builtin_array_type],
-    ["make", None, exec_array_make] ;
+    ["make", None, exec_array_make ;
+     "mixfix []", None, exec_array_get ;
+    ] ;
   ]
 
 let add_builtin_mo lib (l,n,t,d) =
@@ -381,7 +399,7 @@ let rec update_rec env s ity t =
                                parameter and if yes substitute it *)
                             let r =
                               try
-                                Mreg.find r env.regenv 
+                                Mreg.find r env.regenv
                               with Not_found -> r
                             in
                             (* then look for r in store *)
@@ -418,7 +436,7 @@ let rec update_rec env s ity t =
 let update env s ity t =
   match ity with
   | None -> t
-  | Some ity -> update_rec env s ity t 
+  | Some ity -> update_rec env s ity t
 
 let get_vs env s vs =
   try
@@ -659,7 +677,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
               | VTvalue ity -> ity
               | VTarrow _ -> assert false
           in
-          begin 
+          begin
             try
               exec_app env s' ps (pvs::args) ity_result
             with Exit -> Irred e, s
@@ -768,8 +786,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     eprintf "updating region <%a> with value %a@."
       Mlw_pretty.print_reg reg Pretty.print_term t;
 *)
-    let r = 
-      try Mreg.find reg env.regenv 
+    let r =
+      try Mreg.find reg env.regenv
       with Not_found -> reg
     in
     Normal t_void, Mreg.add r t s
@@ -804,25 +822,25 @@ and exec_app env s ps args ity_result =
     Mlw_ty.aty_vars_match ps.ps_subst ps.ps_aty args_ty ity_result
   in
   let subst = subst.ity_subst_reg in
-  let env1 = { env with regenv = 
+  let env1 = { env with regenv =
       Mreg.union (fun _ _ -> assert false) subst env.regenv }
   in
   match Mlw_decl.find_definition env.mknown ps with
     | Some d ->
       let lam = d.fun_lambda in
       let env' = multibind_pvs lam.l_args args' env1 in
-        (* 
+        (*
            eprintf "@[Evaluating function body of %s in regenv: %a@\nand state: %a@]@."
            ps.ps_name.Ident.id_string
-          (Pp.print_list Pp.comma 
+          (Pp.print_list Pp.comma
              (fun fmt (r1,r2) ->
-               fprintf fmt "@[%a -> %a@]" 
+               fprintf fmt "@[%a -> %a@]"
                  Mlw_pretty.print_reg r1
                  Mlw_pretty.print_reg r2))
           (Mreg.bindings env''.regenv)
           print_state s';
         *)
-      eval_expr env' s lam.l_expr 
+      eval_expr env' s lam.l_expr
     | None ->
       try
         let f = Hps.find builtin_progs ps in
