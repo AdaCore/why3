@@ -1,6 +1,7 @@
 
 open Format
 
+open Stdlib
 open Term
 
 let t_app_infer_inst ls tl ty =
@@ -188,6 +189,10 @@ let eval_equ _ty _ls l =
 
 (* functions on map.Map *)
 
+let ts_map = ref Ty.ts_int
+
+let builtin_map_type ts = ts_map := ts
+  
 let ls_map_const = ref ps_equ
 let ls_map_get = ref ps_equ
 let ls_map_set = ref ps_equ
@@ -235,7 +240,7 @@ let eval_map_set ty ls_set l =
 (* all builtin functions *)
 
 let built_in_theories =
-  [ ["int"],"Int",
+  [ ["int"],"Int", [],
     [ "infix +", None, eval_int_op Big_int.add_big_int;
       "infix -", None, eval_int_op Big_int.sub_big_int;
       "infix *", None, eval_int_op Big_int.mult_big_int;
@@ -245,24 +250,29 @@ let built_in_theories =
       "infix >", None, eval_int_rel Big_int.gt_big_int;
       "infix >=", None, eval_int_rel Big_int.ge_big_int;
     ] ;
-    ["int"],"ComputerDivision",
+    ["int"],"ComputerDivision", [],
     [ "div", None, eval_int_op computer_div_big_int;
       "mod", None, eval_int_op computer_mod_big_int;
     ] ;
-    ["int"],"EuclideanDivision",
+    ["int"],"EuclideanDivision", [],
     [ "div", None, eval_int_op Big_int.div_big_int;
       "mod", None, eval_int_op Big_int.mod_big_int;
     ] ;
-    ["map"],"Map",
+    ["map"],"Map", ["map", builtin_map_type],
     [ "const", Some ls_map_const, eval_map_const;
       "get", Some ls_map_get, eval_map_get;
       "set", Some ls_map_set, eval_map_set;
     ] ;
   ]
 
-let add_builtin_th env (l,n,d) =
+let add_builtin_th env (l,n,t,d) =
   try
     let th = Env.find_theory env l n in
+    List.iter
+      (fun (id,r) ->
+        let ts = Theory.ns_find_ts th.Theory.th_export [id] in
+        r ts)
+      t;
     List.iter
       (fun (id,r,f) ->
         let ls = Theory.ns_find_ls th.Theory.th_export [id] in
@@ -274,10 +284,74 @@ let add_builtin_th env (l,n,d) =
   with Not_found ->
     Format.eprintf "[Warning] theory %s not found@." n
 
-
 let get_builtins env =
   Hls.add builtins ps_equ eval_equ;
   List.iter (add_builtin_th env) built_in_theories
+
+
+type result =
+  | Normal of term
+  | Excep of xsymbol * term
+  | Irred of expr
+  | Fun of psymbol * pvsymbol list * int
+
+let builtin_progs = Hps.create 17
+
+let array_cons_ls = ref ps_equ
+
+let builtin_array_type kn its =
+  let csl = Mlw_decl.find_constructors kn its in
+  match csl with
+    | [(pls,_)] -> array_cons_ls := pls.pl_ls
+    | _ ->  assert false
+
+let exec_array_make _env s args =
+  match args with
+    | [n;def] -> 
+      let ty_def = match def.t_ty with 
+        | None -> assert false
+        | Some t -> t
+      in
+      let ty = Ty.ty_app !ts_map [Ty.ty_int;ty_def] in
+      let m = t_app !ls_map_const [def] (Some ty) in
+      let t = t_app_infer !array_cons_ls [n;m] in
+      Normal t,s
+    | _ -> assert false
+
+let built_in_modules =
+  [ "array","Array",
+    ["array", builtin_array_type],
+    ["make", None, exec_array_make] ;
+  ]
+
+let add_builtin_mo lib (l,n,t,d) =
+  try
+    Format.eprintf "[interp] looking for mlw file %s@." l;
+    let mods, _ths = Env.read_lib_file lib [l] in
+    let mo = Mstr.find n mods in
+    let exp = mo.Mlw_module.mod_export in
+    let kn = mo.Mlw_module.mod_known in
+    List.iter
+      (fun (id,r) ->
+        Format.eprintf "[interp] looking for type %s@." id;
+        let its = Mlw_module.ns_find_its exp [id] in
+        r kn its)
+      t;
+    List.iter
+      (fun (id,r,f) ->
+        Format.eprintf "[interp] looking for function %s@." id;
+        let ps = Mlw_module.ns_find_ps exp [id] in
+        Hps.add builtin_progs ps f;
+        match r with
+          | None -> ()
+          | Some r -> r := ps)
+      d
+  with Not_found ->
+    Format.eprintf "[Warning] module %s not found@." n
+
+let get_builtin_progs lib =
+  List.iter (add_builtin_mo lib) built_in_modules
+
 
 (* updates term t with current values in the store for
    mutable fields *)
@@ -539,14 +613,6 @@ and p_expr fmt e =
     | Eabsurd -> fprintf fmt "@[Eabsurd@]"
 
 
-(* evaluation of WhyML expressions *)
-
-type result =
-  | Normal of term
-  | Excep of xsymbol * term
-  | Irred of expr
-  | Fun of psymbol * pvsymbol list * int
-
 let print_result fmt r =
   match r with
     | Normal t ->
@@ -559,6 +625,9 @@ let print_result fmt r =
         p_expr e
     | Fun _ ->
       Format.fprintf fmt "@[Result is a function@]"
+
+
+(* evaluation of WhyML expressions *)
 
 let rec eval_expr env (s:state) (e : expr) : result * state =
   match e.e_node with
@@ -729,21 +798,19 @@ and exec_match env t s ebl =
   iter ebl
 
 and exec_app env s ps args ity_result =
+  let args' = List.rev_map (fun pvs -> get_pvs env s pvs) args in
+  let args_ty = List.rev_map (fun pvs -> pvs.pv_ity) args in
+  let subst =
+    Mlw_ty.aty_vars_match ps.ps_subst ps.ps_aty args_ty ity_result
+  in
+  let subst = subst.ity_subst_reg in
+  let env1 = { env with regenv = 
+      Mreg.union (fun _ _ -> assert false) subst env.regenv }
+  in
   match Mlw_decl.find_definition env.mknown ps with
     | Some d ->
       let lam = d.fun_lambda in
-      let args' = List.rev_map (fun pvs -> get_pvs env s pvs) args in
-      let env' = multibind_pvs lam.l_args args' env in
-      let args_ty = List.rev_map (fun pvs -> pvs.pv_ity) args in
-      let subst =
-        Mlw_ty.aty_vars_match ps.ps_subst ps.ps_aty args_ty ity_result
-      in
-      let subst = subst.ity_subst_reg in
-      let env'' = { env' with regenv = 
-          Mreg.union
-            (fun _ _ -> assert false)
-            subst env'.regenv }
-      in
+      let env' = multibind_pvs lam.l_args args' env1 in
         (* 
            eprintf "@[Evaluating function body of %s in regenv: %a@\nand state: %a@]@."
            ps.ps_name.Ident.id_string
@@ -755,15 +822,20 @@ and exec_app env s ps args ity_result =
           (Mreg.bindings env''.regenv)
           print_state s';
         *)
-      eval_expr env'' s lam.l_expr 
+      eval_expr env' s lam.l_expr 
     | None ->
-      Format.eprintf "[Exec] definition of psymbol %s not found@."
-        ps.ps_name.Ident.id_string;
-      raise Exit
+      try
+        let f = Hps.find builtin_progs ps in
+        f env1 s args'
+      with Not_found ->
+        Format.eprintf "[Exec] definition of psymbol %s not found@."
+          ps.ps_name.Ident.id_string;
+        raise Exit
 
 
 let eval_global_expr env mkm tkm e =
   get_builtins env;
+  get_builtin_progs (Mlw_main.library_of_env env);
   let env = {
     mknown = mkm;
     tknown = tkm;

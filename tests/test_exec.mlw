@@ -158,6 +158,8 @@ module Array
     with Found i -> i
     end
 
+  let t0 () : array int = Array.make 2 0
+
   let t () : array int = 
      let t = Array.make 3 0 in
      t[0] <- 12;
