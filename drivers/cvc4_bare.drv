@@ -302,7 +302,7 @@ theory ieee754.Single_RNE
 
    (* ugh... going through bitvector would be nicer? *)
    syntax function  from_int "((_ to_fp_real 8 24) RNE (to_real %1))"
-   syntax function  to_int   "(to_int ((_ fp.to_real 8 24) %1))"
+   syntax function  to_int   "(to_int ((_ fp.to_real 8 24) (roundToIntegral RTA %1)))"
 
    syntax function  fp_abs  "(fp.abs %1)"
    syntax function  fp_neg  "(fp.neg %1)"
@@ -350,7 +350,7 @@ theory ieee754.Double_RNE
 
    (* ugh... going through bitvector would be nicer? *)
    syntax function  from_int "((_ to_fp_real 11 53) RNE (to_real %1))"
-   syntax function  to_int   "(to_int ((_ fp.to_real 11 53) %1))"
+   syntax function  to_int   "(to_int ((_ fp.to_real 11 53) (roundToIntegral RTA %1)))"
 
    syntax function  fp_abs  "(fp.abs %1)"
    syntax function  fp_neg  "(fp.neg %1)"
