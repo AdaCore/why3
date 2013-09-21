@@ -316,7 +316,8 @@ theory ieee754.Single_RNE
    syntax function  fp_min  "(fp.min %1 %2)"
    syntax function  fp_max  "(fp.max %1 %2)"
 
-   syntax function  roundToIntegral  "(roundToIntegral RNE %1)"
+   syntax function  roundToIntegral_RNE  "(roundToIntegral RNE %1)"
+   syntax function  roundToIntegral_RTA  "(roundToIntegral RTA %1)"
 
    syntax predicate fp_eq  "(fp.eq %1 %2)"
    syntax predicate fp_neq "(not (fp.eq %1 %2))"
@@ -364,7 +365,8 @@ theory ieee754.Double_RNE
    syntax function  fp_min  "(fp.min %1 %2)"
    syntax function  fp_max  "(fp.max %1 %2)"
 
-   syntax function  roundToIntegral  "(roundToIntegral RNE %1)"
+   syntax function  roundToIntegral_RNE  "(roundToIntegral RNE %1)"
+   syntax function  roundToIntegral_RTA  "(roundToIntegral RTA %1)"
 
    syntax predicate fp_eq  "(fp.eq %1 %2)"
    syntax predicate fp_neq "(not (fp.eq %1 %2))"

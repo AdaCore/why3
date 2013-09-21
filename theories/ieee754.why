@@ -58,7 +58,8 @@ theory IEEE_Float
    function fp_rem (x:t) (y:t) : t
    (* x-y*n, where n in Z is nearest to x/y *)
 
-   function roundToIntegral (x:t) : t
+   function roundToIntegral_RNE (x:t) : t
+   function roundToIntegral_RTA (x:t) : t
    (* round to integral *)
 
    function fp_min (x:t) (y:t) : t =
