@@ -302,7 +302,7 @@ theory ieee754.Single_RNE
 
    (* ugh... going through bitvector would be nicer? *)
    syntax function  from_int "((_ to_fp_real 8 24) RNE (to_real %1))"
-   syntax function  to_int   "(to_int ((_ fp.to_real 8 24) (roundToIntegral RTA %1)))"
+   syntax function  to_int   "(to_int ((_ fp.to_real 8 24) (roundToIntegral RNA %1)))"
 
    syntax function  fp_abs  "(fp.abs %1)"
    syntax function  fp_neg  "(fp.neg %1)"
@@ -317,7 +317,7 @@ theory ieee754.Single_RNE
    syntax function  fp_max  "(fp.max %1 %2)"
 
    syntax function  roundToIntegral_RNE  "(roundToIntegral RNE %1)"
-   syntax function  roundToIntegral_RTA  "(roundToIntegral RTA %1)"
+   syntax function  roundToIntegral_RNA  "(roundToIntegral RNA %1)"
    syntax function  roundToIntegral_RTZ  "(roundToIntegral RTZ %1)"
 
    syntax predicate fp_eq  "(fp.eq %1 %2)"
@@ -352,7 +352,7 @@ theory ieee754.Double_RNE
 
    (* ugh... going through bitvector would be nicer? *)
    syntax function  from_int "((_ to_fp_real 11 53) RNE (to_real %1))"
-   syntax function  to_int   "(to_int ((_ fp.to_real 11 53) (roundToIntegral RTA %1)))"
+   syntax function  to_int   "(to_int ((_ fp.to_real 11 53) (roundToIntegral RNA %1)))"
 
    syntax function  fp_abs  "(fp.abs %1)"
    syntax function  fp_neg  "(fp.neg %1)"
@@ -367,7 +367,7 @@ theory ieee754.Double_RNE
    syntax function  fp_max  "(fp.max %1 %2)"
 
    syntax function  roundToIntegral_RNE  "(roundToIntegral RNE %1)"
-   syntax function  roundToIntegral_RTA  "(roundToIntegral RTA %1)"
+   syntax function  roundToIntegral_RNA  "(roundToIntegral RNA %1)"
    syntax function  roundToIntegral_RTZ  "(roundToIntegral RTZ %1)"
 
    syntax predicate fp_eq  "(fp.eq %1 %2)"
