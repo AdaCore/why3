@@ -50,10 +50,20 @@ end
 
 theory ada__model_th.IEEE_Float32_Theory
   syntax function bool_eq "(fp.eq %1 %2)"
+  syntax function bool_lt "(fp.lt %1 %2)"
+  syntax function bool_le "(fp.leq %1 %2)"
+  syntax function bool_gt "(fp.gt %1 %2)"
+  syntax function bool_ge "(fp.geq %1 %2)"
+  syntax function bool_neq "(not (fp.eq %1 %2))"
 end
 
 theory ada__model_th.IEEE_Float64_Theory
   syntax function bool_eq "(fp.eq %1 %2)"
+  syntax function bool_lt "(fp.lt %1 %2)"
+  syntax function bool_le "(fp.leq %1 %2)"
+  syntax function bool_gt "(fp.gt %1 %2)"
+  syntax function bool_ge "(fp.geq %1 %2)"
+  syntax function bool_neq "(not (fp.eq %1 %2))"
 end
 
 (*
