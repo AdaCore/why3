@@ -5,11 +5,20 @@
    - the emulation cannot deal with signed zero
 *)
 
-theory IEEE_Float
-   use export floating_point.Rounding
+theory IEEE_Rounding_Mode
 
-   use floating_point.GenFloat
-   use import real.RealInfix
+   type mode
+
+   function roundNearestTiesToEven : mode
+   function roundNearestTiesToAway : mode
+   function roundTowardPositive    : mode
+   function roundTowardNegative    : mode
+   function roundTowardZero        : mode
+
+end
+
+theory IEEE_Float
+   use import IEEE_Rounding_Mode
 
    type t
 
@@ -23,38 +32,19 @@ theory IEEE_Float
    function from_int (x:int) : t
    function to_int (x:t)     : int
 
-   function fp_abs "inline" (x:t) : t =
-      (if to_real x <. 0.0 then from_real (-. to_real x) else x)
+   function fp_abs (x:t) : t
    (* absolute value, no rounding mode *)
 
-   function fp_neg "inline" (x:t) : t =
-      (from_real (-. (to_real x)))
+   function fp_neg (x:t) : t
    (* absolute value, no rounding mode *)
 
-   function fp_add "inline" (x:t) (y:t) : t =
-      from_real (GenFloat.round rounding_mode
-                                ((to_real x) +. (to_real y)))
-
-   function fp_sub "inline" (x:t) (y:t) : t =
-      from_real (GenFloat.round rounding_mode
-                                ((to_real x) -. (to_real y)))
-
-   function fp_mul "inline" (x:t) (y:t) : t =
-      from_real (GenFloat.round rounding_mode
-                                ((to_real x) *. (to_real y)))
-
-   function fp_div "inline" (x:t) (y:t) : t =
-      from_real (GenFloat.round rounding_mode
-                                ((to_real x) /. (to_real y)))
-
-
-   function fp_fma "inline" (x:t) (y:t) (z:t) : t =
-      from_real (GenFloat.round rounding_mode
-                                ((to_real x) *. (to_real y) +. (to_real z)))
+   function fp_add (x:t) (y:t) : t
+   function fp_sub (x:t) (y:t) : t
+   function fp_mul (x:t) (y:t) : t
+   function fp_div (x:t) (y:t) : t
+   function fp_fma (x:t) (y:t) (z:t) : t
    (* fused multiplication and addition: x*y+z *)
-
    function fp_sqrt (x:t) : t
-
    function fp_rem (x:t) (y:t) : t
    (* x-y*n, where n in Z is nearest to x/y *)
 
@@ -63,20 +53,17 @@ theory IEEE_Float
    function roundToIntegral_RTZ (x:t) : t
    (* round to integral *)
 
-   function fp_min (x:t) (y:t) : t =
-      (if to_real x <. to_real y then x else y)
-
-   function fp_max (x:t) (y:t) : t =
-      (if to_real x >. to_real y then x else y)
+   function fp_min (x:t) (y:t) : t
+   function fp_max (x:t) (y:t) : t
 
    (*** comparison operators ***)
 
    predicate fp_eq  (x:t) (y:t)
    predicate fp_neq "inline" (x:t) (y:t) = not (fp_eq x y)
-   predicate fp_leq "inline" (x:t) (y:t) = (to_real x) <=. (to_real y)
-   predicate fp_lt  "inline" (x:t) (y:t) = (to_real x) <. (to_real y)
-   predicate fp_geq "inline" (x:t) (y:t) = (to_real x) >=. (to_real y)
-   predicate fp_gt  "inline" (x:t) (y:t) = (to_real x) >. (to_real y)
+   predicate fp_leq (x:t) (y:t)
+   predicate fp_lt  (x:t) (y:t)
+   predicate fp_geq (x:t) (y:t)
+   predicate fp_gt  (x:t) (y:t)
 
    (*** classification of numbers ***)
 
@@ -97,13 +84,13 @@ theory IEEE_Float
 end
 
 theory Single_RNE
-   use export floating_point.Rounding
+   use import IEEE_Rounding_Mode
 
    type single
 
    constant be : int = 8
    constant sb : int = 24
-   constant rm : mode = NearestTiesToEven
+   constant rm : mode = roundNearestTiesToEven
 
    clone export IEEE_Float with
       type t = single,
@@ -113,13 +100,13 @@ theory Single_RNE
 end
 
 theory Double_RNE
-   use export floating_point.Rounding
+   use import IEEE_Rounding_Mode
 
    type double
 
    constant be : int = 11
    constant sb : int = 53
-   constant rm : mode = NearestTiesToEven
+   constant rm : mode = roundNearestTiesToEven
 
    clone export IEEE_Float with
       type t = double,

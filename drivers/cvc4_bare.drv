@@ -24,6 +24,9 @@ transformation "eliminate_recursion"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
 
+(* This seems to actually simplify the output in most cases. *)
+transformation "eliminate_let"
+
 transformation "simplify_formula"
 
 (* remove pointless quantifiers from the goal *)
@@ -33,6 +36,9 @@ transformation "eliminate_bounded_types"
 (* For some reason this is commented out in all drivers except gappa
 and mathematica. Why? *)
 (* transformation "simplify_trivial_quantification" *)
+
+
+
 
 transformation "discriminate"
 transformation "encoding_smt"
@@ -173,6 +179,7 @@ theory bool.Bool
    meta "encoding : kept" type bool
    meta "eliminate_algebraic" "no_inversion"
    meta "eliminate_algebraic" "no_selector"
+   meta "eliminate_algebraic" "no_index"
 
    syntax type     bool  "Bool"
    syntax function True  "true"
@@ -252,42 +259,15 @@ theory map.Map
   syntax function set   "(store %1 %2 %3)"
 end
 
-theory floating_point.Rounding
+theory ieee754.IEEE_Rounding_Mode
+   syntax type mode "RoundingMode"
    meta "encoding : kept" type mode
-   meta "eliminate_algebraic" "no_inversion"
-   meta "eliminate_algebraic" "no_selector"
-   meta "eliminate_algebraic" "no_index"
 
-   syntax function NearestTiesToEven "RNE"
-   syntax function NearestTiesToAway "RNA"
-   syntax function Up "RTP"
-   syntax function Down "RTN"
-   syntax function ToZero "RTZ"
-end
-
-theory floating_point.GenFloat
-   remove prop Bounded_real_no_overflow
-   remove prop Round_monotonic
-   remove prop Round_idempotent
-   remove prop Round_value
-   remove prop Bounded_value
-   remove prop Exact_rounding_for_integers
-   remove prop Round_down_le
-   remove prop Round_up_ge
-   remove prop Round_down_neg
-   remove prop Round_up_neg
-
-   syntax function model "xREMOVEx"
-   syntax function exact "xREMOVEx"
-   syntax function value "xREMOVEx"
-   syntax function round "xREMOVEx"
-   syntax function round_logic "xREMOVEx"
-   syntax function round_error "xREMOVEx"
-   syntax function total_error "xREMOVEx"
-   syntax function max "xREMOVEx"
-   syntax predicate no_overflow "xREMOVEx"
-   syntax function max_representable_integer "xREMOVEx"
-
+   syntax function roundNearestTiesToEven "RNE"
+   syntax function roundNearestTiesToAway "RNA"
+   syntax function roundTowardPositive    "RTP"
+   syntax function roundTowardNegative    "RTN"
+   syntax function roundTowardZero        "RTZ"
 end
 
 theory ieee754.Single_RNE
@@ -404,10 +384,3 @@ theory ieee754.Double_RNE_Conversion
 
 end
 
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)
