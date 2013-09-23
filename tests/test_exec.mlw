@@ -160,17 +160,36 @@ module Array
 
   let test0 () = let t = Array.make 2 21 in t[0]+t[1]
 
-  let test1 () = 
-    let t = Array.make 2 21 in 
+  let test1 () =
+    let t = Array.make 2 21 in
     t[1] <- 17;
     t[0]+t[1]
 
-  let t () : array int = 
+  let test2 () =
+    let t = Array.make 2 21 in
+    t[1] <- 17;
+    t[0] <- 7;
+    t[0]+t[1]
+
+  let t () : array int =
      let t = Array.make 3 0 in
      t[0] <- 12;
      t[1] <- 42;
      t[2] <- 67;
      t
+
+  let tbis () = t ()
+
+  let t0 () =
+     let t = Array.make 3 0 in
+     t[0] <- 12;
+     t[1] <- 42;
+     t[2] <- 67;
+     t[0] + t[1] + t[2] (* 121 *)
+
+  let t1 () = 
+    let t = t () in
+    t[0] + t[1] + t[2] (* 121 *)
 
   let test12 () = search (t ()) 12
   let test42 () = search (t ()) 42

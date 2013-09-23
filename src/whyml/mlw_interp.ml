@@ -305,7 +305,7 @@ let builtin_array_type kn its =
     | [(pls,_)] -> array_cons_ls := pls.pl_ls
     | _ ->  assert false
 
-let exec_array_make _env s args =
+let exec_array_make _env _spec s args =
   match args with
     | [n;def] ->
       let ty_def = match def.t_ty with
@@ -318,7 +318,7 @@ let exec_array_make _env s args =
       Normal t,s
     | _ -> assert false
 
-let exec_array_get _env s args =
+let exec_array_get _env _spec s args =
   match args with
     | [t;i] ->
       begin
@@ -334,11 +334,46 @@ let exec_array_get _env s args =
       end
     | _ -> assert false
 
+let exec_array_length _env _spec s args =
+  match args with
+    | [t] ->
+      begin
+        match t.t_node with
+          | Tapp(ls,[len;_m]) when ls_equal ls !array_cons_ls ->
+            Normal len,s
+          | _ -> assert false
+      end
+    | _ -> assert false
+
+let exec_array_set env spec s args =
+  match args with
+    | [t;i;v] ->
+      begin
+        match t.t_node with
+          | Tapp(ls,[_len;m]) when ls_equal ls !array_cons_ls ->
+            let t = eval_map_set m.t_ty !ls_map_set [m;i;v] in
+            let effs = spec.c_effect.eff_writes in
+            let reg =
+              if Sreg.cardinal effs = 1 then Sreg.choose effs
+              else assert false
+            in
+            let reg =
+              try Mreg.find reg env.regenv
+              with Not_found -> reg
+            in
+            let s' = Mreg.add reg t s in
+            Normal (Mlw_expr.t_void),s'
+          | _ -> assert false
+      end
+    | _ -> assert false
+
 let built_in_modules =
   [ "array","Array",
     ["array", builtin_array_type],
     ["make", None, exec_array_make ;
      "mixfix []", None, exec_array_get ;
+     "length", None, exec_array_length ;
+     "mixfix []<-", None, exec_array_set ;
     ] ;
   ]
 
@@ -666,7 +701,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         end
       | LetA _ -> Irred e, s
     end
-  | Eapp(e1,pvs,_spec) ->
+  | Eapp(e1,pvs,spec) ->
     begin match eval_expr env s e1 with
       | Fun(ps,args,n), s' ->
         if n > 1 then
@@ -679,7 +714,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           in
           begin
             try
-              exec_app env s' ps (pvs::args) ity_result
+              exec_app env s' ps (pvs::args) spec ity_result
             with Exit -> Irred e, s
           end
       | _ -> Irred e, s
@@ -760,6 +795,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           | DownTo -> Big_int.ge_big_int, Big_int.pred_big_int
         in
         let rec iter i s =
+          eprintf "[interp] for loop with index = %s@."
+            (Big_int.string_of_big_int i);
           if le i b then
             let env' = bind_vs pvs.pv_vs (term_of_big_int i) env in
             match eval_expr env' s e1 with
@@ -791,11 +828,13 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
       with Not_found -> reg
     in
     Normal t_void, Mreg.add r t s
+  | Eassert _ ->
+    (* TODO check the validity ! *)
+    Normal t_void, s
+  | Eghost e (* -> (* eval_expr env s e *) Normal t_void, s  *)
   | Erec _
-  | Eghost _
   | Eany _
   | Eabstr _
-  | Eassert _
   | Eabsurd ->
     Format.eprintf "@[Unsupported expression: @[%a@]@]@."
                   Mlw_pretty.print_expr e;
@@ -815,7 +854,7 @@ and exec_match env t s ebl =
   in
   iter ebl
 
-and exec_app env s ps args ity_result =
+and exec_app env s ps args spec ity_result =
   let args' = List.rev_map (fun pvs -> get_pvs env s pvs) args in
   let args_ty = List.rev_map (fun pvs -> pvs.pv_ity) args in
   let subst =
@@ -830,21 +869,30 @@ and exec_app env s ps args ity_result =
       let lam = d.fun_lambda in
       let env' = multibind_pvs lam.l_args args' env1 in
         (*
-           eprintf "@[Evaluating function body of %s in regenv: %a@\nand state: %a@]@."
+           eprintf "@[Evaluating function body of %s in regenv:@\n%a@\nand state:@\n%a@]@."
            ps.ps_name.Ident.id_string
           (Pp.print_list Pp.comma
              (fun fmt (r1,r2) ->
                fprintf fmt "@[%a -> %a@]"
                  Mlw_pretty.print_reg r1
                  Mlw_pretty.print_reg r2))
-          (Mreg.bindings env''.regenv)
-          print_state s';
+          (Mreg.bindings env'.regenv)
+          print_state s;
         *)
-      eval_expr env' s lam.l_expr
+      let r,s' = eval_expr env' s lam.l_expr
+      in
+      (*
+        eprintf "@[Return from function %s value %a in state:@\n%a@]@."
+        ps.ps_name.Ident.id_string
+        print_result r
+        print_state s';
+      *)
+      r,s'
+
     | None ->
       try
         let f = Hps.find builtin_progs ps in
-        f env1 s args'
+        f env1 spec s args'
       with Not_found ->
         Format.eprintf "[Exec] definition of psymbol %s not found@."
           ps.ps_name.Ident.id_string;
