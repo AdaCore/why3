@@ -132,7 +132,6 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
                  ?(cleanup=false) ?(inplace=false) fin =
 
   let arglist = Cmdline.cmdline_split command in
-  let command = List.hd arglist in
   let use_stdin = ref true in
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
@@ -158,6 +157,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
       raise e
   in
   let arglist = List.map subst arglist in
+  let command = List.hd arglist in
   Debug.dprintf debug "@[<hov 2>Call_provers: command is: %a@]@."
     (Pp.print_list Pp.space pp_print_string) arglist;
   let argarray = Array.of_list arglist in

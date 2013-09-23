@@ -579,10 +579,8 @@ fi
 
 if test "$enable_local" = no; then
    LOCALDIR=''
-   LOCALBIN=''
 else
    LOCALDIR="${PWD}"
-   LOCALBIN="${PWD}/bin/"
 fi
 
 #For the META
@@ -667,7 +665,6 @@ AC_SUBST(FRAMAC_LIBDIR)
 
 AC_SUBST(enable_local)
 AC_SUBST(LOCALDIR)
-AC_SUBST(LOCALBIN)
 
 AC_SUBST(enable_relocation)
 
@@ -677,7 +674,7 @@ dnl AC_SUBST(PDFVIEWER)
 # Finally create the Makefile from Makefile.in
 dnl AC_OUTPUT(Makefile)
 AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
-AC_CONFIG_FILES(share/provers-detection-data.conf lib/why3/META)
+AC_CONFIG_FILES(lib/why3/META)
 AC_CONFIG_FILES(src/jessie/Makefile)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/config.sh doc/version.tex;

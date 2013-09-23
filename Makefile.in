@@ -1061,19 +1061,20 @@ endif
 # tools
 #######
 
-TOOLS = bin/why3-cpulimit$(EXE)
+TOOLS = lib/why3-cpulimit$(EXE)
 
 byte opt: $(TOOLS)
 
-bin/why3-cpulimit$(EXE): src/tools/@CPULIMIT@.c
+lib/why3-cpulimit$(EXE): src/tools/@CPULIMIT@.c
 	$(CC) -Wall -o $@ $^
 
 clean::
-	rm -f bin/why3-cpulimit$(EXE) src/tools/*~
+	rm -f lib/why3-cpulimit$(EXE) src/tools/*~
 
 install_no_local::
-	cp -f bin/why3-cpulimit$(EXE) $(BINDIR)/why3-cpulimit$(EXE)
-	cp -f bin/why3-call-pvs $(BINDIR)/why3-call-pvs
+	mkdir -p $(LIBDIR)/why3
+	cp -f lib/why3-cpulimit$(EXE) $(LIBDIR)/why3/why3-cpulimit$(EXE)
+	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
 
 #########
 # why3doc
@@ -1534,7 +1535,7 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       modules/*.mlw \
       lib/coq/*.v lib/coq/*/*.v lib/coq-tactic/*.v \
       lib/pvs/*/*.pvs lib/pvs/*/*.prf \
-      share/provers-detection-data.conf.in \
+      share/provers-detection-data.conf \
       share/why3session.dtd \
       share/javascript/*.js share/javascript/*.css \
       share/javascript/themes/default/*.gif \
@@ -1661,16 +1662,10 @@ clean::
 doc/version.tex: doc/version.tex.in config.status
 	./config.status chmod --file $@
 
-share/provers-detection-data.conf: share/provers-detection-data.conf.in config.status
-	./config.status chmod --file $@
-
-# We want it to be always up-ot-date
-Makefile : share/provers-detection-data.conf
-
 config.status: configure Version
 	./config.status --recheck
 
-opt byte: lib/why3/META share/provers-detection-data.conf
+opt byte: lib/why3/META
 
 lib/why3/META: lib/why3/META.in config.status
 	./config.status chmod --file $@
