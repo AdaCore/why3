@@ -831,7 +831,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Eassert _ ->
     (* TODO check the validity ! *)
     Normal t_void, s
-  | Eghost e (* -> (* eval_expr env s e *) Normal t_void, s  *)
+  | Eghost _ (* -> (* eval_expr env s e *) Normal t_void, s  *)
   | Erec _
   | Eany _
   | Eabstr _
