@@ -75,11 +75,18 @@ theory IEEE_Float
    predicate isNaN       t
 
    (*** some constants ***)
+
    function fp_constant_zero : t = from_real 0.0
 
    (*** helper functions required by gnat2why ***)
+
    function floor (t)   : t
    function ceiling (t) : t
+
+   (*** unimplemented functions, for now ***)
+
+   function fp_pow  (x:t) (y:t)   : t
+   function fp_pown (x:t) (y:int) : t
 
 end
 
