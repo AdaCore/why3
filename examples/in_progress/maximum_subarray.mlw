@@ -1,0 +1,49 @@
+
+(* Maximum subarray problem
+
+   Given an array of integers, find the contiguous subarray with the
+   largest sum.
+ *)
+
+module Spec
+  use import int.Int
+  use export array.Array
+  use export array.ArraySum
+
+  predicate maxsub (a: array int) (min max: int) (s: int) =
+    forall l h: int. min <= l <= h <= max -> sum a l h <= s
+
+end
+
+(* Naive solution, in O(N^3) *)
+module Algo1
+
+  use import ref.Refint
+  use import Spec
+
+  let maximum_subarray (a: array int) (ghost lo hi: ref int): int
+    ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
+    ensures { maxsub a 0 (length a) result }
+  = lo := 0;
+    hi := 0;
+    let n = length a in
+    let ms = ref 0 in
+    for l = 0 to n-1 do
+      invariant { 0 <= !lo <= l && 0 <= !hi <= n && !ms = sum a !lo !hi }
+      invariant { forall l': int. 0 <= l' < l -> maxsub a l' n !ms }
+      for h = l to n-1 do
+        invariant { 0 <= !lo <= l && 0 <= !hi <= n && !ms = sum a !lo !hi }
+        invariant { forall l': int. 0 <= l' < l -> maxsub a l' n !ms }
+        invariant { forall h': int. l <= h' < h -> maxsub a l h' !ms }
+        let s = ref 0 in
+        for i = l to h do
+          invariant { !s = sum a l i }
+          invariant { 0 <= !lo <= l && 0 <= !hi <= n && !ms = sum a !lo !hi }
+          s += a[i]
+        done;
+        if !s > !ms then begin ms := !s; lo := l; hi := h+1 end
+      done
+    done;
+    !ms
+
+end
