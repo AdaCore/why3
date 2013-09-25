@@ -10,8 +10,11 @@ module Spec
   use export array.Array
   use export array.ArraySum
 
-  predicate maxsub (a: array int) (min max: int) (s: int) =
-    forall l h: int. min <= l <= h <= max -> sum a l h <= s
+  predicate maxsublo (a: array int) (maxlo: int) (s: int) =
+    forall l h: int. 0 <= l < maxlo -> l <= h <= length a -> sum a l h <= s
+
+  predicate maxsub (a: array int) (s: int) =
+    forall l h: int. 0 <= l <= h <= length a -> sum a l h <= s
 
 end
 
@@ -23,27 +26,30 @@ module Algo1
 
   let maximum_subarray (a: array int) (ghost lo hi: ref int): int
     ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
-    ensures { maxsub a 0 (length a) result }
+    ensures { maxsub a result }
   = lo := 0;
     hi := 0;
     let n = length a in
     let ms = ref 0 in
     for l = 0 to n-1 do
-      invariant { 0 <= !lo <= l && 0 <= !hi <= n && !ms = sum a !lo !hi }
-      invariant { forall l': int. 0 <= l' < l -> maxsub a l' n !ms }
-      for h = l to n-1 do
-        invariant { 0 <= !lo <= l && 0 <= !hi <= n && !ms = sum a !lo !hi }
-        invariant { forall l': int. 0 <= l' < l -> maxsub a l' n !ms }
-        invariant { forall h': int. l <= h' < h -> maxsub a l h' !ms }
+      invariant { 0 <= !lo <= l && !lo <= !hi <= n && !ms = sum a !lo !hi }
+      invariant { maxsublo a l !ms }
+      for h = l to n do
+        invariant { 0 <= !lo <= l && !lo <= !hi <= n && !ms = sum a !lo !hi }
+        invariant { maxsublo a l !ms }
+        invariant { forall h': int. l <= h' < h -> sum a l h' <= !ms }
+        (* consider the sum of a[l..h[ *)
         let s = ref 0 in
-        for i = l to h do
+        for i = l to h-1 do
           invariant { !s = sum a l i }
-          invariant { 0 <= !lo <= l && 0 <= !hi <= n && !ms = sum a !lo !hi }
+          invariant { 0 <= !lo <= l && !lo <= !hi <= n && !ms = sum a !lo !hi }
           s += a[i]
         done;
-        if !s > !ms then begin ms := !s; lo := l; hi := h+1 end
+        assert { !s = sum a l h };
+        if !s > !ms then begin ms := !s; lo := l; hi := h end
       done
     done;
     !ms
 
 end
+

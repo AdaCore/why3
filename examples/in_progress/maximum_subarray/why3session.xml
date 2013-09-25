@@ -7,15 +7,11 @@
   version="0.95.1"/>
  <prover
   id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
   name="Z3"
-  version="3.2"/>
+  version="4.3.1"/>
  <file
   name="../maximum_subarray.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="Spec"
@@ -27,30 +23,30 @@
   <theory
    name="Algo1"
    locfile="../maximum_subarray.mlw"
-   loclnum="19" loccnumb="7" loccnume="12"
-   verified="false"
+   loclnum="22" loccnumb="7" loccnume="12"
+   verified="true"
    expanded="true">
    <goal
     name="WP_parameter maximum_subarray"
     locfile="../maximum_subarray.mlw"
-    loclnum="24" loccnumb="6" loccnume="22"
+    loclnum="27" loccnumb="6" loccnume="22"
     expl="VC for maximum_subarray"
-    sum="4684ffbc9112a1d5ecbadb36bb90ae02"
-    proved="false"
+    sum="4f20ed377886f1abf85b56afb51f106d"
+    proved="true"
     expanded="true"
-    shape="amaxsubV2c0V0V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=c0V8IamaxsubV2V9V0V6Iainfix &lt;V9ainfix +V5c1Aainfix &lt;=c0V9FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8AamaxsubV2V15V0V12Iainfix &lt;V15ainfix +V10c1Aainfix &lt;=c0V15FAainfix =V12asumV1V14V13Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V14ainfix +V10c1Aainfix &lt;=c0V14IamaxsubV2V10V16V12Iainfix &lt;V16ainfix +V11c1Aainfix &lt;=V10V16FAamaxsubV2V17V0V12Iainfix &lt;V17V10Aainfix &lt;=c0V17FAainfix =V12asumV1V14V13Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V14V10Aainfix &lt;=c0V14AiamaxsubV2V10V20V12Iainfix &lt;V20ainfix +V18c1Aainfix &lt;=V10V20FAamaxsubV2V21V0V12Iainfix &lt;V21V10Aainfix &lt;=c0V21FAainfix =V12asumV1V14V13Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V14V10Aainfix &lt;=c0V14amaxsubV2V10V25V22Iainfix &lt;V25ainfix +V18c1Aainfix &lt;=V10V25FAamaxsubV2V26V0V22Iainfix &lt;V26V10Aainfix &lt;=c0V26FAainfix =V22asumV1V23V24Aainfix &lt;=V24V0Aainfix &lt;=c0V24Aainfix &lt;=V23V10Aainfix &lt;=c0V23Iainfix =V24ainfix +V18c1FIainfix =V23V10FIainfix =V22V19Fainfix &gt;V19V12Iainfix =V12asumV1V14V13Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V14V10Aainfix &lt;=c0V14Aainfix =V19asumV1V10ainfix +V18c1Aainfix =V12asumV1V14V13Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V14V10Aainfix &lt;=c0V14Aainfix =V28asumV1V10ainfix +V27c1Iainfix =V28ainfix +V19agetV1V27FAainfix &lt;V27V0Aainfix &lt;=c0V27Iainfix =V12asumV1V14V13Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V14V10Aainfix &lt;=c0V14Aainfix =V19asumV1V10V27Iainfix &lt;=V27V18Aainfix &lt;=V10V27FFAainfix =V12asumV1V14V13Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V14V10Aainfix &lt;=c0V14Aainfix =c0asumV1V10V10Iainfix &lt;=V10V18AiamaxsubV2V10V29V12Iainfix &lt;V29ainfix +V18c1Aainfix &lt;=V10V29FAamaxsubV2V30V0V12Iainfix &lt;V30V10Aainfix &lt;=c0V30FAainfix =V12asumV1V14V13Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V14V10Aainfix &lt;=c0V14amaxsubV2V10V34V31Iainfix &lt;V34ainfix +V18c1Aainfix &lt;=V10V34FAamaxsubV2V35V0V31Iainfix &lt;V35V10Aainfix &lt;=c0V35FAainfix =V31asumV1V32V33Aainfix &lt;=V33V0Aainfix &lt;=c0V33Aainfix &lt;=V32V10Aainfix &lt;=c0V32Iainfix =V33ainfix +V18c1FIainfix =V32V10FIainfix =V31c0Fainfix &gt;c0V12Iainfix &gt;V10V18IamaxsubV2V10V36V12Iainfix &lt;V36V18Aainfix &lt;=V10V36FAamaxsubV2V37V0V12Iainfix &lt;V37V10Aainfix &lt;=c0V37FAainfix =V12asumV1V14V13Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V14V10Aainfix &lt;=c0V14Iainfix &lt;=V18V11Aainfix &lt;=V10V18FFAamaxsubV2V10V38V6Iainfix &lt;V38V10Aainfix &lt;=V10V38FAamaxsubV2V39V0V6Iainfix &lt;V39V10Aainfix &lt;=c0V39FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V10Aainfix &lt;=c0V8Iainfix &lt;=V10V11AamaxsubV2V40V0V6Iainfix &lt;V40ainfix +V10c1Aainfix &lt;=c0V40FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8ainfix +V10c1Aainfix &lt;=c0V8Iainfix &gt;V10V11Lainfix -V0c1IamaxsubV2V41V0V6Iainfix &lt;V41V10Aainfix &lt;=c0V41FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V10Aainfix &lt;=c0V8Iainfix &lt;=V10V5Aainfix &lt;=c0V10FFAamaxsubV2V42V0c0Iainfix &lt;V42c0Aainfix &lt;=c0V42FAainfix =c0asumV1V3V4Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=V3c0Aainfix &lt;=c0V3Iainfix &lt;=c0V5AamaxsubV2c0V0c0Aainfix =c0asumV1V3V4Aainfix &lt;=V4V0Aainfix &lt;=V3V4Aainfix &lt;=c0V3Iainfix &gt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+    shape="amaxsubV2V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=c0V8IamaxsubloV2ainfix +V5c1V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8AamaxsubloV2ainfix +V9c1V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12ainfix +V9c1Aainfix &lt;=c0V12Iainfix &lt;=asumV1V9V13V10Iainfix &lt;V13ainfix +V0c1Aainfix &lt;=V9V13FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aiainfix &lt;=asumV1V9V17V10Iainfix &lt;V17ainfix +V14c1Aainfix &lt;=V9V17FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12ainfix &lt;=asumV1V9V21V18Iainfix &lt;V21ainfix +V14c1Aainfix &lt;=V9V21FAamaxsubloV2V9V18Aainfix =V18asumV1V19V20Aainfix &lt;=V20V0Aainfix &lt;=V19V20Aainfix &lt;=V19V9Aainfix &lt;=c0V19Iainfix =V20V14FIainfix =V19V9FIainfix =V18V16Fainfix &gt;V16V10Aainfix =V16asumV1V9V14Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V16asumV1V9ainfix +V15c1Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V23asumV1V9ainfix +V22c1Iainfix =V23ainfix +V16agetV1V22FAainfix &lt;V22V0Aainfix &lt;=c0V22Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V16asumV1V9V22Iainfix &lt;=V22V15Aainfix &lt;=V9V22FFAainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =c0asumV1V9V9Iainfix &lt;=V9V15Aiainfix &lt;=asumV1V9V24V10Iainfix &lt;V24ainfix +V14c1Aainfix &lt;=V9V24FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12ainfix &lt;=asumV1V9V28V25Iainfix &lt;V28ainfix +V14c1Aainfix &lt;=V9V28FAamaxsubloV2V9V25Aainfix =V25asumV1V26V27Aainfix &lt;=V27V0Aainfix &lt;=V26V27Aainfix &lt;=V26V9Aainfix &lt;=c0V26Iainfix =V27V14FIainfix =V26V9FIainfix =V25c0Fainfix &gt;c0V10Aainfix =c0asumV1V9V14Iainfix &gt;V9V15Lainfix -V14c1Iainfix &lt;=asumV1V9V29V10Iainfix &lt;V29V14Aainfix &lt;=V9V29FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V14V0Aainfix &lt;=V9V14FFAainfix &lt;=asumV1V9V30V6Iainfix &lt;V30V9Aainfix &lt;=V9V30FAamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V0AamaxsubloV2ainfix +V9c1V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V9c1Aainfix &lt;=c0V8Iainfix &gt;V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFAamaxsubloV2c0c0Aainfix =c0asumV1V3V4Aainfix &lt;=V4V0Aainfix &lt;=V3V4Aainfix &lt;=V3c0Aainfix &lt;=c0V3Iainfix &lt;=c0V5AamaxsubV2c0Aainfix =c0asumV1V3V4Aainfix &lt;=V4V0Aainfix &lt;=V3V4Aainfix &lt;=c0V3Iainfix &gt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
     <label
      name="expl:VC for maximum_subarray"/>
     <transf
      name="split_goal_wp"
-     proved="false"
+     proved="true"
      expanded="true">
      <goal
       name="WP_parameter maximum_subarray.1"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="1. postcondition"
-      sum="c03fecb5c10374d6419c9f5e497d8269"
+      sum="2fe7be1a8b7066438d677c3acb249f84"
       proved="true"
       expanded="false"
       shape="postconditionainfix =c0asumV1V3V4Aainfix &lt;=V4V0Aainfix &lt;=V3V4Aainfix &lt;=c0V3Iainfix &gt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
@@ -68,12 +64,12 @@
      <goal
       name="WP_parameter maximum_subarray.2"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="2. postcondition"
-      sum="571aa2e5dadb205febb2ce0683e16ace"
+      sum="07a01a159eb7b9037846afe4803b7724"
       proved="true"
       expanded="false"
-      shape="postconditionamaxsubV2c0V0c0Iainfix &gt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="postconditionamaxsubV2c0Iainfix &gt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -88,12 +84,12 @@
      <goal
       name="WP_parameter maximum_subarray.3"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="3. loop invariant init"
-      sum="47cbabd3d8d640c8e6644ca96070f267"
+      sum="73bc72d9c501a97489c6b6def767dccd"
       proved="true"
       expanded="false"
-      shape="loop invariant initainfix =c0asumV1V3V4Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=V3c0Aainfix &lt;=c0V3Iainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant initainfix =c0asumV1V3V4Aainfix &lt;=V4V0Aainfix &lt;=V3V4Aainfix &lt;=V3c0Aainfix &lt;=c0V3Iainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -108,12 +104,12 @@
      <goal
       name="WP_parameter maximum_subarray.4"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="4. loop invariant init"
-      sum="70861d1286427a70df6e6541eae0d539"
+      sum="2a73561f77d0bbc3b03721e4f5427678"
       proved="true"
       expanded="false"
-      shape="loop invariant initamaxsubV2V6V0c0Iainfix &lt;V6c0Aainfix &lt;=c0V6FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant initamaxsubloV2c0c0Iainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -128,12 +124,12 @@
      <goal
       name="WP_parameter maximum_subarray.5"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="5. loop invariant preservation"
-      sum="825b1a222f94049bf766e0a76d56dd90"
+      sum="da8eeec730821ef06550ec3877086aa4"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8ainfix +V9c1Aainfix &lt;=c0V8Iainfix &gt;V9V10Lainfix -V0c1IamaxsubV2V11V0V6Iainfix &lt;V11V9Aainfix &lt;=c0V11FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V9c1Aainfix &lt;=c0V8Iainfix &gt;V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -148,12 +144,12 @@
      <goal
       name="WP_parameter maximum_subarray.6"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="6. loop invariant preservation"
-      sum="b3cf5559246e8d1e9f2cb3b8cdfd0499"
+      sum="2355ab0642733e2884f1787412a5171e"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationamaxsubV2V11V0V6Iainfix &lt;V11ainfix +V9c1Aainfix &lt;=c0V11FIainfix &gt;V9V10Lainfix -V0c1IamaxsubV2V12V0V6Iainfix &lt;V12V9Aainfix &lt;=c0V12FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationamaxsubloV2ainfix +V9c1V6Iainfix &gt;V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -162,18 +158,18 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter maximum_subarray.7"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="7. loop invariant init"
-      sum="c1735c72662fa0041ca4c3de39589fc8"
+      sum="b0f5ce1761a42b7f5bbfd6aa24257bff"
       proved="true"
       expanded="false"
-      shape="loop invariant initainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V11V0V6Iainfix &lt;V11V9Aainfix &lt;=c0V11FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant initainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -188,12 +184,49 @@
      <goal
       name="WP_parameter maximum_subarray.8"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="8. loop invariant init"
-      sum="ef09132acd22c3e6620c092caf5ec7ba"
+      sum="c224563d8d16b0a3987ae5694b78f9d4"
       proved="true"
       expanded="false"
-      shape="loop invariant initamaxsubV2V11V0V6Iainfix &lt;V11V9Aainfix &lt;=c0V11FIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V12V0V6Iainfix &lt;V12V9Aainfix &lt;=c0V12FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant initamaxsubloV2V9V6Iainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for maximum_subarray"/>
+      <transf
+       name="inline_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter maximum_subarray.8.1"
+        locfile="../maximum_subarray.mlw"
+        loclnum="27" loccnumb="6" loccnume="22"
+        expl="1. loop invariant init"
+        sum="e4ca41b5891275d3d12c2c97ec1b8fe3"
+        proved="true"
+        expanded="false"
+        shape="loop invariant initainfix &lt;=asumV2V10V11V6Iainfix &lt;=V11alengthV2Aainfix &lt;=V10V11Iainfix &lt;V10V9Aainfix &lt;=c0V10FIainfix =V9V0Oainfix &lt;V9V0Iainfix &lt;=asumV2V12V13V6Iainfix &lt;=V13alengthV2Aainfix &lt;=V12V13Iainfix &lt;V12V9Aainfix &lt;=c0V12FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =V8V7Oainfix &lt;V8V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for maximum_subarray"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter maximum_subarray.9"
+      locfile="../maximum_subarray.mlw"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="9. loop invariant init"
+      sum="d761f300e9f1f4d6e796130983ad46ed"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=asumV1V9V10V6Iainfix &lt;V10V9Aainfix &lt;=V9V10FIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -206,34 +239,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter maximum_subarray.9"
-      locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="9. loop invariant init"
-      sum="9f1d0eab4c5ecd12d1bb80587688b674"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initamaxsubV2V9V11V6Iainfix &lt;V11V9Aainfix &lt;=V9V11FIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V12V0V6Iainfix &lt;V12V9Aainfix &lt;=c0V12FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for maximum_subarray"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
       name="WP_parameter maximum_subarray.10"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="10. loop invariant preservation"
-      sum="331c041cc7ccd487f4e2135360749cdd"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="10. assertion"
+      sum="a06af6dc5bb5743730ab1bd24ece60b4"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =V15asumV1V16V17Aainfix &lt;=V17V0Aainfix &lt;=c0V17Aainfix &lt;=V16V9Aainfix &lt;=c0V16Iainfix =V17ainfix +V14c1FIainfix =V16V9FIainfix =V15c0FIainfix &gt;c0V11Iainfix &gt;V9V14IamaxsubV2V9V18V11Iainfix &lt;V18V14Aainfix &lt;=V9V18FAamaxsubV2V19V0V11Iainfix &lt;V19V9Aainfix &lt;=c0V19FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V20V0V6Iainfix &lt;V20V9Aainfix &lt;=c0V20FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="assertionainfix =c0asumV1V9V13Iainfix &gt;V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V15V10Iainfix &lt;V15V13Aainfix &lt;=V9V15FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -248,12 +261,12 @@
      <goal
       name="WP_parameter maximum_subarray.11"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="11. loop invariant preservation"
-      sum="cc86aafc7d87628619f02e8c7bf05dd4"
+      sum="b9ae386bf9c9d673b0725499e15eb4a3"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationamaxsubV2V18V0V15Iainfix &lt;V18V9Aainfix &lt;=c0V18FIainfix =V17ainfix +V14c1FIainfix =V16V9FIainfix =V15c0FIainfix &gt;c0V11Iainfix &gt;V9V14IamaxsubV2V9V19V11Iainfix &lt;V19V14Aainfix &lt;=V9V19FAamaxsubV2V20V0V11Iainfix &lt;V20V9Aainfix &lt;=c0V20FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V21V0V6Iainfix &lt;V21V9Aainfix &lt;=c0V21FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationainfix =V15asumV1V16V17Aainfix &lt;=V17V0Aainfix &lt;=V16V17Aainfix &lt;=V16V9Aainfix &lt;=c0V16Iainfix =V17V13FIainfix =V16V9FIainfix =V15c0FIainfix &gt;c0V10Iainfix =c0asumV1V9V13Iainfix &gt;V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V18V10Iainfix &lt;V18V13Aainfix &lt;=V9V18FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -268,52 +281,120 @@
      <goal
       name="WP_parameter maximum_subarray.12"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="12. loop invariant preservation"
-      sum="c6c0a70fd9551816899a78063f8c0c76"
+      sum="b9acf15ea42e453e9f363380d7bc51be"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationamaxsubV2V9V18V15Iainfix &lt;V18ainfix +V14c1Aainfix &lt;=V9V18FIainfix =V17ainfix +V14c1FIainfix =V16V9FIainfix =V15c0FIainfix &gt;c0V11Iainfix &gt;V9V14IamaxsubV2V9V19V11Iainfix &lt;V19V14Aainfix &lt;=V9V19FAamaxsubV2V20V0V11Iainfix &lt;V20V9Aainfix &lt;=c0V20FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V21V0V6Iainfix &lt;V21V9Aainfix &lt;=c0V21FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationamaxsubloV2V9V15Iainfix =V17V13FIainfix =V16V9FIainfix =V15c0FIainfix &gt;c0V10Iainfix =c0asumV1V9V13Iainfix &gt;V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V18V10Iainfix &lt;V18V13Aainfix &lt;=V9V18FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
+      <transf
+       name="inline_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter maximum_subarray.12.1"
+        locfile="../maximum_subarray.mlw"
+        loclnum="27" loccnumb="6" loccnume="22"
+        expl="1. loop invariant preservation"
+        sum="00f41064d1a91d6e43d217000555dd38"
+        proved="true"
+        expanded="false"
+        shape="loop invariant preservationainfix &lt;=asumV2V18V19V15Iainfix &lt;=V19alengthV2Aainfix &lt;=V18V19Iainfix &lt;V18V9Aainfix &lt;=c0V18FIainfix =V17V13FIainfix =V16V9FIainfix =V15c0FIainfix &lt;V10c0Iainfix =c0asumV1V9V13Iainfix &lt;V14V9Lainfix -V13c1Iainfix =asumV1V9V20V10Oainfix &lt;asumV1V9V20V10Iainfix &lt;V20V13Aainfix =V9V20Oainfix &lt;V9V20FAainfix &lt;=asumV2V21V22V10Iainfix &lt;=V22alengthV2Aainfix &lt;=V21V22Iainfix &lt;V21V9Aainfix &lt;=c0V21FAainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12Iainfix =V13V0Oainfix &lt;V13V0Aainfix =V9V13Oainfix &lt;V9V13FFIainfix =V9V0Oainfix &lt;V9V0Iainfix &lt;=asumV2V23V24V6Iainfix &lt;=V24alengthV2Aainfix &lt;=V23V24Iainfix &lt;V23V9Aainfix &lt;=c0V23FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =V8V7Oainfix &lt;V8V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for maximum_subarray"/>
+        <transf
+         name="split_goal_wp"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter maximum_subarray.12.1.1"
+          locfile="../maximum_subarray.mlw"
+          loclnum="27" loccnumb="6" loccnume="22"
+          expl="1. loop invariant preservation"
+          sum="00f41064d1a91d6e43d217000555dd38"
+          proved="true"
+          expanded="false"
+          shape="loop invariant preservationainfix &lt;=asumV2V18V19V15Iainfix &lt;=V19alengthV2Aainfix &lt;=V18V19Iainfix &lt;V18V9Aainfix &lt;=c0V18FIainfix =V17V13FIainfix =V16V9FIainfix =V15c0FIainfix &lt;V10c0Iainfix =c0asumV1V9V13Iainfix &lt;V14V9Lainfix -V13c1Iainfix =asumV1V9V20V10Oainfix &lt;asumV1V9V20V10Iainfix &lt;V20V13Aainfix =V9V20Oainfix &lt;V9V20FAainfix &lt;=asumV2V21V22V10Iainfix &lt;=V22alengthV2Aainfix &lt;=V21V22Iainfix &lt;V21V9Aainfix &lt;=c0V21FAainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12Iainfix =V13V0Oainfix &lt;V13V0Aainfix =V9V13Oainfix &lt;V9V13FFIainfix =V9V0Oainfix &lt;V9V0Iainfix &lt;=asumV2V23V24V6Iainfix &lt;=V24alengthV2Aainfix &lt;=V23V24Iainfix &lt;V23V9Aainfix &lt;=c0V23FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =V8V7Oainfix &lt;V8V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
+          <label
+           name="expl:VC for maximum_subarray"/>
+          <proof
+           prover="0"
+           timelimit="10"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.05"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
      </goal>
      <goal
       name="WP_parameter maximum_subarray.13"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="13. loop invariant preservation"
-      sum="a032de1ba8e1612b552637eea35262e2"
+      sum="6af68af0228f305a1fdb275a9050dc5b"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13INainfix &gt;c0V11Iainfix &gt;V9V14IamaxsubV2V9V15V11Iainfix &lt;V15V14Aainfix &lt;=V9V15FAamaxsubV2V16V0V11Iainfix &lt;V16V9Aainfix &lt;=c0V16FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V17V0V6Iainfix &lt;V17V9Aainfix &lt;=c0V17FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationainfix &lt;=asumV1V9V18V15Iainfix &lt;V18ainfix +V13c1Aainfix &lt;=V9V18FIainfix =V17V13FIainfix =V16V9FIainfix =V15c0FIainfix &gt;c0V10Iainfix =c0asumV1V9V13Iainfix &gt;V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V19V10Iainfix &lt;V19V13Aainfix &lt;=V9V19FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
+      <transf
+       name="inline_goal"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter maximum_subarray.13.1"
+        locfile="../maximum_subarray.mlw"
+        loclnum="27" loccnumb="6" loccnume="22"
+        expl="1. loop invariant preservation"
+        sum="7f2deed9009a2641d07bd3afb2753c5f"
+        proved="true"
+        expanded="false"
+        shape="loop invariant preservationainfix =asumV1V9V18V15Oainfix &lt;asumV1V9V18V15Iainfix &lt;V18ainfix +V13c1Aainfix =V9V18Oainfix &lt;V9V18FIainfix =V17V13FIainfix =V16V9FIainfix =V15c0FIainfix &lt;V10c0Iainfix =c0asumV1V9V13Iainfix &lt;V14V9Lainfix -V13c1Iainfix =asumV1V9V19V10Oainfix &lt;asumV1V9V19V10Iainfix &lt;V19V13Aainfix =V9V19Oainfix &lt;V9V19FAainfix &lt;=asumV2V20V21V10Iainfix &lt;=V21alengthV2Aainfix &lt;=V20V21Iainfix &lt;V20V9Aainfix &lt;=c0V20FAainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12Iainfix =V13V0Oainfix &lt;V13V0Aainfix =V9V13Oainfix &lt;V9V13FFIainfix =V9V0Oainfix &lt;V9V0Iainfix &lt;=asumV2V22V23V6Iainfix &lt;=V23alengthV2Aainfix &lt;=V22V23Iainfix &lt;V22V9Aainfix &lt;=c0V22FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =V8V7Oainfix &lt;V8V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for maximum_subarray"/>
+        <transf
+         name="split_goal_wp"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter maximum_subarray.13.1.1"
+          locfile="../maximum_subarray.mlw"
+          loclnum="27" loccnumb="6" loccnume="22"
+          expl="1. loop invariant preservation"
+          sum="7f2deed9009a2641d07bd3afb2753c5f"
+          proved="true"
+          expanded="false"
+          shape="loop invariant preservationainfix =asumV1V9V18V15Oainfix &lt;asumV1V9V18V15Iainfix &lt;V18ainfix +V13c1Aainfix =V9V18Oainfix &lt;V9V18FIainfix =V17V13FIainfix =V16V9FIainfix =V15c0FIainfix &lt;V10c0Iainfix =c0asumV1V9V13Iainfix &lt;V14V9Lainfix -V13c1Iainfix =asumV1V9V19V10Oainfix &lt;asumV1V9V19V10Iainfix &lt;V19V13Aainfix =V9V19Oainfix &lt;V9V19FAainfix &lt;=asumV2V20V21V10Iainfix &lt;=V21alengthV2Aainfix &lt;=V20V21Iainfix &lt;V20V9Aainfix &lt;=c0V20FAainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12Iainfix =V13V0Oainfix &lt;V13V0Aainfix =V9V13Oainfix &lt;V9V13FFIainfix =V9V0Oainfix &lt;V9V0Iainfix &lt;=asumV2V22V23V6Iainfix &lt;=V23alengthV2Aainfix &lt;=V22V23Iainfix &lt;V22V9Aainfix &lt;=c0V22FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =V8V7Oainfix &lt;V8V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
+          <label
+           name="expl:VC for maximum_subarray"/>
+          <proof
+           prover="0"
+           timelimit="10"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.04"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
      </goal>
      <goal
       name="WP_parameter maximum_subarray.14"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="14. loop invariant preservation"
-      sum="3bd8fb64b699ae91f437941e448597b5"
+      sum="a8c6353df09cfc1f6cecbc5f9bf532f2"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationamaxsubV2V15V0V11Iainfix &lt;V15V9Aainfix &lt;=c0V15FINainfix &gt;c0V11Iainfix &gt;V9V14IamaxsubV2V9V16V11Iainfix &lt;V16V14Aainfix &lt;=V9V16FAamaxsubV2V17V0V11Iainfix &lt;V17V9Aainfix &lt;=c0V17FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V18V0V6Iainfix &lt;V18V9Aainfix &lt;=c0V18FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12INainfix &gt;c0V10Iainfix =c0asumV1V9V13Iainfix &gt;V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V15V10Iainfix &lt;V15V13Aainfix &lt;=V9V15FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -328,12 +409,12 @@
      <goal
       name="WP_parameter maximum_subarray.15"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="15. loop invariant preservation"
-      sum="6c7c090f2c9622492fa085078db0f5f9"
+      sum="ed5a55f5ca3c74def0bd0e3e38d8bed4"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationamaxsubV2V9V15V11Iainfix &lt;V15ainfix +V14c1Aainfix &lt;=V9V15FINainfix &gt;c0V11Iainfix &gt;V9V14IamaxsubV2V9V16V11Iainfix &lt;V16V14Aainfix &lt;=V9V16FAamaxsubV2V17V0V11Iainfix &lt;V17V9Aainfix &lt;=c0V17FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V18V0V6Iainfix &lt;V18V9Aainfix &lt;=c0V18FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationamaxsubloV2V9V10INainfix &gt;c0V10Iainfix =c0asumV1V9V13Iainfix &gt;V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V15V10Iainfix &lt;V15V13Aainfix &lt;=V9V15FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -342,18 +423,18 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter maximum_subarray.16"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="16. loop invariant init"
-      sum="c2a1ede9e74b2aa4e984107df8e0d959"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="16. loop invariant preservation"
+      sum="708523766880ba73010cadd5f4bd7117"
       proved="true"
       expanded="false"
-      shape="loop invariant initainfix =c0asumV1V9V9Iainfix &lt;=V9V14IamaxsubV2V9V15V11Iainfix &lt;V15V14Aainfix &lt;=V9V15FAamaxsubV2V16V0V11Iainfix &lt;V16V9Aainfix &lt;=c0V16FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V17V0V6Iainfix &lt;V17V9Aainfix &lt;=c0V17FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationainfix &lt;=asumV1V9V15V10Iainfix &lt;V15ainfix +V13c1Aainfix &lt;=V9V15FINainfix &gt;c0V10Iainfix =c0asumV1V9V13Iainfix &gt;V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V16V10Iainfix &lt;V16V13Aainfix &lt;=V9V16FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -368,12 +449,12 @@
      <goal
       name="WP_parameter maximum_subarray.17"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="17. loop invariant init"
-      sum="46a51a2b6f9c2cb52400a75e1ebeeddc"
+      sum="28cf273bcc6c4ec280217c286e00ec21"
       proved="true"
       expanded="false"
-      shape="loop invariant initainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V9V14IamaxsubV2V9V15V11Iainfix &lt;V15V14Aainfix &lt;=V9V15FAamaxsubV2V16V0V11Iainfix &lt;V16V9Aainfix &lt;=c0V16FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V17V0V6Iainfix &lt;V17V9Aainfix &lt;=c0V17FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant initainfix =c0asumV1V9V9Iainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V15V10Iainfix &lt;V15V13Aainfix &lt;=V9V15FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -388,12 +469,12 @@
      <goal
       name="WP_parameter maximum_subarray.18"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="18. precondition"
-      sum="9f5f059a93dab190160662545641c968"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="18. loop invariant init"
+      sum="4f2fa7e50f9f49285fec49f6d0b4229e"
       proved="true"
       expanded="false"
-      shape="preconditionainfix &lt;V16V0Aainfix &lt;=c0V16Iainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Aainfix =V15asumV1V9V16Iainfix &lt;=V16V14Aainfix &lt;=V9V16FFIainfix &lt;=V9V14IamaxsubV2V9V17V11Iainfix &lt;V17V14Aainfix &lt;=V9V17FAamaxsubV2V18V0V11Iainfix &lt;V18V9Aainfix &lt;=c0V18FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V19V0V6Iainfix &lt;V19V9Aainfix &lt;=c0V19FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant initainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V15V10Iainfix &lt;V15V13Aainfix &lt;=V9V15FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -408,12 +489,12 @@
      <goal
       name="WP_parameter maximum_subarray.19"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="19. loop invariant preservation"
-      sum="37ffd5e4ebd8863f7fef08d4ba0b45f3"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="19. precondition"
+      sum="cf00e75fb8b2b04634605e471c06f435"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =V17asumV1V9ainfix +V16c1Iainfix =V17ainfix +V15agetV1V16FIainfix &lt;V16V0Aainfix &lt;=c0V16Iainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Aainfix =V15asumV1V9V16Iainfix &lt;=V16V14Aainfix &lt;=V9V16FFIainfix &lt;=V9V14IamaxsubV2V9V18V11Iainfix &lt;V18V14Aainfix &lt;=V9V18FAamaxsubV2V19V0V11Iainfix &lt;V19V9Aainfix &lt;=c0V19FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V20V0V6Iainfix &lt;V20V9Aainfix &lt;=c0V20FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="preconditionainfix &lt;V16V0Aainfix &lt;=c0V16Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9V16Iainfix &lt;=V16V14Aainfix &lt;=V9V16FFIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V17V10Iainfix &lt;V17V13Aainfix &lt;=V9V17FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -428,12 +509,12 @@
      <goal
       name="WP_parameter maximum_subarray.20"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="20. loop invariant preservation"
-      sum="c4bbf775b91d695bf14c1c759fbc269b"
+      sum="09809b2e2324c761b15494977adf66e2"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix =V17ainfix +V15agetV1V16FIainfix &lt;V16V0Aainfix &lt;=c0V16Iainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Aainfix =V15asumV1V9V16Iainfix &lt;=V16V14Aainfix &lt;=V9V16FFIainfix &lt;=V9V14IamaxsubV2V9V18V11Iainfix &lt;V18V14Aainfix &lt;=V9V18FAamaxsubV2V19V0V11Iainfix &lt;V19V9Aainfix &lt;=c0V19FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V20V0V6Iainfix &lt;V20V9Aainfix &lt;=c0V20FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationainfix =V17asumV1V9ainfix +V16c1Iainfix =V17ainfix +V15agetV1V16FIainfix &lt;V16V0Aainfix &lt;=c0V16Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9V16Iainfix &lt;=V16V14Aainfix &lt;=V9V16FFIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V18V10Iainfix &lt;V18V13Aainfix &lt;=V9V18FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -448,12 +529,12 @@
      <goal
       name="WP_parameter maximum_subarray.21"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="21. loop invariant preservation"
-      sum="d3d5afc38c18c5fdab33dacbfb57d04c"
+      sum="7b66699f6dcb8c81433554f8ecdd37b1"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =V16asumV1V17V18Aainfix &lt;=V18V0Aainfix &lt;=c0V18Aainfix &lt;=V17V9Aainfix &lt;=c0V17Iainfix =V18ainfix +V14c1FIainfix =V17V9FIainfix =V16V15FIainfix &gt;V15V11Iainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14IamaxsubV2V9V19V11Iainfix &lt;V19V14Aainfix &lt;=V9V19FAamaxsubV2V20V0V11Iainfix &lt;V20V9Aainfix &lt;=c0V20FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V21V0V6Iainfix &lt;V21V9Aainfix &lt;=c0V21FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix =V17ainfix +V15agetV1V16FIainfix &lt;V16V0Aainfix &lt;=c0V16Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9V16Iainfix &lt;=V16V14Aainfix &lt;=V9V16FFIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V18V10Iainfix &lt;V18V13Aainfix &lt;=V9V18FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -468,152 +549,12 @@
      <goal
       name="WP_parameter maximum_subarray.22"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="22. loop invariant preservation"
-      sum="56c5d22ad2f864c413df3717eab63df1"
-      proved="false"
-      expanded="true"
-      shape="loop invariant preservationamaxsubV2V19V0V16Iainfix &lt;V19V9Aainfix &lt;=c0V19FIainfix =V18ainfix +V14c1FIainfix =V17V9FIainfix =V16V15FIainfix &gt;V15V11Iainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14IamaxsubV2V9V20V11Iainfix &lt;V20V14Aainfix &lt;=V9V20FAamaxsubV2V21V0V11Iainfix &lt;V21V9Aainfix &lt;=c0V21FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V22V0V6Iainfix &lt;V22V9Aainfix &lt;=c0V22FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for maximum_subarray"/>
-      <transf
-       name="inline_goal"
-       proved="false"
-       expanded="true">
-       <goal
-        name="WP_parameter maximum_subarray.22.1"
-        locfile="../maximum_subarray.mlw"
-        loclnum="24" loccnumb="6" loccnume="22"
-        expl="1. loop invariant preservation"
-        sum="b6bcf72c3cf7e7e302d22288c13b9e40"
-        proved="false"
-        expanded="true"
-        shape="loop invariant preservationainfix &lt;=asumV2V20V21V16Iainfix &lt;=V21V0Aainfix &lt;=V20V21Aainfix &lt;=V19V20FIainfix &lt;V19V9Aainfix =c0V19Oainfix &lt;c0V19FIainfix =V18ainfix +V14c1FIainfix =V17V9FIainfix =V16V15FIainfix &lt;V11V15Iainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix =V9V14Oainfix &lt;V9V14Iainfix &lt;=asumV2V23V24V11Iainfix &lt;=V24V22Aainfix &lt;=V23V24Aainfix &lt;=V9V23FIainfix &lt;V22V14Aainfix =V9V22Oainfix &lt;V9V22FAainfix &lt;=asumV2V26V27V11Iainfix &lt;=V27V0Aainfix &lt;=V26V27Aainfix &lt;=V25V26FIainfix &lt;V25V9Aainfix =c0V25Oainfix &lt;c0V25FAainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Iainfix =V14V10Oainfix &lt;V14V10Aainfix =V9V14Oainfix &lt;V9V14FFIainfix =V9V10Oainfix &lt;V9V10Lainfix -V0c1Iainfix &lt;=asumV2V29V30V6Iainfix &lt;=V30V0Aainfix &lt;=V29V30Aainfix &lt;=V28V29FIainfix &lt;V28V9Aainfix =c0V28Oainfix &lt;c0V28FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
-        <label
-         name="expl:VC for maximum_subarray"/>
-        <transf
-         name="split_goal_wp"
-         proved="false"
-         expanded="true">
-         <goal
-          name="WP_parameter maximum_subarray.22.1.1"
-          locfile="../maximum_subarray.mlw"
-          loclnum="24" loccnumb="6" loccnume="22"
-          expl="1. loop invariant preservation"
-          sum="b6bcf72c3cf7e7e302d22288c13b9e40"
-          proved="false"
-          expanded="true"
-          shape="loop invariant preservationainfix &lt;=asumV2V20V21V16Iainfix &lt;=V21V0Aainfix &lt;=V20V21Aainfix &lt;=V19V20FIainfix &lt;V19V9Aainfix =c0V19Oainfix &lt;c0V19FIainfix =V18ainfix +V14c1FIainfix =V17V9FIainfix =V16V15FIainfix &lt;V11V15Iainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix =V9V14Oainfix &lt;V9V14Iainfix &lt;=asumV2V23V24V11Iainfix &lt;=V24V22Aainfix &lt;=V23V24Aainfix &lt;=V9V23FIainfix &lt;V22V14Aainfix =V9V22Oainfix &lt;V9V22FAainfix &lt;=asumV2V26V27V11Iainfix &lt;=V27V0Aainfix &lt;=V26V27Aainfix &lt;=V25V26FIainfix &lt;V25V9Aainfix =c0V25Oainfix &lt;c0V25FAainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Iainfix =V14V10Oainfix &lt;V14V10Aainfix =V9V14Oainfix &lt;V9V14FFIainfix =V9V10Oainfix &lt;V9V10Lainfix -V0c1Iainfix &lt;=asumV2V29V30V6Iainfix &lt;=V30V0Aainfix &lt;=V29V30Aainfix &lt;=V28V29FIainfix &lt;V28V9Aainfix =c0V28Oainfix &lt;c0V28FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
-          <label
-           name="expl:VC for maximum_subarray"/>
-          <proof
-           prover="0"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="10.00"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <undone/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <undone/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-      </transf>
-     </goal>
-     <goal
-      name="WP_parameter maximum_subarray.23"
-      locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="23. loop invariant preservation"
-      sum="c367d04013170b2d56fdcedeb9371502"
-      proved="false"
-      expanded="true"
-      shape="loop invariant preservationamaxsubV2V9V19V16Iainfix &lt;V19ainfix +V14c1Aainfix &lt;=V9V19FIainfix =V18ainfix +V14c1FIainfix =V17V9FIainfix =V16V15FIainfix &gt;V15V11Iainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14IamaxsubV2V9V20V11Iainfix &lt;V20V14Aainfix &lt;=V9V20FAamaxsubV2V21V0V11Iainfix &lt;V21V9Aainfix &lt;=c0V21FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V22V0V6Iainfix &lt;V22V9Aainfix &lt;=c0V22FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for maximum_subarray"/>
-      <transf
-       name="inline_goal"
-       proved="false"
-       expanded="true">
-       <goal
-        name="WP_parameter maximum_subarray.23.1"
-        locfile="../maximum_subarray.mlw"
-        loclnum="24" loccnumb="6" loccnume="22"
-        expl="1. loop invariant preservation"
-        sum="ca09437c1a3b05da0bc818cce82e5192"
-        proved="false"
-        expanded="true"
-        shape="loop invariant preservationainfix &lt;=asumV2V20V21V16Iainfix &lt;=V21V19Aainfix &lt;=V20V21Aainfix &lt;=V9V20FIainfix &lt;V19ainfix +V14c1Aainfix =V9V19Oainfix &lt;V9V19FIainfix =V18ainfix +V14c1FIainfix =V17V9FIainfix =V16V15FIainfix &lt;V11V15Iainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix =V9V14Oainfix &lt;V9V14Iainfix &lt;=asumV2V23V24V11Iainfix &lt;=V24V22Aainfix &lt;=V23V24Aainfix &lt;=V9V23FIainfix &lt;V22V14Aainfix =V9V22Oainfix &lt;V9V22FAainfix &lt;=asumV2V26V27V11Iainfix &lt;=V27V0Aainfix &lt;=V26V27Aainfix &lt;=V25V26FIainfix &lt;V25V9Aainfix =c0V25Oainfix &lt;c0V25FAainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Iainfix =V14V10Oainfix &lt;V14V10Aainfix =V9V14Oainfix &lt;V9V14FFIainfix =V9V10Oainfix &lt;V9V10Lainfix -V0c1Iainfix &lt;=asumV2V29V30V6Iainfix &lt;=V30V0Aainfix &lt;=V29V30Aainfix &lt;=V28V29FIainfix &lt;V28V9Aainfix =c0V28Oainfix &lt;c0V28FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
-        <label
-         name="expl:VC for maximum_subarray"/>
-        <transf
-         name="split_goal_wp"
-         proved="false"
-         expanded="true">
-         <goal
-          name="WP_parameter maximum_subarray.23.1.1"
-          locfile="../maximum_subarray.mlw"
-          loclnum="24" loccnumb="6" loccnume="22"
-          expl="1. loop invariant preservation"
-          sum="ca09437c1a3b05da0bc818cce82e5192"
-          proved="false"
-          expanded="true"
-          shape="loop invariant preservationainfix &lt;=asumV2V20V21V16Iainfix &lt;=V21V19Aainfix &lt;=V20V21Aainfix &lt;=V9V20FIainfix &lt;V19ainfix +V14c1Aainfix =V9V19Oainfix &lt;V9V19FIainfix =V18ainfix +V14c1FIainfix =V17V9FIainfix =V16V15FIainfix &lt;V11V15Iainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix =V9V14Oainfix &lt;V9V14Iainfix &lt;=asumV2V23V24V11Iainfix &lt;=V24V22Aainfix &lt;=V23V24Aainfix &lt;=V9V23FIainfix &lt;V22V14Aainfix =V9V22Oainfix &lt;V9V22FAainfix &lt;=asumV2V26V27V11Iainfix &lt;=V27V0Aainfix &lt;=V26V27Aainfix &lt;=V25V26FIainfix &lt;V25V9Aainfix =c0V25Oainfix &lt;c0V25FAainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Iainfix =V14V10Oainfix &lt;V14V10Aainfix =V9V14Oainfix &lt;V9V14FFIainfix =V9V10Oainfix &lt;V9V10Lainfix -V0c1Iainfix &lt;=asumV2V29V30V6Iainfix &lt;=V30V0Aainfix &lt;=V29V30Aainfix &lt;=V28V29FIainfix &lt;V28V9Aainfix =c0V28Oainfix &lt;c0V28FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
-          <label
-           name="expl:VC for maximum_subarray"/>
-          <proof
-           prover="0"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <result status="timeout" time="9.93"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <undone/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <undone/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-      </transf>
-     </goal>
-     <goal
-      name="WP_parameter maximum_subarray.24"
-      locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="24. loop invariant preservation"
-      sum="41203bba08f638424cab26d7680b3635"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="22. assertion"
+      sum="35e06038edbb4f963f2fc7ac08fb17c1"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13INainfix &gt;V15V11Iainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14IamaxsubV2V9V16V11Iainfix &lt;V16V14Aainfix &lt;=V9V16FAamaxsubV2V17V0V11Iainfix &lt;V17V9Aainfix &lt;=c0V17FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V18V0V6Iainfix &lt;V18V9Aainfix &lt;=c0V18FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="assertionainfix =V15asumV1V9V13Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V16V10Iainfix &lt;V16V13Aainfix &lt;=V9V16FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -626,14 +567,54 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter maximum_subarray.25"
+      name="WP_parameter maximum_subarray.23"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="25. loop invariant preservation"
-      sum="8943bb5c65a45e3b4860314f8584ad7b"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="23. loop invariant preservation"
+      sum="a8553dc2cec8ec1daaef3420f1b871c9"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationamaxsubV2V16V0V11Iainfix &lt;V16V9Aainfix &lt;=c0V16FINainfix &gt;V15V11Iainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14IamaxsubV2V9V17V11Iainfix &lt;V17V14Aainfix &lt;=V9V17FAamaxsubV2V18V0V11Iainfix &lt;V18V9Aainfix &lt;=c0V18FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V19V0V6Iainfix &lt;V19V9Aainfix &lt;=c0V19FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationainfix =V16asumV1V17V18Aainfix &lt;=V18V0Aainfix &lt;=V17V18Aainfix &lt;=V17V9Aainfix &lt;=c0V17Iainfix =V18V13FIainfix =V17V9FIainfix =V16V15FIainfix &gt;V15V10Iainfix =V15asumV1V9V13Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V19V10Iainfix &lt;V19V13Aainfix &lt;=V9V19FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for maximum_subarray"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter maximum_subarray.24"
+      locfile="../maximum_subarray.mlw"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="24. loop invariant preservation"
+      sum="2c7fa8c1d013c17c371be7fbb7e13f20"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationamaxsubloV2V9V16Iainfix =V18V13FIainfix =V17V9FIainfix =V16V15FIainfix &gt;V15V10Iainfix =V15asumV1V9V13Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V19V10Iainfix &lt;V19V13Aainfix &lt;=V9V19FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for maximum_subarray"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter maximum_subarray.25"
+      locfile="../maximum_subarray.mlw"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="25. loop invariant preservation"
+      sum="7e4334513abb4b33d843e821ee6241d1"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=asumV1V9V19V16Iainfix &lt;V19ainfix +V13c1Aainfix &lt;=V9V19FIainfix =V18V13FIainfix =V17V9FIainfix =V16V15FIainfix &gt;V15V10Iainfix =V15asumV1V9V13Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V20V10Iainfix &lt;V20V13Aainfix &lt;=V9V20FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -648,42 +629,62 @@
      <goal
       name="WP_parameter maximum_subarray.26"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
+      loclnum="27" loccnumb="6" loccnume="22"
       expl="26. loop invariant preservation"
-      sum="55edefcdd63d00bc5b12340a5650cb11"
-      proved="false"
-      expanded="true"
-      shape="loop invariant preservationamaxsubV2V9V16V11Iainfix &lt;V16ainfix +V14c1Aainfix &lt;=V9V16FINainfix &gt;V15V11Iainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14IamaxsubV2V9V17V11Iainfix &lt;V17V14Aainfix &lt;=V9V17FAamaxsubV2V18V0V11Iainfix &lt;V18V9Aainfix &lt;=c0V18FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13Iainfix &lt;=V14V10Aainfix &lt;=V9V14FFIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V19V0V6Iainfix &lt;V19V9Aainfix &lt;=c0V19FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      sum="5278742f7b87a67f6900a98561383988"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12INainfix &gt;V15V10Iainfix =V15asumV1V9V13Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V16V10Iainfix &lt;V16V13Aainfix &lt;=V9V16FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for maximum_subarray"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter maximum_subarray.27"
+      locfile="../maximum_subarray.mlw"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="27. loop invariant preservation"
+      sum="fd6418c4c3298fe82a85c4312cf7297e"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationamaxsubloV2V9V10INainfix &gt;V15V10Iainfix =V15asumV1V9V13Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V16V10Iainfix &lt;V16V13Aainfix &lt;=V9V16FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <transf
        name="inline_goal"
-       proved="false"
-       expanded="true">
+       proved="true"
+       expanded="false">
        <goal
-        name="WP_parameter maximum_subarray.26.1"
+        name="WP_parameter maximum_subarray.27.1"
         locfile="../maximum_subarray.mlw"
-        loclnum="24" loccnumb="6" loccnume="22"
+        loclnum="27" loccnumb="6" loccnume="22"
         expl="1. loop invariant preservation"
-        sum="5ab5abd8315fa69b3d9c54a65807a803"
-        proved="false"
-        expanded="true"
-        shape="loop invariant preservationainfix &lt;=asumV2V17V18V11Iainfix &lt;=V18V16Aainfix &lt;=V17V18Aainfix &lt;=V9V17FIainfix &lt;V16ainfix +V14c1Aainfix =V9V16Oainfix &lt;V9V16FINainfix &lt;V11V15Iainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix =V9V14Oainfix &lt;V9V14Iainfix &lt;=asumV2V20V21V11Iainfix &lt;=V21V19Aainfix &lt;=V20V21Aainfix &lt;=V9V20FIainfix &lt;V19V14Aainfix =V9V19Oainfix &lt;V9V19FAainfix &lt;=asumV2V23V24V11Iainfix &lt;=V24V0Aainfix &lt;=V23V24Aainfix &lt;=V22V23FIainfix &lt;V22V9Aainfix =c0V22Oainfix &lt;c0V22FAainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Iainfix =V14V10Oainfix &lt;V14V10Aainfix =V9V14Oainfix &lt;V9V14FFIainfix =V9V10Oainfix &lt;V9V10Lainfix -V0c1Iainfix &lt;=asumV2V26V27V6Iainfix &lt;=V27V0Aainfix &lt;=V26V27Aainfix &lt;=V25V26FIainfix &lt;V25V9Aainfix =c0V25Oainfix &lt;c0V25FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
+        sum="bab96a146d5ecc8f0867a44eb385ca2a"
+        proved="true"
+        expanded="false"
+        shape="loop invariant preservationainfix &lt;=asumV2V16V17V10Iainfix &lt;=V17alengthV2Aainfix &lt;=V16V17Iainfix &lt;V16V9Aainfix &lt;=c0V16FINainfix &lt;V10V15Iainfix =V15asumV1V9V13Iainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V15asumV1V9ainfix +V14c1FIainfix =V9V14Oainfix &lt;V9V14Lainfix -V13c1Iainfix =asumV1V9V18V10Oainfix &lt;asumV1V9V18V10Iainfix &lt;V18V13Aainfix =V9V18Oainfix &lt;V9V18FAainfix &lt;=asumV2V19V20V10Iainfix &lt;=V20alengthV2Aainfix &lt;=V19V20Iainfix &lt;V19V9Aainfix &lt;=c0V19FAainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12Iainfix =V13V0Oainfix &lt;V13V0Aainfix =V9V13Oainfix &lt;V9V13FFIainfix =V9V0Oainfix &lt;V9V0Iainfix &lt;=asumV2V21V22V6Iainfix &lt;=V22alengthV2Aainfix &lt;=V21V22Iainfix &lt;V21V9Aainfix &lt;=c0V21FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =V8V7Oainfix &lt;V8V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
         <label
          name="expl:VC for maximum_subarray"/>
         <transf
          name="split_goal_wp"
-         proved="false"
-         expanded="true">
+         proved="true"
+         expanded="false">
          <goal
-          name="WP_parameter maximum_subarray.26.1.1"
+          name="WP_parameter maximum_subarray.27.1.1"
           locfile="../maximum_subarray.mlw"
-          loclnum="24" loccnumb="6" loccnume="22"
+          loclnum="27" loccnumb="6" loccnume="22"
           expl="1. loop invariant preservation"
-          sum="5ab5abd8315fa69b3d9c54a65807a803"
-          proved="false"
-          expanded="true"
-          shape="loop invariant preservationainfix &lt;=asumV2V17V18V11Iainfix &lt;=V18V16Aainfix &lt;=V17V18Aainfix &lt;=V9V17FIainfix &lt;V16ainfix +V14c1Aainfix =V9V16Oainfix &lt;V9V16FINainfix &lt;V11V15Iainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Aainfix =V15asumV1V9ainfix +V14c1FIainfix =V9V14Oainfix &lt;V9V14Iainfix &lt;=asumV2V20V21V11Iainfix &lt;=V21V19Aainfix &lt;=V20V21Aainfix &lt;=V9V20FIainfix &lt;V19V14Aainfix =V9V19Oainfix &lt;V9V19FAainfix &lt;=asumV2V23V24V11Iainfix &lt;=V24V0Aainfix &lt;=V23V24Aainfix &lt;=V22V23FIainfix &lt;V22V9Aainfix =c0V22Oainfix &lt;c0V22FAainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13Iainfix =V14V10Oainfix &lt;V14V10Aainfix =V9V14Oainfix &lt;V9V14FFIainfix =V9V10Oainfix &lt;V9V10Lainfix -V0c1Iainfix &lt;=asumV2V26V27V6Iainfix &lt;=V27V0Aainfix &lt;=V26V27Aainfix &lt;=V25V26FIainfix &lt;V25V9Aainfix =c0V25Oainfix &lt;c0V25FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
+          sum="bab96a146d5ecc8f0867a44eb385ca2a"
+          proved="true"
+          expanded="false"
+          shape="loop invariant preservationainfix &lt;=asumV2V16V17V10Iainfix &lt;=V17alengthV2Aainfix &lt;=V16V17Iainfix &lt;V16V9Aainfix &lt;=c0V16FINainfix &lt;V10V15Iainfix =V15asumV1V9V13Iainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V15asumV1V9ainfix +V14c1FIainfix =V9V14Oainfix &lt;V9V14Lainfix -V13c1Iainfix =asumV1V9V18V10Oainfix &lt;asumV1V9V18V10Iainfix &lt;V18V13Aainfix =V9V18Oainfix &lt;V9V18FAainfix &lt;=asumV2V19V20V10Iainfix &lt;=V20alengthV2Aainfix &lt;=V19V20Iainfix &lt;V19V9Aainfix &lt;=c0V19FAainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12Iainfix =V13V0Oainfix &lt;V13V0Aainfix =V9V13Oainfix &lt;V9V13FFIainfix =V9V0Oainfix &lt;V9V0Iainfix &lt;=asumV2V21V22V6Iainfix &lt;=V22alengthV2Aainfix &lt;=V21V22Iainfix &lt;V21V9Aainfix &lt;=c0V21FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =V8V7Oainfix &lt;V8V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
           <label
            name="expl:VC for maximum_subarray"/>
           <proof
@@ -692,23 +693,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="timeout" time="9.21"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <undone/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <undone/>
+           <result status="valid" time="0.04"/>
           </proof>
          </goal>
         </transf>
@@ -716,14 +701,34 @@
       </transf>
      </goal>
      <goal
-      name="WP_parameter maximum_subarray.27"
+      name="WP_parameter maximum_subarray.28"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="27. loop invariant preservation"
-      sum="4d5ea89539c4d027f9b367c865ebf210"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="28. loop invariant preservation"
+      sum="aa3a35d83b195c838f4b43df4b99f99b"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13ainfix +V9c1Aainfix &lt;=c0V13IamaxsubV2V9V14V11Iainfix &lt;V14ainfix +V10c1Aainfix &lt;=V9V14FAamaxsubV2V15V0V11Iainfix &lt;V15V9Aainfix &lt;=c0V15FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13FIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V16V0V6Iainfix &lt;V16V9Aainfix &lt;=c0V16FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      shape="loop invariant preservationainfix &lt;=asumV1V9V16V10Iainfix &lt;V16ainfix +V13c1Aainfix &lt;=V9V16FINainfix &gt;V15V10Iainfix =V15asumV1V9V13Iainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Aainfix =V15asumV1V9ainfix +V14c1FIainfix &lt;=V9V14Lainfix -V13c1Iainfix &lt;=asumV1V9V17V10Iainfix &lt;V17V13Aainfix &lt;=V9V17FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12Iainfix &lt;=V13V0Aainfix &lt;=V9V13FFIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for maximum_subarray"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter maximum_subarray.29"
+      locfile="../maximum_subarray.mlw"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="29. loop invariant preservation"
+      sum="c3de26851d6f510ad370a8f96f9b996b"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12ainfix +V9c1Aainfix &lt;=c0V12Iainfix &lt;=asumV1V9V13V10Iainfix &lt;V13ainfix +V0c1Aainfix &lt;=V9V13FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12FIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
@@ -736,44 +741,44 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter maximum_subarray.28"
+      name="WP_parameter maximum_subarray.30"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="28. loop invariant preservation"
-      sum="1a70fa03db6f843ffcc173efee7f5435"
-      proved="false"
-      expanded="true"
-      shape="loop invariant preservationamaxsubV2V14V0V11Iainfix &lt;V14ainfix +V9c1Aainfix &lt;=c0V14FIamaxsubV2V9V15V11Iainfix &lt;V15ainfix +V10c1Aainfix &lt;=V9V15FAamaxsubV2V16V0V11Iainfix &lt;V16V9Aainfix &lt;=c0V16FAainfix =V11asumV1V13V12Aainfix &lt;=V12V0Aainfix &lt;=c0V12Aainfix &lt;=V13V9Aainfix &lt;=c0V13FIainfix &lt;=V9V10Lainfix -V0c1IamaxsubV2V17V0V6Iainfix &lt;V17V9Aainfix &lt;=c0V17FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="30. loop invariant preservation"
+      sum="dcf1c881fff4ae94dd164159d028231a"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationamaxsubloV2ainfix +V9c1V10Iainfix &lt;=asumV1V9V13V10Iainfix &lt;V13ainfix +V0c1Aainfix &lt;=V9V13FAamaxsubloV2V9V10Aainfix =V10asumV1V12V11Aainfix &lt;=V11V0Aainfix &lt;=V12V11Aainfix &lt;=V12V9Aainfix &lt;=c0V12FIainfix &lt;=V9V0IamaxsubloV2V9V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8V9Aainfix &lt;=c0V8Iainfix &lt;=V9V5Aainfix &lt;=c0V9FFIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <transf
        name="inline_goal"
-       proved="false"
-       expanded="true">
+       proved="true"
+       expanded="false">
        <goal
-        name="WP_parameter maximum_subarray.28.1"
+        name="WP_parameter maximum_subarray.30.1"
         locfile="../maximum_subarray.mlw"
-        loclnum="24" loccnumb="6" loccnume="22"
+        loclnum="27" loccnumb="6" loccnume="22"
         expl="1. loop invariant preservation"
-        sum="7d7e6d4396d3c5e56ec91573e169abd0"
-        proved="false"
-        expanded="true"
-        shape="loop invariant preservationainfix &lt;=asumV2V15V16V11Iainfix &lt;=V16V0Aainfix &lt;=V15V16Aainfix &lt;=V14V15FIainfix &lt;V14ainfix +V9c1Aainfix =c0V14Oainfix &lt;c0V14FIainfix &lt;=asumV2V18V19V11Iainfix &lt;=V19V17Aainfix &lt;=V18V19Aainfix &lt;=V9V18FIainfix &lt;V17ainfix +V10c1Aainfix =V9V17Oainfix &lt;V9V17FAainfix &lt;=asumV2V21V22V11Iainfix &lt;=V22V0Aainfix &lt;=V21V22Aainfix &lt;=V20V21FIainfix &lt;V20V9Aainfix =c0V20Oainfix &lt;c0V20FAainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13FIainfix =V9V10Oainfix &lt;V9V10Lainfix -V0c1Iainfix &lt;=asumV2V24V25V6Iainfix &lt;=V25V0Aainfix &lt;=V24V25Aainfix &lt;=V23V24FIainfix &lt;V23V9Aainfix =c0V23Oainfix &lt;c0V23FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
+        sum="9ead699c7ef260d8cf60e89d4e722022"
+        proved="true"
+        expanded="false"
+        shape="loop invariant preservationainfix &lt;=asumV2V13V14V10Iainfix &lt;=V14alengthV2Aainfix &lt;=V13V14Iainfix &lt;V13ainfix +V9c1Aainfix &lt;=c0V13FIainfix =asumV1V9V15V10Oainfix &lt;asumV1V9V15V10Iainfix &lt;V15ainfix +V0c1Aainfix =V9V15Oainfix &lt;V9V15FAainfix &lt;=asumV2V16V17V10Iainfix &lt;=V17alengthV2Aainfix &lt;=V16V17Iainfix &lt;V16V9Aainfix &lt;=c0V16FAainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12FIainfix =V9V0Oainfix &lt;V9V0Iainfix &lt;=asumV2V18V19V6Iainfix &lt;=V19alengthV2Aainfix &lt;=V18V19Iainfix &lt;V18V9Aainfix &lt;=c0V18FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =V8V7Oainfix &lt;V8V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
         <label
          name="expl:VC for maximum_subarray"/>
         <transf
          name="split_goal_wp"
-         proved="false"
-         expanded="true">
+         proved="true"
+         expanded="false">
          <goal
-          name="WP_parameter maximum_subarray.28.1.1"
+          name="WP_parameter maximum_subarray.30.1.1"
           locfile="../maximum_subarray.mlw"
-          loclnum="24" loccnumb="6" loccnume="22"
+          loclnum="27" loccnumb="6" loccnume="22"
           expl="1. loop invariant preservation"
-          sum="7d7e6d4396d3c5e56ec91573e169abd0"
-          proved="false"
-          expanded="true"
-          shape="loop invariant preservationainfix &lt;=asumV2V15V16V11Iainfix &lt;=V16V0Aainfix &lt;=V15V16Aainfix &lt;=V14V15FIainfix &lt;V14ainfix +V9c1Aainfix =c0V14Oainfix &lt;c0V14FIainfix &lt;=asumV2V18V19V11Iainfix &lt;=V19V17Aainfix &lt;=V18V19Aainfix &lt;=V9V18FIainfix &lt;V17ainfix +V10c1Aainfix =V9V17Oainfix &lt;V9V17FAainfix &lt;=asumV2V21V22V11Iainfix &lt;=V22V0Aainfix &lt;=V21V22Aainfix &lt;=V20V21FIainfix &lt;V20V9Aainfix =c0V20Oainfix &lt;c0V20FAainfix =V11asumV1V13V12Aainfix =V12V0Oainfix &lt;V12V0Aainfix =c0V12Oainfix &lt;c0V12Aainfix =V13V9Oainfix &lt;V13V9Aainfix =c0V13Oainfix &lt;c0V13FIainfix =V9V10Oainfix &lt;V9V10Lainfix -V0c1Iainfix &lt;=asumV2V24V25V6Iainfix &lt;=V25V0Aainfix &lt;=V24V25Aainfix &lt;=V23V24FIainfix &lt;V23V9Aainfix =c0V23Oainfix &lt;c0V23FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =c0V7Oainfix &lt;c0V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
+          sum="9ead699c7ef260d8cf60e89d4e722022"
+          proved="true"
+          expanded="false"
+          shape="loop invariant preservationainfix &lt;=asumV2V13V14V10Iainfix &lt;=V14alengthV2Aainfix &lt;=V13V14Iainfix &lt;V13ainfix +V9c1Aainfix &lt;=c0V13FIainfix =asumV1V9V15V10Oainfix &lt;asumV1V9V15V10Iainfix &lt;V15ainfix +V0c1Aainfix =V9V15Oainfix &lt;V9V15FAainfix &lt;=asumV2V16V17V10Iainfix &lt;=V17alengthV2Aainfix &lt;=V16V17Iainfix &lt;V16V9Aainfix &lt;=c0V16FAainfix =V10asumV1V12V11Aainfix =V11V0Oainfix &lt;V11V0Aainfix =V12V11Oainfix &lt;V12V11Aainfix =V12V9Oainfix &lt;V12V9Aainfix =c0V12Oainfix &lt;c0V12FIainfix =V9V0Oainfix &lt;V9V0Iainfix &lt;=asumV2V18V19V6Iainfix &lt;=V19alengthV2Aainfix &lt;=V18V19Iainfix &lt;V18V9Aainfix &lt;=c0V18FAainfix =V6asumV1V8V7Aainfix =V7V0Oainfix &lt;V7V0Aainfix =V8V7Oainfix &lt;V8V7Aainfix =V8V9Oainfix &lt;V8V9Aainfix =c0V8Oainfix &lt;c0V8Iainfix =V9V5Oainfix &lt;V9V5Aainfix =c0V9Oainfix &lt;c0V9FFIainfix =c0V5Oainfix &lt;c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix =c0V0Oainfix &lt;c0V0Lamk arrayV0V1F">
           <label
            name="expl:VC for maximum_subarray"/>
           <proof
@@ -782,23 +787,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="timeout" time="9.55"/>
-          </proof>
-          <proof
-           prover="1"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <undone/>
-          </proof>
-          <proof
-           prover="2"
-           timelimit="10"
-           memlimit="1000"
-           obsolete="false"
-           archived="false">
-           <undone/>
+           <result status="valid" time="1.66"/>
           </proof>
          </goal>
         </transf>
@@ -806,37 +795,29 @@
       </transf>
      </goal>
      <goal
-      name="WP_parameter maximum_subarray.29"
+      name="WP_parameter maximum_subarray.31"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="29. postcondition"
-      sum="83b17b308fb25e15c22168c94d348214"
-      proved="false"
-      expanded="true"
-      shape="postconditionainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=c0V8IamaxsubV2V9V0V6Iainfix &lt;V9ainfix +V5c1Aainfix &lt;=c0V9FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="31. postcondition"
+      sum="5afe33f6187aba9cb286e0eb947ff75a"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=c0V8IamaxsubloV2ainfix +V5c1V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.07"/>
-      </proof>
       <transf
        name="split_goal_wp"
-       proved="false"
-       expanded="true">
+       proved="true"
+       expanded="false">
        <goal
-        name="WP_parameter maximum_subarray.29.1"
+        name="WP_parameter maximum_subarray.31.1"
         locfile="../maximum_subarray.mlw"
-        loclnum="24" loccnumb="6" loccnume="22"
+        loclnum="27" loccnumb="6" loccnume="22"
         expl="1."
-        sum="08dd5e9373cf38a0b51c59d1383ff4a1"
+        sum="1f0f33d7bd0750da53f2b82de70af196"
         proved="true"
         expanded="false"
-        shape="ainfix &lt;=c0V8IamaxsubV2V9V0V6Iainfix &lt;V9ainfix +V5c1Aainfix &lt;=c0V9FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        shape="ainfix &lt;=c0V8IamaxsubloV2ainfix +V5c1V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
         <label
          name="expl:VC for maximum_subarray"/>
         <proof
@@ -849,14 +830,14 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter maximum_subarray.29.2"
+        name="WP_parameter maximum_subarray.31.2"
         locfile="../maximum_subarray.mlw"
-        loclnum="24" loccnumb="6" loccnume="22"
+        loclnum="27" loccnumb="6" loccnume="22"
         expl="2."
-        sum="291b181674430d310fddb943217d9a93"
-        proved="false"
-        expanded="true"
-        shape="ainfix &lt;=V8V7IamaxsubV2V9V0V6Iainfix &lt;V9ainfix +V5c1Aainfix &lt;=c0V9FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        sum="11d33fc2a3152cdb1a5be503664f99b0"
+        proved="true"
+        expanded="false"
+        shape="ainfix &lt;=V8V7IamaxsubloV2ainfix +V5c1V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
         <label
          name="expl:VC for maximum_subarray"/>
         <proof
@@ -865,34 +846,18 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="unknown" time="0.06"/>
-        </proof>
-        <proof
-         prover="1"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <undone/>
-        </proof>
-        <proof
-         prover="2"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
-         <undone/>
+         <result status="valid" time="0.06"/>
         </proof>
        </goal>
        <goal
-        name="WP_parameter maximum_subarray.29.3"
+        name="WP_parameter maximum_subarray.31.3"
         locfile="../maximum_subarray.mlw"
-        loclnum="24" loccnumb="6" loccnume="22"
+        loclnum="27" loccnumb="6" loccnume="22"
         expl="3."
-        sum="19215d9bd5a64183707382b8a89335cf"
+        sum="3870fe9861b4584dfb5ca7bb452fec2f"
         proved="true"
         expanded="false"
-        shape="ainfix &lt;=V7V0IamaxsubV2V9V0V6Iainfix &lt;V9ainfix +V5c1Aainfix &lt;=c0V9FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        shape="ainfix &lt;=V7V0IamaxsubloV2ainfix +V5c1V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
         <label
          name="expl:VC for maximum_subarray"/>
         <proof
@@ -905,14 +870,14 @@
         </proof>
        </goal>
        <goal
-        name="WP_parameter maximum_subarray.29.4"
+        name="WP_parameter maximum_subarray.31.4"
         locfile="../maximum_subarray.mlw"
-        loclnum="24" loccnumb="6" loccnume="22"
+        loclnum="27" loccnumb="6" loccnume="22"
         expl="4."
-        sum="3499124320d951706c8438f964aed317"
+        sum="e943747723383077de42825a9ced9fb1"
         proved="true"
         expanded="false"
-        shape="ainfix =V6asumV1V8V7Iainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=c0V8IamaxsubV2V9V0V6Iainfix &lt;V9ainfix +V5c1Aainfix &lt;=c0V9FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        shape="ainfix =V6asumV1V8V7Iainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=c0V8IamaxsubloV2ainfix +V5c1V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
         <label
          name="expl:VC for maximum_subarray"/>
         <proof
@@ -927,23 +892,23 @@
       </transf>
      </goal>
      <goal
-      name="WP_parameter maximum_subarray.30"
+      name="WP_parameter maximum_subarray.32"
       locfile="../maximum_subarray.mlw"
-      loclnum="24" loccnumb="6" loccnume="22"
-      expl="30. postcondition"
-      sum="77bbaeb3955d1729d657ce8e4fa23008"
+      loclnum="27" loccnumb="6" loccnume="22"
+      expl="32. postcondition"
+      sum="b1a7d07c6969fd9cc7a24533d352faa7"
       proved="true"
-      expanded="false"
-      shape="postconditionamaxsubV2c0V0V6IamaxsubV2V9V0V6Iainfix &lt;V9ainfix +V5c1Aainfix &lt;=c0V9FAainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=c0V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      expanded="true"
+      shape="postconditionamaxsubV2V6IamaxsubloV2ainfix +V5c1V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for maximum_subarray"/>
       <proof
-       prover="0"
+       prover="1"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
