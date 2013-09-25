@@ -2,21 +2,32 @@
 (* Maximum subarray problem
 
    Given an array of integers, find the contiguous subarray with the
-   largest sum.
+   largest sum. Subarrays of length 0 are allowed (which means that an
+   array with negative values only has a maximal sum of 0).
+
+   Authors: Jean-Christophe Filliâtre (CNRS)
+            Guillaume Melquiond       (Inria)
  *)
 
 module Spec
   use import int.Int
   use export array.Array
-  use export array.ArraySum
 
+  use export array.ArraySum
+  (* provides [sum a l h] = the sum of a[l..h[ and suitable lemmas *)
+
+  (* s is no smaller than sums of subarrays a[l..h[ with 0 <= l < maxlo *)
   predicate maxsublo (a: array int) (maxlo: int) (s: int) =
     forall l h: int. 0 <= l < maxlo -> l <= h <= length a -> sum a l h <= s
 
+  (* s is no smaller than sums of subarrays of a *)
   predicate maxsub (a: array int) (s: int) =
     forall l h: int. 0 <= l <= h <= length a -> sum a l h <= s
 
 end
+
+(* In all codes below, reference ms stands for the maximal sum found so far
+   and ghost references lo and hi hold the bounds for this sum *)
 
 (* Naive solution, in O(N^3) *)
 module Algo1
@@ -38,7 +49,7 @@ module Algo1
         invariant { 0 <= !lo <= l && !lo <= !hi <= n && !ms = sum a !lo !hi }
         invariant { maxsublo a l !ms }
         invariant { forall h': int. l <= h' < h -> sum a l h' <= !ms }
-        (* consider the sum of a[l..h[ *)
+        (* compute the sum of a[l..h[ *)
         let s = ref 0 in
         for i = l to h-1 do
           invariant { !s = sum a l i }
@@ -53,7 +64,8 @@ module Algo1
 
 end
 
-(* Slightly less naive solution, in O(N^2) *)
+(* Slightly less naive solution, in O(N^2)
+   Do not recompute the sum, simply update it *)
 
 module Algo2
 
@@ -77,7 +89,7 @@ module Algo2
         invariant { maxsublo a l !ms }
         invariant { forall h': int. l <= h' < h -> sum a l h' <= !ms }
         invariant { !s = sum a l (h-1) }
-        s += a[h-1];
+        s += a[h-1]; (* update the sum *)
         assert { !s = sum a l h };
         if !s > !ms then begin ms := !s; lo := l; hi := h end
       done
@@ -154,7 +166,8 @@ module Algo3
 
 end
 
-(* Optimal solution, in O(N) *)
+(* Optimal solution, in O(N)
+   Known as Kadane's algorithm *)
 
 module Algo4
 
