@@ -86,4 +86,92 @@ module Algo2
 
 end
 
+(* Divide-and-conqueer solution, in O(N log N) *)
 
+module Algo3
+
+  use import ref.Refint
+  use import int.ComputerDivision
+  use import Spec
+
+  let rec maximum_subarray_rec (a: array int) (l h: int) (ghost lo hi: ref int)
+    : int
+    requires { 0 <= l <= h <= length a }
+    ensures  { l <= !lo <= !hi <= h && result = sum a !lo !hi }
+    ensures  { forall l' h': int. l <= l' <= h' <= h -> sum a l' h' <= result }
+    variant  { h - l }
+  = if h = l then begin
+      (* base case: no element at all *)
+      lo := l; hi := h; 0
+    end else begin
+      (* at least one element *)
+      let mid = l + div (h - l) 2 in
+      (* first consider all sums that include a[mid] *)
+      lo := mid; hi := mid+1;
+      let ms = ref a[mid] in
+      let s  = ref !ms in
+      for i = mid-1 downto l do
+        invariant { l <= !lo <= mid && !hi = mid+1 && !ms = sum a !lo !hi }
+        invariant { !s = sum a (i+1) (mid+1) }
+        s += a[i];
+        assert { !s = sum a i (mid+1) };
+        if !s > !ms then begin ms := !s; lo := i end
+      done;
+      s := !ms;
+      for i = mid+1 to h-1 do
+        invariant { l <= !lo <= mid < !hi <= h && !ms = sum a !lo !hi }
+        invariant { !s = sum a !lo i }
+        s += a[i];
+        assert { !s = sum a !lo (i+1) };
+        if !s > !ms then begin ms := !s; hi := (i+1) end
+      done;
+      (* then consider sums left and right of mid, recursively *)
+      if l < mid then begin
+         let ghost lo' = ref 0 in
+         let ghost hi' = ref 0 in
+         let left = maximum_subarray_rec a l mid lo' hi' in
+         if left > !ms then begin ms := left; lo := !lo'; hi := !hi' end
+      end;
+      if mid+1 < h then begin
+         let ghost lo' = ref 0 in
+         let ghost hi' = ref 0 in
+         let right = maximum_subarray_rec a (mid+1) h lo' hi' in
+        if right > !ms then begin ms := right; lo := !lo'; hi := !hi' end
+      end;
+      !ms
+    end
+
+ let maximum_subarray (a: array int) (ghost lo hi: ref int): int
+    ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
+    ensures { maxsub a result }
+  = maximum_subarray_rec a 0 (length a) lo hi
+
+end
+
+(* Optimal solution, in O(N) *)
+
+module Algo4
+
+  use import ref.Refint
+  use import Spec
+
+  let maximum_subarray (a: array int) (ghost lo hi: ref int): int
+    ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
+    ensures { maxsub a result }
+  = lo := 0;
+    hi := 0;
+    let n = length a in
+    let ms = ref 0 in
+    let ghost l = ref 0 in
+    let s = ref 0 in
+    for i = 0 to n-1 do
+      invariant { 0 <= !lo <= !hi <= i && 0 <= !ms = sum a !lo !hi }
+      invariant { forall l' h': int. 0 <= l' <= h' <= i -> sum a l' h' <= !ms }
+      invariant { 0 <= !l <= i && !s = sum a !l i }
+      invariant { forall l': int. 0 <= l' < i -> sum a l' i <= !s }
+      if !s < 0 then begin s := a[i]; l := i end else s += a[i];
+      if !s > !ms then begin ms := !s; lo := !l; hi := (i+1) end
+    done;
+    !ms
+
+end
