@@ -158,6 +158,11 @@ module Array
     with Found i -> i
     end
 
+  let incr (t:array int) : unit =
+    for i=0 to t.length - 1 do
+      t[i] <- t[i]+1
+    done
+
   let test0 () = let t = Array.make 2 21 in t[0]+t[1]
 
   let test1 () =
@@ -178,18 +183,11 @@ module Array
      t[2] <- 67;
      t
 
-  let tbis () = t ()
-
-  let t0 () =
-     let t = Array.make 3 0 in
-     t[0] <- 12;
-     t[1] <- 42;
-     t[2] <- 67;
-     t[0] + t[1] + t[2] (* 121 *)
-
   let t1 () = 
     let t = t () in
     t[0] + t[1] + t[2] (* 121 *)
+
+  let i () = incr (t ())
 
   let test12 () = search (t ()) 12
   let test42 () = search (t ()) 42
