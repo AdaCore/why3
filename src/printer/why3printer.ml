@@ -395,12 +395,12 @@ let print_tdecls =
     print_tdecl fmt td in
   Printer.sprint_tdecls print
 
-let print_task _env pr thpr _blacklist ?old:_ fmt task =
+let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
   (* forget_all (); *)
-  print_prelude fmt pr;
+  print_prelude fmt args.prelude;
   fprintf fmt "theory Task@\n";
-  print_th_prelude task fmt thpr;
+  print_th_prelude task fmt args.prelude_map;
   fprintf fmt "%a@\nend@."
     (print_list nothing string)
       (List.rev (Trans.apply print_tdecls task))

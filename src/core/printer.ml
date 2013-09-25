@@ -28,8 +28,15 @@ type blacklist = string list
 
 type 'a pp = formatter -> 'a -> unit
 
+type printer_args =
+  { env : Env.env;
+    prelude : prelude;
+    prelude_map : prelude_map;
+    blacklist : blacklist
+  }
+
 type printer =
-  Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
+  printer_args -> ?old:in_channel -> task pp
 
 type reg_printer = Pp.formatted * printer
 
@@ -51,7 +58,7 @@ let list_printers () =
 
 let () = register_printer
   ~desc:"Dummy@ printer@ with@ no@ output@ (used@ for@ debugging)." "(null)"
-  (fun _ _ _ _ ?old:_ _ _ -> ())
+  (fun _ ?old:_ _ _ -> ())
 
 (** Syntax substitutions *)
 

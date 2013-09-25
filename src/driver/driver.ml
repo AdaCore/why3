@@ -292,9 +292,11 @@ let print_task_prepared ?old drv fmt task =
     | Some p -> p
   in
   let printer =
-    lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude
-      drv.drv_blacklist
-  in
+    lookup_printer p
+      { Printer.env = drv.drv_env;
+        prelude     = drv.drv_prelude;
+        prelude_map = drv.drv_thprelude;
+        blacklist   = drv.drv_blacklist } in
   fprintf fmt "@[%a@]@?" (printer ?old) task
 
 let print_task ?old drv fmt task =

@@ -814,10 +814,10 @@ let init_printer th =
   Sid.iter (fun id -> ignore (id_unique pr id)) th.Theory.th_local;
   pr
 
-let print_task env pr thpr _blacklist realize ?old fmt task =
+let print_task printer_args realize ?old fmt task =
   forget_all ();
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+  print_prelude fmt printer_args.prelude;
+  print_th_prelude task fmt printer_args.prelude_map;
   (* find theories that are both used and realized from metas *)
   let realized_theories =
     Task.on_meta meta_realized_theory (fun mid args ->
@@ -826,7 +826,7 @@ let print_task env pr thpr _blacklist realize ?old fmt task =
         let f,id =
           let l = Strings.rev_split s1 '.' in
           List.rev (List.tl l), List.hd l in
-        let th = Env.find_theory env f id in
+        let th = Env.find_theory printer_args.env f id in
         Mid.add th.Theory.th_name
           (th, (f, if s2 = "" then String.concat "." f else s2)) mid
       | _ -> assert false
@@ -897,11 +897,11 @@ let print_task env pr thpr _blacklist realize ?old fmt task =
   output_remaining fmt !old;
   fprintf fmt "@]@\nEND %s@\n@]" thname
 
-let print_task_full env pr thpr blacklist ?old fmt task =
-  print_task env pr thpr blacklist false ?old fmt task
+let print_task_full args ?old fmt task =
+  print_task args false ?old fmt task
 
-let print_task_real env pr thpr blacklist ?old fmt task =
-  print_task env pr thpr blacklist true  ?old fmt task
+let print_task_real args ?old fmt task =
+  print_task args true  ?old fmt task
 
 let () = register_printer "pvs" print_task_full
   ~desc:"Printer@ for@ the@ PVS@ proof@ assistant@ \

@@ -392,11 +392,11 @@ let print_decls =
       add_projection (Mls.empty,Sls.empty,Spr.empty) mal in
     Printer.sprint_decls (print ac sl tc csm pjs axs))))
 
-let print_task _env pr thpr _blacklist ?old:_ fmt task =
+let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+  print_prelude fmt args.prelude;
+  print_th_prelude task fmt args.prelude_map;
   fprintf fmt "%a@." (print_list nothing string)
     (List.rev (Trans.apply print_decls task))
 

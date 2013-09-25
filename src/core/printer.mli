@@ -24,8 +24,14 @@ type blacklist = string list
 
 type 'a pp = Format.formatter -> 'a -> unit
 
+type printer_args =
+  { env : Env.env;
+    prelude : prelude;
+    prelude_map : prelude_map;
+    blacklist : blacklist
+  }
 type printer =
-  Env.env -> prelude -> prelude_map -> blacklist -> ?old:in_channel -> task pp
+  printer_args -> ?old:in_channel -> task pp
 
 val register_printer : desc:Pp.formatted -> string -> printer -> unit
 
