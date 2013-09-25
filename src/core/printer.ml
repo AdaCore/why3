@@ -32,7 +32,8 @@ type printer_args =
   { env : Env.env;
     prelude : prelude;
     prelude_map : prelude_map;
-    blacklist : blacklist
+    blacklist : blacklist;
+    filename  : string;
   }
 
 type printer =

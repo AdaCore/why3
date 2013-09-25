@@ -45,11 +45,11 @@ val call_on_buffer :
 
 val print_task :
   ?old       : in_channel ->
-  driver -> Format.formatter -> Task.task -> unit
+  driver -> string -> Format.formatter -> Task.task -> unit
 
 val print_theory :
   ?old       : in_channel ->
-  driver -> Format.formatter -> Theory.theory -> unit
+  driver -> string -> Format.formatter -> Theory.theory -> unit
   (** produce a realization of the given theory using the given driver *)
 
 val prove_task :
@@ -65,7 +65,7 @@ val prepare_task : driver -> Task.task -> Task.task
 
 val print_task_prepared :
   ?old       : in_channel ->
-  driver -> Format.formatter -> Task.task -> unit
+  driver -> string -> Format.formatter -> Task.task -> unit
 
 val prove_task_prepared :
   command    : string ->
