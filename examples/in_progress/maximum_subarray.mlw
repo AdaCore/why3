@@ -53,3 +53,37 @@ module Algo1
 
 end
 
+(* Slightly less naive solution, in O(N^2) *)
+
+module Algo2
+
+  use import ref.Refint
+  use import Spec
+
+  let maximum_subarray (a: array int) (ghost lo hi: ref int): int
+    ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
+    ensures { maxsub a result }
+  = lo := 0;
+    hi := 0;
+    let n = length a in
+    let ms = ref 0 in
+    for l = 0 to n-1 do
+      invariant { 0 <= !lo <= l && !lo <= !hi <= n && 0 <= !ms = sum a !lo !hi }
+      invariant { maxsublo a l !ms }
+      let s = ref 0 in
+      for h = l+1 to n do
+        invariant
+                { 0 <= !lo <= l && !lo <= !hi <= n && 0 <= !ms = sum a !lo !hi }
+        invariant { maxsublo a l !ms }
+        invariant { forall h': int. l <= h' < h -> sum a l h' <= !ms }
+        invariant { !s = sum a l (h-1) }
+        s += a[h-1];
+        assert { !s = sum a l h };
+        if !s > !ms then begin ms := !s; lo := l; hi := h end
+      done
+    done;
+    !ms
+
+end
+
+
