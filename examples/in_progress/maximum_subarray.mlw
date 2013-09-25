@@ -118,6 +118,8 @@ module Algo3
         assert { !s = sum a i (mid+1) };
         if !s > !ms then begin ms := !s; lo := i end
       done;
+      assert { forall l': int. l <= l' <= mid ->
+               sum a l' (mid+1) <= sum a !lo (mid+1) };
       s := !ms;
       for i = mid+1 to h-1 do
         invariant { l <= !lo <= mid < !hi <= h && !ms = sum a !lo !hi }
@@ -126,6 +128,7 @@ module Algo3
         invariant { !s = sum a !lo i }
         s += a[i];
         assert { !s = sum a !lo (i+1) };
+        assert { !s = sum a !lo (mid+1) + sum a (mid+1) (i+1) };
         if !s > !ms then begin ms := !s; hi := (i+1) end
       done;
       (* then consider sums in a[l..mid[ and a[mid+1..h[, recursively *)
