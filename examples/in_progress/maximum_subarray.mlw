@@ -112,6 +112,7 @@ module Algo3
       let s  = ref !ms in
       for i = mid-1 downto l do
         invariant { l <= !lo <= mid && !hi = mid+1 && !ms = sum a !lo !hi }
+        invariant { forall l': int. i < l' <= mid -> sum a l' (mid+1) <= !ms }
         invariant { !s = sum a (i+1) (mid+1) }
         s += a[i];
         assert { !s = sum a i (mid+1) };
@@ -120,12 +121,14 @@ module Algo3
       s := !ms;
       for i = mid+1 to h-1 do
         invariant { l <= !lo <= mid < !hi <= h && !ms = sum a !lo !hi }
+        invariant { forall l' h': int. l <= l' <= mid < h' <= i ->
+                    sum a l' h' <= !ms }
         invariant { !s = sum a !lo i }
         s += a[i];
         assert { !s = sum a !lo (i+1) };
         if !s > !ms then begin ms := !s; hi := (i+1) end
       done;
-      (* then consider sums left and right of mid, recursively *)
+      (* then consider sums in a[l..mid[ and a[mid+1..h[, recursively *)
       if l < mid then begin
          let ghost lo' = ref 0 in
          let ghost hi' = ref 0 in
