@@ -8,6 +8,7 @@ type reason =
    | VC_Range_Check
    | VC_Length_Check
    | VC_Discriminant_Check
+   | VC_Initial_Condition
    | VC_Precondition
    | VC_Postcondition
    | VC_Contract_Case

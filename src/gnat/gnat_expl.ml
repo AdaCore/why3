@@ -9,6 +9,7 @@ type reason =
    | VC_Range_Check
    | VC_Length_Check
    | VC_Discriminant_Check
+   | VC_Initial_Condition
    | VC_Precondition
    | VC_Postcondition
    | VC_Contract_Case
@@ -70,6 +71,7 @@ let reason_from_string s =
    | "VC_RANGE_CHECK"             -> VC_Range_Check
    | "VC_LENGTH_CHECK"            -> VC_Length_Check
    | "VC_DISCRIMINANT_CHECK"      -> VC_Discriminant_Check
+   | "VC_INITIAL_CONDITION"       -> VC_Initial_Condition
    | "VC_PRECONDITION"            -> VC_Precondition
    | "VC_POSTCONDITION"           -> VC_Postcondition
    | "VC_CONTRACT_CASE"           -> VC_Contract_Case
@@ -92,6 +94,7 @@ let string_of_reason s =
    | VC_Range_Check               -> "range check"
    | VC_Length_Check              -> "length check"
    | VC_Discriminant_Check        -> "discriminant check"
+   | VC_Initial_Condition         -> "initial condition"
    | VC_Precondition              -> "precondition"
    | VC_Postcondition             -> "postcondition"
    | VC_Contract_Case             -> "contract case"
@@ -111,6 +114,7 @@ let tag_of_reason s =
    | VC_Range_Check               -> "range_check"
    | VC_Length_Check              -> "length_check"
    | VC_Discriminant_Check        -> "discriminant_check"
+   | VC_Initial_Condition         -> "initial_condition"
    | VC_Precondition              -> "precondition"
    | VC_Postcondition             -> "postcondition"
    | VC_Contract_Case             -> "contract_case"
