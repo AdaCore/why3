@@ -205,12 +205,12 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task pr thpr _blacklist fmt task =
+let print_task args fmt task =
   fprintf fmt "(benchmark why3@\n"
     (*print_ident (Task.task_goal task).pr_name*);
   fprintf fmt "  :status unknown@\n";
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+  print_prelude fmt args.prelude;
+  print_th_prelude task fmt args.prelude_map;
   let info = {
     info_syn = get_syntax_map task;
   }
@@ -220,7 +220,7 @@ let print_task pr thpr _blacklist fmt task =
   fprintf fmt "@\n)@."
 
 let () = register_printer "smtv1"
-  (fun _env pr thpr blacklist ?old:_ fmt task ->
+  (fun args ?old:_ fmt task ->
      forget_all ident_printer;
-     print_task pr thpr blacklist fmt task)
+     print_task args fmt task)
   ~desc:"Printer@ for@ the@ SMTlib@ version@ 1@ format."

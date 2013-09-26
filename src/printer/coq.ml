@@ -961,11 +961,11 @@ let print_decl ~old info fmt d =
 let print_decls ~old info fmt dl =
   fprintf fmt "@\n@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
 
-let print_task env pr thpr _blacklist realize ?old fmt task =
+let print_task printer_args realize ?old fmt task =
   (* eprintf "Task:%a@.@." Pretty.print_task task; *)
   forget_all ();
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+  print_prelude fmt printer_args.prelude;
+  print_th_prelude task fmt printer_args.prelude_map;
   (* find theories that are both used and realized from metas *)
   let realized_theories =
     Task.on_meta meta_realized_theory (fun mid args ->
@@ -975,7 +975,7 @@ let print_task env pr thpr _blacklist realize ?old fmt task =
         let f,id =
           let l = Strings.rev_split s1 '.' in
           List.rev (List.tl l), List.hd l in
-        let th = Env.find_theory env f id in
+        let th = Env.find_theory printer_args.env f id in
         Mid.add th.Theory.th_name (th, if s2 = "" then s1 else s2) mid
       | _ -> assert false
     ) Mid.empty task in
@@ -1016,11 +1016,11 @@ let print_task env pr thpr _blacklist realize ?old fmt task =
   print_decls ~old info fmt local_decls;
   output_remaining fmt !old
 
-let print_task_full env pr thpr blacklist ?old fmt task =
-  print_task env pr thpr blacklist false ?old fmt task
+let print_task_full args ?old fmt task =
+  print_task args false ?old fmt task
 
-let print_task_real env pr thpr blacklist ?old fmt task =
-  print_task env pr thpr blacklist true  ?old fmt task
+let print_task_real args ?old fmt task =
+  print_task args true  ?old fmt task
 
 let () = register_printer "coq" print_task_full
   ~desc:"Printer@ for@ the@ Coq@ proof@ assistant@ \

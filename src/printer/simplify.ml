@@ -150,9 +150,9 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task pr thpr _blacklist fmt task =
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+let print_task args fmt task =
+  print_prelude fmt args.prelude;
+  print_th_prelude task fmt args.prelude_map;
   let info = {
     info_syn = get_syntax_map task }
   in
@@ -160,8 +160,8 @@ let print_task pr thpr _blacklist fmt task =
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
 let () = register_printer "simplify"
-  (fun _env pr thpr blacklist ?old:_ fmt task ->
+  (fun args ?old:_ fmt task ->
      forget_all ident_printer;
-     print_task pr thpr blacklist fmt task)
+     print_task args fmt task)
   ~desc:"Printer@ for@ the@ Simplify@ theorem@ prover."
 

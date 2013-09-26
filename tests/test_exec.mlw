@@ -76,6 +76,12 @@ module Mut
 
   type refint = { mutable i : int }
 
+  let y () : refint = { i = 0 }
+
+  let z () : int =
+    let r = { i = 0 } in r.i <- 42; r.i
+
+
   let test () =
     let x = { i = 0 } in
     let s = { i = 0 } in
@@ -134,3 +140,61 @@ module Ref
 
 
 end
+
+
+module Array
+
+  use import int.Int
+  use import array.Array
+
+  exception Found int
+
+  let search (t:array int) (v:int) : int =
+    try
+      for i=0 to t.length - 1 do
+        if t[i] = v then raise (Found i)
+      done;
+      -1
+    with Found i -> i
+    end
+
+  let test0 () = let t = Array.make 2 21 in t[0]+t[1]
+
+  let test1 () =
+    let t = Array.make 2 21 in
+    t[1] <- 17;
+    t[0]+t[1]
+
+  let test2 () =
+    let t = Array.make 2 21 in
+    t[1] <- 17;
+    t[0] <- 7;
+    t[0]+t[1]
+
+  let t () : array int =
+     let t = Array.make 3 0 in
+     t[0] <- 12;
+     t[1] <- 42;
+     t[2] <- 67;
+     t
+
+  let tbis () = t ()
+
+  let t0 () =
+     let t = Array.make 3 0 in
+     t[0] <- 12;
+     t[1] <- 42;
+     t[2] <- 67;
+     t[0] + t[1] + t[2] (* 121 *)
+
+  let t1 () = 
+    let t = t () in
+    t[0] + t[1] + t[2] (* 121 *)
+
+  let test12 () = search (t ()) 12
+  let test42 () = search (t ()) 42
+  let test67 () = search (t ()) 67
+  let test7 () = search (t ()) 7
+
+end
+

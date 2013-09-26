@@ -216,11 +216,11 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
 
-let print_task fof _env pr thpr _blacklist ?old:_ fmt task =
+let print_task fof args ?old:_ fmt task =
   forget_all ident_printer;
   forget_all pr_printer;
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+  print_prelude fmt args.prelude;
+  print_th_prelude task fmt args.prelude_map;
   let info = { info_syn = get_syntax_map task; info_fof = fof } in
   fprintf fmt "@[%a@]@."
     (print_list nothing (print_decl info)) (Task.task_decls task)
@@ -351,12 +351,12 @@ let print_axiom info fmt d = match d.d_node with
         (print_fmla info) f print_pr pr
   | _ -> ()
 
-let print_dfg _env pr thpr _blacklist ?old:_ fmt task =
+let print_dfg args ?old:_ fmt task =
   forget_all ident_printer;
   forget_all pr_printer;
   fprintf fmt "@[begin_problem(why3).@\n@\n";
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+  print_prelude fmt args.prelude;
+  print_th_prelude task fmt args.prelude_map;
   fprintf fmt "list_of_descriptions.@\n";
   fprintf fmt
     "name({**}). author({**}). status(unknown). description({**}).@\n";

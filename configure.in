@@ -306,13 +306,14 @@ else
    enable_html_doc=no
 fi
 
-# checking for hevea
-if test "$enable_html_doc" = yes ; then
+# checking for hevea (note that the pdf documentation uses hevea.sty)
+if test "$enable_doc" = yes ; then
    AC_CHECK_PROG(HEVEA,hevea,hevea,no)
    if test "$HEVEA" = no ; then
+      enable_doc=no
       enable_html_doc=no
-      reason_html_doc=" (hevea not found)"
-      AC_MSG_WARN([Cannot find hevea, HTML documentation disabled.])
+      reason_doc=" (hevea not found)"
+      AC_MSG_WARN([Cannot find hevea, documentation disabled.])
    fi
 fi
 
@@ -390,6 +391,7 @@ if test "$enable_bench" = yes ; then
       SQLITE3LIB="+sqlite3"
       AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_bench=no)
       if test "$enable_bench" = no; then
+        reason_bench=" (sqlite3 not found)"
         AC_MSG_WARN([Lib sqlite3 not found, why3bench disabled.])
       fi
    fi
@@ -545,6 +547,7 @@ if test "$enable_hypothesis_selection" = yes; then
      OCAMLGRAPHLIB="+ocamlgraph"
      AC_CHECK_FILE($OCAMLLIB/ocamlgraph/,,enable_hypothesis_selection=no)
      if test "$enable_hypothesis_selection" = no; then
+       reason_hypothesis_selection=" (ocamlgraph not found)"
        AC_MSG_WARN([Lib ocamlgraph not found, hypothesis selection disabled.])
      fi
    fi
@@ -576,10 +579,8 @@ fi
 
 if test "$enable_local" = no; then
    LOCALDIR=''
-   LOCALBIN=''
 else
    LOCALDIR="${PWD}"
-   LOCALBIN="${PWD}/bin/"
 fi
 
 #For the META
@@ -664,7 +665,6 @@ AC_SUBST(FRAMAC_LIBDIR)
 
 AC_SUBST(enable_local)
 AC_SUBST(LOCALDIR)
-AC_SUBST(LOCALBIN)
 
 AC_SUBST(enable_relocation)
 
@@ -674,7 +674,7 @@ dnl AC_SUBST(PDFVIEWER)
 # Finally create the Makefile from Makefile.in
 dnl AC_OUTPUT(Makefile)
 AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
-AC_CONFIG_FILES(share/provers-detection-data.conf lib/why3/META)
+AC_CONFIG_FILES(lib/why3/META)
 AC_CONFIG_FILES(src/jessie/Makefile)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/config.sh doc/version.tex;
@@ -697,10 +697,10 @@ echo "    Library path        : $OCAMLLIB"
 echo "    Native compilation  : $enable_native_code"
 echo "    Profiling           : $enable_profiling"
 echo "IDE                     : $enable_ide$reason_ide"
-echo "Bench tool              : $enable_bench"
-echo "Documentation           : $enable_doc"
+echo "Bench tool              : $enable_bench$reason_bench"
+echo "Documentation           : $enable_doc$reason_doc"
 if test "$enable_doc" = yes ; then
-   echo "    HTML                : $enable_html_doc"
+   echo "    HTML                : $enable_html_doc$reason_html_doc"
 fi
 echo "Coq support             : $enable_coq_support$reason_coq_support"
 if test "$enable_coq_support" = yes ; then
@@ -724,7 +724,7 @@ if test "$enable_frama_c" = yes ; then
    echo "    Share path          : $FRAMAC_SHARE"
    echo "    Library path        : $FRAMAC_LIBDIR"
 fi
-echo "Hypothesis selection    : $enable_hypothesis_selection"
+echo "Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
 if test "$enable_local" = yes ; then
    echo "Installable             : no"
 else

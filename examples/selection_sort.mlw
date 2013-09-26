@@ -29,4 +29,10 @@ module SelectionSort
       assert { permut (at a 'L1) a }
     done
 
+  let test () =
+    let a = make 8 0 in
+    a[0] <- 3; a[1] <- 1; a[2] <- 7; a[3] <- 0;
+    a[4] <- 4; a[5] <- 1; a[6] <- 6; a[7] <- 3;
+    selection_sort a
+
 end

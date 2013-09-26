@@ -574,7 +574,9 @@ module Save_VCs = struct
       let dr = Gnat_config.prover_driver in
       let vc_fn = vc_name expl in
       GM.add goal_map goal vc_fn;
-      with_fmt_channel vc_fn (fun fmt -> Driver.print_task dr fmt task);
+      with_fmt_channel vc_fn
+        (fun fmt ->
+          Driver.print_task dr vc_fn fmt task);
       Format.printf "saved VC to %s@." vc_fn
 
    let compute_trace =

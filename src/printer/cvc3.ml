@@ -314,9 +314,9 @@ let distingued =
       let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in
       Trans.return dis2))
 
-let print_task pr thpr _blacklist fmt task =
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+let print_task args fmt task =
+  print_prelude fmt args.prelude;
+  print_th_prelude task fmt args.prelude_map;
   let info = {
     info_syn = Mid.union (fun _ _ s -> Some s)
       (get_syntax_map task) (Trans.apply distingued task);
@@ -327,7 +327,7 @@ let print_task pr thpr _blacklist fmt task =
   ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
 
 let () = register_printer "cvc3"
-  (fun _env pr thpr blacklist ?old:_ fmt task ->
+  (fun args ?old:_ fmt task ->
      forget_all ident_printer;
-     print_task pr thpr blacklist fmt task)
+     print_task args fmt task)
   ~desc:"Printer@ for@ the@ CVC3@ theorem@ prover."

@@ -849,11 +849,25 @@ and wp_abstract env c_eff c_q c_xq q xq =
   in
   backstep proceed c_q c_xq
 
+and wp_fun_regs ps l = (* regions to refresh at the top of function WP *)
+  let add_arg = let seen = ref Sreg.empty in fun sbs pv ->
+    (* we only need to "havoc" the regions that occur twice in [l.l_args].
+       If a region in an argument is shared with the context, then is it
+       already frozen in [ps.ps_subst]. If a region in an argument is not
+       shared at all, the last [wp_forall] over [args] will be enough. *)
+    let rec down sbs ity =
+      let rl = match ity.ity_node with
+        | Ityapp (_,_,rl) -> rl | _ -> [] in
+      ity_fold down (List.fold_left add_reg sbs rl) ity
+    and add_reg sbs r =
+      if Sreg.mem r !seen then reg_match sbs r r else
+      (seen := Sreg.add r !seen; down sbs r.reg_ity) in
+    down sbs pv.pv_ity in
+  let sbs = List.fold_left add_arg ps.ps_subst l.l_args in
+  Mreg.map (fun _ -> ()) sbs.ity_subst_reg
+
 and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let lab = fresh_mark () and c = l.l_spec in
-  let add_arg sbs pv = ity_match sbs pv.pv_ity pv.pv_ity in
-  let subst = List.fold_left add_arg ps.ps_subst l.l_args in
-  let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
   let env =
     if c.c_letrec = 0 || c.c_variant = [] then env else
@@ -866,7 +880,7 @@ and wp_fun_defn env { fun_ps = ps ; fun_lambda = l } =
   let conv p = old_mark lab (wp_expl expl_xpost p) in
   let f = wp_expr env l.l_expr q (Mexn.map conv c.c_xpost) in
   let f = wp_implies c.c_pre (erase_mark lab f) in
-  wp_forall args (quantify env regs f)
+  wp_forall args (quantify env (wp_fun_regs ps l) f)
 
 and wp_rec_defn env fdl = List.map (wp_fun_defn env) fdl
 
@@ -1971,14 +1985,11 @@ let wp_rec ~wp env kn th fdl =
         Loc.errorm ?loc "lemma functions must return unit";
       let env = mk_env env kn th in
       let lab = fresh_mark () in
-      let add_arg sbs pv = ity_match sbs pv.pv_ity pv.pv_ity in
-      let subst = List.fold_left add_arg ps.ps_subst l.l_args in
-      let regs = Mreg.map (fun _ -> ()) subst.ity_subst_reg in
       let args = List.map (fun pv -> pv.pv_vs) l.l_args in
       let q = old_mark lab spec.c_post in
       let f = wp_expr env e_void q Mexn.empty in
       let f = wp_implies spec.c_pre (erase_mark lab f) in
-      let f = wp_forall args (quantify env regs f) in
+      let f = wp_forall args (quantify env (wp_fun_regs ps l) f) in
       let f = t_forall_close (Mvs.keys f.t_vars) [] f in
       let lkn = Theory.get_known th in
       let f = if Debug.test_flag no_track then f else track_values lkn kn f in

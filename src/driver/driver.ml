@@ -286,32 +286,33 @@ let prepare_task drv task =
   let task = update_task drv task in
   List.fold_left apply task transl
 
-let print_task_prepared ?old drv fmt task =
+let print_task_prepared ?old drv filename fmt task =
   let p = match drv.drv_printer with
     | None -> raise NoPrinter
     | Some p -> p
   in
   let printer =
-    lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude
-      drv.drv_blacklist
-  in
+    lookup_printer p
+      { Printer.env = drv.drv_env;
+        prelude     = drv.drv_prelude;
+        prelude_map = drv.drv_thprelude;
+        blacklist   = drv.drv_blacklist;
+        filename    = filename } in
   fprintf fmt "@[%a@]@?" (printer ?old) task
 
-let print_task ?old drv fmt task =
+let print_task ?old drv filename fmt task =
   let task = prepare_task drv task in
-  print_task_prepared ?old drv fmt task
+  print_task_prepared ?old drv filename fmt task
 
-let print_theory ?old drv fmt th =
+let print_theory ?old drv filename fmt th =
   let task = Task.use_export None th in
-  print_task ?old drv fmt task
+  print_task ?old drv filename fmt task
 
 let prove_task_prepared
   ~command ?timelimit ?memlimit ?old ?inplace drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
-  print_task_prepared ?old:old_channel drv fmt task; pp_print_flush fmt ();
-  Opt.iter close_in old_channel;
   let filename = match old, inplace with
     | Some fn, Some true -> fn
     | _ ->
@@ -322,6 +323,8 @@ let prove_task_prepared
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         get_filename drv fn "T" pr.pr_name.id_string
   in
+  print_task_prepared ?old:old_channel drv filename fmt task; pp_print_flush fmt ();
+  Opt.iter close_in old_channel;
   let res =
     call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buf in
   Buffer.reset buf;

@@ -12,6 +12,7 @@ module PrefixSumRec
    use import int.ComputerDivision
    use import int.Power
 
+   use import map.Map as M
    use import array.Array
    use import array.ArraySum
 
@@ -64,21 +65,29 @@ module PrefixSumRec
   (** frame lemma for "phase1" on fourth argument.
      needed to prove both upsweep, downsweep and compute_sums
    *)
-  lemma phase1_frame:
-    forall left right:int, a0 a a' : array int.
-    (forall i:int. left-(right-left) < i < right ->
-       a[i] = a'[i]) ->
-    phase1 left right a0 a -> phase1 left right a0 a'
-
+  let rec lemma phase1_frame (left right:int) (a0 a a' : array int) : unit variant { right-left }
+    requires { forall i:int. left-(right-left) < i < right ->
+               a[i] = a'[i]}
+    requires { phase1 left right a0 a }
+    ensures { phase1 left right a0 a' } =
+    if right > left + 1 then begin
+       phase1_frame (go_left left right) left a0 a a';
+       phase1_frame (go_right left right) right a0 a a'
+    end
 
   (** frame lemma for "phase1" on third argument.
      needed to prove upsweep and compute_sums
    *)
-  lemma phase1_frame2:
-    forall left right:int, a0 a0' a : array int.
-    (forall i:int. left-(right-left) < i < right ->
-       a0[i] = a0'[i]) ->
-    phase1 left right a0 a -> phase1 left right a0' a
+  let rec lemma phase1_frame2 (left right:int) (a0 a0' a : array int) : unit variant { right-left }
+    requires { forall i:int. left-(right-left) < i < right ->
+               a0[i] = a0'[i]}
+    requires { phase1 left right a0 a }
+    ensures { phase1 left right a0' a } =
+    if right > left + 1 then begin
+       phase1_frame2 (go_left left right) left a0 a0' a;
+       phase1_frame2 (go_right left right) right a0 a0' a
+    end
+
 
 (** {2 The upsweep phase}
 
@@ -142,6 +151,7 @@ module PrefixSumRec
     assert { phase1 (go_right left right) right a0 (at a 'Init) };
     assert { phase1 (go_right left right) right a0 a };
     downsweep (left - div space 2) left a0 a;
+    assert { phase1 (go_right left right) right a0 a };
     downsweep (right - div space 2) right a0 a;
     assert { partial_sum (left - div space 2) left a0 a };
     assert { partial_sum (right - div space 2) right a0 a }

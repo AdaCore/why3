@@ -75,41 +75,6 @@ let open_temp_file ?(debug=false) filesuffix usefile =
         close_out cout;
         raise e
 
-type 'a result =
-  | Result of 'a
-  | Exception of exn
-
-open Unix
-
-exception Bad_execution of process_status
-
-let call_asynchronous (f : unit -> 'a) =
-  let cin,cout = pipe () in
-  let cin = in_channel_of_descr cin in
-  let cout = out_channel_of_descr cout in
-  match fork () with
-    | 0 ->
-        let result =
-          try
-            Result (f ())
-          with exn -> Exception exn in
-        Marshal.to_channel cout (result : 'a result) [];
-        close_out cout;
-        exit 0
-    | pid ->
-        let f () =
-          let result = (Marshal.from_channel cin: 'a result) in
-          close_in cin;
-          let _, ps = waitpid [] pid in
-          match ps with
-            | WEXITED 0 ->
-                begin match result with
-                  | Result res -> res
-                  | Exception exn -> raise exn
-                end
-            | _ -> raise (Bad_execution ps) in
-        f
-
 let copy_file from to_ =
   let cin = open_in from in
   let cout = open_out to_ in

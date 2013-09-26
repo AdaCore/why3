@@ -527,11 +527,13 @@ let print_goal info fmt g =
         fprintf fmt "False@\n"
 
 
-let print_task env pr thpr _blacklist ?old:_ fmt task =
+let print_task args ?old:_ fmt task =
   forget_all ident_printer;
-  let info = get_info env task in
-  print_prelude fmt (List.append pr ["$MaxExtraPrecision = 256; ClearAll[vcWhy,varsWhy];"]);
-  print_th_prelude task fmt thpr;
+  let info = get_info args.env task in
+  print_prelude fmt
+    (List.append args.prelude
+      ["$MaxExtraPrecision = 256; ClearAll[vcWhy,varsWhy];"]);
+  print_th_prelude task fmt args.prelude_map;
   let params,funs,preds,eqs,hyps,goal,types =
     List.fold_left (prepare info (Hid.create 17)) ([],[],[],[],[],Goal_none,[]) (Task.task_decls task)
   in
