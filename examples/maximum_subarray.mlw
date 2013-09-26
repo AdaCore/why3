@@ -1,0 +1,196 @@
+
+(* Maximum subarray problem
+
+   Given an array of integers, find the contiguous subarray with the
+   largest sum. Subarrays of length 0 are allowed (which means that an
+   array with negative values only has a maximal sum of 0).
+
+   Authors: Jean-Christophe Filliâtre (CNRS)
+            Guillaume Melquiond       (Inria)
+ *)
+
+module Spec
+  use import int.Int
+  use export array.Array
+
+  use export array.ArraySum
+  (* provides [sum a l h] = the sum of a[l..h[ and suitable lemmas *)
+
+  (* s is no smaller than sums of subarrays a[l..h[ with 0 <= l < maxlo *)
+  predicate maxsublo (a: array int) (maxlo: int) (s: int) =
+    forall l h: int. 0 <= l < maxlo -> l <= h <= length a -> sum a l h <= s
+
+  (* s is no smaller than sums of subarrays of a *)
+  predicate maxsub (a: array int) (s: int) =
+    forall l h: int. 0 <= l <= h <= length a -> sum a l h <= s
+
+end
+
+(* In all codes below, reference ms stands for the maximal sum found so far
+   and ghost references lo and hi hold the bounds for this sum *)
+
+(* Naive solution, in O(N^3) *)
+module Algo1
+
+  use import ref.Refint
+  use import Spec
+
+  let maximum_subarray (a: array int) (ghost lo hi: ref int): int
+    ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
+    ensures { maxsub a result }
+  = lo := 0;
+    hi := 0;
+    let n = length a in
+    let ms = ref 0 in
+    for l = 0 to n-1 do
+      invariant { 0 <= !lo <= l && !lo <= !hi <= n && !ms = sum a !lo !hi }
+      invariant { maxsublo a l !ms }
+      for h = l to n do
+        invariant { 0 <= !lo <= l && !lo <= !hi <= n && !ms = sum a !lo !hi }
+        invariant { maxsublo a l !ms }
+        invariant { forall h': int. l <= h' < h -> sum a l h' <= !ms }
+        (* compute the sum of a[l..h[ *)
+        let s = ref 0 in
+        for i = l to h-1 do
+          invariant { !s = sum a l i }
+          invariant { 0 <= !lo <= l && !lo <= !hi <= n && !ms = sum a !lo !hi }
+          s += a[i]
+        done;
+        assert { !s = sum a l h };
+        if !s > !ms then begin ms := !s; lo := l; hi := h end
+      done
+    done;
+    !ms
+
+end
+
+(* Slightly less naive solution, in O(N^2)
+   Do not recompute the sum, simply update it *)
+
+module Algo2
+
+  use import ref.Refint
+  use import Spec
+
+  let maximum_subarray (a: array int) (ghost lo hi: ref int): int
+    ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
+    ensures { maxsub a result }
+  = lo := 0;
+    hi := 0;
+    let n = length a in
+    let ms = ref 0 in
+    for l = 0 to n-1 do
+      invariant { 0 <= !lo <= l && !lo <= !hi <= n && 0 <= !ms = sum a !lo !hi }
+      invariant { maxsublo a l !ms }
+      let s = ref 0 in
+      for h = l+1 to n do
+        invariant
+                { 0 <= !lo <= l && !lo <= !hi <= n && 0 <= !ms = sum a !lo !hi }
+        invariant { maxsublo a l !ms }
+        invariant { forall h': int. l <= h' < h -> sum a l h' <= !ms }
+        invariant { !s = sum a l (h-1) }
+        s += a[h-1]; (* update the sum *)
+        assert { !s = sum a l h };
+        if !s > !ms then begin ms := !s; lo := l; hi := h end
+      done
+    done;
+    !ms
+
+end
+
+(* Divide-and-conqueer solution, in O(N log N) *)
+
+module Algo3
+
+  use import ref.Refint
+  use import int.ComputerDivision
+  use import Spec
+
+  let rec maximum_subarray_rec (a: array int) (l h: int) (ghost lo hi: ref int)
+    : int
+    requires { 0 <= l <= h <= length a }
+    ensures  { l <= !lo <= !hi <= h && result = sum a !lo !hi }
+    ensures  { forall l' h': int. l <= l' <= h' <= h -> sum a l' h' <= result }
+    variant  { h - l }
+  = if h = l then begin
+      (* base case: no element at all *)
+      lo := l; hi := h; 0
+    end else begin
+      (* at least one element *)
+      let mid = l + div (h - l) 2 in
+      (* first consider all sums that include a[mid] *)
+      lo := mid; hi := mid;
+      let ms = ref 0 in
+      let s  = ref !ms in
+      for i = mid-1 downto l do
+        invariant { l <= !lo <= mid = !hi && !ms = sum a !lo !hi }
+        invariant { forall l': int. i < l' <= mid -> sum a l' mid <= !ms }
+        invariant { !s = sum a (i+1) mid }
+        s += a[i];
+        assert { !s = sum a i mid };
+        if !s > !ms then begin ms := !s; lo := i end
+      done;
+      assert { forall l': int. l <= l' <= mid ->
+               sum a l' mid <= sum a !lo mid };
+      s := !ms;
+      for i = mid to h-1 do
+        invariant { l <= !lo <= mid <= !hi <= h && !ms = sum a !lo !hi }
+        invariant { forall l' h': int. l <= l' <= mid <= h' <= i ->
+                    sum a l' h' <= !ms }
+        invariant { !s = sum a !lo i }
+        s += a[i];
+        assert { !s = sum a !lo (i+1) };
+        assert { !s = sum a !lo mid + sum a mid (i+1) };
+        if !s > !ms then begin ms := !s; hi := (i+1) end
+      done;
+      (* then consider sums in a[l..mid[ and a[mid+1..h[, recursively *)
+      begin
+         let ghost lo' = ref 0 in
+         let ghost hi' = ref 0 in
+         let left = maximum_subarray_rec a l mid lo' hi' in
+         if left > !ms then begin ms := left; lo := !lo'; hi := !hi' end
+      end;
+      begin
+         let ghost lo' = ref 0 in
+         let ghost hi' = ref 0 in
+         let right = maximum_subarray_rec a (mid+1) h lo' hi' in
+         if right > !ms then begin ms := right; lo := !lo'; hi := !hi' end
+      end;
+      !ms
+    end
+
+ let maximum_subarray (a: array int) (ghost lo hi: ref int): int
+    ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
+    ensures { maxsub a result }
+  = maximum_subarray_rec a 0 (length a) lo hi
+
+end
+
+(* Optimal solution, in O(N)
+   Known as Kadane's algorithm *)
+
+module Algo4
+
+  use import ref.Refint
+  use import Spec
+
+  let maximum_subarray (a: array int) (ghost lo hi: ref int): int
+    ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
+    ensures { maxsub a result }
+  = lo := 0;
+    hi := 0;
+    let n = length a in
+    let ms = ref 0 in
+    let ghost l = ref 0 in
+    let s = ref 0 in
+    for i = 0 to n-1 do
+      invariant { 0 <= !lo <= !hi <= i && 0 <= !ms = sum a !lo !hi }
+      invariant { forall l' h': int. 0 <= l' <= h' <= i -> sum a l' h' <= !ms }
+      invariant { 0 <= !l <= i && !s = sum a !l i }
+      invariant { forall l': int. 0 <= l' < i -> sum a l' i <= !s }
+      if !s < 0 then begin s := a[i]; l := i end else s += a[i];
+      if !s > !ms then begin ms := !s; lo := !l; hi := (i+1) end
+    done;
+    !ms
+
+end

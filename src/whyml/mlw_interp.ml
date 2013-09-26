@@ -1,6 +1,7 @@
 
 open Format
 
+open Stdlib
 open Term
 
 let t_app_infer_inst ls tl ty =
@@ -16,6 +17,7 @@ open Mlw_expr
 type env = {
   mknown : Mlw_decl.known_map;
   tknown : Decl.known_map;
+  regenv : region Mreg.t;
   vsenv : (ity option * term) Mvs.t;
 }
 
@@ -44,7 +46,7 @@ let multibind_pvs l tl env =
 type state = term Mreg.t
 
 let p_reg fmt (reg,t) =
-  fprintf fmt "@[<hov 2><%a> -> %a@]" 
+  fprintf fmt "@[<hov 2><%a> -> %a@]"
     Mlw_pretty.print_reg reg Pretty.print_term t
 
 let print_state fmt s =
@@ -187,6 +189,10 @@ let eval_equ _ty _ls l =
 
 (* functions on map.Map *)
 
+let ts_map = ref Ty.ts_int
+
+let builtin_map_type ts = ts_map := ts
+
 let ls_map_const = ref ps_equ
 let ls_map_get = ref ps_equ
 let ls_map_set = ref ps_equ
@@ -234,7 +240,7 @@ let eval_map_set ty ls_set l =
 (* all builtin functions *)
 
 let built_in_theories =
-  [ ["int"],"Int",
+  [ ["int"],"Int", [],
     [ "infix +", None, eval_int_op Big_int.add_big_int;
       "infix -", None, eval_int_op Big_int.sub_big_int;
       "infix *", None, eval_int_op Big_int.mult_big_int;
@@ -244,24 +250,29 @@ let built_in_theories =
       "infix >", None, eval_int_rel Big_int.gt_big_int;
       "infix >=", None, eval_int_rel Big_int.ge_big_int;
     ] ;
-    ["int"],"ComputerDivision",
+    ["int"],"ComputerDivision", [],
     [ "div", None, eval_int_op computer_div_big_int;
       "mod", None, eval_int_op computer_mod_big_int;
     ] ;
-    ["int"],"EuclideanDivision",
+    ["int"],"EuclideanDivision", [],
     [ "div", None, eval_int_op Big_int.div_big_int;
       "mod", None, eval_int_op Big_int.mod_big_int;
     ] ;
-    ["map"],"Map",
+    ["map"],"Map", ["map", builtin_map_type],
     [ "const", Some ls_map_const, eval_map_const;
       "get", Some ls_map_get, eval_map_get;
       "set", Some ls_map_set, eval_map_set;
     ] ;
   ]
 
-let add_builtin_th env (l,n,d) =
+let add_builtin_th env (l,n,t,d) =
   try
     let th = Env.find_theory env l n in
+    List.iter
+      (fun (id,r) ->
+        let ts = Theory.ns_find_ts th.Theory.th_export [id] in
+        r ts)
+      t;
     List.iter
       (fun (id,r,f) ->
         let ls = Theory.ns_find_ls th.Theory.th_export [id] in
@@ -273,10 +284,127 @@ let add_builtin_th env (l,n,d) =
   with Not_found ->
     Format.eprintf "[Warning] theory %s not found@." n
 
-
 let get_builtins env =
   Hls.add builtins ps_equ eval_equ;
   List.iter (add_builtin_th env) built_in_theories
+
+
+type result =
+  | Normal of term
+  | Excep of xsymbol * term
+  | Irred of expr
+  | Fun of psymbol * pvsymbol list * int
+
+let builtin_progs = Hps.create 17
+
+let array_cons_ls = ref ps_equ
+
+let builtin_array_type kn its =
+  let csl = Mlw_decl.find_constructors kn its in
+  match csl with
+    | [(pls,_)] -> array_cons_ls := pls.pl_ls
+    | _ ->  assert false
+
+let exec_array_make _env _spec s args =
+  match args with
+    | [n;def] ->
+      let ty_def = match def.t_ty with
+        | None -> assert false
+        | Some t -> t
+      in
+      let ty = Ty.ty_app !ts_map [Ty.ty_int;ty_def] in
+      let m = t_app !ls_map_const [def] (Some ty) in
+      let t = t_app_infer !array_cons_ls [n;m] in
+      Normal t,s
+    | _ -> assert false
+
+let exec_array_get _env _spec s args =
+  match args with
+    | [t;i] ->
+      begin
+        match t.t_node with
+          | Tapp(ls,[_len;m]) when ls_equal ls !array_cons_ls ->
+            let ty = match t.t_ty with
+              | Some { Ty.ty_node = Ty.Tyapp(_,[t]) } -> t
+              | _ -> assert false
+            in
+            let t = eval_map_get (Some ty) !ls_map_get [m;i] in
+            Normal t,s
+          | _ -> assert false
+      end
+    | _ -> assert false
+
+let exec_array_length _env _spec s args =
+  match args with
+    | [t] ->
+      begin
+        match t.t_node with
+          | Tapp(ls,[len;_m]) when ls_equal ls !array_cons_ls ->
+            Normal len,s
+          | _ -> assert false
+      end
+    | _ -> assert false
+
+let exec_array_set env spec s args =
+  match args with
+    | [t;i;v] ->
+      begin
+        match t.t_node with
+          | Tapp(ls,[_len;m]) when ls_equal ls !array_cons_ls ->
+            let t = eval_map_set m.t_ty !ls_map_set [m;i;v] in
+            let effs = spec.c_effect.eff_writes in
+            let reg =
+              if Sreg.cardinal effs = 1 then Sreg.choose effs
+              else assert false
+            in
+            let reg =
+              try Mreg.find reg env.regenv
+              with Not_found -> reg
+            in
+            let s' = Mreg.add reg t s in
+            Normal (Mlw_expr.t_void),s'
+          | _ -> assert false
+      end
+    | _ -> assert false
+
+let built_in_modules =
+  [ "array","Array",
+    ["array", builtin_array_type],
+    ["make", None, exec_array_make ;
+     "mixfix []", None, exec_array_get ;
+     "length", None, exec_array_length ;
+     "mixfix []<-", None, exec_array_set ;
+    ] ;
+  ]
+
+let add_builtin_mo lib (l,n,t,d) =
+  try
+    Format.eprintf "[interp] looking for mlw file %s@." l;
+    let mods, _ths = Env.read_lib_file lib [l] in
+    let mo = Mstr.find n mods in
+    let exp = mo.Mlw_module.mod_export in
+    let kn = mo.Mlw_module.mod_known in
+    List.iter
+      (fun (id,r) ->
+        Format.eprintf "[interp] looking for type %s@." id;
+        let its = Mlw_module.ns_find_its exp [id] in
+        r kn its)
+      t;
+    List.iter
+      (fun (id,r,f) ->
+        Format.eprintf "[interp] looking for function %s@." id;
+        let ps = Mlw_module.ns_find_ps exp [id] in
+        Hps.add builtin_progs ps f;
+        match r with
+          | None -> ()
+          | Some r -> r := ps)
+      d
+  with Not_found ->
+    Format.eprintf "[Warning] module %s not found@." n
+
+let get_builtin_progs lib =
+  List.iter (add_builtin_mo lib) built_in_modules
+
 
 (* updates term t with current values in the store for
    mutable fields *)
@@ -294,7 +422,6 @@ let rec update_rec env s ity t =
               | (cs,fdl)::rem ->
                 if ls_equal cs ls then
                   begin
-                    (* eprintf "found constructor@."; *)
                   let l =
                     List.map2
                       (fun fd t ->
@@ -302,9 +429,15 @@ let rec update_rec env s ity t =
                           match fd.fd_mut with
                           | None -> t
                           | Some r ->
-(*
-                            eprintf "found a mutable field, looking in store -> ";
-*)
+                            (* found a mutable field, looking in store *)
+                            (* first find if region r is a region
+                               parameter and if yes substitute it *)
+                            let r =
+                              try
+                                Mreg.find r env.regenv
+                              with Not_found -> r
+                            in
+                            (* then look for r in store *)
                             let t =
                               try
                                 Mreg.find r s
@@ -315,9 +448,6 @@ let rec update_rec env s ity t =
 *)
                                 t
                             in
-(*
-                            eprintf "found term %a@." Pretty.print_term t;
-*)
                             t
                         in
                         update_rec env s fd.fd_ity t)
@@ -330,32 +460,18 @@ let rec update_rec env s ity t =
             (* it must be pure, no ? *)
             assert false
             (* t *)
-(*
-            let l =
-              List.map2 (update_rec env s) ityl tl
-            in t_app ls l (Some (ty_of_ity ity))
-*)
+        (*
+          let l =
+          List.map2 (update_rec env s) ityl tl
+          in t_app ls l (Some (ty_of_ity ity))
+        *)
         end
       | _ -> assert false
 
 let update env s ity t =
   match ity with
-  | None ->
-    (* eprintf "not calling update_rec on %a@." Pretty.print_term t; *)
-    t
-  | Some ity ->
-(*
-    eprintf "calling update on %a, type %a: "
-      Pretty.print_term t Mlw_pretty.print_ity ity;
-*)
-    let t = update_rec env s ity t in
-(*
-    eprintf "returns %a@." Pretty.print_term t;
-*)
-    t
-
-
-
+  | None -> t
+  | Some ity -> update_rec env s ity t
 
 let get_vs env s vs =
   try
@@ -492,6 +608,7 @@ let eval_global_term env km t =
   let env =
     { mknown = Ident.Mid.empty;
       tknown = km;
+      regenv = Mreg.empty;
       vsenv = Mvs.empty;
     }
   in
@@ -549,14 +666,6 @@ and p_expr fmt e =
     | Eabsurd -> fprintf fmt "@[Eabsurd@]"
 
 
-(* evaluation of WhyML expressions *)
-
-type result =
-  | Normal of term
-  | Excep of xsymbol * term
-  | Irred of expr
-  | Fun of psymbol * lambda * pvsymbol list * int
-
 let print_result fmt r =
   match r with
     | Normal t ->
@@ -569,6 +678,9 @@ let print_result fmt r =
         p_expr e
     | Fun _ ->
       Format.fprintf fmt "@[Result is a function@]"
+
+
+(* evaluation of WhyML expressions *)
 
 let rec eval_expr env (s:state) (e : expr) : result * state =
   match e.e_node with
@@ -589,30 +701,39 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         end
       | LetA _ -> Irred e, s
     end
-  | Eapp(e,pvs,_spec) ->
-    begin match eval_expr env s e with
-      | Fun(ps,lam,args,n), s' ->
+  | Eapp(e1,pvs,spec) ->
+    begin match eval_expr env s e1 with
+      | Fun(ps,args,n), s' ->
         if n > 1 then
-          Fun(ps,lam,pvs::args,n-1), s'
+          Fun(ps,pvs::args,n-1), s'
         else
-        let args = List.rev_map (fun pvs -> get_pvs env s pvs) (pvs::args) in
-        let env' = multibind_pvs lam.l_args args env in
-        eval_expr env' s' lam.l_expr
+          let ity_result =
+            match e.e_vty with
+              | VTvalue ity -> ity
+              | VTarrow _ -> assert false
+          in
+          begin
+            try
+              exec_app env s' ps (pvs::args) spec ity_result
+            with Exit -> Irred e, s
+          end
       | _ -> Irred e, s
     end
   | Earrow ps ->
+    let len = List.length ps.ps_aty.aty_args in
+    Fun(ps,[],len),s
+(*
     begin
       match Mlw_decl.find_definition env.mknown ps with
         | Some d ->
           let lam = d.fun_lambda in
-          (* TODO: we need to instantiate regions in [lam]
-             with the same substitution as in Earrow *)
-          Fun(ps,lam,[], List.length lam.l_args),s
+          Fun(ps,lam,[], len (* List.length lam.l_args*)),s
         | None ->
           Format.eprintf "[Exec] definition of psymbol %s not found@."
             ps.ps_name.Ident.id_string;
           Irred e,s
     end
+*)
   | Eif(e1,e2,e3) ->
     begin
       match eval_expr env s e1 with
@@ -674,6 +795,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           | DownTo -> Big_int.ge_big_int, Big_int.pred_big_int
         in
         let rec iter i s =
+          eprintf "[interp] for loop with index = %s@."
+            (Big_int.string_of_big_int i);
           if le i b then
             let env' = bind_vs pvs.pv_vs (term_of_big_int i) env in
             match eval_expr env' s e1 with
@@ -700,12 +823,18 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     eprintf "updating region <%a> with value %a@."
       Mlw_pretty.print_reg reg Pretty.print_term t;
 *)
-    Normal t_void, Mreg.add reg t s
+    let r =
+      try Mreg.find reg env.regenv
+      with Not_found -> reg
+    in
+    Normal t_void, Mreg.add r t s
+  | Eassert _ ->
+    (* TODO check the validity ! *)
+    Normal t_void, s
+  | Eghost _ (* -> (* eval_expr env s e *) Normal t_void, s  *)
   | Erec _
-  | Eghost _
   | Eany _
   | Eabstr _
-  | Eassert _
   | Eabsurd ->
     Format.eprintf "@[Unsupported expression: @[%a@]@]@."
                   Mlw_pretty.print_expr e;
@@ -725,13 +854,68 @@ and exec_match env t s ebl =
   in
   iter ebl
 
+and exec_app env s ps args spec ity_result =
+  let args' = List.rev_map (fun pvs -> get_pvs env s pvs) args in
+  let args_ty = List.rev_map (fun pvs -> pvs.pv_ity) args in
+  let subst =
+    Mlw_ty.aty_vars_match ps.ps_subst ps.ps_aty args_ty ity_result
+  in
+  let subst = subst.ity_subst_reg in
+  let env1 = { env with regenv =
+      Mreg.union (fun _ _ -> assert false) subst env.regenv }
+  in
+  match Mlw_decl.find_definition env.mknown ps with
+    | Some d ->
+      let lam = d.fun_lambda in
+      let env' = multibind_pvs lam.l_args args' env1 in
+        (*
+           eprintf "@[Evaluating function body of %s in regenv:@\n%a@\nand state:@\n%a@]@."
+           ps.ps_name.Ident.id_string
+          (Pp.print_list Pp.comma
+             (fun fmt (r1,r2) ->
+               fprintf fmt "@[%a -> %a@]"
+                 Mlw_pretty.print_reg r1
+                 Mlw_pretty.print_reg r2))
+          (Mreg.bindings env'.regenv)
+          print_state s;
+        *)
+      let r,s' = eval_expr env' s lam.l_expr
+      in
+      (*
+        eprintf "@[Return from function %s value %a in state:@\n%a@]@."
+        ps.ps_name.Ident.id_string
+        print_result r
+        print_state s';
+      *)
+      r,s'
+
+    | None ->
+      try
+        let f = Hps.find builtin_progs ps in
+        f env1 spec s args'
+      with Not_found ->
+        Format.eprintf "[Exec] definition of psymbol %s not found@."
+          ps.ps_name.Ident.id_string;
+        raise Exit
+
 
 let eval_global_expr env mkm tkm e =
   get_builtins env;
+  get_builtin_progs (Mlw_main.library_of_env env);
   let env = {
     mknown = mkm;
     tknown = tkm;
+    regenv = Mreg.empty;
     vsenv = Mvs.empty;
   }
   in
   eval_expr env Mreg.empty e
+
+
+
+
+(*
+Local Variables:
+compile-command: "unset LANG; make -C ../.. bin/why3.byte"
+End:
+*)

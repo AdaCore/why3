@@ -45,7 +45,7 @@ module Matrix
 
   let defensive_set (a: matrix 'a) (i: index) (v: 'a)
     ensures { valid_index a i /\ a = set (old a) i v }
-    raises  { OutOfBounds -> not (valid_index a i) }
+    raises  { OutOfBounds -> not (valid_index a i) /\ a = old a }
   = let r,c = i in
     if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
     set a i v

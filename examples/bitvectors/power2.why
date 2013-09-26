@@ -83,32 +83,9 @@ theory Pow2int
 
   use import int.EuclideanDivision
 
-(*
-  lemma div_uniq:
-    forall x y q:int.
-      y > 0 /\ (exists r:int. x = q*y + r /\ 0 <= r < y) -> div x y = q
-
-  lemma mod_uniq:
-    forall x y r:int.
-      y > 0 /\ (exists q:int. x = q*y + r /\ 0 <= r < y) -> mod x y = r
-
-  lemma Div_double_aux:
-    forall x y:int. 0 < y <= x < 2*y -> 
-      x = 1*y+(x-y) /\ 0 <= x-y < y
-
-  lemma Div_double_aux2:
-    forall x y:int. 0 < y <= x < 2*y -> mod x y = x - y
-*)
-
-(*
-  lemma Div_mult :
-    forall x y q:int. q > 0 -> 
-      0 < q*y <= x < (q+1)*y -> div x y = q
-
-  lemma Div_mult_neg :
-    forall x y q:int. q > 0 ->
-      -(q+1)*y <= x < -q*y < 0 -> div x y = -(q+1)
-*)
+  lemma Div_mult_inst: forall x z:int.
+          x > 0 ->
+          div (x * 1 + z) x = 1 + div z x
 
   lemma Div_double:
     forall x y:int. 0 < y <= x < 2*y -> div x y = 1 
