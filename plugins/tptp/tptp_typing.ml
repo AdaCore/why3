@@ -118,7 +118,7 @@ let defined_ty ~loc denv env impl dw tyl =
     | DT DTdummy -> error ~loc InvalidDummy
     | DT (DTtype|DTprop) | DF _ | DP _ -> error ~loc TypeExpected
   in
-  Loc.try2 loc ty_app ts tyl
+  Loc.try2 ~loc ty_app ts tyl
 
 let defined_arith ~loc denv env impl dw tl =
   let ts = match tl with
@@ -185,7 +185,7 @@ let defined_arith ~loc denv env impl dw tl =
     | DP DPisrat -> ns_find_ls th.th_export ["is_rat"]
     | DP (DPtrue|DPfalse|DPdistinct) | DT _ -> assert false
   in
-  Loc.try2 loc t_app_infer ls tl
+  Loc.try2 ~loc t_app_infer ls tl
 
 let defined_expr ~loc is_fmla denv env impl dw tl = match dw, tl with
   | (DT DTdummy), _ -> error ~loc InvalidDummy
@@ -201,7 +201,7 @@ let defined_expr ~loc is_fmla denv env impl dw tl = match dw, tl with
             dist (List.fold_left add acc tl) tl
         | _ -> acc
       in
-      Loc.try2 loc dist t_true tl
+      Loc.try2 ~loc dist t_true tl
   | _ -> defined_arith ~loc denv env impl dw tl
 
 (** TPTP environment *)
@@ -270,13 +270,13 @@ let find_dobj ~loc denv env impl s =
     | _ -> assert false (* impossible *)
 
 let ty_check loc s ty1 t =
-  Loc.try3 loc ty_match s ty1 (Opt.get t.t_ty)
+  Loc.try3 ~loc ty_match s ty1 (Opt.get t.t_ty)
 
 let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Eapp (aw,al) ->
       let ts = find_ts ~loc env impl aw al in
       let tyl = List.map (ty denv env impl) al in
-      Loc.try2 loc ty_app ts tyl
+      Loc.try2 ~loc ty_app ts tyl
   | Edef (dw,al) ->
       let tyl = List.map (ty denv env impl) al in
       defined_ty ~loc denv env impl dw tyl

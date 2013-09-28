@@ -240,7 +240,7 @@ let hidden_pl ~loc pl =
 
 let hidden_ls ~loc ls =
   { de_desc = DEglobal_ls ls;
-    de_type = Loc.try1 loc specialize_lsymbol ls;
+    de_type = Loc.try1 ~loc specialize_lsymbol ls;
     de_loc  = loc; de_lab = Slab.empty }
 
 (* helper functions for let-expansion *)
@@ -293,7 +293,7 @@ let specialize_qualid uc p = match uc_find_ps uc p with
   | PV pv -> DEglobal_pv pv, ([],specialize_pvsymbol pv)
   | PS ps -> DEglobal_ps ps, specialize_psymbol  ps
   | PL pl -> DEglobal_pl pl, specialize_plsymbol pl
-  | LS ls -> DEglobal_ls ls, Loc.try1 (qloc p) specialize_lsymbol ls
+  | LS ls -> DEglobal_ls ls, Loc.try1 ~loc:(qloc p) specialize_lsymbol ls
   | XS xs -> errorm ~loc:(qloc p) "unexpected exception symbol %a" print_xs xs
 
 let chainable_qualid uc p = match uc_find_ps uc p with
@@ -345,13 +345,13 @@ let rec dpattern denv ({ pat_loc = loc } as pp) dity = match pp.pat_desc with
   | Ptree.PPprec fl when is_pure_record denv.uc fl ->
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
-      let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
+      let cs,pjl,flm = Loc.try2 ~loc Decl.parse_record kn fl in
       let wild = { pat_desc = Ptree.PPpwild; pat_loc = loc } in
       let get_val pj = Mls.find_def wild pj flm in
       dpat_app denv loc (hidden_ls ~loc cs) (List.map get_val pjl) dity
   | Ptree.PPprec fl ->
       let fl = List.map (find_prog_field denv.uc) fl in
-      let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
+      let cs,pjl,flm = Loc.try2 ~loc parse_record denv.uc fl in
       let wild = { pat_desc = Ptree.PPpwild; pat_loc = loc } in
       let get_val pj = Mls.find_def wild pj.pl_ls flm in
       dpat_app denv loc (hidden_pl ~loc cs) (List.map get_val pjl) dity
@@ -397,7 +397,7 @@ let dbinders denv bl =
     in
     let denv, id = match id with
       | Some ({ id = x; id_loc = loc } as id) ->
-          s := Loc.try3 loc Sstr.add_new (DuplicateProgVar x) x !s;
+          s := Loc.try3 ~loc Sstr.add_new (DuplicateProgVar x) x !s;
           add_var id dity denv, id
       | None ->
           denv, { id = "_"; id_loc = loc; id_lab = [] }
@@ -577,14 +577,14 @@ and de_desc denv loc = function
   | Ptree.Erecord fl when is_pure_record denv.uc fl ->
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
-      let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
+      let cs,pjl,flm = Loc.try2 ~loc Decl.parse_record kn fl in
       let get_val pj = match Mls.find_opt pj flm with
         | Some e -> dexpr denv e
         | None -> error ~loc (Decl.RecordFieldMissing (cs,pj)) in
       de_app loc (hidden_ls ~loc cs) (List.map get_val pjl)
   | Ptree.Erecord fl ->
       let fl = List.map (find_prog_field denv.uc) fl in
-      let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
+      let cs,pjl,flm = Loc.try2 ~loc parse_record denv.uc fl in
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
         | Some e -> dexpr denv e
         | None -> error ~loc (Decl.RecordFieldMissing (cs.pl_ls,pj.pl_ls)) in
@@ -594,7 +594,7 @@ and de_desc denv loc = function
       let e0 = mk_var "q " e1 in
       let kn = Theory.get_known (get_theory denv.uc) in
       let fl = List.map (find_pure_field denv.uc) fl in
-      let cs,pjl,flm = Loc.try2 loc Decl.parse_record kn fl in
+      let cs,pjl,flm = Loc.try2 ~loc Decl.parse_record kn fl in
       let get_val pj = match Mls.find_opt pj flm with
         | Some e -> dexpr denv e
         | None ->
@@ -607,7 +607,7 @@ and de_desc denv loc = function
       let e1 = dexpr denv e1 in
       let e0 = mk_var "q " e1 in
       let fl = List.map (find_prog_field denv.uc) fl in
-      let cs,pjl,flm = Loc.try2 loc parse_record denv.uc fl in
+      let cs,pjl,flm = Loc.try2 ~loc parse_record denv.uc fl in
       let get_val pj = match Mls.find_opt pj.pl_ls flm with
         | Some e -> dexpr denv e
         | None ->
@@ -854,7 +854,7 @@ let create_post lenv res pat f =
     | Ptree.PPpvar { id = x } ->
         Mstr.add x res lenv.log_vars
     | Ptree.PPptuple [] ->
-        Loc.try2 pat.pat_loc Ty.ty_equal_check res.vs_ty ty_unit;
+        Loc.try2 ~loc:pat.pat_loc Ty.ty_equal_check res.vs_ty ty_unit;
         lenv.log_vars
     | Ptree.PPpwild ->
         lenv.log_vars
@@ -1165,7 +1165,7 @@ let e_arrow_dity ps (argl,res) =
 
 let rec expr lenv de =
   let loc = de.de_loc in
-  let e = Loc.try3 loc expr_desc lenv loc de in
+  let e = Loc.try3 ~loc expr_desc lenv loc de in
   e_label ~loc de.de_lab e
 
 and expr_desc lenv loc de = match de.de_desc with
@@ -1353,7 +1353,7 @@ and expr_rec lenv dfdl =
     | Mlw_ty.TypeMismatch _ as exn ->
         List.iter (fun (ps,_,_,_) ->
           let loc = Opt.get ps.ps_name.Ident.id_loc in
-          Loc.try2 loc check_user_ps true ps) fdl;
+          Loc.try2 ~loc check_user_ps true ps) fdl;
         raise exn in
   let fdl = try create_rec_defn fdl with
     | Loc.Located (_, Mlw_ty.TypeMismatch _)
@@ -1361,13 +1361,13 @@ and expr_rec lenv dfdl =
         List.iter (fun (ps,lam) ->
           let loc = Opt.get ps.ps_name.Ident.id_loc in
           let fd = create_fun_defn (id_clone ps.ps_name) lam in
-          Loc.try2 loc check_user_ps true fd.fun_ps) fdl;
+          Loc.try2 ~loc check_user_ps true fd.fun_ps) fdl;
         raise exn in
   let step3 fd = fd.fun_ps, lambda_invariant lenv fd.fun_lambda in
   let fdl = create_rec_defn (List.map step3 fdl) in
   let step4 fd (id,_,_,bl,(de,dsp)) =
-    Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp;
-    Loc.try2 id.id_loc check_user_ps true fd.fun_ps in
+    Loc.try4 ~loc:de.de_loc check_lambda_effect lenv fd bl dsp;
+    Loc.try2 ~loc:id.id_loc check_user_ps true fd.fun_ps in
   List.iter2 step4 fdl dfdl;
   fdl
 
@@ -1389,8 +1389,8 @@ and expr_fun lenv x gh bl (de, dsp as tr) =
         { lam with l_spec = spec } in
   let lam = lambda_invariant lenv lam in
   let fd = create_fun_defn (Denv.create_user_id x) lam in
-  Loc.try4 de.de_loc check_lambda_effect lenv fd bl dsp;
-  Loc.try2 x.id_loc check_user_ps false fd.fun_ps;
+  Loc.try4 ~loc:de.de_loc check_lambda_effect lenv fd bl dsp;
+  Loc.try2 ~loc:x.id_loc check_user_ps false fd.fun_ps;
   fd
 
 and expr_lam lenv gh pvl (de, dsp) =
@@ -1407,7 +1407,7 @@ let add_type_invariant loc uc id params inv =
   let x = "self" in
   let its = match uc_find_ts uc (Qident id) with
     | PT its when its.its_inv -> its
-    | _ -> errorm ~loc "type %s does not have an invariant" id.id in
+    | _ -> Loc.errorm ~loc "type %s does not have an invariant" id.id in
   let add_tv acc { id = id; id_loc = loc } =
     let e = Loc.Located (loc, DuplicateTypeVar id) in
     Sstr.add_new e id acc, Typing.create_user_tv id in
@@ -1580,8 +1580,8 @@ let add_types ~wp uc tdl =
         | PPTtyapp (q,tyl) ->
             let tyl = List.map parse tyl in
             begin match get_ts q with
-              | TS ts -> Loc.try2 (qloc q) ity_pur ts tyl
-              | PT ts -> Loc.try2 (qloc q) ity_app_fresh ts tyl
+              | TS ts -> Loc.try2 ~loc:(qloc q) ity_pur ts tyl
+              | PT ts -> Loc.try2 ~loc:(qloc q) ity_app_fresh ts tyl
             end
         | PPTtuple tyl ->
             let ts = ts_tuple (List.length tyl) in
@@ -1613,15 +1613,15 @@ let add_types ~wp uc tdl =
                   if not gh then nogh := ity_nonghost_reg !nogh ity;
                   let regs = Sreg.union regs ity.ity_vars.vars_reg in
                   (regs, inv), (None, fd)
-              | Some id ->
+              | Some ({ id = x; id_loc = loc } as id) ->
                   try
-                    let fd = Hstr.find projs id.id in
-                    if gh <> fd.fd_ghost then Loc.errorm ~loc:id.id_loc
+                    let fd = Hstr.find projs x in
+                    if gh <> fd.fd_ghost then Loc.errorm ~loc
                       "this field must be ghost in every constructor";
-                    ignore (Loc.try3 id.id_loc ity_match sbs fd.fd_ity ity);
+                    ignore (Loc.try3 ~loc ity_match sbs fd.fd_ity ity);
                     (regs, inv), (Some (Denv.create_user_id id), fd)
                   with Not_found ->
-                    Hstr.replace projs id.id fd;
+                    Hstr.replace projs x fd;
                     if not gh then nogh := ity_nonghost_reg !nogh ity;
                     let regs = Sreg.union regs ity.ity_vars.vars_reg in
                     (regs, inv), (Some (Denv.create_user_id id), fd)
@@ -1690,8 +1690,8 @@ let add_types ~wp uc tdl =
       | PPTtyapp (q,tyl) ->
           let tyl = List.map parse tyl in
           begin match get_ts q with
-            | TS ts -> Loc.try2 (qloc q) ity_pur ts tyl
-            | PT ts -> Loc.try3 (qloc q) ity_app ts tyl []
+            | TS ts -> Loc.try2 ~loc:(qloc q) ity_pur ts tyl
+            | PT ts -> Loc.try3 ~loc:(qloc q) ity_app ts tyl []
           end
       | PPTtuple tyl ->
           let ts = ts_tuple (List.length tyl) in
@@ -1711,15 +1711,15 @@ let add_types ~wp uc tdl =
             let fd = mk_field ity gh None in
             match id with
             | None -> None, fd
-            | Some id ->
+            | Some ({ id = x; id_loc = loc } as id) ->
                 try
-                  let fd = Hstr.find projs id.id in
-                  if gh <> fd.fd_ghost then Loc.errorm ~loc:id.id_loc
+                  let fd = Hstr.find projs x in
+                  if gh <> fd.fd_ghost then Loc.errorm ~loc
                     "this field must be ghost in every constructor";
-                  Loc.try2 id.id_loc ity_equal_check fd.fd_ity ity;
+                  Loc.try2 ~loc ity_equal_check fd.fd_ity ity;
                   Some (Denv.create_user_id id), fd
                 with Not_found ->
-                  Hstr.replace projs id.id fd;
+                  Hstr.replace projs x fd;
                   Some (Denv.create_user_id id), fd
           in
           let mk_constr (_loc,cid,pjl) =
@@ -1899,7 +1899,7 @@ let add_decl ~wp loc uc = function
 
 let add_decl ~wp loc uc d =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try3 loc (add_decl ~wp) loc uc d
+  Loc.try3 ~loc (add_decl ~wp) loc uc d
 
 let add_pdecl ~wp loc uc = function
   | Dlet (id, gh, e) ->
@@ -1942,7 +1942,7 @@ let add_pdecl ~wp loc uc = function
 
 let add_pdecl ~wp loc uc d =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try3 loc (add_pdecl ~wp) loc uc d
+  Loc.try3 ~loc (add_pdecl ~wp) loc uc d
 
 let use_clone_pure lib mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
@@ -1964,7 +1964,7 @@ let use_clone_pure lib mth uc loc (use,inst) =
 
 let use_clone_pure lib mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try5 loc use_clone_pure lib mth uc loc use
+  Loc.try5 ~loc use_clone_pure lib mth uc loc use
 
 let use_clone lib mmd mth uc loc (use,inst) =
   let path, s = Typing.split_qualid use.use_theory in
@@ -1990,7 +1990,7 @@ let use_clone lib mmd mth uc loc (use,inst) =
 
 let use_clone lib mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try6 loc use_clone lib mmd mth uc loc use
+  Loc.try6 ~loc use_clone lib mmd mth uc loc use
 
 let close_theory (mmd,mth) uc =
   if Debug.test_flag Typing.debug_parse_only then (mmd,mth) else
@@ -2046,7 +2046,7 @@ let open_file, close_file =
       open_module = open_module;
       close_module = close_module;
       open_namespace = open_namespace;
-      close_namespace = (fun loc imp -> Loc.try1 loc close_namespace imp);
+      close_namespace = (fun loc imp -> Loc.try1 ~loc close_namespace imp);
       new_decl = new_decl;
       new_pdecl = new_pdecl;
       use_clone = use_clone; }

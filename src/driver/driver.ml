@@ -154,7 +154,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
           | PTyapp ((loc,_) as q,tyl) ->
               let ts = find_ts th q in
               let tyl = List.map ty_of_pty tyl in
-              Loc.try2 loc Ty.ty_app ts tyl
+              Loc.try2 ~loc Ty.ty_app ts tyl
           | PTuple tyl ->
               let ts = Ty.ts_tuple (List.length tyl) in
               Ty.ty_app ts (List.map ty_of_pty tyl)

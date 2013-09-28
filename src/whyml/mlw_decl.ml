@@ -273,9 +273,8 @@ let check_match lkn _kn d =
         let t_p = t_var (create_vsymbol (id_fresh "x") typ) in
         let t_e = t_var (create_vsymbol (id_fresh "y") tye) in
         let bl = List.map (fun (pp,_) -> [pp.ppat_pattern], t_e) bl in
-        let try3 f = match e.e_loc with Some l -> Loc.try3 l f | None -> f in
-        let find ts = List.map fst (Decl.find_constructors lkn ts) in
-        ignore (try3 Pattern.CompileTerm.compile find [t_p] bl);
+        let get ts = List.map fst (Decl.find_constructors lkn ts) in
+        ignore (Loc.try3 ?loc:e.e_loc Pattern.CompileTerm.compile get [t_p] bl);
         e_fold checkE () e
     | _ -> e_fold checkE () e
   in

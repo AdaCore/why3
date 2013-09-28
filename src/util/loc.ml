@@ -73,39 +73,37 @@ let report_position fmt = fprintf fmt "%a:@\n" gen_report_position
 
 exception Located of position * exn
 
-let try1 loc f x =
-  if Debug.test_flag Debug.stack_trace then f x else
-  try f x with Located _ as e -> raise e | e -> raise (Located (loc, e))
-
-let try2 loc f x y =
-  if Debug.test_flag Debug.stack_trace then f x y else
-  try f x y with Located _ as e -> raise e | e -> raise (Located (loc, e))
-
-let try3 loc f x y z =
-  if Debug.test_flag Debug.stack_trace then f x y z else
-  try f x y z with Located _ as e -> raise e | e -> raise (Located (loc, e))
-
-let try4 loc f x y z t =
-  if Debug.test_flag Debug.stack_trace then f x y z t else
-  try f x y z t with Located _ as e -> raise e | e -> raise (Located (loc, e))
-
-let try5 loc f x y z t u =
-  if Debug.test_flag Debug.stack_trace then f x y z t u else
-  try f x y z t u with Located _ as e -> raise e | e -> raise (Located (loc, e))
-
-let try6 loc f x y z t u v =
-  if Debug.test_flag Debug.stack_trace then f x y z t u v else
-  try f x y z t u v with
-    Located _ as e -> raise e | e -> raise (Located (loc, e))
-
-let try7 loc f x y z t u v w =
-  if Debug.test_flag Debug.stack_trace then f x y z t u v w else
-  try f x y z t u v w with
-    Located _ as e -> raise e | e -> raise (Located (loc, e))
-
 let error ?loc e = match loc with
-  | None -> raise e
   | Some loc -> raise (Located (loc, e))
+  | None -> raise e
+
+let try1 ?loc f x =
+  if Debug.test_flag Debug.stack_trace then f x else
+  try f x with Located _ as e -> raise e | e -> error ?loc e
+
+let try2 ?loc f x y =
+  if Debug.test_flag Debug.stack_trace then f x y else
+  try f x y with Located _ as e -> raise e | e -> error ?loc e
+
+let try3 ?loc f x y z =
+  if Debug.test_flag Debug.stack_trace then f x y z else
+  try f x y z with Located _ as e -> raise e | e -> error ?loc e
+
+let try4 ?loc f x y z t =
+  if Debug.test_flag Debug.stack_trace then f x y z t else
+  try f x y z t with Located _ as e -> raise e | e -> error ?loc e
+
+let try5 ?loc f x y z t u =
+  if Debug.test_flag Debug.stack_trace then f x y z t u else
+  try f x y z t u with Located _ as e -> raise e | e -> error ?loc e
+
+let try6 ?loc f x y z t u v =
+  if Debug.test_flag Debug.stack_trace then f x y z t u v else
+  try f x y z t u v with Located _ as e -> raise e | e -> error ?loc e
+
+let try7 ?loc f x y z t u v w =
+  if Debug.test_flag Debug.stack_trace then f x y z t u v w else
+  try f x y z t u v w with Located _ as e -> raise e | e -> error ?loc e
 
 (* located messages *)
 
