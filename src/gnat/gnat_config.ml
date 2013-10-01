@@ -163,6 +163,9 @@ let config =
 let config_main = Whyconf.get_main (config)
 
 let env =
+   (* load plugins; may be needed for external provers *)
+   if !opt_prover <> None then
+     Whyconf.load_plugins config_main;
    Env.create_env (Whyconf.loadpath config_main)
 
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
