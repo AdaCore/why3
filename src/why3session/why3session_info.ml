@@ -49,6 +49,7 @@ let spec =
 
 type proof_stats =
     { mutable nb_goals : int;
+      mutable max_time : float;
       mutable nb_proved_goals : int;
       mutable no_proof : Sstr.t;
       mutable only_one_proof : Sstr.t;
@@ -62,6 +63,7 @@ type proof_stats =
 
 let new_proof_stats () =
   { nb_goals = 0;
+    max_time = 0.0;
     nb_proved_goals = 0;
     no_proof = Sstr.empty;
     only_one_proof = Sstr.empty;
@@ -125,7 +127,8 @@ let update_hist tbl (prover, time) =
   in
   Hprover.replace tbl prover h
 
-let update_perf_stats stats prover_and_time =
+let update_perf_stats stats ((_,t) as prover_and_time) =
+  if t > stats.max_time then stats.max_time <- t;
   update_min_time stats.prover_min_time prover_and_time;
   update_max_time stats.prover_max_time prover_and_time;
   update_avg_time stats.prover_avg_time prover_and_time;
@@ -358,19 +361,37 @@ let run_one stats r0 r1 fname =
 
 (**** print histograms ******)
 
-let print_hist fmt h =
-  Hprover.iter
-    (fun p h ->
-      fprintf fmt "Prover: %s@." (string_of_prover p);
+let print_hist stats =
+  let main_ch = open_out "why3session.gnuplot" in
+  let main_fmt = formatter_of_out_channel main_ch in
+  let (_:int) =
+  Hprover.fold
+    (fun p h acc ->
+      let pf = (string_of_int acc) ^ ".plot" in
+      if acc = 1 then 
+        fprintf main_fmt "plot [0:%.2f] [0:%d]" (2.0 *. stats.max_time) stats.nb_goals 
+      else 
+        fprintf main_fmt "replot";
+      fprintf main_fmt " \"%s\" using 1:2 title \"%s\" with linespoints@\n" 
+        pf (string_of_prover p);
+      let ch = open_out pf in
+      let fmt = formatter_of_out_channel ch in
+      fprintf fmt "0.00 0@\n";
       let (_ :int) =
         Mfloat.fold
           (fun t c acc ->
             let acc = c + acc in
-            fprintf fmt "%.2f,%d@." t acc;
+            fprintf fmt "%.2f %d@\n" t acc;
             acc)
           h 0
-      in ())
-    h
+      in 
+      fprintf fmt "@.";
+      close_out ch;
+      acc+1)
+    stats.prover_hist 1
+  in
+  fprintf main_fmt "pause -1 \"Press any key\"@.";
+  close_out main_ch
 
 
 (****** run on all files  ******)
@@ -386,7 +407,7 @@ let run () =
       finalize_stats stats;
       print_stats !r0 !r1 stats
     end;
-  if !opt_hist_print then print_hist std_formatter stats.prover_hist
+  if !opt_hist_print then print_hist stats
 
 
 let cmd =
