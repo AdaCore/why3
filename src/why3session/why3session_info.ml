@@ -25,6 +25,7 @@ let opt_print_provers = ref false
 let opt_print_edited = ref false
 let opt_tree_print = ref false
 let opt_stats_print = ref false
+let opt_hist_print = ref false
 let opt_project_dir = ref false
 let opt_print0 = ref false
 
@@ -35,6 +36,8 @@ let spec =
    " edited proof scripts in the session" ) ::
   ("--stats", Arg.Set opt_stats_print,
    " prints various proofs statistics" ) ::
+  ("--hist", Arg.Set opt_hist_print,
+   " outputs a histogram of external proof results" ) ::
   ("--tree", Arg.Set opt_tree_print,
    " session contents as a tree in textual format" ) ::
   ("--dir", Arg.Set opt_project_dir,
@@ -49,6 +52,7 @@ type proof_stats =
       mutable nb_proved_goals : int;
       mutable no_proof : Sstr.t;
       mutable only_one_proof : Sstr.t;
+      prover_hist : int Mfloat.t Hprover.t;
       prover_min_time : float Hprover.t;
       prover_avg_time : float Hprover.t;
       prover_max_time : float Hprover.t;
@@ -61,6 +65,7 @@ let new_proof_stats () =
     nb_proved_goals = 0;
     no_proof = Sstr.empty;
     only_one_proof = Sstr.empty;
+    prover_hist = Hprover.create 3;
     prover_min_time = Hprover.create 3;
     prover_avg_time = Hprover.create 3;
     prover_max_time = Hprover.create 3;
@@ -106,11 +111,26 @@ let update_count tbl (prover, _time) =
       | None -> 1)
     ~name:prover
 
+let update_hist tbl (prover, time) =
+  let h = 
+    try Hprover.find tbl prover 
+    with Not_found -> Mfloat.empty
+  in
+  let h =
+    try
+      let c = Mfloat.find time h in
+      Mfloat.add time (succ c) h
+    with Not_found ->
+      Mfloat.add time 1 h
+  in
+  Hprover.replace tbl prover h
+
 let update_perf_stats stats prover_and_time =
   update_min_time stats.prover_min_time prover_and_time;
   update_max_time stats.prover_max_time prover_and_time;
   update_avg_time stats.prover_avg_time prover_and_time;
-  update_count stats.prover_num_proofs prover_and_time
+  update_count stats.prover_num_proofs prover_and_time;
+  update_hist stats.prover_hist prover_and_time
 
 let string_of_prover p = Pp.string_of_wnl print_prover p
 
@@ -328,7 +348,7 @@ let run_one stats r0 r1 fname =
       session;
   if !opt_tree_print then
     printf "%a@." print_session session;
-  if !opt_stats_print then
+  if !opt_stats_print || !opt_hist_print then
     begin
       (* fill_prover_data stats session; *)
       PHstr.iter (stats_of_file stats) session.session_files;
@@ -336,6 +356,24 @@ let run_one stats r0 r1 fname =
       r1 := stats2_of_session ~nb_proofs:1 session !r1
     end
 
+(**** print histograms ******)
+
+let print_hist fmt h =
+  Hprover.iter
+    (fun p h ->
+      fprintf fmt "Prover: %s@." (string_of_prover p);
+      let (_ :int) =
+        Mfloat.fold
+          (fun t c acc ->
+            let acc = c + acc in
+            fprintf fmt "%.2f,%d@." t acc;
+            acc)
+          h 0
+      in ())
+    h
+
+
+(****** run on all files  ******)
 
 let run () =
   let _,_,should_exit1 = read_env_spec () in
@@ -343,8 +381,12 @@ let run () =
   let stats = new_proof_stats () in
   let r0 = ref [] and r1 = ref [] in
   iter_files (run_one stats r0 r1);
-  finalize_stats stats;
-  print_stats !r0 !r1 stats
+  if !opt_stats_print then
+    begin
+      finalize_stats stats;
+      print_stats !r0 !r1 stats
+    end;
+  if !opt_hist_print then print_hist std_formatter stats.prover_hist
 
 
 let cmd =
