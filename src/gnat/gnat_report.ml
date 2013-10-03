@@ -96,10 +96,10 @@ let register expl task result valid tracefile =
   msg_set := msg :: !msg_set
 
 let print_msg fmt m =
-  if m.result then Format.fprintf fmt "info: ";
-  Format.fprintf fmt "%a" Gnat_expl.print_reason (Gnat_expl.get_reason m.expl);
-  if m.result then Format.fprintf fmt " proved"
-  else Format.fprintf fmt " not proved";
+  if m.result then Format.fprintf fmt "info: " else Format.fprintf fmt "warning: ";
+  Format.fprintf fmt "%a" (Gnat_expl.print_reason ~proved:m.result)
+    (Gnat_expl.get_reason m.expl);
+  if m.result then Format.fprintf fmt " proved";
   if m.extra_msg <> "" then Format.fprintf fmt ", requires %s" m.extra_msg
 
 let improve_sloc msg =

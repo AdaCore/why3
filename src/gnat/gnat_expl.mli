@@ -51,7 +51,7 @@ type expl
 val expl_compare : expl -> expl -> int
 
 val reason_from_string : string -> reason
-val print_reason : Format.formatter -> reason -> unit
+val print_reason : proved:bool -> Format.formatter -> reason -> unit
 val tag_of_reason : reason -> string
 
 val simple_print_expl : Format.formatter -> expl -> unit

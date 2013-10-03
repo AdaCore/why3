@@ -86,25 +86,45 @@ let reason_from_string s =
        Format.printf "unknown VC reason: %s@." s;
        Gnat_util.abort_with_message ""
 
-let string_of_reason s =
-   match s with
-   | VC_Division_Check            -> "division check"
-   | VC_Index_Check               -> "index check"
-   | VC_Overflow_Check            -> "overflow check"
-   | VC_Range_Check               -> "range check"
-   | VC_Length_Check              -> "length check"
-   | VC_Discriminant_Check        -> "discriminant check"
-   | VC_Initial_Condition         -> "initial condition"
-   | VC_Precondition              -> "precondition"
-   | VC_Postcondition             -> "postcondition"
-   | VC_Contract_Case             -> "contract case"
-   | VC_Disjoint_Contract_Cases   -> "disjoint contract cases"
-   | VC_Complete_Contract_Cases   -> "complete contract cases"
-   | VC_Loop_Invariant            -> "loop invariant"
-   | VC_Loop_Invariant_Init       -> "loop invariant initialization"
-   | VC_Loop_Invariant_Preserv    -> "loop invariant preservation"
-   | VC_Loop_Variant              -> "loop variant"
-   | VC_Assert                    -> "assertion"
+let string_of_reason proved s =
+  if proved then
+    match s with
+    | VC_Division_Check            -> "division check"
+    | VC_Index_Check               -> "index check"
+    | VC_Overflow_Check            -> "overflow check"
+    | VC_Range_Check               -> "range check"
+    | VC_Length_Check              -> "length check"
+    | VC_Discriminant_Check        -> "discriminant check"
+    | VC_Initial_Condition         -> "initial condition"
+    | VC_Precondition              -> "precondition"
+    | VC_Postcondition             -> "postcondition"
+    | VC_Contract_Case             -> "contract case"
+    | VC_Disjoint_Contract_Cases   -> "disjoint contract cases"
+    | VC_Complete_Contract_Cases   -> "complete contract cases"
+    | VC_Loop_Invariant            -> "loop invariant"
+    | VC_Loop_Invariant_Init       -> "loop invariant initialization"
+    | VC_Loop_Invariant_Preserv    -> "loop invariant preservation"
+    | VC_Loop_Variant              -> "loop variant"
+    | VC_Assert                    -> "assertion"
+  else
+    match s with
+    | VC_Division_Check            -> "divide by zero might fail"
+    | VC_Index_Check               -> "array index check might fail"
+    | VC_Overflow_Check            -> "overflow check might fail"
+    | VC_Range_Check               -> "range check might fail"
+    | VC_Length_Check              -> "length check might fail"
+    | VC_Discriminant_Check        -> "discriminant check might fail"
+    | VC_Initial_Condition         -> "initial condition might fail"
+    | VC_Precondition              -> "precondition might fail"
+    | VC_Postcondition             -> "postcondition might fail"
+    | VC_Contract_Case             -> "contract case might fail"
+    | VC_Disjoint_Contract_Cases   -> "contract cases might not be disjoint"
+    | VC_Complete_Contract_Cases   -> "contract cases might not be complete"
+    | VC_Loop_Invariant            -> "loop invariant might fail"
+    | VC_Loop_Invariant_Init       -> "loop invariant might fail in first iteration"
+    | VC_Loop_Invariant_Preserv    -> "loop invariant might fail after first iteration"
+    | VC_Loop_Variant              -> "loop variant might fail"
+    | VC_Assert                    -> "assertion might fail"
 
 let tag_of_reason s =
   match s with
@@ -168,9 +188,8 @@ let get_loc e = e.expl_check.loc
 let get_reason e = e.expl_check.reason
 let get_subp_entity e = e.expl_subp
 
-let print_reason fmt r =
-   Format.fprintf fmt "%s" (string_of_reason r)
-
+let print_reason ~proved fmt r =
+   Format.fprintf fmt "%s" (string_of_reason proved r)
 
 type sloc_options =
    | VC_Sloc of Gnat_loc.loc
@@ -264,7 +283,8 @@ let simple_print_expl fmt p =
   match p.loc with
   | [] -> assert false
   | primary :: _ ->
-      Format.fprintf fmt "%a:%a" simple_print_loc primary print_reason p.reason
+      Format.fprintf fmt "%a:%a" simple_print_loc primary
+        (print_reason ~proved:true) p.reason
 
 let improve_sloc sloc task =
    let info = extract_msg (Task.task_goal_fmla task) in
@@ -283,7 +303,7 @@ let improve_sloc sloc task =
 let print_skipped fmt p =
   let p = p.expl_check in
    Format.fprintf fmt "%a: %a skipped"
-     simple_print_loc (List.hd p.loc) print_reason p.reason
+     simple_print_loc (List.hd p.loc) (print_reason ~proved:true) p.reason
 
 let to_filename ?goal expl =
   let expl = expl.expl_check in
