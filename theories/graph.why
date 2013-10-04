@@ -79,7 +79,7 @@ theory SimplePath
 
   predicate edge graph vertex vertex
 
-  (* [simple_path g src [x1;...;xn] dst] is a path
+  (** [simple_path g src [x1;...;xn] dst] is a path
      src --> x1 --> x2 --> ... --> xn --> dst without repetition. *)
   inductive simple_path graph vertex (list vertex) vertex =
   | Path_empty :
