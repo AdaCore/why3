@@ -372,7 +372,7 @@ let print_hist stats =
         fprintf main_fmt "plot [0:%.2f] [0:%d]" (2.0 *. stats.max_time) stats.nb_goals 
       else 
         fprintf main_fmt "replot";
-      fprintf main_fmt " \"%s\" using 1:2 title \"%s\" with linespoints@\n" 
+      fprintf main_fmt " \"%s\" using 1:2 title \"%s\" with linespoints ps 0.2@\n" 
         pf (string_of_prover p);
       let ch = open_out pf in
       let fmt = formatter_of_out_channel ch in
@@ -390,7 +390,10 @@ let print_hist stats =
       acc+1)
     stats.prover_hist 1
   in
-  fprintf main_fmt "pause -1 \"Press any key\"@.";
+  fprintf main_fmt "pause -1 \"Press any key\"@\n";
+  fprintf main_fmt "set terminal pdfcairo@\n";
+  fprintf main_fmt "set output \"why3session.pdf\"@\n";
+  fprintf main_fmt "replot@.";
   close_out main_ch
 
 
