@@ -1,12 +1,15 @@
 (* Why driver for SMT syntax *)
 
 prelude ";;; this is a prelude for veriT"
+prelude "(set-logic AUFLIRA)"
 
 printer "smtv2"
 filename "%f-%t-%g.smt2"
 
 valid "^unsat"
 unknown "^\\(unknown\\|sat\\)" ""
+unknown "non-linear reasoning desactivated" ""
+
 time "why3cpulimit time : %s s"
 
 (* À discuter *)
@@ -114,7 +117,7 @@ theory real.Real
 end
 
 theory Bool
-   syntax type bool      "bool"
+   syntax type bool      "Bool"
    syntax function True  "true"
    syntax function False "false"
    meta "encoding : kept" type bool
