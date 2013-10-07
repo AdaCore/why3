@@ -168,14 +168,13 @@ let next objective =
       None
 
 let strategy =
-  "split_goal" ::
-  (if Gnat_config.proof_mode = Gnat_config.No_Split then
-    []
-  else
-  [
-    Gnat_split_conj.split_conj_name;
-    Gnat_split_disj.split_disj_name
-  ])
+  match Gnat_config.proof_mode with
+  | Gnat_config.Path_WP -> ["path_split"; Gnat_split_conj.split_conj_name]
+  | Gnat_config.No_Split -> ["split_goal"]
+  | _ ->
+      ["split_goal";
+       Gnat_split_conj.split_conj_name;
+       Gnat_split_disj.split_disj_name]
 
 let parent_transform_name goal =
    match goal.Session.goal_parent with
@@ -185,6 +184,8 @@ let parent_transform_name goal =
 let rev_strategy = List.rev strategy
 
 let last_transform = List.hd rev_strategy
+
+let first_transform = List.hd strategy
 
 let next_transform =
   let h = Hashtbl.create 17 in
@@ -407,7 +408,7 @@ let iter_leafs goal f =
       Session.goal_iter (fun any ->
          match any with
          | Session.Transf t
-            when t.Session.transf_name = Gnat_config.split_name ->
+            when t.Session.transf_name = first_transform ->
                Session.transf_iter (fun any ->
                   match any with
                   | Session.Goal g ->
@@ -437,12 +438,12 @@ let apply_split_goal_if_needed g =
    (* before doing any proofs, we apply "split" to all "main goals" (see
       iter_main_goals). This function applies that transformation, but only
       when needed. *)
-   if Session.PHstr.mem g.Session.goal_transformations Gnat_config.split_name
+   if Session.PHstr.mem g.Session.goal_transformations first_transform
    then ()
    else
       ignore
         (Session.add_registered_transformation
-           ~keygen:Keygen.keygen (get_session ()) Gnat_config.split_name g)
+           ~keygen:Keygen.keygen (get_session ()) first_transform g)
 
 let schedule_goal callback g =
    (* actually schedule the goal, ie call the prover. This function returns

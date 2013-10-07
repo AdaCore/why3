@@ -59,9 +59,6 @@ val filename : string
 val unit_name : string
 (* the name of the Ada unit to which the input file corresponds *)
 
-val split_name : string
-(* name of the "split_goal" transformation *)
-
 val limit_line : Gnat_loc.loc option
 (* set if option --limit-line was given; we only prove VCs from that line *)
 

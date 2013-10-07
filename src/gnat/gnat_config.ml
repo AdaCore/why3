@@ -220,7 +220,6 @@ let proof_mode = !opt_proof_mode
 let debug = !opt_debug
 let force = !opt_force
 let show_tag = !opt_show_tag
-let split_name = "split_goal"
 let limit_line = !opt_limit_line
 
 let limit_subp =
@@ -234,7 +233,6 @@ let parallel = !opt_parallel
 (* when not doing proof, stop after typing to avoid the exponential WP work *)
 let () = if proof_mode = No_WP then Debug.set_flag Typing.debug_type_only
 let () =
-  if proof_mode <> Path_WP then
     Debug.set_flag (Debug.lookup_flag "fast_wp")
 
 let unit_name =

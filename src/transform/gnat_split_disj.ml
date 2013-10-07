@@ -2,9 +2,6 @@ open Term
 open Decl
 open Ident
 
-let apply_append fn acc l =
-  List.fold_left (fun l e -> fn e :: l) acc (List.rev l)
-
 let join_and f l =
   if l = [] then [f] else
     List.map (fun f2 -> t_and f f2) l
@@ -58,8 +55,14 @@ let split_goal pr f =
 let split_disj = Trans.goal_l split_goal
 
 let split_disj_name = "split_disj"
+let path_split_name = "path_split"
 
 let () =
    Trans.register_transform_l split_disj_name split_disj
    ~desc:"Split disjunctions, if-then-else and case in the goal,\
    on the left hand side, and only there."
+
+let () =
+   Trans.register_transform_l path_split_name
+    (Trans.compose_l Split_goal.split_goal_wp split_disj)
+   ~desc:"First do split_goal, then split_disj"
