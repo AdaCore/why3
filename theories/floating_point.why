@@ -488,6 +488,24 @@ theory GenFloatSpecFull
     /\ model r = - model x
 
 
+  predicate div_post (m:mode) (x:t) (y:t) (r:t) =
+    (is_NaN x \/ is_NaN y -> is_NaN r)
+    /\ (is_finite x /\ is_infinite y -> is_gen_zero r)
+    /\ (is_infinite x /\ is_finite y -> is_infinite r)
+    /\ (is_infinite x /\ is_infinite y -> is_NaN r)
+    /\ (is_finite x /\ is_finite y /\ value y <> 0.0 /\
+        no_overflow m (value x / value y)
+        -> is_finite r /\ value r = round m (value x / value y))
+    /\ (is_finite x /\ is_finite y /\ value y <> 0.0 /\
+        not no_overflow m (value x / value y)
+        -> overflow_value m r)
+    /\ (is_finite x /\ is_gen_zero y /\ value x <> 0.0
+        -> is_infinite r)
+    /\(is_gen_zero x /\ is_gen_zero y -> is_NaN r)
+    /\ product_sign r x y
+    /\ exact r = exact x /exact y 
+    /\ model r = model x /model y
+
   predicate of_real_exact_post (x:real) (r:t) =
     is_finite r /\ value r = x /\ exact r = x /\ model r = x
 
