@@ -306,6 +306,10 @@ let print_prop_decl info fmt k pr f = match k with
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n@\n"
         print_ident pr.pr_name (print_fmla info) f
   | Pgoal ->
+      (match pr.pr_name.id_loc with
+      | None -> ()
+      | Some loc -> fprintf fmt " @[(* %a *)@]@\n"
+            Loc.gen_report_position loc);
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         print_ident pr.pr_name (print_fmla info) f
   | Plemma| Pskip -> assert false
