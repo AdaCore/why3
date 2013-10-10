@@ -69,6 +69,7 @@ type integer_support_kind = integer_format number_support_kind
 
 type number_support = {
   long_int_support  : bool;
+  extra_leading_zeros_support : bool;
   dec_int_support   : integer_support_kind;
   hex_int_support   : integer_support_kind;
   oct_int_support   : integer_support_kind;

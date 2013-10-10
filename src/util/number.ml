@@ -130,6 +130,7 @@ type integer_support_kind = integer_format number_support_kind
 
 type number_support = {
   long_int_support  : bool;
+  extra_leading_zeros_support : bool;
   dec_int_support   : integer_support_kind;
   hex_int_support   : integer_support_kind;
   oct_int_support   : integer_support_kind;
@@ -185,24 +186,36 @@ let print_bin_int support fmt =
     (fun s i -> assert support.long_int_support; fprintf fmt s i)
   (fun i -> print_dec_int support fmt (any_to_dec 2 i))
 
+let remove_leading_zeros support s =
+  if support.extra_leading_zeros_support then s else
+  let len = String.length s in
+  let rec aux i =
+    if i+1 < len && s.[i] = '0' then aux (i+1) else i
+  in
+  let i = aux 0 in
+  String.sub s i (len - i)
+
 let print_dec_real support fmt =
   check_support support.dec_real_support
     (Some (PrintDecReal ("%s.%s", "%s.%se%s")))
     (fun (PrintDecReal (noexp,full)) i f e ->
       match e with
-      | None -> fprintf fmt noexp i f
-      | Some e -> fprintf fmt full i f e)
-  (check_support support.frac_real_support None
+      | None -> fprintf fmt noexp (remove_leading_zeros support i) f
+      | Some e -> fprintf fmt full
+	(remove_leading_zeros support i) f (remove_leading_zeros support e))
+    (check_support support.frac_real_support None
     (fun (PrintFracReal (exp_zero, exp_pos, exp_neg)) i f e ->
       let f = if f = "0" then "" else f in
       let e = Opt.fold (fun _ -> int_of_string) 0 e in
       let e = e - String.length f in
       if e = 0 then
-        fprintf fmt exp_zero (i ^ f)
+        fprintf fmt exp_zero (remove_leading_zeros support (i ^ f))
       else if e > 0 then
-        fprintf fmt exp_pos (i ^ f) ("1" ^ String.make e '0')
+        fprintf fmt exp_pos (remove_leading_zeros support (i ^ f))
+	  ("1" ^ String.make e '0')
       else
-        fprintf fmt exp_neg (i ^ f) ("1" ^ String.make (-e) '0'))
+        fprintf fmt exp_neg (remove_leading_zeros support (i ^ f))
+	  ("1" ^ String.make (-e) '0'))
   (force_support support.def_real_support
     (fun def i f e -> fprintf fmt def (sprintf "%s_%s_e%s" i f
       (match e with None -> "0" | Some e -> remove_minus e)))
