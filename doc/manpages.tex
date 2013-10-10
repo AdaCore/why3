@@ -72,7 +72,7 @@ This must be redone each time a new prover is installed.
 
 The provers which \why attempts to detect are described in
 the readable configuration file \texttt{provers-detection-data.conf}
-of the \why data directory (\eg{}
+of the \why data directory (\eg
 \texttt{/usr/local/share/why3}). Advanced users may try to modify this
 file to add support for detection of other provers. (In that case,
 please consider submitting a new prover configuration on the bug
@@ -82,11 +82,11 @@ The result of provers detection is stored in the user's
 configuration file (\verb+~/.why3.conf+ or, in the case of local
 installation, \verb+why3.conf+ in Why3 sources top directory). This file
 is also human-readable, and advanced users may modify it in order to
-experiment with different ways of calling provers, \eg{} different
+experiment with different ways of calling provers, \eg different
 versions of the same prover, or with different options.
 
 \texttt{why3config} also detects the plugins installed in the \why
-plugins directory (\eg{} \texttt{/usr/local/lib/why3/plugins}). A
+plugins directory (\eg \texttt{/usr/local/lib/why3/plugins}). A
 plugin must register itself as a parser, a transformation or a
 printer, as explained in the corresponding section.
 \index{plugin}
@@ -123,7 +123,7 @@ input file. By default, such a file must be written either in \why language
 (extension \texttt{.why}) or in \whyml language (extension \texttt{.mlw}).
 However, a dynamically loaded
 plugin can register a parser for some other format of logical problems,
-\eg{} TPTP or SMTlib.
+\eg TPTP or SMT-LIB.
 \index{why3@\texttt{why3}}
 
 The \texttt{why3} tool executes the following steps:
@@ -252,7 +252,7 @@ Additionally, a proof attempt can have the following attributes:
 \item[obsolete]\index{obsolete!proof attempt} The prover associated to
   that proof attempt has not been run on the current task, but on an
   earlier version of that task. You need to replay the proof
-  attempt, \emph{i.e.} run the prover with the current task of the proof
+  attempt, \ie run the prover with the current task of the proof
   attempt, in order to update the answer of the prover and remove this
   attribute.
 \item[archived]\index{archived!proof attempt} The proof attempt is not useful
@@ -356,7 +356,7 @@ A copy of the tools already available in the left toolbar, plus:
 \item[Non-splitting transformation] applies one of the available
   transformations, as listed in Section~\ref{sec:transformations}.
 \item[Splitting transformation] is the same as above, but for
-  splitting transformations, \emph{i.e.} those that can generate
+  splitting transformations, \ie those that can generate
   several sub-goals.
 \end{description}
 
