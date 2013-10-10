@@ -48,9 +48,11 @@ let spec =
 
 
 type proof_stats =
-    { mutable nb_goals : int;
+    { mutable nb_root_goals : int;
+      mutable nb_sub_goals : int;
       mutable max_time : float;
-      mutable nb_proved_goals : int;
+      mutable nb_proved_root_goals : int;
+      mutable nb_proved_sub_goals : int;
       mutable no_proof : Sstr.t;
       mutable only_one_proof : Sstr.t;
       prover_hist : int Mfloat.t Hprover.t;
@@ -62,9 +64,11 @@ type proof_stats =
     }
 
 let new_proof_stats () =
-  { nb_goals = 0;
+  { nb_root_goals = 0;
+    nb_sub_goals = 0;
     max_time = 0.0;
-    nb_proved_goals = 0;
+    nb_proved_root_goals = 0;
+    nb_proved_sub_goals = 0;
     no_proof = Sstr.empty;
     only_one_proof = Sstr.empty;
     prover_hist = Hprover.create 3;
@@ -137,8 +141,10 @@ let update_perf_stats stats ((_,t) as prover_and_time) =
 
 let string_of_prover p = Pp.string_of_wnl print_prover p
 
-let rec stats_of_goal prefix_name stats goal =
-  stats.nb_goals <- stats.nb_goals + 1;
+let rec stats_of_goal ~root prefix_name stats goal =
+  if root
+  then stats.nb_root_goals <- stats.nb_root_goals + 1
+  else stats.nb_sub_goals <- stats.nb_sub_goals + 1;
   let proof_list =
     PHprover.fold
       (fun prover proof_attempt acc ->
@@ -162,7 +168,10 @@ let rec stats_of_goal prefix_name stats goal =
     stats.no_proof <- Sstr.add goal_name stats.no_proof
   else
     begin
-      stats.nb_proved_goals <- stats.nb_proved_goals + 1;
+      if root then
+        stats.nb_proved_root_goals <- stats.nb_proved_root_goals + 1
+      else
+        stats.nb_proved_sub_goals <- stats.nb_proved_sub_goals + 1;
       match proof_list with
       | [ (prover, _) ] ->
         let goal_name = prefix_name ^ goal.goal_name.Ident.id_string in
@@ -175,13 +184,13 @@ let rec stats_of_goal prefix_name stats goal =
 
 and stats_of_transf prefix_name stats _ transf =
   let prefix_name = prefix_name ^ transf.transf_name  ^ " / " in
-  List.iter (stats_of_goal prefix_name stats) transf.transf_goals
+  List.iter (stats_of_goal ~root:false prefix_name stats) transf.transf_goals
 
 let stats_of_theory file stats theory =
   let goals = theory.theory_goals in
   let prefix_name = file.file_name ^ " / " ^ theory.theory_name.Ident.id_string
     ^  " / " in
-  List.iter (stats_of_goal prefix_name stats) goals
+  List.iter (stats_of_goal ~root:true prefix_name stats) goals
 
 let stats_of_file stats _ file =
   let theories = file.file_theories in
@@ -311,8 +320,11 @@ let finalize_stats stats =
     stats.prover_avg_time
 
 let print_stats r0 r1 stats =
-  printf "== Number of goals ==@\n  total: %d  proved: %d@\n@\n"
-    stats.nb_goals stats.nb_proved_goals;
+  printf "== Number of root goals ==@\n  total: %d  proved: %d@\n@\n"
+    stats.nb_root_goals stats.nb_proved_root_goals;
+
+  printf "== Number of sub goals ==@\n  total: %d  proved: %d@\n@\n"
+    stats.nb_sub_goals stats.nb_proved_sub_goals;
 
   printf "== Goals not proved ==@\n  @[";
   print_session_stats ~time:false r0;
@@ -369,7 +381,8 @@ let print_hist stats =
     (fun p h acc ->
       let pf = (string_of_int acc) ^ ".plot" in
       if acc = 1 then 
-        fprintf main_fmt "plot [0:%.2f] [0:%d]" (2.0 *. stats.max_time) stats.nb_goals 
+        fprintf main_fmt "plot [0:%.2f] [0:%d]" (2.0 *. stats.max_time) 
+          (stats.nb_root_goals + stats.nb_sub_goals)
       else 
         fprintf main_fmt "replot";
       fprintf main_fmt " \"%s\" using 1:2 title \"%s\" with linespoints ps 0.2@\n" 
