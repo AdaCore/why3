@@ -174,7 +174,7 @@ module BellmanFord
      forall v: vertex. not (negative_cycle v)
 
   let relax (m: ref distmap) (u v: vertex) (pass: int)
-            (via: set (vertex, vertex))
+            (ghost via: set (vertex, vertex))
     requires { 1 <= pass /\ mem (u, v) edges /\ not (mem (u, v) via) }
     requires { inv1 !m pass via }
     ensures  { inv1 !m pass (add (u, v) via) }
@@ -200,7 +200,7 @@ module BellmanFord
       while not (S.is_empty es) do
         invariant { subset !es edges /\ inv1 !m i (diff edges !es) }
         variant   { cardinal !es }
-        let via = diff edges !es in (* ghost *)
+        let ghost via = diff edges !es in
         let (u, v) = S.pop es in
         relax m u v i via
       done;
