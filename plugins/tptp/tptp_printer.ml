@@ -120,7 +120,7 @@ and print_fmla info fmt f = match f.t_node with
         | Tand -> "&" | Tor -> "|" | Timplies -> "=>" | Tiff -> "<=>" in
       fprintf fmt "(%a@ %s %a)" (print_fmla info) f1 s (print_fmla info) f2
   | Tnot f ->
-      fprintf fmt "~@ (%a)" (print_fmla info) f
+      fprintf fmt "~@ %a" (print_fmla info) f
   | Ttrue ->
       fprintf fmt "$true"
   | Tfalse ->
