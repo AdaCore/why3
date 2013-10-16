@@ -71,8 +71,10 @@ let number_format = {
   Number.def_int_support = Number.Number_unsupported;
   Number.dec_real_support = Number.Number_default;
   Number.hex_real_support = Number.Number_unsupported;
-  Number.frac_real_support = Number.Number_unsupported;
-  Number.def_real_support = Number.Number_unsupported;
+  Number.frac_real_support = Number.Number_custom
+    (Number.PrintFracReal ("%s", "(%s * %s)", "(%s / %s)"));
+  Number.def_real_support = Number.Number_unsupported
+  ;
 }
 
 let rec print_app info fmt ls tl oty =

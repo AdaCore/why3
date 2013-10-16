@@ -11,3 +11,27 @@ theory P
     forall x:real. sqr x >= 0.0
 
 end
+
+theory P2
+
+  use import real.Real
+  use import real.Square
+
+  goal sqr_pos :
+    forall x:real. sqr x >= 0.0
+
+end
+
+theory P3
+
+  use import real.Real
+  use import real.Trigonometry
+
+  goal cos_bound :
+    forall x:real. -1.0 <= cos x <= 1.0
+
+  goal cos_bound_harder :
+    forall x:real. 0.0 <= x <= 0.1 -> 0.1 <= cos x <= 1.0
+
+end
+
