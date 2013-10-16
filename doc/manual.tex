@@ -2,6 +2,13 @@
 
 % rubber: module index
 
+%BEGIN LATEX
+\usepackage{comment}
+\newcommand{\ahref}[2]{{#2}}
+\excludecomment{htmlonly}
+\newenvironment{latexonly}{}{}
+%END LATEX
+
 %HEVEA\@addimagenopt{-pdf}
 
 %BEGIN LATEX
@@ -21,7 +28,6 @@
 
 \usepackage{listings}
 \usepackage{xspace}
-\input{./myhevea.tex}
 
 %BEGIN LATEX
 \setulmarginsandblock{30mm}{30mm}{*}
