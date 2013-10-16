@@ -1,0 +1,13 @@
+theory P
+
+  use import real.Real
+
+  goal x_mul_x_pos :
+    forall x:real. x * x >= 0.0
+
+  function sqr (x:real) : real = x * x
+
+  goal sqr_pos :
+    forall x:real. sqr x >= 0.0
+
+end
