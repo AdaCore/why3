@@ -40,7 +40,8 @@ let ident_printer =
        (** for security *)
       "bool";"unsat";"sat";"true";"false";
       "true";"check";"assert";"TYPE";"SUBTYPE";
-      "scalar";"select";"update";"int";"real";"subtype";"subrange";"mk-bv";
+      "scalar";"select";"update";"int";"real";"nat";
+      "subtype";"subrange";"mk-bv";
       "bv-concat";"bv-extract";"bv-shift-right0";"div";"mod";"bitvector";
       "lambda";
 ]
