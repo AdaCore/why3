@@ -147,7 +147,7 @@ theory real.Trigonometry
   prelude "include('Axioms/arctan-lower.ax')."
   prelude "include('Axioms/arctan-upper.ax')."
 
-  syntax function atan  "arctan(%1)"
+  syntax function atan "arctan(%1)"
   syntax function tan  "tan(%1)"
 
   prelude "include('Axioms/cos.ax')."
@@ -160,10 +160,13 @@ theory real.Trigonometry
   remove prop Cos_0
   remove prop Sin_0
 
+  (* The following files "greatly increase the search space" and thus
+     cause failures. Do not include them! *)
+  (*
   prelude "include('Axioms/cos-constant.ax')."
   prelude "include('Axioms/sin-constant.ax')."
+  *)
 
-  (* These follow from Metitarski's auxiliary axioms. *)
   remove prop Cos_le_one
   remove prop Sin_le_one
 end

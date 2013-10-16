@@ -13,7 +13,7 @@
    name="P"
    locfile="../metitarski.why"
    loclnum="1" loccnumb="7" loccnume="8"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="x_mul_x_pos"
@@ -37,17 +37,81 @@
     locfile="../metitarski.why"
     loclnum="10" loccnumb="7" loccnume="14"
     sum="14c5e18ceaa4ec73959d4db9a1295376"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="ainfix &gt;=asqrV0c0.0F">
     <proof
      prover="0"
      timelimit="5"
      memlimit="1000"
-     edited="metitarski-P-sqr_pos_1.tptp"
      obsolete="false"
      archived="false">
-     <result status="unknown" time="0.24"/>
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="P2"
+   locfile="../metitarski.why"
+   loclnum="15" loccnumb="7" loccnume="9"
+   verified="true"
+   expanded="true">
+   <goal
+    name="sqr_pos"
+    locfile="../metitarski.why"
+    loclnum="20" loccnumb="7" loccnume="14"
+    sum="222051b3fa2e2f7946541037ee172109"
+    proved="true"
+    expanded="true"
+    shape="ainfix &gt;=asqrV0c0.0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="P3"
+   locfile="../metitarski.why"
+   loclnum="25" loccnumb="7" loccnume="9"
+   verified="false"
+   expanded="true">
+   <goal
+    name="cos_bound"
+    locfile="../metitarski.why"
+    loclnum="30" loccnumb="7" loccnume="16"
+    sum="1279f956936a79ace638c17c4f31378d"
+    proved="false"
+    expanded="true"
+    shape="ainfix &lt;=acosV0c1.0Aainfix &lt;=aprefix -c1.0acosV0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="2.34"/>
+    </proof>
+   </goal>
+   <goal
+    name="cos_bound_harder"
+    locfile="../metitarski.why"
+    loclnum="33" loccnumb="7" loccnume="23"
+    sum="9e730acb71ecc7a8fb46ef19c84a57db"
+    proved="true"
+    expanded="true"
+    shape="ainfix &lt;=acosV0c1.0Aainfix &lt;=c0.7acosV0Iainfix &lt;=V0c0.7Aainfix &lt;=aprefix -c0.7V0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.21"/>
     </proof>
    </goal>
   </theory>
