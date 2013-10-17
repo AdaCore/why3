@@ -118,20 +118,34 @@ Scheduled for 31 october 2013
 
 == New Features to announce ==
 
-* provers: 
-** veriT 201310
-** Alt-Ergo 0.95.2 
-** CVC4 1.1 & 1.2 (?)
-** Coq 8.4pl2 
-** Metitarski 
-** gappa 1.0.0
-** Metis
-** Beagle, Princess
-** SPASS 3.8 ?
-** Yices 1.?.?
+* lemma functions
 
-* --stats: changed (detailler, temps, distinction root et subgoals, CLAUDE)
-  --hist: TODO documenter (voir Alain ou Mohamed sur les graphes SMT)
+* polymorphic recursion permitted
+
+* why.el renamed into why3.el
+
+* new provers: 
+** veriT 201310
+** Metitarski 2.2
+** Metis 2.3
+** Beagle 0.4.1
+** Princess 2013-05-13
+** Yices2 2.0.4
+
+* new versions of provers:
+** Alt-Ergo 0.95.2 
+** CVC4 1.1 (& 1.2 ?)
+** Coq 8.4pl2 
+** gappa 1.0.0
+** SPASS 3.8ds 
+
+* API: more examples of use 
+
+* why3session
+** --stats: changed (detailler, temps, distinction root et subgoals, CLAUDE)
+**  --hist: TODO documenter (voir Alain ou Mohamed sur les graphes SMT)
+
+* bug fix: PVS configuration and installation
 
 * bug fix: leading zeros in decimal literals
 
@@ -141,6 +155,11 @@ Scheduled for 31 october 2013
   Compatibility with session files from version 0.81 and earlier is
   assured.
 
+* bug fix: Coq tactic now loads dynamic plug-ins
+
+* bug fix: Coq output of poly rec types
+
+* BTS 15493, 15053
 * BTS 13736 fixed
 https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
 
