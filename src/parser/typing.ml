@@ -321,11 +321,11 @@ let dterm uc gvars denv pp =
 
 let type_term uc gfn t =
   let t = dterm uc gfn denv_empty t in
-  Dterm.term ~strict:true ~keep_loc:true Mstr.empty t
+  Dterm.term ~strict:true ~keep_loc:true t
 
 let type_fmla uc gfn f =
   let f = dterm uc gfn denv_empty f in
-  Dterm.fmla ~strict:true ~keep_loc:true Mstr.empty f
+  Dterm.fmla ~strict:true ~keep_loc:true f
 
 (** Typing declarations *)
 
@@ -517,12 +517,12 @@ let add_logics dl th =
     | None, _ -> ls :: abst, defn
     | Some e, None -> (* predicate *)
         let f = dterm th' (fun _ -> None) denv e in
-        let f = fmla ~strict:true ~keep_loc:true Mstr.empty f in
+        let f = fmla ~strict:true ~keep_loc:true f in
         abst, (ls, vl, f) :: defn
     | Some e, Some ty -> (* function *)
         let e = { e with pp_desc = PPcast (e, ty) } in
         let t = dterm th' (fun _ -> None) denv e in
-        let t = term ~strict:true ~keep_loc:true Mstr.empty t in
+        let t = term ~strict:true ~keep_loc:true t in
         abst, (ls, vl, t) :: defn
   in
   let abst,defn = List.fold_right type_decl dl ([],[]) in

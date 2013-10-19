@@ -468,8 +468,8 @@ let term ~strict ~keep_loc env prop dt =
   in
   get None env prop dt
 
-let fmla ~strict ~keep_loc env dt = term ~strict ~keep_loc env true dt
-let term ~strict ~keep_loc env dt = term ~strict ~keep_loc env false dt
+let fmla ~strict ~keep_loc dt = term ~strict ~keep_loc Mstr.empty true dt
+let term ~strict ~keep_loc dt = term ~strict ~keep_loc Mstr.empty false dt
 
 (** Exception printer *)
 
