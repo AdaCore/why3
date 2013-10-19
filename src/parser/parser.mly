@@ -37,13 +37,6 @@ end
   let floc_ij i j = Loc.extract (loc_ij i j)
 *)
 
-  let pty_of_id i = PPTtyapp (Qident i, [])
-
-  let params_of_binders bl = List.map (function
-    | l, None, _, None -> Loc.errorm ~loc:l "cannot determine the type"
-    | l, Some i, gh, None -> l, None, gh, pty_of_id i
-    | l, i, gh, Some t -> l, i, gh, t) bl
-
   let quvars_of_lidents ty ll = List.map (function
     | l, None -> Loc.errorm ~loc:l "anonymous binders are not allowed here"
     | _, Some i -> i, ty) ll
@@ -68,6 +61,10 @@ end
   let mk_id id loc = { id = id; id_lab = []; id_loc = loc }
 
   let add_lab id l = { id with id_lab = l }
+
+  let rec mk_l_apply f a =
+    let loc = Loc.join f.pp_loc a.pp_loc in
+    { pp_loc = loc; pp_desc = PPhoapp (f,a) }
 
   let mk_l_prefix op e1 =
     let id = mk_id (prefix op) (floc_i 1) in
@@ -207,9 +204,9 @@ end
 %token AND ARROW
 %token BAR
 %token COLON COMMA
-%token DOT EQUAL FUNC LAMBDA LTGT
+%token DOT EQUAL LAMBDA LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
-%token LARROW LRARROW OR PRED
+%token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
 %token UNDERSCORE
 
@@ -568,13 +565,9 @@ indcase:
 /* Type expressions */
 
 primitive_type:
-| primitive_type_arg           { $1 }
-| lqualid primitive_type_args  { PPTtyapp ($1, $2) }
-;
-
-primitive_type_non_lident:
-| primitive_type_arg_non_lident           { $1 }
-| uqualid DOT lident primitive_type_args  { PPTtyapp (Qdot ($1, $3), $4) }
+| primitive_type_arg                  { $1 }
+| lqualid primitive_type_args         { PPTtyapp ($1, $2) }
+| primitive_type ARROW primitive_type { PPTarrow ($1, $3) }
 ;
 
 primitive_type_args:
@@ -582,19 +575,9 @@ primitive_type_args:
 | primitive_type_arg primitive_type_args  { $1 :: $2 }
 ;
 
-primitive_type_args_non_lident:
-| primitive_type_arg_non_lident                      { [$1] }
-| primitive_type_arg_non_lident primitive_type_args  { $1 :: $2 }
-;
-
 primitive_type_arg:
-| lident                         { PPTtyapp (Qident $1, []) }
-| primitive_type_arg_non_lident  { $1 }
-;
-
-primitive_type_arg_non_lident:
-| uqualid DOT lident
-   { PPTtyapp (Qdot ($1, $3), []) }
+| lqualid
+   { PPTtyapp ($1, []) }
 | quote_lident
    { PPTtyvar ($1, false) }
 | opaque_quote_lident
@@ -604,7 +587,7 @@ primitive_type_arg_non_lident:
 | LEFTPAR RIGHTPAR
    { PPTtuple [] }
 | LEFTPAR primitive_type RIGHTPAR
-   { $2 }
+   { PPTparen $2 }
 ;
 
 list1_primitive_type_sep_comma:
@@ -645,6 +628,8 @@ lexpr:
    { mk_l_prefix $1 $2 }
 | qualid list1_lexpr_arg
    { mk_pp (PPapp ($1, $2)) }
+| lexpr_arg_noid list1_lexpr_arg
+   { List.fold_left mk_l_apply $1 $2 }
 | IF lexpr THEN lexpr ELSE lexpr
    { mk_pp (PPif ($2, $4, $6)) }
 | quant list1_quant_vars triggers DOT lexpr
@@ -662,10 +647,6 @@ lexpr:
    { mk_pp (PPmatch ($2, $5)) }
 | MATCH lexpr COMMA list1_lexpr_sep_comma WITH bar_ match_cases END
    { mk_pp (PPmatch (mk_pp (PPtuple ($2::$4)), $7)) }
-/*
-| EPSILON lident labels COLON primitive_type DOT lexpr
-   { mk_pp (PPeps ((add_lab $2 $3, Some $5), $7)) }
-*/
 | lexpr COLON primitive_type
    { mk_pp (PPcast ($1, $3)) }
 | lexpr_arg
@@ -695,6 +676,10 @@ constant:
 
 lexpr_arg:
 | qualid            { mk_pp (PPvar $1) }
+| lexpr_arg_noid    { $1 }
+;
+
+lexpr_arg_noid:
 | constant          { mk_pp (PPconst $1) }
 | TRUE              { mk_pp PPtrue }
 | FALSE             { mk_pp PPfalse }
@@ -732,8 +717,6 @@ quant:
 | FORALL  { PPforall }
 | EXISTS  { PPexists }
 | LAMBDA  { PPlambda }
-| FUNC    { PPfunc }
-| PRED    { PPpred }
 ;
 
 /* Triggers */
@@ -820,7 +803,8 @@ list0_param:
 ;
 
 list1_param:
-| list1_binder  { params_of_binders $1 }
+| param               { $1 }
+| param list1_param   { $1 @ $2 }
 ;
 
 list1_binder:
@@ -828,75 +812,97 @@ list1_binder:
 | binder list1_binder { $1 @ $2 }
 ;
 
+/* [param] and [binder] below must have the same grammar and
+   raise [Parse_error] in the same cases. Interpretaion of
+   single-standing untyped [Qident]'s is different: [param]
+   treats them as type expressions, [binder], as parameter
+   names, whose type must be inferred. */
+
+param:
+| anon_binder
+   { Loc.errorm ~loc:(floc ())
+      "cannot determine the type of the parameter" }
+| primitive_type_arg
+   { [floc (), None, false, $1] }
+| LEFTPAR GHOST primitive_type RIGHTPAR
+   { [floc (), None, true, $3] }
+| primitive_type_arg label labels
+   { match $1 with
+      | PPTtyapp (Qident _, []) -> Loc.errorm ~loc:(floc ())
+          "cannot determine the type of the parameter"
+      | _ -> Loc.error ~loc:(floc_i 2) Parsing.Parse_error }
+| LEFTPAR binder_vars_rest RIGHTPAR
+   { match $2 with [l,_] -> Loc.errorm ~loc:l
+          "cannot determine the type of the parameter"
+      | _ -> Loc.error ~loc:(floc_i 3) Parsing.Parse_error }
+| LEFTPAR GHOST binder_vars_rest RIGHTPAR
+   { match $3 with [l,_] -> Loc.errorm ~loc:l
+          "cannot determine the type of the parameter"
+      | _ -> Loc.error ~loc:(floc_i 4) Parsing.Parse_error }
+| LEFTPAR binder_vars COLON primitive_type RIGHTPAR
+   { List.map (fun (l,i) -> l, i, false, $4) $2 }
+| LEFTPAR GHOST binder_vars COLON primitive_type RIGHTPAR
+   { List.map (fun (l,i) -> l, i, true, $5) $3 }
+;
+
 binder:
-| quote_lident
-   { [floc (), None, false, Some (PPTtyvar ($1, false))] }
-| opaque_quote_lident
-   { [floc (), None, false, Some (PPTtyvar ($1, true))] }
-| lqualid_qualified
-   { [floc (), None, false, Some (PPTtyapp ($1, []))] }
-| lident labels
-   { [floc (), Some (add_lab $1 $2), false, None] }
-| UNDERSCORE
-   { Loc.errorm ~loc:(floc ()) "untyped anonymous parameters are not allowed" }
-| LEFTPAR RIGHTPAR
-   { [floc (), None, false, Some (PPTtuple [])] }
-| LEFTPAR binder_in RIGHTPAR
-   { $2 }
-| LEFTPAR GHOST binder_in RIGHTPAR
-   { List.map (fun (l,i,_,t) -> (l,i,true,t)) $3 }
-| LEFTPAR binder_type COMMA list1_primitive_type_sep_comma RIGHTPAR
-   { [floc (), None, false, Some (PPTtuple ($2::$4))] }
-;
-
-binder_in:
-| lident labels
-   { [floc (), Some (add_lab $1 $2), false, None] }
-| UNDERSCORE
-   { Loc.errorm ~loc:(floc ()) "untyped anonymous parameters are not allowed" }
-| binder_type_rest
-   { [floc (), None, false, Some $1] }
-| binder_vars COLON primitive_type
-   { List.map (fun (l,v) -> l, v, false, Some $3) $1 }
-;
-
-binder_type:
-| lident            { PPTtyapp (Qident $1, []) }
-| binder_type_rest  { $1 }
-;
-
-binder_type_rest:
-| lident list1_lident
-   { PPTtyapp (Qident $1, List.map pty_of_id $2) }
-| lident list0_lident primitive_type_args_non_lident
-   { PPTtyapp (Qident $1, List.map pty_of_id $2 @ $3) }
-| primitive_type_non_lident
-   { $1 }
+| anon_binder
+   { Loc.errorm ~loc:(floc ())
+      "cannot determine the type of the parameter" }
+| primitive_type_arg
+   { match $1 with
+      | PPTtyapp (Qident id, [])
+      | PPTparen (PPTtyapp (Qident id, [])) ->
+             [floc (), Some id, false, None]
+      | _ -> [floc (), None, false, Some $1] }
+| LEFTPAR GHOST primitive_type RIGHTPAR
+   { match $3 with
+      | PPTtyapp (Qident id, []) ->
+             [floc (), Some id, true, None]
+      | _ -> [floc (), None, true, Some $3] }
+| primitive_type_arg label labels
+   { match $1 with
+      | PPTtyapp (Qident id, []) ->
+          [floc (), Some (add_lab id ($2::$3)), false, None]
+      | _ -> Loc.error ~loc:(floc_i 2) Parsing.Parse_error }
+| LEFTPAR binder_vars_rest RIGHTPAR
+   { match $2 with [l,i] -> [l, i, false, None]
+      | _ -> Loc.error ~loc:(floc_i 3) Parsing.Parse_error }
+| LEFTPAR GHOST binder_vars_rest RIGHTPAR
+   { match $3 with [l,i] -> [l, i, true, None]
+      | _ -> Loc.error ~loc:(floc_i 4) Parsing.Parse_error }
+| LEFTPAR binder_vars COLON primitive_type RIGHTPAR
+   { List.map (fun (l,i) -> l, i, false, Some $4) $2 }
+| LEFTPAR GHOST binder_vars COLON primitive_type RIGHTPAR
+   { List.map (fun (l,i) -> l, i, true, Some $5) $3 }
 ;
 
 binder_vars:
-| list1_lident
-   { List.map (fun id -> id.id_loc, Some id) $1 }
-| list1_lident UNDERSCORE list0_lident_labels
-   { List.map (fun id -> id.id_loc, Some id) $1 @ (floc_i 2, None) :: $3 }
-| lident list1_lident label labels list0_lident_labels
-   { let l = match List.rev ($1 :: $2) with
-       | i :: l -> add_lab i ($3 :: $4) :: l
-       | [] -> assert false in
-     List.fold_left (fun acc id -> (id.id_loc, Some id) :: acc) $5 l }
-| lident label labels list0_lident_labels
-   { ($1.id_loc, Some (add_lab $1 ($2 :: $3))) :: $4 }
-| UNDERSCORE list0_lident_labels
-   { (floc_i 1, None) :: $2 }
+| binder_vars_head  { List.rev $1 }
+| binder_vars_rest  { $1 }
 ;
 
-list0_lident:
-| /* epsilon */ { [] }
-| list1_lident  { $1 }
+binder_vars_rest:
+| binder_vars_head label labels list0_lident_labels
+   { List.rev_append (match $1 with
+      | (l, Some id) :: bl ->
+          (Loc.join l (floc_i 3), Some (add_lab id ($2::$3))) :: bl
+      | _ -> assert false) $4 }
+| binder_vars_head anon_binder list0_lident_labels
+   { List.rev_append $1 ($2 :: $3) }
+| anon_binder list0_lident_labels
+   { $1 :: $2 }
 ;
 
-list1_lident:
-| lident list0_lident  { $1 :: $2 }
+binder_vars_head:
+| primitive_type {
+    let of_id id = id.id_loc, Some id in
+    let push acc = function
+      | PPTtyapp (Qident id, []) -> of_id id :: acc
+      | _ -> Loc.error ~loc:(floc ()) Parsing.Parse_error in
+    match $1 with
+      | PPTtyapp (Qident id, l) -> List.fold_left push [of_id id] l
+      | _ -> Loc.error ~loc:(floc ()) Parsing.Parse_error }
 ;
 
 list1_quant_vars:
@@ -920,6 +926,9 @@ list1_lident_labels:
 
 lident_labels:
 | lident labels { floc (), Some (add_lab $1 $2) }
+| anon_binder   { $1 }
+
+anon_binder:
 | UNDERSCORE    { floc (), None }
 ;
 
@@ -1010,10 +1019,6 @@ lqualid:
 /* copy of lqualid to avoid yacc conflicts */
 lqualid_copy:
 | lident              { Qident $1 }
-| uqualid DOT lident  { Qdot ($1, $3) }
-;
-
-lqualid_qualified:
 | uqualid DOT lident  { Qdot ($1, $3) }
 ;
 

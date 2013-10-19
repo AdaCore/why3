@@ -829,20 +829,13 @@ let t_tuple tl =
 let fs_func_app =
   let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
   let ty_b = ty_var (create_tvsymbol (id_fresh "b")) in
-  create_fsymbol (id_fresh "infix @!") [ty_func ty_a ty_b; ty_a] ty_b
-
-let ps_pred_app =
-  let ty_a = ty_var (create_tvsymbol (id_fresh "a")) in
-  create_psymbol (id_fresh "infix @?") [ty_pred ty_a; ty_a]
+  create_fsymbol (id_fresh "infix @") [ty_func ty_a ty_b; ty_a] ty_b
 
 let t_func_app fn t = t_app_infer fs_func_app [fn; t]
-let t_pred_app pr t = ps_app ps_pred_app [pr; t]
+let t_pred_app pr t = t_equ (t_func_app pr t) t_bool_true
 
-let t_func_app_l = List.fold_left t_func_app
-
-let t_pred_app_l pr tl = match List.rev tl with
-  | t::tl -> t_pred_app (t_func_app_l pr (List.rev tl)) t
-  | _ -> Pervasives.invalid_arg "t_pred_app_l"
+let t_func_app_l fn tl = List.fold_left t_func_app fn tl
+let t_pred_app_l pr tl = t_equ (t_func_app_l pr tl) t_bool_true
 
 (** Term library *)
 

@@ -30,12 +30,17 @@ let dty_fresh = let i = ref 0 in fun () -> Dvar (ref (Dind (incr i; !i)))
 let dty_of_ty ty = Duty ty
 
 let rec ty_of_dty ~strict = function
-  | Dvar { contents = Dval dty } -> ty_of_dty ~strict dty
+  | Dvar { contents = Dval (Duty ty) } ->
+      ty
+  | Dvar ({ contents = Dval dty } as r) ->
+      let ty = ty_of_dty ~strict dty in
+      r := Dval (Duty ty); ty
   | Dvar r ->
-        if strict then Loc.errorm "undefined type variable";
-        let ty = ty_var (create_tvsymbol (id_fresh "xi")) in
-        r := Dval (Duty ty); ty
-  | Dapp (ts,dl) -> ty_app ts (List.map (ty_of_dty ~strict) dl)
+      if strict then Loc.errorm "undefined type variable";
+      let ty = ty_var (create_tvsymbol (id_fresh "xi")) in
+      r := Dval (Duty ty); ty
+  | Dapp (ts,dl) ->
+      ty_app ts (List.map (ty_of_dty ~strict) dl)
   | Duty ty -> ty
 
 let rec occur_check i = function
@@ -65,12 +70,9 @@ let rec dty_unify dty1 dty2 = match dty1,dty2 with
       List.iter2 dty_unify dl1 dl2
   | _ -> raise Exit
 
-(*
-exception DTypeMismatch of dty * dty
-
-let dty_unify dty1 dty2 =
-  try dty_unify dty1 dty2 with Exit -> raise (DTypeMismatch (dty1,dty2))
-*)
+let dty_int = Duty ty_int
+let dty_real = Duty ty_real
+let dty_bool = Duty ty_bool
 
 let rec print_dty ht inn fmt = function
   | Dvar { contents = Dval dty } ->
@@ -147,13 +149,12 @@ and dpattern_node =
 type dterm = {
   dt_node  : dterm_node;
   dt_dty   : dty option;
-  dt_label : Slab.t;
   dt_loc   : Loc.position option;
-  dt_uloc  : Loc.position option;
 }
 
 and dterm_node =
-  | DTvar of string
+  | DTvar of string * dty
+  | DTgvar of vsymbol
   | DTconst of Number.constant
   | DTapp of lsymbol * dterm list
   | DTif of dterm * dterm * dterm
@@ -165,54 +166,62 @@ and dterm_node =
   | DTnot of dterm
   | DTtrue
   | DTfalse
+  | DTcast of dterm * ty
+  | DTuloc of dterm * Loc.position
+  | DTlabel of dterm * Slab.t
 
 (** Environment *)
 
-type denv = dty Mstr.t
+type denv = dterm_node Mstr.t
 
 exception TermExpected
 exception FmlaExpected
 exception DuplicateVar of string
 exception UnboundVar of string
 
-let denv_get_var ?loc denv n =
-  let dty = Mstr.find_exn (UnboundVar n) n denv in
-  { dt_node = DTvar n;
-    dt_dty = Some dty;
-    dt_label = Slab.empty;
-    dt_loc = loc;
-    dt_uloc = None }
+let denv_get denv n = Mstr.find_exn (UnboundVar n) n denv
+
+let denv_get_opt denv n = Mstr.find_opt n denv
 
 let dty_of_dterm dt = match dt.dt_dty with
   | None -> Loc.error ?loc:dt.dt_loc TermExpected
   | Some dty -> dty
 
+let denv_empty = Mstr.empty
+
 let denv_add_var denv id dty =
-  Mstr.add (preid_name id) dty denv
+  let n = preid_name id in
+  Mstr.add n (DTvar (n, dty)) denv
 
 let denv_add_let denv dt id =
-  Mstr.add (preid_name id) (dty_of_dterm dt) denv
+  let n = preid_name id in
+  Mstr.add n (DTvar (n, dty_of_dterm dt)) denv
 
 let denv_add_quant denv vl =
   let add acc (id,dty) = let n = preid_name id in
-    Mstr.add_new (DuplicateVar n) n dty acc in
+    Mstr.add_new (DuplicateVar n) n (DTvar (n, dty)) acc in
   let s = List.fold_left add Mstr.empty vl in
   Mstr.set_union s denv
 
 let denv_add_pat denv dp =
   let rec get dp = match dp.dp_node with
     | DPwild -> Mstr.empty
-    | DPvar id -> Mstr.singleton (preid_name id) dp.dp_dty
+    | DPvar id ->
+        let n = preid_name id in
+        Mstr.singleton n (DTvar (n, dp.dp_dty))
     | DPapp (_,dpl) ->
         let join n _ _ = raise (DuplicateVar n) in
         let add acc dp = Mstr.union join acc (get dp) in
         List.fold_left add Mstr.empty dpl
     | DPor (dp1,dp2) ->
-        let join _ dty1 dty2 = dty_unify dty1 dty2; Some dty1 in
+        let join _ dtn1 dtn2 = match dtn1, dtn2 with
+          | DTvar (_,dty1), DTvar (_,dty2) -> dty_unify dty1 dty2; Some dtn1
+          | _ -> assert false in
         Mstr.union join (get dp1) (get dp2)
     | DPas (dp,id) ->
         let n = preid_name id in
-        Mstr.add_new (DuplicateVar n) n dp.dp_dty (get dp) in
+        Mstr.add_new (DuplicateVar n) n (DTvar (n, dp.dp_dty)) (get dp)
+  in
   Mstr.set_union (get dp) denv
 
 (** Unification tools *)
@@ -233,13 +242,17 @@ let darg_expected_type ?loc dt_dty dty =
 
 let dterm_expected_type dt dty = match dt.dt_dty with
   | Some dt_dty -> darg_expected_type ?loc:dt.dt_loc dt_dty dty
-  | None -> Loc.error ?loc:dt.dt_loc TermExpected
+  | None -> begin try dty_unify dty_bool dty with Exit ->
+      Loc.error ?loc:dt.dt_loc TermExpected end
 
-let dfmla_expected_type dt dty = match dt.dt_dty, dty with
-  | Some dt_dty, Some dty -> darg_expected_type ?loc:dt.dt_loc dt_dty dty
-  | Some _, None -> Loc.error ?loc:dt.dt_loc FmlaExpected
-  | None, Some _ -> Loc.error ?loc:dt.dt_loc TermExpected
-  | None, None -> ()
+let dfmla_expected_type dt = match dt.dt_dty with
+  | Some dt_dty -> begin try dty_unify dt_dty dty_bool with Exit ->
+      Loc.error ?loc:dt.dt_loc FmlaExpected end
+  | None -> ()
+
+let dexpr_expected_type dt dty = match dty with
+  | Some dty -> dterm_expected_type dt dty
+  | None -> dfmla_expected_type dt
 
 (** Constructors *)
 
@@ -261,17 +274,22 @@ let dpattern ?loc node =
 
 let dterm ?loc node =
   let get_dty = function
-    | DTvar _ -> Loc.errorm "Invalid argument, use Dterm.denv_get_var"
-    | DTconst (Number.ConstInt _) -> Some (dty_of_ty ty_int)
-    | DTconst (Number.ConstReal _) -> Some (dty_of_ty ty_real)
+    | DTvar (_,dty) ->
+        Some dty
+    | DTgvar vs ->
+        Some (dty_of_ty vs.vs_ty)
+    | DTconst (Number.ConstInt _) ->
+        Some dty_int
+    | DTconst (Number.ConstReal _) ->
+        Some dty_real
     | DTapp (ls,dtl) ->
         let dtyl, dty = specialize_ls ls in
         dty_unify_app ls dterm_expected_type dtl dtyl;
         dty
     | DTif (df,dt1,dt2) ->
-        dfmla_expected_type df None;
-        dfmla_expected_type dt2 dt1.dt_dty;
-        dt1.dt_dty
+        dfmla_expected_type df;
+        dexpr_expected_type dt2 dt1.dt_dty;
+        if dt2.dt_dty = None then None else dt1.dt_dty
     | DTlet (dt,_,df) ->
         ignore (dty_of_dterm dt);
         df.dt_dty
@@ -281,41 +299,38 @@ let dterm ?loc node =
         dterm_expected_type dt dp1.dp_dty;
         let check (dp,df) =
           dpat_expected_type dp dp1.dp_dty;
-          dfmla_expected_type df df1.dt_dty in
+          dexpr_expected_type df df1.dt_dty in
         List.iter check bl;
-        df1.dt_dty
+        let is_fmla (_,df) = df.dt_dty = None in
+        if List.exists is_fmla bl then None else df1.dt_dty
     | DTeps (_,dty,df) ->
-        dfmla_expected_type df None;
+        dfmla_expected_type df;
         Some dty
     | DTquant (_,_,_,df) ->
-        dfmla_expected_type df None;
+        dfmla_expected_type df;
         None
     | DTbinop (_,df1,df2) ->
-        dfmla_expected_type df1 None;
-        dfmla_expected_type df2 None;
+        dfmla_expected_type df1;
+        dfmla_expected_type df2;
         None
     | DTnot df ->
-        dfmla_expected_type df None;
+        dfmla_expected_type df;
         None
     | DTtrue | DTfalse ->
-        None
-  in
+        (* we put here [Some dty_bool] instead of [None] because we can
+           always replace [true] by [True] and [false] by [False], so that
+           there is no need to count these constructs as "formulas" which
+           require explicit if-then-else conversion to bool *)
+        Some dty_bool
+    | DTcast (dt,ty) ->
+        let dty = dty_of_ty ty in
+        dterm_expected_type dt dty;
+        Some dty
+    | DTuloc (dt,_)
+    | DTlabel (dt,_) ->
+        dt.dt_dty in
   let dty = Loc.try1 ?loc get_dty node in
-  { dt_node = node; dt_dty = dty;
-    dt_label = Slab.empty;
-    dt_loc = loc; dt_uloc = None }
-
-let dterm_type_cast dt ty =
-  dterm_expected_type dt (dty_of_ty ty); dt
-
-let dterm_add_label dt lab =
-  { dt with dt_label = Slab.add lab dt.dt_label }
-
-let dterm_set_labels dt slab =
-  { dt with dt_label = slab }
-
-let dterm_set_uloc dt loc =
-  { dt with dt_uloc = Some loc }
+  { dt_node = node; dt_dty = dty; dt_loc = loc }
 
 (** Final stage *)
 
@@ -363,55 +378,108 @@ let check_exists_implies q f = match q, f.t_node with
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
-let term ~strict ~keep_loc env dt =
-  let rec get uloc env dt =
-    let uloc = if dt.dt_uloc = None then uloc else dt.dt_uloc in
-    let t = Loc.try4 ?loc:dt.dt_loc try_get uloc env dt.dt_dty dt.dt_node in
-    let loc = if keep_loc then dt.dt_loc else None in
-    let loc = if uloc = None then loc else uloc in
-    if loc = None && Slab.is_empty dt.dt_label
-      then t else t_label ?loc dt.dt_label t
-  and try_get uloc env dty = function
-    | DTvar n ->
+let term ~strict ~keep_loc env prop dt =
+  let t_label loc labs t =
+    if loc = None && Slab.is_empty labs
+    then t else t_label ?loc labs t in
+
+  let rec strip uloc labs dt = match dt.dt_node with
+    | DTcast (dt,_) -> strip uloc labs dt
+    | DTuloc (dt,loc) -> strip (Some loc) labs dt
+    | DTlabel (dt,s) -> strip uloc (Slab.union labs s) dt
+    | _ -> uloc, labs, dt in
+
+  let rec get uloc env prop dt =
+    let uloc, labs, dt = strip uloc Slab.empty dt in
+    let tloc = if keep_loc then dt.dt_loc else None in
+    let tloc = if uloc <> None then uloc else tloc in
+    let t = t_label tloc labs (Loc.try5 ?loc:dt.dt_loc
+      try_get uloc env prop dt.dt_dty dt.dt_node) in
+    match t.t_ty with
+    | Some _ when prop -> t_label tloc Slab.empty
+        (Loc.try2 ?loc:dt.dt_loc t_equ t t_bool_true)
+    | None when not prop -> t_label tloc Slab.empty
+        (t_if t t_bool_true t_bool_false)
+    | _ -> t
+
+  and try_get uloc env prop dty = function
+    | DTvar (n,_) ->
         t_var (Mstr.find_exn (UnboundVar n) n env)
+    | DTgvar vs ->
+        t_var vs
     | DTconst c ->
         t_const c
+    | DTapp (ls,[]) when ls_equal ls fs_bool_true ->
+        if prop then t_true else t_bool_true
+    | DTapp (ls,[]) when ls_equal ls fs_bool_false ->
+        if prop then t_false else t_bool_false
+    | DTapp (ls,[dt1;dt2]) when ls_equal ls ps_equ ->
+      (* avoid putting formulas into a term context *)
+        if dt1.dt_dty = None || dt2.dt_dty = None
+        then t_iff (get uloc env true dt1) (get uloc env true dt2)
+        else t_equ (get uloc env false dt1) (get uloc env false dt2)
     | DTapp (ls,dtl) ->
-        t_app ls (List.map (get uloc env) dtl) (Opt.map (ty_of_dty ~strict) dty)
-    | DTif (df,dt1,dt2) ->
-        t_if (get uloc env df) (get uloc env dt1) (get uloc env dt2)
+        t_app ls (List.map (get uloc env false) dtl)
+          (Opt.map (ty_of_dty ~strict) dty)
     | DTlet (dt,id,df) ->
-        let t = get uloc env dt in
+        let prop = prop || dty = None in
+        let t = get uloc env false dt in
         let v = create_vsymbol id (t_type t) in
         let env = Mstr.add (preid_name id) v env in
-        let f = get uloc env df in
+        let f = get uloc env prop df in
         check_used_var f.t_vars v;
         t_let_close v t f
+    | DTif (df,dt1,dt2) ->
+        let prop = prop || dty = None in
+        t_if (get uloc env true df)
+          (get uloc env prop dt1) (get uloc env prop dt2)
     | DTcase (dt,bl) ->
+        let prop = prop || dty = None in
         let branch (dp,df) =
           let env, p = pattern ~strict env dp in
-          let f = get uloc env df in
+          let f = get uloc env prop df in
           Svs.iter (check_used_var f.t_vars) p.pat_vars;
           t_close_branch p f in
-        t_case (get uloc env dt) (List.map branch bl)
+        t_case (get uloc env false dt) (List.map branch bl)
     | DTeps (id,dty,df) ->
         let v = create_vsymbol id (ty_of_dty ~strict dty) in
         let env = Mstr.add (preid_name id) v env in
-        let f = get uloc env df in
+        let f = get uloc env true df in
         check_used_var f.t_vars v;
         t_eps_close v f
     | DTquant (q,vl,dll,df) ->
         let env, vl = quant_vars ~strict env vl in
-        let trl = List.map (List.map (get uloc env)) dll in
-        let f = get uloc env df in
+        let tr_get dt = get uloc env (dt.dt_dty = None) dt in
+        let trl = List.map (List.map tr_get) dll in
+        let f = get uloc env true df in
         List.iter (check_used_var f.t_vars) vl;
         check_exists_implies q f;
         t_quant_close q vl trl f
     | DTbinop (op,df1,df2) ->
-        t_binary op (get uloc env df1) (get uloc env df2)
+        t_binary op (get uloc env true df1) (get uloc env true df2)
     | DTnot df ->
-        t_not (get uloc env df)
-    | DTtrue -> t_true
-    | DTfalse -> t_false
+        t_not (get uloc env true df)
+    | DTtrue ->
+        if prop then t_true else t_bool_true
+    | DTfalse ->
+        if prop then t_false else t_bool_false
+    | DTcast _ | DTuloc _ | DTlabel _ ->
+        assert false (* already stripped *)
   in
-  get None env dt
+  get None env prop dt
+
+let fmla ~strict ~keep_loc env dt = term ~strict ~keep_loc env true dt
+let term ~strict ~keep_loc env dt = term ~strict ~keep_loc env false dt
+
+(** Exception printer *)
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  | TermExpected ->
+      Format.fprintf fmt "syntax error: term expected"
+  | FmlaExpected ->
+      Format.fprintf fmt "syntax error: formula expected"
+  | DuplicateVar s ->
+      Format.fprintf fmt "duplicate variable %s" s
+  | UnboundVar s ->
+      Format.fprintf fmt "unbound variable %s" s
+  | _ -> raise e)

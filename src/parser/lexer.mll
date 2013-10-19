@@ -240,10 +240,6 @@ rule token = parse
       { OR }
   | "\\"
       { LAMBDA }
-  | "\\?"
-      { PRED }
-  | "\\!"
-      { FUNC }
   | "."
       { DOT }
   | "|"

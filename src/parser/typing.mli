@@ -40,9 +40,10 @@ val close_file : unit -> theory Mstr.t
 (***************************************************************************)
 
 val create_user_tv : string -> tvsymbol
+val create_user_id : Ptree.ident -> Ident.preid
 
+val string_list_of_qualid : Ptree.qualid -> string list
 val print_qualid : Format.formatter -> Ptree.qualid -> unit
-val split_qualid : Ptree.qualid -> string list * string
 val qloc : Ptree.qualid -> Loc.position
 
 val find_ns :

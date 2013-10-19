@@ -143,6 +143,10 @@ let rec dity_of_pty denv = function
   | Ptree.PPTtuple pl ->
       let dl = List.map (dity_of_pty denv) pl in
       ts_app (ts_tuple (List.length pl)) dl
+  | Ptree.PPTarrow (ty1, ty2) ->
+      ts_app ts_func [dity_of_pty denv ty1; dity_of_pty denv ty2]
+  | Ptree.PPTparen ty ->
+      dity_of_pty denv ty
 
 let opaque_binders acc args =
   List.fold_left (fun acc (_,_,dty) -> opaque_tvs acc dty) acc args
@@ -187,12 +191,16 @@ let pass_opacity (e,_) bl = match find_top_pty e with
   | Some pty ->
       let ht = Hstr.create 3 in
       let rec fill = function
+        | Ptree.PPTparen ty -> fill ty
+        | Ptree.PPTarrow (ty1, ty2) -> fill ty1; fill ty2
         | Ptree.PPTtyapp (_, pl) | Ptree.PPTtuple pl -> List.iter fill pl
         | Ptree.PPTtyvar (id, true) -> Hstr.replace ht id.id ()
         | Ptree.PPTtyvar _ -> () in
       fill pty;
       if Hstr.length ht = 0 then bl else
       let rec pass = function
+        | Ptree.PPTparen ty -> pass ty
+        | Ptree.PPTarrow (ty1, ty2) -> Ptree.PPTarrow (pass ty1, pass ty2)
         | Ptree.PPTtyvar (id,op) -> Ptree.PPTtyvar (id, op || Hstr.mem ht id.id)
         | Ptree.PPTtyapp (p, pl) -> Ptree.PPTtyapp (p, List.map pass pl)
         | Ptree.PPTtuple pl -> Ptree.PPTtuple (List.map pass pl) in
@@ -338,7 +346,7 @@ let rec dpattern denv ({ pat_loc = loc } as pp) dity = match pp.pat_desc with
   | Ptree.PPpwild ->
       PPwild, denv
   | Ptree.PPpvar id ->
-      PPvar (Denv.create_user_id id), add_var id dity denv
+      PPvar (Typing.create_user_id id), add_var id dity denv
   | Ptree.PPpapp (q,ppl) ->
       let sym, dvty = specialize_qualid denv.uc q in
       dpat_app denv loc (mk_dexpr sym dvty loc Slab.empty) ppl dity
@@ -364,7 +372,7 @@ let rec dpattern denv ({ pat_loc = loc } as pp) dity = match pp.pat_desc with
       PPor (pp1, pp2), denv
   | Ptree.PPpas (pp, id) ->
       let pp, denv = dpattern denv pp dity in
-      PPas (pp, Denv.create_user_id id), add_var id dity denv
+      PPas (pp, Typing.create_user_id id), add_var id dity denv
 
 and dpat_app denv gloc ({ de_loc = loc } as de) ppl dity =
   let ls = match de.de_desc with
@@ -529,9 +537,9 @@ and de_desc denv loc = function
         | Ptree.Einfix (e1, op1, e2) when chainable_op denv op1 ->
             get_chain e1 ((op1, dexpr denv e2) :: acc)
         | _ -> e12, acc in
+      let ch = [op2, dexpr denv e3] in
       let e1, ch = if chainable_op denv op2
-        then get_chain e12 [op2, dexpr denv e3]
-        else e12, [op2, dexpr denv e3] in
+        then get_chain e12 ch else e12, ch in
       make_chain "q1 " "q2 " (dexpr denv e1) ch
   | Ptree.Elet (id, gh, e1, e2) ->
       let e1 = dexpr denv e1 in
@@ -893,7 +901,7 @@ let add_local x lv lenv = match lv with
 
 let binders bl =
   let binder (id, ghost, dity) =
-    create_pvsymbol (Denv.create_user_id id) ~ghost (ity_of_dity dity) in
+    create_pvsymbol (Typing.create_user_id id) ~ghost (ity_of_dity dity) in
   List.map binder bl
 
 let add_binders lenv pvl =
@@ -1194,7 +1202,7 @@ and expr_desc lenv loc de = match de.de_desc with
   | DElet (x, gh, de1, de2) ->
       let e1 = e_ghostify gh (expr lenv de1) in
       let mk_expr e1 =
-        let def1 = create_let_defn (Denv.create_user_id x) e1 in
+        let def1 = create_let_defn (Typing.create_user_id x) e1 in
         let lenv = add_local x.id def1.let_sym lenv in
         let e2 = expr lenv de2 in
         let e2_unit = match e2.e_vty with
@@ -1314,7 +1322,7 @@ and expr_desc lenv loc de = match de.de_desc with
       in
       e_try e1 (List.rev_map mk_branch xsl)
   | DEmark (x, de1) ->
-      let ld = create_let_defn (Denv.create_user_id x) e_now in
+      let ld = create_let_defn (Typing.create_user_id x) e_now in
       let lenv = add_local x.id ld.let_sym lenv in
       e_let ld (expr lenv de1)
   | DEany dtyc ->
@@ -1329,7 +1337,7 @@ and expr_desc lenv loc de = match de.de_desc with
   | DEfor (x,defrom,dir,deto,inv,de1) ->
       let efrom = expr lenv defrom in
       let eto = expr lenv deto in
-      let pv = create_pvsymbol (Denv.create_user_id x) ity_int in
+      let pv = create_pvsymbol (Typing.create_user_id x) ity_int in
       let lenv = add_local x.id (LetV pv) lenv in
       let inv = create_pre lenv inv in
       let e1 = expr lenv de1 in
@@ -1344,7 +1352,7 @@ and expr_rec lenv dfdl =
     if fst de.de_type <> [] then errorm ~loc:de.de_loc
       "The body of a recursive function must be a first-order value";
     let aty = vty_arrow pvl (VTvalue (ity_of_dity (snd de.de_type))) in
-    let ps = create_psymbol (Denv.create_user_id id) ~ghost:gh aty in
+    let ps = create_psymbol (Typing.create_user_id id) ~ghost:gh aty in
     add_local id.id (LetA ps) lenv, (ps, gh, pvl, tr) in
   let lenv, fdl = Lists.map_fold_left step1 lenv dfdl in
   let step2 (ps, gh, pvl, tr) = ps, expr_lam lenv gh pvl tr in
@@ -1388,7 +1396,7 @@ and expr_fun lenv x gh bl (de, dsp as tr) =
         let spec = { lam.l_spec with c_post = post } in
         { lam with l_spec = spec } in
   let lam = lambda_invariant lenv lam in
-  let fd = create_fun_defn (Denv.create_user_id x) lam in
+  let fd = create_fun_defn (Typing.create_user_id x) lam in
   Loc.try4 ~loc:de.de_loc check_lambda_effect lenv fd bl dsp;
   Loc.try2 ~loc:x.id_loc check_user_ps false fd.fun_ps;
   fd
@@ -1464,6 +1472,8 @@ let add_types ~wp uc tdl =
           | _ -> seen in
         let rec check seen = function
           | PPTtyvar _ -> seen
+          | PPTparen ty -> check seen ty
+          | PPTarrow (ty1,ty2) -> check (check seen ty1) ty2
           | PPTtyapp (q,tyl) -> List.fold_left check (ts_seen seen q) tyl
           | PPTtuple tyl -> List.fold_left check seen tyl in
         let seen = match d.td_def with
@@ -1487,6 +1497,8 @@ let add_types ~wp uc tdl =
       in
       let rec check = function
         | PPTtyvar _ -> false
+        | PPTparen ty -> check ty
+        | PPTarrow (ty1,ty2) -> check ty1 || check ty2
         | PPTtyapp (q,tyl) -> ts_imp q || List.exists check tyl
         | PPTtuple tyl -> List.exists check tyl in
       Hstr.replace impures x false;
@@ -1524,6 +1536,8 @@ let add_types ~wp uc tdl =
       in
       let rec check = function
         | PPTtyvar _ -> false
+        | PPTparen ty -> check ty
+        | PPTarrow (ty1,ty2) -> check ty1 || check ty2
         | PPTtyapp (q,tyl) -> ts_mut q || List.exists check tyl
         | PPTtuple tyl -> List.exists check tyl in
       Hstr.replace mutables x false;
@@ -1565,7 +1579,7 @@ let add_types ~wp uc tdl =
         Mstr.add_new e id.id tv acc in
       let vars = List.fold_left add_tv Mstr.empty d.td_params in
       let vl = List.map (fun id -> Mstr.find id.id vars) d.td_params in
-      let id = Denv.create_user_id d.td_ident in
+      let id = Typing.create_user_id d.td_ident in
       let abst = d.td_vis = Abstract in
       let priv = d.td_vis = Private in
       Hstr.add tysymbols x None;
@@ -1586,6 +1600,10 @@ let add_types ~wp uc tdl =
         | PPTtuple tyl ->
             let ts = ts_tuple (List.length tyl) in
             ity_pur ts (List.map parse tyl)
+        | PPTarrow (ty1,ty2) ->
+            ity_pur ts_func [parse ty1; parse ty2]
+        | PPTparen ty ->
+            parse ty
       in
       let ts = match d.td_def with
         | TDalias ty when Hstr.find impures x ->
@@ -1619,16 +1637,16 @@ let add_types ~wp uc tdl =
                     if gh <> fd.fd_ghost then Loc.errorm ~loc
                       "this field must be ghost in every constructor";
                     ignore (Loc.try3 ~loc ity_match sbs fd.fd_ity ity);
-                    (regs, inv), (Some (Denv.create_user_id id), fd)
+                    (regs, inv), (Some (Typing.create_user_id id), fd)
                   with Not_found ->
                     Hstr.replace projs x fd;
                     if not gh then nogh := ity_nonghost_reg !nogh ity;
                     let regs = Sreg.union regs ity.ity_vars.vars_reg in
-                    (regs, inv), (Some (Denv.create_user_id id), fd)
+                    (regs, inv), (Some (Typing.create_user_id id), fd)
             in
             let mk_constr s (_loc,cid,pjl) =
               let s,pjl = Lists.map_fold_left mk_proj s pjl in
-              s, (Denv.create_user_id cid, pjl)
+              s, (Typing.create_user_id cid, pjl)
             in
             let init = (Sreg.empty, d.td_inv <> []) in
             let (regs,inv),def = Lists.map_fold_left mk_constr init csl in
@@ -1641,7 +1659,7 @@ let add_types ~wp uc tdl =
             let mk_field (regs,inv) f =
               let ity = parse f.f_pty in
               let inv = inv || ity_has_inv ity in
-              let fid = Denv.create_user_id f.f_ident in
+              let fid = Typing.create_user_id f.f_ident in
               let regs,mut = if f.f_mutable then
                 let r = create_region fid ity in
                 Sreg.add r regs, Some r
@@ -1657,7 +1675,7 @@ let add_types ~wp uc tdl =
             let ghost_reg = Sreg.diff regs !nogh in
             let rl = Sreg.elements regs in
             let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
-            Hstr.replace predefs x [Denv.create_user_id cid, pjl];
+            Hstr.replace predefs x [Typing.create_user_id cid, pjl];
             PT (create_itysymbol id ~abst ~priv ~inv ~ghost_reg vl rl None)
         | TDalgebraic _ | TDrecord _ when Hstr.find impures x ->
             PT (create_itysymbol id ~abst ~priv ~inv:false vl [] None)
@@ -1696,6 +1714,10 @@ let add_types ~wp uc tdl =
       | PPTtuple tyl ->
           let ts = ts_tuple (List.length tyl) in
           ity_pur ts (List.map parse tyl)
+      | PPTarrow (ty1,ty2) ->
+          ity_pur ts_func [parse ty1; parse ty2]
+      | PPTparen ty ->
+          parse ty
     in
     match d.td_def with
       | TDabstract ->
@@ -1717,20 +1739,20 @@ let add_types ~wp uc tdl =
                   if gh <> fd.fd_ghost then Loc.errorm ~loc
                     "this field must be ghost in every constructor";
                   Loc.try2 ~loc ity_equal_check fd.fd_ity ity;
-                  Some (Denv.create_user_id id), fd
+                  Some (Typing.create_user_id id), fd
                 with Not_found ->
                   Hstr.replace projs x fd;
-                  Some (Denv.create_user_id id), fd
+                  Some (Typing.create_user_id id), fd
           in
           let mk_constr (_loc,cid,pjl) =
-            Denv.create_user_id cid, List.map mk_proj pjl in
+            Typing.create_user_id cid, List.map mk_proj pjl in
           abstr, (ts, List.map mk_constr csl) :: algeb, alias
       | TDrecord fl ->
           let mk_field f =
-            let fid = Denv.create_user_id f.f_ident in
+            let fid = Typing.create_user_id f.f_ident in
             Some fid, mk_field (parse f.f_pty) f.f_ghost None in
           let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
-          let csl = [Denv.create_user_id cid, List.map mk_field fl] in
+          let csl = [Typing.create_user_id cid, List.map mk_field fl] in
           abstr, (ts, csl) :: algeb, alias
   in
   let abstr,algeb,alias = List.fold_right def_visit tdl ([],[],[]) in
@@ -1914,7 +1936,7 @@ let add_pdecl ~wp loc uc = function
             let e = e_ghostify gh (expr (create_lenv uc) e) in
             if not gh && e.e_ghost then
               errorm ~loc "%s must be a ghost variable" id.id;
-            let def = create_let_defn (Denv.create_user_id id) e in
+            let def = create_let_defn (Typing.create_user_id id) e in
             create_let_decl def in
       add_pdecl_with_tuples ~wp uc pd
   | Dletrec fdl ->
@@ -1925,7 +1947,7 @@ let add_pdecl ~wp loc uc = function
       add_pdecl_with_tuples ~wp uc pd
   | Dexn (id, pty) ->
       let ity = ity_of_dity (dity_of_pty (create_denv uc) pty) in
-      let xs = create_xsymbol (Denv.create_user_id id) ity in
+      let xs = create_xsymbol (Typing.create_user_id id) ity in
       let pd = create_exn_decl xs in
       add_pdecl_with_tuples ~wp uc pd
   | Dparam (id, gh, tyv) ->
@@ -1934,9 +1956,9 @@ let add_pdecl ~wp loc uc = function
       let tyv = type_v (create_lenv uc) Spv.empty vars_empty Stv.empty tyv in
       let lv = match tyv with
         | VTvalue v ->
-            LetV (create_pvsymbol (Denv.create_user_id id) ~ghost:gh v)
+            LetV (create_pvsymbol (Typing.create_user_id id) ~ghost:gh v)
         | VTarrow a ->
-            LetA (create_psymbol (Denv.create_user_id id) ~ghost:gh a) in
+            LetA (create_psymbol (Typing.create_user_id id) ~ghost:gh a) in
       let pd = create_val_decl lv in
       add_pdecl_with_tuples ~wp uc pd
 
@@ -1945,7 +1967,9 @@ let add_pdecl ~wp loc uc d =
   Loc.try3 ~loc (add_pdecl ~wp) loc uc d
 
 let use_clone_pure lib mth uc loc (use,inst) =
-  let path, s = Typing.split_qualid use.use_theory in
+  let path, s = match use.use_theory with
+    | Qdot (p,id) -> Typing.string_list_of_qualid p, id.id
+    | Qident id -> [], id.id in
   let th = find_theory loc lib mth path s in
   (* open namespace, if any *)
   let uc = match use.use_import with
@@ -1967,7 +1991,9 @@ let use_clone_pure lib mth uc loc use =
   Loc.try5 ~loc use_clone_pure lib mth uc loc use
 
 let use_clone lib mmd mth uc loc (use,inst) =
-  let path, s = Typing.split_qualid use.use_theory in
+  let path, s = match use.use_theory with
+    | Qdot (p,id) -> Typing.string_list_of_qualid p, id.id
+    | Qident id -> [], id.id in
   let mth = find_module loc lib mmd mth path s in
   (* open namespace, if any *)
   let uc = match use.use_import with
@@ -2020,9 +2046,9 @@ let open_file, close_file =
     let wp = path = [] && Debug.test_noflag Typing.debug_type_only in
     Stack.push (Mstr.empty,Mstr.empty) lenv;
     let open_theory id = Stack.push false inm;
-      Stack.push (Theory.create_theory ~path (Denv.create_user_id id)) tuc in
+      Stack.push (Theory.create_theory ~path (Typing.create_user_id id)) tuc in
     let open_module id = Stack.push true inm;
-      Stack.push (create_module env ~path (Denv.create_user_id id)) muc in
+      Stack.push (create_module env ~path (Typing.create_user_id id)) muc in
     let close_theory () = ignore (Stack.pop inm);
       Stack.push (close_theory (Stack.pop lenv) (Stack.pop tuc)) lenv in
     let close_module () = ignore (Stack.pop inm);

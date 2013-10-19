@@ -24,7 +24,7 @@ type label =
   | Lpos of Loc.position
 
 type pp_quant =
-  | PPforall | PPexists | PPlambda | PPfunc | PPpred
+  | PPforall | PPexists | PPlambda
 
 type pp_binop =
   | PPand | PPor | PPimplies | PPiff
@@ -44,6 +44,8 @@ type pty =
   | PPTtyvar of ident * opacity
   | PPTtyapp of qualid * pty list
   | PPTtuple of pty list
+  | PPTarrow of pty * pty
+  | PPTparen of pty
 
 type ghost = bool
 type top_ghost = Gnone | Gghost | Glemma
@@ -70,6 +72,7 @@ type lexpr =
 and pp_desc =
   | PPvar of qualid
   | PPapp of qualid * lexpr list
+  | PPhoapp of lexpr * lexpr
   | PPtrue
   | PPfalse
   | PPconst of constant
@@ -81,7 +84,6 @@ and pp_desc =
   | PPquant of pp_quant * quvar list * lexpr list list * lexpr
   | PPnamed of label * lexpr
   | PPlet of ident * lexpr * lexpr
-  | PPeps of quvar * lexpr
   | PPmatch of lexpr * (pattern * lexpr) list
   | PPcast of lexpr * pty
   | PPtuple of lexpr list

@@ -115,7 +115,7 @@ val ts_func : tysymbol
 val ts_pred : tysymbol
 
 val ty_func : ty -> ty -> ty
-val ty_pred : ty -> ty
+val ty_pred : ty -> ty (* ty_pred 'a == ty_func 'a bool *)
 
 val ts_tuple : int -> tysymbol
 val ty_tuple : ty list -> ty
