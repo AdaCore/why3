@@ -1363,6 +1363,7 @@ let t_replace_alpha t1 t2 t =
 
 let keep_on_simp_label = create_label "keep_on_simp"
 let can_simp t = not (Slab.mem keep_on_simp_label t.t_label)
+let can_simp_left t = can_simp t && not (Slab.mem asym_label t.t_label)
 
 let t_not_simp f = match f.t_node with
   | Ttrue  -> t_label_copy f t_false
@@ -1372,19 +1373,19 @@ let t_not_simp f = match f.t_node with
 
 let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f2 -> f1
-  | Tfalse, _ when can_simp f2 -> f1
-  | _, Tfalse when can_simp f1 -> f2
+  | _, Ttrue  when can_simp f2 -> t_label_remove asym_label f1
+  | Tfalse, _ when can_simp f2 -> t_label_remove asym_label f1
+  | _, Tfalse when can_simp_left f1 -> f2
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_and f1 f2
 
 let t_and_simp_l l = List.fold_left t_and_simp t_true l
 
 let t_or_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f2 -> f1
-  | _, Ttrue  when can_simp f1 -> f2
+  | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
+  | _, Ttrue  when can_simp_left f1 -> f2
   | Tfalse, _ when can_simp f1 -> f2
-  | _, Tfalse when can_simp f2 -> f1
+  | _, Tfalse when can_simp f2 -> t_label_remove asym_label f1
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_or f1 f2
 
@@ -1392,19 +1393,19 @@ let t_or_simp_l l = List.fold_left t_or_simp t_false l
 
 let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f2 -> f1
-  | Tfalse, _ when can_simp f2 -> f1
-  | _, Tfalse when can_simp f1 -> f2
+  | _, Ttrue  when can_simp f2 -> t_label_remove asym_label f1
+  | Tfalse, _ when can_simp f2 -> t_label_remove asym_label f1
+(*| _, Tfalse when can_simp f1 -> f2*)
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_and_asym f1 f2
 
 let t_and_asym_simp_l l = List.fold_left t_and_asym_simp t_true l
 
 let t_or_asym_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f2 -> f1
-  | _, Ttrue  when can_simp f1 -> f2
+  | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
+(*| _, Ttrue  when can_simp f1 -> f2*)
   | Tfalse, _ when can_simp f1 -> f2
-  | _, Tfalse when can_simp f2 -> f1
+  | _, Tfalse when can_simp f2 -> t_label_remove asym_label f1
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_or_asym f1 f2
 
