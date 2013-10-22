@@ -554,7 +554,7 @@ and tr_global_ts dep env r =
                       | _ -> raise NotFO (* GADT *)
                     in
                     List.fold_right2 add v ts.Ty.ts_args Idmap.empty
-                | Ind _ ->
+                | Ind _ | Prod _ ->
                     Idmap.empty
                 | _ ->
                     assert false (* ensured by Coq typing *)
