@@ -57,6 +57,7 @@ type prover_autodetection_data =
       prover_id : string;
       prover_name : string;
       prover_altern : string;
+      compile_time_support : bool;
       execs : string list;
       version_switch : string;
       version_regexp : string;
@@ -74,7 +75,8 @@ type prover_autodetection_data =
 let prover_keys =
   let add acc k = Sstr.add k acc in
   List.fold_left add Sstr.empty
-    ["name";"exec";"version_switch";"version_regexp";
+    ["name";"compile_time_support";
+     "exec";"version_switch";"version_regexp";
      "version_ok";"version_old";"version_bad";"command";
      "editor";"driver";"in_place";"message";"alternative";]
 
@@ -85,6 +87,8 @@ let load_prover kind (id,section) =
     prover_id = id;
     prover_name = get_string section "name";
     prover_altern = get_string section ~default:"" "alternative";
+    compile_time_support = 
+      get_bool section ~default:false "compile_time_support";
     execs = get_stringl section "exec";
     version_switch = get_string section ~default:"" "version_switch";
     version_regexp = get_string section ~default:"" "version_regexp";
@@ -329,7 +333,31 @@ let detect_exec env main data acc exec_name =
   let bad = List.exists (check_version ver) data.versions_bad in
   if bad then (known_version env exec_name; acc)
   else
-
+    (* check if this prover needs compile-time support *)
+    let missing_compile_time_support =
+      if data.compile_time_support then
+        try 
+          let compile_time_ver =
+            List.assoc data.prover_name Config.compile_time_support 
+          in 
+          if compile_time_ver <> ver then begin
+            eprintf 
+              "Found prover %s version %s, but Why3 was compiled with support for version %s@."
+            data.prover_name ver compile_time_ver;
+            true
+          end
+          else
+            false
+        with Not_found ->
+          eprintf 
+            "Found prover %s version %s, but Why3 wasn't compiled with support for it@."
+            data.prover_name ver;
+          true
+      else false
+    in
+    if missing_compile_time_support then
+      (known_version env exec_name; acc)
+    else
     let good = List.exists (check_version ver) data.versions_ok in
     let old  = List.exists (check_version ver) data.versions_old in
     match data.prover_command with

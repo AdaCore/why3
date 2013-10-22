@@ -444,6 +444,9 @@ fi
 if test "$enable_coq_support" = no; then
    enable_coq_tactic=no
    enable_coq_libs=no
+   COMPILETIMECOQ=
+else
+   COMPILETIMECOQ="\\\"Coq\\\", \\\"$COQVERSION\\\"; "
 fi
 
 if test "$enable_coq_tactic" = yes; then
@@ -519,6 +522,9 @@ fi
 
 if test "$enable_pvs_support" = no; then
    enable_pvs_libs=no
+   COMPILETIMEPVS=
+else
+   COMPILETIMEPVS="\\\"PVS\\\", \\\"$PVSVERSION\\\"; "
 fi
 
 if test "$enable_pvs_libs" = yes; then
@@ -641,10 +647,12 @@ AC_SUBST(COQC)
 AC_SUBST(COQDEP)
 AC_SUBST(COQLIB)
 AC_SUBST(COQVERSION)
+AC_SUBST(COMPILETIMECOQ)
 
 AC_SUBST(enable_pvs_libs)
 AC_SUBST(PVS)
 AC_SUBST(PVSVERSION)
+AC_SUBST(COMPILETIMEPVS)
 
 AC_SUBST(enable_hypothesis_selection)
 
