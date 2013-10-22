@@ -34,5 +34,14 @@ theory P3
   goal cos_bound_harder :
     forall x:real. -0.7 <= x <= 0.7 -> 0.7 <= cos x <= 1.0
 
+
+  use import real.Abs
+
+  goal MethodErrorOK: forall x:real. abs x <= 0x1p-5 ->
+    abs (1.0 - 0.5 * (x * x) - cos x) <= 0x1p-24
+
+  goal MethodErrorWrong: forall x:real. abs x <= 0x1p-5 ->
+    abs (1.0 - 0.5 * (x * x) - cos x) <= 0x1p-25
+
 end
 
