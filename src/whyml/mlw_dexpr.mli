@@ -47,7 +47,9 @@ type dpattern_node =
 
 type ghost = bool
 
-type dbinder = preid * ghost * dity
+type opaque = Stv.t
+
+type dbinder = preid * ghost * opaque * dity
 
 type 'a later = vsymbol Mstr.t -> 'a
   (* specification terms are parsed and typechecked after the program
