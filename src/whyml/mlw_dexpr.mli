@@ -27,11 +27,16 @@ val dity_of_ity : ity -> dity
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
+val dity_is_bool : dity -> bool
+
+val dvty_is_chainable : dvty -> bool
+
 (** Patterns *)
 
 type dpattern = private {
   dp_pat  : pre_ppattern;
   dp_dity : dity;
+  dp_vars : dity Mstr.t;
   dp_loc  : Loc.position option;
 }
 
@@ -49,7 +54,7 @@ type ghost = bool
 
 type opaque = Stv.t
 
-type dbinder = preid * ghost * opaque * dity
+type dbinder = preid option * ghost * opaque * dity
 
 type 'a later = vsymbol Mstr.t -> 'a
   (* specification terms are parsed and typechecked after the program
@@ -118,7 +123,7 @@ and dval_decl = preid * ghost * dtype_v
 
 and dlet_defn = preid * ghost * dexpr
 
-and dfun_defn = preid * ghost * dbinder list * dity * dexpr * dspec later
+and dfun_defn = preid * ghost * dbinder list * dexpr * dspec later
 
 (** Environment *)
 
@@ -132,9 +137,18 @@ val denv_add_let : denv -> dlet_defn -> denv
 
 val denv_add_fun : denv -> dfun_defn -> denv
 
-val denv_prepare_rec : denv -> preid -> dbinder list -> dity -> denv
+val denv_prepare_rec : denv -> (preid * dbinder list * dity) list -> denv
+  (* [denv_prepare_rec] adds to the environment the user-supplied
+     types of every function in a (mutually) recursive definition.
+     Every user type variable not frozen in [denv] is generalized,
+     and must not be unified with any outer fresh type variable. *)
 
-val denv_verify_rec  : denv -> preid -> unit
+val denv_verify_rec : denv -> preid -> unit
+  (* after a (mutually) recursive definition has been typechecked,
+     [denv_verify_rec] should be called for every function on the
+     [denv] before [denv_prepare_rec]. This function verifies that
+     the resulting functions are not less polymorphic than expected
+     according the user-supplied type annotations. *)
 
 val denv_add_args : denv -> dbinder list -> denv
 
