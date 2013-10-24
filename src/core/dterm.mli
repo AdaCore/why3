@@ -27,6 +27,7 @@ val dty_of_ty : ty -> dty
 type dpattern = private {
   dp_node : dpattern_node;
   dp_dty  : dty;
+  dp_vars : dty Mstr.t;
   dp_loc  : Loc.position option;
 }
 

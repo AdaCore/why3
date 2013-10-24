@@ -136,6 +136,7 @@ let specialize_ps ls =
 type dpattern = {
   dp_node : dpattern_node;
   dp_dty  : dty;
+  dp_vars : dty Mstr.t;
   dp_loc  : Loc.position option;
 }
 
@@ -204,25 +205,8 @@ let denv_add_quant denv vl =
   Mstr.set_union s denv
 
 let denv_add_pat denv dp =
-  let rec get dp = match dp.dp_node with
-    | DPwild -> Mstr.empty
-    | DPvar id ->
-        let n = preid_name id in
-        Mstr.singleton n (DTvar (n, dp.dp_dty))
-    | DPapp (_,dpl) ->
-        let join n _ _ = raise (DuplicateVar n) in
-        let add acc dp = Mstr.union join acc (get dp) in
-        List.fold_left add Mstr.empty dpl
-    | DPor (dp1,dp2) ->
-        let join _ dtn1 dtn2 = match dtn1, dtn2 with
-          | DTvar (_,dty1), DTvar (_,dty2) -> dty_unify dty1 dty2; Some dtn1
-          | _ -> assert false in
-        Mstr.union join (get dp1) (get dp2)
-    | DPas (dp,id) ->
-        let n = preid_name id in
-        Mstr.add_new (DuplicateVar n) n (DTvar (n, dp.dp_dty)) (get dp)
-  in
-  Mstr.set_union (get dp) denv
+  let s = Mstr.mapi (fun n dty -> DTvar (n, dty)) dp.dp_vars in
+  Mstr.set_union s denv
 
 (** Unification tools *)
 
@@ -258,19 +242,29 @@ let dexpr_expected_type dt dty = match dty with
 
 let dpattern ?loc node =
   let get_dty = function
-    | DPwild -> dty_fresh ()
-    | DPvar _ -> dty_fresh ()
+    | DPwild ->
+        dty_fresh (), Mstr.empty
+    | DPvar id ->
+        let dty = dty_fresh () in
+        dty, Mstr.singleton (preid_name id) dty
     | DPapp (ls,dpl) ->
         let dtyl, dty = specialize_cs ls in
         dty_unify_app ls dpat_expected_type dpl dtyl;
-        dty
+        let join n _ _ = raise (DuplicateVar n) in
+        let add acc dp = Mstr.union join acc dp.dp_vars in
+        dty, List.fold_left add Mstr.empty dpl
     | DPor (dp1,dp2) ->
         dpat_expected_type dp2 dp1.dp_dty;
-        dp1.dp_dty
-    | DPas (dp,_) ->
-        dp.dp_dty in
-  let dty = Loc.try1 ?loc get_dty node in
-  { dp_node = node; dp_dty = dty; dp_loc = loc }
+        let join n dty1 dty2 = try dty_unify dty1 dty2; Some dty1
+          with Exit -> Loc.errorm ?loc
+            "Variable %s has type %a,@ but is expected to have type %a"
+            n print_dty dty1 print_dty dty2 in
+        dp1.dp_dty, Mstr.union join dp1.dp_vars dp2.dp_vars
+    | DPas (dp,id) ->
+        let n = preid_name id in
+        dp.dp_dty, Mstr.add_new (DuplicateVar n) n dp.dp_dty dp.dp_vars in
+  let dty, vars = Loc.try1 ?loc get_dty node in
+  { dp_node = node; dp_dty = dty; dp_vars = vars; dp_loc = loc }
 
 let dterm ?loc node =
   let get_dty = function
