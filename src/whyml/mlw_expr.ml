@@ -139,15 +139,14 @@ let make_ppattern pp ?(ghost=false) ity =
   let hv = Hstr.create 3 in
   let gghost = ref false in
   let find id ghost ity =
-    let nm = preid_name id in
     try
-      let pv = Hstr.find hv nm in
+      let pv = Hstr.find hv id.pre_name in
       ity_equal_check ity pv.pv_ity;
       if (pv.pv_ghost <> ghost) then invalid_arg "Mlw_expr.make_ppattern";
       pv
     with Not_found ->
       let pv = create_pvsymbol id ~ghost ity in
-      Hstr.add hv nm pv; pv
+      Hstr.add hv id.pre_name pv; pv
   in
   let make_app ls ppl ghost ity =
     let patl = List.map (fun pp -> pp.ppat_pattern) ppl in

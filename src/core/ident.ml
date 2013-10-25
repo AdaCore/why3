@@ -61,7 +61,11 @@ module Mid = Id.M
 module Hid = Id.H
 module Wid = Id.W
 
-type preid = ident
+type preid = {
+  pre_name  : string;
+  pre_label : Slab.t;
+  pre_loc   : Loc.position option;
+}
 
 let id_equal : ident -> ident -> bool = (==)
 
@@ -69,14 +73,17 @@ let id_hash id = Weakhtbl.tag_hash id.id_tag
 
 (* constructors *)
 
-let id_register = let r = ref 0 in fun id ->
-  { id with id_tag = (incr r; Weakhtbl.create_tag !r) }
+let id_register = let r = ref 0 in fun id -> {
+  id_string = id.pre_name;
+  id_label  = id.pre_label;
+  id_loc    = id.pre_loc;
+  id_tag    = (incr r; Weakhtbl.create_tag !r);
+}
 
 let create_ident name labels loc = {
-  id_string = name;
-  id_label  = labels;
-  id_loc    = loc;
-  id_tag    = Weakhtbl.dummy_tag;
+  pre_name  = name;
+  pre_label = labels;
+  pre_loc   = loc;
 }
 
 let id_fresh ?(label = Slab.empty) ?loc nm =
@@ -93,7 +100,7 @@ let id_derive ?(label = Slab.empty) nm id =
   let ll = Slab.union label id.id_label in
   create_ident nm ll id.id_loc
 
-let preid_name id = id.id_string
+let preid_name id = id.pre_name
 
 (** Unique names for pretty printing *)
 

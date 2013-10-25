@@ -190,16 +190,14 @@ let dty_of_dterm dt = match dt.dt_dty with
 
 let denv_empty = Mstr.empty
 
-let denv_add_var denv id dty =
-  let n = preid_name id in
+let denv_add_var denv {pre_name = n} dty =
   Mstr.add n (DTvar (n, dty)) denv
 
-let denv_add_let denv dt id =
-  let n = preid_name id in
+let denv_add_let denv dt {pre_name = n} =
   Mstr.add n (DTvar (n, dty_of_dterm dt)) denv
 
 let denv_add_quant denv vl =
-  let add acc (id,dty) = let n = preid_name id in
+  let add acc ({pre_name = n}, dty) =
     Mstr.add_new (DuplicateVar n) n (DTvar (n, dty)) acc in
   let s = List.fold_left add Mstr.empty vl in
   Mstr.set_union s denv
@@ -244,9 +242,9 @@ let dpattern ?loc node =
   let get_dty = function
     | DPwild ->
         dty_fresh (), Mstr.empty
-    | DPvar id ->
+    | DPvar {pre_name = n} ->
         let dty = dty_fresh () in
-        dty, Mstr.singleton (preid_name id) dty
+        dty, Mstr.singleton n dty
     | DPapp (ls,dpl) ->
         let dtyl, dty = specialize_cs ls in
         dty_unify_app ls dpat_expected_type dpl dtyl;
@@ -260,8 +258,7 @@ let dpattern ?loc node =
             "Variable %s has type %a,@ but is expected to have type %a"
             n print_dty dty1 print_dty dty2 in
         dp1.dp_dty, Mstr.union join dp1.dp_vars dp2.dp_vars
-    | DPas (dp,id) ->
-        let n = preid_name id in
+    | DPas (dp, {pre_name = n}) ->
         dp.dp_dty, Mstr.add_new (DuplicateVar n) n dp.dp_dty dp.dp_vars in
   let dty, vars = Loc.try1 ?loc get_dty node in
   { dp_node = node; dp_dty = dty; dp_vars = vars; dp_loc = loc }
@@ -330,8 +327,7 @@ let dterm ?loc node =
 
 let pattern ~strict env dp =
   let acc = ref Mstr.empty in
-  let find_var id ty =
-    let n = preid_name id in
+  let find_var ({pre_name = n} as id) ty =
     try Mstr.find n !acc with Not_found ->
       let vs = create_vsymbol id ty in
       acc := Mstr.add n vs !acc; vs in
@@ -353,8 +349,7 @@ let pattern ~strict env dp =
   Mstr.set_union !acc env, pat
 
 let quant_vars ~strict env vl =
-  let add acc (id,dty) =
-    let n = preid_name id in
+  let add acc ({pre_name = n} as id, dty) =
     let ty = ty_of_dty ~strict dty in
     let vs = create_vsymbol id ty in
     Mstr.add_new (DuplicateVar n) n vs acc, vs in
@@ -419,7 +414,7 @@ let term ~strict ~keep_loc env prop dt =
         let prop = prop || dty = None in
         let t = get uloc env false dt in
         let v = create_vsymbol id (t_type t) in
-        let env = Mstr.add (preid_name id) v env in
+        let env = Mstr.add id.pre_name v env in
         let f = get uloc env prop df in
         check_used_var f.t_vars v;
         t_let_close v t f
@@ -437,7 +432,7 @@ let term ~strict ~keep_loc env prop dt =
         t_case (get uloc env false dt) (List.map branch bl)
     | DTeps (id,dty,df) ->
         let v = create_vsymbol id (ty_of_dty ~strict dty) in
-        let env = Mstr.add (preid_name id) v env in
+        let env = Mstr.add id.pre_name v env in
         let f = get uloc env true df in
         check_used_var f.t_vars v;
         t_eps_close v f

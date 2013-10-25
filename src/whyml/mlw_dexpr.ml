@@ -460,17 +460,17 @@ let free_user_vars frozen (argl,res) =
   List.fold_left add (add Stv.empty res) argl
 
 let denv_add_mono { frozen = frozen; locals = locals } id dvty =
-  let locals = Mstr.add (preid_name id) (None, dvty) locals in
+  let locals = Mstr.add id.pre_name (None, dvty) locals in
   { frozen = freeze_dvty frozen dvty; locals = locals }
 
 let denv_add_poly { frozen = frozen; locals = locals } id dvty =
   let ftvs = free_vars frozen dvty in
-  let locals = Mstr.add (preid_name id) (Some ftvs, dvty) locals in
+  let locals = Mstr.add id.pre_name (Some ftvs, dvty) locals in
   { frozen = frozen; locals = locals }
 
 let denv_add_rec { frozen = frozen; locals = locals } id dvty =
   let ftvs = free_user_vars frozen dvty in
-  let locals = Mstr.add (preid_name id) (Some ftvs, dvty) locals in
+  let locals = Mstr.add id.pre_name (Some ftvs, dvty) locals in
   { frozen = freeze_dtvs frozen dvty; locals = locals }
 
 let denv_add_val denv (id,_,dtv) =
@@ -488,7 +488,7 @@ let denv_add_fun denv (id,_,bl,{de_dvty = (argl,res)},_) =
   denv_add_poly denv id (argl, res)
 
 let denv_prepare_rec denv l =
-  let add s (id,_,_) = let n = preid_name id in
+  let add s ({pre_name = n},_,_) =
     Sstr.add_new (Dterm.DuplicateVar n) n s in
   let _ = try List.fold_left add Sstr.empty l with
     | Dterm.DuplicateVar n -> (* TODO: loc *)
@@ -502,7 +502,7 @@ let denv_verify_rec { frozen = frozen; locals = locals } id =
   let check tv = if is_frozen frozen tv then Loc.errorm (* TODO: loc *)
     "This function is expected to be polymorphic in type variable %a"
     Pretty.print_tv tv in
-  match Mstr.find_opt (preid_name id) locals with
+  match Mstr.find_opt id.pre_name locals with
     | Some (Some tvs, _) -> Stv.iter check tvs
     | Some (None, _) -> assert false
     | None -> assert false
@@ -510,7 +510,7 @@ let denv_verify_rec { frozen = frozen; locals = locals } id =
 let denv_add_args { frozen = frozen; locals = locals } bl =
   let l = List.fold_left (fun l (_,_,_,t) -> t::l) frozen bl in
   let add s (id,_,_,t) = match id with
-    | Some id -> let n = preid_name id in
+    | Some {pre_name = n} ->
         Mstr.add_new (Dterm.DuplicateVar n) n (None, ([],t)) s
     | None -> s in
   let s = List.fold_left add Mstr.empty bl in

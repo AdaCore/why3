@@ -1769,9 +1769,9 @@ let add_types ~wp uc tdl =
       fty, match pj with
         | None -> None
         | Some id ->
-            try Hstr.find pjt (preid_name id) with Not_found ->
+            try Hstr.find pjt id.pre_name with Not_found ->
             let pj = Some (create_fsymbol ~opaque id [ty] fty) in
-            Hstr.replace pjt (preid_name id) pj;
+            Hstr.replace pjt id.pre_name pj;
             pj
     in
     let mk_constr (id,pjl) =

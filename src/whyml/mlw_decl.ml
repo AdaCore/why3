@@ -106,7 +106,7 @@ let create_data_decl tdl =
       (* build the projections, if any *)
       let build_proj fd id =
         try
-          let pj = Hstr.find projections (preid_name id) in
+          let pj = Hstr.find projections id.pre_name in
           ity_equal_check pj.pl_value.fd_ity fd.fd_ity;
           begin match pj.pl_value.fd_mut, fd.fd_mut with
             | None, None -> ()
@@ -119,7 +119,7 @@ let create_data_decl tdl =
         with Not_found ->
           let pj = create_plsymbol ~hidden id [res] fd in
           news := news_id !news pj.pl_ls.ls_name;
-          Hstr.add projections (preid_name id) pj;
+          Hstr.add projections id.pre_name pj;
           pj
       in
       cs, List.map (fun (id,fd) -> Opt.map (build_proj fd) id) al
