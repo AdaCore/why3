@@ -1308,10 +1308,8 @@ and expr_desc lenv loc de = match de.de_desc with
         | bl ->
             let pv = create_pvsymbol (id_fresh "res") xs.xs_ity in
             let pl = List.rev_map (fun (p,_) -> [p.ppat_pattern],t_void) bl in
-            let lkn = Theory.get_known (get_theory lenv.mod_uc) in
-            let find ts = List.map fst (Decl.find_constructors lkn ts) in
             let bl = try
-              ignore (Pattern.CompileTerm.compile find [t_var pv.pv_vs] pl);
+              ignore (Pattern.CompileTerm.compile_bare [t_var pv.pv_vs] pl);
               bl
             with Pattern.NonExhaustive _ ->
               let ity = ity_of_dity (snd de.de_type) in

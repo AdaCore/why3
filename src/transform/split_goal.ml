@@ -86,8 +86,7 @@ let split_case_2 kn forig spl pos acc t bl =
     split_case_2 kn forig spl pos acc t bl
   else
     let mk_b b = let p,f = t_open_branch b in [p], f in
-    let find ts = List.map fst (find_constructors kn ts) in
-    let f = Compile.compile find [t] (List.map mk_b bl) in
+    let f = Compile.compile_bare [t] (List.map mk_b bl) in
     spl acc f
 
 let asym_split = Term.asym_label

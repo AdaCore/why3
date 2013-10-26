@@ -49,10 +49,9 @@ let apply_projection kn ls t = match t.t_node with
       List.fold_left2 find t_true tl pjl
   | _ -> assert false
 
-let flat_case kn t bl =
+let flat_case t bl =
   let mk_b b = let p,t = t_open_branch b in [p],t in
-  let find_constructors kn ts = List.map fst (find_constructors kn ts) in
-  Pattern.CompileTerm.compile (find_constructors kn) [t] (List.map mk_b bl)
+  Pattern.CompileTerm.compile_bare [t] (List.map mk_b bl)
 
 let rec add_quant kn (vl,tl,f) v =
   let ty = v.vs_ty in
@@ -129,7 +128,7 @@ let eval_match ~inline kn t =
         let_map eval env t1 tb2
     | Tcase (t1, bl1) ->
         let t1 = eval env t1 in
-        let fn env t2 = eval env (Loc.try3 ?loc:t.t_loc flat_case kn t2 bl1) in
+        let fn env t2 = eval env (Loc.try2 ?loc:t.t_loc flat_case t2 bl1) in
         begin try dive_to_constructor kn fn env t1
         with Exit -> branch_map eval env t1 bl1 end
     | Tquant (q, qf) ->

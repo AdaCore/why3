@@ -52,22 +52,15 @@ let is_infinite_ty inf_ts ma_map =
 
 (** Compile match patterns *)
 
-let rec rewriteT kn t = match t.t_node with
+let rec rewriteT t = match t.t_node with
   | Tcase (t,bl) ->
-      let t = rewriteT kn t in
-      let mk_b (p,t) = ([p], rewriteT kn t) in
+      let t = rewriteT t in
+      let mk_b (p,t) = ([p], rewriteT t) in
       let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
-      let find_constructors kn ts = List.map fst (find_constructors kn ts) in
-      Pattern.CompileTerm.compile (find_constructors kn) [t] bl
-  | _ -> t_map (rewriteT kn) t
+      Pattern.CompileTerm.compile_bare [t] bl
+  | _ -> t_map rewriteT t
 
-let comp t task =
-  let fn = rewriteT t.task_known in
-  match t.task_decl.td_node with
-  | Decl d -> add_decl task (decl_map fn d)
-  | _ -> add_tdecl task t.task_decl
-
-let compile_match = Trans.fold comp None
+let compile_match = Trans.decl (fun d -> [decl_map rewriteT d]) None
 
 (** Eliminate algebraic types and match statements *)
 

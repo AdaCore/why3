@@ -28,9 +28,16 @@ exception NonExhaustive of pattern list
 module Compile (X : Action) : sig
   val compile : (tysymbol -> lsymbol list) ->
     term list -> (pattern list * X.action) list -> X.action
+
+  val compile_bare :
+    term list -> (pattern list * X.action) list -> X.action
+  (** [compile_bare] does not compute non-covered patterns *)
 end
 
 module CompileTerm : sig
   val compile : (tysymbol -> lsymbol list) ->
+    term list -> (pattern list * term) list -> term
+
+  val compile_bare :
     term list -> (pattern list * term) list -> term
 end

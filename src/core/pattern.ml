@@ -24,10 +24,13 @@ end
 exception ConstructorExpected of lsymbol * ty
 exception NonExhaustive of pattern list
 
-module Compile (X : Action) = struct
-  open X
+exception Bare
 
-  let rec compile constructors tl rl = match tl,rl with
+module Compile (X : Action) = struct
+open X
+
+let compile constructors tl rl =
+  let rec compile tl rl = match tl,rl with
     | _, [] -> (* no actions *)
         let pl = List.map (fun t -> pat_wild (t_type t)) tl in
         raise (NonExhaustive pl)
@@ -36,12 +39,15 @@ module Compile (X : Action) = struct
     | t :: tl, _ -> (* process the leftmost column *)
         let ty = t_type t in
         (* extract the set of constructors *)
-        let css = match ty.ty_node with
+        let bare,css = match ty.ty_node with
           | Tyapp (ts,_) ->
-              let csl = constructors ts in
-              List.fold_left (fun s cs -> Sls.add cs s) Sls.empty csl
-          | Tyvar _ ->
-              Sls.empty
+              begin try false, Sls.of_list (constructors ts)
+              with Bare -> true, Sls.empty end
+          | Tyvar _ -> false, Sls.empty
+        in
+        (* if bare, only check fs.ls_constr *)
+        let is_constr fs =
+          fs.ls_constr > 0 && (bare || Sls.mem fs css)
         in
         (* map every constructor occurring at the head
          * of the pattern list to the list of its args *)
@@ -50,7 +56,7 @@ module Compile (X : Action) = struct
             | Pwild | Pvar _ -> acc
             | Pas (p,_) -> populate acc p
             | Por (p,q) -> populate (populate acc p) q
-            | Papp (fs,pl) when Sls.mem fs css -> Mls.add fs pl acc
+            | Papp (fs,pl) when is_constr fs -> Mls.add fs pl acc
             | Papp (fs,_) -> raise (ConstructorExpected (fs,ty))
           in
           let populate acc (pl,_) = populate acc (List.hd pl) in
@@ -88,7 +94,7 @@ module Compile (X : Action) = struct
         in
         (* how to proceed if [t] is [Tapp(cs,al)] and [cs] is in [cases] *)
         let comp_cases cs al =
-          try compile constructors (List.rev_append al tl) (Mls.find cs cases)
+          try compile (List.rev_append al tl) (Mls.find cs cases)
           with NonExhaustive pl ->
             let rec cont acc vl pl = match vl,pl with
               | (_::vl), (p::pl) -> cont (p::acc) vl pl
@@ -99,7 +105,7 @@ module Compile (X : Action) = struct
         in
         (* how to proceed if [t] is not covered by [cases] *)
         let comp_wilds () =
-          try compile constructors tl wilds
+          try compile tl wilds
           with NonExhaustive pl ->
             let find_cs cs =
               if Mls.mem cs types then () else
@@ -115,11 +121,17 @@ module Compile (X : Action) = struct
         match t.t_node with
         | _ when Mls.is_empty types ->
             comp_wilds ()
-        | Tapp (cs,al) when Sls.mem cs css ->
+        | Tapp (cs,al) when is_constr cs ->
             if Mls.mem cs types then comp_cases cs al else comp_wilds ()
         | _ ->
-            let base =
-              if Mls.set_submap css types then []
+            let no_wilds =
+              if bare then
+                let cs,_ = Mls.choose types in
+                Mls.cardinal types = cs.ls_constr
+              else
+                Mls.set_submap css types
+            in
+            let base = if no_wilds then []
               else [mk_branch (pat_wild ty) (comp_wilds ())]
             in
             let add cs ql acc =
@@ -130,6 +142,12 @@ module Compile (X : Action) = struct
               mk_branch (pat_app cs pl ty) (comp_cases cs al) :: acc
             in
             mk_case t (Mls.fold add types base)
+  in
+  compile tl rl
+
+let compile_bare tl rl =
+  try compile (fun _ -> raise Bare) tl rl
+  with NonExhaustive _ -> raise (NonExhaustive [])
 
 end
 
