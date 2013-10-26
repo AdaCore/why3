@@ -472,9 +472,11 @@ let denv_add_rec { frozen = frozen; locals = locals } id dvty =
 
 let dvty_of_dtype_v dtv =
   let rec dvty argl = function
+    | DSpecA (bl,(DSpecV res,_)) ->
+        List.rev_append argl (List.map (fun (_,_,_,t) -> t) bl), res
     | DSpecA (bl,(dtv,_)) ->
         dvty (List.fold_left (fun l (_,_,_,t) -> t::l) argl bl) dtv
-    | DSpecV res -> (List.rev argl, res) in
+    | DSpecV res -> List.rev argl, res in
   dvty [] dtv
 
 let denv_add_val denv (id,_,dtv) =
@@ -650,10 +652,10 @@ let dexpr ?loc node =
           dexpr_expected_type de res in
         List.iter branch bl;
         [], res
-    | DEassign (pl,de1,de) ->
+    | DEassign (pl,de1,de2) ->
         let argl, res = specialize_pl pl in
         dity_unify_app pl.pl_ls dexpr_expected_type [de1] argl;
-        dexpr_expected_type_weak de res;
+        dexpr_expected_type_weak de2 res;
         [], dity_unit
     | DElazy (_,de1,de2) ->
         dexpr_expected_type de1 dity_bool;
@@ -704,9 +706,235 @@ let dexpr ?loc node =
   let dvty = Loc.try1 ?loc get_dvty node in
   { de_node = node; de_dvty = dvty; de_loc = loc }
 
+(** Specifications *)
+
+let check_at f0 =
+  let rec check f = match f.t_node with
+    | Term.Tapp (ls, _) when ls_equal ls Mlw_wp.fs_at ->
+        let d = Mvs.set_diff f.t_vars f0.t_vars in
+        Mvs.is_empty d || Loc.errorm ?loc:f.t_loc
+          "locally bound variable %a under `at'"
+          Pretty.print_vs (fst (Mvs.choose d))
+    | _ ->
+        t_all check f
+  in
+  ignore (check f0)
+
+let get_variant vsm (vl : variant list later) =
+  let vl = vl vsm in
+  List.iter (fun (t,_) -> check_at t) vl;
+  vl
+
+let get_assert vsm (f : term later) =
+  let f = f vsm in
+  check_at f;
+  f
+
 (** Final stage *)
 
-let expr     ~strict ~keep_loc _ = ignore(strict); ignore(keep_loc); assert false (* strict:bool -> keep_loc:bool -> dexpr -> expr *)
+type local_env = {
+  psm : psymbol Mstr.t;
+  pvm : pvsymbol Mstr.t;
+  vsm : vsymbol Mstr.t;
+}
+
+let env_empty = {
+  psm = Mstr.empty;
+  pvm = Mstr.empty;
+  vsm = Mstr.empty;
+}
+
+let add_let_sym {psm = psm; pvm = pvm; vsm = vsm} {pre_name = n} = function
+  | LetV pv ->
+      { psm = psm; pvm = Mstr.add n pv pvm; vsm = Mstr.add n pv.pv_vs vsm }
+  | LetA ps ->
+      { psm = Mstr.add n ps psm; pvm = pvm; vsm = vsm }
+
+let add_pv_map {psm = psm; pvm = pvm; vsm = vsm} vm =
+  let um = Mstr.map (fun pv -> pv.pv_vs) vm in
+  { psm = psm; pvm = Mstr.set_union vm pvm; vsm = Mstr.set_union um vsm }
+
+let e_ghostify gh e =
+  if gh && not e.e_ghost then e_ghost e else e
+
+let expr ~strict ~keep_loc de =
+  reunify_regions (); (* no more unifications *)
+
+  let ity_of_dity dity = ity_of_dity ~strict dity in
+
+  let rec strip uloc labs de = match de.de_node with
+    | DEcast (de,_) -> strip uloc labs de
+    | DEuloc (de,loc) -> strip (Some loc) labs de
+    | DElabel (de,s) -> strip uloc (Slab.union labs s) de
+    | _ -> uloc, labs, de in
+
+  let rec get uloc env ({ de_loc = loc } as de) =
+    let uloc, labs, de = strip uloc Slab.empty de in
+    let e = Loc.try4 ?loc try_get uloc env de.de_dvty de.de_node in
+    let loc = if keep_loc then loc else None in
+    let loc = if uloc <> None then uloc else loc in
+    if loc = None && Slab.is_empty labs then e else
+    e_label ?loc labs e
+
+  and try_get uloc env (argl,res) = function
+    | DEvar (n,_) when argl = [] ->
+        e_value (Mstr.find_exn (Dterm.UnboundVar n) n env.pvm)
+    | DEvar (n,_) ->
+        let ps = Mstr.find_exn (Dterm.UnboundVar n) n env.psm in
+        e_arrow ps (List.map ity_of_dity argl) (ity_of_dity res)
+    | DEgpvar pv ->
+        e_value pv
+    | DEgpsym ps ->
+        e_arrow ps (List.map ity_of_dity argl) (ity_of_dity res)
+    | DEplapp (pl,del) ->
+        let get_gh fd de = e_ghostify fd.fd_ghost (get uloc env de) in
+        e_plapp pl (List.map2 get_gh pl.pl_args del) (ity_of_dity res)
+    | DElsapp (ls,del) ->
+        e_lapp ls (List.map (get uloc env) del) (ity_of_dity res)
+    | DEapply (de,del) ->
+        let rec ghostify_args del = function
+          | VTvalue _ -> assert (del = []); []
+          | VTarrow a ->
+              let rec args del al = match del, al with
+                | de::del, {pv_ghost = gh}::al ->
+                    e_ghostify gh (get uloc env de) :: args del al
+                | [], _ -> []
+                | _, [] -> ghostify_args del a.aty_result in
+              args del a.aty_args in
+        let e = get uloc env de in
+        e_app e (ghostify_args del e.e_vty)
+    | DEconst c ->
+        e_const c
+    | DEval ((_id,_gh,_dtv),_de) ->
+        assert false (* TODO *)
+    | DElet ((id,gh,de1),de2) ->
+        let e1 = get uloc env de1 in
+        let mk_expr e1 =
+          let e1 = e_ghostify gh e1 in
+          let ld1 = create_let_defn id e1 in
+          let env = add_let_sym env id ld1.let_sym in
+          let e2 = get uloc env de2 in
+          let e2_unit = match e2.e_vty with
+            | VTvalue ity -> ity_equal ity ity_unit
+            | _ -> false in
+          let e1_no_eff =
+            Sreg.is_empty e1.e_effect.eff_writes &&
+            Sexn.is_empty e1.e_effect.eff_raises &&
+            not e1.e_effect.eff_diverg in
+          let e2 =
+            if e2_unit (* e2 is unit *)
+              && e2.e_ghost (* and e2 is ghost *)
+              && not e1.e_ghost (* and e1 is non-ghost *)
+              && not e1_no_eff (* and e1 has observable effects *)
+            then e_let (create_let_defn (id_fresh "gh") e2) e_void
+            else e2 in
+          e_let ld1 e2 in
+        let rec flatten e1 = match e1.e_node with
+          | Elet (ld,_) (* can't let a non-ghost expr escape *)
+            when gh && not ld.let_expr.e_ghost -> mk_expr e1
+          | Elet (ld,e1) -> e_let ld (flatten e1)
+          | _ -> mk_expr e1 in
+        begin match e1.e_vty with
+          | VTarrow _ when e1.e_ghost && not gh ->
+              Loc.errorm "%s must be a ghost function" id.pre_name
+          | VTarrow _ -> flatten e1
+          | VTvalue _ -> mk_expr e1
+        end
+(*
+    | DEfun (_,de)
+    | DErec (_,de) ->
+        de.de_dvty
+*)
+    | DEif (de1,de2,de3) ->
+        let e1 = get uloc env de1 in
+        let e2 = get uloc env de2 in
+        let e3 = get uloc env de3 in
+        e_if e1 e2 e3
+    | DEmatch (de1,bl) ->
+        let e1 = get uloc env de1 in
+        let ity = ity_of_expr e1 in
+        let ghost = e1.e_ghost in
+        let branch (dp,de) =
+          let vm, pat = make_ppattern dp.dp_pat ~ghost ity in
+          pat, get uloc (add_pv_map env vm) de in
+        e_case e1 (List.map branch bl)
+    | DEassign (pl,de1,de2) ->
+        e_assign pl (get uloc env de1) (get uloc env de2)
+    | DElazy (DEand,de1,de2) ->
+        e_lazy_and (get uloc env de1) (get uloc env de2)
+    | DElazy (DEor,de1,de2) ->
+        e_lazy_or (get uloc env de1) (get uloc env de2)
+    | DEnot de ->
+        e_not (get uloc env de)
+    | DEtrue ->
+        e_true
+    | DEfalse ->
+        e_false
+    | DEraise (xs,de) ->
+        e_raise xs (get uloc env de) (ity_of_dity res)
+    | DEtry (de1,bl) ->
+        let e1 = get uloc env de1 in
+        let add_branch (m,l) (xs,dp,de) =
+          let vm, pat = make_ppattern dp.dp_pat xs.xs_ity in
+          let e = get uloc (add_pv_map env vm) de in
+          try Mexn.add xs ((pat,e) :: Mexn.find xs m) m, l
+          with Not_found -> Mexn.add xs [pat,e] m, (xs::l) in
+        let xsm, xsl = List.fold_left add_branch (Mexn.empty,[]) bl in
+        let mk_branch xs = match Mexn.find xs xsm with
+          | [{ ppat_pattern = { pat_node = Pvar vs }}, e] ->
+              xs, Mlw_ty.restore_pv vs, e
+          | [{ ppat_pattern = { pat_node = Pwild }}, e] ->
+              xs, create_pvsymbol (id_fresh "_") xs.xs_ity, e
+          | [{ ppat_pattern = { pat_node = Papp (fs,[]) }}, e]
+            when ls_equal fs Mlw_expr.fs_void ->
+              xs, create_pvsymbol (id_fresh "_") xs.xs_ity, e
+          | bl ->
+              let pv = create_pvsymbol (id_fresh "res") xs.xs_ity in
+              let bl = try
+                let conv (p,_) = [p.ppat_pattern], t_void in
+                let comp = Pattern.CompileTerm.compile_bare in
+                ignore (comp [t_var pv.pv_vs] (List.rev_map conv bl));
+                bl
+              with Pattern.NonExhaustive _ ->
+                let _, pp = make_ppattern PPwild pv.pv_ity in
+                (pp, e_raise xs (e_value pv) (ity_of_dity res)) :: bl
+              in
+              xs, pv, e_case (e_value pv) (List.rev bl)
+        in
+        e_try e1 (List.rev_map mk_branch xsl)
+(*
+    | DEfor (_,de_from,_,de_to,_,de) ->
+        dexpr_expected_type de_from dity_int;
+        dexpr_expected_type de_to dity_int;
+        dexpr_expected_type de dity_unit;
+        de.de_dvty
+    | DEloop (_,_,de) ->
+        dexpr_expected_type de dity_unit;
+        de.de_dvty
+*)
+    | DEabsurd ->
+        e_absurd (ity_of_dity res)
+    | DEassert (ak,f) ->
+        e_assert ak (get_assert env.vsm f)
+(*
+    | DEabstract (de,_)
+*)
+    | DEmark (id,de) ->
+        let ld = create_let_defn id Mlw_wp.e_now in
+        let env = add_let_sym env id ld.let_sym in
+        e_let ld (get uloc env de)
+    | DEghost de ->
+        (* keep user ghost annotations even if redundant *)
+        e_ghost (get uloc env de)
+(*
+    | DEany (dtv,_) ->
+        dvty_of_dtype_v dtv
+*)
+    | DEcast _ | DEuloc _ | DElabel _ ->
+        assert false (* already stripped *)
+  in
+  get None env_empty de
+
 let val_decl ~strict ~keep_loc _ = ignore(strict); ignore(keep_loc); assert false (* strict:bool -> keep_loc:bool -> dval_decl -> let_sym *)
 let let_defn ~strict ~keep_loc _ = ignore(strict); ignore(keep_loc); assert false (* strict:bool -> keep_loc:bool -> dlet_defn -> let_defn *)
 let fun_defn ~strict ~keep_loc _ = ignore(strict); ignore(keep_loc); assert false (* strict:bool -> keep_loc:bool -> dfun_defn -> fun_defn *)

@@ -234,6 +234,8 @@ val e_const : Number.constant -> expr
 val e_lazy_and : expr -> expr -> expr
 val e_lazy_or : expr -> expr -> expr
 val e_not : expr -> expr
+val e_true : expr
+val e_false : expr
 
 val e_raise : xsymbol -> expr -> ity -> expr
 val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr

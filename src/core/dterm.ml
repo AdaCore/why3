@@ -367,7 +367,7 @@ let check_exists_implies q f = match q, f.t_node with
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
-let term ~strict ~keep_loc env prop dt =
+let term ~strict ~keep_loc prop dt =
   let t_label loc labs t =
     if loc = None && Slab.is_empty labs
     then t else t_label ?loc labs t in
@@ -455,10 +455,10 @@ let term ~strict ~keep_loc env prop dt =
     | DTcast _ | DTuloc _ | DTlabel _ ->
         assert false (* already stripped *)
   in
-  get None env prop dt
+  get None Mstr.empty prop dt
 
-let fmla ~strict ~keep_loc dt = term ~strict ~keep_loc Mstr.empty true dt
-let term ~strict ~keep_loc dt = term ~strict ~keep_loc Mstr.empty false dt
+let fmla ~strict ~keep_loc dt = term ~strict ~keep_loc true dt
+let term ~strict ~keep_loc dt = term ~strict ~keep_loc false dt
 
 (** Exception printer *)
 
