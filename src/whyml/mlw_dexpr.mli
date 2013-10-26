@@ -93,7 +93,7 @@ and dexpr_node =
   | DEplapp of plsymbol * dexpr list
   | DElsapp of lsymbol * dexpr list
   | DEapply of dexpr * dexpr list
-  | DEconstant of Number.constant
+  | DEconst of Number.constant
   | DEval of dval_decl * dexpr
   | DElet of dlet_defn * dexpr
   | DEfun of dfun_defn * dexpr

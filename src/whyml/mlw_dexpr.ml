@@ -77,6 +77,11 @@ let ity_of_dity ~strict dity =
   in
   ity dity
 
+let dity_int  = Dpur (ts_int,  [])
+let dity_real = Dpur (ts_real, [])
+let dity_bool = Dpur (ts_bool, [])
+let dity_unit = Dpur (ts_unit, [])
+
 (** Destructive type unification *)
 
 let rec occur_check tv = function
@@ -85,10 +90,10 @@ let rec occur_check tv = function
   | Dvar { contents = Dtvs tv' } | Dutv tv' ->
       if tv_equal tv tv' then raise Exit
 
-let rec unify d1 d2 = match d1,d2 with
+let rec dity_unify d1 d2 = match d1,d2 with
   | Dvar { contents = Dval d1 }, d2
   | d1, Dvar { contents = Dval d2 } ->
-      unify d1 d2
+      dity_unify d1 d2
   | Dvar { contents = Dtvs tv1 },
     Dvar { contents = Dtvs tv2 } when tv_equal tv1 tv2 ->
       ()
@@ -99,9 +104,9 @@ let rec unify d1 d2 = match d1,d2 with
   | Dutv tv1, Dutv tv2 when tv_equal tv1 tv2 ->
       ()
   | Dapp (s1,dl1,_), Dapp (s2,dl2,_) when its_equal s1 s2 ->
-      List.iter2 unify dl1 dl2
+      List.iter2 dity_unify dl1 dl2
   | Dpur (s1,dl1), Dpur (s2,dl2) when ts_equal s1 s2 ->
-      List.iter2 unify dl1 dl2
+      List.iter2 dity_unify dl1 dl2
   | _ -> raise Exit
 
 (** Reunify regions *)
@@ -139,9 +144,9 @@ let rec dity_refresh = function
   | Dpur (s,dl) -> Dpur (s, List.map dity_refresh dl)
   | Dutv _ as dity -> dity
 
-let unify ?(weak=false) d1 d2 =
-  unify d1 d2;
-  if not weak then Queue.add (d1,d2) unify_queue
+let dity_unify_weak = dity_unify
+
+let dity_unify d1 d2 = dity_unify d1 d2; Queue.add (d1,d2) unify_queue
 
 let rec reunify d1 d2 = match d1,d2 with
   | Dvar { contents = Dval d1 }, d2
@@ -244,7 +249,7 @@ let specialize_scheme tvs (argl,res) =
   and get_tv tv dity = try Htv.find htv tv with Not_found ->
     let v = dity_fresh () in
     (* can't return dity, might differ in regions *)
-    if Stv.mem tv tvs then unify ~weak:true v dity;
+    if Stv.mem tv tvs then dity_unify_weak v dity;
     Htv.add htv tv v;
     v
   and get_reg tv dity = try Htv.find hreg tv with Not_found ->
@@ -255,13 +260,12 @@ let specialize_scheme tvs (argl,res) =
 
 let spec_ity htv hreg vars ity =
   let get_tv tv =
-    assert (not (Stv.mem tv vars.vars_tv));
     try Htv.find htv tv with Not_found ->
     let v = dity_fresh () in
     Htv.add htv tv v;
     v in
   let rec dity ity = match ity.ity_node with
-    | Ityvar tv -> get_tv tv
+    | Ityvar tv -> if Stv.mem tv vars.vars_tv then Dutv tv else get_tv tv
     | Ityapp (s,tl,rl) -> Dapp (s, List.map dity tl, List.map dreg rl)
     | Itypur (s,tl)    -> Dpur (s, List.map dity tl)
   and dreg reg = try Hreg.find hreg reg with Not_found ->
@@ -272,34 +276,27 @@ let spec_ity htv hreg vars ity =
   in
   dity ity
 
-let specialize_ity ity =
-  let htv = Htv.create 3 and hreg = Hreg.create 3 in
-  spec_ity htv hreg ity.ity_vars ity
+let specialize_pv { pv_ity = ity } =
+  spec_ity (Htv.create 3) (Hreg.create 3) ity.ity_vars ity
 
-let specialize_pvsymbol pv = specialize_ity pv.pv_ity
+let specialize_xs { xs_ity = ity } =
+  spec_ity (Htv.create 3) (Hreg.create 3) ity.ity_vars ity
 
-let specialize_xsymbol xs = specialize_ity xs.xs_ity
-
-let specialize_arrow vars aty =
+let specialize_ps { ps_aty = aty; ps_vars = vars } =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
   let conv pv = spec_ity htv hreg vars pv.pv_ity in
-  let rec specialize a =
+  let rec spec_aty a =
     let argl = List.map conv a.aty_args in
     let narg,res = match a.aty_result with
       | VTvalue v -> [], spec_ity htv hreg vars v
-      | VTarrow a -> specialize a
-    in
-    argl @ narg, res
-  in
-  specialize aty
+      | VTarrow a -> spec_aty a in
+    argl @ narg, res in
+  spec_aty aty
 
-let specialize_psymbol ps =
-  specialize_arrow ps.ps_vars ps.ps_aty
-
-let specialize_plsymbol pls =
+let specialize_pl pl =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
   let conv fd = spec_ity htv hreg vars_empty fd.fd_ity in
-  List.map conv pls.pl_args, conv pls.pl_value
+  List.map conv pl.pl_args, conv pl.pl_value
 
 let dity_of_ty htv hreg vars ty =
   let rec pure ty = match ty.ty_node with
@@ -310,14 +307,14 @@ let dity_of_ty htv hreg vars ty =
   if not (pure ty) then raise Exit;
   spec_ity htv hreg vars (ity_of_ty ty)
 
-let specialize_lsymbol ls =
+let specialize_ls ls =
   let htv = Htv.create 3 and hreg = Hreg.create 3 in
   let conv ty = dity_of_ty htv hreg vars_empty ty in
   let ty = Opt.get_def ty_bool ls.ls_value in
   List.map conv ls.ls_args, conv ty
 
-let specialize_lsymbol ls =
-  try specialize_lsymbol ls with Exit ->
+let specialize_ls ls =
+  try specialize_ls ls with Exit ->
     Loc.errorm "Function symbol `%a' can only be used in specification"
       Pretty.print_ls ls
 
@@ -383,7 +380,7 @@ and dexpr_node =
   | DEplapp of plsymbol * dexpr list
   | DElsapp of lsymbol * dexpr list
   | DEapply of dexpr * dexpr list
-  | DEconstant of Number.constant
+  | DEconst of Number.constant
   | DEval of dval_decl * dexpr
   | DElet of dlet_defn * dexpr
   | DEfun of dfun_defn * dexpr
@@ -473,12 +470,15 @@ let denv_add_rec { frozen = frozen; locals = locals } id dvty =
   let locals = Mstr.add id.pre_name (Some ftvs, dvty) locals in
   { frozen = freeze_dtvs frozen dvty; locals = locals }
 
-let denv_add_val denv (id,_,dtv) =
+let dvty_of_dtype_v dtv =
   let rec dvty argl = function
     | DSpecA (bl,(dtv,_)) ->
         dvty (List.fold_left (fun l (_,_,_,t) -> t::l) argl bl) dtv
     | DSpecV res -> (List.rev argl, res) in
-  denv_add_poly denv id (dvty [] dtv)
+  dvty [] dtv
+
+let denv_add_val denv (id,_,dtv) =
+  denv_add_poly denv id (dvty_of_dtype_v dtv)
 
 let denv_add_let denv (id,_,{de_dvty = dvty}) =
   denv_add_mono denv id dvty
@@ -487,19 +487,21 @@ let denv_add_fun denv (id,_,bl,{de_dvty = (argl,res)},_) =
   let argl = List.fold_right (fun (_,_,_,t) l -> t::l) bl argl in
   denv_add_poly denv id (argl, res)
 
+exception DupId of preid
+
 let denv_prepare_rec denv l =
-  let add s ({pre_name = n},_,_) =
-    Sstr.add_new (Dterm.DuplicateVar n) n s in
-  let _ = try List.fold_left add Sstr.empty l with
-    | Dterm.DuplicateVar n -> (* TODO: loc *)
-        Loc.errorm "duplicate function name %s" n in
+  let add s (id,_,_) =
+    Sstr.add_new (DupId id) id.pre_name s in
+  let _ = try List.fold_left add Sstr.empty l
+    with DupId id -> Loc.errorm ?loc:id.pre_loc
+      "duplicate function name %s" id.pre_name in
   let add denv (id,bl,res) =
     let argl = List.map (fun (_,_,_,t) -> t) bl in
     denv_add_rec denv id (argl, res) in
   List.fold_left add denv l
 
 let denv_verify_rec { frozen = frozen; locals = locals } id =
-  let check tv = if is_frozen frozen tv then Loc.errorm (* TODO: loc *)
+  let check tv = if is_frozen frozen tv then Loc.errorm ?loc:id.pre_loc
     "This function is expected to be polymorphic in type variable %a"
     Pretty.print_tv tv in
   match Mstr.find_opt id.pre_name locals with
@@ -531,11 +533,176 @@ let denv_get denv n =
 let denv_get_opt denv n =
   Opt.map (mk_node n) (Mstr.find_opt n denv.locals)
 
+(** Unification tools *)
+
+let dity_unify_app ls fn l1 l2 =
+  try List.iter2 fn l1 l2 with Invalid_argument _ ->
+    raise (BadArity (ls, List.length l2))
+
+let dpat_expected_type {dp_dity = dp_dity; dp_loc = loc} dity =
+  try dity_unify dp_dity dity with Exit -> Loc.errorm ?loc
+    "This pattern has type %a,@ but is expected to have type %a"
+    print_dity dp_dity print_dity dity
+
+let dexpr_expected_type {de_dvty = (al,res); de_loc = loc} dity =
+  if al <> [] then Loc.errorm ?loc "This expression is not a first-order value";
+  try dity_unify res dity with Exit -> Loc.errorm ?loc
+    "This expression has type %a,@ but is expected to have type %a"
+    print_dity res print_dity dity
+
+let dexpr_expected_type_weak {de_dvty = (al,res); de_loc = loc} dity =
+  if al <> [] then Loc.errorm ?loc "This expression is not a first-order value";
+  try dity_unify_weak res dity with Exit -> Loc.errorm ?loc
+    "This expression has type %a,@ but is expected to have type %a"
+    print_dity res print_dity dity
+
 (** Constructors *)
 
-let dpattern ?loc _ = ignore(loc); assert false (* ?loc:Loc.position -> dpattern_node -> dpattern *)
+let dpattern ?loc node =
+  let mk_dpat pre dity vars =
+    { dp_pat = pre; dp_dity = dity; dp_vars = vars; dp_loc = loc } in
+  let dpat = function
+    | DPwild ->
+        mk_dpat PPwild (dity_fresh ()) Mstr.empty
+    | DPvar id ->
+        let dity = dity_fresh () in
+        mk_dpat (PPvar id) dity (Mstr.singleton id.pre_name dity)
+    | DPlapp (ls,dpl) ->
+        if ls.ls_constr = 0 then raise (ConstructorExpected ls);
+        let argl, res = specialize_ls ls in
+        dity_unify_app ls dpat_expected_type dpl argl;
+        let join n _ _ = raise (Dterm.DuplicateVar n) in
+        let add acc dp = Mstr.union join acc dp.dp_vars in
+        let vars = List.fold_left add Mstr.empty dpl in
+        let ppl = List.map (fun dp -> dp.dp_pat) dpl in
+        mk_dpat (PPlapp (ls, ppl)) res vars
+    | DPpapp ({pl_ls = ls} as pl, dpl) ->
+        if ls.ls_constr = 0 then raise (ConstructorExpected ls);
+        let argl, res = specialize_pl pl in
+        dity_unify_app ls dpat_expected_type dpl argl;
+        let join n _ _ = raise (Dterm.DuplicateVar n) in
+        let add acc dp = Mstr.union join acc dp.dp_vars in
+        let vars = List.fold_left add Mstr.empty dpl in
+        let ppl = List.map (fun dp -> dp.dp_pat) dpl in
+        mk_dpat (PPpapp (pl, ppl)) res vars
+    | DPor (dp1,dp2) ->
+        dpat_expected_type dp2 dp1.dp_dity;
+        let join n dity1 dity2 = try dity_unify dity1 dity2; Some dity1
+          with Exit -> Loc.errorm ?loc
+            "Variable %s has type %a,@ but is expected to have type %a"
+            n print_dity dity1 print_dity dity2 in
+        let vars = Mstr.union join dp1.dp_vars dp2.dp_vars in
+        mk_dpat (PPor (dp1.dp_pat, dp2.dp_pat)) dp1.dp_dity vars
+    | DPas (dp, ({pre_name = n} as id)) ->
+        let { dp_pat = pat; dp_dity = dity; dp_vars = vars } = dp in
+        let vars = Mstr.add_new (Dterm.DuplicateVar n) n dity vars in
+        mk_dpat (PPas (pat, id)) dity vars
+  in
+  Loc.try1 ?loc dpat node
 
-let dexpr ?loc _ = ignore (loc); assert false (* ?loc:Loc.position -> dexpr_node -> dexpr *)
+let dexpr ?loc node =
+  let get_dvty = function
+    | DEvar (_,dvty) ->
+        dvty
+    | DEgpvar pv ->
+        [], specialize_pv pv
+    | DEgpsym ps ->
+        specialize_ps ps
+    | DEplapp (pl,del) ->
+        let argl, res = specialize_pl pl in
+        dity_unify_app pl.pl_ls dexpr_expected_type del argl;
+        [], res
+    | DElsapp (ls,del) ->
+        let argl, res = specialize_ls ls in
+        dity_unify_app ls dexpr_expected_type del argl;
+        [], res
+    | DEapply (de,del) ->
+        let argl, res = de.de_dvty in
+        let rec down del al = match del, al with
+          | de::del, dity::al -> dexpr_expected_type de dity; down del al
+          | [], _ -> al
+          | _ when argl = [] -> Loc.errorm
+              "This expression is not a function and cannot be applied"
+          | _ -> Loc.errorm
+              "This function is applied to too many arguments" in
+        down del argl, res
+    | DEconst (Number.ConstInt _) ->
+        [], dity_int
+    | DEconst (Number.ConstReal _) ->
+        [], dity_real
+    | DEval (_,de)
+    | DElet (_,de)
+    | DEfun (_,de)
+    | DErec (_,de) ->
+        de.de_dvty
+    | DEif (de1,de2,de3) ->
+        let res = dity_fresh () in
+        dexpr_expected_type de1 dity_bool;
+        dexpr_expected_type de2 res;
+        dexpr_expected_type de3 res;
+        de2.de_dvty
+    | DEmatch (de,bl) ->
+        let ety = dity_fresh () in
+        let res = dity_fresh () in
+        dexpr_expected_type de ety;
+        let branch (dp,de) =
+          dpat_expected_type dp ety;
+          dexpr_expected_type de res in
+        List.iter branch bl;
+        [], res
+    | DEassign (pl,de1,de) ->
+        let argl, res = specialize_pl pl in
+        dity_unify_app pl.pl_ls dexpr_expected_type [de1] argl;
+        dexpr_expected_type_weak de res;
+        [], dity_unit
+    | DElazy (_,de1,de2) ->
+        dexpr_expected_type de1 dity_bool;
+        dexpr_expected_type de2 dity_bool;
+        de1.de_dvty
+    | DEnot de ->
+        dexpr_expected_type de dity_bool;
+        de.de_dvty
+    | DEtrue
+    | DEfalse ->
+        [], dity_bool
+    | DEraise (xs,de) ->
+        dexpr_expected_type de (specialize_xs xs);
+        [], dity_fresh ()
+    | DEtry (de,bl) ->
+        let res = dity_fresh () in
+        dexpr_expected_type de res;
+        let branch (xs,dp,de) =
+          let ety = specialize_xs xs in
+          dpat_expected_type dp ety;
+          dexpr_expected_type de res in
+        List.iter branch bl;
+        de.de_dvty
+    | DEfor (_,de_from,_,de_to,_,de) ->
+        dexpr_expected_type de_from dity_int;
+        dexpr_expected_type de_to dity_int;
+        dexpr_expected_type de dity_unit;
+        de.de_dvty
+    | DEloop (_,_,de) ->
+        dexpr_expected_type de dity_unit;
+        de.de_dvty
+    | DEabsurd ->
+        [], dity_fresh ()
+    | DEassert _ ->
+        [], dity_unit
+    | DEabstract (de,_)
+    | DEmark (_,de)
+    | DEghost de ->
+        de.de_dvty
+    | DEany (dtv,_) ->
+        dvty_of_dtype_v dtv
+    | DEcast (de,ity) ->
+        dexpr_expected_type_weak de (dity_of_ity ity);
+        de.de_dvty
+    | DEuloc (de,_)
+    | DElabel (de,_) ->
+        de.de_dvty in
+  let dvty = Loc.try1 ?loc get_dvty node in
+  { de_node = node; de_dvty = dvty; de_loc = loc }
 
 (** Final stage *)
 
