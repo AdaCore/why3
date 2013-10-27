@@ -37,10 +37,6 @@ end
   let floc_ij i j = Loc.extract (loc_ij i j)
 *)
 
-  let quvars_of_lidents ty ll = List.map (function
-    | l, None -> Loc.errorm ~loc:l "anonymous binders are not allowed here"
-    | _, Some i -> i, ty) ll
-
   let mk_ppl loc d = { pp_loc = loc; pp_desc = d }
   let mk_pp d = mk_ppl (floc ()) d
 (* dead code
@@ -911,8 +907,10 @@ list1_quant_vars:
 ;
 
 quant_vars:
-| list1_lident_labels COLON primitive_type
-   { quvars_of_lidents (Some $3) $1 }
+| list1_lident_labels opt_cast {
+    List.map (function
+      | loc, None -> Loc.errorm ~loc "anonymous binders are not allowed here"
+      | _, Some i -> i, $2) $1 }
 ;
 
 list0_lident_labels:
