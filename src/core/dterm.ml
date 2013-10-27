@@ -29,6 +29,8 @@ let dty_fresh = let i = ref 0 in fun () -> Dvar (ref (Dind (incr i; !i)))
 
 let dty_of_ty ty = Duty ty
 
+exception UndefinedTypeVar of tvsymbol
+
 let rec ty_of_dty ~strict = function
   | Dvar { contents = Dval (Duty ty) } ->
       ty
@@ -36,9 +38,10 @@ let rec ty_of_dty ~strict = function
       let ty = ty_of_dty ~strict dty in
       r := Dval (Duty ty); ty
   | Dvar r ->
-      if strict then Loc.errorm "undefined type variable";
-      let ty = ty_var (create_tvsymbol (id_fresh "xi")) in
-      r := Dval (Duty ty); ty
+      let tv = create_tvsymbol (id_fresh "xi") in
+      let ty = ty_var tv in
+      r := Dval (Duty ty);
+      if strict then raise (UndefinedTypeVar tv) else ty
   | Dapp (ts,dl) ->
       ty_app ts (List.map (ty_of_dty ~strict) dl)
   | Duty ty -> ty
@@ -325,6 +328,24 @@ let dterm ?loc node =
 
 (** Final stage *)
 
+let pat_ty_of_dty ~strict dty =
+  if not strict then ty_of_dty ~strict dty else
+  try ty_of_dty ~strict dty with UndefinedTypeVar tv -> Loc.errorm
+    "This@ pattern@ has@ polymorphic@ type@ %a@ where@ type@ variable@ %a@ \
+      is@ never@ named@ explicitly" print_dty dty Pretty.print_tv tv
+
+let var_ty_of_dty {pre_loc = loc} ~strict dty =
+  if not strict then ty_of_dty ~strict dty else
+  try ty_of_dty ~strict dty with UndefinedTypeVar tv -> Loc.errorm ?loc
+    "This@ variable@ has@ polymorphic@ type@ %a@ where@ type@ variable@ %a@ \
+      is@ never@ named@ explicitly" print_dty dty Pretty.print_tv tv
+
+let term_ty_of_dty ~strict dty =
+  if not strict then ty_of_dty ~strict dty else
+  try ty_of_dty ~strict dty with UndefinedTypeVar tv -> Loc.errorm
+    "This@ term@ has@ polymorphic@ type@ %a@ where@ type@ variable@ %a@ \
+      is@ never@ named@ explicitly" print_dty dty Pretty.print_tv tv
+
 let pattern ~strict env dp =
   let acc = ref Mstr.empty in
   let find_var ({pre_name = n} as id) ty =
@@ -335,11 +356,11 @@ let pattern ~strict env dp =
     Loc.try2 ?loc:dp.dp_loc try_get dp.dp_dty dp.dp_node
   and try_get dty = function
     | DPwild ->
-        pat_wild (ty_of_dty ~strict dty)
+        pat_wild (pat_ty_of_dty ~strict dty)
     | DPvar id ->
-        pat_var (find_var id (ty_of_dty ~strict dty))
+        pat_var (find_var id (pat_ty_of_dty ~strict dty))
     | DPapp (ls,dpl) ->
-        pat_app ls (List.map get dpl) (ty_of_dty ~strict dty)
+        pat_app ls (List.map get dpl) (pat_ty_of_dty ~strict dty)
     | DPor (dp1,dp2) ->
         pat_or (get dp1) (get dp2)
     | DPas (dp,id) ->
@@ -350,9 +371,12 @@ let pattern ~strict env dp =
 
 let quant_vars ~strict env vl =
   let add acc ({pre_name = n} as id, dty) =
-    let ty = ty_of_dty ~strict dty in
+    let ty = var_ty_of_dty id ~strict dty in
     let vs = create_vsymbol id ty in
-    Mstr.add_new (DuplicateVar n) n vs acc, vs in
+    let exn = match id.pre_loc with
+      | Some loc -> Loc.Located (loc, DuplicateVar n)
+      | None -> DuplicateVar n in
+    Mstr.add_new exn n vs acc, vs in
   let acc, vl = Lists.map_fold_left add Mstr.empty vl in
   Mstr.set_union acc env, vl
 
@@ -409,7 +433,7 @@ let term ~strict ~keep_loc prop dt =
         else t_equ (get uloc env false dt1) (get uloc env false dt2)
     | DTapp (ls,dtl) ->
         t_app ls (List.map (get uloc env false) dtl)
-          (Opt.map (ty_of_dty ~strict) dty)
+          (Opt.map (term_ty_of_dty ~strict) dty)
     | DTlet (dt,id,df) ->
         let prop = prop || dty = None in
         let t = get uloc env false dt in
@@ -431,7 +455,7 @@ let term ~strict ~keep_loc prop dt =
           t_close_branch p f in
         t_case (get uloc env false dt) (List.map branch bl)
     | DTeps (id,dty,df) ->
-        let v = create_vsymbol id (ty_of_dty ~strict dty) in
+        let v = create_vsymbol id (var_ty_of_dty id ~strict dty) in
         let env = Mstr.add id.pre_name v env in
         let f = get uloc env true df in
         check_used_var f.t_vars v;
