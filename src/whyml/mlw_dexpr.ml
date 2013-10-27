@@ -56,10 +56,9 @@ let dity_of_ity ity =
   in
   dity ity
 
-let ity_of_dity ~strict dity =
+let ity_of_dity dity =
   let rec ity = function
     | Dvar { contents = Dval t } -> ity t
-    | Dvar _ when strict -> Loc.errorm "undefined type variable"
     | Dvar ref ->
         let tv = create_tvsymbol (id_fresh "xi") in
         ref := Dval (Dutv tv);
@@ -432,26 +431,10 @@ let freeze_dvty frozen (argl,res) =
     | Dapp (_,tl,_) | Dpur (_,tl) -> List.fold_left add l tl in
   List.fold_left add (add frozen res) argl
 
-let freeze_dtvs frozen (argl,res) =
-  let rec add l = function
-    | Dvar { contents = Dval d } -> add l d
-    | Dvar { contents = Dtvs _ } as d -> d :: l
-    | Dutv _ -> l
-    | Dapp (_,tl,_) | Dpur (_,tl) -> List.fold_left add l tl in
-  List.fold_left add (add frozen res) argl
-
 let free_vars frozen (argl,res) =
   let rec add s = function
     | Dvar { contents = Dval d } -> add s d
     | Dvar { contents = Dtvs tv }
-    | Dutv tv -> if is_frozen frozen tv then s else Stv.add tv s
-    | Dapp (_,tl,_) | Dpur (_,tl) -> List.fold_left add s tl in
-  List.fold_left add (add Stv.empty res) argl
-
-let free_user_vars frozen (argl,res) =
-  let rec add s = function
-    | Dvar { contents = Dval d } -> add s d
-    | Dvar { contents = Dtvs _ } -> s
     | Dutv tv -> if is_frozen frozen tv then s else Stv.add tv s
     | Dapp (_,tl,_) | Dpur (_,tl) -> List.fold_left add s tl in
   List.fold_left add (add Stv.empty res) argl
@@ -465,10 +448,24 @@ let denv_add_poly { frozen = frozen; locals = locals } id dvty =
   let locals = Mstr.add id.pre_name (Some ftvs, dvty) locals in
   { frozen = frozen; locals = locals }
 
-let denv_add_rec { frozen = frozen; locals = locals } id dvty =
-  let ftvs = free_user_vars frozen dvty in
+let denv_add_rec_mono { frozen = frozen; locals = locals } id dvty =
+  let locals = Mstr.add id.pre_name (Some Stv.empty, dvty) locals in
+  { frozen = freeze_dvty frozen dvty; locals = locals }
+
+let denv_add_rec_poly { frozen = frozen; locals = locals } frozen0 id dvty =
+  let ftvs = free_vars frozen0 dvty in
   let locals = Mstr.add id.pre_name (Some ftvs, dvty) locals in
-  { frozen = freeze_dtvs frozen dvty; locals = locals }
+  { frozen = frozen; locals = locals }
+
+let denv_add_rec denv frozen0 id ((argl,res) as dvty) =
+  let rec is_explicit = function
+    | Dapp (_,tl,_) | Dpur (_,tl) -> List.for_all is_explicit tl
+    | Dvar { contents = Dval d } -> is_explicit d
+    | Dvar { contents = Dtvs _ } -> false
+    | Dutv _ -> true in
+  if List.for_all is_explicit argl && is_explicit res
+  then denv_add_rec_poly denv frozen0 id dvty
+  else denv_add_rec_mono denv id dvty
 
 let dvty_of_dtype_v dtv =
   let rec dvty argl = function
@@ -491,7 +488,7 @@ let denv_add_fun denv (id,_,bl,{de_dvty = (argl,res)},_) =
 
 exception DupId of preid
 
-let denv_prepare_rec denv l =
+let denv_prepare_rec denv0 l =
   let add s (id,_,_) =
     Sstr.add_new (DupId id) id.pre_name s in
   let _ = try List.fold_left add Sstr.empty l
@@ -499,8 +496,8 @@ let denv_prepare_rec denv l =
       "duplicate function name %s" id.pre_name in
   let add denv (id,bl,res) =
     let argl = List.map (fun (_,_,_,t) -> t) bl in
-    denv_add_rec denv id (argl, res) in
-  List.fold_left add denv l
+    denv_add_rec denv denv0.frozen id (argl,res) in
+  List.fold_left add denv0 l
 
 let denv_verify_rec { frozen = frozen; locals = locals } id =
   let check tv = if is_frozen frozen tv then Loc.errorm ?loc:id.pre_loc
@@ -757,10 +754,8 @@ let add_pv_map {psm = psm; pvm = pvm; vsm = vsm} vm =
 let e_ghostify gh e =
   if gh && not e.e_ghost then e_ghost e else e
 
-let expr ~strict ~keep_loc de =
+let expr ~keep_loc de =
   reunify_regions (); (* no more unifications *)
-
-  let ity_of_dity dity = ity_of_dity ~strict dity in
 
   let rec strip uloc labs de = match de.de_node with
     | DEcast (de,_) -> strip uloc labs de
@@ -935,7 +930,7 @@ let expr ~strict ~keep_loc de =
   in
   get None env_empty de
 
-let val_decl ~strict ~keep_loc _ = ignore(strict); ignore(keep_loc); assert false (* strict:bool -> keep_loc:bool -> dval_decl -> let_sym *)
-let let_defn ~strict ~keep_loc _ = ignore(strict); ignore(keep_loc); assert false (* strict:bool -> keep_loc:bool -> dlet_defn -> let_defn *)
-let fun_defn ~strict ~keep_loc _ = ignore(strict); ignore(keep_loc); assert false (* strict:bool -> keep_loc:bool -> dfun_defn -> fun_defn *)
-let rec_defn ~strict ~keep_loc _ = ignore(strict); ignore(keep_loc); assert false (* strict:bool -> keep_loc:bool -> dfun_defn list -> fun_defn list *)
+let val_decl ~keep_loc _ = ignore(keep_loc); assert false (* keep_loc:bool -> dval_decl -> let_sym *)
+let let_defn ~keep_loc _ = ignore(keep_loc); assert false (* keep_loc:bool -> dlet_defn -> let_defn *)
+let fun_defn ~keep_loc _ = ignore(keep_loc); assert false (* keep_loc:bool -> dfun_defn -> fun_defn *)
+let rec_defn ~keep_loc _ = ignore(keep_loc); assert false (* keep_loc:bool -> dfun_defn list -> fun_defn list *)

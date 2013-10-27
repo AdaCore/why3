@@ -140,8 +140,9 @@ val denv_add_fun : denv -> dfun_defn -> denv
 val denv_prepare_rec : denv -> (preid * dbinder list * dity) list -> denv
   (* [denv_prepare_rec] adds to the environment the user-supplied
      types of every function in a (mutually) recursive definition.
-     Every user type variable not frozen in [denv] is generalized,
-     and must not be unified with any outer fresh type variable. *)
+     Functions with fully specified prototypes are generalized in
+     the recursive block (polymorphic recursion), except for the
+     type variables that appear in the upper context. *)
 
 val denv_verify_rec : denv -> preid -> unit
   (* after a (mutually) recursive definition has been typechecked,
@@ -166,8 +167,8 @@ val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
 
 (** Final stage *)
 
-val expr     : strict:bool -> keep_loc:bool -> dexpr -> expr
-val val_decl : strict:bool -> keep_loc:bool -> dval_decl -> let_sym
-val let_defn : strict:bool -> keep_loc:bool -> dlet_defn -> let_defn
-val fun_defn : strict:bool -> keep_loc:bool -> dfun_defn -> fun_defn
-val rec_defn : strict:bool -> keep_loc:bool -> dfun_defn list -> fun_defn list
+val expr     : keep_loc:bool -> dexpr -> expr
+val val_decl : keep_loc:bool -> dval_decl -> let_sym
+val let_defn : keep_loc:bool -> dlet_defn -> let_defn
+val fun_defn : keep_loc:bool -> dfun_defn -> fun_defn
+val rec_defn : keep_loc:bool -> dfun_defn list -> fun_defn list
