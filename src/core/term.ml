@@ -488,9 +488,10 @@ let t_label_add l t =
 let t_label_remove l t =
   Hsterm.hashcons { t with t_label = Slab.remove l t.t_label }
 
-let t_label_copy { t_label = lab; t_loc = loc } t =
-  let lab = Slab.union lab t.t_label in
-  let loc = if t.t_loc = None then loc else t.t_loc in
+let t_label_copy s t =
+  if t_equal s t then s else
+  let lab = Slab.union s.t_label t.t_label in
+  let loc = if t.t_loc = None then s.t_loc else t.t_loc in
   Hsterm.hashcons { t with t_label = lab; t_loc = loc }
 
 (* unsafe map *)
