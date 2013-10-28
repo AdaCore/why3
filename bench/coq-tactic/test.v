@@ -317,3 +317,11 @@ Goal wgt (S O, 3) = 3.
 ae.
 Qed.
 
+Require Import BuiltIn.
+Require Import R_sqrt.
+Require Import Rfunctions.
+Require Import Rbasic_fun.
+
+Goal forall (x:R), (0 <= x * x)%R.
+ae.
+Qed.
