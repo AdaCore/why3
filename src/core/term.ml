@@ -999,17 +999,33 @@ let rec t_app_fold fn acc t =
 
 let t_map fn t = match t.t_node with
   | Tlet (t1, b) ->
-      let u,t2,close = t_open_bound_cb b in
-      t_label_copy t (t_let (fn t1) (close u (fn t2)))
+      let u,t2 = t_open_bound b in
+      let s1 = fn t1 and s2 = fn t2 in
+      if t_equal s2 t2
+        then if t_equal s1 t1 then t
+          else t_label_copy t (t_let s1 b)
+        else t_label_copy t (t_let_close u s1 s2)
   | Tcase (t1, bl) ->
-      let brn b = let p,t,close = t_open_branch_cb b in close p (fn t) in
-      t_label_copy t (t_case (fn t1) (List.map brn bl))
+      let s1 = fn t1 in
+      let brn same b =
+        let p,t = t_open_branch b in
+        let s = fn t in
+        if t_equal s t then same, b
+          else false, t_close_branch p s
+      in
+      let same, bl = Lists.map_fold_left brn true bl in
+      if t_equal s1 t1 && same then t
+        else t_label_copy t (t_case s1 bl)
   | Teps b ->
-      let u,t1,close = t_open_bound_cb b in
-      t_label_copy t (t_eps (close u (fn t1)))
+      let u,t1 = t_open_bound b in
+      let s1 = fn t1 in
+      if t_equal s1 t1 then t
+        else t_label_copy t (t_eps_close u s1)
   | Tquant (q, b) ->
-      let vl,tl,f1,close = t_open_quant_cb b in
-      t_label_copy t (t_quant q (close vl (tr_map fn tl) (fn f1)))
+      let vl,tl,f1 = t_open_quant b in
+      let g1 = fn f1 and sl = tr_map fn tl in
+      if t_equal g1 f1 && List.for_all2 (List.for_all2 t_equal) sl tl then t
+        else t_label_copy t (t_quant_close q vl sl g1)
   | _ ->
       t_map_unsafe fn t
 
@@ -1036,27 +1052,36 @@ let t_any pr t = try t_fold (Util.any_fn pr) false t with Util.FoldSkip -> true
 (* safe opening map_fold *)
 
 let t_map_fold fn acc t = match t.t_node with
-  | Tlet (e,b) ->
-      let acc, e = fn acc e in
-      let u,t1,close = t_open_bound_cb b in
-      let acc, t1 = fn acc t1 in
-      acc, t_label_copy t (t_let e (close u t1))
-  | Tcase (e,bl) ->
-      let acc, e = fn acc e in
-      let brn acc b =
-        let p,t,close = t_open_branch_cb b in
-        let acc,t = fn acc t in acc, close p t in
-      let acc, bl = Lists.map_fold_left brn acc bl in
-      acc, t_label_copy t (t_case e bl)
+  | Tlet (t1, b) ->
+      let acc, s1 = fn acc t1 in
+      let u,t2 = t_open_bound b in
+      let acc, s2 = fn acc t2 in
+      acc, if t_equal s2 t2
+        then if t_equal s1 t1 then t
+          else t_label_copy t (t_let s1 b)
+        else t_label_copy t (t_let_close u s1 s2)
+  | Tcase (t1, bl) ->
+      let acc, s1 = fn acc t1 in
+      let brn (acc,same) b =
+        let p,t = t_open_branch b in
+        let acc, s = fn acc t in
+        if t_equal s t then (acc,same), b
+          else (acc,false), t_close_branch p s
+      in
+      let (acc,same), bl = Lists.map_fold_left brn (acc,true) bl in
+      acc, if t_equal s1 t1 && same then t
+        else t_label_copy t (t_case s1 bl)
   | Teps b ->
-      let u,t1,close = t_open_bound_cb b in
-      let acc, t1 = fn acc t1 in
-      acc, t_label_copy t (t_eps (close u t1))
-  | Tquant (q,b) ->
-      let vl,tl,f1,close = t_open_quant_cb b in
-      let acc, tl = tr_map_fold fn acc tl in
-      let acc, f1 = fn acc f1 in
-      acc, t_label_copy t (t_quant q (close vl tl f1))
+      let u,t1 = t_open_bound b in
+      let acc, s1 = fn acc t1 in
+      acc, if t_equal s1 t1 then t
+        else t_label_copy t (t_eps_close u s1)
+  | Tquant (q, b) ->
+      let vl,tl,f1 = t_open_quant b in
+      let acc, sl = tr_map_fold fn acc tl in
+      let acc, g1 = fn acc f1 in
+      acc, if t_equal g1 f1 && List.for_all2 (List.for_all2 t_equal) sl tl
+        then t else t_label_copy t (t_quant_close q vl sl g1)
   | _ -> t_map_fold_unsafe fn acc t
 
 let t_map_fold fn = t_map_fold (fun acc t ->
