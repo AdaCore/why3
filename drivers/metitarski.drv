@@ -42,23 +42,17 @@ transformation "encoding_smt"
 *)
 
 theory BuiltIn
+(* support for integers disabled because may be inconsistent
   meta "encoding : kept" type int
+*)
   meta "encoding : kept" type real
   syntax predicate (=)  "(%1 = %2)"
   meta "eliminate_algebraic" "no_index"
-(*
-  meta "select_inst" "all"
-  meta "select_lskept" "all"
-  meta "select_lsinst" "all"
-  meta "select_kept" "all"
-*)
 end
 
 import "discrimination.gen"
 
 theory real.Real
-
-  meta "encoding : kept" type real
 
   syntax function zero "0.0"
   syntax function one  "1.0"
@@ -197,6 +191,7 @@ theory real.MinMax
   remove prop Min_is_some
 end
 
+(* support for integers disabled because may be inconsistent
 theory real.PowerInt
   syntax function power "%1^%2"
 
@@ -206,6 +201,7 @@ theory real.PowerInt
 
   (* These follow from Metitarski's axioms. *)
 end
+*)
 
 theory real.ExpLog
   syntax function exp "exp(%1)"
@@ -231,6 +227,7 @@ theory real.PowerReal
   remove prop Pow_exp_log
 end
 
+(* support for integers disabled because may be inconsistent
 theory int.Int
 
   syntax function zero "0"
@@ -268,3 +265,4 @@ theory int.Int
   remove prop ZeroLessOne
 
 end
+*)
