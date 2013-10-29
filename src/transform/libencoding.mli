@@ -18,14 +18,8 @@ val debug : Debug.flag
 (* meta to tag the protected types *)
 val meta_kept : Theory.meta
 
-(* sort symbol of the "universal" type *)
-val ts_base : tysymbol
-
-(* "universal" sort *)
-val ty_base : ty
-
-(* ts_base type declaration *)
-val d_ts_base : decl
+(* meta to tag the custom base type *)
+val meta_base : Theory.meta
 
 (* sort symbol of (polymorphic) types *)
 val ts_type : tysymbol
@@ -66,8 +60,8 @@ val is_protecting_id : Ident.ident -> bool
 val is_protected_vs : Sty.t -> vsymbol -> bool
 val is_protected_ls : Sty.t -> lsymbol -> bool
 
-(* monomorphise wrt the set of kept types, and a symbol map *)
-val d_monomorph : Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
+(* monomorphise wrt the base type, the set of kept types, and a symbol map *)
+val d_monomorph : ty -> Sty.t -> (lsymbol -> lsymbol) -> decl -> decl list
 
 (* replace all non-kept types with ty_base *)
 val monomorphise_task : Task.task Trans.trans

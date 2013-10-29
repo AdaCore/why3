@@ -77,16 +77,8 @@ let encoding_tptp env = Trans.seq [
   forget_kept;
   Trans.on_flag meta_enco_poly ft_enco_poly def_enco_poly_tptp env]
 
-let encoding_metitarski env = Trans.seq [
-  Libencoding.monomorphise_goal;
-  (* forget_kept; *)
-  Trans.on_flag meta_enco_poly ft_enco_poly def_enco_poly_tptp env]
-
 let () = register_env_transform "encoding_smt" encoding_smt
   ~desc:"Encode@ polymorphic@ types@ for@ provers@ with@ sorts."
 
 let () = register_env_transform "encoding_tptp" encoding_tptp
   ~desc:"Encode@ polymorphic@ types@ for@ provers@ without@ sorts."
-
-let () = register_env_transform "encoding_metitarski" encoding_metitarski
-  ~desc:"Encode@ polymorphic@ types@ for@ prover@ metitarski."

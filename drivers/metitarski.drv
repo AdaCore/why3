@@ -34,18 +34,13 @@ transformation "eliminate_let"
 
 transformation "simplify_unknown_lsymbols"
 transformation "discriminate"
-transformation "encoding_metitarski"
-(*
 transformation "encoding_tptp"
-transformation "encoding_sort"
-transformation "encoding_smt"
-*)
 
 theory BuiltIn
 (* support for integers disabled because may be inconsistent
   meta "encoding : kept" type int
 *)
-  meta "encoding : kept" type real
+  meta "encoding : base" type real
   syntax predicate (=)  "(%1 = %2)"
   meta "eliminate_algebraic" "no_index"
 end
