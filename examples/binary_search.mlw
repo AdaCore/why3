@@ -125,3 +125,56 @@ module BinarySearchInt32
     end
 
 end
+
+
+
+(* another binary search using machine integers:
+   32-bit integers for indexes and
+   64-bit integers for values *)
+
+module BinarySearchMachineInts
+
+  use import int.Int
+  use mach_int.Int32
+  use mach_int.Int64
+  use import ref.Ref
+  use import array.Array
+
+  (* the code and its specification *)
+
+  exception Break Int32.int32 (* raised to exit the loop *)
+  exception Not_found (* raised to signal a search failure *)
+
+  let binary_search (a : array Int64.int64) (v : Int64.int64) : Int32.int32
+    requires { length a <= Int32.max_int32 }
+    requires { forall i1 i2 : int. 
+      0 <= i1 <= i2 < length a -> Int64.to_int a[i1] <= Int64.to_int a[i2] }
+    ensures  { 0 <= Int32.to_int result < length a /\ 
+               Int64.to_int a[Int32.to_int result] = Int64.to_int v }
+    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+  = try
+      let l = ref (Int32.of_int 0) in
+      let u = ref (Int32.sub (Int32.of_int (length a)) (Int32.of_int 1)) in
+      while Int32.le !l !u do
+        invariant { 0 <= Int32.to_int !l /\ Int32.to_int !u < length a }
+        invariant {
+          forall i : int. 0 <= i < length a -> a[i] = v -> 
+            Int32.to_int !l <= i <= Int32.to_int !u }
+        variant { Int32.to_int !u - Int32.to_int !l }
+        let m = 
+          Int32.add !l (Int32.div (Int32.sub !u !l) (Int32.of_int 2)) 
+        in
+        assert { Int32.to_int !l <= Int32.to_int m <= Int32.to_int !u };
+        if Int64.lt a[Int32.to_int m] v then
+          l := Int32.add m (Int32.of_int 1)
+        else if Int64.gt a[Int32.to_int m] v then
+          u := Int32.sub m (Int32.of_int 1)
+        else
+          raise (Break m)
+      done;
+      raise Not_found
+    with Break i ->
+      i
+    end
+
+end
