@@ -132,7 +132,7 @@ let rec rewriteT kn state t = match t.t_node with
 and rewriteF kn state av sign f = match f.t_node with
   | Tcase (t1,bl) ->
       let t1 = rewriteT kn state t1 in
-      let av' = Mvs.set_diff av t1.t_vars in
+      let av' = Mvs.set_diff av (t_vars t1) in
       let mk_br (w,m) br =
         let (p,e) = t_open_branch br in
         let e = rewriteF kn state av' sign e in
@@ -182,7 +182,7 @@ and rewriteF kn state av sign f = match f.t_node with
       TermTF.t_map_sign (Util.const (rewriteT kn state))
         (rewriteF kn state av) sign f
   | Tlet (t1, _) ->
-      let av = Mvs.set_diff av t1.t_vars in
+      let av = Mvs.set_diff av (t_vars t1) in
       TermTF.t_map_sign (Util.const (rewriteT kn state))
         (rewriteF kn state av) sign f
   | _ ->

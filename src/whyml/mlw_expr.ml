@@ -1006,10 +1006,10 @@ let spec_purify sp =
   let vs, f = Mlw_ty.open_post sp.c_post in
   match f.t_node with
   | Tapp (ps, [{t_node = Tvar us}; t])
-    when ls_equal ps ps_equ && vs_equal vs us && not (Mvs.mem vs t.t_vars) ->
+    when ls_equal ps ps_equ && vs_equal vs us && t_v_occurs vs t = 0 ->
       t
   | Tbinop (Tiff, {t_node = Tapp (ps,[{t_node = Tvar us};{t_node = Ttrue}])},f)
-    when ls_equal ps ps_equ && vs_equal vs us && not (Mvs.mem vs f.t_vars) ->
+    when ls_equal ps ps_equ && vs_equal vs us && t_v_occurs vs f = 0 ->
       t_if f t_bool_true t_bool_false
   | _ -> raise Exit
 

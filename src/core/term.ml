@@ -271,7 +271,6 @@ type term = {
   t_ty    : ty option;
   t_label : Slab.t;
   t_loc   : Loc.position option;
-  t_vars  : int Mvs.t;
   t_tag   : int;
 }
 
@@ -351,11 +350,27 @@ let bnd_map_fold fn acc bv =
 
 (* hash-consing for terms and formulas *)
 
-let some_plus _ m n = Some (m + n)
-let add_t_vars s t = Mvs.union some_plus s t.t_vars
-let add_b_vars s (_,b,_) = Mvs.union some_plus s b.bv_vars
-let add_nt_vars _ n t s = Mvs.union some_plus s
-  (if n = 1 then t.t_vars else Mvs.map (( * ) n) t.t_vars)
+let vars_union s1 s2 = Mvs.union (fun _ m n -> Some (m + n)) s1 s2
+
+let add_b_vars s (_,b,_) = vars_union s b.bv_vars
+
+let rec t_vars t = match t.t_node with
+  | Tvar v -> Mvs.singleton v 1
+  | Tconst _ -> Mvs.empty
+  | Tapp (_,tl) -> List.fold_left add_t_vars Mvs.empty tl
+  | Tif (f,t,e) -> add_t_vars (add_t_vars (t_vars f) t) e
+  | Tlet (t,bt) -> add_b_vars (t_vars t) bt
+  | Tcase (t,bl) -> List.fold_left add_b_vars (t_vars t) bl
+  | Teps (_,b,_) -> b.bv_vars
+  | Tquant (_,(_,b,_,_)) -> b.bv_vars
+  | Tbinop (_,f1,f2) -> add_t_vars (t_vars f1) f2
+  | Tnot f -> t_vars f
+  | Ttrue | Tfalse -> Mvs.empty
+
+and add_t_vars s t = vars_union s (t_vars t)
+
+let add_nt_vars _ n t s = vars_union s
+  (if n = 1 then t_vars t else Mvs.map (( * ) n) (t_vars t))
 
 module Hsterm = Hashcons.Make (struct
 
@@ -429,20 +444,7 @@ module Hsterm = Hashcons.Make (struct
       (Hashcons.combine_option Loc.hash t.t_loc)
       (Slab.fold comb t.t_label (oty_hash t.t_ty))
 
-  let t_vars_node = function
-    | Tvar v -> Mvs.singleton v 1
-    | Tconst _ -> Mvs.empty
-    | Tapp (_,tl) -> List.fold_left add_t_vars Mvs.empty tl
-    | Tif (f,t,e) -> add_t_vars (add_t_vars f.t_vars t) e
-    | Tlet (t,bt) -> add_b_vars t.t_vars bt
-    | Tcase (t,bl) -> List.fold_left add_b_vars t.t_vars bl
-    | Teps (_,b,_) -> b.bv_vars
-    | Tquant (_,(_,b,_,_)) -> b.bv_vars
-    | Tbinop (_,f1,f2) -> add_t_vars f1.t_vars f2
-    | Tnot f -> f.t_vars
-    | Ttrue | Tfalse -> Mvs.empty
-
-  let tag n t = { t with t_tag = n ; t_vars = t_vars_node t.t_node }
+  let tag n t = { t with t_tag = n }
 
 end)
 
@@ -461,7 +463,6 @@ let mk_term n ty = Hsterm.hashcons {
   t_node  = n;
   t_label = Slab.empty;
   t_loc   = None;
-  t_vars  = Mvs.empty;
   t_ty    = ty;
   t_tag   = -1
 }
@@ -641,13 +642,13 @@ let t_subst_unsafe m t =
 
 let bnd_new s = { bv_vars = s ; bv_subst = Mvs.empty }
 
-let t_close_bound v t = (v, bnd_new (Mvs.remove v t.t_vars), t)
+let t_close_bound v t = (v, bnd_new (Mvs.remove v (t_vars t)), t)
 
-let t_close_branch p t = (p, bnd_new (Mvs.set_diff t.t_vars p.pat_vars), t)
+let t_close_branch p t = (p, bnd_new (Mvs.set_diff (t_vars t) p.pat_vars), t)
 
 let t_close_quant vl tl f =
   let del_v s v = Mvs.remove v s in
-  let s = tr_fold add_t_vars f.t_vars tl in
+  let s = tr_fold add_t_vars (t_vars f) tl in
   let s = List.fold_left del_v s vl in
   (vl, bnd_new s, tl, t_prop f)
 
@@ -926,13 +927,13 @@ let t_gen_map fnT fnL mapV t = t_gen_map (Wty.memoize 17 fnT) fnL mapV t
 
 let gen_mapV fnT = Mvs.mapi (fun v _ -> gen_fresh_vsymbol fnT v)
 
-let t_s_map fnT fnL t = t_gen_map fnT fnL (gen_mapV fnT t.t_vars) t
+let t_s_map fnT fnL t = t_gen_map fnT fnL (gen_mapV fnT (t_vars t)) t
 
 (* simultaneous substitution into types and terms *)
 
 let t_ty_subst mapT mapV t =
   let fnT = ty_inst mapT in
-  let m = gen_mapV fnT t.t_vars in
+  let m = gen_mapV fnT (t_vars t) in
   let t = t_gen_map fnT (fun ls -> ls) m t in
   let add _ v t m = vs_check v t; Mvs.add v t m in
   let m = Mvs.fold2_inter add m mapV Mvs.empty in
@@ -1171,12 +1172,42 @@ let t_map_cont fn = t_map_cont (fun cont t ->
 
 let t_v_map fn t =
   let fn v _ = let res = fn v in vs_check v res; res in
-  t_subst_unsafe (Mvs.mapi fn t.t_vars) t
+  t_subst_unsafe (Mvs.mapi fn (t_vars t)) t
 
-let t_v_fold fn acc t = Mvs.fold (fun v _ a -> fn a v) t.t_vars acc
+let bnd_v_fold fn acc b = Mvs.fold (fun v _ acc -> fn acc v) b.bv_vars acc
 
-let t_v_all pr t = Mvs.for_all (fun v _ -> pr v) t.t_vars
-let t_v_any pr t = Mvs.exists  (fun v _ -> pr v) t.t_vars
+let bound_v_fold fn acc (_,b,_) = bnd_v_fold fn acc b
+
+let rec t_v_fold fn acc t = match t.t_node with
+  | Tvar v -> fn acc v
+  | Tlet (e,b) -> bound_v_fold fn (t_v_fold fn acc e) b
+  | Tcase (e,bl) -> List.fold_left (bound_v_fold fn) (t_v_fold fn acc e) bl
+  | Teps b -> bound_v_fold fn acc b
+  | Tquant (_,(_,b,_,_)) -> bnd_v_fold fn acc b
+  | _ -> t_fold_unsafe (t_v_fold fn) acc t
+
+let t_v_all pr t =
+  try t_v_fold (Util.all_fn pr) true t with Util.FoldSkip -> false
+
+let t_v_any pr t =
+  try t_v_fold (Util.any_fn pr) false t with Util.FoldSkip -> true
+
+let t_closed t = t_v_all (fun _ -> false) t
+
+let bnd_v_count fn acc b = Mvs.fold (fun v n acc -> fn acc v n) b.bv_vars acc
+
+let bound_v_count fn acc (_,b,_) = bnd_v_count fn acc b
+
+let rec t_v_count fn acc t = match t.t_node with
+  | Tvar v -> fn acc v 1
+  | Tlet (e,b) -> bound_v_count fn (t_v_count fn acc e) b
+  | Tcase (e,bl) -> List.fold_left (bound_v_count fn) (t_v_count fn acc e) bl
+  | Teps b -> bound_v_count fn acc b
+  | Tquant (_,(_,b,_,_)) -> bnd_v_count fn acc b
+  | _ -> t_fold_unsafe (t_v_count fn) acc t
+
+let t_v_occurs v t =
+  t_v_count (fun c u n -> if vs_equal u v then c + n else c) 0 t
 
 (* replaces variables with terms in term [t] using map [m] *)
 
@@ -1474,7 +1505,7 @@ let small t = match t.t_node with
   | _ -> false
 
 let t_let_simp e ((v,b,t) as bt) =
-  let n = Mvs.find_def 0 v t.t_vars in
+  let n = t_v_occurs v t in
   if n = 0 && can_simp e then
     t_subst_unsafe b.bv_subst t else
   if n = 1 || small e then begin
@@ -1484,7 +1515,7 @@ let t_let_simp e ((v,b,t) as bt) =
     t_let e bt
 
 let t_let_close_simp v e t =
-  let n = Mvs.find_def 0 v t.t_vars in
+  let n = t_v_occurs v t in
   if n = 0 && can_simp e then t else
   if n = 1 || small e then
     t_subst_single v e t
@@ -1503,7 +1534,7 @@ let t_case_simp t bl =
     | Ttrue when can_simp e -> e0_true
     | Tfalse when can_simp e -> e0_false
     | _ -> t_equal e e0 in
-  if can_simp t && Mvs.is_empty e0.t_vars && List.for_all is_e0 tl then e0
+  if can_simp t && t_closed e0 && List.for_all is_e0 tl then e0
   else t_case t bl
 
 let t_case_close_simp t bl =
@@ -1518,29 +1549,31 @@ let t_case_close_simp t bl =
     | Ttrue when can_simp e -> e0_true
     | Tfalse when can_simp e -> e0_false
     | _ -> t_equal e e0 in
-  if can_simp t && Mvs.is_empty e0.t_vars && List.for_all is_e0 tl then e0
+  if can_simp t && t_closed e0 && List.for_all is_e0 tl then e0
   else t_case_close t bl
 
-let v_occurs f v = Mvs.mem v f.t_vars
-let v_subset f e = Mvs.set_submap e.t_vars f.t_vars
-
-let vl_filter f vl = List.filter (v_occurs f) vl
-let tr_filter f tl = List.filter (List.for_all (v_subset f)) tl
-
 let t_quant_simp q ((vl,_,_,f) as qf) =
-  if List.for_all (v_occurs f) vl then
+  let fvs = t_vars f in
+  let check v = Mvs.mem v fvs in
+  if List.for_all check vl then
     t_quant q qf
   else
     let vl,tl,f = t_open_quant qf in
-    let vl = vl_filter f vl in
-    if vl = [] then f else t_quant_close q vl (tr_filter f tl) f
+    let fvs = t_vars f in
+    let check v = Mvs.mem v fvs in
+    let vl = List.filter check vl in
+    if vl = [] then f
+    else t_quant_close q vl (List.filter (List.for_all (t_v_all check)) tl) f
 
 let t_quant_close_simp q vl tl f =
-  if List.for_all (v_occurs f) vl then
+  let fvs = t_vars f in
+  let check v = Mvs.mem v fvs in
+  if List.for_all check vl then
     t_quant_close q vl tl f
   else
-    let vl = vl_filter f vl in
-    if vl = [] then f else t_quant_close q vl (tr_filter f tl) f
+    let vl = List.filter check vl in
+    if vl = [] then f
+    else t_quant_close q vl (List.filter (List.for_all (t_v_all check)) tl) f
 
 let t_forall_simp = t_quant_simp Tforall
 let t_exists_simp = t_quant_simp Texists

@@ -352,8 +352,8 @@ let quant_vars ~strict env vl =
   let acc, vl = Lists.map_fold_left add Mstr.empty vl in
   Mstr.set_union acc env, vl
 
-let check_used_var vars vs =
-  if not (Mvs.mem vs vars) then
+let check_used_var t vs =
+  if t_v_occurs vs t = 0 then
   let s = vs.vs_name.id_string in
   if not (String.length s > 0 && s.[0] = '_') then
   Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s
@@ -385,26 +385,26 @@ let term ~strict ~keep_loc env dt =
         let v = create_vsymbol id (t_type t) in
         let env = Mstr.add (preid_name id) v env in
         let f = get uloc env df in
-        check_used_var f.t_vars v;
+        check_used_var f v;
         t_let_close v t f
     | DTcase (dt,bl) ->
         let branch (dp,df) =
           let env, p = pattern ~strict env dp in
           let f = get uloc env df in
-          Svs.iter (check_used_var f.t_vars) p.pat_vars;
+          Svs.iter (check_used_var f) p.pat_vars;
           t_close_branch p f in
         t_case (get uloc env dt) (List.map branch bl)
     | DTeps (id,dty,df) ->
         let v = create_vsymbol id (ty_of_dty ~strict dty) in
         let env = Mstr.add (preid_name id) v env in
         let f = get uloc env df in
-        check_used_var f.t_vars v;
+        check_used_var f v;
         t_eps_close v f
     | DTquant (q,vl,dll,df) ->
         let env, vl = quant_vars ~strict env vl in
         let trl = List.map (List.map (get uloc env)) dll in
         let f = get uloc env df in
-        List.iter (check_used_var f.t_vars) vl;
+        List.iter (check_used_var f) vl;
         check_exists_implies q f;
         t_quant_close q vl trl f
     | DTbinop (op,df1,df2) ->

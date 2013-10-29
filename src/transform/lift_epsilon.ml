@@ -23,7 +23,7 @@ let lift kind =
   let rec term acc t =
     match t.t_node with
     | Teps fb ->
-        let fv = Mvs.keys t.t_vars in
+        let fv = Mvs.keys (t_vars t) in
         let x, f = t_open_bound fb in
         let acc, f = form acc f in
         let tys = List.map (fun x -> x.vs_ty) fv in

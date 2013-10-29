@@ -192,14 +192,14 @@ and dtrigger =
 
 let allowed_unused s = String.length s > 0 && s.[0] = '_'
 
-let check_used_var vars v =
-  if not (Mvs.mem v vars) then
+let check_used_var t v =
+  if t_v_occurs v t = 0 then
     let s = v.vs_name.id_string in
     if not (allowed_unused s) then
       Warning.emit ?loc:v.vs_name.Ident.id_loc "unused variable %s" s
 
-let check_used_vars vars =
-  List.iter (check_used_var vars)
+let check_used_vars t vl =
+  List.iter (check_used_var t) vl
 
 let check_exists_implies q f =
   match q,f.t_node with
@@ -224,7 +224,7 @@ let rec term env t = match t.dt_node with
       let v = create_user_vs id (t_type e1) in
       let env = Mstr.add id.id v env in
       let e2 = term env e2 in
-      check_used_var e2.t_vars v;
+      check_used_var e2 v;
       t_let_close v e1 e2
   | Tmatch (t1, bl) ->
       let branch (p,e) =
@@ -267,7 +267,7 @@ and fmla env = function
       in
       let trl = List.map (List.map trigger) trl in
       let f = fmla env f1 in
-      check_used_vars f.Term.t_vars vl;
+      check_used_vars f vl;
       check_exists_implies q f;
       t_quant_close q vl trl f
   | Fapp (s, tl) ->
@@ -277,7 +277,7 @@ and fmla env = function
       let v = create_user_vs id (t_type e1) in
       let env = Mstr.add id.id v env in
       let f2 = fmla env f2 in
-      check_used_var f2.t_vars v;
+      check_used_var f2 v;
       t_let_close v e1 f2
   | Fmatch (t, bl) ->
       let branch (p,e) =

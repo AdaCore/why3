@@ -30,7 +30,7 @@ type logic_decl = lsymbol * ls_defn
 exception UnboundVar of vsymbol
 
 let check_fvs f =
-  Mvs.iter (fun vs _ -> raise (UnboundVar vs)) f.t_vars;
+  t_v_fold (fun _ vs -> raise (UnboundVar vs)) () f;
   t_prop f
 
 let check_vl ty v = ty_equal_check ty v.vs_ty
