@@ -94,7 +94,6 @@ type pattern = {
   pat_node : pattern_node;
   pat_vars : Svs.t;
   pat_ty   : ty;
-  pat_tag  : int;
 }
 
 and pattern_node =
@@ -104,55 +103,12 @@ and pattern_node =
   | Por  of pattern * pattern
   | Pas  of pattern * vsymbol
 
-let pat_equal : pattern -> pattern -> bool = (==)
-
-let pat_hash p = p.pat_tag
-
-module Hspat = Hashcons.Make (struct
-  type t = pattern
-
-  let equal_node p1 p2 = match p1, p2 with
-    | Pwild, Pwild -> true
-    | Pvar v1, Pvar v2 -> vs_equal v1 v2
-    | Papp (s1, l1), Papp (s2, l2) ->
-        ls_equal s1 s2 && List.for_all2 pat_equal l1 l2
-    | Por (p1, q1), Por (p2, q2) ->
-        pat_equal p1 p2 && pat_equal q1 q2
-    | Pas (p1, n1), Pas (p2, n2) ->
-        pat_equal p1 p2 && vs_equal n1 n2
-    | _ -> false
-
-  let equal p1 p2 =
-    equal_node p1.pat_node p2.pat_node && ty_equal p1.pat_ty p2.pat_ty
-
-  let hash_node = function
-    | Pwild -> 0
-    | Pvar v -> vs_hash v
-    | Papp (s, pl) -> Hashcons.combine_list pat_hash (ls_hash s) pl
-    | Por (p, q) -> Hashcons.combine (pat_hash p) (pat_hash q)
-    | Pas (p, v) -> Hashcons.combine (pat_hash p) (vs_hash v)
-
-  let hash p = Hashcons.combine (hash_node p.pat_node) (ty_hash p.pat_ty)
-
-  let tag n p = { p with pat_tag = n }
-end)
-
-module Pat = MakeMSH (struct
-  type t = pattern
-  let tag pat = pat.pat_tag
-end)
-
-module Spat = Pat.S
-module Mpat = Pat.M
-module Hpat = Pat.H
-
 (* h-consing constructors for patterns *)
 
-let mk_pattern n vs ty = Hspat.hashcons {
+let mk_pattern n vs ty = {
   pat_node = n;
   pat_vars = vs;
   pat_ty   = ty;
-  pat_tag  = -1
 }
 
 exception UncoveredVar of vsymbol
@@ -271,7 +227,6 @@ type term = {
   t_ty    : ty option;
   t_label : Slab.t;
   t_loc   : Loc.position option;
-  t_tag   : int;
 }
 
 and term_node =
@@ -460,6 +415,33 @@ let t_compare t1 t2 =
 
 let t_equal t1 t2 = (t_compare t1 t2 = 0)
 
+let t_similar t1 t2 =
+  t1 == t2 || begin
+    oty_equal t1.t_ty t2.t_ty &&
+    match t1.t_node, t2.t_node with
+    | Tvar v1, Tvar v2 -> vs_equal v1 v2
+    | Tconst c1, Tconst c2 -> c1 = c2
+    | Tapp (s1,l1), Tapp (s2,l2) ->
+        ls_equal s1 s2 && Lists.equal (==) l1 l2
+    | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
+        f1 == f2 && t1 == t2 && e1 == e2
+    | Tlet (t1,bv1), Tlet (t2,bv2) ->
+        t1 == t2 && bv1 == bv2
+    | Tcase (t1,bl1), Tcase (t2,bl2) ->
+        t1 == t2 && Lists.equal (==) bl1 bl2
+    | Teps bv1, Teps bv2 ->
+        bv1 == bv2
+    | Tquant (q1,bv1), Tquant (q2,bv2) ->
+        q1 = q2 && bv1 == bv2
+    | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
+        op1 = op2 && f1 == f2 && g1 == g2
+    | Tnot f1, Tnot f2 ->
+        f1 == f2
+    | Ttrue, Ttrue
+    | Tfalse, Tfalse -> true
+    | _, _ -> false
+  end
+
 let t_hash t =
   let rec pat_hash bnd bv p = match p.pat_node with
     | Pwild -> bnd, bv, 0
@@ -537,11 +519,6 @@ let t_hash t =
     end in
   t_hash 0 [] t
 
-(* term equality and hash *)
-
-let t_equal : term -> term -> bool = (==)
-let t_hash t = t.t_tag
-
 (* type checking *)
 
 exception TermExpected of term
@@ -571,12 +548,6 @@ let tr_fold fn = List.fold_left (List.fold_left fn)
 let tr_map_fold fn = Lists.map_fold_left (Lists.map_fold_left fn)
 
 (* bind_info equality, hash, and traversal *)
-
-let bnd_equal b1 b2 = Mvs.equal t_equal b1.bv_subst b2.bv_subst
-
-let bnd_hash bv =
-  let comb v t acc = Hashcons.combine2 (vs_hash v) (t_hash t) acc in
-  Mvs.fold comb bv.bv_subst
 
 let bnd_map fn bv = { bv with bv_subst = Mvs.map fn bv.bv_subst }
 
@@ -610,99 +581,24 @@ and add_t_vars s t = vars_union s (t_vars t)
 let add_nt_vars _ n t s = vars_union s
   (if n = 1 then t_vars t else Mvs.map (( * ) n) (t_vars t))
 
-module Hsterm = Hashcons.Make (struct
-
+module TermOHT = struct
   type t = term
+  let hash = t_hash
+  let equal = t_equal
+  let compare = t_compare
+end
 
-  let t_eq_bound (v1,b1,t1) (v2,b2,t2) =
-    vs_equal v1 v2 && bnd_equal b1 b2 && t_equal t1 t2
-
-  let t_eq_branch (p1,b1,t1) (p2,b2,t2) =
-    pat_equal p1 p2 && bnd_equal b1 b2 && t_equal t1 t2
-
-  let t_eq_quant (vl1,b1,tl1,f1) (vl2,b2,tl2,f2) =
-    t_equal f1 f2 && Lists.equal vs_equal vl1 vl2 &&
-    bnd_equal b1 b2 && tr_equal tl1 tl2
-
-  let t_equal_node t1 t2 = match t1,t2 with
-    | Tvar v1, Tvar v2 -> vs_equal v1 v2
-    | Tconst c1, Tconst c2 -> c1 = c2
-    | Tapp (s1,l1), Tapp (s2,l2) ->
-        ls_equal s1 s2 && List.for_all2 t_equal l1 l2
-    | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
-        t_equal f1 f2 && t_equal t1 t2 && t_equal e1 e2
-    | Tlet (t1,b1), Tlet (t2,b2) ->
-        t_equal t1 t2 && t_eq_bound b1 b2
-    | Tcase (t1,bl1), Tcase (t2,bl2) ->
-        t_equal t1 t2 && Lists.equal t_eq_branch bl1 bl2
-    | Teps f1, Teps f2 -> t_eq_bound f1 f2
-    | Tquant (q1,b1), Tquant (q2,b2) ->
-        q1 = q2 && t_eq_quant b1 b2
-    | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
-        op1 = op2 && t_equal f1 f2 && t_equal g1 g2
-    | Tnot f1, Tnot f2 -> t_equal f1 f2
-    | Ttrue, Ttrue | Tfalse, Tfalse -> true
-    | _ -> false
-
-  let equal t1 t2 =
-    oty_equal t1.t_ty t2.t_ty &&
-    t_equal_node t1.t_node t2.t_node &&
-    Slab.equal t1.t_label t2.t_label &&
-    Opt.equal Loc.equal t1.t_loc t2.t_loc
-
-  let t_hash_bound (v,b,t) =
-    Hashcons.combine (vs_hash v) (bnd_hash b (t_hash t))
-
-  let t_hash_branch (p,b,t) =
-    Hashcons.combine (pat_hash p) (bnd_hash b (t_hash t))
-
-  let t_hash_quant (vl,b,tl,f) =
-    let h = bnd_hash b (t_hash f) in
-    let h = Hashcons.combine_list vs_hash h vl in
-    List.fold_left (Hashcons.combine_list t_hash) h tl
-
-  let t_hash_node = function
-    | Tvar v -> vs_hash v
-    | Tconst c -> Hashtbl.hash c
-    | Tapp (f,tl) -> Hashcons.combine_list t_hash (ls_hash f) tl
-    | Tif (f,t,e) -> Hashcons.combine2 (t_hash f) (t_hash t) (t_hash e)
-    | Tlet (t,bt) -> Hashcons.combine (t_hash t) (t_hash_bound bt)
-    | Tcase (t,bl) -> Hashcons.combine_list t_hash_branch (t_hash t) bl
-    | Teps f -> t_hash_bound f
-    | Tquant (q,bf) -> Hashcons.combine (Hashtbl.hash q) (t_hash_quant bf)
-    | Tbinop (op,f1,f2) ->
-        Hashcons.combine2 (Hashtbl.hash op) (t_hash f1) (t_hash f2)
-    | Tnot f -> Hashcons.combine 1 (t_hash f)
-    | Ttrue -> 0
-    | Tfalse -> 1
-
-  let hash t =
-    let comb l = Hashcons.combine (lab_hash l) in
-    Hashcons.combine2 (t_hash_node t.t_node)
-      (Hashcons.combine_option Loc.hash t.t_loc)
-      (Slab.fold comb t.t_label (oty_hash t.t_ty))
-
-  let tag n t = { t with t_tag = n }
-
-end)
-
-module Term = MakeMSH (struct
-  type t = term
-  let tag term = term.t_tag
-end)
-
-module Sterm = Term.S
-module Mterm = Term.M
-module Hterm = Term.H
+module Mterm = Extmap.Make(TermOHT)
+module Sterm = Extset.MakeOfMap(Mterm)
+module Hterm = Exthtbl.Make(TermOHT)
 
 (* hash-consing constructors for terms *)
 
-let mk_term n ty = Hsterm.hashcons {
+let mk_term n ty = {
   t_node  = n;
   t_label = Slab.empty;
   t_loc   = None;
   t_ty    = ty;
-  t_tag   = -1
 }
 
 let t_var v         = mk_term (Tvar v) (Some v.vs_ty)
@@ -718,20 +614,17 @@ let t_not f         = mk_term (Tnot f) None
 let t_true          = mk_term (Ttrue) None
 let t_false         = mk_term (Tfalse) None
 
-let t_label ?loc l t =
-  Hsterm.hashcons { t with t_label = l; t_loc = loc }
+let t_label ?loc l t = { t with t_label = l; t_loc = loc }
 
-let t_label_add l t =
-  Hsterm.hashcons { t with t_label = Slab.add l t.t_label }
+let t_label_add l t = { t with t_label = Slab.add l t.t_label }
 
-let t_label_remove l t =
-  Hsterm.hashcons { t with t_label = Slab.remove l t.t_label }
+let t_label_remove l t = { t with t_label = Slab.remove l t.t_label }
 
 let t_label_copy s t =
-  if t_equal s t then s else
+  if t_similar s t then s else
   let lab = Slab.union s.t_label t.t_label in
   let loc = if t.t_loc = None then s.t_loc else t.t_loc in
-  Hsterm.hashcons { t with t_label = lab; t_loc = loc }
+  { t with t_label = lab; t_loc = loc }
 
 (* unsafe map *)
 
@@ -739,30 +632,14 @@ let bound_map fn (u,b,e) = (u, bnd_map fn b, fn e)
 
 let t_map_unsafe fn t = t_label_copy t (match t.t_node with
   | Tvar _ | Tconst _ -> t
-  | Tapp (f,tl) ->
-      let sl = List.map fn tl in
-      if List.for_all2 t_equal sl tl then t else
-      t_app f sl t.t_ty
-  | Tif (f,t1,t2) ->
-      let g = fn f and s1 = fn t1 and s2 = fn t2 in
-      if t_equal g f && t_equal s1 t1 && t_equal s2 t2 then t else
-      t_if g s1 s2
-  | Tlet (e,b) ->
-      t_let (fn e) (bound_map fn b) t.t_ty
-  | Tcase (e,bl) ->
-      t_case (fn e) (List.map (bound_map fn) bl) t.t_ty
-  | Teps b ->
-      t_eps (bound_map fn b) t.t_ty
-  | Tquant (q,(vl,b,tl,f1)) ->
-      t_quant q (vl, bnd_map fn b, tr_map fn tl, fn f1)
-  | Tbinop (op,f1,f2) ->
-      let g1 = fn f1 and g2 = fn f2 in
-      if t_equal g1 f1 && t_equal g2 f2 then t else
-      t_binary op g1 g2
-  | Tnot f1 ->
-      let g1 = fn f1 in
-      if t_equal g1 f1 then t else
-      t_not g1
+  | Tapp (f,tl) -> t_app f (List.map fn tl) t.t_ty
+  | Tif (f,t1,t2) -> t_if (fn f) (fn t1) (fn t2)
+  | Tlet (e,b) -> t_let (fn e) (bound_map fn b) t.t_ty
+  | Tcase (e,bl) -> t_case (fn e) (List.map (bound_map fn) bl) t.t_ty
+  | Teps b -> t_eps (bound_map fn b) t.t_ty
+  | Tquant (q,(vl,b,tl,f)) -> t_quant q (vl, bnd_map fn b, tr_map fn tl, fn f)
+  | Tbinop (op,f1,f2) -> t_binary op (fn f1) (fn f2)
+  | Tnot f1 -> t_not (fn f1)
   | Ttrue | Tfalse -> t)
 
 (* unsafe fold *)
@@ -793,13 +670,11 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
       acc, t
   | Tapp (f,tl) ->
       let acc,sl = Lists.map_fold_left fn acc tl in
-      if List.for_all2 t_equal sl tl then acc,t else
       acc, t_label_copy t (t_app f sl t.t_ty)
   | Tif (f,t1,t2) ->
       let acc, g  = fn acc f in
       let acc, s1 = fn acc t1 in
       let acc, s2 = fn acc t2 in
-      if t_equal g f && t_equal s1 t1 && t_equal s2 t2 then acc,t else
       acc, t_label_copy t (t_if g s1 s2)
   | Tlet (e,b) ->
       let acc, e = fn acc e in
@@ -820,11 +695,9 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
   | Tbinop (op,f1,f2) ->
       let acc, g1 = fn acc f1 in
       let acc, g2 = fn acc f2 in
-      if t_equal g1 f1 && t_equal g2 f2 then acc,t else
       acc, t_label_copy t (t_binary op g1 g2)
   | Tnot f1 ->
       let acc, g1 = fn acc f1 in
-      if t_equal g1 f1 then acc,t else
       acc, t_label_copy t (t_not g1)
   | Ttrue | Tfalse ->
       acc, t
@@ -833,27 +706,26 @@ let t_map_fold_unsafe fn acc t = match t.t_node with
 
 let rec t_subst_unsafe m t =
   let t_subst t = t_subst_unsafe m t in
-  let b_subst (u,b,e) = (u, bv_subst_unsafe m b, e) in
-  let nosubst (_,b,_) = Mvs.set_disjoint m b.bv_vars in
+  let b_subst (u,b,e as bv) =
+    if Mvs.set_disjoint m b.bv_vars then bv else
+    (u, bv_subst_unsafe m b, e) in
   match t.t_node with
   | Tvar u ->
       Mvs.find_def t u m
   | Tlet (e, bt) ->
       let d = t_subst e in
-      if t_equal d e && nosubst bt then t else
       t_label_copy t (t_let d (b_subst bt) t.t_ty)
   | Tcase (e, bl) ->
       let d = t_subst e in
-      if t_equal d e && List.for_all nosubst bl then t else
       let bl = List.map b_subst bl in
       t_label_copy t (t_case d bl t.t_ty)
   | Teps bf ->
-      if nosubst bf then t else
       t_label_copy t (t_eps (b_subst bf) t.t_ty)
-  | Tquant (q, (vl,b,tl,f1)) ->
-      if Mvs.set_disjoint m b.bv_vars then t else
-      let b = bv_subst_unsafe m b in
-      t_label_copy t (t_quant q (vl,b,tl,f1))
+  | Tquant (q, (vl,b,tl,f1 as bq)) ->
+      let bq =
+        if Mvs.set_disjoint m b.bv_vars then bq else
+        (vl,bv_subst_unsafe m b,tl,f1) in
+      t_label_copy t (t_quant q bq)
   | _ ->
       t_map_unsafe t_subst t
 
@@ -926,21 +798,23 @@ let t_open_quant (vl,b,tl,f) =
 let t_open_bound_cb tb =
   let v, t = t_open_bound tb in
   let close v' t' =
-    if t_equal t t' && vs_equal v v' then tb else t_close_bound v' t'
+    if t == t' && vs_equal v v' then tb else t_close_bound v' t'
   in
   v, t, close
 
 let t_open_branch_cb tbr =
   let p, t = t_open_branch tbr in
   let close p' t' =
-    if t_equal t t' && pat_equal p p' then tbr else t_close_branch p' t'
+    if t == t' && p == p' then tbr else t_close_branch p' t'
   in
   p, t, close
 
 let t_open_quant_cb fq =
   let vl, tl, f = t_open_quant fq in
   let close vl' tl' f' =
-    if t_equal f f' && tr_equal tl tl' && Lists.equal vs_equal vl vl'
+    if f == f' &&
+      Lists.equal (Lists.equal ((==) : term -> term -> bool)) tl tl' &&
+      Lists.equal vs_equal vl vl'
     then fq else t_close_quant vl' tl' f'
   in
   vl, tl, f, close
@@ -1240,8 +1114,8 @@ let t_map fn t = match t.t_node with
   | Tlet (t1, b) ->
       let u,t2 = t_open_bound b in
       let s1 = fn t1 and s2 = fn t2 in
-      if t_equal s2 t2
-        then if t_equal s1 t1 then t
+      if s2 == t2
+        then if s1 == t1 then t
           else t_label_copy t (t_let s1 b)
         else t_label_copy t (t_let_close u s1 s2)
   | Tcase (t1, bl) ->
@@ -1249,21 +1123,21 @@ let t_map fn t = match t.t_node with
       let brn same b =
         let p,t = t_open_branch b in
         let s = fn t in
-        if t_equal s t then same, b
+        if s == t then same, b
           else false, t_close_branch p s
       in
       let same, bl = Lists.map_fold_left brn true bl in
-      if t_equal s1 t1 && same then t
+      if s1 == t1 && same then t
         else t_label_copy t (t_case s1 bl)
   | Teps b ->
       let u,t1 = t_open_bound b in
       let s1 = fn t1 in
-      if t_equal s1 t1 then t
+      if s1 == t1 then t
         else t_label_copy t (t_eps_close u s1)
   | Tquant (q, b) ->
       let vl,tl,f1 = t_open_quant b in
       let g1 = fn f1 and sl = tr_map fn tl in
-      if t_equal g1 f1 && List.for_all2 (List.for_all2 t_equal) sl tl then t
+      if g1 == f1 && List.for_all2 (List.for_all2 (==)) sl tl then t
         else t_label_copy t (t_quant_close q vl sl g1)
   | _ ->
       t_map_unsafe fn t
@@ -1295,8 +1169,8 @@ let t_map_fold fn acc t = match t.t_node with
       let acc, s1 = fn acc t1 in
       let u,t2 = t_open_bound b in
       let acc, s2 = fn acc t2 in
-      acc, if t_equal s2 t2
-        then if t_equal s1 t1 then t
+      acc, if s2 == t2
+        then if s1 == t1 then t
           else t_label_copy t (t_let s1 b)
         else t_label_copy t (t_let_close u s1 s2)
   | Tcase (t1, bl) ->
@@ -1304,22 +1178,22 @@ let t_map_fold fn acc t = match t.t_node with
       let brn (acc,same) b =
         let p,t = t_open_branch b in
         let acc, s = fn acc t in
-        if t_equal s t then (acc,same), b
+        if s == t then (acc,same), b
           else (acc,false), t_close_branch p s
       in
       let (acc,same), bl = Lists.map_fold_left brn (acc,true) bl in
-      acc, if t_equal s1 t1 && same then t
+      acc, if s1 == t1 && same then t
         else t_label_copy t (t_case s1 bl)
   | Teps b ->
       let u,t1 = t_open_bound b in
       let acc, s1 = fn acc t1 in
-      acc, if t_equal s1 t1 then t
+      acc, if s1 == t1 then t
         else t_label_copy t (t_eps_close u s1)
   | Tquant (q, b) ->
       let vl,tl,f1 = t_open_quant b in
       let acc, sl = tr_map_fold fn acc tl in
       let acc, g1 = fn acc f1 in
-      acc, if t_equal g1 f1 && List.for_all2 (List.for_all2 t_equal) sl tl
+      acc, if g1 == f1 && List.for_all2 (List.for_all2 (==)) sl tl
         then t else t_label_copy t (t_quant_close q vl sl g1)
   | _ -> t_map_fold_unsafe fn acc t
 
@@ -1459,184 +1333,16 @@ let t_freevars = add_t_vars
 
 (* alpha-equality *)
 
-let vs_rename_alpha c h vs = incr c; Mvs.add vs !c h
+let t_equal_alpha = t_equal
 
-let vl_rename_alpha c h vl = List.fold_left (vs_rename_alpha c) h vl
-
-let rec pat_rename_alpha c h p = match p.pat_node with
-  | Pvar v -> vs_rename_alpha c h v
-  | Pas (p, v) -> pat_rename_alpha c (vs_rename_alpha c h v) p
-  | Por (p, _) -> pat_rename_alpha c h p
-  | _ -> pat_fold (pat_rename_alpha c) h p
-
-let rec pat_equal_alpha p1 p2 =
-  pat_equal p1 p2 ||
-  ty_equal p1.pat_ty p2.pat_ty &&
-  match p1.pat_node, p2.pat_node with
-  | Pwild, Pwild | Pvar _, Pvar _ -> true
-  | Papp (f1, l1), Papp (f2, l2) ->
-      ls_equal f1 f2 && List.for_all2 pat_equal_alpha l1 l2
-  | Pas (p1, _), Pas (p2, _) -> pat_equal_alpha p1 p2
-  | Por (p1, q1), Por (p2, q2) ->
-      pat_equal_alpha p1 p2 && pat_equal_alpha q1 q2
-  | _ -> false
-
-let rec t_equal_alpha c1 c2 m1 m2 t1 t2 =
-  t_equal t1 t2 || oty_equal t1.t_ty t2.t_ty &&
-  let t_eq = t_equal_alpha c1 c2 m1 m2 in
-  match t1.t_node, t2.t_node with
-    | Tvar v1, Tvar v2 when Mvs.mem v1 m1 ->
-        Mvs.mem v2 m2 && Mvs.find v1 m1 = Mvs.find v2 m2
-    | Tvar v1, Tvar v2 when not (Mvs.mem v2 m2) ->
-        vs_equal v1 v2
-    | Tconst c1, Tconst c2 ->
-        c1 = c2
-    | Tapp (s1,l1), Tapp (s2,l2) ->
-        ls_equal s1 s2 && List.for_all2 t_eq l1 l2
-    | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
-        t_eq f1 f2 && t_eq t1 t2 && t_eq e1 e2
-    | Tlet (t1,b1), Tlet (t2,b2) ->
-        t_eq t1 t2 &&
-        let u1,e1 = t_open_bound b1 in
-        let u2,e2 = t_open_bound b2 in
-        let m1 = vs_rename_alpha c1 m1 u1 in
-        let m2 = vs_rename_alpha c2 m2 u2 in
-        t_equal_alpha c1 c2 m1 m2 e1 e2
-    | Tcase (t1,bl1), Tcase (t2,bl2) ->
-        t_eq t1 t2 &&
-        let br_eq ((p1,_,_) as b1) ((p2,_,_) as b2) =
-          pat_equal_alpha p1 p2 &&
-          let p1,e1 = t_open_branch b1 in
-          let p2,e2 = t_open_branch b2 in
-          let m1 = pat_rename_alpha c1 m1 p1 in
-          let m2 = pat_rename_alpha c2 m2 p2 in
-          t_equal_alpha c1 c2 m1 m2 e1 e2
-        in
-        Lists.equal br_eq bl1 bl2
-    | Teps b1, Teps b2 ->
-        let u1,e1 = t_open_bound b1 in
-        let u2,e2 = t_open_bound b2 in
-        let m1 = vs_rename_alpha c1 m1 u1 in
-        let m2 = vs_rename_alpha c2 m2 u2 in
-        t_equal_alpha c1 c2 m1 m2 e1 e2
-    | Tquant (q1,((vl1,_,_,_) as b1)), Tquant (q2,((vl2,_,_,_) as b2)) ->
-        q1 = q2 &&
-        Lists.equal (fun v1 v2 -> ty_equal v1.vs_ty v2.vs_ty) vl1 vl2 &&
-        let vl1,_,e1 = t_open_quant b1 in
-        let vl2,_,e2 = t_open_quant b2 in
-        let m1 = vl_rename_alpha c1 m1 vl1 in
-        let m2 = vl_rename_alpha c2 m2 vl2 in
-        t_equal_alpha c1 c2 m1 m2 e1 e2
-    | Tbinop (a,f1,g1), Tbinop (b,f2,g2) ->
-        a = b && t_eq f1 f2 && t_eq g1 g2
-    | Tnot f1, Tnot f2 ->
-        t_eq f1 f2
-    | Ttrue, Ttrue | Tfalse, Tfalse ->
-        true
-    | _ -> false
-
-let t_equal_alpha = t_equal_alpha (ref (-1)) (ref (-1)) Mvs.empty Mvs.empty
-
-(* hash modulo alpha *)
-
-(* dead code
-let rec pat_hash_alpha p =
-  match p.pat_node with
-  | Pwild -> 0
-  | Pvar _ -> 1
-  | Papp (f, l) ->
-      let acc = Hashcons.combine 2 (ls_hash f) in
-      Hashcons.combine_list pat_hash_alpha acc l
-  | Pas (p, _) -> Hashcons.combine 3 (pat_hash_alpha p)
-  | Por (p, q) ->
-      Hashcons.combine
-        (Hashcons.combine 4 (pat_hash_alpha p)) (pat_hash_alpha q)
-*)
-
-let rec t_hash_alpha c m t =
-  let fn = t_hash_alpha c m in
-  match t.t_node with
-  | Tvar v ->
-      Hashcons.combine 0 (Mvs.find_def (vs_hash v) v m)
-  | Tconst c ->
-      Hashcons.combine 1 (Hashtbl.hash c)
-  | Tapp (s,l) ->
-      let acc = Hashcons.combine 2 (ls_hash s) in
-      Hashcons.combine_list fn acc l
-  | Tif (f,t1,t2) ->
-      Hashcons.combine3 3 (fn f) (fn t1) (fn t2)
-  | Tlet (t1,b) ->
-      let u,t2 = t_open_bound b in
-      let m = vs_rename_alpha c m u in
-      Hashcons.combine2 4 (fn t1) (t_hash_alpha c m t2)
-  | Tcase (t1,bl) ->
-      let hash_br b =
-        let p,t2 = t_open_branch b in
-        let m = pat_rename_alpha c m p in
-        t_hash_alpha c m t2
-      in
-      let acc = Hashcons.combine 5 (fn t1) in
-      Hashcons.combine_list hash_br acc bl
-  | Teps b ->
-      let u,f = t_open_bound b in
-      let m = vs_rename_alpha c m u in
-      Hashcons.combine 6 (t_hash_alpha c m f)
-  | Tquant (q,b) ->
-      let vl,_,f1 = t_open_quant b in
-      let m = vl_rename_alpha c m vl in
-      let hq = match q with Tforall -> 1 | Texists -> 2 in
-      Hashcons.combine2 1 hq (t_hash_alpha c m f1)
-  | Tbinop (o,f,g) ->
-      let ho = match o with
-        | Tand -> 3 | Tor -> 4 | Timplies -> 5 | Tiff -> 7
-      in
-      Hashcons.combine3 2 ho (fn f) (fn g)
-  | Tnot f ->
-      Hashcons.combine 3 (fn f)
-  | Ttrue -> 4
-  | Tfalse -> 5
-
-let t_hash_alpha = t_hash_alpha (ref (-1)) Mvs.empty
-
-module Hterm_alpha = Exthtbl.Make (struct
-  type t = term
-  let equal = t_equal_alpha
-  let hash = t_hash_alpha
-end)
-
-(* binder-free term/formula matching *)
-
-(* exception NoMatch *)
-
-(* let rec t_match s t1 t2 = *)
-(*   if not (oty_equal t1.t_ty t2.t_ty) then raise NoMatch else *)
-(*   match t1.t_node, t2.t_node with *)
-(*     | Tconst c1, Tconst c2 when c1 = c2 -> s *)
-(*     | Tvar v1, _ -> *)
-(*         Mvs.change v1 (function *)
-(*           | None -> Some t2 *)
-(*           | Some t1 as r when t_equal t1 t2 -> r *)
-(*           | _ -> raise NoMatch) s *)
-(*     | Tapp (s1,l1), Tapp (s2,l2) when ls_equal s1 s2 -> *)
-(*         List.fold_left2 t_match s l1 l2 *)
-(*     | Tif (f1,t1,e1), Tif (f2,t2,e2) -> *)
-(*         t_match (t_match (t_match s f1 f2) t1 t2) e1 e2 *)
-(*     | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) when op1 = op2 -> *)
-(*         t_match (t_match s f1 f2) g1 g2 *)
-(*     | Tnot f1, Tnot f2 -> *)
-(*         t_match s f1 f2 *)
-(*     | Ttrue, Ttrue *)
-(*     | Tfalse, Tfalse -> *)
-(*         s *)
-(*     | _ -> raise NoMatch *)
+module Hterm_alpha = Hterm
 
 (* occurrence check *)
 
 let rec t_occurs r t =
   t_equal r t || t_any (t_occurs r) t
 
-let rec t_occurs_alpha r t =
-  t_equal_alpha r t || t_any (t_occurs_alpha r) t
+let t_occurs_alpha = t_occurs
 
 (* substitutes term [t2] for term [t1] in term [t] *)
 
@@ -1647,12 +1353,7 @@ let t_replace t1 t2 t =
   t_ty_check t2 t1.t_ty;
   t_replace t1 t2 t
 
-let rec t_replace_alpha t1 t2 t =
-  if t_equal_alpha t t1 then t2 else t_map (t_replace_alpha t1 t2) t
-
-let t_replace_alpha t1 t2 t =
-  t_ty_check t2 t1.t_ty;
-  t_replace_alpha t1 t2 t
+let t_replace_alpha = t_replace
 
 (* constructors with propositional simplification *)
 

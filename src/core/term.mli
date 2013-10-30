@@ -77,7 +77,6 @@ type pattern = private {
   pat_node : pattern_node;
   pat_vars : Svs.t;
   pat_ty   : ty;
-  pat_tag  : int;
 }
 
 and pattern_node = private
@@ -86,9 +85,6 @@ and pattern_node = private
   | Papp of lsymbol * pattern list
   | Por  of pattern * pattern
   | Pas  of pattern * vsymbol
-
-val pat_equal : pattern -> pattern -> bool
-val pat_hash : pattern -> int
 
 (** Smart constructors for patterns *)
 
@@ -122,7 +118,6 @@ type term = private {
   t_ty    : ty option;
   t_label : Slab.t;
   t_loc   : Loc.position option;
-  t_tag   : int;
 }
 
 and term_node = private
