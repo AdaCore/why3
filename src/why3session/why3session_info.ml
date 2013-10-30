@@ -374,34 +374,34 @@ let run_one stats r0 r1 fname =
 (**** print histograms ******)
 
 let print_hist stats =
-  let main_ch = open_out "why3session.gnuplot" in
+  let main_file,main_ch = 
+    Filename.open_temp_file "why3session" ".gnuplot" 
+  in
   let main_fmt = formatter_of_out_channel main_ch in
-  fprintf main_fmt "set logscale y@\n";
+  fprintf main_fmt "set logscale@\n";
   fprintf main_fmt "set key rmargin@\n";
   let (_:int) =
   Hprover.fold
     (fun p h acc ->
-      let pf = (string_of_int acc) ^ ".plot" in
+      let pf,ch = Filename.open_temp_file "why3session" ".data" in
       if acc = 1 then 
-        fprintf main_fmt "plot [0:%d] [0.01:%.2f] " 
+        fprintf main_fmt "plot [1:%d] [0.01:%.2f] " 
           (stats.nb_proved_sub_goals + stats.nb_proved_root_goals)
           (stats.max_time) 
       else 
         fprintf main_fmt "replot";
-      fprintf main_fmt " \"%s\" using 2:1 title \"%s\" with linespoints ps 0.2@\n" 
+      fprintf main_fmt 
+        " \"%s\" using 2:1 title \"%s\" with linespoints ps 0.2@\n" 
         pf (string_of_prover p);
-      let ch = open_out pf in
       let fmt = formatter_of_out_channel ch in
-(*
-      fprintf fmt "0.00 0@\n";
-*)
-      let (_ :int) =
+      let (_ : float * int) =
         Mfloat.fold
-          (fun t c acc ->
-            let acc = c + acc in
-            fprintf fmt "%.2f %d@\n" t acc;
-            acc)
-          h 0
+          (fun t c (acct,accc) ->
+            let accc = c + accc in
+            let acct = t +. acct in
+            fprintf fmt "%.2f %d@\n" acct accc;
+            (acct,accc))
+          h (0.0,0)
       in 
       fprintf fmt "@.";
       close_out ch;
@@ -412,8 +412,14 @@ let print_hist stats =
   fprintf main_fmt "set terminal pdfcairo@\n";
   fprintf main_fmt "set output \"why3session.pdf\"@\n";
   fprintf main_fmt "replot@.";
-  close_out main_ch
-
+  close_out main_ch;
+  let cmd = "gnuplot " ^ main_file in
+  eprintf "Running command %s@." cmd;
+  let ret = Sys.command cmd in
+  if ret <> 0 then
+    eprintf "Command %s failed@." cmd
+  else
+    eprintf "See also results in file why3session.pdf@."
 
 (****** run on all files  ******)
 

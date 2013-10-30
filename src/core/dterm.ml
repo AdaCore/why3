@@ -112,22 +112,26 @@ let specialize_ls ls =
   let spec ty = if ty_closed ty then Duty ty else spec ty in
   List.map spec ls.ls_args, Opt.map spec ls.ls_value
 
+(* dead code
 let specialize_fs ls =
   let dtyl, dty = specialize_ls ls in
   match dty with
   | Some dty -> dtyl, dty
   | None -> raise (FunctionSymbolExpected ls)
+*)
 
 let specialize_cs ls =
   if ls.ls_constr = 0 then raise (ConstructorExpected ls);
   let dtyl, dty = specialize_ls ls in
   dtyl, Opt.get dty
 
+(* dead code
 let specialize_ps ls =
   let dtyl, dty = specialize_ls ls in
   match dty with
   | Some _ -> raise (PredicateSymbolExpected ls)
   | None -> dtyl
+*)
 
 (** Patterns, terms, and formulas *)
 
