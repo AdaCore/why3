@@ -337,7 +337,7 @@ let t_compare t1 t2 =
     | Por _, _  -> raise CompLT | _, Por _  -> raise CompGT
   in
   let rec t_compare bnd vml1 vml2 t1 t2 =
-    if t1 != t2 then begin
+    if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
       oty_compare t1.t_ty t2.t_ty;
       comp_raise (Slab.compare t1.t_label t2.t_label);
       match descend vml1 t1, descend vml2 t2 with
