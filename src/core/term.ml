@@ -299,6 +299,244 @@ and bind_info = {
   bv_subst : term Mvs.t   (* deferred substitution *)
 }
 
+(* term equality modulo alpha-equivalence and location *)
+
+exception CompLT
+exception CompGT
+
+type frame = int Mvs.t * term Mvs.t
+
+type term_or_bound =
+  | Trm of term * frame list
+  | Bnd of int
+
+let rec descend vml t = match t.t_node with
+  | Tvar vs ->
+      let rec find vs = function
+        | (bv,vm)::vml ->
+            begin match Mvs.find_opt vs bv with
+            | Some i -> Bnd i
+            | None ->
+                begin match Mvs.find_opt vs vm with
+                | Some t -> descend vml t
+                | None   -> find vs vml
+                end
+            end
+        | [] -> Trm (t, [])
+      in
+      find vs vml
+  | _ -> Trm (t, vml)
+
+let t_compare t1 t2 =
+  let comp_raise c =
+    if c < 0 then raise CompLT else if c > 0 then raise CompGT in
+  let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
+  (* TODO: provide Ty.ty_compare and Ty.oty_compare *)
+  let oty_compare oty1 oty2 = match oty1, oty2 with
+    | Some ty1, Some ty2 -> perv_compare (ty_hash ty1) (ty_hash ty2)
+    | Some _, None -> raise CompLT
+    | None, Some _ -> raise CompGT
+    | None, None -> () in
+  let rec l_compare cmp l1 l2 = match l1, l2 with
+    | (e1::l1),(e2::l2) -> cmp e1 e2; l_compare cmp l1 l2
+    | [], (_::_) -> raise CompLT
+    | (_::_), [] -> raise CompGT
+    | [],[] -> () in
+  let rec pat_compare bnd bv1 bv2 p1 p2 =
+    match p1.pat_node, p2.pat_node with
+    | Pwild, Pwild ->
+        bnd, bv1, bv2
+    | Pvar v1, Pvar v2 ->
+        bnd + 1, Mvs.add v1 bnd bv1, Mvs.add v2 bnd bv2
+    | Papp (s1, l1), Papp (s2, l2) -> (* TODO: Term.ls_compare *)
+        perv_compare (ls_hash s1) (ls_hash s2);
+        let cmp (bnd,bv1,bv2) p1 p2 = pat_compare bnd bv1 bv2 p1 p2 in
+        List.fold_left2 cmp (bnd,bv1,bv2) l1 l2
+    | Por (p1, q1), Por (p2, q2) ->
+        let (_,bv1,bv2 as res) = pat_compare bnd bv1 bv2 p1 p2 in
+        let rec or_cmp q1 q2 = match q1.pat_node, q2.pat_node with
+          | Pwild, Pwild -> ()
+          | Pvar v1, Pvar v2 ->
+              perv_compare (Mvs.find v1 bv1) (Mvs.find v2 bv2)
+          | Papp (s1, l1), Papp (s2, l2) -> (* TODO: Term.ls_compare *)
+              perv_compare (ls_hash s1) (ls_hash s2);
+              List.iter2 or_cmp l1 l2
+          | Por (p1, q1), Por (p2, q2) ->
+              or_cmp p1 p2; or_cmp q1 q2
+          | Pas (p1, v1), Pas (p2, v2) ->
+              or_cmp p1 p2;
+              perv_compare (Mvs.find v1 bv1) (Mvs.find v2 bv2)
+          | Pwild,  _ -> raise CompLT | _, Pwild  -> raise CompGT
+          | Pvar _, _ -> raise CompLT | _, Pvar _ -> raise CompGT
+          | Papp _, _ -> raise CompLT | _, Papp _ -> raise CompGT
+          | Por _,  _ -> raise CompLT | _, Por _  -> raise CompGT
+        in
+        or_cmp q1 q2;
+        res
+    | Pas (p1, v1), Pas (p2, v2) ->
+        let bnd, bv1, bv2 = pat_compare bnd bv1 bv2 p1 p2 in
+        bnd + 1, Mvs.add v1 bnd bv1, Mvs.add v2 bnd bv2
+    | Pwild, _  -> raise CompLT | _, Pwild  -> raise CompGT
+    | Pvar _, _ -> raise CompLT | _, Pvar _ -> raise CompGT
+    | Papp _, _ -> raise CompLT | _, Papp _ -> raise CompGT
+    | Por _, _  -> raise CompLT | _, Por _  -> raise CompGT
+  in
+  let rec t_compare bnd vml1 vml2 t1 t2 =
+    if t1 != t2 then begin
+      oty_compare t1.t_ty t2.t_ty;
+      comp_raise (Slab.compare t1.t_label t2.t_label);
+      match descend vml1 t1, descend vml2 t2 with
+      | Bnd i1, Bnd i2 -> perv_compare i1 i2
+      | Bnd _, Trm _ -> raise CompLT
+      | Trm _, Bnd _ -> raise CompGT
+      | Trm (t1,vml1), Trm (t2,vml2) ->
+          begin match t1.t_node, t2.t_node with
+          | Tvar v1, Tvar v2 -> (* TODO: Term.vs_compare *)
+              perv_compare (vs_hash v1) (vs_hash v2)
+          | Tconst c1, Tconst c2 -> (* TODO: Number.const_compare *)
+              perv_compare c1 c2
+          | Tapp (s1,l1), Tapp (s2,l2) -> (* TODO: Term.ls_compare *)
+              perv_compare (ls_hash s1) (ls_hash s2);
+              List.iter2 (t_compare bnd vml1 vml2) l1 l2
+          | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
+              t_compare bnd vml1 vml2 f1 f2;
+              t_compare bnd vml1 vml2 t1 t2;
+              t_compare bnd vml1 vml2 e1 e2
+          | Tlet (t1,(v1,b1,e1)), Tlet (t2,(v2,b2,e2)) ->
+              t_compare bnd vml1 vml2 t1 t2;
+              let vml1 = (Mvs.singleton v1 bnd, b1.bv_subst) :: vml1 in
+              let vml2 = (Mvs.singleton v2 bnd, b2.bv_subst) :: vml2 in
+              t_compare (bnd + 1) vml1 vml2 e1 e2
+          | Tcase (t1,bl1), Tcase (t2,bl2) ->
+              t_compare bnd vml1 vml2 t1 t2;
+              let b_compare (p1,b1,t1) (p2,b2,t2) =
+                let bnd,bv1,bv2 = pat_compare bnd Mvs.empty Mvs.empty p1 p2 in
+                let vml1 = (bv1, b1.bv_subst) :: vml1 in
+                let vml2 = (bv2, b2.bv_subst) :: vml2 in
+                t_compare bnd vml1 vml2 t1 t2 in
+              List.iter2 b_compare bl1 bl2
+          | Teps (v1,b1,e1), Teps (v2,b2,e2) ->
+              let vml1 = (Mvs.singleton v1 bnd, b1.bv_subst) :: vml1 in
+              let vml2 = (Mvs.singleton v2 bnd, b2.bv_subst) :: vml2 in
+              t_compare (bnd + 1) vml1 vml2 e1 e2
+          | Tquant (q1,(vl1,b1,tr1,f1)), Tquant (q2,(vl2,b2,tr2,f2)) ->
+              perv_compare q1 q2;
+              let rec add bnd bv1 bv2 vl1 vl2 = match vl1, vl2 with
+                | (v1::vl1), (v2::vl2) ->
+                    let bv1 = Mvs.add v1 bnd bv1 in
+                    let bv2 = Mvs.add v2 bnd bv2 in
+                    add (bnd + 1) bv1 bv2 vl1 vl2
+                | [], (_::_) -> raise CompLT
+                | (_::_), [] -> raise CompGT
+                | [], [] -> bnd, bv1, bv2 in
+              let bnd, bv1, bv2 = add bnd Mvs.empty Mvs.empty vl1 vl2 in
+              let vml1 = (bv1, b1.bv_subst) :: vml1 in
+              let vml2 = (bv2, b2.bv_subst) :: vml2 in
+              l_compare (l_compare (t_compare bnd vml1 vml2)) tr1 tr2;
+              t_compare bnd vml1 vml2 f1 f2
+          | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
+              perv_compare op1 op2;
+              t_compare bnd vml1 vml2 f1 f2;
+              t_compare bnd vml1 vml2 g1 g2
+          | Tnot f1, Tnot f2 ->
+              t_compare bnd vml1 vml2 f1 f2
+          | Ttrue, Ttrue -> ()
+          | Tfalse, Tfalse -> ()
+          | Tvar _, _   -> raise CompLT | _, Tvar _   -> raise CompGT
+          | Tconst _, _ -> raise CompLT | _, Tconst _ -> raise CompGT
+          | Tapp _, _   -> raise CompLT | _, Tapp _   -> raise CompGT
+          | Tif _, _    -> raise CompLT | _, Tif _    -> raise CompGT
+          | Tlet _, _   -> raise CompLT | _, Tlet _   -> raise CompGT
+          | Tcase _, _  -> raise CompLT | _, Tcase _  -> raise CompGT
+          | Teps _, _   -> raise CompLT | _, Teps _   -> raise CompGT
+          | Tquant _, _ -> raise CompLT | _, Tquant _ -> raise CompGT
+          | Tbinop _, _ -> raise CompLT | _, Tbinop _ -> raise CompGT
+          | Tnot _, _   -> raise CompLT | _, Tnot _   -> raise CompGT
+          | Ttrue, _    -> raise CompLT | _, Ttrue    -> raise CompGT
+          end
+    end in
+  try t_compare 0 [] [] t1 t2; 0
+  with CompLT -> -1 | CompGT -> 1
+
+let t_equal t1 t2 = (t_compare t1 t2 = 0)
+
+let t_hash t =
+  let rec pat_hash bnd bv p = match p.pat_node with
+    | Pwild -> bnd, bv, 0
+    | Pvar v -> bnd + 1, Mvs.add v bnd bv, bnd + 1
+    | Papp (s,l) ->
+        let hash (bnd,bv,h) p =
+          let bnd,bv,hp = pat_hash bnd bv p in
+          bnd, bv, Hashcons.combine h hp in
+        List.fold_left hash (bnd,bv,ls_hash s) l
+    | Por (p,q) ->
+        let bnd,bv,hp = pat_hash bnd bv p in
+        let rec or_hash q = match q.pat_node with
+          | Pwild -> 0
+          | Pvar v -> Mvs.find v bv + 1
+          | Papp (s,l) -> Hashcons.combine_list or_hash (ls_hash s) l
+          | Por (p,q) -> Hashcons.combine (or_hash p) (or_hash q)
+          | Pas (p,v) -> Hashcons.combine (or_hash p) (Mvs.find v bv + 1)
+        in
+        bnd, bv, Hashcons.combine hp (or_hash q)
+    | Pas (p,v) ->
+        let bnd,bv,hp = pat_hash bnd bv p in
+        bnd + 1, Mvs.add v bnd bv, Hashcons.combine hp (bnd + 1)
+  in
+  let rec t_hash bnd vml t =
+    let comb l h = Hashcons.combine (lab_hash l) h in
+    let h = Slab.fold comb t.t_label (oty_hash t.t_ty) in
+    Hashcons.combine h
+      begin match descend vml t with
+      | Bnd i -> i + 1
+      | Trm (t,vml) ->
+          begin match t.t_node with
+          | Tvar v -> vs_hash v
+          | Tconst c -> Hashtbl.hash c
+          | Tapp (s,l) ->
+              Hashcons.combine_list (t_hash bnd vml) (ls_hash s) l
+          | Tif (f,t,e) ->
+              let hf = t_hash bnd vml f in
+              let ht = t_hash bnd vml t in
+              let he = t_hash bnd vml e in
+              Hashcons.combine2 hf ht he
+          | Tlet (t,(v,b,e)) ->
+              let h = t_hash bnd vml t in
+              let vml = (Mvs.singleton v bnd, b.bv_subst) :: vml in
+              Hashcons.combine h (t_hash (bnd + 1) vml e)
+          | Tcase (t,bl) ->
+              let h = t_hash bnd vml t in
+              let b_hash (p,b,t) =
+                let bnd,bv,hp = pat_hash bnd Mvs.empty p in
+                let vml = (bv, b.bv_subst) :: vml in
+                Hashcons.combine hp (t_hash bnd vml t) in
+              Hashcons.combine_list b_hash h bl
+          | Teps (v,b,e) ->
+              let vml = (Mvs.singleton v bnd, b.bv_subst) :: vml in
+              t_hash (bnd + 1) vml e
+          | Tquant (q,(vl,b,tr,f)) ->
+              let h = Hashtbl.hash q in
+              let rec add bnd bv vl = match vl with
+                | v::vl -> add (bnd + 1) (Mvs.add v bnd bv) vl
+                | [] -> bnd, bv in
+              let bnd, bv = add bnd Mvs.empty vl in
+              let vml = (bv, b.bv_subst) :: vml in
+              let h = List.fold_left
+                (Hashcons.combine_list (t_hash bnd vml)) h tr in
+              Hashcons.combine h (t_hash bnd vml f)
+          | Tbinop (op,f,g) ->
+              let ho = Hashtbl.hash op in
+              let hf = t_hash bnd vml f in
+              let hg = t_hash bnd vml g in
+              Hashcons.combine2 ho hf hg
+          | Tnot f ->
+              Hashcons.combine 1 (t_hash bnd vml f)
+          | Ttrue -> 2
+          | Tfalse -> 3
+          end
+    end in
+  t_hash 0 [] t
+
 (* term equality and hash *)
 
 let t_equal : term -> term -> bool = (==)
