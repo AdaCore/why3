@@ -213,11 +213,13 @@ let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
     | Ttrue -> push tag_true acc
     | Tfalse -> push tag_false acc
 
+(* dead code
 let t_shape_buf ?(version=current_shape_version) t =
   let b = Buffer.create 17 in
   let push t () = Buffer.add_string b t in
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () t in
   Buffer.contents b
+*)
 
 let t_shape_task ?(version=current_shape_version) t =
   let b = Buffer.create 17 in
