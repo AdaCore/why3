@@ -47,7 +47,9 @@ module Wtask = Weakhtbl.Make (struct
   let tag t = t.task_tag
 end)
 
-let store fn = Wtask.memoize_option 63 fn
+let store fn = let tr = Wtask.memoize_option 63 fn in fun t -> match t with
+  | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}}} -> fn t
+  | _ -> tr t
 
 let bind f g = store (fun task -> g (f task) task)
 
@@ -60,8 +62,9 @@ let fold fn v =
     | Use _  -> 'U' | Meta _  -> 'M') (task.task_decl.td_tag);
 *)
     let acc = fn task acc in
-    Wtask.set h task acc;
-    acc
+    match task.task_decl.td_node with
+    | Decl {d_node = Dprop (Pgoal,_,_)} -> acc
+    | _ -> Wtask.set h task acc; acc
   in
   let current task =
     try Some (Wtask.find h task)
@@ -82,8 +85,12 @@ let fold_map   fn v t = conv_res snd            (fold   fn (v, t))
 let fold_map_l fn v t = conv_res (List.map snd) (fold_l fn (v, t))
 (* we use List.map instead of List.map_rev to preserve the order *)
 
+let store_decl fn = let tr = Wdecl.memoize 63 fn in function
+  | {d_node = Dprop (Pgoal,_,_)} as d -> fn d
+  | d -> tr d
+
 let gen_decl add fn =
-  let fn = Wdecl.memoize 63 fn in
+  let fn = store_decl fn in
   let fn task acc = match task.task_decl.td_node with
     | Decl d -> List.fold_left add acc (fn d)
     | _ -> add_tdecl acc task.task_decl
@@ -91,7 +98,7 @@ let gen_decl add fn =
   fold fn
 
 let gen_decl_l add fn =
-  let fn = Wdecl.memoize 63 fn in
+  let fn = store_decl fn in
   let fn task acc = match task.task_decl.td_node with
     | Decl d -> List.map (List.fold_left add acc) (fn d)
     | _ -> [add_tdecl acc task.task_decl]
@@ -107,17 +114,15 @@ let apply_to_goal fn d = match d.d_node with
   | Dprop (Pgoal,pr,f) -> fn pr f
   | _ -> assert false
 
-let gen_goal add fn =
-  let fn = Wdecl.memoize 5 (apply_to_goal fn) in store (function
-    | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
-        List.fold_left add prev (fn d)
-    | _ -> assert false)
+let gen_goal add fn = function
+  | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
+      List.fold_left add prev (apply_to_goal fn d)
+  | _ -> assert false
 
-let gen_goal_l add fn =
-  let fn = Wdecl.memoize 5 (apply_to_goal fn) in store (function
-    | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
-        List.map (List.fold_left add prev) (fn d)
-    | _ -> assert false)
+let gen_goal_l add fn = function
+  | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
+      List.map (List.fold_left add prev) (apply_to_goal fn d)
+  | _ -> assert false
 
 let goal    = gen_goal   add_decl
 let goal_l  = gen_goal_l add_decl
