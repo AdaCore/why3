@@ -27,6 +27,7 @@ module Svs : Extset.S with module M = Mvs
 module Hvs : Exthtbl.S with type key = vsymbol
 module Wvs : Weakhtbl.S with type key = vsymbol
 
+val vs_compare : vsymbol -> vsymbol -> int
 val vs_equal : vsymbol -> vsymbol -> bool
 val vs_hash : vsymbol -> int
 
@@ -47,6 +48,7 @@ module Sls : Extset.S with module M = Mls
 module Hls : Exthtbl.S with type key = lsymbol
 module Wls : Weakhtbl.S with type key = lsymbol
 
+val ls_compare : lsymbol -> lsymbol -> int
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
 
@@ -144,6 +146,7 @@ module Mterm : Extmap.S with type key = term
 module Sterm : Extset.S with module M = Mterm
 module Hterm : Exthtbl.S with type key = term
 
+val t_compare : term -> term -> int
 val t_equal : term -> term -> bool
 val t_hash : term -> int
 

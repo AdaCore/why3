@@ -31,8 +31,8 @@ module Hvs = Vsym.H
 module Wvs = Vsym.W
 
 let vs_equal : vsymbol -> vsymbol -> bool = (==)
-
 let vs_hash vs = id_hash vs.vs_name
+let vs_compare vs1 vs2 = id_compare vs1.vs_name vs2.vs_name
 
 let create_vsymbol name ty = {
   vs_name = id_register name;
@@ -60,8 +60,8 @@ module Hls = Lsym.H
 module Wls = Lsym.W
 
 let ls_equal : lsymbol -> lsymbol -> bool = (==)
-
 let ls_hash ls = id_hash ls.ls_name
+let ls_compare ls1 ls2 = id_compare ls1.ls_name ls2.ls_name
 
 let check_opaque opaque args value =
   if Stv.is_empty opaque then opaque else
@@ -286,35 +286,23 @@ let t_compare t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
   let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
-  (* TODO: provide Ty.ty_compare and Ty.oty_compare *)
-  let oty_compare oty1 oty2 = match oty1, oty2 with
-    | Some ty1, Some ty2 -> perv_compare (ty_hash ty1) (ty_hash ty2)
-    | Some _, None -> raise CompLT
-    | None, Some _ -> raise CompGT
-    | None, None -> () in
-  let rec l_compare cmp l1 l2 = match l1, l2 with
-    | (e1::l1),(e2::l2) -> cmp e1 e2; l_compare cmp l1 l2
-    | [], (_::_) -> raise CompLT
-    | (_::_), [] -> raise CompGT
-    | [],[] -> () in
-  let rec pat_compare bnd bv1 bv2 p1 p2 =
+  let rec pat_compare (bnd,bv1,bv2 as state) p1 p2 =
     match p1.pat_node, p2.pat_node with
     | Pwild, Pwild ->
         bnd, bv1, bv2
     | Pvar v1, Pvar v2 ->
         bnd + 1, Mvs.add v1 bnd bv1, Mvs.add v2 bnd bv2
-    | Papp (s1, l1), Papp (s2, l2) -> (* TODO: Term.ls_compare *)
-        perv_compare (ls_hash s1) (ls_hash s2);
-        let cmp (bnd,bv1,bv2) p1 p2 = pat_compare bnd bv1 bv2 p1 p2 in
-        List.fold_left2 cmp (bnd,bv1,bv2) l1 l2
+    | Papp (s1, l1), Papp (s2, l2) ->
+        comp_raise (ls_compare s1 s2);
+        List.fold_left2 pat_compare state l1 l2
     | Por (p1, q1), Por (p2, q2) ->
-        let (_,bv1,bv2 as res) = pat_compare bnd bv1 bv2 p1 p2 in
+        let (_,bv1,bv2 as res) = pat_compare state p1 p2 in
         let rec or_cmp q1 q2 = match q1.pat_node, q2.pat_node with
           | Pwild, Pwild -> ()
           | Pvar v1, Pvar v2 ->
               perv_compare (Mvs.find v1 bv1) (Mvs.find v2 bv2)
-          | Papp (s1, l1), Papp (s2, l2) -> (* TODO: Term.ls_compare *)
-              perv_compare (ls_hash s1) (ls_hash s2);
+          | Papp (s1, l1), Papp (s2, l2) ->
+              comp_raise (ls_compare s1 s2);
               List.iter2 or_cmp l1 l2
           | Por (p1, q1), Por (p2, q2) ->
               or_cmp p1 p2; or_cmp q1 q2
@@ -329,7 +317,7 @@ let t_compare t1 t2 =
         or_cmp q1 q2;
         res
     | Pas (p1, v1), Pas (p2, v2) ->
-        let bnd, bv1, bv2 = pat_compare bnd bv1 bv2 p1 p2 in
+        let bnd, bv1, bv2 = pat_compare state p1 p2 in
         bnd + 1, Mvs.add v1 bnd bv1, Mvs.add v2 bnd bv2
     | Pwild, _  -> raise CompLT | _, Pwild  -> raise CompGT
     | Pvar _, _ -> raise CompLT | _, Pvar _ -> raise CompGT
@@ -338,7 +326,7 @@ let t_compare t1 t2 =
   in
   let rec t_compare bnd vml1 vml2 t1 t2 =
     if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
-      oty_compare t1.t_ty t2.t_ty;
+      comp_raise (oty_compare t1.t_ty t2.t_ty);
       comp_raise (Slab.compare t1.t_label t2.t_label);
       match descend vml1 t1, descend vml2 t2 with
       | Bnd i1, Bnd i2 -> perv_compare i1 i2
@@ -346,12 +334,12 @@ let t_compare t1 t2 =
       | Trm _, Bnd _ -> raise CompGT
       | Trm (t1,vml1), Trm (t2,vml2) ->
           begin match t1.t_node, t2.t_node with
-          | Tvar v1, Tvar v2 -> (* TODO: Term.vs_compare *)
-              perv_compare (vs_hash v1) (vs_hash v2)
-          | Tconst c1, Tconst c2 -> (* TODO: Number.const_compare *)
+          | Tvar v1, Tvar v2 ->
+              comp_raise (vs_compare v1 v2)
+          | Tconst c1, Tconst c2 ->
               perv_compare c1 c2
-          | Tapp (s1,l1), Tapp (s2,l2) -> (* TODO: Term.ls_compare *)
-              perv_compare (ls_hash s1) (ls_hash s2);
+          | Tapp (s1,l1), Tapp (s2,l2) ->
+              comp_raise (ls_compare s1 s2);
               List.iter2 (t_compare bnd vml1 vml2) l1 l2
           | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
               t_compare bnd vml1 vml2 f1 f2;
@@ -365,11 +353,11 @@ let t_compare t1 t2 =
           | Tcase (t1,bl1), Tcase (t2,bl2) ->
               t_compare bnd vml1 vml2 t1 t2;
               let b_compare (p1,b1,t1) (p2,b2,t2) =
-                let bnd,bv1,bv2 = pat_compare bnd Mvs.empty Mvs.empty p1 p2 in
+                let bnd,bv1,bv2 = pat_compare (bnd,Mvs.empty,Mvs.empty) p1 p2 in
                 let vml1 = (bv1, b1.bv_subst) :: vml1 in
                 let vml2 = (bv2, b2.bv_subst) :: vml2 in
-                t_compare bnd vml1 vml2 t1 t2 in
-              List.iter2 b_compare bl1 bl2
+                t_compare bnd vml1 vml2 t1 t2; 0 in
+              comp_raise (Lists.compare b_compare bl1 bl2)
           | Teps (v1,b1,e1), Teps (v2,b2,e2) ->
               let vml1 = (Mvs.singleton v1 bnd, b1.bv_subst) :: vml1 in
               let vml2 = (Mvs.singleton v2 bnd, b2.bv_subst) :: vml2 in
@@ -387,7 +375,8 @@ let t_compare t1 t2 =
               let bnd, bv1, bv2 = add bnd Mvs.empty Mvs.empty vl1 vl2 in
               let vml1 = (bv1, b1.bv_subst) :: vml1 in
               let vml2 = (bv2, b2.bv_subst) :: vml2 in
-              l_compare (l_compare (t_compare bnd vml1 vml2)) tr1 tr2;
+              let tr_cmp t1 t2 = t_compare bnd vml1 vml2 t1 t2; 0 in
+              comp_raise (Lists.compare (Lists.compare tr_cmp) tr1 tr2);
               t_compare bnd vml1 vml2 f1 f2
           | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
               perv_compare op1 op2;
@@ -421,24 +410,15 @@ let t_similar t1 t2 =
     match t1.t_node, t2.t_node with
     | Tvar v1, Tvar v2 -> vs_equal v1 v2
     | Tconst c1, Tconst c2 -> c1 = c2
-    | Tapp (s1,l1), Tapp (s2,l2) ->
-        ls_equal s1 s2 && Lists.equal (==) l1 l2
-    | Tif (f1,t1,e1), Tif (f2,t2,e2) ->
-        f1 == f2 && t1 == t2 && e1 == e2
-    | Tlet (t1,bv1), Tlet (t2,bv2) ->
-        t1 == t2 && bv1 == bv2
-    | Tcase (t1,bl1), Tcase (t2,bl2) ->
-        t1 == t2 && Lists.equal (==) bl1 bl2
-    | Teps bv1, Teps bv2 ->
-        bv1 == bv2
-    | Tquant (q1,bv1), Tquant (q2,bv2) ->
-        q1 = q2 && bv1 == bv2
-    | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
-        op1 = op2 && f1 == f2 && g1 == g2
-    | Tnot f1, Tnot f2 ->
-        f1 == f2
-    | Ttrue, Ttrue
-    | Tfalse, Tfalse -> true
+    | Tapp (s1,l1), Tapp (s2,l2) -> ls_equal s1 s2 && Lists.equal (==) l1 l2
+    | Tif (f1,t1,e1), Tif (f2,t2,e2) -> f1 == f2 && t1 == t2 && e1 == e2
+    | Tlet (t1,bv1), Tlet (t2,bv2) -> t1 == t2 && bv1 == bv2
+    | Tcase (t1,bl1), Tcase (t2,bl2) -> t1 == t2 && Lists.equal (==) bl1 bl2
+    | Teps bv1, Teps bv2 -> bv1 == bv2
+    | Tquant (q1,bv1), Tquant (q2,bv2) -> q1 = q2 && bv1 == bv2
+    | Tbinop (o1,f1,g1), Tbinop (o2,f2,g2) -> o1 = o2 && f1 == f2 && g1 == g2
+    | Tnot f1, Tnot f2 -> f1 == f2
+    | Ttrue, Ttrue | Tfalse, Tfalse -> true
     | _, _ -> false
   end
 
@@ -621,10 +601,17 @@ let t_label_add l t = { t with t_label = Slab.add l t.t_label }
 let t_label_remove l t = { t with t_label = Slab.remove l t.t_label }
 
 let t_label_copy s t =
-  if t_similar s t then s else
-  let lab = Slab.union s.t_label t.t_label in
-  let loc = if t.t_loc = None then s.t_loc else t.t_loc in
-  { t with t_label = lab; t_loc = loc }
+  let copy base =
+    let lab = Slab.union s.t_label t.t_label in
+    let loc = if t.t_loc = None then s.t_loc else t.t_loc in
+    { base with t_label = lab; t_loc = loc }
+  in
+  if t_similar s t then
+    if (t.t_label == s.t_label || Slab.subset t.t_label s.t_label) then
+      if (t.t_loc == s.t_loc || t.t_loc = None) then s
+      else { s with t_loc = t.t_loc }
+    else copy s
+  else copy t
 
 (* unsafe map *)
 
