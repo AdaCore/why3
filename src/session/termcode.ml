@@ -412,35 +412,39 @@ module Checksum = struct
         char b 'C'; ident b th.Theory.th_name; list string b th.Theory.th_path
     | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
 
-  let task_v1 t =
+  let task_v1 =
     let c = ref 0 in
     let m = ref Ident.Mid.empty in
     let b = Buffer.create 8192 in
-    Task.task_iter (tdecl (CV1,c,m,b)) t;
-    clear_ident_v1 ();
-    let s = Buffer.contents b in
-    Digest.to_hex (Digest.string s)
+    fun t ->
+      Task.task_iter (tdecl (CV1,c,m,b)) t;
+      clear_ident_v1 ();
+      let dnew = Digest.string (Buffer.contents b) in
+      Buffer.clear b;
+      Digest.to_hex dnew
 
-  let task_v2 t (c,mold,rest) =
-    let c = ref c in
-    let m = ref mold in
+  let task_v2 =
+    let c = ref 0 in
+    let m = ref Ident.Mid.empty in
     let b = Buffer.create 8192 in
-    tdecl (CV2,c,m,b) t.Task.task_decl;
-    Buffer.add_string b (Digest.to_hex rest);
-    let s = Buffer.contents b in
-    Buffer.clear b;
-    let mnew = match t.Task.task_decl.Theory.td_node with
-      | Theory.Decl d ->
-          let m = Ident.Mid.set_inter !m d.Decl.d_news in
-          Ident.Mid.set_union mold m
-      | _ -> !m in
-    (!c, mnew, Digest.string s)
-
-  let task_v2 = Trans.fold task_v2 (0, Ident.Mid.empty, Digest.string "")
-
-  let task_v2 t =
-    let _,_,s = Trans.apply task_v2 t in
-    Digest.to_hex s
+    let task_hd t (cold,mold,dold) =
+      c := cold;
+      m := mold;
+      tdecl (CV2,c,m,b) t.Task.task_decl;
+      Buffer.add_string b (Digest.to_hex dold);
+      let dnew = Digest.string (Buffer.contents b) in
+      Buffer.clear b;
+      let mnew = match t.Task.task_decl.Theory.td_node with
+        | Theory.Decl d ->
+            let m = Ident.Mid.set_inter !m d.Decl.d_news in
+            Ident.Mid.set_union mold m
+        | _ -> !m in
+      !c, mnew, dnew
+    in
+    let tr = Trans.fold task_hd (0, Ident.Mid.empty, Digest.string "") in
+    fun t ->
+      let _,_,dnew = Trans.apply tr t in
+      Digest.to_hex dnew
 
   let task ~version t = match version with
     | CV1 -> task_v1 t
