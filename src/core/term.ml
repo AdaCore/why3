@@ -405,9 +405,8 @@ let t_compare t1 t2 =
 let t_equal t1 t2 = (t_compare t1 t2 = 0)
 
 let t_similar t1 t2 =
-  t1 == t2 || begin
-    oty_equal t1.t_ty t2.t_ty &&
-    match t1.t_node, t2.t_node with
+  oty_equal t1.t_ty t2.t_ty &&
+  match t1.t_node, t2.t_node with
     | Tvar v1, Tvar v2 -> vs_equal v1 v2
     | Tconst c1, Tconst c2 -> c1 = c2
     | Tapp (s1,l1), Tapp (s2,l2) -> ls_equal s1 s2 && Lists.equal (==) l1 l2
@@ -420,7 +419,6 @@ let t_similar t1 t2 =
     | Tnot f1, Tnot f2 -> f1 == f2
     | Ttrue, Ttrue | Tfalse, Tfalse -> true
     | _, _ -> false
-  end
 
 let t_hash t =
   let rec pat_hash bnd bv p = match p.pat_node with
@@ -601,17 +599,11 @@ let t_label_add l t = { t with t_label = Slab.add l t.t_label }
 let t_label_remove l t = { t with t_label = Slab.remove l t.t_label }
 
 let t_label_copy s t =
-  let copy base =
-    let lab = Slab.union s.t_label t.t_label in
-    let loc = if t.t_loc = None then s.t_loc else t.t_loc in
-    { base with t_label = lab; t_loc = loc }
-  in
-  if t_similar s t then
-    if (t.t_label == s.t_label || Slab.subset t.t_label s.t_label) then
-      if (t.t_loc == s.t_loc || t.t_loc = None) then s
-      else { s with t_loc = t.t_loc }
-    else copy s
-  else copy t
+  if s == t then s else
+  if t_similar s t && Slab.is_empty t.t_label && t.t_loc = None then s else
+  let lab = Slab.union s.t_label t.t_label in
+  let loc = if t.t_loc = None then s.t_loc else t.t_loc in
+  { t with t_label = lab; t_loc = loc }
 
 (* unsafe map *)
 
