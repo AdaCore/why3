@@ -423,17 +423,7 @@ val t_app_map :
 val t_app_fold :
   ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
 
-(** Equality modulo alpha *)
-
-val t_equal_alpha : term -> term -> bool
-
-module Hterm_alpha : Exthtbl.S with type key = term
-
 (** Subterm occurrence check and replacement *)
 
-val t_occurs : term -> term -> bool
-val t_occurs_alpha : term -> term -> bool
-
+val t_occurs  : term -> term -> bool
 val t_replace : term -> term -> term -> term
-val t_replace_alpha : term -> term -> term -> term
-

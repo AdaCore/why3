@@ -1318,18 +1318,10 @@ let t_subst_single v t1 t = t_subst (Mvs.singleton v t1) t
 
 let t_freevars = add_t_vars
 
-(* alpha-equality *)
-
-let t_equal_alpha = t_equal
-
-module Hterm_alpha = Hterm
-
 (* occurrence check *)
 
 let rec t_occurs r t =
   t_equal r t || t_any (t_occurs r) t
-
-let t_occurs_alpha = t_occurs
 
 (* substitutes term [t2] for term [t1] in term [t] *)
 
@@ -1339,8 +1331,6 @@ let rec t_replace t1 t2 t =
 let t_replace t1 t2 t =
   t_ty_check t2 t1.t_ty;
   t_replace t1 t2 t
-
-let t_replace_alpha = t_replace
 
 (* constructors with propositional simplification *)
 
