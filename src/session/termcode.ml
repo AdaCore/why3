@@ -421,15 +421,20 @@ module Checksum = struct
     let s = Buffer.contents b in
     Digest.to_hex (Digest.string s)
 
-  let task_v2 t (c,m,rest) =
+  let task_v2 t (c,mold,rest) =
     let c = ref c in
-    let m = ref m in
+    let m = ref mold in
     let b = Buffer.create 8192 in
     tdecl (CV2,c,m,b) t.Task.task_decl;
     Buffer.add_string b (Digest.to_hex rest);
     let s = Buffer.contents b in
     Buffer.clear b;
-    (!c, !m, Digest.string s)
+    let mnew = match t.Task.task_decl.Theory.td_node with
+      | Theory.Decl d ->
+          let m = Ident.Mid.set_inter !m d.Decl.d_news in
+          Ident.Mid.set_union mold m
+      | _ -> !m in
+    (!c, mnew, Digest.string s)
 
   let task_v2 = Trans.fold task_v2 (0, Ident.Mid.empty, Digest.string "")
 
