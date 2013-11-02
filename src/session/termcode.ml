@@ -289,8 +289,9 @@ module Checksum = struct
     | Ty.Tyvar tv -> char b 'v'; tvsymbol b tv
     | Ty.Tyapp (ts, tyl) -> char b 'a'; ident b ts.Ty.ts_name; list ty b tyl
 
-  (* variable: the type, but not the name (we want alpha-equivalence) *)
-  let vsymbol b vs = ty b vs.vs_ty
+  let vsymbol (v,_,_,_ as b) vs = match v with
+    | CV1 -> ty b vs.vs_ty
+    | CV2 -> ident b vs.vs_name; ty b vs.vs_ty
 
   (* start: _ V ident a o *)
   let rec pat b p = match p.pat_node with
@@ -435,9 +436,9 @@ module Checksum = struct
       let dnew = Digest.string (Buffer.contents b) in
       Buffer.clear b;
       let mnew = match t.Task.task_decl.Theory.td_node with
-        | Theory.Decl d ->
-            let m = Ident.Mid.set_inter !m d.Decl.d_news in
-            Ident.Mid.set_union mold m
+        | Theory.Decl { Decl.d_news = s } ->
+            Ident.Sid.fold (fun id a ->
+              Ident.Mid.add id (Ident.Mid.find id !m) a) s mold
         | _ -> !m in
       !c, mnew, dnew
     in
