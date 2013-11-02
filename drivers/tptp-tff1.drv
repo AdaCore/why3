@@ -1,6 +1,6 @@
-(* Why driver for first-order tptp provers supporting TFF0 *)
+(* Why driver for first-order tptp provers supporting TFF1 *)
 
-printer "tptp-tff"
+printer "tptp-tff1"
 filename "%f-%t-%g.p"
 
 valid   "Proof found"
@@ -29,9 +29,6 @@ transformation "eliminate_definition"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
 
-transformation "encoding_smt"
-transformation "encoding_sort"
-
 theory BuiltIn
   syntax predicate (=)  "(%1 = %2)"
   syntax type int  "$int"
@@ -40,11 +37,6 @@ theory BuiltIn
   meta "encoding : kept" type int
   meta "encoding : kept" type real
   meta "eliminate_algebraic" "no_index"
-
-  meta "select_inst" "all"
-  meta "select_lskept" "all"
-  meta "select_lsinst" "all"
-  meta "select_kept" "all"
 end
 
 theory int.Int

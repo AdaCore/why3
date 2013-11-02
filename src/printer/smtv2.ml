@@ -71,55 +71,23 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
-(** type *)
 type info = {
   info_syn : syntax_map;
-(*  complex_type : ty Hty.t; *)
 }
 
+(** type *)
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
-  | Tyapp (ts, []) -> begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_type info) fmt []
-      | None -> fprintf fmt "%a" print_ident ts.ts_name
-  end
   | Tyapp (ts, l) ->
-     begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_type info) fmt l
-      | None -> fprintf fmt "(%a %a)" print_ident ts.ts_name
-        (print_list space (print_type info)) l
+     begin match query_syntax info.info_syn ts.ts_name, l with
+      | Some s, _ -> syntax_arguments s (print_type info) fmt l
+      | None, [] -> fprintf fmt "%a" print_ident ts.ts_name
+      | None, _ -> fprintf fmt "(%a %a)" print_ident ts.ts_name
+          (print_list space (print_type info)) l
      end
 
-(*
-let iter_complex_type info fmt () ty =
-    match ty.ty_node with
-      | Tyapp (_,_::_) when not (Hty.mem info.complex_type ty) ->
-        let id = id_fresh (Pp.string_of_wnl Pretty.print_ty ty) in
-        let ts = create_tysymbol id [] None in
-        let cty = ty_app ts [] in
-        fprintf fmt "(define-sorts ((%a %a)))@\n"
-          print_ident ts.ts_name
-          (print_type info) ty;
-        Hty.add info.complex_type ty cty
-      | _ -> ()
-
-let find_complex_type info fmt f =
-  t_ty_fold (iter_complex_type info fmt) () f
-
-let print_type info fmt ty =
-  print_type info fmt
-    (try
-       Hty.find info.complex_type ty
-     with Not_found -> ty)
-*)
-
-(* and print_tyapp info fmt = function *)
-(*   | [] -> () *)
-(*   | [ty] -> fprintf fmt "%a " (print_type info) ty *)
-(*   | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl *)
-
-let print_type info fmt =
-  catch_unsupportedType (print_type info fmt)
+let print_type info fmt ty = try print_type info fmt ty
+  with Unsupported s -> raise (UnsupportedType (ty,s))
 
 let print_type_value info fmt = function
   | None -> fprintf fmt "Bool"
@@ -246,10 +214,6 @@ and print_triggers info fmt = function
     (print_list space (print_trigger info)) a
     (print_triggers info) l
 
-let _print_logic_binder info fmt v =
-  fprintf fmt "%a: %a" print_ident v.vs_name
-    (print_type info) v.vs_ty
-
 let print_type_decl info fmt ts =
   if ts.ts_def <> None then () else
   if Mid.mem ts.ts_name info.info_syn then () else
@@ -304,66 +268,24 @@ let print_decl info fmt d = match d.d_node with
       if Mid.mem pr.pr_name info.info_syn then () else
       print_prop_decl info fmt k pr f
 
-let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
-
-let distingued =
-  let dist_syntax mls = function
-    | [MAls ls;MAstr s] -> Mls.add ls s mls
-    | _ -> assert false in
-  let dist_dist syntax mls = function
-    | [MAls ls;MAls lsdis] ->
-      begin try
-              Mid.add lsdis.ls_name (Mls.find ls syntax) mls
-        with Not_found -> mls end
-    | _ -> assert false in
-  Trans.on_meta meta_syntax_logic (fun syntax ->
-    let syntax = List.fold_left dist_syntax Mls.empty syntax in
-    Trans.on_meta Discriminate.meta_lsinst (fun dis ->
-      let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in
-      Trans.return dis2))
-
-let print_task_old pr thpr _blacklist fmt task =
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
-  let info = {
-    info_syn = Mid.union (fun _ _ s -> Some s)
-      (get_syntax_map task) (Trans.apply distingued task);
-    (* complex_type = Hty.create 5; *)
-  }
-  in
-  let decls = Task.task_decls task in
-  fprintf fmt "%a@." (print_list nothing (print_decl info)) decls
-
-let () = register_printer "smtv2"
-  (fun _env pr thpr blacklist ?old:_ fmt task ->
-     forget_all ident_printer;
-     print_task_old pr thpr blacklist fmt task)
-  ~desc:"Printer for the SMTlib version 2 format."
-
-(*
 let print_decls =
-  let add_ls sm acc = function
-    | [MAls ls; MAls lsdis] ->
-        begin try
-          Mid.add lsdis.ls_name (Mid.find ls.ls_name sm) acc
-        with Not_found -> acc end
-    | _ -> assert false in
-  let print dls sm fmt d =
-    let info = {
-      info_syn = List.fold_left (add_ls sm) sm dls;
-    } in
-    print_decl info fmt d in
-  Trans.on_meta Discriminate.meta_lsinst (fun dls ->
-    Printer.sprint_decls (print dls))
+  let print_decl sm fmt d =
+    try print_decl {info_syn = sm} fmt d; sm
+    with Unsupported s -> raise (UnsupportedDecl (d,s)) in
+  let print_decl = Printer.sprint_decl print_decl in
+  let print_decl task acc = print_decl task.Task.task_decl acc in
+  Discriminate.on_syntax_map (fun sm -> Trans.fold print_decl (sm,[]))
 
 let print_task _env pr thpr _blacklist ?old:_ fmt task =
-  (* In trans-based p-printing [forget_all] is taboo *)
+  (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  fprintf fmt "%a@." (print_list nothing string)
-    (List.rev (Trans.apply print_decls task))
+  let rec print = function
+    | x :: r -> print r; Pp.string fmt x
+    | [] -> () in
+  print (snd (Trans.apply print_decls task));
+  pp_print_flush fmt ()
 
-let () = register_printer "smtv2new" print_task
-  ~desc:"Printer for the SMTlib version 2 format."
-*)
+let () = register_printer "smtv2" print_task
+  ~desc:"Printer@ for@ the@ SMTlib@ version@ 2@ format."

@@ -73,6 +73,17 @@ module Lsmap = struct
    instantié. Un tag sur un logique polymorphe doit être un tag sur toute
    la famille de fonctions *)
 
+  let ls_inst = Wls.memoize 3 (fun ls ->
+    let m = ref Mtyl.empty in
+    fun tyl tyv ->
+      let l = oty_cons tyl tyv in
+      match Mtyl.find_opt l !m with
+      | Some ls -> ls
+      | None    ->
+          let nls = create_lsymbol (id_clone ls.ls_name) tyl tyv in
+          m := Mtyl.add l nls !m;
+          nls)
+
   type t = lsymbol Mtyl.t Mls.t
 
   let empty = Mls.empty
@@ -81,9 +92,8 @@ module Lsmap = struct
     if ls_equal ls ps_equ then lsmap else
     if not (List.for_all Ty.ty_closed (oty_cons tyl tyv)) then lsmap else
     let newls = function
-      | None -> Some (create_lsymbol (id_clone ls.ls_name) tyl tyv)
-      | nls  -> nls
-    in
+      | None -> Some (ls_inst ls tyl tyv)
+      | nls  -> nls in
     let insts = Mls.find_def Mtyl.empty ls lsmap in
     Mls.add ls (Mtyl.change newls (oty_cons tyl tyv) insts) lsmap
 
@@ -295,3 +305,22 @@ let discriminate env = Trans.seq [
 let () = Trans.register_env_transform "discriminate" discriminate
   ~desc:"Generate@ monomorphic@ type@ instances@ of@ function@ and@ \
          predicate@ symbols@ and@ monomorphize@ task@ premises."
+
+let on_lsinst fn =
+  let add_ls acc = function
+    | [MAls ls; MAls nls] -> Mls.add nls ls acc
+    | _ -> assert false in
+  Trans.on_meta meta_lsinst (fun dls ->
+    fn (List.fold_left add_ls Mls.empty dls))
+
+let on_syntax_map fn =
+  let add_ls sm0 sm = function
+    | [MAls ls; MAls nls] ->
+        begin match Mid.find_opt ls.ls_name sm0 with
+          | Some s -> Mid.add nls.ls_name s sm
+          | None -> sm
+        end
+    | _ -> assert false in
+  Printer.on_syntax_map (fun sm0 ->
+  Trans.on_meta meta_lsinst (fun dls ->
+    fn (List.fold_left (fun sm dl -> add_ls sm0 sm dl) sm0 dls)))

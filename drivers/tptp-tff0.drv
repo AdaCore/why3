@@ -1,13 +1,10 @@
-(* Why3 driver for princess
-   see http://www.philipp.ruemmer.org/princess.shtml *)
+(* Why driver for first-order tptp provers supporting TFF0 *)
 
 printer "tptp-tff0"
 filename "%f-%t-%g.p"
 
 valid   "Proof found"
 invalid "Completion found"
-valid   "^No countermodel exists, formula is valid"
-invalid "^Formula is invalid, found a countermodel:"
 valid   "^% SZS status Theorem"
 valid   "^% SZS status Unsatisfiable"
 unknown "^% SZS status CounterSatisfiable" ""
@@ -22,17 +19,15 @@ unknown "No Proof Found"            ""
 fail    "Failure.*"                   "\"\\0\""
 time "why3cpulimit time : %s s"
 
-(* transformations *)
+
+(* to be improved *)
 
 transformation "inline_trivial"
+
 transformation "eliminate_builtin"
 transformation "eliminate_definition"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
-
-(* currently, princess does not support $let and $ite *)
-transformation "eliminate_let"
-transformation "eliminate_if"
 
 transformation "discriminate"
 transformation "encoding_smt"
@@ -287,3 +282,9 @@ theory tptp.RatToReal
   syntax function to_real "$to_real(%1)"
 end
 
+(*
+Local Variables:
+mode: why
+compile-command: "unset LANG; make -C .. bench"
+End:
+*)

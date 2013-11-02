@@ -72,10 +72,15 @@ val syntax_arguments_typed :
 
 (** {2 pretty-printing transformations (useful for caching)} *)
 
-val fold_tdecls : (syntax_map -> tdecl -> 'a -> 'a) -> 'a -> 'a Trans.trans
+val on_syntax_map : (syntax_map -> 'a Trans.trans) -> 'a Trans.trans
 
-val sprint_tdecls : (syntax_map -> tdecl pp) -> string list Trans.trans
-val sprint_decls  : (syntax_map -> decl  pp) -> string list Trans.trans
+val sprint_tdecl :
+  ('a -> Format.formatter -> Theory.tdecl -> 'a) ->
+    Theory.tdecl -> 'a * string list -> 'a * string list
+
+val sprint_decl :
+  ('a -> Format.formatter -> Decl.decl -> 'a) ->
+    Theory.tdecl -> 'a * string list -> 'a * string list
 
 (** {2 exceptions to use in transformations and printers} *)
 

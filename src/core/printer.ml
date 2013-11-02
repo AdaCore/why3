@@ -266,7 +266,7 @@ let add_syntax_map td sm = match td.td_node with
 
 let query_syntax sm id = Mid.find_opt id sm
 
-let fold_tdecls fn acc =
+let on_syntax_map fn =
   Trans.on_meta meta_syntax_type (fun sts ->
   Trans.on_meta meta_syntax_logic (fun sls ->
   Trans.on_meta meta_remove_prop (fun spr ->
@@ -274,27 +274,27 @@ let fold_tdecls fn acc =
     let sm = List.fold_left sm_add_ts sm sts in
     let sm = List.fold_left sm_add_ls sm sls in
     let sm = List.fold_left sm_add_pr sm spr in
-    Trans.fold (fun t -> fn sm t.task_decl) acc)))
+    fn sm)))
 
-let sprint_tdecls (fn : syntax_map -> tdecl pp) =
-  let buf = Buffer.create 512 in
+let sprint_tdecl (fn : 'a -> Format.formatter -> tdecl -> 'a) =
+  let buf = Buffer.create 2048 in
   let fmt = Format.formatter_of_buffer buf in
-  let print sm td acc =
+  fun td (acc,strl) ->
     Buffer.reset buf;
-    Format.fprintf fmt "%a@?" (fn sm) td;
-    Buffer.contents buf :: acc in
-  fold_tdecls print []
+    let acc = fn acc fmt td in
+    Format.pp_print_flush fmt ();
+    acc, Buffer.contents buf :: strl
 
-let sprint_decls (fn : syntax_map -> decl pp) =
-  let buf = Buffer.create 512 in
+let sprint_decl (fn : 'a -> Format.formatter -> decl -> 'a) =
+  let buf = Buffer.create 2048 in
   let fmt = Format.formatter_of_buffer buf in
-  let print sm td acc = match td.td_node with
+  fun td (acc,strl) -> match td.td_node with
     | Decl d ->
         Buffer.reset buf;
-        Format.fprintf fmt "%a@?" (fn sm) d;
-        Buffer.contents buf :: acc
-    | _ -> acc in
-  fold_tdecls print []
+        let acc = fn acc fmt d in
+        Format.pp_print_flush fmt ();
+        acc, Buffer.contents buf :: strl
+    | _ -> acc, strl
 
 (** {2 exceptions to use in transformations and printers} *)
 
