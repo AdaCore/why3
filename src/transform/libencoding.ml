@@ -118,9 +118,8 @@ let t_monomorph ty_base kept lsmap consts vmap t =
   let rec t_mono vmap t = t_label_copy t (match t.t_node with
     | Tvar v ->
         Mvs.find v vmap
-    | Tconst _ when ty_equal (t_type t) ty_base ->
-        t
-    | Tconst _ when Sty.mem (t_type t) kept ->
+    | Tconst _ when ty_equal (t_type t) ty_base ||
+                    Sty.mem  (t_type t) kept ->
         t
     | Tconst _ ->
         let ls = ls_of_const ty_base t in
@@ -221,11 +220,14 @@ let monomorphise_task =
     Trans.decl decl (Task.add_decl None d_ts_base)))
 
 (* replace type variables in a goal with fresh type constants *)
+let ts_of_tv = Htv.memo 63 (fun tv ->
+  create_tysymbol (id_clone tv.tv_name) [] None)
+
 let monomorphise_goal = Trans.goal (fun pr f ->
   let stv = t_ty_freevars Stv.empty f in
   if Stv.is_empty stv then [create_prop_decl Pgoal pr f] else
   let mty,ltv = Stv.fold (fun tv (mty,ltv) ->
-    let ts = create_tysymbol (id_clone tv.tv_name) [] None in
+    let ts = ts_of_tv tv in
     Mtv.add tv (ty_app ts []) mty, ts::ltv) stv (Mtv.empty,[]) in
   let f = t_ty_subst mty Mvs.empty f in
   List.fold_left
