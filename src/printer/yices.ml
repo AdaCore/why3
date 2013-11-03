@@ -55,41 +55,35 @@ let print_ident fmt id =
 type info = {
   info_syn     : syntax_map;
   complex_type : ty Mty.t ref;
+  urg_output   : string list ref;
 }
 
 (** type *)
-let rec print_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "yices: you must encode the polymorphism"
-  | Tyapp (ts, l) ->
-      begin match query_syntax info.info_syn ts.ts_name, l with
-      | Some s, _ -> syntax_arguments s (print_type info) fmt l
-      | None, [] -> fprintf fmt "%a" print_ident ts.ts_name
-      | None, _ -> print_type info fmt (Mty.find ty !(info.complex_type))
-      end
-
 let complex_type = Wty.memoize 3 (fun ty ->
   let s = Pp.string_of_wnl Pretty.print_ty ty in
   create_tysymbol (id_fresh s) [] None)
 
-let rec iter_complex_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "yices: you must encode the polymorphism"
-  | Tyapp (_, []) -> ()
+let rec print_type info fmt ty = match ty.ty_node with
+  | Tyvar _ -> unsupported "cvc3: you must encode the polymorphism"
   | Tyapp (ts, l) ->
-      begin match query_syntax info.info_syn ts.ts_name with
-      | Some _ -> List.iter (iter_complex_type info fmt) l
-      | None when Mty.mem ty !(info.complex_type) -> ()
-      | None ->
-          let ts = complex_type ty in
-          fprintf fmt "(define-type %a)@\n@\n" print_ident ts.ts_name;
-          info.complex_type := Mty.add ty (ty_app ts []) !(info.complex_type)
+      begin match query_syntax info.info_syn ts.ts_name, l with
+      | Some s, _ -> syntax_arguments s (print_type info) fmt []
+      | None, [] -> fprintf fmt "%a" print_ident ts.ts_name
+      | None, _ ->
+          begin match Mty.find_opt ty !(info.complex_type) with
+          | Some ty -> print_type info fmt ty
+          | None ->
+              let ts = complex_type ty in let cty = ty_app ts [] in
+              let us = sprintf
+                "(define-type %a)@\n@\n" print_ident ts.ts_name in
+              info.complex_type := Mty.add ty cty !(info.complex_type);
+              info.urg_output := us :: !(info.urg_output);
+              print_type info fmt cty
+          end
       end
 
-let iter_complex_type info fmt ty =
-  try iter_complex_type info fmt ty
+let print_type info fmt ty = try print_type info fmt ty
   with Unsupported s -> raise (UnsupportedType (ty,s))
-
-let find_complex_type info fmt f =
-  t_ty_fold (fun () ty -> iter_complex_type info fmt ty) () f
 
 let print_type_value info fmt = function
   | None -> fprintf fmt "bool"
@@ -235,8 +229,6 @@ let print_data_decl info fmt (ts, _ as d) =
   print_data_decl info fmt d
 
 let print_param_decl info fmt ls =
-  List.iter (iter_complex_type info fmt) ls.ls_args;
-  Opt.iter (iter_complex_type info fmt) ls.ls_value;
   match ls.ls_args with
   | [] ->
     fprintf fmt "@[<hov 2>(define %a::%a)@]@\n@\n"
@@ -265,11 +257,9 @@ let print_decl info fmt d = match d.d_node with
       "yices: inductive definitions are not supported"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
-      find_complex_type info fmt f;
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a);@]@\n@\n"
         pr.pr_name.id_string (print_fmla info) f
   | Dprop (Pgoal, pr, f) ->
-      find_complex_type info fmt f;
       fprintf fmt "@[(assert@\n";
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
       (match pr.pr_name.id_loc with
@@ -280,8 +270,8 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decls =
   let print_decl (sm,ct) fmt d =
-    let info = {info_syn = sm; complex_type = ref ct} in
-    try print_decl info fmt d; (sm, !(info.complex_type))
+    let info = {info_syn = sm; complex_type = ref ct; urg_output = ref []} in
+    try print_decl info fmt d; (sm, !(info.complex_type)), !(info.urg_output)
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in

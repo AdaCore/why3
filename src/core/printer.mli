@@ -75,11 +75,11 @@ val syntax_arguments_typed :
 val on_syntax_map : (syntax_map -> 'a Trans.trans) -> 'a Trans.trans
 
 val sprint_tdecl :
-  ('a -> Format.formatter -> Theory.tdecl -> 'a) ->
+  ('a -> Format.formatter -> Theory.tdecl -> 'a * string list) ->
     Theory.tdecl -> 'a * string list -> 'a * string list
 
 val sprint_decl :
-  ('a -> Format.formatter -> Decl.decl -> 'a) ->
+  ('a -> Format.formatter -> Decl.decl -> 'a * string list) ->
     Theory.tdecl -> 'a * string list -> 'a * string list
 
 (** {2 exceptions to use in transformations and printers} *)

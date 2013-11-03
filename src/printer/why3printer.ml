@@ -379,8 +379,7 @@ let print_tdecl fmt td = match td.td_node with
 
 let print_tdecls =
   let print_tdecl sm fmt td =
-    info := {info_syn = sm};
-    print_tdecl fmt td; sm in
+    info := {info_syn = sm}; print_tdecl fmt td; sm, [] in
   let print_tdecl = Printer.sprint_tdecl print_tdecl in
   let print_tdecl task acc = print_tdecl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm -> Trans.fold print_tdecl (sm,[]))

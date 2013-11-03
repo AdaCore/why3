@@ -51,48 +51,39 @@ type info = {
   info_syn : syntax_map;
   info_fmt : tptp_format;
   info_srt : ty Mty.t ref;
+  info_urg : string list ref;
 }
 
+let complex_type = Wty.memoize 3 (fun ty ->
+  let s = Pp.string_of_wnl Pretty.print_ty ty in
+  create_tysymbol (id_fresh s) [] None)
+
 let rec print_type info fmt ty = match ty.ty_node with
+  | Tyvar _ when info.info_fmt = TFF0 ->
+      unsupported "TFF0 does not support polymorphic types"
   | Tyvar tv -> print_tvar fmt tv
   | Tyapp (ts, tl) ->
       begin match query_syntax info.info_syn ts.ts_name, tl with
       | Some s, _ -> syntax_arguments s (print_type info) fmt tl
       | None, [] -> print_symbol fmt ts.ts_name
       | None, _ when info.info_fmt = TFF0 ->
-          print_type info fmt (Mty.find ty !(info.info_srt))
+          begin match Mty.find_opt ty !(info.info_srt) with
+          | Some ty -> print_type info fmt ty
+          | None ->
+              let ts = complex_type ty in let cty = ty_app ts [] in
+              let us = sprintf "@[<hov 2>tff(%s, type,@ %a:@ $tType).@]@\n@\n"
+                (id_unique pr_printer ts.ts_name) print_symbol ts.ts_name in
+              info.info_srt := Mty.add ty cty !(info.info_srt);
+              info.info_urg := us :: !(info.info_urg);
+              print_type info fmt cty
+          end
       | None, tl ->
           fprintf fmt "@[%a(%a)@]" print_symbol ts.ts_name
             (print_list comma (print_type info)) tl
       end
 
-let complex_type = Wty.memoize 3 (fun ty ->
-  let s = Pp.string_of_wnl Pretty.print_ty ty in
-  create_tysymbol (id_fresh s) [] None)
-
-let rec iter_complex_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "TFF0 does not support polymorphic types"
-  | Tyapp (_, []) -> ()
-  | Tyapp (ts, l) ->
-      begin match query_syntax info.info_syn ts.ts_name with
-      | Some _ -> List.iter (iter_complex_type info fmt) l
-      | None when Mty.mem ty !(info.info_srt) -> ()
-      | None ->
-          let ts = complex_type ty in
-          fprintf fmt "@[<hov 2>tff(%s, type,@ %a:@ $tType).@]@\n@\n"
-            (id_unique pr_printer ts.ts_name) print_symbol ts.ts_name;
-          info.info_srt := Mty.add ty (ty_app ts []) !(info.info_srt)
-      end
-
-let iter_complex_type info fmt ty =
-  try iter_complex_type info fmt ty
+let print_type info fmt ty = try print_type info fmt ty
   with Unsupported s -> raise (UnsupportedType (ty,s))
-
-let find_complex_type info fmt f = if info.info_fmt = TFF0 then
-  t_ty_fold (fun () ty -> iter_complex_type info fmt ty) () f
-
-let iter_complex_type info fmt ty = if info.info_fmt = TFF0 then
-  iter_complex_type info fmt ty
 
 let number_format = {
   Number.long_int_support = true;
@@ -209,8 +200,6 @@ let print_decl info fmt d = match d.d_node with
   | Dparam _ when info.info_fmt = FOF -> ()
   | Dparam ls when query_syntax info.info_syn ls.ls_name <> None -> ()
   | Dparam ls ->
-      List.iter (iter_complex_type info fmt) ls.ls_args;
-      Opt.iter (iter_complex_type info fmt) ls.ls_value;
       let print_type = print_type info in
       let print_val fmt = function
         | Some ty -> print_type fmt ty
@@ -243,12 +232,10 @@ let print_decl info fmt d = match d.d_node with
       "TPTP does not support inductive predicates, use eliminate_inductive"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
-      find_complex_type info fmt f;
       let head = if info.info_fmt = FOF then "fof" else "tff" in
       fprintf fmt "@[<hov 2>%s(%a, axiom,@ %a).@]@\n@\n"
         head print_pr pr (print_fmla info) f
   | Dprop (Pgoal, pr, f) ->
-      find_complex_type info fmt f;
       let head = if info.info_fmt = FOF then "fof" else "tff" in
       fprintf fmt "@[<hov 2>%s(%a, conjecture,@ %a).@]@\n"
         head print_pr pr (print_fmla info) f
@@ -256,9 +243,10 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decls fm =
   let print_decl (sm,fm,ct) fmt d =
-    let info = {
-      info_syn = sm; info_fmt = fm; info_srt = ref ct } in
-    try print_decl info fmt d; (sm,fm,!(info.info_srt))
+    let info = { info_syn = sm;     info_fmt = fm;
+                 info_srt = ref ct; info_urg = ref [] } in
+    try print_decl info fmt d;
+        (sm,fm,!(info.info_srt)), !(info.info_urg)
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
@@ -413,8 +401,11 @@ let print_dfg _env pr thpr _blacklist ?old:_ fmt task =
   fprintf fmt
     "name({**}). author({**}). status(unknown). description({**}).@\n";
   fprintf fmt "end_of_list.@\n@\n";
-  let info = { info_syn = get_syntax_map task;
-    info_fmt = FOF; info_srt = ref Mty.empty } in
+  let info = {
+    info_syn = get_syntax_map task;
+    info_fmt = FOF;
+    info_urg = ref [];
+    info_srt = ref Mty.empty } in
   let dl = Task.task_decls task in
   let tl = List.filter (is_type info) dl in
   let fl = List.filter (is_function info) dl in

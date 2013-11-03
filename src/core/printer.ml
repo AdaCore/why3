@@ -276,24 +276,24 @@ let on_syntax_map fn =
     let sm = List.fold_left sm_add_pr sm spr in
     fn sm)))
 
-let sprint_tdecl (fn : 'a -> Format.formatter -> tdecl -> 'a) =
+let sprint_tdecl (fn : 'a -> Format.formatter -> tdecl -> 'a * string list) =
   let buf = Buffer.create 2048 in
   let fmt = Format.formatter_of_buffer buf in
   fun td (acc,strl) ->
     Buffer.reset buf;
-    let acc = fn acc fmt td in
+    let acc, urg = fn acc fmt td in
     Format.pp_print_flush fmt ();
-    acc, Buffer.contents buf :: strl
+    acc, Buffer.contents buf :: List.rev_append urg strl
 
-let sprint_decl (fn : 'a -> Format.formatter -> decl -> 'a) =
+let sprint_decl (fn : 'a -> Format.formatter -> decl -> 'a * string list) =
   let buf = Buffer.create 2048 in
   let fmt = Format.formatter_of_buffer buf in
   fun td (acc,strl) -> match td.td_node with
     | Decl d ->
         Buffer.reset buf;
-        let acc = fn acc fmt d in
+        let acc, urg = fn acc fmt d in
         Format.pp_print_flush fmt ();
-        acc, Buffer.contents buf :: strl
+        acc, Buffer.contents buf :: List.rev_append urg strl
     | _ -> acc, strl
 
 (** {2 exceptions to use in transformations and printers} *)

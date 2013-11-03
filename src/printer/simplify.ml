@@ -145,7 +145,7 @@ let print_decl info fmt d = match d.d_node with
 
 let print_decls =
   let print_decl sm fmt d =
-    try print_decl {info_syn = sm} fmt d; sm
+    try print_decl {info_syn = sm} fmt d; sm, []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
