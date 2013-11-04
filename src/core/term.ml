@@ -406,7 +406,7 @@ module Hsterm = Hashcons.Make (struct
   let t_hash_quant (vl,b,tl,f) =
     let h = bnd_hash b (t_hash f) in
     let h = Hashcons.combine_list vs_hash h vl in
-    List.fold_left (Hashcons.combine_list t_hash) h tl
+    List.fold_left (fun acc t -> Hashcons.combine_list t_hash acc t) h tl
 
   let t_hash_node = function
     | Tvar v -> vs_hash v
