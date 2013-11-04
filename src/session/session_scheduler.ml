@@ -250,7 +250,7 @@ let idle_handler t =
                 in
                 Queue.push (callback,pre_call) t.proof_attempts_queue;
                 run_timeout_handler t
-              with e ->
+              with e when not (Debug.test_flag Debug.stack_trace) ->
                 Format.eprintf "@[Exception raise in Session.idle_handler:@ \
 %a@.@]"
                   Exn_printer.exn_printer e;
@@ -263,7 +263,7 @@ let idle_handler t =
     t.idle_handler_activated <- false;
     dprintf debug "[Sched] idle_handler stopped@.";
     false
-    | e ->
+    | e when not (Debug.test_flag Debug.stack_trace) ->
       Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
         Exn_printer.exn_printer e;
       eprintf "Session.idle_handler stopped@.";
