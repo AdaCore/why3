@@ -54,7 +54,7 @@ let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "smtv1: you must encode the polymorphism"
   | Tyapp (ts, l) ->
       begin match query_syntax info.info_syn ts.ts_name, l with
-      | Some s, _ -> syntax_arguments s (print_type info) fmt []
+      | Some s, _ -> syntax_arguments s (print_type info) fmt l
       | None, [] -> fprintf fmt "%a" print_ident ts.ts_name
       | None, _ ->
           begin match Mty.find_opt ty !(info.complex_type) with
