@@ -53,6 +53,13 @@ module GoalHash = struct
    let equal a b = a.Session.goal_key = b.Session.goal_key
    let hash a = a.Session.goal_key
 end
+
+module GoalCmp = struct
+   (* module to provide comparison goals *)
+  type t = goal
+  let compare a b = Pervasives.compare a.Session.goal_key b.Session.goal_key
+end
+
 module GoalMap = Hashtbl.Make (GoalHash)
 (* module to provide a mutable map on goals *)
 
@@ -69,16 +76,26 @@ module GoalSet : sig
    val reset : t -> unit
 end =
 struct
-   type t = unit GoalMap.t
+   (* We use an ordered set instead of a hashed set here so that we have
+      predictable order of iteration. *)
 
-   let empty () = GoalMap.create 17
-   let is_empty t = GoalMap.length t = 0
-   let add t x = GoalMap.add t x ()
-   let remove t x = GoalMap.remove t x
-   let mem t x = GoalMap.mem t x
-   let count t = GoalMap.length t
-   let reset t = GoalMap.clear t
-   let iter f t = GoalMap.iter (fun k () -> f k) t
+   module S = Set.Make(GoalCmp)
+   type t = S.t ref
+
+   let empty () = ref S.empty
+   let is_empty t = S.is_empty !t
+   let add t x =
+     t := S.add x !t
+   let remove t x =
+     t := S.remove x !t
+   let mem t x =
+     S.mem x !t
+   let count t =
+     S.cardinal !t
+   let reset t =
+     t := S.empty
+   let iter f t =
+     S.iter f !t
 
    exception Found of goal
    let choose t =
