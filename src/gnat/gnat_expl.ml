@@ -20,6 +20,7 @@ type reason =
    | VC_Loop_Invariant_Preserv
    | VC_Loop_Variant
    | VC_Assert
+   | VC_Raise
 
 type check = { loc : loc ; reason : reason }
 
@@ -82,6 +83,7 @@ let reason_from_string s =
    | "VC_LOOP_INVARIANT_PRESERV"  -> VC_Loop_Invariant_Preserv
    | "VC_LOOP_VARIANT"            -> VC_Loop_Variant
    | "VC_ASSERT"                  -> VC_Assert
+   | "VC_RAISE"                   -> VC_Raise
    | _                            ->
        Format.printf "unknown VC reason: %s@." s;
        Gnat_util.abort_with_message ""
@@ -89,23 +91,24 @@ let reason_from_string s =
 let string_of_reason proved s =
   if proved then
     match s with
-    | VC_Division_Check            -> "division check"
-    | VC_Index_Check               -> "index check"
-    | VC_Overflow_Check            -> "overflow check"
-    | VC_Range_Check               -> "range check"
-    | VC_Length_Check              -> "length check"
-    | VC_Discriminant_Check        -> "discriminant check"
-    | VC_Initial_Condition         -> "initial condition"
-    | VC_Precondition              -> "precondition"
-    | VC_Postcondition             -> "postcondition"
-    | VC_Contract_Case             -> "contract case"
-    | VC_Disjoint_Contract_Cases   -> "disjoint contract cases"
-    | VC_Complete_Contract_Cases   -> "complete contract cases"
-    | VC_Loop_Invariant            -> "loop invariant"
-    | VC_Loop_Invariant_Init       -> "loop invariant initialization"
-    | VC_Loop_Invariant_Preserv    -> "loop invariant preservation"
-    | VC_Loop_Variant              -> "loop variant"
-    | VC_Assert                    -> "assertion"
+    | VC_Division_Check            -> "division check proved"
+    | VC_Index_Check               -> "index check proved"
+    | VC_Overflow_Check            -> "overflow check proved"
+    | VC_Range_Check               -> "range check proved"
+    | VC_Length_Check              -> "length check proved"
+    | VC_Discriminant_Check        -> "discriminant check proved"
+    | VC_Initial_Condition         -> "initial condition proved"
+    | VC_Precondition              -> "precondition proved"
+    | VC_Postcondition             -> "postcondition proved"
+    | VC_Contract_Case             -> "contract case proved"
+    | VC_Disjoint_Contract_Cases   -> "disjoint contract cases proved"
+    | VC_Complete_Contract_Cases   -> "complete contract cases proved"
+    | VC_Loop_Invariant            -> "loop invariant proved"
+    | VC_Loop_Invariant_Init       -> "loop invariant initialization proved"
+    | VC_Loop_Invariant_Preserv    -> "loop invariant preservation proved"
+    | VC_Loop_Variant              -> "loop variant proved"
+    | VC_Assert                    -> "assertion proved"
+    | VC_Raise                     -> "exception cannot be raised"
   else
     match s with
     | VC_Division_Check            -> "divide by zero might fail"
@@ -121,10 +124,13 @@ let string_of_reason proved s =
     | VC_Disjoint_Contract_Cases   -> "contract cases might not be disjoint"
     | VC_Complete_Contract_Cases   -> "contract cases might not be complete"
     | VC_Loop_Invariant            -> "loop invariant might fail"
-    | VC_Loop_Invariant_Init       -> "loop invariant might fail in first iteration"
-    | VC_Loop_Invariant_Preserv    -> "loop invariant might fail after first iteration"
+    | VC_Loop_Invariant_Init       ->
+        "loop invariant might fail in first iteration"
+    | VC_Loop_Invariant_Preserv    ->
+        "loop invariant might fail after first iteration"
     | VC_Loop_Variant              -> "loop variant might fail"
     | VC_Assert                    -> "assertion might fail"
+    | VC_Raise                     -> "exception might be raised"
 
 let tag_of_reason s =
   match s with
@@ -145,6 +151,7 @@ let tag_of_reason s =
    | VC_Loop_Invariant_Preserv    -> "loop_invariant_preservation"
    | VC_Loop_Variant              -> "loop_variant"
    | VC_Assert                    -> "assertion"
+   | VC_Raise                     -> "raise statement"
 
 type gp_label =
   | Gp_Sloc of Gnat_loc.loc

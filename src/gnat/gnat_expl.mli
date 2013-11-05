@@ -19,6 +19,7 @@ type reason =
    | VC_Loop_Invariant_Preserv
    | VC_Loop_Variant
    | VC_Assert
+   | VC_Raise
 
 type check = { loc : loc ; reason : reason }
 
