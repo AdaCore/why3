@@ -108,7 +108,7 @@ let string_of_reason proved s =
     | VC_Loop_Invariant_Preserv    -> "loop invariant preservation proved"
     | VC_Loop_Variant              -> "loop variant proved"
     | VC_Assert                    -> "assertion proved"
-    | VC_Raise                     -> "exception cannot be raised"
+    | VC_Raise                     -> "raise statement proved unreachable"
   else
     match s with
     | VC_Division_Check            -> "divide by zero might fail"
