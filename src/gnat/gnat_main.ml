@@ -78,9 +78,11 @@ let rec handle_vc_result goal result prover_result =
        Gnat_report.register obj (Some task) prover_result true ""
    | Gnat_objectives.Not_Proved ->
        let tracefile =
-         if Gnat_config.proof_mode = Gnat_config.Then_Split then
+         match Gnat_config.proof_mode with
+         | Gnat_config.Then_Split | Gnat_config.Path_WP ->
            Gnat_objectives.Save_VCs.save_trace goal
-         else "" in
+         | _ -> ""
+       in
        Gnat_report.register obj (Some task) prover_result false tracefile
    | Gnat_objectives.Work_Left ->
          match Gnat_objectives.next obj with
