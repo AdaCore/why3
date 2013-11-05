@@ -92,7 +92,6 @@ theory GenFloat
   type t
 
   function round mode real : real
-  function round_logic mode real : t
 
   function value t : real
   function exact t : real
@@ -137,6 +136,13 @@ theory GenFloat
     forall x:real. round Down (-x) = - round Up x
   axiom Round_up_neg:
     forall x:real. round Up (-x) = - round Down x
+
+  (** rounding into a float instead of a real *)
+  function round_logic mode real : t
+  axiom Round_logic_def:
+    forall m:mode, x:real.
+      no_overflow m x ->
+      value (round_logic m x) = round m x
 
 end
 
