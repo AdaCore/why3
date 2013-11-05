@@ -15,7 +15,7 @@ open Debug
 
 let debug = register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
-         and@ transformtion@ applications."
+         and@ transformation@ applications."
 
 module Todo = struct
   type ('a,'b) todo =
