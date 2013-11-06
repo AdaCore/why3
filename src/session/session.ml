@@ -297,6 +297,9 @@ let iter_transf f t =
 
 let iter_metas f t = f t.metas_goal
 
+let iter_theory f t =
+  List.iter f t.theory_goals
+
 let iter_file f fi = List.iter f fi.file_theories
 
 let iter_session f s = PHstr.iter (fun _ th -> f th) s.session_files
@@ -2039,7 +2042,7 @@ and merge_metas ~keygen ~theories env to_goal s from_metas =
 exception OutdatedSession
 
 let merge_theory
-    ?(release=false) ~keygen ~theories env ~allow_obsolete from_th to_th =
+    ~release ~keygen ~theories env ~allow_obsolete from_th to_th =
   set_theory_expanded to_th from_th.theory_expanded;
   let from_goals = List.fold_left
     (fun from_goals g ->
@@ -2068,7 +2071,7 @@ let merge_theory
         | Not_found -> raise OutdatedSession
     ) to_th.theory_goals
 
-let merge_file ?release ~keygen ~theories env ~allow_obsolete from_f to_f =
+let merge_file ~release ~keygen ~theories env ~allow_obsolete from_f to_f =
   dprintf debug "[Info] merge_file, shape_version = %d@\n"
     env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
@@ -2085,7 +2088,7 @@ let merge_file ?release ~keygen ~theories env ~allow_obsolete from_f to_f =
           (* TODO: remove this later when all sessions are updated *)
           with Not_found -> Mstr.find ("WP "^name) from_theories
         in
-        merge_theory ?release ~keygen ~theories env ~allow_obsolete from_th to_th
+        merge_theory ~release ~keygen ~theories env ~allow_obsolete from_th to_th
       with
         | Not_found when allow_obsolete -> ()
         | Not_found -> raise OutdatedSession
@@ -2093,33 +2096,38 @@ let merge_file ?release ~keygen ~theories env ~allow_obsolete from_f to_f =
     to_f.file_theories;
   dprintf debug "[Info] merge_file, done@\n"
 
-let rec recompute_all_shapes_goal g =
+let rec recompute_all_shapes_goal ~release g =
   let t = goal_task g in
   (* g.goal_shape <- Termcode.t_shape_buf (Task.task_goal_fmla t); *)
   g.goal_shape <- Termcode.t_shape_task t;
   g.goal_checksum <- Termcode.task_checksum t;
-  PHstr.iter recompute_all_shapes_transf g.goal_transformations
+  if release then release_task g;
+  iter_goal
+    (fun pa -> ())
+    (iter_transf (recompute_all_shapes_goal ~release))
+    (iter_metas  (recompute_all_shapes_goal ~release))
+    g
 
-and recompute_all_shapes_transf _ tr =
-  List.iter recompute_all_shapes_goal tr.transf_goals
+let recompute_all_shapes_theory ~release t =
+  iter_theory (recompute_all_shapes_goal ~release) t
 
-let recompute_all_shapes_theory t =
-  List. iter recompute_all_shapes_goal t.theory_goals
+let recompute_all_shapes_file ~release f =
+  iter_file (recompute_all_shapes_theory ~release) f
 
-let recompute_all_shapes_file _ f =
-  List.iter recompute_all_shapes_theory f.file_theories
-
-let recompute_all_shapes session =
+let recompute_all_shapes ~release session =
   session.session_shape_version <- Termcode.current_shape_version;
-  PHstr.iter recompute_all_shapes_file session.session_files
+  iter_session (recompute_all_shapes_file ~release) session
 
-let update_session ?release ~keygen ~allow_obsolete old_session env whyconf =
+let update_session
+    ?(release=false) ~keygen ~allow_obsolete old_session env whyconf =
   dprintf debug "[Info] update_session: shape_version = %d@\n"
     old_session.session_shape_version;
   let new_session =
     create_session ~shape_version:old_session.session_shape_version
       old_session.session_dir
   in
+  let will_recompute_shape =
+    old_session.session_shape_version <> Termcode.current_shape_version in
   let new_env_session =
     { session = new_session;
       env = env;
@@ -2139,7 +2147,8 @@ let update_session ?release ~keygen ~allow_obsolete old_session env whyconf =
       let theories = Opt.get new_file.file_for_recovery in
       dprintf debug "[Merge] file '%s'@\n" old_file.file_name;
       merge_file ~keygen ~theories
-        ?release new_env_session ~allow_obsolete old_file new_file;
+        ~release:(release && (not will_recompute_shape))
+          new_env_session ~allow_obsolete old_file new_file;
       let fname =
         Filename.basename (Filename.chop_extension old_file.file_name)
       in
@@ -2150,11 +2159,11 @@ let update_session ?release ~keygen ~allow_obsolete old_session env whyconf =
   new_env_session.files <- files;
   dprintf debug "[Info] update_session: done@\n";
   let obsolete =
-    if old_session.session_shape_version <> Termcode.current_shape_version
+    if will_recompute_shape
     then
       begin
         dprintf debug "[Info] update_session: recompute shapes@\n";
-        recompute_all_shapes new_session;
+        recompute_all_shapes ~release new_session;
         true
       end
     else
