@@ -15,7 +15,7 @@ open Debug
 
 let debug = register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
-         and@ transformtion@ applications."
+         and@ transformation@ applications."
 
 module Todo = struct
   type ('a,'b) todo =
@@ -319,7 +319,7 @@ let schedule_edition t command filename callback =
   dprintf debug "[Sched] Scheduling an edition@.";
   let precall =
     Call_provers.call_on_file ~command ~regexps:[] ~timeregexps:[]
-      ~exitcodes:[(0,Call_provers.Unknown "")] filename
+      ~exitcodes:[(0,Call_provers.Unknown "")] ~redirect:false filename
   in
   callback Running;
   t.running_proofs <- (Check_prover(callback, precall ())) :: t.running_proofs;

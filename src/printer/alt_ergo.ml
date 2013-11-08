@@ -26,6 +26,10 @@ let meta_printer_option =
   Theory.register_meta "printer_option" [Theory.MTstring]
     ~desc:"Pass@ additional@ parameters@ to@ the@ pretty-printer."
 
+let meta_invalid_trigger =
+  Theory.register_meta "invalid trigger" [Theory.MTlsymbol]
+  ~desc:"Specify@ that@ a@ symbol@ is@ not@ allowed@ in@ a@ trigger."
+
 type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
@@ -34,6 +38,7 @@ type info = {
   info_csm : lsymbol list Mls.t;
   info_pjs : Sls.t;
   info_axs : Spr.t;
+  info_inv_trig : Sls.t;
 }
 
 let ident_printer =
@@ -117,6 +122,7 @@ let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
       let number_format = {
           Number.long_int_support = true;
+          Number.extra_leading_zeros_support = true;
           Number.dec_int_support = Number.Number_default;
           Number.hex_int_support = Number.Number_unsupported;
           Number.oct_int_support = Number.Number_unsupported;
@@ -221,7 +227,7 @@ and print_expr info fmt =
 and print_triggers info fmt tl =
   let filter = function
     | { t_ty = Some _ } -> true
-    | { t_node = Tapp (ps,_) } -> not (ls_equal ps ps_equ)
+    | { t_node = Tapp (ps,_) } -> not (Sls.mem ps info.info_inv_trig)
     | _ -> false in
   let tl = List.map (List.filter filter) tl in
   let tl = List.filter (function [] -> false | _::_ -> true) tl in
@@ -376,7 +382,7 @@ let () = register_printer "alt-ergo-old"
 *)
 
 let print_decls =
-  let print ac sl tc csm pjs axs sm fmt d =
+  let print inv_trig ac sl tc csm pjs axs sm fmt d =
     let info = {
       info_syn = sm;
       info_ac  = ac;
@@ -385,8 +391,10 @@ let print_decls =
       info_csm = Mls.map Array.to_list csm;
       info_pjs = pjs;
       info_axs = axs;
+      info_inv_trig = Sls.add ps_equ inv_trig;
     } in
     print_decl info fmt d in
+  Trans.on_tagged_ls meta_invalid_trigger (fun inv_trig ->
   Trans.on_tagged_ls meta_ac (fun ac ->
   Trans.on_meta meta_printer_option (fun args ->
     let sl = List.fold_left check_showlabels false args in
@@ -394,7 +402,7 @@ let print_decls =
   Trans.on_meta Eliminate_algebraic.meta_proj (fun mal ->
     let csm,pjs,axs = List.fold_left
       add_projection (Mls.empty,Sls.empty,Spr.empty) mal in
-    Printer.sprint_decls (print ac sl tc csm pjs axs))))
+    Printer.sprint_decls (print inv_trig ac sl tc csm pjs axs)))))
 
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)

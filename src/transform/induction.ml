@@ -20,7 +20,9 @@ open Task
 
 
 (** TODO use this label in the following function *)
+(* dead code
 let label_induction = create_label "induction"
+*)
 
 (*
 let desc_labels = [label_induction,
@@ -144,13 +146,14 @@ let print_lex lexl =
 (************************* WITH LEXICOGRAPHIC ORDER **************************)
 (*****************************************************************************)
 
-
+(* dead code
 let split_quantifiers x qvl =
   let rec aux left = function
     | hd :: tl when vs_equal x hd -> List.rev left, tl
     | hd :: tl -> aux (hd :: left) tl
     | [] -> assert false
   in aux [] qvl
+*)
 
 (*INITIAL FORMULA SPLIT*)
 let decompose_forall t =
@@ -363,17 +366,20 @@ the induction hypothesis are the variables on the right of the rightmost
 induction variable.*)
 
 (* separate prenex universal quantification from the body of the formula*)
+(* dead code
 let decompose_int_forall t =
   let rec aux qvl_acc t = match t.t_node with
     | Tquant (Tforall, qt) ->
       let qvl, _, t = t_open_quant qt in aux (qvl_acc @ qvl) t
     | _ -> qvl_acc, t
   in aux [] t
+*)
 
 (* find labeled variables (for induction variables),
 and the rest of the quantified variables after the last labeled variable
 (for the variables to generalize inside induction hypothesis).
 Ex: the result of Va.x1.b.x2.c.x3.d.P is [a.x1.b.x2.c.x3][x1.x2.x3][d]*)
+(* dead code
 let split_int_qlv_labeled qvl =
   let rec aux left_acc ind_acc gen_acc = function
     | [] -> List.rev left_acc, List.rev ind_acc, gen_acc
@@ -384,6 +390,7 @@ let split_int_qlv_labeled qvl =
 	then aux (v :: (gen_acc @ left_acc)) (v :: ind_acc) [] tl
 	else aux left_acc ind_acc (v :: gen_acc) tl
   in aux [] [] [] qvl
+*)
 
 (*
 input: ordered induction variables, rightmost neutral variables
@@ -397,6 +404,7 @@ then output:
  (d',e') ~ 'generalization variables',
  (x1',x2',x3') ~ 'induction variables'
  (0 <= x1'/\0 <= x2'/\(x1' < x1 \/ x1' = x1 /\ x2' < x2) ~ 'hyp. condition' *)
+(* dead code
 let lex_order_ivl (le_int,lt_int) ivl rvl  =
   let gen_rvl, (hd,hd',tl,tl') =
     let create_v v = Term.create_vsymbol (Ident.id_clone v.vs_name) ty_int in
@@ -423,10 +431,12 @@ let lex_order_ivl (le_int,lt_int) ivl rvl  =
       | _ -> assert false
     in lex_ord (hd, hd', [],[]) lt_hd (tl, tl') in
   gen_rvl, (hd' :: tl'), t_and nonneg_ivl' lt_lex
+*)
 
 (*returns the resulting formula with induction hypothesis.
 The formula however is still not closed (by the quantifiers before
 the rightmost neutral quantifiers). *)
+(* dead code
 let int_strong_induction_lex (le_int,lt_int) ivl rvl t =
   let (gen_rvl, ind_ivl, hyp_cond) =
     lex_order_ivl (le_int,lt_int) ivl rvl in
@@ -437,7 +447,9 @@ let int_strong_induction_lex (le_int,lt_int) ivl rvl t =
   let ind_hyp =
     t_forall_close (ind_ivl @ gen_rvl) [] (t_implies hyp_cond hyp_goal) in
   let open_t = t_implies ind_hyp (t_forall_close rvl [] t) in open_t
+*)
 
+(* dead code
 let induction_int_lex _km (le_int,lt_int) t0 =
   let qvl, t = decompose_int_forall t0 in
   let lvl,ivl, genl =  split_int_qlv_labeled qvl in
@@ -452,7 +464,9 @@ let induction_int_lex _km (le_int,lt_int) t0 =
 	 Format.printf "New Task: %a \n@." Pretty.print_term t);
       [t]
     end
+*)
 
+(* dead code
 let induction_int_lex th_int = function
   | Some
       { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
@@ -466,6 +480,7 @@ let induction_int_lex th_int = function
 	  (induction_int_lex km (le_int, lt_int) f)
       with Exit -> [t] end
   | _ -> assert false
+*)
 
 (*
 let () =

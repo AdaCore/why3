@@ -594,8 +594,10 @@ enable_frama_c
 enable_html_doc
 enable_doc
 enable_hypothesis_selection
+COMPILETIMEPVS
 PVSVERSION
 enable_pvs_libs
+COMPILETIMECOQ
 COQVERSION
 COQLIB
 coq_compat_version
@@ -3470,8 +3472,8 @@ else
    enable_html_doc=no
 fi
 
-# checking for hevea (note that the pdf documentation uses hevea.sty)
-if test "$enable_doc" = yes ; then
+# checking for hevea (note that the pdf documentation DOES NOT use hevea.sty)
+if test "$enable_html_doc" = yes ; then
    # Extract the first word of "hevea", so it can be a program name with args.
 set dummy hevea; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -3511,11 +3513,10 @@ fi
 
 
    if test "$HEVEA" = no ; then
-      enable_doc=no
       enable_html_doc=no
-      reason_doc=" (hevea not found)"
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find hevea, documentation disabled." >&5
-$as_echo "$as_me: WARNING: Cannot find hevea, documentation disabled." >&2;}
+      reason_html_doc=" (hevea not found)"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find hevea, HTML documentation disabled." >&5
+$as_echo "$as_me: WARNING: Cannot find hevea, HTML documentation disabled." >&2;}
    fi
 fi
 
@@ -3779,6 +3780,9 @@ fi
 if test "$enable_coq_support" = no; then
    enable_coq_tactic=no
    enable_coq_libs=no
+   COMPILETIMECOQ=
+else
+   COMPILETIMECOQ="\\\"Coq\\\", \\\"$COQVERSION\\\"; "
 fi
 
 if test "$enable_coq_tactic" = yes; then
@@ -3960,6 +3964,9 @@ fi
 
 if test "$enable_pvs_support" = no; then
    enable_pvs_libs=no
+   COMPILETIMEPVS=
+else
+   COMPILETIMEPVS="\\\"PVS\\\", \\\"$PVSVERSION\\\"; "
 fi
 
 if test "$enable_pvs_libs" = yes; then
@@ -4103,6 +4110,8 @@ fi
 BUILDDATE="$(date)"
 
 # substitutions to perform
+
+
 
 
 
@@ -5314,7 +5323,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
   case $ac_file$ac_mode in
     "chmod":C) chmod a-w Makefile src/config.sh doc/version.tex;
-chmod a-w share/provers-detection-data.conf lib/why3/META;
+chmod a-w lib/why3/META;
 chmod a-w src/jessie/Makefile;
 chmod u+x src/config.sh ;;
 

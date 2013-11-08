@@ -2,25 +2,59 @@
 
 ============ Long-term Roadmap (see below for roadmaps to next release) ===========
 
+
+== long-term projects ==
+
+* entiers machines
+
+* modules, raffinement (these de Leon)
+
+* support for higher-order
+
+* extraction, more generally how to turn Why3 into a real programming language (these de Martin)
+
+* rapprocher la logique et les programmes
+** variant dans la logique ?
+** monter les fonctions de programmes pures dans la logique ?
+
+
+* internal interpreter, test of specifications, quickcheck
+
+* BWare project, support for rewrite rules, improved support for provers,
+  extensions of set theory and their Coq realizations.
+
+* LABCOM avec Adacore
+** calculs non-linéaires, calculs en virgule flottante
+** production de contre-exemples de preuves solides et exprimés dans le langage d’origine
+** support efficace des invariants de données
+** développer des composants réutilisables prouvés.
+
+* jessie3
+
 == Papers to write ==
 
   * paper on the module system, its semantics, realizations, avec en
-    particulier la solution avec les types classes qui reste a
-    implanter
+    particulier la solution avec les types classes
 
   * DONE paper on the proof management system
 
   * DONE Encodings and transformations (Andrei+Francois FroCos 11)
+
   * DONE Why presentation at the IVL workshop of CADE:
     (http://research.microsoft.com/en-us/um/people/moskal/boogie2011/)
     deadline: May 1st
+
   * Caml code ?
+
   * logic language for talking to provers
     - DONE (Boogie 11)
     - DONE FOL + poly (FroCos 11)
     -  alg + ind + rec ? + theories
+
   * VACID-0
-  * system description (e.g. at CADE, TACAS)
+
+  * system description (e.g. at CADE, TACAS) DONE at ESOP
+
   * rapports recherche ?
 
 == stages ==
@@ -28,8 +62,11 @@
 * M1. preuve d'un petit compilateur, pas de pb de lieur,
    eventuellement outils pour les preuves par recurrence
    a la Leino, + fct size automatique
+
 * M2. Lieur en Why3, POPLmark challenge. vers
    un theorie et/ou un module réutilisable de lieurs
+  DONE (Stage M2 de Martin)
+
 * (M2?) Stage Airbus, "TIP" avec Frama-C/Jessie ou WP/Why/Coq
    besoin de la tactique Coq?
 
@@ -44,7 +81,7 @@
 * A true Jessie3 front-end
 
 * Why3ML
- - Fast WP a la Leino
+ - Fast WP a la Leino (DONE ?)
  - assert qui ne donne pas une hypothese dans la suite -> "check"
    also: in a black box
 
@@ -72,15 +109,88 @@
 ** support de Yices 2 ? interesserait Cesar
 
 
+==================== Roadmap for release 0.83 ========================
+
+== TODOs ==
+
+* extraction vers Caml
+** utiliser ZArith
+
+* replayer
+** deplacer option -bench dans une commande de why3session
+
+* terminaison
+** generer une obligation de preuve de well-foundedness quand on utilise
+   un variant avec "with R" (une seule fois pour chaque R !)
+** quand une definition logique recursive ne peut pas etre verifiee
+   bien-fondee statiquement, generer une obligation de preuve
+   (feature wish de F Besson)
+
+* Coq tactic
+** ajout de bases de hint
+
+* IDE
+** todo: run detection immediately at start up if conf file absent or
+    outdated. should become doable with the new Session module
+** "detect provers" menu
+
+* Contre-exemples de Alt-Ergo
+
+* detect editors
+*** check if coqide and also emacs/proof-general is installed
+
+
+* bug 15629
+
 ==================== Roadmap for release 0.82 ========================
 
-Scheduled for August 2013 ?
+Scheduled for 31 october 2013
 
 == New Features to announce ==
 
-* improved shape mecanism for session updates (see VSTTE'13 paper).
+* input language
+** lemma functions
+** polymorphic recursion permitted
+** types "opaques" ???
+
+
+* new provers:
+** veriT 201310
+** Metitarski 2.2
+** Metis 2.3
+** Beagle 0.4.1
+** Princess 2013-05-13
+** Yices2 2.0.4
+
+* new versions of provers:
+** Alt-Ergo 0.95.2
+** CVC4 1.1 (& 1.2 ?)
+** Coq 8.4pl2
+** gappa 1.0.0
+** SPASS 3.8ds
+
+* API: more examples of use in  examples/use_api/
+
+* emacs support: why.el renamed into why3.el
+
+* why3session
+** --stats: changed (detailler, temps, distinction root et subgoals, CLAUDE)
+**  --hist: TODO documenter (voir Alain ou Mohamed sur les graphes SMT)
+
+* bug fixes:
+** remove extra leading zeros in decimal literals when a prover don't like them 
+** PVS output: types are always non-empty
+** PVS: fixed configuration and installation process
+** improved shape mecanism for session updates (see VSTTE'13 paper).
   Compatibility with session files from version 0.81 and earlier is
   assured.
+** Coq tactic: now loads dynamic plug-ins
+** Coq output: fixed printing of polymorphic recursive datatypes
+** bug #15493: ?
+** bug #15053: ?
+** bug #13736: ?
+** syntax highlighting bugs: should be fixed by removing the old language
+   file alt-ergo.lang from alt-ergo distribution
 
 == Final preparation ==
 
@@ -157,59 +267,63 @@ Scheduled for August 2013 ?
 
 == TODOs ==
 
-* replayer
-** deplacer option -bench dans une commande de why3session
+* Patch de johannes pour les noms de fichier pour Isabelle TODO
 
+* discriminate, mettre les bons arguments par defaut (ANDREI)
 
-* extraction vers Caml
- - PRIORITAIRE, JCF, ANDREI
+* eliminate_match: (apres la release ?)
+** faire un cas particulier pour "bool", le match pouvant se traduire
+   vers ite qui est supporté par pas mal de prouveurs
+** introduire des symboles _match non polymorphes differents pour
+   chaque instance necessaires. plutot qu'un seul symbole _match
+   poymorphe.
 
-* terminaison
-** generer une obligation de preuve de well-foundedness quand on utilise
-   un variant avec "with R" (une seule fois pour chaque R !)
-** quand une definition logique recursive ne peut pas etre verifiee
-   bien-fondee statiquement, generer une obligation de preuve
-   (feature wish de F Besson)
+* efficiency issues
+** understand problems when large number of goals (cf D Mentré examples)
+** prouveur de Martin
+** tester avant la release sur
+*** BWare
+*** Prouveur de Martin
+*** examples de Frama-C/Jessie et Krakatoa
 
-* Coq detection
+* DONE Coq detection (et PVS) (CLAUDE, champ supplementaire compile_support = yes dans le prover-detection-data)
 ** refuser de detecter Coq si on n'a pas compilé avec le support de Coq
    (i.e. si Coq a ete installé apres)
 
-* Coq tactic
-** ajout de bases de hint
-
-* efficiency issues
- - understand problems when large number of goals (cf D Mentré examples)
- - also: BTS 13736
-https://gforge.inria.fr/tracker/index.php?func=detail&aid=13736&group_id=2990
+* Coq tactic (CLAUDE, GUILLAUME, JCF, ANDREI)
+** DONE bug Prod(_,_,_) -> traiter le cas
 
 * Smoke detector and absurd: on pourrait mettre un label particulier
   sur le "false" genéré par absurd, pour indiquer que c'est
-  intentionel que l'on veuille prouver false. Un tel cas pourrait etre
+  intentionel que l'on veuille prouver false. FAIT
+  Un tel cas pourrait etre
   traité de facon speciale par le smoke detector avec option "deep",
   pour eviter une fausse alarme.
-
-* IDE
-** todo: run detection immediately at start up if conf file absent or
-    outdated. should become doable with the new Session module
-** "detect provers" menu
-** syntax highlighting bugs ?
-   some keywords are not colored in the bottom-right window
-   (but they are in the top-right window)
-   it is caused by the language file for alt-ergo superseding the one for why3
+  PAS FAIT
 
 * faire le menage dans les transformations d'induction : _int _ty
-  _ty_lex, et DOCUMENTER
-
-* Contre-exemples de Alt-Ergo
-
-* detect editors
-*** check if coqide and also emacs/proof-general is installed
+  _ty_lex, FAIT et documenter PAS FAIT
 
 * Documentation
  - (ANDREI) make the glossary available
- - (CLAUDE) complete api.tex: explain how to build apply
-   transformations, write new functions on terms (A)
+ - (CLAUDE) complete api.tex: explain how to build/apply
+   transformations, write new functions on terms
+ - LEON: add a section "further reading"
+
+* bug fix: 16454 (ne pas envoyer des triggers arithmetiques) (GUILLAUME)
+
+* bug fix: 15652 (ghost code detection)
+
+* support for new provers
+** Alt-Ergo 0.95.2 DONE
+** CVC4 1.2 TODO: pb avec les booleens
+** DONE Coq 8.4pl2: probleme tactique Why3
+** DONE ? Metitarski: improve it (CLAUDE, GUILLAUME)
+
+
+* DONE? simplification de (a && false) ne devrait pas etre false
+
+
 
 
 

@@ -129,7 +129,7 @@ let save f = f ^ ".save"
 
 let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
                  ~regexps ~timeregexps ~exitcodes
-                 ?(cleanup=false) ?(inplace=false) fin =
+                 ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
 
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
@@ -139,7 +139,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     | "%" -> "%"
     | "f" -> use_stdin := false; fin
     | "t" -> on_timelimit := true; string_of_int timelimit
-    | "T" -> string_of_int (16 * succ timelimit)
+    | "T" -> string_of_int (succ timelimit)
     | "m" -> string_of_int memlimit
     (* FIXME: libdir and datadir can be changed in the configuration file
        Should we pass them as additional arguments? Or would it be better
@@ -164,24 +164,33 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
 
   fun () ->
     let fd_in = if !use_stdin then Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
-    let fout,cout = Filename.open_temp_file (Filename.basename fin) ".out" in
-    let fd_out = Unix.descr_of_out_channel cout in
+    let fout,cout,fd_out,fd_err =
+      if redirect then
+        let fout,cout = Filename.open_temp_file (Filename.basename fin) ".out" in
+        let fd_out = Unix.descr_of_out_channel cout in
+        fout, cout, fd_out, fd_out
+      else
+        "", stdout, Unix.stdout, Unix.stderr in
     let time = Unix.gettimeofday () in
-    let pid = Unix.create_process command argarray fd_in fd_out fd_out in
+    let pid = Unix.create_process command argarray fd_in fd_out fd_err in
     if !use_stdin then Unix.close fd_in;
-    close_out cout;
+    if redirect then close_out cout;
 
     let call = fun ret ->
       let time = Unix.gettimeofday () -. time in
-      let cout = open_in fout in
-      let out = Sysutil.channel_contents cout in
-      close_in cout;
+      let out =
+        if redirect then
+          let cout = open_in fout in
+          let out = Sysutil.channel_contents cout in
+          close_in cout;
+          out
+        else "" in
 
       fun () ->
         if Debug.test_noflag debug then begin
           if cleanup then Sysutil.safe_remove fin;
           if inplace then Sys.rename (save fin) fin;
-          Sysutil.safe_remove fout;
+          if redirect then Sysutil.safe_remove fout;
         end;
         let ans = match ret with
           | Unix.WSTOPPED n ->

@@ -406,7 +406,7 @@ module Hsterm = Hashcons.Make (struct
   let t_hash_quant (vl,b,tl,f) =
     let h = bnd_hash b (t_hash f) in
     let h = Hashcons.combine_list vs_hash h vl in
-    List.fold_left (Hashcons.combine_list t_hash) h tl
+    List.fold_left (fun acc t -> Hashcons.combine_list t_hash acc t) h tl
 
   let t_hash_node = function
     | Tvar v -> vs_hash v
@@ -485,9 +485,13 @@ let t_label ?loc l t =
 let t_label_add l t =
   Hsterm.hashcons { t with t_label = Slab.add l t.t_label }
 
-let t_label_copy { t_label = lab; t_loc = loc } t =
-  let lab = Slab.union lab t.t_label in
-  let loc = if t.t_loc = None then loc else t.t_loc in
+let t_label_remove l t =
+  Hsterm.hashcons { t with t_label = Slab.remove l t.t_label }
+
+let t_label_copy s t =
+  if t_equal s t then s else
+  let lab = Slab.union s.t_label t.t_label in
+  let loc = if t.t_loc = None then s.t_loc else t.t_loc in
   Hsterm.hashcons { t with t_label = lab; t_loc = loc }
 
 (* unsafe map *)
@@ -995,17 +999,33 @@ let rec t_app_fold fn acc t =
 
 let t_map fn t = match t.t_node with
   | Tlet (t1, b) ->
-      let u,t2,close = t_open_bound_cb b in
-      t_label_copy t (t_let (fn t1) (close u (fn t2)))
+      let u,t2 = t_open_bound b in
+      let s1 = fn t1 and s2 = fn t2 in
+      if t_equal s2 t2
+        then if t_equal s1 t1 then t
+          else t_label_copy t (t_let s1 b)
+        else t_label_copy t (t_let_close u s1 s2)
   | Tcase (t1, bl) ->
-      let brn b = let p,t,close = t_open_branch_cb b in close p (fn t) in
-      t_label_copy t (t_case (fn t1) (List.map brn bl))
+      let s1 = fn t1 in
+      let brn same b =
+        let p,t = t_open_branch b in
+        let s = fn t in
+        if t_equal s t then same, b
+          else false, t_close_branch p s
+      in
+      let same, bl = Lists.map_fold_left brn true bl in
+      if t_equal s1 t1 && same then t
+        else t_label_copy t (t_case s1 bl)
   | Teps b ->
-      let u,t1,close = t_open_bound_cb b in
-      t_label_copy t (t_eps (close u (fn t1)))
+      let u,t1 = t_open_bound b in
+      let s1 = fn t1 in
+      if t_equal s1 t1 then t
+        else t_label_copy t (t_eps_close u s1)
   | Tquant (q, b) ->
-      let vl,tl,f1,close = t_open_quant_cb b in
-      t_label_copy t (t_quant q (close vl (tr_map fn tl) (fn f1)))
+      let vl,tl,f1 = t_open_quant b in
+      let g1 = fn f1 and sl = tr_map fn tl in
+      if t_equal g1 f1 && List.for_all2 (List.for_all2 t_equal) sl tl then t
+        else t_label_copy t (t_quant_close q vl sl g1)
   | _ ->
       t_map_unsafe fn t
 
@@ -1032,27 +1052,36 @@ let t_any pr t = try t_fold (Util.any_fn pr) false t with Util.FoldSkip -> true
 (* safe opening map_fold *)
 
 let t_map_fold fn acc t = match t.t_node with
-  | Tlet (e,b) ->
-      let acc, e = fn acc e in
-      let u,t1,close = t_open_bound_cb b in
-      let acc, t1 = fn acc t1 in
-      acc, t_label_copy t (t_let e (close u t1))
-  | Tcase (e,bl) ->
-      let acc, e = fn acc e in
-      let brn acc b =
-        let p,t,close = t_open_branch_cb b in
-        let acc,t = fn acc t in acc, close p t in
-      let acc, bl = Lists.map_fold_left brn acc bl in
-      acc, t_label_copy t (t_case e bl)
+  | Tlet (t1, b) ->
+      let acc, s1 = fn acc t1 in
+      let u,t2 = t_open_bound b in
+      let acc, s2 = fn acc t2 in
+      acc, if t_equal s2 t2
+        then if t_equal s1 t1 then t
+          else t_label_copy t (t_let s1 b)
+        else t_label_copy t (t_let_close u s1 s2)
+  | Tcase (t1, bl) ->
+      let acc, s1 = fn acc t1 in
+      let brn (acc,same) b =
+        let p,t = t_open_branch b in
+        let acc, s = fn acc t in
+        if t_equal s t then (acc,same), b
+          else (acc,false), t_close_branch p s
+      in
+      let (acc,same), bl = Lists.map_fold_left brn (acc,true) bl in
+      acc, if t_equal s1 t1 && same then t
+        else t_label_copy t (t_case s1 bl)
   | Teps b ->
-      let u,t1,close = t_open_bound_cb b in
-      let acc, t1 = fn acc t1 in
-      acc, t_label_copy t (t_eps (close u t1))
-  | Tquant (q,b) ->
-      let vl,tl,f1,close = t_open_quant_cb b in
-      let acc, tl = tr_map_fold fn acc tl in
-      let acc, f1 = fn acc f1 in
-      acc, t_label_copy t (t_quant q (close vl tl f1))
+      let u,t1 = t_open_bound b in
+      let acc, s1 = fn acc t1 in
+      acc, if t_equal s1 t1 then t
+        else t_label_copy t (t_eps_close u s1)
+  | Tquant (q, b) ->
+      let vl,tl,f1 = t_open_quant b in
+      let acc, sl = tr_map_fold fn acc tl in
+      let acc, g1 = fn acc f1 in
+      acc, if t_equal g1 f1 && List.for_all2 (List.for_all2 t_equal) sl tl
+        then t else t_label_copy t (t_quant_close q vl sl g1)
   | _ -> t_map_fold_unsafe fn acc t
 
 let t_map_fold fn = t_map_fold (fun acc t ->
@@ -1360,6 +1389,7 @@ let t_replace_alpha t1 t2 t =
 
 let keep_on_simp_label = create_label "keep_on_simp"
 let can_simp t = not (Slab.mem keep_on_simp_label t.t_label)
+let can_simp_left t = can_simp t && not (Slab.mem asym_label t.t_label)
 
 let t_not_simp f = match f.t_node with
   | Ttrue  -> t_label_copy f t_false
@@ -1369,19 +1399,19 @@ let t_not_simp f = match f.t_node with
 
 let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f2 -> f1
-  | Tfalse, _ when can_simp f2 -> f1
-  | _, Tfalse when can_simp f1 -> f2
+  | _, Ttrue  when can_simp f2 -> t_label_remove asym_label f1
+  | Tfalse, _ when can_simp f2 -> t_label_remove asym_label f1
+  | _, Tfalse when can_simp_left f1 -> f2
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_and f1 f2
 
 let t_and_simp_l l = List.fold_left t_and_simp t_true l
 
 let t_or_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f2 -> f1
-  | _, Ttrue  when can_simp f1 -> f2
+  | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
+  | _, Ttrue  when can_simp_left f1 -> f2
   | Tfalse, _ when can_simp f1 -> f2
-  | _, Tfalse when can_simp f2 -> f1
+  | _, Tfalse when can_simp f2 -> t_label_remove asym_label f1
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_or f1 f2
 
@@ -1389,19 +1419,19 @@ let t_or_simp_l l = List.fold_left t_or_simp t_false l
 
 let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f1 -> f2
-  | _, Ttrue  when can_simp f2 -> f1
-  | Tfalse, _ when can_simp f2 -> f1
-  | _, Tfalse when can_simp f1 -> f2
+  | _, Ttrue  when can_simp f2 -> t_label_remove asym_label f1
+  | Tfalse, _ when can_simp f2 -> t_label_remove asym_label f1
+(*| _, Tfalse when can_simp f1 -> f2*)
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_and_asym f1 f2
 
 let t_and_asym_simp_l l = List.fold_left t_and_asym_simp t_true l
 
 let t_or_asym_simp f1 f2 = match f1.t_node, f2.t_node with
-  | Ttrue, _  when can_simp f2 -> f1
-  | _, Ttrue  when can_simp f1 -> f2
+  | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
+(*| _, Ttrue  when can_simp f1 -> f2*)
   | Tfalse, _ when can_simp f1 -> f2
-  | _, Tfalse when can_simp f2 -> f1
+  | _, Tfalse when can_simp f2 -> t_label_remove asym_label f1
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_or_asym f1 f2
 

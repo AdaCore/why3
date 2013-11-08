@@ -306,14 +306,13 @@ else
    enable_html_doc=no
 fi
 
-# checking for hevea (note that the pdf documentation uses hevea.sty)
-if test "$enable_doc" = yes ; then
+# checking for hevea (note that the pdf documentation DOES NOT use hevea.sty)
+if test "$enable_html_doc" = yes ; then
    AC_CHECK_PROG(HEVEA,hevea,hevea,no)
    if test "$HEVEA" = no ; then
-      enable_doc=no
       enable_html_doc=no
-      reason_doc=" (hevea not found)"
-      AC_MSG_WARN([Cannot find hevea, documentation disabled.])
+      reason_html_doc=" (hevea not found)"
+      AC_MSG_WARN([Cannot find hevea, HTML documentation disabled.])
    fi
 fi
 
@@ -445,6 +444,9 @@ fi
 if test "$enable_coq_support" = no; then
    enable_coq_tactic=no
    enable_coq_libs=no
+   COMPILETIMECOQ=
+else
+   COMPILETIMECOQ="\\\"Coq\\\", \\\"$COQVERSION\\\"; "
 fi
 
 if test "$enable_coq_tactic" = yes; then
@@ -520,6 +522,9 @@ fi
 
 if test "$enable_pvs_support" = no; then
    enable_pvs_libs=no
+   COMPILETIMEPVS=
+else
+   COMPILETIMEPVS="\\\"PVS\\\", \\\"$PVSVERSION\\\"; "
 fi
 
 if test "$enable_pvs_libs" = yes; then
@@ -642,10 +647,12 @@ AC_SUBST(COQC)
 AC_SUBST(COQDEP)
 AC_SUBST(COQLIB)
 AC_SUBST(COQVERSION)
+AC_SUBST(COMPILETIMECOQ)
 
 AC_SUBST(enable_pvs_libs)
 AC_SUBST(PVS)
 AC_SUBST(PVSVERSION)
+AC_SUBST(COMPILETIMEPVS)
 
 AC_SUBST(enable_hypothesis_selection)
 
@@ -678,7 +685,7 @@ AC_CONFIG_FILES(lib/why3/META)
 AC_CONFIG_FILES(src/jessie/Makefile)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/config.sh doc/version.tex;
-chmod a-w share/provers-detection-data.conf lib/why3/META;
+chmod a-w lib/why3/META;
 chmod a-w src/jessie/Makefile;
 chmod u+x src/config.sh)
 

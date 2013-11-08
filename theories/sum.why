@@ -7,10 +7,10 @@ theory Sum "Sum of the elements of an indexed container"
 
   type container
 
-  (* [f c i] is the [i]-th element in the container [c] *)
+  (** [f c i] is the [i]-th element in the container [c] *)
   function f container int : int
 
-  (* [sum c i j] is the sum Sum_{i <= k < j} f c k *)
+  (** [sum c i j] is the sum Sum_{i <= k < j} f c k *)
   function sum container int int : int
 
   axiom Sum_def_empty :

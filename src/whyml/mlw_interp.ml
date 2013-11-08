@@ -329,6 +329,8 @@ let exec_array_get _env _spec s args =
               | _ -> assert false
             in
             let t = eval_map_get (Some ty) !ls_map_get [m;i] in
+            eprintf "[interp] t[%a] -> %a@."
+              Pretty.print_term i Pretty.print_term t;
             Normal t,s
           | _ -> assert false
       end
@@ -362,6 +364,8 @@ let exec_array_set env spec s args =
               with Not_found -> reg
             in
             let s' = Mreg.add reg t s in
+            eprintf "[interp] t[%a] <- %a@."
+              Pretty.print_term i Pretty.print_term v; 
             Normal (Mlw_expr.t_void),s'
           | _ -> assert false
       end

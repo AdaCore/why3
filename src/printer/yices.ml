@@ -40,7 +40,8 @@ let ident_printer =
        (** for security *)
       "bool";"unsat";"sat";"true";"false";
       "true";"check";"assert";"TYPE";"SUBTYPE";
-      "scalar";"select";"update";"int";"real";"subtype";"subrange";"mk-bv";
+      "scalar";"select";"update";"int";"real";"nat";
+      "subtype";"subrange";"mk-bv";
       "bv-concat";"bv-extract";"bv-shift-right0";"div";"mod";"bitvector";
       "lambda";
 ]
@@ -125,6 +126,7 @@ let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
       let number_format = {
           Number.long_int_support = true;
+          Number.extra_leading_zeros_support = true;
           Number.dec_int_support = Number.Number_default;
           Number.hex_int_support = Number.Number_unsupported;
           Number.oct_int_support = Number.Number_unsupported;

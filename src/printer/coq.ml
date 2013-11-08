@@ -299,6 +299,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tconst c ->
       let number_format = {
           Number.long_int_support = true;
+          Number.extra_leading_zeros_support = true;
           Number.dec_int_support = Number.Number_custom "%s%%Z";
           Number.hex_int_support = Number.Number_unsupported;
           Number.oct_int_support = Number.Number_unsupported;

@@ -238,6 +238,7 @@ val t_exists_close : vsymbol list -> trigger -> term -> term
 
 val t_label : ?loc:Loc.position -> Slab.t -> term -> term
 val t_label_add : label -> term -> term
+val t_label_remove : label -> term -> term
 val t_label_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)

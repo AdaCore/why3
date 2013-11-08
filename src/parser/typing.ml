@@ -198,7 +198,7 @@ let rec dty uc = function
   | PPTtyapp (x, p) ->
       let ts = find_tysymbol x uc in
       let tyl = List.map (dty uc) p in
-      Loc.try2 (qloc x) tyapp ts tyl
+      Loc.try2 ~loc:(qloc x) tyapp ts tyl
   | PPTtuple tyl ->
       let ts = ts_tuple (List.length tyl) in
       tyapp ts (List.map (dty uc) tyl)
@@ -209,7 +209,7 @@ let rec ty_of_pty uc = function
   | PPTtyapp (x, p) ->
       let ts = find_tysymbol x uc in
       let tyl = List.map (ty_of_pty uc) p in
-      Loc.try2 (qloc x) ty_app ts tyl
+      Loc.try2 ~loc:(qloc x) ty_app ts tyl
   | PPTtuple tyl ->
       let ts = ts_tuple (List.length tyl) in
       ty_app ts (List.map (ty_of_pty uc) tyl)
@@ -261,8 +261,8 @@ let binop = function
 
 let check_pat_linearity p =
   let s = ref Sstr.empty in
-  let add id =
-    s := Loc.try3 id.id_loc Sstr.add_new (DuplicateVar id.id) id.id !s
+  let add { id = id; id_loc = loc } =
+    s := Loc.try3 ~loc Sstr.add_new (DuplicateVar id) id !s
   in
   let rec check p = match p.pat_desc with
     | PPpwild -> ()
@@ -293,7 +293,7 @@ and dpat_node loc uc env = function
   | PPprec fl ->
       let renv = ref env in
       let fl = List.map (fun (q,e) -> find_lsymbol q uc,e) fl in
-      let cs,pjl,flm = Loc.try2 loc parse_record (get_known uc) fl in
+      let cs,pjl,flm = Loc.try2 ~loc parse_record (get_known uc) fl in
       let tyl,ty = Denv.specialize_lsymbol ~loc cs in
       let get_val pj ty = match Mls.find_opt pj flm with
         | Some e ->
@@ -351,7 +351,7 @@ let param_tys uc pl =
   let ty_of_param (loc,id,gh,ty) =
     if gh then Loc.errorm ~loc "ghost parameters are not allowed here";
     Opt.iter (fun { id = id; id_loc = loc } ->
-      s := Loc.try3 loc Sstr.add_new (DuplicateVar id) id !s) id;
+      s := Loc.try3 ~loc Sstr.add_new (DuplicateVar id) id !s) id;
     ty_of_dty (dty uc ty) in
   List.map ty_of_param pl
 
@@ -364,7 +364,7 @@ let quant_var uc env (id,ty) =
 let quant_vars uc env qvl =
   let s = ref Sstr.empty in
   let add env (({ id = id; id_loc = loc }, _) as qv) =
-    s := Loc.try3 loc Sstr.add_new (DuplicateVar id) id !s;
+    s := Loc.try3 ~loc Sstr.add_new (DuplicateVar id) id !s;
     quant_var uc env qv in
   Lists.map_fold_left add env qvl
 
@@ -523,7 +523,7 @@ and dterm_node ~localize loc uc env = function
       Teps (id, ty, Fquant (Tforall, uqu, trl, f)), ty
   | PPrecord fl ->
       let fl = List.map (fun (q,e) -> find_lsymbol q uc,e) fl in
-      let cs,pjl,flm = Loc.try2 loc parse_record (get_known uc) fl in
+      let cs,pjl,flm = Loc.try2 ~loc parse_record (get_known uc) fl in
       let tyl,ty = Denv.specialize_lsymbol ~loc cs in
       let get_val pj ty = match Mls.find_opt pj flm with
         | Some e ->
@@ -538,7 +538,7 @@ and dterm_node ~localize loc uc env = function
   | PPupdate (e,fl) ->
       let e = dterm ~localize uc env e in
       let fl = List.map (fun (q,e) -> find_lsymbol q uc,e) fl in
-      let cs,pjl,flm = Loc.try2 loc parse_record (get_known uc) fl in
+      let cs,pjl,flm = Loc.try2 ~loc parse_record (get_known uc) fl in
       let tyl,ty = Denv.specialize_lsymbol ~loc cs in
       let get_val pj ty = match Mls.find_opt pj flm with
         | Some e ->
@@ -723,7 +723,7 @@ let add_types dl th =
                     | Qident _ | Qdot _ ->
                         find_tysymbol q th
                   in
-                  Loc.try2 (qloc q) ty_app ts (List.map apply tyl)
+                  Loc.try2 ~loc:(qloc q) ty_app ts (List.map apply tyl)
               | PPTtuple tyl ->
                   let ts = ts_tuple (List.length tyl) in
                   ty_app ts (List.map apply tyl)
@@ -766,17 +766,17 @@ let add_types dl th =
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
           let projection (_,id,_,_) fty = match id with
             | None -> None
-            | Some id ->
+            | Some ({ id = x; id_loc = loc } as id) ->
                 try
-                  let pj = Hstr.find ht id.id in
+                  let pj = Hstr.find ht x in
                   let ty = Opt.get pj.ls_value in
-                  ignore (Loc.try2 id.id_loc ty_equal_check ty fty);
+                  ignore (Loc.try2 ~loc ty_equal_check ty fty);
                   Some pj
                 with Not_found ->
                   let fn = create_user_id id in
                   let pj = create_fsymbol ~opaque fn [ty] fty in
-                  Hstr.replace csymbols id.id id.id_loc;
-                  Hstr.replace ht id.id pj;
+                  Hstr.replace csymbols x loc;
+                  Hstr.replace ht x pj;
                   Some pj
           in
           let constructor (loc, id, pl) =
@@ -844,7 +844,7 @@ let add_logics dl th =
     let opaque = opaque_tvs d.ld_params d.ld_type in
     let ls = create_lsymbol ~opaque v pl ty in
     Hstr.add lsymbols id ls;
-    Loc.try2 d.ld_loc add_param_decl th ls
+    Loc.try2 ~loc:d.ld_loc add_param_decl th ls
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
@@ -924,7 +924,7 @@ let type_fmla uc gfn f =
 let add_prop k loc s f th =
   let pr = create_prsymbol (create_user_id s) in
   let f = type_fmla th (fun _ -> None) f in
-  Loc.try4 loc add_prop_decl th k pr f
+  Loc.try4 ~loc add_prop_decl th k pr f
 
 let loc_of_id id = Opt.get id.Ident.id_loc
 
@@ -938,7 +938,7 @@ let add_inductives s dl th =
     let opaque = opaque_tvs d.in_params None in
     let ps = create_psymbol ~opaque v pl in
     Hstr.add psymbols id ps;
-    Loc.try2 d.in_loc add_param_decl th ps
+    Loc.try2 ~loc:d.in_loc add_param_decl th ps
   in
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
@@ -1053,11 +1053,11 @@ let add_decl loc th = function
         | PMAint i -> MAint i
       in
       let add s = add_meta th (lookup_meta s) (List.map convert al) in
-      Loc.try1 loc add id.id
+      Loc.try1 ~loc add id.id
 
 let add_decl loc th d =
   if Debug.test_flag debug_parse_only then th else
-  Loc.try3 loc add_decl loc th d
+  Loc.try3 ~loc add_decl loc th d
 
 let type_inst th t s =
   let add_inst s = function
@@ -1065,7 +1065,7 @@ let type_inst th t s =
       let find ns x = find_namespace_ns x ns in
       let ns1 = Opt.fold find t.th_export p in
       let ns2 = Opt.fold find (get_namespace th) q in
-      Loc.try6 loc clone_ns t.th_known t.th_local [] ns2 ns1 s
+      Loc.try6 ~loc clone_ns t.th_known t.th_local [] ns2 ns1 s
     | CStsym (loc,p,[],PPTtyapp (q,[])) ->
       let ts1 = find_tysymbol_ns p t.th_export in
       let ts2 = find_tysymbol q th in
@@ -1077,7 +1077,7 @@ let type_inst th t s =
       let id = id_user (ts1.ts_name.id_string ^ "_subst") loc in
       let tvl = List.map (fun id -> create_user_tv id.id) tvl in
       let def = Some (ty_of_pty th pty) in
-      let ts2 = Loc.try3 loc create_tysymbol id tvl def in
+      let ts2 = Loc.try3 ~loc create_tysymbol id tvl def in
       if Mts.mem ts1 s.inst_ts
       then error ~loc (ClashSymbol ts1.ts_name.id_string);
       { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
@@ -1128,7 +1128,7 @@ let add_use_clone env lenv th loc (use, subst) =
     | None ->
         use_or_clone th
   in
-  Loc.try1 loc use_or_clone th
+  Loc.try1 ~loc use_or_clone th
 
 let close_theory lenv th =
   if Debug.test_flag debug_parse_only then lenv else
@@ -1139,7 +1139,7 @@ let close_theory lenv th =
   Mstr.add id th lenv
 
 let close_namespace loc import th =
-  Loc.try2 loc close_namespace th import
+  Loc.try2 ~loc close_namespace th import
 
 (* incremental parsing *)
 

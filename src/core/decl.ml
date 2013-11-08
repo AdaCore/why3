@@ -673,8 +673,7 @@ let check_match kn d =
     | Tcase (t1,bl) ->
         let find ts = List.map fst (find_constructors kn ts) in
         let bl = List.map (fun b -> let p,t = t_open_branch b in [p],t) bl in
-        let try3 f = match t.t_loc with Some l -> Loc.try3 l f | None -> f in
-        ignore (try3 Pattern.CompileTerm.compile find [t1] bl);
+        ignore (Loc.try3 ?loc:t.t_loc Pattern.CompileTerm.compile find [t1] bl);
         t_fold check () t
     | _ -> t_fold check () t
   in

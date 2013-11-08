@@ -77,6 +77,7 @@ val call_on_file :
   exitcodes   : (int * prover_answer) list ->
   ?cleanup    : bool ->
   ?inplace    : bool ->
+  ?redirect   : bool ->
   string -> pre_prover_call
 
 val call_on_buffer :

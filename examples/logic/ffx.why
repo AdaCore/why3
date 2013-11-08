@@ -1,0 +1,29 @@
+
+
+theory T
+
+  type t
+
+  predicate r t
+
+  function f t : t
+
+  axiom a : forall x:t. r x \/ r (f x)
+
+  goal g1 : exists x:t. r x /\ r (f (f x))
+
+  goal g2 : exists x:t. r x /\ r (f (f (f (f x))))
+
+  goal g3 : exists x:t. r x /\ r (f (f (f (f (f (f x))))))
+
+  goal g4 : exists x:t. r x /\ r (f (f (f (f (f (f (f (f x))))))))
+
+  goal g5 : exists x:t. r x /\ r (f (f (f (f (f (f (f (f (f (f x))))))))))
+
+  goal g6 : exists x:t. r x /\ r (f (f (f (f (f (f (f (f (f (f (f (f x))))))))))))
+
+  goal g7 : exists x:t. r x /\ r (f (f (f (f (f (f (f (f (f (f (f (f (f (f x))))))))))))))
+
+
+
+end

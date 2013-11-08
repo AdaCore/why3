@@ -1,12 +1,263 @@
 (* Why driver for MetiTarski *)
 
-valid   "Proof found"
-invalid "Completion found"
-timeout "Ran out of time"
-timeout "CPU time limit exceeded"
-outofmemory "Out of Memory"
-unknown "No Proof Found" ""
-fail    "Failure.*" "\"\\0\""
+(* TODO:
+ * real.FromInt
+ * real.Truncate
+ * real.PowerInt    (incomplete)
+ * real.Hyperbolic
+ * real.Polar       (should work as is)
+ *)
 
-import "tptp.gen"
+printer "tptp-fof"
+filename "%f-%t-%g.tptp"
+
+valid   "^SZS status Theorem"
+valid   "^SZS status Unsatisfiable"
+unknown "^SZS status CounterSatisfiable" ""
+unknown "^SZS status Satisfiable" ""
+timeout "^SZS status Timeout"
+unknown "^SZS status GaveUp" ""
+fail    "^SZS status Error" ""
+
+time "why3cpulimit time : %s s"
+
+(* to be improved *)
+
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+transformation "inline_all"
+transformation "eliminate_definition"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_if"
+transformation "eliminate_let"
+
+transformation "simplify_unknown_lsymbols"
+transformation "discriminate"
+transformation "encoding_tptp"
+
+theory BuiltIn
+(* support for integers disabled because may be inconsistent
+  meta "encoding : kept" type int
+*)
+  meta "encoding : base" type real
+  syntax predicate (=)  "(%1 = %2)"
+  meta "eliminate_algebraic" "no_index"
+end
+
 import "discrimination.gen"
+
+theory real.Real
+
+  syntax function zero "0.0"
+  syntax function one  "1.0"
+
+  syntax function (+)  "(%1 + %2)"
+  syntax function (-)  "(%1 - %2)"
+  syntax function (-_) "(-%1)"
+  syntax function (*)  "(%1 * %2)"
+  syntax function (/)  "(%1 / %2)"
+  syntax function inv  "(1/ %1)"
+
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 < %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 > %2)"
+
+  (* These follow from Metitarski's axioms. *)
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Inverse
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop ZeroLessOne
+
+  remove prop add_div
+  remove prop sub_div
+  remove prop neg_div
+  remove prop assoc_mul_div
+  remove prop assoc_div_mul
+  remove prop assoc_div_div
+  remove prop CompatOrderMult
+end
+
+prelude "%%% this is a prelude for Metitarski"
+prelude "include('Axioms/general.ax')."
+
+theory real.Abs
+  prelude "%%% this is a prelude for Metitarski absolute value"
+
+  syntax function abs "abs(%1)"
+
+  prelude "include('Axioms/abs.ax')."
+  prelude "include('Axioms/abs2.ax')."
+
+  (* These follow from Metitarski's axioms. *)
+  remove prop Abs_le
+  remove prop Abs_pos
+  remove prop Abs_sum
+  remove prop Abs_prod
+  remove prop triangular_inequality
+end
+
+theory real.Square
+  prelude "%%% this is a prelude for Metitarski square"
+
+  prelude "include('Axioms/sqrt-general.ax')."
+
+  syntax function sqr  "(%1)^2"
+  syntax function sqrt "sqrt(%1)"
+
+  (* This follows from Metitarski's general axioms. *)
+  remove prop Sqrt_positive
+  remove prop Sqrt_le
+end
+
+theory real.Trigonometry
+  prelude "%%% this is a prelude for Metitarski trigonometry"
+
+  prelude "include('Axioms/pi.ax')."
+
+  remove prop Pi_interval
+  remove prop Cos_pi
+  remove prop Sin_pi
+
+  remove prop Cos_pi2
+  remove prop Sin_pi2
+
+  remove prop Cos_plus_pi
+  remove prop Sin_plus_pi
+
+  remove prop Cos_plus_pi2
+  remove prop Sin_plus_pi2
+
+  prelude "include('Axioms/tan.ax')."
+  prelude "include('Axioms/arctan-lower.ax')."
+  prelude "include('Axioms/arctan-upper.ax')."
+
+  syntax function atan "arctan(%1)"
+  syntax function tan  "tan(%1)"
+
+  prelude "include('Axioms/cos.ax')."
+  prelude "include('Axioms/sin.ax')."
+
+  syntax function cos  "cos(%1)"
+  syntax function sin  "sin(%1)"
+
+  (* These follow from Metitarski's base axioms. *)
+  remove prop Cos_0
+  remove prop Sin_0
+
+  (* The following files "greatly increase the search space" and thus
+     cause failures. Do not include them! *)
+  (*
+  prelude "include('Axioms/cos-constant.ax')."
+  prelude "include('Axioms/sin-constant.ax')."
+  *)
+
+  remove prop Cos_le_one
+  remove prop Sin_le_one
+end
+
+theory real.MinMax
+  prelude "%%% this is a prelude for Metitarski min-max"
+
+  prelude "include('Axioms/minmax.ax')."
+
+  syntax function min "min(%1,%2)"
+  syntax function max "max(%1,%2)"
+
+  remove prop Max_is_ge
+  remove prop Max_is_some
+  remove prop Min_is_le
+  remove prop Min_is_some
+end
+
+(* support for integers disabled because may be inconsistent
+theory real.PowerInt
+  syntax function power "%1^%2"
+
+  prelude "%%% this is a prelude for Metitarski power function"
+
+  prelude "include('Axioms/pow.ax')."
+
+  (* These follow from Metitarski's axioms. *)
+end
+*)
+
+theory real.ExpLog
+  syntax function exp "exp(%1)"
+  syntax function log "ln(%1)"
+
+  prelude "%%% this is a prelude for Metitarski exp/log"
+
+  prelude "include('Axioms/exp-general.ax')."
+  prelude "include('Axioms/ln-general.ax')."
+
+  (* These follow from Metitarski's axioms. *)
+  remove prop Log_one
+  remove prop Exp_zero
+end
+
+theory real.PowerReal
+  syntax function pow "pow(%1,%2)"
+
+  prelude "include('Axioms/pow.ax')."
+
+  (* These follow from Metitarski's axioms. *)
+  remove prop Pow_one_y
+  remove prop Pow_exp_log
+end
+
+(* support for integers disabled because may be inconsistent
+theory int.Int
+
+  syntax function zero "0"
+  syntax function one  "1"
+
+  syntax function (+)  "(%1 + %2)"
+  syntax function (-)  "(%1 - %2)"
+  syntax function (*)  "(%1 * %2)"
+  syntax function (-_) "(-%1)"
+
+  syntax predicate (<=) "(%1 <= %2)"
+  syntax predicate (<)  "(%1 < %2)"
+  syntax predicate (>=) "(%1 >= %2)"
+  syntax predicate (>)  "(%1 > %2)"
+
+  (* These follow from Metitarski's axioms. *)
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop CompatOrderMult
+  remove prop ZeroLessOne
+
+end
+*)

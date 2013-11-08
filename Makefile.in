@@ -111,7 +111,8 @@ LIB_UTIL = config util opt lists strings extmap extset exthtbl weakhtbl \
 	   hashcons stdlib exn_printer pp debug loc print_tree \
 	   cmdline warning sysutil rc plugin number pqueue
 
-LIB_CORE = ident ty term pattern decl theory task pretty env trans printer
+LIB_CORE = ident ty term pattern decl theory \
+	   task pretty dterm env trans printer
 
 LIB_PARSER = ptree denv glob parser typing lexer
 
@@ -137,7 +138,7 @@ LIB_SESSION = xml termcode session session_tools session_scheduler
 
 LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
 	    mlw_dtree mlw_dty mlw_typing mlw_driver mlw_ocaml \
-	    mlw_main mlw_interp 
+	    mlw_main mlw_interp
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
@@ -488,6 +489,19 @@ gallery::
 	  zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f/$$f.html  $$f; \
 	  cd ..; \
 	done
+
+%-gallery::
+	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
+	x=$*/why3session.xml; \
+	d=`dirname $$x`; \
+	f=`basename $$d`; \
+	why3session html $$x; \
+	echo "exporting $$f"; \
+	mkdir -p $(GALLERYDIR)/$$f; \
+	cp examples/$$f.mlw examples/$$f/$$f.html $(GALLERYDIR)/$$f/; \
+	rm -f $(GALLERYDIR)/$$f/$$f.zip; \
+	cd examples/; \
+	zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f/$$f.html  $$f
 
 ########
 # XML DTD validation
@@ -1353,7 +1367,7 @@ doc/html/index.html: doc/html/manual.html
 
 else
 
-doc/html/manual.html:
+doc/html/index.html:
 
 endif
 

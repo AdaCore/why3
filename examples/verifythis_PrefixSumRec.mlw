@@ -65,7 +65,8 @@ module PrefixSumRec
   (** frame lemma for "phase1" on fourth argument.
      needed to prove both upsweep, downsweep and compute_sums
    *)
-  let rec lemma phase1_frame (left right:int) (a0 a a' : array int) : unit variant { right-left }
+  let rec lemma phase1_frame (left right:int) (a0 a a' : array int) : unit
+    variant { right-left }
     requires { forall i:int. left-(right-left) < i < right ->
                a[i] = a'[i]}
     requires { phase1 left right a0 a }
@@ -78,7 +79,8 @@ module PrefixSumRec
   (** frame lemma for "phase1" on third argument.
      needed to prove upsweep and compute_sums
    *)
-  let rec lemma phase1_frame2 (left right:int) (a0 a0' a : array int) : unit variant { right-left }
+  let rec lemma phase1_frame2 (left right:int) (a0 a0' a : array int) : unit
+    variant { right-left }
     requires { forall i:int. left-(right-left) < i < right ->
                a0[i] = a0'[i]}
     requires { phase1 left right a0 a }

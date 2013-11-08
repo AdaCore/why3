@@ -342,7 +342,7 @@ theory NumOcc
   use import int.Int
   use import List
 
-  (* number of occurrence of x in l *)
+  (** number of occurrences of [x] in [l] *)
   function num_occ (x: 'a) (l: list 'a) : int =
     match l with
     | Nil      -> 0

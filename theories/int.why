@@ -358,7 +358,7 @@ theory Iter
   type t
   function f t : t
 
-  (* f^k(x) *)
+  (** [iter k x] is [f^k(x)] *)
   function iter int t : t
 
   axiom iter_0: forall x: t. iter 0 x = x
