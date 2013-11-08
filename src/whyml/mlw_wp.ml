@@ -1044,6 +1044,11 @@ module Subst : sig
       (s',f) is the new state [s'] and a formula [f] which defines the new
       values in [s'] with respect to the input state [s]. *)
 
+   val extract_glue : wp_env -> Sreg.t -> t -> t -> term
+   (* The formula [extract_glue env regs s1 s2] expresses what has not changed
+      between [s1] and [s2], concerning program variables. The set of
+    *)
+
    val merge : t -> t -> t -> t * term * term
    (* Given a start state and two states that parted from there, return a new
       "join" state and two formulas.  The first formula links the first branch
@@ -1073,15 +1078,15 @@ end = struct
     }
   (* a substitution or state knows the current variables to use for each region
      and each mutable program variable. *)
-  (* the reg_names field is a simple name hint; a mapping reg |-> name means
-     that [name] should be used as a base for new variables in region [reg].
-     This mapping is not required to be complete for regions. *)
 
   type t =
     { now       : subst;
       other     : subst Mvs.t;
       reg_names : vsymbol Mreg.t;
     }
+  (* the reg_names field is a simple name hint; a mapping reg |-> name means
+     that [name] should be used as a base for new variables in region [reg].
+     This mapping is not required to be complete for regions. *)
   (* the actual state knows not only the current state, but also all labeled
      past states. *)
 
@@ -1106,13 +1111,11 @@ end = struct
        belonging to this program variable are also added to the state, if not
        already there. Note that [add_pvar] doesn't really change the state,
        only adds new knowledge. *)
-    (* for simple variables (1 variable = 1 mutable region), we register the
-       variable name as a name hint for the region. Also, we enter a
-       dummy program variable in the substitution map, so that we know that we
-       have to do something with this variable, but still know it is a program
-       variable. Previously, we did not enter it at all in the map, which made
-       us forget to substitute it.
-       See also [havoc], [merge] and [term]. *)
+    (* for simple variables (1 variable = 1 mutable region), we do not
+       introduce a new program variable each time, instead we use directly the
+       [update_var] term. See also [havoc]. This is a heuristics which assumes
+       that in this case, the program variable would be an overhead. In
+       particular for simple references it is an important optimization. *)
     let ity = pv.pv_ity in
     if ity_immutable ity then s
     else
@@ -1164,8 +1167,8 @@ end = struct
         Mreg.add reg (fresh_var_from_region s.reg_names reg) acc)
       regset s.now.subst_regions in
     let touched_regs = Mreg.set_inter regs regset in
-    (* We special case simple variables, when the mapping is the dummy
-     * variable. So no new names/equations are introduced for those. *)
+    (* We special case simple variables: no new variable is introduced for the
+     * program variable, we directly use the "update_var" term. *)
     let vars, f = Mvs.fold (fun vs _ ((acc_vars, acc_f) as acc) ->
       if pv_is_touched_by_regions vs regset then begin
         let new_term = update_var env touched_regs vs in
@@ -1189,9 +1192,7 @@ end = struct
        "current" substitution accordingly. *)
     match t.t_node with
     | Tvar vs ->
-        (* the normal case here is to replace the program variable [vs] by its
-           "now" value. The special case is where it is a simple variable; we
-           directly insert the "update" term here. *)
+        (* We simply replace the program variable [vs] by its "now" value. *)
         begin try Mvs.find vs s.now.subst_vars
         with Not_found -> t
         end
@@ -1218,6 +1219,22 @@ end = struct
         t_map (term s) t
     | _ ->
         t_map (term s) t
+
+  let extract_glue env regions s1 s2 =
+    (* we are only interested in "now" program vars *)
+    let touched_regions =
+      Mreg.filter (fun r _ -> Sreg.mem r regions) s2.now.subst_regions in
+    let s1 = s1.now.subst_vars and s2 = s2.now.subst_vars in
+    (* We iterate over the first state, because the second one potentially
+     * contains more variables *)
+    Mvs.fold
+      (fun var old_f acc ->
+          let f = Mvs.find var s2 in
+          if t_equal f old_f || is_simple_var var <> None then acc
+          else
+            let new_value = update_var env touched_regions var in
+            t_and_simp acc (t_equ_simp f new_value)
+      ) s1 t_true
 
   let subst_inter a b =
     (* compute the intersection of two substitutions. *)
@@ -1684,9 +1701,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
            for the exceptions that are actually listed. *)
         let wp1_exn_filtered =
           Mexn.filter (fun ex _ -> Mexn.mem ex xpost) wp1.exn in
-        (* ??? the glue is missing in this call to apply_state_to_post. This
-           means that "abstract" also forgets which immutable *components* are
-           not modified. To be fixed. *)
         let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
         wp_nimplies wp1.post.ne wp1_exn_filtered ((result, post.ne), xq)
       in
@@ -1698,6 +1712,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           if Mexn.mem ex acc then acc
           else Mexn.add ex post acc)
         wp1.exn xpost in
+      let regs = regs_of_writes e1.e_effect in
+      let glue = Subst.extract_glue env regs pre_abstr_state wp1.post.s in
+      let post = { post with ne = t_and_simp glue post.ne } in
       let ok = t_and_simp_l [wp1.ok; (Subst.term s spec.c_pre); ok_post] in
       { ok = wp_label e ok;
         post = post;
