@@ -255,11 +255,11 @@ let print_decls fm =
 
 let print_task fm =
   let print_decls = print_decls fm in
-  fun _env pr thpr _blacklist ?old:_ fmt task ->
+  fun args ?old:_ fmt task ->
     (* In trans-based p-printing [forget_all] is a no-no *)
     (* forget_all ident_printer; *)
-    print_prelude fmt pr;
-    print_th_prelude task fmt thpr;
+    print_prelude fmt args.prelude;
+    print_th_prelude task fmt args.th_prelude;
     let rec print = function
       | x :: r -> print r; Pp.string fmt x
       | [] -> () in
@@ -391,12 +391,12 @@ let print_axiom info fmt d = match d.d_node with
         (print_fmla info) f print_pr pr
   | _ -> ()
 
-let print_dfg _env pr thpr _blacklist ?old:_ fmt task =
+let print_dfg args ?old:_ fmt task =
   forget_all ident_printer;
   forget_all pr_printer;
   fprintf fmt "@[begin_problem(why3).@\n@\n";
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+  print_prelude fmt args.prelude;
+  print_th_prelude task fmt args.th_prelude;
   fprintf fmt "list_of_descriptions.@\n";
   fprintf fmt
     "name({**}). author({**}). status(unknown). description({**}).@\n";

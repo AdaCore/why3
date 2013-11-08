@@ -384,12 +384,12 @@ let print_tdecls =
   let print_tdecl task acc = print_tdecl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm -> Trans.fold print_tdecl (sm,[]))
 
-let print_task _env pr thpr _blacklist ?old:_ fmt task =
+let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
   (* forget_all (); *)
-  print_prelude fmt pr;
+  print_prelude fmt args.prelude;
   fprintf fmt "theory Task@\n";
-  print_th_prelude task fmt thpr;
+  print_th_prelude task fmt args.th_prelude;
   let rec print = function
     | x :: r -> print r; Pp.string fmt x
     | [] -> () in

@@ -269,11 +269,11 @@ let print_decls =
   Discriminate.on_syntax_map (fun sm ->
     Trans.fold print_decl ((sm,Mty.empty),[]))
 
-let print_task _env pr thpr _blacklist ?old:_ fmt task =
+let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+  print_prelude fmt args.prelude;
+  print_th_prelude task fmt args.th_prelude;
   let rec print = function
     | x :: r -> print r; Pp.string fmt x
     | [] -> () in
