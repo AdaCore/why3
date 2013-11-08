@@ -123,46 +123,44 @@ and print_triggers info fmt = function
   | tl -> fprintf fmt "@ (PATS %a)" (print_list space (print_trigger info)) tl
 
 let print_decl info fmt d = match d.d_node with
-  | Dtype _ | Dparam _ ->
-      false
+  | Dtype _ | Dparam _ -> ()
   | Ddata _ ->
       unsupportedDecl d "Algebraic datatypes are not supported"
   | Dlogic _ ->
       unsupportedDecl d "Predicate and function definition aren't supported"
   | Dind _ ->
       unsupportedDecl d "simplify : inductive definition are not supported"
-  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn ->
-      false
+  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
-      fprintf fmt "@[(BG_PUSH@\n ;; axiom %s@\n @[<hov 2>%a@])@]@\n"
-        pr.pr_name.id_string (print_fmla info) f;
-      true
+      fprintf fmt "@[(BG_PUSH@\n ;; axiom %s@\n @[<hov 2>%a@])@]@\n@\n"
+        pr.pr_name.id_string (print_fmla info) f
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
-      begin match pr.pr_name.id_loc with
-        | None -> ()
-        | Some loc -> fprintf fmt " @[;; %a@]@\n"
-            Loc.gen_report_position loc
-      end;
-      fprintf fmt "@[<hov 2>%a@]@\n" (print_fmla info) f;
-      true
+      (match pr.pr_name.id_loc with
+        | Some loc -> fprintf fmt " @[;; %a@]@\n" Loc.gen_report_position loc
+        | None -> ());
+      fprintf fmt "@[<hov 2>%a@]@\n" (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) ->
       assert false
 
-let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
+let print_decls =
+  let print_decl sm fmt d =
+    try print_decl {info_syn = sm} fmt d; sm, []
+    with Unsupported s -> raise (UnsupportedDecl (d,s)) in
+  let print_decl = Printer.sprint_decl print_decl in
+  let print_decl task acc = print_decl task.Task.task_decl acc in
+  Discriminate.on_syntax_map (fun sm -> Trans.fold print_decl (sm,[]))
 
-let print_task pr thpr _blacklist fmt task =
+let print_task _env pr thpr _blacklist ?old:_ fmt task =
+  (* In trans-based p-printing [forget_all] is a no-no *)
+  (* forget_all ident_printer; *)
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  let info = {
-    info_syn = get_syntax_map task }
-  in
-  let decls = Task.task_decls task in
-  ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
+  let rec print = function
+    | x :: r -> print r; Pp.string fmt x
+    | [] -> () in
+  print (snd (Trans.apply print_decls task));
+  pp_print_flush fmt ()
 
-let () = register_printer "simplify"
-  (fun _env pr thpr blacklist ?old:_ fmt task ->
-     forget_all ident_printer;
-     print_task pr thpr blacklist fmt task)
+let () = register_printer "simplify" print_task
   ~desc:"Printer@ for@ the@ Simplify@ theorem@ prover."
-

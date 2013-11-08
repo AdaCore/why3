@@ -39,8 +39,8 @@ let create_label s = Hslab.hashcons {
 }
 
 let lab_equal : label -> label -> bool = (==)
-
-let lab_hash (lab : label) = lab.lab_tag
+let lab_hash lab = lab.lab_tag
+let lab_compare l1 l2 = Pervasives.compare l1.lab_tag l2.lab_tag
 
 (** Identifiers *)
 
@@ -64,8 +64,8 @@ module Wid = Id.W
 type preid = ident
 
 let id_equal : ident -> ident -> bool = (==)
-
 let id_hash id = Weakhtbl.tag_hash id.id_tag
+let id_compare id1 id2 = Pervasives.compare (id_hash id1) (id_hash id2)
 
 (* constructors *)
 

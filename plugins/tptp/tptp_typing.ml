@@ -649,7 +649,7 @@ let typecheck lib path ast =
         let f,_ = fmla denv env impl (Some pol) [] e in
         let f = if strict then f else
           let q = if pol then Texists else Tforall in
-          let vl = Mvs.keys f.t_vars in
+          let vl = Mvs.keys (t_vars f) in
           t_quant_close q vl [] f in
         let env,uc = flush_impl ~strict env uc impl in
 

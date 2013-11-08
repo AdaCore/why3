@@ -251,6 +251,7 @@ let print_enum_decl fmt ts csl =
     (print_list alt2 print_cs) csl
 
 let print_ty_decl info fmt ts =
+  if ts.ts_def <> None then () else
   if Mid.mem ts.ts_name info.info_syn then () else
   (fprintf fmt "%a@\n@\n" print_type_decl ts; forget_tvs ())
 
@@ -333,8 +334,6 @@ let print_decl info fmt d = match d.d_node with
       "alt-ergo: inductive definitions are not supported"
   | Dprop (k,pr,f) -> print_prop_decl info fmt k pr f
 
-let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
-
 let add_projection (csm,pjs,axs) = function
   | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
       let csm = try Array.set (Mls.find cs csm) ind ls; csm
@@ -353,66 +352,41 @@ let check_typecasts acc = function
   | [Theory.MAstr _] -> acc
   | _ -> assert false
 
-(*
-let print_task_old pr thpr fmt task =
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
-  let csm,pjs,axs = Task.on_meta Eliminate_algebraic.meta_proj
-    add_projection (Mls.empty,Sls.empty,Spr.empty) task in
-  let info = {
-    info_syn = get_syntax_map task;
-    info_ac  = Task.on_tagged_ls meta_ac task;
-    info_show_labels =
-      Task.on_meta meta_printer_option check_showlabels false task;
-    info_csm = Mls.map Array.to_list csm;
-    info_pjs = pjs;
-    info_axs = axs;
-  } in
-  let decls = Task.task_decls task in
-  fprintf fmt "%a@." (print_list nothing (print_decl info)) decls
-
-let () = register_printer "alt-ergo-old"
-  (fun _env pr thpr ?old:_ fmt task ->
-     forget_all ident_printer;
-     print_task_old pr thpr fmt task)
-*)
-
 let print_decls =
-  let print inv_trig ac sl tc csm pjs axs sm fmt d =
+  let print_decl info fmt d =
+    try print_decl info fmt d; info, []
+    with Unsupported s -> raise (UnsupportedDecl (d,s)) in
+  let print_decl = Printer.sprint_decl print_decl in
+  let print_decl task acc = print_decl task.Task.task_decl acc in
+  Discriminate.on_syntax_map (fun sm ->
+  Trans.on_tagged_ls meta_ac (fun ac ->
+  Trans.on_meta meta_printer_option (fun args ->
+  Trans.on_meta Eliminate_algebraic.meta_proj (fun mal ->
+  Trans.on_tagged_ls meta_invalid_trigger (fun inv_trig ->
+    let csm,pjs,axs =
+      List.fold_left add_projection (Mls.empty,Sls.empty,Spr.empty) mal in
     let info = {
       info_syn = sm;
       info_ac  = ac;
-      info_show_labels = sl;
-      info_type_casts = tc;
+      info_show_labels = List.fold_left check_showlabels false args;
+      info_type_casts = List.fold_left check_typecasts true args;
       info_csm = Mls.map Array.to_list csm;
       info_pjs = pjs;
       info_axs = axs;
       info_inv_trig = Sls.add ps_equ inv_trig;
     } in
-    print_decl info fmt d in
-  Trans.on_tagged_ls meta_invalid_trigger (fun inv_trig ->
-  Trans.on_tagged_ls meta_ac (fun ac ->
-  Trans.on_meta meta_printer_option (fun args ->
-    let sl = List.fold_left check_showlabels false args in
-    let tc = List.fold_left check_typecasts  true  args in
-  Trans.on_meta Eliminate_algebraic.meta_proj (fun mal ->
-    let csm,pjs,axs = List.fold_left
-      add_projection (Mls.empty,Sls.empty,Spr.empty) mal in
-    Printer.sprint_decls (print inv_trig ac sl tc csm pjs axs)))))
+    Trans.fold print_decl (info,[]))))))
 
 let print_task _env pr thpr _blacklist ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
   (* forget_all ident_printer; *)
   print_prelude fmt pr;
   print_th_prelude task fmt thpr;
-  fprintf fmt "%a@." (print_list nothing string)
-    (List.rev (Trans.apply print_decls task))
+  let rec print = function
+    | x :: r -> print r; Pp.string fmt x
+    | [] -> () in
+  print (snd (Trans.apply print_decls task));
+  pp_print_flush fmt ()
 
 let () = register_printer "alt-ergo" print_task
   ~desc:"Printer for the Alt-Ergo theorem prover."
-(*
-let print_goal info fmt (id, f, task) =
-  print_task info fmt task;
-  fprintf fmt "@\n@[<hov 2>goal %a : %a@]@\n" print_ident id (print_fmla info) f
-*)
-

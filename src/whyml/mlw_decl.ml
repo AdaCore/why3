@@ -131,7 +131,7 @@ let create_data_decl tdl =
 
 let add_invariant pd its p =
   if not its.its_inv then invalid_arg "Mlw_decl.add_invariant";
-  Mvs.iter (fun vs _ -> raise (Decl.UnboundVar vs)) p.t_vars;
+  t_v_fold (fun _ vs -> raise (Decl.UnboundVar vs)) () p;
   let rec add = function
     | (s, cls, inv) :: tdl when its_equal s its ->
         check_post (t_type inv) p;

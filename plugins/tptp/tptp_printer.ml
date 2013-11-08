@@ -45,21 +45,45 @@ let print_pr fmt pr =
 let forget_var v = forget_id ident_printer v.vs_name
 let forget_tvar v = forget_id ident_printer v.tv_name
 
+type tptp_format = FOF | TFF0 | TFF1
+
 type info = {
   info_syn : syntax_map;
-  info_fof : bool;
+  info_fmt : tptp_format;
+  info_srt : ty Mty.t ref;
+  info_urg : string list ref;
 }
 
+let complex_type = Wty.memoize 3 (fun ty ->
+  let s = Pp.string_of_wnl Pretty.print_ty ty in
+  create_tysymbol (id_fresh s) [] None)
+
 let rec print_type info fmt ty = match ty.ty_node with
+  | Tyvar _ when info.info_fmt = TFF0 ->
+      unsupported "TFF0 does not support polymorphic types"
   | Tyvar tv -> print_tvar fmt tv
-  | Tyapp (ts, tl) -> begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_type info) fmt tl
-      | None -> begin match tl with
-          | [] -> print_symbol fmt ts.ts_name
-          | _ -> fprintf fmt "@[%a(%a)@]" print_symbol ts.ts_name
-              (print_list comma (print_type info)) tl
+  | Tyapp (ts, tl) ->
+      begin match query_syntax info.info_syn ts.ts_name, tl with
+      | Some s, _ -> syntax_arguments s (print_type info) fmt tl
+      | None, [] -> print_symbol fmt ts.ts_name
+      | None, _ when info.info_fmt = TFF0 ->
+          begin match Mty.find_opt ty !(info.info_srt) with
+          | Some ty -> print_type info fmt ty
+          | None ->
+              let ts = complex_type ty in let cty = ty_app ts [] in
+              let us = sprintf "@[<hov 2>tff(%s, type,@ %a:@ $tType).@]@\n@\n"
+                (id_unique pr_printer ts.ts_name) print_symbol ts.ts_name in
+              info.info_srt := Mty.add ty cty !(info.info_srt);
+              info.info_urg := us :: !(info.info_urg);
+              print_type info fmt cty
           end
+      | None, tl ->
+          fprintf fmt "@[%a(%a)@]" print_symbol ts.ts_name
+            (print_list comma (print_type info)) tl
       end
+
+let print_type info fmt ty = try print_type info fmt ty
+  with Unsupported s -> raise (UnsupportedType (ty,s))
 
 let number_format = {
   Number.long_int_support = true;
@@ -73,8 +97,7 @@ let number_format = {
   Number.hex_real_support = Number.Number_unsupported;
   Number.frac_real_support = Number.Number_custom
     (Number.PrintFracReal ("%s", "(%s * %s)", "(%s / %s)"));
-  Number.def_real_support = Number.Number_unsupported
-  ;
+  Number.def_real_support = Number.Number_unsupported;
 }
 
 let rec print_app info fmt ls tl oty =
@@ -131,7 +154,7 @@ and print_fmla info fmt f = match f.t_node with
       let q = match q with Tforall -> "!" | Texists -> "?" in
       let vl, _tl, f = t_open_quant fq in
       let print_vsty fmt vs =
-        if info.info_fof then fprintf fmt "%a" print_var vs
+        if info.info_fmt = FOF then fprintf fmt "%a" print_var vs
         else fprintf fmt "%a:@,%a" print_var vs (print_type info) vs.vs_ty in
       fprintf fmt "%s[%a]:@ %a" q
         (print_list comma print_vsty) vl (print_fmla info) f;
@@ -160,8 +183,9 @@ let print_fmla info fmt f =
   Stv.iter forget_tvar tvs
 
 let print_decl info fmt d = match d.d_node with
-  | Dtype _ when info.info_fof -> ()
+  | Dtype _ when info.info_fmt = FOF -> ()
   | Dtype { ts_def = Some _ } -> ()
+  | Dtype { ts_args = _::_ } when info.info_fmt = TFF0 -> ()
   | Dtype ts when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Dtype ts ->
       let print_arg fmt _ = fprintf fmt "$tType" in
@@ -173,7 +197,7 @@ let print_decl info fmt d = match d.d_node with
       fprintf fmt "@[<hov 2>tff(%s, type,@ %a:@ %a).@]@\n@\n"
         (id_unique pr_printer ts.ts_name)
         print_symbol ts.ts_name print_sig ts
-  | Dparam _ when info.info_fof -> ()
+  | Dparam _ when info.info_fmt = FOF -> ()
   | Dparam ls when query_syntax info.info_syn ls.ls_name <> None -> ()
   | Dparam ls ->
       let print_type = print_type info in
@@ -208,30 +232,43 @@ let print_decl info fmt d = match d.d_node with
       "TPTP does not support inductive predicates, use eliminate_inductive"
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
-      let head = if info.info_fof then "fof" else "tff" in
+      let head = if info.info_fmt = FOF then "fof" else "tff" in
       fprintf fmt "@[<hov 2>%s(%a, axiom,@ %a).@]@\n@\n"
         head print_pr pr (print_fmla info) f
   | Dprop (Pgoal, pr, f) ->
-      let head = if info.info_fof then "fof" else "tff" in
+      let head = if info.info_fmt = FOF then "fof" else "tff" in
       fprintf fmt "@[<hov 2>%s(%a, conjecture,@ %a).@]@\n"
         head print_pr pr (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) -> assert false
 
-let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
+let print_decls fm =
+  let print_decl (sm,fm,ct) fmt d =
+    let info = { info_syn = sm;     info_fmt = fm;
+                 info_srt = ref ct; info_urg = ref [] } in
+    try print_decl info fmt d;
+        (sm,fm,!(info.info_srt)), !(info.info_urg)
+    with Unsupported s -> raise (UnsupportedDecl (d,s)) in
+  let print_decl = Printer.sprint_decl print_decl in
+  let print_decl task acc = print_decl task.Task.task_decl acc in
+  Discriminate.on_syntax_map (fun sm ->
+    Trans.fold print_decl ((sm,fm,Mty.empty),[]))
 
-let print_task fof _env pr thpr _blacklist ?old:_ fmt task =
-  forget_all ident_printer;
-  forget_all pr_printer;
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
-  let info = { info_syn = get_syntax_map task; info_fof = fof } in
-  fprintf fmt "@[%a@]@."
-    (print_list nothing (print_decl info)) (Task.task_decls task)
+let print_task fm =
+  let print_decls = print_decls fm in
+  fun _env pr thpr _blacklist ?old:_ fmt task ->
+    (* In trans-based p-printing [forget_all] is a no-no *)
+    (* forget_all ident_printer; *)
+    print_prelude fmt pr;
+    print_th_prelude task fmt thpr;
+    let rec print = function
+      | x :: r -> print r; Pp.string fmt x
+      | [] -> () in
+    print (snd (Trans.apply print_decls task));
+    pp_print_flush fmt ()
 
-let () = register_printer "tptp-tff" (print_task false) ~desc:"TPTP TFF format"
-let () = register_printer "tptp-fof" (print_task true) ~desc:"TPTP FOF format"
-
-
+let () = register_printer "tptp-tff0" (print_task TFF0) ~desc:"TPTP TFF0 format"
+let () = register_printer "tptp-tff1" (print_task TFF1) ~desc:"TPTP TFF1 format"
+let () = register_printer "tptp-fof"  (print_task FOF)  ~desc:"TPTP FOF format"
 
 (** DFG input format for SPASS >= 3.8
     (with the help of Daniel Wand)
@@ -364,7 +401,11 @@ let print_dfg _env pr thpr _blacklist ?old:_ fmt task =
   fprintf fmt
     "name({**}). author({**}). status(unknown). description({**}).@\n";
   fprintf fmt "end_of_list.@\n@\n";
-  let info = { info_syn = get_syntax_map task; info_fof = true } in
+  let info = {
+    info_syn = get_syntax_map task;
+    info_fmt = FOF;
+    info_urg = ref [];
+    info_srt = ref Mty.empty } in
   let dl = Task.task_decls task in
   let tl = List.filter (is_type info) dl in
   let fl = List.filter (is_function info) dl in

@@ -162,7 +162,7 @@ let eval_int_rel op _ty ls l =
   | _ -> assert false
 
 let term_equality t1 t2 =
-  if t_equal_alpha t1 t2 then Some true
+  if t_equal t1 t2 then Some true
   else
     try
       let i1 = big_int_of_term t1 in

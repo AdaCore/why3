@@ -1,13 +1,10 @@
-(* Why3 driver for princess
-   see http://www.philipp.ruemmer.org/princess.shtml *)
+(* Why driver for first-order tptp provers supporting TFF1 *)
 
-printer "tptp-tff0"
+printer "tptp-tff1"
 filename "%f-%t-%g.p"
 
 valid   "Proof found"
 invalid "Completion found"
-valid   "^No countermodel exists, formula is valid"
-invalid "^Formula is invalid, found a countermodel:"
 valid   "^% SZS status Theorem"
 valid   "^% SZS status Unsatisfiable"
 unknown "^% SZS status CounterSatisfiable" ""
@@ -22,30 +19,21 @@ unknown "No Proof Found"            ""
 fail    "Failure.*"                   "\"\\0\""
 time "why3cpulimit time : %s s"
 
-(* transformations *)
+
+(* to be improved *)
 
 transformation "inline_trivial"
+
 transformation "eliminate_builtin"
 transformation "eliminate_definition"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
-
-(* currently, princess does not support $let and $ite *)
-transformation "eliminate_let"
-transformation "eliminate_if"
-
-transformation "discriminate"
-transformation "encoding_smt"
-
-import "discrimination.gen"
 
 theory BuiltIn
   syntax predicate (=)  "(%1 = %2)"
   syntax type int  "$int"
   syntax type real "$real"
 
-  meta "encoding : kept" type int
-  meta "encoding : kept" type real
   meta "eliminate_algebraic" "no_index"
 end
 
@@ -141,8 +129,6 @@ end
 
 theory tptp.Univ
   syntax type iType "$i"
-
-  meta "encoding : kept" type iType
 end
 
 theory tptp.IntTrunc
@@ -209,8 +195,6 @@ theory tptp.Rat
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
-
-  meta "encoding : kept" type rat
 end
 
 theory tptp.RatTrunc
@@ -287,3 +271,9 @@ theory tptp.RatToReal
   syntax function to_real "$to_real(%1)"
 end
 
+(*
+Local Variables:
+mode: why
+compile-command: "unset LANG; make -C .. bench"
+End:
+*)

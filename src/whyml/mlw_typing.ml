@@ -76,9 +76,10 @@ let ts_tuple n = Hint.replace ht_tuple n (); ts_tuple n
 let fs_tuple n = Hint.replace ht_tuple n (); fs_tuple n
 
 let check_at f0 =
+  let fvs0 = t_vars f0 in
   let rec check f = match f.t_node with
     | Term.Tapp (ls, _) when ls_equal ls fs_at ->
-        let d = Mvs.set_diff f.t_vars f0.t_vars in
+        let d = Mvs.set_diff (t_vars f) fvs0 in
         if not (Mvs.is_empty d) then errorm ?loc:f.t_loc
           "locally bound variable %a under `at'"
           Pretty.print_vs (fst (Mvs.choose d))
@@ -786,7 +787,7 @@ let rec check_reset rvs t = match t.t_node with
         under `old' in the postcondition" vs.vs_name.id_string
   | Tapp (ls,_) when ls_equal ls fs_at -> false
   | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
-      let rvs = Mvs.set_inter rvs t.t_vars in
+      let rvs = Mvs.set_inter rvs (t_vars t) in
       if Mvs.is_empty rvs then false else
       t_any (check_reset rvs) t
   | _ ->
@@ -1117,7 +1118,7 @@ let rec type_c lenv pvs vars otv (dtyv, dsp) =
      ignored outside of "let rec" definitions, so WP are not affected. *)
   let del_pv pv s = Svs.remove pv.pv_vs s in
   let esvs = Spv.fold del_pv pvs esvs in
-  let drop _ t s = Mvs.set_diff s t.t_vars in
+  let drop _ t s = Mvs.set_diff s (t_vars t) in
   let esvs = drop () spec.c_pre esvs in
   let esvs = drop () spec.c_post esvs in
   let esvs = Mexn.fold drop spec.c_xpost esvs in

@@ -28,18 +28,12 @@ trigger they can't appear since = can't appear *)
 (*transformation "filter_trigger_builtin"*)
 
 (* this is sound as long as int is the only kept type *)
-transformation "encoding_smt"
+transformation "encoding_tptp"
 
 theory BuiltIn
   syntax predicate (=)  "(EQ %1 %2)"
 
-  meta "encoding : kept" type int
-
-  (* no symbol discrimination, no kept types *)
-  meta "select_inst" "none"
-  meta "select_lskept" "none"
-  meta "select_lsinst" "none"
-  meta "select_kept" "none"
+  meta "encoding : base" type int
 end
 
 theory int.Int

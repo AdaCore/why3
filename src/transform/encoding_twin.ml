@@ -15,7 +15,7 @@ open Ty
 open Term
 open Decl
 
-let make_pont ty () =
+let make_pont = Wty.memoize 3 (fun ty ->
   let t2tb =
     let t2tb_name = "t2tb" in
     let t2tb_id = Libencoding.id_unprotected t2tb_name in
@@ -44,7 +44,7 @@ let make_pont ty () =
     let ax = t_forall_close [x_vs] [[t2tb_tb2t_x]] eq in
     let pr = create_prsymbol (id_fresh "BridgeR") in
     create_prop_decl Paxiom pr ax in
-  t2tb, tb2t, [t2tb_def; tb2t_def; bridge_l; bridge_r]
+  t2tb, tb2t, [t2tb_def; tb2t_def; bridge_l; bridge_r])
 
 let seen = Hty.create 7
 
@@ -109,6 +109,6 @@ let decl tenv d =
   add_decls tenv decls
 
 let t = Trans.on_tagged_ty Libencoding.meta_kept (fun s ->
-  Trans.decl (decl (Mty.mapi make_pont s)) None)
+  Trans.decl (decl (Mty.mapi (fun ty () -> make_pont ty) s)) None)
 
 let () = Hstr.replace Encoding.ft_enco_kept "twin" (Util.const t)
