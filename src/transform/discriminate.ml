@@ -73,16 +73,19 @@ module Lsmap = struct
    instantié. Un tag sur un logique polymorphe doit être un tag sur toute
    la famille de fonctions *)
 
-  let ls_inst = Wls.memoize 3 (fun ls ->
-    let m = ref Mtyl.empty in
-    fun tyl tyv ->
+  let ls_inst =
+    (* FIXME? Skolem type constants are short-living but
+       will stay in lsmap as long as the lsymbol is alive *)
+    let lsmap = Wls.memoize 63 (fun _ -> ref Mtyl.empty) in
+    fun ls tyl tyv ->
+      let m = lsmap ls in
       let l = oty_cons tyl tyv in
       match Mtyl.find_opt l !m with
       | Some ls -> ls
-      | None    ->
+      | None ->
           let nls = create_lsymbol (id_clone ls.ls_name) tyl tyv in
           m := Mtyl.add l nls !m;
-          nls)
+          nls
 
   type t = lsymbol Mtyl.t Mls.t
 

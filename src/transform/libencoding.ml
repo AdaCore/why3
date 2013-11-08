@@ -191,6 +191,27 @@ let d_monomorph ty_base kept lsmap d =
   let add ls acc = create_param_decl ls :: acc in
   Sls.fold add !consts dl
 
+module OHTyl = Stdlib.OrderedHashedList(struct
+  type t = ty
+  let tag = ty_hash
+end)
+
+module Mtyl = Extmap.Make(OHTyl)
+
+let ls_inst =
+  (* FIXME? Skolem type constants are short-living but
+      will stay in lsmap as long as the lsymbol is alive *)
+  let lsmap = Wls.memoize 63 (fun _ -> ref Mtyl.empty) in
+  fun ls tyl tyv ->
+    let m = lsmap ls in
+    let l = oty_cons tyl tyv in
+    match Mtyl.find_opt l !m with
+    | Some ls -> ls
+    | None ->
+        let nls = create_lsymbol (id_clone ls.ls_name) tyl tyv in
+        m := Mtyl.add l nls !m;
+        nls
+
 let lsmap ty_base kept = Hls.memo 63 (fun ls ->
   let prot_arg = is_protecting_id ls.ls_name in
   let prot_val = is_protected_id ls.ls_name in
@@ -200,7 +221,7 @@ let lsmap ty_base kept = Hls.memo 63 (fun ls ->
   let ty_res = Opt.map pos ls.ls_value in
   if Opt.equal ty_equal ty_res ls.ls_value &&
      List.for_all2 ty_equal ty_arg ls.ls_args then ls
-  else create_lsymbol (id_clone ls.ls_name) ty_arg ty_res)
+  else ls_inst ls ty_arg ty_res)
 
 (* replace all non-kept types with ty_base *)
 let monomorphise_task =
