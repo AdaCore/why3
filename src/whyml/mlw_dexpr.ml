@@ -750,6 +750,165 @@ let create_xpost pll =
 
 let create_post vty pll = create_post (ty_of_vty vty) pll
 
+let spec_of_dspec eff vty dsp = {
+  c_pre     = create_pre dsp.ds_pre;
+  c_post    = create_post vty dsp.ds_post;
+  c_xpost   = create_xpost dsp.ds_xpost;
+  c_effect  = eff;
+  c_variant = dsp.ds_variant;
+  c_letrec  = 0;
+}
+
+(** User effects *)
+
+let mk_field ity gh mut = {fd_ity = ity; fd_ghost = gh; fd_mut = mut}
+
+let rec effect_of_term t = match t.t_node with
+  | Tvar vs ->
+      let pv = try restore_pv vs with Not_found ->
+        Loc.errorm ?loc:t.t_loc "unsupported effect expression" in
+      vs, mk_field pv.pv_ity pv.pv_ghost None
+  | Tapp (fs,[ta]) ->
+      let vs, fa = effect_of_term ta in
+      let ofa,ofv = try match restore_pl fs with
+        | {pl_args = [ofa]; pl_value = ofv} ->
+            ofa, ofv
+        | _ -> assert false
+      with Not_found -> match fs with
+        | {ls_args = [tya]; ls_value = Some tyv} ->
+            mk_field (ity_of_ty tya) false None,
+            mk_field (ity_of_ty tyv) false None
+        | {ls_args = [_]; ls_value = None} ->
+            Loc.errorm ?loc:t.t_loc "unsupported effect expression"
+        | _ -> assert false in
+      let sbs = ity_match ity_subst_empty ofa.fd_ity fa.fd_ity in
+      let ity = try ity_full_inst sbs ofv.fd_ity with Not_found ->
+        Loc.errorm ?loc:t.t_loc "unsupported effect expression" in
+      let gh = (fa.fd_ghost && not ofa.fd_ghost) || ofv.fd_ghost in
+      let mut = Opt.map (reg_full_inst sbs) ofv.fd_mut in
+      vs, mk_field ity gh mut
+  | _ ->
+      Loc.errorm ?loc:t.t_loc "unsupported effect expression"
+
+let effect_of_dspec dsp =
+  let add_raise eff (xs,_,_) = eff_raise eff xs in
+  let add_raise eff (_,pl) = List.fold_left add_raise eff pl in
+  let eff = List.fold_left add_raise eff_empty dsp.ds_xpost in
+  let svs = List.fold_right Svs.add dsp.ds_reads Svs.empty in
+  let add_write (svs,mreg,eff) t =
+    let vs, fd = effect_of_term t in
+    match fd.fd_mut, fd.fd_ity.ity_node with
+    | Some reg, _ ->
+        Svs.add vs svs, Mreg.add reg t mreg,
+        eff_write eff ~ghost:fd.fd_ghost reg
+    | None, Ityapp ({its_ghrl = ghrl},_,(_::_ as regl)) ->
+        let add_reg mreg reg = Mreg.add reg t mreg in
+        let add_write eff gh reg =
+          eff_write eff ~ghost:(fd.fd_ghost || gh) reg in
+        Svs.add vs svs, List.fold_left add_reg mreg regl,
+        List.fold_left2 add_write eff ghrl regl
+    | _ ->
+        Loc.errorm ?loc:t.t_loc "mutable expression expected"
+  in
+  List.fold_left add_write (svs,Mreg.empty,eff) dsp.ds_writes
+
+let e_find_loc pr e =
+  try (e_find (fun e -> e.e_loc <> None && pr e) e).e_loc
+  with Not_found -> None
+
+let check_user_effect e spec full_xpost dsp =
+  let has_write reg eff =
+    Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
+  let has_raise xs eff =
+    Sexn.mem xs eff.eff_raises || Sexn.mem xs eff.eff_ghostx in
+  (* computed effect vs user effect *)
+  let eeff = spec.c_effect in
+  let usvs, mreg, ueff = effect_of_dspec dsp in
+  (* check that every user effect actually happens *)
+  let check_read vs =
+    let pv = try restore_pv vs with Not_found ->
+      Loc.errorm "unsupported effect expression" in
+    if not (Spv.mem pv e.e_syms.syms_pv) then Loc.errorm ?loc:e.e_loc
+      "variable %a does not occur in this expression" Pretty.print_vs vs in
+  List.iter check_read dsp.ds_reads;
+  let check_write reg = if not (has_write reg eeff)
+    then let t = Mreg.find reg mreg in Loc.errorm ?loc:t.t_loc
+      "this write effect does not happen in the expression" in
+  Sreg.iter check_write ueff.eff_writes;
+  Sreg.iter check_write ueff.eff_ghostw;
+  let check_raise xs _ = if not (has_raise xs eeff)
+    then Loc.errorm ?loc:e.e_loc
+      "this expression does not raise exception %a"
+      Mlw_pretty.print_xs xs in
+  Mexn.iter check_raise ueff.eff_raises;
+  Mexn.iter check_raise ueff.eff_ghostx;
+  (* check that every computed effect is listed *)
+  let check_read pv = if not (Svs.mem pv.pv_vs usvs) then
+    Loc.errorm ?loc:(e_find_loc (fun e -> Spv.mem pv e.e_syms.syms_pv) e)
+      "this expression depends on variable %a left out in specification"
+      Mlw_pretty.print_pv pv in
+  if dsp.ds_reads <> [] then Spv.iter check_read
+    (Spv.diff e.e_syms.syms_pv (spec_pvset Spv.empty spec));
+  let check_write reg = if not (has_write reg ueff) then
+    Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
+      "this expression produces an unlisted write effect" in
+  if dsp.ds_writes <> [] then Sreg.iter check_write eeff.eff_writes;
+  if dsp.ds_writes <> [] then Sreg.iter check_write eeff.eff_ghostw;
+  let check_raise xs = if not (has_raise xs ueff) then
+    Loc.errorm ?loc:(e_find_loc (fun e -> has_raise xs e.e_effect) e)
+      "this expression raises unlisted exception %a"
+      Mlw_pretty.print_xs xs in
+  if full_xpost then Sexn.iter check_raise eeff.eff_raises;
+  if full_xpost then Sexn.iter check_raise eeff.eff_ghostx
+
+(*
+let check_lambda_effect lenv ({fun_lambda = lam} as fd) bl dsp =
+  let lenv = add_binders lenv lam.l_args in
+  let spec = fd.fun_ps.ps_aty.aty_spec in
+  check_user_effect lenv lam.l_expr spec true dsp;
+  (* check that we don't look inside opaque type variables *)
+  let optv = opaque_binders Stv.empty bl in
+  let bad_comp tv _ _ = Loc.errorm
+    ?loc:(e_find_loc (fun e -> Stv.mem tv e.e_effect.eff_compar) lam.l_expr)
+    "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
+  ignore (Mtv.inter bad_comp optv spec.c_effect.eff_compar)
+*)
+
+let check_user_ps recu ps =
+  let ps_regs = ps.ps_subst.ity_subst_reg in
+  let report r =
+    if Mreg.mem r ps_regs then let spv = Spv.filter
+        (fun pv -> reg_occurs r pv.pv_ity.ity_vars) ps.ps_pvset in
+      Loc.errorm "The type of this function contains an alias with \
+        external variable %a" Mlw_pretty.print_pv (Spv.choose spv)
+    else
+      Loc.errorm "The type of this function contains an alias"
+  in
+  let rec check regs ity = match ity.ity_node with
+    | Ityapp (_,_,rl) ->
+        let add regs r =
+          if Mreg.mem r regs then report r else
+          check (Mreg.add r r regs) r.reg_ity in
+        let regs = List.fold_left add regs rl in
+        ity_fold check regs ity
+    | _ ->
+        ity_fold check regs ity
+  in
+  let rec down regs a =
+    let add regs pv = check regs pv.pv_ity in
+    let regs = List.fold_left add regs a.aty_args in
+    match a.aty_result with
+    | VTarrow a -> down regs a
+    | VTvalue v -> check (if recu then regs else ps_regs) v
+    (* we allow the value in a non-recursive function to contain
+       regions coming the function's arguments, but not from the
+       context. It is sometimes useful to write a function around
+       a constructor or a projection. For recursive functions, we
+       impose the full non-alias discipline, to ensure the safety
+       of region polymorphism (see add_rec_mono). *)
+  in
+  ignore (down ps_regs ps.ps_aty)
+
 (** Final stage *)
 
 type local_env = {
@@ -935,17 +1094,14 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
       e_absurd (ity_of_dity res)
   | DEassert (ak,f) ->
       e_assert ak (create_assert (de0.de_loc, f env.vsm))
-(*
-  | DEabstract (de,dspec) ->
+  | DEabstract (de,dsp) ->
       let e = get env de in
-      let dspec = dspec env.vsm in
-      if dspec.ds_variant <> [] then Loc.errorm
+      let dsp = dsp env.vsm in
+      if dsp.ds_variant <> [] then Loc.errorm
         "variants are not allowed in `abstract'";
-      let spec = spec_of_dspec dspec in
-      check_user_effect lenv e1 spec false dsp;
-      let spec = { spec with c_effect = e.e_effect } in
-      e_abstract e1 spec
-*)
+      let spec = spec_of_dspec e.e_effect e.e_vty dsp in
+      check_user_effect e spec false dsp;
+      e_abstract e spec
   | DEmark (id,de) ->
       let ld = create_let_defn id Mlw_wp.e_now in
       let env = add_let_sym env id ld.let_sym in
