@@ -403,7 +403,8 @@ let task_view =
     ~height:gconfig.task_height
     ()
 
-let modifiable_font_views = ref [goals_view#misc ; task_view#misc]
+let modifiable_sans_font_views = ref [goals_view#misc]
+let modifiable_mono_font_views = ref [task_view#misc]
 let () = task_view#source_buffer#set_language why_lang
 let () = task_view#set_highlight_current_line true
 
@@ -1231,17 +1232,20 @@ let exit_function ?(destroy=false) () =
 (* View menu *)
 (*************)
 
-let font_family = "Monospace"
+let sans_font_family = "Sans"
+let mono_font_family = "Monospace"
 let font_size = ref 10
 
 let change_font () =
 (*
   Tools.resize_images (!Colors.font_size * 2 - 4);
 *)
-  let f =
-    Pango.Font.from_string (font_family ^ " " ^ string_of_int !font_size)
-  in
-  List.iter (fun v -> v#modify_font f) !modifiable_font_views
+  let sff = sans_font_family ^ " " ^ string_of_int !font_size in
+  let mff = mono_font_family ^ " " ^ string_of_int !font_size in
+  let sf = Pango.Font.from_string sff in
+  let mf = Pango.Font.from_string mff in
+  List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
+  List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
 
 let enlarge_font () =
   incr font_size;
@@ -1790,7 +1794,10 @@ let source_view =
 (*
   source_view#misc#modify_font_by_name font_name;
 *)
-let () = modifiable_font_views := source_view#misc :: !modifiable_font_views
+let () = modifiable_mono_font_views :=
+          source_view#misc :: !modifiable_mono_font_views
+let () = change_font ()
+
 let () = source_view#source_buffer#set_language None
 let () = source_view#set_highlight_current_line true
 (*
