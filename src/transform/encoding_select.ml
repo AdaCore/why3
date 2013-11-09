@@ -90,7 +90,7 @@ module Lsinst = struct
 
   let add_lsinst mls ls tyl tyv =
     if ls_equal ls ps_equ ||
-      List.for_all ty_closed (oty_cons ls.ls_args ls.ls_value) &&
+      List.for_all ty_closed (oty_cons ls.ls_args ls.ls_value) ||
       List.exists (fun ty -> not (ty_closed ty)) (oty_cons tyl tyv)
     then mls else Lsmap.add ls tyl tyv mls
 
