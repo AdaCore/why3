@@ -593,4 +593,9 @@ module Pairing(Old: S)(New: S) = struct
     end;
     Array.to_list result
 
+(*
+  let associate oldgoals newgoals =
+    try List.map2 (fun o n -> n, Some (o, true)) oldgoals newgoals
+    with Invalid_argument _ -> associate oldgoals newgoals
+*)
 end
