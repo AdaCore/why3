@@ -61,10 +61,15 @@ type 'a later = vsymbol Mstr.t -> 'a
      expressions, when the types of locally bound program variables are
      already established. *)
 
+type dpre = Loc.position option * term
+type dpost = Loc.position option * (pattern * term) list
+type dxpost = Loc.position option * (xsymbol * pattern * term) list
+type dinvariant = (Loc.position option * term) list
+
 type dspec = {
-  ds_pre     : pre;
-  ds_post    : post;
-  ds_xpost   : xpost;
+  ds_pre     : dpre list;
+  ds_post    : dpost list;
+  ds_xpost   : dxpost list;
   ds_reads   : vsymbol list;
   ds_writes  : term list;
   ds_variant : variant list;
@@ -107,8 +112,8 @@ and dexpr_node =
   | DEfalse
   | DEraise of xsymbol * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
-  | DEfor of preid * dexpr * for_direction * dexpr * invariant later * dexpr
-  | DEloop of variant list later * invariant later * dexpr
+  | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
+  | DEloop of (variant list * dinvariant) later * dexpr
   | DEabsurd
   | DEassert of assertion_kind * term later
   | DEabstract of dexpr * dspec later
