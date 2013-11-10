@@ -708,6 +708,26 @@ let dexpr ?loc node =
   let dvty = Loc.try1 ?loc get_dvty node in
   { de_node = node; de_dvty = dvty; de_loc = loc }
 
+(** Final stage *)
+
+(** Binders *)
+
+let binders bl =
+  let sn = ref Sstr.empty in
+  let binder (id, ghost, _, dity) =
+    let id = match id with
+      | Some ({pre_name = n} as id) ->
+          let exn = match id.pre_loc with
+            | Some loc -> Loc.Located (loc, Dterm.DuplicateVar n)
+            | None -> Dterm.DuplicateVar n in
+          sn := Sstr.add_new exn n !sn; id
+      | None -> id_fresh "_" in
+    create_pvsymbol id ~ghost (ity_of_dity dity) in
+  List.map binder bl
+
+let opaque_binders otv bl =
+  List.fold_left (fun otv (_,_,s,_) -> Stv.union otv s) otv bl
+
 (** Specifications *)
 
 let to_fmla f = match f.t_ty with
@@ -867,18 +887,14 @@ let check_user_effect e spec full_xpost dsp =
   if full_xpost then Sexn.iter check_raise eeff.eff_raises;
   if full_xpost then Sexn.iter check_raise eeff.eff_ghostx
 
-(*
-let check_lambda_effect lenv ({fun_lambda = lam} as fd) bl dsp =
-  let lenv = add_binders lenv lam.l_args in
+let check_lambda_effect ({fun_lambda = lam} as fd) bl dsp =
   let spec = fd.fun_ps.ps_aty.aty_spec in
-  check_user_effect lenv lam.l_expr spec true dsp;
-  (* check that we don't look inside opaque type variables *)
+  check_user_effect lam.l_expr spec true dsp;
   let optv = opaque_binders Stv.empty bl in
   let bad_comp tv _ _ = Loc.errorm
     ?loc:(e_find_loc (fun e -> Stv.mem tv e.e_effect.eff_compar) lam.l_expr)
     "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
   ignore (Mtv.inter bad_comp optv spec.c_effect.eff_compar)
-*)
 
 let check_user_ps recu ps =
   let ps_regs = ps.ps_subst.ity_subst_reg in
@@ -915,7 +931,7 @@ let check_user_ps recu ps =
   in
   ignore (down ps_regs ps.ps_aty)
 
-(** Final stage *)
+(** Environment *)
 
 type local_env = {
   psm : psymbol Mstr.t;
@@ -929,39 +945,27 @@ let env_empty = {
   vsm = Mstr.empty;
 }
 
-let add_let_sym {psm = psm; pvm = pvm; vsm = vsm} {pre_name = n} = function
-  | LetV pv ->
-      { psm = psm; pvm = Mstr.add n pv pvm; vsm = Mstr.add n pv.pv_vs vsm }
-  | LetA ps ->
-      { psm = Mstr.add n ps psm; pvm = pvm; vsm = vsm }
+let add_psymbol {psm = psm; pvm = pvm; vsm = vsm} ps =
+  let n = ps.ps_name.id_string in
+  { psm = Mstr.add n ps psm; pvm = pvm; vsm = vsm }
+
+let add_pvsymbol {psm = psm; pvm = pvm; vsm = vsm} pv =
+  let n = pv.pv_vs.vs_name.id_string in
+  { psm = psm; pvm = Mstr.add n pv pvm; vsm = Mstr.add n pv.pv_vs vsm }
 
 let add_pv_map {psm = psm; pvm = pvm; vsm = vsm} vm =
   let um = Mstr.map (fun pv -> pv.pv_vs) vm in
   { psm = psm; pvm = Mstr.set_union vm pvm; vsm = Mstr.set_union um vsm }
 
-let add_binder {psm = psm; pvm = pvm; vsm = vsm} pv =
-  let n = pv.pv_vs.vs_name.id_string in
-  { psm = psm; pvm = Mstr.add n pv pvm; vsm = Mstr.add n pv.pv_vs vsm }
+let add_let_sym env = function
+  | LetV pv -> add_pvsymbol env pv
+  | LetA ps -> add_psymbol env ps
 
-let add_binders env pvl = List.fold_left add_binder env pvl
+let add_fundef  env fd  = add_psymbol env fd.fun_ps
+let add_fundefs env fdl = List.fold_left add_fundef env fdl
+let add_binders env pvl = List.fold_left add_pvsymbol env pvl
 
 (** Abstract values *)
-
-let binders bl =
-  let sn = ref Sstr.empty in
-  let binder (id, ghost, _, dity) =
-    let id = match id with
-      | Some ({pre_name = n} as id) ->
-          let exn = match id.pre_loc with
-            | Some loc -> Loc.Located (loc, Dterm.DuplicateVar n)
-            | None -> Dterm.DuplicateVar n in
-          sn := Sstr.add_new exn n !sn; id
-      | None -> id_fresh "_" in
-    create_pvsymbol id ~ghost (ity_of_dity dity) in
-  List.map binder bl
-
-let opaque_binders otv bl =
-  List.fold_left (fun otv (_,_,s,_) -> Stv.union otv s) otv bl
 
 let rec type_c env pvs vars otv (dtyv, dsp) =
   let dsp = dsp env.vsm in
@@ -1007,7 +1011,18 @@ and type_v env pvs vars otv = function
       let spec, vty = type_c env pvs vars otv tyc in
       VTarrow (vty_arrow pvl ~spec vty)
 
+let val_decl env (id,ghost,dtyv) =
+  match type_v env Spv.empty vars_empty Stv.empty dtyv with
+  | VTvalue v -> LetV (create_pvsymbol id ~ghost v)
+  | VTarrow a -> LetA (create_psymbol id ~ghost a)
+
+let comp_decl env dtyc =
+  type_c env Spv.empty vars_empty Stv.empty dtyc
+
 (** Expressions *)
+
+let implicit_post = Debug.register_flag "implicit_post"
+  ~desc:"Generate@ a@ postcondition@ for@ pure@ functions@ without@ one."
 
 let e_ghostify gh e =
   if gh && not e.e_ghost then e_ghost e else e
@@ -1020,15 +1035,15 @@ let rec strip uloc labs de = match de.de_node with
 
 let rec expr ~keep_loc uloc env ({de_loc = loc} as de) =
   let uloc, labs, de = strip uloc Slab.empty de in
-  let e = Loc.try4 ?loc try_expr keep_loc uloc env de in
+  let e = Loc.try5 ?loc try_expr keep_loc uloc env de.de_dvty de.de_node in
   let loc = if keep_loc then loc else None in
   let loc = if uloc <> None then uloc else loc in
   if loc = None && Slab.is_empty labs then e else
   e_label ?loc labs e
 
-and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
+and try_expr keep_loc uloc env (argl,res) node =
   let get env de = expr ~keep_loc uloc env de in
-  match de0.de_node with
+  match node with
   | DEvar (n,_) when argl = [] ->
       e_value (Mstr.find_exn (Dterm.UnboundVar n) n env.pvm)
   | DEvar (n,_) ->
@@ -1057,20 +1072,17 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
       e_app e (ghostify_args del e.e_vty)
   | DEconst c ->
       e_const c
-  | DEval ((id,ghost,dtyv),de) ->
-      let tyv = type_v env Spv.empty vars_empty Stv.empty dtyv in
-      let lv = match tyv with
-        | VTvalue v -> LetV (create_pvsymbol id ~ghost v)
-        | VTarrow a -> LetA (create_psymbol id ~ghost a) in
-      let env = add_let_sym env id lv in
+  | DEval (vald,de) ->
+      let lv = val_decl env vald in
+      let env = add_let_sym env lv in
       let _e = get env de in
-      assert false (* TODO *)
+      assert false (* TODO: e_val lv e *)
   | DElet ((id,gh,de1),de2) ->
       let e1 = get env de1 in
       let mk_expr e1 =
         let e1 = e_ghostify gh e1 in
         let ld1 = create_let_defn id e1 in
-        let env = add_let_sym env id ld1.let_sym in
+        let env = add_let_sym env ld1.let_sym in
         let e2 = get env de2 in
         let e2_unit = match e2.e_vty with
           | VTvalue ity -> ity_equal ity ity_unit
@@ -1093,16 +1105,11 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
         | Elet (ld,e1) -> e_let ld (flatten e1)
         | _ -> mk_expr e1 in
       begin match e1.e_vty with
-        | VTarrow _ when e1.e_ghost && not gh ->
+        | VTarrow _ when e1.e_ghost && not gh -> (* TODO: localize *)
             Loc.errorm "%s must be a ghost function" id.pre_name
         | VTarrow _ -> flatten e1
         | VTvalue _ -> mk_expr e1
       end
-(*
-  | DEfun (_,de)
-  | DErec (_,de) ->
-      de.de_dvty
-*)
   | DEif (de1,de2,de3) ->
       let e1 = get env de1 in
       let e2 = get env de2 in
@@ -1159,7 +1166,7 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
       let e_from = get env de_from in
       let e_to = get env de_to in
       let pv = create_pvsymbol id ity_int in
-      let env = add_binder env pv in
+      let env = add_pvsymbol env pv in
       let e = get env de in
       let inv = dinv env.vsm in
       e_for pv e_from dir e_to (create_inv inv) e
@@ -1170,7 +1177,7 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
   | DEabsurd ->
       e_absurd (ity_of_dity res)
   | DEassert (ak,f) ->
-      e_assert ak (create_assert (de0.de_loc, f env.vsm))
+      e_assert ak (create_assert (None, f env.vsm))
   | DEabstract (de,dsp) ->
       let e = get env de in
       let dsp = dsp env.vsm in
@@ -1181,22 +1188,108 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
       e_abstract e spec
   | DEmark (id,de) ->
       let ld = create_let_defn id Mlw_wp.e_now in
-      let env = add_let_sym env id ld.let_sym in
+      let env = add_let_sym env ld.let_sym in
       e_let ld (get env de)
-  | DEghost de ->
-      (* keep user ghost annotations even if redundant *)
+  | DEghost de -> (* keep user ghost annotations even if redundant *)
       e_ghost (get env de)
   | DEany dtyc ->
-      let spec, result = type_c env Spv.empty vars_empty Stv.empty dtyc in
+      let spec, result = comp_decl env dtyc in
       e_any spec result
+  | DEfun (fd,de) ->
+      let fd = expr_fun ~keep_loc uloc env fd in
+      let e = get (add_fundef env fd) de in
+      e_rec [fd] e
+  | DErec (fdl,de) ->
+      let fdl = expr_rec ~keep_loc uloc env fdl in
+      let e = get (add_fundefs env fdl) de in
+      e_rec fdl e
   | DEcast _ | DEuloc _ | DElabel _ ->
       assert false (* already stripped *)
+
+and expr_rec ~keep_loc uloc env dfdl =
+  let step1 env (id, gh, bl, de, dsp) =
+    let pvl = binders bl in
+    if fst de.de_dvty <> [] then Loc.errorm ?loc:de.de_loc
+      "The body of a recursive function must be a first-order value";
+    let aty = vty_arrow pvl (VTvalue (ity_of_dity (snd de.de_dvty))) in
+    let ps = create_psymbol id ~ghost:gh aty in
+    add_psymbol env ps, (ps, gh, bl, pvl, de, dsp) in
+  let env, fdl = Lists.map_fold_left step1 env dfdl in
+  let step2 (ps, gh, bl, pvl, de, dsp) (fdl, dfdl) =
+    let lam, dsp = expr_lam ~keep_loc uloc env gh pvl de dsp in
+    (ps, lam) :: fdl, (ps.ps_name, gh, bl, de, dsp) :: dfdl in
+  (* check for unexpected aliases in case of trouble *)
+  let fdl, dfdl = try List.fold_right step2 fdl ([],[]) with
+    | Loc.Located (_, Mlw_ty.TypeMismatch _)
+    | Mlw_ty.TypeMismatch _ as exn ->
+        List.iter (fun (ps,_,_,_,_,_) ->
+          let loc = Opt.get ps.ps_name.Ident.id_loc in
+          Loc.try2 ~loc check_user_ps true ps) fdl;
+        raise exn in
+  let fdl = try create_rec_defn fdl with
+    | Loc.Located (_, Mlw_ty.TypeMismatch _)
+    | Mlw_ty.TypeMismatch _ as exn ->
+        List.iter (fun (ps,lam) ->
+          let loc = Opt.get ps.ps_name.Ident.id_loc in
+          let fd = create_fun_defn (id_clone ps.ps_name) lam in
+          Loc.try2 ~loc check_user_ps true fd.fun_ps) fdl;
+        raise exn in
+  let step3 fd (id,_,bl,de,dsp) =
+    Loc.try3 ?loc:de.de_loc check_lambda_effect fd bl dsp;
+    Loc.try2 ?loc:id.id_loc check_user_ps true fd.fun_ps in
+  List.iter2 step3 fdl dfdl;
+  fdl
+
+and expr_fun ~keep_loc uloc env (id,gh,bl,de,dsp) =
+  let lam, dsp = expr_lam ~keep_loc uloc env gh (binders bl) de dsp in
+  if lam.l_spec.c_variant <> [] then Loc.errorm ?loc:id.pre_loc
+    "variants are not allowed in a non-recursive definition";
+  let lam = (* TODO: the following cannot work in letrec *)
+    if Debug.test_noflag implicit_post || dsp.ds_post <> [] ||
+       oty_equal lam.l_spec.c_post.t_ty (Some ty_unit) then lam
+    else match e_purify lam.l_expr with
+    | None -> lam
+    | Some t ->
+        let vs, f = Mlw_ty.open_post lam.l_spec.c_post in
+        let f = t_and_simp (t_equ_simp (t_var vs) t) f in
+        let f = t_label_add Split_goal.stop_split f in
+        let post = Mlw_ty.create_post vs f in
+        let spec = { lam.l_spec with c_post = post } in
+        { lam with l_spec = spec } in
+  let fd = create_fun_defn id lam in
+  Loc.try3 ?loc:de.de_loc check_lambda_effect fd bl dsp;
+  Loc.try2 ?loc:id.pre_loc check_user_ps false fd.fun_ps;
+  fd
+
+and expr_lam ~keep_loc uloc env gh pvl de dsp =
+  let env = add_binders env pvl in
+  let e = e_ghostify gh (expr ~keep_loc uloc env de) in
+  if not gh && e.e_ghost then (* TODO: localize better *)
+    Loc.errorm ?loc:de.de_loc "ghost body in a non-ghost function";
+  let dsp = dsp env.vsm in
+  let spec = spec_of_dspec e.e_effect e.e_vty dsp in
+  { l_args = pvl; l_expr = e; l_spec = spec }, dsp
+
+let val_decl ~keep_loc:_ vald =
+  reunify_regions ();
+  val_decl env_empty vald
+
+let let_defn ~keep_loc (id,gh,de) =
+  reunify_regions ();
+  let e = expr ~keep_loc None env_empty de in
+  let e = e_ghostify gh e in
+  if e.e_ghost && not gh then (* TODO: localize better *)
+    Loc.errorm ?loc:id.pre_loc "%s must be a ghost variable" id.pre_name;
+  create_let_defn id e
+
+let fun_defn ~keep_loc dfd =
+  reunify_regions ();
+  expr_fun ~keep_loc None env_empty dfd
+
+let rec_defn ~keep_loc dfdl =
+  reunify_regions ();
+  expr_rec ~keep_loc None env_empty dfdl
 
 let expr ~keep_loc de =
   reunify_regions ();
   expr ~keep_loc None env_empty de
-
-let val_decl ~keep_loc _ = ignore(keep_loc); assert false (* keep_loc:bool -> dval_decl -> let_sym *)
-let let_defn ~keep_loc _ = ignore(keep_loc); assert false (* keep_loc:bool -> dlet_defn -> let_defn *)
-let fun_defn ~keep_loc _ = ignore(keep_loc); assert false (* keep_loc:bool -> dfun_defn -> fun_defn *)
-let rec_defn ~keep_loc _ = ignore(keep_loc); assert false (* keep_loc:bool -> dfun_defn list -> fun_defn list *)
