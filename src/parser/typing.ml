@@ -127,7 +127,7 @@ let ty_of_pty_top ~noop uc pty =
 
 let ty_of_pty uc pty = ty_of_pty_top ~noop:true uc pty
 
-let opaque_tvs args value =
+let opaque_tvs args =
   let rec opaque_tvs acc = function
     | PPTtyvar (id, true) -> Stv.add (create_user_tv id.id) acc
     | PPTtyvar (_, false) -> acc
@@ -135,8 +135,7 @@ let opaque_tvs args value =
     | PPTtuple pl -> List.fold_left opaque_tvs acc pl
     | PPTarrow (ty1, ty2) -> opaque_tvs (opaque_tvs acc ty1) ty2
     | PPTparen ty -> opaque_tvs acc ty in
-  let acc = Opt.fold opaque_tvs Stv.empty value in
-  List.fold_left (fun acc (_,_,_,ty) -> opaque_tvs acc ty) acc args
+  List.fold_left (fun acc (_,_,_,ty) -> opaque_tvs acc ty) Stv.empty args
 
 (** typing using destructive type variables
 
@@ -500,8 +499,14 @@ let add_logics dl th =
     let id = d.ld_ident.id in
     let v = create_user_id d.ld_ident in
     let pl = tyl_of_params ~noop:false th d.ld_params in
-    let ty = Opt.map (ty_of_pty_top ~noop:false th) d.ld_type in
-    let opaque = opaque_tvs d.ld_params d.ld_type in
+    let ty = Opt.map (ty_of_pty th) d.ld_type in
+    let opaque = opaque_tvs d.ld_params in
+    (* for abstract lsymbols fresh tyvars are opaque *)
+    let opaque = if d.ld_def = None && ty <> None then
+      let atvs = List.fold_left ty_freevars Stv.empty pl in
+      let vtvs = oty_freevars Stv.empty ty in
+      Stv.union opaque (Stv.diff vtvs atvs)
+    else opaque in
     let ls = create_lsymbol ~opaque v pl ty in
     Hstr.add lsymbols id ls;
     Loc.try2 ~loc:d.ld_loc add_param_decl th ls
@@ -584,7 +589,7 @@ let add_inductives s dl th =
     let id = d.in_ident.id in
     let v = create_user_id d.in_ident in
     let pl = tyl_of_params ~noop:false th d.in_params in
-    let opaque = opaque_tvs d.in_params None in
+    let opaque = opaque_tvs d.in_params in
     let ps = create_psymbol ~opaque v pl in
     Hstr.add psymbols id ps;
     Loc.try2 ~loc:d.in_loc add_param_decl th ps
