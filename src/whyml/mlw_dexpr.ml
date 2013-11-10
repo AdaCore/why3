@@ -710,22 +710,28 @@ let dexpr ?loc node =
 
 (** Specifications *)
 
-(* TODO: convert bool-typed terms to formulas, check matches *)
+let to_fmla f = match f.t_ty with
+  | None -> f
+  | Some ty when ty_equal ty ty_bool -> t_equ f t_bool_true
+  | _ -> Loc.error ?loc:f.t_loc Dterm.FmlaExpected
 
-let create_assert (_,f) = t_label_add Split_goal.stop_split f
+let create_assert (_,f) = t_label_add Split_goal.stop_split (to_fmla f)
 let create_pre fl = t_and_simp_l (List.map create_assert fl)
 let create_inv = create_pre
 
-let create_post u (_loc,pl) =
+let create_post u (loc,pl) =
   let f = match pl with
-    | [{ pat_node = Pvar v }, f] when vs_equal u v -> f
-    | [{ pat_node = Pvar v }, f] -> t_subst_single v (t_var u) f
-    | [{ pat_node = Pwild }, f] -> f
-    | [{ pat_node = Papp (fs,[]) }, f] when ls_equal fs fs_void -> f
-    | bl -> t_case_close (t_var u) bl in
+    | [{pat_node = Pwild}, f] -> to_fmla f
+    | [{pat_node = Pvar v}, f] when vs_equal u v -> to_fmla f
+    | [{pat_node = Pvar v}, f] -> t_subst_single v (t_var u) (to_fmla f)
+    | [{pat_node = Papp (fs,[])}, f] when ls_equal fs fs_void -> to_fmla f
+    | bl -> let mk_b (p,f) = t_close_branch p (to_fmla f) in
+            let f = t_case (t_var u) (List.map mk_b bl) in
+            t_label ?loc Slab.empty f in
   let f = t_label_add Split_goal.stop_split f in
-  let f = Mlw_wp.remove_old f in
-  f
+  Mlw_wp.remove_old f
+
+let create_post u (loc,_ as pl) = Loc.try2 ?loc create_post u pl
 
 let create_post ty pll =
   let rec get_var = function
