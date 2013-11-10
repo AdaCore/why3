@@ -1307,15 +1307,11 @@ and expr_desc lenv loc de = match de.de_desc with
             xs, create_pvsymbol (id_fresh "void") p.ppat_ity, e
         | bl ->
             let pv = create_pvsymbol (id_fresh "res") xs.xs_ity in
-            let pl = List.rev_map (fun (p,_) -> [p.ppat_pattern],t_void) bl in
-            let bl = try
-              ignore (Pattern.CompileTerm.compile_bare [t_var pv.pv_vs] pl);
-              bl
-            with Pattern.NonExhaustive _ ->
-              let ity = ity_of_dity (snd de.de_type) in
+            let pl = List.rev_map (fun (p,_) -> [p.ppat_pattern]) bl in
+            let bl = if Pattern.is_exhaustive [t_var pv.pv_vs] pl
+              then bl else let ity = ity_of_dity (snd de.de_type) in
               let _, pp = make_ppattern PPwild pv.pv_ity in
-              (pp, e_raise xs (e_value pv) ity) :: bl
-            in
+              (pp, e_raise xs (e_value pv) ity) :: bl in
             xs, pv, e_case (e_value pv) (List.rev bl)
       in
       e_try e1 (List.rev_map mk_branch xsl)

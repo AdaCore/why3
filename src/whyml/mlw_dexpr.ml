@@ -1142,15 +1142,10 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
             xs, create_pvsymbol (id_fresh "_") xs.xs_ity, e
         | bl ->
             let pv = create_pvsymbol (id_fresh "res") xs.xs_ity in
-            let bl = try
-              let conv (p,_) = [p.ppat_pattern], t_void in
-              let comp = Pattern.CompileTerm.compile_bare in
-              ignore (comp [t_var pv.pv_vs] (List.rev_map conv bl));
-              bl
-            with Pattern.NonExhaustive _ ->
-              let _, pp = make_ppattern PPwild pv.pv_ity in
-              (pp, e_raise xs (e_value pv) (ity_of_dity res)) :: bl
-            in
+            let pl = List.rev_map (fun (p,_) -> [p.ppat_pattern]) bl in
+            let bl = if Pattern.is_exhaustive [t_var pv.pv_vs] pl
+              then bl else let _,pp = make_ppattern PPwild pv.pv_ity in
+              (pp, e_raise xs (e_value pv) (ity_of_dity res)) :: bl in
             xs, pv, e_case (e_value pv) (List.rev bl)
       in
       e_try e1 (List.rev_map mk_branch xsl)

@@ -55,9 +55,9 @@ let is_infinite_ty inf_ts ma_map =
 let rec rewriteT t = match t.t_node with
   | Tcase (t,bl) ->
       let t = rewriteT t in
-      let mk_b (p,t) = ([p], rewriteT t) in
-      let bl = List.map (fun b -> mk_b (t_open_branch b)) bl in
-      Pattern.CompileTerm.compile_bare [t] bl
+      let mk_b b = let p,t = t_open_branch b in [p], rewriteT t in
+      let mk_case = t_case_close and mk_let = t_let_close_simp in
+      Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl)
   | _ -> t_map rewriteT t
 
 let compile_match = Trans.decl (fun d -> [decl_map rewriteT d]) None

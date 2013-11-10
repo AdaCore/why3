@@ -51,7 +51,8 @@ let apply_projection kn ls t = match t.t_node with
 
 let flat_case t bl =
   let mk_b b = let p,t = t_open_branch b in [p],t in
-  Pattern.CompileTerm.compile_bare [t] (List.map mk_b bl)
+  let mk_case = t_case_close and mk_let = t_let_close_simp in
+  Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl)
 
 let rec add_quant kn (vl,tl,f) v =
   let ty = v.vs_ty in

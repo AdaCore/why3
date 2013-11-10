@@ -13,23 +13,12 @@ open Ident
 open Ty
 open Term
 
-module type Action = sig
-  type action
-  type branch
-  val mk_let : vsymbol -> term -> action -> action
-  val mk_branch : pattern -> action -> branch
-  val mk_case : term -> branch list -> action
-end
-
 exception ConstructorExpected of lsymbol * ty
 exception NonExhaustive of pattern list
 
 exception Bare
 
-module Compile (X : Action) = struct
-open X
-
-let compile constructors tl rl =
+let compile ~get_constructors ~mk_case ~mk_let tl rl =
   let rec compile tl rl = match tl,rl with
     | _, [] -> (* no actions *)
         let pl = List.map (fun t -> pat_wild (t_type t)) tl in
@@ -41,7 +30,7 @@ let compile constructors tl rl =
         (* extract the set of constructors *)
         let bare,css = match ty.ty_node with
           | Tyapp (ts,_) ->
-              begin try false, Sls.of_list (constructors ts)
+              begin try false, Sls.of_list (get_constructors ts)
               with Bare -> true, Sls.empty end
           | Tyvar _ -> false, Sls.empty
         in
@@ -132,30 +121,42 @@ let compile constructors tl rl =
                 Mls.set_submap css types
             in
             let base = if no_wilds then []
-              else [mk_branch (pat_wild ty) (comp_wilds ())]
+              else [pat_wild ty, comp_wilds ()]
             in
             let add cs ql acc =
               let get_vs q = create_vsymbol (id_fresh "x") q.pat_ty in
               let vl = List.rev_map get_vs ql in
               let pl = List.rev_map pat_var vl in
               let al = List.rev_map t_var vl in
-              mk_branch (pat_app cs pl ty) (comp_cases cs al) :: acc
+              (pat_app cs pl ty, comp_cases cs al) :: acc
             in
             mk_case t (Mls.fold add types base)
   in
   compile tl rl
 
-let compile_bare tl rl =
-  try compile (fun _ -> raise Bare) tl rl
+let compile_bare ~mk_case ~mk_let tl rl =
+  let get_constructors _ = raise Bare in
+  try compile ~get_constructors ~mk_case ~mk_let tl rl
   with NonExhaustive _ -> raise (NonExhaustive [])
 
-end
+let check_compile ~get_constructors tl = function
+  | [] ->
+      let pl = List.map (fun t -> pat_wild (t_type t)) tl in
+      raise (NonExhaustive pl)
+  | (pl::_) as ppl ->
+      let mkt p = t_var (create_vsymbol (id_fresh "_") p.pat_ty) in
+      let tl = if tl = [] then List.map mkt pl else tl in
+      let rl = List.map (fun pl -> pl, ()) ppl in
+      let mk_case _ _ = () and mk_let _ _ _ = () in
+      compile ~get_constructors ~mk_case ~mk_let tl rl
 
-module CompileTerm  = Compile (struct
-  type action = term
-  type branch = term_branch
-  let mk_let v s t  = t_let_close_simp v s t
-  let mk_branch p t = t_close_branch p t
-  let mk_case t bl  = t_case t bl
-end)
-
+let is_exhaustive tl = function
+  | [] -> false
+  | (pl::_) as ppl ->
+      let mkt p = t_var (create_vsymbol (id_fresh "_") p.pat_ty) in
+      let tl = if tl = [] then List.map mkt pl else tl in
+      let rl = List.map (fun pl -> pl, true) ppl in
+      let get_constructors _ = raise Bare in
+      let mk_case _ _ = true and mk_let _ _ _ = true in
+      try compile ~get_constructors ~mk_case ~mk_let tl rl
+      with NonExhaustive _ -> false
