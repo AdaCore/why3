@@ -933,6 +933,76 @@ let add_pv_map {psm = psm; pvm = pvm; vsm = vsm} vm =
   let um = Mstr.map (fun pv -> pv.pv_vs) vm in
   { psm = psm; pvm = Mstr.set_union vm pvm; vsm = Mstr.set_union um vsm }
 
+let add_binder {psm = psm; pvm = pvm; vsm = vsm} pv =
+  let n = pv.pv_vs.vs_name.id_string in
+  { psm = psm; pvm = Mstr.add n pv pvm; vsm = Mstr.add n pv.pv_vs vsm }
+
+let add_binders env pvl = List.fold_left add_binder env pvl
+
+(** Abstract values *)
+
+let binders bl =
+  let sn = ref Sstr.empty in
+  let binder (id, ghost, _, dity) =
+    let id = match id with
+      | Some ({pre_name = n} as id) ->
+          let exn = match id.pre_loc with
+            | Some loc -> Loc.Located (loc, Dterm.DuplicateVar n)
+            | None -> Dterm.DuplicateVar n in
+          sn := Sstr.add_new exn n !sn; id
+      | None -> id_fresh "_" in
+    create_pvsymbol id ~ghost (ity_of_dity dity) in
+  List.map binder bl
+
+let opaque_binders otv bl =
+  List.fold_left (fun otv (_,_,s,_) -> Stv.union otv s) otv bl
+
+let rec type_c env pvs vars otv (dtyv, dsp) =
+  let dsp = dsp env.vsm in
+  let vty = type_v env pvs vars otv dtyv in
+  let esvs, _, eff = effect_of_dspec dsp in
+  (* refresh every subregion of a modified region *)
+  let writes = Sreg.union eff.eff_writes eff.eff_ghostw in
+  let check u eff =
+    reg_fold (fun r e -> eff_refresh e r u) u.reg_ity.ity_vars eff in
+  let eff = Sreg.fold check writes eff in
+  (* eff_compare every type variable not marked as opaque *)
+  let eff = Stv.fold_left eff_compare eff (Stv.diff vars.vars_tv otv) in
+  (* make spec *)
+  let spec = spec_of_dspec eff vty dsp in
+  if spec.c_variant <> [] then Loc.errorm
+    "variants are not allowed in a parameter declaration";
+  (* we add a fake variant term for every external variable in effect
+     expressions which also does not occur in pre/post/xpost. In this
+     way, we store the variable in the specification in order to keep
+     the effect from being erased by Mlw_ty.spec_filter. Variants are
+     ignored outside of "let rec" definitions, so WP are not affected. *)
+  let del_pv pv s = Svs.remove pv.pv_vs s in
+  let esvs = Spv.fold del_pv pvs esvs in
+  let drop _ t s = Mvs.set_diff s t.t_vars in
+  let esvs = drop () spec.c_pre esvs in
+  let esvs = drop () spec.c_post esvs in
+  let esvs = Mexn.fold drop spec.c_xpost esvs in
+  let add_vs vs varl = (t_var vs, None) :: varl in
+  let varl = Svs.fold add_vs esvs spec.c_variant in
+  let spec = { spec with c_variant = varl } in
+  spec, vty
+
+and type_v env pvs vars otv = function
+  | DSpecV v ->
+      VTvalue (ity_of_dity v)
+  | DSpecA (bl,tyc) ->
+      let pvl = binders bl in
+      let env = add_binders env pvl in
+      let otv = opaque_binders otv bl in
+      let add_pv pv s = vars_union pv.pv_ity.ity_vars s in
+      let vars = List.fold_right add_pv pvl vars in
+      let pvs = List.fold_right Spv.add pvl pvs in
+      let spec, vty = type_c env pvs vars otv tyc in
+      VTarrow (vty_arrow pvl ~spec vty)
+
+(** Expressions *)
+
 let e_ghostify gh e =
   if gh && not e.e_ghost then e_ghost e else e
 
@@ -981,7 +1051,13 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
       e_app e (ghostify_args del e.e_vty)
   | DEconst c ->
       e_const c
-  | DEval ((_id,_gh,_dtv),_de) ->
+  | DEval ((id,ghost,dtyv),de) ->
+      let tyv = type_v env Spv.empty vars_empty Stv.empty dtyv in
+      let lv = match tyv with
+        | VTvalue v -> LetV (create_pvsymbol id ~ghost v)
+        | VTarrow a -> LetA (create_psymbol id ~ghost a) in
+      let env = add_let_sym env id lv in
+      let _e = get env de in
       assert false (* TODO *)
   | DElet ((id,gh,de1),de2) ->
       let e1 = get env de1 in
@@ -1082,7 +1158,7 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
       let e_from = get env de_from in
       let e_to = get env de_to in
       let pv = create_pvsymbol id ity_int in
-      let env = add_let_sym env id (LetV pv) in
+      let env = add_binder env pv in
       let e = get env de in
       let inv = dinv env.vsm in
       e_for pv e_from dir e_to (create_inv inv) e
@@ -1109,10 +1185,9 @@ and try_expr keep_loc uloc env ({de_dvty = (argl,res)} as de0) =
   | DEghost de ->
       (* keep user ghost annotations even if redundant *)
       e_ghost (get env de)
-(*
-  | DEany (dtv,_) ->
-      dvty_of_dtype_v dtv
-*)
+  | DEany dtyc ->
+      let spec, result = type_c env Spv.empty vars_empty Stv.empty dtyc in
+      e_any spec result
   | DEcast _ | DEuloc _ | DElabel _ ->
       assert false (* already stripped *)
 
