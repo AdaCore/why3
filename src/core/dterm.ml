@@ -391,98 +391,106 @@ let check_exists_implies q f = match q, f.t_node with
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
-let term ~strict ~keep_loc prop dt =
-  let t_label loc labs t =
-    if loc = None && Slab.is_empty labs
-    then t else t_label ?loc labs t in
+let t_label loc labs t =
+  if loc = None && Slab.is_empty labs
+  then t else t_label ?loc labs t
 
-  let rec strip uloc labs dt = match dt.dt_node with
-    | DTcast (dt,_) -> strip uloc labs dt
-    | DTuloc (dt,loc) -> strip (Some loc) labs dt
-    | DTlabel (dt,s) -> strip uloc (Slab.union labs s) dt
-    | _ -> uloc, labs, dt in
+let rec strip uloc labs dt = match dt.dt_node with
+  | DTcast (dt,_) -> strip uloc labs dt
+  | DTuloc (dt,loc) -> strip (Some loc) labs dt
+  | DTlabel (dt,s) -> strip uloc (Slab.union labs s) dt
+  | _ -> uloc, labs, dt
 
-  let rec get uloc env prop dt =
-    let uloc, labs, dt = strip uloc Slab.empty dt in
-    let tloc = if keep_loc then dt.dt_loc else None in
-    let tloc = if uloc <> None then uloc else tloc in
-    let t = t_label tloc labs (Loc.try5 ?loc:dt.dt_loc
-      try_get uloc env prop dt.dt_dty dt.dt_node) in
-    match t.t_ty with
-    | Some _ when prop -> t_label tloc Slab.empty
-        (Loc.try2 ?loc:dt.dt_loc t_equ t t_bool_true)
-    | None when not prop -> t_label tloc Slab.empty
-        (t_if t t_bool_true t_bool_false)
-    | _ -> t
+let rec term ~strict ~keep_loc uloc env prop dt =
+  let uloc, labs, dt = strip uloc Slab.empty dt in
+  let tloc = if keep_loc then dt.dt_loc else None in
+  let tloc = if uloc <> None then uloc else tloc in
+  let t = Loc.try7 ?loc:dt.dt_loc
+    try_expr strict keep_loc uloc env prop dt.dt_dty dt.dt_node in
+  let t = t_label tloc labs t in
+  match t.t_ty with
+  | Some _ when prop -> t_label tloc Slab.empty
+      (Loc.try2 ?loc:dt.dt_loc t_equ t t_bool_true)
+  | None when not prop -> t_label tloc Slab.empty
+      (t_if t t_bool_true t_bool_false)
+  | _ -> t
 
-  and try_get uloc env prop dty = function
-    | DTvar (n,_) ->
-        t_var (Mstr.find_exn (UnboundVar n) n env)
-    | DTgvar vs ->
-        t_var vs
-    | DTconst c ->
-        t_const c
-    | DTapp (ls,[]) when ls_equal ls fs_bool_true ->
-        if prop then t_true else t_bool_true
-    | DTapp (ls,[]) when ls_equal ls fs_bool_false ->
-        if prop then t_false else t_bool_false
-    | DTapp (ls,[dt1;dt2]) when ls_equal ls ps_equ ->
-      (* avoid putting formulas into a term context *)
-        if dt1.dt_dty = None || dt2.dt_dty = None
-        then t_iff (get uloc env true dt1) (get uloc env true dt2)
-        else t_equ (get uloc env false dt1) (get uloc env false dt2)
-    | DTapp (ls,dtl) ->
-        t_app ls (List.map (get uloc env false) dtl)
-          (Opt.map (term_ty_of_dty ~strict) dty)
-    | DTlet (dt,id,df) ->
-        let prop = prop || dty = None in
-        let t = get uloc env false dt in
-        let v = create_vsymbol id (t_type t) in
-        let env = Mstr.add id.pre_name v env in
-        let f = get uloc env prop df in
-        check_used_var f.t_vars v;
-        t_let_close v t f
-    | DTif (df,dt1,dt2) ->
-        let prop = prop || dty = None in
-        t_if (get uloc env true df)
-          (get uloc env prop dt1) (get uloc env prop dt2)
-    | DTcase (dt,bl) ->
-        let prop = prop || dty = None in
-        let branch (dp,df) =
-          let env, p = pattern ~strict env dp in
-          let f = get uloc env prop df in
-          Svs.iter (check_used_var f.t_vars) p.pat_vars;
-          t_close_branch p f in
-        t_case (get uloc env false dt) (List.map branch bl)
-    | DTeps (id,dty,df) ->
-        let v = create_vsymbol id (var_ty_of_dty id ~strict dty) in
-        let env = Mstr.add id.pre_name v env in
-        let f = get uloc env true df in
-        check_used_var f.t_vars v;
-        t_eps_close v f
-    | DTquant (q,vl,dll,df) ->
-        let env, vl = quant_vars ~strict env vl in
-        let tr_get dt = get uloc env (dt.dt_dty = None) dt in
-        let trl = List.map (List.map tr_get) dll in
-        let f = get uloc env true df in
-        List.iter (check_used_var f.t_vars) vl;
-        check_exists_implies q f;
-        t_quant_close q vl trl f
-    | DTbinop (op,df1,df2) ->
-        t_binary op (get uloc env true df1) (get uloc env true df2)
-    | DTnot df ->
-        t_not (get uloc env true df)
-    | DTtrue ->
-        if prop then t_true else t_bool_true
-    | DTfalse ->
-        if prop then t_false else t_bool_false
-    | DTcast _ | DTuloc _ | DTlabel _ ->
-        assert false (* already stripped *)
-  in
-  get None Mstr.empty prop dt
+and try_expr strict keep_loc uloc env prop dty node =
+  let get env prop dt = term ~strict ~keep_loc uloc env prop dt in
+  match node with
+  | DTvar (n,_) ->
+      t_var (Mstr.find_exn (UnboundVar n) n env)
+  | DTgvar vs ->
+      t_var vs
+  | DTconst c ->
+      t_const c
+  | DTapp (ls,[]) when ls_equal ls fs_bool_true ->
+      if prop then t_true else t_bool_true
+  | DTapp (ls,[]) when ls_equal ls fs_bool_false ->
+      if prop then t_false else t_bool_false
+  | DTapp (ls,[dt1;dt2]) when ls_equal ls ps_equ ->
+    (* avoid putting formulas into a term context *)
+      if dt1.dt_dty = None || dt2.dt_dty = None
+      then t_iff (get env true dt1) (get env true dt2)
+      else t_equ (get env false dt1) (get env false dt2)
+  | DTapp (ls,dtl) ->
+      t_app ls (List.map (get env false) dtl)
+        (Opt.map (term_ty_of_dty ~strict) dty)
+  | DTlet (dt,id,df) ->
+      let prop = prop || dty = None in
+      let t = get env false dt in
+      let v = create_vsymbol id (t_type t) in
+      let env = Mstr.add id.pre_name v env in
+      let f = get env prop df in
+      check_used_var f.t_vars v;
+      t_let_close v t f
+  | DTif (df,dt1,dt2) ->
+      let prop = prop || dty = None in
+      t_if (get env true df)
+        (get env prop dt1) (get env prop dt2)
+  | DTcase (dt,bl) ->
+      let prop = prop || dty = None in
+      let mk_b b = branch ~strict ~keep_loc uloc env prop b in
+      t_case_close (get env false dt) (List.map mk_b bl)
+  | DTeps (id,dty,df) ->
+      let v = create_vsymbol id (var_ty_of_dty id ~strict dty) in
+      let env = Mstr.add id.pre_name v env in
+      let f = get env true df in
+      check_used_var f.t_vars v;
+      t_eps_close v f
+  | DTquant (q,vl,dll,df) ->
+      let env, vl = quant_vars ~strict env vl in
+      let tr_get dt = get env (dt.dt_dty = None) dt in
+      let trl = List.map (List.map tr_get) dll in
+      let f = get env true df in
+      List.iter (check_used_var f.t_vars) vl;
+      check_exists_implies q f;
+      t_quant_close q vl trl f
+  | DTbinop (op,df1,df2) ->
+      t_binary op (get env true df1) (get env true df2)
+  | DTnot df ->
+      t_not (get env true df)
+  | DTtrue ->
+      if prop then t_true else t_bool_true
+  | DTfalse ->
+      if prop then t_false else t_bool_false
+  | DTcast _ | DTuloc _ | DTlabel _ ->
+      assert false (* already stripped *)
 
-let fmla ~strict ~keep_loc dt = term ~strict ~keep_loc true dt
-let term ~strict ~keep_loc dt = term ~strict ~keep_loc false dt
+and branch ~strict ~keep_loc uloc env prop (dp,dt) =
+  let env, p = pattern ~strict env dp in
+  let t = term ~strict ~keep_loc uloc env prop dt in
+  Svs.iter (check_used_var t.t_vars) p.pat_vars;
+  p, t
+
+let fmla ~strict ~keep_loc dt = term ~strict ~keep_loc None Mstr.empty true dt
+let term ~strict ~keep_loc dt = term ~strict ~keep_loc None Mstr.empty false dt
+
+let term_branch ~strict ~keep_loc dp dt =
+  branch ~strict ~keep_loc None Mstr.empty false (dp,dt)
+
+let fmla_branch ~strict ~keep_loc dp dt =
+  branch ~strict ~keep_loc None Mstr.empty true (dp,dt)
 
 (** Exception printer *)
 

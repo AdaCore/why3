@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Stdlib
-open Format
 open Ident
 open Ptree
 open Ty
@@ -56,8 +55,8 @@ let string_list_of_qualid q =
   sloq [] q
 
 let rec print_qualid fmt = function
-  | Qident s -> fprintf fmt "%s" s.id
-  | Qdot (m, s) -> fprintf fmt "%a.%s" print_qualid m s.id
+  | Qident s -> Format.fprintf fmt "%s" s.id
+  | Qdot (m, s) -> Format.fprintf fmt "%a.%s" print_qualid m s.id
 
 exception UnboundSymbol of qualid
 
@@ -111,9 +110,9 @@ let ty_of_pty_top ~noop uc pty =
           allowed@ in@ function@ and@ predicate@ prototypes"
     | PPTtyvar ({id = x}, _) ->
         ty_var (create_user_tv x)
-    | PPTtyapp (x, p) ->
+    | PPTtyapp (x, tyl) ->
         let ts = find_tysymbol x uc in
-        let tyl = List.map get_ty p in
+        let tyl = List.map get_ty tyl in
         Loc.try2 ~loc:(qloc x) ty_app ts tyl
     | PPTtuple tyl ->
         let ts = ts_tuple (List.length tyl) in
@@ -161,22 +160,24 @@ let parse_record ~loc uc get_val fl =
   let get_val pj = get_val cs pj (Mls.find_opt pj flm) in
   cs, List.map get_val pjl
 
-let dpattern uc pat =
-  let rec ppat { pat_desc = desc; pat_loc = loc } =
-    dpattern ~loc (match desc with
-      | PPpwild -> DPwild
-      | PPpvar x -> DPvar (create_user_id x)
-      | PPpapp (x,pl) -> DPapp (find_lsymbol x uc, List.map ppat pl)
-      | PPptuple pl -> DPapp (fs_tuple (List.length pl), List.map ppat pl)
-      | PPprec fl ->
-          let get_val _ _ = function
-            Some p -> ppat p | None -> dpattern DPwild in
-          let cs,fl = parse_record ~loc uc get_val fl in
-          DPapp (cs,fl)
-      | PPpas (p, x) -> DPas (ppat p, create_user_id x)
-      | PPpor (p, q) -> DPor (ppat p, ppat q))
-  in
-  ppat pat
+let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
+  Dterm.dpattern ~loc (match desc with
+    | PPpwild -> DPwild
+    | PPpvar x -> DPvar (create_user_id x)
+    | PPpapp (x,pl) ->
+        let pl = List.map (dpattern uc) pl in
+        DPapp (find_lsymbol x uc, pl)
+    | PPptuple pl ->
+        let pl = List.map (dpattern uc) pl in
+        DPapp (fs_tuple (List.length pl), pl)
+    | PPprec fl ->
+        let get_val _ _ = function
+          | Some p -> dpattern uc p
+          | None -> Dterm.dpattern DPwild in
+        let cs,fl = parse_record ~loc uc get_val fl in
+        DPapp (cs,fl)
+    | PPpas (p, x) -> DPas (dpattern uc p, create_user_id x)
+    | PPpor (p, q) -> DPor (dpattern uc p, dpattern uc q))
 
 let quant_var uc (x,ty) =
   create_user_id x, match ty with
@@ -193,138 +194,140 @@ let chainable_op uc op =
         && not (ty_equal ty2 ty_bool)
     | _ -> false
 
-let dterm uc gvars denv pp =
-  let rec pterm denv { pp_desc = desc; pp_loc = loc } =
-    let highord_app e1 e2 =
-      DTapp (fs_func_app, [dterm ~loc e1; pterm denv e2]) in
-    let highord_app e1 el = List.fold_left highord_app e1 el in
-    let qualid_app x el = match gvars x with
-      | Some vs ->
-          highord_app (DTgvar vs) el
-      | None ->
-          let ls = find_lsymbol x uc in
-          let rec take al l el = match l, el with
-            | (_::l), (e::el) -> take (pterm denv e :: al) l el
-            | _, _ -> List.rev al, el in
-          let al, el = take [] ls.ls_args el in
-          highord_app (DTapp (ls,al)) el
-    in
-    let qualid_app x el = match x with
-      | Qident {id = n} ->
-          (match denv_get_opt denv n with
-          | Some dt -> highord_app dt el
-          | None -> qualid_app x el)
-      | _ -> qualid_app x el
-    in
-    dterm ~loc (match desc with
-    | PPvar x ->
-        qualid_app x []
-    | PPapp (x, tl) ->
-        qualid_app x tl
-    | PPhoapp (e1, e2) ->
-        DTapp (fs_func_app, [pterm denv e1; pterm denv e2])
-    | PPtuple tl ->
-        let tl = List.map (pterm denv) tl in
-        DTapp (fs_tuple (List.length tl), tl)
-    | PPinfix (e12, op2, e3)
-    | PPinnfix (e12, op2, e3) ->
-        let make_app de1 op de2 = if op.id = "infix <>" then
-          let op = { op with id = "infix =" } in
-          let ls = find_lsymbol (Qident op) uc in
-          DTnot (dterm ~loc (DTapp (ls, [de1;de2])))
-        else
-          DTapp (find_lsymbol (Qident op) uc, [de1;de2])
-        in
-        let rec make_chain de1 = function
-          | [op,de2] ->
-              make_app de1 op de2
-          | (op,de2) :: ch ->
-              let de12 = dterm ~loc (make_app de1 op de2) in
-              let de23 = dterm ~loc (make_chain de2 ch) in
-              DTbinop (Tand, de12, de23)
-          | [] -> assert false in
-        let rec get_chain e12 acc = match e12.pp_desc with
-          | PPinfix (e1, op1, e2) when chainable_op uc op1 ->
-              get_chain e1 ((op1, pterm denv e2) :: acc)
-          | _ -> e12, acc in
-        let ch = [op2, pterm denv e3] in
-        let e1, ch = if chainable_op uc op2
-          then get_chain e12 ch else e12, ch in
-        make_chain (pterm denv e1) ch
-    | PPconst c ->
-        DTconst c
-    | PPlet (x, e1, e2) ->
-        let id = create_user_id x in
-        let e1 = pterm denv e1 in
-        let denv = denv_add_let denv e1 id in
-        let e2 = pterm denv e2 in
-        DTlet (e1, id, e2)
-    | PPmatch (e1, bl) ->
-        let e1 = pterm denv e1 in
-        let branch (p, e) =
-          let p = dpattern uc p in
-          let denv = denv_add_pat denv p in
-          p, pterm denv e in
-        DTcase (e1, List.map branch bl)
-    | PPif (e1, e2, e3) ->
-        let e1 = pterm denv e1 in
-        let e2 = pterm denv e2 in
-        let e3 = pterm denv e3 in
-        DTif (e1, e2, e3)
-    | PPtrue ->
-        DTtrue
-    | PPfalse ->
-        DTfalse
-    | PPunop (PPnot, e1) ->
-        DTnot (pterm denv e1)
-    | PPbinop (e1, op, e2) ->
-        let e1 = pterm denv e1 in
-        let e2 = pterm denv e2 in
-        let op = match op with
-          | PPand -> Tand
-          | PPor -> Tor
-          | PPimplies -> Timplies
-          | PPiff -> Tiff in
-        DTbinop (op, e1, e2)
-    | PPquant (q, uqu, trl, e1) ->
-        let qvl = List.map (quant_var uc) uqu in
-        let denv = denv_add_quant denv qvl in
-        let trl = List.map (List.map (pterm denv)) trl in
-        let e1 = pterm denv e1 in
-        begin match q with
-          | PPforall -> DTquant (Tforall, qvl, trl, e1)
-          | PPexists -> DTquant (Texists, qvl, trl, e1)
-          | PPlambda ->
-              let id = id_user "fc" loc and dty = dty_fresh () in
-              let add acc ({id = x}, _) =
-                let arg = dterm ~loc (denv_get denv x) in
-                DTapp (fs_func_app, [dterm ~loc acc; arg]) in
-              let app = List.fold_left add (DTvar ("fc",dty)) uqu in
-              let f = DTapp (ps_equ, [dterm ~loc app; e1]) in
-              let f = DTquant (Tforall, qvl, trl, dterm ~loc f) in
-              DTeps (id, dty, dterm ~loc f)
-        end
-    | PPrecord fl ->
-        let get_val cs pj = function
-          | Some e -> pterm denv e
-          | None -> Loc.error ~loc (RecordFieldMissing (cs,pj)) in
-        let cs, fl = parse_record ~loc uc get_val fl in
-        DTapp (cs, fl)
-    | PPupdate (e1, fl) ->
-        let e1 = pterm denv e1 in
-        let get_val _ pj = function
-          | Some e -> pterm denv e
-          | None -> dterm ~loc (DTapp (pj,[e1])) in
-        let cs, fl = parse_record ~loc uc get_val fl in
-        DTapp (cs, fl)
-    | PPnamed (Lpos uloc, e1) ->
-        DTuloc (pterm denv e1, uloc)
-    | PPnamed (Lstr lab, e1) ->
-        DTlabel (pterm denv e1, Slab.singleton lab)
-    | PPcast (e1, ty) ->
-        DTcast (pterm denv e1, ty_of_pty uc ty))
+type global_vs = Ptree.qualid -> vsymbol option
+
+let rec dterm uc (gvars: global_vs) denv {pp_desc = desc; pp_loc = loc} =
+  let pterm denv pp = dterm uc gvars denv pp in
+  let highord_app e1 e2 =
+    DTapp (fs_func_app, [Dterm.dterm ~loc e1; pterm denv e2]) in
+  let highord_app e1 el = List.fold_left highord_app e1 el in
+  let qualid_app x el = match gvars x with
+    | Some vs ->
+        highord_app (DTgvar vs) el
+    | None ->
+        let ls = find_lsymbol x uc in
+        let rec take al l el = match l, el with
+          | (_::l), (e::el) -> take (pterm denv e :: al) l el
+          | _, _ -> List.rev al, el in
+        let al, el = take [] ls.ls_args el in
+        highord_app (DTapp (ls,al)) el
   in
-  pterm denv pp
+  let qualid_app x el = match x with
+    | Qident {id = n} ->
+        (match denv_get_opt denv n with
+        | Some dt -> highord_app dt el
+        | None -> qualid_app x el)
+    | _ -> qualid_app x el
+  in
+  Dterm.dterm ~loc (match desc with
+  | PPvar x ->
+      qualid_app x []
+  | PPapp (x, tl) ->
+      qualid_app x tl
+  | PPhoapp (e1, e2) ->
+      DTapp (fs_func_app, [pterm denv e1; pterm denv e2])
+  | PPtuple tl ->
+      let tl = List.map (pterm denv) tl in
+      DTapp (fs_tuple (List.length tl), tl)
+  | PPinfix (e12, op2, e3)
+  | PPinnfix (e12, op2, e3) ->
+      let make_app de1 op de2 = if op.id = "infix <>" then
+        let op = { op with id = "infix =" } in
+        let ls = find_lsymbol (Qident op) uc in
+        DTnot (Dterm.dterm ~loc (DTapp (ls, [de1;de2])))
+      else
+        DTapp (find_lsymbol (Qident op) uc, [de1;de2])
+      in
+      let rec make_chain de1 = function
+        | [op,de2] ->
+            make_app de1 op de2
+        | (op,de2) :: ch ->
+            let de12 = Dterm.dterm ~loc (make_app de1 op de2) in
+            let de23 = Dterm.dterm ~loc (make_chain de2 ch) in
+            DTbinop (Tand, de12, de23)
+        | [] -> assert false in
+      let rec get_chain e12 acc = match e12.pp_desc with
+        | PPinfix (e1, op1, e2) when chainable_op uc op1 ->
+            get_chain e1 ((op1, pterm denv e2) :: acc)
+        | _ -> e12, acc in
+      let ch = [op2, pterm denv e3] in
+      let e1, ch = if chainable_op uc op2
+        then get_chain e12 ch else e12, ch in
+      make_chain (pterm denv e1) ch
+  | PPconst c ->
+      DTconst c
+  | PPlet (x, e1, e2) ->
+      let id = create_user_id x in
+      let e1 = pterm denv e1 in
+      let denv = denv_add_let denv e1 id in
+      let e2 = pterm denv e2 in
+      DTlet (e1, id, e2)
+  | PPmatch (e1, bl) ->
+      let e1 = pterm denv e1 in
+      let branch (p, e) =
+        let p = dpattern uc p in
+        let denv = denv_add_pat denv p in
+        p, pterm denv e in
+      DTcase (e1, List.map branch bl)
+  | PPif (e1, e2, e3) ->
+      let e1 = pterm denv e1 in
+      let e2 = pterm denv e2 in
+      let e3 = pterm denv e3 in
+      DTif (e1, e2, e3)
+  | PPtrue ->
+      DTtrue
+  | PPfalse ->
+      DTfalse
+  | PPunop (PPnot, e1) ->
+      DTnot (pterm denv e1)
+  | PPbinop (e1, op, e2) ->
+      let e1 = pterm denv e1 in
+      let e2 = pterm denv e2 in
+      let op = match op with
+        | PPand -> Tand
+        | PPor -> Tor
+        | PPimplies -> Timplies
+        | PPiff -> Tiff in
+      DTbinop (op, e1, e2)
+  | PPquant (q, uqu, trl, e1) ->
+      let qvl = List.map (quant_var uc) uqu in
+      let denv = denv_add_quant denv qvl in
+      let trl = List.map (List.map (pterm denv)) trl in
+      let e1 = pterm denv e1 in
+      begin match q with
+        | PPforall -> DTquant (Tforall, qvl, trl, e1)
+        | PPexists -> DTquant (Texists, qvl, trl, e1)
+        | PPlambda ->
+            let id = id_user "fc" loc and dty = dty_fresh () in
+            let add acc ({id = x}, _) =
+              let arg = Dterm.dterm ~loc (denv_get denv x) in
+              DTapp (fs_func_app, [Dterm.dterm ~loc acc; arg]) in
+            let app = List.fold_left add (DTvar ("fc",dty)) uqu in
+            let f = DTapp (ps_equ, [Dterm.dterm ~loc app; e1]) in
+            let f = DTquant (Tforall, qvl, trl, Dterm.dterm ~loc f) in
+            DTeps (id, dty, Dterm.dterm ~loc f)
+      end
+  | PPrecord fl ->
+      let get_val cs pj = function
+        | Some e -> pterm denv e
+        | None -> Loc.error ~loc (RecordFieldMissing (cs,pj)) in
+      let cs, fl = parse_record ~loc uc get_val fl in
+      DTapp (cs, fl)
+  | PPupdate (e1, fl) ->
+      let e1 = pterm denv e1 in
+      let get_val _ pj = function
+        | Some e -> pterm denv e
+        | None -> Dterm.dterm ~loc (DTapp (pj,[e1])) in
+      let cs, fl = parse_record ~loc uc get_val fl in
+      DTapp (cs, fl)
+  | PPnamed (Lpos uloc, e1) ->
+      DTuloc (pterm denv e1, uloc)
+  | PPnamed (Lstr lab, e1) ->
+      DTlabel (pterm denv e1, Slab.singleton lab)
+  | PPcast (e1, ty) ->
+      DTcast (pterm denv e1, ty_of_pty uc ty))
+
+(** Export for program parsing *)
 
 let type_term uc gfn t =
   let t = dterm uc gfn denv_empty t in
@@ -333,6 +336,18 @@ let type_term uc gfn t =
 let type_fmla uc gfn f =
   let f = dterm uc gfn denv_empty f in
   Dterm.fmla ~strict:true ~keep_loc:true f
+
+let type_term_branch uc gfn p t =
+  let p = dpattern uc p in
+  let denv = denv_add_pat denv_empty p in
+  let t = dterm uc gfn denv t in
+  Dterm.term_branch ~strict:true ~keep_loc:true p t
+
+let type_fmla_branch uc gfn p f =
+  let p = dpattern uc p in
+  let denv = denv_add_pat denv_empty p in
+  let f = dterm uc gfn denv f in
+  Dterm.fmla_branch ~strict:true ~keep_loc:true p f
 
 (** Typing declarations *)
 
@@ -632,8 +647,8 @@ let find_theory env lenv q = match q with
 
 let rec clone_ns kn sl path ns2 ns1 s =
   let qualid fmt path = Pp.print_list
-    (fun fmt () -> pp_print_char fmt '.')
-    pp_print_string fmt (List.rev path) in
+    (fun fmt () -> Format.pp_print_char fmt '.')
+    Format.pp_print_string fmt (List.rev path) in
   let s = Mstr.fold (fun nm ns1 acc ->
     let ns2 = Mstr.find_def empty_ns nm ns2.ns_ns in
     clone_ns kn sl (nm::path) ns2 ns1 acc) ns1.ns_ns s
@@ -828,13 +843,13 @@ let open_file, close_file =
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | UnboundSymbol q ->
-      fprintf fmt "unbound symbol '%a'" print_qualid q
+      Format.fprintf fmt "unbound symbol '%a'" print_qualid q
   | UnboundTypeVar s ->
-      fprintf fmt "unbound type variable '%s" s
+      Format.fprintf fmt "unbound type variable '%s" s
   | DuplicateTypeVar s ->
-      fprintf fmt "duplicate type parameter '%s" s
+      Format.fprintf fmt "duplicate type parameter '%s" s
   | ClashTheory s ->
-      fprintf fmt "clash with previous theory %s" s
+      Format.fprintf fmt "clash with previous theory %s" s
   | _ -> raise e)
 
 (*
