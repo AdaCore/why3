@@ -177,8 +177,17 @@ val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
 
 (** Final stage *)
 
-val expr     : keep_loc:bool -> dexpr -> expr
-val val_decl : keep_loc:bool -> dval_decl -> let_sym
-val let_defn : keep_loc:bool -> dlet_defn -> let_defn
-val fun_defn : keep_loc:bool -> dfun_defn -> fun_defn
-val rec_defn : keep_loc:bool -> dfun_defn list -> fun_defn list
+val expr : keep_loc:bool ->
+  Decl.known_map -> Mlw_decl.known_map -> dexpr -> expr
+
+val val_decl : keep_loc:bool ->
+  Decl.known_map -> Mlw_decl.known_map -> dval_decl -> let_sym
+
+val let_defn : keep_loc:bool ->
+  Decl.known_map -> Mlw_decl.known_map -> dlet_defn -> let_defn
+
+val fun_defn : keep_loc:bool ->
+  Decl.known_map -> Mlw_decl.known_map -> dfun_defn -> fun_defn
+
+val rec_defn : keep_loc:bool ->
+  Decl.known_map -> Mlw_decl.known_map -> dfun_defn list -> fun_defn list

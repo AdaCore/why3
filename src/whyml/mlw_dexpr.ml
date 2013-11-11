@@ -919,28 +919,32 @@ let check_user_ps recu ps =
 (** Environment *)
 
 type local_env = {
+   kn : Mlw_decl.known_map;
+  lkn : Decl.known_map;
   psm : psymbol Mstr.t;
   pvm : pvsymbol Mstr.t;
   vsm : vsymbol Mstr.t;
 }
 
-let env_empty = {
+let env_empty lkn kn = {
+   kn = kn;
+  lkn = lkn;
   psm = Mstr.empty;
   pvm = Mstr.empty;
   vsm = Mstr.empty;
 }
 
-let add_psymbol {psm = psm; pvm = pvm; vsm = vsm} ps =
+let add_psymbol ({psm = psm} as lenv) ps =
   let n = ps.ps_name.id_string in
-  { psm = Mstr.add n ps psm; pvm = pvm; vsm = vsm }
+  { lenv with psm = Mstr.add n ps psm }
 
-let add_pvsymbol {psm = psm; pvm = pvm; vsm = vsm} pv =
+let add_pvsymbol ({pvm = pvm; vsm = vsm} as lenv) pv =
   let n = pv.pv_vs.vs_name.id_string in
-  { psm = psm; pvm = Mstr.add n pv pvm; vsm = Mstr.add n pv.pv_vs vsm }
+  { lenv with pvm = Mstr.add n pv pvm; vsm = Mstr.add n pv.pv_vs vsm }
 
-let add_pv_map {psm = psm; pvm = pvm; vsm = vsm} vm =
+let add_pv_map ({pvm = pvm; vsm = vsm} as lenv) vm =
   let um = Mstr.map (fun pv -> pv.pv_vs) vm in
-  { psm = psm; pvm = Mstr.set_union vm pvm; vsm = Mstr.set_union um vsm }
+  { lenv with pvm = Mstr.set_union vm pvm; vsm = Mstr.set_union um vsm }
 
 let add_let_sym env = function
   | LetV pv -> add_pvsymbol env pv
@@ -949,6 +953,70 @@ let add_let_sym env = function
 let add_fundef  env fd  = add_psymbol env fd.fun_ps
 let add_fundefs env fdl = List.fold_left add_fundef env fdl
 let add_binders env pvl = List.fold_left add_pvsymbol env pvl
+
+(** Invariant handling *)
+
+let env_invariant {lkn = lkn; kn = kn} eff pvs =
+  let regs = Sreg.union eff.eff_writes eff.eff_ghostw in
+  let add_pv pv (pinv,qinv) =
+    let ity = pv.pv_ity in
+    let written r = reg_occurs r ity.ity_vars in
+    let inv = Mlw_wp.full_invariant lkn kn pv.pv_vs ity in
+    let qinv = (* we reprove invariants for modified non-reset variables *)
+      if Sreg.exists written regs && not (eff_stale_region eff ity.ity_vars)
+      then t_and_simp qinv inv else qinv in
+    t_and_simp pinv inv, qinv
+  in
+  Spv.fold add_pv pvs (t_true,t_true)
+
+let rec check_reset rvs t = match t.t_node with
+  | Tvar vs when Svs.mem vs rvs ->
+      Loc.errorm "Variable %s is reset and can only be used \
+        under `old' in the postcondition" vs.vs_name.id_string
+  | Tapp (ls,_) when ls_equal ls Mlw_wp.fs_at -> false
+  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
+      let rvs = Mvs.set_inter rvs t.t_vars in
+      if Mvs.is_empty rvs then false else
+      t_any (check_reset rvs) t
+  | _ ->
+      t_any (check_reset rvs) t
+
+let post_invariant {lkn = lkn; kn = kn} rvs inv ity q =
+  ignore (check_reset rvs q);
+  let vs, q = open_post q in
+  let res_inv = Mlw_wp.full_invariant lkn kn vs ity in
+  let q = t_and_asym_simp (t_and_simp res_inv inv) q in
+  Mlw_ty.create_post vs q
+
+let reset_vars eff pvs =
+  let add pv s =
+    if eff_stale_region eff pv.pv_ity.ity_vars
+    then Svs.add pv.pv_vs s else s in
+  if Mreg.is_empty eff.eff_resets then Svs.empty else
+  Spv.fold add pvs Svs.empty
+
+let spec_invariant env pvs vty spec =
+  let ity = ity_of_vty vty in
+  let pvs = spec_pvset pvs spec in
+  let rvs = reset_vars spec.c_effect pvs in
+  let pinv,qinv = env_invariant env spec.c_effect pvs in
+  let post_inv = post_invariant env rvs qinv in
+  let xpost_inv xs q = post_inv xs.xs_ity q in
+  { spec with c_pre   = t_and_asym_simp pinv spec.c_pre;
+              c_post  = post_inv ity spec.c_post;
+              c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
+
+let abstr_invariant env e spec0 =
+  let pvs = spec_pvset e.e_syms.syms_pv spec0 in
+  let spec = spec_invariant env pvs e.e_vty spec0 in
+  (* we do not require invariants on free variables *)
+  { spec with c_pre = spec0.c_pre }
+
+let lambda_invariant env lam =
+  let { l_spec = spec; l_expr = e } = lam in
+  let pvs = spec_pvset e.e_syms.syms_pv spec in
+  let spec = spec_invariant env pvs e.e_vty spec in
+  { lam with l_spec = { spec with c_letrec = 0 }}
 
 (** Abstract values *)
 
@@ -982,7 +1050,8 @@ let rec type_c env pvs vars otv (dtyv, dsp) =
   let add_vs vs varl = (t_var vs, None) :: varl in
   let varl = Svs.fold add_vs esvs spec.c_variant in
   let spec = { spec with c_variant = varl } in
-  spec, vty
+  (* add the invariants *)
+  spec_invariant env pvs vty spec, vty
 
 and type_v env pvs vars otv = function
   | DSpecV v ->
@@ -1172,6 +1241,7 @@ and try_expr keep_loc uloc env (argl,res) node =
         "variants are not allowed in `abstract'";
       let spec = spec_of_dspec e.e_effect tyv dsp in
       check_user_effect e spec false dsp;
+      let spec = abstr_invariant env e spec in
       e_abstract e spec
   | DEmark (id,de) ->
       let ld = create_let_defn id Mlw_wp.e_now in
@@ -1221,10 +1291,12 @@ and expr_rec ~keep_loc uloc env dfdl =
           let fd = create_fun_defn (id_clone ps.ps_name) lam in
           Loc.try2 ~loc check_user_ps true fd.fun_ps) fdl;
         raise exn in
-  let step3 fd (id,_,bl,de,dsp) =
+  let step3 fd = fd.fun_ps, lambda_invariant env fd.fun_lambda in
+  let fdl = create_rec_defn (List.map step3 fdl) in
+  let step4 fd (id,_,bl,de,dsp) =
     Loc.try3 ?loc:de.de_loc check_lambda_effect fd bl dsp;
     Loc.try2 ?loc:id.id_loc check_user_ps true fd.fun_ps in
-  List.iter2 step3 fdl dfdl;
+  List.iter2 step4 fdl dfdl;
   fdl
 
 and expr_fun ~keep_loc uloc env (id,gh,bl,de,dsp) =
@@ -1243,6 +1315,7 @@ and expr_fun ~keep_loc uloc env (id,gh,bl,de,dsp) =
         let post = Mlw_ty.create_post vs f in
         let spec = { lam.l_spec with c_post = post } in
         { lam with l_spec = spec } in
+  let lam = lambda_invariant env lam in
   let fd = create_fun_defn id lam in
   Loc.try3 ?loc:de.de_loc check_lambda_effect fd bl dsp;
   Loc.try2 ?loc:id.pre_loc check_user_ps false fd.fun_ps;
@@ -1258,26 +1331,26 @@ and expr_lam ~keep_loc uloc env gh pvl de dsp =
   let spec = spec_of_dspec e.e_effect tyv dsp in
   { l_args = pvl; l_expr = e; l_spec = spec }, dsp
 
-let val_decl ~keep_loc:_ vald =
+let val_decl ~keep_loc:_ lkn kn vald =
   reunify_regions ();
-  val_decl env_empty vald
+  val_decl (env_empty lkn kn) vald
 
-let let_defn ~keep_loc (id,gh,de) =
+let let_defn ~keep_loc lkn kn (id,gh,de) =
   reunify_regions ();
-  let e = expr ~keep_loc None env_empty de in
+  let e = expr ~keep_loc None (env_empty lkn kn) de in
   let e = e_ghostify gh e in
   if e.e_ghost && not gh then (* TODO: localize better *)
     Loc.errorm ?loc:id.pre_loc "%s must be a ghost variable" id.pre_name;
   create_let_defn id e
 
-let fun_defn ~keep_loc dfd =
+let fun_defn ~keep_loc lkn kn dfd =
   reunify_regions ();
-  expr_fun ~keep_loc None env_empty dfd
+  expr_fun ~keep_loc None (env_empty lkn kn) dfd
 
-let rec_defn ~keep_loc dfdl =
+let rec_defn ~keep_loc lkn kn dfdl =
   reunify_regions ();
-  expr_rec ~keep_loc None env_empty dfdl
+  expr_rec ~keep_loc None (env_empty lkn kn) dfdl
 
-let expr ~keep_loc de =
+let expr ~keep_loc lkn kn de =
   reunify_regions ();
-  expr ~keep_loc None env_empty de
+  expr ~keep_loc None (env_empty lkn kn) de
