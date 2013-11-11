@@ -42,7 +42,7 @@ let opt_stats = ref true
 let opt_force = ref false
 let opt_obsolete_only = ref false
 let opt_bench = ref false
-
+let opt_provers = ref []
 
 
 
@@ -93,6 +93,10 @@ let spec = Arg.align [
    " try to detect if the context is self-contradicting") ;
   ("--bench",
    Arg.Set opt_bench, " run as bench (experimental)");
+  ("--prover",
+   Arg.String (fun s ->
+     opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
+   "<prover> restrict replay to given prover");
   ("-s",
    Arg.Clear opt_stats,
    " do not print statistics") ;
@@ -363,7 +367,14 @@ let add_to_check_no_smoke config found_obs env_session sched =
         exit 1
       end
   in
-  M.check_all ~release:true ~callback env_session sched
+  if !opt_provers = [] then
+    M.check_all ~release:true ~callback env_session sched
+  else
+    let filter a =
+      List.exists
+        (fun p -> Whyconf.filter_prover p a.Session.proof_prover)
+        !opt_provers in
+    M.check_all ~release:true ~filter ~callback env_session sched
 
 let add_to_check_smoke env_session sched =
   let callback report =

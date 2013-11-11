@@ -721,12 +721,16 @@ let rec goal_iter_proof_attempt_with_release ~release f g =
   Mmetas_args.iter (fun _ t -> iter t.metas_goal) g.goal_metas;
   if release then release_task g
 
-let check_all ?(release=false) eS eT ~callback =
+let check_all ?(release=false) ?filter eS eT ~callback =
   dprintf debug "[Sched] check all@.%a@." print_session eS.session;
   let todo = Todo.create [] push_report callback in
   Todo.start todo;
   let check_top_goal g =
-    let check a = check_external_proof eS eT todo a in
+    let check a =
+      let c = match filter with
+        | None -> true
+        | Some f -> f a in
+      if c then check_external_proof eS eT todo a in
     goal_iter_proof_attempt_with_release ~release check g
   in
   PHstr.iter (fun _ file ->
