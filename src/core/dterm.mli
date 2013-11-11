@@ -94,10 +94,5 @@ val dterm : ?loc:Loc.position -> dterm_node -> dterm
 (** Final stage *)
 
 val term : strict:bool -> keep_loc:bool -> dterm -> term
+
 val fmla : strict:bool -> keep_loc:bool -> dterm -> term
-
-val term_branch :
-  strict:bool -> keep_loc:bool -> dpattern -> dterm -> pattern * term
-
-val fmla_branch :
-  strict:bool -> keep_loc:bool -> dpattern -> dterm -> pattern * term

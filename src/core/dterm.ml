@@ -406,7 +406,7 @@ let rec term ~strict ~keep_loc uloc env prop dt =
   let tloc = if keep_loc then dt.dt_loc else None in
   let tloc = if uloc <> None then uloc else tloc in
   let t = Loc.try7 ?loc:dt.dt_loc
-    try_expr strict keep_loc uloc env prop dt.dt_dty dt.dt_node in
+    try_term strict keep_loc uloc env prop dt.dt_dty dt.dt_node in
   let t = t_label tloc labs t in
   match t.t_ty with
   | Some _ when prop -> t_label tloc Slab.empty
@@ -415,7 +415,7 @@ let rec term ~strict ~keep_loc uloc env prop dt =
       (t_if t t_bool_true t_bool_false)
   | _ -> t
 
-and try_expr strict keep_loc uloc env prop dty node =
+and try_term strict keep_loc uloc env prop dty node =
   let get env prop dt = term ~strict ~keep_loc uloc env prop dt in
   match node with
   | DTvar (n,_) ->
@@ -450,8 +450,12 @@ and try_expr strict keep_loc uloc env prop dty node =
         (get env prop dt1) (get env prop dt2)
   | DTcase (dt,bl) ->
       let prop = prop || dty = None in
-      let mk_b b = branch ~strict ~keep_loc uloc env prop b in
-      t_case_close (get env false dt) (List.map mk_b bl)
+      let branch (dp,dt) =
+        let env, p = pattern ~strict env dp in
+        let t = get env prop dt in
+        Svs.iter (check_used_var t.t_vars) p.pat_vars;
+        t_close_branch p t in
+      t_case (get env false dt) (List.map branch bl)
   | DTeps (id,dty,df) ->
       let v = create_vsymbol id (var_ty_of_dty id ~strict dty) in
       let env = Mstr.add id.pre_name v env in
@@ -477,20 +481,8 @@ and try_expr strict keep_loc uloc env prop dty node =
   | DTcast _ | DTuloc _ | DTlabel _ ->
       assert false (* already stripped *)
 
-and branch ~strict ~keep_loc uloc env prop (dp,dt) =
-  let env, p = pattern ~strict env dp in
-  let t = term ~strict ~keep_loc uloc env prop dt in
-  Svs.iter (check_used_var t.t_vars) p.pat_vars;
-  p, t
-
 let fmla ~strict ~keep_loc dt = term ~strict ~keep_loc None Mstr.empty true dt
 let term ~strict ~keep_loc dt = term ~strict ~keep_loc None Mstr.empty false dt
-
-let term_branch ~strict ~keep_loc dp dt =
-  branch ~strict ~keep_loc None Mstr.empty false (dp,dt)
-
-let fmla_branch ~strict ~keep_loc dp dt =
-  branch ~strict ~keep_loc None Mstr.empty true (dp,dt)
 
 (** Exception printer *)
 

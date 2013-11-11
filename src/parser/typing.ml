@@ -45,8 +45,12 @@ let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
 (** symbol lookup *)
 
 let rec qloc = function
-  | Qident x -> x.id_loc
-  | Qdot (m, x) -> Loc.join (qloc m) x.id_loc
+  | Qdot (p, id) -> Loc.join (qloc p) id.id_loc
+  | Qident id    -> id.id_loc
+
+let rec print_qualid fmt = function
+  | Qdot (p, id) -> Format.fprintf fmt "%a.%s" print_qualid p id.id
+  | Qident id    -> Format.fprintf fmt "%s" id.id
 
 let string_list_of_qualid q =
   let rec sloq acc = function
@@ -54,51 +58,43 @@ let string_list_of_qualid q =
     | Qident id -> id.id :: acc in
   sloq [] q
 
-let rec print_qualid fmt = function
-  | Qident s -> Format.fprintf fmt "%s" s.id
-  | Qdot (m, s) -> Format.fprintf fmt "%a.%s" print_qualid m s.id
-
 exception UnboundSymbol of qualid
 
-let find_ns get_id find q ns =
+let find_qualid get_id find ns q =
   let sl = string_list_of_qualid q in
   let r = try find ns sl with Not_found ->
     Loc.error ~loc:(qloc q) (UnboundSymbol q) in
   if Debug.test_flag Glob.flag then Glob.use (qloc q) (get_id r);
   r
 
-let find_prop_ns q ns     = find_ns (fun pr -> pr.pr_name) ns_find_pr q ns
-let find_tysymbol_ns q ns = find_ns (fun ts -> ts.ts_name) ns_find_ts q ns
-let find_lsymbol_ns q ns  = find_ns (fun ls -> ls.ls_name) ns_find_ls q ns
+let find_prop_ns     ns q = find_qualid (fun pr -> pr.pr_name) ns_find_pr ns q
+let find_tysymbol_ns ns q = find_qualid (fun ts -> ts.ts_name) ns_find_ts ns q
+let find_lsymbol_ns  ns q = find_qualid (fun ls -> ls.ls_name) ns_find_ls ns q
 
-let find_fsymbol_ns q ns =
-  let ls = find_lsymbol_ns q ns in
+let find_fsymbol_ns ns q =
+  let ls = find_lsymbol_ns ns q in
   if ls.ls_value <> None then ls else
     Loc.error ~loc:(qloc q) (FunctionSymbolExpected ls)
 
-let find_psymbol_ns q ns =
-  let ls = find_lsymbol_ns q ns in
+let find_psymbol_ns ns q =
+  let ls = find_lsymbol_ns ns q in
   if ls.ls_value = None then ls else
     Loc.error ~loc:(qloc q) (PredicateSymbolExpected ls)
 
-let find_prop q uc     = find_prop_ns q (get_namespace uc)
-let find_tysymbol q uc = find_tysymbol_ns q (get_namespace uc)
-let find_lsymbol q uc  = find_lsymbol_ns q (get_namespace uc)
-let find_fsymbol q uc  = find_fsymbol_ns q (get_namespace uc)
-let find_psymbol q uc  = find_psymbol_ns q (get_namespace uc)
+let find_prop     uc q = find_prop_ns     (get_namespace uc) q
+let find_tysymbol uc q = find_tysymbol_ns (get_namespace uc) q
+let find_lsymbol  uc q = find_lsymbol_ns  (get_namespace uc) q
+let find_fsymbol  uc q = find_fsymbol_ns  (get_namespace uc) q
+let find_psymbol  uc q = find_psymbol_ns  (get_namespace uc) q
 
-let find_namespace_ns q ns =
-  find_ns (fun _ -> Glob.dummy_id) ns_find_ns q ns
-
-(* dead code
-let find_namespace q uc = find_namespace_ns q (get_namespace uc)
-*)
+let find_namespace_ns ns q =
+  find_qualid (fun _ -> Glob.dummy_id) ns_find_ns ns q
 
 (** Parsing types *)
 
 let create_user_tv =
-  let hs = Hstr.create 17 in
-  fun s -> try Hstr.find hs s with Not_found ->
+  let hs = Hstr.create 17 in fun s ->
+  try Hstr.find hs s with Not_found ->
   let tv = create_tvsymbol (id_fresh s) in
   Hstr.add hs s tv;
   tv
@@ -110,10 +106,10 @@ let ty_of_pty_top ~noop uc pty =
           allowed@ in@ function@ and@ predicate@ prototypes"
     | PPTtyvar ({id = x}, _) ->
         ty_var (create_user_tv x)
-    | PPTtyapp (x, tyl) ->
-        let ts = find_tysymbol x uc in
+    | PPTtyapp (q, tyl) ->
+        let ts = find_tysymbol uc q in
         let tyl = List.map get_ty tyl in
-        Loc.try2 ~loc:(qloc x) ty_app ts tyl
+        Loc.try2 ~loc:(qloc q) ty_app ts tyl
     | PPTtuple tyl ->
         let ts = ts_tuple (List.length tyl) in
         ty_app ts (List.map get_ty tyl)
@@ -147,15 +143,14 @@ let opaque_tvs args =
 
 (** Typing patterns, terms, and formulas *)
 
-let create_user_id { id = x ; id_lab = ll ; id_loc = loc } =
-  let get_labels (ll,p) = function
-    | Lstr l -> Slab.add l ll, p
-    | Lpos p -> ll, Some p in
-  let label,p = List.fold_left get_labels (Slab.empty,None) ll in
-  id_user ~label x (Opt.get_def loc p)
+let create_user_id {id = n; id_lab = label; id_loc = loc} =
+  let get_labels (label, loc) = function
+    | Lstr lab -> Slab.add lab label, loc | Lpos loc -> label, loc in
+  let label,loc = List.fold_left get_labels (Slab.empty,loc) label in
+  id_user ~label n loc
 
 let parse_record ~loc uc get_val fl =
-  let fl = List.map (fun (q,e) -> find_lsymbol q uc, e) fl in
+  let fl = List.map (fun (q,e) -> find_lsymbol uc q, e) fl in
   let cs,pjl,flm = Loc.try2 ~loc parse_record (get_known uc) fl in
   let get_val pj = get_val cs pj (Mls.find_opt pj flm) in
   cs, List.map get_val pjl
@@ -164,9 +159,9 @@ let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
   Dterm.dpattern ~loc (match desc with
     | PPpwild -> DPwild
     | PPpvar x -> DPvar (create_user_id x)
-    | PPpapp (x,pl) ->
+    | PPpapp (q,pl) ->
         let pl = List.map (dpattern uc) pl in
-        DPapp (find_lsymbol x uc, pl)
+        DPapp (find_lsymbol uc q, pl)
     | PPptuple pl ->
         let pl = List.map (dpattern uc) pl in
         DPapp (fs_tuple (List.length pl), pl)
@@ -187,12 +182,12 @@ let quant_var uc (x,ty) =
 let chainable_op uc op =
   (* non-bool -> non-bool -> bool *)
   op.id = "infix =" || op.id = "infix <>" ||
-  match find_lsymbol (Qident op) uc with
-    | { ls_args = [ty1;ty2]; ls_value = ty } ->
-        Opt.fold (fun _ ty -> ty_equal ty ty_bool) true ty
-        && not (ty_equal ty1 ty_bool)
-        && not (ty_equal ty2 ty_bool)
-    | _ -> false
+  match find_lsymbol uc (Qident op) with
+  | {ls_args = [ty1;ty2]; ls_value = ty} ->
+      Opt.fold (fun _ ty -> ty_equal ty ty_bool) true ty
+      && not (ty_equal ty1 ty_bool)
+      && not (ty_equal ty2 ty_bool)
+  | _ -> false
 
 type global_vs = Ptree.qualid -> vsymbol option
 
@@ -201,23 +196,23 @@ let rec dterm uc (gvars: global_vs) denv {pp_desc = desc; pp_loc = loc} =
   let highord_app e1 e2 =
     DTapp (fs_func_app, [Dterm.dterm ~loc e1; pterm denv e2]) in
   let highord_app e1 el = List.fold_left highord_app e1 el in
-  let qualid_app x el = match gvars x with
+  let qualid_app q el = match gvars q with
     | Some vs ->
         highord_app (DTgvar vs) el
     | None ->
-        let ls = find_lsymbol x uc in
+        let ls = find_lsymbol uc q in
         let rec take al l el = match l, el with
           | (_::l), (e::el) -> take (pterm denv e :: al) l el
           | _, _ -> List.rev al, el in
         let al, el = take [] ls.ls_args el in
         highord_app (DTapp (ls,al)) el
   in
-  let qualid_app x el = match x with
+  let qualid_app q el = match q with
     | Qident {id = n} ->
         (match denv_get_opt denv n with
         | Some dt -> highord_app dt el
-        | None -> qualid_app x el)
-    | _ -> qualid_app x el
+        | None -> qualid_app q el)
+    | _ -> qualid_app q el
   in
   Dterm.dterm ~loc (match desc with
   | PPvar x ->
@@ -233,10 +228,10 @@ let rec dterm uc (gvars: global_vs) denv {pp_desc = desc; pp_loc = loc} =
   | PPinnfix (e12, op2, e3) ->
       let make_app de1 op de2 = if op.id = "infix <>" then
         let op = { op with id = "infix =" } in
-        let ls = find_lsymbol (Qident op) uc in
+        let ls = find_lsymbol uc (Qident op) in
         DTnot (Dterm.dterm ~loc (DTapp (ls, [de1;de2])))
       else
-        DTapp (find_lsymbol (Qident op) uc, [de1;de2])
+        DTapp (find_lsymbol uc (Qident op), [de1;de2])
       in
       let rec make_chain de1 = function
         | [op,de2] ->
@@ -329,25 +324,13 @@ let rec dterm uc (gvars: global_vs) denv {pp_desc = desc; pp_loc = loc} =
 
 (** Export for program parsing *)
 
-let type_term uc gfn t =
-  let t = dterm uc gfn denv_empty t in
+let type_term uc gvars t =
+  let t = dterm uc gvars denv_empty t in
   Dterm.term ~strict:true ~keep_loc:true t
 
-let type_fmla uc gfn f =
-  let f = dterm uc gfn denv_empty f in
+let type_fmla uc gvars f =
+  let f = dterm uc gvars denv_empty f in
   Dterm.fmla ~strict:true ~keep_loc:true f
-
-let type_term_branch uc gfn p t =
-  let p = dpattern uc p in
-  let denv = denv_add_pat denv_empty p in
-  let t = dterm uc gfn denv t in
-  Dterm.term_branch ~strict:true ~keep_loc:true p t
-
-let type_fmla_branch uc gfn p f =
-  let p = dpattern uc p in
-  let denv = denv_add_pat denv_empty p in
-  let f = dterm uc gfn denv f in
-  Dterm.fmla_branch ~strict:true ~keep_loc:true p f
 
 (** Typing declarations *)
 
@@ -396,7 +379,7 @@ let add_types dl th =
                     | Qident x when Mstr.mem x.id def ->
                         visit x.id
                     | Qident _ | Qdot _ ->
-                        find_tysymbol q th
+                        find_tysymbol th q
                   in
                   Loc.try2 ~loc:(qloc q) ty_app ts (List.map apply tyl)
               | PPTtuple tyl ->
@@ -711,11 +694,11 @@ let add_decl loc th = function
   | Ptree.Meta (id, al) ->
       let convert = function
         | PMAty (PPTtyapp (q,[]))
-                   -> MAts (find_tysymbol q th)
+                   -> MAts (find_tysymbol th q)
         | PMAty ty -> MAty (ty_of_pty th ty)
-        | PMAfs q  -> MAls (find_fsymbol q th)
-        | PMAps q  -> MAls (find_psymbol q th)
-        | PMApr q  -> MApr (find_prop q th)
+        | PMAfs q  -> MAls (find_fsymbol th q)
+        | PMAps q  -> MAls (find_psymbol th q)
+        | PMApr q  -> MApr (find_prop th q)
         | PMAstr s -> MAstr s
         | PMAint i -> MAint i
       in
@@ -729,18 +712,17 @@ let add_decl loc th d =
 let type_inst th t s =
   let add_inst s = function
     | CSns (loc,p,q) ->
-      let find ns x = find_namespace_ns x ns in
-      let ns1 = Opt.fold find t.th_export p in
-      let ns2 = Opt.fold find (get_namespace th) q in
+      let ns1 = Opt.fold find_namespace_ns t.th_export p in
+      let ns2 = Opt.fold find_namespace_ns (get_namespace th) q in
       Loc.try6 ~loc clone_ns t.th_known t.th_local [] ns2 ns1 s
     | CStsym (loc,p,[],PPTtyapp (q,[])) ->
-      let ts1 = find_tysymbol_ns p t.th_export in
-      let ts2 = find_tysymbol q th in
+      let ts1 = find_tysymbol_ns t.th_export p in
+      let ts2 = find_tysymbol th q in
       if Mts.mem ts1 s.inst_ts
       then Loc.error ~loc (ClashSymbol ts1.ts_name.id_string);
       { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
     | CStsym (loc,p,tvl,pty) ->
-      let ts1 = find_tysymbol_ns p t.th_export in
+      let ts1 = find_tysymbol_ns t.th_export p in
       let id = id_user (ts1.ts_name.id_string ^ "_subst") loc in
       let tvl = List.map (fun id -> create_user_tv id.id) tvl in
       let def = Some (ty_of_pty th pty) in
@@ -749,24 +731,24 @@ let type_inst th t s =
       then Loc.error ~loc (ClashSymbol ts1.ts_name.id_string);
       { s with inst_ts = Mts.add ts1 ts2 s.inst_ts }
     | CSfsym (loc,p,q) ->
-      let ls1 = find_fsymbol_ns p t.th_export in
-      let ls2 = find_fsymbol q th in
+      let ls1 = find_fsymbol_ns t.th_export p in
+      let ls2 = find_fsymbol th q in
       if Mls.mem ls1 s.inst_ls
       then Loc.error ~loc (ClashSymbol ls1.ls_name.id_string);
       { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
     | CSpsym (loc,p,q) ->
-      let ls1 = find_psymbol_ns p t.th_export in
-      let ls2 = find_psymbol q th in
+      let ls1 = find_psymbol_ns t.th_export p in
+      let ls2 = find_psymbol th q in
       if Mls.mem ls1 s.inst_ls
       then Loc.error ~loc (ClashSymbol ls1.ls_name.id_string);
       { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
     | CSlemma (loc,p) ->
-      let pr = find_prop_ns p t.th_export in
+      let pr = find_prop_ns t.th_export p in
       if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
       then Loc.error ~loc (ClashSymbol pr.pr_name.id_string);
       { s with inst_lemma = Spr.add pr s.inst_lemma }
     | CSgoal (loc,p) ->
-      let pr = find_prop_ns p t.th_export in
+      let pr = find_prop_ns t.th_export p in
       if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
       then Loc.error ~loc (ClashSymbol pr.pr_name.id_string);
       { s with inst_goal = Spr.add pr s.inst_goal }

@@ -48,7 +48,7 @@ type dpattern_node =
   | DPor   of dpattern * dpattern
   | DPas   of dpattern * preid
 
-(** Specifications *)
+(** Binders *)
 
 type ghost = bool
 
@@ -56,24 +56,27 @@ type opaque = Stv.t
 
 type dbinder = preid option * ghost * opaque * dity
 
+(** Specifications *)
+
 type 'a later = vsymbol Mstr.t -> 'a
-  (* specification terms are parsed and typechecked after the program
+  (* Specification terms are parsed and typechecked after the program
      expressions, when the types of locally bound program variables are
      already established. *)
 
-type dpre = Loc.position option * term
-type dpost = Loc.position option * (pattern * term) list
-type dxpost = Loc.position option * (xsymbol * pattern * term) list
-type dinvariant = (Loc.position option * term) list
-
-type dspec = {
-  ds_pre     : dpre list;
-  ds_post    : dpost list;
-  ds_xpost   : dxpost list;
+type dspec_final = {
+  ds_pre     : term list;
+  ds_post    : (vsymbol option * term) list;
+  ds_xpost   : (vsymbol option * term) list Mexn.t;
   ds_reads   : vsymbol list;
   ds_writes  : term list;
   ds_variant : variant list;
 }
+
+type dspec = ty -> dspec_final
+  (* Computation specification is also parametrized by the result type.
+     All vsymbols in the postcondition clauses in the [ds_post] field
+     must have this type. All vsymbols in the exceptional postcondition
+     clauses must have the type of the corresponding exception. *)
 
 type dtype_v =
   | DSpecV of dity
@@ -82,6 +85,8 @@ type dtype_v =
 and dtype_c = dtype_v * dspec later
 
 (** Expressions *)
+
+type dinvariant = term list
 
 type dlazy_op = DEand | DEor
 

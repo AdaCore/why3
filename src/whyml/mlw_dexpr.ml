@@ -347,19 +347,20 @@ type 'a later = vsymbol Mstr.t -> 'a
      expressions, when the types of locally bound program variables are
      already established. *)
 
-type dpre = Loc.position option * term
-type dpost = Loc.position option * (pattern * term) list
-type dxpost = Loc.position option * (xsymbol * pattern * term) list
-type dinvariant = (Loc.position option * term) list
-
-type dspec = {
-  ds_pre     : dpre list;
-  ds_post    : dpost list;
-  ds_xpost   : dxpost list;
+type dspec_final = {
+  ds_pre     : term list;
+  ds_post    : (vsymbol option * term) list;
+  ds_xpost   : (vsymbol option * term) list Mexn.t;
   ds_reads   : vsymbol list;
   ds_writes  : term list;
   ds_variant : variant list;
 }
+
+type dspec = ty -> dspec_final
+  (* Computation specification is also parametrized by the result type.
+     All vsymbols in the postcondition clauses in the [ds_post] field
+     must have this type. All vsymbols in the exceptional postcondition
+     clauses must have the type of the corresponding exception. *)
 
 type dtype_v =
   | DSpecV of dity
@@ -368,6 +369,8 @@ type dtype_v =
 and dtype_c = dtype_v * dspec later
 
 (** Expressions *)
+
+type dinvariant = term list
 
 type dlazy_op = DEand | DEor
 
@@ -735,50 +738,33 @@ let to_fmla f = match f.t_ty with
   | Some ty when ty_equal ty ty_bool -> t_equ f t_bool_true
   | _ -> Loc.error ?loc:f.t_loc Dterm.FmlaExpected
 
-let create_assert (_,f) = t_label_add Split_goal.stop_split (to_fmla f)
+let create_assert f = t_label_add Split_goal.stop_split (to_fmla f)
 let create_pre fl = t_and_simp_l (List.map create_assert fl)
 let create_inv = create_pre
 
-let create_post u (loc,pl) =
-  let f = match pl with
-    | [{pat_node = Pwild}, f] -> to_fmla f
-    | [{pat_node = Pvar v}, f] when vs_equal u v -> to_fmla f
-    | [{pat_node = Pvar v}, f] -> t_subst_single v (t_var u) (to_fmla f)
-    | [{pat_node = Papp (fs,[])}, f] when ls_equal fs fs_void -> to_fmla f
-    | bl -> let mk_b (p,f) = t_close_branch p (to_fmla f) in
-            let f = t_case (t_var u) (List.map mk_b bl) in
-            t_label ?loc Slab.empty f in
-  let f = t_label_add Split_goal.stop_split f in
-  Mlw_wp.remove_old f
+let create_post u (v,f) =
+  let f = match v with
+    | Some v when vs_equal u v -> f
+    | Some v -> Loc.try3 ?loc:f.t_loc t_subst_single v (t_var u) f
+    | None -> f in
+  let f = Mlw_wp.remove_old (to_fmla f) in
+  t_label_add Split_goal.stop_split f
 
-let create_post u (loc,_ as pl) = Loc.try2 ?loc create_post u pl
-
-let create_post ty pll =
+let create_post ty ql =
   let rec get_var = function
     | [] -> create_vsymbol (id_fresh "result") ty
-    | (_, [{ pat_node = Pvar v }, _]) :: _ -> v
+    | (Some v, _) :: _ -> Ty.ty_equal_check ty v.vs_ty; v
     | _ :: l -> get_var l in
-  let vs = get_var pll in
-  let f = t_and_simp_l (List.map (create_post vs) pll) in
-  Mlw_ty.create_post vs f
+  let u = get_var ql in
+  let f = t_and_simp_l (List.map (create_post u) ql) in
+  Mlw_ty.create_post u f
 
-let create_xpost pll =
-  let add_exn (xs,p,f) m = Mexn.change (function
-    | Some l -> Some ((p,f) :: l)
-    | None   -> Some ((p,f) :: [])) xs m in
-  let exn_map loc pl =
-    let m = List.fold_right add_exn pl Mexn.empty in
-    Mexn.map (fun pl -> [loc, pl]) m in
-  let add_map (loc,pl) m =
-    Mexn.union (fun _ l r -> Some (l @ r)) (exn_map loc pl) m in
-  let m = List.fold_right add_map pll Mexn.empty in
-  Mexn.mapi (fun xs pll -> create_post (ty_of_ity xs.xs_ity) pll) m
+let create_xpost xql =
+  Mexn.mapi (fun xs ql -> create_post (ty_of_ity xs.xs_ity) ql) xql
 
-let create_post vty pll = create_post (ty_of_vty vty) pll
-
-let spec_of_dspec eff vty dsp = {
+let spec_of_dspec eff ty dsp = {
   c_pre     = create_pre dsp.ds_pre;
-  c_post    = create_post vty dsp.ds_post;
+  c_post    = create_post ty dsp.ds_post;
   c_xpost   = create_xpost dsp.ds_xpost;
   c_effect  = eff;
   c_variant = dsp.ds_variant;
@@ -817,9 +803,8 @@ let rec effect_of_term t = match t.t_node with
       Loc.errorm ?loc:t.t_loc "unsupported effect expression"
 
 let effect_of_dspec dsp =
-  let add_raise eff (xs,_,_) = eff_raise eff xs in
-  let add_raise eff (_,pl) = List.fold_left add_raise eff pl in
-  let eff = List.fold_left add_raise eff_empty dsp.ds_xpost in
+  let add_raise xs _ eff = eff_raise eff xs in
+  let eff = Mexn.fold add_raise dsp.ds_xpost eff_empty in
   let svs = List.fold_right Svs.add dsp.ds_reads Svs.empty in
   let add_write (svs,mreg,eff) t =
     let vs, fd = effect_of_term t in
@@ -968,8 +953,9 @@ let add_binders env pvl = List.fold_left add_pvsymbol env pvl
 (** Abstract values *)
 
 let rec type_c env pvs vars otv (dtyv, dsp) =
-  let dsp = dsp env.vsm in
   let vty = type_v env pvs vars otv dtyv in
+  let res = ty_of_vty vty in
+  let dsp = dsp env.vsm res in
   let esvs, _, eff = effect_of_dspec dsp in
   (* refresh every subregion of a modified region *)
   let writes = Sreg.union eff.eff_writes eff.eff_ghostw in
@@ -979,7 +965,7 @@ let rec type_c env pvs vars otv (dtyv, dsp) =
   (* eff_compare every type variable not marked as opaque *)
   let eff = Stv.fold_left eff_compare eff (Stv.diff vars.vars_tv otv) in
   (* make spec *)
-  let spec = spec_of_dspec eff vty dsp in
+  let spec = spec_of_dspec eff res dsp in
   if spec.c_variant <> [] then Loc.errorm
     "variants are not allowed in a parameter declaration";
   (* we add a fake variant term for every external variable in effect
@@ -1177,13 +1163,14 @@ and try_expr keep_loc uloc env (argl,res) node =
   | DEabsurd ->
       e_absurd (ity_of_dity res)
   | DEassert (ak,f) ->
-      e_assert ak (create_assert (None, f env.vsm))
+      e_assert ak (create_assert (f env.vsm))
   | DEabstract (de,dsp) ->
       let e = get env de in
-      let dsp = dsp env.vsm in
+      let tyv = ty_of_vty e.e_vty in
+      let dsp = dsp env.vsm tyv in
       if dsp.ds_variant <> [] then Loc.errorm
         "variants are not allowed in `abstract'";
-      let spec = spec_of_dspec e.e_effect e.e_vty dsp in
+      let spec = spec_of_dspec e.e_effect tyv dsp in
       check_user_effect e spec false dsp;
       e_abstract e spec
   | DEmark (id,de) ->
@@ -1266,8 +1253,9 @@ and expr_lam ~keep_loc uloc env gh pvl de dsp =
   let e = e_ghostify gh (expr ~keep_loc uloc env de) in
   if not gh && e.e_ghost then (* TODO: localize better *)
     Loc.errorm ?loc:de.de_loc "ghost body in a non-ghost function";
-  let dsp = dsp env.vsm in
-  let spec = spec_of_dspec e.e_effect e.e_vty dsp in
+  let tyv = ty_of_vty e.e_vty in
+  let dsp = dsp env.vsm tyv in
+  let spec = spec_of_dspec e.e_effect tyv dsp in
   { l_args = pvl; l_expr = e; l_spec = spec }, dsp
 
 let val_decl ~keep_loc:_ vald =
