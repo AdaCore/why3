@@ -41,23 +41,36 @@ let print_var fmt {vs_name = id} =
   fprintf fmt "%s" n
 
 type info = {
-  info_syn : syntax_map;
+  info_syn     : syntax_map;
+  complex_type : ty Mty.t ref;
+  urg_output   : string list ref;
 }
 
+let complex_type = Wty.memoize 3 (fun ty ->
+  let s = Pp.string_of_wnl Pretty.print_ty ty in
+  create_tysymbol (id_fresh s) [] None)
+
 let rec print_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
-  | Tyapp (ts, []) -> begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_type info) fmt []
-      | None -> fprintf fmt "%a" print_ident ts.ts_name
-  end
-  | Tyapp (_, _) -> unsupported "smt : you must encode the complexe type"
+  | Tyvar _ -> unsupported "smtv1: you must encode the polymorphism"
+  | Tyapp (ts, l) ->
+      begin match query_syntax info.info_syn ts.ts_name, l with
+      | Some s, _ -> syntax_arguments s (print_type info) fmt l
+      | None, [] -> fprintf fmt "%a" print_ident ts.ts_name
+      | None, _ ->
+          begin match Mty.find_opt ty !(info.complex_type) with
+          | Some ty -> print_type info fmt ty
+          | None ->
+              let ts = complex_type ty in let cty = ty_app ts [] in
+              let us = sprintf
+                ":extrasorts (%a)@\n@\n" print_ident ts.ts_name in
+              info.complex_type := Mty.add ty cty !(info.complex_type);
+              info.urg_output := us :: !(info.urg_output);
+              print_type info fmt cty
+          end
+      end
 
-(* and print_tyapp info fmt = function *)
-(*   | [] -> () *)
-(*   | [ty] -> fprintf fmt "%a " (print_type info) ty *)
-(*   | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl *)
-
-let print_type info fmt = catch_unsupportedType (print_type info fmt)
+let print_type info fmt ty = try print_type info fmt ty
+  with Unsupported s -> raise (UnsupportedType (ty,s))
 
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
@@ -148,80 +161,82 @@ and print_fmla info fmt f = match f.t_node with
       "smtv1 : you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
+(*
 and _print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)
 
 and _print_triggers info fmt tl = print_list comma (_print_expr info) fmt tl
 
-
 let _print_logic_binder info fmt v =
   fprintf fmt "%a: %a" print_ident v.vs_name (print_type info) v.vs_ty
+*)
 
 let print_type_decl info fmt ts =
-  if Mid.mem ts.ts_name info.info_syn then false else
-  if ts.ts_args = [] then
-    (fprintf fmt ":extrasorts (%a)" print_ident ts.ts_name; true)
-  else unsupported "smtv1 : type with argument are not supported"
+  if ts.ts_args = [] && ts.ts_def = None then
+  if not (Mid.mem ts.ts_name info.info_syn) then
+  fprintf fmt ":extrasorts (%a)@\n@\n" print_ident ts.ts_name
 
 let print_param_decl info fmt ls = match ls.ls_value with
   | None ->
-      fprintf fmt "@[<hov 2>:extrapreds ((%a %a))@]@\n"
+      fprintf fmt "@[<hov 2>:extrapreds ((%a %a))@]@\n@\n"
         print_ident ls.ls_name
         (print_list space (print_type info)) ls.ls_args
   | Some value ->
-      fprintf fmt "@[<hov 2>:extrafuns ((%a %a %a))@]@\n"
+      fprintf fmt "@[<hov 2>:extrafuns ((%a %a %a))@]@\n@\n"
         print_ident ls.ls_name
         (print_list space (print_type info)) ls.ls_args
         (print_type info) value
 
 let print_param_decl info fmt ls =
-  if Mid.mem ls.ls_name info.info_syn then
-    false else (print_param_decl info fmt ls; true)
+  if not (Mid.mem ls.ls_name info.info_syn) then
+  print_param_decl info fmt ls
 
 let print_decl info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
-  | Ddata _ -> unsupported
-          "smtv1 : algebraic type are not supported"
+  | Ddata _ -> unsupportedDecl d
+      "smtv1 : algebraic types are not supported"
   | Dparam ls ->
       print_param_decl info fmt ls
-  | Dlogic _ -> unsupported
-      "Predicate and function definition aren't supported"
+  | Dlogic _ -> unsupportedDecl d
+      "smtv1 : predicate and function definitions are not supported"
   | Dind _ -> unsupportedDecl d
-      "smt : inductive definition are not supported"
-  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false
+      "smtv1 : inductive definitions are not supported"
+  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
-      fprintf fmt "@[<hov 2>;; %s@\n:assumption@ %a@]@\n"
-        pr.pr_name.id_string
-        (print_fmla info) f; true
+      fprintf fmt "@[<hov 2>;; %s@\n:assumption@ %a@]@\n@\n"
+        pr.pr_name.id_string (print_fmla info) f
   | Dprop (Pgoal, pr, f) ->
       fprintf fmt "@[:formula@\n";
       fprintf fmt "@[;; %a@]@\n" print_ident pr.pr_name;
       (match pr.pr_name.id_loc with
-        | None -> ()
-        | Some loc -> fprintf fmt " @[;; %a@]@\n"
-            Loc.gen_report_position loc);
-      fprintf fmt "  @[(not@ %a)@]" (print_fmla info) f;true
+        | Some loc -> fprintf fmt " @[;; %a@]@\n" Loc.gen_report_position loc
+        | None -> ());
+      fprintf fmt "  @[(not@ %a)@]@\n" (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) -> assert false
 
-let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
+let print_decls =
+  let print_decl (sm,ct) fmt d =
+    let info = {info_syn = sm; complex_type = ref ct; urg_output = ref []} in
+    try print_decl info fmt d; (sm, !(info.complex_type)), !(info.urg_output)
+    with Unsupported s -> raise (UnsupportedDecl (d,s)) in
+  let print_decl = Printer.sprint_decl print_decl in
+  let print_decl task acc = print_decl task.Task.task_decl acc in
+  Discriminate.on_syntax_map (fun sm ->
+    Trans.fold print_decl ((sm,Mty.empty),[]))
 
-let print_task args fmt task =
-  fprintf fmt "(benchmark why3@\n"
-    (*print_ident (Task.task_goal task).pr_name*);
+let print_task args ?old:_ fmt task =
+  (* In trans-based p-printing [forget_all] is a no-no *)
+  (* forget_all ident_printer; *)
+  fprintf fmt "(benchmark why3@\n";
   fprintf fmt "  :status unknown@\n";
   print_prelude fmt args.prelude;
-  print_th_prelude task fmt args.prelude_map;
-  let info = {
-    info_syn = get_syntax_map task;
-  }
-  in
-  let decls = Task.task_decls task in
-  ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls);
-  fprintf fmt "@\n)@."
+  print_th_prelude task fmt args.th_prelude;
+  let rec print = function
+    | x :: r -> print r; Pp.string fmt x
+    | [] -> () in
+  print (snd (Trans.apply print_decls task));
+  fprintf fmt ")@."
 
-let () = register_printer "smtv1"
-  (fun args ?old:_ fmt task ->
-     forget_all ident_printer;
-     print_task args fmt task)
+let () = register_printer "smtv1" print_task
   ~desc:"Printer@ for@ the@ SMTlib@ version@ 1@ format."

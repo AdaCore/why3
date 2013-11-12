@@ -437,7 +437,7 @@ let print_task args ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info args.env task in
   print_prelude fmt args.prelude;
-  print_th_prelude task fmt args.prelude_map;
+  print_th_prelude task fmt args.th_prelude;
   let equations,hyps,goal =
     List.fold_left (prepare info (Hid.create 17)) ([],[],Goal_none) (Task.task_decls task)
   in

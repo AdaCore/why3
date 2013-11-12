@@ -1,7 +1,7 @@
 (* Why3 driver for beagle
    see http://users.cecs.anu.edu.au/~baumgart/systems/beagle/ *)
 
-printer "tptp-tff"
+printer "tptp-tff0"
 filename "%f-%t-%g.p"
 
 valid   "Proof found"
@@ -34,8 +34,10 @@ transformation "eliminate_algebraic"
 transformation "eliminate_let"
 transformation "eliminate_if"
 
+transformation "discriminate"
 transformation "encoding_smt"
-transformation "encoding_sort"
+
+import "discrimination.gen"
 
 theory BuiltIn
   syntax predicate (=)  "(%1 = %2)"
@@ -45,11 +47,6 @@ theory BuiltIn
   meta "encoding : kept" type int
   meta "encoding : kept" type real
   meta "eliminate_algebraic" "no_index"
-
-  meta "select_inst" "all"
-  meta "select_lskept" "all"
-  meta "select_lsinst" "all"
-  meta "select_kept" "all"
 end
 
 theory int.Int

@@ -1,20 +1,26 @@
 #!/bin/sh
 # regression tests for why3
 
+REPLAYOPT=""
+
+while test $# != 0; do
 case "$1" in
   "-force")
-        REPLAYOPT="-force"
+        REPLAYOPT="$REPLAYOPT -force"
         ;;
   "-obsolete-only")
-        REPLAYOPT="-obsolete-only"
+        REPLAYOPT="$REPLAYOPT -obsolete-only"
         ;;
-  "")
-        REPLAYOPT=""
+  "--prover")
+        REPLAYOPT="$REPLAYOPT --prover $2"
+        shift
         ;;
   *)
         echo "$0: Unknown option '$1'"
         exit 2
 esac
+shift
+done
 
 TMP=$PWD/why3regtests.out
 TMPERR=$PWD/why3regtests.err

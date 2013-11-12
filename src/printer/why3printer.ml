@@ -377,34 +377,24 @@ let print_tdecl fmt td = match td.td_node with
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma print_meta_arg) al
 
-(*
-let print_task_old _env pr thpr _blacklist ?old:_ fmt task =
-  forget_all ();
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
-  info := { info_syn = get_syntax_map task };
-  fprintf fmt "theory Task@\n%a@\nend@."
-    (print_list nothing print_tdecl) (Task.task_tdecls task)
-
-let () = register_printer "why3old" print_task_old ~desc:""
-*)
-
 let print_tdecls =
-  let print sm fmt td =
-    info := { info_syn = sm };
-    print_tdecl fmt td in
-  Printer.sprint_tdecls print
+  let print_tdecl sm fmt td =
+    info := {info_syn = sm}; print_tdecl fmt td; sm, [] in
+  let print_tdecl = Printer.sprint_tdecl print_tdecl in
+  let print_tdecl task acc = print_tdecl task.Task.task_decl acc in
+  Discriminate.on_syntax_map (fun sm -> Trans.fold print_tdecl (sm,[]))
 
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
   (* forget_all (); *)
   print_prelude fmt args.prelude;
   fprintf fmt "theory Task@\n";
-  print_th_prelude task fmt args.prelude_map;
-  fprintf fmt "%a@\nend@."
-    (print_list nothing string)
-      (List.rev (Trans.apply print_tdecls task))
+  print_th_prelude task fmt args.th_prelude;
+  let rec print = function
+    | x :: r -> print r; Pp.string fmt x
+    | [] -> () in
+  print (snd (Trans.apply print_tdecls task));
+  fprintf fmt "end@."
 
 let () = register_printer "why3" print_task
-  ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ \
-    Used@ for@ debugging."
+  ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ Used@ for@ debugging."

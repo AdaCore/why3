@@ -250,7 +250,7 @@ let idle_handler t =
                 in
                 Queue.push (callback,pre_call) t.proof_attempts_queue;
                 run_timeout_handler t
-              with e ->
+              with e when not (Debug.test_flag Debug.stack_trace) ->
                 Format.eprintf "@[Exception raise in Session.idle_handler:@ \
 %a@.@]"
                   Exn_printer.exn_printer e;
@@ -263,7 +263,7 @@ let idle_handler t =
     t.idle_handler_activated <- false;
     dprintf debug "[Sched] idle_handler stopped@.";
     false
-    | e ->
+    | e when not (Debug.test_flag Debug.stack_trace) ->
       Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
         Exn_printer.exn_printer e;
       eprintf "Session.idle_handler stopped@.";
@@ -714,17 +714,28 @@ let check_goal_and_children eS eT todo g =
   goal_iter_proof_attempt (check_external_proof eS eT todo) g
 *)
 
-let check_all ?(release=false) eS eT ~callback =
+let rec goal_iter_proof_attempt_with_release ~release f g =
+  let iter g = goal_iter_proof_attempt_with_release ~release f g in
+  PHprover.iter (fun _ a -> f a) g.goal_external_proofs;
+  PHstr.iter (fun _ t -> List.iter iter t.transf_goals) g.goal_transformations;
+  Mmetas_args.iter (fun _ t -> iter t.metas_goal) g.goal_metas;
+  if release then release_task g
+
+let check_all ?(release=false) ?filter eS eT ~callback =
   dprintf debug "[Sched] check all@.%a@." print_session eS.session;
- let todo = Todo.create [] push_report callback in
+  let todo = Todo.create [] push_report callback in
   Todo.start todo;
   let check_top_goal g =
-    goal_iter_proof_attempt (check_external_proof eS eT todo) g;
-    if release then release_sub_tasks g
+    let check a =
+      let c = match filter with
+        | None -> true
+        | Some f -> f a in
+      if c then check_external_proof eS eT todo a in
+    goal_iter_proof_attempt_with_release ~release check g
   in
   PHstr.iter (fun _ file ->
-      List.iter  (fun t ->
-          List.iter  check_top_goal t.theory_goals)
+      List.iter (fun t ->
+          List.iter check_top_goal t.theory_goals)
         file.file_theories)
     eS.session.session_files;
   Todo.stop todo

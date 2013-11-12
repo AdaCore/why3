@@ -818,7 +818,7 @@ let init_printer th =
 let print_task printer_args realize ?old fmt task =
   forget_all ();
   print_prelude fmt printer_args.prelude;
-  print_th_prelude task fmt printer_args.prelude_map;
+  print_th_prelude task fmt printer_args.th_prelude;
   (* find theories that are both used and realized from metas *)
   let realized_theories =
     Task.on_meta meta_realized_theory (fun mid args ->

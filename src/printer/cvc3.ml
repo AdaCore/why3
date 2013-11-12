@@ -47,56 +47,37 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
-(** type *)
 type info = {
-  info_syn : syntax_map;
-  complex_type : ty Hty.t;
+  info_syn     : syntax_map;
+  complex_type : ty Mty.t ref;
+  urg_output   : string list ref;
 }
 
+(** type *)
+let complex_type = Wty.memoize 3 (fun ty ->
+  let s = Pp.string_of_wnl Pretty.print_ty ty in
+  create_tysymbol (id_fresh s) [] None)
+
 let rec print_type info fmt ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "cvc3 : you must encode the polymorphism"
-  | Tyapp (ts, []) -> begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_type info) fmt []
-      | None -> fprintf fmt "%a" print_ident ts.ts_name
-  end
+  | Tyvar _ -> unsupported "cvc3: you must encode the polymorphism"
   | Tyapp (ts, l) ->
-     begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_type info) fmt l
-      | None -> print_type info fmt (Hty.find info.complex_type ty)
-     end
+      begin match query_syntax info.info_syn ts.ts_name, l with
+      | Some s, _ -> syntax_arguments s (print_type info) fmt l
+      | None, [] -> fprintf fmt "%a" print_ident ts.ts_name
+      | None, _ ->
+          begin match Mty.find_opt ty !(info.complex_type) with
+          | Some ty -> print_type info fmt ty
+          | None ->
+              let ts = complex_type ty in let cty = ty_app ts [] in
+              let us = sprintf "%a: TYPE;@\n@\n" print_ident ts.ts_name in
+              info.complex_type := Mty.add ty cty !(info.complex_type);
+              info.urg_output := us :: !(info.urg_output);
+              print_type info fmt cty
+          end
+      end
 
-(* and print_tyapp info fmt = function *)
-(*   | [] -> () *)
-(*   | [ty] -> fprintf fmt "%a " (print_type info) ty *)
-(*   | tl -> fprintf fmt "(%a) " (print_list comma (print_type info)) tl *)
-
-let rec iter_complex_type info fmt () ty = match ty.ty_node with
-  | Tyvar _ -> unsupported "cvc3 : you must encode the polymorphism"
-  | Tyapp (_, []) -> ()
-  | Tyapp (ts, l) ->
-    begin match query_syntax info.info_syn ts.ts_name with
-      | Some _ -> List.iter (iter_complex_type info fmt ()) l
-      | None when not (Hty.mem info.complex_type ty) ->
-        let id = id_fresh (Pp.string_of_wnl Pretty.print_ty ty) in
-        let ts = create_tysymbol id [] None in
-        let cty = ty_app ts [] in
-        fprintf fmt "%a: TYPE;@."
-          print_ident ts.ts_name;
-        Hty.add info.complex_type ty cty
-      | None -> ()
-    end
-
-let find_complex_type info fmt f =
-  t_ty_fold (iter_complex_type info fmt) () f
-
-let find_complex_type_expr info fmt f =
-  TermTF.t_selecti
-    (t_ty_fold (iter_complex_type info fmt))
-    (t_ty_fold (iter_complex_type info fmt))
-    () f
-
-let print_type info fmt =
-  catch_unsupportedType (print_type info fmt)
+let print_type info fmt ty = try print_type info fmt ty
+  with Unsupported s -> raise (UnsupportedType (ty,s))
 
 let print_type_value info fmt = function
   | None -> fprintf fmt "BOOLEAN"
@@ -221,42 +202,28 @@ and print_triggers info fmt = function
     (print_list comma (print_expr info)) a
     (print_triggers info) l
 
-let _print_logic_binder info fmt v =
-  fprintf fmt "%a: %a" print_ident v.vs_name
-    (print_type info) v.vs_ty
-
 let print_type_decl info fmt ts =
-  if Mid.mem ts.ts_name info.info_syn then false else
-  if ts.ts_args = [] then
-  (fprintf fmt "%a : TYPE;" print_ident ts.ts_name; true)
-  else false
+  if ts.ts_args = [] && ts.ts_def = None then
+  if not (Mid.mem ts.ts_name info.info_syn) then
+  fprintf fmt "%a : TYPE;@\n@\n" print_ident ts.ts_name
+
+let print_lsargs info fmt = function
+  | [] -> ()
+  | l  -> fprintf fmt "(%a) -> " (print_list comma (print_type info)) l
 
 let print_param_decl info fmt ls =
-  let print_lsargs info fmt = function
-    | [] -> ()
-    | l ->  fprintf fmt "(%a) -> "
-      (print_list comma (print_type info)) l in
-  List.iter (iter_complex_type info fmt ()) ls.ls_args;
-  Opt.iter (iter_complex_type info fmt ()) ls.ls_value;
-  fprintf fmt "@[<hov 2>%a: %a%a;@]@\n"
+  fprintf fmt "@[<hov 2>%a: %a%a;@]@\n@\n"
     print_ident ls.ls_name
     (print_lsargs info) ls.ls_args
     (print_type_value info) ls.ls_value
 
 let print_param_decl info fmt ls =
-  if Mid.mem ls.ls_name info.info_syn then
-    false else (print_param_decl info fmt ls; true)
+  if not (Mid.mem ls.ls_name info.info_syn)
+  then print_param_decl info fmt ls
 
 let print_logic_decl info fmt (ls,def) =
-  let print_lsargs info fmt = function
-    | [] -> ()
-    | l ->  fprintf fmt "(%a) -> "
-      (print_list comma (print_type info)) l in
-  List.iter (iter_complex_type info fmt ()) ls.ls_args;
-  Opt.iter (iter_complex_type info fmt ()) ls.ls_value;
   let vsl,expr = Decl.open_ls_defn def in
-  find_complex_type_expr info fmt expr;
-  fprintf fmt "@[<hov 2>%a: %a%a = LAMBDA (%a): %a;@]@\n"
+  fprintf fmt "@[<hov 2>%a: %a%a = LAMBDA (%a): %a;@]@\n@\n"
     print_ident ls.ls_name
     (print_lsargs info) ls.ls_args
     (print_type_value info) ls.ls_value
@@ -265,8 +232,8 @@ let print_logic_decl info fmt (ls,def) =
   List.iter forget_var vsl
 
 let print_logic_decl info fmt d =
-  if Mid.mem (fst d).ls_name info.info_syn then
-    false else (print_logic_decl info fmt d; true)
+  if not (Mid.mem (fst d).ls_name info.info_syn)
+  then print_logic_decl info fmt d
 
 let print_decl info fmt d = match d.d_node with
   | Dtype ts ->
@@ -276,59 +243,42 @@ let print_decl info fmt d = match d.d_node with
   | Dparam ls ->
       print_param_decl info fmt ls
   | Dlogic dl ->
-      print_list_opt newline (print_logic_decl info) fmt dl
+      print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "cvc3 : inductive definition are not supported"
-  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> false
+  | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()
   | Dprop (Paxiom, pr, f) ->
-    find_complex_type info fmt f;
-      fprintf fmt "@[<hov 2>%% %s@\nASSERT@ %a;@]@\n"
-        pr.pr_name.id_string
-        (print_fmla info) f; true
+      fprintf fmt "@[<hov 2>%% %s@\nASSERT@ %a;@]@\n@\n"
+        pr.pr_name.id_string (print_fmla info) f
   | Dprop (Pgoal, pr, f) ->
-    find_complex_type info fmt f;
       fprintf fmt "@[QUERY@\n";
       fprintf fmt "@[%% %a@]@\n" print_ident pr.pr_name;
       (match pr.pr_name.id_loc with
-        | None -> ()
-        | Some loc -> fprintf fmt " @[%% %a@]@\n"
-            Loc.gen_report_position loc);
-      fprintf fmt "  @[%a;@]@]" (print_fmla info) f;
-      true
+        | Some loc -> fprintf fmt " @[%% %a@]@\n" Loc.gen_report_position loc
+        | None -> ());
+      fprintf fmt "  @[%a;@]@]@\n" (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) -> assert false
 
-let print_decl info fmt = catch_unsupportedDecl (print_decl info fmt)
+let print_decls =
+  let print_decl (sm,ct) fmt d =
+    let info = {info_syn = sm; complex_type = ref ct; urg_output = ref []} in
+    try print_decl info fmt d; (sm, !(info.complex_type)), !(info.urg_output)
+    with Unsupported s -> raise (UnsupportedDecl (d,s)) in
+  let print_decl = Printer.sprint_decl print_decl in
+  let print_decl task acc = print_decl task.Task.task_decl acc in
+  Discriminate.on_syntax_map (fun sm ->
+    Trans.fold print_decl ((sm,Mty.empty),[]))
 
-let distingued =
-  let dist_syntax mls = function
-    | [MAls ls;MAstr s] -> Mls.add ls s mls
-    | _ -> assert false in
-  let dist_dist syntax mls = function
-    | [MAls ls;MAls lsdis] ->
-      begin try
-              Mid.add lsdis.ls_name (Mls.find ls syntax) mls
-        with Not_found -> mls end
-    | _ -> assert false in
-  Trans.on_meta meta_syntax_logic (fun syntax ->
-    let syntax = List.fold_left dist_syntax Mls.empty syntax in
-    Trans.on_meta Discriminate.meta_lsinst (fun dis ->
-      let dis2 = List.fold_left (dist_dist syntax) Mid.empty dis in
-      Trans.return dis2))
-
-let print_task args fmt task =
+let print_task args ?old:_ fmt task =
+  (* In trans-based p-printing [forget_all] is a no-no *)
+  (* forget_all ident_printer; *)
   print_prelude fmt args.prelude;
-  print_th_prelude task fmt args.prelude_map;
-  let info = {
-    info_syn = Mid.union (fun _ _ s -> Some s)
-      (get_syntax_map task) (Trans.apply distingued task);
-    complex_type = Hty.create 5;
-  }
-  in
-  let decls = Task.task_decls task in
-  ignore (print_list_opt (add_flush newline2) (print_decl info) fmt decls)
+  print_th_prelude task fmt args.th_prelude;
+  let rec print = function
+    | x :: r -> print r; Pp.string fmt x
+    | [] -> () in
+  print (snd (Trans.apply print_decls task));
+  pp_print_flush fmt ()
 
-let () = register_printer "cvc3"
-  (fun args ?old:_ fmt task ->
-     forget_all ident_printer;
-     print_task args fmt task)
+let () = register_printer "cvc3" print_task
   ~desc:"Printer@ for@ the@ CVC3@ theorem@ prover."
