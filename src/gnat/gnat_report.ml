@@ -126,6 +126,16 @@ let print_json_entity fmt e =
   Format.fprintf fmt "{\"name\":\"%s\",\"file\":\"%s\",\"line\":%d}"
   e.Gnat_expl.subp_name file line
 
+let json_escape_msg =
+  let b = Buffer.create 150 in
+  fun s ->
+    Buffer.reset b;
+    for i = 0 to String.length s - 1 do
+      if s.[i] = '"' then Buffer.add_char b '\\';
+      Buffer.add_char b s.[i];
+    done;
+    Buffer.contents b
+
 let print_json_msg fmt m =
   let e = m.expl in
   (* ??? what about more complex slocs *)
@@ -133,6 +143,7 @@ let print_json_msg fmt m =
   let file, line, col = Gnat_loc.explode loc in
   let ent = Gnat_expl.get_subp_entity e in
   let msg = Pp.sprintf "%a" print_msg m in
+  let msg = json_escape_msg msg in
   let severity = if m.result then "info" else "error" in
   let rule = Gnat_expl.tag_of_reason (Gnat_expl.get_reason e) in
   (* ??? Trace file *)
