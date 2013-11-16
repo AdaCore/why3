@@ -133,13 +133,29 @@ let (why_lang, any_lang) =
     | Some _ as l -> l in
   (why_lang, any_lang)
 
+
+
+(* Borrowed from Frama-C src/gui/source_manager.ml: 
+Try to convert a source file either as UTF-8 or as locale. *)
+let try_convert s =
+  try
+    if Glib.Utf8.validate s then s else Glib.Convert.locale_to_utf8 s
+  with Glib.Convert.Error _ ->
+    try
+      Glib.Convert.convert_with_fallback
+        ~fallback:"#neither UTF-8 nor locale nor ISO-8859-15#"
+        ~to_codeset:"UTF-8"
+        ~from_codeset:"ISO_8859-15"
+        s
+    with Glib.Convert.Error _ as e -> Printexc.to_string e
+
 let source_text fname =
   let ic = open_in fname in
   let size = in_channel_length ic in
   let buf = String.create size in
   really_input ic buf 0 size;
   close_in ic;
-  buf
+  try_convert buf
 
 (********************************)
 (* loading WhyIDE configuration *)
