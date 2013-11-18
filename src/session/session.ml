@@ -2103,7 +2103,7 @@ let rec recompute_all_shapes_goal ~release g =
   g.goal_checksum <- Termcode.task_checksum t;
   if release then release_task g;
   iter_goal
-    (fun pa -> ())
+    (fun _pa -> ())
     (iter_transf (recompute_all_shapes_goal ~release))
     (iter_metas  (recompute_all_shapes_goal ~release))
     g

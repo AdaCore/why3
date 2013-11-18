@@ -17,7 +17,6 @@ open Ident
 open Ty
 open Term
 open Decl
-open Theory
 open Printer
 
 (** SMTLIB tokens taken from CVC4: src/parser/smt2/Smt2.g *)

@@ -150,12 +150,15 @@ let try_convert s =
     with Glib.Convert.Error _ as e -> Printexc.to_string e
 
 let source_text fname =
-  let ic = open_in fname in
-  let size = in_channel_length ic in
-  let buf = String.create size in
-  really_input ic buf 0 size;
-  close_in ic;
-  try_convert buf
+  try
+    let ic = open_in fname in
+    let size = in_channel_length ic in
+    let buf = String.create size in
+    really_input ic buf 0 size;
+    close_in ic;
+    try_convert buf
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    "Error while opening or reading file '" ^ fname ^ "':\n" ^ (Printexc.to_string e)
 
 (********************************)
 (* loading WhyIDE configuration *)
