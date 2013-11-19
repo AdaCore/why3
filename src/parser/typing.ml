@@ -191,38 +191,41 @@ let chainable_op uc op =
 
 type global_vs = Ptree.qualid -> vsymbol option
 
-let rec dterm uc (gvars: global_vs) denv {pp_desc = desc; pp_loc = loc} =
-  let pterm denv pp = dterm uc gvars denv pp in
-  let highord_app e1 e2 =
-    DTapp (fs_func_app, [Dterm.dterm ~loc e1; pterm denv e2]) in
-  let highord_app e1 el = List.fold_left highord_app e1 el in
-  let qualid_app q el = match gvars q with
+let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
+  let func_app loc e el =
+    let app (loc, e) e1 = Loc.join loc e1.pp_loc,
+      DTfapp (Dterm.dterm ~loc e, dterm uc gvars denv e1) in
+    snd (List.fold_left app (loc, e) el)
+  in
+  let rec take loc al l el = match l, el with
+    | (_::l), (e::el) ->
+        take (Loc.join loc e.pp_loc) (dterm uc gvars denv e :: al) l el
+    | _, _ -> loc, List.rev al, el
+  in
+  let qualid_app loc q el = match gvars q with
     | Some vs ->
-        highord_app (DTgvar vs) el
+        func_app loc (DTgvar vs) el
     | None ->
         let ls = find_lsymbol uc q in
-        let rec take al l el = match l, el with
-          | (_::l), (e::el) -> take (pterm denv e :: al) l el
-          | _, _ -> List.rev al, el in
-        let al, el = take [] ls.ls_args el in
-        highord_app (DTapp (ls,al)) el
+        let loc, al, el = take loc [] ls.ls_args el in
+        func_app loc (DTapp (ls,al)) el
   in
-  let qualid_app q el = match q with
+  let qualid_app loc q el = match q with
     | Qident {id = n} ->
         (match denv_get_opt denv n with
-        | Some dt -> highord_app dt el
-        | None -> qualid_app q el)
-    | _ -> qualid_app q el
+        | Some d -> func_app loc d el
+        | None -> qualid_app loc q el)
+    | _ -> qualid_app loc q el
   in
   Dterm.dterm ~loc (match desc with
-  | PPvar x ->
-      qualid_app x []
-  | PPapp (x, tl) ->
-      qualid_app x tl
+  | PPvar q ->
+      qualid_app loc q []
+  | PPapp (q, tl) ->
+      qualid_app (qloc q) q tl
   | PPhoapp (e1, e2) ->
-      DTapp (fs_func_app, [pterm denv e1; pterm denv e2])
+      DTfapp (dterm uc gvars denv e1, dterm uc gvars denv e2)
   | PPtuple tl ->
-      let tl = List.map (pterm denv) tl in
+      let tl = List.map (dterm uc gvars denv) tl in
       DTapp (fs_tuple (List.length tl), tl)
   | PPinfix (e12, op2, e3)
   | PPinnfix (e12, op2, e3) ->
@@ -243,41 +246,41 @@ let rec dterm uc (gvars: global_vs) denv {pp_desc = desc; pp_loc = loc} =
         | [] -> assert false in
       let rec get_chain e12 acc = match e12.pp_desc with
         | PPinfix (e1, op1, e2) when chainable_op uc op1 ->
-            get_chain e1 ((op1, pterm denv e2) :: acc)
+            get_chain e1 ((op1, dterm uc gvars denv e2) :: acc)
         | _ -> e12, acc in
-      let ch = [op2, pterm denv e3] in
+      let ch = [op2, dterm uc gvars denv e3] in
       let e1, ch = if chainable_op uc op2
         then get_chain e12 ch else e12, ch in
-      make_chain (pterm denv e1) ch
+      make_chain (dterm uc gvars denv e1) ch
   | PPconst c ->
       DTconst c
   | PPlet (x, e1, e2) ->
       let id = create_user_id x in
-      let e1 = pterm denv e1 in
+      let e1 = dterm uc gvars denv e1 in
       let denv = denv_add_let denv e1 id in
-      let e2 = pterm denv e2 in
+      let e2 = dterm uc gvars denv e2 in
       DTlet (e1, id, e2)
   | PPmatch (e1, bl) ->
-      let e1 = pterm denv e1 in
+      let e1 = dterm uc gvars denv e1 in
       let branch (p, e) =
         let p = dpattern uc p in
         let denv = denv_add_pat denv p in
-        p, pterm denv e in
+        p, dterm uc gvars denv e in
       DTcase (e1, List.map branch bl)
   | PPif (e1, e2, e3) ->
-      let e1 = pterm denv e1 in
-      let e2 = pterm denv e2 in
-      let e3 = pterm denv e3 in
+      let e1 = dterm uc gvars denv e1 in
+      let e2 = dterm uc gvars denv e2 in
+      let e3 = dterm uc gvars denv e3 in
       DTif (e1, e2, e3)
   | PPtrue ->
       DTtrue
   | PPfalse ->
       DTfalse
   | PPunop (PPnot, e1) ->
-      DTnot (pterm denv e1)
+      DTnot (dterm uc gvars denv e1)
   | PPbinop (e1, op, e2) ->
-      let e1 = pterm denv e1 in
-      let e2 = pterm denv e2 in
+      let e1 = dterm uc gvars denv e1 in
+      let e2 = dterm uc gvars denv e2 in
       let op = match op with
         | PPand -> Tand
         | PPor -> Tor
@@ -287,8 +290,9 @@ let rec dterm uc (gvars: global_vs) denv {pp_desc = desc; pp_loc = loc} =
   | PPquant (q, uqu, trl, e1) ->
       let qvl = List.map (quant_var uc) uqu in
       let denv = denv_add_quant denv qvl in
-      let trl = List.map (List.map (pterm denv)) trl in
-      let e1 = pterm denv e1 in
+      let dterm e = dterm uc gvars denv e in
+      let trl = List.map (List.map dterm) trl in
+      let e1 = dterm e1 in
       begin match q with
         | PPforall -> DTquant (Tforall, qvl, trl, e1)
         | PPexists -> DTquant (Texists, qvl, trl, e1)
@@ -304,23 +308,23 @@ let rec dterm uc (gvars: global_vs) denv {pp_desc = desc; pp_loc = loc} =
       end
   | PPrecord fl ->
       let get_val cs pj = function
-        | Some e -> pterm denv e
+        | Some e -> dterm uc gvars denv e
         | None -> Loc.error ~loc (RecordFieldMissing (cs,pj)) in
       let cs, fl = parse_record ~loc uc get_val fl in
       DTapp (cs, fl)
   | PPupdate (e1, fl) ->
-      let e1 = pterm denv e1 in
+      let e1 = dterm uc gvars denv e1 in
       let get_val _ pj = function
-        | Some e -> pterm denv e
+        | Some e -> dterm uc gvars denv e
         | None -> Dterm.dterm ~loc (DTapp (pj,[e1])) in
       let cs, fl = parse_record ~loc uc get_val fl in
       DTapp (cs, fl)
   | PPnamed (Lpos uloc, e1) ->
-      DTuloc (pterm denv e1, uloc)
+      DTuloc (dterm uc gvars denv e1, uloc)
   | PPnamed (Lstr lab, e1) ->
-      DTlabel (pterm denv e1, Slab.singleton lab)
+      DTlabel (dterm uc gvars denv e1, Slab.singleton lab)
   | PPcast (e1, ty) ->
-      DTcast (pterm denv e1, ty_of_pty uc ty))
+      DTcast (dterm uc gvars denv e1, ty_of_pty uc ty))
 
 (** Export for program parsing *)
 

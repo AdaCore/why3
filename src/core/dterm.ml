@@ -161,6 +161,7 @@ and dterm_node =
   | DTgvar of vsymbol
   | DTconst of Number.constant
   | DTapp of lsymbol * dterm list
+  | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm
   | DTlet of dterm * preid * dterm
   | DTcase of dterm * (dpattern * dterm) list
@@ -279,6 +280,11 @@ let dterm ?loc node =
     | DTapp (ls,dtl) ->
         let dtyl, dty = specialize_ls ls in
         dty_unify_app ls dterm_expected_type dtl dtyl;
+        dty
+    | DTfapp (dt1,dt2) ->
+        let dtyl, dty = specialize_ls fs_func_app in
+        (* TODO: better error messages based on dt1 *)
+        dty_unify_app fs_func_app dterm_expected_type [dt1;dt2] dtyl;
         dty
     | DTif (df,dt1,dt2) ->
         dfmla_expected_type df;
@@ -436,6 +442,8 @@ and try_term strict keep_loc uloc env prop dty node =
   | DTapp (ls,dtl) ->
       t_app ls (List.map (get env false) dtl)
         (Opt.map (term_ty_of_dty ~strict) dty)
+  | DTfapp (dt1,dt2) ->
+      t_func_app (get env false dt1) (get env false dt2)
   | DTlet (dt,id,df) ->
       let prop = prop || dty = None in
       let t = get env false dt in

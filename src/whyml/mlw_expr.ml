@@ -585,7 +585,8 @@ let rec e_app_flatten e pv = match e.e_node with
    will be rejected, since local_get_ref is instantiated to
    the region introduced (reset) by create_ref. Is it bad? *)
 
-let e_app = List.fold_left (fun e -> on_value (e_app_flatten e))
+let e_app e1 e2 = on_value (fun pv -> e_app_flatten e1 pv) e2
+let e_app e1 el = List.fold_left e_app e1 el
 
 let e_plapp pls el ity =
   if pls.pl_hidden then raise (HiddenPLS pls);

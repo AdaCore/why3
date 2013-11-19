@@ -102,7 +102,7 @@ and dexpr_node =
   | DEgpsym of psymbol
   | DEplapp of plsymbol * dexpr list
   | DElsapp of lsymbol * dexpr list
-  | DEapply of dexpr * dexpr list
+  | DEapply of dexpr * dexpr
   | DEconst of Number.constant
   | DEval of dval_decl * dexpr
   | DElet of dlet_defn * dexpr

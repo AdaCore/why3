@@ -49,6 +49,7 @@ and dterm_node =
   | DTgvar of vsymbol
   | DTconst of Number.constant
   | DTapp of lsymbol * dterm list
+  | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm
   | DTlet of dterm * preid * dterm
   | DTcase of dterm * (dpattern * dterm) list

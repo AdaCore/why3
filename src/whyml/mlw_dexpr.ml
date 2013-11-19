@@ -386,7 +386,7 @@ and dexpr_node =
   | DEgpsym of psymbol
   | DEplapp of plsymbol * dexpr list
   | DElsapp of lsymbol * dexpr list
-  | DEapply of dexpr * dexpr list
+  | DEapply of dexpr * dexpr
   | DEconst of Number.constant
   | DEval of dval_decl * dexpr
   | DElet of dlet_defn * dexpr
@@ -623,16 +623,13 @@ let dexpr ?loc node =
         let argl, res = specialize_ls ls in
         dity_unify_app ls dexpr_expected_type del argl;
         [], res
-    | DEapply (de,del) ->
-        let argl, res = de.de_dvty in
-        let rec down del al = match del, al with
-          | de::del, dity::al -> dexpr_expected_type de dity; down del al
-          | [], _ -> al
-          | _ when argl = [] -> Loc.errorm
-              "This expression is not a function and cannot be applied"
-          | _ -> Loc.errorm
-              "This function is applied to too many arguments" in
-        down del argl, res
+    | DEapply ({de_dvty = (dity::argl, res)}, de2) ->
+        dexpr_expected_type de2 dity;
+        argl, res
+    | DEapply (de1, de2) -> (* TODO: better error messages *)
+        let argl, res = specialize_ls fs_func_app in
+        dity_unify_app fs_func_app dexpr_expected_type [de1;de2] argl;
+        [], res
     | DEconst (Number.ConstInt _) ->
         [], dity_int
     | DEconst (Number.ConstReal _) ->
@@ -1113,18 +1110,14 @@ and try_expr keep_loc uloc env (argl,res) node =
       e_plapp pl (List.map2 get_gh pl.pl_args del) (ity_of_dity res)
   | DElsapp (ls,del) ->
       e_lapp ls (List.map (get env) del) (ity_of_dity res)
-  | DEapply (de,del) ->
-      let rec ghostify_args del = function
-        | VTvalue _ -> assert (del = []); []
-        | VTarrow a ->
-            let rec args del al = match del, al with
-              | de::del, {pv_ghost = gh}::al ->
-                  e_ghostify gh (get env de) :: args del al
-              | [], _ -> []
-              | _, [] -> ghostify_args del a.aty_result in
-            args del a.aty_args in
-      let e = get env de in
-      e_app e (ghostify_args del e.e_vty)
+  | DEapply ({de_dvty = (_::_, _)} as de1,de2) ->
+      let e1 = get env de1 in
+      let gh = match e1.e_vty with
+        | VTarrow {aty_args = pv::_} -> pv.pv_ghost
+        | _ -> assert false in
+      e_app e1 [e_ghostify gh (get env de2)]
+  | DEapply (de1,de2) ->
+      e_lapp fs_func_app [get env de1; get env de2] (ity_of_dity res)
   | DEconst c ->
       e_const c
   | DEval (vald,de) ->
