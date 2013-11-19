@@ -106,7 +106,7 @@ and dexpr_node =
   | DEconst of Number.constant
   | DElet of dlet_defn * dexpr
   | DEfun of dfun_defn * dexpr
-  | DErec of dfun_defn list * dexpr
+  | DErec of drec_defn * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
   | DEassign of plsymbol * dexpr * dexpr
@@ -132,6 +132,8 @@ and dlet_defn = preid * ghost * dexpr
 
 and dfun_defn = preid * ghost * dbinder list * dexpr * dspec later
 
+and drec_defn = private { fds : dfun_defn list }
+
 type dval_decl = preid * ghost * dtype_v
 
 (** Environment *)
@@ -145,20 +147,6 @@ val denv_add_var : denv -> preid -> dity -> denv
 val denv_add_let : denv -> dlet_defn -> denv
 
 val denv_add_fun : denv -> dfun_defn -> denv
-
-val denv_prepare_rec : denv -> (preid * dbinder list * dity) list -> denv
-  (* [denv_prepare_rec] adds to the environment the user-supplied
-     types of every function in a (mutually) recursive definition.
-     Functions with fully specified prototypes are generalized in
-     the recursive block (polymorphic recursion), except for the
-     type variables that appear in the upper context. *)
-
-val denv_verify_rec : denv -> preid -> unit
-  (* after a (mutually) recursive definition has been typechecked,
-     [denv_verify_rec] should be called for every function on the
-     [denv] before [denv_prepare_rec]. This function verifies that
-     the resulting functions are not less polymorphic than expected
-     according the user-supplied type annotations. *)
 
 val denv_add_args : denv -> dbinder list -> denv
 
@@ -174,6 +162,11 @@ val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 
 val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
 
+type pre_fun_defn =
+  preid * ghost * dbinder list * dity * (denv -> dexpr * dspec later)
+
+val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
+
 (** Final stage *)
 
 val expr : keep_loc:bool ->
@@ -186,7 +179,7 @@ val fun_defn : keep_loc:bool ->
   Decl.known_map -> Mlw_decl.known_map -> dfun_defn -> fun_defn
 
 val rec_defn : keep_loc:bool ->
-  Decl.known_map -> Mlw_decl.known_map -> dfun_defn list -> fun_defn list
+  Decl.known_map -> Mlw_decl.known_map -> drec_defn -> fun_defn list
 
 val val_decl : keep_loc:bool ->
   Decl.known_map -> Mlw_decl.known_map -> dval_decl -> let_sym

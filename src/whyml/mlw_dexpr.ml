@@ -248,7 +248,7 @@ let specialize_scheme tvs (argl,res) =
   and get_tv tv dity = try Htv.find htv tv with Not_found ->
     let v = dity_fresh () in
     (* can't return dity, might differ in regions *)
-    if Stv.mem tv tvs then dity_unify_weak v dity;
+    if not (Stv.mem tv tvs) then dity_unify_weak v dity;
     Htv.add htv tv v;
     v
   and get_reg tv dity = try Htv.find hreg tv with Not_found ->
@@ -390,7 +390,7 @@ and dexpr_node =
   | DEconst of Number.constant
   | DElet of dlet_defn * dexpr
   | DEfun of dfun_defn * dexpr
-  | DErec of dfun_defn list * dexpr
+  | DErec of drec_defn * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
   | DEassign of plsymbol * dexpr * dexpr
@@ -415,6 +415,8 @@ and dexpr_node =
 and dlet_defn = preid * ghost * dexpr
 
 and dfun_defn = preid * ghost * dbinder list * dexpr * dspec later
+
+and drec_defn = { fds : dfun_defn list }
 
 type dval_decl = preid * ghost * dtype_v
 
@@ -489,30 +491,9 @@ let denv_add_let denv (id,_,{de_dvty = dvty}) =
   denv_add_mono denv id dvty
 
 let denv_add_fun denv (id,_,bl,{de_dvty = (argl,res)},_) =
+  if bl = [] then invalid_arg "Mlw_dexpr.denv_add_fun: empty argument list";
   let argl = List.fold_right (fun (_,_,_,t) l -> t::l) bl argl in
   denv_add_poly denv id (argl, res)
-
-exception DupId of preid
-
-let denv_prepare_rec denv0 l =
-  let add s (id,_,_) =
-    Sstr.add_new (DupId id) id.pre_name s in
-  let _ = try List.fold_left add Sstr.empty l
-    with DupId id -> Loc.errorm ?loc:id.pre_loc
-      "duplicate function name %s" id.pre_name in
-  let add denv (id,bl,res) =
-    let argl = List.map (fun (_,_,_,t) -> t) bl in
-    denv_add_rec denv denv0.frozen id (argl,res) in
-  List.fold_left add denv0 l
-
-let denv_verify_rec { frozen = frozen; locals = locals } id =
-  let check tv = if is_frozen frozen tv then Loc.errorm ?loc:id.pre_loc
-    "This function is expected to be polymorphic in type variable %a"
-    Pretty.print_tv tv in
-  match Mstr.find_opt id.pre_name locals with
-    | Some (Some tvs, _) -> Stv.iter check tvs
-    | Some (None, _) -> assert false
-    | None -> assert false
 
 let denv_add_args { frozen = frozen; locals = locals } bl =
   let l = List.fold_left (fun l (_,_,_,t) -> t::l) frozen bl in
@@ -560,6 +541,39 @@ let dexpr_expected_type_weak {de_dvty = (al,res); de_loc = loc} dity =
   try dity_unify_weak res dity with Exit -> Loc.errorm ?loc
     "This expression has type %a,@ but is expected to have type %a"
     print_dity res print_dity dity
+
+(** Generation of letrec blocks *)
+
+type pre_fun_defn =
+  preid * ghost * dbinder list * dity * (denv -> dexpr * dspec later)
+
+exception DupId of preid
+
+let drec_defn denv0 prel =
+  if prel = [] then invalid_arg "Mlw_dexpr.drec_defn: empty function list";
+  let add s (id,_,_,_,_) = Sstr.add_new (DupId id) id.pre_name s in
+  let _ = try List.fold_left add Sstr.empty prel with DupId id ->
+    Loc.errorm ?loc:id.pre_loc "duplicate function name %s" id.pre_name in
+  let add denv (id,_,bl,res,_) =
+    if bl = [] then invalid_arg "Mlw_dexpr.drec_defn: empty argument list";
+    let argl = List.map (fun (_,_,_,t) -> t) bl in
+    denv_add_rec denv denv0.frozen id (argl,res) in
+  let denv1 = List.fold_left add denv0 prel in
+  let parse (id,gh,bl,res,pre) =
+    let de, dsp = pre (denv_add_args denv1 bl) in
+    dexpr_expected_type_weak de res;
+    (id,gh,bl,de,dsp) in
+  let fdl = List.map parse prel in
+  let add denv ((id,_,_,_,_) as fd) =
+    let check tv = if is_frozen denv0.frozen tv then Loc.errorm ?loc:id.pre_loc
+      "This function is expected to be polymorphic in type variable %a"
+      Pretty.print_tv tv in
+    begin match Mstr.find_opt id.pre_name denv1.locals with
+    | Some (Some tvs, _) -> Stv.iter check tvs
+    | Some (None, _) | None -> assert false
+    end;
+    denv_add_fun denv fd in
+  List.fold_left add denv0 fdl, { fds = fdl }
 
 (** Constructors *)
 
@@ -632,6 +646,8 @@ let dexpr ?loc node =
         [], dity_int
     | DEconst (Number.ConstReal _) ->
         [], dity_real
+    | DEfun ((_,_,[],_,_),_) ->
+        invalid_arg "Mlw_dexpr.dexpr: empty argument list in DEfun"
     | DElet (_,de)
     | DEfun (_,de)
     | DErec (_,de) ->
@@ -642,6 +658,8 @@ let dexpr ?loc node =
         dexpr_expected_type de2 res;
         dexpr_expected_type de3 res;
         de2.de_dvty
+    | DEcase (_,[]) ->
+        invalid_arg "Mlw_dexpr.dexpr: empty branch list in DEcase"
     | DEcase (de,bl) ->
         let ety = dity_fresh () in
         let res = dity_fresh () in
@@ -669,6 +687,8 @@ let dexpr ?loc node =
     | DEraise (xs,de) ->
         dexpr_expected_type de (specialize_xs xs);
         [], dity_fresh ()
+    | DEtry (_,[]) ->
+        invalid_arg "Mlw_dexpr.dexpr: empty branch list in DEtry"
     | DEtry (de,bl) ->
         let res = dity_fresh () in
         dexpr_expected_type de res;
@@ -1225,6 +1245,7 @@ and try_expr keep_loc uloc env (argl,res) node =
       e_ghost (get env de)
   | DEany dtyc ->
       let spec, result = comp_decl env dtyc in
+      (* no invariants on arbitrary computations *)
       e_any spec result
   | DEfun (fd,de) ->
       let fd = expr_fun ~keep_loc uloc env fd in
@@ -1237,7 +1258,7 @@ and try_expr keep_loc uloc env (argl,res) node =
   | DEcast _ | DEuloc _ | DElabel _ ->
       assert false (* already stripped *)
 
-and expr_rec ~keep_loc uloc env dfdl =
+and expr_rec ~keep_loc uloc env {fds = dfdl} =
   let step1 env (id, gh, bl, de, dsp) =
     let pvl = binders bl in
     if fst de.de_dvty <> [] then Loc.errorm ?loc:de.de_loc
