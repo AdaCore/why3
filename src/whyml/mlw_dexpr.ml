@@ -388,6 +388,7 @@ and dexpr_node =
   | DElsapp of lsymbol * dexpr list
   | DEapply of dexpr * dexpr
   | DEconst of Number.constant
+  | DElam of dbinder list * dexpr * dspec later
   | DElet of dlet_defn * dexpr
   | DEfun of dfun_defn * dexpr
   | DErec of drec_defn * dexpr
@@ -652,6 +653,10 @@ let dexpr ?loc node =
     | DEfun (_,de)
     | DErec (_,de) ->
         de.de_dvty
+    | DElam ([],_,_) ->
+        invalid_arg "Mlw_dexpr.dexpr: empty argument list in DElam"
+    | DElam (bl,{de_dvty = (argl,res)},_) ->
+        List.fold_right (fun (_,_,_,t) l -> t::l) bl argl, res
     | DEif (de1,de2,de3) ->
         let res = dity_fresh () in
         dexpr_expected_type de1 dity_bool;
@@ -1092,15 +1097,15 @@ let rec strip uloc labs de = match de.de_node with
 
 let rec expr ~keep_loc uloc env ({de_loc = loc} as de) =
   let uloc, labs, de = strip uloc Slab.empty de in
-  let e = Loc.try5 ?loc try_expr keep_loc uloc env de.de_dvty de.de_node in
+  let e = Loc.try4 ?loc try_expr keep_loc uloc env de in
   let loc = if keep_loc then loc else None in
   let loc = if uloc <> None then uloc else loc in
   if loc = None && Slab.is_empty labs then e else
   e_label ?loc labs e
 
-and try_expr keep_loc uloc env (argl,res) node =
+and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
   let get env de = expr ~keep_loc uloc env de in
-  match node with
+  match de0.de_node with
   | DEvar (n,_) when argl = [] ->
       e_value (Mstr.find_exn (Dterm.UnboundVar n) n env.pvm)
   | DEvar (n,_) ->
@@ -1255,9 +1260,14 @@ and try_expr keep_loc uloc env (argl,res) node =
       (* no invariants on arbitrary computations *)
       e_any spec result
   | DEfun (fd,de) ->
-      let fd = expr_fun ~keep_loc uloc env fd in
+      let fd = expr_fun ~keep_loc ~strict:true uloc env fd in
       let e = get (add_fundef env fd) de in
       e_rec [fd] e
+  | DElam (bl,de,sp) ->
+      let fd = id_fresh "fn", false, bl, de, sp in
+      let fd = expr_fun ~keep_loc ~strict:false uloc env fd in
+      let de = { de0 with de_node = DEgpsym fd.fun_ps } in
+      e_rec [fd] (get env de)
   | DErec (fdl,de) ->
       let fdl = expr_rec ~keep_loc uloc env fdl in
       let e = get (add_fundefs env fdl) de in
@@ -1275,7 +1285,8 @@ and expr_rec ~keep_loc uloc env {fds = dfdl} =
     add_psymbol env ps, (ps, gh, bl, pvl, de, dsp) in
   let env, fdl = Lists.map_fold_left step1 env dfdl in
   let step2 (ps, gh, bl, pvl, de, dsp) (fdl, dfdl) =
-    let lam, dsp = expr_lam ~keep_loc uloc env gh pvl de dsp in
+    let lam, dsp =
+      expr_lam ~keep_loc ~strict:true uloc env gh pvl de dsp in
     (ps, lam) :: fdl, (ps.ps_name, gh, bl, de, dsp) :: dfdl in
   (* check for unexpected aliases in case of trouble *)
   let fdl, dfdl = try List.fold_right step2 fdl ([],[]) with
@@ -1304,8 +1315,9 @@ and expr_rec ~keep_loc uloc env {fds = dfdl} =
   List.iter2 step4 fdl dfdl;
   fdl
 
-and expr_fun ~keep_loc uloc env (id,gh,bl,de,dsp) =
-  let lam, dsp = expr_lam ~keep_loc uloc env gh (binders bl) de dsp in
+and expr_fun ~keep_loc ~strict uloc env (id,gh,bl,de,dsp) =
+  let lam, dsp =
+    expr_lam ~keep_loc ~strict uloc env gh (binders bl) de dsp in
   if lam.l_spec.c_variant <> [] then Loc.errorm ?loc:id.pre_loc
     "variants are not allowed in a non-recursive definition";
   let lam = (* TODO: the following cannot work in letrec *)
@@ -1328,10 +1340,10 @@ and expr_fun ~keep_loc uloc env (id,gh,bl,de,dsp) =
   Loc.try2 ?loc:id.pre_loc check_user_ps false fd.fun_ps;
   fd
 
-and expr_lam ~keep_loc uloc env gh pvl de dsp =
+and expr_lam ~keep_loc ~strict uloc env gh pvl de dsp =
   let env = add_binders env pvl in
   let e = e_ghostify gh (expr ~keep_loc uloc env de) in
-  if not gh && e.e_ghost then (* TODO: localize better *)
+  if strict && not gh && e.e_ghost then (* TODO: localize better *)
     Loc.errorm ?loc:de.de_loc "ghost body in a non-ghost function";
   let tyv = ty_of_vty e.e_vty in
   let dsp = dsp env.vsm tyv in
@@ -1352,7 +1364,7 @@ let let_defn ~keep_loc lkn kn (id,gh,de) =
 
 let fun_defn ~keep_loc lkn kn dfd =
   reunify_regions ();
-  expr_fun ~keep_loc None (env_empty lkn kn) dfd
+  expr_fun ~keep_loc ~strict:true None (env_empty lkn kn) dfd
 
 let rec_defn ~keep_loc lkn kn dfdl =
   reunify_regions ();
