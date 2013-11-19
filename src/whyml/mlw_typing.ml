@@ -419,7 +419,7 @@ let mk_dpost loc = function
   | l ->
       let i = { id = "(null)"; id_loc = loc; id_lab = [] } in
       let p = { pat_desc = Ptree.PPpvar i; pat_loc = loc } in
-      let v = { pp_desc = Ptree.PPvar (Qident i); pp_loc = loc } in
+      let v = { pp_desc = Ptree.PPident (Qident i); pp_loc = loc } in
       p, { pp_desc = PPmatch (v,l); pp_loc = loc }
 
 let dpost ql = List.map (fun (loc, ql) -> mk_dpost loc ql) ql
@@ -639,9 +639,9 @@ and de_desc denv loc = function
       expected_type e0 res;
       expected_type ~weak:true e2 res;
       DEassign (pl, e1, e2), ([], dity_unit)
-  | Ptree.Econstant (Number.ConstInt _ as c) ->
+  | Ptree.Econst (Number.ConstInt _ as c) ->
       DEconstant c, ([], dity_int)
-  | Ptree.Econstant (Number.ConstReal _ as c) ->
+  | Ptree.Econst (Number.ConstReal _ as c) ->
       DEconstant c, ([], dity_real)
   | Ptree.Enot e1 ->
       let e1 = dexpr denv e1 in
@@ -926,10 +926,10 @@ let get_eff_pv lenv p = match p with
 
 (* TODO: devise a good grammar for effect expressions *)
 let rec get_eff_expr lenv { pp_desc = d; pp_loc = loc } = match d with
-  | Ptree.PPvar p ->
+  | Ptree.PPident p ->
       let pv = get_eff_pv lenv p in
       pv.pv_vs, fd_of_pv pv
-  | Ptree.PPapp (p, [le]) ->
+  | Ptree.PPidapp (p, [le]) ->
       let vs, fda = get_eff_expr lenv le in
       let quit () = errorm ~loc:le.pp_loc "This expression is not a record" in
       let pjm = match fda.fd_ity.ity_node with

@@ -70,12 +70,12 @@ type lexpr =
   { pp_loc : loc; pp_desc : pp_desc }
 
 and pp_desc =
-  | PPvar of qualid
-  | PPapp of qualid * lexpr list
-  | PPhoapp of lexpr * lexpr
   | PPtrue
   | PPfalse
   | PPconst of constant
+  | PPident of qualid
+  | PPidapp of qualid * lexpr list
+  | PPapply of lexpr * lexpr
   | PPinfix of lexpr * ident * lexpr
   | PPinnfix of lexpr * ident * lexpr
   | PPbinop of lexpr * pp_binop * lexpr
@@ -212,8 +212,8 @@ type expr = {
 }
 
 and expr_desc =
+  | Econst of constant
   (* lambda-calculus *)
-  | Econstant of constant
   | Eident of qualid
   | Eapply of expr * expr
   | Einfix of expr * ident * expr

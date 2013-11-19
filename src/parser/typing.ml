@@ -218,11 +218,11 @@ let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
     | _ -> qualid_app loc q el
   in
   Dterm.dterm ~loc (match desc with
-  | PPvar q ->
+  | PPident q ->
       qualid_app loc q []
-  | PPapp (q, tl) ->
+  | PPidapp (q, tl) ->
       qualid_app (qloc q) q tl
-  | PPhoapp (e1, e2) ->
+  | PPapply (e1, e2) ->
       DTfapp (dterm uc gvars denv e1, dterm uc gvars denv e2)
   | PPtuple tl ->
       let tl = List.map (dterm uc gvars denv) tl in

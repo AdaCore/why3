@@ -60,11 +60,11 @@ end
 
   let rec mk_l_apply f a =
     let loc = Loc.join f.pp_loc a.pp_loc in
-    { pp_loc = loc; pp_desc = PPhoapp (f,a) }
+    { pp_loc = loc; pp_desc = PPapply (f,a) }
 
   let mk_l_prefix op e1 =
     let id = mk_id (prefix op) (floc_i 1) in
-    mk_pp (PPapp (Qident id, [e1]))
+    mk_pp (PPidapp (Qident id, [e1]))
 
   let mk_l_infix e1 op e2 =
     let id = mk_id (infix op) (floc_i 2) in
@@ -72,11 +72,11 @@ end
 
   let mk_l_mixfix2 op e1 e2 =
     let id = mk_id (mixfix op) (floc_i 2) in
-    mk_pp (PPapp (Qident id, [e1;e2]))
+    mk_pp (PPidapp (Qident id, [e1;e2]))
 
   let mk_l_mixfix3 op e1 e2 e3 =
     let id = mk_id (mixfix op) (floc_i 2) in
-    mk_pp (PPapp (Qident id, [e1;e2;e3]))
+    mk_pp (PPidapp (Qident id, [e1;e2;e3]))
 
   let () = Exn_printer.register
     (fun fmt exn -> match exn with
@@ -623,7 +623,7 @@ lexpr:
 | prefix_op lexpr %prec prec_prefix_op
    { mk_l_prefix $1 $2 }
 | qualid list1_lexpr_arg
-   { mk_pp (PPapp ($1, $2)) }
+   { mk_pp (PPidapp ($1, $2)) }
 | lexpr_arg_noid list1_lexpr_arg
    { List.fold_left mk_l_apply $1 $2 }
 | IF lexpr THEN lexpr ELSE lexpr
@@ -671,7 +671,7 @@ constant:
 ;
 
 lexpr_arg:
-| qualid            { mk_pp (PPvar $1) }
+| qualid            { mk_pp (PPident $1) }
 | lexpr_arg_noid    { $1 }
 ;
 
@@ -681,18 +681,18 @@ lexpr_arg_noid:
 | FALSE             { mk_pp PPfalse }
 | OPPREF lexpr_arg  { mk_l_prefix $1 $2 }
 | lexpr_sub         { $1 }
-| quote_uident      { mk_pp (PPvar (Qident $1)) }
+| quote_uident      { mk_pp (PPident (Qident $1)) }
 ;
 
 lexpr_dot:
-| lqualid_copy      { mk_pp (PPvar $1) }
+| lqualid_copy      { mk_pp (PPident $1) }
 | OPPREF lexpr_dot  { mk_l_prefix $1 $2 }
 | lexpr_sub         { $1 }
 ;
 
 lexpr_sub:
 | lexpr_dot DOT lqualid_rich
-   { mk_pp (PPapp ($3, [$1])) }
+   { mk_pp (PPidapp ($3, [$1])) }
 | LEFTPAR lexpr RIGHTPAR
    { $2 }
 | LEFTPAR RIGHTPAR
@@ -1282,8 +1282,8 @@ expr:
 ;
 
 expr_arg:
-| constant        { mk_expr (Econstant $1) }
 | qualid          { mk_expr (Eident $1) }
+| constant        { mk_expr (Econst $1) }
 | OPPREF expr_arg { mk_prefix $1 $2 }
 | expr_sub        { $1 }
 ;
@@ -1296,7 +1296,7 @@ expr_dot:
 
 expr_sub:
 | expr_dot DOT lqualid_rich
-   { mk_expr (mk_apply (mk_expr_i 3 (Eident $3)) [$1]) }
+    { mk_expr (mk_apply (mk_expr_i 3 (Eident $3)) [$1]) }
 | LEFTPAR expr RIGHTPAR
     { $2 }
 | BEGIN expr END
@@ -1304,11 +1304,11 @@ expr_sub:
 | LEFTPAR RIGHTPAR
     { mk_expr (Etuple []) }
 | LEFTPAR expr COMMA list1_expr_sep_comma RIGHTPAR
-   { mk_expr (Etuple ($2 :: $4)) }
+    { mk_expr (Etuple ($2 :: $4)) }
 | LEFTBRC list1_field_expr opt_semicolon RIGHTBRC
-   { mk_expr (Erecord (List.rev $2)) }
+    { mk_expr (Erecord (List.rev $2)) }
 | LEFTBRC expr_arg WITH list1_field_expr opt_semicolon RIGHTBRC
-   { mk_expr (Eupdate ($2, List.rev $4)) }
+    { mk_expr (Eupdate ($2, List.rev $4)) }
 | BEGIN END
     { mk_expr (Etuple []) }
 | expr_arg LEFTSQ expr RIGHTSQ
