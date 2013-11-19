@@ -148,21 +148,9 @@ let make_ppattern pp ?(ghost=false) ity =
       let pv = create_pvsymbol id ~ghost ity in
       Hstr.add hv id.pre_name pv; pv
   in
-  let make_app ls ppl ghost ity =
-    let patl = List.map (fun pp -> pp.ppat_pattern) ppl in
-    { ppat_pattern = pat_app ls patl (ty_of_ity ity);
-      ppat_ity     = ity;
-      ppat_ghost   = ghost; }
-  in
   let rec make ghost ity = function
-    | PPwild -> {
-        ppat_pattern = pat_wild (ty_of_ity ity);
-        ppat_ity     = ity;
-        ppat_ghost   = ghost; }
-    | PPvar id -> {
-        ppat_pattern = pat_var (find id ghost ity).pv_vs;
-        ppat_ity     = ity;
-        ppat_ghost   = ghost; }
+    | PPwild -> pat_wild (ty_of_ity ity)
+    | PPvar id -> pat_var (find id ghost ity).pv_vs
     | PPpapp (pls,ppl) ->
         if pls.pl_hidden then raise (HiddenPLS pls);
         if pls.pl_ls.ls_constr = 0 then
@@ -177,7 +165,7 @@ let make_ppattern pp ?(ghost=false) ity =
           | Not_found -> raise (Term.ConstructorExpected pls.pl_ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (pls.pl_ls, List.length ppl)) in
-        make_app pls.pl_ls ppl ghost ity
+        pat_app pls.pl_ls ppl (ty_of_ity ity)
     | PPlapp (ls,ppl) ->
         if ls.ls_constr = 0 then
           raise (Term.ConstructorExpected ls);
@@ -190,23 +178,16 @@ let make_ppattern pp ?(ghost=false) ity =
           | Not_found -> raise (Term.ConstructorExpected ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (ls, List.length ppl)) in
-        make_app ls ppl ghost ity
+        pat_app ls ppl (ty_of_ity ity)
     | PPor (pp1,pp2) ->
-        let pp1 = make ghost ity pp1 in
-        let pp2 = make ghost ity pp2 in
-        { ppat_pattern = pat_or pp1.ppat_pattern pp2.ppat_pattern;
-          ppat_ity     = ity;
-          ppat_ghost   = ghost; }
+        pat_or (make ghost ity pp1) (make ghost ity pp2)
     | PPas (pp,id) ->
-        let pp = make ghost ity pp in
-        { ppat_pattern = pat_as pp.ppat_pattern (find id ghost ity).pv_vs;
-          ppat_ity     = ity;
-          ppat_ghost   = ghost; }
+        pat_as (make ghost ity pp) (find id ghost ity).pv_vs;
   in
-  let pp = make ghost ity pp in
-  let gh = pp.ppat_ghost || !gghost in
-  let pp = { pp with ppat_ghost = gh } in
-  Hstr.fold Mstr.add hv Mstr.empty, pp
+  let pat = make ghost ity pp in
+  let gh = ghost || !gghost in
+  Hstr.fold Mstr.add hv Mstr.empty,
+  { ppat_pattern = pat; ppat_ity = ity; ppat_ghost = gh }
 
 (** program symbols *)
 
