@@ -1138,7 +1138,14 @@ and try_expr keep_loc uloc env (argl,res) node =
         let e1_no_eff =
           Sreg.is_empty e1.e_effect.eff_writes &&
           Sexn.is_empty e1.e_effect.eff_raises &&
-          not e1.e_effect.eff_diverg in
+          not e1.e_effect.eff_diverg &&
+          (* if e1 is a recursive call, we may not know yet its effects,
+             so we have to rely on an heuristic: if the result of e1 is
+             not used in e2, then it was probably called for the effect. *)
+          match ld1.let_sym with
+          | LetV pv -> Spv.mem pv e2.e_syms.syms_pv
+          | LetA ps -> Sps.mem ps e2.e_syms.syms_ps
+        in
         let e2 =
           if e2_unit (* e2 is unit *)
             && e2.e_ghost (* and e2 is ghost *)
