@@ -104,7 +104,6 @@ and dexpr_node =
   | DElsapp of lsymbol * dexpr list
   | DEapply of dexpr * dexpr
   | DEconst of Number.constant
-  | DEval of dval_decl * dexpr
   | DElet of dlet_defn * dexpr
   | DEfun of dfun_defn * dexpr
   | DErec of dfun_defn list * dexpr
@@ -129,19 +128,17 @@ and dexpr_node =
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
-and dval_decl = preid * ghost * dtype_v
-
 and dlet_defn = preid * ghost * dexpr
 
 and dfun_defn = preid * ghost * dbinder list * dexpr * dspec later
+
+type dval_decl = preid * ghost * dtype_v
 
 (** Environment *)
 
 type denv
 
 val denv_empty : denv
-
-val denv_add_val : denv -> dval_decl -> denv
 
 val denv_add_let : denv -> dlet_defn -> denv
 
@@ -180,9 +177,6 @@ val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
 val expr : keep_loc:bool ->
   Decl.known_map -> Mlw_decl.known_map -> dexpr -> expr
 
-val val_decl : keep_loc:bool ->
-  Decl.known_map -> Mlw_decl.known_map -> dval_decl -> let_sym
-
 val let_defn : keep_loc:bool ->
   Decl.known_map -> Mlw_decl.known_map -> dlet_defn -> let_defn
 
@@ -191,3 +185,6 @@ val fun_defn : keep_loc:bool ->
 
 val rec_defn : keep_loc:bool ->
   Decl.known_map -> Mlw_decl.known_map -> dfun_defn list -> fun_defn list
+
+val val_decl : keep_loc:bool ->
+  Decl.known_map -> Mlw_decl.known_map -> dval_decl -> let_sym

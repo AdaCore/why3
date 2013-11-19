@@ -388,7 +388,6 @@ and dexpr_node =
   | DElsapp of lsymbol * dexpr list
   | DEapply of dexpr * dexpr
   | DEconst of Number.constant
-  | DEval of dval_decl * dexpr
   | DElet of dlet_defn * dexpr
   | DEfun of dfun_defn * dexpr
   | DErec of dfun_defn list * dexpr
@@ -413,11 +412,11 @@ and dexpr_node =
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
-and dval_decl = preid * ghost * dtype_v
-
 and dlet_defn = preid * ghost * dexpr
 
 and dfun_defn = preid * ghost * dbinder list * dexpr * dspec later
+
+type dval_decl = preid * ghost * dtype_v
 
 (** Environment *)
 
@@ -483,9 +482,6 @@ let dvty_of_dtype_v dtv =
         dvty (List.fold_left (fun l (_,_,_,t) -> t::l) argl bl) dtv
     | DSpecV res -> List.rev argl, res in
   dvty [] dtv
-
-let denv_add_val denv (id,_,dtv) =
-  denv_add_poly denv id (dvty_of_dtype_v dtv)
 
 let denv_add_let denv (id,_,{de_dvty = dvty}) =
   denv_add_mono denv id dvty
@@ -634,7 +630,6 @@ let dexpr ?loc node =
         [], dity_int
     | DEconst (Number.ConstReal _) ->
         [], dity_real
-    | DEval (_,de)
     | DElet (_,de)
     | DEfun (_,de)
     | DErec (_,de) ->
@@ -1120,11 +1115,6 @@ and try_expr keep_loc uloc env (argl,res) node =
       e_lapp fs_func_app [get env de1; get env de2] (ity_of_dity res)
   | DEconst c ->
       e_const c
-  | DEval (vald,de) ->
-      let lv = val_decl env vald in
-      let env = add_let_sym env lv in
-      let _e = get env de in
-      assert false (* TODO: e_val lv e *)
   | DElet ((id,gh,de1),de2) ->
       let e1 = get env de1 in
       let mk_expr e1 =
