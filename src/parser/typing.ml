@@ -99,7 +99,7 @@ let create_user_tv =
   Hstr.add hs s tv;
   tv
 
-let ty_of_pty_top ~noop uc pty =
+let ty_of_pty ?(noop=true) uc pty =
   let rec get_ty = function
     | PPTtyvar ({id_loc = loc}, true) when noop ->
         Loc.errorm ~loc "Opaqueness@ annotations@ are@ only@ \
@@ -119,8 +119,6 @@ let ty_of_pty_top ~noop uc pty =
         get_ty ty
   in
   get_ty pty
-
-let ty_of_pty uc pty = ty_of_pty_top ~noop:true uc pty
 
 let opaque_tvs args =
   let rec opaque_tvs acc = function
@@ -338,11 +336,11 @@ let type_fmla uc gvars f =
 
 (** Typing declarations *)
 
-let tyl_of_params ~noop uc pl =
+let tyl_of_params ?(noop=false) uc pl =
   let ty_of_param (loc,_,gh,ty) =
     if gh then Loc.errorm ~loc
       "ghost parameters are not allowed in pure declarations";
-    ty_of_pty_top ~noop uc ty in
+    ty_of_pty ~noop uc ty in
   List.map ty_of_param pl
 
 let add_types dl th =
@@ -500,7 +498,7 @@ let add_logics dl th =
   let create_symbol th d =
     let id = d.ld_ident.id in
     let v = create_user_id d.ld_ident in
-    let pl = tyl_of_params ~noop:false th d.ld_params in
+    let pl = tyl_of_params th d.ld_params in
     let ty = Opt.map (ty_of_pty th) d.ld_type in
     let opaque = opaque_tvs d.ld_params in
     (* for abstract lsymbols fresh tyvars are opaque *)
@@ -590,7 +588,7 @@ let add_inductives s dl th =
   let create_symbol th d =
     let id = d.in_ident.id in
     let v = create_user_id d.in_ident in
-    let pl = tyl_of_params ~noop:false th d.in_params in
+    let pl = tyl_of_params th d.in_params in
     let opaque = opaque_tvs d.in_params in
     let ps = create_psymbol ~opaque v pl in
     Hstr.add psymbols id ps;
