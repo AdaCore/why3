@@ -212,6 +212,8 @@ type expr = {
 }
 
 and expr_desc =
+  | Etrue
+  | Efalse
   | Econst of constant
   (* lambda-calculus *)
   | Eident of qualid

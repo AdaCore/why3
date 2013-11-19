@@ -1284,6 +1284,8 @@ expr:
 expr_arg:
 | qualid          { mk_expr (Eident $1) }
 | constant        { mk_expr (Econst $1) }
+| TRUE            { mk_expr Etrue }
+| FALSE           { mk_expr Efalse }
 | OPPREF expr_arg { mk_prefix $1 $2 }
 | expr_sub        { $1 }
 ;

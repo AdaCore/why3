@@ -643,6 +643,10 @@ and de_desc denv loc = function
       DEconstant c, ([], dity_int)
   | Ptree.Econst (Number.ConstReal _ as c) ->
       DEconstant c, ([], dity_real)
+  | Ptree.Etrue ->
+      DEglobal_ls Term.fs_bool_true, ([], dity_bool)
+  | Ptree.Efalse ->
+      DEglobal_ls Term.fs_bool_false, ([], dity_bool)
   | Ptree.Enot e1 ->
       let e1 = dexpr denv e1 in
       expected_type e1 dity_bool;
