@@ -108,7 +108,7 @@ and dexpr_node =
   | DEfun of dfun_defn * dexpr
   | DErec of dfun_defn list * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEmatch of dexpr * (dpattern * dexpr) list
+  | DEcase of dexpr * (dpattern * dexpr) list
   | DEassign of plsymbol * dexpr * dexpr
   | DElazy of dlazy_op * dexpr * dexpr
   | DEnot of dexpr
@@ -139,6 +139,8 @@ type dval_decl = preid * ghost * dtype_v
 type denv
 
 val denv_empty : denv
+
+val denv_add_var : denv -> preid -> dity -> denv
 
 val denv_add_let : denv -> dlet_defn -> denv
 

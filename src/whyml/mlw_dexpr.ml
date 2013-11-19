@@ -392,7 +392,7 @@ and dexpr_node =
   | DEfun of dfun_defn * dexpr
   | DErec of dfun_defn list * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEmatch of dexpr * (dpattern * dexpr) list
+  | DEcase of dexpr * (dpattern * dexpr) list
   | DEassign of plsymbol * dexpr * dexpr
   | DElazy of dlazy_op * dexpr * dexpr
   | DEnot of dexpr
@@ -482,6 +482,8 @@ let dvty_of_dtype_v dtv =
         dvty (List.fold_left (fun l (_,_,_,t) -> t::l) argl bl) dtv
     | DSpecV res -> List.rev argl, res in
   dvty [] dtv
+
+let denv_add_var denv id dity = denv_add_mono denv id ([], dity)
 
 let denv_add_let denv (id,_,{de_dvty = dvty}) =
   denv_add_mono denv id dvty
@@ -640,7 +642,7 @@ let dexpr ?loc node =
         dexpr_expected_type de2 res;
         dexpr_expected_type de3 res;
         de2.de_dvty
-    | DEmatch (de,bl) ->
+    | DEcase (de,bl) ->
         let ety = dity_fresh () in
         let res = dity_fresh () in
         dexpr_expected_type de ety;
@@ -998,18 +1000,6 @@ let spec_invariant env pvs vty spec =
               c_post  = post_inv ity spec.c_post;
               c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
-let abstr_invariant env e spec0 =
-  let pvs = spec_pvset e.e_syms.syms_pv spec0 in
-  let spec = spec_invariant env pvs e.e_vty spec0 in
-  (* we do not require invariants on free variables *)
-  { spec with c_pre = spec0.c_pre }
-
-let lambda_invariant env lam =
-  let { l_spec = spec; l_expr = e } = lam in
-  let pvs = spec_pvset e.e_syms.syms_pv spec in
-  let spec = spec_invariant env pvs e.e_vty spec in
-  { lam with l_spec = { spec with c_letrec = 0 }}
-
 (** Abstract values *)
 
 let rec type_c env pvs vars otv (dtyv, dsp) =
@@ -1153,7 +1143,7 @@ and try_expr keep_loc uloc env (argl,res) node =
       let e2 = get env de2 in
       let e3 = get env de3 in
       e_if e1 e2 e3
-  | DEmatch (de1,bl) ->
+  | DEcase (de1,bl) ->
       let e1 = get env de1 in
       let ity = ity_of_expr e1 in
       let ghost = e1.e_ghost in
@@ -1224,8 +1214,9 @@ and try_expr keep_loc uloc env (argl,res) node =
         "variants are not allowed in `abstract'";
       let spec = spec_of_dspec e.e_effect tyv dsp in
       check_user_effect e spec false dsp;
-      let spec = abstr_invariant env e spec in
-      e_abstract e spec
+      let speci = spec_invariant env e.e_syms.syms_pv e.e_vty spec in
+      (* we do not require invariants on free variables *)
+      e_abstract e { speci with c_pre = spec.c_pre }
   | DEmark (id,de) ->
       let ld = create_let_defn id Mlw_wp.e_now in
       let env = add_let_sym env ld.let_sym in
@@ -1274,7 +1265,10 @@ and expr_rec ~keep_loc uloc env dfdl =
           let fd = create_fun_defn (id_clone ps.ps_name) lam in
           Loc.try2 ~loc check_user_ps true fd.fun_ps) fdl;
         raise exn in
-  let step3 fd = fd.fun_ps, lambda_invariant env fd.fun_lambda in
+  let step3 { fun_ps = ps; fun_lambda = lam } =
+    let { l_spec = spec; l_expr = e } = lam in
+    let spec = spec_invariant env e.e_syms.syms_pv e.e_vty spec in
+    ps, { lam with l_spec = { spec with c_letrec = 0 }} in
   let fdl = create_rec_defn (List.map step3 fdl) in
   let step4 fd (id,_,bl,de,dsp) =
     Loc.try3 ?loc:de.de_loc check_lambda_effect fd bl dsp;
@@ -1298,8 +1292,10 @@ and expr_fun ~keep_loc uloc env (id,gh,bl,de,dsp) =
         let post = Mlw_ty.create_post vs f in
         let spec = { lam.l_spec with c_post = post } in
         { lam with l_spec = spec } in
-  let lam = lambda_invariant env lam in
-  let fd = create_fun_defn id lam in
+  (* add invariants *)
+  let { l_spec = spec; l_expr = e } = lam in
+  let spec = spec_invariant env e.e_syms.syms_pv e.e_vty spec in
+  let fd = create_fun_defn id { lam with l_spec = spec } in
   Loc.try3 ?loc:de.de_loc check_lambda_effect fd bl dsp;
   Loc.try2 ?loc:id.pre_loc check_user_ps false fd.fun_ps;
   fd
