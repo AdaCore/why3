@@ -1096,13 +1096,13 @@ new_ns_mo:
 ;
 
 pdecl:
-| LET top_ghost lident_rich labels fun_defn
-    { Dlet (add_lab $3 $4, $2, $5) }
 | LET top_ghost lident_rich labels EQUAL fun_expr
     { Dlet (add_lab $3 $4, $2, $6) }
+| LET top_ghost lident_rich labels fun_defn
+    { Dlet (add_lab $3 $4, $2, $5) }
 | LET REC list1_rec_defn
     { Dletrec $3 }
-| VAL ghost lident_rich labels type_v
+| VAL top_ghost lident_rich labels type_v
     { Dparam (add_lab $3 $4, $2, $5) }
 | EXCEPTION uident labels
     { Dexn (add_lab $2 $3, ty_unit ()) }
@@ -1211,26 +1211,34 @@ expr:
    { mk_expr (Elazy (LazyOr, $1, $3)) }
 | LET pattern EQUAL expr IN expr
    { match $2.pat_desc with
-     | PPpvar id -> mk_expr (Elet (id, false, $4, $6))
-     | PPpwild -> mk_expr (Elet (id_anonymous (), false, $4, $6))
-     | PPptuple [] -> mk_expr (Elet (id_anonymous (), false,
+     | PPpvar id -> mk_expr (Elet (id, Gnone, $4, $6))
+     | PPpwild -> mk_expr (Elet (id_anonymous (), Gnone, $4, $6))
+     | PPptuple [] -> mk_expr (Elet (id_anonymous (), Gnone,
           { $4 with expr_desc = Ecast ($4, PPTtuple []) }, $6))
      | _ -> mk_expr (Ematch ($4, [$2, $6])) }
-| LET GHOST pattern EQUAL expr IN expr
+| LET GHOST pat_arg EQUAL expr IN expr
    { match $3.pat_desc with
-     | PPpvar id -> mk_expr (Elet (id, true, $5, $7))
-     | PPpwild -> mk_expr (Elet (id_anonymous (), true, $5, $7))
-     | PPptuple [] -> mk_expr (Elet (id_anonymous (), true,
+     | PPpvar id -> mk_expr (Elet (id, Gghost, $5, $7))
+     | PPpwild -> mk_expr (Elet (id_anonymous (), Gghost, $5, $7))
+     | PPptuple [] -> mk_expr (Elet (id_anonymous (), Gghost,
           { $5 with expr_desc = Ecast ($5, PPTtuple []) }, $7))
-     | _ -> Loc.errorm ~loc:(floc_i 3) "`ghost' cannot come before a pattern" }
+     | _ -> mk_expr (Ematch ({ $5 with expr_desc = Eghost $5 }, [$3, $7])) }
 | LET lident labels fun_defn IN expr
-   { mk_expr (Elet (add_lab $2 $3, false, $4, $6)) }
+   { mk_expr (Elet (add_lab $2 $3, Gnone, $4, $6)) }
 | LET lident_op_id labels fun_defn IN expr
-   { mk_expr (Elet (add_lab $2 $3, false, $4, $6)) }
+   { mk_expr (Elet (add_lab $2 $3, Gnone, $4, $6)) }
 | LET GHOST lident labels fun_defn IN expr
-   { mk_expr (Elet (add_lab $3 $4, true, $5, $7)) }
+   { mk_expr (Elet (add_lab $3 $4, Gghost, $5, $7)) }
 | LET GHOST lident_op_id labels fun_defn IN expr
-   { mk_expr (Elet (add_lab $3 $4, true, $5, $7)) }
+   { mk_expr (Elet (add_lab $3 $4, Gghost, $5, $7)) }
+| LET lident_op_id labels EQUAL expr IN expr
+   { mk_expr (Elet (add_lab $2 $3, Gnone, $5, $7)) }
+| LET GHOST lident_op_id labels EQUAL expr IN expr
+   { mk_expr (Elet (add_lab $3 $4, Gghost, $6, $8)) }
+| LET LEMMA lident_rich labels EQUAL expr IN expr
+   { mk_expr (Elet (add_lab $3 $4, Glemma, $6, $8)) }
+| LET LEMMA lident_rich labels fun_defn IN expr
+   { mk_expr (Elet (add_lab $3 $4, Glemma, $5, $7)) }
 | LET REC list1_rec_defn IN expr
    { mk_expr (Eletrec ($3, $5)) }
 | fun_expr
@@ -1468,11 +1476,6 @@ single_variant:
 opt_cast:
 | /* epsilon */        { None }
 | COLON primitive_type { Some $2 }
-;
-
-ghost:
-| /* epsilon */ { false }
-| GHOST         { true }
 ;
 
 top_ghost:

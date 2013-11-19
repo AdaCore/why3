@@ -542,6 +542,7 @@ and de_desc denv loc = function
         then get_chain e12 ch else e12, ch in
       make_chain "q1 " "q2 " (dexpr denv e1) ch
   | Ptree.Elet (id, gh, e1, e2) ->
+      let id, gh = add_lemma_label ~top:false id gh in
       let e1 = dexpr denv e1 in
       let denv = match e1.de_desc with
         | DEfun _ -> add_poly id e1.de_type denv
@@ -1945,6 +1946,7 @@ let add_pdecl ~wp loc uc = function
       let pd = create_exn_decl xs in
       add_pdecl_with_tuples ~wp uc pd
   | Dparam (id, gh, tyv) ->
+      let id, gh = add_lemma_label ~top:true id gh in
       let tyv, _ = dtype_v (create_denv uc) tyv in
       let uc = flush_tuples uc in
       let tyv = type_v (create_lenv uc) Spv.empty vars_empty Stv.empty tyv in

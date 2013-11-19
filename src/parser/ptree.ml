@@ -219,7 +219,7 @@ and expr_desc =
   | Einfix of expr * ident * expr
   | Einnfix of expr * ident * expr
   | Efun of binder list * triple
-  | Elet of ident * ghost * expr * expr
+  | Elet of ident * top_ghost * expr * expr
   | Eletrec of letrec list * expr
   | Etuple of expr list
   | Erecord of (qualid * expr) list
@@ -252,7 +252,7 @@ and triple = expr * spec
 type pdecl =
   | Dlet of ident * top_ghost * expr
   | Dletrec of letrec list
-  | Dparam of ident * ghost * type_v
+  | Dparam of ident * top_ghost * type_v
   | Dexn of ident * pty
 
 (* incremental parsing *)
