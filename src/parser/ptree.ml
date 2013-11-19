@@ -48,7 +48,6 @@ type pty =
   | PPTparen of pty
 
 type ghost = bool
-type top_ghost = Gnone | Gghost | Glemma
 
 type binder = loc * ident option * ghost * pty option
 type param  = loc * ident option * ghost * pty
@@ -206,6 +205,8 @@ type type_v =
 
 and type_c = type_v * spec
 
+type top_ghost = Gnone | Gghost | Glemma
+
 type expr = {
   expr_desc : expr_desc;
   expr_loc  : loc;
@@ -217,6 +218,7 @@ and expr_desc =
   | Econst of constant
   (* lambda-calculus *)
   | Eident of qualid
+  | Eidapp of qualid * expr list
   | Eapply of expr * expr
   | Einfix of expr * ident * expr
   | Einnfix of expr * ident * expr

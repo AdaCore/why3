@@ -506,6 +506,10 @@ and de_desc denv loc = function
       end
   | Ptree.Eident p ->
       specialize_qualid denv.uc p
+  | Ptree.Eidapp (p, el) ->
+      let e = { expr_desc = Ptree.Eident p; expr_loc = qloc p } in
+      let el = List.map (dexpr denv) el in
+      de_app loc (dexpr denv e) el
   | Ptree.Eapply (e1, e2) ->
       let e, el = decompose_app [e2] e1 in
       let el = List.map (dexpr denv) el in

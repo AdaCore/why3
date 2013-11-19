@@ -58,7 +58,7 @@ end
 
   let add_lab id l = { id with id_lab = l }
 
-  let rec mk_l_apply f a =
+  let mk_l_apply f a =
     let loc = Loc.join f.pp_loc a.pp_loc in
     { pp_loc = loc; pp_desc = PPapply (f,a) }
 
@@ -90,33 +90,25 @@ end
     | Some pt -> { e with expr_desc = Ecast (e, pt) }
     | None -> e
 
-  let rec mk_apply f = function
-    | [] ->
-        assert false
-    | [a] ->
-        Eapply (f, a)
-    | a :: l ->
-        let loc = Loc.join f.expr_loc a.expr_loc in
-        mk_apply { expr_loc = loc; expr_desc = Eapply (f, a) } l
+  let rec mk_apply f a =
+    let loc = Loc.join f.expr_loc a.expr_loc in
+    { expr_loc = loc; expr_desc = Eapply (f,a) }
 
-  let mk_apply_id id =
-    mk_apply { expr_desc = Eident (Qident id); expr_loc = id.id_loc }
-
-  let mk_mixfix2 op e1 e2 =
-    let id = mk_id (mixfix op) (floc_i 2) in
-    mk_expr (mk_apply_id id [e1; e2])
-
-  let mk_mixfix3 op e1 e2 e3 =
-    let id = mk_id (mixfix op) (floc_i 2) in
-    mk_expr (mk_apply_id id [e1; e2; e3])
+  let mk_prefix op e1 =
+    let id = mk_id (prefix op) (floc_i 1) in
+    mk_expr (Eidapp (Qident id, [e1]))
 
   let mk_infix e1 op e2 =
     let id = mk_id (infix op) (floc_i 2) in
     mk_expr (Einfix (e1, id, e2))
 
-  let mk_prefix op e1 =
-    let id = mk_id (prefix op) (floc_i 1) in
-    mk_expr (mk_apply_id id [e1])
+  let mk_mixfix2 op e1 e2 =
+    let id = mk_id (mixfix op) (floc_i 2) in
+    mk_expr (Eidapp (Qident id, [e1; e2]))
+
+  let mk_mixfix3 op e1 e2 e3 =
+    let id = mk_id (mixfix op) (floc_i 2) in
+    mk_expr (Eidapp (Qident id, [e1; e2; e3]))
 
   let exit_exn () = Qident (mk_id "%Exit" (floc ()))
   let id_anonymous () = mk_id "_" (floc ())
@@ -1170,19 +1162,11 @@ expr:
 | expr LTGT expr
    { mk_infix $1 "<>" $3 }
 | expr LARROW expr
-    { match $1.expr_desc with
-        | Eapply (e11, e12) -> begin match e11.expr_desc with
-            | Eident x ->
-                mk_expr (Eassign (e12, x, $3))
-            | Eapply ({ expr_desc = Eident (Qident x) }, e11)
-            when x.id = mixfix "[]" ->
-                mk_mixfix3 "[]<-" e11 e12 $3
-            | _ ->
-                raise Parsing.Parse_error
-          end
-        | _ ->
-            raise Parsing.Parse_error
-    }
+   { match $1.expr_desc with
+     | Eidapp (q, [e1]) -> mk_expr (Eassign (e1, q, $3))
+     | Eidapp (Qident id, [e1;e2]) when id.id = mixfix "[]" ->
+         mk_mixfix3 "[]<-" e1 e2 $3
+     | _ -> raise Parsing.Parse_error }
 | expr OP1 expr
    { mk_infix $1 $2 $3 }
 | expr OP2 expr
@@ -1195,8 +1179,10 @@ expr:
    { mk_expr (Enot $2) }
 | prefix_op expr %prec prec_prefix_op
    { mk_prefix $1 $2 }
-| expr_arg list1_expr_arg
-   { mk_expr (mk_apply $1 $2) }
+| qualid list1_expr_arg
+   { mk_expr (Eidapp ($1, $2)) }
+| expr_arg_noid list1_expr_arg
+   { List.fold_left mk_apply $1 $2 }
 | IF expr THEN expr ELSE expr
    { mk_expr (Eif ($2, $4, $6)) }
 | IF expr THEN expr %prec prec_no_else
@@ -1283,6 +1269,10 @@ expr:
 
 expr_arg:
 | qualid          { mk_expr (Eident $1) }
+| expr_arg_noid   { $1 }
+;
+
+expr_arg_noid:
 | constant        { mk_expr (Econst $1) }
 | TRUE            { mk_expr Etrue }
 | FALSE           { mk_expr Efalse }
@@ -1298,7 +1288,7 @@ expr_dot:
 
 expr_sub:
 | expr_dot DOT lqualid_rich
-    { mk_expr (mk_apply (mk_expr_i 3 (Eident $3)) [$1]) }
+    { mk_expr (Eidapp ($3, [$1])) }
 | LEFTPAR expr RIGHTPAR
     { $2 }
 | BEGIN expr END
