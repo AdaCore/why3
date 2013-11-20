@@ -106,8 +106,7 @@ let improve_sloc msg =
   | None -> List.hd (Gnat_expl.get_loc msg.expl)
   | Some l -> l
 
-let print_with_sloc_and_tag fmt m =
-  let reason = Gnat_expl.get_reason m.expl in
+let print_with_sloc fmt m =
   match Gnat_expl.get_loc m.expl with
   | [] -> assert false (* the sloc of a VC is never empty *)
   | _ :: secondaries ->
@@ -116,9 +115,7 @@ let print_with_sloc_and_tag fmt m =
       List.iter
          (fun secondary_sloc ->
            Format.fprintf fmt ", in instantiation at %a"
-              Gnat_loc.print_line_loc secondary_sloc) secondaries;
-      if Gnat_config.show_tag then
-        Format.fprintf fmt " [%s]" (Gnat_expl.tag_of_reason reason)
+              Gnat_loc.print_line_loc secondary_sloc) secondaries
 
 let print_json_entity fmt e =
   let sl = List.hd e.Gnat_expl.subp_loc in
@@ -186,7 +183,7 @@ let print_messages () =
         (* special output in IDE mode *)
         print_json_msg Format.std_formatter msg
       end else begin
-        print_with_sloc_and_tag Format.std_formatter msg;
+        print_with_sloc Format.std_formatter msg;
         if Gnat_config.report = Gnat_config.Statistics then
           Format.printf "(%a)" print_statistics msg;
         Format.printf "@.";
