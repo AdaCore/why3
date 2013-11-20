@@ -151,7 +151,7 @@ let tag_of_reason s =
    | VC_Loop_Invariant_Preserv    -> "loop_invariant_preservation"
    | VC_Loop_Variant              -> "loop_variant"
    | VC_Assert                    -> "assertion"
-   | VC_Raise                     -> "raise statement"
+   | VC_Raise                     -> "raise_statement"
 
 type gp_label =
   | Gp_Sloc of Gnat_loc.loc

@@ -1,6 +1,9 @@
 open Why3
 open Gnat_loc
 
+(* If you change this type, chances are you also need to change the file
+   vc_kinds.ads, and the SPARK UG *)
+
 type reason =
    | VC_Division_Check
    | VC_Index_Check
