@@ -1236,7 +1236,7 @@ expr:
              (Eloop ($4,
                      mk_expr (Eif ($2, $5,
                                    mk_expr (Eraise (exit_exn (), None)))))),
-          [exit_exn (), mk_pat (PPptuple []), mk_expr (Etuple [])])) }
+          [exit_exn (), None, mk_expr (Etuple [])])) }
 | FOR lident EQUAL expr for_direction expr DO for_loop_invariant expr DONE
    { mk_expr (Efor ($2, $4, $5, $6, $8, $9)) }
 | ABSURD
@@ -1327,9 +1327,9 @@ list1_handler_sep_bar:
 
 handler:
 | uqualid ARROW expr
-    { ($1, { pat_desc = PPptuple []; pat_loc = floc_i 1 }, $3) }
+    { ($1, None, $3) }
 | uqualid pat_arg ARROW expr
-    { ($1, $2, $4) }
+    { ($1, Some $2, $4) }
 ;
 
 program_match_cases:

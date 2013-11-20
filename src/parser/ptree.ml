@@ -239,7 +239,7 @@ and expr_desc =
   | Ematch of expr * (pattern * expr) list
   | Eabsurd
   | Eraise of qualid * expr option
-  | Etry of expr * (qualid * pattern * expr) list
+  | Etry of expr * (qualid * pattern option * expr) list
   | Efor of ident * expr * for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of assertion_kind * lexpr
