@@ -125,7 +125,7 @@ declarations of another theory, coming either from the same input
 text or from the library. Another way to referring to a theory is
 by ``cloning''. A \texttt{clone} declaration constructs a local
 copy of the cloned theory, possibly instantiating some of its
-abstract (\emph{i.e.}~declared but not defined) symbols.
+abstract (\ie declared but not defined) symbols.
 
 %BEGIN LATEX
 Consider the continued example in Figure~\ref{fig:tutorial2}.
@@ -194,7 +194,7 @@ use of it (see Section~\ref{sec:drivers}).
 
 Notice an important difference between \texttt{use}
 and \texttt{clone}. If we \texttt{use} a theory, say
-\texttt{List}, twice (directly or indirectly: \emph{e.g.}~by
+\texttt{List}, twice (directly or indirectly: \eg by
 making \texttt{use} of both \texttt{Length} and
 \texttt{Sorted}), there is no duplication: there is
 still only one type of lists and a unique pair
@@ -211,7 +211,7 @@ this time we use the abstract order on the values of type
 Now, we can instantiate theory \texttt{SortedGen} to any
 ordered type, without having to retype the definition of
 \texttt{sorted}. For example, theory \texttt{SortedIntList}
-makes \texttt{clone} of \texttt{SortedGen} (\emph{i.e.}~copies its
+makes \texttt{clone} of \texttt{SortedGen} (\ie copies its
 declarations) substituting type \texttt{int} for type
 \texttt{O.t} of \texttt{SortedGen} and the default order
 on integers for predicate \texttt{O.(<=)}. \why will
@@ -285,7 +285,7 @@ optional, if it is omitted, the name of the symbol is \texttt{List.$s$}.
 \item \texttt{use import List as L} --- every symbol $s$ from
 \texttt{List} is accessible under the name \texttt{L.$s$}. It is also
 accessible simply as \texttt{$s$}, but only up to the end of the current
-namespace, \emph{e.g.}~the current theory. If the current theory, that is the
+namespace, \eg the current theory. If the current theory, that is the
 one making \texttt{use}, is later used under the name \texttt{T},
 the name of the symbol would be \texttt{T.L.$s$}. (This is why we
 could refer directly to the symbols of \texttt{Order} in theory

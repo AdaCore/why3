@@ -443,6 +443,19 @@ gallery::
 	  cd ..; \
 	done
 
+%-gallery::
+	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
+	x=$*/why3session.xml; \
+	d=`dirname $$x`; \
+	f=`basename $$d`; \
+	why3session html $$x; \
+	echo "exporting $$f"; \
+	mkdir -p $(GALLERYDIR)/$$f; \
+	cp examples/$$f.mlw examples/$$f/$$f.html $(GALLERYDIR)/$$f/; \
+	rm -f $(GALLERYDIR)/$$f/$$f.zip; \
+	cd examples/; \
+	zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f/$$f.html  $$f
+
 ########
 # XML DTD validation
 ########
@@ -1305,7 +1318,7 @@ doc/html/index.html: doc/html/manual.html
 
 else
 
-doc/html/manual.html:
+doc/html/index.html:
 
 endif
 

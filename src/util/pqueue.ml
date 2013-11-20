@@ -54,7 +54,9 @@ module Make(X: Set.OrderedType) = struct
   type t = elt RA.t
   let create ~dummy = RA.make 0 dummy
   let is_empty h = RA.length h = 0
+  (* dead code
   let clear h = RA.resize h 0
+  *)
 
   let rec move_up h x i =
     if i = 0 then RA.set h i x else

@@ -210,10 +210,10 @@ let find_local_vs uc lvm p = match p with
       if ovs = None then find_global_vs uc p else ovs
 
 let check_at f0 =
-  let tvs0 = f0.t_vars in
+  let tvs0 = t_vars f0 in
   let rec check () f = match f.t_node with
     | Term.Tapp (ls, _) when ls_equal ls fs_at || ls_equal ls fs_old ->
-        let tvs = f.t_vars in
+        let tvs = t_vars f in
         if not (Mvs.set_submap tvs tvs0) then Loc.errorm ?loc:f.t_loc
           "locally bound variable %a under `at'/`old'"
           Pretty.print_vs (fst (Mvs.choose (Mvs.set_diff tvs tvs0)));

@@ -117,22 +117,26 @@ let specialize_ls ls =
   let spec ty = if ty_closed ty then Duty ty else spec ty in
   List.map spec ls.ls_args, Opt.map spec ls.ls_value
 
+(* dead code
 let specialize_fs ls =
   let dtyl, dty = specialize_ls ls in
   match dty with
   | Some dty -> dtyl, dty
   | None -> raise (FunctionSymbolExpected ls)
+*)
 
 let specialize_cs ls =
   if ls.ls_constr = 0 then raise (ConstructorExpected ls);
   let dtyl, dty = specialize_ls ls in
   dtyl, Opt.get dty
 
+(* dead code
 let specialize_ps ls =
   let dtyl, dty = specialize_ls ls in
   match dty with
   | Some _ -> raise (PredicateSymbolExpected ls)
   | None -> dtyl
+*)
 
 (** Patterns, terms, and formulas *)
 
@@ -386,8 +390,8 @@ let quant_vars ~strict env vl =
   let acc, vl = Lists.map_fold_left add Mstr.empty vl in
   Mstr.set_union acc env, vl
 
-let check_used_var vars vs =
-  if not (Mvs.mem vs vars) then
+let check_used_var t vs =
+  if t_v_occurs vs t = 0 then
   let s = vs.vs_name.id_string in
   if not (String.length s > 0 && s.[0] = '_') then
   Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s
@@ -450,7 +454,7 @@ and try_term strict keep_loc uloc env prop dty node =
       let v = create_vsymbol id (t_type t) in
       let env = Mstr.add id.pre_name v env in
       let f = get env prop df in
-      check_used_var f.t_vars v;
+      check_used_var f v;
       t_let_close v t f
   | DTif (df,dt1,dt2) ->
       let prop = prop || dty = None in
@@ -461,21 +465,21 @@ and try_term strict keep_loc uloc env prop dty node =
       let branch (dp,dt) =
         let env, p = pattern ~strict env dp in
         let t = get env prop dt in
-        Svs.iter (check_used_var t.t_vars) p.pat_vars;
+        Svs.iter (check_used_var t) p.pat_vars;
         t_close_branch p t in
       t_case (get env false dt) (List.map branch bl)
   | DTeps (id,dty,df) ->
       let v = create_vsymbol id (var_ty_of_dty id ~strict dty) in
       let env = Mstr.add id.pre_name v env in
       let f = get env true df in
-      check_used_var f.t_vars v;
+      check_used_var f v;
       t_eps_close v f
   | DTquant (q,vl,dll,df) ->
       let env, vl = quant_vars ~strict env vl in
       let tr_get dt = get env (dt.dt_dty = None) dt in
       let trl = List.map (List.map tr_get) dll in
       let f = get env true df in
-      List.iter (check_used_var f.t_vars) vl;
+      List.iter (check_used_var f) vl;
       check_exists_implies q f;
       t_quant_close q vl trl f
   | DTbinop (op,df1,df2) ->

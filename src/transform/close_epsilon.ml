@@ -46,7 +46,7 @@ let is_lambda t = destruct_lambda t <> LNone
 let rec rewriteT t =
   match t.t_node with
   | Teps fb when is_lambda t ->
-      let fv = Mvs.keys t.t_vars in
+      let fv = Mvs.keys (t_vars t) in
       let x, f = t_open_bound fb in
       let f = rewriteF f in
       if fv = [] then t_eps_close x f

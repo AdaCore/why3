@@ -22,3 +22,6 @@ end
 val ft_select_inst   : (Env.env,Ty.Sty.t) Trans.flag_trans
 val ft_select_lskept : (Env.env,Term.Sls.t) Trans.flag_trans
 val ft_select_lsinst : (Env.env,Lsmap.t) Trans.flag_trans
+
+val on_lsinst : (Term.lsymbol Term.Mls.t -> 'a Trans.trans) -> 'a Trans.trans
+val on_syntax_map : (Printer.syntax_map -> 'a Trans.trans) -> 'a Trans.trans

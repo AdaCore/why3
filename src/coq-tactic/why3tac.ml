@@ -554,10 +554,22 @@ and tr_global_ts dep env r =
                       | _ -> raise NotFO (* GADT *)
                     in
                     List.fold_right2 add v ts.Ty.ts_args Idmap.empty
-                | Ind _ ->
-                    Idmap.empty
-                | _ ->
-                    assert false (* ensured by Coq typing *)
+                | Ind _ -> Idmap.empty
+                | Prod _ -> Idmap.empty
+                (* ensured by Coq typing *)
+                | CoFix _ -> assert false
+                | Fix _ -> assert false
+                | Case (_, _, _, _) -> assert false
+                | Construct _ -> assert false
+                | Const _ -> assert false
+                | LetIn (_, _, _, _) -> assert false
+                | Lambda (_, _, _) -> assert false
+                | Cast (_, _, _) -> assert false
+                | Sort _ -> assert false
+                | Evar _ -> assert false
+                | Meta _ -> assert false
+                | Var _ -> assert false
+                | Rel _ -> assert false
               in
               let l = List.map (tr_type dep' tvm env) l in
               let id = preid_of_id (Nametab.basename_of_global r) in

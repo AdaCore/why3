@@ -595,6 +595,7 @@ let hypothesis_selection = (* create lots of hashtables... *)
   Trans.store (transformation fmlaTable fTbl tTbl symbTbl)
 
 let _ = Trans.register_transform "hypothesis_selection" hypothesis_selection
+  ~desc:"Hypothesis@ selection."
 
 (*
 Local Variables:

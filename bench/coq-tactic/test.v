@@ -1,5 +1,6 @@
 Require Import Why3.
-Ltac ae := why3 "alt-ergo".
+Ltac ae := why3 "alt-ergo" timelimit 5.
+Ltac z3 := why3 "z3" timelimit 5.
 
 Require Export ZArith.
 Open Scope Z_scope.
@@ -44,8 +45,6 @@ Goal (match Leaf with Leaf => 1 | Node z f => 2 end)=1.
 ae.
 Qed.
 
-
-(*
 Inductive foo : Set :=
   | OO : foo
   | SS : forall x:nat, p x -> foo
@@ -53,18 +52,23 @@ with p : nat -> Prop :=
   | cc : p O.
 
 Goal p O.
+(* not a first order goal
 ae.
 *)
+exact cc.
+Qed.
 
-Inductive foo : nat -> Prop :=
-  c : bar O -> foo O
+Inductive fooo : nat -> Prop :=
+  c : bar O -> fooo O
 with bar : nat -> Prop :=
   d : forall f:nat->nat, bar (f O).
 
-(*
-Goal foo O.
+Goal fooo O.
+(* Don't know
 ae.
 *)
+exact (c (d (fun x => O))).
+Qed.
 
 Inductive tree' : Set :=
   | Empty' : tree'
@@ -72,24 +76,25 @@ Inductive tree' : Set :=
 with forest' : Set :=
   | Forest' : (nat -> tree') -> forest'.
 
-(*
 Goal forall f: nat ->tree, True.
 intros.
 ae.
-*)
+Qed.
 
-(*
 Parameter f : (nat -> nat) -> nat.
 
 Goal f (plus O) = f (plus O).
+(* not a first order goal
 ae.
-Qed.*)
+*)
+trivial.
+Qed.
 
-Parameter f: nat -> nat.
+Parameter f' : nat -> nat.
 
-Axiom f_def: f O = O.
+Axiom f'_def: f' O = O.
 
-Goal f (f O) = O.
+Goal f' (f' O) = O.
 ae.
 Qed.
 
@@ -102,8 +107,8 @@ Variable b:Set->Set.
 Variable a:Set.
 
 Inductive sorted : list a -> Prop :=
-  cc: sorted (@nil a)
-| dd: forall x: a, sorted (cons x nil).
+  ccc: sorted (@nil a)
+| ddd: forall x: a, sorted (cons x nil).
 
 Variable f : a -> a.
 
@@ -126,21 +131,21 @@ Goal True.
 ae.
 Qed.
 
-Parameter p: Z -> Prop.
+Parameter par: Z -> Prop.
 
 (* let in *)
 Goal
   let t := Z in
-  let f := p 0 in
-  (forall x:t, p x -> p (let y := x+1 in y)) ->
-  f -> p 1.
+  let f := par 0 in
+  (forall x:t, par x -> par (let y := x+1 in y)) ->
+  f -> par 1.
 ae.
 Qed.
 
 (* cast *)
 Goal
   (
-  (forall x:Z, p x -> p (x+1)) -> p (0 : Z) -> p 1 : Prop).
+  (forall x:Z, par x -> par (x+1)) -> par (0 : Z) -> par 1 : Prop).
 ae.
 Qed.
 
@@ -174,11 +179,7 @@ Definition eq' (A:Set) (x y : A) := x=y.
 Goal
   eq' nat O O.
 ae.
-(*
-why "z3".  (* BUG encoding decorate ici ? *)
 Qed.
-*)
-Admitted.
 
 Definition pred (n:nat) := match n with 
   | O => O
@@ -317,3 +318,20 @@ Goal wgt (S O, 3) = 3.
 ae.
 Qed.
 
+Require Import Rbase.
+Require Import R_sqrt.
+Require Import Rfunctions.
+Require Import Rbasic_fun.
+
+Goal forall (x:R), (0 <= x * x)%R.
+(* don't know
+ae
+*)
+(* timeout
+z3.
+*)
+(* timeout
+why3 "cvc3" timelimit 3.
+*)
+intros.
+Admitted.

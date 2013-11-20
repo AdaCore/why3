@@ -23,8 +23,9 @@ type label = private {
 module Mlab : Extmap.S with type key = label
 module Slab : Extset.S with module M = Mlab
 
+val lab_compare : label -> label -> int
 val lab_equal : label -> label -> bool
-val lab_hash  : label -> int
+val lab_hash : label -> int
 
 val create_label : string -> label
 
@@ -42,8 +43,8 @@ module Sid : Extset.S with module M = Mid
 module Hid : Exthtbl.S with type key = ident
 module Wid : Weakhtbl.S with type key = ident
 
+val id_compare : ident -> ident -> int
 val id_equal : ident -> ident -> bool
-
 val id_hash : ident -> int
 
 (* a user-created type of unregistered identifiers *)

@@ -33,7 +33,7 @@ let make_rt_rf env =
       | Tapp (lselect,[{t_node=Tapp(lstore,[_;a1;b])};a2])
           when lselect.ls_name == select &&
             lstore.ls_name == store &&
-            t_equal_alpha a1 a2 -> b
+            t_equal a1 a2 -> b
       | _ -> t
   and rf f = TermTF.t_map rt rf f  in
   rt,rf

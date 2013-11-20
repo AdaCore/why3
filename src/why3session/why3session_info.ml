@@ -48,28 +48,32 @@ let spec =
 
 
 type proof_stats =
-    { mutable nb_goals : int;
+    { mutable nb_root_goals : int;
+      mutable nb_sub_goals : int;
       mutable max_time : float;
-      mutable nb_proved_goals : int;
+      mutable nb_proved_root_goals : int;
+      mutable nb_proved_sub_goals : int;
       mutable no_proof : Sstr.t;
       mutable only_one_proof : Sstr.t;
       prover_hist : int Mfloat.t Hprover.t;
       prover_min_time : float Hprover.t;
-      prover_avg_time : float Hprover.t;
+      prover_sum_time : float Hprover.t;
       prover_max_time : float Hprover.t;
       prover_num_proofs : int Hprover.t;
       (* prover_data : (string) Hprover.t *)
     }
 
 let new_proof_stats () =
-  { nb_goals = 0;
+  { nb_root_goals = 0;
+    nb_sub_goals = 0;
     max_time = 0.0;
-    nb_proved_goals = 0;
+    nb_proved_root_goals = 0;
+    nb_proved_sub_goals = 0;
     no_proof = Sstr.empty;
     only_one_proof = Sstr.empty;
     prover_hist = Hprover.create 3;
     prover_min_time = Hprover.create 3;
-    prover_avg_time = Hprover.create 3;
+    prover_sum_time = Hprover.create 3;
     prover_max_time = Hprover.create 3;
     prover_num_proofs =  Hprover.create 3;
     (* prover_data = Hprover.create 3  *)}
@@ -97,7 +101,7 @@ let update_max_time tbl (prover, time) =
       | None -> time)
     ~name:prover
 
-let update_avg_time tbl (prover, time) =
+let update_sum_time tbl (prover, time) =
   apply_f_on_hashtbl_entry
     ~tbl
     ~f:(function
@@ -114,8 +118,8 @@ let update_count tbl (prover, _time) =
     ~name:prover
 
 let update_hist tbl (prover, time) =
-  let h = 
-    try Hprover.find tbl prover 
+  let h =
+    try Hprover.find tbl prover
     with Not_found -> Mfloat.empty
   in
   let h =
@@ -131,14 +135,16 @@ let update_perf_stats stats ((_,t) as prover_and_time) =
   if t > stats.max_time then stats.max_time <- t;
   update_min_time stats.prover_min_time prover_and_time;
   update_max_time stats.prover_max_time prover_and_time;
-  update_avg_time stats.prover_avg_time prover_and_time;
+  update_sum_time stats.prover_sum_time prover_and_time;
   update_count stats.prover_num_proofs prover_and_time;
   update_hist stats.prover_hist prover_and_time
 
 let string_of_prover p = Pp.string_of_wnl print_prover p
 
-let rec stats_of_goal prefix_name stats goal =
-  stats.nb_goals <- stats.nb_goals + 1;
+let rec stats_of_goal ~root prefix_name stats goal =
+  if root
+  then stats.nb_root_goals <- stats.nb_root_goals + 1
+  else stats.nb_sub_goals <- stats.nb_sub_goals + 1;
   let proof_list =
     PHprover.fold
       (fun prover proof_attempt acc ->
@@ -162,7 +168,10 @@ let rec stats_of_goal prefix_name stats goal =
     stats.no_proof <- Sstr.add goal_name stats.no_proof
   else
     begin
-      stats.nb_proved_goals <- stats.nb_proved_goals + 1;
+      if root then
+        stats.nb_proved_root_goals <- stats.nb_proved_root_goals + 1
+      else
+        stats.nb_proved_sub_goals <- stats.nb_proved_sub_goals + 1;
       match proof_list with
       | [ (prover, _) ] ->
         let goal_name = prefix_name ^ goal.goal_name.Ident.id_string in
@@ -175,13 +184,13 @@ let rec stats_of_goal prefix_name stats goal =
 
 and stats_of_transf prefix_name stats _ transf =
   let prefix_name = prefix_name ^ transf.transf_name  ^ " / " in
-  List.iter (stats_of_goal prefix_name stats) transf.transf_goals
+  List.iter (stats_of_goal ~root:false prefix_name stats) transf.transf_goals
 
 let stats_of_theory file stats theory =
   let goals = theory.theory_goals in
   let prefix_name = file.file_name ^ " / " ^ theory.theory_name.Ident.id_string
     ^  " / " in
-  List.iter (stats_of_goal prefix_name stats) goals
+  List.iter (stats_of_goal ~root:true prefix_name stats) goals
 
 let stats_of_file stats _ file =
   let theories = file.file_theories in
@@ -233,7 +242,7 @@ and stats2_of_transf ~nb_proofs tr : (notask goal * notask goal_stat) list =
         | r -> (g,r)::acc)
     [] tr.transf_goals
 
-let print_res ~time fmt (p,t) = 
+let print_res ~time fmt (p,t) =
   fprintf fmt "%a" print_prover p;
   if time then fprintf fmt " (%.2f)" t
 
@@ -248,7 +257,7 @@ let rec print_goal_stats ~time depth (g,l) =
       begin
         match pl with
           | [] -> printf "@\n"
-          | _ -> printf ": %a@\n" 
+          | _ -> printf ": %a@\n"
             (Pp.print_list pp_print_space (print_res ~time)) pl
       end;
       List.iter (print_transf_stats ~time (depth+1)) l
@@ -302,6 +311,7 @@ let fill_prover_data stats session =
     (get_used_provers session)
 *)
 
+(*
 let finalize_stats stats =
   Hprover.iter
     (fun prover time ->
@@ -309,10 +319,14 @@ let finalize_stats stats =
       Hprover.replace stats.prover_avg_time prover
         (time /. (float_of_int n)))
     stats.prover_avg_time
+*)
 
 let print_stats r0 r1 stats =
-  printf "== Number of goals ==@\n  total: %d  proved: %d@\n@\n"
-    stats.nb_goals stats.nb_proved_goals;
+  printf "== Number of root goals ==@\n  total: %d  proved: %d@\n@\n"
+    stats.nb_root_goals stats.nb_proved_root_goals;
+
+  printf "== Number of sub goals ==@\n  total: %d  proved: %d@\n@\n"
+    stats.nb_sub_goals stats.nb_proved_sub_goals;
 
   printf "== Goals not proved ==@\n  @[";
   print_session_stats ~time:false r0;
@@ -325,11 +339,13 @@ let print_stats r0 r1 stats =
   printf "@]@\n";
 
   printf "== Statistics per prover: number of proofs, time (minimum/maximum/average) in seconds ==@\n  @[";
-  Hprover.iter (fun prover n -> printf "%-20s : %3d %6.2f %6.2f %6.2f@\n"
-    (string_of_prover prover) n
-    (Hprover.find stats.prover_min_time prover)
-    (Hprover.find stats.prover_max_time prover)
-    (Hprover.find stats.prover_avg_time prover))
+  Hprover.iter (fun prover n ->
+    let sum_times = Hprover.find stats.prover_sum_time prover in
+    printf "%-20s : %3d %6.2f %6.2f %6.2f@\n"
+      (string_of_prover prover) n
+      (Hprover.find stats.prover_min_time prover)
+      (Hprover.find stats.prover_max_time prover)
+      (sum_times /. (float_of_int n)))
     stats.prover_num_proofs;
   printf "@]@\n"
 
@@ -362,29 +378,40 @@ let run_one stats r0 r1 fname =
 (**** print histograms ******)
 
 let print_hist stats =
-  let main_ch = open_out "why3session.gnuplot" in
+  let main_file,main_ch =
+    Filename.open_temp_file "why3session" ".gnuplot"
+  in
   let main_fmt = formatter_of_out_channel main_ch in
+  fprintf main_fmt "set logscale y@\n";
+  fprintf main_fmt "set key rmargin@\n";
+  let max_sum_times =
+    Hprover.fold
+      (fun _ s acc -> max s acc)
+      stats.prover_sum_time 0.0
+  in
   let (_:int) =
   Hprover.fold
     (fun p h acc ->
-      let pf = (string_of_int acc) ^ ".plot" in
-      if acc = 1 then 
-        fprintf main_fmt "plot [0:%.2f] [0:%d]" (2.0 *. stats.max_time) stats.nb_goals 
-      else 
+      let pf,ch = Filename.open_temp_file "why3session" ".data" in
+      if acc = 1 then
+        fprintf main_fmt "plot [1:%d] [0.01:%.2f] "
+          (stats.nb_proved_sub_goals + stats.nb_proved_root_goals)
+          max_sum_times
+      else
         fprintf main_fmt "replot";
-      fprintf main_fmt " \"%s\" using 1:2 title \"%s\" with linespoints ps 0.2@\n" 
+      fprintf main_fmt
+        " \"%s\" using 2:1 title \"%s\" with linespoints ps 0.2@\n"
         pf (string_of_prover p);
-      let ch = open_out pf in
       let fmt = formatter_of_out_channel ch in
-      fprintf fmt "0.00 0@\n";
-      let (_ :int) =
+      let (_ : float * int) =
         Mfloat.fold
-          (fun t c acc ->
-            let acc = c + acc in
-            fprintf fmt "%.2f %d@\n" t acc;
-            acc)
-          h 0
-      in 
+          (fun t c (acct,accc) ->
+            let accc = c + accc in
+            let acct = t +. acct in
+            fprintf fmt "%.2f %d@\n" acct accc;
+            (acct,accc))
+          h (0.0,0)
+      in
       fprintf fmt "@.";
       close_out ch;
       acc+1)
@@ -394,8 +421,14 @@ let print_hist stats =
   fprintf main_fmt "set terminal pdfcairo@\n";
   fprintf main_fmt "set output \"why3session.pdf\"@\n";
   fprintf main_fmt "replot@.";
-  close_out main_ch
-
+  close_out main_ch;
+  let cmd = "gnuplot " ^ main_file in
+  eprintf "Running command %s@." cmd;
+  let ret = Sys.command cmd in
+  if ret <> 0 then
+    eprintf "Command %s failed@." cmd
+  else
+    eprintf "See also results in file why3session.pdf@."
 
 (****** run on all files  ******)
 
@@ -407,7 +440,7 @@ let run () =
   iter_files (run_one stats r0 r1);
   if !opt_stats_print then
     begin
-      finalize_stats stats;
+      (* finalize_stats stats; *)
       print_stats !r0 !r1 stats
     end;
   if !opt_hist_print then print_hist stats

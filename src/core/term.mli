@@ -27,6 +27,7 @@ module Svs : Extset.S with module M = Mvs
 module Hvs : Exthtbl.S with type key = vsymbol
 module Wvs : Weakhtbl.S with type key = vsymbol
 
+val vs_compare : vsymbol -> vsymbol -> int
 val vs_equal : vsymbol -> vsymbol -> bool
 val vs_hash : vsymbol -> int
 
@@ -47,6 +48,7 @@ module Sls : Extset.S with module M = Mls
 module Hls : Exthtbl.S with type key = lsymbol
 module Wls : Weakhtbl.S with type key = lsymbol
 
+val ls_compare : lsymbol -> lsymbol -> int
 val ls_equal : lsymbol -> lsymbol -> bool
 val ls_hash : lsymbol -> int
 
@@ -77,7 +79,6 @@ type pattern = private {
   pat_node : pattern_node;
   pat_vars : Svs.t;
   pat_ty   : ty;
-  pat_tag  : int;
 }
 
 and pattern_node = private
@@ -86,9 +87,6 @@ and pattern_node = private
   | Papp of lsymbol * pattern list
   | Por  of pattern * pattern
   | Pas  of pattern * vsymbol
-
-val pat_equal : pattern -> pattern -> bool
-val pat_hash : pattern -> int
 
 (** Smart constructors for patterns *)
 
@@ -122,8 +120,6 @@ type term = private {
   t_ty    : ty option;
   t_label : Slab.t;
   t_loc   : Loc.position option;
-  t_vars  : int Mvs.t;
-  t_tag   : int;
 }
 
 and term_node = private
@@ -150,6 +146,7 @@ module Mterm : Extmap.S with type key = term
 module Sterm : Extset.S with module M = Mterm
 module Hterm : Exthtbl.S with type key = term
 
+val t_compare : term -> term -> int
 val t_equal : term -> term -> bool
 val t_hash : term -> int
 
@@ -238,6 +235,7 @@ val t_exists_close : vsymbol list -> trigger -> term -> term
 
 val t_label : ?loc:Loc.position -> Slab.t -> term -> term
 val t_label_add : label -> term -> term
+val t_label_remove : label -> term -> term
 val t_label_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
@@ -381,6 +379,10 @@ val t_v_fold : ('a -> vsymbol -> 'a) -> 'a -> term -> 'a
 val t_v_all : (vsymbol -> bool) -> term -> bool
 val t_v_any : (vsymbol -> bool) -> term -> bool
 
+val t_v_count : ('a -> vsymbol -> int -> 'a) -> 'a -> term -> 'a
+
+val t_v_occurs : vsymbol -> term -> int
+
 (** Variable substitution *)
 
 val t_subst : term Mvs.t -> term -> term
@@ -390,7 +392,12 @@ val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
 
 (** Find free variables and type variables *)
 
-val t_freevars    : int Mvs.t -> term -> int Mvs.t
+val t_closed : term -> bool
+
+val t_vars : term -> int Mvs.t
+
+val t_freevars : int Mvs.t -> term -> int Mvs.t
+
 val t_ty_freevars : Stv.t -> term -> Stv.t
 
 (** Map/fold over types and logical symbols in terms and patterns *)
@@ -415,17 +422,7 @@ val t_app_map :
 val t_app_fold :
   ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
 
-(** Equality modulo alpha *)
-
-val t_equal_alpha : term -> term -> bool
-
-module Hterm_alpha : Exthtbl.S with type key = term
-
 (** Subterm occurrence check and replacement *)
 
-val t_occurs : term -> term -> bool
-val t_occurs_alpha : term -> term -> bool
-
+val t_occurs  : term -> term -> bool
 val t_replace : term -> term -> term -> term
-val t_replace_alpha : term -> term -> term -> term
-

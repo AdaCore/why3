@@ -800,8 +800,8 @@ let spec_subst sbs c =
   }
 
 let spec_vsset c =
-  let add f s = Mvs.set_union f.t_vars s in
-  let s = add c.c_pre c.c_post.t_vars in
+  let add f s = Mvs.set_union (t_vars f) s in
+  let s = add c.c_pre (t_vars c.c_post) in
   let s = Mexn.fold (fun _ f s -> add f s) c.c_xpost s in
   List.fold_left (fun s (t,_) -> add t s) s c.c_variant
 
@@ -872,7 +872,7 @@ let create_pvsymbol, restore_pv =
 let pvs_of_vss pvs vss =
   Mvs.fold (fun vs _ s -> Spv.add (restore_pv vs) s) vss pvs
 
-let t_pvset pvs t = pvs_of_vss pvs t.t_vars
+let t_pvset pvs t = pvs_of_vss pvs (t_vars t)
 
 let spec_pvset pvs spec = pvs_of_vss pvs (spec_vsset spec)
 

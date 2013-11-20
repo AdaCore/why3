@@ -19,6 +19,8 @@ open Decl
 open Task
 open Libencoding
 
+(* complete dead module code
+
 (** module with printing functions *)
 module Debug = struct
   let print_mtv vprinter fmter m =
@@ -35,6 +37,7 @@ module Debug = struct
 
   let debug x = Format.eprintf "%s@." x
 end
+*)
 
 (** {2 module to separate utilities from important functions} *)
 

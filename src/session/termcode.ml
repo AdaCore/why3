@@ -61,7 +61,9 @@ let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
          session@ trees@ after@ modification@ of@ source@ files."
 
-let current_shape_version = 3
+let current_shape_version = 4
+
+type shape_version = SV1 | SV2 | SV3
 
 (* similarity code of terms, or of "shapes"
 
@@ -138,32 +140,29 @@ let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
           l
     | Tif (f,t1,t2) ->
       begin match version with
-      | 1 | 2 -> fn (fn (fn (push tag_if acc) f) t1) t2
-      | 3 -> fn (fn (fn (push tag_if acc) t2) t1) f
-      | _ -> assert false
+      | SV1 | SV2 -> fn (fn (fn (push tag_if acc) f) t1) t2
+      | SV3 -> fn (fn (fn (push tag_if acc) t2) t1) f
       end
     | Tcase (t1,bl) ->
         let br_shape acc b =
           let p,t2 = t_open_branch b in
           match version with
-          | 1 | 2 ->
+          | SV1 | SV2 ->
             let acc = pat_shape ~push c m acc p in
             let m = pat_rename_alpha c m p in
             t_shape ~version ~push c m acc t2
-          | 3 ->
+          | SV3 ->
             let m1 = pat_rename_alpha c m p in
             let acc = t_shape ~version ~push c m1 acc t2 in
             pat_shape ~push c m acc p
-          | _ -> assert false
         in
         begin match version with
-        | 1 | 2 ->
+        | SV1 | SV2 ->
           List.fold_left br_shape (fn (push tag_case acc) t1) bl
-        | 3 ->
+        | SV3 ->
           let acc = push tag_case acc in
           let acc = List.fold_left br_shape acc bl in
           fn acc t1
-        | _ -> assert false
         end
     | Teps b ->
         let u,f = t_open_bound b in
@@ -197,41 +196,47 @@ let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
         let m = vs_rename_alpha c m u in
         begin
           match version with
-            | 1 ->
+            | SV1 ->
               t_shape ~version ~push c m (fn (push tag_let acc) t1) t2
-            | 2 | 3 ->
+            | SV2 | SV3 ->
               (* t2 first, intentionally *)
               fn (push tag_let (t_shape ~version ~push c m acc t2)) t1
-            | _ -> assert false
         end
     | Tnot f ->
       begin match version with
-      | 1 | 2 -> push tag_not (fn acc f)
-      | 3 -> fn (push tag_not acc) f
-      | _ -> assert false
+      | SV1 | SV2 -> push tag_not (fn acc f)
+      | SV3 -> fn (push tag_not acc) f
       end
     | Ttrue -> push tag_true acc
     | Tfalse -> push tag_false acc
 
+(* dead code
 let t_shape_buf ?(version=current_shape_version) t =
   let b = Buffer.create 17 in
   let push t () = Buffer.add_string b t in
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () t in
   Buffer.contents b
+*)
 
-let t_shape_task ?(version=current_shape_version) t =
+let t_shape_task ~version t =
   let b = Buffer.create 17 in
   let push t () = Buffer.add_string b t in
   begin match version with
-  | 1 | 2 -> ()
-  | 3 -> 
+  | SV1 | SV2 -> ()
+  | SV3 ->
     let _, expl, _ = goal_expl_task ~root:false t in
     Opt.iter (Buffer.add_string b) expl
-  | _ -> assert false
   end;
   let f = Task.task_goal_fmla t in
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () f in
   Buffer.contents b
+
+let t_shape_task ?(version=current_shape_version) t =
+  let version = match version with
+    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3
+    | _ -> assert false
+  in
+  t_shape_task ~version t
 
 (* Checksums *)
 
@@ -242,22 +247,36 @@ let checksum_of_string x = x
 let equal_checksum x y = (x : checksum) = y
 let dumb_checksum = ""
 
+type checksum_version = CV1 | CV2
+
 module Checksum = struct
 
-  let char = Buffer.add_char
-  let int b i = char b 'i'; Buffer.add_string b (string_of_int i)
-  let string b s =
-    char b '"'; Buffer.add_string b (String.escaped s); char b '"'
+  let char (_,_,_,buf) c = Buffer.add_char buf c
+  let int (_,_,_,buf as b) i =
+    char b 'i'; Buffer.add_string buf (string_of_int i)
+  let string (_,_,_,buf as b) s =
+    char b '"'; Buffer.add_string buf (String.escaped s); char b '"'
   let option e b = function None -> char b 'n' | Some x -> char b 's'; e b x
   let list e b l = char b '['; List.iter (e b) l; char b ']'
 
-  let ident, clear_ident =
+  let ident_v1, clear_ident_v1 =
     let hident = Ident.Hid.create 17 in
     let c = ref 0 in
     (fun b id ->
       int b (try Ident.Hid.find hident id
         with Not_found -> incr c; Ident.Hid.add hident id !c; !c)),
     (fun () -> Ident.Hid.clear hident; c := 0)
+
+  let ident_v2 (_,c,m,_ as b) id =
+    let i = match Ident.Mid.find_opt id !m with
+      | Some i -> i
+      | None -> incr c; m := Ident.Mid.add id !c !m; !c
+    in
+    int b i
+
+  let ident (v,_,_,_ as b) id = match v with
+    | CV1 -> ident_v1 b id
+    | CV2 -> ident_v2 b id
 
   let const b c =
     let buf = Buffer.create 17 in
@@ -270,8 +289,9 @@ module Checksum = struct
     | Ty.Tyvar tv -> char b 'v'; tvsymbol b tv
     | Ty.Tyapp (ts, tyl) -> char b 'a'; ident b ts.Ty.ts_name; list ty b tyl
 
-  (* variable: the type, but not the name (we want alpha-equivalence) *)
-  let vsymbol b vs = ty b vs.vs_ty
+  let vsymbol (v,_,_,_ as b) vs = match v with
+    | CV1 -> ty b vs.vs_ty
+    | CV2 -> ident b vs.vs_name; ty b vs.vs_ty
 
   (* start: _ V ident a o *)
   let rec pat b p = match p.pat_node with
@@ -393,17 +413,52 @@ module Checksum = struct
         char b 'C'; ident b th.Theory.th_name; list string b th.Theory.th_path
     | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
 
-  let task t =
+  let task_v1 =
+    let c = ref 0 in
+    let m = ref Ident.Mid.empty in
     let b = Buffer.create 8192 in
-    Task.task_iter (tdecl b) t;
-    clear_ident ();
-    let s = Buffer.contents b in
-    Digest.to_hex (Digest.string s)
+    fun t ->
+      Task.task_iter (tdecl (CV1,c,m,b)) t;
+      clear_ident_v1 ();
+      let dnew = Digest.string (Buffer.contents b) in
+      Buffer.clear b;
+      Digest.to_hex dnew
 
+  let task_v2 =
+    let c = ref 0 in
+    let m = ref Ident.Mid.empty in
+    let b = Buffer.create 8192 in
+    let task_hd t (cold,mold,dold) =
+      c := cold;
+      m := mold;
+      tdecl (CV2,c,m,b) t.Task.task_decl;
+      Buffer.add_string b (Digest.to_hex dold);
+      let dnew = Digest.string (Buffer.contents b) in
+      Buffer.clear b;
+      let mnew = match t.Task.task_decl.Theory.td_node with
+        | Theory.Decl { Decl.d_news = s } ->
+            Ident.Sid.fold (fun id a ->
+              Ident.Mid.add id (Ident.Mid.find id !m) a) s mold
+        | _ -> !m in
+      !c, mnew, dnew
+    in
+    let tr = Trans.fold task_hd (0, Ident.Mid.empty, Digest.string "") in
+    fun t ->
+      let _,_,dnew = Trans.apply tr t in
+      Digest.to_hex dnew
+
+  let task ~version t = match version with
+    | CV1 -> task_v1 t
+    | CV2 -> task_v2 t
 end
 
-let task_checksum ?(version=0) t = ignore version; Checksum.task t
-
+let task_checksum ?(version=current_shape_version) t =
+  let version = match version with
+    | 1 | 2 | 3 -> CV1
+    | 4 -> CV2
+    | _ -> assert false
+  in
+  Checksum.task ~version t
 
 (*************************************************************)
 (* Pairing of new and old subgoals                           *)
@@ -538,4 +593,9 @@ module Pairing(Old: S)(New: S) = struct
     end;
     Array.to_list result
 
+(*
+  let associate oldgoals newgoals =
+    try List.map2 (fun o n -> n, Some (o, true)) oldgoals newgoals
+    with Invalid_argument _ -> associate oldgoals newgoals
+*)
 end

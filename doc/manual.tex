@@ -2,6 +2,13 @@
 
 % rubber: module index
 
+%BEGIN LATEX
+\usepackage{comment}
+\newcommand{\ahref}[2]{{#2}}
+\excludecomment{htmlonly}
+\newenvironment{latexonly}{}{}
+%END LATEX
+
 %HEVEA\@addimagenopt{-pdf}
 
 %BEGIN LATEX
@@ -21,7 +28,6 @@
 
 \usepackage{listings}
 \usepackage{xspace}
-\usepackage{hevea}
 
 %BEGIN LATEX
 \setulmarginsandblock{30mm}{30mm}{*}
@@ -38,7 +44,7 @@
 \setcounter{bottomnumber}{4}
 \setcounter{totalnumber}{8}
 
-\newstyle{table.lstframe}{width:100\%;border-width:1px;}
+%HEVEA \newstyle{table.lstframe}{width:100\%;border-width:1px;}
 
 % \usepackage[toc,nonumberlist]{glossaries}
 % \makeglossaries

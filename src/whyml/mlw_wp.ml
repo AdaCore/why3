@@ -152,7 +152,7 @@ let wp_forall vl f = t_forall_close_simp vl [] f
 
 let is_equality_for v f = match f.t_node with
   | Tapp (ps, [{ t_node = Tvar u }; t])
-    when ls_equal ps ps_equ && vs_equal u v && not (Mvs.mem v t.t_vars) ->
+    when ls_equal ps ps_equ && vs_equal u v && t_v_occurs v t = 0 ->
       Some t
   | _ ->
       None
@@ -294,7 +294,7 @@ let rec subst_at_now now mvs t = match t.t_node with
       t_map (subst_at_now now mvs) t
   | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
       (* do not open unless necessary *)
-      let mvs = Mvs.set_inter mvs t.t_vars in
+      let mvs = Mvs.set_inter mvs (t_vars t) in
       if Mvs.is_empty mvs then t else
       t_map (subst_at_now now mvs) t
   | _ ->
@@ -330,7 +330,7 @@ let update_term env (mreg : vsymbol Mreg.t) f =
   let update vs _ = match update_var env mreg vs with
     | { t_node = Tvar nv } when vs_equal vs nv -> None
     | t -> Some t in
-  let vars = Mvs.mapi_filter update f.t_vars in
+  let vars = Mvs.mapi_filter update (t_vars f) in
   (* [vv'] : modified variable -> fresh variable *)
   let new_var vs _ = mk_var vs.vs_name model2_lab vs.vs_ty in
   let vv' = Mvs.mapi new_var vars in
@@ -345,11 +345,11 @@ let get_single_region_of_var vs =
 
 (* look for a variable with a single region equal to [reg] *)
 let var_of_region reg f =
-  let test vs _ acc =
+  let test acc vs =
     match get_single_region_of_var vs with
     | Some r when reg_equal r reg -> Some vs
     | _ -> acc in
-  Mvs.fold test f.t_vars None
+  t_v_fold test None f
 
 let quantify env regs f =
   (* mreg : modified region -> vs *)
@@ -980,7 +980,7 @@ let wp_let env km th { let_sym = lv; let_expr = e } =
   let env = mk_env env km th in
   let q, xq = default_post e.e_vty e.e_effect in
   let f = wp_expr env e q xq in
-  let f = wp_forall (Mvs.keys f.t_vars) f in
+  let f = wp_forall (Mvs.keys (t_vars f)) f in
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name
     | LetA ps -> ps.ps_name in
@@ -992,7 +992,7 @@ let wp_rec env km th fdl =
   let add_one th d f =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
       d.fun_ps.ps_name.id_string Pretty.print_term f;
-    let f = wp_forall (Mvs.keys f.t_vars) f in
+    let f = wp_forall (Mvs.keys (t_vars f)) f in
     add_wp_decl km d.fun_ps.ps_name f th
   in
   List.fold_left2 add_one th fdl fl
@@ -1044,6 +1044,11 @@ module Subst : sig
       (s',f) is the new state [s'] and a formula [f] which defines the new
       values in [s'] with respect to the input state [s]. *)
 
+   val extract_glue : wp_env -> Sreg.t -> t -> t -> term
+   (* The formula [extract_glue env regs s1 s2] expresses what has not changed
+      between [s1] and [s2], concerning program variables. The set of
+    *)
+
    val merge : t -> t -> t -> t * term * term
    (* Given a start state and two states that parted from there, return a new
       "join" state and two formulas.  The first formula links the first branch
@@ -1073,15 +1078,15 @@ end = struct
     }
   (* a substitution or state knows the current variables to use for each region
      and each mutable program variable. *)
-  (* the reg_names field is a simple name hint; a mapping reg |-> name means
-     that [name] should be used as a base for new variables in region [reg].
-     This mapping is not required to be complete for regions. *)
 
   type t =
     { now       : subst;
       other     : subst Mvs.t;
       reg_names : vsymbol Mreg.t;
     }
+  (* the reg_names field is a simple name hint; a mapping reg |-> name means
+     that [name] should be used as a base for new variables in region [reg].
+     This mapping is not required to be complete for regions. *)
   (* the actual state knows not only the current state, but also all labeled
      past states. *)
 
@@ -1106,13 +1111,11 @@ end = struct
        belonging to this program variable are also added to the state, if not
        already there. Note that [add_pvar] doesn't really change the state,
        only adds new knowledge. *)
-    (* for simple variables (1 variable = 1 mutable region), we register the
-       variable name as a name hint for the region. Also, we enter a
-       dummy program variable in the substitution map, so that we know that we
-       have to do something with this variable, but still know it is a program
-       variable. Previously, we did not enter it at all in the map, which made
-       us forget to substitute it.
-       See also [havoc], [merge] and [term]. *)
+    (* for simple variables (1 variable = 1 mutable region), we do not
+       introduce a new program variable each time, instead we use directly the
+       [update_var] term. See also [havoc]. This is a heuristics which assumes
+       that in this case, the program variable would be an overhead. In
+       particular for simple references it is an important optimization. *)
     let ity = pv.pv_ity in
     if ity_immutable ity then s
     else
@@ -1164,8 +1167,8 @@ end = struct
         Mreg.add reg (fresh_var_from_region s.reg_names reg) acc)
       regset s.now.subst_regions in
     let touched_regs = Mreg.set_inter regs regset in
-    (* We special case simple variables, when the mapping is the dummy
-     * variable. So no new names/equations are introduced for those. *)
+    (* We special case simple variables: no new variable is introduced for the
+     * program variable, we directly use the "update_var" term. *)
     let vars, f = Mvs.fold (fun vs _ ((acc_vars, acc_f) as acc) ->
       if pv_is_touched_by_regions vs regset then begin
         let new_term = update_var env touched_regs vs in
@@ -1189,9 +1192,7 @@ end = struct
        "current" substitution accordingly. *)
     match t.t_node with
     | Tvar vs ->
-        (* the normal case here is to replace the program variable [vs] by its
-           "now" value. The special case is where it is a simple variable; we
-           directly insert the "update" term here. *)
+        (* We simply replace the program variable [vs] by its "now" value. *)
         begin try Mvs.find vs s.now.subst_vars
         with Not_found -> t
         end
@@ -1213,11 +1214,27 @@ end = struct
         t_map (term subst) subterm
     | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
         (* do not open unless necessary *)
-        let mvs = Mvs.set_inter s.now.subst_vars t.t_vars in
+        let mvs = Mvs.set_inter s.now.subst_vars (t_vars t) in
         if Mvs.is_empty mvs then t else
         t_map (term s) t
     | _ ->
         t_map (term s) t
+
+  let extract_glue env regions s1 s2 =
+    (* we are only interested in "now" program vars *)
+    let touched_regions =
+      Mreg.filter (fun r _ -> Sreg.mem r regions) s2.now.subst_regions in
+    let s1 = s1.now.subst_vars and s2 = s2.now.subst_vars in
+    (* We iterate over the first state, because the second one potentially
+     * contains more variables *)
+    Mvs.fold
+      (fun var old_f acc ->
+          let f = Mvs.find var s2 in
+          if t_equal f old_f || is_simple_var var <> None then acc
+          else
+            let new_value = update_var env touched_regions var in
+            t_and_simp acc (t_equ_simp f new_value)
+      ) s1 t_true
 
   let subst_inter a b =
     (* compute the intersection of two substitutions. *)
@@ -1684,9 +1701,6 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
            for the exceptions that are actually listed. *)
         let wp1_exn_filtered =
           Mexn.filter (fun ex _ -> Mexn.mem ex xpost) wp1.exn in
-        (* ??? the glue is missing in this call to apply_state_to_post. This
-           means that "abstract" also forgets which immutable *components* are
-           not modified. To be fixed. *)
         let xq = Mexn.mapi (fun ex q -> Mexn.find ex xresult, q.ne) xpost in
         wp_nimplies wp1.post.ne wp1_exn_filtered ((result, post.ne), xq)
       in
@@ -1698,6 +1712,9 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           if Mexn.mem ex acc then acc
           else Mexn.add ex post acc)
         wp1.exn xpost in
+      let regs = regs_of_writes e1.e_effect in
+      let glue = Subst.extract_glue env regs pre_abstr_state wp1.post.s in
+      let post = { post with ne = t_and_simp glue post.ne } in
       let ok = t_and_simp_l [wp1.ok; (Subst.term s spec.c_pre); ok_post] in
       { ok = wp_label e ok;
         post = post;
@@ -1881,8 +1898,8 @@ and fast_wp_fun_defn env { fun_lambda = l } =
   let args = List.map (fun pv -> pv.pv_vs) l.l_args in
   let build_set svs =
     Mvs.fold (fun x _ acc -> Spv.add (restore_pv x) acc) svs Spv.empty in
-  let pre_vars = build_set c.c_pre.t_vars in
-  let post_vars = build_set c.c_post.t_vars in
+  let pre_vars = build_set (t_vars c.c_pre) in
+  let post_vars = build_set (t_vars c.c_post) in
   let all_vars = Spv.union l.l_expr.e_syms.syms_pv pre_vars in
   let all_vars = Spv.union all_vars post_vars in
   let prestate = Subst.init all_vars in
@@ -1914,7 +1931,7 @@ and fast_wp_fun_defn env { fun_lambda = l } =
      t_and_simp res.ok
      (wp_nimplies res.post.ne res.exn ((result, q.ne), xq)) in
   let f = wp_implies pre f in
-  let f = wp_forall args (t_forall_close (Mvs.keys f.t_vars) [] f) in
+  let f = wp_forall args (t_forall_close (Mvs.keys (t_vars f)) [] f) in
   f
 
 and fast_wp_rec_defn env fdl = List.map (fast_wp_fun_defn env) fdl
@@ -1923,7 +1940,7 @@ let fast_wp_let env km th { let_sym = lv; let_expr = e } =
   let env = mk_env env km th in
   let res =
     fast_wp_expr env (Subst.init e.e_syms.syms_pv) (result e) e in
-  let f = wp_forall (Mvs.keys res.ok.t_vars) res.ok in
+  let f = wp_forall (Mvs.keys (t_vars res.ok)) res.ok in
   let id = match lv with
     | LetV pv -> pv.pv_vs.vs_name
     | LetA ps -> ps.ps_name in
@@ -1935,7 +1952,7 @@ let fast_wp_rec env km th fdl =
   let add_one th d f =
     Debug.dprintf debug "wp %s = %a@\n----------------@."
       d.fun_ps.ps_name.id_string Pretty.print_term f;
-    let f = wp_forall (Mvs.keys f.t_vars) f in
+    let f = wp_forall (Mvs.keys (t_vars f)) f in
     add_wp_decl km d.fun_ps.ps_name f th
   in
   List.fold_left2 add_one th fdl fl
@@ -1973,7 +1990,7 @@ let wp_rec ~wp env kn th fdl =
       let f = wp_expr env e_void q Mexn.empty in
       let f = wp_implies spec.c_pre (erase_mark lab f) in
       let f = wp_forall args (quantify env (wp_fun_regs ps l) f) in
-      let f = t_forall_close (Mvs.keys f.t_vars) [] f in
+      let f = t_forall_close (Mvs.keys (t_vars f)) [] f in
       let lkn = Theory.get_known th in
       let f = if Debug.test_flag no_track then f else track_values lkn kn f in
       (*let f = if Debug.test_flag no_eval then f else

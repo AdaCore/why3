@@ -37,7 +37,8 @@ let incremental_pat_match env holes =
         end
     | PatApp (sp,ss,sl,pl), Tapp (ls,tl) ->
         if List.length pl <> List.length tl then raise Not_found;
-        let th = try Env.find_theory env sp ss with Env.TheoryNotFound _ -> raise Not_found in
+        let th = try Env.find_theory env sp ss with Env.TheoryNotFound _ ->
+            raise Not_found in
         let s = ns_find_ls th.th_export sl in
         if not (ls_equal s ls) then raise Not_found;
         List.iter2 aux pl tl
@@ -115,14 +116,15 @@ let print_ident fmt id =
 let print_const fmt c =
   let number_format = {
     Number.long_int_support = true;
+    Number.extra_leading_zeros_support = true;
     Number.dec_int_support = Number.Number_default;
     Number.hex_int_support = Number.Number_default;
     Number.oct_int_support = Number.Number_unsupported;
     Number.bin_int_support = Number.Number_unsupported;
     Number.def_int_support = Number.Number_unsupported;
-    Number.dec_real_support = (*Number.Number_default*) Number.Number_unsupported;
-    Number.hex_real_support = (*Number.Number_default*) Number.Number_unsupported;
-    Number.frac_real_support = (*Number.Number_unsupported;*)
+    Number.dec_real_support = Number.Number_unsupported;
+    Number.hex_real_support = Number.Number_unsupported;
+    Number.frac_real_support =
       Number.Number_custom (Number.PrintFracReal ("%s", "(%s/%s)", "(%s/%s)"));
     Number.def_real_support = Number.Number_unsupported;
   } in
@@ -168,18 +170,19 @@ let rec print_term info fmt t =
       | None -> print_ident fmt id
     end
   | Tapp ( { ls_name = id } ,[t] ) 
-      when try String.sub id.id_string 0 6 = "index_" with Invalid_argument _ -> false ->
-      fprintf fmt "%a" term t
+      when try String.sub id.id_string 0 6 = "index_" with Invalid_argument _
+        -> false ->
+            fprintf fmt "%a" term t
   | Tapp (ls, tl) ->
       begin match query_syntax info.info_syn ls.ls_name with
         | Some s -> syntax_arguments s term fmt tl
         (*| None ->
             unsupportedTerm t
               ("math: function '" ^ ls.ls_name.id_string ^ "' is not supported")*)
-	| None -> begin match tl with
+        | None -> begin match tl with
             | [] -> fprintf fmt "%a" print_ident ls.ls_name
             | _ -> fprintf fmt "%a[%a]"
-		print_ident ls.ls_name (print_list comma term) tl
+                print_ident ls.ls_name (print_list comma term) tl
           end
       end
 
@@ -201,14 +204,6 @@ let rec print_term info fmt t =
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 
-(*and print_case _pp info fmt t _bl =
-  let ts = match t.t_ty with
-    | Some { ty_node = Tyapp (ts,_) } -> ts
-    | _ -> Printer.unsupportedTerm t "math: unknown type"
-  in
-  fprintf fmt "Match%a[%a]" print_ident ts.ts_name (print_term info) t*)
-
-
 (* predicates *)
 
 (*let rec*) and print_fmla info fmt f =
@@ -222,7 +217,7 @@ let rec print_term info fmt t =
     end
   | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
       (* TODO: distinguish between type of t1 and t2
-         the following is OK only for real of integer
+         the following is OK only for real or integer
       *)
       begin try
         let c1 = constant_value t1 in
@@ -258,27 +253,27 @@ let rec print_term info fmt t =
         | None ->
             (*unsupportedTerm f
               ("math: predicate '" ^ ls.ls_name.id_string ^ "' is not supported")*)
-	    begin match tl with
+            begin match tl with
               | [] -> fprintf fmt "%a" print_ident ls.ls_name
               | _ -> fprintf fmt "%a[%a]"
-		  print_ident ls.ls_name (print_list comma (print_term info)) tl
+                print_ident ls.ls_name (print_list comma (print_term info)) tl
             end
       end
   (*| Tquant _ ->
       unsupportedTerm f "math: quantifiers are not supported"*)
   (*| Tquant (Tforall, fq) ->
       let vl, _tl, f = t_open_quant fq in
-	info.info_vars <- List.append info.info_vars vl;
+        info.info_vars <- List.append info.info_vars vl;
         fprintf fmt "%a" fmla f*)
   | Tquant (Tforall, fq) ->
       let vl, _tl, f = t_open_quant fq in
       let var fmt v = (* TODO: type check v.vs_ty *)
-	print_ident fmt v.vs_name in
+        print_ident fmt v.vs_name in
         fprintf fmt "ForAll[{%a}, %a]" (print_list comma var) vl fmla f
   | Tquant (Texists, fq) ->
       let vl, _tl, f = t_open_quant fq in
       let var fmt v = (* TODO: type check v.vs_ty *)
-	print_ident fmt v.vs_name in
+        print_ident fmt v.vs_name in
         fprintf fmt "Exists[{%a}, %a]" (print_list comma var) vl fmla f
   | Tbinop (Tand, f1, f2) ->
       fprintf fmt "(%a &&@ %a)" fmla f1 fmla f2
@@ -319,23 +314,15 @@ let is_number = function
 let filter_logic info ((params,funs,preds,types) as acc) (ls,ld) =
   if (not (Mid.mem ls.ls_name info.info_symbols)) then
     match ls.ls_args, ls.ls_value with
-    (*| [], Some ty -> if is_number ty.ty_node then (* params (functions without args) *)
-	((ls,ld)::params,funs,preds,types)
-      else 
-	(printf "param: %a" print_ident ls.ls_name;
-	acc)
-    *)
-
     | _, Some _ty (*when is_number ty.ty_node*) -> (* functions *)
-	(params,(ls,ld)::funs,preds,types)
+      (params,(ls,ld)::funs,preds,types)
 
     | _, None -> (* predicates *)
-	(params,funs,(ls,ld)::preds,types)
+      (params,funs,(ls,ld)::preds,types)
 
     (*| _, _, None -> (* funs/preds without definitions *)
-	(*unsupported "math: funs/preds without definitions"*)
-	acc
-    *)
+        (*unsupported "math: funs/preds without definitions"*)
+        acc *)
   else acc
 
 
@@ -347,10 +334,11 @@ let rec filter_hyp info params defs eqs hyps pr f =
           | Tapp(l,[]) ->
               if Hid.mem defs l.ls_name then raise AlreadyDefined;
               Hid.add defs l.ls_name ();
-              t_s_fold (fun _ _ -> ()) (fun _ ls -> Hid.replace defs ls.ls_name ()) () t2;
-	      (* filters out the defined parameter *)
-	      let params = List.filter (fun p -> p.ls_name <> l.ls_name) params in
-	      (*info.info_vars <- List.filter (fun v -> v.vs_name = l.ls_name) info.info_vars;*)
+              t_s_fold (fun _ _ -> ()) (fun _ ls -> 
+                  Hid.replace defs ls.ls_name ()) () t2;
+              (* filters out the defined parameter *)
+              let params = List.filter (fun p -> p.ls_name <> l.ls_name) params 
+              in
               (params, (pr,t1,t2)::eqs, hyps)
           | _ -> raise AlreadyDefined in
       begin try
@@ -380,46 +368,46 @@ type filter_goal =
 let filter_goal pr f =
   match f.t_node with
     | Tapp(ps,[]) -> 
-	Goal_bad ("symbol " ^ ps.ls_name.Ident.id_string ^ " unknown")
+        Goal_bad ("symbol " ^ ps.ls_name.Ident.id_string ^ " unknown")
         (* todo: filter more goals *)
     | _ -> 
-	Goal_good(pr,f)
+        Goal_good(pr,f)
 
 
 let prepare info defs ((params,funs,preds,eqs,hyps,goal,types) as acc) d =
   match d.d_node with
     (*| Dtype [ts, Talgebraic csl] -> 
-	(params,funs,preds,eqs,hyps,goal,(ts,csl)::types)*)
+        (params,funs,preds,eqs,hyps,goal,(ts,csl)::types)*)
     (*| Dtype [ts, Tabstract] -> 
-	printf "abst type: %a@\n" print_ident ts.ts_name;
-	if Mid.mem ts.ts_name types then acc else
-	let types = Mid.add (ts.ts_name,[]) types in
-	  (params,funs,preds,eqs,hyps,goal,types)*)
+        printf "abst type: %a@\n" print_ident ts.ts_name;
+        if Mid.mem ts.ts_name types then acc else
+        let types = Mid.add (ts.ts_name,[]) types in
+          (params,funs,preds,eqs,hyps,goal,types)*)
     | Dtype _ -> acc
-	
+        
     | Dparam ls ->
-	begin match ls.ls_args, ls.ls_value with
-	  | [], Some ty -> if is_number ty.ty_node then (* params *)
-	      (ls::params,funs,preds,eqs,hyps,goal,types)
-	    else 
-	      acc
-	  | _ -> acc
-	end
+        begin match ls.ls_args, ls.ls_value with
+          | [], Some ty -> if is_number ty.ty_node then (* params *)
+              (ls::params,funs,preds,eqs,hyps,goal,types)
+            else 
+              acc
+          | _ -> acc
+        end
 
     | Dlogic dl ->
-	(* TODO *)
-	let (params,funs,preds,types) = List.fold_left
-	  (filter_logic info) (params,funs,preds,types) dl
-	in (params,funs,preds,eqs,hyps,goal,types)
+        (* TODO *)
+        let (params,funs,preds,types) = List.fold_left
+          (filter_logic info) (params,funs,preds,types) dl
+        in (params,funs,preds,eqs,hyps,goal,types)
     | Dprop (Paxiom, pr, f) ->
         let (params,eqs,hyps) = filter_hyp info params defs eqs hyps pr f in 
-	(params,funs,preds,eqs,hyps,goal,types)
+        (params,funs,preds,eqs,hyps,goal,types)
     | Dprop (Pgoal, pr, f) ->
         begin
           match goal with
             | Goal_none -> 
-		let goal = filter_goal pr f in
-		(params,funs,preds,eqs,hyps,goal,types)
+                let goal = filter_goal pr f in
+                (params,funs,preds,eqs,hyps,goal,types)
             | _ -> assert false
         end
 
@@ -460,15 +448,14 @@ let print_pred_def info fmt (ls,ld) =
     fprintf fmt "@\n"
 
 let print_type_def _info fmt (ts,csl) =
-  fprintf fmt "(* algebraic type %a*)@\n" print_ident ts.ts_name
-    (*(print_list space (fun fmt tvs -> print_ident fmt tvs.tv_name)) ts.ts_args*);
+  fprintf fmt "(* algebraic type %a*)@\n" print_ident ts.ts_name;
 
   let alen = List.length csl in
   let print_def fmt () =
     if alen >= 1 then begin
       fprintf fmt "x = 1";
       for i = 2 to alen do
-	fprintf fmt " || x = %d" i
+        fprintf fmt " || x = %d" i
       done end
     else ()
   in
@@ -527,13 +514,15 @@ let print_goal info fmt g =
         fprintf fmt "False@\n"
 
 
-let print_task env pr thpr _blacklist ?old:_ fmt task =
+let print_task args ?old:_ fmt task =
   forget_all ident_printer;
-  let info = get_info env task in
-  print_prelude fmt (List.append pr ["$MaxExtraPrecision = 256; ClearAll[vcWhy,varsWhy];"]);
-  print_th_prelude task fmt thpr;
+  let info = get_info args.env task in
+  print_prelude fmt (List.append args.prelude ["$MaxExtraPrecision = 256;
+  ClearAll[vcWhy,varsWhy,resWhy];"]);
+  print_th_prelude task fmt args.th_prelude;
   let params,funs,preds,eqs,hyps,goal,types =
-    List.fold_left (prepare info (Hid.create 17)) ([],[],[],[],[],Goal_none,[]) (Task.task_decls task)
+    List.fold_left (prepare info (Hid.create 17)) ([],[],[],[],[],Goal_none,[])
+    (Task.task_decls task)
   in
   List.iter (print_equation info fmt) (List.rev eqs);
   List.iter (print_fun_def  info fmt) (List.rev funs);
@@ -553,12 +542,13 @@ let print_task env pr thpr _blacklist ?old:_ fmt task =
     (print_list simple_comma (print_var   info)) info.info_vars;*)
 
   fprintf fmt "@[<hov 2>resWhy = FullSimplify[vcWhy];@]@\n";
-  fprintf fmt "@[<hov 2>If[resWhy===True||resWhy===False,resWhy,@,";
-  (*fprintf fmt "resWhy = Resolve[resWhy,varsWhy,Reals];@,";
-  fprintf fmt "If[resWhy===True||resWhy===False,resWhy,@,";*)
+  fprintf fmt "@[<hov 2>If[resWhy, Print[True], Print[False],@,";
   fprintf fmt "resWhy = FindInstance[Not[resWhy],varsWhy,Reals];@,";
-  fprintf fmt "If[Head[resWhy]==List&&Length[resWhy]==0,True,@,";
-  fprintf fmt "Reduce[vcWhy,varsWhy,Reals] ]]@]@."
+  fprintf fmt "@[<hov 2>If[Head[resWhy]==List&&Length[resWhy]==0,@,";
+  fprintf fmt "Print[True],@,";
+  fprintf fmt "resWhy = Reduce[vcWhy,varsWhy,Reals];@,";
+  fprintf fmt "If[resWhy, Print[True], Print[False], Print[resWhy]] ]@] ];@]"
+  (*fprintf fmt "@[<hov 2>Quit[];@]@\n"*)
 (*
   print_decls ?old info fmt (Task.task_decls task)
 *)

@@ -994,7 +994,7 @@ let rec check_reset rvs t = match t.t_node with
         under `old' in the postcondition" vs.vs_name.id_string
   | Tapp (ls,_) when ls_equal ls Mlw_wp.fs_at -> false
   | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
-      let rvs = Mvs.set_inter rvs t.t_vars in
+      let rvs = Mvs.set_inter rvs (t_vars t) in
       if Mvs.is_empty rvs then false else
       t_any (check_reset rvs) t
   | _ ->
@@ -1050,7 +1050,7 @@ let rec type_c env pvs vars otv (dtyv, dsp) =
      ignored outside of "let rec" definitions, so WP are not affected. *)
   let del_pv pv s = Svs.remove pv.pv_vs s in
   let esvs = Spv.fold del_pv pvs esvs in
-  let drop _ t s = Mvs.set_diff s t.t_vars in
+  let drop _ t s = Mvs.set_diff s (t_vars t) in
   let esvs = drop () spec.c_pre esvs in
   let esvs = drop () spec.c_post esvs in
   let esvs = Mexn.fold drop spec.c_xpost esvs in

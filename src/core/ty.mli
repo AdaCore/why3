@@ -55,6 +55,9 @@ module Sty : Extset.S with module M = Mty
 module Hty : Exthtbl.S with type key = ty
 module Wty : Weakhtbl.S with type key = ty
 
+val ts_compare : tysymbol -> tysymbol -> int
+val ty_compare : ty -> ty -> int
+
 val ts_equal : tysymbol -> tysymbol -> bool
 val ty_equal : ty -> ty -> bool
 
@@ -127,6 +130,7 @@ val is_ts_tuple_id : ident -> int option
 
 exception UnexpectedProp
 
+val oty_compare : ty option -> ty option -> int
 val oty_equal : ty option -> ty option -> bool
 val oty_hash  : ty option -> int
 

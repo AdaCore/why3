@@ -6,19 +6,21 @@ OCaml code with the \why library. We progressively introduce the way
 one can use the library to build terms, formulas, theories, proof
 tasks, call external provers on tasks, and apply transformations on
 tasks. The complete documentation for API calls is given
-at URL~\url{http://why3.lri.fr/api/}.
+at URL~\url{http://why3.lri.fr/api-\whyversion/}.
 
 We assume the reader has a fair knowledge of the OCaml
 language. Notice that the \why library must be installed, see
 Section~\ref{sec:installlib}. The OCaml code given below is available in
-the source distribution as \verb|examples/use_api/use_api.ml|.
+the source distribution in directory \verb|examples/use_api/| together
+with a few other examples.
 
 
 \section{Building Propositional Formulas}
 
 The first step is to know how to build propositional formulas. The
 module \texttt{Term} gives a few functions for building these. Here is
-a piece of OCaml code for building the formula $\mathit{true} \lor \mathit{false}$.
+a piece of OCaml code for building the formula $\mathit{true} \lor
+\mathit{false}$.
 \begin{ocamlcode}
 (* opening the Why3 library *)
 open Why3

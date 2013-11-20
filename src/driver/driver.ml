@@ -248,36 +248,26 @@ let call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buffer =
 
 exception NoPrinter
 
-let update_task drv task_orig =
-  (** task_orig is the task for looking for theories
-      task      is the task for adding new metas
-      goal      is the last decl that we want to keep at the end (goal or clone)
-  *)
-  let task, goal = match task_orig with
-    | Some { task_decl = g ; task_prev = t } -> t,g
-    | None -> raise Task.GoalNotFound
-  in
-  let task =
+let update_task = let ht = Hint.create 5 in fun drv ->
+  let update task0 =
     Mid.fold (fun _ (th,s) task ->
       Task.on_theory th (fun task sm ->
         Stdecl.fold (fun tdm task ->
           add_tdecl task (clone_meta tdm sm)
         ) s task
-      ) task task_orig
-    ) drv.drv_meta task
+      ) task task0
+    ) drv.drv_meta task0
   in
-  add_tdecl task goal
-
-let update_task =
-  let h = Hint.create 5 in
-  fun drv ->
-    let update = try Hint.find h drv.drv_tag with
-      | Not_found ->
-          let upd = Trans.store (update_task drv) in
-          Hint.add h drv.drv_tag upd;
-          upd
-    in
-    Trans.apply update
+  function
+  | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}} as goal;
+          task_prev = task} ->
+      (* we cannot add metas nor memoize after goal *)
+      let update = try Hint.find ht drv.drv_tag with Not_found ->
+        let upd = Trans.store update in
+        Hint.add ht drv.drv_tag upd; upd in
+      let task = Trans.apply update task in
+      add_tdecl task goal
+  | task -> update task
 
 let prepare_task drv task =
   let lookup_transform t = lookup_transform t drv.drv_env in
@@ -291,10 +281,11 @@ let print_task_prepared ?old drv fmt task =
     | None -> raise NoPrinter
     | Some p -> p
   in
-  let printer =
-    lookup_printer p drv.drv_env drv.drv_prelude drv.drv_thprelude
-      drv.drv_blacklist
-  in
+  let printer = lookup_printer p
+    { Printer.env = drv.drv_env;
+      prelude     = drv.drv_prelude;
+      th_prelude  = drv.drv_thprelude;
+      blacklist   = drv.drv_blacklist } in
   fprintf fmt "@[%a@]@?" (printer ?old) task
 
 let print_task ?old drv fmt task =

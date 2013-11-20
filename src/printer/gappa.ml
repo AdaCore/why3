@@ -145,6 +145,7 @@ let print_ident fmt id =
 
 let number_format = {
     Number.long_int_support = true;
+    Number.extra_leading_zeros_support = true;
     Number.dec_int_support = Number.Number_default;
     Number.hex_int_support = Number.Number_default;
     Number.oct_int_support = Number.Number_unsupported;
@@ -432,11 +433,11 @@ let print_goal info fmt g =
         fprintf fmt "# (no goal at all ??)@\n";
         fprintf fmt "1 in [0,0]@\n"
 
-let print_task env pr thpr _blacklist ?old:_ fmt task =
+let print_task args ?old:_ fmt task =
   forget_all ident_printer;
-  let info = get_info env task in
-  print_prelude fmt pr;
-  print_th_prelude task fmt thpr;
+  let info = get_info args.env task in
+  print_prelude fmt args.prelude;
+  print_th_prelude task fmt args.th_prelude;
   let equations,hyps,goal =
     List.fold_left (prepare info (Hid.create 17)) ([],[],Goal_none) (Task.task_decls task)
   in

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="3">
+<why3session shape_version="4">
  <prover
   id="0"
   name="Alt-Ergo"
@@ -23,10 +23,14 @@
   version="8.4pl2"/>
  <prover
   id="5"
+  name="MetiTarski"
+  version="2.2"/>
+ <prover
+  id="6"
   name="Z3"
   version="3.2"/>
  <prover
-  id="6"
+  id="7"
   name="Z3"
   version="4.3.1"/>
  <file
@@ -43,12 +47,12 @@
     name="norm2_pos"
     locfile="../lagrange_inequality.why"
     loclnum="24" loccnumb="8" loccnume="17"
-    sum="c6713b13328556e5aa44d719637857fd"
+    sum="f2942a313345b6f3570a65ca2efea6a0"
     proved="true"
     expanded="true"
     shape="ainfix &gt;=anorm2V0V1c0.0F">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -60,12 +64,12 @@
     name="Lagrange"
     locfile="../lagrange_inequality.why"
     loclnum="28" loccnumb="8" loccnume="16"
-    sum="0805ea99e2edafcb1a06a72bbc8fe737"
+    sum="621df0eac1260a360b979069ef8f577b"
     proved="true"
     expanded="true"
     shape="ainfix =ainfix *anorm2V0V1anorm2V2V3ainfix +asqradotV0V1V2V3asqrainfix -ainfix *V0V3ainfix *V1V2F">
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -84,7 +88,7 @@
     name="CauchySchwarz_aux"
     locfile="../lagrange_inequality.why"
     loclnum="42" loccnumb="8" loccnume="25"
-    sum="74515faec7e71e3e7f81d8e6016db0e3"
+    sum="60286fcac3b9b4b9700a8f992a019a7a"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3F">
@@ -97,7 +101,7 @@
      <result status="valid" time="0.80"/>
     </proof>
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -109,7 +113,7 @@
     name="norm_pos"
     locfile="../lagrange_inequality.why"
     loclnum="50" loccnumb="8" loccnume="16"
-    sum="a188be4535d190568332f2f2f80c7927"
+    sum="8d95da19d79cf7adc5069923d3af185e"
     proved="true"
     expanded="true"
     shape="ainfix &gt;=anormV0V1c0.0F">
@@ -130,7 +134,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -142,7 +146,7 @@
     name="sqr_le_sqrt"
     locfile="../lagrange_inequality.why"
     loclnum="54" loccnumb="8" loccnume="19"
-    sum="6250442676910c34e9e77945d8b289d3"
+    sum="f7a62278abbba47b82e22b6025bcbb68"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=V0asqrtV1Iainfix &lt;=asqrV0V1F">
@@ -155,12 +159,20 @@
      archived="false">
      <result status="valid" time="1.78"/>
     </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
    </goal>
    <goal
     name="CauchySchwarz"
     locfile="../lagrange_inequality.why"
     loclnum="57" loccnumb="8" loccnume="21"
-    sum="aa07648bfdc4522e30bd13f94cc07322"
+    sum="f2685cf8dd64430a204c41bfe4848046"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=adotV0V1V2V3ainfix *anormV0V1anormV2V3F">
@@ -185,12 +197,12 @@
     name="triangle_aux"
     locfile="../lagrange_inequality.why"
     loclnum="77" loccnumb="8" loccnume="20"
-    sum="92dd55f2dc3885689466197667e29fe8"
+    sum="38f7f167c357b4f98d8401955497bc8e"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=anorm2ainfix +V0V2ainfix +V1V3asqrainfix +anormV0V1anormV2V3F">
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -198,7 +210,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="6"
+     prover="7"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -210,7 +222,7 @@
     name="sqr_sqrt_le"
     locfile="../lagrange_inequality.why"
     loclnum="82" loccnumb="8" loccnume="19"
-    sum="2cc66c2946fbb25974fc232820c669f3"
+    sum="b418617e0ea0a9340d9518e31089e1ee"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=asqrtV0V1Iainfix &lt;=V0asqrV1Aainfix &lt;=c0.0V0Aainfix &lt;=c0.0V1F">
@@ -238,12 +250,20 @@
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
    </goal>
    <goal
     name="triangle"
     locfile="../lagrange_inequality.why"
     loclnum="85" loccnumb="8" loccnume="16"
-    sum="bcf1784cff07a0ba41b6dc3f0809402a"
+    sum="d160993bac50590ad70307c4fb70b056"
     proved="true"
     expanded="true"
     shape="ainfix &lt;=anormainfix +V0V2ainfix +V1V3ainfix +anormV0V1anormV2V3F">

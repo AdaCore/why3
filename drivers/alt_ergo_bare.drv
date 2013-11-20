@@ -48,6 +48,11 @@ theory int.Int
   syntax function (*)  "(%1 * %2)"
   syntax function (-_) "(-%1)"
 
+  meta "invalid trigger" predicate (<=)
+  meta "invalid trigger" predicate (<)
+  meta "invalid trigger" predicate (>=)
+  meta "invalid trigger" predicate (>)
+
   syntax predicate (<=) "(%1 <= %2)"
   syntax predicate (<)  "(%1 <  %2)"
   syntax predicate (>=) "(%1 >= %2)"
@@ -89,6 +94,11 @@ theory real.Real
   syntax function (-_) "(-%1)"
   syntax function inv  "(1.0 / %1)"
 
+  meta "invalid trigger" predicate (<=)
+  meta "invalid trigger" predicate (<)
+  meta "invalid trigger" predicate (>=)
+  meta "invalid trigger" predicate (>)
+
   syntax predicate (<=) "(%1 <= %2)"
   syntax predicate (<)  "(%1 <  %2)"
   syntax predicate (>=) "(%1 >= %2)"
@@ -123,6 +133,11 @@ theory real.RealInfix
   syntax function ( *.) "(%1 * %2)"
   syntax function (/.)  "(%1 / %2)"
   syntax function (-._) "(-%1)"
+
+  meta "invalid trigger" predicate (<=.)
+  meta "invalid trigger" predicate (<.)
+  meta "invalid trigger" predicate (>=.)
+  meta "invalid trigger" predicate (>.)
 
   syntax predicate (<=.) "(%1 <= %2)"
   syntax predicate (<.)  "(%1 <  %2)"

@@ -28,8 +28,8 @@ module Mtv = Tvar.M
 module Htv = Tvar.H
 
 let tv_equal : tvsymbol -> tvsymbol -> bool = (==)
-
 let tv_hash tv = id_hash tv.tv_name
+let tv_compare tv1 tv2 = id_compare tv1.tv_name tv2.tv_name
 
 let create_tvsymbol n = { tv_name = id_register n }
 
@@ -65,6 +65,9 @@ let ty_equal : ty       -> ty       -> bool = (==)
 
 let ts_hash ts = id_hash ts.ts_name
 let ty_hash ty = Weakhtbl.tag_hash ty.ty_tag
+
+let ts_compare ts1 ts2 = id_compare ts1.ts_name ts2.ts_name
+let ty_compare ty1 ty2 = Pervasives.compare (ty_hash ty1) (ty_hash ty2)
 
 let mk_ts name args def = {
   ts_name = id_register name;
@@ -253,6 +256,8 @@ let oty_type = function Some ty -> ty | None -> raise UnexpectedProp
 
 let oty_equal = Opt.equal ty_equal
 let oty_hash = Opt.fold (fun _ -> ty_hash) 1
+
+let oty_compare o1 o2 = Opt.compare ty_compare o1 o2
 
 let oty_match m o1 o2 = match o1,o2 with
   | Some ty1, Some ty2 -> ty_match m ty1 ty2

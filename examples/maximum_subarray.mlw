@@ -7,6 +7,7 @@
 
    Authors: Jean-Christophe Filliâtre (CNRS)
             Guillaume Melquiond       (Inria)
+            Andrei Paskevich          (U-PSUD)
  *)
 
 module Spec
@@ -192,5 +193,42 @@ module Algo4
       if !s > !ms then begin ms := !s; lo := !l; hi := (i+1) end
     done;
     !ms
+
+end
+
+(* A slightly different variation of Kadane's algorithm *)
+
+module Algo5
+
+  use import int.Int
+  use import ref.Refint
+  use export array.Array
+  use export array.ArraySum
+
+(*
+    [| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |]
+     ......|###### maxsum #######|..............
+     ............................. |## curmax ##
+*)
+
+  let maximum_subarray (a: array int): int
+    ensures { forall l h: int. 0 <= l <= h <= length a -> sum a l h <= result }
+    ensures { exists l h: int. 0 <= l <= h <= length a /\ sum a l h  = result }
+  =
+    let maxsum = ref 0 in
+    let curmax = ref 0 in
+    let ghost lo = ref 0 in
+    let ghost hi = ref 0 in
+    let ghost cl = ref 0 in
+    for i = 0 to a.length - 1 do
+      invariant { forall l : int. 0 <= l <= i -> sum a l i <= !curmax }
+      invariant { 0 <= !cl <= i /\ sum a !cl i  = !curmax }
+      invariant { forall l h: int. 0 <= l <= h <= i -> sum a l h <= !maxsum }
+      invariant { 0 <= !lo <= !hi <= i /\ sum a !lo !hi = !maxsum }
+      curmax += a[i];
+      if !curmax < 0 then begin curmax := 0; cl := i+1 end;
+      if !curmax > !maxsum then begin maxsum := !curmax; lo := !cl; hi := i+1 end
+    done;
+    !maxsum
 
 end
