@@ -222,9 +222,10 @@ and expr_desc =
   | Eapply of expr * expr
   | Einfix of expr * ident * expr
   | Einnfix of expr * ident * expr
-  | Efun of binder list * triple
   | Elet of ident * top_ghost * expr * expr
-  | Eletrec of letrec list * expr
+  | Efun of ident * top_ghost * lambda * expr
+  | Erec of fundef list * expr
+  | Elam of lambda
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
@@ -246,17 +247,18 @@ and expr_desc =
   | Ecast of expr * pty
   | Eany of type_c
   | Eghost of expr
-  | Eabstract of triple
+  | Eabstract of expr * spec
   | Enamed of label * expr
 
-and letrec = loc * ident * top_ghost * binder list * triple
+and fundef = ident * top_ghost * lambda
 
-and triple = expr * spec
+and lambda = binder list * pty option * expr * spec
 
 type pdecl =
+  | Dval of ident * top_ghost * type_v
   | Dlet of ident * top_ghost * expr
-  | Dletrec of letrec list
-  | Dparam of ident * top_ghost * type_v
+  | Dfun of ident * top_ghost * lambda
+  | Drec of fundef list
   | Dexn of ident * pty
 
 (* incremental parsing *)

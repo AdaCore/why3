@@ -553,13 +553,22 @@ and de_desc denv loc = function
         | _       -> add_mono id e1.de_type denv in
       let e2 = dexpr denv e2 in
       DElet (id, gh, e1, e2), e2.de_type
-  | Ptree.Eletrec (fdl, e1) ->
+  | Ptree.Efun (id, gh, lam, e2) ->
+      let id, gh = add_lemma_label ~top:false id gh in
+      let e1 = dexpr denv {expr_desc = Ptree.Elam lam; expr_loc = id.id_loc} in
+      let denv = add_poly id e1.de_type denv in
+      let e2 = dexpr denv e2 in
+      DElet (id, gh, e1, e2), e2.de_type
+  | Ptree.Erec (fdl, e1) ->
       let fdl = dletrec ~top:false denv fdl in
       let add_one denv (id,_,dvty,_,_) = add_poly id dvty denv in
       let denv = List.fold_left add_one denv fdl in
       let e1 = dexpr denv e1 in
       DEletrec (fdl, e1), e1.de_type
-  | Ptree.Efun (bl, tr) ->
+  | Ptree.Elam (bl, pty, e1, sp) ->
+      let tr = match pty with
+        | Some pty -> { e1 with expr_desc = Ptree.Ecast (e1, pty) }, sp
+        | None -> e1, sp in
       let denv, bl, tyl = dbinders denv (pass_opacity tr bl) in
       let tr, (argl, res) = dtriple denv tr in
       DEfun (bl, tr), (tyl @ argl, res)
@@ -727,9 +736,8 @@ and de_desc denv loc = function
 and dletrec ~top denv fdl =
   let tvars = denv.tvars in
   (* add all functions into the environment *)
-  let add_one denv (_,id,_,bl,tr) =
-    let _,argl,tyl = dbinders denv (pass_opacity tr bl) in
-    let rpty = find_top_pty (fst tr) in
+  let add_one denv (id,_,(bl,rpty,_,_)) =
+    let _,argl,tyl = dbinders denv bl in
     let dvty = tyl, match rpty with
       | Some pty -> dity_of_pty denv pty
       | None -> create_type_variable () in
@@ -740,18 +748,21 @@ and dletrec ~top denv fdl =
     denv, (argl, dvty, freetvs) in
   let denv, dvtyl = Lists.map_fold_left add_one denv fdl in
   (* then type-check the bodies *)
-  let type_one (loc,id,gh,bl,tr) (argl,((tyl,tyv) as dvty),freetvs) =
+  let type_one (id,gh,(bl,pty,e1,sp)) (argl,((tyl,tyv) as dvty),freetvs) =
+    let tr = match pty with
+      | Some pty -> { e1 with expr_desc = Ptree.Ecast (e1, pty) }, sp
+      | None -> e1, sp in
     let add denv (_,id,_,_) dity = match id with
       | Some id -> add_var id dity denv
       | None -> denv in
     let denv = List.fold_left2 add denv bl tyl in
     let id, gh = add_lemma_label ~top id gh in
     let tr, (badl, res) = dtriple denv tr in
-    if badl <> [] then Loc.errorm ~loc
+    if badl <> [] then Loc.errorm ~loc:e1.expr_loc
       "The body of a recursive function must be a first-order value";
-    unify_loc unify loc tyv res;
+    unify_loc unify e1.expr_loc tyv res;
     let freenow = free_user_vars tvars dvty in
-    if not (Stv.subset freetvs freenow) then Loc.errorm ~loc
+    if not (Stv.subset freetvs freenow) then Loc.errorm ~loc:e1.expr_loc
       "This function is expected to be polymorphic in type variable %a"
       Pretty.print_tv (Stv.choose (Stv.diff freetvs freenow));
     id, gh, dvty, argl, tr in
@@ -1942,7 +1953,18 @@ let add_pdecl ~wp loc uc = function
             let def = create_let_defn (Typing.create_user_id id) e in
             create_let_decl def in
       add_pdecl_with_tuples ~wp uc pd
-  | Dletrec fdl ->
+  | Dfun (id, gh, lam) ->
+      let id, gh = add_lemma_label ~top:true id gh in
+      let e = {expr_desc = Ptree.Elam lam; expr_loc = loc} in
+      let e = dexpr (create_denv uc) e in
+      let uc = flush_tuples uc in
+      let pd = match e.de_desc with
+        | DEfun (bl, tr) ->
+            let fd = expr_fun (create_lenv uc) id gh bl tr in
+            create_rec_decl [fd]
+        | _ -> assert false in
+      add_pdecl_with_tuples ~wp uc pd
+  | Drec fdl ->
       let fdl = dletrec ~top:true (create_denv uc) fdl in
       let uc = flush_tuples uc in
       let fdl = expr_rec (create_lenv uc) fdl in
@@ -1953,7 +1975,7 @@ let add_pdecl ~wp loc uc = function
       let xs = create_xsymbol (Typing.create_user_id id) ity in
       let pd = create_exn_decl xs in
       add_pdecl_with_tuples ~wp uc pd
-  | Dparam (id, gh, tyv) ->
+  | Dval (id, gh, tyv) ->
       let id, gh = add_lemma_label ~top:true id gh in
       let tyv, _ = dtype_v (create_denv uc) tyv in
       let uc = flush_tuples uc in

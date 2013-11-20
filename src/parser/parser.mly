@@ -39,9 +39,6 @@ end
 
   let mk_ppl loc d = { pp_loc = loc; pp_desc = d }
   let mk_pp d = mk_ppl (floc ()) d
-(* dead code
-  let mk_pp_i i d = mk_ppl (floc_i i) d
-*)
   let mk_pat p = { pat_loc = floc (); pat_desc = p }
 
   let infix_ppl loc a i b = mk_ppl loc (PPbinop (a, i, b))
@@ -84,13 +81,8 @@ end
       | _ -> raise exn)
 
   let mk_expr d = { expr_loc = floc (); expr_desc = d }
-  let mk_expr_i i d = { expr_loc = floc_i i; expr_desc = d }
 
-  let cast_body c e = match c with
-    | Some pt -> { e with expr_desc = Ecast (e, pt) }
-    | None -> e
-
-  let rec mk_apply f a =
+  let mk_apply f a =
     let loc = Loc.join f.expr_loc a.expr_loc in
     { expr_loc = loc; expr_desc = Eapply (f,a) }
 
@@ -1089,13 +1081,13 @@ new_ns_mo:
 
 pdecl:
 | LET top_ghost lident_rich labels EQUAL fun_expr
-    { Dlet (add_lab $3 $4, $2, $6) }
+    { Dfun (add_lab $3 $4, $2, $6) }
 | LET top_ghost lident_rich labels fun_defn
-    { Dlet (add_lab $3 $4, $2, $5) }
+    { Dfun (add_lab $3 $4, $2, $5) }
 | LET REC list1_rec_defn
-    { Dletrec $3 }
+    { Drec $3 }
 | VAL top_ghost lident_rich labels type_v
-    { Dparam (add_lab $3 $4, $2, $5) }
+    { Dval (add_lab $3 $4, $2, $5) }
 | EXCEPTION uident labels
     { Dexn (add_lab $2 $3, ty_unit ()) }
 | EXCEPTION uident labels primitive_type
@@ -1139,17 +1131,17 @@ list1_rec_defn:
 
 rec_defn:
 | top_ghost lident_rich labels list1_binder opt_cast spec EQUAL spec expr
-   { floc (), add_lab $2 $3, $1, $4, (cast_body $5 $9, spec_union $6 $8) }
+   { add_lab $2 $3, $1, ($4, $5, $9, spec_union $6 $8) }
 ;
 
 fun_defn:
 | list1_binder opt_cast spec EQUAL spec expr
-   { mk_expr_i 6 (Efun ($1, (cast_body $2 $6, spec_union $3 $5))) }
+   { ($1, $2, $6, spec_union $3 $5) }
 ;
 
 fun_expr:
 | FUN list1_binder spec ARROW spec expr %prec prec_fun
-   { mk_expr (Efun ($2, ($6, spec_union $3 $5))) }
+   { ($2, None, $6, spec_union $3 $5) }
 ;
 
 expr:
@@ -1210,13 +1202,13 @@ expr:
           { $5 with expr_desc = Ecast ($5, PPTtuple []) }, $7))
      | _ -> mk_expr (Ematch ({ $5 with expr_desc = Eghost $5 }, [$3, $7])) }
 | LET lident labels fun_defn IN expr
-   { mk_expr (Elet (add_lab $2 $3, Gnone, $4, $6)) }
+   { mk_expr (Efun (add_lab $2 $3, Gnone, $4, $6)) }
 | LET lident_op_id labels fun_defn IN expr
-   { mk_expr (Elet (add_lab $2 $3, Gnone, $4, $6)) }
+   { mk_expr (Efun (add_lab $2 $3, Gnone, $4, $6)) }
 | LET GHOST lident labels fun_defn IN expr
-   { mk_expr (Elet (add_lab $3 $4, Gghost, $5, $7)) }
+   { mk_expr (Efun (add_lab $3 $4, Gghost, $5, $7)) }
 | LET GHOST lident_op_id labels fun_defn IN expr
-   { mk_expr (Elet (add_lab $3 $4, Gghost, $5, $7)) }
+   { mk_expr (Efun (add_lab $3 $4, Gghost, $5, $7)) }
 | LET lident_op_id labels EQUAL expr IN expr
    { mk_expr (Elet (add_lab $2 $3, Gnone, $5, $7)) }
 | LET GHOST lident_op_id labels EQUAL expr IN expr
@@ -1224,11 +1216,11 @@ expr:
 | LET LEMMA lident_rich labels EQUAL expr IN expr
    { mk_expr (Elet (add_lab $3 $4, Glemma, $6, $8)) }
 | LET LEMMA lident_rich labels fun_defn IN expr
-   { mk_expr (Elet (add_lab $3 $4, Glemma, $5, $7)) }
+   { mk_expr (Efun (add_lab $3 $4, Glemma, $5, $7)) }
 | LET REC list1_rec_defn IN expr
-   { mk_expr (Eletrec ($3, $5)) }
+   { mk_expr (Erec ($3, $5)) }
 | fun_expr
-   { $1 }
+   { mk_expr (Elam $1) }
 | MATCH expr WITH bar_ program_match_cases END
    { mk_expr (Ematch ($2, $5)) }
 | MATCH expr COMMA list1_expr_sep_comma WITH bar_ program_match_cases END

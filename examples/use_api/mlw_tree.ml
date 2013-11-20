@@ -131,9 +131,7 @@ let d : pdecl =
     let p = mk_lexpr (PPinfix(c6p7,mk_ident "infix =",c42)) in
     mk_expr(Eassert(Aassert,p))
   in
-  let triple = body, spec in
-  let lambda = mk_expr(Efun(args,triple)) in
-  Dlet(mk_ident "f",Gnone,lambda)
+  Dfun(mk_ident "f",Gnone,(args,None,body,spec))
 
 let () =
   try t.new_pdecl Loc.dummy_position d
