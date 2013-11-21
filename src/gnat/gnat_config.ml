@@ -146,13 +146,28 @@ let filename =
               (Printf.sprintf "Not a Why input file: %s." s);
          s
 
+let prover_merge m1 m2 =
+  (* merge two prover maps; if they have share a key, keep the entry of the
+     first map *)
+  Whyconf.Mprover.merge (fun _ v1 v2 ->
+    match v1, v2 with
+    | None, x -> x
+    | (Some _ as x), _ -> x)
+  m1 m2
+
 let config =
    (* if a prover was given, read default config file and local config file *)
    try
-      if !opt_prover = None then Whyconf.read_config (Some "why3.conf")
+     let gnatprove_config =
+       Whyconf.read_config (Some gnatprove_why3conf_file) in
+      if !opt_prover = None then gnatprove_config
       else begin
          let conf = Whyconf.read_config None in
-         Whyconf.merge_config conf gnatprove_why3conf_file
+         let provers =
+           prover_merge
+             (Whyconf.get_provers gnatprove_config)
+             (Whyconf.get_provers conf) in
+         Whyconf.set_provers gnatprove_config provers
       end
    with Rc.CannotOpen _ ->
       Gnat_util.abort_with_message "Cannot read file why3.conf."
