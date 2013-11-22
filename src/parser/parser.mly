@@ -82,6 +82,8 @@ end
 
   let mk_expr d = { expr_loc = floc (); expr_desc = d }
 
+  let mk_expr_i i d = { expr_loc = floc_i i; expr_desc = d }
+
   let mk_apply f a =
     let loc = Loc.join f.expr_loc a.expr_loc in
     { expr_loc = loc; expr_desc = Eapply (f,a) }
@@ -1221,6 +1223,8 @@ expr:
    { mk_expr (Erec ($3, $5)) }
 | fun_expr
    { mk_expr (Elam $1) }
+| VAL top_ghost lident_rich labels tail_type_c IN expr
+   { mk_expr (Elet (add_lab $3 $4, $2, mk_expr_i 5 (Eany $5), $7)) }
 | MATCH expr WITH bar_ program_match_cases END
    { mk_expr (Ematch ($2, $5)) }
 | MATCH expr COMMA list1_expr_sep_comma WITH bar_ program_match_cases END
