@@ -129,12 +129,12 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		eval_match instantiate_predicate smoke_detector
 
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs \
-		simplify gappa cvc3 yices mathematica
+	      simplify gappa cvc3 yices mathematica
 
 LIB_SESSION = xml termcode session session_tools session_scheduler
 
 LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
-	    mlw_dtree mlw_dty mlw_dexpr mlw_typing mlw_driver mlw_ocaml \
+	    mlw_dexpr mlw_typing mlw_driver mlw_ocaml \
 	    mlw_main mlw_interp
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
