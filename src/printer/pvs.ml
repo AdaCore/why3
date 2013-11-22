@@ -833,21 +833,21 @@ let print_task printer_args realize ?old fmt task =
       | _ -> assert false
     ) Mid.empty task in
   (* two cases: task is clone T with [] or task is a real goal *)
-  let thname, thpath, realized_theories = match task with
-    | None -> assert false
+    let rec upd_realized_theories = function
+    | Some { Task.task_decl = { Theory.td_node =
+               Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, pr, _) }}} ->
+        id_unique thprinter pr.pr_name, [], realized_theories
     | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
-        let id = th.Theory.th_name in
-        id_unique thprinter id,
-        th.Theory.th_path, Mid.remove id realized_theories
-    | Some { Task.task_decl = { Theory.td_node = td } } ->
-        let name = match td with
-          | Theory.Decl { Decl.d_node = Dprop (_, pr, _) } ->
-              id_unique thprinter pr.pr_name
-          | _ -> "goal"
-        in
-        name, [], realized_theories
-  in
+       let id = th.Theory.th_name in
+       id_unique thprinter id,
+       th.Theory.th_path,
+       Mid.remove id realized_theories
+    | Some { Task.task_decl = { Theory.td_node = Theory.Meta _ };
+             Task.task_prev = task } ->
+        upd_realized_theories task
+    | _ -> assert false in
+  let thname, thpath, realized_theories = upd_realized_theories task in
   (* make names as stable as possible by first printing all identifiers *)
   let realized_theories' = Mid.map fst realized_theories in
   let realized_symbols = Task.used_symbols realized_theories' in
