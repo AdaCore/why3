@@ -234,6 +234,7 @@ and expr_desc =
   | Esequence of expr * expr
   | Eif of expr * expr * expr
   | Eloop of loop_annotation * expr
+  | Ewhile of expr * loop_annotation * expr
   | Elazy of lazy_op * expr * expr
   | Enot of expr
   | Ematch of expr * (pattern * expr) list

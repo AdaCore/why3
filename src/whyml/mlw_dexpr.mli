@@ -118,6 +118,7 @@ and dexpr_node =
   | DEraise of xsymbol * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
+  | DEwhile of dexpr * (variant list * dinvariant) later * dexpr
   | DEloop of (variant list * dinvariant) later * dexpr
   | DEabsurd
   | DEassert of assertion_kind * term later

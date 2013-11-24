@@ -81,6 +81,11 @@ let dity_real = Dpur (ts_real, [])
 let dity_bool = Dpur (ts_bool, [])
 let dity_unit = Dpur (ts_unit, [])
 
+let dvty_int  = [], dity_int
+let dvty_real = [], dity_real
+let dvty_bool = [], dity_bool
+let dvty_unit = [], dity_unit
+
 (** Destructive type unification *)
 
 let rec occur_check tv = function
@@ -402,6 +407,7 @@ and dexpr_node =
   | DEraise of xsymbol * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
+  | DEwhile of dexpr * (variant list * dinvariant) later * dexpr
   | DEloop of (variant list * dinvariant) later * dexpr
   | DEabsurd
   | DEassert of assertion_kind * term later
@@ -644,9 +650,9 @@ let dexpr ?loc node =
         dity_unify_app fs_func_app dexpr_expected_type [de1;de2] argl;
         [], res
     | DEconst (Number.ConstInt _) ->
-        [], dity_int
+        dvty_int
     | DEconst (Number.ConstReal _) ->
-        [], dity_real
+        dvty_real
     | DEfun ((_,_,[],_,_),_) ->
         invalid_arg "Mlw_dexpr.dexpr: empty argument list in DEfun"
     | DElet (_,de)
@@ -678,7 +684,7 @@ let dexpr ?loc node =
         let argl, res = specialize_pl pl in
         dity_unify_app pl.pl_ls dexpr_expected_type [de1] argl;
         dexpr_expected_type_weak de2 res;
-        [], dity_unit
+        dvty_unit
     | DElazy (_,de1,de2) ->
         dexpr_expected_type de1 dity_bool;
         dexpr_expected_type de2 dity_bool;
@@ -688,7 +694,7 @@ let dexpr ?loc node =
         de.de_dvty
     | DEtrue
     | DEfalse ->
-        [], dity_bool
+        dvty_bool
     | DEraise (xs,de) ->
         dexpr_expected_type de (specialize_xs xs);
         [], dity_fresh ()
@@ -708,13 +714,17 @@ let dexpr ?loc node =
         dexpr_expected_type de_to dity_int;
         dexpr_expected_type de dity_unit;
         de.de_dvty
+    | DEwhile (de1,_,de2) ->
+        dexpr_expected_type de1 dity_bool;
+        dexpr_expected_type de2 dity_unit;
+        de2.de_dvty
     | DEloop (_,de) ->
         dexpr_expected_type de dity_unit;
         de.de_dvty
     | DEabsurd ->
         [], dity_fresh ()
     | DEassert _ ->
-        [], dity_unit
+        dvty_unit
     | DEabstract (de,_)
     | DEmark (_,de)
     | DEghost de ->
@@ -729,6 +739,13 @@ let dexpr ?loc node =
         de.de_dvty in
   let dvty = Loc.try1 ?loc get_dvty node in
   { de_node = node; de_dvty = dvty; de_loc = loc }
+
+let mk_dexpr loc d n = { de_node = n; de_dvty = d; de_loc = loc }
+
+let de_void loc = mk_dexpr loc dvty_unit (DElsapp (fs_void, []))
+
+let pat_void loc = { dp_pat = PPlapp (fs_void, []);
+  dp_dity = dity_unit; dp_vars = Mstr.empty; dp_loc = loc }
 
 (** Final stage *)
 
@@ -1230,6 +1247,15 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
       let e = get env de in
       let inv = dinv env.vsm in
       e_for pv e_from dir e_to (create_inv inv) e
+  | DEwhile (de1,varl_inv,de2) ->
+      let loc = de0.de_loc in
+      let de3 = mk_dexpr loc dvty_unit
+        (DEtry (mk_dexpr loc dvty_unit
+          (DEloop (varl_inv, mk_dexpr loc dvty_unit
+            (DEif (de1, de2, mk_dexpr loc dvty_unit
+              (DEraise (Mlw_module.xs_exit, de_void loc)))))),
+          [Mlw_module.xs_exit, pat_void loc, de_void loc])) in
+      try_expr keep_loc uloc env de3
   | DEloop (varl_inv,de) ->
       let e = get env de in
       let varl, inv = varl_inv env.vsm in

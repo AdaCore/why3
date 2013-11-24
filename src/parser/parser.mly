@@ -32,6 +32,7 @@ end
 
   let loc_i i = (rhs_start_pos i, rhs_end_pos i)
   let floc_i i = Loc.extract (loc_i i)
+
 (* dead code
   let loc_ij i j = (rhs_start_pos i, rhs_end_pos j)
   let floc_ij i j = Loc.extract (loc_ij i j)
@@ -104,13 +105,7 @@ end
     let id = mk_id (mixfix op) (floc_i 2) in
     mk_expr (Eidapp (Qident id, [e1; e2; e3]))
 
-  let exit_exn () = Qident (mk_id "%Exit" (floc ()))
   let id_anonymous () = mk_id "_" (floc ())
-  let ty_unit () = PPTtuple []
-
-(* dead code
-  let id_lt_nat () = Qident (mk_id "lt_nat" (floc ()))
-*)
 
   let variant_union v1 v2 = match v1, v2 with
     | _, [] -> v1
@@ -1091,7 +1086,7 @@ pdecl:
 | VAL top_ghost lident_rich labels type_v
     { Dval (add_lab $3 $4, $2, $5) }
 | EXCEPTION uident labels
-    { Dexn (add_lab $2 $3, ty_unit ()) }
+    { Dexn (add_lab $2 $3, PPTtuple []) }
 | EXCEPTION uident labels primitive_type
     { Dexn (add_lab $2 $3, $4) }
 ;
@@ -1234,13 +1229,7 @@ expr:
 | LOOP loop_annotation expr END
    { mk_expr (Eloop ($2, $3)) }
 | WHILE expr DO loop_annotation expr DONE
-   { mk_expr
-       (Etry
-          (mk_expr
-             (Eloop ($4,
-                     mk_expr (Eif ($2, $5,
-                                   mk_expr (Eraise (exit_exn (), None)))))),
-          [exit_exn (), None, mk_expr (Etuple [])])) }
+   { mk_expr (Ewhile ($2, $4, $5)) }
 | FOR lident EQUAL expr for_direction expr DO for_loop_invariant expr DONE
    { mk_expr (Efor ($2, $4, $5, $6, $8, $9)) }
 | ABSURD

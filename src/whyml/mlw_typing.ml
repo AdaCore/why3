@@ -521,6 +521,10 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Eloop (ann, e1) ->
       let e1 = dexpr lenv denv e1 in
       DEloop (dloopannot lenv ann, e1)
+  | Ptree.Ewhile (e1, ann, e2) ->
+      let e1 = dexpr lenv denv e1 in
+      let e2 = dexpr lenv denv e2 in
+      DEwhile (e1, dloopannot lenv ann, e2)
   | Ptree.Efor (id, efrom, dir, eto, inv, e1) ->
       let dir = match dir with
         | Ptree.To -> To | Ptree.Downto -> DownTo in
