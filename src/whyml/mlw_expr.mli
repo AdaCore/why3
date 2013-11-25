@@ -246,7 +246,7 @@ val e_for :
   pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
 
 val e_abstract : expr -> spec -> expr
-val e_any : spec -> vty -> expr
+val e_any : spec option -> vty -> expr
 
 val e_assert : assertion_kind -> term -> expr
 val e_absurd : ity -> expr

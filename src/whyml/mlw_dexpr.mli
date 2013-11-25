@@ -125,7 +125,7 @@ and dexpr_node =
   | DEabstract of dexpr * dspec later
   | DEmark of preid * dexpr
   | DEghost of dexpr
-  | DEany of dtype_c
+  | DEany of dtype_v * dspec later option
   | DEcast of dexpr * ity
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t

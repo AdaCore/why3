@@ -414,7 +414,7 @@ and dexpr_node =
   | DEabstract of dexpr * dspec later
   | DEmark of preid * dexpr
   | DEghost of dexpr
-  | DEany of dtype_c
+  | DEany of dtype_v * dspec later option
   | DEcast of dexpr * ity
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
@@ -494,8 +494,15 @@ let dvty_of_dtype_v dtv =
 
 let denv_add_var denv id dity = denv_add_mono denv id ([], dity)
 
-let denv_add_let denv (id,_,{de_dvty = dvty}) =
-  denv_add_mono denv id dvty
+let denv_add_let denv (id,_,({de_dvty = dvty} as de)) =
+  if fst dvty = [] then denv_add_mono denv id dvty else
+  let rec is_value de = match de.de_node with
+    | DEghost de | DEuloc (de,_) | DElabel (de,_) -> is_value de
+    | DEvar _ | DEgpsym _ | DElam _ | DEany (_,None) -> true
+    | _ -> false in
+  if is_value de
+  then denv_add_poly denv id dvty
+  else denv_add_mono denv id dvty
 
 let denv_add_fun denv (id,_,bl,{de_dvty = (argl,res)},_) =
   if bl = [] then invalid_arg "Mlw_dexpr.denv_add_fun: empty argument list";
@@ -1074,8 +1081,7 @@ let rec type_c env pvs vars otv (dtyv, dsp) =
   let add_vs vs varl = (t_var vs, None) :: varl in
   let varl = Svs.fold add_vs esvs spec.c_variant in
   let spec = { spec with c_variant = varl } in
-  (* add the invariants *)
-  spec_invariant env pvs vty spec, vty
+  spec, vty
 
 and type_v env pvs vars otv = function
   | DSpecV v ->
@@ -1088,15 +1094,13 @@ and type_v env pvs vars otv = function
       let vars = List.fold_right add_pv pvl vars in
       let pvs = List.fold_right Spv.add pvl pvs in
       let spec, vty = type_c env pvs vars otv tyc in
+      let spec = spec_invariant env pvs vty spec in
       VTarrow (vty_arrow pvl ~spec vty)
 
 let val_decl env (id,ghost,dtyv) =
   match type_v env Spv.empty vars_empty Stv.empty dtyv with
   | VTvalue v -> LetV (create_pvsymbol id ~ghost v)
   | VTarrow a -> LetA (create_psymbol id ~ghost a)
-
-let comp_decl env dtyc =
-  type_c env Spv.empty vars_empty Stv.empty dtyc
 
 (** Expressions *)
 
@@ -1281,10 +1285,11 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
       e_let ld (get env de)
   | DEghost de -> (* keep user ghost annotations even if redundant *)
       e_ghost (get env de)
-  | DEany dtyc ->
-      let spec, result = comp_decl env dtyc in
-      (* no invariants on arbitrary computations *)
-      e_any spec result
+  | DEany (dtyv, Some dsp) -> (* we do not add invariants to the top spec *)
+      let spec, vty = type_c env Spv.empty vars_empty Stv.empty (dtyv,dsp) in
+      e_any (Some spec) vty
+  | DEany (dtyv, None) ->
+      e_any None (type_v env Spv.empty vars_empty Stv.empty dtyv)
   | DEfun (fd,de) ->
       let fd = expr_fun ~keep_loc ~strict:true uloc env fd in
       let e = get (add_fundef env fd) de in

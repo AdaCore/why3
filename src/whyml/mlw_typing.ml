@@ -561,8 +561,13 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
       DEtry (e1, List.map branch cl)
   | Ptree.Eghost e1 ->
       DEghost (dexpr lenv denv e1)
-  | Ptree.Eany tyc ->
-      DEany (dtype_c lenv tyc)
+  | Ptree.Eany (tyv, sp) ->
+      let dsp = if
+        sp.sp_pre   = [] && sp.sp_post   = [] && sp.sp_xpost   = [] &&
+        sp.sp_reads = [] && sp.sp_writes = [] && sp.sp_variant = []
+      then None
+      else Some (dspec lenv sp) in
+      DEany (dtype_v lenv tyv, dsp)
   | Ptree.Eabstract (e1, sp) ->
       DEabstract (dexpr lenv denv e1, dspec lenv sp)
   | Ptree.Eabsurd -> DEabsurd

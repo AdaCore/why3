@@ -220,7 +220,7 @@ let ps_equal : psymbol -> psymbol -> bool = (==)
 let add_pv_vars vars pv = vars_union vars pv.pv_ity.ity_vars
 let add_ps_vars vars ps = vars_union vars ps.ps_vars
 
-let create_psymbol_real ~poly id ghost syms aty =
+let create_psymbol_raw ~poly id ghost syms aty =
   let { syms_pv = pvset; syms_ps = psset } = syms in
   let tyvars = if poly then vars_empty else aty_vars aty in
   let pvvars = Spv.fold_left add_pv_vars vars_empty pvset in
@@ -236,9 +236,6 @@ let create_psymbol_real ~poly id ghost syms aty =
     ps_pvset = pvset;
     ps_vars  = vars;
     ps_subst = vars_freeze vars; }
-
-let create_psymbol_poly = create_psymbol_real ~poly:true
-let create_psymbol_mono = create_psymbol_real ~poly:false
 
 (** specification *)
 
@@ -268,7 +265,7 @@ let create_psymbol id ?(ghost=false) aty =
   let syms = { syms_pv = aty_pvset aty; syms_ps = Sps.empty } in
   let vars = Spv.fold_left add_pv_vars vars_empty syms.syms_pv in
   aty_check vars aty;
-  create_psymbol_poly id ghost syms aty
+  create_psymbol_raw ~poly:true id ghost syms aty
 
 (** program expressions *)
 
@@ -498,8 +495,17 @@ let e_arrow_aty ps aty =
 
 let create_let_defn id e =
   let lv = match e.e_vty with
-    | VTarrow aty -> LetA (create_psymbol_mono id e.e_ghost e.e_syms aty)
-    | VTvalue ity -> LetV (create_pvsymbol id ~ghost:e.e_ghost ity) in
+    | VTarrow aty ->
+        let rec is_value e = match e.e_node with
+          | Earrow _ -> true
+          | Erec ([fd], {e_node = Earrow ps}) -> (* (fun ... -> ...) *)
+              ps_equal fd.fun_ps ps && fd.fun_lambda.l_spec.c_letrec = 0
+          | Eany spec -> eff_is_empty spec.c_effect (* && empty spec? *)
+          | Eghost e -> is_value e
+          | _ -> false in
+        LetA (create_psymbol_raw ~poly:(is_value e) id e.e_ghost e.e_syms aty)
+    | VTvalue ity ->
+        LetV (create_pvsymbol id ~ghost:e.e_ghost ity) in
   { let_sym = lv ; let_expr = e }
 
 let create_let_pv_defn id e =
@@ -813,7 +819,7 @@ let e_try e0 bl =
 let pv_dummy = create_pvsymbol (id_fresh "dummy") ity_unit
 
 let e_any spec vty =
-  let aty = vty_arrow [pv_dummy] ~spec vty in
+  let aty = vty_arrow [pv_dummy] ?spec vty in
   let ps = create_psymbol (id_fresh "dummy") aty in
   let syms = del_ps_syms ps (add_ps_syms ps syms_empty) in
   let vty = ps.ps_aty.aty_result in
@@ -844,7 +850,7 @@ let create_fun_defn id ({l_expr = e; l_spec = c} as lam) =
   let syms = add_spec_syms lam.l_spec lam.l_expr.e_syms in
   let syms = List.fold_right del_pv_syms lam.l_args syms in
   let aty = vty_arrow lam.l_args ~spec e.e_vty in
-  { fun_ps     = create_psymbol_poly id e.e_ghost syms aty;
+  { fun_ps     = create_psymbol_raw ~poly:true id e.e_ghost syms aty;
     fun_lambda = lam;
     fun_syms   = syms; }
 
@@ -887,14 +893,18 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
       e_arrow_aty (Mps.find ps psm) (aty_of_expr e)
   | Eapp (e,pv,_) ->
       e_app_real (expr_subst psm e) pv
-  | Elet ({ let_sym = LetV pv ; let_expr = d }, e) ->
+  | Elet ({ let_sym = LetV pv; let_expr = d }, e) ->
       let nd = expr_subst psm d in
       if not (ity_equal (ity_of_expr nd) pv.pv_ity) then
         Loc.errorm "vty_value mismatch";
-      e_let { let_sym = LetV pv ; let_expr = nd } (expr_subst psm e)
-  | Elet ({ let_sym = LetA ps ; let_expr = d }, e) ->
+      e_let { let_sym = LetV pv; let_expr = nd } (expr_subst psm e)
+  | Elet ({ let_sym = LetA ps; let_expr = d }, e) ->
       let ld,ns = create_let_ps_defn (id_clone ps.ps_name) (expr_subst psm d) in
       e_let ld (expr_subst (Mps.add ps ns psm) e)
+  | Erec ([{fun_ps = ps; fun_lambda = lam}], e) when lam.l_spec.c_letrec = 0 ->
+      let lam = { lam with l_expr = expr_subst psm lam.l_expr } in
+      let fd = create_fun_defn (id_clone ps.ps_name) lam in
+      e_rec [fd] (expr_subst (Mps.add ps fd.fun_ps psm) e)
   | Erec (fdl, e) ->
       let conv lam = { lam with l_expr = expr_subst psm lam.l_expr } in
       let defl = List.map (fun fd -> fd.fun_ps, conv fd.fun_lambda) fdl in
