@@ -217,7 +217,10 @@ let rec print_term info defs fmt t = match t.t_node with
            (print_list nothing (print_branch info defs)))
         fmt (t, bl)
   | Teps fb ->
-      assert false (* FIXME? *)
+      elem' "app"
+        (pair print_const
+           (print_abs info (print_term info defs)))
+        fmt ("Hilbert_Choice.Eps", t_open_bound fb)
   | Tapp (fs, pl) when is_fs_tuple fs ->
       elems' "prod" (print_term info defs) fmt pl
   | Tapp (fs, tl) ->
