@@ -28,17 +28,12 @@ function make_theory()
   BNAME=`basename "$1"`
 
   if [ ! -e "$1.thy" ]; then
+    echo -e "theory $BNAME\nimports Why3\nbegin\n\nwhy3_open \"$BNAME.xml\"\n" > "$1.thy"
     sed \
-      -e "s/<theory[^>]*>/theory $BNAME\nimports Why3\nbegin\n\nwhy3_open \"$BNAME\.xml\"\n\n/g" \
       -e 's/<lemma name="\([^"]*\)"[^>]*>/why3_vc \1\n\n/g' \
-      -e 's/<\/theory>/why3_end\n\nend\n/g' \
-      -e 's/<[^tl\/][^>]*>//g' \
-      -e 's/<type[^>]*>//g' \
-      -e 's/<tvar[^>]*>//g' \
-      -e 's/<\/[^t][^>]*>//g' \
-      -e 's/<\/type[^>]*>//g' \
-      -e 's/<\/tvar[^>]*>//g' \
-      "$1.xml" > "$1.thy"
+      -e 's/<[^l][^>]*>//g' \
+      "$1.xml" >> "$1.thy"
+    echo -e "why3_end\n\nend" >> "$1.thy"
   fi
 }
 
