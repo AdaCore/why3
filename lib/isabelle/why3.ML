@@ -315,8 +315,9 @@ fun expand_cases ctxt t =
 
     fun strip_case used t =
       if null (loose_bnos t)
-      then Option.map (apsnd (map (rename_case used)))
-        (Case_Translation.strip_case ctxt false t)
+      then (case Case_Translation.strip_case ctxt false t of
+          SOME (u as Free _, ps) => SOME (u, map (rename_case used) ps)
+        | _ => NONE)
       else NONE;
 
     fun mk_ctxt f = Option.map (fn (x, ps) => (x, map (apsnd f) ps));
