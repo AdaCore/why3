@@ -73,15 +73,8 @@ theory int.MinMax
   syntax function max "<app><const name=\"Orderings.ord_class.max\"/>%1%2</app>"
 end
 
-theory int.EuclideanDivision
-  syntax function div "<app><const name=\"Divides.div_class.div\"/>%1%2</app>"
-  syntax function mod "<app><const name=\"Divides.div_class.mod\"/>%1%2</app>"
-
-  remove prop Div_mod
-  remove prop Div_bound
-  remove prop Mod_bound
-  remove prop Mod_1
-  remove prop Div_1
+theory int.Exponentiation
+  syntax function power "<app><const name=\"Power.power_class.power\"/>%1<app><const name=\"Int.nat\"/>%2</app></app>"
 end
 
 theory list.List
@@ -125,6 +118,7 @@ theory map.Map
   syntax function ([]) "<app>%1%2</app>"
   syntax function set "<app><const name=\"Fun.fun_upd\"/>%1%2%3</app>"
   syntax function ([<-]) "<app><const name=\"Fun.fun_upd\"/>%1%2%3</app>"
+  syntax function const "<app><const name=\"_type_constraint_\"><fun>%t0%t0</fun></const><abs name=\"\"><type name=\"dummy\"/>%1</abs></app>"
 end
 
 theory set.SetGen
