@@ -395,8 +395,7 @@ let detect_exec env main data acc exec_name =
       eprintf "Found prover %s version %s%s@."
         data.prover_name ver
         (Opt.get_def (if old then
-            " (it is an old version that is less tested than \
-             the current one)." else ", Ok.")
+            " (old version, please consider upgrading)." else ", Ok.")
            data.message);
       known_version env exec_name;
       add_prover_shortcuts env prover;
@@ -417,7 +416,7 @@ let detect_unknown env detected =
     | Some (priority,prover_id,prover_config) ->
       let prover = prover_config.prover in
       eprintf "Warning: prover %s version %s is not known to be \
-                     supported, use it at your own risk!@."
+                     supported.@."
         prover.Wc.prover_name prover.prover_version;
       (** Pb: Even if it match the first prover section (normally
           highest priority) since it is unknown it has the lower
