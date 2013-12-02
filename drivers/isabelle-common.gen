@@ -1,0 +1,134 @@
+valid "Finished Why3 theory"
+fail "\\*\\*\\* \\(.*\\)$" "\\1"
+time "why3cpulimit time : %s s"
+
+transformation "eliminate_projections"
+
+transformation "simplify_formula"
+
+theory BuiltIn
+  syntax type int "<type name=\"Int.int\"/>"
+  syntax type real "<type name=\"Real.real\"/>"
+
+  syntax predicate  (=)   "<app><const name=\"HOL.eq\"/>%1%2</app>"
+end
+
+theory Bool
+  syntax type bool   "<type name=\"HOL.bool\"/>"
+
+  syntax function True  "<const name=\"HOL.True\"/>"
+  syntax function False "<const name=\"HOL.False\"/>"
+end
+
+theory bool.Bool
+  syntax function andb  "<app><const name=\"HOL.conj\"/>%1%2</app>"
+  syntax function orb   "<app><const name=\"HOL.disj\"/>%1%2</app>"
+  syntax function notb  "<app><const name=\"HOL.Not\"/>%1</app>"
+  syntax function implb "<app><const name=\"HOL.implies\"/>%1%2</app>"
+end
+
+theory int.Int
+  syntax function zero "<number val=\"0\"><type name=\"Int.int\"/></number>"
+  syntax function one  "<number val=\"1\"><type name=\"Int.int\"/></number>"
+
+  syntax function (+)  "<app><const name=\"Groups.plus_class.plus\"/>%1%2</app>"
+  syntax function (-)  "<app><const name=\"Groups.minus_class.minus\"/>%1%2</app>"
+  syntax function (*)  "<app><const name=\"Groups.times_class.times\"/>%1%2</app>"
+  syntax function (-_) "<app><const name=\"Groups.uminus_class.uminus\"/>%1</app>"
+
+  syntax predicate (<=) "<app><const name=\"Orderings.ord_class.less_eq\"/>%1%2</app>"
+  syntax predicate (<)  "<app><const name=\"Orderings.ord_class.less\"/>%1%2</app>"
+  syntax predicate (>=) "<app><const name=\"Orderings.ord_class.less_eq\"/>%2%1</app>"
+  syntax predicate (>)  "<app><const name=\"Orderings.ord_class.less\"/>%2%1</app>"
+
+  remove prop CommutativeGroup.Comm.Comm
+  remove prop CommutativeGroup.Assoc
+  remove prop CommutativeGroup.Unit_def_l
+  remove prop CommutativeGroup.Unit_def_r
+  remove prop CommutativeGroup.Inv_def_l
+  remove prop CommutativeGroup.Inv_def_r
+  remove prop Assoc.Assoc
+  remove prop Mul_distr_l
+  remove prop Mul_distr_r
+  remove prop Comm.Comm
+  remove prop Unitary
+  remove prop Refl
+  remove prop Trans
+  remove prop Antisymm
+  remove prop Total
+  remove prop NonTrivialRing
+  remove prop CompatOrderAdd
+  remove prop CompatOrderMult
+  remove prop ZeroLessOne
+end
+
+theory int.Abs
+  syntax function abs "<app><const name=\"Groups.abs_class.abs\"/>%1</app>"
+
+  remove prop Abs_pos
+end
+
+theory int.MinMax
+  syntax function min "<app><const name=\"Orderings.ord_class.min\"/>%1%2</app>"
+  syntax function max "<app><const name=\"Orderings.ord_class.max\"/>%1%2</app>"
+end
+
+theory int.Exponentiation
+  syntax function power "<app><const name=\"Power.power_class.power\"/>%1<app><const name=\"Int.nat\"/>%2</app></app>"
+end
+
+theory list.List
+  syntax type list "<type name=\"List.list\">%1</type>"
+
+  syntax function Nil "<const name=\"List.list.Nil\">%t0</const>"
+  syntax function Cons "<app><const name=\"List.list.Cons\"/>%1%2</app>"
+end
+
+theory list.Length
+  syntax function length "<app><const name=\"Nat.semiring_1_class.of_nat\"><fun><type name=\"Nat.nat\"/><type name=\"Int.int\"/></fun></const><app><const name=\"List.length\"/>%1</app></app>"
+end
+
+theory list.Append
+  syntax function (++) "<app><const name=\"List.append\"/>%1%2</app>"
+end
+
+theory list.Reverse
+  syntax function reverse "<app><const name=\"List.rev\"/>%1</app>"
+end
+
+theory list.Mem
+  syntax predicate mem "<app><const name=\"Set.member\"/>%1<app><const name=\"List.set\"/>%2</app></app>"
+end
+
+theory list.NthNoOpt
+  syntax function nth "<app><const name=\"List.nth\"/>%2<app><const name=\"Int.nat\"/>%1</app></app>"
+end
+
+theory option.Option
+  syntax type option "<type name=\"Option.option\">%1</type>"
+
+  syntax function None "<const name=\"Option.option.None\">%t0</const>"
+  syntax function Some "<app><const name=\"Option.option.Some\"/>%1</app>"
+end
+
+theory map.Map
+  syntax type  map "<fun>%1%2</fun>"
+
+  syntax function get "<app>%1%2</app>"
+  syntax function ([]) "<app>%1%2</app>"
+  syntax function set "<app><const name=\"Fun.fun_upd\"/>%1%2%3</app>"
+  syntax function ([<-]) "<app><const name=\"Fun.fun_upd\"/>%1%2%3</app>"
+  syntax function const "<app><const name=\"_type_constraint_\"><fun>%t0%t0</fun></const><abs name=\"\"><type name=\"dummy\"/>%1</abs></app>"
+end
+
+theory set.SetGen
+  syntax predicate (==) "<app><const name=\"HOL.eq\"/>%1%2</app>"
+  syntax predicate subset "<app><const name=\"Orderings.ord_class.less_eq\"/>%1%2</app>"
+end
+
+theory set.Fset
+  syntax function cardinal "<app><const name=\"Nat.semiring_1_class.of_nat\"><fun><type name=\"Nat.nat\"/><type name=\"Int.int\"/></fun></const><app><const name=\"FSet.fcard\"/>%1</app></app>"
+end
+
+(* this file has an extension .aux rather than .gen since it should not be distributed *)
+import "isabelle-realizations.aux"

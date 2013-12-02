@@ -128,7 +128,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		introduction abstraction close_epsilon lift_epsilon \
 		eval_match instantiate_predicate smoke_detector
 
-LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs \
+LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
 		simplify gappa cvc3 yices mathematica
 
 LIB_SESSION = xml termcode session session_tools session_scheduler
@@ -1046,6 +1046,103 @@ opt byte: drivers/pvs-realizations.aux
 
 clean::
 	rm -f drivers/pvs-realizations.aux
+
+#######################
+# Isabelle realizations
+#######################
+
+ifeq (@enable_isabelle_libs@,yes)
+
+ISABELLELIBS_INT_FILES = Exponentiation Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
+ISABELLELIBS_INT = $(addsuffix .xml, $(addprefix lib/isabelle/int/, $(ISABELLELIBS_INT_FILES)))
+
+ISABELLELIBS_BOOL_FILES = Bool
+ISABELLELIBS_BOOL = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_BOOL_FILES)))
+
+ISABELLELIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt Real Square RealInfix
+ISABELLELIBS_REAL = $(addsuffix .xml, $(addprefix lib/isabelle/real/, $(ISABELLELIBS_REAL_FILES)))
+
+ISABELLELIBS_NUMBER_FILES = Divisibility Gcd Parity Prime
+ISABELLELIBS_NUMBER = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_NUMBER_FILES)))
+
+ISABELLELIBS_SET_FILES = Set Fset
+ISABELLELIBS_SET = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_SET_FILES)))
+
+ISABELLELIBS_MAP_FILES = Map MapPermut
+ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_MAP_FILES)))
+
+ISABELLELIBS_LIST_FILES = List Length Mem Nth NthNoOpt NthLength HdTl NthHdTl Append NthLengthAppend Reverse
+ISABELLELIBS_LIST = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_LIST_FILES)))
+
+drivers/isabelle-realizations.aux: Makefile
+	$(if $(QUIET),@echo 'Generate $@' &&) \
+	(echo "(* generated automatically at compilation time *)"; \
+	echo 'theory BuiltIn meta "realized_theory" "BuiltIn", "" end'; \
+	for f in $(ISABELLELIBS_INT_FILES); do \
+	echo 'theory int.'"$$f"' meta "realized_theory" "int.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_BOOL_FILES); do \
+	echo 'theory bool.'"$$f"' meta "realized_theory" "bool.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_REAL_FILES); do \
+	echo 'theory real.'"$$f"' meta "realized_theory" "real.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_NUMBER_FILES); do \
+	echo 'theory number.'"$$f"' meta "realized_theory" "number.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_SET_FILES); do \
+	echo 'theory set.'"$$f"' meta "realized_theory" "set.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_MAP_FILES); do \
+	echo 'theory map.'"$$f"' meta "realized_theory" "map.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_LIST_FILES); do \
+	echo 'theory list.'"$$f"' meta "realized_theory" "list.'"$$f"'", "" end'; done; \
+	for f in $(ISABELLELIBS_OPTION_FILES); do \
+	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
+	) > $@
+
+install_no_local::
+	cp -r lib/isabelle $(LIBDIR)/why3
+	cp drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
+
+update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+
+$(ISABELLELIBS_INT): bin/why3 drivers/isabelle-realizations.aux \
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+	mkdir -p lib/isabelle/int/
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T int.$(notdir $(basename $@)) -o lib/isabelle/int/
+
+$(ISABELLELIBS_BOOL): bin/why3 drivers/isabelle-realizations.aux \
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T bool.$(notdir $(basename $@)) -o lib/isabelle/
+
+$(ISABELLELIBS_REAL): bin/why3 drivers/isabelle-realizations.aux \
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+	mkdir -p lib/isabelle/real/
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T real.$(notdir $(basename $@)) -o lib/isabelle/real/
+
+$(ISABELLELIBS_NUMBER): bin/why3 drivers/isabelle-realizations.aux \
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T number.$(notdir $(basename $@)) -o lib/isabelle/
+
+$(ISABELLELIBS_SET): bin/why3 drivers/isabelle-realizations.aux \
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T set.$(notdir $(basename $@)) -o lib/isabelle/
+
+$(ISABELLELIBS_MAP): bin/why3 drivers/isabelle-realizations.aux \
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T map.$(notdir $(basename $@)) -o lib/isabelle/
+
+$(ISABELLELIBS_LIST): bin/why3 drivers/isabelle-realizations.aux \
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T list.$(notdir $(basename $@)) -o lib/isabelle/
+
+$(ISABELLELIBS_OPTION): bin/why3 drivers/isabelle-realizations.aux \
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T option.$(notdir $(basename $@)) -o lib/isabelle/
+
+opt byte: update-isabelle
+
+clean::
+	rm -f drivers/isabelle-realizations.aux
+	rm -rf lib/isabelle/*.xml lib/isabelle/int lib/isabelle/real
+
+endif
 
 ################
 # Jessie3 plugin

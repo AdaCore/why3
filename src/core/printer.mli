@@ -71,6 +71,9 @@ val syntax_arguments : string -> 'a pp -> 'a list pp
 (** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt
      the list l using the template templ and the printer print_arg *)
 
+val gen_syntax_arguments_typed :
+  ('a -> 'b) -> ('a -> 'b array) -> string -> 'a pp -> 'b pp -> 'a -> 'a list pp
+
 val syntax_arguments_typed :
   string -> term pp -> ty pp -> term -> term list pp
 (** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt
