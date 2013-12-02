@@ -1,0 +1,12 @@
+theory genealogy_Genealogy_Grandparent_is_grandfather_or_grandmother_1
+imports Why3
+begin
+
+why3_open "genealogy_Genealogy_Grandparent_is_grandfather_or_grandmother_1.xml"
+
+why3_vc Grandparent_is_grandfather_or_grandmother
+by (metis grandfather_def grandmother_def grandparent_def parent_def)
+
+why3_end
+
+end
