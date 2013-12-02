@@ -4,7 +4,7 @@ begin
 
 section {* Length of a list *}
 
-why3_open "Length.xml"
+why3_open "list/Length.xml"
 
 why3_vc length_def by (cases l) simp_all
 
@@ -17,7 +17,7 @@ why3_end
 
 section {* Membership in a list *}
 
-why3_open "Mem.xml"
+why3_open "list/Mem.xml"
 
 why3_vc mem_def by (simp split add: list.split)
 
@@ -26,7 +26,7 @@ why3_end
 
 section {* Nth element of a list *}
 
-why3_open "Nth.xml"
+why3_open "list/Nth.xml"
 
 lemma nth_eq: "0 \<le> i \<Longrightarrow> nat i < length xs \<Longrightarrow> nth i xs = Some (xs ! nat i)"
   by (induct xs arbitrary: i) (auto simp add: nat_diff_distrib)
@@ -34,7 +34,7 @@ lemma nth_eq: "0 \<le> i \<Longrightarrow> nat i < length xs \<Longrightarrow> n
 why3_end
 
 
-why3_open "NthNoOpt.xml"
+why3_open "list/NthNoOpt.xml"
 
 why3_vc nth_cons_0 by simp
 
@@ -45,7 +45,7 @@ why3_vc nth_cons_n
 why3_end
 
 
-why3_open "NthLength.xml"
+why3_open "list/NthLength.xml"
 
 why3_vc nth_none_1
   using assms
@@ -78,14 +78,14 @@ why3_end
 
 section {* Head and tail *}
 
-why3_open "HdTl.xml"
+why3_open "list/HdTl.xml"
 
 why3_end
 
 
 section {* Relation between head, tail, and nth *}
 
-why3_open "NthHdTl.xml"
+why3_open "list/NthHdTl.xml"
 
 why3_vc Nth_tl
   using assms
@@ -99,7 +99,7 @@ why3_end
 
 section {* Appending two lists *}
 
-why3_open "Append.xml"
+why3_open "list/Append.xml"
 
 why3_vc infix_plpl_def by (simp split add: list.split)
 
@@ -118,7 +118,7 @@ why3_vc mem_decomp
 why3_end
 
 
-why3_open "NthLengthAppend.xml"
+why3_open "list/NthLengthAppend.xml"
 
 why3_vc nth_append_1
 proof (cases "0 \<le> i")
@@ -146,7 +146,7 @@ why3_end
 
 section {* Reversing a list *}
 
-why3_open "Reverse.xml"
+why3_open "list/Reverse.xml"
 
 why3_vc reverse_def by (simp split add: list.split)
 

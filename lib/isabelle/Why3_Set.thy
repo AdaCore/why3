@@ -7,7 +7,7 @@ section {* Potentially infinite sets *}
 definition choose :: "'a set \<Rightarrow> 'a" where
   "choose S = (\<some>x. x \<in> S)"
 
-why3_open "Set.xml"
+why3_open "set/Set.xml"
   constants
     mem = Set.member
     empty = bot
@@ -76,7 +76,7 @@ definition fremove :: "'a \<Rightarrow> 'a fset \<Rightarrow> 'a fset" where
 definition fchoose :: "'a fset \<Rightarrow> 'a" where
   "fchoose S = (\<some>x. x |\<in>| S)"
 
-why3_open "Fset.xml"
+why3_open "set/Fset.xml"
   constants
     mem = fmember
     empty = bot

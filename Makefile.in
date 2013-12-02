@@ -1056,23 +1056,23 @@ ifeq (@enable_isabelle_libs@,yes)
 ISABELLELIBS_INT_FILES = Exponentiation Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
 ISABELLELIBS_INT = $(addsuffix .xml, $(addprefix lib/isabelle/int/, $(ISABELLELIBS_INT_FILES)))
 
-ISABELLELIBS_BOOL_FILES = Bool
-ISABELLELIBS_BOOL = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_BOOL_FILES)))
+ISABELLELIBS_BOOL_FILES = # not yet realized : Bool
+ISABELLELIBS_BOOL = $(addsuffix .xml, $(addprefix lib/isabelle/bool/, $(ISABELLELIBS_BOOL_FILES)))
 
-ISABELLELIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt Real Square RealInfix
+ISABELLELIBS_REAL_FILES = # not yet realized : Abs ExpLog FromInt MinMax PowerInt Real Square RealInfix
 ISABELLELIBS_REAL = $(addsuffix .xml, $(addprefix lib/isabelle/real/, $(ISABELLELIBS_REAL_FILES)))
 
-ISABELLELIBS_NUMBER_FILES = Divisibility Gcd Parity Prime
-ISABELLELIBS_NUMBER = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_NUMBER_FILES)))
+ISABELLELIBS_NUMBER_FILES = # not yet realized : Divisibility Gcd Parity Prime
+ISABELLELIBS_NUMBER = $(addsuffix .xml, $(addprefix lib/isabelle/number/, $(ISABELLELIBS_NUMBER_FILES)))
 
 ISABELLELIBS_SET_FILES = Set Fset
-ISABELLELIBS_SET = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_SET_FILES)))
+ISABELLELIBS_SET = $(addsuffix .xml, $(addprefix lib/isabelle/set/, $(ISABELLELIBS_SET_FILES)))
 
-ISABELLELIBS_MAP_FILES = Map MapPermut
-ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_MAP_FILES)))
+ISABELLELIBS_MAP_FILES = Map # not yet realized : MapPermut
+ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix lib/isabelle/map/, $(ISABELLELIBS_MAP_FILES)))
 
 ISABELLELIBS_LIST_FILES = List Length Mem Nth NthNoOpt NthLength HdTl NthHdTl Append NthLengthAppend Reverse
-ISABELLELIBS_LIST = $(addsuffix .xml, $(addprefix lib/isabelle/, $(ISABELLELIBS_LIST_FILES)))
+ISABELLELIBS_LIST = $(addsuffix .xml, $(addprefix lib/isabelle/list/, $(ISABELLELIBS_LIST_FILES)))
 
 drivers/isabelle-realizations.aux: Makefile
 	$(if $(QUIET),@echo 'Generate $@' &&) \
@@ -1104,43 +1104,49 @@ update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $
 
 $(ISABELLELIBS_INT): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
-	mkdir -p lib/isabelle/int/
+	mkdir -p lib/isabelle/int
 	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T int.$(notdir $(basename $@)) -o lib/isabelle/int/
 
 $(ISABELLELIBS_BOOL): bin/why3 drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T bool.$(notdir $(basename $@)) -o lib/isabelle/
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/bool.why
+	mkdir -p lib/isabelle/bool
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T bool.$(notdir $(basename $@)) -o lib/isabelle/bool/
 
 $(ISABELLELIBS_REAL): bin/why3 drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
-	mkdir -p lib/isabelle/real/
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/real.why
+	mkdir -p lib/isabelle/real
 	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T real.$(notdir $(basename $@)) -o lib/isabelle/real/
 
 $(ISABELLELIBS_NUMBER): bin/why3 drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T number.$(notdir $(basename $@)) -o lib/isabelle/
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/number.why
+	mkdir -p lib/isabelle/number
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T number.$(notdir $(basename $@)) -o lib/isabelle/number/
 
 $(ISABELLELIBS_SET): bin/why3 drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T set.$(notdir $(basename $@)) -o lib/isabelle/
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/set.why
+	mkdir -p lib/isabelle/set
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T set.$(notdir $(basename $@)) -o lib/isabelle/set/
 
 $(ISABELLELIBS_MAP): bin/why3 drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T map.$(notdir $(basename $@)) -o lib/isabelle/
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/map.why
+	mkdir -p lib/isabelle/map
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T map.$(notdir $(basename $@)) -o lib/isabelle/map/
 
 $(ISABELLELIBS_LIST): bin/why3 drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T list.$(notdir $(basename $@)) -o lib/isabelle/
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/list.why
+	mkdir -p lib/isabelle/list
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T list.$(notdir $(basename $@)) -o lib/isabelle/list/
 
 $(ISABELLELIBS_OPTION): bin/why3 drivers/isabelle-realizations.aux \
-  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T option.$(notdir $(basename $@)) -o lib/isabelle/
+  drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/option.why
+	mkdir -p lib/isabelle/option
+	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
 
 opt byte: update-isabelle
 
 clean::
 	rm -f drivers/isabelle-realizations.aux
-	rm -rf lib/isabelle/*.xml lib/isabelle/int lib/isabelle/real
+	rm -f lib/isabelle/*/*.xml
 
 endif
 
