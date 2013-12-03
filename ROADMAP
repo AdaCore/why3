@@ -113,6 +113,13 @@
 
 == TODOs ==
 
+* eliminate_match: (apres la release ?)
+** faire un cas particulier pour "bool", le match pouvant se traduire
+   vers ite qui est supporté par pas mal de prouveurs
+** introduire des symboles _match non polymorphes differents pour
+   chaque instance necessaires. plutot qu'un seul symbole _match
+   poymorphe.
+
 * extraction vers Caml
 ** utiliser ZArith
 
@@ -175,10 +182,10 @@ Scheduled for 31 october 2013
 
 * why3session
 ** --stats: changed (detailler, temps, distinction root et subgoals, CLAUDE)
-**  --hist: TODO documenter (voir Alain ou Mohamed sur les graphes SMT)
+** --hist: TODO documenter (voir Alain ou Mohamed sur les graphes SMT)
 
 * bug fixes:
-** remove extra leading zeros in decimal literals when a prover don't like them 
+** remove extra leading zeros in decimal literals when a prover don't like them
 ** PVS output: types are always non-empty
 ** PVS: fixed configuration and installation process
 ** improved shape mecanism for session updates (see VSTTE'13 paper).
@@ -186,9 +193,11 @@ Scheduled for 31 october 2013
   assured.
 ** Coq tactic: now loads dynamic plug-ins
 ** Coq output: fixed printing of polymorphic recursive datatypes
-** bug #15493: ?
-** bug #15053: ?
-** bug #13736: ?
+** bug #15493: correct Coq output for polymorphic algebraic data types
+** wish #15053: Remove proof time from "Goals proved by only one prover" section of why3session info --stats
+** bug #13736: why3ml was slow when there are many inclusions
+** bug #16488: decimals in TPTP syntax
+** bug #16454: do not send arithmetic triggers anymore to alt-Ergo
 ** syntax highlighting bugs: should be fixed by removing the old language
    file alt-ergo.lang from alt-ergo distribution
 
@@ -267,19 +276,11 @@ Scheduled for 31 october 2013
 
 == TODOs ==
 
-* Patch de johannes pour les noms de fichier pour Isabelle TODO
+* DONE Patch de johannes pour les noms de fichier pour Isabelle
 
-* discriminate, mettre les bons arguments par defaut (ANDREI)
-  DONE ?
+* DONE discriminate, mettre les bons arguments par defaut (ANDREI)
 
-* eliminate_match: (apres la release ?)
-** faire un cas particulier pour "bool", le match pouvant se traduire
-   vers ite qui est supporté par pas mal de prouveurs
-** introduire des symboles _match non polymorphes differents pour
-   chaque instance necessaires. plutot qu'un seul symbole _match
-   poymorphe.
-
-* efficiency issues
+* DONE efficiency issues
 ** understand problems when large number of goals (cf D Mentré examples)
 ** prouveur de Martin
 ** tester avant la release sur
@@ -311,18 +312,18 @@ Scheduled for 31 october 2013
    transformations, write new functions on terms
  - LEON: add a section "further reading"
 
-* bug fix: 16454 (ne pas envoyer des triggers arithmetiques) (GUILLAUME)
+* DONE bug fix: 16454 (ne pas envoyer des triggers arithmetiques) (GUILLAUME)
 
-* bug fix: 15652 (ghost code detection)
+* DONE ? bug fix: 15652 (ghost code detection)
 
 * support for new provers
 ** Alt-Ergo 0.95.2 DONE
-** CVC4 1.2 TODO: pb avec les booleens
+** CVC4 1.2 DONE: pb avec les booleens
 ** DONE Coq 8.4pl2: probleme tactique Why3
-** DONE ? Metitarski: improve it (CLAUDE, GUILLAUME)
+** DONE Metitarski: improve it (CLAUDE, GUILLAUME)
 
 
-* DONE? simplification de (a && false) ne devrait pas etre false
+* DONE simplification de (a && false) ne devrait pas etre false
 
 
 
