@@ -153,9 +153,9 @@ let p_type p = p.pat_ty
 let rec print_pat info fmt p = match p.pat_node with
   | Pwild -> print_const fmt "dummy_pattern"
   | Pvar v -> print_var info fmt v
-  | Pas (p, v) ->
+  | Pas _ ->
       assert false
-  | Por (p, q) ->
+  | Por _ ->
       assert false
   | Papp (cs, pl) when is_fs_tuple cs ->
       elems' "prod" (print_pat info) fmt pl
@@ -412,7 +412,7 @@ let print_task printer_args realize fmt task =
   let realized_theories =
     Task.on_meta meta_realized_theory (fun mid args ->
       match args with
-      | [Theory.MAstr s1; Theory.MAstr s2] ->
+      | [Theory.MAstr s1; Theory.MAstr _] ->
         let f,id =
           let l = Strings.rev_split s1 '.' in
           List.rev (List.tl l), List.hd l in
