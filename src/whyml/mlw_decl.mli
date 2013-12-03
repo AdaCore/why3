@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Ident
-open Ty
 open Term
 open Mlw_ty
 open Mlw_ty.T

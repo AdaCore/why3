@@ -11,13 +11,11 @@
 
 (* destructive types for program type inference *)
 
-open Ident
 open Ty
 open Term
 open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
-open Mlw_module
 
 type dreg
 type dity

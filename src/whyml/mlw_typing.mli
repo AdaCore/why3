@@ -10,9 +10,6 @@
 (********************************************************************)
 
 open Stdlib
-open Theory
-open Env
-open Ptree
 open Mlw_module
 
 type mlw_contents = modul Mstr.t
