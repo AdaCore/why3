@@ -1145,10 +1145,19 @@ $(ISABELLELIBS_OPTION): bin/why3 drivers/isabelle-realizations.aux \
 opt byte: update-isabelle
 
 clean::
-	rm -f drivers/isabelle-realizations.aux
 	rm -f lib/isabelle/*/*.xml
 
+else
+
+drivers/isabelle-realizations.aux:
+	echo "(* generated automatically at compilation time *)" > $@
+
 endif
+
+opt byte: drivers/isabelle-realizations.aux
+
+clean::
+	rm -f drivers/isabelle-realizations.aux
 
 ################
 # Jessie3 plugin
