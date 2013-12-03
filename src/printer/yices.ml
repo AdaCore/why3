@@ -73,7 +73,7 @@ let rec print_type info fmt ty = match ty.ty_node with
           | Some ty -> print_type info fmt ty
           | None ->
               let ts = complex_type ty in let cty = ty_app ts [] in
-              let us = sprintf
+              let us = Pp.sprintf
                 "(define-type %a)@\n@\n" print_ident ts.ts_name in
               info.complex_type := Mty.add ty cty !(info.complex_type);
               info.urg_output := us :: !(info.urg_output);

@@ -71,7 +71,7 @@ let rec print_type info fmt ty = match ty.ty_node with
           | Some ty -> print_type info fmt ty
           | None ->
               let ts = complex_type ty in let cty = ty_app ts [] in
-              let us = sprintf "@[<hov 2>tff(%s, type,@ %a:@ $tType).@]@\n@\n"
+              let us = Pp.sprintf "@[<hov 2>tff(%s, type,@ %a:@ $tType).@]@\n@\n"
                 (id_unique pr_printer ts.ts_name) print_symbol ts.ts_name in
               info.info_srt := Mty.add ty cty !(info.info_srt);
               info.info_urg := us :: !(info.info_urg);

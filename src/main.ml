@@ -370,7 +370,7 @@ let () = try
       | Some s -> [MAstr s]
       | None -> []
     in
-    add_meta task meta args
+    Task.add_meta task meta args
   in
   opt_task := List.fold_left add_meta !opt_task !opt_metas
 

@@ -85,7 +85,7 @@ let () =
 
 let () = Gconfig.read_config !opt_config !opt_extra
 
-let () = C.load_plugins (get_main ())
+let () = C.load_plugins (Gconfig.get_main ())
 
 let () =
   Debug.Args.set_flags_selected ();
@@ -113,7 +113,7 @@ let () =
   Gconfig.init ()
 
 let (why_lang, any_lang) =
-  let main = get_main () in
+  let main = Gconfig.get_main () in
   let load_path = Filename.concat (datadir main) "lang" in
   let languages_manager =
     GSourceView2.source_language_manager ~default:true
@@ -164,7 +164,7 @@ let source_text fname =
 (* loading WhyIDE configuration *)
 (********************************)
 
-let loadpath = (C.loadpath (get_main ())) @ List.rev !includes
+let loadpath = (C.loadpath (Gconfig.get_main ())) @ List.rev !includes
 
 let gconfig =
   let c = Gconfig.config () in
@@ -1225,7 +1225,7 @@ let save_session () =
 
 
 let exit_function ?(destroy=false) () =
-  save_config ();
+  Gconfig.save_config ();
   if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()
