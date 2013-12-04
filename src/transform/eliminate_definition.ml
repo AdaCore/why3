@@ -100,7 +100,7 @@ let add_ld func pred (ls,ld) (abst,defn,axl) =
     let nm = ls.ls_name.id_string ^ "_def" in
     let pr = create_prsymbol (id_derive nm ls.ls_name) in
     let hd = t_app ls (List.map t_var vl) e.t_ty in
-    let ax = t_forall_close vl [] (t_insert hd e) in
+    let ax = t_forall_close vl [[hd]] (t_insert hd e) in
     let ax = create_prop_decl Paxiom pr ax in
     let ld = create_param_decl ls in
     ld :: abst, defn, ax :: axl
