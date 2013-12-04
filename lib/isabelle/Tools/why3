@@ -70,13 +70,22 @@ fi
 if [ "$BATCH" = true ]; then
   $ISABELLE_PROCESS -e "use_thy \"$NAME\";" -rq Why3
 elif [ "$INTERACTIVE" = true ]; then
-  if [ "$INTERFACE" = emacs ]; then
-    LOGIC="-L"
-  else
-    LOGIC="-l"
-  fi
   make_theory "$NAME"
-  $ISABELLE_TOOL $INTERFACE $LOGIC Why3 "$NAME.thy"
+  case "$INTERFACE" in
+    emacs)
+      "$ISABELLE_TOOL" emacs -L Why3 "$NAME.thy"
+      ;;
+    jedit)
+      "$ISABELLE_TOOL" jedit -l Why3 "$NAME.thy"
+      ;;
+    jedit-server)
+      if [ -f "$JEDIT_SETTINGS/server-Why3" ]; then
+        "$ISABELLE_TOOL" jedit -j-server=server-Why3 -l Pure "$NAME.thy"
+      else
+        "$ISABELLE_TOOL" jedit -j-server=server-Why3 -l Why3 "$NAME.thy" &
+      fi
+      ;;
+  esac
 else
   usage
 fi
