@@ -7,6 +7,8 @@
 (*  General Public License version 2.1, with the special exception  *)
 (*  on linking described in file LICENSE.                           *)
 (*                                                                  *)
+(*  main author: Stefan Berghofer <stefan.berghofer@secunet.com>    *)
+(*                                                                  *)
 (********************************************************************)
 
 (** Isabelle printer *)
