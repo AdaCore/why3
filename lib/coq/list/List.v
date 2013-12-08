@@ -5,6 +5,7 @@ Require BuiltIn.
 
 
 
+
 Global Instance list_WhyType : forall T {T_WT : WhyType T}, WhyType (list T).
 split.
 apply nil.
