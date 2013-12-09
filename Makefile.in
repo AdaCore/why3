@@ -965,6 +965,9 @@ else
 drivers/coq-realizations.aux:
 	echo "(* generated automatically at compilation time *)" > $@
 
+install_no_local::
+	cp drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
+
 endif
 
 opt byte: drivers/coq-realizations.aux
@@ -1039,6 +1042,9 @@ else
 
 drivers/pvs-realizations.aux:
 	echo "(* generated automatically at compilation time *)" > $@
+
+install_no_local::
+	cp drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
 endif
 
@@ -1151,6 +1157,9 @@ else
 
 drivers/isabelle-realizations.aux:
 	echo "(* generated automatically at compilation time *)" > $@
+
+install_no_local::
+	cp drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
 
 endif
 
