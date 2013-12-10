@@ -32,8 +32,8 @@ now rewrite 2!Map.Select_neq by now apply sym_not_eq.
 Qed.
 
 (* Why3 assumption *)
-Inductive permut_sub {a:Type} {a_WT:WhyType a} : (@map.Map.map Z _ a a_WT)
-  -> (@map.Map.map Z _ a a_WT) -> Z -> Z -> Prop :=
+Inductive permut_sub {a:Type} {a_WT:WhyType a} : (@map.Map.map Z _ a a_WT) ->
+  (@map.Map.map Z _ a a_WT) -> Z -> Z -> Prop :=
   | permut_refl : forall (a1:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z),
       ((@permut_sub _ _) a1 a1 l u)
   | permut_sym : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _

@@ -230,7 +230,7 @@ let print_paren_l fmt x =
 let print_paren_r fmt x =
   print_list_delim ~start:lparen_r ~stop:rparen ~sep:comma fmt x
 
-let arrow fmt () = fprintf fmt "@ -> "
+let arrow fmt () = fprintf fmt " ->@ "
 let print_arrow_list fmt x = print_list_suf arrow fmt x
 
 let rec print_pat info fmt p = match p.pat_node with
