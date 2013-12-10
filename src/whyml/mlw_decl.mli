@@ -15,6 +15,8 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 
+(** *)
+
 (** {2 Type declaration} *)
 
 type constructor = plsymbol * plsymbol option list

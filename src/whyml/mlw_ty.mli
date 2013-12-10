@@ -13,7 +13,9 @@ open Ident
 open Ty
 open Term
 
-(** individual types (first-order types w/o effects) *)
+(** *)
+
+(** {2 Individual types (first-order types w/o effects)} *)
 
 module rec T : sig
 
@@ -23,13 +25,13 @@ module rec T : sig
   }
 
   type itysymbol = private {
-    its_ts   : tysymbol;      (* "pure snapshot" type symbol *)
-    its_regs : region list;   (* region arguments *)
-    its_def  : ity option;    (* type alias definition *)
-    its_ghrl : bool list;     (* ghost region arguments *)
-    its_inv  : bool;          (* carries a type invariant *)
-    its_abst : bool;          (* is an abstract (= "model") type *)
-    its_priv : bool;          (* is a private (à la Ocaml) type *)
+    its_ts   : tysymbol;      (** "pure snapshot" type symbol *)
+    its_regs : region list;   (** region arguments *)
+    its_def  : ity option;    (** type alias definition *)
+    its_ghrl : bool list;     (** ghost region arguments *)
+    its_inv  : bool;          (** carries a type invariant *)
+    its_abst : bool;          (** is an abstract (= "model") type *)
+    its_priv : bool;          (** is a private (à la Ocaml) type *)
   }
 
   (** ity = individual type in programs, first-order, i.e. no functions *)
@@ -91,7 +93,7 @@ val create_itysymbol :
     tvsymbol list -> region list -> ity option -> itysymbol
 
 val restore_its : tysymbol -> itysymbol
-  (* raises Not_found if the argument is not a its_ts *)
+  (** raises [Not_found] if the argument is not a its_ts *)
 
 val ity_var : tvsymbol -> ity
 val ity_pur : tysymbol -> ity list -> ity
@@ -99,20 +101,20 @@ val ity_pur : tysymbol -> ity list -> ity
 val ity_app : itysymbol -> ity list -> region list -> ity
 val ity_app_fresh : itysymbol -> ity list -> ity
 
-(* all aliases expanded, all regions removed *)
 val ty_of_ity : ity -> ty
+(** all aliases expanded, all regions removed *)
 
-(* replaces every [Tyapp] with [Itypur] *)
 val ity_of_ty : ty -> ity
+(** replaces every [Tyapp] with [Itypur] *)
 
-(* generic traversal functions *)
+(** {2 Generic traversal functions} *)
 
 val ity_map : (ity -> ity) -> ity -> ity
 val ity_fold : ('a -> ity -> 'a) -> 'a -> ity -> 'a
 val ity_all : (ity -> bool) -> ity -> bool
 val ity_any : (ity -> bool) -> ity -> bool
 
-(* traversal functions on type symbols *)
+(** {2 Traversal functions on type symbols} *)
 
 val ity_s_fold :
   ('a -> itysymbol -> 'a) -> ('a -> tysymbol -> 'a) -> 'a -> ity -> 'a
@@ -140,9 +142,9 @@ val reg_occurs : region -> varset -> bool
 val ity_nonghost_reg : Sreg.t -> ity -> Sreg.t
 val lookup_nonghost_reg : Sreg.t -> ity -> bool
 
-(* built-in types *)
+(** {2 Built-in types} *)
 
-val ts_unit : tysymbol (* the same as [Ty.ts_tuple 0] *)
+val ts_unit : tysymbol (** the same as [Ty.ts_tuple 0] *)
 val ty_unit : ty
 
 val ity_int : ity
@@ -171,7 +173,7 @@ val ity_full_inst : ity_subst -> ity -> ity
 
 val reg_full_inst : ity_subst -> region -> region
 
-(* varset manipulation *)
+(** {2 Varset manipulation} *)
 
 val vars_empty : varset
 
@@ -179,10 +181,11 @@ val vars_union : varset -> varset -> varset
 
 val vars_freeze : varset -> ity_subst
 
-(* exception symbols *)
+(** {2 Exception symbols} *)
+
 type xsymbol = private {
   xs_name : ident;
-  xs_ity  : ity; (* closed and immutable *)
+  xs_ity  : ity; (** closed and immutable *)
 }
 
 val xs_equal : xsymbol -> xsymbol -> bool
@@ -195,13 +198,13 @@ val create_xsymbol : preid -> ity -> xsymbol
 module Mexn: Extmap.S with type key = xsymbol
 module Sexn: Extset.S with module M = Mexn
 
-(** effects *)
+(** {2 Effects} *)
 
 type effect = private {
   eff_writes : Sreg.t;
   eff_raises : Sexn.t;
-  eff_ghostw : Sreg.t; (* ghost writes *)
-  eff_ghostx : Sexn.t; (* ghost raises *)
+  eff_ghostw : Sreg.t; (** ghost writes *)
+  eff_ghostx : Sexn.t; (** ghost raises *)
   (* if r1 -> Some r2 then r1 appears in ty(r2) *)
   eff_resets : region option Mreg.t;
   eff_compar : Stv.t;
@@ -235,7 +238,7 @@ val eff_full_inst : ity_subst -> effect -> effect
 
 val eff_is_empty : effect -> bool
 
-(** specification *)
+(** {2 Specification} *)
 
 type pre = term          (** precondition: pre_fmla *)
 type post = term         (** postcondition: eps result . post_fmla *)
@@ -256,7 +259,7 @@ type spec = {
   c_letrec  : int;
 }
 
-(** program variables *)
+(** {2 Program variables} *)
 
 type pvsymbol = private {
   pv_vs    : vsymbol;
@@ -274,15 +277,15 @@ val pv_equal : pvsymbol -> pvsymbol -> bool
 val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
 
 val restore_pv : vsymbol -> pvsymbol
-  (** raises Not_found if the argument is not a pv_vs *)
+(** raises [Not_found] if the argument is not a [pv_vs] *)
 
 val t_pvset : Spv.t -> term -> Spv.t
-  (** raises Not_found if the term contains non-pv variables *)
+(** raises [Not_found] if the term contains non-pv variables *)
 
 val spec_pvset : Spv.t -> spec -> Spv.t
-  (** raises Not_found if the spec contains non-pv variables *)
+(** raises [Not_found] if the spec contains non-pv variables *)
 
-(** program types *)
+(** {2 Program types} *)
 
 type vty =
   | VTvalue of ity

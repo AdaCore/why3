@@ -32,7 +32,7 @@ val ns_find_ls : namespace -> string list -> lsymbol
 val ns_find_pr : namespace -> string list -> prsymbol
 val ns_find_ns : namespace -> string list -> namespace
 
-(** Meta properties *)
+(** {2 Meta properties} *)
 
 type meta_arg_type =
   | MTty
@@ -78,7 +78,7 @@ val register_meta_excl :
 val lookup_meta : string -> meta
 val list_metas  : unit -> meta list
 
-(** Theory *)
+(** {2 Theories} *)
 
 type theory = private {
   th_name   : ident;      (* theory name *)
@@ -114,9 +114,9 @@ module Htdecl : Exthtbl.S with type key = tdecl
 val td_equal : tdecl -> tdecl -> bool
 val td_hash : tdecl -> int
 
-(** Constructors and utilities *)
+(** {2 Constructors and utilities} *)
 
-type theory_uc  (* a theory under construction *)
+type theory_uc  (** a theory under construction *)
 
 val create_theory : ?path:string list -> preid -> theory_uc
 val close_theory  : theory_uc -> theory
@@ -129,13 +129,13 @@ val get_known : theory_uc -> known_map
 val get_rev_decls : theory_uc -> tdecl list
 
 val restore_path : ident -> string list * string * string list
-(* [restore_path id] returns the triple (library path, theory,
+(** [restore_path id] returns the triple (library path, theory,
    qualified symbol name) if the ident was ever introduced in
    a theory declaration. If the ident was declared in several
    different theories, the first association is retained.
    Raises Not_found if the ident was never declared in a theory. *)
 
-(** Declaration constructors *)
+(** {2 Declaration constructors} *)
 
 val create_decl : decl -> tdecl
 
@@ -148,12 +148,12 @@ val add_logic_decl : theory_uc -> logic_decl list -> theory_uc
 val add_ind_decl : theory_uc -> ind_sign -> ind_decl list -> theory_uc
 val add_prop_decl : theory_uc -> prop_kind -> prsymbol -> term -> theory_uc
 
-(** Use *)
+(** {2 Use} *)
 
 val create_use : theory -> tdecl
 val use_export : theory_uc -> theory -> theory_uc
 
-(** Clone *)
+(** {2 Clone} *)
 
 type th_inst = {
   inst_ts    : tysymbol Mts.t; (* old to new *)
@@ -180,21 +180,21 @@ val create_null_clone : theory -> tdecl
 
 val is_empty_sm : symbol_map -> bool
 
-(** Meta *)
+(** {2 Meta} *)
 
 val create_meta : meta -> meta_arg list -> tdecl
 
 val add_meta : theory_uc -> meta -> meta_arg list -> theory_uc
 
 val clone_meta : tdecl -> symbol_map -> tdecl
-(* [clone_meta td_meta sm] produces from [td_meta]
- * a new Meta tdecl instantiated with respect to [sm]]. *)
+(** [clone_meta td_meta sm] produces from [td_meta]
+    a new Meta tdecl instantiated with respect to [sm]. *)
 
 (*
 val on_meta: meta-> ('a -> meta_arg list -> 'a) -> 'a -> theory -> 'a
 *)
 
-(** Base theories *)
+(** {2 Base theories} *)
 
 val builtin_theory : theory
 
@@ -210,7 +210,7 @@ val tuple_theory_name : string -> int option
 
 val add_decl_with_tuples : theory_uc -> decl -> theory_uc
 
-(* exceptions *)
+(* {2 Exceptions} *)
 
 exception NonLocal of ident
 exception CannotInstantiate of ident

@@ -20,6 +20,8 @@ open Mlw_ty.T
 open Mlw_expr
 open Mlw_decl
 
+(** *)
+
 type type_symbol =
   | PT of itysymbol
   | TS of tysymbol
@@ -50,7 +52,7 @@ val ns_find_ls  : namespace -> string list -> lsymbol
 
 val ns_find_ns  : namespace -> string list -> namespace
 
-(** Module *)
+(** {2 Module} *)
 
 type modul = private {
   mod_theory: theory;			(* pure theory *)
@@ -61,7 +63,7 @@ type modul = private {
   mod_used  : Sid.t;			(* used modules *)
 }
 
-(** Module under construction *)
+(** {2 Module under construction} *)
 
 type module_uc (* a module under construction *)
 
@@ -76,25 +78,25 @@ val get_namespace : module_uc -> namespace
 val get_known : module_uc -> known_map
 
 val restore_path : ident -> string list * string * string list
-(* [restore_path id] returns the triple (library path, module,
+(** [restore_path id] returns the triple (library path, module,
    qualified symbol name) if the ident was ever introduced in
    a module declaration. If the ident was declared in several
    different modules, the first association is retained.
    Raises Not_found if the ident was never declared in a module. *)
 
-(** Use and clone *)
+(** {2 Use and clone} *)
 
 val use_export : module_uc -> modul -> module_uc
 val clone_export : module_uc -> modul -> th_inst -> module_uc
 
-(** Logic decls *)
+(** {2 Logic decls} *)
 
 val add_decl : module_uc -> decl -> module_uc
 val use_export_theory: module_uc -> theory -> module_uc
 val clone_export_theory: module_uc -> theory -> th_inst -> module_uc
 val add_meta : module_uc -> meta -> meta_arg list -> module_uc
 
-(** Program decls *)
+(** {2 Program decls} *)
 
 val add_pdecl : wp:bool -> module_uc -> pdecl -> module_uc
 (** [add_pdecl ~wp m d] adds declaration [d] in module [m].
@@ -104,6 +106,6 @@ exception TooLateInvariant
 
 val add_invariant : module_uc -> itysymbol -> post -> module_uc
 
-(** Builtin symbols *)
+(** {2 Builtin symbols} *)
 
 val xs_exit : xsymbol (* exception used to break the loops *)
