@@ -1168,6 +1168,45 @@ opt byte: drivers/isabelle-realizations.aux
 clean::
 	rm -f drivers/isabelle-realizations.aux
 
+#######################
+# Ocaml realizations
+#######################
+
+OCAMLLIBS_FILES = \
+	array__Array \
+	int__Abs int__ComputerDivision int__Int int__Lex2 int__MinMax \
+	ref__Refint ref__Ref \
+	why3__BuiltIn why3__Prelude
+
+OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
+
+OCAMLLIBS_DEP = $(addsuffix .dep, $(OCAMLLIBS_MODULES))
+OCAMLLIBS_CMO = $(addsuffix .cmo, $(OCAMLLIBS_MODULES))
+OCAMLLIBS_CMX = $(addsuffix .cmx, $(OCAMLLIBS_MODULES))
+
+$(OCAMLLIBS_DEP): DEPFLAGS += -I lib/ocaml
+$(OCAMLLIBS_CMO) $(OCAMLLIBS_CMX): INCLUDES += -I lib/ocaml
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(OCAMLLIBS_DEP)
+endif
+
+depend: $(OCAMLLIBS_DEP)
+
+clean::
+	rm -f lib/ocaml/*.cm[iox] lib/ocaml/*.o
+	rm -f lib/ocaml/*.annot lib/ocaml/*.dep
+
+opt: $(OCAMLLIBS_CMX)
+
+byte: $(OCAMLLIBS_CMO)
+
+install_no_local::
+	mkdir -p $(LIBDIR)/why3/ocaml
+	cp lib/ocaml/*.cm[iox] $(LIBDIR)/why3/ocaml
+
+install_local: bin/why3doc
+
 ################
 # Jessie3 plugin
 ################
