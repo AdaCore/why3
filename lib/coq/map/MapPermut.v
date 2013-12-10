@@ -137,4 +137,3 @@ now apply sym_eq, H1 ; split.
 now apply H1 ; split.
 Qed.
 
-

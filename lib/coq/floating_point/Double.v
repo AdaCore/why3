@@ -178,4 +178,3 @@ Definition lt (x:floating_point.DoubleFormat.double)
 Definition gt (x:floating_point.DoubleFormat.double)
   (y:floating_point.DoubleFormat.double): Prop := ((value y) < (value x))%R.
 
-

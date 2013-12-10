@@ -112,5 +112,4 @@ rewrite IHn.
 now rewrite Assoc, <- (Assoc y), (Comm y), 2!Assoc.
 Qed.
 
-
 End Exponentiation.

@@ -70,4 +70,3 @@ specialize (IHq _ H).
 omega.
 Qed.
 
-

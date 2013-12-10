@@ -82,4 +82,3 @@ apply in_split.
 now apply Mem.mem_std.
 Qed.
 
-

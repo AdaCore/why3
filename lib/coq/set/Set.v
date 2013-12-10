@@ -235,4 +235,3 @@ intros a a_WT x.
 now unfold all.
 Qed.
 
-

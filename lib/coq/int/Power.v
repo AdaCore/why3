@@ -79,4 +79,3 @@ rewrite 3!power_is_exponentiation ; auto with zarith.
 apply Power_mult2 ; auto with zarith.
 Qed.
 
-

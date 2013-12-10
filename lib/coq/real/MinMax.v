@@ -54,4 +54,3 @@ apply Rmin_right.
 now apply Rlt_le.
 Qed.
 
-

@@ -189,4 +189,3 @@ Definition lt (x:floating_point.SingleFormat.single)
 Definition gt (x:floating_point.SingleFormat.single)
   (y:floating_point.SingleFormat.single): Prop := ((value y) < (value x))%R.
 
-

@@ -960,7 +960,7 @@ let print_decl ~old info fmt d =
       print_prop_decl ~prev info fmt pr
 
 let print_decls ~old info fmt dl =
-  fprintf fmt "@\n@[<hov>%a@\n@]" (print_list nothing (print_decl ~old info)) dl
+  fprintf fmt "@\n@[<hov>%a@]" (print_list nothing (print_decl ~old info)) dl
 
 let print_task printer_args realize ?old fmt task =
   (* eprintf "Task:%a@.@." Pretty.print_task task; *)

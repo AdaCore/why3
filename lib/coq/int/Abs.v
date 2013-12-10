@@ -33,4 +33,3 @@ Lemma Abs_pos : forall (x:Z), (0%Z <= (Zabs x))%Z.
 exact Zabs_pos.
 Qed.
 
-

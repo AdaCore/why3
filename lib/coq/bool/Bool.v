@@ -58,4 +58,3 @@ Proof.
 now intros [|] [|].
 Qed.
 
-

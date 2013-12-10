@@ -141,4 +141,3 @@ apply Zmult_le_0_compat with (1 := Hy).
 now apply Zlt_le_weak.
 Qed.
 
-
