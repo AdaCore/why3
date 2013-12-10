@@ -1,0 +1,33 @@
+
+(* 8 balls, one is lighter than the others
+   Given a Roberval balance, use it only twice to find the lighter ball *)
+
+module Balance
+
+  use import int.Int
+  use import array.Array
+
+  let solve3 (balls: array int) (s: int) (ghost lb: int) (ghost w: int) : int
+    requires { 0 <= s && s+3 <= length balls }
+    requires { s <= lb < s+3 }
+    requires { forall i: int. s <= i < s+3 -> i <> lb -> balls[i] = w }
+    requires { balls[lb] < w }
+    ensures  { result = lb }
+  =
+    absurd
+
+  let solve8 (balls: array int) (ghost lb: int) (ghost w: int) : int
+    requires { length balls = 8 }
+    requires { 0 <= lb < 8 }
+    requires { forall i: int. 0 <= i < 8 -> i<> lb -> balls[i] = w }
+    requires { balls[lb] < w }
+    ensures  { result = lb }
+  =
+    if balls[0] + balls[1] + balls[2] < balls[3] + balls[4] + balls[5] then
+      solve3 balls 0 lb w
+    else if balls[0] + balls[1] + balls[2] > balls[3] + balls[4] + balls[5] then
+      solve3 balls 3 lb w
+    else
+      if balls[6] < balls[7] then 6 else 7
+
+end
