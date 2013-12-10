@@ -11,6 +11,7 @@ type reason =
    | VC_Discriminant_Check
    | VC_Initial_Condition
    | VC_Precondition
+   | VC_Precondition_Main
    | VC_Postcondition
    | VC_Contract_Case
    | VC_Disjoint_Contract_Cases
@@ -74,6 +75,7 @@ let reason_from_string s =
    | "VC_DISCRIMINANT_CHECK"      -> VC_Discriminant_Check
    | "VC_INITIAL_CONDITION"       -> VC_Initial_Condition
    | "VC_PRECONDITION"            -> VC_Precondition
+   | "VC_PRECONDITION_MAIN"       -> VC_Precondition_Main
    | "VC_POSTCONDITION"           -> VC_Postcondition
    | "VC_CONTRACT_CASE"           -> VC_Contract_Case
    | "VC_DISJOINT_CONTRACT_CASES" -> VC_Disjoint_Contract_Cases
@@ -99,6 +101,7 @@ let string_of_reason proved s =
     | VC_Discriminant_Check        -> "discriminant check proved"
     | VC_Initial_Condition         -> "initial condition proved"
     | VC_Precondition              -> "precondition proved"
+    | VC_Precondition_Main         -> "precondition of main program proved"
     | VC_Postcondition             -> "postcondition proved"
     | VC_Contract_Case             -> "contract case proved"
     | VC_Disjoint_Contract_Cases   -> "disjoint contract cases proved"
@@ -119,6 +122,7 @@ let string_of_reason proved s =
     | VC_Discriminant_Check        -> "discriminant check might fail"
     | VC_Initial_Condition         -> "initial condition might fail"
     | VC_Precondition              -> "precondition might fail"
+    | VC_Precondition_Main         -> "precondition of main program might fail"
     | VC_Postcondition             -> "postcondition might fail"
     | VC_Contract_Case             -> "contract case might fail"
     | VC_Disjoint_Contract_Cases   -> "contract cases might not be disjoint"
@@ -142,6 +146,7 @@ let tag_of_reason s =
    | VC_Discriminant_Check        -> "discriminant_check"
    | VC_Initial_Condition         -> "initial_condition"
    | VC_Precondition              -> "precondition"
+   | VC_Precondition_Main         -> "precondition_main"
    | VC_Postcondition             -> "postcondition"
    | VC_Contract_Case             -> "contract_case"
    | VC_Disjoint_Contract_Cases   -> "disjoint_contract_cases"

@@ -13,6 +13,7 @@ type reason =
    | VC_Discriminant_Check
    | VC_Initial_Condition
    | VC_Precondition
+   | VC_Precondition_Main
    | VC_Postcondition
    | VC_Contract_Case
    | VC_Disjoint_Contract_Cases
