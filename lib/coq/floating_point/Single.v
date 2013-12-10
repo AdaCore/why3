@@ -18,12 +18,6 @@ exact (round 24 128).
 Defined.
 
 (* Why3 goal *)
-Definition round_logic: floating_point.Rounding.mode -> R ->
-  floating_point.SingleFormat.single.
-exact (round_logic 24 128 (refl_equal true) (refl_equal true)).
-Defined.
-
-(* Why3 goal *)
 Definition value: floating_point.SingleFormat.single -> R.
 exact (value 24 128).
 Defined.
@@ -59,7 +53,6 @@ Qed.
 Lemma Bounded_real_no_overflow : forall (m:floating_point.Rounding.mode)
   (x:R), ((Rabs x) <= (33554430 * 10141204801825835211973625643008)%R)%R ->
   (no_overflow m x).
-(* YOU MAY EDIT THE PROOF BELOW *)
 intros m x Hx.
 unfold no_overflow.
 rewrite max_single_eq in *.
@@ -123,6 +116,22 @@ Qed.
 Lemma Round_up_neg : forall (x:R), ((round floating_point.Rounding.Up
   (-x)%R) = (-(round floating_point.Rounding.Down x))%R).
 now apply Round_up_neg.
+Qed.
+
+(* Why3 goal *)
+Definition round_logic: floating_point.Rounding.mode -> R ->
+  floating_point.SingleFormat.single.
+exact (round_logic 24 128 (refl_equal true) (refl_equal true)).
+Defined.
+
+(* Why3 goal *)
+Lemma Round_logic_def : forall (m:floating_point.Rounding.mode) (x:R),
+  (no_overflow m x) -> ((value (round_logic m x)) = (round m x)).
+Proof.
+intros m x.
+unfold no_overflow.
+rewrite max_single_eq.
+exact (Round_logic_def 24 128 (refl_equal true) (refl_equal true) m x).
 Qed.
 
 (* Why3 assumption *)
