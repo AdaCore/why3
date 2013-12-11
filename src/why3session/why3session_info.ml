@@ -403,13 +403,14 @@ let print_hist stats =
         " \"%s\" using 2:1 title \"%s\" with linespoints ps 0.2@\n"
         pf (string_of_prover p);
       let fmt = formatter_of_out_channel ch in
-      let (_ : int) =
+      let (_ : float * int) =
         Mfloat.fold
-          (fun t c accc ->
+          (fun t c (acct,accc) ->
             let accc = c + accc in
-            fprintf fmt "%.2f %d@\n" t accc;
-            accc)
-          h 0
+            let acct = t +. acct in
+            fprintf fmt "%.2f %d@\n" acct accc;
+            (acct,accc))
+          h (0.0,0)
       in
       fprintf fmt "@.";
       close_out ch;
