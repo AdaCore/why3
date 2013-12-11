@@ -107,10 +107,6 @@ let iprinter =
   let isanitize = sanitizer char_to_lalpha char_to_lalnumus in
   create_ident_printer black_list ~sanitizer:isanitize
 
-let thprinter =
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  create_ident_printer black_list ~sanitizer:isanitize
-
 let forget_all () = forget_all iprinter
 
 let tv_set = ref Sid.empty
@@ -156,9 +152,6 @@ let print_pr fmt pr =
 let print_name fmt id =
   fprintf fmt "%% Why3 %s@\n" (id_unique iprinter id)
 
-let print_th_name fmt id =
-  fprintf fmt "%s" (id_unique thprinter id)
-
 (* info *)
 
 type info = {
@@ -174,7 +167,7 @@ let print_id fmt id = string fmt (id_unique iprinter id)
 let print_id_real info fmt id =
   try
     let path, th, ipr = Mid.find id info.symbol_printers in
-    let th = id_unique thprinter th.Theory.th_name in
+    let th = th.Theory.th_name.id_string in
     let id = id_unique ipr id in
     if path = "" then fprintf fmt "%s.%s" th id
     else fprintf fmt "%s@@%s.%s" path th id
@@ -836,11 +829,11 @@ let print_task printer_args realize ?old fmt task =
     let rec upd_realized_theories = function
     | Some { Task.task_decl = { Theory.td_node =
                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, pr, _) }}} ->
-        id_unique thprinter pr.pr_name, [], realized_theories
+        pr.pr_name.id_string, [], realized_theories
     | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
        let id = th.Theory.th_name in
-       id_unique thprinter id,
+       id.id_string,
        th.Theory.th_path,
        Mid.remove id realized_theories
     | Some { Task.task_decl = { Theory.td_node = Theory.Meta _ };
@@ -891,7 +884,7 @@ let print_task printer_args realize ?old fmt task =
   Mid.iter
     (fun _ (th, (path, _)) ->
        let lib = if path = thpath then "" else String.concat "." path ^ "@" in
-       fprintf fmt "IMPORTING %s%a@\n" lib print_th_name th.Theory.th_name)
+       fprintf fmt "IMPORTING %s%s@\n" lib th.Theory.th_name.id_string)
     realized_theories;
   fprintf fmt "%% do not edit above this line@\n@\n";
   print_decls ~old info fmt local_decls;
