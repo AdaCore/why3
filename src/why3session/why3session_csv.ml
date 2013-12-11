@@ -50,6 +50,18 @@ let select_gnuplot = function
   | "gp" -> opt_gnuplot := GP::!opt_gnuplot
   | _ -> assert false (** absurd: Arg already filtered bad cases *)
 
+type gnuplot_x =
+  | Xtime
+  | Xgoals
+
+let opt_gnuplot_x = ref Xtime
+
+let select_gnuplot_x = function
+  | "time" -> opt_gnuplot_x := Xtime
+  | "goals" -> opt_gnuplot_x := Xgoals
+  | _ -> assert false (** absurd: Arg already filtered bad cases *)
+
+
 let opt_data = ref false
 let opt_by_time = ref false
 
@@ -74,6 +86,9 @@ let spec =
     ("--gnuplot", Arg.Symbol (["pdf";"png";"svg";"qt";"gp"],select_gnuplot),
      "Run gnuplot on the produced file (currently only with --valid_by_time)\
       (gp write the gnuplot script used for generating the other case)")::
+    ("--gnuplot-x", Arg.Symbol (["time";"goals"],select_gnuplot_x),
+     "Select the data used for the x axes time or number of goal proved \
+      (default time)")::
     ("--output-csv", Arg.Set opt_print_csv,
      "print the csv, set byt default when --gnuplot is not set")::
     common_options
@@ -201,19 +216,30 @@ let print_provers_time (provers_time : float list Whyconf.Hprover.t) fmt =
   print_line l
 
 let create_gnuplot_by_time nb_provers fmt =
+  let timeaxe, goalsaxe =
+    match !opt_gnuplot_x with | Xtime -> "x","y" | Xgoals -> "y","x"
+  in
   Format.pp_print_string fmt
 "\
 set datafile separator \",\"\n\
 set key autotitle columnhead\n\
-set logscale x 10\n\
 set object rectangle from screen 0,0 to screen 1,1 behind\n\
-set xlabel \"time\"\n\
-\n\
-plot ";
+set key rmargin width -4 samplen 2\n";
+  Format.fprintf fmt "set logscale %s 10\n" timeaxe;
+  Format.fprintf fmt "set %slabel \"time(s)\"\n" timeaxe;
+  Format.fprintf fmt "set %slabel \"number of solved goals\"\n\n" goalsaxe;
+  Format.pp_print_string fmt "plot \\\n";
   for i=1 to nb_provers do
-    Format.fprintf fmt
-      "data_filename using ($1):($%i) with steps"
-      (i+1);
+    begin match !opt_gnuplot_x with
+    | Xtime ->
+      Format.fprintf fmt
+        "data_filename using ($1):($%i) with steps title columnhead(%i)"
+        (i+1) (i+1)
+    | Xgoals ->
+      Format.fprintf fmt
+        "data_filename using ($%i):($1) with fsteps title columnhead(%i)"
+        (i+1) (i+1)
+    end;
     if i <> nb_provers then Format.pp_print_string fmt ",\\\n";
   done
 
