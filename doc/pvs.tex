@@ -29,8 +29,10 @@ realization:
   \texttt{AXIOM} with either \texttt{LEMMA} or \texttt{THEOREM}.
 
 \item insert anything between generated declarations, such as a lemma,
-  an extra definition for the purpose of a proof, etc.
+  an extra definition for the purpose of a proof, an extra
+  \texttt{IMPORTING} command, etc. Do not forget to surround these
+  extra declarations with blank lines.
 \end{itemize}
-\why makes some effort to merge the new declarations with the old ones
-and with the user chunks. If it happens that some chunks could not be
+\why makes some effort to merge new declarations with old ones
+and with user chunks. If it happens that some chunks could not be
 merged, they are appended at the end of the file, in comments.

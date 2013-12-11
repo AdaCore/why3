@@ -1458,7 +1458,8 @@ doc/bnf: doc/bnf.mll
 	$(OCAMLOPT) -o $@ doc/bnf.ml
 
 DOC = api glossary ide intro library macros manpages install coq_tactic \
-      realizations manual starting syntax syntaxref technical version whyml
+      realizations manual starting syntax syntaxref technical version whyml \
+      pvs
 
 DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 

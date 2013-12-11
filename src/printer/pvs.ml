@@ -886,7 +886,9 @@ let print_task printer_args realize ?old fmt task =
        let lib = if path = thpath then "" else String.concat "." path ^ "@" in
        fprintf fmt "IMPORTING %s%s@\n" lib th.Theory.th_name.id_string)
     realized_theories;
-  fprintf fmt "%% do not edit above this line@\n@\n";
+  fprintf fmt "%% do not edit above this line@\n";
+  fprintf fmt
+    "%% surround new declarations you insert below with blank lines@\n@\n";
   print_decls ~old info fmt local_decls;
   output_remaining fmt !old;
   fprintf fmt "@]@\nEND %s@\n@]" thname
