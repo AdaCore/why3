@@ -25,6 +25,7 @@ let opt_print_provers = ref false
 let opt_print_edited = ref false
 let opt_tree_print = ref false
 let opt_stats_print = ref false
+let opt_hist_print = ref false
 let opt_project_dir = ref false
 let opt_print0 = ref false
 
@@ -35,6 +36,8 @@ let spec =
    " edited proof scripts in the session" ) ::
   ("--stats", Arg.Set opt_stats_print,
    " prints various proofs statistics" ) ::
+  ("--hist", Arg.Set opt_hist_print,
+   " outputs a histogram of external proof results" ) ::
   ("--tree", Arg.Set opt_tree_print,
    " session contents as a tree in textual format" ) ::
   ("--dir", Arg.Set opt_project_dir,
@@ -52,6 +55,7 @@ type proof_stats =
       mutable nb_proved_sub_goals : int;
       mutable no_proof : Sstr.t;
       mutable only_one_proof : Sstr.t;
+      prover_hist : int Mfloat.t Hprover.t;
       prover_min_time : float Hprover.t;
       prover_sum_time : float Hprover.t;
       prover_max_time : float Hprover.t;
@@ -67,6 +71,7 @@ let new_proof_stats () =
     nb_proved_sub_goals = 0;
     no_proof = Sstr.empty;
     only_one_proof = Sstr.empty;
+    prover_hist = Hprover.create 3;
     prover_min_time = Hprover.create 3;
     prover_sum_time = Hprover.create 3;
     prover_max_time = Hprover.create 3;
@@ -112,13 +117,27 @@ let update_count tbl (prover, _time) =
       | None -> 1)
     ~name:prover
 
+let update_hist tbl (prover, time) =
+  let h =
+    try Hprover.find tbl prover
+    with Not_found -> Mfloat.empty
+  in
+  let h =
+    try
+      let c = Mfloat.find time h in
+      Mfloat.add time (succ c) h
+    with Not_found ->
+      Mfloat.add time 1 h
+  in
+  Hprover.replace tbl prover h
 
 let update_perf_stats stats ((_,t) as prover_and_time) =
   if t > stats.max_time then stats.max_time <- t;
   update_min_time stats.prover_min_time prover_and_time;
   update_max_time stats.prover_max_time prover_and_time;
   update_sum_time stats.prover_sum_time prover_and_time;
-  update_count stats.prover_num_proofs prover_and_time
+  update_count stats.prover_num_proofs prover_and_time;
+  update_hist stats.prover_hist prover_and_time
 
 let string_of_prover p = Pp.string_of_wnl print_prover p
 
@@ -348,13 +367,68 @@ let run_one stats r0 r1 fname =
       session;
   if !opt_tree_print then
     printf "%a@." print_session session;
-  if !opt_stats_print then
+  if !opt_stats_print || !opt_hist_print then
     begin
       (* fill_prover_data stats session; *)
       PHstr.iter (stats_of_file stats) session.session_files;
       r0 := stats2_of_session ~nb_proofs:0 session !r0;
       r1 := stats2_of_session ~nb_proofs:1 session !r1
     end
+
+(**** print histograms ******)
+
+let print_hist stats =
+  let main_file,main_ch =
+    Filename.open_temp_file "why3session" ".gnuplot"
+  in
+  let main_fmt = formatter_of_out_channel main_ch in
+  fprintf main_fmt "set logscale y@\n";
+  fprintf main_fmt "set key rmargin@\n";
+  let max_sum_times =
+    Hprover.fold
+      (fun _ s acc -> max s acc)
+      stats.prover_sum_time 0.0
+  in
+  let (_:int) =
+  Hprover.fold
+    (fun p h acc ->
+      let pf,ch = Filename.open_temp_file "why3session" ".data" in
+      if acc = 1 then
+        fprintf main_fmt "plot [1:%d] [0.01:%.2f] "
+          (stats.nb_proved_sub_goals + stats.nb_proved_root_goals)
+          max_sum_times
+      else
+        fprintf main_fmt "replot";
+      fprintf main_fmt
+        " \"%s\" using 2:1 title \"%s\" with linespoints ps 0.2@\n"
+        pf (string_of_prover p);
+      let fmt = formatter_of_out_channel ch in
+      let (_ : float * int) =
+        Mfloat.fold
+          (fun t c (acct,accc) ->
+            let accc = c + accc in
+            let acct = t +. acct in
+            fprintf fmt "%.2f %d@\n" acct accc;
+            (acct,accc))
+          h (0.0,0)
+      in
+      fprintf fmt "@.";
+      close_out ch;
+      acc+1)
+    stats.prover_hist 1
+  in
+  fprintf main_fmt "pause -1 \"Press any key\"@\n";
+  fprintf main_fmt "set terminal pdfcairo@\n";
+  fprintf main_fmt "set output \"why3session.pdf\"@\n";
+  fprintf main_fmt "replot@.";
+  close_out main_ch;
+  let cmd = "gnuplot " ^ main_file in
+  eprintf "Running command %s@." cmd;
+  let ret = Sys.command cmd in
+  if ret <> 0 then
+    eprintf "Command %s failed@." cmd
+  else
+    eprintf "See also results in file why3session.pdf@."
 
 (****** run on all files  ******)
 
@@ -368,7 +442,8 @@ let run () =
     begin
       (* finalize_stats stats; *)
       print_stats !r0 !r1 stats
-    end
+    end;
+  if !opt_hist_print then print_hist stats
 
 
 let cmd =
