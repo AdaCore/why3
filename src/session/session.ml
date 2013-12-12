@@ -1423,7 +1423,7 @@ let remove_file file =
 (*      transformations    *)
 (***************************)
 
-let add_transformation ~keygen env_session transfn g goals =
+let add_transformation ?(init=notify) ?(notify=notify) ~keygen env_session transfn g goals =
   let rtransf = raw_add_transformation ~keygen ~expanded:true g transfn in
   let parent = Parent_transf rtransf in
   let i = ref 0 in
@@ -1453,6 +1453,8 @@ let add_transformation ~keygen env_session transfn g goals =
   let goals = List.fold_left add_goal [] goals in
   rtransf.transf_goals <- List.rev goals;
   rtransf.transf_verified <- transf_verified rtransf;
+  init (Transf rtransf);
+  check_goal_proved notify g;
   rtransf
 
 

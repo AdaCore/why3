@@ -396,6 +396,8 @@ val copy_external_proof :
 (** {2 Transformation} *)
 
 val add_transformation :
+  ?init:'key notify ->
+  ?notify:'key notify ->
   keygen:'key keygen ->
   'key env_session ->
   string ->
