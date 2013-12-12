@@ -1693,7 +1693,7 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       src/*.ml* src/*.dep src/*/*.ml* src/*/*.dep src/*/*.c \
       plugins/printer/.keepme plugins/*/*.ml* plugins/*/*.dep \
       lib/why3/META.in lib/why3/why3.ml \
-      bin/why3-call-pvs \
+      lib/why3-call-pvs \
       doc/version.tex.in doc/manual.pdf \
       drivers/*.drv drivers/*.gen \
       examples/*.mlw examples/logic/*.why \
@@ -1705,11 +1705,17 @@ DISTRIB_FILES = Version Makefile.in configure.in configure \
       examples/foveoos11-cm/*.mlw \
       examples/*/*.xml examples/*/*/*.xml examples/*/*/*/*.xml \
       examples/*/*.v   examples/*/*/*.v examples/*/*/*/*.v\
+      examples/*/*.pvs   examples/*/*/*.pvs examples/*/*/*/*.pvs \
+      examples/*/*.prf   examples/*/*/*.prf examples/*/*/*/*.prf \
+      examples/*/*.thy   examples/*/*/*.thy examples/*/*/*/*.thy \
       examples/use_api/*.ml \
       theories/*.why \
       modules/*.mlw \
       lib/coq/*.v lib/coq/*/*.v lib/coq-tactic/*.v \
       lib/pvs/*/*.pvs lib/pvs/*/*.prf \
+      lib/isabelle/why3.ML lib/isabelle/ROOT lib/isabelle/*.thy \
+      lib/isabelle/etc lib/isabelle/Tools \
+      lib/ocaml/*.ml lib/ocaml/*.dep \
       share/provers-detection-data.conf \
       share/why3session.dtd \
       share/javascript/*.js share/javascript/*.css \
@@ -1753,6 +1759,21 @@ $(DISTRIB_TAR): doc/manual.pdf
 	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) \
           $(COQPGENERATED) $(WHY3DOCGENERATED) $(PLUGGENERATED)
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
+
+
+EXTRA_DIST = configure doc/manual.pdf
+
+dist: $(EXTRA_DIST)
+	rm -rf $(DISTRIB_TAR) $(DISTRIB_DIR)
+	mkdir $(DISTRIB_DIR)
+	for d in `git ls-tree -d -r --name-only HEAD`; do mkdir $(DISTRIB_DIR)/$$d; done
+	for f in `git ls-tree -r --name-only HEAD` $(EXTRA_DIST); do cp $$f $(DISTRIB_DIR)/$$f; done
+	rm `find $(DISTRIB_DIR) -name .gitignore`
+	rm -rf  $(DISTRIB_DIR)/examples/in_progress
+	rm -rf  $(DISTRIB_DIR)/misc
+	cd $(DISTRIB_DIR); rm ROADMAP DEVELOPER.readme
+	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
+
 
 # distrib export: source export-doc export-www export-examples export-examples-c linux
 #
