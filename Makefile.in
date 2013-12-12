@@ -1810,9 +1810,10 @@ $(DISTRIB_TAR): doc/manual.pdf
 
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
-	    Makefile.in configure.in src/*.ml* src/*/*.ml* \
-	    plugins/*/*.ml* src/tools/cpulimit.c \
-	    examples/use_api/*.ml*
+		Makefile.in configure.in src/*.ml \
+		src/*/*.ml src/*/*.ml[iyl] \
+		plugins/*/*.ml plugins/*/*.ml[ily] src/tools/cpulimit.c \
+		examples/use_api/*.ml
 
 #########
 # myself

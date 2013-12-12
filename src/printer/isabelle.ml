@@ -9,8 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Isabelle printer 
-    main author: Stefan Berghofer <stefan.berghofer@secunet.com> 
+(** Isabelle printer
+    main author: Stefan Berghofer <stefan.berghofer@secunet.com>
 *)
 
 open Format
@@ -470,10 +470,10 @@ let print_task printer_args realize fmt task =
     ((thname, opt_string_of_bool realize),
      (Mid.values realized_theories, local_decls))
 
-let print_task_full args ?old fmt task =
+let print_task_full args ?old:_ fmt task =
   print_task args false fmt task
 
-let print_task_real args ?old fmt task =
+let print_task_real args ?old:_ fmt task =
   print_task args true fmt task
 
 let () = register_printer "isabelle" print_task_full
