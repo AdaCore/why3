@@ -1463,7 +1463,7 @@ DOC = api glossary ide intro library macros manpages install coq_tactic \
 
 DOCTEX = $(addprefix doc/, $(addsuffix .tex, $(DOC)))
 
-doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib
+doc/manual.pdf: $(BNFTEX) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
 	cd doc; $(RUBBER) --warn all --pdf manual.tex
 
 ifeq (@enable_html_doc@,yes)
