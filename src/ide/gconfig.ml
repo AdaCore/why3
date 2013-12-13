@@ -563,17 +563,22 @@ let show_about_window () =
                 "";
                 "with contributions of";
                 "";
+                "Stefan Berghofer";
                 "Sylvie Boldo";
+                "Martin Clochard";
                 "Simon Cruanes";
                 "Leon Gondelman";
+                "Daisuke Ishii";
                 "Johannes Kanig";
                 "David Mentré";
                 "Benjamin Monate";
                 "Thi-Minh-Tuyen Nguyen";
                 "Simão Melo de Sousa";
-                "Asma Tafat-Bouzid";
+                "Asma Tafat";
+                "Piotr Trojanek";
+                "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2012    INRIA, CNRS, Paris-Sud University"
+      ~copyright:"Copyright 2010-2014 Inria, CNRS, Paris-Sud University"
       ~license:"GNU Lesser General Public License version 2.1"
       ~website:"http://why3.lri.fr"
       ~website_label:"http://why3.lri.fr"
