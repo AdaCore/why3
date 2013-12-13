@@ -801,7 +801,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
   in
   let d = GWindow.message_dialog
     ~message:s
-    ~message_type:mt
+    ~message_type:(mt :> Gtk.Tags.message_type)
     ~buttons
     ~title:"Why3IDE"
     ~icon:(!Gconfig.why_icon)
