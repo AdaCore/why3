@@ -111,9 +111,87 @@
 
 ==================== Roadmap for release 0.83 ========================
 
+== New Features to announce ==
+
+
+== Final preparation ==
+
+* inform Jerry James <loganjerry@gmail.com> so that he can test the Fedora package
+* faire une passe sur le BTS
+* do "make update-coq" and "make", fix Coq realizations if needed
+* check that nightly bench is OK
+* check that "make xml-validate-local" is OK
+  (see below : copy the dtd on the web)
+* put 0.83 in file Version
+* check headers
+* check the file CHANGES, add the release date
+* manual in PDF: check that macro \todo is commented out
+    in ./macros.tex, and then "make doc"
+  (check that manual in HTML is also generated, doc/html/index.html)
+* do "make dist"
+* test distrib/why3-0.83.tar.gz
+* install web page for why2 which includes an updated page for the
+  quick migration guide. (sources are in CVS repository
+  ~filliatr/ARCHIVE/www/why)
+* put on the web page
+ - why3-0.83.tar.gz
+   cp distrib/why3-0.83.tar.gz /users/www-perso/projets/why3/download
+
+ - the manual in PDF
+   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.83.pdf
+
+ - the HTML version of the manual (content of doc/html)
+   cp -r doc/html /users/www-perso/projets/why3/doc-0.83
+
+ - why3session.dtd
+   cp share/why3session.dtd /users/www-perso/projets/why3/
+
+ - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
+   make stdlibdoc
+   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.83
+   rm /users/www-perso/projets/why3/stdlib
+   ln -s /users/www-perso/projets/why3/stdlib-0.83 \
+            /users/www-perso/projets/why3/stdlib
+ - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
+    make apidoc
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.83
+    rm /users/www-perso/projets/why3/api
+    ln -s /users/www-perso/projets/why3/api-0.83 \
+      /users/www-perso/projets/why3/api
+   (PROBLEME avec style.css ? Ou est le probleme ?)
+ - update the main HTML page (sources are in repository why3-www)
+   edit index.html
+   make export
+
+ - add links to extra resources like
+   http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
+   page du cours de l'X (in french ? using Krakatoa/why3 bridge)
+
+ - make everything writeable for the group
+   chmod -R g+w /users/www-perso/projets/why3
+
+* make a last commit:
+ - git commit -m "release 0.83"
+ - add tag 0.83 to the git repository, using
+   git tag 0.83
+ - do not forget to push it using
+   git push
+   git push --tags
+
+* add a new version to the bugtracker:
+  https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
+
+* produce the Why3 part of Toccata gallery
+  -> add also a tar.gz and a ZIP file of it (this is done by doing
+  "make gallery-files" in the sources of the Toccata web pages)
+* Announce the distrib
+ - What to put in the announcement: see New Features above
+* The next commit : add +git to the version in file Version
+
+
 == TODOs ==
 
-* eliminate_match: (apres la release ?)
+* eliminate_match:
 ** faire un cas particulier pour "bool", le match pouvant se traduire
    vers ite qui est supporté par pas mal de prouveurs
 ** introduire des symboles _match non polymorphes differents pour
@@ -146,8 +224,7 @@
 * detect editors
 *** check if coqide and also emacs/proof-general is installed
 
-
-* bug 15629
+* bug #15629
 
 ==================== Roadmap for release 0.82 ========================
 
