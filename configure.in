@@ -97,6 +97,12 @@ AC_ARG_ENABLE(pvs-libs,
     [  --enable-pvs-libs       enable PVS realizations],,
     enable_pvs_libs=yes)
 
+# Isabelle libraries
+
+AC_ARG_ENABLE(isabelle-libs,
+    [  --enable-isabelle-libs       enable Isabelle realizations],,
+    enable_isabelle_libs=yes)
+
 # hypothesis selection
 
 AC_ARG_ENABLE(hypothesis-selection,
@@ -527,6 +533,41 @@ else
    COMPILETIMEPVS="\\\"PVS\\\", \\\"$PVSVERSION\\\"; "
 fi
 
+# Isabelle
+
+if test "$enable_isabelle_libs" = no; then
+    enable_isabelle_support=no
+    AC_MSG_WARN(Isabelle support disabled)
+    reason_isabelle_support=" (disabled by user)"
+else
+    AC_CHECK_PROG(ISABELLE,isabelle,isabelle,no)
+    if test "$ISABELLE" = no ; then
+        enable_isabelle_support=no
+        AC_MSG_WARN(Cannot find isabelle.)
+        reason_isabelle_support=" (isabelle not found)"
+    else
+        AC_MSG_CHECKING(Isabelle version)
+        ISABELLEVERSION=`$ISABELLE version | sed -n -e 's|Isabelle\([[^:]]*\).*$|\1|p' `
+
+        case $ISABELLEVERSION in
+          2013-2)
+	        enable_isabelle_support=yes
+                AC_MSG_RESULT($ISABELLEVERSION)
+                ;;
+          *)
+                AC_MSG_RESULT($ISABELLEVERSION)
+                enable_isabelle_support=no
+	        AC_MSG_WARN(You need Isabelle2013-2; Isabelle discarded)
+                reason_isabelle_support=" (need version 2013-2)"
+                ;;
+        esac
+    fi
+fi
+
+if test "$enable_isabelle_support" = no; then
+   enable_isabelle_libs=no
+fi
+
 if test "$enable_pvs_libs" = yes; then
    AC_MSG_CHECKING([for NASA PVS library])
    enable_pvs_libs=no
@@ -654,6 +695,10 @@ AC_SUBST(PVS)
 AC_SUBST(PVSVERSION)
 AC_SUBST(COMPILETIMEPVS)
 
+AC_SUBST(enable_isabelle_libs)
+AC_SUBST(ISABELLE)
+AC_SUBST(ISABELLEVERSION)
+
 AC_SUBST(enable_hypothesis_selection)
 
 AC_SUBST(enable_doc)
@@ -724,6 +769,11 @@ if test "$enable_pvs_support" = yes ; then
    echo "    Version             : $PVSVERSION"
    echo "    Library path        : $PVSLIB"
    echo "    Realization support : $enable_pvs_libs$reason_pvs_libs"
+fi
+echo "Isabelle support        : $enable_isabelle_support$reason_isabelle_support"
+if test "$enable_isabelle_support" = yes ; then
+   echo "    Version             : $ISABELLEVERSION"
+   echo "    Realization support : $enable_isabelle_libs$reason_isabelle_libs"
 fi
 echo "Frama-C support         : $enable_frama_c$reason_frama_c"
 if test "$enable_frama_c" = yes ; then

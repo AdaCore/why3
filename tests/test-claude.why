@@ -228,3 +228,13 @@ theory TestWarnings
   lemma L2 : exists x:t. x=x -> false
 
 end
+
+theory TestPVSRealAbs
+
+  use import int.Abs
+  use import real.RealInfix
+  use import real.Abs as A
+
+  lemma l: A.abs (-. 1.0) = 1.0
+
+end

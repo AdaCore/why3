@@ -28,9 +28,6 @@ module C = Call_provers
 
 **)
 
-let debug = register_info_flag "verbose"
-  ~desc:"Describe@ all@ the@ result@ compared@ to@ the@ previous."
-
 (** To prover *)
 
 type edit_mode =
@@ -149,7 +146,7 @@ end
 module M = Session_scheduler.Make(O)
 
 let print_res fname pa ps old_ps =
-  dprintf debug
+  dprintf verbose
     "@[<hov 2>From file %s:@\nResult@ for@ the@ proof@ attempt@ %a:\
              @ %a@\nPreviously@ it@ was@ %a@]@."
     fname print_external_proof pa print_attempt_status ps
@@ -201,7 +198,7 @@ let run_one sched env config filters interactive_provers fname =
     read_update_session ~allow_obsolete:(!opt_outofsync <> Outofsync_none)
       env config fname in
   if out_of_sync then
-    dprintf debug "@[From@ file@ %s:out of sync@]@." fname;
+    dprintf verbose "@[From@ file@ %s:out of sync@]@." fname;
   let todo = Todo.create () (fun () _ -> ())
     (fun () ->
       if !opt_save <> Save_none &&
@@ -223,13 +220,13 @@ let run_one sched env config filters interactive_provers fname =
       | _, M.StatusChange (Interrupted) -> Todo.stop todo
       | _, M.StatusChange (JustEdited|Unedited) -> assert false
       | _, M.MissingFile efname ->
-        dprintf debug
+        dprintf verbose
           "@[From@ file@ %s:@\nThe@ edited@ file@ %s@ for@ the@ proof@ of@ %a@ \
            is@ missing@]@."
           fname efname print_proof_goal pa;
         Todo.stop todo
       | _, M.MissingProver ->
-        dprintf debug
+        dprintf verbose
           "@[From@ file@ %s:@\nThe@ prover@ %a@ for@ the@ proof@ of@ %a@ is@ \
            not@ installed@]@."
           fname Whyconf.print_prover p
@@ -248,7 +245,7 @@ let run_one sched env config filters interactive_provers fname =
         queue_proof pa old_res new_res
       | Some old_res, M.StatusChange (Done new_res)
         when same_result old_res new_res ->
-        dprintf debug
+        dprintf verbose
           "@[From@ file@ %s:@\nThe@ prover@ %a for@ the@ proof@ of@ \
            %a@ give@ the@ same@ result@ %a@ as@ before@ %a.@]@."
           fname print_prover pa.proof_prover print_proof_goal pa
@@ -259,7 +256,7 @@ let run_one sched env config filters interactive_provers fname =
             set_proof_state ~obsolete:false ~archived:false (Done new_res) pa;
         Todo.stop todo
       | None, M.StatusChange (Done new_res) ->
-        dprintf debug
+        dprintf verbose
           "@[From@ file@ %s:@\nThe@ prover@ %a@ for@ the@ proof,@ previously@ \
            undone,@ of@ %a@ give@ the@ new@ result@ %a.@]@."
           fname print_prover pa.proof_prover
@@ -268,7 +265,7 @@ let run_one sched env config filters interactive_provers fname =
           set_proof_state ~obsolete:false ~archived:false (Done new_res) pa;
         Todo.stop todo
       | Some old_res, M.StatusChange (Done new_res) when pa.proof_obsolete ->
-        dprintf debug
+        dprintf verbose
           "@[From@ file@ %s:@\nThe@ prover@ %a@ for@ the@ proof@ of@ %a@ give@ \
            the@ result@ %a@ instead@ of@ the@ obsolete@ %a.@]@."
           fname print_prover pa.proof_prover print_proof_goal pa
@@ -277,7 +274,7 @@ let run_one sched env config filters interactive_provers fname =
           set_proof_state ~obsolete:false ~archived:false (Done new_res) pa;
         Todo.stop todo
       | Some old_res, M.StatusChange (Done new_res) ->
-        dprintf debug
+        dprintf verbose
           "@[From@ file@ %s:@\nThe@ prover@ %a@ for@ the@ proof@ of@ %a@ give@ \
            the@ result@ %a@ instead@ of@ %a.@]@."
           fname print_prover pa.proof_prover print_proof_goal pa
@@ -286,7 +283,7 @@ let run_one sched env config filters interactive_provers fname =
           set_proof_state ~obsolete:false ~archived:false (Done new_res) pa;
         Todo.stop todo
       | _, M.StatusChange (InternalFailure exn) ->
-        dprintf debug
+        dprintf verbose
           "@[From@ file@ %s:@\nThe@ prover@ %a@ for@ the@ proof@ of@ %a@ \
              failed@ with@ the@ error@ %a@]@."
           fname print_prover pa.proof_prover print_proof_goal pa

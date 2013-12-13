@@ -19,4 +19,3 @@ Definition tl {a:Type} {a_WT:WhyType a} (l:(list a)): (option (list a)) :=
   | (cons _ t) => (Some t)
   end.
 
-

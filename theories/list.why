@@ -77,7 +77,7 @@ theory NthNoOpt
   use export List
   use import int.Int
 
-  function nth (n: int) (l: list 'a) : 'a 
+  function nth (n: int) (l: list 'a) : 'a
 
   axiom nth_cons_0: forall x:'a, r:list 'a. nth 0 (Cons x r) = x
   axiom nth_cons_n: forall x:'a, r:list 'a, n:int.
@@ -118,6 +118,20 @@ theory HdTl
     | Nil      -> None
     | Cons _ t -> Some t
   end
+
+end
+
+theory HdTlNoOpt
+
+  use export List
+
+  function hd (l: list 'a) : 'a
+
+  axiom hd_cons: forall x:'a, r:list 'a. hd (Cons x r) = x
+
+  function tl (l: list 'a) : list 'a
+
+  axiom tl_cons: forall x:'a, r:list 'a. tl (Cons x r) = r
 
 end
 

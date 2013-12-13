@@ -57,4 +57,3 @@ apply IHl1.
 omega.
 Qed.
 
-

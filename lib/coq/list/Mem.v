@@ -11,7 +11,6 @@ Fixpoint mem {a:Type} {a_WT:WhyType a} (x:a) (l:(list a)) {struct l}: Prop :=
   | (cons y r) => (x = y) \/ (mem x r)
   end.
 
-
 Lemma mem_std :
   forall {a:Type} {a_WT:WhyType a} (x:a) (l:list a),
   mem x l <-> List.In x l.

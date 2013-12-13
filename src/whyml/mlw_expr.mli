@@ -11,17 +11,18 @@
 
 open Stdlib
 open Ident
-open Ty
 open Term
 open Mlw_ty
 open Mlw_ty.T
 
-(** program/logic symbols *)
+(** *)
 
-(* plsymbols represent algebraic type constructors and projections.
+(** {2 Program/logic symbols} *)
+
+(** {!plsymbol}s represent algebraic type constructors and projections.
    They must be fully applied and the result is equal to the application of
    the lsymbol. We need this kind of symbols to cover nullary constructors,
-   such as Nil, which cannot be given a post-condition. They cannot be
+   such as [Nil], which cannot be given a post-condition. They cannot be
    locally defined and therefore every type variable and region in their
    type signature can be instantiated. *)
 
@@ -46,12 +47,12 @@ val create_plsymbol :
     preid -> field list -> field -> plsymbol
 
 val restore_pl : lsymbol -> plsymbol
-  (* raises Not_found if the argument is not a pl_ls *)
+(** raises [Not_found] if the argument is not a [pl_ls] *)
 
 exception HiddenPLS of plsymbol
 exception RdOnlyPLS of plsymbol
 
-(** cloning *)
+(** {2 Cloning} *)
 
 type symbol_map = private {
   sm_pure : Theory.symbol_map;
@@ -61,7 +62,7 @@ type symbol_map = private {
 
 val pl_clone : Theory.symbol_map -> symbol_map
 
-(** patterns *)
+(** {2 Patterns} *)
 
 type ppattern = private {
   ppat_pattern : pattern;
@@ -80,9 +81,9 @@ type pre_ppattern =
 val make_ppattern :
   pre_ppattern -> ?ghost:bool -> ity -> pvsymbol Mstr.t * ppattern
 
-(** program symbols *)
+(** {2 Program symbols} *)
 
-(* psymbols represent lambda-abstractions. They are polymorphic and
+(** {!psymbol}s represent lambda-abstractions. They are polymorphic and
    can be type-instantiated in some type variables and regions of
    their type signature. *)
 
@@ -92,12 +93,12 @@ type psymbol = private {
   ps_ghost : bool;
   ps_pvset : Spv.t;
   ps_vars  : varset;
-  (* this varset covers the type variables and regions of the defining
+  (** this varset covers the type variables and regions of the defining
      lambda that cannot be instantiated. Every other type variable
-     and region in ps_aty is generalized and can be instantiated. *)
+     and region in [ps_aty] is generalized and can be instantiated. *)
   ps_subst : ity_subst;
-  (* this substitution instantiates every type variable and region
-     in ps_vars to itself *)
+  (** this substitution instantiates every type variable and region
+     in [ps_vars] to itself *)
 }
 
 module Mps : Extmap.S with type key = psymbol
@@ -109,7 +110,7 @@ val ps_equal : psymbol -> psymbol -> bool
 
 val create_psymbol : preid -> ?ghost:bool -> aty -> psymbol
 
-(** program expressions *)
+(** {2 Program expressions} *)
 
 type assertion_kind = Aassert | Aassume | Acheck
 
@@ -192,7 +193,7 @@ val e_arrow : psymbol -> ity list -> ity -> expr
 (** [e_arrow p argl res] instantiates the program function symbol [p]
     into a program expression having the given types of the arguments
     and the result. The resulting expression can be applied to
-    arguments using [e_app] given below.
+    arguments using {!e_app} given below.
 
     See also [examples/use_api/mlw.ml] *)
 
@@ -204,10 +205,9 @@ val aty_of_expr : expr -> aty
 
 val e_app : expr -> expr list -> expr
 (** [e_app e el] builds the application of [e] to arguments [el].
-    [e] is typically constructed using [e_arrow] defined above.
+    [e] is typically constructed using {!e_arrow} defined above.
 
-    See also [examples/use_api/mlw.ml]
-*)
+    See also [examples/use_api/mlw.ml] *)
 
 val e_lapp : lsymbol -> expr list -> ity -> expr
 val e_plapp : plsymbol -> expr list -> ity -> expr
@@ -220,7 +220,7 @@ val create_fun_defn : preid -> lambda -> fun_defn
 val create_rec_defn : (psymbol * lambda) list -> fun_defn list
 
 exception StaleRegion of expr * ident
-(* freshness violation: a previously reset region is associated to an ident *)
+(** freshness violation: a previously reset region is associated to an ident *)
 
 val e_let : let_defn -> expr -> expr
 val e_rec : fun_defn list -> expr -> expr
@@ -256,7 +256,7 @@ val e_any : spec -> vty -> expr
 val e_assert : assertion_kind -> term -> expr
 val e_absurd : ity -> expr
 
-(** expression traversal *)
+(** {2 Expression traversal} *)
 
 val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
 

@@ -18,4 +18,3 @@ simpl in H1.
 omega.
 Qed.
 
-

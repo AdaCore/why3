@@ -1,0 +1,52 @@
+
+(* You are given 8 balls and a Roberval balance.
+   All balls have the same weight, apart from one, which is lighter.
+   Using the balance at most twice, determine the lighter ball.
+
+   Though this problem is not that difficult (though, you may want to
+   think about it before reading any further), it is an interesting
+   exercise in program specification.
+
+   The index of the lighter ball is passed as a ghost argument to the
+   program. Thus it cannot be used to compute the answer, but only to
+   write the specification.
+
+   Jean-Christophe Filliâtre (CNRS), December 2013
+*)
+
+module Balance
+
+  use import int.Int
+  use import array.Array
+
+  (* All values in balls[lo..hi[ are equal to [w], apart from balls[lb]
+     which is smaller. *)
+  predicate spec (balls: array int) (lo hi: int) (lb w: int) =
+    0 <= lo <= lb < hi <= length balls &&
+    (forall i: int. lo <= i < hi -> i <> lb -> balls[i] = w) &&
+    balls[lb] < w
+
+  (* Solve the problem for 3 balls, using exactly one weighing *)
+  let solve3 (balls: array int) (lo: int) (ghost lb: int) (ghost w: int) : int
+    requires { spec balls lo (lo + 3) lb w }
+    ensures  { result = lb }
+  =
+    if balls[lo] < balls[lo+1] then lo
+    else if balls[lo] > balls[lo+1] then lo+1
+    else lo+2
+
+  (* Solve the problem for 8 balls, using exactly two weighings *)
+  let solve8 (balls: array int) (ghost lb: int) (ghost w: int) : int
+    requires { spec balls 0 8 lb w }
+    ensures  { result = lb }
+  =
+    (* first, compare balls 0,1,2 with balls 3,4,5 *)
+    if balls[0] + balls[1] + balls[2] < balls[3] + balls[4] + balls[5] then
+      solve3 balls 0 lb w
+    else if balls[0] + balls[1] + balls[2] > balls[3] + balls[4] + balls[5] then
+      solve3 balls 3 lb w
+    else
+      (* 0,1,2 = 3,4,5 thus lb must be 6 or 7 *)
+      if balls[6] < balls[7] then 6 else 7
+
+end

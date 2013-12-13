@@ -1,0 +1,28 @@
+\subsection{Isabelle/HOL}
+
+When using Isabelle, files generated from Why3 theories are stored in
+a dedicated XML format. Those files should not be edited. Instead,
+realizations must be designed in some \texttt{.thy} as follows. See
+directory \url{lib/isabelle} for examples.
+
+The realization file corresponding to some Why3 file \url{f.why}
+should have the following form. 
+\begin{verbatim}
+theory Why3_f
+imports Why3_Setup
+begin
+
+section {* realization of theory T *}
+
+why3_open "f/T.xml"
+
+why3_vc <some lemma> 
+<proof>
+
+why3_vc <some other lemma> by proof
+
+[...]
+
+why3_end
+\end{verbatim}
+

@@ -38,4 +38,3 @@ Lemma Neg : forall (x:Z), ((IZR (-x)%Z) = (-(IZR x))%R).
 exact opp_IZR.
 Qed.
 
-

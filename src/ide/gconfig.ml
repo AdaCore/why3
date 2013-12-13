@@ -196,7 +196,7 @@ let load_altern alterns (_,section) =
 
 let load_config config original_config =
   let main = get_main config in
-  let ide  = match get_section config "ide" with
+  let ide  = match Whyconf.get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s
   in
@@ -294,7 +294,7 @@ let save_config t =
   let ide = set_string ide "iconset" t.iconset in
   let ide = set_string ide "default_editor" t.default_editor in
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
-  let config = set_section config "ide" ide in
+  let config = Whyconf.set_section config "ide" ide in
   Whyconf.save_config config
 
 let read_config conf_file extra_files =
@@ -563,17 +563,22 @@ let show_about_window () =
                 "";
                 "with contributions of";
                 "";
+                "Stefan Berghofer";
                 "Sylvie Boldo";
+                "Martin Clochard";
                 "Simon Cruanes";
                 "Leon Gondelman";
+                "Daisuke Ishii";
                 "Johannes Kanig";
                 "David Mentré";
                 "Benjamin Monate";
                 "Thi-Minh-Tuyen Nguyen";
                 "Simão Melo de Sousa";
-                "Asma Tafat-Bouzid";
+                "Asma Tafat";
+                "Piotr Trojanek";
+                "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2012    INRIA, CNRS, Paris-Sud University"
+      ~copyright:"Copyright 2010-2014 Inria, CNRS, Paris-Sud University"
       ~license:"GNU Lesser General Public License version 2.1"
       ~website:"http://why3.lri.fr"
       ~website_label:"http://why3.lri.fr"

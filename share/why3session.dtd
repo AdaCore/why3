@@ -33,7 +33,7 @@
 <!ATTLIST goal loccnumb CDATA #IMPLIED>
 <!ATTLIST goal loccnume CDATA #IMPLIED>
 
-<!ELEMENT proof (result|undone)>
+<!ELEMENT proof (result|undone|internalfailure)>
 <!ATTLIST proof prover CDATA #REQUIRED>
 <!ATTLIST proof timelimit CDATA #IMPLIED>
 <!ATTLIST proof memlimit CDATA #IMPLIED>
@@ -42,10 +42,13 @@
 <!ATTLIST proof archived CDATA #IMPLIED>
 
 <!ELEMENT result EMPTY>
-<!ATTLIST result status (valid|invalid|unknown|timeout|outofmemory|failure) #REQUIRED>
+<!ATTLIST result status (valid|invalid|unknown|timeout|outofmemory|failure|highfailure) #REQUIRED>
 <!ATTLIST result time CDATA #IMPLIED>
 
 <!ELEMENT undone EMPTY>
+
+<!ELEMENT internalfailure EMPTY>
+<!ATTLIST internalfailure reason CDATA #REQUIRED>
 
 <!ELEMENT transf (goal*)>
 <!ATTLIST transf name CDATA #REQUIRED>

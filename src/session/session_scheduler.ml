@@ -815,8 +815,7 @@ let transformation_on_goal_aux eS tr keep_dumb_transformation g =
       | _ -> true
   in
   if b then
-    let ntr = add_transformation ~keygen:O.create eS tr g subgoals in
-    init_any (Transf ntr);
+    let ntr = add_transformation ~init:init_any ~notify ~keygen:O.create eS tr g subgoals in
     Some ntr
   else None
 

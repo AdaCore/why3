@@ -152,7 +152,7 @@ let get_type_arguments t = match t.t_node with
   | _ ->
       [||]
 
-let syntax_arguments_typed s print_arg print_type t fmt l =
+let gen_syntax_arguments_typed ty_of tys_of s print_arg print_type t fmt l =
   let args = Array.of_list l in
   let repl_fun s fmt =
     let grp = (Str.matched_group 1 s) in
@@ -160,16 +160,19 @@ let syntax_arguments_typed s print_arg print_type t fmt l =
       let grp = String.sub grp 1 (String.length grp - 1) in
       let i = int_of_string grp in
       if i = 0
-      then print_type fmt (t_type t)
-      else print_type fmt (t_type args.(i-1))
+      then print_type fmt (ty_of t)
+      else print_type fmt (ty_of args.(i-1))
     else if grp.[0] = 'v' then
       let grp = String.sub grp 1 (String.length grp - 1) in
-      let m = get_type_arguments t in
+      let m = tys_of t in
       print_type fmt m.(int_of_string grp)
     else
       let i = int_of_string grp in
       print_arg fmt args.(i-1) in
   global_substitute_fmt regexp_arg_pos_typed repl_fun s fmt
+
+let syntax_arguments_typed =
+  gen_syntax_arguments_typed t_type get_type_arguments
 
 (** {2 use printers} *)
 

@@ -7,7 +7,7 @@ module EuclideanAlgorithm
   use import number.Gcd
   use import int.ComputerDivision
 
-  let rec gcd (u v: int) : int
+  let rec euclid (u v: int) : int
     variant  { v }
     requires { u >= 0 /\ v >= 0 }
     ensures  { result = gcd u v }
@@ -15,7 +15,7 @@ module EuclideanAlgorithm
     if v = 0 then
       u
     else
-      gcd v (mod u v)
+      euclid v (mod u v)
 
 end
 
@@ -26,7 +26,7 @@ module EuclideanAlgorithmIterative
   use import number.Gcd
   use import int.ComputerDivision
 
-  let gcd (u0 v0: int) : int
+  let euclid (u0 v0: int) : int
     requires { u0 >= 0 /\ v0 >= 0 }
     ensures  { result = gcd u0 v0 }
   =

@@ -1,10 +1,46 @@
+
 * marks an incompatible change
 
-  o shape algorithm modified (see VSTTE'13 paper) but should be
-    backward compatible
+
+version 0.82, December 12, 2013
+===============================
+
+  o lemma functions
+  o polymorphic recursion permitted
+  o opaque types
+  o new prover: Metitarski (2.2, contribution by Piotr Trojanek)
+  o new prover: Metis (2.3)
+  o new prover: Beagle (0.4.1)
+  o new prover: Princess (2013-05-13)
+  o new prover: Yices2 (2.0.4)
+  o new prover: Isabelle (2013-2, contribution by Stefan Berghofer)
+  o new version of prover: Alt-Ergo 0.95.2
+  o new version of prover: CVC4 1.1 & 1.2 & 1.3
+  o new version of prover: Coq 8.4pl2
+  o new version of prover: gappa 1.0.0
+  o new version of prover: SPASS 3.8ds
+  o new version of prover: veriT (201310)
+  o API: more examples of use in  examples/use_api/
+  o why3session csv can create graph with option --gnuplot [png|svg|pdf|qt]
+  o shape algorithm modified (see VSTTE'13 paper) but is
+    backward compatible thanks to shape_version numbers in
+    why3session.xml files
+  * options name and default of why3session csv changed
   * [emacs] why.el renamed to why3.el
-  o [GTK sourceview] why.lang renamed to why3.lang
+  * [GTK sourceview] why.lang renamed to why3.lang
   * Loc.try[1-7] functions now take location as an optional parameter
+  o [fix] remove extra leading zeros in decimal literals when a prover don't like them
+  o [fix] PVS output: types are always non-empty
+  o [fix] PVS: fixed configuration and installation process
+  o [fix] Coq tactic: now loads dynamic plug-ins
+  o [fix] bug #15493: correct Coq output for polymorphic algebraic data types
+  * [fix] wish #15053: Remove proof time from "Goals proved by only one prover" section 
+    of why3session info --stats
+  o [fix] bug #13736: why3ml was slow when there are many inclusions
+  o [fix] bug #16488: decimals in TPTP syntax
+  o [fix] bug #16454: do not send arithmetic triggers anymore to alt-Ergo
+  o [fix] syntax highlighting bugs: should be fixed by removing the old language
+    file alt-ergo.lang from alt-ergo distribution
 
 version 0.81, March 25, 2013
 ============================

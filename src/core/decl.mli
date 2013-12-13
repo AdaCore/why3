@@ -9,8 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
-
 (** Logic Declarations *)
 
 open Ident
@@ -76,13 +74,13 @@ type ind_sign = Ind | Coind
 
 type ind_list = ind_sign * ind_decl list
 
-(* Proposition declaration *)
+(** {2 Proposition declaration} *)
 
 type prop_kind =
-  | Plemma    (* prove, use as a premise *)
-  | Paxiom    (* do not prove, use as a premise *)
-  | Pgoal     (* prove, do not use as a premise *)
-  | Pskip     (* do not prove, do not use as a premise *)
+  | Plemma    (** prove, use as a premise *)
+  | Paxiom    (** do not prove, use as a premise *)
+  | Pgoal     (** prove, do not use as a premise *)
+  | Pskip     (** do not prove, do not use as a premise *)
 
 type prop_decl = prop_kind * prsymbol * term
 
@@ -90,18 +88,18 @@ type prop_decl = prop_kind * prsymbol * term
 
 type decl = private {
   d_node : decl_node;
-  d_syms : Sid.t;         (* idents used in declaration *)
-  d_news : Sid.t;         (* idents introduced in declaration *)
-  d_tag  : Weakhtbl.tag;  (* unique magical tag *)
+  d_syms : Sid.t;         (** idents used in declaration *)
+  d_news : Sid.t;         (** idents introduced in declaration *)
+  d_tag  : Weakhtbl.tag;  (** unique magical tag *)
 }
 
 and decl_node = private
-  | Dtype  of tysymbol          (* abstract types and aliases *)
-  | Ddata  of data_decl list    (* recursive algebraic types *)
-  | Dparam of lsymbol           (* abstract functions and predicates *)
-  | Dlogic of logic_decl list   (* recursive functions and predicates *)
-  | Dind   of ind_list          (* (co)inductive predicates *)
-  | Dprop  of prop_decl         (* axiom / lemma / goal *)
+  | Dtype  of tysymbol          (** abstract types and aliases *)
+  | Ddata  of data_decl list    (** recursive algebraic types *)
+  | Dparam of lsymbol           (** abstract functions and predicates *)
+  | Dlogic of logic_decl list   (** recursive functions and predicates *)
+  | Dind   of ind_list          (** (co)inductive predicates *)
+  | Dprop  of prop_decl         (** axiom / lemma / goal *)
 
 module Mdecl : Extmap.S with type key = decl
 module Sdecl : Extset.S with module M = Mdecl
@@ -120,7 +118,7 @@ val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_sign -> ind_decl list -> decl
 val create_prop_decl : prop_kind -> prsymbol -> term -> decl
 
-(* exceptions *)
+(* {2 Exceptions} *)
 
 exception IllegalTypeAlias of tysymbol
 exception NonPositiveTypeDecl of tysymbol * lsymbol * ty
@@ -179,7 +177,7 @@ val find_logic_definition : known_map -> lsymbol -> ls_defn option
 val find_prop : known_map -> prsymbol -> term
 val find_prop_decl : known_map -> prsymbol -> prop_kind * term
 
-(** Records *)
+(** {2 Records} *)
 
 exception EmptyRecord
 

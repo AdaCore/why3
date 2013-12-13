@@ -149,4 +149,3 @@ apply Zis_gcd_mult.
 apply Zgcd_is_gcd.
 Qed.
 
-

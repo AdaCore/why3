@@ -13,6 +13,9 @@ open Why3
 module S = Session
 module C = Whyconf
 
+let verbose = Debug.register_info_flag "verbose"
+    ~desc:"Increase verbosity."
+
 type spec_list = (Arg.key * Arg.spec * Arg.doc) list
 
 type cmd =
@@ -58,6 +61,7 @@ let common_options = [
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> same as -L";
   "-v", Arg.Set opt_version, " prints version information" ;
+  Debug.Args.desc_shortcut "verbose" "--verbose" "increase verbosity";
   Debug.Args.desc_debug_list;
   Debug.Args.desc_debug_all;
   Debug.Args.desc_debug;

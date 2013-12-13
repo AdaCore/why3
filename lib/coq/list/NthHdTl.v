@@ -36,4 +36,3 @@ Proof.
 now intros a a_WT [|h t].
 Qed.
 
-

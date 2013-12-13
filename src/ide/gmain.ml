@@ -85,7 +85,7 @@ let () =
 
 let () = Gconfig.read_config !opt_config !opt_extra
 
-let () = C.load_plugins (get_main ())
+let () = C.load_plugins (Gconfig.get_main ())
 
 let () =
   Debug.Args.set_flags_selected ();
@@ -113,7 +113,7 @@ let () =
   Gconfig.init ()
 
 let (why_lang, any_lang) =
-  let main = get_main () in
+  let main = Gconfig.get_main () in
   let load_path = Filename.concat (datadir main) "lang" in
   let languages_manager =
     GSourceView2.source_language_manager ~default:true
@@ -133,19 +133,38 @@ let (why_lang, any_lang) =
     | Some _ as l -> l in
   (why_lang, any_lang)
 
+
+
+(* Borrowed from Frama-C src/gui/source_manager.ml: 
+Try to convert a source file either as UTF-8 or as locale. *)
+let try_convert s =
+  try
+    if Glib.Utf8.validate s then s else Glib.Convert.locale_to_utf8 s
+  with Glib.Convert.Error _ ->
+    try
+      Glib.Convert.convert_with_fallback
+        ~fallback:"#neither UTF-8 nor locale nor ISO-8859-15#"
+        ~to_codeset:"UTF-8"
+        ~from_codeset:"ISO_8859-15"
+        s
+    with Glib.Convert.Error _ as e -> Printexc.to_string e
+
 let source_text fname =
-  let ic = open_in fname in
-  let size = in_channel_length ic in
-  let buf = String.create size in
-  really_input ic buf 0 size;
-  close_in ic;
-  buf
+  try
+    let ic = open_in fname in
+    let size = in_channel_length ic in
+    let buf = String.create size in
+    really_input ic buf 0 size;
+    close_in ic;
+    try_convert buf
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    "Error while opening or reading file '" ^ fname ^ "':\n" ^ (Printexc.to_string e)
 
 (********************************)
 (* loading WhyIDE configuration *)
 (********************************)
 
-let loadpath = (C.loadpath (get_main ())) @ List.rev !includes
+let loadpath = (C.loadpath (Gconfig.get_main ())) @ List.rev !includes
 
 let gconfig =
   let c = Gconfig.config () in
@@ -768,7 +787,7 @@ let project_dir =
 let () =
   if not (Sys.file_exists project_dir) then
     begin
-      Debug.dprintf debug "[Info] '%s' does not exists. \
+      Debug.dprintf debug "[Info] '%s' does not exist. \
         Creating directory of that name for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end
@@ -782,7 +801,7 @@ let info_window ?(callback=(fun () -> ())) mt s =
   in
   let d = GWindow.message_dialog
     ~message:s
-    ~message_type:mt
+    ~message_type:(mt :> Gtk.Tags.message_type)
     ~buttons
     ~title:"Why3IDE"
     ~icon:(!Gconfig.why_icon)
@@ -1158,7 +1177,14 @@ let (_ : GMenu.image_menu_item) =
     ~label:"_Add file" ~callback:select_file
     ()
 
-let refresh_provers = ref (fun () -> ())
+let gui_items = ref []
+
+let add_gui_item f =
+  f ();
+  gui_items := f :: !gui_items
+
+let recreate_gui () =
+  List.iter (fun f -> f ()) (List.rev !gui_items)
 
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Preferences" ~callback:
@@ -1171,7 +1197,7 @@ let (_ : GMenu.image_menu_item) =
               Session.update_env_session_config e gconfig.config;
               Session.unload_provers e
       end;
-      !refresh_provers ();
+      recreate_gui ();
 (*
       Mprover.iter
         (fun p pi ->
@@ -1183,17 +1209,10 @@ let (_ : GMenu.image_menu_item) =
       M.set_maximum_running_proofs nb sched)
     ()
 
-let add_refresh_provers f _msg =
-(*
-  Debug.dprintf debug "[Info] recording '%s' for refresh provers@." msg;
-*)
-  let rp = !refresh_provers in
-  refresh_provers := (fun () -> rp (); f ())
-
 (*
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~label:"_Detect provers" ~callback:
-    (fun () -> Gconfig.run_auto_detection gconfig; !refresh_provers () )
+    (fun () -> Gconfig.run_auto_detection gconfig; recreate_gui () )
     ()
 *)
 
@@ -1206,7 +1225,7 @@ let save_session () =
 
 
 let exit_function ?(destroy=false) () =
-  save_config ();
+  Gconfig.save_config ();
   if not !session_needs_saving then GMain.quit () else
   match (Gconfig.config ()).saving_policy with
     | 0 -> save_session (); GMain.quit ()
@@ -1393,16 +1412,18 @@ let (_ : GMenu.check_menu_item) = view_factory#add_check_item
 (**************)
 
 
-let () = add_refresh_provers (fun () ->
-  List.iter (fun item -> item#destroy ()) provers_box#all_children)
-  "remove from provers box"
-
 let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
 
-let () = add_refresh_provers (fun () ->
+let () = add_gui_item (fun () ->
+  List.iter (fun item -> item#destroy ()) provers_box#all_children;
   List.iter (fun item -> item#destroy ()) tools_menu#all_children)
-  "remove from tools menu"
+
+let add_tool_separator () =
+  add_gui_item (fun () -> ignore(tools_factory#add_separator ()))
+
+let add_tool_item label callback =
+  add_gui_item (fun () -> ignore(tools_factory#add_image_item ~label ~callback ()))
 
 let () =
   let add_item_provers () =
@@ -1439,8 +1460,7 @@ let () =
          in ())
       provers
   in
-  add_refresh_provers add_item_provers "Add in tools menu and provers box";
-  add_item_provers ()
+  add_gui_item add_item_provers
 
 let split_selected_goals () =
   apply_trans_on_selection split_transformation
@@ -1457,19 +1477,6 @@ let sanitize_markup x =
 
 
 let () =
-  let add_separator () =
-    ignore(tools_factory#add_separator
-             () : GMenu.menu_item) in
-  let add_item_split () =
-    ignore(tools_factory#add_image_item
-             ~label:"Split in selection"
-             ~callback:split_selected_goals
-             () : GMenu.image_menu_item) in
-  let add_item_inline () =
-    ignore(tools_factory#add_image_item
-             ~label:"Inline in selection"
-             ~callback:inline_selected_goals
-             () : GMenu.image_menu_item) in
   let add_submenu_transform name get_trans () =
     let submenu = tools_factory#add_submenu name in
     let submenu = new GMenu.factory submenu ~accel_group in
@@ -1485,22 +1492,6 @@ let () =
     let trans = List.sort (fun (x,_) (y,_) -> String.compare x y) trans in
     List.iter iter trans
   in
-
-  let add_item_bisect () =
-    ignore(tools_factory#add_image_item
-             ~label:"Bisect in selection"
-             ~callback:apply_bisect_on_selection
-             () : GMenu.image_menu_item) in
-  let add_copy_past_item () =
-    ignore(tools_factory#add_image_item
-             ~label:"Copy"
-             ~callback:copy_on_selection
-             () : GMenu.image_menu_item);
-    ignore(tools_factory#add_image_item
-             ~label:"Paste"
-             ~callback:paste_on_selection
-             () : GMenu.image_menu_item) in
-
   let add_splitting =
     add_submenu_transform
       "splitting transformations" Trans.list_transforms_l
@@ -1520,30 +1511,17 @@ let () =
         List.filter (fun (x,_) -> x >= "f") l)
   in
 
-  add_refresh_provers add_separator "add separator in tools menu";
-  add_refresh_provers add_copy_past_item "add copy paste item";
-  add_refresh_provers add_separator "add separator in tools menu";
-  add_refresh_provers add_item_split "add split in tools menu";
-  add_refresh_provers add_item_inline  "add inline in tools menu";
-  add_refresh_provers add_non_splitting_1
-    "add non splitting transformations (a-e) in tools menu";
-  add_refresh_provers add_non_splitting_2
-    "add non splitting transformations (f-z) in tools menu";
-  add_refresh_provers add_splitting
-    "add splitting transformations in tools menu";
-  add_refresh_provers add_separator "add separator for metas in tools menu";
-  add_refresh_provers add_item_bisect "add bisect in tools menu";
-  (** execute them *)
-  add_separator ();
-  add_copy_past_item ();
-  add_separator ();
-  add_item_split ();
-  add_item_inline ();
-  add_non_splitting_1 ();
-  add_non_splitting_2 ();
-  add_splitting ();
-  add_separator ();
-  add_item_bisect ()
+  add_tool_separator ();
+  add_tool_item "Copy" copy_on_selection;
+  add_tool_item "Paste" paste_on_selection;
+  add_tool_separator ();
+  add_tool_item "Split in selection" split_selected_goals;
+  add_tool_item "Inline in selection" inline_selected_goals;
+  add_gui_item add_non_splitting_1;
+  add_gui_item add_non_splitting_2;
+  add_gui_item add_splitting;
+  add_tool_separator ();
+  add_tool_item "Bisect in selection" apply_bisect_on_selection
 
 let () =
   let b = GButton.button ~packing:transf_box#add ~label:"Split" () in
@@ -2023,48 +2001,12 @@ let edit_current_proof () =
         info_window `INFO "Please select exactly one proof to edit"
 
 let () =
-  let add_separator () =
-    ignore(tools_factory#add_separator
-             () : GMenu.menu_item) in
-  let add_item_edit () =
-    ignore (tools_factory#add_image_item
-              ~label:"Edit current proof"
-              ~callback:edit_current_proof
-              () : GMenu.image_menu_item) in
-  let add_item_replay () =
-    ignore (tools_factory#add_image_item
-              ~label:"Replay selection"
-              ~callback:replay_obsolete_proofs
-              () : GMenu.image_menu_item) in
-  let add_item_cancel () =
-    ignore (tools_factory#add_image_item
-              ~label:"Mark as obsolete"
-              ~callback:cancel_proofs
-              () : GMenu.image_menu_item) in
-  let add_item_archived () =
-    ignore (tools_factory#add_image_item
-              ~label:"Mark as archive"
-              ~callback:(set_archive_proofs true)
-              () : GMenu.image_menu_item) in
-  let add_item_unarchived () =
-    ignore (tools_factory#add_image_item
-              ~label:"Remove from archive"
-              ~callback:(set_archive_proofs false)
-              () : GMenu.image_menu_item) in
-  add_refresh_provers add_separator "add sep in tools menu";
-  add_refresh_provers add_item_edit "add edit in tools menu";
-  add_refresh_provers add_item_replay "add replay in tools menu";
-  add_refresh_provers add_item_cancel "add cancel in tools menu";
-  add_refresh_provers add_item_archived "add archive in tools menu";
-  add_refresh_provers add_item_unarchived "add unarchive in tools menu";
-  add_separator ();
-  add_item_edit ();
-  add_item_replay ();
-  add_item_cancel ();
-  add_item_archived ();
-  add_item_unarchived ()
-
-
+  add_tool_separator ();
+  add_tool_item "Edit current proof" edit_current_proof;
+  add_tool_item "Replay selection" replay_obsolete_proofs;
+  add_tool_item "Mark as obsolete" cancel_proofs;
+  add_tool_item "Mark as archived" (set_archive_proofs true);
+  add_tool_item "Remove from archive" (set_archive_proofs false)
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Edit" () in
@@ -2147,25 +2089,9 @@ let clean_selection () =
     (get_selected_row_references ())
 
 let () =
-  let add_separator () =
-    ignore(tools_factory#add_separator
-             () : GMenu.menu_item) in
-  let add_item_remove () =
-    ignore(tools_factory#add_image_item
-             ~label:"Remove current proof"
-             ~callback:confirm_remove_selection
-             () : GMenu.image_menu_item) in
-  let add_item_clean () =
-    ignore(tools_factory#add_image_item
-             ~label:"Clean selection"
-             ~callback:clean_selection
-             () : GMenu.image_menu_item) in
-  add_refresh_provers add_separator "add sep in tools menu";
-  add_refresh_provers add_item_remove "add remove in tools menu";
-  add_refresh_provers add_item_clean "add clean in tools menu";
-  add_separator ();
-  add_item_remove ();
-  add_item_clean ()
+  add_tool_separator ();
+  add_tool_item "Remove current proof" confirm_remove_selection;
+  add_tool_item "Clean selection" clean_selection
 
 let () =
   let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in

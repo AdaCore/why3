@@ -36,31 +36,31 @@
    verified="true"
    expanded="true">
    <goal
-    name="WP_parameter gcd"
+    name="WP_parameter euclid"
     locfile="../gcd.mlw"
-    loclnum="10" loccnumb="10" loccnume="13"
-    expl="VC for gcd"
+    loclnum="10" loccnumb="10" loccnume="16"
+    expl="VC for euclid"
     sum="b84585017fffbe0f504e8d89ce0def98"
     proved="true"
     expanded="true"
     shape="iainfix =agcdV1V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V1c0Aainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1ainfix =V0agcdV0V1ainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
     <label
-     name="expl:VC for gcd"/>
+     name="expl:VC for euclid"/>
     <transf
      name="split_goal"
      proved="true"
      expanded="true">
      <goal
-      name="WP_parameter gcd.1"
+      name="WP_parameter euclid.1"
       locfile="../gcd.mlw"
-      loclnum="10" loccnumb="10" loccnume="13"
+      loclnum="10" loccnumb="10" loccnume="16"
       expl="1. postcondition"
       sum="033ce819fc80e7096085ec758f6fe349"
       proved="true"
       expanded="true"
       shape="postconditionainfix =V0agcdV0V1Iainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
-       name="expl:VC for gcd"/>
+       name="expl:VC for euclid"/>
       <proof
        prover="0"
        timelimit="2"
@@ -87,16 +87,16 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter gcd.2"
+      name="WP_parameter euclid.2"
       locfile="../gcd.mlw"
-      loclnum="10" loccnumb="10" loccnume="13"
+      loclnum="10" loccnumb="10" loccnume="16"
       expl="2. variant decrease"
       sum="f2ba394399ba521ce1cedb96dda922b6"
       proved="true"
       expanded="true"
       shape="variant decreaseainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
-       name="expl:VC for gcd"/>
+       name="expl:VC for euclid"/>
       <proof
        prover="0"
        timelimit="5"
@@ -115,16 +115,16 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter gcd.3"
+      name="WP_parameter euclid.3"
       locfile="../gcd.mlw"
-      loclnum="10" loccnumb="10" loccnume="13"
+      loclnum="10" loccnumb="10" loccnume="16"
       expl="3. precondition"
       sum="101f6236e5072dfb1a5699ed806a4717"
       proved="true"
       expanded="true"
       shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
-       name="expl:VC for gcd"/>
+       name="expl:VC for euclid"/>
       <proof
        prover="0"
        timelimit="10"
@@ -151,16 +151,16 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter gcd.4"
+      name="WP_parameter euclid.4"
       locfile="../gcd.mlw"
-      loclnum="10" loccnumb="10" loccnume="13"
+      loclnum="10" loccnumb="10" loccnume="16"
       expl="4. postcondition"
       sum="1fc66eaeb9c88e73b45a64e02dc29d51"
       proved="true"
       expanded="true"
       shape="postconditionainfix =agcdV1V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
-       name="expl:VC for gcd"/>
+       name="expl:VC for euclid"/>
       <proof
        prover="0"
        timelimit="10"
@@ -180,11 +180,11 @@
       <proof
        prover="3"
        timelimit="10"
-       memlimit="0"
+       memlimit="1000"
        edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.17"/>
+       <result status="valid" time="1.06"/>
       </proof>
      </goal>
     </transf>
@@ -197,31 +197,31 @@
    verified="true"
    expanded="true">
    <goal
-    name="WP_parameter gcd"
+    name="WP_parameter euclid"
     locfile="../gcd.mlw"
-    loclnum="29" loccnumb="6" loccnume="9"
-    expl="VC for gcd"
+    loclnum="29" loccnumb="6" loccnume="12"
+    expl="VC for euclid"
     sum="d474f7a97f5c02e8730797c5e1cf11e4"
     proved="true"
     expanded="true"
     shape="iainfix =V3agcdV0V1ainfix &lt;V4V2Aainfix &lt;=c0V2Aainfix =agcdV5V4agcdV0V1Aainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FNainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FAainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
     <label
-     name="expl:VC for gcd"/>
+     name="expl:VC for euclid"/>
     <transf
      name="split_goal_wp"
      proved="true"
      expanded="true">
      <goal
-      name="WP_parameter gcd.1"
+      name="WP_parameter euclid.1"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="9"
+      loclnum="29" loccnumb="6" loccnume="12"
       expl="1. loop invariant init"
       sum="1366e7cebe0555bc0be81993c5836c21"
       proved="true"
       expanded="true"
       shape="loop invariant initainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
-       name="expl:VC for gcd"/>
+       name="expl:VC for euclid"/>
       <proof
        prover="0"
        timelimit="10"
@@ -232,16 +232,16 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter gcd.2"
+      name="WP_parameter euclid.2"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="9"
+      loclnum="29" loccnumb="6" loccnume="12"
       expl="2. loop invariant preservation"
       sum="9dcd65974a9bbc214b602b70371ae6e2"
       proved="true"
       expanded="true"
       shape="loop invariant preservationainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
-       name="expl:VC for gcd"/>
+       name="expl:VC for euclid"/>
       <proof
        prover="0"
        timelimit="10"
@@ -252,16 +252,16 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter gcd.3"
+      name="WP_parameter euclid.3"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="9"
+      loclnum="29" loccnumb="6" loccnume="12"
       expl="3. loop invariant preservation"
       sum="99474cb596c8b4cc5c787171b63b7146"
       proved="true"
       expanded="true"
       shape="loop invariant preservationainfix =agcdV5V4agcdV0V1Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
-       name="expl:VC for gcd"/>
+       name="expl:VC for euclid"/>
       <proof
        prover="0"
        timelimit="10"
@@ -272,16 +272,16 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter gcd.4"
+      name="WP_parameter euclid.4"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="9"
+      loclnum="29" loccnumb="6" loccnume="12"
       expl="4. loop variant decrease"
       sum="f8dd2ca54328343ceda03832078f78ca"
       proved="true"
       expanded="true"
       shape="loop variant decreaseainfix &lt;V4V2Aainfix &lt;=c0V2Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
-       name="expl:VC for gcd"/>
+       name="expl:VC for euclid"/>
       <proof
        prover="2"
        timelimit="10"
@@ -300,16 +300,16 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter gcd.5"
+      name="WP_parameter euclid.5"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="9"
+      loclnum="29" loccnumb="6" loccnume="12"
       expl="5. postcondition"
       sum="80e3f77c3f671a5e25f45b882719960c"
       proved="true"
       expanded="true"
       shape="postconditionainfix =V3agcdV0V1INNainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
-       name="expl:VC for gcd"/>
+       name="expl:VC for euclid"/>
       <proof
        prover="0"
        timelimit="10"
