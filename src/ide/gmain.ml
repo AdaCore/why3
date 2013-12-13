@@ -787,7 +787,7 @@ let project_dir =
 let () =
   if not (Sys.file_exists project_dir) then
     begin
-      Debug.dprintf debug "[Info] '%s' does not exists. \
+      Debug.dprintf debug "[Info] '%s' does not exist. \
         Creating directory of that name for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end
