@@ -170,6 +170,19 @@ let _ =
       done, we apply the split_goal transformation when needed, and we schedule
       the first VC of all objectives. When done, we save the session.
    *)
+
+   (* save session on interrupt initiated by the user *)
+   let save_session_and_exit signum =
+     (* ignore all SIGINT, SIGHUP and SIGTERM, which may be received when gnatprove is
+        called in GPS, so that the session file is always saved *)
+     Sys.set_signal Sys.sigint Sys.Signal_ignore;
+     Sys.set_signal Sys.sighup Sys.Signal_ignore;
+     Sys.set_signal Sys.sigterm Sys.Signal_ignore;
+     Gnat_objectives.save_session ();
+     exit signum
+   in
+   Sys.set_signal Sys.sigint (Sys.Signal_handle save_session_and_exit);
+
    try
       Gnat_objectives.init ();
       match Gnat_config.proof_mode with
