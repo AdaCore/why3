@@ -10,6 +10,10 @@ type msg =
     tracefile : string;
   }
 
+type status =
+  | Everything_Proved
+  | Unproved_Checks
+
 let cmp msg1 msg2 = Gnat_expl.expl_compare msg1.expl msg2.expl
 
 let msg_set : msg list ref = ref []
@@ -176,7 +180,9 @@ let write_proof_result_file msg =
 let print_messages () =
   let l = List.sort cmp !msg_set in
   write_proof_result_file l;
+  let success = ref Everything_Proved in
   List.iter (fun msg ->
+    if not msg.result then success := Unproved_Checks;
     if not msg.result || Gnat_config.report <> Gnat_config.Fail then begin
       (* we only print the message if asked for *)
       if Gnat_config.ide_progress_bar then begin
@@ -189,4 +195,5 @@ let print_messages () =
         Format.printf "@.";
       end
     end
-  ) l
+  ) l;
+  !success

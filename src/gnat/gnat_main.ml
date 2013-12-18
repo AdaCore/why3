@@ -190,8 +190,12 @@ let _ =
       | Gnat_config.Path_WP
       | Gnat_config.No_Split ->
          Gnat_objectives.iter_subps normal_handle_one_subp;
-         Gnat_report.print_messages ();
-         Gnat_objectives.save_session ()
+         let success = Gnat_report.print_messages () in
+         Gnat_objectives.save_session ();
+         if (Gnat_config.warning_mode = Gnat_config.Treat_As_Error &&
+            success = Gnat_report.Unproved_Checks)
+         then exit 1
+         else exit 0
       | Gnat_config.All_Split ->
          Gnat_objectives.iter_subps all_split_subp
       | Gnat_config.No_WP ->

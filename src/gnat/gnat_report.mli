@@ -12,7 +12,12 @@ val register :
    Use the empty string for the trace file if there is none.
    *)
 
-val print_messages : unit -> unit
+type status =
+  | Everything_Proved
+  | Unproved_Checks
+
+val print_messages : unit -> status
 (* print all messages that have been registered so far. Also
-   print the result file. *)
+   print the result file. The return value describes whether "warning messages"
+   have been issued (= unproved checks). *)
 

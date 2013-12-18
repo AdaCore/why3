@@ -39,11 +39,22 @@ type proof_mode =
    In mode No_Split, do not split VCs at all
    *)
 
+type warning_mode =
+  | Suppress
+  | Warn_Normal
+  | Treat_As_Error
+(* In mode Warn_Normal, exit code of gnatwhy3 is always 0; In mode
+   Treat_As_Error, exit code of gnatwhy3 is non-zero when unproved checks
+   exist, 0 otherwise.  Mode Suppress is ignored by gnatwhy3 (behaves like mode
+   Warn_Normal). Default is Treat_As_Error. *)
+
 val report : report_mode
 (* reflects value of option --report, default "Fail" *)
 
 val proof_mode : proof_mode
 (* reflects value of option --proof, default "Then_Split" *)
+
+val warning_mode : warning_mode
 
 val debug : bool
 (* true if option --debug was present *)

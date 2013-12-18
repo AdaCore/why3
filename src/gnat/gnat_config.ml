@@ -14,6 +14,11 @@ type verbosity =
   | Quiet
   | Verbose
 
+type warning_mode =
+  | Suppress
+  | Warn_Normal
+  | Treat_As_Error
+
 let gnatprove_why3conf_file = "why3.conf"
 
 let default_timeout = 1
@@ -29,6 +34,7 @@ let opt_filename : string option ref = ref None
 let opt_ide_progress_bar = ref false
 let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
+let opt_warning_mode = ref Treat_As_Error
 
 let opt_limit_line : Gnat_loc.loc option ref = ref None
 let opt_limit_subp : string option ref = ref None
@@ -47,6 +53,15 @@ let set_report s =
    else if s <> "fail" then
       Gnat_util.abort_with_message
         "argument for option --report should be one of (fail|all|statistics)."
+
+let set_warning_mode s =
+   if s = "off" then
+      opt_warning_mode := Suppress
+   else if s = "on" then
+      opt_warning_mode := Warn_Normal
+   else if s <> "error" then
+      Gnat_util.abort_with_message
+        "argument for option --warnings should be one of (on|off|error)."
 
 let set_proof_mode s =
    if s = "no_wp" then
@@ -121,6 +136,10 @@ let options = Arg.align [
           " Set proof mode, one of \
             (then_split|no_wp|all_split|path_wp|no_split) \
           , default is then_split";
+   "--warnings", Arg.String set_warning_mode,
+          " Set warning mode, one of \
+            (on|off|error) \
+          , default is error";
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given by \"file:line\"";
    "--limit-subp", Arg.String set_limit_subp,
@@ -229,6 +248,7 @@ let timeout =
 let verbose = !opt_verbose
 let report  = !opt_report
 let proof_mode = !opt_proof_mode
+let warning_mode = !opt_warning_mode
 let debug = !opt_debug
 let force = !opt_force
 let limit_line = !opt_limit_line
