@@ -50,7 +50,9 @@ let set_report s =
       opt_report := Statistics
    else if s = "all" then
       opt_report := Fail_And_Proved
-   else if s <> "fail" then
+   else if s = "fail" then
+     opt_report := Fail
+   else
       Gnat_util.abort_with_message
         "argument for option --report should be one of (fail|all|statistics)."
 
@@ -59,7 +61,9 @@ let set_warning_mode s =
       opt_warning_mode := Suppress
    else if s = "on" then
       opt_warning_mode := Warn_Normal
-   else if s <> "error" then
+   else if s = "error" then
+      opt_warning_mode := Treat_As_Error
+   else
       Gnat_util.abort_with_message
         "argument for option --warnings should be one of (on|off|error)."
 
@@ -72,7 +76,9 @@ let set_proof_mode s =
       opt_proof_mode := Path_WP
    else if s = "no_split" then
       opt_proof_mode := No_Split
-   else if s <> "then_split" then
+   else if s = "then_split" then
+     opt_proof_mode := Then_Split
+   else
       Gnat_util.abort_with_message
         "argument for option --proof should be one of\
         (then_split|no_wp|all_split|path_wp|no_split)."
