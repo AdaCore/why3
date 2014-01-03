@@ -13,6 +13,7 @@ type reason =
    | VC_Precondition
    | VC_Precondition_Main
    | VC_Postcondition
+   | VC_Refined_Post
    | VC_Contract_Case
    | VC_Disjoint_Contract_Cases
    | VC_Complete_Contract_Cases
@@ -77,6 +78,7 @@ let reason_from_string s =
    | "VC_PRECONDITION"            -> VC_Precondition
    | "VC_PRECONDITION_MAIN"       -> VC_Precondition_Main
    | "VC_POSTCONDITION"           -> VC_Postcondition
+   | "VC_REFINED_POST"            -> VC_Refined_Post
    | "VC_CONTRACT_CASE"           -> VC_Contract_Case
    | "VC_DISJOINT_CONTRACT_CASES" -> VC_Disjoint_Contract_Cases
    | "VC_COMPLETE_CONTRACT_CASES" -> VC_Complete_Contract_Cases
@@ -103,6 +105,7 @@ let string_of_reason proved s =
     | VC_Precondition              -> "precondition proved"
     | VC_Precondition_Main         -> "precondition of main program proved"
     | VC_Postcondition             -> "postcondition proved"
+    | VC_Refined_Post              -> "refined post proved"
     | VC_Contract_Case             -> "contract case proved"
     | VC_Disjoint_Contract_Cases   -> "disjoint contract cases proved"
     | VC_Complete_Contract_Cases   -> "complete contract cases proved"
@@ -124,6 +127,7 @@ let string_of_reason proved s =
     | VC_Precondition              -> "precondition might fail"
     | VC_Precondition_Main         -> "precondition of main program might fail"
     | VC_Postcondition             -> "postcondition might fail"
+    | VC_Refined_Post              -> "refined postcondition might fail"
     | VC_Contract_Case             -> "contract case might fail"
     | VC_Disjoint_Contract_Cases   -> "contract cases might not be disjoint"
     | VC_Complete_Contract_Cases   -> "contract cases might not be complete"
@@ -148,6 +152,7 @@ let tag_of_reason s =
    | VC_Precondition              -> "precondition"
    | VC_Precondition_Main         -> "precondition_main"
    | VC_Postcondition             -> "postcondition"
+   | VC_Refined_Post              -> "refined_post"
    | VC_Contract_Case             -> "contract_case"
    | VC_Disjoint_Contract_Cases   -> "disjoint_contract_cases"
    | VC_Complete_Contract_Cases   -> "complete_contract_cases"

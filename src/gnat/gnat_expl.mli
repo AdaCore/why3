@@ -15,6 +15,7 @@ type reason =
    | VC_Precondition
    | VC_Precondition_Main
    | VC_Postcondition
+   | VC_Refined_Post
    | VC_Contract_Case
    | VC_Disjoint_Contract_Cases
    | VC_Complete_Contract_Cases
