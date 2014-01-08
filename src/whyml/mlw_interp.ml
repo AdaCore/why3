@@ -833,10 +833,10 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     end
   | Eassign(_pl,_e1,reg,pvs) ->
     let t = get_pvs env s pvs in
-(*
+(**)
     eprintf "updating region <%a> with value %a@."
       Mlw_pretty.print_reg reg Pretty.print_term t;
-*)
+(**)
     let r =
       try Mreg.find reg env.regenv
       with Not_found -> reg
@@ -845,7 +845,9 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Eassert _ ->
     (* TODO check the validity ! *)
     Normal t_void, s
-  | Eghost _ (* -> (* eval_expr env s e *) Normal t_void, s  *)
+  | Eghost e1 -> 
+    (* TODO: do not eval ghost if no assertion check *)
+    eval_expr env s e1
   | Erec _
   | Eany _
   | Eabstr _
