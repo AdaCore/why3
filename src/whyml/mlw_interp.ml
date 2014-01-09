@@ -171,6 +171,18 @@ let eval_int_rel op _ty ls l =
     end
   | _ -> assert false
 
+let is_true t =
+  match t.t_node with
+    | Ttrue -> true
+    | Tapp(ls,[]) when ls_equal ls fs_bool_true -> true
+    | _ -> false
+
+let is_false t =
+  match t.t_node with
+    | Tfalse -> true
+    | Tapp(ls,[]) when ls_equal ls fs_bool_false -> true
+    | _ -> false
+
 let term_equality t1 t2 =
   if t_equal t1 t2 then Some true
   else
@@ -179,23 +191,39 @@ let term_equality t1 t2 =
       let i2 = big_int_of_term t2 in
       Some (Big_int.eq_big_int i1 i2)
     with NotNum ->
-      match t1.t_node,t2.t_node with
-        | Ttrue, Tfalse | Tfalse, Ttrue -> Some false
-        | Tapp(ls1,[]),Tapp(ls2,[]) when
-            ls_equal ls1 fs_bool_true && ls_equal ls2 fs_bool_false
-            || ls_equal ls1 fs_bool_false && ls_equal ls2 fs_bool_true
-            -> Some false
-        | _ -> None
+      if is_true t1 && is_true t2 
+        || is_false t1 && is_false t2 
+      then Some true
+      else
+      if is_true t1 && is_false t2 
+        || is_false t1 && is_true t2 
+      then Some false
+      else None
 
 let eval_equ _ty _ls l =
+(*
+  Format.eprintf "[interp] eval_equ ? @.";
+*)
+  let res =
   match l with
   | [t1;t2] ->
     begin match term_equality t1 t2 with
       | Some true -> t_true
       | Some false -> t_false
-      | None -> t_equ t1 t2
+      | None -> 
+        try t_equ t1 t2 with TermExpected _ ->
+          Format.eprintf "t1 = %a, t2 = %a@." Pretty.print_term t1 Pretty.print_term t2;
+          assert false
     end
   | _ -> assert false
+  in
+(*
+  Format.eprintf "[interp] eval_equ: OK@.";
+*)
+  res
+
+let eval_now ty ls l =
+  t_app_infer_inst ls l ty
 
 (* functions on map.Map *)
 
@@ -296,6 +324,7 @@ let add_builtin_th env (l,n,t,d) =
 
 let get_builtins env =
   Hls.add builtins ps_equ eval_equ;
+  Hls.add builtins Mlw_wp.fs_now eval_now;
   List.iter (add_builtin_th env) built_in_theories
 
 
@@ -374,8 +403,9 @@ let exec_array_set env spec s args =
               with Not_found -> reg
             in
             let s' = Mreg.add reg t s in
-            eprintf "[interp] t[%a] <- %a@."
-              Pretty.print_term i Pretty.print_term v; 
+            eprintf "[interp] t[%a] <- %a (map = %a)@."
+              Pretty.print_term i Pretty.print_term v
+              Pretty.print_term t; 
             Normal (Mlw_expr.t_void),s'
           | _ -> assert false
       end
@@ -545,6 +575,14 @@ let rec eval_term env s ty t =
   | Tconst _
   | Ttrue
   | Tfalse -> t
+
+
+
+
+
+
+
+
 
 and eval_match env s ty u tbl =
   let rec iter tbl =
@@ -750,21 +788,18 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
 *)
   | Eif(e1,e2,e3) ->
     begin
+      eprintf "[interp] condition of the if : @?";
       match eval_expr env s e1 with
         | Normal t, s' ->
           begin
-            match t.t_node with
-              | Ttrue -> eval_expr env s' e2
-              | Tapp(ls,[]) when ls_equal ls fs_bool_true
-                -> eval_expr env s' e2
-              | Tfalse -> eval_expr env s' e3
-              | Tapp(ls,[]) when ls_equal ls fs_bool_false
-                  -> eval_expr env s' e3
-              | _ ->
+            if is_true t then eval_expr env s' e2 else
+            if is_false t then eval_expr env s' e3 else
+              begin
                 Format.eprintf
                   "@[[Exec] Cannot decide condition of if: @[%a@]@]@."
                   Pretty.print_term t;
                 Irred e, s
+              end
           end
         | r -> r
     end

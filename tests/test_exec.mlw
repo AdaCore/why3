@@ -6,6 +6,12 @@ module M
 
   let x () : int = 13 * 3 + 7 - 4
 
+  use import ref.Ref
+
+  let x0 () : int =
+    let x = ref 13 in
+    if !x <> 3 then 7 else 4
+
   use import list.Append
 
   let y () : list int =
@@ -183,7 +189,7 @@ module Array
      t[2] <- 67;
      t
 
-  let t1 () = 
+  let t1 () =
     let t = t () in
     t[0] + t[1] + t[2] (* 121 *)
 
@@ -193,6 +199,23 @@ module Array
   let test42 () = search (t ()) 42
   let test67 () = search (t ()) 67
   let test7 () = search (t ()) 7
+
+
+  use import array.ArraySwap
+
+  let test_swap () =
+     let t = Array.make 3 0 in
+     t[0] <- 12;
+     t[1] <- 42;
+     t[2] <- 67;
+     swap t 1 2;
+     t[1] (* 67 *)
+
+
+  let test_loop () =
+     let t = Array.make 3 0 in
+     for i=0 to 2 do t[i] <- i done;
+     t[0] + t[1] + t[2] (* 3 *)
 
 end
 

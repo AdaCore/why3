@@ -31,6 +31,7 @@ val t_at_old : Term.term -> Term.term
 val th_mark_at  : Theory.theory
 val th_mark_old : Theory.theory
 
+val fs_now : Term.lsymbol
 val e_now : expr
 
 val pv_old : pvsymbol

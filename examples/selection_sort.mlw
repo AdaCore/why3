@@ -14,11 +14,12 @@ module SelectionSort
   let selection_sort (a: array int)
     ensures { sorted a /\ permut (old a) a } =
 'L:
+    let min = ref 0 in
     for i = 0 to length a - 1 do
       (* a[0..i[ is sorted; now find minimum of a[i..n[ *)
       invariant { sorted_sub a 0 i /\ permut (at a 'L) a /\
           forall k1 k2: int. 0 <= k1 < i <= k2 < length a -> a[k1] <= a[k2] }
-      let min = ref i in
+      (* let min = ref i in *) min := i;
       for j = i + 1 to length a - 1 do
         invariant {
           i <= !min < j && forall k: int. i <= k < j -> a[!min] <= a[k] }
@@ -29,10 +30,17 @@ module SelectionSort
       assert { permut (at a 'L1) a }
     done
 
-  let test () =
+  let test1 () =
+    let a = make 3 0 in
+    a[0] <- 7; a[1] <- 3; a[2] <- 1; 
+    selection_sort a;
+    a
+
+  let test2 () =
     let a = make 8 0 in
     a[0] <- 3; a[1] <- 1; a[2] <- 7; a[3] <- 0;
     a[4] <- 4; a[5] <- 1; a[6] <- 6; a[7] <- 3;
-    selection_sort a
+    selection_sort a;
+    a
 
 end
