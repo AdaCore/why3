@@ -532,7 +532,7 @@ let do_theory env drv fname tname th glist elist =
         match l with
         | [] ->
           let t = Mlw_interp.eval_global_term env th.th_known t in
-          printf "@[<hov 2>Evaluation of %s:@ %a@]@." x Pretty.print_term t
+          printf "@[<hov 2>Evaluation of %s:@ %a@]@." x Mlw_interp.print_value t
         | _ ->
           eprintf "Symbol '%s' is not a constant in theory '%s'.@." x tname;
           exit 1

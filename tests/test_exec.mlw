@@ -107,7 +107,7 @@ module Mut
       x.i <- y.i;
       y.i <- 4 * y.i + tmp;
       sum.i <- sum.i + tmp
-    done;
+    done;   
     sum.i
 
   let run1 () = f 10 (* should be 10 *)
@@ -144,6 +144,20 @@ module Ref
 
   let run2 () = f 4000000 (* should be 4613732 *)
 
+
+  let g () : int =
+    for i=1 to 10 do
+       let x = ref i in
+       x := !x + 1
+    done;
+    42
+
+  let rec h n : int =
+    let x = ref 0 in
+    x := !x + 1;
+    if n = 0 then 0 else h (n-1) + !x
+
+  let hh () = h 10
 
 end
 

@@ -1582,7 +1582,7 @@ let eval const result =
                             Mlw_interp.eval_global_term e.S.env
                               th.Theory.th_known t
                           in
-                          Pp.sprintf "@[<hov 2>%a@]" Pretty.print_term t
+                          Pp.sprintf "@[<hov 2>%a@]" Mlw_interp.print_value t
                         | _ ->
                           Pp.sprintf
                             "Symbol '%s' is not a constant in theory '%s.%s'"

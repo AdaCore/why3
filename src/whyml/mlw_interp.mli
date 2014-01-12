@@ -11,7 +11,11 @@
 
 (* WhyML interpretation *)
 
-val eval_global_term: Env.env -> Decl.known_map -> Term.term -> Term.term
+type value
+
+val print_value: Format.formatter -> value -> unit
+
+val eval_global_term: Env.env -> Decl.known_map -> Term.term -> value
 
 type result
 
