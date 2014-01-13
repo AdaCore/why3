@@ -492,8 +492,7 @@ let extract_sloc main_goal =
    with Found l -> l
 
 let init_subp_vcs subp =
-   apply_split_goal_if_needed subp.subp_goal;
-   Scheduler.main_loop ()
+   apply_split_goal_if_needed subp.subp_goal
 
 let init () =
    sched_state := Some (M.init Gnat_config.parallel);
