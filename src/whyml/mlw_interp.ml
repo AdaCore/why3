@@ -166,6 +166,14 @@ let print_state fmt s =
   let l = Mreg.bindings s in
   fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_reg) l
 
+let p_regvar fmt (reg,t) =
+  fprintf fmt "@[<hov 2><%a> -> %a@]"
+    Mlw_pretty.print_reg reg Mlw_pretty.print_reg t
+
+let print_regenv fmt s =
+  let l = Mreg.bindings s in
+  fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_regvar) l
+
 
 (* evaluation of terms *)
 
@@ -376,9 +384,9 @@ let eval_map_get ls_get l =
           | Vapp(ls,[m';y;v]) when ls_equal ls !ls_map_set ->
             begin try
                     if value_equality x y then
-                      (* Format.eprintf "ok!@."; *) v
+                      ( Format.eprintf "ok!@."; v)
                     else
-                      (* Format.eprintf "recur...@."; *) find m'
+                      ( Format.eprintf "recur...@."; find m' )
               with Undetermined ->
                 (* Format.eprintf "failed.@."; *)
                 Vapp(ls_get,[m;x])
@@ -433,11 +441,13 @@ let built_in_theories =
     [ "div", None, eval_int_op Big_int.div_big_int;
       "mod", None, eval_int_op Big_int.mod_big_int;
     ] ;
+(*
     ["map"],"Map", ["map", builtin_map_type],
     [ "const", Some ls_map_const, eval_map_const;
       "get", Some ls_map_get, eval_map_get;
       "set", Some ls_map_set, eval_map_set;
     ] ;
+*)
   ]
 
 let add_builtin_th env (l,n,t,d) =
@@ -554,13 +564,16 @@ let exec_array_set env spec s args =
     | _ -> assert false
 
 let built_in_modules =
-  [ "array","Array",
+  [
+ (*
+   "array","Array",
     ["array", builtin_array_type],
     ["make", None, exec_array_make ;
      "mixfix []", None, exec_array_get ;
      "length", None, exec_array_length ;
      "mixfix []<-", None, exec_array_set ;
     ] ;
+ *)
   ]
 
 let add_builtin_mo lib (l,n,t,d) =
@@ -667,7 +680,7 @@ let get_vs env (*s*) vs =
     let t = Mvs.find vs env.vsenv in (*update env s*) t
   with Not_found ->
     eprintf "logic variable %s not found in env@." vs.vs_name.Ident.id_string;
-    exit 1
+    assert false
 
 let get_pvs env (*s*) pvs =
   let (*vty,*)t =
@@ -676,7 +689,7 @@ let get_pvs env (*s*) pvs =
   with Not_found ->
     eprintf "program variable %s not found in env@."
       pvs.pv_vs.vs_name.Ident.id_string;
-    exit 1
+    assert false
   in
   (*update env s vty*) t
 
@@ -889,7 +902,7 @@ and p_expr fmt e =
     | Evalue pvs -> fprintf fmt "@[Evalue(%a)@]" p_pvs pvs
     | Earrow ps -> fprintf fmt "@[Earrow(%a)@]" p_ps ps
     | Eapp (e1, pvs, _) ->
-      fprintf fmt "@[Eapp(%a,@ %a,@ _)@]" p_expr e1 p_pvs pvs
+      fprintf fmt "@[Eapp(%a,@ %a,@ <spec>)@]" p_expr e1 p_pvs pvs
     | Elet(ldefn,e1) ->
       fprintf fmt "@[Elet(%a,@ %a)@]" p_let ldefn p_expr e1
     | Erec (_, _) -> fprintf fmt "@[Erec(_,@ _,@ _)@]"
@@ -950,7 +963,13 @@ let to_program_value env s ty v =
         (* ls must be a constructor of a record with mutable fields *)
         let regions =
           match ity.ity_node with
-          | Ityapp(_,_,rl) -> rl
+          | Ityapp(_,_,rl) ->
+            List.map
+              (fun r ->
+                try
+                  Mreg.find r env.regenv
+                with Not_found -> assert false)
+              rl
           | _ -> assert false
         in
         try
@@ -992,6 +1011,8 @@ let to_program_value env s ty v =
 let rec eval_expr env (s:state) (e : expr) : result * state =
   match e.e_node with
   | Elogic t ->
+    eprintf "@[<hov 2>[interp]before@ @[%a@]:@ regenv=@ %a@ state=@ %a@]@."
+      p_expr e print_regenv env.regenv print_state s;
     let v = eval_term env s t in
     let s',v' = to_program_value env s e.e_vty v in
     eprintf "@[<hov 2>[interp]after@ @[%a@]: state=@ %a@]@."
@@ -1001,7 +1022,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
     begin
       try
         let t = get_pvs env (*s*) pvs in (Normal t),s
-      with Not_found -> Irred e, s
+      with Not_found -> assert false (* Irred e, s *)
     end
   | Elet(ld,e1) ->
     begin match ld.let_sym with
@@ -1129,21 +1150,21 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         | r -> r
     end
   | Eassign(_pl,_e1,reg,pvs) ->
-    eprintf "@[<hov 2>[interp]before@ @[%a@]: state=@ %a@]@."
-      p_expr e print_state s;
+    eprintf "@[<hov 2>[interp]before@ @[%a@]:@ regenv =@ %a@ state=@ %a@]@."
+      p_expr e print_regenv env.regenv print_state s;
     let t = get_pvs env (*s*) pvs in
-(**)
-    eprintf "updating region <%a> with value %a@."
-      Mlw_pretty.print_reg reg print_value t;
-(**)
     let r =
       try Mreg.find reg env.regenv
       with Not_found -> reg
     in
+(**)
+    eprintf "updating region <%a> with value %a@."
+      Mlw_pretty.print_reg r print_value t;
+(**)
     let _ =
-      try Mreg.find reg s
+      try Mreg.find r s
       with Not_found ->
-        Format.eprintf "region %a not found@." Mlw_pretty.print_reg reg;
+        Format.eprintf "region %a not found@." Mlw_pretty.print_reg r;
         assert false
     in
     let s' = Mreg.add r t s in

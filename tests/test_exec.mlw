@@ -183,18 +183,23 @@ module Array
       t[i] <- t[i]+1
     done
 
-  let test0 () = let t = Array.make 2 21 in t[0]+t[1]
+  let test0 () =
+    let t = Array.make 2 21 in
+    t[0]+t[1]
+    (* should be 42 *)
 
   let test1 () =
     let t = Array.make 2 21 in
     t[1] <- 17;
     t[0]+t[1]
+    (* should be 38 *)
 
   let test2 () =
     let t = Array.make 2 21 in
     t[1] <- 17;
     t[0] <- 7;
     t[0]+t[1]
+    (* should be 24 *)
 
   let t () : array int =
      let t = Array.make 3 0 in
