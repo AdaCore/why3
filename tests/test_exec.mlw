@@ -57,27 +57,28 @@ module Mut
   let e1 () =
     let y = { a = 1; c = 43; b = 2 } in
     y.a <- 3;
+    y.b <- 7;
     y
 
   let t0 () =
     let y = { a = 1; c = 43; b = 2 } in
-    y.a + y.c
+    y.a + y.c (* should be 3 *)
 
   let t1 () =
     let y = { a = 1; c = 43; b = 2 } in
     let z = y in
-    y.a + z.b
+    y.a + z.b (* should be 3 *)
 
   let t2 () =
     let y = { a = 1; c = 43; b = 2 } in
     y.a <- 3;
-    y.a + y.b
+    y.a + y.b (* should be 5 *)
 
   let t3 () =
     let y = { a = 1; c = 43; b = 2 } in
     let z = y in
     z.a <- 3;
-    y.a
+    y.a (* should be 3 *)
 
   type refint = { mutable i : int }
 
@@ -106,7 +107,7 @@ module Mut
       x.i <- y.i;
       y.i <- 4 * y.i + tmp;
       sum.i <- sum.i + tmp
-    done;   
+    done;
     sum.i
 
   let run1 () = f 10 (* should be 10 *)

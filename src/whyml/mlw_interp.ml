@@ -27,7 +27,9 @@ module Nummap =
 
 type value =
   | Vapp of lsymbol * value list
+(*
   | Vvar of vsymbol
+*)
   | Vnum of Big_int.big_int
   | Vbool of bool
   | Vvoid
@@ -51,8 +53,10 @@ let rec print_value fmt v =
   | Vapp(ls,vl) ->
     fprintf fmt "@[%a(%a)@]"
       Pretty.print_ls ls (Pp.print_list Pp.comma print_value) vl
+(*
   | Vvar v ->
     Pretty.print_vs fmt v
+*)
   | Vnum n ->
     fprintf fmt "%s" (Big_int.string_of_big_int n)
   | Vbool b ->
@@ -304,8 +308,10 @@ let rec value_equality v1 v2 =
     | Vbool b1, Vbool b2 -> b1 == b2
     | Vapp(ls1,vl1), Vapp(ls2,vl2) ->
       must_be_true (ls_equal ls1 ls2 && List.for_all2 value_equality vl1 vl2)
+(*
     | Vvar v1, Vvar v2 ->
       must_be_true (vs_equal v1 v2)
+*)
     | Vbin(o1,v11,v12),Vbin(o2,v21,v22) ->
        must_be_true (o1 == o2 &&
                        value_equality v11 v21 && value_equality v12 v22)
@@ -674,12 +680,52 @@ let get_pvs env (*s*) pvs =
   in
   (*update env s vty*) t
 
-let rec eval_term env s t =
+let rec to_logic_value env s v =
+  let eval_rec t = to_logic_value env s t in
+  match v with
+  | Vreg r ->
+    let r' =
+      try Mreg.find r env.regenv
+      with Not_found -> r
+    in
+    Mreg.find r' s
+  | Vnum _ | Vbool _ | Vvoid -> v
+  | Vbin(Tand,t1,t2) ->
+    v_and (eval_rec t1) (eval_rec t2)
+  | Vbin(Tor,t1,t2) ->
+    v_or (eval_rec t1) (eval_rec t2)
+  | Vbin(Timplies,t1,t2) ->
+    v_implies (eval_rec t1) (eval_rec t2)
+  | Vbin(Tiff,t1,t2) ->
+    v_iff (eval_rec t1) (eval_rec t2)
+  | Vnot t1 -> v_not (eval_rec t1)
+  | Vapp(ls,tl) ->
+    eval_app env s ls (List.map eval_rec tl)
+  | Veq (v1, v2) -> eval_equ ps_equ [v1;v2]
+  | Vif(t1,t2,t3) ->
+    let u = eval_rec t1 in
+    begin match u with
+    | Vbool true -> eval_term env s t2
+    | Vbool false -> eval_term env s t3
+    | _ -> v_if u t2 t3
+    end
+  | Vcase(t1,tbl) ->
+(*
+    eprintf "found a match ... with ...@.";
+*)
+    let u = eval_rec t1 in
+    eval_match env s u tbl
+  | Vquant(q,t) -> Vquant(q,t)
+  | Veps t -> Veps t
+
+and eval_term env s t =
   let eval_rec t = eval_term env s t in
   match t.t_node with
   | Tvar x ->
     begin
-      try get_vs env (*s*) x with Not_found -> Vvar x
+      try
+        to_logic_value env s (get_vs env x)
+      with Not_found -> assert false
     end
   | Tbinop(Tand,t1,t2) ->
     v_and (eval_rec t1) (eval_rec t2)
@@ -895,7 +941,7 @@ let print_result fmt r =
      <r2> -> Vnum 2
 
 *)
-let to_value env s ty v =
+let to_program_value env s ty v =
   match ty,v with
   | VTarrow _, _ -> s,v
   | VTvalue ity,Vapp(ls,vl) ->
@@ -947,7 +993,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   match e.e_node with
   | Elogic t ->
     let v = eval_term env s t in
-    let s',v' = to_value env s e.e_vty v in
+    let s',v' = to_program_value env s e.e_vty v in
     eprintf "@[<hov 2>[interp]after@ @[%a@]: state=@ %a@]@."
       p_expr e print_state s';
     Normal v', s'
