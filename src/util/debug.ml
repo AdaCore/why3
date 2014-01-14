@@ -146,3 +146,64 @@ module Args = struct
       opt_list_flags;
     if test_flag stack_trace then Printexc.record_backtrace true
 end
+
+
+(** Stats *)
+let stats = register_info_flag "stats"
+  ~desc:"Compute and print statistics."
+
+type 'a stat = {
+  mutable value:'a;
+  printer: Format.formatter -> 'a -> unit;
+  name   : string;
+}
+
+module Stats = struct
+  let max_name_size = ref 0
+
+  let registered_stats :  (Format.formatter -> unit) list ref = ref []
+
+  let rec print_nb_char fmt = function
+    | n when n <= 0 -> ()
+    | n -> Format.pp_print_char fmt ' '; print_nb_char fmt (n-1)
+
+
+  let print_stat fmt stat =
+    Format.fprintf fmt "@[%s%a: %a@]"
+      stat.name print_nb_char (!max_name_size - String.length stat.name)
+      stat.printer stat.value
+
+  let print () =
+    dprintf stats "@[%a@]@\n"
+      (Pp.print_list Pp.newline (fun fmt f -> f fmt))
+      !registered_stats
+
+
+  let () = at_exit (fun () ->
+    print ();
+    Format.pp_print_flush !formatter ())
+(** SIGXCPU cpu time limit reached *)
+  let _ =
+  (** TODO? have a possible callback for printing different message*)
+    Sys.signal 24 (Sys.Signal_handle (fun _ -> exit 2))
+
+  let register ~print ~name ~init =
+    let s = {name; printer = print; value = init} in
+    max_name_size := max !max_name_size (String.length name);
+    registered_stats := (fun fmt -> print_stat fmt s)::!registered_stats;
+    s
+
+  let mod0 stat f =
+    if test_flag stats then stat.value <- f stat.value
+  let mod1 stat f x =
+    if test_flag stats then stat.value <- f stat.value x
+  let mod2 stat f x y =
+    if test_flag stats then stat.value <- f stat.value x y
+
+  let register_int ~name ~init =
+    register ~print:Format.pp_print_int ~name ~init
+
+  let incr r = if test_flag stats then r.value <- r.value + 1
+  let decr r = if test_flag stats then r.value <- r.value - 1
+
+end
