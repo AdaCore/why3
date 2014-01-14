@@ -589,7 +589,7 @@ let do_exec env fname cin exec =
             | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
               printf "@[<hov 2>Execution of %s ():@\n" x;
               let body = lam.Mlw_expr.l_expr in
-              printf "type  : @[%a@]@\n"
+              printf "type  : @[%a@]"
                 Mlw_pretty.print_vty body.Mlw_expr.e_vty;
             (* printf "effect: %a@\n" *)
             (*   Mlw_pretty.print_effect body.Mlw_expr.e_effect; *)
@@ -598,9 +598,17 @@ let do_exec env fname cin exec =
                   m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known
                   lam.Mlw_expr.l_expr
               in
-              printf "result: %a@\nstate: %a@]@." 
-                Mlw_interp.print_result res
-                Mlw_interp.print_state st
+              begin
+                match res with
+                | Mlw_interp.Normal _ | Mlw_interp.Excep _ ->
+                  printf "@\nresult: %a@\nstate: %a@]@." 
+                    Mlw_interp.print_result res
+                    Mlw_interp.print_state st
+                | Mlw_interp.Irred _ | Mlw_interp.Fun _ -> 
+                  printf "@]@.";
+                  eprintf "Execution error: %a@." Mlw_interp.print_result res;
+                  exit 1
+              end
             | _ ->
               eprintf "Only functions with one unit argument can be executed.@.";
               exit 1

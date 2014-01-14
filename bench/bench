@@ -66,6 +66,18 @@ valid_goals () {
     done
 }
 
+execute () {
+    echo -n "$1 $2... "
+    if $pgm $1 --exec $2 > /dev/null 2>&1; then
+        echo "ok"
+    else
+        echo "execution test failed!"
+        echo $pgm $1 --exec $2
+        $pgm $1 --exec $2
+        exit 1
+    fi
+}
+
 list_stuff () {
     echo -n "$1 "
     if $pgm $1 > /dev/null 2>&1; then
@@ -109,6 +121,13 @@ goods examples/bitvectors "-I examples/bitvectors"
 goods examples/in_progress
 echo ""
 
+echo "=== Checking execution ==="
+execute examples/euler001.mlw Euler001.run
+execute examples/euler002.mlw Solve.run
+# fails execute examples/same_fringe.mlw Test.test1
+execute examples/selection_sort.mlw SelectionSort.test2
+echo ""
+
 echo "=== Checking drivers ==="
 drivers drivers
 echo ""
@@ -125,3 +144,4 @@ list_stuff --list-formats
 list_stuff --list-metas
 list_stuff --list-debug-flags
 echo ""
+

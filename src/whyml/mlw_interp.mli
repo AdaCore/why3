@@ -17,7 +17,11 @@ val print_value: Format.formatter -> value -> unit
 
 val eval_global_term: Env.env -> Decl.known_map -> Term.term -> value
 
-type result
+type result = private
+  | Normal of value
+  | Excep of Mlw_ty.xsymbol * value
+  | Irred of Mlw_expr.expr
+  | Fun of Mlw_expr.psymbol * Mlw_ty.pvsymbol list * int
 
 val print_result: Format.formatter -> result -> unit
 

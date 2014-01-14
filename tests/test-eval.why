@@ -95,9 +95,9 @@ theory T
 
   constant t2 : map int int = t[2<-37]
 
-  constant y0 : int = t2[0]
-  constant y1 : int = t2[1]
-  constant y2 : int = t2[2]
+  constant y0 : int = t2[0] (* should be 0 *)
+  constant y1 : int = t2[1] (* should be 42 *)
+  constant y2 : int = t2[2] (* should be 37 *)
 
   constant t3 : map int int = t2[1<-12]
 
