@@ -93,4 +93,8 @@ module PrimeNumbers
     done;
     p
 
+  let bench () =
+     let t = prime_numbers 20 in
+     if t[0] <> 2 then absurd
+
 end

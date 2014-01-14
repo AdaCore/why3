@@ -132,4 +132,18 @@ module Harness
     let get_b_0 = get b 0 in assert { get_b_0 = default };
     ()
 
+  let bench () =
+    let a = create 10 default in
+    let b = create 20 default in
+    if get a 5 <> default then absurd;
+    if get b 7 <> default then absurd;
+    set a 5 c1;
+    set b 7 c2;
+    if get a 5 <> c1 then absurd;
+    if get b 7 <> c2 then absurd;
+    if get a 7 <> default then absurd;
+    if get b 5 <> default then absurd;
+    if get a 0 <> default then absurd;
+    if get b 0 <> default then absurd
+
 end

@@ -72,6 +72,8 @@ module SameFringe
   let test4 () = same_fringe (Node (leaf a) b Empty) (Node Empty a (leaf b))
   let test5 () = same_fringe (Node (leaf a) b Empty) (Node Empty b (leaf a))
 
+  let bench () = if not (test4 ()) then absurd
+
 end
 
 module Test

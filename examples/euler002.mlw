@@ -152,4 +152,6 @@ module Solve
 
   let run () = f 4000000 (* should be 4613732 *)
 
+  let bench () = if run () <> 4613732 then absurd
+
 end
