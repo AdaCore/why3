@@ -15,8 +15,10 @@ open Why3
 open Stdlib
 
 
+(* dead code
 type id_tool = (string * string)
 type id_prob = (string * string * string)
+*)
 
 type benchrc = { tools : tool list Mstr.t;
                  probs : prob list Mstr.t;

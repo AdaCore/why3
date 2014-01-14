@@ -15,7 +15,6 @@ open Theory
 open Task
 open Trans
 open Driver
-open Call_provers
 
 module BenchUtil : sig
   val maximum_running_proofs: int ref

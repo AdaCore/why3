@@ -126,7 +126,7 @@ and dpattern_node =
   | Por of dpattern * dpattern
   | Pas of dpattern * ident
 
-let create_user_id { id = x ; id_lab = ll ; id_loc = loc } =
+let create_user_id { id = x ; id_lab = ll ; Ptree.id_loc = loc } =
   let get_labels (ll,p) = function
     | Lstr l -> Slab.add l ll, p
     | Lpos p -> ll, Some p
@@ -170,7 +170,7 @@ and dterm_node =
   | Tif of dfmla * dterm * dterm
   | Tlet of dterm * ident * dterm
   | Tmatch of dterm * (dpattern * dterm) list
-  | Tnamed of label * dterm
+  | Tnamed of Ptree.label * dterm
   | Teps of ident * dty * dfmla
 
 and dfmla =
@@ -183,7 +183,7 @@ and dfmla =
   | Fif of dfmla * dfmla * dfmla
   | Flet of dterm * ident * dfmla
   | Fmatch of dterm * (dpattern * dfmla) list
-  | Fnamed of label * dfmla
+  | Fnamed of Ptree.label * dfmla
   | Fvar of term
 
 and dtrigger =

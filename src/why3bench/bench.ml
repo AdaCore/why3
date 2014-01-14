@@ -112,11 +112,13 @@ struct
       Mutex.lock queue_lock
     done
 
+(* dead code
   let yield () =
     Thread.yield ();
     Mutex.lock queue_lock;
     treat_result ();
     Mutex.unlock queue_lock
+*)
 
   (** Wait for the last remaining tasks *)
   let wait_remaining_task () =

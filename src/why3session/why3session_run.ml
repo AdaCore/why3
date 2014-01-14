@@ -81,24 +81,24 @@ let opt_verbosity = ref Vnormal
 let spec =
   [
    "--edit", Arg.Symbol (["all";"diff";"none"],set_edit_opt),
-   " set when the user can edit an interactive proof:
-     - all: edit all the proofs not proved valid
-     - diff: edit all the proofs that have a different result
+   " set when the user can edit an interactive proof:\
+     - all: edit all the proofs not proved valid\
+     - diff: edit all the proofs that have a different result\
      - none: never ask (default)";
    "-e", Arg.Unit (fun () -> set_edit_opt "all"),
    " same as --edit all";
    "--modif", Arg.Symbol (["all";"obsolete";"none"],set_save_opt),
-   " set when modification of proofs are saved:
-     - all: apply all modifications
-     - obsolete: modify only the proofs that were obsolete or are new
+   " set when modification of proofs are saved:\
+     - all: apply all modifications\
+     - obsolete: modify only the proofs that were obsolete or are new\
      - none: modify nothing (default)";
    "-m", Arg.Unit (fun () -> set_save_opt "all"),
    " same as --modif all";
    "--out-of-sync", Arg.Symbol (["none";"success";"usual"],set_outofsync_opt),
    " set what to do with sessions which are out-of-sync with the \
-     original file or with why3:
-     - none: don't open sessions which are out-of-sync
-     - success: save them only if all the goals are proved at the end (default)
+     original file or with why3:\
+     - none: don't open sessions which are out-of-sync\
+     - success: save them only if all the goals are proved at the end (default)\
      - usual: don't consider them specially";
    "--quiet",Arg.Unit (fun () -> opt_verbosity := Vquiet),
    " remove the progression";
@@ -295,7 +295,7 @@ let run_one sched env config filters interactive_provers fname =
       else
         edit_proof a old_res new_res
     and edit_proof a old_res new_res =
-      printf "@[<hov 2>From@ file@ %s:@\n
+      printf "@[<hov 2>From@ file@ %s:@\n\
            Do@ you@ want@ to@ edit@ %a@ that@ fail@ with@ the@ result@ \
            %a@\nPreviously@ %a.@]@."
         fname print_external_proof a C.print_prover_result new_res

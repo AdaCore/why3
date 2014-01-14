@@ -233,17 +233,17 @@ let rec num_lines acc tr =
          print_file) s.session_files
 
 
-  let context : context = "<!DOCTYPE html
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\">
-<head>
-<title>Why3 session of %s</title>
-</head>
-<body>
-%a
-</body>
-</html>
+  let context : context = "<!DOCTYPE html\
+PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\
+\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
+<html xmlns=\"http://www.w3.org/1999/xhtml\">\
+<head>\
+<title>Why3 session of %s</title>\
+</head>\
+<body>\
+%a\
+</body>\
+</html>\
 "
 
   let run_one = run_file context print_session
@@ -301,17 +301,17 @@ struct
          print_file) s.session_files
 
 
-  let context : context = "<!DOCTYPE html
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\">
-<head>
-<title>Why3 session of %s</title>
-</head>
-<body>
-%a
-</body>
-</html>
+  let context : context = "<!DOCTYPE html\
+PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\
+\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
+<html xmlns=\"http://www.w3.org/1999/xhtml\">\
+<head>\
+<title>Why3 session of %s</title>\
+</head>\
+<body>\
+%a\
+</body>\
+</html>\
 "
 
   let run_one = run_file context print_session
@@ -435,71 +435,71 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
       session.session_files in
 
     fprintf fmt
-      "<a href='#' onclick=\"$('#%s_session').jstree('open_all');\">
-expand all
-</a> <a href='#' onclick=\"$('#%s_session').jstree('close_all');\">
-close all
-</a>
-<div id=\"%s_session\" class=\"session\">
-%a
-</div>
-<script type=\"text/javascript\" class=\"source\">
-$(function () {
-  $(\"#%s_session\").jstree({
-      \"types\" : {
-	   \"types\" : {
-	   \"file\" : {
-		\"icon\" : { \"image\" : \"images/folder16.png\"},
-		      },
-	   \"theory\" : {
-		\"icon\" : { \"image\" : \"images/folder16.png\"},
-		      },
-	   \"goal\" : {
-		\"icon\" : { \"image\" : \"images/file16.png\"},
-		      },
-	   \"prover\" : {
-		\"icon\" : { \"image\" : \"images/wizard16.png\"},
-		      },
-	   \"transf\" : {
-		\"icon\" : { \"image\" : \"images/configure16.png\"},
-		      },
-                        }
-                },
-      \"plugins\" : [\"themes\",\"html_data\",\"types\"]
-        });
-});
-</script>
+      "<a href='#' onclick=\"$('#%s_session').jstree('open_all');\">\
+expand all\
+</a> <a href='#' onclick=\"$('#%s_session').jstree('close_all');\">\
+close all\
+</a>\
+<div id=\"%s_session\" class=\"session\">\
+%a\
+</div>\
+<script type=\"text/javascript\" class=\"source\">\
+$(function () {\
+  $(\"#%s_session\").jstree({\
+      \"types\" : {\
+	   \"types\" : {\
+	   \"file\" : {\
+		\"icon\" : { \"image\" : \"images/folder16.png\"},\
+		      },\
+	   \"theory\" : {\
+		\"icon\" : { \"image\" : \"images/folder16.png\"},\
+		      },\
+	   \"goal\" : {\
+		\"icon\" : { \"image\" : \"images/file16.png\"},\
+		      },\
+	   \"prover\" : {\
+		\"icon\" : { \"image\" : \"images/wizard16.png\"},\
+		      },\
+	   \"transf\" : {\
+		\"icon\" : { \"image\" : \"images/configure16.png\"},\
+		      },\
+                        }\
+                },\
+      \"plugins\" : [\"themes\",\"html_data\",\"types\"]\
+        });\
+});\
+</script>\
 "
   name name name print_session_aux name name
 
 
-  let context : context = "<!DOCTYPE html
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\">
-<head>
-    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
-    <title>Why3 session of %s</title>
-    <link rel=\"stylesheet\" type=\"text/css\"
-     href=\"javascript/session.css\" />
-    <script type=\"text/javascript\" src=\"javascript/jquery.js\"></script>
+  let context : context = "<!DOCTYPE html\
+PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\
+\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
+<html xmlns=\"http://www.w3.org/1999/xhtml\">\
+<head>\
+    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\
+    <title>Why3 session of %s</title>\
+    <link rel=\"stylesheet\" type=\"text/css\"\
+     href=\"javascript/session.css\" />\
+    <script type=\"text/javascript\" src=\"javascript/jquery.js\"></script>\
     <script type=\"text/javascript\" src=\"javascript/jquery.jstree.js\">\
-</script>
+</script>\
     <script type=\"text/javascript\" src=\"javascript/session.js\">\
-</script>
-</head>
-<body>
-%a
-<iframe src=\"\"  id='edited'>
-<p>Your browser does not support iframes.</p>
-</iframe>
-<script type=\"text/javascript\" class=\"source\">
-$(function () {
-  $('#edited').hide()
-})
-</script>
-</body>
-</html>
+</script>\
+</head>\
+<body>\
+%a\
+<iframe src=\"\"  id='edited'>\
+<p>Your browser does not support iframes.</p>\
+</iframe>\
+<script type=\"text/javascript\" class=\"source\">\
+$(function () {\
+  $('#edited').hide()\
+})\
+</script>\
+</body>\
+</html>\
 "
 
   let run_files config =

@@ -517,7 +517,7 @@ let print_goal info fmt g =
 let print_task args ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info args.env task in
-  print_prelude fmt (List.append args.prelude ["$MaxExtraPrecision = 256;
+  print_prelude fmt (List.append args.prelude ["$MaxExtraPrecision = 256;\
   ClearAll[vcWhy,varsWhy,resWhy];"]);
   print_th_prelude task fmt args.th_prelude;
   let params,funs,preds,eqs,hyps,goal,types =

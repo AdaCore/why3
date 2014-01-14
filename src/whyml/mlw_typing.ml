@@ -462,7 +462,8 @@ let add_lemma_label ~top id = function
   | Gnone -> id, false
   | Gghost -> id, true
   | Glemma when not top ->
-      errorm ~loc:id.id_loc "lemma functions are only allowed at toplevel"
+      errorm ~loc:id. Ptree.id_loc
+        "lemma functions are only allowed at toplevel"
   | Glemma -> { id with id_lab = Lstr Mlw_wp.lemma_label :: id.id_lab }, true
 
 let de_unit ~loc = hidden_ls ~loc Mlw_expr.fs_void
@@ -1273,9 +1274,9 @@ and expr_desc lenv loc de = match de.de_desc with
       e_abstract e1 spec
   | DEassert (ak, f) ->
       let ak = match ak with
-        | Ptree.Aassert -> Aassert
-        | Ptree.Aassume -> Aassume
-        | Ptree.Acheck  -> Acheck in
+        | Ptree.Aassert -> Mlw_expr.Aassert
+        | Ptree.Aassume -> Mlw_expr.Aassume
+        | Ptree.Acheck  -> Mlw_expr.Acheck in
       e_assert ak (create_assert lenv f)
   | DEabsurd ->
       e_absurd (ity_of_dity (snd de.de_type))
@@ -1335,8 +1336,8 @@ and expr_desc lenv loc de = match de.de_desc with
       let inv = create_pre lenv inv in
       let e1 = expr lenv de1 in
       let dir = match dir with
-        | Ptree.To -> To
-        | Ptree.Downto -> DownTo in
+        | Ptree.To ->  Mlw_expr.To
+        | Ptree.Downto ->  Mlw_expr.DownTo in
       e_for pv efrom dir eto inv e1
 
 and expr_rec lenv dfdl =
@@ -1368,7 +1369,7 @@ and expr_rec lenv dfdl =
   let fdl = create_rec_defn (List.map step3 fdl) in
   let step4 fd (id,_,_,bl,(de,dsp)) =
     Loc.try4 ~loc:de.de_loc check_lambda_effect lenv fd bl dsp;
-    Loc.try2 ~loc:id.id_loc check_user_ps true fd.fun_ps in
+    Loc.try2 ~loc:id.Ptree.id_loc check_user_ps true fd.fun_ps in
   List.iter2 step4 fdl dfdl;
   fdl
 
@@ -1561,7 +1562,7 @@ let add_types ~wp uc tdl =
     with Not_found ->
       let d = Mstr.find x def in
       let add_tv acc id =
-        let e = Loc.Located (id.id_loc, DuplicateTypeVar id.id) in
+        let e = Loc.Located (id.Ptree.id_loc, DuplicateTypeVar id.id) in
         let tv = Typing.create_user_tv id.id in
         Mstr.add_new e id.id tv acc in
       let vars = List.fold_left add_tv Mstr.empty d.td_params in
