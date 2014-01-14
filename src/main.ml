@@ -600,14 +600,19 @@ let do_exec env fname cin exec =
               in
               begin
                 match res with
-                | Mlw_interp.Normal _ | Mlw_interp.Excep _ ->
+                | Mlw_interp.Normal _ ->
                   printf "@\nresult: %a@\nstate: %a@]@." 
                     Mlw_interp.print_result res
                     Mlw_interp.print_state st
+                | Mlw_interp.Excep _ ->
+                  printf "@\nexceptional result: %a@\nstate: %a@]@." 
+                    Mlw_interp.print_result res
+                    Mlw_interp.print_state st;
+                  exit 1
                 | Mlw_interp.Irred _ | Mlw_interp.Fun _ -> 
                   printf "@]@.";
                   eprintf "Execution error: %a@." Mlw_interp.print_result res;
-                  exit 1
+                  exit 2
               end
             | _ ->
               eprintf "Only functions with one unit argument can be executed.@.";

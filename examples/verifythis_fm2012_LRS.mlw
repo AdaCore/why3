@@ -177,11 +177,13 @@ let test () =
   check {x = 1}
 *)
 
-let bench () =
-  let arr = Array.make 4 0 in
-  arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
-  let x = lcp arr 1 2 in
-  if x <> 1 then absurd
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let arr = Array.make 4 0 in
+    arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
+    let x = lcp arr 1 2 in
+    if x <> 1 then raise BenchFailure
 
 end
 
@@ -381,14 +383,16 @@ let test () =
   check {x = 0 (* TODO *)}
 *)
 
-let bench () =
-  let arr = Array.make 4 0 in
-  arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
-  let sa = create arr in
-  if sa.suffixes[0] <> 0 then absurd;
-  if sa.suffixes[1] <> 1 then absurd;
-  if sa.suffixes[2] <> 2 then absurd;
-  if sa.suffixes[3] <> 3 then absurd
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let arr = Array.make 4 0 in
+    arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
+    let sa = create arr in
+    if sa.suffixes[0] <> 0 then raise BenchFailure;
+    if sa.suffixes[1] <> 1 then raise BenchFailure;
+    if sa.suffixes[2] <> 2 then raise BenchFailure;
+    if sa.suffixes[3] <> 3 then raise BenchFailure
 
 end
 

@@ -40,23 +40,25 @@ module InsertionSort
     insertion_sort a;
     a
 
-  let test2 () =
+  let test2 () ensures { result.length = 8 } =
     let a = make 8 0 in
     a[0] <- 53; a[1] <- 91; a[2] <- 17; a[3] <- -5;
     a[4] <- 413; a[5] <- 42; a[6] <- 69; a[7] <- 6;
     insertion_sort a;
     a
 
-  let bench () =
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
     let a = test2 () in
-    if a[0] <> -5 then absurd;
-    if a[1] <> 6 then absurd;
-    if a[2] <> 17 then absurd;
-    if a[3] <> 42 then absurd;
-    if a[4] <> 53 then absurd;
-    if a[5] <> 69 then absurd;
-    if a[6] <> 91 then absurd;
-    if a[7] <> 413 then absurd
+    if a[0] <> -5 then raise BenchFailure;
+    if a[1] <> 6 then raise BenchFailure;
+    if a[2] <> 17 then raise BenchFailure;
+    if a[3] <> 42 then raise BenchFailure;
+    if a[4] <> 53 then raise BenchFailure;
+    if a[5] <> 69 then raise BenchFailure;
+    if a[6] <> 91 then raise BenchFailure;
+    if a[7] <> 413 then raise BenchFailure
 
 end
 

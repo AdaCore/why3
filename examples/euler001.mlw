@@ -171,6 +171,9 @@ module Euler001
   let run () = solve 1000
     (* should return 233168 *)
 
-  let bench () = if run () <> 233168 then absurd
+    exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    if run () <> 233168 then raise BenchFailure
 
 end

@@ -152,6 +152,9 @@ module Solve
 
   let run () = f 4000000 (* should be 4613732 *)
 
-  let bench () = if run () <> 4613732 then absurd
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    if run () <> 4613732 then raise BenchFailure
 
 end
