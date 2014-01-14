@@ -33,9 +33,9 @@ type value =
 (*
   | Varray of Big_int.big_int * value * value Nummap.t
               (* length, default, elements *)
+*)
   | Vmap of value * value Nummap.t
               (* default, elements *)
-*)
   | Vbin of binop * value * value
   | Veq of value * value
   | Vnot of value
@@ -44,11 +44,10 @@ type value =
   | Veps of term_bound
   | Vcase of value * term_branch list
 
+let array_cons_ls = ref ps_equ
+
 let rec print_value fmt v =
   match v with
-  | Vapp(ls,vl) ->
-    fprintf fmt "@[%a(%a)@]"
-      Pretty.print_ls ls (Pp.print_list Pp.comma print_value) vl
   | Vnum n ->
     fprintf fmt "%s" (Big_int.string_of_big_int n)
   | Vbool b ->
@@ -56,9 +55,15 @@ let rec print_value fmt v =
   | Vvoid ->
     fprintf fmt "()"
   | Vreg reg -> Mlw_pretty.print_reg fmt reg
-(*
-  | Varray(len, def, m) ->
-    fprintf fmt "@[";
+  | Vmap(def,m) ->
+    fprintf fmt "@[[def=%a" print_value def;
+    Nummap.iter
+      (fun i v ->
+        fprintf fmt ",@ %s -> %a" (Big_int.string_of_big_int i) print_value v)
+      m;
+    fprintf fmt "]@]"
+  | Vapp(ls,[Vnum len;Vmap(def,m)]) when ls_equal ls !array_cons_ls ->
+    fprintf fmt "@[[";
     let i = ref Big_int.zero_big_int in
     while Big_int.lt_big_int !i len do
       let v =
@@ -71,7 +76,9 @@ let rec print_value fmt v =
       i := Big_int.succ_big_int !i
     done;
     fprintf fmt "]@]"
-*)
+  | Vapp(ls,vl) ->
+    fprintf fmt "@[%a(%a)@]"
+      Pretty.print_ls ls (Pp.print_list Pp.comma print_value) vl
   | Vbin(op,v1,v2) ->
     fprintf fmt "@[(%a %a@ %a)@]"
       print_value v1 (Pretty.print_binop ~asym:false) op print_value v2
@@ -225,18 +232,6 @@ let builtins = Hls.create 17
 
 let ls_minus = ref ps_equ (* temporary *)
 
-(*
-let term_of_big_int i =
-  if Big_int.sign_big_int i >= 0 then
-    let s = Big_int.string_of_big_int i in
-    t_const (Number.ConstInt (Number.int_const_dec s))
-  else
-    let i = Big_int.minus_big_int i in
-    let s = Big_int.string_of_big_int i in
-    let c = t_const (Number.ConstInt (Number.int_const_dec s)) in
-    t_app_infer !ls_minus [c]
-*)
-
 exception NotNum
 
 let big_int_of_const c =
@@ -248,16 +243,6 @@ let big_int_of_value v =
   match v with
     | Vnum i -> i
     | _ -> assert false
-
-(*
-let rec big_int_of_term t =
-  match t.t_node with
-    | Tconst c -> big_int_of_const c
-    | Tapp(ls,[t1]) when ls_equal ls !ls_minus ->
-      let i = big_int_of_term t1 in
-      Big_int.minus_big_int i
-    | _ -> raise NotNum
-*)
 
 let eval_true _ls _l = Vbool true
 
@@ -293,20 +278,6 @@ let eval_int_rel op ls l =
     end
   | _ -> Vapp(ls,l)
 
-
-(*
-let is_true t =
-  match t.t_node with
-    | Ttrue -> true
-    | Tapp(ls,[]) when ls_equal ls fs_bool_true -> true
-    | _ -> false
-
-let is_false t =
-  match t.t_node with
-    | Tfalse -> true
-    | Tapp(ls,[]) when ls_equal ls fs_bool_false -> true
-    | _ -> false
-*)
 
 let must_be_true b =
   if b then true else raise Undetermined
@@ -367,51 +338,64 @@ let ls_map_set = ref ps_equ
 
 let eval_map_const ls l =
   match l with
-(*
-    | [d] -> Vintmap(d,Nummap.empty)
-*)
+    | [d] -> Vmap(d,Nummap.empty)
     | _ -> Vapp(ls,l)
 
 let eval_map_get ls_get l =
   match l with
-    | [m;x] ->
+  | [m;x] ->
       (* eprintf "Looking for get:"; *)
-      let rec find m =
-        match m with
-          | Vapp(ls,[m';y;v]) when ls_equal ls !ls_map_set ->
-            begin try
-                    if value_equality x y then
-                      ((* Format.eprintf "ok!@.";*) v)
-                    else
-                      ((* Format.eprintf "recur...@.";*) find m' )
-              with Undetermined ->
-                (* Format.eprintf "failed.@."; *)
-                Vapp(ls_get,[m;x])
+    let rec find m =
+      match m with
+      | Vmap(def,m) ->
+        begin
+          match x with
+          | Vnum i ->
+            begin try Nummap.find i m
+              with Not_found -> def
             end
-          | Vapp(ls,[def]) when ls_equal ls !ls_map_const -> def
-          | _ -> Vapp(ls_get,[m;x])
-      in find m
-    | _ -> assert false
+          | _ -> assert false
+        end
+      | Vapp(ls,[m';y;v]) when ls_equal ls !ls_map_set ->
+        begin try
+                if value_equality x y then
+                  ((* Format.eprintf "ok!@.";*) v)
+                else
+                  ((* Format.eprintf "recur...@.";*) find m' )
+          with Undetermined ->
+              (* Format.eprintf "failed.@."; *)
+            Vapp(ls_get,[m;x])
+        end
+      | Vapp(ls,[def]) when ls_equal ls !ls_map_const -> def
+      | _ -> Vapp(ls_get,[m;x])
+    in find m
+  | _ -> assert false
 
 let eval_map_set ls_set l =
   match l with
-    | [m;x;v] ->
-      let rec compress m =
-        match m with
-          | Vapp(ls,[m';y;v']) when ls_equal ls !ls_map_set ->
-            begin try
-                    if value_equality x y then
-                      Vapp(ls_set,[m';x;v])
-                    else
-                      let c = compress m' in
-                      Vapp(ls_set,[c;y;v'])
-              with Undetermined ->
-                Vapp(ls_set,[m;x;v])
-            end
-          | _ ->
+  | [m;x;v] ->
+    let rec compress m =
+      match m with
+      | Vmap(def,m) ->
+        begin
+          match x with
+          | Vnum i -> Vmap(def,Nummap.add i v m)
+          | _ -> assert false
+        end
+      | Vapp(ls,[m';y;v']) when ls_equal ls !ls_map_set ->
+        begin try
+                if value_equality x y then
+                  Vapp(ls_set,[m';x;v])
+                else
+                  let c = compress m' in
+                  Vapp(ls_set,[c;y;v'])
+          with Undetermined ->
             Vapp(ls_set,[m;x;v])
-      in compress m
-    | _ -> assert false
+        end
+      | _ ->
+        Vapp(ls_set,[m;x;v])
+    in compress m
+  | _ -> assert false
 
 (* all builtin functions *)
 
@@ -548,19 +532,17 @@ type result =
 
 let builtin_progs = Hps.create 17
 
-let array_cons_ls = ref ps_equ
-
 let builtin_array_type kn its =
   let csl = Mlw_decl.find_constructors kn its in
   match csl with
     | [(pls,_)] -> array_cons_ls := pls.pl_ls
     | _ ->  assert false
 
-let exec_array_make env _spec s vty args =
+let exec_array_make env s vty args =
   match args with
     | [Vnum n;def] ->
 (**)
-      let m = Vapp(!ls_map_const,[def]) in
+      let m = Vmap(def,Nummap.empty) in
       let v = Vapp(!array_cons_ls,[Vnum n;m]) in
       let s',v' = to_program_value env s vty v in
 (**)
@@ -570,7 +552,7 @@ let exec_array_make env _spec s vty args =
       Normal v',s'
     | _ -> assert false
 
-let exec_array_get _env _spec s _vty args =
+let exec_array_get _env s _vty args =
   match args with
     | [t;Vnum i] ->
       begin
@@ -609,7 +591,7 @@ let exec_array_get _env _spec s _vty args =
       end
     | _ -> assert false
 
-let exec_array_length _env _spec s _vty args =
+let exec_array_length _env s _vty args =
   match args with
     | [t] ->
       begin
@@ -620,7 +602,7 @@ let exec_array_length _env _spec s _vty args =
       end
     | _ -> assert false
 
-let exec_array_set _env _spec s _vty args =
+let exec_array_set _env s _vty args =
   match args with
     | [t;i;v] ->
       begin
@@ -732,7 +714,7 @@ let rec to_logic_value env s v =
       with Not_found -> r
     in
     Mreg.find r' s
-  | Vnum _ | Vbool _ | Vvoid -> v
+  | Vnum _ | Vbool _ | Vvoid | Vmap _ -> v
   | Vbin(Tand,t1,t2) ->
     v_and (eval_rec t1) (eval_rec t2)
   | Vbin(Tor,t1,t2) ->
@@ -943,18 +925,35 @@ and p_expr fmt e =
     | Eassert (_, _) -> fprintf fmt "@[Eassert(_,@ _)@]"
     | Eabsurd -> fprintf fmt "@[Eabsurd@]"
 
-let print_result fmt r =
+let print_result mkm tkm s fmt r =
   match r with
     | Normal t ->
-      fprintf fmt "@[%a@]" print_value t
+      let env = {
+        mknown = mkm;
+        tknown = tkm;
+        regenv = Mreg.empty;
+        vsenv = Mvs.empty;
+      }
+      in
+      let v = to_logic_value env s t in
+      fprintf fmt "@[%a@]" print_value v
     | Excep(x,t) ->
+      let env = {
+        mknown = mkm;
+        tknown = tkm;
+        regenv = Mreg.empty;
+        vsenv = Mvs.empty;
+      }
+      in
+      let v = to_logic_value env s t in
       fprintf fmt "@[exception %s(@[%a@])@]"
-        x.xs_name.Ident.id_string print_value t
+        x.xs_name.Ident.id_string print_value v
     | Irred e ->
       fprintf fmt "@[Cannot execute expression@ @[%a@]@]"
         p_expr e
     | Fun _ ->
       fprintf fmt "@[Result is a function@]"
+
 
 
 (* evaluation of WhyML expressions *)
@@ -992,7 +991,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         end
       | LetA _ -> Irred e, s
     end
-  | Eapp(e1,pvs,spec) ->
+  | Eapp(e1,pvs,_spec) ->
     begin match eval_expr env s e1 with
       | Fun(ps,args,n), s' ->
         if n > 1 then
@@ -1005,7 +1004,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           in
           begin
             try
-              exec_app env s' ps (pvs::args) spec ity_result
+              exec_app env s' ps (pvs::args) (*spec*) ity_result
             with Exit -> Irred e, s
           end
       | _ -> Irred e, s
@@ -1153,7 +1152,7 @@ and exec_match env t s ebl =
   in
   iter ebl
 
-and exec_app env s ps args spec ity_result =
+and exec_app env s ps args (*spec*) ity_result =
   let args' = List.rev_map (fun pvs -> get_pvs env (*s*) pvs) args in
   let args_ty = List.rev_map (fun pvs -> pvs.pv_ity) args in
   let subst =
@@ -1190,7 +1189,7 @@ and exec_app env s ps args spec ity_result =
           ps.ps_name.Ident.id_string print_regenv env1.regenv
           print_state s;
 *)
-        let r,s' = f env1 spec s (VTvalue ity_result) args' in
+        let r,s' = f env1 (*spec*) s (VTvalue ity_result) args' in
 (*
         eprintf "@[Return from builtin function %s value %a in state:@\n%a@]@."
           ps.ps_name.Ident.id_string

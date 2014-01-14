@@ -469,8 +469,10 @@ val goal_task_or_recover: 'a env_session -> 'a goal -> Task.task
 (** {3 recursive} *)
 
 val goal_iter_proof_attempt : ('key proof_attempt -> unit) -> 'key goal -> unit
+(* unused
 val transf_iter_proof_attempt :
   ('key proof_attempt -> unit) -> 'key transf -> unit
+*)
 val theory_iter_proof_attempt :
   ('key proof_attempt -> unit) -> 'key theory -> unit
 val transf_iter_proof_attempt :
@@ -506,7 +508,9 @@ val iter_session :
 
 
 val goal_iter : ('key any -> unit) -> 'key goal -> unit
+(* unused
 val transf_iter : ('key any -> unit) -> 'key transf -> unit
+*)
 val theory_iter : ('key any -> unit) -> 'key theory -> unit
 val transf_iter : ('key any -> unit) -> 'key transf -> unit
 val metas_iter : ('key any -> unit) -> 'key metas -> unit

@@ -281,7 +281,7 @@ let rec dpat uc env pat =
 and dpat_node loc uc env = function
   | PPpwild ->
       let ty = fresh_type_var loc in
-      env, Pwild, ty
+      env, Denv.Pwild, ty
   | PPpvar x ->
       let ty = fresh_type_var loc in
       let env = add_var x.id ty env in
@@ -303,7 +303,7 @@ and dpat_node loc uc env = function
             renv := env;
             e
         | None ->
-            { dp_node = Pwild; dp_ty = ty }
+            { dp_node = Denv.Pwild; dp_ty = ty }
       in
       let al = List.map2 get_val pjl tyl in
       !renv, Papp (cs, al), Opt.get ty

@@ -467,7 +467,7 @@ let empty_tool_res =
       match r with
         | Done (_,t) -> max acc t
         | InternalFailure _ -> acc ) 0. l
-  open Format
+
 (**
 answer output time
 

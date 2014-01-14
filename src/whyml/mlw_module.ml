@@ -495,7 +495,9 @@ let clone_export uc m inst =
         add_pdecl uc (create_val_decl (LetV npv))
     | PDval (LetA ps) ->
         let aty = conv_aty !mvs ps.ps_aty in
-        let nps = create_psymbol (id_clone ps.ps_name) ~ghost:ps.ps_ghost aty in
+        let nps =
+          Mlw_expr.create_psymbol (id_clone ps.ps_name) ~ghost:ps.ps_ghost aty
+        in
         Hid.add psh ps.ps_name (PS nps);
         add_pdecl uc (create_val_decl (LetA nps))
     | PDrec fdl ->
@@ -507,7 +509,7 @@ let clone_export uc m inst =
           (* we save all external pvsymbols to preserve the effects *)
           let spec = { aty.aty_spec with c_variant = vari } in
           let aty = vty_arrow ~spec aty.aty_args aty.aty_result in
-          let nps = create_psymbol id ~ghost:ps.ps_ghost aty in
+          let nps = Mlw_expr.create_psymbol id ~ghost:ps.ps_ghost aty in
           Hid.add psh ps.ps_name (PS nps);
           add_pdecl uc (create_val_decl (LetA nps)) in
         List.fold_left conv_fd uc fdl

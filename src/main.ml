@@ -601,17 +601,21 @@ let do_exec env fname cin exec =
               begin
                 match res with
                 | Mlw_interp.Normal _ ->
-                  printf "@\nresult: %a@\nstate: %a@]@." 
-                    Mlw_interp.print_result res
+                  printf "@\nresult: %a@\nstate: %a@]@."
+                    (Mlw_interp.print_result m.Mlw_module.mod_known
+                       m.Mlw_module.mod_theory.Theory.th_known st) res
                     Mlw_interp.print_state st
                 | Mlw_interp.Excep _ ->
-                  printf "@\nexceptional result: %a@\nstate: %a@]@." 
-                    Mlw_interp.print_result res
+                  printf "@\nexceptional result: %a@\nstate: %a@]@."
+                    (Mlw_interp.print_result m.Mlw_module.mod_known
+                       m.Mlw_module.mod_theory.Theory.th_known st) res
                     Mlw_interp.print_state st;
                   exit 1
-                | Mlw_interp.Irred _ | Mlw_interp.Fun _ -> 
+                | Mlw_interp.Irred _ | Mlw_interp.Fun _ ->
                   printf "@]@.";
-                  eprintf "Execution error: %a@." Mlw_interp.print_result res;
+                  eprintf "Execution error: %a@."
+                    (Mlw_interp.print_result m.Mlw_module.mod_known
+                       m.Mlw_module.mod_theory.Theory.th_known st) res;
                   exit 2
               end
             | _ ->
