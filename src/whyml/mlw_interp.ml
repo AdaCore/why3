@@ -21,11 +21,11 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 
-module Nummap = 
-  Map.Make(struct type t = Big_int.big_int 
+module Nummap =
+  Map.Make(struct type t = Big_int.big_int
                   let compare = Big_int.compare_big_int end)
 
-type value = 
+type value =
   | Vapp of lsymbol * value list
   | Vvar of vsymbol
   | Vnum of Big_int.big_int
@@ -33,9 +33,9 @@ type value =
   | Vvoid
   | Vreg of region
 (*
-  | Varray of Big_int.big_int * value * value Nummap.t 
+  | Varray of Big_int.big_int * value * value Nummap.t
               (* length, default, elements *)
-  | Vmap of value * value Nummap.t 
+  | Vmap of value * value Nummap.t
               (* default, elements *)
 *)
   | Vbin of binop * value * value
@@ -49,17 +49,17 @@ type value =
 let rec print_value fmt v =
   match v with
   | Vapp(ls,vl) ->
-    fprintf fmt "@[%a(%a)@]" 
+    fprintf fmt "@[%a(%a)@]"
       Pretty.print_ls ls (Pp.print_list Pp.comma print_value) vl
-  | Vvar v -> 
+  | Vvar v ->
     Pretty.print_vs fmt v
   | Vnum n ->
     fprintf fmt "%s" (Big_int.string_of_big_int n)
   | Vbool b ->
     fprintf fmt "%b" b
-  | Vvoid -> 
-    fprintf fmt "()" 
-  | Vreg reg -> Mlw_pretty.print_reg fmt reg 
+  | Vvoid ->
+    fprintf fmt "()"
+  | Vreg reg -> Mlw_pretty.print_reg fmt reg
 (*
   | Varray(len, def, m) ->
     fprintf fmt "@[";
@@ -68,8 +68,8 @@ let rec print_value fmt v =
       let v =
         try Nummap.find !i m
         with Not_found -> def
-      in 
-      if Big_int.gt_big_int !i Big_int.zero_big_int 
+      in
+      if Big_int.gt_big_int !i Big_int.zero_big_int
       then fprintf fmt ",@ ";
       fprintf fmt "%a" print_value v;
       i := Big_int.succ_big_int !i
@@ -77,22 +77,22 @@ let rec print_value fmt v =
     fprintf fmt "]@]"
 *)
   | Vbin(op,v1,v2) ->
-    fprintf fmt "@[(%a %a@ %a)@]" 
+    fprintf fmt "@[(%a %a@ %a)@]"
       print_value v1 (Pretty.print_binop ~asym:false) op print_value v2
-  | Veq(v1,v2) -> 
+  | Veq(v1,v2) ->
     fprintf fmt "@[(%a =@ %a)@]" print_value v1 print_value v2
   | Vnot v ->
     fprintf fmt "@[(not@ %a)@]" print_value v
   | Vif(v,t1,t2) ->
-    fprintf fmt "@[if %a@ then %a@ else %a@]" 
+    fprintf fmt "@[if %a@ then %a@ else %a@]"
       print_value v Pretty.print_term t1 Pretty.print_term t2
   | Vquant(q,tq) ->
     Pretty.print_term fmt (t_quant q tq)
   | Veps(tb) ->
     Pretty.print_term fmt (t_eps tb)
   | Vcase(v,_) ->
-    fprintf fmt "@[match %a@ with ... end@]" 
-      print_value v 
+    fprintf fmt "@[match %a@ with ... end@]"
+      print_value v
 
 let v_eq v1 v2 = Veq(v1,v2)
 
@@ -307,11 +307,11 @@ let rec value_equality v1 v2 =
     | Vvar v1, Vvar v2 ->
       must_be_true (vs_equal v1 v2)
     | Vbin(o1,v11,v12),Vbin(o2,v21,v22) ->
-       must_be_true (o1 == o2 && 
+       must_be_true (o1 == o2 &&
                        value_equality v11 v21 && value_equality v12 v22)
     | Veq(v11,v12),Veq(v21,v22) ->
       must_be_true (value_equality v11 v21 && value_equality v12 v22)
-    | Vnot v1, Vnot v2 -> 
+    | Vnot v1, Vnot v2 ->
       must_be_true (value_equality v1 v2)
     | Vif(v1,t11,t12),Vif(v2,t21,t22) ->
       must_be_true (value_equality v1 v2 &&
@@ -331,7 +331,7 @@ let eval_equ _ls l =
   let res =
   match l with
   | [t1;t2] ->
-    begin 
+    begin
       try Vbool(value_equality t1 t2)
       with Undetermined -> v_eq t1 t2
     end
@@ -354,7 +354,7 @@ let ls_map_const = ref ps_equ
 let ls_map_get = ref ps_equ
 let ls_map_set = ref ps_equ
 
-let eval_map_const ls l = 
+let eval_map_const ls l =
   match l with
 (*
     | [d] -> Vintmap(d,Nummap.empty)
@@ -368,7 +368,7 @@ let eval_map_get ls_get l =
       let rec find m =
         match m with
           | Vapp(ls,[m';y;v]) when ls_equal ls !ls_map_set ->
-            begin try 
+            begin try
                     if value_equality x y then
                       (* Format.eprintf "ok!@."; *) v
                     else
@@ -406,8 +406,8 @@ let eval_map_set ls_set l =
 
 let built_in_theories =
   [ ["bool"],"Bool", [],
-    [ "True", None, eval_true ; 
-      "False", None, eval_false ; 
+    [ "True", None, eval_true ;
+      "False", None, eval_false ;
     ] ;
     ["int"],"Int", [],
     [ "infix +", None, eval_int_op Big_int.add_big_int;
@@ -495,7 +495,7 @@ let exec_array_get _env _spec s args =
         match t with
 (*
           | Varray(_,def,m) ->
-            let t = 
+            let t =
               try Nummap.find i m
               with Not_found -> def
             in
@@ -541,7 +541,7 @@ let exec_array_set env spec s args =
             in
             let s' = Mreg.add reg t s in
             eprintf "[interp] t[%a] <- %a (map = %a)@."
-              print_value i print_value v print_value t; 
+              print_value i print_value v print_value t;
             Normal Vvoid,s'
           | _ -> assert false
       end
@@ -647,7 +647,7 @@ let rec update_rec env s ity t =
         *)
         end
       | Varray(len,def,m) -> t
-        
+
       | _ -> assert false
 
 let update env s ity t =
@@ -711,7 +711,7 @@ let rec eval_term env s t =
     eval_match env s u tbl
   | Tquant(q,t) -> Vquant(q,t)
   | Teps t -> Veps t
-  | Tconst n -> Vnum (big_int_of_const n) 
+  | Tconst n -> Vnum (big_int_of_const n)
   | Ttrue -> Vbool true
   | Tfalse -> Vbool false
 
@@ -732,7 +732,7 @@ and eval_match env s u tbl =
         eval_term env' s t
       with NoMatch -> iter rem
   in
-  try iter tbl with Undetermined -> 
+  try iter tbl with Undetermined ->
     Vcase(u,tbl)
 
 and eval_app env s ls tl =
@@ -837,7 +837,9 @@ let rec p_let fmt ld =
 
 and p_expr fmt e =
   match e.e_node with
-    | Elogic t -> fprintf fmt "@[Elogic(%a)@]" Pretty.print_term t
+    | Elogic t -> fprintf fmt "@[Elogic{type=%a}(%a)@]"
+      Mlw_pretty.print_vty e.e_vty
+      Pretty.print_term t
     | Evalue pvs -> fprintf fmt "@[Evalue(%a)@]" p_pvs pvs
     | Earrow ps -> fprintf fmt "@[Earrow(%a)@]" p_ps ps
     | Eapp (e1, pvs, _) ->
@@ -877,9 +879,78 @@ let print_result fmt r =
 
 (* evaluation of WhyML expressions *)
 
+(* promotes logic value v of program type ty into a program value,
+   e.g if
+
+     type t = { mutable a : int; c: int ; mutable b : int }
+
+   then
+
+     to_value (mk_t 1 43 2 : t <r1,r2>) =
+        Vapp(mk_t,[Vreg r1,Vnum 43, Vreg r2])
+
+   with new regions in s
+
+     <r1> -> Vnum 1
+     <r2> -> Vnum 2
+
+*)
+let to_value env s ty v =
+  match ty,v with
+  | VTarrow _, _ -> s,v
+  | VTvalue ity,Vapp(ls,vl) ->
+    if ity_immutable ity then s,v else
+      begin
+        (* ls must be a constructor of a record with mutable fields *)
+        let regions =
+          match ity.ity_node with
+          | Ityapp(_,_,rl) -> rl
+          | _ -> assert false
+        in
+        try
+        let csl = Mlw_decl.inst_constructors env.tknown env.mknown ity in
+        let rec find_cs csl =
+          match csl with
+          | [] -> assert false
+          | (cs,fdl)::rem ->
+            if ls_equal cs ls then
+              (* we found the fields of that constructor *)
+              begin
+                let (s,regions,vl) =
+                  List.fold_left2
+                    (fun (s,regions,vl) fd v ->
+                      match fd.fd_mut,regions with
+                      | None,_ -> (s,regions,v::vl)
+                      | Some _r, reg::regions ->
+                          (* found a mutable field *)
+                        let s' = Mreg.add reg v s in
+                        (s',regions,Vreg reg :: vl)
+                      | Some _, [] -> assert false)
+                    (s,regions,[]) fdl vl
+                in
+                assert (regions = []);
+                s,Vapp(ls,List.rev vl)
+              end
+            else find_cs rem
+        in find_cs csl
+      with Not_found ->
+        (* absurd, it would be a pure type *)
+        assert false
+      end
+  | VTvalue ity, _ ->
+    assert (ity_immutable ity);
+    s,v
+
+
+(* evaluate expressions *)
 let rec eval_expr env (s:state) (e : expr) : result * state =
   match e.e_node with
-  | Elogic t -> Normal (eval_term env s t), s
+  | Elogic t ->
+    let v = eval_term env s t in
+    let s',v' = to_value env s e.e_vty v in
+    eprintf "@[<hov 2>[interp]after@ @[%a@]: state=@ %a@]@."
+      p_expr e print_state s';
+    Normal v', s'
   | Evalue pvs ->
     begin
       try
@@ -936,8 +1007,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         | Normal t, s' ->
           begin
             match t with
-              | Vbool true -> eval_expr env s' e2 
-              | Vbool false -> eval_expr env s' e3 
+              | Vbool true -> eval_expr env s' e2
+              | Vbool false -> eval_expr env s' e3
               | _ ->
               begin
                 Format.eprintf
@@ -1012,6 +1083,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         | r -> r
     end
   | Eassign(_pl,_e1,reg,pvs) ->
+    eprintf "@[<hov 2>[interp]before@ @[%a@]: state=@ %a@]@."
+      p_expr e print_state s;
     let t = get_pvs env (*s*) pvs in
 (**)
     eprintf "updating region <%a> with value %a@."
@@ -1019,15 +1092,22 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
 (**)
     let r =
       try Mreg.find reg env.regenv
-      with Not_found -> 
+      with Not_found -> reg
+    in
+    let _ =
+      try Mreg.find reg s
+      with Not_found ->
         Format.eprintf "region %a not found@." Mlw_pretty.print_reg reg;
         assert false
     in
-    Normal Vvoid, Mreg.add r t s
+    let s' = Mreg.add r t s in
+    eprintf "@[<hov 2>[interp]after@ @[%a@]: state=@ %a@]@."
+      p_expr e print_state s;
+    Normal Vvoid, s'
   | Eassert _ ->
     (* TODO check the validity ! *)
     Normal Vvoid, s
-  | Eghost e1 -> 
+  | Eghost e1 ->
     (* TODO: do not eval ghost if no assertion check *)
     eval_expr env s e1
   | Erec _
@@ -1098,6 +1178,8 @@ and exec_app env s ps args spec ity_result =
 
 
 let eval_global_expr env mkm tkm e =
+  Format.eprintf "@[<hov 2>[interp] eval_global_expr:@ %a@]@."
+    p_expr e;
   get_builtins env;
   get_builtin_progs (Mlw_main.library_of_env env);
   let env = {
