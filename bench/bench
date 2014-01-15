@@ -126,14 +126,19 @@ execute examples/euler001.mlw Euler001.bench
 execute examples/euler002.mlw Solve.bench
 execute examples/fibonacci.mlw FibonacciLogarithmic.bench
 execute examples/same_fringe.mlw SameFringe.bench
-# fails: execute examples/same_fringe.mlw --exec SameFringe.test5
-# fails: execute examples/same_fringe.mlw --exec Test.test1
+# fails: cannot evaluate condition a=b (how to do it?)
+# execute examples/same_fringe.mlw --exec SameFringe.test5
+# fails: "let" are cloned as "val"
+# execute examples/same_fringe.mlw --exec Test.test1
 execute examples/selection_sort.mlw SelectionSort.bench
 execute examples/insertion_sort.mlw InsertionSort.bench
-# fails: examples/vacid_0_sparse_array.mlw --exec Harness.bench
-# fails: examples/knuth_prime_numbers.mlw --exec PrimeNumbers.bench
-# fails: examples/verifythis_fm2012_LRS.mlw --exec LCP_test.bench
-# fails: examples/verifythis_fm2012_LRS.mlw --exec SuffixArray_test.bench
+# fails: needs support for "val" without code (how to do it?)
+# examples/vacid_0_sparse_array.mlw --exec Harness.bench
+# fails: needs support for let rec
+# examples/knuth_prime_numbers.mlw --exec PrimeNumbers.bench
+execute examples/verifythis_fm2012_LRS.mlw LCP_test.bench
+# fails: assert failure on (regions = []) in Mlw_interp.to_program_value
+# examples/verifythis_fm2012_LRS.mlw --exec SuffixArray_test.bench
 echo ""
 
 echo "=== Checking drivers ==="

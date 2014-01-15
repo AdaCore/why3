@@ -14,6 +14,9 @@ open Stdlib
 open Term
 
 
+let debug = Debug.register_info_flag "trace_exec"
+  ~desc:"trace execution of code given by --exec or --eval"
+
 (* environment *)
 
 open Mlw_ty
@@ -152,6 +155,13 @@ let multibind_pvs l tl env =
   with Invalid_argument _ -> assert false
 
 
+let get_reg env r =
+  let rec aux r =
+    try
+      aux (Mreg.find r env.regenv)
+    with Not_found -> r
+  in aux r
+
 
 
 (* store *)
@@ -165,7 +175,6 @@ let print_state fmt s =
   let l = Mreg.bindings s in
   fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_reg) l
 
-(*
 let p_regvar fmt (reg,t) =
   fprintf fmt "@[<hov 2><%a> -> %a@]"
     Mlw_pretty.print_reg reg Mlw_pretty.print_reg t
@@ -174,6 +183,7 @@ let print_regenv fmt s =
   let l = Mreg.bindings s in
   fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_regvar) l
 
+(*
 let p_vsvar fmt (vs,t) =
   fprintf fmt "@[<hov 2><%a> -> %a@]"
     Pretty.print_vs vs print_value t
@@ -482,12 +492,7 @@ let to_program_value env s ty v =
         let regions =
           match ity.ity_node with
           | Ityapp(_,_,rl) ->
-            List.map
-              (fun r ->
-                try
-                  Mreg.find r env.regenv
-                with Not_found -> r (*assert false*))
-              rl
+            List.map (get_reg env) rl
           | _ -> assert false
         in
         try
@@ -708,12 +713,7 @@ let get_pvs env pvs =
 let rec to_logic_value env s v =
   let eval_rec t = to_logic_value env s t in
   match v with
-  | Vreg r ->
-    let r' =
-      try Mreg.find r env.regenv
-      with Not_found -> r
-    in
-    Mreg.find r' s
+  | Vreg r -> Mreg.find (get_reg env r) s
   | Vnum _ | Vbool _ | Vvoid | Vmap _ -> v
   | Vbin(Tand,t1,t2) ->
     v_and (eval_rec t1) (eval_rec t2)
@@ -925,26 +925,13 @@ and p_expr fmt e =
     | Eassert (_, _) -> fprintf fmt "@[Eassert(_,@ _)@]"
     | Eabsurd -> fprintf fmt "@[Eabsurd@]"
 
-let print_result mkm tkm s fmt r =
+
+let print_result_aux env s fmt r =
   match r with
     | Normal t ->
-      let env = {
-        mknown = mkm;
-        tknown = tkm;
-        regenv = Mreg.empty;
-        vsenv = Mvs.empty;
-      }
-      in
       let v = to_logic_value env s t in
       fprintf fmt "@[%a@]" print_value v
     | Excep(x,t) ->
-      let env = {
-        mknown = mkm;
-        tknown = tkm;
-        regenv = Mreg.empty;
-        vsenv = Mvs.empty;
-      }
-      in
       let v = to_logic_value env s t in
       fprintf fmt "@[exception %s(@[%a@])@]"
         x.xs_name.Ident.id_string print_value v
@@ -953,6 +940,16 @@ let print_result mkm tkm s fmt r =
         p_expr e
     | Fun _ ->
       fprintf fmt "@[Result is a function@]"
+
+let print_result mkm tkm s fmt r =
+  let env = {
+    mknown = mkm;
+    tknown = tkm;
+    regenv = Mreg.empty;
+    vsenv = Mvs.empty;
+  }
+  in
+  print_result_aux env s fmt r
 
 
 
@@ -1104,10 +1101,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
       p_expr e print_regenv env.regenv print_state s;
 *)
     let t = get_pvs env pvs in
-    let r =
-      try Mreg.find reg env.regenv
-      with Not_found -> reg
-    in
+    let r = get_reg env reg in
 (*
     eprintf "updating region <%a> with value %a@."
       Mlw_pretty.print_reg r print_value t;
@@ -1166,40 +1160,36 @@ and exec_app env s ps args (*spec*) ity_result =
     | Some d ->
       let lam = d.fun_lambda in
       let env' = multibind_pvs lam.l_args args' env1 in
-        (*
-           eprintf "@[Evaluating function body of %s in regenv:@\n%a@\nand state:@\n%a@]@."
-             ps.ps_name.Ident.id_string print_regenv env'.regenv
-             print_state s;
-        *)
+      Debug.dprintf debug
+        "@[Evaluating function body of %s in regenv:@\n%a@\nand state:@\n%a@]@."
+        ps.ps_name.Ident.id_string print_regenv env'.regenv
+        print_state s;
       let r,s' = eval_expr env' s lam.l_expr
       in
-      (*
-        eprintf "@[Return from function %s value %a in state:@\n%a@]@."
+      Debug.dprintf debug
+        "@[Return from function %s@ result@ %a in state:@\n%a@]@."
         ps.ps_name.Ident.id_string
-        print_result r
+        (print_result_aux env s') r
         print_state s';
-      *)
       r,s'
 
     | None ->
       try
         let f = Hps.find builtin_progs ps in
-(*
-        eprintf "@[Evaluating function body of %s in regenv:@\n%a@\nand state:@\n%a@]@."
+        Debug.dprintf debug
+          "@[Evaluating builtin function %s in regenv:@\n%a@\nand state:@\n%a@]@."
           ps.ps_name.Ident.id_string print_regenv env1.regenv
           print_state s;
-*)
         let r,s' = f env1 (*spec*) s (VTvalue ity_result) args' in
-(*
-        eprintf "@[Return from builtin function %s value %a in state:@\n%a@]@."
+        Debug.dprintf debug
+          "@[Return from builtin function %s result %a in state:@\n%a@]@."
           ps.ps_name.Ident.id_string
-          print_result r
+          (print_result_aux env s') r
           print_state s';
-*)
         r, s'
 
       with Not_found ->
-        Format.eprintf "[Exec] definition of psymbol %s not found@."
+        eprintf "[Exec] definition of psymbol %s not found@."
           ps.ps_name.Ident.id_string;
         raise Exit
 
