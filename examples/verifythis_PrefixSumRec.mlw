@@ -180,6 +180,7 @@ module PrefixSumRec
 
 (** {2 A simple test} *)
 
+
   let test_harness () =
     let a = make 8 0 in
     (* needed for the precondition of compute_sums *)
@@ -195,5 +196,24 @@ module PrefixSumRec
     assert { a[5] = 15 };
     assert { a[6] = 16 };
     assert { a[7] = 22 }
+
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let a = make 8 0 in
+    (* needed for the precondition of compute_sums *)
+    assert { power 2 3 = a.length };
+    a[0] <- 3; a[1] <- 1; a[2] <- 7; a[3] <- 0;
+    a[4] <- 4; a[5] <- 1; a[6] <- 6; a[7] <- 3;
+    compute_sums a;
+    if a[0] <> 0 then raise BenchFailure;
+    if a[1] <> 3 then raise BenchFailure;
+    if a[2] <> 4 then raise BenchFailure;
+    if a[3] <> 11 then raise BenchFailure;
+    if a[4] <> 11 then raise BenchFailure;
+    if a[5] <> 15 then raise BenchFailure;
+    if a[6] <> 16 then raise BenchFailure;
+    if a[7] <> 22 then raise BenchFailure
 
 end

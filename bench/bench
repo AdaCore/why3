@@ -130,15 +130,23 @@ execute examples/same_fringe.mlw SameFringe.bench
 # execute examples/same_fringe.mlw --exec SameFringe.test5
 # fails: "let" are cloned as "val"
 # execute examples/same_fringe.mlw --exec Test.test1
+execute examples/vstte12_combinators.mlw Combinators.test_SKK
 execute examples/selection_sort.mlw SelectionSort.bench
 execute examples/insertion_sort.mlw InsertionSort.bench
 # fails: needs support for "val" without code (how to do it?)
 # examples/vacid_0_sparse_array.mlw --exec Harness.bench
 # fails: needs support for let rec
 # examples/knuth_prime_numbers.mlw --exec PrimeNumbers.bench
+execute examples/vstte10_max_sum.mlw TestCase.test_case
 execute examples/verifythis_fm2012_LRS.mlw LCP_test.bench
 # fails: assert failure on (regions = []) in Mlw_interp.to_program_value
 # examples/verifythis_fm2012_LRS.mlw --exec SuffixArray_test.bench
+# fails: needs support for Array.copy
+# examples/verifythis_PrefixSumRec.mlw --exec PrefixSumRec.bench
+# fails: assert failure in Mreg.merge
+# examples/queens.mlw --exec  NQueensBits.test8
+# fails: assert failure in Mreg.merge
+# examples/vstte10_queens.mlw --exec NQueens.test8
 echo ""
 
 echo "=== Checking drivers ==="

@@ -82,6 +82,16 @@ module Combinators
       end
     end
 
+  exception BenchFailure
+
+  constant i : term = App (App S K) K
+
+  let test_SKK () raises { BenchFailure -> true } =
+     let t = reduction (App i i) in
+     if t <> i then raise BenchFailure;
+     let t = reduction (App (App (App (App K K) K) K) K) in
+     if t <> K then raise BenchFailure
+
   (* an irreducible term is a value *)
 
   lemma reducible_or_value:

@@ -7,35 +7,43 @@
   version="0.95.1"/>
  <prover
   id="1"
-  name="CVC3"
-  version="2.2"/>
+  name="Alt-Ergo"
+  version="0.95.2"/>
  <prover
   id="2"
   name="CVC3"
-  version="2.4.1"/>
+  version="2.2"/>
  <prover
   id="3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="4"
   name="CVC4"
   version="1.2"/>
  <prover
-  id="4"
+  id="5"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="6"
   name="Coq"
   version="8.4pl2"/>
  <prover
-  id="5"
+  id="7"
   name="Z3"
   version="2.19"/>
  <prover
-  id="6"
+  id="8"
   name="Z3"
   version="3.2"/>
  <prover
-  id="7"
+  id="9"
   name="Z3"
   version="4.3.1"/>
  <file
   name="../queens.mlw"
-  verified="true"
+  verified="false"
   expanded="true">
   <theory
    name="S"
@@ -87,7 +95,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -95,7 +103,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="7"
+       prover="9"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -123,7 +131,7 @@
        <result status="valid" time="0.06"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -151,7 +159,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -159,7 +167,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="7"
+       prover="9"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -187,7 +195,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -221,7 +229,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="25"
      memlimit="1000"
      obsolete="false"
@@ -229,7 +237,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="7"
+     prover="9"
      timelimit="25"
      memlimit="1000"
      obsolete="false"
@@ -246,7 +254,7 @@
     expanded="false"
     shape="Naeq_solamixfix []V0V3amixfix []V0V4Iainfix &lt;V4V2Aainfix &lt;V3V4Aainfix &lt;=V1V3FIasortedV0V1V2F">
     <proof
-     prover="1"
+     prover="2"
      timelimit="10"
      memlimit="0"
      obsolete="false"
@@ -254,7 +262,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="25"
      memlimit="1000"
      obsolete="false"
@@ -268,7 +276,7 @@
    locfile="../queens.mlw"
    loclnum="94" loccnumb="7" loccnume="18"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter t3"
     locfile="../queens.mlw"
@@ -276,14 +284,14 @@
     expl="VC for t3"
     sum="57f02119afaddc19825b9675dd067273"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="iaeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6Fiaeq_prefixV4V14V3Aaeq_prefixV6V16V15Aaeq_solV17amixfix []V14V18Aainfix &lt;V18V13Aainfix &lt;=V3V18Eqaeq_prefixV16V17V15AasolutionV17FAasortedV14V3V13Aainfix =V15V5Aainfix &gt;=ainfix -V13V3c0Aainfix =V11ainfix -V13V3ainfix &lt;acardinalV29acardinalV12Aainfix &lt;=c0acardinalV12Aaeq_prefixV4V24V3Aaeq_prefixV6V26V28Aaeq_solV30amixfix []V24V31Aainfix &lt;V31V23Aainfix &lt;=V3V31Eqamemamixfix []V30V28adiffadiffadiffV0V1V2V29Aaeq_prefixV26V30V28AasolutionV30FAainfix &lt;V32V33IamemV33V29IamemV32adiffadiffadiffV0V1V2V29FAasortedV24V3V23Aapartial_solutionV28V26AasubsetV29adiffadiffV0V1V2Aainfix =V28V5Aainfix &gt;=ainfix -V23V3c0Aainfix =V27ainfix -V23V3Iainfix =V29aremoveV19V12FIainfix =V28ainfix -V25c1FIainfix =V27ainfix +V11ainfix -V23V13FIaeq_prefixV14V24V13Aaeq_prefixV20V26V25Aaeq_solV34amixfix []V24V35Aainfix &lt;V35V23Aainfix &lt;=V13V35Eqaeq_prefixV26V34V25AasolutionV34FAasortedV24V13V23Aainfix =V25V21Aainfix &gt;=ainfix -V23V13c0FAapartial_solutionV21V20ANainfix =amixfix []V20V37ainfix -ainfix +V36V21V37Iainfix &lt;V37V21Aainfix &lt;=c0V37FqNamemV36apredaaddV19V2Iainfix &gt;=V36c0FANainfix =amixfix []V20V39ainfix -ainfix +V38V39V21Iainfix &lt;V39V21Aainfix &lt;=c0V39FqNamemV38asuccaaddV19V1Iainfix &gt;=V38c0FANainfix =amixfix []V20V41V40Iainfix &lt;V41V21Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40V22FAainfix &gt;=V13c0Aainfix =ainfix +V21acardinalV22anAainfix &lt;=c0V21Aainfix &lt;acardinalV22acardinalV0Aainfix &lt;=c0acardinalV0LaremoveV19V0Iainfix =V21ainfix +V15c1FIainfix =V20amixfix [&lt;-]V16V15V19FLamin_eltV12Nais_emptyV12Iaeq_prefixV4V14V3Aaeq_prefixV6V16V15Aaeq_solV42amixfix []V14V43Aainfix &lt;V43V13Aainfix &lt;=V3V43Eqamemamixfix []V42V15adiffadiffadiffV0V1V2V12Aaeq_prefixV16V42V15AasolutionV42FAainfix &lt;V44V45IamemV45V12IamemV44adiffadiffadiffV0V1V2V12FAasortedV14V3V13Aapartial_solutionV15V16AasubsetV12adiffadiffV0V1V2Aainfix =V15V5Aainfix &gt;=ainfix -V13V3c0Aainfix =V11ainfix -V13V3FAaeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV46amixfix []V4V47Aainfix &lt;V47V3Aainfix &lt;=V3V47Eqamemamixfix []V46V5adiffadiffadiffV0V1V2adiffadiffV0V1V2Aaeq_prefixV6V46V5AasolutionV46FAainfix &lt;V48V49IamemV49adiffadiffV0V1V2IamemV48adiffadiffadiffV0V1V2adiffadiffV0V1V2FAasortedV4V3V3Aapartial_solutionV5V6AasubsetadiffadiffV0V1V2adiffadiffV0V1V2Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3Nais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V51ainfix -ainfix +V50V5V51Iainfix &lt;V51V5Aainfix &lt;=c0V51FqNamemV50V2Iainfix &gt;=V50c0FANainfix =amixfix []V6V53ainfix -ainfix +V52V53V5Iainfix &lt;V53V5Aainfix &lt;=c0V53FqNamemV52V1Iainfix &gt;=V52c0FANainfix =amixfix []V6V55V54Iainfix &lt;V55V5Aainfix &lt;=c0V55FAainfix &lt;V54anAainfix &lt;=c0V54qamemV54V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
     <label
      name="expl:VC for t3"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter t3.1"
       locfile="../queens.mlw"
@@ -304,7 +312,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="1"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -312,7 +320,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -320,7 +328,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="7"
+       prover="9"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -348,7 +356,7 @@
        <result status="valid" time="0.79"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -363,14 +371,14 @@
       expl="3. precondition"
       sum="a9b0828c1448346a4c8078fc33c6029c"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="preconditionapartial_solutionV15V14ANainfix =amixfix []V14V18ainfix -ainfix +V17V15V18Iainfix &lt;V18V15Aainfix &lt;=c0V18FqNamemV17apredaaddV13V2Iainfix &gt;=V17c0FANainfix =amixfix []V14V20ainfix -ainfix +V19V20V15Iainfix &lt;V20V15Aainfix &lt;=c0V20FqNamemV19asuccaaddV13V1Iainfix &gt;=V19c0FANainfix =amixfix []V14V22V21Iainfix &lt;V22V15Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV23amixfix []V10V24Aainfix &lt;V24V9Aainfix &lt;=V3V24Eqamemamixfix []V23V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V23V11AasolutionV23FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V28ainfix -ainfix +V27V5V28Iainfix &lt;V28V5Aainfix &lt;=c0V28FqNamemV27V2Iainfix &gt;=V27c0FANainfix =amixfix []V6V30ainfix -ainfix +V29V30V5Iainfix &lt;V30V5Aainfix &lt;=c0V30FqNamemV29V1Iainfix &gt;=V29c0FANainfix =amixfix []V6V32V31Iainfix &lt;V32V5Aainfix &lt;=c0V32FAainfix &lt;V31anAainfix &lt;=c0V31qamemV31V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter t3.3.1"
         locfile="../queens.mlw"
@@ -391,7 +399,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -399,7 +407,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -427,7 +435,7 @@
          <result status="valid" time="1.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -455,7 +463,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -463,7 +471,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -491,7 +499,7 @@
          <result status="valid" time="0.11"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -519,7 +527,7 @@
          <result status="valid" time="0.12"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -547,7 +555,7 @@
          <result status="valid" time="1.86"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -575,7 +583,7 @@
          <result status="valid" time="4.80"/>
         </proof>
         <proof
-         prover="4"
+         prover="6"
          timelimit="5"
          memlimit="1000"
          edited="queens_WP_NQueensSets_WP_parameter_t3_1.v"
@@ -616,7 +624,7 @@
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="4"
+         prover="6"
          timelimit="5"
          memlimit="1000"
          edited="queens_WP_NQueensSets_WP_parameter_t3_3.v"
@@ -645,7 +653,7 @@
          <result status="valid" time="0.60"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -673,7 +681,7 @@
          <result status="valid" time="4.06"/>
         </proof>
         <proof
-         prover="4"
+         prover="6"
          timelimit="5"
          memlimit="1000"
          edited="queens_WP_NQueensSets_WP_parameter_t3_4.v"
@@ -689,14 +697,14 @@
         expl="12."
         sum="9d1e1524566e195019ea3bbd8ba4120d"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="apartial_solutionV15V14LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20V8IamemV19adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23V1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <transf
          name="inline_goal"
          proved="true"
-         expanded="true">
+         expanded="false">
          <goal
           name="WP_parameter t3.3.12.1"
           locfile="../queens.mlw"
@@ -704,14 +712,14 @@
           expl="1."
           sum="7fe9d705253dff3271fa45193b0e53b9"
           proved="true"
-          expanded="true"
+          expanded="false"
           shape="Nainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V18V17ANainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V17V18ANainfix =amixfix []V14V17amixfix []V14V18Iainfix &lt;V18V17Aainfix &lt;=c0V18FAainfix &lt;amixfix []V14V17anAainfix &lt;=c0amixfix []V14V17Iainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV19V8FIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29ANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30ANainfix =amixfix []V12V29amixfix []V12V30Iainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV32V0FINainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33ANainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34ANainfix =amixfix []V6V33amixfix []V6V34Iainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FANainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36Iainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqNamemV35V2Iainfix &lt;=c0V35FANainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5Iainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqNamemV37V1Iainfix &lt;=c0V37FANainfix =agetV6V40V39Iainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
           <label
            name="expl:VC for t3"/>
           <transf
            name="split_goal"
            proved="true"
-           expanded="true">
+           expanded="false">
            <goal
             name="WP_parameter t3.3.12.1.1"
             locfile="../queens.mlw"
@@ -772,7 +780,7 @@
              <result status="valid" time="4.72"/>
             </proof>
             <proof
-             prover="3"
+             prover="4"
              timelimit="25"
              memlimit="1000"
              obsolete="false"
@@ -787,7 +795,7 @@
             expl="4."
             sum="7eef9f6b558519c9fa33ff39982dbdae"
             proved="true"
-            expanded="true"
+            expanded="false"
             shape="Nainfix =ainfix -amixfix []V14V17amixfix []V14V18ainfix -V17V18Iainfix &lt;V18V17Aainfix &lt;=c0V18FIainfix &lt;V17V15Aainfix &lt;=c0V17FLaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14asetV12V11V13FLamin_eltV8INNamemV19V8FIainfix =amixfix []V4V20amixfix []V10V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =amixfix []V6V21amixfix []V12V21Iainfix &lt;V21V11Aainfix &lt;=c0V21FAaeq_prefixV22amixfix []V10V23anAainfix &lt;V23V9Aainfix =V3V23Oainfix &lt;V3V23Eqamemamixfix []V22V11adiffadiffadiffV0V1V2V8Aainfix =amixfix []V12V24amixfix []V22V24Iainfix &lt;V24V11Aainfix &lt;=c0V24FAapartial_solutionanV22FAainfix &lt;V25V26IamemV26V8IamemV25adiffadiffadiffV0V1V2V8FAalt_solamixfix []V10V27amixfix []V10V28Iainfix &lt;V28V9Aainfix &lt;V27V28Aainfix &lt;=V3V27FANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V30V29ANainfix =ainfix -amixfix []V12V29amixfix []V12V30ainfix -V29V30ANainfix =amixfix []V12V29amixfix []V12V30Iainfix &lt;V30V29Aainfix &lt;=c0V30FAainfix &lt;amixfix []V12V29anAainfix &lt;=c0amixfix []V12V29Iainfix &lt;V29V11Aainfix &lt;=c0V29FAamemV31adiffadiffV0V1V2IamemV31V8FAainfix =V11V5Aainfix &lt;=c0ainfix -V9V3Aainfix =V7ainfix +V9aprefix -V3FINNamemV32V0FINainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V34V33ANainfix =ainfix -amixfix []V6V33amixfix []V6V34ainfix -V33V34ANainfix =amixfix []V6V33amixfix []V6V34Iainfix &lt;V34V33Aainfix &lt;=c0V34FAainfix &lt;amixfix []V6V33anAainfix &lt;=c0amixfix []V6V33Iainfix &lt;V33V5Aainfix &lt;=c0V33FANainfix =agetV6V36ainfix +ainfix +V35V5aprefix -V36Iainfix &lt;V36V5Aainfix =c0V36Oainfix &lt;c0V36FqNamemV35V2Iainfix &lt;=c0V35FANainfix =agetV6V38ainfix +ainfix +V37V38aprefix -V5Iainfix &lt;V38V5Aainfix =c0V38Oainfix &lt;c0V38FqNamemV37V1Iainfix &lt;=c0V37FANainfix =agetV6V40V39Iainfix &lt;V40V5Aainfix =c0V40Oainfix &lt;c0V40FAainfix &lt;V39anAainfix =c0V39Oainfix &lt;c0V39qamemV39V0FAainfix &lt;=c0V3Aainfix =ainfix +V5acardinalV0anAainfix =c0V5Oainfix &lt;c0V5FF">
             <label
              name="expl:VC for t3"/>
@@ -845,7 +853,7 @@
              <ts_pos
               name="ref"
               arity="1"
-              id="3803"
+              id="87763"
               ip_theory="Ref">
               <ip_library
                name="ref"/>
@@ -855,7 +863,7 @@
              <ts_pos
               name="solution"
               arity="0"
-              id="4264"
+              id="88224"
               ip_theory="Solution">
               <ip_qualid
                name="solution"/>
@@ -863,7 +871,7 @@
              <ts_pos
               name="solutions"
               arity="0"
-              id="4329"
+              id="88289"
               ip_theory="Solution">
               <ip_qualid
                name="solutions"/>
@@ -879,7 +887,7 @@
              </ls_pos>
              <ls_pos
               name="zero"
-              id="842"
+              id="84808"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -888,7 +896,7 @@
              </ls_pos>
              <ls_pos
               name="one"
-              id="843"
+              id="84809"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -897,7 +905,7 @@
              </ls_pos>
              <ls_pos
               name="infix &lt;"
-              id="844"
+              id="84810"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -906,7 +914,7 @@
              </ls_pos>
              <ls_pos
               name="infix &gt;"
-              id="847"
+              id="84813"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -915,7 +923,7 @@
              </ls_pos>
              <ls_pos
               name="infix +"
-              id="1944"
+              id="85905"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -924,7 +932,7 @@
              </ls_pos>
              <ls_pos
               name="prefix -"
-              id="1945"
+              id="85906"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -933,7 +941,7 @@
              </ls_pos>
              <ls_pos
               name="infix *"
-              id="1946"
+              id="85907"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -942,7 +950,7 @@
              </ls_pos>
              <ls_pos
               name="infix &gt;="
-              id="2014"
+              id="85975"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -951,7 +959,7 @@
              </ls_pos>
              <ls_pos
               name="mem"
-              id="2858"
+              id="86819"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -960,7 +968,7 @@
              </ls_pos>
              <ls_pos
               name="infix =="
-              id="2861"
+              id="86822"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -969,7 +977,7 @@
              </ls_pos>
              <ls_pos
               name="subset"
-              id="2879"
+              id="86840"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -978,7 +986,7 @@
              </ls_pos>
              <ls_pos
               name="empty"
-              id="2900"
+              id="86861"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -987,7 +995,7 @@
              </ls_pos>
              <ls_pos
               name="add"
-              id="2912"
+              id="86873"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -996,7 +1004,7 @@
              </ls_pos>
              <ls_pos
               name="singleton"
-              id="2918"
+              id="86879"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1005,7 +1013,7 @@
              </ls_pos>
              <ls_pos
               name="remove"
-              id="2923"
+              id="86884"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1014,7 +1022,7 @@
              </ls_pos>
              <ls_pos
               name="union"
-              id="2941"
+              id="86902"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1023,7 +1031,7 @@
              </ls_pos>
              <ls_pos
               name="inter"
-              id="2948"
+              id="86909"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1032,7 +1040,7 @@
              </ls_pos>
              <ls_pos
               name="diff"
-              id="2955"
+              id="86916"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1041,7 +1049,7 @@
              </ls_pos>
              <ls_pos
               name="choose"
-              id="2967"
+              id="86928"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1050,7 +1058,7 @@
              </ls_pos>
              <ls_pos
               name="cardinal"
-              id="2971"
+              id="86932"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1059,7 +1067,7 @@
              </ls_pos>
              <ls_pos
               name="min_elt"
-              id="3031"
+              id="86992"
               ip_theory="Fsetint">
               <ip_library
                name="set"/>
@@ -1068,7 +1076,7 @@
              </ls_pos>
              <ls_pos
               name="max_elt"
-              id="3041"
+              id="87002"
               ip_theory="Fsetint">
               <ip_library
                name="set"/>
@@ -1077,7 +1085,7 @@
              </ls_pos>
              <ls_pos
               name="below"
-              id="3051"
+              id="87012"
               ip_theory="Fsetint">
               <ip_library
                name="set"/>
@@ -1086,7 +1094,7 @@
              </ls_pos>
              <ls_pos
               name="get"
-              id="3087"
+              id="87048"
               ip_theory="Map">
               <ip_library
                name="map"/>
@@ -1095,7 +1103,7 @@
              </ls_pos>
              <ls_pos
               name="set"
-              id="3090"
+              id="87051"
               ip_theory="Map">
               <ip_library
                name="map"/>
@@ -1104,7 +1112,7 @@
              </ls_pos>
              <ls_pos
               name="mixfix [&lt;-]"
-              id="3110"
+              id="87071"
               ip_theory="Map">
               <ip_library
                name="map"/>
@@ -1113,7 +1121,7 @@
              </ls_pos>
              <ls_pos
               name="const"
-              id="3141"
+              id="87102"
               ip_theory="Map">
               <ip_library
                name="map"/>
@@ -1122,21 +1130,21 @@
              </ls_pos>
              <ls_pos
               name="succ"
-              id="3785"
+              id="87746"
               ip_theory="S">
               <ip_qualid
                name="succ"/>
              </ls_pos>
              <ls_pos
               name="pred"
-              id="3792"
+              id="87753"
               ip_theory="S">
               <ip_qualid
                name="pred"/>
              </ls_pos>
              <ls_pos
               name="prefix !"
-              id="3809"
+              id="87769"
               ip_theory="Ref">
               <ip_library
                name="ref"/>
@@ -1145,35 +1153,35 @@
              </ls_pos>
              <ls_pos
               name="n"
-              id="4263"
+              id="88223"
               ip_theory="Solution">
               <ip_qualid
                name="n"/>
              </ls_pos>
              <ls_pos
               name="eq_sol"
-              id="4281"
+              id="88241"
               ip_theory="Solution">
               <ip_qualid
                name="eq_sol"/>
              </ls_pos>
              <ls_pos
               name="solution"
-              id="4305"
+              id="88265"
               ip_theory="Solution">
               <ip_qualid
                name="solution"/>
              </ls_pos>
              <ls_pos
               name="sorted"
-              id="4330"
+              id="88290"
               ip_theory="Solution">
               <ip_qualid
                name="sorted"/>
              </ls_pos>
              <pr_pos
               name="Assoc"
-              id="1947"
+              id="85908"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1184,7 +1192,7 @@
              </pr_pos>
              <pr_pos
               name="Unit_def_l"
-              id="1954"
+              id="85915"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1195,7 +1203,7 @@
              </pr_pos>
              <pr_pos
               name="Unit_def_r"
-              id="1957"
+              id="85918"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1206,7 +1214,7 @@
              </pr_pos>
              <pr_pos
               name="Inv_def_l"
-              id="1960"
+              id="85921"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1217,7 +1225,7 @@
              </pr_pos>
              <pr_pos
               name="Inv_def_r"
-              id="1963"
+              id="85924"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1228,7 +1236,7 @@
              </pr_pos>
              <pr_pos
               name="Comm"
-              id="1966"
+              id="85927"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1241,7 +1249,7 @@
              </pr_pos>
              <pr_pos
               name="Assoc"
-              id="1971"
+              id="85932"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1252,7 +1260,7 @@
              </pr_pos>
              <pr_pos
               name="Mul_distr_l"
-              id="1978"
+              id="85939"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1261,7 +1269,7 @@
              </pr_pos>
              <pr_pos
               name="Mul_distr_r"
-              id="1985"
+              id="85946"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1270,7 +1278,7 @@
              </pr_pos>
              <pr_pos
               name="Comm"
-              id="2003"
+              id="85964"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1281,7 +1289,7 @@
              </pr_pos>
              <pr_pos
               name="Unitary"
-              id="2008"
+              id="85969"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1290,7 +1298,7 @@
              </pr_pos>
              <pr_pos
               name="NonTrivialRing"
-              id="2011"
+              id="85972"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1299,7 +1307,7 @@
              </pr_pos>
              <pr_pos
               name="Refl"
-              id="2023"
+              id="85984"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1308,7 +1316,7 @@
              </pr_pos>
              <pr_pos
               name="Trans"
-              id="2026"
+              id="85987"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1317,7 +1325,7 @@
              </pr_pos>
              <pr_pos
               name="Antisymm"
-              id="2033"
+              id="85994"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1326,7 +1334,7 @@
              </pr_pos>
              <pr_pos
               name="Total"
-              id="2038"
+              id="85999"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1335,7 +1343,7 @@
              </pr_pos>
              <pr_pos
               name="ZeroLessOne"
-              id="2043"
+              id="86004"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1344,7 +1352,7 @@
              </pr_pos>
              <pr_pos
               name="CompatOrderAdd"
-              id="2044"
+              id="86005"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1353,7 +1361,7 @@
              </pr_pos>
              <pr_pos
               name="CompatOrderMult"
-              id="2051"
+              id="86012"
               ip_theory="Int">
               <ip_library
                name="int"/>
@@ -1362,7 +1370,7 @@
              </pr_pos>
              <pr_pos
               name="extensionality"
-              id="2872"
+              id="86833"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1371,7 +1379,7 @@
              </pr_pos>
              <pr_pos
               name="subset_refl"
-              id="2890"
+              id="86851"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1380,7 +1388,7 @@
              </pr_pos>
              <pr_pos
               name="subset_trans"
-              id="2893"
+              id="86854"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1389,7 +1397,7 @@
              </pr_pos>
              <pr_pos
               name="empty_def1"
-              id="2909"
+              id="86870"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1398,7 +1406,7 @@
              </pr_pos>
              <pr_pos
               name="mem_empty"
-              id="2910"
+              id="86871"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1407,7 +1415,7 @@
              </pr_pos>
              <pr_pos
               name="add_def1"
-              id="2913"
+              id="86874"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1416,7 +1424,7 @@
              </pr_pos>
              <pr_pos
               name="remove_def1"
-              id="2924"
+              id="86885"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1425,7 +1433,7 @@
              </pr_pos>
              <pr_pos
               name="add_remove"
-              id="2929"
+              id="86890"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1434,7 +1442,7 @@
              </pr_pos>
              <pr_pos
               name="remove_add"
-              id="2933"
+              id="86894"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1443,7 +1451,7 @@
              </pr_pos>
              <pr_pos
               name="subset_remove"
-              id="2937"
+              id="86898"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1452,7 +1460,7 @@
              </pr_pos>
              <pr_pos
               name="union_def1"
-              id="2942"
+              id="86903"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1461,7 +1469,7 @@
              </pr_pos>
              <pr_pos
               name="inter_def1"
-              id="2949"
+              id="86910"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1470,7 +1478,7 @@
              </pr_pos>
              <pr_pos
               name="subset_diff"
-              id="2962"
+              id="86923"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1479,7 +1487,7 @@
              </pr_pos>
              <pr_pos
               name="choose_def"
-              id="2968"
+              id="86929"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1488,7 +1496,7 @@
              </pr_pos>
              <pr_pos
               name="cardinal_nonneg"
-              id="2973"
+              id="86934"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1497,7 +1505,7 @@
              </pr_pos>
              <pr_pos
               name="cardinal_empty"
-              id="2976"
+              id="86937"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1506,7 +1514,7 @@
              </pr_pos>
              <pr_pos
               name="cardinal_add"
-              id="2979"
+              id="86940"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1515,7 +1523,7 @@
              </pr_pos>
              <pr_pos
               name="cardinal_remove"
-              id="2984"
+              id="86945"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1524,7 +1532,7 @@
              </pr_pos>
              <pr_pos
               name="cardinal_subset"
-              id="2989"
+              id="86950"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1533,7 +1541,7 @@
              </pr_pos>
              <pr_pos
               name="cardinal1"
-              id="2994"
+              id="86955"
               ip_theory="Fset">
               <ip_library
                name="set"/>
@@ -1542,7 +1550,7 @@
              </pr_pos>
              <pr_pos
               name="min_elt_def2"
-              id="3036"
+              id="86997"
               ip_theory="Fsetint">
               <ip_library
                name="set"/>
@@ -1551,7 +1559,7 @@
              </pr_pos>
              <pr_pos
               name="max_elt_def1"
-              id="3043"
+              id="87004"
               ip_theory="Fsetint">
               <ip_library
                name="set"/>
@@ -1560,7 +1568,7 @@
              </pr_pos>
              <pr_pos
               name="max_elt_def2"
-              id="3046"
+              id="87007"
               ip_theory="Fsetint">
               <ip_library
                name="set"/>
@@ -1569,7 +1577,7 @@
              </pr_pos>
              <pr_pos
               name="below_def"
-              id="3053"
+              id="87014"
               ip_theory="Fsetint">
               <ip_library
                name="set"/>
@@ -1578,7 +1586,7 @@
              </pr_pos>
              <pr_pos
               name="cardinal_below"
-              id="3058"
+              id="87019"
               ip_theory="Fsetint">
               <ip_library
                name="set"/>
@@ -1587,7 +1595,7 @@
              </pr_pos>
              <pr_pos
               name="Select_eq"
-              id="3123"
+              id="87084"
               ip_theory="Map">
               <ip_library
                name="map"/>
@@ -1596,7 +1604,7 @@
              </pr_pos>
              <pr_pos
               name="Select_neq"
-              id="3132"
+              id="87093"
               ip_theory="Map">
               <ip_library
                name="map"/>
@@ -1605,7 +1613,7 @@
              </pr_pos>
              <pr_pos
               name="Const"
-              id="3143"
+              id="87104"
               ip_theory="Map">
               <ip_library
                name="map"/>
@@ -1614,28 +1622,28 @@
              </pr_pos>
              <pr_pos
               name="succ_def"
-              id="3787"
+              id="87748"
               ip_theory="S">
               <ip_qualid
                name="succ_def"/>
              </pr_pos>
              <pr_pos
               name="pred_def"
-              id="3794"
+              id="87755"
               ip_theory="S">
               <ip_qualid
                name="pred_def"/>
              </pr_pos>
              <pr_pos
               name="partial_solution_eq_prefix"
-              id="4310"
+              id="88270"
               ip_theory="Solution">
               <ip_qualid
                name="partial_solution_eq_prefix"/>
              </pr_pos>
              <pr_pos
               name="no_duplicate"
-              id="4349"
+              id="88309"
               ip_theory="Solution">
               <ip_qualid
                name="no_duplicate"/>
@@ -1648,427 +1656,427 @@
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="842"/>
+               id="84808"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="843"/>
+               id="84809"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="844"/>
+               id="84810"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="847"/>
+               id="84813"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="1944"/>
+               id="85905"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="1945"/>
+               id="85906"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="1946"/>
+               id="85907"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2014"/>
+               id="85975"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2858"/>
+               id="86819"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2861"/>
+               id="86822"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2879"/>
+               id="86840"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2900"/>
+               id="86861"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2912"/>
+               id="86873"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2918"/>
+               id="86879"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2923"/>
+               id="86884"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2941"/>
+               id="86902"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2948"/>
+               id="86909"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2955"/>
+               id="86916"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2967"/>
+               id="86928"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="2971"/>
+               id="86932"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3031"/>
+               id="86992"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3041"/>
+               id="87002"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3051"/>
+               id="87012"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3087"/>
+               id="87048"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3090"/>
+               id="87051"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3110"/>
+               id="87071"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3141"/>
+               id="87102"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3785"/>
+               id="87746"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3792"/>
+               id="87753"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="3809"/>
+               id="87769"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="4263"/>
+               id="88223"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="4281"/>
+               id="88241"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="4305"/>
+               id="88265"/>
              </meta>
              <meta
               name="remove_logic">
               <meta_arg_ls
-               id="4330"/>
+               id="88290"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="1947"/>
+               id="85908"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="1954"/>
+               id="85915"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="1957"/>
+               id="85918"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="1960"/>
+               id="85921"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="1963"/>
+               id="85924"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="1966"/>
+               id="85927"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="1971"/>
+               id="85932"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="1978"/>
+               id="85939"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="1985"/>
+               id="85946"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2003"/>
+               id="85964"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2008"/>
+               id="85969"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2011"/>
+               id="85972"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2023"/>
+               id="85984"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2026"/>
+               id="85987"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2033"/>
+               id="85994"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2038"/>
+               id="85999"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2043"/>
+               id="86004"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2044"/>
+               id="86005"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2051"/>
+               id="86012"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2872"/>
+               id="86833"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2890"/>
+               id="86851"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2893"/>
+               id="86854"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2909"/>
+               id="86870"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2910"/>
+               id="86871"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2913"/>
+               id="86874"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2924"/>
+               id="86885"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2929"/>
+               id="86890"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2933"/>
+               id="86894"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2937"/>
+               id="86898"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2942"/>
+               id="86903"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2949"/>
+               id="86910"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2962"/>
+               id="86923"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2968"/>
+               id="86929"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2973"/>
+               id="86934"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2976"/>
+               id="86937"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2979"/>
+               id="86940"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2984"/>
+               id="86945"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2989"/>
+               id="86950"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="2994"/>
+               id="86955"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3036"/>
+               id="86997"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3043"/>
+               id="87004"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3046"/>
+               id="87007"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3053"/>
+               id="87014"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3058"/>
+               id="87019"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3123"/>
+               id="87084"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3132"/>
+               id="87093"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3143"/>
+               id="87104"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3787"/>
+               id="87748"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="3794"/>
+               id="87755"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="4310"/>
+               id="88270"/>
              </meta>
              <meta
               name="remove_prop">
               <meta_arg_pr
-               id="4349"/>
+               id="88309"/>
              </meta>
              <meta
               name="remove_type">
@@ -2093,17 +2101,17 @@
              <meta
               name="remove_type">
               <meta_arg_ts
-               id="3803"/>
+               id="87763"/>
              </meta>
              <meta
               name="remove_type">
               <meta_arg_ts
-               id="4264"/>
+               id="88224"/>
              </meta>
              <meta
               name="remove_type">
               <meta_arg_ts
-               id="4329"/>
+               id="88289"/>
              </meta>
              <goal
               name="WP_parameter t3.3.12.1.4"
@@ -2140,7 +2148,7 @@
                  <result status="valid" time="0.12"/>
                 </proof>
                 <proof
-                 prover="3"
+                 prover="4"
                  timelimit="25"
                  memlimit="1000"
                  obsolete="false"
@@ -2148,7 +2156,7 @@
                  <result status="valid" time="2.32"/>
                 </proof>
                 <proof
-                 prover="6"
+                 prover="8"
                  timelimit="25"
                  memlimit="1000"
                  obsolete="false"
@@ -2156,7 +2164,7 @@
                  <result status="valid" time="0.02"/>
                 </proof>
                 <proof
-                 prover="7"
+                 prover="9"
                  timelimit="25"
                  memlimit="1000"
                  obsolete="false"
@@ -2201,14 +2209,14 @@
       expl="4. loop invariant preservation"
       sum="2b89e700fe9a5e05b1e991cdb03450cb"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="loop invariant preservationaeq_prefixV4V18V3Aaeq_prefixV6V20V22Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25Eqamemamixfix []V24V22adiffadiffadiffV0V1V2V23Aaeq_prefixV20V24V22AasolutionV24FAainfix &lt;V26V27IamemV27V23IamemV26adiffadiffadiffV0V1V2V23FAasortedV18V3V17Aapartial_solutionV22V20AasubsetV23adiffadiffV0V1V2Aainfix =V22V5Aainfix &gt;=ainfix -V17V3c0Aainfix =V21ainfix -V17V3Iainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV28amixfix []V18V29Aainfix &lt;V29V17Aainfix &lt;=V9V29Eqaeq_prefixV20V28V19AasolutionV28FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V31ainfix -ainfix +V30V15V31Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30apredaaddV13V2Iainfix &gt;=V30c0FANainfix =amixfix []V14V33ainfix -ainfix +V32V33V15Iainfix &lt;V33V15Aainfix &lt;=c0V33FqNamemV32asuccaaddV13V1Iainfix &gt;=V32c0FANainfix =amixfix []V14V35V34Iainfix &lt;V35V15Aainfix &lt;=c0V35FAainfix &lt;V34anAainfix &lt;=c0V34qamemV34V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV36amixfix []V10V37Aainfix &lt;V37V9Aainfix &lt;=V3V37Eqamemamixfix []V36V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V36V11AasolutionV36FAainfix &lt;V38V39IamemV39V8IamemV38adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V41ainfix -ainfix +V40V5V41Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V2Iainfix &gt;=V40c0FANainfix =amixfix []V6V43ainfix -ainfix +V42V43V5Iainfix &lt;V43V5Aainfix &lt;=c0V43FqNamemV42V1Iainfix &gt;=V42c0FANainfix =amixfix []V6V45V44Iainfix &lt;V45V5Aainfix &lt;=c0V45FAainfix &lt;V44anAainfix &lt;=c0V44qamemV44V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter t3.4.1"
         locfile="../queens.mlw"
@@ -2229,7 +2237,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2237,7 +2245,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2265,7 +2273,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2273,7 +2281,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2301,7 +2309,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2309,7 +2317,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2337,7 +2345,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2345,7 +2353,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2373,7 +2381,7 @@
          <result status="valid" time="19.10"/>
         </proof>
         <proof
-         prover="1"
+         prover="2"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -2381,7 +2389,7 @@
          <result status="valid" time="0.18"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2389,7 +2397,7 @@
          <result status="valid" time="0.08"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -2409,7 +2417,7 @@
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="4"
+         prover="6"
          timelimit="10"
          memlimit="0"
          edited="queens_WP_NQueensSets_WP_parameter_t3_5.v"
@@ -2430,7 +2438,7 @@
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="4"
+         prover="6"
          timelimit="10"
          memlimit="0"
          edited="queens_WP_NQueensSets_WP_parameter_t3_6.v"
@@ -2446,12 +2454,12 @@
         expl="8."
         sum="b484e7ac992f3f04d1ac26ac428e049d"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="aeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EIamemamixfix []V24V22adiffadiffadiffV0V1V2V23Aaeq_prefixV20V24V22AasolutionV24FIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="1"
+         prover="2"
          timelimit="55"
          memlimit="0"
          obsolete="false"
@@ -2504,7 +2512,7 @@
          <ts_pos
           name="ref"
           arity="1"
-          id="3803"
+          id="87763"
           ip_theory="Ref">
           <ip_library
            name="ref"/>
@@ -2514,7 +2522,7 @@
          <ts_pos
           name="solution"
           arity="0"
-          id="4264"
+          id="88224"
           ip_theory="Solution">
           <ip_qualid
            name="solution"/>
@@ -2522,7 +2530,7 @@
          <ts_pos
           name="solutions"
           arity="0"
-          id="4329"
+          id="88289"
           ip_theory="Solution">
           <ip_qualid
            name="solutions"/>
@@ -2538,7 +2546,7 @@
          </ls_pos>
          <ls_pos
           name="zero"
-          id="842"
+          id="84808"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2547,7 +2555,7 @@
          </ls_pos>
          <ls_pos
           name="one"
-          id="843"
+          id="84809"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2556,7 +2564,7 @@
          </ls_pos>
          <ls_pos
           name="infix &lt;"
-          id="844"
+          id="84810"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2565,7 +2573,7 @@
          </ls_pos>
          <ls_pos
           name="infix &gt;"
-          id="847"
+          id="84813"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2574,7 +2582,7 @@
          </ls_pos>
          <ls_pos
           name="infix +"
-          id="1944"
+          id="85905"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2583,7 +2591,7 @@
          </ls_pos>
          <ls_pos
           name="prefix -"
-          id="1945"
+          id="85906"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2592,7 +2600,7 @@
          </ls_pos>
          <ls_pos
           name="infix *"
-          id="1946"
+          id="85907"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2601,7 +2609,7 @@
          </ls_pos>
          <ls_pos
           name="mem"
-          id="2858"
+          id="86819"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2610,7 +2618,7 @@
          </ls_pos>
          <ls_pos
           name="infix =="
-          id="2861"
+          id="86822"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2619,7 +2627,7 @@
          </ls_pos>
          <ls_pos
           name="empty"
-          id="2900"
+          id="86861"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2628,7 +2636,7 @@
          </ls_pos>
          <ls_pos
           name="add"
-          id="2912"
+          id="86873"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2637,7 +2645,7 @@
          </ls_pos>
          <ls_pos
           name="singleton"
-          id="2918"
+          id="86879"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2646,7 +2654,7 @@
          </ls_pos>
          <ls_pos
           name="remove"
-          id="2923"
+          id="86884"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2655,7 +2663,7 @@
          </ls_pos>
          <ls_pos
           name="union"
-          id="2941"
+          id="86902"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2664,7 +2672,7 @@
          </ls_pos>
          <ls_pos
           name="inter"
-          id="2948"
+          id="86909"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2673,7 +2681,7 @@
          </ls_pos>
          <ls_pos
           name="diff"
-          id="2955"
+          id="86916"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2682,7 +2690,7 @@
          </ls_pos>
          <ls_pos
           name="choose"
-          id="2967"
+          id="86928"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2691,7 +2699,7 @@
          </ls_pos>
          <ls_pos
           name="cardinal"
-          id="2971"
+          id="86932"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2700,7 +2708,7 @@
          </ls_pos>
          <ls_pos
           name="min_elt"
-          id="3031"
+          id="86992"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -2709,7 +2717,7 @@
          </ls_pos>
          <ls_pos
           name="max_elt"
-          id="3041"
+          id="87002"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -2718,7 +2726,7 @@
          </ls_pos>
          <ls_pos
           name="below"
-          id="3051"
+          id="87012"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -2727,7 +2735,7 @@
          </ls_pos>
          <ls_pos
           name="get"
-          id="3087"
+          id="87048"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -2736,7 +2744,7 @@
          </ls_pos>
          <ls_pos
           name="set"
-          id="3090"
+          id="87051"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -2745,7 +2753,7 @@
          </ls_pos>
          <ls_pos
           name="const"
-          id="3141"
+          id="87102"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -2754,21 +2762,21 @@
          </ls_pos>
          <ls_pos
           name="succ"
-          id="3785"
+          id="87746"
           ip_theory="S">
           <ip_qualid
            name="succ"/>
          </ls_pos>
          <ls_pos
           name="pred"
-          id="3792"
+          id="87753"
           ip_theory="S">
           <ip_qualid
            name="pred"/>
          </ls_pos>
          <ls_pos
           name="prefix !"
-          id="3809"
+          id="87769"
           ip_theory="Ref">
           <ip_library
            name="ref"/>
@@ -2777,14 +2785,14 @@
          </ls_pos>
          <ls_pos
           name="n"
-          id="4263"
+          id="88223"
           ip_theory="Solution">
           <ip_qualid
            name="n"/>
          </ls_pos>
          <pr_pos
           name="Assoc"
-          id="1947"
+          id="85908"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2795,7 +2803,7 @@
          </pr_pos>
          <pr_pos
           name="Unit_def_l"
-          id="1954"
+          id="85915"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2806,7 +2814,7 @@
          </pr_pos>
          <pr_pos
           name="Unit_def_r"
-          id="1957"
+          id="85918"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2817,7 +2825,7 @@
          </pr_pos>
          <pr_pos
           name="Inv_def_l"
-          id="1960"
+          id="85921"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2828,7 +2836,7 @@
          </pr_pos>
          <pr_pos
           name="Inv_def_r"
-          id="1963"
+          id="85924"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2839,7 +2847,7 @@
          </pr_pos>
          <pr_pos
           name="Comm"
-          id="1966"
+          id="85927"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2852,7 +2860,7 @@
          </pr_pos>
          <pr_pos
           name="Assoc"
-          id="1971"
+          id="85932"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2863,7 +2871,7 @@
          </pr_pos>
          <pr_pos
           name="Mul_distr_l"
-          id="1978"
+          id="85939"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2872,7 +2880,7 @@
          </pr_pos>
          <pr_pos
           name="Mul_distr_r"
-          id="1985"
+          id="85946"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2881,7 +2889,7 @@
          </pr_pos>
          <pr_pos
           name="Comm"
-          id="2003"
+          id="85964"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2892,7 +2900,7 @@
          </pr_pos>
          <pr_pos
           name="Unitary"
-          id="2008"
+          id="85969"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2901,7 +2909,7 @@
          </pr_pos>
          <pr_pos
           name="NonTrivialRing"
-          id="2011"
+          id="85972"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2910,7 +2918,7 @@
          </pr_pos>
          <pr_pos
           name="Refl"
-          id="2023"
+          id="85984"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2919,7 +2927,7 @@
          </pr_pos>
          <pr_pos
           name="Trans"
-          id="2026"
+          id="85987"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2928,7 +2936,7 @@
          </pr_pos>
          <pr_pos
           name="Antisymm"
-          id="2033"
+          id="85994"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2937,7 +2945,7 @@
          </pr_pos>
          <pr_pos
           name="Total"
-          id="2038"
+          id="85999"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2946,7 +2954,7 @@
          </pr_pos>
          <pr_pos
           name="ZeroLessOne"
-          id="2043"
+          id="86004"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2955,7 +2963,7 @@
          </pr_pos>
          <pr_pos
           name="CompatOrderAdd"
-          id="2044"
+          id="86005"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2964,7 +2972,7 @@
          </pr_pos>
          <pr_pos
           name="CompatOrderMult"
-          id="2051"
+          id="86012"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -2973,7 +2981,7 @@
          </pr_pos>
          <pr_pos
           name="extensionality"
-          id="2872"
+          id="86833"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2982,7 +2990,7 @@
          </pr_pos>
          <pr_pos
           name="subset_refl"
-          id="2890"
+          id="86851"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -2991,7 +2999,7 @@
          </pr_pos>
          <pr_pos
           name="subset_trans"
-          id="2893"
+          id="86854"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3000,7 +3008,7 @@
          </pr_pos>
          <pr_pos
           name="empty_def1"
-          id="2909"
+          id="86870"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3009,7 +3017,7 @@
          </pr_pos>
          <pr_pos
           name="mem_empty"
-          id="2910"
+          id="86871"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3018,7 +3026,7 @@
          </pr_pos>
          <pr_pos
           name="add_def1"
-          id="2913"
+          id="86874"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3027,7 +3035,7 @@
          </pr_pos>
          <pr_pos
           name="add_remove"
-          id="2929"
+          id="86890"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3036,7 +3044,7 @@
          </pr_pos>
          <pr_pos
           name="remove_add"
-          id="2933"
+          id="86894"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3045,7 +3053,7 @@
          </pr_pos>
          <pr_pos
           name="subset_remove"
-          id="2937"
+          id="86898"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3054,7 +3062,7 @@
          </pr_pos>
          <pr_pos
           name="union_def1"
-          id="2942"
+          id="86903"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3063,7 +3071,7 @@
          </pr_pos>
          <pr_pos
           name="inter_def1"
-          id="2949"
+          id="86910"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3072,7 +3080,7 @@
          </pr_pos>
          <pr_pos
           name="subset_diff"
-          id="2962"
+          id="86923"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3081,7 +3089,7 @@
          </pr_pos>
          <pr_pos
           name="choose_def"
-          id="2968"
+          id="86929"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3090,7 +3098,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_nonneg"
-          id="2973"
+          id="86934"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3099,7 +3107,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_add"
-          id="2979"
+          id="86940"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3108,7 +3116,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_remove"
-          id="2984"
+          id="86945"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3117,7 +3125,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_subset"
-          id="2989"
+          id="86950"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3126,7 +3134,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal1"
-          id="2994"
+          id="86955"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3135,7 +3143,7 @@
          </pr_pos>
          <pr_pos
           name="min_elt_def1"
-          id="3033"
+          id="86994"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -3144,7 +3152,7 @@
          </pr_pos>
          <pr_pos
           name="min_elt_def2"
-          id="3036"
+          id="86997"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -3153,7 +3161,7 @@
          </pr_pos>
          <pr_pos
           name="max_elt_def1"
-          id="3043"
+          id="87004"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -3162,7 +3170,7 @@
          </pr_pos>
          <pr_pos
           name="max_elt_def2"
-          id="3046"
+          id="87007"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -3171,7 +3179,7 @@
          </pr_pos>
          <pr_pos
           name="below_def"
-          id="3053"
+          id="87014"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -3180,7 +3188,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_below"
-          id="3058"
+          id="87019"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -3189,7 +3197,7 @@
          </pr_pos>
          <pr_pos
           name="Select_eq"
-          id="3123"
+          id="87084"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -3198,7 +3206,7 @@
          </pr_pos>
          <pr_pos
           name="Select_neq"
-          id="3132"
+          id="87093"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -3207,7 +3215,7 @@
          </pr_pos>
          <pr_pos
           name="Const"
-          id="3143"
+          id="87104"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -3216,28 +3224,28 @@
          </pr_pos>
          <pr_pos
           name="succ_def"
-          id="3787"
+          id="87748"
           ip_theory="S">
           <ip_qualid
            name="succ_def"/>
          </pr_pos>
          <pr_pos
           name="pred_def"
-          id="3794"
+          id="87755"
           ip_theory="S">
           <ip_qualid
            name="pred_def"/>
          </pr_pos>
          <pr_pos
           name="partial_solution_eq_prefix"
-          id="4310"
+          id="88270"
           ip_theory="Solution">
           <ip_qualid
            name="partial_solution_eq_prefix"/>
          </pr_pos>
          <pr_pos
           name="no_duplicate"
-          id="4349"
+          id="88309"
           ip_theory="Solution">
           <ip_qualid
            name="no_duplicate"/>
@@ -3250,392 +3258,392 @@
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="842"/>
+           id="84808"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="843"/>
+           id="84809"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="844"/>
+           id="84810"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="847"/>
+           id="84813"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="1944"/>
+           id="85905"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="1945"/>
+           id="85906"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="1946"/>
+           id="85907"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2858"/>
+           id="86819"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2861"/>
+           id="86822"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2900"/>
+           id="86861"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2912"/>
+           id="86873"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2918"/>
+           id="86879"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2923"/>
+           id="86884"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2941"/>
+           id="86902"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2948"/>
+           id="86909"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2955"/>
+           id="86916"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2967"/>
+           id="86928"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2971"/>
+           id="86932"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3031"/>
+           id="86992"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3041"/>
+           id="87002"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3051"/>
+           id="87012"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3087"/>
+           id="87048"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3090"/>
+           id="87051"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3141"/>
+           id="87102"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3785"/>
+           id="87746"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3792"/>
+           id="87753"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3809"/>
+           id="87769"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="4263"/>
+           id="88223"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1947"/>
+           id="85908"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1954"/>
+           id="85915"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1957"/>
+           id="85918"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1960"/>
+           id="85921"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1963"/>
+           id="85924"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1966"/>
+           id="85927"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1971"/>
+           id="85932"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1978"/>
+           id="85939"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1985"/>
+           id="85946"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2003"/>
+           id="85964"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2008"/>
+           id="85969"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2011"/>
+           id="85972"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2023"/>
+           id="85984"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2026"/>
+           id="85987"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2033"/>
+           id="85994"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2038"/>
+           id="85999"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2043"/>
+           id="86004"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2044"/>
+           id="86005"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2051"/>
+           id="86012"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2872"/>
+           id="86833"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2890"/>
+           id="86851"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2893"/>
+           id="86854"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2909"/>
+           id="86870"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2910"/>
+           id="86871"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2913"/>
+           id="86874"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2929"/>
+           id="86890"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2933"/>
+           id="86894"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2937"/>
+           id="86898"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2942"/>
+           id="86903"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2949"/>
+           id="86910"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2962"/>
+           id="86923"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2968"/>
+           id="86929"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2973"/>
+           id="86934"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2979"/>
+           id="86940"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2984"/>
+           id="86945"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2989"/>
+           id="86950"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2994"/>
+           id="86955"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3033"/>
+           id="86994"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3036"/>
+           id="86997"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3043"/>
+           id="87004"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3046"/>
+           id="87007"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3053"/>
+           id="87014"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3058"/>
+           id="87019"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3123"/>
+           id="87084"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3132"/>
+           id="87093"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3143"/>
+           id="87104"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3787"/>
+           id="87748"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3794"/>
+           id="87755"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="4310"/>
+           id="88270"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="4349"/>
+           id="88309"/>
          </meta>
          <meta
           name="remove_type">
@@ -3660,17 +3668,17 @@
          <meta
           name="remove_type">
           <meta_arg_ts
-           id="3803"/>
+           id="87763"/>
          </meta>
          <meta
           name="remove_type">
           <meta_arg_ts
-           id="4264"/>
+           id="88224"/>
          </meta>
          <meta
           name="remove_type">
           <meta_arg_ts
-           id="4329"/>
+           id="88289"/>
          </meta>
          <goal
           name="WP_parameter t3.4.8"
@@ -3699,7 +3707,7 @@
             <label
              name="expl:VC for t3"/>
             <proof
-             prover="1"
+             prover="2"
              timelimit="55"
              memlimit="0"
              obsolete="false"
@@ -3707,7 +3715,7 @@
              <result status="valid" time="1.18"/>
             </proof>
             <proof
-             prover="2"
+             prover="3"
              timelimit="60"
              memlimit="1000"
              obsolete="false"
@@ -3731,7 +3739,7 @@
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="1"
+         prover="2"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3739,7 +3747,7 @@
          <result status="valid" time="0.21"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -3754,12 +3762,12 @@
         expl="10."
         sum="1d7ba4159a1e2963d8b79cb8b6805d2b"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="aeq_prefixV20V24V22Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="1"
+         prover="2"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -3812,7 +3820,7 @@
          <ts_pos
           name="ref"
           arity="1"
-          id="3803"
+          id="87763"
           ip_theory="Ref">
           <ip_library
            name="ref"/>
@@ -3822,7 +3830,7 @@
          <ts_pos
           name="solution"
           arity="0"
-          id="4264"
+          id="88224"
           ip_theory="Solution">
           <ip_qualid
            name="solution"/>
@@ -3830,7 +3838,7 @@
          <ts_pos
           name="solutions"
           arity="0"
-          id="4329"
+          id="88289"
           ip_theory="Solution">
           <ip_qualid
            name="solutions"/>
@@ -3846,7 +3854,7 @@
          </ls_pos>
          <ls_pos
           name="zero"
-          id="842"
+          id="84808"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -3855,7 +3863,7 @@
          </ls_pos>
          <ls_pos
           name="one"
-          id="843"
+          id="84809"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -3864,7 +3872,7 @@
          </ls_pos>
          <ls_pos
           name="infix &lt;"
-          id="844"
+          id="84810"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -3873,7 +3881,7 @@
          </ls_pos>
          <ls_pos
           name="infix &gt;"
-          id="847"
+          id="84813"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -3882,7 +3890,7 @@
          </ls_pos>
          <ls_pos
           name="infix +"
-          id="1944"
+          id="85905"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -3891,7 +3899,7 @@
          </ls_pos>
          <ls_pos
           name="prefix -"
-          id="1945"
+          id="85906"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -3900,7 +3908,7 @@
          </ls_pos>
          <ls_pos
           name="infix *"
-          id="1946"
+          id="85907"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -3909,7 +3917,7 @@
          </ls_pos>
          <ls_pos
           name="mem"
-          id="2858"
+          id="86819"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3918,7 +3926,7 @@
          </ls_pos>
          <ls_pos
           name="infix =="
-          id="2861"
+          id="86822"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3927,7 +3935,7 @@
          </ls_pos>
          <ls_pos
           name="empty"
-          id="2900"
+          id="86861"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3936,7 +3944,7 @@
          </ls_pos>
          <ls_pos
           name="add"
-          id="2912"
+          id="86873"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3945,7 +3953,7 @@
          </ls_pos>
          <ls_pos
           name="singleton"
-          id="2918"
+          id="86879"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3954,7 +3962,7 @@
          </ls_pos>
          <ls_pos
           name="remove"
-          id="2923"
+          id="86884"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3963,7 +3971,7 @@
          </ls_pos>
          <ls_pos
           name="union"
-          id="2941"
+          id="86902"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3972,7 +3980,7 @@
          </ls_pos>
          <ls_pos
           name="inter"
-          id="2948"
+          id="86909"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3981,7 +3989,7 @@
          </ls_pos>
          <ls_pos
           name="diff"
-          id="2955"
+          id="86916"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3990,7 +3998,7 @@
          </ls_pos>
          <ls_pos
           name="choose"
-          id="2967"
+          id="86928"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -3999,7 +4007,7 @@
          </ls_pos>
          <ls_pos
           name="cardinal"
-          id="2971"
+          id="86932"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4008,7 +4016,7 @@
          </ls_pos>
          <ls_pos
           name="min_elt"
-          id="3031"
+          id="86992"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -4017,7 +4025,7 @@
          </ls_pos>
          <ls_pos
           name="max_elt"
-          id="3041"
+          id="87002"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -4026,7 +4034,7 @@
          </ls_pos>
          <ls_pos
           name="below"
-          id="3051"
+          id="87012"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -4035,7 +4043,7 @@
          </ls_pos>
          <ls_pos
           name="get"
-          id="3087"
+          id="87048"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -4044,7 +4052,7 @@
          </ls_pos>
          <ls_pos
           name="set"
-          id="3090"
+          id="87051"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -4053,7 +4061,7 @@
          </ls_pos>
          <ls_pos
           name="const"
-          id="3141"
+          id="87102"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -4062,21 +4070,21 @@
          </ls_pos>
          <ls_pos
           name="succ"
-          id="3785"
+          id="87746"
           ip_theory="S">
           <ip_qualid
            name="succ"/>
          </ls_pos>
          <ls_pos
           name="pred"
-          id="3792"
+          id="87753"
           ip_theory="S">
           <ip_qualid
            name="pred"/>
          </ls_pos>
          <ls_pos
           name="prefix !"
-          id="3809"
+          id="87769"
           ip_theory="Ref">
           <ip_library
            name="ref"/>
@@ -4085,14 +4093,14 @@
          </ls_pos>
          <ls_pos
           name="n"
-          id="4263"
+          id="88223"
           ip_theory="Solution">
           <ip_qualid
            name="n"/>
          </ls_pos>
          <pr_pos
           name="Assoc"
-          id="1947"
+          id="85908"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4103,7 +4111,7 @@
          </pr_pos>
          <pr_pos
           name="Unit_def_l"
-          id="1954"
+          id="85915"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4114,7 +4122,7 @@
          </pr_pos>
          <pr_pos
           name="Unit_def_r"
-          id="1957"
+          id="85918"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4125,7 +4133,7 @@
          </pr_pos>
          <pr_pos
           name="Inv_def_l"
-          id="1960"
+          id="85921"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4136,7 +4144,7 @@
          </pr_pos>
          <pr_pos
           name="Inv_def_r"
-          id="1963"
+          id="85924"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4147,7 +4155,7 @@
          </pr_pos>
          <pr_pos
           name="Comm"
-          id="1966"
+          id="85927"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4160,7 +4168,7 @@
          </pr_pos>
          <pr_pos
           name="Assoc"
-          id="1971"
+          id="85932"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4171,7 +4179,7 @@
          </pr_pos>
          <pr_pos
           name="Mul_distr_l"
-          id="1978"
+          id="85939"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4180,7 +4188,7 @@
          </pr_pos>
          <pr_pos
           name="Mul_distr_r"
-          id="1985"
+          id="85946"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4189,7 +4197,7 @@
          </pr_pos>
          <pr_pos
           name="Comm"
-          id="2003"
+          id="85964"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4200,7 +4208,7 @@
          </pr_pos>
          <pr_pos
           name="Unitary"
-          id="2008"
+          id="85969"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4209,7 +4217,7 @@
          </pr_pos>
          <pr_pos
           name="NonTrivialRing"
-          id="2011"
+          id="85972"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4218,7 +4226,7 @@
          </pr_pos>
          <pr_pos
           name="Refl"
-          id="2023"
+          id="85984"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4227,7 +4235,7 @@
          </pr_pos>
          <pr_pos
           name="Trans"
-          id="2026"
+          id="85987"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4236,7 +4244,7 @@
          </pr_pos>
          <pr_pos
           name="Antisymm"
-          id="2033"
+          id="85994"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4245,7 +4253,7 @@
          </pr_pos>
          <pr_pos
           name="Total"
-          id="2038"
+          id="85999"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4254,7 +4262,7 @@
          </pr_pos>
          <pr_pos
           name="ZeroLessOne"
-          id="2043"
+          id="86004"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4263,7 +4271,7 @@
          </pr_pos>
          <pr_pos
           name="CompatOrderAdd"
-          id="2044"
+          id="86005"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4272,7 +4280,7 @@
          </pr_pos>
          <pr_pos
           name="CompatOrderMult"
-          id="2051"
+          id="86012"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -4281,7 +4289,7 @@
          </pr_pos>
          <pr_pos
           name="extensionality"
-          id="2872"
+          id="86833"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4290,7 +4298,7 @@
          </pr_pos>
          <pr_pos
           name="subset_refl"
-          id="2890"
+          id="86851"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4299,7 +4307,7 @@
          </pr_pos>
          <pr_pos
           name="subset_trans"
-          id="2893"
+          id="86854"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4308,7 +4316,7 @@
          </pr_pos>
          <pr_pos
           name="empty_def1"
-          id="2909"
+          id="86870"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4317,7 +4325,7 @@
          </pr_pos>
          <pr_pos
           name="mem_empty"
-          id="2910"
+          id="86871"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4326,7 +4334,7 @@
          </pr_pos>
          <pr_pos
           name="add_def1"
-          id="2913"
+          id="86874"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4335,7 +4343,7 @@
          </pr_pos>
          <pr_pos
           name="remove_def1"
-          id="2924"
+          id="86885"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4344,7 +4352,7 @@
          </pr_pos>
          <pr_pos
           name="add_remove"
-          id="2929"
+          id="86890"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4353,7 +4361,7 @@
          </pr_pos>
          <pr_pos
           name="remove_add"
-          id="2933"
+          id="86894"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4362,7 +4370,7 @@
          </pr_pos>
          <pr_pos
           name="subset_remove"
-          id="2937"
+          id="86898"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4371,7 +4379,7 @@
          </pr_pos>
          <pr_pos
           name="union_def1"
-          id="2942"
+          id="86903"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4380,7 +4388,7 @@
          </pr_pos>
          <pr_pos
           name="inter_def1"
-          id="2949"
+          id="86910"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4389,7 +4397,7 @@
          </pr_pos>
          <pr_pos
           name="diff_def1"
-          id="2956"
+          id="86917"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4398,7 +4406,7 @@
          </pr_pos>
          <pr_pos
           name="subset_diff"
-          id="2962"
+          id="86923"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4407,7 +4415,7 @@
          </pr_pos>
          <pr_pos
           name="choose_def"
-          id="2968"
+          id="86929"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4416,7 +4424,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_nonneg"
-          id="2973"
+          id="86934"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4425,7 +4433,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_empty"
-          id="2976"
+          id="86937"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4434,7 +4442,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_add"
-          id="2979"
+          id="86940"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4443,7 +4451,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_remove"
-          id="2984"
+          id="86945"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4452,7 +4460,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_subset"
-          id="2989"
+          id="86950"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4461,7 +4469,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal1"
-          id="2994"
+          id="86955"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -4470,7 +4478,7 @@
          </pr_pos>
          <pr_pos
           name="min_elt_def1"
-          id="3033"
+          id="86994"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -4479,7 +4487,7 @@
          </pr_pos>
          <pr_pos
           name="min_elt_def2"
-          id="3036"
+          id="86997"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -4488,7 +4496,7 @@
          </pr_pos>
          <pr_pos
           name="max_elt_def1"
-          id="3043"
+          id="87004"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -4497,7 +4505,7 @@
          </pr_pos>
          <pr_pos
           name="max_elt_def2"
-          id="3046"
+          id="87007"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -4506,7 +4514,7 @@
          </pr_pos>
          <pr_pos
           name="below_def"
-          id="3053"
+          id="87014"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -4515,7 +4523,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_below"
-          id="3058"
+          id="87019"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -4524,7 +4532,7 @@
          </pr_pos>
          <pr_pos
           name="Select_eq"
-          id="3123"
+          id="87084"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -4533,7 +4541,7 @@
          </pr_pos>
          <pr_pos
           name="Select_neq"
-          id="3132"
+          id="87093"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -4542,7 +4550,7 @@
          </pr_pos>
          <pr_pos
           name="Const"
-          id="3143"
+          id="87104"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -4551,28 +4559,28 @@
          </pr_pos>
          <pr_pos
           name="succ_def"
-          id="3787"
+          id="87748"
           ip_theory="S">
           <ip_qualid
            name="succ_def"/>
          </pr_pos>
          <pr_pos
           name="pred_def"
-          id="3794"
+          id="87755"
           ip_theory="S">
           <ip_qualid
            name="pred_def"/>
          </pr_pos>
          <pr_pos
           name="partial_solution_eq_prefix"
-          id="4310"
+          id="88270"
           ip_theory="Solution">
           <ip_qualid
            name="partial_solution_eq_prefix"/>
          </pr_pos>
          <pr_pos
           name="no_duplicate"
-          id="4349"
+          id="88309"
           ip_theory="Solution">
           <ip_qualid
            name="no_duplicate"/>
@@ -4585,407 +4593,407 @@
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="842"/>
+           id="84808"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="843"/>
+           id="84809"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="844"/>
+           id="84810"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="847"/>
+           id="84813"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="1944"/>
+           id="85905"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="1945"/>
+           id="85906"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="1946"/>
+           id="85907"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2858"/>
+           id="86819"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2861"/>
+           id="86822"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2900"/>
+           id="86861"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2912"/>
+           id="86873"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2918"/>
+           id="86879"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2923"/>
+           id="86884"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2941"/>
+           id="86902"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2948"/>
+           id="86909"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2955"/>
+           id="86916"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2967"/>
+           id="86928"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2971"/>
+           id="86932"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3031"/>
+           id="86992"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3041"/>
+           id="87002"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3051"/>
+           id="87012"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3087"/>
+           id="87048"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3090"/>
+           id="87051"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3141"/>
+           id="87102"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3785"/>
+           id="87746"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3792"/>
+           id="87753"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3809"/>
+           id="87769"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="4263"/>
+           id="88223"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1947"/>
+           id="85908"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1954"/>
+           id="85915"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1957"/>
+           id="85918"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1960"/>
+           id="85921"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1963"/>
+           id="85924"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1966"/>
+           id="85927"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1971"/>
+           id="85932"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1978"/>
+           id="85939"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1985"/>
+           id="85946"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2003"/>
+           id="85964"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2008"/>
+           id="85969"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2011"/>
+           id="85972"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2023"/>
+           id="85984"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2026"/>
+           id="85987"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2033"/>
+           id="85994"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2038"/>
+           id="85999"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2043"/>
+           id="86004"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2044"/>
+           id="86005"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2051"/>
+           id="86012"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2872"/>
+           id="86833"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2890"/>
+           id="86851"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2893"/>
+           id="86854"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2909"/>
+           id="86870"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2910"/>
+           id="86871"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2913"/>
+           id="86874"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2924"/>
+           id="86885"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2929"/>
+           id="86890"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2933"/>
+           id="86894"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2937"/>
+           id="86898"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2942"/>
+           id="86903"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2949"/>
+           id="86910"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2956"/>
+           id="86917"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2962"/>
+           id="86923"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2968"/>
+           id="86929"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2973"/>
+           id="86934"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2976"/>
+           id="86937"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2979"/>
+           id="86940"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2984"/>
+           id="86945"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2989"/>
+           id="86950"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2994"/>
+           id="86955"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3033"/>
+           id="86994"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3036"/>
+           id="86997"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3043"/>
+           id="87004"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3046"/>
+           id="87007"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3053"/>
+           id="87014"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3058"/>
+           id="87019"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3123"/>
+           id="87084"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3132"/>
+           id="87093"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3143"/>
+           id="87104"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3787"/>
+           id="87748"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3794"/>
+           id="87755"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="4310"/>
+           id="88270"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="4349"/>
+           id="88309"/>
          </meta>
          <meta
           name="remove_type">
@@ -5010,17 +5018,17 @@
          <meta
           name="remove_type">
           <meta_arg_ts
-           id="3803"/>
+           id="87763"/>
          </meta>
          <meta
           name="remove_type">
           <meta_arg_ts
-           id="4264"/>
+           id="88224"/>
          </meta>
          <meta
           name="remove_type">
           <meta_arg_ts
-           id="4329"/>
+           id="88289"/>
          </meta>
          <goal
           name="WP_parameter t3.4.10"
@@ -5049,7 +5057,7 @@
             <label
              name="expl:VC for t3"/>
             <proof
-             prover="1"
+             prover="2"
              timelimit="10"
              memlimit="0"
              obsolete="false"
@@ -5057,7 +5065,7 @@
              <result status="valid" time="0.41"/>
             </proof>
             <proof
-             prover="2"
+             prover="3"
              timelimit="125"
              memlimit="1000"
              obsolete="false"
@@ -5076,12 +5084,12 @@
         expl="11."
         sum="198a34d8ecd20eb9c98a216e52ea0a72"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="amemamixfix []V24V22adiffadiffadiffV0V1V2V23Iaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25EFIainfix =V23aremoveV13V8FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV26amixfix []V18V27Aainfix &lt;V27V17Aainfix &lt;=V9V27Eqaeq_prefixV20V26V19AasolutionV26FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V29ainfix -ainfix +V28V15V29Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28apredaaddV13V2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31ainfix -ainfix +V30V31V15Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30asuccaaddV13V1Iainfix &gt;=V30c0FANainfix =amixfix []V14V33V32Iainfix &lt;V33V15Aainfix &lt;=c0V33FAainfix &lt;V32anAainfix &lt;=c0V32qamemV32V16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalV16anAainfix &lt;=c0V15LaremoveV13V0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11V13FLamin_eltV8INais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV34amixfix []V10V35Aainfix &lt;V35V9Aainfix &lt;=V3V35Eqamemamixfix []V34V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V34V11AasolutionV34FAainfix &lt;V36V37IamemV37V8IamemV36adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V39ainfix -ainfix +V38V5V39Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38V2Iainfix &gt;=V38c0FANainfix =amixfix []V6V41ainfix -ainfix +V40V41V5Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40V1Iainfix &gt;=V40c0FANainfix =amixfix []V6V43V42Iainfix &lt;V43V5Aainfix &lt;=c0V43FAainfix &lt;V42anAainfix &lt;=c0V42qamemV42V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="1"
+         prover="2"
          timelimit="30"
          memlimit="0"
          obsolete="false"
@@ -5134,7 +5142,7 @@
          <ts_pos
           name="ref"
           arity="1"
-          id="3803"
+          id="87763"
           ip_theory="Ref">
           <ip_library
            name="ref"/>
@@ -5144,7 +5152,7 @@
          <ts_pos
           name="solution"
           arity="0"
-          id="4264"
+          id="88224"
           ip_theory="Solution">
           <ip_qualid
            name="solution"/>
@@ -5152,7 +5160,7 @@
          <ts_pos
           name="solutions"
           arity="0"
-          id="4329"
+          id="88289"
           ip_theory="Solution">
           <ip_qualid
            name="solutions"/>
@@ -5168,7 +5176,7 @@
          </ls_pos>
          <ls_pos
           name="zero"
-          id="842"
+          id="84808"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5177,7 +5185,7 @@
          </ls_pos>
          <ls_pos
           name="one"
-          id="843"
+          id="84809"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5186,7 +5194,7 @@
          </ls_pos>
          <ls_pos
           name="infix &lt;"
-          id="844"
+          id="84810"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5195,7 +5203,7 @@
          </ls_pos>
          <ls_pos
           name="infix &gt;"
-          id="847"
+          id="84813"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5204,7 +5212,7 @@
          </ls_pos>
          <ls_pos
           name="infix +"
-          id="1944"
+          id="85905"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5213,7 +5221,7 @@
          </ls_pos>
          <ls_pos
           name="prefix -"
-          id="1945"
+          id="85906"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5222,7 +5230,7 @@
          </ls_pos>
          <ls_pos
           name="infix *"
-          id="1946"
+          id="85907"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5231,7 +5239,7 @@
          </ls_pos>
          <ls_pos
           name="mem"
-          id="2858"
+          id="86819"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5240,7 +5248,7 @@
          </ls_pos>
          <ls_pos
           name="infix =="
-          id="2861"
+          id="86822"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5249,7 +5257,7 @@
          </ls_pos>
          <ls_pos
           name="empty"
-          id="2900"
+          id="86861"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5258,7 +5266,7 @@
          </ls_pos>
          <ls_pos
           name="add"
-          id="2912"
+          id="86873"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5267,7 +5275,7 @@
          </ls_pos>
          <ls_pos
           name="singleton"
-          id="2918"
+          id="86879"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5276,7 +5284,7 @@
          </ls_pos>
          <ls_pos
           name="remove"
-          id="2923"
+          id="86884"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5285,7 +5293,7 @@
          </ls_pos>
          <ls_pos
           name="union"
-          id="2941"
+          id="86902"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5294,7 +5302,7 @@
          </ls_pos>
          <ls_pos
           name="inter"
-          id="2948"
+          id="86909"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5303,7 +5311,7 @@
          </ls_pos>
          <ls_pos
           name="diff"
-          id="2955"
+          id="86916"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5312,7 +5320,7 @@
          </ls_pos>
          <ls_pos
           name="choose"
-          id="2967"
+          id="86928"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5321,7 +5329,7 @@
          </ls_pos>
          <ls_pos
           name="cardinal"
-          id="2971"
+          id="86932"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5330,7 +5338,7 @@
          </ls_pos>
          <ls_pos
           name="min_elt"
-          id="3031"
+          id="86992"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -5339,7 +5347,7 @@
          </ls_pos>
          <ls_pos
           name="max_elt"
-          id="3041"
+          id="87002"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -5348,7 +5356,7 @@
          </ls_pos>
          <ls_pos
           name="below"
-          id="3051"
+          id="87012"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -5357,7 +5365,7 @@
          </ls_pos>
          <ls_pos
           name="get"
-          id="3087"
+          id="87048"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -5366,7 +5374,7 @@
          </ls_pos>
          <ls_pos
           name="set"
-          id="3090"
+          id="87051"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -5375,7 +5383,7 @@
          </ls_pos>
          <ls_pos
           name="const"
-          id="3141"
+          id="87102"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -5384,21 +5392,21 @@
          </ls_pos>
          <ls_pos
           name="succ"
-          id="3785"
+          id="87746"
           ip_theory="S">
           <ip_qualid
            name="succ"/>
          </ls_pos>
          <ls_pos
           name="pred"
-          id="3792"
+          id="87753"
           ip_theory="S">
           <ip_qualid
            name="pred"/>
          </ls_pos>
          <ls_pos
           name="prefix !"
-          id="3809"
+          id="87769"
           ip_theory="Ref">
           <ip_library
            name="ref"/>
@@ -5407,14 +5415,14 @@
          </ls_pos>
          <ls_pos
           name="n"
-          id="4263"
+          id="88223"
           ip_theory="Solution">
           <ip_qualid
            name="n"/>
          </ls_pos>
          <pr_pos
           name="Assoc"
-          id="1947"
+          id="85908"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5425,7 +5433,7 @@
          </pr_pos>
          <pr_pos
           name="Unit_def_l"
-          id="1954"
+          id="85915"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5436,7 +5444,7 @@
          </pr_pos>
          <pr_pos
           name="Unit_def_r"
-          id="1957"
+          id="85918"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5447,7 +5455,7 @@
          </pr_pos>
          <pr_pos
           name="Inv_def_l"
-          id="1960"
+          id="85921"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5458,7 +5466,7 @@
          </pr_pos>
          <pr_pos
           name="Inv_def_r"
-          id="1963"
+          id="85924"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5469,7 +5477,7 @@
          </pr_pos>
          <pr_pos
           name="Comm"
-          id="1966"
+          id="85927"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5482,7 +5490,7 @@
          </pr_pos>
          <pr_pos
           name="Assoc"
-          id="1971"
+          id="85932"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5493,7 +5501,7 @@
          </pr_pos>
          <pr_pos
           name="Mul_distr_l"
-          id="1978"
+          id="85939"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5502,7 +5510,7 @@
          </pr_pos>
          <pr_pos
           name="Mul_distr_r"
-          id="1985"
+          id="85946"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5511,7 +5519,7 @@
          </pr_pos>
          <pr_pos
           name="Comm"
-          id="2003"
+          id="85964"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5522,7 +5530,7 @@
          </pr_pos>
          <pr_pos
           name="Unitary"
-          id="2008"
+          id="85969"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5531,7 +5539,7 @@
          </pr_pos>
          <pr_pos
           name="NonTrivialRing"
-          id="2011"
+          id="85972"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5540,7 +5548,7 @@
          </pr_pos>
          <pr_pos
           name="Refl"
-          id="2023"
+          id="85984"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5549,7 +5557,7 @@
          </pr_pos>
          <pr_pos
           name="Trans"
-          id="2026"
+          id="85987"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5558,7 +5566,7 @@
          </pr_pos>
          <pr_pos
           name="Antisymm"
-          id="2033"
+          id="85994"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5567,7 +5575,7 @@
          </pr_pos>
          <pr_pos
           name="Total"
-          id="2038"
+          id="85999"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5576,7 +5584,7 @@
          </pr_pos>
          <pr_pos
           name="ZeroLessOne"
-          id="2043"
+          id="86004"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5585,7 +5593,7 @@
          </pr_pos>
          <pr_pos
           name="CompatOrderAdd"
-          id="2044"
+          id="86005"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5594,7 +5602,7 @@
          </pr_pos>
          <pr_pos
           name="CompatOrderMult"
-          id="2051"
+          id="86012"
           ip_theory="Int">
           <ip_library
            name="int"/>
@@ -5603,7 +5611,7 @@
          </pr_pos>
          <pr_pos
           name="extensionality"
-          id="2872"
+          id="86833"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5612,7 +5620,7 @@
          </pr_pos>
          <pr_pos
           name="subset_refl"
-          id="2890"
+          id="86851"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5621,7 +5629,7 @@
          </pr_pos>
          <pr_pos
           name="subset_trans"
-          id="2893"
+          id="86854"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5630,7 +5638,7 @@
          </pr_pos>
          <pr_pos
           name="empty_def1"
-          id="2909"
+          id="86870"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5639,7 +5647,7 @@
          </pr_pos>
          <pr_pos
           name="mem_empty"
-          id="2910"
+          id="86871"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5648,7 +5656,7 @@
          </pr_pos>
          <pr_pos
           name="add_def1"
-          id="2913"
+          id="86874"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5657,7 +5665,7 @@
          </pr_pos>
          <pr_pos
           name="add_remove"
-          id="2929"
+          id="86890"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5666,7 +5674,7 @@
          </pr_pos>
          <pr_pos
           name="remove_add"
-          id="2933"
+          id="86894"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5675,7 +5683,7 @@
          </pr_pos>
          <pr_pos
           name="subset_remove"
-          id="2937"
+          id="86898"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5684,7 +5692,7 @@
          </pr_pos>
          <pr_pos
           name="union_def1"
-          id="2942"
+          id="86903"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5693,7 +5701,7 @@
          </pr_pos>
          <pr_pos
           name="inter_def1"
-          id="2949"
+          id="86910"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5702,7 +5710,7 @@
          </pr_pos>
          <pr_pos
           name="subset_diff"
-          id="2962"
+          id="86923"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5711,7 +5719,7 @@
          </pr_pos>
          <pr_pos
           name="choose_def"
-          id="2968"
+          id="86929"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5720,7 +5728,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_nonneg"
-          id="2973"
+          id="86934"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5729,7 +5737,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_add"
-          id="2979"
+          id="86940"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5738,7 +5746,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_remove"
-          id="2984"
+          id="86945"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5747,7 +5755,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_subset"
-          id="2989"
+          id="86950"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5756,7 +5764,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal1"
-          id="2994"
+          id="86955"
           ip_theory="Fset">
           <ip_library
            name="set"/>
@@ -5765,7 +5773,7 @@
          </pr_pos>
          <pr_pos
           name="min_elt_def2"
-          id="3036"
+          id="86997"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -5774,7 +5782,7 @@
          </pr_pos>
          <pr_pos
           name="max_elt_def1"
-          id="3043"
+          id="87004"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -5783,7 +5791,7 @@
          </pr_pos>
          <pr_pos
           name="max_elt_def2"
-          id="3046"
+          id="87007"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -5792,7 +5800,7 @@
          </pr_pos>
          <pr_pos
           name="below_def"
-          id="3053"
+          id="87014"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -5801,7 +5809,7 @@
          </pr_pos>
          <pr_pos
           name="cardinal_below"
-          id="3058"
+          id="87019"
           ip_theory="Fsetint">
           <ip_library
            name="set"/>
@@ -5810,7 +5818,7 @@
          </pr_pos>
          <pr_pos
           name="Select_eq"
-          id="3123"
+          id="87084"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -5819,7 +5827,7 @@
          </pr_pos>
          <pr_pos
           name="Select_neq"
-          id="3132"
+          id="87093"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -5828,7 +5836,7 @@
          </pr_pos>
          <pr_pos
           name="Const"
-          id="3143"
+          id="87104"
           ip_theory="Map">
           <ip_library
            name="map"/>
@@ -5837,28 +5845,28 @@
          </pr_pos>
          <pr_pos
           name="succ_def"
-          id="3787"
+          id="87748"
           ip_theory="S">
           <ip_qualid
            name="succ_def"/>
          </pr_pos>
          <pr_pos
           name="pred_def"
-          id="3794"
+          id="87755"
           ip_theory="S">
           <ip_qualid
            name="pred_def"/>
          </pr_pos>
          <pr_pos
           name="partial_solution_eq_prefix"
-          id="4310"
+          id="88270"
           ip_theory="Solution">
           <ip_qualid
            name="partial_solution_eq_prefix"/>
          </pr_pos>
          <pr_pos
           name="no_duplicate"
-          id="4349"
+          id="88309"
           ip_theory="Solution">
           <ip_qualid
            name="no_duplicate"/>
@@ -5871,387 +5879,387 @@
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="842"/>
+           id="84808"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="843"/>
+           id="84809"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="844"/>
+           id="84810"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="847"/>
+           id="84813"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="1944"/>
+           id="85905"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="1945"/>
+           id="85906"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="1946"/>
+           id="85907"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2858"/>
+           id="86819"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2861"/>
+           id="86822"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2900"/>
+           id="86861"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2912"/>
+           id="86873"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2918"/>
+           id="86879"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2923"/>
+           id="86884"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2941"/>
+           id="86902"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2948"/>
+           id="86909"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2955"/>
+           id="86916"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2967"/>
+           id="86928"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="2971"/>
+           id="86932"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3031"/>
+           id="86992"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3041"/>
+           id="87002"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3051"/>
+           id="87012"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3087"/>
+           id="87048"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3090"/>
+           id="87051"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3141"/>
+           id="87102"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3785"/>
+           id="87746"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3792"/>
+           id="87753"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="3809"/>
+           id="87769"/>
          </meta>
          <meta
           name="remove_logic">
           <meta_arg_ls
-           id="4263"/>
+           id="88223"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1947"/>
+           id="85908"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1954"/>
+           id="85915"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1957"/>
+           id="85918"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1960"/>
+           id="85921"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1963"/>
+           id="85924"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1966"/>
+           id="85927"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1971"/>
+           id="85932"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1978"/>
+           id="85939"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="1985"/>
+           id="85946"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2003"/>
+           id="85964"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2008"/>
+           id="85969"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2011"/>
+           id="85972"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2023"/>
+           id="85984"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2026"/>
+           id="85987"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2033"/>
+           id="85994"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2038"/>
+           id="85999"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2043"/>
+           id="86004"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2044"/>
+           id="86005"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2051"/>
+           id="86012"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2872"/>
+           id="86833"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2890"/>
+           id="86851"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2893"/>
+           id="86854"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2909"/>
+           id="86870"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2910"/>
+           id="86871"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2913"/>
+           id="86874"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2929"/>
+           id="86890"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2933"/>
+           id="86894"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2937"/>
+           id="86898"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2942"/>
+           id="86903"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2949"/>
+           id="86910"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2962"/>
+           id="86923"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2968"/>
+           id="86929"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2973"/>
+           id="86934"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2979"/>
+           id="86940"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2984"/>
+           id="86945"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2989"/>
+           id="86950"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="2994"/>
+           id="86955"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3036"/>
+           id="86997"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3043"/>
+           id="87004"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3046"/>
+           id="87007"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3053"/>
+           id="87014"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3058"/>
+           id="87019"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3123"/>
+           id="87084"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3132"/>
+           id="87093"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3143"/>
+           id="87104"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3787"/>
+           id="87748"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="3794"/>
+           id="87755"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="4310"/>
+           id="88270"/>
          </meta>
          <meta
           name="remove_prop">
           <meta_arg_pr
-           id="4349"/>
+           id="88309"/>
          </meta>
          <meta
           name="remove_type">
@@ -6276,17 +6284,17 @@
          <meta
           name="remove_type">
           <meta_arg_ts
-           id="3803"/>
+           id="87763"/>
          </meta>
          <meta
           name="remove_type">
           <meta_arg_ts
-           id="4264"/>
+           id="88224"/>
          </meta>
          <meta
           name="remove_type">
           <meta_arg_ts
-           id="4329"/>
+           id="88289"/>
          </meta>
          <goal
           name="WP_parameter t3.4.11"
@@ -6315,7 +6323,7 @@
             <label
              name="expl:VC for t3"/>
             <proof
-             prover="1"
+             prover="2"
              timelimit="30"
              memlimit="0"
              obsolete="false"
@@ -6347,7 +6355,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6355,7 +6363,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6383,7 +6391,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6391,7 +6399,7 @@
          <result status="valid" time="0.04"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6421,7 +6429,7 @@
        <result status="valid" time="0.07"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -6436,14 +6444,14 @@
       expl="6. postcondition"
       sum="7241aea2264a3cd8970adc067164231a"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="postconditionaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqaeq_prefixV12V13V11AasolutionV13FAasortedV10V3V9Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3INNais_emptyV8Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffadiffadiffV0V1V2V8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18V8IamemV17adiffadiffadiffV0V1V2V8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetV8adiffadiffV0V1V2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19V2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21V1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter t3.6.1"
         locfile="../queens.mlw"
@@ -6464,7 +6472,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6472,7 +6480,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6500,7 +6508,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6508,7 +6516,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6536,7 +6544,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6544,7 +6552,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6572,7 +6580,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6592,7 +6600,7 @@
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="4"
+         prover="6"
          timelimit="10"
          memlimit="0"
          edited="queens_WP_NQueensSets_WP_parameter_t3_2.v"
@@ -6613,7 +6621,7 @@
         <label
          name="expl:VC for t3"/>
         <proof
-         prover="1"
+         prover="2"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -6621,7 +6629,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6649,7 +6657,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="1"
+         prover="2"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -6657,7 +6665,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6685,7 +6693,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="1"
+         prover="2"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -6693,7 +6701,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6701,7 +6709,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6729,7 +6737,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="1"
+         prover="2"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -6737,7 +6745,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6745,7 +6753,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6762,14 +6770,14 @@
       expl="7. postcondition"
       sum="dc0ba02985003a8512c61345beecf5d7"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="postconditionaeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNais_emptyV0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11V2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13V1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15V0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalV0anAainfix &lt;=c0V5FF">
       <label
        name="expl:VC for t3"/>
       <transf
        name="split_goal"
        proved="true"
-       expanded="true">
+       expanded="false">
        <goal
         name="WP_parameter t3.7.1"
         locfile="../queens.mlw"
@@ -6790,7 +6798,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6798,7 +6806,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6826,7 +6834,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6834,7 +6842,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6862,7 +6870,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6870,7 +6878,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6898,7 +6906,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="5"
+         prover="7"
          timelimit="10"
          memlimit="0"
          obsolete="false"
@@ -6906,7 +6914,7 @@
          <result status="valid" time="0.03"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6934,7 +6942,7 @@
          <result status="valid" time="0.08"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6962,7 +6970,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6990,7 +6998,7 @@
          <result status="valid" time="0.00"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -6998,7 +7006,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -7026,7 +7034,7 @@
          <result status="valid" time="0.01"/>
         </proof>
         <proof
-         prover="3"
+         prover="4"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -7034,7 +7042,7 @@
          <result status="valid" time="0.02"/>
         </proof>
         <proof
-         prover="7"
+         prover="9"
          timelimit="25"
          memlimit="1000"
          obsolete="false"
@@ -7053,14 +7061,14 @@
     expl="VC for queens3"
     sum="0e18fc3844ca8be4125858f8eb10fb37"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="aeq_solV11amixfix []V7V12Aainfix &lt;V12V10Aainfix &lt;=c0V12EqasolutionV11FAasortedV7c0V6Aainfix =V10V6Iaeq_prefixV2V7V1Aaeq_prefixV4V9V8Aaeq_solV13amixfix []V7V14Aainfix &lt;V14V6Aainfix &lt;=V1V14Eqaeq_prefixV9V13V8AasolutionV13FAasortedV7V1V6Aainfix =V8V3Aainfix &gt;=ainfix -V6V1c0Lainfix -V6V1FAapartial_solutionV3V4ANainfix =amixfix []V4V16ainfix -ainfix +V15V3V16Iainfix &lt;V16V3Aainfix &lt;=c0V16FqNamemV15aemptyIainfix &gt;=V15c0FANainfix =amixfix []V4V18ainfix -ainfix +V17V18V3Iainfix &lt;V18V3Aainfix &lt;=c0V18FqNamemV17aemptyIainfix &gt;=V17c0FANainfix =amixfix []V4V20V19Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19V5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalV5anAainfix &lt;=c0V3LabelowV0Iainfix =V3c0Aainfix =V1c0Aainfix =V0anAainfix &lt;=c0V0FF">
     <label
      name="expl:VC for queens3"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter queens3.1"
       locfile="../queens.mlw"
@@ -7081,7 +7089,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -7089,7 +7097,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="3"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -7097,7 +7105,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="25"
        memlimit="1000"
        obsolete="false"
@@ -7105,7 +7113,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="6"
+       prover="8"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -7133,7 +7141,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -7141,7 +7149,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -7150,6 +7158,471 @@
       </proof>
      </goal>
     </transf>
+   </goal>
+  </theory>
+  <theory
+   name="BitwiseArithmetic"
+   locfile="../queens.mlw"
+   loclnum="169" loccnumb="7" loccnume="24"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
+   name="Bits"
+   locfile="../queens.mlw"
+   loclnum="184" loccnumb="7" loccnume="11"
+   verified="true"
+   expanded="true">
+   <label
+    name="the 1-bits of an integer, as a set of integers"/>
+  </theory>
+  <theory
+   name="NQueensBits"
+   locfile="../queens.mlw"
+   loclnum="229" loccnumb="7" loccnume="18"
+   verified="false"
+   expanded="true">
+   <goal
+    name="WP_parameter t"
+    locfile="../queens.mlw"
+    loclnum="245" loccnumb="10" loccnume="11"
+    expl="VC for t"
+    sum="7d6c68457eb36f35045803bb0cd3eb7e"
+    proved="false"
+    expanded="true"
+    shape="iaeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6Fiaeq_prefixV4V14V3Aaeq_prefixV6V16V15Aaeq_solV17amixfix []V14V18Aainfix &lt;V18V13Aainfix &lt;=V3V18Eqaeq_prefixV16V17V15AasolutionV17FAasortedV14V3V13Aainfix =V15V5Aainfix &gt;=ainfix -V13V3c0Aainfix =V11ainfix -V13V3ainfix &lt;acardinalabitsV29acardinalabitsV12Aainfix &lt;=c0acardinalabitsV12Aaeq_prefixV4V24V3Aaeq_prefixV6V26V28Aaeq_solV30amixfix []V24V31Aainfix &lt;V31V23Aainfix &lt;=V3V31Eqamemamixfix []V30V28adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV29Aaeq_prefixV26V30V28AasolutionV30FAainfix &lt;V32V33IamemV33abitsV29IamemV32adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV29FAasortedV24V3V23Aapartial_solutionV28V26AasubsetabitsV29adiffadiffabitsV0abitsV1abitsV2Aainfix =V28V5Aainfix &gt;=ainfix -V23V3c0Aainfix =V27ainfix -V23V3Iainfix =V29ainfix -V12V19FIainfix =V28ainfix -V25c1FIainfix =V27ainfix +V11ainfix -V23V13FIaeq_prefixV14V24V13Aaeq_prefixV20V26V25Aaeq_solV34amixfix []V24V35Aainfix &lt;V35V23Aainfix &lt;=V13V35Eqaeq_prefixV26V34V25AasolutionV34FAasortedV24V13V23Aainfix =V25V21Aainfix &gt;=ainfix -V23V13c0FAapartial_solutionV21V20ANainfix =amixfix []V20V37ainfix -ainfix +V36V21V37Iainfix &lt;V37V21Aainfix &lt;=c0V37FqNamemV36abitsadivainfix +V2V19c2Iainfix &gt;=V36c0FANainfix =amixfix []V20V39ainfix -ainfix +V38V39V21Iainfix &lt;V39V21Aainfix &lt;=c0V39FqNamemV38abitsainfix *ainfix +V1V19c2Iainfix &gt;=V38c0FANainfix =amixfix []V20V41V40Iainfix &lt;V41V21Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40abitsV22FAainfix &gt;=V13c0Aainfix =ainfix +V21acardinalabitsV22anAainfix &lt;=c0V21Aainfix &lt;acardinalabitsV22acardinalabitsV0Aainfix &lt;=c0acardinalabitsV0Lainfix -V0V19ANainfix =c2c0Iainfix =V21ainfix +V15c1FIainfix =V20amixfix [&lt;-]V16V15amin_eltabitsV19FANainfix =V19c0Lainfix &amp;V12aprefix -V12Nainfix =V12c0Iaeq_prefixV4V14V3Aaeq_prefixV6V16V15Aaeq_solV42amixfix []V14V43Aainfix &lt;V43V13Aainfix &lt;=V3V43Eqamemamixfix []V42V15adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV12Aaeq_prefixV16V42V15AasolutionV42FAainfix &lt;V44V45IamemV45abitsV12IamemV44adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV12FAasortedV14V3V13Aapartial_solutionV15V16AasubsetabitsV12adiffadiffabitsV0abitsV1abitsV2Aainfix =V15V5Aainfix &gt;=ainfix -V13V3c0Aainfix =V11ainfix -V13V3FAaeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV46amixfix []V4V47Aainfix &lt;V47V3Aainfix &lt;=V3V47Eqamemamixfix []V46V5adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2Aaeq_prefixV6V46V5AasolutionV46FAainfix &lt;V48V49IamemV49abitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2IamemV48adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2FAasortedV4V3V3Aapartial_solutionV5V6Aasubsetabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2adiffadiffabitsV0abitsV1abitsV2Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3Nainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V51ainfix -ainfix +V50V5V51Iainfix &lt;V51V5Aainfix &lt;=c0V51FqNamemV50abitsV2Iainfix &gt;=V50c0FANainfix =amixfix []V6V53ainfix -ainfix +V52V53V5Iainfix &lt;V53V5Aainfix &lt;=c0V53FqNamemV52abitsV1Iainfix &gt;=V52c0FANainfix =amixfix []V6V55V54Iainfix &lt;V55V5Aainfix &lt;=c0V55FAainfix &lt;V54anAainfix &lt;=c0V54qamemV54abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+    <label
+     name="expl:VC for t"/>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter t.1"
+      locfile="../queens.mlw"
+      loclnum="245" loccnumb="10" loccnume="11"
+      expl="1. loop invariant init"
+      sum="5eb93cf1fdd8008758230816c25e4093"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initaeq_prefixV4V4V3Aaeq_prefixV6V6V5Aaeq_solV7amixfix []V4V8Aainfix &lt;V8V3Aainfix &lt;=V3V8Eqamemamixfix []V7V5adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2Aaeq_prefixV6V7V5AasolutionV7FAainfix &lt;V9V10IamemV10abitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2IamemV9adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2FAasortedV4V3V3Aapartial_solutionV5V6Aasubsetabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2adiffadiffabitsV0abitsV1abitsV2Aainfix &gt;=ainfix -V3V3c0Aainfix =c0ainfix -V3V3INainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11abitsV2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13abitsV1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+      <label
+       name="expl:VC for t"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter t.2"
+      locfile="../queens.mlw"
+      loclnum="245" loccnumb="10" loccnume="11"
+      expl="2. precondition"
+      sum="e8e563f7161523f940f5c199d743559d"
+      proved="false"
+      expanded="false"
+      shape="preconditionNainfix =V13c0Lainfix &amp;V8aprefix -V8INainfix =V8c0Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV14amixfix []V10V15Aainfix &lt;V15V9Aainfix &lt;=V3V15Eqamemamixfix []V14V11adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8Aaeq_prefixV12V14V11AasolutionV14FAainfix &lt;V16V17IamemV17abitsV8IamemV16adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetabitsV8adiffadiffabitsV0abitsV1abitsV2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V19ainfix -ainfix +V18V5V19Iainfix &lt;V19V5Aainfix &lt;=c0V19FqNamemV18abitsV2Iainfix &gt;=V18c0FANainfix =amixfix []V6V21ainfix -ainfix +V20V21V5Iainfix &lt;V21V5Aainfix &lt;=c0V21FqNamemV20abitsV1Iainfix &gt;=V20c0FANainfix =amixfix []V6V23V22Iainfix &lt;V23V5Aainfix &lt;=c0V23FAainfix &lt;V22anAainfix &lt;=c0V22qamemV22abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+      <label
+       name="expl:VC for t"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.98"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter t.3"
+      locfile="../queens.mlw"
+      loclnum="245" loccnumb="10" loccnume="11"
+      expl="3. precondition"
+      sum="1c85aaa853788cfa980b47ebebb2d7e3"
+      proved="true"
+      expanded="false"
+      shape="preconditionNainfix =c2c0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11amin_eltabitsV13FINainfix =V13c0Lainfix &amp;V8aprefix -V8INainfix =V8c0Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV16amixfix []V10V17Aainfix &lt;V17V9Aainfix &lt;=V3V17Eqamemamixfix []V16V11adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8Aaeq_prefixV12V16V11AasolutionV16FAainfix &lt;V18V19IamemV19abitsV8IamemV18adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetabitsV8adiffadiffabitsV0abitsV1abitsV2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V21ainfix -ainfix +V20V5V21Iainfix &lt;V21V5Aainfix &lt;=c0V21FqNamemV20abitsV2Iainfix &gt;=V20c0FANainfix =amixfix []V6V23ainfix -ainfix +V22V23V5Iainfix &lt;V23V5Aainfix &lt;=c0V23FqNamemV22abitsV1Iainfix &gt;=V22c0FANainfix =amixfix []V6V25V24Iainfix &lt;V25V5Aainfix &lt;=c0V25FAainfix &lt;V24anAainfix &lt;=c0V24qamemV24abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+      <label
+       name="expl:VC for t"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter t.4"
+      locfile="../queens.mlw"
+      loclnum="245" loccnumb="10" loccnume="11"
+      expl="4. variant decrease"
+      sum="0155ed8e348ccbb57004b5fb00fc0cf4"
+      proved="false"
+      expanded="false"
+      shape="variant decreaseainfix &lt;acardinalabitsV16acardinalabitsV0Aainfix &lt;=c0acardinalabitsV0Lainfix -V0V13INainfix =c2c0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11amin_eltabitsV13FINainfix =V13c0Lainfix &amp;V8aprefix -V8INainfix =V8c0Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV17amixfix []V10V18Aainfix &lt;V18V9Aainfix &lt;=V3V18Eqamemamixfix []V17V11adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8Aaeq_prefixV12V17V11AasolutionV17FAainfix &lt;V19V20IamemV20abitsV8IamemV19adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetabitsV8adiffadiffabitsV0abitsV1abitsV2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V22ainfix -ainfix +V21V5V22Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21abitsV2Iainfix &gt;=V21c0FANainfix =amixfix []V6V24ainfix -ainfix +V23V24V5Iainfix &lt;V24V5Aainfix &lt;=c0V24FqNamemV23abitsV1Iainfix &gt;=V23c0FANainfix =amixfix []V6V26V25Iainfix &lt;V26V5Aainfix &lt;=c0V26FAainfix &lt;V25anAainfix &lt;=c0V25qamemV25abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+      <label
+       name="expl:VC for t"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter t.5"
+      locfile="../queens.mlw"
+      loclnum="245" loccnumb="10" loccnume="11"
+      expl="5. precondition"
+      sum="15542c75ee613c1732de9f05ebaeeb3d"
+      proved="false"
+      expanded="false"
+      shape="preconditionapartial_solutionV15V14ANainfix =amixfix []V14V18ainfix -ainfix +V17V15V18Iainfix &lt;V18V15Aainfix &lt;=c0V18FqNamemV17abitsadivainfix +V2V13c2Iainfix &gt;=V17c0FANainfix =amixfix []V14V20ainfix -ainfix +V19V20V15Iainfix &lt;V20V15Aainfix &lt;=c0V20FqNamemV19abitsainfix *ainfix +V1V13c2Iainfix &gt;=V19c0FANainfix =amixfix []V14V22V21Iainfix &lt;V22V15Aainfix &lt;=c0V22FAainfix &lt;V21anAainfix &lt;=c0V21qamemV21abitsV16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalabitsV16anAainfix &lt;=c0V15Lainfix -V0V13INainfix =c2c0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11amin_eltabitsV13FINainfix =V13c0Lainfix &amp;V8aprefix -V8INainfix =V8c0Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV23amixfix []V10V24Aainfix &lt;V24V9Aainfix &lt;=V3V24Eqamemamixfix []V23V11adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8Aaeq_prefixV12V23V11AasolutionV23FAainfix &lt;V25V26IamemV26abitsV8IamemV25adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetabitsV8adiffadiffabitsV0abitsV1abitsV2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V28ainfix -ainfix +V27V5V28Iainfix &lt;V28V5Aainfix &lt;=c0V28FqNamemV27abitsV2Iainfix &gt;=V27c0FANainfix =amixfix []V6V30ainfix -ainfix +V29V30V5Iainfix &lt;V30V5Aainfix &lt;=c0V30FqNamemV29abitsV1Iainfix &gt;=V29c0FANainfix =amixfix []V6V32V31Iainfix &lt;V32V5Aainfix &lt;=c0V32FAainfix &lt;V31anAainfix &lt;=c0V31qamemV31abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+      <label
+       name="expl:VC for t"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.98"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter t.6"
+      locfile="../queens.mlw"
+      loclnum="245" loccnumb="10" loccnume="11"
+      expl="6. loop invariant preservation"
+      sum="f0d55309d0d2e82c86cad7d3825edc8c"
+      proved="false"
+      expanded="false"
+      shape="loop invariant preservationaeq_prefixV4V18V3Aaeq_prefixV6V20V22Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V3V25Eqamemamixfix []V24V22adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV23Aaeq_prefixV20V24V22AasolutionV24FAainfix &lt;V26V27IamemV27abitsV23IamemV26adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV23FAasortedV18V3V17Aapartial_solutionV22V20AasubsetabitsV23adiffadiffabitsV0abitsV1abitsV2Aainfix =V22V5Aainfix &gt;=ainfix -V17V3c0Aainfix =V21ainfix -V17V3Iainfix =V23ainfix -V8V13FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV28amixfix []V18V29Aainfix &lt;V29V17Aainfix &lt;=V9V29Eqaeq_prefixV20V28V19AasolutionV28FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V31ainfix -ainfix +V30V15V31Iainfix &lt;V31V15Aainfix &lt;=c0V31FqNamemV30abitsadivainfix +V2V13c2Iainfix &gt;=V30c0FANainfix =amixfix []V14V33ainfix -ainfix +V32V33V15Iainfix &lt;V33V15Aainfix &lt;=c0V33FqNamemV32abitsainfix *ainfix +V1V13c2Iainfix &gt;=V32c0FANainfix =amixfix []V14V35V34Iainfix &lt;V35V15Aainfix &lt;=c0V35FAainfix &lt;V34anAainfix &lt;=c0V34qamemV34abitsV16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalabitsV16anAainfix &lt;=c0V15Lainfix -V0V13INainfix =c2c0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11amin_eltabitsV13FINainfix =V13c0Lainfix &amp;V8aprefix -V8INainfix =V8c0Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV36amixfix []V10V37Aainfix &lt;V37V9Aainfix &lt;=V3V37Eqamemamixfix []V36V11adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8Aaeq_prefixV12V36V11AasolutionV36FAainfix &lt;V38V39IamemV39abitsV8IamemV38adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetabitsV8adiffadiffabitsV0abitsV1abitsV2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V41ainfix -ainfix +V40V5V41Iainfix &lt;V41V5Aainfix &lt;=c0V41FqNamemV40abitsV2Iainfix &gt;=V40c0FANainfix =amixfix []V6V43ainfix -ainfix +V42V43V5Iainfix &lt;V43V5Aainfix &lt;=c0V43FqNamemV42abitsV1Iainfix &gt;=V42c0FANainfix =amixfix []V6V45V44Iainfix &lt;V45V5Aainfix &lt;=c0V45FAainfix &lt;V44anAainfix &lt;=c0V44qamemV44abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+      <label
+       name="expl:VC for t"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter t.7"
+      locfile="../queens.mlw"
+      loclnum="245" loccnumb="10" loccnume="11"
+      expl="7. loop variant decrease"
+      sum="3140b4bd27ae2356815a29e8ec36f879"
+      proved="false"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;acardinalabitsV23acardinalabitsV8Aainfix &lt;=c0acardinalabitsV8Iainfix =V23ainfix -V8V13FIainfix =V22ainfix -V19c1FIainfix =V21ainfix +V7ainfix -V17V9FIaeq_prefixV10V18V9Aaeq_prefixV14V20V19Aaeq_solV24amixfix []V18V25Aainfix &lt;V25V17Aainfix &lt;=V9V25Eqaeq_prefixV20V24V19AasolutionV24FAasortedV18V9V17Aainfix =V19V15Aainfix &gt;=ainfix -V17V9c0FIapartial_solutionV15V14ANainfix =amixfix []V14V27ainfix -ainfix +V26V15V27Iainfix &lt;V27V15Aainfix &lt;=c0V27FqNamemV26abitsadivainfix +V2V13c2Iainfix &gt;=V26c0FANainfix =amixfix []V14V29ainfix -ainfix +V28V29V15Iainfix &lt;V29V15Aainfix &lt;=c0V29FqNamemV28abitsainfix *ainfix +V1V13c2Iainfix &gt;=V28c0FANainfix =amixfix []V14V31V30Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix &lt;V30anAainfix &lt;=c0V30qamemV30abitsV16FAainfix &gt;=V9c0Aainfix =ainfix +V15acardinalabitsV16anAainfix &lt;=c0V15Lainfix -V0V13INainfix =c2c0Iainfix =V15ainfix +V11c1FIainfix =V14amixfix [&lt;-]V12V11amin_eltabitsV13FINainfix =V13c0Lainfix &amp;V8aprefix -V8INainfix =V8c0Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV32amixfix []V10V33Aainfix &lt;V33V9Aainfix &lt;=V3V33Eqamemamixfix []V32V11adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8Aaeq_prefixV12V32V11AasolutionV32FAainfix &lt;V34V35IamemV35abitsV8IamemV34adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetabitsV8adiffadiffabitsV0abitsV1abitsV2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V37ainfix -ainfix +V36V5V37Iainfix &lt;V37V5Aainfix &lt;=c0V37FqNamemV36abitsV2Iainfix &gt;=V36c0FANainfix =amixfix []V6V39ainfix -ainfix +V38V39V5Iainfix &lt;V39V5Aainfix &lt;=c0V39FqNamemV38abitsV1Iainfix &gt;=V38c0FANainfix =amixfix []V6V41V40Iainfix &lt;V41V5Aainfix &lt;=c0V41FAainfix &lt;V40anAainfix &lt;=c0V40qamemV40abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+      <label
+       name="expl:VC for t"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.98"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter t.8"
+      locfile="../queens.mlw"
+      loclnum="245" loccnumb="10" loccnume="11"
+      expl="8. postcondition"
+      sum="db1aab700b02cfced40ae67705ce618a"
+      proved="false"
+      expanded="false"
+      shape="postconditionaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV13amixfix []V10V14Aainfix &lt;V14V9Aainfix &lt;=V3V14Eqaeq_prefixV12V13V11AasolutionV13FAasortedV10V3V9Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3INNainfix =V8c0Iaeq_prefixV4V10V3Aaeq_prefixV6V12V11Aaeq_solV15amixfix []V10V16Aainfix &lt;V16V9Aainfix &lt;=V3V16Eqamemamixfix []V15V11adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8Aaeq_prefixV12V15V11AasolutionV15FAainfix &lt;V17V18IamemV18abitsV8IamemV17adiffabitsainfix &amp;ainfix &amp;V0aprefix ~V1aprefix ~V2abitsV8FAasortedV10V3V9Aapartial_solutionV11V12AasubsetabitsV8adiffadiffabitsV0abitsV1abitsV2Aainfix =V11V5Aainfix &gt;=ainfix -V9V3c0Aainfix =V7ainfix -V9V3FINainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V20ainfix -ainfix +V19V5V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FqNamemV19abitsV2Iainfix &gt;=V19c0FANainfix =amixfix []V6V22ainfix -ainfix +V21V22V5Iainfix &lt;V22V5Aainfix &lt;=c0V22FqNamemV21abitsV1Iainfix &gt;=V21c0FANainfix =amixfix []V6V24V23Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;V23anAainfix &lt;=c0V23qamemV23abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+      <label
+       name="expl:VC for t"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter t.9"
+      locfile="../queens.mlw"
+      loclnum="245" loccnumb="10" loccnume="11"
+      expl="9. postcondition"
+      sum="ed2e37e5dbcc3c0c392c9c545864bd43"
+      proved="true"
+      expanded="false"
+      shape="postconditionaeq_prefixV4V7V3Aaeq_prefixV6V6V5Aaeq_solV9amixfix []V7V10Aainfix &lt;V10V8Aainfix &lt;=V3V10Eqaeq_prefixV6V9V5AasolutionV9FAasortedV7V3V8Aainfix &gt;=ainfix -V8V3c0Aainfix =c1ainfix -V8V3Iainfix =V8ainfix +V3c1FIainfix =V7amixfix [&lt;-]V4V3V6FINNainfix =V0c0Iapartial_solutionV5V6ANainfix =amixfix []V6V12ainfix -ainfix +V11V5V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FqNamemV11abitsV2Iainfix &gt;=V11c0FANainfix =amixfix []V6V14ainfix -ainfix +V13V14V5Iainfix &lt;V14V5Aainfix &lt;=c0V14FqNamemV13abitsV1Iainfix &gt;=V13c0FANainfix =amixfix []V6V16V15Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15anAainfix &lt;=c0V15qamemV15abitsV0FAainfix &gt;=V3c0Aainfix =ainfix +V5acardinalabitsV0anAainfix &lt;=c0V5FF">
+      <label
+       name="expl:VC for t"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.18"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter queens"
+    locfile="../queens.mlw"
+    loclnum="296" loccnumb="6" loccnume="12"
+    expl="VC for queens"
+    sum="d44eb72ba7aa6a15673b7de6e04748dd"
+    proved="false"
+    expanded="true"
+    shape="aeq_solV11amixfix []V7V12Aainfix &lt;V12V10Aainfix &lt;=c0V12EqasolutionV11FAasortedV7c0V6Aainfix =V10V6Iaeq_prefixV2V7V1Aaeq_prefixV4V9V8Aaeq_solV13amixfix []V7V14Aainfix &lt;V14V6Aainfix &lt;=V1V14Eqaeq_prefixV9V13V8AasolutionV13FAasortedV7V1V6Aainfix =V8V3Aainfix &gt;=ainfix -V6V1c0Lainfix -V6V1FAapartial_solutionV3V4ANainfix =amixfix []V4V16ainfix -ainfix +V15V3V16Iainfix &lt;V16V3Aainfix &lt;=c0V16FqNamemV15abitsc0Iainfix &gt;=V15c0FANainfix =amixfix []V4V18ainfix -ainfix +V17V18V3Iainfix &lt;V18V3Aainfix &lt;=c0V18FqNamemV17abitsc0Iainfix &gt;=V17c0FANainfix =amixfix []V4V20V19Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19abitsV5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalabitsV5anAainfix &lt;=c0V3Laprefix ~ainfix &lt;&lt;aprefix ~c0V0Iainfix =V3c0Aainfix =V1c0Aainfix &lt;=anasizeAainfix =V0anAainfix &lt;=c0V0FF">
+    <label
+     name="expl:VC for queens"/>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter queens.1"
+      locfile="../queens.mlw"
+      loclnum="296" loccnumb="6" loccnume="12"
+      expl="1. precondition"
+      sum="515896abea64e1846ba89f94ada5fab9"
+      proved="false"
+      expanded="false"
+      shape="preconditionapartial_solutionV3V4ANainfix =amixfix []V4V7ainfix -ainfix +V6V3V7Iainfix &lt;V7V3Aainfix &lt;=c0V7FqNamemV6abitsc0Iainfix &gt;=V6c0FANainfix =amixfix []V4V9ainfix -ainfix +V8V9V3Iainfix &lt;V9V3Aainfix &lt;=c0V9FqNamemV8abitsc0Iainfix &gt;=V8c0FANainfix =amixfix []V4V11V10Iainfix &lt;V11V3Aainfix &lt;=c0V11FAainfix &lt;V10anAainfix &lt;=c0V10qamemV10abitsV5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalabitsV5anAainfix &lt;=c0V3Laprefix ~ainfix &lt;&lt;aprefix ~c0V0Iainfix =V3c0Aainfix =V1c0Aainfix &lt;=anasizeAainfix =V0anAainfix &lt;=c0V0FF">
+      <label
+       name="expl:VC for queens"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.99"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter queens.2"
+      locfile="../queens.mlw"
+      loclnum="296" loccnumb="6" loccnume="12"
+      expl="2. postcondition"
+      sum="c75daf5fe4406737faa8e3fe6207582e"
+      proved="true"
+      expanded="false"
+      shape="postconditionaeq_solV11amixfix []V7V12Aainfix &lt;V12V10Aainfix &lt;=c0V12EqasolutionV11FAasortedV7c0V6Aainfix =V10V6Iaeq_prefixV2V7V1Aaeq_prefixV4V9V8Aaeq_solV13amixfix []V7V14Aainfix &lt;V14V6Aainfix &lt;=V1V14Eqaeq_prefixV9V13V8AasolutionV13FAasortedV7V1V6Aainfix =V8V3Aainfix &gt;=ainfix -V6V1c0Lainfix -V6V1FIapartial_solutionV3V4ANainfix =amixfix []V4V16ainfix -ainfix +V15V3V16Iainfix &lt;V16V3Aainfix &lt;=c0V16FqNamemV15abitsc0Iainfix &gt;=V15c0FANainfix =amixfix []V4V18ainfix -ainfix +V17V18V3Iainfix &lt;V18V3Aainfix &lt;=c0V18FqNamemV17abitsc0Iainfix &gt;=V17c0FANainfix =amixfix []V4V20V19Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix &lt;V19anAainfix &lt;=c0V19qamemV19abitsV5FAainfix &gt;=V1c0Aainfix =ainfix +V3acardinalabitsV5anAainfix &lt;=c0V3Laprefix ~ainfix &lt;&lt;aprefix ~c0V0Iainfix =V3c0Aainfix =V1c0Aainfix &lt;=anasizeAainfix =V0anAainfix &lt;=c0V0FF">
+      <label
+       name="expl:VC for queens"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter test8"
+    locfile="../queens.mlw"
+    loclnum="304" loccnumb="6" loccnume="11"
+    expl="VC for test8"
+    sum="c5c0ca17cc5734ecf6bdd5dfe3983454"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V1c0Aainfix =V0c0Aainfix &lt;=anasizeAainfix =c8anAainfix &lt;=c0c8Iainfix =V1c0FIainfix =V0c0FIainfix =anc8Aainfix =asizec32">
+    <label
+     name="expl:VC for test8"/>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
   </theory>
  </file>

@@ -58,7 +58,9 @@ module TestCase
   use import array.Array
   use import array.ArraySum
 
-  let test_case () =
+  exception BenchFailure
+
+  let test_case () raises { BenchFailure -> true } =
     let n = 10 in
     let a = make n 0 in
     a[0] <- 9;
@@ -73,6 +75,9 @@ module TestCase
     a[9] <- 6;
     let (s, m) = max_sum a n in
     assert { s = 45 };
-    assert { m = 10 }
+    assert { m = 10 };
+    (* bench of --exec *)
+    if s <> 45  then raise BenchFailure;
+    if m <> 10  then raise BenchFailure
 
 end

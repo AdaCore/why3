@@ -7,14 +7,18 @@
   version="0.95.1"/>
  <prover
   id="1"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="2"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="2"
+  id="3"
   name="Coq"
   version="8.4pl2"/>
  <prover
-  id="3"
+  id="4"
   name="Z3"
   version="3.2"/>
  <file
@@ -124,7 +128,7 @@
     <label
      name="expl:VC for check_is_consistent"/>
     <proof
-     prover="1"
+     prover="2"
      timelimit="20"
      memlimit="0"
      obsolete="false"
@@ -141,7 +145,7 @@
     expanded="true"
     shape="asolutionV1V2IasolutionV0V2Iaeq_boardV0V1V2Iainfix =alengthV0alengthV1F">
     <proof
-     prover="2"
+     prover="3"
      timelimit="20"
      memlimit="0"
      edited="vstte10_queens_NQueens_solution_eq_board_1.v"
@@ -150,7 +154,7 @@
      <result status="valid" time="1.31"/>
     </proof>
     <proof
-     prover="3"
+     prover="4"
      timelimit="8"
      memlimit="1000"
      obsolete="false"
@@ -170,7 +174,7 @@
     <label
      name="expl:VC for bt_queens"/>
     <proof
-     prover="1"
+     prover="2"
      timelimit="20"
      memlimit="0"
      obsolete="false"
@@ -196,6 +200,26 @@
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter test8"
+    locfile="../vstte10_queens.mlw"
+    loclnum="106" loccnumb="6" loccnume="11"
+    expl="VC for test8"
+    sum="0bec3c08db525ae6261cf1b30528173a"
+    proved="true"
+    expanded="true"
+    shape="ainfix &gt;=c8c0">
+    <label
+     name="expl:VC for test8"/>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>
