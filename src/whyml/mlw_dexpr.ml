@@ -210,20 +210,23 @@ let print_dity fmt dity =
   let protect_on x s = if x then "(" ^^ s ^^ ")" else s in
   let print_rtvs fmt tv = Mlw_pretty.print_reg fmt
     (create_region (id_clone tv.tv_name) Mlw_ty.ity_unit) in
-  let rec print_dity inn fmt = function
+  let rec print_dity pri fmt = function
     | Dvar { contents = Dtvs tv }
     | Dutv tv -> Pretty.print_tv fmt tv
-    | Dvar { contents = Dval dty } -> print_dity inn fmt dty
+    | Dvar { contents = Dval dty } -> print_dity pri fmt dty
+    | Dpur (s,[t1;t2]) when ts_equal s Ty.ts_func ->
+        Format.fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
+          (print_dity 1) t1 (print_dity 0) t2
     | Dpur (s,tl) when is_ts_tuple s -> Format.fprintf fmt "(%a)"
-        (Pp.print_list Pp.comma (print_dity false)) tl
+        (Pp.print_list Pp.comma (print_dity 0)) tl
     | Dpur (s,[]) -> Pretty.print_ts fmt s
-    | Dpur (s,tl) -> Format.fprintf fmt (protect_on inn "%a@ %a")
-        Pretty.print_ts s (Pp.print_list Pp.space (print_dity true)) tl
-    | Dapp (s,[],rl) -> Format.fprintf fmt (protect_on inn "%a@ <%a>")
+    | Dpur (s,tl) -> Format.fprintf fmt (protect_on (pri > 1) "%a@ %a")
+        Pretty.print_ts s (Pp.print_list Pp.space (print_dity 2)) tl
+    | Dapp (s,[],rl) -> Format.fprintf fmt (protect_on (pri > 1) "%a@ <%a>")
         Mlw_pretty.print_its s (Pp.print_list Pp.comma print_dreg) rl
-    | Dapp (s,tl,rl) -> Format.fprintf fmt (protect_on inn "%a@ <%a>@ %a")
+    | Dapp (s,tl,rl) -> Format.fprintf fmt (protect_on (pri > 1) "%a@ <%a>@ %a")
         Mlw_pretty.print_its s (Pp.print_list Pp.comma print_dreg) rl
-          (Pp.print_list Pp.space (print_dity true)) tl
+          (Pp.print_list Pp.space (print_dity 2)) tl
   and print_dreg fmt = function
     | Rreg (r,_) when Debug.test_flag debug_print_reg_types ->
         Format.fprintf fmt "@[%a:@,%a@]" Mlw_pretty.print_reg r
@@ -231,11 +234,11 @@ let print_dity fmt dity =
     | Rreg (r,_) -> Mlw_pretty.print_reg fmt r
     | Rvar { contents = Rtvs (tv,dity) }
       when Debug.test_flag debug_print_reg_types ->
-        Format.fprintf fmt "@[%a:@,%a@]" print_rtvs tv (print_dity false) dity
+        Format.fprintf fmt "@[%a:@,%a@]" print_rtvs tv (print_dity 0) dity
     | Rvar { contents = Rtvs (tv,_) } -> print_rtvs fmt tv
     | Rvar { contents = Rval dreg } -> print_dreg fmt dreg
   in
-  print_dity false fmt dity
+  print_dity 0 fmt dity
 
 (* Specialization of symbols *)
 
@@ -652,7 +655,13 @@ let dexpr ?loc node =
     | DEapply ({de_dvty = (dity::argl, res)}, de2) ->
         dexpr_expected_type de2 dity;
         argl, res
-    | DEapply (de1, de2) -> (* TODO: better error messages *)
+    | DEapply ({de_dvty = ([],res)} as de1, de2) ->
+        let rec not_arrow = function
+          | Dvar {contents = Dval dity} -> not_arrow dity
+          | Dpur (ts,_) -> not (ts_equal ts Ty.ts_func)
+          | Dvar _ -> false | _ -> true in
+        if not_arrow res then Loc.errorm ?loc:de1.de_loc
+          "This expression has type %a,@ it cannot be applied" print_dity res;
         let argl, res = specialize_ls fs_func_app in
         dity_unify_app fs_func_app dexpr_expected_type [de1;de2] argl;
         [], res
@@ -1051,6 +1060,16 @@ let spec_invariant env pvs vty spec =
 
 (** Abstract values *)
 
+let warn_unused s loc =
+  if not (String.length s > 0 && s.[0] = '_') then
+  Warning.emit ?loc "unused variable %s" s
+
+let check_used_pv e pv = if not (Spv.mem pv e.e_syms.syms_pv) then
+  warn_unused pv.pv_vs.vs_name.id_string pv.pv_vs.vs_name.id_loc
+
+let check_used_ps e ps = if not (Sps.mem ps e.e_syms.syms_ps) then
+  warn_unused ps.ps_name.id_string ps.ps_name.id_loc
+
 let rec type_c env pvs vars otv (dtyv, dsp) =
   let vty = type_v env pvs vars otv dtyv in
   let res = ty_of_vty vty in
@@ -1161,6 +1180,10 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
         let e2_unit = match e2.e_vty with
           | VTvalue ity -> ity_equal ity ity_unit
           | _ -> false in
+        let id_in_e2 = match ld1.let_sym with
+          | LetV pv -> Spv.mem pv e2.e_syms.syms_pv
+          | LetA ps -> Sps.mem ps e2.e_syms.syms_ps in
+        if not id_in_e2 then warn_unused id.pre_name id.pre_loc;
         let e1_no_eff =
           Sreg.is_empty e1.e_effect.eff_writes &&
           Sexn.is_empty e1.e_effect.eff_raises &&
@@ -1168,9 +1191,7 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
           (* if e1 is a recursive call, we may not know yet its effects,
              so we have to rely on an heuristic: if the result of e1 is
              not used in e2, then it was probably called for the effect. *)
-          match ld1.let_sym with
-          | LetV pv -> Spv.mem pv e2.e_syms.syms_pv
-          | LetA ps -> Sps.mem ps e2.e_syms.syms_ps
+          id_in_e2
         in
         let e2 =
           if e2_unit (* e2 is unit *)
@@ -1202,7 +1223,9 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
       let ghost = e1.e_ghost in
       let branch (dp,de) =
         let vm, pat = make_ppattern dp.dp_pat ~ghost ity in
-        pat, get (add_pv_map env vm) de in
+        let e = get (add_pv_map env vm) de in
+        Mstr.iter (fun _ pv -> check_used_pv e pv) vm;
+        pat, e in
       e_case e1 (List.map branch bl)
   | DEassign (pl,de1,de2) ->
       e_assign pl (get env de1) (get env de2)
@@ -1223,6 +1246,7 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
       let add_branch (m,l) (xs,dp,de) =
         let vm, pat = make_ppattern dp.dp_pat xs.xs_ity in
         let e = get (add_pv_map env vm) de in
+        Mstr.iter (fun _ pv -> check_used_pv e pv) vm;
         try Mexn.add xs ((pat,e) :: Mexn.find xs m) m, l
         with Not_found -> Mexn.add xs [pat,e] m, (xs::l) in
       let xsm, xsl = List.fold_left add_branch (Mexn.empty,[]) bl in
@@ -1293,6 +1317,7 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
   | DEfun (fd,de) ->
       let fd = expr_fun ~keep_loc ~strict:true uloc env fd in
       let e = get (add_fundef env fd) de in
+      check_used_ps e fd.fun_ps;
       e_rec [fd] e
   | DElam (bl,de,sp) ->
       let fd = id_fresh "fn", false, bl, de, sp in

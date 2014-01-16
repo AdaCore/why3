@@ -73,37 +73,40 @@ let rec dty_unify dty1 dty2 = match dty1,dty2 with
       List.iter2 dty_unify dl1 dl2
   | _ -> raise Exit
 
-let dty_int = Duty ty_int
+let dty_int  = Duty ty_int
 let dty_real = Duty ty_real
 let dty_bool = Duty ty_bool
 
-let rec print_dty ht inn fmt = function
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
+let rec print_dty ht pri fmt = function
   | Dvar { contents = Dval dty } ->
-      print_dty ht inn fmt dty
+      print_dty ht pri fmt dty
   | Dvar { contents = Dind i } ->
       let tv = try Hint.find ht i with Not_found ->
         let tv = create_tvsymbol (id_fresh "xi") in
         Hint.replace ht i tv; tv in
       Pretty.print_tv fmt tv
+  | Dapp (ts,[d1;d2]) when ts_equal ts Ty.ts_func ->
+      Format.fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
+        (print_dty ht 1) d1 (print_dty ht 0) d2
   | Dapp (ts,dl) when is_ts_tuple ts ->
       Format.fprintf fmt "(%a)"
-        (Pp.print_list Pp.comma (print_dty ht false)) dl
+        (Pp.print_list Pp.comma (print_dty ht 0)) dl
   | Dapp (ts,[]) ->
       Pretty.print_ts fmt ts
-  | Dapp (ts,dl) when inn ->
-      Format.fprintf fmt "(%a@ %a)"
-        Pretty.print_ts ts (Pp.print_list Pp.space (print_dty ht true)) dl
   | Dapp (ts,dl) ->
-      Format.fprintf fmt "%a@ %a"
-        Pretty.print_ts ts (Pp.print_list Pp.space (print_dty ht true)) dl
+      Format.fprintf fmt (protect_on (pri > 1) "%a@ %a")
+        Pretty.print_ts ts (Pp.print_list Pp.space (print_dty ht 2)) dl
   | Duty ({ty_node = Tyapp (ts,(_::_))} as ty)
-    when inn && not (is_ts_tuple ts) ->
+    when (pri > 1 && not (is_ts_tuple ts))
+      || (pri = 1 && ts_equal ts Ty.ts_func) ->
       Format.fprintf fmt "(%a)" Pretty.print_ty ty
   | Duty ty ->
       Pretty.print_ty fmt ty
 
 let print_dty = let ht = Hint.create 3 in fun fmt dty ->
-  print_dty ht false fmt dty
+  print_dty ht 0 fmt dty
 
 (** Symbols *)
 
@@ -285,11 +288,19 @@ let dterm ?loc node =
         let dtyl, dty = specialize_ls ls in
         dty_unify_app ls dterm_expected_type dtl dtyl;
         dty
-    | DTfapp (dt1,dt2) ->
+    | DTfapp ({dt_dty = Some res} as dt1,dt2) ->
+        let rec not_arrow = function
+          | Dvar {contents = Dval dty} -> not_arrow dty
+          | Duty {ty_node = Tyapp (ts,_)}
+          | Dapp (ts,_) -> not (ts_equal ts Ty.ts_func)
+          | Dvar _ -> false | _ -> true in
+        if not_arrow res then Loc.errorm ?loc:dt1.dt_loc
+          "This term has type %a,@ it cannot be applied" print_dty res;
         let dtyl, dty = specialize_ls fs_func_app in
-        (* TODO: better error messages based on dt1 *)
         dty_unify_app fs_func_app dterm_expected_type [dt1;dt2] dtyl;
         dty
+    | DTfapp ({dt_dty = None; dt_loc = loc},_) ->
+        Loc.errorm ?loc "This term has type bool,@ it cannot be applied"
     | DTif (df,dt1,dt2) ->
         dfmla_expected_type df;
         dexpr_expected_type dt2 dt1.dt_dty;
