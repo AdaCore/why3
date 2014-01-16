@@ -124,6 +124,7 @@ echo ""
 echo "=== Checking execution ==="
 execute examples/euler001.mlw Euler001.bench
 execute examples/euler002.mlw Solve.bench
+execute examples/fibonacci.mlw FibRecGhost.bench
 execute examples/fibonacci.mlw FibonacciLogarithmic.bench
 execute examples/same_fringe.mlw SameFringe.bench
 # fails: cannot evaluate condition a=b (how to do it?)
@@ -135,18 +136,19 @@ execute examples/selection_sort.mlw SelectionSort.bench
 execute examples/insertion_sort.mlw InsertionSort.bench
 # fails: needs support for "val" without code (how to do it?)
 # examples/vacid_0_sparse_array.mlw --exec Harness.bench
-# fails: needs support for let rec
+# fails: needs support for local let rec
 # examples/knuth_prime_numbers.mlw --exec PrimeNumbers.bench
 execute examples/vstte10_max_sum.mlw TestCase.test_case
 execute examples/verifythis_fm2012_LRS.mlw LCP_test.bench
 # fails: assert failure on (regions = []) in Mlw_interp.to_program_value
+# -> needs support for nested mutable fields
 # examples/verifythis_fm2012_LRS.mlw --exec SuffixArray_test.bench
 # fails: needs support for Array.copy
 # examples/verifythis_PrefixSumRec.mlw --exec PrefixSumRec.bench
-# fails: assert failure in Mreg.merge
+execute examples/vstte10_queens.mlw NQueens.test8
+# fails: "program variable s not found in env"
+# -> needs support for global variables
 # examples/queens.mlw --exec  NQueensBits.test8
-# fails: assert failure in Mreg.merge
-# examples/vstte10_queens.mlw --exec NQueens.test8
 echo ""
 
 echo "=== Checking drivers ==="

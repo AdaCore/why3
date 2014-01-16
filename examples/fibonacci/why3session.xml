@@ -180,7 +180,7 @@
    locfile="../fibonacci.mlw"
    loclnum="46" loccnumb="7" loccnume="18"
    verified="true"
-   expanded="false">
+   expanded="true">
    <label
     name="recursive version, using ghost code"/>
    <goal
@@ -255,11 +255,51 @@
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
+   <goal
+    name="WP_parameter test42"
+    locfile="../fibonacci.mlw"
+    loclnum="61" loccnumb="6" loccnume="12"
+    expl="VC for test42"
+    sum="4722e2323d409d25c4832cfff59379d0"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=c0c42">
+    <label
+     name="expl:VC for test42"/>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter bench"
+    locfile="../fibonacci.mlw"
+    loclnum="65" loccnumb="6" loccnume="11"
+    expl="VC for bench"
+    sum="5876ce5863cf951fb600b95cf58f10ff"
+    proved="true"
+    expanded="false"
+    shape="t">
+    <label
+     name="expl:VC for bench"/>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
   </theory>
   <theory
    name="FibRecNoGhost"
    locfile="../fibonacci.mlw"
-   loclnum="63" loccnumb="7" loccnume="20"
+   loclnum="70" loccnumb="7" loccnume="20"
    verified="true"
    expanded="false">
    <label
@@ -267,7 +307,7 @@
    <goal
     name="WP_parameter fib_aux"
     locfile="../fibonacci.mlw"
-    loclnum="68" loccnumb="10" loccnume="17"
+    loclnum="75" loccnumb="10" loccnume="17"
     expl="VC for fib_aux"
     sum="984fce177a8f2fd3f62c58ff96a406e4"
     proved="true"
@@ -287,7 +327,7 @@
    <goal
     name="WP_parameter fib"
     locfile="../fibonacci.mlw"
-    loclnum="74" loccnumb="6" loccnume="9"
+    loclnum="81" loccnumb="6" loccnume="9"
     expl="VC for fib"
     sum="ccb3d098eb4c54c7ce68bda3998e0b10"
     proved="true"
@@ -316,7 +356,7 @@
   <theory
    name="Mat22"
    locfile="../fibonacci.mlw"
-   loclnum="81" loccnumb="7" loccnume="12"
+   loclnum="88" loccnumb="7" loccnume="12"
    verified="true"
    expanded="true">
    <label
@@ -325,13 +365,13 @@
   <theory
    name="FibonacciLogarithmic"
    locfile="../fibonacci.mlw"
-   loclnum="103" loccnumb="7" loccnume="27"
+   loclnum="110" loccnumb="7" loccnume="27"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter logfib"
     locfile="../fibonacci.mlw"
-    loclnum="117" loccnumb="10" loccnume="16"
+    loclnum="124" loccnumb="10" loccnume="16"
     expl="VC for logfib"
     sum="aa0581d6e96cfbe2df36199653dd7892"
     proved="true"
@@ -346,7 +386,7 @@
      <goal
       name="WP_parameter logfib.1"
       locfile="../fibonacci.mlw"
-      loclnum="117" loccnumb="10" loccnume="16"
+      loclnum="124" loccnumb="10" loccnume="16"
       expl="1. postcondition"
       sum="edb4470d3cf85827177081056bc0bd87"
       proved="true"
@@ -390,7 +430,7 @@
      <goal
       name="WP_parameter logfib.2"
       locfile="../fibonacci.mlw"
-      loclnum="117" loccnumb="10" loccnume="16"
+      loclnum="124" loccnumb="10" loccnume="16"
       expl="2. variant decrease"
       sum="91358c02634eb5d72c921170ee3fe925"
       proved="true"
@@ -410,7 +450,7 @@
      <goal
       name="WP_parameter logfib.3"
       locfile="../fibonacci.mlw"
-      loclnum="117" loccnumb="10" loccnume="16"
+      loclnum="124" loccnumb="10" loccnume="16"
       expl="3. precondition"
       sum="7d437bf067fe6c0f95f2da430a0cec82"
       proved="true"
@@ -438,7 +478,7 @@
      <goal
       name="WP_parameter logfib.4"
       locfile="../fibonacci.mlw"
-      loclnum="117" loccnumb="10" loccnume="16"
+      loclnum="124" loccnumb="10" loccnume="16"
       expl="4. postcondition"
       sum="934cc293599c5423b6ae534062275f75"
       proved="true"
@@ -461,7 +501,7 @@
    <goal
     name="fib_m"
     locfile="../fibonacci.mlw"
-    loclnum="140" loccnumb="8" loccnume="13"
+    loclnum="147" loccnumb="8" loccnume="13"
     sum="5182716f896c722451c4db01baef910f"
     proved="true"
     expanded="false"
@@ -479,7 +519,7 @@
    <goal
     name="WP_parameter fibo"
     locfile="../fibonacci.mlw"
-    loclnum="144" loccnumb="6" loccnume="10"
+    loclnum="151" loccnumb="6" loccnume="10"
     expl="VC for fibo"
     sum="20a1a34ec8db40c1e1a75ebb5f31e560"
     proved="true"
@@ -507,7 +547,7 @@
    <goal
     name="WP_parameter test0"
     locfile="../fibonacci.mlw"
-    loclnum="148" loccnumb="6" loccnume="11"
+    loclnum="155" loccnumb="6" loccnume="11"
     expl="VC for test0"
     sum="4b4f8ea266e45f2265d6b86511cd173a"
     proved="true"
@@ -527,7 +567,7 @@
    <goal
     name="WP_parameter test1"
     locfile="../fibonacci.mlw"
-    loclnum="149" loccnumb="6" loccnume="11"
+    loclnum="156" loccnumb="6" loccnume="11"
     expl="VC for test1"
     sum="f1806ba29ce415e743a60c1282e336ca"
     proved="true"
@@ -547,7 +587,7 @@
    <goal
     name="WP_parameter test7"
     locfile="../fibonacci.mlw"
-    loclnum="150" loccnumb="6" loccnume="11"
+    loclnum="157" loccnumb="6" loccnume="11"
     expl="VC for test7"
     sum="5530a3babb7a8002d145b770db03402f"
     proved="true"
@@ -567,7 +607,7 @@
    <goal
     name="WP_parameter test42"
     locfile="../fibonacci.mlw"
-    loclnum="151" loccnumb="6" loccnume="12"
+    loclnum="158" loccnumb="6" loccnume="12"
     expl="VC for test42"
     sum="a47c44bd86b23970167f2477a019a7ef"
     proved="true"
@@ -587,7 +627,7 @@
    <goal
     name="WP_parameter test2014"
     locfile="../fibonacci.mlw"
-    loclnum="152" loccnumb="6" loccnume="14"
+    loclnum="159" loccnumb="6" loccnume="14"
     expl="VC for test2014"
     sum="1b190a129993c4d82495557fead4c819"
     proved="true"
@@ -607,7 +647,7 @@
    <goal
     name="WP_parameter bench"
     locfile="../fibonacci.mlw"
-    loclnum="155" loccnumb="6" loccnume="11"
+    loclnum="163" loccnumb="6" loccnume="11"
     expl="VC for bench"
     sum="b642f9eb998305d5158c9ddf28d1fe6a"
     proved="true"

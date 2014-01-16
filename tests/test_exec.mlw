@@ -159,6 +159,14 @@ module Ref
 
   let hh () = h 10
 
+  (* use of a global ref *)
+
+  val x : ref int
+
+  let j () =
+    x := 42;
+    !x
+
 end
 
 

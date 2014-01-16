@@ -516,7 +516,14 @@ let to_program_value env s ty v =
                       | Some _, [] -> assert false)
                     (s,regions,[]) fdl vl
                 in
-                assert (regions = []);
+                begin match regions with
+                | [] -> ()
+                | _ ->
+                  eprintf "@[<hov 2>error while converting logic value (%a:%a) to a program value:@ regions should be empty, not@ [%a]@]@."
+                    print_value v Mlw_pretty.print_vty ty
+                    (Pp.print_list Pp.comma Mlw_pretty.print_reg) regions;
+                  assert false
+                end;
                 s,Vapp(ls,List.rev vl)
               end
             else find_cs rem
@@ -1154,7 +1161,7 @@ and exec_app env s ps args (*spec*) ity_result =
   in
   let subst = subst.ity_subst_reg in
   let env1 = { env with regenv =
-      Mreg.union (fun _ _ -> assert false) subst env.regenv }
+      Mreg.union (fun _ x _ -> Some x) subst env.regenv }
   in
   match Mlw_decl.find_definition env.mknown ps with
     | Some d ->

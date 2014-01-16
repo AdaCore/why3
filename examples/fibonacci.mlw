@@ -58,6 +58,13 @@ module FibRecGhost "recursive version, using ghost code"
     ensures  { result = fib n }
   = fib_aux 0 0 1 n
 
+  let test42 () = fib 42
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    if test42 () <> 267914296 then raise BenchFailure
+
 end
 
 module FibRecNoGhost "recursive version, without ghost code"
