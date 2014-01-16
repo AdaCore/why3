@@ -594,7 +594,7 @@ let hypothesis_selection = (* create lots of hashtables... *)
   let symbTbl = Hls.create 17 in
   Trans.store (transformation fmlaTable fTbl tTbl symbTbl)
 
-let _ = Trans.register_transform "hypothesis_selection" hypothesis_selection
+let () = Trans.register_transform "hypothesis_selection" hypothesis_selection
   ~desc:"Hypothesis@ selection."
 
 (*

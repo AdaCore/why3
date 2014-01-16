@@ -107,8 +107,8 @@ unfold add, mem; intuition.
 Qed.
 
 (* Why3 goal *)
-Definition remove: forall {a:Type} {a_WT:WhyType a}, a -> (@set a a_WT)
-  -> (@set a a_WT).
+Definition remove: forall {a:Type} {a_WT:WhyType a}, a -> (@set a a_WT) ->
+  (@set a a_WT).
 intros a a_WT x s.
 exact (fun y => x <> y /\ s y).
 Defined.
@@ -234,5 +234,4 @@ Lemma all_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a), (mem x
 intros a a_WT x.
 now unfold all.
 Qed.
-
 

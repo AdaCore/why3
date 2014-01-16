@@ -191,4 +191,3 @@ ring.
 auto with zarith.
 Qed.
 
-

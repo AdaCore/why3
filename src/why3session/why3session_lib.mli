@@ -12,6 +12,8 @@
 open Why3
 open Whyconf
 
+val verbose: Debug.flag
+
 type spec_list = (Arg.key * Arg.spec * Arg.doc) list
 
 type cmd =

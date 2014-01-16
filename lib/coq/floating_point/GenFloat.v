@@ -188,11 +188,6 @@ Definition round: floating_point.Rounding.mode -> R -> R.
 exact (fun m => round radix2 fexp (round_mode (rnd_of_mode m))).
 Defined.
 
-(* Why3 goal *)
-Definition round_logic: floating_point.Rounding.mode -> R -> t.
-exact (fun m r => r_to_fp_aux m r r r).
-Defined.
-
 (* Why3 assumption *)
 Definition round_error(x:t): R := (Rabs ((value x) - (exact x))%R).
 
@@ -385,6 +380,32 @@ intros x.
 pattern x at 2 ; rewrite <- Ropp_involutive.
 rewrite Round_down_neg.
 now rewrite Ropp_involutive.
+Qed.
+
+(* Why3 goal *)
+Definition round_logic: floating_point.Rounding.mode -> R -> t.
+exact (fun m r => r_to_fp_aux m r r r).
+Defined.
+
+(* Why3 goal *)
+Lemma Round_logic_def : forall (m:floating_point.Rounding.mode) (x:R),
+  (no_overflow m x) -> ((value (round_logic m x)) = (round m x)).
+Proof.
+intros m x h1.
+unfold value, round_logic.
+simpl.
+apply r_to_fp_correct.
+apply Rle_lt_trans with (1 := h1).
+replace emax with (prec + (emax - prec))%Z by ring.
+rewrite bpow_plus.
+apply Rmult_lt_compat_r.
+apply bpow_gt_0.
+simpl.
+rewrite <- Z2R_Zpower.
+apply Z2R_lt.
+apply Zlt_pred.
+apply Zlt_le_weak.
+exact Hprec'.
 Qed.
 
 End GenFloat.

@@ -44,4 +44,3 @@ generalize (Length_nonnegative t).
 omega.
 Qed.
 
-

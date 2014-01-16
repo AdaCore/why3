@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Why3
-open Whyconf
 
 type t =
     { mutable window_width : int;

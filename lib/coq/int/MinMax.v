@@ -78,4 +78,3 @@ intros x y _.
 apply Zmin_comm.
 Qed.
 
-

@@ -69,4 +69,3 @@ replace (x - z)%R with ((x - y) + (y - z))%R by ring.
 apply Rabs_triang.
 Qed.
 
-

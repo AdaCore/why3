@@ -121,7 +121,7 @@ and 'a metas =
 and 'a transf = private
     { mutable transf_key : 'a;
       transf_name : string;
-      (** Why3 tranformation name *)
+      (** Why3 transformation name *)
       transf_parent : 'a goal;
       mutable transf_verified : bool;
       mutable transf_goals : 'a goal list;
@@ -166,22 +166,21 @@ val print_attempt_status : Format.formatter -> proof_attempt_status -> unit
 val print_external_proof : Format.formatter -> 'key proof_attempt -> unit
 
 val create_session : ?shape_version:int -> string -> 'key session
-(** create a new_session in the given directory. The directory is
+(** create a new session in the given directory. The directory is
     created if it doesn't exists yet. Don't change the current
     directory of the program if you give a relative path *)
 
 val get_project_dir : string -> string
 (** find the session which corresponds to the given file or return
     directly the given directory;
-    return {Not_found} if the file or the directory doesn't exists
+    return [Not_found] if the file or the directory doesn't exists
 *)
 
 (** {2 Read/Write} *)
 
 type notask
-(** A phantom type which is used for session which doesn't contain task. The
-    only session that can not contain task are session that come from the
-    following function *)
+(** A phantom type which is used for sessions which don't contain any task. The
+    only such sessions are sessions that come from {!read_session} *)
 
 val read_session : string -> notask session
 (** Read a session stored on the disk. It returns a session without any
@@ -239,7 +238,7 @@ val update_session :
 
     The last case meant that the session was obsolete.
     It is authorized if [allow_obsolete] is [true],
-    otherwise the exception [OutdatedSession] is raised.
+    otherwise the exception {!OutdatedSession} is raised.
     If the session was obsolete is indicated by
     the second result.
 
@@ -269,8 +268,8 @@ val add_metas_to_goal :
 
 exception NoTask
 val goal_task : 'key goal -> Task.task
-(** Return the task of a goal. Raise NoTask if the goal doesn't contain a task
-    (equivalent to 'key = notask if release_task is not used) *)
+(** Return the task of a goal. Raise {!NoTask} if the goal doesn't contain a task
+    (equivalent to ['key = notask] if {!release_task} is not used) *)
 
 val goal_task_option : 'key goal -> Task.task option
 (** Return the task of a goal. *)
@@ -349,7 +348,7 @@ val set_archived : 'key proof_attempt -> bool -> unit
 val set_edited_as : string option -> 'key proof_attempt -> unit
 
 val get_edited_as_abs : 'key session -> 'k proof_attempt -> string option
-(** return the edited filename after concatenation to session_dir *)
+(** return the edited filename after concatenation to [session_dir] *)
 
 val update_edit_external_proof :
   'key env_session -> 'key proof_attempt -> string
@@ -396,6 +395,8 @@ val copy_external_proof :
 (** {2 Transformation} *)
 
 val add_transformation :
+  ?init:'key notify ->
+  ?notify:'key notify ->
   keygen:'key keygen ->
   'key env_session ->
   string ->
@@ -411,7 +412,7 @@ val add_registered_transformation :
   'key goal ->
   'key transf
 (** Apply a real transformation by its why3 name,
-    raise NoTask if the goal doesn't contain a task.
+    raise {!NoTask} if the goal doesn't contain a task.
     If the goal already has a transformation with this name,
     it is returned. *)
 

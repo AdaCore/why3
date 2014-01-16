@@ -36,8 +36,9 @@ let spec =
    " edited proof scripts in the session" ) ::
   ("--stats", Arg.Set opt_stats_print,
    " prints various proofs statistics" ) ::
-  ("--hist", Arg.Set opt_hist_print,
-   " outputs a histogram of external proof results" ) ::
+  ("--graph", Arg.Set opt_hist_print,
+   " outputs a graph of the total time needed for \
+     proving a given number of goals for each provers" ) ::
   ("--tree", Arg.Set opt_tree_print,
    " session contents as a tree in textual format" ) ::
   ("--dir", Arg.Set opt_project_dir,
@@ -403,6 +404,8 @@ let print_hist stats =
         " \"%s\" using 2:1 title \"%s\" with linespoints ps 0.2@\n"
         pf (string_of_prover p);
       let fmt = formatter_of_out_channel ch in
+      (** The time is also accumulated in order to obtain the total cpu time
+          taken to reach the given number of proved goal *)
       let (_ : float * int) =
         Mfloat.fold
           (fun t c (acct,accc) ->

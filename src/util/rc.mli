@@ -100,8 +100,7 @@ val set_simple_family : t -> string -> simple_family -> t
 val get_int : ?default:int -> section -> string -> int
 (** [get_int ~default section key] one key to one value
 
-    @raise Bad_value_type if the value associated to [key] is not of type
-    {!int}
+    @raise Bad_value_type if the value associated to [key] is not of type [int]
 
     @raise Key_not_found if default is not given and no value is
     associated to [key]
@@ -114,8 +113,7 @@ val get_into : section -> string -> int option
 val get_intl : ?default:int list -> section -> string -> int list
 (** [get_intl ~default section key] one key to many value
 
-    @raise Bad_value_type if the value associated to [key] is not of
-    type {!int}
+    @raise Bad_value_type if the value associated to [key] is not of type [int]
 
     @raise MissingField if default is not given and no values are
     associated to [key]

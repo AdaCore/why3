@@ -82,7 +82,9 @@ let copy_file from to_ =
   let n = ref 0 in
   while n := input cin buff 0 1024; !n <> 0 do
     output cout buff 0 !n
-  done
+  done;
+  close_out cout;
+  close_in  cin
 
 let rec copy_dir from to_ =
   if not (Sys.file_exists to_) then Unix.mkdir to_ 0o755;

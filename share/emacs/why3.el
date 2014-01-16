@@ -162,7 +162,8 @@
   ;(make-local-variable 'indent-line-function)
   ;(setq indent-line-function 'why3-indent-line)
   ; OCaml style comments for comment-region, comment-dwim, etc.
-  (setq comment-start "(*" comment-end "*)")
+  (set (make-local-variable 'comment-start) "(*")
+  (set (make-local-variable 'comment-end)   "*)")
   ; menu
   ; providing the mode
   (setq major-mode 'why3-mode)
