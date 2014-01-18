@@ -550,16 +550,19 @@ opt:  bin/why3ide.opt
 bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
 
-bin/why3ide.opt: lib/why3/why3.cmxa $(IDECMX)
+bin/why3ide.opt: lib/why3/why3.cmxa src/ide/resetgc.o $(IDECMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3ide.byte: lib/why3/why3.cma $(IDECMO)
+bin/why3ide.byte: lib/why3/why3.cma src/ide/resetgc.o $(IDECMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
 
 bin/why3ide: bin/why3ide.@OCAMLBEST@
 	ln -sf why3ide.@OCAMLBEST@ $@
+
+src/ide/resetgc.o: src/ide/resetgc.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 # depend and clean targets
 

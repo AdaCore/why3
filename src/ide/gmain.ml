@@ -19,6 +19,17 @@ open Stdlib
 open Debug
 module C = Whyconf
 
+external reset_gc : unit -> unit = "ml_reset_gc"
+
+(* Setting a Gc.alarm is pointless; the function has to be called manually
+   before each lablgtk operation. Indeed, each major slice resets
+   caml_extra_heap_resources to zero, but alarms are executed only at
+   finalization time, that is, after a full collection completes. Note that
+   manual calls can fail to prevent extraneous collections too, if a major
+   slice happens right in the middle of a sequence of lablgtk operations due
+   to memory starvation. Hopefully, it seldom happens. *)
+let () = reset_gc ()
+
 let debug = Debug.lookup_flag "ide_info"
 
 (************************)
@@ -621,6 +632,7 @@ module MA = struct
      type key = GTree.row_reference
 
      let create ?parent () =
+       reset_gc ();
        session_needs_saving := true;
        let parent = match parent with
          | None -> None
@@ -650,6 +662,7 @@ module MA = struct
      let notify_timer_state =
        let c = ref 0 in
        fun t s r ->
+	 reset_gc ();
          incr c;
          monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
          monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
@@ -658,6 +671,7 @@ module MA = struct
               "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
 
 let notify any =
+  reset_gc ();
   session_needs_saving := true;
   let row,expanded =
     match any with
@@ -707,6 +721,7 @@ let notify any =
 let init =
   let cpt = ref (-1) in
   fun row any ->
+    reset_gc ();
     let ind = goals_model#get ~row:row#iter ~column:index_column in
     if ind < 0 then
       begin
@@ -1821,6 +1836,7 @@ let color_loc (v:GSourceView2.source_view) ~color l b e =
   buf#apply_tag ~start ~stop color
 
 let scroll_to_loc ?(yalign=0.0) ~color loc =
+  reset_gc ();
   let (f,l,b,e) = Loc.get loc in
   if f <> !current_file then
     begin
