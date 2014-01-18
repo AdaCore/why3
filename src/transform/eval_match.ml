@@ -105,8 +105,8 @@ let rec cs_equ kn env t1 t2 =
 
 and apply_cs_equ kn cs1 tl1 env t = match t.t_node with
   | Tapp (cs2,tl2) when ls_equal cs1 cs2 ->
-      let merge f t1 t2 = t_and_simp f (cs_equ kn env t1 t2) in
-      List.fold_left2 merge t_true tl1 tl2
+      let merge t1 t2 f = t_and_simp (cs_equ kn env t1 t2) f in
+      List.fold_right2 merge tl1 tl2 t_true
   | Tapp _ -> t_false
   | _ -> assert false
 

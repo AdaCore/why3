@@ -1337,7 +1337,7 @@ let t_and_simp f1 f2 = match f1.t_node, f2.t_node with
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_and f1 f2
 
-let t_and_simp_l l = List.fold_left t_and_simp t_true l
+let t_and_simp_l l = List.fold_right t_and_simp l t_true
 
 let t_or_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
@@ -1347,7 +1347,7 @@ let t_or_simp f1 f2 = match f1.t_node, f2.t_node with
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_or f1 f2
 
-let t_or_simp_l l = List.fold_left t_or_simp t_false l
+let t_or_simp_l l = List.fold_right t_or_simp l t_false
 
 let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f1 -> f2
@@ -1357,7 +1357,7 @@ let t_and_asym_simp f1 f2 = match f1.t_node, f2.t_node with
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_and_asym f1 f2
 
-let t_and_asym_simp_l l = List.fold_left t_and_asym_simp t_true l
+let t_and_asym_simp_l l = List.fold_right t_and_asym_simp l t_true
 
 let t_or_asym_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f2 -> t_label_remove asym_label f1
@@ -1367,7 +1367,7 @@ let t_or_asym_simp f1 f2 = match f1.t_node, f2.t_node with
   | _, _ when t_equal f1 f2    -> f1
   | _, _ -> t_or_asym f1 f2
 
-let t_or_asym_simp_l l = List.fold_left t_or_asym_simp t_false l
+let t_or_asym_simp_l l = List.fold_right t_or_asym_simp l t_false
 
 let t_implies_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  when can_simp f1 -> f2

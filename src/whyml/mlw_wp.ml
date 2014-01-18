@@ -234,14 +234,14 @@ let decrease_alg ?loc env old_t t =
   let csl = Decl.find_constructors env.pure_known ts in
   if csl = [] then quit ();
   let sbs = ty_match Mtv.empty (ty_app ts (List.map ty_var ts.ts_args)) oty in
-  let add_arg acc fty =
+  let add_arg fty acc =
     let fty = ty_inst sbs fty in
     if ty_equal fty nty then
       let vs = create_vsymbol (id_fresh "f") nty in
-      t_or_simp acc (t_equ (t_var vs) t), pat_var vs
-    else acc, pat_wild fty in
+      pat_var vs, t_or_simp (t_equ (t_var vs) t) acc
+    else pat_wild fty, acc in
   let add_cs (cs,_) =
-    let f, pl = Lists.map_fold_left add_arg t_false cs.ls_args in
+    let pl, f = Lists.map_fold_right add_arg cs.ls_args t_false in
     t_close_branch (pat_app cs pl oty) f in
   t_case old_t (List.map add_cs csl)
 
