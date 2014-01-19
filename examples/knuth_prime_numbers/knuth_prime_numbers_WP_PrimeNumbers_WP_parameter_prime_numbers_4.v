@@ -77,8 +77,8 @@ Definition no_prime_in (l:Z) (u:Z): Prop := forall (x:Z), ((l < x)%Z /\
 
 (* Why3 assumption *)
 Definition first_primes (p:(@array Z _)) (u:Z): Prop := ((get p
-  0%Z) = 2%Z) /\ ((forall (i:Z) (j:Z), (((0%Z <= i)%Z /\ (i < j)%Z) /\
-  (j < u)%Z) -> ((get p i) < (get p j))%Z) /\ ((forall (i:Z),
+  0%Z) = 2%Z) /\ ((forall (i:Z) (j:Z), ((0%Z <= i)%Z /\ ((i < j)%Z /\
+  (j < u)%Z)) -> ((get p i) < (get p j))%Z) /\ ((forall (i:Z),
   ((0%Z <= i)%Z /\ (i < u)%Z) -> (number.Prime.prime (get p i))) /\
   forall (i:Z), ((0%Z <= i)%Z /\ (i < (u - 1%Z)%Z)%Z) -> (no_prime_in (get p
   i) (get p (i + 1%Z)%Z)))).
@@ -108,28 +108,27 @@ Theorem WP_parameter_prime_numbers : forall (m:Z), (2%Z <= m)%Z ->
   (((0%Z <= 1%Z)%Z /\ (1%Z < m)%Z) -> forall (p1:(@map.Map.map Z _ Z _)),
   ((0%Z <= m)%Z /\ (p1 = (map.Map.set p 1%Z 3%Z))) -> let o := (m - 1%Z)%Z in
   ((2%Z <= o)%Z -> forall (n:Z) (p2:(@map.Map.map Z _ Z _)), forall (j:Z),
-  ((2%Z <= j)%Z /\ (j <= o)%Z) -> (((((first_primes (mk_array m p2) j) /\
-  (((map.Map.get p2 (j - 1%Z)%Z) < n)%Z /\ (n < (2%Z * (map.Map.get p2
-  (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n)) /\ (no_prime_in
-  (map.Map.get p2 (j - 1%Z)%Z) n)) -> forall (k:Z), forall (n1:Z)
-  (p3:(@map.Map.map Z _ Z _)), ((0%Z <= m)%Z /\ (((((((1%Z <= k)%Z /\
-  (k < j)%Z) /\ (first_primes (mk_array m p3) j)) /\ (((map.Map.get p3
-  (j - 1%Z)%Z) < n1)%Z /\ (n1 < (2%Z * (map.Map.get p3
-  (j - 1%Z)%Z))%Z)%Z)) /\ (number.Parity.odd n1)) /\ (no_prime_in
-  (map.Map.get p3 (j - 1%Z)%Z) n1)) /\ forall (i:Z), ((0%Z <= i)%Z /\
-  (i < k)%Z) -> ~ (number.Divisibility.divides (map.Map.get p3 i) n1))) ->
+  ((2%Z <= j)%Z /\ (j <= o)%Z) -> (((first_primes (mk_array m p2) j) /\
+  ((((map.Map.get p2 (j - 1%Z)%Z) < n)%Z /\ (n < (2%Z * (map.Map.get p2
+  (j - 1%Z)%Z))%Z)%Z) /\ ((number.Parity.odd n) /\ (no_prime_in
+  (map.Map.get p2 (j - 1%Z)%Z) n)))) -> forall (k:Z), forall (n1:Z)
+  (p3:(@map.Map.map Z _ Z _)), ((0%Z <= m)%Z /\ (((1%Z <= k)%Z /\
+  (k < j)%Z) /\ ((first_primes (mk_array m p3) j) /\ ((((map.Map.get p3
+  (j - 1%Z)%Z) < n1)%Z /\ (n1 < (2%Z * (map.Map.get p3 (j - 1%Z)%Z))%Z)%Z) /\
+  ((number.Parity.odd n1) /\ ((no_prime_in (map.Map.get p3 (j - 1%Z)%Z)
+  n1) /\ forall (i:Z), ((0%Z <= i)%Z /\ (i < k)%Z) ->
+  ~ (number.Divisibility.divides (map.Map.get p3 i) n1))))))) ->
   (((0%Z <= k)%Z /\ (k < m)%Z) -> ((~ ((ZOmod n1 (map.Map.get p3
   k)) = 0%Z)) -> (((0%Z <= k)%Z /\ (k < m)%Z) -> (((0%Z <= k)%Z /\
   (k < m)%Z) -> ((~ ((map.Map.get p3 k) < (ZOdiv n1 (map.Map.get p3
   k)))%Z) -> (number.Prime.prime n1)))))))))))).
-(* Why3 intros m h1 h2 h3 (h4,h5) p (h6,h7) (h8,h9) p1 (h10,h11) o h12 n p2 j
-        (h13,h14) (((h15,(h16,h17)),h18),h19) k n1 p3
-        (h20,((((((h21,h22),h23),(h24,h25)),h26),h27),h28)) (h29,h30) h31
-        (h32,h33) (h34,h35) h36. *)
-Proof.
-intros. intuition.
-red in H33. destruct H33 as (p0, (sorted, (only_primes, all_primes))).
-assert (h2: (2 < Map.get p3 k)%Z).
+intros m h1 h2 h3 (h4,h5) p (h6,h7) (h8,h9) p1 (h10,h11) o h12 n p2 j
+        (h13,h14) (h15,((h16,h17),(h18,h19))) k n1 p3
+        (h20,((h21,h22),(h23,((h24,h25),(h26,(h27,h28)))))) (h29,h30) h31
+        (h32,h33) (h34,h35) h36.
+intuition.
+red in h23. destruct h23 as (p0, (sorted, (only_primes, all_primes))).
+assert (H2: (2 < Map.get p3 k)%Z).
 rewrite <- p0. apply sorted; omega.
 apply Prime.small_divisors; auto.
 omega.
@@ -166,11 +165,10 @@ replace (k+1-1)%Z with k by omega.
 auto.
 unfold get in hi2; simpl in hi2. subst d.
 assert (case: (i < k \/i = k)%Z) by omega. destruct case.
-red; intro. apply H27 with i; try omega.
+red; intro. apply h28 with i; try omega.
 auto.
 subst i.
-intro. apply H11.
+intro. apply h31.
 apply Divisibility.divides_mod_computer; auto; omega.
 Qed.
-
 

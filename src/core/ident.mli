@@ -46,7 +46,11 @@ val id_equal : ident -> ident -> bool
 val id_hash : ident -> int
 
 (* a user-created type of unregistered identifiers *)
-type preid
+type preid = {
+  pre_name  : string;
+  pre_label : Slab.t;
+  pre_loc   : Loc.position option;
+}
 
 (* register a pre-ident (you should never use this function) *)
 val id_register : preid -> ident
@@ -63,7 +67,7 @@ val id_clone : ?label:Slab.t -> ident -> preid
 (* create a derived pre-ident (inherit labels and location) *)
 val id_derive : ?label:Slab.t -> string -> ident -> preid
 
-(* retrieve preid name without registering *)
+(* DEPRECATED : retrieve preid name without registering *)
 val preid_name : preid -> string
 
 (** Unique persistent names for pretty printing *)

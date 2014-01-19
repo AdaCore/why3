@@ -84,25 +84,25 @@ Theorem WP_parameter_distance : let o := n in ((0%Z <= o)%Z ->
   (-1%Z)%Z))) -> let o1 := n in ((0%Z <= o1)%Z -> (((0%Z < o1)%Z \/
   (0%Z = o1)) -> let o2 := (n - 1%Z)%Z in (((1%Z < o2)%Z \/ (1%Z = o2)) ->
   forall (count:Z) (d:(@map.Map.map Z _ Z _)) (g1:(@map.Map.map Z _ Z _)),
-  (((((map.Map.get d 0%Z) = 0%Z) /\ (((map.Map.get g1 0%Z) = (-1%Z)%Z) /\
+  ((((map.Map.get d 0%Z) = 0%Z) /\ (((map.Map.get g1 0%Z) = (-1%Z)%Z) /\
   (((count + (map.Map.get d
   ((o2 + 1%Z)%Z - 1%Z)%Z))%Z < ((o2 + 1%Z)%Z - 1%Z)%Z)%Z \/
   ((count + (map.Map.get d
-  ((o2 + 1%Z)%Z - 1%Z)%Z))%Z = ((o2 + 1%Z)%Z - 1%Z)%Z)))) /\ forall (k:Z),
-  ((0%Z < k)%Z /\ (k < (o2 + 1%Z)%Z)%Z) -> (((((map.Map.get g1
-  (map.Map.get g1 k)) < (f k))%Z /\ (((f k) < (map.Map.get g1 k))%Z \/
-  ((f k) = (map.Map.get g1 k)))) /\ ((map.Map.get g1 k) < k)%Z) /\
+  ((o2 + 1%Z)%Z - 1%Z)%Z))%Z = ((o2 + 1%Z)%Z - 1%Z)%Z)))) /\ ((forall (k:Z),
+  ((0%Z < k)%Z /\ (k < (o2 + 1%Z)%Z)%Z) -> ((((map.Map.get g1 (map.Map.get g1
+  k)) < (f k))%Z /\ ((((f k) < (map.Map.get g1 k))%Z \/
+  ((f k) = (map.Map.get g1 k))) /\ ((map.Map.get g1 k) < k)%Z)) /\
   (((0%Z < (map.Map.get d k))%Z /\ ((map.Map.get d k) = ((map.Map.get d
   (map.Map.get g1 k)) + 1%Z)%Z)) /\ forall (k':Z), (((map.Map.get g1
   k) < k')%Z /\ (k' < k)%Z) -> ((map.Map.get d (map.Map.get g1
   k)) < (map.Map.get d k'))%Z))) /\ forall (k:Z), (((0%Z < k)%Z \/
-  (0%Z = k)) /\ (k < (o2 + 1%Z)%Z)%Z) -> (path (map.Map.get d k) k)) ->
+  (0%Z = k)) /\ (k < (o2 + 1%Z)%Z)%Z) -> (path (map.Map.get d k) k))) ->
   ((count < n)%Z -> forall (k:Z), (((0%Z < k)%Z \/ (0%Z = k)) /\
   (k < n)%Z) -> forall (d':Z), (path d' k) -> ((map.Map.get d
   k) <= d')%Z))))))).
 (* Why3 intros o h1 h2 h3 g (h4,h5) o1 h6 h7 o2 h8 count d g1
-        (((h9,(h10,h11)),h12),h13) h14 k (h15,h16) d' h17. *)
-intros o _ _ h3 g _ o1 h4 h5 o2 h6 count d g1 (((h7,(h8,h9)),h10),h11) h12 k
+        ((h9,(h10,h11)),(h12,h13)) h14 k (h15,h16) d' h17. *)
+intros o _ _ h3 g _ o1 h4 h5 o2 h6 count d g1 ((h7,(h8,h9)),(h10,h11)) h12 k
 (h13,h14) d' h15.
 subst o o1 o2.
 clear h4 h5 h6.
@@ -133,5 +133,4 @@ why3 "z3" timelimit 3.
 (* k = 0 *)
 ae.
 Qed.
-
 

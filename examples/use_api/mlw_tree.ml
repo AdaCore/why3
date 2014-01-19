@@ -127,13 +127,11 @@ let d : pdecl =
     let c6 = mk_const "6" in
     let c7 = mk_const "7" in
     let c42 = mk_const "42" in
-    let c6p7 = mk_lexpr (PPapp(mul_int,[c6;c7])) in
+    let c6p7 = mk_lexpr (PPidapp(mul_int,[c6;c7])) in
     let p = mk_lexpr (PPinfix(c6p7,mk_ident "infix =",c42)) in
     mk_expr(Eassert(Aassert,p))
   in
-  let triple = body, spec in
-  let lambda = mk_expr(Efun(args,triple)) in
-  Dlet(mk_ident "f",Gnone,lambda)
+  Dfun(mk_ident "f",Gnone,(args,None,body,spec))
 
 let () =
   try t.new_pdecl Loc.dummy_position d

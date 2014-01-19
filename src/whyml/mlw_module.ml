@@ -163,7 +163,7 @@ type module_uc = {
 
 let empty_module env n p = {
   muc_theory = create_theory ~path:p n;
-  muc_name   = Ident.preid_name n;
+  muc_name   = n.Ident.pre_name;
   muc_path   = p;
   muc_decls  = [];
   muc_prefix = [];

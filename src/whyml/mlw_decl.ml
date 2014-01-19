@@ -106,7 +106,7 @@ let create_data_decl tdl =
       (* build the projections, if any *)
       let build_proj fd id =
         try
-          let pj = Hstr.find projections (preid_name id) in
+          let pj = Hstr.find projections id.pre_name in
           ity_equal_check pj.pl_value.fd_ity fd.fd_ity;
           begin match pj.pl_value.fd_mut, fd.fd_mut with
             | None, None -> ()
@@ -119,7 +119,7 @@ let create_data_decl tdl =
         with Not_found ->
           let pj = create_plsymbol ~hidden id [res] fd in
           news := news_id !news pj.pl_ls.ls_name;
-          Hstr.add projections (preid_name id) pj;
+          Hstr.add projections id.pre_name pj;
           pj
       in
       cs, List.map (fun (id,fd) -> Opt.map (build_proj fd) id) al
@@ -267,14 +267,10 @@ let find_definition kn ps =
 
 let check_match lkn _kn d =
   let rec checkE () e = match e.e_node with
-    | Ecase (e1,bl) ->
-        let typ = ty_of_ity (ity_of_expr e1) in
-        let tye = ty_of_ity (ity_of_expr e) in
-        let t_p = t_var (create_vsymbol (id_fresh "x") typ) in
-        let t_e = t_var (create_vsymbol (id_fresh "y") tye) in
-        let bl = List.map (fun (pp,_) -> [pp.ppat_pattern], t_e) bl in
-        let get ts = List.map fst (Decl.find_constructors lkn ts) in
-        ignore (Loc.try3 ?loc:e.e_loc Pattern.CompileTerm.compile get [t_p] bl);
+    | Ecase (_,bl) ->
+        let pl = List.map (fun (pp,_) -> [pp.ppat_pattern]) bl in
+        let get_constructors s = List.map fst (Decl.find_constructors lkn s) in
+        Loc.try2 ?loc:e.e_loc (Pattern.check_compile ~get_constructors) [] pl;
         e_fold checkE () e
     | _ -> e_fold checkE () e
   in

@@ -99,13 +99,13 @@ module Treedel
      forall z "induction": zipper 'a, x: 'a, l r: tree 'a.
      inorder (zip (Node l x r) z) = inorder l ++ Cons x (inorder (zip r z))
 
-  let ghost left (t: tree loc) : tree loc
+  let ghost tree_left (t: tree loc) : tree loc
      requires { t <> Empty }
      ensures  { match t with Empty -> false | Node l _ _ -> result = l end }
   =
      match t with Empty -> absurd | Node l _ _ -> l end
 
-  let ghost right (t: tree loc) : tree loc
+  let ghost tree_right (t: tree loc) : tree loc
      requires { t <> Empty }
      ensures  { match t with Empty -> false | Node _ _ r -> result = r end }
   =
@@ -142,8 +142,8 @@ module Treedel
       let pp = ref t in
       let tt = ref (get_left !p) in
       let ghost zipper = ref Top in
-      let ghost ppr = ref (right it) in
-      let ghost subtree = ref (left it) in
+      let ghost ppr = ref (tree_right it) in
+      let ghost subtree = ref (tree_left it) in
       while !tt <> null do
         invariant { !pp <> null /\ !mem[!pp].left = !p }
         invariant { !p <> null /\ !mem[!p].left = !tt }
@@ -151,8 +151,8 @@ module Treedel
                     istree !mem !pp pt /\ zip pt !zipper = it }
         assert { istree !mem !p !subtree };
         ghost zipper := Left !zipper !pp !ppr;
-        ghost ppr := right !subtree;
-        ghost subtree := left !subtree;
+        ghost ppr := tree_right !subtree;
+        ghost subtree := tree_left !subtree;
         pp := !p;
         p := !tt;
         tt := get_left !p
@@ -162,8 +162,8 @@ module Treedel
       let m = get_data !p in
       tt := get_right !p;
       mem := set !mem !pp { !mem[!pp] with left = !tt };
-      let ghost pl = left !subtree in assert { pl = Empty };
-      ghost ot := zip (right !subtree) (Left !zipper !pp !ppr);
+      let ghost pl = tree_left !subtree in assert { pl = Empty };
+      ghost ot := zip (tree_right !subtree) (Left !zipper !pp !ppr);
       (t, m)
     end
 

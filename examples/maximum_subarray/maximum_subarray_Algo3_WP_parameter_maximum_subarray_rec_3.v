@@ -90,35 +90,35 @@ Definition maxsublo (a:(@array Z _)) (maxlo:Z) (s:Z): Prop := forall (l:Z)
 
 (* Why3 assumption *)
 Definition maxsub (a:(@array Z _)) (s:Z): Prop := forall (l:Z) (h:Z),
-  (((0%Z <= l)%Z /\ (l <= h)%Z) /\ (h <= (length a))%Z) -> ((sum1 a l
+  ((0%Z <= l)%Z /\ ((l <= h)%Z /\ (h <= (length a))%Z)) -> ((sum1 a l
   h) <= s)%Z.
 
 (* Why3 goal *)
 Theorem WP_parameter_maximum_subarray_rec : forall (a:Z) (a1:(@map.Map.map
-  Z _ Z _)) (l:Z) (h:Z), ((0%Z <= a)%Z /\ (((0%Z <= l)%Z /\ (l <= h)%Z) /\
-  (h <= a)%Z)) -> ((~ (h = l)) -> let mid := (l + (ZOdiv (h - l)%Z 2%Z))%Z in
-  forall (lo:Z), (lo = mid) -> forall (hi:Z), (hi = mid) ->
-  ((l <= (mid - 1%Z)%Z)%Z -> forall (s:Z) (ms:Z) (lo1:Z),
-  ((((((l <= lo1)%Z /\ (lo1 <= mid)%Z) /\ (mid = hi)) /\ (ms = (sum a1 lo1
-  hi))) /\ forall (l':Z), (((l - 1%Z)%Z < l')%Z /\ (l' <= mid)%Z) -> ((sum a1
-  l' mid) <= ms)%Z) /\ (s = (sum a1 ((l - 1%Z)%Z + 1%Z)%Z mid))) ->
-  ((forall (l':Z), ((l <= l')%Z /\ (l' <= mid)%Z) -> ((sum a1 l'
-  mid) <= (sum a1 lo1 mid))%Z) -> forall (s1:Z), (s1 = ms) -> let o :=
-  (h - 1%Z)%Z in ((mid <= o)%Z -> forall (s2:Z) (ms1:Z) (hi1:Z),
-  forall (i:Z), ((mid <= i)%Z /\ (i <= o)%Z) -> ((((((((l <= lo1)%Z /\
-  (lo1 <= mid)%Z) /\ (mid <= hi1)%Z) /\ (hi1 <= h)%Z) /\ (ms1 = (sum a1 lo1
-  hi1))) /\ forall (l':Z) (h':Z), ((((l <= l')%Z /\ (l' <= mid)%Z) /\
-  (mid <= h')%Z) /\ (h' <= i)%Z) -> ((sum a1 l' h') <= ms1)%Z) /\
-  (s2 = (sum a1 lo1 i))) -> (((0%Z <= i)%Z /\ (i < a)%Z) -> forall (s3:Z),
-  (s3 = (s2 + (map.Map.get a1 i))%Z) -> ((s3 = (sum a1 lo1 (i + 1%Z)%Z)) ->
-  ((s3 = ((sum a1 lo1 mid) + (sum a1 mid (i + 1%Z)%Z))%Z) ->
-  ((~ (ms1 < s3)%Z) -> forall (l':Z) (h':Z), ((((l <= l')%Z /\
-  (l' <= mid)%Z) /\ (mid <= h')%Z) /\ (h' <= (i + 1%Z)%Z)%Z) -> ((sum a1 l'
-  h') <= ms1)%Z))))))))).
-intros a a1 l h (h1,((h2,h3),h4)) h5 mid lo h6 hi h7 h8 s ms lo1
-(((((h9,h10),h11),h12),h13),h14) h15 s1 h16 o h17 s2 ms1 hi1 i (h18,h19)
-((((((h20,h21),h22),h23),h24),h25),h26) (h27,h28) s3 h29 h30 h31 h32 l' h'
-(((h33,h34),h35),h36).
+  Z _ Z _)) (l:Z) (h:Z), ((0%Z <= a)%Z /\ ((0%Z <= l)%Z /\ ((l <= h)%Z /\
+  (h <= a)%Z))) -> ((~ (h = l)) -> let mid :=
+  (l + (ZOdiv (h - l)%Z 2%Z))%Z in forall (lo:Z), (lo = mid) ->
+  forall (hi:Z), (hi = mid) -> ((l <= (mid - 1%Z)%Z)%Z -> forall (s:Z) (ms:Z)
+  (lo1:Z), ((((l <= lo1)%Z /\ ((lo1 <= mid)%Z /\ (mid = hi))) /\
+  (ms = (sum a1 lo1 hi))) /\ ((forall (l':Z), (((l - 1%Z)%Z < l')%Z /\
+  (l' <= mid)%Z) -> ((sum a1 l' mid) <= ms)%Z) /\ (s = (sum a1
+  ((l - 1%Z)%Z + 1%Z)%Z mid)))) -> ((forall (l':Z), ((l <= l')%Z /\
+  (l' <= mid)%Z) -> ((sum a1 l' mid) <= (sum a1 lo1 mid))%Z) ->
+  forall (s1:Z), (s1 = ms) -> let o := (h - 1%Z)%Z in ((mid <= o)%Z ->
+  forall (s2:Z) (ms1:Z) (hi1:Z), forall (i:Z), ((mid <= i)%Z /\
+  (i <= o)%Z) -> (((((l <= lo1)%Z /\ ((lo1 <= mid)%Z /\ ((mid <= hi1)%Z /\
+  (hi1 <= h)%Z))) /\ (ms1 = (sum a1 lo1 hi1))) /\ ((forall (l':Z) (h':Z),
+  ((l <= l')%Z /\ ((l' <= mid)%Z /\ ((mid <= h')%Z /\ (h' <= i)%Z))) ->
+  ((sum a1 l' h') <= ms1)%Z) /\ (s2 = (sum a1 lo1 i)))) -> (((0%Z <= i)%Z /\
+  (i < a)%Z) -> forall (s3:Z), (s3 = (s2 + (map.Map.get a1 i))%Z) ->
+  ((s3 = (sum a1 lo1 (i + 1%Z)%Z)) -> ((s3 = ((sum a1 lo1 mid) + (sum a1 mid
+  (i + 1%Z)%Z))%Z) -> ((~ (ms1 < s3)%Z) -> forall (l':Z) (h':Z),
+  ((l <= l')%Z /\ ((l' <= mid)%Z /\ ((mid <= h')%Z /\
+  (h' <= (i + 1%Z)%Z)%Z))) -> ((sum a1 l' h') <= ms1)%Z))))))))).
+intros a a1 l h (h1,(h2,(h3,h4))) h5 mid lo h6 hi h7 h8 s ms lo1
+        (((h9,(h10,h11)),h12),(h13,h14)) h15 s1 h16 o h17 s2 ms1 hi1 i
+        (h18,h19) (((h20,(h21,(h22,h23))),h24),(h25,h26)) (h27,h28) s3 h29
+        h30 h31 h32 l' h' (h33,(h34,(h35,h36))).
 destruct (Z_le_dec (i + 1) h').
 assert (h' = i + 1)%Z by omega.
 rewrite H.
@@ -138,5 +138,4 @@ omega.
 apply h25.
 omega.
 Qed.
-
 

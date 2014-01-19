@@ -40,18 +40,21 @@ val close_file : unit -> theory Mstr.t
 (***************************************************************************)
 
 val create_user_tv : string -> tvsymbol
+val create_user_id : Ptree.ident -> Ident.preid
 
-val print_qualid : Format.formatter -> Ptree.qualid -> unit
-val split_qualid : Ptree.qualid -> string list * string
 val qloc : Ptree.qualid -> Loc.position
+val string_list_of_qualid : Ptree.qualid -> string list
+val print_qualid : Format.formatter -> Ptree.qualid -> unit
 
-val find_ns :
-  ('a -> Ident.ident) -> ('b -> string list -> 'a) -> Ptree.qualid -> 'b -> 'a
+exception UnboundSymbol of Ptree.qualid
 
-val type_term :
-  theory_uc -> (Ptree.qualid -> vsymbol option) -> Ptree.lexpr -> term
+val find_qualid :
+  ('a -> Ident.ident) -> ('b -> string list -> 'a) -> 'b -> Ptree.qualid -> 'a
 
-val type_fmla :
-  theory_uc -> (Ptree.qualid -> vsymbol option) -> Ptree.lexpr -> term
+type global_vs = Ptree.qualid -> vsymbol option
+
+val type_term : theory_uc -> global_vs -> Ptree.lexpr -> term
+
+val type_fmla : theory_uc -> global_vs -> Ptree.lexpr -> term
 
 val type_inst : theory_uc -> theory -> Ptree.clone_subst list -> th_inst

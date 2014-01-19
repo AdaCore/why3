@@ -23,6 +23,11 @@ let map_fold_left f acc l =
   let acc, rev = rev_map_fold_left f acc l in
   acc, List.rev rev
 
+let map_fold_right f l acc =
+  List.fold_right
+    (fun e (l, acc) -> let e, acc = f e acc in e :: l, acc)
+    l ([], acc)
+
 let equal pr l1 l2 =
   try List.for_all2 pr l1 l2 with Invalid_argument _ -> false
 

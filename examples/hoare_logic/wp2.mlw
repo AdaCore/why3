@@ -114,7 +114,7 @@ predicate fresh_in_fmla (id:ident) (f:fmla) =
       fresh_in_fmla id f1 /\ fresh_in_fmla id f2
   | Fnot f -> fresh_in_fmla id f
   | Flet y t f -> id <> y /\ fresh_in_term id t /\ fresh_in_fmla id f
-  | Fforall y ty f -> id <> y /\ fresh_in_fmla id f
+  | Fforall y _ f -> id <> y /\ fresh_in_fmla id f
   end
 
 function subst (f:fmla) (x:ident) (v:ident) : fmla =

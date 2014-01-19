@@ -79,30 +79,33 @@ let print_its fmt ts = print_ts fmt ts.its_ts
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let rec print_ity_node s inn fmt ity = match ity.ity_node with
+let rec print_ity_node s pri fmt ity = match ity.ity_node with
   | Ityvar v ->
       begin match Mtv.find_opt v s.ity_subst_tv with
-        | Some ity -> print_ity_node ity_subst_empty inn fmt ity
+        | Some ity -> print_ity_node ity_subst_empty pri fmt ity
         | None     -> print_tv fmt v
       end
+  | Itypur (ts,[t1;t2]) when ts_equal ts Ty.ts_func ->
+      fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
+        (print_ity_node s 1) t1 (print_ity_node s 0) t2
   | Itypur (ts,tl) when is_ts_tuple ts -> fprintf fmt "(%a)"
-      (print_list comma (print_ity_node s false)) tl
+      (print_list comma (print_ity_node s 0)) tl
   | Itypur (ts,[]) -> print_ts fmt ts
-  | Itypur (ts,tl) -> fprintf fmt (protect_on inn "%a@ %a")
-      print_ts ts (print_list space (print_ity_node s true)) tl
-  | Ityapp (ts,[],rl) -> fprintf fmt (protect_on inn "%a@ <%a>")
+  | Itypur (ts,tl) -> fprintf fmt (protect_on (pri > 1) "%a@ %a")
+      print_ts ts (print_list space (print_ity_node s 2)) tl
+  | Ityapp (ts,[],rl) -> fprintf fmt (protect_on (pri > 1) "%a@ <%a>")
       print_its ts (print_list comma print_regty)
       (List.map (fun r -> Mreg.find_def r r s.ity_subst_reg) rl)
-  | Ityapp (ts,tl,rl) -> fprintf fmt (protect_on inn "%a@ <%a>@ %a")
+  | Ityapp (ts,tl,rl) -> fprintf fmt (protect_on (pri > 1) "%a@ <%a>@ %a")
       print_its ts (print_list comma print_regty)
       (List.map (fun r -> Mreg.find_def r r s.ity_subst_reg) rl)
-      (print_list space (print_ity_node s true)) tl
+      (print_list space (print_ity_node s 2)) tl
 
 and print_regty fmt reg =
   if Debug.test_noflag debug_print_reg_types then print_reg fmt reg
   else fprintf fmt "@[%a:@,%a@]" print_reg reg print_ity reg.reg_ity
 
-and print_ity fmt ity = print_ity_node ity_subst_empty false fmt ity
+and print_ity fmt ity = print_ity_node ity_subst_empty 2 fmt ity
 
 let print_reg_opt fmt = function
   | Some r -> fprintf fmt "<%a>" print_regty r
@@ -342,7 +345,7 @@ and print_tl fmt tl =
 let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
 
 let print_ty_arg fmt ty =
-  fprintf fmt "@ %a" (print_ity_node ity_subst_empty true) ty
+  fprintf fmt "@ %a" (print_ity_node ity_subst_empty 2) ty
 
 let print_constr fmt (cs,pjl) =
   let print_pj fmt (fd,pj) = match pj with
@@ -426,13 +429,14 @@ let print_pdecl fmt d = match d.pd_node with
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
+  | Mlw_ty.BadItyArity ({its_ts = {ts_args = []}} as ts, _) ->
+      fprintf fmt "Type symbol %a expects no arguments" print_its ts
   | Mlw_ty.BadItyArity (ts, app_arg) ->
-      fprintf fmt "Bad type arity: type symbol %a must be applied \
-                   to %i arguments, but is applied to %i"
+      fprintf fmt "Type symbol %a expects %i arguments but is applied to %i"
         print_its ts (List.length ts.its_ts.ts_args) app_arg
   | Mlw_ty.BadRegArity (ts, app_arg) ->
-      fprintf fmt "Bad region arity: type symbol %a must be applied \
-                   to %i regions, but is applied to %i"
+      fprintf fmt "Type symbol %a expects \
+                   %i region arguments but is applied to %i"
         print_its ts (List.length ts.its_regs) app_arg
   | Mlw_ty.DuplicateRegion r ->
       fprintf fmt "Region %a is used twice" print_reg r
@@ -447,7 +451,7 @@ let () = Exn_printer.register
         print_regty r1 print_regty r2
   | Mlw_ty.TypeMismatch (t1,t2,s) ->
       fprintf fmt "Type mismatch between %a and %a"
-        (print_ity_node s false) t1 print_ity t2
+        (print_ity_node s 0) t1 print_ity t2
   | Mlw_ty.PolymorphicException (id,_ity) ->
       fprintf fmt "Exception %s has a polymorphic type" id.id_string
   | Mlw_ty.MutableException (id,_ity) ->

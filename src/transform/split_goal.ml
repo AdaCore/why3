@@ -37,14 +37,6 @@ let split_case forig spl pos acc tl bl =
 
 let compiled = Ident.create_label "split_goal: compiled match"
 
-module Compile = Pattern.Compile (struct
-  type action = term
-  type branch = term_branch
-  let mk_let v s t  = t_let_close_simp v s t
-  let mk_branch p t = t_close_branch p t
-  let mk_case t bl  = t_label_add compiled (t_case t bl)
-end)
-
 let split_case_2 kn forig spl pos acc t bl =
   let vs = create_vsymbol (id_fresh "q") (t_type t) in
   let tv = t_var vs in
@@ -85,9 +77,10 @@ let split_case_2 kn forig spl pos acc t bl =
     let forig = t_label ?loc:forig.t_loc lab forig in
     split_case_2 kn forig spl pos acc t bl
   else
+    let mk_let = t_let_close_simp in
+    let mk_case t bl = t_label_add compiled (t_case_close t bl) in
     let mk_b b = let p,f = t_open_branch b in [p], f in
-    let find ts = List.map fst (find_constructors kn ts) in
-    let f = Compile.compile find [t] (List.map mk_b bl) in
+    let f = Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl) in
     spl acc f
 
 let asym_split = Term.asym_label

@@ -166,7 +166,6 @@ module M
       invariant { reverse (model (old_next) (old_p)) =
         reverse (model !next !p) ++ model !next !q }
       let tmp = !next[!p] in
-      let bak_next = !next in
       next := !next[!p <- !q];
       assert { (reverse (Cons !p (model !next tmp))) ++ (model !next !q) =
                (reverse (model !next tmp)) ++ (Cons !p (model !next !q))};
@@ -328,8 +327,7 @@ module M2
     requires { is_list !next !p }
     ensures  { is_list !next !result }
     ensures  { reverse (model (old !next) (old !p)) = model !next !result }
-  = let old_next = !next in
-    let old_p = !p in
+  = let old_p = !p in
     let q = ref null in
 'Init:
     while !p <> null do
@@ -338,7 +336,6 @@ module M2
       invariant { reverse (model (at !next 'Init) (old_p)) =
         reverse (model !next !p) ++ model !next !q }
       let tmp = !next[!p] in
-      let bak_next = !next in
       next := !next[!p <- !q];
       (* assert { (reverse (Cons p (model !next tmp))) ++ (model !next q) = *)
       (*          (reverse (model !next tmp)) ++ (Cons p (model !next q))}; *)

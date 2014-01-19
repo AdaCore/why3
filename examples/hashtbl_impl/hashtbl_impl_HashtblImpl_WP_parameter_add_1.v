@@ -108,18 +108,18 @@ Require Import Why3. Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 3.
 (* Why3 goal *)
 Theorem WP_parameter_add : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
   (h1:(@map.Map.map Z _ (list (key* a)%type) _)) (h2:(@map.Map.map
-  key key_WhyType (option a) _)) (k:key) (v:a), ((((0%Z < h)%Z /\
-  forall (i:Z), ((0%Z <= i)%Z /\ (i < h)%Z) -> (good_hash (mk_array h h1)
-  i)) /\ forall (k1:key) (v1:a), (good_data k1 v1 h2 (mk_array h h1))) /\
+  key key_WhyType (option a) _)) (k:key) (v:a), (((0%Z < h)%Z /\
+  ((forall (i:Z), ((0%Z <= i)%Z /\ (i < h)%Z) -> (good_hash (mk_array h h1)
+  i)) /\ forall (k1:key) (v1:a), (good_data k1 v1 h2 (mk_array h h1)))) /\
   (0%Z <= h)%Z) -> forall (rho:Z) (rho1:(@map.Map.map Z _ (list (key*
-  a)%type) _)), ((((0%Z < rho)%Z /\ forall (i:Z), ((0%Z <= i)%Z /\
+  a)%type) _)), (((0%Z < rho)%Z /\ ((forall (i:Z), ((0%Z <= i)%Z /\
   (i < rho)%Z) -> (good_hash (mk_array rho rho1) i)) /\ forall (k1:key)
-  (v1:a), (good_data k1 v1 h2 (mk_array rho rho1))) /\ (0%Z <= rho)%Z) ->
+  (v1:a), (good_data k1 v1 h2 (mk_array rho rho1)))) /\ (0%Z <= rho)%Z) ->
   forall (rho2:(@map.Map.map key key_WhyType (option a) _))
   (rho3:(@map.Map.map Z _ (list (key* a)%type) _)) (rho4:Z),
-  (((((0%Z < rho)%Z /\ forall (i:Z), ((0%Z <= i)%Z /\ (i < rho)%Z) ->
+  ((((0%Z < rho)%Z /\ ((forall (i:Z), ((0%Z <= i)%Z /\ (i < rho)%Z) ->
   (good_hash (mk_array rho rho3) i)) /\ forall (k1:key) (v1:a), (good_data k1
-  v1 rho2 (mk_array rho rho3))) /\ (0%Z <= rho)%Z) /\ (((map.Map.get rho2
+  v1 rho2 (mk_array rho rho3)))) /\ (0%Z <= rho)%Z) /\ (((map.Map.get rho2
   k) = None) /\ forall (k':key), (~ (k' = k)) -> ((map.Map.get rho2
   k') = (map.Map.get h2 k')))) -> let i := (bucket k rho) in
   (((0%Z <= i)%Z /\ (i < rho)%Z) -> (((0%Z <= i)%Z /\ (i < rho)%Z) ->
@@ -129,8 +129,8 @@ Theorem WP_parameter_add : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
   key key_WhyType (option a) _)), (rho6 = (map.Map.set rho2 k (Some v))) ->
   forall (i1:Z), ((0%Z <= i1)%Z /\ (i1 < rho)%Z) -> (good_hash (mk_array rho
   o) i1))).
-intros a a_WT rho rho1 rho2 k v (((h1,h2),h3),h4) rho3 rho4 (((h5,h6),h7),h8)
-rho5 rho6 rho7 ((((h9,h10),h11),h12),(h13,h14)) i1 (h15,h16) (h17,h18) o
+intros a a_WT rho rho1 rho2 k v ((h1,(h2,h3)),h4) rho3 rho4 ((h5,(h6,h7)),h8)
+rho5 rho6 rho7 (((h9,(h10,h11)),h12),(h13,h14)) i1 (h15,h16) (h17,h18) o
 (h19,h20) rho8 h21 rho9 h22 i (h23,h24).
 subst i1.
 unfold good_hash in *.
@@ -143,5 +143,4 @@ destruct h.
 ae.
 ae.
 Qed.
-
 

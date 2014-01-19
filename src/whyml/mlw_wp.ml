@@ -72,7 +72,7 @@ let t_old  = t_var vs_old
 let t_at_old t = t_app fs_at [t; t_old] t.t_ty
 
 let ls_absurd = create_lsymbol (id_fresh "absurd") [] None
-let t_absurd  = ps_app ls_absurd []
+let t_absurd  = t_label_add Split_goal.stop_split (ps_app ls_absurd [])
 
 let mk_t_if f = t_if f t_bool_true t_bool_false
 let to_term t = if t.t_ty = None then mk_t_if t else t
@@ -234,14 +234,14 @@ let decrease_alg ?loc env old_t t =
   let csl = Decl.find_constructors env.pure_known ts in
   if csl = [] then quit ();
   let sbs = ty_match Mtv.empty (ty_app ts (List.map ty_var ts.ts_args)) oty in
-  let add_arg acc fty =
+  let add_arg fty acc =
     let fty = ty_inst sbs fty in
     if ty_equal fty nty then
       let vs = create_vsymbol (id_fresh "f") nty in
-      t_or_simp acc (t_equ (t_var vs) t), pat_var vs
-    else acc, pat_wild fty in
+      pat_var vs, t_or_simp (t_equ (t_var vs) t) acc
+    else pat_wild fty, acc in
   let add_cs (cs,_) =
-    let f, pl = Lists.map_fold_left add_arg t_false cs.ls_args in
+    let pl, f = Lists.map_fold_right add_arg cs.ls_args t_false in
     t_close_branch (pat_app cs pl oty) f in
   t_case old_t (List.map add_cs csl)
 
@@ -715,7 +715,7 @@ and wp_desc env e q xq = match e.e_node with
       let f = wp_expl expl_assume f in
       wp_implies (wp_label e f) q
   | Eabsurd ->
-      wp_label e (t_label_add expl_absurd t_absurd)
+      wp_label e (wp_expl expl_absurd t_absurd)
   | Eany spec ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
