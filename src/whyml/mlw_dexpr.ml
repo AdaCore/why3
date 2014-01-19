@@ -911,7 +911,8 @@ let check_user_effect e spec full_xpost dsp =
       "this expression depends on variable %a left out in specification"
       Mlw_pretty.print_pv pv in
   if dsp.ds_reads <> [] then Spv.iter check_read
-    (Spv.diff e.e_syms.syms_pv (spec_pvset Spv.empty spec));
+    (Spv.remove Mlw_wp.pv_old
+      (Spv.diff e.e_syms.syms_pv (spec_pvset Spv.empty spec)));
   let check_write reg = if not (has_write reg ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
       "this expression produces an unlisted write effect" in
