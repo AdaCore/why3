@@ -72,7 +72,7 @@ let t_old  = t_var vs_old
 let t_at_old t = t_app fs_at [t; t_old] t.t_ty
 
 let ls_absurd = create_lsymbol (id_fresh "absurd") [] None
-let t_absurd  = ps_app ls_absurd []
+let t_absurd  = t_label_add Split_goal.stop_split (ps_app ls_absurd [])
 
 let mk_t_if f = t_if f t_bool_true t_bool_false
 let to_term t = if t.t_ty = None then mk_t_if t else t
@@ -715,7 +715,7 @@ and wp_desc env e q xq = match e.e_node with
       let f = wp_expl expl_assume f in
       wp_implies (wp_label e f) q
   | Eabsurd ->
-      wp_label e (t_label_add expl_absurd t_absurd)
+      wp_label e (wp_expl expl_absurd t_absurd)
   | Eany spec ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
