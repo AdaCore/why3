@@ -106,16 +106,16 @@ Definition size {a:Type} {a_WT:WhyType a} (v:(@t a a_WT)): Z :=
 (* Why3 goal *)
 Theorem WP_parameter_find : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
   (h1:(@map.Map.map Z _ (list (key* a)%type) _)) (h2:(@map.Map.map
-  key key_WhyType (option a) _)) (k:key), ((((0%Z < h)%Z /\ forall (i:Z),
+  key key_WhyType (option a) _)) (k:key), (((0%Z < h)%Z /\ ((forall (i:Z),
   ((0%Z <= i)%Z /\ (i < h)%Z) -> (good_hash (mk_array h h1) i)) /\
-  forall (k1:key) (v:a), (good_data k1 v h2 (mk_array h h1))) /\
+  forall (k1:key) (v:a), (good_data k1 v h2 (mk_array h h1)))) /\
   (0%Z <= h)%Z) -> let i := (bucket k h) in (((0%Z <= i)%Z /\ (i < h)%Z) ->
   let o := (map.Map.get h1 i) in forall (result:(option a)),
   match result with
   | None => forall (v:a), ~ (list.Mem.mem (k, v) o)
   | (Some v) => (list.Mem.mem (k, v) o)
   end -> (result = (map.Map.get h2 k))).
-intros a a_WT rho rho1 rho2 k (((h1,h2),h3),h4) i (h5,h6) o result h7.
+intros a a_WT rho rho1 rho2 k ((h1,(h2,h3)),h4) i (h5,h6) o result h7.
 subst i.
 destruct result.
 symmetry.
@@ -127,5 +127,4 @@ elim (h7 a0).
 now apply h3.
 easy.
 Qed.
-
 

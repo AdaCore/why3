@@ -106,9 +106,9 @@ Definition size {a:Type} {a_WT:WhyType a} (v:(@t a a_WT)): Z :=
 (* Why3 goal *)
 Theorem WP_parameter_remove : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
   (h1:(@map.Map.map Z _ (list (key* a)%type) _)) (h2:(@map.Map.map
-  key key_WhyType (option a) _)) (k:key), ((((0%Z < h)%Z /\ forall (i:Z),
+  key key_WhyType (option a) _)) (k:key), (((0%Z < h)%Z /\ ((forall (i:Z),
   ((0%Z <= i)%Z /\ (i < h)%Z) -> (good_hash (mk_array h h1) i)) /\
-  forall (k1:key) (v:a), (good_data k1 v h2 (mk_array h h1))) /\
+  forall (k1:key) (v:a), (good_data k1 v h2 (mk_array h h1)))) /\
   (0%Z <= h)%Z) -> let i := (bucket k h) in (((0%Z <= i)%Z /\ (i < h)%Z) ->
   let l := (map.Map.get h1 i) in forall (result:(option a)),
   match result with
@@ -119,7 +119,7 @@ Theorem WP_parameter_remove : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
   | None => ((map.Map.get h2 k) = None)
   | (Some _) => True
   end).
-intros a a_WT rho rho1 rho2 k (((h1,h2),h3),h4) i (h5,h6) l result h7.
+intros a a_WT rho rho1 rho2 k ((h1,(h2,h3)),h4) i (h5,h6) l result h7.
 subst i.
 destruct result; auto.
 subst l.
@@ -130,5 +130,4 @@ generalize (h3 a0); clear h3; intro h3.
 generalize (h7 a0); clear h7; intro h7.
 intuition.
 Qed.
-
 
