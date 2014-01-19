@@ -252,8 +252,8 @@ use export list.List
 function type_value (v:value) : datatype =
   match v with
     | Vvoid  -> TYunit
-    | Vint int ->  TYint
-    | Vbool bool -> TYbool
+    | Vint _ ->  TYint
+    | Vbool _ -> TYbool
   end
 
 inductive type_operator (op:operator) (ty1 ty2 ty: datatype) =
@@ -452,7 +452,7 @@ predicate fresh_in_fmla (id:ident) (f:fmla) =
       fresh_in_fmla id f1 /\ fresh_in_fmla id f2
   | Fnot f -> fresh_in_fmla id f
   | Flet y t f -> id <> y /\ fresh_in_term id t /\ fresh_in_fmla id f
-  | Fforall y ty f -> id <> y /\ fresh_in_fmla id f
+  | Fforall y _ f -> id <> y /\ fresh_in_fmla id f
   end
 
 

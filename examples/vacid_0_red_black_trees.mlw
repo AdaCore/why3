@@ -85,7 +85,7 @@ module RedBlackTree
   predicate bst (t : tree) =
     match t with
     | Leaf -> true
-    | Node _ l k v r -> bst l /\ bst r /\ lt_tree k l /\ gt_tree k r
+    | Node _ l k _ r -> bst l /\ bst r /\ lt_tree k l /\ gt_tree k r
     end
 
   lemma bst_Leaf : bst Leaf
