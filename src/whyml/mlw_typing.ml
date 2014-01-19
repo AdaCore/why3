@@ -83,7 +83,6 @@ let uc_find_ls uc p =
 (** parsing types *)
 
 let create_user_tv = Typing.create_user_tv
-let create_user_id = Typing.create_user_id
 
 let ity_of_pty ?(noop=true) uc pty =
   let rec get_ty = function
