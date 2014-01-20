@@ -297,6 +297,8 @@ let dspec lenv sp lvm ty = {
   ds_reads   = dreads lenv sp.sp_reads lvm;
   ds_writes  = dwrites lenv sp.sp_writes lvm;
   ds_variant = dvariant lenv sp.sp_variant lvm;
+  ds_checkrw = sp.sp_checkrw;
+  ds_diverge = sp.sp_diverge;
 }
 
 let dassert lenv f lvm =
@@ -563,7 +565,8 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Eany (tyv, sp) ->
       let dsp = if
         sp.sp_pre   = [] && sp.sp_post   = [] && sp.sp_xpost   = [] &&
-        sp.sp_reads = [] && sp.sp_writes = [] && sp.sp_variant = []
+        sp.sp_reads = [] && sp.sp_writes = [] && sp.sp_variant = [] &&
+        not sp.sp_checkrw && not sp.sp_diverge
       then None
       else Some (dspec lenv sp) in
       DEany (dtype_v lenv tyv, dsp)

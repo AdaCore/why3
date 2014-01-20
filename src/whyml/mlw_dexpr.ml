@@ -362,6 +362,8 @@ type dspec_final = {
   ds_reads   : vsymbol list;
   ds_writes  : term list;
   ds_variant : variant list;
+  ds_checkrw : bool;
+  ds_diverge : bool;
 }
 
 type dspec = ty -> dspec_final
@@ -857,6 +859,7 @@ let rec effect_of_term t = match t.t_node with
 let effect_of_dspec dsp =
   let add_raise xs _ eff = eff_raise eff xs in
   let eff = Mexn.fold add_raise dsp.ds_xpost eff_empty in
+  let eff = if dsp.ds_diverge then eff_diverge eff else eff in
   let svs = List.fold_right Svs.add dsp.ds_reads Svs.empty in
   let add_write (svs,mreg,eff) t =
     let vs, fd = effect_of_term t in
@@ -879,7 +882,7 @@ let e_find_loc pr e =
   try (e_find (fun e -> e.e_loc <> None && pr e) e).e_loc
   with Not_found -> None
 
-let check_user_effect e spec full_xpost dsp =
+let check_user_effect e spec args full_xpost dsp =
   let has_write reg eff =
     Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
   let has_raise xs eff =
@@ -905,29 +908,38 @@ let check_user_effect e spec full_xpost dsp =
       Mlw_pretty.print_xs xs in
   Mexn.iter check_raise ueff.eff_raises;
   Mexn.iter check_raise ueff.eff_ghostx;
+  if ueff.eff_diverg && not eeff.eff_diverg then
+    Loc.errorm ?loc:e.e_loc "this expression does not diverge";
   (* check that every computed effect is listed *)
   let check_read pv = if not (Svs.mem pv.pv_vs usvs) then
     Loc.errorm ?loc:(e_find_loc (fun e -> Spv.mem pv e.e_syms.syms_pv) e)
       "this expression depends on variable %a left out in specification"
       Mlw_pretty.print_pv pv in
-  if dsp.ds_reads <> [] then Spv.iter check_read
-    (Spv.remove Mlw_wp.pv_old
-      (Spv.diff e.e_syms.syms_pv (spec_pvset Spv.empty spec)));
   let check_write reg = if not (has_write reg ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
       "this expression produces an unlisted write effect" in
-  if dsp.ds_writes <> [] then Sreg.iter check_write eeff.eff_writes;
-  if dsp.ds_writes <> [] then Sreg.iter check_write eeff.eff_ghostw;
+  if dsp.ds_checkrw then begin
+    let reads = Spv.remove Mlw_wp.pv_old e.e_syms.syms_pv in
+    let reads = Spv.diff reads (spec_pvset Spv.empty spec) in
+    let reads = List.fold_right Spv.remove args reads in
+    Spv.iter check_read reads;
+    Sreg.iter check_write eeff.eff_writes;
+    Sreg.iter check_write eeff.eff_ghostw;
+  end;
   let check_raise xs = if not (has_raise xs ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_raise xs e.e_effect) e)
       "this expression raises unlisted exception %a"
       Mlw_pretty.print_xs xs in
   if full_xpost then Sexn.iter check_raise eeff.eff_raises;
-  if full_xpost then Sexn.iter check_raise eeff.eff_ghostx
+  if full_xpost then Sexn.iter check_raise eeff.eff_ghostx;
+  if eeff.eff_diverg && not ueff.eff_diverg then
+    Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
+      "this expression may diverge, which is not stated in specification"
 
 let check_lambda_effect ({fun_lambda = lam} as fd) bl dsp =
   let spec = fd.fun_ps.ps_aty.aty_spec in
-  check_user_effect lam.l_expr spec true dsp;
+  let args = fd.fun_ps.ps_aty.aty_args in
+  check_user_effect lam.l_expr spec args true dsp;
   let optv = opaque_binders Stv.empty bl in
   let bad_comp tv _ _ = Loc.errorm
     ?loc:(e_find_loc (fun e -> Stv.mem tv e.e_effect.eff_compar) lam.l_expr)
@@ -1300,7 +1312,7 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
       if dsp.ds_variant <> [] then Loc.errorm
         "variants are not allowed in `abstract'";
       let spec = spec_of_dspec e.e_effect tyv dsp in
-      check_user_effect e spec false dsp;
+      check_user_effect e spec [] false dsp;
       let speci = spec_invariant env e.e_syms.syms_pv e.e_vty spec in
       (* we do not require invariants on free variables *)
       e_abstract e { speci with c_pre = spec.c_pre }

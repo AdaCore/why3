@@ -120,6 +120,8 @@ end
     sp_reads   = [];
     sp_writes  = [];
     sp_variant = [];
+    sp_checkrw = false;
+    sp_diverge = false;
   }
 
   let spec_union s1 s2 = {
@@ -129,6 +131,8 @@ end
     sp_reads   = s1.sp_reads @ s2.sp_reads;
     sp_writes  = s1.sp_writes @ s2.sp_writes;
     sp_variant = variant_union s1.sp_variant s2.sp_variant;
+    sp_checkrw = s1.sp_checkrw || s2.sp_checkrw;
+    sp_diverge = s1.sp_diverge || s2.sp_diverge;
   }
 
 (* dead code
@@ -171,7 +175,7 @@ end
 
 /* program keywords */
 
-%token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK DO DONE DOWNTO
+%token ABSTRACT ABSURD ANY ASSERT ASSUME BEGIN CHECK DIVERGES DO DONE DOWNTO
 %token ENSURES EXCEPTION FOR
 %token FUN GHOST INVARIANT LOOP MODEL MODULE MUTABLE PRIVATE RAISE
 %token RAISES READS REC REQUIRES RETURNS TO TRY VAL VARIANT WHILE WRITES
@@ -1383,11 +1387,13 @@ single_spec:
 | RAISES LEFTBRC BAR raises RIGHTBRC
     { { empty_spec with sp_xpost = [floc_i 4, $4] } }
 | READS  LEFTBRC reads RIGHTBRC
-    { { empty_spec with sp_reads = $3 } }
+    { { empty_spec with sp_reads = $3; sp_checkrw = true } }
 | WRITES LEFTBRC writes RIGHTBRC
-    { { empty_spec with sp_writes = $3 } }
+    { { empty_spec with sp_writes = $3; sp_checkrw = true } }
 | RAISES LEFTBRC xsymbols RIGHTBRC
     { { empty_spec with sp_xpost = [floc_i 3, $3] } }
+| DIVERGES
+    { { empty_spec with sp_diverge = true } }
 | variant
     { { empty_spec with sp_variant = $1 } }
 ;
@@ -1414,13 +1420,23 @@ raises_case:
 ;
 
 reads:
-| lqualid             { [$1] }
-| lqualid COMMA reads { $1::$3 }
+| /* epsilon */ { [] }
+| list_reads1   { $1 }
+;
+
+list_reads1:
+| lqualid                   { [$1] }
+| lqualid COMMA list_reads1 { $1::$3 }
 ;
 
 writes:
-| lexpr              { [$1] }
-| lexpr COMMA writes { $1::$3 }
+| /* epsilon */ { [] }
+| list_writes1  { $1 }
+;
+
+list_writes1:
+| lexpr                    { [$1] }
+| lexpr COMMA list_writes1 { $1::$3 }
 ;
 
 xsymbols:

@@ -70,6 +70,8 @@ type dspec_final = {
   ds_reads   : vsymbol list;
   ds_writes  : term list;
   ds_variant : variant list;
+  ds_checkrw : bool;
+  ds_diverge : bool;
 }
 
 type dspec = ty -> dspec_final

@@ -28,7 +28,7 @@
    ;; Note: comment font-lock is guaranteed by suitable syntax entries
    '("(\\*\\([^*)]\\([^*]\\|\\*[^)]\\)*\\)?\\*)" . font-lock-comment-face)
 ;   '("{}\\|{[^|]\\([^}]*\\)}" . font-lock-type-face)
-   `(,(why3-regexp-opt '("invariant" "variant" "requires" "ensures" "returns" "raises" "reads" "writes" "assert" "assume" "check")) . font-lock-type-face)
+   `(,(why3-regexp-opt '("invariant" "variant" "diverges" "requires" "ensures" "returns" "raises" "reads" "writes" "assert" "assume" "check")) . font-lock-type-face)
    `(,(why3-regexp-opt '("use" "clone" "namespace" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "model" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "try" "with" "theory" "uses" "module")) . font-lock-keyword-face)
    )
   "Minimal highlighting for Why3 mode")

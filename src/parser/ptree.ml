@@ -197,6 +197,8 @@ type spec = {
   sp_reads   : qualid list;
   sp_writes  : lexpr list;
   sp_variant : variant list;
+  sp_checkrw : bool;
+  sp_diverge : bool;
 }
 
 type type_v =

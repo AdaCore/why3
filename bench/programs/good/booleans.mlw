@@ -35,6 +35,7 @@ let test_not_1 ()
 let test_not_2 ()
   requires { !x <= 0 }
   ensures  { !x = 0 }
+  diverges
   = while not (!x = 0) do invariant { !x <= 0 } incr x done
 
 let test_all_1 ()

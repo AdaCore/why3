@@ -121,6 +121,8 @@ let d : pdecl =
     sp_reads = [];
     sp_writes = [];
     sp_variant = [];
+    sp_checkrw = false;
+    sp_diverge = false;
   }
   in
   let body =

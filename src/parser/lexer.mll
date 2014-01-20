@@ -71,6 +71,7 @@
         "assume", ASSUME;
         "begin", BEGIN;
         "check", CHECK;
+        "diverges", DIVERGES;
         "do", DO;
         "done", DONE;
         "downto", DOWNTO;
