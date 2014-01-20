@@ -889,52 +889,58 @@ let check_user_effect e spec args full_xpost dsp =
     Sexn.mem xs eff.eff_raises || Sexn.mem xs eff.eff_ghostx in
   (* computed effect vs user effect *)
   let eeff = spec.c_effect in
+  let args = Spv.of_list args in
   let usvs, mreg, ueff = effect_of_dspec dsp in
   (* check that every user effect actually happens *)
   let check_read vs =
     let pv = try restore_pv vs with Not_found ->
-      Loc.errorm "unsupported effect expression" in
+      Loc.errorm "unsupported@ effect@ expression" in
+    if Spv.mem pv args then Warning.emit ?loc:e.e_loc
+      "variable@ %a@ is@ a@ local@ function@ argument,@ \
+        it@ does@ not@ have@ to@ be@ listed@ in@ the@ `reads'@ clause"
+      Pretty.print_vs vs;
     if not (Spv.mem pv e.e_syms.syms_pv) then Loc.errorm ?loc:e.e_loc
-      "variable %a does not occur in this expression" Pretty.print_vs vs in
+      "variable@ %a@ does@ not@ occur@ in@ this@ expression"
+      Pretty.print_vs vs in
   List.iter check_read dsp.ds_reads;
   let check_write reg = if not (has_write reg eeff)
     then let t = Mreg.find reg mreg in Loc.errorm ?loc:t.t_loc
-      "this write effect does not happen in the expression" in
+      "this@ write@ effect@ does@ not@ happen@ in@ the@ expression" in
   Sreg.iter check_write ueff.eff_writes;
   Sreg.iter check_write ueff.eff_ghostw;
   let check_raise xs _ = if not (has_raise xs eeff)
     then Loc.errorm ?loc:e.e_loc
-      "this expression does not raise exception %a"
+      "this@ expression@ does@ not@ raise@ exception@ %a"
       Mlw_pretty.print_xs xs in
   Mexn.iter check_raise ueff.eff_raises;
   Mexn.iter check_raise ueff.eff_ghostx;
   if ueff.eff_diverg && not eeff.eff_diverg then
-    Loc.errorm ?loc:e.e_loc "this expression does not diverge";
+    Loc.errorm ?loc:e.e_loc "this@ expression@ does@ not@ diverge";
   (* check that every computed effect is listed *)
   let check_read pv = if not (Svs.mem pv.pv_vs usvs) then
     Loc.errorm ?loc:(e_find_loc (fun e -> Spv.mem pv e.e_syms.syms_pv) e)
-      "this expression depends on variable %a left out in specification"
-      Mlw_pretty.print_pv pv in
+      "this@ expression@ depends@ on@ variable@ %a@ \
+        left@ out@ in@ specification" Mlw_pretty.print_pv pv in
   let check_write reg = if not (has_write reg ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
-      "this expression produces an unlisted write effect" in
+      "this@ expression@ produces@ an@ unlisted@ write@ effect" in
   if dsp.ds_checkrw then begin
     let reads = Spv.remove Mlw_wp.pv_old e.e_syms.syms_pv in
     let reads = Spv.diff reads (spec_pvset Spv.empty spec) in
-    let reads = List.fold_right Spv.remove args reads in
-    Spv.iter check_read reads;
+    Spv.iter check_read (Spv.diff reads args);
     Sreg.iter check_write eeff.eff_writes;
     Sreg.iter check_write eeff.eff_ghostw;
   end;
   let check_raise xs = if not (has_raise xs ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_raise xs e.e_effect) e)
-      "this expression raises unlisted exception %a"
+      "this@ expression@ raises@ unlisted@ exception@ %a"
       Mlw_pretty.print_xs xs in
   if full_xpost then Sexn.iter check_raise eeff.eff_raises;
   if full_xpost then Sexn.iter check_raise eeff.eff_ghostx;
   if eeff.eff_diverg && not ueff.eff_diverg then
     Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
-      "this expression may diverge, which is not stated in specification"
+      "this@ expression@ may@ diverge,@ \
+        which@ is@ not@ stated@ in@ specification"
 
 let check_lambda_effect ({fun_lambda = lam} as fd) bl dsp =
   let spec = fd.fun_ps.ps_aty.aty_spec in
