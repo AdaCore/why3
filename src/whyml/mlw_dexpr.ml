@@ -920,7 +920,7 @@ let check_user_effect e spec args full_xpost dsp =
   let check_read pv = if not (Svs.mem pv.pv_vs usvs) then
     Loc.errorm ?loc:(e_find_loc (fun e -> Spv.mem pv e.e_syms.syms_pv) e)
       "this@ expression@ depends@ on@ variable@ %a@ \
-        left@ out@ in@ specification" Mlw_pretty.print_pv pv in
+        left@ out@ in@ the@ specification" Mlw_pretty.print_pv pv in
   let check_write reg = if not (has_write reg ueff) then
     Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect" in
@@ -940,7 +940,7 @@ let check_user_effect e spec args full_xpost dsp =
   if eeff.eff_diverg && not ueff.eff_diverg then
     Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
       "this@ expression@ may@ diverge,@ \
-        which@ is@ not@ stated@ in@ specification"
+        which@ is@ not@ stated@ in@ the@ specification"
 
 let check_lambda_effect ({fun_lambda = lam} as fd) bl dsp =
   let spec = fd.fun_ps.ps_aty.aty_spec in
