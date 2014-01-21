@@ -14,6 +14,6 @@ extern double caml_extra_heap_resources;
 CAMLprim value ml_reset_gc(value unit)
 {
   CAMLparam1(unit);
-  caml_extra_heap_resources = - 1. / 0.;
+  caml_extra_heap_resources = - 1.0 / 0.0;
   CAMLreturn(Val_unit);
 }

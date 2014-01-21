@@ -563,7 +563,7 @@ bin/why3ide: bin/why3ide.@OCAMLBEST@
 	ln -sf why3ide.@OCAMLBEST@ $@
 
 src/ide/resetgc.o: src/ide/resetgc.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(OCAMLC) -c -ccopt "-Wall -o $@" $<
 
 # depend and clean targets
 
