@@ -587,39 +587,43 @@ let do_exec env fname cin exec =
           let lam = d.Mlw_expr.fun_lambda in
           match lam.Mlw_expr.l_args with
             | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
+              begin
               printf "@[<hov 2>Execution of %s ():@\n" x;
               let spec = lam.Mlw_expr.l_spec in
               let eff = spec.Mlw_ty.c_effect in
               let writes = eff.Mlw_ty.eff_writes in
               let body = lam.Mlw_expr.l_expr in
-              printf "type  : @[%a@]"
+              printf "@[<hov 2>  type  :@ %a@]@."
                 Mlw_pretty.print_vty body.Mlw_expr.e_vty;
             (* printf "effect: %a@\n" *)
             (*   Mlw_pretty.print_effect body.Mlw_expr.e_effect; *)
+              try
               let res, st =
                 Mlw_interp.eval_global_expr env
                   m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known
                   writes lam.Mlw_expr.l_expr
               in
-              begin
                 match res with
                 | Mlw_interp.Normal _ ->
-                  printf "@\nresult: %a@\nstate: %a@]@."
+                  printf "@[<hov 2>  result:@ %a@\nstate :@ %a@]@."
                     (Mlw_interp.print_result m.Mlw_module.mod_known
                        m.Mlw_module.mod_theory.Theory.th_known st) res
                     Mlw_interp.print_state st
                 | Mlw_interp.Excep _ ->
-                  printf "@\nexceptional result: %a@\nstate: %a@]@."
+                  printf "@[<hov 2>exceptional result:@ %a@\nstate:@ %a@]@."
                     (Mlw_interp.print_result m.Mlw_module.mod_known
                        m.Mlw_module.mod_theory.Theory.th_known st) res
                     Mlw_interp.print_state st;
                   exit 1
                 | Mlw_interp.Irred _ | Mlw_interp.Fun _ ->
-                  printf "@]@.";
+                  printf "@\n@]@.";
                   eprintf "Execution error: %a@."
                     (Mlw_interp.print_result m.Mlw_module.mod_known
                        m.Mlw_module.mod_theory.Theory.th_known st) res;
                   exit 2
+              with e when Debug.test_noflag Debug.stack_trace ->
+                printf "@\n@]@.";
+                raise e
               end
             | _ ->
               eprintf "Only functions with one unit argument can be executed.@.";
