@@ -138,6 +138,10 @@ Theorem WP_parameter_quick_rec : forall (t:Z) (t1:(@map.Map.map Z _ Z _))
   Z _ Z _)), ((0%Z <= t)%Z /\ ((sorted_sub t5 o1 (r + 1%Z)%Z) /\
   (map.MapPermut.permut_sub t4 t5 o1 (r + 1%Z)%Z))) -> ((sorted_sub t5 l
   (r + 1%Z)%Z) /\ (map.MapPermut.permut_sub t1 t5 l (r + 1%Z)%Z)))))))).
+(* Why3 intros t t1 l r (h1,(h2,h3)) h4 (h5,h6) v h7 m t2
+        (h8,(h9,(h10,(h11,(h12,h13))))) (h14,((h15,h16),(h17,h18))) t3
+        (h19,h20) o (h21,h22) t4 (h23,(h24,h25)) o1 (h26,h27) t5
+        (h28,(h29,h30)). *)
 intros n t1 l r.
 intros (_, (hl, hr)) hlr hl2 v hlr2.
 intros m t2 (inv1, (inv2, (inv3, (inv4, inv5)))).
@@ -290,5 +294,4 @@ omega.
 apply permut_weakening with (m+1)%Z (r+1)%Z; auto.
 omega.
 Qed.
-
 
