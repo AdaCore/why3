@@ -1201,13 +1201,18 @@ and exec_app env s ps args (*spec*) ity_result =
         raise Exit
 
 
-let eval_global_expr env mkm tkm e =
+let eval_global_expr env mkm tkm writes e =
 (*
   eprintf "@[<hov 2>[interp] eval_global_expr:@ %a@]@."
     p_expr e;
 *)
   get_builtins env;
   get_builtin_progs (Mlw_main.library_of_env env);
+  let init_state =
+    Sreg.fold
+      (fun r acc -> Mreg.add r Vvoid acc)
+      writes Mreg.empty
+  in
   let env = {
     mknown = mkm;
     tknown = tkm;
@@ -1215,7 +1220,7 @@ let eval_global_expr env mkm tkm e =
     vsenv = Mvs.empty;
   }
   in
-  eval_expr env Mreg.empty e
+  eval_expr env init_state e
 
 
 

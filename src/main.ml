@@ -588,6 +588,9 @@ let do_exec env fname cin exec =
           match lam.Mlw_expr.l_args with
             | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
               printf "@[<hov 2>Execution of %s ():@\n" x;
+              let spec = lam.Mlw_expr.l_spec in
+              let eff = spec.Mlw_ty.c_effect in
+              let writes = eff.Mlw_ty.eff_writes in
               let body = lam.Mlw_expr.l_expr in
               printf "type  : @[%a@]"
                 Mlw_pretty.print_vty body.Mlw_expr.e_vty;
@@ -596,7 +599,7 @@ let do_exec env fname cin exec =
               let res, st =
                 Mlw_interp.eval_global_expr env
                   m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known
-                  lam.Mlw_expr.l_expr
+                  writes lam.Mlw_expr.l_expr
               in
               begin
                 match res with

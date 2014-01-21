@@ -28,7 +28,10 @@ type state
 val print_state: Format.formatter -> state -> unit
 
 val eval_global_expr: Env.env ->
-  Mlw_decl.known_map -> Decl.known_map -> Mlw_expr.expr -> result * state
+  Mlw_decl.known_map -> Decl.known_map
+  -> Mlw_ty.Sreg.t (* writes *)
+  -> Mlw_expr.expr ->
+  result * state
 
 val print_result: Mlw_decl.known_map -> Decl.known_map -> state -> Format.formatter -> result -> unit
 

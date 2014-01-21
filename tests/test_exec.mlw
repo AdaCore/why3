@@ -114,6 +114,11 @@ module Mut
 
   let run2 () = f 4000000 (* should be 4613732 *)
 
+  (* use of a global *)
+
+  val x : refint
+
+  let j () = x.i <- 42 (*; x.i *)
 
 end
 
