@@ -398,6 +398,7 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
      forall sigma pi sigma' pi':env, n:int.
        many_steps sigma pi s sigma' pi' Sskip n ->
        assigns sigma result sigma' }
+   variant { s }
   = match s with
     | Sskip -> Set.empty
     | Sassign i _ -> Set.singleton i
@@ -427,6 +428,7 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
 
   let rec wp (i:stmt) (q:fmla)
     ensures { valid_triple result i q }
+    variant { i }
   = match i with
     | Sskip -> q
     | Sseq i1 i2 -> wp i1 (wp i2 q)

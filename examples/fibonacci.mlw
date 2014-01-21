@@ -49,7 +49,9 @@ module FibRecGhost "recursive version, using ghost code"
   use import int.Int
 
   let rec fib_aux (ghost n: int) (a b k: int) : int
+    requires { k >= 0 }
     requires { 0 <= n && a = fib n && b = fib (n+1) }
+    variant  { k }
     ensures  { result = fib (n+k) }
   = if k = 0 then a else fib_aux (n+1) b (a+b) (k-1)
 
@@ -73,7 +75,9 @@ module FibRecNoGhost "recursive version, without ghost code"
   use import int.Int
 
   let rec fib_aux (a b k: int) : int
+    requires { k >= 0 }
     requires { exists n: int. 0 <= n && a = fib n && b = fib (n+1) }
+    variant  { k }
     ensures  { forall n: int. 0 <= n && a = fib n && b = fib (n+1) ->
                               result = fib (n+k) }
   = if k = 0 then a else fib_aux b (a+b) (k-1)

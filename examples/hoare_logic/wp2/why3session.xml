@@ -7,22 +7,26 @@
   version="0.95.1"/>
  <prover
   id="1"
-  name="CVC3"
-  version="2.2"/>
+  name="Alt-Ergo"
+  version="0.95.2"/>
  <prover
   id="2"
   name="CVC3"
-  version="2.4.1"/>
+  version="2.2"/>
  <prover
   id="3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="4"
   name="Coq"
   version="8.4pl2"/>
  <prover
-  id="4"
+  id="5"
   name="Z3"
   version="2.19"/>
  <prover
-  id="5"
+  id="6"
   name="Z3"
   version="3.2"/>
  <file
@@ -44,7 +48,7 @@
     expanded="false"
     shape="ainfix =aeval_termV0V1asubst_termV2V3V4aeval_termasetV0V3agetV1V4V1V2Iafresh_in_termV4V2F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="0"
      edited="wp2_Imp_eval_subst_term_1.v"
@@ -62,7 +66,7 @@
     expanded="false"
     shape="ainfix =aeval_termV1asetV2V3V4V0aeval_termV1V2V0Iafresh_in_termV3V0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="0"
      edited="wp2_Imp_eval_term_change_free_1.v"
@@ -80,7 +84,7 @@
     expanded="false"
     shape="aeval_fmlaasetV1V3agetV2V4V2V0qaeval_fmlaV1V2asubstV0V3V4Iafresh_in_fmlaV4V0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="0"
      edited="wp2_Imp_eval_subst_1.v"
@@ -98,7 +102,7 @@
     expanded="false"
     shape="aeval_fmlaV1asetasetV2V4V6V3V5V0qaeval_fmlaV1asetasetV2V3V5V4V6V0INainfix =V3V4F">
     <proof
-     prover="1"
+     prover="2"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -106,7 +110,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -123,7 +127,7 @@
     expanded="false"
     shape="aeval_fmlaV1V2V0qaeval_fmlaV1asetV2V3V4V0Iafresh_in_fmlaV3V0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="0"
      edited="wp2_Imp_eval_change_free_1.v"
@@ -149,14 +153,6 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
      prover="2"
      timelimit="5"
      memlimit="0"
@@ -165,7 +161,15 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="4"
+     prover="3"
+     timelimit="5"
+     memlimit="0"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -173,7 +177,7 @@
      <result status="valid" time="0.00"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -190,7 +194,7 @@
     expanded="false"
     shape="ainfix &gt;=V6c0Iamany_stepsV0V1V4V2V3V5V6F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="3"
      memlimit="0"
      edited="wp2_Imp_steps_non_neg_1.v"
@@ -208,7 +212,7 @@
     expanded="false"
     shape="ainfix =V6ainfix +ainfix +c1V9V10Aamany_stepsV7V8V5V2V3aSskipV10Aamany_stepsV0V1V4V7V8aSskipV9EIamany_stepsV0V1aSseqV4V5V2V3aSskipV6F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="3"
      memlimit="0"
      edited="wp2_Imp_many_steps_seq_1.v"
@@ -241,7 +245,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="1"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -249,7 +253,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -274,7 +278,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="1"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -282,7 +286,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -307,7 +311,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="1"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -315,7 +319,7 @@
      <result status="valid" time="0.04"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -332,7 +336,7 @@
     expanded="false"
     shape="ainfix =aeval_termamy_sigmaamy_piaTbinaTvarc0aOplusaTconstc13aVintc55">
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="wp2_TestSemantics_Test55_1.v"
@@ -358,7 +362,7 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="1"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -366,7 +370,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -383,7 +387,7 @@
     expanded="false"
     shape="ainfix =agetV3V0aVintc13Iaone_stepV1V2V5V3V4aSskipIaone_stepamy_sigmaamy_piaSifaTbinaTderefV0aOleaTconstc10aSassignV0aTconstc13aSassignV0aTconstc42V1V2V5FLc0">
     <proof
-     prover="3"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      edited="wp2_TestSemantics_If42_1.v"
@@ -408,7 +412,7 @@
     expanded="false"
     shape="avalid_tripleV1V4V3Iavalid_fmlaaFimpliesV2V3Iavalid_tripleV0V4V2Iavalid_fmlaaFimpliesV1V0F">
     <proof
-     prover="1"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -416,7 +420,7 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -433,7 +437,7 @@
     expanded="false"
     shape="avalid_tripleV0aSskipV0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="3"
      memlimit="0"
      edited="wp2_HoareLogic_skip_rule_1.v"
@@ -451,7 +455,7 @@
     expanded="false"
     shape="avalid_tripleaFletV2V3asubstV0V1V2aSassignV1V3V0Iafresh_in_fmlaV2V0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="3"
      memlimit="0"
      edited="wp2_HoareLogic_assign_rule_1.v"
@@ -469,7 +473,7 @@
     expanded="false"
     shape="avalid_tripleV0aSseqV3V4V1Iavalid_tripleV2V4V1Aavalid_tripleV0V3V2F">
     <proof
-     prover="4"
+     prover="5"
      timelimit="5"
      memlimit="0"
      obsolete="false"
@@ -477,7 +481,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="5"
+     prover="6"
      timelimit="3"
      memlimit="0"
      obsolete="false"
@@ -494,7 +498,7 @@
     expanded="false"
     shape="avalid_tripleV1aSifV0V3V4V2Iavalid_tripleaFandV1aFnotaFtermV0V4V2Aavalid_tripleaFandV1aFtermV0V3V2F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="3"
      memlimit="0"
      edited="wp2_HoareLogic_if_rule_1.v"
@@ -512,7 +516,7 @@
     expanded="false"
     shape="avalid_tripleV1aSassertV0V1Iavalid_fmlaaFimpliesV1V0F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="3"
      memlimit="0"
      edited="wp2_HoareLogic_assert_rule_1.v"
@@ -530,7 +534,7 @@
     expanded="false"
     shape="avalid_tripleaFimpliesV0V1aSassertV0V1F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="3"
      memlimit="0"
      edited="wp2_HoareLogic_assert_rule_ext_1.v"
@@ -548,7 +552,7 @@
     expanded="false"
     shape="avalid_tripleV1aSwhileV0V1V2aFandaFnotaFtermV0V1Iavalid_tripleaFandaFtermV0V1V2V1F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="3"
      memlimit="0"
      edited="wp2_HoareLogic_while_rule_1.v"
@@ -566,7 +570,7 @@
     expanded="false"
     shape="avalid_tripleV2aSwhileV0V1V3aFandaFnotaFtermV0V2Iavalid_tripleaFandaFtermV0V2V3V2Iavalid_fmlaaFimpliesV2V1F">
     <proof
-     prover="3"
+     prover="4"
      timelimit="3"
      memlimit="0"
      edited="wp2_HoareLogic_while_rule_ext_1.v"
@@ -581,7 +585,7 @@
    locfile="../wp2.mlw"
    loclnum="360" loccnumb="7" loccnume="9"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="assigns_refl"
     locfile="../wp2.mlw"
@@ -655,10 +659,10 @@
     locfile="../wp2.mlw"
     loclnum="396" loccnumb="10" loccnume="24"
     expl="VC for compute_writes"
-    sum="804952eb3a7061b7732f7affc90b6a27"
+    sum="af5db7dbbbdb66179045f59e204160b4"
     proved="true"
     expanded="false"
-    shape="CaassignsV1aemptyV3Iamany_stepsV1V2V0V3V4aSskipV5FaSskipaassignsV7asingletonV6V9Iamany_stepsV7V8V0V9V10aSskipV11FaSassignVwaassignsV16aunionV15V14V18Iamany_stepsV16V17V0V18V19aSskipV20FIaassignsV21V15V23Iamany_stepsV21V22V12V23V24aSskipV25FFIaassignsV26V14V28Iamany_stepsV26V27V13V28V29aSskipV30FFaSseqVVaassignsV35aunionV34V33V37Iamany_stepsV35V36V0V37V38aSskipV39FIaassignsV40V34V42Iamany_stepsV40V41V31V42V43aSskipV44FFIaassignsV45V33V47Iamany_stepsV45V46V32V47V48aSskipV49FFaSifwVVaassignsV52V51V54Iamany_stepsV52V53V0V54V55aSskipV56FIaassignsV57V51V59Iamany_stepsV57V58V50V59V60aSskipV61FFaSwhilewwVaassignsV62aemptyV64Iamany_stepsV62V63V0V64V65aSskipV66FaSassertwV0F">
+    shape="CaassignsV1aemptyV3Iamany_stepsV1V2V0V3V4aSskipV5FaSskipaassignsV7asingletonV6V9Iamany_stepsV7V8V0V9V10aSskipV11FaSassignVwaassignsV16aunionV15V14V18Iamany_stepsV16V17V0V18V19aSskipV20FIaassignsV21V15V23Iamany_stepsV21V22V12V23V24aSskipV25FFACfaSskipfaSassignwwainfix =V27V12Oainfix =V26V12aSseqVVainfix =V29V12Oainfix =V28V12aSifwVVfaSassertwainfix =V30V12aSwhilewwVV0IaassignsV31V14V33Iamany_stepsV31V32V13V33V34aSskipV35FFACfaSskipfaSassignwwainfix =V37V13Oainfix =V36V13aSseqVVainfix =V39V13Oainfix =V38V13aSifwVVfaSassertwainfix =V40V13aSwhilewwVV0aSseqVVaassignsV45aunionV44V43V47Iamany_stepsV45V46V0V47V48aSskipV49FIaassignsV50V44V52Iamany_stepsV50V51V41V52V53aSskipV54FFACfaSskipfaSassignwwainfix =V56V41Oainfix =V55V41aSseqVVainfix =V58V41Oainfix =V57V41aSifwVVfaSassertwainfix =V59V41aSwhilewwVV0IaassignsV60V43V62Iamany_stepsV60V61V42V62V63aSskipV64FFACfaSskipfaSassignwwainfix =V66V42Oainfix =V65V42aSseqVVainfix =V68V42Oainfix =V67V42aSifwVVfaSassertwainfix =V69V42aSwhilewwVV0aSifwVVaassignsV72V71V74Iamany_stepsV72V73V0V74V75aSskipV76FIaassignsV77V71V79Iamany_stepsV77V78V70V79V80aSskipV81FFACfaSskipfaSassignwwainfix =V83V70Oainfix =V82V70aSseqVVainfix =V85V70Oainfix =V84V70aSifwVVfaSassertwainfix =V86V70aSwhilewwVV0aSwhilewwVaassignsV87aemptyV89Iamany_stepsV87V88V0V89V90aSskipV91FaSassertwV0F">
     <label
      name="expl:VC for compute_writes"/>
     <transf
@@ -697,7 +701,7 @@
       <label
        name="expl:VC for compute_writes"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="3"
        memlimit="0"
        edited="wp2_WP_WP_WP_parameter_compute_writes_1.v"
@@ -710,7 +714,47 @@
       name="WP_parameter compute_writes.3"
       locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="3. postcondition"
+      expl="3. variant decrease"
+      sum="895c1356878f82b10fc2c704252122ac"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskiptaSassignVwCfaSskipfaSassignwwainfix =V5V3Oainfix =V4V3aSseqVVainfix =V7V3Oainfix =V6V3aSifwVVfaSassertwainfix =V8V3aSwhilewwVV0aSseqVVtaSifwVVtaSwhilewwVtaSassertwV0F">
+      <label
+       name="expl:VC for compute_writes"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter compute_writes.4"
+      locfile="../wp2.mlw"
+      loclnum="396" loccnumb="10" loccnume="24"
+      expl="4. variant decrease"
+      sum="6afdd3a31ee9faf02eb7e4161db615ee"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskiptaSassignVwCfaSskipfaSassignwwainfix =V6V2Oainfix =V5V2aSseqVVainfix =V8V2Oainfix =V7V2aSifwVVfaSassertwainfix =V9V2aSwhilewwVV0IaassignsV10V4V12Iamany_stepsV10V11V3V12V13aSskipV14FFaSseqVVtaSifwVVtaSwhilewwVtaSassertwV0F">
+      <label
+       name="expl:VC for compute_writes"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter compute_writes.5"
+      locfile="../wp2.mlw"
+      loclnum="396" loccnumb="10" loccnume="24"
+      expl="5. postcondition"
       sum="da6f10067bf7f6460b8a37e29f9eed18"
       proved="true"
       expanded="false"
@@ -718,7 +762,7 @@
       <label
        name="expl:VC for compute_writes"/>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -726,7 +770,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -735,10 +779,50 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter compute_writes.4"
+      name="WP_parameter compute_writes.6"
       locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="4. postcondition"
+      expl="6. variant decrease"
+      sum="f8b6723e79fb7a6910d566d7223bc79f"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskiptaSassignVwtaSseqVVCfaSskipfaSassignwwainfix =V7V5Oainfix =V6V5aSseqVVainfix =V9V5Oainfix =V8V5aSifwVVfaSassertwainfix =V10V5aSwhilewwVV0aSifwVVtaSwhilewwVtaSassertwV0F">
+      <label
+       name="expl:VC for compute_writes"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter compute_writes.7"
+      locfile="../wp2.mlw"
+      loclnum="396" loccnumb="10" loccnume="24"
+      expl="7. variant decrease"
+      sum="4403bf3edae1df5dbbbbfa0b29bade63"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskiptaSassignVwtaSseqVVCfaSskipfaSassignwwainfix =V8V4Oainfix =V7V4aSseqVVainfix =V10V4Oainfix =V9V4aSifwVVfaSassertwainfix =V11V4aSwhilewwVV0IaassignsV12V6V14Iamany_stepsV12V13V5V14V15aSskipV16FFaSifwVVtaSwhilewwVtaSassertwV0F">
+      <label
+       name="expl:VC for compute_writes"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter compute_writes.8"
+      locfile="../wp2.mlw"
+      loclnum="396" loccnumb="10" loccnume="24"
+      expl="8. postcondition"
       sum="aa2ee244c654a76b15cf6d218c61fade"
       proved="true"
       expanded="false"
@@ -746,7 +830,7 @@
       <label
        name="expl:VC for compute_writes"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="3"
        memlimit="0"
        edited="wp2_WP_WP_WP_parameter_compute_writes_3.v"
@@ -756,10 +840,30 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter compute_writes.5"
+      name="WP_parameter compute_writes.9"
       locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="5. postcondition"
+      expl="9. variant decrease"
+      sum="c0ec0053f183ff8c61359cd20ce19ec3"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskiptaSassignVwtaSseqVVtaSifwVVCfaSskipfaSassignwwainfix =V8V6Oainfix =V7V6aSseqVVainfix =V10V6Oainfix =V9V6aSifwVVfaSassertwainfix =V11V6aSwhilewwVV0aSwhilewwVtaSassertwV0F">
+      <label
+       name="expl:VC for compute_writes"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter compute_writes.10"
+      locfile="../wp2.mlw"
+      loclnum="396" loccnumb="10" loccnume="24"
+      expl="10. postcondition"
       sum="3843739ce7987a9898bfeb5d61f07e36"
       proved="true"
       expanded="false"
@@ -767,7 +871,7 @@
       <label
        name="expl:VC for compute_writes"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="3"
        memlimit="0"
        edited="wp2_WP_WP_WP_parameter_compute_writes_4.v"
@@ -777,10 +881,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter compute_writes.6"
+      name="WP_parameter compute_writes.11"
       locfile="../wp2.mlw"
       loclnum="396" loccnumb="10" loccnume="24"
-      expl="6. postcondition"
+      expl="11. postcondition"
       sum="0229c4acc2fc2e6f3b4f5ad5c13904b3"
       proved="true"
       expanded="false"
@@ -788,7 +892,7 @@
       <label
        name="expl:VC for compute_writes"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="3"
        memlimit="0"
        edited="wp2_WP_WP_WP_parameter_compute_writes_2.v"
@@ -802,12 +906,12 @@
    <goal
     name="WP_parameter wp"
     locfile="../wp2.mlw"
-    loclnum="428" loccnumb="10" loccnume="12"
+    loclnum="429" loccnumb="10" loccnume="12"
     expl="VC for wp"
-    sum="fca19d1e43d59598dca57915a4bc3978"
+    sum="abb30995a14ecc3db844903560bde35e"
     proved="true"
     expanded="false"
-    shape="Cavalid_tripleV1V0V1aSskipavalid_tripleV5V0V1Iavalid_tripleV5V2V4FIavalid_tripleV4V3V1FaSseqVVavalid_tripleaFletV8V7asubstV1V6V8V0V1Iafresh_in_fmlaV8V1FaSassignVVavalid_tripleaFandaFimpliesaFtermV9V13aFimpliesaFnotaFtermV9V12V0V1Iavalid_tripleV13V10V1FIavalid_tripleV12V11V1FaSifVVVavalid_tripleaFimpliesV14V1V0V1aSassertVavalid_tripleaFandV16V19V0V1Iaeval_fmlaV22V23V19Iamany_stepsV20V21V17V22V23aSskipV24FAaeval_fmlaV20V21aFandaFimpliesaFandaFtermV15V16V18aFimpliesaFandaFnotaFtermV15V16V1Iaeval_fmlaV20V21V19FFIavalid_tripleV18V17V16FaSwhileVVVV0F">
+    shape="Cavalid_tripleV1V0V1aSskipavalid_tripleV5V0V1Iavalid_tripleV5V2V4FACfaSskipfaSassignwwainfix =V7V2Oainfix =V6V2aSseqVVainfix =V9V2Oainfix =V8V2aSifwVVfaSassertwainfix =V10V2aSwhilewwVV0Iavalid_tripleV4V3V1FACfaSskipfaSassignwwainfix =V12V3Oainfix =V11V3aSseqVVainfix =V14V3Oainfix =V13V3aSifwVVfaSassertwainfix =V15V3aSwhilewwVV0aSseqVVavalid_tripleaFletV18V17asubstV1V16V18V0V1Iafresh_in_fmlaV18V1FaSassignVVavalid_tripleaFandaFimpliesaFtermV19V23aFimpliesaFnotaFtermV19V22V0V1Iavalid_tripleV23V20V1FACfaSskipfaSassignwwainfix =V25V20Oainfix =V24V20aSseqVVainfix =V27V20Oainfix =V26V20aSifwVVfaSassertwainfix =V28V20aSwhilewwVV0Iavalid_tripleV22V21V1FACfaSskipfaSassignwwainfix =V30V21Oainfix =V29V21aSseqVVainfix =V32V21Oainfix =V31V21aSifwVVfaSassertwainfix =V33V21aSwhilewwVV0aSifVVVavalid_tripleaFimpliesV34V1V0V1aSassertVavalid_tripleaFandV36V39V0V1Iaeval_fmlaV42V43V39Iamany_stepsV40V41V37V42V43aSskipV44FAaeval_fmlaV40V41aFandaFimpliesaFandaFtermV35V36V38aFimpliesaFandaFnotaFtermV35V36V1Iaeval_fmlaV40V41V39FFIavalid_tripleV38V37V36FACfaSskipfaSassignwwainfix =V46V37Oainfix =V45V37aSseqVVainfix =V48V37Oainfix =V47V37aSifwVVfaSassertwainfix =V49V37aSwhilewwVV0aSwhileVVVV0F">
     <label
      name="expl:VC for wp"/>
     <transf
@@ -817,7 +921,7 @@
      <goal
       name="WP_parameter wp.1"
       locfile="../wp2.mlw"
-      loclnum="428" loccnumb="10" loccnume="12"
+      loclnum="429" loccnumb="10" loccnume="12"
       expl="1. postcondition"
       sum="c744512d32b382fe3330da91902b601e"
       proved="true"
@@ -834,7 +938,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
+       prover="2"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -842,7 +946,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="2"
+       prover="3"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -850,7 +954,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -858,7 +962,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -869,8 +973,48 @@
      <goal
       name="WP_parameter wp.2"
       locfile="../wp2.mlw"
-      loclnum="428" loccnumb="10" loccnume="12"
-      expl="2. postcondition"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="2. variant decrease"
+      sum="1ea514e994b076612635f9d4786c9ef4"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskipCfaSskipfaSassignwwainfix =V5V3Oainfix =V4V3aSseqVVainfix =V7V3Oainfix =V6V3aSifwVVfaSassertwainfix =V8V3aSwhilewwVV0aSseqVVtaSassignVVtaSifVVVtaSassertVtaSwhileVVVV0F">
+      <label
+       name="expl:VC for wp"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.3"
+      locfile="../wp2.mlw"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="3. variant decrease"
+      sum="407dd6435b7d85bf19ffe5c03dcbf5a1"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskipCfaSskipfaSassignwwainfix =V6V2Oainfix =V5V2aSseqVVainfix =V8V2Oainfix =V7V2aSifwVVfaSassertwainfix =V9V2aSwhilewwVV0Iavalid_tripleV4V3V1FaSseqVVtaSassignVVtaSifVVVtaSassertVtaSwhileVVVV0F">
+      <label
+       name="expl:VC for wp"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.4"
+      locfile="../wp2.mlw"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="4. postcondition"
       sum="2ef4dd72d19d007299bd09c3e654a400"
       proved="true"
       expanded="false"
@@ -886,14 +1030,6 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
-       timelimit="3"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="3"
        memlimit="0"
@@ -902,7 +1038,15 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="4"
+       prover="3"
+       timelimit="3"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="5"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -910,7 +1054,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -919,10 +1063,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter wp.3"
+      name="WP_parameter wp.5"
       locfile="../wp2.mlw"
-      loclnum="428" loccnumb="10" loccnume="12"
-      expl="3. postcondition"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="5. postcondition"
       sum="e122155a1cd40e77563d48d9fc80c435"
       proved="true"
       expanded="false"
@@ -938,7 +1082,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
+       prover="2"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -946,7 +1090,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="2"
+       prover="3"
        timelimit="3"
        memlimit="0"
        obsolete="false"
@@ -954,7 +1098,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -962,7 +1106,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="5"
+       prover="6"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -971,10 +1115,50 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter wp.4"
+      name="WP_parameter wp.6"
       locfile="../wp2.mlw"
-      loclnum="428" loccnumb="10" loccnume="12"
-      expl="4. postcondition"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="6. variant decrease"
+      sum="f416377621c425a4d3df17bae3409d77"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskiptaSseqVVtaSassignVVCfaSskipfaSassignwwainfix =V10V8Oainfix =V9V8aSseqVVainfix =V12V8Oainfix =V11V8aSifwVVfaSassertwainfix =V13V8aSwhilewwVV0aSifVVVtaSassertVtaSwhileVVVV0F">
+      <label
+       name="expl:VC for wp"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.7"
+      locfile="../wp2.mlw"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="7. variant decrease"
+      sum="5693bff68e72f45b983568d5e6f9bfac"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskiptaSseqVVtaSassignVVCfaSskipfaSassignwwainfix =V11V7Oainfix =V10V7aSseqVVainfix =V13V7Oainfix =V12V7aSifwVVfaSassertwainfix =V14V7aSwhilewwVV0Iavalid_tripleV9V8V1FaSifVVVtaSassertVtaSwhileVVVV0F">
+      <label
+       name="expl:VC for wp"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.8"
+      locfile="../wp2.mlw"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="8. postcondition"
       sum="e8324ed3f2b1e0dbbf0ce58cada31ccb"
       proved="true"
       expanded="false"
@@ -982,7 +1166,7 @@
       <label
        name="expl:VC for wp"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="3"
        memlimit="0"
        edited="wp2_WP_WP_WP_parameter_wp_1.v"
@@ -992,10 +1176,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter wp.5"
+      name="WP_parameter wp.9"
       locfile="../wp2.mlw"
-      loclnum="428" loccnumb="10" loccnume="12"
-      expl="5. postcondition"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="9. postcondition"
       sum="82b5ba0839936d91c4fcd68d789b3701"
       proved="true"
       expanded="false"
@@ -1011,14 +1195,6 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
-       timelimit="3"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof
        prover="2"
        timelimit="3"
        memlimit="0"
@@ -1027,8 +1203,8 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="4"
-       timelimit="5"
+       prover="3"
+       timelimit="3"
        memlimit="0"
        obsolete="false"
        archived="false">
@@ -1040,14 +1216,42 @@
        memlimit="0"
        obsolete="false"
        archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="0"
+       obsolete="false"
+       archived="false">
        <result status="valid" time="0.11"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter wp.6"
+      name="WP_parameter wp.10"
       locfile="../wp2.mlw"
-      loclnum="428" loccnumb="10" loccnume="12"
-      expl="6. postcondition"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="10. variant decrease"
+      sum="9c908707f40188122494fc3a67ec68d0"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaSskiptaSseqVVtaSassignVVtaSifVVVtaSassertVCfaSskipfaSassignwwainfix =V14V12Oainfix =V13V12aSseqVVainfix =V16V12Oainfix =V15V12aSifwVVfaSassertwainfix =V17V12aSwhilewwVV0aSwhileVVVV0F">
+      <label
+       name="expl:VC for wp"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter wp.11"
+      locfile="../wp2.mlw"
+      loclnum="429" loccnumb="10" loccnume="12"
+      expl="11. postcondition"
       sum="58ca078d88204f488ded58bf0a7a3654"
       proved="true"
       expanded="false"
@@ -1055,7 +1259,7 @@
       <label
        name="expl:VC for wp"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="5"
        memlimit="0"
        edited="wp2_WP_WP_WP_parameter_wp_2.v"

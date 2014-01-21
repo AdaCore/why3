@@ -149,6 +149,7 @@ module Treedel
         invariant { !p <> null /\ !mem[!p].left = !tt }
         invariant { let pt = Node !subtree !pp !ppr in
                     istree !mem !pp pt /\ zip pt !zipper = it }
+        variant { !subtree }
         assert { istree !mem !p !subtree };
         ghost zipper := Left !zipper !pp !ppr;
         ghost ppr := tree_right !subtree;

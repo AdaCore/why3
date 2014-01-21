@@ -16,7 +16,7 @@
  <prover
   id="3"
   name="CVC4"
-  version="1.2"/>
+  version="1.3"/>
  <prover
   id="4"
   name="Coq"
@@ -35,14 +35,10 @@
   version="0.6"/>
  <prover
   id="8"
-  name="Yices"
-  version="1.0.38"/>
- <prover
-  id="9"
   name="Z3"
   version="2.19"/>
  <prover
-  id="10"
+  id="9"
   name="Z3"
   version="4.3.1"/>
  <file
@@ -188,81 +184,387 @@
     locfile="../fibonacci.mlw"
     loclnum="51" loccnumb="10" loccnume="17"
     expl="VC for fib_aux"
-    sum="f1370ae24ceaed957d1662249c3b9245"
+    sum="bd6ac7dc4a156c05b3ce1be52f664b6e"
     proved="true"
-    expanded="false"
-    shape="iainfix =afibainfix +V4ainfix -V3c1afibainfix +V0V3Aainfix =ainfix +V1V2afibainfix +V4c1Aainfix =V2afibV4Aainfix &lt;=c0V4Lainfix +V0c1ainfix =V1afibainfix +V0V3ainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0F">
+    expanded="true"
+    shape="iainfix =afibainfix +V5V4afibainfix +V0V3Aainfix =ainfix +V1V2afibainfix +V5c1Aainfix =V2afibV5Aainfix &lt;=c0V5Aainfix &gt;=V4c0Aainfix &lt;V4V3Aainfix &lt;=c0V3Lainfix +V0c1Lainfix -V3c1ainfix =V1afibainfix +V0V3ainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
     <label
      name="expl:VC for fib_aux"/>
-    <proof
-     prover="8"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="9"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="10"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter fib_aux.1"
+      locfile="../fibonacci.mlw"
+      loclnum="51" loccnumb="10" loccnume="17"
+      expl="1. postcondition"
+      sum="6a0c4d86cecf8656a1571da996908e58"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =V1afibainfix +V0V3Iainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_aux.2"
+      locfile="../fibonacci.mlw"
+      loclnum="51" loccnumb="10" loccnume="17"
+      expl="2. variant decrease"
+      sum="f1d0163235b9685298eecaeff01eab7d"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseainfix &lt;V4V3Aainfix &lt;=c0V3Lainfix +V0c1Lainfix -V3c1INainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_aux.3"
+      locfile="../fibonacci.mlw"
+      loclnum="51" loccnumb="10" loccnume="17"
+      expl="3. precondition"
+      sum="82cec315dab0028fed0269cc2704cdc5"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=V4c0Lainfix +V0c1Lainfix -V3c1INainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_aux.4"
+      locfile="../fibonacci.mlw"
+      loclnum="51" loccnumb="10" loccnume="17"
+      expl="4. precondition"
+      sum="bcf7ebfd1cbcc650d09dad3631cc4b31"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix =ainfix +V1V2afibainfix +V5c1Aainfix =V2afibV5Aainfix &lt;=c0V5Lainfix +V0c1Lainfix -V3c1INainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_aux.5"
+      locfile="../fibonacci.mlw"
+      loclnum="51" loccnumb="10" loccnume="17"
+      expl="5. postcondition"
+      sum="514bfdeb5d88def3b155f9af95c5e5be"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =afibainfix +V5V4afibainfix +V0V3Iainfix =ainfix +V1V2afibainfix +V5c1Aainfix =V2afibV5Aainfix &lt;=c0V5Aainfix &gt;=V4c0Lainfix +V0c1Lainfix -V3c1INainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
    <goal
     name="WP_parameter fib"
     locfile="../fibonacci.mlw"
-    loclnum="56" loccnumb="6" loccnume="9"
+    loclnum="58" loccnumb="6" loccnume="9"
     expl="VC for fib"
-    sum="baad61ef69855b311830853c8af821c3"
+    sum="4d85d47dc4455112a89c5e805c8865d6"
     proved="true"
-    expanded="false"
-    shape="ainfix =afibainfix +c0V0afibV0Aainfix =c1afibainfix +c0c1Aainfix =c0afibc0Aainfix &lt;=c0c0Iainfix &lt;=c0V0F">
+    expanded="true"
+    shape="ainfix =afibainfix +c0V0afibV0Aainfix =c1afibainfix +c0c1Aainfix =c0afibc0Aainfix &lt;=c0c0Aainfix &gt;=V0c0Iainfix &lt;=c0V0F">
     <label
      name="expl:VC for fib"/>
-    <proof
-     prover="0"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="10"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter fib.1"
+      locfile="../fibonacci.mlw"
+      loclnum="58" loccnumb="6" loccnume="9"
+      expl="1. precondition"
+      sum="23e14906133445ab871f58817f675746"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for fib"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib.2"
+      locfile="../fibonacci.mlw"
+      loclnum="58" loccnumb="6" loccnume="9"
+      expl="2. precondition"
+      sum="95cabe346b768df482b54a5c0aa29763"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix =c1afibainfix +c0c1Aainfix =c0afibc0Aainfix &lt;=c0c0Iainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for fib"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib.3"
+      locfile="../fibonacci.mlw"
+      loclnum="58" loccnumb="6" loccnume="9"
+      expl="3. postcondition"
+      sum="7ad5d2abb596fa0163fce78badccd795"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =afibainfix +c0V0afibV0Iainfix =c1afibainfix +c0c1Aainfix =c0afibc0Aainfix &lt;=c0c0Aainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for fib"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
    <goal
     name="WP_parameter test42"
     locfile="../fibonacci.mlw"
-    loclnum="61" loccnumb="6" loccnume="12"
+    loclnum="63" loccnumb="6" loccnume="12"
     expl="VC for test42"
     sum="4722e2323d409d25c4832cfff59379d0"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=c0c42">
     <label
      name="expl:VC for test42"/>
@@ -274,11 +576,35 @@
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter bench"
     locfile="../fibonacci.mlw"
-    loclnum="65" loccnumb="6" loccnume="11"
+    loclnum="67" loccnumb="6" loccnume="11"
     expl="VC for bench"
     sum="5876ce5863cf951fb600b95cf58f10ff"
     proved="true"
@@ -294,69 +620,367 @@
      archived="false">
      <result status="valid" time="0.00"/>
     </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="9"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
   </theory>
   <theory
    name="FibRecNoGhost"
    locfile="../fibonacci.mlw"
-   loclnum="70" loccnumb="7" loccnume="20"
+   loclnum="72" loccnumb="7" loccnume="20"
    verified="true"
-   expanded="false">
+   expanded="true">
    <label
     name="recursive version, without ghost code"/>
    <goal
     name="WP_parameter fib_aux"
     locfile="../fibonacci.mlw"
-    loclnum="75" loccnumb="10" loccnume="17"
+    loclnum="77" loccnumb="10" loccnume="17"
     expl="VC for fib_aux"
-    sum="984fce177a8f2fd3f62c58ff96a406e4"
+    sum="25b77a5f82b4701514868d01c277201e"
     proved="true"
     expanded="false"
-    shape="iainfix =V4afibainfix +V5V2Iainfix =V1afibainfix +V5c1Aainfix =V0afibV5Aainfix &lt;=c0V5FIainfix =V4afibainfix +V6ainfix -V2c1Iainfix =V3afibainfix +V6c1Aainfix =V1afibV6Aainfix &lt;=c0V6FFAainfix =V3afibainfix +V7c1Aainfix =V1afibV7Aainfix &lt;=c0V7ELainfix +V0V1ainfix =V0afibainfix +V8V2Iainfix =V1afibainfix +V8c1Aainfix =V0afibV8Aainfix &lt;=c0V8Fainfix =V2c0Iainfix =V1afibainfix +V9c1Aainfix =V0afibV9Aainfix &lt;=c0V9EF">
+    shape="iainfix =V5afibainfix +V6V2Iainfix =V1afibainfix +V6c1Aainfix =V0afibV6Aainfix &lt;=c0V6FIainfix =V5afibainfix +V7V3Iainfix =V4afibainfix +V7c1Aainfix =V1afibV7Aainfix &lt;=c0V7FFAainfix =V4afibainfix +V8c1Aainfix =V1afibV8Aainfix &lt;=c0V8EAainfix &gt;=V3c0Aainfix &lt;V3V2Aainfix &lt;=c0V2Lainfix +V0V1Lainfix -V2c1ainfix =V0afibainfix +V9V2Iainfix =V1afibainfix +V9c1Aainfix =V0afibV9Aainfix &lt;=c0V9Fainfix =V2c0Iainfix =V1afibainfix +V10c1Aainfix =V0afibV10Aainfix &lt;=c0V10EAainfix &gt;=V2c0F">
     <label
      name="expl:VC for fib_aux"/>
-    <proof
-     prover="10"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter fib_aux.1"
+      locfile="../fibonacci.mlw"
+      loclnum="77" loccnumb="10" loccnume="17"
+      expl="1. postcondition"
+      sum="3551e4cdec8a7fc6e4f9a60d30589112"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =V0afibainfix +V3V2Iainfix =V1afibainfix +V3c1Aainfix =V0afibV3Aainfix &lt;=c0V3FIainfix =V2c0Iainfix =V1afibainfix +V4c1Aainfix =V0afibV4Aainfix &lt;=c0V4EAainfix &gt;=V2c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_aux.2"
+      locfile="../fibonacci.mlw"
+      loclnum="77" loccnumb="10" loccnume="17"
+      expl="2. variant decrease"
+      sum="3651d65a0fc21ec391d4e7dcdde99048"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseainfix &lt;V3V2Aainfix &lt;=c0V2Lainfix +V0V1Lainfix -V2c1INainfix =V2c0Iainfix =V1afibainfix +V5c1Aainfix =V0afibV5Aainfix &lt;=c0V5EAainfix &gt;=V2c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_aux.3"
+      locfile="../fibonacci.mlw"
+      loclnum="77" loccnumb="10" loccnume="17"
+      expl="3. precondition"
+      sum="a802c05a69c7efcbcb0df1fbb662580c"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=V3c0Lainfix +V0V1Lainfix -V2c1INainfix =V2c0Iainfix =V1afibainfix +V5c1Aainfix =V0afibV5Aainfix &lt;=c0V5EAainfix &gt;=V2c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_aux.4"
+      locfile="../fibonacci.mlw"
+      loclnum="77" loccnumb="10" loccnume="17"
+      expl="4. precondition"
+      sum="93e0fa7f36e6e9db9dd7e56d7ddcaef3"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix =V4afibainfix +V5c1Aainfix =V1afibV5Aainfix &lt;=c0V5ELainfix +V0V1Lainfix -V2c1INainfix =V2c0Iainfix =V1afibainfix +V6c1Aainfix =V0afibV6Aainfix &lt;=c0V6EAainfix &gt;=V2c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_aux.5"
+      locfile="../fibonacci.mlw"
+      loclnum="77" loccnumb="10" loccnume="17"
+      expl="5. postcondition"
+      sum="5dec0832a1b0070fecacf397c21e5464"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =V5afibainfix +V6V2Iainfix =V1afibainfix +V6c1Aainfix =V0afibV6Aainfix &lt;=c0V6FIainfix =V5afibainfix +V7V3Iainfix =V4afibainfix +V7c1Aainfix =V1afibV7Aainfix &lt;=c0V7FFIainfix =V4afibainfix +V8c1Aainfix =V1afibV8Aainfix &lt;=c0V8EAainfix &gt;=V3c0Lainfix +V0V1Lainfix -V2c1INainfix =V2c0Iainfix =V1afibainfix +V9c1Aainfix =V0afibV9Aainfix &lt;=c0V9EAainfix &gt;=V2c0F">
+      <label
+       name="expl:VC for fib_aux"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
    <goal
     name="WP_parameter fib"
     locfile="../fibonacci.mlw"
-    loclnum="81" loccnumb="6" loccnume="9"
+    loclnum="85" loccnumb="6" loccnume="9"
     expl="VC for fib"
-    sum="ccb3d098eb4c54c7ce68bda3998e0b10"
+    sum="ccdc0b8e67174c1be3a90cdf3fd01f15"
     proved="true"
     expanded="false"
-    shape="ainfix =V1afibV0Iainfix =V1afibainfix +V2V0Iainfix =c1afibainfix +V2c1Aainfix =c0afibV2Aainfix &lt;=c0V2FFAainfix =c1afibainfix +V3c1Aainfix =c0afibV3Aainfix &lt;=c0V3EIainfix &lt;=c0V0F">
+    shape="ainfix =V1afibV0Iainfix =V1afibainfix +V2V0Iainfix =c1afibainfix +V2c1Aainfix =c0afibV2Aainfix &lt;=c0V2FFAainfix =c1afibainfix +V3c1Aainfix =c0afibV3Aainfix &lt;=c0V3EAainfix &gt;=V0c0Iainfix &lt;=c0V0F">
     <label
      name="expl:VC for fib"/>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="10"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter fib.1"
+      locfile="../fibonacci.mlw"
+      loclnum="85" loccnumb="6" loccnume="9"
+      expl="1. precondition"
+      sum="23e14906133445ab871f58817f675746"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for fib"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib.2"
+      locfile="../fibonacci.mlw"
+      loclnum="85" loccnumb="6" loccnume="9"
+      expl="2. precondition"
+      sum="af244e7432ef52186b9d5874bf9ace29"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix =c1afibainfix +V1c1Aainfix =c0afibV1Aainfix &lt;=c0V1EIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for fib"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib.3"
+      locfile="../fibonacci.mlw"
+      loclnum="85" loccnumb="6" loccnume="9"
+      expl="3. postcondition"
+      sum="c7c2c4316af832526c46d101a01e76e5"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =V1afibV0Iainfix =V1afibainfix +V2V0Iainfix =c1afibainfix +V2c1Aainfix =c0afibV2Aainfix &lt;=c0V2FFIainfix =c1afibainfix +V3c1Aainfix =c0afibV3Aainfix &lt;=c0V3EAainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for fib"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
   </theory>
   <theory
    name="Mat22"
    locfile="../fibonacci.mlw"
-   loclnum="88" loccnumb="7" loccnume="12"
+   loclnum="92" loccnumb="7" loccnume="12"
    verified="true"
    expanded="true">
    <label
@@ -365,13 +989,13 @@
   <theory
    name="FibonacciLogarithmic"
    locfile="../fibonacci.mlw"
-   loclnum="110" loccnumb="7" loccnume="27"
+   loclnum="114" loccnumb="7" loccnume="27"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter logfib"
     locfile="../fibonacci.mlw"
-    loclnum="124" loccnumb="10" loccnume="16"
+    loclnum="128" loccnumb="10" loccnume="16"
     expl="VC for logfib"
     sum="aa0581d6e96cfbe2df36199653dd7892"
     proved="true"
@@ -386,7 +1010,7 @@
      <goal
       name="WP_parameter logfib.1"
       locfile="../fibonacci.mlw"
-      loclnum="124" loccnumb="10" loccnume="16"
+      loclnum="128" loccnumb="10" loccnume="16"
       expl="1. postcondition"
       sum="edb4470d3cf85827177081056bc0bd87"
       proved="true"
@@ -419,7 +1043,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="9"
+       prover="8"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -430,7 +1054,7 @@
      <goal
       name="WP_parameter logfib.2"
       locfile="../fibonacci.mlw"
-      loclnum="124" loccnumb="10" loccnume="16"
+      loclnum="128" loccnumb="10" loccnume="16"
       expl="2. variant decrease"
       sum="91358c02634eb5d72c921170ee3fe925"
       proved="true"
@@ -450,7 +1074,7 @@
      <goal
       name="WP_parameter logfib.3"
       locfile="../fibonacci.mlw"
-      loclnum="124" loccnumb="10" loccnume="16"
+      loclnum="128" loccnumb="10" loccnume="16"
       expl="3. precondition"
       sum="7d437bf067fe6c0f95f2da430a0cec82"
       proved="true"
@@ -467,7 +1091,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="9"
+       prover="8"
        timelimit="5"
        memlimit="0"
        obsolete="false"
@@ -478,7 +1102,7 @@
      <goal
       name="WP_parameter logfib.4"
       locfile="../fibonacci.mlw"
-      loclnum="124" loccnumb="10" loccnume="16"
+      loclnum="128" loccnumb="10" loccnume="16"
       expl="4. postcondition"
       sum="934cc293599c5423b6ae534062275f75"
       proved="true"
@@ -501,7 +1125,7 @@
    <goal
     name="fib_m"
     locfile="../fibonacci.mlw"
-    loclnum="147" loccnumb="8" loccnume="13"
+    loclnum="151" loccnumb="8" loccnume="13"
     sum="5182716f896c722451c4db01baef910f"
     proved="true"
     expanded="false"
@@ -519,7 +1143,7 @@
    <goal
     name="WP_parameter fibo"
     locfile="../fibonacci.mlw"
-    loclnum="151" loccnumb="6" loccnume="10"
+    loclnum="155" loccnumb="6" loccnume="10"
     expl="VC for fibo"
     sum="20a1a34ec8db40c1e1a75ebb5f31e560"
     proved="true"
@@ -547,7 +1171,7 @@
    <goal
     name="WP_parameter test0"
     locfile="../fibonacci.mlw"
-    loclnum="155" loccnumb="6" loccnume="11"
+    loclnum="159" loccnumb="6" loccnume="11"
     expl="VC for test0"
     sum="4b4f8ea266e45f2265d6b86511cd173a"
     proved="true"
@@ -567,7 +1191,7 @@
    <goal
     name="WP_parameter test1"
     locfile="../fibonacci.mlw"
-    loclnum="156" loccnumb="6" loccnume="11"
+    loclnum="160" loccnumb="6" loccnume="11"
     expl="VC for test1"
     sum="f1806ba29ce415e743a60c1282e336ca"
     proved="true"
@@ -587,7 +1211,7 @@
    <goal
     name="WP_parameter test7"
     locfile="../fibonacci.mlw"
-    loclnum="157" loccnumb="6" loccnume="11"
+    loclnum="161" loccnumb="6" loccnume="11"
     expl="VC for test7"
     sum="5530a3babb7a8002d145b770db03402f"
     proved="true"
@@ -607,7 +1231,7 @@
    <goal
     name="WP_parameter test42"
     locfile="../fibonacci.mlw"
-    loclnum="158" loccnumb="6" loccnume="12"
+    loclnum="162" loccnumb="6" loccnume="12"
     expl="VC for test42"
     sum="a47c44bd86b23970167f2477a019a7ef"
     proved="true"
@@ -627,7 +1251,7 @@
    <goal
     name="WP_parameter test2014"
     locfile="../fibonacci.mlw"
-    loclnum="159" loccnumb="6" loccnume="14"
+    loclnum="163" loccnumb="6" loccnume="14"
     expl="VC for test2014"
     sum="1b190a129993c4d82495557fead4c819"
     proved="true"
@@ -647,7 +1271,7 @@
    <goal
     name="WP_parameter bench"
     locfile="../fibonacci.mlw"
-    loclnum="163" loccnumb="6" loccnume="11"
+    loclnum="167" loccnumb="6" loccnume="11"
     expl="VC for bench"
     sum="b642f9eb998305d5158c9ddf28d1fe6a"
     proved="true"

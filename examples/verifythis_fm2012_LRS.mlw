@@ -133,6 +133,7 @@ let lcp (a:array int) (x y:int) : int
     let l = ref 0 in
     while x + !l < n && y + !l < n && a[x + !l] = a[y + !l] do
       invariant { is_common_prefix a x y !l }
+      variant { n - !l }
       incr l
     done;
     !l
@@ -271,6 +272,7 @@ let sort (a:array int) (data : array int)
        invariant { sorted_sub a data.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                      le a data[k1] data[k2] }
+       variant { !j }
        'L:
        let b = !j - 1 in
        let t = data[!j] in
