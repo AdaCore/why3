@@ -108,7 +108,7 @@ module BSTree
     end
 
   let rec bst_mem (x: elt) (t: tree)
-    requires { bst t } ensures { result=True <-> mem x t }
+    requires { bst t } ensures { result=True <-> mem x t } variant { t }
   = match t with
     | Empty ->
         False
@@ -124,6 +124,7 @@ module BSTree
     ensures { bst result /\ not (mem x t) /\
       forall y: elt. mem y result <-> y=x || mem y t }
     raises { Already -> mem x t }
+    variant { t }
   = match t with
     | Empty ->
         Node Empty x Empty
