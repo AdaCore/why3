@@ -1034,6 +1034,8 @@ module Subst : sig
    type t
    (* the type of substitutions *)
 
+   val print_state : Format.formatter -> t -> unit
+
    val init : Spv.t -> t
    (* the initial substitution for a program which mentions the given program
       variables *)
@@ -1146,6 +1148,11 @@ end = struct
                         subst_vars    = Mvs.empty; }
     }
 
+  let print_state fmt s =
+    Format.fprintf fmt "{ ";
+    Mvs.iter (fun _ v -> Format.printf " %a " Pretty.print_term v) s.now.subst_vars;
+    Format.fprintf fmt " }"
+
   let init pvs =
     (* init the state with the given program variables. *)
     Spv.fold add_pvar pvs empty
@@ -1251,23 +1258,24 @@ end = struct
   let first_different_terms base l = first_different base t_equal l
 
   let merge_vars base domain mapl =
-    Mvs.fold (fun k _ ( map , fl) ->
+    Mvs.fold (fun k _ (map , fl) ->
         let all_terms = List.map (fun m -> Mvs.find k m) mapl in
         match first_different_terms (Mvs.find k base) all_terms with
         | None -> Mvs.add k (List.hd all_terms) map, fl
-        | Some new_ ->
+        | Some _ ->
+            let new_ = t_var (fresh_var_from_var k) in
             Mvs.add k new_ map,
             List.map2 (fun old f ->
-              if t_equal old new_ then f
-              else t_and_simp (t_equ new_ old) f) all_terms fl)
+              t_and_simp (t_equ new_ old) f) all_terms fl)
     domain (Mvs.empty, List.map (fun _ -> t_true) mapl)
 
-  let merge_regs base domain mapl =
+  let merge_regs names base domain mapl =
     Mreg.fold (fun k _ (map, fl) ->
       let all_vars = List.map (fun m -> Mreg.find k m) mapl in
       match first_different_vars (Mreg.find k base) all_vars with
       | None -> Mreg.add k (List.hd all_vars) map, fl
-      | Some new_ ->
+      | Some _ ->
+          let new_ = fresh_var_from_region names k in
           Mreg.add k new_ map,
           List.map2 (fun old f ->
             if vs_equal old new_ then f
@@ -1288,7 +1296,7 @@ end = struct
             (List.map (fun x -> x.now.subst_vars) sl)
         in
         let regs, fl2 =
-          merge_regs base.now.subst_regions domain.subst_regions
+          merge_regs base.reg_names base.now.subst_regions domain.subst_regions
                      (List.map (fun x -> x.now.subst_regions) sl)
         in
         { base with now =
@@ -1660,6 +1668,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
          Mexn.fold (fun ex (pv,_) acc ->
             Mexn.add ex pv.pv_vs acc) handlers xresult in
       let wp1 = fast_wp_expr env s (result,xresult') e1 in
+      let result =
       Mexn.fold (fun ex post acc ->
         try
           let _, e2 = Mexn.find ex handlers in
@@ -1681,6 +1690,8 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           post = wp1.post;
           exn = Mexn.empty
         }
+      in
+      result
   | Eabstr (e1, spec) ->
       (* OK: spec.pre /\ ok(e1) /\ (ne(e1) => spec.post)
              /\ (forall x. ex(e1)(x) => spec.xpost(x) *)
