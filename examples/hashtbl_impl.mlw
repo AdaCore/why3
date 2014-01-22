@@ -78,6 +78,7 @@ module HashtblImpl
       ensures  { forall k: key, v: 'a.
         if 0 <= bucket k osize <= i then good_data k v h.view ndata
         else not in_data k v ndata }
+      variant  { l }
     = match l with
       | Nil -> ()
       | Cons (k, v) r ->

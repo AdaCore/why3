@@ -21,18 +21,20 @@ module M
 
   val table : ref table
 
-  val add (x:int) (y:int) : unit writes { table }
+  val add (x:int) (y:int) : unit
+    writes  { table }
     ensures { !table = (old !table)[x <- Some y] }
 
   exception Not_found
 
   val find (x:int) : int
     ensures { !table[x] = Some result }
-    raises { Not_found -> !table[x] = None }
+    raises  { Not_found -> !table[x] = None }
 
   let rec fibo n =
     requires { 0 <= n /\ inv !table }
-    ensures { result = fib n /\ inv !table }
+    ensures  { result = fib n /\ inv !table }
+    variant  { 2*n }
     if n <= 1 then
       1
     else
@@ -40,7 +42,8 @@ module M
 
   with memo_fibo n =
     requires { 0 <= n /\ inv !table }
-    ensures { result = fib n /\ inv !table }
+    ensures  { result = fib n /\ inv !table }
+    variant  { 2*n+1 }
     try  find n
     with Not_found -> let fn = fibo n in add n fn; fn end
 

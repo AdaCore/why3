@@ -24,17 +24,17 @@
  <file
   name="../hashtbl_impl.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="HashtblImpl"
    locfile="../hashtbl_impl.mlw"
-   loclnum="1" loccnumb="7" loccnume="18"
+   loclnum="7" loccnumb="7" loccnume="18"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="bucket_bounds"
     locfile="../hashtbl_impl.mlw"
-    loclnum="19" loccnumb="8" loccnume="21"
+    loclnum="25" loccnumb="8" loccnume="21"
     sum="77ec1fa2d56193c2dfbc4dde3b9a7a0a"
     proved="true"
     expanded="false"
@@ -51,7 +51,7 @@
    <goal
     name="WP_parameter create"
     locfile="../hashtbl_impl.mlw"
-    loclnum="42" loccnumb="6" loccnume="12"
+    loclnum="48" loccnumb="6" loccnume="12"
     expl="VC for create"
     sum="9b6808d3ad36ec77f80bc2f665c6a702"
     proved="true"
@@ -65,13 +65,13 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
+     <result status="valid" time="0.14"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter clear"
     locfile="../hashtbl_impl.mlw"
-    loclnum="48" loccnumb="6" loccnume="11"
+    loclnum="54" loccnumb="6" loccnume="11"
     expl="VC for clear"
     sum="8dc1e6fda2ce201d3d005f9a1f91b589"
     proved="true"
@@ -91,12 +91,12 @@
    <goal
     name="WP_parameter resize"
     locfile="../hashtbl_impl.mlw"
-    loclnum="56" loccnumb="6" loccnume="12"
+    loclnum="62" loccnumb="6" loccnume="12"
     expl="VC for resize"
-    sum="bf4d387ec07f1dd691dfafde2ac6292e"
+    sum="a1792f1d30076c983e9be34062a2bbf6"
     proved="true"
     expanded="false"
-    shape="ainfix &lt;=c0V8Aagood_dataV10V11V2amk arrayV8V9FAagood_hashamk arrayV8V9V12Iainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix &lt;c0V8Iainfix =V9V6Aainfix =V8V3FIiNain_dataV13V14V7agood_dataV13V14V2V7ainfix &lt;abucketV13V0ainfix +V5c1Aainfix &lt;=c0abucketV13V0FAagood_hashV7V15Iainfix &lt;V15V3Aainfix &lt;=c0V15FAiNain_dataV20V21V19agood_dataV20V21V2V19ainfix &lt;abucketV20V0ainfix +V16c1Aainfix &lt;=c0abucketV20V0FAagood_hashV19V22Iainfix &lt;V22V3Aainfix &lt;=c0V22FIiNain_dataV23V24V19agood_dataV23V24V2V19ainfix &lt;=abucketV23V0V16Aainfix &lt;=c0abucketV23V0FAagood_hashV19V25Iainfix &lt;V25V3Aainfix &lt;=c0V25FAainfix &lt;=c0V3Lamk arrayV3V18FAiiNain_dataV26V27V7ain_dataV26V27V7OamemaTuple2V26V27V17qainfix =agetV2V26aSomeV27ainfix =abucketV26V0V16agood_dataV26V27V2V7ainfix &lt;abucketV26V0V16Aainfix &lt;=c0abucketV26V0FAagood_hashV7V28Iainfix &lt;V28V3Aainfix &lt;=c0V28FAainfix =abucketV29V0V16IamemaTuple2V29V30V17FAainfix &lt;=c0V3LagetV1V16Aainfix &lt;V16V0Aainfix &lt;=c0V16IiNain_dataV31V32V7agood_dataV31V32V2V7ainfix &lt;abucketV31V0V16Aainfix &lt;=c0abucketV31V0FAagood_hashV7V33Iainfix &lt;V33V3Aainfix &lt;=c0V33FIainfix &lt;=V16V5Aainfix &lt;=c0V16FLamk arrayV3V6FAiNain_dataV34V35V4agood_dataV34V35V2V4ainfix &lt;abucketV34V0c0Aainfix &lt;=c0abucketV34V0FAagood_hashV4V36Iainfix &lt;V36V3Aainfix &lt;=c0V36FIainfix &lt;=c0V5Aainfix &lt;=c0V37Aagood_dataV39V40V2amk arrayV37V38FAagood_hashamk arrayV37V38V41Iainfix &lt;V41V37Aainfix &lt;=c0V41FAainfix &lt;c0V37Iainfix =V38aconstaNilAainfix =V37V3FIainfix &gt;c0V5Lainfix -V0c1ACiNain_dataV49V50V48agood_dataV49V50V45V48ainfix &lt;=abucketV49V0V42Aainfix &lt;=c0abucketV49V0FAagood_hashV48V51Iainfix &lt;V51V3Aainfix &lt;=c0V51FaNiliNain_dataV60V61V59agood_dataV60V61V45V59ainfix &lt;=abucketV60V0V42Aainfix &lt;=c0abucketV60V0FAagood_hashV59V62Iainfix &lt;V62V3Aainfix &lt;=c0V62FIiNain_dataV63V64V59agood_dataV63V64V45V59ainfix &lt;=abucketV63V0V42Aainfix &lt;=c0abucketV63V0FAagood_hashV59V65Iainfix &lt;V65V3Aainfix &lt;=c0V65FAainfix &lt;=c0V3Lamk arrayV3V58FAiiNain_dataV66V67V57ain_dataV66V67V57OamemaTuple2V66V67V54qainfix =agetV45V66aSomeV67ainfix =abucketV66V0V42agood_dataV66V67V45V57ainfix &lt;abucketV66V0V42Aainfix &lt;=c0abucketV66V0FAagood_hashV57V68Iainfix &lt;V68V3Aainfix &lt;=c0V68FAainfix =abucketV69V0V42IamemaTuple2V69V70V54FIainfix =V56asetV44V55aConsaTuple2V52V53agetV44V55Aainfix &lt;=c0V3Lamk arrayV3V56FAainfix &lt;V55V3Aainfix &lt;=c0V55Aainfix &lt;V55V3Aainfix &lt;=c0V55LabucketV52V3aConsaTuple2VVVV43IiiNain_dataV71V72V48ain_dataV71V72V48OamemaTuple2V71V72V43qainfix =agetV45V71aSomeV72ainfix =abucketV71V0V42agood_dataV71V72V45V48ainfix &lt;abucketV71V0V42Aainfix &lt;=c0abucketV71V0FAagood_hashV48V73Iainfix &lt;V73V3Aainfix &lt;=c0V73FAainfix =abucketV74V0V42IamemaTuple2V74V75V43FAainfix &lt;=c0V3Aainfix &lt;=c0V46Aagood_dataV76V77V45amk arrayV46V47FAagood_hashamk arrayV46V47V78Iainfix &lt;V78V46Aainfix &lt;=c0V78FAainfix &lt;c0V46Lamk arrayV3V44FFIainfix &lt;=c0V3Lamk arrayV3aconstaNilAainfix &gt;=V3c0Lainfix +ainfix *c2V0c1Iainfix &lt;=c0V0Aagood_dataV79V80V2amk arrayV0V1FAagood_hashamk arrayV0V1V81Iainfix &lt;V81V0Aainfix &lt;=c0V81FAainfix &lt;c0V0F">
+    shape="ainfix &lt;=c0V8Aagood_dataV10V11V2amk arrayV8V9FAagood_hashamk arrayV8V9V12Iainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix &lt;c0V8Iainfix =V9V6Aainfix =V8V3FIiNain_dataV13V14V7agood_dataV13V14V2V7ainfix &lt;abucketV13V0ainfix +V5c1Aainfix &lt;=c0abucketV13V0FAagood_hashV7V15Iainfix &lt;V15V3Aainfix &lt;=c0V15FAiNain_dataV20V21V19agood_dataV20V21V2V19ainfix &lt;abucketV20V0ainfix +V16c1Aainfix &lt;=c0abucketV20V0FAagood_hashV19V22Iainfix &lt;V22V3Aainfix &lt;=c0V22FIiNain_dataV23V24V19agood_dataV23V24V2V19ainfix &lt;=abucketV23V0V16Aainfix &lt;=c0abucketV23V0FAagood_hashV19V25Iainfix &lt;V25V3Aainfix &lt;=c0V25FAainfix &lt;=c0V3Lamk arrayV3V18FAiiNain_dataV26V27V7ain_dataV26V27V7OamemaTuple2V26V27V17qainfix =agetV2V26aSomeV27ainfix =abucketV26V0V16agood_dataV26V27V2V7ainfix &lt;abucketV26V0V16Aainfix &lt;=c0abucketV26V0FAagood_hashV7V28Iainfix &lt;V28V3Aainfix &lt;=c0V28FAainfix =abucketV29V0V16IamemaTuple2V29V30V17FAainfix &lt;=c0V3LagetV1V16Aainfix &lt;V16V0Aainfix &lt;=c0V16IiNain_dataV31V32V7agood_dataV31V32V2V7ainfix &lt;abucketV31V0V16Aainfix &lt;=c0abucketV31V0FAagood_hashV7V33Iainfix &lt;V33V3Aainfix &lt;=c0V33FIainfix &lt;=V16V5Aainfix &lt;=c0V16FLamk arrayV3V6FAiNain_dataV34V35V4agood_dataV34V35V2V4ainfix &lt;abucketV34V0c0Aainfix &lt;=c0abucketV34V0FAagood_hashV4V36Iainfix &lt;V36V3Aainfix &lt;=c0V36FIainfix &lt;=c0V5Aainfix &lt;=c0V37Aagood_dataV39V40V2amk arrayV37V38FAagood_hashamk arrayV37V38V41Iainfix &lt;V41V37Aainfix &lt;=c0V41FAainfix &lt;c0V37Iainfix =V38aconstaNilAainfix =V37V3FIainfix &gt;c0V5Lainfix -V0c1ACiNain_dataV49V50V48agood_dataV49V50V45V48ainfix &lt;=abucketV49V0V42Aainfix &lt;=c0abucketV49V0FAagood_hashV48V51Iainfix &lt;V51V3Aainfix &lt;=c0V51FaNiliNain_dataV60V61V59agood_dataV60V61V45V59ainfix &lt;=abucketV60V0V42Aainfix &lt;=c0abucketV60V0FAagood_hashV59V62Iainfix &lt;V62V3Aainfix &lt;=c0V62FIiNain_dataV63V64V59agood_dataV63V64V45V59ainfix &lt;=abucketV63V0V42Aainfix &lt;=c0abucketV63V0FAagood_hashV59V65Iainfix &lt;V65V3Aainfix &lt;=c0V65FAainfix &lt;=c0V3Lamk arrayV3V58FAiiNain_dataV66V67V57ain_dataV66V67V57OamemaTuple2V66V67V54qainfix =agetV45V66aSomeV67ainfix =abucketV66V0V42agood_dataV66V67V45V57ainfix &lt;abucketV66V0V42Aainfix &lt;=c0abucketV66V0FAagood_hashV57V68Iainfix &lt;V68V3Aainfix &lt;=c0V68FAainfix =abucketV69V0V42IamemaTuple2V69V70V54FACfaNilainfix =V71V54aConswVV43Iainfix =V56asetV44V55aConsaTuple2V52V53agetV44V55Aainfix &lt;=c0V3Lamk arrayV3V56FAainfix &lt;V55V3Aainfix &lt;=c0V55Aainfix &lt;V55V3Aainfix &lt;=c0V55LabucketV52V3aConsaTuple2VVVV43IiiNain_dataV72V73V48ain_dataV72V73V48OamemaTuple2V72V73V43qainfix =agetV45V72aSomeV73ainfix =abucketV72V0V42agood_dataV72V73V45V48ainfix &lt;abucketV72V0V42Aainfix &lt;=c0abucketV72V0FAagood_hashV48V74Iainfix &lt;V74V3Aainfix &lt;=c0V74FAainfix =abucketV75V0V42IamemaTuple2V75V76V43FAainfix &lt;=c0V3Aainfix &lt;=c0V46Aagood_dataV77V78V45amk arrayV46V47FAagood_hashamk arrayV46V47V79Iainfix &lt;V79V46Aainfix &lt;=c0V79FAainfix &lt;c0V46Lamk arrayV3V44FFIainfix &lt;=c0V3Lamk arrayV3aconstaNilAainfix &gt;=V3c0Lainfix +ainfix *c2V0c1Iainfix &lt;=c0V0Aagood_dataV80V81V2amk arrayV0V1FAagood_hashamk arrayV0V1V82Iainfix &lt;V82V0Aainfix &lt;=c0V82FAainfix &lt;c0V0F">
     <label
      name="expl:VC for resize"/>
     <transf
@@ -106,7 +106,7 @@
      <goal
       name="WP_parameter resize.1"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
+      loclnum="62" loccnumb="6" loccnume="12"
       expl="1. precondition"
       sum="98e1fd235b7e532706a1357ad3cb2ab2"
       proved="true"
@@ -126,7 +126,7 @@
      <goal
       name="WP_parameter resize.2"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
+      loclnum="62" loccnumb="6" loccnume="12"
       expl="2. postcondition"
       sum="0ee373ae9a127fc257d628ec637425cf"
       proved="true"
@@ -146,7 +146,7 @@
      <goal
       name="WP_parameter resize.3"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
+      loclnum="62" loccnumb="6" loccnume="12"
       expl="3. postcondition"
       sum="e933797cc4b3f9d2dbd28fc36846265c"
       proved="true"
@@ -166,7 +166,7 @@
      <goal
       name="WP_parameter resize.4"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
+      loclnum="62" loccnumb="6" loccnume="12"
       expl="4. precondition"
       sum="d6b9d0712c18e71bc25c4be484f00222"
       proved="true"
@@ -186,7 +186,7 @@
      <goal
       name="WP_parameter resize.5"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
+      loclnum="62" loccnumb="6" loccnume="12"
       expl="5. precondition"
       sum="f42e59e83fec42053b1eada16e56b865"
       proved="true"
@@ -206,8 +206,28 @@
      <goal
       name="WP_parameter resize.6"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="6. precondition"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="6. variant decrease"
+      sum="1b8419ea13e756f92422f4f0726bb74f"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNilCfaNilainfix =V18V14aConswVV6Iainfix =V16asetV7V15aConsaTuple2V12V13agetV7V15Aainfix &lt;=c0V3Lamk arrayV3V16FIainfix &lt;V15V3Aainfix &lt;=c0V15Iainfix &lt;V15V3Aainfix &lt;=c0V15LabucketV12V3aConsaTuple2VVVV6IiiNain_dataV19V20V11ain_dataV19V20V11OamemaTuple2V19V20V6qainfix =agetV8V19aSomeV20ainfix =abucketV19V0V5agood_dataV19V20V8V11ainfix &lt;abucketV19V0V5Aainfix &lt;=c0abucketV19V0FAagood_hashV11V21Iainfix &lt;V21V3Aainfix &lt;=c0V21FAainfix =abucketV22V0V5IamemaTuple2V22V23V6FAainfix &lt;=c0V3Aainfix &lt;=c0V9Aagood_dataV24V25V8amk arrayV9V10FAagood_hashamk arrayV9V10V26Iainfix &lt;V26V9Aainfix &lt;=c0V26FAainfix &lt;c0V9Lamk arrayV3V7FFIainfix &lt;=c0V3Lamk arrayV3aconstaNilIainfix &gt;=V3c0Lainfix +ainfix *c2V0c1Iainfix &lt;=c0V0Aagood_dataV27V28V2amk arrayV0V1FAagood_hashamk arrayV0V1V29Iainfix &lt;V29V0Aainfix &lt;=c0V29FAainfix &lt;c0V0F">
+      <label
+       name="expl:VC for resize"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter resize.7"
+      locfile="../hashtbl_impl.mlw"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="7. precondition"
       sum="762c6bbf4db7454cf08a50baa94e98cf"
       proved="true"
       expanded="false"
@@ -224,10 +244,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.7"
+      name="WP_parameter resize.8"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="7. precondition"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="8. precondition"
       sum="1575f34c81f1fdde2e6b10407110ec07"
       proved="true"
       expanded="false"
@@ -239,9 +259,9 @@
        proved="true"
        expanded="false">
        <goal
-        name="WP_parameter resize.7.1"
+        name="WP_parameter resize.8.1"
         locfile="../hashtbl_impl.mlw"
-        loclnum="56" loccnumb="6" loccnume="12"
+        loclnum="62" loccnumb="6" loccnume="12"
         expl="1. precondition"
         sum="c65ea2d352b282cde42707f3c6ee06ea"
         proved="true"
@@ -255,16 +275,16 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.22"/>
+         <result status="valid" time="4.26"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
-      name="WP_parameter resize.8"
+      name="WP_parameter resize.9"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="8. precondition"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="9. precondition"
       sum="c1b8f73e4fb1244e0008691eaf90b2f6"
       proved="true"
       expanded="false"
@@ -276,9 +296,9 @@
        proved="true"
        expanded="false">
        <goal
-        name="WP_parameter resize.8.1"
+        name="WP_parameter resize.9.1"
         locfile="../hashtbl_impl.mlw"
-        loclnum="56" loccnumb="6" loccnume="12"
+        loclnum="62" loccnumb="6" loccnume="12"
         expl="1. precondition"
         sum="8ffb4eda44b52204e1b00d8e980625b5"
         proved="true"
@@ -291,9 +311,9 @@
          proved="true"
          expanded="false">
          <goal
-          name="WP_parameter resize.8.1.1"
+          name="WP_parameter resize.9.1.1"
           locfile="../hashtbl_impl.mlw"
-          loclnum="56" loccnumb="6" loccnume="12"
+          loclnum="62" loccnumb="6" loccnume="12"
           expl="1. precondition"
           sum="c58c0465227d3fd3bf61fddb8c15e630"
           proved="true"
@@ -307,13 +327,13 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.06"/>
+           <result status="valid" time="0.35"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter resize.8.1.2"
+          name="WP_parameter resize.9.1.2"
           locfile="../hashtbl_impl.mlw"
-          loclnum="56" loccnumb="6" loccnume="12"
+          loclnum="62" loccnumb="6" loccnume="12"
           expl="2. precondition"
           sum="b37336d91e79990816df6aeaa94e2fb5"
           proved="true"
@@ -331,9 +351,9 @@
           </proof>
          </goal>
          <goal
-          name="WP_parameter resize.8.1.3"
+          name="WP_parameter resize.9.1.3"
           locfile="../hashtbl_impl.mlw"
-          loclnum="56" loccnumb="6" loccnume="12"
+          loclnum="62" loccnumb="6" loccnume="12"
           expl="3. precondition"
           sum="f033fb7ab18d3527a27157c90c050421"
           proved="true"
@@ -347,13 +367,13 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.21"/>
+           <result status="valid" time="0.63"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter resize.8.1.4"
+          name="WP_parameter resize.9.1.4"
           locfile="../hashtbl_impl.mlw"
-          loclnum="56" loccnumb="6" loccnume="12"
+          loclnum="62" loccnumb="6" loccnume="12"
           expl="4. precondition"
           sum="25285f0ea47fad02825bb73371dd005c"
           proved="true"
@@ -367,13 +387,13 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.17"/>
+           <result status="valid" time="0.62"/>
           </proof>
          </goal>
          <goal
-          name="WP_parameter resize.8.1.5"
+          name="WP_parameter resize.9.1.5"
           locfile="../hashtbl_impl.mlw"
-          loclnum="56" loccnumb="6" loccnume="12"
+          loclnum="62" loccnumb="6" loccnume="12"
           expl="5. precondition"
           sum="d3ac7231fd5e909fc99836e42515b34a"
           proved="true"
@@ -387,7 +407,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.15"/>
+           <result status="valid" time="0.36"/>
           </proof>
          </goal>
         </transf>
@@ -395,10 +415,10 @@
       </transf>
      </goal>
      <goal
-      name="WP_parameter resize.9"
+      name="WP_parameter resize.10"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="9. postcondition"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="10. postcondition"
       sum="f63df9bd296d9bd7a5804211ee19e496"
       proved="true"
       expanded="false"
@@ -423,10 +443,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.10"
+      name="WP_parameter resize.11"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="10. postcondition"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="11. postcondition"
       sum="a1442963ecdf2c46008533541264baf5"
       proved="true"
       expanded="false"
@@ -443,10 +463,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.11"
+      name="WP_parameter resize.12"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="11. type invariant"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="12. type invariant"
       sum="d256a928d27aa6c0fe79d9bc3e942912"
       proved="true"
       expanded="false"
@@ -463,10 +483,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.12"
+      name="WP_parameter resize.13"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="12. type invariant"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="13. type invariant"
       sum="e18acd452b6c155861de37defea6878b"
       proved="true"
       expanded="false"
@@ -483,10 +503,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.13"
+      name="WP_parameter resize.14"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="13. type invariant"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="14. type invariant"
       sum="e141c936695f4d645e11ea65f27fdd07"
       proved="true"
       expanded="false"
@@ -503,10 +523,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.14"
+      name="WP_parameter resize.15"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="14. type invariant"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="15. type invariant"
       sum="405ea928183d19bfdefbb685f9fd4a6b"
       proved="true"
       expanded="false"
@@ -523,10 +543,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.15"
+      name="WP_parameter resize.16"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="15. loop invariant init"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="16. loop invariant init"
       sum="d4919e769fe4534c2cba763aaa846137"
       proved="true"
       expanded="false"
@@ -543,10 +563,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.16"
+      name="WP_parameter resize.17"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="16. loop invariant init"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="17. loop invariant init"
       sum="f72e2d558398103f6088476dac586629"
       proved="true"
       expanded="false"
@@ -559,14 +579,14 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.46"/>
+       <result status="valid" time="2.00"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.17"
+      name="WP_parameter resize.18"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="17. precondition"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="18. precondition"
       sum="3da6285a0d0e6c8c467c386761f413d6"
       proved="true"
       expanded="false"
@@ -583,10 +603,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.18"
+      name="WP_parameter resize.19"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="18. type invariant"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="19. type invariant"
       sum="9c63a6f7938856570b6562a7fcd4a6d3"
       proved="true"
       expanded="false"
@@ -603,10 +623,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.19"
+      name="WP_parameter resize.20"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="19. precondition"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="20. precondition"
       sum="7b05e69ced84212d54f4723e0e49cf5e"
       proved="true"
       expanded="false"
@@ -618,9 +638,9 @@
        proved="true"
        expanded="false">
        <goal
-        name="WP_parameter resize.19.1"
+        name="WP_parameter resize.20.1"
         locfile="../hashtbl_impl.mlw"
-        loclnum="56" loccnumb="6" loccnume="12"
+        loclnum="62" loccnumb="6" loccnume="12"
         expl="1. precondition"
         sum="c0f02163465075dced8c0dce64beb733"
         proved="true"
@@ -634,16 +654,16 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.15"/>
+         <result status="valid" time="0.27"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
-      name="WP_parameter resize.20"
+      name="WP_parameter resize.21"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="20. precondition"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="21. precondition"
       sum="fe91fda611047f9a3124b46a3bf797db"
       proved="true"
       expanded="false"
@@ -660,10 +680,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.21"
+      name="WP_parameter resize.22"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="21. precondition"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="22. precondition"
       sum="c79870ad56e52bdeae50db95279fa85c"
       proved="true"
       expanded="false"
@@ -675,9 +695,9 @@
        proved="true"
        expanded="false">
        <goal
-        name="WP_parameter resize.21.1"
+        name="WP_parameter resize.22.1"
         locfile="../hashtbl_impl.mlw"
-        loclnum="56" loccnumb="6" loccnume="12"
+        loclnum="62" loccnumb="6" loccnume="12"
         expl="1. precondition"
         sum="15a5ff9f002e0fcdee5f7935784f5a6b"
         proved="true"
@@ -691,7 +711,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.14"/>
+         <result status="timeout" time="4.96"/>
         </proof>
         <proof
          prover="2"
@@ -699,16 +719,16 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.08"/>
+         <result status="valid" time="0.28"/>
         </proof>
        </goal>
       </transf>
      </goal>
      <goal
-      name="WP_parameter resize.22"
+      name="WP_parameter resize.23"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="22. loop invariant preservation"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="23. loop invariant preservation"
       sum="ce9536152d9b7ec5ac2e294c7a6b57f0"
       proved="true"
       expanded="false"
@@ -725,10 +745,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.23"
+      name="WP_parameter resize.24"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="23. loop invariant preservation"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="24. loop invariant preservation"
       sum="f4fc710493af12ac635bfe120c3336c0"
       proved="true"
       expanded="false"
@@ -745,10 +765,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.24"
+      name="WP_parameter resize.25"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="24. type invariant"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="25. type invariant"
       sum="f31283225e6b49ebd8391fd8bfdfb386"
       proved="true"
       expanded="false"
@@ -765,10 +785,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.25"
+      name="WP_parameter resize.26"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="25. type invariant"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="26. type invariant"
       sum="38d7400daa134f6ff816069db06f6766"
       proved="true"
       expanded="false"
@@ -785,10 +805,10 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.26"
+      name="WP_parameter resize.27"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="26. type invariant"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="27. type invariant"
       sum="c1ef1701e7a5a7e8dcfdefc138dd51a1"
       proved="true"
       expanded="false"
@@ -801,14 +821,14 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.14"/>
+       <result status="valid" time="0.48"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter resize.27"
+      name="WP_parameter resize.28"
       locfile="../hashtbl_impl.mlw"
-      loclnum="56" loccnumb="6" loccnume="12"
-      expl="27. type invariant"
+      loclnum="62" loccnumb="6" loccnume="12"
+      expl="28. type invariant"
       sum="c383bbde528f2c714ad6e6a6bc0d6c85"
       proved="true"
       expanded="false"
@@ -829,7 +849,7 @@
    <goal
     name="WP_parameter list_find"
     locfile="../hashtbl_impl.mlw"
-    loclnum="91" loccnumb="10" loccnume="19"
+    loclnum="98" loccnumb="10" loccnume="19"
     expl="VC for list_find"
     sum="45958adf4dddbbecbe76d450396deb47"
     proved="true"
@@ -849,26 +869,26 @@
    <goal
     name="WP_parameter find"
     locfile="../hashtbl_impl.mlw"
-    loclnum="102" loccnumb="6" loccnume="10"
+    loclnum="109" loccnumb="6" loccnume="10"
     expl="VC for find"
     sum="8e24eeff0fd8161391291998d6f9f90c"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =V6agetV2V3ICNamemaTuple2V3V7V5FaNoneamemaTuple2V3V8V5aSomeVV6FLagetV1V4Aainfix &lt;V4V0Aainfix &lt;=c0V4LabucketV3V0Iainfix &lt;=c0V0Aagood_dataV9V10V2amk arrayV0V1FAagood_hashamk arrayV0V1V11Iainfix &lt;V11V0Aainfix &lt;=c0V11FAainfix &lt;c0V0F">
     <label
      name="expl:VC for find"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter find.1"
       locfile="../hashtbl_impl.mlw"
-      loclnum="102" loccnumb="6" loccnume="10"
+      loclnum="109" loccnumb="6" loccnume="10"
       expl="1. precondition"
       sum="63251c802295c54693bbd9a999cc12af"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="preconditionainfix &lt;V4V0Aainfix &lt;=c0V4LabucketV3V0Iainfix &lt;=c0V0Aagood_dataV5V6V2amk arrayV0V1FAagood_hashamk arrayV0V1V7Iainfix &lt;V7V0Aainfix &lt;=c0V7FAainfix &lt;c0V0F">
       <label
        name="expl:VC for find"/>
@@ -884,11 +904,11 @@
      <goal
       name="WP_parameter find.2"
       locfile="../hashtbl_impl.mlw"
-      loclnum="102" loccnumb="6" loccnume="10"
+      loclnum="109" loccnumb="6" loccnume="10"
       expl="2. postcondition"
       sum="829ead1dbc7f1567e36ef278bff94d17"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="postconditionainfix =V6agetV2V3ICNamemaTuple2V3V7V5FaNoneamemaTuple2V3V8V5aSomeVV6FLagetV1V4Iainfix &lt;V4V0Aainfix &lt;=c0V4LabucketV3V0Iainfix &lt;=c0V0Aagood_dataV9V10V2amk arrayV0V1FAagood_hashamk arrayV0V1V11Iainfix &lt;V11V0Aainfix &lt;=c0V11FAainfix &lt;c0V0F">
       <label
        name="expl:VC for find"/>
@@ -899,7 +919,7 @@
        edited="hashtbl_impl_HashtblImpl_WP_parameter_find_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.08"/>
+       <result status="valid" time="3.30"/>
       </proof>
      </goal>
     </transf>
@@ -907,7 +927,7 @@
    <goal
     name="WP_parameter list_remove"
     locfile="../hashtbl_impl.mlw"
-    loclnum="108" loccnumb="10" loccnume="21"
+    loclnum="115" loccnumb="10" loccnume="21"
     expl="VC for list_remove"
     sum="c94e1c8f8a5fa6fa643e60c332d0c2eb"
     proved="true"
@@ -922,7 +942,7 @@
      <goal
       name="WP_parameter list_remove.1"
       locfile="../hashtbl_impl.mlw"
-      loclnum="108" loccnumb="10" loccnume="21"
+      loclnum="115" loccnumb="10" loccnume="21"
       expl="1. postcondition"
       sum="db865554252a609f283455712206b552"
       proved="true"
@@ -942,7 +962,7 @@
      <goal
       name="WP_parameter list_remove.2"
       locfile="../hashtbl_impl.mlw"
-      loclnum="108" loccnumb="10" loccnume="21"
+      loclnum="115" loccnumb="10" loccnume="21"
       expl="2. variant decrease"
       sum="998953cc906bcf1affa69fa8012d5c18"
       proved="true"
@@ -962,7 +982,7 @@
      <goal
       name="WP_parameter list_remove.3"
       locfile="../hashtbl_impl.mlw"
-      loclnum="108" loccnumb="10" loccnume="21"
+      loclnum="115" loccnumb="10" loccnume="21"
       expl="3. postcondition"
       sum="65e6e48f0dfd06f9ea54b60c2bda21fb"
       proved="true"
@@ -982,7 +1002,7 @@
      <goal
       name="WP_parameter list_remove.4"
       locfile="../hashtbl_impl.mlw"
-      loclnum="108" loccnumb="10" loccnume="21"
+      loclnum="115" loccnumb="10" loccnume="21"
       expl="4. variant decrease"
       sum="3a6d5bd7c28473a8ef1f8d90bf67046b"
       proved="true"
@@ -1002,7 +1022,7 @@
      <goal
       name="WP_parameter list_remove.5"
       locfile="../hashtbl_impl.mlw"
-      loclnum="108" loccnumb="10" loccnume="21"
+      loclnum="115" loccnumb="10" loccnume="21"
       expl="5. postcondition"
       sum="eb3b089e7de754fe4b9d8ff4d9a08526"
       proved="true"
@@ -1024,26 +1044,26 @@
    <goal
     name="WP_parameter remove"
     locfile="../hashtbl_impl.mlw"
-    loclnum="118" loccnumb="6" loccnume="12"
+    loclnum="125" loccnumb="6" loccnume="12"
     expl="VC for remove"
     sum="761fd389e5a92a5e185198660b56a42b"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="Cainfix =agetV3V4aNoneaNoneainfix =agetV11V12agetV3V12INainfix =V12V4FAainfix =agetV11V4aNoneAainfix &lt;=c0V1Aagood_dataV13V14V11amk arrayV1V9FAagood_hashamk arrayV1V9V15Iainfix &lt;V15V1Aainfix &lt;=c0V15FAainfix &lt;c0V1Iainfix =V11asetV3V4aNoneFIainfix =V10ainfix -V0c1FIainfix =V9asetV2V5V8Aainfix &lt;=c0V1FAainfix &lt;V5V1Aainfix &lt;=c0V5INainfix =V16V4AamemaTuple2V16V17V6qamemaTuple2V16V17V8FFaSomewV7ICNamemaTuple2V4V18V6FaNoneamemaTuple2V4V19V6aSomeVV7FLagetV2V5Aainfix &lt;V5V1Aainfix &lt;=c0V5LabucketV4V1Iainfix &lt;=c0V1Aagood_dataV20V21V3amk arrayV1V2FAagood_hashamk arrayV1V2V22Iainfix &lt;V22V1Aainfix &lt;=c0V22FAainfix &lt;c0V1F">
     <label
      name="expl:VC for remove"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter remove.1"
       locfile="../hashtbl_impl.mlw"
-      loclnum="118" loccnumb="6" loccnume="12"
+      loclnum="125" loccnumb="6" loccnume="12"
       expl="1. precondition"
       sum="c6e01b530a08e765913bfe7c7ee3febe"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="preconditionainfix &lt;V5V1Aainfix &lt;=c0V5LabucketV4V1Iainfix &lt;=c0V1Aagood_dataV6V7V3amk arrayV1V2FAagood_hashamk arrayV1V2V8Iainfix &lt;V8V1Aainfix &lt;=c0V8FAainfix &lt;c0V1F">
       <label
        name="expl:VC for remove"/>
@@ -1075,11 +1095,11 @@
      <goal
       name="WP_parameter remove.2"
       locfile="../hashtbl_impl.mlw"
-      loclnum="118" loccnumb="6" loccnume="12"
+      loclnum="125" loccnumb="6" loccnume="12"
       expl="2. postcondition"
       sum="f72e346329977ce6240ae7ee9f5c7af8"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="postconditionCainfix =agetV3V4aNoneaNonetaSomewV7ICNamemaTuple2V4V8V6FaNoneamemaTuple2V4V9V6aSomeVV7FLagetV2V5Iainfix &lt;V5V1Aainfix &lt;=c0V5LabucketV4V1Iainfix &lt;=c0V1Aagood_dataV10V11V3amk arrayV1V2FAagood_hashamk arrayV1V2V12Iainfix &lt;V12V1Aainfix &lt;=c0V12FAainfix &lt;c0V1F">
       <label
        name="expl:VC for remove"/>
@@ -1090,13 +1110,13 @@
        edited="hashtbl_impl_HashtblImpl_WP_parameter_remove_2.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.07"/>
+       <result status="valid" time="3.45"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter remove.3"
       locfile="../hashtbl_impl.mlw"
-      loclnum="118" loccnumb="6" loccnume="12"
+      loclnum="125" loccnumb="6" loccnume="12"
       expl="3. precondition"
       sum="a56b9793b9ea542202acb0304e4b0aa6"
       proved="true"
@@ -1132,7 +1152,7 @@
      <goal
       name="WP_parameter remove.4"
       locfile="../hashtbl_impl.mlw"
-      loclnum="118" loccnumb="6" loccnume="12"
+      loclnum="125" loccnumb="6" loccnume="12"
       expl="4. type invariant"
       sum="79165715a3f4cd855b5690e918bb67d9"
       proved="true"
@@ -1168,7 +1188,7 @@
      <goal
       name="WP_parameter remove.5"
       locfile="../hashtbl_impl.mlw"
-      loclnum="118" loccnumb="6" loccnume="12"
+      loclnum="125" loccnumb="6" loccnume="12"
       expl="5. type invariant"
       sum="05dfc51ca4465ae2d51b6b69cb4931c3"
       proved="true"
@@ -1183,7 +1203,7 @@
        <goal
         name="WP_parameter remove.5.1"
         locfile="../hashtbl_impl.mlw"
-        loclnum="118" loccnumb="6" loccnume="12"
+        loclnum="125" loccnumb="6" loccnume="12"
         expl="1. type invariant"
         sum="67c6902d07f755157f80fbc770ae0315"
         proved="true"
@@ -1205,7 +1225,7 @@
      <goal
       name="WP_parameter remove.6"
       locfile="../hashtbl_impl.mlw"
-      loclnum="118" loccnumb="6" loccnume="12"
+      loclnum="125" loccnumb="6" loccnume="12"
       expl="6. type invariant"
       sum="7c13a98b44b06ae851a71179f6e16d20"
       proved="true"
@@ -1220,7 +1240,7 @@
        <goal
         name="WP_parameter remove.6.1"
         locfile="../hashtbl_impl.mlw"
-        loclnum="118" loccnumb="6" loccnume="12"
+        loclnum="125" loccnumb="6" loccnume="12"
         expl="1. type invariant"
         sum="27a79c51f350d92cd48ee02d19f74e35"
         proved="true"
@@ -1234,7 +1254,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.46"/>
+         <result status="valid" time="1.10"/>
         </proof>
        </goal>
       </transf>
@@ -1242,7 +1262,7 @@
      <goal
       name="WP_parameter remove.7"
       locfile="../hashtbl_impl.mlw"
-      loclnum="118" loccnumb="6" loccnume="12"
+      loclnum="125" loccnumb="6" loccnume="12"
       expl="7. type invariant"
       sum="f75330c1019b77c34319af78f02353c8"
       proved="true"
@@ -1278,7 +1298,7 @@
      <goal
       name="WP_parameter remove.8"
       locfile="../hashtbl_impl.mlw"
-      loclnum="118" loccnumb="6" loccnume="12"
+      loclnum="125" loccnumb="6" loccnume="12"
       expl="8. postcondition"
       sum="c00abdeea60ef1d4521e89a6b2424bcc"
       proved="true"
@@ -1314,7 +1334,7 @@
      <goal
       name="WP_parameter remove.9"
       locfile="../hashtbl_impl.mlw"
-      loclnum="118" loccnumb="6" loccnume="12"
+      loclnum="125" loccnumb="6" loccnume="12"
       expl="9. postcondition"
       sum="93b1b204fedaf76efc7a7ff1a379ba6f"
       proved="true"
@@ -1336,22 +1356,22 @@
    <goal
     name="WP_parameter add"
     locfile="../hashtbl_impl.mlw"
-    loclnum="134" loccnumb="6" loccnume="9"
+    loclnum="141" loccnumb="6" loccnume="9"
     expl="VC for add"
     sum="5106dd77e1622ee42de1e164f2153886"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="ainfix =agetV13V14agetV2V14INainfix =V14V3FAainfix =agetV13V3aSomeV4Aainfix &lt;=c0V5Aagood_dataV15V16V13amk arrayV5V11FAagood_hashamk arrayV5V11V17Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix &lt;c0V5Iainfix =V13asetV7V3aSomeV4FIainfix =V12ainfix +V9c1FIainfix =V11asetV8V10aConsaTuple2V3V4agetV8V10Aainfix &lt;=c0V5FAainfix &lt;V10V5Aainfix &lt;=c0V10Aainfix &lt;V10V5Aainfix &lt;=c0V10LabucketV3V5Iainfix =agetV7V18agetV2V18INainfix =V18V3FAainfix =agetV7V3aNoneAainfix &lt;=c0V5Aagood_dataV19V20V7amk arrayV5V8FAagood_hashamk arrayV5V8V21Iainfix &lt;V21V5Aainfix &lt;=c0V21FAainfix &lt;c0V5FIainfix &lt;=c0V5Aagood_dataV22V23V2amk arrayV5V6FAagood_hashamk arrayV5V6V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FAainfix &lt;c0V5FIainfix &lt;=c0V0Aagood_dataV25V26V2amk arrayV0V1FAagood_hashamk arrayV0V1V27Iainfix &lt;V27V0Aainfix &lt;=c0V27FAainfix &lt;c0V0F">
     <label
      name="expl:VC for add"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter add.1"
       locfile="../hashtbl_impl.mlw"
-      loclnum="134" loccnumb="6" loccnume="9"
+      loclnum="141" loccnumb="6" loccnume="9"
       expl="1. precondition"
       sum="a0016e77e8345086869214b49731801a"
       proved="true"
@@ -1379,7 +1399,7 @@
      <goal
       name="WP_parameter add.2"
       locfile="../hashtbl_impl.mlw"
-      loclnum="134" loccnumb="6" loccnume="9"
+      loclnum="141" loccnumb="6" loccnume="9"
       expl="2. precondition"
       sum="a6c229469ead55ef72dd5c175318393c"
       proved="true"
@@ -1407,11 +1427,11 @@
      <goal
       name="WP_parameter add.3"
       locfile="../hashtbl_impl.mlw"
-      loclnum="134" loccnumb="6" loccnume="9"
+      loclnum="141" loccnumb="6" loccnume="9"
       expl="3. type invariant"
       sum="a94a682167b227aef3930553e2261796"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="type invariantainfix &lt;c0V5Iainfix =V13asetV7V3aSomeV4FIainfix =V12ainfix +V9c1FIainfix =V11asetV8V10aConsaTuple2V3V4agetV8V10Aainfix &lt;=c0V5FIainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;V10V5Aainfix &lt;=c0V10LabucketV3V5Iainfix =agetV7V14agetV2V14INainfix =V14V3FAainfix =agetV7V3aNoneAainfix &lt;=c0V5Aagood_dataV15V16V7amk arrayV5V8FAagood_hashamk arrayV5V8V17Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix &lt;c0V5FIainfix &lt;=c0V5Aagood_dataV18V19V2amk arrayV5V6FAagood_hashamk arrayV5V6V20Iainfix &lt;V20V5Aainfix &lt;=c0V20FAainfix &lt;c0V5FIainfix &lt;=c0V0Aagood_dataV21V22V2amk arrayV0V1FAagood_hashamk arrayV0V1V23Iainfix &lt;V23V0Aainfix &lt;=c0V23FAainfix &lt;c0V0F">
       <label
        name="expl:VC for add"/>
@@ -1435,11 +1455,11 @@
      <goal
       name="WP_parameter add.4"
       locfile="../hashtbl_impl.mlw"
-      loclnum="134" loccnumb="6" loccnume="9"
+      loclnum="141" loccnumb="6" loccnume="9"
       expl="4. type invariant"
       sum="6f3f2c376beb53ae7b7ac3dd5d30d542"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="type invariantagood_hashamk arrayV5V11V14Iainfix &lt;V14V5Aainfix &lt;=c0V14FIainfix =V13asetV7V3aSomeV4FIainfix =V12ainfix +V9c1FIainfix =V11asetV8V10aConsaTuple2V3V4agetV8V10Aainfix &lt;=c0V5FIainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;V10V5Aainfix &lt;=c0V10LabucketV3V5Iainfix =agetV7V15agetV2V15INainfix =V15V3FAainfix =agetV7V3aNoneAainfix &lt;=c0V5Aagood_dataV16V17V7amk arrayV5V8FAagood_hashamk arrayV5V8V18Iainfix &lt;V18V5Aainfix &lt;=c0V18FAainfix &lt;c0V5FIainfix &lt;=c0V5Aagood_dataV19V20V2amk arrayV5V6FAagood_hashamk arrayV5V6V21Iainfix &lt;V21V5Aainfix &lt;=c0V21FAainfix &lt;c0V5FIainfix &lt;=c0V0Aagood_dataV22V23V2amk arrayV0V1FAagood_hashamk arrayV0V1V24Iainfix &lt;V24V0Aainfix &lt;=c0V24FAainfix &lt;c0V0F">
       <label
        name="expl:VC for add"/>
@@ -1450,13 +1470,13 @@
        edited="hashtbl_impl_HashtblImpl_WP_parameter_add_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.06"/>
+       <result status="valid" time="8.62"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter add.5"
       locfile="../hashtbl_impl.mlw"
-      loclnum="134" loccnumb="6" loccnume="9"
+      loclnum="141" loccnumb="6" loccnume="9"
       expl="5. type invariant"
       sum="d802d6a311286b3e75ec9ac7a1950e41"
       proved="true"
@@ -1471,7 +1491,7 @@
        <goal
         name="WP_parameter add.5.1"
         locfile="../hashtbl_impl.mlw"
-        loclnum="134" loccnumb="6" loccnume="9"
+        loclnum="141" loccnumb="6" loccnume="9"
         expl="1. type invariant"
         sum="bf37cd94afdf67025ee0b77069eca67e"
         proved="true"
@@ -1486,7 +1506,7 @@
          <goal
           name="WP_parameter add.5.1.1"
           locfile="../hashtbl_impl.mlw"
-          loclnum="134" loccnumb="6" loccnume="9"
+          loclnum="141" loccnumb="6" loccnume="9"
           expl="1. type invariant"
           sum="f064387729ef68d99d15358332376224"
           proved="true"
@@ -1500,13 +1520,13 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="1.74"/>
+           <result status="valid" time="8.01"/>
           </proof>
          </goal>
          <goal
           name="WP_parameter add.5.1.2"
           locfile="../hashtbl_impl.mlw"
-          loclnum="134" loccnumb="6" loccnume="9"
+          loclnum="141" loccnumb="6" loccnume="9"
           expl="2. type invariant"
           sum="1f5f95802e97c99d8431c6220ae2c275"
           proved="true"
@@ -1520,7 +1540,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="1.85"/>
+           <result status="valid" time="6.84"/>
           </proof>
          </goal>
         </transf>
@@ -1530,7 +1550,7 @@
      <goal
       name="WP_parameter add.6"
       locfile="../hashtbl_impl.mlw"
-      loclnum="134" loccnumb="6" loccnume="9"
+      loclnum="141" loccnumb="6" loccnume="9"
       expl="6. type invariant"
       sum="cbe1b6653e5335541c82210ad6f4fb15"
       proved="true"
@@ -1558,7 +1578,7 @@
      <goal
       name="WP_parameter add.7"
       locfile="../hashtbl_impl.mlw"
-      loclnum="134" loccnumb="6" loccnume="9"
+      loclnum="141" loccnumb="6" loccnume="9"
       expl="7. postcondition"
       sum="fd8b150829c4f2701037e43aec6426b2"
       proved="true"
@@ -1573,7 +1593,7 @@
        <goal
         name="WP_parameter add.7.1"
         locfile="../hashtbl_impl.mlw"
-        loclnum="134" loccnumb="6" loccnume="9"
+        loclnum="141" loccnumb="6" loccnume="9"
         expl="1. postcondition"
         sum="c7eccaa87cd54e9279ae7efa2943c63f"
         proved="true"
@@ -1595,7 +1615,7 @@
      <goal
       name="WP_parameter add.8"
       locfile="../hashtbl_impl.mlw"
-      loclnum="134" loccnumb="6" loccnume="9"
+      loclnum="141" loccnumb="6" loccnume="9"
       expl="8. postcondition"
       sum="bbb7e538c20dcd8c7962f00999543b6b"
       proved="true"
@@ -1610,7 +1630,7 @@
        <goal
         name="WP_parameter add.8.1"
         locfile="../hashtbl_impl.mlw"
-        loclnum="134" loccnumb="6" loccnume="9"
+        loclnum="141" loccnumb="6" loccnume="9"
         expl="1. postcondition"
         sum="dad4a23ccd324e47793d5c3562a1f501"
         proved="true"
@@ -1625,7 +1645,7 @@
          <goal
           name="WP_parameter add.8.1.1"
           locfile="../hashtbl_impl.mlw"
-          loclnum="134" loccnumb="6" loccnume="9"
+          loclnum="141" loccnumb="6" loccnume="9"
           expl="1. postcondition"
           sum="dad4a23ccd324e47793d5c3562a1f501"
           proved="true"
