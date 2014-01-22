@@ -88,7 +88,7 @@ let ity_of_pty ?(noop=true) uc pty =
   let rec get_ty = function
     | PPTtyvar ({id_loc = loc}, true) when noop ->
         Loc.errorm ~loc "Opaqueness@ annotations@ are@ only@ \
-          allowed@ in@ function@ and@ predicate@ prototypes"
+          allowed@ in@ the@ types@ of@ formal@ arguments"
     | PPTtyvar ({id = x}, _) ->
         ity_var (create_user_tv x)
     | PPTtyapp (q, tyl) ->
