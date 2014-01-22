@@ -5,10 +5,6 @@
   id="0"
   name="Alt-Ergo"
   version="0.95.1"/>
- <prover
-  id="1"
-  name="Coq"
-  version="8.4pl2"/>
  <file
   name="../fill.mlw"
   verified="true"
@@ -16,59 +12,18 @@
   <theory
    name="Fill"
    locfile="../fill.mlw"
-   loclnum="4" loccnumb="7" loccnume="11"
+   loclnum="8" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
-    name="size_nonneg"
-    locfile="../fill.mlw"
-    loclnum="23" loccnumb="8" loccnume="19"
-    sum="d6989057b859a31c420e5a135d99655c"
-    proved="true"
-    expanded="true"
-    shape="ainfix &gt;=asizeV0c0F">
-    <proof
-     prover="1"
-     timelimit="15"
-     memlimit="0"
-     edited="fill_WP_Fill_size_nonneg_2.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.03"/>
-    </proof>
-    <transf
-     name="induction_ty_lex"
-     proved="true"
-     expanded="true">
-     <goal
-      name="size_nonneg.1"
-      locfile="../fill.mlw"
-      loclnum="23" loccnumb="8" loccnume="19"
-      expl="1."
-      sum="0b63a76a02c377e78ec180b9cab1f193"
-      proved="true"
-      expanded="false"
-      shape="Cainfix &gt;=asizeV0c0aNullainfix &gt;=asizeV0c0Iainfix &gt;=asizeV1c0Iainfix &gt;=asizeV3c0aNodeVVVV0F">
-      <proof
-       prover="0"
-       timelimit="8"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
     name="WP_parameter fill"
     locfile="../fill.mlw"
-    loclnum="25" loccnumb="10" loccnume="14"
+    loclnum="21" loccnumb="10" loccnume="14"
     expl="VC for fill"
-    sum="ce7b3b9380df0f057d6e0b43040853d3"
+    sum="54f68147a978c58c7d986082f25212bb"
     proved="true"
     expanded="true"
-    shape="CacontainsV0agetV2V4Iainfix &lt;V4V3Aainfix &lt;=V3V4FAainfix &lt;=V3V1Aainfix &lt;=V3V3aNulliacontainsV0agetV8V10Iainfix &lt;V10V9Aainfix &lt;=V3V10FAainfix =agetV8V11agetV2V11Iainfix &lt;V11V3Aainfix &lt;=c0V11FAainfix &lt;=V9V1Aainfix &lt;=V3V9acontainsV0agetV14V16Iainfix &lt;V16V15Aainfix &lt;=V3V16FAainfix =agetV14V17agetV2V17Iainfix &lt;V17V3Aainfix &lt;=c0V17FAainfix &lt;=V15V1Aainfix &lt;=V3V15IacontainsV7agetV14V18Iainfix &lt;V18V15Aainfix &lt;=V13V18FAainfix =agetV14V19agetV12V19Iainfix &lt;V19V13Aainfix &lt;=c0V19FAainfix &lt;=V15V1Aainfix &lt;=V13V15Aainfix &lt;=c0V1FFAainfix &lt;=V13V1Aainfix &lt;=c0V13Aainfix &lt;asizeV7asizeV0Aainfix &lt;=c0asizeV0Lainfix +V9c1Iainfix =V12asetV8V9V6Aainfix &lt;=c0V1FAainfix &lt;V9V1Aainfix &lt;=c0V9Nainfix =V9V1IacontainsV5agetV8V20Iainfix &lt;V20V9Aainfix &lt;=V3V20FAainfix =agetV8V21agetV2V21Iainfix &lt;V21V3Aainfix &lt;=c0V21FAainfix &lt;=V9V1Aainfix &lt;=V3V9Aainfix &lt;=c0V1FFAainfix &lt;=V3V1Aainfix &lt;=c0V3Aainfix &lt;asizeV5asizeV0Aainfix &lt;=c0asizeV0aNodeVVVV0Iainfix &lt;=V3V1Aainfix &lt;=c0V3Aainfix &lt;=c0V1F">
+    shape="CacontainsV0agetV2V4Iainfix &lt;V4V3Aainfix &lt;=V3V4FAainfix &lt;=V3V1Aainfix &lt;=V3V3aNulliacontainsV0agetV8V10Iainfix &lt;V10V9Aainfix &lt;=V3V10FAainfix =agetV8V11agetV2V11Iainfix &lt;V11V3Aainfix &lt;=c0V11FAainfix &lt;=V9V1Aainfix &lt;=V3V9acontainsV0agetV14V16Iainfix &lt;V16V15Aainfix &lt;=V3V16FAainfix =agetV14V17agetV2V17Iainfix &lt;V17V3Aainfix &lt;=c0V17FAainfix &lt;=V15V1Aainfix &lt;=V3V15IacontainsV7agetV14V18Iainfix &lt;V18V15Aainfix &lt;=V13V18FAainfix =agetV14V19agetV12V19Iainfix &lt;V19V13Aainfix &lt;=c0V19FAainfix &lt;=V15V1Aainfix &lt;=V13V15Aainfix &lt;=c0V1FFAainfix &lt;=V13V1Aainfix &lt;=c0V13ACfaNullainfix =V21V7Oainfix =V20V7aNodeVwVV0Lainfix +V9c1Iainfix =V12asetV8V9V6Aainfix &lt;=c0V1FAainfix &lt;V9V1Aainfix &lt;=c0V9Nainfix =V9V1IacontainsV5agetV8V22Iainfix &lt;V22V9Aainfix &lt;=V3V22FAainfix =agetV8V23agetV2V23Iainfix &lt;V23V3Aainfix &lt;=c0V23FAainfix &lt;=V9V1Aainfix &lt;=V3V9Aainfix &lt;=c0V1FFAainfix &lt;=V3V1Aainfix &lt;=c0V3ACfaNullainfix =V25V5Oainfix =V24V5aNodeVwVV0aNodeVVVV0Iainfix &lt;=V3V1Aainfix &lt;=c0V3Aainfix &lt;=c0V1F">
     <label
      name="expl:VC for fill"/>
     <proof
