@@ -532,26 +532,30 @@ let get_selected_row_references () =
 
 let row_expanded b iter _path =
   session_needs_saving := true;
+  let expand_g g = goals_view#expand_row g.S.goal_key#path in
+  let expand_tr _ tr = goals_view#expand_row tr.S.transf_key#path in
+  let expand_m _ m = goals_view#expand_row m.S.metas_key#path in
   match get_any_from_iter iter with
     | S.File f ->
         S.set_file_expanded f b
     | S.Theory t ->
         S.set_theory_expanded t b
     | S.Goal g ->
-        S.set_goal_expanded g b
+        S.set_goal_expanded g b;
+        if b then begin
+          Session.PHstr.iter expand_tr g.S.goal_transformations;
+          Session.Mmetas_args.iter expand_m g.S.goal_metas
+        end
     | S.Transf tr ->
-        S.set_transf_expanded tr b
+        S.set_transf_expanded tr b;
+        if b then begin match tr.S.transf_goals with
+          | [g] -> expand_g g
+          | _ -> ()
+        end
     | S.Proof_attempt _ -> ()
     | S.Metas m ->
-      S.set_metas_expanded m b
-
-
-
-let (_:GtkSignal.id) =
-  goals_view#connect#row_collapsed ~callback:(row_expanded false)
-
-let (_:GtkSignal.id) =
-  goals_view#connect#row_expanded ~callback:(row_expanded true)
+        S.set_metas_expanded m b;
+        if b then expand_g m.S.metas_goal
 
 let current_selected_row = ref None
 let current_env_session = ref None
@@ -715,7 +719,7 @@ let notify any =
         set_proof_state a
     | S.Transf tr ->
         set_row_status row tr.S.transf_verified
-   | S.Metas m ->
+    | S.Metas m ->
         set_row_status row m.S.metas_verified
 
 let init =
@@ -2174,6 +2178,12 @@ let (_ : GtkSignal.id) =
         | [] -> ()
         | _ -> ()
     end
+
+let (_:GtkSignal.id) =
+  goals_view#connect#row_collapsed ~callback:(row_expanded false)
+
+let (_:GtkSignal.id) =
+  goals_view#connect#row_expanded ~callback:(row_expanded true)
 
 (*
 let () = Debug.set_flag (Debug.lookup_flag "transform")
