@@ -1329,8 +1329,10 @@ let read_session dir =
 
 let rec set_goal_expanded g b =
   g.goal_expanded <- b;
-  if not b then
-    PHstr.iter (fun _ tr -> set_transf_expanded tr b) g.goal_transformations
+  if not b then begin
+    PHstr.iter (fun _ tr -> set_transf_expanded tr b) g.goal_transformations;
+    Mmetas_args.iter (fun _ m -> set_metas_expanded m b) g.goal_metas
+  end
 
 and set_transf_expanded tr b =
   tr.transf_expanded <- b;
