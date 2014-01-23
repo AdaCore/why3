@@ -2,19 +2,40 @@
 (* Computing the square root (up to eps) using binary search
 
    Note: precondition 0. < eps is not necessary for soundness
-   but it could be used to ensure termination (not done here). *)
+   but needed to ensure termination.
+*)
 
 module BinarySqrt
 
   use import real.Real
+  use int.Int
+  use real.MinMax
+  use real.FromInt
+  use real.Truncate
 
-  let rec sqrt (r: real) (eps: real) : real
-    requires { 0. <= r /\ 0. < eps }
+  let rec sqrt (r: real) (eps: real) (ghost n:int) (ghost eps0:real) : real
+    requires { 0.0 <= r }
+    requires { eps0 > 0.0 /\ Int.(>=) n 1 }
+    requires { eps = (FromInt.from_int n) * eps0 }
+    variant  { Int.(-) (Truncate.ceil (MinMax.max r 1.0 / eps0)) n }
     ensures  { result * result <= r < (result + eps) * (result + eps) }
-  = if r < eps && 1. < eps then
-      0.
+  = if r < eps && 1.0 < eps then
+      0.0
     else
-      let r' = sqrt r (2. * eps) in
+      begin
+      assert { FromInt.from_int n * eps0 <= MinMax.max r 1.0 };
+      assert { 1.0 / eps0 > 0.0 };
+      assert { FromInt.from_int n * eps0 * (1.0 / eps0) <= MinMax.max r 1.0 * (1.0 / eps0)};
+      assert { FromInt.from_int n * eps0 / eps0 <= MinMax.max r 1.0 / eps0};
+      assert { FromInt.from_int n <= MinMax.max r 1.0 / eps0 };
+      let r' = sqrt r (2.0 * eps) (Int.(*) 2 n) eps0 in
       if (r' + eps) * (r' + eps) <= r then r' + eps else r'
+      end
+
+  let sqrt_main (r:real) (eps:real) : real
+    requires { 0.0 <= r }
+    requires { eps > 0.0 }
+    ensures  { result * result <= r < (result + eps) * (result + eps) }
+  = sqrt r eps 1 eps
 
 end
