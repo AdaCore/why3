@@ -114,6 +114,7 @@ module M
 
   let list_rev (p : ref pointer)
     requires { is_list !next !p }
+    diverges
     ensures { is_list !next !result }
   = let q = ref null in
     while !p <> null do
@@ -155,6 +156,7 @@ module M
 
   let list_rev_behv (p : ref pointer)
     requires { is_list !next !p }
+    diverges
     ensures  { is_list !next !result }
     ensures  { reverse (model (old !next) (old !p)) = model !next !result }
   = let old_next = !next in
@@ -281,6 +283,7 @@ module M2
 
   let list_rev (p : ref pointer) =
     requires { is_list !next !p }
+    diverges
     ensures  { is_list !next !result }
     let q = ref null in
     while !p <> null do
@@ -335,6 +338,7 @@ module M2
       invariant { sep_list_list !next !p !q }
       invariant { reverse (model (at !next 'Init) (old_p)) =
         reverse (model !next !p) ++ model !next !q }
+      variant { model !next !p }
       let tmp = !next[!p] in
       next := !next[!p <- !q];
       (* assert { (reverse (Cons p (model !next tmp))) ++ (model !next q) = *)

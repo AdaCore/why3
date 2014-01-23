@@ -31,6 +31,7 @@ module InsertionSortNaive
        invariant { sorted_sub a !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                       a[k1] <= a[k2] }
+       variant { !j }
        'L:
        let b = !j - 1 in
        let t = a[!j] in
@@ -83,6 +84,7 @@ module InsertionSortNaiveGen
        invariant { sorted_sub a !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                       le a[k1] a[k2] }
+       variant { !j }
        'L:
        let b = !j - 1 in
        let t = a[!j] in
@@ -142,6 +144,7 @@ module InsertionSortParam
        invariant { sorted_sub p a.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                       le p a[k1] a[k2] }
+       variant { !j }
        'L:
        let b = !j - 1 in
        let t = a[!j] in
@@ -201,6 +204,7 @@ module InsertionSortParamBad
        invariant { sorted_sub p a !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                       le p a[k1] a[k2] }
+       variant { !j }
        'L:
        let b = !j - 1 in
        let t = a[!j] in
