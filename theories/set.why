@@ -166,6 +166,42 @@ theory Fset
 
 end
 
+(** {2 Finite Set Comprehension} *)
+
+theory FsetComprehension
+
+  use export Fset
+  use import int.Int
+  use HighOrd as HO
+
+  (** { x | x in U and p(x) } *)
+  function filter (p: HO.pred 'a) (u: set 'a) : set 'a
+
+  axiom filter_def:
+    forall p: HO.pred 'a, u: set 'a.
+    forall x: 'a. mem x (filter p u) <-> (p x /\ mem x u)
+
+  lemma filter_cardinal:
+    forall p: HO.pred 'a, u: set 'a. cardinal (filter p u) <= cardinal u
+
+  (** { f x | x in U } *)
+  function map (f: HO.func 'a 'b) (u: set 'a) : set 'b
+
+  axiom map_def:
+    forall f: HO.func 'a 'b, u: set 'a.
+    forall y: 'b. mem y (map f u) <-> (exists x: 'a. mem x u /\ y = f x)
+
+  lemma map_def1:
+    forall f: HO.func 'a 'b, u: set 'a.
+    forall x: 'a. mem x u -> mem (f x) (map f u)
+
+  lemma map_cardinal:
+    forall f: HO.func 'a 'b, u: set 'a. cardinal (map f u) <= cardinal u
+
+end
+
+(** {2 N-th element of a finite set} *)
+
 theory FsetNth
 
   use import int.Int
