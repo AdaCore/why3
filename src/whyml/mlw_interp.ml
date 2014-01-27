@@ -1125,9 +1125,21 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
       p_expr e print_state s;
 *)
     Normal Vvoid, s'
-  | Eassert _ ->
-    (* TODO check the validity ! *)
-    Normal Vvoid, s
+  | Eassert(_,t) ->
+    (* TODO: do not eval t if no assertion check *)
+    if true then (* noassert *) Normal Vvoid, s
+    else
+      begin match (eval_term env s t) with
+      | Vbool true -> Normal Vvoid, s
+      | Vbool false ->
+        eprintf "@[Assertion failed at %a@]@."
+          (Pp.print_option Pretty.print_loc) e.e_loc;
+        Irred e, s
+      | _ ->
+        eprintf "@[Warning: assertion cannot be evaluated at %a@]@."
+          (Pp.print_option Pretty.print_loc) e.e_loc;
+        Normal Vvoid, s
+      end
   | Eghost e1 ->
     (* TODO: do not eval ghost if no assertion check *)
     eval_expr env s e1
