@@ -61,3 +61,92 @@ module ref.Ref
   syntax val      (:=)     "Pervasives.(:=)"
 end
 
+module mach.int.Int31
+  (* even on a 64-bit machine, it is safe to use type int for 31-bit integers *)
+  syntax type     int31     "int"
+  syntax constant min_int31 "(- 0x4000_0000)"
+  syntax constant max_int31    "0x3fff_ffff"
+  syntax val      of_int    "(fun x -> int_of_string (Num.string_of_num x))"
+                            (* FIXME: use a realization instead? *)
+  syntax val      ( + )     "( + )"
+  syntax val      ( - )     "( - )"
+  syntax val      (-_)      "( ~- )"
+  syntax val      ( * )     "( * )"
+  syntax val      ( / )     "( / )"
+  syntax val      (<=)      "(<=)"
+  syntax val      (<)       "(<)"
+  syntax val      (>=)      "(>=)"
+  syntax val      (>)       "(>)"
+end
+
+module mach.int.Int32
+  syntax type     int32     "Int32.t"
+  syntax constant min_int32 "Int32.min_int"
+  syntax constant max_int32 "Int32.max_int"
+  syntax val      of_int    "(fun x -> Int32.of_string (Num.string_of_num x))"
+                            (* FIXME: use a realization instead? *)
+  syntax val      (+)       "Int32.add"
+  syntax val      (-)       "Int32.sub"
+  syntax val      (-_)      "Int32.neg"
+  syntax val      ( * )     "Int32.mul"
+  syntax val      (/)       "Int32.div"
+  syntax val      (<=)      "(<=)"
+  syntax val      (<)       "(<)"
+  syntax val      (>=)      "(>=)"
+  syntax val      (>)       "(>)"
+end
+
+module mach.int.Int63
+  (* only safe on a 64-bit machine *)
+  prelude "let () = assert (Sys.word_size = 64)"
+  syntax type     int63     "int"
+  syntax constant min_int63 "(- 0x4000_0000_0000_0000)"
+  syntax constant max_int63    "0x3fff_ffff_ffff_ffff"
+  syntax val      of_int    "(fun x -> int_of_string (Num.string_of_num x))"
+                            (* FIXME: use a realization instead? *)
+  syntax val      ( + )     "( + )"
+  syntax val      ( - )     "( - )"
+  syntax val      (-_)      "( ~- )"
+  syntax val      ( * )     "( * )"
+  syntax val      ( / )     "( / )"
+  syntax val      (<=)      "(<=)"
+  syntax val      (<)       "(<)"
+  syntax val      (>=)      "(>=)"
+  syntax val      (>)       "(>)"
+end
+
+module mach.int.Int64
+  syntax type     int64     "Int64.t"
+  syntax constant min_int64 "Int64.min_int"
+  syntax constant max_int64 "Int64.max_int"
+  syntax val      of_int    "(fun x -> Int64.of_string (Num.string_of_num x))"
+                            (* FIXME: use a realization instead? *)
+  syntax val      (+)       "Int64.add"
+  syntax val      (-)       "Int64.sub"
+  syntax val      (-_)      "Int64.neg"
+  syntax val      ( * )     "Int64.mul"
+  syntax val      (/)       "Int64.div"
+  syntax val      (<=)      "(<=)"
+  syntax val      (<)       "(<)"
+  syntax val      (>=)      "(>=)"
+  syntax val      (>)       "(>)"
+end
+
+module mach.array.Array31
+  syntax type array  "array"
+  syntax val  make   "Array.make"
+  syntax val  ([])   "Array.get"
+  syntax val  ([]<-) "Array.set"
+  syntax val  length "Array.length"
+  syntax val  append "Array.append"
+  syntax val  sub    "Array.sub"
+  syntax val  copy   "Array.copy"
+  syntax val  fill   "Array.fill"
+  syntax val  blit   "Array.blit"
+  syntax val  self_blit "Array.blit"
+end
+
+(* TODO
+   - OutOfBounds, defensive_get, defensive_set in mach.array.in Array31
+   - mach.array.Array32  -> Bigarray sur 32-bit / Array sur 64-bit ?
+*)

@@ -39,7 +39,12 @@ end
 
 (** {2 Machine integers}
 
-32-bit integers and such go here.
+  Bounded integers, typically n-bit signed and unsigned integers, go
+  here. We first introude a generic theory [Bounded_int]of bounded
+  integers, with minimal and maximal values (resp. [min] and [max]).
+  Then we instantiate it to get 32 and 64 signed and unsigned integers
+  ([Int32], [UInt32], [Int64], and [UInt64]) as well as 31 and 63 signed
+  integers ([Int31] and [Int63]) to be used in OCaml programs.
 
 *)
 
@@ -101,6 +106,22 @@ module Bounded_int
 
 end
 
+module Int31
+
+  use import int.Int
+
+  type int31
+
+  constant min_int31 : int = - 0x40000000
+  constant max_int31 : int =   0x3fffffff
+
+  clone export Bounded_int with
+    type t = int31,
+    constant min = min_int31,
+    constant max = max_int31
+
+end
+
 module Int32
 
   use import int.Int
@@ -128,6 +149,22 @@ module UInt32
     type t = uint32,
     constant min = min_uint32,
     constant max = max_uint32
+
+end
+
+module Int63
+
+  use import int.Int
+
+  type int63
+
+  constant min_int63 : int = - 0x4000000000000000
+  constant max_int63 : int =   0x3fffffffffffffff
+
+  clone export Bounded_int with
+    type t = int63,
+    constant min = min_int63,
+    constant max = max_int63
 
 end
 
