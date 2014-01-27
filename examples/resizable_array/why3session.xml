@@ -10,15 +10,22 @@
   verified="true"
   expanded="true">
   <theory
+   name="ResizableArraySpec"
+   locfile="../resizable_array.mlw"
+   loclnum="2" loccnumb="7" loccnume="25"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
    name="ResizableArrayImplem"
    locfile="../resizable_array.mlw"
-   loclnum="2" loccnumb="7" loccnume="27"
+   loclnum="39" loccnumb="7" loccnume="27"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter make"
     locfile="../resizable_array.mlw"
-    loclnum="21" loccnumb="6" loccnume="10"
+    loclnum="58" loccnumb="6" loccnume="10"
     expl="VC for make"
     sum="5b4631428a6946947f0f076fb2760573"
     proved="true"
@@ -38,7 +45,7 @@
    <goal
     name="WP_parameter mixfix []"
     locfile="../resizable_array.mlw"
-    loclnum="26" loccnumb="7" loccnume="9"
+    loclnum="63" loccnumb="7" loccnume="9"
     expl="VC for mixfix []"
     sum="1bd2167ad56d7becbc7031fd7b9b9dbb"
     proved="true"
@@ -58,7 +65,7 @@
    <goal
     name="WP_parameter mixfix []&lt;-"
     locfile="../resizable_array.mlw"
-    loclnum="31" loccnumb="7" loccnume="11"
+    loclnum="68" loccnumb="7" loccnume="11"
     expl="VC for mixfix []&lt;-"
     sum="1a37d101faa2beb517535fb3d9976d2f"
     proved="true"
@@ -78,12 +85,12 @@
    <goal
     name="WP_parameter resize"
     locfile="../resizable_array.mlw"
-    loclnum="36" loccnumb="6" loccnume="12"
+    loclnum="73" loccnumb="6" loccnume="12"
     expl="VC for resize"
-    sum="b41f697b946804a4b6599de0dcf21ace"
+    sum="f7092d48158c0c95ec4155a22203343f"
     proved="true"
     expanded="true"
-    shape="iainfix =agetV6V8agetV3V8Iainfix &lt;V8aminV1V4Aainfix &lt;=c0V8FAainfix =V7V4Aainfix &lt;=c0V2Aainfix =agetV6V9V0Iainfix &lt;V9V2Aainfix &lt;=V7V9FAainfix &lt;=V7V2Aainfix &lt;=c0V7Iainfix =V7V4FIainfix =agetV6V10V0Iainfix &lt;V10ainfix +V4V5Aainfix &lt;=V4V10FAainfix =agetV6V11agetV3V11Iainfix &lt;V11V2Aainfix &lt;=ainfix +V4V5V11Oainfix &lt;V11V4Aainfix &lt;=c0V11FAainfix &lt;=c0V2FAainfix &lt;=ainfix +V4V5V2Aainfix &lt;=c0V5Aainfix &lt;=c0V4Lainfix -V2V4ainfix =agetV15V17agetV3V17Iainfix &lt;V17aminV1V4Aainfix &lt;=c0V17FAainfix =V16V4Aainfix &lt;=c0V14Aainfix =agetV15V18V0Iainfix &lt;V18V14Aainfix &lt;=V16V18FAainfix &lt;=V16V14Aainfix &lt;=c0V16Iainfix =V16V4FIainfix =V15V13Aainfix =V14V12FIainfix =agetV13V19agetV3ainfix -ainfix +c0V19c0Iainfix &lt;V19ainfix +c0V2Aainfix &lt;=c0V19FAainfix =agetV13V20agetaconstV0V20Iainfix &lt;V20V12Aainfix &lt;=ainfix +c0V2V20Oainfix &lt;V20c0Aainfix &lt;=c0V20FAainfix &lt;=c0V12FAainfix &lt;=ainfix +c0V2V12Aainfix &lt;=c0c0Aainfix &lt;=ainfix +c0V2V2Aainfix &lt;=c0V2Aainfix &lt;=c0c0Iainfix &lt;=c0V12Aainfix &gt;=V12c0LamaxV4ainfix *c2V2ainfix &gt;V4V2Iainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix =agetV3V21V0Iainfix &lt;V21V2Aainfix &lt;=V1V21FAainfix &lt;=V1V2Aainfix &lt;=c0V1F">
+    shape="iainfix =agetV6V8agetV3V8Iainfix &lt;V8V4Iainfix &lt;V8V1Aainfix &lt;=c0V8FAainfix =V7V4Aainfix &lt;=c0V2Aainfix =agetV6V9V0Iainfix &lt;V9V2Aainfix &lt;=V7V9FAainfix &lt;=V7V2Aainfix &lt;=c0V7Iainfix =V7V4FIainfix =agetV6V10V0Iainfix &lt;V10ainfix +V4V5Aainfix &lt;=V4V10FAainfix =agetV6V11agetV3V11Iainfix &lt;V11V2Aainfix &lt;=ainfix +V4V5V11Oainfix &lt;V11V4Aainfix &lt;=c0V11FAainfix &lt;=c0V2FAainfix &lt;=ainfix +V4V5V2Aainfix &lt;=c0V5Aainfix &lt;=c0V4Lainfix -V2V4ainfix =agetV15V17agetV3V17Iainfix &lt;V17V4Iainfix &lt;V17V1Aainfix &lt;=c0V17FAainfix =V16V4Aainfix &lt;=c0V14Aainfix =agetV15V18V0Iainfix &lt;V18V14Aainfix &lt;=V16V18FAainfix &lt;=V16V14Aainfix &lt;=c0V16Iainfix =V16V4FIainfix =V15V13Aainfix =V14V12FIainfix =agetV13V19agetV3ainfix -ainfix +c0V19c0Iainfix &lt;V19ainfix +c0V2Aainfix &lt;=c0V19FAainfix =agetV13V20agetaconstV0V20Iainfix &lt;V20V12Aainfix &lt;=ainfix +c0V2V20Oainfix &lt;V20c0Aainfix &lt;=c0V20FAainfix &lt;=c0V12FAainfix &lt;=ainfix +c0V2V12Aainfix &lt;=c0c0Aainfix &lt;=ainfix +c0V2V2Aainfix &lt;=c0V2Aainfix &lt;=c0c0Iainfix &lt;=c0V12Aainfix &gt;=V12c0LamaxV4ainfix *c2V2ainfix &gt;V4V2Iainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix =agetV3V21V0Iainfix &lt;V21V2Aainfix &lt;=V1V21FAainfix &lt;=V1V2Aainfix &lt;=c0V1F">
     <label
      name="expl:VC for resize"/>
     <proof
@@ -98,12 +105,12 @@
    <goal
     name="WP_parameter append"
     locfile="../resizable_array.mlw"
-    loclnum="52" loccnumb="6" loccnume="12"
+    loclnum="89" loccnumb="6" loccnume="12"
     expl="VC for append"
-    sum="45ca5377534c4bb571155c1605a959e4"
+    sum="cb8a113fc28823d9ef36aaf8253a5dbb"
     proved="true"
     expanded="true"
-    shape="ainfix =agetV12V13agetV7ainfix -V13V1Iainfix &lt;=V1V13Aainfix =agetV12V13agetV3V13Iainfix &lt;V13V1Iainfix &lt;V13V11Aainfix &lt;=c0V13FAainfix =V11ainfix +V1V5Aainfix &lt;=c0V9Aainfix =agetV12V14V0Iainfix &lt;V14V9Aainfix &lt;=V11V14FAainfix &lt;=V11V9Aainfix &lt;=c0V11Iainfix =agetV12V15agetV7ainfix -ainfix +c0V15V1Iainfix &lt;V15ainfix +V1V5Aainfix &lt;=V1V15FAainfix =agetV12V16agetV10V16Iainfix &lt;V16V9Aainfix &lt;=ainfix +V1V5V16Oainfix &lt;V16V1Aainfix &lt;=c0V16FAainfix &lt;=c0V9FAainfix &lt;=ainfix +V1V5V9Aainfix &lt;=c0V1Aainfix &lt;=ainfix +c0V5V6Aainfix &lt;=c0V5Aainfix &lt;=c0c0Iainfix =agetV10V17agetV3V17Iainfix &lt;V17aminV1V8Aainfix &lt;=c0V17FAainfix =V11V8Aainfix &lt;=c0V9Aainfix =agetV10V18V0Iainfix &lt;V18V9Aainfix &lt;=V11V18FAainfix &lt;=V11V9Aainfix &lt;=c0V11FAainfix &lt;=c0V8Lainfix +V1V5Iainfix &lt;=c0V6Aainfix =agetV7V19V4Iainfix &lt;V19V6Aainfix &lt;=V5V19FAainfix &lt;=V5V6Aainfix &lt;=c0V5Aainfix &lt;=c0V2Aainfix =agetV3V20V0Iainfix &lt;V20V2Aainfix &lt;=V1V20FAainfix &lt;=V1V2Aainfix &lt;=c0V1F">
+    shape="ainfix =agetV12V13agetV7ainfix -V13V1Iainfix &lt;=V1V13Aainfix =agetV12V13agetV3V13Iainfix &lt;V13V1Iainfix &lt;V13V11Aainfix &lt;=c0V13FAainfix =V11ainfix +V1V5Aainfix &lt;=c0V9Aainfix =agetV12V14V0Iainfix &lt;V14V9Aainfix &lt;=V11V14FAainfix &lt;=V11V9Aainfix &lt;=c0V11Iainfix =agetV12V15agetV7ainfix -ainfix +c0V15V1Iainfix &lt;V15ainfix +V1V5Aainfix &lt;=V1V15FAainfix =agetV12V16agetV10V16Iainfix &lt;V16V9Aainfix &lt;=ainfix +V1V5V16Oainfix &lt;V16V1Aainfix &lt;=c0V16FAainfix &lt;=c0V9FAainfix &lt;=ainfix +V1V5V9Aainfix &lt;=c0V1Aainfix &lt;=ainfix +c0V5V6Aainfix &lt;=c0V5Aainfix &lt;=c0c0Iainfix =agetV10V17agetV3V17Iainfix &lt;V17V8Iainfix &lt;V17V1Aainfix &lt;=c0V17FAainfix =V11V8Aainfix &lt;=c0V9Aainfix =agetV10V18V0Iainfix &lt;V18V9Aainfix &lt;=V11V18FAainfix &lt;=V11V9Aainfix &lt;=c0V11FAainfix &lt;=c0V8Lainfix +V1V5Iainfix &lt;=c0V6Aainfix =agetV7V19V4Iainfix &lt;V19V6Aainfix &lt;=V5V19FAainfix &lt;=V5V6Aainfix &lt;=c0V5Aainfix &lt;=c0V2Aainfix =agetV3V20V0Iainfix &lt;V20V2Aainfix &lt;=V1V20FAainfix &lt;=V1V2Aainfix &lt;=c0V1F">
     <label
      name="expl:VC for append"/>
     <proof
@@ -119,18 +126,18 @@
   <theory
    name="Test"
    locfile="../resizable_array.mlw"
-   loclnum="88" loccnumb="7" loccnume="11"
+   loclnum="125" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter test1"
     locfile="../resizable_array.mlw"
-    loclnum="93" loccnumb="6" loccnume="11"
+    loclnum="130" loccnumb="6" loccnume="11"
     expl="VC for test1"
-    sum="8c01dd1fff987addefab08da45b65e6a"
+    sum="4b2b0e4784a5d77c84c51db66c94c29b"
     proved="true"
     expanded="true"
-    shape="ainfix =CV4amk rarrayVVVV0c7Aainfix =agetCV3amk rarrayVVVV0c0c17Iainfix =agetCV3amk rarrayVVVV0V11agetCCV1amk arrayVVV17amk rarrayVVVV0V11Iainfix &lt;V11aminCV21amk rarrayVVVV0c7Aainfix &lt;=c0V11FAainfix =CV4amk rarrayVVVV0c7ACainfix &lt;=c0V2amk rarrayVVVV0Aainfix =agetCV3amk rarrayVVVV0V29CV33amk rarrayVVVV0Iainfix &lt;V29CV2amk rarrayVVVV0Aainfix &lt;=CV4amk rarrayVVVV0V29FAainfix &lt;=CV4amk rarrayVVVV0CV2amk rarrayVVVV0Aainfix &lt;=c0CV4amk rarrayVVVV0FAainfix &lt;=c0c7ICCainfix =asetaeltsadataV0c0c17V1Aainfix =alengthadataV0V54amk arrayVVV53Aainfix =alengthV0V52Aainfix =adummyV0V51amk rarrayVVVV0ACainfix &lt;=c0CV59amk arrayVVV58amk rarrayVVVV0Aainfix =agetCCV1amk arrayVVV64amk rarrayVVVV0V61CV67amk rarrayVVVV0Iainfix &lt;V61CCV73amk arrayVVV72amk rarrayVVVV0Aainfix &lt;=CV76amk rarrayVVVV0V61FAainfix &lt;=CV79amk rarrayVVVV0CCV84amk arrayVVV83amk rarrayVVVV0Aainfix &lt;=c0CV87amk rarrayVVVV0FAainfix &lt;c0alengthV0Aainfix &lt;=c0c0Aainfix =alengthV0c10ICainfix &lt;=c0alengthV91amk rarrayVVVV0Aainfix =agetaeltsadataV0V92adummyV0Iainfix &lt;V92alengthadataV0Aainfix &lt;=alengthV0V92FAainfix &lt;=alengthV0alengthadataV0Aainfix &lt;=c0alengthV0Lamakec10c0Aainfix &lt;=c0c10">
+    shape="ainfix =CV4amk rarrayVVVV0c7Aainfix =agetCV3amk rarrayVVVV0c0c17Iainfix =agetCV3amk rarrayVVVV0V11agetCCV1amk arrayVVV17amk rarrayVVVV0V11Iainfix &lt;V11c7Iainfix &lt;V11CV21amk rarrayVVVV0Aainfix &lt;=c0V11FAainfix =CV4amk rarrayVVVV0c7ACainfix &lt;=c0V2amk rarrayVVVV0Aainfix =agetCV3amk rarrayVVVV0V29CV33amk rarrayVVVV0Iainfix &lt;V29CV2amk rarrayVVVV0Aainfix &lt;=CV4amk rarrayVVVV0V29FAainfix &lt;=CV4amk rarrayVVVV0CV2amk rarrayVVVV0Aainfix &lt;=c0CV4amk rarrayVVVV0FAainfix &lt;=c0c7ICCainfix =asetaeltsadataV0c0c17V1Aainfix =alengthadataV0V54amk arrayVVV53Aainfix =alengthV0V52Aainfix =adummyV0V51amk rarrayVVVV0ACainfix &lt;=c0CV59amk arrayVVV58amk rarrayVVVV0Aainfix =agetCCV1amk arrayVVV64amk rarrayVVVV0V61CV67amk rarrayVVVV0Iainfix &lt;V61CCV73amk arrayVVV72amk rarrayVVVV0Aainfix &lt;=CV76amk rarrayVVVV0V61FAainfix &lt;=CV79amk rarrayVVVV0CCV84amk arrayVVV83amk rarrayVVVV0Aainfix &lt;=c0CV87amk rarrayVVVV0FAainfix &lt;c0alengthV0Aainfix &lt;=c0c0Aainfix =alengthV0c10ICainfix &lt;=c0alengthV91amk rarrayVVVV0Aainfix =agetaeltsadataV0V92adummyV0Iainfix &lt;V92alengthadataV0Aainfix &lt;=alengthV0V92FAainfix &lt;=alengthV0alengthadataV0Aainfix &lt;=c0alengthV0Lamakec10c0Aainfix &lt;=c0c10">
     <label
      name="expl:VC for test1"/>
     <proof
@@ -145,7 +152,7 @@
    <goal
     name="WP_parameter test2"
     locfile="../resizable_array.mlw"
-    loclnum="101" loccnumb="6" loccnume="11"
+    loclnum="138" loccnumb="6" loccnume="11"
     expl="VC for test2"
     sum="fc235564c1afc4c5743ec37c44b123c0"
     proved="true"
