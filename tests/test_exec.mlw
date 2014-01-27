@@ -92,6 +92,7 @@ module Mut
     let x = { i = 0 } in
     let s = { i = 0 } in
     while x.i <= 10 do
+      variant { 10 - x.i }
       s.i <- s.i + x.i;
       x.i <- x.i + 1
     done;
@@ -103,6 +104,7 @@ module Mut
     let y = { i = 8 } in
     let sum = { i = 0 } in
     while x.i <= m do
+      variant { m - x.i }
       let tmp = x.i in
       x.i <- y.i;
       y.i <- 4 * y.i + tmp;
@@ -118,7 +120,7 @@ module Mut
 
   val x : refint
 
-  let j () = x.i <- 42 (*; x.i *)
+  let j () = x.i <- 42; x.i 
 
 end
 
@@ -138,6 +140,7 @@ module Ref
     let y = ref 8 in
     let sum = ref 0 in
     while !x <= m do
+      variant { m - !x }
       let tmp = !x in
       x := !y;
       y := 4 * !y + tmp;
@@ -157,7 +160,9 @@ module Ref
     done;
     42
 
-  let rec h n : int =
+  let rec h n : int
+    variant { n }
+  =
     let x = ref 0 in
     x := !x + 1;
     if n = 0 then 0 else h (n-1) + !x

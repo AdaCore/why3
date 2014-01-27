@@ -1213,23 +1213,70 @@ and exec_app env s ps args (*spec*) ity_result =
         raise Exit
 
 
-let eval_global_expr env mkm tkm writes e =
+let eval_global_expr env mkm tkm _writes e =
 (*
   eprintf "@[<hov 2>[interp] eval_global_expr:@ %a@]@."
     p_expr e;
 *)
   get_builtins env;
   get_builtin_progs (Mlw_main.library_of_env env);
+(*
   let init_state =
     Sreg.fold
       (fun r acc -> Mreg.add r Vvoid acc)
       writes Mreg.empty
   in
+*)
+  let constr_of_ity renv ity =
+    if ity_immutable ity then Vvoid,renv else
+    let regions =
+      match ity.ity_node with
+        | Ityapp(_,_,rl) -> rl
+        | _ -> 
+          eprintf "type = %a@." Mlw_pretty.print_ity ity;
+          assert false
+    in
+    let csl = Mlw_decl.inst_constructors tkm mkm ity in
+    match csl with
+      | [] -> assert false
+      | [ cs,fdl ] ->
+        let (renv,_regions,vl) =
+          List.fold_left
+            (fun (renv,regions,vl) fd ->
+              match fd.fd_mut,regions with
+                | None,_ -> (renv,regions,Vvoid::vl)
+                | Some _r, reg::regions ->
+                  (* found a mutable field *)
+                  let renv' = Mreg.add reg Vvoid renv in
+                  (renv',regions,Vreg reg :: vl)
+                | Some _, [] -> assert false)
+            (renv,regions,[]) fdl 
+        in
+        Vapp(cs,vl),renv
+      | _ ->
+        Vvoid,renv (* FIXME ! *)
+  in
+  let add_glob _ d ((venv,renv) as acc) =
+    match d.Mlw_decl.pd_node with
+      | Mlw_decl.PDval (Mlw_expr.LetV pvs) ->
+        let ity = pvs.pv_ity in
+        let v,renv = constr_of_ity renv ity in
+        (Mvs.add pvs.pv_vs v venv,renv)
+(*
+         Sreg.fold
+          (fun r acc -> Mreg.add r Vvoid acc)
+          ity.ity_vars.vars_reg renv)
+*)
+      | _ -> acc
+  in
+  let init_env,init_state = 
+    Ident.Mid.fold add_glob mkm (Mvs.empty,Mreg.empty)
+  in
   let env = {
     mknown = mkm;
     tknown = tkm;
     regenv = Mreg.empty;
-    vsenv = Mvs.empty;
+    vsenv = init_env;
   }
   in
   eval_expr env init_state e
