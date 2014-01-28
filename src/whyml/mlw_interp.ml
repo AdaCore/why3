@@ -183,7 +183,6 @@ let print_regenv fmt s =
   let l = Mreg.bindings s in
   fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_regvar) l
 
-(*
 let p_vsvar fmt (vs,t) =
   fprintf fmt "@[<hov 2><%a> -> %a@]"
     Pretty.print_vs vs print_value t
@@ -191,7 +190,6 @@ let p_vsvar fmt (vs,t) =
 let print_vsenv fmt s =
   let l = Mvs.bindings s in
   fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_vsvar) l
-*)
 
 (* evaluation of terms *)
 
@@ -868,6 +866,12 @@ and eval_app env s ls tl =
         ls.ls_name.Ident.id_string;
       Vapp(ls,tl)
 
+let to_logic_result env st res =
+  match res with
+    | Normal v -> Normal(to_logic_value env st v)
+    | Excep(e,v) -> Excep(e,to_logic_value env st v)
+    | Irred _ | Fun _ -> res
+      
 let eval_global_term env km t =
   get_builtins env;
   let env =
@@ -933,13 +937,11 @@ and p_expr fmt e =
     | Eabsurd -> fprintf fmt "@[Eabsurd@]"
 
 
-let print_result_aux env s fmt r =
+let print_logic_result fmt r =
   match r with
-    | Normal t ->
-      let v = to_logic_value env s t in
+    | Normal v ->
       fprintf fmt "@[%a@]" print_value v
-    | Excep(x,t) ->
-      let v = to_logic_value env s t in
+    | Excep(x,v) ->
       fprintf fmt "@[exception %s(@[%a@])@]"
         x.xs_name.Ident.id_string print_value v
     | Irred e ->
@@ -948,7 +950,11 @@ let print_result_aux env s fmt r =
     | Fun _ ->
       fprintf fmt "@[Result is a function@]"
 
-let print_result mkm tkm s fmt r =
+let print_result env s fmt r =
+  print_logic_result fmt (to_logic_result env s r)
+
+(*
+let print_result env s fmt r =
   let env = {
     mknown = mkm;
     tknown = tkm;
@@ -957,6 +963,7 @@ let print_result mkm tkm s fmt r =
   }
   in
   print_result_aux env s fmt r
+*)
 
 
 
@@ -1188,7 +1195,7 @@ and exec_app env s ps args (*spec*) ity_result =
       Debug.dprintf debug
         "@[Return from function %s@ result@ %a in state:@\n%a@]@."
         ps.ps_name.Ident.id_string
-        (print_result_aux env s') r
+        (print_result env s') r
         print_state s';
       r,s'
 
@@ -1203,7 +1210,7 @@ and exec_app env s ps args (*spec*) ity_result =
         Debug.dprintf debug
           "@[Return from builtin function %s result %a in state:@\n%a@]@."
           ps.ps_name.Ident.id_string
-          (print_result_aux env s') r
+          (print_result env s') r
           print_state s';
         r, s'
 
@@ -1279,9 +1286,61 @@ let eval_global_expr env mkm tkm _writes e =
     vsenv = init_env;
   }
   in
-  eval_expr env init_state e
+  let res,st = eval_expr env init_state e in
+  let final_env =
+    Mvs.map (fun v -> to_logic_value env st v) init_env
+  in
+  let res = to_logic_result env st res in
+  res, final_env
 
 
+
+let eval_global_symbol env m d =
+  let lam = d.Mlw_expr.fun_lambda in
+  match lam.Mlw_expr.l_args with
+  | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
+    begin
+      let spec = lam.Mlw_expr.l_spec in
+      let eff = spec.Mlw_ty.c_effect in
+      let writes = eff.Mlw_ty.eff_writes in
+      let body = lam.Mlw_expr.l_expr in
+      printf "@[<hov 2>   type:@ %a@]@."
+        Mlw_pretty.print_vty body.Mlw_expr.e_vty;
+            (* printf "effect: %a@\n" *)
+            (*   Mlw_pretty.print_effect body.Mlw_expr.e_effect; *)
+      let res, final_env =
+        eval_global_expr env
+          m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known
+          writes lam.Mlw_expr.l_expr
+      in
+      match res with
+        | Normal _ ->
+          printf "@[<hov 2>   result:@ %a@\nglobals:@ %a@]@."
+            print_logic_result res print_vsenv final_env
+(*
+          printf "@[<hov 2>  result:@ %a@\nstate :@ %a@]@."
+            (print_result m.Mlw_module.mod_known
+               m.Mlw_module.mod_theory.Theory.th_known st) res
+            print_state st
+*)
+        | Excep _ ->
+          printf "@[<hov 2>exceptional result:@ %a@\nglobals:@ %a@]@."
+            print_logic_result res print_vsenv final_env;
+(*
+          printf "@[<hov 2>exceptional result:@ %a@\nstate:@ %a@]@."
+            (print_result m.Mlw_module.mod_known
+               m.Mlw_module.mod_theory.Theory.th_known st) res
+            print_state st;
+          *)
+          exit 1
+        | Irred _ | Fun _ ->
+          printf "@\n@]@.";
+          eprintf "Execution error: %a@." print_logic_result res;
+          exit 2
+    end
+  | _ ->
+    eprintf "Only functions with one unit argument can be executed.@.";
+    exit 1
 
 
 (*

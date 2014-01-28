@@ -581,64 +581,17 @@ let do_exec env fname cin exec =
       in
       match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
         | None ->
-          eprintf "Function %s.%s has no definition.@." mid name;
+          eprintf "Function %s has no definition.@." x;
           exit 1
         | Some d ->
-          let lam = d.Mlw_expr.fun_lambda in
-          match lam.Mlw_expr.l_args with
-            | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
-              begin
-              printf "@[<hov 2>Execution of %s ():@\n" x;
-              let spec = lam.Mlw_expr.l_spec in
-              let eff = spec.Mlw_ty.c_effect in
-              let writes = eff.Mlw_ty.eff_writes in
-              let body = lam.Mlw_expr.l_expr in
-              printf "@[<hov 2>  type  :@ %a@]@."
-                Mlw_pretty.print_vty body.Mlw_expr.e_vty;
-            (* printf "effect: %a@\n" *)
-            (*   Mlw_pretty.print_effect body.Mlw_expr.e_effect; *)
-              try
-              let res, st =
-                Mlw_interp.eval_global_expr env
-                  m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known
-                  writes lam.Mlw_expr.l_expr
-              in
-                match res with
-                | Mlw_interp.Normal _ ->
-                  printf "@[<hov 2>  result:@ %a@\nstate :@ %a@]@."
-                    (Mlw_interp.print_result m.Mlw_module.mod_known
-                       m.Mlw_module.mod_theory.Theory.th_known st) res
-                    Mlw_interp.print_state st
-                | Mlw_interp.Excep _ ->
-                  printf "@[<hov 2>exceptional result:@ %a@\nstate:@ %a@]@."
-                    (Mlw_interp.print_result m.Mlw_module.mod_known
-                       m.Mlw_module.mod_theory.Theory.th_known st) res
-                    Mlw_interp.print_state st;
-                  exit 1
-                | Mlw_interp.Irred _ | Mlw_interp.Fun _ ->
-                  printf "@\n@]@.";
-                  eprintf "Execution error: %a@."
-                    (Mlw_interp.print_result m.Mlw_module.mod_known
-                       m.Mlw_module.mod_theory.Theory.th_known st) res;
-                  exit 2
-              with e when Debug.test_noflag Debug.stack_trace ->
-                printf "@\n@]@.";
-                raise e
-              end
-            | _ ->
-              eprintf "Only functions with one unit argument can be executed.@.";
-              exit 1
+          try
+            printf "@[<hov 2>Execution of %s ():@\n" x;
+            Mlw_interp.eval_global_symbol env m d;
+          with e when Debug.test_noflag Debug.stack_trace ->
+            printf "@\n@]@.";
+            raise e
     in
     Queue.iter do_exec exec
-(*
-    if Queue.is_empty tlist then begin
-      let do_m t m thm =
-        do_extract_module edrv ~fname t m; Mstr.remove t thm in
-      let thm = Mstr.fold do_m mm thm in
-      Mstr.iter (fun t th -> do_extract_theory edrv ~fname t th) thm
-    end else
-      Queue.iter (do_extract_module_from edrv fname mm thm) tlist
-*)
  else
   begin
     Format.eprintf "'--exec is available only for mlw files@.";
