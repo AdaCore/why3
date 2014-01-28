@@ -184,7 +184,7 @@ let print_regenv fmt s =
   fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_regvar) l
 
 let p_vsvar fmt (vs,t) =
-  fprintf fmt "@[<hov 2><%a> -> %a@]"
+  fprintf fmt "@[<hov 2>%a -> %a@]"
     Pretty.print_vs vs print_value t
 
 let print_vsenv fmt s =
@@ -1220,6 +1220,8 @@ and exec_app env s ps args (*spec*) ity_result =
         raise Exit
 
 
+let default_fixme = Vnum (Big_int.big_int_of_string "424242")
+
 let eval_global_expr env mkm tkm _writes e =
 (*
   eprintf "@[<hov 2>[interp] eval_global_expr:@ %a@]@."
@@ -1227,15 +1229,8 @@ let eval_global_expr env mkm tkm _writes e =
 *)
   get_builtins env;
   get_builtin_progs (Mlw_main.library_of_env env);
-(*
-  let init_state =
-    Sreg.fold
-      (fun r acc -> Mreg.add r Vvoid acc)
-      writes Mreg.empty
-  in
-*)
   let constr_of_ity renv ity =
-    if ity_immutable ity then Vvoid,renv else
+    if ity_immutable ity then default_fixme (* FIXME ! *),renv else
     let regions =
       match ity.ity_node with
         | Ityapp(_,_,rl) -> rl
@@ -1251,29 +1246,25 @@ let eval_global_expr env mkm tkm _writes e =
           List.fold_left
             (fun (renv,regions,vl) fd ->
               match fd.fd_mut,regions with
-                | None,_ -> (renv,regions,Vvoid::vl)
+                | None,_ -> (renv,regions,default_fixme (* FIXME ! *) ::vl)
                 | Some _r, reg::regions ->
                   (* found a mutable field *)
-                  let renv' = Mreg.add reg Vvoid renv in
+                  let renv' = Mreg.add reg default_fixme (* FIXME ! *) renv in
                   (renv',regions,Vreg reg :: vl)
                 | Some _, [] -> assert false)
             (renv,regions,[]) fdl 
         in
         Vapp(cs,vl),renv
       | _ ->
-        Vvoid,renv (* FIXME ! *)
+        default_fixme,renv (* FIXME ! *)
   in
   let add_glob _ d ((venv,renv) as acc) =
     match d.Mlw_decl.pd_node with
-      | Mlw_decl.PDval (Mlw_expr.LetV pvs) ->
+      | Mlw_decl.PDval (Mlw_expr.LetV pvs) 
+        when not (pv_equal pvs Mlw_wp.pv_old) ->
         let ity = pvs.pv_ity in
         let v,renv = constr_of_ity renv ity in
         (Mvs.add pvs.pv_vs v venv,renv)
-(*
-         Sreg.fold
-          (fun r acc -> Mreg.add r Vvoid acc)
-          ity.ity_vars.vars_reg renv)
-*)
       | _ -> acc
   in
   let init_env,init_state = 

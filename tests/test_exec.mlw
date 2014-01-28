@@ -254,5 +254,11 @@ module Array
      for i=0 to 2 do t[i] <- i done;
      t[0] + t[1] + t[2] (* 3 *)
 
+  (* global arrays *)
+
+  val g : array int
+
+  let j () = g[0] <- 42
+
 end
 
