@@ -253,8 +253,8 @@ theory NumOfParam
 
   predicate pr param int
 
-  (** number of [n] such that [a <= n < b] and [pr p n] *)
   function num_of (p : param) (a b : int) : int
+  (** number of [n] such that [a <= n < b] and [pr p n] *)
 
   axiom Num_of_empty :
     forall p : param, a b : int.
@@ -358,8 +358,8 @@ theory Iter
   type t
   function f t : t
 
-  (** [iter k x] is [f^k(x)] *)
   function iter int t : t
+  (** [iter k x] is [f^k(x)] *)
 
   axiom iter_0: forall x: t. iter 0 x = x
   axiom iter_s: forall k: int, x: t. 0 < k -> iter k x = iter (k-1) (f x)
