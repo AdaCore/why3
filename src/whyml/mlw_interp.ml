@@ -195,6 +195,7 @@ let print_vsenv fmt s =
 
 exception NoMatch
 exception Undetermined
+exception CannotCompute
 
 let rec matching env (t:value) p =
   match p.pat_node with
@@ -560,22 +561,14 @@ let exec_array_make env s vty args =
       let v = Varray(n,def,Nummap.empty) in
 *)
       Normal v',s'
-    | _ -> assert false
+    | _ ->
+      raise CannotCompute
 
 let exec_array_get _env s _vty args =
   match args with
     | [t;Vnum i] ->
       begin
         match t with
-(*
-          | Varray(_,def,m) ->
-            let t =
-              try Nummap.find i m
-              with Not_found -> def
-            in
-            Normal t,s
-*)
-(**)
           | Vapp(ls,[_len;m]) when ls_equal ls !array_cons_ls ->
             begin
               match m with
@@ -588,7 +581,7 @@ let exec_array_get _env s _vty args =
                   Mlw_pretty.print_reg r print_state s print_value (Vnum i) print_value t;
 *)
                 Normal t,s
-              | _ -> assert false
+              | _ -> raise CannotCompute
 (*
                 let t = eval_map_get !ls_map_get [m;Vnum i] in
                 eprintf
@@ -597,9 +590,9 @@ let exec_array_get _env s _vty args =
                 Normal t,s
 *)
             end
-          | _ -> assert false
+          | _ -> raise CannotCompute
       end
-    | _ -> assert false
+    | _ -> raise CannotCompute
 
 let exec_array_length _env s _vty args =
   match args with
@@ -608,9 +601,9 @@ let exec_array_length _env s _vty args =
         match t with
           | Vapp(ls,[len;_m]) when ls_equal ls !array_cons_ls ->
             Normal len,s
-          | _ -> assert false
+          | _ -> raise CannotCompute
       end
-    | _ -> assert false
+    | _ -> raise CannotCompute
 
 let exec_array_set _env s _vty args =
   match args with
@@ -645,9 +638,9 @@ let exec_array_set _env s _vty args =
               print_value i print_value v print_state s';
             Normal Vvoid,s'
 *)
-              | _ -> assert false
+              | _ -> raise CannotCompute
             end
-          | _ -> assert false
+          | _ -> raise CannotCompute
       end
     | _ -> assert false
 
@@ -871,7 +864,7 @@ let to_logic_result env st res =
     | Normal v -> Normal(to_logic_value env st v)
     | Excep(e,v) -> Excep(e,to_logic_value env st v)
     | Irred _ | Fun _ -> res
-      
+
 let eval_global_term env km t =
   get_builtins env;
   let env =
@@ -1016,7 +1009,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           begin
             try
               exec_app env s' ps (pvs::args) (*spec*) ity_result
-            with Exit -> Irred e, s
+            with CannotCompute -> Irred e, s
           end
       | _ -> Irred e, s
     end
@@ -1200,24 +1193,26 @@ and exec_app env s ps args (*spec*) ity_result =
       r,s'
 
     | None ->
-      try
-        let f = Hps.find builtin_progs ps in
+        let f =
+          try
+            Hps.find builtin_progs ps
+          with Not_found ->
+            eprintf "[Exec] definition of psymbol %s not found@."
+              ps.ps_name.Ident.id_string;
+            raise CannotCompute
+        in
         Debug.dprintf debug
           "@[Evaluating builtin function %s in regenv:@\n%a@\nand state:@\n%a@]@."
           ps.ps_name.Ident.id_string print_regenv env1.regenv
           print_state s;
         let r,s' = f env1 (*spec*) s (VTvalue ity_result) args' in
         Debug.dprintf debug
-          "@[Return from builtin function %s result %a in state:@\n%a@]@."
-          ps.ps_name.Ident.id_string
-          (print_result env s') r
-          print_state s';
-        r, s'
+            "@[Return from builtin function %s result %a in state:@\n%a@]@."
+            ps.ps_name.Ident.id_string
+            (print_result env s') r
+            print_state s';
+          r, s'
 
-      with Not_found ->
-        eprintf "[Exec] definition of psymbol %s not found@."
-          ps.ps_name.Ident.id_string;
-        raise Exit
 
 
 let default_fixme = Vnum (Big_int.big_int_of_string "424242")
@@ -1234,7 +1229,7 @@ let eval_global_expr env mkm tkm _writes e =
     let regions =
       match ity.ity_node with
         | Ityapp(_,_,rl) -> rl
-        | _ -> 
+        | _ ->
           eprintf "type = %a@." Mlw_pretty.print_ity ity;
           assert false
     in
@@ -1252,7 +1247,7 @@ let eval_global_expr env mkm tkm _writes e =
                   let renv' = Mreg.add reg default_fixme (* FIXME ! *) renv in
                   (renv',regions,Vreg reg :: vl)
                 | Some _, [] -> assert false)
-            (renv,regions,[]) fdl 
+            (renv,regions,[]) fdl
         in
         Vapp(cs,vl),renv
       | _ ->
@@ -1260,14 +1255,14 @@ let eval_global_expr env mkm tkm _writes e =
   in
   let add_glob _ d ((venv,renv) as acc) =
     match d.Mlw_decl.pd_node with
-      | Mlw_decl.PDval (Mlw_expr.LetV pvs) 
+      | Mlw_decl.PDval (Mlw_expr.LetV pvs)
         when not (pv_equal pvs Mlw_wp.pv_old) ->
         let ity = pvs.pv_ity in
         let v,renv = constr_of_ity renv ity in
         (Mvs.add pvs.pv_vs v venv,renv)
       | _ -> acc
   in
-  let init_env,init_state = 
+  let init_env,init_state =
     Ident.Mid.fold add_glob mkm (Mvs.empty,Mreg.empty)
   in
   let env = {

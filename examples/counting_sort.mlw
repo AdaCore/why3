@@ -22,7 +22,7 @@ module Spec
   use export array.ArraySorted
 
   (* values of the array are in the range 0..k-1 *)
-  function k: int
+  constant k: int
   axiom k_positive: 0 < k
 
   predicate k_values (a: array int) =
