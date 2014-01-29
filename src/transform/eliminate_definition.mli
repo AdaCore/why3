@@ -16,10 +16,10 @@ val compute_diff :
 (** compute the meta_remove given two tasks one included in the other *)
 
 
-
 val eliminate_definition_func : Task.task Trans.trans
 val eliminate_definition_pred : Task.task Trans.trans
 val eliminate_definition      : Task.task Trans.trans
+val eliminate_definition_gen : (Term.lsymbol -> bool) -> Task.task Trans.trans
 
 val eliminate_mutual_recursion: Task.task Trans.trans
 
