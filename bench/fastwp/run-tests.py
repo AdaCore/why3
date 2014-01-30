@@ -24,6 +24,7 @@ list_of_files = [
    "bug4.mlw",
    "bug5.mlw",
    "bug6.mlw",
+   "bug7.mlw",
    "variant.mlw",
    "rec_variant.mlw",
    "case.mlw",
