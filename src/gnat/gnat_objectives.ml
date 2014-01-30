@@ -349,43 +349,8 @@ let stat subp =
    if Gnat_config.verbose <> Gnat_config.Quiet then begin
       Format.printf "analyzing %s, %d checks@."
         subp.subp_entity.Gnat_expl.subp_name !nb_objectives
-   end
-
-module Base_Sched = Session_scheduler.Base_scheduler (struct end)
-(* a simple scheduler provided by the Why3 library *)
-
-module Scheduler =
-   (* Simplify the base scheduler above, and provide the right interface for
-    * the Session_scheduler functor *)
-  struct
-
-     type key = int
-
-     let create = Keygen.keygen
-
-     let remove _ = ()
-
-     let reset () = ()
-
-     let notify _ = ()
-     let init _ _ = ()
-     let timeout ~ms x = Base_Sched.timeout ~ms x
-     let idle x    = Base_Sched.idle x
-     let notify_timer_state _ _ _= ()
-
-     let uninstalled_prover _ _ = Whyconf.CPU_keep
-
-     let main_loop () = Base_Sched.main_loop ()
-  end
-
-module M = Session_scheduler.Make (Scheduler)
-(* this is the module for interaction with the Why3 scheduler *)
-
-let sched_state : M.t option ref = ref None
-let get_sched_state () =
-   match !sched_state with
-   | Some s -> s
-   | None -> assert false
+   end;
+   nb_objectives := 0
 
 let has_file session =
    (* Check whether the session has a file associated with it. Sessions without
@@ -462,17 +427,13 @@ let apply_split_goal_if_needed g =
         (Session.add_registered_transformation
            ~keygen:Keygen.keygen (get_session ()) first_transform g)
 
-let schedule_goal callback g =
+let schedule_goal g =
    (* actually schedule the goal, ie call the prover. This function returns
       immediately. *)
-   M.prover_on_goal (get_session ()) (get_sched_state ())
-     ~callback
-     ~timelimit:Gnat_config.timeout
-     ~memlimit:0
-     Gnat_config.prover.Whyconf.prover g
+   Gnat_sched.add_goal g
 
-let do_scheduled_jobs () =
-   Scheduler.main_loop ()
+let do_scheduled_jobs callback =
+   Gnat_sched.run callback
 
 exception Found of Gnat_loc.loc
 
@@ -495,7 +456,6 @@ let init_subp_vcs subp =
    apply_split_goal_if_needed subp.subp_goal
 
 let init () =
-   sched_state := Some (M.init Gnat_config.parallel);
    let project_dir = Session.get_project_dir Gnat_config.filename in
    let env_session, is_new_session =
       (* either create a new session, or read an existing ession *)
@@ -505,13 +465,20 @@ let init () =
          else
             Session.create_session project_dir, true in
       let env_session, (_:bool) =
-         M.update_session ~allow_obsolete:true session Gnat_config.env
-         Gnat_config.config in
+         Session.update_session
+           ~keygen:Gnat_sched.Keygen.keygen
+           ~allow_obsolete:true
+           session
+           Gnat_config.env
+           Gnat_config.config in
       env_session, is_new_session in
    my_session := Some env_session;
    if is_new_session || not (has_file env_session) then begin
-      ignore (M.add_file env_session
-        (Sysutil.relativize_filename project_dir Gnat_config.filename));
+      ignore 
+        (Session.add_file
+          ~keygen:Gnat_sched.Keygen.keygen
+          env_session
+          (Sysutil.relativize_filename project_dir Gnat_config.filename));
    end
 
 let save_session () =

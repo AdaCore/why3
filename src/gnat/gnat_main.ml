@@ -137,24 +137,23 @@ and schedule_goal (g : Gnat_objectives.goal) =
    end
 
 and actually_schedule_goal g =
-   Gnat_objectives.schedule_goal interpret_result g
+   Gnat_objectives.schedule_goal g
+
+let handle_obj obj =
+   if Gnat_objectives.objective_status obj =
+      Gnat_objectives.Proved then begin
+        Gnat_report.register obj None None true ""
+   end else begin
+      match Gnat_objectives.next obj with
+      | Some g -> schedule_goal g
+      | None -> ()
+   end
 
 let normal_handle_one_subp subp =
    if Gnat_objectives.matches_subp_filter subp then begin
      Gnat_objectives.init_subp_vcs subp;
      Gnat_objectives.iter_leaf_goals subp register_goal;
      Gnat_objectives.stat subp;
-     Gnat_objectives.iter (fun obj ->
-     if Gnat_objectives.objective_status obj =
-        Gnat_objectives.Proved then begin
-          Gnat_report.register obj None None true ""
-     end else begin
-        match Gnat_objectives.next obj with
-        | Some g -> schedule_goal g
-        | None -> ()
-     end);
-     Gnat_objectives.do_scheduled_jobs ();
-     Gnat_objectives.clear ();
    end
 
 let all_split_subp subp =
@@ -190,6 +189,9 @@ let _ =
       | Gnat_config.Path_WP
       | Gnat_config.No_Split ->
          Gnat_objectives.iter_subps normal_handle_one_subp;
+         Gnat_objectives.iter handle_obj;
+         Gnat_objectives.do_scheduled_jobs interpret_result;
+         Gnat_objectives.clear ();
          let success = Gnat_report.print_messages () in
          Gnat_objectives.save_session ();
          if (Gnat_config.warning_mode = Gnat_config.Treat_As_Error &&

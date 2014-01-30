@@ -110,20 +110,17 @@ val get_num_goals : unit -> int
 val get_num_goals_done : unit -> int
 (* return the number of goals done *)
 
-module Scheduler : Session_scheduler.OBSERVER with type key = int
-(* to be used with Session_scheduler.Make *)
-
 val init : unit -> unit
 (* initialize the session, and return the session. The boolean is true when the
    session is new, otherwise "false" *)
 
-val schedule_goal :
-   (key Session.proof_attempt -> Session.proof_attempt_status -> unit)
-   -> goal -> unit
-(* schedule a goal with the given callback for proof with default prover and
+val schedule_goal : goal -> unit
+(* schedule a goal for proof with default prover and
    default timeout. The function returns immediately. *)
 
-val do_scheduled_jobs : unit -> unit
+val do_scheduled_jobs :
+   (key Session.proof_attempt -> Session.proof_attempt_status -> unit) ->
+  unit
 (* run all the jobs that have been scheduled with [schedule_goal] *)
 
 val save_session : unit -> unit
