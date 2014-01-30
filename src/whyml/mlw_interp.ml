@@ -535,6 +535,38 @@ let to_program_value env s ty v =
     assert (ity_immutable ity);
     s,v
 
+
+let rec any_value_of_type env ty =
+  match ty.Ty.ty_node with
+  | Ty.Tyvar _ -> assert false
+  | Ty.Tyapp(ts,_) when Ty.ts_equal ts Ty.ts_int ->
+    let n = Random.int 199 - 99 in
+    Vnum (Big_int.big_int_of_int n)
+  | Ty.Tyapp(ts,_) when Ty.ts_equal ts Ty.ts_real ->
+    Vvoid (* FIXME *)
+  | Ty.Tyapp(ts,_) when Ty.ts_equal ts Ty.ts_bool ->
+    Vbool(Random.bool ())
+  | Ty.Tyapp(ts,_tyl) when Ty.is_ts_tuple ts ->
+    Vvoid (* FIXME *)
+  | Ty.Tyapp(ts,tyargs) ->
+    try
+      let csl = Decl.find_constructors env.tknown ts in
+      match csl with
+      | [] -> Vvoid (* FIXME *)
+      | [cs,_] ->
+        let ts_args = ts.Ty.ts_args in
+        let subst = List.fold_left2
+          (fun acc v t -> Ty.Mtv.add v t acc) Ty.Mtv.empty ts_args tyargs
+        in
+        let tyl = List.map (Ty.ty_inst subst) cs.ls_args in
+        let vl = List.map (any_value_of_type env) tyl in
+        Vapp(cs,vl)
+      | (cs,_)::_rem -> (* FIXME *)
+        let tyl = cs.ls_args in
+        let vl = List.map (any_value_of_type env) tyl in
+        Vapp(cs,vl)
+    with Not_found -> Vvoid (* FIXME *)
+
 type result =
   | Normal of value
   | Excep of xsymbol * value
@@ -1215,7 +1247,9 @@ and exec_app env s ps args (*spec*) ity_result =
 
 
 
+(*
 let default_fixme = Vnum (Big_int.big_int_of_string "424242")
+*)
 
 let eval_global_expr env mkm tkm _writes e =
 (*
@@ -1224,7 +1258,15 @@ let eval_global_expr env mkm tkm _writes e =
 *)
   get_builtins env;
   get_builtin_progs (Mlw_main.library_of_env env);
+  let env = {
+    mknown = mkm;
+    tknown = tkm;
+    regenv = Mreg.empty;
+    vsenv = Mvs.empty;
+  }
+  in
   let constr_of_ity renv ity =
+(*
     if ity_immutable ity then default_fixme (* FIXME ! *),renv else
     let regions =
       match ity.ity_node with
@@ -1252,13 +1294,16 @@ let eval_global_expr env mkm tkm _writes e =
         Vapp(cs,vl),renv
       | _ ->
         default_fixme,renv (* FIXME ! *)
+*)
+    let v = any_value_of_type env (ty_of_ity ity) in
+    to_program_value env renv (VTvalue ity) v
   in
   let add_glob _ d ((venv,renv) as acc) =
     match d.Mlw_decl.pd_node with
       | Mlw_decl.PDval (Mlw_expr.LetV pvs)
         when not (pv_equal pvs Mlw_wp.pv_old) ->
         let ity = pvs.pv_ity in
-        let v,renv = constr_of_ity renv ity in
+        let renv,v = constr_of_ity renv ity in
         (Mvs.add pvs.pv_vs v venv,renv)
       | _ -> acc
   in
