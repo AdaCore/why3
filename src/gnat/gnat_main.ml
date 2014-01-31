@@ -173,8 +173,8 @@ let _ =
 
    (* save session on interrupt initiated by the user *)
    let save_session_and_exit signum =
-     (* ignore all SIGINT, SIGHUP and SIGTERM, which may be received when gnatprove is
-        called in GPS, so that the session file is always saved *)
+     (* ignore all SIGINT, SIGHUP and SIGTERM, which may be received when
+        gnatprove is called in GPS, so that the session file is always saved *)
      Sys.set_signal Sys.sigint Sys.Signal_ignore;
      Sys.set_signal Sys.sighup Sys.Signal_ignore;
      Sys.set_signal Sys.sigterm Sys.Signal_ignore;
