@@ -1040,6 +1040,8 @@ module Subst : sig
    (* the initial substitution for a program which mentions the given program
       variables *)
 
+   val mark : t -> t
+
    val havoc : wp_env -> Sreg.t -> t -> t * term
    (* [havoc env regions s] generates a new state in which all regions in
       [regions] are touched and all other regions unchanged. The result pair
@@ -1085,6 +1087,7 @@ end = struct
     { now       : subst;
       other     : subst Mvs.t;
       reg_names : vsymbol Mreg.t;
+      marked    : bool;
     }
   (* the reg_names field is a simple name hint; a mapping reg |-> name means
      that [name] should be used as a base for new variables in region [reg].
@@ -1131,6 +1134,7 @@ end = struct
       in
       { other      = s.other;
         reg_names  = reg_names;
+        marked     = s.marked;
         now        =
           { subst_vars = vars;
             subst_regions =
@@ -1144,9 +1148,12 @@ end = struct
   let empty =
     { other         = Mvs.empty;
       reg_names     = Mreg.empty;
+      marked        = false;
       now           = { subst_regions = Mreg.empty;
                         subst_vars    = Mvs.empty; }
     }
+
+  let mark s = { s with marked = true }
 
   let print_state fmt s =
     Format.fprintf fmt "{ ";
@@ -1189,9 +1196,10 @@ end = struct
         acc
       end) s.now.subst_vars (s.now.subst_vars, t_true) in
     { s with now =
-      { subst_regions = regs;
-        subst_vars    = vars;
-      } }, f
+        { subst_regions = regs;
+          subst_vars    = vars;
+        };
+        marked = s.marked }, f
 
   let rec term s t =
     (* apply a substitution to a formula. This is straightforward, we only need
@@ -1257,25 +1265,26 @@ end = struct
   let first_different_vars base l = first_different base vs_equal l
   let first_different_terms base l = first_different base t_equal l
 
-  let merge_vars base domain mapl =
+  let merge_vars marked base domain mapl =
     Mvs.fold (fun k _ (map , fl) ->
         let all_terms = List.map (fun m -> Mvs.find k m) mapl in
         match first_different_terms (Mvs.find k base) all_terms with
         | None -> Mvs.add k (List.hd all_terms) map, fl
-        | Some _ ->
-            let new_ = t_var (fresh_var_from_var k) in
+        | Some new_ ->
+            let new_ = if marked then t_var (fresh_var_from_var k) else new_ in
             Mvs.add k new_ map,
             List.map2 (fun old f ->
-              t_and_simp (t_equ new_ old) f) all_terms fl)
+              if t_equal old new_ then f
+              else t_and_simp (t_equ new_ old) f) all_terms fl)
     domain (Mvs.empty, List.map (fun _ -> t_true) mapl)
 
-  let merge_regs names base domain mapl =
+  let merge_regs names marked base domain mapl =
     Mreg.fold (fun k _ (map, fl) ->
       let all_vars = List.map (fun m -> Mreg.find k m) mapl in
       match first_different_vars (Mreg.find k base) all_vars with
       | None -> Mreg.add k (List.hd all_vars) map, fl
-      | Some _ ->
-          let new_ = fresh_var_from_region names k in
+      | Some new_ ->
+          let new_ = if marked then fresh_var_from_region names k else new_ in
           Mreg.add k new_ map,
           List.map2 (fun old f ->
             if vs_equal old new_ then f
@@ -1291,17 +1300,20 @@ end = struct
            program variables/regions should be present in all of them. *)
         let domain =
           List.fold_left (fun acc s -> subst_inter acc s.now) base.now sl in
+        let marked = List.exists (fun x -> x.marked) sl in
         let vars, fl1 =
-          merge_vars base.now.subst_vars domain.subst_vars
+          merge_vars marked base.now.subst_vars domain.subst_vars
             (List.map (fun x -> x.now.subst_vars) sl)
         in
         let regs, fl2 =
-          merge_regs base.reg_names base.now.subst_regions domain.subst_regions
+          merge_regs base.reg_names marked base.now.subst_regions
+                     domain.subst_regions
                      (List.map (fun x -> x.now.subst_regions) sl)
         in
         { base with now =
-          { subst_vars = vars;
-            subst_regions = regs }
+            { subst_vars = vars;
+              subst_regions = regs };
+            marked = false;
         },
         List.map2 t_and_simp fl1 fl2
 
@@ -1648,7 +1660,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           s, ne
         with Not_found ->
           wp1.post.s, t_and_simp wp1.post.ne rpost in
-      let expost = { s = s; ne = wp_label e ne } in
+      let expost = { s = Subst.mark s; ne = wp_label e ne } in
       let xne = Mexn.add ex expost wp1.exn in
       { ok = wp1.ok;
         post = { ne = t_false; s = wp1.post.s };
