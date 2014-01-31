@@ -445,7 +445,6 @@ byte: bin/gnatwhy3.byte
 opt:  bin/gnatwhy3.opt
 
 bin/gnatwhy3.opt: lib/why3/why3.cmxa $(GNATCMX)
-	echo $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 
