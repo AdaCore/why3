@@ -445,6 +445,7 @@ byte: bin/gnatwhy3.byte
 opt:  bin/gnatwhy3.opt
 
 bin/gnatwhy3.opt: lib/why3/why3.cmxa $(GNATCMX)
+	echo $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 
@@ -455,6 +456,7 @@ install_no_local::
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
 
 include .depend.gnat
+$(GNATCMX): lib/why3/why3.cmxa
 
 .depend.gnat:
 	$(OCAMLDEP) -slash -I src -I src/util -I src/gnat $(GNATML) $(GNATMLI) > $@
