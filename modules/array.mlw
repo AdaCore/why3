@@ -25,11 +25,11 @@ module Array
   function ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a = set a i v
 
   val ([]) (a: array ~'a) (i: int) : 'a
-    requires { 0 <= i < length a }
+    requires { "expl:index in array bounds" 0 <= i < length a }
     ensures  { result = a[i] }
 
   val ([]<-) (a: array ~'a) (i: int) (v: 'a) : unit writes {a}
-    requires { 0 <= i < length a }
+    requires { "expl:index in array bounds" 0 <= i < length a }
     ensures  { a.elts = M.set (old a.elts) i v }
 
   val length (a: array ~'a) : int ensures { result = a.length }
@@ -53,7 +53,7 @@ module Array
     { length = n; elts = M.const v }
 
   val make (n: int) (v: ~'a) : array 'a
-    requires { n >= 0 } ensures { result = make n v }
+    requires { "expl:array creation size" n >= 0 } ensures { result = make n v }
 
   val append (a1: array ~'a) (a2: array 'a) : array 'a
     ensures { length result = length a1 + length a2 }
