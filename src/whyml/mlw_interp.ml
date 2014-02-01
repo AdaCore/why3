@@ -971,7 +971,7 @@ let print_logic_result fmt r =
         x.xs_name.Ident.id_string print_value v
     | Irred e ->
       fprintf fmt "@[Cannot execute expression@ @[%a@]@]"
-        p_expr e
+        Mlw_pretty.print_expr (* p_expr *) e
     | Fun _ ->
       fprintf fmt "@[Result is a function@]"
 
