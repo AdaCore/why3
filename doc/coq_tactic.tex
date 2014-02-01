@@ -1,10 +1,9 @@
-\chapter{Coq Tactic}
-\label{chap:tactic}
-\index{Coq proof assistant}
+\subsection{Coq Tactic}
+\label{sec:coqtactic}
 
 \why\ provides a Coq tactic to call external theorem provers as oracles.
 
-\section{Installation}
+\subsubsection{Installation}
 
 You need Coq version 8.3 or greater. If this is the case, \why's
 configuration detects it, then compiles and installs the Coq tactic.
@@ -24,7 +23,7 @@ option \texttt{-I} or by adding
 \end{center}
 to your \texttt{\~{}/.coqrc} resource file.
 
-\section{Usage}
+\subsubsection{Usage}
 
 The Coq tactic is called \texttt{why3} and is used as follows:
 \begin{center}
@@ -41,7 +40,7 @@ limit in seconds as given by \why's configuration file
 (see page~\pageref{sec:whyconffile}). A different value may be given
 using the \texttt{timelimit} keyword.
 
-\paragraph{Error messages.} The following errors may be reported by
+\subsubsection{Error messages.} The following errors may be reported by
 the Coq tactic.
 \begin{description}
 \item[\texttt{Not a first order goal}]\emptyitem

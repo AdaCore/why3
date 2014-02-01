@@ -1,4 +1,13 @@
-\subsection{PVS}
+\section{PVS}
+\label{sec:pvs}
+
+\index{PVS proof assistant}
+
+\subsection{Installation}
+
+You need version 6.0.
+
+\subsection{Usage}
 
 When a PVS file is regenerated, the old version is split into chunks,
 according to blank lines. Chunks corresponding to \why declarations
@@ -12,6 +21,8 @@ Thus a comment such as \verb+% Why3 f+ must not be removed;
 otherwise, there will be two
 declarations for \texttt{f} in the next version of the file (one being
 regenerated and another one considered to be a user-edited chunk).
+
+\subsection{Realization}
 
 The user is allowed to perform the following actions on a PVS
 realization:
@@ -36,3 +47,10 @@ realization:
 \why makes some effort to merge new declarations with old ones
 and with user chunks. If it happens that some chunks could not be
 merged, they are appended at the end of the file, in comments.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% TeX-master: "manual"
+%%% End:
