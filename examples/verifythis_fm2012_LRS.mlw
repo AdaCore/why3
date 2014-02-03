@@ -517,18 +517,20 @@ lemma le_le_common_prefix:
 end
 
 
-(*
 module LRS_test
 
-use import array.Array
-use import ref.Ref
-use import LRS
+  use import array.Array
+  use import ref.Ref
+  use import LRS
 
- let test () =
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
     let arr = Array.make 4 0 in
-    arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-9;
+    (* [7,8,8,6] *)
+    arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-6;
     lrs arr;
-    check { !solStart = 1 /\ !solLength = 1 }
+    if !solStart <> 1 then raise BenchFailure;
+    if !solLength <> 1 then raise BenchFailure
 
 end
-*)
