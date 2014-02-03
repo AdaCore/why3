@@ -5,6 +5,10 @@
   id="0"
   name="Alt-Ergo"
   version="0.95.1"/>
+ <prover
+  id="1"
+  name="Alt-Ergo"
+  version="0.95.2"/>
  <file
   name="../relabel.mlw"
   verified="true"
@@ -74,16 +78,16 @@
     locfile="../relabel.mlw"
     loclnum="47" loccnumb="10" loccnume="17"
     expl="VC for relabel"
-    sum="4c413598c9b374dfba3dd5abbe0df4ba"
+    sum="cc7968bdb0e79f2620a85bc1a757e777"
     proved="true"
-    expanded="true"
-    shape="Cainfix &lt;=V4V2Aainfix &lt;V1V4IamemV4alabelsV3FAainfix &lt;=V1V2AadistinctalabelsV3Aasame_shapeV0V3LaLeafV2Iainfix =V2ainfix +V1c1FaLeafwainfix &lt;=V12V9Aainfix &lt;V1V12IamemV12alabelsV11FAainfix &lt;=V1V9AadistinctalabelsV11Aasame_shapeV0V11LaNodeV10V8Iainfix &lt;=V13V9Aainfix &lt;V7V13IamemV13alabelsV10FAainfix &lt;=V7V9AadistinctalabelsV10Aasame_shapeV5V10FFIainfix &lt;=V14V7Aainfix &lt;V1V14IamemV14alabelsV8FAainfix &lt;=V1V7AadistinctalabelsV8Aasame_shapeV6V8FFaNodeVVV0FF">
+    expanded="false"
+    shape="Cainfix &lt;=V4V2Aainfix &lt;V1V4IamemV4alabelsV3FAainfix &lt;=V1V2AadistinctalabelsV3Aasame_shapeV0V3LaLeafV2Iainfix =V2ainfix +V1c1FaLeafwainfix &lt;=V12V9Aainfix &lt;V1V12IamemV12alabelsV11FAainfix &lt;=V1V9AadistinctalabelsV11Aasame_shapeV0V11LaNodeV10V8Iainfix &lt;=V13V9Aainfix &lt;V7V13IamemV13alabelsV10FAainfix &lt;=V7V9AadistinctalabelsV10Aasame_shapeV5V10FFACfaLeafwainfix =V15V5Oainfix =V14V5aNodeVVV0Iainfix &lt;=V16V7Aainfix &lt;V1V16IamemV16alabelsV8FAainfix &lt;=V1V7AadistinctalabelsV8Aasame_shapeV6V8FFACfaLeafwainfix =V18V6Oainfix =V17V6aNodeVVV0aNodeVVV0FF">
     <label
      name="expl:VC for relabel"/>
     <transf
      name="split_goal"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter relabel.1"
       locfile="../relabel.mlw"
@@ -108,7 +112,47 @@
       name="WP_parameter relabel.2"
       locfile="../relabel.mlw"
       loclnum="47" loccnumb="10" loccnume="17"
-      expl="2. postcondition"
+      expl="2. variant decrease"
+      sum="a5c17a1621955c434267c1990fca23b6"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaLeafwCfaLeafwainfix =V5V3Oainfix =V4V3aNodeVVV0aNodeVVV0FF">
+      <label
+       name="expl:VC for relabel"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter relabel.3"
+      locfile="../relabel.mlw"
+      loclnum="47" loccnumb="10" loccnume="17"
+      expl="3. variant decrease"
+      sum="56c5996989280fd8e48ce034d25d0584"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaLeafwCfaLeafwainfix =V7V2Oainfix =V6V2aNodeVVV0Iainfix &lt;=V8V4Aainfix &lt;V1V8IamemV8alabelsV5FAainfix &lt;=V1V4AadistinctalabelsV5Aasame_shapeV3V5FFaNodeVVV0FF">
+      <label
+       name="expl:VC for relabel"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter relabel.4"
+      locfile="../relabel.mlw"
+      loclnum="47" loccnumb="10" loccnume="17"
+      expl="4. postcondition"
       sum="9a5a25f19ed0ca70dc5c6a2c6bf27df5"
       proved="true"
       expanded="false"

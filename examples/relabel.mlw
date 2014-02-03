@@ -45,6 +45,7 @@ module Relabel
     r := !r + 1; !r
 
   let rec relabel (t : tree 'a) : tree int
+    variant { t }
     ensures { same_shape t result /\ distinct (labels result) /\
       old !r <= !r /\
       (forall x:int. mem x (labels result) -> old !r < x <= !r) }
