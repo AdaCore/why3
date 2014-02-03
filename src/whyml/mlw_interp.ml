@@ -155,12 +155,27 @@ let multibind_pvs l tl env =
   with Invalid_argument _ -> assert false
 
 
+let p_regvar fmt (reg,t) =
+  fprintf fmt "@[<hov 2><%a> -> %a@]"
+    Mlw_pretty.print_reg reg Mlw_pretty.print_reg t
+
+let print_regenv fmt s =
+  let l = Mreg.bindings s in
+  fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_regvar) l
+
+
 let get_reg env r =
-  let rec aux r =
-    try
-      aux (Mreg.find r env.regenv)
-    with Not_found -> r
-  in aux r
+  let rec aux n r =
+    if n > 1000 then 
+      begin
+        eprintf "@[<hov 2>looping region association ??? regenv =@ %a@]@."
+          print_regenv env.regenv;
+        assert false
+      end;
+    match Mreg.find_opt r env.regenv with
+    | None -> r
+    | Some r' -> aux (succ n) r'
+  in aux 0 r
 
 
 
@@ -174,14 +189,6 @@ let p_reg fmt (reg,t) =
 let print_state fmt s =
   let l = Mreg.bindings s in
   fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_reg) l
-
-let p_regvar fmt (reg,t) =
-  fprintf fmt "@[<hov 2><%a> -> %a@]"
-    Mlw_pretty.print_reg reg Mlw_pretty.print_reg t
-
-let print_regenv fmt s =
-  let l = Mreg.bindings s in
-  fprintf fmt "@[<v 0>%a@]" (Pp.print_list Pp.semi p_regvar) l
 
 let p_vsvar fmt (vs,t) =
   fprintf fmt "@[<hov 2>%a -> %a@]"
@@ -1122,10 +1129,8 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           | DownTo -> Big_int.ge_big_int, Big_int.pred_big_int
         in
         let rec iter i s =
-(*
-          eprintf "[interp] for loop with index = %s@."
+          Debug.dprintf debug "[interp] for loop with index = %s@."
             (Big_int.string_of_big_int i);
-*)
           if le i b then
             let env' = bind_vs pvs.pv_vs (Vnum i) env in
             match eval_expr env' s e1 with
@@ -1216,6 +1221,9 @@ and exec_app env s ps args (*spec*) ity_result =
     Mlw_ty.aty_vars_match ps.ps_subst ps.ps_aty args_ty ity_result
   in
   let subst = subst.ity_subst_reg in
+  let subst = (* remove superfluous substitutions *)
+    Mreg.filter (fun r1 r2 -> not (reg_equal r1 r2)) subst
+  in
   let env1 = { env with regenv =
       Mreg.union (fun _ x _ -> Some x) subst env.regenv }
   in
