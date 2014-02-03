@@ -138,6 +138,9 @@ module BuildMaze
 let build_maze (n:int)
   requires { 1 <= n /\ !num_edges = 0 /\
     forall x y:int. x=y <-> path !graph x y }
+  diverges (* termination is only almost sure,
+              assuming rand is well distributed.
+              See http://toccata.lri.fr/gallery/RandomWalk.en.html *)
   ensures { !num_edges = n*n-1 /\
     forall x y:int. 0 <= x < n*n -> 0 <= y < n*n -> path !graph x y }
   = let u = create (n*n) in
