@@ -143,9 +143,8 @@ execute examples/conjugate.mlw Test.bench
 # examples/knuth_prime_numbers.mlw --exec PrimeNumbers.bench
 execute examples/vstte10_max_sum.mlw TestCase.test_case
 execute examples/verifythis_fm2012_LRS.mlw LCP_test.bench
-# fails: assert failure on (regions = []) in Mlw_interp.to_program_value
-# -> needs support for nested mutable fields
-# examples/verifythis_fm2012_LRS.mlw --exec SuffixArray_test.bench
+execute examples/verifythis_fm2012_LRS.mlw SuffixSort_test.bench
+execute examples/verifythis_fm2012_LRS.mlw SuffixArray_test.bench
 # fails: needs support for Array.copy
 # examples/verifythis_PrefixSumRec.mlw --exec PrefixSumRec.bench
 execute examples/vstte10_queens.mlw NQueens.test8

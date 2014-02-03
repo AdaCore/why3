@@ -285,9 +285,33 @@ let sort (a:array int) (data : array int)
      assert { !j > 0 -> le a data[!j-1] data[!j] }
    done
 
+
 end
 
 
+module SuffixSort_test
+
+  use import int.Int
+  use import array.Array
+  use LCP
+  use SuffixSort
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let arr = Array.make 4 0 in
+    (* [7,8,8,6] *)
+    arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-6;
+    let suf = Array.make 4 0 in
+    for i = 0 to 3 do suf[i] <- i done;
+    SuffixSort.sort arr suf;
+    (* should be [3,0,2,1] *)
+    if suf[0] <> 3 then raise BenchFailure;
+    if suf[1] <> 0 then raise BenchFailure;
+    if suf[2] <> 2 then raise BenchFailure;
+    if suf[3] <> 1 then raise BenchFailure
+
+end
 
 
 
@@ -389,12 +413,13 @@ let test () =
 
   let bench () raises { BenchFailure -> true } =
     let arr = Array.make 4 0 in
-    arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
+    (* [7,8,8,6] *)
+    arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-6;
     let sa = create arr in
-    if sa.suffixes[0] <> 0 then raise BenchFailure;
-    if sa.suffixes[1] <> 1 then raise BenchFailure;
+    if sa.suffixes[0] <> 3 then raise BenchFailure;
+    if sa.suffixes[1] <> 0 then raise BenchFailure;
     if sa.suffixes[2] <> 2 then raise BenchFailure;
-    if sa.suffixes[3] <> 3 then raise BenchFailure
+    if sa.suffixes[3] <> 1 then raise BenchFailure
 
 end
 

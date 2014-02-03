@@ -182,6 +182,31 @@ module Ref
 end
 
 
+module Pair
+
+  use import ref.Ref
+
+  type t = { left : ref int ; middle : int; right : ref int }
+
+  let a () = { left = ref 13 ; middle = 5; right = ref 42 }
+
+  let b () =
+    let x = a () in
+    x.left := 57;
+    x.right := 98;
+    x
+
+  type u = { u1 : t ; u2 : t }
+
+  let c () =
+    let x = { left = ref 1; middle = 2; right = ref 3} in
+    let y = { left = ref 4; middle = 5; right = ref 6} in
+    let u = { u1 = x ; u2 = y } in
+    u.u2.left := 7;
+    u
+
+end
+
 module Array
 
   use import int.Int

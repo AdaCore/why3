@@ -481,6 +481,47 @@ let get_builtins env =
      <r2> -> Vnum 2
 
 *)
+
+let rec to_program_value_rec env regions s ity ls vl =
+  try
+    let csl = Mlw_decl.inst_constructors env.tknown env.mknown ity in
+    let rec find_cs csl =
+      match csl with
+      | [] -> assert false (* FIXME ? *)
+      | (cs,fdl)::rem ->
+        if ls_equal cs ls then
+              (* we found the fields of that constructor *)
+          begin
+            let (s,regions,vl) =
+              List.fold_left2
+                (fun (s,regions,vl) fd v ->
+                  match fd.fd_mut,regions with
+                  | None,_ -> (* non mutable field, but
+                                 some subfield may be mutable *)
+                    begin
+                      match v with
+                      | Vapp(ls1,vl1) ->
+                        let s, regions, v =
+                          to_program_value_rec env regions s fd.fd_ity ls1 vl1
+                        in
+                        (s,regions,v::vl)
+                      | _ -> (s,regions,v::vl)
+                    end
+                  | Some _r, reg::regions ->
+                        (* found a mutable field *)
+                    let s' = Mreg.add reg v s in
+                    (s',regions,Vreg reg :: vl)
+                  | Some _, [] -> assert false)
+                (s,regions,[]) fdl vl
+            in
+            s,regions,Vapp(ls,List.rev vl)
+          end
+        else find_cs rem
+    in find_cs csl
+  with Not_found ->
+        (* absurd, it would be a pure type *)
+    assert false
+
 let to_program_value env s ty v =
   match ty,v with
   | VTarrow _, _ -> s,v
@@ -494,42 +535,14 @@ let to_program_value env s ty v =
             List.map (get_reg env) rl
           | _ -> assert false
         in
-        try
-        let csl = Mlw_decl.inst_constructors env.tknown env.mknown ity in
-        let rec find_cs csl =
-          match csl with
-          | [] -> assert false
-          | (cs,fdl)::rem ->
-            if ls_equal cs ls then
-              (* we found the fields of that constructor *)
-              begin
-                let (s,regions,vl) =
-                  List.fold_left2
-                    (fun (s,regions,vl) fd v ->
-                      match fd.fd_mut,regions with
-                      | None,_ -> (s,regions,v::vl)
-                      | Some _r, reg::regions ->
-                          (* found a mutable field *)
-                        let s' = Mreg.add reg v s in
-                        (s',regions,Vreg reg :: vl)
-                      | Some _, [] -> assert false)
-                    (s,regions,[]) fdl vl
-                in
-                begin match regions with
-                | [] -> ()
-                | _ ->
-                  eprintf "@[<hov 2>error while converting logic value (%a:%a) to a program value:@ regions should be empty, not@ [%a]@]@."
-                    print_value v Mlw_pretty.print_vty ty
-                    (Pp.print_list Pp.comma Mlw_pretty.print_reg) regions;
-                  assert false
-                end;
-                s,Vapp(ls,List.rev vl)
-              end
-            else find_cs rem
-        in find_cs csl
-      with Not_found ->
-        (* absurd, it would be a pure type *)
-        assert false
+        let s,regions,v = to_program_value_rec env regions s ity ls vl in
+        match regions with
+        | [] -> s,v
+        | _ ->
+          eprintf "@[<hov 2>error while converting logic value (%a:%a) to a program value:@ regions should be empty, not@ [%a]@]@."
+            print_value v Mlw_pretty.print_vty ty
+            (Pp.print_list Pp.comma Mlw_pretty.print_reg) regions;
+          assert false
       end
   | VTvalue ity, _ ->
     assert (ity_immutable ity);
@@ -837,9 +850,6 @@ and eval_match env s u tbl =
     Vcase(u,tbl)
 
 and eval_app env s ls tl =
-(*
-  if ls.ls_constr > 0 then eval_constr env s ls tl else
-*)
   try
     let f = Hls.find builtins ls in
     f ls tl
@@ -857,12 +867,14 @@ and eval_app env s ls tl =
       | Decl.Dparam _ | Decl.Dind _ ->
         Vapp(ls,tl)
       | Decl.Ddata dl ->
-        (* projection *)
+        (* constructor or projection *)
         match tl with
         | [ Vapp(ls1,tl1) ] ->
+          (* if ls is a projection and ls1 is a constructor,
+             we should compute that projection *)
           let rec iter dl =
             match dl with
-            | [] -> assert false
+            | [] -> Vapp(ls,tl)
             | (_,csl) :: rem ->
               let rec iter2 csl =
                 match csl with
@@ -1180,7 +1192,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Eabstr _
   | Eabsurd ->
     eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
-                  Mlw_pretty.print_expr e;
+      (if Debug.test_flag debug then p_expr else Mlw_pretty.print_expr) e;
     Irred e, s
 
 and exec_match env t s ebl =
@@ -1265,45 +1277,13 @@ let eval_global_expr env mkm tkm _writes e =
     vsenv = Mvs.empty;
   }
   in
-  let constr_of_ity renv ity =
-(*
-    if ity_immutable ity then default_fixme (* FIXME ! *),renv else
-    let regions =
-      match ity.ity_node with
-        | Ityapp(_,_,rl) -> rl
-        | _ ->
-          eprintf "type = %a@." Mlw_pretty.print_ity ity;
-          assert false
-    in
-    let csl = Mlw_decl.inst_constructors tkm mkm ity in
-    match csl with
-      | [] -> assert false
-      | [ cs,fdl ] ->
-        let (renv,_regions,vl) =
-          List.fold_left
-            (fun (renv,regions,vl) fd ->
-              match fd.fd_mut,regions with
-                | None,_ -> (renv,regions,default_fixme (* FIXME ! *) ::vl)
-                | Some _r, reg::regions ->
-                  (* found a mutable field *)
-                  let renv' = Mreg.add reg default_fixme (* FIXME ! *) renv in
-                  (renv',regions,Vreg reg :: vl)
-                | Some _, [] -> assert false)
-            (renv,regions,[]) fdl
-        in
-        Vapp(cs,vl),renv
-      | _ ->
-        default_fixme,renv (* FIXME ! *)
-*)
-    let v = any_value_of_type env (ty_of_ity ity) in
-    to_program_value env renv (VTvalue ity) v
-  in
   let add_glob _ d ((venv,renv) as acc) =
     match d.Mlw_decl.pd_node with
       | Mlw_decl.PDval (Mlw_expr.LetV pvs)
         when not (pv_equal pvs Mlw_wp.pv_old) ->
         let ity = pvs.pv_ity in
-        let renv,v = constr_of_ity renv ity in
+        let v = any_value_of_type env (ty_of_ity ity) in
+        let renv,v = to_program_value env renv (VTvalue ity) v in
         (Mvs.add pvs.pv_vs v venv,renv)
       | _ -> acc
   in
