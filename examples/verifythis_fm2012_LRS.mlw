@@ -184,7 +184,8 @@ let test () =
     let arr = Array.make 4 0 in
     arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
     let x = lcp arr 1 2 in
-    if x <> 1 then raise BenchFailure
+    if x <> 1 then raise BenchFailure;
+    x
 
 end
 
@@ -309,7 +310,8 @@ module SuffixSort_test
     if suf[0] <> 3 then raise BenchFailure;
     if suf[1] <> 0 then raise BenchFailure;
     if suf[2] <> 2 then raise BenchFailure;
-    if suf[3] <> 1 then raise BenchFailure
+    if suf[3] <> 1 then raise BenchFailure;
+    suf
 
 end
 
@@ -419,7 +421,8 @@ let test () =
     if sa.suffixes[0] <> 3 then raise BenchFailure;
     if sa.suffixes[1] <> 0 then raise BenchFailure;
     if sa.suffixes[2] <> 2 then raise BenchFailure;
-    if sa.suffixes[3] <> 1 then raise BenchFailure
+    if sa.suffixes[3] <> 1 then raise BenchFailure;
+    sa
 
 end
 
@@ -531,6 +534,7 @@ module LRS_test
     arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-6;
     lrs arr;
     if !solStart <> 1 then raise BenchFailure;
-    if !solLength <> 1 then raise BenchFailure
+    if !solLength <> 1 then raise BenchFailure;
+    (!solStart, !solLength)
 
 end

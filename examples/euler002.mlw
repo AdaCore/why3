@@ -157,6 +157,8 @@ module Solve
   exception BenchFailure
 
   let bench () raises { BenchFailure -> true } =
-    if run () <> 4613732 then raise BenchFailure
+    let x = run () in
+    if x <> 4613732 then raise BenchFailure;
+    x
 
 end

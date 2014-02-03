@@ -604,15 +604,25 @@ let builtin_array_type kn its =
 let exec_array_make env s vty args =
   match args with
     | [Vnum n;def] ->
-(**)
       let m = Vmap(def,Nummap.empty) in
       let v = Vapp(!array_cons_ls,[Vnum n;m]) in
       let s',v' = to_program_value env s vty v in
-(**)
-(*
-      let v = Varray(n,def,Nummap.empty) in
-*)
       Normal v',s'
+    | _ ->
+      raise CannotCompute
+
+let exec_array_copy env s vty args =
+  match args with
+    | [Vapp(ls,[len;m])] when ls_equal ls !array_cons_ls ->
+      begin
+        match m with
+          | Vreg r ->
+            let m = Mreg.find r s in
+            let v = Vapp(!array_cons_ls,[len;m]) in
+            let s',v' = to_program_value env s vty v in
+            Normal v',s'
+          | _ -> raise CannotCompute
+      end
     | _ ->
       raise CannotCompute
 
@@ -704,6 +714,7 @@ let built_in_modules =
      "mixfix []", None, exec_array_get ;
      "length", None, exec_array_length ;
      "mixfix []<-", None, exec_array_set ;
+     "copy", None, exec_array_copy ;
     ] ;
   ]
 

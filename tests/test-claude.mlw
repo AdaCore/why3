@@ -1,23 +1,13 @@
 
 
-(* obsolete
 module M
 
   use import int.Int
-  use import module ref.Ref
+  use import ref.Ref
 
-  val x : ref int
-
-  goal A : !x = 0
-
-  goal B : (old !x) = 0
-
-  function f (n:int) : int = n + ! x
-
-  goal C : f(3) = 4
-
+  val f (n:int) : bool
+    ensures { if result then n >= 0 else n <= 0 }
 end
-*)
 
 
 module Termination

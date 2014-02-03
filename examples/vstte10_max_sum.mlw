@@ -78,6 +78,7 @@ module TestCase
     assert { m = 10 };
     (* bench of --exec *)
     if s <> 45  then raise BenchFailure;
-    if m <> 10  then raise BenchFailure
+    if m <> 10  then raise BenchFailure;
+    (s,m)
 
 end

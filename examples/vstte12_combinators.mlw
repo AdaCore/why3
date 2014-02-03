@@ -88,12 +88,13 @@ module Combinators
   constant i : term = App (App S K) K
 
   let test_SKK ()
-    diverges
+    diverges (* would be hard to prove terminating *)
     raises { BenchFailure -> true }
-  = let t = reduction (App i i) in
-    if t <> i then raise BenchFailure;
-    let t = reduction (App (App (App (App K K) K) K) K) in
-    if t <> K then raise BenchFailure
+  = let t1 = reduction (App i i) in
+    if t1 <> i then raise BenchFailure;
+    let t2 = reduction (App (App (App (App K K) K) K) K) in
+    if t2 <> K then raise BenchFailure;
+    (t1, t2)
 
   (* an irreducible term is a value *)
 
