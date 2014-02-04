@@ -129,15 +129,16 @@ end
 
 module ArrayEq
 
+  use import int.Int
   use import Array
-  use import map.MapEq as M
+  use import map.MapEq
 
   predicate array_eq_sub (a1 a2: array 'a) (l u: int) =
+    a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
     map_eq_sub a1.elts a2.elts l u
 
   predicate array_eq (a1 a2: array 'a) =
-    a1.length = a2.length /\
-    array_eq_sub a1 a2 0 a1.length
+    a1.length = a2.length /\ map_eq_sub a1.elts a2.elts 0 (length a1)
 
 end
 
@@ -148,21 +149,43 @@ module ArrayPermut
   use import int.Int
   use import Array
   use import map.MapPermut as M
+  use import map.MapEq
+  use import ArrayEq
 
   predicate exchange (a1 a2: array 'a) (i j: int) =
-    M.exchange a1.elts a2.elts i j
+    a1.length = a2.length /\ 0 <= i < a1.length /\ 0 <= j < a1.length /\
+    a1[i] = a2[j] /\ a1[j] = a2[i] /\
+    (forall k:int. 0 <= k < a1.length -> k <> i -> k <> j -> a1[k] = a2[k])
+  (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
+      by the swapping of elements at indices [i] and [j] *)
+
+  predicate map_permut_sub (a1 a2: array 'a) (l u: int) =
+    a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
+    M.permut_sub a1.elts a2.elts l u
+  (** [map_permut_sub a1 a2 l u] is true when the segment
+      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)].
+      Values outside of the interval (l..u-1) are ignored. *)
 
   predicate permut_sub (a1 a2: array 'a) (l u: int) =
-    M.permut_sub a1.elts a2.elts l u
+    a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
+    map_eq_sub a1.elts a2.elts 0 l /\
+    M.permut_sub a1.elts a2.elts l u /\
+    map_eq_sub a2.elts a2.elts u (length a1)
+  (** [permut_sub a1 a2 l u] is true when the segment
+      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)]
+      and values outside of the interval (l..u-1) are equal. *)
 
   predicate permut (a1 a2: array 'a) =
     a1.length = a2.length /\ M.permut_sub a1.elts a2.elts 0 a1.length
+  (** [permut a1 a2 l u] is true when array [a1] is a permutation
+      of array [a2]. *)
+
+  lemma permut_refl:
+    forall a: array 'a. permut a a
 
   lemma exchange_permut:
     forall a1 a2: array 'a, i j: int [exchange a1 a2 i j].
-    exchange a1 a2 i j -> a1.length = a2.length ->
-    0 <= i < a1.length -> 0 <= j < a1.length ->
-    permut a1 a2
+    exchange a1 a2 i j -> permut a1 a2
 
   lemma permut_sym:
     forall a1 a2: array 'a.
@@ -172,15 +195,18 @@ module ArrayPermut
     forall a1 a2 a3: array 'a.
     permut a1 a2 -> permut a2 a3 -> permut a1 a3
 
-  use import ArrayEq
-
-  lemma array_eq_sub_permut:
-    forall a1 a2: array 'a, l u: int.
-    array_eq_sub a1 a2 l u -> permut_sub a1 a2 l u
-
   lemma array_eq_permut:
     forall a1 a2: array 'a.
     array_eq a1 a2 -> permut a1 a2
+
+  lemma permut_sub_weakening:
+    forall a1 a2: array 'a, l1 u1 l2 u2: int.
+    permut_sub a1 a2 l1 u1 -> 0 <= l2 <= l1 -> u1 <= u2 <= length a1 ->
+    permut_sub a1 a2 l2 u2
+
+  lemma permut_sub_permut:
+    forall a1 a2: array 'a, l u: int.
+    permut_sub a1 a2 l u -> permut a1 a2
 
 end
 

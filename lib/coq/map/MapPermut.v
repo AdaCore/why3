@@ -6,36 +6,16 @@ Require int.Int.
 Require map.Map.
 
 (* Why3 assumption *)
-Definition exchange {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _ a a_WT))
-  (a2:(@map.Map.map Z _ a a_WT)) (i:Z) (j:Z): Prop := ((map.Map.get a1
-  i) = (map.Map.get a2 j)) /\ (((map.Map.get a2 i) = (map.Map.get a1 j)) /\
-  forall (k:Z), ((~ (k = i)) /\ ~ (k = j)) -> ((map.Map.get a1
-  k) = (map.Map.get a2 k))).
-
-(* Why3 goal *)
-Lemma exchange_set : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(@map.Map.map Z _ a a_WT)), forall (i:Z) (j:Z), (exchange a1
-  (map.Map.set (map.Map.set a1 i (map.Map.get a1 j)) j (map.Map.get a1 i)) i
-  j).
-Proof.
-intros a a_WT a1 i j.
-split.
-now rewrite Map.Select_eq.
-split.
-destruct (Z_eq_dec i j) as [H|H].
-rewrite H.
-now rewrite Map.Select_eq.
-rewrite Map.Select_neq by now apply sym_not_eq.
-now rewrite Map.Select_eq.
-intros k (Hk1,Hk2).
-now rewrite 2!Map.Select_neq by now apply sym_not_eq.
-Qed.
+Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _
+  a a_WT)) (a2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z): Prop := forall (i:Z),
+  ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
 
 (* Why3 assumption *)
 Inductive permut_sub {a:Type} {a_WT:WhyType a} : (@map.Map.map Z _ a a_WT) ->
   (@map.Map.map Z _ a a_WT) -> Z -> Z -> Prop :=
-  | permut_refl : forall (a1:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z),
-      ((@permut_sub _ _) a1 a1 l u)
+  | permut_refl : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _
+      a a_WT)), forall (l:Z) (u:Z), (map_eq_sub a1 a2 l u) ->
+      ((@permut_sub _ _) a1 a2 l u)
   | permut_sym : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _
       a a_WT)), forall (l:Z) (u:Z), ((@permut_sub _ _) a1 a2 l u) ->
       ((@permut_sub _ _) a2 a1 l u)
@@ -45,44 +25,32 @@ Inductive permut_sub {a:Type} {a_WT:WhyType a} : (@map.Map.map Z _ a a_WT) ->
       ((@permut_sub _ _) a1 a3 l u))
   | permut_exchange : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map
       Z _ a a_WT)), forall (l:Z) (u:Z) (i:Z) (j:Z), ((l <= i)%Z /\
-      (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> ((exchange a1 a2 i j) ->
-      ((@permut_sub _ _) a1 a2 l u))).
+      (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> (((map.Map.get a1
+      i) = (map.Map.get a2 j)) -> (((map.Map.get a1 j) = (map.Map.get a2
+      i)) -> ((forall (k:Z), ((l <= k)%Z /\ (k < u)%Z) -> ((~ (k = i)) ->
+      ((~ (k = j)) -> ((map.Map.get a1 k) = (map.Map.get a2 k))))) ->
+      ((@permut_sub _ _) a1 a2 l u))))).
 
 (* Why3 goal *)
-Lemma permut_weakening : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _ a a_WT)),
-  forall (l1:Z) (r1:Z) (l2:Z) (r2:Z), (((l1 <= l2)%Z /\ (l2 <= r2)%Z) /\
-  (r2 <= r1)%Z) -> ((permut_sub a1 a2 l2 r2) -> (permut_sub a1 a2 l1 r1)).
-Proof.
-intros a a_WT a1 a2 l1 r1 l2 r2 ((h1,h2),h3) h4.
-induction h4.
-constructor.
-constructor.
-now apply IHh4.
-constructor 3 with a2.
-now apply IHh4_1.
-now apply IHh4_2.
-constructor 4 with (3 := H1).
-omega.
-omega.
-Qed.
-
-(* Why3 goal *)
-Lemma permut_eq : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@map.Map.map
-  Z _ a a_WT)) (a2:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z),
-  (permut_sub a1 a2 l u) -> forall (i:Z), ((i < l)%Z \/ (u <= i)%Z) ->
-  ((map.Map.get a2 i) = (map.Map.get a1 i)).
-Proof.
-intros a a_WT a1 a2 l u h1 i h2.
-induction h1.
-apply eq_refl.
-now apply sym_eq, IHh1.
-etransitivity.
-now apply IHh1_2.
-now apply IHh1_1.
-apply sym_eq.
-apply H1.
-omega.
+Lemma permut_exchange_set : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z) (i:Z) (j:Z),
+  ((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> (permut_sub a1
+  (map.Map.set (map.Map.set a1 i (map.Map.get a1 j)) j (map.Map.get a1 i)) l
+  u)).
+intros a a_WT a1 l u i j (h1,h2) (h3,h4).
+apply permut_exchange with i j; auto.
+assert (h: i=j \/ i<>j) by omega. destruct h.
+subst.
+rewrite Map.Select_eq; auto.
+rewrite Map.Select_eq; auto.
+assert (h: i=j \/ i<>j) by omega. destruct h.
+subst.
+rewrite Map.Select_eq; auto.
+rewrite Map.Select_neq; auto.
+rewrite Map.Select_eq; auto.
+intros.
+rewrite Map.Select_neq; auto.
+rewrite Map.Select_neq; auto.
 Qed.
 
 (* Why3 goal *)
@@ -99,7 +67,9 @@ assert ((exists j, (l <= j < u)%Z /\ Map.get a2 i = Map.get a1 j) /\
 revert i Hi.
 induction h1.
 intros i Hi.
-now split ; exists i ; split.
+red in H.
+split ; exists i ; intuition.
+  rewrite <- H; auto.
 intros i Hi.
 destruct (IHh1 i Hi) as ((j&H1&H2),(k&H3&H4)).
 split.
@@ -123,17 +93,17 @@ split ;
   exists j ;
   split ; try easy ;
   rewrite Hki ;
-  apply H1.
+  intuition.
 destruct (Z_eq_dec k j) as [Hkj|Hkj].
 split ;
   exists i ;
   split ; try easy ;
   rewrite Hkj ;
-  apply sym_eq, H1.
+  apply sym_eq; intuition.
 split ;
   exists k ;
   split ; try easy.
-now apply sym_eq, H1 ; split.
-now apply H1 ; split.
+now apply sym_eq, H3 ; intuition.
+now apply H3 ; intuition.
 Qed.
 

@@ -151,6 +151,7 @@ module InsertionSortParam
        a[!j] <- a[b];
        a[b] <- t;
        assert { exchange (at a 'L) a (!j-1) !j };
+       assert { sorted_sub p a.elts (!j-1) (i+1) };
        decr j
      done
    done

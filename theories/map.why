@@ -55,7 +55,7 @@ end
 theory MapEq
 
   use import int.Int
-  use export Map
+  use import Map
 
   predicate map_eq_sub (a1 a2 : map int 'a) (l u : int) =
     forall i:int. l <= i < u -> a1[i] = a2[i]
@@ -96,53 +96,41 @@ end
 theory MapPermut
 
   use import int.Int
-  use export Map
-
-  predicate exchange (a1 a2 : map int 'a) (i j : int) =
-    a1[i] = a2[j] /\ a2[i] = a1[j] /\
-    forall k:int. (k <> i /\ k <> j) -> a1[k] = a2[k]
-  (** [exchange m1 m2 i j] is true when the maps [m1]
-      and [m2] are identical except at indexes [i]
-      and [j], where the values are exchanged *)
-
-  lemma exchange_set :
-    forall a : map int 'a. forall i j : int.
-    exchange a a[i <- a[j]][j <- a[i]] i j
+  use import Map
+  use import MapEq
 
   inductive permut_sub (map int 'a) (map int 'a) int int =
-  | permut_refl :
-      forall a : map int 'a. forall l u : int. permut_sub a a l u
-  | permut_sym :
+  | permut_refl : (* a1[l..u[ and a2[l..u[ are identical *)
+      forall a1 a2 : map int 'a. forall l u : int.
+      map_eq_sub a1 a2 l u -> permut_sub a1 a2 l u
+  | permut_sym : (* symmetry *)
       forall a1 a2 : map int 'a. forall l u : int.
       permut_sub a1 a2 l u -> permut_sub a2 a1 l u
-  | permut_trans :
+  | permut_trans : (* transitivity *)
       forall a1 a2 a3 : map int 'a. forall l u : int.
       permut_sub a1 a2 l u -> permut_sub a2 a3 l u -> permut_sub a1 a3 l u
-  | permut_exchange :
+  | permut_exchange : (* elements at indices i and j have been swapped *)
       forall a1 a2 : map int 'a. forall l u i j : int.
-      l <= i < u -> l <= j < u -> exchange a1 a2 i j -> permut_sub a1 a2 l u
+      l <= i < u -> l <= j < u ->
+      a1[i] = a2[j] -> a1[j] = a2[i] ->
+      (forall k:int. l <= k < u -> k <> i -> k <> j -> a1[k] = a2[k]) ->
+      permut_sub a1 a2 l u
   (** [permut_sub m1 m2 l u] is true when the segment
-      [m1(l..u-1)] is a permutation of the segment
-      [m2(l..u-1)].
+      [m1(l..u-1)] is a permutation of the segment [m2(l..u-1)].
       Values outside of the interval (l..u-1) are ignored.
 
       It is defined inductively as the smallest equivalence relation
       that contains the exchanges *)
 
-  lemma permut_weakening :
-    forall a1 a2 : map int 'a. forall l1 r1 l2 r2 : int.
-    l1 <= l2 <= r2 <= r1 -> permut_sub a1 a2 l2 r2 -> permut_sub a1 a2 l1 r1
-
-  lemma permut_eq :
-    forall a1 a2 : map int 'a. forall l u : int.
-    permut_sub a1 a2 l u ->
-    forall i:int. (i < l \/ u <= i) -> a2[i] = a1[i]
+  lemma permut_exchange_set :
+    forall a: map int 'a. forall l u i j: int.
+    l <= i < u -> l <= j < u -> permut_sub a a[i <- a[j]][j <- a[i]] l u
 
   lemma permut_exists :
-    forall a1 a2 : map int 'a. forall l u : int.
+    forall a1 a2: map int 'a. forall l u: int.
     permut_sub a1 a2 l u ->
-    forall i : int. l <= i < u ->
-    exists j : int. l <= j < u /\ a2[i] = a1[j]
+    forall i: int. l <= i < u ->
+    exists j: int. l <= j < u /\ a2[i] = a1[j]
 
 end
 

@@ -56,24 +56,55 @@ Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (@array a a_WT) :=
   (mk_array n (map.Map.const v:(@map.Map.map Z _ a a_WT))).
 
 (* Why3 assumption *)
+Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _
+  a a_WT)) (a2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z): Prop := forall (i:Z),
+  ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
+
+(* Why3 assumption *)
+Definition array_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\
+  (((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\
+  (u <= (length a1))%Z) /\ (map_eq_sub (elts a1) (elts a2) l u))).
+
+(* Why3 assumption *)
+Definition array_eq {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)): Prop := ((length a1) = (length a2)) /\ (map_eq_sub
+  (elts a1) (elts a2) 0%Z (length a1)).
+
+(* Why3 assumption *)
 Definition exchange {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)) (i:Z) (j:Z): Prop := (map.MapPermut.exchange (elts a1)
-  (elts a2) i j).
+  (a2:(@array a a_WT)) (i:Z) (j:Z): Prop := ((length a1) = (length a2)) /\
+  (((0%Z <= i)%Z /\ (i < (length a1))%Z) /\ (((0%Z <= j)%Z /\
+  (j < (length a1))%Z) /\ (((get a1 i) = (get a2 j)) /\ (((get a1
+  j) = (get a2 i)) /\ forall (k:Z), ((0%Z <= k)%Z /\ (k < (length a1))%Z) ->
+  ((~ (k = i)) -> ((~ (k = j)) -> ((get a1 k) = (get a2 k)))))))).
+
+(* Why3 assumption *)
+Definition map_permut_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\
+  (((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\
+  (u <= (length a1))%Z) /\ (map.MapPermut.permut_sub (elts a1) (elts a2) l
+  u))).
 
 (* Why3 assumption *)
 Definition permut_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := (map.MapPermut.permut_sub
-  (elts a1) (elts a2) l u).
+  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\
+  (((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\
+  (u <= (length a1))%Z) /\ ((map_eq_sub (elts a1) (elts a2) 0%Z l) /\
+  ((map.MapPermut.permut_sub (elts a1) (elts a2) l u) /\ (map_eq_sub
+  (elts a2) (elts a2) u (length a1)))))).
 
 (* Why3 assumption *)
 Definition permut {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (a2:(@array
   a a_WT)): Prop := ((length a1) = (length a2)) /\ (map.MapPermut.permut_sub
   (elts a1) (elts a2) 0%Z (length a1)).
 
+Axiom permut_refl : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)), (permut a1 a1).
+
 Axiom exchange_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
-  a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z), (exchange a1 a2 i j) ->
-  (((length a1) = (length a2)) -> (((0%Z <= i)%Z /\ (i < (length a1))%Z) ->
-  (((0%Z <= j)%Z /\ (j < (length a1))%Z) -> (permut a1 a2)))).
+  a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z), (exchange a1 a2 i j) -> (permut
+  a1 a2).
 
 Axiom permut_sym : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
   a a_WT)) (a2:(@array a a_WT)), (permut a1 a2) -> (permut a2 a1).
@@ -82,27 +113,17 @@ Axiom permut_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
   a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT)), (permut a1 a2) ->
   ((permut a2 a3) -> (permut a1 a3)).
 
-(* Why3 assumption *)
-Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _
-  a a_WT)) (a2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z): Prop := forall (i:Z),
-  ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
-
-(* Why3 assumption *)
-Definition array_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := (map_eq_sub (elts a1) (elts a2) l
-  u).
-
-(* Why3 assumption *)
-Definition array_eq {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)): Prop := ((length a1) = (length a2)) /\ (array_eq_sub
-  a1 a2 0%Z (length a1)).
-
-Axiom array_eq_sub_permut : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (array_eq_sub
-  a1 a2 l u) -> (permut_sub a1 a2 l u).
-
 Axiom array_eq_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
   a a_WT)) (a2:(@array a a_WT)), (array_eq a1 a2) -> (permut a1 a2).
+
+Axiom permut_sub_weakening : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l1:Z) (u1:Z) (l2:Z)
+  (u2:Z), (permut_sub a1 a2 l1 u1) -> (((0%Z <= l2)%Z /\ (l2 <= l1)%Z) ->
+  (((u1 <= u2)%Z /\ (u2 <= (length a1))%Z) -> (permut_sub a1 a2 l2 u2))).
+
+Axiom permut_sub_permut : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
+  a1 a2 l u) -> (permut a1 a2).
 
 Axiom elt : Type.
 Parameter elt_WhyType : WhyType elt.
@@ -152,9 +173,13 @@ Theorem WP_parameter_insertion_sort : forall (a:Z) (a1:(@map.Map.map Z _
   (map.Map.get a4 o1) v)) -> let o2 := (j - 1%Z)%Z in (((0%Z <= o2)%Z /\
   (o2 < a)%Z) -> (((0%Z <= j)%Z /\ (j < a)%Z) -> forall (a5:(@map.Map.map Z _
   elt elt_WhyType)), ((0%Z <= a)%Z /\ (a5 = (map.Map.set a4 j (map.Map.get a4
-  o2)))) -> ((map.MapPermut.exchange (map.Map.set a4 j v) (map.Map.set a5
-  (j - 1%Z)%Z v) (j - 1%Z)%Z j) -> forall (j1:Z), (j1 = (j - 1%Z)%Z) ->
-  (permut a2 (mk_array a (map.Map.set a5 j1 v))))))))))))).
+  o2)))) -> ((exchange (mk_array a (map.Map.set a4 j v)) (mk_array a
+  (map.Map.set a5 (j - 1%Z)%Z v)) (j - 1%Z)%Z j) -> forall (j1:Z),
+  (j1 = (j - 1%Z)%Z) -> (permut a2 (mk_array a (map.Map.set a5 j1
+  v))))))))))))).
+(* Why3 intros a a1 a2 h1 o h2 a3 i (h3,h4) (h5,h6) (h7,(h8,h9)) v j a4
+        ((h10,h11),(h12,(h13,h14))) h15 o1 (h16,(h17,h18)) h19 o2 (h20,h21)
+        (h22,h23) a5 (h24,h25) h26 j1 h27. *)
 intros a a1 a2 h1 o h2 a3 i (h3,h4) (h5,h6) (h7,(h8,h9)) v j a4
         ((h10,h11),(h12,(h13,h14))) h15 o1 (h16,(h17,h18)) h19 o2 (h20,h21)
         (h22,h23) a5 (h24,h25) h26 j1 h27.

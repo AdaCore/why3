@@ -56,19 +56,6 @@ Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (@array a a_WT) :=
   (mk_array n (map.Map.const v:(@map.Map.map Z _ a a_WT))).
 
 (* Why3 assumption *)
-Definition sorted_sub (a:(@map.Map.map Z _ Z _)) (l:Z) (u:Z): Prop :=
-  forall (i1:Z) (i2:Z), ((l <= i1)%Z /\ ((i1 <= i2)%Z /\ (i2 < u)%Z)) ->
-  ((map.Map.get a i1) <= (map.Map.get a i2))%Z.
-
-(* Why3 assumption *)
-Definition sorted_sub1 (a:(@array Z _)) (l:Z) (u:Z): Prop := (sorted_sub
-  (elts a) l u).
-
-(* Why3 assumption *)
-Definition sorted (a:(@array Z _)): Prop := (sorted_sub (elts a) 0%Z
-  (length a)).
-
-(* Why3 assumption *)
 Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _
   a a_WT)) (a2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z): Prop := forall (i:Z),
   ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
@@ -101,11 +88,8 @@ Definition map_permut_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
 
 (* Why3 assumption *)
 Definition permut_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\
-  (((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\
-  (u <= (length a1))%Z) /\ ((map_eq_sub (elts a1) (elts a2) 0%Z l) /\
-  ((map.MapPermut.permut_sub (elts a1) (elts a2) l u) /\ (map_eq_sub
-  (elts a2) (elts a2) u (length a1)))))).
+  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := (array_eq_sub a1 a2 0%Z l) /\
+  ((map_permut_sub a1 a2 l u) /\ (array_eq_sub a2 a2 u (length a1))).
 
 (* Why3 assumption *)
 Definition permut {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (a2:(@array
@@ -138,47 +122,21 @@ Axiom permut_sub_permut : forall {a:Type} {a_WT:WhyType a},
   forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
   a1 a2 l u) -> (permut a1 a2).
 
-Import MapPermut.
-
 (* Why3 goal *)
-Theorem WP_parameter_insertion_sort : forall (a:Z) (a1:(@map.Map.map Z _
-  Z _)), let a2 := (mk_array a a1) in ((0%Z <= a)%Z -> let o :=
-  (a - 1%Z)%Z in ((1%Z <= o)%Z -> forall (a3:(@map.Map.map Z _ Z _)),
-  forall (i:Z), ((1%Z <= i)%Z /\ (i <= o)%Z) -> (((sorted_sub a3 0%Z i) /\
-  (permut a2 (mk_array a a3))) -> (((0%Z <= a)%Z /\ ((0%Z <= i)%Z /\
-  (i < a)%Z)) -> let v := (map.Map.get a3 i) in forall (j:Z)
-  (a4:(@map.Map.map Z _ Z _)), (((0%Z <= j)%Z /\ (j <= i)%Z) /\ ((permut a2
-  (mk_array a (map.Map.set a4 j v))) /\ ((forall (k1:Z) (k2:Z),
-  ((0%Z <= k1)%Z /\ ((k1 <= k2)%Z /\ (k2 <= i)%Z)) -> ((~ (k1 = j)) ->
-  ((~ (k2 = j)) -> ((map.Map.get a4 k1) <= (map.Map.get a4 k2))%Z))) /\
-  forall (k:Z), (((j + 1%Z)%Z <= k)%Z /\ (k <= i)%Z) -> (v < (map.Map.get a4
-  k))%Z))) -> ((0%Z < j)%Z -> let o1 := (j - 1%Z)%Z in (((0%Z <= a)%Z /\
-  ((0%Z <= o1)%Z /\ (o1 < a)%Z)) -> ((v < (map.Map.get a4 o1))%Z -> let o2 :=
-  (j - 1%Z)%Z in (((0%Z <= o2)%Z /\ (o2 < a)%Z) -> (((0%Z <= j)%Z /\
-  (j < a)%Z) -> forall (a5:(@map.Map.map Z _ Z _)), ((0%Z <= a)%Z /\
-  (a5 = (map.Map.set a4 j (map.Map.get a4 o2)))) -> ((exchange (mk_array a
-  (map.Map.set a4 j v)) (mk_array a (map.Map.set a5 (j - 1%Z)%Z v))
-  (j - 1%Z)%Z j) -> forall (j1:Z), (j1 = (j - 1%Z)%Z) -> (permut a2
-  (mk_array a (map.Map.set a5 j1 v))))))))))))).
-(* Why3 intros a a1 a2 h1 o h2 a3 i (h3,h4) (h5,h6) (h7,(h8,h9)) v j a4
-        ((h10,h11),(h12,(h13,h14))) h15 o1 (h16,(h17,h18)) h19 o2 (h20,h21)
-        (h22,h23) a5 (h24,h25) h26 j1 h27. *)
-intros a a1 a2 h1 o h2 a3 i (h3,h4) (h5,h6) (h7,(h8,h9)) v j a4
-        ((h10,h11),(h12,(h13,h14))) h15 o1 (h16,(h17,h18)) h19 o2 (h20,h21)
-        (h22,h23) a5 (h24,h25) h26 j1 h27.
-intuition.
-unfold permut.
-split.
-simpl.
-auto.
-subst a5.
-simpl.
-apply permut_trans with (elts (set (mk_array a a4) j (Map.get a3 i))); auto.
-subst j1.
-unfold permut in h12.
-intuition.
-generalize (exchange_permut _ _ _ _ h26).
-unfold permut; simpl; intuition.
-subst j1; assumption.
+Theorem WP_parameter_partition : forall (a:Z) (a1:(@map.Map.map Z _ Z _))
+  (m:Z) (n:Z), ((0%Z <= a)%Z /\ ((0%Z <= m)%Z /\ ((m < n)%Z /\
+  (n < a)%Z))) -> (((0%Z <= m)%Z /\ ((m < n)%Z /\ (n < a)%Z)) -> forall (o:Z)
+  (j:Z) (i:Z) (a2:(@map.Map.map Z _ Z _)), ((0%Z <= a)%Z /\ (((m <= j)%Z /\
+  ((j < i)%Z /\ (i <= n)%Z)) /\ ((permut_sub (mk_array a a1) (mk_array a a2)
+  m (n + 1%Z)%Z) /\ ((forall (r:Z), ((m <= r)%Z /\ (r <= j)%Z) ->
+  ((map.Map.get a2 r) <= o)%Z) /\ ((forall (r:Z), ((j < r)%Z /\ (r < i)%Z) ->
+  ((map.Map.get a2 r) = o)) /\ forall (r:Z), ((i <= r)%Z /\ (r <= n)%Z) ->
+  (o <= (map.Map.get a2 r))%Z))))) -> exists x:Z, (forall (r:Z),
+  ((m <= r)%Z /\ (r <= j)%Z) -> ((map.Map.get a2 r) <= x)%Z) /\
+  ((forall (r:Z), ((j < r)%Z /\ (r < i)%Z) -> ((map.Map.get a2 r) = x)) /\
+  forall (r:Z), ((i <= r)%Z /\ (r <= n)%Z) -> (x <= (map.Map.get a2 r))%Z)).
+intros a a1 m n (h1,(h2,(h3,h4))) (h5,(h6,h7)) o j i a2
+(h8,((h9,(h10,h11)),(h12,(h13,(h14,h15))))).
+exists o; auto.
 Qed.
 
