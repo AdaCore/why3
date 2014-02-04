@@ -123,11 +123,11 @@ theory MapPermut
       l <= i < u -> l <= j < u -> exchange a1 a2 i j -> permut_sub a1 a2 l u
   (** [permut_sub m1 m2 l u] is true when the segment
       [m1(l..u-1)] is a permutation of the segment
-      [m2(l..u-1)]
+      [m2(l..u-1)].
+      Values outside of the interval (l..u-1) are ignored.
 
-      It is defined inductively as the smallest
-      equivalence relation that contains the
-      exchanges *)
+      It is defined inductively as the smallest equivalence relation
+      that contains the exchanges *)
 
   lemma permut_weakening :
     forall a1 a2 : map int 'a. forall l1 r1 l2 r2 : int.
