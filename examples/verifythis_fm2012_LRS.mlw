@@ -304,7 +304,10 @@ module SuffixSort_test
     (* [7,8,8,6] *)
     arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-6;
     let suf = Array.make 4 0 in
-    for i = 0 to 3 do suf[i] <- i done;
+    for i = 0 to 3 do 
+      invariant { forall j:int. 0 <= j < i -> suf[j] = j }
+      suf[i] <- i 
+    done;
     SuffixSort.sort arr suf;
     (* should be [3,0,2,1] *)
     if suf[0] <> 3 then raise BenchFailure;
