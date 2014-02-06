@@ -167,10 +167,9 @@ module ArrayPermut
       Values outside of the interval (l..u-1) are ignored. *)
 
   predicate permut_sub (a1 a2: array 'a) (l u: int) =
-    a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
     map_eq_sub a1.elts a2.elts 0 l /\
-    M.permut_sub a1.elts a2.elts l u /\
-    map_eq_sub a2.elts a2.elts u (length a1)
+    map_permut_sub a1 a2 l u /\
+    map_eq_sub a1.elts a2.elts u (length a1)
   (** [permut_sub a1 a2 l u] is true when the segment
       [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)]
       and values outside of the interval (l..u-1) are equal. *)
@@ -222,10 +221,8 @@ module ArraySwap
     ensures  { exchange (old a) a i j }
     =
     let v = a[i] in
-    begin
-      a[i] <- a[j];
-      a[j] <- v
-    end
+    a[i] <- a[j];
+    a[j] <- v
 
 end
 

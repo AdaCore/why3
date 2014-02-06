@@ -16,20 +16,30 @@ Inductive permut_sub {a:Type} {a_WT:WhyType a} : (@map.Map.map Z _ a a_WT) ->
   | permut_refl : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _
       a a_WT)), forall (l:Z) (u:Z), (map_eq_sub a1 a2 l u) ->
       ((@permut_sub _ _) a1 a2 l u)
-  | permut_sym : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _
-      a a_WT)), forall (l:Z) (u:Z), ((@permut_sub _ _) a1 a2 l u) ->
-      ((@permut_sub _ _) a2 a1 l u)
   | permut_trans : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map
       Z _ a a_WT)) (a3:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z),
       ((@permut_sub _ _) a1 a2 l u) -> (((@permut_sub _ _) a2 a3 l u) ->
       ((@permut_sub _ _) a1 a3 l u))
   | permut_exchange : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map
       Z _ a a_WT)), forall (l:Z) (u:Z) (i:Z) (j:Z), ((l <= i)%Z /\
-      (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> (((map.Map.get a1
-      i) = (map.Map.get a2 j)) -> (((map.Map.get a1 j) = (map.Map.get a2
-      i)) -> ((forall (k:Z), ((l <= k)%Z /\ (k < u)%Z) -> ((~ (k = i)) ->
-      ((~ (k = j)) -> ((map.Map.get a1 k) = (map.Map.get a2 k))))) ->
-      ((@permut_sub _ _) a1 a2 l u))))).
+      (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> ((~ (i = j)) ->
+      (((map.Map.get a1 i) = (map.Map.get a2 j)) -> (((map.Map.get a1
+      j) = (map.Map.get a2 i)) -> ((forall (k:Z), ((l <= k)%Z /\
+      (k < u)%Z) -> ((~ (k = i)) -> ((~ (k = j)) -> ((map.Map.get a1
+      k) = (map.Map.get a2 k))))) -> ((@permut_sub _ _) a1 a2 l u)))))).
+
+(* Why3 goal *)
+Lemma permut_sym : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@map.Map.map
+  Z _ a a_WT)) (a2:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z),
+  (permut_sub a1 a2 l u) -> (permut_sub a2 a1 l u).
+intros a a_WT a1 a2 l u h1.
+induction h1; intuition.
+apply permut_refl; unfold map_eq_sub in *; intuition.
+  rewrite <- H; auto.
+apply permut_trans with a2; auto.
+apply permut_exchange with j i; auto.
+  intros; rewrite <- H4; auto.
+Qed.
 
 (* Why3 goal *)
 Lemma permut_exchange_set : forall {a:Type} {a_WT:WhyType a},
@@ -38,13 +48,15 @@ Lemma permut_exchange_set : forall {a:Type} {a_WT:WhyType a},
   (map.Map.set (map.Map.set a1 i (map.Map.get a1 j)) j (map.Map.get a1 i)) l
   u)).
 intros a a_WT a1 l u i j (h1,h2) (h3,h4).
+assert (h: i=j \/ i<>j) by omega. destruct h.
+subst. apply permut_refl.
+  red; intros.
+  assert (h: i=j \/ i<>j) by omega. destruct h.
+  subst. rewrite Map.Select_eq; auto.
+  rewrite Map.Select_neq.
+  rewrite Map.Select_neq; auto.
+  auto.
 apply permut_exchange with i j; auto.
-assert (h: i=j \/ i<>j) by omega. destruct h.
-subst.
-rewrite Map.Select_eq; auto.
-rewrite Map.Select_eq; auto.
-assert (h: i=j \/ i<>j) by omega. destruct h.
-subst.
 rewrite Map.Select_eq; auto.
 rewrite Map.Select_neq; auto.
 rewrite Map.Select_eq; auto.
@@ -66,15 +78,12 @@ assert ((exists j, (l <= j < u)%Z /\ Map.get a2 i = Map.get a1 j) /\
 2: easy.
 revert i Hi.
 induction h1.
+(* refl *)
 intros i Hi.
 red in H.
 split ; exists i ; intuition.
   rewrite <- H; auto.
-intros i Hi.
-destruct (IHh1 i Hi) as ((j&H1&H2),(k&H3&H4)).
-split.
-now exists k ; split.
-now exists j ; split.
+(* trans *)
 intros i Hi.
 split.
 destruct (IHh1_2 i Hi) as ((j&H1&H2),_).
@@ -87,6 +96,7 @@ destruct (IHh1_2 j H1) as (_,(k&H3&H4)).
 exists k.
 split ; try easy.
 now transitivity (Map.get a2 j).
+(* exchange *)
 intros k Hk.
 destruct (Z_eq_dec k i) as [Hki|Hki].
 split ;
@@ -103,7 +113,13 @@ split ;
 split ;
   exists k ;
   split ; try easy.
-now apply sym_eq, H3 ; intuition.
-now apply H3 ; intuition.
+now apply sym_eq, H4 ; intuition.
+now apply H4 ; intuition.
 Qed.
 
+(* Unused content named permut_sub_concat
+intros a a_WT a1 a2 l m u h1 h2.
+induction h1.
+
+Qed.
+ *)

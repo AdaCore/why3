@@ -88,11 +88,9 @@ Definition map_permut_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
 
 (* Why3 assumption *)
 Definition permut_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\
-  (((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\
-  (u <= (length a1))%Z) /\ ((map_eq_sub (elts a1) (elts a2) 0%Z l) /\
-  ((map.MapPermut.permut_sub (elts a1) (elts a2) l u) /\ (map_eq_sub
-  (elts a2) (elts a2) u (length a1)))))).
+  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := (map_eq_sub (elts a1) (elts a2)
+  0%Z l) /\ ((map_permut_sub a1 a2 l u) /\ (map_eq_sub (elts a1) (elts a2) u
+  (length a1))).
 
 (* Why3 assumption *)
 Definition permut {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (a2:(@array
@@ -338,11 +336,9 @@ intuition.
 red; simpl.
 split. trivial.
 apply permut_trans with a5.
-apply permut_exchange with i1 j1; try omega.
-red in H48; intuition.
-red in H48; intuition.
-red in H48; intuition.
-red in H19; simpl in H19.
-intuition.
+assert (permut (mk_array a a8) (mk_array a a5)).
+  apply exchange_permut with i1 j1; auto.
+  destruct H54; intuition.
+red in H19; intuition.
 Qed.
 
