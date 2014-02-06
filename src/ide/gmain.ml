@@ -884,7 +884,7 @@ let sched =
       else
         S.create_session project_dir
     in
-    let env,(_:bool) =
+    let env,(_:bool),(_:bool) =
       M.update_session ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config
     in
@@ -1921,7 +1921,7 @@ let reload () =
     gconfig.env <- Env.create_env loadpath;
     (** reload the session *)
     let old_session = (env_session()).S.session in
-    let new_env_session,(_:bool) =
+    let new_env_session,(_:bool),(_:bool) =
       M.update_session ~allow_obsolete:true old_session gconfig.env
         gconfig.Gconfig.config
     in

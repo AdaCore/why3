@@ -229,7 +229,7 @@ val update_session :
   ?release:bool (* default false *)  ->
   keygen:'a keygen ->
   allow_obsolete:bool -> 'b session ->
-  Env.env -> Whyconf.config -> 'a env_session * bool
+  Env.env -> Whyconf.config -> 'a env_session * bool * bool
 (** reload the given session with the given environnement :
     - the files are reloaded
     - apply again the transformation
@@ -241,6 +241,8 @@ val update_session :
     otherwise the exception {!OutdatedSession} is raised.
     If the session was obsolete is indicated by
     the second result.
+    If the merge generated new unpaired goals is indicated by
+    the third result.
 
     raises [Failure msg] if the database file cannot be read correctly
 

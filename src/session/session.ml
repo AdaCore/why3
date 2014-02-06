@@ -1761,6 +1761,7 @@ end
 (**********************************)
 
 let found_obsolete = ref false
+let found_missed_goals = ref false
 
 let merge_proof ~keygen obsolete to_goal _ from_proof =
   let obsolete = obsolete || from_proof.proof_obsolete in
@@ -2006,12 +2007,14 @@ and merge_trans ~keygen ~theories env to_goal _ from_transf =
     let associated =
       dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
         env.session.session_shape_version;
-      AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
+      AssoGoals.associate from_transf.transf_goals to_transf.transf_goals
+    in
     List.iter (function
-    | (to_goal, Some (from_goal, obsolete)) ->
-      merge_any_goal ~keygen ~theories env obsolete  from_goal to_goal
-    | (_, None) -> ()
-    ) associated
+      | (to_goal, Some (from_goal, obsolete)) ->
+        merge_any_goal ~keygen ~theories env obsolete  from_goal to_goal
+      | (_, None) ->
+        found_missed_goals := true)
+      associated
   with Exit -> ()
 
 (** convert the ident from the old task to the ident at the same
@@ -2071,6 +2074,7 @@ let merge_theory
         if release then release_sub_tasks to_goal
       with
         | Not_found when allow_obsolete ->
+          found_missed_goals := true;
           if release then release_sub_tasks to_goal
         | Not_found -> raise OutdatedSession
     ) to_th.theory_goals
@@ -2141,6 +2145,7 @@ let update_session
     }
   in
   found_obsolete := false;
+  found_missed_goals := false;
   let files =
     PHstr.fold (fun _ old_file acc ->
       dprintf debug "[Load] file '%s'@\n" old_file.file_name;
@@ -2175,7 +2180,7 @@ let update_session
   in
   assert (new_env_session.session.session_shape_version
           = Termcode.current_shape_version);
-  new_env_session, obsolete
+  new_env_session, obsolete, !found_missed_goals
 
 
 (** Copy/Paste *)

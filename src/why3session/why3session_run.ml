@@ -194,15 +194,17 @@ let is_successful env = (** means all goals proved*)
 
 
 let run_one sched env config filters interactive_provers fname =
-  let env_session, out_of_sync =
+  let env_session, out_of_sync, missed =
     read_update_session ~allow_obsolete:(!opt_outofsync <> Outofsync_none)
       env config fname in
   if out_of_sync then
-    dprintf verbose "@[From@ file@ %s:out of sync@]@." fname;
+    dprintf verbose "@[From@ file@ %s: out of sync@]@." fname;
+  if missed then
+    dprintf verbose "@[From@ file@ %s: merge missed new goals@]@." fname;
   let todo = Todo.create () (fun () _ -> ())
     (fun () ->
       if !opt_save <> Save_none &&
-        (not out_of_sync
+        (not (out_of_sync || missed)
          || !opt_outofsync = Outofsync_usual
            || (!opt_outofsync = Outofsync_success
               && is_successful env_session ))

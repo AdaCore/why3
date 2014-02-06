@@ -53,7 +53,7 @@ let keygen ?parent:_ _ = ()
 let fname_printer = Ident.create_ident_printer []
 
 let run_one env config filters dir fname =
-  let env_session,_ =
+  let env_session,_,_ =
     read_update_session ~allow_obsolete:!opt_force_obsolete env config fname in
   iter_session (fun file ->
     let fname = Filename.basename file.file_name in
