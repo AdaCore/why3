@@ -32,7 +32,7 @@ module M
    We express this property using integers by multiplying everything by [2a]. *)
 
   lemma closest :
-    forall a b c: int. 0 < a ->
+    forall a b c: int.
     abs (2 * a * b - 2 * c) <= a ->
     forall b': int. abs (a * b - c) <= abs (a * b' - c)
 

@@ -31,138 +31,15 @@ Axiom first_octant : (0%Z <= y2)%Z /\ (y2 <= x2)%Z.
 Definition best (x:Z) (y:Z): Prop := forall (y':Z),
   ((Zabs ((x2 * y)%Z - (x * y2)%Z)%Z) <= (Zabs ((x2 * y')%Z - (x * y2)%Z)%Z))%Z.
 
-(*s First a tactic [Case_Zabs] to do case split over [(Zabs x)]: 
-    introduces two subgoals, one where [x] is assumed to be non negative
-    and thus where [Zabs x] is replaced by [x]; and another where
-    [x] is assumed to be non positive and thus where [Zabs x] is
-    replaced by [-x]. *)
-
-Lemma Z_gt_le : forall x y:Z, (x > y)%Z -> (y <= x)%Z.
-Proof.
-intros; omega.
-Qed.
-
-Ltac Case_Zabs a Ha :=
-  elim (Z_le_gt_dec 0 a); intro Ha;
-   [ rewrite (Zabs_eq a Ha)
-   | rewrite (Zabs_non_eq a (Z_gt_le 0 a Ha)) ].
-
-(*s A useful lemma to establish $|a| \le |b|$. *)
-
-Lemma Zabs_le_Zabs :
- forall a b:Z,
-   (b <= a <= 0)%Z \/ (0 <= a <= b)%Z -> (Zabs a <= Zabs b)%Z.
-Proof.
-intro a; Case_Zabs a Ha; intro b; Case_Zabs b Hb; omega.
-Qed.
-
-(*s A useful lemma to establish $|a| \le $. *)
-
-Lemma Zabs_le :
- forall a b:Z, (0 <= b)%Z -> ((Zopp b <= a <= b)%Z <-> (Zabs a <= b)%Z).
-Proof.
-intros a b Hb.
- Case_Zabs a Ha; split; omega.
-Qed.
-
-(*s Two tactics. [ZCompare x y H] discriminates between [x<y], [x=y] and 
-    [x>y] ([H] is the hypothesis name). [RingSimpl x y] rewrites [x] by [y]
-    using the [Ring] tactic. *)
-
-Ltac ZCompare x y H :=
-  elim (Z_gt_le_dec x y); intro H;
-   [ idtac | elim (Z_le_lt_eq_dec x y H); clear H; intro H ].
-
-Ltac RingSimpl x y := replace x with y; [ idtac | ring ].
-
-Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.95.1," timelimit 3.
+(* The following short and nice proof is due to Laurent Théry *)
+Require Import Psatz.
 
 (* Why3 goal *)
-Theorem closest : forall (a:Z) (b:Z) (c:Z), (0%Z < a)%Z ->
-  (((Zabs (((2%Z * a)%Z * b)%Z - (2%Z * c)%Z)%Z) <= a)%Z -> forall (b':Z),
-  ((Zabs ((a * b)%Z - c)%Z) <= (Zabs ((a * b')%Z - c)%Z))%Z).
-(* Why3 intros a b c h1 h2 b'. *)
-intros a b c Ha Hmin.
-assert (Ha': (0 <= a)%Z) by omega.
-generalize (proj2 (Zabs_le (2 * a * b - 2 * c) a Ha') Hmin).
-intros Hmin' b'.
-elim (Z_le_gt_dec (2 * a * b) (2 * c)); intro Habc.
-(* 2ab <= 2c *)
-rewrite (Zabs_non_eq (a * b - c)).
-ZCompare b b' Hbb'.
-  (* b > b' *)
-  rewrite (Zabs_non_eq (a * b' - c)).
-ae.
-ae.
-  (* b < b' *)
-  rewrite (Zabs_eq (a * b' - c)).
-  apply Zmult_le_reg_r with (p := 2%Z).
- omega.
-  RingSimpl ((a * b' - c) * 2)%Z
-   (2 * (a * b' - a * b) + 2 * (a * b - c))%Z.
-  apply Zle_trans with a.
-   RingSimpl (Zopp (a * b - c) * 2)%Z (Zopp (2 * a * b - 2 * c)).
- omega.
-  apply Zle_trans with (2 * a + Zopp a)%Z.
- omega.
-  apply Zplus_le_compat.
-  RingSimpl (2 * a)%Z (2 * a * 1)%Z.
-  RingSimpl (2 * (a * b' - a * b))%Z (2 * a * (b' - b))%Z.
-ae.
-  RingSimpl (2 * (a * b - c))%Z (2 * a * b - 2 * c)%Z.
- omega.
-    (* 0 <= ab'-c *)
-    RingSimpl (a * b' - c)%Z (a * b' - a * b + (a * b - c))%Z.
-    RingSimpl 0%Z (a + Zopp a)%Z.
-    apply Zplus_le_compat.
-    RingSimpl a (a * 1)%Z.
-    RingSimpl (a * 1 * b' - a * 1 * b)%Z (a * (b' - b))%Z.
-ae.
-    apply Zle_trans with (Zopp a).
- omega.
-      RingSimpl ((a * b - c) * 2)%Z (2 * a * b - 2 * c)%Z.
-ae. 
-  (* b = b' *)
-ae.
-ae.
- 
-(* 2ab > 2c *)
-rewrite (Zabs_eq (a * b - c)).
-ZCompare b b' Hbb'.
-  (* b > b' *)
-  rewrite (Zabs_non_eq (a * b' - c)).
-  apply Zmult_le_reg_r with (p := 2%Z).
- omega.
-  RingSimpl (Zopp (a * b' - c) * 2)%Z
-   (2 * (c - a * b) + 2 * (a * b - a * b'))%Z.
-  apply Zle_trans with a.
-ae.
-  apply Zle_trans with (Zopp a + 2 * a)%Z.
- omega.
-  apply Zplus_le_compat.
-ae.
-  RingSimpl (2 * a)%Z (2 * a * 1)%Z.
-  RingSimpl (2 * (a * b - a * b'))%Z (2 * a * (b - b'))%Z.
-ae.
-    (* 0 >= ab'-c *)
-    RingSimpl (a * b' - c)%Z (a * b' - a * b + (a * b - c))%Z.
-    RingSimpl 0%Z (Zopp a + a)%Z.
-    apply Zplus_le_compat.
-    RingSimpl (Zopp a) (a * (-1))%Z.
-    RingSimpl (a * b' - a * b)%Z (a * (b' - b))%Z.
-ae.
-ae.
-  (* b < b' *)
-  rewrite (Zabs_eq (a * b' - c)).
-  apply Zle_left_rev.
-  RingSimpl (a * b' - c + Zopp (a * b - c))%Z (a * (b' - b))%Z.
-ae.
-  apply Zle_trans with (m := (a * b - c)%Z).
-ae.
-ae.
-ae.
-ae.
+Theorem closest : forall (a:Z) (b:Z) (c:Z),
+  ((Zabs (((2%Z * a)%Z * b)%Z - (2%Z * c)%Z)%Z) <= a)%Z -> forall (b':Z),
+  ((Zabs ((a * b)%Z - c)%Z) <= (Zabs ((a * b')%Z - c)%Z))%Z.
+intros a b c H b'.
+assert (H1:  b = b' \/ b <> b') by nia.
+nia.
 Qed.
-
 
