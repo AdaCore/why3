@@ -430,6 +430,10 @@ let built_in_theories =
       "infix >", None, eval_int_rel Big_int.gt_big_int;
       "infix >=", None, eval_int_rel Big_int.ge_big_int;
     ] ;
+    ["int"],"MinMax", [],
+    [ "min", None, eval_int_op Big_int.min_big_int;
+      "max", None, eval_int_op Big_int.max_big_int;
+    ] ;
     ["int"],"ComputerDivision", [],
     [ "div", None, eval_int_op computer_div_big_int;
       "mod", None, eval_int_op computer_mod_big_int;
