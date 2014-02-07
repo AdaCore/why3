@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="1"
+  name="Coq"
+  version="8.4pl2"/>
+ <file
+  name="../remove_duplicate.mlw"
+  verified="true"
+  expanded="false">
+  <theory
+   name="Spec"
+   locfile="../remove_duplicate.mlw"
+   loclnum="6" loccnumb="7" loccnume="11"
+   verified="true"
+   expanded="false">
+  </theory>
+  <theory
+   name="RemoveDuplicateQuadratic"
+   locfile="../remove_duplicate.mlw"
+   loclnum="23" loccnumb="7" loccnume="31"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter test_appears"
+    locfile="../remove_duplicate.mlw"
+    loclnum="28" loccnumb="10" loccnume="22"
+    expl="VC for test_appears"
+    sum="e9050138f355f19b8364091c32897785"
+    proved="true"
+    expanded="false"
+    shape="iNaappearsV0V4V3iaappearsV0V4V3qainfix =V7aTrueIaappearsV0V4V6qainfix =V7aTrueFAainfix &lt;=V6V1Aainfix &lt;=c0V6Aainfix &lt;V6V3Aainfix &lt;=c0V3Lainfix -V3c1aappearsV0V4V3ainfix =agetV2V5V0Aainfix &lt;V5V1Aainfix &lt;=c0V5Lainfix -V3c1ainfix &gt;V3c0Iainfix &lt;=V3V1Aainfix &lt;=c0V3Aainfix &lt;=c0V1Lamk arrayV1V2F">
+    <label
+     name="expl:VC for test_appears"/>
+    <proof
+     prover="0"
+     timelimit="30"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter remove_duplicate"
+    locfile="../remove_duplicate.mlw"
+    loclnum="34" loccnumb="6" loccnume="22"
+    expl="VC for remove_duplicate"
+    sum="e946ae4148759c2adcbc08815963ac59"
+    proved="true"
+    expanded="false"
+    shape="aappearsV7V6V4qaappearsV7V2V0FAanodupV6V4Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix =agetV5V8agetV1V8Iainfix &lt;V8V0Aainfix &lt;=ainfix +V3c1V8FAaappearsV9V6V4qaappearsV9V2ainfix +V3c1FAanodupV6V4Aainfix &lt;=V4ainfix +V3c1Aainfix &lt;=c0V4Aiainfix =agetV5V12agetV1V12Iainfix &lt;V12V0Aainfix &lt;=ainfix +V10c1V12FAaappearsV13V6V4qaappearsV13V2ainfix +V10c1FAanodupV6V4Aainfix &lt;=V4ainfix +V10c1Aainfix &lt;=c0V4ainfix =agetV14V17agetV1V17Iainfix &lt;V17V0Aainfix &lt;=ainfix +V10c1V17FAaappearsV18V15V16qaappearsV18V2ainfix +V10c1FAanodupV15V16Aainfix &lt;=V16ainfix +V10c1Aainfix &lt;=c0V16Iainfix =V16ainfix +V4c1FIainfix =V14asetV5V4agetV5V10Aainfix &lt;=c0V0Lamk arrayV0V14FAainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;V10V0Aainfix &lt;=c0V10Nainfix =V11aTrueIaappearsagetV5V10V6V4qainfix =V11aTrueFAainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0Iainfix =agetV5V19agetV1V19Iainfix &lt;V19V0Aainfix &lt;=V10V19FAaappearsV20V6V4qaappearsV20V2V10FAanodupV6V4Aainfix &lt;=V4V10Aainfix &lt;=c0V4Iainfix &lt;=V10V3Aainfix &lt;=c0V10FLamk arrayV0V5FAanodupV2c0Aainfix &lt;=c0c0Iainfix &lt;=c0V3AaappearsV21V2c0qaappearsV21V2V0FAanodupV2c0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix &gt;c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+    <label
+     name="expl:VC for remove_duplicate"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter remove_duplicate.1"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="1. postcondition"
+      sum="621783dc94012bdc308e5a56aa1552b8"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix &gt;c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.2"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="2. postcondition"
+      sum="60e6d493ffb9153a10c3e89c66da5ffc"
+      proved="true"
+      expanded="false"
+      shape="postconditionanodupV2c0Iainfix &gt;c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.3"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="3. postcondition"
+      sum="1c075b12ff26bf600fb87085bff3ecee"
+      proved="true"
+      expanded="false"
+      shape="postconditionaappearsV4V2c0qaappearsV4V2V0FIainfix &gt;c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.4"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="4. loop invariant init"
+      sum="dabfd14f9822a0dad2754ce40d3de29b"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=c0c0Iainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.5"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="5. loop invariant init"
+      sum="b1a68a3b17ed88d4cb5aebe066d2402a"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initanodupV2c0Iainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.6"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="6. type invariant"
+      sum="d37a18a3e3b27073f22f485f88684650"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V0Iainfix =agetV5V8agetV1V8Iainfix &lt;V8V0Aainfix &lt;=V7V8FAaappearsV9V6V4qaappearsV9V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.7"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="7. index in array bounds"
+      sum="d96bfb3d1fc0aa2ea8af6054628abc4c"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix &lt;=c0V0Iainfix =agetV5V8agetV1V8Iainfix &lt;V8V0Aainfix &lt;=V7V8FAaappearsV9V6V4qaappearsV9V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.8"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="8. precondition"
+      sum="98c39a59e30602be238b400b3271692a"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V8agetV1V8Iainfix &lt;V8V0Aainfix &lt;=V7V8FAaappearsV9V6V4qaappearsV9V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.9"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="9. index in array bounds"
+      sum="739ee155224fddba56d4d7de69caf8ab"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V7V0Aainfix &lt;=c0V7INainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V9agetV1V9Iainfix &lt;V9V0Aainfix &lt;=V7V9FAaappearsV10V6V4qaappearsV10V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.10"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="10. index in array bounds"
+      sum="7fa6b9cbdb604fae5149f936997a71a3"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7INainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V9agetV1V9Iainfix &lt;V9V0Aainfix &lt;=V7V9FAaappearsV10V6V4qaappearsV10V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.11"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="11. loop invariant preservation"
+      sum="4fc418ccd7cd96367e66b4b89f9c86ba"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V11ainfix +V7c1Aainfix &lt;=c0V11Iainfix =V11ainfix +V4c1FIainfix =V9asetV5V4agetV5V7Aainfix &lt;=c0V0Lamk arrayV0V9FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7INainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V12agetV1V12Iainfix &lt;V12V0Aainfix &lt;=V7V12FAaappearsV13V6V4qaappearsV13V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.12"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="12. loop invariant preservation"
+      sum="58962140d21554c0b1e6086f98e43332"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationanodupV10V11Iainfix =V11ainfix +V4c1FIainfix =V9asetV5V4agetV5V7Aainfix &lt;=c0V0Lamk arrayV0V9FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7INainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V12agetV1V12Iainfix &lt;V12V0Aainfix &lt;=V7V12FAaappearsV13V6V4qaappearsV13V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.12"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.13"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="13. loop invariant preservation"
+      sum="1ec075e5c70b893202ffec99720c95df"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationaappearsV12V10V11qaappearsV12V2ainfix +V7c1FIainfix =V11ainfix +V4c1FIainfix =V9asetV5V4agetV5V7Aainfix &lt;=c0V0Lamk arrayV0V9FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7INainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V13agetV1V13Iainfix &lt;V13V0Aainfix &lt;=V7V13FAaappearsV14V6V4qaappearsV14V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="1"
+       timelimit="30"
+       memlimit="1000"
+       edited="remove_duplicate_RemoveDuplicateQuadratic_WP_parameter_remove_duplicate_1.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="4.85"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.14"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="14. loop invariant preservation"
+      sum="221f8b835930dcecdbbc3d127a6ff24b"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV9V12agetV1V12Iainfix &lt;V12V0Aainfix &lt;=ainfix +V7c1V12FIainfix =V11ainfix +V4c1FIainfix =V9asetV5V4agetV5V7Aainfix &lt;=c0V0Lamk arrayV0V9FIainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7INainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V13agetV1V13Iainfix &lt;V13V0Aainfix &lt;=V7V13FAaappearsV14V6V4qaappearsV14V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.15"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="15. loop invariant preservation"
+      sum="d9498eb1507c69df53deecb17ce618b1"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V4ainfix +V7c1Aainfix &lt;=c0V4INNainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V9agetV1V9Iainfix &lt;V9V0Aainfix &lt;=V7V9FAaappearsV10V6V4qaappearsV10V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.16"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="16. loop invariant preservation"
+      sum="b21793bb821f69003612f7a54e528d77"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationanodupV6V4INNainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V9agetV1V9Iainfix &lt;V9V0Aainfix &lt;=V7V9FAaappearsV10V6V4qaappearsV10V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.17"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="17. loop invariant preservation"
+      sum="f32059c9ac897b22a5529ee62ae31c08"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationaappearsV9V6V4qaappearsV9V2ainfix +V7c1FINNainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V10agetV1V10Iainfix &lt;V10V0Aainfix &lt;=V7V10FAaappearsV11V6V4qaappearsV11V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.18"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="18. loop invariant preservation"
+      sum="703c4206ab3a8e501328efd3cdd4249b"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV5V9agetV1V9Iainfix &lt;V9V0Aainfix &lt;=ainfix +V7c1V9FINNainfix =V8aTrueIaappearsagetV5V7V6V4qainfix =V8aTrueFIainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;V7V0Aainfix &lt;=c0V7Aainfix &lt;=c0V0Iainfix =agetV5V10agetV1V10Iainfix &lt;V10V0Aainfix &lt;=V7V10FAaappearsV11V6V4qaappearsV11V2V7FAanodupV6V4Aainfix &lt;=V4V7Aainfix &lt;=c0V4Iainfix &lt;=V7V3Aainfix &lt;=c0V7FLamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.19"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="19. type invariant"
+      sum="e98f18afea34635da0d43173071dc95d"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V0Iainfix =agetV5V7agetV1V7Iainfix &lt;V7V0Aainfix &lt;=ainfix +V3c1V7FAaappearsV8V6V4qaappearsV8V2ainfix +V3c1FAanodupV6V4Aainfix &lt;=V4ainfix +V3c1Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.20"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="20. postcondition"
+      sum="ca159d6283aa477f04be5b93c8b9b203"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;=c0V0Iainfix =agetV5V7agetV1V7Iainfix &lt;V7V0Aainfix &lt;=ainfix +V3c1V7FAaappearsV8V6V4qaappearsV8V2ainfix +V3c1FAanodupV6V4Aainfix &lt;=V4ainfix +V3c1Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.21"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="21. postcondition"
+      sum="1541c553eb881d92f18ce8d0fd1ab34a"
+      proved="true"
+      expanded="false"
+      shape="postconditionanodupV6V4Iainfix &lt;=c0V0Iainfix =agetV5V7agetV1V7Iainfix &lt;V7V0Aainfix &lt;=ainfix +V3c1V7FAaappearsV8V6V4qaappearsV8V2ainfix +V3c1FAanodupV6V4Aainfix &lt;=V4ainfix +V3c1Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter remove_duplicate.22"
+      locfile="../remove_duplicate.mlw"
+      loclnum="34" loccnumb="6" loccnume="22"
+      expl="22. postcondition"
+      sum="4bc1472f77d10707c1a6525bd31ad04d"
+      proved="true"
+      expanded="false"
+      shape="postconditionaappearsV7V6V4qaappearsV7V2V0FIainfix &lt;=c0V0Iainfix =agetV5V8agetV1V8Iainfix &lt;V8V0Aainfix &lt;=ainfix +V3c1V8FAaappearsV9V6V4qaappearsV9V2ainfix +V3c1FAanodupV6V4Aainfix &lt;=V4ainfix +V3c1Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for remove_duplicate"/>
+      <proof
+       prover="0"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>
