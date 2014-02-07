@@ -16,7 +16,7 @@ module Quicksort
   use import array.ArrayEq
 
   let rec quick_rec (t:array int) (l:int) (r:int) : unit variant { 1+r-l }
-    requires { 0 <= l /\ r < length t }
+    requires { 0 <= l <= r+1 <= length t }
     ensures { sorted_sub t l (r+1) /\ permut_sub (old t) t l (r+1) }
   = if l < r then begin
       let v = t[l] in
@@ -40,7 +40,7 @@ module Quicksort
 
   let test1 () =
     let a = make 3 0 in
-    a[0] <- 7; a[1] <- 3; a[2] <- 1; 
+    a[0] <- 7; a[1] <- 3; a[2] <- 1;
     quicksort a;
     a
 
