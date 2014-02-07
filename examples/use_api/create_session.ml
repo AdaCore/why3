@@ -59,7 +59,7 @@ let provers =
 let keygen ?parent () = ()
 
 (* create an empty session in the current directory *)
-let env_session,_ =
+let env_session,_,_ =
   let dummy_session : unit Session.session = Session.create_session "." in
   Session.update_session ~keygen ~allow_obsolete:true dummy_session env config
 
