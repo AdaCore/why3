@@ -49,4 +49,9 @@ module Algo64
       assert { permut_sub (at a 'L2) a m (n+1) }
     end
 
+  let qs (a:array int) : unit
+    ensures  { permut (old a) a }
+    ensures  { sorted a }
+  = if length a > 0 then quicksort a 0 (length a - 1)
+
 end
