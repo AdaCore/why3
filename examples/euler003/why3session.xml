@@ -1,0 +1,1395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="3"
+  name="Eprover"
+  version="1.8-001"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="4.3.1"/>
+ <file
+  name="../euler003.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="PrimeFactor"
+   locfile="../euler003.mlw"
+   loclnum="10" loccnumb="7" loccnume="18"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter smallest_divisor"
+    locfile="../euler003.mlw"
+    loclnum="19" loccnumb="8" loccnume="24"
+    expl="VC for smallest_divisor"
+    sum="4761d5be084e7a6de8182079b6e06405"
+    proved="true"
+    expanded="false"
+    shape="iiNadividesV4V1Iainfix &lt;V4V3Aainfix &lt;=c2V4FAadividesV3V1Aainfix &lt;=V3V1Aainfix &lt;=V0V3INadividesV5V1Iainfix &lt;V5V3Aainfix &lt;=c2V5FAadividesV3V1Aainfix &lt;=V3V1Aainfix &lt;=V2V3FANadividesV6V1Iainfix &lt;V6V2Aainfix &lt;=c2V6FAainfix &lt;=V2V1Aainfix &lt;=c2V2Aainfix &lt;=c2V1Aainfix &lt;ainfix -V1V2ainfix -V1V0Aainfix &lt;=c0ainfix -V1V0Lainfix +V0c1NadividesV7V1Iainfix &lt;V7V0Aainfix &lt;=c2V7FAadividesV0V1Aainfix &lt;=V0V1Aainfix &lt;=V0V0ainfix =amodV1V0c0Aainfix &gt;=V0c2NadividesV8V1Iainfix &lt;V8V1Aainfix &lt;=c2V8FAadividesV1V1Aainfix &lt;=V1V1Aainfix &lt;=V0V1AfAainfix &lt;V10V1Aainfix &gt;=V10c2AfAainfix &gt;=ainfix *V0V9ainfix *V0V0Aainfix &gt;=V1ainfix *V0V9Iainfix &gt;=V10V0Aainfix =ainfix *V10V9V1AadividesV10V1Aainfix =ainfix *V10V9V1LadivV1V9Aainfix &gt;=V9V0IadividesV9V1Aainfix &lt;V9V1Aainfix &lt;=c2V9Fainfix &gt;ainfix *V0V0V1INadividesV11V1Iainfix &lt;V11V0Aainfix &lt;=c2V11FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+    <label
+     name="expl:VC for smallest_divisor"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter smallest_divisor.1"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="1. assertion"
+      sum="68a049f79ff737130e89702d44bd066a"
+      proved="true"
+      expanded="false"
+      shape="assertionfAainfix &lt;V3V1Aainfix &gt;=V3c2AfAainfix &gt;=ainfix *V0V2ainfix *V0V0Aainfix &gt;=V1ainfix *V0V2Iainfix &gt;=V3V0Aainfix =ainfix *V3V2V1AadividesV3V1Aainfix =ainfix *V3V2V1LadivV1V2Aainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter smallest_divisor.1.1"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="1. assertion"
+        sum="c901e6ddd2b7271f7869b1773d373c37"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV3V1Iainfix &lt;V3V0Aainfix &lt;=c2V3FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter smallest_divisor.1.2"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="2. assertion"
+        sum="a80e3ff3c5c67a53cf1b3f3e8a549aa8"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix =ainfix *V3V2V1LadivV1V2Iainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.75"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter smallest_divisor.1.3"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="3. assertion"
+        sum="5aa11148a4e715ef23587330bc57e6ae"
+        proved="true"
+        expanded="false"
+        shape="assertionadividesV3V1Iainfix =ainfix *V3V2V1LadivV1V2Iainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter smallest_divisor.1.4"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="4. assertion"
+        sum="db867aea3a6dce6ad2c80a0f330c3512"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix =ainfix *V3V2V1IadividesV3V1Iainfix =ainfix *V3V2V1LadivV1V2Iainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter smallest_divisor.1.5"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="5. assertion"
+        sum="8ba72b24866e59ee96483ef8879ce716"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &gt;=V1ainfix *V0V2Iainfix &gt;=V3V0Iainfix =ainfix *V3V2V1IadividesV3V1Iainfix =ainfix *V3V2V1LadivV1V2Iainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter smallest_divisor.1.6"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="6. assertion"
+        sum="aaa0cc74a91fff711bc2cda7f5558f65"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &gt;=ainfix *V0V2ainfix *V0V0Iainfix &gt;=V3V0Iainfix =ainfix *V3V2V1IadividesV3V1Iainfix =ainfix *V3V2V1LadivV1V2Iainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter smallest_divisor.1.7"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="7. assertion"
+        sum="511148b8fb8d3c1735a752775819de44"
+        proved="true"
+        expanded="false"
+        shape="assertionfIainfix &gt;=ainfix *V0V2ainfix *V0V0Aainfix &gt;=V1ainfix *V0V2Iainfix &gt;=V3V0Iainfix =ainfix *V3V2V1IadividesV3V1Iainfix =ainfix *V3V2V1LadivV1V2Iainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter smallest_divisor.1.8"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="8. assertion"
+        sum="646fa51f9de870777f0ba8543039d71f"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &gt;=V3c2IfAainfix &gt;=ainfix *V0V2ainfix *V0V0Aainfix &gt;=V1ainfix *V0V2Iainfix &gt;=V3V0Iainfix =ainfix *V3V2V1IadividesV3V1Iainfix =ainfix *V3V2V1LadivV1V2Iainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter smallest_divisor.1.9"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="9. assertion"
+        sum="7f3c5c1059e39908a6dbf442a7ba0f67"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &lt;V3V1Iainfix &gt;=V3c2IfAainfix &gt;=ainfix *V0V2ainfix *V0V0Aainfix &gt;=V1ainfix *V0V2Iainfix &gt;=V3V0Iainfix =ainfix *V3V2V1IadividesV3V1Iainfix =ainfix *V3V2V1LadivV1V2Iainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter smallest_divisor.1.10"
+        locfile="../euler003.mlw"
+        loclnum="19" loccnumb="8" loccnume="24"
+        expl="10. assertion"
+        sum="16499ba922b21f00b540e6cf5b51c78f"
+        proved="true"
+        expanded="false"
+        shape="assertionfIainfix &lt;V3V1Iainfix &gt;=V3c2IfAainfix &gt;=ainfix *V0V2ainfix *V0V0Aainfix &gt;=V1ainfix *V0V2Iainfix &gt;=V3V0Iainfix =ainfix *V3V2V1IadividesV3V1Iainfix =ainfix *V3V2V1LadivV1V2Iainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+        <label
+         name="expl:VC for smallest_divisor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.14"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.2"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="2. postcondition"
+      sum="15fd7662f742a0fa3adace72484b09ad"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix &lt;=V1V1Aainfix &lt;=V0V1IfAainfix &lt;V3V1Aainfix &gt;=V3c2AfAainfix &gt;=ainfix *V0V2ainfix *V0V0Aainfix &gt;=V1ainfix *V0V2Iainfix &gt;=V3V0Aainfix =ainfix *V3V2V1AadividesV3V1Aainfix =ainfix *V3V2V1LadivV1V2Aainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.3"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="3. postcondition"
+      sum="894be0af6c7c90c82ae309b3d6859811"
+      proved="true"
+      expanded="false"
+      shape="postconditionadividesV1V1IfAainfix &lt;V3V1Aainfix &gt;=V3c2AfAainfix &gt;=ainfix *V0V2ainfix *V0V0Aainfix &gt;=V1ainfix *V0V2Iainfix &gt;=V3V0Aainfix =ainfix *V3V2V1AadividesV3V1Aainfix =ainfix *V3V2V1LadivV1V2Aainfix &gt;=V2V0IadividesV2V1Aainfix &lt;V2V1Aainfix &lt;=c2V2FIainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.4"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="4. postcondition"
+      sum="03d5eaae165d3ca92cc78f6883ddea5e"
+      proved="true"
+      expanded="false"
+      shape="postconditionNadividesV2V1Iainfix &lt;V2V1Aainfix &lt;=c2V2FIfAainfix &lt;V4V1Aainfix &gt;=V4c2AfAainfix &gt;=ainfix *V0V3ainfix *V0V0Aainfix &gt;=V1ainfix *V0V3Iainfix &gt;=V4V0Aainfix =ainfix *V4V3V1AadividesV4V1Aainfix =ainfix *V4V3V1LadivV1V3Aainfix &gt;=V3V0IadividesV3V1Aainfix &lt;V3V1Aainfix &lt;=c2V3FIainfix &gt;ainfix *V0V0V1INadividesV5V1Iainfix &lt;V5V0Aainfix &lt;=c2V5FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.5"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="5. postcondition"
+      sum="b8e04e744b5b716443101c57a6be3a35"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix &lt;=V0V1Aainfix &lt;=V0V0Iainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV2V1Iainfix &lt;V2V0Aainfix &lt;=c2V2FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.6"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="6. postcondition"
+      sum="8fc71fe7cffccbafca77f6e55b2a4981"
+      proved="true"
+      expanded="false"
+      shape="postconditionadividesV0V1Iainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV2V1Iainfix &lt;V2V0Aainfix &lt;=c2V2FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.7"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="7. postcondition"
+      sum="f669e5d3694943bce3d4af0f12056623"
+      proved="true"
+      expanded="false"
+      shape="postconditionNadividesV2V1Iainfix &lt;V2V0Aainfix &lt;=c2V2FIainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV3V1Iainfix &lt;V3V0Aainfix &lt;=c2V3FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.8"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="8. variant decrease"
+      sum="880ce09792b98a01f9a8e11aa95cc324"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseainfix &lt;ainfix -V1V2ainfix -V1V0Aainfix &lt;=c0ainfix -V1V0Lainfix +V0c1INainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV3V1Iainfix &lt;V3V0Aainfix &lt;=c2V3FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.9"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="9. precondition"
+      sum="772f70e0e44a0a9ddcc0c2912aa96dbf"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=c2V1Lainfix +V0c1INainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV3V1Iainfix &lt;V3V0Aainfix &lt;=c2V3FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.10"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="10. precondition"
+      sum="7f4bf840528bff67f55b8dd48009fc09"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=V2V1Aainfix &lt;=c2V2Lainfix +V0c1INainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV3V1Iainfix &lt;V3V0Aainfix &lt;=c2V3FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.24"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.11"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="11. precondition"
+      sum="f8ee405a980261e9f41992ef2132e3f8"
+      proved="true"
+      expanded="false"
+      shape="preconditionNadividesV3V1Iainfix &lt;V3V2Aainfix &lt;=c2V3FLainfix +V0c1INainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV4V1Iainfix &lt;V4V0Aainfix &lt;=c2V4FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.12"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="12. postcondition"
+      sum="1982e6ab84e4badea4ee23e466fdcaa0"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix &lt;=V3V1Aainfix &lt;=V0V3INadividesV4V1Iainfix &lt;V4V3Aainfix &lt;=c2V4FAadividesV3V1Aainfix &lt;=V3V1Aainfix &lt;=V2V3FINadividesV5V1Iainfix &lt;V5V2Aainfix &lt;=c2V5FAainfix &lt;=V2V1Aainfix &lt;=c2V2Aainfix &lt;=c2V1Lainfix +V0c1INainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV6V1Iainfix &lt;V6V0Aainfix &lt;=c2V6FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.13"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="13. postcondition"
+      sum="3e340c8b9e650c8b132b980ce88528e5"
+      proved="true"
+      expanded="false"
+      shape="postconditionadividesV3V1INadividesV4V1Iainfix &lt;V4V3Aainfix &lt;=c2V4FAadividesV3V1Aainfix &lt;=V3V1Aainfix &lt;=V2V3FINadividesV5V1Iainfix &lt;V5V2Aainfix &lt;=c2V5FAainfix &lt;=V2V1Aainfix &lt;=c2V2Aainfix &lt;=c2V1Lainfix +V0c1INainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV6V1Iainfix &lt;V6V0Aainfix &lt;=c2V6FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter smallest_divisor.14"
+      locfile="../euler003.mlw"
+      loclnum="19" loccnumb="8" loccnume="24"
+      expl="14. postcondition"
+      sum="b91bc3e12497b9ae1a641135d3d07f5e"
+      proved="true"
+      expanded="false"
+      shape="postconditionNadividesV4V1Iainfix &lt;V4V3Aainfix &lt;=c2V4FINadividesV5V1Iainfix &lt;V5V3Aainfix &lt;=c2V5FAadividesV3V1Aainfix &lt;=V3V1Aainfix &lt;=V2V3FINadividesV6V1Iainfix &lt;V6V2Aainfix &lt;=c2V6FAainfix &lt;=V2V1Aainfix &lt;=c2V2Aainfix &lt;=c2V1Lainfix +V0c1INainfix =amodV1V0c0Aainfix &gt;=V0c2INainfix &gt;ainfix *V0V0V1INadividesV7V1Iainfix &lt;V7V0Aainfix &lt;=c2V7FAainfix &lt;=V0V1Aainfix &lt;=c2V0Aainfix &lt;=c2V1F">
+      <label
+       name="expl:VC for smallest_divisor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter largest_prime_factor"
+    locfile="../euler003.mlw"
+    loclnum="55" loccnumb="4" loccnume="24"
+    expl="VC for largest_prime_factor"
+    sum="5fec65ff45a4771eefd18b438edc3877"
+    proved="true"
+    expanded="false"
+    shape="iNadividesV6V0AaprimeV6Iainfix &lt;=V6V0Aainfix &lt;V4V6FAadividesV4V0AaprimeV4ainfix &lt;V10V3Aainfix &lt;=c0V3AadividesV11V10Iainfix &gt;V11V8AadividesV11V0AaprimeV11FAadividesV12V0Aainfix &gt;=V12V8Iainfix &gt;=V12c2AadividesV12V10FAaprimeV8AadividesV8V0Aainfix &lt;=V8V0Aainfix &lt;=c2V8Aainfix &lt;=V10V0Aainfix &lt;=c1V10AadividesV13V10AacoprimeV7V13Aainfix &lt;V7V13Aainfix &lt;=c1V7AadividesV13V3Aainfix &gt;V13V4Iainfix &gt;V13V7AadividesV13V0AaprimeV13FAadividesV10V3Aainfix =ainfix *V10V7V3Iainfix =V10adivV3V7FIainfix =V9aConsV7V5FIainfix =V8V7FAaprimeV7INadividesV14V3Iainfix &lt;V14V7Aainfix &lt;=c2V14FAadividesV7V3Aainfix &lt;=V7V3Aainfix &lt;=V4V7FANadividesV15V3Iainfix &lt;V15V4Aainfix &lt;=c2V15FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Aainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3ainfix &gt;=V3c2IadividesV16V3Iainfix &gt;V16V4AadividesV16V0AaprimeV16FAadividesV17V0Aainfix &gt;=V17V4Iainfix &gt;=V17c2AadividesV17V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FAadividesV18adivV0V1Iainfix &gt;V18V1AadividesV18V0AaprimeV18FAadividesV19V0Aainfix &gt;=V19V1Iainfix &gt;=V19c2AadividesV19adivV0V1FAaprimeV1AadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1Aainfix &lt;=adivV0V1V0Aainfix &lt;=c1adivV0V1AadividesV20adivV0V1AacoprimeV1V20Iainfix &gt;V20V1AadividesV20V0AaprimeV20FAadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV21V0Iainfix &lt;V21V1Aainfix &lt;=c2V21FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FANadividesV22V0Iainfix &lt;V22c2Aainfix &lt;=c2V22FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+    <label
+     name="expl:VC for largest_prime_factor"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter largest_prime_factor.1"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="1. precondition"
+      sum="e43578b01fa416ce6bec19c75597c3be"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.2"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="2. precondition"
+      sum="1075671ac6fde30840484d7b966ad738"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=c2V0Aainfix &lt;=c2c2Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.3"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="3. precondition"
+      sum="adb4d58eec886cb537620ec7e33ccefb"
+      proved="true"
+      expanded="false"
+      shape="preconditionNadividesV1V0Iainfix &lt;V1c2Aainfix &lt;=c2V1FIainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.4"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="4. assertion"
+      sum="cc5d18f168e8f7ce309eb10a23f4a985"
+      proved="true"
+      expanded="false"
+      shape="assertionadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV3V0Iainfix &lt;V3V1Aainfix &lt;=c2V3FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV4V0Iainfix &lt;V4c2Aainfix &lt;=c2V4FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter largest_prime_factor.4.1"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="1."
+        sum="e6a0b1375262f0b47d3b3d5ea2c8587c"
+        proved="true"
+        expanded="false"
+        shape="ainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV3V0Iainfix &lt;V3V1Aainfix &lt;=c2V3FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV4V0Iainfix &lt;V4c2Aainfix &lt;=c2V4FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.32"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter largest_prime_factor.4.2"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="2."
+        sum="4d66a2cd507a1f8a297c28950be72774"
+        proved="true"
+        expanded="false"
+        shape="adividesadivV0V1V0Iainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV3V0Iainfix &lt;V3V1Aainfix &lt;=c2V3FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV4V0Iainfix &lt;V4c2Aainfix &lt;=c2V4FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.5"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="5. assertion"
+      sum="e1b4299472167882bd4825e22eb539fe"
+      proved="true"
+      expanded="false"
+      shape="assertionadividesV3adivV0V1AacoprimeV1V3Iainfix &gt;V3V1AadividesV3V0AaprimeV3FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV4V0Iainfix &lt;V4V1Aainfix &lt;=c2V4FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV5V0Iainfix &lt;V5c2Aainfix &lt;=c2V5FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.6"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="6. loop invariant init"
+      sum="c269df6268e9a261f9e42820cd0589ae"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=adivV0V1V0Aainfix &lt;=c1adivV0V1IadividesV3adivV0V1AacoprimeV1V3Iainfix &gt;V3V1AadividesV3V0AaprimeV3FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV4V0Iainfix &lt;V4V1Aainfix &lt;=c2V4FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV5V0Iainfix &lt;V5c2Aainfix &lt;=c2V5FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.40"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.7"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="7. loop invariant init"
+      sum="f31b098c0ee6719b448ffc7b9974cb58"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=V1V0Aainfix &lt;=c2V1IadividesV3adivV0V1AacoprimeV1V3Iainfix &gt;V3V1AadividesV3V0AaprimeV3FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV4V0Iainfix &lt;V4V1Aainfix &lt;=c2V4FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV5V0Iainfix &lt;V5c2Aainfix &lt;=c2V5FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.8"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="8. loop invariant init"
+      sum="4d75adbf70014d869316b421ffd15acf"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initadividesV1V0IadividesV3adivV0V1AacoprimeV1V3Iainfix &gt;V3V1AadividesV3V0AaprimeV3FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV4V0Iainfix &lt;V4V1Aainfix &lt;=c2V4FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV5V0Iainfix &lt;V5c2Aainfix &lt;=c2V5FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.9"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="9. loop invariant init"
+      sum="2b0227676595be09b78ae1b21a0440d0"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initaprimeV1IadividesV3adivV0V1AacoprimeV1V3Iainfix &gt;V3V1AadividesV3V0AaprimeV3FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV4V0Iainfix &lt;V4V1Aainfix &lt;=c2V4FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV5V0Iainfix &lt;V5c2Aainfix &lt;=c2V5FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.58"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.10"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="10. loop invariant init"
+      sum="f2dfba9b64df310435e92c4e6c1d30ea"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initadividesV3V0Aainfix &gt;=V3V1Iainfix &gt;=V3c2AadividesV3adivV0V1FIadividesV4adivV0V1AacoprimeV1V4Iainfix &gt;V4V1AadividesV4V0AaprimeV4FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV5V0Iainfix &lt;V5V1Aainfix &lt;=c2V5FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV6V0Iainfix &lt;V6c2Aainfix &lt;=c2V6FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.13"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.11"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="11. loop invariant init"
+      sum="bc0cecbae08eaefbb024c0c0a6b69784"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initadividesV3adivV0V1Iainfix &gt;V3V1AadividesV3V0AaprimeV3FIadividesV4adivV0V1AacoprimeV1V4Iainfix &gt;V4V1AadividesV4V0AaprimeV4FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV5V0Iainfix &lt;V5V1Aainfix &lt;=c2V5FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV6V0Iainfix &lt;V6c2Aainfix &lt;=c2V6FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.12"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="12. assertion"
+      sum="b744f295878e1008545b7bfe1201d84a"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV6V3Iainfix &gt;V6V4AadividesV6V0AaprimeV6FAadividesV7V0Aainfix &gt;=V7V4Iainfix &gt;=V7c2AadividesV7V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV8adivV0V1AacoprimeV1V8Iainfix &gt;V8V1AadividesV8V0AaprimeV8FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV9V0Iainfix &lt;V9V1Aainfix &lt;=c2V9FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV10V0Iainfix &lt;V10c2Aainfix &lt;=c2V10FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter largest_prime_factor.12.1"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="1."
+        sum="9eeac8a1d695dee28aa7b4bb708535a8"
+        proved="true"
+        expanded="false"
+        shape="adividesV3V3Iainfix &gt;=V3c2IadividesV6V3Iainfix &gt;V6V4AadividesV6V0AaprimeV6FAadividesV7V0Aainfix &gt;=V7V4Iainfix &gt;=V7c2AadividesV7V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV8adivV0V1AacoprimeV1V8Iainfix &gt;V8V1AadividesV8V0AaprimeV8FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV9V0Iainfix &lt;V9V1Aainfix &lt;=c2V9FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV10V0Iainfix &lt;V10c2Aainfix &lt;=c2V10FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter largest_prime_factor.12.2"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="2."
+        sum="568aace1a0a699e7bb169b5d8f9adc4b"
+        proved="true"
+        expanded="false"
+        shape="ainfix &gt;=V3c2IadividesV3V3Iainfix &gt;=V3c2IadividesV6V3Iainfix &gt;V6V4AadividesV6V0AaprimeV6FAadividesV7V0Aainfix &gt;=V7V4Iainfix &gt;=V7c2AadividesV7V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV8adivV0V1AacoprimeV1V8Iainfix &gt;V8V1AadividesV8V0AaprimeV8FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV9V0Iainfix &lt;V9V1Aainfix &lt;=c2V9FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV10V0Iainfix &lt;V10c2Aainfix &lt;=c2V10FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter largest_prime_factor.12.3"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="3."
+        sum="bb751dea04e869ea227aad3956bed0a9"
+        proved="true"
+        expanded="false"
+        shape="ainfix &gt;=V3V4Iainfix &gt;=V3c2IadividesV3V3Iainfix &gt;=V3c2IadividesV6V3Iainfix &gt;V6V4AadividesV6V0AaprimeV6FAadividesV7V0Aainfix &gt;=V7V4Iainfix &gt;=V7c2AadividesV7V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV8adivV0V1AacoprimeV1V8Iainfix &gt;V8V1AadividesV8V0AaprimeV8FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV9V0Iainfix &lt;V9V1Aainfix &lt;=c2V9FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV10V0Iainfix &lt;V10c2Aainfix &lt;=c2V10FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.13"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="13. precondition"
+      sum="92b9a9db8749422b3f22bed561361367"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV6V3Iainfix &gt;V6V4AadividesV6V0AaprimeV6FAadividesV7V0Aainfix &gt;=V7V4Iainfix &gt;=V7c2AadividesV7V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV8adivV0V1AacoprimeV1V8Iainfix &gt;V8V1AadividesV8V0AaprimeV8FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV9V0Iainfix &lt;V9V1Aainfix &lt;=c2V9FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV10V0Iainfix &lt;V10c2Aainfix &lt;=c2V10FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.14"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="14. precondition"
+      sum="c9e5b38cd837bd1e4f38422b5e7a3f6c"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=V4V3Aainfix &lt;=c2V4Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV6V3Iainfix &gt;V6V4AadividesV6V0AaprimeV6FAadividesV7V0Aainfix &gt;=V7V4Iainfix &gt;=V7c2AadividesV7V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV8adivV0V1AacoprimeV1V8Iainfix &gt;V8V1AadividesV8V0AaprimeV8FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV9V0Iainfix &lt;V9V1Aainfix &lt;=c2V9FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV10V0Iainfix &lt;V10c2Aainfix &lt;=c2V10FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.15"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="15. precondition"
+      sum="e3a5bfa146ea4c741156c028387c3ac6"
+      proved="true"
+      expanded="false"
+      shape="preconditionNadividesV6V3Iainfix &lt;V6V4Aainfix &lt;=c2V6FIainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV7V3Iainfix &gt;V7V4AadividesV7V0AaprimeV7FAadividesV8V0Aainfix &gt;=V8V4Iainfix &gt;=V8c2AadividesV8V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV9adivV0V1AacoprimeV1V9Iainfix &gt;V9V1AadividesV9V0AaprimeV9FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV10V0Iainfix &lt;V10V1Aainfix &lt;=c2V10FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV11V0Iainfix &lt;V11c2Aainfix &lt;=c2V11FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.16"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="16. assertion"
+      sum="55568d855214851f115e38e8af75ea6f"
+      proved="true"
+      expanded="false"
+      shape="assertionaprimeV6INadividesV7V3Iainfix &lt;V7V6Aainfix &lt;=c2V7FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV8V3Iainfix &lt;V8V4Aainfix &lt;=c2V8FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV9V3Iainfix &gt;V9V4AadividesV9V0AaprimeV9FAadividesV10V0Aainfix &gt;=V10V4Iainfix &gt;=V10c2AadividesV10V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV11adivV0V1AacoprimeV1V11Iainfix &gt;V11V1AadividesV11V0AaprimeV11FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV12V0Iainfix &lt;V12V1Aainfix &lt;=c2V12FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV13V0Iainfix &lt;V13c2Aainfix &lt;=c2V13FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.83"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.17"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="17. assertion"
+      sum="a4443804d97803f9bd1fa2a6ad1a9067"
+      proved="true"
+      expanded="false"
+      shape="assertionadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV10V3Iainfix &lt;V10V6Aainfix &lt;=c2V10FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV11V3Iainfix &lt;V11V4Aainfix &lt;=c2V11FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV12V3Iainfix &gt;V12V4AadividesV12V0AaprimeV12FAadividesV13V0Aainfix &gt;=V13V4Iainfix &gt;=V13c2AadividesV13V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV14adivV0V1AacoprimeV1V14Iainfix &gt;V14V1AadividesV14V0AaprimeV14FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV15V0Iainfix &lt;V15V1Aainfix &lt;=c2V15FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV16V0Iainfix &lt;V16c2Aainfix &lt;=c2V16FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter largest_prime_factor.17.1"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="1."
+        sum="8a9fb7b467456f895e66b377d16fa4d6"
+        proved="true"
+        expanded="false"
+        shape="ainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV10V3Iainfix &lt;V10V6Aainfix &lt;=c2V10FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV11V3Iainfix &lt;V11V4Aainfix &lt;=c2V11FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV12V3Iainfix &gt;V12V4AadividesV12V0AaprimeV12FAadividesV13V0Aainfix &gt;=V13V4Iainfix &gt;=V13c2AadividesV13V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV14adivV0V1AacoprimeV1V14Iainfix &gt;V14V1AadividesV14V0AaprimeV14FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV15V0Iainfix &lt;V15V1Aainfix &lt;=c2V15FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV16V0Iainfix &lt;V16c2Aainfix &lt;=c2V16FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.43"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter largest_prime_factor.17.2"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="2."
+        sum="a2ae87f63ed5222b99aa0c6a32b97eda"
+        proved="true"
+        expanded="false"
+        shape="adividesV9V3Iainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV10V3Iainfix &lt;V10V6Aainfix &lt;=c2V10FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV11V3Iainfix &lt;V11V4Aainfix &lt;=c2V11FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV12V3Iainfix &gt;V12V4AadividesV12V0AaprimeV12FAadividesV13V0Aainfix &gt;=V13V4Iainfix &gt;=V13c2AadividesV13V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV14adivV0V1AacoprimeV1V14Iainfix &gt;V14V1AadividesV14V0AaprimeV14FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV15V0Iainfix &lt;V15V1Aainfix &lt;=c2V15FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV16V0Iainfix &lt;V16c2Aainfix &lt;=c2V16FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.18"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="18. assertion"
+      sum="478edfe194a97c38ce3e916ad5dbd956"
+      proved="true"
+      expanded="false"
+      shape="assertionadividesV10V9AacoprimeV6V10Aainfix &lt;V6V10Aainfix &lt;=c1V6AadividesV10V3Aainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter largest_prime_factor.18.1"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="1. assertion"
+        sum="9ca501cbe01f8e5a7208ab6aa2ddf909"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter largest_prime_factor.18.2"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="2. assertion"
+        sum="8995314c8b2e176ebd3039c7a86644ac"
+        proved="true"
+        expanded="false"
+        shape="assertionadividesV10V3Iainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.11"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter largest_prime_factor.18.3"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="3. assertion"
+        sum="bc3e6b8b87ee1e5d8f3220765c2ffb72"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &lt;=c1V6IadividesV10V3Iainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter largest_prime_factor.18.4"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="4. assertion"
+        sum="20fef15af3b05cc31c41ed59bf3c05c0"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &lt;V6V10IadividesV10V3Iainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter largest_prime_factor.18.5"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="5. assertion"
+        sum="77b17a82eb7072a5a5cbb58c80656964"
+        proved="true"
+        expanded="false"
+        shape="assertionacoprimeV6V10Iainfix &lt;V6V10Aainfix &lt;=c1V6IadividesV10V3Iainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.73"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter largest_prime_factor.18.6"
+        locfile="../euler003.mlw"
+        loclnum="55" loccnumb="4" loccnume="24"
+        expl="6. assertion"
+        sum="24df0eafc8ac1f1f239d7a5bc64352d2"
+        proved="true"
+        expanded="false"
+        shape="assertionadividesV10V9IacoprimeV6V10Iainfix &lt;V6V10Aainfix &lt;=c1V6IadividesV10V3Iainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+        <label
+         name="expl:VC for largest_prime_factor"/>
+        <proof
+         prover="3"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.61"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.19"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="19. loop invariant preservation"
+      sum="1971ab60ee2ba17f7f7e4aa5a3aeec00"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V9V0Aainfix &lt;=c1V9IadividesV10V9AacoprimeV6V10Aainfix &lt;V6V10Aainfix &lt;=c1V6AadividesV10V3Aainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.20"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="20. loop invariant preservation"
+      sum="e680a2ce0e9ed0f5a7a5dfcc6adf13a4"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V7V0Aainfix &lt;=c2V7IadividesV10V9AacoprimeV6V10Aainfix &lt;V6V10Aainfix &lt;=c1V6AadividesV10V3Aainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.21"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="21. loop invariant preservation"
+      sum="95c58f1d7839fc781a5f6dc695564e8b"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationadividesV7V0IadividesV10V9AacoprimeV6V10Aainfix &lt;V6V10Aainfix &lt;=c1V6AadividesV10V3Aainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.30"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.22"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="22. loop invariant preservation"
+      sum="0c0e103258462b2f3e3ed528b574ad88"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationaprimeV7IadividesV10V9AacoprimeV6V10Aainfix &lt;V6V10Aainfix &lt;=c1V6AadividesV10V3Aainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.23"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="23. loop invariant preservation"
+      sum="994ce1b650342a57dd8ad520e2b4520b"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationadividesV10V0Aainfix &gt;=V10V7Iainfix &gt;=V10c2AadividesV10V9FIadividesV11V9AacoprimeV6V11Aainfix &lt;V6V11Aainfix &lt;=c1V6AadividesV11V3Aainfix &gt;V11V4Iainfix &gt;V11V6AadividesV11V0AaprimeV11FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV12V3Iainfix &lt;V12V6Aainfix &lt;=c2V12FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV13V3Iainfix &lt;V13V4Aainfix &lt;=c2V13FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV14V3Iainfix &gt;V14V4AadividesV14V0AaprimeV14FAadividesV15V0Aainfix &gt;=V15V4Iainfix &gt;=V15c2AadividesV15V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV16adivV0V1AacoprimeV1V16Iainfix &gt;V16V1AadividesV16V0AaprimeV16FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV17V0Iainfix &lt;V17V1Aainfix &lt;=c2V17FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV18V0Iainfix &lt;V18c2Aainfix &lt;=c2V18FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.20"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.24"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="24. loop invariant preservation"
+      sum="54847aeaf97e37d06d17a35b989239e0"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationadividesV10V9Iainfix &gt;V10V7AadividesV10V0AaprimeV10FIadividesV11V9AacoprimeV6V11Aainfix &lt;V6V11Aainfix &lt;=c1V6AadividesV11V3Aainfix &gt;V11V4Iainfix &gt;V11V6AadividesV11V0AaprimeV11FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV12V3Iainfix &lt;V12V6Aainfix &lt;=c2V12FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV13V3Iainfix &lt;V13V4Aainfix &lt;=c2V13FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV14V3Iainfix &gt;V14V4AadividesV14V0AaprimeV14FAadividesV15V0Aainfix &gt;=V15V4Iainfix &gt;=V15c2AadividesV15V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV16adivV0V1AacoprimeV1V16Iainfix &gt;V16V1AadividesV16V0AaprimeV16FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV17V0Iainfix &lt;V17V1Aainfix &lt;=c2V17FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV18V0Iainfix &lt;V18c2Aainfix &lt;=c2V18FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.26"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.25"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="25. loop variant decrease"
+      sum="92dc3d4f5754521af91ea1d6f86ad3e9"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;V9V3Aainfix &lt;=c0V3IadividesV10V9AacoprimeV6V10Aainfix &lt;V6V10Aainfix &lt;=c1V6AadividesV10V3Aainfix &gt;V10V4Iainfix &gt;V10V6AadividesV10V0AaprimeV10FIadividesV9V3Aainfix =ainfix *V9V6V3Iainfix =V9adivV3V6FIainfix =V8aConsV6V5FIainfix =V7V6FIaprimeV6INadividesV11V3Iainfix &lt;V11V6Aainfix &lt;=c2V11FAadividesV6V3Aainfix &lt;=V6V3Aainfix &lt;=V4V6FINadividesV12V3Iainfix &lt;V12V4Aainfix &lt;=c2V12FAainfix &lt;=V4V3Aainfix &lt;=c2V4Aainfix &lt;=c2V3Iainfix &gt;=V3V4Aainfix &gt;=V3c2AadividesV3V3Iainfix &gt;=V3c2IadividesV13V3Iainfix &gt;V13V4AadividesV13V0AaprimeV13FAadividesV14V0Aainfix &gt;=V14V4Iainfix &gt;=V14c2AadividesV14V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV15adivV0V1AacoprimeV1V15Iainfix &gt;V15V1AadividesV15V0AaprimeV15FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV16V0Iainfix &lt;V16V1Aainfix &lt;=c2V16FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV17V0Iainfix &lt;V17c2Aainfix &lt;=c2V17FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.26"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="26. postcondition"
+      sum="13d2c9ac3284545f948ce4ab3786c5d9"
+      proved="true"
+      expanded="false"
+      shape="postconditionaprimeV4INainfix &gt;=V3c2IadividesV6V3Iainfix &gt;V6V4AadividesV6V0AaprimeV6FAadividesV7V0Aainfix &gt;=V7V4Iainfix &gt;=V7c2AadividesV7V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV8adivV0V1AacoprimeV1V8Iainfix &gt;V8V1AadividesV8V0AaprimeV8FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV9V0Iainfix &lt;V9V1Aainfix &lt;=c2V9FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV10V0Iainfix &lt;V10c2Aainfix &lt;=c2V10FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.27"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="27. postcondition"
+      sum="fab2c2a6782a0439eebe70f625e09204"
+      proved="true"
+      expanded="false"
+      shape="postconditionadividesV4V0INainfix &gt;=V3c2IadividesV6V3Iainfix &gt;V6V4AadividesV6V0AaprimeV6FAadividesV7V0Aainfix &gt;=V7V4Iainfix &gt;=V7c2AadividesV7V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV8adivV0V1AacoprimeV1V8Iainfix &gt;V8V1AadividesV8V0AaprimeV8FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV9V0Iainfix &lt;V9V1Aainfix &lt;=c2V9FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV10V0Iainfix &lt;V10c2Aainfix &lt;=c2V10FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter largest_prime_factor.28"
+      locfile="../euler003.mlw"
+      loclnum="55" loccnumb="4" loccnume="24"
+      expl="28. postcondition"
+      sum="d9b90185098cf3b9c88669c5cf366502"
+      proved="true"
+      expanded="false"
+      shape="postconditionNadividesV6V0AaprimeV6Iainfix &lt;=V6V0Aainfix &lt;V4V6FINainfix &gt;=V3c2IadividesV7V3Iainfix &gt;V7V4AadividesV7V0AaprimeV7FAadividesV8V0Aainfix &gt;=V8V4Iainfix &gt;=V8c2AadividesV8V3FAaprimeV4AadividesV4V0Aainfix &lt;=V4V0Aainfix &lt;=c2V4Aainfix &lt;=V3V0Aainfix &lt;=c1V3FIadividesV9adivV0V1AacoprimeV1V9Iainfix &gt;V9V1AadividesV9V0AaprimeV9FIadividesadivV0V1V0Aainfix =ainfix *adivV0V1V1V0Iainfix =V2aConsV1aNilFINadividesV10V0Iainfix &lt;V10V1Aainfix &lt;=c2V10FAadividesV1V0Aainfix &lt;=V1V0Aainfix &lt;=c2V1FINadividesV11V0Iainfix &lt;V11c2Aainfix &lt;=c2V11FAainfix &lt;=c2V0Aainfix &lt;=c2c2Aainfix &lt;=c2V0Iainfix &lt;=c2V0F">
+      <label
+       name="expl:VC for largest_prime_factor"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.13"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter test"
+    locfile="../euler003.mlw"
+    loclnum="97" loccnumb="4" loccnume="8"
+    expl="VC for test"
+    sum="7850314bba5c86e1b01084be03f46308"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=c2c13195">
+    <label
+     name="expl:VC for test"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter solve"
+    locfile="../euler003.mlw"
+    loclnum="100" loccnumb="4" loccnume="9"
+    expl="VC for solve"
+    sum="ddf19e30cf464c94bc94a674b6b008c1"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=c2c600851475143">
+    <label
+     name="expl:VC for solve"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>
