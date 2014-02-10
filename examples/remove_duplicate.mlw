@@ -25,14 +25,13 @@ module RemoveDuplicateQuadratic
   use import Spec
   use import ref.Refint
 
-  let rec test_appears (ghost w:ref int) (v: 'a) (a: array 'a) (s: int) : bool
+  let rec test_appears (ghost w: ref int) (v: 'a) (a: array 'a) (s: int) : bool
     requires { 0 <= s <= length a }
     ensures  { result=true <-> appears v a s }
-    ensures { result=true -> 0 <= !w < s && a[!w] = v }
+    ensures  { result=true -> 0 <= !w < s && a[!w] = v }
     variant  { s }
-  = s > 0 && if a[s-1] = v
-      then begin w := s - 1 ; true end
-      else test_appears w v a (s-1)
+  = s > 0 &&
+    if a[s-1] = v then begin w := s - 1; true end else test_appears w v a (s-1)
 
   let remove_duplicate (a: array 'a) : int
     ensures { 0 <= result <= length a }
@@ -41,7 +40,7 @@ module RemoveDuplicateQuadratic
   = let n = length a in
     let r = ref 0 in
     let ghost from = make n 0 in
-    let ghost to_ = make n 0 in
+    let ghost to_  = make n 0 in
     'L:
     for i = 0 to n - 1 do
       invariant { 0 <= !r <= i }
