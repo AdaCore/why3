@@ -219,7 +219,7 @@ let denv_add_pat denv dp =
 
 (** Unification tools *)
 
-let dty_unify_app ls unify (l1: 'a list) (l2:dty list) =
+let dty_unify_app ls unify (l1: 'a list) (l2: dty list) =
   try List.iter2 unify l1 l2 with Invalid_argument _ ->
     raise (BadArity (ls, List.length l1))
 

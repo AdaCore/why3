@@ -540,7 +540,7 @@ let denv_get_opt denv n =
 
 (** Unification tools *)
 
-let dity_unify_app ls fn l1 (l2:dity list) =
+let dity_unify_app ls fn (l1: 'a list) (l2: dity list) =
   try List.iter2 fn l1 l2 with Invalid_argument _ ->
     raise (BadArity (ls, List.length l1))
 
@@ -884,7 +884,7 @@ let e_find_loc pr e =
 
 let lab_w_diverges_no = Ident.create_label "W:diverges:N"
 
-let check_user_effect ?ps e spec args full_xpost dsp =
+let check_user_effect ?ps e spec args dsp =
   let has_write reg eff =
     Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
   let has_raise xs eff =
@@ -892,6 +892,7 @@ let check_user_effect ?ps e spec args full_xpost dsp =
   (* computed effect vs user effect *)
   let eeff = spec.c_effect in
   let args = Spv.of_list args in
+  let full_xpost = ps <> None in
   let usvs, mreg, ueff = effect_of_dspec dsp in
   (* check that every user effect actually happens *)
   let check_read vs =
@@ -939,25 +940,17 @@ let check_user_effect ?ps e spec args full_xpost dsp =
       Mlw_pretty.print_xs xs in
   if full_xpost then Sexn.iter check_raise eeff.eff_raises;
   if full_xpost then Sexn.iter check_raise eeff.eff_ghostx;
-  if eeff.eff_diverg && not ueff.eff_diverg then
-    let loc =
-      match ps with
-      | None -> None
-      | Some p ->
-        let lab = p.ps_name.id_label in
-        if Slab.mem lab_w_diverges_no lab then None
-        else e_find_loc (fun e -> e.e_effect.eff_diverg) e
-    in match loc with
+  if eeff.eff_diverg && not ueff.eff_diverg then match ps with
+    | Some {ps_name = {id_label = l}} when Slab.mem lab_w_diverges_no l ->
+        Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
+          "this@ expression@ may@ diverge,@ \
+          which@ is@ not@ stated@ in@ the@ specification"
     | None -> ()
-    | Some _ ->
-      Warning.emit ?loc
-        "this@ expression@ may@ diverge,@ \
-        which@ is@ not@ stated@ in@ the@ specification"
 
 let check_lambda_effect ({fun_lambda = lam} as fd) bl dsp =
   let spec = fd.fun_ps.ps_aty.aty_spec in
   let args = fd.fun_ps.ps_aty.aty_args in
-  check_user_effect ~ps:fd.fun_ps lam.l_expr spec args true dsp;
+  check_user_effect ~ps:fd.fun_ps lam.l_expr spec args dsp;
   let optv = opaque_binders Stv.empty bl in
   let bad_comp tv _ _ = Loc.errorm
     ?loc:(e_find_loc (fun e -> Stv.mem tv e.e_effect.eff_compar) lam.l_expr)
@@ -1330,7 +1323,7 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
       if dsp.ds_variant <> [] then Loc.errorm
         "variants are not allowed in `abstract'";
       let spec = spec_of_dspec e.e_effect tyv dsp in
-      check_user_effect e spec [] false dsp;
+      check_user_effect e spec [] dsp;
       let speci = spec_invariant env e.e_syms.syms_pv e.e_vty spec in
       (* we do not require invariants on free variables *)
       e_abstract e { speci with c_pre = spec.c_pre }

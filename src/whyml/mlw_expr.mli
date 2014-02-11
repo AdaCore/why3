@@ -257,6 +257,6 @@ val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
 
 val e_find : (expr -> bool) -> expr -> expr
 (** [e_find pr e] returns a sub-expression of [e] satisfying [pr].
-    raises Not_found if no sub-expression satisfy [pr]. *)
+    raises [Not_found] if no sub-expression satisfies [pr]. *)
 
 val e_purify : expr -> term option
