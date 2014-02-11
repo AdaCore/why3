@@ -219,9 +219,9 @@ let denv_add_pat denv dp =
 
 (** Unification tools *)
 
-let dty_unify_app ls unify l1 l2 =
+let dty_unify_app ls unify (l1: 'a list) (l2:dty list) =
   try List.iter2 unify l1 l2 with Invalid_argument _ ->
-    raise (BadArity (ls, List.length l2))
+    raise (BadArity (ls, List.length l1))
 
 let dpat_expected_type dp dty =
   try dty_unify dp.dp_dty dty with Exit -> Loc.errorm ?loc:dp.dp_loc

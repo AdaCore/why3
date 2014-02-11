@@ -7,6 +7,13 @@ Ltac ae := why3 "alt-ergo" timelimit 3.
 *)
 
 
+theory W
+
+ use int.Int
+
+ predicate f (x:int) = Int.(<=) x
+
+end
 
 theory TestProp
 

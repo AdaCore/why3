@@ -540,9 +540,9 @@ let denv_get_opt denv n =
 
 (** Unification tools *)
 
-let dity_unify_app ls fn l1 l2 =
+let dity_unify_app ls fn l1 (l2:dity list) =
   try List.iter2 fn l1 l2 with Invalid_argument _ ->
-    raise (BadArity (ls, List.length l2))
+    raise (BadArity (ls, List.length l1))
 
 let dpat_expected_type {dp_dity = dp_dity; dp_loc = loc} dity =
   try dity_unify dp_dity dity with Exit -> Loc.errorm ?loc
