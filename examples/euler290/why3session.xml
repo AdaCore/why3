@@ -9,6 +9,14 @@
   id="1"
   name="CVC3"
   version="2.4.1"/>
+ <prover
+  id="2"
+  name="CVC4"
+  version="1.2"/>
+ <prover
+  id="3"
+  name="CVC4"
+  version="1.3"/>
  <file
   name="../euler290.mlw"
   verified="false"
@@ -57,17 +65,17 @@
     name="Induc"
     locfile="../euler290.mlw"
     loclnum="55" loccnumb="8" loccnume="13"
-    sum="cf43691d3fcaec2492b10c5ac20df569"
+    sum="ca95c539ce1f450727b457f26db7653c"
     proved="false"
     expanded="true"
-    shape="ainfix =asolutionV4V5ainfix -V6c1anum_of_modcaTuple3V0V1V2c0apowerc10V6Iainfix &gt;V6c0FLainfix -ainfix +amodV3c10V1V2LadivV3c10Lainfix +ainfix *c137V2V0Iainfix &lt;V2c10Aainfix &lt;=c0V2Iainfix &lt;=c0V0F">
+    shape="ainfix =asolutionV5V6ainfix -V3c1anum_of_modcaTuple3V0V1V2c0apowerc10V3Lainfix -ainfix +amodV4c10V1V2LadivV4c10Lainfix +ainfix *c137V2V0Iainfix &gt;V3c0Iainfix &lt;V2c10Aainfix &lt;=c0V2Iainfix &lt;=c0V0F">
    </goal>
    <goal
     name="WP_parameter sd"
     locfile="../euler290.mlw"
-    loclnum="67" loccnumb="10" loccnume="12"
+    loclnum="66" loccnumb="10" loccnume="12"
     expl="VC for sd"
-    sum="2d339bcd0e2d3a0a64e418be1b8470c6"
+    sum="8342411a644201fb547526bb6874ee10"
     proved="true"
     expanded="false"
     shape="iainfix =ainfix +asum_digitsV1amodV0c10asum_digitsV0Aainfix &gt;=V1c0Aainfix &lt;V1V0Aainfix &lt;=c0V0LadivV0c10ainfix =c0asum_digitsV0ainfix =V0c0Iainfix &gt;=V0c0F">
@@ -85,24 +93,24 @@
    <goal
     name="WP_parameter f"
     locfile="../euler290.mlw"
-    loclnum="75" loccnumb="10" loccnume="11"
+    loclnum="74" loccnumb="10" loccnume="11"
     expl="VC for f"
-    sum="747029b96bc67621d69f2403c2b42456"
+    sum="b23418f37a0e558c5966caa99f592e5a"
     proved="true"
-    expanded="false"
-    shape="iainfix =V3asolutionV1V2V0Iainfix =V3anum_ofaTuple3V1V2ainfix +c9c1c0apowerc10V0Aainfix =V8anum_ofaTuple3V1V2ainfix +V4c1c0apowerc10V0Iainfix =V8ainfix +V3asolutionV6ainfix -ainfix +amodV5c10V2V4V7FAainfix &lt;=c0V6Aainfix &lt;=c0V7Aainfix &lt;V7V0Aainfix &lt;=c0V0Lainfix -V0c1LadivV5c10Lainfix +ainfix *c137V4V1Iainfix =V3anum_ofaTuple3V1V2V4c0apowerc10V0Iainfix &lt;=V4c9Aainfix &lt;=c0V4FFAainfix =c0anum_ofaTuple3V1V2c0c0apowerc10V0Iainfix &lt;=c0c9Aainfix =c0asolutionV1V2V0Iainfix &gt;c0c9ainfix =ic0c1ainfix =ainfix +asum_digitsV1V2c0asolutionV1V2V0Aainfix &gt;=V1c0ainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+    expanded="true"
+    shape="iainfix =V4asolutionV1V2V0Iainfix =V4anum_ofaTuple3V1V2ainfix +c9c1c0V3Aainfix =V10anum_ofaTuple3V1V2ainfix +V5c1c0V3Aainfix =ainfix -V10V4anum_of_modcaTuple3V1V2V5c0V3Aainfix =V8amodV6c10Aainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FAainfix &lt;=c0V7Aainfix &lt;=c0V9Aainfix &lt;V9V0Aainfix &lt;=c0V0Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFAainfix =c0anum_ofaTuple3V1V2c0c0V3Iainfix &lt;=c0c9Aainfix =c0asolutionV1V2V0Iainfix &gt;c0c9Lapowerc10V0ainfix =ic0c1ainfix =ainfix +asum_digitsV1V2c0asolutionV1V2V0Aainfix &gt;=V1c0ainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
     <label
      name="expl:VC for f"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="WP_parameter f.1"
       locfile="../euler290.mlw"
-      loclnum="75" loccnumb="10" loccnume="11"
+      loclnum="74" loccnumb="10" loccnume="11"
       expl="1. precondition"
-      sum="33549ab3d57be34931226ccd0b65225e"
+      sum="df686f449aa663b84288cabd21ec8bfd"
       proved="true"
       expanded="false"
       shape="preconditionainfix &gt;=V1c0Iainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
@@ -110,7 +118,7 @@
        name="expl:VC for f"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -120,9 +128,9 @@
      <goal
       name="WP_parameter f.2"
       locfile="../euler290.mlw"
-      loclnum="75" loccnumb="10" loccnume="11"
+      loclnum="74" loccnumb="10" loccnume="11"
       expl="2. postcondition"
-      sum="7755175ab539038173c1ea75868f2bd8"
+      sum="11b1ec0d33a50b32990fa47977f57ba3"
       proved="true"
       expanded="false"
       shape="postconditionainfix =ic0c1ainfix =ainfix +asum_digitsV1V2c0asolutionV1V2V0Iainfix &gt;=V1c0Iainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
@@ -130,27 +138,27 @@
        name="expl:VC for f"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.70"/>
+       <result status="valid" time="0.08"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter f.3"
       locfile="../euler290.mlw"
-      loclnum="75" loccnumb="10" loccnume="11"
+      loclnum="74" loccnumb="10" loccnume="11"
       expl="3. postcondition"
-      sum="0e636ef68fb8ecb78a3fc9776fed83e4"
+      sum="3ac52b10a35bb138c192ad80f6690447"
       proved="true"
       expanded="false"
-      shape="postconditionainfix =c0asolutionV1V2V0Iainfix &gt;c0c9INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      shape="postconditionainfix =c0asolutionV1V2V0Iainfix &gt;c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for f"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -160,17 +168,17 @@
      <goal
       name="WP_parameter f.4"
       locfile="../euler290.mlw"
-      loclnum="75" loccnumb="10" loccnume="11"
+      loclnum="74" loccnumb="10" loccnume="11"
       expl="4. loop invariant init"
-      sum="d6b312ab912bcac4e24806c370c84aa3"
+      sum="b33e0bfa983d9f60d77faf7c42ee7f9c"
       proved="true"
       expanded="false"
-      shape="loop invariant initainfix =c0anum_ofaTuple3V1V2c0c0apowerc10V0Iainfix &lt;=c0c9INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      shape="loop invariant initainfix =c0anum_ofaTuple3V1V2c0c0V3Iainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for f"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -180,17 +188,17 @@
      <goal
       name="WP_parameter f.5"
       locfile="../euler290.mlw"
-      loclnum="75" loccnumb="10" loccnume="11"
+      loclnum="74" loccnumb="10" loccnume="11"
       expl="5. variant decrease"
-      sum="03bcd47b917f7102016280a9d25451f3"
+      sum="e82236042dfa76f945e256f165a6d76a"
       proved="true"
       expanded="false"
-      shape="variant decreaseainfix &lt;V7V0Aainfix &lt;=c0V0Lainfix -V0c1LadivV5c10Lainfix +ainfix *c137V4V1Iainfix =V3anum_ofaTuple3V1V2V4c0apowerc10V0Iainfix &lt;=V4c9Aainfix &lt;=c0V4FFIainfix &lt;=c0c9INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      shape="variant decreaseainfix &lt;V9V0Aainfix &lt;=c0V0Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for f"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -200,17 +208,17 @@
      <goal
       name="WP_parameter f.6"
       locfile="../euler290.mlw"
-      loclnum="75" loccnumb="10" loccnume="11"
+      loclnum="74" loccnumb="10" loccnume="11"
       expl="6. precondition"
-      sum="8c4279522a5afd47f25feddb2bf6da50"
+      sum="46fdaf3fc65dfa87f42bd3bf923abbf2"
       proved="true"
       expanded="false"
-      shape="preconditionainfix &lt;=c0V6Aainfix &lt;=c0V7Lainfix -V0c1LadivV5c10Lainfix +ainfix *c137V4V1Iainfix =V3anum_ofaTuple3V1V2V4c0apowerc10V0Iainfix &lt;=V4c9Aainfix &lt;=c0V4FFIainfix &lt;=c0c9INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      shape="preconditionainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for f"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -220,36 +228,76 @@
      <goal
       name="WP_parameter f.7"
       locfile="../euler290.mlw"
-      loclnum="75" loccnumb="10" loccnume="11"
-      expl="7. loop invariant preservation"
-      sum="bfa28bd4703499893c6377c9d72f5924"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="7. assertion"
+      sum="9d1074bedd3d5967f8e3721034d6c2ba"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =V8anum_ofaTuple3V1V2ainfix +V4c1c0apowerc10V0Iainfix =V8ainfix +V3asolutionV6ainfix -ainfix +amodV5c10V2V4V7FIainfix &lt;=c0V6Aainfix &lt;=c0V7Lainfix -V0c1LadivV5c10Lainfix +ainfix *c137V4V1Iainfix =V3anum_ofaTuple3V1V2V4c0apowerc10V0Iainfix &lt;=V4c9Aainfix &lt;=c0V4FFIainfix &lt;=c0c9INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      shape="assertionainfix =ainfix -V10V4anum_of_modcaTuple3V1V2V5c0V3Aainfix =V8amodV6c10Aainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for f"/>
       <transf
-       name="inline_goal"
+       name="split_goal_wp"
        proved="true"
        expanded="false">
        <goal
         name="WP_parameter f.7.1"
         locfile="../euler290.mlw"
-        loclnum="75" loccnumb="10" loccnume="11"
-        expl="1. loop invariant preservation"
-        sum="140d7d31a2c129f7f00367a760487594"
+        loclnum="74" loccnumb="10" loccnume="11"
+        expl="1."
+        sum="c741fcd5dffae3dfa67eb1ee25d02f09"
         proved="true"
         expanded="false"
-        shape="loop invariant preservationainfix =V8anum_ofaTuple3V1V2ainfix +V4c1c0apowerc10V0Iainfix =V8ainfix +V3asolutionV6ainfix -ainfix +amodV5c10V2V4V7FIainfix =c0V6Oainfix &lt;c0V6Aainfix =c0V7Oainfix &lt;c0V7Lainfix -V0c1LadivV5c10Lainfix +ainfix *c137V4V1Iainfix =V3anum_ofaTuple3V1V2V4c0apowerc10V0Iainfix =V4c9Oainfix &lt;V4c9Aainfix =c0V4Oainfix &lt;c0V4FFIainfix =c0c9Oainfix &lt;c0c9INainfix =V0c0Iainfix =c0V1Oainfix &lt;c0V1Aainfix =c0V0Oainfix &lt;c0V0F">
+        shape="ainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
         <label
          name="expl:VC for f"/>
         <proof
-         prover="1"
-         timelimit="60"
+         prover="0"
+         timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="47.04"/>
+         <result status="valid" time="0.30"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter f.7.2"
+        locfile="../euler290.mlw"
+        loclnum="74" loccnumb="10" loccnume="11"
+        expl="2."
+        sum="4a9bd4a92b6ccd11cd3686bc7550c62e"
+        proved="true"
+        expanded="false"
+        shape="ainfix =V8amodV6c10Iainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for f"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter f.7.3"
+        locfile="../euler290.mlw"
+        loclnum="74" loccnumb="10" loccnume="11"
+        expl="3."
+        sum="fa1f48fc01ddf17792a7399273cb6644"
+        proved="true"
+        expanded="false"
+        shape="ainfix =ainfix -V10V4anum_of_modcaTuple3V1V2V5c0V3Iainfix =V8amodV6c10Iainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for f"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
         </proof>
        </goal>
       </transf>
@@ -257,17 +305,61 @@
      <goal
       name="WP_parameter f.8"
       locfile="../euler290.mlw"
-      loclnum="75" loccnumb="10" loccnume="11"
-      expl="8. postcondition"
-      sum="ca337390e8505769e64d34de5d331c65"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="8. loop invariant preservation"
+      sum="b4967c65aa346cec7fa0e03362930b2d"
       proved="true"
       expanded="false"
-      shape="postconditionainfix =V3asolutionV1V2V0Iainfix =V3anum_ofaTuple3V1V2ainfix +c9c1c0apowerc10V0FIainfix &lt;=c0c9INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      shape="loop invariant preservationainfix =V10anum_ofaTuple3V1V2ainfix +V5c1c0V3Iainfix =ainfix -V10V4anum_of_modcaTuple3V1V2V5c0V3Aainfix =V8amodV6c10Aainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
       <label
        name="expl:VC for f"/>
       <proof
        prover="0"
-       timelimit="10"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.86"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.9"
+      locfile="../euler290.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="9. postcondition"
+      sum="a99c47b1acc72b443c11156626b0a8c7"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =V4asolutionV1V2V0Iainfix =V4anum_ofaTuple3V1V2ainfix +c9c1c0V3FIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">

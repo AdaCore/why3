@@ -18,7 +18,7 @@ module Euler290
 
   use import int.Int
   use import ref.Ref
-  use import int.EuclideanDivision
+  use import int.EuclideanDivision as E
   use import int.Power
 
   function sum_digits int : int
@@ -51,13 +51,12 @@ module Euler290
 
   lemma Empty:
     forall a b x y: int. P.num_of (a,b,0) x y = 0
-
+  
   lemma Induc:
-    forall a b c: int. 0 <= a -> 0 <= c < 10 ->
+    forall a b c: int,m:int. 0 <= a -> 0 <= c < 10 -> m > 0 ->
     let x = 137 * c + a in
     let a' = div x 10 in
     let b' = mod x 10 + b - c in
-    forall m: int. m > 0 ->
     solution a' b' (m-1) = num_of_modc (a,b,c) 0 (power 10 m)
 
   (* code *)
@@ -81,12 +80,17 @@ module Euler290
       if sd a + b = 0 then 1 else 0
     end else begin
       let sum = ref 0 in
+      let ghost p = power 10 m in
       for c = 0 to 9 do (* count the n st n mod 10 = c *)
-        invariant { !sum = P.num_of (a,b,c) 0 (power 10 m) }
+        invariant { !sum = P.num_of (a,b,c) 0 p }
+        'L:
         let x = 137 * c + a in
         let q = div x 10 in
         let r = mod x 10 in
-        sum := !sum + f (m-1) q (r + b - c)
+        let b' = (r+b-c) in
+        sum := !sum + f (m-1) q b';
+        assert { q = E.div x 10 && r = E.mod x 10 &&
+          !sum - !(at sum 'L) = num_of_modc (a,b,c) 0 p }
       done;
       !sum
     end
