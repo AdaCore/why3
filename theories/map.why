@@ -99,20 +99,20 @@ theory MapPermut
   use import Map
   use import MapEq
 
-  inductive permut_sub (map int 'a) (map int 'a) int int =
+  inductive permut (map int 'a) (map int 'a) int int =
   | permut_refl : (* a1[l..u[ and a2[l..u[ are identical *)
       forall a1 a2 : map int 'a. forall l u : int.
-      map_eq_sub a1 a2 l u -> permut_sub a1 a2 l u
+      map_eq_sub a1 a2 l u -> permut a1 a2 l u
   | permut_trans : (* transitivity *)
       forall a1 a2 a3 : map int 'a. forall l u : int.
-      permut_sub a1 a2 l u -> permut_sub a2 a3 l u -> permut_sub a1 a3 l u
+      permut a1 a2 l u -> permut a2 a3 l u -> permut a1 a3 l u
   | permut_exchange : (* elements at indices i and j have been swapped *)
       forall a1 a2 : map int 'a. forall l u i j : int.
       l <= i < u -> l <= j < u -> i <> j ->
       a1[i] = a2[j] -> a1[j] = a2[i] ->
       (forall k:int. l <= k < u -> k <> i -> k <> j -> a1[k] = a2[k]) ->
-      permut_sub a1 a2 l u
-  (** [permut_sub m1 m2 l u] is true when the segment
+      permut a1 a2 l u
+  (** [permut m1 m2 l u] is true when the segment
       [m1(l..u-1)] is a permutation of the segment [m2(l..u-1)].
       Values outside of the interval (l..u-1) are ignored.
 
@@ -122,22 +122,22 @@ theory MapPermut
   (* symmetry can be proved *)
   lemma permut_sym:
     forall a1 a2 : map int 'a. forall l u : int.
-    permut_sub a1 a2 l u -> permut_sub a2 a1 l u
+    permut a1 a2 l u -> permut a2 a1 l u
 
   lemma permut_exchange_set :
     forall a: map int 'a. forall l u i j: int.
-    l <= i < u -> l <= j < u -> permut_sub a a[i <- a[j]][j <- a[i]] l u
+    l <= i < u -> l <= j < u -> permut a a[i <- a[j]][j <- a[i]] l u
 
   lemma permut_exists :
     forall a1 a2: map int 'a. forall l u: int.
-    permut_sub a1 a2 l u ->
+    permut a1 a2 l u ->
     forall i: int. l <= i < u ->
     exists j: int. l <= j < u /\ a2[i] = a1[j]
 
 (*
-  lemma permut_sub_concat:
+  lemma permut_concat:
     forall a1 a2: map int 'a, l m u: int.
-    permut_sub a1 a2 l m -> permut_sub a1 a2 m u -> permut_sub a1 a2 l u
+    permut a1 a2 l m -> permut a1 a2 m u -> permut a1 a2 l u
 *)
 
 end

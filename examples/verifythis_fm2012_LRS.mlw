@@ -257,18 +257,18 @@ let sort (a:array int) (data : array int)
   requires { data.length = a.length }
   requires { range data }
   ensures { sorted a data }
-  ensures { ArrayPermut.permut (old data) data }
+  ensures { ArrayPermut.permut_all (old data) data }
   =
    'Init:
    for i = 0 to data.length - 1 do
-     invariant { ArrayPermut.permut (at data 'Init) data   }
+     invariant { ArrayPermut.permut_all (at data 'Init) data   }
      invariant { sorted_sub a data.elts 0 i  }
      invariant { range data }
      let j = ref i in
      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
        invariant { 0 <= !j <= i }
        invariant { range data }
-       invariant { ArrayPermut.permut (at data 'Init) data   }
+       invariant { ArrayPermut.permut_all (at data 'Init) data   }
        invariant { sorted_sub a data.elts 0 !j }
        invariant { sorted_sub a data.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
@@ -353,7 +353,7 @@ use array.ArrayPermut
 
 (** needed to establish invariant in function [create] *)
 lemma permut_permutation : forall a1 a2:array int.
-  ArrayPermut.permut a1 a2 /\ permutation a1.elts a1.length ->
+  ArrayPermut.permut_all a1 a2 /\ permutation a1.elts a1.length ->
     permutation a2.elts a2.length
 
 (** constructor of suffixArray structure *)

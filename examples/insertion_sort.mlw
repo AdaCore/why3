@@ -11,16 +11,16 @@ module InsertionSort
   use import array.ArrayEq
 
   let insertion_sort (a: array int) =
-    ensures { sorted a /\ permut (old a) a }
+    ensures { sorted a /\ permut_all (old a) a }
 'L:
     for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
-      invariant { sorted_sub a 0 i /\ permut (at a 'L) a }
+      invariant { sorted_sub a 0 i /\ permut_all (at a 'L) a }
       let v = a[i] in
       let j = ref i in
       while !j > 0 && a[!j - 1] > v do
         invariant { 0 <= !j <= i }
-        invariant { permut (at a 'L) a[!j <- v] }
+        invariant { permut_all (at a 'L) a[!j <- v] }
         invariant { forall k1 k2: int.
              0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> a[k1] <= a[k2] }
         invariant { forall k: int. !j+1 <= k <= i -> v < a[k] }
@@ -86,16 +86,16 @@ module InsertionSortGen
     M.sorted_sub a.elts 0 a.length
 
   let insertion_sort (a: array elt) =
-    ensures { sorted a /\ permut (old a) a }
+    ensures { sorted a /\ permut_all (old a) a }
 'L:
     for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
-      invariant { sorted_sub a 0 i /\ permut (at a 'L) a }
+      invariant { sorted_sub a 0 i /\ permut_all (at a 'L) a }
       let v = a[i] in
       let j = ref i in
       while !j > 0 && not (le a[!j - 1] v) do
         invariant { 0 <= !j <= i }
-        invariant { permut (at a 'L) a[!j <- v] }
+        invariant { permut_all (at a 'L) a[!j <- v] }
         invariant { forall k1 k2: int.
              0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> le a[k1] a[k2] }
         invariant { forall k: int. !j+1 <= k <= i -> le v a[k] }

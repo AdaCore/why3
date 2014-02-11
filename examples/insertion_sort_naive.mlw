@@ -17,16 +17,16 @@ module InsertionSortNaive
 
   let sort (a:array int) 
     ensures { sorted a }
-    ensures { permut (old a) a }
+    ensures { permut_all (old a) a }
   =
    'Init:
    for i = 0 to a.length - 1 do
-     invariant { permut (at a 'Init) a   }
+     invariant { permut_all (at a 'Init) a   }
      invariant { sorted_sub a 0 i  }
      let j = ref i in
      while !j > 0 && a[!j-1] > a[!j]  do
        invariant { 0 <= !j <= i }
-       invariant { permut (at a 'Init) a   }
+       invariant { permut_all (at a 'Init) a   }
        invariant { sorted_sub a 0 !j }
        invariant { sorted_sub a !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
@@ -70,16 +70,16 @@ module InsertionSortNaiveGen
 
   let sort (a:array elt) 
     ensures { sorted a }
-    ensures { permut (old a) a }
+    ensures { permut_all (old a) a }
   =
    'Init:
    for i = 0 to a.length - 1 do
-     invariant { permut (at a 'Init) a   }
+     invariant { permut_all (at a 'Init) a   }
      invariant { sorted_sub a 0 i  }
      let j = ref i in
      while !j > 0 && not (le a[!j-1] a[!j])  do
        invariant { 0 <= !j <= i }
-       invariant { permut (at a 'Init) a   }
+       invariant { permut_all (at a 'Init) a   }
        invariant { sorted_sub a 0 !j }
        invariant { sorted_sub a !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
@@ -130,16 +130,16 @@ module InsertionSortParam
 
   let sort (p:param) (a:array elt)
     ensures { sorted p a }
-    ensures { permut (old a) a }
+    ensures { permut_all (old a) a }
   =
    'Init:
    for i = 0 to a.length - 1 do
-     invariant { permut (at a 'Init) a   }
+     invariant { permut_all (at a 'Init) a   }
      invariant { sorted_sub p a.elts 0 i  }
      let j = ref i in
      while !j > 0 && not (le p a[!j-1] a[!j])  do
        invariant { 0 <= !j <= i }
-       invariant { permut (at a 'Init) a   }
+       invariant { permut_all (at a 'Init) a   }
        invariant { sorted_sub p a.elts 0 !j }
        invariant { sorted_sub p a.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
@@ -191,16 +191,16 @@ module InsertionSortParamBad
 
   let sort (p:param) (a:array elt)
     ensures { sorted p a }
-    ensures { permut (old a) a }
+    ensures { permut_all (old a) a }
   =
    'Init:
    for i = 0 to a.length - 1 do
-     invariant { permut (at a 'Init) a   }
+     invariant { permut_all (at a 'Init) a   }
      invariant { sorted_sub p a 0 i  }
      let j = ref i in
      while !j > 0 && not (le p a[!j-1] a[!j])  do
        invariant { 0 <= !j <= i }
-       invariant { permut (at a 'Init) a   }
+       invariant { permut_all (at a 'Init) a   }
        invariant { sorted_sub p a 0 !j }
        invariant { sorted_sub p a !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->

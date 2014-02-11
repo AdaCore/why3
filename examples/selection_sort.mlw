@@ -12,12 +12,12 @@ module SelectionSort
   use import array.ArrayEq
 
   let selection_sort (a: array int)
-    ensures { sorted a /\ permut (old a) a } =
+    ensures { sorted a /\ permut_all (old a) a } =
 'L:
     let min = ref 0 in
     for i = 0 to length a - 1 do
       (* a[0..i[ is sorted; now find minimum of a[i..n[ *)
-      invariant { sorted_sub a 0 i /\ permut (at a 'L) a /\
+      invariant { sorted_sub a 0 i /\ permut_all (at a 'L) a /\
           forall k1 k2: int. 0 <= k1 < i <= k2 < length a -> a[k1] <= a[k2] }
       (* let min = ref i in *) min := i;
       for j = i + 1 to length a - 1 do
@@ -27,7 +27,7 @@ module SelectionSort
       done;
 'L1:
       if !min <> i then swap a !min i;
-      assert { permut (at a 'L1) a }
+      assert { permut_all (at a 'L1) a }
     done
 
   let test1 () =

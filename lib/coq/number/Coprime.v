@@ -67,3 +67,4 @@ intros p a b (h1,h2).
 apply Znumtheory.prime_mult; auto.
 now rewrite <- Prime.prime_is_Zprime.
 Qed.
+

@@ -34,7 +34,7 @@ module Quicksort
     end
 
   let quicksort (t : array int) =
-    ensures { sorted t /\ permut (old t) t }
+    ensures { sorted t /\ permut_all (old t) t }
     quick_rec t 0 (length t - 1)
 
 

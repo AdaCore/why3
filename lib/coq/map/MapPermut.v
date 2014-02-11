@@ -11,27 +11,27 @@ Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _
   ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
 
 (* Why3 assumption *)
-Inductive permut_sub {a:Type} {a_WT:WhyType a} : (@map.Map.map Z _ a a_WT) ->
+Inductive permut {a:Type} {a_WT:WhyType a} : (@map.Map.map Z _ a a_WT) ->
   (@map.Map.map Z _ a a_WT) -> Z -> Z -> Prop :=
   | permut_refl : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _
-      a a_WT)), forall (l:Z) (u:Z), (map_eq_sub a1 a2 l u) ->
-      ((@permut_sub _ _) a1 a2 l u)
+      a a_WT)), forall (l:Z) (u:Z), (map_eq_sub a1 a2 l u) -> ((@permut _ _)
+      a1 a2 l u)
   | permut_trans : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map
       Z _ a a_WT)) (a3:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z),
-      ((@permut_sub _ _) a1 a2 l u) -> (((@permut_sub _ _) a2 a3 l u) ->
-      ((@permut_sub _ _) a1 a3 l u))
+      ((@permut _ _) a1 a2 l u) -> (((@permut _ _) a2 a3 l u) ->
+      ((@permut _ _) a1 a3 l u))
   | permut_exchange : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map
       Z _ a a_WT)), forall (l:Z) (u:Z) (i:Z) (j:Z), ((l <= i)%Z /\
       (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> ((~ (i = j)) ->
       (((map.Map.get a1 i) = (map.Map.get a2 j)) -> (((map.Map.get a1
       j) = (map.Map.get a2 i)) -> ((forall (k:Z), ((l <= k)%Z /\
       (k < u)%Z) -> ((~ (k = i)) -> ((~ (k = j)) -> ((map.Map.get a1
-      k) = (map.Map.get a2 k))))) -> ((@permut_sub _ _) a1 a2 l u)))))).
+      k) = (map.Map.get a2 k))))) -> ((@permut _ _) a1 a2 l u)))))).
 
 (* Why3 goal *)
 Lemma permut_sym : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@map.Map.map
-  Z _ a a_WT)) (a2:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z),
-  (permut_sub a1 a2 l u) -> (permut_sub a2 a1 l u).
+  Z _ a a_WT)) (a2:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z), (permut a1
+  a2 l u) -> (permut a2 a1 l u).
 intros a a_WT a1 a2 l u h1.
 induction h1; intuition.
 apply permut_refl; unfold map_eq_sub in *; intuition.
@@ -44,7 +44,7 @@ Qed.
 (* Why3 goal *)
 Lemma permut_exchange_set : forall {a:Type} {a_WT:WhyType a},
   forall (a1:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z) (i:Z) (j:Z),
-  ((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> (permut_sub a1
+  ((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> (permut a1
   (map.Map.set (map.Map.set a1 i (map.Map.get a1 j)) j (map.Map.get a1 i)) l
   u)).
 intros a a_WT a1 l u i j (h1,h2) (h3,h4).
@@ -68,7 +68,7 @@ Qed.
 (* Why3 goal *)
 Lemma permut_exists : forall {a:Type} {a_WT:WhyType a},
   forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _ a a_WT)),
-  forall (l:Z) (u:Z), (permut_sub a1 a2 l u) -> forall (i:Z), ((l <= i)%Z /\
+  forall (l:Z) (u:Z), (permut a1 a2 l u) -> forall (i:Z), ((l <= i)%Z /\
   (i < u)%Z) -> exists j:Z, ((l <= j)%Z /\ (j < u)%Z) /\ ((map.Map.get a2
   i) = (map.Map.get a1 j)).
 Proof.
