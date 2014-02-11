@@ -941,11 +941,12 @@ let check_user_effect ?ps e spec args dsp =
   if full_xpost then Sexn.iter check_raise eeff.eff_raises;
   if full_xpost then Sexn.iter check_raise eeff.eff_ghostx;
   if eeff.eff_diverg && not ueff.eff_diverg then match ps with
-    | Some {ps_name = {id_label = l}} when Slab.mem lab_w_diverges_no l ->
-        Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
-          "this@ expression@ may@ diverge,@ \
+    | Some {ps_name = {id_label = l}} 
+        when not (Slab.mem lab_w_diverges_no l) ->
+      Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
+        "this@ expression@ may@ diverge,@ \
           which@ is@ not@ stated@ in@ the@ specification"
-    | None -> ()
+    | _ -> ()
 
 let check_lambda_effect ({fun_lambda = lam} as fd) bl dsp =
   let spec = fd.fun_ps.ps_aty.aty_spec in
