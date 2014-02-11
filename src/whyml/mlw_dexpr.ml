@@ -882,7 +882,9 @@ let e_find_loc pr e =
   try (e_find (fun e -> e.e_loc <> None && pr e) e).e_loc
   with Not_found -> None
 
-let check_user_effect e spec args full_xpost dsp =
+let lab_w_diverges_no = Ident.create_label "W:diverges:N"
+
+let check_user_effect ?ps e spec args full_xpost dsp =
   let has_write reg eff =
     Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
   let has_raise xs eff =
@@ -938,14 +940,24 @@ let check_user_effect e spec args full_xpost dsp =
   if full_xpost then Sexn.iter check_raise eeff.eff_raises;
   if full_xpost then Sexn.iter check_raise eeff.eff_ghostx;
   if eeff.eff_diverg && not ueff.eff_diverg then
-    Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
-      "this@ expression@ may@ diverge,@ \
+    let loc =
+      match ps with
+      | None -> None
+      | Some p ->
+        let lab = p.ps_name.id_label in
+        if Slab.mem lab_w_diverges_no lab then None
+        else e_find_loc (fun e -> e.e_effect.eff_diverg) e
+    in match loc with
+    | None -> ()
+    | Some _ ->
+      Warning.emit ?loc
+        "this@ expression@ may@ diverge,@ \
         which@ is@ not@ stated@ in@ the@ specification"
 
 let check_lambda_effect ({fun_lambda = lam} as fd) bl dsp =
   let spec = fd.fun_ps.ps_aty.aty_spec in
   let args = fd.fun_ps.ps_aty.aty_args in
-  check_user_effect lam.l_expr spec args true dsp;
+  check_user_effect ~ps:fd.fun_ps lam.l_expr spec args true dsp;
   let optv = opaque_binders Stv.empty bl in
   let bad_comp tv _ _ = Loc.errorm
     ?loc:(e_find_loc (fun e -> Stv.mem tv e.e_effect.eff_compar) lam.l_expr)

@@ -24,7 +24,7 @@ module Termination
   predicate q (x:t) =
     match x with
     | A (A y) -> q y
-    | A y -> false
+    | A _y -> false
     | B -> true
     end
 
@@ -37,6 +37,13 @@ module Termination
     | E D -> true
     end
 
+
+  let rec f "W:diverges:N" (x:t) : t =
+    let _y = 42 in
+    f x
+
+  let g "W:diverges:N" (x:t) : t =
+    while true do () done; x
 
 end
 
