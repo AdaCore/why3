@@ -248,6 +248,7 @@ module ZipperBased
             match t2 with Node l2 _ -> g (Cons (d2+1, l2) left)
                         | Leaf      -> true end
         | Nil -> true end }
+    variant { length left + 2 * length right }
     ensures { depths 0 result = forest_depths (reverse left ++ right) }
     raises { Failure ->
       forall t: tree. depths 0 t <> forest_depths (reverse left ++ right) }

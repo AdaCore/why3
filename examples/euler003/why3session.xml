@@ -16,9 +16,17 @@
  <prover
   id="3"
   name="Eprover"
-  version="1.8-001"/>
+  version="1.6"/>
  <prover
   id="4"
+  name="Eprover"
+  version="1.8-001"/>
+ <prover
+  id="5"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="6"
   name="Z3"
   version="4.3.1"/>
  <file
@@ -98,7 +106,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.75"/>
+         <result status="valid" time="0.83"/>
         </proof>
        </goal>
        <goal
@@ -173,7 +181,7 @@
         <label
          name="expl:VC for smallest_divisor"/>
         <proof
-         prover="4"
+         prover="6"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
@@ -213,7 +221,7 @@
         <label
          name="expl:VC for smallest_divisor"/>
         <proof
-         prover="4"
+         prover="6"
          timelimit="5"
          memlimit="1000"
          obsolete="false"
@@ -632,7 +640,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.32"/>
+         <result status="valid" time="0.85"/>
         </proof>
        </goal>
        <goal
@@ -694,7 +702,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.40"/>
+       <result status="valid" time="0.14"/>
       </proof>
      </goal>
      <goal
@@ -986,7 +994,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.43"/>
+         <result status="valid" time="2.92"/>
         </proof>
        </goal>
        <goal
@@ -1123,7 +1131,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.73"/>
+         <result status="valid" time="1.31"/>
         </proof>
        </goal>
        <goal
@@ -1140,10 +1148,26 @@
         <proof
          prover="3"
          timelimit="5"
+         memlimit="4000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.34"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
          <result status="valid" time="0.61"/>
+        </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="4000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="2.73"/>
         </proof>
        </goal>
       </transf>
@@ -1160,7 +1184,7 @@
       <label
        name="expl:VC for largest_prime_factor"/>
       <proof
-       prover="4"
+       prover="6"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -1265,7 +1289,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.26"/>
+       <result status="valid" time="0.11"/>
       </proof>
      </goal>
      <goal
