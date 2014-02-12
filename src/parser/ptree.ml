@@ -27,7 +27,7 @@ type pp_quant =
   | PPforall | PPexists | PPlambda
 
 type pp_binop =
-  | PPand | PPor | PPimplies | PPiff
+  | PPand | PPand_asym | PPor | PPor_asym | PPimplies | PPiff
 
 type pp_unop =
   | PPnot

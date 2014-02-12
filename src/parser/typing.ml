@@ -254,7 +254,7 @@ let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
         | (op,de2) :: ch ->
             let de12 = Dterm.dterm ~loc (make_app de1 op de2) in
             let de23 = Dterm.dterm ~loc (make_chain de2 ch) in
-            DTbinop (Tand, de12, de23)
+            DTbinop (DTand, de12, de23)
         | [] -> assert false in
       let rec get_chain e12 acc = match e12.pp_desc with
         | PPinfix (e1, op1, e2) when chainable_op uc op1 ->
@@ -294,10 +294,12 @@ let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
       let e1 = dterm uc gvars denv e1 in
       let e2 = dterm uc gvars denv e2 in
       let op = match op with
-        | PPand -> Tand
-        | PPor -> Tor
-        | PPimplies -> Timplies
-        | PPiff -> Tiff in
+        | PPand -> DTand
+        | PPand_asym -> DTand_asym
+        | PPor -> DTor
+        | PPor_asym -> DTor_asym
+        | PPimplies -> DTimplies
+        | PPiff -> DTiff in
       DTbinop (op, e1, e2)
   | PPquant (q, uqu, trl, e1) ->
       let qvl = List.map (quant_var uc) uqu in

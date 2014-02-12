@@ -157,6 +157,9 @@ and dpattern_node =
   | DPor of dpattern * dpattern
   | DPas of dpattern * preid
 
+type dbinop =
+  | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff
+
 type dterm = {
   dt_node  : dterm_node;
   dt_dty   : dty option;
@@ -174,7 +177,7 @@ and dterm_node =
   | DTcase of dterm * (dpattern * dterm) list
   | DTeps of preid * dty * dterm
   | DTquant of quant * (preid * dty) list * dterm list list * dterm
-  | DTbinop of binop * dterm * dterm
+  | DTbinop of dbinop * dterm * dterm
   | DTnot of dterm
   | DTtrue
   | DTfalse
@@ -493,8 +496,18 @@ and try_term strict keep_loc uloc env prop dty node =
       List.iter (check_used_var f) vl;
       check_exists_implies q f;
       t_quant_close q vl trl f
-  | DTbinop (op,df1,df2) ->
-      t_binary op (get env true df1) (get env true df2)
+  | DTbinop (DTand,df1,df2) ->
+      t_and (get env true df1) (get env true df2)
+  | DTbinop (DTand_asym,df1,df2) ->
+      t_and_asym (get env true df1) (get env true df2)
+  | DTbinop (DTor,df1,df2) ->
+      t_or (get env true df1) (get env true df2)
+  | DTbinop (DTor_asym,df1,df2) ->
+      t_or_asym (get env true df1) (get env true df2)
+  | DTbinop (DTimplies,df1,df2) ->
+      t_implies (get env true df1) (get env true df2)
+  | DTbinop (DTiff,df1,df2) ->
+      t_iff (get env true df1) (get env true df2)
   | DTnot df ->
       t_not (get env true df)
   | DTtrue ->

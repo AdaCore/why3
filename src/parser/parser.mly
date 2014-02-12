@@ -586,11 +586,11 @@ lexpr:
 | lexpr OR lexpr
    { infix_pp $1 PPor $3 }
 | lexpr BARBAR lexpr
-   { infix_pp (mk_pp (PPnamed (Lstr Term.asym_label, $1))) PPor $3 }
+   { infix_pp $1 PPor_asym $3 }
 | lexpr AND lexpr
    { infix_pp $1 PPand $3 }
 | lexpr AMPAMP lexpr
-   { infix_pp (mk_pp (PPnamed (Lstr Term.asym_label, $1))) PPand $3 }
+   { infix_pp $1 PPand_asym $3 }
 | NOT lexpr
    { prefix_pp PPnot $2 }
 | lexpr EQUAL lexpr

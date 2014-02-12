@@ -38,6 +38,9 @@ and dpattern_node =
   | DPor of dpattern * dpattern
   | DPas of dpattern * preid
 
+type dbinop =
+  | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff
+
 type dterm = private {
   dt_node  : dterm_node;
   dt_dty   : dty option;
@@ -55,7 +58,7 @@ and dterm_node =
   | DTcase of dterm * (dpattern * dterm) list
   | DTeps of preid * dty * dterm
   | DTquant of quant * (preid * dty) list * dterm list list * dterm
-  | DTbinop of binop * dterm * dterm
+  | DTbinop of dbinop * dterm * dterm
   | DTnot of dterm
   | DTtrue
   | DTfalse
