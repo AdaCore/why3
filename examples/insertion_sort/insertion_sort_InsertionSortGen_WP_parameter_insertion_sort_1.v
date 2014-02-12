@@ -74,10 +74,7 @@ Definition array_eq {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
 (* Why3 assumption *)
 Definition exchange {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
   (a2:(@array a a_WT)) (i:Z) (j:Z): Prop := ((length a1) = (length a2)) /\
-  (((0%Z <= i)%Z /\ (i < (length a1))%Z) /\ (((0%Z <= j)%Z /\
-  (j < (length a1))%Z) /\ (((get a1 i) = (get a2 j)) /\ (((get a1
-  j) = (get a2 i)) /\ forall (k:Z), ((0%Z <= k)%Z /\ (k < (length a1))%Z) ->
-  ((~ (k = i)) -> ((~ (k = j)) -> ((get a1 k) = (get a2 k)))))))).
+  (map.MapPermut.exchange (elts a1) (elts a2) 0%Z (length a1) i j).
 
 (* Why3 assumption *)
 Definition permut {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (a2:(@array
@@ -96,28 +93,49 @@ Definition permut_all {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
   (a2:(@array a a_WT)): Prop := ((length a1) = (length a2)) /\
   (map.MapPermut.permut (elts a1) (elts a2) 0%Z (length a1)).
 
-Axiom permut_all_refl : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
-  a a_WT)), (permut_all a1 a1).
+Axiom permut_sub_refl : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)) (l:Z) (u:Z), ((0%Z <= l)%Z /\ ((l <= u)%Z /\
+  (u <= (length a1))%Z)) -> (permut_sub a1 a1 l u).
 
-Axiom exchange_permut_all : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z), (exchange a1
-  a2 i j) -> (permut_all a1 a2).
+Axiom permut_sub_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
+  a1 a2 l u) -> ((permut_sub a2 a3 l u) -> (permut_sub a1 a3 l u)).
 
-Axiom permut_all_sym : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
-  a a_WT)) (a2:(@array a a_WT)), (permut_all a1 a2) -> (permut_all a2 a1).
+Axiom exchange_permut_sub : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z) (l:Z) (u:Z),
+  (exchange a1 a2 i j) -> (((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\
+  (j < u)%Z) -> ((0%Z <= l)%Z -> ((u <= (length a1))%Z -> (permut_sub a1 a2 l
+  u))))).
 
-Axiom permut_all_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
-  a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT)), (permut_all a1 a2) ->
-  ((permut_all a2 a3) -> (permut_all a1 a3)).
-
-Axiom array_eq_permut_all : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)), (array_eq a1 a2) ->
-  (permut_all a1 a2).
+Axiom permut_sub_unmodified : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
+  a1 a2 l u) -> forall (i:Z), (((0%Z <= i)%Z /\ (i < l)%Z) \/ ((u <= i)%Z /\
+  (i < (length a1))%Z)) -> ((get a2 i) = (get a1 i)).
 
 Axiom permut_sub_weakening : forall {a:Type} {a_WT:WhyType a},
   forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l1:Z) (u1:Z) (l2:Z)
   (u2:Z), (permut_sub a1 a2 l1 u1) -> (((0%Z <= l2)%Z /\ (l2 <= l1)%Z) ->
   (((u1 <= u2)%Z /\ (u2 <= (length a1))%Z) -> (permut_sub a1 a2 l2 u2))).
+
+Axiom permut_sub_compose : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT))
+  (l1:Z) (u1:Z) (l2:Z) (u2:Z), (u1 <= l2)%Z -> ((permut_sub a1 a2 l1 u1) ->
+  ((permut_sub a2 a3 l2 u2) -> (permut_sub a1 a3 l1 u2))).
+
+Axiom permut_all_refl : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)), (permut_all a1 a1).
+
+Axiom permut_all_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT)), (permut_all a1 a2) ->
+  ((permut_all a2 a3) -> (permut_all a1 a3)).
+
+Axiom exchange_permut_all : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z), (exchange a1
+  a2 i j) -> (permut_all a1 a2).
+
+Axiom array_eq_permut_all : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)), (array_eq a1 a2) ->
+  (permut_all a1 a2).
 
 Axiom permut_sub_permut_all : forall {a:Type} {a_WT:WhyType a},
   forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
@@ -148,8 +166,6 @@ Definition sorted_sub1 (a:(@array elt elt_WhyType)) (l:Z) (u:Z): Prop :=
 (* Why3 assumption *)
 Definition sorted (a:(@array elt elt_WhyType)): Prop := (sorted_sub (elts a)
   0%Z (length a)).
-
-Import MapPermut.
 
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
@@ -186,7 +202,7 @@ unfold permut_all in *.
 simpl; split; auto.
 simpl in h12.
 destruct h12 as (h12a & h12b).
-apply permut_trans with (1:=h12b).
+apply MapPermut.permut_trans with (1:=h12b).
 ae.
 Qed.
 
