@@ -464,7 +464,7 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Eupdate (e1, ((q,_)::_ as fl)) ->
       let e1 = dexpr lenv denv e1 in
       let re = is_reusable e1 in
-      let v = if re then e1 else mk_var "q " e1 in
+      let v = if re then e1 else mk_var "_q " e1 in
       let prog_val _ pj = function
         | None -> Mlw_dexpr.dexpr ~loc (DEplapp (pj, [v]))
         | Some e -> dexpr lenv denv e in
@@ -476,7 +476,7 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
         | LS _ -> let cs,fl = pure_record ~loc uc pure_val fl in DElsapp (cs,fl)
         | _ -> Loc.errorm ~loc:(qloc q) "Not a record field: %a" print_qualid q
       in
-      if re then d else mk_let ~loc "q " e1 d
+      if re then d else mk_let ~loc "_q " e1 d
   | Ptree.Elet (id, gh, e1, e2) ->
       let id, gh = add_lemma_label ~top:false id gh in
       let ld = create_user_id id, gh, dexpr lenv denv e1 in
