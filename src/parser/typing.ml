@@ -177,6 +177,20 @@ let quant_var uc (x,ty) =
     | Some ty -> dty_of_ty (ty_of_pty uc ty)
     | None -> dty_fresh ()
 
+let is_reusable dt = match dt.dt_node with
+  | DTvar _ | DTgvar _ | DTconst _ | DTtrue | DTfalse -> true
+  | DTapp (_,[]) -> true
+  | _ -> false
+
+let mk_var n dt =
+  let dty = match dt.dt_dty with
+    | None -> dty_of_ty ty_bool
+    | Some dty -> dty in
+  Dterm.dterm ?loc:dt.dt_loc (DTvar (n, dty))
+
+let mk_let ~loc n dt node =
+  DTlet (dt, id_user n loc, Dterm.dterm ~loc node)
+
 let chainable_op uc op =
   (* non-bool -> non-bool -> bool *)
   op.id = "infix =" || op.id = "infix <>" ||
@@ -312,11 +326,14 @@ let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
       DTapp (cs, fl)
   | PPupdate (e1, fl) ->
       let e1 = dterm uc gvars denv e1 in
+      let re = is_reusable e1 in
+      let v = if re then e1 else mk_var "_q " e1 in
       let get_val _ pj = function
         | Some e -> dterm uc gvars denv e
-        | None -> Dterm.dterm ~loc (DTapp (pj,[e1])) in
+        | None -> Dterm.dterm ~loc (DTapp (pj,[v])) in
       let cs, fl = parse_record ~loc uc get_val fl in
-      DTapp (cs, fl)
+      let d = DTapp (cs, fl) in
+      if re then d else mk_let ~loc "_q " e1 d
   | PPnamed (Lpos uloc, e1) ->
       DTuloc (dterm uc gvars denv e1, uloc)
   | PPnamed (Lstr lab, e1) ->
