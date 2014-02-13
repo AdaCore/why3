@@ -17,6 +17,7 @@ type t =
       mutable tree_width : int;
       mutable task_height : int;
       mutable verbose : int;
+      mutable default_prover : string;
       mutable default_editor : string;
       mutable intro_premises : bool;
       mutable show_labels : bool;

@@ -2143,11 +2143,38 @@ let () =
   in ()
 
 
+(***********************************************)
+(* Keyboard shortcuts in the (goals) tree view *)
+(***********************************************)
+
+(* TODO:
+   - instead of a default prover, have instead keyboard shortcuts for
+     any prover *)
+
+let () =
+  let run_default_prover () =
+    if gconfig.default_prover = "" then
+      Debug.dprintf debug "no default prover@." else
+    let fp = Whyconf.parse_filter_prover gconfig.default_prover in
+    let pr = Whyconf.filter_one_prover gconfig.config fp in
+    prover_on_selected_goals pr.prover in
+  let callback ev =
+    let key = GdkEvent.Key.keyval ev in
+    if key = GdkKeysyms._c then begin clean_selection (); true end else
+    if key = GdkKeysyms._e then begin edit_current_proof (); true end else
+    if key = GdkKeysyms._i then begin inline_selected_goals (); true end else
+    if key = GdkKeysyms._o then begin cancel_proofs (); true end else
+    if key = GdkKeysyms._p then begin run_default_prover (); true end else
+    if key = GdkKeysyms._r then begin replay_obsolete_proofs (); true end else
+    if key = GdkKeysyms._s then begin split_selected_goals (); true end else
+    if key = GdkKeysyms._x then begin confirm_remove_selection (); true end else
+    false (* otherwise, use the default event handler *) in
+  ignore (goals_view#event#connect#key_press ~callback)
+
+
 (***************)
 (* Bind events *)
 (***************)
-
-
 
 (* to be run when a row in the tree view is selected *)
 let select_row r =
