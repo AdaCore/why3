@@ -1209,7 +1209,7 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
           | LetV pv -> Spv.mem pv e2.e_syms.syms_pv
           | LetA ps -> Sps.mem ps e2.e_syms.syms_ps in
         (* ??? N214-006 disable this warning globally until better option is
-           avaiable
+           available
         if not id_in_e2 then warn_unused id.pre_name id.pre_loc;
         *)
         let e1_no_eff =
