@@ -58,6 +58,7 @@ syn keyword  whyTodo contained TODO FIXME XXX NOTE
 " Blocks
 " FIXME? match and try should detect the absence of "with" ?
 syn region   whyEnd matchgroup=whyKeyword start="\<begin\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
+syn region   whyEnd matchgroup=whyKeyword start="\<abstract\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
 syn region   whyEnd matchgroup=whyKeyword start="\<match\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
 syn region   whyEnd matchgroup=whyKeyword start="\<loop\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
 syn region   whyEnd matchgroup=whyKeyword start="\<try\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
@@ -90,7 +91,7 @@ syn keyword  whyKeyword  let meta
 syn keyword  whyKeyword  not predicate
 syn keyword  whyKeyword  then type with
 
-syn keyword  whyKeyword  abstract any
+syn keyword  whyKeyword  any
 syn keyword  whyKeyword  exception fun ghost
 syn keyword  whyKeyword  model mutable private
 syn keyword  whyKeyword  raise rec val while
@@ -139,7 +140,7 @@ syn sync maxlines=500
 syn sync match whyDoSync      grouphere  whyDo      "\<do\>"
 syn sync match whyDoSync      groupthere whyDo      "\<done\>"
 
-syn sync match whyEndSync     grouphere  whyEnd     "\<\(begin\|match\|loop\|try\)\>"
+syn sync match whyEndSync     grouphere  whyEnd     "\<\(begin\|abstract\|match\|loop\|try\)\>"
 syn sync match whyEndSync     groupthere whyEnd     "\<end\>"
 
 syn sync match whyTheorySync  grouphere  whyTheory  "\<theory\>"

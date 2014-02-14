@@ -205,8 +205,6 @@ end
 %right SEMICOLON
 %nonassoc prec_no_else
 %nonassoc DOT ELSE GHOST
-%nonassoc prec_no_spec
-%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES DIVERGES VARIANT
 %nonassoc prec_named
 %nonassoc COLON
 
@@ -1273,8 +1271,8 @@ expr:
    { mk_expr (Eany $2) }
 | GHOST expr
    { mk_expr (Eghost $2) }
-| ABSTRACT expr spec
-   { mk_expr (Eabstract($2, $3)) }
+| ABSTRACT spec final_expr END
+   { mk_expr (Eabstract($3, $2)) }
 | label expr %prec prec_named
    { mk_expr (Enamed ($1, $2)) }
 ;
@@ -1400,8 +1398,8 @@ type_invariant:
 ;
 
 spec:
-| /* epsilon */     %prec prec_no_spec  { empty_spec }
-| single_spec spec                      { spec_union $1 $2 }
+| /* epsilon */     { empty_spec }
+| single_spec spec  { spec_union $1 $2 }
 ;
 
 single_spec:
