@@ -464,7 +464,7 @@ let init () =
             Session.read_session project_dir, false
          else
             Session.create_session project_dir, true in
-      let env_session, (_:bool) =
+      let env_session, (_:bool), (_:bool) =
          Session.update_session
            ~keygen:Gnat_sched.Keygen.keygen
            ~allow_obsolete:true
