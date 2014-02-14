@@ -150,6 +150,8 @@ execute examples/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
 execute examples/vstte10_queens.mlw NQueens.test8
 # fails: "Cannot decide condition of if: (not ((~)((<<)((~)(0), 8)) = 0))"
 # examples/queens.mlw --exec  NQueensBits.test8
+# fails: "let" are cloned as "val"
+# examples/in_progress/residual.mlw --exec Test.test_astar
 echo ""
 
 echo "=== Checking drivers ==="

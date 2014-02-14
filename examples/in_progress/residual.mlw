@@ -1,0 +1,78 @@
+
+(** {1 Decision of regular expression membership} *)
+
+(** Decision algorithm based on residuals *)
+
+module Residuals
+
+  type char
+
+  clone export regexp.Regexp with type char = char
+
+  let rec accepts_epsilon (r:regexp) : bool
+    variant { r }
+    ensures { result <-> mem Nil r }
+  = match r with
+    | Empty -> false
+    | Epsilon -> true
+    | Char _ -> false
+    | Alt r1 r2 -> accepts_epsilon r1 || accepts_epsilon r2
+    | Concat r1 r2 -> accepts_epsilon r1 && accepts_epsilon r2
+    | Star _ -> true
+    end
+
+  let lemma inversion_mem_star (c:char) (w:word) (r:regexp)
+     ensures { 
+       forall w' r'. w' = Cons c w /\ r' = Star r ->
+       mem w' r' ->
+       exists w1 w2. w = w1 ++ w2 /\ mem (Cons c w1) r /\ mem w2 r' }
+  = ()
+
+  lemma inversion_mem_star2 :
+    forall c w r. mem (Cons c w) (Star r) ->
+       exists w1 w2. w = w1 ++ w2 /\ mem (Cons c w1) r /\ mem w2 (Star r)
+
+  (** [residual r c] denotes the set of words [w] such that [mem c.w r] *)
+  let rec residual (r:regexp) (c:char) : regexp
+    variant { r }
+    ensures { forall w. mem w result <-> mem (Cons c w) r }
+  = match r with
+    | Empty -> Empty
+    | Epsilon -> Empty
+    | Char c' -> if c = c' then Epsilon else Empty
+    | Alt r1 r2 -> Alt (residual r1 c) (residual r2 c)
+    | Concat r1 r2 ->
+       if accepts_epsilon r1 then
+          Alt (Concat (residual r1 c) r2) (residual r2 c)
+       else Concat (residual r1 c) r2
+    | Star r1 ->
+      Concat (residual r1 c) r
+    end
+
+  let rec decide_mem (w:word) (r:regexp) : bool
+    variant { w }
+    ensures { result <-> mem w r }
+  = match w with
+    | Nil -> accepts_epsilon r
+    | Cons c w' -> decide_mem w' (residual r c)
+    end
+
+
+end
+
+
+module Test
+
+  type char = int 
+
+  clone import Residuals with type char = char
+
+  constant a : char = 65
+
+  constant aa : word = Cons a (Cons a Nil)
+ 
+  constant astar : regexp = Star (Char a)
+
+  let test_astar () = decide_mem aa astar
+
+end

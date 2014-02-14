@@ -914,7 +914,7 @@ and eval_app env s ls tl =
                           iter3 prs tl1
                       | None::prs, _::tl1 ->
                         iter3 prs tl1
-                      | _ -> assert false
+                      | _ -> Vapp(ls,tl)
                     in iter3 prs tl1
                   else iter2 rem2
               in iter2 csl

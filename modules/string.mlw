@@ -9,13 +9,6 @@ module Char
 
   type char model { code : int }
 
-  val chr (x:int) : char
-    requires { 0 <= x <= 255 }
-    ensures  { result = { code = x } }
-
-  val code (c:char) : int
-    ensures  { result = c.code /\ 0 <= c.code <= 255 }
-
   function uppercase char : char
   function lowercase char : char
 
@@ -35,8 +28,12 @@ module Char
     forall c:int. 0 <= c < 65 \/ 90 < c <= 127 ->
       lowercase { code = c } = { code = c }
 
-  val uppercase (c:char) : char ensures { result = uppercase c }
-  val lowercase (c:char) : char ensures { result = lowercase c }
+  val chr (x:int) : char
+    requires { 0 <= x <= 255 }
+    ensures  { result = { code = x } }
+
+  val code (c:char) : int
+    ensures  { result = c.code /\ 0 <= c.code <= 255 }
 
   (*** TODO
      - compare ?
