@@ -24,10 +24,10 @@ type label =
   | Lpos of Loc.position
 
 type pp_quant =
-  | PPforall | PPexists | PPlambda | PPfunc | PPpred
+  | PPforall | PPexists | PPlambda
 
 type pp_binop =
-  | PPand | PPor | PPimplies | PPiff
+  | PPand | PPand_asym | PPor | PPor_asym | PPimplies | PPiff
 
 type pp_unop =
   | PPnot
@@ -44,9 +44,10 @@ type pty =
   | PPTtyvar of ident * opacity
   | PPTtyapp of qualid * pty list
   | PPTtuple of pty list
+  | PPTarrow of pty * pty
+  | PPTparen of pty
 
 type ghost = bool
-type top_ghost = Gnone | Gghost | Glemma
 
 type binder = loc * ident option * ghost * pty option
 type param  = loc * ident option * ghost * pty
@@ -68,11 +69,12 @@ type lexpr =
   { pp_loc : loc; pp_desc : pp_desc }
 
 and pp_desc =
-  | PPvar of qualid
-  | PPapp of qualid * lexpr list
   | PPtrue
   | PPfalse
   | PPconst of constant
+  | PPident of qualid
+  | PPidapp of qualid * lexpr list
+  | PPapply of lexpr * lexpr
   | PPinfix of lexpr * ident * lexpr
   | PPinnfix of lexpr * ident * lexpr
   | PPbinop of lexpr * pp_binop * lexpr
@@ -81,7 +83,6 @@ and pp_desc =
   | PPquant of pp_quant * quvar list * lexpr list list * lexpr
   | PPnamed of label * lexpr
   | PPlet of ident * lexpr * lexpr
-  | PPeps of quvar * lexpr
   | PPmatch of lexpr * (pattern * lexpr) list
   | PPcast of lexpr * pty
   | PPtuple of lexpr list
@@ -196,6 +197,8 @@ type spec = {
   sp_reads   : qualid list;
   sp_writes  : lexpr list;
   sp_variant : variant list;
+  sp_checkrw : bool;
+  sp_diverge : bool;
 }
 
 type type_v =
@@ -204,21 +207,27 @@ type type_v =
 
 and type_c = type_v * spec
 
+type top_ghost = Gnone | Gghost | Glemma
+
 type expr = {
   expr_desc : expr_desc;
   expr_loc  : loc;
 }
 
 and expr_desc =
+  | Etrue
+  | Efalse
+  | Econst of constant
   (* lambda-calculus *)
-  | Econstant of constant
   | Eident of qualid
+  | Eidapp of qualid * expr list
   | Eapply of expr * expr
   | Einfix of expr * ident * expr
   | Einnfix of expr * ident * expr
-  | Efun of binder list * triple
-  | Elet of ident * ghost * expr * expr
-  | Eletrec of letrec list * expr
+  | Elet of ident * top_ghost * expr * expr
+  | Efun of ident * top_ghost * lambda * expr
+  | Erec of fundef list * expr
+  | Elam of lambda
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
@@ -227,12 +236,13 @@ and expr_desc =
   | Esequence of expr * expr
   | Eif of expr * expr * expr
   | Eloop of loop_annotation * expr
+  | Ewhile of expr * loop_annotation * expr
   | Elazy of lazy_op * expr * expr
   | Enot of expr
   | Ematch of expr * (pattern * expr) list
   | Eabsurd
   | Eraise of qualid * expr option
-  | Etry of expr * (qualid * pattern * expr) list
+  | Etry of expr * (qualid * pattern option * expr) list
   | Efor of ident * expr * for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of assertion_kind * lexpr
@@ -240,17 +250,18 @@ and expr_desc =
   | Ecast of expr * pty
   | Eany of type_c
   | Eghost of expr
-  | Eabstract of triple
+  | Eabstract of expr * spec
   | Enamed of label * expr
 
-and letrec = loc * ident * top_ghost * binder list * triple
+and fundef = ident * top_ghost * lambda
 
-and triple = expr * spec
+and lambda = binder list * pty option * expr * spec
 
 type pdecl =
+  | Dval of ident * top_ghost * type_v
   | Dlet of ident * top_ghost * expr
-  | Dletrec of letrec list
-  | Dparam of ident * ghost * type_v
+  | Dfun of ident * top_ghost * lambda
+  | Drec of fundef list
   | Dexn of ident * pty
 
 (* incremental parsing *)

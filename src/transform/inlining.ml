@@ -63,10 +63,12 @@ let fold in_goal notdeft notdeff notls d (env, task) =
           not (TermTF.t_select notdeft notdeff e
             || t_s_any Util.ffalse (ls_equal ls) e) in
         let env = if inline then Mls.add ls (vl,e) env else env in
-        let task = if inline && not in_goal then task else add_decl task d in
+        let task =
+          if inline && not in_goal then task else Task.add_decl task d
+        in
         env, task
     | _ ->
-        env, add_decl task d
+        env, Task.add_decl task d
 
 let fold in_goal notdeft notdeff notls task_hd (env, task) =
   match task_hd.task_decl.td_node with

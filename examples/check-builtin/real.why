@@ -59,10 +59,11 @@ theory TrigonometryTest
   use import real.Trigonometry
   use import real.Square
 
-  lemma Cos_2_pi : cos (2.0 * pi) = 1.0
-  lemma Sin_2_pi : sin (2.0 * pi) = 0.
-  lemma Tan_pi_3 : tan (pi / 2.0) = sqrt 3.0
-  lemma Atan_1   : atan 1.0 = pi / 4.0
+  goal Cos_2_pi : cos (2.0 * pi) = 1.0
+  goal Sin_2_pi : sin (2.0 * pi) = 0.0
+  goal Tan_pi_4 : tan (pi / 4.0) = 1.0
+  goal Tan_pi_3 : tan (pi / 3.0) = sqrt 3.0
+  goal Atan_1   : atan 1.0 = pi / 4.0
 
 end
 

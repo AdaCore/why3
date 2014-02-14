@@ -189,4 +189,12 @@ theory Coprime
     forall p: int.
     prime p <-> 2 <= p && forall n:int. 1 <= n < p -> coprime n p
 
+  lemma Gauss:
+    forall a b c:int. divides a (b*c) /\ coprime a b -> divides a c
+
+  lemma Euclid:
+    forall p a b:int.
+      prime p /\ divides p (a*b) -> divides p a \/ divides p b
+
+
 end

@@ -155,10 +155,10 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
   in
     if depth > 0 then
       if subgoal > 0 then
-	fprintf fmt "\\cline{%d-%d} @." (depth + 1) column
+	fprintf fmt "\\cline{%d-%d}@." (depth + 1) column
       else ()
     else
-      fprintf fmt "\\hline @.";
+      fprintf fmt "\\hline@.";
     if depth_max > 1 then
       begin
 	if subgoal > 0 then
@@ -212,7 +212,7 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
       let tr = g.S.goal_transformations in
 	if S.PHstr.length tr > 0 then
 	  if S.PHprover.length proofs > 0 then
-	    fprintf fmt "\\cline{%d-%d} @." (depth + 2) column;
+	    fprintf fmt "\\cline{%d-%d}@." (depth + 2) column;
 	S.PHstr.iter (fun _st tr ->
           let goals = tr.S.transf_goals in
 	  let _ = List.fold_left (fun subgoal g ->
@@ -224,9 +224,9 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 let style_2_row fmt ?(transf=false) depth prov subgoal expl=
   let column = column 2 depth prov in
   if depth > 0 || transf then
-    fprintf fmt "\\cline{%d-%d} @." 2 column
+    fprintf fmt "\\cline{%d-%d}@." 2 column
   else
-    fprintf fmt "\\hline @.";
+    fprintf fmt "\\hline@.";
   for _i = 1 to depth do fprintf fmt "\\quad" done;
   let macro = if transf then "transformation" else "explanation" in
   if depth = 0 || transf then
@@ -242,7 +242,7 @@ let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
       print_result_prov proofs prov fmt
     end
  else
-    if depth = 0 then
+    if (*depth = 0*) true then
       begin
         style_2_row fmt depth prov subgoal (protect (S.goal_expl g));
 	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @."
@@ -254,7 +254,7 @@ let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
       S.PHstr.iter (fun _st tr ->
         style_2_row fmt ~transf:true (depth+1) prov subgoal
           (protect tr.S.transf_name);
-	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @."
+	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\@."
           (List.length prov);
 	let goals = tr.S.transf_goals in
 	let _ = List.fold_left (fun subgoal g ->
@@ -264,7 +264,7 @@ let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
     end
  else
     if (S.PHprover.length proofs) == 0 && depth <> 0 then
-      fprintf fmt "\\\\ @."
+      fprintf fmt "\\\\@."
 
 let latex_tabular_goal n fmt depth provers g =
   print_tabular_head n depth provers fmt;

@@ -19,6 +19,17 @@ open Stdlib
 open Debug
 module C = Whyconf
 
+external reset_gc : unit -> unit = "ml_reset_gc"
+
+(* Setting a Gc.alarm is pointless; the function has to be called manually
+   before each lablgtk operation. Indeed, each major slice resets
+   caml_extra_heap_resources to zero, but alarms are executed only at
+   finalization time, that is, after a full collection completes. Note that
+   manual calls can fail to prevent extraneous collections too, if a major
+   slice happens right in the middle of a sequence of lablgtk operations due
+   to memory starvation. Hopefully, it seldom happens. *)
+let () = reset_gc ()
+
 let debug = Debug.lookup_flag "ide_info"
 
 (************************)
@@ -521,26 +532,30 @@ let get_selected_row_references () =
 
 let row_expanded b iter _path =
   session_needs_saving := true;
+  let expand_g g = goals_view#expand_row g.S.goal_key#path in
+  let expand_tr _ tr = goals_view#expand_row tr.S.transf_key#path in
+  let expand_m _ m = goals_view#expand_row m.S.metas_key#path in
   match get_any_from_iter iter with
     | S.File f ->
         S.set_file_expanded f b
     | S.Theory t ->
         S.set_theory_expanded t b
     | S.Goal g ->
-        S.set_goal_expanded g b
+        S.set_goal_expanded g b;
+        if b then begin
+          Session.PHstr.iter expand_tr g.S.goal_transformations;
+          Session.Mmetas_args.iter expand_m g.S.goal_metas
+        end
     | S.Transf tr ->
-        S.set_transf_expanded tr b
+        S.set_transf_expanded tr b;
+        if b then begin match tr.S.transf_goals with
+          | [g] -> expand_g g
+          | _ -> ()
+        end
     | S.Proof_attempt _ -> ()
     | S.Metas m ->
-      S.set_metas_expanded m b
-
-
-
-let (_:GtkSignal.id) =
-  goals_view#connect#row_collapsed ~callback:(row_expanded false)
-
-let (_:GtkSignal.id) =
-  goals_view#connect#row_expanded ~callback:(row_expanded true)
+        S.set_metas_expanded m b;
+        if b then expand_g m.S.metas_goal
 
 let current_selected_row = ref None
 let current_env_session = ref None
@@ -621,6 +636,7 @@ module MA = struct
      type key = GTree.row_reference
 
      let create ?parent () =
+       reset_gc ();
        session_needs_saving := true;
        let parent = match parent with
          | None -> None
@@ -650,6 +666,7 @@ module MA = struct
      let notify_timer_state =
        let c = ref 0 in
        fun t s r ->
+	 reset_gc ();
          incr c;
          monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
          monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
@@ -658,6 +675,7 @@ module MA = struct
               "Running: " ^ (string_of_int r)^ " " ^ (fan (!c / 10)))
 
 let notify any =
+  reset_gc ();
   session_needs_saving := true;
   let row,expanded =
     match any with
@@ -701,12 +719,13 @@ let notify any =
         set_proof_state a
     | S.Transf tr ->
         set_row_status row tr.S.transf_verified
-   | S.Metas m ->
+    | S.Metas m ->
         set_row_status row m.S.metas_verified
 
 let init =
   let cpt = ref (-1) in
   fun row any ->
+    reset_gc ();
     let ind = goals_model#get ~row:row#iter ~column:index_column in
     if ind < 0 then
       begin
@@ -865,7 +884,7 @@ let sched =
       else
         S.create_session project_dir
     in
-    let env,(_:bool) =
+    let env,(_:bool),(_:bool) =
       M.update_session ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config
     in
@@ -1582,7 +1601,7 @@ let eval const result =
                             Mlw_interp.eval_global_term e.S.env
                               th.Theory.th_known t
                           in
-                          Pp.sprintf "@[<hov 2>%a@]" Pretty.print_term t
+                          Pp.sprintf "@[<hov 2>%a@]" Mlw_interp.print_value t
                         | _ ->
                           Pp.sprintf
                             "Symbol '%s' is not a constant in theory '%s.%s'"
@@ -1821,6 +1840,7 @@ let color_loc (v:GSourceView2.source_view) ~color l b e =
   buf#apply_tag ~start ~stop color
 
 let scroll_to_loc ?(yalign=0.0) ~color loc =
+  reset_gc ();
   let (f,l,b,e) = Loc.get loc in
   if f <> !current_file then
     begin
@@ -1901,7 +1921,7 @@ let reload () =
     gconfig.env <- Env.create_env loadpath;
     (** reload the session *)
     let old_session = (env_session()).S.session in
-    let new_env_session,(_:bool) =
+    let new_env_session,(_:bool),(_:bool) =
       M.update_session ~allow_obsolete:true old_session gconfig.env
         gconfig.Gconfig.config
     in
@@ -2123,11 +2143,38 @@ let () =
   in ()
 
 
+(***********************************************)
+(* Keyboard shortcuts in the (goals) tree view *)
+(***********************************************)
+
+(* TODO:
+   - instead of a default prover, have instead keyboard shortcuts for
+     any prover *)
+
+let () =
+  let run_default_prover () =
+    if gconfig.default_prover = "" then
+      Debug.dprintf debug "no default prover@." else
+    let fp = Whyconf.parse_filter_prover gconfig.default_prover in
+    let pr = Whyconf.filter_one_prover gconfig.config fp in
+    prover_on_selected_goals pr.prover in
+  let callback ev =
+    let key = GdkEvent.Key.keyval ev in
+    if key = GdkKeysyms._c then begin clean_selection (); true end else
+    if key = GdkKeysyms._e then begin edit_current_proof (); true end else
+    if key = GdkKeysyms._i then begin inline_selected_goals (); true end else
+    if key = GdkKeysyms._o then begin cancel_proofs (); true end else
+    if key = GdkKeysyms._p then begin run_default_prover (); true end else
+    if key = GdkKeysyms._r then begin replay_obsolete_proofs (); true end else
+    if key = GdkKeysyms._s then begin split_selected_goals (); true end else
+    if key = GdkKeysyms._x then begin confirm_remove_selection (); true end else
+    false (* otherwise, use the default event handler *) in
+  ignore (goals_view#event#connect#key_press ~callback)
+
+
 (***************)
 (* Bind events *)
 (***************)
-
-
 
 (* to be run when a row in the tree view is selected *)
 let select_row r =
@@ -2158,6 +2205,12 @@ let (_ : GtkSignal.id) =
         | [] -> ()
         | _ -> ()
     end
+
+let (_:GtkSignal.id) =
+  goals_view#connect#row_collapsed ~callback:(row_expanded false)
+
+let (_:GtkSignal.id) =
+  goals_view#connect#row_expanded ~callback:(row_expanded true)
 
 (*
 let () = Debug.set_flag (Debug.lookup_flag "transform")

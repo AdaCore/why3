@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#
+# DESCRIPTION: Isabelle/jEdit with Why3 session and server port
+
+
+## diagnostics
+
+PRG="$(basename "$0")"
+
+function usage()
+{
+  echo
+  echo "Usage: isabelle $PRG [ARGS...]"
+  echo
+  echo "Start Isabelle/jEdit with Why3 session and server port, for quick invocation"
+  echo "via why3ide."
+  exit 1
+}
+
+function fail()
+{
+  echo "$1" >&2
+  exit 2
+}
+
+
+## main
+
+[ "$1" = "-?" ] && usage
+
+SERVER_FILE="$JEDIT_SETTINGS/$WHY3_JEDIT_SERVER"
+
+if [ -f "$SERVER_FILE" ]; then
+  fail "Server already running: \"$SERVER_FILE\""
+else
+  exec "$ISABELLE_TOOL" jedit "-j-server=$WHY3_JEDIT_SERVER" -l Why3 "$@"
+fi

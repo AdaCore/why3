@@ -60,10 +60,10 @@ let apply_projection kn ls t = match t.t_node with
       List.fold_left2 find t_true tl pjl
   | _ -> assert false
 
-let flat_case kn t bl =
+let flat_case t bl =
   let mk_b b = let p,t = t_open_branch b in [p],t in
-  let find_constructors kn ts = List.map fst (find_constructors kn ts) in
-  Pattern.CompileTerm.compile (find_constructors kn) [t] (List.map mk_b bl)
+  let mk_case = t_case_close and mk_let = t_let_close_simp in
+  Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl)
 
 let rec add_quant kn (vl,tl,f) v =
   (* (vl,tl,f) represents a formula
@@ -135,8 +135,8 @@ let rec cs_equ kn env t1 t2 =
 
 and apply_cs_equ kn cs1 tl1 env t = match t.t_node with
   | Tapp (cs2,tl2) when ls_equal cs1 cs2 ->
-      let merge f t1 t2 = t_and_simp f (cs_equ kn env t1 t2) in
-      List.fold_left2 merge t_true tl1 tl2
+      let merge t1 t2 f = t_and_simp (cs_equ kn env t1 t2) f in
+      List.fold_right2 merge tl1 tl2 t_true
   | Tapp _ -> t_false
   | _ -> assert false
 
@@ -159,7 +159,7 @@ let eval_match ~inline kn t =
         let_map eval env t1 tb2
     | Tcase (t1, bl1) ->
         let t1 = eval env t1 in
-        let fn env t2 = eval env (Loc.try3 ?loc:t.t_loc flat_case kn t2 bl1) in
+        let fn env t2 = eval env (Loc.try2 ?loc:t.t_loc flat_case t2 bl1) in
         begin try dive_to_constructor kn fn env t1
         with Exit -> branch_map eval env t1 bl1 end
     | Tquant (q, qf) ->

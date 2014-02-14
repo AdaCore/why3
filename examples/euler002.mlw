@@ -141,6 +141,8 @@ module Solve
       invariant { !y = fib_even (!n+1) }
       invariant { !y = fib (!k+3) }
       invariant { !sum = fib_sum_even m !k }
+      invariant { 0 < !x < !y }
+      variant { m - !x }
       let tmp = !x in
       x := !y;
       y := 4 * !y + tmp;
@@ -151,5 +153,12 @@ module Solve
     !sum
 
   let run () = f 4000000 (* should be 4613732 *)
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let x = run () in
+    if x <> 4613732 then raise BenchFailure;
+    x
 
 end

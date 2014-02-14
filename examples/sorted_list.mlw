@@ -10,7 +10,10 @@ module FindInSortedList
     forall x y : int, l : list int.
     x < y -> sorted (Cons y l) -> not mem x (Cons y l)
 
-  let rec find x l requires { sorted l } ensures { result=True <-> mem x l }
+  let rec find x l
+    requires { sorted l }
+    variant { l }
+    ensures { result=True <-> mem x l }
   = match l with
     | Nil -> False
     | Cons y r -> x = y || x > y && find x r

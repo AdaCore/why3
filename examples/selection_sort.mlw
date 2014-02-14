@@ -12,13 +12,14 @@ module SelectionSort
   use import array.ArrayEq
 
   let selection_sort (a: array int)
-    ensures { sorted a /\ permut (old a) a } =
+    ensures { sorted a /\ permut_all (old a) a } =
 'L:
+    let min = ref 0 in
     for i = 0 to length a - 1 do
       (* a[0..i[ is sorted; now find minimum of a[i..n[ *)
-      invariant { sorted_sub a 0 i /\ permut (at a 'L) a /\
+      invariant { sorted_sub a 0 i /\ permut_all (at a 'L) a /\
           forall k1 k2: int. 0 <= k1 < i <= k2 < length a -> a[k1] <= a[k2] }
-      let min = ref i in
+      (* let min = ref i in *) min := i;
       for j = i + 1 to length a - 1 do
         invariant {
           i <= !min < j && forall k: int. i <= k < j -> a[!min] <= a[k] }
@@ -26,13 +27,34 @@ module SelectionSort
       done;
 'L1:
       if !min <> i then swap a !min i;
-      assert { permut (at a 'L1) a }
+      assert { permut_all (at a 'L1) a }
     done
 
-  let test () =
+  let test1 () =
+    let a = make 3 0 in
+    a[0] <- 7; a[1] <- 3; a[2] <- 1; 
+    selection_sort a;
+    a
+
+  let test2 () ensures { result.length = 8 } =
     let a = make 8 0 in
-    a[0] <- 3; a[1] <- 1; a[2] <- 7; a[3] <- 0;
-    a[4] <- 4; a[5] <- 1; a[6] <- 6; a[7] <- 3;
-    selection_sort a
+    a[0] <- 53; a[1] <- 91; a[2] <- 17; a[3] <- -5;
+    a[4] <- 413; a[5] <- 42; a[6] <- 69; a[7] <- 6;
+    selection_sort a;
+    a
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let a = test2 () in
+    if a[0] <> -5 then raise BenchFailure;
+    if a[1] <> 6 then raise BenchFailure;
+    if a[2] <> 17 then raise BenchFailure;
+    if a[3] <> 42 then raise BenchFailure;
+    if a[4] <> 53 then raise BenchFailure;
+    if a[5] <> 69 then raise BenchFailure;
+    if a[6] <> 91 then raise BenchFailure;
+    if a[7] <> 413 then raise BenchFailure;
+    a
 
 end

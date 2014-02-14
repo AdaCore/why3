@@ -238,8 +238,8 @@ module ZipperBased
     requires { (* list [left] satisfies the invariant *)
       g left /\
       (* when [left] has one element, it can't be a solution *)
-      match left with Cons (d1, t1) Nil -> d1 <> 0 \/ right <> Nil
-                    | _                 -> true                    end /\
+      match left with Cons (d1, _) Nil -> d1 <> 0 \/ right <> Nil
+                    | _                -> true                    end /\
       (* apart (possibly) from its head, all elements in [right] are leaves;
          moreover the left branch of [right]'s head already satisfies
          invariant [g] when consed to [left] *)
@@ -248,6 +248,7 @@ module ZipperBased
             match t2 with Node l2 _ -> g (Cons (d2+1, l2) left)
                         | Leaf      -> true end
         | Nil -> true end }
+    variant { length left + 2 * length right }
     ensures { depths 0 result = forest_depths (reverse left ++ right) }
     raises { Failure ->
       forall t: tree. depths 0 t <> forest_depths (reverse left ++ right) }

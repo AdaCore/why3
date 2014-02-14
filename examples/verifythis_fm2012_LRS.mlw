@@ -133,13 +133,13 @@ let lcp (a:array int) (x y:int) : int
     let l = ref 0 in
     while x + !l < n && y + !l < n && a[x + !l] = a[y + !l] do
       invariant { is_common_prefix a x y !l }
+      variant { n - !l }
       incr l
     done;
     !l
 
 end
 
-(*
 module LCP_test
 
 (** test harness for lcp *)
@@ -147,6 +147,7 @@ module LCP_test
 use import array.Array
 use import LCP
 
+(*
 let test () =
   let arr = Array.make 4 0 in
   arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
@@ -175,10 +176,19 @@ let test () =
   assert { is_common_prefix drr 2 3 1};
   assert { not is_common_prefix drr 2 3 2};
   check {x = 1}
+*)
 
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let arr = Array.make 4 0 in
+    arr[0]<-1; arr[1]<-2; arr[2]<-2; arr[3]<-5;
+    let x = lcp arr 1 2 in
+    if x <> 1 then raise BenchFailure;
+    x
 
 end
-*)
+
 
 (** {2 Second module: sorting suffixes } *)
 module SuffixSort
@@ -247,22 +257,23 @@ let sort (a:array int) (data : array int)
   requires { data.length = a.length }
   requires { range data }
   ensures { sorted a data }
-  ensures { ArrayPermut.permut (old data) data }
+  ensures { ArrayPermut.permut_all (old data) data }
   =
    'Init:
    for i = 0 to data.length - 1 do
-     invariant { ArrayPermut.permut (at data 'Init) data   }
+     invariant { ArrayPermut.permut_all (at data 'Init) data   }
      invariant { sorted_sub a data.elts 0 i  }
      invariant { range data }
      let j = ref i in
      while !j > 0 && compare a data[!j-1] data[!j] > 0 do
        invariant { 0 <= !j <= i }
        invariant { range data }
-       invariant { ArrayPermut.permut (at data 'Init) data   }
+       invariant { ArrayPermut.permut_all (at data 'Init) data   }
        invariant { sorted_sub a data.elts 0 !j }
        invariant { sorted_sub a data.elts !j (i+1) }
        invariant { forall k1 k2:int. 0 <= k1 < !j /\ !j+1 <= k2 <= i ->
                      le a data[k1] data[k2] }
+       variant { !j }
        'L:
        let b = !j - 1 in
        let t = data[!j] in
@@ -275,9 +286,37 @@ let sort (a:array int) (data : array int)
      assert { !j > 0 -> le a data[!j-1] data[!j] }
    done
 
+
 end
 
 
+module SuffixSort_test
+
+  use import int.Int
+  use import array.Array
+  use LCP
+  use SuffixSort
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let arr = Array.make 4 0 in
+    (* [7,8,8,6] *)
+    arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-6;
+    let suf = Array.make 4 0 in
+    for i = 0 to 3 do 
+      invariant { forall j:int. 0 <= j < i -> suf[j] = j }
+      suf[i] <- i 
+    done;
+    SuffixSort.sort arr suf;
+    (* should be [3,0,2,1] *)
+    if suf[0] <> 3 then raise BenchFailure;
+    if suf[1] <> 0 then raise BenchFailure;
+    if suf[2] <> 2 then raise BenchFailure;
+    if suf[3] <> 1 then raise BenchFailure;
+    suf
+
+end
 
 
 
@@ -314,7 +353,7 @@ use array.ArrayPermut
 
 (** needed to establish invariant in function [create] *)
 lemma permut_permutation : forall a1 a2:array int.
-  ArrayPermut.permut a1 a2 /\ permutation a1.elts a1.length ->
+  ArrayPermut.permut_all a1 a2 /\ permutation a1.elts a1.length ->
     permutation a2.elts a2.length
 
 (** constructor of suffixArray structure *)
@@ -339,7 +378,6 @@ end
 
 
 
-(*
 module SuffixArray_test
 
 use import array.Array
@@ -376,8 +414,20 @@ let test () =
   check {x = 0 (* TODO *)}
 *)
 
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let arr = Array.make 4 0 in
+    (* [7,8,8,6] *)
+    arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-6;
+    let sa = create arr in
+    if sa.suffixes[0] <> 3 then raise BenchFailure;
+    if sa.suffixes[1] <> 0 then raise BenchFailure;
+    if sa.suffixes[2] <> 2 then raise BenchFailure;
+    if sa.suffixes[3] <> 1 then raise BenchFailure;
+    sa
+
 end
-*)
 
 
 (** {2 Fourth module: Longest Repeated Substring} *)
@@ -473,18 +523,21 @@ lemma le_le_common_prefix:
 end
 
 
-(*
 module LRS_test
 
-use import array.Array
-use import ref.Ref
-use import LRS
+  use import array.Array
+  use import ref.Ref
+  use import LRS
 
- let test () =
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
     let arr = Array.make 4 0 in
-    arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-9;
+    (* [7,8,8,6] *)
+    arr[0]<-7; arr[1]<-8; arr[2]<-8; arr[3]<-6;
     lrs arr;
-    check { !solStart = 1 /\ !solLength = 1 }
+    if !solStart <> 1 then raise BenchFailure;
+    if !solLength <> 1 then raise BenchFailure;
+    (!solStart, !solLength)
 
 end
-*)

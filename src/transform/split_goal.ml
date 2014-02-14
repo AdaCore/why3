@@ -37,14 +37,6 @@ let split_case forig spl pos acc tl bl =
 
 let compiled = Ident.create_label "split_goal: compiled match"
 
-module Compile = Pattern.Compile (struct
-  type action = term
-  type branch = term_branch
-  let mk_let v s t  = t_let_close_simp v s t
-  let mk_branch p t = t_close_branch p t
-  let mk_case t bl  = t_label_add compiled (t_case t bl)
-end)
-
 let split_case_2 kn forig spl pos acc t bl =
   let vs = create_vsymbol (id_fresh "q") (t_type t) in
   let tv = t_var vs in
@@ -85,16 +77,17 @@ let split_case_2 kn forig spl pos acc t bl =
     let forig = t_label ?loc:forig.t_loc lab forig in
     split_case_2 kn forig spl pos acc t bl
   else
+    let mk_let = t_let_close_simp in
+    let mk_case t bl = t_label_add compiled (t_case_close t bl) in
     let mk_b b = let p,f = t_open_branch b in [p], f in
-    let find ts = List.map fst (find_constructors kn ts) in
-    let f = Compile.compile find [t] (List.map mk_b bl) in
+    let f = Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl) in
     spl acc f
 
-let asym_split = Term.asym_label
 let stop_split = Ident.create_label "stop_split"
 
-let asym f = Slab.mem asym_split f.t_label
 let stop f = Slab.mem stop_split f.t_label
+let asym f = Slab.mem Term.asym_label f.t_label
+let keep f = Slab.mem Term.keep_on_simp_label f.t_label
 
 let unstop f =
   t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f
@@ -108,7 +101,7 @@ type split = {
 
 let rec split_pos ro acc f = match f.t_node with
   | _ when ro.stop_label && stop f -> unstop f :: acc
-  | Ttrue -> acc
+  | Ttrue -> if keep f then f::acc else acc
   | Tfalse -> f::acc
   | Tapp _ -> f::acc
   | Tbinop (Tand,f1,f2) when ro.respect_as && asym f1 ->
@@ -154,7 +147,7 @@ let rec split_pos ro acc f = match f.t_node with
 and split_neg ro acc f = match f.t_node with
   | _ when ro.stop_label && stop f -> unstop f :: acc
   | Ttrue -> f::acc
-  | Tfalse -> acc
+  | Tfalse -> if keep f then f::acc else acc
   | Tapp _ -> f::acc
   | Tbinop (Tand,_,_) when ro.right_only -> f::acc
   | Tbinop (Tand,f1,f2) ->
@@ -287,7 +280,7 @@ let ls_of_var v =
 let rec split_intro pr dl acc f =
   let rsp = split_intro pr dl in
   match f.t_node with
-  | Ttrue -> acc
+  | Ttrue when not (keep f) -> acc
   | Tbinop (Tand,f1,f2) when asym f1 ->
       rsp (rsp acc (t_implies f1 f2)) f1
   | Tbinop (Tand,f1,f2) ->

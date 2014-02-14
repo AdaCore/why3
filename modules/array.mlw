@@ -25,11 +25,11 @@ module Array
   function ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a = set a i v
 
   val ([]) (a: array ~'a) (i: int) : 'a
-    requires { 0 <= i < length a }
+    requires { "expl:index in array bounds" 0 <= i < length a }
     ensures  { result = a[i] }
 
   val ([]<-) (a: array ~'a) (i: int) (v: 'a) : unit writes {a}
-    requires { 0 <= i < length a }
+    requires { "expl:index in array bounds" 0 <= i < length a }
     ensures  { a.elts = M.set (old a.elts) i v }
 
   val length (a: array ~'a) : int ensures { result = a.length }
@@ -53,7 +53,7 @@ module Array
     { length = n; elts = M.const v }
 
   val make (n: int) (v: ~'a) : array 'a
-    requires { n >= 0 } ensures { result = make n v }
+    requires { "expl:array creation size" n >= 0 } ensures { result = make n v }
 
   val append (a1: array ~'a) (a2: array 'a) : array 'a
     ensures { length result = length a1 + length a2 }
@@ -129,15 +129,16 @@ end
 
 module ArrayEq
 
+  use import int.Int
   use import Array
-  use import map.MapEq as M
+  use import map.MapEq
 
   predicate array_eq_sub (a1 a2: array 'a) (l u: int) =
+    a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
     map_eq_sub a1.elts a2.elts l u
 
   predicate array_eq (a1 a2: array 'a) =
-    a1.length = a2.length /\
-    array_eq_sub a1 a2 0 a1.length
+    a1.length = a2.length /\ map_eq_sub a1.elts a2.elts 0 (length a1)
 
 end
 
@@ -148,39 +149,110 @@ module ArrayPermut
   use import int.Int
   use import Array
   use import map.MapPermut as M
-
-  predicate exchange (a1 a2: array 'a) (i j: int) =
-    M.exchange a1.elts a2.elts i j
-
-  predicate permut_sub (a1 a2: array 'a) (l u: int) =
-    M.permut_sub a1.elts a2.elts l u
-
-  predicate permut (a1 a2: array 'a) =
-    a1.length = a2.length /\ M.permut_sub a1.elts a2.elts 0 a1.length
-
-  lemma exchange_permut:
-    forall a1 a2: array 'a, i j: int [exchange a1 a2 i j].
-    exchange a1 a2 i j -> a1.length = a2.length ->
-    0 <= i < a1.length -> 0 <= j < a1.length ->
-    permut a1 a2
-
-  lemma permut_sym:
-    forall a1 a2: array 'a.
-    permut a1 a2 -> permut a2 a1
-
-  lemma permut_trans:
-    forall a1 a2 a3: array 'a.
-    permut a1 a2 -> permut a2 a3 -> permut a1 a3
-
+  use import map.MapEq
   use import ArrayEq
 
-  lemma array_eq_sub_permut:
-    forall a1 a2: array 'a, l u: int.
-    array_eq_sub a1 a2 l u -> permut_sub a1 a2 l u
+  predicate exchange (a1 a2: array 'a) (i j: int) =
+    a1.length = a2.length /\
+    M.exchange a1.elts a2.elts 0 a1.length i j
+  (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
+      by the swapping of elements at indices [i] and [j] *)
 
-  lemma array_eq_permut:
+  predicate permut (a1 a2: array 'a) (l u: int) =
+    a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
+    M.permut a1.elts a2.elts l u
+  (** [permut a1 a2 l u] is true when the segment
+      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)].
+      Values outside of the interval (l..u-1) are ignored. *)
+
+  predicate permut_sub (a1 a2: array 'a) (l u: int) =
+    map_eq_sub a1.elts a2.elts 0 l /\
+    permut a1 a2 l u /\
+    map_eq_sub a1.elts a2.elts u (length a1)
+  (** [permut_sub a1 a2 l u] is true when the segment
+      [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)]
+      and values outside of the interval (l..u-1) are equal. *)
+
+  predicate permut_all (a1 a2: array 'a) =
+    a1.length = a2.length /\ M.permut a1.elts a2.elts 0 a1.length
+  (** [permut_all a1 a2 l u] is true when array [a1] is a permutation
+      of array [a2]. *)
+
+  (** {3 lemmas about [permut_sub]} *)
+
+  (** permut_sub is reflexive, symmetric, transitive and contains
+      transpositions *)
+
+  lemma permut_sub_refl:
+    forall a: array 'a, l u: int.
+    0 <= l <= u <= length a -> permut_sub a a l u
+
+(*
+  lemma permut_sub_sym:
+    forall a1 a2: array 'a, l u: int.
+    permut_sub a1 a2 l u -> permut_sub a2 a1 l u
+*)
+
+  lemma permut_sub_trans:
+    forall a1 a2 a3: array 'a, l u: int.
+    permut_sub a1 a2 l u -> permut_sub a2 a3 l u -> permut_sub a1 a3 l u
+
+  lemma exchange_permut_sub:
+    forall a1 a2: array 'a, i j l u: int.
+    exchange a1 a2 i j -> l <= i < u -> l <= j < u ->
+    0 <= l -> u <= length a1 -> permut_sub a1 a2 l u
+
+  lemma permut_sub_unmodified:
+    forall a1 a2: array 'a, l u: int.
+    permut_sub a1 a2 l u ->
+    forall i: int. (0 <= i < l \/ u <= i < length a1) -> a2[i] = a1[i]
+
+  (** we can always enlarge the interval *)
+
+  lemma permut_sub_weakening:
+    forall a1 a2: array 'a, l1 u1 l2 u2: int.
+    permut_sub a1 a2 l1 u1 -> 0 <= l2 <= l1 -> u1 <= u2 <= length a1 ->
+    permut_sub a1 a2 l2 u2
+
+  lemma permut_sub_compose:
+    forall a1 a2 a3: array 'a, l1 u1 l2 u2: int. u1 <= l2 ->
+    permut_sub a1 a2 l1 u1 ->
+    permut_sub a2 a3 l2 u2 ->
+    permut_sub a1 a3 l1 u2
+
+  (** {3 lemmas about [permut_all]} *)
+
+  (** permut_all is reflexive, symmetric, transitive and contains
+      transpositions *)
+
+  lemma permut_all_refl:
+    forall a: array 'a. permut_all a a
+
+(*
+  lemma permut_all_sym:
     forall a1 a2: array 'a.
-    array_eq a1 a2 -> permut a1 a2
+    permut_all a1 a2 -> permut_all a2 a1
+*)
+
+  lemma permut_all_trans:
+    forall a1 a2 a3: array 'a.
+    permut_all a1 a2 -> permut_all a2 a3 -> permut_all a1 a3
+
+  lemma exchange_permut_all:
+    forall a1 a2: array 'a, i j: int.
+    exchange a1 a2 i j -> permut_all a1 a2
+
+  (** identical arrays *)
+
+  lemma array_eq_permut_all:
+    forall a1 a2: array 'a.
+    array_eq a1 a2 -> permut_all a1 a2
+
+  (** permutation on a sub-interval *)
+
+  lemma permut_sub_permut_all:
+    forall a1 a2: array 'a, l u: int.
+    permut_sub a1 a2 l u -> permut_all a1 a2
 
 end
 
@@ -192,13 +264,11 @@ module ArraySwap
 
   let swap (a:array 'a) (i:int) (j:int) : unit
     requires { 0 <= i < length a /\ 0 <= j < length a }
+    writes   { a }
     ensures  { exchange (old a) a i j }
-    =
-    let v = a[i] in
-    begin
-      a[i] <- a[j];
-      a[j] <- v
-    end
+  = let v = a[i] in
+    a[i] <- a[j];
+    a[j] <- v
 
 end
 

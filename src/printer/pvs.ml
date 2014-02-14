@@ -111,6 +111,10 @@ let forget_all () = forget_all iprinter
 
 let tv_set = ref Sid.empty
 
+let thprinter =
+  let isanitize = sanitizer char_to_alpha char_to_alnumus in
+  create_ident_printer black_list ~sanitizer:isanitize
+
 (* type variables *)
 
 let print_tv fmt tv =
@@ -152,6 +156,11 @@ let print_pr fmt pr =
 let print_name fmt id =
   fprintf fmt "%% Why3 %s@\n" (id_unique iprinter id)
 
+let get_th_name id =
+  let s = id_unique thprinter id in
+  Ident.forget_all thprinter;
+  s
+
 (* info *)
 
 type info = {
@@ -167,7 +176,7 @@ let print_id fmt id = string fmt (id_unique iprinter id)
 let print_id_real info fmt id =
   try
     let path, th, ipr = Mid.find id info.symbol_printers in
-    let th = th.Theory.th_name.id_string in
+    let th = get_th_name th.Theory.th_name in
     let id = id_unique ipr id in
     if path = "" then fprintf fmt "%s.%s" th id
     else fprintf fmt "%s@@%s.%s" path th id
@@ -829,11 +838,11 @@ let print_task printer_args realize ?old fmt task =
     let rec upd_realized_theories = function
     | Some { Task.task_decl = { Theory.td_node =
                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, pr, _) }}} ->
-        pr.pr_name.id_string, [], realized_theories
+        get_th_name pr.pr_name, [], realized_theories
     | Some { Task.task_decl = { Theory.td_node = Theory.Clone (th,_) }} ->
         Sid.iter (fun id -> ignore (id_unique iprinter id)) th.Theory.th_local;
        let id = th.Theory.th_name in
-       id.id_string,
+       get_th_name id,
        th.Theory.th_path,
        Mid.remove id realized_theories
     | Some { Task.task_decl = { Theory.td_node = Theory.Meta _ };
@@ -884,7 +893,7 @@ let print_task printer_args realize ?old fmt task =
   Mid.iter
     (fun _ (th, (path, _)) ->
        let lib = if path = thpath then "" else String.concat "." path ^ "@" in
-       fprintf fmt "IMPORTING %s%s@\n" lib th.Theory.th_name.id_string)
+       fprintf fmt "IMPORTING %s%s@\n" lib (get_th_name th.Theory.th_name))
     realized_theories;
   fprintf fmt "%% do not edit above this line@\n";
   fprintf fmt

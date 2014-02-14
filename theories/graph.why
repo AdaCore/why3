@@ -10,14 +10,14 @@ theory Path
 
   predicate edge vertex vertex
 
-  (** [path v0 [v0; v1; ...; vn-1] vn]
-     means a path from [v0] to [vn] composed of [n] edges [(vi,vi+1)]. *)
   inductive path vertex (list vertex) vertex =
   | Path_empty:
       forall x: vertex. path x Nil x
   | Path_cons:
       forall x y z: vertex, l: list vertex.
       edge x y -> path y l z -> path x (Cons x l) z
+  (** [path v0 [v0; v1; ...; vn-1] vn]
+     means a path from [v0] to [vn] composed of [n] edges [(vi,vi+1)]. *)
 
   lemma path_right_extension:
     forall x y z: vertex, l: list vertex.
@@ -49,12 +49,12 @@ theory IntPathWeight
 
   function weight vertex vertex : int
 
-  (** the total weight of a path [path _ l dst] *)
   function path_weight (l: list vertex) (dst: vertex) : int = match l with
     | Nil -> 0
     | Cons x Nil -> weight x dst
     | Cons x ((Cons y _) as r) -> weight x y + path_weight r dst
   end
+  (** the total weight of a path [path _ l dst] *)
 
   lemma path_weight_right_extension:
     forall x y: vertex, l: list vertex.

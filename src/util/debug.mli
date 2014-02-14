@@ -53,6 +53,8 @@ val dprintf : flag -> ('a, Format.formatter, unit) format -> 'a
 val stack_trace : flag
 (** stack_trace flag *)
 
+
+
 (** Command line arguments *)
 module Args : sig
   type spec = (Arg.key * Arg.spec * Arg.doc)
@@ -76,4 +78,26 @@ module Args : sig
   val set_flags_selected : unit -> unit
   (** Set the flags selected by debug_all, debug or a shortcut.
       You should run this function after the plugins have been loaded. *)
+end
+
+val stats: flag
+type 'a stat
+
+module Stats: sig
+  (** Stats *)
+
+  val register:
+    print:(Format.formatter -> 'a -> unit) ->
+    name:string ->
+    init:'a -> 'a stat
+
+  val mod0: 'a stat -> ('a -> 'a) -> unit
+  val mod1: 'a stat -> ('a -> 'b -> 'a) -> 'b -> unit
+  val mod2: 'a stat -> ('a -> 'b -> 'c -> 'a) -> 'b -> 'c -> unit
+
+  val register_int: name:string -> init:int -> int stat
+  val incr: int stat -> unit
+  val decr: int stat -> unit
+
+  val print: unit -> unit
 end

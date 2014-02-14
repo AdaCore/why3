@@ -119,15 +119,18 @@ let print_pr fmt pr =
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let rec print_ty_node inn fmt ty = match ty.ty_node with
+let rec print_ty_node pri fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
-  | Tyapp (ts, tl) when is_ts_tuple ts -> fprintf fmt "(%a)"
-      (print_list comma (print_ty_node false)) tl
+  | Tyapp (ts, [t1;t2]) when ts_equal ts Ty.ts_func ->
+      fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
+        (print_ty_node 1) t1 (print_ty_node 0) t2
+  | Tyapp (ts, tl) when is_ts_tuple ts ->
+      fprintf fmt "(%a)" (print_list comma (print_ty_node 0)) tl
   | Tyapp (ts, []) -> print_ts fmt ts
-  | Tyapp (ts, tl) -> fprintf fmt (protect_on inn "%a@ %a")
-      print_ts ts (print_list space (print_ty_node true)) tl
+  | Tyapp (ts, tl) -> fprintf fmt (protect_on (pri > 1) "%a@ %a")
+      print_ts ts (print_list space (print_ty_node 2)) tl
 
-let print_ty = print_ty_node false
+let print_ty fmt ty = print_ty_node 0 fmt ty
 
 let print_const fmt = function
   | ConstInt (IConstDec s) -> fprintf fmt "%s" s
@@ -292,7 +295,7 @@ and print_tl fmt tl =
 (** Declarations *)
 
 let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
-let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node true) ty
+let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node 2) ty
 let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
 let print_constr fmt (cs,pjl) =
@@ -500,9 +503,10 @@ let () = Exn_printer.register
   | Ty.TypeMismatch (t1,t2) ->
       fprintf fmt "Type mismatch between %a and %a"
         print_ty t1 print_ty t2
+  | Ty.BadTypeArity ({ts_args = []} as ts, _) ->
+      fprintf fmt "Type symbol %a expects no arguments" print_ts ts
   | Ty.BadTypeArity (ts, app_arg) ->
-      fprintf fmt "Bad type arity: type symbol %a must be applied \
-                   to %i arguments, but is applied to %i"
+      fprintf fmt "Type symbol %a expects %i arguments but is applied to %i"
         print_ts ts (List.length ts.ts_args) app_arg
   | Ty.DuplicateTypeVar tv ->
       fprintf fmt "Type variable %a is used twice" print_tv tv
@@ -510,9 +514,12 @@ let () = Exn_printer.register
       fprintf fmt "Unbound type variable: %a" print_tv tv
   | Ty.UnexpectedProp ->
       fprintf fmt "Unexpected propositional type"
+  | Term.BadArity ({ls_args = []} as ls, _) ->
+      fprintf fmt "%s %a expects no arguments"
+        (if ls.ls_value = None then "Predicate" else "Function") print_ls ls
   | Term.BadArity (ls, app_arg) ->
-      fprintf fmt "Bad arity: symbol %a must be applied \
-                   to %i arguments, but is applied to %i"
+      fprintf fmt "%s %a expects %i arguments but is applied to %i"
+        (if ls.ls_value = None then "Predicate" else "Function")
         print_ls ls (List.length ls.ls_args) app_arg
   | Term.EmptyCase ->
       fprintf fmt "Empty match expression"
@@ -525,20 +532,21 @@ let () = Exn_printer.register
   | Term.PredicateSymbolExpected ls ->
       fprintf fmt "Not a predicate symbol: %a" print_ls ls
   | Term.ConstructorExpected ls ->
-      fprintf fmt "Symbol %a is not a constructor"
-        print_ls ls
+      fprintf fmt "%s %a is not a constructor"
+        (if ls.ls_value = None then "Predicate" else "Function") print_ls ls
   | Term.TermExpected t ->
       fprintf fmt "Not a term: %a" print_term t
   | Term.FmlaExpected t ->
       fprintf fmt "Not a formula: %a" print_term t
   | Pattern.ConstructorExpected (ls,ty) ->
-      fprintf fmt "Symbol %a is not a constructor of type %a"
-        print_ls ls print_ty ty
+      fprintf fmt "%s %a is not a constructor of type %a"
+        (if ls.ls_value = None then "Predicate" else "Function") print_ls ls
+        print_ty ty
   | Pattern.NonExhaustive pl ->
       fprintf fmt "Pattern not covered by a match:@\n  @[%a@]"
         print_pat (List.hd pl)
   | Decl.BadConstructor ls ->
-      fprintf fmt "Bad constructor symbol: %a" print_ls ls
+      fprintf fmt "Bad constructor: %a" print_ls ls
   | Decl.BadRecordField ls ->
       fprintf fmt "Not a record field: %a" print_ls ls
   | Decl.RecordFieldMissing (_cs,ls) ->

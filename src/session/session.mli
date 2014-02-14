@@ -229,7 +229,7 @@ val update_session :
   ?release:bool (* default false *)  ->
   keygen:'a keygen ->
   allow_obsolete:bool -> 'b session ->
-  Env.env -> Whyconf.config -> 'a env_session * bool
+  Env.env -> Whyconf.config -> 'a env_session * bool * bool
 (** reload the given session with the given environnement :
     - the files are reloaded
     - apply again the transformation
@@ -241,6 +241,8 @@ val update_session :
     otherwise the exception {!OutdatedSession} is raised.
     If the session was obsolete is indicated by
     the second result.
+    If the merge generated new unpaired goals is indicated by
+    the third result.
 
     raises [Failure msg] if the database file cannot be read correctly
 
@@ -469,8 +471,10 @@ val goal_task_or_recover: 'a env_session -> 'a goal -> Task.task
 (** {3 recursive} *)
 
 val goal_iter_proof_attempt : ('key proof_attempt -> unit) -> 'key goal -> unit
+(* unused
 val transf_iter_proof_attempt :
   ('key proof_attempt -> unit) -> 'key transf -> unit
+*)
 val theory_iter_proof_attempt :
   ('key proof_attempt -> unit) -> 'key theory -> unit
 val transf_iter_proof_attempt :
@@ -506,7 +510,9 @@ val iter_session :
 
 
 val goal_iter : ('key any -> unit) -> 'key goal -> unit
+(* unused
 val transf_iter : ('key any -> unit) -> 'key transf -> unit
+*)
 val theory_iter : ('key any -> unit) -> 'key theory -> unit
 val transf_iter : ('key any -> unit) -> 'key transf -> unit
 val metas_iter : ('key any -> unit) -> 'key metas -> unit

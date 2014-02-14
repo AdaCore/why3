@@ -72,7 +72,7 @@ let t_old  = t_var vs_old
 let t_at_old t = t_app fs_at [t; t_old] t.t_ty
 
 let ls_absurd = create_lsymbol (id_fresh "absurd") [] None
-let t_absurd  = ps_app ls_absurd []
+let t_absurd  = t_label_add Split_goal.stop_split (ps_app ls_absurd [])
 
 let mk_t_if f = t_if f t_bool_true t_bool_false
 let to_term t = if t.t_ty = None then mk_t_if t else t
@@ -234,14 +234,14 @@ let decrease_alg ?loc env old_t t =
   let csl = Decl.find_constructors env.pure_known ts in
   if csl = [] then quit ();
   let sbs = ty_match Mtv.empty (ty_app ts (List.map ty_var ts.ts_args)) oty in
-  let add_arg acc fty =
+  let add_arg fty acc =
     let fty = ty_inst sbs fty in
     if ty_equal fty nty then
       let vs = create_vsymbol (id_fresh "f") nty in
-      t_or_simp acc (t_equ (t_var vs) t), pat_var vs
-    else acc, pat_wild fty in
+      pat_var vs, t_or_simp (t_equ (t_var vs) t) acc
+    else pat_wild fty, acc in
   let add_cs (cs,_) =
-    let f, pl = Lists.map_fold_left add_arg t_false cs.ls_args in
+    let pl, f = Lists.map_fold_right add_arg cs.ls_args t_false in
     t_close_branch (pat_app cs pl oty) f in
   t_case old_t (List.map add_cs csl)
 
@@ -715,7 +715,7 @@ and wp_desc env e q xq = match e.e_node with
       let f = wp_expl expl_assume f in
       wp_implies (wp_label e f) q
   | Eabsurd ->
-      wp_label e (t_label_add expl_absurd t_absurd)
+      wp_label e (wp_expl expl_absurd t_absurd)
   | Eany spec ->
       let p = wp_label e (wp_expl expl_pre spec.c_pre) in
       let p = t_label ?loc:e.e_loc p.t_label p in
@@ -1034,7 +1034,9 @@ module Subst : sig
    type t
    (* the type of substitutions *)
 
+   (* (* debugging code *)
    val print_state : Format.formatter -> t -> unit
+   *)
 
    val init : Spv.t -> t
    (* the initial substitution for a program which mentions the given program
@@ -1155,10 +1157,12 @@ end = struct
 
   let mark s = { s with marked = true }
 
+  (* (* debugging code *)
   let print_state fmt s =
     Format.fprintf fmt "{ ";
     Mvs.iter (fun _ v -> Format.printf " %a " Pretty.print_term v) s.now.subst_vars;
     Format.fprintf fmt " }"
+  *)
 
   let init pvs =
     (* init the state with the given program variables. *)
@@ -1274,8 +1278,7 @@ end = struct
             let new_ = if marked then t_var (fresh_var_from_var k) else new_ in
             Mvs.add k new_ map,
             List.map2 (fun old f ->
-              if t_equal old new_ then f
-              else t_and_simp (t_equ new_ old) f) all_terms fl)
+              t_and_simp (t_equ new_ old) f) all_terms fl)
     domain (Mvs.empty, List.map (fun _ -> t_true) mapl)
 
   let merge_regs names marked base domain mapl =
@@ -1681,8 +1684,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
             Mexn.add ex pv.pv_vs acc) handlers xresult in
       let wp1 = fast_wp_expr env s (result,xresult') e1 in
       let result =
-      Mexn.fold (fun ex post acc ->
-        try
+        Mexn.fold (fun ex post acc -> try
           let _, e2 = Mexn.find ex handlers in
           let wp2 = fast_wp_expr env post.s r e2 in
           let s,f1,f2 = Subst.merge s wp1.post.s wp2.post.s in
@@ -1696,7 +1698,7 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
           }
         with Not_found ->
           { acc with exn = Mexn.add ex post acc.exn }
-         )
+        )
         wp1.exn
         { ok = wp1.ok;
           post = wp1.post;

@@ -164,7 +164,7 @@ end
 
 (* 2. More realistic code with bitwise operations **************************)
 
-(***
+(***)
 
 theory BitwiseArithmetic
 
@@ -229,20 +229,20 @@ end
 module NQueensBits
 
   use import Bits
-  use import arith.Int
+  use import mach.int.Int
   use import ref.Refint
   use import Solution
 
   val min_elt (x: int) : int
     requires { x <> 0 } ensures { result = min_elt (bits x) }
 
-  val col: ref solution  (* solution under construction *)
-  val k  : ref int       (* current row in the current solution *)
+  val ghost col: ref solution  (* solution under construction *)
+  val ghost k  : ref int       (* current row in the current solution *)
 
-  val sol: ref solutions (* all solutions *)
-  val s  : ref int       (* next slot for a solution = number of solutions *)
+  val ghost sol: ref solutions (* all solutions *)
+  val ghost s  : ref int       (* next slot for a solution = number of solutions *)
 
-  let rec t (a b c: int) variant { cardinal (bits a) } =
+  let rec t (a b c: int) variant { cardinal (bits a) }
     requires { 0 <= !k /\ !k + cardinal (bits a) = n /\ !s >= 0 /\
       (forall i: int. mem i (bits a) <->
         (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
@@ -300,6 +300,11 @@ module NQueensBits
         solution u <-> (exists i: int. 0 <= i < result /\ eq_sol u !sol[i]) }
   = t (~(~0 << q)) 0 0
 
+
+  let test8 () requires { size=32 /\ n = 8 } =
+    s := 0; k := 0;
+    queens 8
+
 end
 
-***)
+(***)

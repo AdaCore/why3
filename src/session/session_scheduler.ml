@@ -336,7 +336,7 @@ let schedule_delayed_action t callback =
 
 let update_session ?release ~allow_obsolete old_session env whyconf  =
   O.reset ();
-  let (env_session,_) as res =
+  let (env_session,_,_) as res =
     update_session ?release
       ~keygen:O.create ~allow_obsolete old_session env whyconf in
   dprintf debug "Init_session@\n";

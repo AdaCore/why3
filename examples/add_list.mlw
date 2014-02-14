@@ -30,6 +30,7 @@ module AddListRec
 use import SumList
 
 let rec sum (l: list or_integer_float) : (int, real) =
+    variant { l }
     returns { si, sf -> si = add_int l /\ sf = add_real l }
   match l with
   | Nil -> (0, 0.0)
@@ -70,6 +71,7 @@ let sum (l: list or_integer_float) : (int, real) =
     invariant { !si + add_int !ll = add_int l /\
                 !sf +. add_real !ll = add_real l
               }
+    variant { !ll }
      match !ll with
      | Nil -> raise Break
      | Cons (Integer n) t ->

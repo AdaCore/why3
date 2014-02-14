@@ -7,14 +7,18 @@
   version="0.95.1"/>
  <prover
   id="1"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="2"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="2"
+  id="3"
   name="Coq"
   version="8.4pl2"/>
  <prover
-  id="3"
+  id="4"
   name="Z3"
   version="2.19"/>
  <file
@@ -31,18 +35,18 @@
     name="closest"
     locfile="../bresenham.mlw"
     loclnum="34" loccnumb="8" loccnume="15"
-    sum="2da4d109f40a504c6240248e6e9ff056"
+    sum="c18e4a733a845b9d1202d0b801bbf0f3"
     proved="true"
     expanded="true"
-    shape="ainfix &lt;=aabsainfix -ainfix *V0V1V2aabsainfix -ainfix *V0V3V2FIainfix &lt;=aabsainfix -ainfix *ainfix *c2V0V1ainfix *c2V2V0Iainfix &lt;c0V0F">
+    shape="ainfix &lt;=aabsainfix -ainfix *V0V1V2aabsainfix -ainfix *V0V3V2FIainfix &lt;=aabsainfix -ainfix *ainfix *c2V0V1ainfix *c2V2V0F">
     <proof
-     prover="2"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      edited="bresenham_M_closest_1.v"
      obsolete="false"
      archived="false">
-     <result status="valid" time="4.20"/>
+     <result status="valid" time="3.74"/>
     </proof>
    </goal>
    <goal
@@ -50,7 +54,7 @@
     locfile="../bresenham.mlw"
     loclnum="39" loccnumb="6" loccnume="15"
     expl="VC for bresenham"
-    sum="145c3afb9565db0c8a64db135f0f44de"
+    sum="9b8128bb23b676133822da0cac2fea53"
     proved="true"
     expanded="true"
     shape="iainfix &lt;=V5ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V5Aainfix =V5ainfix -ainfix *ainfix *c2ainfix +ainfix +V3c1c1ay2ainfix *ainfix +ainfix *c2V4c1ax2Iainfix =V5ainfix +V1ainfix *c2ainfix -ay2ax2FIainfix =V4ainfix +V2c1Fainfix &lt;=V6ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V6Aainfix =V6ainfix -ainfix *ainfix *c2ainfix +ainfix +V3c1c1ay2ainfix *ainfix +ainfix *c2V2c1ax2Iainfix =V6ainfix +V1ainfix *c2ay2Fainfix &lt;V1c0AabestV3V2Iainfix &lt;=V1ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V1Aainfix =V1ainfix -ainfix *ainfix *c2ainfix +V3c1ay2ainfix *ainfix +ainfix *c2V2c1ax2Iainfix &lt;=V3V0Aainfix &lt;=c0V3FFAainfix &lt;=ainfix -ainfix *c2ay2ax2ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2ainfix -ainfix *c2ay2ax2Aainfix =ainfix -ainfix *c2ay2ax2ainfix -ainfix *ainfix *c2ainfix +c0c1ay2ainfix *ainfix +ainfix *c2c0c1ax2Iainfix &lt;=c0V0Lax2">
@@ -65,7 +69,7 @@
       locfile="../bresenham.mlw"
       loclnum="39" loccnumb="6" loccnume="15"
       expl="1. loop invariant init"
-      sum="a7d59511d637bd777ac8a33a539550bc"
+      sum="818d60808053e43e7be4da19c039bf40"
       proved="true"
       expanded="true"
       shape="loop invariant initainfix =ainfix -ainfix *c2ay2ax2ainfix -ainfix *ainfix *c2ainfix +c0c1ay2ainfix *ainfix +ainfix *c2c0c1ax2Iainfix &lt;=c0V0Lax2">
@@ -80,7 +84,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="1"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -88,7 +92,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -101,7 +105,7 @@
       locfile="../bresenham.mlw"
       loclnum="39" loccnumb="6" loccnume="15"
       expl="2. loop invariant init"
-      sum="a47e474878fd2e9638b69c1ea3cae179"
+      sum="4ed4f3c9453360f984689a439a94d03a"
       proved="true"
       expanded="true"
       shape="loop invariant initainfix &lt;=ainfix -ainfix *c2ay2ax2ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2ainfix -ainfix *c2ay2ax2Iainfix &lt;=c0V0Lax2">
@@ -121,7 +125,7 @@
       locfile="../bresenham.mlw"
       loclnum="39" loccnumb="6" loccnume="15"
       expl="3. assertion"
-      sum="b4fdabc8784d3fff3a314c29c063b44e"
+      sum="fcbcee9000353217b3dbca58d7cc9146"
       proved="true"
       expanded="true"
       shape="assertionabestV3V2Iainfix &lt;=V1ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V1Aainfix =V1ainfix -ainfix *ainfix *c2ainfix +V3c1ay2ainfix *ainfix +ainfix *c2V2c1ax2Iainfix &lt;=V3V0Aainfix &lt;=c0V3FFIainfix &lt;=c0V0Lax2">
@@ -129,11 +133,19 @@
        name="expl:VC for bresenham"/>
       <proof
        prover="0"
-       timelimit="5"
+       timelimit="30"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.10"/>
+       <result status="valid" time="6.17"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="30"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="6.86"/>
       </proof>
      </goal>
      <goal
@@ -141,7 +153,7 @@
       locfile="../bresenham.mlw"
       loclnum="39" loccnumb="6" loccnume="15"
       expl="4. loop invariant preservation"
-      sum="0bef89498ad79d5da5ff76cc66a9751d"
+      sum="0926f96b84b6aebff66f2379e7c0e76e"
       proved="true"
       expanded="true"
       shape="loop invariant preservationainfix =V4ainfix -ainfix *ainfix *c2ainfix +ainfix +V3c1c1ay2ainfix *ainfix +ainfix *c2V2c1ax2Iainfix =V4ainfix +V1ainfix *c2ay2FIainfix &lt;V1c0IabestV3V2Iainfix &lt;=V1ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V1Aainfix =V1ainfix -ainfix *ainfix *c2ainfix +V3c1ay2ainfix *ainfix +ainfix *c2V2c1ax2Iainfix &lt;=V3V0Aainfix &lt;=c0V3FFIainfix &lt;=c0V0Lax2">
@@ -156,7 +168,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -164,7 +176,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -177,7 +189,7 @@
       locfile="../bresenham.mlw"
       loclnum="39" loccnumb="6" loccnume="15"
       expl="5. loop invariant preservation"
-      sum="e6aba1a5d837387369af060369d26120"
+      sum="46f21c9ec9008592af315031d0658467"
       proved="true"
       expanded="true"
       shape="loop invariant preservationainfix &lt;=V4ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V4Iainfix =V4ainfix +V1ainfix *c2ay2FIainfix &lt;V1c0IabestV3V2Iainfix &lt;=V1ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V1Aainfix =V1ainfix -ainfix *ainfix *c2ainfix +V3c1ay2ainfix *ainfix +ainfix *c2V2c1ax2Iainfix &lt;=V3V0Aainfix &lt;=c0V3FFIainfix &lt;=c0V0Lax2">
@@ -197,14 +209,14 @@
       locfile="../bresenham.mlw"
       loclnum="39" loccnumb="6" loccnume="15"
       expl="6. loop invariant preservation"
-      sum="8bf10f587c91043c58241ffb93901f35"
+      sum="effb2332ccb437bc6e30129ae779efb0"
       proved="true"
       expanded="true"
       shape="loop invariant preservationainfix =V5ainfix -ainfix *ainfix *c2ainfix +ainfix +V3c1c1ay2ainfix *ainfix +ainfix *c2V4c1ax2Iainfix =V5ainfix +V1ainfix *c2ainfix -ay2ax2FIainfix =V4ainfix +V2c1FINainfix &lt;V1c0IabestV3V2Iainfix &lt;=V1ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V1Aainfix =V1ainfix -ainfix *ainfix *c2ainfix +V3c1ay2ainfix *ainfix +ainfix *c2V2c1ax2Iainfix &lt;=V3V0Aainfix &lt;=c0V3FFIainfix &lt;=c0V0Lax2">
       <label
        name="expl:VC for bresenham"/>
       <proof
-       prover="1"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -212,12 +224,12 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="10"
        memlimit="0"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.24"/>
+       <result status="valid" time="0.95"/>
       </proof>
      </goal>
      <goal
@@ -225,7 +237,7 @@
       locfile="../bresenham.mlw"
       loclnum="39" loccnumb="6" loccnume="15"
       expl="7. loop invariant preservation"
-      sum="dfc6df2fc87f993588f5515228babc75"
+      sum="60e316bbceaf72ebb290a196c9b2d99f"
       proved="true"
       expanded="true"
       shape="loop invariant preservationainfix &lt;=V5ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V5Iainfix =V5ainfix +V1ainfix *c2ainfix -ay2ax2FIainfix =V4ainfix +V2c1FINainfix &lt;V1c0IabestV3V2Iainfix &lt;=V1ainfix *c2ay2Aainfix &lt;=ainfix *c2ainfix -ay2ax2V1Aainfix =V1ainfix -ainfix *ainfix *c2ainfix +V3c1ay2ainfix *ainfix +ainfix *c2V2c1ax2Iainfix &lt;=V3V0Aainfix &lt;=c0V3FFIainfix &lt;=c0V0Lax2">

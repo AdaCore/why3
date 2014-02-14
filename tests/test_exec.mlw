@@ -6,6 +6,12 @@ module M
 
   let x () : int = 13 * 3 + 7 - 4
 
+  use import ref.Ref
+
+  let x0 () : int =
+    let x = ref 13 in
+    if !x <> 3 then 7 else 4
+
   use import list.Append
 
   let y () : list int =
@@ -51,28 +57,28 @@ module Mut
   let e1 () =
     let y = { a = 1; c = 43; b = 2 } in
     y.a <- 3;
+    y.b <- 7;
     y
 
   let t0 () =
     let y = { a = 1; c = 43; b = 2 } in
-    y.a + y.c
+    y.a + y.c (* should be 3 *)
 
   let t1 () =
     let y = { a = 1; c = 43; b = 2 } in
     let z = y in
-    y.a + z.b
+    y.a + z.b (* should be 3 *)
 
   let t2 () =
     let y = { a = 1; c = 43; b = 2 } in
     y.a <- 3;
-    y.a + y.b
+    y.a + y.b (* should be 5 *)
 
   let t3 () =
     let y = { a = 1; c = 43; b = 2 } in
     let z = y in
     z.a <- 3;
-    y.a
-
+    y.a (* should be 3 *)
 
   type refint = { mutable i : int }
 
@@ -86,6 +92,7 @@ module Mut
     let x = { i = 0 } in
     let s = { i = 0 } in
     while x.i <= 10 do
+      variant { 10 - x.i }
       s.i <- s.i + x.i;
       x.i <- x.i + 1
     done;
@@ -97,6 +104,7 @@ module Mut
     let y = { i = 8 } in
     let sum = { i = 0 } in
     while x.i <= m do
+      variant { m - x.i }
       let tmp = x.i in
       x.i <- y.i;
       y.i <- 4 * y.i + tmp;
@@ -108,6 +116,13 @@ module Mut
 
   let run2 () = f 4000000 (* should be 4613732 *)
 
+  (* use of a global mutable variable *)
+
+  val x : refint
+
+  let j0 () = x.i
+
+  let j () = x.i <- 42; x.i
 
 end
 
@@ -127,6 +142,7 @@ module Ref
     let y = ref 8 in
     let sum = ref 0 in
     while !x <= m do
+      variant { m - !x }
       let tmp = !x in
       x := !y;
       y := 4 * !y + tmp;
@@ -139,8 +155,57 @@ module Ref
   let run2 () = f 4000000 (* should be 4613732 *)
 
 
+  let g () : int =
+    for i=1 to 10 do
+       let x = ref i in
+       x := !x + 1
+    done;
+    42
+
+  let rec h n : int
+    variant { n }
+  =
+    let x = ref 0 in
+    x := !x + 1;
+    if n = 0 then 0 else h (n-1) + !x
+
+  let hh () = h 10
+
+  (* use of a global ref *)
+
+  val x : ref int
+
+  let j () =
+    x := 42;
+    !x
+
 end
 
+
+module Pair
+
+  use import ref.Ref
+
+  type t = { left : ref int ; middle : int; right : ref int }
+
+  let a () = { left = ref 13 ; middle = 5; right = ref 42 }
+
+  let b () =
+    let x = a () in
+    x.left := 57;
+    x.right := 98;
+    x
+
+  type u = { u1 : t ; u2 : t }
+
+  let c () =
+    let x = { left = ref 1; middle = 2; right = ref 3} in
+    let y = { left = ref 4; middle = 5; right = ref 6} in
+    let u = { u1 = x ; u2 = y } in
+    u.u2.left := 7;
+    u
+
+end
 
 module Array
 
@@ -163,18 +228,23 @@ module Array
       t[i] <- t[i]+1
     done
 
-  let test0 () = let t = Array.make 2 21 in t[0]+t[1]
+  let test0 () =
+    let t = Array.make 2 21 in
+    t[0]+t[1]
+    (* should be 42 *)
 
   let test1 () =
     let t = Array.make 2 21 in
     t[1] <- 17;
     t[0]+t[1]
+    (* should be 38 *)
 
   let test2 () =
     let t = Array.make 2 21 in
     t[1] <- 17;
     t[0] <- 7;
     t[0]+t[1]
+    (* should be 24 *)
 
   let t () : array int =
      let t = Array.make 3 0 in
@@ -183,7 +253,7 @@ module Array
      t[2] <- 67;
      t
 
-  let t1 () = 
+  let t1 () =
     let t = t () in
     t[0] + t[1] + t[2] (* 121 *)
 
@@ -193,6 +263,29 @@ module Array
   let test42 () = search (t ()) 42
   let test67 () = search (t ()) 67
   let test7 () = search (t ()) 7
+
+
+  use import array.ArraySwap
+
+  let test_swap () =
+     let t = Array.make 3 0 in
+     t[0] <- 12;
+     t[1] <- 42;
+     t[2] <- 67;
+     swap t 1 2;
+     t[1] (* 67 *)
+
+
+  let test_loop () =
+     let t = Array.make 3 0 in
+     for i=0 to 2 do t[i] <- i done;
+     t[0] + t[1] + t[2] (* 3 *)
+
+  (* global arrays *)
+
+  val g : array int
+
+  let j () = g[0] <- 42
 
 end
 

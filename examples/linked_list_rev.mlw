@@ -83,6 +83,7 @@ module InPlaceRev
       invariant { list_seg !r !next !rM null }
       invariant { disjoint !pM !rM }
       invariant { (reverse !pM) ++ !rM = reverse lM }
+      variant   { !pM }
         let n = get !next !p in
         next := set !next !p !r;
         assert { list_seg !r !next !rM null };

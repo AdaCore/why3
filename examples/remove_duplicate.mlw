@@ -1,0 +1,68 @@
+
+(** Given an array a of size n, removes its duplicate elements,
+    in-place, as follows: return r such that a[0..r[ contains the same
+    elements as a[0..n[ and no duplicate *)
+
+module Spec
+
+  use export int.Int
+  use export array.Array
+
+  (** v appears in a[0..s[ *)
+  predicate appears (v: 'a) (a: array 'a) (s: int) =
+    exists i: int. 0 <= i < s /\ a[i] = v
+
+  (** a[0..s[ contains no duplicate element *)
+  predicate nodup (a: array 'a) (s: int) =
+    forall i: int. 0 <= i < s -> not (appears a[i] a i)
+
+end
+
+(** Quadratic implementation, without extra space *)
+
+module RemoveDuplicateQuadratic
+
+  use import Spec
+  use import ref.Refint
+
+  let rec test_appears (ghost w: ref int) (v: 'a) (a: array 'a) (s: int) : bool
+    requires { 0 <= s <= length a }
+    ensures  { result=true <-> appears v a s }
+    ensures  { result=true -> 0 <= !w < s && a[!w] = v }
+    variant  { s }
+  = s > 0 &&
+    if a[s-1] = v then begin w := s - 1; true end else test_appears w v a (s-1)
+
+  let remove_duplicate (a: array 'a) : int
+    ensures { 0 <= result <= length a }
+    ensures { nodup a result }
+    ensures { forall v:'a. appears v (old a) (length a) <-> appears v a result }
+  = let n = length a in
+    let r = ref 0 in
+    let ghost from = make n 0 in
+    let ghost to_  = make n 0 in
+    'L:
+    for i = 0 to n - 1 do
+      invariant { 0 <= !r <= i }
+      invariant { nodup a !r }
+      invariant { forall j:int. 0 <= j < !r ->
+        0 <= to_[j] < i /\ a[j] = (at a 'L)[to_[j]] }
+      invariant { forall j:int. 0 <= j < i ->
+        0 <= from[j] < !r /\ (at a 'L)[j] = a[from[j]] }
+      (*invariant { forall v: 'a. appears v (at a 'L) i <-> appears v a !r }*)
+      invariant { forall j: int. i <= j < n -> a[j] = (at a 'L)[j] }
+      let ghost w = ref 0 in
+      if not (test_appears w a[i] a !r) then begin
+        a[!r] <- a[i];
+        from[i] <- !r;
+        to_[!r] <- i;
+        incr r
+      end else begin
+        from[i] <- !w;
+        ()
+      end
+    done;
+    !r
+
+
+end

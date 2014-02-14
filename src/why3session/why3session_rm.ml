@@ -58,7 +58,7 @@ let rec interactive to_remove =
     | _ -> interactive to_remove
 
 let run_one env config filters fname =
-  let env_session,_ =
+  let env_session,_,_ =
     read_update_session ~allow_obsolete:!opt_force_obsolete env config fname in
   session_iter_proof_attempt_by_filter filters
     (fun pr ->

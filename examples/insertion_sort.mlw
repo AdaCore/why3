@@ -11,16 +11,16 @@ module InsertionSort
   use import array.ArrayEq
 
   let insertion_sort (a: array int) =
-    ensures { sorted a /\ permut (old a) a }
+    ensures { sorted a /\ permut_all (old a) a }
 'L:
     for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
-      invariant { sorted_sub a 0 i /\ permut (at a 'L) a }
+      invariant { sorted_sub a 0 i /\ permut_all (at a 'L) a }
       let v = a[i] in
       let j = ref i in
       while !j > 0 && a[!j - 1] > v do
         invariant { 0 <= !j <= i }
-        invariant { permut (at a 'L) a[!j <- v] }
+        invariant { permut_all (at a 'L) a[!j <- v] }
         invariant { forall k1 k2: int.
              0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> a[k1] <= a[k2] }
         invariant { forall k: int. !j+1 <= k <= i -> v < a[k] }
@@ -34,11 +34,32 @@ module InsertionSort
       a[!j] <- v
     done
 
-  let test () =
+  let test1 () =
+    let a = make 3 0 in
+    a[0] <- 7; a[1] <- 3; a[2] <- 1;
+    insertion_sort a;
+    a
+
+  let test2 () ensures { result.length = 8 } =
     let a = make 8 0 in
-    a[0] <- 3; a[1] <- 1; a[2] <- 7; a[3] <- 0;
-    a[4] <- 4; a[5] <- 1; a[6] <- 6; a[7] <- 3;
-    insertion_sort a
+    a[0] <- 53; a[1] <- 91; a[2] <- 17; a[3] <- -5;
+    a[4] <- 413; a[5] <- 42; a[6] <- 69; a[7] <- 6;
+    insertion_sort a;
+    a
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let a = test2 () in
+    if a[0] <> -5 then raise BenchFailure;
+    if a[1] <> 6 then raise BenchFailure;
+    if a[2] <> 17 then raise BenchFailure;
+    if a[3] <> 42 then raise BenchFailure;
+    if a[4] <> 53 then raise BenchFailure;
+    if a[5] <> 69 then raise BenchFailure;
+    if a[6] <> 91 then raise BenchFailure;
+    if a[7] <> 413 then raise BenchFailure;
+    a
 
 end
 
@@ -65,16 +86,16 @@ module InsertionSortGen
     M.sorted_sub a.elts 0 a.length
 
   let insertion_sort (a: array elt) =
-    ensures { sorted a /\ permut (old a) a }
+    ensures { sorted a /\ permut_all (old a) a }
 'L:
     for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
-      invariant { sorted_sub a 0 i /\ permut (at a 'L) a }
+      invariant { sorted_sub a 0 i /\ permut_all (at a 'L) a }
       let v = a[i] in
       let j = ref i in
       while !j > 0 && not (le a[!j - 1] v) do
         invariant { 0 <= !j <= i }
-        invariant { permut (at a 'L) a[!j <- v] }
+        invariant { permut_all (at a 'L) a[!j <- v] }
         invariant { forall k1 k2: int.
              0 <= k1 <= k2 <= i -> k1 <> !j -> k2 <> !j -> le a[k1] a[k2] }
         invariant { forall k: int. !j+1 <= k <= i -> le v a[k] }

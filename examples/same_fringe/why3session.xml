@@ -7,6 +7,10 @@
   version="0.95.1"/>
  <prover
   id="1"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="2"
   name="CVC3"
   version="2.4.1"/>
  <file
@@ -131,7 +135,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="1"
+       prover="2"
        timelimit="10"
        memlimit="0"
        obsolete="false"
@@ -381,17 +385,37 @@
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
+   <goal
+    name="WP_parameter bench"
+    locfile="../same_fringe.mlw"
+    loclnum="77" loccnumb="6" loccnume="11"
+    expl="VC for bench"
+    sum="9020315c47e71b0301c59e758be57eb8"
+    proved="true"
+    expanded="false"
+    shape="t">
+    <label
+     name="expl:VC for bench"/>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
   </theory>
   <theory
    name="Test"
    locfile="../same_fringe.mlw"
-   loclnum="77" loccnumb="7" loccnume="11"
+   loclnum="82" loccnumb="7" loccnume="11"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter test1"
     locfile="../same_fringe.mlw"
-    loclnum="82" loccnumb="6" loccnume="11"
+    loclnum="87" loccnumb="6" loccnume="11"
     expl="VC for test1"
     sum="d37ebc1cd434eba73675a2913c7a3548"
     proved="true"
@@ -411,7 +435,7 @@
    <goal
     name="WP_parameter test2"
     locfile="../same_fringe.mlw"
-    loclnum="83" loccnumb="6" loccnume="11"
+    loclnum="88" loccnumb="6" loccnume="11"
     expl="VC for test2"
     sum="d37ebc1cd434eba73675a2913c7a3548"
     proved="true"
@@ -431,7 +455,7 @@
    <goal
     name="WP_parameter test3"
     locfile="../same_fringe.mlw"
-    loclnum="84" loccnumb="6" loccnume="11"
+    loclnum="89" loccnumb="6" loccnume="11"
     expl="VC for test3"
     sum="d37ebc1cd434eba73675a2913c7a3548"
     proved="true"
@@ -451,7 +475,7 @@
    <goal
     name="WP_parameter leaf"
     locfile="../same_fringe.mlw"
-    loclnum="89" loccnumb="6" loccnume="10"
+    loclnum="94" loccnumb="6" loccnume="10"
     expl="VC for leaf"
     sum="cb3d58a8e5a4cd2167042439af66c371"
     proved="true"
@@ -471,7 +495,7 @@
    <goal
     name="WP_parameter test4"
     locfile="../same_fringe.mlw"
-    loclnum="91" loccnumb="6" loccnume="11"
+    loclnum="96" loccnumb="6" loccnume="11"
     expl="VC for test4"
     sum="cb3d58a8e5a4cd2167042439af66c371"
     proved="true"
@@ -491,7 +515,7 @@
    <goal
     name="WP_parameter test5"
     locfile="../same_fringe.mlw"
-    loclnum="92" loccnumb="6" loccnume="11"
+    loclnum="97" loccnumb="6" loccnume="11"
     expl="VC for test5"
     sum="cb3d58a8e5a4cd2167042439af66c371"
     proved="true"

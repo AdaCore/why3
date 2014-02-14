@@ -100,4 +100,15 @@ module NQueens
     raises { Solution -> solution board n }
   = bt_queens board n 0
 
+
+  exception BenchFailure
+
+  let test8 () raises { BenchFailure -> true } =
+    let a = Array.make 8 0 in
+    try
+      queens a 8;
+      raise BenchFailure
+    with Solution -> a
+    end
+
 end

@@ -20,8 +20,6 @@ open Term
 open Decl
 open Theory
 open Printer
-open Mlw_ty
-open Mlw_module
 
 let debug =
   Debug.register_info_flag "extraction"
@@ -144,7 +142,8 @@ let print_qident ~sanitizer info fmt id =
     let s = sanitizer s in
     let s = if is_ocaml_keyword s then s ^ "_renamed" else s in
     if Sid.mem id info.current_theory.th_local ||
-       Opt.fold (fun _ m -> Sid.mem id m.mod_local) false info.current_module
+       Opt.fold (fun _ m -> Sid.mem id m.Mlw_module.mod_local)
+        false info.current_module
     then
       fprintf fmt "%s" s
     else
@@ -462,7 +461,8 @@ and print_app pri ls info fmt tl =
 
 and print_tnode pri info fmt t = match t.t_node with
   | Tvar v ->
-      let gh = try (restore_pv v).pv_ghost with Not_found -> false in
+      let gh = try (Mlw_ty.restore_pv v).Mlw_ty.pv_ghost
+      with Not_found -> false in
       if gh then fprintf fmt "()" else print_vs fmt v
   | Tconst c ->
       print_const fmt c

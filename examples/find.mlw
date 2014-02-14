@@ -39,18 +39,18 @@ module FIND
 
   let find (a: array int) =
     requires { length a = _N+1 }
-    ensures  { found a /\ permut a (old a) }
+    ensures  { found a /\ permut_all a (old a) }
 'Init:
   let m = ref 1 in let n = ref _N in
   while !m < !n do
     invariant { m_invariant !m a /\ n_invariant !n a /\
-      permut a (at a 'Init) /\ 1 <= !m /\ !n <= _N }
+      permut_all a (at a 'Init) /\ 1 <= !m /\ !n <= _N }
     variant { !n - !m }
     let r = a[f] in let i = ref !m in let j = ref !n in
     while !i <= !j do
       invariant { i_invariant !m !n !i r a /\ j_invariant !m !n !j r a /\
         m_invariant !m a /\ n_invariant !n a /\ 0 <= !j /\ !i <= _N + 1 /\
-        termination !i !j !m !n r a /\ permut a (at a 'Init) }
+        termination !i !j !m !n r a /\ permut_all a (at a 'Init) }
       variant { _N + 2 + !j - !i }
   'L: while a[!i] < r do
         invariant { i_invariant !m !n !i r a /\

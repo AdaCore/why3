@@ -26,7 +26,7 @@ type prelude = string list
 type prelude_map = prelude Mid.t
 type blacklist = string list
 
-type 'a pp = formatter -> 'a -> unit
+type 'a pp = Pp.formatter -> 'a -> unit
 
 type printer_args = {
   env        : Env.env;

@@ -15,6 +15,8 @@ module DfaExample
 
   val input: stream
 
+  use import list.Length
+
   val get () : option char writes {input}
     ensures { match old input.state with
     | Cons c l -> input.state = l /\ result = Some c
@@ -28,10 +30,21 @@ module DfaExample
       +-0--/                           \----- 1 --+
   *)
 
-  constant r1 : regexp = Concat (Star (Alt (Char Zero) (Char One))) (Char One)
+  constant r0 : regexp = Star (Alt (Char Zero) (Char One))
+  constant r1 : regexp = Concat r0 (Char One)
   constant r2 : regexp = Alt Epsilon r1
 
   lemma nil_notin_r1: not (mem Nil r1)
+
+  let rec lemma all_in_r0 (w: list char)
+    variant { w }
+    ensures { mem w r0 }
+  = match w with
+    | Nil -> ()
+    | Cons c r ->
+      assert { w = (Cons c Nil) ++ r } ;
+      all_in_r0 r
+    end
 
   lemma ends_with_one:
     forall w: list char.
@@ -44,6 +57,7 @@ module DfaExample
   lemma one_w_in_r2: forall w: list char. mem w r2 <-> mem (Cons One w) r2
 
   let rec astate1 () : bool
+    variant { length input.state }
     ensures { result = True <-> input.state = Nil /\ mem (old input.state) r1 }
     =
     match get () with
@@ -53,6 +67,7 @@ module DfaExample
     end
 
   with astate2 () : bool
+    variant { length input.state }
     ensures { result = True <-> input.state = Nil /\ mem (old input.state) r2 }
     =
     match get () with

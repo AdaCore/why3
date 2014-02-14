@@ -534,7 +534,7 @@ let do_theory env drv fname tname th glist elist =
         match l with
         | [] ->
           let t = Mlw_interp.eval_global_term env th.th_known t in
-          printf "@[<hov 2>Evaluation of %s:@ %a@]@." x Pretty.print_term t
+          printf "@[<hov 2>Evaluation of %s:@ %a@]@." x Mlw_interp.print_value t
         | _ ->
           eprintf "Symbol '%s' is not a constant in theory '%s'.@." x tname;
           exit 1
@@ -583,40 +583,17 @@ let do_exec env fname cin exec =
       in
       match Mlw_decl.find_definition m.Mlw_module.mod_known ps with
         | None ->
-          eprintf "Function %s.%s has no definition.@." mid name;
+          eprintf "Function %s has no definition.@." x;
           exit 1
         | Some d ->
-          let lam = d.Mlw_expr.fun_lambda in
-          match lam.Mlw_expr.l_args with
-            | [pvs] when Mlw_ty.ity_equal pvs.Mlw_ty.pv_ity Mlw_ty.ity_unit ->
-              printf "@[<hov 2>Execution of %s ():@\n" x;
-              let body = lam.Mlw_expr.l_expr in
-              printf "type  : @[%a@]@\n"
-                Mlw_pretty.print_vty body.Mlw_expr.e_vty;
-            (* printf "effect: %a@\n" *)
-            (*   Mlw_pretty.print_effect body.Mlw_expr.e_effect; *)
-              let res, st =
-                Mlw_interp.eval_global_expr env
-                  m.Mlw_module.mod_known m.Mlw_module.mod_theory.Theory.th_known
-                  lam.Mlw_expr.l_expr
-              in
-              printf "result: %a@\nstate: %a@]@." 
-                Mlw_interp.print_result res
-                Mlw_interp.print_state st
-            | _ ->
-              eprintf "Only functions with one unit argument can be executed.@.";
-              exit 1
+          try
+            printf "@[<hov 2>Execution of %s ():@\n" x;
+            Mlw_interp.eval_global_symbol env m d;
+          with e when Debug.test_noflag Debug.stack_trace ->
+            printf "@\n@]@.";
+            raise e
     in
     Queue.iter do_exec exec
-(*
-    if Queue.is_empty tlist then begin
-      let do_m t m thm =
-        do_extract_module edrv ~fname t m; Mstr.remove t thm in
-      let thm = Mstr.fold do_m mm thm in
-      Mstr.iter (fun t th -> do_extract_theory edrv ~fname t th) thm
-    end else
-      Queue.iter (do_extract_module_from edrv fname mm thm) tlist
-*)
  else
   begin
     Format.eprintf "'--exec is available only for mlw files@.";

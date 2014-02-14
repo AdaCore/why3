@@ -11,16 +11,12 @@
 
 (* WhyML interpretation *)
 
-val eval_global_term: Env.env -> Decl.known_map -> Term.term -> Term.term
+type value
 
-type result
+val print_value: Format.formatter -> value -> unit
 
-val print_result: Format.formatter -> result -> unit
+val eval_global_term: 
+  Env.env -> Decl.known_map -> Term.term -> value
 
-type state
-
-val print_state: Format.formatter -> state -> unit
-
-val eval_global_expr: Env.env ->
-  Mlw_decl.known_map -> Decl.known_map -> Mlw_expr.expr -> result * state
-
+val eval_global_symbol:
+  Env.env -> Mlw_module.modul -> Mlw_expr.fun_defn -> unit

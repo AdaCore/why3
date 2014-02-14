@@ -29,7 +29,7 @@ end
 module GP = Graph.Persistent.Digraph.ConcreteLabeled(
   struct
     type t = lsymbol
-    let compare x y = compare (ls_hash x) (ls_hash y)
+    let compare = ls_compare
     let hash = ls_hash
     let equal = ls_equal
   end)(Int_Dft)
@@ -37,15 +37,13 @@ module GP = Graph.Persistent.Digraph.ConcreteLabeled(
 (** a way to compare/hash expressions *)
 module ExprNode = struct
     type t = Term.term
-    let compare x y = compare (t_hash x) (t_hash y)
+    let compare = t_compare
     let hash = t_hash
     let equal = t_equal
 end
 module GC = Graph.Persistent.Graph.Concrete(ExprNode)
 module Sls = Set.Make(GP.V)
 module Sexpr = Set.Make(ExprNode)
-
-let err = Format.err_formatter
 
 (** prints the given expression, transforming spaces into _ *)
 let string_of_expr_node node =
@@ -109,7 +107,7 @@ module NF = struct (* add memoization, one day ? *)
   (* TODO ! *)
   (** all quantifiers in prenex form, currently just identity *)
   let prenex_fmla fmla =
-    Format.fprintf err "prenex_fmla : @[%a@]@." Pretty.print_term fmla;
+    Format.eprintf "prenex_fmla : @[%a@]@." Pretty.print_term fmla;
     fmla
 
   (** creates a fresh non-quantified formula, representing a quantified formula *)
@@ -124,14 +122,14 @@ module NF = struct (* add memoization, one day ? *)
       A clause is a list of formulae, so this function returns a list
       of list of formulae. *)
   let rec transform fmlaTable fmla =
-    Format.fprintf err "transform : @[%a@]@." Pretty.print_term fmla;
+    Format.eprintf "transform : @[%a@]@." Pretty.print_term fmla;
     match fmla.t_node with
     | Tquant (_,f_bound) ->
         let var,_,f =  t_open_quant f_bound in
         traverse fmlaTable fmla var f
     | Tbinop (_,_,_) ->
         let clauses = split fmla in
-        Format.fprintf err "split : @[%a@]@." Util.print_clause clauses;
+        Format.eprintf "split : @[%a@]@." Util.print_clause clauses;
         begin match clauses with
           | [f] -> begin match f.t_node with
               | Tbinop (Tor,f1,f2) ->
@@ -279,19 +277,11 @@ module GraphConstant = struct
   let analyse_clause fTbl tTbl gc clause =
     List.fold_left (analyse_fmla_base fTbl tTbl) gc clause
 
-  (** analyses a proposition :
-      - get it into normal form
+  (** analyses a list of clauses :
       - fold over clauses with analyse_clause *)
-  let analyse_prop fmlaTable fTbl tTbl gc prop =
-    let clauses = NF.make_clauses fmlaTable prop in
+  let analyse_clauses fTbl tTbl gc clauses =
     List.fold_left (analyse_clause fTbl tTbl) gc clauses
 
-  (** processes a single task_head. *)
-  let update fmlaTable fTbl tTbl gc task_head =
-    match task_head.task_decl.Theory.td_node with
-    | Theory.Decl {d_node = Dprop(_,_,prop_decl)} ->
-      analyse_prop fmlaTable fTbl tTbl gc prop_decl
-    | _ -> gc
 end
 
 (** module used to compute the directed graph of predicates *)
@@ -346,29 +336,13 @@ module GraphPredicate = struct
       (fun gp left ->
        List.fold_left (add left) gp positive) gp negative
 
-  (** takes a prop, puts it in Normal Form and then builds a clause
-      from it *)
-  let analyse_prop fmlaTable symbTbl gp prop =
-    let clauses = NF.make_clauses fmlaTable prop in
+  let analyse_clauses symbTbl gp clauses =
     List.fold_left (analyse_clause symbTbl) gp clauses
 
   (** add a symbol to the graph as a new vertex *)
   let add_symbol symbTbl gp lsymbol =
     GP.add_vertex gp (find symbTbl lsymbol)
 
-  (** takes a constant graph and a task_head, and add any interesting
-      element to the graph it returns. *)
-  let update fmlaTable symbTbl gp task_head =
-    match task_head.task_decl.Theory.td_node with
-      | Theory.Decl {d_node = Dprop (_,_,prop_decl) } ->
-        (* a proposition to analyse *)
-        analyse_prop fmlaTable symbTbl gp prop_decl
-      | Theory.Decl {d_node = Dlogic logic_decls } ->
-        (* a symbol to add *)
-        List.fold_left
-          (fun gp logic_decl -> add_symbol symbTbl gp (fst logic_decl))
-          gp logic_decls
-      | _ -> gp
 end
 
 (** module that makes the final selection *)
@@ -430,8 +404,11 @@ module Select = struct
 
   (** builds the list of reachable nodes in a non-directed graph (of constants)*)
   let build_relevant_variables gc goal_clause =
-    let acc = Sexpr.empty in
-    let l0 = List.fold_right Sexpr.add goal_clause acc in
+    let rec add_literal acc f = match f.t_node with
+      | Tnot f -> add_literal acc f
+      | Tapp _ -> Sexpr.add f acc
+      | _ -> failwith "bad literal in the goal clause" in
+    let l0 = List.fold_left add_literal Sexpr.empty goal_clause in
 
     (** explore one more step *)
     let rec one_step cur =
@@ -551,48 +528,66 @@ module Select = struct
       | Dprop(_,_,_) -> [decl]
 end
 
-(** if this is the goal, return it as Some goal after checking there is no other
-    goal. Else, return the option *)
-let get_goal task_head option =
-  match task_head.task_decl.Theory.td_node with
-    | Theory.Decl {d_node = Dprop(Pgoal,_,goal_fmla)} ->
-        assert (option = None); (* only one goal ! *)
-        Some goal_fmla
-    | _ -> option
+(** persistent incremental tables *)
+let fmlaTable = Hterm.create 17
+let fTbl = Hterm.create 17
+let tTbl = Hterm.create 17
+let symbTbl = Hls.create 17
 
 (** collects data on predicates and constants in task *)
-let collect_info fmlaTable fTbl tTbl symbTbl =
-  Trans.fold
-    (fun t (gc, gp, goal_option) ->
-       GraphConstant.update fmlaTable fTbl tTbl gc t,
-       GraphPredicate.update fmlaTable symbTbl gp t,
-       get_goal t goal_option)
-    (GC.empty, GP.empty, None)
+let collect_info =
+  let analyse_prop is_goal gc gp prop =
+    let clauses = NF.make_clauses fmlaTable prop in
+    (if is_goal then Some clauses else None),
+    GraphConstant.analyse_clauses fTbl tTbl gc clauses,
+    GraphPredicate.analyse_clauses symbTbl gp clauses
+  in
+  let update task_head (last_clauses,gc,gp) =
+    assert (last_clauses = None);
+    match task_head.task_decl.Theory.td_node with
+    | Theory.Decl {d_node = Dprop (Pgoal,_,prop_decl)} ->
+        analyse_prop true gc gp prop_decl
+    | Theory.Decl {d_node = Dprop (_,_,prop_decl)} ->
+        analyse_prop false gc gp prop_decl
+    | Theory.Decl {d_node = Dparam ls} ->
+        None, gc, GraphPredicate.add_symbol symbTbl gp ls
+    | Theory.Decl {d_node = Dlogic dl} ->
+        let add_symbol gp (ls,_) =
+          GraphPredicate.add_symbol symbTbl gp ls in
+        let gp = List.fold_left add_symbol gp dl in
+        let add_ld (_,gc,gp) (_,ld) =
+          analyse_prop false gc gp (Decl.ls_defn_axiom ld) in
+        List.fold_left add_ld (None,gc,gp) dl
+    | Theory.Decl {d_node = Dind (_,il)} ->
+        let add_symbol gp (ls,_) =
+          GraphPredicate.add_symbol symbTbl gp ls in
+        let gp = List.fold_left add_symbol gp il in
+        let add_id (_,gc,gp) (_,prop) =
+          analyse_prop false gc gp prop in
+        let add_id (_,gc,gp) (_,il) =
+          List.fold_left add_id (None,gc,gp) il in
+        List.fold_left add_id (None,gc,gp) il
+    | _ -> None,gc,gp
+  in
+  Trans.fold update (None, GC.empty, GP.empty)
 
 (** the transformation, made from applying collect_info and
 then mapping Select.filter *)
-let transformation fmlaTable fTbl tTbl symbTbl task =
+let transformation task =
   (* first, collect data in 2 graphes *)
-  let (gc,gp,goal_option) =
-    Trans.apply (collect_info fmlaTable fTbl tTbl symbTbl) task in
-  Format.fprintf Format.err_formatter "graph: @\n@\n%a@\n@." Dot_.fprint_graph gc;
+  let (last_clauses,gc,gp) = Trans.apply collect_info task in
+  Format.eprintf "graph: @\n@\n%a@\n@." Dot_.fprint_graph gc;
   (* get the goal *)
-  let goal_fmla = match goal_option with
+  let goal_clauses = match last_clauses with
     | None -> failwith "no goal !"
-    | Some goal_fmla -> goal_fmla in
-  let goal_clauses = NF.make_clauses fmlaTable goal_fmla in
+    | Some clauses -> clauses in
   (* filter one declaration at once *)
   Trans.apply
     (Trans.decl
        (Select.filter fTbl tTbl symbTbl goal_clauses (gc,gp)) None) task
 
 (** the transformation to be registered *)
-let hypothesis_selection = (* create lots of hashtables... *)
-  let fmlaTable = Hterm.create 17 in
-  let fTbl = Hterm.create 17 in
-  let tTbl = Hterm.create 17 in
-  let symbTbl = Hls.create 17 in
-  Trans.store (transformation fmlaTable fTbl tTbl symbTbl)
+let hypothesis_selection = Trans.store transformation
 
 let () = Trans.register_transform "hypothesis_selection" hypothesis_selection
   ~desc:"Hypothesis@ selection."

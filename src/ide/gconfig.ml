@@ -47,6 +47,7 @@ type t =
       mutable tree_width : int;
       mutable task_height : int;
       mutable verbose : int;
+      mutable default_prover : string; (* "" means none *)
       mutable default_editor : string;
       mutable intro_premises : bool;
       mutable show_labels : bool;
@@ -87,6 +88,7 @@ type ide = {
   ide_goal_color : string;
   ide_error_color : string;
   ide_iconset : string;
+  ide_default_prover : string;
   ide_default_editor : string;
   (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
@@ -108,6 +110,7 @@ let default_ide =
     ide_error_color = "orange";
     ide_iconset = "boomy";
     (* ide_replace_prover = CRP_Ask; *)
+    ide_default_prover = "";
     ide_default_editor =
       (try Sys.getenv "EDITOR" ^ " %f"
        with Not_found -> "editor %f");
@@ -152,6 +155,9 @@ let load_ide section =
     ide_default_editor =
       get_string section ~default:default_ide.ide_default_editor
         "default_editor";
+    ide_default_prover =
+      get_string section ~default:default_ide.ide_default_prover
+        "default_prover";
  (*
    ide_replace_prover =
       begin
@@ -221,6 +227,7 @@ let load_config config original_config =
     goal_color = ide.ide_goal_color;
     error_color = ide.ide_error_color;
     iconset = ide.ide_iconset;
+    default_prover = ide.ide_default_prover;
     default_editor = ide.ide_default_editor;
     config         = config;
     original_config = original_config;
@@ -292,6 +299,7 @@ let save_config t =
   let ide = set_string ide "goal_color" t.goal_color in
   let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "iconset" t.iconset in
+  let ide = set_string ide "default_prover" t.default_prover in
   let ide = set_string ide "default_editor" t.default_editor in
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = Whyconf.set_section config "ide" ide in
@@ -780,14 +788,14 @@ let provers_page c (notebook:GPack.notebook) =
   with Gtk.Error _ -> assert false
   in let () = scrollview#set_shadow_type `OUT in
   let vbox = GPack.vbox ~packing:scrollview#add_with_viewport () in
+  let hbox = GPack.hbox ~packing:(vbox#pack ~fill:true ~expand:true) () in
+  (* show/hide provers *)
   let frame =
-    GBin.frame ~label:"Provers button shown in the left toolbar"
-      ~packing:(vbox#pack ~fill:true ~expand:true) ()
-  in
+    GBin.frame ~label:"Prover button in the left toolbar"
+      ~packing:(hbox#pack ~fill:true ~expand:true) () in
   let provers_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-      ~packing:frame#add ()
-  in
+      ~packing:frame#add () in
   let hidden_provers = Hashtbl.create 7 in
   Mprover.iter
     (fun _ p ->
@@ -806,7 +814,30 @@ let provers_page c (notebook:GPack.notebook) =
               Hashtbl.fold
               (fun l h acc -> if !h then l::acc else acc) hidden_provers [])
       in ())
+    (Whyconf.get_provers c.config);
+  (* default prover *)
+  let frame2 =
+    GBin.frame ~label:"Default prover"
+      ~packing:(hbox#pack ~fill:true ~expand:true) () in
+  let provers_box =
+    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:frame2#add () in
+  let group = ref None in
+  Mprover.iter
+    (fun _ p ->
+      let name = prover_parseable_format p.prover in
+      let label = Pp.string_of_wnl print_prover p.prover in
+      let b =
+        GButton.radio_button ~label ?group:!group ~packing:provers_box#add ()
+          ~active:(name = c.default_prover)
+      in
+      if !group = None then group := Some b#group;
+      let (_ : GtkSignal.id) =
+        b#connect#toggled ~callback:(fun () -> c.default_prover <- name)
+      in ())
     (Whyconf.get_provers c.config)
+
+
 
 (* Page "Uninstalled provers" *)
 
@@ -887,7 +918,8 @@ let editors_page c (notebook:GPack.notebook) =
   let add_prover p pi =
     let text = Pp.string_of_wnl Whyconf.print_prover p in
     let hb = GPack.hbox ~homogeneous:false ~packing:box#pack () in
-    let _ = GMisc.label ~width:150 ~xalign:0.0 ~text ~packing:(hb#pack ~fill:true ~expand:true) () in
+    let _ = GMisc.label ~width:150 ~xalign:0.0 ~text
+      ~packing:(hb#pack ~fill:true ~expand:true) () in
     let (combo, ((_ : GTree.list_store), column)) =
       GEdit.combo_box_text ~packing:hb#pack ~strings ()
     in

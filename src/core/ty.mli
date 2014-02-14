@@ -21,8 +21,8 @@ module Mtv : Extmap.S with type key = tvsymbol
 module Stv : Extset.S with module M = Mtv
 module Htv : Exthtbl.S with type key = tvsymbol
 
+val tv_compare : tvsymbol -> tvsymbol -> int
 val tv_equal : tvsymbol -> tvsymbol -> bool
-
 val tv_hash : tvsymbol -> int
 
 val create_tvsymbol : preid -> tvsymbol
@@ -117,7 +117,7 @@ val ts_func : tysymbol
 val ts_pred : tysymbol
 
 val ty_func : ty -> ty -> ty
-val ty_pred : ty -> ty
+val ty_pred : ty -> ty (* ty_pred 'a == ty_func 'a bool *)
 
 val ts_tuple : int -> tysymbol
 val ty_tuple : ty list -> ty

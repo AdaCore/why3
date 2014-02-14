@@ -12,45 +12,55 @@ Definition unit := unit.
 (* Why3 assumption *)
 Inductive array
   (a:Type) {a_WT:WhyType a} :=
-  | mk_array : Z -> (map.Map.map Z a) -> array a.
+  | mk_array : Z -> (@map.Map.map Z _ a a_WT) -> array a.
 Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 Implicit Arguments mk_array [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a} (v:(array a)): (map.Map.map Z a) :=
-  match v with
+Definition elts {a:Type} {a_WT:WhyType a} (v:(@array a a_WT)): (@map.Map.map
+  Z _ a a_WT) := match v with
   | (mk_array x x1) => x1
   end.
 
 (* Why3 assumption *)
-Definition length {a:Type} {a_WT:WhyType a} (v:(array a)): Z :=
+Definition length {a:Type} {a_WT:WhyType a} (v:(@array a a_WT)): Z :=
   match v with
   | (mk_array x x1) => x
   end.
 
 (* Why3 assumption *)
-Definition get {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
+Definition get {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (i:Z): a :=
   (map.Map.get (elts a1) i).
 
 (* Why3 assumption *)
-Definition set {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
+Definition set {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (i:Z)
+  (v:a): (@array a a_WT) := (mk_array (length a1) (map.Map.set (elts a1) i
+  v)).
 
 (* Why3 assumption *)
-Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (array a) :=
-  (mk_array n (map.Map.const v:(map.Map.map Z a))).
+Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (@array a a_WT) :=
+  (mk_array n (map.Map.const v:(@map.Map.map Z _ a a_WT))).
 
 (* Why3 assumption *)
-Definition is_common_prefix (a:(array Z)) (x:Z) (y:Z) (l:Z): Prop :=
+Definition is_common_prefix (a:(@array Z _)) (x:Z) (y:Z) (l:Z): Prop :=
   (0%Z <= l)%Z /\ (((x + l)%Z <= (length a))%Z /\
   (((y + l)%Z <= (length a))%Z /\ forall (i:Z), ((0%Z <= i)%Z /\
   (i < l)%Z) -> ((get a (x + i)%Z) = (get a (y + i)%Z)))).
 
+Axiom not_common_prefix_if_last_char_are_different : forall (a:(@array Z _))
+  (x:Z) (y:Z) (l:Z), ((0%Z <= l)%Z /\ (((x + l)%Z < (length a))%Z /\
+  (((y + l)%Z < (length a))%Z /\ ~ ((get a (x + l)%Z) = (get a
+  (y + l)%Z))))) -> ~ (is_common_prefix a x y (l + 1%Z)%Z).
+
 (* Why3 assumption *)
-Definition is_longest_common_prefix (a:(array Z)) (x:Z) (y:Z) (l:Z): Prop :=
-  (is_common_prefix a x y l) /\ forall (m:Z), (l < m)%Z ->
+Definition is_longest_common_prefix (a:(@array Z _)) (x:Z) (y:Z)
+  (l:Z): Prop := (is_common_prefix a x y l) /\ forall (m:Z), (l < m)%Z ->
   ~ (is_common_prefix a x y m).
+
+Axiom longest_common_prefix_succ : forall (a:(@array Z _)) (x:Z) (y:Z) (l:Z),
+  ((is_common_prefix a x y l) /\ ~ (is_common_prefix a x y (l + 1%Z)%Z)) ->
+  (is_longest_common_prefix a x y l).
 
 (* Why3 assumption *)
 Inductive ref (a:Type) {a_WT:WhyType a} :=
@@ -60,146 +70,176 @@ Existing Instance ref_WhyType.
 Implicit Arguments mk_ref [[a] [a_WT]].
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:(@ref a a_WT)): a :=
   match v with
   | (mk_ref x) => x
   end.
 
 (* Why3 assumption *)
-Definition lt (a:(array Z)) (x:Z) (y:Z): Prop := let n := (length a) in
+Definition lt (a:(@array Z _)) (x:Z) (y:Z): Prop := let n := (length a) in
   (((0%Z <= x)%Z /\ (x <= n)%Z) /\ (((0%Z <= y)%Z /\ (y <= n)%Z) /\
   exists l:Z, (is_common_prefix a x y l) /\ (((y + l)%Z < n)%Z /\
   (((x + l)%Z = n) \/ ((get a (x + l)%Z) < (get a (y + l)%Z))%Z)))).
 
 (* Why3 assumption *)
-Definition le (a:(array Z)) (x:Z) (y:Z): Prop := (x = y) \/ (lt a x y).
-
-Axiom le_refl : forall (a:(array Z)) (x:Z), ((0%Z <= x)%Z /\
-  (x <= (length a))%Z) -> (le a x x).
-
-Axiom lcp_refl : forall (a:(array Z)) (x:Z), ((0%Z <= x)%Z /\
-  (x <= (length a))%Z) -> (is_longest_common_prefix a x x
-  ((length a) - x)%Z).
-
-Axiom not_common_prefix_if_last_different : forall (a:(array Z)) (x:Z) (y:Z)
-  (l:Z), ((0%Z <= l)%Z /\ (((x + l)%Z < (length a))%Z /\
-  (((y + l)%Z < (length a))%Z /\ ~ ((get a (x + l)%Z) = (get a
-  (y + l)%Z))))) -> ~ (is_common_prefix a x y (l + 1%Z)%Z).
-
-Axiom longest_common_prefix_succ : forall (a:(array Z)) (x:Z) (y:Z) (l:Z),
-  ((is_common_prefix a x y l) /\ ~ (is_common_prefix a x y (l + 1%Z)%Z)) ->
-  (is_longest_common_prefix a x y l).
-
-Axiom le_trans : forall (a:(array Z)) (x:Z) (y:Z) (z:Z), (((0%Z <= x)%Z /\
-  (x <= (length a))%Z) /\ (((0%Z <= y)%Z /\ (y <= (length a))%Z) /\
-  (((0%Z <= z)%Z /\ (z <= (length a))%Z) /\ ((le a x y) /\ (le a y z))))) ->
-  (le a x z).
-
-(* Why3 assumption *)
-Definition injective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
+Definition injective (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z)
+  (j:Z), ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
   ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
 
 (* Why3 assumption *)
-Definition surjective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
+Definition surjective (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i < n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\
   ((map.Map.get a j) = i).
 
 (* Why3 assumption *)
-Definition range (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
+Definition range (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
   ((map.Map.get a i) < n)%Z).
 
-Axiom injective_surjective : forall (a:(map.Map.map Z Z)) (n:Z), (injective a
-  n) -> ((range a n) -> (surjective a n)).
+Axiom injective_surjective : forall (a:(@map.Map.map Z _ Z _)) (n:Z),
+  (injective a n) -> ((range a n) -> (surjective a n)).
 
 (* Why3 assumption *)
-Definition permutation (m:(map.Map.map Z Z)) (u:Z): Prop := (range m u) /\
-  (injective m u).
+Definition range1 (a:(@array Z _)): Prop := (range (elts a) (length a)).
 
 (* Why3 assumption *)
-Definition sorted_sub (a:(array Z)) (data:(map.Map.map Z Z)) (l:Z)
-  (u:Z): Prop := forall (i1:Z) (i2:Z), (((l <= i1)%Z /\ (i1 <= i2)%Z) /\
-  (i2 < u)%Z) -> (le a (map.Map.get data i1) (map.Map.get data i2)).
+Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _
+  a a_WT)) (a2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z): Prop := forall (i:Z),
+  ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
 
 (* Why3 assumption *)
-Definition sorted (a:(array Z)) (data:(array Z)): Prop := (sorted_sub a
+Definition array_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\
+  (((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\
+  (u <= (length a1))%Z) /\ (map_eq_sub (elts a1) (elts a2) l u))).
+
+(* Why3 assumption *)
+Definition array_eq {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)): Prop := ((length a1) = (length a2)) /\ (map_eq_sub
+  (elts a1) (elts a2) 0%Z (length a1)).
+
+(* Why3 assumption *)
+Definition exchange {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)) (i:Z) (j:Z): Prop := ((length a1) = (length a2)) /\
+  (map.MapPermut.exchange (elts a1) (elts a2) 0%Z (length a1) i j).
+
+(* Why3 assumption *)
+Definition permut {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (a2:(@array
+  a a_WT)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\
+  (((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\
+  (u <= (length a1))%Z) /\ (map.MapPermut.permut (elts a1) (elts a2) l u))).
+
+(* Why3 assumption *)
+Definition permut_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := (map_eq_sub (elts a1) (elts a2)
+  0%Z l) /\ ((permut a1 a2 l u) /\ (map_eq_sub (elts a1) (elts a2) u
+  (length a1))).
+
+(* Why3 assumption *)
+Definition permut_all {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)): Prop := ((length a1) = (length a2)) /\
+  (map.MapPermut.permut (elts a1) (elts a2) 0%Z (length a1)).
+
+Axiom permut_sub_refl : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)) (l:Z) (u:Z), ((0%Z <= l)%Z /\ ((l <= u)%Z /\
+  (u <= (length a1))%Z)) -> (permut_sub a1 a1 l u).
+
+Axiom permut_sub_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
+  a1 a2 l u) -> ((permut_sub a2 a3 l u) -> (permut_sub a1 a3 l u)).
+
+Axiom exchange_permut_sub : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z) (l:Z) (u:Z),
+  (exchange a1 a2 i j) -> (((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\
+  (j < u)%Z) -> ((0%Z <= l)%Z -> ((u <= (length a1))%Z -> (permut_sub a1 a2 l
+  u))))).
+
+Axiom permut_sub_unmodified : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
+  a1 a2 l u) -> forall (i:Z), (((0%Z <= i)%Z /\ (i < l)%Z) \/ ((u <= i)%Z /\
+  (i < (length a1))%Z)) -> ((get a2 i) = (get a1 i)).
+
+Axiom permut_sub_weakening : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l1:Z) (u1:Z) (l2:Z)
+  (u2:Z), (permut_sub a1 a2 l1 u1) -> (((0%Z <= l2)%Z /\ (l2 <= l1)%Z) ->
+  (((u1 <= u2)%Z /\ (u2 <= (length a1))%Z) -> (permut_sub a1 a2 l2 u2))).
+
+Axiom permut_sub_compose : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT))
+  (l1:Z) (u1:Z) (l2:Z) (u2:Z), (u1 <= l2)%Z -> ((permut_sub a1 a2 l1 u1) ->
+  ((permut_sub a2 a3 l2 u2) -> (permut_sub a1 a3 l1 u2))).
+
+Axiom permut_all_refl : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)), (permut_all a1 a1).
+
+Axiom permut_all_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT)), (permut_all a1 a2) ->
+  ((permut_all a2 a3) -> (permut_all a1 a3)).
+
+Axiom exchange_permut_all : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z), (exchange a1
+  a2 i j) -> (permut_all a1 a2).
+
+Axiom array_eq_permut_all : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)), (array_eq a1 a2) ->
+  (permut_all a1 a2).
+
+Axiom permut_sub_permut_all : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
+  a1 a2 l u) -> (permut_all a1 a2).
+
+(* Why3 assumption *)
+Definition le (a:(@array Z _)) (x:Z) (y:Z): Prop := (x = y) \/ (lt a x y).
+
+Axiom lcp_same_index : forall (a:(@array Z _)) (x:Z), ((0%Z <= x)%Z /\
+  (x <= (length a))%Z) -> (is_longest_common_prefix a x x
+  ((length a) - x)%Z).
+
+Axiom le_trans : forall (a:(@array Z _)) (x:Z) (y:Z) (z:Z), ((le a x y) /\
+  (le a y z)) -> (le a x z).
+
+(* Why3 assumption *)
+Definition sorted_sub (a:(@array Z _)) (data:(@map.Map.map Z _ Z _)) (l:Z)
+  (u:Z): Prop := forall (i1:Z) (i2:Z), ((l <= i1)%Z /\ ((i1 <= i2)%Z /\
+  (i2 < u)%Z)) -> (le a (map.Map.get data i1) (map.Map.get data i2)).
+
+(* Why3 assumption *)
+Definition sorted (a:(@array Z _)) (data:(@array Z _)): Prop := (sorted_sub a
   (elts data) 0%Z (length data)).
 
 (* Why3 assumption *)
-Definition exchange {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array a))
-  (i:Z) (j:Z): Prop := (map.MapPermut.exchange (elts a1) (elts a2) i j).
-
-(* Why3 assumption *)
-Definition permut_sub {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array a))
-  (l:Z) (u:Z): Prop := (map.MapPermut.permut_sub (elts a1) (elts a2) l u).
-
-(* Why3 assumption *)
-Definition permut {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array
-  a)): Prop := ((length a1) = (length a2)) /\ (map.MapPermut.permut_sub
-  (elts a1) (elts a2) 0%Z (length a1)).
-
-Axiom exchange_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array
-  a)) (a2:(array a)) (i:Z) (j:Z), (exchange a1 a2 i j) ->
-  (((length a1) = (length a2)) -> (((0%Z <= i)%Z /\ (i < (length a1))%Z) ->
-  (((0%Z <= j)%Z /\ (j < (length a1))%Z) -> (permut a1 a2)))).
-
-Axiom permut_sym : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array a))
-  (a2:(array a)), (permut a1 a2) -> (permut a2 a1).
-
-Axiom permut_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array a))
-  (a2:(array a)) (a3:(array a)), (permut a1 a2) -> ((permut a2 a3) -> (permut
-  a1 a3)).
-
-(* Why3 assumption *)
-Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(map.Map.map Z a))
-  (a2:(map.Map.map Z a)) (l:Z) (u:Z): Prop := forall (i:Z), ((l <= i)%Z /\
-  (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
-
-(* Why3 assumption *)
-Definition array_eq_sub {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array
-  a)) (l:Z) (u:Z): Prop := (map_eq_sub (elts a1) (elts a2) l u).
-
-(* Why3 assumption *)
-Definition array_eq {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array
-  a)): Prop := ((length a1) = (length a2)) /\ (array_eq_sub a1 a2 0%Z
-  (length a1)).
-
-Axiom array_eq_sub_permut : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(array a)) (a2:(array a)) (l:Z) (u:Z), (array_eq_sub a1 a2 l
-  u) -> (permut_sub a1 a2 l u).
-
-Axiom array_eq_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(array
-  a)) (a2:(array a)), (array_eq a1 a2) -> (permut a1 a2).
+Definition permutation (m:(@map.Map.map Z _ Z _)) (u:Z): Prop := (range m
+  u) /\ (injective m u).
 
 (* Why3 assumption *)
 Inductive suffixArray :=
-  | mk_suffixArray : (array Z) -> (array Z) -> suffixArray.
+  | mk_suffixArray : (@array Z _) -> (@array Z _) -> suffixArray.
 Axiom suffixArray_WhyType : WhyType suffixArray.
 Existing Instance suffixArray_WhyType.
 
 (* Why3 assumption *)
-Definition suffixes (v:suffixArray): (array Z) :=
+Definition suffixes (v:suffixArray): (@array Z _) :=
   match v with
   | (mk_suffixArray x x1) => x1
   end.
 
 (* Why3 assumption *)
-Definition values (v:suffixArray): (array Z) :=
+Definition values (v:suffixArray): (@array Z _) :=
   match v with
   | (mk_suffixArray x x1) => x
   end.
 
-(* Why3 assumption *)
-Definition inv (s:suffixArray): Prop :=
-  ((length (values s)) = (length (suffixes s))) /\ ((permutation
-  (elts (suffixes s)) (length (suffixes s))) /\ (sorted (values s)
-  (suffixes s))).
-
+Definition map_exchange {a:Type} {a_WT:WhyType a} 
+  (a1: map.Map.map Z a) (a2: map.Map.map Z a) (l u i j: Z) :=
+  (map.Map.get a1 i) = (map.Map.get a2 j) /\
+  (map.Map.get a1 j) = (map.Map.get a2 i) /\
+  (forall k:Z, (l <= k < u)%Z -> k <> i -> k <> j ->
+                   map.Map.get a1 k = map.Map.get a2 k).
 
 Inductive permut2 {a:Type} {a_WT:WhyType a} (l u : Z) : 
  (map.Map.map Z a)-> (map.Map.map Z a) -> Prop :=
-  | permut2_refl : forall (a1:(map.Map.map Z a)), (permut2 l u a1 a1)
+  | permut2_refl : forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)),
+      map_eq_sub a1 a2 l u -> (permut2 l u a1 a2)
   | permut2_sym : forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)),
       (permut2 l u a1 a2) -> (permut2 l u a2 a1)
   | permut2_trans : forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a))
@@ -207,28 +247,29 @@ Inductive permut2 {a:Type} {a_WT:WhyType a} (l u : Z) :
       ((permut2 l u a2 a3) -> (permut2 l u a1 a3))
   | permut2_exchange : forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)),
       forall (i:Z) (j:Z), ((l <= i)%Z /\ (i < u)%Z) ->
-      (((l <= j)%Z /\ (j < u)%Z) -> ((map.MapPermut.exchange a1 a2 i j) -> (permut2 l u a1
+      (((l <= j)%Z /\ (j < u)%Z) -> ((map_exchange a1 a2 l u i j) -> (permut2 l u a1
       a2))).
-
-Lemma permut_permut2: 
-  forall (a:Type) (a_WT:WhyType a) (a1 a2 :(map.Map.map Z a)) (l u:Z),
-  map.MapPermut.permut_sub a1 a2 l u -> permut2 l u a1 a2.
-induction 1.
-apply permut2_refl.
-apply permut2_sym; auto.
-eapply permut2_trans; eauto.
-eapply permut2_exchange.
-apply H.
-apply H0.
-auto.
-Qed.
-
 
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 3.
 
+Lemma permut_permut2: 
+  forall (a:Type) (a_WT:WhyType a) (a1 a2 :(map.Map.map Z a)) (l u:Z),
+  map.MapPermut.permut a1 a2 l u -> permut2 l u a1 a2.
+induction 1.
+apply permut2_refl; auto.
+apply permut2_sym; auto.
+eapply permut2_trans with a2; eauto.
+apply permut2_sym; auto.
+apply permut2_sym; auto.
+eapply permut2_exchange with i j.
+apply H.
+ae.
+ae.
+Qed.
+
 Lemma aux : forall (m1:(map.Map.map Z Z))
-  (m2:(map.Map.map Z Z)) (u:Z), (map.MapPermut.permut_sub m1 m2 0%Z u) ->
+  (m2:(map.Map.map Z Z)) (u:Z), (map.MapPermut.permut m1 m2 0%Z u) ->
   ((permutation m1 u) <-> (permutation m2 u)).
 intros m1 m2 u H.
 assert (permut2 0%Z u m1 m2).
@@ -239,10 +280,10 @@ Qed.
 
 
 (* Why3 goal *)
-Theorem permut_permutation : forall (a1:(array Z)) (a2:(array Z)), (permut a1
-  a2) -> ((permutation (elts a1) (length a1)) -> (permutation (elts a2)
-  (length a2))).
+Theorem permut_permutation : forall (a1:(@array Z _)) (a2:(@array Z _)),
+  ((permut_all a1 a2) /\ (permutation (elts a1) (length a1))) -> (permutation
+  (elts a2) (length a2)).
+(* Why3 intros a1 a2 (h1,h2). *)
 ae.
 Qed.
-
 

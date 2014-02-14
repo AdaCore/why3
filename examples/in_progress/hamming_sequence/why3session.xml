@@ -1,0 +1,1717 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="3.2"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="4.3.1"/>
+ <file
+  name="../hamming_sequence.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="HammingSequence"
+   locfile="../hamming_sequence.mlw"
+   loclnum="13" loccnumb="7" loccnume="22"
+   verified="false"
+   expanded="true">
+   <goal
+    name="is_hamming_times2"
+    locfile="../hamming_sequence.mlw"
+    loclnum="24" loccnumb="8" loccnume="25"
+    sum="4553c608413c9c3c43cc053a722aa104"
+    proved="true"
+    expanded="false"
+    shape="ais_hammingainfix *c2V0Iais_hammingV0Iainfix &gt;=V0c1F">
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.11"/>
+    </proof>
+   </goal>
+   <goal
+    name="is_hamming_times3"
+    locfile="../hamming_sequence.mlw"
+    loclnum="27" loccnumb="8" loccnume="25"
+    sum="8ed97d72ab87981ef0b6f81baf40c670"
+    proved="true"
+    expanded="false"
+    shape="ais_hammingainfix *c3V0Iais_hammingV0Iainfix &gt;=V0c1F">
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.19"/>
+    </proof>
+   </goal>
+   <goal
+    name="is_hamming_times5"
+    locfile="../hamming_sequence.mlw"
+    loclnum="30" loccnumb="8" loccnume="25"
+    sum="2eb839a20666356e1c2fa6bd082dd5ad"
+    proved="true"
+    expanded="false"
+    shape="ais_hammingainfix *c5V0Iais_hammingV0Iainfix &gt;=V0c1F">
+    <proof
+     prover="1"
+     timelimit="3"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.58"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter hamming"
+    locfile="../hamming_sequence.mlw"
+    loclnum="36" loccnumb="6" loccnume="13"
+    expl="VC for hamming"
+    sum="a2625e0754b0e8ce7614e1cd80ce1e3f"
+    proved="false"
+    expanded="true"
+    shape="Nais_hammingV11Iainfix &lt;V11agetV9V10Aainfix &lt;agetV9ainfix -V10c1V11Iainfix &lt;V10V0Aainfix &lt;c0V10FAainfix &lt;agetV9ainfix -V12c1agetV9V12Iainfix &lt;V12V0Aainfix &lt;c0V12FAais_hammingagetV9V13Iainfix &lt;V13V0Aainfix &lt;=c0V13FAainfix &lt;=c0V0Iainfix &gt;V4agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V6agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V8agetV9ainfix -ainfix +V2c1c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3ainfix +V2c1Aainfix &lt;=c0V3Aainfix &lt;V5ainfix +V2c1Aainfix &lt;=c0V5Aainfix &lt;V7ainfix +V2c1Aainfix &lt;=c0V7Aais_hammingagetV9V14Iainfix &lt;V14ainfix +V2c1Aainfix &lt;=c0V14FAainfix &lt;agetV9ainfix -V15c1agetV9V15Iainfix &lt;V15ainfix +V2c1Aainfix &lt;c0V15FAainfix &gt;agetV9V16c0Iainfix &lt;V16ainfix +V2c1Aainfix &lt;=c0V16FAiiiainfix &gt;V25agetV19ainfix -ainfix +V17c1c1Aainfix &gt;V23agetV19ainfix -ainfix +V17c1c1Aainfix &gt;V21agetV19ainfix -ainfix +V17c1c1Aainfix =V25ainfix *c5agetV19V24Aainfix =V23ainfix *c3agetV19V22Aainfix =V21ainfix *c2agetV19V20Aainfix &lt;V24ainfix +V17c1Aainfix &lt;=c0V24Aainfix &lt;V22ainfix +V17c1Aainfix &lt;=c0V22Aainfix &lt;V20ainfix +V17c1Aainfix &lt;=c0V20Aais_hammingagetV19V26Iainfix &lt;V26ainfix +V17c1Aainfix &lt;=c0V26FAainfix &lt;agetV19ainfix -V27c1agetV19V27Iainfix &lt;V27ainfix +V17c1Aainfix &lt;c0V27FAainfix &gt;agetV19V28c0Iainfix &lt;V28ainfix +V17c1Aainfix &lt;=c0V28Fainfix &lt;ainfix -V18V30ainfix -V18V25Aainfix &lt;=c0ainfix -V18V25Aainfix =V30ainfix *c5agetV19V29Aainfix &lt;=V29V17Aainfix &lt;=c0V29Iainfix =V30ainfix *c5agetV19V29FAainfix &lt;V29V0Aainfix &lt;=c0V29Iainfix =V29ainfix +V24c1FAainfix &lt;V24V17ainfix &lt;=V25V18Iainfix =V25ainfix *c5agetV19V24Aainfix &lt;=V24V17Aainfix &lt;=c0V24FAainfix =V4ainfix *c5agetV19V3Aainfix &lt;=V3V17Aainfix &lt;=c0V3ainfix &lt;ainfix -V18V32ainfix -V18V23Aainfix &lt;=c0ainfix -V18V23Aainfix =V32ainfix *c3agetV19V31Aainfix &lt;=V31V17Aainfix &lt;=c0V31Iainfix =V32ainfix *c3agetV19V31FAainfix &lt;V31V0Aainfix &lt;=c0V31Iainfix =V31ainfix +V22c1FAainfix &lt;V22V17ainfix &lt;=V23V18Iainfix =V23ainfix *c3agetV19V22Aainfix &lt;=V22V17Aainfix &lt;=c0V22FAainfix =V6ainfix *c3agetV19V5Aainfix &lt;=V5V17Aainfix &lt;=c0V5ainfix &lt;ainfix -V18V34ainfix -V18V21Aainfix &lt;=c0ainfix -V18V21Aainfix =V34ainfix *c2agetV19V33Aainfix &lt;=V33V17Aainfix &lt;=c0V33Iainfix =V34ainfix *c2agetV19V33FAainfix &lt;V33V0Aainfix &lt;=c0V33Iainfix =V33ainfix +V20c1FAainfix &lt;V20V17ainfix &lt;=V21V18Iainfix =V21ainfix *c2agetV19V20Aainfix &lt;=V20V17Aainfix &lt;=c0V20FAainfix =V8ainfix *c2agetV19V7Aainfix &lt;=V7V17Aainfix &lt;=c0V7Iainfix =V19asetV9V17V18Aainfix &lt;=c0V0FAainfix &lt;V17V0Aainfix &lt;=c0V17Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V17c1Aainfix &gt;V6agetV9ainfix -V17c1Aainfix &gt;V8agetV9ainfix -V17c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V17Aainfix &lt;=c0V3Aainfix &lt;V5V17Aainfix &lt;=c0V5Aainfix &lt;V7V17Aainfix &lt;=c0V7Aais_hammingagetV9V35Iainfix &lt;V35V17Aainfix &lt;=c0V35FAainfix &lt;agetV9ainfix -V36c1agetV9V36Iainfix &lt;V36V17Aainfix &lt;c0V36FAainfix &gt;agetV9V37c0Iainfix &lt;V37V17Aainfix &lt;=c0V37FIainfix &lt;=V17V2Aainfix &lt;=c1V17FFAainfix &gt;c5agetV1ainfix -c1c1Aainfix &gt;c3agetV1ainfix -c1c1Aainfix &gt;c2agetV1ainfix -c1c1Aainfix =c5ainfix *c5agetV1c0Aainfix =c3ainfix *c3agetV1c0Aainfix =c2ainfix *c2agetV1c0Aainfix &lt;c0c1Aainfix &lt;=c0c0Aainfix &lt;c0c1Aainfix &lt;=c0c0Aainfix &lt;c0c1Aainfix &lt;=c0c0Aais_hammingagetV1V38Iainfix &lt;V38c1Aainfix &lt;=c0V38FAainfix &lt;agetV1ainfix -V39c1agetV1V39Iainfix &lt;V39c1Aainfix &lt;c0V39FAainfix &gt;agetV1V40c0Iainfix &lt;V40c1Aainfix &lt;=c0V40FIainfix &lt;=c1V2ANais_hammingV42Iainfix &lt;V42agetV1V41Aainfix &lt;agetV1ainfix -V41c1V42Iainfix &lt;V41V0Aainfix &lt;c0V41FAainfix &lt;agetV1ainfix -V43c1agetV1V43Iainfix &lt;V43V0Aainfix &lt;c0V43FAais_hammingagetV1V44Iainfix &lt;V44V0Aainfix &lt;=c0V44FIainfix &gt;c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FAainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Aainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+    <label
+     name="expl:VC for hamming"/>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter hamming.1"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="1. array creation size"
+      sum="dfd04bfed671c6f1ef9ccd1b9f64eed5"
+      proved="true"
+      expanded="false"
+      shape="array creation sizeainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.2"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="2. index in array bounds"
+      sum="35f4240297c5a0314d568e7656424d1d"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.3"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="3. postcondition"
+      sum="4fe4322edfabc5cb10b2aaad828e3cde"
+      proved="true"
+      expanded="false"
+      shape="postconditionais_hammingagetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3FIainfix &gt;c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.4"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="4. postcondition"
+      sum="2820c8f24198631ffc08966b0518a1d0"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix &lt;agetV1ainfix -V3c1agetV1V3Iainfix &lt;V3V0Aainfix &lt;c0V3FIainfix &gt;c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.5"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="5. postcondition"
+      sum="1fe57f1589948925f8d33106c2b01815"
+      proved="true"
+      expanded="false"
+      shape="postconditionNais_hammingV4Iainfix &lt;V4agetV1V3Aainfix &lt;agetV1ainfix -V3c1V4Iainfix &lt;V3V0Aainfix &lt;c0V3FIainfix &gt;c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.6"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="6. loop invariant init"
+      sum="416570e739b722e746c38fc220262419"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &gt;agetV1V3c0Iainfix &lt;V3c1Aainfix &lt;=c0V3FIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.7"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="7. loop invariant init"
+      sum="ba394a1becb900e73c0725084979c914"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;agetV1ainfix -V3c1agetV1V3Iainfix &lt;V3c1Aainfix &lt;c0V3FIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.8"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="8. loop invariant init"
+      sum="5ddacaef0bccc9560be4c0ea83589d60"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initais_hammingagetV1V3Iainfix &lt;V3c1Aainfix &lt;=c0V3FIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.9"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="9. loop invariant init"
+      sum="95ef739aa5317d8d025c55a0aa78a9f5"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;c0c1Aainfix &lt;=c0c0Iainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.10"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="10. loop invariant init"
+      sum="95ef739aa5317d8d025c55a0aa78a9f5"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;c0c1Aainfix &lt;=c0c0Iainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.11"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="11. loop invariant init"
+      sum="95ef739aa5317d8d025c55a0aa78a9f5"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;c0c1Aainfix &lt;=c0c0Iainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.12"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="12. loop invariant init"
+      sum="042826c2dac685b7bd6fd76704edc9d3"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =c2ainfix *c2agetV1c0Iainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.13"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="13. loop invariant init"
+      sum="ecac0027db95d4b75261da5ad61463fd"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =c3ainfix *c3agetV1c0Iainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.14"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="14. loop invariant init"
+      sum="c0a16bc727c69bd89706ff524e9a7579"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =c5ainfix *c5agetV1c0Iainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.15"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="15. loop invariant init"
+      sum="2c3c939a09e39f058a7319de83f7e3b7"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &gt;c2agetV1ainfix -c1c1Iainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.16"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="16. loop invariant init"
+      sum="b037ad5bf5aedc99d8d8c022038f66ba"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &gt;c3agetV1ainfix -c1c1Iainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.17"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="17. loop invariant init"
+      sum="cb20c7f5384bd0d8dda3109d4cf5a639"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &gt;c5agetV1ainfix -c1c1Iainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.18"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="18. type invariant"
+      sum="415e45b1a4861f8223b4d549294bf0d9"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V12Iainfix &lt;V12V10Aainfix &lt;=c0V12FAainfix &lt;agetV9ainfix -V13c1agetV9V13Iainfix &lt;V13V10Aainfix &lt;c0V13FAainfix &gt;agetV9V14c0Iainfix &lt;V14V10Aainfix &lt;=c0V14FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.19"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="19. index in array bounds"
+      sum="5e0c89ffdec64ad0c76694be2cd0d126"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V12Iainfix &lt;V12V10Aainfix &lt;=c0V12FAainfix &lt;agetV9ainfix -V13c1agetV9V13Iainfix &lt;V13V10Aainfix &lt;c0V13FAainfix &gt;agetV9V14c0Iainfix &lt;V14V10Aainfix &lt;=c0V14FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.20"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="20. loop invariant init"
+      sum="aae906101e77dcdbb359ac83b87a4eb2"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=V7V10Aainfix &lt;=c0V7Iainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V13Iainfix &lt;V13V10Aainfix &lt;=c0V13FAainfix &lt;agetV9ainfix -V14c1agetV9V14Iainfix &lt;V14V10Aainfix &lt;c0V14FAainfix &gt;agetV9V15c0Iainfix &lt;V15V10Aainfix &lt;=c0V15FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.21"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="21. loop invariant init"
+      sum="12bd8cadb0ab31d93bee5676b8ff8373"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =V8ainfix *c2agetV12V7Iainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V13Iainfix &lt;V13V10Aainfix &lt;=c0V13FAainfix &lt;agetV9ainfix -V14c1agetV9V14Iainfix &lt;V14V10Aainfix &lt;c0V14FAainfix &gt;agetV9V15c0Iainfix &lt;V15V10Aainfix &lt;=c0V15FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.22"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="22. assertion"
+      sum="5e31d73c5c039289186899783282b057"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix &lt;V13V10Iainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V15Iainfix &lt;V15V10Aainfix &lt;=c0V15FAainfix &lt;agetV9ainfix -V16c1agetV9V16Iainfix &lt;V16V10Aainfix &lt;c0V16FAainfix &gt;agetV9V17c0Iainfix &lt;V17V10Aainfix &lt;=c0V17FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.12"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.23"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="23. index in array bounds"
+      sum="f2579a4ddeaf4c2eeddd8fdd8db71d84"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15ainfix +V13c1FIainfix &lt;V13V10Iainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V16Iainfix &lt;V16V10Aainfix &lt;=c0V16FAainfix &lt;agetV9ainfix -V17c1agetV9V17Iainfix &lt;V17V10Aainfix &lt;c0V17FAainfix &gt;agetV9V18c0Iainfix &lt;V18V10Aainfix &lt;=c0V18FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.24"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="24. loop invariant preservation"
+      sum="c57230a7c5fc541b59add8deeb47791f"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V15V10Aainfix &lt;=c0V15Iainfix =V16ainfix *c2agetV12V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15ainfix +V13c1FIainfix &lt;V13V10Iainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V17Iainfix &lt;V17V10Aainfix &lt;=c0V17FAainfix &lt;agetV9ainfix -V18c1agetV9V18Iainfix &lt;V18V10Aainfix &lt;c0V18FAainfix &gt;agetV9V19c0Iainfix &lt;V19V10Aainfix &lt;=c0V19FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.25"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="25. loop invariant preservation"
+      sum="376dbaa6e4653e6259f73ba10f4ec0fd"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V16ainfix *c2agetV12V15Iainfix =V16ainfix *c2agetV12V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15ainfix +V13c1FIainfix &lt;V13V10Iainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V17Iainfix &lt;V17V10Aainfix &lt;=c0V17FAainfix &lt;agetV9ainfix -V18c1agetV9V18Iainfix &lt;V18V10Aainfix &lt;c0V18FAainfix &gt;agetV9V19c0Iainfix &lt;V19V10Aainfix &lt;=c0V19FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.26"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="26. loop variant decrease"
+      sum="7c7855db5f64616d23a408f8eb1a0cea"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;ainfix -V11V16ainfix -V11V14Aainfix &lt;=c0ainfix -V11V14Iainfix =V16ainfix *c2agetV12V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15ainfix +V13c1FIainfix &lt;V13V10Iainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V17Iainfix &lt;V17V10Aainfix &lt;=c0V17FAainfix &lt;agetV9ainfix -V18c1agetV9V18Iainfix &lt;V18V10Aainfix &lt;c0V18FAainfix &gt;agetV9V19c0Iainfix &lt;V19V10Aainfix &lt;=c0V19FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.27"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="27. loop invariant init"
+      sum="dadee1bfcc9b757c03c4694bc171792d"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=V5V10Aainfix &lt;=c0V5INainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V15Iainfix &lt;V15V10Aainfix &lt;=c0V15FAainfix &lt;agetV9ainfix -V16c1agetV9V16Iainfix &lt;V16V10Aainfix &lt;c0V16FAainfix &gt;agetV9V17c0Iainfix &lt;V17V10Aainfix &lt;=c0V17FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.28"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="28. loop invariant init"
+      sum="dcc3bfee9e3e182b9b578d24423a9d1b"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =V6ainfix *c3agetV12V5INainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V15Iainfix &lt;V15V10Aainfix &lt;=c0V15FAainfix &lt;agetV9ainfix -V16c1agetV9V16Iainfix &lt;V16V10Aainfix &lt;c0V16FAainfix &gt;agetV9V17c0Iainfix &lt;V17V10Aainfix &lt;=c0V17FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.29"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="29. assertion"
+      sum="e6f699daabf0f7d9a7895c2f63a0c2c8"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix &lt;V15V10Iainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V17Iainfix &lt;V17V10Aainfix &lt;=c0V17FAainfix &lt;agetV9ainfix -V18c1agetV9V18Iainfix &lt;V18V10Aainfix &lt;c0V18FAainfix &gt;agetV9V19c0Iainfix &lt;V19V10Aainfix &lt;=c0V19FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.30"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="30. index in array bounds"
+      sum="a247d8faae4d982602d0b651853b553d"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix =V17ainfix +V15c1FIainfix &lt;V15V10Iainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V18Iainfix &lt;V18V10Aainfix &lt;=c0V18FAainfix &lt;agetV9ainfix -V19c1agetV9V19Iainfix &lt;V19V10Aainfix &lt;c0V19FAainfix &gt;agetV9V20c0Iainfix &lt;V20V10Aainfix &lt;=c0V20FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.31"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="31. loop invariant preservation"
+      sum="9edc50094d6bc6c142fc488b30168c74"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V17V10Aainfix &lt;=c0V17Iainfix =V18ainfix *c3agetV12V17FIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix =V17ainfix +V15c1FIainfix &lt;V15V10Iainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.32"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="32. loop invariant preservation"
+      sum="8357c5b42ce955bff67d31091400eefd"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V18ainfix *c3agetV12V17Iainfix =V18ainfix *c3agetV12V17FIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix =V17ainfix +V15c1FIainfix &lt;V15V10Iainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.33"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="33. loop variant decrease"
+      sum="2613412e37f138d725d3111bc2ad0821"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;ainfix -V11V18ainfix -V11V16Aainfix &lt;=c0ainfix -V11V16Iainfix =V18ainfix *c3agetV12V17FIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix =V17ainfix +V15c1FIainfix &lt;V15V10Iainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.34"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="34. loop invariant init"
+      sum="0d99d6ef57176c37e88f276c5eeee6e4"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=V3V10Aainfix &lt;=c0V3INainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V17Iainfix &lt;V17V10Aainfix &lt;=c0V17FAainfix &lt;agetV9ainfix -V18c1agetV9V18Iainfix &lt;V18V10Aainfix &lt;c0V18FAainfix &gt;agetV9V19c0Iainfix &lt;V19V10Aainfix &lt;=c0V19FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.35"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="35. loop invariant init"
+      sum="59e77e3b91f827d1a0f22ed5bda2baa2"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =V4ainfix *c5agetV12V3INainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V17Iainfix &lt;V17V10Aainfix &lt;=c0V17FAainfix &lt;agetV9ainfix -V18c1agetV9V18Iainfix &lt;V18V10Aainfix &lt;c0V18FAainfix &gt;agetV9V19c0Iainfix &lt;V19V10Aainfix &lt;=c0V19FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.36"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="36. assertion"
+      sum="505a66ef0b93c4f758d85bac84158344"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix &lt;V17V10Iainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.37"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="37. index in array bounds"
+      sum="6efc454bd27aa4edd5b60c4cf1f2ae1d"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix =V19ainfix +V17c1FIainfix &lt;V17V10Iainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V20Iainfix &lt;V20V10Aainfix &lt;=c0V20FAainfix &lt;agetV9ainfix -V21c1agetV9V21Iainfix &lt;V21V10Aainfix &lt;c0V21FAainfix &gt;agetV9V22c0Iainfix &lt;V22V10Aainfix &lt;=c0V22FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.38"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="38. loop invariant preservation"
+      sum="0083fea081857bc9618d086d229d7a88"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V19V10Aainfix &lt;=c0V19Iainfix =V20ainfix *c5agetV12V19FIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix =V19ainfix +V17c1FIainfix &lt;V17V10Iainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V21Iainfix &lt;V21V10Aainfix &lt;=c0V21FAainfix &lt;agetV9ainfix -V22c1agetV9V22Iainfix &lt;V22V10Aainfix &lt;c0V22FAainfix &gt;agetV9V23c0Iainfix &lt;V23V10Aainfix &lt;=c0V23FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.39"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="39. loop invariant preservation"
+      sum="50a29639675732238e3fd16671a8040e"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V20ainfix *c5agetV12V19Iainfix =V20ainfix *c5agetV12V19FIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix =V19ainfix +V17c1FIainfix &lt;V17V10Iainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V21Iainfix &lt;V21V10Aainfix &lt;=c0V21FAainfix &lt;agetV9ainfix -V22c1agetV9V22Iainfix &lt;V22V10Aainfix &lt;c0V22FAainfix &gt;agetV9V23c0Iainfix &lt;V23V10Aainfix &lt;=c0V23FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.40"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="40. loop variant decrease"
+      sum="91d409f219d422cf95b9bb6211bc8f44"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;ainfix -V11V20ainfix -V11V18Aainfix &lt;=c0ainfix -V11V18Iainfix =V20ainfix *c5agetV12V19FIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix =V19ainfix +V17c1FIainfix &lt;V17V10Iainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V21Iainfix &lt;V21V10Aainfix &lt;=c0V21FAainfix &lt;agetV9ainfix -V22c1agetV9V22Iainfix &lt;V22V10Aainfix &lt;c0V22FAainfix &gt;agetV9V23c0Iainfix &lt;V23V10Aainfix &lt;=c0V23FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.41"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="41. loop invariant preservation"
+      sum="ecb45d6205a14dbb6d218f41bf90fd12"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &gt;agetV12V19c0Iainfix &lt;V19ainfix +V10c1Aainfix &lt;=c0V19FINainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V20Iainfix &lt;V20V10Aainfix &lt;=c0V20FAainfix &lt;agetV9ainfix -V21c1agetV9V21Iainfix &lt;V21V10Aainfix &lt;c0V21FAainfix &gt;agetV9V22c0Iainfix &lt;V22V10Aainfix &lt;=c0V22FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="3.26"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.13"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.42"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="42. loop invariant preservation"
+      sum="a5f36d5a81473cd3749f6c9fe7e10ec4"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;agetV12ainfix -V19c1agetV12V19Iainfix &lt;V19ainfix +V10c1Aainfix &lt;c0V19FINainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V20Iainfix &lt;V20V10Aainfix &lt;=c0V20FAainfix &lt;agetV9ainfix -V21c1agetV9V21Iainfix &lt;V21V10Aainfix &lt;c0V21FAainfix &gt;agetV9V22c0Iainfix &lt;V22V10Aainfix &lt;=c0V22FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.13"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.43"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="43. loop invariant preservation"
+      sum="bb5c56baf3c13d983aba2c23dd6aa80c"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationais_hammingagetV12V19Iainfix &lt;V19ainfix +V10c1Aainfix &lt;=c0V19FINainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V20Iainfix &lt;V20V10Aainfix &lt;=c0V20FAainfix &lt;agetV9ainfix -V21c1agetV9V21Iainfix &lt;V21V10Aainfix &lt;c0V21FAainfix &gt;agetV9V22c0Iainfix &lt;V22V10Aainfix &lt;=c0V22FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.17"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.44"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="44. loop invariant preservation"
+      sum="cc363aac4abfc4205a1b4248921ac592"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;V13ainfix +V10c1Aainfix &lt;=c0V13INainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.45"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="45. loop invariant preservation"
+      sum="57ec27d3a0571bf448cd7a29249047fd"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;V15ainfix +V10c1Aainfix &lt;=c0V15INainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.46"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="46. loop invariant preservation"
+      sum="b9e3cad6af34623136ec12a5faa70784"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;V17ainfix +V10c1Aainfix &lt;=c0V17INainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.47"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="47. loop invariant preservation"
+      sum="7d95fc5091209d4de1c1c9e7efd935b9"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V14ainfix *c2agetV12V13INainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.48"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="48. loop invariant preservation"
+      sum="9d3680175080191ef9e2eda922a75548"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V16ainfix *c3agetV12V15INainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.49"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="49. loop invariant preservation"
+      sum="f68d7508a943e79a25bbbb97cb3d79f6"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V18ainfix *c5agetV12V17INainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.50"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="50. loop invariant preservation"
+      sum="b4addac430321e7d8074a7839353c4db"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &gt;V14agetV12ainfix -ainfix +V10c1c1INainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.51"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="51. loop invariant preservation"
+      sum="8a91fb57860c31c35352e23525c639b1"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &gt;V16agetV12ainfix -ainfix +V10c1c1INainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.52"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="52. loop invariant preservation"
+      sum="792411fb68f5f42a73afbf2bd795a88e"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &gt;V18agetV12ainfix -ainfix +V10c1c1INainfix &lt;=V18V11Iainfix =V18ainfix *c5agetV12V17Aainfix &lt;=V17V10Aainfix &lt;=c0V17FINainfix &lt;=V16V11Iainfix =V16ainfix *c3agetV12V15Aainfix &lt;=V15V10Aainfix &lt;=c0V15FINainfix &lt;=V14V11Iainfix =V14ainfix *c2agetV12V13Aainfix &lt;=V13V10Aainfix &lt;=c0V13FIainfix =V12asetV9V10V11Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0LaminV8aminV6V4Iainfix &gt;V4agetV9ainfix -V10c1Aainfix &gt;V6agetV9ainfix -V10c1Aainfix &gt;V8agetV9ainfix -V10c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3V10Aainfix &lt;=c0V3Aainfix &lt;V5V10Aainfix &lt;=c0V5Aainfix &lt;V7V10Aainfix &lt;=c0V7Aais_hammingagetV9V19Iainfix &lt;V19V10Aainfix &lt;=c0V19FAainfix &lt;agetV9ainfix -V20c1agetV9V20Iainfix &lt;V20V10Aainfix &lt;c0V20FAainfix &gt;agetV9V21c0Iainfix &lt;V21V10Aainfix &lt;=c0V21FIainfix &lt;=V10V2Aainfix &lt;=c1V10FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.53"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="53. type invariant"
+      sum="53ebd2f9919bc545f4f3fda68ef85c01"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V0Iainfix &gt;V4agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V6agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V8agetV9ainfix -ainfix +V2c1c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3ainfix +V2c1Aainfix &lt;=c0V3Aainfix &lt;V5ainfix +V2c1Aainfix &lt;=c0V5Aainfix &lt;V7ainfix +V2c1Aainfix &lt;=c0V7Aais_hammingagetV9V10Iainfix &lt;V10ainfix +V2c1Aainfix &lt;=c0V10FAainfix &lt;agetV9ainfix -V11c1agetV9V11Iainfix &lt;V11ainfix +V2c1Aainfix &lt;c0V11FAainfix &gt;agetV9V12c0Iainfix &lt;V12ainfix +V2c1Aainfix &lt;=c0V12FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.54"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="54. postcondition"
+      sum="891656294d278d7a88afa2218165b4a6"
+      proved="true"
+      expanded="false"
+      shape="postconditionais_hammingagetV9V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FIainfix &lt;=c0V0Iainfix &gt;V4agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V6agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V8agetV9ainfix -ainfix +V2c1c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3ainfix +V2c1Aainfix &lt;=c0V3Aainfix &lt;V5ainfix +V2c1Aainfix &lt;=c0V5Aainfix &lt;V7ainfix +V2c1Aainfix &lt;=c0V7Aais_hammingagetV9V11Iainfix &lt;V11ainfix +V2c1Aainfix &lt;=c0V11FAainfix &lt;agetV9ainfix -V12c1agetV9V12Iainfix &lt;V12ainfix +V2c1Aainfix &lt;c0V12FAainfix &gt;agetV9V13c0Iainfix &lt;V13ainfix +V2c1Aainfix &lt;=c0V13FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.55"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="55. postcondition"
+      sum="6302b6302572faab74da34c63e7aff47"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix &lt;agetV9ainfix -V10c1agetV9V10Iainfix &lt;V10V0Aainfix &lt;c0V10FIainfix &lt;=c0V0Iainfix &gt;V4agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V6agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V8agetV9ainfix -ainfix +V2c1c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3ainfix +V2c1Aainfix &lt;=c0V3Aainfix &lt;V5ainfix +V2c1Aainfix &lt;=c0V5Aainfix &lt;V7ainfix +V2c1Aainfix &lt;=c0V7Aais_hammingagetV9V11Iainfix &lt;V11ainfix +V2c1Aainfix &lt;=c0V11FAainfix &lt;agetV9ainfix -V12c1agetV9V12Iainfix &lt;V12ainfix +V2c1Aainfix &lt;c0V12FAainfix &gt;agetV9V13c0Iainfix &lt;V13ainfix +V2c1Aainfix &lt;=c0V13FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter hamming.56"
+      locfile="../hamming_sequence.mlw"
+      loclnum="36" loccnumb="6" loccnume="13"
+      expl="56. postcondition"
+      sum="dc9d1386ea95b32c046a3917a24362bf"
+      proved="false"
+      expanded="true"
+      shape="postconditionNais_hammingV11Iainfix &lt;V11agetV9V10Aainfix &lt;agetV9ainfix -V10c1V11Iainfix &lt;V10V0Aainfix &lt;c0V10FIainfix &lt;=c0V0Iainfix &gt;V4agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V6agetV9ainfix -ainfix +V2c1c1Aainfix &gt;V8agetV9ainfix -ainfix +V2c1c1Aainfix =V4ainfix *c5agetV9V3Aainfix =V6ainfix *c3agetV9V5Aainfix =V8ainfix *c2agetV9V7Aainfix &lt;V3ainfix +V2c1Aainfix &lt;=c0V3Aainfix &lt;V5ainfix +V2c1Aainfix &lt;=c0V5Aainfix &lt;V7ainfix +V2c1Aainfix &lt;=c0V7Aais_hammingagetV9V12Iainfix &lt;V12ainfix +V2c1Aainfix &lt;=c0V12FAainfix &lt;agetV9ainfix -V13c1agetV9V13Iainfix &lt;V13ainfix +V2c1Aainfix &lt;c0V13FAainfix &gt;agetV9V14c0Iainfix &lt;V14ainfix +V2c1Aainfix &lt;=c0V14FFIainfix &lt;=c1V2Lainfix -V0c1Iainfix =V1asetaconstc0c0c1Aainfix &lt;=c0V0FIainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Iainfix &gt;=V0c0Iainfix &gt;=V0c1F">
+      <label
+       name="expl:VC for hamming"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="2.93"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="2.98"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="2.98"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="2.99"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="2.97"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter test"
+    locfile="../hamming_sequence.mlw"
+    loclnum="86" loccnumb="6" loccnume="10"
+    expl="VC for test"
+    sum="c8948fc4cfafc890fd0f134b526cba60"
+    proved="true"
+    expanded="false"
+    shape="ainfix &gt;=c30c1">
+    <label
+     name="expl:VC for test"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter test.1"
+      locfile="../hamming_sequence.mlw"
+      loclnum="86" loccnumb="6" loccnume="10"
+      expl="1. precondition"
+      sum="c8948fc4cfafc890fd0f134b526cba60"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=c30c1">
+      <label
+       name="expl:VC for test"/>
+      <proof
+       prover="0"
+       timelimit="3"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

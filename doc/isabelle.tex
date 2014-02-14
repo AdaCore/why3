@@ -1,9 +1,23 @@
-\subsection{Isabelle/HOL}
+\section{Isabelle/HOL}
+\label{sec:isabelle}
+
+\index{Isabelle proof assistant}
+
+\subsection{Installation}
+
+You need version Isabelle2013-2.
+
+\todo{put ... in ... etc/components}
+
+\subsection{Usage}
+
+\todo{Explain Isabelle/jedit server interaction}
 
 When using Isabelle, files generated from Why3 theories are stored in
 a dedicated XML format. Those files should not be edited. Instead,
-realizations must be designed in some \texttt{.thy} as follows. See
-directory \url{lib/isabelle} for examples.
+realizations must be designed in some \texttt{.thy} as follows. 
+
+\subsection{Realizations}
 
 The realization file corresponding to some Why3 file \url{f.why}
 should have the following form. 
@@ -26,3 +40,12 @@ why3_vc <some other lemma> by proof
 why3_end
 \end{verbatim}
 
+
+See directory \url{lib/isabelle} for examples.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% TeX-master: "manual"
+%%% End:

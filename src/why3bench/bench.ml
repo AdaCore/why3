@@ -112,11 +112,13 @@ struct
       Mutex.lock queue_lock
     done
 
+(* dead code
   let yield () =
     Thread.yield ();
     Mutex.lock queue_lock;
     treat_result ();
     Mutex.unlock queue_lock
+*)
 
   (** Wait for the last remaining tasks *)
   let wait_remaining_task () =
@@ -465,7 +467,7 @@ let empty_tool_res =
       match r with
         | Done (_,t) -> max acc t
         | InternalFailure _ -> acc ) 0. l
-  open Format
+
 (**
 answer output time
 

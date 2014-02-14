@@ -85,7 +85,7 @@ module RedBlackTree
   predicate bst (t : tree) =
     match t with
     | Leaf -> true
-    | Node _ l k v r -> bst l /\ bst r /\ lt_tree k l /\ gt_tree k r
+    | Node _ l k _ r -> bst l /\ bst r /\ lt_tree k l /\ gt_tree k r
     end
 
   lemma bst_Leaf : bst Leaf
@@ -153,6 +153,7 @@ module RedBlackTree
 
   let rec find (t : tree) (k : key) : value
     requires { bst t }
+    variant { t }
     ensures { memt t k result }
     raises { Not_found -> forall v : value. not (memt t k v) }
   = match t with
@@ -244,6 +245,7 @@ module RedBlackTree
 
   let rec insert (t : tree) (k : key) (v : value) : tree
     requires { bst t /\ exists n: int. rbtree n t }
+    variant { t }
     ensures { bst result /\
       (forall n : int. rbtree n t -> almost_rbtree n result /\
          (is_not_red t -> rbtree n result)) /\

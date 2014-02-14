@@ -15,6 +15,8 @@ open Sqlite3
 
 type transaction_mode = | Deferred | Immediate | Exclusive
 
+let _ = Exclusive
+
 type handle = {
   raw_db : Sqlite3.db;
   mutable in_transaction: int;

@@ -1,0 +1,23 @@
+
+(* Los problem *)
+
+theory LosProblem
+
+  type t
+  predicate p t t
+  predicate q t t
+
+  (* p and q are transitive *)
+  axiom p_trans: forall x y z: t. p x y -> p y z -> p x z
+  axiom q_trans: forall x y z: t. q x y -> q y z -> q x z
+
+  (* q is symmetric *)
+  axiom q_sym: forall x y: t. q x y -> q y x
+
+  (* p\/q is universal *)
+  axiom p_or_q: forall x y: t. p x y \/ q x y
+
+  (* show that either p or q is universal *)
+  goal los_problem: (forall x y: t. p x y) \/ (forall x y: t. q x y)
+
+end

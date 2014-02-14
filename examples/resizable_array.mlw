@@ -1,5 +1,42 @@
 
-module ResizableArrayImplem
+module ResizableArraySpec
+
+  use import int.Int
+  use import map.Map
+
+  type rarray 'a model { mutable length: int; mutable data: map int 'a }
+
+  function ([]) (r: rarray 'a) (i: int) : 'a = Map.get r.data i
+  function ([<-]) (r: rarray 'a) (i: int) (v: 'a) : rarray 'a =
+    { r with data = Map.set r.data i v }
+
+  val make (len: int) (dummy: 'a) : rarray 'a
+    requires { 0 <= len }
+    ensures  { result.length = len }
+    ensures  { result.data = Map.const dummy }
+    (* ensures  { forall i: int. 0 <= i < len -> result[i] = dummy } *)
+
+  val ([]) (r: rarray 'a) (i: int) : 'a
+    requires { 0 <= i < r.length } ensures { result = r[i] }
+
+  val ([]<-) (r: rarray 'a) (i: int) (v: 'a) : unit
+    requires { 0 <= i < r.length } ensures { r = (old r)[i <- v] }
+
+  val resize (r: rarray 'a) (len: int) : unit
+    requires { 0 <= len }
+    ensures  { r.length = len }
+    ensures  { forall i: int.
+               0 <= i < old r.length -> i < len -> r[i] = (old r)[i] }
+
+  val append (r1: rarray 'a) (r2: rarray 'a) : unit
+    ensures { r1.length = old r1.length + r2.length }
+    ensures { forall i: int. 0 <= i < r1.length ->
+               (i < old r1.length  -> r1[i] = (old r1)[i]) /\
+               (old r1.length <= i -> r1[i] = r2[i - old r1.length]) }
+
+end
+
+module ResizableArrayImplem (* : ResizableArraySpec *)
 
   use import int.Int
   use import int.MinMax
@@ -37,7 +74,7 @@ module ResizableArrayImplem
     requires { 0 <= len }
     ensures  { r.length = len }
     ensures  { forall i: int.
-                 0 <= i < min (old r.length) len -> r[i] = (old r)[i] }
+                 0 <= i < old r.length -> i < len -> r[i] = (old r)[i] }
     =
     let n = A.length r.data in
     if len > n then begin

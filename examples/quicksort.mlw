@@ -15,26 +15,72 @@ module Quicksort
   use import array.ArrayPermut
   use import array.ArrayEq
 
-  let rec quick_rec (t:array int) (l:int) (r:int) : unit variant { 1+r-l }
-    requires { 0 <= l /\ r < length t }
-    ensures { sorted_sub t l (r+1) /\ permut_sub (old t) t l (r+1) }
-  = if l < r then begin
+  let rec quick_rec (t: array int) (l: int) (r: int) : unit
+    requires { 0 <= l <= r <= length t }
+    ensures  { sorted_sub t l r }
+    ensures  { permut_sub (old t) t l r }
+    variant  { r - l }
+  = if l + 1 < r then begin
       let v = t[l] in
       let m = ref l in
-'L:   for i = l + 1 to r do
-        invariant { (forall j:int. l < j <= !m -> t[j] < v) /\
-                    (forall j:int. !m < j <  i -> t[j] >= v) /\
-                    permut_sub (at t 'L) t l (r+1) /\
-                    t[l] = v /\ l <= !m < i }
-        if t[i] < v then begin m := !m + 1; swap t i !m end
+  'L: for i = l + 1 to r - 1 do
+        invariant { t[l] = v /\ l <= !m < i }
+        invariant { forall j:int. l < j <= !m -> t[j] < v }
+        invariant { forall j:int. !m < j <  i -> t[j] >= v }
+        invariant { permut_sub (at t 'L) t l r }
+    'K: if t[i] < v then begin
+          m := !m + 1;
+          swap t i !m;
+          assert { permut_sub (at t 'K) t l r }
+        end
       done;
-      swap t l !m;
-      quick_rec t l (!m - 1);
-      quick_rec t (!m + 1) r
+  'M: swap t l !m;
+      assert { permut_sub (at t 'M) t l r };
+      assert { forall j:int. l <= j < !m -> t[j] < v };
+      assert { forall j:int. !m < j < r -> t[j] = (at t 'M)[j] };
+  'N: quick_rec t l !m;
+      assert { permut_sub (at t 'N) t l r };
+      assert { forall j:int. l <= j < !m -> t[j] < v };
+      assert { forall j:int. !m <= j < r -> t[j] = (at t 'N)[j] };
+  'O: quick_rec t (!m + 1) r;
+      assert { permut_sub (at t 'O) t l r };
+      assert { forall j:int. l <= j <= !m -> t[j] = (at t 'O)[j] };
+      assert { forall j:int. !m < j < r ->
+        (exists i:int. !m < i < r /\ t[j] = (at t 'O)[i]) &&
+        t[j] >= v }
     end
 
   let quicksort (t : array int) =
-    ensures { sorted t /\ permut (old t) t }
-    quick_rec t 0 (length t - 1)
+    ensures { sorted t }
+    ensures { permut_all (old t) t }
+    quick_rec t 0 (length t)
+
+
+  let test1 () =
+    let a = make 3 0 in
+    a[0] <- 7; a[1] <- 3; a[2] <- 1;
+    quicksort a;
+    a
+
+  let test2 () ensures { result.length = 8 } =
+    let a = make 8 0 in
+    a[0] <- 53; a[1] <- 91; a[2] <- 17; a[3] <- -5;
+    a[4] <- 413; a[5] <- 42; a[6] <- 69; a[7] <- 6;
+    quicksort a;
+    a
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let a = test2 () in
+    if a[0] <> -5 then raise BenchFailure;
+    if a[1] <> 6 then raise BenchFailure;
+    if a[2] <> 17 then raise BenchFailure;
+    if a[3] <> 42 then raise BenchFailure;
+    if a[4] <> 53 then raise BenchFailure;
+    if a[5] <> 69 then raise BenchFailure;
+    if a[6] <> 91 then raise BenchFailure;
+    if a[7] <> 413 then raise BenchFailure;
+    a
 
 end

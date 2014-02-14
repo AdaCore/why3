@@ -62,6 +62,7 @@ module PrimeNumbers
 
   let prime_numbers (m: int)
     requires { m >= 2 }
+    ensures  { result.length = m }
     ensures  { first_primes result m }
   = let p = make m 0 in
     p[0] <- 2;
@@ -92,5 +93,11 @@ module PrimeNumbers
       n += 2
     done;
     p
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+     let t = prime_numbers 20 in
+     if t[0] <> 2 then raise BenchFailure
 
 end

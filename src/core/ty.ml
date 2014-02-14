@@ -223,11 +223,13 @@ let ts_func =
   let tv_b = create_tvsymbol (id_fresh "b") in
   create_tysymbol (id_fresh "func") [tv_a;tv_b] None
 
+let ty_func ty_a ty_b = ty_app ts_func [ty_a;ty_b]
+
 let ts_pred =
   let tv_a = create_tvsymbol (id_fresh "a") in
-  create_tysymbol (id_fresh "pred") [tv_a] None
+  let def = Some (ty_func (ty_var tv_a) ty_bool) in
+  create_tysymbol (id_fresh "pred") [tv_a] def
 
-let ty_func ty_a ty_b = ty_app ts_func [ty_a;ty_b]
 let ty_pred ty_a = ty_app ts_pred [ty_a]
 
 let ts_tuple_ids = Hid.create 17

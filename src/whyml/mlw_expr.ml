@@ -139,31 +139,18 @@ let make_ppattern pp ?(ghost=false) ity =
   let hv = Hstr.create 3 in
   let gghost = ref false in
   let find id ghost ity =
-    let nm = preid_name id in
     try
-      let pv = Hstr.find hv nm in
+      let pv = Hstr.find hv id.pre_name in
       ity_equal_check ity pv.pv_ity;
       if (pv.pv_ghost <> ghost) then invalid_arg "Mlw_expr.make_ppattern";
       pv
     with Not_found ->
       let pv = create_pvsymbol id ~ghost ity in
-      Hstr.add hv nm pv; pv
-  in
-  let make_app ls ppl ghost ity =
-    let patl = List.map (fun pp -> pp.ppat_pattern) ppl in
-    { ppat_pattern = pat_app ls patl (ty_of_ity ity);
-      ppat_ity     = ity;
-      ppat_ghost   = ghost; }
+      Hstr.add hv id.pre_name pv; pv
   in
   let rec make ghost ity = function
-    | PPwild -> {
-        ppat_pattern = pat_wild (ty_of_ity ity);
-        ppat_ity     = ity;
-        ppat_ghost   = ghost; }
-    | PPvar id -> {
-        ppat_pattern = pat_var (find id ghost ity).pv_vs;
-        ppat_ity     = ity;
-        ppat_ghost   = ghost; }
+    | PPwild -> pat_wild (ty_of_ity ity)
+    | PPvar id -> pat_var (find id ghost ity).pv_vs
     | PPpapp (pls,ppl) ->
         if pls.pl_hidden then raise (HiddenPLS pls);
         if pls.pl_ls.ls_constr = 0 then
@@ -178,7 +165,7 @@ let make_ppattern pp ?(ghost=false) ity =
           | Not_found -> raise (Term.ConstructorExpected pls.pl_ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (pls.pl_ls, List.length ppl)) in
-        make_app pls.pl_ls ppl ghost ity
+        pat_app pls.pl_ls ppl (ty_of_ity ity)
     | PPlapp (ls,ppl) ->
         if ls.ls_constr = 0 then
           raise (Term.ConstructorExpected ls);
@@ -191,23 +178,16 @@ let make_ppattern pp ?(ghost=false) ity =
           | Not_found -> raise (Term.ConstructorExpected ls)
           | Invalid_argument _ -> raise (Term.BadArity
               (ls, List.length ppl)) in
-        make_app ls ppl ghost ity
+        pat_app ls ppl (ty_of_ity ity)
     | PPor (pp1,pp2) ->
-        let pp1 = make ghost ity pp1 in
-        let pp2 = make ghost ity pp2 in
-        { ppat_pattern = pat_or pp1.ppat_pattern pp2.ppat_pattern;
-          ppat_ity     = ity;
-          ppat_ghost   = ghost; }
+        pat_or (make ghost ity pp1) (make ghost ity pp2)
     | PPas (pp,id) ->
-        let pp = make ghost ity pp in
-        { ppat_pattern = pat_as pp.ppat_pattern (find id ghost ity).pv_vs;
-          ppat_ity     = ity;
-          ppat_ghost   = ghost; }
+        pat_as (make ghost ity pp) (find id ghost ity).pv_vs;
   in
-  let pp = make ghost ity pp in
-  let gh = pp.ppat_ghost || !gghost in
-  let pp = { pp with ppat_ghost = gh } in
-  Hstr.fold Mstr.add hv Mstr.empty, pp
+  let pat = make ghost ity pp in
+  let gh = ghost || !gghost in
+  Hstr.fold Mstr.add hv Mstr.empty,
+  { ppat_pattern = pat; ppat_ity = ity; ppat_ghost = gh }
 
 (** program symbols *)
 
@@ -240,7 +220,7 @@ let ps_equal : psymbol -> psymbol -> bool = (==)
 let add_pv_vars vars pv = vars_union vars pv.pv_ity.ity_vars
 let add_ps_vars vars ps = vars_union vars ps.ps_vars
 
-let create_psymbol_real ~poly id ghost syms aty =
+let create_psymbol_raw ~poly id ghost syms aty =
   let { syms_pv = pvset; syms_ps = psset } = syms in
   let tyvars = if poly then vars_empty else aty_vars aty in
   let pvvars = Spv.fold_left add_pv_vars vars_empty pvset in
@@ -256,9 +236,6 @@ let create_psymbol_real ~poly id ghost syms aty =
     ps_pvset = pvset;
     ps_vars  = vars;
     ps_subst = vars_freeze vars; }
-
-let create_psymbol_poly = create_psymbol_real ~poly:true
-let create_psymbol_mono = create_psymbol_real ~poly:false
 
 (** specification *)
 
@@ -288,7 +265,7 @@ let create_psymbol id ?(ghost=false) aty =
   let syms = { syms_pv = aty_pvset aty; syms_ps = Sps.empty } in
   let vars = Spv.fold_left add_pv_vars vars_empty syms.syms_pv in
   aty_check vars aty;
-  create_psymbol_poly id ghost syms aty
+  create_psymbol_raw ~poly:true id ghost syms aty
 
 (** program expressions *)
 
@@ -518,8 +495,17 @@ let e_arrow_aty ps aty =
 
 let create_let_defn id e =
   let lv = match e.e_vty with
-    | VTarrow aty -> LetA (create_psymbol_mono id e.e_ghost e.e_syms aty)
-    | VTvalue ity -> LetV (create_pvsymbol id ~ghost:e.e_ghost ity) in
+    | VTarrow aty ->
+        let rec is_value e = match e.e_node with
+          | Earrow _ -> true
+          | Erec ([fd], {e_node = Earrow ps}) -> (* (fun ... -> ...) *)
+              ps_equal fd.fun_ps ps && fd.fun_lambda.l_spec.c_letrec = 0
+          | Eany spec -> eff_is_empty spec.c_effect (* && empty spec? *)
+          | Eghost e -> is_value e
+          | _ -> false in
+        LetA (create_psymbol_raw ~poly:(is_value e) id e.e_ghost e.e_syms aty)
+    | VTvalue ity ->
+        LetV (create_pvsymbol id ~ghost:e.e_ghost ity) in
   { let_sym = lv ; let_expr = e }
 
 let create_let_pv_defn id e =
@@ -586,7 +572,8 @@ let rec e_app_flatten e pv = match e.e_node with
    will be rejected, since local_get_ref is instantiated to
    the region introduced (reset) by create_ref. Is it bad? *)
 
-let e_app = List.fold_left (fun e -> on_value (e_app_flatten e))
+let e_app e1 e2 = on_value (fun pv -> e_app_flatten e1 pv) e2
+let e_app e1 el = List.fold_left e_app e1 el
 
 let e_plapp pls el ity =
   if pls.pl_hidden then raise (HiddenPLS pls);
@@ -832,7 +819,7 @@ let e_try e0 bl =
 let pv_dummy = create_pvsymbol (id_fresh "dummy") ity_unit
 
 let e_any spec vty =
-  let aty = vty_arrow [pv_dummy] ~spec vty in
+  let aty = vty_arrow [pv_dummy] ?spec vty in
   let ps = create_psymbol (id_fresh "dummy") aty in
   let syms = del_ps_syms ps (add_ps_syms ps syms_empty) in
   let vty = ps.ps_aty.aty_result in
@@ -863,7 +850,7 @@ let create_fun_defn id ({l_expr = e; l_spec = c} as lam) =
   let syms = add_spec_syms lam.l_spec lam.l_expr.e_syms in
   let syms = List.fold_right del_pv_syms lam.l_args syms in
   let aty = vty_arrow lam.l_args ~spec e.e_vty in
-  { fun_ps     = create_psymbol_poly id e.e_ghost syms aty;
+  { fun_ps     = create_psymbol_raw ~poly:true id e.e_ghost syms aty;
     fun_lambda = lam;
     fun_syms   = syms; }
 
@@ -906,14 +893,18 @@ let rec expr_subst psm e = e_label_copy e (match e.e_node with
       e_arrow_aty (Mps.find ps psm) (aty_of_expr e)
   | Eapp (e,pv,_) ->
       e_app_real (expr_subst psm e) pv
-  | Elet ({ let_sym = LetV pv ; let_expr = d }, e) ->
+  | Elet ({ let_sym = LetV pv; let_expr = d }, e) ->
       let nd = expr_subst psm d in
       if not (ity_equal (ity_of_expr nd) pv.pv_ity) then
         Loc.errorm "vty_value mismatch";
-      e_let { let_sym = LetV pv ; let_expr = nd } (expr_subst psm e)
-  | Elet ({ let_sym = LetA ps ; let_expr = d }, e) ->
+      e_let { let_sym = LetV pv; let_expr = nd } (expr_subst psm e)
+  | Elet ({ let_sym = LetA ps; let_expr = d }, e) ->
       let ld,ns = create_let_ps_defn (id_clone ps.ps_name) (expr_subst psm d) in
       e_let ld (expr_subst (Mps.add ps ns psm) e)
+  | Erec ([{fun_ps = ps; fun_lambda = lam}], e) when lam.l_spec.c_letrec = 0 ->
+      let lam = { lam with l_expr = expr_subst psm lam.l_expr } in
+      let fd = create_fun_defn (id_clone ps.ps_name) lam in
+      e_rec [fd] (expr_subst (Mps.add ps fd.fun_ps psm) e)
   | Erec (fdl, e) ->
       let conv lam = { lam with l_expr = expr_subst psm lam.l_expr } in
       let defl = List.map (fun fd -> fd.fun_ps, conv fd.fun_lambda) fdl in

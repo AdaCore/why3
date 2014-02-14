@@ -71,6 +71,7 @@
         "assume", ASSUME;
         "begin", BEGIN;
         "check", CHECK;
+        "diverges", DIVERGES;
         "do", DO;
         "done", DONE;
         "downto", DOWNTO;
@@ -240,10 +241,6 @@ rule token = parse
       { OR }
   | "\\"
       { LAMBDA }
-  | "\\?"
-      { PRED }
-  | "\\!"
-      { FUNC }
   | "."
       { DOT }
   | "|"

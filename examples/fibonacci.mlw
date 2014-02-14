@@ -49,7 +49,9 @@ module FibRecGhost "recursive version, using ghost code"
   use import int.Int
 
   let rec fib_aux (ghost n: int) (a b k: int) : int
+    requires { k >= 0 }
     requires { 0 <= n && a = fib n && b = fib (n+1) }
+    variant  { k }
     ensures  { result = fib (n+k) }
   = if k = 0 then a else fib_aux (n+1) b (a+b) (k-1)
 
@@ -57,6 +59,13 @@ module FibRecGhost "recursive version, using ghost code"
     requires { 0 <= n }
     ensures  { result = fib n }
   = fib_aux 0 0 1 n
+
+  let test42 () = fib 42
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    if test42 () <> 267914296 then raise BenchFailure
 
 end
 
@@ -66,7 +75,9 @@ module FibRecNoGhost "recursive version, without ghost code"
   use import int.Int
 
   let rec fib_aux (a b k: int) : int
+    requires { k >= 0 }
     requires { exists n: int. 0 <= n && a = fib n && b = fib (n+1) }
+    variant  { k }
     ensures  { forall n: int. 0 <= n && a = fib n && b = fib (n+1) ->
                               result = fib (n+k) }
   = if k = 0 then a else fib_aux b (a+b) (k-1)
@@ -149,5 +160,13 @@ module FibonacciLogarithmic
   let test1 () = fibo 1
   let test7 () = fibo 7
   let test42 () = fibo 42
+  let test2014 () = fibo 2014
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    if test42 () <> 267914296 then raise BenchFailure;
+    if test2014 () <> 3561413997540486142674781564382874188700994538849211456995042891654110985470076818421080236961243875711537543388676277339875963824466334432403730750376906026741819889036464401788232213002522934897299928844192803507157647764542466327613134605502785287441134627457615461304177503249289874066244145666889138852687147544158443155204157950294129177785119464446668374163746700969372438526182906768143740891051274219441912520127
+    then raise BenchFailure
 
 end

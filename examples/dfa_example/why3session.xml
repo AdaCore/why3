@@ -7,32 +7,56 @@
   version="0.95.1"/>
  <prover
   id="1"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="2"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="2"
+  id="3"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="4"
   name="Coq"
   version="8.4pl2"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="3.2"/>
+ <prover
+  id="6"
+  name="Z3"
+  version="4.3.1"/>
  <file
   name="../dfa_example.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="DfaExample"
    locfile="../dfa_example.mlw"
    loclnum="2" loccnumb="7" loccnume="17"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="nil_notin_r1"
     locfile="../dfa_example.mlw"
-    loclnum="34" loccnumb="8" loccnume="20"
-    sum="e78734cec112274a9d5694bae33c2735"
+    loclnum="37" loccnumb="8" loccnume="20"
+    sum="10cfa3fac5df36de8dc16910cace7517"
     proved="true"
     expanded="false"
     shape="NamemaNilar1">
     <proof
-     prover="2"
+     prover="1"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+    <proof
+     prover="4"
      timelimit="8"
      memlimit="1000"
      edited="dfa_example_DfaExample_nil_notin_r1_1.v"
@@ -40,61 +64,220 @@
      archived="false">
      <result status="valid" time="1.01"/>
     </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter all_in_r0"
+    locfile="../dfa_example.mlw"
+    loclnum="39" loccnumb="16" loccnume="25"
+    expl="VC for all_in_r0"
+    sum="2340c833a1dcb6287ba12a228086d1dc"
+    proved="true"
+    expanded="false"
+    shape="CamemV0aStaraAltaCharaZeroaCharaOneaNilamemV0aStaraAltaCharaZeroaCharaOneIamemV2aStaraAltaCharaZeroaCharaOneACfaNilainfix =V3V2aConswVV0Aainfix =V0ainfix ++aConsV1aNilV2aConsVVV0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for all_in_r0"/>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.54"/>
+    </proof>
    </goal>
    <goal
     name="ends_with_one"
     locfile="../dfa_example.mlw"
-    loclnum="36" loccnumb="8" loccnume="21"
-    sum="f2ccee3596052c570c11960358c752fb"
-    proved="false"
-    expanded="true"
+    loclnum="49" loccnumb="8" loccnume="21"
+    sum="3bc915669deba61fbbaf569be8db6211"
+    proved="true"
+    expanded="false"
     shape="ainfix =V0ainfix ++V1aConsaOneaNilEqamemV0ar1F">
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="ends_with_one.1"
+      locfile="../dfa_example.mlw"
+      loclnum="49" loccnumb="8" loccnume="21"
+      expl="1."
+      sum="8ae185aebb47846b4534e4120fcf202d"
+      proved="true"
+      expanded="false"
+      shape="ainfix =V0ainfix ++V1aConsaOneaNilEIamemV0ar1F">
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.05"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="ends_with_one.2"
+      locfile="../dfa_example.mlw"
+      loclnum="49" loccnumb="8" loccnume="21"
+      expl="2."
+      sum="3f65ba5570c8e1018548d4e58d0a11ce"
+      proved="true"
+      expanded="false"
+      shape="amemV0ar1Iainfix =V0ainfix ++V1aConsaOneaNilEF">
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="6"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
    <goal
     name="zero_w_in_r1"
     locfile="../dfa_example.mlw"
-    loclnum="40" loccnumb="8" loccnume="20"
-    sum="4768013bbf908e024baa6be90a7ee42c"
-    proved="false"
-    expanded="true"
+    loclnum="53" loccnumb="8" loccnume="20"
+    sum="edb14e295e700b2d4e7e327d0481a042"
+    proved="true"
+    expanded="false"
     shape="amemaConsaZeroV0ar1qamemV0ar1F">
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
    </goal>
    <goal
     name="one_w_in_r1"
     locfile="../dfa_example.mlw"
-    loclnum="41" loccnumb="8" loccnume="19"
-    sum="015b56bf232a186164f60584bdd1b612"
-    proved="false"
-    expanded="true"
+    loclnum="54" loccnumb="8" loccnume="19"
+    sum="8f8880b17eb7fab658c20bd9562cf519"
+    proved="true"
+    expanded="false"
     shape="amemaConsaOneV0ar1qamemV0ar2F">
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.39"/>
+    </proof>
    </goal>
    <goal
     name="zero_w_in_r2"
     locfile="../dfa_example.mlw"
-    loclnum="43" loccnumb="8" loccnume="20"
-    sum="bace1b50db2d786d3d4c3b3fa524d878"
-    proved="false"
-    expanded="true"
+    loclnum="56" loccnumb="8" loccnume="20"
+    sum="23501a04f1a1221cfdef3c01c1f5ceb5"
+    proved="true"
+    expanded="false"
     shape="amemaConsaZeroV0ar2qamemV0ar1F">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.35"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.53"/>
+    </proof>
    </goal>
    <goal
     name="one_w_in_r2"
     locfile="../dfa_example.mlw"
-    loclnum="44" loccnumb="8" loccnume="19"
-    sum="a4802a4091493e93f89f04d03cfdfd36"
-    proved="false"
-    expanded="true"
+    loclnum="57" loccnumb="8" loccnume="19"
+    sum="157daf7e06693c1da3b89de12810230c"
+    proved="true"
+    expanded="false"
     shape="amemaConsaOneV0ar2qamemV0ar2F">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.27"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="4000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.61"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter astate1"
     locfile="../dfa_example.mlw"
-    loclnum="46" loccnumb="10" loccnume="17"
+    loclnum="59" loccnumb="10" loccnume="17"
     expl="VC for astate1"
-    sum="6b6c9abe193515bd00d13b451f936746"
+    sum="0266bd9f1103469f747b6c3eccf2eefa"
     proved="true"
     expanded="false"
-    shape="CNamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilaNoneamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaZeroamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueFFaSomeaOneV2ICainfix =V2aSomeV7Aainfix =V1V8aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
+    shape="CNamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilaNoneamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFAainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0aSomeaZeroamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueFFAainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0aSomeaOneV2ICainfix =V2aSomeV7Aainfix =V1V8aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
     <label
      name="expl:VC for astate1"/>
     <transf
@@ -104,29 +287,57 @@
      <goal
       name="WP_parameter astate1.1"
       locfile="../dfa_example.mlw"
-      loclnum="46" loccnumb="10" loccnume="17"
+      loclnum="59" loccnumb="10" loccnume="17"
       expl="1. postcondition"
-      sum="7b479119d9259b88cb60932356b4fd7c"
+      sum="fc48650c65c91c82d5525e56ed04e136"
       proved="true"
       expanded="false"
       shape="postconditionCNamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilaNonetaSomeaZerotaSomeaOneV2ICainfix =V2aSomeV3Aainfix =V1V4aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
       <label
        name="expl:VC for astate1"/>
       <proof
-       prover="1"
+       prover="2"
        timelimit="20"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.09"/>
       </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter astate1.2"
       locfile="../dfa_example.mlw"
-      loclnum="46" loccnumb="10" loccnume="17"
-      expl="2. postcondition"
-      sum="7f403abd9904e5cad2d8956b68622409"
+      loclnum="59" loccnumb="10" loccnume="17"
+      expl="2. variant decrease"
+      sum="4e1c7f6b912318d29496bd6bd17eabec"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNoneainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0aSomeaZerotaSomeaOneV2ICainfix =V2aSomeV3Aainfix =V1V4aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
+      <label
+       name="expl:VC for astate1"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter astate1.3"
+      locfile="../dfa_example.mlw"
+      loclnum="59" loccnumb="10" loccnume="17"
+      expl="3. postcondition"
+      sum="18c6aab50ab2146f1cfdf4e4a0e99686"
       proved="true"
       expanded="false"
       shape="postconditionCtaNoneamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaZerotaSomeaOneV2ICainfix =V2aSomeV5Aainfix =V1V6aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
@@ -137,11 +348,11 @@
        proved="true"
        expanded="false">
        <goal
-        name="WP_parameter astate1.2.1"
+        name="WP_parameter astate1.3.1"
         locfile="../dfa_example.mlw"
-        loclnum="46" loccnumb="10" loccnume="17"
+        loclnum="59" loccnumb="10" loccnume="17"
         expl="1. postcondition"
-        sum="a73ed83dc0af512f42ce2a2e886f0e84"
+        sum="aa8bac408f2064e5f567128ea7670552"
         proved="true"
         expanded="false"
         shape="postconditionCtaNoneainfix =V3aNilIainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaZerotaSomeaOneV2ICainfix =V2aSomeV5Aainfix =V1V6aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
@@ -155,13 +366,21 @@
          archived="false">
          <result status="valid" time="0.04"/>
         </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="4000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
        </goal>
        <goal
-        name="WP_parameter astate1.2.2"
+        name="WP_parameter astate1.3.2"
         locfile="../dfa_example.mlw"
-        loclnum="46" loccnumb="10" loccnume="17"
+        loclnum="59" loccnumb="10" loccnume="17"
         expl="2. postcondition"
-        sum="d7039b3fa3909a625085f9869b73ff58"
+        sum="5717579e3d33f3e7f9c74c7c1038fdf8"
         proved="true"
         expanded="false"
         shape="postconditionCtaNoneamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneIainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaZerotaSomeaOneV2ICainfix =V2aSomeV5Aainfix =V1V6aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
@@ -175,13 +394,21 @@
          archived="false">
          <result status="valid" time="0.06"/>
         </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="4000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
        </goal>
        <goal
-        name="WP_parameter astate1.2.3"
+        name="WP_parameter astate1.3.3"
         locfile="../dfa_example.mlw"
-        loclnum="46" loccnumb="10" loccnume="17"
+        loclnum="59" loccnumb="10" loccnume="17"
         expl="3. postcondition"
-        sum="0de7b6b3a547a23761aec28cb24078bb"
+        sum="21d574f883f25dff82032d7b9a4d0b83"
         proved="true"
         expanded="false"
         shape="postconditionCtaNoneainfix =V4aTrueIamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaZerotaSomeaOneV2ICainfix =V2aSomeV5Aainfix =V1V6aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
@@ -195,15 +422,43 @@
          archived="false">
          <result status="valid" time="0.05"/>
         </proof>
+        <proof
+         prover="5"
+         timelimit="5"
+         memlimit="4000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
        </goal>
       </transf>
      </goal>
      <goal
-      name="WP_parameter astate1.3"
+      name="WP_parameter astate1.4"
       locfile="../dfa_example.mlw"
-      loclnum="46" loccnumb="10" loccnume="17"
-      expl="3. postcondition"
-      sum="ddf4a11caf232a3702080b1ce1477a2c"
+      loclnum="59" loccnumb="10" loccnume="17"
+      expl="4. variant decrease"
+      sum="a5eb7afa15de17f7e6874520842d77cc"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNonetaSomeaZeroainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0aSomeaOneV2ICainfix =V2aSomeV3Aainfix =V1V4aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
+      <label
+       name="expl:VC for astate1"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter astate1.5"
+      locfile="../dfa_example.mlw"
+      loclnum="59" loccnumb="10" loccnume="17"
+      expl="5. postcondition"
+      sum="f0f30b1c181f88288c04b4bfce714247"
       proved="true"
       expanded="false"
       shape="postconditionCtaNonetaSomeaZeroamemV0aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaOneV2ICainfix =V2aSomeV5Aainfix =V1V6aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
@@ -217,18 +472,26 @@
        archived="false">
        <result status="valid" time="0.12"/>
       </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter astate2"
     locfile="../dfa_example.mlw"
-    loclnum="55" loccnumb="7" loccnume="14"
+    loclnum="69" loccnumb="7" loccnume="14"
     expl="VC for astate2"
-    sum="8737ca21f1bc69940f019d29161d2107"
+    sum="b13a51399111e41282cc4827d44aa3ec"
     proved="true"
     expanded="false"
-    shape="CamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilaNoneamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaZeroamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueFFaSomeaOneV2ICainfix =V2aSomeV7Aainfix =V1V8aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
+    shape="CamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilaNoneamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFAainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0aSomeaZeroamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V5aNilqainfix =V6aTrueFFAainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0aSomeaOneV2ICainfix =V2aSomeV7Aainfix =V1V8aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
     <label
      name="expl:VC for astate2"/>
     <transf
@@ -238,49 +501,105 @@
      <goal
       name="WP_parameter astate2.1"
       locfile="../dfa_example.mlw"
-      loclnum="55" loccnumb="7" loccnume="14"
+      loclnum="69" loccnumb="7" loccnume="14"
       expl="1. postcondition"
-      sum="a6d4cd021811541911b3cbcf2d582dfe"
+      sum="6e79eea29a1f798a575cad5054c05cff"
       proved="true"
       expanded="false"
       shape="postconditionCamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V1aNilaNonetaSomeaZerotaSomeaOneV2ICainfix =V2aSomeV3Aainfix =V1V4aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
       <label
        name="expl:VC for astate2"/>
       <proof
-       prover="1"
+       prover="2"
        timelimit="8"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.09"/>
       </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter astate2.2"
       locfile="../dfa_example.mlw"
-      loclnum="55" loccnumb="7" loccnume="14"
-      expl="2. postcondition"
-      sum="b875960cb9c0299908d6183e7ac71ac2"
+      loclnum="69" loccnumb="7" loccnume="14"
+      expl="2. variant decrease"
+      sum="4e1c7f6b912318d29496bd6bd17eabec"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNoneainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0aSomeaZerotaSomeaOneV2ICainfix =V2aSomeV3Aainfix =V1V4aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
+      <label
+       name="expl:VC for astate2"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter astate2.3"
+      locfile="../dfa_example.mlw"
+      loclnum="69" loccnumb="7" loccnume="14"
+      expl="3. postcondition"
+      sum="46af92e7ce86e872482cb6419bc2cffa"
       proved="true"
       expanded="false"
       shape="postconditionCtaNoneamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaZerotaSomeaOneV2ICainfix =V2aSomeV5Aainfix =V1V6aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
       <label
        name="expl:VC for astate2"/>
       <proof
-       prover="1"
+       prover="2"
        timelimit="8"
        memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.09"/>
       </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.16"/>
+      </proof>
      </goal>
      <goal
-      name="WP_parameter astate2.3"
+      name="WP_parameter astate2.4"
       locfile="../dfa_example.mlw"
-      loclnum="55" loccnumb="7" loccnume="14"
-      expl="3. postcondition"
-      sum="ab8c87c4622b1ffaba63e3e1db364222"
+      loclnum="69" loccnumb="7" loccnume="14"
+      expl="4. variant decrease"
+      sum="a5eb7afa15de17f7e6874520842d77cc"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNonetaSomeaZeroainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0aSomeaOneV2ICainfix =V2aSomeV3Aainfix =V1V4aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
+      <label
+       name="expl:VC for astate2"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter astate2.5"
+      locfile="../dfa_example.mlw"
+      loclnum="69" loccnumb="7" loccnume="14"
+      expl="5. postcondition"
+      sum="473083c73d6a992a47d1b5e6a95fb860"
       proved="true"
       expanded="false"
       shape="postconditionCtaNonetaSomeaZeroamemV0aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueIamemV1aAltaEpsilonaConcataStaraAltaCharaZeroaCharaOneaCharaOneAainfix =V3aNilqainfix =V4aTrueFFaSomeaOneV2ICainfix =V2aSomeV5Aainfix =V1V6aConsVVainfix =V2aNoneAainfix =V1aNilAainfix =V0V1aNilV0FFF">
@@ -293,6 +612,14 @@
        obsolete="false"
        archived="false">
        <result status="valid" time="0.12"/>
+      </proof>
+      <proof
+       prover="5"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.13"/>
       </proof>
      </goal>
     </transf>

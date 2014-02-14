@@ -1,0 +1,201 @@
+
+(** {1 Arithmetic for programs} *)
+
+(** {2 Integer Division}
+
+It is checked that divisor is not null.
+
+*)
+
+module Int
+
+  use export int.Int
+  use export int.ComputerDivision
+
+  let (/) (x: int) (y:int)
+    requires { y <> 0 } ensures { result = div x y }
+  = div x y
+
+end
+
+(** {2 Division on real numbers}
+
+See also {h <a href="floating_point.why.html">Floating-Point theories</a>.}
+
+*)
+
+module Real
+
+  use import real.Real
+  use export real.RealInfix
+  use export real.FromInt
+
+  let (/.) (x: real) (y: real)
+    requires { y <> 0. } ensures { result = x / y }
+  = x / y
+
+end
+
+
+(** {2 Machine integers}
+
+  Bounded integers, typically n-bit signed and unsigned integers, go
+  here. We first introduce a generic theory [Bounded_int] of bounded
+  integers, with minimal and maximal values (resp. [min] and [max]).
+  Then we instantiate it to get 32-bit and 64-bit signed and unsigned integers
+  ([Int32], [UInt32], [Int64], and [UInt64]) as well as 31-bit and 63-bit signed
+  integers ([Int31] and [Int63]) to be used in OCaml programs.
+
+*)
+
+module Bounded_int
+
+  use export int.Int
+
+  type t
+
+  constant min : int
+  constant max : int
+
+  function to_int (n:t) : int
+
+  predicate in_bounds (n:int) = min <= n <= max
+
+  axiom to_int_in_bounds: forall n:t. in_bounds (to_int n)
+
+  val of_int (n:int) : t
+    requires { "expl:integer overflow" in_bounds n }
+    ensures  { to_int result = n }
+
+  val (+) (a:t) (b:t) : t
+    requires { "expl:integer overflow" in_bounds (to_int a + to_int b) }
+    ensures   { to_int result = to_int a + to_int b }
+
+  val (-) (a:t) (b:t) : t
+    requires { "expl:integer overflow" in_bounds (to_int a - to_int b) }
+    ensures  { to_int result = to_int a - to_int b }
+
+  val (*) (a:t) (b:t) : t
+    requires { "expl:integer overflow" in_bounds (to_int a * to_int b) }
+    ensures  { to_int result = to_int a * to_int b }
+
+  val (-_) (a:t) : t
+    requires { "expl:integer overflow" in_bounds (- (to_int a)) }
+    ensures  { to_int result = - (to_int a) }
+
+  axiom extensionality: forall x y: t. to_int x = to_int y -> x = y
+
+  val (<=) (a:t) (b:t) : bool
+    ensures  { result = True <-> to_int a <= to_int b }
+
+  val (<) (a:t) (b:t) : bool
+    ensures  { result = True <-> to_int a < to_int b }
+
+  val (>=) (a:t) (b:t) : bool
+    ensures  { result = True <-> to_int a >= to_int b }
+
+  val (>) (a:t) (b:t) : bool
+    ensures  { result = True <-> to_int a > to_int b }
+
+  use import int.ComputerDivision
+
+  val (/) (a:t) (b:t) : t
+    requires { "expl:division by zero" to_int b <> 0 }
+    requires { "expl:integer overflow" in_bounds (div (to_int a) (to_int b)) }
+    ensures  { to_int result = div (to_int a) (to_int b) }
+
+end
+
+module Int31
+
+  use import int.Int
+
+  type int31
+
+  constant min_int31 : int = - 0x40000000
+  constant max_int31 : int =   0x3fffffff
+
+  clone export Bounded_int with
+    type t = int31,
+    constant min = min_int31,
+    constant max = max_int31
+
+end
+
+module Int32
+
+  use import int.Int
+
+  type int32
+
+  constant min_int32 : int = - 0x80000000
+  constant max_int32 : int =   0x7fffffff
+
+  clone export Bounded_int with
+    type t = int32,
+    constant min = min_int32,
+    constant max = max_int32
+
+end
+
+module UInt32
+
+  type uint32
+
+  constant min_uint32 : int = 0x00000000
+  constant max_uint32 : int = 0xffffffff
+
+  clone export Bounded_int with
+    type t = uint32,
+    constant min = min_uint32,
+    constant max = max_uint32
+
+end
+
+module Int63
+
+  use import int.Int
+
+  type int63
+
+  constant min_int63 : int = - 0x4000000000000000
+  constant max_int63 : int =   0x3fffffffffffffff
+
+  clone export Bounded_int with
+    type t = int63,
+    constant min = min_int63,
+    constant max = max_int63
+
+end
+
+module Int64
+
+  use import int.Int
+
+  type int64
+
+  constant min_int64 : int = - 0x8000000000000000
+  constant max_int64 : int =   0x7fffffffffffffff
+
+  clone export Bounded_int with
+    type t = int64,
+    constant min = min_int64,
+    constant max = max_int64
+
+end
+
+module UInt64
+
+  use import int.Int
+
+  type uint64
+
+  constant min_uint64 : int =  0x0000000000000000
+  constant max_uint64 : int =  0xffffffffffffffff
+
+  clone export Bounded_int with
+    type t = uint64,
+    constant min = min_uint64,
+    constant max = max_uint64
+
+end

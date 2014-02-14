@@ -1,0 +1,88 @@
+(*
+
+Hamming sequence is the infinite sequence of integers
+1,2,3,4,5,6,8,9,10,12,... divisible by no primes other than 2,3 and 5.
+
+This program computes the n first numbers in this sequence
+
+See Gries, The Science of Programming, page 243
+
+*)
+
+
+module HammingSequence
+
+  use import int.Int
+  use import int.MinMax
+  use import number.Divisibility
+  use import number.Prime
+  use import number.Coprime  (* for Euclid's lemma *)
+
+  predicate is_hamming (n:int) =
+    forall d:int. prime d /\ divides d n -> d = 2 \/ d = 3 \/ d = 5
+
+  lemma is_hamming_times2 :
+    forall n:int. n >= 1 -> is_hamming n -> is_hamming (2*n)
+
+  lemma is_hamming_times3 :
+    forall n:int. n >= 1 -> is_hamming n -> is_hamming (3*n)
+
+  lemma is_hamming_times5 :
+    forall n:int. n >= 1 -> is_hamming n -> is_hamming (5*n)
+
+  use import array.Array
+  use import ref.Ref
+
+  let hamming (n:int) : array int
+    requires { n >= 1 }
+    ensures  { forall k:int. 0 <= k < n -> is_hamming result[k] }
+    ensures  { forall k:int. 0 < k < n -> result[k-1] < result[k] }
+    ensures  { forall k m:int. 0 < k < n -> 
+      result[k-1] < m < result[k] -> not (is_hamming m) }
+  = let t = make n 0 in
+    t[0] <- 1;
+    let x2 = ref 2 in let j2 = ref 0 in
+    let x3 = ref 3 in let j3 = ref 0 in
+    let x5 = ref 5 in let j5 = ref 0 in
+    for i=1 to n-1 do
+      invariant { forall k:int. 0 <= k < i -> t[k] > 0 }
+      invariant { forall k:int. 0 < k < i -> t[k-1] < t[k] }
+      invariant { forall k:int. 0 <= k < i -> is_hamming t[k] }
+      invariant { 0 <= !j2 < i }
+      invariant { 0 <= !j3 < i }
+      invariant { 0 <= !j5 < i }
+      invariant { !x2 = 2*t[!j2] }
+      invariant { !x3 = 3*t[!j3] }
+      invariant { !x5 = 5*t[!j5] }
+      invariant { !x2 > t[i-1] }
+      invariant { !x3 > t[i-1] }
+      invariant { !x5 > t[i-1] }
+      let next = min !x2 (min !x3 !x5) in
+      t[i] <- next;
+      while !x2 <= next do
+        invariant { 0 <= !j2 <= i }
+        invariant { !x2 = 2*t[!j2] }
+        variant { next - !x2 }
+        assert { !j2 < i };
+        j2 := !j2+1; x2 := 2*t[!j2] 
+      done;
+      while !x3 <= next do 
+        invariant { 0 <= !j3 <= i }
+        invariant { !x3 = 3*t[!j3] }
+        variant { next - !x3 }
+        assert { !j3 < i };
+        j3 := !j3+1; x3 := 3*t[!j3] 
+      done;
+      while !x5 <= next do 
+        invariant { 0 <= !j5 <= i }
+        invariant { !x5 = 5*t[!j5] }
+        variant { next - !x5 }
+        assert { !j5 < i };
+        j5 := !j5+1; x5 := 5*t[!j5] 
+      done
+    done;
+    t
+
+  let test () = hamming 30
+    
+end

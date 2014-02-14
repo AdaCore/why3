@@ -58,7 +58,7 @@ type modul = private {
   mod_theory: theory;			(* pure theory *)
   mod_decls : pdecl list;		(* module declarations *)
   mod_export: namespace;		(* exported namespace *)
-  mod_known : known_map;		(* known identifiers *)
+  mod_known : Mlw_decl.known_map;	(* known identifiers *)
   mod_local : Sid.t;			(* locally declared idents *)
   mod_used  : Sid.t;			(* used modules *)
 }
@@ -75,7 +75,7 @@ val close_namespace : module_uc -> bool -> module_uc
 
 val get_theory : module_uc -> theory_uc
 val get_namespace : module_uc -> namespace
-val get_known : module_uc -> known_map
+val get_known : module_uc -> Mlw_decl.known_map
 
 val restore_path : ident -> string list * string * string list
 (** [restore_path id] returns the triple (library path, module,

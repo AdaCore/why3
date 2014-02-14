@@ -94,8 +94,8 @@ let rec t_insert hd t = match t.t_node with
       t_case tl (List.map br bl)
   | _ -> TermTF.t_selecti t_equ_simp t_iff_simp hd t
 
-let add_ld func pred (ls,ld) (abst,defn,axl) =
-  if (if ls.ls_value = None then pred else func) then
+let add_ld which (ls,ld) (abst,defn,axl) =
+  if which ls then
     let vl,e = open_ls_defn ld in
     let nm = ls.ls_name.id_string ^ "_def" in
     let pr = create_prsymbol (id_derive nm ls.ls_name) in
@@ -107,19 +107,19 @@ let add_ld func pred (ls,ld) (abst,defn,axl) =
   else
     abst, (ls,ld) :: defn, axl
 
-let elim_decl func pred l =
-  let abst,defn,axl = List.fold_right (add_ld func pred) l ([],[],[]) in
+let elim_decl which l =
+  let abst,defn,axl = List.fold_right (add_ld which) l ([],[],[]) in
   let defn = if defn = [] then [] else [create_logic_decl defn] in
   abst @ defn @ axl
 
-let elim func pred d = match d.d_node with
-  | Dlogic l -> elim_decl func pred l
+let elim which d = match d.d_node with
+  | Dlogic l -> elim_decl which l
   | _ -> [d]
 
 let elim_recursion d = match d.d_node with
   | Dlogic ([s,_] as l)
-    when Sid.mem s.ls_name d.d_syms -> elim_decl true true l
-  | Dlogic l when List.length l > 1 -> elim_decl true true l
+    when Sid.mem s.ls_name d.d_syms -> elim_decl Util.ttrue l
+  | Dlogic l when List.length l > 1 -> elim_decl Util.ttrue l
   | _ -> [d]
 
 let is_struct dl = (* FIXME? Shouldn't 0 be allowed too? *)
@@ -129,17 +129,23 @@ let is_struct dl = (* FIXME? Shouldn't 0 be allowed too? *)
 let elim_non_struct_recursion d = match d.d_node with
   | Dlogic ((s,_) :: _ as dl)
     when Sid.mem s.ls_name d.d_syms && not (is_struct dl) ->
-      elim_decl true true dl
+      elim_decl Util.ttrue dl
   | _ ->
       [d]
 
 let elim_mutual d = match d.d_node with
-  | Dlogic l when List.length l > 1 -> elim_decl true true l
+  | Dlogic l when List.length l > 1 -> elim_decl Util.ttrue l
   | _ -> [d]
 
-let eliminate_definition_func  = Trans.decl (elim true false) None
-let eliminate_definition_pred  = Trans.decl (elim false true) None
-let eliminate_definition       = Trans.decl (elim true true) None
+let eliminate_definition_gen which = Trans.decl (elim which) None
+
+let eliminate_definition_func  =
+  eliminate_definition_gen (fun ls -> ls.ls_value <> None)
+let eliminate_definition_pred  =
+  eliminate_definition_gen (fun ls -> ls.ls_value =  None)
+let eliminate_definition       =
+  eliminate_definition_gen Util.ttrue
+
 let eliminate_recursion        = Trans.decl elim_recursion None
 let eliminate_non_struct_recursion = Trans.decl elim_non_struct_recursion None
 let eliminate_mutual_recursion = Trans.decl elim_mutual None

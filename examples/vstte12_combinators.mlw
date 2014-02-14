@@ -67,6 +67,7 @@ module Combinators
   (* task 1: implement CBV reduction *)
 
   let rec reduction (t: term) : term
+    diverges (* there are non-normalizable terms... *)
     ensures { t -->* result /\ is_value result }
   = match t with
     | S -> S
@@ -81,6 +82,19 @@ module Combinators
       | _ -> absurd
       end
     end
+
+  exception BenchFailure
+
+  constant i : term = App (App S K) K
+
+  let test_SKK ()
+    diverges (* would be hard to prove terminating *)
+    raises { BenchFailure -> true }
+  = let t1 = reduction (App i i) in
+    if t1 <> i then raise BenchFailure;
+    let t2 = reduction (App (App (App (App K K) K) K) K) in
+    if t2 <> K then raise BenchFailure;
+    (t1, t2)
 
   (* an irreducible term is a value *)
 
@@ -151,6 +165,7 @@ module Combinators
 
   let rec reduction3 (t: term) : term
     requires { exists n: int. n >= 0 /\ t = ks n }
+    diverges (* TODO: prove termination ... *)
     ensures { is_value result /\
       forall n: int. n >= 0 -> (t = ks (2*n)   -> result = K)
                             /\ (t = ks (2*n+1) -> result = App K K) }

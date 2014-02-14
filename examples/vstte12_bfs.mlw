@@ -94,6 +94,7 @@ module BFS
         subset (diff (succ v) !acc) !visited /\
         (forall x: vertex. x<> v -> closure !visited !current !next x)
       }
+      variant { cardinal !acc }
       let w = B.pop acc in
       if not (mem w !visited) then begin
         B.push w visited;
@@ -115,6 +116,8 @@ module BFS
         (forall x: vertex. closure !visited !current !next x) /\
         0 <= !d
       }
+      (* variant { cardinal all_nodes - cardinal !visited }
+         needs to assume that the set of reachable nodes is finite *)
       let v = B.pop current in
       if v = t then raise (Found !d);
       fill_next s t v visited current next d;

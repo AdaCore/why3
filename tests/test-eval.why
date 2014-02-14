@@ -22,6 +22,8 @@ theory T
 
   constant c5 : int = if 2 = 3 then 1 else 2
 
+  constant c5a : int = if 2 <> 3 then 1 else 2
+
   constant c6 : int = if 2 < 3 /\ 5 >= 6 /\ 7 > 8 \/ 9 <= 10 then 1 else 0
 
   use import int.Abs
@@ -86,16 +88,21 @@ theory T
 
   use import map.Map
 
-  constant t : map int int = (const 0)[1<-42]
+  constant t0 : map int int = (const 42)
 
-  constant x0 : int = t[0]
-  constant x1 : int = t[1]
+  constant a0 : int = t0[0]
+  constant a1 : int = t0[1]
 
-  constant t2 : map int int = t[2<-37]
+  constant t1 : map int int = (const 0)[1<-42]
 
-  constant y0 : int = t2[0]
-  constant y1 : int = t2[1]
-  constant y2 : int = t2[2]
+  constant x0 : int = t1[0]
+  constant x1 : int = t1[1]
+
+  constant t2 : map int int = t1[2<-37]
+
+  constant y0 : int = t2[0] (* should be 0 *)
+  constant y1 : int = t2[1] (* should be 42 *)
+  constant y2 : int = t2[2] (* should be 37 *)
 
   constant t3 : map int int = t2[1<-12]
 

@@ -105,8 +105,8 @@ let gen_decl_l add fn =
   in
   fold_l fn
 
-let decl    = gen_decl   add_decl
-let decl_l  = gen_decl_l add_decl
+let decl    = gen_decl   Task.add_decl
+let decl_l  = gen_decl_l Task.add_decl
 let tdecl   = gen_decl   add_tdecl
 let tdecl_l = gen_decl_l add_tdecl
 
@@ -124,8 +124,8 @@ let gen_goal_l add fn = function
       List.map (List.fold_left add prev) (apply_to_goal fn d)
   | _ -> assert false
 
-let goal    = gen_goal   add_decl
-let goal_l  = gen_goal_l add_decl
+let goal    = gen_goal   Task.add_decl
+let goal_l  = gen_goal_l Task.add_decl
 let tgoal   = gen_goal   add_tdecl
 let tgoal_l = gen_goal_l add_tdecl
 
@@ -134,10 +134,10 @@ let rewriteTF fnT fnF = rewrite (TermTF.t_select fnT fnF)
 
 let gen_add_decl add decls = store (function
   | Some { task_decl = { td_node = Decl d }; task_prev = prev } ->
-      add_decl (List.fold_left add prev decls) d
+      Task.add_decl (List.fold_left add prev decls) d
   | _ -> assert false)
 
-let add_decls  = gen_add_decl add_decl
+let add_decls  = gen_add_decl Task.add_decl
 let add_tdecls = gen_add_decl add_tdecl
 
 (** dependent transformations *)
