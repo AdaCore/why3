@@ -206,7 +206,7 @@ end
 %nonassoc prec_no_else
 %nonassoc DOT ELSE GHOST
 %nonassoc prec_no_spec
-%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES VARIANT
+%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES DIVERGES VARIANT
 %nonassoc prec_named
 %nonassoc COLON
 
