@@ -4,6 +4,7 @@ module Rope
   use import int.Int
 
   (* immutable strings *)
+
 (**
   namespace import S
 
@@ -11,6 +12,8 @@ module Rope
     type char
     constant dummy_char: char
     type string = { length: int; chars: HO.func int char }
+
+    function ([]) (s: string) (i: int) : char = s.chars i
 
     val get (s: string) (i:int) : char
       requires { 0 <= i < s.length }
@@ -29,6 +32,7 @@ module Rope
 
   end
 **)
+
   namespace import S
 
     type char
@@ -40,6 +44,10 @@ module Rope
     axiom length_nonnegative: forall s: string. length s >= 0
 
     function ([]) string int: char
+
+    val ([]) (s: string) (i:int) : char
+      requires { 0 <= i < s.length }
+      ensures  { result = s[i] }
 
     constant empty: string
     axiom empty_def: length empty = 0
@@ -69,8 +77,11 @@ module Rope
       0 <= len -> 0 <= ofs < length s -> ofs + len <= length s ->
       forall i: int. 0 <= i < len -> (sub s ofs len)[i] = s[ofs + i]
 
- end
+    val sub (s: string) (ofs len: int) : string
+      requires { 0 <= len /\ 0 <= ofs < length s /\ ofs + len <= length s }
+      ensures  { result = sub s ofs len }
 
+  end
 
   type rope =
     | Emp
@@ -108,7 +119,7 @@ module Rope
 
   let is_empty (r: rope) : bool
     requires { inv r }
-    ensures  { result <-> length r = 0 }
+    ensures  { result <-> string r == empty }
   = r = Emp
 
   let of_string (s: string) : rope
@@ -131,17 +142,28 @@ module Rope
         if i < n then get left i else get right (i - n)
     end
 
-  let rec concat (r1 r2: rope) : rope
+  let concat (r1 r2: rope) : rope
     requires { inv r1 /\ inv r2 }
     ensures  { inv result }
-    ensures  { string result = S.app (string r1) (string r2) }
-  = absurd (* TODO *)
+    ensures  { string result == S.app (string r1) (string r2) }
+  = match r1, r2 with
+    | Emp, r | r, Emp -> r
+    | _               -> App r1 r2 (length r1 + length r2)
+    end
 
   let rec sub (r: rope) (ofs len: int) : rope
     requires { inv r }
     requires { 0 <= len /\ 0 <= ofs < length r /\ ofs + len <= length r }
     ensures  { inv result }
-    ensures  { string result = S.sub (string r) ofs len }
-  = absurd (* TODO *)
+    ensures  { string result == S.sub (string r) ofs len }
+  = match r with
+    | Emp          -> absurd
+    | Str s ofs' _ -> Str s (ofs' + ofs) len
+    | App r1 r2 _  ->
+        let left = length r1 - ofs in (* max chars to the left *)
+        if len <= left then sub r1 ofs len
+        else if 0 >= left then sub r2 (- left) len
+        else concat (sub r1 ofs left) (sub r2 0 (len - left))
+    end
 
 end
