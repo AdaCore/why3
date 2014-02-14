@@ -11,14 +11,15 @@ Require list.Append.
 (* Why3 assumption *)
 Definition unit := unit.
 
-(* Why3 assumption *)
-Definition char := Z.
+Axiom char : Type.
+Parameter char_WhyType : WhyType char.
+Existing Instance char_WhyType.
 
 (* Why3 assumption *)
 Inductive regexp :=
   | Empty : regexp
   | Epsilon : regexp
-  | Char : Z -> regexp
+  | Char : char -> regexp
   | Alt : regexp -> regexp -> regexp
   | Concat : regexp -> regexp -> regexp
   | Star : regexp -> regexp.
@@ -26,42 +27,43 @@ Axiom regexp_WhyType : WhyType regexp.
 Existing Instance regexp_WhyType.
 
 (* Why3 assumption *)
-Definition word := (list Z).
+Definition word := (list char).
 
 (* Why3 assumption *)
-Inductive mem : (list Z) -> regexp -> Prop :=
+Inductive mem : (list char) -> regexp -> Prop :=
   | mem_eps : (mem nil Epsilon)
-  | mem_char : forall (c:Z), (mem (cons c nil) (Char c))
-  | mem_altl : forall (w:(list Z)) (r1:regexp) (r2:regexp), (mem w r1) ->
+  | mem_char : forall (c:char), (mem (cons c nil) (Char c))
+  | mem_altl : forall (w:(list char)) (r1:regexp) (r2:regexp), (mem w r1) ->
       (mem w (Alt r1 r2))
-  | mem_altr : forall (w:(list Z)) (r1:regexp) (r2:regexp), (mem w r2) ->
+  | mem_altr : forall (w:(list char)) (r1:regexp) (r2:regexp), (mem w r2) ->
       (mem w (Alt r1 r2))
-  | mem_concat : forall (w1:(list Z)) (w2:(list Z)) (r1:regexp) (r2:regexp),
-      (mem w1 r1) -> ((mem w2 r2) -> (mem (List.app w1 w2) (Concat r1 r2)))
+  | mem_concat : forall (w1:(list char)) (w2:(list char)) (r1:regexp)
+      (r2:regexp), (mem w1 r1) -> ((mem w2 r2) -> (mem (List.app w1 w2)
+      (Concat r1 r2)))
   | mems1 : forall (r:regexp), (mem nil (Star r))
-  | mems2 : forall (w1:(list Z)) (w2:(list Z)) (r:regexp), (mem w1 r) ->
-      ((mem w2 (Star r)) -> (mem (List.app w1 w2) (Star r))).
+  | mems2 : forall (w1:(list char)) (w2:(list char)) (r:regexp), (mem w1
+      r) -> ((mem w2 (Star r)) -> (mem (List.app w1 w2) (Star r))).
 
-Axiom inversion_mem_star : forall (c:Z) (w:(list Z)) (r:regexp),
-  forall (w':(list Z)) (r':regexp), ((w' = (cons c w)) /\ (r' = (Star r))) ->
-  ((mem w' r') -> exists w1:(list Z), exists w2:(list Z),
+Axiom inversion_mem_star_gen : forall (c:char) (w:(list char)) (r:regexp)
+  (w':(list char)) (r':regexp), ((w' = (cons c w)) /\ (r' = (Star r))) ->
+  ((mem w' r') -> exists w1:(list char), exists w2:(list char),
   (w = (List.app w1 w2)) /\ ((mem (cons c w1) r) /\ (mem w2 r'))).
 
-Axiom inversion_mem_star2 : forall (c:Z) (w:(list Z)) (r:regexp), (mem
-  (cons c w) (Star r)) -> exists w1:(list Z), exists w2:(list Z),
+Axiom inversion_mem_star : forall (c:char) (w:(list char)) (r:regexp), (mem
+  (cons c w) (Star r)) -> exists w1:(list char), exists w2:(list char),
   (w = (List.app w1 w2)) /\ ((mem (cons c w1) r) /\ (mem w2 (Star r))).
 
 (* Why3 goal *)
-Theorem WP_parameter_residual : forall (r:regexp) (c:Z),
+Theorem WP_parameter_residual : forall (r:regexp) (c:char),
   match r with
   | Empty => True
   | Epsilon => True
   | (Char c') => True
   | (Alt r1 r2) => True
   | (Concat r1 r2) => True
-  | (Star r1) => forall (o:regexp), (forall (w:(list Z)), (mem w o) <-> (mem
-      (cons c w) r1)) -> forall (w:(list Z)), (mem w (Concat o r)) <-> (mem
-      (cons c w) r)
+  | (Star r1) => forall (o:regexp), (forall (w:(list char)), (mem w o) <->
+      (mem (cons c w) r1)) -> forall (w:(list char)), (mem w (Concat o
+      r)) <-> (mem (cons c w) r)
   end.
 (* Why3 intros r c. *)
 intros r c.
@@ -74,7 +76,7 @@ rewrite List.app_comm_cons.
 constructor; auto.
 rewrite <- H; auto.
 
-destruct (inversion_mem_star2 _ _ _ H0) as (w1 & w2 & h1 & h2 & h3).
+destruct (inversion_mem_star _ _ _ H0) as (w1 & w2 & h1 & h2 & h3).
 subst w.
 constructor; auto.
 now rewrite H.

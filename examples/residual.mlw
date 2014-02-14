@@ -21,14 +21,13 @@ module Residuals
     | Star _ -> true
     end
 
-  let lemma inversion_mem_star (c:char) (w:word) (r:regexp)
-     ensures { 
-       forall w' r'. w' = Cons c w /\ r' = Star r ->
-       mem w' r' ->
-       exists w1 w2. w = w1 ++ w2 /\ mem (Cons c w1) r /\ mem w2 r' }
-  = ()
+  lemma inversion_mem_star_gen :
+    forall c w r w' r'. 
+      w' = Cons c w /\ r' = Star r ->
+      mem w' r' ->
+      exists w1 w2. w = w1 ++ w2 /\ mem (Cons c w1) r /\ mem w2 r' 
 
-  lemma inversion_mem_star2 :
+  lemma inversion_mem_star :
     forall c w r. mem (Cons c w) (Star r) ->
        exists w1 w2. w = w1 ++ w2 /\ mem (Cons c w1) r /\ mem w2 (Star r)
 
