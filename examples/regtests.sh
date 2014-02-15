@@ -59,10 +59,15 @@ run_dir () {
     done
 }
 
-echo "=== Tests ==="
-run_dir tests
-run_dir tests-provers
+echo "=== Standard Library ==="
+run_dir ../lib/why3
 echo ""
+
+# there's no session there...
+# echo "=== Tests ==="
+# run_dir tests
+# run_dir tests-provers
+# echo ""
 
 echo "=== Check Builtin translation ==="
 run_dir check-builtin

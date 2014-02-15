@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="3.2"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="4.3.1"/>
+ <file
+  name="../../../modules/array.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="Array"
+   locfile="../../../modules/array.mlw"
+   loclnum="10" loccnumb="7" loccnume="12"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter defensive_get"
+    locfile="../../../modules/array.mlw"
+    loclnum="40" loccnumb="6" loccnume="19"
+    expl="VC for defensive_get"
+    sum="417b50dd6c746afcd074c39a87c22b33"
+    proved="true"
+    expanded="false"
+    shape="iiainfix &lt;V1V0Aainfix &lt;=c0V1Aainfix &lt;V1V0Aainfix &lt;=c0V1ainfix &gt;=V1V0Oainfix &lt;V1c0ainfix &gt;=V1V0ainfix &gt;=V1V0Oainfix &lt;V1c0ainfix &lt;V1c0Iainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for defensive_get"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter defensive_set"
+    locfile="../../../modules/array.mlw"
+    loclnum="46" loccnumb="6" loccnume="19"
+    expl="VC for defensive_set"
+    sum="fa98a75c669382d0f728114285407406"
+    proved="true"
+    expanded="false"
+    shape="iiainfix =asetV1V2V3V4Aainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V4asetV1V2V3Aainfix &lt;=c0V0FAainfix &lt;V2V0Aainfix &lt;=c0V2ainfix &gt;=V2V0Oainfix &lt;V2c0ainfix &gt;=V2V0ainfix &gt;=V2V0Oainfix &lt;V2c0ainfix &lt;V2c0Iainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for defensive_set"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter fill"
+    locfile="../../../modules/array.mlw"
+    loclnum="73" loccnumb="6" loccnume="10"
+    expl="VC for fill"
+    sum="66669ba1682a1bf957739087e768c993"
+    proved="true"
+    expanded="false"
+    shape="ainfix =agetV6V7V4Iainfix &lt;V7ainfix +V2V3Aainfix &lt;=V2V7FAainfix =agetV6V8agetV1V8Iainfix &lt;V8V0Aainfix &lt;=ainfix +V2V3V8Oainfix &lt;V8V2Aainfix &lt;=c0V8FAainfix &lt;=c0V0Iainfix =agetV6V9V4Iainfix &lt;V9ainfix +V2ainfix +V5c1Aainfix &lt;=V2V9FAainfix =agetV6V10agetV1V10Iainfix &lt;V10V0Aainfix &lt;=ainfix +V2V3V10Oainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =agetV13V14V4Iainfix &lt;V14ainfix +V2ainfix +V11c1Aainfix &lt;=V2V14FAainfix =agetV13V15agetV1V15Iainfix &lt;V15V0Aainfix &lt;=ainfix +V2V3V15Oainfix &lt;V15V2Aainfix &lt;=c0V15FIainfix =V13asetV6V12V4Aainfix &lt;=c0V0FAainfix &lt;V12V0Aainfix &lt;=c0V12Aainfix &lt;=c0V0Lainfix +V2V11Iainfix =agetV6V16V4Iainfix &lt;V16ainfix +V2V11Aainfix &lt;=V2V16FAainfix =agetV6V17agetV1V17Iainfix &lt;V17V0Aainfix &lt;=ainfix +V2V3V17Oainfix &lt;V17V2Aainfix &lt;=c0V17FIainfix &lt;=V11V5Aainfix &lt;=c0V11FFAainfix =agetV1V18V4Iainfix &lt;V18ainfix +V2c0Aainfix &lt;=V2V18FIainfix &lt;=c0V5Aainfix =agetV1V19V4Iainfix &lt;V19ainfix +V2V3Aainfix &lt;=V2V19FIainfix &gt;c0V5Lainfix -V3c1Iainfix &lt;=ainfix +V2V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for fill"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="ArraySorted"
+   locfile="../../../modules/array.mlw"
+   loclnum="114" loccnumb="7" loccnume="18"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
+   name="ArrayEq"
+   locfile="../../../modules/array.mlw"
+   loclnum="130" loccnumb="7" loccnume="14"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
+   name="ArrayExchange"
+   locfile="../../../modules/array.mlw"
+   loclnum="145" loccnumb="7" loccnume="20"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
+   name="ArrayPermut"
+   locfile="../../../modules/array.mlw"
+   loclnum="161" loccnumb="7" loccnume="18"
+   verified="false"
+   expanded="true">
+   <goal
+    name="permut_sub_refl"
+    locfile="../../../modules/array.mlw"
+    loclnum="195" loccnumb="8" loccnume="23"
+    sum="f68782ae31ac1b7a7492f246fb653e86"
+    proved="true"
+    expanded="false"
+    shape="apermut_subV0V0V1V2Iainfix &lt;=V2alengthV0Aainfix &lt;=V1V2Aainfix &lt;=c0V1F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="permut_sub_trans"
+    locfile="../../../modules/array.mlw"
+    loclnum="199" loccnumb="8" loccnume="24"
+    sum="8edae7fa2dd643f48e3d888c0b8eaf52"
+    proved="true"
+    expanded="false"
+    shape="apermut_subV0V2V3V4Iapermut_subV1V2V3V4Iapermut_subV0V1V3V4F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.39"/>
+    </proof>
+   </goal>
+   <goal
+    name="exchange_permut_sub"
+    locfile="../../../modules/array.mlw"
+    loclnum="203" loccnumb="8" loccnume="27"
+    sum="46248a68021f451a0710abef2dd44bc8"
+    proved="true"
+    expanded="false"
+    shape="apermut_subV0V1V4V5Iainfix &lt;=V5alengthV0Iainfix &lt;=c0V4Iainfix &lt;V3V5Aainfix &lt;=V4V3Iainfix &lt;V2V5Aainfix &lt;=V4V2IaexchangeV0V1V2V3F">
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.14"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="permut_sub_unmodified"
+    locfile="../../../modules/array.mlw"
+    loclnum="208" loccnumb="8" loccnume="29"
+    sum="418d3e00fdbbe226469b0dcbeeac0780"
+    proved="true"
+    expanded="false"
+    shape="ainfix =amixfix []V1V4amixfix []V0V4Iainfix &lt;V4alengthV0Aainfix &lt;=V3V4Oainfix &lt;V4V2Aainfix &lt;=c0V4FIapermut_subV0V1V2V3F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="permut_sub_weakening"
+    locfile="../../../modules/array.mlw"
+    loclnum="215" loccnumb="8" loccnume="28"
+    sum="e20689b7af6a06507f26e6e8383175f6"
+    proved="false"
+    expanded="true"
+    shape="apermut_subV0V1V4V5Iainfix &lt;=V5alengthV0Aainfix &lt;=V3V5Iainfix &lt;=V4V2Aainfix &lt;=c0V4Iapermut_subV0V1V2V3F">
+   </goal>
+   <goal
+    name="permut_sub_compose"
+    locfile="../../../modules/array.mlw"
+    loclnum="220" loccnumb="8" loccnume="26"
+    sum="b78075bc53d18b55bf3f5e49da3cf143"
+    proved="false"
+    expanded="true"
+    shape="apermut_subV0V2V3V6Iapermut_subV1V2V5V6Iapermut_subV0V1V3V4Iainfix &lt;=V4V5F">
+   </goal>
+   <goal
+    name="permut_all_refl"
+    locfile="../../../modules/array.mlw"
+    loclnum="228" loccnumb="8" loccnume="23"
+    sum="d8fcea94f70f11f8fda9ca73e167b2ca"
+    proved="true"
+    expanded="false"
+    shape="apermut_allV0V0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="permut_all_trans"
+    locfile="../../../modules/array.mlw"
+    loclnum="231" loccnumb="8" loccnume="24"
+    sum="5a79aff890ca96f42ab6f51bb356b366"
+    proved="true"
+    expanded="false"
+    shape="apermut_allV0V2Iapermut_allV1V2Iapermut_allV0V1F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="exchange_permut_all"
+    locfile="../../../modules/array.mlw"
+    loclnum="235" loccnumb="8" loccnume="27"
+    sum="7eae0015b20e2df7926e75af5e7ca221"
+    proved="true"
+    expanded="false"
+    shape="apermut_allV0V1IaexchangeV0V1V2V3F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="array_eq_permut_all"
+    locfile="../../../modules/array.mlw"
+    loclnum="241" loccnumb="8" loccnume="27"
+    sum="27d528521c8e5a3196c0e12b4c700bd8"
+    proved="true"
+    expanded="false"
+    shape="apermut_allV0V1Iaarray_eqV0V1F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="permut_sub_permut_all"
+    locfile="../../../modules/array.mlw"
+    loclnum="247" loccnumb="8" loccnume="29"
+    sum="93ec5c9c95b7d10245d7181d81e9f5a5"
+    proved="true"
+    expanded="false"
+    shape="apermut_allV0V1Iapermut_subV0V1V2V3F">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="1.10"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="ArrayPermut2"
+   locfile="../../../modules/array.mlw"
+   loclnum="255" loccnumb="7" loccnume="19"
+   verified="false"
+   expanded="true">
+   <goal
+    name="exchange_permut_sub"
+    locfile="../../../modules/array.mlw"
+    loclnum="284" loccnumb="8" loccnume="27"
+    sum="8f5e74b84210112bcf015696e54f4d2c"
+    proved="false"
+    expanded="true"
+    shape="apermut_subV0V1V4V5Iainfix &lt;=V5alengthV0Iainfix &lt;=c0V4Iainfix &lt;V3V5Aainfix &lt;=V4V3Iainfix &lt;V2V5Aainfix &lt;=V4V2IaexchangeV0V1V2V3F">
+   </goal>
+   <goal
+    name="permut_sub_weakening"
+    locfile="../../../modules/array.mlw"
+    loclnum="291" loccnumb="8" loccnume="28"
+    sum="1b8b3e5dbd3f5413296e1d8d09e43ad3"
+    proved="false"
+    expanded="true"
+    shape="apermut_subV0V1V4V5Iainfix &lt;=V5alengthV0Aainfix &lt;=V3V5Iainfix &lt;=V4V2Aainfix &lt;=c0V4Iapermut_subV0V1V2V3F">
+   </goal>
+   <goal
+    name="permut_sub_compose"
+    locfile="../../../modules/array.mlw"
+    loclnum="296" loccnumb="8" loccnume="26"
+    sum="b917acd5ee0e6b652357bfb6ad1a03bc"
+    proved="false"
+    expanded="true"
+    shape="apermut_subV0V2V3V6Iapermut_subV1V2V5V6Iapermut_subV0V1V3V4Iainfix &lt;=V4V5F">
+   </goal>
+   <goal
+    name="exchange_permut_all"
+    locfile="../../../modules/array.mlw"
+    loclnum="304" loccnumb="8" loccnume="27"
+    sum="4728f8dbe973447071e385caa2c30709"
+    proved="true"
+    expanded="false"
+    shape="apermut_allV0V1IaexchangeV0V1V2V3F">
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="ArraySwap"
+   locfile="../../../modules/array.mlw"
+   loclnum="324" loccnumb="7" loccnume="16"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter swap"
+    locfile="../../../modules/array.mlw"
+    loclnum="330" loccnumb="6" loccnume="10"
+    expl="VC for swap"
+    sum="5e54f2889debe7787a9278286b940deb"
+    proved="true"
+    expanded="false"
+    shape="aexchangeamk arrayV0V1amk arrayV0V5V2V3Iainfix =V5asetV4V3agetV1V2Aainfix &lt;=c0V0FAainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix =V4asetV1V2agetV1V3Aainfix &lt;=c0V0FAainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for swap"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="ArraySum"
+   locfile="../../../modules/array.mlw"
+   loclnum="342" loccnumb="7" loccnume="15"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
+   name="NumOfParam"
+   locfile="../../../modules/array.mlw"
+   loclnum="360" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
+   name="NumOfEq"
+   locfile="../../../modules/array.mlw"
+   loclnum="376" loccnumb="7" loccnume="14"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
+   name="NumOf"
+   locfile="../../../modules/array.mlw"
+   loclnum="389" loccnumb="7" loccnume="12"
+   verified="true"
+   expanded="true">
+  </theory>
+ </file>
+</why3session>
