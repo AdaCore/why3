@@ -1210,7 +1210,7 @@ byte: $(OCAMLLIBS_CMO)
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/ocaml
-	cp lib/ocaml/*.cm[iox] $(LIBDIR)/why3/ocaml
+	cp lib/ocaml/*.cm[iox] lib/ocaml/*.o $(LIBDIR)/why3/ocaml
 
 install_local: bin/why3doc
 

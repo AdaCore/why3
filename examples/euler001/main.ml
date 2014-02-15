@@ -1,0 +1,21 @@
+
+open Format
+
+let usage () =
+  eprintf "Euler001: sum of all the multiples of 3 or 5 below a given number@.";
+  eprintf "Usage: %s <decimal number>@." Sys.argv.(0);
+  exit 2
+
+let input =
+  if Array.length Sys.argv <> 2 then usage ();
+  Sys.argv.(1)
+
+let input_num =
+  try
+    Why3__BuiltIn.int_constant input
+  with _ -> usage ()
+
+let () =
+  let a = Euler001__Euler001.solve input_num in
+  printf "The sum of all the multiples of 3 or 5 below %s is %s@." 
+    (Num.string_of_num input_num) (Num.string_of_num a)

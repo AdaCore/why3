@@ -78,6 +78,25 @@ execute () {
     fi
 }
 
+extract_and_run () {
+    echo -n "$1... "
+    if make -C $1 > /dev/null 2>&1; then
+       if $1/main.opt $2 > /dev/null 2>&1; then
+           echo "ok"
+       else
+           echo "execution failed!"
+           echo $1/main.opt $2
+           $1/main.opt $2
+           exit 1
+       fi
+    else
+        echo "extract or compilation failed!"
+        echo make -C $1
+        make -C $1
+        exit 1
+    fi
+}
+
 list_stuff () {
     echo -n "$1 "
     if $pgm $1 > /dev/null 2>&1; then
@@ -151,6 +170,10 @@ execute examples/vstte10_queens.mlw NQueens.test8
 # examples/queens.mlw --exec  NQueensBits.test8
 # fails: "let" are cloned as "val"
 # examples/in_progress/residual.mlw --exec Test.test_astar
+echo ""
+
+echo "=== Extraction to Ocaml ==="
+extract_and_run examples/euler001 1000000
 echo ""
 
 echo "=== Checking drivers ==="
