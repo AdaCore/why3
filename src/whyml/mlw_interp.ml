@@ -132,6 +132,7 @@ let v_if v t1 t2 = Vif(v,t1,t2)
 type env = {
   mknown : Mlw_decl.known_map;
   tknown : Decl.known_map;
+  funenv : Mlw_expr.fun_defn Mps.t;
   regenv : region Mreg.t;
   vsenv : value Mvs.t;
 }
@@ -166,7 +167,7 @@ let print_regenv fmt s =
 
 let get_reg env r =
   let rec aux n r =
-    if n > 1000 then 
+    if n > 1000 then
       begin
         eprintf "@[<hov 2>looping region association ??? regenv =@ %a@]@."
           print_regenv env.regenv;
@@ -936,6 +937,7 @@ let eval_global_term env km t =
   let env =
     { mknown = Ident.Mid.empty;
       tknown = km;
+      funenv = Mps.empty;
       regenv = Mreg.empty;
       vsenv = Mvs.empty;
     }
@@ -1028,6 +1030,12 @@ let print_result env s fmt r =
 
 (* evaluation of WhyML expressions *)
 
+let find_definition env ps =
+  try
+    Some (Mps.find ps env.funenv)
+  with
+      Not_found ->
+        Mlw_decl.find_definition env.mknown ps 
 
 
 (* evaluate expressions *)
@@ -1207,7 +1215,14 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Eghost e1 ->
     (* TODO: do not eval ghost if no assertion check *)
     eval_expr env s e1
-  | Erec _
+  | Erec (defs,e1) ->
+    let env' =
+      { env with funenv =
+          List.fold_left
+            (fun acc d -> Mps.add d.fun_ps d acc) env.funenv defs
+      }
+    in
+    eval_expr env' s e1
   | Eany _
   | Eabstr _
   | Eabsurd ->
@@ -1242,7 +1257,7 @@ and exec_app env s ps args (*spec*) ity_result =
   let env1 = { env with regenv =
       Mreg.union (fun _ x _ -> Some x) subst env.regenv }
   in
-  match Mlw_decl.find_definition env.mknown ps with
+  match find_definition env ps with
     | Some d ->
       let lam = d.fun_lambda in
       let env' = multibind_pvs lam.l_args args' env1 in
@@ -1296,6 +1311,7 @@ let eval_global_expr env mkm tkm _writes e =
   let env = {
     mknown = mkm;
     tknown = tkm;
+    funenv = Mps.empty;
     regenv = Mreg.empty;
     vsenv = Mvs.empty;
   }
@@ -1316,6 +1332,7 @@ let eval_global_expr env mkm tkm _writes e =
   let env = {
     mknown = mkm;
     tknown = tkm;
+    funenv = Mps.empty;
     regenv = Mreg.empty;
     vsenv = init_env;
   }
