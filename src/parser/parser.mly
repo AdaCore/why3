@@ -612,7 +612,9 @@ lexpr:
 | qualid list1_lexpr_arg
    { mk_pp (PPidapp ($1, $2)) }
 | lexpr_arg_noid list1_lexpr_arg
-   { List.fold_left mk_l_apply $1 $2 }
+   { match $1.pp_desc with
+     | PPidapp (id,al) -> mk_pp (PPidapp (id, al @ $2))
+     | _ -> List.fold_left mk_l_apply $1 $2 }
 | IF lexpr THEN lexpr ELSE lexpr
    { mk_pp (PPif ($2, $4, $6)) }
 | quant list1_quant_vars triggers DOT lexpr
@@ -1195,7 +1197,9 @@ expr:
 | qualid list1_expr_arg
    { mk_expr (Eidapp ($1, $2)) }
 | expr_arg_noid list1_expr_arg
-   { List.fold_left mk_apply $1 $2 }
+   { match $1.expr_desc with
+     | Eidapp (id,al) -> mk_expr (Eidapp (id, al @ $2))
+     | _ -> List.fold_left mk_apply $1 $2 }
 | IF final_expr THEN expr ELSE expr
    { mk_expr (Eif ($2, $4, $6)) }
 | IF final_expr THEN expr %prec prec_no_else
