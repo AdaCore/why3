@@ -4,6 +4,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require map.Map.
+Require map.MapInjection.
 
 (* Why3 assumption *)
 Definition unit := unit.
@@ -99,24 +100,6 @@ Axiom value_def : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@sparse_array
 Definition length1 {a:Type} {a_WT:WhyType a} (a1:(@sparse_array
   a a_WT)): Z := (length (values a1)).
 
-(* Why3 assumption *)
-Definition injective (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z)
-  (j:Z), ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
-  ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
-
-(* Why3 assumption *)
-Definition surjective (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\
-  ((map.Map.get a j) = i).
-
-(* Why3 assumption *)
-Definition range (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
-  ((map.Map.get a i) < n)%Z).
-
-Axiom injective_surjective : forall (a:(@map.Map.map Z _ Z _)) (n:Z),
-  (injective a n) -> ((range a n) -> (surjective a n)).
-
 Require Import Why3.
 Ltac ae := why3 "alt-ergo".
 
@@ -138,9 +121,9 @@ unfold is_elt, length1, get; simpl.
 intro H; decompose [and] H; clear H.
 subst n1 n2.
 intros. subst a_card.
-assert (inj: injective a_back n0) by ae.
-assert (rng: range a_back n0) by ae.
-generalize (injective_surjective a_back n0 inj rng); intro surj.
+assert (inj: MapInjection.injective a_back n0) by ae.
+assert (rng: MapInjection.range a_back n0) by ae.
+generalize (MapInjection.injective_surjective a_back n0 inj rng); intro surj.
 destruct (surj i H1) as (j, (hj1, hj2)).
 ae.
 Qed.
