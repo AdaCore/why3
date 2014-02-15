@@ -63,6 +63,7 @@ HACHA = @HACHA@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
+INCLUDES = @BIGINTINCLUDE@
 OFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 BFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 
@@ -76,7 +77,7 @@ endif
 # external libraries common to all binaries
 
 EXTOBJS =
-EXTLIBS = str unix nums dynlink
+EXTLIBS = str unix @BIGINTLIB@ dynlink 
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
@@ -159,6 +160,21 @@ $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
+
+# Zarith
+
+ifeq (@enable_zarith@,yes)
+
+src/util/bigInt.ml: src/util/bigInt_ocamlnum.ml src/util/bigInt_zarith.ml
+	cp src/util/bigInt_zarith.ml src/util/bigInt.ml
+
+else
+
+src/util/bigInt.ml: src/util/bigInt_ocamlnum.ml
+	cp src/util/bigInt_ocamlnum.ml src/util/bigInt.ml
+
+endif
+
 
 # build targets
 
