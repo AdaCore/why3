@@ -346,6 +346,7 @@ if test "$enable_zarith" = yes; then
    fi
    if test -n "$BIGINTINCLUDE"; then
       echo "ocamlfind found zarith in $BIGINTINCLUDE"
+      BIGINTINCLUDE="-I $BIGINTINCLUDE"
    else
       BIGINTINCLUDE="+zarith"
       AC_CHECK_FILE($OCAMLLIB/zarith/zarith.cma,,enable_zarith=no)
@@ -710,6 +711,7 @@ AC_SUBST(SQLITE3LIB)
 AC_SUBST(enable_bench)
 AC_SUBST(META_OCAMLGRAPH)
 
+AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)
 AC_SUBST(BIGINTLIB)
 
