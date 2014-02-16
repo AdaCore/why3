@@ -3,11 +3,14 @@
 *~
 *.bak
 *.o
+*.a
 why3.conf
 *.cmx
 *.cmo
 *.cmi
 *.cmxs
+*.cma
+*.cmxa
 *.annot
 *.dep
 *.vo
@@ -112,9 +115,9 @@ why3.conf
 
 # /lib/why3/
 /lib/why3/META
-/lib/why3/why3.cm*
-/lib/why3/why3.a
-/lib/why3/why3.o
+
+# /lib/ocaml/
+/lib/ocaml/why3__BigInt.ml
 
 # /share/
 /share/emacs/semantic.cache
@@ -126,7 +129,6 @@ why3.conf
 /src/coq-tactic/coqCompat.ml
 /src/coq-tactic/g_why3tac.ml
 /src/coq-tactic/.why3-vo-*
-/lib/coq-tactic/why3tac.cma
 
 # PVS
 .pvscontext
@@ -192,6 +194,7 @@ pvsbin/
 /examples/why3regtests.out
 /examples/*/*.ml
 /examples/*/*.opt
+/examples/*/*.byte
 /examples/*/*.html
 /examples/*/*/*.html
 /examples/*/*/*/*.html
@@ -211,7 +214,6 @@ pvsbin/
 
 # jessie3
 /src/jessie/.depend
-/src/jessie/Jessie3.cma
 /src/jessie/Jessie3_DEP
 /src/jessie/autom4te.cache/
 /src/jessie/config.log

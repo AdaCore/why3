@@ -1,0 +1,37 @@
+
+OBJ=euler001__Euler001 main
+
+CMO = $(addsuffix .cmo, $(OBJ))
+CMX = $(addsuffix .cmx, $(OBJ))
+
+NAME=main
+
+OCAMLOPT=ocamlopt -noassert -inline 1000
+
+INCLUDE=@BIGINTINCLUDE@ -I ../../lib/why3 
+
+all: $(NAME).@OCAMLBEST@
+
+$(NAME).byte: $(CMO)
+	ocamlc $(INCLUDE) @BIGINTLIB@.cma why3extract.cma -o $@ $^
+
+$(NAME).opt: $(CMX)
+	$(OCAMLOPT) $(INCLUDE) @BIGINTLIB@.cmxa why3extract.cmxa -o $@ $^
+
+main.cmx: euler001__Euler001.cmx
+
+euler001__Euler001.ml: ../euler001.mlw
+	../../bin/why3 -E ocaml ../euler001.mlw -o .
+
+%.cmx: %.ml 
+	ocamlopt $(INCLUDE) -annot -c $<
+
+%.cmo: %.ml 
+	ocamlc $(INCLUDE) -annot -c $<
+
+%.cmi: %.mli 
+	ocamlc $(INCLUDE) -annot -c $<
+
+clean::
+	rm -f *.cm[xio] $(NAME).opt
+

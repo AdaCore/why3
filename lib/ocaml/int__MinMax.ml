@@ -1,5 +1,5 @@
 (* This file has been generated from Why3 theory int.MinMax *)
 
-let min = Num.min_num
-let max = Num.max_num
+let min = Why3__BigInt.min
+let max = Why3__BigInt.max
 

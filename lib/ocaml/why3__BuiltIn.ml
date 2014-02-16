@@ -1,7 +1,10 @@
 
-type int = Num.num
+
+module BigInt = Why3__BigInt
+
+type int = BigInt.t
 
 let infix_eq = Pervasives.(=)
 
-let int_constant = Num.num_of_string
+let int_constant = BigInt.of_string
 

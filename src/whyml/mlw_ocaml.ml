@@ -612,6 +612,8 @@ let extract_theory drv ?old ?fname fmt th =
   fprintf fmt
     "(* This file has been generated from Why3 theory %a *)@\n@\n"
     print_theory_name th;
+  fprintf fmt
+    "open Why3extract@\n@\n";
   print_list nothing (logic_decl info) fmt th.th_decls;
   fprintf fmt "@."
 
@@ -1012,6 +1014,8 @@ let extract_module drv ?old ?fname fmt m =
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     print_module_name m;
+  fprintf fmt
+    "open Why3extract@\n@\n";
   print_list nothing (logic_decl info) fmt th.th_decls;
   print_list nothing (pdecl info) fmt m.mod_decls;
   fprintf fmt "@."

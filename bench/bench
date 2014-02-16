@@ -80,13 +80,14 @@ execute () {
 
 extract_and_run () {
     echo -n "$1... "
+    rm -f $1/$2
     if make -C $1 > /dev/null 2>&1; then
-       if $1/main.opt $2 > /dev/null 2>&1; then
+       if $1/main.opt $3 > /dev/null 2>&1; then
            echo "ok"
        else
            echo "execution failed!"
-           echo $1/main.opt $2
-           $1/main.opt $2
+           echo $1/main.opt $3
+           $1/main.opt $3
            exit 1
        fi
     else
@@ -173,7 +174,7 @@ execute examples/vstte10_queens.mlw NQueens.test8
 echo ""
 
 echo "=== Extraction to Ocaml ==="
-extract_and_run examples/euler001 1000000
+extract_and_run examples/euler001 euler001__Euler001.ml 1000000
 echo ""
 
 echo "=== Checking drivers ==="

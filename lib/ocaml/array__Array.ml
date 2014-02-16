@@ -1,16 +1,18 @@
 (* This file has been generated from Why3 module array.Array *)
 
+module BigInt = Why3__BigInt
+
 type 'a pervasives_array = 'a array
 type 'a array = 'a pervasives_array
 
 let mixfix_lbrb (a: 'a array) (i: Why3__BuiltIn.int) : 'a =
-  a.(Num.int_of_num i)
+  a.(BigInt.to_int i)
 
 let mixfix_lbrblsmn (a: 'a array) (i: Why3__BuiltIn.int) (v: 'a) : unit =
-  a.(Num.int_of_num i) <- v
+  a.(BigInt.to_int i) <- v
 
 let length (a: 'a array) : Why3__BuiltIn.int =
-  Num.num_of_int (Array.length a)
+  BigInt.of_int (Array.length a)
 
 exception OutOfBounds
 
@@ -31,7 +33,7 @@ let defensive_set (a1: 'a array) (i1: Why3__BuiltIn.int) (v: 'a) =
   (((mixfix_lbrblsmn a1) i1) v) end
 
 let make (n: Why3__BuiltIn.int) (v1: 'a) : 'a array =
-  Array.make (Num.int_of_num n) v1
+  Array.make (BigInt.to_int n) v1
 
 
 
@@ -42,7 +44,7 @@ let append (a11: 'a array) (a2: 'a array) : 'a array =
 
 let sub (a2: 'a array) (ofs: Why3__BuiltIn.int) (len: Why3__BuiltIn.int)
     : 'a array =
-  Array.sub a2 (Num.int_of_num ofs) (Num.int_of_num len)
+  Array.sub a2 (BigInt.to_int ofs) (BigInt.to_int len)
 
 
 
@@ -60,8 +62,8 @@ let fill (a2: 'a array) (ofs: Why3__BuiltIn.int) (len: Why3__BuiltIn.int)
 
 let blit (a11: 'a array) (ofs1: Why3__BuiltIn.int) (a21: 'a array) (ofs2:
   Why3__BuiltIn.int) (len1: Why3__BuiltIn.int) : unit =
-  Array.blit a11 (Num.int_of_num ofs1)
-             a21 (Num.int_of_num ofs2) (Num.int_of_num len1)
+  Array.blit a11 (BigInt.to_int ofs1)
+             a21 (BigInt.to_int ofs2) (BigInt.to_int len1)
 
 
 

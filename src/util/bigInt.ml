@@ -1,10 +1,11 @@
 
-open Big_int_Z
+open Big_int
 
 type t = big_int
 let compare = compare_big_int
 
 let zero = zero_big_int
+let one = unit_big_int
 let of_int = big_int_of_int
 
 let succ = succ_big_int
@@ -48,8 +49,11 @@ let computer_mod x y = snd (computer_div_mod x y)
 
 let min = min_big_int
 let max = max_big_int
+let abs = abs_big_int
 
 let pow_int_pos = power_int_positive_int
 
 let to_string = string_of_big_int
 let of_string = big_int_of_string
+let to_int = int_of_big_int
+

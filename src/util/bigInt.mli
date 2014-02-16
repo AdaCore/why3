@@ -6,6 +6,7 @@ val compare : t -> t -> int
 
 (** constants *)
 val zero : t
+val one : t
 val of_int : int -> t
 
 (** basic operations *)
@@ -43,13 +44,15 @@ val computer_div_mod : t -> t -> t * t
 val computer_div : t -> t -> t 
 val computer_mod : t -> t -> t 
 
-(** min and max *)
+(** min, max, abs *)
 val min : t -> t -> t
 val max : t -> t -> t
+val abs : t -> t
 
 (** power of small integers. Second arg must be non-negative *)
 val pow_int_pos : int -> int -> t
 
-(** conversion with strings *)
+(** conversions *)
 val of_string : string -> t
 val to_string : t -> string
+val to_int : t -> int

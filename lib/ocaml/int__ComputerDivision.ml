@@ -1,8 +1,7 @@
 (* This file has been generated from Why3 theory int.ComputerDivision *)
 
-(* Note: documentation for Num says ``Euclidean division'' but this is
-   rather a computer division *)
+module BigInt = Why3__BigInt
 
-let div = Num.quo_num
+let div = BigInt.computer_div
 
-let mod_renamed = Num.mod_num
+let mod_renamed = BigInt.computer_mod

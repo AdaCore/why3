@@ -63,7 +63,7 @@ HACHA = @HACHA@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @BIGINTINCLUDE@
+INCLUDES = 
 OFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 BFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 
@@ -77,7 +77,7 @@ endif
 # external libraries common to all binaries
 
 EXTOBJS =
-EXTLIBS = str unix @BIGINTLIB@ dynlink
+EXTLIBS = str unix nums dynlink
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
@@ -102,11 +102,12 @@ endif
 # Why3 library
 ##############
 
-LIBGENERATED = src/util/config.ml src/util/bigInt.ml \
+LIBGENERATED = src/util/config.ml \
 	       src/util/rc.ml src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	       src/driver/driver_lexer.ml src/session/xml.ml
+	       src/driver/driver_lexer.ml src/session/xml.ml \
+	       lib/ocaml/why3__BigInt.ml
 
 LIB_UTIL = config bigInt util opt lists strings extmap extset exthtbl weakhtbl \
 	   hashcons stdlib exn_printer pp debug loc print_tree \
@@ -166,13 +167,13 @@ $(LIBDEP): $(LIBGENERATED)
 
 ifeq (@enable_zarith@,yes)
 
-src/util/bigInt.ml: config.status src/util/bigInt_zarith.ml
-	cp src/util/bigInt_zarith.ml src/util/bigInt.ml
+lib/ocaml/why3__BigInt.ml: config.status lib/ocaml/bigInt_zarith.ml
+	cp lib/ocaml/bigInt_zarith.ml lib/ocaml/why3__BigInt.ml
 
 else
 
-src/util/bigInt.ml: config.status src/util/bigInt_ocamlnum.ml
-	cp src/util/bigInt_ocamlnum.ml src/util/bigInt.ml
+lib/ocaml/why3__BigInt.ml: config.status src/util/bigInt.ml
+	cp src/util/bigInt.ml lib/ocaml/why3__BigInt.ml
 
 endif
 
@@ -812,12 +813,12 @@ src/coq-tactic/g_why3tac.ml: src/coq-tactic/g_why3tac.ml4
 
 src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cma
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    WHY3CONFIG="" $(COQC) -byte @BIGINTINCLUDE@ -I lib/coq-tactic/ $< && \
+	    WHY3CONFIG="" $(COQC) -byte -I lib/coq-tactic/ $< && \
 	    touch src/coq-tactic/.why3-vo-byte
 
 src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cmxs
 	$(if $(QUIET),@echo 'Coqc     $<' &&) \
-	    WHY3CONFIG="" $(COQC) -opt @BIGINTINCLUDE@ -I lib/coq-tactic/ $< && \
+	    WHY3CONFIG="" $(COQC) -opt -I lib/coq-tactic/ $< && \
 	    touch src/coq-tactic/.why3-vo-opt
 
 # depend and clean targets
@@ -1198,11 +1199,9 @@ clean::
 # Ocaml realizations
 #######################
 
-OCAMLLIBS_FILES = \
-	array__Array \
-	int__Abs int__ComputerDivision int__Int int__Lex2 int__MinMax \
-	ref__Refint ref__Ref \
-	why3__BuiltIn why3__Prelude
+OCAMLLIBS_FILES = why3__BigInt why3__BuiltIn why3__Prelude \
+	int__Int int__Abs int__ComputerDivision int__Lex2 int__MinMax \
+	ref__Refint ref__Ref array__Array 
 
 OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
 
@@ -1210,8 +1209,9 @@ OCAMLLIBS_DEP = $(addsuffix .dep, $(OCAMLLIBS_MODULES))
 OCAMLLIBS_CMO = $(addsuffix .cmo, $(OCAMLLIBS_MODULES))
 OCAMLLIBS_CMX = $(addsuffix .cmx, $(OCAMLLIBS_MODULES))
 
-$(OCAMLLIBS_DEP): DEPFLAGS += -I lib/ocaml
-$(OCAMLLIBS_CMO) $(OCAMLLIBS_CMX): INCLUDES += -I lib/ocaml
+$(OCAMLLIBS_DEP): DEPFLAGS += -I src/util -I lib/ocaml @BIGINTINCLUDE@
+$(OCAMLLIBS_CMO) $(OCAMLLIBS_CMX): INCLUDES += -I src/util -I lib/ocaml  @BIGINTINCLUDE@
+$(OCAMLLIBS_CMX): OFLAGS += -for-pack Why3extract
 
 ifneq "$(MAKECMDGOALS)" "clean"
 include $(OCAMLLIBS_DEP)
@@ -1227,11 +1227,32 @@ opt: $(OCAMLLIBS_CMX)
 
 byte: $(OCAMLLIBS_CMO)
 
+
+byte: lib/why3/why3extract.cma
+opt:  lib/why3/why3extract.cmxa
+
+lib/why3/why3extract.cma: lib/why3/why3extract.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
+
+lib/why3/why3extract.cmxa: lib/why3/why3extract.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) -a $(OFLAGS) -o $@ $^
+
+lib/why3/why3extract.cmo: $(OCAMLLIBS_CMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
+
+lib/why3/why3extract.cmx: $(OCAMLLIBS_CMX)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
+
+
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/ocaml
-	cp lib/ocaml/*.cm[iox] lib/ocaml/*.o $(LIBDIR)/why3/ocaml
+	cp lib/why3/why3extract.cma lib/why3/why3extract.cmxa $(LIBDIR)/why3/ocaml
 
-install_local: bin/why3doc
+
 
 ################
 # Jessie3 plugin
@@ -1390,27 +1411,27 @@ testl-type: bin/why3.byte
 
 test-api-logic.byte: examples/use_api/logic.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
-	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
+	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null \
 	|| (rm -f test-api-logic.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-logic.byte;
 
 test-api-logic.opt: examples/use_api/logic.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
-	&& ./test-api-logic.opt) \
+	&& ./test-api-logic.opt > /dev/null) \
 	|| (rm -f test-api-logic.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-logic.opt
 
 test-api-mlw-tree.byte: examples/use_api/mlw_tree.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
-	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
+	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null\
 	|| (rm -f test-api-mlw-tree.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw-tree.byte;
 
 test-api-mlw-tree.opt: examples/use_api/mlw_tree.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
-	&& ./test-api-mlw-tree.opt) \
+	&& ./test-api-mlw-tree.opt > /dev/null) \
 	|| (rm -f test-api-mlw-tree.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw-tree.opt
 
@@ -1423,7 +1444,7 @@ test-api-mlw.byte: examples/use_api/mlw.ml lib/why3/why3.cma
 test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
-	&& ./test-api-mlw.opt) \
+	&& ./test-api-mlw.opt > /dev/null) \
 	|| (rm -f test-api-mlw.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw.opt
 
@@ -1432,7 +1453,7 @@ test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
 
 test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
-	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
+	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null\
 	|| (rm -f why3session.xml;  \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f why3session.xml
@@ -1440,7 +1461,7 @@ test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma
 test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
-	&& ./test-session.opt) \
+	&& ./test-session.opt > /dev/null) \
 	|| (rm -f test-session.opt why3session.xml; \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f test-session.opt why3session.xml
