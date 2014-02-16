@@ -1201,7 +1201,8 @@ clean::
 
 OCAMLLIBS_FILES = why3__BigInt why3__BuiltIn why3__Prelude \
 	int__Int int__Abs int__ComputerDivision int__Lex2 int__MinMax \
-	ref__Refint ref__Ref array__Array 
+	ref__Refint ref__Ref \
+	map__Map array__Array 
 
 OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
 
@@ -1248,10 +1249,11 @@ lib/why3/why3extract.cmx: $(OCAMLLIBS_CMX)
 	    $(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
 
 
-install_no_local::
-	mkdir -p $(LIBDIR)/why3/ocaml
-	cp lib/why3/why3extract.cma lib/why3/why3extract.cmxa $(LIBDIR)/why3/ocaml
 
+install_no_local_lib::
+	mkdir -p $(OCAMLINSTALLLIB)/why3
+	cp -f lib/why3/why3extract.cm* lib/why3/why3extract.[ao] \
+		$(OCAMLINSTALLLIB)/why3
 
 
 ################
