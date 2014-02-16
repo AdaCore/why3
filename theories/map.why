@@ -275,6 +275,14 @@ theory Occ
     (forall i: int. l <= i < u -> m[i] <> v) -> occ v m l u = 0
     (* by induction on u *)
 
+  lemma occ_exists:
+    forall v: 'a, m: map int 'a, l u: int.
+    occ v m l u > 0 -> exists i: int. l <= i < u /\ m[i] = v
+
+  lemma occ_pos:
+    forall m: map int 'a, l u i: int.
+    l <= i < u -> occ m[i] m l u > 0
+
 end
 
 theory MapPermut2
