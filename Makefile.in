@@ -800,11 +800,11 @@ src/coq-tactic/coqCompat.ml: src/coq-tactic/coqCompat@coq_compat_version@.ml
 
 lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared @BIGINTLIB@.cmxa $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
 lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) -a $(BFLAGS) -o $@ @BIGINTLIB@.cma $^
+	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 src/coq-tactic/g_why3tac.ml: src/coq-tactic/g_why3tac.ml4
 	$(if $(QUIET),@echo 'Camlp5   $<' &&) \
