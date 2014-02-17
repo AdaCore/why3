@@ -1,0 +1,1082 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="1"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="2"
+  name="Z3"
+  version="4.3.1"/>
+ <file
+  name="../inverse_in_place.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="InverseInPlace"
+   locfile="../inverse_in_place.mlw"
+   loclnum="8" loccnumb="7" loccnume="21"
+   verified="false"
+   expanded="true">
+   <goal
+    name="num_of_decrease"
+    locfile="../inverse_in_place.mlw"
+    loclnum="20" loccnumb="8" loccnume="23"
+    sum="cefc6900fa0396a805da6757d9dd4f88"
+    proved="false"
+    expanded="false"
+    shape="ainfix &lt;anum_ofasetV0V3V4V1V2anum_ofV0V1V2Iainfix &lt;V4c0Iainfix &gt;=agetV0V3c0Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
+    <proof
+     prover="0"
+     timelimit="6"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="timeout" time="5.98"/>
+    </proof>
+   </goal>
+   <goal
+    name="is_permutation_inverse"
+    locfile="../inverse_in_place.mlw"
+    loclnum="29" loccnumb="8" loccnume="30"
+    sum="111610622f124a0d627b82d5395461a7"
+    proved="true"
+    expanded="false"
+    shape="ais_permutationV1Iainfix =amixfix []V0amixfix []V1V2V2Iainfix &lt;V2alengthV1Aainfix &lt;=c0V2FIainfix &lt;amixfix []V1V3alengthV1Aainfix &lt;=c0amixfix []V1V3Iainfix &lt;V3alengthV1Aainfix &lt;=c0V3FIais_permutationV0Iainfix =alengthV0alengthV1F">
+    <proof
+     prover="0"
+     timelimit="6"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter inverse_in_place"
+    locfile="../inverse_in_place.mlw"
+    loclnum="55" loccnumb="6" loccnume="22"
+    expl="VC for inverse_in_place"
+    sum="448dc29fff6de10ce1e960bc9b1658a4"
+    proved="false"
+    expanded="true"
+    shape="ainfix =agetV1agetV4V5V5Iainfix &lt;V5V0Aainfix &lt;=c0V5FAais_permutationamk arrayV0V4Aainfix &lt;=c0V0Iainfix =agetV1V6agetV4V6Iainfix &gt;=agetV4V6c0Iainfix &lt;=V6ainfix -c0c1Aainfix &lt;=c0V6FAainfix =agetV1aprefix ~agetV4V7V7Iainfix &lt;agetV4V7c0Iainfix &lt;=V7ainfix -c0c1Aainfix &lt;=c0V7FAainfix =agetV1agetV4V8V8Iainfix &lt;V8V0Aainfix &lt;ainfix -c0c1V8FAainfix &lt;=c0agetV4V9Iainfix &lt;V9V0Aainfix &lt;ainfix -c0c1V9FAainfix &lt;agetV4V10V0Aainfix &lt;=aprefix -V0agetV4V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FAiainfix =agetV1V13agetV12V13Iainfix &gt;=agetV12V13c0Iainfix &lt;=V13ainfix -V11c1Aainfix &lt;=c0V13FAainfix =agetV1aprefix ~agetV12V14V14Iainfix &lt;agetV12V14c0Iainfix &lt;=V14ainfix -V11c1Aainfix &lt;=c0V14FAainfix =agetV1agetV12V15V15Iainfix &lt;V15V0Aainfix &lt;ainfix -V11c1V15FAainfix &lt;=c0agetV12V16Iainfix &lt;V16V0Aainfix &lt;ainfix -V11c1V16FAainfix &lt;agetV12V17V0Aainfix &lt;=aprefix -V0agetV12V17Iainfix &lt;V17V0Aainfix &lt;=c0V17FIainfix =V12asetV4V11aprefix ~agetV4V11Aainfix &lt;=c0V0FAainfix &lt;V11V0Aainfix &lt;=c0V11Aainfix =agetV1aprefix ~agetV4V11V11iainfix =agetV1V27agetV26V27Iainfix &gt;=agetV26V27c0Iainfix &lt;=V27ainfix -V11c1Aainfix &lt;=c0V27FAainfix =agetV1aprefix ~agetV26V28V28Iainfix &lt;agetV26V28c0Iainfix &lt;=V28ainfix -V11c1Aainfix &lt;=c0V28FAainfix =agetV1agetV26V29V29Iainfix &lt;V29V0Aainfix &lt;ainfix -V11c1V29FAainfix &lt;=c0agetV26V30Iainfix &lt;V30V0Aainfix &lt;ainfix -V11c1V30FAainfix &lt;agetV26V31V0Aainfix &lt;=aprefix -V0agetV26V31Iainfix &lt;V31V0Aainfix &lt;=c0V31FIainfix =V26asetV24V11aprefix ~V25Aainfix &lt;=c0V0FAainfix &lt;V11V0Aainfix &lt;=c0V11Aainfix &lt;=c0V0Aainfix =agetV1aprefix ~V25V11Iainfix =V25V22FAainfix =V21V11ainfix &lt;anum_ofV32c0V0anum_ofV24c0V0Aainfix &lt;=c0anum_ofV24c0V0Aainfix =agetV1V36agetV32V36Iainfix &gt;=agetV32V36c0Iainfix &lt;V36V11Aainfix &lt;=c0V36FAainfix =agetV1aprefix ~agetV32V37V37Iainfix &lt;agetV32V37c0Iainfix &lt;V37V11Aainfix &lt;=c0V37FAainfix =agetV1agetV32V38V38Iainfix &lt;V38V0Aainfix &lt;V11V38FAainfix &lt;=c0agetV32V39Iainfix &lt;V39V0Aainfix &lt;V11V39FAainfix &lt;agetV32V40V0Aainfix &lt;=aprefix -V0agetV32V40Iainfix &lt;V40V0Aainfix &lt;=c0V40FAainfix =agetV1aprefix ~V33V34Aainfix &lt;V33c0Aainfix &lt;=aprefix -V0V33Aainfix &lt;=V34V11Aainfix &lt;=c0V34Aainfix &lt;=V35V11Aainfix =agetV32V34V35Iainfix =V35agetV32V34FAainfix &lt;V34V0Aainfix &lt;=c0V34Iainfix =V34V23FIainfix =V33aprefix ~V21FIainfix =V32asetV24V21V22Aainfix &lt;=c0V0FAainfix &lt;V21V0Aainfix &lt;=c0V21Aainfix &lt;=c0V0ainfix &gt;=V23c0Iainfix =agetV1V41agetV24V41Iainfix &gt;=agetV24V41c0Iainfix &lt;V41V11Aainfix &lt;=c0V41FAainfix =agetV1aprefix ~agetV24V42V42Iainfix &lt;agetV24V42c0Iainfix &lt;V42V11Aainfix &lt;=c0V42FAainfix =agetV1agetV24V43V43Iainfix &lt;V43V0Aainfix &lt;V11V43FAainfix &lt;=c0agetV24V44Iainfix &lt;V44V0Aainfix &lt;V11V44FAainfix &lt;agetV24V45V0Aainfix &lt;=aprefix -V0agetV24V45Iainfix &lt;V45V0Aainfix &lt;=c0V45FAainfix =agetV1aprefix ~V22V21Aainfix &lt;V22c0Aainfix &lt;=aprefix -V0V22Aainfix &lt;=V21V11Aainfix &lt;=c0V21Aainfix &lt;=V23V11Aainfix =agetV24V21V23FAainfix =agetV1V46agetV18V46Iainfix &gt;=agetV18V46c0Iainfix &lt;V46V11Aainfix &lt;=c0V46FAainfix =agetV1aprefix ~agetV18V47V47Iainfix &lt;agetV18V47c0Iainfix &lt;V47V11Aainfix &lt;=c0V47FAainfix =agetV1agetV18V48V48Iainfix &lt;V48V0Aainfix &lt;V11V48FAainfix &lt;=c0agetV18V49Iainfix &lt;V49V0Aainfix &lt;V11V49FAainfix &lt;agetV18V50V0Aainfix &lt;=aprefix -V0agetV18V50Iainfix &lt;V50V0Aainfix &lt;=c0V50FAainfix =agetV1aprefix ~aprefix ~V11agetV4V11Aainfix &lt;aprefix ~V11c0Aainfix &lt;=aprefix -V0aprefix ~V11Aainfix &lt;=agetV4V11V11Aainfix &lt;=c0agetV4V11Aainfix &lt;=V20V11Aainfix =agetV18agetV4V11V20Iainfix =V20agetV18V19FAainfix &lt;V19V0Aainfix &lt;=c0V19LagetV4V11Iainfix =V18asetV4V11aprefix -c1Aainfix &lt;=c0V0FAainfix &lt;V11V0Aainfix &lt;=c0V11ainfix &gt;=agetV4V11c0Aainfix &lt;V11V0Aainfix &lt;=c0V11Aainfix &lt;=c0V0Iainfix =agetV1V51agetV4V51Iainfix &gt;=agetV4V51c0Iainfix &lt;=V51V11Aainfix &lt;=c0V51FAainfix =agetV1aprefix ~agetV4V52V52Iainfix &lt;agetV4V52c0Iainfix &lt;=V52V11Aainfix &lt;=c0V52FAainfix =agetV1agetV4V53V53Iainfix &lt;V53V0Aainfix &lt;V11V53FAainfix &lt;=c0agetV4V54Iainfix &lt;V54V0Aainfix &lt;V11V54FAainfix &lt;agetV4V55V0Aainfix &lt;=aprefix -V0agetV4V55Iainfix &lt;V55V0Aainfix &lt;=c0V55FIainfix &gt;=V11c0Aainfix &gt;=V3V11FFAainfix =agetV1aprefix ~agetV1V56V56Iainfix &lt;agetV1V56c0Iainfix &lt;=V56V3Aainfix &lt;=c0V56FAainfix =agetV1agetV1V57V57Iainfix &lt;V57V0Aainfix &lt;V3V57FAainfix &lt;=c0agetV1V58Iainfix &lt;V58V0Aainfix &lt;V3V58FAainfix &lt;agetV1V59V0Aainfix &lt;=aprefix -V0agetV1V59Iainfix &lt;V59V0Aainfix &lt;=c0V59FIainfix &gt;=V3c0Aainfix =agetV1agetV1V60V60Iainfix &lt;V60V0Aainfix &lt;=c0V60FAais_permutationV2Iainfix &lt;V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+    <label
+     name="expl:VC for inverse_in_place"/>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter inverse_in_place.1"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="1. postcondition"
+      sum="3401c2c26154f0cb12e2472adb87af2d"
+      proved="true"
+      expanded="false"
+      shape="postconditionais_permutationV2Iainfix &lt;V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.2"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="2. postcondition"
+      sum="49e6f6b5faa7544cb04d58825b8fa74c"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV1agetV1V4V4Iainfix &lt;V4V0Aainfix &lt;=c0V4FIainfix &lt;V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.3"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="3. loop invariant init"
+      sum="c19070e7c6d462a5997cc9aa2e658a53"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;agetV1V4V0Aainfix &lt;=aprefix -V0agetV1V4Iainfix &lt;V4V0Aainfix &lt;=c0V4FIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.4"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="4. loop invariant init"
+      sum="7c618a282bbf8b23fcfadddab9d235a4"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=c0agetV1V4Iainfix &lt;V4V0Aainfix &lt;V3V4FIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.5"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="5. loop invariant init"
+      sum="5f10bd4f9774ba2964caaa2f865898fb"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =agetV1agetV1V4V4Iainfix &lt;V4V0Aainfix &lt;V3V4FIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.6"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="6. loop invariant init"
+      sum="231f77233934cfdf063bbc71c562b87c"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =agetV1aprefix ~agetV1V4V4Iainfix &lt;agetV1V4c0Iainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.7"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="7. type invariant"
+      sum="d4703f96fde8c65500e40661d5a87b1f"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V0Iainfix =agetV1V6agetV4V6Iainfix &gt;=agetV4V6c0Iainfix &lt;=V6V5Aainfix &lt;=c0V6FAainfix =agetV1aprefix ~agetV4V7V7Iainfix &lt;agetV4V7c0Iainfix &lt;=V7V5Aainfix &lt;=c0V7FAainfix =agetV1agetV4V8V8Iainfix &lt;V8V0Aainfix &lt;V5V8FAainfix &lt;=c0agetV4V9Iainfix &lt;V9V0Aainfix &lt;V5V9FAainfix &lt;agetV4V10V0Aainfix &lt;=aprefix -V0agetV4V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.8"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="8. index in array bounds"
+      sum="ab10d695c4ee6c1e262fcf019168a272"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;=c0V0Iainfix =agetV1V6agetV4V6Iainfix &gt;=agetV4V6c0Iainfix &lt;=V6V5Aainfix &lt;=c0V6FAainfix =agetV1aprefix ~agetV4V7V7Iainfix &lt;agetV4V7c0Iainfix &lt;=V7V5Aainfix &lt;=c0V7FAainfix =agetV1agetV4V8V8Iainfix &lt;V8V0Aainfix &lt;V5V8FAainfix &lt;=c0agetV4V9Iainfix &lt;V9V0Aainfix &lt;V5V9FAainfix &lt;agetV4V10V0Aainfix &lt;=aprefix -V0agetV4V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.9"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="9. index in array bounds"
+      sum="19a5ae86ab1124f541398b23143f5227"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V6agetV4V6Iainfix &gt;=agetV4V6c0Iainfix &lt;=V6V5Aainfix &lt;=c0V6FAainfix =agetV1aprefix ~agetV4V7V7Iainfix &lt;agetV4V7c0Iainfix &lt;=V7V5Aainfix &lt;=c0V7FAainfix =agetV1agetV4V8V8Iainfix &lt;V8V0Aainfix &lt;V5V8FAainfix &lt;=c0agetV4V9Iainfix &lt;V9V0Aainfix &lt;V5V9FAainfix &lt;agetV4V10V0Aainfix &lt;=aprefix -V0agetV4V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.10"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="10. index in array bounds"
+      sum="d34d777beea8a98eb20574d49f4132f0"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V8agetV4V8Iainfix &gt;=agetV4V8c0Iainfix &lt;=V8V5Aainfix &lt;=c0V8FAainfix =agetV1aprefix ~agetV4V9V9Iainfix &lt;agetV4V9c0Iainfix &lt;=V9V5Aainfix &lt;=c0V9FAainfix =agetV1agetV4V10V10Iainfix &lt;V10V0Aainfix &lt;V5V10FAainfix &lt;=c0agetV4V11Iainfix &lt;V11V0Aainfix &lt;V5V11FAainfix &lt;agetV4V12V0Aainfix &lt;=aprefix -V0agetV4V12Iainfix &lt;V12V0Aainfix &lt;=c0V12FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.11"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="11. loop invariant init"
+      sum="f77ffb564b86ac23ae2f9937cfde2146"
+      proved="false"
+      expanded="false"
+      shape="loop invariant initainfix =agetV1aprefix ~aprefix ~V5agetV4V5Aainfix &lt;aprefix ~V5c0Aainfix &lt;=aprefix -V0aprefix ~V5Aainfix &lt;=agetV4V5V5Aainfix &lt;=c0agetV4V5Aainfix &lt;=V8V5Aainfix =agetV6agetV4V5V8Iainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V9agetV4V9Iainfix &gt;=agetV4V9c0Iainfix &lt;=V9V5Aainfix &lt;=c0V9FAainfix =agetV1aprefix ~agetV4V10V10Iainfix &lt;agetV4V10c0Iainfix &lt;=V10V5Aainfix &lt;=c0V10FAainfix =agetV1agetV4V11V11Iainfix &lt;V11V0Aainfix &lt;V5V11FAainfix &lt;=c0agetV4V12Iainfix &lt;V12V0Aainfix &lt;V5V12FAainfix &lt;agetV4V13V0Aainfix &lt;=aprefix -V0agetV4V13Iainfix &lt;V13V0Aainfix &lt;=c0V13FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.38"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.99"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.94"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.12"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="12. loop invariant init"
+      sum="7a3bff0896fd8c792d18aff919325eab"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;agetV6V9V0Aainfix &lt;=aprefix -V0agetV6V9Iainfix &lt;V9V0Aainfix &lt;=c0V9FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V10agetV4V10Iainfix &gt;=agetV4V10c0Iainfix &lt;=V10V5Aainfix &lt;=c0V10FAainfix =agetV1aprefix ~agetV4V11V11Iainfix &lt;agetV4V11c0Iainfix &lt;=V11V5Aainfix &lt;=c0V11FAainfix =agetV1agetV4V12V12Iainfix &lt;V12V0Aainfix &lt;V5V12FAainfix &lt;=c0agetV4V13Iainfix &lt;V13V0Aainfix &lt;V5V13FAainfix &lt;agetV4V14V0Aainfix &lt;=aprefix -V0agetV4V14Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.13"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="13. loop invariant init"
+      sum="4526a24600b813476db20f6f048eddbf"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=c0agetV6V9Iainfix &lt;V9V0Aainfix &lt;V5V9FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V10agetV4V10Iainfix &gt;=agetV4V10c0Iainfix &lt;=V10V5Aainfix &lt;=c0V10FAainfix =agetV1aprefix ~agetV4V11V11Iainfix &lt;agetV4V11c0Iainfix &lt;=V11V5Aainfix &lt;=c0V11FAainfix =agetV1agetV4V12V12Iainfix &lt;V12V0Aainfix &lt;V5V12FAainfix &lt;=c0agetV4V13Iainfix &lt;V13V0Aainfix &lt;V5V13FAainfix &lt;agetV4V14V0Aainfix &lt;=aprefix -V0agetV4V14Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.14"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="14. loop invariant init"
+      sum="52cfed1e4a5f3c67d4e89b62a0e3898d"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =agetV1agetV6V9V9Iainfix &lt;V9V0Aainfix &lt;V5V9FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V10agetV4V10Iainfix &gt;=agetV4V10c0Iainfix &lt;=V10V5Aainfix &lt;=c0V10FAainfix =agetV1aprefix ~agetV4V11V11Iainfix &lt;agetV4V11c0Iainfix &lt;=V11V5Aainfix &lt;=c0V11FAainfix =agetV1agetV4V12V12Iainfix &lt;V12V0Aainfix &lt;V5V12FAainfix &lt;=c0agetV4V13Iainfix &lt;V13V0Aainfix &lt;V5V13FAainfix &lt;agetV4V14V0Aainfix &lt;=aprefix -V0agetV4V14Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.15"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="15. loop invariant init"
+      sum="7ddec9d309b180a4fea3d4931c800772"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =agetV1aprefix ~agetV6V9V9Iainfix &lt;agetV6V9c0Iainfix &lt;V9V5Aainfix &lt;=c0V9FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V10agetV4V10Iainfix &gt;=agetV4V10c0Iainfix &lt;=V10V5Aainfix &lt;=c0V10FAainfix =agetV1aprefix ~agetV4V11V11Iainfix &lt;agetV4V11c0Iainfix &lt;=V11V5Aainfix &lt;=c0V11FAainfix =agetV1agetV4V12V12Iainfix &lt;V12V0Aainfix &lt;V5V12FAainfix &lt;=c0agetV4V13Iainfix &lt;V13V0Aainfix &lt;V5V13FAainfix &lt;agetV4V14V0Aainfix &lt;=aprefix -V0agetV4V14Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="3.08"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.16"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="16. loop invariant init"
+      sum="0664a103f625e93ab2e0b0dd528b65a3"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =agetV1V9agetV6V9Iainfix &gt;=agetV6V9c0Iainfix &lt;V9V5Aainfix &lt;=c0V9FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V10agetV4V10Iainfix &gt;=agetV4V10c0Iainfix &lt;=V10V5Aainfix &lt;=c0V10FAainfix =agetV1aprefix ~agetV4V11V11Iainfix &lt;agetV4V11c0Iainfix &lt;=V11V5Aainfix &lt;=c0V11FAainfix =agetV1agetV4V12V12Iainfix &lt;V12V0Aainfix &lt;V5V12FAainfix &lt;=c0agetV4V13Iainfix &lt;V13V0Aainfix &lt;V5V13FAainfix &lt;agetV4V14V0Aainfix &lt;=aprefix -V0agetV4V14Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.17"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="17. type invariant"
+      sum="62f40fc02ccf08b258df60392d6f41e7"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V13agetV12V13Iainfix &gt;=agetV12V13c0Iainfix &lt;V13V5Aainfix &lt;=c0V13FAainfix =agetV1aprefix ~agetV12V14V14Iainfix &lt;agetV12V14c0Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix =agetV1agetV12V15V15Iainfix &lt;V15V0Aainfix &lt;V5V15FAainfix &lt;=c0agetV12V16Iainfix &lt;V16V0Aainfix &lt;V5V16FAainfix &lt;agetV12V17V0Aainfix &lt;=aprefix -V0agetV12V17Iainfix &lt;V17V0Aainfix &lt;=c0V17FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V18agetV4V18Iainfix &gt;=agetV4V18c0Iainfix &lt;=V18V5Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~agetV4V19V19Iainfix &lt;agetV4V19c0Iainfix &lt;=V19V5Aainfix &lt;=c0V19FAainfix =agetV1agetV4V20V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;=c0agetV4V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;agetV4V22V0Aainfix &lt;=aprefix -V0agetV4V22Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.18"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="18. index in array bounds"
+      sum="8f8b5966aababfade6438a2096c04e83"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V13agetV12V13Iainfix &gt;=agetV12V13c0Iainfix &lt;V13V5Aainfix &lt;=c0V13FAainfix =agetV1aprefix ~agetV12V14V14Iainfix &lt;agetV12V14c0Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix =agetV1agetV12V15V15Iainfix &lt;V15V0Aainfix &lt;V5V15FAainfix &lt;=c0agetV12V16Iainfix &lt;V16V0Aainfix &lt;V5V16FAainfix &lt;agetV12V17V0Aainfix &lt;=aprefix -V0agetV12V17Iainfix &lt;V17V0Aainfix &lt;=c0V17FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V18agetV4V18Iainfix &gt;=agetV4V18c0Iainfix &lt;=V18V5Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~agetV4V19V19Iainfix &lt;agetV4V19c0Iainfix &lt;=V19V5Aainfix &lt;=c0V19FAainfix =agetV1agetV4V20V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;=c0agetV4V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;agetV4V22V0Aainfix &lt;=aprefix -V0agetV4V22Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.19"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="19. index in array bounds"
+      sum="307192a716cc1a27e002333686d7ab9a"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15V11FIainfix =V14aprefix ~V9FIainfix =V13asetV12V9V10Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V16agetV12V16Iainfix &gt;=agetV12V16c0Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix =agetV1aprefix ~agetV12V17V17Iainfix &lt;agetV12V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix =agetV1agetV12V18V18Iainfix &lt;V18V0Aainfix &lt;V5V18FAainfix &lt;=c0agetV12V19Iainfix &lt;V19V0Aainfix &lt;V5V19FAainfix &lt;agetV12V20V0Aainfix &lt;=aprefix -V0agetV12V20Iainfix &lt;V20V0Aainfix &lt;=c0V20FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V21agetV4V21Iainfix &gt;=agetV4V21c0Iainfix &lt;=V21V5Aainfix &lt;=c0V21FAainfix =agetV1aprefix ~agetV4V22V22Iainfix &lt;agetV4V22c0Iainfix &lt;=V22V5Aainfix &lt;=c0V22FAainfix =agetV1agetV4V23V23Iainfix &lt;V23V0Aainfix &lt;V5V23FAainfix &lt;=c0agetV4V24Iainfix &lt;V24V0Aainfix &lt;V5V24FAainfix &lt;agetV4V25V0Aainfix &lt;=aprefix -V0agetV4V25Iainfix &lt;V25V0Aainfix &lt;=c0V25FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.20"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="20. loop invariant preservation"
+      sum="c4aef2e53f3c2430fccfc051494a2248"
+      proved="false"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1aprefix ~V14V15Aainfix &lt;V14c0Aainfix &lt;=aprefix -V0V14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;=V16V5Aainfix =agetV13V15V16Iainfix =V16agetV13V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15V11FIainfix =V14aprefix ~V9FIainfix =V13asetV12V9V10Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V17agetV12V17Iainfix &gt;=agetV12V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix =agetV1aprefix ~agetV12V18V18Iainfix &lt;agetV12V18c0Iainfix &lt;V18V5Aainfix &lt;=c0V18FAainfix =agetV1agetV12V19V19Iainfix &lt;V19V0Aainfix &lt;V5V19FAainfix &lt;=c0agetV12V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;agetV12V21V0Aainfix &lt;=aprefix -V0agetV12V21Iainfix &lt;V21V0Aainfix &lt;=c0V21FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V22agetV4V22Iainfix &gt;=agetV4V22c0Iainfix &lt;=V22V5Aainfix &lt;=c0V22FAainfix =agetV1aprefix ~agetV4V23V23Iainfix &lt;agetV4V23c0Iainfix &lt;=V23V5Aainfix &lt;=c0V23FAainfix =agetV1agetV4V24V24Iainfix &lt;V24V0Aainfix &lt;V5V24FAainfix &lt;=c0agetV4V25Iainfix &lt;V25V0Aainfix &lt;V5V25FAainfix &lt;agetV4V26V0Aainfix &lt;=aprefix -V0agetV4V26Iainfix &lt;V26V0Aainfix &lt;=c0V26FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.97"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.92"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.98"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.21"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="21. loop invariant preservation"
+      sum="5b4611ba554471d8b59bdabb87844aff"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;agetV13V17V0Aainfix &lt;=aprefix -V0agetV13V17Iainfix &lt;V17V0Aainfix &lt;=c0V17FIainfix =V16agetV13V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15V11FIainfix =V14aprefix ~V9FIainfix =V13asetV12V9V10Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V18agetV12V18Iainfix &gt;=agetV12V18c0Iainfix &lt;V18V5Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~agetV12V19V19Iainfix &lt;agetV12V19c0Iainfix &lt;V19V5Aainfix &lt;=c0V19FAainfix =agetV1agetV12V20V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;=c0agetV12V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;agetV12V22V0Aainfix &lt;=aprefix -V0agetV12V22Iainfix &lt;V22V0Aainfix &lt;=c0V22FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V23agetV4V23Iainfix &gt;=agetV4V23c0Iainfix &lt;=V23V5Aainfix &lt;=c0V23FAainfix =agetV1aprefix ~agetV4V24V24Iainfix &lt;agetV4V24c0Iainfix &lt;=V24V5Aainfix &lt;=c0V24FAainfix =agetV1agetV4V25V25Iainfix &lt;V25V0Aainfix &lt;V5V25FAainfix &lt;=c0agetV4V26Iainfix &lt;V26V0Aainfix &lt;V5V26FAainfix &lt;agetV4V27V0Aainfix &lt;=aprefix -V0agetV4V27Iainfix &lt;V27V0Aainfix &lt;=c0V27FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.42"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.22"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="22. loop invariant preservation"
+      sum="e3114cb6b03566760b462cf7801165b7"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=c0agetV13V17Iainfix &lt;V17V0Aainfix &lt;V5V17FIainfix =V16agetV13V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15V11FIainfix =V14aprefix ~V9FIainfix =V13asetV12V9V10Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V18agetV12V18Iainfix &gt;=agetV12V18c0Iainfix &lt;V18V5Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~agetV12V19V19Iainfix &lt;agetV12V19c0Iainfix &lt;V19V5Aainfix &lt;=c0V19FAainfix =agetV1agetV12V20V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;=c0agetV12V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;agetV12V22V0Aainfix &lt;=aprefix -V0agetV12V22Iainfix &lt;V22V0Aainfix &lt;=c0V22FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V23agetV4V23Iainfix &gt;=agetV4V23c0Iainfix &lt;=V23V5Aainfix &lt;=c0V23FAainfix =agetV1aprefix ~agetV4V24V24Iainfix &lt;agetV4V24c0Iainfix &lt;=V24V5Aainfix &lt;=c0V24FAainfix =agetV1agetV4V25V25Iainfix &lt;V25V0Aainfix &lt;V5V25FAainfix &lt;=c0agetV4V26Iainfix &lt;V26V0Aainfix &lt;V5V26FAainfix &lt;agetV4V27V0Aainfix &lt;=aprefix -V0agetV4V27Iainfix &lt;V27V0Aainfix &lt;=c0V27FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.23"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="23. loop invariant preservation"
+      sum="17f849cfc081e8724fc71912c9de4214"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1agetV13V17V17Iainfix &lt;V17V0Aainfix &lt;V5V17FIainfix =V16agetV13V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15V11FIainfix =V14aprefix ~V9FIainfix =V13asetV12V9V10Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V18agetV12V18Iainfix &gt;=agetV12V18c0Iainfix &lt;V18V5Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~agetV12V19V19Iainfix &lt;agetV12V19c0Iainfix &lt;V19V5Aainfix &lt;=c0V19FAainfix =agetV1agetV12V20V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;=c0agetV12V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;agetV12V22V0Aainfix &lt;=aprefix -V0agetV12V22Iainfix &lt;V22V0Aainfix &lt;=c0V22FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V23agetV4V23Iainfix &gt;=agetV4V23c0Iainfix &lt;=V23V5Aainfix &lt;=c0V23FAainfix =agetV1aprefix ~agetV4V24V24Iainfix &lt;agetV4V24c0Iainfix &lt;=V24V5Aainfix &lt;=c0V24FAainfix =agetV1agetV4V25V25Iainfix &lt;V25V0Aainfix &lt;V5V25FAainfix &lt;=c0agetV4V26Iainfix &lt;V26V0Aainfix &lt;V5V26FAainfix &lt;agetV4V27V0Aainfix &lt;=aprefix -V0agetV4V27Iainfix &lt;V27V0Aainfix &lt;=c0V27FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.24"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="24. loop invariant preservation"
+      sum="6197586ab15585dc7242ef1ae7ec0c25"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1aprefix ~agetV13V17V17Iainfix &lt;agetV13V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FIainfix =V16agetV13V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15V11FIainfix =V14aprefix ~V9FIainfix =V13asetV12V9V10Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V18agetV12V18Iainfix &gt;=agetV12V18c0Iainfix &lt;V18V5Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~agetV12V19V19Iainfix &lt;agetV12V19c0Iainfix &lt;V19V5Aainfix &lt;=c0V19FAainfix =agetV1agetV12V20V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;=c0agetV12V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;agetV12V22V0Aainfix &lt;=aprefix -V0agetV12V22Iainfix &lt;V22V0Aainfix &lt;=c0V22FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V23agetV4V23Iainfix &gt;=agetV4V23c0Iainfix &lt;=V23V5Aainfix &lt;=c0V23FAainfix =agetV1aprefix ~agetV4V24V24Iainfix &lt;agetV4V24c0Iainfix &lt;=V24V5Aainfix &lt;=c0V24FAainfix =agetV1agetV4V25V25Iainfix &lt;V25V0Aainfix &lt;V5V25FAainfix &lt;=c0agetV4V26Iainfix &lt;V26V0Aainfix &lt;V5V26FAainfix &lt;agetV4V27V0Aainfix &lt;=aprefix -V0agetV4V27Iainfix &lt;V27V0Aainfix &lt;=c0V27FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.94"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.25"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="25. loop invariant preservation"
+      sum="306b5305b09b2898725ae210a853a5e7"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1V17agetV13V17Iainfix &gt;=agetV13V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FIainfix =V16agetV13V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15V11FIainfix =V14aprefix ~V9FIainfix =V13asetV12V9V10Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V18agetV12V18Iainfix &gt;=agetV12V18c0Iainfix &lt;V18V5Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~agetV12V19V19Iainfix &lt;agetV12V19c0Iainfix &lt;V19V5Aainfix &lt;=c0V19FAainfix =agetV1agetV12V20V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;=c0agetV12V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;agetV12V22V0Aainfix &lt;=aprefix -V0agetV12V22Iainfix &lt;V22V0Aainfix &lt;=c0V22FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V23agetV4V23Iainfix &gt;=agetV4V23c0Iainfix &lt;=V23V5Aainfix &lt;=c0V23FAainfix =agetV1aprefix ~agetV4V24V24Iainfix &lt;agetV4V24c0Iainfix &lt;=V24V5Aainfix &lt;=c0V24FAainfix =agetV1agetV4V25V25Iainfix &lt;V25V0Aainfix &lt;V5V25FAainfix &lt;=c0agetV4V26Iainfix &lt;V26V0Aainfix &lt;V5V26FAainfix &lt;agetV4V27V0Aainfix &lt;=aprefix -V0agetV4V27Iainfix &lt;V27V0Aainfix &lt;=c0V27FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.26"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="26. loop variant decrease"
+      sum="3f8cb01207c271303e566ba42f3d9e08"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;anum_ofV13c0V0anum_ofV12c0V0Aainfix &lt;=c0anum_ofV12c0V0Iainfix =V16agetV13V15FIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix =V15V11FIainfix =V14aprefix ~V9FIainfix =V13asetV12V9V10Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &gt;=V11c0Iainfix =agetV1V17agetV12V17Iainfix &gt;=agetV12V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix =agetV1aprefix ~agetV12V18V18Iainfix &lt;agetV12V18c0Iainfix &lt;V18V5Aainfix &lt;=c0V18FAainfix =agetV1agetV12V19V19Iainfix &lt;V19V0Aainfix &lt;V5V19FAainfix &lt;=c0agetV12V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;agetV12V21V0Aainfix &lt;=aprefix -V0agetV12V21Iainfix &lt;V21V0Aainfix &lt;=c0V21FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V22agetV4V22Iainfix &gt;=agetV4V22c0Iainfix &lt;=V22V5Aainfix &lt;=c0V22FAainfix =agetV1aprefix ~agetV4V23V23Iainfix &lt;agetV4V23c0Iainfix &lt;=V23V5Aainfix &lt;=c0V23FAainfix =agetV1agetV4V24V24Iainfix &lt;V24V0Aainfix &lt;V5V24FAainfix &lt;=c0agetV4V25Iainfix &lt;V25V0Aainfix &lt;V5V25FAainfix &lt;agetV4V26V0Aainfix &lt;=aprefix -V0agetV4V26Iainfix &lt;V26V0Aainfix &lt;=c0V26FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.27"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="27. assertion"
+      sum="22151ea1ffc1219049f01a96d7ab73f8"
+      proved="false"
+      expanded="false"
+      shape="assertionainfix =V9V5INainfix &gt;=V11c0Iainfix =agetV1V13agetV12V13Iainfix &gt;=agetV12V13c0Iainfix &lt;V13V5Aainfix &lt;=c0V13FAainfix =agetV1aprefix ~agetV12V14V14Iainfix &lt;agetV12V14c0Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix =agetV1agetV12V15V15Iainfix &lt;V15V0Aainfix &lt;V5V15FAainfix &lt;=c0agetV12V16Iainfix &lt;V16V0Aainfix &lt;V5V16FAainfix &lt;agetV12V17V0Aainfix &lt;=aprefix -V0agetV12V17Iainfix &lt;V17V0Aainfix &lt;=c0V17FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V18agetV4V18Iainfix &gt;=agetV4V18c0Iainfix &lt;=V18V5Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~agetV4V19V19Iainfix &lt;agetV4V19c0Iainfix &lt;=V19V5Aainfix &lt;=c0V19FAainfix =agetV1agetV4V20V20Iainfix &lt;V20V0Aainfix &lt;V5V20FAainfix &lt;=c0agetV4V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;agetV4V22V0Aainfix &lt;=aprefix -V0agetV4V22Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.92"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.97"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.98"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.28"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="28. assertion"
+      sum="9b071e156218cf170dcae47144a3f2aa"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix =agetV1aprefix ~V13V5Iainfix =V13V10FIainfix =V9V5INainfix &gt;=V11c0Iainfix =agetV1V14agetV12V14Iainfix &gt;=agetV12V14c0Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix =agetV1aprefix ~agetV12V15V15Iainfix &lt;agetV12V15c0Iainfix &lt;V15V5Aainfix &lt;=c0V15FAainfix =agetV1agetV12V16V16Iainfix &lt;V16V0Aainfix &lt;V5V16FAainfix &lt;=c0agetV12V17Iainfix &lt;V17V0Aainfix &lt;V5V17FAainfix &lt;agetV12V18V0Aainfix &lt;=aprefix -V0agetV12V18Iainfix &lt;V18V0Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V19agetV4V19Iainfix &gt;=agetV4V19c0Iainfix &lt;=V19V5Aainfix &lt;=c0V19FAainfix =agetV1aprefix ~agetV4V20V20Iainfix &lt;agetV4V20c0Iainfix &lt;=V20V5Aainfix &lt;=c0V20FAainfix =agetV1agetV4V21V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;=c0agetV4V22Iainfix &lt;V22V0Aainfix &lt;V5V22FAainfix &lt;agetV4V23V0Aainfix &lt;=aprefix -V0agetV4V23Iainfix &lt;V23V0Aainfix &lt;=c0V23FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.29"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="29. type invariant"
+      sum="12d6533ef1f987d652fd0cccb2af2ea1"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V0Iainfix =agetV1aprefix ~V13V5Iainfix =V13V10FIainfix =V9V5INainfix &gt;=V11c0Iainfix =agetV1V14agetV12V14Iainfix &gt;=agetV12V14c0Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix =agetV1aprefix ~agetV12V15V15Iainfix &lt;agetV12V15c0Iainfix &lt;V15V5Aainfix &lt;=c0V15FAainfix =agetV1agetV12V16V16Iainfix &lt;V16V0Aainfix &lt;V5V16FAainfix &lt;=c0agetV12V17Iainfix &lt;V17V0Aainfix &lt;V5V17FAainfix &lt;agetV12V18V0Aainfix &lt;=aprefix -V0agetV12V18Iainfix &lt;V18V0Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V19agetV4V19Iainfix &gt;=agetV4V19c0Iainfix &lt;=V19V5Aainfix &lt;=c0V19FAainfix =agetV1aprefix ~agetV4V20V20Iainfix &lt;agetV4V20c0Iainfix &lt;=V20V5Aainfix &lt;=c0V20FAainfix =agetV1agetV4V21V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;=c0agetV4V22Iainfix &lt;V22V0Aainfix &lt;V5V22FAainfix &lt;agetV4V23V0Aainfix &lt;=aprefix -V0agetV4V23Iainfix &lt;V23V0Aainfix &lt;=c0V23FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.30"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="30. index in array bounds"
+      sum="d9f9d2ee30f22769e818e537381c70d0"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;=c0V0Iainfix =agetV1aprefix ~V13V5Iainfix =V13V10FIainfix =V9V5INainfix &gt;=V11c0Iainfix =agetV1V14agetV12V14Iainfix &gt;=agetV12V14c0Iainfix &lt;V14V5Aainfix &lt;=c0V14FAainfix =agetV1aprefix ~agetV12V15V15Iainfix &lt;agetV12V15c0Iainfix &lt;V15V5Aainfix &lt;=c0V15FAainfix =agetV1agetV12V16V16Iainfix &lt;V16V0Aainfix &lt;V5V16FAainfix &lt;=c0agetV12V17Iainfix &lt;V17V0Aainfix &lt;V5V17FAainfix &lt;agetV12V18V0Aainfix &lt;=aprefix -V0agetV12V18Iainfix &lt;V18V0Aainfix &lt;=c0V18FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V19agetV4V19Iainfix &gt;=agetV4V19c0Iainfix &lt;=V19V5Aainfix &lt;=c0V19FAainfix =agetV1aprefix ~agetV4V20V20Iainfix &lt;agetV4V20c0Iainfix &lt;=V20V5Aainfix &lt;=c0V20FAainfix =agetV1agetV4V21V21Iainfix &lt;V21V0Aainfix &lt;V5V21FAainfix &lt;=c0agetV4V22Iainfix &lt;V22V0Aainfix &lt;V5V22FAainfix &lt;agetV4V23V0Aainfix &lt;=aprefix -V0agetV4V23Iainfix &lt;V23V0Aainfix &lt;=c0V23FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.31"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="31. loop invariant preservation"
+      sum="02185f4426de138db2a4dab2355d6b6e"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;agetV14V15V0Aainfix &lt;=aprefix -V0agetV14V15Iainfix &lt;V15V0Aainfix &lt;=c0V15FIainfix =V14asetV12V5aprefix ~V13Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1aprefix ~V13V5Iainfix =V13V10FIainfix =V9V5INainfix &gt;=V11c0Iainfix =agetV1V16agetV12V16Iainfix &gt;=agetV12V16c0Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix =agetV1aprefix ~agetV12V17V17Iainfix &lt;agetV12V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix =agetV1agetV12V18V18Iainfix &lt;V18V0Aainfix &lt;V5V18FAainfix &lt;=c0agetV12V19Iainfix &lt;V19V0Aainfix &lt;V5V19FAainfix &lt;agetV12V20V0Aainfix &lt;=aprefix -V0agetV12V20Iainfix &lt;V20V0Aainfix &lt;=c0V20FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V21agetV4V21Iainfix &gt;=agetV4V21c0Iainfix &lt;=V21V5Aainfix &lt;=c0V21FAainfix =agetV1aprefix ~agetV4V22V22Iainfix &lt;agetV4V22c0Iainfix &lt;=V22V5Aainfix &lt;=c0V22FAainfix =agetV1agetV4V23V23Iainfix &lt;V23V0Aainfix &lt;V5V23FAainfix &lt;=c0agetV4V24Iainfix &lt;V24V0Aainfix &lt;V5V24FAainfix &lt;agetV4V25V0Aainfix &lt;=aprefix -V0agetV4V25Iainfix &lt;V25V0Aainfix &lt;=c0V25FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.20"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.32"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="32. loop invariant preservation"
+      sum="14b89bb3bcc997c078a20686cce15a9f"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=c0agetV14V15Iainfix &lt;V15V0Aainfix &lt;ainfix -V5c1V15FIainfix =V14asetV12V5aprefix ~V13Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1aprefix ~V13V5Iainfix =V13V10FIainfix =V9V5INainfix &gt;=V11c0Iainfix =agetV1V16agetV12V16Iainfix &gt;=agetV12V16c0Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix =agetV1aprefix ~agetV12V17V17Iainfix &lt;agetV12V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix =agetV1agetV12V18V18Iainfix &lt;V18V0Aainfix &lt;V5V18FAainfix &lt;=c0agetV12V19Iainfix &lt;V19V0Aainfix &lt;V5V19FAainfix &lt;agetV12V20V0Aainfix &lt;=aprefix -V0agetV12V20Iainfix &lt;V20V0Aainfix &lt;=c0V20FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V21agetV4V21Iainfix &gt;=agetV4V21c0Iainfix &lt;=V21V5Aainfix &lt;=c0V21FAainfix =agetV1aprefix ~agetV4V22V22Iainfix &lt;agetV4V22c0Iainfix &lt;=V22V5Aainfix &lt;=c0V22FAainfix =agetV1agetV4V23V23Iainfix &lt;V23V0Aainfix &lt;V5V23FAainfix &lt;=c0agetV4V24Iainfix &lt;V24V0Aainfix &lt;V5V24FAainfix &lt;agetV4V25V0Aainfix &lt;=aprefix -V0agetV4V25Iainfix &lt;V25V0Aainfix &lt;=c0V25FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.33"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="33. loop invariant preservation"
+      sum="209d0c12be3b3f05e01eae2b4a62e33f"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1agetV14V15V15Iainfix &lt;V15V0Aainfix &lt;ainfix -V5c1V15FIainfix =V14asetV12V5aprefix ~V13Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1aprefix ~V13V5Iainfix =V13V10FIainfix =V9V5INainfix &gt;=V11c0Iainfix =agetV1V16agetV12V16Iainfix &gt;=agetV12V16c0Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix =agetV1aprefix ~agetV12V17V17Iainfix &lt;agetV12V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix =agetV1agetV12V18V18Iainfix &lt;V18V0Aainfix &lt;V5V18FAainfix &lt;=c0agetV12V19Iainfix &lt;V19V0Aainfix &lt;V5V19FAainfix &lt;agetV12V20V0Aainfix &lt;=aprefix -V0agetV12V20Iainfix &lt;V20V0Aainfix &lt;=c0V20FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V21agetV4V21Iainfix &gt;=agetV4V21c0Iainfix &lt;=V21V5Aainfix &lt;=c0V21FAainfix =agetV1aprefix ~agetV4V22V22Iainfix &lt;agetV4V22c0Iainfix &lt;=V22V5Aainfix &lt;=c0V22FAainfix =agetV1agetV4V23V23Iainfix &lt;V23V0Aainfix &lt;V5V23FAainfix &lt;=c0agetV4V24Iainfix &lt;V24V0Aainfix &lt;V5V24FAainfix &lt;agetV4V25V0Aainfix &lt;=aprefix -V0agetV4V25Iainfix &lt;V25V0Aainfix &lt;=c0V25FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.34"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="34. loop invariant preservation"
+      sum="e86451eba7f2be7224d06ffa2e5b62bb"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1aprefix ~agetV14V15V15Iainfix &lt;agetV14V15c0Iainfix &lt;=V15ainfix -V5c1Aainfix &lt;=c0V15FIainfix =V14asetV12V5aprefix ~V13Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1aprefix ~V13V5Iainfix =V13V10FIainfix =V9V5INainfix &gt;=V11c0Iainfix =agetV1V16agetV12V16Iainfix &gt;=agetV12V16c0Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix =agetV1aprefix ~agetV12V17V17Iainfix &lt;agetV12V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix =agetV1agetV12V18V18Iainfix &lt;V18V0Aainfix &lt;V5V18FAainfix &lt;=c0agetV12V19Iainfix &lt;V19V0Aainfix &lt;V5V19FAainfix &lt;agetV12V20V0Aainfix &lt;=aprefix -V0agetV12V20Iainfix &lt;V20V0Aainfix &lt;=c0V20FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V21agetV4V21Iainfix &gt;=agetV4V21c0Iainfix &lt;=V21V5Aainfix &lt;=c0V21FAainfix =agetV1aprefix ~agetV4V22V22Iainfix &lt;agetV4V22c0Iainfix &lt;=V22V5Aainfix &lt;=c0V22FAainfix =agetV1agetV4V23V23Iainfix &lt;V23V0Aainfix &lt;V5V23FAainfix &lt;=c0agetV4V24Iainfix &lt;V24V0Aainfix &lt;V5V24FAainfix &lt;agetV4V25V0Aainfix &lt;=aprefix -V0agetV4V25Iainfix &lt;V25V0Aainfix &lt;=c0V25FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="5.97"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.35"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="35. loop invariant preservation"
+      sum="923fa363a8451daf22815e922ca9ad97"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1V15agetV14V15Iainfix &gt;=agetV14V15c0Iainfix &lt;=V15ainfix -V5c1Aainfix &lt;=c0V15FIainfix =V14asetV12V5aprefix ~V13Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1aprefix ~V13V5Iainfix =V13V10FIainfix =V9V5INainfix &gt;=V11c0Iainfix =agetV1V16agetV12V16Iainfix &gt;=agetV12V16c0Iainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix =agetV1aprefix ~agetV12V17V17Iainfix &lt;agetV12V17c0Iainfix &lt;V17V5Aainfix &lt;=c0V17FAainfix =agetV1agetV12V18V18Iainfix &lt;V18V0Aainfix &lt;V5V18FAainfix &lt;=c0agetV12V19Iainfix &lt;V19V0Aainfix &lt;V5V19FAainfix &lt;agetV12V20V0Aainfix &lt;=aprefix -V0agetV12V20Iainfix &lt;V20V0Aainfix &lt;=c0V20FAainfix =agetV1aprefix ~V10V9Aainfix &lt;V10c0Aainfix &lt;=aprefix -V0V10Aainfix &lt;=V9V5Aainfix &lt;=c0V9Aainfix &lt;=V11V5Aainfix =agetV12V9V11FIainfix =V8agetV6V7FIainfix &lt;V7V0Aainfix &lt;=c0V7LagetV4V5Iainfix =V6asetV4V5aprefix -c1Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V21agetV4V21Iainfix &gt;=agetV4V21c0Iainfix &lt;=V21V5Aainfix &lt;=c0V21FAainfix =agetV1aprefix ~agetV4V22V22Iainfix &lt;agetV4V22c0Iainfix &lt;=V22V5Aainfix &lt;=c0V22FAainfix =agetV1agetV4V23V23Iainfix &lt;V23V0Aainfix &lt;V5V23FAainfix &lt;=c0agetV4V24Iainfix &lt;V24V0Aainfix &lt;V5V24FAainfix &lt;agetV4V25V0Aainfix &lt;=aprefix -V0agetV4V25Iainfix &lt;V25V0Aainfix &lt;=c0V25FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.36"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="36. assertion"
+      sum="e300f053ba44c05fc08af285cafd4bc1"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix =agetV1aprefix ~agetV4V5V5INainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V6agetV4V6Iainfix &gt;=agetV4V6c0Iainfix &lt;=V6V5Aainfix &lt;=c0V6FAainfix =agetV1aprefix ~agetV4V7V7Iainfix &lt;agetV4V7c0Iainfix &lt;=V7V5Aainfix &lt;=c0V7FAainfix =agetV1agetV4V8V8Iainfix &lt;V8V0Aainfix &lt;V5V8FAainfix &lt;=c0agetV4V9Iainfix &lt;V9V0Aainfix &lt;V5V9FAainfix &lt;agetV4V10V0Aainfix &lt;=aprefix -V0agetV4V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.37"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="37. index in array bounds"
+      sum="ee72dd3419422b5640a82d89c6642374"
+      proved="true"
+      expanded="false"
+      shape="index in array boundsainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1aprefix ~agetV4V5V5INainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V6agetV4V6Iainfix &gt;=agetV4V6c0Iainfix &lt;=V6V5Aainfix &lt;=c0V6FAainfix =agetV1aprefix ~agetV4V7V7Iainfix &lt;agetV4V7c0Iainfix &lt;=V7V5Aainfix &lt;=c0V7FAainfix =agetV1agetV4V8V8Iainfix &lt;V8V0Aainfix &lt;V5V8FAainfix &lt;=c0agetV4V9Iainfix &lt;V9V0Aainfix &lt;V5V9FAainfix &lt;agetV4V10V0Aainfix &lt;=aprefix -V0agetV4V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.38"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="38. loop invariant preservation"
+      sum="d63f622a3ed9dab4a6c095ec81c85bde"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;agetV6V7V0Aainfix &lt;=aprefix -V0agetV6V7Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix =V6asetV4V5aprefix ~agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1aprefix ~agetV4V5V5INainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V8agetV4V8Iainfix &gt;=agetV4V8c0Iainfix &lt;=V8V5Aainfix &lt;=c0V8FAainfix =agetV1aprefix ~agetV4V9V9Iainfix &lt;agetV4V9c0Iainfix &lt;=V9V5Aainfix &lt;=c0V9FAainfix =agetV1agetV4V10V10Iainfix &lt;V10V0Aainfix &lt;V5V10FAainfix &lt;=c0agetV4V11Iainfix &lt;V11V0Aainfix &lt;V5V11FAainfix &lt;agetV4V12V0Aainfix &lt;=aprefix -V0agetV4V12Iainfix &lt;V12V0Aainfix &lt;=c0V12FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.39"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="39. loop invariant preservation"
+      sum="3d4c91c3fdd161c035410690c9b1f9ee"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=c0agetV6V7Iainfix &lt;V7V0Aainfix &lt;ainfix -V5c1V7FIainfix =V6asetV4V5aprefix ~agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1aprefix ~agetV4V5V5INainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V8agetV4V8Iainfix &gt;=agetV4V8c0Iainfix &lt;=V8V5Aainfix &lt;=c0V8FAainfix =agetV1aprefix ~agetV4V9V9Iainfix &lt;agetV4V9c0Iainfix &lt;=V9V5Aainfix &lt;=c0V9FAainfix =agetV1agetV4V10V10Iainfix &lt;V10V0Aainfix &lt;V5V10FAainfix &lt;=c0agetV4V11Iainfix &lt;V11V0Aainfix &lt;V5V11FAainfix &lt;agetV4V12V0Aainfix &lt;=aprefix -V0agetV4V12Iainfix &lt;V12V0Aainfix &lt;=c0V12FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.40"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="40. loop invariant preservation"
+      sum="665187d086f0808c324356be1d553854"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1agetV6V7V7Iainfix &lt;V7V0Aainfix &lt;ainfix -V5c1V7FIainfix =V6asetV4V5aprefix ~agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1aprefix ~agetV4V5V5INainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V8agetV4V8Iainfix &gt;=agetV4V8c0Iainfix &lt;=V8V5Aainfix &lt;=c0V8FAainfix =agetV1aprefix ~agetV4V9V9Iainfix &lt;agetV4V9c0Iainfix &lt;=V9V5Aainfix &lt;=c0V9FAainfix =agetV1agetV4V10V10Iainfix &lt;V10V0Aainfix &lt;V5V10FAainfix &lt;=c0agetV4V11Iainfix &lt;V11V0Aainfix &lt;V5V11FAainfix &lt;agetV4V12V0Aainfix &lt;=aprefix -V0agetV4V12Iainfix &lt;V12V0Aainfix &lt;=c0V12FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.41"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="41. loop invariant preservation"
+      sum="50ffdc5fb0bb7bc2137f05087fdda56e"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1aprefix ~agetV6V7V7Iainfix &lt;agetV6V7c0Iainfix &lt;=V7ainfix -V5c1Aainfix &lt;=c0V7FIainfix =V6asetV4V5aprefix ~agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1aprefix ~agetV4V5V5INainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V8agetV4V8Iainfix &gt;=agetV4V8c0Iainfix &lt;=V8V5Aainfix &lt;=c0V8FAainfix =agetV1aprefix ~agetV4V9V9Iainfix &lt;agetV4V9c0Iainfix &lt;=V9V5Aainfix &lt;=c0V9FAainfix =agetV1agetV4V10V10Iainfix &lt;V10V0Aainfix &lt;V5V10FAainfix &lt;=c0agetV4V11Iainfix &lt;V11V0Aainfix &lt;V5V11FAainfix &lt;agetV4V12V0Aainfix &lt;=aprefix -V0agetV4V12Iainfix &lt;V12V0Aainfix &lt;=c0V12FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="2.09"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.42"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="42. loop invariant preservation"
+      sum="95905efee47ba3813ddee87350ee13c2"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =agetV1V7agetV6V7Iainfix &gt;=agetV6V7c0Iainfix &lt;=V7ainfix -V5c1Aainfix &lt;=c0V7FIainfix =V6asetV4V5aprefix ~agetV4V5Aainfix &lt;=c0V0FIainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1aprefix ~agetV4V5V5INainfix &gt;=agetV4V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix =agetV1V8agetV4V8Iainfix &gt;=agetV4V8c0Iainfix &lt;=V8V5Aainfix &lt;=c0V8FAainfix =agetV1aprefix ~agetV4V9V9Iainfix &lt;agetV4V9c0Iainfix &lt;=V9V5Aainfix &lt;=c0V9FAainfix =agetV1agetV4V10V10Iainfix &lt;V10V0Aainfix &lt;V5V10FAainfix &lt;=c0agetV4V11Iainfix &lt;V11V0Aainfix &lt;V5V11FAainfix &lt;agetV4V12V0Aainfix &lt;=aprefix -V0agetV4V12Iainfix &lt;V12V0Aainfix &lt;=c0V12FIainfix &gt;=V5c0Aainfix &gt;=V3V5FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.43"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="43. type invariant"
+      sum="671afb8687b83b17e897254c6d495fcd"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V0Iainfix =agetV1V5agetV4V5Iainfix &gt;=agetV4V5c0Iainfix &lt;=V5ainfix -c0c1Aainfix &lt;=c0V5FAainfix =agetV1aprefix ~agetV4V6V6Iainfix &lt;agetV4V6c0Iainfix &lt;=V6ainfix -c0c1Aainfix &lt;=c0V6FAainfix =agetV1agetV4V7V7Iainfix &lt;V7V0Aainfix &lt;ainfix -c0c1V7FAainfix &lt;=c0agetV4V8Iainfix &lt;V8V0Aainfix &lt;ainfix -c0c1V8FAainfix &lt;agetV4V9V0Aainfix &lt;=aprefix -V0agetV4V9Iainfix &lt;V9V0Aainfix &lt;=c0V9FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.44"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="44. postcondition"
+      sum="e2f33b334431092dd8e5378e653b0f8f"
+      proved="true"
+      expanded="false"
+      shape="postconditionais_permutationamk arrayV0V4Iainfix &lt;=c0V0Iainfix =agetV1V5agetV4V5Iainfix &gt;=agetV4V5c0Iainfix &lt;=V5ainfix -c0c1Aainfix &lt;=c0V5FAainfix =agetV1aprefix ~agetV4V6V6Iainfix &lt;agetV4V6c0Iainfix &lt;=V6ainfix -c0c1Aainfix &lt;=c0V6FAainfix =agetV1agetV4V7V7Iainfix &lt;V7V0Aainfix &lt;ainfix -c0c1V7FAainfix &lt;=c0agetV4V8Iainfix &lt;V8V0Aainfix &lt;ainfix -c0c1V8FAainfix &lt;agetV4V9V0Aainfix &lt;=aprefix -V0agetV4V9Iainfix &lt;V9V0Aainfix &lt;=c0V9FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter inverse_in_place.45"
+      locfile="../inverse_in_place.mlw"
+      loclnum="55" loccnumb="6" loccnume="22"
+      expl="45. postcondition"
+      sum="08cea7aa9ccf8ecff63bb7753d90f00c"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =agetV1agetV4V5V5Iainfix &lt;V5V0Aainfix &lt;=c0V5FIainfix &lt;=c0V0Iainfix =agetV1V6agetV4V6Iainfix &gt;=agetV4V6c0Iainfix &lt;=V6ainfix -c0c1Aainfix &lt;=c0V6FAainfix =agetV1aprefix ~agetV4V7V7Iainfix &lt;agetV4V7c0Iainfix &lt;=V7ainfix -c0c1Aainfix &lt;=c0V7FAainfix =agetV1agetV4V8V8Iainfix &lt;V8V0Aainfix &lt;ainfix -c0c1V8FAainfix &lt;=c0agetV4V9Iainfix &lt;V9V0Aainfix &lt;ainfix -c0c1V9FAainfix &lt;agetV4V10V0Aainfix &lt;=aprefix -V0agetV4V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FFIainfix &gt;=V3c0Lainfix -V0c1Iais_permutationV2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for inverse_in_place"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+  <theory
+   name="Harness"
+   locfile="../inverse_in_place.mlw"
+   loclnum="104" loccnumb="7" loccnume="14"
+   verified="true"
+   expanded="true">
+  </theory>
+ </file>
+</why3session>
