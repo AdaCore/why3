@@ -178,7 +178,7 @@ lib/ocaml/why3__BigInt.ml: config.status src/util/bigInt.ml
 endif
 
 clean::
-	rm -f src/util/bigInt.ml
+	rm -f lib/ocaml/why3__BigInt.ml
 
 # build targets
 
@@ -1202,7 +1202,7 @@ clean::
 OCAMLLIBS_FILES = why3__BigInt why3__BuiltIn why3__Prelude \
 	int__Int int__Abs int__ComputerDivision int__Lex2 int__MinMax \
 	ref__Refint ref__Ref \
-	map__Map array__Array 
+	map__Map array__Array
 
 OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
 
@@ -1217,6 +1217,8 @@ $(OCAMLLIBS_CMX): OFLAGS += -for-pack Why3extract
 ifneq "$(MAKECMDGOALS)" "clean"
 include $(OCAMLLIBS_DEP)
 endif
+
+$(OCAMLLIBS_DEP): lib/ocaml/why3__BigInt.ml
 
 depend: $(OCAMLLIBS_DEP)
 
