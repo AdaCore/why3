@@ -54,19 +54,33 @@ let get_prover config env acc (short, name) =
 
 let process () =
   let prog = Ast.get () in
-  (* File.pretty_ast (); *)
+  (* File.pretty_ast ();  *)
   let provers =
-    List.fold_left
-      (get_prover ACSLtoWhy3.config ACSLtoWhy3.env)
-      []
-      [ "Z431", "Z3,4.3.1";
-        "Z32 ", "Z3,3.2";
-        "C241", "CVC3,2.4.1";
-        "A951", "Alt-Ergo,0.95.1,";
+    try
+      ACSLtoWhy3.Self.result "Loading prover drivers...";
+      List.fold_left
+        (get_prover ACSLtoWhy3.config ACSLtoWhy3.env)
+        []
+        [ "Z431", "Z3,4.3.1";
+          "Z32 ", "Z3,3.2";
+          "C241", "CVC3,2.4.1";
+          "C413", "CVC4,1.3";
+          "A952", "Alt-Ergo,0.95.2,";
         ]
+    with e ->
+      ACSLtoWhy3.Self.fatal "Exception raised when loading prover drivers:@ %a"
+        Exn_printer.exn_printer e
   in
-  let theories = ACSLtoWhy3.prog prog in
+  let theories =
+    try
+      ACSLtoWhy3.Self.result "Translating to Why3...";
+      ACSLtoWhy3.prog prog
+    with e ->
+      ACSLtoWhy3.Self.fatal "Exception raised when loading prover drivers:@ %a"
+        Exn_printer.exn_printer e
+  in
   try
+    ACSLtoWhy3.Self.result "Running provers...";
     List.iter (fun th ->
       ACSLtoWhy3.Self.result "running theory 1:";
       ACSLtoWhy3.Self.result "@[<hov 2>%a@]" Pretty.print_theory th;
@@ -87,7 +101,8 @@ let process () =
       in ())
     theories
   with e ->
-    ACSLtoWhy3.Self.fatal "Exception raised when running provers:@ %a" Exn_printer.exn_printer e
+    ACSLtoWhy3.Self.fatal "Exception raised when running provers:@ %a"
+      Exn_printer.exn_printer e
 
 
 let (_unused : (unit -> unit) -> unit -> unit) =
@@ -98,4 +113,9 @@ let (_unused : (unit -> unit) -> unit -> unit) =
     (Datatype.func Datatype.unit Datatype.unit)
 
 let run () =  if ACSLtoWhy3.Enabled.get () then process ()
-let () = Db.Main.extend run
+let () =
+  try
+    Db.Main.extend run
+  with e ->
+    ACSLtoWhy3.Self.fatal "Exception raised when loading Jessie3:@ %a"
+      Exn_printer.exn_printer e

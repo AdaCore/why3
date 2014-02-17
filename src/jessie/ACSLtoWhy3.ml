@@ -52,22 +52,42 @@ open Why3
 let env,config =
   try
     (* reads the Why3 config file *)
+    Self.result "Loading Why3 configuration...";
     let config : Whyconf.config = Whyconf.read_config None in
     (* the [main] section of the config file *)
     let main : Whyconf.main = Whyconf.get_main config in
     let env : Env.env = Env.create_env (Whyconf.loadpath main) in
+    Self.result "Why3 environment loaded.";
     env,config
   with e ->
-    Self.fatal "Exception raised in Why3 env:@ %a" Exn_printer.exn_printer e
+    Self.fatal "Exception raised while reading Why3 environment:@ %a"
+      Exn_printer.exn_printer e
 
-let find th s = Theory.ns_find_ls th.Theory.th_export [s]
-let find_type th s = Theory.ns_find_ts th.Theory.th_export [s]
+let find th s =
+  try
+    Theory.ns_find_ls th.Theory.th_export [s]
+  with e ->
+    Self.fatal "Exception raised while loading Why3 symbol %s:@ %a"
+      s Exn_printer.exn_printer e
 
-(* let () = Self.result "Loading Why3 theories" *)
+let find_type th s =
+  try
+    Theory.ns_find_ts th.Theory.th_export [s]
+  with e ->
+    Self.fatal "Exception raised while loading Why3 type %s:@ %a"
+      s Exn_printer.exn_printer e
+
+let () = Self.result "Loading Why3 theories..."
 
 (* int.Int theory *)
 let int_type : Ty.ty = Ty.ty_int
-let int_theory : Theory.theory = Env.find_theory env ["int"] "Int"
+let int_theory : Theory.theory =
+  try
+    Env.find_theory env ["int"] "Int"
+  with e ->
+    Self.fatal "Exception raised while loading int theory:@ %a"
+      Exn_printer.exn_printer e
+
 let add_int : Term.lsymbol = find int_theory "infix +"
 let sub_int : Term.lsymbol = find int_theory "infix -"
 let minus_int : Term.lsymbol = find int_theory "prefix -"
@@ -97,104 +117,107 @@ let map_ts : Ty.tysymbol = find_type map_theory "map"
 let map_get : Term.lsymbol = find map_theory "get"
 
 
+let () = Self.result "Loading Why3 modules..."
+
+let find_ps mo s =
+  try
+    Mlw_module.ns_find_ps mo.Mlw_module.mod_export [s]
+  with e ->
+    Self.fatal "Exception raised while loading Why3 program symbol %s:@ %a"
+      s Exn_printer.exn_printer e
+
+let find_ls mo s = find mo.Mlw_module.mod_theory s
+
 (* ref.Ref module *)
 
 let ref_modules, ref_theories =
-  Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
+  try
+    Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
+  with e ->
+    Self.fatal "Exception raised while loading ref module:@ %a"
+      Exn_printer.exn_printer e
 
 let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
 
 let ref_type : Mlw_ty.T.itysymbol =
   Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]
 
-let ref_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["ref"]
+let ref_fun : Mlw_expr.psymbol = find_ps ref_module "ref"
 
-let get_logic_fun : Term.lsymbol =
-  find ref_module.Mlw_module.mod_theory "prefix !"
+let get_logic_fun : Term.lsymbol = find_ls ref_module "prefix !"
 
-let get_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["prefix !"]
+let get_fun : Mlw_expr.psymbol = find_ps ref_module "prefix !"
 
-let set_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps ref_module.Mlw_module.mod_export ["infix :="]
+let set_fun : Mlw_expr.psymbol = find_ps ref_module "infix :="
 
 (* mach_int.Int32 module *)
 
 let mach_int_modules, _mach_int_theories =
-  Env.read_lib_file (Mlw_main.library_of_env env) ["mach_int"]
+  try
+    Env.read_lib_file (Mlw_main.library_of_env env) ["mach";"int"]
+  with e ->
+    Self.fatal "Exception raised while loading mach.int modules:@ %a"
+      Exn_printer.exn_printer e
 
-let int32_module : Mlw_module.modul = Stdlib.Mstr.find "Int32" mach_int_modules
+let int32_module : Mlw_module.modul =
+  try
+    Self.result "Looking up module mach.int.Int32";
+    Stdlib.Mstr.find "Int32" mach_int_modules
+  with Not_found ->
+    Self.fatal "Module mach.int.Int32 not found"
 
 let int32_type : Why3.Ty.tysymbol =
   Mlw_module.ns_find_ts int32_module.Mlw_module.mod_export ["int32"]
 
-let int32_to_int : Term.lsymbol =
-  find int32_module.Mlw_module.mod_theory "to_int"
+let int32_to_int : Term.lsymbol = find_ls int32_module "to_int"
 
-let add32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["add"]
+let add32_fun : Mlw_expr.psymbol = find_ps int32_module "infix +"
 
-let sub32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["sub"]
+let sub32_fun : Mlw_expr.psymbol = find_ps int32_module "infix -"
 
-let mul32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["mul"]
+let mul32_fun : Mlw_expr.psymbol = find_ps int32_module "infix *"
 
-let neg32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["neg"]
+let neg32_fun : Mlw_expr.psymbol = find_ps int32_module "prefix -"
 
-let eq32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["eq"]
+let eq32_fun : Mlw_expr.psymbol = find_ps int32_module "eq"
 
-let ne32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["ne"]
+let ne32_fun : Mlw_expr.psymbol = find_ps int32_module "ne"
 
-let le32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["le"]
+let le32_fun : Mlw_expr.psymbol = find_ps int32_module "infix <="
 
-let lt32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["lt"]
+let lt32_fun : Mlw_expr.psymbol = find_ps int32_module "infix <"
 
-let ge32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["ge"]
+let ge32_fun : Mlw_expr.psymbol = find_ps int32_module "infix >="
 
-let gt32_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["gt"]
+let gt32_fun : Mlw_expr.psymbol = find_ps int32_module "infix >"
 
-let int32ofint_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int32_module.Mlw_module.mod_export ["of_int"]
+let int32ofint_fun : Mlw_expr.psymbol = find_ps int32_module "of_int"
 
 (* mach_int.Int64 module *)
 
-let mach_int_modules, mach_int_theories =
-  Env.read_lib_file (Mlw_main.library_of_env env) ["mach_int"]
-
-let int64_module : Mlw_module.modul = Stdlib.Mstr.find "Int64" mach_int_modules
+let int64_module : Mlw_module.modul =
+  try
+    Self.result "Looking up module mach.int.Int64";
+    Stdlib.Mstr.find "Int64" mach_int_modules
+  with Not_found ->
+    Self.fatal "Module mach.int.Int64 not found"
 
 let int64_type : Why3.Ty.tysymbol =
   Mlw_module.ns_find_ts int64_module.Mlw_module.mod_export ["int64"]
 
-let int64_to_int : Term.lsymbol =
-  find int64_module.Mlw_module.mod_theory "to_int"
+let int64_to_int : Term.lsymbol = find_ls int64_module "to_int"
 
-let add64_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["add"]
+let add64_fun : Mlw_expr.psymbol = find_ps int64_module "infix +"
 
-let sub64_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["sub"]
+let sub64_fun : Mlw_expr.psymbol = find_ps int64_module "infix -"
 
-let mul64_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["mul"]
+let mul64_fun : Mlw_expr.psymbol = find_ps int64_module "infix *"
 
-let le64_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["le"]
+let le64_fun : Mlw_expr.psymbol = find_ps int64_module "infix <="
 
-let lt64_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["lt"]
+let lt64_fun : Mlw_expr.psymbol = find_ps int64_module "infix <"
 
-let int64ofint_fun : Mlw_expr.psymbol =
-  Mlw_module.ns_find_ps int64_module.Mlw_module.mod_export ["of_int"]
+let int64ofint_fun : Mlw_expr.psymbol = find_ps int64_module "of_int"
 
 (* array.Array module *)
 
@@ -477,7 +500,7 @@ let coerce_to_int ty t =
     | Ctype(TInt(IInt,_attr)) -> t_app int32_to_int [t]
     | Ctype(TInt(ILong,_attr)) -> t_app int64_to_int [t]
     | _ -> Self.not_yet_implemented "coerce_to_int"
-      
+
 
 let rec term_node ~label t =
   match t with
@@ -615,7 +638,7 @@ and tlval ~label (host,offset) =
 
 let eq op ty1 t1 ty2 t2 =
   match ty1,ty2 with
-    | ty1, ty2 when is_int_type ty1 && is_int_type ty2 -> 
+    | ty1, ty2 when is_int_type ty1 && is_int_type ty2 ->
       op (coerce_to_int ty1 t1) (coerce_to_int ty2 t2)
     | Lreal, Lreal -> op t1 t2
     | Ctype _,_ ->
@@ -630,7 +653,7 @@ let eq op ty1 t1 ty2 t2 =
 
 let compare op ty1 t1 ty2 t2 =
   match ty1,ty2 with
-    | ty1,ty2 when is_int_type ty1 && is_int_type ty2 -> 
+    | ty1,ty2 when is_int_type ty1 && is_int_type ty2 ->
       t_app op [coerce_to_int ty1 t1;coerce_to_int ty2 t2]
     | Lreal, Lreal -> assert false
     | Ctype _,_ ->
@@ -681,10 +704,10 @@ let rec predicate ~label p =
       Self.not_yet_implemented "predicate Pnot"
     | Pat (_, _) ->
       Self.not_yet_implemented "predicate Pat"
-    | Pseparated _ 
-    | Por (_, _) 
+    | Pseparated _
+    | Por (_, _)
     | Pxor (_, _)
-    | Piff (_, _) 
+    | Piff (_, _)
     | Pif (_, _, _)
     | Plet (_, _)
     | Pexists (_, _)
@@ -984,9 +1007,9 @@ and lval (host,offset) =
     | Mem({enode = BinOp((PlusPI|IndexPI),e,i,ty)}), NoOffset ->
       (* e[i] -> Map.get e i *)
       let e = expr e in
-      let ity = 
+      let ity =
         match ty with
-          | TPtr(t,_) -> ctype t 
+          | TPtr(t,_) -> ctype t
           | _ -> assert false
       in
       let i = expr i in
@@ -1042,7 +1065,7 @@ let instr i =
     let e = functional_expr e in
     let e = Mlw_expr.e_app e (List.map expr el) in
     assignment lv e loc
-  | Asm (_, _, _, _, _, _) ->
+  | Asm _ ->
     Self.not_yet_implemented "instr Asm"
   | Skip _loc ->
     Mlw_expr.e_void
