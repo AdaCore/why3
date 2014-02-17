@@ -349,11 +349,12 @@ if test "$enable_zarith" = yes; then
       echo "ocamlfind found zarith in $BIGINTINCLUDE"
       BIGINTINCLUDE="-I $BIGINTINCLUDE"
    else
-      BIGINTINCLUDE="+zarith"
       AC_CHECK_FILE($OCAMLLIB/zarith/zarith.cma,,enable_zarith=no)
       if test "$enable_zarith" = no; then
          AC_MSG_WARN([Lib Zarith not found, using Nums instead.])
          reason_zarith=" (zarith not found)"
+      else
+         BIGINTINCLUDE="+zarith"
       fi
    fi
 fi
