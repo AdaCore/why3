@@ -8,29 +8,21 @@
  <prover
   id="1"
   name="CVC4"
-  version="1.0"/>
- <prover
-  id="2"
-  name="CVC4"
   version="1.3"/>
- <prover
-  id="3"
-  name="Z3"
-  version="4.3.1"/>
  <file
   name="../ropes.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="Rope"
    locfile="../ropes.mlw"
    loclnum="2" loccnumb="7" loccnume="11"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="rope_length_is_string_length"
     locfile="../ropes.mlw"
-    loclnum="113" loccnumb="8" loccnume="36"
+    loclnum="143" loccnumb="8" loccnume="36"
     sum="c6f0e9a4526fd86fc2c651a3aa144de9"
     proved="true"
     expanded="false"
@@ -42,7 +34,7 @@
      <goal
       name="rope_length_is_string_length.1"
       locfile="../ropes.mlw"
-      loclnum="113" loccnumb="8" loccnume="36"
+      loclnum="143" loccnumb="8" loccnume="36"
       expl="1."
       sum="b6bf4eb630e8ae656734e891c2a69a5e"
       proved="true"
@@ -62,7 +54,7 @@
    <goal
     name="WP_parameter empty"
     locfile="../ropes.mlw"
-    loclnum="116" loccnumb="6" loccnume="11"
+    loclnum="150" loccnumb="6" loccnume="11"
     expl="VC for empty"
     sum="b3b8030e65ca587fb31305a23fc6ab60"
     proved="true"
@@ -82,7 +74,7 @@
    <goal
     name="WP_parameter is_empty"
     locfile="../ropes.mlw"
-    loclnum="120" loccnumb="6" loccnume="14"
+    loclnum="155" loccnumb="6" loccnume="14"
     expl="VC for is_empty"
     sum="ce93f6a9c7c40e2eae8df003ecb92c85"
     proved="true"
@@ -91,7 +83,7 @@
     <label
      name="expl:VC for is_empty"/>
     <proof
-     prover="2"
+     prover="1"
      timelimit="10"
      memlimit="1000"
      obsolete="false"
@@ -102,7 +94,7 @@
    <goal
     name="WP_parameter of_string"
     locfile="../ropes.mlw"
-    loclnum="125" loccnumb="6" loccnume="15"
+    loclnum="161" loccnumb="6" loccnume="15"
     expl="VC for of_string"
     sum="f8a4505f5a32f2c1fe7e4dc8ef6cb8ac"
     proved="true"
@@ -122,7 +114,7 @@
    <goal
     name="WP_parameter get"
     locfile="../ropes.mlw"
-    loclnum="131" loccnumb="10" loccnume="13"
+    loclnum="168" loccnumb="10" loccnume="13"
     expl="VC for get"
     sum="acbc5288ef443262f911277a6a57a91c"
     proved="true"
@@ -137,7 +129,7 @@
      <goal
       name="WP_parameter get.1"
       locfile="../ropes.mlw"
-      loclnum="131" loccnumb="10" loccnume="13"
+      loclnum="168" loccnumb="10" loccnume="13"
       expl="1. unreachable point"
       sum="89aad05b35e2b576108ba50a784a2a17"
       proved="true"
@@ -157,7 +149,7 @@
      <goal
       name="WP_parameter get.2"
       locfile="../ropes.mlw"
-      loclnum="131" loccnumb="10" loccnume="13"
+      loclnum="168" loccnumb="10" loccnume="13"
       expl="2. precondition"
       sum="56af9a7fe9a3ef9bac6e90046cdc9db4"
       proved="true"
@@ -177,7 +169,7 @@
      <goal
       name="WP_parameter get.3"
       locfile="../ropes.mlw"
-      loclnum="131" loccnumb="10" loccnume="13"
+      loclnum="168" loccnumb="10" loccnume="13"
       expl="3. postcondition"
       sum="467d39c96c375f479ab675248e064f62"
       proved="true"
@@ -197,7 +189,7 @@
      <goal
       name="WP_parameter get.4"
       locfile="../ropes.mlw"
-      loclnum="131" loccnumb="10" loccnume="13"
+      loclnum="168" loccnumb="10" loccnume="13"
       expl="4. variant decrease"
       sum="b67bf33eb3cc79bb3e5ef8368b68d517"
       proved="true"
@@ -217,7 +209,7 @@
      <goal
       name="WP_parameter get.5"
       locfile="../ropes.mlw"
-      loclnum="131" loccnumb="10" loccnume="13"
+      loclnum="168" loccnumb="10" loccnume="13"
       expl="5. precondition"
       sum="63a96e9f5c7a491a06a0f48d16e350e1"
       proved="true"
@@ -237,7 +229,7 @@
      <goal
       name="WP_parameter get.6"
       locfile="../ropes.mlw"
-      loclnum="131" loccnumb="10" loccnume="13"
+      loclnum="168" loccnumb="10" loccnume="13"
       expl="6. postcondition"
       sum="4ce40f215e6b5c85767a8fad17492c14"
       proved="true"
@@ -257,7 +249,7 @@
      <goal
       name="WP_parameter get.7"
       locfile="../ropes.mlw"
-      loclnum="131" loccnumb="10" loccnume="13"
+      loclnum="168" loccnumb="10" loccnume="13"
       expl="7. variant decrease"
       sum="7f73ae5b0544744a8bb87d6c5184a80d"
       proved="true"
@@ -277,7 +269,7 @@
      <goal
       name="WP_parameter get.8"
       locfile="../ropes.mlw"
-      loclnum="131" loccnumb="10" loccnume="13"
+      loclnum="168" loccnumb="10" loccnume="13"
       expl="8. precondition"
       sum="5dbfcae409f9bc13b582f741b9cf8fad"
       proved="true"
@@ -297,7 +289,7 @@
      <goal
       name="WP_parameter get.9"
       locfile="../ropes.mlw"
-      loclnum="131" loccnumb="10" loccnume="13"
+      loclnum="168" loccnumb="10" loccnume="13"
       expl="9. postcondition"
       sum="e3a44ec65e45648a5f560a9635f7d47c"
       proved="true"
@@ -319,22 +311,22 @@
    <goal
     name="WP_parameter concat"
     locfile="../ropes.mlw"
-    loclnum="145" loccnumb="6" loccnume="12"
+    loclnum="183" loccnumb="6" loccnume="12"
     expl="VC for concat"
     sum="5a7a42d857264775f712e3c1e70fc6e9"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="CCainfix ==astringV1aappastringV0astringV1AainvV1aEmpainfix ==astringV0aappastringV0astringV1AainvV0wV0aEmpCainfix ==astringV1aappastringV0astringV1AainvV1aEmpainfix ==astringV2aappastringV0astringV1AainvV2LaAppV0V1ainfix +Cc0aEmpV3aStrwwVV4aAppwwVV0Cc0aEmpV5aStrwwVV6aAppwwVV1wV0wV1IainvV1AainvV0F">
     <label
      name="expl:VC for concat"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter concat.1"
       locfile="../ropes.mlw"
-      loclnum="145" loccnumb="6" loccnume="12"
+      loclnum="183" loccnumb="6" loccnume="12"
       expl="1. postcondition"
       sum="f94fe07ba923c64f58407f8f9dd23289"
       proved="true"
@@ -354,7 +346,7 @@
      <goal
       name="WP_parameter concat.2"
       locfile="../ropes.mlw"
-      loclnum="145" loccnumb="6" loccnume="12"
+      loclnum="183" loccnumb="6" loccnume="12"
       expl="2. postcondition"
       sum="8a370479c218ccf608022bbd9297ef78"
       proved="true"
@@ -374,7 +366,7 @@
      <goal
       name="WP_parameter concat.3"
       locfile="../ropes.mlw"
-      loclnum="145" loccnumb="6" loccnume="12"
+      loclnum="183" loccnumb="6" loccnume="12"
       expl="3. postcondition"
       sum="df43cc21ee7504270d355b4b620a08fc"
       proved="true"
@@ -394,7 +386,7 @@
      <goal
       name="WP_parameter concat.4"
       locfile="../ropes.mlw"
-      loclnum="145" loccnumb="6" loccnume="12"
+      loclnum="183" loccnumb="6" loccnume="12"
       expl="4. postcondition"
       sum="1d8a2bab4e280c110c25efa6e9326755"
       proved="true"
@@ -414,7 +406,7 @@
      <goal
       name="WP_parameter concat.5"
       locfile="../ropes.mlw"
-      loclnum="145" loccnumb="6" loccnume="12"
+      loclnum="183" loccnumb="6" loccnume="12"
       expl="5. postcondition"
       sum="f2cfb1ba2ad47bb66d20b49c97a947e0"
       proved="true"
@@ -434,7 +426,7 @@
      <goal
       name="WP_parameter concat.6"
       locfile="../ropes.mlw"
-      loclnum="145" loccnumb="6" loccnume="12"
+      loclnum="183" loccnumb="6" loccnume="12"
       expl="6. postcondition"
       sum="21ea9092be1187e29afb2b8415ec5f87"
       proved="true"
@@ -454,7 +446,7 @@
      <goal
       name="WP_parameter concat.7"
       locfile="../ropes.mlw"
-      loclnum="145" loccnumb="6" loccnume="12"
+      loclnum="183" loccnumb="6" loccnume="12"
       expl="7. postcondition"
       sum="8ff87d40614d144eb0bd7c01c62ceeca"
       proved="true"
@@ -474,7 +466,7 @@
      <goal
       name="WP_parameter concat.8"
       locfile="../ropes.mlw"
-      loclnum="145" loccnumb="6" loccnume="12"
+      loclnum="183" loccnumb="6" loccnume="12"
       expl="8. postcondition"
       sum="0e0daed42f32eb375d792e42f49abb54"
       proved="true"
@@ -496,32 +488,32 @@
    <goal
     name="WP_parameter sub"
     locfile="../ropes.mlw"
-    loclnum="154" loccnumb="10" loccnume="13"
+    loclnum="193" loccnumb="10" loccnume="13"
     expl="VC for sub"
-    sum="15d4496d30ede50e9db343ab30c6c55e"
-    proved="false"
-    expanded="true"
-    shape="CfaEmpainfix ==astringV5asubastringV0V1V2AainvV5LaStrV3ainfix +V4V1V2aStrVVwiiainfix ==astringV12asubastringV0V1V2AainvV12Iainfix ==astringV12aappastringV11astringV10AainvV12FAainvV10AainvV11Iainfix ==astringV11asubastringV6V1V8AainvV11FAainfix &lt;=ainfix +V1V8Cc0aEmpV13aStrwwVV14aAppwwVV6Aainfix &lt;V1Cc0aEmpV15aStrwwVV16aAppwwVV6Aainfix &lt;=c0V1Aainfix &lt;=c0V8AainvV6Iainfix ==astringV10asubastringV7c0V9AainvV10FAainfix &lt;=ainfix +c0V9Cc0aEmpV17aStrwwVV18aAppwwVV7Aainfix &lt;c0Cc0aEmpV19aStrwwVV20aAppwwVV7Aainfix &lt;=c0c0Aainfix &lt;=c0V9AainvV7Lainfix -V2V8ainfix ==astringV22asubastringV0V1V2AainvV22Iainfix ==astringV22asubastringV7V21V2AainvV22FAainfix &lt;=ainfix +V21V2Cc0aEmpV23aStrwwVV24aAppwwVV7Aainfix &lt;V21Cc0aEmpV25aStrwwVV26aAppwwVV7Aainfix &lt;=c0V21Aainfix &lt;=c0V2AainvV7Laprefix -V8ainfix &gt;=c0V8ainfix ==astringV27asubastringV0V1V2AainvV27Iainfix ==astringV27asubastringV6V1V2AainvV27FAainfix &lt;=ainfix +V1V2Cc0aEmpV28aStrwwVV29aAppwwVV6Aainfix &lt;V1Cc0aEmpV30aStrwwVV31aAppwwVV6Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV6ainfix &lt;=V2V8Lainfix -Cc0aEmpV32aStrwwVV33aAppwwVV6V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV34aStrwwVV35aAppwwVV0Aainfix &lt;V1Cc0aEmpV36aStrwwVV37aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+    sum="c56b0fd23e03f44021c3dd8f76d64871"
+    proved="true"
+    expanded="false"
+    shape="CfaEmpainfix ==astringV5asubastringV0V1V2AainvV5LaStrV3ainfix +V4V1V2aStrVVwiiainfix ==astringV12asubastringV0V1V2AainvV12Iainfix ==astringV12aappastringV11astringV10AainvV12FAainvV10AainvV11Iainfix ==astringV11asubastringV6V1V8AainvV11FAainfix &lt;=ainfix +V1V8Cc0aEmpV13aStrwwVV14aAppwwVV6Aainfix &lt;V1Cc0aEmpV15aStrwwVV16aAppwwVV6Aainfix &lt;=c0V1Aainfix &lt;c0V8AainvV6ACfaEmpfaStrwwwainfix =V18V6Oainfix =V17V6aAppVVwV0Iainfix ==astringV10asubastringV7c0V9AainvV10FAainfix &lt;=ainfix +c0V9Cc0aEmpV19aStrwwVV20aAppwwVV7Aainfix &lt;c0Cc0aEmpV21aStrwwVV22aAppwwVV7Aainfix &lt;=c0c0Aainfix &lt;c0V9AainvV7ACfaEmpfaStrwwwainfix =V24V7Oainfix =V23V7aAppVVwV0ainfix ==astringV26asubastringV0V1V2AainvV26Iainfix ==astringV26asubastringV7V25V2AainvV26FAainfix &lt;=ainfix +V25V2Cc0aEmpV27aStrwwVV28aAppwwVV7Aainfix &lt;V25Cc0aEmpV29aStrwwVV30aAppwwVV7Aainfix &lt;=c0V25Aainfix &lt;c0V2AainvV7ACfaEmpfaStrwwwainfix =V32V7Oainfix =V31V7aAppVVwV0Laprefix -V8ainfix &gt;=c0V8ainfix ==astringV33asubastringV0V1V2AainvV33Iainfix ==astringV33asubastringV6V1V2AainvV33FAainfix &lt;=ainfix +V1V2Cc0aEmpV34aStrwwVV35aAppwwVV6Aainfix &lt;V1Cc0aEmpV36aStrwwVV37aAppwwVV6Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV6ACfaEmpfaStrwwwainfix =V39V6Oainfix =V38V6aAppVVwV0ainfix &lt;=V9c0Lainfix -V2V8Lainfix -Cc0aEmpV40aStrwwVV41aAppwwVV6V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV42aStrwwVV43aAppwwVV0Aainfix &lt;V1Cc0aEmpV44aStrwwVV45aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
     <label
      name="expl:VC for sub"/>
     <transf
      name="split_goal_wp"
-     proved="false"
-     expanded="true">
+     proved="true"
+     expanded="false">
      <goal
       name="WP_parameter sub.1"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
+      loclnum="193" loccnumb="10" loccnume="13"
       expl="1. unreachable point"
-      sum="0b3b147d4c60ad1654ea64d9e077eef8"
+      sum="ece245fe9acb2717f963bf12c162cda1"
       proved="true"
       expanded="false"
-      shape="unreachable pointCfaEmptaStrVVwtaAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV7aStrwwVV8aAppwwVV0Aainfix &lt;V1Cc0aEmpV9aStrwwVV10aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="unreachable pointCfaEmptaStrVVwtaAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV7aStrwwVV8aAppwwVV0Aainfix &lt;V1Cc0aEmpV9aStrwwVV10aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -531,81 +523,57 @@
      <goal
       name="WP_parameter sub.2"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
+      loclnum="193" loccnumb="10" loccnume="13"
       expl="2. postcondition"
-      sum="59e4fa16779c879a7f4b896acf5a82d1"
-      proved="false"
-      expanded="true"
-      shape="postconditionCtaEmpainvV5LaStrV3ainfix +V4V1V2aStrVVwtaAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV8aStrwwVV9aAppwwVV0Aainfix &lt;V1Cc0aEmpV10aStrwwVV11aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      sum="9010cb07b327b9174bf98e435bb98ff8"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaEmpainvV5LaStrV3ainfix +V4V1V2aStrVVwtaAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV8aStrwwVV9aAppwwVV0Aainfix &lt;V1Cc0aEmpV10aStrwwVV11aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.97"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.96"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.98"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.99"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter sub.3"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
+      loclnum="193" loccnumb="10" loccnume="13"
       expl="3. postcondition"
-      sum="112ce683e1c4aacd464b125b8f9f93f0"
+      sum="84122d219bafb662a476bb6ab8f0418a"
       proved="true"
       expanded="false"
-      shape="postconditionCtaEmpainfix ==astringV5asubastringV0V1V2LaStrV3ainfix +V4V1V2aStrVVwtaAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV8aStrwwVV9aAppwwVV0Aainfix &lt;V1Cc0aEmpV10aStrwwVV11aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="postconditionCtaEmpainfix ==astringV5asubastringV0V1V2LaStrV3ainfix +V4V1V2aStrVVwtaAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV8aStrwwVV9aAppwwVV0Aainfix &lt;V1Cc0aEmpV10aStrwwVV11aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.24"/>
+       <result status="valid" time="0.11"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter sub.4"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="4. precondition"
-      sum="9febd013724142e4cdaab9affd4d81d5"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="4. variant decrease"
+      sum="76309638fce2f4c7348af4bbb6a9cfe1"
       proved="true"
       expanded="false"
-      shape="preconditionCtaEmptaStrVVwainvV5Iainfix &lt;=V2V7Lainfix -Cc0aEmpV8aStrwwVV9aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV10aStrwwVV11aAppwwVV0Aainfix &lt;V1Cc0aEmpV12aStrwwVV13aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="variant decreaseCtaEmptaStrVVwCfaEmpfaStrwwwainfix =V10V5Oainfix =V9V5aAppVVwV0Iainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV11aStrwwVV12aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV13aStrwwVV14aAppwwVV0Aainfix &lt;V1Cc0aEmpV15aStrwwVV16aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -615,45 +583,37 @@
      <goal
       name="WP_parameter sub.5"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
+      loclnum="193" loccnumb="10" loccnume="13"
       expl="5. precondition"
-      sum="765561156291c992227cf47537f6354e"
-      proved="false"
+      sum="2cfe6d822a798b91a3f9add8d4ef8ca1"
+      proved="true"
       expanded="false"
-      shape="preconditionCtaEmptaStrVVwainfix &lt;=ainfix +V1V2Cc0aEmpV8aStrwwVV9aAppwwVV5Aainfix &lt;V1Cc0aEmpV10aStrwwVV11aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;=c0V2Iainfix &lt;=V2V7Lainfix -Cc0aEmpV12aStrwwVV13aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV14aStrwwVV15aAppwwVV0Aainfix &lt;V1Cc0aEmpV16aStrwwVV17aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="preconditionCtaEmptaStrVVwainvV5Iainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV9aStrwwVV10aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV11aStrwwVV12aAppwwVV0Aainfix &lt;V1Cc0aEmpV13aStrwwVV14aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.97"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="6.00"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter sub.6"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="6. postcondition"
-      sum="60e0784314932b5bd300b7431eab6907"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="6. precondition"
+      sum="b02663b3ea6d8074e53586dcc303ff95"
       proved="true"
       expanded="false"
-      shape="postconditionCtaEmptaStrVVwainvV8Iainfix ==astringV8asubastringV5V1V2AainvV8FIainfix &lt;=ainfix +V1V2Cc0aEmpV9aStrwwVV10aAppwwVV5Aainfix &lt;V1Cc0aEmpV11aStrwwVV12aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV5Iainfix &lt;=V2V7Lainfix -Cc0aEmpV13aStrwwVV14aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV15aStrwwVV16aAppwwVV0Aainfix &lt;V1Cc0aEmpV17aStrwwVV18aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="preconditionCtaEmptaStrVVwainfix &lt;=ainfix +V1V2Cc0aEmpV9aStrwwVV10aAppwwVV5Aainfix &lt;V1Cc0aEmpV11aStrwwVV12aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;c0V2Iainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV13aStrwwVV14aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV15aStrwwVV16aAppwwVV0Aainfix &lt;V1Cc0aEmpV17aStrwwVV18aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -663,77 +623,77 @@
      <goal
       name="WP_parameter sub.7"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
+      loclnum="193" loccnumb="10" loccnume="13"
       expl="7. postcondition"
-      sum="fdd01ecd1cba39af71d1a7022860d817"
+      sum="b7d391c24706f7b15f6e48299d61e9a4"
       proved="true"
       expanded="false"
-      shape="postconditionCtaEmptaStrVVwainfix ==astringV8asubastringV0V1V2Iainfix ==astringV8asubastringV5V1V2AainvV8FIainfix &lt;=ainfix +V1V2Cc0aEmpV9aStrwwVV10aAppwwVV5Aainfix &lt;V1Cc0aEmpV11aStrwwVV12aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV5Iainfix &lt;=V2V7Lainfix -Cc0aEmpV13aStrwwVV14aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV15aStrwwVV16aAppwwVV0Aainfix &lt;V1Cc0aEmpV17aStrwwVV18aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="postconditionCtaEmptaStrVVwainvV9Iainfix ==astringV9asubastringV5V1V2AainvV9FIainfix &lt;=ainfix +V1V2Cc0aEmpV10aStrwwVV11aAppwwVV5Aainfix &lt;V1Cc0aEmpV12aStrwwVV13aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV5Iainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV14aStrwwVV15aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV16aStrwwVV17aAppwwVV0Aainfix &lt;V1Cc0aEmpV18aStrwwVV19aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter sub.8"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="8. precondition"
-      sum="fe3a629846339acf473b18f18ccfbd58"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="8. postcondition"
+      sum="e578aa2758ca6ff58ee190b975664dda"
       proved="true"
       expanded="false"
-      shape="preconditionCtaEmptaStrVVwainvV6Laprefix -V7Iainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV9aStrwwVV10aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV11aStrwwVV12aAppwwVV0Aainfix &lt;V1Cc0aEmpV13aStrwwVV14aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="postconditionCtaEmptaStrVVwainfix ==astringV9asubastringV0V1V2Iainfix ==astringV9asubastringV5V1V2AainvV9FIainfix &lt;=ainfix +V1V2Cc0aEmpV10aStrwwVV11aAppwwVV5Aainfix &lt;V1Cc0aEmpV12aStrwwVV13aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV5Iainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV14aStrwwVV15aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV16aStrwwVV17aAppwwVV0Aainfix &lt;V1Cc0aEmpV18aStrwwVV19aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter sub.9"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="9. precondition"
-      sum="5e19de536e6ae2d97e527626675b742d"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="9. variant decrease"
+      sum="a22f5aae8f0603d4352d62ee18099f9a"
       proved="true"
       expanded="false"
-      shape="preconditionCtaEmptaStrVVwainfix &lt;=ainfix +V8V2Cc0aEmpV9aStrwwVV10aAppwwVV6Aainfix &lt;V8Cc0aEmpV11aStrwwVV12aAppwwVV6Aainfix &lt;=c0V8Aainfix &lt;=c0V2Laprefix -V7Iainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV13aStrwwVV14aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV15aStrwwVV16aAppwwVV0Aainfix &lt;V1Cc0aEmpV17aStrwwVV18aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="variant decreaseCtaEmptaStrVVwCfaEmpfaStrwwwainfix =V11V6Oainfix =V10V6aAppVVwV0Laprefix -V7Iainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV12aStrwwVV13aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV14aStrwwVV15aAppwwVV0Aainfix &lt;V1Cc0aEmpV16aStrwwVV17aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter sub.10"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="10. postcondition"
-      sum="7207af6656cfacc57107f0a92d5a6ae7"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="10. precondition"
+      sum="42863fff658fba0863301f70c1fd0c69"
       proved="true"
       expanded="false"
-      shape="postconditionCtaEmptaStrVVwainvV9Iainfix ==astringV9asubastringV6V8V2AainvV9FIainfix &lt;=ainfix +V8V2Cc0aEmpV10aStrwwVV11aAppwwVV6Aainfix &lt;V8Cc0aEmpV12aStrwwVV13aAppwwVV6Aainfix &lt;=c0V8Aainfix &lt;=c0V2AainvV6Laprefix -V7Iainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV14aStrwwVV15aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV16aStrwwVV17aAppwwVV0Aainfix &lt;V1Cc0aEmpV18aStrwwVV19aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="preconditionCtaEmptaStrVVwainvV6Laprefix -V7Iainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV10aStrwwVV11aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV12aStrwwVV13aAppwwVV0Aainfix &lt;V1Cc0aEmpV14aStrwwVV15aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -743,37 +703,37 @@
      <goal
       name="WP_parameter sub.11"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="11. postcondition"
-      sum="29a53899d198e1b31704518278dce163"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="11. precondition"
+      sum="024580180d8b6a9a42a1067b2ee71b4c"
       proved="true"
       expanded="false"
-      shape="postconditionCtaEmptaStrVVwainfix ==astringV9asubastringV0V1V2Iainfix ==astringV9asubastringV6V8V2AainvV9FIainfix &lt;=ainfix +V8V2Cc0aEmpV10aStrwwVV11aAppwwVV6Aainfix &lt;V8Cc0aEmpV12aStrwwVV13aAppwwVV6Aainfix &lt;=c0V8Aainfix &lt;=c0V2AainvV6Laprefix -V7Iainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV14aStrwwVV15aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV16aStrwwVV17aAppwwVV0Aainfix &lt;V1Cc0aEmpV18aStrwwVV19aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="preconditionCtaEmptaStrVVwainfix &lt;=ainfix +V9V2Cc0aEmpV10aStrwwVV11aAppwwVV6Aainfix &lt;V9Cc0aEmpV12aStrwwVV13aAppwwVV6Aainfix &lt;=c0V9Aainfix &lt;c0V2Laprefix -V7Iainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV14aStrwwVV15aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV16aStrwwVV17aAppwwVV0Aainfix &lt;V1Cc0aEmpV18aStrwwVV19aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter sub.12"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="12. precondition"
-      sum="b0492348ad2ca3717be32d917a3b7ac1"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="12. postcondition"
+      sum="212a4d9580a2942d34126503947c63fb"
       proved="true"
       expanded="false"
-      shape="preconditionCtaEmptaStrVVwainvV6Lainfix -V2V7INainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV9aStrwwVV10aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV11aStrwwVV12aAppwwVV0Aainfix &lt;V1Cc0aEmpV13aStrwwVV14aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="postconditionCtaEmptaStrVVwainvV10Iainfix ==astringV10asubastringV6V9V2AainvV10FIainfix &lt;=ainfix +V9V2Cc0aEmpV11aStrwwVV12aAppwwVV6Aainfix &lt;V9Cc0aEmpV13aStrwwVV14aAppwwVV6Aainfix &lt;=c0V9Aainfix &lt;c0V2AainvV6Laprefix -V7Iainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV15aStrwwVV16aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV17aStrwwVV18aAppwwVV0Aainfix &lt;V1Cc0aEmpV19aStrwwVV20aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -783,37 +743,37 @@
      <goal
       name="WP_parameter sub.13"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="13. precondition"
-      sum="14e5d362c0920691330d70c375061df1"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="13. postcondition"
+      sum="53ae8d98f6ebd30603837580920bd1cb"
       proved="true"
       expanded="false"
-      shape="preconditionCtaEmptaStrVVwainfix &lt;=ainfix +c0V8Cc0aEmpV9aStrwwVV10aAppwwVV6Aainfix &lt;c0Cc0aEmpV11aStrwwVV12aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;=c0V8Lainfix -V2V7INainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV13aStrwwVV14aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV15aStrwwVV16aAppwwVV0Aainfix &lt;V1Cc0aEmpV17aStrwwVV18aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="postconditionCtaEmptaStrVVwainfix ==astringV10asubastringV0V1V2Iainfix ==astringV10asubastringV6V9V2AainvV10FIainfix &lt;=ainfix +V9V2Cc0aEmpV11aStrwwVV12aAppwwVV6Aainfix &lt;V9Cc0aEmpV13aStrwwVV14aAppwwVV6Aainfix &lt;=c0V9Aainfix &lt;c0V2AainvV6Laprefix -V7Iainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV15aStrwwVV16aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV17aStrwwVV18aAppwwVV0Aainfix &lt;V1Cc0aEmpV19aStrwwVV20aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter sub.14"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="14. precondition"
-      sum="85c51f6a4a332ba2dbe833d0fde2614d"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="14. variant decrease"
+      sum="24578b2ae7ca472610f77422d9a65481"
       proved="true"
       expanded="false"
-      shape="preconditionCtaEmptaStrVVwainvV5Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV10aStrwwVV11aAppwwVV6Aainfix &lt;c0Cc0aEmpV12aStrwwVV13aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;=c0V8AainvV6Lainfix -V2V7INainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV14aStrwwVV15aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV16aStrwwVV17aAppwwVV0Aainfix &lt;V1Cc0aEmpV18aStrwwVV19aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="variant decreaseCtaEmptaStrVVwCfaEmpfaStrwwwainfix =V10V6Oainfix =V9V6aAppVVwV0INainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV11aStrwwVV12aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV13aStrwwVV14aAppwwVV0Aainfix &lt;V1Cc0aEmpV15aStrwwVV16aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -823,17 +783,17 @@
      <goal
       name="WP_parameter sub.15"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
+      loclnum="193" loccnumb="10" loccnume="13"
       expl="15. precondition"
-      sum="24141585f6ef216c4c47462ad819ee42"
+      sum="9701cb6ea5df14e499e2438b9f896073"
       proved="true"
       expanded="false"
-      shape="preconditionCtaEmptaStrVVwainfix &lt;=ainfix +V1V7Cc0aEmpV10aStrwwVV11aAppwwVV5Aainfix &lt;V1Cc0aEmpV12aStrwwVV13aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;=c0V7Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV14aStrwwVV15aAppwwVV6Aainfix &lt;c0Cc0aEmpV16aStrwwVV17aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;=c0V8AainvV6Lainfix -V2V7INainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV18aStrwwVV19aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV20aStrwwVV21aAppwwVV0Aainfix &lt;V1Cc0aEmpV22aStrwwVV23aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="preconditionCtaEmptaStrVVwainvV6INainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV9aStrwwVV10aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV11aStrwwVV12aAppwwVV0Aainfix &lt;V1Cc0aEmpV13aStrwwVV14aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -843,17 +803,17 @@
      <goal
       name="WP_parameter sub.16"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
+      loclnum="193" loccnumb="10" loccnume="13"
       expl="16. precondition"
-      sum="72ca5f7aea99ee4d4bc84aa252176a4d"
+      sum="14cb8fc05ca3aae7febb92a575d89291"
       proved="true"
       expanded="false"
-      shape="preconditionCtaEmptaStrVVwainvV9AainvV10Iainfix ==astringV10asubastringV5V1V7AainvV10FIainfix &lt;=ainfix +V1V7Cc0aEmpV11aStrwwVV12aAppwwVV5Aainfix &lt;V1Cc0aEmpV13aStrwwVV14aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;=c0V7AainvV5Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV15aStrwwVV16aAppwwVV6Aainfix &lt;c0Cc0aEmpV17aStrwwVV18aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;=c0V8AainvV6Lainfix -V2V7INainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV19aStrwwVV20aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV21aStrwwVV22aAppwwVV0Aainfix &lt;V1Cc0aEmpV23aStrwwVV24aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="preconditionCtaEmptaStrVVwainfix &lt;=ainfix +c0V8Cc0aEmpV9aStrwwVV10aAppwwVV6Aainfix &lt;c0Cc0aEmpV11aStrwwVV12aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;c0V8INainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV13aStrwwVV14aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV15aStrwwVV16aAppwwVV0Aainfix &lt;V1Cc0aEmpV17aStrwwVV18aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -863,17 +823,17 @@
      <goal
       name="WP_parameter sub.17"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="17. postcondition"
-      sum="7182417c71585aa0f1b537d754e179ca"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="17. variant decrease"
+      sum="82992b48bc56980240e847e9ec45c863"
       proved="true"
       expanded="false"
-      shape="postconditionCtaEmptaStrVVwainvV11Iainfix ==astringV11aappastringV10astringV9AainvV11FIainvV9AainvV10Iainfix ==astringV10asubastringV5V1V7AainvV10FIainfix &lt;=ainfix +V1V7Cc0aEmpV12aStrwwVV13aAppwwVV5Aainfix &lt;V1Cc0aEmpV14aStrwwVV15aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;=c0V7AainvV5Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV16aStrwwVV17aAppwwVV6Aainfix &lt;c0Cc0aEmpV18aStrwwVV19aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;=c0V8AainvV6Lainfix -V2V7INainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV20aStrwwVV21aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV22aStrwwVV23aAppwwVV0Aainfix &lt;V1Cc0aEmpV24aStrwwVV25aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="variant decreaseCtaEmptaStrVVwCfaEmpfaStrwwwainfix =V11V5Oainfix =V10V5aAppVVwV0Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV12aStrwwVV13aAppwwVV6Aainfix &lt;c0Cc0aEmpV14aStrwwVV15aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;c0V8AainvV6INainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV16aStrwwVV17aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV18aStrwwVV19aAppwwVV0Aainfix &lt;V1Cc0aEmpV20aStrwwVV21aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
@@ -883,21 +843,101 @@
      <goal
       name="WP_parameter sub.18"
       locfile="../ropes.mlw"
-      loclnum="154" loccnumb="10" loccnume="13"
-      expl="18. postcondition"
-      sum="daed6716cc867bb99e3f7545d5e8dac4"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="18. precondition"
+      sum="39928550dc914475fbf63e11328cd890"
       proved="true"
       expanded="false"
-      shape="postconditionCtaEmptaStrVVwainfix ==astringV11asubastringV0V1V2Iainfix ==astringV11aappastringV10astringV9AainvV11FIainvV9AainvV10Iainfix ==astringV10asubastringV5V1V7AainvV10FIainfix &lt;=ainfix +V1V7Cc0aEmpV12aStrwwVV13aAppwwVV5Aainfix &lt;V1Cc0aEmpV14aStrwwVV15aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;=c0V7AainvV5Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV16aStrwwVV17aAppwwVV6Aainfix &lt;c0Cc0aEmpV18aStrwwVV19aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;=c0V8AainvV6Lainfix -V2V7INainfix &gt;=c0V7INainfix &lt;=V2V7Lainfix -Cc0aEmpV20aStrwwVV21aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV22aStrwwVV23aAppwwVV0Aainfix &lt;V1Cc0aEmpV24aStrwwVV25aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;=c0V2AainvV0F">
+      shape="preconditionCtaEmptaStrVVwainvV5Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV10aStrwwVV11aAppwwVV6Aainfix &lt;c0Cc0aEmpV12aStrwwVV13aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;c0V8AainvV6INainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV14aStrwwVV15aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV16aStrwwVV17aAppwwVV0Aainfix &lt;V1Cc0aEmpV18aStrwwVV19aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
       <label
        name="expl:VC for sub"/>
       <proof
        prover="0"
-       timelimit="6"
+       timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.11"/>
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sub.19"
+      locfile="../ropes.mlw"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="19. precondition"
+      sum="48b866786ab22b66eaf5f03f202cd4e4"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaEmptaStrVVwainfix &lt;=ainfix +V1V7Cc0aEmpV10aStrwwVV11aAppwwVV5Aainfix &lt;V1Cc0aEmpV12aStrwwVV13aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;c0V7Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV14aStrwwVV15aAppwwVV6Aainfix &lt;c0Cc0aEmpV16aStrwwVV17aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;c0V8AainvV6INainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV18aStrwwVV19aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV20aStrwwVV21aAppwwVV0Aainfix &lt;V1Cc0aEmpV22aStrwwVV23aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
+      <label
+       name="expl:VC for sub"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sub.20"
+      locfile="../ropes.mlw"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="20. precondition"
+      sum="acf3e282fcbe4c28444672679e3120fc"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaEmptaStrVVwainvV9AainvV10Iainfix ==astringV10asubastringV5V1V7AainvV10FIainfix &lt;=ainfix +V1V7Cc0aEmpV11aStrwwVV12aAppwwVV5Aainfix &lt;V1Cc0aEmpV13aStrwwVV14aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;c0V7AainvV5Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV15aStrwwVV16aAppwwVV6Aainfix &lt;c0Cc0aEmpV17aStrwwVV18aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;c0V8AainvV6INainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV19aStrwwVV20aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV21aStrwwVV22aAppwwVV0Aainfix &lt;V1Cc0aEmpV23aStrwwVV24aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
+      <label
+       name="expl:VC for sub"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sub.21"
+      locfile="../ropes.mlw"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="21. postcondition"
+      sum="1ccae80b7716e38e7e9c76f46a46f6f9"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaEmptaStrVVwainvV11Iainfix ==astringV11aappastringV10astringV9AainvV11FIainvV9AainvV10Iainfix ==astringV10asubastringV5V1V7AainvV10FIainfix &lt;=ainfix +V1V7Cc0aEmpV12aStrwwVV13aAppwwVV5Aainfix &lt;V1Cc0aEmpV14aStrwwVV15aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;c0V7AainvV5Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV16aStrwwVV17aAppwwVV6Aainfix &lt;c0Cc0aEmpV18aStrwwVV19aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;c0V8AainvV6INainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV20aStrwwVV21aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV22aStrwwVV23aAppwwVV0Aainfix &lt;V1Cc0aEmpV24aStrwwVV25aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
+      <label
+       name="expl:VC for sub"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sub.22"
+      locfile="../ropes.mlw"
+      loclnum="193" loccnumb="10" loccnume="13"
+      expl="22. postcondition"
+      sum="6eab8ce9709dc22f5fded8408ef37963"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaEmptaStrVVwainfix ==astringV11asubastringV0V1V2Iainfix ==astringV11aappastringV10astringV9AainvV11FIainvV9AainvV10Iainfix ==astringV10asubastringV5V1V7AainvV10FIainfix &lt;=ainfix +V1V7Cc0aEmpV12aStrwwVV13aAppwwVV5Aainfix &lt;V1Cc0aEmpV14aStrwwVV15aAppwwVV5Aainfix &lt;=c0V1Aainfix &lt;c0V7AainvV5Iainfix ==astringV9asubastringV6c0V8AainvV9FIainfix &lt;=ainfix +c0V8Cc0aEmpV16aStrwwVV17aAppwwVV6Aainfix &lt;c0Cc0aEmpV18aStrwwVV19aAppwwVV6Aainfix &lt;=c0c0Aainfix &lt;c0V8AainvV6INainfix &gt;=c0V7INainfix &lt;=V8c0Lainfix -V2V7Lainfix -Cc0aEmpV20aStrwwVV21aAppwwVV5V1aAppVVwV0Iainfix &lt;=ainfix +V1V2Cc0aEmpV22aStrwwVV23aAppwwVV0Aainfix &lt;V1Cc0aEmpV24aStrwwVV25aAppwwVV0Aainfix &lt;=c0V1Aainfix &lt;c0V2AainvV0F">
+      <label
+       name="expl:VC for sub"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.62"/>
       </proof>
      </goal>
     </transf>
