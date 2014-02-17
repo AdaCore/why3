@@ -291,7 +291,7 @@ and print_lrfmla opl opr info fmt f = match f.t_label with
       (print_list space print_label) ll (print_fnode false false info) f
 *)
 
-and print_tnode opl opr info fmt t = match t.t_node with
+and print_tnode _opl opr info fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
@@ -316,7 +316,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
-        print_vs v (print_opl_term info) t1 (print_opl_term info) t2;
+        print_vs v (print_term info) t1 (print_opl_term info) t2;
       forget_var v
   | Tcase (t,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
@@ -340,7 +340,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
             if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
             else fprintf fmt "(%a %a)" (print_ls_real info) fs
               (print_list space (print_opr_term info)) tl
-          else fprintf fmt (protect_on opl "(%a %a: %a)")
+          else fprintf fmt "(%a %a: %a)"
             (print_ls_real info) fs (print_list space (print_opr_term info)) tl
             (print_ty info) (t_type t)
     end
@@ -377,7 +377,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
   | Tlet (t,f) ->
       let v,f = t_open_bound f in
       fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
-        print_vs v (print_opl_term info) t (print_opl_fmla info) f;
+        print_vs v (print_term info) t (print_opl_fmla info) f;
       forget_var v
   | Tcase (t,bl) ->
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
@@ -390,7 +390,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
     begin match query_syntax info.info_syn ps.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
       | _ -> fprintf fmt "(%a%a)" (print_ls_real info) ps
-          (print_list_pre space (print_term info)) tl
+          (print_list_pre space (print_opr_term info)) tl
     end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
