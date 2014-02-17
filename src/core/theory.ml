@@ -907,10 +907,11 @@ let () = Exn_printer.register
       Format.fprintf fmt "Metaproperty %s is already registered with \
         a conflicting signature" m.meta_name
   | BadMetaArity (m,n) ->
-      Format.fprintf fmt "Metaproperty %s requires %d arguments but \
-        is applied to %d" m.meta_name (List.length m.meta_type) n
+      let i = List.length m.meta_type in
+      Format.fprintf fmt "Metaproperty %s expects %d argument%s but \
+        is applied to %d" m.meta_name i (if i = 1 then "" else "s") n
   | MetaTypeMismatch (m,t1,t2) ->
-      Format.fprintf fmt "Metaproperty %s expects %a argument but \
+      Format.fprintf fmt "Metaproperty %s expects a %a argument but \
         is applied to %a"
         m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
   | _ -> raise exn

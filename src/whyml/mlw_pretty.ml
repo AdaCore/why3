@@ -432,12 +432,14 @@ let () = Exn_printer.register
   | Mlw_ty.BadItyArity ({its_ts = {ts_args = []}} as ts, _) ->
       fprintf fmt "Type symbol %a expects no arguments" print_its ts
   | Mlw_ty.BadItyArity (ts, app_arg) ->
-      fprintf fmt "Type symbol %a expects %i arguments but is applied to %i"
-        print_its ts (List.length ts.its_ts.ts_args) app_arg
+      let i = List.length ts.its_ts.ts_args in
+      fprintf fmt "Type symbol %a expects %i argument%s but is applied to %i"
+        print_its ts i (if i = 1 then "" else "s") app_arg
   | Mlw_ty.BadRegArity (ts, app_arg) ->
+      let i = List.length ts.its_regs in
       fprintf fmt "Type symbol %a expects \
-                   %i region arguments but is applied to %i"
-        print_its ts (List.length ts.its_regs) app_arg
+                   %i region argument%s but is applied to %i"
+        print_its ts i (if i = 1 then "" else "s") app_arg
   | Mlw_ty.DuplicateRegion r ->
       fprintf fmt "Region %a is used twice" print_reg r
   | Mlw_ty.UnboundRegion r ->
