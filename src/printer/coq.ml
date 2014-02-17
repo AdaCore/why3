@@ -272,9 +272,7 @@ let rec print_term info fmt t = print_lrterm false false info fmt t
 and     print_fmla info fmt f = print_lrfmla false false info fmt f
 and print_opl_term info fmt t = print_lrterm true  false info fmt t
 and print_opl_fmla info fmt f = print_lrfmla true  false info fmt f
-(* unused
 and print_opr_term info fmt t = print_lrterm false true  info fmt t
-*)
 and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
 
 and print_lrterm opl opr info fmt t = match t.t_label with
@@ -341,9 +339,10 @@ and print_tnode opl opr info fmt t = match t.t_node with
           then
             if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
             else fprintf fmt "(%a %a)" (print_ls_real info) fs
-              (print_list space (print_term info)) tl
-          else fprintf fmt (protect_on opl "(%a %a:%a)") (print_ls_real info) fs
-            (print_list space (print_term info)) tl (print_ty info) (t_type t)
+              (print_list space (print_opr_term info)) tl
+          else fprintf fmt (protect_on opl "(%a %a: %a)")
+            (print_ls_real info) fs (print_list space (print_opr_term info)) tl
+            (print_ty info) (t_type t)
     end
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
