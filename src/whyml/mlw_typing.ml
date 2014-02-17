@@ -380,41 +380,71 @@ let chainable_op uc denv op =
   | Some _ -> false (* can never happen *)
   | None -> chainable_qualid uc (Qident op)
 
+let mk_closure loc _ls =
+  Loc.errorm ~loc "Partial@ application@ of@ logical@ symbols@ \
+    is@ currently@ not@ supported@ in@ programs."
+(*
+  let mk dt = Dterm.dterm ~loc dt in
+  let id = id_user "fc" loc and dty = dty_fresh () in
+  let mk_v i _ =
+    id_user ("y" ^ string_of_int i) loc, dty_fresh () in
+  let mk_t (id, dty) = mk (DTvar (id.pre_name, dty)) in
+  let vl = Lists.mapi mk_v ls.ls_args in
+  let tl = List.map mk_t vl in
+  let app e1 e2 = DTapp (fs_func_app, [mk e1; e2]) in
+  let e = List.fold_left app (DTvar ("fc", dty)) tl in
+  let f = DTapp (ps_equ, [mk e; mk (DTapp (ls, tl))]) in
+  DTeps (id, dty, mk (DTquant (Tforall, vl, [], mk f)))
+*)
+
 let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
-  let expr_app loc e el =
-    let app (loc, e) e1 = Opt.fold Loc.join loc e1.de_loc,
-      DEapply (Mlw_dexpr.dexpr ~loc e, e1) in
-    snd (List.fold_left app (loc, e) el)
+  let expr_app e el =
+    List.fold_left (fun e1 (loc, e2) ->
+      DEapply (Mlw_dexpr.dexpr ~loc e1, e2)) e el
   in
-  let rec take loc al l el = match l, el with
-    | (_::l), (e::el) ->
-        take (Opt.fold Loc.join loc e.de_loc) (e::al) l el
-    | _, _ -> loc, List.rev al, el
+  let rec apply_pl loc pl al l el = match l, el with
+    | (_::l), (e::el) -> apply_pl loc pl (e::al) l el
+    | [], _ -> expr_app (DEplapp (pl, List.rev_map snd al)) el
+    | _, [] -> expr_app (mk_closure loc pl) (List.rev_append al el)
   in
-  let qualid_app loc q el = match uc_find_ps uc q with
-    | PV pv -> expr_app loc (DEgpvar pv) el
-    | PS ps -> expr_app loc (DEgpsym ps) el
-    | PL pl -> let loc,al,el = take loc [] pl.pl_args el in
-               expr_app loc (DEplapp (pl, al)) el
-    | LS ls -> let loc,al,el = take loc [] ls.ls_args el in
-               expr_app loc (DElsapp (ls, al)) el
+  let rec apply_ls loc ls al l el = match l, el with
+    | (_::l), (e::el) -> apply_ls loc ls (e::al) l el
+    | [], _ -> expr_app (DElsapp (ls, List.rev_map snd al)) el
+    | _, [] -> expr_app (mk_closure loc ls) (List.rev_append al el)
+  in
+  let qualid_app q el = match uc_find_ps uc q with
+    | PV pv -> expr_app (DEgpvar pv) el
+    | PS ps -> expr_app (DEgpsym ps) el
+    | PL pl -> apply_pl (qloc q) pl [] pl.pl_args el
+    | LS ls -> apply_ls (qloc q) ls [] ls.ls_args el
     | XS xs -> Loc.errorm ~loc:(qloc q)
         "unexpected exception symbol %a" print_xs xs
   in
-  let qualid_app loc q el = match q with
+  let qualid_app q el = match q with
     | Qident {id = n} ->
         (match denv_get_opt denv n with
-        | Some d -> expr_app loc d el
-        | None -> qualid_app loc q el)
-    | _ -> qualid_app loc q el
+        | Some d -> expr_app d el
+        | None -> qualid_app q el)
+    | _ -> qualid_app q el
+  in
+  let rec unfold_app e1 e2 el = match e1.expr_desc with
+    | Ptree.Eapply (e11,e12) ->
+        let e12 = dexpr lenv denv e12 in
+        unfold_app e11 e12 ((e1.expr_loc, e2)::el)
+    | Ptree.Eident q ->
+        qualid_app q ((e1.expr_loc, e2)::el)
+    | _ ->
+        expr_app (DEapply (dexpr lenv denv e1, e2)) el
   in
   Mlw_dexpr.dexpr ~loc (match desc with
   | Ptree.Eident q ->
-      qualid_app loc q []
+      qualid_app q []
   | Ptree.Eidapp (q, tl) ->
-      qualid_app (qloc q) q (List.map (dexpr lenv denv) tl)
+      (* FIXME: qloc q is wrong for the 2nd and later arguments *)
+      let loc = qloc q in
+      qualid_app q (List.map (fun t -> loc, dexpr lenv denv t) tl)
   | Ptree.Eapply (e1, e2) ->
-      DEapply (dexpr lenv denv e1, dexpr lenv denv e2)
+      unfold_app e1 (dexpr lenv denv e2) []
   | Ptree.Etuple el ->
       let el = List.map (dexpr lenv denv) el in
       DElsapp (fs_tuple (List.length el), el)
@@ -422,10 +452,11 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Einnfix (e12, op2, e3) ->
       let make_app de1 op de2 = if op.id = "infix <>" then
         let oq = Qident { op with id = "infix =" } in
-        let dt = qualid_app op.id_loc oq [de1;de2] in
+        (* FIXME: op.id_loc is wrong for the 2nd argument *)
+        let dt = qualid_app oq [(op.id_loc, de1); (op.id_loc, de2)] in
         DEnot (Mlw_dexpr.dexpr ~loc dt)
       else
-        qualid_app op.id_loc (Qident op) [de1;de2]
+        qualid_app (Qident op) [(op.id_loc, de1); (op.id_loc, de2)]
       in
       let rec make_chain n1 n2 de1 = function
         | [op,de2] ->

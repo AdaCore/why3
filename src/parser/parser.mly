@@ -38,15 +38,13 @@ end
   let floc_ij i j = Loc.extract (loc_ij i j)
 *)
 
-  let mk_ppl loc d = { pp_loc = loc; pp_desc = d }
-  let mk_pp d = mk_ppl (floc ()) d
+  let mk_pp_l loc d = { pp_loc = loc; pp_desc = d }
+  let mk_pp d = { pp_loc = floc (); pp_desc = d }
+
   let mk_pat p = { pat_loc = floc (); pat_desc = p }
 
-  let infix_ppl loc a i b = mk_ppl loc (PPbinop (a, i, b))
-  let infix_pp a i b = infix_ppl (floc ()) a i b
-
-  let prefix_ppl loc p a = mk_ppl loc (PPunop (p, a))
-  let prefix_pp p a = prefix_ppl (floc ()) p a
+  let infix_pp a i b = mk_pp (PPbinop (a, i, b))
+  let prefix_pp p a = mk_pp (PPunop (p, a))
 
   let infix  s = "infix "  ^ s
   let prefix s = "prefix " ^ s
@@ -55,10 +53,6 @@ end
   let mk_id id loc = { id = id; id_lab = []; id_loc = loc }
 
   let add_lab id l = { id with id_lab = l }
-
-  let mk_l_apply f a =
-    let loc = Loc.join f.pp_loc a.pp_loc in
-    { pp_loc = loc; pp_desc = PPapply (f,a) }
 
   let mk_l_prefix op e1 =
     let id = mk_id (prefix op) (floc_i 1) in
@@ -81,13 +75,8 @@ end
       | Parsing.Parse_error -> Format.fprintf fmt "syntax error"
       | _ -> raise exn)
 
+  let mk_expr_l loc d = { expr_loc = loc; expr_desc = d }
   let mk_expr d = { expr_loc = floc (); expr_desc = d }
-
-  let mk_expr_i i d = { expr_loc = floc_i i; expr_desc = d }
-
-  let mk_apply f a =
-    let loc = Loc.join f.expr_loc a.expr_loc in
-    { expr_loc = loc; expr_desc = Eapply (f,a) }
 
   let mk_prefix op e1 =
     let id = mk_id (prefix op) (floc_i 1) in
@@ -609,12 +598,10 @@ lexpr:
    { mk_l_infix $1 $2 $3 }
 | prefix_op lexpr %prec prec_prefix_op
    { mk_l_prefix $1 $2 }
-| qualid list1_lexpr_arg
-   { mk_pp (PPidapp ($1, $2)) }
-| lexpr_arg_noid list1_lexpr_arg
-   { match $1.pp_desc with
-     | PPidapp (id,al) -> mk_pp (PPidapp (id, al @ $2))
-     | _ -> List.fold_left mk_l_apply $1 $2 }
+| lexpr_arg list1_lexpr_arg /* FIXME/TODO: "lexpr lexpr_arg" */
+   { let b = rhs_start_pos 1 in
+     List.fold_left (fun f (e,a) ->
+       mk_pp_l (Loc.extract (b,e)) (PPapply (f,a))) $1 $2 }
 | IF lexpr THEN lexpr ELSE lexpr
    { mk_pp (PPif ($2, $4, $6)) }
 | quant list1_quant_vars triggers DOT lexpr
@@ -650,8 +637,8 @@ field_value:
 ;
 
 list1_lexpr_arg:
-| lexpr_arg                 { [$1] }
-| lexpr_arg list1_lexpr_arg { $1::$2 }
+| lexpr_arg                 { [rhs_end_pos 1, $1] }
+| lexpr_arg list1_lexpr_arg { (rhs_end_pos 1, $1) :: $2 }
 ;
 
 constant:
@@ -661,10 +648,6 @@ constant:
 
 lexpr_arg:
 | qualid            { mk_pp (PPident $1) }
-| lexpr_arg_noid    { $1 }
-;
-
-lexpr_arg_noid:
 | constant          { mk_pp (PPconst $1) }
 | TRUE              { mk_pp PPtrue }
 | FALSE             { mk_pp PPfalse }
@@ -1194,12 +1177,10 @@ expr:
    { mk_expr (Enot $2) }
 | prefix_op expr %prec prec_prefix_op
    { mk_prefix $1 $2 }
-| qualid list1_expr_arg
-   { mk_expr (Eidapp ($1, $2)) }
-| expr_arg_noid list1_expr_arg
-   { match $1.expr_desc with
-     | Eidapp (id,al) -> mk_expr (Eidapp (id, al @ $2))
-     | _ -> List.fold_left mk_apply $1 $2 }
+| expr_arg list1_expr_arg /* FIXME/TODO: "expr expr_arg" */
+   { let b = rhs_start_pos 1 in
+     List.fold_left (fun f (e,a) ->
+       mk_expr_l (Loc.extract (b,e)) (Eapply (f,a))) $1 $2 }
 | IF final_expr THEN expr ELSE expr
    { mk_expr (Eif ($2, $4, $6)) }
 | IF final_expr THEN expr %prec prec_no_else
@@ -1247,7 +1228,7 @@ expr:
 | fun_expr
    { mk_expr (Elam $1) }
 | VAL top_ghost lident_rich labels tail_type_c IN expr
-   { mk_expr (Elet (add_lab $3 $4, $2, mk_expr_i 5 (Eany $5), $7)) }
+   { mk_expr (Elet (add_lab $3 $4, $2, mk_expr_l (floc_i 5) (Eany $5), $7)) }
 | MATCH final_expr WITH bar_ program_match_cases END
    { mk_expr (Ematch ($2, $5)) }
 | MATCH list2_expr_sep_comma WITH bar_ program_match_cases END
@@ -1287,10 +1268,6 @@ final_expr:
 
 expr_arg:
 | qualid          { mk_expr (Eident $1) }
-| expr_arg_noid   { $1 }
-;
-
-expr_arg_noid:
 | constant        { mk_expr (Econst $1) }
 | TRUE            { mk_expr Etrue }
 | FALSE           { mk_expr Efalse }
@@ -1337,8 +1314,8 @@ field_expr:
 ;
 
 list1_expr_arg:
-| expr_arg                   { [$1] }
-| expr_arg list1_expr_arg    { $1 :: $2 }
+| expr_arg                   { [rhs_end_pos 1, $1] }
+| expr_arg list1_expr_arg    { (rhs_end_pos 1, $1) :: $2 }
 ;
 
 list2_expr_sep_comma:
