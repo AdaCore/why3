@@ -8,7 +8,7 @@ NAME=main
 
 OCAMLOPT=ocamlopt -noassert -inline 1000
 
-INCLUDE=@BIGINTINCLUDE@ -I ../../lib/why3 
+INCLUDE=@BIGINTINCLUDE@ -I ../../lib/why3
 
 all: $(NAME).@OCAMLBEST@
 
@@ -23,15 +23,19 @@ main.cmx: euler001__Euler001.cmx
 euler001__Euler001.ml: ../euler001.mlw
 	../../bin/why3 -E ocaml ../euler001.mlw -o .
 
-%.cmx: %.ml 
+%.cmx: %.ml
 	ocamlopt $(INCLUDE) -annot -c $<
 
-%.cmo: %.ml 
+%.cmo: %.ml
 	ocamlc $(INCLUDE) -annot -c $<
 
-%.cmi: %.mli 
+%.cmi: %.mli
 	ocamlc $(INCLUDE) -annot -c $<
 
 clean::
-	rm -f *.cm[xio] $(NAME).opt
+	rm -f *.cm[xio] *.o *.annot $(NAME).opt
+	rm -f euler001__*.ml euler001__*.ml.bak
+
+Makefile: Makefile.in ../../config.status
+	cd ../.. ; ./config.status chmod --file examples/euler001/Makefile
 

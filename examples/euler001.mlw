@@ -171,7 +171,7 @@ module Euler001
   let run () = solve 1000
     (* should return 233168 *)
 
-    exception BenchFailure
+  exception BenchFailure
 
   let bench () raises { BenchFailure -> true } =
     let x = run () in

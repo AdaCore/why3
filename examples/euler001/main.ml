@@ -18,5 +18,5 @@ let input_num =
 
 let () =
   let a = Euler001__Euler001.solve input_num in
-  printf "The sum of all the multiples of 3 or 5 below %s is %s@." 
+  printf "The sum of all the multiples of 3 or 5 below %s is %s@."
     (Why3__BigInt.to_string input_num) (Why3__BigInt.to_string a)
