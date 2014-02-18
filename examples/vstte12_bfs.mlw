@@ -105,6 +105,7 @@ module BFS
   let bfs (s: vertex) (t: vertex)
     ensures { forall d: int. not (path s t d) }
     raises { Found r -> shortest_path s t r }
+    diverges (* the set of reachable nodes may be infinite *)
   = let visited = ref (singleton s) in
     let current = ref (singleton s) in
     let next    = ref empty in
@@ -116,8 +117,6 @@ module BFS
         (forall x: vertex. closure !visited !current !next x) /\
         0 <= !d
       }
-      (* variant { cardinal all_nodes - cardinal !visited }
-         needs to assume that the set of reachable nodes is finite *)
       let v = B.pop current in
       if v = t then raise (Found !d);
       fill_next s t v visited current next d;
