@@ -73,14 +73,6 @@ let iprinter,aprinter,_tprinter,_pprinter =
 let forget_tvs () =
   forget_all aprinter
 
-(* dead code
-let forget_all () =
-  forget_all iprinter;
-  forget_all aprinter;
-  forget_all tprinter;
-  forget_all pprinter
-*)
-
 (* info *)
 
 type info = {
@@ -181,31 +173,29 @@ let star fmt () = fprintf fmt " *@ "
 
 let has_syntax info id = Mid.mem id info.info_syn
 
-let rec print_ty_node inn info fmt ty = match ty.ty_node with
+let rec print_ty ?(paren=false) info fmt ty = match ty.ty_node with
   | Tyvar v ->
       print_tv fmt v
   | Tyapp (ts, []) when is_ts_tuple ts ->
       fprintf fmt "unit"
   | Tyapp (ts, tl) when is_ts_tuple ts ->
-      fprintf fmt "(%a)" (print_list star (print_ty_node false info)) tl
+      fprintf fmt "(%a)" (print_list star (print_ty  info)) tl
   | Tyapp (ts, tl) ->
       begin match query_syntax info.info_syn ts.ts_name with
-        | Some s -> syntax_arguments s (print_ty_node true info) fmt tl
+        | Some s -> syntax_arguments s (print_ty ~paren:true info) fmt tl
         | None ->
           begin match tl with
             | [] ->
                 print_ts info fmt ts
             | [ty] ->
-                fprintf fmt (protect_on inn "%a@ %a")
-                  (print_ty_node true info) ty (print_ts info) ts
+                fprintf fmt (protect_on paren "%a@ %a")
+                  (print_ty info) ty (print_ts info) ts
             | _ ->
-                fprintf fmt (protect_on inn "(%a)@ %a")
-                  (print_list comma (print_ty_node false info)) tl
+                fprintf fmt (protect_on paren "(%a)@ %a")
+                  (print_list comma (print_ty info)) tl
                   (print_ts info) ts
         end
       end
-
-let print_ty = print_ty_node false
 
 let print_vsty info fmt v =
   fprintf fmt "%a:@ %a" print_vs v (print_ty info) v.vs_ty
@@ -216,7 +206,7 @@ let print_tv_args fmt = function
   | [tv] -> fprintf fmt "%a@ " print_tv_arg tv
   | tvl -> fprintf fmt "(%a)@ " (print_list comma print_tv_arg) tvl
 
-let print_ty_arg info fmt ty = fprintf fmt "%a" (print_ty_node true info) ty
+let print_ty_arg info fmt ty = fprintf fmt "%a" (print_ty ~paren:true info) ty
 let print_vs_arg info fmt vs = fprintf fmt "(%a)" (print_vsty info) vs
 
 let print_constr info fmt (cs,_) = match cs.ls_args with
@@ -341,9 +331,9 @@ let rec is_exec_term t = match t.t_node with
 and is_exec_branch b =
   let _, t = t_open_branch b in is_exec_term t
 
-let print_const fmt = function
+let print_const ~paren fmt = function
   | ConstInt (IConstDec s) ->
-      fprintf fmt "(Why3__BuiltIn.int_constant \"%s\")" s
+      fprintf fmt (protect_on paren "Why3__BuiltIn.int_constant \"%s\"") s
   | ConstInt (IConstHex s) -> fprintf fmt (tbi "0x%s") s
   | ConstInt (IConstOct s) -> fprintf fmt (tbi "0o%s") s
   | ConstInt (IConstBin s) -> fprintf fmt (tbi "0b%s") s
@@ -412,19 +402,7 @@ let print_binop fmt = function
   | Tiff -> fprintf fmt "="
   | Timplies -> assert false
 
-let prio_binop = function
-  | Tand -> 3
-  | Tor -> 2
-  | Timplies -> 1
-  | Tiff -> 1
-
-let rec print_term info fmt t =
-  print_lterm 0 info fmt t
-
-and print_lterm pri info fmt t =
-  print_tnode pri info fmt t
-
-and print_app pri ls info fmt tl =
+let rec print_app ?(paren=false) ls info fmt tl =
   let isconstr = is_constructor info ls in
   let is_field (_, csl) = match csl with
     | [_, pjl] ->
@@ -443,8 +421,8 @@ and print_app pri ls info fmt tl =
       let tl = filter_ghost ls Mlw_expr.t_void tl in
       let pjl = get_record info ls in
       if pjl = [] then
-        fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ (%a)@]")
-          (print_cs info) ls (print_list comma (print_lterm 6 info)) tl
+        fprintf fmt (protect_on paren "@[<hov 1>%a@ (%a)@]")
+          (print_cs info) ls (print_list comma (print_term info)) tl
       else
         let print_field fmt (ls, t) =
           fprintf fmt "%a = %a" (print_ls info) ls (print_term info) t in
@@ -453,39 +431,39 @@ and print_app pri ls info fmt tl =
   | [t1] when isfield ->
       fprintf fmt "(%a).%a" (print_term info) t1 (print info) ls
   | [t1] ->
-      fprintf fmt (protect_on (pri > 4) "%a %a")
-        (print info) ls (print_lterm 5 info) t1
+      fprintf fmt (protect_on paren "%a %a")
+        (print info) ls (print_term_p info) t1
   | tl ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
-        (print_ls info) ls (print_list space (print_lterm 6 info)) tl
+      fprintf fmt (protect_on paren "@[<hov 2>%a@ %a@]")
+        (print_ls info) ls (print_list space (print_term_p info)) tl
 
-and print_tnode pri info fmt t = match t.t_node with
+and print_term ?(paren=false) info fmt t = match t.t_node with
   | Tvar v ->
       let gh = try (Mlw_ty.restore_pv v).Mlw_ty.pv_ghost
       with Not_found -> false in
       if gh then fprintf fmt "()" else print_vs fmt v
   | Tconst c ->
-      print_const fmt c
+      print_const ~paren fmt c
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma (print_term info)) tl
   | Tapp (fs, tl) ->
       begin match query_syntax info.info_syn fs.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
-      | None when unambig_fs fs -> print_app pri fs info fmt tl
+      | Some s -> syntax_arguments s (print_term_p info) fmt tl
+      | None when unambig_fs fs -> print_app ~paren fs info fmt tl
       | None ->
-          fprintf fmt (protect_on (pri > 0) "@[<hov 2>(%a:@ %a)@]")
-            (print_app 5 fs info) tl (print_ty info) (t_type t)
+          fprintf fmt "@[<hov 2>(%a:@ %a)@]"
+            (print_app fs info) tl (print_ty info) (t_type t)
       end
   | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
+      fprintf fmt (protect_on paren "if @[%a@] then %a@ else %a")
         (print_term info) f (print_term info) t1 (print_term info) t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
-        print_vs v (print_lterm 4 info) t1 (print_term info) t2;
+      fprintf fmt (protect_on paren "let %a = @[%a@] in@ %a")
+        print_vs v (print_term info) t1 (print_term info) t2;
       forget_var v
   | Tcase (t1,bl) ->
-      fprintf fmt "@[(match @[%a@] with@\n@[<hov>%a@])@]"
+      fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
         (print_term info) t1 (print_list newline (print_tbranch info)) bl
   | Teps _
   | Tquant _ ->
@@ -495,24 +473,20 @@ and print_tnode pri info fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (Timplies,f1,f2) ->
-      fprintf fmt "(not (%a) || (%a))" (print_term info) f1 (print_term info) f2
+      fprintf fmt (protect_on paren "not %a || %a")
+        (print_term_p info) f1 (print_term_p info) f2
   | Tbinop (b,f1,f2) ->
-      let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
-        (print_lterm (p + 1) info) f1 print_binop b (print_lterm p info) f2
+      fprintf fmt (protect_on paren "@[<hov 1>%a %a@ %a@]")
+        (print_term_p info) f1 print_binop b (print_term_p info) f2
   | Tnot f ->
-      fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 5 info) f
+      fprintf fmt (protect_on paren "not %a") (print_term_p info) f
+
+and print_term_p info fmt t = print_term ~paren:true info fmt t
 
 and print_tbranch info fmt br =
   let p,t = t_open_branch br in
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat info) p (print_term info) t;
   Svs.iter forget_var p.pat_vars
-
-(* dead code
-and print_tl info fmt tl =
-  if tl = [] then () else fprintf fmt "@ [%a]"
-    (print_list alt (print_list comma (print_term info))) tl
-*)
 
 let print_ls_type info fmt = function
   | None -> fprintf fmt "bool"
@@ -702,42 +676,44 @@ let is_letrec = function
 
 let ity_mark = ity_pur Mlw_wp.ts_mark []
 
-let rec print_expr info fmt e = print_lexpr 0 info fmt e
+(* WhyML expressions
+   optional argument [paren] requires surrounding parentheses when necessary *)
 
-and print_lexpr pri info fmt e =
+let rec print_expr ?(paren=false) info fmt e =
   if e.e_ghost then
-    fprintf fmt "((* ghost *))"
+    fprintf fmt "(* ghost *)"
   else match e.e_node with
   | Elogic t ->
-      fprintf fmt "(%a)" (print_term info) t
+      fprintf fmt (protect_on paren "%a") (print_term info) t
   | Evalue v ->
       print_pv info fmt v
   | Earrow a ->
       begin match query_syntax info.info_syn a.ps_name with
-        | Some s -> syntax_arguments s (print_expr info) fmt []
+        | Some s -> syntax_arguments s (print_expr ~paren:true info) fmt []
         | None   -> print_ps info fmt a end
   | Eapp (e,v,_) ->
-      fprintf fmt "(%a@ %a)" (print_lexpr pri info) e (print_pv info) v
+      fprintf fmt (protect_on paren "%a@ %a")
+        (print_expr info) e (print_pv info) v
   | Elet ({ let_expr = e1 }, e2) when e1.e_ghost ->
-      print_expr info fmt e2
+      print_expr ~paren info fmt e2
   | Elet ({ let_sym = LetV pv }, e2)
     when ity_equal pv.pv_ity ity_mark ->
-      print_expr info fmt e2
+      print_expr ~paren info fmt e2
   | Elet ({ let_sym = LetV pv ; let_expr = e1 }, e2)
-    when pv.pv_vs.vs_name.id_string = "_" &&
-         ity_equal pv.pv_ity ity_unit ->
-      fprintf fmt (protect_on (pri > 0) "@[begin %a;@ %a end@]")
+    when pv.pv_vs.vs_name.id_string = "_" && ity_equal pv.pv_ity ity_unit ->
+      (* TODO: begin/end inly if paren *)
+      fprintf fmt "@[begin %a;@ %a end@]"
         (print_expr info) e1 (print_expr info) e2;
   | Elet ({ let_sym = lv ; let_expr = e1 }, e2) ->
-      fprintf fmt (protect_on (pri > 0) "@[<hov 2>let %a =@ %a@ in@]@\n%a")
-        (print_lv info) lv (print_lexpr 4 info) e1 (print_expr info) e2;
+      fprintf fmt (protect_on paren "@[<hov 2>let %a =@ %a@ in@]@\n%a")
+        (print_lv info) lv (print_expr info) e1 (print_expr info) e2;
       forget_lv lv
   | Eif (e0,e1,e2) ->
-      fprintf fmt (protect_on (pri > 0)
+      fprintf fmt (protect_on paren
                      "@[<hv>if %a@ @[<hov 2>then %a@]@ @[<hov 2>else %a@]@]")
         (print_expr info) e0 (print_expr info) e1 (print_expr info) e2
   | Eassign (pl,e,_,pv) ->
-      fprintf fmt (protect_on (pri > 0) "%a.%a <- %a")
+      fprintf fmt (protect_on paren "%a.%a <- %a")
         (print_expr info) e (print_ls info) pl.pl_ls (print_pv info) pv
   | Eloop (_,_,e) ->
       fprintf fmt "@[while true do@ %a@ done@]" (print_expr info) e
@@ -756,10 +732,10 @@ and print_lexpr pri info fmt e =
             fprintf fmt "raise (%a %a)" (print_xs info) xs (print_expr info) e
       end
   | Etry (e,bl) ->
-      fprintf fmt "@[(try %a with@\n@[<hov>%a@])@]"
+      fprintf fmt "@[begin try %a with@\n@[<hov>%a@] end@]"
         (print_expr info) e (print_list newline (print_xbranch info)) bl
   | Eabstr (e,_) ->
-      print_lexpr pri info fmt e
+      print_expr ~paren info fmt e
   | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"
   | Eassert _ ->
@@ -770,16 +746,16 @@ and print_lexpr pri info fmt e =
       fprintf fmt "@[(%a :@ %a)@]" to_be_implemented "any"
         (print_vty info) e.e_vty
   | Ecase (e1, [_,e2]) when e1.e_ghost ->
-      print_lexpr pri info fmt e2
+      print_expr ~paren info fmt e2
   | Ecase (e1, bl) ->
-      fprintf fmt "@[(match @[%a@] with@\n@[<hov>%a@])@]"
+      fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
         (print_expr info) e1 (print_list newline (print_ebranch info)) bl
   | Erec (fdl, e) ->
       (* print non-ghost first *)
       let cmp {fun_ps=ps1} {fun_ps=ps2} =
         Pervasives.compare ps1.ps_ghost ps2.ps_ghost in
       let fdl = List.sort cmp fdl in
-      fprintf fmt "@[<v>%a@\nin@\n%a@]"
+      fprintf fmt (protect_on paren "@[<v>%a@\nin@\n%a@]")
         (print_list_next newline (print_rec_decl (is_letrec fdl) info)) fdl
         (print_expr info) e
 
@@ -790,7 +766,7 @@ and print_rec lr info fst fmt { fun_ps = ps ; fun_lambda = lam } =
       (print_ps info) ps
   else
     let print_arg fmt pv = fprintf fmt "@[%a@]" (print_pvty info) pv in
-    fprintf fmt "@[<hov 2>%s %a %a =@ %a@]"
+    fprintf fmt "@[<hov 2>%s %a %a =@\n@[%a@]@]"
       (if fst then if lr then "let rec" else "let" else "and")
       (print_ps info) ps (print_list space print_arg) lam.l_args
       (print_expr info) lam.l_expr

@@ -9,9 +9,9 @@ Require int.ComputerDivision.
 
 Parameter fib: Z -> Z.
 
-Axiom fib0 : ((fib 0%Z) = 1%Z).
+Axiom fib0 : ((fib 0%Z) = 0%Z).
 
-Axiom fib1 : ((fib 1%Z) = 2%Z).
+Axiom fib1 : ((fib 1%Z) = 1%Z).
 
 Axiom fibn : forall (n:Z), (2%Z <= n)%Z ->
   ((fib n) = ((fib (n - 1%Z)%Z) + (fib (n - 2%Z)%Z))%Z).
@@ -19,12 +19,11 @@ Axiom fibn : forall (n:Z), (2%Z <= n)%Z ->
 Require Import Why3.
 
 (* Why3 goal *)
-Theorem fib_even : forall (n:Z), (0%Z <= n)%Z ->
-  (((ZOmod (fib n) 2%Z) = 0%Z) <-> ((ZOmod n 3%Z) = 1%Z)).
+Theorem fib_even_3n : forall (n:Z), (0%Z <= n)%Z ->
+  (((ZOmod (fib n) 2%Z) = 0%Z) <-> ((ZOmod n 3%Z) = 0%Z)).
+Proof.
 intros n h1.
 generalize h1; pattern n.
 apply Z_lt_induction; auto.
-why3 "cvc3" timelimit 3.
+why3 "cvc3" timelimit 10.
 Qed.
-
-
