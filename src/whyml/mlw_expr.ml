@@ -591,7 +591,8 @@ let e_plapp pls el ity =
         mk_expr (Elogic t) (VTvalue ity) ghost eff syms
     | [],_ | _,[] ->
         raise (Term.BadArity (pls.pl_ls, List.length el))
-    | fd::fdl, ({ e_node = Elogic t } as e)::argl ->
+    | fd::fdl, ({ e_node = Elogic t } as e)::argl
+      when Spv.for_all (fun pv -> ity_immutable pv.pv_ity) e.e_syms.syms_pv ->
         let t = match t.t_ty with
           | Some _ -> t
           | None -> t_if_simp t t_bool_true t_bool_false in
