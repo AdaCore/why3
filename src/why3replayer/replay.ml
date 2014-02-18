@@ -82,13 +82,13 @@ let spec = Arg.align [
    " same as -C") ;
   ("--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
    "<file> Read additional configuration from <file>") ;
-  ("-force",
+  ("--force",
    Arg.Set opt_force,
    " enforce saving the session after replay") ;
-  ("-obsolete-only",
+  ("--obsolete-only",
    Arg.Set opt_obsolete_only,
    " replay only if session is obsolete") ;
-  ("-smoke-detector",
+  ("--smoke-detector",
    Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
    " try to detect if the context is self-contradicting") ;
   ("--bench",
