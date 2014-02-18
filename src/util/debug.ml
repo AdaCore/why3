@@ -185,7 +185,7 @@ module Stats = struct
 (** SIGXCPU cpu time limit reached *)
   let _ =
   (** TODO? have a possible callback for printing different message*)
-    Sys.signal 24 (Sys.Signal_handle (fun _ -> exit 2))
+    Sys.signal Sys.sigint (Sys.Signal_handle (fun _ -> exit 2))
 
   let register ~print ~name ~init =
     let s = {name; printer = print; value = init} in
