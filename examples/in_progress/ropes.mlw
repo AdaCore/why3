@@ -1,11 +1,68 @@
 
-module Rope
+module String "immutable strings"
 
   use import int.Int
 
-  (* immutable strings *)
+  type char
+  constant dummy_char: char
 
-(**
+  type string
+
+  (* axiomatized function length *)
+  function length string: int
+  axiom length_nonnegative: forall s: string. length s >= 0
+
+  function ([]) string int: char (* access to i-th char *)
+
+  (* string access routine *)
+  val ([]) (s: string) (i:int) : char
+    requires { 0 <= i < s.length }
+    ensures  { result = s[i] }
+
+  constant empty: string
+  axiom empty_def: length empty = 0
+
+
+  (* extensional equality for strings *)
+  predicate (==) (s1 s2: string) =
+    length s1 = length s2 /\
+    forall i:int. 0 <= i < length s1 -> s1[i] = s2[i]
+
+  (* axiomatized concatenation *)
+  function app string string: string
+
+  axiom app_def1:
+    forall s1 s2: string. length (app s1 s2) = length s1 + length s2
+
+  axiom app_def2:
+    forall s1 s2: string, i: int.
+    0 <= i < length s1 -> (app s1 s2)[i] = s1[i]
+
+  axiom app_def3:
+    forall s1 s2: string, i: int.
+    length s1 <= i < length s1 + length s2 ->
+    (app s1 s2)[i] = s2[i - length s1]
+
+
+  (* axiomatized substring *)
+  function sub string int int: string
+
+  axiom sub_def1:
+    forall s: string, ofs len: int.
+    0 <= len -> 0 <= ofs <= length s -> ofs + len <= length s ->
+    length (sub s ofs len) = len
+
+  axiom sub_def2:
+    forall s: string, ofs len: int.
+    0 <= len -> 0 <= ofs <= length s -> ofs + len <= length s ->
+    forall i: int. 0 <= i < len -> (sub s ofs len)[i] = s[ofs + i]
+
+  (* substring routine *)
+  val sub (s: string) (ofs len: int) : string
+    requires { 0 <= len /\ 0 <= ofs <= length s /\ ofs + len <= length s }
+    ensures  { result = sub s ofs len }
+
+  (**
   namespace import S
 
     use HighOrd as HO
@@ -31,81 +88,53 @@ module Rope
       forall i:int. 0 <= i < s1.length -> s1.chars i = s2.chars i
 
   end
-**)
+  **)
 
-  namespace import S
+end
 
-    type char
-    constant dummy_char: char (* empty character *)
+module Sig
 
-    type string
+  use import int.Int
+  use import String as S
 
-    (* axiomatized function length *)
-    function length string: int
-    axiom length_nonnegative: forall s: string. length s >= 0
+  type rope
 
-    function ([]) string int: char (* logical function 'get' *)
+  function string rope: string
 
-    (* contract for string access routine *)
-    val ([]) (s: string) (i:int) : char
-      requires { 0 <= i < s.length }
-      ensures  { result = s[i] }
+  function length rope: int
 
-    constant empty: string
-    axiom empty_def: length empty = 0
+  val empty () : rope
+    ensures { length result = 0 /\ string result == S.empty }
 
+  val is_empty (r: rope) : bool
+    ensures  { result <-> string r == empty }
 
-    (* extensional equality for strings *)
-    predicate (==) (s1 s2: string) =
-      length s1 = length s2 /\
-      forall i:int. 0 <= i < length s1 -> s1[i] = s2[i]
+  val of_string (s: string) : rope
+    requires { 0 <= S.length s }
+    ensures  { string result == s}
 
-    (* axiomatiezd concatenation function *)
-    function app string string: string
+  (* access to the i-th character *)
+  val get (r: rope) (i: int) : char
+    requires { 0 <= i < length r }
+    ensures  { result = (string r)[i] }
 
-    (* concatenation length *)
-    axiom app_def1:
-      forall s1 s2: string. length (app s1 s2) = length s1 + length s2
+  val concat (r1 r2: rope) : rope
+    ensures  { string result == S.app (string r1) (string r2) }
 
-    (* access in concatenation I  *)
-    axiom app_def2:
-      forall s1 s2: string, i: int.
-      0 <= i < length s1 -> (app s1 s2)[i] = s1[i]
+  (* sub-rope construction *)
+  val sub (r: rope) (ofs len: int) : rope
+    requires { 0 <= len /\ 0 <= ofs <= length r /\ ofs + len <= length r }
+    ensures  { string result == S.sub (string r) ofs len }
 
-    (* access in concatenation II *)
-    axiom app_def3:
-      forall s1 s2: string, i: int.
-      length s1 <= i < length s1 + length s2 ->
-      (app s1 s2)[i] = s2[i - length s1]
+  val balance (r: rope) : rope
+    ensures  { string result == string r }
 
+end
 
-    (* axiomatized substring function *)
-    function sub string int int: string
+module Rope (* : Sig *)
 
-    (*  |sub s ofs len| = len *)
-    axiom sub_def1:
-      forall s: string, ofs len: int.
-      0 <= len ->
-        0 <= ofs < length s ->
-          ofs + len <= length s ->
-            length (sub s ofs len) = len
-
-    (* access of substring *)
-    axiom sub_def2:
-      forall s: string, ofs len: int.
-      0 <= len ->
-        0 <= ofs < length s ->
-           ofs + len <= length s ->
-             forall i: int.
-                0 <= i < len ->
-                  (sub s ofs len)[i] = s[ofs + i]
-
-    (* contract for substring routine *)
-    val sub (s: string) (ofs len: int) : string
-      requires { 0 <= len /\ 0 <= ofs < length s /\ ofs + len <= length s }
-      ensures  { result = sub s ofs len }
-
-  end
+  use import int.Int
+  use import String as S
 
   (* ***** Logical description of rope type **** *)
   type rope =
@@ -125,14 +154,14 @@ module Rope
         true
     | Str s ofs len ->
         0 < len /\ 0 <= ofs < S.length s /\ ofs + len <= S.length s
-        (* s[ofs..ofs+len[ is non-empty substring of s *)
+        (* s[ofs..ofs+len[ is a non-empty substring of s *)
     | App l r len ->
         0 < length l /\ inv l /\ 0 < length r /\ inv r /\
         len = length l + length r
         (* l and r are non-empty strings of the size (|l| + |r|) = len *)
   end
 
-  (* string projection *)
+  (* the string model of a rope *)
   function string (r: rope) : string = match r with
     | Emp           -> S.empty
     | Str s ofs len -> S.sub s ofs len
@@ -143,11 +172,11 @@ module Rope
   lemma rope_length_is_string_length:
     forall r: rope. inv r -> S.length (string r) = length r
 
-  (* NB: Here and below pay attention
-  to the use of '==' predicate in contracts *)
+  (* NB: Here and below pay attention to the use of '==' predicate in
+  contracts *)
 
   (* empty rope *)
-  let empty ()
+  let empty () : rope
     ensures { length result = 0 /\ inv result /\ string result == S.empty }
   = Emp
 
@@ -166,7 +195,8 @@ module Rope
 
   (* access to the character of the given index i *)
   let rec get (r: rope) (i: int) : char
-    requires { inv r /\ 0 <= i < length r }
+    requires { inv r }
+    requires { 0 <= i < length r }
     ensures  { result = (string r)[i] }
     variant  { r }
   = match r with
@@ -192,14 +222,14 @@ module Rope
   (* sub-rope construction *)
   let rec sub (r: rope) (ofs len: int) : rope
     requires { inv r}
-    requires { 0 < len /\ 0 <= ofs < length r /\ ofs + len <= length r }
+    requires { 0 <= len /\ 0 <= ofs <= length r /\ ofs + len <= length r }
     ensures  { inv result }
     ensures  { string result == S.sub (string r) ofs len }
     variant  { r }
   =
   match r with
-    | Emp          -> absurd (* since 0 < |r| *)
-    | Str s ofs' _ -> Str s (ofs' + ofs) len
+    | Emp          -> assert { len = 0 }; Emp
+    | Str s ofs' _ -> if len = 0 then Emp else Str s (ofs' + ofs) len
     | App r1 r2 _  ->
         let left  = length r1 - ofs in (* max chars to the left  *)
         let right = len - left      in (* max chars to the right *)
@@ -207,4 +237,30 @@ module Rope
         else if 0 >= left then sub r2 (- left) len
         else concat (sub r1 ofs left) (sub r2 0 right)
     end
+
+  (* balancing *)
+
+  use import int.Fibonacci
+  use import int.MinMax
+  use array.Array
+
+  function height (r: rope) : int = match r with
+    | Emp | Str _ _ _  -> 0
+    | App left right _ -> 1 + max (height left) (height right)
+  end
+
+  constant max : int = 44
+
+  (**
+  TODO:
+  1. code + safety
+  2. ensures string result == string r
+  3. ensures inv result
+  4. file[i] <> Emp -> height(file[i]) <= i -2 /\ length file[i] >= fib i
+
+  let balance (r: rope) : rope
+  = let file = Array.make (max+1) Emp in
+    ...
+  **)
+
 end
