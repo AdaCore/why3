@@ -3,6 +3,12 @@
   Inverse of a permutation, in place
     Algorithm I
     The Art of Computer Programming, volume 1, Sec. 1.3.3, page 176
+
+  The idea is to inverse each orbit at a time, using negative values to
+  denote elements already inversed. The main loop scans the array and
+  proceeds as follows: a negative value -x-1 is simply changed into x; a
+  nonnegative value is the topmost element of a new orbit, which is
+  inversed by the inner loop.
 *)
 
 module InverseInPlace
@@ -46,11 +52,26 @@ module InverseInPlace
     is_permutation a
 ***)
 
+(*
   predicate nodup (a: M.map int int) (m: int) =
     forall i j: int. 0 <= i < j < m ->
        (M.get a i <> M.get a j /\ M.get a i <> ~ (M.get a j))
     \/ (M.get a i = ~ (M.get a j) = m)
     \/ (~ (M.get a i) = M.get a j = m)
+*)
+
+  inductive orbit (array int) int int int =
+  | orbitO:
+      forall a: array int, x: int. orbit a x x 0
+  | orbitS:
+      forall a: array int, x y s: int. orbit a x y s -> orbit a x a[y] (s+1)
+  (** [orbit a x y s] means y=a^s(x) *)
+
+  lemma orbit1: forall a: array int, x: int. orbit a x a[x] 1
+
+  lemma orbit_permutation_1:
+    forall a: array int. is_permutation a ->
+    forall x y s: int. 0 <= x < length a -> orbit a x y s -> 0 <= y < length a
 
   let inverse_in_place (a: array int)
     requires { is_permutation a }
@@ -60,24 +81,28 @@ module InverseInPlace
  'L:let n = length a in
     for m = n-1 downto 0 do
       invariant { forall e: int. 0 <= e < n -> -n <= a[e] < n }
-      invariant { forall e: int. m < e < n -> "FOO1" 0 <= a[e] }
-      invariant { forall e: int. m < e < n -> "FOO2" (at a 'L)[a[e]] = e }
-      invariant { forall e: int. 0 <= e <= m ->
-                  a[e] < 0 -> "FOO3" (at a 'L)[~ a[e]] = e }
-      invariant { forall e: int. 0 <= e <= m ->
-                  a[e] >= 0 -> "FOO4" (at a 'L)[e] = a[e] }
+      invariant { forall e: int. m < e < n -> 0 <= a[e] }
+      invariant { forall e: int. m < e < n -> (at a 'L)[a[e]] = e }
+      invariant { forall e: int. 0 <= e <= m -> a[e] < 0 ->
+                  (at a 'L)[~ a[e]] = e }
+      invariant { forall e: int. 0 <= e <= m -> a[e] >= 0 ->
+                  (at a 'L)[e] = a[e] }
+      invariant { forall e: int. 0 <= e <= m -> a[e] >= 0 ->
+                  forall y s: int. orbit (at a 'L) a[e] y s -> 0 <= y <= m }
       let i = ref a[m] in
       if !i >= 0 then begin
         (* unrolled loop once *)
+        assert { orbit (at a 'L) m !i 1 };
         a[m] <- -1;
         let j = ref (~m) in
         let k = ref !i in
         i := a[!i];
-        (* ghost let pre_a = ref a.elts in *)
-        (* ghost let pre_pre_a = ref a.elts in *)
+        assert { orbit (at a 'L) m !k 1 };
+        assert { 0 <= !i -> orbit (at a 'L) m !i 2 };
+        (* TODO: a ghost reference to count number of steps *)
         while !i >= 0 do
           invariant { a[!k] = !i <= m /\ 0 <= !k <= m /\ -n <= !j < 0 /\
-                      (at a 'L)[~ !j] = !k }
+                      (at a 'L)[~ !j] = !k /\ a[m] < 0 }
           invariant { forall e: int. 0 <= e < n -> -n <= a[e] < n }
           invariant { forall e: int. m < e < n -> 0 <= a[e] }
           invariant { forall e: int. m < e < n -> (at a 'L)[a[e]] = e }
@@ -85,7 +110,8 @@ module InverseInPlace
                       a[e] < 0 -> (at a 'L)[~ a[e]] = e }
           invariant { forall e: int. 0 <= e < m ->
                       a[e] >= 0 -> (at a 'L)[e] = a[e] }
-        (* nodup a.elts m /\ nodup pre_a m /\ nodup pre_pre_a m *)
+          invariant { forall e: int. 0 <= e < m -> a[e] >= 0 ->
+                      forall y s: int. orbit (at a 'L) a[e] y s -> 0 <= y <= m }
           variant   { num_of a.elts 0 n }
           a[!k] <- !j;
           j := ~ !k;
@@ -102,6 +128,23 @@ module InverseInPlace
 end
 
 module Harness
+
+  use import array.Array
+  use import InverseInPlace
+
+  (* (0 2) (1) *)
+  let test1 () =
+    let a = make 3 0 in
+    a[0] <- 2; a[2] <- 0; a[1] <- 1;
+    inverse_in_place a;
+    a
+
+  (* (0 1 2) *)
+  let test2 () =
+    let a = make 3 0 in
+    a[0] <- 1; a[1] <- 2; a[2] <- 0;
+    inverse_in_place a;
+    a
 
 end
 
