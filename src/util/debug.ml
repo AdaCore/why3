@@ -188,7 +188,7 @@ module Stats = struct
     Sys.signal Sys.sigint (Sys.Signal_handle (fun _ -> exit 2))
 
   let register ~print ~name ~init =
-    let s = {name; printer = print; value = init} in
+    let s = {name = name; printer = print; value = init} in
     max_name_size := max !max_name_size (String.length name);
     registered_stats := (fun fmt -> print_stat fmt s)::!registered_stats;
     s
