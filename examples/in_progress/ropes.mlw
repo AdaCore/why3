@@ -43,6 +43,8 @@ module String "immutable strings"
     length s1 <= i < length s1 + length s2 ->
     (app s1 s2)[i] = s2[i - length s1]
 
+  lemma app_assoc:
+    forall s1 s2 s3: string. app s1 (app s2 s3) == app (app s1 s2) s3
 
   (* axiomatized substring *)
   function sub string int int: string
@@ -238,11 +240,16 @@ module Rope (* : Sig *)
         else concat (sub r1 ofs left) (sub r2 0 right)
     end
 
-  (* balancing *)
+end
 
+module Balance
+
+  use import String
+  use import Rope as R
   use import int.Fibonacci
   use import int.MinMax
-  use array.Array
+  use import array.Array
+  use import ref.Ref
 
   function height (r: rope) : int = match r with
     | Emp | Str _ _ _  -> 0
@@ -258,9 +265,107 @@ module Rope (* : Sig *)
   3. ensures inv result
   4. file[i] <> Emp -> height(file[i]) <= i -2 /\ length file[i] >= fib i
 
-  let balance (r: rope) : rope
-  = let file = Array.make (max+1) Emp in
-    ...
   **)
+
+  function string_of_array (q: Array.array rope) (l u: int) : string
+    (** q[u-1] + q[u-2] + ... + q[l] *)
+
+  axiom string_of_array_empty:
+    forall q: Array.array rope, l: int.
+    0 <= l <= length q -> string_of_array q l l == S.empty
+  axiom string_of_array_concat_left:
+    forall q: Array.array rope, l u: int. 0 <= l < u <= Array.length q ->
+    string_of_array q l u ==
+      S.app (string_of_array q (l+1) u) (string q[l])
+
+  lemma string_of_array_concat:
+    forall q: Array.array rope, l mid u: int.
+    0 <= l <= mid <= u <= Array.length q ->
+    string_of_array q l u ==
+      S.app (string_of_array q l mid) (string_of_array q mid u)
+  lemma string_of_array_concat_right:
+    forall q: Array.array rope, l u: int. 0 <= l < u <= Array.length q ->
+    string_of_array q l u ==
+      S.app (string q[u-1]) (string_of_array q l (u-1))
+  lemma string_of_array_length:
+    forall q: Array.array rope, l u i: int. 0 <= l <= i < u <= Array.length q ->
+    (forall j: int. l <= j < u -> inv q[j]) ->
+    S.length (string_of_array q l u) >= S.length (string q[i])
+  lemma string_of_array_eq:
+    forall q1 q2: Array.array rope, l u: int.
+    0 <= l <= u <= Array.length q1 = Array.length q2 ->
+    (forall j: int. l <= j < u -> q1[j] = q2[j]) ->
+    string_of_array q1 l u == string_of_array q2 l u
+  lemma string_of_array_frame:
+    forall q: Array.array rope, l u: int. 0 <= l <= u <= Array.length q ->
+    forall i: int, r: rope. (0 <= i < l \/ u <= i < Array.length q) ->
+    string_of_array q l u == string_of_array q[i <- r] l u
+  lemma string_of_array_concat_empty:
+    forall q: Array.array rope, l u: int. 0 <= l <= u <= Array.length q ->
+    (forall j: int. l <= j < u -> q[j] = Emp) ->
+    string_of_array q l u == S.empty
+
+  function string_of_queue (q: Array.array rope) : string =
+    string_of_array q 2 (Array.length q)
+
+  let rec insert (q: Array.array rope) (i: int) (r: rope) : unit
+    requires { 2 <= i < length q = max+1 }
+    requires { inv r }
+    requires { forall j: int. 2 <= j <= max -> inv q[j] }
+    requires { S.length (string_of_array q i (max+1)) + R.length r
+               < fib (max+1) }
+    ensures  { forall j: int. 2 <= j <= max -> inv q[j] }
+    ensures  { forall j: int. 2 <= j < i -> q[j] = (old q)[j] }
+    ensures  { string_of_array q i (max+1) ==
+                 S.app (string_of_array (old q) i (max+1)) (string r) }
+    variant  { max - i }
+  = 'L:
+    let r' = concat q[i] r in
+    if R.length r' < fib (i+1) then begin
+      q[i] <- r';
+      assert {    string_of_array q         (i+1) (max+1)
+               == string_of_array (at q 'L) (i+1) (max+1) }
+    end else begin
+      q[i] <- Emp;
+      assert {    string_of_array q         i     (max+1)
+               == string_of_array (at q 'L) (i+1) (max+1) };
+      assert { S.length (string_of_array q         i (max+1)) + R.length r'
+             = S.length (string_of_array (at q 'L) i (max+1)) + R.length r };
+      insert q (i+1) r';
+      assert { q[i] = Emp };
+      assert { string_of_array q i (max+1) == string_of_array q (i+1) (max+1) }
+    end
+
+  let rec insert_leaves (q: array rope) (r: rope) : unit
+    requires { 2 < length q = max+1 }
+    requires { inv r }
+    requires { forall j: int. 2 <= j <= max -> inv q[j] }
+    requires { S.length (string_of_queue q) + R.length r < fib (max+1) }
+    ensures  { forall j: int. 2 <= j <= max -> inv q[j] }
+    ensures  { string_of_queue q ==
+                 S.app (string_of_queue (old q)) (string r) }
+    variant  { r }
+  = match r with
+    | Emp              -> ()
+    | Str _ _ _        -> insert q 2 r
+    | App left right _ -> insert_leaves q left; insert_leaves q right
+  end
+
+  let balance (r: rope) : rope
+    requires { inv r }
+    requires { R.length r < fib (max+1) }
+    ensures  { inv result }
+    ensures  { string result == string r }
+  = let q = Array.make (max+1) Emp in
+    assert { string_of_queue q == S.empty };
+    insert_leaves q r;
+    assert { string_of_queue q == string r };
+    let res = ref Emp in
+    for i = 2 to max do
+      invariant { inv !res }
+      invariant { string !res == string_of_array q 2 i }
+      res := concat q[i] !res
+    done;
+    !res
 
 end
