@@ -278,11 +278,15 @@ module Balance
     string_of_array q l u ==
       S.app (string_of_array q (l+1) u) (string q[l])
 
-  lemma string_of_array_concat:
-    forall q: Array.array rope, l mid u: int.
-    0 <= l <= mid <= u <= Array.length q ->
-    string_of_array q l u ==
-      S.app (string_of_array q l mid) (string_of_array q mid u)
+
+  let rec lemma string_of_array_concat
+    (q: Array.array rope) (l mid u: int) : unit
+    requires { 0 <= l <= mid <= u <= Array.length q }
+    ensures  { string_of_array q l u ==
+      S.app (string_of_array q mid u) (string_of_array q l mid) }
+    variant  { mid - l }
+  = if l < mid then string_of_array_concat q (l+1) mid u
+
   lemma string_of_array_concat_right:
     forall q: Array.array rope, l u: int. 0 <= l < u <= Array.length q ->
     string_of_array q l u ==
