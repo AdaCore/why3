@@ -1,4 +1,13 @@
-
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 type t
 
@@ -27,22 +36,22 @@ val gt : t -> t -> bool
 val le : t -> t -> bool
 val ge : t -> t -> bool
 
-(** Division and modulo operators with the convention 
+(** Division and modulo operators with the convention
 that modulo is always non-negative.
 
 It implies that division rounds down when divisor is positive, and
 rounds up when divisor is negative.
 *)
 val euclidean_div_mod : t -> t -> t * t
-val euclidean_div : t -> t -> t 
-val euclidean_mod : t -> t -> t 
+val euclidean_div : t -> t -> t
+val euclidean_mod : t -> t -> t
 
 (** "computer" division, i.e division rounds towards zero, and thus [mod
     x y] has the same sign as x
 *)
 val computer_div_mod : t -> t -> t * t
-val computer_div : t -> t -> t 
-val computer_mod : t -> t -> t 
+val computer_div : t -> t -> t
+val computer_mod : t -> t -> t
 
 (** min, max, abs *)
 val min : t -> t -> t

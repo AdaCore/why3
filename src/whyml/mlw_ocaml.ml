@@ -160,10 +160,10 @@ let print_path_id fmt = function
 let print_theory_name fmt th = print_path_id fmt (th.th_path, th.th_name)
 let print_module_name fmt m  = print_theory_name fmt m.Mlw_module.mod_theory
 
-let to_be_implemented fmt s =
-  fprintf fmt "failwith \"to be implemented\" (* %s *)" s
+let non_executable fmt s =
+  fprintf fmt "failwith \"non-executable\" (* %s *)" s
 
-let tbi s = "failwith \"to be implemented\" (* " ^^ s ^^ " *)"
+let non_executable_fmt s = "failwith \"non-executable\" (* " ^^ s ^^ " *)"
 
 (** Types *)
 
@@ -295,7 +295,7 @@ let print_ind_decl info sign fst fmt (ps,_ as d) =
   fprintf fmt "@[<hov 2>%s %a %a : bool =@ @[<hov>%a@\n(* @[%a@] *)@]@]"
     (if fst then "let rec" else "and") (print_ls info) ps
     (print_list space (print_vs_arg info)) vars
-    to_be_implemented "inductive"
+    non_executable "inductive"
     print_ind d;
   forget_vars vars
 
@@ -334,13 +334,17 @@ and is_exec_branch b =
 let print_const ~paren fmt = function
   | ConstInt (IConstDec s) ->
       fprintf fmt (protect_on paren "Why3__BuiltIn.int_constant \"%s\"") s
-  | ConstInt (IConstHex s) -> fprintf fmt (tbi "0x%s") s
-  | ConstInt (IConstOct s) -> fprintf fmt (tbi "0o%s") s
-  | ConstInt (IConstBin s) -> fprintf fmt (tbi "0b%s") s
-  | ConstReal (RConstDec (i,f,None)) -> fprintf fmt (tbi "%s.%s") i f
-  | ConstReal (RConstDec (i,f,Some e)) -> fprintf fmt (tbi "%s.%se%s") i f e
-  | ConstReal (RConstHex (i,f,Some e)) -> fprintf fmt (tbi "0x%s.%sp%s") i f e
-  | ConstReal (RConstHex (i,f,None)) -> fprintf fmt (tbi "0x%s.%s") i f
+  | ConstInt (IConstHex _ | IConstOct _ | IConstBin _ as c) ->
+      let s = BigInt.to_string (Number.compute_int c) in
+      fprintf fmt (protect_on paren "Why3__BuiltIn.int_constant \"%s\"") s
+  | ConstReal (RConstDec (i,f,None)) ->
+      fprintf fmt (non_executable_fmt "%s.%s") i f
+  | ConstReal (RConstDec (i,f,Some e)) ->
+      fprintf fmt (non_executable_fmt "%s.%se%s") i f e
+  | ConstReal (RConstHex (i,f,Some e)) ->
+      fprintf fmt (non_executable_fmt "0x%s.%sp%s") i f e
+  | ConstReal (RConstHex (i,f,None)) ->
+      fprintf fmt (non_executable_fmt "0x%s.%s") i f
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -495,7 +499,7 @@ let print_ls_type info fmt = function
 let print_defn info fmt e =
   if is_exec_term e then print_term info fmt e
   else fprintf fmt "@[<hov>%a@ @[(* %a *)@]@]"
-    to_be_implemented "not executable" Pretty.print_term e
+    non_executable "not executable" Pretty.print_term e
 
 let print_param_decl info fmt ls =
   if has_syntax info ls.ls_name then
@@ -507,7 +511,7 @@ let print_param_decl info fmt ls =
       (print_ls info) ls
       (print_list space (print_vs_arg info)) vars
       (print_ls_type info) ls.ls_value
-      to_be_implemented "uninterpreted symbol";
+      non_executable "uninterpreted symbol";
     forget_vars vars;
     forget_tvs ()
   end
@@ -676,7 +680,20 @@ let is_letrec = function
 
 let ity_mark = ity_pur Mlw_wp.ts_mark []
 
-(* WhyML expressions
+let is_underscore pv =
+  pv.pv_vs.vs_name.id_string = "_" && ity_equal pv.pv_ity ity_unit
+
+(* flatten a sequence expression, to print it as e1; e2; ...; en
+   [right] is a list of expressions, to be appended to the right *)
+let rec flatten_block e right = match e.e_node with
+  | Elet ({ let_sym = LetV pv; let_expr = e1 }, e2) when is_underscore pv ->
+      flatten_block e1 (flatten_block e2 right)
+  | Eassert _ ->
+      right
+  | _ ->
+      e :: right
+
+(* printing WhyML expressions in OCaml syntax
    optional argument [paren] requires surrounding parentheses when necessary *)
 
 let rec print_expr ?(paren=false) info fmt e =
@@ -699,24 +716,32 @@ let rec print_expr ?(paren=false) info fmt e =
   | Elet ({ let_sym = LetV pv }, e2)
     when ity_equal pv.pv_ity ity_mark ->
       print_expr ~paren info fmt e2
-  | Elet ({ let_sym = LetV pv ; let_expr = e1 }, e2)
-    when pv.pv_vs.vs_name.id_string = "_" && ity_equal pv.pv_ity ity_unit ->
-      (* TODO: begin/end inly if paren *)
-      fprintf fmt "@[begin %a;@ %a end@]"
-        (print_expr info) e1 (print_expr info) e2;
+  | Elet ({ let_sym = LetV pv }, _) when is_underscore pv ->
+      begin match flatten_block e [] with
+        | []  -> fprintf fmt "()"
+        | [e] -> print_expr ~paren info fmt e
+        | bl  -> fprintf fmt "@[<hv>begin@;<1 2>@[%a@]@ end@]"
+                   (print_list semi (print_expr info)) bl
+      end
   | Elet ({ let_sym = lv ; let_expr = e1 }, e2) ->
       fprintf fmt (protect_on paren "@[<hov 2>let %a =@ %a@ in@]@\n%a")
         (print_lv info) lv (print_expr info) e1 (print_expr info) e2;
       forget_lv lv
+  | Eif (e0, e1, { e_node = Elogic { t_node = Tapp (ls, []) }})
+    when ls_equal ls fs_void ->
+      fprintf fmt
+        (protect_on paren "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@]")
+        (print_expr info) e0 (print_expr info) e1
   | Eif (e0,e1,e2) ->
-      fprintf fmt (protect_on paren
-                     "@[<hv>if %a@ @[<hov 2>then %a@]@ @[<hov 2>else %a@]@]")
+      fprintf fmt
+        (protect_on paren
+         "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@ else@;<1 2>@[%a@]@]")
         (print_expr info) e0 (print_expr info) e1 (print_expr info) e2
   | Eassign (pl,e,_,pv) ->
       fprintf fmt (protect_on paren "%a.%a <- %a")
         (print_expr info) e (print_ls info) pl.pl_ls (print_pv info) pv
   | Eloop (_,_,e) ->
-      fprintf fmt "@[while true do@ %a@ done@]" (print_expr info) e
+      fprintf fmt "@[<hv>while true do@;<1 2>@[%a@]@ done@]" (print_expr info) e
   | Efor (pv,(pvfrom,dir,pvto),_,e) ->
       fprintf fmt
         "@[<hov 2>(Int__Int.for_loop_%s %a %a@ (fun %a -> %a))@]"
@@ -727,28 +752,31 @@ let rec print_expr ?(paren=false) info fmt e =
       begin match query_syntax info.info_syn xs.xs_name with
         | Some s -> syntax_arguments s (print_expr info) fmt [e]
         | None when ity_equal xs.xs_ity ity_unit ->
-            fprintf fmt "raise %a" (print_xs info) xs
+            fprintf fmt (protect_on paren "raise %a") (print_xs info) xs
         | None ->
-            fprintf fmt "raise (%a %a)" (print_xs info) xs (print_expr info) e
+            fprintf fmt (protect_on paren "raise (%a %a)")
+              (print_xs info) xs (print_expr info) e
       end
   | Etry (e,bl) ->
-      fprintf fmt "@[begin try %a with@\n@[<hov>%a@] end@]"
+      fprintf fmt
+        "@[<v>@[<hv>@[<hov 2>begin@ try@ %a@]@ with@]@\n@[<hov>%a@]@\nend@]"
         (print_expr info) e (print_list newline (print_xbranch info)) bl
   | Eabstr (e,_) ->
       print_expr ~paren info fmt e
   | Eabsurd ->
-      fprintf fmt "assert false (* absurd *)"
+      fprintf fmt (protect_on paren "assert false (* absurd *)")
   | Eassert _ ->
-      fprintf fmt "((* assert *))"
+      fprintf fmt "() (* assert *)"
   | Eghost _ ->
       assert false
   | Eany _ ->
-      fprintf fmt "@[(%a :@ %a)@]" to_be_implemented "any"
+      fprintf fmt "@[(%a :@ %a)@]" non_executable "any"
         (print_vty info) e.e_vty
   | Ecase (e1, [_,e2]) when e1.e_ghost ->
       print_expr ~paren info fmt e2
   | Ecase (e1, bl) ->
-      fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
+      fprintf fmt
+        "@[<v>@[<hv>@[<hov 2>begin@ match@ %a@]@ with@]@\n@[<hov>%a@]@\nend@]"
         (print_expr info) e1 (print_list newline (print_ebranch info)) bl
   | Erec (fdl, e) ->
       (* print non-ghost first *)
@@ -840,7 +868,7 @@ let print_val_decl info fmt lv =
     (print_lv info) lv
     (print_list space (print_vs_arg info)) vars
     (print_ity info) ity
-    to_be_implemented "val";
+    non_executable "val";
   forget_vars vars;
   forget_tvs ()
 
