@@ -1,0 +1,32 @@
+
+module String
+
+  use import int.Int
+  use HighOrd as HO
+
+  type char
+  constant dummy_char: char
+
+  type string = { length: int; chars: HO.func int char }
+
+  function ([]) (s: string) (i: int) : char = s.chars i
+
+  constant empty : string = { length = 0; chars = \ i: int. dummy_char }
+
+  val get (s: string) (i:int) : char
+    requires { 0 <= i < s.length }
+    ensures  { result = s.chars i }
+
+  function app (s1 s2: string) : string =
+    { length = s1.length + s2.length;
+      chars = \ i: int.
+        if i < s1.length then s1.chars i else s2.chars (i - s1.length) }
+
+  function sub (s: string) (ofs: int) (len: int) : string =
+    { length = len; chars = \ i: int. s.chars (i - ofs) }
+
+  predicate (==) (s1 s2: string) =
+    s1.length = s2.length /\
+    forall i:int. 0 <= i < s1.length -> s1.chars i = s2.chars i
+
+end
