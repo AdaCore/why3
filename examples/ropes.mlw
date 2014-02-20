@@ -43,6 +43,9 @@ module String
     length s1 = length s2 /\
     forall i:int. 0 <= i < length s1 -> s1[i] = s2[i]
 
+  axiom extensionality:
+     forall s1 s2: string. s1 == s2 -> s1 = s2
+
   (* axiomatized concatenation *)
   function app string string: string
 
@@ -326,10 +329,9 @@ module Balance
       q[i] <- Emp;
       assert {    string_of_array q         i     (max+1)
                == string_of_array (at q 'L) (i+1) (max+1) };
-      assert { S.length (string_of_array q         i (max+1)) + R.length r'
-             = S.length (string_of_array (at q 'L) i (max+1)) + R.length r };
+      assert {   S.app (string_of_array q         i (max+1)) (string r')
+              == S.app (string_of_array (at q 'L) i (max+1)) (string r) };
       insert q (i+1) r';
-      assert { q[i] = Emp };
       assert { string_of_array q i (max+1) == string_of_array q (i+1) (max+1) }
     end
 
