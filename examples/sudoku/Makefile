@@ -15,6 +15,8 @@ OCAMLOPT = ocamlopt -noassert -inline 1000
 
 all: $(MAIN).opt
 
+extract: $(ML)
+
 doc:
 	../../bin/why3doc ../sudoku.mlw
 	../../bin/why3session html ../sudoku.mlw
@@ -40,5 +42,5 @@ $(ML): ../sudoku.mlw
 	ocamlc $(WHY3) -annot -g -c $<
 
 clean::
-	rm -f $(ML) *.cm[xio] $(MAIN).opt
+	rm -f $(ML) *.cm[xio] $(MAIN).opt $(MAIN).byte
 

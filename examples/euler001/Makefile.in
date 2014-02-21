@@ -1,30 +1,32 @@
 
-OBJ=euler001__Euler001 main
+MAIN=main
+OBJ=euler001__Euler001
 
+ML  = $(addsuffix .ml, $(OBJ))
 CMO = $(addsuffix .cmo, $(OBJ))
 CMX = $(addsuffix .cmx, $(OBJ))
-
-NAME=main
 
 OCAMLOPT=ocamlopt -noassert -inline 1000
 
 INCLUDE=@BIGINTINCLUDE@ -I ../../lib/why3
 
-all: $(NAME).@OCAMLBEST@
+all: $(MAIN).@OCAMLBEST@
 
-$(NAME).byte: $(CMO)
+extract: $(ML)
+
+$(MAIN).byte: $(CMO)  $(MAIN).cmo
 	ocamlc $(INCLUDE) @BIGINTLIB@.cma why3extract.cma -o $@ $^
 
-$(NAME).opt: $(CMX)
+$(MAIN).opt: $(CMX)  $(MAIN).cmx
 	$(OCAMLOPT) $(INCLUDE) @BIGINTLIB@.cmxa why3extract.cmxa -o $@ $^
 
-main.cmx: euler001__Euler001.cmx
+$(MAIN).cmx: $(CMX)
 
-euler001__Euler001.ml: ../euler001.mlw
+$(ML): ../euler001.mlw
 	../../bin/why3 -E ocaml ../euler001.mlw -o .
 
 %.cmx: %.ml
-	ocamlopt $(INCLUDE) -annot -c $<
+	$(OCAMLOPT) $(INCLUDE) -annot -c $<
 
 %.cmo: %.ml
 	ocamlc $(INCLUDE) -annot -c $<
@@ -33,8 +35,7 @@ euler001__Euler001.ml: ../euler001.mlw
 	ocamlc $(INCLUDE) -annot -c $<
 
 clean::
-	rm -f *.cm[xio] *.o *.annot $(NAME).opt
-	rm -f euler001__*.ml euler001__*.ml.bak
+	rm -f $(ML) *.cm[xio] *.o *.annot $(MAIN).opt $(MAIN).byte
 
 Makefile: Makefile.in ../../config.status
 	cd ../.. ; ./config.status chmod --file examples/euler001/Makefile
