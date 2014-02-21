@@ -332,10 +332,15 @@ and is_exec_branch b =
   let _, t = t_open_branch b in is_exec_term t
 
 let print_const ~paren fmt = function
-  | ConstInt (IConstDec s) ->
-      fprintf fmt (protect_on paren "Why3__BuiltIn.int_constant \"%s\"") s
-  | ConstInt (IConstHex _ | IConstOct _ | IConstBin _ as c) ->
-      let s = BigInt.to_string (Number.compute_int c) in
+  | ConstInt c ->
+      let n = Number.compute_int c in
+      if BigInt.eq n BigInt.zero then
+        fprintf fmt "Why3__BuiltIn.int_zero"
+      else
+      if BigInt.eq n BigInt.one then
+        fprintf fmt "Why3__BuiltIn.int_one"
+      else
+      let s = BigInt.to_string n in
       fprintf fmt (protect_on paren "Why3__BuiltIn.int_constant \"%s\"") s
   | ConstReal (RConstDec (i,f,None)) ->
       fprintf fmt (non_executable_fmt "%s.%s") i f
