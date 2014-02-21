@@ -9,15 +9,15 @@ CMX = $(addsuffix .cmx, $(OBJ))
 
 ZARITH = $(shell ocamlfind query -i-format zarith)
 NUMLIB = zarith
-WHY3   = $(shell ocamlfind query -i-format why3)
+WHY3   = -I ../../lib/why3
 
 OCAMLOPT = ocamlopt -noassert -inline 1000
 
 all: $(MAIN).opt
 
 doc:
-	why3doc ../sudoku.mlw
-	why3session html ../sudoku.mlw
+	../../bin/why3doc ../sudoku.mlw
+	../../bin/why3session html ../sudoku.mlw
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
 	ocamlc -g $(ZARITH) $(WHY3) $(NUMLIB).cma why3extract.cma -o $@ $^
@@ -28,7 +28,7 @@ $(MAIN).opt: $(CMX) $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../sudoku.mlw
-	why3 -E ocaml ../sudoku.mlw -o .
+	../../bin/why3 -E ocaml ../sudoku.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(WHY3) -annot -c $<

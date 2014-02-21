@@ -1,7 +1,7 @@
 
 open Big_int_Z
 
-type t = big_int
+type t = Z.t
 let compare = compare_big_int
 
 let zero = zero_big_int

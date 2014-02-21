@@ -790,7 +790,7 @@ let rec print_expr ?(paren=false) info fmt e =
 and print_rec lr info fst fmt { fun_ps = ps ; fun_lambda = lam } =
   if ps.ps_ghost then
     fprintf fmt "@[<hov 2>%s %a = ()@]"
-      (if fst then if lr then "let rec" else "let" else "with")
+      (if fst then if lr then "let (*rec*)" else "let" else "with")
       (print_ps info) ps
   else
     let print_arg fmt pv = fprintf fmt "@[%a@]" (print_pvty info) pv in
