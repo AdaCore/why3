@@ -109,6 +109,36 @@
 ** support de Yices 2 ? interesserait Cesar
 
 
+==================== Roadmap for release 0.91 ========================
+
+HighOrd: Coq output and OCaml extraction should produce lambda's from lambda's
+and no epsilon
+
+* terminaison
+** generer une obligation de preuve de well-foundedness quand on utilise
+   un variant avec "with R" (une seule fois pour chaque R !)
+** quand une definition logique recursive ne peut pas etre verifiee
+   bien-fondee statiquement, generer une obligation de preuve
+   (feature wish de F Besson)
+
+* Coq tactic
+** ajout de bases de hint
+
+* replayer
+** deplacer option -bench dans une commande de why3session
+
+* IDE
+** todo: run detection immediately at start up if conf file absent or
+    outdated. should become doable with the new Session module
+** "detect provers" menu
+
+* Contre-exemples de Alt-Ergo
+
+* detect editors
+*** check if coqide and also emacs/proof-general is installed
+
+
+
 ==================== Roadmap for release 0.90 ========================
 
 == New Features to announce ==
@@ -220,33 +250,10 @@
    vers ite qui est supporté par pas mal de prouveurs
 ** introduire des symboles _match non polymorphes differents pour
    chaque instance necessaires. plutot qu'un seul symbole _match
-   poymorphe.
+   polymorphe.
 
 * extraction vers Caml
-** utiliser ZArith
-
-* replayer
-** deplacer option -bench dans une commande de why3session
-
-* terminaison
-** generer une obligation de preuve de well-foundedness quand on utilise
-   un variant avec "with R" (une seule fois pour chaque R !)
-** quand une definition logique recursive ne peut pas etre verifiee
-   bien-fondee statiquement, generer une obligation de preuve
-   (feature wish de F Besson)
-
-* Coq tactic
-** ajout de bases de hint
-
-* IDE
-** todo: run detection immediately at start up if conf file absent or
-    outdated. should become doable with the new Session module
-** "detect provers" menu
-
-* Contre-exemples de Alt-Ergo
-
-* detect editors
-*** check if coqide and also emacs/proof-general is installed
+** DONE utiliser ZArith
 
 * bug #15629
 

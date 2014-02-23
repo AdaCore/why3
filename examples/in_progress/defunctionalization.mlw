@@ -190,45 +190,43 @@ module Defunctionalization
 use import Expr
 use import DirectSem
 
-(*
+(**
 Exercise 2:
 
-  De-functionalize the continuation of eval_1.
+  De-functionalize the continuation of [eval_1].
 
          cont ::= ...
 
-    continue_2 : cont -> value -> value
-      eval_2 : expression -> cont -> value
-  interpret_2 : program -> value
+   [continue_2 : cont -> value -> value]
+       [eval_2 : expression -> cont -> value]
+  [interpret_2 : program -> value]
 
-  Le type de donnees ("data type") cont represente
-  la grammaire des contextes.
+  The data type cont represents the grammar of contexts.
 
-  Les deux fonctions mutuellement recursives eval_2
-  et continue_2 implementent une machine abstraite,
-  c'est Ã  dire un systÃ¨me de transition d'etats.
+  The two mutually recursive functions [eval_2] and [continue_2]
+  implement an abstract machine, that is a state transition system.
 
 *)
 
 type cont = A1 expr cont | A2 int cont | I
 
-(*
+(**
 
-On voudrait ecrire
+One would want to write in Why:
 
-function eval_cont (c:cont) (v:int) : int =
+[function eval_cont (c:cont) (v:int) : int =
   match c with
   | A1 e2 k ->
     let v2 = eval_0 e2 in
     eval_cont (A2 v k) v2
   | A2 v1 k -> eval_cont k (v1 - v)
   | I -> v
-  end
+  end]
 
-Mais la recursion n'etant pas structurelle, le noyau de Why3 la refuse
-(les definitions dans la logique doivent etre totales)
+But since the recursion is not structural, Why3 kernel rejects it
+(definitions in the logic part of the language must be total)
 
-On remplace par une definition relationnelle, inductive.
+We replace that with a relational definition, an inductive one.
 
 *)
 
@@ -242,7 +240,7 @@ inductive eval_cont cont int int =
 | a3 :
   forall v:int. eval_cont I v v
 
-(* fonctions servant de mesure pour la preuve de terminaison *)
+(** Some functions to serve as measures for the termination proof *)
 
 function size_e (e:expr) : int =
   match e with
@@ -274,8 +272,8 @@ let rec lemma size_c_pos (c:cont) : unit
   | A2 _ k -> size_c_pos k
   end
 
-(* programs WhyML (declarés avec "let" au lieu de "function"),
-   mutuellement recursifs resultant de la defonctionalisation *)
+(** WhyML programs (declared with "let" instead of "function"),
+   mutually recursive, resulting from de-functionalization *)
 
 let rec continue_2 (c:cont) (v:int) : int
   variant { size_c c }
@@ -296,8 +294,8 @@ with eval_2 (e:expr) (c:cont) : int
     | Sub e1 e2 -> eval_2 e1 (A1 e2 c)
   end
 
-(* L'interprete. La post-condition specifie que ce program calcule
-   la meme chose que eval_0 *)
+(** The interpreter. The post-condition specifies that this program
+    computes the same thing as [eval_0] *)
 
 let interpret_2 (p:prog) : int
   ensures { result = eval_0 p }
@@ -310,6 +308,8 @@ let u3 () = interpret_2 p3
 let u4 () = interpret_2 p4
 
 end
+
+
 
 
 module SemErreur

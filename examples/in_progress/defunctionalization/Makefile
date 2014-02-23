@@ -11,8 +11,7 @@ CMX = $(addsuffix .cmx, $(OBJ))
 
 
 ZARITH = $(shell ocamlfind query -i-format zarith)
-# NUMLIB = zarith
-NUMLIB = nums
+NUMLIB = zarith
 WHY3   = $(shell ocamlfind query -i-format why3)
 
 OCAMLOPT = ocamlopt -noassert -inline 1000
@@ -22,6 +21,7 @@ all: $(MAIN).opt
 doc:
 	why3doc ../defunctionalization.mlw
 	why3session html ../defunctionalization.mlw
+	firefox defunctionalization.mlw.html defunctionalization.html
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
 	ocamlc -g $(ZARITH) $(WHY3) $(NUMLIB).cma why3extract.cma -o $@ $^

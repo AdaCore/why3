@@ -17,7 +17,7 @@ let rec p_expr fmt e =
   match e with
     | Cte n -> fprintf fmt "%s" (Why3__BigInt.to_string n)
     | Sub(e1,e2) -> 
-      fprintf fmt "%a - %a" p_expr e1 p_expr e2
+      fprintf fmt "(%a - %a)" p_expr e1 p_expr e2
   
 let p_prog fmt p = p_expr fmt p
 
@@ -26,7 +26,7 @@ let p_value fmt v =
 
 let run s f p =
   let v = f p in
-  printf "%s (%a): %a@." s p_prog p p_value v
+  printf "%s %a : %a@." s p_prog p p_value v
 
 let () =
   printf "Exercise 0: direct semantics@.";
