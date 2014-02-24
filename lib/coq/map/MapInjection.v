@@ -218,7 +218,6 @@ Definition range (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
   ((map.Map.get a i) < n)%Z).
 
-
 (* Why3 goal *)
 Lemma injective_surjective : forall (a:(@map.Map.map Z _ Z _)) (n:Z),
   (injective a n) -> ((range a n) -> (surjective a n)).

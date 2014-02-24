@@ -15,6 +15,12 @@ module Quicksort
   use import array.ArrayPermut
   use import array.ArrayEq
 
+  predicate qs_partition (t1 t2: array int) (l m r: int) (v: int) =
+    permut_sub t1 t2 l r /\
+    (forall j:int. l <= j < m -> t2[j] < v) /\
+    (forall j:int. m < j < r -> v <= t2[j]) /\
+    t2[m] = v
+
   let rec quick_rec (t: array int) (l: int) (r: int) : unit
     requires { 0 <= l <= r <= length t }
     ensures  { sorted_sub t l r }
@@ -35,19 +41,12 @@ module Quicksort
         end
       done;
   'M: swap t l !m;
-      assert { permut_sub (at t 'M) t l r };
-      assert { forall j:int. l <= j < !m -> t[j] < v };
-      assert { forall j:int. !m < j < r -> t[j] = (at t 'M)[j] };
+      assert { qs_partition (at t 'M) t l !m r v };
   'N: quick_rec t l !m;
-      assert { permut_sub (at t 'N) t l r };
-      assert { forall j:int. l <= j < !m -> t[j] < v };
-      assert { forall j:int. !m <= j < r -> t[j] = (at t 'N)[j] };
+      assert { qs_partition (at t 'N) t l !m r v };
   'O: quick_rec t (!m + 1) r;
-      assert { permut_sub (at t 'O) t l r };
-      assert { forall j:int. l <= j <= !m -> t[j] = (at t 'O)[j] };
-      assert { forall j:int. !m < j < r ->
-        (exists i:int. !m < i < r /\ t[j] = (at t 'O)[i]) &&
-        t[j] >= v }
+      assert { qs_partition (at t 'O) t l !m r v };
+      assert { qs_partition (at t 'N) t l !m r v }
     end
 
   let quicksort (t : array int) =

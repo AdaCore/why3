@@ -79,7 +79,7 @@ Definition is_empty {a:Type} {a_WT:WhyType a} (s:(@set a a_WT)): Prop :=
   forall (x:a), ~ (mem x s).
 
 (* Why3 goal *)
-Lemma empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(@set
+Lemma empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty : (@set
   a a_WT))).
 intros a a_WT.
 unfold is_empty; intuition.
@@ -87,7 +87,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma mem_empty : forall {a:Type} {a_WT:WhyType a}, forall (x:a), ~ (mem x
-  (empty :(@set a a_WT))).
+  (empty : (@set a a_WT))).
 intros a a_WT x.
 auto.
 Qed.
@@ -230,7 +230,7 @@ Defined.
 
 (* Why3 goal *)
 Lemma all_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a), (mem x
-  (all :(@set a a_WT))).
+  (all : (@set a a_WT))).
 intros a a_WT x.
 now unfold all.
 Qed.

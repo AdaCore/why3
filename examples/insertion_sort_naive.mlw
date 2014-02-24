@@ -15,7 +15,7 @@ module InsertionSortNaive
   use import array.ArraySorted
   use import array.ArrayPermut
 
-  let sort (a:array int) 
+  let sort (a:array int)
     ensures { sorted a }
     ensures { permut_all (old a) a }
   =
@@ -68,7 +68,7 @@ module InsertionSortNaiveGen
   predicate sorted (a : array elt) =
     M.sorted_sub a.elts 0 a.length
 
-  let sort (a:array elt) 
+  let sort (a:array elt)
     ensures { sorted a }
     ensures { permut_all (old a) a }
   =
@@ -161,7 +161,8 @@ end
 
 module InsertionSortParamBad
 
-   (* this version is hard to prove because predicate sorted_sub applies to an array instead of a map *)
+   (* this version is hard to prove because predicate sorted_sub
+      applies to an array instead of a map *)
 
   use import int.Int
   use import ref.Ref
