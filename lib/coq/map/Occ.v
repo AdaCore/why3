@@ -15,7 +15,7 @@ Function occ_ (a:Type) (a_WT:WhyType a) (v:a) (m: @map.Map.map Z _
 intros a a_WT _ _ _ delta h.
 destruct (Z_le_gt_dec delta 0); intros.
 now omega.
-now apply Zabs2Nat.inj_lt; omega.
+now apply Zabs_nat_lt; omega.
 Defined.
 
 (* Why3 goal *)
@@ -179,14 +179,14 @@ Lemma occ_exists : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
   exists i:Z, ((l <= i)%Z /\ (i < u)%Z) /\ ((map.Map.get m i) = v).
 intros a a_WT v m l u h1.
 assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
-rewrite occ_empty in h1. omega. omega.
+rewrite occ_empty in h1. elimtype False; omega. omega.
 generalize h1.
 replace u with (l + (u - l))%Z. 2:ring.
 generalize H.
 pattern (u - l)%Z; apply Z_lt_induction. 2: omega.
 clear H; intros.
 assert (h: (x = 0 \/ x <> 0)%Z) by omega. destruct h.
-now rewrite occ_empty in h0; omega.
+rewrite occ_empty in h0. elimtype False; omega. omega.
 destruct (why_decidable_eq (Map.get m (l + (x-1))%Z) v).
 exists (l+(x-1))%Z. split. omega. now trivial.
 destruct (H (x-1))%Z as (i,(hi1,hi2)). omega. omega.
