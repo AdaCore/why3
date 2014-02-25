@@ -37,6 +37,8 @@ let gt = gt_big_int
 let le = le_big_int
 let ge = ge_big_int
 
+let lt_nat x y = le zero y && lt x y
+let lex (x1,x2) (y1,y2) = lt x1 y1 || eq x1 y1 && lt x2 y2
 
 let euclidean_div_mod = quomod_big_int
 
@@ -67,3 +69,40 @@ let to_string = string_of_big_int
 let of_string = big_int_of_string
 let to_int = int_of_big_int
 
+(* the code below is to be used in OCaml extracted code (see ocaml.drv) *)
+
+let rec for_loop_to x1 x2 body =
+  if le x1 x2 then begin
+    body x1;
+    for_loop_to (succ x1) x2 body
+  end
+
+let rec for_loop_downto x1 x2 body =
+  if ge x1 x2 then begin
+    body x1;
+    for_loop_downto (pred x1) x2 body
+  end
+
+let incr r = r := succ !r
+let decr r = r := pred !r
+let ( += ) r v = r := add !r v
+let ( -= ) r v = r := sub !r v
+let ( *= ) r v = r := mul !r v
+
+module Array = struct
+  type 'a t = 'a array
+  let get a i = a.(to_int i)
+  let set a i v = a.(to_int i) <- v
+  let length a = of_int (Array.length a)
+  exception OutOfBounds
+  let check_bounds a i = if i < 0 || i >= Array.length a then raise OutOfBounds
+  let defensive_get a i = let i = to_int i in check_bounds a i; a.(i)
+  let defensive_set a i v = let i = to_int i in check_bounds a i; a.(i) <- v
+  let make n v = Array.make (to_int n) v
+  let append = Array.append
+  let sub a ofs len = Array.sub a (to_int ofs) (to_int len)
+  let copy = Array.copy
+  let fill a ofs len v = Array.fill a (to_int ofs) (to_int len) v
+  let blit a1 ofs1 a2 ofs2 len =
+    Array.blit a1 (to_int ofs1) a2 (to_int ofs2) (to_int len)
+end

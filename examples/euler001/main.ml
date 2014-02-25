@@ -13,7 +13,7 @@ let input =
 
 let input_num =
   try
-    Why3__BuiltIn.int_constant input
+    Why3__BigInt.of_string input
   with _ -> usage ()
 
 let () =

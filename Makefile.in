@@ -63,7 +63,7 @@ HACHA = @HACHA@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = 
+INCLUDES =
 OFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 BFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 
@@ -1199,16 +1199,7 @@ clean::
 # Ocaml realizations
 #######################
 
-OCAMLLIBS_INT_THEORIES = Int Abs ComputerDivision Lex2 MinMax
-OCAMLLIBS_MAP_THEORIES = Map
-OCAMLLIBS_REF_MODULES = Ref Refint
-OCAMLLIBS_ARRAY_MODULES = Array
-
-OCAMLLIBS_FILES = why3__BigInt why3__BuiltIn why3__Prelude \
-	$(addprefix int__, $(OCAMLLIBS_INT_THEORIES)) \
-	$(addprefix map__, $(OCAMLLIBS_MAP_THEORIES)) \
-	$(addprefix ref__, $(OCAMLLIBS_REF_MODULES)) \
-	$(addprefix array__, $(OCAMLLIBS_ARRAY_MODULES)) 
+OCAMLLIBS_FILES = why3__BigInt why3__Prelude why3__Map
 
 OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
 
@@ -1262,13 +1253,6 @@ install_no_local_lib::
 	mkdir -p $(OCAMLINSTALLLIB)/why3
 	cp -f lib/why3/why3extract.cm* lib/why3/why3extract.[ao] \
 		$(OCAMLINSTALLLIB)/why3
-
-
-update-ocaml: update-ocaml-int 
-
-update-ocaml-int: bin/why3 theories/int.why
-	# does not work: would erase existing realization :-(
-	#	for f in $(OCAMLLIBS_INT_THEORIES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ -E ocaml -L modules -L theories -T int.$$f -o lib/ocaml; done
 
 
 

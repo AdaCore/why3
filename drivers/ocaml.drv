@@ -2,6 +2,7 @@
 printer "ocaml"
 
 theory BuiltIn
+  syntax type int "Why3__BigInt.t"
   syntax predicate  (=)   "(%1 = %2)"
 end
 
@@ -31,6 +32,45 @@ theory bool.Bool
   (* syntax function implb "(implb %1)" *)
 end
 
+theory int.Int
+  syntax constant zero "Why3__BigInt.zero"
+  syntax constant one  "Why3__BigInt.one"
+
+  syntax predicate (<)  "(Why3__BigInt.lt %1 %2)"
+  syntax predicate (<=) "(Why3__BigInt.le %1 %2)"
+  syntax predicate (>)  "(Why3__BigInt.gt %1 %2)"
+  syntax predicate (>=) "(Why3__BigInt.ge %1 %2)"
+
+  syntax function (+)   "(Why3__BigInt.add %1 %2)"
+  syntax function (-)   "(Why3__BigInt.sub %1 %2)"
+  syntax function ( * ) "(Why3__BigInt.mul %1 %2)"
+  syntax function (-_)  "(Why3__BigInt.minus %1)"
+end
+
+theory int.Abs
+  syntax function abs "(Why3__BigInt.abs %1)"
+end
+
+theory int.MinMax
+  syntax function min "(Why3__BigInt.min %1 %2)"
+  syntax function max "(Why3__BigInt.max %1 %2)"
+end
+
+theory int.Lex2
+  syntax predicate lt_nat "(Why3__BigInt.lt_nat %1 %2)"
+  syntax predicate lex    "(Why3__BigInt.lex %1 %2)"
+end
+
+theory int.EuclideanDivision
+  syntax function div "(Why3__BigInt.euclidean_div %1 %2)"
+  syntax function mod "(Why3__BigInt.euclidean_mod %1 %2)"
+end
+
+theory int.ComputerDivision
+  syntax function div "(Why3__BigInt.computer_div %1 %2)"
+  syntax function mod "(Why3__BigInt.computer_mod %1 %2)"
+end
+
 theory list.List
   syntax type     list "%1 list"
   syntax function Nil  "[]"
@@ -49,7 +89,14 @@ theory list.Reverse
   syntax function reverse "(List.rev %1)"
 end
 
-
+theory map.Map
+  syntax type map "((%1, %2) Why3__Map.map)"
+  syntax function const "(Why3__Map.const %1)"
+  syntax function ([]) "(Why3__Map.get %1 %2)"
+  syntax function get "(Why3__Map.get %1 %2)"
+  syntax function ([<-]) "(Why3__Map.set %1 %2 %3)"
+  syntax function set "(Why3__Map.set %1 %2 %3)"
+end
 
 (* WhyML *)
 
@@ -59,6 +106,31 @@ module ref.Ref
   syntax val      ref      "Pervasives.ref"
   syntax val      (!_)     "Pervasives.(!)"
   syntax val      (:=)     "Pervasives.(:=)"
+end
+
+module ref.Refint
+  syntax val incr "Why3__BigInt.incr"
+  syntax val decr "Why3__BigInt.decr"
+  syntax val ( += ) "Why3__BigInt.(+=)"
+  syntax val ( -= ) "Why3__BigInt.(-=)"
+  syntax val ( *= ) "Why3__BigInt.(*=)"
+end
+
+module array.Array
+  syntax type array "(%1 Why3__BigInt.Array.t)"
+  syntax function ([]) "(Why3__BigInt.Array.get %1 %2)"
+  syntax val ([]) "Why3__BigInt.Array.get"
+  syntax val ([]<-) "Why3__BigInt.Array.set"
+  syntax val length "Why3__BigInt.Array.length"
+  syntax exception OutOfBounds "Why3__BigInt.Array.OutOfBounds"
+  syntax val defensive_get "Why3__BigInt.Array.defensive_get"
+  syntax val defensive_set "Why3__BigInt.Array.defensive_set"
+  syntax val make "Why3__BigInt.Array.make"
+  syntax val append "Why3__BigInt.Array.append"
+  syntax val sub "Why3__BigInt.Array.sub"
+  syntax val copy "Why3__BigInt.Array.copy"
+  syntax val fill "Why3__BigInt.Array.fill"
+  syntax val blit "Why3__BigInt.Array.blit"
 end
 
 module mach.int.Int31

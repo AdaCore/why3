@@ -1,13 +1,15 @@
-(* This file has been generated from Why3 theory Map *)
 
-type ('a, 'b) map = (* inefficient implementation *)
+(* inefficient implementation of theory map.Map
+   to be used in OCaml extracted code (see driver ocaml.drv) *)
+
+type ('a, 'b) map =
   { default : 'b;
     table : ('a * 'b) list;
   }
 
-let get (x: ('a, 'b) map) (x1: 'a) : 'b = 
+let get (x: ('a, 'b) map) (x1: 'a) : 'b =
   try
-    List.assoc x1 x.table 
+    List.assoc x1 x.table
   with Not_found -> x.default
 
 let rec update l x y =
@@ -24,7 +26,7 @@ let mixfix_lbrb (a: ('a, 'b) map) (i: 'a) : 'b = get a i
 let mixfix_lblsmnrb (a: ('a, 'b) map) (i: 'a) (v: 'b) : ('a, 'b) map =
   set a i v
 
-let const (x: 'b) : ('a, 'b) map = 
+let const (x: 'b) : ('a, 'b) map =
   { default = x ; table = [] }
 
 

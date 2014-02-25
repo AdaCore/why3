@@ -335,13 +335,13 @@ let print_const ~paren fmt = function
   | ConstInt c ->
       let n = Number.compute_int c in
       if BigInt.eq n BigInt.zero then
-        fprintf fmt "Why3__BuiltIn.int_zero"
+        fprintf fmt "Why3__BigInt.zero"
       else
       if BigInt.eq n BigInt.one then
-        fprintf fmt "Why3__BuiltIn.int_one"
+        fprintf fmt "Why3__BigInt.one"
       else
       let s = BigInt.to_string n in
-      fprintf fmt (protect_on paren "Why3__BuiltIn.int_constant \"%s\"") s
+      fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
   | ConstReal (RConstDec (i,f,None)) ->
       fprintf fmt (non_executable_fmt "%s.%s") i f
   | ConstReal (RConstDec (i,f,Some e)) ->
@@ -749,7 +749,7 @@ let rec print_expr ?(paren=false) info fmt e =
       fprintf fmt "@[<hv>while true do@;<1 2>@[%a@]@ done@]" (print_expr info) e
   | Efor (pv,(pvfrom,dir,pvto),_,e) ->
       fprintf fmt
-        "@[<hov 2>(Int__Int.for_loop_%s %a %a@ (fun %a -> %a))@]"
+        "@[<hov 2>(Why3__BigInt.for_loop_%s %a %a@ (fun %a -> %a))@]"
         (if dir = To then "to" else "downto")
         (print_pv info) pvfrom (print_pv info) pvto
         (print_pv info) pv (print_expr info) e
