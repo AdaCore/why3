@@ -56,7 +56,7 @@ module Algo64
     end
 
   let qs (a:array int) : unit
-    ensures  { permut_all (old a) a /\ qs_partition (old a) a 0 0 0 0 0 }
+    ensures  { permut_all (old a) a }
     ensures  { sorted a }
   = if length a > 0 then quicksort a 0 (length a - 1)
 
