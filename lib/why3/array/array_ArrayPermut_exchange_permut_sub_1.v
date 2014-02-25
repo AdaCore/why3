@@ -96,15 +96,12 @@ Definition permut_all {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
   (a2:(@array a a_WT)): Prop := ((length a1) = (length a2)) /\
   (map.MapPermut.permut (elts a1) (elts a2) 0%Z (length a1)).
 
-(* Require Import Why3. Ltac ae := why3 "Alt-Ergo,0.95.2," timelimit 3. *)
-
 (* Why3 goal *)
 Theorem exchange_permut_sub : forall {a:Type} {a_WT:WhyType a},
   forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z) (l:Z) (u:Z),
   (exchange1 a1 a2 i j) -> (((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\
   (j < u)%Z) -> ((0%Z <= l)%Z -> ((u <= (length a1))%Z -> (permut_sub a1 a2 l
   u))))).
-(* Why3 intros a a_WT a1 a2 i j l u h1 (h2,h3) (h4,h5) h6 h7. *)
 intros a a_WT a1 a2 i j l u h1 (h2,h3) (h4,h5) h6 h7.
 destruct h1 as (h11,h12).
 destruct h12 as (ha,(hb,(hc,(hd,he)))).
@@ -114,6 +111,46 @@ red. intros. apply he; omega.
 assumption. assumption. omega. omega. assumption.
 (* permut *)
 red. intro v.
+
+assert (Occ.occ v (elts a1) i (i+1) + Occ.occ v (elts a1) j (j+1)
+      = Occ.occ v (elts a2) i (i+1) + Occ.occ v (elts a2) j (j+1))%Z.
+destruct (why_decidable_eq (Map.get (elts a1) i) v).
+rewrite Occ.occ_right_add. 2: omega. 2: ring_simplify (i+1-1)%Z; assumption.
+rewrite (Occ.occ_right_add v (elts a2) j). 2: omega.
+  2: ring_simplify (j+1-1)%Z; rewrite <- hc; assumption.
+ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
+rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) j). 2: omega.
+destruct (why_decidable_eq (Map.get (elts a1) j) v).
+rewrite Occ.occ_right_add. 2: omega. 2: ring_simplify (j+1-1)%Z; assumption.
+rewrite (Occ.occ_right_add v (elts a2) i). 2: omega.
+  2: ring_simplify (i+1-1)%Z; rewrite <- hd; assumption.
+ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
+rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) i). 2: omega.
+ring.
+rewrite Occ.occ_right_no_add. 2: omega. 2: ring_simplify (j+1-1)%Z; assumption.
+rewrite (Occ.occ_right_no_add v (elts a2) i). 2: omega.
+  2: ring_simplify (i+1-1)%Z; rewrite <- hd; assumption.
+ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
+rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) i). 2: omega.
+ring.
+rewrite Occ.occ_right_no_add. 2: omega. 2: ring_simplify (i+1-1)%Z; assumption.
+rewrite (Occ.occ_right_no_add v (elts a2) j). 2: omega.
+  2: ring_simplify (j+1-1)%Z; rewrite <- hc; assumption.
+rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) j). 2: omega.
+destruct (why_decidable_eq (Map.get (elts a1) j) v).
+rewrite Occ.occ_right_add. 2: omega. 2: ring_simplify (j+1-1)%Z; assumption.
+rewrite (Occ.occ_right_add v (elts a2) i). 2: omega.
+  2: ring_simplify (i+1-1)%Z; rewrite <- hd; assumption.
+ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
+rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) i). 2: omega.
+ring.
+rewrite Occ.occ_right_no_add. 2: omega. 2: ring_simplify (j+1-1)%Z; assumption.
+rewrite (Occ.occ_right_no_add v (elts a2) i). 2: omega.
+  2: ring_simplify (i+1-1)%Z; rewrite <- hd; assumption.
+ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
+rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) i). 2: omega.
+ring.
+
 assert (c: (i < j \/ i = j \/ j < i)%Z) by omega. destruct c as [c|c].
 (* i < j *)
 assert (Occ.occ v (elts a1) l u = Occ.occ v (elts a1) l i + Occ.occ v (elts a1) i u)%Z.
@@ -124,10 +161,24 @@ assert (Occ.occ v (elts a1) (i+1) u = Occ.occ v (elts a1) (i+1) j + Occ.occ v (e
   apply Occ.occ_append. omega.
 assert (Occ.occ v (elts a1) j u = Occ.occ v (elts a1) j (j+1) + Occ.occ v (elts a1) (j+1) u)%Z.
   apply Occ.occ_append. omega.
+
+assert (Occ.occ v (elts a2) l u = Occ.occ v (elts a2) l i + Occ.occ v (elts a2) i u)%Z.
+  apply Occ.occ_append. omega.
+assert (Occ.occ v (elts a2) i u = Occ.occ v (elts a2) i (i+1) + Occ.occ v (elts a2) (i+1) u)%Z.
+  apply Occ.occ_append. omega.
+assert (Occ.occ v (elts a2) (i+1) u = Occ.occ v (elts a2) (i+1) j + Occ.occ v (elts a2) j u)%Z.
+  apply Occ.occ_append. omega.
+assert (Occ.occ v (elts a2) j u = Occ.occ v (elts a2) j (j+1) + Occ.occ v (elts a2) (j+1) u)%Z.
+  apply Occ.occ_append. omega.
+
 assert (Occ.occ v (elts a1) l i = Occ.occ v (elts a2) l i).
   apply Occ.occ_eq. intros. apply he; omega.
+assert (Occ.occ v (elts a1) (i+1) j = Occ.occ v (elts a2) (i+1) j).
+  apply Occ.occ_eq. intros; apply he; omega.
+assert (Occ.occ v (elts a1) (j+1) u = Occ.occ v (elts a2) (j+1) u).
+  apply Occ.occ_eq. intros; apply he; omega.
 
-admit. (*TODO*)
+omega.
 
 (* i = j *)
 destruct c.
@@ -137,9 +188,34 @@ intros k hk.
 assert (c: (k=i \/ k <>i)%Z) by omega. destruct c.
 subst k. assumption.
 apply he. omega. assumption. assumption.
-(* j < i *)
 
-admit. (*TODO*)
+(* j < i *)
+assert (Occ.occ v (elts a1) l u = Occ.occ v (elts a1) l j + Occ.occ v (elts a1) j u)%Z.
+  apply Occ.occ_append. omega.
+assert (Occ.occ v (elts a1) j u = Occ.occ v (elts a1) j (j+1) + Occ.occ v (elts a1) (j+1) u)%Z.
+  apply Occ.occ_append. omega.
+assert (Occ.occ v (elts a1) (j+1) u = Occ.occ v (elts a1) (j+1) i + Occ.occ v (elts a1) i u)%Z.
+  apply Occ.occ_append. omega.
+assert (Occ.occ v (elts a1) i u = Occ.occ v (elts a1) i (i+1) + Occ.occ v (elts a1) (i+1) u)%Z.
+  apply Occ.occ_append. omega.
+
+assert (Occ.occ v (elts a2) l u = Occ.occ v (elts a2) l j + Occ.occ v (elts a2) j u)%Z.
+  apply Occ.occ_append. omega.
+assert (Occ.occ v (elts a2) j u = Occ.occ v (elts a2) j (j+1) + Occ.occ v (elts a2) (j+1) u)%Z.
+  apply Occ.occ_append. omega.
+assert (Occ.occ v (elts a2) (j+1) u = Occ.occ v (elts a2) (j+1) i + Occ.occ v (elts a2) i u)%Z.
+  apply Occ.occ_append. omega.
+assert (Occ.occ v (elts a2) i u = Occ.occ v (elts a2) i (i+1) + Occ.occ v (elts a2) (i+1) u)%Z.
+  apply Occ.occ_append. omega.
+
+assert (Occ.occ v (elts a1) l j = Occ.occ v (elts a2) l j).
+  apply Occ.occ_eq. intros. apply he; omega.
+assert (Occ.occ v (elts a1) (j+1) i = Occ.occ v (elts a2) (j+1) i).
+  apply Occ.occ_eq. intros; apply he; omega.
+assert (Occ.occ v (elts a1) (i+1) u = Occ.occ v (elts a2) (i+1) u).
+  apply Occ.occ_eq. intros; apply he; omega.
+
+omega.
 
 (* eq_sub *)
 red. intros. apply he; omega.
