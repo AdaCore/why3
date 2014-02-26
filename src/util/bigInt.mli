@@ -36,9 +36,6 @@ val gt : t -> t -> bool
 val le : t -> t -> bool
 val ge : t -> t -> bool
 
-val lt_nat: t -> t -> bool
-val lex: t * t -> t * t -> bool
-
 (** Division and modulo operators with the convention
 that modulo is always non-negative.
 
@@ -68,8 +65,3 @@ val pow_int_pos : int -> int -> t
 val of_string : string -> t
 val to_string : t -> string
 val to_int : t -> int
-
-(** for loops *)
-
-val for_loop_to: t -> t -> (t -> unit) -> unit
-val for_loop_downto: t -> t -> (t -> unit) -> unit
