@@ -84,6 +84,10 @@ val restore_path : ident -> string list * string * string list
    different modules, the first association is retained.
    Raises Not_found if the ident was never declared in a module. *)
 
+val restore_module : theory -> modul
+(** retrieves a module from its underlying theory
+    raises [Not_found] if no such module exists *)
+
 (** {2 Use and clone} *)
 
 val use_export : module_uc -> modul -> module_uc

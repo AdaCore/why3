@@ -42,5 +42,9 @@ $(ML): ../sudoku.mlw
 	ocamlc $(WHY3) -annot -g -c $<
 
 clean::
-	rm -f $(ML) *.cm[xio] $(MAIN).opt $(MAIN).byte
+	rm -f $(ML) *.annot *.o *.cm[xio] $(MAIN).opt $(MAIN).byte
+	rm -f sudoku__*.ml why3__*.ml
+	rm -f int__Int.ml map__Map.ml array__Array.ml
+
+
 

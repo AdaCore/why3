@@ -613,19 +613,44 @@ let extract_to ?fname th extract =
   extract file ?old (formatter_of_out_channel cout);
   close_out cout
 
-let do_extract_theory edrv ?fname tname th =
+let extract_to =
+  let visited = Ident.Hid.create 17 in
+  fun ?fname th extract ->
+    if not (Ident.Hid.mem visited th.th_name) then begin
+      Ident.Hid.add visited th.th_name ();
+      extract_to ?fname th extract
+    end
+
+let use_iter f th =
+  List.iter (fun d -> match d.td_node with Use t -> f t | _ -> ()) th.th_decls
+
+let rec do_extract_theory edrv ?fname th =
   let extract file ?old fmt = ignore (old);
+    let tname = th.th_name.Ident.id_string in
     Debug.dprintf Mlw_ocaml.debug "extract theory %s to file %s@." tname file;
     Mlw_ocaml.extract_theory edrv ?old ?fname fmt th
   in
-  extract_to ?fname th extract
+  extract_to ?fname th extract;
+  let extract_use th' =
+    let fname = if th'.th_path = [] then fname else None in
+    do_extract_theory edrv ?fname th' in
+  use_iter extract_use th
 
-let do_extract_module edrv ?fname tname m =
+let rec do_extract_module edrv ?fname m =
   let extract file ?old fmt = ignore (old);
+    let tname = m.Mlw_module.mod_theory.th_name.Ident.id_string in
     Debug.dprintf Mlw_ocaml.debug "extract module %s to file %s@." tname file;
     Mlw_ocaml.extract_module edrv ?old ?fname fmt m
   in
-  extract_to ?fname m.Mlw_module.mod_theory extract
+  extract_to ?fname m.Mlw_module.mod_theory extract;
+  let extract_use th' =
+    let fname = if th'.th_path = [] then fname else None in
+    match
+      try Some (Mlw_module.restore_module th') with Not_found -> None
+    with
+      | Some m' -> do_extract_module edrv ?fname m'
+      | None    -> do_extract_theory edrv ?fname th' in
+  use_iter extract_use m.Mlw_module.mod_theory
 
 let do_global_extract edrv (tname,p,t,_,_) =
   let lib = edrv.Mlw_driver.drv_lib in
@@ -633,15 +658,15 @@ let do_global_extract edrv (tname,p,t,_,_) =
     let mm, thm = Env.read_lib_file lib p in
     try
       let m = Mstr.find t mm in
-      do_extract_module edrv tname m
+      do_extract_module edrv m
     with Not_found ->
       let th = Mstr.find t thm in
-      do_extract_theory edrv tname th
+      do_extract_theory edrv th
   with Env.LibFileNotFound _ | Not_found -> try
     let format = Opt.get_def "why" !opt_parser in
     let env = Env.env_of_library lib in
     let th = Env.read_theory ~format env p t in
-    do_extract_theory edrv tname th
+    do_extract_theory edrv th
   with Env.LibFileNotFound _ | Env.TheoryNotFound _ ->
     eprintf "Theory/module '%s' not found.@." tname;
     exit 1
@@ -651,13 +676,13 @@ let do_extract_theory_from env fname m (tname,_,t,_,_) =
     eprintf "Theory '%s' not found in file '%s'.@." tname fname;
     exit 1
   in
-  do_extract_theory env ~fname tname th
+  do_extract_theory env ~fname th
 
 let do_extract_module_from env fname mm thm (tname,_,t,_,_) =
   try
-    let m = Mstr.find t mm in do_extract_module env ~fname tname m
+    let m = Mstr.find t mm in do_extract_module env ~fname m
   with Not_found -> try
-    let th = Mstr.find t thm in do_extract_theory env ~fname tname th
+    let th = Mstr.find t thm in do_extract_theory env ~fname th
   with Not_found ->
     eprintf "Theory/module '%s' not found in file '%s'.@." tname fname;
     exit 1
@@ -668,9 +693,9 @@ let do_local_extract edrv fname cin tlist =
     let mm, thm = Mlw_main.read_channel lib [] fname cin in
     if Queue.is_empty tlist then begin
       let do_m t m thm =
-        do_extract_module edrv ~fname t m; Mstr.remove t thm in
+        do_extract_module edrv ~fname m; Mstr.remove t thm in
       let thm = Mstr.fold do_m mm thm in
-      Mstr.iter (fun t th -> do_extract_theory edrv ~fname t th) thm
+      Mstr.iter (fun _ th -> do_extract_theory edrv ~fname th) thm
     end else
       Queue.iter (do_extract_module_from edrv fname mm thm) tlist
   end else begin
@@ -678,7 +703,7 @@ let do_local_extract edrv fname cin tlist =
     let m = Env.read_channel ?format:!opt_parser env fname cin in
     if Queue.is_empty tlist then
       let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-      let do_th _ (t,th) = do_extract_theory edrv ~fname t th in
+      let do_th _ (_,th) = do_extract_theory edrv ~fname th in
       Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
     else
       Queue.iter (do_extract_theory_from edrv fname m) tlist

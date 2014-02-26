@@ -36,6 +36,7 @@ $(ML): ../euler001.mlw
 
 clean::
 	rm -f $(ML) *.cm[xio] *.o *.annot $(MAIN).opt $(MAIN).byte
+	rm -f why3__*.ml* euler001__*.ml* int__*.ml*
 
 Makefile: Makefile.in ../../config.status
 	cd ../.. ; ./config.status chmod --file examples/euler001/Makefile

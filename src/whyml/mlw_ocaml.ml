@@ -753,6 +753,8 @@ let rec print_expr ?(paren=false) info fmt e =
         (if dir = To then "to" else "downto")
         (print_pv info) pvfrom (print_pv info) pvto
         (print_pv info) pv (print_expr info) e
+  | Eraise (xs,_) when xs_equal xs xs_exit ->
+      fprintf fmt (protect_on paren "raise Pervasives.Exit")
   | Eraise (xs,e) ->
       begin match query_syntax info.info_syn xs.xs_name with
         | Some s -> syntax_arguments s (print_expr info) fmt [e]
@@ -811,6 +813,8 @@ and print_ebranch info fmt ({ppat_pattern=p}, e) =
 and print_xbranch info fmt (xs, pv, e) =
   begin match query_syntax info.info_syn xs.xs_name with
     | Some s -> syntax_arguments s (print_pv info) fmt [pv]
+    | None when xs_equal xs xs_exit ->
+        fprintf fmt "@[<hov 4>| Pervasives.Exit ->@ %a@]" (print_expr info) e
     | None when ity_equal xs.xs_ity ity_unit ->
         fprintf fmt "@[<hov 4>| %a ->@ %a@]"
           (print_xs info) xs (print_expr info) e
@@ -914,6 +918,7 @@ let print_exn_decl info fmt xs =
       (print_ity info) xs.xs_ity
 
 let print_exn_decl info fmt xs =
+  if not (xs_equal xs xs_exit) then
   if has_syntax info xs.xs_name then
     fprintf fmt "(* symbol %a is overridden by driver *)"
       (print_lident info) xs.xs_name
@@ -990,6 +995,8 @@ let pdecl info fmt pd = match pd.pd_node with
       print_list_next newline (print_pdata_decl info) fmt tl;
       fprintf fmt "@\n@\n";
       print_list nothing (print_pprojections info) fmt tl
+  | PDval (LetV pv) when pv_equal pv Mlw_wp.pv_old ->
+      ()
   | PDval lv ->
       print_val_decl info fmt lv;
       fprintf fmt "@\n@\n"

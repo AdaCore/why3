@@ -175,14 +175,19 @@ let empty_module env n p = {
   muc_env    = env;
 }
 
-let close_module uc =
-  let th = close_theory uc.muc_theory in (* catches errors *)
-  { mod_theory = th;
-    mod_decls  = List.rev uc.muc_decls;
-    mod_export = List.hd uc.muc_export;
-    mod_known  = uc.muc_known;
-    mod_local  = uc.muc_local;
-    mod_used   = uc.muc_used; }
+let close_module, restore_module =
+  let h = Hid.create 17 in
+  (fun uc ->
+     let th = close_theory uc.muc_theory in (* catches errors *)
+     let m = { mod_theory = th;
+               mod_decls  = List.rev uc.muc_decls;
+               mod_export = List.hd uc.muc_export;
+               mod_known  = uc.muc_known;
+               mod_local  = uc.muc_local;
+               mod_used   = uc.muc_used; } in
+     Hid.add h th.th_name m;
+     m),
+  (fun th -> Hid.find h th.th_name)
 
 let get_theory uc = uc.muc_theory
 let get_namespace uc = List.hd uc.muc_import
@@ -386,6 +391,7 @@ let mod_prelude env =
   let pd_exit = create_exn_decl xs_exit in
   let pd_old = create_val_decl (LetV Mlw_wp.pv_old) in
   let uc = empty_module env (id_fresh "Prelude") ["why3"] in
+  let uc = add_decl uc (Decl.create_ty_decl Mlw_wp.ts_mark) in
   let uc = add_pdecl ~wp:false uc pd_old in
   let uc = add_pdecl ~wp:false uc pd_exit in
   close_module uc
