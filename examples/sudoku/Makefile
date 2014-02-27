@@ -30,7 +30,7 @@ $(MAIN).opt: $(CMX) $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../sudoku.mlw
-	../../bin/why3 -E ocaml ../sudoku.mlw -o .
+	../../bin/why3 -E ocaml32 ../sudoku.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(WHY3) -annot -c $<

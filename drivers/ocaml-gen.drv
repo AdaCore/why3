@@ -1,4 +1,7 @@
 
+(* OCaml driver
+   Generic part, for both 32-bit and 64-bit architectures *)
+
 printer "ocaml"
 
 theory BuiltIn
@@ -84,11 +87,11 @@ theory int.Power
 end
 
 theory int.Fact
-  syntax function fact "(Why3__BigInt.fact %1)"
+  syntax function fact "(Why3__IntAux.fact %1)"
 end
 
 theory int.Fibonacci
-  syntax function fib "(Why3__BigInt.fib %1)"
+  syntax function fib "(Why3__IntAux.fib %1)"
 end
 
 (* TODO number.Gcd *)
@@ -147,87 +150,61 @@ module ref.Ref
 end
 
 module array.Array
-  syntax type array "(%1 Why3__BigInt.Array.t)"
-  syntax function ([]) "(Why3__BigInt.Array.get %1 %2)"
-  syntax val ([]) "Why3__BigInt.Array.get"
-  syntax val ([]<-) "Why3__BigInt.Array.set"
-  syntax val length "Why3__BigInt.Array.length"
-  syntax exception OutOfBounds "Why3__BigInt.Array.OutOfBounds"
-  syntax val defensive_get "Why3__BigInt.Array.defensive_get"
-  syntax val defensive_set "Why3__BigInt.Array.defensive_set"
-  syntax val make "Why3__BigInt.Array.make"
-  syntax val append "Why3__BigInt.Array.append"
-  syntax val sub "Why3__BigInt.Array.sub"
-  syntax val copy "Why3__BigInt.Array.copy"
-  syntax val fill "Why3__BigInt.Array.fill"
-  syntax val blit "Why3__BigInt.Array.blit"
+  syntax type array "(%1 Why3__Array.t)"
+
+  syntax function ([]) "(Why3__Array.get %1 %2)"
+
+  syntax exception OutOfBounds "Why3__Array.OutOfBounds"
+
+  syntax val ([])          "Why3__Array.get"
+  syntax val ([]<-)        "Why3__Array.set"
+  syntax val length        "Why3__Array.length"
+  syntax val defensive_get "Why3__Array.defensive_get"
+  syntax val defensive_set "Why3__Array.defensive_set"
+  syntax val make          "Why3__Array.make"
+  syntax val append        "Why3__Array.append"
+  syntax val sub           "Why3__Array.sub"
+  syntax val copy          "Why3__Array.copy"
+  syntax val fill          "Why3__Array.fill"
+  syntax val blit          "Why3__Array.blit"
 end
 
 module mach.int.Int31
   (* even on a 64-bit machine, it is safe to use type int for 31-bit integers *)
+  syntax val       of_int   "Why3__BigInt.to_int"
+  syntax converter of_int   "%1"
+
+  syntax function to_int "(Why3__BigInt.of_int %1)"
+
   syntax type     int31     "int"
-  syntax constant min_int31 "(- 0x4000_0000)"
-  syntax constant max_int31    "0x3fff_ffff"
-  syntax val      of_int    "(fun x -> int_of_string (Num.string_of_num x))"
-                            (* FIXME: use a realization instead? *)
   syntax val      ( + )     "( + )"
   syntax val      ( - )     "( - )"
   syntax val      (-_)      "( ~- )"
   syntax val      ( * )     "( * )"
   syntax val      ( / )     "( / )"
+  syntax val      eq        "(=)"
+  syntax val      ne        "(<>)"
   syntax val      (<=)      "(<=)"
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
   syntax val      (>)       "(>)"
 end
 
-module mach.int.Int32
-  syntax type     int32     "Int32.t"
-  syntax constant min_int32 "Int32.min_int"
-  syntax constant max_int32 "Int32.max_int"
-  syntax val      of_int    "(fun x -> Int32.of_string (Num.string_of_num x))"
-                            (* FIXME: use a realization instead? *)
-  syntax val      (+)       "Int32.add"
-  syntax val      (-)       "Int32.sub"
-  syntax val      (-_)      "Int32.neg"
-  syntax val      ( * )     "Int32.mul"
-  syntax val      (/)       "Int32.div"
-  syntax val      (<=)      "(<=)"
-  syntax val      (<)       "(<)"
-  syntax val      (>=)      "(>=)"
-  syntax val      (>)       "(>)"
-end
+module mach.int.UInt64
+  (* no OCaml library for unsigned 64-bit integers => we use BigInt *)
+  syntax val       of_int   "%1"
+  syntax converter of_int   "(Why3__BigInt.of_string \"%1\")"
 
-module mach.int.Int63
-  (* only safe on a 64-bit machine *)
-  prelude "let () = assert (Sys.word_size = 64)"
-  syntax type     int63     "int"
-  syntax constant min_int63 "(- 0x4000_0000_0000_0000)"
-  syntax constant max_int63    "0x3fff_ffff_ffff_ffff"
-  syntax val      of_int    "(fun x -> int_of_string (Num.string_of_num x))"
-                            (* FIXME: use a realization instead? *)
-  syntax val      ( + )     "( + )"
-  syntax val      ( - )     "( - )"
-  syntax val      (-_)      "( ~- )"
-  syntax val      ( * )     "( * )"
-  syntax val      ( / )     "( / )"
-  syntax val      (<=)      "(<=)"
-  syntax val      (<)       "(<)"
-  syntax val      (>=)      "(>=)"
-  syntax val      (>)       "(>)"
-end
+  syntax function to_int "%1"
 
-module mach.int.Int64
-  syntax type     int64     "Int64.t"
-  syntax constant min_int64 "Int64.min_int"
-  syntax constant max_int64 "Int64.max_int"
-  syntax val      of_int    "(fun x -> Int64.of_string (Num.string_of_num x))"
-                            (* FIXME: use a realization instead? *)
-  syntax val      (+)       "Int64.add"
-  syntax val      (-)       "Int64.sub"
-  syntax val      (-_)      "Int64.neg"
-  syntax val      ( * )     "Int64.mul"
-  syntax val      (/)       "Int64.div"
+  syntax type     uint64    "Why3__BigInt.t"
+  syntax val      ( + )     "Why3__BigInt.add"
+  syntax val      ( - )     "Why3__BigInt.sub"
+  syntax val      (-_)      "Why3__BigInt.minus"
+  syntax val      ( * )     "Why3__BigInt.mul"
+  syntax val      ( / )     "Why3__BigInt.computer_div"
+  syntax val      eq        "(=)"
+  syntax val      ne        "(<>)"
   syntax val      (<=)      "(<=)"
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
@@ -235,7 +212,8 @@ module mach.int.Int64
 end
 
 module mach.array.Array31
-  syntax type array  "array"
+  syntax type array  "(%1 array)"
+
   syntax val  make   "Array.make"
   syntax val  ([])   "Array.get"
   syntax val  ([]<-) "Array.set"
@@ -249,6 +227,5 @@ module mach.array.Array31
 end
 
 (* TODO
-   - OutOfBounds, defensive_get, defensive_set in mach.array.in Array31
    - mach.array.Array32  -> Bigarray sur 32-bit / Array sur 64-bit ?
 *)

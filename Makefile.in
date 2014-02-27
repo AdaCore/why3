@@ -167,13 +167,13 @@ $(LIBDEP): $(LIBGENERATED)
 
 ifeq (@enable_zarith@,yes)
 
-lib/ocaml/why3__BigInt.ml: config.status lib/ocaml/bigInt_zarith.ml
-	cp lib/ocaml/bigInt_zarith.ml lib/ocaml/why3__BigInt.ml
+lib/ocaml/why3__BigInt.ml: config.status lib/ocaml/why3__BigInt_zarith.ml
+	cp lib/ocaml/why3__BigInt_zarith.ml $@
 
 else
 
-lib/ocaml/why3__BigInt.ml: config.status src/util/bigInt.ml
-	cp lib/ocaml/bigInt_num.ml lib/ocaml/why3__BigInt.ml
+lib/ocaml/why3__BigInt.ml: config.status lib/ocaml/why3__BigInt_num.ml
+	cp lib/ocaml/why3__BigInt_num.ml $@
 
 endif
 
@@ -1199,7 +1199,7 @@ clean::
 # Ocaml realizations
 #######################
 
-OCAMLLIBS_FILES = why3__BigInt why3__Prelude why3__Map
+OCAMLLIBS_FILES = why3__BigInt why3__IntAux why3__Array why3__Map
 
 OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
 
@@ -1364,10 +1364,11 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
 	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
 	$(MAKE) test-api-mlw.@OCAMLBEST@
 	$(MAKE) test-session.@OCAMLBEST@
+	$(MAKE) test-ocaml-extraction
 	# desactivé car requiert findlib
 	# if test -d examples/runstrat ; then \
 	#  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
-	sh bench/bench "bin/why3.@OCAMLBEST@"
+	bash bench/bench "bin/why3.@OCAMLBEST@"
 	@if test "@enable_coq_tactic@" = "yes"; then \
 	   echo "=== checking the Coq tactic ==="; \
 	   $(MAKE) test-coq-tactic.@OCAMLBEST@; fi
@@ -1484,6 +1485,25 @@ test-runstrat.opt: lib/why3/why3.cmxa lib/why3/META
 	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat opt
 
 test-runstrat: test-runstrat.$(OCAMLBEST)
+
+test-ocaml-extraction: bin/why3.opt lib/why3/why3extract.cmxa
+	@echo "driver ocaml32"
+	@mkdir -p tests/test-extraction
+	@cd tests ; ../bin/why3.opt -E ocaml32 \
+	  test_extraction.mlw -o test-extraction
+	@cd tests/test-extraction/ ; \
+	  $(OCAMLOPT) @BIGINTINCLUDE@ -I ../../lib/why3 \
+	  @BIGINTLIB@.cmxa why3extract.cmxa \
+	  ref__Refint.ml test_extraction__TestExtraction.ml main.ml
+	@tests/test-extraction/a.out
+	@echo "driver ocaml64"
+	@cd tests ; ../bin/why3.opt -E ocaml64 \
+	  test_extraction.mlw -o test-extraction
+	@cd tests/test-extraction/ ; \
+	  $(OCAMLOPT) @BIGINTINCLUDE@ -I ../../lib/why3 \
+	  @BIGINTLIB@.cmxa why3extract.cmxa \
+	  ref__Refint.ml test_extraction__TestExtraction.ml main.ml
+	@tests/test-extraction/a.out
 
 ################
 # documentation

@@ -1,0 +1,84 @@
+
+(* OCaml driver for 32-bit architecture *)
+
+import "ocaml-gen.drv"
+
+module mach.int.Int32
+  syntax val of_int "Why3__BigInt.to_int32"
+  syntax converter of_int "%1l"
+
+  syntax function to_int "(Why3__BigInt.of_int32 %1)"
+
+  syntax type     int32     "Int32.t"
+  syntax val      (+)       "Int32.add"
+  syntax val      (-)       "Int32.sub"
+  syntax val      (-_)      "Int32.neg"
+  syntax val      ( * )     "Int32.mul"
+  syntax val      (/)       "Int32.div"
+  syntax val      eq        "(=)"
+  syntax val      ne        "(<>)"
+  syntax val      (<=)      "(<=)"
+  syntax val      (<)       "(<)"
+  syntax val      (>=)      "(>=)"
+  syntax val      (>)       "(>)"
+end
+
+module mach.int.UInt32
+  syntax val of_int "Why3__BigInt.to_int64"
+  syntax converter of_int "%1L"
+
+  syntax function to_int "(Why3__BigInt.of_int64 %1)"
+
+  syntax type     uint32    "Int64.t"
+  syntax val      (+)       "Int64.add"
+  syntax val      (-)       "Int64.sub"
+  syntax val      (-_)      "Int64.neg"
+  syntax val      ( * )     "Int64.mul"
+  syntax val      (/)       "Int64.div"
+  syntax val      eq        "(=)"
+  syntax val      ne        "(<>)"
+  syntax val      (<=)      "(<=)"
+  syntax val      (<)       "(<)"
+  syntax val      (>=)      "(>=)"
+  syntax val      (>)       "(>)"
+end
+
+module mach.int.Int63
+  syntax val of_int "Why3__BigInt.to_int64"
+  syntax converter of_int "%1L"
+
+  syntax function to_int "(Why3__BigInt.of_int64 %1)"
+
+  syntax type     int63     "Int64.t"
+  syntax val      (+)       "Int64.add"
+  syntax val      (-)       "Int64.sub"
+  syntax val      (-_)      "Int64.neg"
+  syntax val      ( * )     "Int64.mul"
+  syntax val      (/)       "Int64.div"
+  syntax val      eq        "(=)"
+  syntax val      ne        "(<>)"
+  syntax val      (<=)      "(<=)"
+  syntax val      (<)       "(<)"
+  syntax val      (>=)      "(>=)"
+  syntax val      (>)       "(>)"
+end
+
+module mach.int.Int64
+  syntax val of_int "Why3__BigInt.to_int64"
+  syntax converter of_int "%1L"
+
+  syntax function to_int "(Why3__BigInt.of_int64 %1)"
+
+  syntax type     int64     "Int64.t"
+  syntax val      (+)       "Int64.add"
+  syntax val      (-)       "Int64.sub"
+  syntax val      (-_)      "Int64.neg"
+  syntax val      ( * )     "Int64.mul"
+  syntax val      (/)       "Int64.div"
+  syntax val      eq        "(=)"
+  syntax val      ne        "(<>)"
+  syntax val      (<=)      "(<=)"
+  syntax val      (<)       "(<)"
+  syntax val      (>=)      "(>=)"
+  syntax val      (>)       "(>)"
+end

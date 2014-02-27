@@ -27,6 +27,7 @@ type driver = {
   drv_thprelude   : Printer.prelude_map;
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
+  drv_converter   : Printer.syntax_map;
 }
 
 let load_file file =
@@ -78,6 +79,7 @@ let load_driver lib file extra_files =
 
   let thprelude = ref Mid.empty in
   let syntax_map = ref Mid.empty in
+  let converter_map = ref Mid.empty in
   let qualid    = ref [] in
 
   let find_pr th (loc,q) = try Theory.ns_find_pr th.th_export q
@@ -96,6 +98,7 @@ let load_driver lib file extra_files =
     let ls = find_ls th q in
     if ls.ls_value <> None then raise (PSymExpected ls) else ls in
   let add_syntax id s = syntax_map := Mid.add id s !syntax_map in
+  let add_converter id s = converter_map := Mid.add id s !converter_map in
   let add_local th = function
     | Rprelude s ->
         let l = Mid.find_def [] th.th_name !thprelude in
@@ -161,6 +164,9 @@ let load_driver lib file extra_files =
     | MRval (q,s) ->
         let id = find_val m q in
         add_syntax id s
+    | MRconverter (q,s) ->
+        let id = find_val m q in
+        add_converter id s
   in
   let add_local_module m (loc,rule) =
     try add_local_module loc m rule with e -> raise (Loc.Located (loc,e))
@@ -197,6 +203,7 @@ let load_driver lib file extra_files =
     drv_thprelude   = Mid.map List.rev !thprelude;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_syntax      = !syntax_map;
+    drv_converter   = !converter_map;
   }
 
 

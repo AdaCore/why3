@@ -1,0 +1,79 @@
+
+(* test of the OCaml extraction
+   run "make test-ocaml-extraction" from the top directory *)
+
+module TestExtraction
+
+  use import int.Int
+  use import int.ComputerDivision
+  let f (x: int) : int = x+1
+  let test_int () = f 31 + (div 33 3 + 2 - 4) - -1
+
+  use import mach.int.Int31
+  let f31 (x: int31) : int31 = x + of_int 1
+  let test_int31 () =
+    to_int (f31 (of_int 31) +
+      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
+
+  use import mach.int.Int32
+  let f32 (x: int32) : int32 = x + of_int 1
+  let test_int32 () =
+    to_int (f32 (of_int 31) +
+      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
+
+  use import mach.int.UInt32
+  let fu32 (x: uint32) : uint32 = x + of_int 1
+  let test_uint32 () =
+    to_int (fu32 (of_int 31) +
+      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
+
+  use import mach.int.Int63
+  let f63 (x: int63) : int63 = x + of_int 1
+  let test_int63 () =
+    to_int (f63 (of_int 31) +
+      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
+
+  use import mach.int.Int64
+  let f64 (x: int64) : int64 = x + of_int 1
+  let test_int64 () =
+    to_int (f64 (of_int 31) +
+      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
+
+  use import mach.int.UInt64
+  let fu64 (x: uint64) : uint64 = x + of_int 1
+  let test_uint64 () =
+    to_int (fu64 (of_int 31) +
+      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
+
+  use import int.Int
+  use import ref.Ref
+  use import ref.Refint
+
+  let test_ref () : int =
+    let r = ref 0 in
+    incr r;
+    r := !r * 43;
+    decr r;
+    !r
+
+  use import array.Array
+
+  let test_array () =
+    let a = Array.make 43 0 in
+    for i = 1 to 42 do a[i] <- a[i-1] + 1 done;
+    a[42]
+
+  use import mach.array.Array31
+
+  let test_array31 () : int =
+    let a = Array31.make (Int31.of_int 43) 0 in
+    for i = 1 to 42 do a[Int31.of_int i] <- a[Int31.of_int (i - 1)] + 1 done;
+    a[Int31.of_int 42]
+
+end
+
+(*
+Local Variables:
+compile-command: "why3 --type-only test_extraction.mlw && make -C .. test-ocaml-extraction"
+End:
+*)

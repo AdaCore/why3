@@ -40,10 +40,6 @@ let modulename ?fname path t =
 let extract_filename ?fname th =
   (modulename ?fname th.th_path th.th_name.Ident.id_string) ^ ".ml"
 
-(* let modulename path t = *)
-(*   String.capitalize *)
-(*     (if path = [] then "why3__" ^ t else String.concat "__" path ^ "__" ^ t) *)
-
 (** Printers *)
 
 let ocaml_keywords =
@@ -77,12 +73,12 @@ let forget_tvs () =
 
 type info = {
   info_syn: syntax_map;
+  converters: syntax_map;
   current_theory: Theory.theory;
   current_module: Mlw_module.modul option;
   th_known_map: Decl.known_map;
   mo_known_map: Mlw_decl.known_map;
   fname: string option;
-  (* symbol_printers : (string * ident_printer) Mid.t; *)
 }
 
 let is_constructor info ls =
@@ -584,9 +580,9 @@ let logic_decl info fmt td = match td.td_node with
 
 let extract_theory drv ?old ?fname fmt th =
   ignore (old); ignore (fname);
-  let sm = drv.Mlw_driver.drv_syntax in
   let info = {
-    info_syn = sm;
+    info_syn = drv.Mlw_driver.drv_syntax;
+    converters = drv.Mlw_driver.drv_converter;
     current_theory = th;
     current_module = None;
     th_known_map = th.th_known;
@@ -701,6 +697,13 @@ let rec flatten_block e right = match e.e_node with
 (* printing WhyML expressions in OCaml syntax
    optional argument [paren] requires surrounding parentheses when necessary *)
 
+let is_int_constant e = match e.e_node with
+  | Elogic { t_node = Tconst (ConstInt _) } -> true
+  | _ -> false
+let get_int_constant e = match e.e_node with
+  | Elogic { t_node = Tconst (ConstInt n) } -> n
+  | _ -> assert false
+
 let rec print_expr ?(paren=false) info fmt e =
   if e.e_ghost then
     fprintf fmt "(* ghost *)"
@@ -713,6 +716,16 @@ let rec print_expr ?(paren=false) info fmt e =
       begin match query_syntax info.info_syn a.ps_name with
         | Some s -> syntax_arguments s (print_expr ~paren:true info) fmt []
         | None   -> print_ps info fmt a end
+  (* converter *)
+  | Elet ({ let_sym = LetV pv; let_expr = e1 },
+          { e_node = Eapp ({ e_node = Earrow a }, pv', _) })
+    when pv_equal pv' pv
+    && Mid.mem a.ps_name info.converters && is_int_constant e1 ->
+      let s = Mid.find a.ps_name info.converters in
+      let print_arg fmt e1 =
+        let n = Number.compute_int (get_int_constant e1) in
+        fprintf fmt "%s" (BigInt.to_string n) in
+      syntax_arguments s print_arg fmt [e1]
   | Eapp (e,v,_) ->
       fprintf fmt (protect_on paren "%a@ %a")
         (print_expr info) e (print_pv info) v
@@ -749,7 +762,7 @@ let rec print_expr ?(paren=false) info fmt e =
       fprintf fmt "@[<hv>while true do@;<1 2>@[%a@]@ done@]" (print_expr info) e
   | Efor (pv,(pvfrom,dir,pvto),_,e) ->
       fprintf fmt
-        "@[<hov 2>(Why3__BigInt.for_loop_%s %a %a@ (fun %a -> %a))@]"
+        "@[<hov 2>(Why3__IntAux.for_loop_%s %a %a@ (fun %a -> %a))@]"
         (if dir = To then "to" else "downto")
         (print_pv info) pvfrom (print_pv info) pvto
         (print_pv info) pv (print_expr info) e
@@ -1018,10 +1031,10 @@ let pdecl info fmt pd = match pd.pd_node with
 
 let extract_module drv ?old ?fname fmt m =
   ignore (old); ignore (fname);
-  let sm = drv.Mlw_driver.drv_syntax in
   let th = m.mod_theory in
   let info = {
-    info_syn = sm;
+    info_syn = drv.Mlw_driver.drv_syntax;
+    converters = drv.Mlw_driver.drv_converter;
     current_theory = th;
     current_module = Some m;
     th_known_map = th.th_known;

@@ -52,6 +52,7 @@
         "module", MODULE;
         "exception", EXCEPTION;
         "val", VAL;
+        "converter", CONVERTER;
       ]
 
 }

@@ -16,6 +16,7 @@ type driver = private {
   drv_thprelude   : Printer.prelude_map;
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
+  drv_converter   : Printer.syntax_map;
 }
 
 val load_driver :

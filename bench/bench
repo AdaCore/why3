@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # auto bench for why
 
@@ -40,7 +40,7 @@ bads () {
 
 drivers () {
     for f in $1/*.drv; do
-        if [ $f = "drivers/ocaml.drv" ]; then continue; fi
+        if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
 	echo -n "  $f... "
 	# running Why
 	if ! echo "theory Test goal G : 1=2 end" | $pgm -F why --driver $f - > /dev/null 2>&1; then
@@ -96,8 +96,8 @@ extract_and_run () {
            fi
         else
             echo "compilation failed!"
-            echo make -C $1 
-            make -C $1 
+            echo make -C $1
+            make -C $1
             exit 1
         fi
     else
@@ -118,7 +118,6 @@ list_stuff () {
         exit 1
     fi
 }
-
 
 echo "=== Checking theories ==="
 goods theories
