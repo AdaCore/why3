@@ -23,7 +23,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../euler001.mlw
-	../../bin/why3 -E ocaml ../euler001.mlw -o .
+	../../bin/why3 -E ocaml32 ../euler001.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<
