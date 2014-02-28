@@ -368,6 +368,24 @@ file. If a theory is supposed to be reused from other files, be they
 \why\ or \whyml\ files, it should be defined in a \why\ file.
 
 
+\section{The \why Standard Library}
+\label{sec:library}\index{standard library}\index{library}
+
+The \why standard library provides general-purpose theories and
+modules, to be used in logic and/or programs.
+It can be browsed on-line at \url{http://why3.lri.fr/stdlib/}.
+Each file contains one or several theories and/or modules.
+To \texttt{use} or \texttt{clone} a theory/module \texttt{T} from file
+\texttt{file}, use the syntax \texttt{file.T}, since \texttt{file} is
+available in \why's default load path. For instance, the theory of
+integers and the module of references are imported as follows:
+
+\begin{whycode}
+  use import int.Int
+  use import ref.Ref
+\end{whycode}
+
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-PDF-mode: t
