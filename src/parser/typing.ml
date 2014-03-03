@@ -203,39 +203,59 @@ let chainable_op uc op =
 
 type global_vs = Ptree.qualid -> vsymbol option
 
+let mk_closure loc ls =
+  let mk dt = Dterm.dterm ~loc dt in
+  let id = id_user "fc" loc and dty = dty_fresh () in
+  let mk_v i _ =
+    id_user ("y" ^ string_of_int i) loc, dty_fresh () in
+  let mk_t (id, dty) = mk (DTvar (id.pre_name, dty)) in
+  let vl = Lists.mapi mk_v ls.ls_args in
+  let tl = List.map mk_t vl in
+  let app e1 e2 = DTapp (fs_func_app, [mk e1; e2]) in
+  let e = List.fold_left app (DTvar ("fc", dty)) tl in
+  let f = DTapp (ps_equ, [mk e; mk (DTapp (ls, tl))]) in
+  DTeps (id, dty, mk (DTquant (Tforall, vl, [], mk f)))
+
 let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
-  let func_app loc e el =
-    let app (loc, e) e1 = Loc.join loc e1.pp_loc,
-      DTfapp (Dterm.dterm ~loc e, dterm uc gvars denv e1) in
-    snd (List.fold_left app (loc, e) el)
+  let func_app e el =
+    List.fold_left (fun e1 (loc, e2) ->
+      DTfapp (Dterm.dterm ~loc e1, e2)) e el
   in
-  let rec take loc al l el = match l, el with
-    | (_::l), (e::el) ->
-        take (Loc.join loc e.pp_loc) (dterm uc gvars denv e :: al) l el
-    | _, _ -> loc, List.rev al, el
+  let rec apply_ls loc ls al l el = match l, el with
+    | (_::l), (e::el) -> apply_ls loc ls (e::al) l el
+    | [], _ -> func_app (DTapp (ls, List.rev_map snd al)) el
+    | _, [] -> func_app (mk_closure loc ls) (List.rev_append al el)
   in
-  let qualid_app loc q el = match gvars q with
-    | Some vs ->
-        func_app loc (DTgvar vs) el
+  let qualid_app q el = match gvars q with
+    | Some vs -> func_app (DTgvar vs) el
     | None ->
         let ls = find_lsymbol uc q in
-        let loc, al, el = take loc [] ls.ls_args el in
-        func_app loc (DTapp (ls,al)) el
+        apply_ls (qloc q) ls [] ls.ls_args el
   in
-  let qualid_app loc q el = match q with
+  let qualid_app q el = match q with
     | Qident {id = n} ->
         (match denv_get_opt denv n with
-        | Some d -> func_app loc d el
-        | None -> qualid_app loc q el)
-    | _ -> qualid_app loc q el
+        | Some d -> func_app d el
+        | None -> qualid_app q el)
+    | _ -> qualid_app q el
+  in
+  let rec unfold_app e1 e2 el = match e1.pp_desc with
+    | PPapply (e11,e12) ->
+        let e12 = dterm uc gvars denv e12 in
+        unfold_app e11 e12 ((e1.pp_loc, e2)::el)
+    | PPident q ->
+        qualid_app q ((e1.pp_loc, e2)::el)
+    | _ ->
+        func_app (DTfapp (dterm uc gvars denv e1, e2)) el
   in
   Dterm.dterm ~loc (match desc with
   | PPident q ->
-      qualid_app loc q []
+      qualid_app q []
   | PPidapp (q, tl) ->
-      qualid_app (qloc q) q tl
+      let tl = List.map (dterm uc gvars denv) tl in
+      DTapp (find_lsymbol uc q, tl)
   | PPapply (e1, e2) ->
-      DTfapp (dterm uc gvars denv e1, dterm uc gvars denv e2)
+      unfold_app e1 (dterm uc gvars denv e2) []
   | PPtuple tl ->
       let tl = List.map (dterm uc gvars denv) tl in
       DTapp (fs_tuple (List.length tl), tl)

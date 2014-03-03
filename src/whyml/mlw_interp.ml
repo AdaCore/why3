@@ -23,13 +23,11 @@ open Mlw_ty
 open Mlw_ty.T
 open Mlw_expr
 
-module Nummap =
-  Map.Make(struct type t = Big_int.big_int
-                  let compare = Big_int.compare_big_int end)
+module Nummap = Map.Make(BigInt)
 
 type value =
   | Vapp of lsymbol * value list
-  | Vnum of Big_int.big_int
+  | Vnum of BigInt.t
   | Vbool of bool
   | Vvoid
   | Vreg of region
@@ -52,7 +50,7 @@ let array_cons_ls = ref ps_equ
 let rec print_value fmt v =
   match v with
   | Vnum n ->
-    fprintf fmt "%s" (Big_int.string_of_big_int n)
+    fprintf fmt "%s" (BigInt.to_string n)
   | Vbool b ->
     fprintf fmt "%b" b
   | Vvoid ->
@@ -62,21 +60,21 @@ let rec print_value fmt v =
     fprintf fmt "@[[def=%a" print_value def;
     Nummap.iter
       (fun i v ->
-        fprintf fmt ",@ %s -> %a" (Big_int.string_of_big_int i) print_value v)
+        fprintf fmt ",@ %s -> %a" (BigInt.to_string i) print_value v)
       m;
     fprintf fmt "]@]"
   | Vapp(ls,[Vnum len;Vmap(def,m)]) when ls_equal ls !array_cons_ls ->
     fprintf fmt "@[[";
-    let i = ref Big_int.zero_big_int in
-    while Big_int.lt_big_int !i len do
+    let i = ref BigInt.zero in
+    while BigInt.lt !i len do
       let v =
         try Nummap.find !i m
         with Not_found -> def
       in
-      if Big_int.gt_big_int !i Big_int.zero_big_int
+      if BigInt.gt !i BigInt.zero
       then fprintf fmt ",@ ";
       fprintf fmt "%a" print_value v;
-      i := Big_int.succ_big_int !i
+      i := BigInt.succ !i
     done;
     fprintf fmt "]@]"
   | Vapp(ls,vl) ->
@@ -132,6 +130,7 @@ let v_if v t1 t2 = Vif(v,t1,t2)
 type env = {
   mknown : Mlw_decl.known_map;
   tknown : Decl.known_map;
+  funenv : Mlw_expr.fun_defn Mps.t;
   regenv : region Mreg.t;
   vsenv : value Mvs.t;
 }
@@ -166,7 +165,7 @@ let print_regenv fmt s =
 
 let get_reg env r =
   let rec aux n r =
-    if n > 1000 then 
+    if n > 1000 then
       begin
         eprintf "@[<hov 2>looping region association ??? regenv =@ %a@]@."
           print_regenv env.regenv;
@@ -228,22 +227,6 @@ let rec matching env (t:value) p =
 
 (* builtin symbols *)
 
-let computer_div_mod_big_int x y =
-  let q,r = Big_int.quomod_big_int x y in
-  (* we have x = q*y + r with 0 <= r < |y| *)
-  if Big_int.sign_big_int x < 0 then
-    if Big_int.sign_big_int y < 0 then
-      (Big_int.pred_big_int q, Big_int.add_big_int r y)
-    else
-      (Big_int.succ_big_int q, Big_int.sub_big_int r y)
-  else (q,r)
-
-let computer_div_big_int x y =
-  fst (computer_div_mod_big_int x y)
-
-let computer_mod_big_int x y =
-  snd (computer_div_mod_big_int x y)
-
 let builtins = Hls.create 17
 
 let ls_minus = ref ps_equ (* temporary *)
@@ -300,7 +283,7 @@ let must_be_true b =
 
 let rec value_equality v1 v2 =
   match (v1,v2) with
-    | Vnum i1, Vnum i2 -> Big_int.eq_big_int i1 i2
+    | Vnum i1, Vnum i2 -> BigInt.eq i1 i2
     | Vbool b1, Vbool b2 -> b1 == b2
     | Vapp(ls1,vl1), Vapp(ls2,vl2) ->
       must_be_true (ls_equal ls1 ls2 && List.for_all2 value_equality vl1 vl2)
@@ -421,26 +404,26 @@ let built_in_theories =
       "False", None, eval_false ;
     ] ;
     ["int"],"Int", [],
-    [ "infix +", None, eval_int_op Big_int.add_big_int;
-      "infix -", None, eval_int_op Big_int.sub_big_int;
-      "infix *", None, eval_int_op Big_int.mult_big_int;
-      "prefix -", Some ls_minus, eval_int_uop Big_int.minus_big_int;
-      "infix <", None, eval_int_rel Big_int.lt_big_int;
-      "infix <=", None, eval_int_rel Big_int.le_big_int;
-      "infix >", None, eval_int_rel Big_int.gt_big_int;
-      "infix >=", None, eval_int_rel Big_int.ge_big_int;
+    [ "infix +", None, eval_int_op BigInt.add;
+      "infix -", None, eval_int_op BigInt.sub;
+      "infix *", None, eval_int_op BigInt.mul;
+      "prefix -", Some ls_minus, eval_int_uop BigInt.minus;
+      "infix <", None, eval_int_rel BigInt.lt;
+      "infix <=", None, eval_int_rel BigInt.le;
+      "infix >", None, eval_int_rel BigInt.gt;
+      "infix >=", None, eval_int_rel BigInt.ge;
     ] ;
     ["int"],"MinMax", [],
-    [ "min", None, eval_int_op Big_int.min_big_int;
-      "max", None, eval_int_op Big_int.max_big_int;
+    [ "min", None, eval_int_op BigInt.min;
+      "max", None, eval_int_op BigInt.max;
     ] ;
     ["int"],"ComputerDivision", [],
-    [ "div", None, eval_int_op computer_div_big_int;
-      "mod", None, eval_int_op computer_mod_big_int;
+    [ "div", None, eval_int_op BigInt.computer_div;
+      "mod", None, eval_int_op BigInt.computer_mod;
     ] ;
     ["int"],"EuclideanDivision", [],
-    [ "div", None, eval_int_op Big_int.div_big_int;
-      "mod", None, eval_int_op Big_int.mod_big_int;
+    [ "div", None, eval_int_op BigInt.euclidean_div;
+      "mod", None, eval_int_op BigInt.euclidean_mod;
     ] ;
     ["map"],"Map", ["map", builtin_map_type],
     [ "const", Some ls_map_const, eval_map_const;
@@ -565,7 +548,7 @@ let rec any_value_of_type env ty =
   | Ty.Tyvar _ -> assert false
   | Ty.Tyapp(ts,_) when Ty.ts_equal ts Ty.ts_int ->
     let n = Random.int 199 - 99 in
-    Vnum (Big_int.big_int_of_int n)
+    Vnum (BigInt.of_int n)
   | Ty.Tyapp(ts,_) when Ty.ts_equal ts Ty.ts_real ->
     Vvoid (* FIXME *)
   | Ty.Tyapp(ts,_) when Ty.ts_equal ts Ty.ts_bool ->
@@ -914,7 +897,7 @@ and eval_app env s ls tl =
                           iter3 prs tl1
                       | None::prs, _::tl1 ->
                         iter3 prs tl1
-                      | _ -> assert false
+                      | _ -> Vapp(ls,tl)
                     in iter3 prs tl1
                   else iter2 rem2
               in iter2 csl
@@ -936,6 +919,7 @@ let eval_global_term env km t =
   let env =
     { mknown = Ident.Mid.empty;
       tknown = km;
+      funenv = Mps.empty;
       regenv = Mreg.empty;
       vsenv = Mvs.empty;
     }
@@ -1028,6 +1012,12 @@ let print_result env s fmt r =
 
 (* evaluation of WhyML expressions *)
 
+let find_definition env ps =
+  try
+    Some (Mps.find ps env.funenv)
+  with
+      Not_found ->
+        Mlw_decl.find_definition env.mknown ps 
 
 
 (* evaluate expressions *)
@@ -1140,12 +1130,12 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
         let a = big_int_of_value (get_pvs env (*s*) pvs1) in
         let b = big_int_of_value (get_pvs env (*s*) pvs2) in
         let le,suc = match dir with
-          | To -> Big_int.le_big_int, Big_int.succ_big_int
-          | DownTo -> Big_int.ge_big_int, Big_int.pred_big_int
+          | To -> BigInt.le, BigInt.succ
+          | DownTo -> BigInt.ge, BigInt.pred
         in
         let rec iter i s =
           Debug.dprintf debug "[interp] for loop with index = %s@."
-            (Big_int.string_of_big_int i);
+            (BigInt.to_string i);
           if le i b then
             let env' = bind_vs pvs.pv_vs (Vnum i) env in
             match eval_expr env' s e1 with
@@ -1207,7 +1197,14 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Eghost e1 ->
     (* TODO: do not eval ghost if no assertion check *)
     eval_expr env s e1
-  | Erec _
+  | Erec (defs,e1) ->
+    let env' =
+      { env with funenv =
+          List.fold_left
+            (fun acc d -> Mps.add d.fun_ps d acc) env.funenv defs
+      }
+    in
+    eval_expr env' s e1
   | Eany _
   | Eabstr _
   | Eabsurd ->
@@ -1242,7 +1239,7 @@ and exec_app env s ps args (*spec*) ity_result =
   let env1 = { env with regenv =
       Mreg.union (fun _ x _ -> Some x) subst env.regenv }
   in
-  match Mlw_decl.find_definition env.mknown ps with
+  match find_definition env ps with
     | Some d ->
       let lam = d.fun_lambda in
       let env' = multibind_pvs lam.l_args args' env1 in
@@ -1282,9 +1279,6 @@ and exec_app env s ps args (*spec*) ity_result =
 
 
 
-(*
-let default_fixme = Vnum (Big_int.big_int_of_string "424242")
-*)
 
 let eval_global_expr env mkm tkm _writes e =
 (*
@@ -1296,6 +1290,7 @@ let eval_global_expr env mkm tkm _writes e =
   let env = {
     mknown = mkm;
     tknown = tkm;
+    funenv = Mps.empty;
     regenv = Mreg.empty;
     vsenv = Mvs.empty;
   }
@@ -1316,6 +1311,7 @@ let eval_global_expr env mkm tkm _writes e =
   let env = {
     mknown = mkm;
     tknown = tkm;
+    funenv = Mps.empty;
     regenv = Mreg.empty;
     vsenv = init_env;
   }

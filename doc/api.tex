@@ -289,7 +289,7 @@ constructed.
 Here is the way we build the formula $2+2=4$. The main difficulty is to
 access the internal identifier for addition: it must be retrieved from
 the standard theory \texttt{Int} of the file \texttt{int.why} (see
-Chap~\ref{chap:library}).
+Chap~\ref{sec:library}).
 \begin{ocamlcode}
 let two : Term.term = 
   Term.t_const (Number.ConstInt (Number.int_const_dec "2"))

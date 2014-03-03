@@ -4,6 +4,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require map.Map.
+Require map.MapInjection.
 Require map.MapPermut.
 
 (* Why3 assumption *)
@@ -56,24 +57,6 @@ Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (@array a a_WT) :=
   (mk_array n (map.Map.const v:(@map.Map.map Z _ a a_WT))).
 
 (* Why3 assumption *)
-Definition injective (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z)
-  (j:Z), ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
-  ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
-
-(* Why3 assumption *)
-Definition surjective (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\
-  ((map.Map.get a j) = i).
-
-(* Why3 assumption *)
-Definition range (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
-  ((map.Map.get a i) < n)%Z).
-
-Axiom injective_surjective : forall (a:(@map.Map.map Z _ Z _)) (n:Z),
-  (injective a n) -> ((range a n) -> (surjective a n)).
-
-(* Why3 assumption *)
 Definition is_common_prefix (a:(@array Z _)) (x:Z) (y:Z) (l:Z): Prop :=
   (0%Z <= l)%Z /\ (((x + l)%Z <= (length a))%Z /\
   (((y + l)%Z <= (length a))%Z /\ forall (i:Z), ((0%Z <= i)%Z /\
@@ -100,34 +83,23 @@ Definition lt (a:(@array Z _)) (x:Z) (y:Z): Prop := let n := (length a) in
   (((x + l)%Z = n) \/ ((get a (x + l)%Z) < (get a (y + l)%Z))%Z)))).
 
 (* Why3 assumption *)
-Definition range1 (a:(@array Z _)): Prop := (range (elts a) (length a)).
+Definition range (a:(@array Z _)): Prop := (map.MapInjection.range (elts a)
+  (length a)).
 
 (* Why3 assumption *)
-Definition exchange {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)) (i:Z) (j:Z): Prop := (map.MapPermut.exchange (elts a1)
-  (elts a2) i j).
+Definition exchange {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _ a a_WT))
+  (a2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z) (i:Z) (j:Z): Prop :=
+  ((l <= i)%Z /\ (i < u)%Z) /\ (((l <= j)%Z /\ (j < u)%Z) /\
+  (((map.Map.get a1 i) = (map.Map.get a2 j)) /\ (((map.Map.get a1
+  j) = (map.Map.get a2 i)) /\ forall (k:Z), ((l <= k)%Z /\ (k < u)%Z) ->
+  ((~ (k = i)) -> ((~ (k = j)) -> ((map.Map.get a1 k) = (map.Map.get a2
+  k))))))).
 
-(* Why3 assumption *)
-Definition permut_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := (map.MapPermut.permut_sub
-  (elts a1) (elts a2) l u).
-
-(* Why3 assumption *)
-Definition permut {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (a2:(@array
-  a a_WT)): Prop := ((length a1) = (length a2)) /\ (map.MapPermut.permut_sub
-  (elts a1) (elts a2) 0%Z (length a1)).
-
-Axiom exchange_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
-  a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z), (exchange a1 a2 i j) ->
-  (((length a1) = (length a2)) -> (((0%Z <= i)%Z /\ (i < (length a1))%Z) ->
-  (((0%Z <= j)%Z /\ (j < (length a1))%Z) -> (permut a1 a2)))).
-
-Axiom permut_sym : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
-  a a_WT)) (a2:(@array a a_WT)), (permut a1 a2) -> (permut a2 a1).
-
-Axiom permut_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
-  a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT)), (permut a1 a2) ->
-  ((permut a2 a3) -> (permut a1 a3)).
+Axiom exchange_set : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z) (i:Z) (j:Z),
+  ((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> (exchange a1
+  (map.Map.set (map.Map.set a1 i (map.Map.get a1 j)) j (map.Map.get a1 i)) l
+  u i j)).
 
 (* Why3 assumption *)
 Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _
@@ -135,21 +107,85 @@ Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _
   ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
 
 (* Why3 assumption *)
+Definition exchange1 {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)) (i:Z) (j:Z): Prop := ((length a1) = (length a2)) /\
+  (exchange (elts a1) (elts a2) 0%Z (length a1) i j).
+
+(* Why3 assumption *)
 Definition array_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := (map_eq_sub (elts a1) (elts a2) l
-  u).
+  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\
+  (((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\
+  (u <= (length a1))%Z) /\ (map_eq_sub (elts a1) (elts a2) l u))).
 
 (* Why3 assumption *)
 Definition array_eq {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
-  (a2:(@array a a_WT)): Prop := ((length a1) = (length a2)) /\ (array_eq_sub
-  a1 a2 0%Z (length a1)).
+  (a2:(@array a a_WT)): Prop := ((length a1) = (length a2)) /\ (map_eq_sub
+  (elts a1) (elts a2) 0%Z (length a1)).
 
-Axiom array_eq_sub_permut : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (array_eq_sub
-  a1 a2 l u) -> (permut_sub a1 a2 l u).
+(* Why3 assumption *)
+Definition permut {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT)) (a2:(@array
+  a a_WT)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\
+  (((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\
+  (u <= (length a1))%Z) /\ (map.MapPermut.permut (elts a1) (elts a2) l u))).
 
-Axiom array_eq_permut : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
-  a a_WT)) (a2:(@array a a_WT)), (array_eq a1 a2) -> (permut a1 a2).
+(* Why3 assumption *)
+Definition permut_sub {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)) (l:Z) (u:Z): Prop := (map_eq_sub (elts a1) (elts a2)
+  0%Z l) /\ ((permut a1 a2 l u) /\ (map_eq_sub (elts a1) (elts a2) u
+  (length a1))).
+
+(* Why3 assumption *)
+Definition permut_all {a:Type} {a_WT:WhyType a} (a1:(@array a a_WT))
+  (a2:(@array a a_WT)): Prop := ((length a1) = (length a2)) /\
+  (map.MapPermut.permut (elts a1) (elts a2) 0%Z (length a1)).
+
+Axiom permut_sub_refl : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)) (l:Z) (u:Z), ((0%Z <= l)%Z /\ ((l <= u)%Z /\
+  (u <= (length a1))%Z)) -> (permut_sub a1 a1 l u).
+
+Axiom permut_sub_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
+  a1 a2 l u) -> ((permut_sub a2 a3 l u) -> (permut_sub a1 a3 l u)).
+
+Axiom exchange_permut_sub : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z) (l:Z) (u:Z),
+  (exchange1 a1 a2 i j) -> (((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\
+  (j < u)%Z) -> ((0%Z <= l)%Z -> ((u <= (length a1))%Z -> (permut_sub a1 a2 l
+  u))))).
+
+Axiom permut_sub_unmodified : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
+  a1 a2 l u) -> forall (i:Z), (((0%Z <= i)%Z /\ (i < l)%Z) \/ ((u <= i)%Z /\
+  (i < (length a1))%Z)) -> ((get a2 i) = (get a1 i)).
+
+Axiom permut_sub_weakening : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l1:Z) (u1:Z) (l2:Z)
+  (u2:Z), (permut_sub a1 a2 l1 u1) -> (((0%Z <= l2)%Z /\ (l2 <= l1)%Z) ->
+  (((u1 <= u2)%Z /\ (u2 <= (length a1))%Z) -> (permut_sub a1 a2 l2 u2))).
+
+Axiom permut_sub_compose : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT))
+  (l1:Z) (u1:Z) (l2:Z) (u2:Z), (u1 <= l2)%Z -> ((permut_sub a1 a2 l1 u1) ->
+  ((permut_sub a2 a3 l2 u2) -> (permut_sub a1 a3 l1 u2))).
+
+Axiom permut_all_refl : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)), (permut_all a1 a1).
+
+Axiom permut_all_trans : forall {a:Type} {a_WT:WhyType a}, forall (a1:(@array
+  a a_WT)) (a2:(@array a a_WT)) (a3:(@array a a_WT)), (permut_all a1 a2) ->
+  ((permut_all a2 a3) -> (permut_all a1 a3)).
+
+Axiom exchange_permut_all : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (i:Z) (j:Z), (exchange1 a1
+  a2 i j) -> (permut_all a1 a2).
+
+Axiom array_eq_permut_all : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)), (array_eq a1 a2) ->
+  (permut_all a1 a2).
+
+Axiom permut_sub_permut_all : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@array a a_WT)) (a2:(@array a a_WT)) (l:Z) (u:Z), (permut_sub
+  a1 a2 l u) -> (permut_all a1 a2).
 
 (* Why3 assumption *)
 Definition le (a:(@array Z _)) (x:Z) (y:Z): Prop := (x = y) \/ (lt a x y).
@@ -171,8 +207,8 @@ Definition sorted (a:(@array Z _)) (data:(@array Z _)): Prop := (sorted_sub a
   (elts data) 0%Z (length data)).
 
 (* Why3 assumption *)
-Definition permutation (m:(@map.Map.map Z _ Z _)) (u:Z): Prop := (range m
-  u) /\ (injective m u).
+Definition permutation (m:(@map.Map.map Z _ Z _)) (u:Z): Prop :=
+  (map.MapInjection.range m u) /\ (map.MapInjection.injective m u).
 
 (* Why3 assumption *)
 Inductive suffixArray :=
@@ -193,7 +229,7 @@ Definition values (v:suffixArray): (@array Z _) :=
   end.
 
 Axiom permut_permutation : forall (a1:(@array Z _)) (a2:(@array Z _)),
-  ((permut a1 a2) /\ (permutation (elts a1) (length a1))) -> (permutation
+  ((permut_all a1 a2) /\ (permutation (elts a1) (length a1))) -> (permutation
   (elts a2) (length a2)).
 
 Axiom lcp_sym : forall (a:(@array Z _)) (x:Z) (y:Z) (l:Z), (((0%Z <= x)%Z /\
@@ -235,6 +271,11 @@ Theorem WP_parameter_lrs : forall (a:Z) (a1:(@map.Map.map Z _ Z _)),
   exists j:Z, exists k:Z, ((0%Z <= j)%Z /\ (j < a)%Z) /\ (((0%Z <= k)%Z /\
   (k < a)%Z) /\ ((~ (j = k)) /\ ((x = (map.Map.get sa3 j)) /\
   (y = (map.Map.get sa3 k)))))))).
+(* Why3 intros a a1 a2 (h1,h2) sa sa1 sa2 sa3
+        (((h3,(h4,h5)),(h6,h7)),(h8,h9)) solStart h10 solLength h11 solStart2
+        h12 o h13 solStart21 solLength1 solStart1
+        ((h14,h15),((h16,h17),(((h18,h19),(h20,h21)),h22))) h23 x y
+        (h24,(h25,h26)). *)
 intros a a1 a2 (h1,h2) sa sa1 sa2 sa3
         (((h3,(h4,h5)),(h6,h7)),(h8,h9)) solStart h10 solLength h11 solStart2
         h12 o h13 solStart21 solLength1 solStart1
@@ -242,7 +283,7 @@ intros a a1 a2 (h1,h2) sa sa1 sa2 sa3
         (h24,(h25,h26)).
 assert (h: sa2 = a) by ae.
 subst sa2.
-assert (surj: surjective sa3 a) by ae.
+assert (surj: MapInjection.surjective sa3 a) by ae.
 red in surj.
 assert (ha : (0 <= x < a)%Z) by omega.
 destruct (surj _ ha) as (j & h30 & h31).

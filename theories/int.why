@@ -444,3 +444,16 @@ theory Induction
     forall n:int. bound <= n -> p n
 
 end
+
+theory Fibonacci "Fibonacci numbers"
+
+  use export Int
+
+  function fib int : int
+
+  axiom fib0: fib 0 = 0
+  axiom fib1: fib 1 = 1
+  axiom fibn: forall n:int. n >= 2 -> fib n = fib (n-1) + fib (n-2)
+
+end
+

@@ -21,18 +21,23 @@ module Algo64
 
   (* Algorithm 63 *)
 
-  val partition (a:array int) (m n:int) (i j:ref int) : unit
+  val partition (a: array int) (m n: int) (i j: ref int) (ghost x: ref int) :
+    unit
     requires { 0 <= m < n < length a }
     writes   { a, i, j}
     ensures  { m <= !j < !i <= n }
     ensures  { permut_sub (old a) a m (n+1) }
-    ensures  {
-      exists x:int.
-        (forall r:int. m <= r <= !j -> a[r] <= x) /\
-        (forall r:int. !j < r < !i -> a[r] = x) /\
-        (forall r:int. !i <= r <= n -> a[r] >= x) }
+    ensures  { forall r:int. m <= r <= !j -> a[r] <= !x }
+    ensures  { forall r:int. !j < r < !i -> a[r] = !x }
+    ensures  { forall r:int. !i <= r <= n -> a[r] >= !x }
 
   (* Algorithm 64 *)
+
+  predicate qs_partition (t1 t2: array int) (m n i j: int) (x: int) =
+    permut_sub t1 t2 m (n+1) /\
+    (forall k:int. m <= k <= j  -> t2[k] <= x) /\
+    (forall k:int. j <  k <  i  -> t2[k] =  x) /\
+    (forall k:int. i <= k <= n ->  t2[k] >= x)
 
   let rec quicksort (a:array int) (m n:int) : unit
     requires { 0 <= m <= n < length a }
@@ -42,29 +47,12 @@ module Algo64
   = if m < n then begin
       let i = ref 0 in
       let j = ref 0 in
-      partition a m n i j;
+      let ghost x = ref 42 in
+      partition a m n i j x;
 'L1:  quicksort a m !j;
-      assert { permut_sub (at a 'L1) a m (n+1) };
-      assert { forall r:int. !j < r <= n -> a[r] = (at a 'L1)[r] };
-      assert { forall r:int. m <= r <= !j ->
-        (exists s:int. m <= s <= !j /\ a[r] = (at a 'L1)[s]) &&
-        a[r] <= a[!j+1] };
+      assert { qs_partition (at a 'L1) a m n !i !j !x };
 'L2:  quicksort a !i n;
-      assert { permut_sub (at a 'L2) a m (n+1) };
-      assert { forall r:int. m <= r < !i -> a[r] = (at a 'L2)[r] };
-      assert { forall r:int. !i <= r <= n ->
-        (exists s:int. !i <= s <= n /\ a[r] = (at a 'L2)[s]) &&
-        a[r] >= a[!i-1] };
-      assert { 
-        forall r s:int. m <= r <= s <= n ->
-          if r <= !j then
-            if s <= !j then "a" a[r] <= a[s] else
-            if s <  !i then "b" a[r] <= a[s] else
-                            "c" a[r] <= a[s] else
-          if r <  !i then
-            if s <  !i then "d" a[r] <= a[s] else
-                            "e" a[r] <= a[s] else
-                            "f" a[r] <= a[s] }
+      assert { qs_partition (at a 'L2) a m n !i !j !x }
     end
 
   let qs (a:array int) : unit

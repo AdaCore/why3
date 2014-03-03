@@ -38,15 +38,13 @@ end
   let floc_ij i j = Loc.extract (loc_ij i j)
 *)
 
-  let mk_ppl loc d = { pp_loc = loc; pp_desc = d }
-  let mk_pp d = mk_ppl (floc ()) d
+  let mk_pp_l loc d = { pp_loc = loc; pp_desc = d }
+  let mk_pp d = { pp_loc = floc (); pp_desc = d }
+
   let mk_pat p = { pat_loc = floc (); pat_desc = p }
 
-  let infix_ppl loc a i b = mk_ppl loc (PPbinop (a, i, b))
-  let infix_pp a i b = infix_ppl (floc ()) a i b
-
-  let prefix_ppl loc p a = mk_ppl loc (PPunop (p, a))
-  let prefix_pp p a = prefix_ppl (floc ()) p a
+  let infix_pp a i b = mk_pp (PPbinop (a, i, b))
+  let prefix_pp p a = mk_pp (PPunop (p, a))
 
   let infix  s = "infix "  ^ s
   let prefix s = "prefix " ^ s
@@ -55,10 +53,6 @@ end
   let mk_id id loc = { id = id; id_lab = []; id_loc = loc }
 
   let add_lab id l = { id with id_lab = l }
-
-  let mk_l_apply f a =
-    let loc = Loc.join f.pp_loc a.pp_loc in
-    { pp_loc = loc; pp_desc = PPapply (f,a) }
 
   let mk_l_prefix op e1 =
     let id = mk_id (prefix op) (floc_i 1) in
@@ -81,13 +75,8 @@ end
       | Parsing.Parse_error -> Format.fprintf fmt "syntax error"
       | _ -> raise exn)
 
+  let mk_expr_l loc d = { expr_loc = loc; expr_desc = d }
   let mk_expr d = { expr_loc = floc (); expr_desc = d }
-
-  let mk_expr_i i d = { expr_loc = floc_i i; expr_desc = d }
-
-  let mk_apply f a =
-    let loc = Loc.join f.expr_loc a.expr_loc in
-    { expr_loc = loc; expr_desc = Eapply (f,a) }
 
   let mk_prefix op e1 =
     let id = mk_id (prefix op) (floc_i 1) in
@@ -205,8 +194,6 @@ end
 %right SEMICOLON
 %nonassoc prec_no_else
 %nonassoc DOT ELSE GHOST
-%nonassoc prec_no_spec
-%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES VARIANT
 %nonassoc prec_named
 %nonassoc COLON
 
@@ -563,12 +550,16 @@ primitive_type_arg:
    { PPTtyvar ($1, false) }
 | opaque_quote_lident
    { PPTtyvar ($1, true) }
-| LEFTPAR primitive_type COMMA list1_primitive_type_sep_comma RIGHTPAR
-   { PPTtuple ($2 :: $4) }
+| LEFTPAR list2_primitive_type_sep_comma RIGHTPAR
+   { PPTtuple $2 }
 | LEFTPAR RIGHTPAR
    { PPTtuple [] }
 | LEFTPAR primitive_type RIGHTPAR
    { PPTparen $2 }
+;
+
+list2_primitive_type_sep_comma:
+| primitive_type COMMA list1_primitive_type_sep_comma { $1 :: $3 }
 ;
 
 list1_primitive_type_sep_comma:
@@ -607,10 +598,10 @@ lexpr:
    { mk_l_infix $1 $2 $3 }
 | prefix_op lexpr %prec prec_prefix_op
    { mk_l_prefix $1 $2 }
-| qualid list1_lexpr_arg
-   { mk_pp (PPidapp ($1, $2)) }
-| lexpr_arg_noid list1_lexpr_arg
-   { List.fold_left mk_l_apply $1 $2 }
+| lexpr_arg list1_lexpr_arg /* FIXME/TODO: "lexpr lexpr_arg" */
+   { let b = rhs_start_pos 1 in
+     List.fold_left (fun f (e,a) ->
+       mk_pp_l (Loc.extract (b,e)) (PPapply (f,a))) $1 $2 }
 | IF lexpr THEN lexpr ELSE lexpr
    { mk_pp (PPif ($2, $4, $6)) }
 | quant list1_quant_vars triggers DOT lexpr
@@ -626,8 +617,8 @@ lexpr:
      | _ -> mk_pp (PPmatch ($4, [$2, $6])) }
 | MATCH lexpr WITH bar_ match_cases END
    { mk_pp (PPmatch ($2, $5)) }
-| MATCH lexpr COMMA list1_lexpr_sep_comma WITH bar_ match_cases END
-   { mk_pp (PPmatch (mk_pp (PPtuple ($2::$4)), $7)) }
+| MATCH list2_lexpr_sep_comma WITH bar_ match_cases END
+   { mk_pp (PPmatch (mk_pp (PPtuple $2), $5)) }
 | lexpr COLON primitive_type
    { mk_pp (PPcast ($1, $3)) }
 | lexpr_arg
@@ -646,8 +637,8 @@ field_value:
 ;
 
 list1_lexpr_arg:
-| lexpr_arg                 { [$1] }
-| lexpr_arg list1_lexpr_arg { $1::$2 }
+| lexpr_arg                 { [rhs_end_pos 1, $1] }
+| lexpr_arg list1_lexpr_arg { (rhs_end_pos 1, $1) :: $2 }
 ;
 
 constant:
@@ -657,10 +648,6 @@ constant:
 
 lexpr_arg:
 | qualid            { mk_pp (PPident $1) }
-| lexpr_arg_noid    { $1 }
-;
-
-lexpr_arg_noid:
 | constant          { mk_pp (PPconst $1) }
 | TRUE              { mk_pp PPtrue }
 | FALSE             { mk_pp PPfalse }
@@ -682,8 +669,8 @@ lexpr_sub:
    { $2 }
 | LEFTPAR RIGHTPAR
    { mk_pp (PPtuple []) }
-| LEFTPAR lexpr COMMA list1_lexpr_sep_comma RIGHTPAR
-   { mk_pp (PPtuple ($2 :: $4)) }
+| LEFTPAR list2_lexpr_sep_comma RIGHTPAR
+   { mk_pp (PPtuple $2) }
 | LEFTBRC list1_field_value opt_semicolon RIGHTBRC
    { mk_pp (PPrecord (List.rev $2)) }
 | LEFTBRC lexpr_arg WITH list1_field_value opt_semicolon RIGHTBRC
@@ -714,6 +701,10 @@ list1_trigger_sep_bar:
 
 trigger:
 | list1_lexpr_sep_comma { $1 }
+;
+
+list2_lexpr_sep_comma:
+| lexpr COMMA list1_lexpr_sep_comma { $1 :: $3 }
 ;
 
 list1_lexpr_sep_comma:
@@ -1130,13 +1121,27 @@ list1_rec_defn:
 | rec_defn WITH list1_rec_defn { $1 :: $3 }
 ;
 
+inner_list1_rec_defn:
+| inner_rec_defn                           { [ $1 ] }
+| inner_rec_defn WITH inner_list1_rec_defn { $1 :: $3 }
+
 rec_defn:
 | top_ghost lident_rich labels list1_binder opt_cast spec EQUAL spec expr
    { add_lab $2 $3, $1, ($4, $5, $9, spec_union $6 $8) }
 ;
 
+inner_rec_defn:
+| top_ghost lident_rich labels list1_binder opt_cast spec EQUAL spec final_expr
+   { add_lab $2 $3, $1, ($4, $5, $9, spec_union $6 $8) }
+;
+
 fun_defn:
 | list1_binder opt_cast spec EQUAL spec expr
+   { ($1, $2, $6, spec_union $3 $5) }
+;
+
+inner_fun_defn:
+| list1_binder opt_cast spec EQUAL spec final_expr
    { ($1, $2, $6, spec_union $3 $5) }
 ;
 
@@ -1172,13 +1177,13 @@ expr:
    { mk_expr (Enot $2) }
 | prefix_op expr %prec prec_prefix_op
    { mk_prefix $1 $2 }
-| qualid list1_expr_arg
-   { mk_expr (Eidapp ($1, $2)) }
-| expr_arg_noid list1_expr_arg
-   { List.fold_left mk_apply $1 $2 }
-| IF expr THEN expr ELSE expr
+| expr_arg list1_expr_arg /* FIXME/TODO: "expr expr_arg" */
+   { let b = rhs_start_pos 1 in
+     List.fold_left (fun f (e,a) ->
+       mk_expr_l (Loc.extract (b,e)) (Eapply (f,a))) $1 $2 }
+| IF final_expr THEN expr ELSE expr
    { mk_expr (Eif ($2, $4, $6)) }
-| IF expr THEN expr %prec prec_no_else
+| IF final_expr THEN expr %prec prec_no_else
    { mk_expr (Eif ($2, $4, mk_expr (Etuple []))) }
 | expr SEMICOLON expr
    { mk_expr (Esequence ($1, $3)) }
@@ -1188,53 +1193,54 @@ expr:
    { mk_expr (Elazy (LazyAnd, $1, $3)) }
 | expr BARBAR expr
    { mk_expr (Elazy (LazyOr, $1, $3)) }
-| LET pattern EQUAL expr IN expr
+| LET pattern EQUAL final_expr IN expr
    { match $2.pat_desc with
      | PPpvar id -> mk_expr (Elet (id, Gnone, $4, $6))
      | PPpwild -> mk_expr (Elet (id_anonymous (), Gnone, $4, $6))
      | PPptuple [] -> mk_expr (Elet (id_anonymous (), Gnone,
           { $4 with expr_desc = Ecast ($4, PPTtuple []) }, $6))
      | _ -> mk_expr (Ematch ($4, [$2, $6])) }
-| LET GHOST pat_arg EQUAL expr IN expr
+| LET GHOST pat_arg EQUAL final_expr IN expr
    { match $3.pat_desc with
      | PPpvar id -> mk_expr (Elet (id, Gghost, $5, $7))
      | PPpwild -> mk_expr (Elet (id_anonymous (), Gghost, $5, $7))
      | PPptuple [] -> mk_expr (Elet (id_anonymous (), Gghost,
           { $5 with expr_desc = Ecast ($5, PPTtuple []) }, $7))
      | _ -> mk_expr (Ematch ({ $5 with expr_desc = Eghost $5 }, [$3, $7])) }
-| LET lident labels fun_defn IN expr
+| LET lident labels inner_fun_defn IN expr
    { mk_expr (Efun (add_lab $2 $3, Gnone, $4, $6)) }
-| LET lident_op_id labels fun_defn IN expr
+| LET lident_op_id labels inner_fun_defn IN expr
    { mk_expr (Efun (add_lab $2 $3, Gnone, $4, $6)) }
-| LET GHOST lident labels fun_defn IN expr
+| LET GHOST lident labels inner_fun_defn IN expr
    { mk_expr (Efun (add_lab $3 $4, Gghost, $5, $7)) }
-| LET GHOST lident_op_id labels fun_defn IN expr
+| LET GHOST lident_op_id labels inner_fun_defn IN expr
    { mk_expr (Efun (add_lab $3 $4, Gghost, $5, $7)) }
-| LET lident_op_id labels EQUAL expr IN expr
+| LET lident_op_id labels EQUAL final_expr IN expr
    { mk_expr (Elet (add_lab $2 $3, Gnone, $5, $7)) }
-| LET GHOST lident_op_id labels EQUAL expr IN expr
+| LET GHOST lident_op_id labels EQUAL final_expr IN expr
    { mk_expr (Elet (add_lab $3 $4, Gghost, $6, $8)) }
-| LET LEMMA lident_rich labels EQUAL expr IN expr
+| LET LEMMA lident_rich labels EQUAL final_expr IN expr
    { mk_expr (Elet (add_lab $3 $4, Glemma, $6, $8)) }
-| LET LEMMA lident_rich labels fun_defn IN expr
+| LET LEMMA lident_rich labels inner_fun_defn IN expr
    { mk_expr (Efun (add_lab $3 $4, Glemma, $5, $7)) }
-| LET REC list1_rec_defn IN expr
+| LET REC inner_list1_rec_defn IN expr
    { mk_expr (Erec ($3, $5)) }
 | fun_expr
    { mk_expr (Elam $1) }
 | VAL top_ghost lident_rich labels tail_type_c IN expr
-   { mk_expr (Elet (add_lab $3 $4, $2, mk_expr_i 5 (Eany $5), $7)) }
-| MATCH expr WITH bar_ program_match_cases END
+   { mk_expr (Elet (add_lab $3 $4, $2, mk_expr_l (floc_i 5) (Eany $5), $7)) }
+| MATCH final_expr WITH bar_ program_match_cases END
    { mk_expr (Ematch ($2, $5)) }
-| MATCH expr COMMA list1_expr_sep_comma WITH bar_ program_match_cases END
-   { mk_expr (Ematch (mk_expr (Etuple ($2::$4)), $7)) }
+| MATCH list2_expr_sep_comma WITH bar_ program_match_cases END
+   { mk_expr (Ematch (mk_expr (Etuple $2), $5)) }
 | quote_uident COLON expr %prec prec_mark
    { mk_expr (Emark ($1, $3)) }
-| LOOP loop_annotation expr END
+| LOOP loop_annotation final_expr END
    { mk_expr (Eloop ($2, $3)) }
-| WHILE expr DO loop_annotation expr DONE
+| WHILE final_expr DO loop_annotation final_expr DONE
    { mk_expr (Ewhile ($2, $4, $5)) }
-| FOR lident EQUAL expr for_direction expr DO for_loop_invariant expr DONE
+| FOR lident EQUAL final_expr for_direction final_expr
+  DO for_loop_invariant final_expr DONE
    { mk_expr (Efor ($2, $4, $5, $6, $8, $9)) }
 | ABSURD
    { mk_expr Eabsurd }
@@ -1242,26 +1248,26 @@ expr:
    { mk_expr (Ecast ($1, $3)) }
 | RAISE uqualid
    { mk_expr (Eraise ($2, None)) }
-| RAISE LEFTPAR uqualid expr RIGHTPAR
+| RAISE LEFTPAR uqualid final_expr RIGHTPAR
    { mk_expr (Eraise ($3, Some $4)) }
-| TRY expr WITH bar_ list1_handler_sep_bar END
+| TRY final_expr WITH bar_ list1_handler_sep_bar END
    { mk_expr (Etry ($2, $5)) }
 | ANY simple_type_c
    { mk_expr (Eany $2) }
 | GHOST expr
    { mk_expr (Eghost $2) }
-| ABSTRACT expr spec
-   { mk_expr (Eabstract($2, $3)) }
+| ABSTRACT spec final_expr END
+   { mk_expr (Eabstract($3, $2)) }
 | label expr %prec prec_named
    { mk_expr (Enamed ($1, $2)) }
 ;
 
-expr_arg:
-| qualid          { mk_expr (Eident $1) }
-| expr_arg_noid   { $1 }
+final_expr:
+| expr opt_semicolon  { $1 }
 ;
 
-expr_arg_noid:
+expr_arg:
+| qualid          { mk_expr (Eident $1) }
 | constant        { mk_expr (Econst $1) }
 | TRUE            { mk_expr Etrue }
 | FALSE           { mk_expr Efalse }
@@ -1278,14 +1284,14 @@ expr_dot:
 expr_sub:
 | expr_dot DOT lqualid_rich
     { mk_expr (Eidapp ($3, [$1])) }
-| LEFTPAR expr RIGHTPAR
+| LEFTPAR final_expr RIGHTPAR
     { $2 }
-| BEGIN expr END
+| BEGIN final_expr END
     { $2 }
 | LEFTPAR RIGHTPAR
     { mk_expr (Etuple []) }
-| LEFTPAR expr COMMA list1_expr_sep_comma RIGHTPAR
-    { mk_expr (Etuple ($2 :: $4)) }
+| LEFTPAR list2_expr_sep_comma RIGHTPAR
+    { mk_expr (Etuple $2) }
 | LEFTBRC list1_field_expr opt_semicolon RIGHTBRC
     { mk_expr (Erecord (List.rev $2)) }
 | LEFTBRC expr_arg WITH list1_field_expr opt_semicolon RIGHTBRC
@@ -1308,13 +1314,17 @@ field_expr:
 ;
 
 list1_expr_arg:
-| expr_arg                   { [$1] }
-| expr_arg list1_expr_arg    { $1 :: $2 }
+| expr_arg                   { [rhs_end_pos 1, $1] }
+| expr_arg list1_expr_arg    { (rhs_end_pos 1, $1) :: $2 }
+;
+
+list2_expr_sep_comma:
+| final_expr COMMA list1_expr_sep_comma { $1 :: $3 }
 ;
 
 list1_expr_sep_comma:
-| expr                            { [$1] }
-| expr COMMA list1_expr_sep_comma { $1 :: $3 }
+| final_expr                            { [$1] }
+| final_expr COMMA list1_expr_sep_comma { $1 :: $3 }
 ;
 
 list1_handler_sep_bar:
@@ -1323,9 +1333,9 @@ list1_handler_sep_bar:
 ;
 
 handler:
-| uqualid ARROW expr
+| uqualid ARROW final_expr
     { ($1, None, $3) }
-| uqualid pat_arg ARROW expr
+| uqualid pat_arg ARROW final_expr
     { ($1, Some $2, $4) }
 ;
 
@@ -1335,7 +1345,7 @@ program_match_cases:
 ;
 
 program_match_case:
-| pattern ARROW expr   { ($1,$3) }
+| pattern ARROW final_expr   { ($1,$3) }
 ;
 
 assertion_kind:
@@ -1369,8 +1379,8 @@ type_invariant:
 ;
 
 spec:
-| /* epsilon */     %prec prec_no_spec  { empty_spec }
-| single_spec spec                      { spec_union $1 $2 }
+| /* epsilon */     { empty_spec }
+| single_spec spec  { spec_union $1 $2 }
 ;
 
 single_spec:

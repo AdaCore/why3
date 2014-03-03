@@ -20,20 +20,19 @@ module Algo65
 
   (* algorithm 63 *)
 
-  val partition (a:array int) (m n:int) (i j:ref int) : unit
+  val partition (a:array int) (m n: int) (i j: ref int) (ghost x: ref int) :
+    unit
     requires { 0 <= m < n < length a }
     writes   { a, i, j }
     ensures  { m <= !j < !i <= n }
     ensures  { permut_sub (old a) a m (n+1) }
-    ensures  {
-      exists x:int.
-        (forall r:int. m <= r <= !j -> a[r] <= x) /\
-        (forall r:int. !j < r < !i -> a[r] = x) /\
-        (forall r:int. !i <= r <= n -> a[r] >= x) }
+    ensures  { forall r:int. m <= r <= !j -> a[r] <= !x }
+    ensures  { forall r:int. !j < r < !i -> a[r] = !x }
+    ensures  { forall r:int. !i <= r <= n -> a[r] >= !x }
 
   (* Algorithm 65 (fixed version) *)
 
-  let rec find (a:array int) (m n:int) (k:int) : unit 
+  let rec find (a:array int) (m n:int) (k:int) : unit
     requires { 0 <= m <= k <= n < length a }
     variant  { n - m }
     ensures  { permut_sub (old a) a m (n+1) }
@@ -42,7 +41,8 @@ module Algo65
   = if m < n then begin
       let i = ref 0 in
       let j = ref 0 in
-      partition a m n i j;
+      let ghost x = ref 42 in
+      partition a m n i j x;
 'L1:
       if k <= !j then find a m !j k;
       assert { permut_sub (at a 'L1) a m (n+1) };

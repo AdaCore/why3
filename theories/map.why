@@ -91,57 +91,21 @@ theory MapInjection
 
 end
 
-(** {2 Map Permutation (indexed by integers)} *)
-theory MapPermut
+theory MapExchange
 
   use import int.Int
   use import Map
-  use import MapEq
 
   predicate exchange (a1 a2: map int 'a) (l u i j: int) =
     l <= i < u /\ l <= j < u /\
     a1[i] = a2[j] /\ a1[j] = a2[i] /\
     (forall k:int. l <= k < u -> k <> i -> k <> j -> a1[k] = a2[k])
 
-  inductive permut (map int 'a) (map int 'a) int int =
-  | permut_refl : (* a1[l..u[ and a2[l..u[ are identical *)
-      forall a1 a2 : map int 'a. forall l u : int.
-      map_eq_sub a1 a2 l u -> permut a1 a2 l u
-  | permut_trans : (* transitivity *)
-      forall a1 a2 a3 : map int 'a. forall l u : int.
-      permut a1 a2 l u -> permut a2 a3 l u -> permut a1 a3 l u
-  | permut_exchange : (* elements at indices i and j have been swapped *)
-      forall a1 a2 : map int 'a. forall l u i j : int.
-      exchange a1 a2 l u i j -> permut a1 a2 l u
-  (** [permut m1 m2 l u] is true when the segment
-      [m1(l..u-1)] is a permutation of the segment [m2(l..u-1)].
-      Values outside of the interval (l..u-1) are ignored.
-
-      It is defined inductively as the smallest equivalence relation
-      that contains the exchanges *)
-
-(*
-  (* symmetry can be proved *)
-  lemma permut_sym:
-    forall a1 a2 : map int 'a. forall l u : int.
-    permut a1 a2 l u -> permut a2 a1 l u
-*)
-
   lemma exchange_set :
     forall a: map int 'a, l u i j: int.
     l <= i < u -> l <= j < u ->
     exchange a a[i <- a[j]][j <- a[i]] l u i j
 
-  lemma permut_exists :
-    forall a1 a2: map int 'a, l u i: int.
-    permut a1 a2 l u -> l <= i < u ->
-    exists j: int. l <= j < u /\ a1[j] = a2[i]
-
-(* THIS IS FALSE WHEN m < l < u
-  lemma permut_concat:
-    forall a1 a2: map int 'a, l m u: int.
-    permut a1 a2 l m -> permut a1 a2 m u -> permut a1 a2 l u
-*)
 end
 
 (** {2 Sum of elements of a map (indexed by integers)} *)
@@ -226,5 +190,77 @@ theory BV32
   constant size : int = 32
 
   clone export BitVector with constant size = size
+
+end
+
+
+(** {2 Number of occurrences} *)
+
+theory Occ
+
+  use import int.Int
+  use export Map
+
+  function occ (v: 'a) (m: map int 'a) (l u: int) : int
+    (** number of occurrences of v in m between l included and u excluded *)
+
+  axiom occ_empty:
+    forall v: 'a, m: map int 'a, l u: int.
+    u <= l -> occ v m l u = 0
+
+  axiom occ_right_no_add:
+    forall v: 'a, m: map int 'a, l u: int.
+    l < u -> m[u-1] <> v -> occ v m l u = occ v m l (u-1)
+
+  axiom occ_right_add:
+    forall v: 'a, m: map int 'a, l u: int.
+    l < u -> m[u-1] = v -> occ v m l u = 1 + occ v m l (u-1)
+
+  lemma occ_bounds:
+    forall v: 'a, m: map int 'a, l u: int.
+    l <= u -> 0 <= occ v m l u <= u - l
+    (* direct when l>=u, by induction on b when l <= u *)
+
+  lemma occ_append:
+    forall v: 'a, m: map int 'a, l mid u: int.
+    l <= mid <= u -> occ v m l u = occ v m l mid + occ v m mid u
+    (* by induction on u *)
+
+  lemma occ_neq:
+    forall v: 'a, m: map int 'a, l u: int.
+    (forall i: int. l <= i < u -> m[i] <> v) -> occ v m l u = 0
+    (* by induction on u *)
+
+  lemma occ_exists:
+    forall v: 'a, m: map int 'a, l u: int.
+    occ v m l u > 0 -> exists i: int. l <= i < u /\ m[i] = v
+
+  lemma occ_pos:
+    forall m: map int 'a, l u i: int.
+    l <= i < u -> occ m[i] m l u > 0
+
+  lemma occ_eq:
+    forall v: 'a, m1 m2: map int 'a, l u: int.
+    (forall i: int. l <= i < u -> m1[i] = m2[i]) -> occ v m1 l u = occ v m2 l u
+    (* by induction on u *)
+
+end
+
+theory MapPermut
+
+  use import int.Int
+  use import Occ
+
+  predicate permut (m1 m2: map int 'a) (l u: int) =
+    forall v: 'a. occ v m1 l u = occ v m2 l u
+
+  lemma permut_trans: (* provable, yet useful *)
+    forall a1 a2 a3 : map int 'a. forall l u : int.
+    permut a1 a2 l u -> permut a2 a3 l u -> permut a1 a3 l u
+
+  lemma permut_exists :
+    forall a1 a2: map int 'a, l u i: int.
+    permut a1 a2 l u -> l <= i < u ->
+    exists j: int. l <= j < u /\ a1[j] = a2[i]
 
 end

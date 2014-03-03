@@ -506,8 +506,9 @@ let () = Exn_printer.register
   | Ty.BadTypeArity ({ts_args = []} as ts, _) ->
       fprintf fmt "Type symbol %a expects no arguments" print_ts ts
   | Ty.BadTypeArity (ts, app_arg) ->
-      fprintf fmt "Type symbol %a expects %i arguments but is applied to %i"
-        print_ts ts (List.length ts.ts_args) app_arg
+      let i = List.length ts.ts_args in
+      fprintf fmt "Type symbol %a expects %i argument%s but is applied to %i"
+        print_ts ts i (if i = 1 then "" else "s") app_arg
   | Ty.DuplicateTypeVar tv ->
       fprintf fmt "Type variable %a is used twice" print_tv tv
   | Ty.UnboundTypeVar tv ->
@@ -518,9 +519,10 @@ let () = Exn_printer.register
       fprintf fmt "%s %a expects no arguments"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls
   | Term.BadArity (ls, app_arg) ->
-      fprintf fmt "%s %a expects %i arguments but is applied to %i"
+      let i = List.length ls.ls_args in
+      fprintf fmt "%s %a expects %i argument%s but is applied to %i"
         (if ls.ls_value = None then "Predicate" else "Function")
-        print_ls ls (List.length ls.ls_args) app_arg
+        print_ls ls i (if i = 1 then "" else "s") app_arg
   | Term.EmptyCase ->
       fprintf fmt "Empty match expression"
   | Term.DuplicateVar vs ->

@@ -1,0 +1,86 @@
+
+\chapter{Executing \whyml Programs}
+\label{chap:exec}\index{whyml@\whyml}
+
+This chapter show how \whyml code can be executed, either by being
+interpreted or compiled to some existing programming language.
+
+Let us consider the program in Fig.~\ref{fig:MaxAndSum}
+on page~\pageref{fig:MaxAndSum} that computes the maximum and the sum
+of an array of integers.
+Let us assume it is contained in a file \texttt{maxsum.mlw}.
+
+\section{Interpreting \whyml Code}
+\index{exec@\verb+--exec+}\index{interpretation!of \whyml}
+\index{testing \whyml code}
+
+To test function \texttt{max\_sum}, we can introduce a \whyml test function
+in module \texttt{MaxAndSum}
+\begin{whycode}
+  let test () =
+    let n = 10 in
+    let a = make n 0 in
+    a[0] <- 9; a[1] <- 5; a[2] <- 0; a[3] <- 2;  a[4] <- 7;
+    a[5] <- 3; a[6] <- 2; a[7] <- 1; a[8] <- 10; a[9] <- 6;
+    max_sum a n
+\end{whycode}
+and then we use option \verb+--exec+ to interpret this function,
+as follows:
+\begin{verbatim}
+  > why3  maxsum.mlw --exec MaxAndSum.test
+  Execution of MaxAndSum.test ():
+       type: (int, int)
+     result: Tuple2(45, 10)
+    globals:
+\end{verbatim}
+We get the excepted output, namely the pair \texttt{(45, 10)}.
+
+\section{Compiling \whyml to OCaml}
+\index{OCaml}\index{extraction}
+\index{E@\verb+-E+|see{\texttt{-{}-extract}}}
+\index{extract@\verb+--extract+}
+
+An alternative to interpretation is to compile \whyml to OCaml.
+We do so using option \verb+--extract+, as follows:
+\begin{verbatim}
+  > mkdir dir
+  > why3 --extract ocaml64 maxsum.mlw -o dir
+\end{verbatim}
+Option \verb+--extract+ requires the name of a driver, which indicates
+how theories/modules from the \why standard library are translated to
+OCaml. Here we assume a 64-bit architecture and thus we pass
+\texttt{ocaml64}. On a 32-bit architecture, we would use
+\texttt{ocaml32} instead. Extraction also requires a target directory
+to be specified using option \verb+-o+. Here we pass a freshly created
+directory \texttt{dir}.
+
+Directory \texttt{dir} is now populated with a bunch of OCaml files,
+among which we find a file \texttt{maxsum\_\_MaxAndSum.ml} containing
+the OCaml code for functions \texttt{max\_sum} and \texttt{test}.
+
+To compile it, we create a file \texttt{main.ml}
+containing a call to \texttt{test}, that is
+\begin{whycode}
+  let () = test ()
+\end{whycode}
+and we pass both files \texttt{maxsum\_\_MaxAndSum.ml} and
+\texttt{main.ml} to the OCaml compiler:
+\begin{verbatim}
+  > cd dir
+  > ocamlopt zarith.cmxa why3extract.cmxa maxsum__MaxAndSum.ml main.ml
+\end{verbatim}
+OCaml code extracted from \why must be linked with the library
+\texttt{why3extract.cmxa} that is shipped with \why. It is typically
+stored in subdirectory \texttt{why3} of the OCaml standard library.
+Depending on the way \why was installed, it depends either on library
+\texttt{nums.cmxa} or \texttt{zarith.cmxa} for big integers. Above we
+assumed the latter. it is likely that additional options \texttt{-I}
+must be passed to the OCaml compiler for libraries
+\texttt{zarith.cmxa} and \texttt{why3extract.cmxa} to be found.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% TeX-master: "manual"
+%%% End:

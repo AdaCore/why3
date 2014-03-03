@@ -72,7 +72,7 @@ Defined.
 
 (* Why3 goal *)
 Lemma Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(@map a a_WT b b_WT)) a1) = b1).
+  forall (b1:b) (a1:a), ((get (const b1: (@map a a_WT b b_WT)) a1) = b1).
 Proof.
 easy.
 Qed.

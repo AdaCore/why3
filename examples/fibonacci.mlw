@@ -1,19 +1,7 @@
 
-theory Fibonacci "Fibonacci numbers"
-
-  use export int.Int
-
-  function fib int : int
-
-  axiom fib0: fib 0 = 0
-  axiom fib1: fib 1 = 1
-  axiom fibn: forall n:int. n >= 2 -> fib n = fib (n-1) + fib (n-2)
-
-end
-
 theory FibonacciTest
 
-  use import Fibonacci
+  use import int.Fibonacci
 
   lemma isfib_2_1 : fib 2 = 1
   lemma isfib_6_8 : fib 6 = 8
@@ -24,7 +12,7 @@ end
 
 module FibonacciLinear
 
-  use import Fibonacci
+  use import int.Fibonacci
   use import int.Int
   use import ref.Ref
 
@@ -45,7 +33,7 @@ end
 
 module FibRecGhost "recursive version, using ghost code"
 
-  use import Fibonacci
+  use import int.Fibonacci
   use import int.Int
 
   let rec fib_aux (ghost n: int) (a b k: int) : int
@@ -71,7 +59,7 @@ end
 
 module FibRecNoGhost "recursive version, without ghost code"
 
-  use import Fibonacci
+  use import int.Fibonacci
   use import int.Int
 
   let rec fib_aux (a b k: int) : int
@@ -113,7 +101,7 @@ end
 
 module FibonacciLogarithmic
 
-  use import Fibonacci
+  use import int.Fibonacci
   use import int.EuclideanDivision
   use import Mat22
 

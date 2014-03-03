@@ -43,6 +43,7 @@ type mo_rule =
   | MRtheory    of th_rule
   | MRexception of qualid * string
   | MRval       of qualid * string
+  | MRconverter of qualid * string
 
 type module_rules = {
   mor_name  : qualid;

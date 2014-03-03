@@ -3,6 +3,7 @@
 *~
 *.bak
 *.o
+*.a
 why3.conf
 *.cmx
 *.cmo
@@ -10,6 +11,8 @@ why3.conf
 *.cmt
 *.cmti
 *.cmxs
+*.cma
+*.cmxa
 *.annot
 *.dep
 *.vo
@@ -118,9 +121,9 @@ why3.conf
 
 # /lib/why3/
 /lib/why3/META
-/lib/why3/why3.cm*
-/lib/why3/why3.a
-/lib/why3/why3.o
+
+# /lib/ocaml/
+/lib/ocaml/why3__BigInt.ml
 
 # /share/
 /share/emacs/semantic.cache
@@ -132,7 +135,6 @@ why3.conf
 /src/coq-tactic/coqCompat.ml
 /src/coq-tactic/g_why3tac.ml
 /src/coq-tactic/.why3-vo-*
-/lib/coq-tactic/why3tac.cma
 
 # PVS
 .pvscontext
@@ -185,6 +187,8 @@ pvsbin/
 /tests/test-pgm-jcf/
 /tests/test-claude/
 /tests/test-and/
+/tests/test-extraction/*
+!/tests/test-extraction/main.ml
 
 # /examples/
 /examples/in_progress/course/
@@ -196,14 +200,25 @@ pvsbin/
 /examples/why3bench.html
 /examples/why3regtests.err
 /examples/why3regtests.out
+/examples/*/*.opt
+/examples/*/*.byte
+/examples/in_progress/*/*.opt
+/examples/in_progress/*/*.byte
 /examples/*/*.html
 /examples/*/*/*.html
 /examples/*/*/*/*.html
+/examples/*/style.css
+/examples/*/*/style.css
+/examples/*/*/*/style.css
 /examples/*/*.tex
 /examples/*/*/*.tex
 /examples/*/*/*/*.tex
 /examples/use_api/runstrat/makejob.opt
 /examples/use_api/runstrat/runstrat.opt
+/examples/euler001/euler001__*.ml
+/examples/euler001/Makefile
+/examples/sudoku/sudoku__*.ml
+/examples/in_progress/defunctionalization/defunctionalization__*.ml
 
 # modules
 /modules/string/
@@ -215,7 +230,6 @@ pvsbin/
 
 # jessie3
 /src/jessie/.depend
-/src/jessie/Jessie3.cma
 /src/jessie/Jessie3_DEP
 /src/jessie/autom4te.cache/
 /src/jessie/config.log

@@ -1,14 +1,10 @@
 (* Fibonacci function with memoisation *)
 
-module M
+module FibMemo
 
   use import int.Int
+  use import int.Fibonacci
   use import ref.Ref
-
-  function fib int : int
-
-  axiom Fib_def : forall n:int. fib n =
-     if n <= 1 then 1 else fib (n-1) + fib (n-2)
 
   type option 'a = None | Some 'a
 
@@ -36,7 +32,7 @@ module M
     ensures  { result = fib n /\ inv !table }
     variant  { 2*n }
     if n <= 1 then
-      1
+      n
     else
       memo_fibo (n-1) + memo_fibo (n-2)
 

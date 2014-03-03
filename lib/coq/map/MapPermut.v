@@ -4,52 +4,21 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require map.Map.
+Require map.Occ.
 
 (* Why3 assumption *)
-Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _
-  a a_WT)) (a2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z): Prop := forall (i:Z),
-  ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get a1 i) = (map.Map.get a2 i)).
-
-(* Why3 assumption *)
-Definition exchange {a:Type} {a_WT:WhyType a} (a1:(@map.Map.map Z _ a a_WT))
-  (a2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z) (i:Z) (j:Z): Prop :=
-  ((l <= i)%Z /\ (i < u)%Z) /\ (((l <= j)%Z /\ (j < u)%Z) /\
-  (((map.Map.get a1 i) = (map.Map.get a2 j)) /\ (((map.Map.get a1
-  j) = (map.Map.get a2 i)) /\ forall (k:Z), ((l <= k)%Z /\ (k < u)%Z) ->
-  ((~ (k = i)) -> ((~ (k = j)) -> ((map.Map.get a1 k) = (map.Map.get a2
-  k))))))).
-
-(* Why3 assumption *)
-Inductive permut {a:Type} {a_WT:WhyType a} : (@map.Map.map Z _ a a_WT) ->
-  (@map.Map.map Z _ a a_WT) -> Z -> Z -> Prop :=
-  | permut_refl : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _
-      a a_WT)), forall (l:Z) (u:Z), (map_eq_sub a1 a2 l u) -> ((@permut _ _)
-      a1 a2 l u)
-  | permut_trans : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map
-      Z _ a a_WT)) (a3:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z),
-      ((@permut _ _) a1 a2 l u) -> (((@permut _ _) a2 a3 l u) ->
-      ((@permut _ _) a1 a3 l u))
-  | permut_exchange : forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map
-      Z _ a a_WT)), forall (l:Z) (u:Z) (i:Z) (j:Z), (exchange a1 a2 l u i
-      j) -> ((@permut _ _) a1 a2 l u).
+Definition permut {a:Type} {a_WT:WhyType a} (m1:(@map.Map.map Z _ a a_WT))
+  (m2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z): Prop := forall (v:a),
+  ((map.Occ.occ v m1 l u) = (map.Occ.occ v m2 l u)).
 
 (* Why3 goal *)
-Lemma exchange_set : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z) (i:Z) (j:Z),
-  ((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) -> (exchange a1
-  (map.Map.set (map.Map.set a1 i (map.Map.get a1 j)) j (map.Map.get a1 i)) l
-  u i j)).
-intros a a_WT a1 l u i j (h1,h2) (h3,h4).
-unfold exchange.
-intuition.
-rewrite Map.Select_eq; auto.
-assert (H: i = j \/ i <> j) by omega.
-destruct H.
-rewrite H; rewrite Map.Select_eq; auto.
-rewrite Map.Select_neq; auto.
-rewrite Map.Select_eq; auto.
-rewrite Map.Select_neq; auto.
-rewrite Map.Select_neq; auto.
+Lemma permut_trans : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _ a a_WT))
+  (a3:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z), (permut a1 a2 l u) ->
+  ((permut a2 a3 l u) -> (permut a1 a3 l u)).
+intros a a_WT a1 a2 a3 l u h1 h2.
+unfold permut in *.
+intros. transitivity (Occ.occ v a2 l u); auto.
 Qed.
 
 (* Why3 goal *)
@@ -60,59 +29,12 @@ Lemma permut_exists : forall {a:Type} {a_WT:WhyType a},
   j) = (map.Map.get a2 i))).
 Proof.
 intros a a_WT a1 a2 l u i h1 Hi.
-assert ((exists j, (l <= j < u)%Z /\ Map.get a1 j = Map.get a2 i) /\
-  (exists j, (l <= j < u)%Z /\ Map.get a2 j = Map.get a1 i)).
-2: easy.
-revert i Hi.
-induction h1.
-(* refl *)
-intros i Hi.
-red in H.
-split ; exists i ; intuition.
-  rewrite <- H; auto.
-(* trans *)
-intros i Hi.
-split.
-destruct (IHh1_2 i Hi) as ((j&H1&H2),_).
-destruct (IHh1_1 j H1) as ((k&H3&H4),_).
-exists k.
-split ; try easy.
-now transitivity (Map.get a2 j).
-destruct (IHh1_1 i Hi) as (_,(j&H1&H2)).
-destruct (IHh1_2 j H1) as (_,(k&H3&H4)).
-exists k.
-split ; try easy.
-now transitivity (Map.get a2 j).
-(* exchange *)
-revert H.
-unfold exchange.
-intros [Hi [Hj [Ha1ia2j [Ha1ja2i H]]]] k Hk.
-destruct (Z_eq_dec k i) as [Hki|Hki].
-split ;
-  exists j ;
-  split ; try easy ;
-  rewrite Hki ;
-  intuition.
-destruct (Z_eq_dec k j) as [Hkj|Hkj].
-split ;
-  exists i ;
-  split ; try easy ;
-  rewrite Hkj ;
-  apply sym_eq; intuition.
-split ;
-  exists k ;
-  split ; try easy.
-now apply H ; intuition.
-now apply sym_eq, H ; intuition.
+pose (v := Map.get a2 i).
+assert (0 < map.Occ.occ v a2 l u)%Z.
+  apply map.Occ.occ_pos. assumption.
+rewrite <- h1 in H.
+generalize (map.Occ.occ_exists v a1 l u H).
+intros (j, (hj1,hj2)).
+exists j; intuition. 
 Qed.
 
-(* Unused content named permut_sym
-intros a a_WT a1 a2 l u h1.
-induction h1; intuition.
-apply permut_refl; unfold map_eq_sub in *; intuition.
-  rewrite <- H; auto.
-apply permut_trans with a2; auto.
-apply permut_exchange with j i; auto.
-  intros; rewrite <- H4; auto.
-Qed.
-*)

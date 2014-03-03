@@ -1,29 +1,31 @@
-(*
-% danvy-ex1.txt
-% exercices pour JFLA 2014
-% 8 janvier 2014
-% Olivier Danvy <danvy@cs.au.dk>
+(** 
 
-----------
+{1 Defunctionalization}
+
+This is inspired from student exercises proposed by Olivier Danvy
+<danvy@cs.au.dk> (cf JFLA 2014)
+
 *)
+
+
+(** {2 Simple Arithmetic Expressions} *)
 
 module Expr
 
 use export int.Int
 
 (*
-1. Les expressions arithmétiques
-   -----------------------------
 
-Expressions:
+Grammar of expressions:
 
 n  :  int
 
 e  :  expression
 e ::= n | e - e
 
-p  :  programme
+p  :  program
 p ::= e
+
 *)
 
 type expr = Cte int | Sub expr expr
@@ -32,7 +34,7 @@ type prog = expr
 
 (*
 
-Exemples:
+Examples:
 
 p0 = 0
 p1 = 10 - 6
@@ -48,28 +50,30 @@ constant p2 : prog = Sub (Sub (Cte 10) (Cte 6)) (Sub (Cte 7) (Cte 2))
 constant p3 : prog = Sub (Sub (Cte 7) (Cte 2)) (Sub (Cte 10) (Cte 6))
 constant p4 : prog = Sub (Cte 10) (Sub (Cte 2) (Cte 3))
 
-
 end
 
 
-module SemDirecte
+(** {2 Direct Semantics} *)
+
+module DirectSem
 
 use import Expr
 
 (*
-Valeurs:
 
-v  :  valeur
+Values:
+
+v  :  value
 v ::= n
 
 
-Valeurs expressibles:
+Expressible Values:
 
-ve  :  valeur_expressible
+ve  :  expressible_value
 ve ::= v
 
 
-Interprétation:
+Interpretation:
 
 ------
 n => n
@@ -79,54 +83,57 @@ e1 => n1   e2 => n2   n1 - n2 = n3
       e1 - e2 => n3
 
 
-On interprète le programme e en la valeur n si le jugement
+A program e is interpreted into a value n if judgement
 
   e => n
 
-est satisfait.
+holds.
 
 
-Exercice 0:
-  Programmer l'interprète ci-dessus (disons en OCaml)
-  et le tester sur les exemples.
+Exercise 0:
+  Program the interpreter above and test it on the examples.
 
-  evalue_0 : expression -> valeur_expressible
-  interprete_0 : programme -> valeur_expressible
+  eval_0 : expression -> expressible_value
+  interpret_0 : program -> expressible_value
 *)
 
-(* Note: les definitions Why3 avec "function" sont dans la partie
-logique du langage *)
+(* Note: Why3 definition introduced by "function" belong to the logic
+   part of Why3 language *)
 
-function evalue_0 (e:expr) : int =
+function eval_0 (e:expr) : int =
   match e with
   | Cte n -> n
   | Sub e1 e2 ->
-     let v1 = evalue_0 e1 in
-     let v2 = evalue_0 e2 in
+     let v1 = eval_0 e1 in
+     let v2 = eval_0 e2 in
      v1 - v2
   end
 
-function interprete_0 (p:prog) : int = evalue_0 p
+function interpret_0 (p:prog) : int = eval_0 p
 
 (*
 
-tests, jouables avec
+Tests, can be replayed using
 
-  why3 defunctionalization.mlw --exec SemDirecte.t0
+  why3 defunctionalization.mlw --exec DirectSem.t0
 
-(resp SemDirecte.t1, SemDirecte.t2, etc. version 0.82 requise)
+(resp DirectSem.t1, DirectSem.t2, etc.) 
+
+(Why3 version at least 0.82 required)
 
 *)
 
-let t0 () = interprete_0 p0
-let t1 () = interprete_0 p1
-let t2 () = interprete_0 p2
-let t3 () = interprete_0 p3
-let t4 () = interprete_0 p4
+let t0 () = interpret_0 p0
+let t1 () = interpret_0 p1
+let t2 () = interpret_0 p2
+let t3 () = interpret_0 p3
+let t4 () = interpret_0 p4
 
 
 end
 
+
+(** {2 CPS: Continuation Passing Style} *)
 
 module CPS
 
@@ -134,42 +141,35 @@ use import Expr
 
 (*
 
+Exercise 1:
 
-Exercice 1:
-  CPS-transformer (en appel par valeur, de gauche à droite)
-  la fonction evalue_0,
-  et l'appeler dans la fonction principale de l'interprète
-  avec comme continuation initiale la fonction identité.
+  CPS-transform (call by value, left to right) the function eval_0,
+  and call it from the main interpreter with the identity function as
+  initial continuation
 
-      evalue_1 : expression -> (valeur_expressible -> 'a) -> 'a
-  interprete_1 : programme -> valeur_expressible
-
-*)
-
-(*
-
-On voudrait ecrire
+      eval_1 : expression -> (expressible_value -> 'a) -> 'a
+  interpret_1 : program -> expressible_value
 
 *)
 
 use HighOrd (* import not needed, but why ? *)
 
-function evalue_1 (e:expr) (k:int -> 'a) : 'a =
+function eval_1 (e:expr) (k:int -> 'a) : 'a =
   match e with
     | Cte n -> k n
     | Sub e1 e2 ->
-      evalue_1 e1 (\ v1. evalue_1 e2 (\ v2. k (v1 - v2)))
+      eval_1 e1 (\ v1. eval_1 e2 (\ v2. k (v1 - v2)))
   end
 
-function interprete_1 (p : prog) : int = evalue_1 p (\ n. n)
+function interpret_1 (p : prog) : int = eval_1 p (\ n. n)
 
 
-use import SemDirecte
+use import DirectSem
 
 
 let rec lemma cps_correct_expr (e:expr) : unit
   variant { e }
-  ensures { forall k:int -> 'a. evalue_1 e k = k (evalue_0 e) }
+  ensures { forall k:int -> 'a. eval_1 e k = k (eval_0 e) }
 = match e with
   | Cte _ -> ()
   | Sub e1 e2 ->
@@ -177,69 +177,70 @@ let rec lemma cps_correct_expr (e:expr) : unit
       cps_correct_expr e2
   end
 
-lemma cps_correct: forall p. interprete_1 p = interprete_0 p
+lemma cps_correct: forall p. interpret_1 p = interpret_0 p
 
 end
 
 
 
-module Defonct
+(** {2 Defunctionalization} *)
+
+module Defunctionalization
 
 use import Expr
-use import SemDirecte
+use import DirectSem
 
-(*
-Exercice 2:
-  Defonctionaliser la continuation de evalue_1.
+(**
+Exercise 2:
+
+  De-functionalize the continuation of [eval_1].
 
          cont ::= ...
 
-    continue_2 : cont -> valeur -> valeur
-      evalue_2 : expression -> cont -> valeur
-  interprete_2 : programme -> valeur
+   [continue_2 : cont -> value -> value]
+       [eval_2 : expression -> cont -> value]
+  [interpret_2 : program -> value]
 
-  Le type de donnees ("data type") cont represente
-  la grammaire des contextes.
+  The data type cont represents the grammar of contexts.
 
-  Les deux fonctions mutuellement recursives evalue_2
-  et continue_2 implementent une machine abstraite,
-  c'est Ã  dire un systÃ¨me de transition d'etats.
+  The two mutually recursive functions [eval_2] and [continue_2]
+  implement an abstract machine, that is a state transition system.
 
 *)
 
 type cont = A1 expr cont | A2 int cont | I
 
-(*
+(**
 
-On voudrait ecrire
+One would want to write in Why:
 
-function evalue_cont (c:cont) (v:int) : int =
+[function eval_cont (c:cont) (v:int) : int =
   match c with
   | A1 e2 k ->
-    let v2 = evalue_0 e2 in
-    evalue_cont (A2 v k) v2
-  | A2 v1 k -> evalue_cont k (v1 - v)
+    let v2 = eval_0 e2 in
+    eval_cont (A2 v k) v2
+  | A2 v1 k -> eval_cont k (v1 - v)
   | I -> v
-  end
+  end]
 
-Mais la recursion n'etant pas structurelle, le noyau de Why3 la refuse
-(les definitions dans la logique doivent etre totales)
+But since the recursion is not structural, Why3 kernel rejects it
+(definitions in the logic part of the language must be total)
 
-On remplace par une definition relationnelle, inductive.
+We replace that with a relational definition, an inductive one.
 
 *)
 
-inductive evalue_cont cont int int =
+inductive eval_cont cont int int =
 | a1 :
   forall e2:expr, k:cont, v:int, r:int.
-  evalue_cont (A2 v k) (evalue_0 e2) r -> evalue_cont (A1 e2 k) v r
+  eval_cont (A2 v k) (eval_0 e2) r -> eval_cont (A1 e2 k) v r
 | a2 :
   forall v1:int, k:cont, v:int, r:int.
-  evalue_cont k (v1 - v) r -> evalue_cont (A2 v1 k) v r
+  eval_cont k (v1 - v) r -> eval_cont (A2 v1 k) v r
 | a3 :
-  forall v:int. evalue_cont I v v
+  forall v:int. eval_cont I v v
 
-(* fonctions servant de mesure pour la preuve de terminaison *)
+(** Some functions to serve as measures for the termination proof *)
 
 function size_e (e:expr) : int =
   match e with
@@ -271,91 +272,68 @@ let rec lemma size_c_pos (c:cont) : unit
   | A2 _ k -> size_c_pos k
   end
 
-(* programmes WhyML (declarés avec "let" au lieu de "function"),
-   mutuellement recursifs resultant de la defonctionalisation *)
+(** WhyML programs (declared with "let" instead of "function"),
+   mutually recursive, resulting from de-functionalization *)
 
 let rec continue_2 (c:cont) (v:int) : int
   variant { size_c c }
-  ensures { evalue_cont c v result }
+  ensures { eval_cont c v result }
   =
   match c with
-    | A1 e2 k -> evalue_2 e2 (A2 v k)
+    | A1 e2 k -> eval_2 e2 (A2 v k)
     | A2 v1 k -> continue_2 k (v1 - v)
     | I -> v
   end
 
-with evalue_2 (e:expr) (c:cont) : int
+with eval_2 (e:expr) (c:cont) : int
   variant { size_c c + size_e e }
-  ensures { evalue_cont c (evalue_0 e) result }
+  ensures { eval_cont c (eval_0 e) result }
   =
   match e with
     | Cte n -> continue_2 c n
-    | Sub e1 e2 -> evalue_2 e1 (A1 e2 c)
+    | Sub e1 e2 -> eval_2 e1 (A1 e2 c)
   end
 
-(* L'interprete. La post-condition specifie que ce programme calcule
-   la meme chose que evalue_0 *)
+(** The interpreter. The post-condition specifies that this program
+    computes the same thing as [eval_0] *)
 
-let interprete_2 (p:prog) : int
-  ensures { result = evalue_0 p }
-  = evalue_2 p I
+let interpret_2 (p:prog) : int
+  ensures { result = eval_0 p }
+  = eval_2 p I
 
-let u0 () = interprete_2 p0
-let u1 () = interprete_2 p1
-let u2 () = interprete_2 p2
-let u3 () = interprete_2 p3
-let u4 () = interprete_2 p4
+let u0 () = interpret_2 p0
+let u1 () = interpret_2 p1
+let u2 () = interpret_2 p2
+let u3 () = interpret_2 p3
+let u4 () = interpret_2 p4
 
 end
 
 
-module SemErreur
+
+
+(** {2 Semantics with errors} *)
+
+module SemWithError
 
 use import Expr
 
 (*
-2. Les expressions arithmetiques, avec des erreurs
-   -----------------------------------------------
-
-Expressions:
-
-n  :  nat
-
-e  :  terme
-e ::= n | e - e
-
-p  :  programme
-p ::= e
 
 
-Exemples:
+Errors:
 
-p0 = 0
-p1 = 10 - 6
-p2 = (10 - 6) - (7 - 2)
-p3 = (7 - 2) - (10 - 6)
-p4 = 10 - (2 - 3)
+s  :  error
 
 
-Valeurs:
+Expressible values:
 
-v  :  valeur
-v ::= n
-
-
-Erreurs:
-
-s  :  erreur
-
-
-Valeurs expressibles:
-
-ve  :  valeur_expressible
+ve  :  expressible_value
 ve ::= v | s
 
 *)
 
-type valeur = Vnum int | Underflow
+type value = Vnum int | Underflow
 
 (*
 Interpretation:
@@ -379,34 +357,33 @@ e1 => n1   e2 => n2   n1 >= n2   n1 - n2 = n3
 ---------------------------------------------
       e1 - e2 => n3
 
-On interprÃ¨te le programme e en la valeur n si le jugement
+We interpret the program e into value n if the judgement
 
   e => n
 
-est satisfait, et en l'erreur s si le jugement
+holds, and into error s if the judgement
 
   e => s
 
-est satisfait.
+holds.
 
 
-Exercice 0:
-  Programmer l'interprete ci-dessus
-  et le tester sur les exemples.
+Exercise 0:
+  Program the interpretor above and test it on the examples.
 
-  evalue_0 : terme -> valeur_expressible
-  interprete_0 : programme -> valeur_expressible
+  eval_0 : expr -> expressible_value
+  interpret_0 : program -> expressible_value
 
 *)
 
-function evalue_0 (e:expr) : valeur =
+function eval_0 (e:expr) : value =
   match e with
   | Cte n -> if n >= 0 then Vnum n else Underflow
   | Sub e1 e2 ->
-     match evalue_0 e1 with
+     match eval_0 e1 with
      | Underflow -> Underflow
      | Vnum v1 ->
-       match evalue_0 e2 with
+       match eval_0 e2 with
        | Underflow -> Underflow
        | Vnum v2 ->
          if v1 >= v2 then Vnum (v1 - v2) else Underflow
@@ -414,24 +391,23 @@ function evalue_0 (e:expr) : valeur =
      end
   end
 
-function interprete_0 (p:prog) : valeur = evalue_0 p
+function interpret_0 (p:prog) : value = eval_0 p
 
-let t0 () = interprete_0 p0
-let t1 () = interprete_0 p1
-let t2 () = interprete_0 p2
-let t3 () = interprete_0 p3
-let t4 () = interprete_0 p4
+let t0 () = interpret_0 p0
+let t1 () = interpret_0 p1
+let t2 () = interpret_0 p2
+let t3 () = interpret_0 p3
+let t4 () = interpret_0 p4
 
 
 (*
-Exercice 1:
-  CPS-transformer (en appel par valeur, de gauche a  droite)
-  la fonction evalue_0,
-  et l'appeler dans la fonction principale de l'interprete
-  avec comme continuation initiale la fonction identite.
+Exercise 1:
+  CPS-transform (call by value, from left to right)
+  the function [eval_0], call it from the main interpreter
+  with the identity function as initial continuation.
 
-      evalue_1 : terme -> (valeur_expressible -> 'a) -> 'a
-  interprÃ¨te_1 : programme -> valeur_expressible
+      eval_1 : expr -> (expressible_value -> 'a) -> 'a
+  interpret_1 : program -> expressible_value
 
 *)
 
@@ -439,15 +415,15 @@ Exercice 1:
 
 use HighOrd (* import not needed, but why ? *)
 
-function evalue_1 (e:expr) (k:valeur -> 'a) : 'a =
+function eval_1 (e:expr) (k:value -> 'a) : 'a =
   match e with
     | Cte n -> k (if n >= 0 then Vnum n else Underflow)
     | Sub e1 e2 ->
-      evalue_1 e1 (\ v1.
+      eval_1 e1 (\ v1.
        match v1 with
        | Underflow -> k Underflow
        | Vnum v1 ->
-         evalue_1 e2 (\ v2.
+         eval_1 e2 (\ v2.
          match v2 with
          | Underflow -> k Underflow
          | Vnum v2 -> k (if v1 >= v2 then Vnum (v1 - v2) else Underflow)
@@ -455,12 +431,12 @@ function evalue_1 (e:expr) (k:valeur -> 'a) : 'a =
        end)
   end
 
-function interprete_1 (p : prog) : valeur = evalue_1 p (\ n. n)
+function interpret_1 (p : prog) : value = eval_1 p (\ n. n)
 
 
 let rec lemma cps_correct_expr (e:expr) : unit
   variant { e }
-  ensures { forall k:valeur -> 'a. evalue_1 e k = k (evalue_0 e) }
+  ensures { forall k:value -> 'a. eval_1 e k = k (eval_0 e) }
 = match e with
   | Cte _ -> ()
   | Sub e1 e2 ->
@@ -468,173 +444,181 @@ let rec lemma cps_correct_expr (e:expr) : unit
       cps_correct_expr e2
   end
 
-lemma cps_correct: forall p. interprete_1 p = interprete_0 p
+lemma cps_correct: forall p. interpret_1 p = interpret_0 p
 
 (*
-Exercice 2:
-  Diviser la continuation
-    valeur_expressible -> 'a
-  en deux:
-    (valeur -> 'a) * (erreur -> 'a)
-  et adapter evalue_1 et interprÃ¨te_1.
+Exercise 2:
 
-      evalue_2 : terme -> (valeur -> 'a) -> (erreur -> 'a) -> 'a
-  interprÃ¨te_2 : programme -> valeur_expressible
+  Divide the continuation
+
+    expressible_value -> 'a
+
+  in two: 
+
+    (value -> 'a) * (error -> 'a)
+
+  and adapt [eval_1] and [interpret_1] as
+
+       eval_2 : expr -> (value -> 'a) -> (error -> 'a) -> 'a
+  interpret_2 : program -> expressible_value
 
 *)
 
 
 
 (*
-function evalue_2 (e:expr) (k:int -> 'a) (kerr: unit -> 'a) : 'a =
+function eval_2 (e:expr) (k:int -> 'a) (kerr: unit -> 'a) : 'a =
   match e with
     | Cte n -> if n >= 0 then k n else kerr ()
     | Sub e1 e2 ->
-      evalue_2 e1 (\ v1.
-         evalue_2 e2 (\ v2.
+      eval_2 e1 (\ v1.
+         eval_2 e2 (\ v2.
            if v1 >= v2 then k (v1 - v2) else kerr ())
            kerr) kerr
   end
 *)
 
-function evalue_2 (e:expr) (k:int -> 'a) (kerr: unit -> 'a) : 'a =
+function eval_2 (e:expr) (k:int -> 'a) (kerr: unit -> 'a) : 'a =
   match e with
     | Cte n -> if n >= 0 then k n else kerr ()
     | Sub e1 e2 ->
-      evalue_2 e1 (evalue_2a e2 k kerr) kerr
+      eval_2 e1 (eval_2a e2 k kerr) kerr
   end
 
-with evalue_2a (e2:expr) (k:int -> 'a) (kerr : unit -> 'a) : int -> 'a =
-  (\ v1. evalue_2 e2 (evalue_2b v1 k kerr) kerr)
+with eval_2a (e2:expr) (k:int -> 'a) (kerr : unit -> 'a) : int -> 'a =
+  (\ v1. eval_2 e2 (eval_2b v1 k kerr) kerr)
 
-with evalue_2b (v1:int) (k:int -> 'a) (kerr : unit -> 'a) : int -> 'a =
+with eval_2b (v1:int) (k:int -> 'a) (kerr : unit -> 'a) : int -> 'a =
   (\ v2. if v1 >= v2 then k (v1 - v2) else kerr ())
 
 
 
-function interprete_2 (p : prog) : valeur = evalue_2 p (\ n. Vnum n) (\ u. Underflow)
+function interpret_2 (p : prog) : value = 
+  eval_2 p (\ n. Vnum n) (\ u. Underflow)
 
 let rec lemma cps2_correct_expr (e:expr) (kerr:unit -> 'a): unit
   variant { e }
-  ensures { forall k. evalue_2 e k kerr =
-    match evalue_0 e with Vnum n -> k n | Underflow -> kerr () end }
+  ensures { forall k. eval_2 e k kerr =
+    match eval_0 e with Vnum n -> k n | Underflow -> kerr () end }
 = match e with
   | Cte _ -> ()
   | Sub e1 e2 ->
       cps2_correct_expr e1 kerr;
       cps2_correct_expr e2 kerr;
-      assert {forall k. evalue_2 e k kerr = evalue_2 e1 (evalue_2a e2 k kerr) kerr }
+      assert {forall k. eval_2 e k kerr = eval_2 e1 (eval_2a e2 k kerr) kerr }
   end
 
-lemma cps2_correct: forall p. interprete_2 p = interprete_0 p
+lemma cps2_correct: forall p. interpret_2 p = interpret_0 p
 
 (*
 
-Exercice 3:
-  Specialiser le co-domaine des continuations et de la fonction
-  d'evaluation pour qu'il ne soit plus polymorphique
-  mais qu'il soit valeur_expressible, et
-  court-circuiter la seconde continuation pour ne pas continuer
-  en cas d'erreur.
+Exercise 3:
+  Specialize the codomain of the continuations and of the evaluation function
+  so that it is not polymorphic anymore but is [expressible_value], and
+  then short-circuit the second continuation to stop in case of error
 
-      evalue_3 : terme -> (valeur -> valeur_expressible) -> valeur_expressible
-  interprÃ¨te_3 : programme -> valeur_expressible
+       eval_3 : expr -> (value -> expressible_value) -> expressible_value
+  interpret_3 : program -> expressible_value
 
-  (NB. Maintenant il n'y a plus qu'une continuation et elle n'est
-  appliquee que s'il n'y a pas eu d'erreur.)
+  NB: Now there is only one continuation and it is applied only in
+  absence of error.
 
 *)
 
 
-function evalue_3 (e:expr) (k:int -> valeur) : valeur =
+function eval_3 (e:expr) (k:int -> value) : value =
   match e with
     | Cte n -> if n >= 0 then k n else Underflow
     | Sub e1 e2 ->
-      evalue_3 e1 (evalue_3a e2 k)
+      eval_3 e1 (eval_3a e2 k)
   end
 
-with evalue_3a (e2:expr) (k:int -> valeur) : int -> valeur =
-  (\ v1. evalue_3 e2 (evalue_3b v1 k))
+with eval_3a (e2:expr) (k:int -> value) : int -> value =
+  (\ v1. eval_3 e2 (eval_3b v1 k))
 
-with evalue_3b (v1:int) (k:int -> valeur) : int -> valeur =
+with eval_3b (v1:int) (k:int -> value) : int -> value =
   (\ v2. if v1 >= v2 then k (v1 - v2) else Underflow)
 
 
-function interprete_3 (p : prog) : valeur = evalue_3 p (\ n. Vnum n)
+function interpret_3 (p : prog) : value = eval_3 p (\ n. Vnum n)
 
 let rec lemma cps3_correct_expr (e:expr) : unit
   variant { e }
-  ensures { forall k. evalue_3 e k =
-    match evalue_0 e with Vnum n -> k n | Underflow -> Underflow end }
+  ensures { forall k. eval_3 e k =
+    match eval_0 e with Vnum n -> k n | Underflow -> Underflow end }
 = match e with
   | Cte _ -> ()
   | Sub e1 e2 ->
       cps3_correct_expr e1;
       cps3_correct_expr e2;
-      assert {forall k. evalue_3 e k = evalue_3 e1 (evalue_3a e2 k) }
+      assert {forall k. eval_3 e k = eval_3 e1 (eval_3a e2 k) }
   end
 
-lemma cps3_correct: forall p. interprete_3 p = interprete_0 p
+lemma cps3_correct: forall p. interpret_3 p = interpret_0 p
 
 
 (*
-Exercice 4:
-  Defonctionaliser la continuation de evalue_3.
+Exercise 4:
+  De-functionalize the continuation of [eval_3].
 
          cont ::= ...
 
-    continue_4 : cont -> valeur -> valeur_expressible
-      evalue_4 : terme -> cont -> valeur_expressible
-  interprÃ¨te_4 : programme -> valeur_expressible
+    continue_4 : cont -> value -> expressible_value
+        eval_4 : expr -> cont -> expressible_value
+  interprete_4 : program -> expressible_value
 
-  Le type de donnees ("data type") cont represente
-  la grammaire des contextes.  (NB. A-t-il change
-  par rapport Ã  l'exercice precedent?)
+  The data type [cont] represents the grammar of contexts.
+  (NB. has it changed w.r.t to previous exercise?)
 
-  Les deux fonctions mutuellement recursives evalue_4
-  et continue_4 implementent une machine abstraite,
-  c'est Ã  dire un systÃ¨me de transition d'etats,
-  qui s'arrÃªte soit tout de suite en cas d'erreur,
-  soit Ã  la fin du calcul.
+  The two mutually recursive functions [eval_4] and [continue_4]
+  implement an abstract machine, that is a transition system that
+  stops immediately in case of error, or and the end of computation.
 
-----------
+*)
 
-Le lambda-calcul
-----------------
 
-Termes:
+(* TODO *)
+
+
+end
+
+
+(** {2 The lambda-calculus} *)
+
+(*
+Terms:
 
 n : int
 
-x : identificateur
+x : identifier
 
-t  : terme
+t  : term
 t ::= x | \x.t | t t
 
-p  :  programme
+p  :  program
 p ::= t
-      oÃ¹ t est ferme (i.e., sans variables libres)
+      where t is ground (i.e. without any free variable)
 
 
-Exemples:
+Examples:
 
 p0 = (\x.x)
 p1 = (\x.x) (\x.x)
 p2 = (\x.\f.f x) (\y.y) (\x.x)
 
 
-Valeurs et environnements:
+Values and environments:
 
-e  :  environnement
-v ::= nil | (identificateur, valeur) :: environnement
+e  :  environment
+v ::= nil | (identifier, value) :: environment
 
-v  :  valeur
+v  :  value
 v ::= (\x.t, e)
 
 
 Operateur algebrique:
 
-lookup : identificateur -> environnement -> valeur
+lookup : identificateur -> environnement -> value
 
 
 Contextes d'evaluation:
@@ -654,22 +638,22 @@ Machine abstraite (dite "CEK"):
 <[(\x.t, e) C], v>_cont -> <t, (x, v) :: e, C>_eval
 
 
-Exercice 0:
-  Programmer cette machine abstraite.
+Exercise 0:
+  Programr cette machine abstraite.
 
 
-Exercice 1:
+Exercise 1:
   Cette machine abstraite est en forme defonctionalisee.
   La refonctionaliser.
 
 
-Exercice 2:
-  Le resultat de l'Exercice 1 est en CPS.
+Exercise 2:
+  Le resultat de l'Exercise 1 est en CPS.
   L'exprimer en style direct.
 
 
-Exercice 3:
-  Le resultat de l'Exercice 2 est en forme defonctionalisee
+Exercise 3:
+  Le resultat de l'Exercise 2 est en forme defonctionalisee
   (dans le sens que les fermetures sont en forme defonctionalisee
   triviale).
   Le refonctionaliser, et caracteriser le resultat.
@@ -681,7 +665,8 @@ Exercice 3:
 *)
 
 
-end
+
+
 
 
 
@@ -698,7 +683,7 @@ module R
 
   use import Expr
 
-  use import SemDirecte
+  use import DirectSem
 
 (*
 Une semantique a petits pas iterative avec des contextes de reduction:
@@ -714,7 +699,7 @@ n  :  int
 e  :  expression
 e ::= n | e - e
 
-p  :  programme
+p  :  program
 p ::= e
 
 
@@ -727,9 +712,9 @@ p3 = (7 - 2) - (10 - 6)
 p4 = 10 - (2 - 3)
 
 
-Valeurs:
+Values:
 
-v  :  valeur
+v  :  value
 v ::= n
 
 
@@ -763,7 +748,7 @@ predicate is_a_redex (e:expr) =
 
 let contracte (e:expr) : expr
   requires { is_a_redex e }
-  ensures { evalue_0 result = evalue_0 e }
+  ensures { eval_0 result = eval_0 e }
   =
   match e with
   | Sub (Cte v1) (Cte v2) -> Cte (v1 - v2)
@@ -802,13 +787,26 @@ function recompose (c:context) (e:expr) : expr =
   end
 
 let rec lemma recompose_values (c:context) (e1 e2:expr) : unit
-  requires { evalue_0 e1 = evalue_0 e2 }
+  requires { eval_0 e1 = eval_0 e2 }
   variant  { c }
-  ensures  { evalue_0 (recompose c e1) = evalue_0 (recompose c e2) }
+  ensures  { eval_0 (recompose c e1) = eval_0 (recompose c e2) }
 = match c with
   | Empty -> ()
   | Left c e -> recompose_values c (Sub e1 e) (Sub e2 e)
   | Right n c -> recompose_values c (Sub (Cte n) e1) (Sub (Cte n) e2)
+  end
+
+let rec lemma recompose_inversion (c:context) (e:expr) 
+  requires { 
+      match c with Empty -> false | _ -> true end \/ 
+      match e with Cte _ -> false | Sub _ _ -> true end }
+  variant { c }
+  ensures {  match recompose c e with 
+               Cte _ -> false | Sub _ _ -> true end }
+= match c with 
+  | Empty -> ()
+  | Left c e2 -> recompose_inversion c (Sub e e2)
+  | Right n1 c -> recompose_inversion c (Sub (Cte n1) e)
   end
 
 (*
@@ -822,7 +820,7 @@ fonction de decomposition:
       decompose_term (n, C) = decompose_cont (C, n)
 decompose_term (e1 - e2, C) = decompose_term (e1, [C e2])
 
-             decompose_cont : cont * valeur -> dec_ou_val
+             decompose_cont : cont * value -> dec_ou_val
      decompose_cont ([], n) = n
   decompose_cont ([C e], n) = decompose_term (e, [n c])
 decompose_term ([n1 C], n2) = (C, n1 - n2)
@@ -892,7 +890,7 @@ alors reduis e = recompose (C, c)
 *)
 
 let reduis (e:expr) : expr
-  ensures { evalue_0 result = evalue_0 e }
+  ensures { eval_0 result = eval_0 e }
   diverges
   raises { NoRedex -> is_a_value e }
   =
@@ -902,7 +900,7 @@ let reduis (e:expr) : expr
 (*
 Evaluation basee sur la reduction iteree:
 
-itere : red_ou_val -> valeur + erreur
+itere : red_ou_val -> value + erreur
 
 itere v = v
 
@@ -916,7 +914,7 @@ alors itere (C, rp) = itere (decompose (recompose (C, c)))
 
 let rec itere (e:expr) : int
   diverges
-  ensures { evalue_0 e = result }
+  ensures { eval_0 e = result }
   =
   try
     let e' = reduis e in
@@ -930,11 +928,11 @@ let rec itere (e:expr) : int
 
 (*
 
-Exercice 1:
+Exercise 1:
   Implementer la "reduction semantics" ci-dessus et la tester.
 
 
-Exercice 2:
+Exercise 2:
   Optimiser l'etape de recomposition / decomposition
   en une fonction "refocus".
 
@@ -943,12 +941,15 @@ Exercice 2:
 
 let refocus c e
   diverges
-  raises { NoRedex -> is_a_value e }
+  ensures { let (c1,e1) = result in
+            recompose c1 e1 = recompose c e /\
+            is_a_redex e1 }
+  raises { NoRedex -> is_a_value (recompose c e) }
   = decompose_term e c
 
 let rec itere_opt (c:context) (e:expr) : int
   diverges
-  ensures { result = evalue_0 (recompose c e) }
+  ensures { result = eval_0 (recompose c e) }
   =
   try
     let (c,r) = refocus c e in
@@ -969,14 +970,12 @@ let rec normalize (e:expr)
 
 (*
 
-Exercice 3:
+Exercise 3:
   Obtenir une machine abstraite.
 
-----------
-
-% fin de danvy-ex2.txt
-
 *)
+
+(* TODO *)
 
 end
 

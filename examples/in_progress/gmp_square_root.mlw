@@ -1,0 +1,207 @@
+
+(*
+  An efficient algorithm proposed by P. Zimmermann in 1999 to compute
+  square roots of arbitrarily large integers
+
+  Following the Coq proof described in
+
+    A Proof of GMP Square Root
+    Yves Bertot, Nicolas Magaud, and Paul Zimmermann
+    Journal of Automated Reasoning 29: 225–252, 2002.
+
+  and available at
+
+    http://www-sop.inria.fr/lemme/AOC/SQRT/index.html
+*)
+
+module GmpModel
+
+  use export int.Int
+  use export int.ComputerDivision
+  use export array.Array
+
+  constant beta' : int
+  axiom beta'_gt_1: 1 < beta'
+  constant beta : int = 2 * beta'
+
+  type memory = array int
+
+  val m: memory
+    (** invariant: each cell contains an integer in [0..beta[ *)
+
+  type pointer = int
+  type size = int
+
+  predicate valid (m: memory) (p: pointer) (s: size) =
+    0 <= p /\ p + s <= length m
+
+  predicate no_overlap (p1: pointer) (s1: size) (p2: pointer) (s2: size) =
+    p1 + s1 <= p2 \/ p2 + s2 <= p1
+
+  function i (m: memory) (p: pointer) (s: size) : int
+    (** the GMP integer in m[p..p+s[ *)
+
+  predicate modifies (m1 m2: memory) (p: pointer) (s: size) =
+    forall q: pointer. (q < p \/ p + s <= q) -> m2[q] = m1[q]
+    (** nothing modified apart from [p..p+s[ *)
+
+  axiom frame:
+    forall m1 m2: memory, p: pointer, s: size.
+    modifies m1 m2 p s ->
+    forall a: pointer, l: size. no_overlap p s a l -> i m2 a l = i m1 a l
+
+  predicate modifies2 (m1 m2: memory)
+                      (p1: pointer) (s1: size) (p2: pointer) (s2: size) =
+    forall q: pointer. (   (q < p1 \/ p1 + s1 <= q)
+                        /\ (q < p2 \/ p2 + s2 <= q)) -> m2[q] = m1[q]
+    (** nothing modified apart from [p1..p1+s1[ and [p2..p2+s2[ *)
+
+  axiom frame2:
+    forall m1 m2: memory, p1 p2: pointer, s1 s2: size.
+    modifies2 m1 m2 p1 s1 p2 s2 ->
+    forall a: pointer, l: size. no_overlap p1 s1 a l -> no_overlap p2 s2 a l ->
+    i m2 a l = i m1 a l
+
+  predicate is_normalized (n h: int) = n < h <= 4 * n
+
+  function sqr (z: int) : int = z*z
+
+  let int_of_bool (b: bool) : int = if b then 1 else 0
+
+  function mult_bool (c: bool) (n: int) : int = if c then n else 0
+
+end
+
+module GmpAuxiliaryfunctions
+
+  use export GmpModel
+  use export ref.Ref
+  use export int.Power
+
+  val rb: ref bool
+
+  val mpn_sub_n (r a b: pointer) (l: size) : unit
+    requires { valid m r l }
+    requires { valid m a l }
+    requires { valid m b l }
+    requires { no_overlap r l a l }
+    requires { no_overlap r l b l }
+    requires { no_overlap a l b l }
+    writes   { m, rb }
+    ensures  { i m r l = (mult_bool !rb (power beta l) + i (old m) a l)
+                         - i (old m) b l }
+    ensures  { modifies (old m) m r l }
+
+  val mpn_divrem (q a: pointer) (la: size) (b: pointer) (lb: size) : unit
+    requires { valid m a la }
+    requires { valid m b lb }
+    requires { valid m q (la - lb) }
+    requires { lb <= la }
+    requires { power beta lb <= 2 * i m b lb }
+    requires { no_overlap a la b lb }
+    requires { no_overlap q (la - lb) a la }
+    requires { no_overlap q (la - lb) b lb }
+    writes   { m, rb }
+    ensures  { i (old m) a la =
+                 (mult_bool !rb (power beta (la - lb)) + i m q (la - lb)) *
+                 (i (old m) b lb) + i m a lb }
+    ensures  { i m a lb < i (old m) b lb }
+    ensures  { modifies2 (old m) m q (la - lb) a lb }
+
+  val mpn_sqr_n (r a: pointer) (l: size) : unit
+    requires { valid m a l }
+    requires { valid m r (2*l) }
+    requires { no_overlap r (2*l) a l }
+    writes   { m }
+    ensures  { i m r (2*l) = sqr (i (old m) a l) }
+    ensures  { modifies (old m) m r (2*l) }
+
+  val mpn_sqrtrem2 (s r n: pointer) : unit
+    requires { valid m n 2 }
+    requires { valid m s 1 }
+    requires { valid m r 1 }
+    requires { no_overlap r 1 s 1 }
+    requires { is_normalized (i m n 2) (power beta 2) }
+    writes   { m, rb }
+    ensures  { let s = i m s 1 in
+               let r = i m r 1 + mult_bool !rb beta in
+               i (old m) n 2 = s*s + r /\ 0 <= r <= 2*s }
+    ensures  { modifies (old m) m n 2 }
+
+  val rz: ref int
+
+  val single_and_1 (a: pointer) : unit
+    requires { valid m a 1 }
+    writes   { rz }
+    ensures  { !rz = mod m[a] 2 }
+
+  val mpn_rshift2 (a b: pointer) (l: size) : unit
+    requires { valid m a l }
+    requires { valid m b l }
+    requires { b <= a } (* ? *)
+    requires { no_overlap a l b l }
+    writes   { m }
+    ensures  { i (old m) b l = 2 * i m a l + mod (old m)[b] 2 }
+    ensures  { modifies (old m) m a l }
+
+
+(*
+  let square_s_and_sub (np sp nn l h q c b: int)
+  = mpn_sqr_n (np + nn) sp l;
+    mpn_sub_n np np (np + nn) (2 * l);
+    ----
+    b := !q + (bool2Z !rb);
+  if (nat_eq_bool !l !h) then
+     c := !c - !b
+  else
+     begin 
+       (mpn_sub_1 (plus np (mult (S (S O)) !l))
+                  (plus np (mult (S (S O)) !l))
+                  (S O) !b);
+       c := !c - (bool2Z !rb)
+     end
+*)
+
+end
+
+module GmpSquareRoot
+
+  use import GmpAuxiliaryfunctions
+  use import ref.Ref
+
+(**
+  let division_step (np sp: pointer) (nn l h: size) (c q: ref int) : unit
+  = if !q <> 0 then mpn_sub_n (np + 2*l) (np + 2*l) (sp + l) h;
+    mpn_divrem sp (np + l) nn (sp + l + h);
+    q := !q + int_of_bool !rb;
+    single_and_1 sp;
+    let c = !rz in
+    mpn_rshift2 sp sp l;
+    m[sp + l-1] <- l_or (s + l-1) (shift_1 !q);
+    q := shift_2 !q;
+    if !c <> 0 then begin
+      mpn_add_n (np + l) (np + l) (sp + l) h;
+      c := int_of_bool !rb
+    end
+
+  let rec mpn_dq_sqrtrem (sp np: pointer) (nn: size) : unit
+    requires { 0 < nn }
+    variant  { nn }
+  = if nn = 1 then
+      mpn_sqrtrem2 sp np np
+    else begin
+      let l = div nn 2 in
+      let h = nn - l in
+      mpn_dq_sqrtrem (sp + l) (np + 2*l) h;
+      let q = if !rb then 1 else 0 in
+      let c = ref 0 in
+      division_step np sp nn l h c q;
+      square_s_and_sub np sp nn l h q c b;
+      mpn_add_1 (sp + l) (sp + l) h q;
+      let q = int_of_bool !rb in
+      correct_result np sp nn l h q c b;
+      rb := !c > 0
+    end
+**)
+
+end

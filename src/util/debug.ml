@@ -179,16 +179,13 @@ module Stats = struct
       !registered_stats
 
 
-  (* ??? We don't use statistics, and the code below breaks on windows *)
-  (*
   let () = at_exit (fun () ->
     print ();
     Format.pp_print_flush !formatter ())
 (** SIGXCPU cpu time limit reached *)
   let _ =
   (** TODO? have a possible callback for printing different message*)
-    Sys.signal 24 (Sys.Signal_handle (fun _ -> exit 2))
-  *)
+    Sys.signal Sys.sigint (Sys.Signal_handle (fun _ -> exit 2))
 
   let register ~print ~name ~init =
     let s = {name = name; printer = print; value = init} in

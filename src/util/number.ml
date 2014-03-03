@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Format
-open Big_int
 
 (** Construction *)
 
@@ -77,6 +76,7 @@ let real_const_hex i f e =
 
 (** Printing *)
 
+
 let compute_any radix s =
   let n = String.length s in
   let rec compute acc i =
@@ -89,9 +89,9 @@ let compute_any radix s =
         | 'a'..'z' as c -> 10 + Char.code c - Char.code 'a'
         | _ -> assert false in
       assert (v < radix);
-      compute (add_int_big_int v (mult_int_big_int radix acc)) (i + 1)
+      compute (BigInt.add_int v (BigInt.mul_int radix acc)) (i + 1)
     end in
-  (compute zero_big_int 0)
+  (compute BigInt.zero 0)
 
 let compute_int c =
   match c with
@@ -101,10 +101,10 @@ let compute_int c =
   | IConstBin s -> compute_any 2 s
 
 let any_to_dec radix s =
-  string_of_big_int (compute_any radix s)
+  BigInt.to_string (compute_any radix s)
 
 let power2 n =
-  string_of_big_int (power_int_positive_int 2 n)
+  BigInt.to_string (BigInt.pow_int_pos 2 n)
 
 type integer_format =
   (string -> unit, Format.formatter, unit) format
@@ -154,7 +154,7 @@ let force_support support do_it v =
   | Number_default -> assert false
   | Number_custom f -> do_it f v
 
-let simplify_max_int = big_int_of_string "2147483646"
+let simplify_max_int = BigInt.of_string "2147483646"
 
 let remove_minus e =
   if e.[0] = '-' then
@@ -165,7 +165,7 @@ let print_dec_int support fmt i =
   let fallback i =
     force_support support.def_int_support (fprintf fmt) i in
   if not support.long_int_support &&
-     (compare_big_int (big_int_of_string i) simplify_max_int > 0) then
+     (BigInt.compare (BigInt.of_string i) simplify_max_int > 0) then
     fallback i
   else
     check_support support.dec_int_support (Some "%s") (fprintf fmt)

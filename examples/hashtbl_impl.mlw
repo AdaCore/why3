@@ -144,7 +144,7 @@ module HashtblImpl
     ensures { forall k': key. k' <> k ->
                 Map.get h.view k' = Map.get (old h.view) k' }
   =
-    abstract (if h.size = length h.data then resize h);
+    abstract if h.size = length h.data then resize h end;
     remove h k;
     let i = bucket k (length h.data) in
     h.data[i] <- Cons (k, v) h.data[i];

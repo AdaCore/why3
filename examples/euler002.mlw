@@ -9,25 +9,10 @@ be:
 By considering the terms in the Fibonacci sequence whose values do not
 exceed four million, find the sum of the even-valued terms. *)
 
-theory Fib "Definition of Fibonacci sequence"
-
-  use import int.Int
-
-  function fib int : int
-
-  axiom fib0: fib 0 = 1
-
-  axiom fib1: fib 1 = 2
-
-  axiom fibn: forall n:int [fib n].
-     n >= 2 -> fib n = fib (n-1) + fib (n-2)
-
-end
-
 theory FibSumEven "sum of even-valued Fibonacci numbers"
 
   use import int.Int
-  use import Fib
+  use import int.Fibonacci
   use import int.ComputerDivision
 
   (* [fib_sum_even m n] is the sum of even-valued terms of the
@@ -37,82 +22,41 @@ theory FibSumEven "sum of even-valued Fibonacci numbers"
   axiom SumZero: forall m:int. fib_sum_even m 0 = 0
 
   axiom SumEvenLe: forall n m:int.
-     n >= 0 /\ (fib n) <= m /\ mod (fib n) 2 = 0 ->
+     n >= 0 -> fib n <= m -> mod (fib n) 2 = 0 ->
        fib_sum_even m (n+1) = fib_sum_even m n + fib n
 
   axiom SumEvenGt: forall n m:int.
-     n >= 0 /\ (fib n) > m /\ mod (fib n) 2 = 0 ->
+     n >= 0 -> fib n > m -> mod (fib n) 2 = 0 ->
        fib_sum_even m (n+1) = fib_sum_even m n
 
   axiom SumOdd: forall n m:int.
-     n >= 0 /\ mod (fib n) 2 <> 0 ->
+     n >= 0 -> mod (fib n) 2 <> 0 ->
        fib_sum_even m (n+1) = fib_sum_even m n
 
-  predicate is_fib_sum_even (m:int) (sum:int) = 
-    exists n:int. 
+  predicate is_fib_sum_even (m:int) (sum:int) =
+    exists n:int.
       sum = fib_sum_even m n /\ fib n > m
    (* Note: we take for granted that [fib] is an
         increasing sequence *)
 
 end
 
-(*
-theory FibSumEven "sum of even-valued Fibonacci numbers"
-
-  use import int.Int
-  use import Fib
-  use import int.ComputerDivision
-
-  (* [fib_sum_even_lt m] is the sum of even-valued terms
-      of the Fibonacci sequence that are less than m
-
-     [fib_sum_even_lt_from m n] is the sum of even-valued terms
-      of the Fibonacci sequence that are less than m, starting from n
-
-
-  *)
-
-  function fib_sum_even_lt_from int int : int
-
-  axiom SumTooLarge: forall m n:int.
-     n >= 0 -> (fib n) >= m -> fib_sum_even_lt_from m n = 0
-     (* Note: we take for granted that [fib] is an
-        increasing sequence *)
-
-  axiom SumYes: forall n m:int.
-     n >= 0 -> (fib n) < m -> mod (fib n) 2 = 0 ->
-       fib_sum_even_lt_from m n = fib_sum_even_lt_from m (n+1) + (fib n)
-
-  axiom SumOdd: forall n m:int.
-     n >= 0 -> mod (fib n) 2 <> 0 ->
-       fib_sum_even_lt_from m n = fib_sum_even_lt_from m (n+1)
-
-  function fib_sum_even_lt (m:int) : int = fib_sum_even_lt_from m 0
-
-end
-*)
 theory FibOnlyEven
 
   use import int.Int
   use import int.ComputerDivision
-  use import Fib
+  use import int.Fibonacci
 
-  lemma fib_even : forall n:int. n >= 0 ->
-      (mod (fib n) 2 = 0 <-> mod n 3 = 1)
+  lemma fib_even_3n : forall n:int. n >= 0 ->
+    mod (fib n) 2 = 0 <-> mod n 3 = 0
 
-  (* we pose xn = f(3n+1), that is
-     x_0 = 2, x_1 = 8, x_{n+2} = 4 x_{n+1} + x_n
-  *)
+  function fib_even (n: int) : int = fib (3 * n)
 
-  function fib_even int : int
+  lemma fib_even0: fib_even 0 = 0
+  lemma fib_even1: fib_even 1 = 2
 
-  axiom fib_even0: fib_even 0 = 2
-  axiom fib_even1: fib_even 1 = 8
-  axiom fib_evenn: forall n:int [fib_even n].
+  lemma fib_evenn: forall n:int [fib_even n].
      n >= 2 -> fib_even n = 4 * fib_even (n-1) + fib_even (n-2)
-
-  lemma fib_even_correct :
-     forall n:int. n >= 0 -> fib_even n = fib (3*n+1)
 
 end
 
@@ -120,28 +64,27 @@ module Solve
 
   use import int.Int
   use import ref.Ref
-  use import Fib
+  use import int.Fibonacci
   use import FibSumEven
   use import FibOnlyEven
 
   let f m : int
     requires { m >= 0 }
-    ensures  { is_fib_sum_even m result }
-  = let x = ref 2 in
-    let y = ref 8 in
+    ensures  { exists n:int. result = fib_sum_even m n /\ fib n > m }
+  = let x = ref 0 in
+    let y = ref 2 in
     let sum = ref 0 in
     let ghost n = ref 0 in
-    let ghost k = ref 1 in
-    assert { !k = 0 + 1 };
+    let ghost k = ref 0 in
     while !x <= m do
       invariant { !n >= 0 }
-      invariant { !k >= 1 }
+      invariant { !k >= 0 }
       invariant { !x = fib_even !n }
       invariant { !x = fib !k }
       invariant { !y = fib_even (!n+1) }
       invariant { !y = fib (!k+3) }
       invariant { !sum = fib_sum_even m !k }
-      invariant { 0 < !x < !y }
+      invariant { 0 <= !x < !y }
       variant { m - !x }
       let tmp = !x in
       x := !y;
@@ -152,7 +95,7 @@ module Solve
     done;
     !sum
 
-  let run () = f 4000000 (* should be 4613732 *)
+  let run () = f 4_000_000 (* should be 4613732 *)
 
   exception BenchFailure
 

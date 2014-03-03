@@ -142,6 +142,20 @@ module ArrayEq
 
 end
 
+module ArrayExchange
+
+  use import int.Int
+  use import Array
+  use import map.MapExchange as M
+
+  predicate exchange (a1 a2: array 'a) (i j: int) =
+    a1.length = a2.length /\
+    M.exchange a1.elts a2.elts 0 a1.length i j
+  (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
+      by the swapping of elements at indices [i] and [j] *)
+
+end
+
 (** {2 Permutation} *)
 
 module ArrayPermut
@@ -151,12 +165,7 @@ module ArrayPermut
   use import map.MapPermut as M
   use import map.MapEq
   use import ArrayEq
-
-  predicate exchange (a1 a2: array 'a) (i j: int) =
-    a1.length = a2.length /\
-    M.exchange a1.elts a2.elts 0 a1.length i j
-  (** [exchange a1 a2 i j] means that arrays [a1] and [a2] only differ
-      by the swapping of elements at indices [i] and [j] *)
+  use export ArrayExchange
 
   predicate permut (a1 a2: array 'a) (l u: int) =
     a1.length = a2.length /\ 0 <= l <= a1.length /\ 0 <= u <= a1.length /\
@@ -178,34 +187,10 @@ module ArrayPermut
   (** [permut_all a1 a2 l u] is true when array [a1] is a permutation
       of array [a2]. *)
 
-  (** {3 lemmas about [permut_sub]} *)
-
-  (** permut_sub is reflexive, symmetric, transitive and contains
-      transpositions *)
-
-  lemma permut_sub_refl:
-    forall a: array 'a, l u: int.
-    0 <= l <= u <= length a -> permut_sub a a l u
-
-(*
-  lemma permut_sub_sym:
-    forall a1 a2: array 'a, l u: int.
-    permut_sub a1 a2 l u -> permut_sub a2 a1 l u
-*)
-
-  lemma permut_sub_trans:
-    forall a1 a2 a3: array 'a, l u: int.
-    permut_sub a1 a2 l u -> permut_sub a2 a3 l u -> permut_sub a1 a3 l u
-
   lemma exchange_permut_sub:
     forall a1 a2: array 'a, i j l u: int.
     exchange a1 a2 i j -> l <= i < u -> l <= j < u ->
     0 <= l -> u <= length a1 -> permut_sub a1 a2 l u
-
-  lemma permut_sub_unmodified:
-    forall a1 a2: array 'a, l u: int.
-    permut_sub a1 a2 l u ->
-    forall i: int. (0 <= i < l \/ u <= i < length a1) -> a2[i] = a1[i]
 
   (** we can always enlarge the interval *)
 
@@ -214,45 +199,11 @@ module ArrayPermut
     permut_sub a1 a2 l1 u1 -> 0 <= l2 <= l1 -> u1 <= u2 <= length a1 ->
     permut_sub a1 a2 l2 u2
 
-  lemma permut_sub_compose:
-    forall a1 a2 a3: array 'a, l1 u1 l2 u2: int. u1 <= l2 ->
-    permut_sub a1 a2 l1 u1 ->
-    permut_sub a2 a3 l2 u2 ->
-    permut_sub a1 a3 l1 u2
-
   (** {3 lemmas about [permut_all]} *)
-
-  (** permut_all is reflexive, symmetric, transitive and contains
-      transpositions *)
-
-  lemma permut_all_refl:
-    forall a: array 'a. permut_all a a
-
-(*
-  lemma permut_all_sym:
-    forall a1 a2: array 'a.
-    permut_all a1 a2 -> permut_all a2 a1
-*)
-
-  lemma permut_all_trans:
-    forall a1 a2 a3: array 'a.
-    permut_all a1 a2 -> permut_all a2 a3 -> permut_all a1 a3
 
   lemma exchange_permut_all:
     forall a1 a2: array 'a, i j: int.
     exchange a1 a2 i j -> permut_all a1 a2
-
-  (** identical arrays *)
-
-  lemma array_eq_permut_all:
-    forall a1 a2: array 'a.
-    array_eq a1 a2 -> permut_all a1 a2
-
-  (** permutation on a sub-interval *)
-
-  lemma permut_sub_permut_all:
-    forall a1 a2: array 'a, l u: int.
-    permut_sub a1 a2 l u -> permut_all a1 a2
 
 end
 
@@ -260,7 +211,7 @@ module ArraySwap
 
   use import int.Int
   use import Array
-  use import ArrayPermut
+  use export ArrayExchange
 
   let swap (a:array 'a) (i:int) (j:int) : unit
     requires { 0 <= i < length a /\ 0 <= j < length a }
