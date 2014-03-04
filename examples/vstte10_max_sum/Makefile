@@ -40,7 +40,5 @@ clean::
 	rm -f $(ML) *.cm[xio] *.o *.annot $(MAIN).opt $(MAIN).byte
 	rm -f why3__*.ml* vstte10_max_sum__*.ml* int__*.ml*
 
-Makefile: Makefile.in ../../config.status
-	cd ../.. ; ./config.status chmod --file examples/vstte10_max_sum/Makefile
 
 
