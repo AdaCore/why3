@@ -5,6 +5,8 @@ Require Import R_sqrt.
 Require BuiltIn.
 Require real.Real.
 
+Import R_sqrt.
+
 (* Why3 goal *)
 Lemma sqr_def : forall (x:R), ((Rsqr x) = (x * x)%R).
 reflexivity.

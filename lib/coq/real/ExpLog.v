@@ -6,6 +6,9 @@ Require Import Rpower.
 Require BuiltIn.
 Require real.Real.
 
+Import Rtrigo_def.
+Import Rpower.
+
 (* Why3 comment *)
 (* exp is replaced with (exp x) by the coq driver *)
 
