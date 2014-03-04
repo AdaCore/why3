@@ -1,5 +1,13 @@
 
-WHY3SHARE=$(shell ../../bin/why3 --print-datadir)
+BENCH ?= no
+
+ifeq ($(BENCH),yes)
+  WHY3=../../bin/why3
+  WHY3SHARE=../../share
+else
+  WHY3=$(BINDIR)/why3
+  WHY3SHARE=$(shell $WHY3 --print-datadir)
+endif
 
 include $(WHY3SHARE)/Makefile.config
 
@@ -25,7 +33,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../euler001.mlw
-	../../bin/why3 -E ocaml32 ../euler001.mlw -o .
+	$(WHY3) -E ocaml32 ../euler001.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<

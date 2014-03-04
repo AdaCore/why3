@@ -1,5 +1,13 @@
 
-WHY3SHARE=$(shell ../../bin/why3 --print-datadir)
+BENCH ?= no
+
+ifeq ($(BENCH),yes)
+  WHY3=../../bin/why3
+  WHY3SHARE=../../share
+else
+  WHY3=$(BINDIR)/why3
+  WHY3SHARE=$(shell $WHY3 --print-datadir)
+endif
 
 include $(WHY3SHARE)/Makefile.config
 
@@ -17,8 +25,8 @@ all: $(MAIN).opt
 extract: $(ML)
 
 doc:
-	../../bin/why3doc ../sudoku.mlw
-	../../bin/why3session html ../sudoku.mlw
+	$(WHY3)doc ../sudoku.mlw
+	$(WHY3)session html ../sudoku.mlw
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
 	ocamlc -g $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ $^
@@ -29,7 +37,7 @@ $(MAIN).opt: $(CMX) $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../sudoku.mlw
-	../../bin/why3 -E ocaml32 ../sudoku.mlw -o .
+	$(WHY3) -E ocaml32 ../sudoku.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<

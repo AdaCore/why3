@@ -82,9 +82,9 @@ extract_and_run () {
     echo -n "$1... "
     rm -f $1/$2
     echo -n "extract... "
-    if make -C $1 extract > /dev/null 2>&1; then
+    if BENCH=yes make -C $1 extract > /dev/null 2>&1; then
         echo -n "compile... "
-        if make -C $1 > /dev/null 2>&1; then
+        if BENCH=yes make -C $1 > /dev/null 2>&1; then
            echo -n "execute... "
            if $1/main.opt $3 > /dev/null 2>&1; then
               echo "ok"
@@ -96,14 +96,14 @@ extract_and_run () {
            fi
         else
             echo "compilation failed!"
-            echo make -C $1
-            make -C $1
+            echo BENCH=yes make -C $1
+            BENCH=yes make -C $1
             exit 1
         fi
     else
         echo "extract failed!"
-        echo make -C $1 extract
-        make -C $1 extract
+        echo BENCH=yes make -C $1 extract
+        BENCH=yes make -C $1 extract
         exit 1
     fi
 }

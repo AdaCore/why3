@@ -1,5 +1,13 @@
 
-WHY3SHARE=$(shell ../../bin/why3 --print-datadir)
+BENCH ?= no
+
+ifeq ($(BENCH),yes)
+  WHY3=../../bin/why3
+  WHY3SHARE=../../share
+else
+  WHY3=$(BINDIR)/why3
+  WHY3SHARE=$(shell $WHY3 --print-datadir)
+endif
 
 include $(WHY3SHARE)/Makefile.config
 
@@ -12,7 +20,7 @@ CMX = $(addsuffix .cmx, $(OBJ))
 
 OCAMLOPT=ocamlopt -noassert -inline 1000
 
-all: $(MAIN).opt
+all: $(MAIN).$(OCAMLBEST)
 
 extract: $(ML)
 
@@ -25,7 +33,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../vstte10_max_sum.mlw
-	../../bin/why3 -E ocaml32 ../vstte10_max_sum.mlw -o .
+	$(WHY3) -E ocaml32 ../vstte10_max_sum.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<
