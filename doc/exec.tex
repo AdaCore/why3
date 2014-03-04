@@ -59,9 +59,11 @@ among which we find a file \texttt{maxsum\_\_MaxAndSum.ml} containing
 the OCaml code for functions \texttt{max\_sum} and \texttt{test}.
 
 To compile it, we create a file \texttt{main.ml}
-containing a call to \texttt{test}, that is
+containing a call to \texttt{test}, that is for example
 \begin{whycode}
-  let () = test ()
+  let (s,m) = test () in
+  Format.printf "sum=%s, max=%s@." 
+    (Why3__BigInt.to_string s) (Why3__BigInt.to_string m)
 \end{whycode}
 and we pass both files \texttt{maxsum\_\_MaxAndSum.ml} and
 \texttt{main.ml} to the OCaml compiler:
