@@ -11,8 +11,8 @@ Require list.Mem.
 Lemma infix_plpl_def  {a:Type} {a_WT:WhyType a}: forall (l1:(list a))
   (l2:(list a)),
   ((List.app l1 l2) = match l1 with
-  | nil => l2
-  | (cons x1 r1) => (cons x1 (List.app r1 l2))
+  | Init.Datatypes.nil => l2
+  | (Init.Datatypes.cons x1 r1) => (Init.Datatypes.cons x1 (List.app r1 l2))
   end).
 Proof.
 now intros [|h1 q1] l2.
@@ -31,7 +31,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((List.app l nil) = l).
+  ((List.app l Init.Datatypes.nil) = l).
 Proof.
 intros a a_WT l.
 apply app_nil_r.
@@ -75,7 +75,7 @@ Qed.
 (* Why3 goal *)
 Lemma mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
   (l:(list a)), (list.Mem.mem x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (List.app l1 (cons x l2))).
+  (l = (List.app l1 (Init.Datatypes.cons x l2))).
 Proof.
 intros a a_WT x l h1.
 apply in_split.

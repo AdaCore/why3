@@ -7,8 +7,8 @@ Require list.List.
 (* Why3 assumption *)
 Fixpoint mem {a:Type} {a_WT:WhyType a} (x:a) (l:(list a)) {struct l}: Prop :=
   match l with
-  | nil => False
-  | (cons y r) => (x = y) \/ (mem x r)
+  | Init.Datatypes.nil => False
+  | (Init.Datatypes.cons y r) => (x = y) \/ (mem x r)
   end.
 
 Lemma mem_std :

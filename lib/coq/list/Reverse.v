@@ -11,8 +11,9 @@ Require list.Append.
 (* Why3 goal *)
 Lemma reverse_def  {a:Type} {a_WT:WhyType a}: forall (l:(list a)),
   ((List.rev l) = match l with
-  | nil => nil
-  | (cons x r) => (List.app (List.rev r) (cons x nil))
+  | Init.Datatypes.nil => Init.Datatypes.nil
+  | (Init.Datatypes.cons x r) =>
+      (List.app (List.rev r) (Init.Datatypes.cons x Init.Datatypes.nil))
   end).
 Proof.
 now intros [|x l].
@@ -21,7 +22,7 @@ Qed.
 (* Why3 goal *)
 Lemma reverse_append : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
   (l2:(list a)) (x:a),
-  ((List.app (List.rev (cons x l1)) l2) = (List.app (List.rev l1) (cons x l2))).
+  ((List.app (List.rev (Init.Datatypes.cons x l1)) l2) = (List.app (List.rev l1) (Init.Datatypes.cons x l2))).
 Proof.
 intros a a_WT l1 l2 x.
 simpl.

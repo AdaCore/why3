@@ -49,7 +49,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> ((0%Z <= (mod1 x
-  y))%Z /\ ((mod1 x y) < (Zabs y))%Z).
+  y))%Z /\ ((mod1 x y) < (ZArith.BinInt.Z.abs y))%Z).
 intros x y Zy.
 zify.
 assert (H1 := Z_mod_neg x y).
