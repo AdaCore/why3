@@ -1,4 +1,8 @@
 
+WHY3SHARE=$(shell ../../bin/why3 --print-datadir)
+
+include $(WHY3SHARE)/Makefile.config
+
 MAIN=main
 OBJ=euler001__Euler001
 
@@ -8,17 +12,15 @@ CMX = $(addsuffix .cmx, $(OBJ))
 
 OCAMLOPT=ocamlopt -noassert -inline 1000
 
-INCLUDE=@BIGINTINCLUDE@ -I ../../lib/why3
-
-all: $(MAIN).@OCAMLBEST@
+all: $(MAIN).$(OCAMLBEST)
 
 extract: $(ML)
 
 $(MAIN).byte: $(CMO)  $(MAIN).cmo
-	ocamlc $(INCLUDE) @BIGINTLIB@.cma why3extract.cma -o $@ $^
+	ocamlc $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ $^
 
 $(MAIN).opt: $(CMX)  $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) @BIGINTLIB@.cmxa why3extract.cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
@@ -37,7 +39,4 @@ $(ML): ../euler001.mlw
 clean::
 	rm -f $(ML) *.cm[xio] *.o *.annot $(MAIN).opt $(MAIN).byte
 	rm -f why3__*.ml* euler001__*.ml* int__*.ml*
-
-Makefile: Makefile.in ../../config.status
-	cd ../.. ; ./config.status chmod --file examples/euler001/Makefile
 

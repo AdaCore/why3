@@ -1923,7 +1923,7 @@ src/config.sh: src/config.sh.in config.status
 
 src/util/config.ml: src/config.sh
 	$(if $(QUIET),@echo 'Generate $@' &&) \
-	    LIBDIR=$(LIBDIR) DATADIR=$(DATADIR) src/config.sh
+	    BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) DATADIR=$(DATADIR) src/config.sh
 
 clean::
 	rm -f src/util/config.ml src/config.ml
