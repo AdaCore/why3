@@ -179,9 +179,9 @@ Lemma mod_divides_computer : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
   (((ZOmod a b) = 0%Z) -> (divides b a)).
 Proof.
 intros a b Zb H.
-exists (ZOdiv a b).
+exists (Z.quot a b).
 rewrite Zmult_comm.
-now apply ZO_div_exact_full_2.
+now apply Zquot.Z_quot_exact_full.
 Qed.
 
 (* Why3 goal *)
@@ -190,7 +190,7 @@ Lemma divides_mod_computer : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((divides b
 Proof.
 intros a b Zb (q,H).
 rewrite H.
-apply ZO_mod_mult.
+apply Zquot.Z_rem_mult.
 Qed.
 
 (* Why3 goal *)

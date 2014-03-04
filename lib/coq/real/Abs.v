@@ -5,6 +5,8 @@ Require Import Rbasic_fun.
 Require BuiltIn.
 Require real.Real.
 
+Import Rbasic_fun.
+
 (* Why3 comment *)
 (* abs is replaced with (Rabs x) by the coq driver *)
 

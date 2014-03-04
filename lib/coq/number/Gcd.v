@@ -119,9 +119,9 @@ Lemma Gcd_computer_mod : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((gcd b
 Proof.
 intros a b _.
 rewrite (Zgcd_comm a b).
-rewrite (gcd_euclid b a (ZOdiv a b)).
+rewrite (gcd_euclid b a (Z.quot a b)).
 apply f_equal.
-rewrite (ZO_div_mod_eq a b) at 2.
+rewrite (Z.quot_rem' a b) at 2.
 ring.
 Qed.
 

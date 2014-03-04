@@ -8,6 +8,7 @@ Require real.Real.
 Require real.RealInfix.
 
 Require Import Exponentiation.
+Import Rfunctions.
 
 (* Why3 comment *)
 (* power is replaced with (powerRZ x x1) by the coq driver *)
