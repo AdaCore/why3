@@ -749,12 +749,13 @@ let rec print_expr ?(paren=false) info fmt e =
     when ls_equal ls fs_void ->
       fprintf fmt
         (protect_on paren "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@]")
-        (print_expr info) e0 (print_expr info) e1
+        (print_expr info) e0 (print_expr ~paren:true info) e1
   | Eif (e0,e1,e2) ->
       fprintf fmt
         (protect_on paren
          "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@ else@;<1 2>@[%a@]@]")
-        (print_expr info) e0 (print_expr info) e1 (print_expr info) e2
+        (print_expr info) e0 (print_expr info) e1
+        (print_expr ~paren:true info) e2
   | Eassign (pl,e,_,pv) ->
       fprintf fmt (protect_on paren "%a.%a <- %a")
         (print_expr info) e (print_ls info) pl.pl_ls (print_pv info) pv
