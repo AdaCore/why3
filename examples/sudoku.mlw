@@ -4,7 +4,7 @@
 
 (** {2 A theory of 9x9 grids} *)
 
-theory Grid 
+module Grid 
 
   use import int.Int
   use import map.Map
@@ -43,28 +43,32 @@ theory Grid
 
   *)
 
+  use import array.Array
+
   type sudoku_chunks =
-    { column_start : map int int;
-      column_offsets : map int int;
-      row_start : map int int;
-      row_offsets : map int int;
-      square_start : map int int;
-      square_offsets : map int int;
+    { column_start : array int;
+      column_offsets : array int;
+      row_start : array int;
+      row_offsets : array int;
+      square_start : array int;
+      square_offsets : array int;
     }
 
   (** Chunks must point to valid indexes of the grid *)
-  predicate chunk_valid_indexes (start:map int int) (offsets:map int int) =
-     forall i o:int. is_index i /\ 0 <= o < 9 ->
-       is_index(start[i] + offsets[o])
+  predicate chunk_valid_indexes (start:array int) (offsets:array int) =
+    start.length = 81 /\ offsets.length = 9 /\
+    forall i o:int. is_index i /\ 0 <= o < 9 ->
+      is_index(start[i] + offsets[o])
 
   (** Chunks (of the same kind column, row or square) with distinct
       starting cells must be disjoint *)
-  predicate disjoint_chunks (start:map int int) (offsets:map int int) =
+  predicate disjoint_chunks (start:array int) (offsets:array int) =
+    start.length = 81 /\ offsets.length = 9 /\
     forall i1 i2 o:int.
        is_index i1 /\ is_index i2 /\ 0 <= o < 9 ->
-       let s1 = Map.get start i1 in
-       let s2 = Map.get start i2 in
-       s1 <> s2 -> i1 <> s2 + Map.get offsets o
+       let s1 = start[i1] in
+       let s2 = start[i2] in
+       s1 <> s2 -> i1 <> s2 + offsets[o]
 
   (** A sudoku grid is well formed when chunks are valid and disjoint *)
   predicate well_formed_sudoku (s:sudoku_chunks) =
@@ -83,12 +87,13 @@ theory Grid
   between 1 and 9 *)
 
   predicate valid_chunk (g:grid) (i:int)
-    (start:map int int) (offsets:map int int) =
+    (start:array int) (offsets:array int) =
     let s = start[i] in
     forall o1 o2 : int. 0 <= o1 < 9 /\ 0 <= o2 < 9 /\ o1 <> o2 ->
       let i1 = s + offsets[o1] in
       let i2 = s + offsets[o2] in
-      1 <= g[i1] <= 9 /\ 1 <= g[i2] <= 9 -> g[i1] <> g[i2]
+      1 <= Map.get g i1 <= 9 /\ 1 <= Map.get g i2 <= 9 ->
+      Map.get g i1 <> Map.get g i2
 
   predicate valid_column (s:sudoku_chunks) (g:grid) (i:int) =
     valid_chunk g i s.column_start s.column_offsets
@@ -106,16 +111,17 @@ theory Grid
 
   (** [full g] is true when all cells are filled *)
   predicate full (g : grid) =
-    forall i : int. is_index i -> 1 <= g[i] <= 9
+    forall i : int. is_index i -> 1 <= Map.get g i <= 9
 
   (** [included g1 g2] *)
   predicate included (g1 g2 : grid) =
-    forall i : int. is_index i /\ 1 <= g1[i] <= 9 -> g2[i] = g1[i]
+    forall i : int. is_index i /\ 1 <= Map.get g1 i <= 9 -> 
+      Map.get g2 i = Map.get g1 i
 
   (** validity is monotonic w.r.t. inclusion *)
   lemma subset_valid_chunk :
     forall g h : grid. included g h ->
-      forall i:int, s o:map int int. is_index i /\
+      forall i:int, s o:array int. is_index i /\
       chunk_valid_indexes s o /\ valid_chunk h i s o ->
         valid_chunk g i s o
 
@@ -133,8 +139,7 @@ end
 
 
 (** {2 Concrete Values of Chunks for the Classical Sudoku Grid} *)
-
-theory TheClassicalSudokuGrid
+module TheClassicalSudokuGrid
 
   use import Grid
   use import map.Map
@@ -188,25 +193,30 @@ theory TheClassicalSudokuGrid
   = (const (-1))
      [ 0<-0][ 1<-1][ 2<-2][ 3<-9][ 4<-10][ 5<-11][ 6<-18][ 7<-19][ 8<-20]
 
-  constant classical_sudoku : sudoku_chunks =
-    { column_start = c_start ;
-      column_offsets = c_offsets ;
-      row_start = r_start ;
-      row_offsets = r_offsets ;
-      square_start = s_start ;
-      square_offsets = s_offsets ;
-    }     
+  use import array.Array
 
-  lemma column_bounds: chunk_valid_indexes c_start c_offsets
-  lemma row_bounds: chunk_valid_indexes r_start r_offsets
-  lemma square_bounds: chunk_valid_indexes s_start s_offsets
+  let array_from_map (n:int) (m:map int int) : array int
+    requires { n >= 0 }
+    ensures { result.length = n }
+    ensures { forall i. 0 <= i < n -> result[i] = Map.get m i }
+  =
+    let r = Array.make n 0 in
+    for j = 0 to n-1 do
+      invariant { forall i. 0 <= i < j -> r[i] = Map.get m i }
+      r[j] <- Map.get m j
+    done;
+    r
 
-  lemma column_disjoint_chunks : disjoint_chunks c_start c_offsets
-  lemma row_disjoint_chunks : disjoint_chunks r_start r_offsets
-  lemma square_disjoint_chunks : disjoint_chunks s_start s_offsets
-
-  lemma well_formed_classical_sudoku:
-    well_formed_sudoku classical_sudoku
+  let classical_sudoku () : sudoku_chunks
+    ensures { well_formed_sudoku result }
+  =
+    { column_start = array_from_map 81 c_start;
+      column_offsets = array_from_map 9 c_offsets;
+      row_start = array_from_map 81 r_start ;
+      row_offsets = array_from_map 9 r_offsets ;
+      square_start = array_from_map 81 s_start ;
+      square_offsets = array_from_map 9 s_offsets ;
+    }
 
 end
 
@@ -217,18 +227,19 @@ end
 module Solver
 
   use import Grid
-  use import map.Map
+  use import array.Array
   use import int.Int
 
   (** predicate for the loop invariant of next function *) 
   predicate valid_chunk_up_to (g:grid) (i:int)
-    (start:map int int) (offsets:map int int) (off:int) =
+    (start:array int) (offsets:array int) (off:int) =
     let s = start[i] in
     forall o1 o2 : int.
       0 <= o1 < off /\ 0 <= o2 < off /\ o1 <> o2 ->
       let i1 = s + offsets[o1] in
       let i2 = s + offsets[o2] in
-      1 <= g[i1] <= 9 /\ 1 <= g[i2] <= 9 -> g[i1] <> g[i2]
+      1 <= Map.get g i1 <= 9 /\ 1 <= Map.get g i2 <= 9 -> 
+      Map.get g i1 <> Map.get g i2
 
   exception Invalid
 
@@ -237,7 +248,7 @@ module Solver
   (** [check_valid_chunk g i start offsets] checks the validity
       of the chunk that includes [i] *)
   let check_valid_chunk (g:array int) (i:int)
-    (start:map int int) (offsets:map int int) : unit
+    (start:array int) (offsets:array int) : unit
     requires { g.length = 81 }
     requires { valid_values g.elts }
     requires { is_index i }
@@ -245,18 +256,18 @@ module Solver
     ensures { valid_chunk g.elts i start offsets }
     raises { Invalid -> not (valid_chunk g.elts i start offsets) }
   =
-    let s = Map.get start i in
+    let s = start[i] in
     let b = Array.make 10 False in
     for off = 0 to 8 do
       invariant { valid_chunk_up_to g.elts i start offsets off }
       invariant { forall o:int. 0 <= o < off ->
-         let v = g[s + Map.get offsets o] in
+         let v = g[s + offsets[o]] in
          1 <= v <= 9 -> b[v] = True }
       invariant { forall j:int. 1 <= j <= 9 ->
          b[j] = True ->
          exists o:int.
-           0 <= o < off /\ Map.get g.elts (s + Map.get offsets o) = j }
-      let v = g[s + Map.get offsets off] in
+           0 <= o < off /\ Map.get g.elts (s + offsets[o]) = j }
+      let v = g[s + offsets[off]] in
       if 1 <= v && v <= 9 then
          begin
            if b[v] = True then raise Invalid;
@@ -351,20 +362,20 @@ this is true but with 2 different possible reasons:
 
 
   lemma valid_unchanged_chunks:
-    forall g : grid, i1 i2 k:int, start offsets:map int int.
+    forall g : grid, i1 i2 k:int, start offsets:array int.
       disjoint_chunks start offsets ->
       is_index i1 /\ is_index i2 /\ 1 <= k <= 9 ->
-      let s1 = Map.get start i1 in
-      let s2 = Map.get start i2 in
+      let s1 = start[i1] in
+      let s2 = start[i2] in
       let h = Map.set g i1 k in
       s1 <> s2 /\ valid_chunk g i2 start offsets ->
       valid_chunk h i2 start offsets
 
   lemma valid_changed_chunks:
-    forall g : grid, i1 i2 k:int, start offsets:map int int.
+    forall g : grid, i1 i2 k:int, start offsets:array int.
       is_index i1 /\ is_index i2 /\ 1 <= k <= 9 ->
-      let s1 = Map.get start i1 in
-      let s2 = Map.get start i2 in
+      let s1 = start[i1] in
+      let s2 = start[i2] in
       let h = Map.set g i1 k in
       s1 = s2 /\ valid_chunk h i1 start offsets ->
       valid_chunk h i2 start offsets
@@ -410,8 +421,7 @@ this is true but with 2 different possible reasons:
       begin
       'L:
       for k = 1 to 9 do
-        invariant { grid_eq_sub (at g 'L).elts g.elts 0 i }
-        invariant { grid_eq_sub (at g 'L).elts g.elts (i+1) 81 }
+        invariant { grid_eq (at g 'L).elts (Map.set g.elts i 0) }
         invariant { full_up_to g.elts i }
         invariant { (* for completeness *)
           forall k'. 1 <= k' < k ->
@@ -422,8 +432,14 @@ this is true but with 2 different possible reasons:
           check_valid_chunk g i s.column_start s.column_offsets;
           check_valid_chunk g i s.row_start s.row_offsets;
           check_valid_chunk g i s.square_start s.square_offsets;
+            (* the hard part: see lemma valid_up_to_change *)
+          assert { let grid' = Map.set (at g 'L).elts i k in
+            grid_eq grid' g.elts &&
+            valid_chunk grid' i s.column_start s.column_offsets &&
+            valid_chunk grid' i s.row_start s.row_offsets && 
+            valid_chunk grid' i s.square_start s.square_offsets &&
+            valid_up_to s grid' (i+1) }; 
           assert { valid_up_to s g.elts (i+1) }; 
-            (* hard: see lemma valid_up_to_change *)
           solve_aux s g (i + 1)
         with Invalid ->
           assert { (* for completeness *)
@@ -463,6 +479,7 @@ end
 
 
 (** {2 Some Tests} *)
+
 module Test
 
   use import Grid
@@ -476,7 +493,7 @@ module Test
   let test0 ()
     raises { NoSolution -> true }
   = let a = Array.make 81 0 in
-    solve classical_sudoku a
+    solve (classical_sudoku()) a
 (* a possible solution:
   1, 2, 3, 4, 5, 6, 7, 8, 9,
   4, 5, 6, 7, 8, 9, 1, 2, 3,
@@ -490,7 +507,7 @@ module Test
 *)
 
 (** A grid known to be solvable *)
-(* 
+(*
 2 0 9 0 0 0 0 1 0
 0 0 0 0 6 0 0 0 0
 0 5 3 8 0 2 7 0 0
@@ -501,7 +518,7 @@ module Test
 8 0 0 0 0 1 0 0 5
 0 0 0 0 0 0 0 7 6
 *)
-  constant solvable : map int int =
+  constant solvable : grid =
     (const 0)
     [0<-2][2<-9][7<-1]
     [13<-6]
@@ -522,7 +539,7 @@ module Test
       invariant { valid_values a.Array.elts }
       Array.([]<-) a i (Map.get solvable i)
     done;
-    solve classical_sudoku a
+    solve (classical_sudoku()) a
 (* the solution:
 
   2, 6, 9, 3, 5, 7, 8, 1, 4,
@@ -541,7 +558,7 @@ module Test
   let test2 ()
     raises { NoSolution -> true }
   = let a = Array.make 81 1 in
-    solve classical_sudoku a
+    solve (classical_sudoku()) a
 
 end
 
