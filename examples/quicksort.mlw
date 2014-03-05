@@ -51,7 +51,7 @@ module Quicksort
       assert { qs_partition (at a 'N) a l !m r v };
   'O: quick_rec a (!m + 1) r;
       assert { qs_partition (at a 'O) a l !m r v };
-      assert { qs_partition (at a 'N) a l !m r v }
+      assert { qs_partition (at a 'N) a l !m r v };
     end
 
   let quicksort (a: array int) =
