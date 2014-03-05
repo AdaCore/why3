@@ -73,12 +73,13 @@ module TestCase
     a[7] <- 1;
     a[8] <- 10;
     a[9] <- 6;
-    max_sum a n
+    let (s, m) = max_sum a n in
+    assert { s = 45 };
+    assert { m = 10 };
+    (s, m)
 
   let test_case () raises { BenchFailure -> true } =
     let (s, m) = test () in
-    assert { s = 45 };
-    assert { m = 10 };
     (* bench of --exec *)
     if s <> 45  then raise BenchFailure;
     if m <> 10  then raise BenchFailure;
