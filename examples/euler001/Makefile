@@ -6,10 +6,14 @@ ifeq ($(BENCH),yes)
   WHY3SHARE=../../share
 else
   WHY3=$(BINDIR)/why3
-  WHY3SHARE=$(shell $WHY3 --print-datadir)
+  WHY3SHARE=$(shell $(WHY3) --print-datadir)
 endif
 
 include $(WHY3SHARE)/Makefile.config
+
+ifeq ($(BENCH),yes)
+  INCLUDE += -I ../../lib/why3
+endif
 
 MAIN=main
 OBJ=euler001__Euler001
