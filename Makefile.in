@@ -1359,7 +1359,8 @@ install_local: bin/why3doc
 
 .PHONY: bench test
 
-bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS)
+bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
+  share/Makefile.config
 	$(MAKE) test-api-logic.@OCAMLBEST@
 	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
 	$(MAKE) test-api-mlw.@OCAMLBEST@
@@ -1921,12 +1922,13 @@ src/jessie/Makefile: src/jessie/Makefile.in config.status
 src/config.sh: src/config.sh.in config.status
 	./config.status chmod --file $@
 
-src/util/config.ml: src/config.sh
+src/util/config.ml share/Makefile.config: src/config.sh
 	$(if $(QUIET),@echo 'Generate $@' &&) \
 	    BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) DATADIR=$(DATADIR) src/config.sh
 
 clean::
 	rm -f src/util/config.ml src/config.ml
+	rm -f share/Makefile.config
 
 doc/version.tex: doc/version.tex.in config.status
 	./config.status chmod --file $@
