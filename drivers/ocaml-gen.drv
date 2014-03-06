@@ -128,17 +128,6 @@ theory list.Combine
   syntax function combine "(List.combine %1 %2)"
 end
 
-(* map *)
-
-theory map.Map
-  syntax type map "((%1, %2) Why3__Map.map)"
-  syntax function const "(Why3__Map.const %1)"
-  syntax function ([]) "(Why3__Map.get %1 %2)"
-  syntax function get "(Why3__Map.get %1 %2)"
-  syntax function ([<-]) "(Why3__Map.set %1 %2 %3)"
-  syntax function set "(Why3__Map.set %1 %2 %3)"
-end
-
 (* WhyML *)
 
 module ref.Ref

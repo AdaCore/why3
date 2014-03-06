@@ -16,7 +16,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN = main
-OBJ = sudoku__Grid sudoku__TheClassicalSudokuGrid sudoku__Solver
+OBJ = map__Map sudoku__Grid sudoku__TheClassicalSudokuGrid sudoku__Solver
 
 ML  = $(addsuffix .ml, $(OBJ))
 CMO = $(addsuffix .cmo, $(OBJ))

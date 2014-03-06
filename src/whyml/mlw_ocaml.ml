@@ -508,7 +508,7 @@ let print_param_decl info fmt ls =
       (print_lident info) ls.ls_name
   else begin
     let vars = name_args ls.ls_args in
-    fprintf fmt "@[<hov 2>(*let %a %a : %a =@ %a*)@]"
+    fprintf fmt "@[<hov 2>let %a %a : %a =@ %a@]"
       (print_ls info) ls
       (print_list space (print_vs_arg info)) vars
       (print_ls_type info) ls.ls_value
