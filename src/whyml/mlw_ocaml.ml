@@ -407,6 +407,8 @@ let print_binop fmt = function
   | Tiff -> fprintf fmt "="
   | Timplies -> assert false
 
+let oty_int = Some ty_int
+
 let rec print_app ?(paren=false) ls info fmt tl =
   let isconstr = is_constructor info ls in
   let is_field (_, csl) = match csl with
@@ -451,6 +453,9 @@ and print_term ?(paren=false) info fmt t = match t.t_node with
       print_const ~paren fmt c
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma (print_term info)) tl
+  | Tapp (fs, [t1; t2]) when ls_equal fs ps_equ && oty_equal t1.t_ty oty_int ->
+      fprintf fmt "(Why3__BigInt.eq %a %a)"
+        (print_term_p info) t1 (print_term_p info) t2
   | Tapp (fs, tl) ->
       begin match query_syntax info.info_syn fs.ls_name with
       | Some s -> syntax_arguments s (print_term_p info) fmt tl
