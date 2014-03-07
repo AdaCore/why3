@@ -29,15 +29,15 @@ let ge = ge_big_int
 let lt_nat x y = le zero y && lt x y
 let lex (x1,x2) (y1,y2) = lt x1 y1 || eq x1 y1 && lt x2 y2
 
-let euclidean_div_mod = quomod_big_int
+let euclidean_div_mod x y =
+  if eq y zero then zero, zero else quomod_big_int x y
 
 let euclidean_div x y = fst (euclidean_div_mod x y)
-
 let euclidean_mod x y = snd (euclidean_div_mod x y)
 
 let computer_div_mod x y =
-  let q,r = quomod_big_int x y in
-  (* we have x = q*y + r with 0 <= r < |y| *)
+  let q,r = euclidean_div_mod x y in
+  (* when y <> 0, we have x = q*y + r with 0 <= r < |y| *)
   if sign x < 0 then
     if sign y < 0
     then (pred q, add r y)
@@ -45,7 +45,6 @@ let computer_div_mod x y =
   else (q,r)
 
 let computer_div x y = fst (computer_div_mod x y)
-
 let computer_mod x y = snd (computer_div_mod x y)
 
 let min = min_big_int
