@@ -235,10 +235,9 @@ let schedule_check t callback =
 
 (* idle handler *)
 
-
 let idle_handler t =
   try
-    begin
+    if Queue.length t.proof_attempts_queue < 2 * t.maximum_running_proofs then begin
       match Queue.pop t.actions_queue with
         | Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                                callback,goal) ->
@@ -257,7 +256,8 @@ let idle_handler t =
                 callback (InternalFailure e)
             end
         | Action_delayed callback -> callback ()
-    end;
+    end else
+      ignore (Unix.select [] [] [] 0.1);
     true
   with Queue.Empty ->
     t.idle_handler_activated <- false;
