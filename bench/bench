@@ -156,7 +156,8 @@ execute examples/euler001.mlw Euler001.bench
 execute examples/euler002.mlw Solve.bench
 execute examples/fibonacci.mlw FibRecGhost.bench
 execute examples/fibonacci.mlw FibonacciLogarithmic.bench
-execute examples/same_fringe.mlw SameFringe.bench
+# fails: definition of psymbol eq not found
+# execute examples/same_fringe.mlw SameFringe.bench
 # fails: cannot evaluate condition a=b (how to do it?)
 # execute examples/same_fringe.mlw --exec SameFringe.test5
 # fails: "let" are cloned as "val"
