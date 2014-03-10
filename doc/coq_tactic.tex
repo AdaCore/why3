@@ -1,7 +1,7 @@
 \subsection{Coq Tactic}
 \label{sec:coqtactic}
 
-\why\ provides a Coq tactic to call external theorem provers as oracles.
+\why provides a Coq tactic to call external theorem provers as oracles.
 
 \subsubsection{Installation}
 
@@ -37,7 +37,7 @@ The current goal is then translated to \why's logic and the prover is
 called. If it reports the goal to be valid, then Coq's \texttt{admit}
 tactic is used to assume the goal. The prover is called with a time
 limit in seconds as given by \why's configuration file
-(see page~\pageref{sec:whyconffile}). A different value may be given
+(see Section~\ref{sec:whyconffile}). A different value may be given
 using the \texttt{timelimit} keyword.
 
 \subsubsection{Error messages.} The following errors may be reported by

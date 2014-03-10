@@ -5,9 +5,15 @@
 This chapter show how \whyml code can be executed, either by being
 interpreted or compiled to some existing programming language.
 
-Let us consider the program in Fig.~\ref{fig:MaxAndSum}
+\begin{latexonly}
+Let us consider the program in Figure~\ref{fig:MaxAndSum}
 on page~\pageref{fig:MaxAndSum} that computes the maximum and the sum
 of an array of integers.
+\end{latexonly}
+\begin{htmlonly}
+Let us consider the program of Section~\ref{sec:MaxAndSum} that computes
+the maximum and the sum of an array of integers.
+\end{htmlonly}
 Let us assume it is contained in a file \texttt{maxsum.mlw}.
 
 \section{Interpreting \whyml Code}
@@ -27,7 +33,7 @@ in module \texttt{MaxAndSum}
 and then we use option \verb+--exec+ to interpret this function,
 as follows:
 \begin{verbatim}
-  > why3  maxsum.mlw --exec MaxAndSum.test
+  > why3 maxsum.mlw --exec MaxAndSum.test
   Execution of MaxAndSum.test ():
        type: (int, int)
      result: Tuple2(45, 10)
@@ -76,7 +82,7 @@ OCaml code extracted from \why must be linked with the library
 stored in subdirectory \texttt{why3} of the OCaml standard library.
 Depending on the way \why was installed, it depends either on library
 \texttt{nums.cmxa} or \texttt{zarith.cmxa} for big integers. Above we
-assumed the latter. it is likely that additional options \texttt{-I}
+assumed the latter. It is likely that additional options \texttt{-I}
 must be passed to the OCaml compiler for libraries
 \texttt{zarith.cmxa} and \texttt{why3extract.cmxa} to be found.
 

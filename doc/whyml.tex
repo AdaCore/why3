@@ -1,9 +1,9 @@
-\chapter{The WhyML Programming Language}
+\chapter{The \whyml Programming Language}
 \label{chap:whyml}
 
 This chapter describes the \whyml programming language.
 A \whyml input text contains a list of theories (see
-chapter~\ref{chap:syntax}) and/or modules.
+Chapter~\ref{chap:syntax}) and/or modules.
 Modules extend theories with \emph{programs}.
 Programs can use all types, symbols, and constructs from the logic.
 They also provide extra features:
@@ -56,6 +56,7 @@ The source code for all these examples is contained in \why's
 distribution, in sub-directory \texttt{examples/}.
 
 \section{Problem 1: Sum and Maximum}
+\label{sec:MaxAndSum}
 
 The first problem is stated as follows:
 \begin{quote}
@@ -86,7 +87,7 @@ declaration:
 \end{whycode}
 Modules \texttt{Ref} and \texttt{Array} respectively provide a type
 \texttt{ref 'a} for references and a type \texttt{array 'a} for
-arrays (see Section~\ref{sec:mllibrary}), together with useful
+arrays, together with useful
 operations and traditional syntax. They are loaded from the \whyml
 files \texttt{ref.mlw} and \texttt{array.mlw} in the standard library.
 \why reports an error when it finds a theory and a module with

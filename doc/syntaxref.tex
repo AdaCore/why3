@@ -3,30 +3,34 @@
 
 This chapter gives the grammar and semantics for \why and \whyml input files.
 
-\section{Lexical conventions}
+\section{Lexical Conventions}
 
 Lexical conventions are common to \why and \whyml.
 
 % TODO: blanks
 
-\paragraph{Comments.}
+\subsection{Comments}
+
 Comments are enclosed by \texttt{(*} and \texttt{*)} and can be nested.
 
-\paragraph{Strings.}
+\subsection{Strings}
+
 Strings are enclosed in double quotes (\verb!"!). Double quotes can be
-inserted in strings using the backslash character (\verb!\!).
+escaped in strings using the backslash character (\verb!\!).
+The other special sequences are \verb!\n! for line feed and \verb!\t!
+for horizontal tab.
 In the following, strings are referred to with the non-terminal
 \nonterm{string}{}.
 
-% TODO: escape sequences for strings
+\subsection{Identifiers}
 
-\paragraph{Identifiers.} The syntax distinguishes lowercase and
+The syntax distinguishes lowercase and
 uppercase identifiers and, similarly, lowercase and uppercase
 qualified identifiers.
 
 \begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
 
-\paragraph{Constants.}
+\subsection{Constants}
 The syntax for constants is given in Figure~\ref{fig:bnf:constant}.
 Integer and real constants have arbitrary precision.
 Integer constants may be given in base 16, 10, 8 or 2.
@@ -38,7 +42,8 @@ Real constants may be given in base 16 or 10.
 \label{fig:bnf:constant}
 \end{figure}
 
-\paragraph{Operators.}
+\subsection{Operators}
+
 Prefix and infix operators are built from characters organized in four
 categories (\textsl{op-char-1} to \textsl{op-char-4}).
 \begin{center}\framebox{\input{./operator_bnf.tex}}\end{center}
@@ -55,7 +60,9 @@ characters they are built from:
 \item level 1: all other operators (non-terminal \textit{infix-op-1}).
 \end{itemize}
 
-\paragraph{Labels.} Identifiers, terms, formulas, program expressions
+\subsection{Labels}
+
+Identifiers, terms, formulas, program expressions
 can all be labeled, either with a string, or with a location tag.
 \begin{center}\framebox{\input{./label_bnf.tex}}\end{center}
 A location tag consists of a file name, a line number, and starting
@@ -63,9 +70,10 @@ and ending characters.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Why3 Language}
+\section{The Why3 Language}
 
-\paragraph{Terms.}
+\subsection{Terms}
+
 The syntax for terms is given in Figure~\ref{fig:bnf:term}.
 The various constructs have the following priorities and
 associativities, from lowest to greatest priority:
@@ -98,14 +106,17 @@ application is not allowed (rejected at typing).
 \label{fig:bnf:term}
 \end{figure}
 
-\paragraph{Type Expressions.} The syntax for type expressions is the following:
+\subsection{Type Expressions}
+
+The syntax for type expressions is the following:
 \begin{center}\framebox{\input{./type_bnf.tex}}\end{center}
 Built-in types are \texttt{int}, \texttt{real}, and tuple types.
 Note that the syntax for type
 expressions notably differs from the usual ML syntax (\eg the
 type of polymorphic lists is written \texttt{list 'a}, not \texttt{'a list}).
 
-\paragraph{Formulas.}
+\subsection{Formulas}
+
 The syntax for formulas is given Figure~\ref{fig:bnf:formula}.
 The various constructs have the following priorities and
 associativities, from lowest to greatest priority:
@@ -146,7 +157,8 @@ transformations. For instance, \texttt{split} transforms the goal
 transforms \verb!not (A || B)! into subgoals \verb|not A| and
 \verb|not ((not A) /\ B)|.
 
-\paragraph{Theories.}
+\subsection{Theories}
+
 The syntax for theories is given on Figure~\ref{fig:bnf:theorya} and~\ref{fig:bnf:theoryb}.
 
 \begin{figure}
@@ -161,18 +173,19 @@ The syntax for theories is given on Figure~\ref{fig:bnf:theorya} and~\ref{fig:bn
 \label{fig:bnf:theoryb}
 \end{figure}
 
-\paragraph{Files.}
+\subsection{Files}
+
 A \why input file is a (possibly empty) list of theories.
 \begin{center}\framebox{\input{./why_file_bnf.tex}}\end{center}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
-\section{WhyML Language}\label{sec:syntax:whyml}
+\section{The \whyml Language}\label{sec:syntax:whyml}
 
 \subsection{Specification}
 
-The syntax for specification clauses in programs 
+The syntax for specification clauses in programs
 is given in Figure~\ref{fig:bnf:spec}.
 \begin{figure}
   \begin{center}\framebox{\input{./spec_bnf.tex}}\end{center}
@@ -363,9 +376,9 @@ variables, functions, exceptions).
 
 A \whyml input file is a (possibly empty) list of theories and modules.
 \begin{center}\framebox{\input{./whyml_file_bnf.tex}}\end{center}
-A theory defined in a \whyml\ file can only be used within that
+A theory defined in a \whyml file can only be used within that
 file. If a theory is supposed to be reused from other files, be they
-\why\ or \whyml\ files, it should be defined in a \why\ file.
+\why or \whyml files, it should be defined in a \why file.
 
 
 \section{The \why Standard Library}
