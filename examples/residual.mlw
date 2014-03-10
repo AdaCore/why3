@@ -22,10 +22,10 @@ module Residuals
     end
 
   lemma inversion_mem_star_gen :
-    forall c w r w' r'. 
+    forall c w r w' r'.
       w' = Cons c w /\ r' = Star r ->
       mem w' r' ->
-      exists w1 w2. w = w1 ++ w2 /\ mem (Cons c w1) r /\ mem w2 r' 
+      exists w1 w2. w = w1 ++ w2 /\ mem (Cons c w1) r /\ mem w2 r'
 
   lemma inversion_mem_star :
     forall c w r. mem (Cons c w) (Star r) ->
@@ -62,16 +62,47 @@ end
 
 module Test
 
-  type char = int 
+  type char = int
 
   clone import Residuals with type char = char
 
   constant a : char = 65
 
   constant aa : word = Cons a (Cons a Nil)
- 
+
   constant astar : regexp = Star (Char a)
 
   let test_astar () = decide_mem aa astar
+
+end
+
+
+
+module DFA
+
+  type char
+  use import list.List
+  type word = list char
+
+  use import map.Map
+
+  (** automaton where states = 0..size-1, init state = 0 *)
+
+  type state = int
+
+  type t =
+    { size : int;
+      is_final_state : map state bool;
+      transition : map (state,char) int;
+    }
+
+  function exec (a:t) (q:state) (w:word) : state =
+    match w with
+    | Nil -> q
+    | Cons c r -> let q' = a.transition[(q,c)] in exec a q' r
+    end
+
+  function accepts (a:t) (w:word) : bool =
+    a.is_final_state[exec a 0 w]
 
 end
