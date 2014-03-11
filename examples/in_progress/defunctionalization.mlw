@@ -413,7 +413,7 @@ Exercise 1:
 
 
 
-use HighOrd (* import not needed, but why ? *)
+use HighOrd
 
 function eval_1 (e:expr) (k:value -> 'a) : 'a =
   match e with
@@ -577,7 +577,110 @@ Exercise 4:
 *)
 
 
-(* TODO *)
+
+type cont = I | A expr cont | B int cont
+
+(**
+
+One would want to write in Why:
+
+[function eval_cont (c:cont) (v:int) : int =
+  match c with
+  | A1 e2 k ->
+    let v2 = eval_0 e2 in
+    eval_cont (A2 v k) v2
+  | A2 v1 k -> eval_cont k (v1 - v)
+  | I -> v
+  end]
+
+But since the recursion is not structural, Why3 kernel rejects it
+(definitions in the logic part of the language must be total)
+
+We replace that with a relational definition, an inductive one.
+
+*)
+
+(*
+inductive eval_cont cont int int =
+| a1 :
+  forall e2:expr, k:cont, v:int, r:int.
+  eval_cont (A2 v k) (eval_0 e2) r -> eval_cont (A1 e2 k) v r
+| a2 :
+  forall v1:int, k:cont, v:int, r:int.
+  eval_cont k (v1 - v) r -> eval_cont (A2 v1 k) v r
+| a3 :
+  forall v:int. eval_cont I v v
+
+(** Some functions to serve as measures for the termination proof *)
+
+function size_e (e:expr) : int =
+  match e with
+  | Cte _ -> 1
+  | Sub e1 e2 -> 3 + size_e e1 + size_e e2
+  end
+
+let rec lemma size_e_pos (e:expr) : unit
+  variant { e }
+  ensures { size_e e >= 1 }
+= match e with
+  | Cte _ -> ()
+  | Sub e1 e2 -> size_e_pos e1; size_e_pos e2
+  end
+*)
+
+use Defunctionalization
+
+function size_c (c:cont) : int =
+  match c with
+  | I -> 0
+  | A e2 k -> 2 + Defunctionalization.size_e e2 + size_c k
+  | B _ k -> 1 + size_c k
+  end
+
+let rec lemma size_c_pos (c:cont) : unit
+  variant { c }
+  ensures { size_c c >= 0 }
+= match c with
+  | I -> ()
+  | A _ k -> size_c_pos k
+  | B _ k -> size_c_pos k
+  end
+
+let rec continue_4 (c:cont) (v:int) : value
+  variant { size_c c }
+(*
+  ensures { eval_cont c v result }
+*)
+  =
+  match c with
+    | A e2 k -> eval_4 e2 (B v k)
+    | B v1 k -> if v1 >= v then continue_4 k (v1 - v) else Underflow
+    | I -> Vnum v
+  end
+
+with eval_4 (e:expr) (c:cont) : value
+  variant { size_c c + Defunctionalization.size_e e }
+(*
+  ensures { eval_cont c (eval_0 e) result }
+*)
+  =
+  match e with
+    | Cte n -> if n >= 0 then continue_4 c n else Underflow
+    | Sub e1 e2 -> eval_4 e1 (A e2 c)
+  end
+
+(** The interpreter. The post-condition specifies that this program
+    computes the same thing as [eval_0] *)
+
+let interpret_4 (p:prog) : value
+  ensures { result = eval_0 p }
+  = eval_4 p I
+
+let u0 () = interpret_4 p0
+let u1 () = interpret_4 p1
+let u2 () = interpret_4 p2
+let u3 () = interpret_4 p3
+let u4 () = interpret_4 p4
 
 
 end
