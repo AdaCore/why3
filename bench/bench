@@ -66,6 +66,20 @@ valid_goals () {
     done
 }
 
+invalid_goals () {
+    for f in $1/*.mlw; do
+	echo -n "  "$f"... "
+	if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
+	    echo "invalid test $f failed!"
+	    echo "$pgm -P alt-ergo $f"
+	    $pgm -t 3 -P alt-ergo $f
+	    exit 1
+        else
+	    echo "ok"
+       fi
+    done
+}
+
 execute () {
     echo -n "$1 $2... "
     if $pgm $1 --exec $2 > /dev/null 2>&1; then
@@ -118,6 +132,10 @@ list_stuff () {
         exit 1
     fi
 }
+
+echo "=== Checking invalid goals ==="
+invalid_goals bench/invalid
+echo ""
 
 echo "=== Checking theories ==="
 goods theories
