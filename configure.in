@@ -462,11 +462,6 @@ else
         COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
 
         case $COQVERSION in
-          8.3*)
-	        enable_coq_support=yes
-                coq_compat_version=".8.3"
-                AC_MSG_RESULT($COQVERSION)
-                ;;
           8.4*|trunk)
 	        enable_coq_support=yes
                 coq_compat_version=".8.4"
@@ -474,8 +469,8 @@ else
                 ;;
           *)
                 enable_coq_support=no
-	        AC_MSG_WARN(You need Coq 8.3 or later; Coq discarded)
-                reason_coq_support=" (version is $COQVERSION but need version 8.3 or higher)"
+	        AC_MSG_WARN(You need Coq 8.4 or later; Coq discarded)
+                reason_coq_support=" (version is $COQVERSION but need version 8.4 or higher)"
                 ;;
         esac
     fi
