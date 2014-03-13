@@ -41,10 +41,6 @@ let elems' s pr fmt xs = elems s nothing pr fmt ((), xs)
 
 let pair pr pr' fmt (x, y) = fprintf fmt "%a%a" pr x pr' y
 
-let print_opt pr fmt = function
-  | None -> ()
-  | Some x -> pr fmt x
-
 let opt_string_of_bool b = if b then Some "true" else None
 
 (* identifiers *)
@@ -57,7 +53,9 @@ let iprinter = fresh_printer ()
 
 let thprinter = fresh_printer ()
 
-let forget_ids () = forget_all iprinter
+let forget_ids () =
+  forget_all iprinter;
+  forget_all thprinter
 
 (* type variables *)
 
@@ -77,24 +75,31 @@ let print_vs fmt vs =
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
-let print_ts fmt ts =
-  fprintf fmt "%s" (id_unique iprinter ts.ts_name)
-
-let print_ls fmt ls =
-  fprintf fmt "%s" (id_unique iprinter ls.ls_name)
-
-let print_pr fmt pr =
-  fprintf fmt "%s" (id_unique iprinter pr.pr_name)
-
 (* info *)
 
 type info = {
   info_syn : syntax_map;
   symbol_printers : (string * ident_printer) Mid.t;
   realization : bool;
+  theories : string Mid.t;
 }
 
 let print_id fmt id = string fmt (id_unique iprinter id)
+
+let print_altname_path info fmt id =
+  attribs "altname" string
+    (print_option (attrib "path" string))
+    fmt (id.id_string, Mid.find_opt id info.theories)
+
+let print_id_attr info fmt id =
+  attribs "name" print_id (print_altname_path info)
+    fmt (id, id)
+
+let print_ts info fmt ts = print_id_attr info fmt ts.ts_name
+
+let print_ls info fmt ls = print_id_attr info fmt ls.ls_name
+
+let print_pr info fmt pr = print_id_attr info fmt pr.pr_name
 
 let print_id_real info fmt id =
   try
@@ -104,7 +109,6 @@ let print_id_real info fmt id =
     attribs "name" print_id (attrib "local" string) fmt (id, "true")
 
 let print_ts_real info fmt ts = print_id_real info fmt ts.ts_name
-let print_pr_real info fmt pr = print_id_real info fmt pr.pr_name
 
 (** Types *)
 
@@ -277,12 +281,12 @@ let rec dest_conj t = match t.t_node with
 (** Declarations *)
 
 let print_constr info fmt (cs, _) =
-  elems "constr" (attrib "name" print_ls) (print_ty info) fmt (cs, cs.ls_args)
+  elems "constr" (print_ls info) (print_ty info) fmt (cs, cs.ls_args)
 
 let print_tparams = elems' "params" (empty_elem "param" (attrib "name" print_tv))
 
 let print_data_decl info fmt (ts, csl) =
-  elem "datatype" (attrib "name" print_ts)
+  elem "datatype" (print_ts info)
     (pair print_tparams (elems' "constrs" (print_constr info)))
     fmt (ts, (ts.ts_args, csl));
   forget_tvs ()
@@ -296,7 +300,7 @@ let print_data_decls info fmt tl =
 
 let print_statement s pr id info fmt f =
   let vl, prems, concl = dest_rule [] [] f in
-  elem s (attrib "name" pr)
+  elem s pr
     (pair
        (elems' "prems" (print_term info Sls.empty))
        (elems' "concls" (print_term info Sls.empty)))
@@ -307,11 +311,11 @@ let print_statement s pr id info fmt f =
 let print_equivalence_lemma info fmt (ls, ld) =
   let name = Ident.string_unique iprinter
     ((id_unique iprinter ls.ls_name) ^ "_def") in
-  print_statement "lemma" string name info fmt (ls_defn_axiom ld)
+  print_statement "lemma" (attrib "name" string) name info fmt (ls_defn_axiom ld)
 
-let print_fun_eqn s info defs fmt (_, ld) =
+let print_fun_eqn s info defs fmt (ls, ld) =
   let vl, t = dest_forall [] (ls_defn_axiom ld) in
-  elem' s (print_term info defs) fmt t;
+  elem s (print_altname_path info) (print_term info defs) fmt (ls.ls_name, t);
   List.iter forget_var vl
 
 let print_logic_decl info fmt ((ls, _) as d) =
@@ -341,13 +345,13 @@ let print_recursive_decl info fmt dl =
 
 let print_ind info defs fmt (pr, f) =
   let vl, fl, g = dest_rule [] [] f in
-  elem "rule" (attrib "name" print_pr)
+  elem "rule" (print_pr info)
     (pair (elems' "prems" (print_term info defs)) (print_term info defs))
     fmt (pr, (fl, g));
   List.iter forget_var vl
 
 let print_ind_decl info defs fmt (ps, bl) =
-  elem "pred" (attrib "name" print_ls)
+  elem "pred" (print_ls info)
     (pair (print_ls_type info) (print_list nothing (print_ind info defs)))
     fmt (ps, (ps, bl))
 
@@ -367,14 +371,14 @@ let print_ind_decls info s fmt tl =
 
 let print_type_decl info fmt ts =
   if not (Mid.mem ts.ts_name info.info_syn || is_ts_tuple ts) then
-    (elem "typedecl" (attrib "name" print_ts)
-       (pair print_tparams (print_opt (print_ty info)))
+    (elem "typedecl" (print_ts info)
+       (pair print_tparams (print_option (print_ty info)))
        fmt (ts, (ts.ts_args, ts.ts_def));
      forget_tvs ())
 
 let print_param_decl info fmt ls =
   if not (Mid.mem ls.ls_name info.info_syn) then
-    (elem "param" (attrib "name" print_ls) (print_ls_type info) fmt (ls, ls);
+    (elem "param" (print_ls info) (print_ls_type info) fmt (ls, ls);
      forget_tvs ())
 
 let print_prop_decl info fmt (k, pr, f) =
@@ -385,7 +389,7 @@ let print_prop_decl info fmt (k, pr, f) =
     | Pgoal -> "lemma"
     | Pskip -> assert false (* impossible *)
   in
-  print_statement stt print_pr pr info fmt f
+  print_statement stt (print_pr info) pr info fmt f
 
 let print_decl info fmt d =
   match d.d_node with
@@ -407,6 +411,9 @@ let print_decl info fmt d =
 
 let print_decls info fmt dl =
   print_list nothing (print_decl info) fmt dl
+
+let make_thname th = String.concat "." (th.Theory.th_path @
+  [id_unique thprinter th.Theory.th_name])
 
 let print_task printer_args realize fmt task =
   forget_ids ();
@@ -456,15 +463,16 @@ let print_task printer_args realize fmt task =
     info_syn = get_syntax_map task;
     symbol_printers = symbol_printers;
     realization = realize;
+    theories = Mid.map make_thname
+      (Task.used_symbols (Task.used_theories task));
   }
   in
   elem "theory"
-    (attribs "name" string (print_opt (attrib "realize" string)))
+    (attribs "name" string (print_option (attrib "realize" string)))
     (pair
        (elems' "realized" (empty_elem "require"
           (attrib "name" (fun fmt (th, _) ->
-             string fmt (String.concat "." (th.Theory.th_path @
-               [id_unique thprinter th.Theory.th_name]))))))
+             string fmt (make_thname th)))))
        (print_decls info))
     fmt
     ((thname, opt_string_of_bool realize),
