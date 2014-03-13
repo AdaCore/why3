@@ -1,11 +1,27 @@
 
 \chapter{Interactive Proof Assistants}
 
-\section{Using an Interactive Proof Assistant from \why}
 
-\todo{expliquer les principes}
+% ... We then provide specific information about some ITPs.
 
-... We then provide specific information about some ITPs.
+\section{Using an Interactive Proof Assistant to Discharge Goals}
+
+Instead of calling an automated theorem prover to discharge a goal,
+\why offers the possibility to call an interactive theorem prover
+instead. In that case, the interaction is decomposed into two distinct
+phases:
+\begin{itemize}
+\item Edition of a proof script for the goal, typically inside a proof editor
+  provided by the external interactive theorem prover;
+\item Replay of an existing proof script.
+\end{itemize}
+An example of such an interaction is given in the tutorial
+section~\ref{sec:gui}.
+
+Some proof assistants offer more than one possible editor, e.g. a
+choice between the use of a dedicated editor and the use of the Emacs
+editor and the ProofGeneral mode. Selection of the preferred mode can
+be made in \texttt{why3ide} preferences, under the ``Editors'' tab.
 
 \section{Theory Realizations}
 \label{sec:realizations}
@@ -16,7 +32,7 @@ some of its uninterpreted symbols and proofs for some of its
 axioms. This way, one can show the consistency of an axiomatized
 theory and/or make a connection to an existing library (of the proof
 assistant) to ease some proofs.
-Currently, realizations are supported for the proof assistants Coq and PVS.
+%Currently, realizations are supported for the proof assistants Coq and PVS.
 
 \subsection{Generating a realization}
 
