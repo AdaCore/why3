@@ -336,8 +336,14 @@ let print_const ~paren fmt = function
       if BigInt.eq n BigInt.one then
         fprintf fmt "Why3__BigInt.one"
       else
-      let s = BigInt.to_string n in
-      fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
+        begin
+          try
+            let m = BigInt.to_int n in
+            fprintf fmt (protect_on paren "Why3__BigInt.of_int %d") m
+          with _ ->
+            let s = BigInt.to_string n in
+            fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
+        end
   | ConstReal (RConstDec (i,f,None)) ->
       fprintf fmt (non_executable_fmt "%s.%s") i f
   | ConstReal (RConstDec (i,f,Some e)) ->
