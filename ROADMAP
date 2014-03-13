@@ -145,15 +145,28 @@ and no epsilon
 
 = syntax =
 
-* new clause "diverges"
-* clauses "reads" and "writes" accept an empty set
+* new clause "diverges". Loops and recursive calls not annotated with variants will generate a warning, unless the "diverges" clause is given,
+* clauses "reads" and "writes": now accept an empty set
 * modified syntax for "abstract"
-* TODO: lemmas with parameters
+* TODO ? lemmas with parameters
 
-= other =
+= provers =
 
+* new version of prover: Coq 8.4pl3
+* Coq 8.3 is no longer supported
+* new version of prover: Gappa 1.1.0
+* improved support for Isabelle2013-2
+
+= tools =
+
+* why3replayer: renamed option -obsolete-only to --obsolete-only,
+    -smoke-detector to --smoke-detector, -force to --force
+
+= fix =
+
+* remove inconsistency in libraries map.MapPermut and array.ArrayPermut
+  names, definitions, and meaning of symbols "permut..." have been modified
 * fixed compilation bug with lablgtk 2.18
-* improved support for Isabelle
 
 == Final preparation ==
 
@@ -243,7 +256,7 @@ and no epsilon
 
 * Isabelle Support:
 ** fix the problem with why3_jedit script missing executable bit
-** add a documentation: start "isabelle why3_jedit" before why3ide, use "Close C-w" to signal the end of edit to why3"
+** DONE add a documentation: start "isabelle why3_jedit" before why3ide, use "Close C-w" to signal the end of edit to why3"
 
 * eliminate_match:
 ** faire un cas particulier pour "bool", le match pouvant se traduire
