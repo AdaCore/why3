@@ -111,7 +111,7 @@ let is_def (fn, l, c) =
   Hashtbl.find f.tags (l, c)
 
 let make_url fn =
-  let url = Filename.basename fn ^ ".html" in
+  let url = html_filename fn ^ ".html" in
   match (get_file fn).kind, !stdlib_url with
     | Local, _ -> url
     | Loadpath, Some www -> www ^ "/" ^ url
