@@ -327,6 +327,8 @@ let rec is_exec_term t = match t.t_node with
 and is_exec_branch b =
   let _, t = t_open_branch b in is_exec_term t
 
+let max_int31 = BigInt.of_int 0x3FFFFFF
+
 let print_const ~paren fmt = function
   | ConstInt c ->
       let n = Number.compute_int c in
@@ -336,14 +338,12 @@ let print_const ~paren fmt = function
       if BigInt.eq n BigInt.one then
         fprintf fmt "Why3__BigInt.one"
       else
-        begin
-          try
-            let m = BigInt.to_int n in
-            fprintf fmt (protect_on paren "Why3__BigInt.of_int %d") m
-          with _ ->
-            let s = BigInt.to_string n in
-            fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
-        end
+        if BigInt.le n max_int31 then
+          let m = BigInt.to_int n in
+          fprintf fmt (protect_on paren "Why3__BigInt.of_int %d") m
+        else
+          let s = BigInt.to_string n in
+          fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
   | ConstReal (RConstDec (i,f,None)) ->
       fprintf fmt (non_executable_fmt "%s.%s") i f
   | ConstReal (RConstDec (i,f,Some e)) ->
