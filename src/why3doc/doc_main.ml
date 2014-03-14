@@ -91,7 +91,7 @@ let print_file fname =
   let fhtml = Doc_def.output_file fname in
   let c = open_out fhtml in
   let fmt = formatter_of_out_channel c in
-  let f = Filename.basename fname in
+  let f = Filename.basename fhtml in
   if not !opt_body then Doc_html.print_header fmt ~title:f ~css ();
   if index then
     fprintf fmt "<p>%s <a href=\"index.html\">index</a></p>@\n<hr>@\n" title;
@@ -118,9 +118,10 @@ let () =
       let add fn =
         let header = Doc_lexer.extract_header fn in
         let header = if header = "" then "" else ": " ^ header in
-        let basename = Filename.basename fn in
-        fprintf fmt "<li> <a href=\"%s.html\">%s</a> %s </li>@\n"
-          basename basename header
+        let fhtml = Doc_def.output_file fn in
+        let basename = Filename.basename fhtml in
+        fprintf fmt "<li> <a href=\"%s\">%s</a> %s </li>@\n"
+          basename fn header
       in
       Queue.iter add opt_queue;
       fprintf fmt "</ul>@\n";

@@ -23,8 +23,11 @@ let set_stdlib_url u = stdlib_url := Some u
 let output_dir = ref None
 let set_output_dir d = output_dir := d
 
+let dir_sep = Str.regexp_string Filename.dir_sep
+let html_filename fn = Str.global_replace dir_sep "." fn
+
 let output_file fname =
-  let f = Filename.basename fname in
+  let f = html_filename fname in
   let base = match !output_dir with
     | None -> f
     | Some dir -> Filename.concat dir f
