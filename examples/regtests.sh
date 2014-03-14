@@ -63,11 +63,11 @@ echo "=== Standard Library ==="
 run_dir ../lib/why3
 echo ""
 
+echo "=== Tests ==="
 # there's no session there...
-# echo "=== Tests ==="
 # run_dir tests
-# run_dir tests-provers
-# echo ""
+run_dir tests-provers
+echo ""
 
 echo "=== Check Builtin translation ==="
 run_dir check-builtin
