@@ -11,6 +11,8 @@ syntax
     clause is given
   o clauses "reads" and "writes" now accept an empty set
   * modified syntax for "abstract": abstract <spec> <expr> end
+  o types in quantifiers are now optional
+  o formulas and Boolean terms can be used interchangeably
 
 library
   * [fix] removed inconsistency in libraries map.MapPermut and
@@ -21,18 +23,25 @@ library
 provers
   o new version of prover: Coq 8.4pl3
   o new version of prover: Gappa 1.1.0
+  o new version of prover: E prover 1.8
   * Coq 8.3 is no longer supported
   o improved support for Isabelle2013-2
 
 tools
   o new option --exec to interpret WhyML programs; see doc chapter 8
   o new option --extract to compile WhyML programs to OCaml;
-    see doc chapter 8
+    see doc chapter 8 and modules/mach/{int,array}.mlw
   * [why3replayer] renamed option -obsolete-only to --obsolete-only,
     -smoke-detector to --smoke-detector, -force to --force
+  * [why3replayer] replay now fails if new goals are added
+
+API
+  o new type-inferring API for logical terms and program expressions
 
 bug fixes
   o fixed compilation bug with lablgtk 2.18
+  * fixed Coq printer (former Coq proofs may have to be updated, with
+    extra qualification of imported symbols)
 
 version 0.82, December 12, 2013
 ===============================
