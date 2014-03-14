@@ -1838,7 +1838,7 @@ EXTRA_DIST = configure doc/manual.pdf
 
 dist: $(EXTRA_DIST)
 	rm -rf $(DISTRIB_TAR) $(DISTRIB_DIR)
-	mkdir $(DISTRIB_DIR)
+	mkdir -p $(DISTRIB_DIR)
 	for d in `git ls-tree -d -r --name-only HEAD`; do mkdir $(DISTRIB_DIR)/$$d; done
 	for f in `git ls-tree -r --name-only HEAD` $(EXTRA_DIST); do cp $$f $(DISTRIB_DIR)/$$f; done
 	rm `find $(DISTRIB_DIR) -name .gitignore`
