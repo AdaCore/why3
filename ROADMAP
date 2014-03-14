@@ -139,16 +139,16 @@ and no epsilon
 
 
 
-==================== Roadmap for release 0.90 ========================
+==================== Roadmap for release 0.83 ========================
 
 == New Features to announce ==
 
 = syntax =
 
-* new clause "diverges". Loops and recursive calls not annotated with variants will generate a warning, unless the "diverges" clause is given,
-* clauses "reads" and "writes": now accept an empty set
-* modified syntax for "abstract"
-* TODO ? lemmas with parameters
+* new clause "diverges". Loops and recursive calls not annotated
+  with variants will generate a warning, unless the "diverges" clause is given
+* clauses "reads" and "writes" now accept an empty set
+* modified syntax for "abstract": abstract <spec> <expr> end
 
 = provers =
 
@@ -159,13 +159,14 @@ and no epsilon
 
 = tools =
 
-* why3replayer: renamed option -obsolete-only to --obsolete-only,
+* why3replayer: renamed options -obsolete-only to --obsolete-only,
     -smoke-detector to --smoke-detector, -force to --force
 
 = fix =
 
-* remove inconsistency in libraries map.MapPermut and array.ArrayPermut
-  names, definitions, and meaning of symbols "permut..." have been modified
+* removed inconsistency in libraries map.MapPermut and array.ArrayPermut.
+  Note: names, definitions, and meaning of symbols "permut..." have been
+  modified. See http://why3.lri.fr/stdlib-0.83/array.mlw.html for details.
 * fixed compilation bug with lablgtk 2.18
 
 == Final preparation ==
@@ -177,7 +178,7 @@ and no epsilon
 * check that nightly bench is OK
 * check that "make xml-validate-local" is OK
   (see below : copy the dtd on the web)
-* put 0.90 in file Version
+* put 0.83 in file Version
 * check/update the content of the About dialog in src/ide/gconfig.ml
   around lines 550-600
 * check headers
@@ -186,34 +187,34 @@ and no epsilon
     in ./macros.tex, and then "make doc"
   (check that manual in HTML is also generated, doc/html/index.html)
 * do "make dist"
-* test distrib/why3-0.90.tar.gz
+* test distrib/why3-0.83.tar.gz
 * install web page for why2 which includes an updated page for the
   quick migration guide. (sources are in CVS repository
-  ~filliatr/ARCHIVE/www/why). ADD a colon on new syntax for 0.90. Change Proval into Toccata
+  ~filliatr/ARCHIVE/www/why). ADD a colon on new syntax for 0.83. Change Proval into Toccata
 * put on the web page
- - why3-0.90.tar.gz
-   cp distrib/why3-0.90.tar.gz /users/www-perso/projets/why3/download
+ - why3-0.83.tar.gz
+   cp distrib/why3-0.83.tar.gz /users/www-perso/projets/why3/download
 
  - the manual in PDF
-   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.90.pdf
+   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.83.pdf
 
  - the HTML version of the manual (content of doc/html)
-   cp -r doc/html /users/www-perso/projets/why3/doc-0.90
+   cp -r doc/html /users/www-perso/projets/why3/doc-0.83
 
  - why3session.dtd
    cp share/why3session.dtd /users/www-perso/projets/why3/
 
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
    make stdlibdoc
-   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.90
+   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.83
    rm /users/www-perso/projets/why3/stdlib
-   ln -s /users/www-perso/projets/why3/stdlib-0.90 \
+   ln -s /users/www-perso/projets/why3/stdlib-0.83 \
             /users/www-perso/projets/why3/stdlib
  - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
     make apidoc
-    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.90
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.83
     rm /users/www-perso/projets/why3/api
-    ln -s /users/www-perso/projets/why3/api-0.90 \
+    ln -s /users/www-perso/projets/why3/api-0.83 \
       /users/www-perso/projets/why3/api
    (PROBLEME avec style.css ? Ou est le probleme ?)
  - update the main HTML page (sources are in repository why3-www)
@@ -228,9 +229,9 @@ and no epsilon
    chmod -R g+w /users/www-perso/projets/why3
 
 * make a last commit:
- - git commit -m "release 0.90"
- - add tag 0.90 to the git repository, using
-   git tag 0.90
+ - git commit -m "release 0.83"
+ - add tag 0.83 to the git repository, using
+   git tag 0.83
  - do not forget to push it using
    git push
    git push --tags
