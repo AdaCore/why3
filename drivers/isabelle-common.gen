@@ -28,6 +28,7 @@ end
 theory bool.Bool
   syntax function andb  "<app><const name=\"HOL.conj\"/>%1%2</app>"
   syntax function orb   "<app><const name=\"HOL.disj\"/>%1%2</app>"
+  syntax function xorb  "<app><const name=\"HOL.Not\"/><app><const name=\"HOL.eq\"/>%1%2</app></app>"
   syntax function notb  "<app><const name=\"HOL.Not\"/>%1</app>"
   syntax function implb "<app><const name=\"HOL.implies\"/>%1%2</app>"
 end
@@ -133,6 +134,27 @@ end
 
 theory set.Fset
   syntax function cardinal "<app><const name=\"Nat.semiring_1_class.of_nat\"><fun><type name=\"Nat.nat\"/><type name=\"Int.int\"/></fun></const><app><const name=\"FSet.fcard\"/>%1</app></app>"
+end
+
+theory number.Parity
+  syntax predicate even "<app><const name=\"Parity.even_odd_class.even\"/>%1</app>"
+  syntax predicate odd  "<app><const name=\"Parity.odd\"/>%1</app>"
+end
+
+theory number.Divisibility
+  syntax predicate divides "<app><const name=\"Rings.dvd_class.dvd\"/>%1%2</app>"
+end
+
+theory number.Gcd
+  syntax function gcd "<app><const name=\"GCD.gcd_class.gcd\"/>%1%2</app>"
+end
+
+theory number.Prime
+  syntax predicate prime "<app><const name=\"Primes.prime_class.prime\"/>%1</app>"
+end
+
+theory number.Coprime
+  syntax predicate coprime "<app><const name=\"GCD.gcd_class.coprime\"/>%1%2</app>"
 end
 
 (* this file has an extension .aux rather than .gen since it should not be distributed *)
