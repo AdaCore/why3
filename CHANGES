@@ -1,6 +1,10 @@
 
 * marks an incompatible change
 
+provers
+  * fixed Coq printer (former Coq proofs may have to be updated, by removing
+    non-emptiness constraints from polymorphic type applications)
+
 version 0.83, March 14, 2014
 ============================
 
@@ -15,10 +19,8 @@ syntax
   o formulas and Boolean terms can be used interchangeably
 
 library
-  * [fix] removed inconsistency in libraries map.MapPermut and
-    array.ArrayPermut
-  * [library] names, definitions, and meaning of symbols "permut..." have
-    been modified
+  * removed inconsistency in libraries map.MapPermut and array.ArrayPermut
+    (names, definitions, and meaning of symbols "permut..." have been modified)
 
 provers
   o new version of prover: Coq 8.4pl3
@@ -26,6 +28,8 @@ provers
   o new version of prover: E prover 1.8
   * Coq 8.3 is no longer supported
   o improved support for Isabelle2013-2
+  * fixed Coq printer (former Coq proofs may have to be updated, with
+    extra qualification of imported symbols)
 
 tools
   o new option --exec to interpret WhyML programs; see doc chapter 8
@@ -38,10 +42,8 @@ tools
 API
   o new type-inferring API for logical terms and program expressions
 
-bug fixes
+miscellaneous
   o fixed compilation bug with lablgtk 2.18
-  * fixed Coq printer (former Coq proofs may have to be updated, with
-    extra qualification of imported symbols)
 
 version 0.82, December 12, 2013
 ===============================
