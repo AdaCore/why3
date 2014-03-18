@@ -219,7 +219,7 @@ theory Occ
   lemma occ_bounds:
     forall v: 'a, m: map int 'a, l u: int.
     l <= u -> 0 <= occ v m l u <= u - l
-    (* direct when l>=u, by induction on b when l <= u *)
+    (* direct when l>=u, by induction on u when l <= u *)
 
   lemma occ_append:
     forall v: 'a, m: map int 'a, l mid u: int.

@@ -13,7 +13,8 @@ module Int
   use export int.ComputerDivision
 
   let (/) (x: int) (y: int)
-    requires { y <> 0 } ensures { result = div x y }
+    requires { "expl:division by zero" y <> 0 } 
+    ensures  { result = div x y }
   = div x y
 
 end
