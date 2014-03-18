@@ -1,0 +1,17 @@
+theory NonEmptyTypes
+
+  type t 'a = T 'a
+  type u 'a = U1 (t (u 'a)) | U2
+
+  function f : 'a
+
+  inductive v (c : u 'a) =
+    | v1 : forall c : u 'a. v (U1 (T c))
+    | v2 : v (f : u 'a)
+
+  function id (x : 'a) : 'a
+  axiom ax : forall x : 'a. id x = x
+
+  goal g1 : exists x : 'a. id x = x
+
+end
