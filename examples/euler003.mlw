@@ -14,7 +14,7 @@ use import number.Divisibility
 use import number.Prime
 use import number.Coprime
 
-(** returns the smallest divisor of [n] greater then 1,
+(** returns the smallest divisor of [n] greater than or equal to [d],
     assuming no divisor between 2 and [d]. *)
 let rec smallest_divisor (d n:int) : int
   requires { 2 <= n }
