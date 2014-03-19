@@ -2,11 +2,14 @@
 
 {1 Defunctionalization}
 
-This is inspired from student exercises proposed by Olivier Danvy
-<danvy@cs.au.dk> (cf JFLA 2014)
+This is inspired from student exercises proposed by 
+{h <a href="http://cs.au.dk/~danvy/">Olivier Danvy</a>}
+at the {h <a href="http://jfla.inria.fr/2014/">JFLA 2014 conference</a>}
 
 *)
 
+
+(**{h }*)
 
 (** {2 Simple Arithmetic Expressions} *)
 
@@ -14,34 +17,30 @@ module Expr
 
 use export int.Int
 
-(*
-
-Grammar of expressions:
-
+(** Grammar of expressions 
+{h <blockquote><pre>
 n  :  int
 
 e  :  expression
 e ::= n | e - e
 
 p  :  program
-p ::= e
-
+p ::= e 
+</pre></blockquote>}
 *)
 
 type expr = Cte int | Sub expr expr
 
 type prog = expr
 
-(*
-
-Examples:
-
+(** Examples:
+{h <blockquote><pre>
 p0 = 0
 p1 = 10 - 6
 p2 = (10 - 6) - (7 - 2)
 p3 = (7 - 2) - (10 - 6)
 p4 = 10 - (2 - 3)
-
+</pre></blockquote>}
 *)
 
 constant p0 : prog = Cte 0
@@ -59,45 +58,42 @@ module DirectSem
 
 use import Expr
 
-(*
-
-Values:
-
+(** Values:
+{h <blockquote><pre>
 v  :  value
 v ::= n
-
-
+</pre></blockquote>
+}
 Expressible Values:
-
+{h <blockquote><pre>
 ve  :  expressible_value
 ve ::= v
-
-
+</pre></blockquote>}
 Interpretation:
-
+{h <blockquote><pre>
 ------
 n => n
 
 e1 => n1   e2 => n2   n1 - n2 = n3
 ----------------------------------
       e1 - e2 => n3
-
-
+</pre></blockquote>}
 A program e is interpreted into a value n if judgement
-
+{h <blockquote><pre>
   e => n
-
+</pre></blockquote>}
 holds.
-
-
-Exercise 0:
-  Program the interpreter above and test it on the examples.
-
-  eval_0 : expression -> expressible_value
-  interpret_0 : program -> expressible_value
 *)
 
-(* Note: Why3 definition introduced by "function" belong to the logic
+(** {4 Exercise 0.0}
+  Program the interpreter above and test it on the examples.
+{h <blockquote><pre>
+  eval_0 : expression -> expressible_value
+  interpret_0 : program -> expressible_value
+</pre></blockquote>}
+*)
+
+(* Note: Why3 definitions introduced by "function" belong to the logic
    part of Why3 language *)
 
 function eval_0 (e:expr) : int =
@@ -111,15 +107,11 @@ function eval_0 (e:expr) : int =
 
 function interpret_0 (p:prog) : int = eval_0 p
 
-(*
-
-Tests, can be replayed using
-
+(** Tests, can be replayed using
+{h <blockquote><pre>
   why3 defunctionalization.mlw --exec DirectSem.t0
-
-(resp DirectSem.t1, DirectSem.t2, etc.) 
-
-(Why3 version at least 0.82 required)
+</pre></blockquote>}
+resp. [DirectSem.t1], [DirectSem.t2], etc. (Why3 version at least 0.82 required)
 
 *)
 
@@ -139,16 +131,15 @@ module CPS
 
 use import Expr
 
-(*
+(** {4 Exercise 0.1}
 
-Exercise 1:
-
-  CPS-transform (call by value, left to right) the function eval_0,
+  CPS-transform (call by value, left to right) the function [eval_0],
   and call it from the main interpreter with the identity function as
   initial continuation
-
+{h <blockquote><pre>
       eval_1 : expression -> (expressible_value -> 'a) -> 'a
   interpret_1 : program -> expressible_value
+</pre></blockquote>}
 
 *)
 
@@ -163,6 +154,8 @@ function eval_1 (e:expr) (k:int -> 'a) : 'a =
 
 function interpret_1 (p : prog) : int = eval_1 p (\ n. n)
 
+
+(** Soundness *)
 
 use import DirectSem
 
@@ -190,18 +183,17 @@ module Defunctionalization
 use import Expr
 use import DirectSem
 
-(**
-Exercise 2:
+(** {4 Exercise 0.2}
 
   De-functionalize the continuation of [eval_1].
-
+{h <blockquote><pre>
          cont ::= ...
 
-   [continue_2 : cont -> value -> value]
-       [eval_2 : expression -> cont -> value]
-  [interpret_2 : program -> value]
-
-  The data type cont represents the grammar of contexts.
+   continue_2 : cont -> value -> value
+       eval_2 : expression -> cont -> value
+  interpret_2 : program -> value
+</pre></blockquote>}
+  The data type [cont] represents the grammar of contexts.
 
   The two mutually recursive functions [eval_2] and [continue_2]
   implement an abstract machine, that is a state transition system.
@@ -210,19 +202,17 @@ Exercise 2:
 
 type cont = A1 expr cont | A2 int cont | I
 
-(**
-
-One would want to write in Why:
-
-[function eval_cont (c:cont) (v:int) : int =
+(** One would want to write in Why:
+{h <blockquote><pre>
+function eval_cont (c:cont) (v:int) : int =
   match c with
   | A1 e2 k ->
     let v2 = eval_0 e2 in
     eval_cont (A2 v k) v2
   | A2 v1 k -> eval_cont k (v1 - v)
   | I -> v
-  end]
-
+  end
+</pre></blockquote>}
 But since the recursion is not structural, Why3 kernel rejects it
 (definitions in the logic part of the language must be total)
 
@@ -318,26 +308,21 @@ module SemWithError
 
 use import Expr
 
-(*
-
-
-Errors:
-
+(** Errors:
+{h <blockquote><pre>
 s  :  error
-
-
+</pre></blockquote>}
 Expressible values:
-
+{h <blockquote><pre>
 ve  :  expressible_value
 ve ::= v | s
-
+</pre></blockquote>}
 *)
 
 type value = Vnum int | Underflow
 
-(*
-Interpretation:
-
+(** Interpretation:
+{h <blockquote><pre>
 ------
 n => n
 
@@ -356,24 +341,25 @@ e1 => n1   e2 => n2   n1 < n2
 e1 => n1   e2 => n2   n1 >= n2   n1 - n2 = n3
 ---------------------------------------------
       e1 - e2 => n3
-
-We interpret the program e into value n if the judgement
-
+</pre></blockquote>}
+We interpret the program [e] into value [n] if the judgement
+{h <blockquote><pre>
   e => n
-
-holds, and into error s if the judgement
-
+</pre></blockquote>}
+holds, and into error [s] if the judgement
+{h <blockquote><pre>
   e => s
-
+</pre></blockquote>}
 holds.
 
 
-Exercise 0:
-  Program the interpretor above and test it on the examples.
+{4 Exercise 1.0}
 
+  Program the interpreter above and test it on the examples.
+{h <blockquote><pre>
   eval_0 : expr -> expressible_value
   interpret_0 : program -> expressible_value
-
+</pre></blockquote>}
 *)
 
 function eval_0 (e:expr) : value =
@@ -400,17 +386,15 @@ let t3 () = interpret_0 p3
 let t4 () = interpret_0 p4
 
 
-(*
-Exercise 1:
+(** {4 Exercise 1.1}
   CPS-transform (call by value, from left to right)
   the function [eval_0], call it from the main interpreter
   with the identity function as initial continuation.
-
+{h <blockquote><pre>
       eval_1 : expr -> (expressible_value -> 'a) -> 'a
   interpret_1 : program -> expressible_value
-
+</pre></blockquote>}
 *)
-
 
 
 use HighOrd
@@ -446,22 +430,21 @@ let rec lemma cps_correct_expr (e:expr) : unit
 
 lemma cps_correct: forall p. interpret_1 p = interpret_0 p
 
-(*
-Exercise 2:
+(** {4 Exercise 1.2}
 
   Divide the continuation
-
+{h <blockquote><pre>
     expressible_value -> 'a
-
+</pre></blockquote>}
   in two: 
-
+{h <blockquote><pre>
     (value -> 'a) * (error -> 'a)
-
+</pre></blockquote>}
   and adapt [eval_1] and [interpret_1] as
-
+{h <blockquote><pre>
        eval_2 : expr -> (value -> 'a) -> (error -> 'a) -> 'a
   interpret_2 : program -> expressible_value
-
+</pre></blockquote>}
 *)
 
 
@@ -510,16 +493,15 @@ let rec lemma cps2_correct_expr (e:expr) (kerr:unit -> 'a): unit
 
 lemma cps2_correct: forall p. interpret_2 p = interpret_0 p
 
-(*
+(** {4 Exercise 1.3}
 
-Exercise 3:
   Specialize the codomain of the continuations and of the evaluation function
   so that it is not polymorphic anymore but is [expressible_value], and
   then short-circuit the second continuation to stop in case of error
-
+{h <blockquote><pre>
        eval_3 : expr -> (value -> expressible_value) -> expressible_value
   interpret_3 : program -> expressible_value
-
+</pre></blockquote>}
   NB: Now there is only one continuation and it is applied only in
   absence of error.
 
@@ -557,16 +539,15 @@ let rec lemma cps3_correct_expr (e:expr) : unit
 lemma cps3_correct: forall p. interpret_3 p = interpret_0 p
 
 
-(*
-Exercise 4:
+(** {4 Exercise 1.4}
   De-functionalize the continuation of [eval_3].
-
+{h <blockquote><pre>
          cont ::= ...
 
     continue_4 : cont -> value -> expressible_value
         eval_4 : expr -> cont -> expressible_value
   interprete_4 : program -> expressible_value
-
+</pre></blockquote>}
   The data type [cont] represents the grammar of contexts.
   (NB. has it changed w.r.t to previous exercise?)
 
@@ -688,9 +669,9 @@ end
 
 (** {2 The lambda-calculus} *)
 
-(*
+(**
 Terms:
-
+{h <blockquote><pre>
 n : int
 
 x : identifier
@@ -700,87 +681,79 @@ t ::= x | \x.t | t t
 
 p  :  program
 p ::= t
+</pre></blockquote>}
       where t is ground (i.e. without any free variable)
+*)
 
-
-Examples:
-
+(** Examples:
+{h <blockquote><pre>
 p0 = (\x.x)
 p1 = (\x.x) (\x.x)
 p2 = (\x.\f.f x) (\y.y) (\x.x)
+</pre></blockquote>}
+*)
 
-
-Values and environments:
-
+(** Values and environments:
+{h <blockquote><pre>
 e  :  environment
 v ::= nil | (identifier, value) :: environment
 
 v  :  value
 v ::= (\x.t, e)
+</pre></blockquote>}
+*)
 
-
-Operateur algebrique:
-
+(** Operateur algebrique:
+{h <blockquote><pre>
 lookup : identificateur -> environnement -> value
+</pre></blockquote>}
+*)
 
-
-Contextes d'evaluation:
-
+(** Contextes d'evaluation:
+{h <blockquote><pre>
 C ::= [] | [C (t, e)] | [v C]
+</pre></blockquote>}
+*)
 
+(** Machine abstraite (dite "CEK"):
+{h <blockquote><pre>
+    &lt;x, e, C&gt;_eval -> &lt;C, v&gt;_cont
+                      where v = lookup x e
+ &lt;\x.t, e, C&gt;_eval -> &lt;C, (\x.t, e)&gt;_cont
+&lt;t0 t1, e, C&gt;_eval -> &lt;t0, e, [C (t1, e)]&gt;
 
-Machine abstraite (dite "CEK"):
+           &lt;[], v&gt;_cont -> v
+   &lt;[C (t, e)], v&gt;_cont -> &lt;t, e, [v C]&gt;_eval
+&lt;[(\x.t, e) C], v&gt;_cont -> &lt;t, (x, v) :: e, C&gt;_eval
+</pre></blockquote>}
+*)
 
-    <x, e, C>_eval -> <C, v>_cont
-                      oÃ¹ v = lookup x e
- <\x.t, e, C>_eval -> <C, (\x.t, e)>_cont
-<t0 t1, e, C>_eval -> <t0, e, [C (t1, e)]>
+(** {4 Exercise 2.0}
+  Program cette machine abstraite.
+*)
 
-           <[], v>_cont -> v
-   <[C (t, e)], v>_cont -> <t, e, [v C]>_eval
-<[(\x.t, e) C], v>_cont -> <t, (x, v) :: e, C>_eval
-
-
-Exercise 0:
-  Programr cette machine abstraite.
-
-
-Exercise 1:
+(** {4 Exercise 2.1}
   Cette machine abstraite est en forme defonctionalisee.
   La refonctionaliser.
+*)
 
-
-Exercise 2:
+(** {4 Exercise 2.2}
   Le resultat de l'Exercise 1 est en CPS.
   L'exprimer en style direct.
+*)
 
-
-Exercise 3:
+(** {4 Exercise 2.3}
   Le resultat de l'Exercise 2 est en forme defonctionalisee
   (dans le sens que les fermetures sont en forme defonctionalisee
   triviale).
   Le refonctionaliser, et caracteriser le resultat.
-
-----------
-
-% fin de danvy-ex1.txt
-
 *)
 
 
 
 
 
-
-
-(*
-% danvy-ex2.txt
-% exercices pour JFLA 2014
-% 9 janvier 2014
-% Olivier Danvy <danvy@cs.au.dk>
-
-----------
-*)
+(** {2 Reduction Semantics} *)
 
 module R
 
@@ -992,6 +965,11 @@ alors reduis e = recompose (C, c)
 
 *)
 
+(** {4 Exercise 3.0}
+  Implementer la "reduction semantics" ci-dessus et la tester.
+*)
+
+
 let reduis (e:expr) : expr
   ensures { eval_0 result = eval_0 e }
   diverges
@@ -1029,16 +1007,9 @@ let rec itere (e:expr) : int
      end
   end
 
-(*
-
-Exercise 1:
-  Implementer la "reduction semantics" ci-dessus et la tester.
-
-
-Exercise 2:
+(** {4 Exercise 3.1}
   Optimiser l'etape de recomposition / decomposition
   en une fonction "refocus".
-
 *)
 
 
@@ -1071,11 +1042,8 @@ let rec normalize (e:expr)
 
 
 
-(*
-
-Exercise 3:
+(** {4 Exercise 3.2}
   Obtenir une machine abstraite.
-
 *)
 
 (* TODO *)

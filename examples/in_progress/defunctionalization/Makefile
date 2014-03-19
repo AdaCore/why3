@@ -21,7 +21,7 @@ all: $(MAIN).opt
 doc:
 	why3doc ../defunctionalization.mlw
 	why3session html ../defunctionalization.mlw
-	firefox defunctionalization.mlw.html defunctionalization.html
+	firefox defunctionalization.mlw.html defunctionalization.html &
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
 	ocamlc -g $(ZARITH) $(WHY3) $(NUMLIB).cma why3extract.cma -o $@ $^
