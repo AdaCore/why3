@@ -7,87 +7,31 @@ Require list.List.
 Require list.Length.
 Require list.Mem.
 Require list.Append.
+Require list.NumOcc.
+Require list.Permut.
 
 (* Why3 assumption *)
 Definition unit := unit.
 
-Parameter num_occ: forall {a:Type} {a_WT:WhyType a}, a -> (list a) -> Z.
-
-Axiom num_occ_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l:(list a)),
-  match l with
-  | nil => ((num_occ x l) = 0%Z)
-  | (cons y r) => ((x = y) -> ((num_occ x l) = (1%Z + (num_occ x r))%Z)) /\
-      ((~ (x = y)) -> ((num_occ x l) = (0%Z + (num_occ x r))%Z))
-  end.
-
-Axiom Mem_Num_Occ : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l:(list a)), (list.Mem.mem x l) <-> (0%Z < (num_occ x l))%Z.
-
-Axiom Append_Num_Occ : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l1:(list a)) (l2:(list a)), ((num_occ x (List.app l1 l2)) = ((num_occ x
-  l1) + (num_occ x l2))%Z).
+Axiom qtmark : Type.
+Parameter qtmark_WhyType : WhyType qtmark.
+Existing Instance qtmark_WhyType.
 
 (* Why3 assumption *)
-Definition permut {a:Type} {a_WT:WhyType a} (l1:(list a))
-  (l2:(list a)): Prop := forall (x:a), ((num_occ x l1) = (num_occ x l2)).
-
-Axiom Permut_refl : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  (permut l l).
-
-Axiom Permut_sym : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), (permut l1 l2) -> (permut l2 l1).
-
-Axiom Permut_trans : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), (permut l1 l2) -> ((permut l2 l3) -> (permut
-  l1 l3)).
-
-Axiom Permut_cons : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l1:(list a)) (l2:(list a)), (permut l1 l2) -> (permut (cons x l1)
-  (cons x l2)).
-
-Axiom Permut_swap : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
-  (l:(list a)), (permut (cons x (cons y l)) (cons y (cons x l))).
-
-Axiom Permut_cons_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l1:(list a)) (l2:(list a)), (permut (List.app (cons x l1) l2)
-  (List.app l1 (cons x l2))).
-
-Axiom Permut_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), (permut (List.app (List.app l1 l2) l3)
-  (List.app l1 (List.app l2 l3))).
-
-Axiom Permut_append : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (k1:(list a)) (k2:(list a)), (permut l1 k1) -> ((permut l2
-  k2) -> (permut (List.app l1 l2) (List.app k1 k2))).
-
-Axiom Permut_append_swap : forall {a:Type} {a_WT:WhyType a},
-  forall (l1:(list a)) (l2:(list a)), (permut (List.app l1 l2)
-  (List.app l2 l1)).
-
-Axiom Permut_mem : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l1:(list a)) (l2:(list a)), (permut l1 l2) -> ((list.Mem.mem x l1) ->
-  (list.Mem.mem x l2)).
-
-Axiom Permut_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), (permut l1 l2) ->
-  ((list.Length.length l1) = (list.Length.length l2)).
-
-(* Why3 assumption *)
-Inductive t (a:Type) {a_WT:WhyType a} :=
+Inductive t (a:Type) :=
   | mk_t : (list a) -> t a.
 Axiom t_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (t a).
 Existing Instance t_WhyType.
-Implicit Arguments mk_t [[a] [a_WT]].
+Implicit Arguments mk_t [[a]].
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a} (v:(@t a a_WT)): (list a) :=
+Definition elts {a:Type} {a_WT:WhyType a} (v:(t a)): (list a) :=
   match v with
   | (mk_t x) => x
   end.
 
 (* Why3 assumption *)
-Definition length {a:Type} {a_WT:WhyType a} (q:(@t a a_WT)): Z :=
+Definition length {a:Type} {a_WT:WhyType a} (q:(t a)): Z :=
   (list.Length.length (elts q)).
 
 Axiom elt : Type.
@@ -102,38 +46,48 @@ Axiom total_preorder2 : forall (x:elt) (y:elt) (z:elt), (le x y) -> ((le y
   z) -> (le x z)).
 
 (* Why3 assumption *)
-Inductive sorted : (list elt) -> Prop :=
-  | Sorted_Nil : (sorted nil)
-  | Sorted_One : forall (x:elt), (sorted (cons x nil))
+Inductive sorted: (list elt) -> Prop :=
+  | Sorted_Nil : (sorted Init.Datatypes.nil)
+  | Sorted_One : forall (x:elt), (sorted
+      (Init.Datatypes.cons x Init.Datatypes.nil))
   | Sorted_Two : forall (x:elt) (y:elt) (l:(list elt)), (le x y) -> ((sorted
-      (cons y l)) -> (sorted (cons x (cons y l)))).
+      (Init.Datatypes.cons y l)) -> (sorted
+      (Init.Datatypes.cons x (Init.Datatypes.cons y l)))).
 
 Axiom sorted_mem : forall (x:elt) (l:(list elt)), ((forall (y:elt),
-  (list.Mem.mem y l) -> (le x y)) /\ (sorted l)) <-> (sorted (cons x l)).
+  (list.Mem.mem y l) -> (le x y)) /\ (sorted l)) <-> (sorted
+  (Init.Datatypes.cons x l)).
+
+Import Permut.
 
 (* Why3 goal *)
-Theorem WP_parameter_merge : forall (q:(list elt)) (q2:(list elt))
-  (q1:(list elt)), (q = nil) -> forall (q3:(list elt)) (q21:(list elt))
-  (q11:(list elt)), (permut (List.app (List.app q3 q11) q21)
-  (List.app q1 q2)) -> ((0%Z < (list.Length.length q11))%Z ->
+Theorem WP_parameter_merge : forall (q1:(list elt)) (q2:(list elt))
+  (q:(list elt)), (q = Init.Datatypes.nil) -> forall (q3:(list elt))
+  (q21:(list elt)) (q11:(list elt)), (list.Permut.permut
+  (Init.Datatypes.app (Init.Datatypes.app q3 q11) q21)
+  (Init.Datatypes.app q1 q2)) -> ((0%Z < (list.Length.length q11))%Z ->
   ((~ ((list.Length.length q11) = 0%Z)) ->
-  ((~ ((list.Length.length q21) = 0%Z)) -> ((~ (q11 = nil)) ->
-  forall (x1:elt), match q11 with
-  | nil => False
-  | (cons x _) => (x1 = x)
-  end -> ((~ (q21 = nil)) -> forall (x2:elt),
+  ((~ ((list.Length.length q21) = 0%Z)) -> ((~ (q11 = Init.Datatypes.nil)) ->
+  forall (x1:elt),
+  match q11 with
+  | Init.Datatypes.nil => False
+  | (Init.Datatypes.cons x _) => (x1 = x)
+  end -> ((~ (q21 = Init.Datatypes.nil)) -> forall (x2:elt),
   match q21 with
-  | nil => False
-  | (cons x _) => (x2 = x)
-  end -> ((~ (le x1 x2)) -> ((~ (q21 = nil)) -> forall (q22:(list elt)),
-  forall (o:elt),
+  | Init.Datatypes.nil => False
+  | (Init.Datatypes.cons x _) => (x2 = x)
+  end -> ((~ (le x1 x2)) -> ((~ (q21 = Init.Datatypes.nil)) ->
+  forall (q22:(list elt)), forall (o:elt),
   match q21 with
-  | nil => False
-  | (cons x t1) => (o = x) /\ (q22 = t1)
-  end -> forall (q4:(list elt)), (q4 = (List.app q3 (cons o nil))) -> (permut
-  (List.app (List.app q4 q11) q22) (List.app q1 q2))))))))).
-(* Why3 intros q q2 q1 h1 q3 q21 q11 h2 h3 h4 h5 h6 x1 h7 h8 x2 h9 h10 h11
+  | Init.Datatypes.nil => False
+  | (Init.Datatypes.cons x t1) => (o = x) /\ (q22 = t1)
+  end -> forall (q4:(list elt)),
+  (q4 = (Init.Datatypes.app q3 (Init.Datatypes.cons o Init.Datatypes.nil))) ->
+  (list.Permut.permut (Init.Datatypes.app (Init.Datatypes.app q4 q11) q22)
+  (Init.Datatypes.app q1 q2))))))))).
+(* Why3 intros q1 q2 q h1 q3 q21 q11 h2 h3 h4 h5 h6 x1 h7 h8 x2 h9 h10 h11
         q22 o h12 q4 h13. *)
+Proof.
 intros q q2 q1 h1 q3 q21 q11 h2 h3 h4 h5 h6 x1 h7 x2 h8 h9 q22 o h10
         q4 h11.
 destruct q21.
@@ -146,5 +100,4 @@ apply Permut_refl.
 simpl.
 apply (Permut_cons_append e).
 Qed.
-
 
