@@ -14,7 +14,7 @@ Require list.Append.
 (* Why3 goal *)
 Lemma nth_append_1 : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
   (l2:(list a)) (i:Z), (i < (list.Length.length l1))%Z -> ((list.Nth.nth i
-  (List.app l1 l2)) = (list.Nth.nth i l1)).
+  (Init.Datatypes.app l1 l2)) = (list.Nth.nth i l1)).
 Proof.
 intros a a_WT l1.
 induction l1 as [|x l1].
@@ -34,7 +34,8 @@ Qed.
 (* Why3 goal *)
 Lemma nth_append_2 : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
   (l2:(list a)) (i:Z), ((list.Length.length l1) <= i)%Z -> ((list.Nth.nth i
-  (List.app l1 l2)) = (list.Nth.nth (i - (list.Length.length l1))%Z l2)).
+  (Init.Datatypes.app l1 l2)) = (list.Nth.nth (i - (list.Length.length l1))%Z
+  l2)).
 Proof.
 intros a a_WT l1.
 induction l1 as [|x l1].

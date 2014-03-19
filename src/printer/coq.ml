@@ -770,9 +770,9 @@ let print_equivalence_lemma ~prev info fmt name (ls,ld) =
   let _, _, all_ty_params = ls_ty_vars ls in
   let def_formula = ls_defn_axiom ld in
   fprintf fmt
-    "(* Why3 goal *)@\n@[<hov 2>Lemma %s %a:@ %a.@]@\n"
+    "(* Why3 goal *)@\n@[<hov 2>Lemma %s :@ %a%a.@]@\n"
     name
-    (print_tv_binders ~whytypes:true ~implicit:true) all_ty_params
+    (print_params ~whytypes:true) all_ty_params
     (print_expr info) def_formula;
   fprintf fmt "%a@\n"
     (print_previous_proof (Some (all_ty_params,def_formula)) info) prev
