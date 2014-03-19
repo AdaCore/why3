@@ -118,7 +118,6 @@ theory Gcd
   clone algebra.AC with type t = int, function op = gcd,
     lemma Comm.Comm, lemma Assoc
 
-  (*** FIXME: Alt-Ergo proves gcd_0_pos even without gcd_unique *)
   lemma gcd_0_pos: forall a: int. 0 <= a -> gcd a 0 = a
   lemma gcd_0_neg: forall a: int. a <  0 -> gcd a 0 = -a
 
@@ -196,5 +195,7 @@ theory Coprime
     forall p a b:int.
       prime p /\ divides p (a*b) -> divides p a \/ divides p b
 
+  lemma gcd_coprime:
+    forall a b c. coprime a b -> gcd a (b*c) = gcd a c
 
 end

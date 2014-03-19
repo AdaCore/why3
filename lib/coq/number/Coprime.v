@@ -67,3 +67,21 @@ apply Znumtheory.prime_mult; auto.
 now rewrite <- Prime.prime_is_Zprime.
 Qed.
 
+(* Why3 goal *)
+Lemma gcd_coprime : forall (a:Z) (b:Z) (c:Z), (coprime a b) ->
+  ((number.Gcd.gcd a (b * c)%Z) = (number.Gcd.gcd a c)).
+intros a b c h1.
+apply Z.gcd_unique.
+- apply Z.gcd_nonneg.
+- apply Gcd.gcd_def1.
+- apply Divisibility.divides_multl.
+  apply Gcd.gcd_def2.
+- intros q h2 h3.
+  apply Gcd.gcd_def3.
+  trivial.
+  apply Gauss with b; split; auto.
+  rewrite coprime_is_Zrel_prime.
+  rewrite coprime_is_Zrel_prime in h1.
+  now apply Znumtheory.rel_prime_div with (2:=h2).
+Qed.
+
