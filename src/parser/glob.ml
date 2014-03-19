@@ -18,20 +18,25 @@ let () = Debug.unset_flag flag (* make sure it is unset by default *)
 
 let dummy_id = id_register (id_fresh "dummy")
 
+type def_use = Def | Use
+
 let glob = Hashtbl.create 5003
   (* could be improved with nested hash tables *)
 
-(* dead code
-let with_loc f = function
-  | None -> ()
-  | Some loc when loc = Loc.dummy_position -> ()
-  | Some loc -> f loc
-*)
+let key loc = let f, l, c, _ = Loc.get loc in f, l, c
+
+let add loc idk =
+  let k = key loc in
+  if not (Hashtbl.mem glob k) then Hashtbl.add glob k idk
+
+let def id =
+  Opt.iter (fun loc -> add loc (id, Def)) id.id_loc
 
 let use loc id =
-  let f, l, c, _ = Loc.get loc in
-(* Format.eprintf "GLOB USE: id=%s at %s/%d/%d@." id.id_string f l c; *)
-  Hashtbl.add glob (f, l, c) id
+  add loc (id, Use)
 
-let locate pos =
-  Hashtbl.find glob pos
+let find loc =
+  Hashtbl.find glob (key loc)
+
+(* FIXME allow several entries for the same loc, find returns all of them,
+         and why3doc inserts several anchors *)

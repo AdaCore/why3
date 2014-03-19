@@ -35,6 +35,10 @@ exception ClashTheory of string
 
 (** lazy declaration of tuples *)
 
+let add_decl_with_tuples uc d =
+  if Debug.test_flag Glob.flag then Sid.iter Glob.def d.d_news;
+  add_decl_with_tuples uc d
+
 let add_ty_decl uc ts      = add_decl_with_tuples uc (create_ty_decl ts)
 let add_data_decl uc dl    = add_decl_with_tuples uc (create_data_decl dl)
 let add_param_decl uc ls   = add_decl_with_tuples uc (create_param_decl ls)
@@ -47,6 +51,9 @@ let add_prop_decl uc k p f = add_decl_with_tuples uc (create_prop_decl k p f)
 let rec qloc = function
   | Qdot (p, id) -> Loc.join (qloc p) id.id_loc
   | Qident id    -> id.id_loc
+
+let qloc_last = function
+  | Qdot (_, id) | Qident id -> id.id_loc
 
 let rec print_qualid fmt = function
   | Qdot (p, id) -> Format.fprintf fmt "%a.%s" print_qualid p id.id
@@ -64,7 +71,7 @@ let find_qualid get_id find ns q =
   let sl = string_list_of_qualid q in
   let r = try find ns sl with Not_found ->
     Loc.error ~loc:(qloc q) (UnboundSymbol q) in
-  if Debug.test_flag Glob.flag then Glob.use (qloc q) (get_id r);
+  if Debug.test_flag Glob.flag then Glob.use (qloc_last q) (get_id r);
   r
 
 let find_prop_ns     ns q = find_qualid (fun pr -> pr.pr_name) ns_find_pr ns q
@@ -800,7 +807,8 @@ let add_use_clone env lenv th loc (use, subst) =
   if Debug.test_flag debug_parse_only then th else
   let use_or_clone th =
     let t = find_theory env lenv use.use_theory in
-    if Debug.test_flag Glob.flag then Glob.use (qloc use.use_theory) t.th_name;
+    if Debug.test_flag Glob.flag then
+      Glob.use (qloc_last use.use_theory) t.th_name;
     match subst with
     | None -> use_export th t
     | Some s ->
@@ -821,6 +829,7 @@ let add_use_clone env lenv th loc (use, subst) =
 let close_theory lenv th =
   if Debug.test_flag debug_parse_only then lenv else
   let th = close_theory th in
+  if Debug.test_flag Glob.flag then Glob.def th.th_name;
   let id = th.th_name.id_string in
   let loc = th.th_name.Ident.id_loc in
   if Mstr.mem id lenv then Loc.error ?loc (ClashTheory id);

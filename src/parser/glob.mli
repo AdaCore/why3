@@ -15,9 +15,14 @@ val flag: Debug.flag
 
 val dummy_id: ident
 
-val use: Loc.position -> ident -> unit
-  (** [add loc id] registers that [id] was used at position [loc] *)
+val def: ident -> unit
+  (** [def id] registers that [id] is defined at position [id.id_loc] *)
 
-val locate: string * int * int -> ident
-  (** [locate pos] returns the ident used at position [pos], if any,
+val use: Loc.position -> ident -> unit
+  (** [use loc id] registers that [id] is used at position [loc] *)
+
+type def_use = Def | Use
+
+val find: Loc.position -> ident * def_use
+  (** [find pos] returns the ident used/defined at position [pos], if any,
       or raises [Not_found] *)

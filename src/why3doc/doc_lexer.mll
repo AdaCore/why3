@@ -45,8 +45,7 @@
     "returns"; "variant"; "writes"; ]
 
   let get_loc lb =
-    let p = Lexing.lexeme_start_p lb in
-    p.pos_fname, p.pos_lnum, p.pos_cnum - p.pos_bol
+    Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
 
   let html_char fmt c =
     pp_print_string fmt (match c with
@@ -91,15 +90,13 @@
       (* is this a def point? *)
       let s = html_escape s in
       try
-        let t = Doc_def.is_def loc in
-        fprintf fmt "<a name=\"%s\">%s</a>" t s
-      with Not_found ->
-      (* is this a use point? *)
-      try
-        let id = Glob.locate loc in
-        let fn, url, t = Doc_def.locate id in
-        let url = if fn = !current_file then "" else url in
-        fprintf fmt "<a href=\"%s#%s\">%s</a>" url t s
+        match Glob.find loc with
+        | id, Glob.Def ->
+          let t = Doc_def.anchor id in
+          fprintf fmt "<a name=\"%s\">%s</a>" t s
+        | id, Glob.Use ->
+          let url = Doc_def.locate id in
+          fprintf fmt "<a href=\"%s\">%s</a>" url s
       with Not_found ->
         (* otherwise, just print it *)
         pp_print_string fmt s

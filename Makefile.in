@@ -1667,6 +1667,13 @@ stdlibdoc: $(STDLIBFILES) $(STDMODFILES) bin/why3doc.@OCAMLBEST@
 	WHY3CONFIG="" bin/why3doc.@OCAMLBEST@ -L theories -L modules \
           -o doc/stdlibdoc --title "Why3 Standard Library" \
 	  $(STDLIBFILES) $(STDMODFILES) $(STDMACFILES)
+	cd doc/stdlibdoc; \
+	  for f in theories.*.html; \
+	    do mv "$$f" "$${f#theories.}"; done; \
+	  for f in modules.*.html; \
+	    do mv "$$f" "$${f#modules.}"; done
+	sed -i -e "s#theories.##g" -e "s#modules.##g" doc/stdlibdoc/index.html
+
 
 clean::
 	rm -f doc/stdlibdoc/*

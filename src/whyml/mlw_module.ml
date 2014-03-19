@@ -241,7 +241,7 @@ let use_export uc m =
 
 let add_to_theory f uc x = { uc with muc_theory = f uc.muc_theory x }
 
-let store_path, restore_path =
+let store_path, store_module, restore_path =
   let id_to_path = Wid.create 17 in
   let store_path uc path id =
     (* this symbol already belongs to some theory *)
@@ -249,8 +249,18 @@ let store_path, restore_path =
     let prefix = List.rev (id.id_string :: path @ uc.muc_prefix) in
     Wid.set id_to_path id (uc.muc_path, uc.muc_name, prefix)
   in
+  let store_module m =
+    let id = m.mod_theory.th_name in
+    (* this symbol is already a module *)
+    if Wid.mem id_to_path id then () else
+    Wid.set id_to_path id (m.mod_theory.th_path, id.id_string, []) in
   let restore_path id = Wid.find id_to_path id in
-  store_path, restore_path
+  store_path, store_module, restore_path
+
+let close_module uc =
+  let m = close_module uc in
+  store_module m;
+  m
 
 let add_symbol add id v uc =
   store_path uc [] id;

@@ -11,8 +11,6 @@
 
 open Format
 open Why3
-open Stdlib
-open Theory
 
 let () = Debug.set_flag Glob.flag
 
@@ -55,7 +53,7 @@ let () =
   let config = Whyconf.read_config None in
   let main = Whyconf.get_main config in
   opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
-  Doc_def.set_loadpath !opt_loadpath;
+  (* Doc_def.set_loadpath !opt_loadpath; *)
   Doc_def.set_output_dir !opt_output
 
 let index = match !opt_index with
@@ -78,11 +76,7 @@ let css =
 
 let do_file env fname =
   try
-    let m = Env.read_file env fname in
-    let add _s th =
-      Doc_def.add_ident th.th_name;
-      Ident.Sid.iter Doc_def.add_ident th.th_local in
-    Mstr.iter add m
+    ignore (Env.read_file env fname)
   with e ->
     eprintf "warning: could not read file '%s'@." fname;
     eprintf "(%a)@." Exn_printer.exn_printer e
@@ -100,7 +94,7 @@ let print_file fname =
   close_out c
 
 let () =
-  Queue.iter Doc_def.add_file opt_queue;
+  (* Queue.iter Doc_def.add_file opt_queue; *)
   try
     let env = Env.create_env !opt_loadpath in
     (* process files *)
@@ -108,7 +102,7 @@ let () =
     Queue.iter print_file opt_queue;
     (* then generate the index *)
     if index then begin
-      let fhtml = Doc_def.output_file "index" in
+      let fhtml = Doc_def.output_file "index.why" in
       let c = open_out fhtml in
       let fmt = formatter_of_out_channel c in
       if not !opt_body then Doc_html.print_header fmt ~title ~css ();
@@ -121,7 +115,7 @@ let () =
         let fhtml = Doc_def.output_file fn in
         let basename = Filename.basename fhtml in
         fprintf fmt "<li> <a href=\"%s\">%s</a> %s </li>@\n"
-          basename fn header
+          basename (Filename.chop_extension basename) header
       in
       Queue.iter add opt_queue;
       fprintf fmt "</ul>@\n";
