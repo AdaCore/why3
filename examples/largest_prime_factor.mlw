@@ -1,0 +1,90 @@
+(*
+Euler project Problem 3: Largest prime factor
+
+The prime factors of 13195 are 5, 7, 13 and 29.
+
+What is the largest prime factor of the number 600851475143 ?
+
+*)
+
+module PrimeFactor
+
+  use import int.ComputerDivision
+  use import number.Divisibility
+  use import number.Prime
+  use import number.Coprime
+
+  (** returns the smallest divisor of [n] greater than or equal to [d],
+      assuming no divisor between 2 and [d]. *)
+  let rec smallest_divisor (d n:int) : int
+    requires { 2 <= n }
+    requires { 2 <= d <= n }
+    requires { forall i:int. 2 <= i < d -> not divides i n }
+    ensures { d <= result <= n }
+    ensures { divides result n }
+    ensures { forall i:int. 2 <= i < result -> not divides i n }
+    variant { n - d }
+  = if d * d > n then begin
+      assert { forall i:int. 2 <= i < n /\ divides i n ->
+        i >= d && let u = div n i in u * i = n && divides u n &&
+        u * i = n && (u >= d -> n >= d * i >= d * d && false)
+        && u >= 2 && u < n && false } ; n
+    end else if d >= 2 && mod n d = 0 then d else
+  smallest_divisor (d+1) n
+
+  use import ref.Ref
+  use import list.List
+
+  val factors : ref (list int)
+
+  let largest_prime_factor (n:int) : int
+    requires { 2 <= n }
+    ensures { prime result }
+    ensures { divides result n }
+    ensures { forall i:int. result < i <= n -> not (prime i /\ divides i n) }
+  = let d = smallest_divisor 2 n in
+    let factor = ref d in
+    let target = ref (div n d) in
+    factors := Cons d Nil;
+    assert { !target * d = n && divides !target n } ;
+    assert { forall i:int. prime i /\ divides i n /\ i > d ->
+      coprime d i && divides i !target };
+    while !target >= 2 do
+      invariant { 1 <= !target <= n }
+      invariant { 2 <= !factor <= n }
+      invariant { divides !factor n }
+      invariant { prime !factor }
+      invariant { forall i:int. divides i !target /\ i >= 2 ->
+        i >= !factor /\ divides i n }
+      invariant { forall i:int. prime i /\ divides i n /\ i > !factor ->
+        divides i !target }
+      variant { !target }
+      let ghost oldt = !target in
+      let ghost oldf = !factor in
+      assert { divides !target !target && !target >= 2 && !target >= !factor };
+      let d = smallest_divisor !factor !target in
+      assert { prime d };
+      factor := d;
+      factors := Cons d !factors;
+      target := div !target d;
+      assert { !target * d = oldt && divides !target oldt } ;
+      assert { forall i:int. prime i /\ divides i n /\ i > d ->
+        i > oldf && divides i oldt && 1 <= d < i
+        && coprime d i && divides i !target }
+    done;
+    !factor
+
+  let test () =
+    largest_prime_factor 13195 (* should be 29 *)
+
+  let solve () =
+    largest_prime_factor 600851475143
+
+end
+
+
+(***
+Local Variables:
+compile-command: "why3ide largest_prime_factor.mlw"
+End:
+*)
