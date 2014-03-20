@@ -4,9 +4,9 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require map.Map.
-Require map.MapInjection.
 Require map.Occ.
 Require map.MapPermut.
+Require map.MapInjection.
 
 (* Why3 assumption *)
 Definition unit := unit.
@@ -195,87 +195,6 @@ Definition values (v:suffixArray): (array Z) :=
   | (mk_suffixArray x x1) => x
   end.
 
-Lemma injective_occ: forall (m: map.Map.map Z Z) n,
-  map.MapInjection.injective m n <-> forall v, (Occ.occ v m 0 n <= 1)%Z.
-intros m n; split.
-(* -> *)
-intros inj v.
-assert (case: (Occ.occ v m 0 n <= 1 \/ Occ.occ v m 0 n >= 2)%Z) by omega. destruct case.
-trivial.
-destruct (Occ.occ_exists v m 0 n) as (i,(hi1,hi2)). omega.
-assert (0 <= Occ.occ v m 0 i)%Z.
-  generalize (Occ.occ_bounds v m 0 i). omega.
-assert (case: (Occ.occ v m 0 i = 0 \/ Occ.occ v m 0 i > 0)%Z) by omega. destruct case.
-assert (0 < Occ.occ v m (i+1) n)%Z.
-assert (Occ.occ v m 0 n = Occ.occ v m 0 i + Occ.occ v m i n)%Z.
-  apply Occ.occ_append; omega.
-  assert (Occ.occ v m i n = Occ.occ v m i (i+1) + Occ.occ v m (i+1) n)%Z.
-  apply Occ.occ_append; omega.
-  assert (Occ.occ v m i (i+1) = 1)%Z.
-  rewrite Occ.occ_right_add.
-  replace (i+1-1)%Z with i by omega.
-  rewrite Occ.occ_empty; omega.
-  omega.
-  replace (i+1-1)%Z with i by omega. auto.
-  omega.
-destruct (Occ.occ_exists v m (i+1) n) as (j,(hj1,hj2)). omega.
-elim (inj i j); omega.
-destruct (Occ.occ_exists v m 0 i) as (j,(hj1,hj2)). omega.
-elim (inj i j); omega.
-
-(* <- *)
-intros occ i j hi hj neq eq.
-pose (v := (Map.get m i)).
-assert (Occ.occ v m 0 n >= 2)%Z.
-assert (Occ.occ v m 0 n = Occ.occ v m 0 i + Occ.occ v m i n)%Z.
-  apply Occ.occ_append; omega.
-  assert (Occ.occ v m i n = Occ.occ v m i (i+1) + Occ.occ v m (i+1) n)%Z.
-  apply Occ.occ_append; omega.
-  assert (Occ.occ v m i (i+1) = 1)%Z.
-  rewrite Occ.occ_right_add.
-  replace (i+1-1)%Z with i by omega.
-  rewrite Occ.occ_empty; omega.
-  omega.
-  replace (i+1-1)%Z with i by omega. auto.
-assert (case: (j < i \/ i+1 <= j)%Z) by omega. destruct case.
-assert (Occ.occ v m 0 i >= 1)%Z.
-  assert (Occ.occ v m 0 i = Occ.occ v m 0 j + Occ.occ v m j i)%Z.
-  apply Occ.occ_append; omega.
-  assert (Occ.occ v m j i = Occ.occ v m j (j+1) + Occ.occ v m (j+1) i)%Z.
-  apply Occ.occ_append; omega.
-  assert (Occ.occ v m j (j+1) = 1)%Z.
-  rewrite Occ.occ_right_add.
-  replace (j+1-1)%Z with j by omega.
-  rewrite Occ.occ_empty; omega.
-  omega.
-  replace (j+1-1)%Z with j by omega. auto.
-  generalize (Occ.occ_bounds v m (i+1) n).
-  generalize (Occ.occ_bounds v m 0 j).
-  generalize (Occ.occ_bounds v m (j+1) i).
-  omega.
-  generalize (Occ.occ_bounds v m (i+1) n).
-omega.
-assert (Occ.occ v m (i+1) n >= 1)%Z.
-  assert (Occ.occ v m (i+1) n = Occ.occ v m (i+1) j + Occ.occ v m j n)%Z.
-  apply Occ.occ_append; omega.
-  assert (Occ.occ v m j n = Occ.occ v m j (j+1) + Occ.occ v m (j+1) n)%Z.
-  apply Occ.occ_append; omega.
-  assert (Occ.occ v m j (j+1) = 1)%Z.
-  rewrite Occ.occ_right_add.
-  replace (j+1-1)%Z with j by omega.
-  rewrite Occ.occ_empty; omega.
-  omega.
-  replace (j+1-1)%Z with j by omega. auto.
-  generalize (Occ.occ_bounds v m (j+1) n).
-  generalize (Occ.occ_bounds v m 0 i).
-  generalize (Occ.occ_bounds v m (i+1) j).
-  omega.
-  generalize (Occ.occ_bounds v m 0 i).
-  omega.
-generalize (occ v); omega.
-Qed.
-
-
 (* Why3 goal *)
 Theorem permut_permutation : forall (a1:(array Z)) (a2:(array Z)),
   ((permut_all a1 a2) /\ (permutation (elts a1) (length a1))) -> (permutation
@@ -289,9 +208,9 @@ red; intros.
 generalize (MapPermut.permut_exists _ _ _ _ _ h1b H).
 intros (j, (h1,h2)). rewrite <- h2. auto.
 (* injective *)
-rewrite injective_occ.
+rewrite MapInjection.injection_occ.
 intros v; rewrite <- h1b.
-generalize v; rewrite <- injective_occ.
+generalize v; rewrite <- MapInjection.injection_occ.
 assumption.
 Qed.
 
