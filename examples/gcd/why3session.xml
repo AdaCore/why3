@@ -36,10 +36,6 @@
  <prover
   id="8"
   name="Z3"
-  version="3.2"/>
- <prover
-  id="9"
-  name="Z3"
   version="4.3.1"/>
  <file
   name="../gcd.mlw"
@@ -50,16 +46,16 @@
    locfile="../gcd.mlw"
    loclnum="4" loccnumb="7" loccnume="25"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="WP_parameter euclid"
     locfile="../gcd.mlw"
-    loclnum="10" loccnumb="10" loccnume="16"
+    loclnum="9" loccnumb="10" loccnume="16"
     expl="VC for euclid"
-    sum="9a5ad727a6158b4ed5fcae8a0a91cde2"
+    sum="3ab04dd4c44ee183018a32e7d2ec29df"
     proved="true"
     expanded="false"
-    shape="iainfix =agcdV1V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V1c0Aainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1ainfix =V0agcdV0V1ainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+    shape="iainfix =agcdV1V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V1c0Aainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1ANainfix =V1c0ainfix =V0agcdV0V1ainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
     <label
      name="expl:VC for euclid"/>
     <transf
@@ -69,9 +65,9 @@
      <goal
       name="WP_parameter euclid.1"
       locfile="../gcd.mlw"
-      loclnum="10" loccnumb="10" loccnume="16"
+      loclnum="9" loccnumb="10" loccnume="16"
       expl="1. postcondition"
-      sum="0e54186d47e8491b80fa1e85af81cd55"
+      sum="4b29b2fc6421c90fd8f963e1572474a7"
       proved="true"
       expanded="false"
       shape="postconditionainfix =V0agcdV0V1Iainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -105,12 +101,32 @@
      <goal
       name="WP_parameter euclid.2"
       locfile="../gcd.mlw"
-      loclnum="10" loccnumb="10" loccnume="16"
-      expl="2. variant decrease"
-      sum="1898dc4c1fe06ec4359e168085b6676b"
+      loclnum="9" loccnumb="10" loccnume="16"
+      expl="2. division by zero"
+      sum="8e76717f13e8a23785706620565cc25a"
       proved="true"
       expanded="false"
-      shape="variant decreaseainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="division by zeroNainfix =V1c0INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for euclid"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter euclid.3"
+      locfile="../gcd.mlw"
+      loclnum="9" loccnumb="10" loccnume="16"
+      expl="3. variant decrease"
+      sum="be81a4b0187857238f69389947f176df"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1INainfix =V1c0INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for euclid"/>
       <proof
@@ -131,14 +147,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter euclid.3"
+      name="WP_parameter euclid.4"
       locfile="../gcd.mlw"
-      loclnum="10" loccnumb="10" loccnume="16"
-      expl="3. precondition"
-      sum="c7ba6ba7814426261e70f2943591f879"
+      loclnum="9" loccnumb="10" loccnume="16"
+      expl="4. precondition"
+      sum="a7896566d75aed58ff2aefaf0cd3b001"
       proved="true"
       expanded="false"
-      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for euclid"/>
       <proof
@@ -167,14 +183,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter euclid.4"
+      name="WP_parameter euclid.5"
       locfile="../gcd.mlw"
-      loclnum="10" loccnumb="10" loccnume="16"
-      expl="4. postcondition"
-      sum="225de1b2e2984b0cc72b24ef56665d16"
+      loclnum="9" loccnumb="10" loccnume="16"
+      expl="5. postcondition"
+      sum="214f28e58e393b2cd7a6402853aa84b3"
       proved="true"
       expanded="false"
-      shape="postconditionainfix =agcdV1V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="postconditionainfix =agcdV1V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for euclid"/>
       <proof
@@ -200,7 +216,7 @@
        edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.50"/>
+       <result status="valid" time="1.12"/>
       </proof>
      </goal>
     </transf>
@@ -209,18 +225,18 @@
   <theory
    name="EuclideanAlgorithmIterative"
    locfile="../gcd.mlw"
-   loclnum="22" loccnumb="7" loccnume="34"
+   loclnum="21" loccnumb="7" loccnume="34"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="WP_parameter euclid"
     locfile="../gcd.mlw"
-    loclnum="29" loccnumb="6" loccnume="12"
+    loclnum="27" loccnumb="6" loccnume="12"
     expl="VC for euclid"
-    sum="9645f91a5bdedcaee18e340a89c06f97"
+    sum="b84c82127f3d3e5547187bde83fc3422"
     proved="true"
     expanded="false"
-    shape="iainfix =V3agcdV0V1ainfix &lt;V4V2Aainfix &lt;=c0V2Aainfix =agcdV5V4agcdV0V1Aainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FNainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FAainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+    shape="iainfix =V3agcdV0V1ainfix &lt;V4V2Aainfix &lt;=c0V2Aainfix =agcdV5V4agcdV0V1Aainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FANainfix =V2c0Nainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FAainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
     <label
      name="expl:VC for euclid"/>
     <transf
@@ -230,9 +246,9 @@
      <goal
       name="WP_parameter euclid.1"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="12"
+      loclnum="27" loccnumb="6" loccnume="12"
       expl="1. loop invariant init"
-      sum="43e840df3fc76d7098f9a7641ada702a"
+      sum="ecb2408642176854911db0a023c11a27"
       proved="true"
       expanded="false"
       shape="loop invariant initainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -250,12 +266,32 @@
      <goal
       name="WP_parameter euclid.2"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="12"
-      expl="2. loop invariant preservation"
-      sum="fdeae67c5d30b43b81c03bc0490a25a2"
+      loclnum="27" loccnumb="6" loccnume="12"
+      expl="2. division by zero"
+      sum="ed86bd1a081bfeb9be9d3a98871428d0"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="division by zeroNainfix =V2c0INainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for euclid"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter euclid.3"
+      locfile="../gcd.mlw"
+      loclnum="27" loccnumb="6" loccnume="12"
+      expl="3. loop invariant preservation"
+      sum="06c94ccd2d197364af6456a5e8ae1424"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0INainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for euclid"/>
       <proof
@@ -268,14 +304,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter euclid.3"
+      name="WP_parameter euclid.4"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="12"
-      expl="3. loop invariant preservation"
-      sum="4ae9c036a7a05e2904f36f18b7579d11"
+      loclnum="27" loccnumb="6" loccnume="12"
+      expl="4. loop invariant preservation"
+      sum="863e719159f6efeebe9c39a9b1e276e4"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix =agcdV5V4agcdV0V1Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="loop invariant preservationainfix =agcdV5V4agcdV0V1Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0INainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for euclid"/>
       <proof
@@ -288,14 +324,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter euclid.4"
+      name="WP_parameter euclid.5"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="12"
-      expl="4. loop variant decrease"
-      sum="ab39a285b97bf530a2ed0733980d1be4"
+      loclnum="27" loccnumb="6" loccnume="12"
+      expl="5. loop variant decrease"
+      sum="325d6bc9547edcf23a3a6d31ee98dc7d"
       proved="true"
       expanded="false"
-      shape="loop variant decreaseainfix &lt;V4V2Aainfix &lt;=c0V2Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="loop variant decreaseainfix &lt;V4V2Aainfix &lt;=c0V2Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0INainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for euclid"/>
       <proof
@@ -307,7 +343,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="9"
+       prover="8"
        timelimit="30"
        memlimit="1000"
        obsolete="false"
@@ -316,11 +352,11 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter euclid.5"
+      name="WP_parameter euclid.6"
       locfile="../gcd.mlw"
-      loclnum="29" loccnumb="6" loccnume="12"
-      expl="5. postcondition"
-      sum="7b6e68ebf51209ee2fa621dabb280cfe"
+      loclnum="27" loccnumb="6" loccnume="12"
+      expl="6. postcondition"
+      sum="f1972b936050ab93b1ef0e6a2fed9789"
       proved="true"
       expanded="false"
       shape="postconditionainfix =V3agcdV0V1INNainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -341,14 +377,14 @@
   <theory
    name="BinaryGcd"
    locfile="../gcd.mlw"
-   loclnum="47" loccnumb="7" loccnume="16"
+   loclnum="45" loccnumb="7" loccnume="16"
    verified="true"
    expanded="true">
    <goal
     name="even1"
     locfile="../gcd.mlw"
-    loclnum="55" loccnumb="8" loccnume="13"
-    sum="7be56cbe271c9573ec995774905f404f"
+    loclnum="52" loccnumb="8" loccnume="13"
+    sum="debb867c1089f7d74f2bff1db9f9e6ec"
     proved="true"
     expanded="false"
     shape="ainfix =V0ainfix *c2adivV0c2qaevenV0Iainfix &lt;=c0V0F">
@@ -364,8 +400,8 @@
    <goal
     name="odd1"
     locfile="../gcd.mlw"
-    loclnum="56" loccnumb="8" loccnume="12"
-    sum="185e3aac3aa7590b72d0bf4e3168d096"
+    loclnum="53" loccnumb="8" loccnume="12"
+    sum="fb354553e7a5683145f862db011d94f9"
     proved="true"
     expanded="false"
     shape="ainfix =V0ainfix +ainfix *c2adivV0c2c1qNaevenV0Iainfix &lt;=c0V0F">
@@ -381,8 +417,8 @@
    <goal
     name="div_nonneg"
     locfile="../gcd.mlw"
-    loclnum="57" loccnumb="8" loccnume="18"
-    sum="bec10c777d925ff632428a5eb9f0cfb8"
+    loclnum="54" loccnumb="8" loccnume="18"
+    sum="45f87535c76bd8a14c4e59bcb8a7cdc3"
     proved="true"
     expanded="false"
     shape="ainfix &lt;=c0adivV0c2Iainfix &lt;=c0V0F">
@@ -398,8 +434,8 @@
    <goal
     name="gcd_even_even"
     locfile="../gcd.mlw"
-    loclnum="61" loccnumb="8" loccnume="21"
-    sum="0ff4c69edc2188c2f55dfbccac02e22e"
+    loclnum="58" loccnumb="8" loccnume="21"
+    sum="9a657595a2d4c1fc65a265b480ee57e0"
     proved="true"
     expanded="false"
     shape="ainfix =agcdainfix *c2V0ainfix *c2V1ainfix *c2agcdV0V1Iainfix &lt;=c0V0Iainfix &lt;=c0V1F">
@@ -415,8 +451,8 @@
    <goal
     name="gcd_even_odd"
     locfile="../gcd.mlw"
-    loclnum="63" loccnumb="8" loccnume="20"
-    sum="c36b3627edc8b2c18b59a14a5123965d"
+    loclnum="60" loccnumb="8" loccnume="20"
+    sum="8349378686d97cb2478f239c51387521"
     proved="true"
     expanded="false"
     shape="ainfix =agcdainfix *c2V0ainfix +ainfix *c2V1c1agcdV0ainfix +ainfix *c2V1c1Iainfix &lt;=c0V0Iainfix &lt;=c0V1F">
@@ -433,8 +469,8 @@
    <goal
     name="gcd_even_odd2"
     locfile="../gcd.mlw"
-    loclnum="65" loccnumb="8" loccnume="21"
-    sum="f3dd458ad1d04257c641287548a5706b"
+    loclnum="62" loccnumb="8" loccnume="21"
+    sum="8ffac00d1cf3682b576ddfc73ecc1de5"
     proved="true"
     expanded="false"
     shape="ainfix =agcdV0V1agcdadivV0c2V1IaoddV1IaevenV0Iainfix &lt;=c0V0Iainfix &lt;=c0V1F">
@@ -450,13 +486,13 @@
    <goal
     name="odd_odd_div2"
     locfile="../gcd.mlw"
-    loclnum="67" loccnumb="8" loccnume="20"
-    sum="b89ce00430a2682c5bcb0952c205d475"
+    loclnum="64" loccnumb="8" loccnume="20"
+    sum="1f0917c122dc55c8f8e255ea6faf65ce"
     proved="true"
     expanded="false"
     shape="ainfix =adivainfix -ainfix +ainfix *c2V0c1ainfix +ainfix *c2V1c1c2ainfix -V0V1Iainfix &lt;=c0V0Iainfix &lt;=c0V1F">
     <proof
-     prover="9"
+     prover="8"
      timelimit="6"
      memlimit="1000"
      obsolete="false"
@@ -465,60 +501,32 @@
     </proof>
    </goal>
    <goal
-    name="gcd_odd_odd_aux"
+    name="WP_parameter gcd_odd_odd"
     locfile="../gcd.mlw"
-    loclnum="69" loccnumb="8" loccnume="23"
-    sum="c9f41981a2bbb4f585b9a1b165277005"
+    loclnum="67" loccnumb="12" loccnume="23"
+    expl="VC for gcd_odd_odd"
+    sum="c16fdbab2dee6a1d44d344e9f2b9541b"
     proved="true"
     expanded="false"
-    shape="ainfix =agcdainfix +ainfix *c2V0c1ainfix +ainfix *c2V1c1agcdainfix -ainfix +ainfix *c2V0c1ainfix *c1ainfix +ainfix *c2V1c1ainfix +ainfix *c2V1c1Iainfix &lt;=V1V0Aainfix &lt;=c0V1F">
+    shape="ainfix =agcdainfix +ainfix *c2V0c1ainfix +ainfix *c2V1c1agcdainfix -V0V1ainfix +ainfix *c2V1c1Aainfix =agcdainfix +ainfix *c2V0c1ainfix +ainfix *c2V1c1agcdainfix -ainfix +ainfix *c2V0c1ainfix *c1ainfix +ainfix *c2V1c1ainfix +ainfix *c2V1c1Iainfix &lt;=V1V0Aainfix &lt;=c0V1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for gcd_odd_odd"/>
     <proof
      prover="1"
      timelimit="5"
-     memlimit="1000"
+     memlimit="4000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="gcd_odd_odd"
-    locfile="../gcd.mlw"
-    loclnum="71" loccnumb="8" loccnume="19"
-    sum="7d0f42fe2077e24ed0584c4a42509617"
-    proved="true"
-    expanded="false"
-    shape="ainfix =agcdainfix +ainfix *c2V0c1ainfix +ainfix *c2V1c1agcdainfix -V0V1ainfix +ainfix *c2V1c1Iainfix &lt;=V1V0Aainfix &lt;=c0V1F">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="8"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="9"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.05"/>
     </proof>
    </goal>
    <goal
     name="gcd_odd_odd2"
     locfile="../gcd.mlw"
     loclnum="73" loccnumb="8" loccnume="20"
-    sum="3e147c7ac37b87dc87f24f02a4353789"
+    sum="2ac2f5d983746a5b8c54753b69c0a0e8"
     proved="true"
     expanded="false"
     shape="ainfix =agcdV0V1agcdadivainfix -V0V1c2V1IaoddV1IaoddV0Iainfix &lt;=V1V0Aainfix &lt;=c0V1F">
@@ -536,10 +544,10 @@
     locfile="../gcd.mlw"
     loclnum="76" loccnumb="10" loccnume="20"
     expl="VC for binary_gcd"
-    sum="2ded6e9da0fc59f9c4a630f811c42b51"
+    sum="12641bb8e2924655905fbdc318e12f56"
     proved="true"
     expanded="false"
-    shape="iiiiainfix =agcdV2V1agcdV0V1Aainfix &gt;=V1c0Aainfix &gt;=V2c0AalexaTuple2V1V2aTuple2V1V0Ladivainfix -V0V1c2ainfix =agcdV0V3agcdV0V1Aainfix &gt;=V3c0Aainfix &gt;=V0c0AalexaTuple2V3V0aTuple2V1V0LadivV1c2aevenV1iainfix =agcdV4V1agcdV0V1Aainfix &gt;=V1c0Aainfix &gt;=V4c0AalexaTuple2V1V4aTuple2V1V0LadivV0c2ainfix =ainfix *c2agcdV6V5agcdV0V1Aainfix &gt;=V5c0Aainfix &gt;=V6c0AalexaTuple2V5V6aTuple2V1V0LadivV0c2LadivV1c2aevenV1aevenV0ainfix =V0agcdV0V1ainfix =V1c0ainfix =agcdV1V0agcdV0V1Aainfix &gt;=V0c0Aainfix &gt;=V1c0AalexaTuple2V0V1aTuple2V1V0ainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+    shape="iiiiainfix =agcdV2V1agcdV0V1Aainfix &gt;=V1c0Aainfix &gt;=V2c0AalexaTuple2V1V2aTuple2V1V0Ladivainfix -V0V1c2ANainfix =c2c0ainfix =agcdV0V3agcdV0V1Aainfix &gt;=V3c0Aainfix &gt;=V0c0AalexaTuple2V3V0aTuple2V1V0LadivV1c2ANainfix =c2c0aevenV1iainfix =agcdV4V1agcdV0V1Aainfix &gt;=V1c0Aainfix &gt;=V4c0AalexaTuple2V1V4aTuple2V1V0LadivV0c2ANainfix =c2c0ainfix =ainfix *c2agcdV6V5agcdV0V1Aainfix &gt;=V5c0Aainfix &gt;=V6c0AalexaTuple2V5V6aTuple2V1V0LadivV0c2ANainfix =c2c0LadivV1c2ANainfix =c2c0aevenV1aevenV0ainfix =V0agcdV0V1ainfix =V1c0ainfix =agcdV1V0agcdV0V1Aainfix &gt;=V0c0Aainfix &gt;=V1c0AalexaTuple2V0V1aTuple2V1V0ainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
     <label
      name="expl:VC for binary_gcd"/>
     <transf
@@ -551,7 +559,7 @@
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
       expl="1. variant decrease"
-      sum="ef046f25bc5cd9675bef571ee6900dd2"
+      sum="478f651693da6865d4ae6a4d87c6054a"
       proved="true"
       expanded="false"
       shape="variant decreasealexaTuple2V0V1aTuple2V1V0Iainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -579,7 +587,7 @@
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
       expl="2. precondition"
-      sum="80a1c2079ed5f0a42cbc85862fd78e02"
+      sum="85c097e7f89a88f97868af5012875698"
       proved="true"
       expanded="false"
       shape="preconditionainfix &gt;=V0c0Aainfix &gt;=V1c0Iainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -607,7 +615,7 @@
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
       expl="3. postcondition"
-      sum="ae86b72f5166c3d6449234b6c8551bce"
+      sum="6d65358801bf9431035a11c68bc40d91"
       proved="true"
       expanded="false"
       shape="postconditionainfix =agcdV1V0agcdV0V1Iainfix &gt;=V0c0Aainfix &gt;=V1c0Iainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -635,7 +643,7 @@
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
       expl="4. postcondition"
-      sum="475dcfd89458b36e418ca5977df9bd9e"
+      sum="6ab71f784e4a35e2310787d151d6e18e"
       proved="true"
       expanded="false"
       shape="postconditionainfix =V0agcdV0V1Iainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
@@ -662,11 +670,51 @@
       name="WP_parameter binary_gcd.5"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="5. variant decrease"
-      sum="2e1337a48640bcc573397294c6ceed62"
+      expl="5. division by zero"
+      sum="ec6327c1de06b46f4e71e36fcad009ed"
       proved="true"
       expanded="false"
-      shape="variant decreasealexaTuple2V2V3aTuple2V1V0LadivV0c2LadivV1c2IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="division by zeroNainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for binary_gcd"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter binary_gcd.6"
+      locfile="../gcd.mlw"
+      loclnum="76" loccnumb="10" loccnume="20"
+      expl="6. division by zero"
+      sum="cb6c39ee41d6ef83e6a9ff1e1090017f"
+      proved="true"
+      expanded="false"
+      shape="division by zeroNainfix =c2c0LadivV1c2INainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for binary_gcd"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter binary_gcd.7"
+      locfile="../gcd.mlw"
+      loclnum="76" loccnumb="10" loccnume="20"
+      expl="7. variant decrease"
+      sum="f9f1436b2ef000441e5d0c09c563d1dd"
+      proved="true"
+      expanded="false"
+      shape="variant decreasealexaTuple2V2V3aTuple2V1V0LadivV0c2INainfix =c2c0LadivV1c2INainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -679,14 +727,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.6"
+      name="WP_parameter binary_gcd.8"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="6. precondition"
-      sum="c440c38e89135654d3992fe2552e78b9"
+      expl="8. precondition"
+      sum="1f88ac11c0394978247370cd88dc4157"
       proved="true"
       expanded="false"
-      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V3c0LadivV0c2LadivV1c2IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V3c0LadivV0c2INainfix =c2c0LadivV1c2INainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -707,14 +755,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.7"
+      name="WP_parameter binary_gcd.9"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="7. postcondition"
-      sum="15b8c4d6aaf509f04d9ea2c9ac26d4a9"
+      expl="9. postcondition"
+      sum="c67500d378ba1d2cc19586d8ead2e06a"
       proved="true"
       expanded="false"
-      shape="postconditionainfix =ainfix *c2agcdV3V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V3c0LadivV0c2LadivV1c2IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="postconditionainfix =ainfix *c2agcdV3V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V3c0LadivV0c2INainfix =c2c0LadivV1c2INainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -731,18 +779,38 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.41"/>
+       <result status="valid" time="0.14"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.8"
+      name="WP_parameter binary_gcd.10"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="8. variant decrease"
-      sum="6a61cc11939da2225c6f4ed3d0d26e03"
+      expl="10. division by zero"
+      sum="10fd273940d00c695355a0895bab061d"
       proved="true"
       expanded="false"
-      shape="variant decreasealexaTuple2V1V2aTuple2V1V0LadivV0c2INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="division by zeroNainfix =c2c0INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for binary_gcd"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter binary_gcd.11"
+      locfile="../gcd.mlw"
+      loclnum="76" loccnumb="10" loccnume="20"
+      expl="11. variant decrease"
+      sum="613f2eda038fbe0e67ce1cd7d4e95af4"
+      proved="true"
+      expanded="false"
+      shape="variant decreasealexaTuple2V1V2aTuple2V1V0LadivV0c2INainfix =c2c0INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -755,14 +823,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.9"
+      name="WP_parameter binary_gcd.12"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="9. precondition"
-      sum="d53f41c70789bb025266f2c929177924"
+      expl="12. precondition"
+      sum="258e3da6cdd2a7cc2241102ebf1d7468"
       proved="true"
       expanded="false"
-      shape="preconditionainfix &gt;=V1c0Aainfix &gt;=V2c0LadivV0c2INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="preconditionainfix &gt;=V1c0Aainfix &gt;=V2c0LadivV0c2INainfix =c2c0INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -783,14 +851,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.10"
+      name="WP_parameter binary_gcd.13"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="10. postcondition"
-      sum="a7ef60aa71b0def6348341329417ab6b"
+      expl="13. postcondition"
+      sum="646c6fe6121bb2a115000733728361ab"
       proved="true"
       expanded="false"
-      shape="postconditionainfix =agcdV2V1agcdV0V1Iainfix &gt;=V1c0Aainfix &gt;=V2c0LadivV0c2INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="postconditionainfix =agcdV2V1agcdV0V1Iainfix &gt;=V1c0Aainfix &gt;=V2c0LadivV0c2INainfix =c2c0INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -807,18 +875,38 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.60"/>
+       <result status="valid" time="0.23"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.11"
+      name="WP_parameter binary_gcd.14"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="11. variant decrease"
-      sum="c0073931eac7733d9ee9205983b9810e"
+      expl="14. division by zero"
+      sum="075276f2b00c969626fb30ed33fae4a7"
       proved="true"
       expanded="false"
-      shape="variant decreasealexaTuple2V2V0aTuple2V1V0LadivV1c2IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="division by zeroNainfix =c2c0IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for binary_gcd"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter binary_gcd.15"
+      locfile="../gcd.mlw"
+      loclnum="76" loccnumb="10" loccnume="20"
+      expl="15. variant decrease"
+      sum="ad3583b457f22293dd58b5c63d3f7b7d"
+      proved="true"
+      expanded="false"
+      shape="variant decreasealexaTuple2V2V0aTuple2V1V0LadivV1c2INainfix =c2c0IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -835,18 +923,18 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.43"/>
+       <result status="timeout" time="6.00"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.12"
+      name="WP_parameter binary_gcd.16"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="12. precondition"
-      sum="6dcb89859f1ce0b59658981c63dc232c"
+      expl="16. precondition"
+      sum="b7de55367a97d27b80b0d69f8c36330a"
       proved="true"
       expanded="false"
-      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V0c0LadivV1c2IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V0c0LadivV1c2INainfix =c2c0IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -867,14 +955,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.13"
+      name="WP_parameter binary_gcd.17"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="13. postcondition"
-      sum="8a39ef78de142e956a5432e6501df9d8"
+      expl="17. postcondition"
+      sum="b138b44b140594520c27110fa73854a9"
       proved="true"
       expanded="false"
-      shape="postconditionainfix =agcdV0V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V0c0LadivV1c2IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="postconditionainfix =agcdV0V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V0c0LadivV1c2INainfix =c2c0IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -891,18 +979,38 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.63"/>
+       <result status="valid" time="0.24"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.14"
+      name="WP_parameter binary_gcd.18"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="14. variant decrease"
-      sum="6072e986e2ab8ee5b3511d8ba0aa8286"
+      expl="18. division by zero"
+      sum="30889c81ddc4f524797a0d7c0fcead93"
       proved="true"
       expanded="false"
-      shape="variant decreasealexaTuple2V1V2aTuple2V1V0Ladivainfix -V0V1c2INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="division by zeroNainfix =c2c0INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      <label
+       name="expl:VC for binary_gcd"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter binary_gcd.19"
+      locfile="../gcd.mlw"
+      loclnum="76" loccnumb="10" loccnume="20"
+      expl="19. variant decrease"
+      sum="910da00ad0faf261791c1823fede63f1"
+      proved="true"
+      expanded="false"
+      shape="variant decreasealexaTuple2V1V2aTuple2V1V0Ladivainfix -V0V1c2INainfix =c2c0INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -923,14 +1031,14 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.15"
+      name="WP_parameter binary_gcd.20"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="15. precondition"
-      sum="ce3f844d28753cfccbe92d1d394d3dbf"
+      expl="20. precondition"
+      sum="e600cc8faf450d913db11a3244ee6a3a"
       proved="true"
       expanded="false"
-      shape="preconditionainfix &gt;=V1c0Aainfix &gt;=V2c0Ladivainfix -V0V1c2INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="preconditionainfix &gt;=V1c0Aainfix &gt;=V2c0Ladivainfix -V0V1c2INainfix =c2c0INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -955,18 +1063,18 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.59"/>
+       <result status="valid" time="4.65"/>
       </proof>
      </goal>
      <goal
-      name="WP_parameter binary_gcd.16"
+      name="WP_parameter binary_gcd.21"
       locfile="../gcd.mlw"
       loclnum="76" loccnumb="10" loccnume="20"
-      expl="16. postcondition"
-      sum="3d8cc01e7b0bf5b9c640c0427df49220"
+      expl="21. postcondition"
+      sum="e4cf3bea13463ab5854a5783a9131c58"
       proved="true"
       expanded="false"
-      shape="postconditionainfix =agcdV2V1agcdV0V1Iainfix &gt;=V1c0Aainfix &gt;=V2c0Ladivainfix -V0V1c2INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      shape="postconditionainfix =agcdV2V1agcdV0V1Iainfix &gt;=V1c0Aainfix &gt;=V2c0Ladivainfix -V0V1c2INainfix =c2c0INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
       <label
        name="expl:VC for binary_gcd"/>
       <proof
@@ -983,7 +1091,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.09"/>
+       <result status="valid" time="0.45"/>
       </proof>
      </goal>
     </transf>

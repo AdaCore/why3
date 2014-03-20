@@ -3,9 +3,8 @@
 
 module EuclideanAlgorithm
 
-  use import int.Int
+  use import mach.int.Int
   use import number.Gcd
-  use import int.ComputerDivision
 
   let rec euclid (u v: int) : int
     variant  { v }
@@ -15,16 +14,15 @@ module EuclideanAlgorithm
     if v = 0 then
       u
     else
-      euclid v (mod u v)
+      euclid v (u % v)
 
 end
 
 module EuclideanAlgorithmIterative
 
-  use import int.Int
+  use import mach.int.Int
   use import ref.Ref
   use import number.Gcd
-  use import int.ComputerDivision
 
   let euclid (u0 v0: int) : int
     requires { u0 >= 0 /\ v0 >= 0 }
@@ -37,7 +35,7 @@ module EuclideanAlgorithmIterative
       invariant { gcd !u !v = gcd u0 v0 }
       variant   { !v }
       let tmp = !v in
-      v := mod !u !v;
+      v := !u % !v;
       u := tmp
     done;
     !u
@@ -46,11 +44,10 @@ end
 
 module BinaryGcd
 
-  use import int.Int
+  use import mach.int.Int
   use import int.Lex2
   use import number.Parity
   use import number.Gcd
-  use import int.ComputerDivision
 
   lemma even1: forall n: int. 0 <= n -> even n <-> n = 2 * div n 2
   lemma odd1: forall n: int. 0 <= n -> not (even n) <-> n = 2 * div n 2 + 1
@@ -66,10 +63,13 @@ module BinaryGcd
     even u -> odd v -> gcd u v = gcd (div u 2) v
   lemma odd_odd_div2: forall u v: int. 0 <= v -> 0 <= u ->
     div ((2*u+1) - (2*v+1)) 2 = u - v
-  lemma gcd_odd_odd_aux: forall u v: int. 0 <= v <= u ->
-    gcd (2 * u + 1) (2 * v + 1) = gcd ((2*u+1) - 1*(2*v+1)) (2 * v + 1)
-  lemma gcd_odd_odd: forall u v: int. 0 <= v <= u ->
-    gcd (2 * u + 1) (2 * v + 1) = gcd (u - v) (2 * v + 1)
+
+  let lemma gcd_odd_odd (u v: int)
+    requires { 0 <= v <= u }
+    ensures { gcd (2 * u + 1) (2 * v + 1) = gcd (u - v) (2 * v + 1) }
+  = assert { gcd (2 * u + 1) (2 * v + 1) =
+             gcd ((2*u+1) - 1*(2*v+1)) (2 * v + 1) }
+
   lemma gcd_odd_odd2: forall u v: int. 0 <= v <= u ->
     odd u -> odd v -> gcd u v = gcd (div (u - v) 2) v
 
@@ -80,9 +80,9 @@ module BinaryGcd
   =
     if v > u then binary_gcd v u else
     if v = 0 then u else
-    if even u then if even v then 2 * binary_gcd (div u 2) (div v 2)
-                             else binary_gcd (div u 2) v
-              else if even v then binary_gcd u (div v 2)
-                             else binary_gcd (div (u - v) 2) v
+    if even u then if even v then 2 * binary_gcd (u / 2) (v / 2)
+                             else binary_gcd (u / 2) v
+              else if even v then binary_gcd u (v / 2)
+                             else binary_gcd ((u - v) / 2) v
 
 end
