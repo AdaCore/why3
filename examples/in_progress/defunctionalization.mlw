@@ -320,6 +320,7 @@ ve ::= v | s
 *)
 
 type value = Vnum int | Underflow
+(* in (Vnum n), n should always be >= 0 *)
 
 (** Interpretation:
 {h <blockquote><pre>
@@ -565,13 +566,14 @@ type cont = I | A expr cont | B int cont
 
 One would want to write in Why:
 
-[function eval_cont (c:cont) (v:int) : int =
+[function eval_cont (c:cont) (v:value) : value =
+  match v with
+  | Underflow -> Underflow
+  | Vnum v ->
   match c with
-  | A1 e2 k ->
-    let v2 = eval_0 e2 in
-    eval_cont (A2 v k) v2
-  | A2 v1 k -> eval_cont k (v1 - v)
-  | I -> v
+  | A e2 k -> eval_cont (B (Vnum v) k) (eval_0 e2)
+  | B v1 k -> eval_cont k (if v1 >= v then Vnum (v1 - v) else Underflow)
+  | I -> Vnum v (* v >= 0 by construction *)
   end]
 
 But since the recursion is not structural, Why3 kernel rejects it
@@ -581,16 +583,18 @@ We replace that with a relational definition, an inductive one.
 
 *)
 
-(*
-inductive eval_cont cont int int =
+inductive eval_cont cont value value =
+| underflow :
+  forall k:cont. eval_cont k Underflow Underflow
 | a1 :
-  forall e2:expr, k:cont, v:int, r:int.
-  eval_cont (A2 v k) (eval_0 e2) r -> eval_cont (A1 e2 k) v r
+  forall e2:expr, k:cont, v:int, r:value.
+  eval_cont (B v k) (eval_0 e2) r -> eval_cont (A e2 k) (Vnum v) r
 | a2 :
-  forall v1:int, k:cont, v:int, r:int.
-  eval_cont k (v1 - v) r -> eval_cont (A2 v1 k) v r
+  forall v1:int, k:cont, v:int, r:value.
+  eval_cont k (if v1 >= v then Vnum (v1 - v) else Underflow) r 
+  -> eval_cont (B v1 k) (Vnum v) r
 | a3 :
-  forall v:int. eval_cont I v v
+  forall v:int. eval_cont I (Vnum v) (Vnum v)
 
 (** Some functions to serve as measures for the termination proof *)
 
@@ -607,7 +611,6 @@ let rec lemma size_e_pos (e:expr) : unit
   | Cte _ -> ()
   | Sub e1 e2 -> size_e_pos e1; size_e_pos e2
   end
-*)
 
 use Defunctionalization
 
@@ -628,10 +631,9 @@ let rec lemma size_c_pos (c:cont) : unit
   end
 
 let rec continue_4 (c:cont) (v:int) : value
+  requires { v >= 0 }
   variant { size_c c }
-(*
-  ensures { eval_cont c v result }
-*)
+  ensures { eval_cont c (Vnum v) result }
   =
   match c with
     | A e2 k -> eval_4 e2 (B v k)
@@ -641,9 +643,7 @@ let rec continue_4 (c:cont) (v:int) : value
 
 with eval_4 (e:expr) (c:cont) : value
   variant { size_c c + Defunctionalization.size_e e }
-(*
   ensures { eval_cont c (eval_0 e) result }
-*)
   =
   match e with
     | Cte n -> if n >= 0 then continue_4 c n else Underflow
@@ -665,90 +665,6 @@ let u4 () = interpret_4 p4
 
 
 end
-
-
-(** {2 The lambda-calculus} *)
-
-(**
-Terms:
-{h <blockquote><pre>
-n : int
-
-x : identifier
-
-t  : term
-t ::= x | \x.t | t t
-
-p  :  program
-p ::= t
-</pre></blockquote>}
-      where t is ground (i.e. without any free variable)
-*)
-
-(** Examples:
-{h <blockquote><pre>
-p0 = (\x.x)
-p1 = (\x.x) (\x.x)
-p2 = (\x.\f.f x) (\y.y) (\x.x)
-</pre></blockquote>}
-*)
-
-(** Values and environments:
-{h <blockquote><pre>
-e  :  environment
-v ::= nil | (identifier, value) :: environment
-
-v  :  value
-v ::= (\x.t, e)
-</pre></blockquote>}
-*)
-
-(** Operateur algebrique:
-{h <blockquote><pre>
-lookup : identificateur -> environnement -> value
-</pre></blockquote>}
-*)
-
-(** Contextes d'evaluation:
-{h <blockquote><pre>
-C ::= [] | [C (t, e)] | [v C]
-</pre></blockquote>}
-*)
-
-(** Machine abstraite (dite "CEK"):
-{h <blockquote><pre>
-    &lt;x, e, C&gt;_eval -> &lt;C, v&gt;_cont
-                      where v = lookup x e
- &lt;\x.t, e, C&gt;_eval -> &lt;C, (\x.t, e)&gt;_cont
-&lt;t0 t1, e, C&gt;_eval -> &lt;t0, e, [C (t1, e)]&gt;
-
-           &lt;[], v&gt;_cont -> v
-   &lt;[C (t, e)], v&gt;_cont -> &lt;t, e, [v C]&gt;_eval
-&lt;[(\x.t, e) C], v&gt;_cont -> &lt;t, (x, v) :: e, C&gt;_eval
-</pre></blockquote>}
-*)
-
-(** {4 Exercise 2.0}
-  Program cette machine abstraite.
-*)
-
-(** {4 Exercise 2.1}
-  Cette machine abstraite est en forme defonctionalisee.
-  La refonctionaliser.
-*)
-
-(** {4 Exercise 2.2}
-  Le resultat de l'Exercise 1 est en CPS.
-  L'exprimer en style direct.
-*)
-
-(** {4 Exercise 2.3}
-  Le resultat de l'Exercise 2 est en forme defonctionalisee
-  (dans le sens que les fermetures sont en forme defonctionalisee
-  triviale).
-  Le refonctionaliser, et caracteriser le resultat.
-*)
-
 
 
 
@@ -965,7 +881,7 @@ alors reduis e = recompose (C, c)
 
 *)
 
-(** {4 Exercise 3.0}
+(** {4 Exercise 2.0}
   Implementer la "reduction semantics" ci-dessus et la tester.
 *)
 
@@ -1007,7 +923,7 @@ let rec itere (e:expr) : int
      end
   end
 
-(** {4 Exercise 3.1}
+(** {4 Exercise 2.1}
   Optimiser l'etape de recomposition / decomposition
   en une fonction "refocus".
 *)
@@ -1042,8 +958,8 @@ let rec normalize (e:expr)
 
 
 
-(** {4 Exercise 3.2}
-  Obtenir une machine abstraite.
+(** {4 Exercise 2.2}
+  Derive an abstract machine
 *)
 
 (* TODO *)

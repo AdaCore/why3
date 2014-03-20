@@ -1,0 +1,119 @@
+(** 
+
+{1 Krivine Abstract Machine}
+
+This is inspired from student exercises proposed by 
+{h <a href="http://cs.au.dk/~danvy/">Olivier Danvy</a>}
+at the {h <a href="http://jfla.inria.fr/2014/">JFLA 2014 conference</a>}
+
+*)
+
+(** {2 The lambda-calculus} *)
+
+module Lambda
+
+(**
+Terms:
+{h <blockquote><pre>
+n : int
+
+x : identifier
+
+t  : term
+t ::= x | \x.t | t t
+
+p  :  program
+p ::= t
+</pre></blockquote>}
+      where [t] is ground (i.e. without any free variable)
+*)
+
+type identifier = int
+
+type term =
+  | Var identifier
+  | Lambda identifier term
+  | App term term
+
+(** Examples:
+{h <blockquote><pre>
+p0 = (\x.x)
+p1 = (\x.x) (\x.x)
+p2 = (\x.\f.f x) (\y.y) (\x.x)
+</pre></blockquote>}
+*)
+
+constant f : identifier = 6
+constant x : identifier = 24
+constant y : identifier = 25
+
+constant p0 : term = Lambda x (Var x)
+
+constant p1 : term = App p0 p0
+
+constant p2 : term = 
+  App (App (Lambda x (Lambda f (App (Var f)  (Var x))))
+           (Lambda y (Var y)))
+      (Lambda x (Var x))
+       
+(** Values and environments:
+{h <blockquote><pre>
+e  :  environment
+v ::= nil | (identifier, value) :: environment
+
+v  :  value
+v ::= (\x.t, e)
+</pre></blockquote>}
+*)
+
+(** Operateur algebrique:
+{h <blockquote><pre>
+lookup : identificateur -> environnement -> value
+</pre></blockquote>}
+*)
+
+(** Contextes d'evaluation:
+{h <blockquote><pre>
+C ::= [] | [C (t, e)] | [v C]
+</pre></blockquote>}
+*)
+
+(** Machine abstraite (dite "CEK"):
+{h <blockquote><pre>
+    &lt;x, e, C&gt;_eval -> &lt;C, v&gt;_cont
+                      where v = lookup x e
+ &lt;\x.t, e, C&gt;_eval -> &lt;C, (\x.t, e)&gt;_cont
+&lt;t0 t1, e, C&gt;_eval -> &lt;t0, e, [C (t1, e)]&gt;
+
+           &lt;[], v&gt;_cont -> v
+   &lt;[C (t, e)], v&gt;_cont -> &lt;t, e, [v C]&gt;_eval
+&lt;[(\x.t, e) C], v&gt;_cont -> &lt;t, (x, v) :: e, C&gt;_eval
+</pre></blockquote>}
+*)
+
+(** {4 Exercise 2.0}
+  Program cette machine abstraite.
+*)
+
+(** {4 Exercise 2.1}
+  Cette machine abstraite est en forme defonctionalisee.
+  La refonctionaliser.
+*)
+
+(** {4 Exercise 2.2}
+  Le resultat de l'Exercise 1 est en CPS.
+  L'exprimer en style direct.
+*)
+
+(** {4 Exercise 2.3}
+  Le resultat de l'Exercise 2 est en forme defonctionalisee
+  (dans le sens que les fermetures sont en forme defonctionalisee
+  triviale).
+  Le refonctionaliser, et caracteriser le resultat.
+*)
+
+end
+
+
+
+
