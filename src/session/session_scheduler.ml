@@ -289,10 +289,13 @@ let schedule_proof_attempt ~timelimit ~memlimit ~stepslimit ?old ~inplace
 
 let schedule_edition t command filename callback =
   Debug.dprintf debug "[Sched] Scheduling an edition@.";
+  let res_parser =
+    { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown "")];
+      Call_provers.prp_regexps = [];
+      Call_provers.prp_timeregexps = []
+    } in
   let precall =
-    Call_provers.call_on_file ~command ~regexps:[] ~timeregexps:[]
-      ~exitcodes:[(0,Call_provers.Unknown "")] ~redirect:false filename
-  in
+    Call_provers.call_on_file ~command ~res_parser ~redirect:false filename in
   callback Running;
   t.running_proofs <- (Check_prover(callback, precall ())) :: t.running_proofs;
   run_timeout_handler t

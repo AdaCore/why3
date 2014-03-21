@@ -80,6 +80,12 @@ type prover_result = {
   pr_steps  : int;		(* -1 if unknown *)
 }
 
+type prover_result_parser = {
+  prp_regexps     : (Str.regexp * prover_answer) list;
+  prp_timeregexps : timeregexp list;
+  prp_exitcodes   : (int * prover_answer) list;
+}
+
 let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
   | Invalid -> fprintf fmt "Invalid"
@@ -132,8 +138,33 @@ type pre_prover_call = unit -> prover_call
 
 let save f = f ^ ".save"
 
+let parse_prover_run res_parser time out ret on_timelimit timelimit =
+  let ans = match ret with
+    | Unix.WSTOPPED n ->
+        Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
+        grep out res_parser.prp_regexps
+    | Unix.WSIGNALED n ->
+        Debug.dprintf debug "Call_provers: killed by signal %d@." n;
+        grep out res_parser.prp_regexps
+    | Unix.WEXITED n ->
+        Debug.dprintf debug "Call_provers: exited with status %d@." n;
+        (try List.assoc n res_parser.prp_exitcodes
+         with Not_found -> grep out res_parser.prp_regexps)
+  in
+  Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
+  let time = Opt.get_def time (grep_time out res_parser.prp_timeregexps) in
+  let ans = match ans with
+    | HighFailure when on_timelimit && timelimit > 0
+      && time >= (0.9 *. float timelimit) -> Timeout
+    | _ -> ans
+  in
+  { pr_answer = ans;
+    pr_status = ret;
+    pr_output = out;
+    pr_time   = time }
+
 let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
-                 ~regexps ~timeregexps ~exitcodes
+                 ~res_parser
                  ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
 
   let arglist = Cmdline.cmdline_split command in
@@ -201,34 +232,12 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
           if inplace then swallow (Sys.rename (save fin)) fin;
           if redirect then swallow Sys.remove fout
         end;
-        let ans = match ret with
-          | Unix.WSTOPPED n ->
-              Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
-              grep out regexps
-          | Unix.WSIGNALED n ->
-              Debug.dprintf debug "Call_provers: killed by signal %d@." n;
-              grep out regexps
-          | Unix.WEXITED n ->
-              Debug.dprintf debug "Call_provers: exited with status %d@." n;
-              (try List.assoc n exitcodes with Not_found -> grep out regexps)
-        in
-        Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
-        let time, step = Opt.get_def (time, -1) (grep_time out timeregexps) in
-        let ans = match ans with
-          | HighFailure when !on_timelimit && timelimit > 0
-            && time >= (0.9 *. float timelimit) -> Timeout
-          | _ -> ans
-        in
-        { pr_answer = ans;
-          pr_status = ret;
-          pr_output = out;
-          pr_time   = time;
-	  pr_steps  = step}
+        parse_prover_run res_parser time out ret !on_timelimit timelimit
     in
     { call = call; pid = pid }
 
 let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
-                   ~regexps ~timeregexps ~exitcodes ~filename
+                   ~res_parser ~filename
                    ?(inplace=false) buffer =
 
   let fin,cin =
@@ -239,7 +248,7 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
       Filename.open_temp_file "why_" ("_" ^ filename) in
   Buffer.output_buffer cin buffer; close_out cin;
   call_on_file ~command ~timelimit ~memlimit ~stepslimit
-               ~regexps ~timeregexps ~exitcodes ~cleanup:true ~inplace fin
+               ~res_parser ~cleanup:true ~inplace fin
 
 let query_call pc =
   let pid, ret = Unix.waitpid [Unix.WNOHANG] pc.pid in
