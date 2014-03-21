@@ -360,14 +360,17 @@ let print_coind fmt s = match s with
   | Coind -> attrib "coind" string fmt "true"
 
 let print_ind_decls info s fmt tl =
-  let tl' = List.filter (fun (ps, _) ->
-    not (Mid.mem ps.ls_name info.info_syn)) tl in
+  let tl_syn, tl_no_syn = List.partition (fun (ps, _) ->
+    info.realization && (Mid.mem ps.ls_name info.info_syn)) tl in
   let defs = List.fold_left (fun acc (ps, _) ->
-    Sls.add ps acc) Sls.empty tl' in
-  if tl' <> [] then begin
-    elems "inductive" print_coind (print_ind_decl info defs) fmt (s, tl');
+    Sls.add ps acc) Sls.empty tl_no_syn in
+  if tl_no_syn <> [] then begin
+    elems "inductive" print_coind (print_ind_decl info defs) fmt (s, tl_no_syn);
     forget_tvs ()
-  end
+  end;
+  List.iter (fun (_, rls) ->
+    List.iter (fun (pr, f) ->
+      print_statement "lemma" (print_pr info) pr info fmt f) rls) tl_syn
 
 let print_type_decl info fmt ts =
   if not (Mid.mem ts.ts_name info.info_syn || is_ts_tuple ts) then
