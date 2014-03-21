@@ -110,6 +110,15 @@ theory list.NthNoOpt
   syntax function nth "<app><const name=\"List.nth\"/>%2<app><const name=\"Int.nat\"/>%1</app></app>"
 end
 
+theory list.HdTlNoOpt
+  syntax function hd "<app><const name=\"List.hd\"/>%1</app>"
+  syntax function tl "<app><const name=\"List.tl\"/>%1</app>"
+end
+
+theory list.Distinct
+  syntax predicate distinct "<app><const name=\"List.distinct\"/>%1</app>"
+end
+
 theory option.Option
   syntax type option "<type name=\"Option.option\">%1</type>"
 
