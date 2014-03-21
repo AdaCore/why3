@@ -158,17 +158,14 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit =
     pr_output = out;
     pr_time   = time }
 
-let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
-                 ~res_parser
-                 ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
-
+let actualcommand command timelimit memlimit file =
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
   let on_timelimit = ref false in
   let cmd_regexp = Str.regexp "%\\(.\\)" in
   let replace s = match Str.matched_group 1 s with
     | "%" -> "%"
-    | "f" -> use_stdin := false; fin
+    | "f" -> file
     | "t" -> on_timelimit := true; string_of_int timelimit
     | "T" -> string_of_int (succ timelimit)
     | "m" -> string_of_int memlimit
@@ -179,22 +176,26 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     | "d" -> Config.datadir
     | _ -> failwith "unknown specifier, use %%f, %%t, %%m, %%l, or %%d"
   in
-  let subst s =
-    try
-      Str.global_substitute cmd_regexp replace s
+  List.map (Str.global_substitute cmd_regexp replace) arglist,
+  !use_stdin, !on_timelimit
+
+let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
+                 ~res_parser
+                 ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
+
+  let command, use_stdin, on_timelimit =
+    try actualcommand command timelimit memlimit fin
     with e ->
       if cleanup then Sys.remove fin;
       if inplace then Sys.rename (save fin) fin;
-      raise e
-  in
-  let arglist = List.map subst arglist in
-  let command = List.hd arglist in
+      raise e in
+  let exec = List.hd command in
   Debug.dprintf debug "@[<hov 2>Call_provers: command is: %a@]@."
-    (Pp.print_list Pp.space pp_print_string) arglist;
-  let argarray = Array.of_list arglist in
+    (Pp.print_list Pp.space pp_print_string) command;
+  let argarray = Array.of_list command in
 
   fun () ->
-    let fd_in = if !use_stdin then Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
+    let fd_in = if use_stdin then Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
     let fout,cout,fd_out,fd_err =
       if redirect then
         let fout,cout = Filename.open_temp_file (Filename.basename fin) ".out" in
@@ -203,8 +204,8 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
       else
         "", stdout, Unix.stdout, Unix.stderr in
     let time = Unix.gettimeofday () in
-    let pid = Unix.create_process command argarray fd_in fd_out fd_err in
-    if !use_stdin then Unix.close fd_in;
+    let pid = Unix.create_process exec argarray fd_in fd_out fd_err in
+    if use_stdin then Unix.close fd_in;
     if redirect then close_out cout;
 
     let call = fun ret ->
@@ -223,7 +224,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
           if inplace then Sys.rename (save fin) fin;
           if redirect then Sysutil.safe_remove fout;
         end;
-        parse_prover_run res_parser time out ret !on_timelimit timelimit
+        parse_prover_run res_parser time out ret on_timelimit timelimit
     in
     { call = call; pid = pid }
 
