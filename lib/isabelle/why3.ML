@@ -87,7 +87,7 @@ fun make_case t ps =
         fold (fn p => fn b =>
             Syntax.const @{const_name case_abs} $
             Term.absfree p b)
-          (Term.add_frees l [])
+          (Term.add_frees l' [])
           (Syntax.const @{const_name case_elem} $ l' $ r) $ u
       end)
     ps (Syntax.const @{const_name case_nil});
@@ -118,7 +118,8 @@ fun term f g = variant
       (map (elem "pat" (K (fn [l, r] => (term f g l, term f g r)))) ps)),
    ("prod", K
       (fn [] => HOLogic.unit
-        | ts => foldr1 HOLogic.mk_prod (map (term f g) ts)))];
+        | ts => foldr1 (fn (t, u) => Syntax.const @{const_name Pair} $ t $ u)
+            (map (term f g) ts)))];
 
 
 (**** declarations ****)
