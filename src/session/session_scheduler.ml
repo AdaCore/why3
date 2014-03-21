@@ -237,7 +237,7 @@ let schedule_check t callback =
 
 let idle_handler t =
   try
-    if Queue.length t.proof_attempts_queue < 2 * t.maximum_running_proofs then begin
+    if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then begin
       match Queue.pop t.actions_queue with
         | Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                                callback,goal) ->
