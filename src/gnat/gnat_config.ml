@@ -38,6 +38,7 @@ let opt_warning_mode = ref Treat_As_Error
 
 let opt_limit_line : Gnat_loc.loc option ref = ref None
 let opt_limit_subp : string option ref = ref None
+let opt_socket_name : string ref = ref ""
 
 let set_filename s =
    if !opt_filename = None then
@@ -91,6 +92,9 @@ let set_timeout t =
 
 let set_steps t =
    opt_steps := Some t
+
+let set_socket_name s =
+  opt_socket_name := s
 
 let parse_line_spec caller s =
    try
@@ -152,6 +156,8 @@ let options = Arg.align [
           " Limit proof to a subprogram defined by \"file:line\"";
    "--prover", Arg.String set_prover,
           " Use prover given in argument instead of Alt-Ergo";
+   "--socket", Arg.String set_socket_name,
+          " The name of the socket to be used";
    "--ide-progress-bar", Arg.Set opt_ide_progress_bar,
           " Issue information on number of VCs proved";
    "--debug", Arg.Set opt_debug,
@@ -277,3 +283,5 @@ let unit_name =
   if Strings.ends_with filename suffix then
     String.sub filename 0 (String.length filename - String.length suffix)
   else Filename.chop_extension filename
+
+let socket_name = !opt_socket_name

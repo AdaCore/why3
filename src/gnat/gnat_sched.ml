@@ -22,42 +22,39 @@ let add_goal g =
 let run_goal g =
   (* spawn a prover and return immediately. The return value is a tuple of type
      Call_provers.prover_call * Session.goal *)
-  Driver.prove_task
-    ~command:Gnat_config.prover.Whyconf.command
+  Driver.prove_task_server
+    Gnat_config.prover.Whyconf.command
     ~timelimit:Gnat_config.timeout
     ~memlimit:0
     Gnat_config.prover_driver
-    (Session.goal_task g) (),
-  g
+    (Session.goal_task g)
 
-let rec take acc n =
-  (* take up to n goals from the queue (less if the queue has less elements)
-     and spawn them. Put the resulting pair (prover_call * goal) in the
-     accumulator. *)
-  if n <= 0 || Queue.is_empty goal_queue then acc
-  else take (run_goal (Queue.pop goal_queue) :: acc) (n-1)
+module Intmap =
+  Extmap.Make (struct type t = int let compare = Pervasives.compare end)
 
-let filter_finished_goals =
-  (* Given a list of pairs (prover_call * goal), return a pair of lists
-       finished : (post_prover_call, goal)
-       rest     : (prover_call, goal)
-    where the first list contains all finished goals, and the second list all
-    still unfinished ones. *)
-  let rec filter fin unf l =
-    match l with
-    | [] -> fin, unf
-    | ((p, g) as rp) :: rest ->
-        begin match Call_provers.query_call p with
-        | None -> filter fin (rp::unf) rest
-        | Some post -> filter ((post, g) :: fin) unf rest
-        end
-  in
-  filter [] []
+type running_goals =
+  { num : int;
+    map : int Session.goal Intmap.t
+  }
 
-let handle_finished_call callback (post, g) =
+let empty = { num = 0; map = Intmap.empty }
+
+let rec run_goals rg =
+  if rg.num >= Gnat_config.parallel || Queue.is_empty goal_queue then rg
+  else begin
+    let g = Queue.pop goal_queue in
+    let id = run_goal g in
+    let rg =
+      { num = rg.num + 1;
+        map = Intmap.add id g rg.map
+      }
+    in
+    run_goals rg
+  end
+
+let handle_finished_call callback g res =
   (* On a pair of the type post_prover_call * goal, register the proof result
      in the session and call the callback *)
-  let res = post () in
   let pas = (Session.Done res) in
   let pa =
     Session.add_external_proof
@@ -72,33 +69,26 @@ let handle_finished_call callback (post, g) =
       pas in
   callback pa pas
 
+let finished_goal callback rg id res =
+  let goal = Intmap.find id rg.map in
+  let rg = { num = rg.num - 1; map = Intmap.remove id rg.map } in
+  handle_finished_call callback goal res;
+  rg
+
 let run callback =
-  let l = take [] Gnat_config.parallel in
-  let handle = handle_finished_call callback in
-  let rec run l =
-    (* l contains the currently running jobs. We first check if any are
-       finished. *)
-    let finished, rest = filter_finished_goals l in
-    match finished = [], rest = [], Queue.is_empty goal_queue with
-    | true, true, true ->
-        (* everything is empty, stop *)
-        ()
-    | true, true, false ->
-        (* nothing is running, but the queue is not empty, grab more *)
-        let l = take [] Gnat_config.parallel in
-        run l
-    | true, false, _ ->
-        (* nothing is finished, wait a bit more and try again *)
-        ignore (Unix.select [] [] [] 0.1);
-        run l
-    | false, _, _ ->
-        (* some provers have terminated. We replace them by new processes (do
-           this first to maximize running processes) and handle the proof
-           results *)
-      let l = take rest (List.length finished) in
-      List.iter handle finished;
-      run l
-  in
-  run l
-
-
+  if not (Queue.is_empty goal_queue) then begin
+    Prove_client.connect ();
+    let handle_list =
+      List.fold_left (fun acc (id, res) -> finished_goal callback acc id res)
+    in
+    let rec run running_goals =
+      let running_goals = run_goals running_goals in
+      if running_goals.num > 0 then
+        let l = Call_provers.wait_for_server_result () in
+        run (handle_list running_goals l)
+      else if Queue.is_empty goal_queue then ()
+      else run running_goals
+    in
+    run empty;
+    Prove_client.disconnect ();
+  end

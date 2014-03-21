@@ -133,7 +133,7 @@ type pre_prover_call = unit -> prover_call
 
 let save f = f ^ ".save"
 
-let parse_prover_run res_parser time out ret on_timelimit timelimit =
+let parse_prover_run res_parser time out ret is_timeout =
   let ans = match ret with
     | Unix.WSTOPPED n ->
         Debug.dprintf debug "Call_provers: stopped by signal %d@." n;
@@ -149,8 +149,7 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit =
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time = Opt.get_def time (grep_time out res_parser.prp_timeregexps) in
   let ans = match ans with
-    | HighFailure when on_timelimit && timelimit > 0
-      && time >= (0.9 *. float timelimit) -> Timeout
+    | HighFailure when is_timeout  -> Timeout
     | _ -> ans
   in
   { pr_answer = ans;
@@ -220,11 +219,13 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
 
       fun () ->
         if Debug.test_noflag debug then begin
-          if cleanup then Sysutil.safe_remove fin;
+          if cleanup then Sys.remove fin;
           if inplace then Sys.rename (save fin) fin;
-          if redirect then Sysutil.safe_remove fout;
+          if redirect then Sys.remove fout;
         end;
-        parse_prover_run res_parser time out ret on_timelimit timelimit
+        let is_timeout =
+          on_timelimit && timelimit > 0 && time >= (0.9 *. float timelimit) in
+        parse_prover_run res_parser time out ret is_timeout
     in
     { call = call; pid = pid }
 
@@ -252,3 +253,64 @@ let wait_on_call pc =
 let post_wait_call pc ret = pc.call ret
 
 let prover_call_pid pc = pc.pid
+
+let set_socket_name =
+  Prove_client.set_socket_name
+
+type server_id = int
+
+let gen_id =
+  let x = ref 0 in
+  fun () ->
+    incr x;
+    !x
+
+type save_data =
+  { vc_file      : string;
+    res_parser   : prover_result_parser;
+  }
+
+let regexs = Hashtbl.create 17
+
+let prove_file_server ~res_parser ~command ~timelimit ~memlimit file =
+  let id = gen_id () in
+  let cmd, _, _ =
+    actualcommand command timelimit memlimit file in
+  let saved_data =
+    { vc_file      = file;
+      res_parser   = res_parser } in
+  Hashtbl.add regexs id saved_data;
+  Prove_client.send_request ~id ~timelimit ~memlimit ~cmd;
+  id
+
+let read_and_delete_file fn =
+  let cin = open_in fn in
+  let buf = Buffer.create 1024 in
+  try
+    while true do
+      Buffer.add_string buf (input_line cin);
+      Buffer.add_char buf '\n'
+    done;
+    assert false
+  with End_of_file ->
+  begin
+    close_in cin;
+    Sys.remove fn;
+    Buffer.contents buf
+  end
+
+let handle_answer answer =
+  let id = answer.Prove_client.id in
+  let save = Hashtbl.find regexs id in
+  Hashtbl.remove regexs id;
+  Sys.remove save.vc_file;
+  let out = read_and_delete_file answer.Prove_client.out_file in
+  let ret = Unix.WEXITED answer.Prove_client.exit_code in
+  let ans =
+    parse_prover_run save.res_parser
+                     answer.Prove_client.time
+                     out ret answer.Prove_client.timeout in
+  id, ans
+
+let wait_for_server_result () =
+  List.map handle_answer (Prove_client.read_answers ())

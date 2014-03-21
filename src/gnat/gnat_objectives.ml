@@ -456,6 +456,7 @@ let init_subp_vcs subp =
    apply_split_goal_if_needed subp.subp_goal
 
 let init () =
+   Call_provers.set_socket_name Gnat_config.socket_name;
    let project_dir = Session.get_project_dir Gnat_config.filename in
    let env_session, is_new_session =
       (* either create a new session, or read an existing ession *)

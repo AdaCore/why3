@@ -83,3 +83,6 @@ val ide_progress_bar : bool
 
 val parallel : int
 (* number of parallel processes that can be run in parallel for proving VCs *)
+
+val socket_name : string
+(* name of the socket to be used for communication with the server *)

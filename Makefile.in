@@ -9,6 +9,7 @@
 #                                                                  #
 ####################################################################
 
+.SUFFIXES:
 include Version
 
 VERBOSEMAKE ?= @enable_verbose_make@
@@ -119,7 +120,7 @@ LIB_CORE = ident ty term pattern decl theory \
 
 LIB_PARSER = ptree glob parser typing lexer
 
-LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
+LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf autodetection
 
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
@@ -183,6 +184,10 @@ endif
 clean::
 	rm -f lib/ocaml/why3__BigInt.ml
 
+src/driver/vc_client.o: src/driver/vc_client.c
+	ocamlopt -c $^
+	mv $(CURDIR)/vc_client.o $@
+
 # build targets
 
 byte: lib/why3/why3.cma
@@ -192,7 +197,7 @@ lib/why3/why3.cma: lib/why3/why3.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
-lib/why3/why3.cmxa: lib/why3/why3.cmx
+lib/why3/why3.cmxa: lib/why3/why3.cmx src/driver/vc_client.o
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) -a $(OFLAGS) -o $@ $^
 
@@ -489,6 +494,34 @@ clean::
 	rm -f src/gnat/*.annot src/gnat/*~
 	rm -f bin/gnatwhy3.byte bin/gnatwhy3.opt bin/gnatwhy3
 	rm -f .depend.gnat
+
+##############
+# Why3server #
+##############
+
+SERVER_MODULES:= arraylist options queue readbuf request writebuf main
+SERVER_C:= $(addprefix src/tools/, $(addsuffix .c, $(SERVER_MODULES)))
+SERVER_H:= $(addprefix src/tools/, $(addsuffix .h, $(SERVER_MODULES)))
+SERVER_O:= $(addprefix src/tools/, $(addsuffix .o, $(SERVER_MODULES)))
+
+opt: bin/why3server$(EXE)
+
+bin/why3server$(EXE): $(SERVER_O)
+	gcc -o $@ $^
+
+%.o: %.c %.h
+	gcc -c -Wall -g -o $@ $<
+%.o: %.c
+	gcc -c -Wall -g -o $@ $<
+
+src/tools/main.o:: src/tools/server-unix.c src/tools/server-win.c
+
+install_no_local::
+	cp -f bin/why3server$(EXE) $(BINDIR)/why3server$(EXE)
+
+clean::
+	 rm -f $(SERVER_O)
+
 
 ##########
 # gallery

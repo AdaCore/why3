@@ -128,3 +128,16 @@ val post_wait_call : prover_call -> Unix.process_status -> post_prover_call
 
 val prover_call_pid : prover_call -> int
 (** Return the pid of the prover *)
+
+val set_socket_name : string -> unit
+
+type server_id = int
+
+val prove_file_server : 
+          res_parser : prover_result_parser ->
+          command : string ->
+          timelimit : int ->
+          memlimit : int ->
+          string -> server_id
+
+val wait_for_server_result : unit -> (server_id * prover_result) list

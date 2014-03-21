@@ -295,12 +295,8 @@ let print_theory ?old drv filename fmt th =
   let task = Task.use_export None th in
   print_task ?old drv filename fmt task
 
-let prove_task_prepared
-  ~command ?timelimit ?memlimit ?old ?inplace drv task =
-  let buf = Buffer.create 1024 in
-  let fmt = formatter_of_buffer buf in
-  let old_channel = Opt.map open_in old in
-  let filename = match old, inplace with
+let file_name_of_task ?old ?inplace drv task =
+  match old, inplace with
     | Some fn, Some true -> fn
     | _ ->
         let pr = Task.task_goal task in
@@ -309,7 +305,14 @@ let prove_task_prepared
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
         get_filename drv fn "T" pr.pr_name.id_string
-  in
+
+
+let prove_task_prepared
+  ~command ?timelimit ?memlimit ?old ?inplace drv task =
+  let buf = Buffer.create 1024 in
+  let fmt = formatter_of_buffer buf in
+  let old_channel = Opt.map open_in old in
+  let filename = file_name_of_task ?old ?inplace drv task in
   print_task_prepared ?old:old_channel drv filename fmt task; pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =
@@ -320,6 +323,26 @@ let prove_task_prepared
 let prove_task ~command ?timelimit ?memlimit ?old ?inplace drv task =
   let task = prepare_task drv task in
   prove_task_prepared ~command ?timelimit ?memlimit ?old ?inplace drv task
+
+let prove_task_server command ~timelimit ~memlimit drv task =
+  let task = prepare_task drv task in
+  let fn = file_name_of_task drv task in
+  let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
+  let p = match drv.drv_printer with
+    | None -> raise NoPrinter
+    | Some p -> p
+  in
+  let fmt = Format.formatter_of_out_channel outc in
+  let printer = lookup_printer p
+    { Printer.env = drv.drv_env;
+      prelude     = drv.drv_prelude;
+      th_prelude  = drv.drv_thprelude;
+      blacklist   = drv.drv_blacklist;
+      filename    = fn } in
+  fprintf fmt "@[%a@]@?" (printer ?old:None) task;
+  close_out outc;
+  let res_parser = drv.drv_res_parser in
+  prove_file_server ~command ~res_parser ~timelimit ~memlimit fn
 
 (* exception report *)
 

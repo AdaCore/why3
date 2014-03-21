@@ -67,6 +67,9 @@ val print_task_prepared :
   ?old       : in_channel ->
   driver -> string -> Format.formatter -> Task.task -> unit
 
+val prove_task_server : string -> timelimit:int -> memlimit:int -> 
+                        driver -> Task.task -> Call_provers.server_id
+
 val prove_task_prepared :
   command    : string ->
   ?timelimit : int ->
