@@ -32,9 +32,7 @@ type driver = {
   drv_thprelude   : prelude_map;
   drv_blacklist   : string list;
   drv_meta        : (theory * Stdecl.t) Mid.t;
-  drv_regexps     : (Str.regexp * prover_answer) list;
-  drv_timeregexps : Call_provers.timeregexp list;
-  drv_exitcodes   : (int * prover_answer) list;
+  drv_res_parser  : prover_result_parser;
   drv_tag         : int
 }
 
@@ -198,9 +196,12 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     drv_thprelude   = Mid.map List.rev !thprelude;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_meta        = !meta;
-    drv_regexps     = List.rev !regexps;
-    drv_timeregexps = List.rev !timeregexps;
-    drv_exitcodes   = List.rev !exitcodes;
+    drv_res_parser = 
+      {
+      prp_regexps     = List.rev !regexps;
+      prp_timeregexps = List.rev !timeregexps;
+      prp_exitcodes   = List.rev !exitcodes;
+    };
     drv_tag         = !driver_tag
   }
 
@@ -237,12 +238,9 @@ let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
 let call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buffer =
-  let regexps = drv.drv_regexps in
-  let timeregexps = drv.drv_timeregexps in
-  let exitcodes = drv.drv_exitcodes in
   Call_provers.call_on_buffer
-    ~command ?timelimit ?memlimit ~regexps ~timeregexps
-    ~exitcodes ~filename ?inplace buffer
+    ~command ?timelimit ?memlimit ~res_parser:drv.drv_res_parser
+    ~filename ?inplace buffer
 
 (** print'n'prove *)
 
