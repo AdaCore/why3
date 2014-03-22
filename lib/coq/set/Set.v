@@ -40,13 +40,12 @@ Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
 
 Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
 
-
 (* Why3 goal *)
 Lemma extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (infix_eqeq s1 s2) -> (s1 = s2).
+Proof.
 intros a a_WT s1 s2 h1.
-apply predicate_extensionality; intro x.
-apply h1.
+now apply predicate_extensionality.
 Qed.
 
 (* Why3 assumption *)
@@ -56,16 +55,17 @@ Definition subset {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
 (* Why3 goal *)
 Lemma subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   (subset s s).
-intros a a_WT s.
-unfold subset; auto.
+Proof.
+now intros a a_WT s x.
 Qed.
 
 (* Why3 goal *)
 Lemma subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)) (s3:(set a)), (subset s1 s2) -> ((subset s2 s3) -> (subset s1
   s3)).
-intros a a_WT s1 s2 s3 h1 h2.
-unfold subset; intuition.
+Proof.
+intros a a_WT s1 s2 s3 h1 h2 x H.
+now apply h2, h1.
 Qed.
 
 (* Why3 goal *)
@@ -81,15 +81,15 @@ Definition is_empty {a:Type} {a_WT:WhyType a} (s:(set a)): Prop :=
 (* Why3 goal *)
 Lemma empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty : (set
   a))).
-intros a a_WT.
-unfold is_empty; intuition.
+Proof.
+now intros a a_WT x.
 Qed.
 
 (* Why3 goal *)
 Lemma mem_empty : forall {a:Type} {a_WT:WhyType a}, forall (x:a), ~ (mem x
   (empty : (set a))).
-intros a a_WT x.
-auto.
+Proof.
+now intros a a_WT x.
 Qed.
 
 (* Why3 goal *)
@@ -101,6 +101,7 @@ Defined.
 (* Why3 goal *)
 Lemma add_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a),
   forall (s:(set a)), (mem x (add y s)) <-> ((x = y) \/ (mem x s)).
+Proof.
 intros a a_WT x y s.
 unfold add, mem; intuition.
 Qed.
@@ -114,6 +115,7 @@ Defined.
 (* Why3 goal *)
 Lemma remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
   (s:(set a)), (mem x (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
+Proof.
 intros a a_WT x y s.
 unfold remove, mem; intuition.
 Qed.
@@ -121,34 +123,33 @@ Qed.
 (* Why3 goal *)
 Lemma add_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
   a)), (mem x s) -> ((add x (remove x s)) = s).
+Proof.
 intros a a_WT x s h1.
 apply extensionality; intro y.
 rewrite add_def1.
 rewrite remove_def1.
-destruct (classic (y=x)).
-subst; tauto.
-tauto.
+destruct (why_decidable_eq y x) as [->|H] ; intuition.
 Qed.
 
 (* Why3 goal *)
 Lemma remove_add : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
   a)), ((remove x (add x s)) = (remove x s)).
+Proof.
 intros a a_WT x s.
 apply extensionality; intro y.
 rewrite remove_def1.
 rewrite remove_def1.
 rewrite add_def1.
-destruct (classic (y=x)).
-subst; tauto.
-tauto.
+destruct (why_decidable_eq y x) as [->|H] ; intuition.
 Qed.
 
 (* Why3 goal *)
 Lemma subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
   a)), (subset (remove x s) s).
-intros a a_WT x s.
-unfold subset; intro y.
-rewrite remove_def1; tauto.
+Proof.
+intros a a_WT x s y.
+rewrite remove_def1.
+now intros [_ H].
 Qed.
 
 (* Why3 goal *)
@@ -161,8 +162,8 @@ Defined.
 (* Why3 goal *)
 Lemma union_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)) (x:a), (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
-intros a a_WT s1 s2 x.
-now unfold union.
+Proof.
+now intros a a_WT s1 s2 x.
 Qed.
 
 (* Why3 goal *)
@@ -175,8 +176,8 @@ Defined.
 (* Why3 goal *)
 Lemma inter_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)) (x:a), (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
-intros a a_WT s1 s2 x.
-now unfold inter.
+Proof.
+now intros a a_WT s1 s2 x.
 Qed.
 
 (* Why3 goal *)
@@ -189,16 +190,17 @@ Defined.
 (* Why3 goal *)
 Lemma diff_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)) (x:a), (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
-intros a a_WT s1 s2 x.
-now unfold diff.
+Proof.
+now intros a a_WT s1 s2 x.
 Qed.
 
 (* Why3 goal *)
 Lemma subset_diff : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (subset (diff s1 s2) s1).
-intros a a_WT s1 s2.
-unfold subset; intro x.
-rewrite diff_def1; tauto.
+Proof.
+intros a a_WT s1 s2 x.
+rewrite diff_def1.
+now intros [H _].
 Qed.
 
 (* Why3 goal *)
@@ -211,6 +213,7 @@ Defined.
 (* Why3 goal *)
 Lemma choose_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   (~ (is_empty s)) -> (mem (choose s) s).
+Proof.
 intros a a_WT s h.
 unfold choose.
 apply epsilon_spec.
@@ -226,7 +229,7 @@ Defined.
 (* Why3 goal *)
 Lemma all_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a), (mem x
   (all : (set a))).
-intros a a_WT x.
-now unfold all.
+Proof.
+now intros a a_WT x.
 Qed.
 
