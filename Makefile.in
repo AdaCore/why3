@@ -1089,22 +1089,22 @@ ifeq (@enable_isabelle_libs@,yes)
 ISABELLELIBS_INT_FILES = Exponentiation Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power
 ISABELLELIBS_INT = $(addsuffix .xml, $(addprefix lib/isabelle/int/, $(ISABELLELIBS_INT_FILES)))
 
-ISABELLELIBS_BOOL_FILES = # not yet realized : Bool
+ISABELLELIBS_BOOL_FILES = Bool
 ISABELLELIBS_BOOL = $(addsuffix .xml, $(addprefix lib/isabelle/bool/, $(ISABELLELIBS_BOOL_FILES)))
 
 ISABELLELIBS_REAL_FILES = # not yet realized : Abs ExpLog FromInt MinMax PowerInt Real Square RealInfix
 ISABELLELIBS_REAL = $(addsuffix .xml, $(addprefix lib/isabelle/real/, $(ISABELLELIBS_REAL_FILES)))
 
-ISABELLELIBS_NUMBER_FILES = # not yet realized : Divisibility Gcd Parity Prime
+ISABELLELIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
 ISABELLELIBS_NUMBER = $(addsuffix .xml, $(addprefix lib/isabelle/number/, $(ISABELLELIBS_NUMBER_FILES)))
 
 ISABELLELIBS_SET_FILES = Set Fset
 ISABELLELIBS_SET = $(addsuffix .xml, $(addprefix lib/isabelle/set/, $(ISABELLELIBS_SET_FILES)))
 
-ISABELLELIBS_MAP_FILES = Map # not yet realized : MapPermut
+ISABELLELIBS_MAP_FILES = Map Occ MapPermut MapInjection
 ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix lib/isabelle/map/, $(ISABELLELIBS_MAP_FILES)))
 
-ISABELLELIBS_LIST_FILES = List Length Mem Nth NthNoOpt NthLength HdTl NthHdTl Append NthLengthAppend Reverse
+ISABELLELIBS_LIST_FILES = List Length Mem Nth NthNoOpt NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt RevAppend Combine Distinct NumOcc Permut
 ISABELLELIBS_LIST = $(addsuffix .xml, $(addprefix lib/isabelle/list/, $(ISABELLELIBS_LIST_FILES)))
 
 drivers/isabelle-realizations.aux: Makefile
