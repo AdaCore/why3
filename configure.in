@@ -354,7 +354,7 @@ if test "$enable_zarith" = yes; then
          AC_MSG_WARN([Lib Zarith not found, using Nums instead.])
          reason_zarith=" (zarith not found)"
       else
-         BIGINTINCLUDE="+zarith"
+         BIGINTINCLUDE="-I +zarith"
       fi
    fi
 fi
