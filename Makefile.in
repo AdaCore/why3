@@ -134,7 +134,8 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		eliminate_epsilon \
 		eval_match instantiate_predicate smoke_detector \
 		gnat_float rec_logic eliminate_bounded_types \
-		gnat_split_conj gnat_split_disj
+		gnat_split_conj gnat_split_disj \
+		eliminate_unused_hypo
 
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
