@@ -1216,6 +1216,22 @@ module AVLSorted
         fun_model_selected o k { p with left = qpl } ql ks
     end
   
+  let rec lemma fun_model_concat (o:order 'a) (k:key_model 'a)
+    (l:list_model 'a 'b) (r:list_model 'a 'b) : unit
+    requires { sorted o l }
+    requires { sorted o r }
+    requires { before o l r }
+    requires { correct_for_order o k }
+    ensures { functional_model o (l++r) k = None <->
+      functional_model o l k = None /\ functional_model o r k = None }
+    ensures { forall d. functional_model o l k = Some d ->
+      functional_model o (l++r) k = Some d }
+    ensures { forall d. functional_model o r k = Some d ->
+      functional_model o (l++r) k = Some d }
+    variant { l }
+  = match l with Nil -> () | Cons _ ql -> fun_model_concat o k ql r end
+    
+  
   (*
   (* Functional model of a concatenation. *)
   let rec lemma fun_model_concat (o:order 'a) (k:key_model 'a)
@@ -1245,6 +1261,18 @@ module AVLSorted
     variant { l }
   = match l with Nil -> () | Cons _ ql -> fun_model_incorrect o k ql end
   
+  let rec lemma fun_model_nonnone (o:order 'a) (d:data_model 'a 'b)
+    (l:list_model 'a 'b) : unit
+    requires { sorted o l }
+    requires { mem d l }
+    ensures { functional_model o l (get_key_m d) <> None }
+    variant { l }
+  = match l with Nil -> () | Cons xl ql ->
+      if d <> xl
+      then fun_model_nonnone o d ql
+      else ()
+    end
+  
   use import ref.Ref
   
   let map_empty (o:order 'a) (inv:data_model 'a 'b -> bool) : map 'a 'b
@@ -1255,6 +1283,27 @@ module AVLSorted
     ensures { map_correct result }
   =
     let rp = empty inv in
+    { avl_repr = rp;
+      order = o;
+      fmodel = functional_model o rp.model }
+  
+  let map_singleton (o:order 'a) (inv:data_model 'a 'b -> bool)
+    (d:data 'a 'b) : map 'a 'b
+    requires { forall d. inv d -> correct_for_order o (get_key_m d) }
+    requires { data_correct d }
+    requires { inv (data_model d) }
+    ensures { result.order = o }
+    ensures { forall k. correct_for_order o k /\
+      eq o k (get_key_m (data_model d)) ->
+      result.fmodel k = Some (data_model d) }
+    ensures { forall k. not correct_for_order o k ->
+      result.fmodel k = None }
+    ensures { forall k. not eq o k (get_key_m (data_model d)) ->
+      result.fmodel k = None }
+    ensures { result.map_data_inv = inv }
+    ensures { map_correct result }
+  =
+    let rp = singleton inv d in
     { avl_repr = rp;
       order = o;
       fmodel = functional_model o rp.model }
@@ -1364,6 +1413,28 @@ module AVLSorted
       order = m.order;
       fmodel = functional_model o r0.model } in
     (l,o0,r)
+  
+  let map_concat (m1 m2:map 'a 'b) : map 'a 'b
+    requires { map_correct m1 /\ map_correct m2 /\
+      m1.map_data_inv = m2.map_data_inv /\
+      m1.order = m2.order }
+    requires { forall k1 k2. m1.fmodel k1 <> None /\ m2.fmodel k2 <> None ->
+      lt m1.order k1 k2 }
+    ensures { map_correct result }
+    ensures { result.order = m1.order }
+    ensures { result.map_data_inv = m1.map_data_inv }
+    ensures { forall k. result.fmodel k = None <-> m1.fmodel k = None /\
+      m2.fmodel k = None }
+    ensures { forall k d. m1.fmodel k = Some d -> result.fmodel k = Some d }
+    ensures { forall k d. m2.fmodel k = Some d -> result.fmodel k = Some d }
+  =
+    let o = m2.order in
+    assert { before o m1.avl_repr.model m2.avl_repr.model };
+    let r0 = concat m1.avl_repr m2.avl_repr in
+    let res = { avl_repr = r0;
+      order = o;
+      fmodel = functional_model o r0.model } in
+    res
   
 end
 
