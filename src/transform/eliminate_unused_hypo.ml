@@ -73,21 +73,13 @@ let check_hypothesis used_vars hypo_list hypo_term imp_term =
            | _ -> Svs.empty }
        in
        if Svs.is_empty hypo.depend_vars then
-         used_vars, hypo_list, old_term
+         Mvs.union map_union_cb used_vars hypo_vars, hypo_list, old_term
        else
          used_vars, hypo :: hypo_list, imp_term
      else
        Mvs.union map_union_cb used_vars hypo_vars, hypo_list, old_term
   | _ -> Mvs.union map_union_cb used_vars hypo_vars, hypo_list, old_term
 
-
-(* match ((List.nth tlist 0).t_node,
-                              (List.nth tlist 1).t_node) with
-                       | (Tvar vs1, Tvar vs2) ->
-                          cond_add vs2 (cond_add vs1
-                                                 (Svs.empty))
-                       | (Tvar vs, _) | (_, Tvar vs) -> cond_add vs (Svs.empty)
-                       | _ -> Svs.empty *)
 
 (*
  * This function removes hypothesis depending on variable
@@ -112,13 +104,16 @@ let rec descend_to_goal term =
 
   match term.t_node with
   | Tquant (q, tq) ->
+     (match q with
+     | Texists -> [], t_freevars (Mvs.empty) term, [], term
+     | _ ->
      let vsl, trig, qterm = t_open_quant tq in
      if trig <> [] then
        ([], Mvs.empty, [], term)
      else
        let (qlist, used_vars, hypo_list, qterm) = descend_to_goal qterm in
-       ((q, vsl) :: qlist, used_vars,
-        clear_hypothesis_on_quant vsl hypo_list, qterm)
+       (vsl @ qlist, used_vars,
+        clear_hypothesis_on_quant vsl hypo_list, qterm))
   | Tbinop (Timplies, tl, tr) ->
      let (qlist, used_vars, hypos, tr) = descend_to_goal tr in
      let (used_vars, hypo_list, term) = check_hypothesis used_vars
@@ -126,14 +121,12 @@ let rec descend_to_goal term =
        qlist, used_vars, hypo_list, term
   |_ -> [], t_freevars (Mvs.empty) term, [], term
 
-let put_quantifiers_top =
-  List.fold_left (fun t qpair -> let (quant, vsl) = qpair in
-                                 t_quant quant (t_close_quant vsl [] t))
-
+let put_quantifiers_top term vsl =
+  t_quant Tforall (t_close_quant vsl [] term)
 
 let rm_useless_vars term =
   let (qlist, _, _, cleaned_term) = descend_to_goal term in
-  put_quantifiers_top cleaned_term (List.rev qlist)
+  put_quantifiers_top cleaned_term qlist
 
 
 let goalcb psym term = [create_prop_decl Decl.Pgoal psym
