@@ -74,6 +74,15 @@ let clear_hypothesis_on_quant vsl hypo_list =
     List.for_all (fun vs ->
       not (Mvs.mem vs h.depend_vars)) vsl) hypo_list
 
+(* Flatten a serie of conjunctions as hypothesis into a series of
+   implications *)
+let rec flatten_conjunction tl tr =
+  match tl.t_node with
+  | Tbinop (Tand, tl1, tl2) ->
+     let t2l, t2r = flatten_conjunction tl2 tr in
+     flatten_conjunction tl1 (t_binary Timplies t2l t2r)
+  | _ -> tl, tr
+
 (* Descends in the tree, collect used variables as it ascends, collects
    quantifiers node and hypothesis candidate to removal.  *)
 let rec descend_to_goal term =
@@ -88,10 +97,11 @@ let rec descend_to_goal term =
        let qlist, used_vars, hypo_list, qterm = descend_to_goal qterm in
        vsl @ qlist, used_vars, clear_hypothesis_on_quant vsl hypo_list, qterm)
   | Tbinop (Timplies, tl, tr) ->
+     let tl, tr = flatten_conjunction tl tr in
      let qlist, used_vars, hypos, tr = descend_to_goal tr in
      let used_vars, hypo_list, term = check_hypothesis used_vars hypos tl tr in
-       qlist, used_vars, hypo_list, term
-  |_ -> [], t_freevars (Mvs.empty) term, [], term
+     qlist, used_vars, hypo_list, term
+ |_ -> [], t_freevars (Mvs.empty) term, [], term
 
 let put_quantifiers_top term vsl =
   t_quant Tforall (t_close_quant vsl [] term)
@@ -101,7 +111,8 @@ let rm_useless_vars term =
   put_quantifiers_top cleaned_term qlist
 
 
-let goalcb psym term = [create_prop_decl Decl.Pgoal psym (rm_useless_vars term)]
+let goalcb psym term =
+  [create_prop_decl Decl.Pgoal psym (rm_useless_vars term)]
 
 let eliminate_unused_hypo = Trans.goal goalcb
 
