@@ -170,7 +170,7 @@ end
 theory Occ
 
   use import int.Int
-  use export Map
+  use import Map
 
   function occ (v: 'a) (m: map int 'a) (l u: int) : int
     (** number of occurrences of v in m between l included and u excluded *)
@@ -220,6 +220,7 @@ end
 theory MapPermut
 
   use import int.Int
+  use import Map
   use import Occ
 
   predicate permut (m1 m2: map int 'a) (l u: int) =

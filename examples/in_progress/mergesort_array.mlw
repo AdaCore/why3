@@ -1,0 +1,131 @@
+
+(** Sorting arrays using mergesort
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module Merge
+
+  use export int.Int
+  use export ref.Refint
+  use export array.Array
+  use export array.ArraySorted
+  use import map.Occ
+  use export array.ArrayPermut
+
+  (* merges a1[l..m[ and a1[m..r[ into a2[l..r[ *)
+  let merge (a1 a2: array int) (l m r: int) : unit
+    requires { 0 <= l <= m <= r <= length a1 = length a2 }
+    requires { sorted_sub a1 l m }
+    requires { sorted_sub a1 m r }
+    ensures  { sorted_sub a2 l r }
+    ensures  { permut a1 a2 l r }
+    ensures  { forall i: int.
+               (0 <= i < l \/ r < i < length a2) -> a2[i] = (old a2)[i] }
+  = 'L:
+    let i = ref l in
+    let j = ref m in
+    for k = l to r-1 do
+      invariant { l <= !i <= m <= !j <= r }
+      invariant { !i - l + !j - m = k - l }
+      invariant { sorted_sub a2 l k }
+      invariant { forall x y: int. l <= x < k -> !i <= y < m -> a2[x] <= a1[y] }
+      invariant { forall x y: int. l <= x < k -> !j <= y < r -> a2[x] <= a1[y] }
+      invariant { forall v: int.
+                  occ v a1.elts l !i + occ v a1.elts m !j = occ v a2.elts l k }
+      invariant { forall i: int.
+                  (0 <= i < l \/ r < i < length a2) -> a2[i] = (at a2 'L)[i] }
+      if !i < m && (!j = r || a1[!i] <= a1[!j]) then begin
+        a2[k] <- a1[!i];
+        incr i
+      end else begin
+        a2[k] <- a1[!j];
+        incr j
+      end
+    done
+
+end
+
+module TopDownMergesort
+
+  use import Merge
+  use import mach.int.Int
+
+  let rec mergesort_rec (a tmp: array int) (l r: int) : unit
+    requires { 0 <= l <= r <= length a = length tmp }
+    ensures { sorted_sub a l r }
+    ensures { permut_sub (old a) a l r }
+  = 'L:
+    if l < r-1 then begin
+      let m = l + (r - l) / 2 in
+      assert { l <= m < r };
+      mergesort_rec a tmp l m;
+      assert { permut_sub (at a 'L) a l r };
+      'M:
+      mergesort_rec a tmp m r;
+      assert { permut_sub (at a 'M) a l r };
+      (* if a[m-1] <= a[m] return; *) (* OPTIM *)
+      'N:
+      blit a l tmp l (r - l);
+      merge tmp a l m r;
+      assert { permut_sub (at a 'N) a l r };
+    end
+
+  let mergesort (a: array int) : unit
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
+  =
+    let tmp = Array.make (length a) 0 in
+    mergesort_rec a tmp 0 (length a)
+
+end
+
+module BottomUpMergesort
+
+(*
+  // bottom-up mergesort
+  static void bottomUpMergesort(int[] a) {
+    int n = a.length;
+    int[] tmp = new int[n];
+    for (int len = 1; len < n; len *= 2)
+      for (int lo = 0; lo < n-len; lo += 2*len) {
+        int mid = lo + len;
+        int hi = Math.min(n, mid + len);
+        for (int i = lo; i < hi; i++) tmp[i] = a[i];
+        merge(tmp, a, lo, mid, hi);
+      }
+  }
+*)
+
+end
+
+module NaturalMergesort
+
+(*
+  // returns hi such that a[lo..hi[ is sorted
+  static int findRun(int[] a, int lo) {
+    while (++lo < a.length && a[lo-1] <= a[lo]);
+    return lo;
+  }
+
+  static void naturalMergesort(int[] a) {
+    int n = a.length;
+    if (n <= 1) return;
+    int[] tmp = new int[n];
+    while (true) {
+      for (int lo = 0; lo < n-1; ) {
+        // find first run a[lo..mid[
+        int mid = findRun(a, lo);
+        if (mid == n) { if (lo == 0) return; break; }
+        // find second run a[mid..hi[
+        int hi = findRun(a, mid);
+        // merge
+        for (int i = lo; i < hi; i++) tmp[i] = a[i];
+        merge(tmp, a, lo, mid, hi);
+        lo = hi;
+      }
+    }
+  }
+*)
+
+end
