@@ -78,6 +78,8 @@ let clear_hypothesis_on_quant vsl hypo_list =
    implications *)
 let rec flatten_conjunction tl tr =
   match tl.t_node with
+  | Tbinop (Tand, { t_node = Ttrue; _ }, t2) -> flatten_conjunction t2 tr
+  | Tbinop (Tand, { t_node = Tfalse; _ }, _) -> t_false , tr
   | Tbinop (Tand, tl1, tl2) ->
      let t2l, t2r = flatten_conjunction tl2 tr in
      flatten_conjunction tl1 (t_binary Timplies t2l t2r)
@@ -103,12 +105,14 @@ let rec descend_to_goal term =
      qlist, used_vars, hypo_list, term
  |_ -> [], t_freevars (Mvs.empty) term, [], term
 
-let put_quantifiers_top term vsl =
+let put_quantifiers_top term vsl used_vars=
+  (* Seem to improve speed for alt-ergo *)
+  let vsl = List.filter (fun vs -> Mvs.mem vs used_vars) vsl in
   t_quant Tforall (t_close_quant vsl [] term)
 
 let rm_useless_vars term =
-  let qlist, _, _, cleaned_term = descend_to_goal term in
-  put_quantifiers_top cleaned_term qlist
+  let qlist, used_vars, _, cleaned_term = descend_to_goal term in
+  put_quantifiers_top cleaned_term qlist used_vars
 
 
 let goalcb psym term =
