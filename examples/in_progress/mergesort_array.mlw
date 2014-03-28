@@ -31,36 +31,56 @@ module Merge
   use import map.Occ
   use export array.ArrayPermut
 
-  (* merges a1[l..m[ and a1[m..r[ into a2[l..r[ *)
-  let merge (a1 a2: array elt) (l m r: int) : unit
-    requires { 0 <= l <= m <= r <= length a1 = length a2 }
-    requires { sorted_sub a1 l m }
-    requires { sorted_sub a1 m r }
-    ensures  { sorted_sub a2 l r }
-    ensures  { permut a1 a2 l r }
+  (* merges tmp[l..m[ and tmp[m..r[ into a[l..r[ *)
+  let merge (tmp a: array elt) (l m r: int) : unit
+    requires { 0 <= l <= m <= r <= length tmp = length a }
+    requires { sorted_sub tmp l m }
+    requires { sorted_sub tmp m r }
+    ensures  { sorted_sub a l r }
+    ensures  { permut tmp a l r }
     ensures  { forall i: int.
-               (0 <= i < l \/ r <= i < length a2) -> a2[i] = (old a2)[i] }
+               (0 <= i < l \/ r <= i < length a) -> a[i] = (old a)[i] }
   = 'L:
     let i = ref l in
     let j = ref m in
     for k = l to r-1 do
       invariant { l <= !i <= m <= !j <= r }
       invariant { !i - l + !j - m = k - l }
-      invariant { sorted_sub a2 l k }
-      invariant { forall x y: int. l <= x < k -> !i <= y < m -> le a2[x] a1[y] }
-      invariant { forall x y: int. l <= x < k -> !j <= y < r -> le a2[x] a1[y] }
+      invariant { sorted_sub a l k }
+      invariant { forall x y: int. l <= x < k -> !i <= y < m -> le a[x] tmp[y] }
+      invariant { forall x y: int. l <= x < k -> !j <= y < r -> le a[x] tmp[y] }
       invariant { forall v: elt.
-                  occ v a1.elts l !i + occ v a1.elts m !j = occ v a2.elts l k }
+                  occ v tmp.elts l !i + occ v tmp.elts m !j = occ v a.elts l k }
       invariant { forall i: int.
-                  (0 <= i < l \/ r <= i < length a2) -> a2[i] = (at a2 'L)[i] }
-      if !i < m && (!j = r || le a1[!i] a1[!j]) then begin
-        a2[k] <- a1[!i];
+                  (0 <= i < l \/ r <= i < length a) -> a[i] = (at a 'L)[i] }
+      if !i < m && (!j = r || le tmp[!i] tmp[!j]) then begin
+        a[k] <- tmp[!i];
         incr i
       end else begin
-        a2[k] <- a1[!j];
+        a[k] <- tmp[!j];
         incr j
       end
     done
+
+  (* merges a[l..m[ and a[m..r[ into a[l..r[, using tmp as a temporary *)
+  let merge_using (tmp a: array elt) (l m r: int) : unit
+    requires { 0 <= l <= m <= r <= length tmp = length a }
+    requires { sorted_sub a l m }
+    requires { sorted_sub a m r }
+    ensures  { sorted_sub a l r }
+    ensures  { permut (old a) a l r }
+    ensures  { forall i: int.
+               (0 <= i < l \/ r <= i < length a) -> a[i] = (old a)[i] }
+  = if l < m && m < r then (* both sides are non empty *)
+      if le a[m-1] a[m] then (* OPTIM: already sorted *)
+        assert { forall i1 i2: int. l <= i1 < m -> m <= i2 < r ->
+                 le a[i1] a[m-1] && le a[m] a[i2] }
+      else begin
+        'N:
+        blit a l tmp l (r - l);
+        merge tmp a l m r;
+        assert { permut_sub (at a 'N) a l r }
+      end
 
 end
 
@@ -83,11 +103,7 @@ module TopDownMergesort
       'M:
       mergesort_rec a tmp m r;
       assert { permut_sub (at a 'M) a l r };
-      (* if a[m-1] <= a[m] return; *) (* OPTIM *)
-      'N:
-      blit a l tmp l (r - l);
-      merge tmp a l m r;
-      assert { permut_sub (at a 'N) a l r };
+      merge_using tmp a l m r;
     end
 
   let mergesort (a: array elt) : unit
@@ -120,8 +136,7 @@ module BottomUpMergesort
         variant   { n + !len - !lo }
         let mid = !lo + !len in
         let hi = min n (mid + !len) in
-        blit a !lo tmp !lo (hi - !lo);
-        merge tmp a !lo mid hi;
+        merge_using tmp a !lo mid hi;
         lo := hi
       done;
       len := 2 * !len
@@ -135,11 +150,12 @@ module NaturalMergesort
   use import mach.int.Int
   use import int.MinMax
 
-  (* returns hi such that a[lo..hi[ is sorted *)
+  (* returns the maximal hi such that a[lo..hi[ is sorted *)
   let find_run (a: array elt) (lo: int) : int
     requires { 0 <= lo < length a }
     ensures  { lo < result <= length a }
     ensures  { sorted_sub a lo result }
+    ensures  { result < length a -> not (le a[result-1] a[result]) }
   =
     let i = ref (lo + 1) in
     while !i < length a && le a[!i - 1] a[!i] do
@@ -158,43 +174,26 @@ module NaturalMergesort
   =
     let n = length a in
     let tmp = Array.copy a in
+    let ghost first_run = ref 0 in
     try
     while true do
+      (* invariant { 0 <= !first_run && sorted_sub a 0 !first_run } *)
+      variant   { n - !first_run }
       let lo = ref 0 in
       try
       while !lo < n - 1 do
         invariant { 0 <= !lo <= n }
+        (* invariant { 0 <= !first_run && sorted_sub a 0 !first_run } *)
         variant   { n - !lo }
         let mid = find_run a !lo in
         if mid = n then begin if !lo = 0 then raise Return; raise Break end;
         let hi = find_run a mid in
-        blit a !lo tmp !lo (hi - !lo);
-        merge tmp a !lo mid hi;
-        lo := hi
+        merge_using tmp a !lo mid hi;
+        ghost if !lo = 0 then first_run := hi;
+        lo := hi;
       done
       with Break -> () end
     done
     with Return -> () end
-
-(*
-  static void naturalMergesort(int[] a) {
-    int n = a.length;
-    if (n <= 1) return;
-    int[] tmp = new int[n];
-    while (true) {
-      for (int lo = 0; lo < n-1; ) {
-        // find first run a[lo..mid[
-        int mid = findRun(a, lo);
-        if (mid == n) { if (lo == 0) return; break; }
-        // find second run a[mid..hi[
-        int hi = findRun(a, mid);
-        // merge
-        for (int i = lo; i < hi; i++) tmp[i] = a[i];
-        merge(tmp, a, lo, mid, hi);
-        lo = hi;
-      }
-    }
-  }
-*)
 
 end
