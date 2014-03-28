@@ -15,11 +15,7 @@ module Elt
 
   clone relations.TotalPreOrder with type t = elt, predicate rel = le
 
-  predicate sorted_sub (a: array elt) (l u: int) =
-    forall i1 i2 : int. l <= i1 <= i2 < u -> le a[i1] a[i2]
-
-  predicate sorted (a: array elt) =
-    forall i1 i2 : int. 0 <= i1 <= i2 < length a -> le a[i1] a[i2]
+  clone export array.ArraySorted with type elt = elt, predicate le = le
 
 end
 

@@ -1,6 +1,10 @@
 
 * marks an incompatible change
 
+library
+  * renamed array.ArraySorted -> array.IntArraySorted
+    array.ArraySorted is now generic, with type and order relation parameters
+
 provers
   * fixed Coq printer (former Coq proofs may have to be updated, by removing
     non-emptiness constraints from polymorphic type applications)
