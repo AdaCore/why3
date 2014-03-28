@@ -105,7 +105,6 @@ module BottomUpMergesort
   use import mach.int.Int
   use import int.MinMax
 
-(*
   let bottom_up_mergesort (a: array elt) : unit
 
   =
@@ -113,7 +112,7 @@ module BottomUpMergesort
     let tmp = Array.copy a in
     let len = ref 1 in
     while !len < n do
-      invariant { 1 <= !len <= 2 * n }
+      invariant { 1 <= !len }
       variant   { 2 * n - !len }
       let lo = ref 0 in
       while !lo < n - !len do
@@ -128,31 +127,56 @@ module BottomUpMergesort
       len := 2 * !len
     done
 
-  // bottom-up mergesort
-  static void bottomUpMergesort(int[] a) {
-    int n = a.length;
-    int[] tmp = new int[n];
-    for (int len = 1; len < n; len *= 2)
-      for (int lo = 0; lo < n-len; lo += 2*len) {
-        int mid = lo + len;
-        int hi = Math.min(n, mid + len);
-        for (int i = lo; i < hi; i++) tmp[i] = a[i];
-        merge(tmp, a, lo, mid, hi);
-      }
-  }
-*)
-
 end
 
 module NaturalMergesort
 
-(*
-  // returns hi such that a[lo..hi[ is sorted
-  static int findRun(int[] a, int lo) {
-    while (++lo < a.length && a[lo-1] <= a[lo]);
-    return lo;
-  }
+  use import Merge
+  use import mach.int.Int
+  use import int.MinMax
 
+  (* returns hi such that a[lo..hi[ is sorted *)
+  let find_run (a: array elt) (lo: int) : int
+    requires { 0 <= lo < length a }
+    ensures  { lo < result <= length a }
+    ensures  { sorted_sub a lo result }
+  =
+    let i = ref (lo + 1) in
+    while !i < length a && le a[!i - 1] a[!i] do
+      invariant { lo < !i <= length a }
+      invariant { sorted_sub a lo !i }
+      variant   { length a - !i }
+      incr i
+    done;
+    !i
+
+  exception Break
+  exception Return
+
+  let natural_mergesort (a: array elt) : unit
+
+  =
+    let n = length a in
+    let tmp = Array.copy a in
+    try
+    while true do
+      let lo = ref 0 in
+      try
+      while !lo < n - 1 do
+        invariant { 0 <= !lo <= n }
+        variant   { n - !lo }
+        let mid = find_run a !lo in
+        if mid = n then begin if !lo = 0 then raise Return; raise Break end;
+        let hi = find_run a mid in
+        blit a !lo tmp !lo (hi - !lo);
+        merge tmp a !lo mid hi;
+        lo := hi
+      done
+      with Break -> () end
+    done
+    with Return -> () end
+
+(*
   static void naturalMergesort(int[] a) {
     int n = a.length;
     if (n <= 1) return;
