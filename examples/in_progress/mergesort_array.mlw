@@ -4,24 +4,42 @@
     Author: Jean-Christophe Filliâtre (CNRS)
 *)
 
-module Merge
+module Elt
 
   use export int.Int
+  use export array.Array
+
+  type elt
+
+  predicate le elt elt
+
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+
+  predicate sorted_sub (a: array elt) (l u: int) =
+    forall i1 i2 : int. l <= i1 <= i2 < u -> le a[i1] a[i2]
+
+  predicate sorted (a: array elt) =
+    forall i1 i2 : int. 0 <= i1 <= i2 < length a -> le a[i1] a[i2]
+
+end
+
+module Merge
+
+  use export Elt
   use export ref.Refint
   use export array.Array
-  use export array.ArraySorted
   use import map.Occ
   use export array.ArrayPermut
 
   (* merges a1[l..m[ and a1[m..r[ into a2[l..r[ *)
-  let merge (a1 a2: array int) (l m r: int) : unit
+  let merge (a1 a2: array elt) (l m r: int) : unit
     requires { 0 <= l <= m <= r <= length a1 = length a2 }
     requires { sorted_sub a1 l m }
     requires { sorted_sub a1 m r }
     ensures  { sorted_sub a2 l r }
     ensures  { permut a1 a2 l r }
     ensures  { forall i: int.
-               (0 <= i < l \/ r < i < length a2) -> a2[i] = (old a2)[i] }
+               (0 <= i < l \/ r <= i < length a2) -> a2[i] = (old a2)[i] }
   = 'L:
     let i = ref l in
     let j = ref m in
@@ -29,13 +47,13 @@ module Merge
       invariant { l <= !i <= m <= !j <= r }
       invariant { !i - l + !j - m = k - l }
       invariant { sorted_sub a2 l k }
-      invariant { forall x y: int. l <= x < k -> !i <= y < m -> a2[x] <= a1[y] }
-      invariant { forall x y: int. l <= x < k -> !j <= y < r -> a2[x] <= a1[y] }
-      invariant { forall v: int.
+      invariant { forall x y: int. l <= x < k -> !i <= y < m -> le a2[x] a1[y] }
+      invariant { forall x y: int. l <= x < k -> !j <= y < r -> le a2[x] a1[y] }
+      invariant { forall v: elt.
                   occ v a1.elts l !i + occ v a1.elts m !j = occ v a2.elts l k }
       invariant { forall i: int.
-                  (0 <= i < l \/ r < i < length a2) -> a2[i] = (at a2 'L)[i] }
-      if !i < m && (!j = r || a1[!i] <= a1[!j]) then begin
+                  (0 <= i < l \/ r <= i < length a2) -> a2[i] = (at a2 'L)[i] }
+      if !i < m && (!j = r || le a1[!i] a1[!j]) then begin
         a2[k] <- a1[!i];
         incr i
       end else begin
@@ -51,10 +69,11 @@ module TopDownMergesort
   use import Merge
   use import mach.int.Int
 
-  let rec mergesort_rec (a tmp: array int) (l r: int) : unit
+  let rec mergesort_rec (a tmp: array elt) (l r: int) : unit
     requires { 0 <= l <= r <= length a = length tmp }
     ensures { sorted_sub a l r }
     ensures { permut_sub (old a) a l r }
+    variant { r - l }
   = 'L:
     if l < r-1 then begin
       let m = l + (r - l) / 2 in
@@ -71,18 +90,44 @@ module TopDownMergesort
       assert { permut_sub (at a 'N) a l r };
     end
 
-  let mergesort (a: array int) : unit
+  let mergesort (a: array elt) : unit
     ensures { sorted a }
     ensures { permut_all (old a) a }
   =
-    let tmp = Array.make (length a) 0 in
+    let tmp = Array.copy a in
     mergesort_rec a tmp 0 (length a)
 
 end
 
 module BottomUpMergesort
 
+  use import Merge
+  use import mach.int.Int
+  use import int.MinMax
+
 (*
+  let bottom_up_mergesort (a: array elt) : unit
+
+  =
+    let n = length a in
+    let tmp = Array.copy a in
+    let len = ref 1 in
+    while !len < n do
+      invariant { 1 <= !len <= 2 * n }
+      variant   { 2 * n - !len }
+      let lo = ref 0 in
+      while !lo < n - !len do
+        invariant { 0 <= !lo <= n }
+        variant   { n + !len - !lo }
+        let mid = !lo + !len in
+        let hi = min n (mid + !len) in
+        blit a !lo tmp !lo (hi - !lo);
+        merge tmp a !lo mid hi;
+        lo := hi
+      done;
+      len := 2 * !len
+    done
+
   // bottom-up mergesort
   static void bottomUpMergesort(int[] a) {
     int n = a.length;
