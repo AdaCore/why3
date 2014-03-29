@@ -145,6 +145,8 @@ module Mterm : Extmap.S with type key = term
 module Sterm : Extset.S with module M = Mterm
 module Hterm : Exthtbl.S with type key = term
 
+(** term equality modulo alpha-equivalence and location *)
+
 val t_compare : term -> term -> int
 val t_equal : term -> term -> bool
 val t_hash : term -> int
