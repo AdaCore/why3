@@ -1,5 +1,8 @@
 
-(* Sorting a list of integers using mergesort *)
+(** Sorting a list of integers using mergesort
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
 
 module Elt
 
@@ -15,13 +18,14 @@ module Elt
 
 end
 
-module Merge
+module Merge (* : MergeSpec *)
 
-  use export Elt
+  clone export Elt
 
   let rec merge (l1 l2: list elt) : list elt
     requires { sorted l1 /\ sorted l2 }
-    ensures  { sorted result /\ permut result (l1 ++ l2) }
+    ensures  { sorted result }
+    ensures  { permut result (l1 ++ l2) }
     variant  { length l1 + length l2 }
   = match l1, l2 with
     | Nil, _ -> l2
@@ -32,19 +36,25 @@ module Merge
 
 end
 
-(* TODO: proof to be completed
-module EfficientMerge
+(** tail recursive implementation *)
 
-  use export Elt
+module EfficientMerge (* : MergeSpec *)
+
+  clone export Elt
   use import list.Mem
   use import list.Reverse
   use import list.RevAppend
+
+  lemma sorted_reverse_cons:
+    forall acc x1. sorted (reverse acc) ->
+    (forall x. mem x acc -> le x x1) -> sorted (reverse (Cons x1 acc))
 
   let rec merge_aux (acc l1 l2: list elt) : list elt
     requires { sorted (reverse acc) /\ sorted l1 /\ sorted l2 }
     requires { forall x y: elt. mem x acc -> mem y l1 -> le x y }
     requires { forall x y: elt. mem x acc -> mem y l2 -> le x y }
-    ensures  { sorted result /\ permut result (acc ++ l1 ++ l2) }
+    ensures  { sorted result }
+    ensures  { permut result (acc ++ l1 ++ l2) }
     variant  { length l1 + length l2 }
   = match l1, l2 with
     | Nil, _ -> rev_append acc l2
@@ -61,11 +71,10 @@ module EfficientMerge
     merge_aux Nil l1 l2
 
 end
-*)
 
 module Mergesort
 
-  use import Merge
+  clone import Merge
 
   let split (l0: list 'a) : (list 'a, list 'a)
     requires { length l0 >= 2 }

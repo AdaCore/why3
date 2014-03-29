@@ -219,8 +219,17 @@ theory Reverse
     forall l1 l2: list 'a, x: 'a.
     (reverse (Cons x l1)) ++ l2 = (reverse l1) ++ (Cons x l2)
 
+  lemma reverse_cons:
+    forall l: list 'a, x: 'a.
+    reverse (Cons x l) = reverse l ++ Cons x Nil
+
   lemma reverse_reverse:
     forall l: list 'a. reverse (reverse l) = l
+
+  use import Mem
+
+  lemma reverse_mem:
+    forall l: list 'a, x: 'a. mem x l <-> mem x (reverse l)
 
   use import Length
 
@@ -257,6 +266,11 @@ theory RevAppend
   lemma rev_append_length:
     forall s t: list 'a.
       length (rev_append s t) = length s + length t
+
+  use import Reverse
+
+  lemma rev_append_def:
+    forall r s: list 'a. rev_append r s = reverse r ++ s
 
 end
 
@@ -298,6 +312,14 @@ theory Sorted
     forall x: t, l: list t.
     (forall y: t. mem y l -> le x y) /\ sorted l <-> sorted (Cons x l)
 
+  use import Append
+
+  lemma sorted_append:
+    forall l1 l2: list t.
+    sorted l1 -> sorted l2 ->
+    (forall x y: t. mem x l1 -> mem y l2 -> le x y) ->
+    sorted (l1 ++ l2)
+
 end
 
 (** {2 Sorted lists of integers} *)
@@ -338,15 +360,6 @@ theory RevSorted
       Decr.sorted (rev_append s t) <->
         Incr.sorted s /\ Decr.sorted t /\ compat t s
 
-  (*
-  use import Reverse
-
-  lemma rev_sorted_incr:
-    forall s: list t. Incr.sorted (reverse s) <-> Decr.sorted s
-
-  lemma rev_sorted_decr:
-    forall s: list t. Decr.sorted (reverse s) <-> Incr.sorted s
-  *)
 end
 
 (** {2 Number of occurrences in a list} *)
@@ -373,6 +386,12 @@ theory NumOcc
   lemma Append_Num_Occ :
     forall x: 'a, l1 l2: list 'a.
     num_occ x (l1 ++ l2) = num_occ x l1 + num_occ x l2
+
+  use import Reverse
+
+  lemma reverse_num_occ :
+    forall x: 'a, l: list 'a.
+    num_occ x l = num_occ x (reverse l)
 
 end
 

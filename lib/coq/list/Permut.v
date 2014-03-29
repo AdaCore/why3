@@ -7,6 +7,7 @@ Require list.List.
 Require list.Length.
 Require list.Mem.
 Require list.Append.
+Require list.Reverse.
 Require list.NumOcc.
 
 (* Why3 assumption *)

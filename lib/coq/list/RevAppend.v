@@ -7,17 +7,18 @@ Require list.List.
 Require list.Length.
 Require list.Mem.
 Require list.Append.
+Require list.Reverse.
 
 (* Why3 goal *)
-Lemma rev_append_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(list a))
+Lemma rev_append_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(list a))
   (t:(list a)),
   ((Lists.List.rev_append s t) = match s with
   | (Init.Datatypes.cons x r) =>
       (Lists.List.rev_append r (Init.Datatypes.cons x t))
   | Init.Datatypes.nil => t
   end).
-Proof.
-now intros a a_WT [|sh st] t.
+intros a a_WT s t.
+destruct s; simpl; auto.
 Qed.
 
 (* Why3 goal *)
@@ -59,5 +60,17 @@ rewrite IHs.
 change (Length.length (sh :: t)) with (1 + Length.length t)%Z.
 change (Length.length (sh :: st)) with (1 + Length.length st)%Z.
 ring.
+Qed.
+
+(* Why3 goal *)
+Lemma rev_append_def : forall {a:Type} {a_WT:WhyType a}, forall (r:(list a))
+  (s:(list a)),
+  ((Lists.List.rev_append r s) = (Init.Datatypes.app (Lists.List.rev r) s)).
+Proof.
+induction r; simpl.
+now auto.
+intro s; rewrite IHr.
+rewrite <- Append.Append_assoc.
+simpl. reflexivity.
 Qed.
 

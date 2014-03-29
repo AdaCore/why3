@@ -30,11 +30,35 @@ now rewrite <- List.app_assoc.
 Qed.
 
 (* Why3 goal *)
+Lemma reverse_cons : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a))
+  (x:a),
+  ((Lists.List.rev (Init.Datatypes.cons x l)) = (Init.Datatypes.app (Lists.List.rev l) (Init.Datatypes.cons x Init.Datatypes.nil))).
+intros a a_WT l x.
+simpl.
+auto.
+Qed.
+
+(* Why3 goal *)
 Lemma reverse_reverse : forall {a:Type} {a_WT:WhyType a},
   forall (l:(list a)), ((Lists.List.rev (Lists.List.rev l)) = l).
 Proof.
 intros a a_WT l.
 apply List.rev_involutive.
+Qed.
+
+(* Why3 goal *)
+Lemma reverse_mem : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a))
+  (x:a), (list.Mem.mem x l) <-> (list.Mem.mem x (Lists.List.rev l)).
+intros a a_WT l x.
+induction l; simpl; intuition.
+rewrite Append.mem_append.
+right; simpl; now intuition.
+rewrite Append.mem_append.
+now auto.
+assert (Mem.mem x (List.rev l) \/ Mem.mem x (a0 :: nil))%list.
+rewrite <- Append.mem_append; assumption.
+intuition; simpl in *.
+intuition.
 Qed.
 
 (* Why3 goal *)
