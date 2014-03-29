@@ -1,8 +1,10 @@
 
-(** Sorting arrays using mergesort
+(** {1 Sorting arrays using mergesort}
 
     Author: Jean-Christophe Filliâtre (CNRS)
 *)
+
+(** {2 Parameters} *)
 
 module Elt
 
@@ -19,9 +21,16 @@ module Elt
 
 end
 
+(** {2 Merging}
+
+    It is well-known than merging sub-arrays in-place is extremely difficult
+    (we don't even know how to do it in linear time).
+    So we use some extra storage i.e. we merge two segments of a first array
+    into a second array. *)
+
 module Merge
 
-  use export Elt
+  clone export Elt
   use export ref.Refint
   use export array.Array
   use import map.Occ
@@ -80,9 +89,13 @@ module Merge
 
 end
 
+(** {2 Top-down, recursive mergesort}
+
+    Split in equal halves, recursively sort the two, and then merge. *)
+
 module TopDownMergesort
 
-  use import Merge
+  clone import Merge
   use import mach.int.Int
 
   let rec mergesort_rec (a tmp: array elt) (l r: int) : unit
@@ -111,38 +124,94 @@ module TopDownMergesort
 
 end
 
+(** {2 Bottom-up, iterative mergesort}
+
+    First sort segments of length 1, then of length 2, then of length 4, etc.
+    until the array is sorted.
+
+    Surprisingly, the proof is much more complex than for natural mergesort
+    (see below). *)
+
 module BottomUpMergesort
 
-  use import Merge
+  clone import Merge
   use import mach.int.Int
   use import int.MinMax
 
   let bottom_up_mergesort (a: array elt) : unit
-
-  =
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
+  = 'I:
     let n = length a in
     let tmp = Array.copy a in
     let len = ref 1 in
     while !len < n do
       invariant { 1 <= !len }
+      invariant { permut_all (at a 'I) a }
+      invariant { forall k: int. let l = k * !len in
+                  0 <= l < n -> sorted_sub a l (min n (l + !len)) }
       variant   { 2 * n - !len }
+      'L:
       let lo = ref 0 in
+      let ghost i = ref 0 in
       while !lo < n - !len do
-        invariant { 0 <= !lo <= n }
+        invariant { 0 <= !lo /\ !lo = 2 * !i * !len }
+        invariant { permut_all (at a 'L) a }
+        invariant { forall k: int. let l = k * !len in
+                    !lo <= l < n -> sorted_sub a l (min n (l + !len)) }
+        invariant { forall k: int. let l = k * (2 * !len) in
+                    0 <= l < !lo -> sorted_sub a l (min n (l + 2 * !len)) }
         variant   { n + !len - !lo }
         let mid = !lo + !len in
+        assert { mid = (2 * !i + 1) * !len };
+        assert { sorted_sub a !lo (min n (!lo + !len)) };
         let hi = min n (mid + !len) in
+        assert { sorted_sub a mid (min n (mid + !len)) };
+        'M:
         merge_using tmp a !lo mid hi;
-        lo := hi
+        assert { permut_sub (at a 'M) a !lo hi };
+        assert { permut_all (at a 'M) a };
+        assert { hi = min n (!lo + 2 * !len) };
+        assert { sorted_sub a !lo (min n (!lo + 2 * !len)) };
+        assert { forall k: int. let l = k * !len in mid + !len <= l < n ->
+                   sorted_sub (at a 'M) l (min n (l + !len)) &&
+                   sorted_sub a         l (min n (l + !len)) };
+        assert { forall k: int. let l = k * (2 * !len) in 0 <= l < mid + !len ->
+                   k <= !i &&
+                   (k < !i ->
+                     min n (l + 2 * !len) <= !lo &&
+                     sorted_sub (at a 'M) l (min n (l + 2 * !len)) &&
+                     sorted_sub a         l (min n (l + 2 * !len)) )
+                   &&
+                   (k = !i ->
+                     l = !lo /\ sorted_sub a         l (min n (l + 2 * !len)))
+               };
+        lo := mid + !len;
+        ghost incr i
       done;
-      len := 2 * !len
-    done
+      assert { forall k: int. let l = k * (2 * !len) in 0 <= l < n ->
+               l = (k * 2) * !len &&
+               (l < !lo ->
+                 sorted_sub a l (min n (l + 2 * !len))) &&
+               (l >= !lo ->
+                 sorted_sub a l (min n (l + !len)) &&
+                 min n (l + 2 * !len) = min n (l + !len) = n &&
+                 sorted_sub a l (min n (l + 2 * !len))) };
+      len := 2 * !len;
+    done;
+    assert { sorted_sub a (0 * !len) (min n (0 + !len)) }
 
 end
 
+(** {2 Natural mergesort}
+
+    This is a mere variant of bottom-up mergesort above, where
+    we start with ascending runs (i.e. segments that are already sorted)
+    instead of starting with single elements. *)
+
 module NaturalMergesort
 
-  use import Merge
+  clone import Merge
   use import mach.int.Int
   use import int.MinMax
 
@@ -166,25 +235,35 @@ module NaturalMergesort
   exception Return
 
   let natural_mergesort (a: array elt) : unit
-
-  =
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
+  = 'I:
     let n = length a in
+    if n >= 2 then
     let tmp = Array.copy a in
     let ghost first_run = ref 0 in
     try
     while true do
-      (* invariant { 0 <= !first_run && sorted_sub a 0 !first_run } *)
+      invariant { 0 <= !first_run <= n && sorted_sub a 0 !first_run }
+      invariant { permut_all (at a 'I) a }
       variant   { n - !first_run }
+      'L:
       let lo = ref 0 in
       try
       while !lo < n - 1 do
         invariant { 0 <= !lo <= n }
-        (* invariant { 0 <= !first_run && sorted_sub a 0 !first_run } *)
+        invariant { at !first_run 'L <= !first_run <= n }
+        invariant { sorted_sub a 0 !first_run }
+        invariant { !lo = 0 \/ !lo >= !first_run > at !first_run 'L }
+        invariant { permut_all (at a 'L) a }
         variant   { n - !lo }
         let mid = find_run a !lo in
         if mid = n then begin if !lo = 0 then raise Return; raise Break end;
         let hi = find_run a mid in
+        'M:
         merge_using tmp a !lo mid hi;
+        assert { permut_sub (at a 'M) a !lo hi };
+        assert { permut_all (at a 'M) a };
         ghost if !lo = 0 then first_run := hi;
         lo := hi;
       done

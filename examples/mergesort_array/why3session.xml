@@ -8,44 +8,52 @@
  <prover
   id="1"
   name="CVC3"
-  version="2.4.1"/>
+  version="2.2"/>
  <prover
   id="2"
-  name="CVC4"
-  version="1.2"/>
+  name="CVC3"
+  version="2.4.1"/>
  <prover
   id="3"
   name="CVC4"
-  version="1.3"/>
+  version="1.2"/>
  <prover
   id="4"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="5"
+  name="Coq"
+  version="8.4pl2"/>
+ <prover
+  id="6"
   name="Z3"
   version="3.2"/>
  <prover
-  id="5"
+  id="7"
   name="Z3"
   version="4.3.1"/>
  <file
   name="../mergesort_array.mlw"
-  verified="false"
-  expanded="true">
+  verified="true"
+  expanded="false">
   <theory
    name="Elt"
    locfile="../mergesort_array.mlw"
-   loclnum="7" loccnumb="7" loccnume="10"
+   loclnum="9" loccnumb="7" loccnume="10"
    verified="true"
    expanded="false">
   </theory>
   <theory
    name="Merge"
    locfile="../mergesort_array.mlw"
-   loclnum="22" loccnumb="7" loccnume="12"
+   loclnum="31" loccnumb="7" loccnume="12"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter merge"
     locfile="../mergesort_array.mlw"
-    loclnum="31" loccnumb="6" loccnume="11"
+    loclnum="40" loccnumb="6" loccnume="11"
     expl="VC for merge"
     sum="36627c8c2269819a8081c1ee0c3e63ad"
     proved="true"
@@ -60,7 +68,7 @@
      <goal
       name="WP_parameter merge.1"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="1. postcondition"
       sum="7501ffaa2be534126858ab00f339687f"
       proved="true"
@@ -80,7 +88,7 @@
      <goal
       name="WP_parameter merge.2"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="2. postcondition"
       sum="5a4f0831e4388b5641e3bd3f90494b54"
       proved="true"
@@ -100,7 +108,7 @@
      <goal
       name="WP_parameter merge.3"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="3. loop invariant init"
       sum="5b52881bc003b0d69cd050c3a55e5634"
       proved="true"
@@ -120,7 +128,7 @@
      <goal
       name="WP_parameter merge.4"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="4. loop invariant init"
       sum="8b7f3dc24b0d880777d6bcd37caa6c11"
       proved="true"
@@ -140,7 +148,7 @@
      <goal
       name="WP_parameter merge.5"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="5. loop invariant init"
       sum="a1cf28c2d872217813fcc1e5a064339e"
       proved="true"
@@ -160,7 +168,7 @@
      <goal
       name="WP_parameter merge.6"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="6. loop invariant init"
       sum="1c16c8770b803ff0542e505c39f922d9"
       proved="true"
@@ -180,7 +188,7 @@
      <goal
       name="WP_parameter merge.7"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="7. loop invariant init"
       sum="58546d8cd49bc8fa4dbf17e91ce6d1b5"
       proved="true"
@@ -200,7 +208,7 @@
      <goal
       name="WP_parameter merge.8"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="8. loop invariant init"
       sum="2175e287f715a1b84fda7abb9d9c5b30"
       proved="true"
@@ -220,7 +228,7 @@
      <goal
       name="WP_parameter merge.9"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="9. index in array bounds"
       sum="863e79284263a6b7130a956f44974d4a"
       proved="true"
@@ -240,7 +248,7 @@
      <goal
       name="WP_parameter merge.10"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="10. type invariant"
       sum="09adc095171d1c2dfce9eaed053cfa68"
       proved="true"
@@ -260,7 +268,7 @@
      <goal
       name="WP_parameter merge.11"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="11. index in array bounds"
       sum="58803abd5b02ccffadc2461b5727599a"
       proved="true"
@@ -280,7 +288,7 @@
      <goal
       name="WP_parameter merge.12"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="12. loop invariant preservation"
       sum="817fe4f6bf3e50c51945d893c3a5f3a8"
       proved="true"
@@ -300,7 +308,7 @@
      <goal
       name="WP_parameter merge.13"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="13. loop invariant preservation"
       sum="cbbb7482c5259597adbf4f96ba62b7d6"
       proved="true"
@@ -320,7 +328,7 @@
      <goal
       name="WP_parameter merge.14"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="14. loop invariant preservation"
       sum="9d5cd168c973311b9bc14e6d6ab680e1"
       proved="true"
@@ -329,7 +337,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="30"
        memlimit="1000"
        obsolete="false"
@@ -340,7 +348,7 @@
      <goal
       name="WP_parameter merge.15"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="15. loop invariant preservation"
       sum="ecc5f116db0f63c704a22ae23ba8a4f8"
       proved="true"
@@ -349,7 +357,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="30"
        memlimit="1000"
        obsolete="false"
@@ -360,7 +368,7 @@
      <goal
       name="WP_parameter merge.16"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="16. loop invariant preservation"
       sum="98835d6e7adc72b4820aef1ca481bb38"
       proved="true"
@@ -380,7 +388,7 @@
      <goal
       name="WP_parameter merge.17"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="17. loop invariant preservation"
       sum="ed11100c424dd54a77b63954acee3a93"
       proved="true"
@@ -389,7 +397,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="1"
+       prover="2"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
@@ -400,7 +408,7 @@
      <goal
       name="WP_parameter merge.18"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="18. loop invariant preservation"
       sum="418e500bdb01a8e503a866e9fbdb1fb4"
       proved="true"
@@ -420,7 +428,7 @@
      <goal
       name="WP_parameter merge.19"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="19. index in array bounds"
       sum="3fe0008e38f83fa2ae72aaab8377b48a"
       proved="true"
@@ -440,7 +448,7 @@
      <goal
       name="WP_parameter merge.20"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="20. index in array bounds"
       sum="5ba610ebee5e632a0db9a9f42a2360b4"
       proved="true"
@@ -460,7 +468,7 @@
      <goal
       name="WP_parameter merge.21"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="21. index in array bounds"
       sum="a9e12e0643e0c90d91d31c5c90a09313"
       proved="true"
@@ -480,7 +488,7 @@
      <goal
       name="WP_parameter merge.22"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="22. type invariant"
       sum="464779ee1e41abda50b36d34fb7403ad"
       proved="true"
@@ -500,7 +508,7 @@
      <goal
       name="WP_parameter merge.23"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="23. index in array bounds"
       sum="564e496f6cc7ef4ebaac7ee07fd2fd11"
       proved="true"
@@ -520,7 +528,7 @@
      <goal
       name="WP_parameter merge.24"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="24. loop invariant preservation"
       sum="60b6fb15d102b00db8e1dd9323447b99"
       proved="true"
@@ -540,7 +548,7 @@
      <goal
       name="WP_parameter merge.25"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="25. loop invariant preservation"
       sum="c6dbc334959e5fbb5c19be7fef5f205b"
       proved="true"
@@ -560,7 +568,7 @@
      <goal
       name="WP_parameter merge.26"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="26. loop invariant preservation"
       sum="7c75e3439739c0786873c5285f0fb7d3"
       proved="true"
@@ -569,7 +577,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="30"
        memlimit="1000"
        obsolete="false"
@@ -580,7 +588,7 @@
      <goal
       name="WP_parameter merge.27"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="27. loop invariant preservation"
       sum="0000d97b79f5b31c33dc4e771f445b00"
       proved="true"
@@ -589,7 +597,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="30"
        memlimit="1000"
        obsolete="false"
@@ -600,7 +608,7 @@
      <goal
       name="WP_parameter merge.28"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="28. loop invariant preservation"
       sum="438641aba61b6c98c1961899283981ce"
       proved="true"
@@ -609,7 +617,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="2"
+       prover="3"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -620,7 +628,7 @@
      <goal
       name="WP_parameter merge.29"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="29. loop invariant preservation"
       sum="116ac9fb62c2aa8ecbfc015a4bcd8e8a"
       proved="true"
@@ -629,7 +637,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="4"
+       prover="6"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -640,7 +648,7 @@
      <goal
       name="WP_parameter merge.30"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="30. loop invariant preservation"
       sum="f5a65dc8fdf4b61dbd9f72da0efea89e"
       proved="true"
@@ -660,7 +668,7 @@
      <goal
       name="WP_parameter merge.31"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="31. index in array bounds"
       sum="97289d08c781ef529bcb32d48190471a"
       proved="true"
@@ -680,7 +688,7 @@
      <goal
       name="WP_parameter merge.32"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="32. type invariant"
       sum="b50e46fef021244a9f4dbabf2bd09f3c"
       proved="true"
@@ -700,7 +708,7 @@
      <goal
       name="WP_parameter merge.33"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="33. index in array bounds"
       sum="a5286955a9b614ff4a534f9f9dadb2d1"
       proved="true"
@@ -720,7 +728,7 @@
      <goal
       name="WP_parameter merge.34"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="34. loop invariant preservation"
       sum="de450c45bc8264c9b1cb0545f0958d9e"
       proved="true"
@@ -740,7 +748,7 @@
      <goal
       name="WP_parameter merge.35"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="35. loop invariant preservation"
       sum="a90311543711319a94ef3422bbf1356f"
       proved="true"
@@ -760,7 +768,7 @@
      <goal
       name="WP_parameter merge.36"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="36. loop invariant preservation"
       sum="51839763ee62a5cdb0ddffec708dea85"
       proved="true"
@@ -769,7 +777,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="30"
        memlimit="1000"
        obsolete="false"
@@ -780,7 +788,7 @@
      <goal
       name="WP_parameter merge.37"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="37. loop invariant preservation"
       sum="56764381b13361e03238a7a636da3eeb"
       proved="true"
@@ -789,7 +797,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="2"
+       prover="3"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -797,7 +805,7 @@
        <result status="valid" time="0.07"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -808,7 +816,7 @@
      <goal
       name="WP_parameter merge.38"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="38. loop invariant preservation"
       sum="966dad44c007f9af37f7a9cec8078a79"
       proved="true"
@@ -817,7 +825,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="30"
        memlimit="1000"
        obsolete="false"
@@ -828,7 +836,7 @@
      <goal
       name="WP_parameter merge.39"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="39. loop invariant preservation"
       sum="fd20303f1e4ae854667592a9e2b69f29"
       proved="true"
@@ -837,7 +845,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="1"
+       prover="2"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
@@ -848,7 +856,7 @@
      <goal
       name="WP_parameter merge.40"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="40. loop invariant preservation"
       sum="88e0f9a47bac93853b80cc61e87cf3e7"
       proved="true"
@@ -868,7 +876,7 @@
      <goal
       name="WP_parameter merge.41"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="41. index in array bounds"
       sum="84dfc0951bd9f8fdf1a386fe96f95d73"
       proved="true"
@@ -888,7 +896,7 @@
      <goal
       name="WP_parameter merge.42"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="42. type invariant"
       sum="e6b374cd4a3646d7985525e7ff29b1c7"
       proved="true"
@@ -908,7 +916,7 @@
      <goal
       name="WP_parameter merge.43"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="43. index in array bounds"
       sum="915c4f692e2fbce629997fc9ed0672b6"
       proved="true"
@@ -928,7 +936,7 @@
      <goal
       name="WP_parameter merge.44"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="44. loop invariant preservation"
       sum="067574e93db0c075d7fc575e117f8286"
       proved="true"
@@ -948,7 +956,7 @@
      <goal
       name="WP_parameter merge.45"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="45. loop invariant preservation"
       sum="19b30a672d2dd40a9d3d8626883bdde6"
       proved="true"
@@ -968,7 +976,7 @@
      <goal
       name="WP_parameter merge.46"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="46. loop invariant preservation"
       sum="4727afc851b42ae5b77e0cc4d48ab756"
       proved="true"
@@ -977,7 +985,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="30"
        memlimit="1000"
        obsolete="false"
@@ -988,7 +996,7 @@
      <goal
       name="WP_parameter merge.47"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="47. loop invariant preservation"
       sum="e4844ed905389f162f25364ffd42c6b7"
       proved="true"
@@ -1008,7 +1016,7 @@
      <goal
       name="WP_parameter merge.48"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="48. loop invariant preservation"
       sum="20a30f674b63c049d2ed076065d2503a"
       proved="true"
@@ -1017,7 +1025,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="3"
+       prover="4"
        timelimit="30"
        memlimit="1000"
        obsolete="false"
@@ -1028,7 +1036,7 @@
      <goal
       name="WP_parameter merge.49"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="49. loop invariant preservation"
       sum="ca32122f3daffb5973c87635f6537b10"
       proved="true"
@@ -1037,7 +1045,7 @@
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="1"
+       prover="2"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
@@ -1048,7 +1056,7 @@
      <goal
       name="WP_parameter merge.50"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="50. loop invariant preservation"
       sum="992d7ddefc6bba1391305049bf823565"
       proved="true"
@@ -1068,7 +1076,7 @@
      <goal
       name="WP_parameter merge.51"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="51. type invariant"
       sum="d85d4c13b6423f5162422d48e0884009"
       proved="true"
@@ -1088,7 +1096,7 @@
      <goal
       name="WP_parameter merge.52"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="52. postcondition"
       sum="4d6eb00e0b6f5c425697b15021fbb716"
       proved="true"
@@ -1108,7 +1116,7 @@
      <goal
       name="WP_parameter merge.53"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="53. postcondition"
       sum="791a70faa1ce4148be8ff5877a252d17"
       proved="true"
@@ -1123,7 +1131,7 @@
        <goal
         name="WP_parameter merge.53.1"
         locfile="../mergesort_array.mlw"
-        loclnum="31" loccnumb="6" loccnume="11"
+        loclnum="40" loccnumb="6" loccnume="11"
         expl="1. postcondition"
         sum="c8f0d6829c3b3831653394e3c701ad2c"
         proved="true"
@@ -1138,7 +1146,7 @@
          <goal
           name="WP_parameter merge.53.1.1"
           locfile="../mergesort_array.mlw"
-          loclnum="31" loccnumb="6" loccnume="11"
+          loclnum="40" loccnumb="6" loccnume="11"
           expl="1."
           sum="807adb82444bd2119a51fe36a639224f"
           proved="true"
@@ -1158,7 +1166,7 @@
          <goal
           name="WP_parameter merge.53.1.2"
           locfile="../mergesort_array.mlw"
-          loclnum="31" loccnumb="6" loccnume="11"
+          loclnum="40" loccnumb="6" loccnume="11"
           expl="2."
           sum="59713827548e2baac75be5b443bb049c"
           proved="true"
@@ -1178,7 +1186,7 @@
          <goal
           name="WP_parameter merge.53.1.3"
           locfile="../mergesort_array.mlw"
-          loclnum="31" loccnumb="6" loccnume="11"
+          loclnum="40" loccnumb="6" loccnume="11"
           expl="3."
           sum="05d5663342ed0d0d13a50a976ac98395"
           proved="true"
@@ -1198,7 +1206,7 @@
          <goal
           name="WP_parameter merge.53.1.4"
           locfile="../mergesort_array.mlw"
-          loclnum="31" loccnumb="6" loccnume="11"
+          loclnum="40" loccnumb="6" loccnume="11"
           expl="4."
           sum="f4928b4d32e94498d32b812e56eeaed6"
           proved="true"
@@ -1218,7 +1226,7 @@
          <goal
           name="WP_parameter merge.53.1.5"
           locfile="../mergesort_array.mlw"
-          loclnum="31" loccnumb="6" loccnume="11"
+          loclnum="40" loccnumb="6" loccnume="11"
           expl="5."
           sum="8a8bcc641209753272cf90caca82bba1"
           proved="true"
@@ -1238,7 +1246,7 @@
          <goal
           name="WP_parameter merge.53.1.6"
           locfile="../mergesort_array.mlw"
-          loclnum="31" loccnumb="6" loccnume="11"
+          loclnum="40" loccnumb="6" loccnume="11"
           expl="6."
           sum="eec0c1eac4befc69b0de69ce6b2cd023"
           proved="true"
@@ -1247,7 +1255,7 @@
           <label
            name="expl:VC for merge"/>
           <proof
-           prover="5"
+           prover="7"
            timelimit="40"
            memlimit="1000"
            obsolete="false"
@@ -1262,7 +1270,7 @@
      <goal
       name="WP_parameter merge.54"
       locfile="../mergesort_array.mlw"
-      loclnum="31" loccnumb="6" loccnume="11"
+      loclnum="40" loccnumb="6" loccnume="11"
       expl="54. postcondition"
       sum="7bbb30228d7286134337256b7e1593aa"
       proved="true"
@@ -1284,7 +1292,7 @@
    <goal
     name="WP_parameter merge_using"
     locfile="../mergesort_array.mlw"
-    loclnum="62" loccnumb="6" loccnume="17"
+    loclnum="71" loccnumb="6" loccnume="17"
     expl="VC for merge_using"
     sum="c5e147179b1be4037fddfe9371e24d4f"
     proved="true"
@@ -1299,7 +1307,7 @@
      <goal
       name="WP_parameter merge_using.1"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="1. index in array bounds"
       sum="af1010c569baf2a2e9e11bb0910d1fa1"
       proved="true"
@@ -1319,7 +1327,7 @@
      <goal
       name="WP_parameter merge_using.2"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="2. index in array bounds"
       sum="e066e33eadfc58963597af4f4ae5352c"
       proved="true"
@@ -1339,7 +1347,7 @@
      <goal
       name="WP_parameter merge_using.3"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="3. assertion"
       sum="417a50721dc2d700680a1271cf83a30c"
       proved="true"
@@ -1356,7 +1364,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="2"
+       prover="3"
        timelimit="20"
        memlimit="1000"
        obsolete="false"
@@ -1364,7 +1372,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="3"
+       prover="4"
        timelimit="20"
        memlimit="1000"
        obsolete="false"
@@ -1375,7 +1383,7 @@
      <goal
       name="WP_parameter merge_using.4"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="4. postcondition"
       sum="bb49acd20d605e658d666b88505c696b"
       proved="true"
@@ -1395,7 +1403,7 @@
      <goal
       name="WP_parameter merge_using.5"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="5. postcondition"
       sum="44ed993ecbc3d70a40c678db76dda086"
       proved="true"
@@ -1415,7 +1423,7 @@
      <goal
       name="WP_parameter merge_using.6"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="6. precondition"
       sum="24930ad4f9fcc2ec458dd16ea22be5cf"
       proved="true"
@@ -1435,7 +1443,7 @@
      <goal
       name="WP_parameter merge_using.7"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="7. precondition"
       sum="47946b8ff967d2220053f1f6c80932d7"
       proved="true"
@@ -1455,7 +1463,7 @@
      <goal
       name="WP_parameter merge_using.8"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="8. precondition"
       sum="c38d2a23046fed23d75adec731ae9079"
       proved="true"
@@ -1475,7 +1483,7 @@
      <goal
       name="WP_parameter merge_using.9"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="9. precondition"
       sum="2db760b57585469542c0681b1470a2d1"
       proved="true"
@@ -1495,7 +1503,7 @@
      <goal
       name="WP_parameter merge_using.10"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="10. precondition"
       sum="85ea90e2571e16c64d55392763413fd8"
       proved="true"
@@ -1515,7 +1523,7 @@
      <goal
       name="WP_parameter merge_using.11"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="11. assertion"
       sum="a683f2f4965919f26874af851359d164"
       proved="true"
@@ -1530,7 +1538,7 @@
        <goal
         name="WP_parameter merge_using.11.1"
         locfile="../mergesort_array.mlw"
-        loclnum="62" loccnumb="6" loccnume="17"
+        loclnum="71" loccnumb="6" loccnume="17"
         expl="1. assertion"
         sum="7baada231633d4a03e49e51ab81bbac1"
         proved="true"
@@ -1545,7 +1553,7 @@
          <goal
           name="WP_parameter merge_using.11.1.1"
           locfile="../mergesort_array.mlw"
-          loclnum="62" loccnumb="6" loccnume="17"
+          loclnum="71" loccnumb="6" loccnume="17"
           expl="1."
           sum="3356a534c03d18eb5ca841741ea9b97a"
           proved="true"
@@ -1565,7 +1573,7 @@
          <goal
           name="WP_parameter merge_using.11.1.2"
           locfile="../mergesort_array.mlw"
-          loclnum="62" loccnumb="6" loccnume="17"
+          loclnum="71" loccnumb="6" loccnume="17"
           expl="2."
           sum="1b3d2b65fa418abfa1b14f38655a3279"
           proved="true"
@@ -1574,7 +1582,7 @@
           <label
            name="expl:VC for merge_using"/>
           <proof
-           prover="3"
+           prover="4"
            timelimit="20"
            memlimit="1000"
            obsolete="false"
@@ -1585,7 +1593,7 @@
          <goal
           name="WP_parameter merge_using.11.1.3"
           locfile="../mergesort_array.mlw"
-          loclnum="62" loccnumb="6" loccnume="17"
+          loclnum="71" loccnumb="6" loccnume="17"
           expl="3."
           sum="3436fee073aa467e8c015494fbefd290"
           proved="true"
@@ -1609,7 +1617,7 @@
      <goal
       name="WP_parameter merge_using.12"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="12. postcondition"
       sum="665fa1a951d2c0d544be4541e4e77042"
       proved="true"
@@ -1629,7 +1637,7 @@
      <goal
       name="WP_parameter merge_using.13"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="13. postcondition"
       sum="fa6af9e3c58ccb4d766298386f146927"
       proved="true"
@@ -1649,7 +1657,7 @@
      <goal
       name="WP_parameter merge_using.14"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="14. postcondition"
       sum="ec5ba907d5266521ffe09db6d40e9eac"
       proved="true"
@@ -1669,7 +1677,7 @@
      <goal
       name="WP_parameter merge_using.15"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="15. postcondition"
       sum="b5971d194cc0403956911a3abee8698a"
       proved="true"
@@ -1689,7 +1697,7 @@
      <goal
       name="WP_parameter merge_using.16"
       locfile="../mergesort_array.mlw"
-      loclnum="62" loccnumb="6" loccnume="17"
+      loclnum="71" loccnumb="6" loccnume="17"
       expl="16. postcondition"
       sum="c1ec4a33329a8daf6f09ba3a717a20c3"
       proved="true"
@@ -1712,13 +1720,13 @@
   <theory
    name="TopDownMergesort"
    locfile="../mergesort_array.mlw"
-   loclnum="83" loccnumb="7" loccnume="23"
+   loclnum="96" loccnumb="7" loccnume="23"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter mergesort_rec"
     locfile="../mergesort_array.mlw"
-    loclnum="88" loccnumb="10" loccnume="23"
+    loclnum="101" loccnumb="10" loccnume="23"
     expl="VC for mergesort_rec"
     sum="c726fa2ac6bd734b1ff02e8a2928d855"
     proved="true"
@@ -1733,7 +1741,7 @@
      <goal
       name="WP_parameter mergesort_rec.1"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="1. division by zero"
       sum="171f13b5f6bcd7bc49f61a42bf09c35a"
       proved="true"
@@ -1753,7 +1761,7 @@
      <goal
       name="WP_parameter mergesort_rec.2"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="2. assertion"
       sum="6a1ce6075fce38bd3c153801d5b54b00"
       proved="true"
@@ -1773,7 +1781,7 @@
      <goal
       name="WP_parameter mergesort_rec.3"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="3. variant decrease"
       sum="095b838ad3ef8e07819299bea5ecb532"
       proved="true"
@@ -1793,7 +1801,7 @@
      <goal
       name="WP_parameter mergesort_rec.4"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="4. precondition"
       sum="758b9374ef9a0711f00a03f34669d260"
       proved="true"
@@ -1813,7 +1821,7 @@
      <goal
       name="WP_parameter mergesort_rec.5"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="5. assertion"
       sum="4d1704a7ded72a426a538def2ee2c77e"
       proved="true"
@@ -1833,7 +1841,7 @@
      <goal
       name="WP_parameter mergesort_rec.6"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="6. variant decrease"
       sum="7078bc0c332602071f18143b6f96d251"
       proved="true"
@@ -1853,7 +1861,7 @@
      <goal
       name="WP_parameter mergesort_rec.7"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="7. precondition"
       sum="63d955e1f164b5faa118bc954e3de2b3"
       proved="true"
@@ -1873,7 +1881,7 @@
      <goal
       name="WP_parameter mergesort_rec.8"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="8. assertion"
       sum="1715e231fc7797598011ae67261274ef"
       proved="true"
@@ -1893,7 +1901,7 @@
      <goal
       name="WP_parameter mergesort_rec.9"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="9. precondition"
       sum="bd49dc8e7ca1d612e28c2e8d0a2429dd"
       proved="true"
@@ -1913,7 +1921,7 @@
      <goal
       name="WP_parameter mergesort_rec.10"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="10. precondition"
       sum="09aa1ac5b88a9c4004b479db77652802"
       proved="true"
@@ -1933,7 +1941,7 @@
      <goal
       name="WP_parameter mergesort_rec.11"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="11. precondition"
       sum="6ecc95189ac8c8e3bc3656c914834b27"
       proved="true"
@@ -1953,7 +1961,7 @@
      <goal
       name="WP_parameter mergesort_rec.12"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="12. postcondition"
       sum="a34ea5edc61ba8e84bf4583f0d3db685"
       proved="true"
@@ -1973,7 +1981,7 @@
      <goal
       name="WP_parameter mergesort_rec.13"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="13. postcondition"
       sum="4bc03587bca23ba1beec16d95dc39714"
       proved="true"
@@ -1993,7 +2001,7 @@
      <goal
       name="WP_parameter mergesort_rec.14"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="14. postcondition"
       sum="386e7bd6d9e7ce20b8753e8a083e0cfb"
       proved="true"
@@ -2013,7 +2021,7 @@
      <goal
       name="WP_parameter mergesort_rec.15"
       locfile="../mergesort_array.mlw"
-      loclnum="88" loccnumb="10" loccnume="23"
+      loclnum="101" loccnumb="10" loccnume="23"
       expl="15. postcondition"
       sum="a52e05a632b285e8228ac99f23b6f5bf"
       proved="true"
@@ -2035,7 +2043,7 @@
    <goal
     name="WP_parameter mergesort"
     locfile="../mergesort_array.mlw"
-    loclnum="105" loccnumb="6" loccnume="15"
+    loclnum="118" loccnumb="6" loccnume="15"
     expl="VC for mergesort"
     sum="66f6c7a61497862255976076dc91f1fa"
     proved="true"
@@ -2056,33 +2064,33 @@
   <theory
    name="BottomUpMergesort"
    locfile="../mergesort_array.mlw"
-   loclnum="114" loccnumb="7" loccnume="24"
-   verified="false"
-   expanded="true">
+   loclnum="132" loccnumb="7" loccnume="24"
+   verified="true"
+   expanded="false">
    <goal
     name="WP_parameter bottom_up_mergesort"
     locfile="../mergesort_array.mlw"
-    loclnum="120" loccnumb="6" loccnume="25"
+    loclnum="138" loccnumb="6" loccnume="25"
     expl="VC for bottom_up_mergesort"
-    sum="2398b1698f075f603f6d5770198f5d18"
-    proved="false"
-    expanded="true"
-    shape="iainfix &lt;=c0V0iainfix &lt;ainfix -ainfix *c2V0V8ainfix -ainfix *c2V0V4Aainfix &lt;=c0ainfix -ainfix *c2V0V4Aainfix &lt;=c1V8Iainfix =V8ainfix *c2V4Fainfix &lt;ainfix -ainfix +V0V4V13ainfix -ainfix +V0V4V5Aainfix &lt;=c0ainfix -ainfix +V0V4V5Aainfix &lt;=V13V0Aainfix &lt;=c0V13Iainfix =V13V10FIainfix =agetV11V14agetV6V14Iainfix &lt;V14V0Aainfix &lt;=V10V14Oainfix &lt;V14V5Aainfix &lt;=c0V14FAapermutV7V12V5V10Aasorted_subV12V5V10Aainfix &lt;=c0V0Aainfix &lt;=c0V2Lamk arrayV0V11FAasorted_subV7V9V10Aasorted_subV7V5V9Aainfix =V2V0Aainfix &lt;=V10V2Aainfix &lt;=V9V10Aainfix &lt;=V5V9Aainfix &lt;=c0V5Aainfix &lt;=c0V0Aainfix &lt;=c0V2LaminV0ainfix +V9V4Lainfix +V5V4ainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FAainfix &lt;=c0V0Aainfix &lt;=c0c0ainfix &lt;V4V0Iainfix &lt;=c1V4FAainfix &lt;=c1c1Iainfix =agetV3V15agetV1V15Iainfix &lt;V15V2Aainfix &lt;=c0V15FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+    sum="0e5c2afbbf87a5bb2a3d18fc84dd4fba"
+    proved="true"
+    expanded="false"
+    shape="iapermut_allV2V7AasortedV7Aainfix &lt;=c0V0Aasorted_subV7ainfix *c0V5aminV0ainfix +c0V5iainfix &lt;ainfix -ainfix *c2V0V12ainfix -ainfix *c2V0V5Aainfix &lt;=c0ainfix -ainfix *c2V0V5Aasorted_subV11V14aminV0ainfix +V14V12Iainfix &lt;V14V0Aainfix &lt;=c0V14Lainfix *V13V12FAapermut_allV2V11Aainfix &lt;=c1V12Iainfix =V12ainfix *c2V5FAasorted_subV11V16aminV0ainfix +V16ainfix *c2V5Aainfix =aminV0ainfix +V16V5V0Aainfix =aminV0ainfix +V16ainfix *c2V5aminV0ainfix +V16V5Aasorted_subV11V16aminV0ainfix +V16V5Iainfix &gt;=V16V9Aasorted_subV11V16aminV0ainfix +V16ainfix *c2V5Iainfix &lt;V16V9Aainfix =V16ainfix *ainfix *V15c2V5Iainfix &lt;V16V0Aainfix &lt;=c0V16Lainfix *V15ainfix *c2V5Fainfix &lt;ainfix -ainfix +V0V5V21ainfix -ainfix +V0V5V9Aainfix &lt;=c0ainfix -ainfix +V0V5V9Aasorted_subV20V24aminV0ainfix +V24ainfix *c2V5Iainfix &lt;V24V21Aainfix &lt;=c0V24Lainfix *V23ainfix *c2V5FAasorted_subV20V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=V21V26Lainfix *V25V5FAapermut_allV7V20Aainfix =V21ainfix *ainfix *c2V22V5Aainfix &lt;=c0V21Iainfix =V22ainfix +V8c1FIainfix =V21ainfix +V17V5FAasorted_subV20V28aminV0ainfix +V28ainfix *c2V5Aainfix =V28V9Iainfix =V27V8Aasorted_subV20V28aminV0ainfix +V28ainfix *c2V5Aasorted_subV11V28aminV0ainfix +V28ainfix *c2V5Aainfix &lt;=aminV0ainfix +V28ainfix *c2V5V9Iainfix &lt;V27V8Aainfix &lt;=V27V8Iainfix &lt;V28ainfix +V17V5Aainfix &lt;=c0V28Lainfix *V27ainfix *c2V5FAasorted_subV20V30aminV0ainfix +V30V5Aasorted_subV11V30aminV0ainfix +V30V5Iainfix &lt;V30V0Aainfix &lt;=ainfix +V17V5V30Lainfix *V29V5FAasorted_subV20V9aminV0ainfix +V9ainfix *c2V5Aainfix =V18aminV0ainfix +V9ainfix *c2V5Aapermut_allV11V20Aapermut_subV11V20V9V18Iainfix =agetV19V31agetV10V31Iainfix &lt;V31V0Aainfix &lt;=V18V31Oainfix &lt;V31V9Aainfix &lt;=c0V31FAapermutV11V20V9V18Aasorted_subV20V9V18Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V19FAasorted_subV11V17V18Aasorted_subV11V9V17Aainfix =V3V0Aainfix &lt;=V18V3Aainfix &lt;=V17V18Aainfix &lt;=V9V17Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Aasorted_subV11V17aminV0ainfix +V17V5LaminV0ainfix +V17V5Aasorted_subV11V9aminV0ainfix +V9V5Aainfix =V17ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5ainfix &lt;V9ainfix -V0V5Iasorted_subV11V33aminV0ainfix +V33ainfix *c2V5Iainfix &lt;V33V9Aainfix &lt;=c0V33Lainfix *V32ainfix *c2V5FAasorted_subV11V35aminV0ainfix +V35V5Iainfix &lt;V35V0Aainfix &lt;=V9V35Lainfix *V34V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FAasorted_subV7V37aminV0ainfix +V37ainfix *c2V5Iainfix &lt;V37c0Aainfix &lt;=c0V37Lainfix *V36ainfix *c2V5FAasorted_subV7V39aminV0ainfix +V39V5Iainfix &lt;V39V0Aainfix &lt;=c0V39Lainfix *V38V5FAapermut_allV7V7Aainfix =c0ainfix *ainfix *c2c0V5Aainfix &lt;=c0c0ainfix &lt;V5V0Iasorted_subV7V41aminV0ainfix +V41V5Iainfix &lt;V41V0Aainfix &lt;=c0V41Lainfix *V40V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FAasorted_subV2V43aminV0ainfix +V43c1Iainfix &lt;V43V0Aainfix &lt;=c0V43Lainfix *V42c1FAapermut_allV2V2Aainfix &lt;=c1c1Iainfix =agetV4V44agetV1V44Iainfix &lt;V44V3Aainfix &lt;=c0V44FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
     <label
      name="expl:VC for bottom_up_mergesort"/>
     <transf
      name="split_goal_wp"
-     proved="false"
-     expanded="true">
+     proved="true"
+     expanded="false">
      <goal
       name="WP_parameter bottom_up_mergesort.1"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
+      loclnum="138" loccnumb="6" loccnume="25"
       expl="1. loop invariant init"
-      sum="8c175c32b00e1f6f162a4505a9cd838c"
+      sum="46244b6ab7fe64d235a454660f34133a"
       proved="true"
       expanded="false"
-      shape="loop invariant initainfix &lt;=c1c1Iainfix =agetV3V4agetV1V4Iainfix &lt;V4V2Aainfix &lt;=c0V4FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initainfix &lt;=c1c1Iainfix =agetV4V5agetV1V5Iainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2097,12 +2105,12 @@
      <goal
       name="WP_parameter bottom_up_mergesort.2"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
+      loclnum="138" loccnumb="6" loccnume="25"
       expl="2. loop invariant init"
-      sum="c9619c8c50062ecf1520f9594ec03ec3"
+      sum="543528d670a83dedfeba65e30d8990ce"
       proved="true"
       expanded="false"
-      shape="loop invariant initainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V5agetV1V5Iainfix &lt;V5V2Aainfix &lt;=c0V5FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initapermut_allV2V2Iainfix =agetV4V5agetV1V5Iainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2111,18 +2119,18 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter bottom_up_mergesort.3"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
-      expl="3. type invariant"
-      sum="2725a8da81c927b859e9dc311980ab06"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="3. loop invariant init"
+      sum="ff9ee336347ba2ae9c75c393acdf49f9"
       proved="true"
       expanded="false"
-      shape="type invariantainfix &lt;=c0V2LaminV0ainfix +V8V4Lainfix +V5V4Iainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V10agetV1V10Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initasorted_subV2V6aminV0ainfix +V6c1Iainfix &lt;V6V0Aainfix &lt;=c0V6Lainfix *V5c1FIainfix =agetV4V7agetV1V7Iainfix &lt;V7V3Aainfix &lt;=c0V7FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2137,12 +2145,12 @@
      <goal
       name="WP_parameter bottom_up_mergesort.4"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
-      expl="4. type invariant"
-      sum="a25dc979abe07bf668daef80d6fa9a51"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="4. loop invariant init"
+      sum="d8cfa29ce327c81373914bbbd855c02b"
       proved="true"
       expanded="false"
-      shape="type invariantainfix &lt;=c0V0LaminV0ainfix +V8V4Lainfix +V5V4Iainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V10agetV1V10Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initainfix =c0ainfix *ainfix *c2c0V5Aainfix &lt;=c0c0Iainfix &lt;V5V0Iasorted_subV7V9aminV0ainfix +V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Lainfix *V8V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V10agetV1V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2157,12 +2165,12 @@
      <goal
       name="WP_parameter bottom_up_mergesort.5"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
-      expl="5. precondition"
-      sum="a2b169183e4b0f9013d03e9644362bec"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="5. loop invariant init"
+      sum="b4cb22d276259f55c3009e625c611954"
       proved="true"
       expanded="false"
-      shape="preconditionainfix =V2V0Aainfix &lt;=V9V2Aainfix &lt;=V8V9Aainfix &lt;=V5V8Aainfix &lt;=c0V5Iainfix &lt;=c0V0Aainfix &lt;=c0V2LaminV0ainfix +V8V4Lainfix +V5V4Iainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V10agetV1V10Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initapermut_allV7V7Iainfix &lt;V5V0Iasorted_subV7V9aminV0ainfix +V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Lainfix *V8V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V10agetV1V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2171,58 +2179,18 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter bottom_up_mergesort.6"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
-      expl="6. precondition"
-      sum="9895dd750f16c5e8768575671943b34f"
-      proved="false"
-      expanded="false"
-      shape="preconditionasorted_subV7V5V8Iainfix &lt;=c0V0Aainfix &lt;=c0V2LaminV0ainfix +V8V4Lainfix +V5V4Iainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V10agetV1V10Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for bottom_up_mergesort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="unknown" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter bottom_up_mergesort.7"
-      locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
-      expl="7. precondition"
-      sum="d12b5c4214cff36c3de3a90148e638f6"
-      proved="false"
-      expanded="false"
-      shape="preconditionasorted_subV7V8V9Iainfix &lt;=c0V0Aainfix &lt;=c0V2LaminV0ainfix +V8V4Lainfix +V5V4Iainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V10agetV1V10Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for bottom_up_mergesort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="unknown" time="0.08"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter bottom_up_mergesort.8"
-      locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
-      expl="8. loop invariant preservation"
-      sum="826c4932cc794fd7a76908e08e0a64e9"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="6. loop invariant init"
+      sum="525ac935ccc6e5270f75ae4bbe6d14d6"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix &lt;=V12V0Aainfix &lt;=c0V12Iainfix =V12V9FIainfix =agetV10V13agetV6V13Iainfix &lt;V13V0Aainfix &lt;=V9V13Oainfix &lt;V13V5Aainfix &lt;=c0V13FAapermutV7V11V5V9Aasorted_subV11V5V9Aainfix &lt;=c0V0Aainfix &lt;=c0V2Lamk arrayV0V10FIasorted_subV7V8V9Aasorted_subV7V5V8Aainfix =V2V0Aainfix &lt;=V9V2Aainfix &lt;=V8V9Aainfix &lt;=V5V8Aainfix &lt;=c0V5Aainfix &lt;=c0V0Aainfix &lt;=c0V2LaminV0ainfix +V8V4Lainfix +V5V4Iainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V14agetV1V14Iainfix &lt;V14V2Aainfix &lt;=c0V14FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initasorted_subV7V9aminV0ainfix +V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Lainfix *V8V5FIainfix &lt;V5V0Iasorted_subV7V11aminV0ainfix +V11V5Iainfix &lt;V11V0Aainfix &lt;=c0V11Lainfix *V10V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V12agetV1V12Iainfix &lt;V12V3Aainfix &lt;=c0V12FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2235,14 +2203,54 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter bottom_up_mergesort.9"
+      name="WP_parameter bottom_up_mergesort.7"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
-      expl="9. loop variant decrease"
-      sum="232481d7096b7c1d971d247318b8d8ae"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="7. loop invariant init"
+      sum="e96ee19e4bdc8ef3464eac16fdb7aa81"
       proved="true"
       expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -ainfix +V0V4V12ainfix -ainfix +V0V4V5Aainfix &lt;=c0ainfix -ainfix +V0V4V5Iainfix =V12V9FIainfix =agetV10V13agetV6V13Iainfix &lt;V13V0Aainfix &lt;=V9V13Oainfix &lt;V13V5Aainfix &lt;=c0V13FAapermutV7V11V5V9Aasorted_subV11V5V9Aainfix &lt;=c0V0Aainfix &lt;=c0V2Lamk arrayV0V10FIasorted_subV7V8V9Aasorted_subV7V5V8Aainfix =V2V0Aainfix &lt;=V9V2Aainfix &lt;=V8V9Aainfix &lt;=V5V8Aainfix &lt;=c0V5Aainfix &lt;=c0V0Aainfix &lt;=c0V2LaminV0ainfix +V8V4Lainfix +V5V4Iainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V14agetV1V14Iainfix &lt;V14V2Aainfix &lt;=c0V14FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initasorted_subV7V9aminV0ainfix +V9ainfix *c2V5Iainfix &lt;V9c0Aainfix &lt;=c0V9Lainfix *V8ainfix *c2V5FIainfix &lt;V5V0Iasorted_subV7V11aminV0ainfix +V11V5Iainfix &lt;V11V0Aainfix &lt;=c0V11Lainfix *V10V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V12agetV1V12Iainfix &lt;V12V3Aainfix &lt;=c0V12FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.8"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="8. assertion"
+      sum="76355a11ed77cb5eaa505416a8522ba0"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V14aminV0ainfix +V14ainfix *c2V5Iainfix &lt;V14V9Aainfix &lt;=c0V14Lainfix *V13ainfix *c2V5FAasorted_subV11V16aminV0ainfix +V16V5Iainfix &lt;V16V0Aainfix &lt;=V9V16Lainfix *V15V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V18aminV0ainfix +V18V5Iainfix &lt;V18V0Aainfix &lt;=c0V18Lainfix *V17V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V19agetV1V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.9"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="9. assertion"
+      sum="92d51f0c63844b886059e41ba658af8a"
+      proved="true"
+      expanded="false"
+      shape="assertionasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V14aminV0ainfix +V14ainfix *c2V5Iainfix &lt;V14V9Aainfix &lt;=c0V14Lainfix *V13ainfix *c2V5FAasorted_subV11V16aminV0ainfix +V16V5Iainfix &lt;V16V0Aainfix &lt;=V9V16Lainfix *V15V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V18aminV0ainfix +V18V5Iainfix &lt;V18V0Aainfix &lt;=c0V18Lainfix *V17V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V19agetV1V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2257,12 +2265,12 @@
      <goal
       name="WP_parameter bottom_up_mergesort.10"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
-      expl="10. loop invariant preservation"
-      sum="f66df09d4436415ade09e79ec61ae62f"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="10. assertion"
+      sum="60c3ea06bfa091100fbd4277b8aa0c24"
       proved="true"
       expanded="false"
-      shape="loop invariant preservationainfix &lt;=c1V8Iainfix =V8ainfix *c2V4FINainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V9agetV1V9Iainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="assertionasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2271,18 +2279,18 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter bottom_up_mergesort.11"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
-      expl="11. loop variant decrease"
-      sum="b4a7f6950ccba556da3bf122e98cfca4"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="11. type invariant"
+      sum="5c0cad118d72e2e76ec65825ea394f97"
       proved="true"
       expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -ainfix *c2V0V8ainfix -ainfix *c2V0V4Aainfix &lt;=c0ainfix -ainfix *c2V0V4Iainfix =V8ainfix *c2V4FINainfix &lt;V5ainfix -V0V4Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V9agetV1V9Iainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="type invariantainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2297,12 +2305,72 @@
      <goal
       name="WP_parameter bottom_up_mergesort.12"
       locfile="../mergesort_array.mlw"
-      loclnum="120" loccnumb="6" loccnume="25"
+      loclnum="138" loccnumb="6" loccnume="25"
       expl="12. type invariant"
-      sum="b9db5403165da9948c18dd88d32e61b7"
+      sum="3b92f9ccdef613c8d4dc79df2d435d83"
       proved="true"
       expanded="false"
-      shape="type invariantainfix &lt;=c0V0INainfix &lt;V4V0Iainfix &lt;=c1V4FIainfix =agetV3V5agetV1V5Iainfix &lt;V5V2Aainfix &lt;=c0V5FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="type invariantainfix &lt;=c0V0Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.13"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="13. precondition"
+      sum="fbd2c404ba84122cacdf26d649019ff5"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Iainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.24"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.14"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="14. precondition"
+      sum="ab0e00cadad95f819b697cd3793477c8"
+      proved="true"
+      expanded="false"
+      shape="preconditionasorted_subV11V9V12Iainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.15"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="15. precondition"
+      sum="4eda965e3608053b63d3e0d9b69b7cdb"
+      proved="true"
+      expanded="false"
+      shape="preconditionasorted_subV11V12V13Iainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for bottom_up_mergesort"/>
       <proof
@@ -2314,19 +2382,731 @@
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.16"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="16. assertion"
+      sum="47766d6f574898cd3cf21d27a3cb7c53"
+      proved="true"
+      expanded="false"
+      shape="assertionapermut_subV11V15V9V13Iainfix =agetV14V16agetV10V16Iainfix &lt;V16V0Aainfix &lt;=V13V16Oainfix &lt;V16V9Aainfix &lt;=c0V16FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V18aminV0ainfix +V18ainfix *c2V5Iainfix &lt;V18V9Aainfix &lt;=c0V18Lainfix *V17ainfix *c2V5FAasorted_subV11V20aminV0ainfix +V20V5Iainfix &lt;V20V0Aainfix &lt;=V9V20Lainfix *V19V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V22aminV0ainfix +V22V5Iainfix &lt;V22V0Aainfix &lt;=c0V22Lainfix *V21V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V23agetV1V23Iainfix &lt;V23V3Aainfix &lt;=c0V23FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.31"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.17"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="17. assertion"
+      sum="c3056975ed0dbe277fbe9df772207eb9"
+      proved="true"
+      expanded="false"
+      shape="assertionapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V16agetV10V16Iainfix &lt;V16V0Aainfix &lt;=V13V16Oainfix &lt;V16V9Aainfix &lt;=c0V16FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V18aminV0ainfix +V18ainfix *c2V5Iainfix &lt;V18V9Aainfix &lt;=c0V18Lainfix *V17ainfix *c2V5FAasorted_subV11V20aminV0ainfix +V20V5Iainfix &lt;V20V0Aainfix &lt;=V9V20Lainfix *V19V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V22aminV0ainfix +V22V5Iainfix &lt;V22V0Aainfix &lt;=c0V22Lainfix *V21V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V23agetV1V23Iainfix &lt;V23V3Aainfix &lt;=c0V23FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="4"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="5.65"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.18"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="18. assertion"
+      sum="cc63b8d3fc16e48b724eb47e2608893c"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V16agetV10V16Iainfix &lt;V16V0Aainfix &lt;=V13V16Oainfix &lt;V16V9Aainfix &lt;=c0V16FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V18aminV0ainfix +V18ainfix *c2V5Iainfix &lt;V18V9Aainfix &lt;=c0V18Lainfix *V17ainfix *c2V5FAasorted_subV11V20aminV0ainfix +V20V5Iainfix &lt;V20V0Aainfix &lt;=V9V20Lainfix *V19V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V22aminV0ainfix +V22V5Iainfix &lt;V22V0Aainfix &lt;=c0V22Lainfix *V21V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V23agetV1V23Iainfix &lt;V23V3Aainfix &lt;=c0V23FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.19"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="19. assertion"
+      sum="4aaa5df8fc8db5b32fedc9a4bd9614e5"
+      proved="true"
+      expanded="false"
+      shape="assertionasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V16agetV10V16Iainfix &lt;V16V0Aainfix &lt;=V13V16Oainfix &lt;V16V9Aainfix &lt;=c0V16FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V18aminV0ainfix +V18ainfix *c2V5Iainfix &lt;V18V9Aainfix &lt;=c0V18Lainfix *V17ainfix *c2V5FAasorted_subV11V20aminV0ainfix +V20V5Iainfix &lt;V20V0Aainfix &lt;=V9V20Lainfix *V19V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V22aminV0ainfix +V22V5Iainfix &lt;V22V0Aainfix &lt;=c0V22Lainfix *V21V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V23agetV1V23Iainfix &lt;V23V3Aainfix &lt;=c0V23FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.20"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="20. assertion"
+      sum="71109f6bd6d8c2749e775e0b83cd4bff"
+      proved="true"
+      expanded="false"
+      shape="assertionasorted_subV15V17aminV0ainfix +V17V5Aasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=ainfix +V12V5V17Lainfix *V16V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V18agetV10V18Iainfix &lt;V18V0Aainfix &lt;=V13V18Oainfix &lt;V18V9Aainfix &lt;=c0V18FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V20aminV0ainfix +V20ainfix *c2V5Iainfix &lt;V20V9Aainfix &lt;=c0V20Lainfix *V19ainfix *c2V5FAasorted_subV11V22aminV0ainfix +V22V5Iainfix &lt;V22V0Aainfix &lt;=V9V22Lainfix *V21V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=c0V24Lainfix *V23V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V25agetV1V25Iainfix &lt;V25V3Aainfix &lt;=c0V25FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter bottom_up_mergesort.20.1"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="1. assertion"
+        sum="91647afcf1c2a6b60af3ef3eae593737"
+        proved="true"
+        expanded="false"
+        shape="assertionasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=ainfix +V12V5V17Lainfix *V16V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V18agetV10V18Iainfix &lt;V18V0Aainfix &lt;=V13V18Oainfix &lt;V18V9Aainfix &lt;=c0V18FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V20aminV0ainfix +V20ainfix *c2V5Iainfix &lt;V20V9Aainfix &lt;=c0V20Lainfix *V19ainfix *c2V5FAasorted_subV11V22aminV0ainfix +V22V5Iainfix &lt;V22V0Aainfix &lt;=V9V22Lainfix *V21V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=c0V24Lainfix *V23V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V25agetV1V25Iainfix &lt;V25V3Aainfix &lt;=c0V25FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.20.2"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="2. assertion"
+        sum="b029a5cebc4e66b682fc0389790af1a9"
+        proved="true"
+        expanded="false"
+        shape="assertionasorted_subV15V17aminV0ainfix +V17V5Iasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=ainfix +V12V5V17Lainfix *V16V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V18agetV10V18Iainfix &lt;V18V0Aainfix &lt;=V13V18Oainfix &lt;V18V9Aainfix &lt;=c0V18FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V20aminV0ainfix +V20ainfix *c2V5Iainfix &lt;V20V9Aainfix &lt;=c0V20Lainfix *V19ainfix *c2V5FAasorted_subV11V22aminV0ainfix +V22V5Iainfix &lt;V22V0Aainfix &lt;=V9V22Lainfix *V21V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=c0V24Lainfix *V23V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V25agetV1V25Iainfix &lt;V25V3Aainfix &lt;=c0V25FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="3"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.48"/>
+        </proof>
+        <proof
+         prover="6"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+        <proof
+         prover="7"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.21"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="21. assertion"
+      sum="3f98426926e3f90a0c3248538bf49047"
+      proved="true"
+      expanded="false"
+      shape="assertionasorted_subV15V17aminV0ainfix +V17ainfix *c2V5Aainfix =V17V9Iainfix =V16V8Aasorted_subV15V17aminV0ainfix +V17ainfix *c2V5Aasorted_subV11V17aminV0ainfix +V17ainfix *c2V5Aainfix &lt;=aminV0ainfix +V17ainfix *c2V5V9Iainfix &lt;V16V8Aainfix &lt;=V16V8Iainfix &lt;V17ainfix +V12V5Aainfix &lt;=c0V17Lainfix *V16ainfix *c2V5FIasorted_subV15V19aminV0ainfix +V19V5Aasorted_subV11V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=ainfix +V12V5V19Lainfix *V18V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V20agetV10V20Iainfix &lt;V20V0Aainfix &lt;=V13V20Oainfix &lt;V20V9Aainfix &lt;=c0V20FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V22aminV0ainfix +V22ainfix *c2V5Iainfix &lt;V22V9Aainfix &lt;=c0V22Lainfix *V21ainfix *c2V5FAasorted_subV11V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=V9V24Lainfix *V23V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=c0V26Lainfix *V25V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V27agetV1V27Iainfix &lt;V27V3Aainfix &lt;=c0V27FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter bottom_up_mergesort.21.1"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="1. assertion"
+        sum="2cf3c2e8752ba6acd63f49cdbc126598"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &lt;=V16V8Iainfix &lt;V17ainfix +V12V5Aainfix &lt;=c0V17Lainfix *V16ainfix *c2V5FIasorted_subV15V19aminV0ainfix +V19V5Aasorted_subV11V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=ainfix +V12V5V19Lainfix *V18V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V20agetV10V20Iainfix &lt;V20V0Aainfix &lt;=V13V20Oainfix &lt;V20V9Aainfix &lt;=c0V20FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V22aminV0ainfix +V22ainfix *c2V5Iainfix &lt;V22V9Aainfix &lt;=c0V22Lainfix *V21ainfix *c2V5FAasorted_subV11V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=V9V24Lainfix *V23V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=c0V26Lainfix *V25V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V27agetV1V27Iainfix &lt;V27V3Aainfix &lt;=c0V27FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.21.2"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="2. assertion"
+        sum="5861371ff86d2b58cc5d1ccb3a977a89"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix &lt;=aminV0ainfix +V17ainfix *c2V5V9Iainfix &lt;V16V8Iainfix &lt;=V16V8Iainfix &lt;V17ainfix +V12V5Aainfix &lt;=c0V17Lainfix *V16ainfix *c2V5FIasorted_subV15V19aminV0ainfix +V19V5Aasorted_subV11V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=ainfix +V12V5V19Lainfix *V18V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V20agetV10V20Iainfix &lt;V20V0Aainfix &lt;=V13V20Oainfix &lt;V20V9Aainfix &lt;=c0V20FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V22aminV0ainfix +V22ainfix *c2V5Iainfix &lt;V22V9Aainfix &lt;=c0V22Lainfix *V21ainfix *c2V5FAasorted_subV11V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=V9V24Lainfix *V23V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=c0V26Lainfix *V25V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V27agetV1V27Iainfix &lt;V27V3Aainfix &lt;=c0V27FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="1"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.21.3"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="3. assertion"
+        sum="21ffb59e11a16c5ee3682955b38b7d1d"
+        proved="true"
+        expanded="false"
+        shape="assertionasorted_subV11V17aminV0ainfix +V17ainfix *c2V5Iainfix &lt;=aminV0ainfix +V17ainfix *c2V5V9Iainfix &lt;V16V8Iainfix &lt;=V16V8Iainfix &lt;V17ainfix +V12V5Aainfix &lt;=c0V17Lainfix *V16ainfix *c2V5FIasorted_subV15V19aminV0ainfix +V19V5Aasorted_subV11V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=ainfix +V12V5V19Lainfix *V18V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V20agetV10V20Iainfix &lt;V20V0Aainfix &lt;=V13V20Oainfix &lt;V20V9Aainfix &lt;=c0V20FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V22aminV0ainfix +V22ainfix *c2V5Iainfix &lt;V22V9Aainfix &lt;=c0V22Lainfix *V21ainfix *c2V5FAasorted_subV11V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=V9V24Lainfix *V23V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=c0V26Lainfix *V25V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V27agetV1V27Iainfix &lt;V27V3Aainfix &lt;=c0V27FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.21.4"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="4. assertion"
+        sum="65f44ab1631d8cba519bf82d649a5a6b"
+        proved="true"
+        expanded="false"
+        shape="assertionasorted_subV15V17aminV0ainfix +V17ainfix *c2V5Iasorted_subV11V17aminV0ainfix +V17ainfix *c2V5Iainfix &lt;=aminV0ainfix +V17ainfix *c2V5V9Iainfix &lt;V16V8Iainfix &lt;=V16V8Iainfix &lt;V17ainfix +V12V5Aainfix &lt;=c0V17Lainfix *V16ainfix *c2V5FIasorted_subV15V19aminV0ainfix +V19V5Aasorted_subV11V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=ainfix +V12V5V19Lainfix *V18V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V20agetV10V20Iainfix &lt;V20V0Aainfix &lt;=V13V20Oainfix &lt;V20V9Aainfix &lt;=c0V20FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V22aminV0ainfix +V22ainfix *c2V5Iainfix &lt;V22V9Aainfix &lt;=c0V22Lainfix *V21ainfix *c2V5FAasorted_subV11V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=V9V24Lainfix *V23V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=c0V26Lainfix *V25V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V27agetV1V27Iainfix &lt;V27V3Aainfix &lt;=c0V27FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="3"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.51"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.21.5"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="5. assertion"
+        sum="b1f9d206fc214c21ddb4557127fb1e69"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix =V17V9Iainfix =V16V8Iasorted_subV15V17aminV0ainfix +V17ainfix *c2V5Aasorted_subV11V17aminV0ainfix +V17ainfix *c2V5Aainfix &lt;=aminV0ainfix +V17ainfix *c2V5V9Iainfix &lt;V16V8Iainfix &lt;=V16V8Iainfix &lt;V17ainfix +V12V5Aainfix &lt;=c0V17Lainfix *V16ainfix *c2V5FIasorted_subV15V19aminV0ainfix +V19V5Aasorted_subV11V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=ainfix +V12V5V19Lainfix *V18V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V20agetV10V20Iainfix &lt;V20V0Aainfix &lt;=V13V20Oainfix &lt;V20V9Aainfix &lt;=c0V20FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V22aminV0ainfix +V22ainfix *c2V5Iainfix &lt;V22V9Aainfix &lt;=c0V22Lainfix *V21ainfix *c2V5FAasorted_subV11V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=V9V24Lainfix *V23V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=c0V26Lainfix *V25V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V27agetV1V27Iainfix &lt;V27V3Aainfix &lt;=c0V27FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.21.6"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="6. assertion"
+        sum="cc1db43bb7ecb4f988923a12b95bd47d"
+        proved="true"
+        expanded="false"
+        shape="assertionasorted_subV15V17aminV0ainfix +V17ainfix *c2V5Iainfix =V16V8Iasorted_subV15V17aminV0ainfix +V17ainfix *c2V5Aasorted_subV11V17aminV0ainfix +V17ainfix *c2V5Aainfix &lt;=aminV0ainfix +V17ainfix *c2V5V9Iainfix &lt;V16V8Iainfix &lt;=V16V8Iainfix &lt;V17ainfix +V12V5Aainfix &lt;=c0V17Lainfix *V16ainfix *c2V5FIasorted_subV15V19aminV0ainfix +V19V5Aasorted_subV11V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=ainfix +V12V5V19Lainfix *V18V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V20agetV10V20Iainfix &lt;V20V0Aainfix &lt;=V13V20Oainfix &lt;V20V9Aainfix &lt;=c0V20FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V22aminV0ainfix +V22ainfix *c2V5Iainfix &lt;V22V9Aainfix &lt;=c0V22Lainfix *V21ainfix *c2V5FAasorted_subV11V24aminV0ainfix +V24V5Iainfix &lt;V24V0Aainfix &lt;=V9V24Lainfix *V23V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=c0V26Lainfix *V25V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V27agetV1V27Iainfix &lt;V27V3Aainfix &lt;=c0V27FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.22"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="22. loop invariant preservation"
+      sum="3b5e708a739f95429b4726e90ba7f3e8"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V16ainfix *ainfix *c2V17V5Aainfix &lt;=c0V16Iainfix =V17ainfix +V8c1FIainfix =V16ainfix +V12V5FIasorted_subV15V19aminV0ainfix +V19ainfix *c2V5Aainfix =V19V9Iainfix =V18V8Aasorted_subV15V19aminV0ainfix +V19ainfix *c2V5Aasorted_subV11V19aminV0ainfix +V19ainfix *c2V5Aainfix &lt;=aminV0ainfix +V19ainfix *c2V5V9Iainfix &lt;V18V8Aainfix &lt;=V18V8Iainfix &lt;V19ainfix +V12V5Aainfix &lt;=c0V19Lainfix *V18ainfix *c2V5FIasorted_subV15V21aminV0ainfix +V21V5Aasorted_subV11V21aminV0ainfix +V21V5Iainfix &lt;V21V0Aainfix &lt;=ainfix +V12V5V21Lainfix *V20V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V22agetV10V22Iainfix &lt;V22V0Aainfix &lt;=V13V22Oainfix &lt;V22V9Aainfix &lt;=c0V22FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V24aminV0ainfix +V24ainfix *c2V5Iainfix &lt;V24V9Aainfix &lt;=c0V24Lainfix *V23ainfix *c2V5FAasorted_subV11V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=V9V26Lainfix *V25V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V28aminV0ainfix +V28V5Iainfix &lt;V28V0Aainfix &lt;=c0V28Lainfix *V27V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V29agetV1V29Iainfix &lt;V29V3Aainfix &lt;=c0V29FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="2"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.23"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="23. loop invariant preservation"
+      sum="ff35f468d68b3f2047d327c16fb6b510"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationapermut_allV7V15Iainfix =V17ainfix +V8c1FIainfix =V16ainfix +V12V5FIasorted_subV15V19aminV0ainfix +V19ainfix *c2V5Aainfix =V19V9Iainfix =V18V8Aasorted_subV15V19aminV0ainfix +V19ainfix *c2V5Aasorted_subV11V19aminV0ainfix +V19ainfix *c2V5Aainfix &lt;=aminV0ainfix +V19ainfix *c2V5V9Iainfix &lt;V18V8Aainfix &lt;=V18V8Iainfix &lt;V19ainfix +V12V5Aainfix &lt;=c0V19Lainfix *V18ainfix *c2V5FIasorted_subV15V21aminV0ainfix +V21V5Aasorted_subV11V21aminV0ainfix +V21V5Iainfix &lt;V21V0Aainfix &lt;=ainfix +V12V5V21Lainfix *V20V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V22agetV10V22Iainfix &lt;V22V0Aainfix &lt;=V13V22Oainfix &lt;V22V9Aainfix &lt;=c0V22FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V24aminV0ainfix +V24ainfix *c2V5Iainfix &lt;V24V9Aainfix &lt;=c0V24Lainfix *V23ainfix *c2V5FAasorted_subV11V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=V9V26Lainfix *V25V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V28aminV0ainfix +V28V5Iainfix &lt;V28V0Aainfix &lt;=c0V28Lainfix *V27V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V29agetV1V29Iainfix &lt;V29V3Aainfix &lt;=c0V29FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.24"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="24. loop invariant preservation"
+      sum="0f9e728ce9dbdaeb3651f01b6f34a193"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationasorted_subV15V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=V16V19Lainfix *V18V5FIainfix =V17ainfix +V8c1FIainfix =V16ainfix +V12V5FIasorted_subV15V21aminV0ainfix +V21ainfix *c2V5Aainfix =V21V9Iainfix =V20V8Aasorted_subV15V21aminV0ainfix +V21ainfix *c2V5Aasorted_subV11V21aminV0ainfix +V21ainfix *c2V5Aainfix &lt;=aminV0ainfix +V21ainfix *c2V5V9Iainfix &lt;V20V8Aainfix &lt;=V20V8Iainfix &lt;V21ainfix +V12V5Aainfix &lt;=c0V21Lainfix *V20ainfix *c2V5FIasorted_subV15V23aminV0ainfix +V23V5Aasorted_subV11V23aminV0ainfix +V23V5Iainfix &lt;V23V0Aainfix &lt;=ainfix +V12V5V23Lainfix *V22V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V24agetV10V24Iainfix &lt;V24V0Aainfix &lt;=V13V24Oainfix &lt;V24V9Aainfix &lt;=c0V24FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V26aminV0ainfix +V26ainfix *c2V5Iainfix &lt;V26V9Aainfix &lt;=c0V26Lainfix *V25ainfix *c2V5FAasorted_subV11V28aminV0ainfix +V28V5Iainfix &lt;V28V0Aainfix &lt;=V9V28Lainfix *V27V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V30aminV0ainfix +V30V5Iainfix &lt;V30V0Aainfix &lt;=c0V30Lainfix *V29V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V31agetV1V31Iainfix &lt;V31V3Aainfix &lt;=c0V31FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.25"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="25. loop invariant preservation"
+      sum="2a7a3b0503c435530fccf09bf84817a8"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationasorted_subV15V19aminV0ainfix +V19ainfix *c2V5Iainfix &lt;V19V16Aainfix &lt;=c0V19Lainfix *V18ainfix *c2V5FIainfix =V17ainfix +V8c1FIainfix =V16ainfix +V12V5FIasorted_subV15V21aminV0ainfix +V21ainfix *c2V5Aainfix =V21V9Iainfix =V20V8Aasorted_subV15V21aminV0ainfix +V21ainfix *c2V5Aasorted_subV11V21aminV0ainfix +V21ainfix *c2V5Aainfix &lt;=aminV0ainfix +V21ainfix *c2V5V9Iainfix &lt;V20V8Aainfix &lt;=V20V8Iainfix &lt;V21ainfix +V12V5Aainfix &lt;=c0V21Lainfix *V20ainfix *c2V5FIasorted_subV15V23aminV0ainfix +V23V5Aasorted_subV11V23aminV0ainfix +V23V5Iainfix &lt;V23V0Aainfix &lt;=ainfix +V12V5V23Lainfix *V22V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V24agetV10V24Iainfix &lt;V24V0Aainfix &lt;=V13V24Oainfix &lt;V24V9Aainfix &lt;=c0V24FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V26aminV0ainfix +V26ainfix *c2V5Iainfix &lt;V26V9Aainfix &lt;=c0V26Lainfix *V25ainfix *c2V5FAasorted_subV11V28aminV0ainfix +V28V5Iainfix &lt;V28V0Aainfix &lt;=V9V28Lainfix *V27V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V30aminV0ainfix +V30V5Iainfix &lt;V30V0Aainfix &lt;=c0V30Lainfix *V29V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V31agetV1V31Iainfix &lt;V31V3Aainfix &lt;=c0V31FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.26"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.26"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="26. loop variant decrease"
+      sum="e42e282249b682ba454fc979f79d9702"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;ainfix -ainfix +V0V5V16ainfix -ainfix +V0V5V9Aainfix &lt;=c0ainfix -ainfix +V0V5V9Iainfix =V17ainfix +V8c1FIainfix =V16ainfix +V12V5FIasorted_subV15V19aminV0ainfix +V19ainfix *c2V5Aainfix =V19V9Iainfix =V18V8Aasorted_subV15V19aminV0ainfix +V19ainfix *c2V5Aasorted_subV11V19aminV0ainfix +V19ainfix *c2V5Aainfix &lt;=aminV0ainfix +V19ainfix *c2V5V9Iainfix &lt;V18V8Aainfix &lt;=V18V8Iainfix &lt;V19ainfix +V12V5Aainfix &lt;=c0V19Lainfix *V18ainfix *c2V5FIasorted_subV15V21aminV0ainfix +V21V5Aasorted_subV11V21aminV0ainfix +V21V5Iainfix &lt;V21V0Aainfix &lt;=ainfix +V12V5V21Lainfix *V20V5FIasorted_subV15V9aminV0ainfix +V9ainfix *c2V5Iainfix =V13aminV0ainfix +V9ainfix *c2V5Iapermut_allV11V15Iapermut_subV11V15V9V13Iainfix =agetV14V22agetV10V22Iainfix &lt;V22V0Aainfix &lt;=V13V22Oainfix &lt;V22V9Aainfix &lt;=c0V22FAapermutV11V15V9V13Aasorted_subV15V9V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V9V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V9V12Aainfix &lt;=c0V9Aainfix &lt;=c0V0Aainfix &lt;=c0V3Iasorted_subV11V12aminV0ainfix +V12V5LaminV0ainfix +V12V5Iasorted_subV11V9aminV0ainfix +V9V5Iainfix =V12ainfix *ainfix +ainfix *c2V8c1V5Lainfix +V9V5Iainfix &lt;V9ainfix -V0V5Iasorted_subV11V24aminV0ainfix +V24ainfix *c2V5Iainfix &lt;V24V9Aainfix &lt;=c0V24Lainfix *V23ainfix *c2V5FAasorted_subV11V26aminV0ainfix +V26V5Iainfix &lt;V26V0Aainfix &lt;=V9V26Lainfix *V25V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V28aminV0ainfix +V28V5Iainfix &lt;V28V0Aainfix &lt;=c0V28Lainfix *V27V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V29agetV1V29Iainfix &lt;V29V3Aainfix &lt;=c0V29FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.27"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="27. assertion"
+      sum="97c417eac67d43896aa1daa11a4d739a"
+      proved="true"
+      expanded="false"
+      shape="assertionasorted_subV11V13aminV0ainfix +V13ainfix *c2V5Aainfix =aminV0ainfix +V13V5V0Aainfix =aminV0ainfix +V13ainfix *c2V5aminV0ainfix +V13V5Aasorted_subV11V13aminV0ainfix +V13V5Iainfix &gt;=V13V9Aasorted_subV11V13aminV0ainfix +V13ainfix *c2V5Iainfix &lt;V13V9Aainfix =V13ainfix *ainfix *V12c2V5Iainfix &lt;V13V0Aainfix &lt;=c0V13Lainfix *V12ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter bottom_up_mergesort.27.1"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="1. assertion"
+        sum="2b0083ff59d1b2f3132e6e3b49f7c5c5"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix =V13ainfix *ainfix *V12c2V5Iainfix &lt;V13V0Aainfix &lt;=c0V13Lainfix *V12ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.27.2"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="2. assertion"
+        sum="79929fb51d8eeb8cdebeca81525e7a64"
+        proved="true"
+        expanded="false"
+        shape="assertionasorted_subV11V13aminV0ainfix +V13ainfix *c2V5Iainfix &lt;V13V9Iainfix =V13ainfix *ainfix *V12c2V5Iainfix &lt;V13V0Aainfix &lt;=c0V13Lainfix *V12ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.27.3"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="3. assertion"
+        sum="eb2612dc26016fb38eff310c424b72e5"
+        proved="true"
+        expanded="false"
+        shape="assertionasorted_subV11V13aminV0ainfix +V13V5Iainfix &gt;=V13V9Iasorted_subV11V13aminV0ainfix +V13ainfix *c2V5Iainfix &lt;V13V9Iainfix =V13ainfix *ainfix *V12c2V5Iainfix &lt;V13V0Aainfix &lt;=c0V13Lainfix *V12ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.04"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.27.4"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="4. assertion"
+        sum="18640f85b6c2e290ae408c0af905fb14"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix =aminV0ainfix +V13ainfix *c2V5aminV0ainfix +V13V5Iasorted_subV11V13aminV0ainfix +V13V5Iainfix &gt;=V13V9Iasorted_subV11V13aminV0ainfix +V13ainfix *c2V5Iainfix &lt;V13V9Iainfix =V13ainfix *ainfix *V12c2V5Iainfix &lt;V13V0Aainfix &lt;=c0V13Lainfix *V12ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.27.5"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="5. assertion"
+        sum="46f6fa5255874d4e07459034d555ed07"
+        proved="true"
+        expanded="false"
+        shape="assertionainfix =aminV0ainfix +V13V5V0Iasorted_subV11V13aminV0ainfix +V13V5Iainfix &gt;=V13V9Iasorted_subV11V13aminV0ainfix +V13ainfix *c2V5Iainfix &lt;V13V9Iainfix =V13ainfix *ainfix *V12c2V5Iainfix &lt;V13V0Aainfix &lt;=c0V13Lainfix *V12ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter bottom_up_mergesort.27.6"
+        locfile="../mergesort_array.mlw"
+        loclnum="138" loccnumb="6" loccnume="25"
+        expl="6. assertion"
+        sum="eccb05f44e3ae9d7ed1fd222cb7c5a6a"
+        proved="true"
+        expanded="false"
+        shape="assertionasorted_subV11V13aminV0ainfix +V13ainfix *c2V5Iainfix =aminV0ainfix +V13V5V0Aainfix =aminV0ainfix +V13ainfix *c2V5aminV0ainfix +V13V5Iasorted_subV11V13aminV0ainfix +V13V5Iainfix &gt;=V13V9Iasorted_subV11V13aminV0ainfix +V13ainfix *c2V5Iainfix &lt;V13V9Iainfix =V13ainfix *ainfix *V12c2V5Iainfix &lt;V13V0Aainfix &lt;=c0V13Lainfix *V12ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V15aminV0ainfix +V15ainfix *c2V5Iainfix &lt;V15V9Aainfix &lt;=c0V15Lainfix *V14ainfix *c2V5FAasorted_subV11V17aminV0ainfix +V17V5Iainfix &lt;V17V0Aainfix &lt;=V9V17Lainfix *V16V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V19aminV0ainfix +V19V5Iainfix &lt;V19V0Aainfix &lt;=c0V19Lainfix *V18V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for bottom_up_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="10"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.28"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="28. loop invariant preservation"
+      sum="b7fecae7b19df68b270d8650367d1aac"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=c1V12Iainfix =V12ainfix *c2V5FIasorted_subV11V14aminV0ainfix +V14ainfix *c2V5Aainfix =aminV0ainfix +V14V5V0Aainfix =aminV0ainfix +V14ainfix *c2V5aminV0ainfix +V14V5Aasorted_subV11V14aminV0ainfix +V14V5Iainfix &gt;=V14V9Aasorted_subV11V14aminV0ainfix +V14ainfix *c2V5Iainfix &lt;V14V9Aainfix =V14ainfix *ainfix *V13c2V5Iainfix &lt;V14V0Aainfix &lt;=c0V14Lainfix *V13ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V16aminV0ainfix +V16ainfix *c2V5Iainfix &lt;V16V9Aainfix &lt;=c0V16Lainfix *V15ainfix *c2V5FAasorted_subV11V18aminV0ainfix +V18V5Iainfix &lt;V18V0Aainfix &lt;=V9V18Lainfix *V17V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V20aminV0ainfix +V20V5Iainfix &lt;V20V0Aainfix &lt;=c0V20Lainfix *V19V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V21agetV1V21Iainfix &lt;V21V3Aainfix &lt;=c0V21FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.29"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="29. loop invariant preservation"
+      sum="17ba4cade038cbb7417448a48323db01"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationapermut_allV2V11Iainfix =V12ainfix *c2V5FIasorted_subV11V14aminV0ainfix +V14ainfix *c2V5Aainfix =aminV0ainfix +V14V5V0Aainfix =aminV0ainfix +V14ainfix *c2V5aminV0ainfix +V14V5Aasorted_subV11V14aminV0ainfix +V14V5Iainfix &gt;=V14V9Aasorted_subV11V14aminV0ainfix +V14ainfix *c2V5Iainfix &lt;V14V9Aainfix =V14ainfix *ainfix *V13c2V5Iainfix &lt;V14V0Aainfix &lt;=c0V14Lainfix *V13ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V16aminV0ainfix +V16ainfix *c2V5Iainfix &lt;V16V9Aainfix &lt;=c0V16Lainfix *V15ainfix *c2V5FAasorted_subV11V18aminV0ainfix +V18V5Iainfix &lt;V18V0Aainfix &lt;=V9V18Lainfix *V17V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V20aminV0ainfix +V20V5Iainfix &lt;V20V0Aainfix &lt;=c0V20Lainfix *V19V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V21agetV1V21Iainfix &lt;V21V3Aainfix &lt;=c0V21FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.30"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="30. loop invariant preservation"
+      sum="fa3d16083e15f930791f8ec0b7897e8c"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationasorted_subV11V14aminV0ainfix +V14V12Iainfix &lt;V14V0Aainfix &lt;=c0V14Lainfix *V13V12FIainfix =V12ainfix *c2V5FIasorted_subV11V16aminV0ainfix +V16ainfix *c2V5Aainfix =aminV0ainfix +V16V5V0Aainfix =aminV0ainfix +V16ainfix *c2V5aminV0ainfix +V16V5Aasorted_subV11V16aminV0ainfix +V16V5Iainfix &gt;=V16V9Aasorted_subV11V16aminV0ainfix +V16ainfix *c2V5Iainfix &lt;V16V9Aainfix =V16ainfix *ainfix *V15c2V5Iainfix &lt;V16V0Aainfix &lt;=c0V16Lainfix *V15ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V18aminV0ainfix +V18ainfix *c2V5Iainfix &lt;V18V9Aainfix &lt;=c0V18Lainfix *V17ainfix *c2V5FAasorted_subV11V20aminV0ainfix +V20V5Iainfix &lt;V20V0Aainfix &lt;=V9V20Lainfix *V19V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V22aminV0ainfix +V22V5Iainfix &lt;V22V0Aainfix &lt;=c0V22Lainfix *V21V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V23agetV1V23Iainfix &lt;V23V3Aainfix &lt;=c0V23FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="5"
+       timelimit="10"
+       memlimit="1000"
+       edited="mergesort_array_BottomUpMergesort_WP_parameter_bottom_up_mergesort_1.v"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.11"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.31"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="31. loop variant decrease"
+      sum="7fcd7007d436e75a24119761e7c7e287"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;ainfix -ainfix *c2V0V12ainfix -ainfix *c2V0V5Aainfix &lt;=c0ainfix -ainfix *c2V0V5Iainfix =V12ainfix *c2V5FIasorted_subV11V14aminV0ainfix +V14ainfix *c2V5Aainfix =aminV0ainfix +V14V5V0Aainfix =aminV0ainfix +V14ainfix *c2V5aminV0ainfix +V14V5Aasorted_subV11V14aminV0ainfix +V14V5Iainfix &gt;=V14V9Aasorted_subV11V14aminV0ainfix +V14ainfix *c2V5Iainfix &lt;V14V9Aainfix =V14ainfix *ainfix *V13c2V5Iainfix &lt;V14V0Aainfix &lt;=c0V14Lainfix *V13ainfix *c2V5FINainfix &lt;V9ainfix -V0V5Iasorted_subV11V16aminV0ainfix +V16ainfix *c2V5Iainfix &lt;V16V9Aainfix &lt;=c0V16Lainfix *V15ainfix *c2V5FAasorted_subV11V18aminV0ainfix +V18V5Iainfix &lt;V18V0Aainfix &lt;=V9V18Lainfix *V17V5FAapermut_allV7V11Aainfix =V9ainfix *ainfix *c2V8V5Aainfix &lt;=c0V9Lamk arrayV0V10FIainfix &lt;V5V0Iasorted_subV7V20aminV0ainfix +V20V5Iainfix &lt;V20V0Aainfix &lt;=c0V20Lainfix *V19V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V21agetV1V21Iainfix &lt;V21V3Aainfix &lt;=c0V21FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.32"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="32. assertion"
+      sum="159456e937db15e5bd63c5361ebe5f0d"
+      proved="true"
+      expanded="false"
+      shape="assertionasorted_subV7ainfix *c0V5aminV0ainfix +c0V5INainfix &lt;V5V0Iasorted_subV7V9aminV0ainfix +V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Lainfix *V8V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V10agetV1V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.33"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="33. type invariant"
+      sum="da5c1a25da233b2b82f516ef3692beb2"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V0Iasorted_subV7ainfix *c0V5aminV0ainfix +c0V5INainfix &lt;V5V0Iasorted_subV7V9aminV0ainfix +V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Lainfix *V8V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V10agetV1V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.34"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="34. postcondition"
+      sum="8ebb699bd9b30ebdaf55f3c54c16e616"
+      proved="true"
+      expanded="false"
+      shape="postconditionasortedV7Iainfix &lt;=c0V0Iasorted_subV7ainfix *c0V5aminV0ainfix +c0V5INainfix &lt;V5V0Iasorted_subV7V9aminV0ainfix +V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Lainfix *V8V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V10agetV1V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter bottom_up_mergesort.35"
+      locfile="../mergesort_array.mlw"
+      loclnum="138" loccnumb="6" loccnume="25"
+      expl="35. postcondition"
+      sum="7db0908203797318304f9ad53f1d99c3"
+      proved="true"
+      expanded="false"
+      shape="postconditionapermut_allV2V7Iainfix &lt;=c0V0Iasorted_subV7ainfix *c0V5aminV0ainfix +c0V5INainfix &lt;V5V0Iasorted_subV7V9aminV0ainfix +V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Lainfix *V8V5FAapermut_allV2V7Aainfix &lt;=c1V5Lamk arrayV0V6FIainfix =agetV4V10agetV1V10Iainfix &lt;V10V3Aainfix &lt;=c0V10FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for bottom_up_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
     </transf>
    </goal>
   </theory>
   <theory
    name="NaturalMergesort"
    locfile="../mergesort_array.mlw"
-   loclnum="143" loccnumb="7" loccnume="23"
-   verified="false"
-   expanded="true">
+   loclnum="209" loccnumb="7" loccnume="23"
+   verified="true"
+   expanded="false">
    <goal
     name="WP_parameter find_run"
     locfile="../mergesort_array.mlw"
-    loclnum="150" loccnumb="6" loccnume="14"
+    loclnum="216" loccnumb="6" loccnume="14"
     expl="VC for find_run"
     sum="80bafa596fed7aa36f87dd98a9b24eec"
     proved="true"
@@ -2341,7 +3121,7 @@
      <goal
       name="WP_parameter find_run.1"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="1. loop invariant init"
       sum="48ea584c996ef957fb191a3c3040c02b"
       proved="true"
@@ -2361,7 +3141,7 @@
      <goal
       name="WP_parameter find_run.2"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="2. loop invariant init"
       sum="8749cb3908818c3a5ac9aa2c4eb2bd0c"
       proved="true"
@@ -2381,7 +3161,7 @@
      <goal
       name="WP_parameter find_run.3"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="3. index in array bounds"
       sum="394738c1c263b4d33179b85081d1ac60"
       proved="true"
@@ -2401,7 +3181,7 @@
      <goal
       name="WP_parameter find_run.4"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="4. index in array bounds"
       sum="b513c5b55c3aa8b08e1abc878b652674"
       proved="true"
@@ -2421,7 +3201,7 @@
      <goal
       name="WP_parameter find_run.5"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="5. loop invariant preservation"
       sum="968393c14e83db594a90982a55e0a202"
       proved="true"
@@ -2441,7 +3221,7 @@
      <goal
       name="WP_parameter find_run.6"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="6. loop invariant preservation"
       sum="8bacd3d980e1fd9ac3cab987583fe471"
       proved="true"
@@ -2461,7 +3241,7 @@
      <goal
       name="WP_parameter find_run.7"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="7. loop variant decrease"
       sum="984d3d2815a1039e7a5f147354425f74"
       proved="true"
@@ -2481,7 +3261,7 @@
      <goal
       name="WP_parameter find_run.8"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="8. postcondition"
       sum="1e01ecc06a75ecf88786073f964ec36b"
       proved="true"
@@ -2501,7 +3281,7 @@
      <goal
       name="WP_parameter find_run.9"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="9. postcondition"
       sum="40c16f26b4b215d9cda2ff90889eb46f"
       proved="true"
@@ -2521,7 +3301,7 @@
      <goal
       name="WP_parameter find_run.10"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="10. postcondition"
       sum="d2583b691846ab1efbd62f2f07d22e09"
       proved="true"
@@ -2541,7 +3321,7 @@
      <goal
       name="WP_parameter find_run.11"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="11. postcondition"
       sum="e09a0294f21ba806e56d6b2b006ed735"
       proved="true"
@@ -2561,7 +3341,7 @@
      <goal
       name="WP_parameter find_run.12"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="12. postcondition"
       sum="410c971954d3ee5efe808d68f78c5de6"
       proved="true"
@@ -2581,7 +3361,7 @@
      <goal
       name="WP_parameter find_run.13"
       locfile="../mergesort_array.mlw"
-      loclnum="150" loccnumb="6" loccnume="14"
+      loclnum="216" loccnumb="6" loccnume="14"
       expl="13. postcondition"
       sum="2c41436f5255e53da2118f3103e5edc2"
       proved="true"
@@ -2603,27 +3383,27 @@
    <goal
     name="WP_parameter natural_mergesort"
     locfile="../mergesort_array.mlw"
-    loclnum="168" loccnumb="6" loccnume="23"
+    loclnum="234" loccnumb="6" loccnume="23"
     expl="VC for natural_mergesort"
-    sum="4196bd85d64803f815eb809acb8a607c"
-    proved="false"
-    expanded="true"
-    shape="iainfix &lt;ainfix -V0V6ainfix -V0V4Aainfix &lt;=c0ainfix -V0V4iiainfix &lt;ainfix -V0V13ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5Aainfix &lt;=V13V0Aainfix &lt;=c0V13Iainfix =V13V10Fainfix &lt;ainfix -V0V15ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5Aainfix &lt;=V15V0Aainfix &lt;=c0V15Iainfix =V15V10FIainfix =V14V10Fainfix =V5c0Iainfix =agetV11V16agetV7V16Iainfix &lt;V16V0Aainfix &lt;=V10V16Oainfix &lt;V16V5Aainfix &lt;=c0V16FAapermutV8V12V5V10Aasorted_subV12V5V10Aainfix &lt;=c0V0Aainfix &lt;=c0V2Lamk arrayV0V11FAasorted_subV8V9V10Aasorted_subV8V5V9Aainfix =V2V0Aainfix &lt;=V10V2Aainfix &lt;=V9V10Aainfix &lt;=V5V9Aainfix &lt;=c0V5Aainfix &lt;=c0V2INaleagetV7ainfix -V10c1agetV7V10Iainfix &lt;V10V0Aasorted_subV8V9V10Aainfix &lt;=V10V0Aainfix &lt;V9V10FAainfix &lt;V9V0Aainfix &lt;=c0V9ainfix &lt;ainfix -V0V6ainfix -V0V4Aainfix &lt;=c0ainfix -V0V4INainfix =V5c0ainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FAainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0ainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FAainfix &lt;=c0V0Aainfix &lt;=c0c0FIainfix =agetV3V17agetV1V17Iainfix &lt;V17V2Aainfix &lt;=c0V17FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+    sum="ab5a622af989561632feeaf9c0854972"
+    proved="true"
+    expanded="false"
+    shape="iapermut_allV2V2AasortedV2iainfix &lt;ainfix -V0V9ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5Aapermut_allV2V11Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=c0V9iiainfix &lt;ainfix -V0V16ainfix -V0V8Aainfix &lt;=c0ainfix -V0V8Aapermut_allV7V15Aainfix &gt;V9V5Aainfix &gt;=V16V9Oainfix =V16c0Aasorted_subV15c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V16V0Aainfix &lt;=c0V16Iainfix =V16V13Fainfix &lt;ainfix -V0V18ainfix -V0V8Aainfix &lt;=c0ainfix -V0V8Aapermut_allV7V15Aainfix &gt;V17V5Aainfix &gt;=V18V17Oainfix =V18c0Aasorted_subV15c0V17Aainfix &lt;=V17V0Aainfix &lt;=V5V17Aainfix &lt;=V18V0Aainfix &lt;=c0V18Iainfix =V18V13FIainfix =V17V13Fainfix =V8c0Aapermut_allV11V15Aapermut_subV11V15V8V13Iainfix =agetV14V19agetV10V19Iainfix &lt;V19V0Aainfix &lt;=V13V19Oainfix &lt;V19V8Aainfix &lt;=c0V19FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FAasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FAainfix &lt;V12V0Aainfix &lt;=c0V12iainfix &lt;ainfix -V0V9ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5Aapermut_allV2V11Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=c0V9apermut_allV2V11AasortedV11ainfix =V8c0ainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FAainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0ainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FAapermut_allV7V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=V5V5Aainfix &lt;=c0V0Aainfix &lt;=c0c0Iapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FAapermut_allV2V2Aasorted_subV2c0c0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix =agetV4V20agetV1V20Iainfix &lt;V20V3Aainfix &lt;=c0V20FAainfix =V3V0Aainfix &lt;=c0V3Fainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
     <label
      name="expl:VC for natural_mergesort"/>
     <transf
      name="split_goal_wp"
-     proved="false"
-     expanded="true">
+     proved="true"
+     expanded="false">
      <goal
       name="WP_parameter natural_mergesort.1"
       locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
+      loclnum="234" loccnumb="6" loccnume="23"
       expl="1. loop invariant init"
-      sum="92dd8f05d6c4fe8480f6db50156645b0"
+      sum="26737de6b72c4eb71af3499a11e7a747"
       proved="true"
       expanded="false"
-      shape="loop invariant initainfix &lt;=c0V0Aainfix &lt;=c0c0FIainfix =agetV3V5agetV1V5Iainfix &lt;V5V2Aainfix &lt;=c0V5FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initasorted_subV2c0c0Aainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix =agetV4V5agetV1V5Iainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for natural_mergesort"/>
       <proof
@@ -2638,12 +3418,12 @@
      <goal
       name="WP_parameter natural_mergesort.2"
       locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="2. type invariant"
-      sum="7da5c96ae1424c657be34cb758401042"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="2. loop invariant init"
+      sum="fc89d10fc9d4e7a6a457f7aa8df0dc8a"
       proved="true"
       expanded="false"
-      shape="type invariantainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V9agetV1V9Iainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initapermut_allV2V2Iainfix =agetV4V5agetV1V5Iainfix &lt;V5V3Aainfix &lt;=c0V5FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for natural_mergesort"/>
       <proof
@@ -2658,12 +3438,12 @@
      <goal
       name="WP_parameter natural_mergesort.3"
       locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="3. precondition"
-      sum="5320f81615a40cad87fb40f9e0f3cbee"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="3. loop invariant init"
+      sum="09d2c718a10be5ede6e5c1a7046e0f98"
       proved="true"
       expanded="false"
-      shape="preconditionainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V9agetV1V9Iainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initainfix &lt;=c0V0Aainfix &lt;=c0c0Iapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V8agetV1V8Iainfix &lt;V8V3Aainfix &lt;=c0V8FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for natural_mergesort"/>
       <proof
@@ -2678,77 +3458,12 @@
      <goal
       name="WP_parameter natural_mergesort.4"
       locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="4. loop variant decrease"
-      sum="1df71a456a95975caa27cd8dbaadf546"
-      proved="false"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -V0V6ainfix -V0V4Aainfix &lt;=c0ainfix -V0V4INainfix =V5c0Iainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V10agetV1V10Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for natural_mergesort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="unknown" time="0.03"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.97"/>
-      </proof>
-      <proof
-       prover="5"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.98"/>
-      </proof>
-      <transf
-       name="split_goal_wp"
-       proved="false"
-       expanded="false">
-       <goal
-        name="WP_parameter natural_mergesort.4.1"
-        locfile="../mergesort_array.mlw"
-        loclnum="168" loccnumb="6" loccnume="23"
-        expl="1."
-        sum="bb5d19fa2ff1ad0875d9488146ef9aba"
-        proved="false"
-        expanded="false"
-        shape="ainfix &lt;=c0ainfix -V0V4INainfix =V5c0Iainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V10agetV1V10Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-        <label
-         name="expl:VC for natural_mergesort"/>
-       </goal>
-       <goal
-        name="WP_parameter natural_mergesort.4.2"
-        locfile="../mergesort_array.mlw"
-        loclnum="168" loccnumb="6" loccnume="23"
-        expl="2."
-        sum="026737af56ddd1616e1996f1b0803bb7"
-        proved="false"
-        expanded="false"
-        shape="ainfix &lt;ainfix -V0V6ainfix -V0V4INainfix =V5c0Iainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V10agetV1V10Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-        <label
-         name="expl:VC for natural_mergesort"/>
-       </goal>
-      </transf>
-     </goal>
-     <goal
-      name="WP_parameter natural_mergesort.5"
-      locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="5. precondition"
-      sum="7352a524601749df459eec6b5699a835"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="4. loop invariant init"
+      sum="5b65b63f4311b36bc5c4a0c51b26a816"
       proved="true"
       expanded="false"
-      shape="preconditionainfix &lt;V9V0Aainfix &lt;=c0V9INainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V10agetV1V10Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initainfix &lt;=V5V0Aainfix &lt;=V5V5Iapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V8agetV1V8Iainfix &lt;V8V3Aainfix &lt;=c0V8FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for natural_mergesort"/>
       <proof
@@ -2757,18 +3472,38 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.5"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="5. loop invariant init"
+      sum="3e5988190f0b8e3be5aad610182a19ca"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initasorted_subV7c0V5Iapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V8agetV1V8Iainfix &lt;V8V3Aainfix &lt;=c0V8FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter natural_mergesort.6"
       locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="6. type invariant"
-      sum="0df5a1b283f4a3635e580706bcdbd9c2"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="6. loop invariant init"
+      sum="46b100daf19ef4137dd49f8bef3acea7"
       proved="true"
       expanded="false"
-      shape="type invariantainfix &lt;=c0V2INaleagetV7ainfix -V10c1agetV7V10Iainfix &lt;V10V0Aasorted_subV8V9V10Aainfix &lt;=V10V0Aainfix &lt;V9V10FIainfix &lt;V9V0Aainfix &lt;=c0V9INainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V11agetV1V11Iainfix &lt;V11V2Aainfix &lt;=c0V11FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="loop invariant initapermut_allV7V7Iapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V8agetV1V8Iainfix &lt;V8V3Aainfix &lt;=c0V8FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for natural_mergesort"/>
       <proof
@@ -2783,132 +3518,12 @@
      <goal
       name="WP_parameter natural_mergesort.7"
       locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="7. precondition"
-      sum="93a606338e7215e04fac96e643051457"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="7. type invariant"
+      sum="287a1cfa3ca5319f417da257e4721fcc"
       proved="true"
       expanded="false"
-      shape="preconditionainfix =V2V0Aainfix &lt;=V10V2Aainfix &lt;=V9V10Aainfix &lt;=V5V9Aainfix &lt;=c0V5Iainfix &lt;=c0V2INaleagetV7ainfix -V10c1agetV7V10Iainfix &lt;V10V0Aasorted_subV8V9V10Aainfix &lt;=V10V0Aainfix &lt;V9V10FIainfix &lt;V9V0Aainfix &lt;=c0V9INainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V11agetV1V11Iainfix &lt;V11V2Aainfix &lt;=c0V11FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for natural_mergesort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter natural_mergesort.8"
-      locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="8. precondition"
-      sum="d32bdbc10eaca72f8578f35d17d3f091"
-      proved="true"
-      expanded="false"
-      shape="preconditionasorted_subV8V5V9Iainfix &lt;=c0V2INaleagetV7ainfix -V10c1agetV7V10Iainfix &lt;V10V0Aasorted_subV8V9V10Aainfix &lt;=V10V0Aainfix &lt;V9V10FIainfix &lt;V9V0Aainfix &lt;=c0V9INainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V11agetV1V11Iainfix &lt;V11V2Aainfix &lt;=c0V11FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for natural_mergesort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter natural_mergesort.9"
-      locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="9. precondition"
-      sum="ba997b14ef9378c521216148b77a64fa"
-      proved="true"
-      expanded="false"
-      shape="preconditionasorted_subV8V9V10Iainfix &lt;=c0V2INaleagetV7ainfix -V10c1agetV7V10Iainfix &lt;V10V0Aasorted_subV8V9V10Aainfix &lt;=V10V0Aainfix &lt;V9V10FIainfix &lt;V9V0Aainfix &lt;=c0V9INainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V11agetV1V11Iainfix &lt;V11V2Aainfix &lt;=c0V11FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for natural_mergesort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter natural_mergesort.10"
-      locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="10. loop invariant preservation"
-      sum="4ae13501e51425614d35114fa2297b25"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;=V14V0Aainfix &lt;=c0V14Iainfix =V14V10FIainfix =V13V10FIainfix =V5c0Iainfix =agetV11V15agetV7V15Iainfix &lt;V15V0Aainfix &lt;=V10V15Oainfix &lt;V15V5Aainfix &lt;=c0V15FAapermutV8V12V5V10Aasorted_subV12V5V10Aainfix &lt;=c0V0Aainfix &lt;=c0V2Lamk arrayV0V11FIasorted_subV8V9V10Aasorted_subV8V5V9Aainfix =V2V0Aainfix &lt;=V10V2Aainfix &lt;=V9V10Aainfix &lt;=V5V9Aainfix &lt;=c0V5Aainfix &lt;=c0V2INaleagetV7ainfix -V10c1agetV7V10Iainfix &lt;V10V0Aasorted_subV8V9V10Aainfix &lt;=V10V0Aainfix &lt;V9V10FIainfix &lt;V9V0Aainfix &lt;=c0V9INainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V16agetV1V16Iainfix &lt;V16V2Aainfix &lt;=c0V16FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for natural_mergesort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter natural_mergesort.11"
-      locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="11. loop variant decrease"
-      sum="f580bdaad958dc35a2f294ef6b6b421e"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -V0V14ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5Iainfix =V14V10FIainfix =V13V10FIainfix =V5c0Iainfix =agetV11V15agetV7V15Iainfix &lt;V15V0Aainfix &lt;=V10V15Oainfix &lt;V15V5Aainfix &lt;=c0V15FAapermutV8V12V5V10Aasorted_subV12V5V10Aainfix &lt;=c0V0Aainfix &lt;=c0V2Lamk arrayV0V11FIasorted_subV8V9V10Aasorted_subV8V5V9Aainfix =V2V0Aainfix &lt;=V10V2Aainfix &lt;=V9V10Aainfix &lt;=V5V9Aainfix &lt;=c0V5Aainfix &lt;=c0V2INaleagetV7ainfix -V10c1agetV7V10Iainfix &lt;V10V0Aasorted_subV8V9V10Aainfix &lt;=V10V0Aainfix &lt;V9V10FIainfix &lt;V9V0Aainfix &lt;=c0V9INainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V16agetV1V16Iainfix &lt;V16V2Aainfix &lt;=c0V16FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for natural_mergesort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter natural_mergesort.12"
-      locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="12. loop invariant preservation"
-      sum="360aece7b6567ece0bd76a69853db5c8"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;=V13V0Aainfix &lt;=c0V13Iainfix =V13V10FINainfix =V5c0Iainfix =agetV11V14agetV7V14Iainfix &lt;V14V0Aainfix &lt;=V10V14Oainfix &lt;V14V5Aainfix &lt;=c0V14FAapermutV8V12V5V10Aasorted_subV12V5V10Aainfix &lt;=c0V0Aainfix &lt;=c0V2Lamk arrayV0V11FIasorted_subV8V9V10Aasorted_subV8V5V9Aainfix =V2V0Aainfix &lt;=V10V2Aainfix &lt;=V9V10Aainfix &lt;=V5V9Aainfix &lt;=c0V5Aainfix &lt;=c0V2INaleagetV7ainfix -V10c1agetV7V10Iainfix &lt;V10V0Aasorted_subV8V9V10Aainfix &lt;=V10V0Aainfix &lt;V9V10FIainfix &lt;V9V0Aainfix &lt;=c0V9INainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V15agetV1V15Iainfix &lt;V15V2Aainfix &lt;=c0V15FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for natural_mergesort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter natural_mergesort.13"
-      locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="13. loop variant decrease"
-      sum="20ef6eac80dd7cff7db551d9223888c7"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -V0V13ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5Iainfix =V13V10FINainfix =V5c0Iainfix =agetV11V14agetV7V14Iainfix &lt;V14V0Aainfix &lt;=V10V14Oainfix &lt;V14V5Aainfix &lt;=c0V14FAapermutV8V12V5V10Aasorted_subV12V5V10Aainfix &lt;=c0V0Aainfix &lt;=c0V2Lamk arrayV0V11FIasorted_subV8V9V10Aasorted_subV8V5V9Aainfix =V2V0Aainfix &lt;=V10V2Aainfix &lt;=V9V10Aainfix &lt;=V5V9Aainfix &lt;=c0V5Aainfix &lt;=c0V2INaleagetV7ainfix -V10c1agetV7V10Iainfix &lt;V10V0Aasorted_subV8V9V10Aainfix &lt;=V10V0Aainfix &lt;V9V10FIainfix &lt;V9V0Aainfix &lt;=c0V9INainfix =V9V0INaleagetV7ainfix -V9c1agetV7V9Iainfix &lt;V9V0Aasorted_subV8V5V9Aainfix &lt;=V9V0Aainfix &lt;V5V9FIainfix &lt;V5V0Aainfix &lt;=c0V5Aainfix &lt;=c0V0Iainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V15agetV1V15Iainfix &lt;V15V2Aainfix &lt;=c0V15FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="type invariantainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V12agetV1V12Iainfix &lt;V12V3Aainfix &lt;=c0V12FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for natural_mergesort"/>
       <proof
@@ -2921,69 +3536,678 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter natural_mergesort.14"
+      name="WP_parameter natural_mergesort.8"
       locfile="../mergesort_array.mlw"
-      loclnum="168" loccnumb="6" loccnume="23"
-      expl="14. loop variant decrease"
-      sum="a90ff70925307703b32dfe1a835a2ffe"
-      proved="false"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="8. precondition"
+      sum="d16524606faee8cbb1a61829873374cf"
+      proved="true"
       expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -V0V6ainfix -V0V4Aainfix &lt;=c0ainfix -V0V4INainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V9agetV1V9Iainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      shape="preconditionainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V12agetV1V12Iainfix &lt;V12V3Aainfix &lt;=c0V12FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
       <label
        name="expl:VC for natural_mergesort"/>
       <proof
        prover="0"
        timelimit="6"
        memlimit="1000"
-       obsolete="true"
+       obsolete="false"
        archived="false">
-       <result status="unknown" time="0.02"/>
+       <result status="valid" time="0.02"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.9"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="9. postcondition"
+      sum="b31ce40077050fc51f36aa3187689e41"
+      proved="true"
+      expanded="false"
+      shape="postconditionasortedV11Iainfix =V8c0Iainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V13agetV1V13Iainfix &lt;V13V3Aainfix &lt;=c0V13FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.10"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="10. postcondition"
+      sum="23439a30fd80252c82e78e3a40bf1631"
+      proved="true"
+      expanded="false"
+      shape="postconditionapermut_allV2V11Iainfix =V8c0Iainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V13agetV1V13Iainfix &lt;V13V3Aainfix &lt;=c0V13FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.11"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="11. loop invariant preservation"
+      sum="681c452ed1b14a17e91b087dc8de7b57"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=c0V9INainfix =V8c0Iainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V13agetV1V13Iainfix &lt;V13V3Aainfix &lt;=c0V13FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.12"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="12. loop invariant preservation"
+      sum="13d55b6d453ee85f90d95f237eed392c"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationapermut_allV2V11INainfix =V8c0Iainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V13agetV1V13Iainfix &lt;V13V3Aainfix &lt;=c0V13FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.13"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="13. loop variant decrease"
+      sum="cfb4d3634724ffe599bb8b78464a4a73"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;ainfix -V0V9ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5INainfix =V8c0Iainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V13agetV1V13Iainfix &lt;V13V3Aainfix &lt;=c0V13FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter natural_mergesort.13.1"
+        locfile="../mergesort_array.mlw"
+        loclnum="234" loccnumb="6" loccnume="23"
+        expl="1."
+        sum="073bf643f741aafeed477ea29f8cf0b1"
+        proved="true"
+        expanded="false"
+        shape="ainfix &lt;=c0ainfix -V0V5INainfix =V8c0Iainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V13agetV1V13Iainfix &lt;V13V3Aainfix &lt;=c0V13FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for natural_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="6"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter natural_mergesort.13.2"
+        locfile="../mergesort_array.mlw"
+        loclnum="234" loccnumb="6" loccnume="23"
+        expl="2."
+        sum="c8ab1db8bb74c5523e3d35d66af81a72"
+        proved="true"
+        expanded="false"
+        shape="ainfix &lt;ainfix -V0V9ainfix -V0V5INainfix =V8c0Iainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V13agetV1V13Iainfix &lt;V13V3Aainfix &lt;=c0V13FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+        <label
+         name="expl:VC for natural_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="6"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.14"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="14. precondition"
+      sum="75f7e15a7bb24dc0b27ef0533a3a0bbb"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V13agetV1V13Iainfix &lt;V13V3Aainfix &lt;=c0V13FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.15"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="15. type invariant"
+      sum="58880d7bdfc7a38126c4dd8ece579c49"
+      proved="true"
+      expanded="false"
+      shape="type invariantainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V14agetV1V14Iainfix &lt;V14V3Aainfix &lt;=c0V14FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.16"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="16. precondition"
+      sum="9eb5f4740a434f40f79a8fd7815581c8"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Iainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V14agetV1V14Iainfix &lt;V14V3Aainfix &lt;=c0V14FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.17"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="17. precondition"
+      sum="f4d9ccda0e3544d24fa4f71d0c84624b"
+      proved="true"
+      expanded="false"
+      shape="preconditionasorted_subV11V8V12Iainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V14agetV1V14Iainfix &lt;V14V3Aainfix &lt;=c0V14FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.18"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="18. precondition"
+      sum="610a75be269e98dd69dfb04695d47bfa"
+      proved="true"
+      expanded="false"
+      shape="preconditionasorted_subV11V12V13Iainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V14agetV1V14Iainfix &lt;V14V3Aainfix &lt;=c0V14FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.19"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="19. assertion"
+      sum="cb4c1ed1b2757b25f48485d2bcffdcd3"
+      proved="true"
+      expanded="false"
+      shape="assertionapermut_subV11V15V8V13Iainfix =agetV14V16agetV10V16Iainfix &lt;V16V0Aainfix &lt;=V13V16Oainfix &lt;V16V8Aainfix &lt;=c0V16FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V17agetV1V17Iainfix &lt;V17V3Aainfix &lt;=c0V17FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.20"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="20. assertion"
+      sum="05715d50b5571ec47c12be6be5cb0bd5"
+      proved="true"
+      expanded="false"
+      shape="assertionapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V16agetV10V16Iainfix &lt;V16V0Aainfix &lt;=V13V16Oainfix &lt;V16V8Aainfix &lt;=c0V16FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V17agetV1V17Iainfix &lt;V17V3Aainfix &lt;=c0V17FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
       <proof
        prover="3"
        timelimit="6"
        memlimit="1000"
-       obsolete="true"
+       obsolete="false"
        archived="false">
-       <result status="timeout" time="5.98"/>
+       <result status="valid" time="2.18"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.21"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="21. loop invariant preservation"
+      sum="7cb5f1fbddc1130e7ad25c829aa53d1d"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V17V0Aainfix &lt;=c0V17Iainfix =V17V13FIainfix =V16V13FIainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V18agetV10V18Iainfix &lt;V18V0Aainfix &lt;=V13V18Oainfix &lt;V18V8Aainfix &lt;=c0V18FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V19agetV1V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
       <proof
-       prover="5"
+       prover="0"
        timelimit="6"
        memlimit="1000"
-       obsolete="true"
+       obsolete="false"
        archived="false">
-       <result status="timeout" time="6.00"/>
+       <result status="valid" time="0.12"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.22"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="22. loop invariant preservation"
+      sum="c81fd9b1751460d8793b161cba878317"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V16V0Aainfix &lt;=V5V16Iainfix =V17V13FIainfix =V16V13FIainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V18agetV10V18Iainfix &lt;V18V0Aainfix &lt;=V13V18Oainfix &lt;V18V8Aainfix &lt;=c0V18FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V19agetV1V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.17"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.23"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="23. loop invariant preservation"
+      sum="ba6068b07c181843147ff1fd37b588a3"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationasorted_subV15c0V16Iainfix =V17V13FIainfix =V16V13FIainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V18agetV10V18Iainfix &lt;V18V0Aainfix &lt;=V13V18Oainfix &lt;V18V8Aainfix &lt;=c0V18FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V19agetV1V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.09"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.24"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="24. loop invariant preservation"
+      sum="cf29f68ff58b9dc93a1530ca03f9629f"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &gt;V16V5Aainfix &gt;=V17V16Oainfix =V17c0Iainfix =V17V13FIainfix =V16V13FIainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V18agetV10V18Iainfix &lt;V18V0Aainfix &lt;=V13V18Oainfix &lt;V18V8Aainfix &lt;=c0V18FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V19agetV1V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.26"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.25"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="25. loop invariant preservation"
+      sum="34f09eddae0c110edbd895e932e76d43"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationapermut_allV7V15Iainfix =V17V13FIainfix =V16V13FIainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V18agetV10V18Iainfix &lt;V18V0Aainfix &lt;=V13V18Oainfix &lt;V18V8Aainfix &lt;=c0V18FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V19agetV1V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="4"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.14"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.26"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="26. loop variant decrease"
+      sum="a9372c8046043f1c6654be88bac442b5"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;ainfix -V0V17ainfix -V0V8Aainfix &lt;=c0ainfix -V0V8Iainfix =V17V13FIainfix =V16V13FIainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V18agetV10V18Iainfix &lt;V18V0Aainfix &lt;=V13V18Oainfix &lt;V18V8Aainfix &lt;=c0V18FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V19agetV1V19Iainfix &lt;V19V3Aainfix &lt;=c0V19FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.27"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="27. loop invariant preservation"
+      sum="e62a99763a92a870c943088f656594c1"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V16V0Aainfix &lt;=c0V16Iainfix =V16V13FINainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V17agetV10V17Iainfix &lt;V17V0Aainfix &lt;=V13V17Oainfix &lt;V17V8Aainfix &lt;=c0V17FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V18agetV1V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.28"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="28. loop invariant preservation"
+      sum="d4f29416e3116e4381ce53ae4eb8b223"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V9V0Aainfix &lt;=V5V9Iainfix =V16V13FINainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V17agetV10V17Iainfix &lt;V17V0Aainfix &lt;=V13V17Oainfix &lt;V17V8Aainfix &lt;=c0V17FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V18agetV1V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.29"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="29. loop invariant preservation"
+      sum="ab16c78fb615338d9dd80f26beb5a36e"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationasorted_subV15c0V9Iainfix =V16V13FINainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V17agetV10V17Iainfix &lt;V17V0Aainfix &lt;=V13V17Oainfix &lt;V17V8Aainfix &lt;=c0V17FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V18agetV1V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="4.86"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.30"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="30. loop invariant preservation"
+      sum="c31268faacaa630bf617db42d3f17d1b"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &gt;V9V5Aainfix &gt;=V16V9Oainfix =V16c0Iainfix =V16V13FINainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V17agetV10V17Iainfix &lt;V17V0Aainfix &lt;=V13V17Oainfix &lt;V17V8Aainfix &lt;=c0V17FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V18agetV1V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.31"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="31. loop invariant preservation"
+      sum="027ca4cb0bb6f65f8e5e0234e3053da5"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationapermut_allV7V15Iainfix =V16V13FINainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V17agetV10V17Iainfix &lt;V17V0Aainfix &lt;=V13V17Oainfix &lt;V17V8Aainfix &lt;=c0V17FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V18agetV1V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="4"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.32"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="32. loop variant decrease"
+      sum="49d400afcd7b929ea0f71a5c301f957e"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;ainfix -V0V16ainfix -V0V8Aainfix &lt;=c0ainfix -V0V8Iainfix =V16V13FINainfix =V8c0Iapermut_allV11V15Iapermut_subV11V15V8V13Iainfix =agetV14V17agetV10V17Iainfix &lt;V17V0Aainfix &lt;=V13V17Oainfix &lt;V17V8Aainfix &lt;=c0V17FAapermutV11V15V8V13Aasorted_subV15V8V13Aainfix &lt;=c0V0Aainfix &lt;=c0V3Lamk arrayV0V14FIasorted_subV11V12V13Aasorted_subV11V8V12Aainfix =V3V0Aainfix &lt;=V13V3Aainfix &lt;=V12V13Aainfix &lt;=V8V12Aainfix &lt;=c0V8Aainfix &lt;=c0V3INaleagetV10ainfix -V13c1agetV10V13Iainfix &lt;V13V0Aasorted_subV11V12V13Aainfix &lt;=V13V0Aainfix &lt;V12V13FIainfix &lt;V12V0Aainfix &lt;=c0V12INainfix =V12V0INaleagetV10ainfix -V12c1agetV10V12Iainfix &lt;V12V0Aasorted_subV11V8V12Aainfix &lt;=V12V0Aainfix &lt;V8V12FIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Iainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V18agetV1V18Iainfix &lt;V18V3Aainfix &lt;=c0V18FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.33"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="33. loop invariant preservation"
+      sum="fab889c74aaac084e62cfe782fc80ed6"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=c0V9INainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V12agetV1V12Iainfix &lt;V12V3Aainfix &lt;=c0V12FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.34"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="34. loop invariant preservation"
+      sum="9d042052c410ff6bb50f0dd9ac46ceee"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationapermut_allV2V11INainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V12agetV1V12Iainfix &lt;V12V3Aainfix &lt;=c0V12FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.35"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="35. loop variant decrease"
+      sum="073b42eb358a991b52b365829bd7afa2"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;ainfix -V0V9ainfix -V0V5Aainfix &lt;=c0ainfix -V0V5INainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V12agetV1V12Iainfix &lt;V12V3Aainfix &lt;=c0V12FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
       <transf
        name="split_goal_wp"
-       proved="false"
+       proved="true"
        expanded="false">
        <goal
-        name="WP_parameter natural_mergesort.14.1"
+        name="WP_parameter natural_mergesort.35.1"
         locfile="../mergesort_array.mlw"
-        loclnum="168" loccnumb="6" loccnume="23"
+        loclnum="234" loccnumb="6" loccnume="23"
         expl="1."
-        sum="3eb79c15865aa48e89ab50181b524ca1"
-        proved="false"
+        sum="643fb3987dffe3c4fcec6faa33d31cf9"
+        proved="true"
         expanded="false"
-        shape="ainfix &lt;=c0ainfix -V0V4INainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V9agetV1V9Iainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+        shape="ainfix &lt;=c0ainfix -V0V5INainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V12agetV1V12Iainfix &lt;V12V3Aainfix &lt;=c0V12FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
         <label
          name="expl:VC for natural_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="6"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.05"/>
+        </proof>
        </goal>
        <goal
-        name="WP_parameter natural_mergesort.14.2"
+        name="WP_parameter natural_mergesort.35.2"
         locfile="../mergesort_array.mlw"
-        loclnum="168" loccnumb="6" loccnume="23"
+        loclnum="234" loccnumb="6" loccnume="23"
         expl="2."
-        sum="7e8bd2ddf55b89adcef8d6c789a4ab44"
-        proved="false"
+        sum="f0db19544016ee025ea9a183fb249489"
+        proved="true"
         expanded="false"
-        shape="ainfix &lt;ainfix -V0V6ainfix -V0V4INainfix &lt;V5ainfix -V0c1Iainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V7FFIainfix =agetV3V9agetV1V9Iainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+        shape="ainfix &lt;ainfix -V0V9ainfix -V0V5INainfix &lt;V8ainfix -V0c1Iapermut_allV7V11Aainfix &gt;V9V5Aainfix &gt;=V8V9Oainfix =V8c0Aasorted_subV11c0V9Aainfix &lt;=V9V0Aainfix &lt;=V5V9Aainfix &lt;=V8V0Aainfix &lt;=c0V8Lamk arrayV0V10FIapermut_allV2V7Aasorted_subV7c0V5Aainfix &lt;=V5V0Aainfix &lt;=c0V5Lamk arrayV0V6FIainfix =agetV4V12agetV1V12Iainfix &lt;V12V3Aainfix &lt;=c0V12FAainfix =V3V0Aainfix &lt;=c0V3FIainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
         <label
          name="expl:VC for natural_mergesort"/>
+        <proof
+         prover="0"
+         timelimit="6"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.06"/>
+        </proof>
        </goal>
       </transf>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.36"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="36. postcondition"
+      sum="57a11bc1d0d65d1d56a1ec0c52344a21"
+      proved="true"
+      expanded="false"
+      shape="postconditionasortedV2INainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter natural_mergesort.37"
+      locfile="../mergesort_array.mlw"
+      loclnum="234" loccnumb="6" loccnume="23"
+      expl="37. postcondition"
+      sum="8e5110ae61aab06c31f3ea48c4b5c711"
+      proved="true"
+      expanded="false"
+      shape="postconditionapermut_allV2V2INainfix &gt;=V0c2Iainfix &lt;=c0V0Lamk arrayV0V1F">
+      <label
+       name="expl:VC for natural_mergesort"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
      </goal>
     </transf>
    </goal>
