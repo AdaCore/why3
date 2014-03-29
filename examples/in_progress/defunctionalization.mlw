@@ -677,8 +677,8 @@ module R
 
   use import DirectSem
 
-(*
-Une semantique a petits pas iterative avec des contextes de reduction:
+(**
+A small step semantics, defined iteratively with reduction contexts
 
 "Reduction semantics" pour les expressions arithmetiques
 --------------------------------------------------------
@@ -882,7 +882,7 @@ alors reduis e = recompose (C, c)
 *)
 
 (** {4 Exercise 2.0}
-  Implementer la "reduction semantics" ci-dessus et la tester.
+  Implement the reduction semantics above and test it
 *)
 
 
@@ -924,8 +924,8 @@ let rec itere (e:expr) : int
   end
 
 (** {4 Exercise 2.1}
-  Optimiser l'etape de recomposition / decomposition
-  en une fonction "refocus".
+  Optimize the step recomposition / decomposition
+  into a single function [refocus].
 *)
 
 

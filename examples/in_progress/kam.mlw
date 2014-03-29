@@ -1,8 +1,8 @@
-(** 
+(**
 
 {1 Krivine Abstract Machine}
 
-This is inspired from student exercises proposed by 
+This is inspired from student exercises proposed by
 {h <a href="http://cs.au.dk/~danvy/">Olivier Danvy</a>}
 at the {h <a href="http://jfla.inria.fr/2014/">JFLA 2014 conference</a>}
 
@@ -28,6 +28,8 @@ p ::= t
       where [t] is ground (i.e. without any free variable)
 *)
 
+use export int.Int
+
 type identifier = int
 
 type term =
@@ -51,11 +53,96 @@ constant p0 : term = Lambda x (Var x)
 
 constant p1 : term = App p0 p0
 
-constant p2 : term = 
+constant p2 : term =
   App (App (Lambda x (Lambda f (App (Var f)  (Var x))))
            (Lambda y (Var y)))
       (Lambda x (Var x))
-       
+
+use HighOrd as H
+
+predicate ground_rec (t:term) (bound: H.pred identifier) =
+  match t with
+  | Var v -> bound v
+  | App t1 t2 -> ground_rec t1 bound /\ ground_rec t2 bound
+  | Lambda x t -> ground_rec t (\v. v=x \/ bound v)
+  end
+
+let lemma ground_rec_app (t1 t2 : term) (bound: H.pred identifier)
+  requires { ground_rec (App t1 t2) bound }
+  ensures  { ground_rec t1 bound }
+  ensures  { ground_rec t2 bound }
+= ()
+
+function no_bound : H.pred identifier = (\x. false)
+
+predicate ground (t:term) = ground_rec t no_bound
+
+let lemma ground_app (t1 t2 : term)
+  requires { ground (App t1 t2) }
+  ensures  { ground t1 }
+  ensures  { ground t2 }
+= ground_rec_app t1 t2 no_bound
+
+
+(* substitution of [x] by [s] in [t].
+   We assume that s is a ground term, so that variable capture cannot
+   occur when we transverse a lambda *)
+function subst (t:term) (x:identifier) (s:term) : term =
+  match t with
+  | Var v -> if x = v then s else t
+  | Lambda v t1 -> Lambda v (if x = v then t1 else subst t1 x s)
+  | App t1 t2 -> App (subst t1 x s) (subst t2 x s)
+  end
+
+(* weak reduction, i.e no reduction under lambda *)
+inductive weak_reduce term term =
+  | Beta : forall t1 t2 x.
+    weak_reduce (App (Lambda x t1) t2) (subst t2 x t1)
+  | Left : forall t1 t2 t.
+    weak_reduce t1 t2 -> weak_reduce (App t1 t) (App t2 t)
+  | Right : forall t1 t2 t.
+    weak_reduce t1 t2 -> weak_reduce (App t t1) (App t t2)
+
+predicate weak_nf (t:term) =
+  match t with
+  | Lambda _ _ -> true
+  | _ -> false
+  end
+
+let lemma weak_nf_correct (t:term)
+  requires { ground t }
+  requires { weak_nf t }
+  ensures  { forall u:term. not (weak_reduce t u) }
+= ()
+
+let rec lemma weak_nf_complete (t:term)
+  requires { ground t }
+  requires { forall u:term. not (weak_reduce t u) }
+  variant  { t }
+  ensures  { weak_nf t }
+= match t with
+  | Var _ -> ()
+  | Lambda _ _ -> ()
+  | App t1 t2 -> 
+    weak_nf_complete t1; weak_nf_complete t2
+  end
+
+(* weak normalisation *)
+
+inductive weak_n_reduce int term term =
+  | Zero : forall t. weak_n_reduce 0 t t
+  | Succ : forall t1 t2 t3 n.
+     weak_reduce t1 t2 -> weak_n_reduce n t2 t3 -> 
+     weak_n_reduce (n+1) t1 t3
+
+predicate weak_normalize (t1 t2:term) =
+  exists n. weak_n_reduce n t1 t2 /\ weak_nf t2
+
+end
+
+
+module CEK
+
 (** Values and environments:
 {h <blockquote><pre>
 e  :  environment
@@ -66,24 +153,45 @@ v ::= (\x.t, e)
 </pre></blockquote>}
 *)
 
-(** Operateur algebrique:
+
+use import Lambda
+
+use import list.List
+
+type environment = list (identifier, value)
+with value = Closure identifier term environment
+
+(** Lookup a value in environment:
 {h <blockquote><pre>
-lookup : identificateur -> environnement -> value
+lookup : identifier -> environment -> value
 </pre></blockquote>}
 *)
 
-(** Contextes d'evaluation:
+constant dummy_value : value = Closure (-1) (Var (-1)) Nil
+
+function lookup (i:identifier) (e:environment) : value =
+  match e with
+  | Nil -> dummy_value
+  | Cons (j,v) r -> if i=j then v else lookup i r
+  end
+
+(** Evaluation Contexts:
 {h <blockquote><pre>
 C ::= [] | [C (t, e)] | [v C]
 </pre></blockquote>}
 *)
 
-(** Machine abstraite (dite "CEK"):
+type context =
+  | Empty
+  | Left context term environment
+  | Right value context
+
+(** The CEK abstract machine :
 {h <blockquote><pre>
     &lt;x, e, C&gt;_eval -> &lt;C, v&gt;_cont
                       where v = lookup x e
  &lt;\x.t, e, C&gt;_eval -> &lt;C, (\x.t, e)&gt;_cont
-&lt;t0 t1, e, C&gt;_eval -> &lt;t0, e, [C (t1, e)]&gt;
+&lt;t0 t1, e, C&gt;_eval -> &lt;t0, e, [C (t1, e)]&gt;_eval
 
            &lt;[], v&gt;_cont -> v
    &lt;[C (t, e)], v&gt;_cont -> &lt;t, e, [v C]&gt;_eval
@@ -91,26 +199,36 @@ C ::= [] | [C (t, e)] | [v C]
 </pre></blockquote>}
 *)
 
-(** {4 Exercise 2.0}
-  Program cette machine abstraite.
-*)
+let rec eval (t:term) (e:environment) (c:context) : value 
+  diverges
+= match t with
+  | Var x -> cont c (lookup x e)
+  | Lambda x t -> cont c (Closure x t e)
+  | App t0 t1 -> eval t0 e (Left c t1 e)
+  end
 
-(** {4 Exercise 2.1}
-  Cette machine abstraite est en forme defonctionalisee.
-  La refonctionaliser.
-*)
+with cont (c:context) (v:value) : value 
+  diverges
+= match c with
+  | Empty -> v
+  | Left c t e -> eval t e (Right v c)
+  | Right (Closure x t e) c -> eval t (Cons (x,v) e) c
+  end
 
-(** {4 Exercise 2.2}
-  Le resultat de l'Exercise 1 est en CPS.
-  L'exprimer en style direct.
-*)
 
-(** {4 Exercise 2.3}
-  Le resultat de l'Exercise 2 est en forme defonctionalisee
-  (dans le sens que les fermetures sont en forme defonctionalisee
-  triviale).
-  Le refonctionaliser, et caracteriser le resultat.
-*)
+let compute p : value
+  requires { ground p }
+  diverges
+  returns { Closure x t e ->
+    e = Nil /\ weak_normalize p (Lambda x t) }
+= eval p Nil Empty
+
+let t0 () = compute p0
+
+let t1 () = compute p1
+
+let t2 () = compute p2
+
 
 end
 
