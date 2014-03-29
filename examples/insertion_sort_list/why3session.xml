@@ -4,142 +4,194 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.95.1"/>
+  version="0.95.2"/>
  <prover
   id="1"
-  name="CVC3"
-  version="2.4.1"/>
+  name="CVC4"
+  version="1.3"/>
  <file
   name="../insertion_sort_list.mlw"
   verified="true"
   expanded="true">
   <theory
-   name="M"
+   name="InsertionSort"
    locfile="../insertion_sort_list.mlw"
-   loclnum="4" loccnumb="7" loccnume="8"
+   loclnum="4" loccnumb="7" loccnume="20"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter insert"
     locfile="../insertion_sort_list.mlw"
-    loclnum="11" loccnumb="10" loccnume="16"
+    loclnum="13" loccnumb="10" loccnume="16"
     expl="VC for insert"
-    sum="57d69e3b9872face7a19c15bf998124f"
+    sum="cc3fc1c2b87387b1c4fa4533d749cd4e"
     proved="true"
     expanded="true"
-    shape="CapermutaConsV0V1V2AasortedV2LaConsV0aNilaNiliapermutaConsV0V1V6AasortedV6LaConsV3V5IapermutaConsV0V4V5AasortedV5FAasortedV4ACfaNilainfix =V7V4aConswVV1apermutaConsV0V1V8AasortedV8LaConsV0V1ainfix &lt;=V0V3aConsVVV1IasortedV1F">
+    shape="CapermutaConsV0V1V2AasortedV2LaConsV0aNilaNiliapermutaConsV0V1V6AasortedV6LaConsV3V5IapermutaConsV0V4V5AasortedV5FAasortedV4ACfaNilainfix =V7V4aConswVV1apermutaConsV0V1V8AasortedV8LaConsV0V1aleV0V3aConsVVV1IasortedV1F">
     <label
      name="expl:VC for insert"/>
     <transf
-     name="split_goal"
+     name="split_goal_wp"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter insert.1"
       locfile="../insertion_sort_list.mlw"
-      loclnum="11" loccnumb="10" loccnume="16"
+      loclnum="13" loccnumb="10" loccnume="16"
       expl="1. postcondition"
-      sum="2ebfa62bb421051252fa75db4cae3795"
+      sum="d94333f89c188ca295e2771d3c06616e"
       proved="true"
-      expanded="true"
-      shape="postconditionCapermutaConsV0V1V2AasortedV2LaConsV0aNilaNiltaConsVVV1IasortedV1F">
+      expanded="false"
+      shape="postconditionCasortedV2LaConsV0aNilaNiltaConsVVV1IasortedV1F">
       <label
        name="expl:VC for insert"/>
       <proof
        prover="0"
        timelimit="10"
-       memlimit="0"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insert.2"
       locfile="../insertion_sort_list.mlw"
-      loclnum="11" loccnumb="10" loccnume="16"
+      loclnum="13" loccnumb="10" loccnume="16"
       expl="2. postcondition"
-      sum="da6c90acf4d246621d5aeec82f1ad640"
+      sum="a90aefb24c56deed211a9a5adbe9a4bc"
       proved="true"
-      expanded="true"
-      shape="postconditionCtaNilapermutaConsV0V1V4AasortedV4LaConsV0V1Iainfix &lt;=V0V2aConsVVV1IasortedV1F">
+      expanded="false"
+      shape="postconditionCapermutaConsV0V1V2LaConsV0aNilaNiltaConsVVV1IasortedV1F">
       <label
        name="expl:VC for insert"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="10"
-       memlimit="0"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insert.3"
       locfile="../insertion_sort_list.mlw"
-      loclnum="11" loccnumb="10" loccnume="16"
-      expl="3. variant decrease"
-      sum="a327b62f8af204b66b0b5ec8e6be854e"
+      loclnum="13" loccnumb="10" loccnume="16"
+      expl="3. postcondition"
+      sum="978c39769aacdd812aff5e13ab053fce"
       proved="true"
-      expanded="true"
-      shape="variant decreaseCtaNilCfaNilainfix =V4V3aConswVV1INainfix &lt;=V0V2aConsVVV1IasortedV1F">
+      expanded="false"
+      shape="postconditionCtaNilasortedV4LaConsV0V1IaleV0V2aConsVVV1IasortedV1F">
       <label
        name="expl:VC for insert"/>
       <proof
        prover="0"
-       timelimit="5"
+       timelimit="10"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insert.4"
       locfile="../insertion_sort_list.mlw"
-      loclnum="11" loccnumb="10" loccnume="16"
-      expl="4. precondition"
-      sum="021157713996b245f08ec339318e5daa"
+      loclnum="13" loccnumb="10" loccnume="16"
+      expl="4. postcondition"
+      sum="f6f2cc2d6a9a3e28c44ec8b6004aca92"
       proved="true"
-      expanded="true"
-      shape="preconditionCtaNilasortedV3INainfix &lt;=V0V2aConsVVV1IasortedV1F">
+      expanded="false"
+      shape="postconditionCtaNilapermutaConsV0V1V4LaConsV0V1IaleV0V2aConsVVV1IasortedV1F">
       <label
        name="expl:VC for insert"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="10"
-       memlimit="0"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insert.5"
       locfile="../insertion_sort_list.mlw"
-      loclnum="11" loccnumb="10" loccnume="16"
-      expl="5. postcondition"
-      sum="796ab11b9a101597f6cd4759e05c6974"
+      loclnum="13" loccnumb="10" loccnume="16"
+      expl="5. variant decrease"
+      sum="34644657d76f754487955c41435534f2"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNilCfaNilainfix =V4V3aConswVV1INaleV0V2aConsVVV1IasortedV1F">
+      <label
+       name="expl:VC for insert"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.6"
+      locfile="../insertion_sort_list.mlw"
+      loclnum="13" loccnumb="10" loccnume="16"
+      expl="6. precondition"
+      sum="027752c77210629ac8042ee30c63b913"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaNilasortedV3INaleV0V2aConsVVV1IasortedV1F">
+      <label
+       name="expl:VC for insert"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.7"
+      locfile="../insertion_sort_list.mlw"
+      loclnum="13" loccnumb="10" loccnume="16"
+      expl="7. postcondition"
+      sum="8d29fdf017af31d90092c8aaf0cf9b50"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNilasortedV5LaConsV2V4IapermutaConsV0V3V4AasortedV4FIasortedV3INaleV0V2aConsVVV1IasortedV1F">
+      <label
+       name="expl:VC for insert"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.15"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insert.8"
+      locfile="../insertion_sort_list.mlw"
+      loclnum="13" loccnumb="10" loccnume="16"
+      expl="8. postcondition"
+      sum="b8fe894d268a2476800098cc339892b5"
       proved="true"
       expanded="true"
-      shape="postconditionCtaNilapermutaConsV0V1V5AasortedV5LaConsV2V4IapermutaConsV0V3V4AasortedV4FIasortedV3INainfix &lt;=V0V2aConsVVV1IasortedV1F">
+      shape="postconditionCtaNilapermutaConsV0V1V5LaConsV2V4IapermutaConsV0V3V4AasortedV4FIasortedV3INaleV0V2aConsVVV1IasortedV1F">
       <label
        name="expl:VC for insert"/>
       <proof
        prover="1"
        timelimit="10"
-       memlimit="0"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.11"/>
+       <result status="valid" time="0.20"/>
       </proof>
      </goal>
     </transf>
@@ -147,89 +199,73 @@
    <goal
     name="WP_parameter insertion_sort"
     locfile="../insertion_sort_list.mlw"
-    loclnum="19" loccnumb="10" loccnume="24"
+    loclnum="23" loccnumb="10" loccnume="24"
     expl="VC for insertion_sort"
-    sum="9cba6252a5bb374e1698f3a5d435e4bc"
+    sum="b1a299800b4664e15a2afe7c1f44ba06"
     proved="true"
     expanded="true"
     shape="CapermutV0V1AasortedV1LaNilaNilapermutV0V5AasortedV5IapermutaConsV2V4V5AasortedV5FAasortedV4IapermutV3V4AasortedV4FACfaNilainfix =V6V3aConswVV0aConsVVV0F">
     <label
      name="expl:VC for insertion_sort"/>
     <transf
-     name="split_goal"
+     name="split_goal_wp"
      proved="true"
      expanded="true">
      <goal
       name="WP_parameter insertion_sort.1"
       locfile="../insertion_sort_list.mlw"
-      loclnum="19" loccnumb="10" loccnume="24"
+      loclnum="23" loccnumb="10" loccnume="24"
       expl="1. postcondition"
-      sum="4f90547a0f4f4ee2e0772ab2e992e7d9"
+      sum="817683103cb88e976105ad6982bc7290"
       proved="true"
-      expanded="true"
-      shape="postconditionCapermutV0V1AasortedV1LaNilaNiltaConsVVV0F">
+      expanded="false"
+      shape="postconditionCasortedV1LaNilaNiltaConsVVV0F">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="10"
-       memlimit="0"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter insertion_sort.2"
       locfile="../insertion_sort_list.mlw"
-      loclnum="19" loccnumb="10" loccnume="24"
-      expl="2. variant decrease"
-      sum="401060003e5e2f247a7fcb18f6494c83"
+      loclnum="23" loccnumb="10" loccnume="24"
+      expl="2. postcondition"
+      sum="17c1bc20bcc98a2a62255d08f0629ffd"
       proved="true"
-      expanded="true"
+      expanded="false"
+      shape="postconditionCapermutV0V1LaNilaNiltaConsVVV0F">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.3"
+      locfile="../insertion_sort_list.mlw"
+      loclnum="23" loccnumb="10" loccnume="24"
+      expl="3. variant decrease"
+      sum="49daa7aafece9356fa313a12cbd9e9b0"
+      proved="true"
+      expanded="false"
       shape="variant decreaseCtaNilCfaNilainfix =V3V2aConswVV0aConsVVV0F">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
        prover="0"
        timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter insertion_sort.3"
-      locfile="../insertion_sort_list.mlw"
-      loclnum="19" loccnumb="10" loccnume="24"
-      expl="3. precondition"
-      sum="3a4eaa0539e5024054dfd058370cb5f4"
-      proved="true"
-      expanded="true"
-      shape="preconditionCtaNilasortedV3IapermutV2V3AasortedV3FaConsVVV0F">
-      <label
-       name="expl:VC for insertion_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="10"
-       memlimit="0"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -238,29 +274,61 @@
      <goal
       name="WP_parameter insertion_sort.4"
       locfile="../insertion_sort_list.mlw"
-      loclnum="19" loccnumb="10" loccnume="24"
-      expl="4. postcondition"
-      sum="27ee032ad7f38750ebdd8a9384349ae1"
+      loclnum="23" loccnumb="10" loccnume="24"
+      expl="4. precondition"
+      sum="42a3ae045178dfa95e3983d955cf627b"
       proved="true"
-      expanded="true"
-      shape="postconditionCtaNilapermutV0V4AasortedV4IapermutaConsV1V3V4AasortedV4FIasortedV3IapermutV2V3AasortedV3FaConsVVV0F">
+      expanded="false"
+      shape="preconditionCtaNilasortedV3IapermutV2V3AasortedV3FaConsVVV0F">
       <label
        name="expl:VC for insertion_sort"/>
       <proof
        prover="0"
        timelimit="10"
-       memlimit="0"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.10"/>
+       <result status="valid" time="0.02"/>
       </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.5"
+      locfile="../insertion_sort_list.mlw"
+      loclnum="23" loccnumb="10" loccnume="24"
+      expl="5. postcondition"
+      sum="c66d62770e5611b4672191a30fe07831"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNilasortedV4IapermutaConsV1V3V4AasortedV4FIasortedV3IapermutV2V3AasortedV3FaConsVVV0F">
+      <label
+       name="expl:VC for insertion_sort"/>
       <proof
-       prover="1"
+       prover="0"
        timelimit="10"
-       memlimit="0"
+       memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.07"/>
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter insertion_sort.6"
+      locfile="../insertion_sort_list.mlw"
+      loclnum="23" loccnumb="10" loccnume="24"
+      expl="6. postcondition"
+      sum="ba5c17e2bd3c3448478bf9f75692ba7a"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNilapermutV0V4IapermutaConsV1V3V4AasortedV4FIasortedV3IapermutV2V3AasortedV3FaConsVVV0F">
+      <label
+       name="expl:VC for insertion_sort"/>
+      <proof
+       prover="0"
+       timelimit="10"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
       </proof>
      </goal>
     </transf>
