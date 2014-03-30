@@ -39,76 +39,16 @@
    verified="true"
    expanded="false">
    <goal
-    name="WP_parameter t0"
+    name="WP_parameter test"
     locfile="../defunctionalization.mlw"
-    loclnum="118" loccnumb="4" loccnume="6"
-    expl="VC for t0"
-    sum="0935014656f08b9c4f330763fe3985aa"
+    loclnum="118" loccnumb="4" loccnume="8"
+    expl="VC for test"
+    sum="3c16bdb5528212d328e097b441f95c6f"
     proved="true"
     expanded="false"
     shape="t">
     <label
-     name="expl:VC for t0"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter t1"
-    locfile="../defunctionalization.mlw"
-    loclnum="119" loccnumb="4" loccnume="6"
-    expl="VC for t1"
-    sum="0935014656f08b9c4f330763fe3985aa"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for t1"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter t2"
-    locfile="../defunctionalization.mlw"
-    loclnum="120" loccnumb="4" loccnume="6"
-    expl="VC for t2"
-    sum="0935014656f08b9c4f330763fe3985aa"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for t2"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter t3"
-    locfile="../defunctionalization.mlw"
-    loclnum="121" loccnumb="4" loccnume="6"
-    expl="VC for t3"
-    sum="0935014656f08b9c4f330763fe3985aa"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for t3"/>
+     name="expl:VC for test"/>
     <proof
      prover="0"
      timelimit="5"
@@ -117,40 +57,52 @@
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
-   </goal>
-   <goal
-    name="WP_parameter t4"
-    locfile="../defunctionalization.mlw"
-    loclnum="122" loccnumb="4" loccnume="6"
-    expl="VC for t4"
-    sum="0935014656f08b9c4f330763fe3985aa"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for t4"/>
     <proof
-     prover="0"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.01"/>
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="CPS"
    locfile="../defunctionalization.mlw"
-   loclnum="130" loccnumb="7" loccnume="10"
+   loclnum="131" loccnumb="7" loccnume="10"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter cps_correct_expr"
     locfile="../defunctionalization.mlw"
-    loclnum="163" loccnumb="14" loccnume="30"
+    loclnum="164" loccnumb="14" loccnume="30"
     expl="VC for cps_correct_expr"
-    sum="d2f1367891c312b845cb79a60db47d69"
+    sum="06f9b0273c9f64489385e6d0410edb8a"
     proved="true"
     expanded="false"
     shape="Cainfix =aeval_1V0V1ainfix @V1aeval_0V0FaCtewainfix =aeval_1V0V4ainfix @V4aeval_0V0FIainfix =aeval_1V3V5ainfix @V5aeval_0V3FACfaCtewainfix =V7V3Oainfix =V6V3aSubVVV0Iainfix =aeval_1V2V8ainfix @V8aeval_0V2FACfaCtewainfix =V10V2Oainfix =V9V2aSubVVV0aSubVVV0F">
@@ -165,9 +117,9 @@
      <goal
       name="WP_parameter cps_correct_expr.1"
       locfile="../defunctionalization.mlw"
-      loclnum="163" loccnumb="14" loccnume="30"
+      loclnum="164" loccnumb="14" loccnume="30"
       expl="1. postcondition"
-      sum="0199f1b906f48e76cfe6bb57ac398a80"
+      sum="12c2fde861f6ab77111ce1d99a33c135"
       proved="true"
       expanded="false"
       shape="postconditionCainfix =aeval_1V0V1ainfix @V1aeval_0V0FaCtewtaSubVVV0F">
@@ -178,7 +130,39 @@
       <proof
        prover="0"
        timelimit="5"
-       memlimit="4000"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -187,9 +171,9 @@
      <goal
       name="WP_parameter cps_correct_expr.2"
       locfile="../defunctionalization.mlw"
-      loclnum="163" loccnumb="14" loccnume="30"
+      loclnum="164" loccnumb="14" loccnume="30"
       expl="2. variant decrease"
-      sum="fe7e64aa58c96b6e6ecf612a32847011"
+      sum="24ab317b83aa193f0073a575c1a45a56"
       proved="true"
       expanded="false"
       shape="variant decreaseCtaCtewCfaCtewainfix =V4V1Oainfix =V3V1aSubVVV0aSubVVV0F">
@@ -200,18 +184,50 @@
       <proof
        prover="0"
        timelimit="5"
-       memlimit="4000"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter cps_correct_expr.3"
       locfile="../defunctionalization.mlw"
-      loclnum="163" loccnumb="14" loccnume="30"
+      loclnum="164" loccnumb="14" loccnume="30"
       expl="3. variant decrease"
-      sum="27c944d5f57789d1547c77e08c5e6bb0"
+      sum="5d0c16222f37b77a2dfd8be30156a0b3"
       proved="true"
       expanded="false"
       shape="variant decreaseCtaCtewCfaCtewainfix =V4V2Oainfix =V3V2aSubVVV0Iainfix =aeval_1V1V5ainfix @V5aeval_0V1FaSubVVV0F">
@@ -222,7 +238,39 @@
       <proof
        prover="0"
        timelimit="5"
-       memlimit="4000"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.01"/>
@@ -231,9 +279,9 @@
      <goal
       name="WP_parameter cps_correct_expr.4"
       locfile="../defunctionalization.mlw"
-      loclnum="163" loccnumb="14" loccnume="30"
+      loclnum="164" loccnumb="14" loccnume="30"
       expl="4. postcondition"
-      sum="b29a55ddfaa67e980a79e6844252f9c5"
+      sum="b5d65326d98ac9068a6a7e1cf4c951dc"
       proved="true"
       expanded="false"
       shape="postconditionCtaCtewainfix =aeval_1V0V3ainfix @V3aeval_0V0FIainfix =aeval_1V2V4ainfix @V4aeval_0V2FIainfix =aeval_1V1V5ainfix @V5aeval_0V1FaSubVVV0F">
@@ -244,10 +292,34 @@
       <proof
        prover="0"
        timelimit="5"
-       memlimit="4000"
+       memlimit="1000"
        obsolete="false"
        archived="false">
        <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.68"/>
       </proof>
      </goal>
     </transf>
@@ -255,33 +327,65 @@
    <goal
     name="cps_correct"
     locfile="../defunctionalization.mlw"
-    loclnum="173" loccnumb="6" loccnume="17"
-    sum="69af986e7fdc20cd3d24f3f19b8dbfcf"
+    loclnum="174" loccnumb="6" loccnume="17"
+    sum="62be912b2d7f1b6531dfb6a8fe39bbdd"
     proved="true"
     expanded="false"
     shape="ainfix =ainterpret_1V0ainterpret_0V0F">
     <proof
      prover="0"
      timelimit="5"
-     memlimit="4000"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="Defunctionalization"
    locfile="../defunctionalization.mlw"
-   loclnum="181" loccnumb="7" loccnume="26"
+   loclnum="182" loccnumb="7" loccnume="26"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter size_e_pos"
     locfile="../defunctionalization.mlw"
-    loclnum="241" loccnumb="14" loccnume="24"
+    loclnum="242" loccnumb="14" loccnume="24"
     expl="VC for size_e_pos"
-    sum="a2c592f2f6a4bf3f1a22fd7d8940a035"
+    sum="e8224595433501501e72809c35211494"
     proved="true"
     expanded="false"
     shape="Cainfix &gt;=asize_eV0c1aCtewainfix &gt;=asize_eV0c1Iainfix &gt;=asize_eV2c1ACfaCtewainfix =V4V2Oainfix =V3V2aSubVVV0Iainfix &gt;=asize_eV1c1ACfaCtewainfix =V6V1Oainfix =V5V1aSubVVV0aSubVVV0F">
@@ -297,13 +401,45 @@
      archived="false">
      <result status="valid" time="0.01"/>
     </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter size_c_pos"
     locfile="../defunctionalization.mlw"
-    loclnum="256" loccnumb="14" loccnume="24"
+    loclnum="257" loccnumb="14" loccnume="24"
     expl="VC for size_c_pos"
-    sum="0a1a5633a7b06d8932ca79efbf99c6bc"
+    sum="81125dc5d3e4e234aa9199e4b1389ec2"
     proved="true"
     expanded="false"
     shape="Cainfix &gt;=asize_cV0c0aIainfix &gt;=asize_cV0c0Iainfix &gt;=asize_cV1c0ACainfix =V2V1aA1wVainfix =V3V1aA2wVfaIV0aA1wVainfix &gt;=asize_cV0c0Iainfix &gt;=asize_cV4c0ACainfix =V5V4aA1wVainfix =V6V4aA2wVfaIV0aA2wVV0F">
@@ -319,13 +455,45 @@
      archived="false">
      <result status="valid" time="0.03"/>
     </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter continue_2"
     locfile="../defunctionalization.mlw"
-    loclnum="268" loccnumb="8" loccnume="18"
+    loclnum="269" loccnumb="8" loccnume="18"
     expl="VC for continue_2"
-    sum="09f70397ba98ee92634f6980ea24a126"
+    sum="1f392e4b9cc724514fa8212fc63fa10e"
     proved="true"
     expanded="false"
     shape="Caeval_contV0V1V5Iaeval_contV4aeval_0V2V5FAainfix &lt;ainfix +asize_cV4asize_eV2asize_cV0Aainfix &lt;=c0asize_cV0LaA2V1V3aA1VVaeval_contV0V1V8Iaeval_contV7ainfix -V6V1V8FAainfix &lt;asize_cV7asize_cV0Aainfix &lt;=c0asize_cV0aA2VVaeval_contV0V1V1aIV0F">
@@ -337,15 +505,280 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.04"/>
+     <result status="valid" time="0.02"/>
     </proof>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter continue_2.1"
+      locfile="../defunctionalization.mlw"
+      loclnum="269" loccnumb="8" loccnume="18"
+      expl="1. variant decrease"
+      sum="1f50f98441218a82005021fb63977add"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCainfix &lt;ainfix +asize_cV4asize_eV2asize_cV0Aainfix &lt;=c0asize_cV0LaA2V1V3aA1VVtaA2VVtaIV0F">
+      <label
+       name="expl:VC for continue_2"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter continue_2.2"
+      locfile="../defunctionalization.mlw"
+      loclnum="269" loccnumb="8" loccnume="18"
+      expl="2. postcondition"
+      sum="ab475a078a3dc029cde5278eb0f1bb4b"
+      proved="true"
+      expanded="false"
+      shape="postconditionCaeval_contV0V1V5Iaeval_contV4aeval_0V2V5FLaA2V1V3aA1VVtaA2VVtaIV0F">
+      <label
+       name="expl:VC for continue_2"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter continue_2.3"
+      locfile="../defunctionalization.mlw"
+      loclnum="269" loccnumb="8" loccnume="18"
+      expl="3. variant decrease"
+      sum="0719f5632b066c1e003e5eafbe40a324"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaA1VVainfix &lt;asize_cV5asize_cV0Aainfix &lt;=c0asize_cV0aA2VVtaIV0F">
+      <label
+       name="expl:VC for continue_2"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter continue_2.4"
+      locfile="../defunctionalization.mlw"
+      loclnum="269" loccnumb="8" loccnume="18"
+      expl="4. postcondition"
+      sum="147ef54571e50ff41de0e662a1d8e686"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaA1VVaeval_contV0V1V6Iaeval_contV5ainfix -V4V1V6FaA2VVtaIV0F">
+      <label
+       name="expl:VC for continue_2"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter continue_2.5"
+      locfile="../defunctionalization.mlw"
+      loclnum="269" loccnumb="8" loccnume="18"
+      expl="5. postcondition"
+      sum="aa169f4e1adf7c43ad7bdc8fc12741bc"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaA1VVtaA2VVaeval_contV0V1V1aIV0F">
+      <label
+       name="expl:VC for continue_2"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
    <goal
     name="WP_parameter eval_2"
     locfile="../defunctionalization.mlw"
-    loclnum="278" loccnumb="5" loccnume="11"
+    loclnum="279" loccnumb="5" loccnume="11"
     expl="VC for eval_2"
-    sum="6dc05d6aac10885ce965e8f2f2a4444b"
+    sum="6674610ea1ae204e50c722dca180458a"
     proved="true"
     expanded="false"
     shape="Caeval_contV1aeval_0V0V3Iaeval_contV1V2V3FAainfix &lt;asize_cV1ainfix +asize_cV1asize_eV0Aainfix &lt;=c0ainfix +asize_cV1asize_eV0aCteVaeval_contV1aeval_0V0V7Iaeval_contV6aeval_0V4V7FAainfix &lt;ainfix +asize_cV6asize_eV4ainfix +asize_cV1asize_eV0Aainfix &lt;=c0ainfix +asize_cV1asize_eV0LaA1V5V1aSubVVV0F">
@@ -359,13 +792,37 @@
      archived="false">
      <result status="valid" time="0.10"/>
     </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter interpret_2"
     locfile="../defunctionalization.mlw"
-    loclnum="290" loccnumb="4" loccnume="15"
+    loclnum="291" loccnumb="4" loccnume="15"
     expl="VC for interpret_2"
-    sum="e6d15619f7ff2be3da90787c948cfb13"
+    sum="ee274dd85e41bfa762e28e7f3e0cee9f"
     proved="true"
     expanded="false"
     shape="ainfix =V1aeval_0V0Iaeval_contaIaeval_0V0V1FF">
@@ -379,378 +836,102 @@
      archived="false">
      <result status="valid" time="0.02"/>
     </proof>
-   </goal>
-   <goal
-    name="WP_parameter u0"
-    locfile="../defunctionalization.mlw"
-    loclnum="294" loccnumb="4" loccnume="6"
-    expl="VC for u0"
-    sum="f63348f1f88d1982b1b6960156e048a6"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for u0"/>
     <proof
-     prover="0"
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
     </proof>
-   </goal>
-   <goal
-    name="WP_parameter u1"
-    locfile="../defunctionalization.mlw"
-    loclnum="295" loccnumb="4" loccnume="6"
-    expl="VC for u1"
-    sum="f63348f1f88d1982b1b6960156e048a6"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for u1"/>
     <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter u2"
-    locfile="../defunctionalization.mlw"
-    loclnum="296" loccnumb="4" loccnume="6"
-    expl="VC for u2"
-    sum="f63348f1f88d1982b1b6960156e048a6"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for u2"/>
-    <proof
-     prover="0"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.02"/>
     </proof>
-   </goal>
-   <goal
-    name="WP_parameter u3"
-    locfile="../defunctionalization.mlw"
-    loclnum="297" loccnumb="4" loccnume="6"
-    expl="VC for u3"
-    sum="f63348f1f88d1982b1b6960156e048a6"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for u3"/>
     <proof
-     prover="0"
+     prover="4"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal
-    name="WP_parameter u4"
+    name="WP_parameter test"
     locfile="../defunctionalization.mlw"
-    loclnum="298" loccnumb="4" loccnume="6"
-    expl="VC for u4"
-    sum="f63348f1f88d1982b1b6960156e048a6"
+    loclnum="295" loccnumb="4" loccnume="8"
+    expl="VC for test"
+    sum="2ab4e1a58188e133cdbdd2b710de598e"
     proved="true"
     expanded="false"
     shape="t">
     <label
-     name="expl:VC for u4"/>
+     name="expl:VC for test"/>
     <proof
      prover="0"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>
   <theory
    name="SemWithError"
    locfile="../defunctionalization.mlw"
-   loclnum="307" loccnumb="7" loccnume="19"
+   loclnum="309" loccnumb="7" loccnume="19"
    verified="true"
    expanded="false">
    <goal
-    name="WP_parameter t0"
-    locfile="../defunctionalization.mlw"
-    loclnum="383" loccnumb="4" loccnume="6"
-    expl="VC for t0"
-    sum="b31a748a6b34508b8783b0a1eb303acd"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for t0"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter t1"
-    locfile="../defunctionalization.mlw"
-    loclnum="384" loccnumb="4" loccnume="6"
-    expl="VC for t1"
-    sum="b31a748a6b34508b8783b0a1eb303acd"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for t1"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter t2"
-    locfile="../defunctionalization.mlw"
-    loclnum="385" loccnumb="4" loccnume="6"
-    expl="VC for t2"
-    sum="b31a748a6b34508b8783b0a1eb303acd"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for t2"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter t3"
-    locfile="../defunctionalization.mlw"
-    loclnum="386" loccnumb="4" loccnume="6"
-    expl="VC for t3"
-    sum="b31a748a6b34508b8783b0a1eb303acd"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for t3"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter t4"
-    locfile="../defunctionalization.mlw"
-    loclnum="387" loccnumb="4" loccnume="6"
-    expl="VC for t4"
-    sum="b31a748a6b34508b8783b0a1eb303acd"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for t4"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
     name="WP_parameter cps_correct_expr"
     locfile="../defunctionalization.mlw"
-    loclnum="422" loccnumb="14" loccnume="30"
+    loclnum="419" loccnumb="14" loccnume="30"
     expl="VC for cps_correct_expr"
     sum="f2cc796e834d5c6f1d79ba6431aaf608"
     proved="true"
@@ -767,7 +948,7 @@
      <goal
       name="WP_parameter cps_correct_expr.1"
       locfile="../defunctionalization.mlw"
-      loclnum="422" loccnumb="14" loccnume="30"
+      loclnum="419" loccnumb="14" loccnume="30"
       expl="1. postcondition"
       sum="005abecdb6f6e5b34beccfc9c0077df7"
       proved="true"
@@ -813,7 +994,7 @@
      <goal
       name="WP_parameter cps_correct_expr.2"
       locfile="../defunctionalization.mlw"
-      loclnum="422" loccnumb="14" loccnume="30"
+      loclnum="419" loccnumb="14" loccnume="30"
       expl="2. variant decrease"
       sum="d9bd5749285237033e5cc81306c5246d"
       proved="true"
@@ -867,7 +1048,7 @@
      <goal
       name="WP_parameter cps_correct_expr.3"
       locfile="../defunctionalization.mlw"
-      loclnum="422" loccnumb="14" loccnume="30"
+      loclnum="419" loccnumb="14" loccnume="30"
       expl="3. variant decrease"
       sum="ce23206c93125e57417cca6771988ee5"
       proved="true"
@@ -921,7 +1102,7 @@
      <goal
       name="WP_parameter cps_correct_expr.4"
       locfile="../defunctionalization.mlw"
-      loclnum="422" loccnumb="14" loccnume="30"
+      loclnum="419" loccnumb="14" loccnume="30"
       expl="4. postcondition"
       sum="b9562a33badbc6470437dad38b329993"
       proved="true"
@@ -931,14 +1112,6 @@
        name="why3:lemma"/>
       <label
        name="expl:VC for cps_correct_expr"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="unknown" time="0.10"/>
-      </proof>
       <proof
        prover="4"
        timelimit="5"
@@ -953,7 +1126,7 @@
    <goal
     name="cps_correct"
     locfile="../defunctionalization.mlw"
-    loclnum="432" loccnumb="6" loccnume="17"
+    loclnum="429" loccnumb="6" loccnume="17"
     sum="402ce22273e4e0d17dc57e5a1a5ba568"
     proved="true"
     expanded="false"
@@ -1002,7 +1175,7 @@
    <goal
     name="WP_parameter cps2_correct_expr"
     locfile="../defunctionalization.mlw"
-    loclnum="483" loccnumb="14" loccnume="31"
+    loclnum="480" loccnumb="14" loccnume="31"
     expl="VC for cps2_correct_expr"
     sum="756d6f49a2b55c12f156d253a4f88e27"
     proved="true"
@@ -1019,7 +1192,7 @@
      <goal
       name="WP_parameter cps2_correct_expr.1"
       locfile="../defunctionalization.mlw"
-      loclnum="483" loccnumb="14" loccnume="31"
+      loclnum="480" loccnumb="14" loccnume="31"
       expl="1. postcondition"
       sum="60ba9769fd7819b3e712e575c841ba5f"
       proved="true"
@@ -1059,13 +1232,13 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.83"/>
+       <result status="valid" time="2.19"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter cps2_correct_expr.2"
       locfile="../defunctionalization.mlw"
-      loclnum="483" loccnumb="14" loccnume="31"
+      loclnum="480" loccnumb="14" loccnume="31"
       expl="2. variant decrease"
       sum="cc5bce16868fe84288a9063dd8e97542"
       proved="true"
@@ -1119,7 +1292,7 @@
      <goal
       name="WP_parameter cps2_correct_expr.3"
       locfile="../defunctionalization.mlw"
-      loclnum="483" loccnumb="14" loccnume="31"
+      loclnum="480" loccnumb="14" loccnume="31"
       expl="3. variant decrease"
       sum="8d0db6eddafe1d9f68e56dd99b9dffe7"
       proved="true"
@@ -1173,7 +1346,7 @@
      <goal
       name="WP_parameter cps2_correct_expr.4"
       locfile="../defunctionalization.mlw"
-      loclnum="483" loccnumb="14" loccnume="31"
+      loclnum="480" loccnumb="14" loccnume="31"
       expl="4. assertion"
       sum="f66bb894f9129e7c0deae57d2351f82d"
       proved="true"
@@ -1227,7 +1400,7 @@
      <goal
       name="WP_parameter cps2_correct_expr.5"
       locfile="../defunctionalization.mlw"
-      loclnum="483" loccnumb="14" loccnume="31"
+      loclnum="480" loccnumb="14" loccnume="31"
       expl="5. postcondition"
       sum="5e730397cca81d95cc31eb7d73e7fb23"
       proved="true"
@@ -1237,14 +1410,6 @@
        name="why3:lemma"/>
       <label
        name="expl:VC for cps2_correct_expr"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="unknown" time="0.49"/>
-      </proof>
       <proof
        prover="3"
        timelimit="5"
@@ -1267,7 +1432,7 @@
    <goal
     name="cps2_correct"
     locfile="../defunctionalization.mlw"
-    loclnum="495" loccnumb="6" loccnume="18"
+    loclnum="492" loccnumb="6" loccnume="18"
     sum="e10eb229fd919140333764370ef643cf"
     proved="true"
     expanded="false"
@@ -1316,7 +1481,7 @@
    <goal
     name="WP_parameter cps3_correct_expr"
     locfile="../defunctionalization.mlw"
-    loclnum="528" loccnumb="14" loccnume="31"
+    loclnum="525" loccnumb="14" loccnume="31"
     expl="VC for cps3_correct_expr"
     sum="2934ccdf2bde1f5132db30090cd205bc"
     proved="true"
@@ -1333,7 +1498,7 @@
      <goal
       name="WP_parameter cps3_correct_expr.1"
       locfile="../defunctionalization.mlw"
-      loclnum="528" loccnumb="14" loccnume="31"
+      loclnum="525" loccnumb="14" loccnume="31"
       expl="1. postcondition"
       sum="c9680a33b2adb9aa25e9e438b4a053c4"
       proved="true"
@@ -1371,7 +1536,7 @@
      <goal
       name="WP_parameter cps3_correct_expr.2"
       locfile="../defunctionalization.mlw"
-      loclnum="528" loccnumb="14" loccnume="31"
+      loclnum="525" loccnumb="14" loccnume="31"
       expl="2. variant decrease"
       sum="979db3d73210d9455ad3af04185b8f9b"
       proved="true"
@@ -1425,7 +1590,7 @@
      <goal
       name="WP_parameter cps3_correct_expr.3"
       locfile="../defunctionalization.mlw"
-      loclnum="528" loccnumb="14" loccnume="31"
+      loclnum="525" loccnumb="14" loccnume="31"
       expl="3. variant decrease"
       sum="e0559ab059894b67eff1173083eb5bf7"
       proved="true"
@@ -1479,7 +1644,7 @@
      <goal
       name="WP_parameter cps3_correct_expr.4"
       locfile="../defunctionalization.mlw"
-      loclnum="528" loccnumb="14" loccnume="31"
+      loclnum="525" loccnumb="14" loccnume="31"
       expl="4. assertion"
       sum="7f50fc951a8d63e01178f5556402e15a"
       proved="true"
@@ -1533,7 +1698,7 @@
      <goal
       name="WP_parameter cps3_correct_expr.5"
       locfile="../defunctionalization.mlw"
-      loclnum="528" loccnumb="14" loccnume="31"
+      loclnum="525" loccnumb="14" loccnume="31"
       expl="5. postcondition"
       sum="d7c678160bad96eb5f549674aeffb3e1"
       proved="true"
@@ -1543,14 +1708,6 @@
        name="why3:lemma"/>
       <label
        name="expl:VC for cps3_correct_expr"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.92"/>
-      </proof>
       <proof
        prover="3"
        timelimit="5"
@@ -1573,7 +1730,7 @@
    <goal
     name="cps3_correct"
     locfile="../defunctionalization.mlw"
-    loclnum="540" loccnumb="6" loccnume="18"
+    loclnum="537" loccnumb="6" loccnume="18"
     sum="ebdd73ce2b34396c4e9889dacb991b32"
     proved="true"
     expanded="false"
@@ -1622,7 +1779,7 @@
    <goal
     name="WP_parameter size_e_pos"
     locfile="../defunctionalization.mlw"
-    loclnum="607" loccnumb="14" loccnume="24"
+    loclnum="604" loccnumb="14" loccnume="24"
     expl="VC for size_e_pos"
     sum="fd7918ed4a98179b600f0275f84520aa"
     proved="true"
@@ -1640,13 +1797,45 @@
      archived="false">
      <result status="valid" time="0.02"/>
     </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter size_c_pos"
     locfile="../defunctionalization.mlw"
-    loclnum="624" loccnumb="14" loccnume="24"
+    loclnum="621" loccnumb="14" loccnume="24"
     expl="VC for size_c_pos"
-    sum="acf10e0b059d63969c1aaf50eabed044"
+    sum="90d22dd7fea19387be5b5e9c644d4ae6"
     proved="true"
     expanded="false"
     shape="Cainfix &gt;=asize_cV0c0aIainfix &gt;=asize_cV0c0Iainfix &gt;=asize_cV1c0ACfaIainfix =V2V1aAwVainfix =V3V1aBwVV0aAwVainfix &gt;=asize_cV0c0Iainfix &gt;=asize_cV4c0ACfaIainfix =V5V4aAwVainfix =V6V4aBwVV0aBwVV0F">
@@ -1662,13 +1851,45 @@
      archived="false">
      <result status="valid" time="0.03"/>
     </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter continue_4"
     locfile="../defunctionalization.mlw"
-    loclnum="633" loccnumb="8" loccnume="18"
+    loclnum="630" loccnumb="8" loccnume="18"
     expl="VC for continue_4"
-    sum="ea76203ddf40486d63200ad5eca7c926"
+    sum="cdc49caa6d5fd61a0ed56a8ea7d114a4"
     proved="true"
     expanded="false"
     shape="Caeval_contV0aVnumV1V5Iaeval_contV4aeval_0V2V5FAainfix &lt;ainfix +asize_cV4asize_eV2asize_cV0Aainfix &lt;=c0asize_cV0LaBV1V3aAVViaeval_contV0aVnumV1aUnderflowaeval_contV0aVnumV1V9Iaeval_contV7aVnumV8V9FAainfix &gt;=V8c0Aainfix &lt;asize_cV7asize_cV0Aainfix &lt;=c0asize_cV0Lainfix -V6V1ainfix &gt;=V6V1aBVVaeval_contV0aVnumV1aVnumV1aIV0Iainfix &gt;=V1c0F">
@@ -1681,9 +1902,9 @@
      <goal
       name="WP_parameter continue_4.1"
       locfile="../defunctionalization.mlw"
-      loclnum="633" loccnumb="8" loccnume="18"
+      loclnum="630" loccnumb="8" loccnume="18"
       expl="1. variant decrease"
-      sum="d421088b96ab104ad7f04e88f3f22647"
+      sum="6814378948451d5e93cb9e9d58045710"
       proved="true"
       expanded="false"
       shape="variant decreaseCainfix &lt;ainfix +asize_cV4asize_eV2asize_cV0Aainfix &lt;=c0asize_cV0LaBV1V3aAVVtaBVVtaIV0Iainfix &gt;=V1c0F">
@@ -1697,13 +1918,45 @@
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter continue_4.2"
       locfile="../defunctionalization.mlw"
-      loclnum="633" loccnumb="8" loccnume="18"
+      loclnum="630" loccnumb="8" loccnume="18"
       expl="2. postcondition"
-      sum="dbb4a5a5d3ec55a592eed9a61ee122d1"
+      sum="3d367683c1e1043db423f83b8c1107c8"
       proved="true"
       expanded="false"
       shape="postconditionCaeval_contV0aVnumV1V5Iaeval_contV4aeval_0V2V5FLaBV1V3aAVVtaBVVtaIV0Iainfix &gt;=V1c0F">
@@ -1717,13 +1970,45 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter continue_4.3"
       locfile="../defunctionalization.mlw"
-      loclnum="633" loccnumb="8" loccnume="18"
+      loclnum="630" loccnumb="8" loccnume="18"
       expl="3. variant decrease"
-      sum="3dbe2ac8dab388a7a475e094f796bebe"
+      sum="6312ab36cc1201ebca12403fd987d017"
       proved="true"
       expanded="false"
       shape="variant decreaseCtaAVVainfix &lt;asize_cV5asize_cV0Aainfix &lt;=c0asize_cV0Lainfix -V4V1Iainfix &gt;=V4V1aBVVtaIV0Iainfix &gt;=V1c0F">
@@ -1737,13 +2022,45 @@
        archived="false">
        <result status="valid" time="0.03"/>
       </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter continue_4.4"
       locfile="../defunctionalization.mlw"
-      loclnum="633" loccnumb="8" loccnume="18"
+      loclnum="630" loccnumb="8" loccnume="18"
       expl="4. precondition"
-      sum="d72d8a8d7f189f3bf53b4510b99db81c"
+      sum="d348d7c73869a72853960eeca40ccf0b"
       proved="true"
       expanded="false"
       shape="preconditionCtaAVVainfix &gt;=V6c0Lainfix -V4V1Iainfix &gt;=V4V1aBVVtaIV0Iainfix &gt;=V1c0F">
@@ -1757,13 +2074,45 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter continue_4.5"
       locfile="../defunctionalization.mlw"
-      loclnum="633" loccnumb="8" loccnume="18"
+      loclnum="630" loccnumb="8" loccnume="18"
       expl="5. postcondition"
-      sum="c6ffeeb43aea90f2ac50959f18eb695e"
+      sum="5739d6cfc02b8ce64e322b466677c418"
       proved="true"
       expanded="false"
       shape="postconditionCtaAVVaeval_contV0aVnumV1V7Iaeval_contV5aVnumV6V7FIainfix &gt;=V6c0Lainfix -V4V1Iainfix &gt;=V4V1aBVVtaIV0Iainfix &gt;=V1c0F">
@@ -1777,13 +2126,45 @@
        archived="false">
        <result status="valid" time="0.01"/>
       </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter continue_4.6"
       locfile="../defunctionalization.mlw"
-      loclnum="633" loccnumb="8" loccnume="18"
+      loclnum="630" loccnumb="8" loccnume="18"
       expl="6. postcondition"
-      sum="1fd3b63e8473801edf7c1cfbb6bbe1b1"
+      sum="6463de8b29b9df45660172bfb79995b8"
       proved="true"
       expanded="false"
       shape="postconditionCtaAVVaeval_contV0aVnumV1aUnderflowINainfix &gt;=V4V1aBVVtaIV0Iainfix &gt;=V1c0F">
@@ -1797,13 +2178,45 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
      <goal
       name="WP_parameter continue_4.7"
       locfile="../defunctionalization.mlw"
-      loclnum="633" loccnumb="8" loccnume="18"
+      loclnum="630" loccnumb="8" loccnume="18"
       expl="7. postcondition"
-      sum="8b759835234c51f93c5ebaae82f8d378"
+      sum="716adae6c3f23402c8fb25ee06dc1c77"
       proved="true"
       expanded="false"
       shape="postconditionCtaAVVtaBVVaeval_contV0aVnumV1aVnumV1aIV0Iainfix &gt;=V1c0F">
@@ -1817,15 +2230,47 @@
        archived="false">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
     </transf>
    </goal>
    <goal
     name="WP_parameter eval_4"
     locfile="../defunctionalization.mlw"
-    loclnum="644" loccnumb="5" loccnume="11"
+    loclnum="641" loccnumb="5" loccnume="11"
     expl="VC for eval_4"
-    sum="d1fa2bdd0b3d794c9bf347a7fe6946ad"
+    sum="a5c664db9797c369d059277d3e1b0f12"
     proved="true"
     expanded="false"
     shape="Ciaeval_contV1aeval_0V0aUnderflowaeval_contV1aeval_0V0V3Iaeval_contV1aVnumV2V3FAainfix &gt;=V2c0Aainfix &lt;asize_cV1ainfix +asize_cV1asize_eV0Aainfix &lt;=c0ainfix +asize_cV1asize_eV0ainfix &gt;=V2c0aCteVaeval_contV1aeval_0V0V7Iaeval_contV6aeval_0V4V7FAainfix &lt;ainfix +asize_cV6asize_eV4ainfix +asize_cV1asize_eV0Aainfix &lt;=c0ainfix +asize_cV1asize_eV0LaAV5V1aSubVVV0F">
@@ -1837,15 +2282,31 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.96"/>
+     <result status="valid" time="0.79"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.17"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
     </proof>
    </goal>
    <goal
     name="WP_parameter interpret_4"
     locfile="../defunctionalization.mlw"
-    loclnum="656" loccnumb="4" loccnume="15"
+    loclnum="653" loccnumb="4" loccnume="15"
     expl="VC for interpret_4"
-    sum="bdda6f128c8a44f1b628e72e32afac2c"
+    sum="5e96763e4b8ebd93bfc1719ff455c0aa"
     proved="true"
     expanded="false"
     shape="ainfix =V1aeval_0V0Iaeval_contaIaeval_0V0V1FF">
@@ -1893,394 +2354,16 @@
     </proof>
    </goal>
    <goal
-    name="WP_parameter u0"
+    name="WP_parameter test"
     locfile="../defunctionalization.mlw"
-    loclnum="660" loccnumb="4" loccnume="6"
-    expl="VC for u0"
-    sum="f4777b02d0a9f5de1f006e84d923fe0c"
+    loclnum="658" loccnumb="4" loccnume="8"
+    expl="VC for test"
+    sum="a3763164b642bb09a7053baa16b37621"
     proved="true"
     expanded="false"
     shape="t">
     <label
-     name="expl:VC for u0"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter u1"
-    locfile="../defunctionalization.mlw"
-    loclnum="661" loccnumb="4" loccnume="6"
-    expl="VC for u1"
-    sum="f4777b02d0a9f5de1f006e84d923fe0c"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for u1"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter u2"
-    locfile="../defunctionalization.mlw"
-    loclnum="662" loccnumb="4" loccnume="6"
-    expl="VC for u2"
-    sum="f4777b02d0a9f5de1f006e84d923fe0c"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for u2"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter u3"
-    locfile="../defunctionalization.mlw"
-    loclnum="663" loccnumb="4" loccnume="6"
-    expl="VC for u3"
-    sum="f4777b02d0a9f5de1f006e84d923fe0c"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for u3"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter u4"
-    locfile="../defunctionalization.mlw"
-    loclnum="664" loccnumb="4" loccnume="6"
-    expl="VC for u4"
-    sum="f4777b02d0a9f5de1f006e84d923fe0c"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for u4"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="R"
-   locfile="../defunctionalization.mlw"
-   loclnum="674" loccnumb="7" loccnume="8"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter contracte"
-    locfile="../defunctionalization.mlw"
-    loclnum="741" loccnumb="4" loccnume="13"
-    expl="VC for contracte"
-    sum="7b74cd4d42a866154511e401504aa2a4"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =aeval_0aCteainfix -V1V2aeval_0V0aSubaCteVaCteVfwV0ICtaSubaCtewaCtewfwV0F">
-    <label
-     name="expl:VC for contracte"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter recompose_values"
-    locfile="../defunctionalization.mlw"
-    loclnum="781" loccnumb="14" loccnume="30"
-    expl="VC for recompose_values"
-    sum="0be3b318d044a3537fb9daed57f44feb"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2aEmptyainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2Iainfix =aeval_0arecomposeV3V6aeval_0arecomposeV3V5Aainfix =aeval_0V6aeval_0V5ACfaEmptyainfix =V7V3aLeftVwainfix =V8V3aRightwVV0LaSubV1V4LaSubV2V4aLeftVVainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2Iainfix =aeval_0arecomposeV10V12aeval_0arecomposeV10V11Aainfix =aeval_0V12aeval_0V11ACfaEmptyainfix =V13V10aLeftVwainfix =V14V10aRightwVV0LaSubaCteV9V1LaSubaCteV9V2aRightVVV0Iainfix =aeval_0V1aeval_0V2F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for recompose_values"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter recompose_inversion"
-    locfile="../defunctionalization.mlw"
-    loclnum="791" loccnumb="14" loccnume="33"
-    expl="VC for recompose_inversion"
-    sum="063ae9d24701a3037d96266adea5f4dd"
-    proved="true"
-    expanded="false"
-    shape="CCfaCtewtaSubwwarecomposeV0V1aEmptyCfaCtewtaSubwwarecomposeV0V1ICfaCtewtaSubwwarecomposeV2aSubV1V3ACfaEmptyainfix =V4V2aLeftVwainfix =V5V2aRightwVV0aLeftVVCfaCtewtaSubwwarecomposeV0V1ICfaCtewtaSubwwarecomposeV7aSubaCteV6V1ACfaEmptyainfix =V8V7aLeftVwainfix =V9V7aRightwVV0aRightVVV0ICfaCtewtaSubwwV1OCfaEmptytwV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for recompose_inversion"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter recompose_inversion.1"
-      locfile="../defunctionalization.mlw"
-      loclnum="791" loccnumb="14" loccnume="33"
-      expl="1. postcondition"
-      sum="ba266b6b85cf2416528e133babdbc5a1"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCfaCtewtaSubwwarecomposeV0V1aEmptytaLeftVVtaRightVVV0ICfaCtewtaSubwwV1OCfaEmptytwV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for recompose_inversion"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter recompose_inversion.2"
-      locfile="../defunctionalization.mlw"
-      loclnum="791" loccnumb="14" loccnume="33"
-      expl="2. variant decrease"
-      sum="d250676fd268d75d9813a4411c7b70e6"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaEmptyCfaEmptyainfix =V4V2aLeftVwainfix =V5V2aRightwVV0aLeftVVtaRightVVV0ICfaCtewtaSubwwV1OCfaEmptytwV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for recompose_inversion"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter recompose_inversion.3"
-      locfile="../defunctionalization.mlw"
-      loclnum="791" loccnumb="14" loccnume="33"
-      expl="3. postcondition"
-      sum="fc939fbcee5c73e589d32998b2138d27"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyCfaCtewtaSubwwarecomposeV0V1ICfaCtewtaSubwwarecomposeV2aSubV1V3aLeftVVtaRightVVV0ICfaCtewtaSubwwV1OCfaEmptytwV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for recompose_inversion"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter recompose_inversion.4"
-      locfile="../defunctionalization.mlw"
-      loclnum="791" loccnumb="14" loccnume="33"
-      expl="4. variant decrease"
-      sum="e0cf77141f7b6dbf6fa053dbb045a7ef"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaEmptytaLeftVVCfaEmptyainfix =V6V5aLeftVwainfix =V7V5aRightwVV0aRightVVV0ICfaCtewtaSubwwV1OCfaEmptytwV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for recompose_inversion"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter recompose_inversion.5"
-      locfile="../defunctionalization.mlw"
-      loclnum="791" loccnumb="14" loccnume="33"
-      expl="5. postcondition"
-      sum="b8966753d98f0189ecca94326b09c838"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptytaLeftVVCfaCtewtaSubwwarecomposeV0V1ICfaCtewtaSubwwarecomposeV5aSubaCteV4V1aRightVVV0ICfaCtewtaSubwwV1OCfaEmptytwV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for recompose_inversion"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter decompose_term"
-    locfile="../defunctionalization.mlw"
-    loclnum="832" loccnumb="8" loccnume="22"
-    expl="VC for decompose_term"
-    sum="edecc9f8d1903bb4c84e8cce874b89b9"
-    proved="true"
-    expanded="false"
-    shape="CCtaCtewfwarecomposeV1V0ICtaCtewfwarecomposeV1aCteV2ACtaSubaCtewaCtewfwV4Aainfix =arecomposeV3V4arecomposeV1V0ICtaSubaCtewaCtewfwV4Aainfix =arecomposeV3V4arecomposeV1aCteV2FaCteVCtaCtewfwarecomposeV1V0ICtaCtewfwarecomposeV7V5ACtaSubaCtewaCtewfwV9Aainfix =arecomposeV8V9arecomposeV1V0ICtaSubaCtewaCtewfwV9Aainfix =arecomposeV8V9arecomposeV7V5FLaLeftV1V6aSubVVV0F">
-    <label
-     name="expl:VC for decompose_term"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter decompose_cont"
-    locfile="../defunctionalization.mlw"
-    loclnum="844" loccnumb="5" loccnume="19"
-    expl="VC for decompose_cont"
-    sum="e5f5f03914de02964564e309fa114ba7"
-    proved="true"
-    expanded="false"
-    shape="CCtaCtewfwarecomposeV0aCteV1aEmptyCtaCtewfwarecomposeV0aCteV1ICtaCtewfwarecomposeV4V3ACtaSubaCtewaCtewfwV6Aainfix =arecomposeV5V6arecomposeV0aCteV1ICtaSubaCtewaCtewfwV6Aainfix =arecomposeV5V6arecomposeV4V3FLaRightV1V2aLeftVVainfix =arecomposeV8aSubaCteV7aCteV1arecomposeV0aCteV1aRightVVV0F">
-    <label
-     name="expl:VC for decompose_cont"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter decompose"
-    locfile="../defunctionalization.mlw"
-    loclnum="857" loccnumb="4" loccnume="13"
-    expl="VC for decompose"
-    sum="b2d1f4e953ca1f3e82fed55702ecbf0a"
-    proved="true"
-    expanded="false"
-    shape="CtaCtewfwV0ICtaCtewfwarecomposeV1V0ACtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3V0ICtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3arecomposeV1V0FLaEmptyF">
-    <label
-     name="expl:VC for decompose"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter reduis"
-    locfile="../defunctionalization.mlw"
-    loclnum="889" loccnumb="4" loccnume="10"
-    expl="VC for reduis"
-    sum="a866db20bc2c194555ca5aafed538f54"
-    proved="true"
-    expanded="false"
-    shape="CtaCtewfwV0ICtaCtewfwV0Aainfix =aeval_0arecomposeV1V3aeval_0V0Iainfix =aeval_0V3aeval_0V2FACtaSubaCtewaCtewfwV2ICtaSubaCtewaCtewfwV2Aainfix =arecomposeV1V2V0FF">
-    <label
-     name="expl:VC for reduis"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter itere"
-    locfile="../defunctionalization.mlw"
-    loclnum="912" loccnumb="8" loccnume="13"
-    expl="VC for itere"
-    sum="03b4967c4bca60680e5f111961bd3cb7"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =aeval_0V0V1aCteVfwV0ICtaCtewfwV0Aainfix =aeval_0V0V3Iainfix =aeval_0V2V3FIainfix =aeval_0V2aeval_0V0FF">
-    <label
-     name="expl:VC for itere"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter refocus"
-    locfile="../defunctionalization.mlw"
-    loclnum="932" loccnumb="4" loccnume="11"
-    expl="VC for refocus"
-    sum="8d87536d6d4db5617350c00061873758"
-    proved="true"
-    expanded="false"
-    shape="CtaCtewfwarecomposeV0V1ICtaCtewfwarecomposeV0V1ACtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3arecomposeV0V1ICtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3arecomposeV0V1FF">
-    <label
-     name="expl:VC for refocus"/>
+     name="expl:VC for test"/>
     <proof
      prover="0"
      timelimit="5"
@@ -2311,10 +2394,549 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.02"/>
+     <result status="valid" time="0.00"/>
     </proof>
     <proof
      prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="ReductionSemantics"
+   locfile="../defunctionalization.mlw"
+   loclnum="672" loccnumb="7" loccnume="25"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter contract"
+    locfile="../defunctionalization.mlw"
+    loclnum="733" loccnumb="4" loccnume="12"
+    expl="VC for contract"
+    sum="96965d9415c6413af4d528b4dbff2288"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =aeval_0aCteainfix -V1V2aeval_0V0aSubaCteVaCteVfwV0ICtaSubaCtewaCtewfwV0F">
+    <label
+     name="expl:VC for contract"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter recompose_values"
+    locfile="../defunctionalization.mlw"
+    loclnum="768" loccnumb="14" loccnume="30"
+    expl="VC for recompose_values"
+    sum="71c8ddbcb4ddbd6537210612aabca6f9"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2aEmptyainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2Iainfix =aeval_0arecomposeV3V6aeval_0arecomposeV3V5Aainfix =aeval_0V6aeval_0V5ACfaEmptyainfix =V7V3aLeftVwainfix =V8V3aRightwVV0LaSubV1V4LaSubV2V4aLeftVVainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2Iainfix =aeval_0arecomposeV10V12aeval_0arecomposeV10V11Aainfix =aeval_0V12aeval_0V11ACfaEmptyainfix =V13V10aLeftVwainfix =V14V10aRightwVV0LaSubaCteV9V1LaSubaCteV9V2aRightVVV0Iainfix =aeval_0V1aeval_0V2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for recompose_values"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter recompose_inversion"
+    locfile="../defunctionalization.mlw"
+    loclnum="778" loccnumb="14" loccnume="33"
+    expl="VC for recompose_inversion"
+    sum="dec0a1ba8b0d10d53094b3c4bdaf8170"
+    proved="true"
+    expanded="false"
+    shape="CCfaCtewtaSubwwarecomposeV0V1aEmptyCfaCtewtaSubwwarecomposeV0V1ICfaCtewtaSubwwarecomposeV2aSubV1V3ACfaEmptyainfix =V4V2aLeftVwainfix =V5V2aRightwVV0aLeftVVCfaCtewtaSubwwarecomposeV0V1ICfaCtewtaSubwwarecomposeV7aSubaCteV6V1ACfaEmptyainfix =V8V7aLeftVwainfix =V9V7aRightwVV0aRightVVV0ICfaCtewtaSubwwV1OCfaEmptytwV0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for recompose_inversion"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter decompose_term"
+    locfile="../defunctionalization.mlw"
+    loclnum="820" loccnumb="8" loccnume="22"
+    expl="VC for decompose_term"
+    sum="1ce89f3ecadbb249feab93b96dcb094b"
+    proved="true"
+    expanded="false"
+    shape="CCtaCtewfwarecomposeV1V0ICtaCtewfwarecomposeV1aCteV2ACtaSubaCtewaCtewfwV4Aainfix =arecomposeV3V4arecomposeV1V0ICtaSubaCtewaCtewfwV4Aainfix =arecomposeV3V4arecomposeV1aCteV2FaCteVCtaCtewfwarecomposeV1V0ICtaCtewfwarecomposeV7V5ACtaSubaCtewaCtewfwV9Aainfix =arecomposeV8V9arecomposeV1V0ICtaSubaCtewaCtewfwV9Aainfix =arecomposeV8V9arecomposeV7V5FLaLeftV1V6aSubVVV0F">
+    <label
+     name="expl:VC for decompose_term"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter decompose_cont"
+    locfile="../defunctionalization.mlw"
+    loclnum="832" loccnumb="5" loccnume="19"
+    expl="VC for decompose_cont"
+    sum="46d168afa1198ff9447d1d0dee20fb00"
+    proved="true"
+    expanded="false"
+    shape="CCtaCtewfwarecomposeV0aCteV1aEmptyCtaCtewfwarecomposeV0aCteV1ICtaCtewfwarecomposeV4V3ACtaSubaCtewaCtewfwV6Aainfix =arecomposeV5V6arecomposeV0aCteV1ICtaSubaCtewaCtewfwV6Aainfix =arecomposeV5V6arecomposeV4V3FLaRightV1V2aLeftVVainfix =arecomposeV8aSubaCteV7aCteV1arecomposeV0aCteV1aRightVVV0F">
+    <label
+     name="expl:VC for decompose_cont"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter decompose"
+    locfile="../defunctionalization.mlw"
+    loclnum="845" loccnumb="4" loccnume="13"
+    expl="VC for decompose"
+    sum="3af202b021b4dd3bcf91f3fe3c7d505e"
+    proved="true"
+    expanded="false"
+    shape="CtaCtewfwV0ICtaCtewfwarecomposeV1V0ACtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3V0ICtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3arecomposeV1V0FLaEmptyF">
+    <label
+     name="expl:VC for decompose"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter reduce"
+    locfile="../defunctionalization.mlw"
+    loclnum="876" loccnumb="4" loccnume="10"
+    expl="VC for reduce"
+    sum="63bd0713db4ac9006191291fbfd987d3"
+    proved="true"
+    expanded="false"
+    shape="CtaCtewfwV0ICtaCtewfwV0Aainfix =aeval_0arecomposeV1V3aeval_0V0Iainfix =aeval_0V3aeval_0V2FACtaSubaCtewaCtewfwV2ICtaSubaCtewaCtewfwV2Aainfix =arecomposeV1V2V0FF">
+    <label
+     name="expl:VC for reduce"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter itere"
+    locfile="../defunctionalization.mlw"
+    loclnum="900" loccnumb="8" loccnume="13"
+    expl="VC for itere"
+    sum="97c0bf428aa1970bc3cf07c5963f7129"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =aeval_0V0V1aCteVfwV0ICtaCtewfwV0Aainfix =aeval_0V0V3Iainfix =aeval_0V2V3FIainfix =aeval_0V2aeval_0V0FF">
+    <label
+     name="expl:VC for itere"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter refocus"
+    locfile="../defunctionalization.mlw"
+    loclnum="920" loccnumb="4" loccnume="11"
+    expl="VC for refocus"
+    sum="3b10c000c5dc52d4501aac77e413a506"
+    proved="true"
+    expanded="false"
+    shape="CtaCtewfwarecomposeV0V1ICtaCtewfwarecomposeV0V1ACtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3arecomposeV0V1ICtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3arecomposeV0V1FF">
+    <label
+     name="expl:VC for refocus"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter itere_opt"
+    locfile="../defunctionalization.mlw"
+    loclnum="928" loccnumb="8" loccnume="17"
+    expl="VC for itere_opt"
+    sum="6b7050abfedf69f054d595ee3bd18cec"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =V2aeval_0arecomposeV0V1aCteVfwarecomposeV0V1ICtaCtewfwarecomposeV0V1Aainfix =aeval_0arecomposeV3V5aeval_0arecomposeV0V1Iainfix =aeval_0V5aeval_0V4FACtaSubaCtewaCtewfwV4ICtaSubaCtewaCtewfwV4Aainfix =arecomposeV3V4arecomposeV0V1FF">
+    <label
+     name="expl:VC for itere_opt"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter normalize"
+    locfile="../defunctionalization.mlw"
+    loclnum="942" loccnumb="8" loccnume="17"
+    expl="VC for normalize"
+    sum="820b6f476998e5aab98b5e65b5c27f95"
+    proved="true"
+    expanded="false"
+    shape="t">
+    <label
+     name="expl:VC for normalize"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter eval_1"
+    locfile="../defunctionalization.mlw"
+    loclnum="963" loccnumb="8" loccnume="14"
+    expl="VC for eval_1"
+    sum="f3df3239bd55a541bca02bf16858a56e"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =aeval_0arecomposeV0aCteV2aeval_0arecomposeV0V1aCteVainfix =aeval_0arecomposeaLeftV0V4V3aeval_0arecomposeV0V1aSubVVV1F">
+    <label
+     name="expl:VC for eval_1"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2323,41 +2945,224 @@
     </proof>
    </goal>
    <goal
-    name="WP_parameter itere_opt"
+    name="WP_parameter eval_2"
     locfile="../defunctionalization.mlw"
-    loclnum="940" loccnumb="8" loccnume="17"
-    expl="VC for itere_opt"
-    sum="607047305302a7eab46bf1d15c535e36"
+    loclnum="971" loccnumb="5" loccnume="11"
+    expl="VC for eval_2"
+    sum="dd91520623116e5d4a0481a46265e5ff"
     proved="true"
     expanded="false"
-    shape="Cainfix =V2aeval_0arecomposeV0V1aCteVfwarecomposeV0V1ICtaCtewfwarecomposeV0V1Aainfix =aeval_0arecomposeV3V5aeval_0arecomposeV0V1Iainfix =aeval_0V5aeval_0V4FACtaSubaCtewaCtewfwV4ICtaSubaCtewaCtewfwV4Aainfix =arecomposeV3V4arecomposeV0V1FF">
+    shape="Cainfix =V1aeval_0arecomposeV0aCteV1aEmptyainfix =aeval_0arecomposeaRightV1V2V3aeval_0arecomposeV0aCteV1aLeftVVainfix =aeval_0arecomposeV5aCteainfix -V4V1aeval_0arecomposeV0aCteV1aRightVVV0F">
     <label
-     name="expl:VC for itere_opt"/>
+     name="expl:VC for eval_2"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.22"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter interpret"
+    locfile="../defunctionalization.mlw"
+    loclnum="980" loccnumb="4" loccnume="13"
+    expl="VC for interpret"
+    sum="e87a079954d80d457b7d575dd32b45df"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aeval_0arecomposeaEmptyV0aeval_0V0F">
+    <label
+     name="expl:VC for interpret"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter test"
+    locfile="../defunctionalization.mlw"
+    loclnum="985" loccnumb="4" loccnume="8"
+    expl="VC for test"
+    sum="820b6f476998e5aab98b5e65b5c27f95"
+    proved="true"
+    expanded="false"
+    shape="t">
+    <label
+     name="expl:VC for test"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="RWithError"
+   locfile="../defunctionalization.mlw"
+   loclnum="997" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter recompose_values"
+    locfile="../defunctionalization.mlw"
+    loclnum="1026" loccnumb="14" loccnume="30"
+    expl="VC for recompose_values"
+    sum="7e799c130d40bbf1f2c99e35d83ec45c"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2aEmptyainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2Iainfix =aeval_0arecomposeV3V6aeval_0arecomposeV3V5Aainfix =aeval_0V6aeval_0V5ACfaEmptyainfix =V7V3aLeftVwainfix =V8V3aRightwVV0LaSubV1V4LaSubV2V4aLeftVVainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2Iainfix =aeval_0arecomposeV10V12aeval_0arecomposeV10V11Aainfix =aeval_0V12aeval_0V11ACfaEmptyainfix =V13V10aLeftVwainfix =V14V10aRightwVV0LaSubaCteV9V1LaSubaCteV9V2aRightVVV0Iainfix =aeval_0V1aeval_0V2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for recompose_values"/>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="3.19"/>
+    </proof>
     <transf
      name="split_goal_wp"
      proved="true"
      expanded="false">
      <goal
-      name="WP_parameter itere_opt.1"
+      name="WP_parameter recompose_values.1"
       locfile="../defunctionalization.mlw"
-      loclnum="940" loccnumb="8" loccnume="17"
-      expl="1. precondition"
-      sum="a26454f1610127eb76fa24d3b2d987ad"
+      loclnum="1026" loccnumb="14" loccnume="30"
+      expl="1. postcondition"
+      sum="ebdfca642c98cb7bed929ea1ef2efd25"
       proved="true"
       expanded="false"
-      shape="preconditionCtaSubaCtewaCtewfwV3ICtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3arecomposeV0V1FF">
+      shape="postconditionCainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2aEmptytaLeftVVtaRightVVV0Iainfix =aeval_0V1aeval_0V2F">
       <label
-       name="expl:VC for itere_opt"/>
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for recompose_values"/>
       <proof
        prover="0"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="4"
        timelimit="5"
        memlimit="1000"
        obsolete="false"
@@ -2366,72 +3171,18 @@
       </proof>
      </goal>
      <goal
-      name="WP_parameter itere_opt.2"
+      name="WP_parameter recompose_values.2"
       locfile="../defunctionalization.mlw"
-      loclnum="940" loccnumb="8" loccnume="17"
-      expl="2. postcondition"
-      sum="431f11253d043ddc65c773047af7acdf"
+      loclnum="1026" loccnumb="14" loccnume="30"
+      expl="2. variant decrease"
+      sum="23edde2d0101b88f8afb13046ea190f5"
       proved="true"
       expanded="false"
-      shape="postconditionainfix =aeval_0arecomposeV2V4aeval_0arecomposeV0V1Iainfix =aeval_0V4aeval_0V3FICtaSubaCtewaCtewfwV3ICtaSubaCtewaCtewfwV3Aainfix =arecomposeV2V3arecomposeV0V1FF">
+      shape="variant decreaseCtaEmptyCfaEmptyainfix =V7V3aLeftVwainfix =V8V3aRightwVV0LaSubV1V4LaSubV2V4aLeftVVtaRightVVV0Iainfix =aeval_0V1aeval_0V2F">
       <label
-       name="expl:VC for itere_opt"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter itere_opt.3"
-      locfile="../defunctionalization.mlw"
-      loclnum="940" loccnumb="8" loccnume="17"
-      expl="3. postcondition"
-      sum="027365081520ef70b1371699fa37e195"
-      proved="true"
-      expanded="false"
-      shape="postconditionCainfix =V2aeval_0arecomposeV0V1aCteVtwarecomposeV0V1ICtaCtewfwarecomposeV0V1F">
+       name="why3:lemma"/>
       <label
-       name="expl:VC for itere_opt"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter itere_opt.4"
-      locfile="../defunctionalization.mlw"
-      loclnum="940" loccnumb="8" loccnume="17"
-      expl="4. unreachable point"
-      sum="3562462e6d5233661f6880ce8ab0dcb6"
-      proved="true"
-      expanded="false"
-      shape="unreachable pointCtaCteVfwarecomposeV0V1ICtaCtewfwarecomposeV0V1F">
-      <label
-       name="expl:VC for itere_opt"/>
+       name="expl:VC for recompose_values"/>
       <proof
        prover="0"
        timelimit="5"
@@ -2454,7 +3205,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.01"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
        prover="3"
@@ -2470,26 +3221,567 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.00"/>
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter recompose_values.3"
+      locfile="../defunctionalization.mlw"
+      loclnum="1026" loccnumb="14" loccnume="30"
+      expl="3. precondition"
+      sum="1a447c9ebde73e4681f4693947466d00"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaEmptyainfix =aeval_0V6aeval_0V5LaSubV1V4LaSubV2V4aLeftVVtaRightVVV0Iainfix =aeval_0V1aeval_0V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for recompose_values"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter recompose_values.4"
+      locfile="../defunctionalization.mlw"
+      loclnum="1026" loccnumb="14" loccnume="30"
+      expl="4. postcondition"
+      sum="58eb1fd2b3db574d429a8202772d9c21"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaEmptyainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2Iainfix =aeval_0arecomposeV3V6aeval_0arecomposeV3V5Iainfix =aeval_0V6aeval_0V5LaSubV1V4LaSubV2V4aLeftVVtaRightVVV0Iainfix =aeval_0V1aeval_0V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for recompose_values"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter recompose_values.5"
+      locfile="../defunctionalization.mlw"
+      loclnum="1026" loccnumb="14" loccnume="30"
+      expl="5. variant decrease"
+      sum="3ec8911a0af2b016e2537266f2b3865f"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaEmptytaLeftVVCfaEmptyainfix =V9V6aLeftVwainfix =V10V6aRightwVV0LaSubaCteV5V1LaSubaCteV5V2aRightVVV0Iainfix =aeval_0V1aeval_0V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for recompose_values"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter recompose_values.6"
+      locfile="../defunctionalization.mlw"
+      loclnum="1026" loccnumb="14" loccnume="30"
+      expl="6. precondition"
+      sum="4dd5a9ea65b9b3aae053d0378c821c59"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaEmptytaLeftVVainfix =aeval_0V8aeval_0V7LaSubaCteV5V1LaSubaCteV5V2aRightVVV0Iainfix =aeval_0V1aeval_0V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for recompose_values"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.18"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter recompose_values.7"
+      locfile="../defunctionalization.mlw"
+      loclnum="1026" loccnumb="14" loccnume="30"
+      expl="7. postcondition"
+      sum="91cd47755f51d5f9554f250c2b275370"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaEmptytaLeftVVainfix =aeval_0arecomposeV0V1aeval_0arecomposeV0V2Iainfix =aeval_0arecomposeV6V8aeval_0arecomposeV6V7Iainfix =aeval_0V8aeval_0V7LaSubaCteV5V1LaSubaCteV5V2aRightVVV0Iainfix =aeval_0V1aeval_0V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for recompose_values"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
-    name="WP_parameter normalize"
+    name="WP_parameter recompose_underflow"
     locfile="../defunctionalization.mlw"
-    loclnum="954" loccnumb="8" loccnume="17"
-    expl="VC for normalize"
-    sum="07ff09083d3db4c1316479f890a48088"
+    loclnum="1036" loccnumb="14" loccnume="33"
+    expl="VC for recompose_underflow"
+    sum="b5d5ee5106ccb57d21144507fb5d4200"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =aeval_0arecomposeV0V1aUnderflowaEmptyainfix =aeval_0arecomposeV0V1aUnderflowIainfix =aeval_0arecomposeV2V4aUnderflowAainfix =aeval_0V4aUnderflowACfaEmptyainfix =V5V2aLeftVwainfix =V6V2aRightwVV0LaSubV1V3aLeftVVainfix =aeval_0arecomposeV0V1aUnderflowIainfix =aeval_0arecomposeV8V9aUnderflowAainfix =aeval_0V9aUnderflowACfaEmptyainfix =V10V8aLeftVwainfix =V11V8aRightwVV0LaSubaCteV7V1aRightVVV0Iainfix =aeval_0V1aUnderflowF">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for recompose_underflow"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.07"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.14"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter eval_1"
+    locfile="../defunctionalization.mlw"
+    loclnum="1048" loccnumb="8" loccnume="14"
+    expl="VC for eval_1"
+    sum="9397024eb0347fcfde5b01ed38d9f0cc"
+    proved="true"
+    expanded="false"
+    shape="Ciainfix =aUnderflowaeval_0arecomposeV0V1ainfix =aeval_0arecomposeV0aCteV2aeval_0arecomposeV0V1Aainfix &gt;=V2c0ainfix &gt;=V2c0aCteVainfix =aeval_0arecomposeaLeftV0V4V3aeval_0arecomposeV0V1aSubVVV1F">
+    <label
+     name="expl:VC for eval_1"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter eval_2"
+    locfile="../defunctionalization.mlw"
+    loclnum="1056" loccnumb="5" loccnume="11"
+    expl="VC for eval_2"
+    sum="e74b8aab1006e644e7e08042eee7759e"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =aVnumV1aeval_0arecomposeV0aCteV1aEmptyainfix =aeval_0arecomposeaRightV1V2V3aeval_0arecomposeV0aCteV1aLeftVViainfix =aUnderflowaeval_0arecomposeV0aCteV1ainfix =aeval_0arecomposeV5aCteainfix -V4V1aeval_0arecomposeV0aCteV1ainfix &gt;=V4V1aRightVVV0Iainfix &gt;=V1c0F">
+    <label
+     name="expl:VC for eval_2"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter eval_2.1"
+      locfile="../defunctionalization.mlw"
+      loclnum="1056" loccnumb="5" loccnume="11"
+      expl="1. postcondition"
+      sum="facfbb851eb4a124ec223e5df72ead2b"
+      proved="true"
+      expanded="false"
+      shape="postconditionCainfix =aVnumV1aeval_0arecomposeV0aCteV1aEmptytaLeftVVtaRightVVV0Iainfix &gt;=V1c0F">
+      <label
+       name="expl:VC for eval_2"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="4"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter eval_2.2"
+      locfile="../defunctionalization.mlw"
+      loclnum="1056" loccnumb="5" loccnume="11"
+      expl="2. postcondition"
+      sum="cde6ece7d181af6793f4932bf3fe1253"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaEmptyainfix =aeval_0arecomposeaRightV1V2V3aeval_0arecomposeV0aCteV1aLeftVVtaRightVVV0Iainfix &gt;=V1c0F">
+      <label
+       name="expl:VC for eval_2"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter eval_2.3"
+      locfile="../defunctionalization.mlw"
+      loclnum="1056" loccnumb="5" loccnume="11"
+      expl="3. postcondition"
+      sum="71dee285319b59e059a2b09854ce0bf0"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaEmptytaLeftVVainfix =aeval_0arecomposeV5aCteainfix -V4V1aeval_0arecomposeV0aCteV1Iainfix &gt;=V4V1aRightVVV0Iainfix &gt;=V1c0F">
+      <label
+       name="expl:VC for eval_2"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.36"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter eval_2.4"
+      locfile="../defunctionalization.mlw"
+      loclnum="1056" loccnumb="5" loccnume="11"
+      expl="4. postcondition"
+      sum="b9a37a927b81c7ddcccfecc1622352e7"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaEmptytaLeftVVainfix =aUnderflowaeval_0arecomposeV0aCteV1INainfix &gt;=V4V1aRightVVV0Iainfix &gt;=V1c0F">
+      <label
+       name="expl:VC for eval_2"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.52"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.43"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter interpret"
+    locfile="../defunctionalization.mlw"
+    loclnum="1066" loccnumb="4" loccnume="13"
+    expl="VC for interpret"
+    sum="ecd2591cc0e802329ba488cd4490a944"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aeval_0arecomposeaEmptyV0aeval_0V0F">
+    <label
+     name="expl:VC for interpret"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.04"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter test"
+    locfile="../defunctionalization.mlw"
+    loclnum="1071" loccnumb="4" loccnume="8"
+    expl="VC for test"
+    sum="31905768445738967833be7a03fbf835"
     proved="true"
     expanded="false"
     shape="t">
     <label
-     name="expl:VC for normalize"/>
+     name="expl:VC for test"/>
     <proof
      prover="0"
      timelimit="5"
-     memlimit="4000"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
      obsolete="false"
      archived="false">
      <result status="valid" time="0.00"/>
