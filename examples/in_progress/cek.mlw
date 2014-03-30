@@ -188,14 +188,14 @@ type context =
 
 (** The CEK abstract machine :
 {h <blockquote><pre>
-    &lt;x, e, C&gt;_eval -> &lt;C, v&gt;_cont
+    (x, e, C)_eval -> (C, v)_cont
                       where v = lookup x e
- &lt;\x.t, e, C&gt;_eval -> &lt;C, (\x.t, e)&gt;_cont
-&lt;t0 t1, e, C&gt;_eval -> &lt;t0, e, [C (t1, e)]&gt;_eval
+ (\x.t, e, C)_eval -> (C, (\x.t, e))_cont
+(t0 t1, e, C)_eval -> (t0, e, [C (t1, e)])_eval
 
-           &lt;[], v&gt;_cont -> v
-   &lt;[C (t, e)], v&gt;_cont -> &lt;t, e, [v C]&gt;_eval
-&lt;[(\x.t, e) C], v&gt;_cont -> &lt;t, (x, v) :: e, C&gt;_eval
+           ([], v)_cont -> v
+   ([C (t, e)], v)_cont -> (t, e, [v C])_eval
+([(\x.t, e) C], v)_cont -> (t, (x, v) :: e, C)_eval
 </pre></blockquote>}
 *)
 
