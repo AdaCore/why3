@@ -1299,6 +1299,55 @@ install_no_local::
 	cp -f lib/why3-cpulimit$(EXE) $(LIBDIR)/why3/why3-cpulimit$(EXE)
 	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
 
+########
+# why3wc
+########
+
+WHY3WCGENERATED = src/tools/why3wc.ml
+
+WHY3WC_FILES = why3wc
+WHY3WCMODULES = $(addprefix src/tools/, $(WHY3WC_FILES))
+
+WHY3WCDEP = $(addsuffix .dep, $(WHY3WCMODULES))
+WHY3WCCMO = $(addsuffix .cmo, $(WHY3WCMODULES))
+WHY3WCCMX = $(addsuffix .cmx, $(WHY3WCMODULES))
+
+$(WHY3WCDEP): DEPFLAGS += -I src/tools
+$(WHY3WCCMO) $(WHY3WCCMX): INCLUDES += -I src/tools
+
+$(WHY3WCDEP): $(WHY3WCGENERATED)
+
+byte: bin/why3wc.byte
+opt:  bin/why3wc.opt
+
+bin/why3wc.opt: $(WHY3WCCMX)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3wc.byte: $(WHY3WCCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+bin/why3wc: bin/why3wc.@OCAMLBEST@
+	ln -sf why3wc.@OCAMLBEST@ $@
+
+ifneq "$(MAKECMDGOALS)" "clean"
+include $(WHY3WCDEP)
+endif
+
+depend: $(WHY3WCDEP)
+
+clean::
+	rm -f $(WHY3WCGENERATED)
+	rm -f src/tools/*.cm[iox] src/tools/*.o
+	rm -f src/tools/*.annot src/tools/*.dep src/tools/*~
+	rm -f bin/why3wc.byte bin/why3wc.opt bin/why3wc
+
+install_no_local::
+	cp -f bin/why3wc.@OCAMLBEST@ $(BINDIR)/why3wc$(EXE)
+
+install_local: bin/why3wc
+
 #########
 # why3doc
 #########
