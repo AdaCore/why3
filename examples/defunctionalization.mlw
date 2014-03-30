@@ -739,7 +739,7 @@ let contract (e:expr) : expr
   | _ -> absurd
   end
 
-(*
+(**
 Reduction Contexts:
 {h <blockquote><pre>
 C  : cont
@@ -749,13 +749,14 @@ C ::= [] | [C e] | [v C]
 
 type context = Empty | Left context expr | Right int context
 
-(*
+(**
 Recomposition:
-
+{h <blockquote><pre>
              recompose : cont * expression -> expression
      recompose ([], e) = e
 recompose ([C e2], e1) = recompose (C, e1 - e2)
 recompose ([n1 C], e2) = recompose (C, n1 - e2)
+</pre></blockquote>}
 *)
 
 function recompose (c:context) (e:expr) : expr =
@@ -788,7 +789,7 @@ let rec lemma recompose_inversion (c:context) (e:expr)
   | Right n1 c -> recompose_inversion c (Sub (Cte n1) e)
   end
 
-(*
+(**
 Decomposition:
 {h <blockquote><pre>
 dec_or_val = (C, rp) | v
@@ -871,7 +872,7 @@ let decompose (e:expr) : (context, expr)
   =
   decompose_term e Empty
 
-(*
+(**
 One reduction step:
 {h <blockquote><pre>
 reduce : expression -> expression + stuck
@@ -901,7 +902,7 @@ let reduce (e:expr) : expr
   let (c,r) = decompose e in
   recompose c (contract r)
 
-(*
+(**
 Evaluation based on iterated reduction:
 {h <blockquote><pre>
 itere : red_ou_val -> value + erreur
@@ -969,14 +970,14 @@ let rec normalize (e:expr)
   Derive an abstract machine
 *)
 
-(*
-
+(**
+{h <blockquote><pre>
 (c,Cte n)_1 -> (c,n)_2
 (c,Sub e1 e2)_1 -> (Left c e2,e1)_1
 (Empty,n)_2 -> stop with result = n
 (Left c e,n)_2 -> (Right n c,e)_1
 (Right n1 c,n)_2 -> (c,Cte (n1 - n))_1
-
+</pre></blockquote>}
 *)
 
 let rec eval_1 c e
@@ -1021,14 +1022,17 @@ use import SemWithError
   An abstract machine for the case with errors
 *)
 
-(*
+(**
 
-(c,Cte n)_1 -> (c,n)_2
+{h <blockquote><pre>
+(c,Cte n)_1 -> stop on Underflow if  n < 0
+(c,Cte n)_1 -> (c,n)_2 if n >= 0
 (c,Sub e1 e2)_1 -> (Left c e2,e1)_1
-(Empty,n)_2 -> stop with result = n
+(Empty,n)_2 -> stop on Vnum n
 (Left c e,n)_2 -> (Right n c,e)_1
-(Right n1 c,n)_2 -> stop with Underflow if n1 < n
+(Right n1 c,n)_2 -> stop on Underflow if n1 < n
 (Right n1 c,n)_2 -> (c,Cte (n1 - n))_1 if n1 >= n
+</pre></blockquote>}
 
 *)
 
