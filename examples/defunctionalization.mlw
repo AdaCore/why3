@@ -817,11 +817,33 @@ predicate is_a_value (e:expr) =
   | _ -> false
   end
 
+use Defunctionalization (* for size_e *)
+
+function size_e (e:expr) : int = Defunctionalization.size_e e
+
+function size_c (c:context) : int =
+  match c with
+  | Empty -> 0
+  | Left c e -> 2 + size_c c + size_e e
+  | Right _ c -> 1 + size_c c
+  end
+
+let rec lemma size_c_pos (c:context) : unit
+  variant { c }
+  ensures { size_c c >= 0 }
+= match c with
+  | Empty -> ()
+  | Left c _ -> size_c_pos c
+  | Right _ c -> size_c_pos c
+  end
+
+
+
 let rec decompose_term (e:expr) (c:context) : (context, expr)
+  variant { size_e e + size_c c }
   ensures { let (c1,e1) = result in
             recompose c1 e1 = recompose c e /\
             is_a_redex e1 }
-  diverges
   raises { Stuck -> is_a_value (recompose c e) }
   =
   match e with
@@ -830,10 +852,10 @@ let rec decompose_term (e:expr) (c:context) : (context, expr)
   end
 
 with decompose_cont (c:context) (n:int) : (context, expr)
+  variant { size_c c }
   ensures { let (c1,e1) = result in
             recompose c1 e1 = recompose c (Cte n)  /\
             is_a_redex e1 }
-  diverges
   raises { Stuck -> is_a_value (recompose c (Cte n)) }
   =
   match c with
@@ -845,7 +867,6 @@ with decompose_cont (c:context) (n:int) : (context, expr)
 let decompose (e:expr) : (context, expr)
   ensures { let (c1,e1) = result in recompose c1 e1 = e  /\
             is_a_redex e1 }
-  diverges
   raises { Stuck -> is_a_value e }
   =
   decompose_term e Empty
@@ -875,7 +896,6 @@ then reduce e = recompose (C, c)
 
 let reduce (e:expr) : expr
   ensures { eval_0 result = eval_0 e }
-  diverges
   raises { Stuck -> is_a_value e }
   =
   let (c,r) = decompose e in
@@ -898,7 +918,7 @@ then itere (C, rp) = itere (decompose (recompose (C, c)))
 
 
 let rec itere (e:expr) : int
-  diverges
+  diverges (* termination could be proved but that's not the point *)
   ensures { eval_0 e = result }
   =
   try
@@ -918,18 +938,16 @@ let rec itere (e:expr) : int
 
 
 let refocus c e
-  diverges
   ensures { let (c1,e1) = result in
             recompose c1 e1 = recompose c e /\
             is_a_redex e1 }
   raises { Stuck -> is_a_value (recompose c e) }
-  = decompose_term e c
+= decompose_term e c
 
 let rec itere_opt (c:context) (e:expr) : int
   diverges
   ensures { result = eval_0 (recompose c e) }
-  =
-  try
+= try
     let (c,r) = refocus c e in
     itere_opt c (contract r)
   with Stuck ->
@@ -940,8 +958,9 @@ let rec itere_opt (c:context) (e:expr) : int
   end
 
 let rec normalize (e:expr)
- diverges
- = itere_opt Empty e
+  diverges
+  ensures { result = eval_0 e }
+= itere_opt Empty e
 
 
 
@@ -961,7 +980,7 @@ let rec normalize (e:expr)
 *)
 
 let rec eval_1 c e
-  diverges
+  variant { 2 * (size_c c + size_e e) }
   ensures { result = eval_0 (recompose c e) }
 = match e with
   | Cte n -> eval_2 c n
@@ -969,7 +988,7 @@ let rec eval_1 c e
   end
 
 with eval_2 c n
-  diverges
+  variant { 1 + 2 * size_c c }
   ensures { result = eval_0 (recompose c (Cte n)) }
 = match c with
   | Empty -> n
@@ -978,11 +997,10 @@ with eval_2 c n
   end
 
 let interpret p
-  diverges
   ensures { result = eval_0 p }
 = eval_1 Empty p
 
-let test () diverges =
+let test () =
   (interpret p0,
    interpret p1,
    interpret p2,
@@ -1016,6 +1034,26 @@ use import SemWithError
 
 type context = Empty | Left context expr | Right int context
 
+use Defunctionalization (* for size_e *)
+
+function size_e (e:expr) : int = Defunctionalization.size_e e
+
+function size_c (c:context) : int =
+  match c with
+  | Empty -> 0
+  | Left c e -> 2 + size_c c + size_e e
+  | Right _ c -> 1 + size_c c
+  end
+
+let rec lemma size_c_pos (c:context) : unit
+  variant { c }
+  ensures { size_c c >= 0 }
+= match c with
+  | Empty -> ()
+  | Left c _ -> size_c_pos c
+  | Right _ c -> size_c_pos c
+  end
+
 function recompose (c:context) (e:expr) : expr =
   match c with
   | Empty -> e
@@ -1046,7 +1084,7 @@ let rec lemma recompose_underflow (c:context) (e:expr) : unit
 
 
 let rec eval_1 c e
-  diverges
+  variant { 2 * (size_c c + size_e e) } 
   ensures { result = eval_0 (recompose c e) }
 = match e with
   | Cte n -> if n >= 0 then eval_2 c n else Underflow
@@ -1054,8 +1092,8 @@ let rec eval_1 c e
   end
 
 with eval_2 c n
+  variant { 1 + 2 * size_c c } 
   requires { n >= 0 }
-  diverges
   ensures { result = eval_0 (recompose c (Cte n)) }
 = match c with
   | Empty -> Vnum n
@@ -1064,11 +1102,10 @@ with eval_2 c n
   end
 
 let interpret p
-  diverges
   ensures { result = eval_0 p }
 = eval_1 Empty p
 
-let test () diverges =
+let test () =
   (interpret p0,
    interpret p1,
    interpret p2,
