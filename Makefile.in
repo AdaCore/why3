@@ -458,10 +458,10 @@ gallery::
 	  why3session html $$x; \
 	  echo "exporting $$f"; \
 	  mkdir -p $(GALLERYDIR)/$$f; \
-	  cp examples/$$f.mlw examples/$$f/$$f.html $(GALLERYDIR)/$$f/; \
+	  cp examples/$$f.mlw examples/$$f/why3session.html $(GALLERYDIR)/$$f/; \
 	  rm -f $(GALLERYDIR)/$$f/$$f.zip; \
 	  cd examples/; \
-	  zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f/$$f.html  $$f; \
+	  zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f; \
 	  cd ..; \
 	done
 
@@ -475,10 +475,10 @@ gallery::
 	mkdir -p $(GALLERYDIR)/$$f; \
 	if test -f examples/$$f.mlw; then cp examples/$$f.mlw $(GALLERYDIR)/$$f/; fi; \
 	if test -f examples/$$f.why; then cp examples/$$f.why $(GALLERYDIR)/$$f/; fi; \
-	cp examples/$$f/$$f.html $(GALLERYDIR)/$$f/; \
+	cp examples/$$f/why3session.html $(GALLERYDIR)/$$f/; \
 	rm -f $(GALLERYDIR)/$$f/$$f.zip; \
 	cd examples/; \
-	zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f/$$f.html  $$f
+	zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f
 
 ########
 # XML DTD validation
