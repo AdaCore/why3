@@ -40,7 +40,7 @@
  <file
   name="../mergesort_list.mlw"
   verified="true"
-  expanded="true">
+  expanded="false">
   <theory
    name="Elt"
    locfile="../mergesort_list.mlw"
@@ -53,7 +53,7 @@
    locfile="../mergesort_list.mlw"
    loclnum="21" loccnumb="7" loccnume="12"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter merge"
     locfile="../mergesort_list.mlw"
@@ -61,14 +61,14 @@
     expl="VC for merge"
     sum="de48bbfde1330bf939c7c59ccc5a3fd8"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="CCiapermutV7ainfix ++V0V1AasortedV7LaConsV2V6IapermutV6ainfix ++V0V3AasortedV6FAasortedV3AasortedV0Aainfix &lt;ainfix +alengthV0alengthV3ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1apermutV9ainfix ++V0V1AasortedV9LaConsV4V8IapermutV8ainfix ++V5V1AasortedV8FAasortedV1AasortedV5Aainfix &lt;ainfix +alengthV5alengthV1ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1aleV4V2aConsVVapermutV1ainfix ++V0V1AasortedV1aNilV0aConsVVCapermutV1ainfix ++V0V1AasortedV1aNilapermutV0ainfix ++V0V1AasortedV0wV0aNilV1IasortedV1AasortedV0F">
     <label
      name="expl:VC for merge"/>
     <transf
      name="split_goal_wp"
      proved="true"
-     expanded="true">
+     expanded="false">
      <goal
       name="WP_parameter merge.1"
       locfile="../mergesort_list.mlw"
@@ -126,7 +126,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="9.92"/>
+       <result status="valid" time="3.56"/>
       </proof>
      </goal>
      <goal
@@ -196,13 +196,13 @@
       expl="7. postcondition"
       sum="6241e72f3729516ce7b35907e15419b3"
       proved="true"
-      expanded="true"
+      expanded="false"
       shape="postconditionCCasortedV7LaConsV2V6IapermutV6ainfix ++V0V3AasortedV6FIasortedV3AasortedV0INaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
       <label
        name="expl:VC for merge"/>
       <metas
        proved="true"
-       expanded="true">
+       expanded="false">
        <ts_pos
         name="real"
         arity="0"
@@ -244,17 +244,9 @@
          name="unit"/>
        </ts_pos>
        <ts_pos
-        name="&apos;mark"
-        arity="0"
-        id="54"
-        ip_theory="WP builtins: at">
-        <ip_qualid
-         name="&apos;mark"/>
-       </ts_pos>
-       <ts_pos
         name="tuple2"
         arity="2"
-        id="855"
+        id="930"
         ip_theory="Tuple2">
         <ip_library
          name="why3"/>
@@ -272,7 +264,7 @@
        </ls_pos>
        <ls_pos
         name="zero"
-        id="139"
+        id="214"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -281,7 +273,7 @@
        </ls_pos>
        <ls_pos
         name="one"
-        id="140"
+        id="215"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -290,7 +282,7 @@
        </ls_pos>
        <ls_pos
         name="infix &lt;"
-        id="141"
+        id="216"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -299,7 +291,7 @@
        </ls_pos>
        <ls_pos
         name="infix &gt;"
-        id="144"
+        id="219"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -308,7 +300,7 @@
        </ls_pos>
        <ls_pos
         name="infix &lt;="
-        id="153"
+        id="228"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -317,7 +309,7 @@
        </ls_pos>
        <ls_pos
         name="infix +"
-        id="1233"
+        id="1308"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -326,7 +318,7 @@
        </ls_pos>
        <ls_pos
         name="prefix -"
-        id="1234"
+        id="1309"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -335,7 +327,7 @@
        </ls_pos>
        <ls_pos
         name="infix *"
-        id="1235"
+        id="1310"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -344,7 +336,7 @@
        </ls_pos>
        <ls_pos
         name="infix -"
-        id="1283"
+        id="1358"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -353,7 +345,7 @@
        </ls_pos>
        <ls_pos
         name="infix &gt;="
-        id="1303"
+        id="1378"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -362,7 +354,7 @@
        </ls_pos>
        <ls_pos
         name="length"
-        id="2157"
+        id="2232"
         ip_theory="Length">
         <ip_library
          name="list"/>
@@ -371,7 +363,7 @@
        </ls_pos>
        <ls_pos
         name="reverse"
-        id="3704"
+        id="3779"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -380,14 +372,14 @@
        </ls_pos>
        <ls_pos
         name="le"
-        id="4297"
+        id="4372"
         ip_theory="Merge">
         <ip_qualid
          name="le"/>
        </ls_pos>
        <pr_pos
         name="Assoc"
-        id="1236"
+        id="1311"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -398,7 +390,7 @@
        </pr_pos>
        <pr_pos
         name="Unit_def_l"
-        id="1243"
+        id="1318"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -409,7 +401,7 @@
        </pr_pos>
        <pr_pos
         name="Unit_def_r"
-        id="1246"
+        id="1321"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -420,7 +412,7 @@
        </pr_pos>
        <pr_pos
         name="Inv_def_l"
-        id="1249"
+        id="1324"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -431,7 +423,7 @@
        </pr_pos>
        <pr_pos
         name="Inv_def_r"
-        id="1252"
+        id="1327"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -442,7 +434,7 @@
        </pr_pos>
        <pr_pos
         name="Comm"
-        id="1255"
+        id="1330"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -455,7 +447,7 @@
        </pr_pos>
        <pr_pos
         name="Assoc"
-        id="1260"
+        id="1335"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -466,7 +458,7 @@
        </pr_pos>
        <pr_pos
         name="Mul_distr_l"
-        id="1267"
+        id="1342"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -475,7 +467,7 @@
        </pr_pos>
        <pr_pos
         name="Mul_distr_r"
-        id="1274"
+        id="1349"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -484,7 +476,7 @@
        </pr_pos>
        <pr_pos
         name="Comm"
-        id="1292"
+        id="1367"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -495,7 +487,7 @@
        </pr_pos>
        <pr_pos
         name="Unitary"
-        id="1297"
+        id="1372"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -504,7 +496,7 @@
        </pr_pos>
        <pr_pos
         name="NonTrivialRing"
-        id="1300"
+        id="1375"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -513,7 +505,7 @@
        </pr_pos>
        <pr_pos
         name="Refl"
-        id="1312"
+        id="1387"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -522,7 +514,7 @@
        </pr_pos>
        <pr_pos
         name="Trans"
-        id="1315"
+        id="1390"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -531,7 +523,7 @@
        </pr_pos>
        <pr_pos
         name="Antisymm"
-        id="1322"
+        id="1397"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -540,7 +532,7 @@
        </pr_pos>
        <pr_pos
         name="Total"
-        id="1327"
+        id="1402"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -549,7 +541,7 @@
        </pr_pos>
        <pr_pos
         name="ZeroLessOne"
-        id="1332"
+        id="1407"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -558,7 +550,7 @@
        </pr_pos>
        <pr_pos
         name="CompatOrderAdd"
-        id="1333"
+        id="1408"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -567,7 +559,7 @@
        </pr_pos>
        <pr_pos
         name="CompatOrderMult"
-        id="1340"
+        id="1415"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -576,7 +568,7 @@
        </pr_pos>
        <pr_pos
         name="Length_nonnegative"
-        id="2167"
+        id="2242"
         ip_theory="Length">
         <ip_library
          name="list"/>
@@ -585,7 +577,7 @@
        </pr_pos>
        <pr_pos
         name="Length_nil"
-        id="2170"
+        id="2245"
         ip_theory="Length">
         <ip_library
          name="list"/>
@@ -594,7 +586,7 @@
        </pr_pos>
        <pr_pos
         name="Append_assoc"
-        id="3653"
+        id="3728"
         ip_theory="Append">
         <ip_library
          name="list"/>
@@ -603,7 +595,7 @@
        </pr_pos>
        <pr_pos
         name="Append_l_nil"
-        id="3660"
+        id="3735"
         ip_theory="Append">
         <ip_library
          name="list"/>
@@ -612,7 +604,7 @@
        </pr_pos>
        <pr_pos
         name="Append_length"
-        id="3663"
+        id="3738"
         ip_theory="Append">
         <ip_library
          name="list"/>
@@ -621,7 +613,7 @@
        </pr_pos>
        <pr_pos
         name="mem_decomp"
-        id="3675"
+        id="3750"
         ip_theory="Append">
         <ip_library
          name="list"/>
@@ -630,7 +622,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_append"
-        id="3717"
+        id="3792"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -639,7 +631,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_cons"
-        id="3724"
+        id="3799"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -648,7 +640,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_reverse"
-        id="3729"
+        id="3804"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -657,7 +649,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_mem"
-        id="3732"
+        id="3807"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -666,7 +658,7 @@
        </pr_pos>
        <pr_pos
         name="Reverse_length"
-        id="3737"
+        id="3812"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -675,7 +667,7 @@
        </pr_pos>
        <pr_pos
         name="Mem_Num_Occ"
-        id="4019"
+        id="4094"
         ip_theory="NumOcc">
         <ip_library
          name="list"/>
@@ -684,7 +676,7 @@
        </pr_pos>
        <pr_pos
         name="Append_Num_Occ"
-        id="4024"
+        id="4099"
         ip_theory="NumOcc">
         <ip_library
          name="list"/>
@@ -693,7 +685,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_num_occ"
-        id="4031"
+        id="4106"
         ip_theory="NumOcc">
         <ip_library
          name="list"/>
@@ -702,7 +694,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_refl"
-        id="4049"
+        id="4124"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -711,7 +703,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_sym"
-        id="4052"
+        id="4127"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -720,7 +712,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_trans"
-        id="4057"
+        id="4132"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -729,7 +721,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_cons"
-        id="4064"
+        id="4139"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -738,7 +730,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_swap"
-        id="4071"
+        id="4146"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -747,7 +739,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_cons_append"
-        id="4078"
+        id="4153"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -756,7 +748,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_assoc"
-        id="4085"
+        id="4160"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -765,7 +757,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_append"
-        id="4092"
+        id="4167"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -774,7 +766,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_append_swap"
-        id="4101"
+        id="4176"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -783,7 +775,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_length"
-        id="4113"
+        id="4188"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -792,7 +784,7 @@
        </pr_pos>
        <pr_pos
         name="Refl"
-        id="4298"
+        id="4373"
         ip_theory="Merge">
         <ip_qualid
          name="TotalPreOrder"/>
@@ -801,7 +793,7 @@
        </pr_pos>
        <pr_pos
         name="sorted_append"
-        id="4336"
+        id="4411"
         ip_theory="Merge">
         <ip_qualid
          name="sorted_append"/>
@@ -814,142 +806,87 @@
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="139"/>
+         id="214"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="140"/>
+         id="215"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="141"/>
+         id="216"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="144"/>
+         id="219"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="153"/>
+         id="228"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1233"/>
+         id="1308"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1234"/>
+         id="1309"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1235"/>
+         id="1310"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1283"/>
+         id="1358"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1303"/>
+         id="1378"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="2157"/>
+         id="2232"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="3704"/>
+         id="3779"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="4297"/>
+         id="4372"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1236"/>
+         id="1311"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1243"/>
+         id="1318"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1246"/>
+         id="1321"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1249"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1252"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1255"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1260"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1267"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1274"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1292"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1297"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1300"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1312"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1315"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1322"/>
+         id="1324"/>
        </meta>
        <meta
         name="remove_prop">
@@ -959,147 +896,202 @@
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1332"/>
+         id="1330"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1333"/>
+         id="1335"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1340"/>
+         id="1342"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="2167"/>
+         id="1349"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="2170"/>
+         id="1367"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3653"/>
+         id="1372"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3660"/>
+         id="1375"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3663"/>
+         id="1387"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3675"/>
+         id="1390"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3717"/>
+         id="1397"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3724"/>
+         id="1402"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3729"/>
+         id="1407"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3732"/>
+         id="1408"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3737"/>
+         id="1415"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4019"/>
+         id="2242"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4024"/>
+         id="2245"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4031"/>
+         id="3728"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4049"/>
+         id="3735"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4052"/>
+         id="3738"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4057"/>
+         id="3750"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4064"/>
+         id="3792"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4071"/>
+         id="3799"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4078"/>
+         id="3804"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4085"/>
+         id="3807"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4092"/>
+         id="3812"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4101"/>
+         id="4094"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4113"/>
+         id="4099"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4298"/>
+         id="4106"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4336"/>
+         id="4124"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4127"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4132"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4139"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4146"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4153"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4160"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4167"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4176"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4188"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4373"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4411"/>
        </meta>
        <meta
         name="remove_type">
@@ -1124,36 +1116,31 @@
        <meta
         name="remove_type">
         <meta_arg_ts
-         id="54"/>
-       </meta>
-       <meta
-        name="remove_type">
-        <meta_arg_ts
-         id="855"/>
+         id="930"/>
        </meta>
        <goal
         name="WP_parameter merge.7"
         locfile="../mergesort_list.mlw"
         loclnum="25" loccnumb="10" loccnume="15"
         expl="7. postcondition"
-        sum="2a973feee138008b1827bf9543b7b9aa"
+        sum="1cabf562a8d8e3ab55c4380684780a19"
         proved="true"
-        expanded="true"
+        expanded="false"
         shape="postconditionCCasortedV7LaConsV2V6IapermutV6ainfix ++V0V3AasortedV6FIasortedV3AasortedV0INaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
         <label
          name="expl:VC for merge"/>
         <transf
          name="eliminate_builtin"
          proved="true"
-         expanded="true">
+         expanded="false">
          <goal
           name="WP_parameter merge.7.1"
           locfile="../mergesort_list.mlw"
           loclnum="25" loccnumb="10" loccnume="15"
           expl="1. postcondition"
-          sum="961c01192a637135d9f763427a50007f"
+          sum="9dff3da27f6f04a15f6c2e124d57236b"
           proved="true"
-          expanded="true"
+          expanded="false"
           shape="postconditionCCasortedV7LaConsV2V6IapermutV6ainfix ++V0V3AasortedV6FIasortedV3AasortedV0INaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
           <label
            name="expl:VC for merge"/>
@@ -1195,7 +1182,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.51"/>
+       <result status="valid" time="0.46"/>
       </proof>
      </goal>
      <goal
@@ -1374,7 +1361,7 @@
    locfile="../mergesort_list.mlw"
    loclnum="41" loccnumb="7" loccnume="21"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="sorted_reverse_cons"
     locfile="../mergesort_list.mlw"
@@ -1389,7 +1376,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.70"/>
+     <result status="valid" time="0.28"/>
     </proof>
     <proof
      prover="8"
@@ -1397,7 +1384,7 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.51"/>
+     <result status="valid" time="0.33"/>
     </proof>
    </goal>
    <goal
@@ -1467,7 +1454,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="4.32"/>
+         <result status="valid" time="1.30"/>
         </proof>
         <proof
          prover="1"
@@ -1475,7 +1462,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.29"/>
+         <result status="valid" time="0.10"/>
         </proof>
         <proof
          prover="3"
@@ -1483,7 +1470,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.98"/>
+         <result status="valid" time="0.32"/>
         </proof>
         <proof
          prover="4"
@@ -1491,7 +1478,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.21"/>
+         <result status="valid" time="0.35"/>
         </proof>
         <proof
          prover="5"
@@ -1507,7 +1494,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.30"/>
+         <result status="valid" time="0.42"/>
         </proof>
        </goal>
        <goal
@@ -1569,7 +1556,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.25"/>
+       <result status="valid" time="0.09"/>
       </proof>
      </goal>
      <goal
@@ -1589,7 +1576,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.73"/>
+       <result status="valid" time="0.52"/>
       </proof>
       <proof
        prover="8"
@@ -1597,7 +1584,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.17"/>
+       <result status="valid" time="0.84"/>
       </proof>
      </goal>
      <goal
@@ -1637,7 +1624,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="5.63"/>
+       <result status="valid" time="1.81"/>
       </proof>
      </goal>
      <goal
@@ -1677,7 +1664,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.19"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <transf
        name="split_goal_wp"
@@ -1700,7 +1687,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="2.86"/>
+         <result status="valid" time="0.91"/>
         </proof>
         <proof
          prover="5"
@@ -1716,7 +1703,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="1.00"/>
+         <result status="valid" time="0.39"/>
         </proof>
        </goal>
        <goal
@@ -1778,7 +1765,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.59"/>
+       <result status="valid" time="0.88"/>
       </proof>
       <proof
        prover="3"
@@ -1786,7 +1773,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.33"/>
+       <result status="valid" time="0.55"/>
       </proof>
       <proof
        prover="8"
@@ -1794,7 +1781,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.29"/>
+       <result status="valid" time="0.85"/>
       </proof>
      </goal>
      <goal
@@ -1814,7 +1801,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.29"/>
+       <result status="valid" time="0.10"/>
       </proof>
       <proof
        prover="3"
@@ -1822,7 +1809,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.22"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <proof
        prover="8"
@@ -1830,7 +1817,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="5.38"/>
+       <result status="valid" time="2.16"/>
       </proof>
      </goal>
      <goal
@@ -1870,7 +1857,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="6.09"/>
+       <result status="valid" time="2.32"/>
       </proof>
      </goal>
      <goal
@@ -1898,7 +1885,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.43"/>
+       <result status="valid" time="0.17"/>
       </proof>
       <proof
        prover="3"
@@ -1906,7 +1893,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.42"/>
+       <result status="valid" time="0.14"/>
       </proof>
       <proof
        prover="7"
@@ -1914,7 +1901,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.01"/>
+       <result status="valid" time="0.28"/>
       </proof>
       <proof
        prover="8"
@@ -1922,7 +1909,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.98"/>
+       <result status="valid" time="0.36"/>
       </proof>
      </goal>
      <goal
@@ -1942,7 +1929,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.16"/>
+       <result status="valid" time="0.04"/>
       </proof>
       <proof
        prover="1"
@@ -1950,7 +1937,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.65"/>
+       <result status="valid" time="0.59"/>
       </proof>
       <proof
        prover="2"
@@ -1958,7 +1945,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.25"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <proof
        prover="3"
@@ -1966,7 +1953,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.38"/>
+       <result status="valid" time="0.14"/>
       </proof>
       <proof
        prover="4"
@@ -1974,7 +1961,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.36"/>
+       <result status="valid" time="0.14"/>
       </proof>
       <proof
        prover="6"
@@ -1982,7 +1969,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="3.05"/>
+       <result status="valid" time="1.25"/>
       </proof>
      </goal>
      <goal
@@ -2042,7 +2029,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.32"/>
+       <result status="valid" time="0.15"/>
       </proof>
      </goal>
      <goal
@@ -2062,7 +2049,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.10"/>
+       <result status="valid" time="0.44"/>
       </proof>
      </goal>
     </transf>
@@ -2330,7 +2317,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.20"/>
+         <result status="valid" time="1.08"/>
         </proof>
        </goal>
       </transf>
@@ -2540,11 +2527,11 @@
          name="expl:VC for mergesort"/>
         <proof
          prover="0"
-         timelimit="6"
+         timelimit="5"
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="timeout" time="8.94"/>
+         <result status="valid" time="3.19"/>
         </proof>
         <proof
          prover="3"
@@ -2552,7 +2539,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.84"/>
+         <result status="valid" time="0.31"/>
         </proof>
        </goal>
       </transf>
