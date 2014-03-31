@@ -102,3 +102,87 @@ module Mergesort
     end
 
 end
+
+module OCamlMergesort
+
+  clone export Elt
+  use import list.Mem
+  use import list.Reverse
+  use import list.RevAppend
+
+  function prefix int (list 'a) : list 'a
+
+  axiom prefix_def1:
+    forall l: list 'a. prefix 0 l = Nil
+  axiom prefix_def2:
+    forall n: int, x: 'a, l: list 'a. n > 0 ->
+    prefix n (Cons x l) = Cons x (prefix (n-1) l)
+
+  let rec chop (n: int) (l: list 'a) : list 'a
+    requires { 0 <= n <= length l }
+    ensures  { l = prefix n l ++ result }
+    variant  { n }
+  =
+    if n = 0 then l else
+    match l with
+      | Cons _ t -> chop (n-1) t
+      | Nil -> absurd
+    end
+
+  lemma sorted_reverse_cons:
+    forall acc x1. sorted (reverse acc) ->
+    (forall x. mem x acc -> le x x1) -> sorted (reverse (Cons x1 acc))
+
+  lemma sorted_rev_append: forall acc l: list elt.
+    sorted (reverse acc) ->
+    sorted l ->
+    (forall x y. mem x acc -> mem y l -> le x y) ->
+    sorted (reverse (rev_append l acc))
+
+  let rec rev_merge (l1 l2 accu: list elt) : list elt
+    requires { sorted (reverse accu) /\ sorted l1 /\ sorted l2 }
+    requires { forall x y: elt. mem x accu -> mem y l1 -> le x y }
+    requires { forall x y: elt. mem x accu -> mem y l2 -> le x y }
+    ensures  { sorted (reverse result) }
+    ensures  { permut result (accu ++ l1 ++ l2) }
+    variant  { length l1 + length l2 }
+  = match l1, l2 with
+    | Nil, _ -> rev_append l2 accu
+    | _, Nil -> rev_append l1 accu
+    | Cons h1 t1, Cons h2 t2 ->
+       if le h1 h2 then rev_merge t1 l2 (Cons h1 accu)
+                   else rev_merge l1 t2 (Cons h2 accu)
+    end
+
+  lemma sorted_reverse_cons2:
+    forall x l. sorted (reverse (Cons x l)) -> sorted (reverse l)
+
+  let rec rev_merge_rev (l1 l2 accu: list elt) : list elt
+    requires { sorted accu /\ sorted (reverse l1) /\ sorted (reverse l2) }
+    requires { forall x y: elt. mem x accu -> mem y l1 -> le y x }
+    requires { forall x y: elt. mem x accu -> mem y l2 -> le y x }
+    ensures  { sorted result }
+    ensures  { permut result (accu ++ l1 ++ l2) }
+    variant  { length l1 + length l2 }
+  = match l1, l2 with
+    | Nil, _ -> rev_append l2 accu
+    | _, Nil -> rev_append l1 accu
+    | Cons h1 t1, Cons h2 t2 ->
+       if not (le h1 h2) then rev_merge_rev t1 l2 (Cons h1 accu)
+                         else rev_merge_rev l1 t2 (Cons h2 accu)
+    end
+
+  val sort (n: int) (l: list elt) : list elt
+    requires { 2 <= n <= length l }
+    ensures  { sorted result }
+    ensures  { permut result (prefix n l) }
+
+  lemma permut_prefix: forall l: list elt. permut (prefix (length l) l) l
+
+  let mergesort (l: list elt) : list elt
+    ensures { sorted result /\ permut result l }
+  =
+    let n = length l in
+    if n < 2 then l else sort n l
+
+end
