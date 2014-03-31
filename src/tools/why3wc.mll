@@ -9,7 +9,13 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Count spec/code tokens/lines and comment lines in Why3 source files *)
+(** Count spec/code tokens/lines and comment lines in Why3 source files
+
+    Features and current limitations:
+    - blank lines are ignored
+    - "type", "constant", and "function" are counted as spec, not code
+    - a type containing a mutable field is counted in both spec and code
+*)
 
 {
   open Lexing
@@ -17,7 +23,7 @@
 
   let skip_header = ref true
   let tokens = ref false
-  let factor = ref false (* TODO: what kinds of de Bruijn factors? *)
+  let factor = ref false
   let files = Queue.create ()
 
   (** counters *)
@@ -170,7 +176,9 @@ and start_annotation = parse
   | "(*"
       { add_comment (comment 0 lexbuf); start_annotation lexbuf }
   | "{"
-      { scan_annotation lexbuf }
+      { add_token (); scan_annotation lexbuf }
+  | '\n'
+      { new_line (); start_annotation lexbuf }
   | _
       { add_token () (* no curly brace, we give up *) }
   | eof
@@ -182,9 +190,9 @@ and scan_annotation = parse
   | space+
       { scan_annotation lexbuf }
   | "{" (* nested curly braces (e.g. records) *)
-      { scan_annotation lexbuf; scan_annotation lexbuf }
+      { add_token (); scan_annotation lexbuf; scan_annotation lexbuf }
   | "}"
-      { () }
+      { add_token () }
   | "(*" space* '\n'?
       { add_comment (comment 0 lexbuf); scan_annotation lexbuf }
   | '"'
@@ -211,7 +219,7 @@ and string n = parse
   | eof  { n }
 
 (** [comment n] reads a comment until its end and returns n + the number
-    of newlines it contains. *)
+    of non-empty lines it contains (not counting the first one). *)
 
 and comment n = parse
   | ('\n' | space)* "*)"
