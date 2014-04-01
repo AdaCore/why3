@@ -271,4 +271,50 @@ module NaturalMergesort
     done
     with Return -> () end
 
+
+  (** an alternative implementation suggested by Martin Clochard,
+      mixing top-down recursive and natural mergesort
+
+      the purpose is to avoid unnecessary calls to [find_run] in
+      the code above *)
+
+  let rec naturalrec (tmp a: array elt) (lo k: int) : int
+    requires { 0 <= lo <= length a = length tmp }
+    requires { 0 <= k }
+    ensures  { result = length a \/ lo + k < result < length a }
+    ensures  { sorted_sub a lo result }
+    ensures  { permut_sub (old a) a lo (length a) }
+    ensures  { forall j: int. 0 <= j < lo -> a[j] = (old a)[j] }
+    variant  { k }
+  = 'I:
+    let n = length a in
+    if lo >= n-1 then n else
+    try
+      let mid = ref (find_run a lo) in
+      if !mid = n then raise Break;
+      for i = 0 to k-1 do
+        invariant { lo + i < !mid < n }
+        invariant { sorted_sub a lo !mid }
+        invariant { permut_sub (at a 'I) a lo (length a) }
+        invariant { forall j: int. 0 <= j < lo -> a[j] = (at a 'I)[j] }
+        let hi = naturalrec tmp a !mid i in
+        assert { permut_sub (at a 'I) a lo (length a) };
+        'M:
+        merge_using tmp a lo !mid hi;
+        assert { permut_sub (at a 'M) a lo hi };
+        assert { permut_sub (at a 'M) a lo (length a) };
+        mid := hi;
+        if !mid = n then raise Break
+      done;
+      !mid
+    with Break -> n end
+
+  let natural_mergesort2 (a: array elt) : unit
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
+  =
+    let tmp = Array.copy a in
+    let _ = naturalrec tmp a 0 (length a) in
+    ()
+
 end
