@@ -1,5 +1,5 @@
 
-(** Sorting a list of integers using mergesort
+(** {1 Sorting lists using mergesort}
 
     Author: Jean-Christophe Filliâtre (CNRS)
 *)
@@ -113,6 +113,19 @@ end
 
 (** {2 OCaml's List.sort}
 
+    There are several ideas here:
+
+    - instead of splitting the list in two, sort takes the length of
+      the prefix to be sorted; hence there is nothing to do to get the
+      first half and the second half is obtained with chop (which does
+      not allocate at all)
+
+    - all functions are tail recursive. To avoid the extra cost of
+      List.rev, sort is duplicated in two versions that respectively
+      sort in order and in reverse order ([sort] and [sort_rev]) and
+      merge is duplicated as well ([rev_merge] and [rev_merge_rev]).
+
+    Note: this is a stable sort, but stability is not proved here.
 *)
 
 module OCamlMergesort
@@ -176,6 +189,18 @@ module OCamlMergesort
     forall n: int, x: 'a, l: list 'a. n > 0 ->
     prefix n (Cons x l) = Cons x (prefix (n-1) l)
 
+  let rec lemma prefix_length (n: int) (l: list 'a)
+    requires { 0 <= n <= length l } ensures { length (prefix n l) = n }
+    variant { n } =
+    if n > 0 then match l with Nil -> () | Cons _ r -> prefix_length (n-1) r end
+
+  let rec lemma prefix_append (n: int) (l1 l2: list 'a)
+    requires { length l1 <= n <= length l1 + length l2 }
+    ensures  { prefix n (l1 ++ l2) =
+               prefix (length l1) l1 ++ prefix (n - length l1) l2 }
+    variant  { l1 }
+  = match l1 with Nil -> () | Cons _ t -> prefix_append (n-1) t l2 end
+
   let rec chop (n: int) (l: list 'a) : list 'a
     requires { 0 <= n <= length l }
     ensures  { l = prefix n l ++ result }
@@ -187,10 +212,73 @@ module OCamlMergesort
       | Nil -> absurd
     end
 
-  val sort (n: int) (l: list elt) : list elt
+  (** [sort n l] sorts [prefix n l]
+      and [rev_sort n l]  sorts [prefix n l] in reverse order. *)
+
+  use import mach.int.Int
+
+  let rec sort (n: int) (l: list elt) : list elt
     requires { 2 <= n <= length l }
     ensures  { sorted result }
     ensures  { permut result (prefix n l) }
+    variant  { n }
+  =
+    if n = 2 then match l with
+      | Cons x1 (Cons x2 _) ->
+          if le x1 x2 then Cons x1 (Cons x2 Nil) else Cons x2 (Cons x1 Nil)
+      | _ -> absurd
+    end else if n = 3 then match l with
+      | Cons x1 (Cons x2 (Cons x3 _)) ->
+           if le x1 x2 then
+             if le x2 x3 then Cons x1 (Cons x2 (Cons x3 Nil))
+             else if le x1 x3 then Cons x1 (Cons x3 (Cons x2 Nil))
+             else Cons x3 (Cons x1 (Cons x2 Nil))
+           else
+             if le x1 x3 then Cons x2 (Cons x1 (Cons x3 Nil))
+             else if le x2 x3 then Cons x2 (Cons x3 (Cons x1 Nil))
+             else Cons x3 (Cons x2 (Cons x1 Nil))
+       | _ -> absurd
+    end else begin
+      let n1 = n / 2 in
+      let n2 = n - n1 in
+      let l2 = chop n1 l in
+      assert { prefix n1 l ++ prefix n2 l2 = prefix n l };
+      let s1 = rev_sort n1 l in
+      let s2 = rev_sort n2 l2 in
+      rev_merge_rev s1 s2 Nil
+   end
+
+  with rev_sort (n: int) (l: list elt) : list elt
+    requires { 2 <= n <= length l }
+    ensures  { sorted (reverse result) }
+    ensures  { permut result (prefix n l) }
+    variant  { n }
+  =
+    if n = 2 then match l with
+      | Cons x1 (Cons x2 _) ->
+          if not (le x1 x2) then Cons x1 (Cons x2 Nil)
+          else Cons x2 (Cons x1 Nil)
+      | _ -> absurd
+    end else if n = 3 then match l with
+      | Cons x1 (Cons x2 (Cons x3 _)) ->
+           if not (le x1 x2) then
+             if not (le x2 x3) then Cons x1 (Cons x2 (Cons x3 Nil))
+             else if not (le x1 x3) then Cons x1 (Cons x3 (Cons x2 Nil))
+             else Cons x3 (Cons x1 (Cons x2 Nil))
+           else
+             if not (le x1 x3) then Cons x2 (Cons x1 (Cons x3 Nil))
+             else if not (le x2 x3) then Cons x2 (Cons x3 (Cons x1 Nil))
+             else Cons x3 (Cons x2 (Cons x1 Nil))
+       | _ -> absurd
+    end else begin
+      let n1 = n / 2 in
+      let n2 = n - n1 in
+      let l2 = chop n1 l in
+      assert { prefix n1 l ++ prefix n2 l2 = prefix n l };
+      let s1 = sort n1 l in
+      let s2 = sort n2 l2 in
+      rev_merge s1 s2 Nil
+    end
 
   lemma permut_prefix: forall l: list elt. permut (prefix (length l) l) l
 
