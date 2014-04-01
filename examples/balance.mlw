@@ -50,3 +50,67 @@ module Balance
       if balls[6] < balls[7] then 6 else 7
 
 end
+
+
+
+module Balance12
+
+  use import int.Int
+  use import array.Array
+
+  (* All values in balls[lo..hi[ are equal to [w], apart from balls[lb]
+     which is of a different weight (lighter or heavier) . *)
+  predicate spec (balls: array int) (lo hi j: int) (w: int) (b: bool) =
+    0 <= lo <= j < hi <= length balls &&
+    (forall i: int. lo <= i < hi -> i <> j -> balls[i] = w) &&
+    (if b then balls[j] < w else balls[j] > w)
+
+ (* j : the index of the different ball,
+    b : the status (lighter or heavier) of the different ball
+        False True meaning heavier and True meaining lighter *)
+ let solve12 (balls: array int) (ghost w j: int) (ghost b: bool) : (int, bool)
+    requires { spec balls 0 12 j w b }
+    ensures  { result = (j, b) }
+ =
+   if balls[0] + balls[1] + balls[2] + balls[3] =
+      balls[4] + balls[5] + balls[6] + balls[7]
+   then
+      if balls[0] + balls[8] = balls[9] + balls[10]
+      then
+         if balls[0] < balls[11]
+         then (11, False)
+         else (11, True)
+      else if balls[0] + balls[8] < balls[9] + balls[10]
+      then
+         if balls[9] = balls[10] then (8, True)
+         else if balls[9] < balls[10] then (10,  False) else (9, False)
+      else
+         if balls[9] = balls[10] then (8, False)
+         else if balls[9] < balls[10] then (9,  True) else (10, True)
+   else if balls[0] + balls[1] + balls[2] + balls[3] <
+           balls[4] + balls[5] + balls[6] + balls[7]
+   then
+      if balls[0] + balls[1] + balls[4] = balls[2] + balls[5] + balls[8]
+      then
+         if balls[6] = balls[7] then (3, True)
+         else if balls[6] < balls[7] then (7, False) else (6, False)
+      else if balls[0] + balls[1] + balls[4] < balls[2] + balls[5] + balls[8]
+      then
+         if balls[0] = balls[1] then (5, False)
+         else if balls[0] < balls[1] then (0, True) else (1, True)
+      else
+         if balls[4] = balls[8] then (2, True) else (4, False)
+   else
+      if balls[0] + balls[1] + balls[4] = balls[2] + balls[5] + balls[8]
+      then
+         if balls[6] = balls[7] then (3, False)
+         else if balls[6] < balls[7] then (6, True) else (7, True)
+      else if balls[0] + balls[1] + balls[4] < balls[2] + balls[5] + balls[8]
+      then
+         if balls[2] = balls[5] then (4, True  )
+         else if balls[2] < balls[5] then (5, False) else (2, False)
+      else
+         if balls[0] = balls[1] then (5, True) else
+         if balls[0] < balls[1] then (1, False) else (0, False)
+
+end
