@@ -104,10 +104,6 @@ theory list.List
   syntax function Cons "(%1 :: %2)"
 end
 
-theory list.Length
-  syntax function length "(List.length %1)"
-end
-
 theory list.Mem
   syntax predicate mem "(List.mem %1 %2)"
 end
@@ -156,6 +152,11 @@ module array.Array
   syntax val copy          "Why3__Array.copy"
   syntax val fill          "Why3__Array.fill"
   syntax val blit          "Why3__Array.blit"
+end
+
+module mach.int.Int
+  syntax val ( / ) "Why3__BigInt.computer_div"
+  syntax val ( % ) "Why3__BigInt.computer_mod"
 end
 
 module mach.int.Int31
