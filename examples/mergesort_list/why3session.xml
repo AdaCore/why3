@@ -16,35 +16,39 @@
  <prover
   id="3"
   name="CVC4"
-  version="1.2"/>
+  version="1.0"/>
  <prover
   id="4"
   name="CVC4"
-  version="1.3"/>
+  version="1.2"/>
  <prover
   id="5"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="6"
   name="Eprover"
   version="1.6"/>
  <prover
-  id="6"
+  id="7"
   name="Spass"
   version="3.7"/>
  <prover
-  id="7"
+  id="8"
   name="Z3"
   version="2.19"/>
  <prover
-  id="8"
+  id="9"
   name="Z3"
   version="3.2"/>
  <prover
-  id="9"
+  id="10"
   name="Z3"
   version="4.3.1"/>
  <file
   name="../mergesort_list.mlw"
-  verified="false"
-  expanded="true">
+  verified="true"
+  expanded="false">
   <theory
    name="Elt"
    locfile="../mergesort_list.mlw"
@@ -55,15 +59,15 @@
   <theory
    name="Merge"
    locfile="../mergesort_list.mlw"
-   loclnum="21" loccnumb="7" loccnume="12"
+   loclnum="23" loccnumb="7" loccnume="12"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter merge"
     locfile="../mergesort_list.mlw"
-    loclnum="25" loccnumb="10" loccnume="15"
+    loclnum="27" loccnumb="10" loccnume="15"
     expl="VC for merge"
-    sum="de48bbfde1330bf939c7c59ccc5a3fd8"
+    sum="f9593e7ec9a06358e8227c17e54a2137"
     proved="true"
     expanded="false"
     shape="CCiapermutV7ainfix ++V0V1AasortedV7LaConsV2V6IapermutV6ainfix ++V0V3AasortedV6FAasortedV3AasortedV0Aainfix &lt;ainfix +alengthV0alengthV3ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1apermutV9ainfix ++V0V1AasortedV9LaConsV4V8IapermutV8ainfix ++V5V1AasortedV8FAasortedV1AasortedV5Aainfix &lt;ainfix +alengthV5alengthV1ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1aleV4V2aConsVVapermutV1ainfix ++V0V1AasortedV1aNilV0aConsVVCapermutV1ainfix ++V0V1AasortedV1aNilapermutV0ainfix ++V0V1AasortedV0wV0aNilV1IasortedV1AasortedV0F">
@@ -76,9 +80,9 @@
      <goal
       name="WP_parameter merge.1"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="1. variant decrease"
-      sum="7f7befab5cf603cadc7e792d971901ee"
+      sum="1177f23d4945e63185025397cc250cd2"
       proved="true"
       expanded="false"
       shape="variant decreaseCCainfix &lt;ainfix +alengthV5alengthV1ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1IaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
@@ -96,9 +100,9 @@
      <goal
       name="WP_parameter merge.2"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="2. precondition"
-      sum="71eaab433b1bcda877456b245b0cb8f5"
+      sum="08254f3bc16fc1b144a4ab6d46b9d284"
       proved="true"
       expanded="false"
       shape="preconditionCCasortedV1AasortedV5IaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
@@ -116,36 +120,44 @@
      <goal
       name="WP_parameter merge.3"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="3. postcondition"
-      sum="c5869c58c89e6750d0ce4d5c83018d65"
+      sum="aef57b91a6463fd4b3c9b47d49ff3fd6"
       proved="true"
       expanded="false"
       shape="postconditionCCasortedV7LaConsV4V6IapermutV6ainfix ++V5V1AasortedV6FIasortedV1AasortedV5IaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="4"
-       timelimit="10"
+       prover="1"
+       timelimit="6"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="3.56"/>
+       <result status="valid" time="0.61"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.60"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter merge.4"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="4. postcondition"
-      sum="e7ea317a78cfc908e6ccf58875a7fbc9"
+      sum="91249278388b47404abea123f8600992"
       proved="true"
       expanded="false"
       shape="postconditionCCapermutV7ainfix ++V0V1LaConsV4V6IapermutV6ainfix ++V5V1AasortedV6FIasortedV1AasortedV5IaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -156,9 +168,9 @@
      <goal
       name="WP_parameter merge.5"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="5. variant decrease"
-      sum="d059b27831777effec9f5b437d536897"
+      sum="858fc702687d5856c99d63c8366ff9c0"
       proved="true"
       expanded="false"
       shape="variant decreaseCCainfix &lt;ainfix +alengthV0alengthV3ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1INaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
@@ -176,9 +188,9 @@
      <goal
       name="WP_parameter merge.6"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="6. precondition"
-      sum="81298eee06b48868a1c885c79478b454"
+      sum="31af9d0f7ab52eefb74711411c66f047"
       proved="true"
       expanded="false"
       shape="preconditionCCasortedV3AasortedV0INaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
@@ -196,9 +208,9 @@
      <goal
       name="WP_parameter merge.7"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="7. postcondition"
-      sum="6241e72f3729516ce7b35907e15419b3"
+      sum="017a39455571b49bf477d7117f5eac21"
       proved="true"
       expanded="false"
       shape="postconditionCCasortedV7LaConsV2V6IapermutV6ainfix ++V0V3AasortedV6FIasortedV3AasortedV0INaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
@@ -250,7 +262,7 @@
        <ts_pos
         name="tuple2"
         arity="2"
-        id="979"
+        id="984"
         ip_theory="Tuple2">
         <ip_library
          name="why3"/>
@@ -268,7 +280,7 @@
        </ls_pos>
        <ls_pos
         name="zero"
-        id="263"
+        id="268"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -277,7 +289,7 @@
        </ls_pos>
        <ls_pos
         name="one"
-        id="264"
+        id="269"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -286,7 +298,7 @@
        </ls_pos>
        <ls_pos
         name="infix &lt;"
-        id="265"
+        id="270"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -295,7 +307,7 @@
        </ls_pos>
        <ls_pos
         name="infix &gt;"
-        id="268"
+        id="273"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -304,7 +316,7 @@
        </ls_pos>
        <ls_pos
         name="infix &lt;="
-        id="277"
+        id="282"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -313,7 +325,7 @@
        </ls_pos>
        <ls_pos
         name="infix +"
-        id="1357"
+        id="1362"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -322,7 +334,7 @@
        </ls_pos>
        <ls_pos
         name="prefix -"
-        id="1358"
+        id="1363"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -331,7 +343,7 @@
        </ls_pos>
        <ls_pos
         name="infix *"
-        id="1359"
+        id="1364"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -340,7 +352,7 @@
        </ls_pos>
        <ls_pos
         name="infix -"
-        id="1407"
+        id="1412"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -349,7 +361,7 @@
        </ls_pos>
        <ls_pos
         name="infix &gt;="
-        id="1427"
+        id="1432"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -358,7 +370,7 @@
        </ls_pos>
        <ls_pos
         name="length"
-        id="2281"
+        id="2286"
         ip_theory="Length">
         <ip_library
          name="list"/>
@@ -367,7 +379,7 @@
        </ls_pos>
        <ls_pos
         name="reverse"
-        id="3828"
+        id="3833"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -376,14 +388,14 @@
        </ls_pos>
        <ls_pos
         name="le"
-        id="4421"
+        id="4426"
         ip_theory="Merge">
         <ip_qualid
          name="le"/>
        </ls_pos>
        <pr_pos
         name="Assoc"
-        id="1360"
+        id="1365"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -394,7 +406,7 @@
        </pr_pos>
        <pr_pos
         name="Unit_def_l"
-        id="1367"
+        id="1372"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -405,7 +417,7 @@
        </pr_pos>
        <pr_pos
         name="Unit_def_r"
-        id="1370"
+        id="1375"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -416,7 +428,7 @@
        </pr_pos>
        <pr_pos
         name="Inv_def_l"
-        id="1373"
+        id="1378"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -427,7 +439,7 @@
        </pr_pos>
        <pr_pos
         name="Inv_def_r"
-        id="1376"
+        id="1381"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -438,7 +450,7 @@
        </pr_pos>
        <pr_pos
         name="Comm"
-        id="1379"
+        id="1384"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -451,7 +463,7 @@
        </pr_pos>
        <pr_pos
         name="Assoc"
-        id="1384"
+        id="1389"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -462,7 +474,7 @@
        </pr_pos>
        <pr_pos
         name="Mul_distr_l"
-        id="1391"
+        id="1396"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -471,7 +483,7 @@
        </pr_pos>
        <pr_pos
         name="Mul_distr_r"
-        id="1398"
+        id="1403"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -480,7 +492,7 @@
        </pr_pos>
        <pr_pos
         name="Comm"
-        id="1416"
+        id="1421"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -491,7 +503,7 @@
        </pr_pos>
        <pr_pos
         name="Unitary"
-        id="1421"
+        id="1426"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -500,7 +512,7 @@
        </pr_pos>
        <pr_pos
         name="NonTrivialRing"
-        id="1424"
+        id="1429"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -509,7 +521,7 @@
        </pr_pos>
        <pr_pos
         name="Refl"
-        id="1436"
+        id="1441"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -518,7 +530,7 @@
        </pr_pos>
        <pr_pos
         name="Trans"
-        id="1439"
+        id="1444"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -527,7 +539,7 @@
        </pr_pos>
        <pr_pos
         name="Antisymm"
-        id="1446"
+        id="1451"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -536,7 +548,7 @@
        </pr_pos>
        <pr_pos
         name="Total"
-        id="1451"
+        id="1456"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -545,7 +557,7 @@
        </pr_pos>
        <pr_pos
         name="ZeroLessOne"
-        id="1456"
+        id="1461"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -554,7 +566,7 @@
        </pr_pos>
        <pr_pos
         name="CompatOrderAdd"
-        id="1457"
+        id="1462"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -563,7 +575,7 @@
        </pr_pos>
        <pr_pos
         name="CompatOrderMult"
-        id="1464"
+        id="1469"
         ip_theory="Int">
         <ip_library
          name="int"/>
@@ -572,7 +584,7 @@
        </pr_pos>
        <pr_pos
         name="Length_nonnegative"
-        id="2291"
+        id="2296"
         ip_theory="Length">
         <ip_library
          name="list"/>
@@ -581,7 +593,7 @@
        </pr_pos>
        <pr_pos
         name="Length_nil"
-        id="2294"
+        id="2299"
         ip_theory="Length">
         <ip_library
          name="list"/>
@@ -590,7 +602,7 @@
        </pr_pos>
        <pr_pos
         name="Append_assoc"
-        id="3777"
+        id="3782"
         ip_theory="Append">
         <ip_library
          name="list"/>
@@ -599,7 +611,7 @@
        </pr_pos>
        <pr_pos
         name="Append_l_nil"
-        id="3784"
+        id="3789"
         ip_theory="Append">
         <ip_library
          name="list"/>
@@ -608,7 +620,7 @@
        </pr_pos>
        <pr_pos
         name="Append_length"
-        id="3787"
+        id="3792"
         ip_theory="Append">
         <ip_library
          name="list"/>
@@ -617,7 +629,7 @@
        </pr_pos>
        <pr_pos
         name="mem_decomp"
-        id="3799"
+        id="3804"
         ip_theory="Append">
         <ip_library
          name="list"/>
@@ -626,7 +638,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_append"
-        id="3841"
+        id="3846"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -635,7 +647,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_cons"
-        id="3848"
+        id="3853"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -644,7 +656,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_reverse"
-        id="3853"
+        id="3858"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -653,7 +665,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_mem"
-        id="3856"
+        id="3861"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -662,7 +674,7 @@
        </pr_pos>
        <pr_pos
         name="Reverse_length"
-        id="3861"
+        id="3866"
         ip_theory="Reverse">
         <ip_library
          name="list"/>
@@ -671,7 +683,7 @@
        </pr_pos>
        <pr_pos
         name="Mem_Num_Occ"
-        id="4143"
+        id="4148"
         ip_theory="NumOcc">
         <ip_library
          name="list"/>
@@ -680,7 +692,7 @@
        </pr_pos>
        <pr_pos
         name="Append_Num_Occ"
-        id="4148"
+        id="4153"
         ip_theory="NumOcc">
         <ip_library
          name="list"/>
@@ -689,7 +701,7 @@
        </pr_pos>
        <pr_pos
         name="reverse_num_occ"
-        id="4155"
+        id="4160"
         ip_theory="NumOcc">
         <ip_library
          name="list"/>
@@ -698,7 +710,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_refl"
-        id="4173"
+        id="4178"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -707,7 +719,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_sym"
-        id="4176"
+        id="4181"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -716,7 +728,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_trans"
-        id="4181"
+        id="4186"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -725,7 +737,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_cons"
-        id="4188"
+        id="4193"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -734,7 +746,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_swap"
-        id="4195"
+        id="4200"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -743,7 +755,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_cons_append"
-        id="4202"
+        id="4207"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -752,7 +764,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_assoc"
-        id="4209"
+        id="4214"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -761,7 +773,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_append"
-        id="4216"
+        id="4221"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -770,7 +782,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_append_swap"
-        id="4225"
+        id="4230"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -779,7 +791,7 @@
        </pr_pos>
        <pr_pos
         name="Permut_length"
-        id="4237"
+        id="4242"
         ip_theory="Permut">
         <ip_library
          name="list"/>
@@ -788,7 +800,7 @@
        </pr_pos>
        <pr_pos
         name="Refl"
-        id="4422"
+        id="4427"
         ip_theory="Merge">
         <ip_qualid
          name="TotalPreOrder"/>
@@ -797,7 +809,7 @@
        </pr_pos>
        <pr_pos
         name="sorted_append"
-        id="4460"
+        id="4465"
         ip_theory="Merge">
         <ip_qualid
          name="sorted_append"/>
@@ -810,97 +822,92 @@
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="263"/>
-       </meta>
-       <meta
-        name="remove_logic">
-        <meta_arg_ls
-         id="264"/>
-       </meta>
-       <meta
-        name="remove_logic">
-        <meta_arg_ls
-         id="265"/>
-       </meta>
-       <meta
-        name="remove_logic">
-        <meta_arg_ls
          id="268"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="277"/>
+         id="269"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1357"/>
+         id="270"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1358"/>
+         id="273"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1359"/>
+         id="282"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1407"/>
+         id="1362"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="1427"/>
+         id="1363"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="2281"/>
+         id="1364"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="3828"/>
+         id="1412"/>
        </meta>
        <meta
         name="remove_logic">
         <meta_arg_ls
-         id="4421"/>
+         id="1432"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="2286"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="3833"/>
+       </meta>
+       <meta
+        name="remove_logic">
+        <meta_arg_ls
+         id="4426"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1360"/>
+         id="1365"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1367"/>
+         id="1372"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1370"/>
+         id="1375"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1373"/>
+         id="1378"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1376"/>
-       </meta>
-       <meta
-        name="remove_prop">
-        <meta_arg_pr
-         id="1379"/>
+         id="1381"/>
        </meta>
        <meta
         name="remove_prop">
@@ -910,17 +917,17 @@
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1391"/>
+         id="1389"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1398"/>
+         id="1396"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1416"/>
+         id="1403"/>
        </meta>
        <meta
         name="remove_prop">
@@ -930,22 +937,22 @@
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1424"/>
+         id="1426"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1436"/>
+         id="1429"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1439"/>
+         id="1441"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1446"/>
+         id="1444"/>
        </meta>
        <meta
         name="remove_prop">
@@ -960,52 +967,52 @@
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1457"/>
+         id="1461"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="1464"/>
+         id="1462"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="2291"/>
+         id="1469"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="2294"/>
+         id="2296"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3777"/>
+         id="2299"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3784"/>
+         id="3782"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3787"/>
+         id="3789"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3799"/>
+         id="3792"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3841"/>
+         id="3804"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3848"/>
+         id="3846"/>
        </meta>
        <meta
         name="remove_prop">
@@ -1015,7 +1022,7 @@
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="3856"/>
+         id="3858"/>
        </meta>
        <meta
         name="remove_prop">
@@ -1025,7 +1032,7 @@
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4143"/>
+         id="3866"/>
        </meta>
        <meta
         name="remove_prop">
@@ -1035,17 +1042,17 @@
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4155"/>
+         id="4153"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4173"/>
+         id="4160"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4176"/>
+         id="4178"/>
        </meta>
        <meta
         name="remove_prop">
@@ -1055,47 +1062,52 @@
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4188"/>
+         id="4186"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4195"/>
+         id="4193"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4202"/>
+         id="4200"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4209"/>
+         id="4207"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4216"/>
+         id="4214"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4225"/>
+         id="4221"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4237"/>
+         id="4230"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4422"/>
+         id="4242"/>
        </meta>
        <meta
         name="remove_prop">
         <meta_arg_pr
-         id="4460"/>
+         id="4427"/>
+       </meta>
+       <meta
+        name="remove_prop">
+        <meta_arg_pr
+         id="4465"/>
        </meta>
        <meta
         name="remove_type">
@@ -1120,14 +1132,14 @@
        <meta
         name="remove_type">
         <meta_arg_ts
-         id="979"/>
+         id="984"/>
        </meta>
        <goal
         name="WP_parameter merge.7"
         locfile="../mergesort_list.mlw"
-        loclnum="25" loccnumb="10" loccnume="15"
+        loclnum="27" loccnumb="10" loccnume="15"
         expl="7. postcondition"
-        sum="1cabf562a8d8e3ab55c4380684780a19"
+        sum="dd1314e5ac98bf938e37836319c8e22c"
         proved="true"
         expanded="false"
         shape="postconditionCCasortedV7LaConsV2V6IapermutV6ainfix ++V0V3AasortedV6FIasortedV3AasortedV0INaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
@@ -1140,7 +1152,7 @@
          <goal
           name="WP_parameter merge.7.1"
           locfile="../mergesort_list.mlw"
-          loclnum="25" loccnumb="10" loccnume="15"
+          loclnum="27" loccnumb="10" loccnume="15"
           expl="1. postcondition"
           sum="9dff3da27f6f04a15f6c2e124d57236b"
           proved="true"
@@ -1157,7 +1169,7 @@
            <result status="valid" time="0.18"/>
           </proof>
           <proof
-           prover="9"
+           prover="10"
            timelimit="6"
            memlimit="1000"
            obsolete="false"
@@ -1172,16 +1184,16 @@
      <goal
       name="WP_parameter merge.8"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="8. postcondition"
-      sum="f7996f3386bd15efb071a767668a05d5"
+      sum="9aff5c36247f4f2fa5d606d3e2858ffa"
       proved="true"
       expanded="false"
       shape="postconditionCCapermutV7ainfix ++V0V1LaConsV2V6IapermutV6ainfix ++V0V3AasortedV6FIasortedV3AasortedV0INaleV4V2aConsVVtaNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
       <label
        name="expl:VC for merge"/>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1192,9 +1204,9 @@
      <goal
       name="WP_parameter merge.9"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="9. postcondition"
-      sum="fff130d68a0e165677fecc5282ed5b73"
+      sum="c89c3cbf46c31acb96a5465abf97779b"
       proved="true"
       expanded="false"
       shape="postconditionCCtaConsVVasortedV1aNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
@@ -1212,9 +1224,9 @@
      <goal
       name="WP_parameter merge.10"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="10. postcondition"
-      sum="97ccc43dfb3a3dd5100f1cde5d6b0706"
+      sum="272c62e8be2d536d64229edfd24133d5"
       proved="true"
       expanded="false"
       shape="postconditionCCtaConsVVapermutV1ainfix ++V0V1aNilV0aConsVVtaNilV1IasortedV1AasortedV0F">
@@ -1229,7 +1241,7 @@
        <result status="valid" time="0.00"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1237,7 +1249,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="9"
+       prover="10"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1248,9 +1260,9 @@
      <goal
       name="WP_parameter merge.11"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="11. postcondition"
-      sum="3f429bf5cc2177009cad3edcdc2043b6"
+      sum="7d46a351d413c58532dc94165cbac9a0"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCasortedV1aNiltwV0aNilV1IasortedV1AasortedV0F">
@@ -1268,9 +1280,9 @@
      <goal
       name="WP_parameter merge.12"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="12. postcondition"
-      sum="dd895aa3f25d12a9f63028348729cdd5"
+      sum="7fb9eb82c89bf3685730acd4337e38ea"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCapermutV1ainfix ++V0V1aNiltwV0aNilV1IasortedV1AasortedV0F">
@@ -1285,7 +1297,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1293,7 +1305,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="9"
+       prover="10"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1304,9 +1316,9 @@
      <goal
       name="WP_parameter merge.13"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="13. postcondition"
-      sum="efcaad4cf473149f2bbe60591d2a05fb"
+      sum="94f64934e3c60f12a5371318496243f0"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCtaNilasortedV0wV0aNilV1IasortedV1AasortedV0F">
@@ -1324,9 +1336,9 @@
      <goal
       name="WP_parameter merge.14"
       locfile="../mergesort_list.mlw"
-      loclnum="25" loccnumb="10" loccnume="15"
+      loclnum="27" loccnumb="10" loccnume="15"
       expl="14. postcondition"
-      sum="965c75fa479521fa649e1cc16a32bb35"
+      sum="fd9a6a8cc24b7e3e5cf06f066e3c93f2"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCtaNilapermutV0ainfix ++V0V1wV0aNilV1IasortedV1AasortedV0F">
@@ -1341,7 +1353,7 @@
        <result status="valid" time="0.01"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1349,7 +1361,7 @@
        <result status="valid" time="0.05"/>
       </proof>
       <proof
-       prover="9"
+       prover="10"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1363,14 +1375,14 @@
   <theory
    name="EfficientMerge"
    locfile="../mergesort_list.mlw"
-   loclnum="41" loccnumb="7" loccnume="21"
+   loclnum="43" loccnumb="7" loccnume="21"
    verified="true"
    expanded="false">
    <goal
     name="sorted_reverse_cons"
     locfile="../mergesort_list.mlw"
-    loclnum="48" loccnumb="8" loccnume="27"
-    sum="31383c8e144f1bfb9af904fa68680192"
+    loclnum="50" loccnumb="8" loccnume="27"
+    sum="66168c8d446d944ea075757982d88427"
     proved="true"
     expanded="false"
     shape="asortedareverseaConsV1V0IaleV2V1IamemV2V0FIasortedareverseV0F">
@@ -1383,7 +1395,7 @@
      <result status="valid" time="0.28"/>
     </proof>
     <proof
-     prover="9"
+     prover="10"
      timelimit="6"
      memlimit="1000"
      obsolete="false"
@@ -1394,9 +1406,9 @@
    <goal
     name="WP_parameter merge_aux"
     locfile="../mergesort_list.mlw"
-    loclnum="52" loccnumb="10" loccnume="19"
+    loclnum="54" loccnumb="10" loccnume="19"
     expl="VC for merge_aux"
-    sum="25ae767c5cd779c2eab9fdae45e43730"
+    sum="ed1c632d3fe213fbc7a604ef7ceba2cc"
     proved="true"
     expanded="false"
     shape="CCiapermutV8ainfix ++ainfix ++V0V1V2AasortedV8IapermutV8ainfix ++ainfix ++V7V1V4AasortedV8FAaleV9V10IamemV10V4IamemV9V7FAaleV11V12IamemV12V1IamemV11V7FAasortedV4AasortedV1AasortedareverseV7Aainfix &lt;ainfix +alengthV1alengthV4ainfix +alengthV1alengthV2Aainfix &lt;=c0ainfix +alengthV1alengthV2LaConsV3V0apermutV14ainfix ++ainfix ++V0V1V2AasortedV14IapermutV14ainfix ++ainfix ++V13V6V2AasortedV14FAaleV15V16IamemV16V2IamemV15V13FAaleV17V18IamemV18V6IamemV17V13FAasortedV2AasortedV6AasortedareverseV13Aainfix &lt;ainfix +alengthV6alengthV2ainfix +alengthV1alengthV2Aainfix &lt;=c0ainfix +alengthV1alengthV2LaConsV5V0aleV5V3aConsVVapermutV19ainfix ++ainfix ++V0V1V2AasortedV19Larev_appendV0V2aNilV1aConsVVCapermutV20ainfix ++ainfix ++V0V1V2AasortedV20Larev_appendV0V2aNilapermutV21ainfix ++ainfix ++V0V1V2AasortedV21Larev_appendV0V1wV1aNilV2IaleV22V23IamemV23V2IamemV22V0FAaleV24V25IamemV25V1IamemV24V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1409,9 +1421,9 @@
      <goal
       name="WP_parameter merge_aux.1"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="1. variant decrease"
-      sum="dfaca54dda2a6fa6129722c8142bac9d"
+      sum="87240349f5728bbf2f92463b49ed883b"
       proved="true"
       expanded="false"
       shape="variant decreaseCCainfix &lt;ainfix +alengthV6alengthV2ainfix +alengthV1alengthV2Aainfix &lt;=c0ainfix +alengthV1alengthV2LaConsV5V0IaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1429,9 +1441,9 @@
      <goal
       name="WP_parameter merge_aux.2"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="2. precondition"
-      sum="94fb8f3bbbff6442e2c34f0c19e50c1c"
+      sum="a25308289dd7b25dfec095eef34cb53c"
       proved="true"
       expanded="false"
       shape="preconditionCCasortedV2AasortedV6AasortedareverseV7LaConsV5V0IaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1444,9 +1456,9 @@
        <goal
         name="WP_parameter merge_aux.2.1"
         locfile="../mergesort_list.mlw"
-        loclnum="52" loccnumb="10" loccnume="19"
+        loclnum="54" loccnumb="10" loccnume="19"
         expl="1."
-        sum="63dbe9da62e7736c5812e72f8ea18463"
+        sum="2ba809bb773148e59b727010b7b464bb"
         proved="true"
         expanded="false"
         shape="CCasortedareverseV7LaConsV5V0IaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1469,7 +1481,7 @@
          <result status="valid" time="0.10"/>
         </proof>
         <proof
-         prover="4"
+         prover="5"
          timelimit="6"
          memlimit="1000"
          obsolete="false"
@@ -1477,7 +1489,7 @@
          <result status="valid" time="0.32"/>
         </proof>
         <proof
-         prover="5"
+         prover="6"
          timelimit="6"
          memlimit="1000"
          obsolete="false"
@@ -1485,7 +1497,7 @@
          <result status="valid" time="0.35"/>
         </proof>
         <proof
-         prover="6"
+         prover="7"
          timelimit="6"
          memlimit="1000"
          obsolete="false"
@@ -1493,7 +1505,7 @@
          <result status="valid" time="0.13"/>
         </proof>
         <proof
-         prover="9"
+         prover="10"
          timelimit="6"
          memlimit="1000"
          obsolete="false"
@@ -1504,9 +1516,9 @@
        <goal
         name="WP_parameter merge_aux.2.2"
         locfile="../mergesort_list.mlw"
-        loclnum="52" loccnumb="10" loccnume="19"
+        loclnum="54" loccnumb="10" loccnume="19"
         expl="2."
-        sum="dd4d9d2a3ac6f88713d996ca1df28e9b"
+        sum="a142a59fdb5e236a00f2d6d38457fb8f"
         proved="true"
         expanded="false"
         shape="CCasortedV6LaConsV5V0IaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1524,9 +1536,9 @@
        <goal
         name="WP_parameter merge_aux.2.3"
         locfile="../mergesort_list.mlw"
-        loclnum="52" loccnumb="10" loccnume="19"
+        loclnum="54" loccnumb="10" loccnume="19"
         expl="3."
-        sum="5cd94ea5b2a146b52d0acf322e6079b1"
+        sum="66c2f6c9b6b2d1645ea8b646345eff8c"
         proved="true"
         expanded="false"
         shape="CCasortedV2LaConsV5V0IaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1546,9 +1558,9 @@
      <goal
       name="WP_parameter merge_aux.3"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="3. precondition"
-      sum="91bcb8ecc275d62fea668b89aad9eb91"
+      sum="c4dee97a138743765ca733539de2a39a"
       proved="true"
       expanded="false"
       shape="preconditionCCaleV8V9IamemV9V6IamemV8V7FLaConsV5V0IaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV10V11IamemV11V2IamemV10V0FAaleV12V13IamemV13V1IamemV12V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1566,16 +1578,16 @@
      <goal
       name="WP_parameter merge_aux.4"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="4. precondition"
-      sum="8859a00b08d6d17b7e04b48e2de8b43b"
+      sum="e7fdc5017fd59737459c8a5ccb36f265"
       proved="true"
       expanded="false"
       shape="preconditionCCaleV8V9IamemV9V2IamemV8V7FLaConsV5V0IaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV10V11IamemV11V2IamemV10V0FAaleV12V13IamemV13V1IamemV12V0FAasortedV2AasortedV1AasortedareverseV0F">
       <label
        name="expl:VC for merge_aux"/>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1583,7 +1595,7 @@
        <result status="valid" time="0.52"/>
       </proof>
       <proof
-       prover="9"
+       prover="10"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1594,9 +1606,9 @@
      <goal
       name="WP_parameter merge_aux.5"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="5. postcondition"
-      sum="f559c4974643eee4a60a5f958ce9e53b"
+      sum="3147fb7d0987ad1e996d0a0b8ae376e0"
       proved="true"
       expanded="false"
       shape="postconditionCCasortedV8IapermutV8ainfix ++ainfix ++V7V6V2AasortedV8FIaleV9V10IamemV10V2IamemV9V7FAaleV11V12IamemV12V6IamemV11V7FAasortedV2AasortedV6AasortedareverseV7LaConsV5V0IaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV13V14IamemV14V2IamemV13V0FAaleV15V16IamemV16V1IamemV15V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1614,9 +1626,9 @@
      <goal
       name="WP_parameter merge_aux.6"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="6. postcondition"
-      sum="5c38a299e3c388f4480f3191bbb4badf"
+      sum="9b1e58410a4ab4885bcd41d60a3312ed"
       proved="true"
       expanded="false"
       shape="postconditionCCapermutV8ainfix ++ainfix ++V0V1V2IapermutV8ainfix ++ainfix ++V7V6V2AasortedV8FIaleV9V10IamemV10V2IamemV9V7FAaleV11V12IamemV12V6IamemV11V7FAasortedV2AasortedV6AasortedareverseV7LaConsV5V0IaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV13V14IamemV14V2IamemV13V0FAaleV15V16IamemV16V1IamemV15V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1634,9 +1646,9 @@
      <goal
       name="WP_parameter merge_aux.7"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="7. variant decrease"
-      sum="bdeae301a00dcab97084a55dc7a7cbed"
+      sum="505c900df3ae0c957da2e7273fb6fc87"
       proved="true"
       expanded="false"
       shape="variant decreaseCCainfix &lt;ainfix +alengthV1alengthV4ainfix +alengthV1alengthV2Aainfix &lt;=c0ainfix +alengthV1alengthV2LaConsV3V0INaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1654,16 +1666,16 @@
      <goal
       name="WP_parameter merge_aux.8"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="8. precondition"
-      sum="85f3db0f47c722c7c6c7a3e9e8ff200c"
+      sum="accf32e0b0453388c90a5da45b09fdca"
       proved="true"
       expanded="false"
       shape="preconditionCCasortedV4AasortedV1AasortedareverseV7LaConsV3V0INaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
       <label
        name="expl:VC for merge_aux"/>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1677,9 +1689,9 @@
        <goal
         name="WP_parameter merge_aux.8.1"
         locfile="../mergesort_list.mlw"
-        loclnum="52" loccnumb="10" loccnume="19"
+        loclnum="54" loccnumb="10" loccnume="19"
         expl="1."
-        sum="e07ed3433c03fe753290912a8bc6c060"
+        sum="e53d7eaf345e306dff59250f37ab130a"
         proved="true"
         expanded="false"
         shape="CCasortedareverseV7LaConsV3V0INaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1694,7 +1706,7 @@
          <result status="valid" time="0.91"/>
         </proof>
         <proof
-         prover="6"
+         prover="7"
          timelimit="10"
          memlimit="1000"
          obsolete="false"
@@ -1702,7 +1714,7 @@
          <result status="valid" time="0.07"/>
         </proof>
         <proof
-         prover="9"
+         prover="10"
          timelimit="10"
          memlimit="1000"
          obsolete="false"
@@ -1713,9 +1725,9 @@
        <goal
         name="WP_parameter merge_aux.8.2"
         locfile="../mergesort_list.mlw"
-        loclnum="52" loccnumb="10" loccnume="19"
+        loclnum="54" loccnumb="10" loccnume="19"
         expl="2."
-        sum="3a3f6f9ecf9e86500466fff162c2526b"
+        sum="a7c0e38287bce8552fe06670de2d9ca6"
         proved="true"
         expanded="false"
         shape="CCasortedV1LaConsV3V0INaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1733,9 +1745,9 @@
        <goal
         name="WP_parameter merge_aux.8.3"
         locfile="../mergesort_list.mlw"
-        loclnum="52" loccnumb="10" loccnume="19"
+        loclnum="54" loccnumb="10" loccnume="19"
         expl="3."
-        sum="770a3fc9cff108b6db738e3a4ca5072d"
+        sum="ccfbf931623fcc6aa64cc533d1289fbe"
         proved="true"
         expanded="false"
         shape="CCasortedV4LaConsV3V0INaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1755,9 +1767,9 @@
      <goal
       name="WP_parameter merge_aux.9"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="9. precondition"
-      sum="b7d7ee9b62060793018bf0a820e04082"
+      sum="f3bb9933810fab2ad4717bca122eb93f"
       proved="true"
       expanded="false"
       shape="preconditionCCaleV8V9IamemV9V1IamemV8V7FLaConsV3V0INaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV10V11IamemV11V2IamemV10V0FAaleV12V13IamemV13V1IamemV12V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1769,10 +1781,10 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.88"/>
+       <result status="valid" time="1.11"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1780,20 +1792,20 @@
        <result status="valid" time="0.55"/>
       </proof>
       <proof
-       prover="9"
+       prover="10"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.85"/>
+       <result status="valid" time="1.04"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter merge_aux.10"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="10. precondition"
-      sum="a9e61bfe50fe44d335dd61f08cf91cee"
+      sum="fa8df8ef4b7089387331e7f623a4d4fc"
       proved="true"
       expanded="false"
       shape="preconditionCCaleV8V9IamemV9V4IamemV8V7FLaConsV3V0INaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV10V11IamemV11V2IamemV10V0FAaleV12V13IamemV13V1IamemV12V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1808,7 +1820,7 @@
        <result status="valid" time="0.10"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1816,7 +1828,7 @@
        <result status="valid" time="0.06"/>
       </proof>
       <proof
-       prover="9"
+       prover="10"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -1827,9 +1839,9 @@
      <goal
       name="WP_parameter merge_aux.11"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="11. postcondition"
-      sum="ce4a0c9530cca10770ffc371bf46b066"
+      sum="e4a62e3dddd3db067234ea3fb5b6e02d"
       proved="true"
       expanded="false"
       shape="postconditionCCasortedV8IapermutV8ainfix ++ainfix ++V7V1V4AasortedV8FIaleV9V10IamemV10V4IamemV9V7FAaleV11V12IamemV12V1IamemV11V7FAasortedV4AasortedV1AasortedareverseV7LaConsV3V0INaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV13V14IamemV14V2IamemV13V0FAaleV15V16IamemV16V1IamemV15V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1847,9 +1859,9 @@
      <goal
       name="WP_parameter merge_aux.12"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="12. postcondition"
-      sum="36ad56b136f952a7aaa823df583016dd"
+      sum="cc4590cce358947eeae0a1f09ab364c2"
       proved="true"
       expanded="false"
       shape="postconditionCCapermutV8ainfix ++ainfix ++V0V1V2IapermutV8ainfix ++ainfix ++V7V1V4AasortedV8FIaleV9V10IamemV10V4IamemV9V7FAaleV11V12IamemV12V1IamemV11V7FAasortedV4AasortedV1AasortedareverseV7LaConsV3V0INaleV5V3aConsVVtaNilV1aConsVVtaNilV2IaleV13V14IamemV14V2IamemV13V0FAaleV15V16IamemV16V1IamemV15V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1867,9 +1879,9 @@
      <goal
       name="WP_parameter merge_aux.13"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="13. postcondition"
-      sum="839dcec214d5f169f598933242619621"
+      sum="de3bf17d649bf0d84210da20607a7210"
       proved="true"
       expanded="false"
       shape="postconditionCCtaConsVVasortedV7Larev_appendV0V2aNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1892,7 +1904,7 @@
        <result status="valid" time="0.17"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
@@ -1900,7 +1912,7 @@
        <result status="valid" time="0.14"/>
       </proof>
       <proof
-       prover="8"
+       prover="9"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
@@ -1908,7 +1920,7 @@
        <result status="valid" time="0.28"/>
       </proof>
       <proof
-       prover="9"
+       prover="10"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
@@ -1919,9 +1931,9 @@
      <goal
       name="WP_parameter merge_aux.14"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="14. postcondition"
-      sum="fe13b8d4a9ac76f34f51eaee79b4f442"
+      sum="1a5adc211baf0bf501cae391aa389564"
       proved="true"
       expanded="false"
       shape="postconditionCCtaConsVVapermutV7ainfix ++ainfix ++V0V1V2Larev_appendV0V2aNilV1aConsVVtaNilV2IaleV8V9IamemV9V2IamemV8V0FAaleV10V11IamemV11V1IamemV10V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -1944,20 +1956,12 @@
        <result status="valid" time="0.59"/>
       </proof>
       <proof
-       prover="3"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-      <proof
        prover="4"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.14"/>
+       <result status="valid" time="0.06"/>
       </proof>
       <proof
        prover="5"
@@ -1968,7 +1972,15 @@
        <result status="valid" time="0.14"/>
       </proof>
       <proof
-       prover="7"
+       prover="6"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.14"/>
+      </proof>
+      <proof
+       prover="8"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
@@ -1979,16 +1991,16 @@
      <goal
       name="WP_parameter merge_aux.15"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="15. postcondition"
-      sum="01a1d7832de014a39aadaef8cfabaa85"
+      sum="21091465c27e28fd78f07cad6d7ea375"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCasortedV5Larev_appendV0V2aNiltwV1aNilV2IaleV6V7IamemV7V2IamemV6V0FAaleV8V9IamemV9V1IamemV8V0FAasortedV2AasortedV1AasortedareverseV0F">
       <label
        name="expl:VC for merge_aux"/>
       <proof
-       prover="4"
+       prover="5"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
@@ -1999,9 +2011,9 @@
      <goal
       name="WP_parameter merge_aux.16"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="16. postcondition"
-      sum="41ce42a22349449105150c8481b12c10"
+      sum="dd5682b240a3676661f8420af2971e7a"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCapermutV5ainfix ++ainfix ++V0V1V2Larev_appendV0V2aNiltwV1aNilV2IaleV6V7IamemV7V2IamemV6V0FAaleV8V9IamemV9V1IamemV8V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -2019,16 +2031,16 @@
      <goal
       name="WP_parameter merge_aux.17"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="17. postcondition"
-      sum="cbb853b8b35cf4bb129b130017223d11"
+      sum="410f127e45e9d667b757d8e939567b3b"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCtaNilasortedV5Larev_appendV0V1wV1aNilV2IaleV6V7IamemV7V2IamemV6V0FAaleV8V9IamemV9V1IamemV8V0FAasortedV2AasortedV1AasortedareverseV0F">
       <label
        name="expl:VC for merge_aux"/>
       <proof
-       prover="4"
+       prover="5"
        timelimit="6"
        memlimit="1000"
        obsolete="false"
@@ -2039,9 +2051,9 @@
      <goal
       name="WP_parameter merge_aux.18"
       locfile="../mergesort_list.mlw"
-      loclnum="52" loccnumb="10" loccnume="19"
+      loclnum="54" loccnumb="10" loccnume="19"
       expl="18. postcondition"
-      sum="c39b8cd81976ea0fe4121e69be6688c8"
+      sum="ab0fed168b4bbbc0c98586c3bc014c91"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCtaNilapermutV5ainfix ++ainfix ++V0V1V2Larev_appendV0V1wV1aNilV2IaleV6V7IamemV7V2IamemV6V0FAaleV8V9IamemV9V1IamemV8V0FAasortedV2AasortedV1AasortedareverseV0F">
@@ -2053,7 +2065,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.44"/>
+       <result status="valid" time="0.29"/>
       </proof>
      </goal>
     </transf>
@@ -2061,9 +2073,9 @@
    <goal
     name="WP_parameter merge"
     locfile="../mergesort_list.mlw"
-    loclnum="67" loccnumb="6" loccnume="11"
+    loclnum="69" loccnumb="6" loccnume="11"
     expl="VC for merge"
-    sum="28b6c4ce0c223884ebccfc6002800392"
+    sum="7ff278d22d1ef66e1fa26d0478b92cde"
     proved="true"
     expanded="false"
     shape="apermutV3ainfix ++V0V1AasortedV3IapermutV3ainfix ++ainfix ++V2V0V1AasortedV3FAaleV4V5IamemV5V1IamemV4V2FAaleV6V7IamemV7V0IamemV6V2FAasortedV1AasortedV0AasortedareverseV2LaNilIasortedV1AasortedV0F">
@@ -2076,9 +2088,9 @@
      <goal
       name="WP_parameter merge.1"
       locfile="../mergesort_list.mlw"
-      loclnum="67" loccnumb="6" loccnume="11"
+      loclnum="69" loccnumb="6" loccnume="11"
       expl="1. precondition"
-      sum="6b2a83ce310cb83fa7cc69def0890ada"
+      sum="3e387f398b2d087e9ed9870b6733edec"
       proved="true"
       expanded="false"
       shape="preconditionasortedV1AasortedV0AasortedareverseV2LaNilIasortedV1AasortedV0F">
@@ -2096,9 +2108,9 @@
      <goal
       name="WP_parameter merge.2"
       locfile="../mergesort_list.mlw"
-      loclnum="67" loccnumb="6" loccnume="11"
+      loclnum="69" loccnumb="6" loccnume="11"
       expl="2. precondition"
-      sum="70612124b58ba56a36635aed38a194f4"
+      sum="a37d72a17c4bcc58e1f5a57bc6277120"
       proved="true"
       expanded="false"
       shape="preconditionaleV3V4IamemV4V0IamemV3V2FLaNilIasortedV1AasortedV0F">
@@ -2113,7 +2125,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -2121,7 +2133,7 @@
        <result status="valid" time="0.03"/>
       </proof>
       <proof
-       prover="9"
+       prover="10"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -2132,9 +2144,9 @@
      <goal
       name="WP_parameter merge.3"
       locfile="../mergesort_list.mlw"
-      loclnum="67" loccnumb="6" loccnume="11"
+      loclnum="69" loccnumb="6" loccnume="11"
       expl="3. precondition"
-      sum="7fd94d6cc8d54f4c40788d268bd69c44"
+      sum="91eb890fa50432f4145e82a7b266b238"
       proved="true"
       expanded="false"
       shape="preconditionaleV3V4IamemV4V1IamemV3V2FLaNilIasortedV1AasortedV0F">
@@ -2149,7 +2161,7 @@
        <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -2157,7 +2169,7 @@
        <result status="valid" time="0.04"/>
       </proof>
       <proof
-       prover="9"
+       prover="10"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
@@ -2168,9 +2180,9 @@
      <goal
       name="WP_parameter merge.4"
       locfile="../mergesort_list.mlw"
-      loclnum="67" loccnumb="6" loccnume="11"
+      loclnum="69" loccnumb="6" loccnume="11"
       expl="4. postcondition"
-      sum="efd5c4b1dc652e08d3aa0e062cc39a73"
+      sum="6aa9b078ffb48f09b88651ab19bde379"
       proved="true"
       expanded="false"
       shape="postconditionapermutV3ainfix ++V0V1AasortedV3IapermutV3ainfix ++ainfix ++V2V0V1AasortedV3FIaleV4V5IamemV5V1IamemV4V2FAaleV6V7IamemV7V0IamemV6V2FAasortedV1AasortedV0AasortedareverseV2LaNilIasortedV1AasortedV0F">
@@ -2191,15 +2203,15 @@
   <theory
    name="Mergesort"
    locfile="../mergesort_list.mlw"
-   loclnum="75" loccnumb="7" loccnume="16"
+   loclnum="83" loccnumb="7" loccnume="16"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter split"
     locfile="../mergesort_list.mlw"
-    loclnum="79" loccnumb="6" loccnume="11"
+    loclnum="87" loccnumb="6" loccnume="11"
     expl="VC for split"
-    sum="2b0e7761095bacdb6482503e0b9e012b"
+    sum="046a38bda6be9531258b8b4c1851e1a7"
     proved="true"
     expanded="false"
     shape="apermutV0ainfix ++V3V4Aainfix &lt;=c1alengthV4Aainfix &lt;=c1alengthV3Iapermutainfix ++V3V4ainfix ++V2ainfix ++V1V0Aainfix =alengthV4ainfix +alengthV3c1Oainfix =alengthV4alengthV3FAainfix =alengthV1ainfix +alengthV2c1Oainfix =alengthV1alengthV2LaNilLaNilACapermutainfix ++V5V6ainfix ++V5ainfix ++V6V7Aainfix =alengthV6ainfix +alengthV5c1Oainfix =alengthV6alengthV5aNilapermutainfix ++V11V12ainfix ++V5ainfix ++V6V7Aainfix =alengthV12ainfix +alengthV11c1Oainfix =alengthV12alengthV11Iapermutainfix ++V11V12ainfix ++V6ainfix ++V10V9Aainfix =alengthV12ainfix +alengthV11c1Oainfix =alengthV12alengthV11FAainfix =alengthV10ainfix +alengthV6c1Oainfix =alengthV10alengthV6Aainfix &lt;alengthV9alengthV7Aainfix &lt;=c0alengthV7LaConsV8V5aConsVVV7Iainfix =alengthV6ainfix +alengthV5c1Oainfix =alengthV6alengthV5FIainfix &gt;=alengthV0c2F">
@@ -2212,9 +2224,9 @@
      <goal
       name="WP_parameter split.1"
       locfile="../mergesort_list.mlw"
-      loclnum="79" loccnumb="6" loccnume="11"
+      loclnum="87" loccnumb="6" loccnume="11"
       expl="1. postcondition"
-      sum="511d12be781e9f46a97889b28fa75859"
+      sum="3f4cda7ad403258dce75567cc8b57e20"
       proved="true"
       expanded="false"
       shape="postconditionCapermutainfix ++V1V2ainfix ++V1ainfix ++V2V3Aainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1aNiltaConsVVV3Iainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FIainfix &gt;=alengthV0c2F">
@@ -2232,9 +2244,9 @@
      <goal
       name="WP_parameter split.2"
       locfile="../mergesort_list.mlw"
-      loclnum="79" loccnumb="6" loccnume="11"
+      loclnum="87" loccnumb="6" loccnume="11"
       expl="2. variant decrease"
-      sum="ab459d36c0073ce2599c8538a8218a54"
+      sum="4b3e7c226d19273a608465ad16b79a6c"
       proved="true"
       expanded="false"
       shape="variant decreaseCtaNilainfix &lt;alengthV5alengthV3Aainfix &lt;=c0alengthV3LaConsV4V1aConsVVV3Iainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FIainfix &gt;=alengthV0c2F">
@@ -2252,9 +2264,9 @@
      <goal
       name="WP_parameter split.3"
       locfile="../mergesort_list.mlw"
-      loclnum="79" loccnumb="6" loccnume="11"
+      loclnum="87" loccnumb="6" loccnume="11"
       expl="3. precondition"
-      sum="c6afb61604008992844405353735bd0b"
+      sum="b403612515ee774ecc1d9dfbf6119c35"
       proved="true"
       expanded="false"
       shape="preconditionCtaNilainfix =alengthV6ainfix +alengthV2c1Oainfix =alengthV6alengthV2LaConsV4V1aConsVVV3Iainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FIainfix &gt;=alengthV0c2F">
@@ -2272,9 +2284,9 @@
      <goal
       name="WP_parameter split.4"
       locfile="../mergesort_list.mlw"
-      loclnum="79" loccnumb="6" loccnume="11"
+      loclnum="87" loccnumb="6" loccnume="11"
       expl="4. postcondition"
-      sum="552e83368823879c1bb1d9658cae9450"
+      sum="672f7df900a08b3f12b033c1ebc76132"
       proved="true"
       expanded="false"
       shape="postconditionCtaNilapermutainfix ++V7V8ainfix ++V1ainfix ++V2V3Aainfix =alengthV8ainfix +alengthV7c1Oainfix =alengthV8alengthV7Iapermutainfix ++V7V8ainfix ++V2ainfix ++V6V5Aainfix =alengthV8ainfix +alengthV7c1Oainfix =alengthV8alengthV7FIainfix =alengthV6ainfix +alengthV2c1Oainfix =alengthV6alengthV2LaConsV4V1aConsVVV3Iainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FIainfix &gt;=alengthV0c2F">
@@ -2287,9 +2299,9 @@
        <goal
         name="WP_parameter split.4.1"
         locfile="../mergesort_list.mlw"
-        loclnum="79" loccnumb="6" loccnume="11"
+        loclnum="87" loccnumb="6" loccnume="11"
         expl="1."
-        sum="98a86529695947816fcec57fa0d7a7c1"
+        sum="9c466261877f75083beb0a24def1f4e7"
         proved="true"
         expanded="false"
         shape="CtaNilainfix =alengthV8ainfix +alengthV7c1Oainfix =alengthV8alengthV7Iapermutainfix ++V7V8ainfix ++V2ainfix ++V6V5Aainfix =alengthV8ainfix +alengthV7c1Oainfix =alengthV8alengthV7FIainfix =alengthV6ainfix +alengthV2c1Oainfix =alengthV6alengthV2LaConsV4V1aConsVVV3Iainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FIainfix &gt;=alengthV0c2F">
@@ -2307,16 +2319,16 @@
        <goal
         name="WP_parameter split.4.2"
         locfile="../mergesort_list.mlw"
-        loclnum="79" loccnumb="6" loccnume="11"
+        loclnum="87" loccnumb="6" loccnume="11"
         expl="2."
-        sum="2b8e28b8a9a15a40ac9568996ecaea53"
+        sum="ff5bc1fcace4a64bc7abfddb7ba16191"
         proved="true"
         expanded="false"
         shape="CtaNilapermutainfix ++V7V8ainfix ++V1ainfix ++V2V3Iapermutainfix ++V7V8ainfix ++V2ainfix ++V6V5Aainfix =alengthV8ainfix +alengthV7c1Oainfix =alengthV8alengthV7FIainfix =alengthV6ainfix +alengthV2c1Oainfix =alengthV6alengthV2LaConsV4V1aConsVVV3Iainfix =alengthV2ainfix +alengthV1c1Oainfix =alengthV2alengthV1FIainfix &gt;=alengthV0c2F">
         <label
          name="expl:VC for split"/>
         <proof
-         prover="4"
+         prover="5"
          timelimit="10"
          memlimit="1000"
          obsolete="false"
@@ -2329,9 +2341,9 @@
      <goal
       name="WP_parameter split.5"
       locfile="../mergesort_list.mlw"
-      loclnum="79" loccnumb="6" loccnume="11"
+      loclnum="87" loccnumb="6" loccnume="11"
       expl="5. precondition"
-      sum="45aedc1777dbaf6c136dabdd4cdd29de"
+      sum="d06a5599fa8884c98e84cbb9b7d69094"
       proved="true"
       expanded="false"
       shape="preconditionainfix =alengthV1ainfix +alengthV2c1Oainfix =alengthV1alengthV2LaNilLaNilIainfix &gt;=alengthV0c2F">
@@ -2349,9 +2361,9 @@
      <goal
       name="WP_parameter split.6"
       locfile="../mergesort_list.mlw"
-      loclnum="79" loccnumb="6" loccnume="11"
+      loclnum="87" loccnumb="6" loccnume="11"
       expl="6. postcondition"
-      sum="94af8a6361fc4461819507d2d114a53b"
+      sum="f0ce4978e5570550eb6b8b35158862f9"
       proved="true"
       expanded="false"
       shape="postconditionapermutV0ainfix ++V3V4Aainfix &lt;=c1alengthV4Aainfix &lt;=c1alengthV3Iapermutainfix ++V3V4ainfix ++V2ainfix ++V1V0Aainfix =alengthV4ainfix +alengthV3c1Oainfix =alengthV4alengthV3FIainfix =alengthV1ainfix +alengthV2c1Oainfix =alengthV1alengthV2LaNilLaNilIainfix &gt;=alengthV0c2F">
@@ -2371,9 +2383,9 @@
    <goal
     name="WP_parameter mergesort"
     locfile="../mergesort_list.mlw"
-    loclnum="96" loccnumb="10" loccnume="19"
+    loclnum="104" loccnumb="10" loccnume="19"
     expl="VC for mergesort"
-    sum="9d3ff4f7a16b3b3abd5763493aa61a96"
+    sum="cf1dec554f90bb80440f52eca8e1bdc0"
     proved="true"
     expanded="false"
     shape="CapermutV0V0AasortedV0aConswaNilOaNilapermutV5V0AasortedV5IapermutV5ainfix ++V4V3AasortedV5FAasortedV3AasortedV4IapermutV4V1AasortedV4FAainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0IapermutV3V2AasortedV3FAainfix &lt;alengthV2alengthV0Aainfix &lt;=c0alengthV0IapermutV0ainfix ++V1V2Aainfix &lt;=c1alengthV2Aainfix &lt;=c1alengthV1FAainfix &gt;=alengthV0c2wV0F">
@@ -2386,9 +2398,9 @@
      <goal
       name="WP_parameter mergesort.1"
       locfile="../mergesort_list.mlw"
-      loclnum="96" loccnumb="10" loccnume="19"
+      loclnum="104" loccnumb="10" loccnume="19"
       expl="1. postcondition"
-      sum="9b65cd93a0c2c9f6b5940f093cac37ce"
+      sum="cfd6c4e8518c424ac9bec9f213a3fe37"
       proved="true"
       expanded="false"
       shape="postconditionCapermutV0V0AasortedV0aConswaNilOaNiltwV0F">
@@ -2406,9 +2418,9 @@
      <goal
       name="WP_parameter mergesort.2"
       locfile="../mergesort_list.mlw"
-      loclnum="96" loccnumb="10" loccnume="19"
+      loclnum="104" loccnumb="10" loccnume="19"
       expl="2. precondition"
-      sum="1bf5c9948dd66c7538aaa5709975085c"
+      sum="cc68b74912633279648381f9e142b994"
       proved="true"
       expanded="false"
       shape="preconditionCtaConswaNilOaNilainfix &gt;=alengthV0c2wV0F">
@@ -2426,9 +2438,9 @@
      <goal
       name="WP_parameter mergesort.3"
       locfile="../mergesort_list.mlw"
-      loclnum="96" loccnumb="10" loccnume="19"
+      loclnum="104" loccnumb="10" loccnume="19"
       expl="3. variant decrease"
-      sum="5036f62ad15486165a7c7b23022d284c"
+      sum="a61f4da3af5daa3ea562753c95185ada"
       proved="true"
       expanded="false"
       shape="variant decreaseCtaConswaNilOaNilainfix &lt;alengthV2alengthV0Aainfix &lt;=c0alengthV0IapermutV0ainfix ++V1V2Aainfix &lt;=c1alengthV2Aainfix &lt;=c1alengthV1FIainfix &gt;=alengthV0c2wV0F">
@@ -2446,9 +2458,9 @@
      <goal
       name="WP_parameter mergesort.4"
       locfile="../mergesort_list.mlw"
-      loclnum="96" loccnumb="10" loccnume="19"
+      loclnum="104" loccnumb="10" loccnume="19"
       expl="4. variant decrease"
-      sum="3905b9ed9aa0ce868437db09c4090849"
+      sum="46a40ab7067b62aaacda2d96a91b576e"
       proved="true"
       expanded="false"
       shape="variant decreaseCtaConswaNilOaNilainfix &lt;alengthV1alengthV0Aainfix &lt;=c0alengthV0IapermutV3V2AasortedV3FIapermutV0ainfix ++V1V2Aainfix &lt;=c1alengthV2Aainfix &lt;=c1alengthV1FIainfix &gt;=alengthV0c2wV0F">
@@ -2466,9 +2478,9 @@
      <goal
       name="WP_parameter mergesort.5"
       locfile="../mergesort_list.mlw"
-      loclnum="96" loccnumb="10" loccnume="19"
+      loclnum="104" loccnumb="10" loccnume="19"
       expl="5. precondition"
-      sum="3384f6c9d5248ea68b349a3598bb1392"
+      sum="7637152886ba36aa25db551d7247b11e"
       proved="true"
       expanded="false"
       shape="preconditionCtaConswaNilOaNilasortedV3AasortedV4IapermutV4V1AasortedV4FIapermutV3V2AasortedV3FIapermutV0ainfix ++V1V2Aainfix &lt;=c1alengthV2Aainfix &lt;=c1alengthV1FIainfix &gt;=alengthV0c2wV0F">
@@ -2486,9 +2498,9 @@
      <goal
       name="WP_parameter mergesort.6"
       locfile="../mergesort_list.mlw"
-      loclnum="96" loccnumb="10" loccnume="19"
+      loclnum="104" loccnumb="10" loccnume="19"
       expl="6. postcondition"
-      sum="4ba719fa28f0c718b66bc65b5980a250"
+      sum="ca61bd4d46cafaa0b48effb9c892277a"
       proved="true"
       expanded="false"
       shape="postconditionCtaConswaNilOaNilapermutV5V0AasortedV5IapermutV5ainfix ++V4V3AasortedV5FIasortedV3AasortedV4IapermutV4V1AasortedV4FIapermutV3V2AasortedV3FIapermutV0ainfix ++V1V2Aainfix &lt;=c1alengthV2Aainfix &lt;=c1alengthV1FIainfix &gt;=alengthV0c2wV0F">
@@ -2501,9 +2513,9 @@
        <goal
         name="WP_parameter mergesort.6.1"
         locfile="../mergesort_list.mlw"
-        loclnum="96" loccnumb="10" loccnume="19"
+        loclnum="104" loccnumb="10" loccnume="19"
         expl="1."
-        sum="7610ed61e20ab7e783be5cc35bdd8544"
+        sum="58615a46ea0a721486535724f1c62875"
         proved="true"
         expanded="false"
         shape="CtaConswaNilOaNilasortedV5IapermutV5ainfix ++V4V3AasortedV5FIasortedV3AasortedV4IapermutV4V1AasortedV4FIapermutV3V2AasortedV3FIapermutV0ainfix ++V1V2Aainfix &lt;=c1alengthV2Aainfix &lt;=c1alengthV1FIainfix &gt;=alengthV0c2wV0F">
@@ -2521,9 +2533,9 @@
        <goal
         name="WP_parameter mergesort.6.2"
         locfile="../mergesort_list.mlw"
-        loclnum="96" loccnumb="10" loccnume="19"
+        loclnum="104" loccnumb="10" loccnume="19"
         expl="2."
-        sum="ae9feb1ffad2abc47977fd5d071bc38f"
+        sum="68bc27cdadc8f9ac02aff978a795cb08"
         proved="true"
         expanded="false"
         shape="CtaConswaNilOaNilapermutV5V0IapermutV5ainfix ++V4V3AasortedV5FIasortedV3AasortedV4IapermutV4V1AasortedV4FIapermutV3V2AasortedV3FIapermutV0ainfix ++V1V2Aainfix &lt;=c1alengthV2Aainfix &lt;=c1alengthV1FIainfix &gt;=alengthV0c2wV0F">
@@ -2535,10 +2547,10 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="3.19"/>
+         <result status="valid" time="3.80"/>
         </proof>
         <proof
-         prover="4"
+         prover="5"
          timelimit="6"
          memlimit="1000"
          obsolete="false"
@@ -2554,34 +2566,14 @@
   <theory
    name="OCamlMergesort"
    locfile="../mergesort_list.mlw"
-   loclnum="106" loccnumb="7" loccnume="21"
-   verified="false"
-   expanded="true">
-   <goal
-    name="WP_parameter chop"
-    locfile="../mergesort_list.mlw"
-    loclnum="121" loccnumb="10" loccnume="14"
-    expl="VC for chop"
-    sum="fbfa5424f8d9b17d333b142273676828"
-    proved="true"
-    expanded="false"
-    shape="iCainfix =V1ainfix ++aprefixV0V1V4Iainfix =V2ainfix ++aprefixV3V2V4FAainfix &lt;=V3alengthV2Aainfix &lt;=c0V3Aainfix &lt;V3V0Aainfix &lt;=c0V0Lainfix -V0c1aConswVfaNilV1ainfix =V1ainfix ++aprefixV0V1V1ainfix =V0c0Iainfix &lt;=V0alengthV1Aainfix &lt;=c0V0F">
-    <label
-     name="expl:VC for chop"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-   </goal>
+   loclnum="118" loccnumb="7" loccnume="21"
+   verified="true"
+   expanded="false">
    <goal
     name="sorted_reverse_cons"
     locfile="../mergesort_list.mlw"
-    loclnum="132" loccnumb="8" loccnume="27"
-    sum="7479a06b74132f5485f6b05592e3ed69"
+    loclnum="125" loccnumb="8" loccnume="27"
+    sum="66168c8d446d944ea075757982d88427"
     proved="true"
     expanded="false"
     shape="asortedareverseaConsV1V0IaleV2V1IamemV2V0FIasortedareverseV0F">
@@ -2591,19 +2583,19 @@
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.46"/>
+     <result status="valid" time="0.25"/>
     </proof>
    </goal>
    <goal
     name="sorted_rev_append"
     locfile="../mergesort_list.mlw"
-    loclnum="136" loccnumb="8" loccnume="25"
-    sum="1fd8f939ac6599241124d4fdac36d4a9"
+    loclnum="129" loccnumb="8" loccnume="25"
+    sum="9dc756853c335a5853e2959983895e77"
     proved="true"
     expanded="false"
     shape="asortedareversearev_appendV1V0IaleV2V3IamemV3V1IamemV2V0FIasortedV1IasortedareverseV0F">
     <proof
-     prover="8"
+     prover="9"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2611,7 +2603,7 @@
      <result status="valid" time="0.09"/>
     </proof>
     <proof
-     prover="9"
+     prover="10"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -2622,9 +2614,9 @@
    <goal
     name="WP_parameter rev_merge"
     locfile="../mergesort_list.mlw"
-    loclnum="142" loccnumb="10" loccnume="19"
+    loclnum="135" loccnumb="10" loccnume="19"
     expl="VC for rev_merge"
-    sum="314d74cafa544b1f541eb1f68c00fbe7"
+    sum="0ff359a251acf952cea7403949a4cf6b"
     proved="true"
     expanded="false"
     shape="CCiapermutV8ainfix ++ainfix ++V2V0V1AasortedareverseV8IapermutV8ainfix ++ainfix ++V7V0V4AasortedareverseV8FAaleV9V10IamemV10V4IamemV9V7FAaleV11V12IamemV12V0IamemV11V7FAasortedV4AasortedV0AasortedareverseV7Aainfix &lt;ainfix +alengthV0alengthV4ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1LaConsV3V2apermutV14ainfix ++ainfix ++V2V0V1AasortedareverseV14IapermutV14ainfix ++ainfix ++V13V6V1AasortedareverseV14FAaleV15V16IamemV16V1IamemV15V13FAaleV17V18IamemV18V6IamemV17V13FAasortedV1AasortedV6AasortedareverseV13Aainfix &lt;ainfix +alengthV6alengthV1ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1LaConsV5V2aleV5V3aConsVVapermutV19ainfix ++ainfix ++V2V0V1AasortedareverseV19Larev_appendV1V2aNilV0aConsVVCapermutV20ainfix ++ainfix ++V2V0V1AasortedareverseV20Larev_appendV1V2aNilapermutV21ainfix ++ainfix ++V2V0V1AasortedareverseV21Larev_appendV0V2wV0aNilV1IaleV22V23IamemV23V1IamemV22V2FAaleV24V25IamemV25V0IamemV24V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2637,9 +2629,9 @@
      <goal
       name="WP_parameter rev_merge.1"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="1. variant decrease"
-      sum="733bc10bd09e3f3c63c699465d846eb4"
+      sum="93cef1e581b6ce3378806a9cce2d1a3f"
       proved="true"
       expanded="false"
       shape="variant decreaseCCainfix &lt;ainfix +alengthV6alengthV1ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1LaConsV5V2IaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV8V9IamemV9V1IamemV8V2FAaleV10V11IamemV11V0IamemV10V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2657,9 +2649,9 @@
      <goal
       name="WP_parameter rev_merge.2"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="2. precondition"
-      sum="caa50978505c4e2c0e31e89b842546f2"
+      sum="07e314ec3b311512a15a9848469ed114"
       proved="true"
       expanded="false"
       shape="preconditionCCasortedV1AasortedV6AasortedareverseV7LaConsV5V2IaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV8V9IamemV9V1IamemV8V2FAaleV10V11IamemV11V0IamemV10V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2671,15 +2663,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="6.93"/>
+       <result status="valid" time="3.64"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge.3"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="3. precondition"
-      sum="5aaa4fca6151d688ff9b05e7d813b6d2"
+      sum="4685fb24bdc3e7790d25a7336d73d4f0"
       proved="true"
       expanded="false"
       shape="preconditionCCaleV8V9IamemV9V6IamemV8V7FLaConsV5V2IaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV10V11IamemV11V1IamemV10V2FAaleV12V13IamemV13V0IamemV12V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2697,29 +2689,29 @@
      <goal
       name="WP_parameter rev_merge.4"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="4. precondition"
-      sum="093fadedfd8513e8e6e4e65292fa18a1"
+      sum="bafe2831ee50451d57a1894af9e17519"
       proved="true"
       expanded="false"
       shape="preconditionCCaleV8V9IamemV9V1IamemV8V7FLaConsV5V2IaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV10V11IamemV11V1IamemV10V2FAaleV12V13IamemV13V0IamemV12V2FAasortedV1AasortedV0AasortedareverseV2F">
       <label
        name="expl:VC for rev_merge"/>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.09"/>
+       <result status="valid" time="0.59"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge.5"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="5. postcondition"
-      sum="af60aea821aa4ca6c7a6f463f3219649"
+      sum="1746b563a76f3b2ab1b4a930d3b3b3c2"
       proved="true"
       expanded="false"
       shape="postconditionCCasortedareverseV8IapermutV8ainfix ++ainfix ++V7V6V1AasortedareverseV8FIaleV9V10IamemV10V1IamemV9V7FAaleV11V12IamemV12V6IamemV11V7FAasortedV1AasortedV6AasortedareverseV7LaConsV5V2IaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV13V14IamemV14V1IamemV13V2FAaleV15V16IamemV16V0IamemV15V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2737,9 +2729,9 @@
      <goal
       name="WP_parameter rev_merge.6"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="6. postcondition"
-      sum="b0a869be86f0707f4820ce12df53f257"
+      sum="2b1efdfdd88a25a1f7a17ff54b35db0c"
       proved="true"
       expanded="false"
       shape="postconditionCCapermutV8ainfix ++ainfix ++V2V0V1IapermutV8ainfix ++ainfix ++V7V6V1AasortedareverseV8FIaleV9V10IamemV10V1IamemV9V7FAaleV11V12IamemV12V6IamemV11V7FAasortedV1AasortedV6AasortedareverseV7LaConsV5V2IaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV13V14IamemV14V1IamemV13V2FAaleV15V16IamemV16V0IamemV15V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2751,15 +2743,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="3.35"/>
+       <result status="valid" time="1.78"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge.7"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="7. variant decrease"
-      sum="227eecbddbcb1586a6446507a1be4473"
+      sum="6054c58db07e5965785319e22b221eff"
       proved="true"
       expanded="false"
       shape="variant decreaseCCainfix &lt;ainfix +alengthV0alengthV4ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1LaConsV3V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV8V9IamemV9V1IamemV8V2FAaleV10V11IamemV11V0IamemV10V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2777,9 +2769,9 @@
      <goal
       name="WP_parameter rev_merge.8"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="8. precondition"
-      sum="5728660426dba71b12bedb1c0fd685cd"
+      sum="dac18f942c61cc6e1563f86dfa50e62f"
       proved="true"
       expanded="false"
       shape="preconditionCCasortedV4AasortedV0AasortedareverseV7LaConsV3V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV8V9IamemV9V1IamemV8V2FAaleV10V11IamemV11V0IamemV10V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2791,15 +2783,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="5.91"/>
+       <result status="valid" time="3.25"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge.9"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="9. precondition"
-      sum="ce1e92400aec573469f6e70fed80e315"
+      sum="d15bc7d7411c1b7d5e9308b2e573b8a2"
       proved="true"
       expanded="false"
       shape="preconditionCCaleV8V9IamemV9V0IamemV8V7FLaConsV3V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV10V11IamemV11V1IamemV10V2FAaleV12V13IamemV13V0IamemV12V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2811,15 +2803,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="1.30"/>
+       <result status="valid" time="0.91"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge.10"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="10. precondition"
-      sum="6c660da7b071a74aeac24207fadac76c"
+      sum="08c216f96fa190708de7f05e3bcb8dd4"
       proved="true"
       expanded="false"
       shape="preconditionCCaleV8V9IamemV9V4IamemV8V7FLaConsV3V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV10V11IamemV11V1IamemV10V2FAaleV12V13IamemV13V0IamemV12V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2837,9 +2829,9 @@
      <goal
       name="WP_parameter rev_merge.11"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="11. postcondition"
-      sum="5c61749e22a4671a04c6872a61ba3483"
+      sum="357db5e7a895ad296a74cde31a1b8f3b"
       proved="true"
       expanded="false"
       shape="postconditionCCasortedareverseV8IapermutV8ainfix ++ainfix ++V7V0V4AasortedareverseV8FIaleV9V10IamemV10V4IamemV9V7FAaleV11V12IamemV12V0IamemV11V7FAasortedV4AasortedV0AasortedareverseV7LaConsV3V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV13V14IamemV14V1IamemV13V2FAaleV15V16IamemV16V0IamemV15V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2857,9 +2849,9 @@
      <goal
       name="WP_parameter rev_merge.12"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="12. postcondition"
-      sum="5bfa7414e589f122872f448af1f33fef"
+      sum="eb1a8d04c8832eea4a5e18ebc224fe2c"
       proved="true"
       expanded="false"
       shape="postconditionCCapermutV8ainfix ++ainfix ++V2V0V1IapermutV8ainfix ++ainfix ++V7V0V4AasortedareverseV8FIaleV9V10IamemV10V4IamemV9V7FAaleV11V12IamemV12V0IamemV11V7FAasortedV4AasortedV0AasortedareverseV7LaConsV3V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV13V14IamemV14V1IamemV13V2FAaleV15V16IamemV16V0IamemV15V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2871,15 +2863,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="4.00"/>
+       <result status="valid" time="2.11"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge.13"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="13. postcondition"
-      sum="ff4a22a16efd6c859384de2ac3552962"
+      sum="52b729fb06d7c967a22ecad968e9ae44"
       proved="true"
       expanded="false"
       shape="postconditionCCtaConsVVasortedareverseV7Larev_appendV1V2aNilV0aConsVVtaNilV1IaleV8V9IamemV9V1IamemV8V2FAaleV10V11IamemV11V0IamemV10V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2897,9 +2889,9 @@
      <goal
       name="WP_parameter rev_merge.14"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="14. postcondition"
-      sum="d9a5175059b740df3e7f6b99046f73c4"
+      sum="36fc435556a53c3bb03f24afefb05134"
       proved="true"
       expanded="false"
       shape="postconditionCCtaConsVVapermutV7ainfix ++ainfix ++V2V0V1Larev_appendV1V2aNilV0aConsVVtaNilV1IaleV8V9IamemV9V1IamemV8V2FAaleV10V11IamemV11V0IamemV10V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2917,9 +2909,9 @@
      <goal
       name="WP_parameter rev_merge.15"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="15. postcondition"
-      sum="8b7f6693448c0e713b5b2357cf712d21"
+      sum="55a6b11959b7c0095fc14ec0162625b7"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCasortedareverseV5Larev_appendV1V2aNiltwV0aNilV1IaleV6V7IamemV7V1IamemV6V2FAaleV8V9IamemV9V0IamemV8V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2937,9 +2929,9 @@
      <goal
       name="WP_parameter rev_merge.16"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="16. postcondition"
-      sum="20087dfb80f1c0379fa034885888dc36"
+      sum="93a44ae1bf9054018b3b69243c727b80"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCapermutV5ainfix ++ainfix ++V2V0V1Larev_appendV1V2aNiltwV0aNilV1IaleV6V7IamemV7V1IamemV6V2FAaleV8V9IamemV9V0IamemV8V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2957,9 +2949,9 @@
      <goal
       name="WP_parameter rev_merge.17"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="17. postcondition"
-      sum="a21b3d53b0dccda2f94c73412d60679f"
+      sum="381bf870cf4f3e531efa18c18cc603ed"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCtaNilasortedareverseV5Larev_appendV0V2wV0aNilV1IaleV6V7IamemV7V1IamemV6V2FAaleV8V9IamemV9V0IamemV8V2FAasortedV1AasortedV0AasortedareverseV2F">
@@ -2977,110 +2969,80 @@
      <goal
       name="WP_parameter rev_merge.18"
       locfile="../mergesort_list.mlw"
-      loclnum="142" loccnumb="10" loccnume="19"
+      loclnum="135" loccnumb="10" loccnume="19"
       expl="18. postcondition"
-      sum="9af6c96d50f4bd273170fcd3e5ee7cac"
+      sum="3dcc7ab08aa8974f6388caacf09d7710"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCtaNilapermutV5ainfix ++ainfix ++V2V0V1Larev_appendV0V2wV0aNilV1IaleV6V7IamemV7V1IamemV6V2FAaleV8V9IamemV9V0IamemV8V2FAasortedV1AasortedV0AasortedareverseV2F">
       <label
        name="expl:VC for rev_merge"/>
       <proof
-       prover="4"
+       prover="5"
        timelimit="10"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.55"/>
+       <result status="valid" time="1.47"/>
       </proof>
      </goal>
     </transf>
+   </goal>
+   <goal
+    name="sorted_reverse_mem"
+    locfile="../mergesort_list.mlw"
+    loclnum="150" loccnumb="8" loccnume="26"
+    sum="86c03ade9ca4e8b91ad5094bfa5664a8"
+    proved="true"
+    expanded="false"
+    shape="aleV2V0IamemV2V1FIasortedareverseaConsV0V1F">
+    <proof
+     prover="5"
+     timelimit="6"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="2.03"/>
+    </proof>
    </goal>
    <goal
     name="sorted_reverse_cons2"
     locfile="../mergesort_list.mlw"
-    loclnum="157" loccnumb="8" loccnume="28"
-    sum="efffc42102d99dbd8d3de389264db401"
-    proved="false"
-    expanded="true"
+    loclnum="153" loccnumb="8" loccnume="28"
+    sum="a6827d0c02341a8d615abb6860295cd7"
+    proved="true"
+    expanded="false"
     shape="asortedareverseV1IasortedareverseaConsV0V1F">
-    <transf
-     name="induction_ty_lex"
-     proved="false"
-     expanded="true">
-     <goal
-      name="sorted_reverse_cons2.1"
-      locfile="../mergesort_list.mlw"
-      loclnum="157" loccnumb="8" loccnume="28"
-      expl="1."
-      sum="f60710d93005f8c774f3735a858b248a"
-      proved="false"
-      expanded="true"
-      shape="CasortedareverseV1IasortedareverseaConsV0V1aNilasortedareverseV1IasortedareverseaConsV0V1IasortedareverseV3IasortedareverseaConsV0V3aConsVVV1F">
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.98"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.00"/>
-      </proof>
-      <proof
-       prover="8"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="9"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="5.00"/>
-      </proof>
-     </goal>
-    </transf>
+    <proof
+     prover="2"
+     timelimit="6"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
    </goal>
    <goal
     name="WP_parameter rev_merge_rev"
     locfile="../mergesort_list.mlw"
-    loclnum="160" loccnumb="10" loccnume="23"
+    loclnum="156" loccnumb="10" loccnume="23"
     expl="VC for rev_merge_rev"
-    sum="200bd057311b3d36ebd56cf91b2c5ebd"
-    proved="false"
-    expanded="true"
+    sum="aa9c55b481b0f6f2dd5e5ad8cfe8c916"
+    proved="true"
+    expanded="false"
     shape="CCiapermutV8ainfix ++ainfix ++V2V0V1AasortedV8IapermutV8ainfix ++ainfix ++V7V0V4AasortedV8FAaleV10V9IamemV10V4IamemV9V7FAaleV12V11IamemV12V0IamemV11V7FAasortedareverseV4AasortedareverseV0AasortedV7Aainfix &lt;ainfix +alengthV0alengthV4ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1LaConsV3V2apermutV14ainfix ++ainfix ++V2V0V1AasortedV14IapermutV14ainfix ++ainfix ++V13V6V1AasortedV14FAaleV16V15IamemV16V1IamemV15V13FAaleV18V17IamemV18V6IamemV17V13FAasortedareverseV1AasortedareverseV6AasortedV13Aainfix &lt;ainfix +alengthV6alengthV1ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1LaConsV5V2NaleV5V3aConsVVapermutV19ainfix ++ainfix ++V2V0V1AasortedV19Larev_appendV1V2aNilV0aConsVVCapermutV20ainfix ++ainfix ++V2V0V1AasortedV20Larev_appendV1V2aNilapermutV21ainfix ++ainfix ++V2V0V1AasortedV21Larev_appendV0V2wV0aNilV1IaleV23V22IamemV23V1IamemV22V2FAaleV25V24IamemV25V0IamemV24V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
     <label
      name="expl:VC for rev_merge_rev"/>
     <transf
      name="split_goal_wp"
-     proved="false"
-     expanded="true">
+     proved="true"
+     expanded="false">
      <goal
       name="WP_parameter rev_merge_rev.1"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="1. variant decrease"
-      sum="0bba059e8a4d28e85737282c5d189254"
+      sum="0caa0a6ff22d54324d0350c90e67a206"
       proved="true"
       expanded="false"
       shape="variant decreaseCCainfix &lt;ainfix +alengthV6alengthV1ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1LaConsV5V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV9V8IamemV9V1IamemV8V2FAaleV11V10IamemV11V0IamemV10V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3098,9 +3060,9 @@
      <goal
       name="WP_parameter rev_merge_rev.2"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="2. precondition"
-      sum="c5f138b250ccbc3482a64474322ea00b"
+      sum="8f4b47aba1d1e46432e2633b926b30b6"
       proved="true"
       expanded="false"
       shape="preconditionCCasortedareverseV1AasortedareverseV6AasortedV7LaConsV5V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV9V8IamemV9V1IamemV8V2FAaleV11V10IamemV11V0IamemV10V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3113,9 +3075,9 @@
        <goal
         name="WP_parameter rev_merge_rev.2.1"
         locfile="../mergesort_list.mlw"
-        loclnum="160" loccnumb="10" loccnume="23"
+        loclnum="156" loccnumb="10" loccnume="23"
         expl="1."
-        sum="8974004dc6d2bb28f8d34e73b8f75dd0"
+        sum="95dc300be5e85102f2aef0d8f3a300c0"
         proved="true"
         expanded="false"
         shape="CCasortedV7LaConsV5V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV9V8IamemV9V1IamemV8V2FAaleV11V10IamemV11V0IamemV10V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3133,9 +3095,9 @@
        <goal
         name="WP_parameter rev_merge_rev.2.2"
         locfile="../mergesort_list.mlw"
-        loclnum="160" loccnumb="10" loccnume="23"
+        loclnum="156" loccnumb="10" loccnume="23"
         expl="2."
-        sum="46801a5f5ccc47cc508cbdac8e5cad36"
+        sum="301881470729d946950fa7c8377b1d79"
         proved="true"
         expanded="false"
         shape="CCasortedareverseV6LaConsV5V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV9V8IamemV9V1IamemV8V2FAaleV11V10IamemV11V0IamemV10V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3153,9 +3115,9 @@
        <goal
         name="WP_parameter rev_merge_rev.2.3"
         locfile="../mergesort_list.mlw"
-        loclnum="160" loccnumb="10" loccnume="23"
+        loclnum="156" loccnumb="10" loccnume="23"
         expl="3."
-        sum="0e115ccd4ad283fdc833db1d1a929fe8"
+        sum="f94099ac16b69a4435cae46ffe7bffbd"
         proved="true"
         expanded="false"
         shape="CCasortedareverseV1LaConsV5V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV9V8IamemV9V1IamemV8V2FAaleV11V10IamemV11V0IamemV10V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3175,145 +3137,57 @@
      <goal
       name="WP_parameter rev_merge_rev.3"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="3. precondition"
-      sum="d685b40b5b1bc596c714f5af9033b149"
-      proved="false"
+      sum="717fc8459a544ee01640fde9b5ad6d7f"
+      proved="true"
       expanded="false"
       shape="preconditionCCaleV9V8IamemV9V6IamemV8V7FLaConsV5V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV11V10IamemV11V1IamemV10V2FAaleV13V12IamemV13V0IamemV12V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
       <label
        name="expl:VC for rev_merge_rev"/>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.98"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
        prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.00"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.20"/>
-      </proof>
-      <proof
-       prover="8"
-       timelimit="5"
+       timelimit="6"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.00"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="9"
-       timelimit="5"
+       prover="5"
+       timelimit="6"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.00"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge_rev.4"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="4. precondition"
-      sum="1fcac82203206ef4248b07f4b70bf6cb"
-      proved="false"
+      sum="677f160299032664a0705ad6aa604610"
+      proved="true"
       expanded="false"
       shape="preconditionCCaleV9V8IamemV9V1IamemV8V7FLaConsV5V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV11V10IamemV11V1IamemV10V2FAaleV13V12IamemV13V0IamemV12V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
       <label
        name="expl:VC for rev_merge_rev"/>
       <proof
-       prover="0"
-       timelimit="5"
+       prover="5"
+       timelimit="6"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="4.98"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.88"/>
-      </proof>
-      <proof
-       prover="8"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.98"/>
-      </proof>
-      <proof
-       prover="9"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.99"/>
+       <result status="valid" time="0.76"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge_rev.5"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="5. postcondition"
-      sum="e923419fdb2160271af292b3f363ec8e"
+      sum="6db28ec1d28c405c4d44c6120a91df12"
       proved="true"
       expanded="false"
       shape="postconditionCCasortedV8IapermutV8ainfix ++ainfix ++V7V6V1AasortedV8FIaleV10V9IamemV10V1IamemV9V7FAaleV12V11IamemV12V6IamemV11V7FAasortedareverseV1AasortedareverseV6AasortedV7LaConsV5V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV14V13IamemV14V1IamemV13V2FAaleV16V15IamemV16V0IamemV15V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3331,9 +3205,9 @@
      <goal
       name="WP_parameter rev_merge_rev.6"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="6. postcondition"
-      sum="e7e49c7f14b65c99611da283a79b89b6"
+      sum="75a39587ae9bade54b852804f9bde412"
       proved="true"
       expanded="false"
       shape="postconditionCCapermutV8ainfix ++ainfix ++V2V0V1IapermutV8ainfix ++ainfix ++V7V6V1AasortedV8FIaleV10V9IamemV10V1IamemV9V7FAaleV12V11IamemV12V6IamemV11V7FAasortedareverseV1AasortedareverseV6AasortedV7LaConsV5V2INaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV14V13IamemV14V1IamemV13V2FAaleV16V15IamemV16V0IamemV15V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3345,15 +3219,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="2.89"/>
+       <result status="valid" time="1.98"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge_rev.7"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="7. variant decrease"
-      sum="f89c9eff1849d407473da36142063f5c"
+      sum="48cd0ee7a7c16c8a7f3fcbdf2a72cd13"
       proved="true"
       expanded="false"
       shape="variant decreaseCCainfix &lt;ainfix +alengthV0alengthV4ainfix +alengthV0alengthV1Aainfix &lt;=c0ainfix +alengthV0alengthV1LaConsV3V2INNaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV9V8IamemV9V1IamemV8V2FAaleV11V10IamemV11V0IamemV10V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3371,213 +3245,85 @@
      <goal
       name="WP_parameter rev_merge_rev.8"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="8. precondition"
-      sum="f88229a8b5d39fc0add1bc680f90be81"
-      proved="false"
+      sum="8d3356f60c4656f04146d67c811edf5c"
+      proved="true"
       expanded="false"
       shape="preconditionCCasortedareverseV4AasortedareverseV0AasortedV7LaConsV3V2INNaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV9V8IamemV9V1IamemV8V2FAaleV11V10IamemV11V0IamemV10V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
       <label
        name="expl:VC for rev_merge_rev"/>
       <proof
-       prover="0"
-       timelimit="5"
+       prover="3"
+       timelimit="10"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="4.98"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.98"/>
+       <result status="valid" time="0.11"/>
       </proof>
       <proof
        prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.07"/>
-      </proof>
-      <proof
-       prover="8"
-       timelimit="5"
+       timelimit="10"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="9"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.99"/>
+       <result status="valid" time="0.07"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge_rev.9"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="9. precondition"
-      sum="bd2a233a1abddc5687ecd8514c65a975"
-      proved="false"
+      sum="ac40f260e83b0f597fdd6199b9078f7b"
+      proved="true"
       expanded="false"
       shape="preconditionCCaleV9V8IamemV9V0IamemV8V7FLaConsV3V2INNaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV11V10IamemV11V1IamemV10V2FAaleV13V12IamemV13V0IamemV12V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
       <label
        name="expl:VC for rev_merge_rev"/>
       <proof
-       prover="0"
-       timelimit="5"
+       prover="5"
+       timelimit="6"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="4.97"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.98"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.03"/>
-      </proof>
-      <proof
-       prover="8"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.98"/>
-      </proof>
-      <proof
-       prover="9"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.99"/>
+       <result status="valid" time="0.78"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge_rev.10"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="10. precondition"
-      sum="5de0ac1663e89f1441b2c39fe5164354"
-      proved="false"
+      sum="c76a9818f0d36e670871d03d5444025d"
+      proved="true"
       expanded="false"
       shape="preconditionCCaleV9V8IamemV9V4IamemV8V7FLaConsV3V2INNaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV11V10IamemV11V1IamemV10V2FAaleV13V12IamemV13V0IamemV12V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
       <label
        name="expl:VC for rev_merge_rev"/>
       <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
        prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="4.99"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="true"
-       archived="false">
-       <result status="timeout" time="5.09"/>
-      </proof>
-      <proof
-       prover="8"
-       timelimit="5"
+       timelimit="6"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="4.99"/>
+       <result status="valid" time="0.02"/>
       </proof>
       <proof
-       prover="9"
-       timelimit="5"
+       prover="5"
+       timelimit="6"
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="timeout" time="5.02"/>
+       <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge_rev.11"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="11. postcondition"
-      sum="958ec5fae1efdd250a71122ef283c67f"
+      sum="8d07f0cc01e87c14ac2d3d987f3e42c6"
       proved="true"
       expanded="false"
       shape="postconditionCCasortedV8IapermutV8ainfix ++ainfix ++V7V0V4AasortedV8FIaleV10V9IamemV10V4IamemV9V7FAaleV12V11IamemV12V0IamemV11V7FAasortedareverseV4AasortedareverseV0AasortedV7LaConsV3V2INNaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV14V13IamemV14V1IamemV13V2FAaleV16V15IamemV16V0IamemV15V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3595,9 +3341,9 @@
      <goal
       name="WP_parameter rev_merge_rev.12"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="12. postcondition"
-      sum="a2848cbc809405d5280bc60a00fe498f"
+      sum="d11ab72b72ce46683f500ca75de40ff9"
       proved="true"
       expanded="false"
       shape="postconditionCCapermutV8ainfix ++ainfix ++V2V0V1IapermutV8ainfix ++ainfix ++V7V0V4AasortedV8FIaleV10V9IamemV10V4IamemV9V7FAaleV12V11IamemV12V0IamemV11V7FAasortedareverseV4AasortedareverseV0AasortedV7LaConsV3V2INNaleV5V3aConsVVtaNilV0aConsVVtaNilV1IaleV14V13IamemV14V1IamemV13V2FAaleV16V15IamemV16V0IamemV15V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3609,15 +3355,15 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="4.00"/>
+       <result status="valid" time="2.48"/>
       </proof>
      </goal>
      <goal
       name="WP_parameter rev_merge_rev.13"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="13. postcondition"
-      sum="e9c2e0ad9df2f333f5c43b60a6d28118"
+      sum="f8966deb98f1c6f76170f3b03b42dc1c"
       proved="true"
       expanded="false"
       shape="postconditionCCtaConsVVasortedV7Larev_appendV1V2aNilV0aConsVVtaNilV1IaleV9V8IamemV9V1IamemV8V2FAaleV11V10IamemV11V0IamemV10V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3635,9 +3381,9 @@
      <goal
       name="WP_parameter rev_merge_rev.14"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="14. postcondition"
-      sum="9993ef744dca1c418b60a0b72330c7f4"
+      sum="5b22f194599f154227b81443a532e5ee"
       proved="true"
       expanded="false"
       shape="postconditionCCtaConsVVapermutV7ainfix ++ainfix ++V2V0V1Larev_appendV1V2aNilV0aConsVVtaNilV1IaleV9V8IamemV9V1IamemV8V2FAaleV11V10IamemV11V0IamemV10V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3655,9 +3401,9 @@
      <goal
       name="WP_parameter rev_merge_rev.15"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="15. postcondition"
-      sum="b15a9d65a5a108692b79b63df50d04b9"
+      sum="329a5a91560ae65a01625ec84cdeab2b"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCasortedV5Larev_appendV1V2aNiltwV0aNilV1IaleV7V6IamemV7V1IamemV6V2FAaleV9V8IamemV9V0IamemV8V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3675,9 +3421,9 @@
      <goal
       name="WP_parameter rev_merge_rev.16"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="16. postcondition"
-      sum="bd98e67cced21642022995f5f443ca00"
+      sum="0a4f0725061bcdd2985cc93c46ee3717"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCapermutV5ainfix ++ainfix ++V2V0V1Larev_appendV1V2aNiltwV0aNilV1IaleV7V6IamemV7V1IamemV6V2FAaleV9V8IamemV9V0IamemV8V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3695,9 +3441,9 @@
      <goal
       name="WP_parameter rev_merge_rev.17"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="17. postcondition"
-      sum="9c3c8356f6829c6005cf15057aad150e"
+      sum="81a96d91552a3de73f3446678d52b442"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCtaNilasortedV5Larev_appendV0V2wV0aNilV1IaleV7V6IamemV7V1IamemV6V2FAaleV9V8IamemV9V0IamemV8V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3715,9 +3461,9 @@
      <goal
       name="WP_parameter rev_merge_rev.18"
       locfile="../mergesort_list.mlw"
-      loclnum="160" loccnumb="10" loccnume="23"
+      loclnum="156" loccnumb="10" loccnume="23"
       expl="18. postcondition"
-      sum="f05b2b324040d0b1088ea5eed7efffe8"
+      sum="fe70873f2577e705fb24360e0e47defc"
       proved="true"
       expanded="false"
       shape="postconditionCtaConsVVCtaNilapermutV5ainfix ++ainfix ++V2V0V1Larev_appendV0V2wV0aNilV1IaleV7V6IamemV7V1IamemV6V2FAaleV9V8IamemV9V0IamemV8V2FAasortedareverseV1AasortedareverseV0AasortedV2F">
@@ -3729,16 +3475,36 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.85"/>
+       <result status="valid" time="0.44"/>
       </proof>
      </goal>
     </transf>
    </goal>
    <goal
+    name="WP_parameter chop"
+    locfile="../mergesort_list.mlw"
+    loclnum="179" loccnumb="10" loccnume="14"
+    expl="VC for chop"
+    sum="e4d8fcad11999d340b979479f3d3ff29"
+    proved="true"
+    expanded="false"
+    shape="iCainfix =V1ainfix ++aprefixV0V1V4Iainfix =V2ainfix ++aprefixV3V2V4FAainfix &lt;=V3alengthV2Aainfix &lt;=c0V3Aainfix &lt;V3V0Aainfix &lt;=c0V0Lainfix -V0c1aConswVfaNilV1ainfix =V1ainfix ++aprefixV0V1V1ainfix =V0c0Iainfix &lt;=V0alengthV1Aainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for chop"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+   </goal>
+   <goal
     name="permut_prefix"
     locfile="../mergesort_list.mlw"
-    loclnum="180" loccnumb="8" loccnume="21"
-    sum="f6d9e63bc7c062b4888ad43a03fb2537"
+    loclnum="195" loccnumb="8" loccnume="21"
+    sum="c56893eadd7ebf6f0cb1def9e3b148dc"
     proved="true"
     expanded="false"
     shape="apermutaprefixalengthV0V0V0F">
@@ -3749,9 +3515,9 @@
      <goal
       name="permut_prefix.1"
       locfile="../mergesort_list.mlw"
-      loclnum="180" loccnumb="8" loccnume="21"
+      loclnum="195" loccnumb="8" loccnume="21"
       expl="1."
-      sum="d3c35557c1a93f43201ceffb75aea85c"
+      sum="3f2f9bc8388bc57d7f03d501be11e4a1"
       proved="true"
       expanded="false"
       shape="CapermutaprefixalengthV0V0V0aNilapermutaprefixalengthV0V0V0IapermutaprefixalengthV2V2V2aConsVVV0F">
@@ -3769,9 +3535,9 @@
    <goal
     name="WP_parameter mergesort"
     locfile="../mergesort_list.mlw"
-    loclnum="182" loccnumb="6" loccnume="15"
+    loclnum="197" loccnumb="6" loccnume="15"
     expl="VC for mergesort"
-    sum="0bdb26428e1cdda980ae88f2c2bb9239"
+    sum="cc639d1e2a98d52201cb2208625a9215"
     proved="true"
     expanded="false"
     shape="iapermutV2V0AasortedV2IapermutV2aprefixV1V0AasortedV2FAainfix &lt;=V1alengthV0Aainfix &lt;=c2V1apermutV0V0AasortedV0ainfix &lt;V1c2LalengthV0F">
@@ -3784,9 +3550,9 @@
      <goal
       name="WP_parameter mergesort.1"
       locfile="../mergesort_list.mlw"
-      loclnum="182" loccnumb="6" loccnume="15"
+      loclnum="197" loccnumb="6" loccnume="15"
       expl="1. postcondition"
-      sum="7e42f82a71b87d54b00f5d0052a7c014"
+      sum="0ea1d9dd18b5c9edcad1fc1ff229b9bc"
       proved="true"
       expanded="false"
       shape="postconditionapermutV0V0AasortedV0Iainfix &lt;V1c2LalengthV0F">
@@ -3799,9 +3565,9 @@
        <goal
         name="WP_parameter mergesort.1.1"
         locfile="../mergesort_list.mlw"
-        loclnum="182" loccnumb="6" loccnume="15"
+        loclnum="197" loccnumb="6" loccnume="15"
         expl="1."
-        sum="7c4256c92f934538050691dbedafd1c8"
+        sum="795ffb9fbad123e0c413b627b470c663"
         proved="true"
         expanded="false"
         shape="asortedV0Iainfix &lt;V1c2LalengthV0F">
@@ -3814,9 +3580,9 @@
          <goal
           name="WP_parameter mergesort.1.1.1"
           locfile="../mergesort_list.mlw"
-          loclnum="182" loccnumb="6" loccnume="15"
+          loclnum="197" loccnumb="6" loccnume="15"
           expl="1."
-          sum="b50e54027912a9302532c6cad674a70d"
+          sum="092afb6af0a0eac2a50a39a8adacf3c9"
           proved="true"
           expanded="false"
           shape="CasortedV0Iainfix &lt;V1c2LalengthV0aNilasortedV0Iainfix &lt;V4c2LalengthV0IasortedV3Iainfix &lt;V5c2LalengthV3aConsVVV0F">
@@ -3836,9 +3602,9 @@
        <goal
         name="WP_parameter mergesort.1.2"
         locfile="../mergesort_list.mlw"
-        loclnum="182" loccnumb="6" loccnume="15"
+        loclnum="197" loccnumb="6" loccnume="15"
         expl="2."
-        sum="37bb8b57f868b7f24f0ca8cbf8b569fa"
+        sum="e4c3668a26fe4e41a19475f8e699a113"
         proved="true"
         expanded="false"
         shape="apermutV0V0Iainfix &lt;V1c2LalengthV0F">
@@ -3858,9 +3624,9 @@
      <goal
       name="WP_parameter mergesort.2"
       locfile="../mergesort_list.mlw"
-      loclnum="182" loccnumb="6" loccnume="15"
+      loclnum="197" loccnumb="6" loccnume="15"
       expl="2. precondition"
-      sum="81e938fec72ac69a35607b7ea98efaf3"
+      sum="23989354fb5ef8e8f429183065799917"
       proved="true"
       expanded="false"
       shape="preconditionainfix &lt;=V1alengthV0Aainfix &lt;=c2V1INainfix &lt;V1c2LalengthV0F">
@@ -3878,9 +3644,9 @@
      <goal
       name="WP_parameter mergesort.3"
       locfile="../mergesort_list.mlw"
-      loclnum="182" loccnumb="6" loccnume="15"
+      loclnum="197" loccnumb="6" loccnume="15"
       expl="3. postcondition"
-      sum="3c20acc14967b4d8d22c23c31bec378a"
+      sum="a6fb3e689a81120319c63b3f7e854c31"
       proved="true"
       expanded="false"
       shape="postconditionapermutV2V0AasortedV2IapermutV2aprefixV1V0AasortedV2FIainfix &lt;=V1alengthV0Aainfix &lt;=c2V1INainfix &lt;V1c2LalengthV0F">

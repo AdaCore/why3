@@ -316,8 +316,8 @@ theory Sorted
 
   lemma sorted_append:
     forall l1 l2: list t.
-    sorted l1 -> sorted l2 ->
-    (forall x y: t. mem x l1 -> mem y l2 -> le x y) ->
+    (sorted l1 /\ sorted l2 /\ (forall x y: t. mem x l1 -> mem y l2 -> le x y))
+    <->
     sorted (l1 ++ l2)
 
 end
