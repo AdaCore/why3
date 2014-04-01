@@ -59,13 +59,13 @@ let set_report s =
 let set_warning_mode s =
    if s = "off" then
       opt_warning_mode := Suppress
-   else if s = "on" then
+   else if s = "on" || s = "continue" then
       opt_warning_mode := Warn_Normal
    else if s = "error" then
       opt_warning_mode := Treat_As_Error
    else
       Gnat_util.abort_with_message
-        "argument for option --warnings should be one of (on|off|error)."
+        "argument for option --warnings should be one of (continue|off|error)."
 
 let set_proof_mode s =
    if s = "no_wp" then
@@ -144,7 +144,7 @@ let options = Arg.align [
           , default is then_split";
    "--warnings", Arg.String set_warning_mode,
           " Set warning mode, one of \
-            (on|off|error) \
+            (continue|off|error) \
           , default is error";
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given by \"file:line\"";
