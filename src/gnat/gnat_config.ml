@@ -59,7 +59,7 @@ let set_report s =
 let set_warning_mode s =
    if s = "off" then
       opt_warning_mode := Suppress
-   else if s = "on" || s = "continue" then
+   else if s = "continue" then
       opt_warning_mode := Warn_Normal
    else if s = "error" then
       opt_warning_mode := Treat_As_Error
@@ -277,5 +277,3 @@ let unit_name =
   if Strings.ends_with filename suffix then
     String.sub filename 0 (String.length filename - String.length suffix)
   else Filename.chop_extension filename
-
-
