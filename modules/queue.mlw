@@ -48,5 +48,10 @@ module Queue
   val length (q: t 'a) : int
     ensures { result = L.length q.elts }
 
+  val transfer (q1 q2: t 'a) : unit
+    writes  { q1, q2 }
+    ensures { q1.elts = Nil }
+    ensures { q2.elts = old q2.elts ++ old q1.elts }
+
 end
 

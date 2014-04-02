@@ -1,7 +1,8 @@
 
 open Why3__BigInt
 
-let rec fact n = if le n one then one else mul n (fact (pred n))
+let rec fact n =
+  if le n one then one else mul n (fact (pred n))
 
 let fib n =
   let n = to_int n in
@@ -21,3 +22,8 @@ let rec for_loop_downto x1 x2 body =
     for_loop_downto (pred x1) x2 body
   end
 
+let stack_length s =
+  of_int (Stack.length s)
+
+let queue_length s =
+  of_int (Queue.length s)
