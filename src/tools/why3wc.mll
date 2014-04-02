@@ -213,7 +213,7 @@ and scan_annotation = parse
 
 and string n = parse
   | '"'  { n }
-  | '\\' ('\\' | 'n' | '"') { string n lexbuf }
+  | '\\' ('\\' | '"') { string n lexbuf }
   | '\n' { string (n + 1) lexbuf }
   | _    { string n lexbuf }
   | eof  { n }
@@ -231,7 +231,7 @@ and comment n = parse
   | eof   { n }
 
 (** [read_header] is used to skip the possible header at
-    the beggining of files (unless option -a is specified).
+    the beginning of files (unless option -a is specified).
     It stops whenever it encounters an empty line or any character outside
     a comment. In this last case, it correctly resets the lexer position
     on that character (decreasing [lex_curr_pos] by 1). *)
