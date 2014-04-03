@@ -1,0 +1,135 @@
+
+(* sorted list, with respect to a key and an ordering parameter. *)
+
+theory Base
+  
+  use import list.List
+  use import list.Mem
+  
+  clone import key_type.KeyType as K
+  clone import relations_params.TransitiveParam as O with type t = key
+  
+  predicate minorate (o:param 'a) (x:key 'a) (l:list (t 'a 'b)) =
+    (forall y. mem y l -> let ky = key y in
+      correct_for o ky /\ rel o x ky)
+  
+  predicate majorate (o:param 'a) (x:key 'a) (l:list (t 'a 'b)) =
+    (forall y. mem y l -> let ky = key y in
+      correct_for o ky /\ rel o ky x)
+  
+  predicate precede (o:param 'a) (l1 l2:list (t 'a 'b)) =
+    (forall x y. mem x l1 /\ mem y l2 -> let kx = key x in
+      let ky = key y in
+      correct_for o kx /\ correct_for o ky /\ rel o kx ky)
+  
+  lemma minorate_by_smaller : forall o:param 'a,kdown kup:key 'a,
+    l:list (t 'a 'b).
+    correct_for o kdown /\ correct_for o kup /\
+    minorate o kup l /\ rel o kdown kup -> minorate o kdown l
+  
+  lemma majorate_by_bigger : forall p:param 'a,kdown kup:key 'a,
+    l:list (t 'a 'b).
+    correct_for p kdown /\ correct_for p kup /\
+    majorate p kdown l /\ rel p kdown kup -> majorate p kup l
+  
+end
+
+module Increasing
+  
+  clone export Base
+  use import list.List
+  use import list.Append
+  use import list.Mem
+  
+  predicate increasing (o:O.param 'a) (l:list (K.t 'a 'b)) =
+    match l with
+    | Nil -> true
+    | Cons x q -> let kx = K.key x in
+      O.correct_for o kx /\ minorate o kx q /\ increasing o q
+    end
+  
+  let rec lemma increasing_precede (o:O.param 'a) (l r:list (K.t 'a 'b))
+    ensures { increasing o l /\ increasing o r /\ precede o l r <->
+      increasing o (l++r) }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons x q -> let kx = K.key x in
+      assert { increasing o (l++r) <-> increasing o (q++r) /\
+        minorate o kx (q++r) /\ O.correct_for o kx };
+      increasing_precede o q r
+    end
+  
+  let lemma increasing_midpoint (o:O.param 'a) (l:list (K.t 'a 'b))
+    (x:K.t 'a 'b) (r:list (K.t 'a 'b)) : unit
+    ensures { let kx = K.key x in
+      increasing o l /\ increasing o r /\ O.correct_for o kx /\
+      minorate o kx r /\ majorate o kx l <-> increasing o (l++Cons x r) }
+  = ()
+  
+  let lemma increasing_snoc (o:O.param 'a) (l:list (K.t 'a 'b))
+    (x:K.t 'a 'b) : unit
+    ensures { let kx = K.key x in
+      increasing o (l++Cons x Nil) <-> increasing o l /\ majorate o kx l /\
+        O.correct_for o kx }
+  = ()
+  
+end
+
+module Decreasing
+  
+  clone export Base
+  use import list.List
+  use import list.Append
+  use import list.Mem
+  
+  predicate decreasing (o:O.param 'a) (l:list (K.t 'a 'b)) =
+    match l with
+    | Nil -> true
+    | Cons x q -> let kx = K.key x in
+      O.correct_for o kx /\ majorate o kx q /\ decreasing o q
+    end
+  
+  let rec lemma decreasing_precede (o:O.param 'a) (l r:list (K.t 'a 'b))
+    ensures { decreasing o l /\ decreasing o r /\ precede o r l <->
+      decreasing o (l++r) }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons x q -> let kx = K.key x in
+      assert { decreasing o (l++r) <-> decreasing o (q++r) /\
+        majorate o kx (q++r) /\ O.correct_for o kx };
+      decreasing_precede o q r
+    end
+  
+  let lemma decreasing_midpoint (o:O.param 'a) (l:list (K.t 'a 'b))
+    (x:K.t 'a 'b) (r:list (K.t 'a 'b)) : unit
+    ensures { let kx = K.key x in
+      decreasing o l /\ decreasing o r /\ O.correct_for o kx /\
+      majorate o kx r /\ minorate o kx l <-> decreasing o (l++Cons x r) }
+  = ()
+  
+  let lemma decreasing_snoc (o:O.param 'a) (l:list (K.t 'a 'b))
+    (x:K.t 'a 'b) : unit
+    ensures { let kx = K.key x in
+      decreasing o (l++Cons x Nil) <-> decreasing o l /\ minorate o kx l /\
+        O.correct_for o kx }
+  = ()
+  
+end
+
+(* This cannot be done nicely now (namely, this is a diamond). *)
+module IncDec
+  
+  use import list.Reverse
+  
+  clone export Increasing
+  clone Decreasing as D with namespace K = K, namespace O = O
+  
+  let rec lemma increasing_decreasing (o:O.param 'a) (l:list (K.t 'a 'b)) : unit
+    ensures { increasing o l <-> D.decreasing o (reverse l) }
+    variant { l }
+  = match l with Nil -> () | Cons _ q -> increasing_decreasing o q end
+  
+end
+

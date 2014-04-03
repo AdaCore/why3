@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <file
+  name="../sorted.mlw"
+  verified="true"
+  expanded="false">
+  <theory
+   name="Base"
+   locfile="../sorted.mlw"
+   loclnum="4" loccnumb="7" loccnume="11"
+   verified="true"
+   expanded="false">
+   <goal
+    name="minorate_by_smaller"
+    locfile="../sorted.mlw"
+    loclnum="25" loccnumb="8" loccnume="27"
+    sum="46f2bb6f60e9d2216709b0bbe2de8a87"
+    proved="true"
+    expanded="false"
+    shape="aminorateV0V1V3IarelV0V1V2AaminorateV0V2V3Aacorrect_forV0V2Aacorrect_forV0V1F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="majorate_by_bigger"
+    locfile="../sorted.mlw"
+    loclnum="30" loccnumb="8" loccnume="26"
+    sum="cb4eb5125229924815be74cec1415a32"
+    proved="true"
+    expanded="false"
+    shape="amajorateV0V2V3IarelV0V1V2AamajorateV0V1V3Aacorrect_forV0V2Aacorrect_forV0V1F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="Increasing"
+   locfile="../sorted.mlw"
+   loclnum="37" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter increasing_precede"
+    locfile="../sorted.mlw"
+    loclnum="51" loccnumb="16" loccnume="34"
+    expl="VC for increasing_precede"
+    sum="df7dd9f603e675967a50a2695a18707a"
+    proved="true"
+    expanded="false"
+    shape="CaincreasingV0ainfix ++V1V2qaprecedeV0V1V2AaincreasingV0V2AaincreasingV0V1aNilaincreasingV0ainfix ++V1V2qaprecedeV0V1V2AaincreasingV0V2AaincreasingV0V1IaincreasingV0ainfix ++V4V2qaprecedeV0V4V2AaincreasingV0V2AaincreasingV0V4ACfaNilainfix =V6V4aConswVV1Aacorrect_forV0V5AaminorateV0V5ainfix ++V4V2AaincreasingV0ainfix ++V4V2qaincreasingV0ainfix ++V1V2LakeyV3aConsVVV1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for increasing_precede"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter increasing_precede.1"
+      locfile="../sorted.mlw"
+      loclnum="51" loccnumb="16" loccnume="34"
+      expl="1. postcondition"
+      sum="f02c900c932d4d04a2f9b352dc8b57ce"
+      proved="true"
+      expanded="false"
+      shape="postconditionCaincreasingV0ainfix ++V1V2qaprecedeV0V1V2AaincreasingV0V2AaincreasingV0V1aNiltaConsVVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter increasing_precede.2"
+      locfile="../sorted.mlw"
+      loclnum="51" loccnumb="16" loccnume="34"
+      expl="2. assertion"
+      sum="c41939ca16d9cff6ff5460e6ddff4083"
+      proved="true"
+      expanded="false"
+      shape="assertionCtaNilacorrect_forV0V5AaminorateV0V5ainfix ++V4V2AaincreasingV0ainfix ++V4V2qaincreasingV0ainfix ++V1V2LakeyV3aConsVVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter increasing_precede.3"
+      locfile="../sorted.mlw"
+      loclnum="51" loccnumb="16" loccnume="34"
+      expl="3. variant decrease"
+      sum="1dd8981db0bad56f6dad861e8ade6da2"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNilCfaNilainfix =V6V4aConswVV1Iacorrect_forV0V5AaminorateV0V5ainfix ++V4V2AaincreasingV0ainfix ++V4V2qaincreasingV0ainfix ++V1V2LakeyV3aConsVVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter increasing_precede.4"
+      locfile="../sorted.mlw"
+      loclnum="51" loccnumb="16" loccnume="34"
+      expl="4. postcondition"
+      sum="14d6a42344779aab075956974e962c22"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNilaincreasingV0ainfix ++V1V2qaprecedeV0V1V2AaincreasingV0V2AaincreasingV0V1IaincreasingV0ainfix ++V4V2qaprecedeV0V4V2AaincreasingV0V2AaincreasingV0V4Iacorrect_forV0V5AaminorateV0V5ainfix ++V4V2AaincreasingV0ainfix ++V4V2qaincreasingV0ainfix ++V1V2LakeyV3aConsVVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.34"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter increasing_midpoint"
+    locfile="../sorted.mlw"
+    loclnum="63" loccnumb="12" loccnume="31"
+    expl="VC for increasing_midpoint"
+    sum="402a7b2bc6665fdd92031747108d9965"
+    proved="true"
+    expanded="false"
+    shape="aincreasingV0ainfix ++V1aConsV2V3qamajorateV0V4V1AaminorateV0V4V3Aacorrect_forV0V4AaincreasingV0V3AaincreasingV0V1LakeyV2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for increasing_midpoint"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.41"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter increasing_snoc"
+    locfile="../sorted.mlw"
+    loclnum="70" loccnumb="12" loccnume="27"
+    expl="VC for increasing_snoc"
+    sum="ef7641a974c55b8a0d412e8e4ed44349"
+    proved="true"
+    expanded="false"
+    shape="acorrect_forV0V3AamajorateV0V3V1AaincreasingV0V1qaincreasingV0ainfix ++V1aConsV2aNilLakeyV2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for increasing_snoc"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="Decreasing"
+   locfile="../sorted.mlw"
+   loclnum="79" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter decreasing_precede"
+    locfile="../sorted.mlw"
+    loclnum="93" loccnumb="16" loccnume="34"
+    expl="VC for decreasing_precede"
+    sum="f709b05599b8a8b9f2ef25eea5a73f15"
+    proved="true"
+    expanded="false"
+    shape="CadecreasingV0ainfix ++V1V2qaprecedeV0V2V1AadecreasingV0V2AadecreasingV0V1aNiladecreasingV0ainfix ++V1V2qaprecedeV0V2V1AadecreasingV0V2AadecreasingV0V1IadecreasingV0ainfix ++V4V2qaprecedeV0V2V4AadecreasingV0V2AadecreasingV0V4ACfaNilainfix =V6V4aConswVV1Aacorrect_forV0V5AamajorateV0V5ainfix ++V4V2AadecreasingV0ainfix ++V4V2qadecreasingV0ainfix ++V1V2LakeyV3aConsVVV1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for decreasing_precede"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter decreasing_precede.1"
+      locfile="../sorted.mlw"
+      loclnum="93" loccnumb="16" loccnume="34"
+      expl="1. postcondition"
+      sum="9f1d4ce48f269a9d918f1fac85f9757e"
+      proved="true"
+      expanded="false"
+      shape="postconditionCadecreasingV0ainfix ++V1V2qaprecedeV0V2V1AadecreasingV0V2AadecreasingV0V1aNiltaConsVVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for decreasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter decreasing_precede.2"
+      locfile="../sorted.mlw"
+      loclnum="93" loccnumb="16" loccnume="34"
+      expl="2. assertion"
+      sum="e61d9ccf0d1e2da6c8ad418ddac25b5e"
+      proved="true"
+      expanded="false"
+      shape="assertionCtaNilacorrect_forV0V5AamajorateV0V5ainfix ++V4V2AadecreasingV0ainfix ++V4V2qadecreasingV0ainfix ++V1V2LakeyV3aConsVVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for decreasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter decreasing_precede.3"
+      locfile="../sorted.mlw"
+      loclnum="93" loccnumb="16" loccnume="34"
+      expl="3. variant decrease"
+      sum="ef83c95486b3009078c65658e3ca9806"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNilCfaNilainfix =V6V4aConswVV1Iacorrect_forV0V5AamajorateV0V5ainfix ++V4V2AadecreasingV0ainfix ++V4V2qadecreasingV0ainfix ++V1V2LakeyV3aConsVVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for decreasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter decreasing_precede.4"
+      locfile="../sorted.mlw"
+      loclnum="93" loccnumb="16" loccnume="34"
+      expl="4. postcondition"
+      sum="df39b18e0f64bc2bea2b9b5df63f1955"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNiladecreasingV0ainfix ++V1V2qaprecedeV0V2V1AadecreasingV0V2AadecreasingV0V1IadecreasingV0ainfix ++V4V2qaprecedeV0V2V4AadecreasingV0V2AadecreasingV0V4Iacorrect_forV0V5AamajorateV0V5ainfix ++V4V2AadecreasingV0ainfix ++V4V2qadecreasingV0ainfix ++V1V2LakeyV3aConsVVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for decreasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.07"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter decreasing_midpoint"
+    locfile="../sorted.mlw"
+    loclnum="105" loccnumb="12" loccnume="31"
+    expl="VC for decreasing_midpoint"
+    sum="4dec2a5a0ce56349a9012c8ba3103f7f"
+    proved="true"
+    expanded="false"
+    shape="adecreasingV0ainfix ++V1aConsV2V3qaminorateV0V4V1AamajorateV0V4V3Aacorrect_forV0V4AadecreasingV0V3AadecreasingV0V1LakeyV2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for decreasing_midpoint"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.50"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter decreasing_snoc"
+    locfile="../sorted.mlw"
+    loclnum="112" loccnumb="12" loccnume="27"
+    expl="VC for decreasing_snoc"
+    sum="e3e7b8e99e5171be4b06111c594dd17c"
+    proved="true"
+    expanded="false"
+    shape="acorrect_forV0V3AaminorateV0V3V1AadecreasingV0V1qadecreasingV0ainfix ++V1aConsV2aNilLakeyV2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for decreasing_snoc"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="IncDec"
+   locfile="../sorted.mlw"
+   loclnum="122" loccnumb="7" loccnume="13"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter increasing_decreasing"
+    locfile="../sorted.mlw"
+    loclnum="129" loccnumb="16" loccnume="37"
+    expl="VC for increasing_decreasing"
+    sum="fc5517c45b6edbc81fdff121cfd08208"
+    proved="true"
+    expanded="false"
+    shape="CadecreasingV0areverseV1qaincreasingV0V1aNiladecreasingV0areverseV1qaincreasingV0V1IadecreasingV0areverseV2qaincreasingV0V2ACfaNilainfix =V3V2aConswVV1aConswVV1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for increasing_decreasing"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.34"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>
