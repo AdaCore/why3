@@ -186,6 +186,25 @@ type context =
   | Left context term environment
   | Right value context
 
+function recompose (c:context) (t:term) (e:environment) : term =
+  match c with
+  | Empty -> t
+  | Left c t1 e1 -> App (recompose c t e) t1
+  | Right (Closure x t1 e1) c -> App (Lambda x t1) (recompose c t e)
+  end
+
+(*
+let rec lemma recompose_values (c:context) (t1 t2:expr) (e:environment) : unit
+  requires { eval_0 e1 = eval_0 e2 }
+  variant  { c }
+  ensures  { eval_0 (recompose c e1) = eval_0 (recompose c e2) }
+= match c with
+  | Empty -> ()
+  | Left c e -> recompose_values c (Sub e1 e) (Sub e2 e)
+  | Right n c -> recompose_values c (Sub (Cte n) e1) (Sub (Cte n) e2)
+  end
+*)
+
 (** The CEK abstract machine :
 {h <blockquote><pre>
     (x, e, C)_eval -> (C, v)_cont
@@ -201,6 +220,8 @@ type context =
 
 let rec eval (t:term) (e:environment) (c:context) : value 
   diverges
+  returns { Closure x t1 e1 -> 
+    weak_normalize (recompose c t e) (Lambda x t1) }
 = match t with
   | Var x -> cont c (lookup x e)
   | Lambda x t -> cont c (Closure x t e)
@@ -223,11 +244,9 @@ let compute p : value
     e = Nil /\ weak_normalize p (Lambda x t) }
 = eval p Nil Empty
 
-let t0 () = compute p0
-
-let t1 () = compute p1
-
-let t2 () = compute p2
+let test () 
+  diverges 
+= (compute p0,compute p1,compute p2)
 
 
 end
