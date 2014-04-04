@@ -105,6 +105,7 @@ type clone_subst =
   | CStsym  of loc * qualid * ident list * pty
   | CSfsym  of loc * qualid * qualid
   | CSpsym  of loc * qualid * qualid
+  | CSvsym  of loc * qualid * qualid
   | CSlemma of loc * qualid
   | CSgoal  of loc * qualid
 

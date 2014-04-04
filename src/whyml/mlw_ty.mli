@@ -302,6 +302,9 @@ exception UnboundException of xsymbol
 
 val vty_arrow : pvsymbol list -> ?spec:spec -> vty -> aty
 
+val aty_pvset : aty -> Spv.t
+(** raises [Not_found] if the spec contains non-pv variables *)
+
 val aty_vars_match : ity_subst -> aty -> ity list -> ity -> ity_subst
 (** this only compares the types of arguments and results, and ignores
     the spec. In other words, only the type variables and regions in

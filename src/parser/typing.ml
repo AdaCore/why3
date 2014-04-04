@@ -790,6 +790,9 @@ let type_inst th t s =
       if Mls.mem ls1 s.inst_ls
       then Loc.error ~loc (ClashSymbol ls1.ls_name.id_string);
       { s with inst_ls = Mls.add ls1 ls2 s.inst_ls }
+    | CSvsym (loc,_,_) ->
+      Loc.errorm ~loc "program symbol instantiation \
+        is not supported in pure theories"
     | CSlemma (loc,p) ->
       let pr = find_prop_ns t.th_export p in
       if Spr.mem pr s.inst_lemma || Spr.mem pr s.inst_goal
