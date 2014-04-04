@@ -14,8 +14,8 @@ filename "%f-%t-%g.smt2"
 valid "^unsat"
 unknown "^\\(unknown\\|sat\\|Fail\\)" ""
 outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
+timeout "interrupted by timeout"
 time "why3cpulimit time : %s s"
-
 
 (* À discuter *)
 transformation "inline_trivial"
