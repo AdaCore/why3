@@ -521,6 +521,9 @@ let cl_find_ls cl ls =
     let id  = id_clone ls.ls_name in
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
     let vt' = Opt.map (cl_trans_ty cl) ls.ls_value in
+    let stv = Opt.fold ty_freevars Stv.empty vt' in
+    let stv = List.fold_left ty_freevars stv ta' in
+    let opaque = Stv.diff opaque stv in
     let ls' = create_lsymbol ~opaque ~constr id ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'
