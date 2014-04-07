@@ -179,20 +179,20 @@ let read_label s =
              Some (Gp_Pretty_Ada msg)
        | "GP_Sloc" :: rest ->
            begin try Some (Gp_Sloc (Gnat_loc.parse_loc rest))
-           with Failure "int_of_string" ->
+           with Failure _ ->
               Format.printf "GP_Sloc: cannot parse string: %s" s;
               Gnat_util.abort_with_message ""
            end
        | "GP_Sloc_VC" :: rest ->
            begin try Some (Gp_Sloc_VC (Gnat_loc.parse_loc rest))
-           with Failure "int_of_string" ->
+           with Failure _ ->
               Format.printf "GP_Sloc_VC: cannot parse string: %s" s;
               Gnat_util.abort_with_message ""
            end
        | ["GP_Subp" ; file ; line ] ->
            begin try
              Some (Gp_Subp (Gnat_loc.mk_loc_line file (int_of_string line)))
-           with Failure "int_of_string" ->
+           with Failure _ ->
               Format.printf "GP_Subp: cannot parse string: %s" s;
               Gnat_util.abort_with_message ""
            end

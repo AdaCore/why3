@@ -1,3 +1,4 @@
+type context
 type simple_loc
 
 type loc = simple_loc list
@@ -9,9 +10,9 @@ val get_line : simple_loc -> int
 val get_col : simple_loc -> int
 val explode : simple_loc -> string * int * int
 
-val mk_loc : string -> int -> int -> loc
+val mk_loc : string -> int -> int -> context option -> loc
 (* construct a location that consists of a single simple location with given
-   file, line and column *)
+   file, line and column, and an optional context *)
 val mk_loc_line : string -> int -> loc
 (* construct a location that consists of a single simple location with given
    file and line, column is set to 0 *)

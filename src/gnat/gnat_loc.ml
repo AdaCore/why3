@@ -1,13 +1,30 @@
 open Why3
-type simple_loc  = { file : string; line : int ; col : int }
+
+type context = Inlined | Instantiated
+
+let context_of_string = function
+    "inlined" -> Inlined
+  | "instantiated" -> Instantiated
+  | _ -> failwith "context_of_string"
+
+(* This wording for messages related to instantiations and inlined calls is the
+   same for flow and proof messages. If you change it here, also change it in
+   flow_error_messages.adb *)
+let print_context fmt = function
+    None -> ()
+  | Some Inlined -> Format.fprintf fmt ", in call inlined at "
+  | Some Instantiated -> Format.fprintf fmt ", in instantiation at "
+
+type simple_loc  =
+   { file : string; line : int; col : int; ctxt : context option }
 type loc = simple_loc list
 
-let mk_simple_loc fn l c =
-   { file = fn; line = l; col = c }
-let mk_loc fn l c =
-   [mk_simple_loc fn l c]
+let mk_simple_loc fn l c ctx =
+   { file = fn; line = l; col = c; ctxt = ctx }
+let mk_loc fn l c ctx =
+   [mk_simple_loc fn l c ctx]
 
-let mk_loc_line fn l = mk_loc fn l 0
+let mk_loc_line fn l = mk_loc fn l 0 None
 
 let equal_line l1 l2 =
    let l1 = List.hd l1 and l2 = List.hd l2 in
@@ -32,22 +49,30 @@ let simple_print_loc fmt l =
    Format.fprintf fmt "%s:%d:%d" l.file l.line l.col
 
 let print_line_loc fmt l =
-   Format.fprintf fmt "%s:%d" l.file l.line
+   Format.fprintf fmt "%a%s:%d" print_context l.ctxt l.file l.line
 
 let print_loc _ _ =
    assert false
 
 let parse_loc =
-   let rec parse_loc_list acc l =
+   let rec parse_loc_list acc ~first l =
       match l with
-      | file::line::col::rest ->
+      | file::line::col::rest when first ->
             let new_loc =
-               mk_simple_loc file (int_of_string line) (int_of_string col) in
-            parse_loc_list (new_loc :: acc) rest
+               mk_simple_loc file (int_of_string line) (int_of_string col)
+                 None
+            in
+            parse_loc_list (new_loc :: acc) ~first:false rest
+      | ctx::file::line::col::rest when not first ->
+            let new_loc =
+               mk_simple_loc file (int_of_string line) (int_of_string col)
+                 (Some (context_of_string ctx))
+            in
+            parse_loc_list (new_loc :: acc) ~first:false rest
       | [] -> acc
       | _ -> Gnat_util.abort_with_message "location list malformed."
    in
-   fun l -> List.rev (parse_loc_list [] l)
+   fun l -> List.rev (parse_loc_list [] ~first:true l)
 
 let get_file l = l.file
 let get_line l = l.line

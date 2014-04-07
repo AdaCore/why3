@@ -116,10 +116,7 @@ let print_with_sloc fmt m =
   | _ :: secondaries ->
       let sloc = improve_sloc m in
       Format.fprintf fmt "%a: %a" Gnat_loc.simple_print_loc sloc print_msg m;
-      List.iter
-         (fun secondary_sloc ->
-           Format.fprintf fmt ", in instantiation at %a"
-              Gnat_loc.print_line_loc secondary_sloc) secondaries
+      List.iter (Gnat_loc.print_line_loc fmt) secondaries
 
 let print_json_entity fmt e =
   let sl = List.hd e.Gnat_expl.subp_loc in
