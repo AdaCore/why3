@@ -1,0 +1,30 @@
+
+(* Type with a key. Intended to factor elements/bindings representations
+   in sets/map-like structures.
+   Typical instantiation:
+     - Set elements, t 'a 'b = key 'a, get_key = id:
+       the only information one can retrieve
+       from a key is presence.
+     - Map bindings, t 'a 'b = (key 'a,value 'b),get_key = fst:
+       one can also retrieve a value from a present binding. *)
+theory KeyType
+  
+  type t 'a 'b
+  type key 'a
+  function key (t 'a 'b) : key 'a
+  
+end
+
+(* program version. *)
+module ProgramKeyType
+  
+  clone export program_type.Type2
+  clone program_type.Type1 as Key
+  function key_m (m 'a 'b) : Key.m 'a
+  val key (x:t 'a 'b) : Key.t 'a
+    requires { c x }
+    ensures { Key.c result }
+    ensures { x.m.key_m = result.Key.m }
+  
+end
+
