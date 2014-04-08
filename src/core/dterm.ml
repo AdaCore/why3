@@ -408,7 +408,8 @@ let check_used_var t vs =
   if t_v_occurs vs t = 0 then
   let s = vs.vs_name.id_string in
   if not (String.length s > 0 && s.[0] = '_') then
-  Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s
+  (*Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s*)
+    ()
 
 let check_exists_implies q f = match q, f.t_node with
   | Texists, Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
