@@ -1,4 +1,5 @@
 open Why3
+open Gnat_expl
 
 type key = int
 (* The key type, with which we identify nodes in the Why3 VC tree *)
@@ -148,7 +149,11 @@ let find e =
 let add_to_objective ex go =
    let filter =
       match Gnat_config.limit_line with
-      | Some l -> Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
+      | Some (Gnat_config.Limit_Line l) ->
+         Gnat_loc.equal_line l (get_loc ex)
+      | Some (Gnat_config.Limit_Check c) ->
+         (Gnat_loc.equal_line c.loc (get_loc ex))
+         && (c.reason = get_reason ex)
       | None -> true
    in
    if filter then begin
@@ -475,7 +480,7 @@ let init () =
       env_session, is_new_session in
    my_session := Some env_session;
    if is_new_session || not (has_file env_session) then begin
-      ignore 
+      ignore
         (Session.add_file
           ~keygen:Gnat_sched.Keygen.keygen
           env_session

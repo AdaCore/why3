@@ -48,6 +48,13 @@ type warning_mode =
    exist, 0 otherwise.  Mode Suppress is ignored by gnatwhy3 (behaves like mode
    Warn_Normal). Default is Treat_As_Error. *)
 
+type limit_mode =
+  | Limit_Check of Gnat_expl.check
+  | Limit_Line of Gnat_loc.loc
+(* This type is used only to differenciate the two different uses of
+   --limit-line: - --limit-line=file:line -> Limit_Line
+                 - --limit-line=file:line:checkkind -> Limit_Check *)
+
 val report : report_mode
 (* reflects value of option --report, default "Fail" *)
 
@@ -70,7 +77,7 @@ val filename : string
 val unit_name : string
 (* the name of the Ada unit to which the input file corresponds *)
 
-val limit_line : Gnat_loc.loc option
+val limit_line : limit_mode option
 (* set if option --limit-line was given; we only prove VCs from that line *)
 
 val limit_subp : Ident.label option

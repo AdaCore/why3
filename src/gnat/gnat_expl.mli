@@ -68,6 +68,10 @@ val print_skipped : Format.formatter -> expl -> unit
 val to_filename : ?goal:'a Session.goal -> expl -> string
 (* print a representation of an explanation that could serve as a filename *)
 
+val mk_check : reason -> loc -> check
+
+val check_equal : check -> check -> bool
+
 val mk_expl : reason -> loc -> subp_entity -> expl
 (* [mk_expl reason l1 se]
      reason - the kind of check for this VC

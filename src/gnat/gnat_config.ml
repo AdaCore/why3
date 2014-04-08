@@ -19,6 +19,10 @@ type warning_mode =
   | Warn_Normal
   | Treat_As_Error
 
+type limit_mode =
+  | Limit_Check of Gnat_expl.check
+  | Limit_Line of Gnat_loc.loc
+
 let gnatprove_why3conf_file = "why3.conf"
 
 let default_timeout = 1
@@ -36,7 +40,7 @@ let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
 let opt_warning_mode = ref Treat_As_Error
 
-let opt_limit_line : Gnat_loc.loc option ref = ref None
+let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_subp : string option ref = ref None
 let opt_socket_name : string ref = ref ""
 
@@ -98,12 +102,21 @@ let set_socket_name s =
 
 let parse_line_spec caller s =
    try
-      let index = String.rindex s ':' in
+      let index = String.index s ':' in
       let fn = String.sub s 0 index in
-      let line =
-         int_of_string (String.sub s (index + 1) (String.length s - index - 1))
+      let (index2, is_check) =
+        let tmp = String.rindex s ':' in
+        if tmp = index then (String.length s, false) else (tmp, true) in
+      let line = int_of_string (String.sub s (index + 1)
+                                           (index2 - index - 1))
       in
-      Gnat_loc.mk_loc_line fn line
+      if not is_check then
+        Limit_Line (Gnat_loc.mk_loc_line fn line)
+      else
+        let check = Gnat_expl.reason_from_string
+                      (String.sub s (index2 + 1)
+                                  (String.length s - index2 - 1)) in
+        Limit_Check (Gnat_expl.mk_check check (Gnat_loc.mk_loc_line fn line))
    with
    | Not_found ->
       Gnat_util.abort_with_message
@@ -151,7 +164,8 @@ let options = Arg.align [
             (continue|off|error) \
           , default is error";
    "--limit-line", Arg.String set_limit_line,
-          " Limit proof to a file and line, given by \"file:line\"";
+          " Limit proof to a file and line, given \
+           by \"file:line[:checkkind]\"";
    "--limit-subp", Arg.String set_limit_subp,
           " Limit proof to a subprogram defined by \"file:line\"";
    "--prover", Arg.String set_prover,
