@@ -106,11 +106,7 @@ let parse_line_spec caller s =
      let fn = List.hd args in
      let line = int_of_string (List.nth args 1) in
      match List.length args with
-     | 0 | 1 -> raise (Failure "bad arity")
      | 2 -> Limit_Line (Gnat_loc.mk_loc_line fn line)
-     | 3 -> let check = Gnat_expl.reason_from_string (List.nth args 2) in
-            Limit_Check (Gnat_expl.mk_check check
-                                            (Gnat_loc.mk_loc_line fn line))
      | 4 -> let col = int_of_string (List.nth args 2) in
             let check = Gnat_expl.reason_from_string (List.nth args 3) in
             Limit_Check (Gnat_expl.mk_check check
@@ -128,7 +124,7 @@ let parse_line_spec caller s =
       Gnat_util.abort_with_message
       (caller ^
         ": incorrect line specification - invalid parameter number, must be \
-         2, 3 or 4")
+         2 or 4")
 
 let set_limit_line s = opt_limit_line := Some (parse_line_spec "limit-line" s)
 let set_limit_subp s = opt_limit_subp := Some s
@@ -169,7 +165,7 @@ let options = Arg.align [
           , default is error";
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given \
-           by \"file:line[[:column]:checkkind]\"";
+           by \"file:line[:column:checkkind]\"";
    "--limit-subp", Arg.String set_limit_subp,
           " Limit proof to a subprogram defined by \"file:line\"";
    "--prover", Arg.String set_prover,

@@ -153,9 +153,7 @@ let add_to_objective ex go =
          Gnat_loc.equal_line l (get_loc ex)
       | Some (Gnat_config.Limit_Check c) ->
          (c.reason = get_reason ex)
-         && (match Gnat_loc.get_col (Gnat_loc.orig_loc c.loc) with
-         | 0 -> Gnat_loc.equal_line c.loc (get_loc ex)
-         | _ -> Gnat_loc.equal_orig_loc c.loc (get_loc ex))
+         && (Gnat_loc.equal_orig_loc c.loc (get_loc ex))
       | None -> true
    in
    if filter then begin
