@@ -263,6 +263,7 @@ void run_request (prequest r) {
       return;
    }
    ghJob = CreateJobObject(NULL,NULL);
+   // ??? check return value of CreateJobObject
    ZeroMemory(&si, sizeof(si));
    si.cb = sizeof(si);
    ZeroMemory(&pi, sizeof(pi));
@@ -291,6 +292,7 @@ void run_request (prequest r) {
    strcat(cmd, r->cmd);
    strcat(cmd, "\"");
    strcat(cmd, " ");
+   // ??? fix escaping of command line, see N409-041
    for (i = 0; i < r->numargs; i++) {
      strcat(cmd, "\"");
      strcat(cmd, r->args[i]);
@@ -328,7 +330,7 @@ void run_request (prequest r) {
                      NULL,
                      NULL,
                      TRUE,
-                     CREATE_SUSPENDED,
+                     CREATE_SUSPENDED | CREATE_BREAKAWAY_FROM_JOB,
                      NULL,
                      NULL,
                      &si,
