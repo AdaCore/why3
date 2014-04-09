@@ -30,6 +30,10 @@ let equal_line l1 l2 =
    let l1 = List.hd l1 and l2 = List.hd l2 in
    l1.line = l2.line && l1.file = l2.file
 
+let equal_orig_loc l1 l2 =
+  let l1 = List.hd l1 and l2 = List.hd l2 in
+  l1.file = l2.file && l1.line = l2.line && l1.col = l2.col
+
 let compare_simple = Pervasives.compare
 
 let rec compare_loc a b =
