@@ -458,7 +458,7 @@ let clone_export uc m minst inst =
   let psh = Hid.create 3 in
   let conv_xs xs = try match Hid.find psh xs.xs_name with
     | XS xs -> xs | _ -> assert false with Not_found -> xs in
-  let conv_eff eff =
+  let conv_eff mv eff =
     let e = eff_empty in
     let conv ghost r e = eff_write ~ghost e (conv_reg r) in
     let e = Sreg.fold (conv false) eff.eff_writes e in
@@ -469,7 +469,10 @@ let clone_export uc m minst inst =
     let conv r u e = match u with
       | Some u -> eff_refresh e (conv_reg r) (conv_reg u)
       | None   -> eff_reset e (conv_reg r) in
-    Mreg.fold conv eff.eff_resets e in
+    let e = Mreg.fold conv eff.eff_resets e in
+    let tvs = Mvs.fold (fun _ vs s -> ty_freevars s vs.vs_ty) mv Stv.empty in
+    let tvs = Stv.inter tvs eff.eff_compar in
+    Stv.fold (fun tv e -> eff_compare e tv) tvs e in
   let conv_term mv t = t_gen_map (ty_s_map conv_ts) conv_ls mv t in
   let addx mv xs t q = Mexn.add (conv_xs xs) (conv_term mv t) q in
   let conv_vari mv (t,r) = conv_term mv t, Opt.map conv_ls r in
@@ -477,7 +480,7 @@ let clone_export uc m minst inst =
     c_pre     = conv_term mv c.c_pre;
     c_post    = conv_term mv c.c_post;
     c_xpost   = Mexn.fold (addx mv) c.c_xpost Mexn.empty;
-    c_effect  = conv_eff c.c_effect;
+    c_effect  = conv_eff mv c.c_effect;
     c_variant = List.map (conv_vari mv) c.c_variant;
     c_letrec  = 0; } in
   let rec conv_aty mv a =
