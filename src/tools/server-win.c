@@ -45,6 +45,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <tchar.h>
 #include <assert.h>
 #include "queue.h"
@@ -53,6 +54,7 @@
 #include "readbuf.h"
 #include "writebuf.h"
 #include "arraylist.h"
+#include "logging.h"
 
 #define READ_ONCE 1024
 #define BUFSIZE 4096
@@ -90,10 +92,10 @@ typedef struct {
    char* outfile;
 } t_proc, *pproc;
 
-pserver server_socket;
+pserver server_socket = NULL;
 int server_key = 0;
-plist clients;
-plist processes;
+plist clients = NULL;
+plist processes = NULL;
 char current_dir[MAX_PATH];
 
 int gen_key = 1;
@@ -114,38 +116,42 @@ int key_of_ms_key(ULONG_PTR ms) {
    return (ms / 2);
 }
 
-static void
-ErrorReport(char *function)
-{
-    char *message;
-    DWORD error = GetLastError();
-
-    FormatMessage(
-                  FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                  FORMAT_MESSAGE_FROM_SYSTEM,
-                  NULL,
-                  error,
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                  (LPTSTR) &message,
-                  0, NULL );
-
-    printf("Fatal: %s failed with error %ld: %s",
-           function, error, message);
-    LocalFree(message);
-}
-
 void init();
 
 char* socket_name = NULL;
 
 HANDLE completion_port = NULL;
 
+void shutdown_with_msg(char* msg);
+
+void shutdown_with_msg(char* msg) {
+  pproc proc;
+  int i;
+  if (completion_port != NULL) {
+    CloseHandle (completion_port);
+  }
+  if (server_socket != NULL) {
+    CloseHandle (server_socket->handle);
+  }
+  if (clients != NULL) {
+     for (i = 0; i < list_length(clients); i++) {
+       CloseHandle(((pclient) clients->data[i])->handle);
+     }
+  }
+  if (processes != NULL) {
+     for (i = 0; i < list_length(processes); i++) {
+       proc = processes->data[i];
+       CloseHandle(proc->handle);
+       CloseHandle(proc->job);
+     }
+  }
+  logging_shutdown(msg);
+}
+
 void add_to_completion_port(HANDLE h, ULONG_PTR key) {
    HANDLE tmp = CreateIoCompletionPort(h, completion_port, key, 1);
    if (tmp == NULL) {
-      ErrorReport("CreateIoCompletionPort");
-      printf("error adding handle to completion port\n");
-      exit(1);
+     shutdown_with_msg("CreateIoCompletionPort: error adding handle");
    }
    if (completion_port == NULL) {
       completion_port = tmp;
@@ -205,12 +211,10 @@ void create_server_socket () {
          //this is the state we want: server socket is waiting
          return;
       } else if (err == ERROR_PIPE_CONNECTED) {
-         //connection works, ignore
-         printf("pipe already connected\n");
-         ;
+        //connection works, ignore
+        ;
       } else {
-         printf("error connecting to socket\n");
-         exit(1);
+        shutdown_with_msg("error connecting to socket");
       }
    }
 }
@@ -227,8 +231,7 @@ HANDLE open_temp_file(char** outfile) {
    *outfile = (char*) malloc (sizeof(char) * MAX_PATH);
    res = GetTempFileName(current_dir, TEXT("vcout"), 0, *outfile);
    if (res ==0) {
-      printf("error obtaining a tmp file name\n");
-      exit(1);
+     shutdown_with_msg("error obtaining a tmp file name");
    }
    h = CreateFile(*outfile,
                   GENERIC_WRITE,
@@ -238,8 +241,7 @@ HANDLE open_temp_file(char** outfile) {
                   FILE_ATTRIBUTE_NORMAL,
                   NULL);
    if (h == INVALID_HANDLE_VALUE) {
-      printf("error creating a tmp file: %ld\n", GetLastError());
-      exit(1);
+      shutdown_with_msg("error creating a tmp file");
    }
    return h;
 }
@@ -263,7 +265,9 @@ void run_request (prequest r) {
       return;
    }
    ghJob = CreateJobObject(NULL,NULL);
-   // ??? check return value of CreateJobObject
+   if (ghJob == NULL) {
+     shutdown_with_msg("failed creating job object");
+   }
    ZeroMemory(&si, sizeof(si));
    si.cb = sizeof(si);
    ZeroMemory(&pi, sizeof(pi));
@@ -273,13 +277,11 @@ void run_request (prequest r) {
    }
    // CreateProcess does not allow more than 32767 bytes for command line parameter
    if (cmdlen > 32767) {
-     printf("Error: parameter's length exceeds CreateProcess limits\n");
-     exit(1);
+     shutdown_with_msg("Error: parameter's length exceeds CreateProcess limits\n");
    }
    cmd = (char*) malloc(sizeof(char) * cmdlen + 1);
    if (cmd == NULL) {
-     printf("Error: when allocating %d bytes in memory\n", (int) cmdlen);
-     exit(1);
+     shutdown_with_msg("Error: when allocating memory");
    }
    outfilehandle = open_temp_file(&outfile);
    // set the stdout for the childprocess
@@ -299,8 +301,7 @@ void run_request (prequest r) {
      strcat(cmd, "\"");
      if (i < r->numargs - 1) strcat(cmd, " ");
    }
-   if (r->timeout!=0||r->memlimit!=0)
-     {/* Set the time limit */
+   if (r->timeout!=0||r->memlimit!=0) {
      ULONGLONG timeout;
      ZeroMemory(&limits, sizeof(limits));
      limits.BasicLimitInformation.LimitFlags =
@@ -319,10 +320,9 @@ void run_request (prequest r) {
 
      if (!SetInformationJobObject(ghJob, JobObjectExtendedLimitInformation,
  				 &limits, sizeof(limits))) {
-       printf("error in SetInformationJobObject\n");
-       exit(1);
+       shutdown_with_msg("error in SetInformationJobObject");
      }
-     }
+   }
 
    // launches "child" process with command line parameter
    if(!CreateProcess(NULL,
@@ -335,13 +335,11 @@ void run_request (prequest r) {
                      NULL,
                      &si,
                      &pi)) {
-       printf( "Error: failed when launching <%s>\n", cmd);
-       printf("error in CreateProcess\n");
-       exit(1);
+       log_msg(cmd);
+       shutdown_with_msg("error when running CreateProcess");
    }
    if (!AssignProcessToJobObject(ghJob,pi.hProcess)) {
-       printf("error in AssignProcessToJobObject\n");
-       exit(1);
+     shutdown_with_msg("failed to assign process to job object");
    }
    proc = (pproc) malloc(sizeof(t_proc));
    proc->handle     = pi.hProcess;
@@ -358,8 +356,7 @@ void run_request (prequest r) {
           JobObjectAssociateCompletionPortInformation,
           &portassoc,
           sizeof( portassoc ) ) ) {
-      wprintf( L"Could not associate job with IO completion port, error %d\n", GetLastError() );
-      exit(1);
+     shutdown_with_msg( "Could not associate job with IO completion port");
    }
    free(cmd);
 
@@ -432,8 +429,7 @@ void send_msg_to_client(pclient client,
    len+= strlen(outfile) + 1;
    msgbuf = (char*) malloc(sizeof(char) * len);
    if (msgbuf == NULL) {
-      printf("error when allocating %d\n", len);
-      exit(1);
+     shutdown_with_msg("error when allocating buffer for client msg");
    }
    snprintf(msgbuf, len, "%s;%d;%.2f;%d;%s\n",
       id, exitcode, cpu_time,(timeout?1:0), outfile);
@@ -512,6 +508,7 @@ void init() {
    clients = init_list(parallel);
    processes = init_list(parallel);
 
+   init_logging();
    create_server_socket();
 }
 
@@ -535,8 +532,7 @@ int main(int argc, char **argv) {
                                       &ov,
                                       INFINITE);
       if (mskey == 0) {
-         printf("wait failed: %ld\n", GetLastError());
-         exit(1);
+        shutdown_with_msg("GetQueuedCompletionStatus failed");
       }
       key = key_of_ms_key(mskey);
       kind = kind_of_ms_key(mskey);

@@ -16,6 +16,7 @@
 #include "readbuf.h"
 #include "writebuf.h"
 #include "options.h"
+#include "logging.h"
 
 #define READ_ONCE 1024
 
@@ -26,7 +27,7 @@ typedef struct {
   pwritebuf writebuf;
 } t_client, *pclient;
 
-int server_sock;
+int server_sock = -1;
 
 typedef struct {
   pid_t id;
@@ -45,6 +46,21 @@ char *current_dir;
 pqueue queue;
 
 static int cpipe[2];
+
+void shutdown_with_msg(char* msg);
+
+void shutdown_with_msg(char* msg) {
+  int i;
+  if (server_sock != -1) {
+    close(server_sock);
+  }
+  if (clients != NULL) {
+     for (i = 0; i < list_length(clients); i++) {
+       close(((pclient) clients->data[i])->fd);
+     }
+  }
+  logging_shutdown(msg);
+}
 
 char* get_cur_dir() {
   return getcwd(NULL, 0);
@@ -105,8 +121,7 @@ void server_accept_client() {
   len = sizeof(struct sockaddr_un);
   fd = accept(server_sock, (struct sockaddr*) &remote, &len);
   if (fd == -1) {
-    printf ("error accepting a client\n");
-    return;
+    shutdown_with_msg("error accepting a client");
   }
   client = (pclient) malloc(sizeof(t_client));
   client->fd = fd;
@@ -120,7 +135,7 @@ static void sigchld_handle(int sig) {
   int saved_errno;
   saved_errno = errno;
   if (write(cpipe[1], "x", 1) == -1 && errno != EAGAIN && errno != EINTR) {
-    printf("error writing to pipe\n");
+    shutdown_with_msg("error writing to pipe\n");
   }
   errno = saved_errno;
 }
@@ -129,35 +144,29 @@ void setup_child_pipe() {
   int flags;
   struct sigaction sa;
   if (pipe(cpipe) == - 1) {
-    printf("error creating pipe\n");
-    exit(1);
+    shutdown_with_msg("error creating pipe");
   }
   flags = fcntl(cpipe[0], F_GETFL);
   if (flags == -1) {
-    printf("error getting flags on pipe\n");
-    exit(1);
+    shutdown_with_msg("error getting flags on pipe");
   }
   flags |= O_NONBLOCK;
   if (fcntl(cpipe[0], F_SETFL, flags) == -1) {
-    printf("error setting flags on pipe\n");
-    exit(1);
+    shutdown_with_msg("error setting flags on pipe");
   }
   flags = fcntl(cpipe[1], F_GETFL);
   if (flags == -1) {
-    printf("error getting flags on pipe\n");
-    exit(1);
+    shutdown_with_msg("error getting flags on pipe");
   }
   flags |= O_NONBLOCK;
   if (fcntl(cpipe[1], F_SETFL, flags) == -1) {
-    printf("error setting flags on pipe\n");
-    exit(1);
+    shutdown_with_msg("error setting flags on pipe");
   }
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESTART;
   sa.sa_handler = sigchld_handle;
   if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-    printf("error installing signal handler\n");
-    exit(1);
+    shutdown_with_msg("error installing signal handler");
   }
   add_to_poll_list(cpipe[0], POLLIN);
 }
@@ -165,6 +174,7 @@ void setup_child_pipe() {
 void server_init_listening(char* basename, int parallel) {
   struct sockaddr_un addr;
   int res;
+  init_logging();
   current_dir = get_cur_dir();
   queue = init_queue(100);
   clients = init_list(parallel);
@@ -177,18 +187,15 @@ void server_init_listening(char* basename, int parallel) {
   res = unlink(basename);
   // we delete the file if present, said otherwise we accept ENOENT as error
   if (res == -1 && errno != ENOENT) {
-    printf("error binding socket: %d\n", errno);
-    exit(1);
+    shutdown_with_msg("error deleting socket");
   }
   res = bind(server_sock, (struct sockaddr*) &addr, sizeof(struct sockaddr_un));
   if (res == -1) {
-    printf("error binding socket: %d\n", errno);
-    exit(1);
+    shutdown_with_msg("error binding socket");
   }
   res = listen(server_sock, parallel*2);
   if (res == -1) {
-    printf("error listening on socket\n");
-    exit(1);
+    shutdown_with_msg("error listening on socket");
   }
   add_to_poll_list(server_sock, POLLIN);
   processes = init_list(parallel);
@@ -222,8 +229,7 @@ pid_t create_process(char* cmd,
 
   pid_t pid = fork ();
   if (pid == -1) {
-      perror("fork");
-      exit(EXIT_FAILURE);
+      shutdown_with_msg("failed to fork");
   }
 
   // the server process simply collects the created pid and returns
@@ -298,8 +304,7 @@ void send_msg_to_client(pclient client,
    len+= strlen(outfile) + 1;
    msgbuf = (char*) malloc(sizeof(char) * len);
    if (msgbuf == NULL) {
-      printf("error when allocating %d\n", len);
-      exit(1);
+      shutdown_with_msg("error when allocating client msg");
    }
    snprintf(msgbuf, len, "%s;%d;%.2f;%d;%s\n",
       id, exitcode, cpu_time,(timeout?1:0), outfile);
@@ -461,7 +466,7 @@ int main(int argc, char **argv) {
     while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR)
       continue;
     if (res == -1) {
-      exit(1);
+      shutdown_with_msg("call to poll failed");
     }
     for (i = 0; i < poll_num; i++) {
       cur = (struct pollfd*) poll_list + i;
@@ -473,7 +478,7 @@ int main(int argc, char **argv) {
         while ((res = read(cpipe[0], &ch, 1)) == -1 && errno == EINTR)
           continue;
         if (res == -1) {
-          exit(1);
+          shutdown_with_msg("call to read shouldn't fail");
         }
         handle_child_events();
         continue;
