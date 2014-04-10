@@ -43,8 +43,7 @@ let send_request ~id ~timelimit ~memlimit ~cmd =
 
 let rec read_lines () =
   let s = read_from_client () in
-  let ends_with_newline = s.[String.length s - 1] = '\n' in
-  if ends_with_newline || String.contains s '\n' then begin
+  if String.contains s '\n' then begin
     let s = Buffer.contents buf ^ s in
     Buffer.clear buf;
     let l = Strings.rev_split s '\n' in
@@ -52,7 +51,8 @@ let rec read_lines () =
     | [] -> assert false
     | [x] -> [x]
     | (x::xs) as l ->
-      if ends_with_newline then List.rev l
+      if x = "" then List.rev xs else
+      if x.[String.length x - 1] = '\n' then List.rev l
       else begin
         Buffer.add_string buf x;
         List.rev xs
