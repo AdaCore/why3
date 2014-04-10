@@ -764,6 +764,7 @@ let rec lemma recompose_values (c:context) (e1 e2:expr) : unit
   | Right n c -> recompose_values c (Sub (Cte n) e1) (Sub (Cte n) e2)
   end
 
+(* not needed anymore
 let rec lemma recompose_inversion (c:context) (e:expr)
   requires {
       match c with Empty -> false | _ -> true end \/
@@ -776,6 +777,7 @@ let rec lemma recompose_inversion (c:context) (e:expr)
   | Left c e2 -> recompose_inversion c (Sub e e2)
   | Right n1 c -> recompose_inversion c (Sub (Cte n1) e)
   end
+*)
 
 (**
 Decomposition:
@@ -806,6 +808,13 @@ predicate is_a_value (e:expr) =
   | _ -> false
   end
 
+predicate is_empty_context (c:context) =
+  match c with
+  | Empty -> true
+  | _ -> false
+  end
+
+
 use Defunctionalization (* for size_e *)
 
 function size_e (e:expr) : int = Defunctionalization.size_e e
@@ -833,7 +842,8 @@ let rec decompose_term (e:expr) (c:context) : (context, expr)
   ensures { let (c1,e1) = result in
             recompose c1 e1 = recompose c e /\
             is_a_redex e1 }
-  raises { Stuck -> is_a_value (recompose c e) }
+  raises { Stuck -> is_empty_context c /\ is_a_value e }
+  (* raises { Stuck -> is_a_value (recompose c e) } *)
   =
   match e with
   | Cte n -> decompose_cont c n
@@ -845,7 +855,8 @@ with decompose_cont (c:context) (n:int) : (context, expr)
   ensures { let (c1,e1) = result in
             recompose c1 e1 = recompose c (Cte n)  /\
             is_a_redex e1 }
-  raises { Stuck -> is_a_value (recompose c (Cte n)) }
+  raises { Stuck -> is_empty_context c }
+(*  raises { Stuck -> is_a_value (recompose c (Cte n)) } *)
   =
   match c with
   | Empty -> raise Stuck
@@ -930,7 +941,7 @@ let refocus c e
   ensures { let (c1,e1) = result in
             recompose c1 e1 = recompose c e /\
             is_a_redex e1 }
-  raises { Stuck -> is_a_value (recompose c e) }
+  raises { Stuck -> is_empty_context c /\ is_a_value e }
 = decompose_term e c
 
 let rec itere_opt (c:context) (e:expr) : int
@@ -940,7 +951,7 @@ let rec itere_opt (c:context) (e:expr) : int
     let (c,r) = refocus c e in
     itere_opt c (contract r)
   with Stuck ->
-     assert { match c with Empty -> true | _ -> false end };
+     assert { is_empty_context c };
      match e with
      | Cte n -> n
      | _ -> absurd
