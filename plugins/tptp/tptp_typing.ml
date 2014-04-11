@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -620,16 +620,8 @@ let typecheck lib path ast =
   let impl = Hstr.create 17 in
   add_theory env impl denv.th_univ;
   (* parsing function *)
-  let conj = ref false in
-  let negc = ref false in
+  let conj = ref [] in
   let input (env,uc) = function
-    (* illegal stuff *)
-    | Formula (_,_,_,_,loc) when !conj ->
-        errorm ~loc "No formula can appear below a conjecture"
-    | Formula (_,_,r,_,loc) when !negc && r <> Negated_conjecture ->
-        errorm ~loc "This formula cannot appear below a negated_conjecture"
-    | Include (_,_,loc) when !conj || !negc ->
-        errorm ~loc "Includes cannot appear below conjectures"
     (* type declarations *)
     | Formula (_,_,Type,TypedAtom (s,e),loc) ->
         typedecl denv env impl loc s e;
@@ -641,28 +633,17 @@ let typecheck lib path ast =
     | Formula (_,_,_,Sequent _,loc) -> (* TODO *)
         errorm ~loc "Sequents are not supported"
     | Formula (k,s,r,LogicFormula e,loc) ->
-        if r = Conjecture then conj := true;
-        if r = Negated_conjecture then negc := true;
-
         let strict = k <> CNF in
-        let pol = r = Conjecture in
-        let f,_ = fmla denv env impl (Some pol) [] e in
+        let goal = r = Conjecture in
+        let f,_ = fmla denv env impl (Some goal) [] e in
         let f = if strict then f else
-          let q = if pol then Texists else Tforall in
+          let q = if goal then Texists else Tforall in
           let vl = Mvs.keys (t_vars f) in
           t_quant_close q vl [] f in
         let env,uc = flush_impl ~strict env uc impl in
-
         let pr = create_prsymbol (id_user s loc) in
-        if r <> Conjecture then
-          env, add_prop_decl uc Paxiom pr f
-        else if Stv.is_empty (t_ty_freevars Stv.empty f) then
-          env, add_prop_decl uc Pgoal pr f
-        else
-          (* Why3 does not support polymorphic goals *)
-          let uc = add_prop_decl uc Paxiom pr (t_not f) in
-          let pr = create_prsymbol (id_fresh "contradiction") in
-          env, add_prop_decl uc Pgoal pr t_false
+        if goal then conj := (pr, f) :: !conj;
+        env, if goal then uc else add_prop_decl uc Paxiom pr f
     (* includes *)
     | Include (_,_,loc) ->
         errorm ~loc "Inclusion is not supported"
@@ -670,8 +651,21 @@ let typecheck lib path ast =
   (* FIXME: localize the identifier *)
   let uc = create_theory ~path (id_fresh "T") in
   let _,uc = List.fold_left input (env,uc) ast in
-  let uc = if not !negc then uc else
-    let pr = create_prsymbol (id_fresh "contradiction") in
-    add_prop_decl uc Pgoal pr t_false in
+  (* In presence of conjectures, TPTP requires us to prove
+     their conjunction, but no conjectures means |- false.
+     This is awkward, and most provers treat conjectures
+     disjunctively, as in a sequent. We follow TPTP here. *)
+  let pr_false = create_prsymbol (id_fresh "contradiction") in
+  let uc = match !conj with
+    | g :: gl ->
+        let combine (_, f) (pr, g) = pr, t_and g f in
+        let pr, goal = List.fold_left combine g gl in
+        if Stv.is_empty (t_ty_freevars Stv.empty goal) then
+          add_prop_decl uc Pgoal pr goal
+        else (* Why3 does not support polymorphic goals *)
+          let uc = add_prop_decl uc Paxiom pr (t_not goal) in
+          add_prop_decl uc Pgoal pr_false t_false
+    | [] -> add_prop_decl uc Pgoal pr_false t_false
+  in
   Mstr.singleton "T" (close_theory uc)
 

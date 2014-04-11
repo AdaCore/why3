@@ -4,6 +4,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require map.Map.
+Require map.Occ.
 
 (* preliminaries *)
 
@@ -204,23 +205,23 @@ Qed.
 
 
 (* Why3 assumption *)
-Definition injective (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z)
-  (j:Z), ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
+Definition injective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
   ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
 
 (* Why3 assumption *)
-Definition surjective (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z),
+Definition surjective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i < n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\
   ((map.Map.get a j) = i).
 
 (* Why3 assumption *)
-Definition range (a:(@map.Map.map Z _ Z _)) (n:Z): Prop := forall (i:Z),
+Definition range (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
   ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
   ((map.Map.get a i) < n)%Z).
 
 (* Why3 goal *)
-Lemma injective_surjective : forall (a:(@map.Map.map Z _ Z _)) (n:Z),
-  (injective a n) -> ((range a n) -> (surjective a n)).
+Lemma injective_surjective : forall (a:(map.Map.map Z Z)) (n:Z), (injective a
+  n) -> ((range a n) -> (surjective a n)).
 unfold injective, range, surjective.
 intros a n h1 h2.
 intros.
@@ -230,5 +231,88 @@ assert (h: (i0 = j \/ i0 <> j)%Z) by omega.
 destruct h; auto.
 red in h1.
 elimtype False; apply h1 with i0 j; clear h1; auto.
+Qed.
+
+Import Occ.
+
+(* Why3 goal *)
+Lemma injection_occ : forall (m:(map.Map.map Z Z)) (n:Z), (injective m n) <->
+  forall (v:Z), ((map.Occ.occ v m 0%Z n) <= 1%Z)%Z.
+intros m n; split.
+(* -> *)
+intros inj v.
+assert (case: (occ v m 0 n <= 1 \/ occ v m 0 n >= 2)%Z) by omega. destruct case.
+trivial.
+destruct (occ_exists v m 0 n) as (i,(hi1,hi2)). omega.
+assert (0 <= occ v m 0 i)%Z.
+  generalize (occ_bounds v m 0 i). omega.
+assert (case: (occ v m 0 i = 0 \/ occ v m 0 i > 0)%Z) by omega. destruct case.
+assert (0 < occ v m (i+1) n)%Z.
+assert (occ v m 0 n = occ v m 0 i + occ v m i n)%Z.
+  apply occ_append; omega.
+  assert (occ v m i n = occ v m i (i+1) + occ v m (i+1) n)%Z.
+  apply occ_append; omega.
+  assert (occ v m i (i+1) = 1)%Z.
+  rewrite occ_right_add.
+  replace (i+1-1)%Z with i by omega.
+  rewrite occ_empty; omega.
+  omega.
+  replace (i+1-1)%Z with i by omega. auto.
+  omega.
+destruct (occ_exists v m (i+1) n) as (j,(hj1,hj2)). omega.
+elim (inj i j); omega.
+destruct (occ_exists v m 0 i) as (j,(hj1,hj2)). omega.
+elim (inj i j); omega.
+
+(* <- *)
+intros Hocc i j hi hj neq eq.
+pose (v := (Map.get m i)).
+assert (occ v m 0 n >= 2)%Z.
+assert (occ v m 0 n = occ v m 0 i + occ v m i n)%Z.
+  apply occ_append; omega.
+  assert (occ v m i n = occ v m i (i+1) + occ v m (i+1) n)%Z.
+  apply occ_append; omega.
+  assert (occ v m i (i+1) = 1)%Z.
+  rewrite occ_right_add.
+  replace (i+1-1)%Z with i by omega.
+  rewrite occ_empty; omega.
+  omega.
+  replace (i+1-1)%Z with i by omega. auto.
+assert (case: (j < i \/ i+1 <= j)%Z) by omega. destruct case.
+assert (occ v m 0 i >= 1)%Z.
+  assert (occ v m 0 i = occ v m 0 j + occ v m j i)%Z.
+  apply occ_append; omega.
+  assert (occ v m j i = occ v m j (j+1) + occ v m (j+1) i)%Z.
+  apply occ_append; omega.
+  assert (occ v m j (j+1) = 1)%Z.
+  rewrite occ_right_add.
+  replace (j+1-1)%Z with j by omega.
+  rewrite occ_empty; omega.
+  omega.
+  replace (j+1-1)%Z with j by omega. auto.
+  generalize (occ_bounds v m (i+1) n).
+  generalize (occ_bounds v m 0 j).
+  generalize (occ_bounds v m (j+1) i).
+  omega.
+  generalize (occ_bounds v m (i+1) n).
+omega.
+assert (occ v m (i+1) n >= 1)%Z.
+  assert (occ v m (i+1) n = occ v m (i+1) j + occ v m j n)%Z.
+  apply occ_append; omega.
+  assert (occ v m j n = occ v m j (j+1) + occ v m (j+1) n)%Z.
+  apply occ_append; omega.
+  assert (occ v m j (j+1) = 1)%Z.
+  rewrite occ_right_add.
+  replace (j+1-1)%Z with j by omega.
+  rewrite occ_empty; omega.
+  omega.
+  replace (j+1-1)%Z with j by omega. auto.
+  generalize (occ_bounds v m (j+1) n).
+  generalize (occ_bounds v m 0 i).
+  generalize (occ_bounds v m (i+1) j).
+  omega.
+  generalize (occ_bounds v m 0 i).
+  omega.
+generalize (Hocc v); omega.
 Qed.
 

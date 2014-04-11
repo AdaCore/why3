@@ -267,6 +267,33 @@ theory real.PowerInt
 
 end
 
+theory real.Trigonometry
+
+  prelude "Require Reals.Rtrigo_def."
+  prelude "Require Reals.Rtrigo1."
+  prelude "Require Reals.Ratan."
+
+  syntax function cos "(Reals.Rtrigo_def.cos %1)"
+  syntax function sin "(Reals.Rtrigo_def.sin %1)"
+
+  syntax function pi "Reals.Rtrigo1.PI"
+
+  syntax function tan "(Reals.Rtrigo1.tan %1)"
+
+  syntax function atan "(Reals.Ratan.atan %1)"
+
+  remove prop Pythagorean_identity
+  remove prop Cos_le_one
+  remove prop Sin_le_one
+  remove prop Cos_0
+  remove prop Sin_0
+  remove prop Cos_pi
+  remove prop Sin_pi
+  remove prop Cos_pi2
+  remove prop Sin_pi2
+
+end
+
 theory list.List
 
   syntax type list "(list %1)"
@@ -277,13 +304,25 @@ end
 
 theory list.Append
 
-  syntax function (++) "(List.app %1 %2)"
+  syntax function (++) "(Init.Datatypes.app %1 %2)"
 
 end
 
 theory list.Reverse
 
-  syntax function reverse "(List.rev %1)"
+  syntax function reverse "(Lists.List.rev %1)"
+
+end
+
+theory list.RevAppend
+
+  syntax function rev_append "(Lists.List.rev_append %1 %2)"
+
+end
+
+theory list.Combine
+
+  syntax function combine "(Lists.List.combine %1 %2)"
 
 end
 

@@ -5,9 +5,15 @@
 This chapter show how \whyml code can be executed, either by being
 interpreted or compiled to some existing programming language.
 
-Let us consider the program in Fig.~\ref{fig:MaxAndSum}
+\begin{latexonly}
+Let us consider the program in Figure~\ref{fig:MaxAndSum}
 on page~\pageref{fig:MaxAndSum} that computes the maximum and the sum
 of an array of integers.
+\end{latexonly}
+\begin{htmlonly}
+Let us consider the program of Section~\ref{sec:MaxAndSum} that computes
+the maximum and the sum of an array of integers.
+\end{htmlonly}
 Let us assume it is contained in a file \texttt{maxsum.mlw}.
 
 \section{Interpreting \whyml Code}
@@ -27,13 +33,13 @@ in module \texttt{MaxAndSum}
 and then we use option \verb+--exec+ to interpret this function,
 as follows:
 \begin{verbatim}
-  > why3  maxsum.mlw --exec MaxAndSum.test
+  > why3 maxsum.mlw --exec MaxAndSum.test
   Execution of MaxAndSum.test ():
        type: (int, int)
      result: Tuple2(45, 10)
     globals:
 \end{verbatim}
-We get the excepted output, namely the pair \texttt{(45, 10)}.
+We get the expected output, namely the pair \texttt{(45, 10)}.
 
 \section{Compiling \whyml to OCaml}
 \index{OCaml}\index{extraction}
@@ -59,9 +65,11 @@ among which we find a file \texttt{maxsum\_\_MaxAndSum.ml} containing
 the OCaml code for functions \texttt{max\_sum} and \texttt{test}.
 
 To compile it, we create a file \texttt{main.ml}
-containing a call to \texttt{test}, that is
+containing a call to \texttt{test}, that is, for example,
 \begin{whycode}
-  let () = test ()
+  let (s,m) = test () in
+  Format.printf "sum=%s, max=%s@."
+    (Why3__BigInt.to_string s) (Why3__BigInt.to_string m)
 \end{whycode}
 and we pass both files \texttt{maxsum\_\_MaxAndSum.ml} and
 \texttt{main.ml} to the OCaml compiler:
@@ -74,9 +82,15 @@ OCaml code extracted from \why must be linked with the library
 stored in subdirectory \texttt{why3} of the OCaml standard library.
 Depending on the way \why was installed, it depends either on library
 \texttt{nums.cmxa} or \texttt{zarith.cmxa} for big integers. Above we
-assumed the latter. it is likely that additional options \texttt{-I}
+assumed the latter. It is likely that additional options \texttt{-I}
 must be passed to the OCaml compiler for libraries
 \texttt{zarith.cmxa} and \texttt{why3extract.cmxa} to be found.
+For instance, it could be
+\begin{verbatim}
+  > ocamlopt -I `ocamlfind query zarith`   zarith.cmxa \
+             -I `why3 --print-libdir`/why3 why3extract.cmxa \
+             ...
+\end{verbatim}
 
 
 %%% Local Variables:

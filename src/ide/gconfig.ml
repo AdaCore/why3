@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -632,7 +632,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
   let _ = GMisc.label ~text:"Time limit (in sec.): " ~width ~xalign
     ~packing:(hb#pack ~expand:false) () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
-  timelimit_spin#adjustment#set_bounds ~lower:0. ~upper:300. ~step_incr:1. ();
+  timelimit_spin#adjustment#set_bounds ~lower:0. ~upper:42_000_000. ~step_incr:1. ();
   timelimit_spin#adjustment#set_value (float_of_int c.session_time_limit);
   let (_ : GtkSignal.id) =
     timelimit_spin#connect#value_changed ~callback:

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -53,8 +53,13 @@ let flush_tuples uc =
   Hint.clear ht_tuple;
   uc
 
-let add_pdecl_with_tuples ~wp uc pd = add_pdecl ~wp (flush_tuples uc) pd
-let add_decl_with_tuples uc d = add_decl (flush_tuples uc) d
+let add_pdecl_with_tuples ~wp uc pd =
+  if Debug.test_flag Glob.flag then Sid.iter Glob.def pd.pd_news;
+  add_pdecl ~wp (flush_tuples uc) pd
+
+let add_decl_with_tuples uc d =
+  if Debug.test_flag Glob.flag then Sid.iter Glob.def d.d_news;
+  add_decl (flush_tuples uc) d
 
 (** symbol lookup *)
 
@@ -1206,9 +1211,10 @@ let add_pdecl ~wp loc uc d =
 
 let use_clone_pure lib mth uc loc (use,inst) =
   let path, s = match use.use_theory with
-    | Qdot (p,id) -> Typing.string_list_of_qualid p, id.id
-    | Qident id -> [], id.id in
-  let th = find_theory loc lib mth path s in
+    | Qdot (p,id) -> Typing.string_list_of_qualid p, id
+    | Qident id -> [], id in
+  let th = find_theory loc lib mth path s.id in
+  if Debug.test_flag Glob.flag then Glob.use s.id_loc th.th_name;
   (* open namespace, if any *)
   let uc = match use.use_import with
     | Some (_, use_as) -> Theory.open_namespace uc use_as
@@ -1230,9 +1236,11 @@ let use_clone_pure lib mth uc loc use =
 
 let use_clone lib mmd mth uc loc (use,inst) =
   let path, s = match use.use_theory with
-    | Qdot (p,id) -> Typing.string_list_of_qualid p, id.id
-    | Qident id -> [], id.id in
-  let mth = find_module loc lib mmd mth path s in
+    | Qdot (p,id) -> Typing.string_list_of_qualid p, id
+    | Qident id -> [], id in
+  let mth = find_module loc lib mmd mth path s.id in
+  if Debug.test_flag Glob.flag then Glob.use s.id_loc
+    (match mth with Module m -> m.mod_theory.th_name | Theory th -> th.th_name);
   (* open namespace, if any *)
   let uc = match use.use_import with
     | Some (_, use_as) -> open_namespace uc use_as
@@ -1268,6 +1276,7 @@ let close_theory (mmd,mth) uc =
 let close_module (mmd,mth) uc =
   if Debug.test_flag Typing.debug_parse_only then (mmd,mth) else
   let m = close_module uc in
+  if Debug.test_flag Glob.flag then Glob.def m.mod_theory.th_name;
   let id = m.mod_theory.th_name.id_string in
   let loc = m.mod_theory.th_name.Ident.id_loc in
   if Mstr.mem id mmd then Loc.errorm ?loc "clash with previous module %s" id;

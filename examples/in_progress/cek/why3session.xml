@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="3.2"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="4.3.1"/>
+ <file
+  name="../cek.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="Lambda"
+   locfile="../cek.mlw"
+   loclnum="13" loccnumb="7" loccnume="13"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter ground_rec_app"
+    locfile="../cek.mlw"
+    loclnum="70" loccnumb="10" loccnume="24"
+    expl="VC for ground_rec_app"
+    sum="d93a4b8cc70a3560dd33d432eccfa38d"
+    proved="true"
+    expanded="false"
+    shape="aground_recV1V2Aaground_recV0V2Iaground_recaAppV0V1V2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for ground_rec_app"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter ground_app"
+    locfile="../cek.mlw"
+    loclnum="80" loccnumb="10" loccnume="20"
+    expl="VC for ground_app"
+    sum="389e487db2cd25b280aecebce989a82a"
+    proved="true"
+    expanded="false"
+    shape="aground_recV1ano_boundAaground_recV0ano_boundIaground_recV1V2Aaground_recV0V2Aaground_recaAppV0V1V2Lano_boundIaground_recaAppV0V1ano_boundF">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for ground_app"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter weak_nf_correct"
+    locfile="../cek.mlw"
+    loclnum="112" loccnumb="10" loccnume="25"
+    expl="VC for weak_nf_correct"
+    sum="f33ba66e26516d60151de4d58e9690ac"
+    proved="true"
+    expanded="false"
+    shape="Naweak_reduceV0V1FICtaLambdawwfwV0Aaground_recV0ano_boundF">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for weak_nf_correct"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter weak_nf_complete"
+    locfile="../cek.mlw"
+    loclnum="118" loccnumb="14" loccnume="30"
+    expl="VC for weak_nf_complete"
+    sum="cfbc1fa742d702882df0f4c175927d59"
+    proved="true"
+    expanded="false"
+    shape="CCtaLambdawwfwV0aVarwCtaLambdawwfwV0aLambdawwCtaLambdawwfwV0ICtaLambdawwfwV2ANaweak_reduceV2V3FAaground_recV2ano_boundACfaVarwainfix =V4V2aLambdawVainfix =V6V2Oainfix =V5V2aAppVVV0ICtaLambdawwfwV1ANaweak_reduceV1V7FAaground_recV1ano_boundACfaVarwainfix =V8V1aLambdawVainfix =V10V1Oainfix =V9V1aAppVVV0aAppVVV0INaweak_reduceV0V11FAaground_recV0ano_boundF">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for weak_nf_complete"/>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="CEK"
+   locfile="../cek.mlw"
+   loclnum="144" loccnumb="7" loccnume="10"
+   verified="false"
+   expanded="true">
+   <goal
+    name="WP_parameter eval"
+    locfile="../cek.mlw"
+    loclnum="221" loccnumb="8" loccnume="12"
+    expl="VC for eval"
+    sum="01b1b5e7dbae7db76b7607209dabcee2"
+    proved="false"
+    expanded="true"
+    shape="Caweak_normalizearecomposeV2V0V1aLambdaV4V5FaVarVaweak_normalizearecomposeV2V0V1aLambdaV8V9FaLambdaVVaweak_normalizearecomposeV2V0V1aLambdaV12V13Iaweak_normalizearecomposeaLeftV2V11V1V10V1aLambdaV12V13FaAppVVV0F">
+    <label
+     name="expl:VC for eval"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="unknown" time="0.53"/>
+    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter eval.1"
+      locfile="../cek.mlw"
+      loclnum="221" loccnumb="8" loccnume="12"
+      expl="1. postcondition"
+      sum="d0fad11df38e27bb7051311f38d9bf60"
+      proved="false"
+      expanded="true"
+      shape="postconditionCaweak_normalizearecomposeV2V0V1aLambdaV4V5FaVarVtaLambdaVVtaAppVVV0F">
+      <label
+       name="expl:VC for eval"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="0.81"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter eval.2"
+      locfile="../cek.mlw"
+      loclnum="221" loccnumb="8" loccnume="12"
+      expl="2. postcondition"
+      sum="4333c6f36e0385ebd472c1e0b2a0e6ba"
+      proved="false"
+      expanded="true"
+      shape="postconditionCtaVarVaweak_normalizearecomposeV2V0V1aLambdaV6V7FaLambdaVVtaAppVVV0F">
+      <label
+       name="expl:VC for eval"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="unknown" time="3.82"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter eval.3"
+      locfile="../cek.mlw"
+      loclnum="221" loccnumb="8" loccnume="12"
+      expl="3. postcondition"
+      sum="e2e0c0cab0bf36e5c66a125e61b10ebc"
+      proved="false"
+      expanded="true"
+      shape="postconditionCtaVarVtaLambdaVVaweak_normalizearecomposeV2V0V1aLambdaV8V9Iaweak_normalizearecomposeaLeftV2V7V1V6V1aLambdaV8V9FaAppVVV0F">
+      <label
+       name="expl:VC for eval"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="timeout" time="4.91"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter cont"
+    locfile="../cek.mlw"
+    loclnum="231" loccnumb="5" loccnume="9"
+    expl="VC for cont"
+    sum="7a77a89c80f9fc8e5c39f1b543d51c27"
+    proved="true"
+    expanded="false"
+    shape="t">
+    <label
+     name="expl:VC for cont"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter compute"
+    locfile="../cek.mlw"
+    loclnum="240" loccnumb="4" loccnume="11"
+    expl="VC for compute"
+    sum="a5a35c4079b7cfb2f931b3d4552b3a48"
+    proved="false"
+    expanded="true"
+    shape="aweak_normalizeV0aLambdaV1V2Aainfix =V3aNilIaweak_normalizearecomposeaEmptyV0aNilaLambdaV1V2FIaground_recV0ano_boundF">
+    <label
+     name="expl:VC for compute"/>
+    <transf
+     name="split_goal_wp"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter compute.1"
+      locfile="../cek.mlw"
+      loclnum="240" loccnumb="4" loccnume="11"
+      expl="1. postcondition"
+      sum="a5a35c4079b7cfb2f931b3d4552b3a48"
+      proved="false"
+      expanded="true"
+      shape="postconditionaweak_normalizeV0aLambdaV1V2Aainfix =V3aNilIaweak_normalizearecomposeaEmptyV0aNilaLambdaV1V2FIaground_recV0ano_boundF">
+      <label
+       name="expl:VC for compute"/>
+      <transf
+       name="split_goal_wp"
+       proved="false"
+       expanded="true">
+       <goal
+        name="WP_parameter compute.1.1"
+        locfile="../cek.mlw"
+        loclnum="240" loccnumb="4" loccnume="11"
+        expl="1."
+        sum="02664c4ff64f0a7a85136ae5406df32f"
+        proved="false"
+        expanded="true"
+        shape="ainfix =V3aNilIaweak_normalizearecomposeaEmptyV0aNilaLambdaV1V2FIaground_recV0ano_boundF">
+        <label
+         name="expl:VC for compute"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="4.98"/>
+        </proof>
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="4.98"/>
+        </proof>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="4.99"/>
+        </proof>
+        <proof
+         prover="3"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="5.00"/>
+        </proof>
+        <proof
+         prover="4"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="timeout" time="4.98"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter compute.1.2"
+        locfile="../cek.mlw"
+        loclnum="240" loccnumb="4" loccnume="11"
+        expl="2."
+        sum="47a684585561a6a0ece89b72106e0d60"
+        proved="true"
+        expanded="true"
+        shape="aweak_normalizeV0aLambdaV1V2Iaweak_normalizearecomposeaEmptyV0aNilaLambdaV1V2FIaground_recV0ano_boundF">
+        <label
+         name="expl:VC for compute"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter test"
+    locfile="../cek.mlw"
+    loclnum="247" loccnumb="4" loccnume="8"
+    expl="VC for test"
+    sum="b4dd010f6aa5ae57ee731a5a0ef52fa9"
+    proved="true"
+    expanded="false"
+    shape="aground_recaLambdaaxaVaraxano_boundIaweak_normalizeV4aLambdaV5V6Aainfix =V7aNilFAaground_recV4ano_boundLaAppaLambdaaxaVaraxaLambdaaxaVaraxIaweak_normalizeV0aLambdaV1V2Aainfix =V3aNilFAaground_recV0ano_boundLaAppaAppaLambdaaxaLambdaafaAppaVarafaVaraxaLambdaayaVarayaLambdaaxaVarax">
+    <label
+     name="expl:VC for test"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter test.1"
+      locfile="../cek.mlw"
+      loclnum="247" loccnumb="4" loccnume="8"
+      expl="1. precondition"
+      sum="128ca15f98e7d69cfa33debe500ede3a"
+      proved="true"
+      expanded="false"
+      shape="preconditionaground_recV0ano_boundLaAppaAppaLambdaaxaLambdaafaAppaVarafaVaraxaLambdaayaVarayaLambdaaxaVarax">
+      <label
+       name="expl:VC for test"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="2.55"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.2"
+      locfile="../cek.mlw"
+      loclnum="247" loccnumb="4" loccnume="8"
+      expl="2. precondition"
+      sum="4db671e4e1b8879d6047d794ee39697b"
+      proved="true"
+      expanded="false"
+      shape="preconditionaground_recV4ano_boundLaAppaLambdaaxaVaraxaLambdaaxaVaraxIaweak_normalizeV0aLambdaV1V2Aainfix =V3aNilFIaground_recV0ano_boundLaAppaAppaLambdaaxaLambdaafaAppaVarafaVaraxaLambdaayaVarayaLambdaaxaVarax">
+      <label
+       name="expl:VC for test"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter test.3"
+      locfile="../cek.mlw"
+      loclnum="247" loccnumb="4" loccnume="8"
+      expl="3. precondition"
+      sum="f62cde8f786dc1757a35c60824b10ad6"
+      proved="true"
+      expanded="false"
+      shape="preconditionaground_recaLambdaaxaVaraxano_boundIaweak_normalizeV4aLambdaV5V6Aainfix =V7aNilFIaground_recV4ano_boundLaAppaLambdaaxaVaraxaLambdaaxaVaraxIaweak_normalizeV0aLambdaV1V2Aainfix =V3aNilFIaground_recV0ano_boundLaAppaAppaLambdaaxaLambdaafaAppaVarafaVaraxaLambdaayaVarayaLambdaaxaVarax">
+      <label
+       name="expl:VC for test"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

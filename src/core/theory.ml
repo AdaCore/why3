@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -346,7 +346,7 @@ let add_tdecl uc td = match td.td_node with
 
 (** Declarations *)
 
-let store_path, restore_path =
+let store_path, store_theory, restore_path =
   let id_to_path = Wid.create 17 in
   let store_path uc path id =
     (* this symbol already belongs to some theory *)
@@ -354,8 +354,18 @@ let store_path, restore_path =
     let prefix = List.rev (id.id_string :: path @ uc.uc_prefix) in
     Wid.set id_to_path id (uc.uc_path, uc.uc_name.id_string, prefix)
   in
+  let store_theory th =
+    let id = th.th_name in
+    (* this symbol is already a theory *)
+    if Wid.mem id_to_path id then () else
+    Wid.set id_to_path id (th.th_path, id.id_string, []) in
   let restore_path id = Wid.find id_to_path id in
-  store_path, restore_path
+  store_path, store_theory, restore_path
+
+let close_theory uc =
+  let th = close_theory uc in
+  store_theory th;
+  th
 
 let add_symbol add id v uc =
   store_path uc [] id;
@@ -511,6 +521,9 @@ let cl_find_ls cl ls =
     let id  = id_clone ls.ls_name in
     let ta' = List.map (cl_trans_ty cl) ls.ls_args in
     let vt' = Opt.map (cl_trans_ty cl) ls.ls_value in
+    let stv = Opt.fold ty_freevars Stv.empty vt' in
+    let stv = List.fold_left ty_freevars stv ta' in
+    let opaque = Stv.diff opaque stv in
     let ls' = create_lsymbol ~opaque ~constr id ta' vt' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     ls'

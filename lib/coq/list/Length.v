@@ -8,8 +8,8 @@ Require list.List.
 (* Why3 assumption *)
 Fixpoint length {a:Type} {a_WT:WhyType a} (l:(list a)) {struct l}: Z :=
   match l with
-  | nil => 0%Z
-  | (cons _ r) => (1%Z + (length r))%Z
+  | Init.Datatypes.nil => 0%Z
+  | (Init.Datatypes.cons _ r) => (1%Z + (length r))%Z
   end.
 
 Lemma length_std :
@@ -34,7 +34,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = nil).
+  ((length l) = 0%Z) <-> (l = Init.Datatypes.nil).
 Proof.
 intros a a_WT [|h t] ; split ; try easy.
 unfold length. fold length.

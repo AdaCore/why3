@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -327,17 +327,22 @@ let rec is_exec_term t = match t.t_node with
 and is_exec_branch b =
   let _, t = t_open_branch b in is_exec_term t
 
+let min_int31 = BigInt.of_int (- 0x40000000)
+let max_int31 = BigInt.of_int    0x3FFFFFFF
+
 let print_const ~paren fmt = function
   | ConstInt c ->
       let n = Number.compute_int c in
       if BigInt.eq n BigInt.zero then
         fprintf fmt "Why3__BigInt.zero"
-      else
-      if BigInt.eq n BigInt.one then
+      else if BigInt.eq n BigInt.one then
         fprintf fmt "Why3__BigInt.one"
+      else if BigInt.le min_int31 n && BigInt.le n max_int31 then
+        let m = BigInt.to_int n in
+        fprintf fmt (protect_on paren "Why3__BigInt.of_int %d") m
       else
-      let s = BigInt.to_string n in
-      fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
+        let s = BigInt.to_string n in
+        fprintf fmt (protect_on paren "Why3__BigInt.of_string \"%s\"") s
   | ConstReal (RConstDec (i,f,None)) ->
       fprintf fmt (non_executable_fmt "%s.%s") i f
   | ConstReal (RConstDec (i,f,Some e)) ->
@@ -407,6 +412,8 @@ let print_binop fmt = function
   | Tiff -> fprintf fmt "="
   | Timplies -> assert false
 
+let oty_int = Some ty_int
+
 let rec print_app ?(paren=false) ls info fmt tl =
   let isconstr = is_constructor info ls in
   let is_field (_, csl) = match csl with
@@ -451,6 +458,9 @@ and print_term ?(paren=false) info fmt t = match t.t_node with
       print_const ~paren fmt c
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma (print_term info)) tl
+  | Tapp (fs, [t1; t2]) when ls_equal fs ps_equ && oty_equal t1.t_ty oty_int ->
+      fprintf fmt "(Why3__BigInt.eq %a %a)"
+        (print_term_p info) t1 (print_term_p info) t2
   | Tapp (fs, tl) ->
       begin match query_syntax info.info_syn fs.ls_name with
       | Some s -> syntax_arguments s (print_term_p info) fmt tl
@@ -508,7 +518,7 @@ let print_param_decl info fmt ls =
       (print_lident info) ls.ls_name
   else begin
     let vars = name_args ls.ls_args in
-    fprintf fmt "@[<hov 2>(*let %a %a : %a =@ %a*)@]"
+    fprintf fmt "@[<hov 2>let %a %a : %a =@ %a@]"
       (print_ls info) ls
       (print_list space (print_vs_arg info)) vars
       (print_ls_type info) ls.ls_value
@@ -749,12 +759,13 @@ let rec print_expr ?(paren=false) info fmt e =
     when ls_equal ls fs_void ->
       fprintf fmt
         (protect_on paren "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@]")
-        (print_expr info) e0 (print_expr info) e1
+        (print_expr info) e0 (print_expr ~paren:true info) e1
   | Eif (e0,e1,e2) ->
       fprintf fmt
         (protect_on paren
          "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@ else@;<1 2>@[%a@]@]")
-        (print_expr info) e0 (print_expr info) e1 (print_expr info) e2
+        (print_expr info) e0 (print_expr info) e1
+        (print_expr ~paren:true info) e2
   | Eassign (pl,e,_,pv) ->
       fprintf fmt (protect_on paren "%a.%a <- %a")
         (print_expr info) e (print_ls info) pl.pl_ls (print_pv info) pv

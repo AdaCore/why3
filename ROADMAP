@@ -109,7 +109,7 @@
 ** support de Yices 2 ? interesserait Cesar
 
 
-==================== Roadmap for release 0.91 ========================
+==================== Roadmap for next releases ========================
 
 HighOrd: Coq output and OCaml extraction should produce lambda's from lambda's
 and no epsilon
@@ -139,21 +139,11 @@ and no epsilon
 
 
 
-==================== Roadmap for release 0.90 ========================
+==================== Roadmap for release 0.83 ========================
 
 == New Features to announce ==
 
-= syntax =
-
-* new clause "diverges"
-* clauses "reads" and "writes" accept an empty set
-* modified syntax for "abstract"
-* TODO: lemmas with parameters
-
-= other =
-
-* fixed compilation bug with lablgtk 2.18
-* improved support for Isabelle
+See CHANGES
 
 == Final preparation ==
 
@@ -164,7 +154,7 @@ and no epsilon
 * check that nightly bench is OK
 * check that "make xml-validate-local" is OK
   (see below : copy the dtd on the web)
-* put 0.90 in file Version
+* put 0.84 in file Version
 * check/update the content of the About dialog in src/ide/gconfig.ml
   around lines 550-600
 * check headers
@@ -173,36 +163,37 @@ and no epsilon
     in ./macros.tex, and then "make doc"
   (check that manual in HTML is also generated, doc/html/index.html)
 * do "make dist"
-* test distrib/why3-0.90.tar.gz
+* test distrib/why3-0.84.tar.gz
 * install web page for why2 which includes an updated page for the
   quick migration guide. (sources are in CVS repository
-  ~filliatr/ARCHIVE/www/why). ADD a colon on new syntax for 0.90. Change Proval into Toccata
+  ~filliatr/ARCHIVE/www/why). 
 * put on the web page
- - why3-0.90.tar.gz
-   cp distrib/why3-0.90.tar.gz /users/www-perso/projets/why3/download
+ - why3-0.84.tar.gz
+   cp distrib/why3-0.84.tar.gz /users/www-perso/projets/why3/download
 
  - the manual in PDF
-   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.90.pdf
+   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.84.pdf
 
  - the HTML version of the manual (content of doc/html)
-   cp -r doc/html /users/www-perso/projets/why3/doc-0.90
+   cp -r doc/html /users/www-perso/projets/why3/doc-0.84
 
  - why3session.dtd
    cp share/why3session.dtd /users/www-perso/projets/why3/
 
  - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
    make stdlibdoc
-   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.90
+   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.84
    rm /users/www-perso/projets/why3/stdlib
-   ln -s /users/www-perso/projets/why3/stdlib-0.90 \
+   ln -s /users/www-perso/projets/why3/stdlib-0.84 \
             /users/www-perso/projets/why3/stdlib
  - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
     make apidoc
-    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.90
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.84
     rm /users/www-perso/projets/why3/api
-    ln -s /users/www-perso/projets/why3/api-0.90 \
+    ln -s /users/www-perso/projets/why3/api-0.84 \
       /users/www-perso/projets/why3/api
    (PROBLEME avec style.css ? Ou est le probleme ?)
+
  - update the main HTML page (sources are in repository why3-www)
    edit index.html
    make export
@@ -215,9 +206,105 @@ and no epsilon
    chmod -R g+w /users/www-perso/projets/why3
 
 * make a last commit:
- - git commit -m "release 0.90"
- - add tag 0.90 to the git repository, using
-   git tag 0.90
+ - git commit -m "release 0.84"
+ - add tag 0.84 to the git repository, using
+   git tag 0.84
+ - do not forget to push it using
+   git push
+   git push --tags
+
+* add a new version to the bugtracker:
+  https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
+
+* produce the Why3 part of Toccata gallery
+  -> add also a tar.gz and a ZIP file of it (this is done by doing
+  "make gallery-files" in the sources of the Toccata web pages)
+* Announce the distrib
+ - What to put in the announcement: see New Features above
+* The next commit : add +git to the version in file Version
+
+
+== TODOs ==
+
+* documentation des nouvelles features higher-order
+
+* eliminate_match:
+** faire un cas particulier pour "bool", le match pouvant se traduire
+   vers ite qui est supporté par pas mal de prouveurs
+** introduire des symboles _match non polymorphes differents pour
+   chaque instance necessaires. plutot qu'un seul symbole _match
+   polymorphe.
+
+==================== Roadmap for release 0.83 ========================
+
+== New Features to announce ==
+
+See CHANGES
+
+== Final preparation ==
+
+* inform Jerry James <loganjerry@gmail.com> so that he can test the
+  Fedora package
+* faire une passe sur le BTS
+* do "make update-coq" and "make", fix Coq realizations if needed
+* check that nightly bench is OK
+* check that "make xml-validate-local" is OK
+  (see below : copy the dtd on the web)
+* put 0.83 in file Version
+* check/update the content of the About dialog in src/ide/gconfig.ml
+  around lines 550-600
+* check headers
+* check the file CHANGES, add the release date
+* manual in PDF: check that macro \todo is commented out
+    in ./macros.tex, and then "make doc"
+  (check that manual in HTML is also generated, doc/html/index.html)
+* do "make dist"
+* test distrib/why3-0.83.tar.gz
+* install web page for why2 which includes an updated page for the
+  quick migration guide. (sources are in CVS repository
+  ~filliatr/ARCHIVE/www/why). ADD a colon on new syntax for 0.83. Change Proval into Toccata
+* put on the web page
+ - why3-0.83.tar.gz
+   cp distrib/why3-0.83.tar.gz /users/www-perso/projets/why3/download
+
+ - the manual in PDF
+   cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.83.pdf
+
+ - the HTML version of the manual (content of doc/html)
+   cp -r doc/html /users/www-perso/projets/why3/doc-0.83
+
+ - why3session.dtd
+   cp share/why3session.dtd /users/www-perso/projets/why3/
+
+ - standard library online, using why3doc, to http://why3.lri.fr/stdlib/
+   make stdlibdoc
+   cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.83
+   rm /users/www-perso/projets/why3/stdlib
+   ln -s /users/www-perso/projets/why3/stdlib-0.83 \
+            /users/www-perso/projets/why3/stdlib
+ - API doc, produced using ocamldoc, to http://why3.lri.fr/api/
+    make apidoc
+    cp -r doc/apidoc /users/www-perso/projets/why3/api-0.83
+    rm /users/www-perso/projets/why3/api
+    ln -s /users/www-perso/projets/why3/api-0.83 \
+      /users/www-perso/projets/why3/api
+   (PROBLEME avec style.css ? Ou est le probleme ?)
+
+ - update the main HTML page (sources are in repository why3-www)
+   edit index.html
+   make export
+
+ - add links to extra resources like
+   http://why3.lri.fr/jfla-2012/, http://www.lri.fr/~marche/MPRI-2-36-1/,
+   page du cours de l'X (in french ? using Krakatoa/why3 bridge)
+
+ - make everything writeable for the group
+   chmod -R g+w /users/www-perso/projets/why3
+
+* make a last commit:
+ - git commit -m "release 0.83"
+ - add tag 0.83 to the git repository, using
+   git tag 0.83
  - do not forget to push it using
    git push
    git push --tags
@@ -237,25 +324,14 @@ and no epsilon
 
 * DONE replayer: replay should be considered failed if new goals appeared.
 
-*  documentation des nouvelles features higher-order
-
-* fix problems with installed scripts that are missing a proper executable right (mails Frederic Boulanger)
+* DONE ? fix problems with installed scripts that are missing a proper executable right (mails Frederic Boulanger)
 
 * Isabelle Support:
-** fix the problem with why3_jedit script missing executable bit
-** add a documentation: start "isabelle why3_jedit" before why3ide, use "Close C-w" to signal the end of edit to why3"
-
-* eliminate_match:
-** faire un cas particulier pour "bool", le match pouvant se traduire
-   vers ite qui est supporté par pas mal de prouveurs
-** introduire des symboles _match non polymorphes differents pour
-   chaque instance necessaires. plutot qu'un seul symbole _match
-   polymorphe.
+** DONE ? fix the problem with why3_jedit script missing executable bit
+** DONE add a documentation: start "isabelle why3_jedit" before why3ide, use "Close C-w" to signal the end of edit to why3"
 
 * extraction vers Caml
 ** DONE utiliser ZArith
-
-* bug #15629
 
 ==================== Roadmap for release 0.82 ========================
 

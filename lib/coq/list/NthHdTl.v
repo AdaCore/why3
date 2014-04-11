@@ -10,9 +10,9 @@ Require list.HdTl.
 
 (* Why3 goal *)
 Lemma Nth_tl : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((list.HdTl.tl l1) = (Some l2)) -> forall (i:Z),
-  (~ (i = (-1%Z)%Z)) -> ((list.Nth.nth i l2) = (list.Nth.nth (i + 1%Z)%Z
-  l1)).
+  (l2:(list a)), ((list.HdTl.tl l1) = (Init.Datatypes.Some l2)) ->
+  forall (i:Z), (~ (i = (-1%Z)%Z)) -> ((list.Nth.nth i
+  l2) = (list.Nth.nth (i + 1%Z)%Z l1)).
 Proof.
 intros a a_WT [|x1 l1] l2 h1 i h2.
 easy.

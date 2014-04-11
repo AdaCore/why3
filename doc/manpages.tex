@@ -10,9 +10,9 @@ provided by the \why environment. These are as follows:
   provers, on the command-line.
 \item[\texttt{why3ide}] graphical interface to display goals, run
   provers and transformations on them.
+\item[\texttt{why3bench}] produces benchmarks.
 \item[\texttt{why3replayer}] replays the proofs stored in a session,
   for regression test purposes.
-\item[\texttt{why3bench}] produces benchmarks.
 \item[\texttt{why3session}] dumps various informations from a proof
   session, and possibly modifies the session.
 \item[\texttt{why3doc}] produces HTML versions of \why source codes.
@@ -46,7 +46,7 @@ particular, option \verb|-help| displays the usage and options.
   sets all debug flags (except flags which change the behavior).
   \index{debug-all@\verb+--debug-all+}
 \item[\texttt{-{}-debug \textsl{<flag>}}]
-  set a specific debug flag.
+  sets a specific debug flag.
   \index{debug@\verb+--debug+}
 \item[\texttt{-v}]
   prints version information.
@@ -54,7 +54,7 @@ particular, option \verb|-help| displays the usage and options.
   displays the usage and the exact list of options for the given tool.
 \end{description}
 
-\section{The \texttt{why3config} command-line tool}
+\section{\texttt{why3config}}
 \label{sec:why3config}
 
 \why must be configured to access external provers. Typically, this is done
@@ -66,8 +66,8 @@ the command line tool \texttt{why3config}.
 %%File/Detect provers
 %%\end{verbatim}
 %%of the IDE.
-This must be redone each time a new prover is installed.
-\index{why3config@\texttt{why3config}}
+This must be redone each time a new prover is installed.%
+\index{why3config@\texttt{why3config}}%
 \index{configuration file}
 
 The provers which \why attempts to detect are described in
@@ -115,7 +115,7 @@ can be obtained by the option \verb|--list-prover-ids|.
 \index{add-prover@\verb+--add-prover+}
 \index{list-prover-ids@\verb+--list-prover-ids+}
 
-\section{The \texttt{why3} command-line tool}
+\section{\texttt{why3}}
 \label{sec:why3ref}
 
 \why is primarily used to call provers on goals contained in an
@@ -203,7 +203,7 @@ multiple times with reduced context. The minimal set of declarations is
 then written in the prover syntax into a file located in the directory
 given to the \verb|-o/--output| option.
 
-\section{The \texttt{why3ide} GUI}
+\section{\texttt{why3ide}}
 \label{sec:ideref}
 
 The basic usage of the GUI is described by the tutorial of
@@ -414,10 +414,10 @@ are grouped together under several tabs.
 \begin{itemize}
 \item The default editor to use when the \textsf{Edit} button is
   pressed.
+  \urldef{\urlprfgen}{\url}{http://proofgeneral.inf.ed.ac.uk/}
 \item For each installed prover, a specific editor can be selected to
   override the default. Typically if you install the Coq prover, then
   the editor to use will be set to ``CoqIDE'' by default, and this
-  \urldef{\urlprfgen}{\url}{http://proofgeneral.inf.ed.ac.uk/}
   dialog allows you to select the Emacs editor and its
  \ahref{\urlprfgen}{Proof General} mode instead%
  \begin{latexonly} (\urlprfgen)\end{latexonly}.
@@ -432,7 +432,7 @@ are grouped together under several tabs.
 \end{description}
 
 
-\section{The \texttt{why3bench} tool}
+\section{\texttt{why3bench}}
 
 The \texttt{why3bench} tool adds a scheduler on top of the \why
 library. \texttt{why3bench} is designed to compare various components
@@ -453,7 +453,7 @@ comparison in various formats:
 \end{itemize}
 
 The compared components can be defined in an \emph{rc-file};
-\texttt{examples/programs/\ prgbench.rc} is such an example. More
+\texttt{examples/misc/prgbench.rc} is an example of such a file. More
 generally, a bench configuration file looks like
 \begin{verbatim}
 [probs "myprobs"]
@@ -509,7 +509,7 @@ One can run all the bench given in one bench configuration file with
 why3bench -B path_to_my_bench.rc
 \end{verbatim}
 
-\section{The \texttt{why3replayer} tool}
+\section{\texttt{why3replayer}}
 \label{sec:why3replayer}
 
 The purpose of the \texttt{why3replayer} tool is to execute the proofs
@@ -615,7 +615,7 @@ if the smoke detector has been triggered, or \texttt{No smoke
 
 
 
-\section{The \texttt{why3session} tool}
+\section{\texttt{why3session}}
 \label{sec:why3session}
 
 The program \texttt{why3session} allows to extract informations from
@@ -844,6 +844,10 @@ This command produces a summary of the proof session in HTML syntax.
 There are three styles of output: `table', `simpletree', and
 `jstree'. The default is `table'.
 
+The file generated is named \texttt{why3session.html} and is written
+in the session directory by default (see option \texttt{-o} to
+override this default).
+
 \begin{figure}[t]
 %BEGIN LATEX
 \begin{center}
@@ -995,18 +999,19 @@ add the option \verb|-F| to force this behavior.
 
 
 
-\section{The \texttt{why3doc} tool}
+\section{\texttt{why3doc}}
 \label{sec:why3doc}
 
-This tool can produce HTML pages from \why source code. A source file
-is scanned, \why code for theories or modules is output in
+This tool can produce HTML pages from \why source code.
+\why code for theories or modules is output in
 preformatted HTML code. Comments are interpreted in three different ways.
 \begin{itemize}
 \item Comments starting with at least three stars are completed
   ignored.
 \item Comments starting with two stars are interpreted as textual
   documentation. Special constructs are interpreted as described
-  below.
+  below. When the previous line is not empty, the comment is indented to
+  the right, so as to be displayed as a description of that line.
 \item Comments starting with one star only are interpreted as code
   comments, and are typeset as the code
 \end{itemize}
@@ -1021,10 +1026,10 @@ identifier use to its definition.
 \item[\texttt{-o \textsl{<dir>}}] defines the directory where to
   output the HTML files.
 \item[\texttt{-{}-output \textsl{<dir>}}] is the same as \verb|-o|.
-\item[\texttt{-{}-index}] (resp. \verb|--no-index|) generates
-  (resp. does not generate) an index file \texttt{index.html}.
-  The default behavior is to generate an index if more than one file
+\item[\texttt{-{}-index}] generates an index file \texttt{index.html}.
+  This is the default behavior if more than one file
   is passed on the command line.
+\item[\texttt{-{}-no-index}] prevents the generation of an index file.
 \item[\texttt{-{}-title \textsl{<title>}}] sets title of the
   index page.
 \item[\texttt{-{}-stdlib-url \textsl{<url>}}] sets a URL for files
@@ -1036,20 +1041,18 @@ identifier use to its definition.
 Some constructs are interpreted:
 \begin{itemize}
 \item \texttt{\{\textsl{c text}\}} interprets character \textsl{c} as
-  some typesetting command, detailed below
+  some typesetting command:
+  \begin{description}
+  \item[1-6] a heading of level 1 to 6 respectively
+  \item[h] raw HTML
+  \end{description}
 \item \texttt{[\textsl{code}]} is a code escape: the text
   \textsl{code} is typeset as \why code.
 \end{itemize}
 
-The typesetting commands are
-\begin{description}
-\item[1-6] a heading of level 1 to 6 respectively
-\item[h] raw HTML
-\end{description}
-
-The HTML rendering is controlled via a CSS file \verb|style.css|
-generated in the same directory as output files. This CSS style can be
-modified manually: regenerating the doc will not overwrite an existing
+A CSS file \verb|style.css| suitable for rendering is generated in the
+same directory as output files. This CSS style can be modified manually,
+since regenerating the HTML documentation will not overwrite an existing
 \verb|style.css| file.
 
 

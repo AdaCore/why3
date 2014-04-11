@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -133,7 +133,8 @@ val restore_path : ident -> string list * string * string list
    qualified symbol name) if the ident was ever introduced in
    a theory declaration. If the ident was declared in several
    different theories, the first association is retained.
-   Raises Not_found if the ident was never declared in a theory. *)
+   If [id] is a theory name, the third component is an empty list.
+   Raises [Not_found] if the ident was never declared in/as a theory. *)
 
 (** {2 Declaration constructors} *)
 

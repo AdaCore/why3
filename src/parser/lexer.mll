@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -290,7 +290,8 @@ and string = parse
         Buffer.clear string_buf;
         s }
   | "\\" (_ as c)
-      { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
+      { if c = '\n' then newline lexbuf;
+        Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
   | newline
       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof

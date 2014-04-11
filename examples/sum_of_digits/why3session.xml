@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="CVC4"
+  version="1.2"/>
+ <prover
+  id="3"
+  name="CVC4"
+  version="1.3"/>
+ <file
+  name="../sum_of_digits.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="Euler290"
+   locfile="../sum_of_digits.mlw"
+   loclnum="17" loccnumb="7" loccnume="15"
+   verified="false"
+   expanded="true">
+   <goal
+    name="Base"
+    locfile="../sum_of_digits.mlw"
+    loclnum="49" loccnumb="8" loccnume="12"
+    sum="38e1ff8cdd036ae501e4e391a4996777"
+    proved="true"
+    expanded="false"
+    shape="apaTuple3V0V1c10c0Iainfix =ainfix +asum_digitsV0V1c0Iainfix &lt;=c0V0F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="Empty"
+    locfile="../sum_of_digits.mlw"
+    loclnum="52" loccnumb="8" loccnume="13"
+    sum="c32555c739e47f2cada745d5d7ac6fb2"
+    proved="true"
+    expanded="false"
+    shape="ainfix =anum_ofaTuple3V0V1c0V2V3c0F">
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="Induc"
+    locfile="../sum_of_digits.mlw"
+    loclnum="55" loccnumb="8" loccnume="13"
+    sum="883a60405607ef56e27231e1f0241da3"
+    proved="false"
+    expanded="true"
+    shape="ainfix =asolutionV5V6ainfix -V3c1anum_of_modcaTuple3V0V1V2c0apowerc10V3Lainfix -ainfix +amodV4c10V1V2LadivV4c10Lainfix +ainfix *c137V2V0Iainfix &gt;V3c0Iainfix &lt;V2c10Aainfix &lt;=c0V2Iainfix &lt;=c0V0F">
+   </goal>
+   <goal
+    name="WP_parameter sd"
+    locfile="../sum_of_digits.mlw"
+    loclnum="66" loccnumb="10" loccnume="12"
+    expl="VC for sd"
+    sum="ff8a9c4c092c4724fa7aef9c54ad1d61"
+    proved="true"
+    expanded="false"
+    shape="iainfix =ainfix +asum_digitsV1amodV0c10asum_digitsV0Aainfix &gt;=V1c0Aainfix &lt;V1V0Aainfix &lt;=c0V0LadivV0c10ainfix =c0asum_digitsV0ainfix =V0c0Iainfix &gt;=V0c0F">
+    <label
+     name="expl:VC for sd"/>
+    <proof
+     prover="0"
+     timelimit="10"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.22"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter f"
+    locfile="../sum_of_digits.mlw"
+    loclnum="74" loccnumb="10" loccnume="11"
+    expl="VC for f"
+    sum="fb58dd1a92816376c4c6ba61f456265f"
+    proved="true"
+    expanded="true"
+    shape="iainfix =V4asolutionV1V2V0Iainfix =V4anum_ofaTuple3V1V2ainfix +c9c1c0V3Aainfix =V10anum_ofaTuple3V1V2ainfix +V5c1c0V3Aainfix =ainfix -V10V4anum_of_modcaTuple3V1V2V5c0V3Aainfix =V8amodV6c10Aainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FAainfix &lt;=c0V7Aainfix &lt;=c0V9Aainfix &lt;V9V0Aainfix &lt;=c0V0Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFAainfix =c0anum_ofaTuple3V1V2c0c0V3Iainfix &lt;=c0c9Aainfix =c0asolutionV1V2V0Iainfix &gt;c0c9Lapowerc10V0ainfix =ic0c1ainfix =ainfix +asum_digitsV1V2c0asolutionV1V2V0Aainfix &gt;=V1c0ainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for f"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter f.1"
+      locfile="../sum_of_digits.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="1. precondition"
+      sum="f55d9535d79e1ccc5d637bd6a6e36345"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=V1c0Iainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.2"
+      locfile="../sum_of_digits.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="2. postcondition"
+      sum="547ae043f7b7b52d37eab6f5275981f9"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =ic0c1ainfix =ainfix +asum_digitsV1V2c0asolutionV1V2V0Iainfix &gt;=V1c0Iainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.08"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.3"
+      locfile="../sum_of_digits.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="3. postcondition"
+      sum="995fd7722e21ed62c5df79928f9f3f68"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =c0asolutionV1V2V0Iainfix &gt;c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.4"
+      locfile="../sum_of_digits.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="4. loop invariant init"
+      sum="4ff7d3e9f2fa9786badc98d035a263b6"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =c0anum_ofaTuple3V1V2c0c0V3Iainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.5"
+      locfile="../sum_of_digits.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="5. variant decrease"
+      sum="7f01d83c2d87ef6f7783cc3ca5c60f76"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseainfix &lt;V9V0Aainfix &lt;=c0V0Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.6"
+      locfile="../sum_of_digits.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="6. precondition"
+      sum="d8b2404618ce53e5ab434fa4b19ca019"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.7"
+      locfile="../sum_of_digits.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="7. assertion"
+      sum="d9119b0de2e1e314a9c20cb5c9aed143"
+      proved="true"
+      expanded="false"
+      shape="assertionainfix =ainfix -V10V4anum_of_modcaTuple3V1V2V5c0V3Aainfix =V8amodV6c10Aainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter f.7.1"
+        locfile="../sum_of_digits.mlw"
+        loclnum="74" loccnumb="10" loccnume="11"
+        expl="1."
+        sum="215e63f1c3cf3703c8c03a808a06db04"
+        proved="true"
+        expanded="false"
+        shape="ainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for f"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.30"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter f.7.2"
+        locfile="../sum_of_digits.mlw"
+        loclnum="74" loccnumb="10" loccnume="11"
+        expl="2."
+        sum="d6019d8336f1d68f09dcaa8d1ad8ec00"
+        proved="true"
+        expanded="false"
+        shape="ainfix =V8amodV6c10Iainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for f"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.07"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter f.7.3"
+        locfile="../sum_of_digits.mlw"
+        loclnum="74" loccnumb="10" loccnume="11"
+        expl="3."
+        sum="3bb90bb3501687aeeb8359768363d908"
+        proved="true"
+        expanded="false"
+        shape="ainfix =ainfix -V10V4anum_of_modcaTuple3V1V2V5c0V3Iainfix =V8amodV6c10Iainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+        <label
+         name="expl:VC for f"/>
+        <proof
+         prover="0"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.01"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter f.8"
+      locfile="../sum_of_digits.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="8. loop invariant preservation"
+      sum="56a5ede9fa7e4fdbdd6361a3be1df3ae"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =V10anum_ofaTuple3V1V2ainfix +V5c1c0V3Iainfix =ainfix -V10V4anum_of_modcaTuple3V1V2V5c0V3Aainfix =V8amodV6c10Aainfix =V7adivV6c10Iainfix =V10ainfix +V4asolutionV7ainfix -ainfix +V8V2V5V9FIainfix &lt;=c0V7Aainfix &lt;=c0V9Lainfix -V0c1LamodV6c10LadivV6c10Lainfix +ainfix *c137V5V1Iainfix =V4anum_ofaTuple3V1V2V5c0V3Iainfix &lt;=V5c9Aainfix &lt;=c0V5FFIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.86"/>
+      </proof>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter f.9"
+      locfile="../sum_of_digits.mlw"
+      loclnum="74" loccnumb="10" loccnume="11"
+      expl="9. postcondition"
+      sum="9a1a94d88241dbd427d2e8c361f130be"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =V4asolutionV1V2V0Iainfix =V4anum_ofaTuple3V1V2ainfix +c9c1c0V3FIainfix &lt;=c0c9Lapowerc10V0INainfix =V0c0Iainfix &lt;=c0V1Aainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for f"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

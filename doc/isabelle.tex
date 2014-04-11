@@ -3,22 +3,48 @@
 
 \index{Isabelle proof assistant}
 
+When using Isabelle from Why3, files generated from Why3 theories and
+goals are stored in a dedicated XML format. Those files should not be
+edited. Instead, the proofs must be completed in a file with the same
+name and extension \texttt{.thy}. This is the file that is opened when
+using ``Edit'' action in \texttt{why3ide}.
+
 \subsection{Installation}
 
-You need version Isabelle2013-2.
+You need version Isabelle2013-2. Former versions are not supported.
 
-\todo{put ... in ... etc/components}
+Isabelle must be installed before compiling Why3. After compilation
+and installation of Why3, you must manually add the path 
+\begin{verbatim}
+<Why3 lib dir>/isabelle
+\end{verbatim}
+into either the user file 
+\begin{verbatim}
+.isabelle/Isabelle2013-2/etc/components
+\end{verbatim}
+or the system-wide file 
+\begin{verbatim}
+<Isabelle install dir>/etc/components
+\end{verbatim}
 
 \subsection{Usage}
 
-\todo{Explain Isabelle/jedit server interaction}
-
-When using Isabelle, files generated from Why3 theories are stored in
-a dedicated XML format. Those files should not be edited. Instead,
-realizations must be designed in some \texttt{.thy} as follows. 
+The most convenient way to call Isabelle for discharging a Why3 goal
+is to start the Isabelle/jedit interface in server mode. In this mode,
+one must start the server once, before launching \texttt{why3ide},
+using
+\begin{verbatim}
+isabelle why3_jedit
+\end{verbatim}
+Then, inside a \texttt{why3ide} session, any use of ``Edit'' will
+transfer the file to the already opened instance of jEdit. When the
+proof is completed, the user must send back the edited proof to
+\texttt{why3ide} by closing the opened buffer, typically by hitting
+\texttt{Ctrl-w}.
 
 \subsection{Realizations}
 
+Realizations must be designed in some \texttt{.thy} as follows. 
 The realization file corresponding to some Why3 file \url{f.why}
 should have the following form. 
 \begin{verbatim}
@@ -39,7 +65,6 @@ why3_vc <some other lemma> by proof
 
 why3_end
 \end{verbatim}
-
 
 See directory \url{lib/isabelle} for examples.
 

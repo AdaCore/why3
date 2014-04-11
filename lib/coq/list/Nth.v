@@ -16,9 +16,10 @@ Defined.
 (* Why3 goal *)
 Lemma nth_def : forall {a:Type} {a_WT:WhyType a}, forall (n:Z) (l:(list a)),
   match l with
-  | nil => ((nth n l) = None)
-  | (cons x r) => ((n = 0%Z) -> ((nth n l) = (Some x))) /\ ((~ (n = 0%Z)) ->
-      ((nth n l) = (nth (n - 1%Z)%Z r)))
+  | Init.Datatypes.nil => ((nth n l) = Init.Datatypes.None)
+  | (Init.Datatypes.cons x r) => ((n = 0%Z) -> ((nth n
+      l) = (Init.Datatypes.Some x))) /\ ((~ (n = 0%Z)) -> ((nth n
+      l) = (nth (n - 1%Z)%Z r)))
   end.
 Proof.
 intros a a_WT n l.

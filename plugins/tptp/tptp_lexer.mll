@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -149,16 +149,19 @@ rule token = parse
   | "$$" (lword as id)
       { raise (UnknownDDW id) }
   | '+'? (natural as s)
-  | '-'   natural as s
-      { INTNUM s }
+      { INTPOSNUM s }
+  | '-'  (natural as s)
+      { INTNEGNUM s }
   | '+'? (natural as n) '/' (positive as d)
-  | ('-'  natural as n) '/' (positive as d)
-      { RATNUM (n,d) }
+      { RATPOSNUM (n,d) }
+  | '-'  (natural as n) '/' (positive as d)
+      { RATNEGNUM (n,d) }
   | '+'? (natural as i) ('.' (digit+ as f))? (['e' 'E'] ('+'? (natural as e)))?
-  | ('-'  natural as i) ('.' (digit+ as f))? (['e' 'E'] ('+'? (natural as e)))?
   | '+'? (natural as i) ('.' (digit+ as f))? (['e' 'E'] ('-'   natural as e))?
-  | ('-'  natural as i) ('.' (digit+ as f))? (['e' 'E'] ('-'   natural as e))?
-      { REALNUM (i,f,e) }
+      { REALPOSNUM (i,f,e) }
+  | '-'  (natural as i) ('.' (digit+ as f))? (['e' 'E'] ('+'? (natural as e)))?
+  | '-'  (natural as i) ('.' (digit+ as f))? (['e' 'E'] ('-'   natural as e))?
+      { REALNEGNUM (i,f,e) }
   | "/*/"
       { SLASH_STAR_SLASH }
   | "/*"

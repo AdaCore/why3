@@ -1,0 +1,256 @@
+(**
+
+{1 Krivine Abstract Machine}
+
+This is inspired from student exercises proposed by
+{h <a href="http://cs.au.dk/~danvy/">Olivier Danvy</a>}
+at the {h <a href="http://jfla.inria.fr/2014/">JFLA 2014 conference</a>}
+
+*)
+
+(** {2 The lambda-calculus} *)
+
+module Lambda
+
+(**
+Terms:
+{h <blockquote><pre>
+n : int
+
+x : identifier
+
+t  : term
+t ::= x | \x.t | t t
+
+p  :  program
+p ::= t
+</pre></blockquote>}
+      where [t] is ground (i.e. without any free variable)
+*)
+
+use export int.Int
+
+type identifier = int
+
+type term =
+  | Var identifier
+  | Lambda identifier term
+  | App term term
+
+(** Examples:
+{h <blockquote><pre>
+p0 = (\x.x)
+p1 = (\x.x) (\x.x)
+p2 = (\x.\f.f x) (\y.y) (\x.x)
+</pre></blockquote>}
+*)
+
+constant f : identifier = 6
+constant x : identifier = 24
+constant y : identifier = 25
+
+constant p0 : term = Lambda x (Var x)
+
+constant p1 : term = App p0 p0
+
+constant p2 : term =
+  App (App (Lambda x (Lambda f (App (Var f)  (Var x))))
+           (Lambda y (Var y)))
+      (Lambda x (Var x))
+
+use HighOrd as H
+
+predicate ground_rec (t:term) (bound: H.pred identifier) =
+  match t with
+  | Var v -> bound v
+  | App t1 t2 -> ground_rec t1 bound /\ ground_rec t2 bound
+  | Lambda x t -> ground_rec t (\v. v=x \/ bound v)
+  end
+
+let lemma ground_rec_app (t1 t2 : term) (bound: H.pred identifier)
+  requires { ground_rec (App t1 t2) bound }
+  ensures  { ground_rec t1 bound }
+  ensures  { ground_rec t2 bound }
+= ()
+
+function no_bound : H.pred identifier = (\x. false)
+
+predicate ground (t:term) = ground_rec t no_bound
+
+let lemma ground_app (t1 t2 : term)
+  requires { ground (App t1 t2) }
+  ensures  { ground t1 }
+  ensures  { ground t2 }
+= ground_rec_app t1 t2 no_bound
+
+
+(* substitution of [x] by [s] in [t].
+   We assume that s is a ground term, so that variable capture cannot
+   occur when we transverse a lambda *)
+function subst (t:term) (x:identifier) (s:term) : term =
+  match t with
+  | Var v -> if x = v then s else t
+  | Lambda v t1 -> Lambda v (if x = v then t1 else subst t1 x s)
+  | App t1 t2 -> App (subst t1 x s) (subst t2 x s)
+  end
+
+(* weak reduction, i.e no reduction under lambda *)
+inductive weak_reduce term term =
+  | Beta : forall t1 t2 x.
+    weak_reduce (App (Lambda x t1) t2) (subst t2 x t1)
+  | Left : forall t1 t2 t.
+    weak_reduce t1 t2 -> weak_reduce (App t1 t) (App t2 t)
+  | Right : forall t1 t2 t.
+    weak_reduce t1 t2 -> weak_reduce (App t t1) (App t t2)
+
+predicate weak_nf (t:term) =
+  match t with
+  | Lambda _ _ -> true
+  | _ -> false
+  end
+
+let lemma weak_nf_correct (t:term)
+  requires { ground t }
+  requires { weak_nf t }
+  ensures  { forall u:term. not (weak_reduce t u) }
+= ()
+
+let rec lemma weak_nf_complete (t:term)
+  requires { ground t }
+  requires { forall u:term. not (weak_reduce t u) }
+  variant  { t }
+  ensures  { weak_nf t }
+= match t with
+  | Var _ -> ()
+  | Lambda _ _ -> ()
+  | App t1 t2 -> 
+    weak_nf_complete t1; weak_nf_complete t2
+  end
+
+(* weak normalisation *)
+
+inductive weak_n_reduce int term term =
+  | Zero : forall t. weak_n_reduce 0 t t
+  | Succ : forall t1 t2 t3 n.
+     weak_reduce t1 t2 -> weak_n_reduce n t2 t3 -> 
+     weak_n_reduce (n+1) t1 t3
+
+predicate weak_normalize (t1 t2:term) =
+  exists n. weak_n_reduce n t1 t2 /\ weak_nf t2
+
+end
+
+
+module CEK
+
+(** Values and environments:
+{h <blockquote><pre>
+e  :  environment
+v ::= nil | (identifier, value) :: environment
+
+v  :  value
+v ::= (\x.t, e)
+</pre></blockquote>}
+*)
+
+
+use import Lambda
+
+use import list.List
+
+type environment = list (identifier, value)
+with value = Closure identifier term environment
+
+(** Lookup a value in environment:
+{h <blockquote><pre>
+lookup : identifier -> environment -> value
+</pre></blockquote>}
+*)
+
+constant dummy_value : value = Closure (-1) (Var (-1)) Nil
+
+function lookup (i:identifier) (e:environment) : value =
+  match e with
+  | Nil -> dummy_value
+  | Cons (j,v) r -> if i=j then v else lookup i r
+  end
+
+(** Evaluation Contexts:
+{h <blockquote><pre>
+C ::= [] | [C (t, e)] | [v C]
+</pre></blockquote>}
+*)
+
+type context =
+  | Empty
+  | Left context term environment
+  | Right value context
+
+function recompose (c:context) (t:term) (e:environment) : term =
+  match c with
+  | Empty -> t
+  | Left c t1 e1 -> App (recompose c t e) t1
+  | Right (Closure x t1 e1) c -> App (Lambda x t1) (recompose c t e)
+  end
+
+(*
+let rec lemma recompose_values (c:context) (t1 t2:expr) (e:environment) : unit
+  requires { eval_0 e1 = eval_0 e2 }
+  variant  { c }
+  ensures  { eval_0 (recompose c e1) = eval_0 (recompose c e2) }
+= match c with
+  | Empty -> ()
+  | Left c e -> recompose_values c (Sub e1 e) (Sub e2 e)
+  | Right n c -> recompose_values c (Sub (Cte n) e1) (Sub (Cte n) e2)
+  end
+*)
+
+(** The CEK abstract machine :
+{h <blockquote><pre>
+    (x, e, C)_eval -> (C, v)_cont
+                      where v = lookup x e
+ (\x.t, e, C)_eval -> (C, (\x.t, e))_cont
+(t0 t1, e, C)_eval -> (t0, e, [C (t1, e)])_eval
+
+           ([], v)_cont -> v
+   ([C (t, e)], v)_cont -> (t, e, [v C])_eval
+([(\x.t, e) C], v)_cont -> (t, (x, v) :: e, C)_eval
+</pre></blockquote>}
+*)
+
+let rec eval (t:term) (e:environment) (c:context) : value 
+  diverges
+  returns { Closure x t1 e1 -> 
+    weak_normalize (recompose c t e) (Lambda x t1) }
+= match t with
+  | Var x -> cont c (lookup x e)
+  | Lambda x t -> cont c (Closure x t e)
+  | App t0 t1 -> eval t0 e (Left c t1 e)
+  end
+
+with cont (c:context) (v:value) : value 
+  diverges
+= match c with
+  | Empty -> v
+  | Left c t e -> eval t e (Right v c)
+  | Right (Closure x t e) c -> eval t (Cons (x,v) e) c
+  end
+
+
+let compute p : value
+  requires { ground p }
+  diverges
+  returns { Closure x t e ->
+    e = Nil /\ weak_normalize p (Lambda x t) }
+= eval p Nil Empty
+
+let test () 
+  diverges 
+= (compute p0,compute p1,compute p2)
+
+
+end
+
+
+
+

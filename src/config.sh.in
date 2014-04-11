@@ -1,18 +1,23 @@
 #!/bin/sh
 
 config=src/util/config.ml
+makefileconfig=share/Makefile.config
 
+bindir="\"$BINDIR\""
 libdir="\"$LIBDIR/why3\""
 datadir="\"$DATADIR/why3\""
 localdir="None"
 
 if [ "@enable_relocation@" = "yes" ]; then
+    bindir='Filename.concat (Filename.dirname
+        (Filename.dirname Sys.executable_name)) "bin"'
     libdir='Filename.concat (Filename.concat (Filename.dirname
         (Filename.dirname Sys.executable_name)) "lib") "why3"'
     datadir='Filename.concat (Filename.concat (Filename.dirname
         (Filename.dirname Sys.executable_name)) "share") "why3"'
     localdir="None"
 elif [ "@enable_local@" = "yes" ]; then
+    bindir="\"@LOCALDIR@/bin\""
     libdir="\"@LOCALDIR@/lib\""
     datadir="\"@LOCALDIR@/share\""
     localdir="Some \"@LOCALDIR@\""
@@ -28,3 +33,13 @@ let localdir  = $localdir
 
 let compile_time_support = [ @COMPILETIMECOQ@ @COMPILETIMEPVS@ ]
 " > $config
+
+echo "
+BINDIR      = $bindir
+LIBDIR      = $libdir
+DATADIR     = $datadir
+OCAMLBEST   = @OCAMLBEST@
+BIGINTLIB   = @BIGINTLIB@
+INCLUDE     = @BIGINTINCLUDE@ -I $libdir/why3
+" > $makefileconfig
+

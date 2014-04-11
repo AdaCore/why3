@@ -73,6 +73,7 @@ end
 theory int.ComputerDivision
 
   syntax function div "int<zr>(%1 / %2)"
+  syntax function mod "(%1 - int<zr>(%1 / %2) * %2)"
 
 end
 

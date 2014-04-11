@@ -8,7 +8,7 @@ module Quicksort
   use import int.Int
   use import ref.Ref
   use import array.Array
-  use import array.ArraySorted
+  use import array.IntArraySorted
   use import array.ArraySwap
   use import array.ArrayPermut
   use import array.ArrayEq
@@ -51,7 +51,7 @@ module Quicksort
       assert { qs_partition (at a 'N) a l !m r v };
   'O: quick_rec a (!m + 1) r;
       assert { qs_partition (at a 'O) a l !m r v };
-      assert { qs_partition (at a 'N) a l !m r v }
+      assert { qs_partition (at a 'N) a l !m r v };
     end
 
   let quicksort (a: array int) =
@@ -78,7 +78,7 @@ end
 module QuicksortWithShuffle
 
   use import array.Array
-  use import array.ArraySorted
+  use import array.IntArraySorted
   use import array.ArrayPermut
   use import Shuffle
   use import Quicksort
@@ -97,7 +97,7 @@ module Quicksort3way
   use import int.Int
   use import ref.Refint
   use import array.Array
-  use import array.ArraySorted
+  use import array.IntArraySorted
   use import array.ArraySwap
   use import array.ArrayPermut
   use import array.ArrayEq

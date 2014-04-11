@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  #
+#  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -354,7 +354,7 @@ if test "$enable_zarith" = yes; then
          AC_MSG_WARN([Lib Zarith not found, using Nums instead.])
          reason_zarith=" (zarith not found)"
       else
-         BIGINTINCLUDE="+zarith"
+         BIGINTINCLUDE="-I +zarith"
       fi
    fi
 fi
@@ -462,11 +462,6 @@ else
         COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
 
         case $COQVERSION in
-          8.3*)
-	        enable_coq_support=yes
-                coq_compat_version=".8.3"
-                AC_MSG_RESULT($COQVERSION)
-                ;;
           8.4*|trunk)
 	        enable_coq_support=yes
                 coq_compat_version=".8.4"
@@ -474,8 +469,8 @@ else
                 ;;
           *)
                 enable_coq_support=no
-	        AC_MSG_WARN(You need Coq 8.3 or later; Coq discarded)
-                reason_coq_support=" (version is $COQVERSION but need version 8.3 or higher)"
+	        AC_MSG_WARN(You need Coq 8.4 or later; Coq discarded)
+                reason_coq_support=" (version is $COQVERSION but need version 8.4 or higher)"
                 ;;
         esac
     fi
@@ -765,7 +760,6 @@ dnl AC_OUTPUT(Makefile)
 AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
 AC_CONFIG_FILES(lib/why3/META)
 AC_CONFIG_FILES(src/jessie/Makefile)
-AC_CONFIG_FILES(examples/euler001/Makefile)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/config.sh doc/version.tex;
 chmod a-w lib/why3/META;

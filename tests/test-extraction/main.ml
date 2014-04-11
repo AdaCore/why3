@@ -4,6 +4,8 @@
 open Why3extract
 open Test_extraction__TestExtraction
 
+let (=) = Why3__BigInt.eq
+
 let b42 = Why3__BigInt.of_int 42
 let () = assert (test_int    () = b42)
 let () = assert (test_int32  () = b42)

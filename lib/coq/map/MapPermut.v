@@ -7,15 +7,15 @@ Require map.Map.
 Require map.Occ.
 
 (* Why3 assumption *)
-Definition permut {a:Type} {a_WT:WhyType a} (m1:(@map.Map.map Z _ a a_WT))
-  (m2:(@map.Map.map Z _ a a_WT)) (l:Z) (u:Z): Prop := forall (v:a),
-  ((map.Occ.occ v m1 l u) = (map.Occ.occ v m2 l u)).
+Definition permut {a:Type} {a_WT:WhyType a} (m1:(map.Map.map Z a))
+  (m2:(map.Map.map Z a)) (l:Z) (u:Z): Prop := forall (v:a), ((map.Occ.occ v
+  m1 l u) = (map.Occ.occ v m2 l u)).
 
 (* Why3 goal *)
 Lemma permut_trans : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _ a a_WT))
-  (a3:(@map.Map.map Z _ a a_WT)), forall (l:Z) (u:Z), (permut a1 a2 l u) ->
-  ((permut a2 a3 l u) -> (permut a1 a3 l u)).
+  forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)) (a3:(map.Map.map Z
+  a)), forall (l:Z) (u:Z), (permut a1 a2 l u) -> ((permut a2 a3 l u) ->
+  (permut a1 a3 l u)).
 intros a a_WT a1 a2 a3 l u h1 h2.
 unfold permut in *.
 intros. transitivity (Occ.occ v a2 l u); auto.
@@ -23,10 +23,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma permut_exists : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(@map.Map.map Z _ a a_WT)) (a2:(@map.Map.map Z _ a a_WT)) (l:Z)
-  (u:Z) (i:Z), (permut a1 a2 l u) -> (((l <= i)%Z /\ (i < u)%Z) ->
-  exists j:Z, ((l <= j)%Z /\ (j < u)%Z) /\ ((map.Map.get a1
-  j) = (map.Map.get a2 i))).
+  forall (a1:(map.Map.map Z a)) (a2:(map.Map.map Z a)) (l:Z) (u:Z) (i:Z),
+  (permut a1 a2 l u) -> (((l <= i)%Z /\ (i < u)%Z) -> exists j:Z,
+  ((l <= j)%Z /\ (j < u)%Z) /\ ((map.Map.get a1 j) = (map.Map.get a2 i))).
 Proof.
 intros a a_WT a1 a2 l u i h1 Hi.
 pose (v := Map.get a2 i).

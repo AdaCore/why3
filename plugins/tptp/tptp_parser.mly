@@ -1,7 +1,7 @@
 /********************************************************************/
 /*                                                                  */
 /*  The Why3 Verification Platform   /   The Why3 Development Team  */
-/*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  */
+/*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  */
 /*                                                                  */
 /*  This software is distributed under the terms of the GNU Lesser  */
 /*  General Public License version 2.1, with the special exception  */
@@ -38,9 +38,12 @@ let () = Why3.Exn_printer.register (fun fmt exn -> match exn with
 %token <string> LWORD UWORD
 %token <Tptp_ast.defined_word> DWORD
 %token <string> SINGLE_QUOTED DISTINCT_OBJECT
-%token <Tptp_ast.num_integer> INTNUM
-%token <Tptp_ast.num_rational> RATNUM
-%token <Tptp_ast.num_real> REALNUM
+%token <Tptp_ast.num_integer> INTPOSNUM
+%token <Tptp_ast.num_integer> INTNEGNUM
+%token <Tptp_ast.num_rational> RATPOSNUM
+%token <Tptp_ast.num_rational> RATNEGNUM
+%token <Tptp_ast.num_real> REALPOSNUM
+%token <Tptp_ast.num_real> REALNEGNUM
 
 /* keywords */
 
@@ -157,8 +160,10 @@ term:
   { mk_e (Elet ($3,$5)) }
 | DISTINCT_OBJECT
   { mk_e (Edob $1) }
-| number
+| pos_number
   { mk_e (Enum $1) }
+| neg_number
+  { mk_e (Edef (DF DFumin, [mk_e (Enum $1)])) }
 | plain_term
   { $1 }
 ;
@@ -312,10 +317,16 @@ nassoc:
 | NBAR      { BOnor }
 ;
 
-number:
-| INTNUM  { Nint $1 }
-| RATNUM  { Nrat $1 }
-| REALNUM { Nreal $1 }
+pos_number:
+| INTPOSNUM  { Nint $1 }
+| RATPOSNUM  { Nrat $1 }
+| REALPOSNUM { Nreal $1 }
+;
+
+neg_number:
+| INTNEGNUM  { Nint $1 }
+| RATNEGNUM  { Nrat $1 }
+| REALNEGNUM { Nreal $1 }
 ;
 
 atomic_word:
@@ -357,7 +368,8 @@ list1_name:
 
 name:
 | atomic_word   { $1 }
-| INTNUM        { $1 }
+| INTPOSNUM     { $1 }
+| INTNEGNUM     { "-" ^ $1 }
 ;
 
 /*

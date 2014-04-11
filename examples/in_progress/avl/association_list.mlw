@@ -1,0 +1,143 @@
+
+(* Association lists. *)
+
+(* Association with respect to an equivalence relation. *)
+module Assoc
+  
+  clone import key_type.KeyType as K
+  clone import relations_params.EquivalenceParam as Eq with type t = key
+  
+  use import list.List
+  use import list.Mem
+  use import option.Option
+  use import HighOrd
+  
+  predicate appear (p:param 'a) (k:key 'a) (l:list (t 'a 'b)) =
+    exists x. mem x l /\ correct_for p k /\ Eq.rel p k (key x)
+  
+  (* Correction. *)
+  predicate correct (p:param 'a) (l:list (t 'a 'b)) = match l with
+    | Nil -> true
+    | Cons x q -> let kx = key x in correct_for p kx /\ correct p q
+    end
+  
+  (* Unique occurence (a desirable property of an association list). *)
+  predicate unique (p:param 'a) (l:list (t 'a 'b)) = match l with
+    | Nil -> true
+    | Cons x q -> not appear p (key x) q /\ unique p q
+    end
+  
+  (* functional update with equivalence classes. *)
+  function param_update (p:param 'a) (f:key 'a -> 'b)
+    (k:key 'a) (b:'b) : key 'a -> 'b = \k2.
+      if Eq.rel p k k2 then b else f k2
+  
+  (* functional model of an association list. *)
+  function model (p:param 'a) (l:list (t 'a 'b)) : key 'a -> option (t 'a 'b) =
+    match l with
+    | Nil -> \x. None
+    | Cons d q -> param_update p (model p q) (key d) (Some d)
+    end
+  
+  (* A key is bound iff it occurs in the association lists. *)
+  let rec lemma model_occurence (p:param 'a) (k:key 'a)
+    (l:list (t 'a 'b)) : unit
+    requires { correct p l }
+    requires { correct_for p k }
+    ensures { appear p k l <-> match model p l k with None -> false
+      | Some _ -> true end }
+    variant { l }
+  = match l with Cons _ q -> model_occurence p k q | _ -> () end
+  
+  (* A key is bound to a value with an equivalent key. *)
+  let rec lemma model_link (p:param 'a) (k:key 'a) (l:list (t 'a 'b)) : unit
+    requires { correct p l }
+    requires { correct_for p k }
+    ensures { match model p l k with None -> true
+      | Some d -> Eq.rel p k (key d) end }
+    variant { l }
+  = match l with Cons _ q -> model_link p k q | _ -> () end
+  
+  (* Two equivalent keys are bound to the same value. *)
+  let rec lemma model_equal (p:param 'a) (k1 k2:key 'a)
+    (l:list (t 'a 'b)) : unit
+    requires { correct p l }
+    requires { correct_for p k1 /\ correct_for p k2 }
+    requires { Eq.rel p k1 k2 }
+    ensures { model p l k1 = model p l k2 }
+    variant { l }
+  = match l with Cons _ q -> model_equal p k1 k2 q | _ -> () end
+  
+  (* If the list satisfies the uniqueness property,
+     then every value occuring in the list is the image of its key. *)
+  let rec lemma model_unique (p:param 'a) (k:key 'a) (l:list (t 'a 'b)) : unit
+    requires { correct p l }
+    requires { unique p l }
+    requires { correct_for p k }
+    ensures { forall d. mem d l -> model p l (key d) = Some d }
+    variant { l }
+  = match l with Cons _ q -> model_unique p k q | _ -> () end
+  
+end
+
+
+(* Sorted (increasing) association list. *)
+
+module AssocSorted
+  
+  use import list.List
+  use import list.Append
+  use import list.Mem
+  use import option.Option
+  
+  clone import key_type.KeyType as K
+  clone import preorder.FullParam as O with type t = key
+  (* The commented out part do not work, unfortunately. *)
+  clone export Assoc with namespace K = K,(*namespace Eq = O.Eq*)
+      type Eq.param = O.order,
+      predicate Eq.correct_for = O.correct_for,
+      predicate Eq.rel = O.eq,
+      (* Duplicates, there is no need to keep them. *)
+      goal Eq.trans,
+      goal Eq.refl,
+      goal Eq.symm
+  clone sorted.Increasing as S with namespace K = K,
+    (*namespace O = O.Lt*)
+    type O.param = O.order,
+    predicate O.correct_for = O.correct_for,
+    predicate O.rel = O.lt,
+    goal O.trans
+  
+  (* Sorted lists are correct association lists with unicity property. *)
+  let rec lemma increasing_unique_and_correct (o:order 'a)
+    (l:list (t 'a 'b)) : unit
+    requires { S.increasing o l }
+    ensures { correct o l }
+    ensures { unique o l }
+    variant { l }
+  = match l with Cons _ q -> increasing_unique_and_correct o q | _ -> () end
+  
+  let lemma absent (o:order 'a) (k:key 'a) (l r:list (t 'a 'b)) : unit
+    requires { correct_for o k }
+    requires { S.increasing o l }
+    requires { S.increasing o r }
+    requires { S.majorate o k l }
+    requires { S.minorate o k r }
+    ensures { model o (l++r) k = None }
+  = assert { S.precede o l r && not appear o k (l++r) &&
+    match model o (l++r) k with None -> true | _ -> false end }
+  
+  let lemma present (o:order 'a) (k:key 'a) (l r:list (t 'a 'b))
+    (d:t 'a 'b) : unit
+    requires { correct_for o k }
+    requires { correct_for o (key d) }
+    requires { S.increasing o l }
+    requires { S.increasing o r }
+    requires { S.majorate o k l }
+    requires { S.minorate o k r }
+    requires { eq o k (key d) }
+    ensures { model o (l++Cons d r) k = Some d }
+  = assert { S.increasing o (l++Cons d r) }
+  
+end
+

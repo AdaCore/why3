@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -78,7 +78,7 @@ let run_file (context : context) print_session fname =
   let basename = Filename.basename project_dir in
   let cout =
     if output_dir = "-" then stdout else
-      open_out (Filename.concat output_dir (basename^".html"))
+      open_out (Filename.concat output_dir ("why3session.html"))
   in
   let fmt = formatter_of_out_channel cout in
   if !opt_context

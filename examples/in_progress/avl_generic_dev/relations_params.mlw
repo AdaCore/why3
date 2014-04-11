@@ -1,0 +1,111 @@
+
+theory EndoRelationParam
+  
+  type param 'a
+  type t 'a
+  predicate correct_for (param 'a) (t 'a)
+  predicate rel (param 'a) (t 'a) (t 'a)
+  
+end
+
+theory ReflexiveParam
+  
+  clone export EndoRelationParam
+  axiom refl : forall p:param 'a,x:t 'a. correct_for p x ->
+    rel p x x
+  
+end
+
+theory IrreflexiveParam
+  clone export EndoRelationParam
+  axiom strict : forall p:param 'a,x:t 'a. correct_for p x -> not rel p x x
+end
+
+theory TransitiveParam
+  clone export EndoRelationParam
+  axiom trans : forall p:param 'a,x y z:t 'a.
+    correct_for p x /\ correct_for p y /\ correct_for p z ->
+      rel p x y /\ rel p y z -> rel p x z
+end
+
+theory SymmetricParam
+  clone export EndoRelationParam
+  axiom symm : forall p:param 'a,x y:t 'a.
+    correct_for p x /\ correct_for p y -> rel p x y -> rel p y x
+end
+
+theory AsymmetricParam
+  clone export EndoRelationParam
+  axiom asymm : forall p:param 'a,x y:t 'a.
+    correct_for p x /\ correct_for p y -> rel p x y -> not rel p y x
+end
+
+theory AntisymmetricParam
+  clone export EndoRelationParam
+  axiom antisymm : forall p:param 'a,x y:t 'a.
+    correct_for p x /\ correct_for p y -> rel p x y -> rel p y x -> x = y
+end
+
+theory TotalParam
+  clone export EndoRelationParam
+  axiom total : forall p:param 'a,x y:t 'a.
+    correct_for p x /\ correct_for p y -> rel p x y \/ rel p y x
+end
+
+theory PreOrderParam
+  clone export ReflexiveParam
+  clone export TransitiveParam with type t = t,
+    type param = param, predicate correct_for = correct_for,
+    predicate rel = rel
+end
+
+theory EquivalenceParam
+  clone export PreOrderParam
+  clone export SymmetricParam with type t = t,
+    type param = param, predicate correct_for = correct_for,
+    predicate rel = rel
+end
+
+theory TotalPreOrderParam
+  clone export PreOrderParam
+  clone export TotalParam with type t = t,
+    type param = param, predicate correct_for = correct_for,
+    predicate rel = rel
+end
+
+theory PartialOrderParam
+  clone export PreOrderParam
+  clone export AntisymmetricParam with type t = t,
+    type param = param, predicate correct_for = correct_for,
+    predicate rel = rel
+end
+
+theory TotalOrderParam
+  clone export PartialOrderParam
+  clone export TotalParam with type t = t,
+    type param = param, predicate correct_for = correct_for,
+    predicate rel = rel
+end
+
+theory PartialStrictOrderParam
+  clone export TransitiveParam
+  clone export AsymmetricParam with type t = t,
+    type param = param, predicate correct_for = correct_for,
+    predicate rel = rel
+end
+
+theory TotalStrictOrderParam
+  clone export PartialStrictOrderParam
+  axiom trichotomy : forall p:param 'a,x y:t 'a.
+    correct_for p x /\ correct_for p y ->
+      rel p x y \/ rel p y x \/ x = y
+end
+
+theory InverseParam
+  
+  clone export EndoRelationParam
+  predicate inv_rel (p:param 'a) (x y : t 'a) = rel p y x
+  
+end
+
+

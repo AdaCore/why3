@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -235,10 +235,9 @@ let schedule_check t callback =
 
 (* idle handler *)
 
-
 let idle_handler t =
   try
-    begin
+    if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then begin
       match Queue.pop t.actions_queue with
         | Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                                callback,goal) ->
@@ -257,7 +256,8 @@ let idle_handler t =
                 callback (InternalFailure e)
             end
         | Action_delayed callback -> callback ()
-    end;
+    end else
+      ignore (Unix.select [] [] [] 0.1);
     true
   with Queue.Empty ->
     t.idle_handler_activated <- false;

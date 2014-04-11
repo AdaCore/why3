@@ -16,6 +16,8 @@ module SameFringe
 
   type elt
 
+  val eq (x y: elt) : bool ensures { result <-> x=y }
+
   type tree =
     | Empty
     | Node tree elt tree
@@ -51,7 +53,7 @@ module SameFringe
     | Done, Done ->
         True
     | Next x1 r1 e1, Next x2 r2 e2 ->
-        x1 = x2 && eq_enum (enum r1 e1) (enum r2 e2)
+        eq x1 x2 && eq_enum (enum r1 e1) (enum r2 e2)
     | _ ->
         False
     end

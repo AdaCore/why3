@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -77,6 +77,9 @@ let rec print_value fmt v =
       i := BigInt.succ !i
     done;
     fprintf fmt "]@]"
+  | Vapp(ls,vl) when is_fs_tuple ls ->
+    fprintf fmt "@[(%a)@]"
+      (Pp.print_list Pp.comma print_value) vl
   | Vapp(ls,vl) ->
     fprintf fmt "@[%a(%a)@]"
       Pretty.print_ls ls (Pp.print_list Pp.comma print_value) vl
@@ -1017,7 +1020,7 @@ let find_definition env ps =
     Some (Mps.find ps env.funenv)
   with
       Not_found ->
-        Mlw_decl.find_definition env.mknown ps 
+        Mlw_decl.find_definition env.mknown ps
 
 
 (* evaluate expressions *)

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2013   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -241,7 +241,7 @@ let use_export uc m =
 
 let add_to_theory f uc x = { uc with muc_theory = f uc.muc_theory x }
 
-let store_path, restore_path =
+let store_path, store_module, restore_path =
   let id_to_path = Wid.create 17 in
   let store_path uc path id =
     (* this symbol already belongs to some theory *)
@@ -249,8 +249,18 @@ let store_path, restore_path =
     let prefix = List.rev (id.id_string :: path @ uc.muc_prefix) in
     Wid.set id_to_path id (uc.muc_path, uc.muc_name, prefix)
   in
+  let store_module m =
+    let id = m.mod_theory.th_name in
+    (* this symbol is already a module *)
+    if Wid.mem id_to_path id then () else
+    Wid.set id_to_path id (m.mod_theory.th_path, id.id_string, []) in
   let restore_path id = Wid.find id_to_path id in
-  store_path, restore_path
+  store_path, store_module, restore_path
+
+let close_module uc =
+  let m = close_module uc in
+  store_module m;
+  m
 
 let add_symbol add id v uc =
   store_path uc [] id;
@@ -443,7 +453,7 @@ let clone_export uc m inst =
   let psh = Hid.create 3 in
   let conv_xs xs = try match Hid.find psh xs.xs_name with
     | XS xs -> xs | _ -> assert false with Not_found -> xs in
-  let conv_eff eff =
+  let conv_eff mv eff =
     let e = eff_empty in
     let conv ghost r e = eff_write ~ghost e (conv_reg r) in
     let e = Sreg.fold (conv false) eff.eff_writes e in
@@ -454,7 +464,10 @@ let clone_export uc m inst =
     let conv r u e = match u with
       | Some u -> eff_refresh e (conv_reg r) (conv_reg u)
       | None   -> eff_reset e (conv_reg r) in
-    Mreg.fold conv eff.eff_resets e in
+    let e = Mreg.fold conv eff.eff_resets e in
+    let tvs = Mvs.fold (fun _ vs s -> ty_freevars s vs.vs_ty) mv Stv.empty in
+    let tvs = Stv.inter tvs eff.eff_compar in
+    Stv.fold (fun tv e -> eff_compare e tv) tvs e in
   let conv_term mv t = t_gen_map (ty_s_map conv_ts) conv_ls mv t in
   let addx mv xs t q = Mexn.add (conv_xs xs) (conv_term mv t) q in
   let conv_vari mv (t,r) = conv_term mv t, Opt.map conv_ls r in
@@ -462,7 +475,7 @@ let clone_export uc m inst =
     c_pre     = conv_term mv c.c_pre;
     c_post    = conv_term mv c.c_post;
     c_xpost   = Mexn.fold (addx mv) c.c_xpost Mexn.empty;
-    c_effect  = conv_eff c.c_effect;
+    c_effect  = conv_eff mv c.c_effect;
     c_variant = List.map (conv_vari mv) c.c_variant;
     c_letrec  = 0; } in
   let rec conv_aty mv a =

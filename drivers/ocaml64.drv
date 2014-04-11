@@ -83,3 +83,34 @@ module mach.int.Int64
   syntax val      (>)       "(>)"
 end
 
+(* arrays *)
+
+module mach.array.Array32
+  syntax type array  "(%1 array)"
+
+  syntax val  make   "Array.make"
+  syntax val  ([])   "Array.get"
+  syntax val  ([]<-) "Array.set"
+  syntax val  length "Array.length"
+  syntax val  append "Array.append"
+  syntax val  sub    "Array.sub"
+  syntax val  copy   "Array.copy"
+  syntax val  fill   "Array.fill"
+  syntax val  blit   "Array.blit"
+  syntax val  self_blit "Array.blit"
+end
+
+module mach.array.Array63
+  syntax type array  "(%1 array)"
+
+  syntax val  make   "Array.make"
+  syntax val  ([])   "Array.get"
+  syntax val  ([]<-) "Array.set"
+  syntax val  length "Array.length"
+  syntax val  append "Array.append"
+  syntax val  sub    "Array.sub"
+  syntax val  copy   "Array.copy"
+  syntax val  fill   "Array.fill"
+  syntax val  blit   "Array.blit"
+  syntax val  self_blit "Array.blit"
+end
