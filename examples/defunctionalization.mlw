@@ -99,10 +99,7 @@ holds.
 function eval_0 (e:expr) : int =
   match e with
   | Cte n -> n
-  | Sub e1 e2 ->
-     let v1 = eval_0 e1 in
-     let v2 = eval_0 e2 in
-     v1 - v2
+  | Sub e1 e2 -> eval_0 e1 - eval_0 e2
   end
 
 function interpret_0 (p:prog) : int = eval_0 p
