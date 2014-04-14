@@ -76,7 +76,7 @@ module Increasing
   
 end
 
-module Decreasing
+(*module Decreasing
   
   clone export Base
   use import list.List
@@ -122,14 +122,20 @@ end
 module IncDec
   
   use import list.Reverse
+  use import list.Mem
   
   clone export Increasing
   clone Decreasing as D with namespace K = K, namespace O = O
+  
+  let rec lemma mem_reverse (x:K.t 'a 'b) (l:list (K.t 'a 'b)) : unit
+    ensures { mem x l <-> mem x (reverse l) }
+    variant { l }
+  = match l with Nil -> () | Cons _ q -> mem_reverse x q end
   
   let rec lemma increasing_decreasing (o:O.param 'a) (l:list (K.t 'a 'b)) : unit
     ensures { increasing o l <-> D.decreasing o (reverse l) }
     variant { l }
   = match l with Nil -> () | Cons _ q -> increasing_decreasing o q end
   
-end
+end*)
 

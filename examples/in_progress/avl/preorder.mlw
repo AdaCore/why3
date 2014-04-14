@@ -27,22 +27,40 @@ theory FullParam
   
 end
 
-(* Preorder + corresponding computable comparison. *)
+theory TotalFullParam
+  
+  clone export FullParam
+  clone export relations_params.TotalParam with type t = t,
+    type param = order, predicate correct_for = correct_for,
+    predicate rel = le
+  clone relations_params.TotalParam as Lt with type t = t,
+    type param = order, predicate correct_for = correct_for,
+    predicate rel = le, goal total
+  lemma lt_def2 : forall o:order 'a,x y:t 'a.
+    correct_for o x /\ correct_for o y -> lt o x y <-> not le o y x
+  
+end
+
+(* Total preorder + corresponding program types and computable comparison. *)
 module ComputableParam
   
   use import int.Int
-  clone export program_type.Type1
+  use import program_type.TypeParams
+  clone program_type.Type1 as T
   clone program_type.Type1 as O
-  clone export FullParam with type t = m, type order = O.m
+  clone export TotalFullParam with type t = T.m, type order = O.m
   
   (* Comparison is computable. *)
-  val compare (o:O.t 'a) (x y:t 'a) : int
-    requires { O.c o }
-    requires { correct_for o.O.m x.m /\ c x }
-    requires { correct_for o.O.m y.m /\ c y }
-    ensures { result > 0 <-> lt o.O.m y.m x.m }
-    ensures { result < 0 <-> lt o.O.m x.m y.m }
-    ensures { result = 0 <-> eq o.O.m x.m y.m }
+  val compare (ghost p:type_params 'a 'b) (o:O.t 'a 'b) (x y:T.t 'a 'b) : int
+    requires { let op = O.make_params p in let tp = T.make_params p in
+      op.inv o /\ tp.inv x /\ tp.inv y /\
+      correct_for (op.mdl o) (tp.mdl x) /\
+      correct_for (op.mdl o) (tp.mdl y) }
+    ensures { let om = p.O.make_params.mdl o in
+      let mt = p.T.make_params.mdl in let xm = mt x in let ym = mt y in
+        (result > 0 <-> lt om ym xm) /\
+        (result < 0 <-> lt om xm ym) /\
+        (result = 0 <-> eq om xm ym) }
   
 end
 

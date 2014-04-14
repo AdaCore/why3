@@ -5,7 +5,9 @@ module TypeParams
   
   (* Additional information for parametric programs:
      'a represent the program type (the effective datatype),
-     'b represent its logical model (the reasoning datatype).
+     'b represent its logical model (the reasoning datatype),
+     which may be different from the effective datatype.
+     Also, one need the representation invariant over the 'a datatype.
      inv is the representation invariant of 'a,
      mdl the function mapping the program representation to its logical model.
    *)
@@ -28,7 +30,7 @@ module Type0
   predicate c t
   (* get logical model (m for model). *)
   function m t : m
-  (* Parameteric information (for use in polymorphic code). *)
+  (* Parametric information (for use in polymorphic code). *)
   constant p : type_params t m = { inv = (\t. c t); mdl = (\t. m t) }
   
 end
@@ -42,6 +44,20 @@ module Type1
   (* Need two types variables to represent both the program and logic worlds. *)
   type t 'a 'b
   type m 'b
+  (* Parametric model and invariants. *)
+  function make_params (type_params 'a 'b) : type_params (t 'a 'b) (m 'b)  
+  
+end
+
+(* Variant for a type storing explicitly its parameters
+  (typically in ghost fields). *)
+
+module Type1Prm
+  
+  use import TypeParams
+  
+  type t 'a 'b
+  type m 'b
   predicate c (t 'a 'b)
   function m (t 'a 'b) : m 'b
   function prm (t 'a 'b) : type_params 'a 'b
@@ -52,6 +68,17 @@ module Type1
 end
 
 module Type2
+  
+  use import TypeParams
+  
+  type t 'a 'b 'c 'd
+  type m 'b 'd
+  function make_params (type_params 'a 'b)
+    (type_params 'c 'd) : type_params (t 'a 'b 'c 'd) (m 'b 'd)
+  
+end
+
+module Type2Prm
   
   use import TypeParams
   

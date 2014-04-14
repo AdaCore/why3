@@ -8,7 +8,7 @@
  <file
   name="../sorted.mlw"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Base"
    locfile="../sorted.mlw"
@@ -373,11 +373,33 @@
    verified="true"
    expanded="false">
    <goal
+    name="WP_parameter mem_reverse"
+    locfile="../sorted.mlw"
+    loclnum="130" loccnumb="16" loccnume="27"
+    expl="VC for mem_reverse"
+    sum="0e66aa18fb07ee588d06d6ed1644255d"
+    proved="true"
+    expanded="false"
+    shape="CamemV0areverseV1qamemV0V1aNilamemV0areverseV1qamemV0V1IamemV0areverseV2qamemV0V2ACfaNilainfix =V3V2aConswVV1aConswVV1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for mem_reverse"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.10"/>
+    </proof>
+   </goal>
+   <goal
     name="WP_parameter increasing_decreasing"
     locfile="../sorted.mlw"
-    loclnum="129" loccnumb="16" loccnume="37"
+    loclnum="135" loccnumb="16" loccnume="37"
     expl="VC for increasing_decreasing"
-    sum="fc5517c45b6edbc81fdff121cfd08208"
+    sum="4e7e8fd0716e48f9f3da73cba390ccb6"
     proved="true"
     expanded="false"
     shape="CadecreasingV0areverseV1qaincreasingV0V1aNiladecreasingV0areverseV1qaincreasingV0V1IadecreasingV0areverseV2qaincreasingV0V2ACfaNilainfix =V3V2aConswVV1aConswVV1F">
@@ -385,14 +407,77 @@
      name="why3:lemma"/>
     <label
      name="expl:VC for increasing_decreasing"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.34"/>
-    </proof>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter increasing_decreasing.1"
+      locfile="../sorted.mlw"
+      loclnum="135" loccnumb="16" loccnume="37"
+      expl="1. postcondition"
+      sum="e151a7fd6fe64741478b4d2879c307ca"
+      proved="true"
+      expanded="false"
+      shape="postconditionCadecreasingV0areverseV1qaincreasingV0V1aNiltaConswVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_decreasing"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter increasing_decreasing.2"
+      locfile="../sorted.mlw"
+      loclnum="135" loccnumb="16" loccnume="37"
+      expl="2. variant decrease"
+      sum="7c1661a299ce7960b34b61eca27782d5"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNilCfaNilainfix =V3V2aConswVV1aConswVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_decreasing"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter increasing_decreasing.3"
+      locfile="../sorted.mlw"
+      loclnum="135" loccnumb="16" loccnume="37"
+      expl="3. postcondition"
+      sum="3b5e887e352dfb976fcad00536a9d272"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNiladecreasingV0areverseV1qaincreasingV0V1IadecreasingV0areverseV2qaincreasingV0V2aConswVV1F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_decreasing"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.34"/>
+      </proof>
+     </goal>
+    </transf>
    </goal>
   </theory>
  </file>

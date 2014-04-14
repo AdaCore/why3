@@ -9,17 +9,19 @@ module Assoc
   
   use import list.List
   use import list.Mem
+  use import list.Append
   use import option.Option
   use import HighOrd
   
   predicate appear (p:param 'a) (k:key 'a) (l:list (t 'a 'b)) =
     exists x. mem x l /\ correct_for p k /\ Eq.rel p k (key x)
   
+  lemma appear_append : forall p:param 'a,k:key 'a,l r:list (t 'a 'b).
+    appear p k (l++r) <-> appear p k l \/ appear p k r
+  
   (* Correction. *)
-  predicate correct (p:param 'a) (l:list (t 'a 'b)) = match l with
-    | Nil -> true
-    | Cons x q -> let kx = key x in correct_for p kx /\ correct p q
-    end
+  predicate correct (p:param 'a) (l:list (t 'a 'b)) =
+    forall x. mem x l -> let kx = key x in correct_for p kx
   
   (* Unique occurence (a desirable property of an association list). *)
   predicate unique (p:param 'a) (l:list (t 'a 'b)) = match l with
@@ -32,10 +34,12 @@ module Assoc
     (k:key 'a) (b:'b) : key 'a -> 'b = \k2.
       if Eq.rel p k k2 then b else f k2
   
+  function const_none : 'a -> option 'b = \x.None
+  
   (* functional model of an association list. *)
   function model (p:param 'a) (l:list (t 'a 'b)) : key 'a -> option (t 'a 'b) =
     match l with
-    | Nil -> \x. None
+    | Nil -> const_none
     | Cons d q -> param_update p (model p q) (key d) (Some d)
     end
   
@@ -46,6 +50,7 @@ module Assoc
     requires { correct_for p k }
     ensures { appear p k l <-> match model p l k with None -> false
       | Some _ -> true end }
+    ensures { not appear p k l <-> model p l k = None }
     variant { l }
   = match l with Cons _ q -> model_occurence p k q | _ -> () end
   
@@ -66,7 +71,11 @@ module Assoc
     requires { Eq.rel p k1 k2 }
     ensures { model p l k1 = model p l k2 }
     variant { l }
-  = match l with Cons _ q -> model_equal p k1 k2 q | _ -> () end
+  = match l with
+    | Cons x q -> assert { correct_for p x.key };
+      model_equal p k1 k2 q
+    | _ -> ()
+    end
   
   (* If the list satisfies the uniqueness property,
      then every value occuring in the list is the image of its key. *)
@@ -77,6 +86,36 @@ module Assoc
     ensures { forall d. mem d l -> model p l (key d) = Some d }
     variant { l }
   = match l with Cons _ q -> model_unique p k q | _ -> () end
+  
+  (* Singleton association list. *)
+  let lemma model_singleton (p:param 'a) (k:key 'a) (d:t 'a 'b) : unit
+    requires { correct_for p d.key }
+    requires { correct_for p k }
+    ensures { model p (Cons d Nil) k = if rel p k d.key
+      then Some d
+      else None }
+  = ()
+  
+  (* Unique union of association list by concatenation. *)
+  let rec lemma model_concat (p:param 'a) (k:key 'a) (l r:list (t 'a 'b)) : unit
+    requires { correct p (l++r) /\ correct p l /\ correct p r }
+    requires { unique p (l++r) /\ unique p l /\ unique p r }
+    requires { correct_for p k }
+    ensures { match model p l k with None -> model p (l++r) k = model p r k
+      | s -> model p (l++r) k = s end }
+    ensures { match model p r k with None -> model p (l++r) k = model p l k
+      | s -> model p (l++r) k = s end }
+    ensures { model p (l++r) k = None <->
+      model p l k = None /\ model p r k = None }
+    ensures { model p l k = None \/ model p r k = None }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons d q -> assert { rel p d.key k -> model p r k <> None ->
+      match model p r k with None -> false | _ -> not appear p k r && false end
+      && false };
+      model_concat p k q r
+    end
   
 end
 
@@ -92,17 +131,15 @@ module AssocSorted
   
   clone import key_type.KeyType as K
   clone import preorder.FullParam as O with type t = key
-  (* The commented out part do not work, unfortunately. *)
-  clone export Assoc with namespace K = K,(*namespace Eq = O.Eq*)
+  clone export Assoc with namespace K = K,
       type Eq.param = O.order,
       predicate Eq.correct_for = O.correct_for,
       predicate Eq.rel = O.eq,
-      (* Duplicates, there is no need to keep them. *)
+      (* Duplicates, there is no need to keep them as lemma. *)
       goal Eq.trans,
       goal Eq.refl,
       goal Eq.symm
   clone sorted.Increasing as S with namespace K = K,
-    (*namespace O = O.Lt*)
     type O.param = O.order,
     predicate O.correct_for = O.correct_for,
     predicate O.rel = O.lt,
@@ -117,27 +154,57 @@ module AssocSorted
     variant { l }
   = match l with Cons _ q -> increasing_unique_and_correct o q | _ -> () end
   
-  let lemma absent (o:order 'a) (k:key 'a) (l r:list (t 'a 'b)) : unit
+  let lemma model_cut (o:order 'a) (k:key 'a) (l r:list (t 'a 'b)) : unit
     requires { correct_for o k }
-    requires { S.increasing o l }
     requires { S.increasing o r }
+    requires { S.increasing o l }
     requires { S.majorate o k l }
     requires { S.minorate o k r }
-    ensures { model o (l++r) k = None }
-  = assert { S.precede o l r && not appear o k (l++r) &&
-    match model o (l++r) k with None -> true | _ -> false end }
+    ensures { forall k2. correct_for o k2 /\ eq o k k2 ->
+      model o (l++r) k2 = None }
+    ensures { forall k2. correct_for o k2 /\ lt o k k2 ->
+      model o (l++r) k2 = model o r k2 }
+    ensures { forall k2. correct_for o k2 /\ le o k2 k ->
+      model o r k2 = None }
+    ensures { forall k2. correct_for o k2 /\ lt o k2 k ->
+      model o (l++r) k2 = model o l k2 }
+    ensures { forall k2. correct_for o k2 /\ le o k k2 ->
+      model o l k2 = None }
+  = assert { S.increasing o (l++r) };
+    assert { forall k2. correct_for o k2 /\ lt o k k2 ->
+    model o (l++r) k2 <> model o r k2 -> match model o r k2 with
+      | None -> match model o l k2 with
+        | None -> false
+        | Some d -> lt o d.key k && false
+        end && false
+      | _ -> false
+      end && false };
+    assert { forall k2. correct_for o k2 /\ lt o k2 k ->
+      model o (l++r) k2 <> model o l k2 -> match model o l k2 with
+       | None -> match model o r k2 with
+         | None -> false
+         | Some d -> lt o k d.key && false
+         end && false
+       | _ -> false
+       end && false }
   
-  let lemma present (o:order 'a) (k:key 'a) (l r:list (t 'a 'b))
-    (d:t 'a 'b) : unit
-    requires { correct_for o k }
-    requires { correct_for o (key d) }
+  let lemma model_split (o:order 'a) (d:t 'a 'b) (l r:list (t 'a 'b)) : unit
+    requires { correct_for o d.key }
     requires { S.increasing o l }
     requires { S.increasing o r }
-    requires { S.majorate o k l }
-    requires { S.minorate o k r }
-    requires { eq o k (key d) }
-    ensures { model o (l++Cons d r) k = Some d }
-  = assert { S.increasing o (l++Cons d r) }
+    requires { S.majorate o d.key l }
+    requires { S.minorate o d.key r }
+    ensures { forall k2. correct_for o k2 /\ eq o d.key k2 ->
+      model o (l++Cons d r) k2 = Some d }
+    ensures { forall k2. correct_for o k2 /\ lt o d.key k2 ->
+      model o (l++Cons d r) k2 = model o r k2 }
+    ensures { forall k2. correct_for o k2 /\ le o k2 d.key ->
+      model o r k2 = None }
+    ensures { forall k2. correct_for o k2 /\ lt o k2 d.key ->
+      model o (l++Cons d r) k2 = model o l k2 }
+    ensures { forall k2. correct_for o k2 /\ le o d.key k2 ->
+      model o l k2 = None }
+  = ()
   
 end
 

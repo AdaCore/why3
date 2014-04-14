@@ -1,0 +1,471 @@
+
+module MapBase
+  
+  use import int.Int
+  use import avl.Base as B
+  use import avl.SelectionTypes
+  use import program_type.TypeParams
+  use import option.Option
+  use import ref.Ref
+  use import list.List
+  use import list.Append
+  use import list.Mem
+  
+  (* Move remaining parameters here. *)
+  constant balancing : int
+  axiom balancing_positive : balancing > 0
+  
+  clone export key_type.ProgramKeyType
+  clone preorder.ComputableParam as CO with namespace T = K
+  
+  (* Full clone of association_list. *)
+  clone association_list.AssocSorted as A with type K.t = D.m,
+    type K.key = K.m,
+    function K.key = key,
+    type O.order = CO.O.m,
+    predicate O.correct_for = CO.correct_for,
+    predicate O.le = CO.le,
+    goal O.refl,
+    goal O.trans,
+    predicate O.eq = CO.eq,
+    goal O.eq_def,
+    predicate O.lt = CO.lt,
+    goal O.lt_def
+  
+  (* Selector: key with respect to an order. *)
+  type selector 'a 'b 'c 'd = { o : CO.O.t 'a 'b; k : K.t 'a 'b }
+  
+  (* Correction of a selector with respect to an avl:
+     1) the selector key is correct with respect to the ordering,
+     2) The avl is sorted with respect to the ordering. *)
+  
+  predicate selector_correct (p1:type_params 'a 'b) (p2:type_params 'c 'd)
+    (s:selector 'a 'b 'c 'd)
+    (t:B.t (D.t 'a 'b 'c 'd) (D.m 'b 'd)) =
+      let om = (CO.O.make_params p1).mdl s.o in
+      let km = (K.make_params p1).mdl s.k in
+      CO.correct_for om km /\ A.S.increasing om t.m.lis /\
+      (CO.O.make_params p1).inv s.o /\
+      (K.make_params p1).inv s.k
+  
+  predicate selected (p1:type_params 'a 'b) (p2:type_params 'c 'd)
+    (s:selector 'a 'b 'c 'd) (e:position (D.m 'b 'd))
+    (t:B.t (D.t 'a 'b 'c 'd) (D.m 'b 'd)) =
+      let om = (CO.O.make_params p1).mdl s.o in
+      let km = (K.make_params p1).mdl s.k in
+      A.S.majorate om km e.left /\ A.S.minorate om km e.right /\
+      A.S.increasing om e.left /\ A.S.increasing om e.right /\
+      match e.middle with
+      | None -> true
+      | Some d2 -> let k2 = key d2 in
+        CO.correct_for om k2 /\ CO.eq om km k2
+      end
+  
+  let selected_way_impl (ghost p1:type_params 'a 'b)
+    (ghost p2:type_params 'c 'd)
+    (s:selector 'a 'b 'c 'd)
+    (ghost base:B.t (D.t 'a 'b 'c 'd) (D.m 'b 'd))
+    (l:B.t (D.t 'a 'b 'c 'd) (D.m 'b 'd))
+    (d:D.t 'a 'b 'c 'd)
+    (r:B.t (D.t 'a 'b 'c 'd) (D.m 'b 'd)) : way_base (selector 'a 'b 'c 'd)
+    requires { exists b. c_balancing b l /\ c_balancing b r /\
+      c_balancing b base }
+    requires { l.prm = r.prm = base.prm /\ l.prm.inv d }
+    requires { l.prm = D.make_params p1 p2 }
+    requires { let l0 = node_model l.m.lis (l.prm.mdl d) r.m.lis in
+      base.m.lis = l0 /\ selector_correct p1 p2 s base }
+    returns { Here -> let e2 = { left = l.m.lis;
+        middle = Some (l.prm.mdl d);
+        right = r.m.lis } in selected p1 p2 s e2 base /\
+          rebuild e2 = node_model l.m.lis (l.prm.mdl d) r.m.lis
+      | Left sl -> selector_correct p1 p2 sl l /\
+        forall e. selected p1 p2 sl e l /\ rebuild e = l.m.lis ->
+          let e2 = { e with right = node_model e.right (l.prm.mdl d) r.m.lis }
+          in selected p1 p2 s e2 base /\ rebuild e2 = base.m.lis
+      | Right sr -> selector_correct p1 p2 sr r /\
+        forall e. selected p1 p2 sr e r /\ rebuild e = r.m.lis ->
+          let e2 = { e with left = node_model l.m.lis (l.prm.mdl d) e.left } in
+          selected p1 p2 s e2 base /\ rebuild e2 = base.m.lis }
+  = let kd = get_key p1 p2 d in
+    let cmp = CO.compare p1 s.o s.k kd in
+    if cmp < 0
+    then begin
+      assert { let mk = p1.K.make_params.mdl in
+        let om = p1.CO.O.make_params.mdl s.o in
+        D.make_params p1 p2 = base.prm -> CO.lt om (mk s.k) (mk kd) &&
+        A.S.minorate om (mk s.k) r.m.lis &&
+        (forall e. rebuild e = l.m.lis -> A.S.majorate om (mk kd) l.m.lis &&
+          A.S.majorate om (mk kd) e.right &&
+          A.S.increasing om (node_model e.right (l.prm.mdl d) r.m.lis)) };
+      Left s
+    end else if cmp > 0
+    then begin
+      assert { let mk = p1.K.make_params.mdl in
+        let om = p1.CO.O.make_params.mdl s.o in
+        D.make_params p1 p2 = base.prm -> CO.lt om (mk kd) (mk s.k) &&
+        A.S.majorate om (mk s.k) l.m.lis &&
+        (forall e. rebuild e = r.m.lis /\ A.S.increasing om e.left ->
+          A.S.minorate om (mk kd) r.m.lis && A.S.minorate om (mk kd) e.left &&
+          A.S.increasing om (node_model l.m.lis (l.prm.mdl d) e.left)) };
+      Right s
+    end else begin 
+      assert { let mk = p1.K.make_params.mdl in
+        let om = p1.CO.O.make_params.mdl s.o in
+        D.make_params p1 p2 = base.prm -> CO.eq om (mk kd) (mk s.k) &&
+        A.S.majorate om (mk s.k) l.B.m.B.lis &&
+        A.S.minorate om (mk s.k) r.B.m.B.lis };
+      Here
+    end
+  
+  
+  (* Full clone of the avl selection module. *)
+  clone avl.Selection as Sel with namespace D = D,
+    type selector = selector,
+    predicate selector_correct = selector_correct,
+    predicate selected = selected,
+    val selected_way = selected_way_impl,
+    goal selector_correct_empty,
+    constant balancing = balancing,
+    goal balancing_positive
+  
+  type t 'a 'b 'c 'd = {
+    repr : B.t (D.t 'a 'b 'c 'd) (D.m 'b 'd);
+    order : CO.O.t 'a 'b;
+    ghost prm1 : type_params 'a 'b;
+    ghost prm2 : type_params 'c 'd;
+  }
+  
+  type m 'b 'd = {
+    func : K.m 'b -> option (D.m 'b 'd);
+    ord : CO.O.m 'b;
+  }
+  
+  function prm (t:t 'a 'b 'c 'd) : (type_params 'a 'b,type_params 'c 'd) =
+    (t.prm1,t.prm2)
+  function oprm (t:t 'a 'b 'c 'd) : type_params (CO.O.t 'a 'b) (CO.O.m 'b) =
+    t.prm1.CO.O.make_params
+  function kprm (t:t 'a 'b 'c 'd) : type_params (K.t 'a 'b) (K.m 'b) =
+    t.prm1.K.make_params
+  function dprm (t:t 'a 'b 'c 'd) : type_params (D.t 'a 'b 'c 'd) (D.m 'b 'd) =
+    D.make_params t.prm1 t.prm2
+  
+  function m (t:t 'a 'b 'c 'd) : m 'b 'd =
+    { func = A.model (t.oprm.mdl t.order) t.repr.B.m.B.lis;
+      ord = t.oprm.mdl t.order }
+  
+  predicate c (t:t 'a 'b 'c 'd) =
+    Sel.c t.repr /\
+    t.repr.B.prm = t.dprm /\
+    A.S.increasing (t.oprm.mdl t.order) t.repr.B.m.B.lis /\
+    t.oprm.inv t.order
+  
+  clone export program_type.Type2Prm with type t = t, type m = m,
+    function m = m,predicate c = c,function prm1 = prm1,function prm2 = prm2
+  
+  (* Should be the exported part of the invariant. *)
+  let lemma correction (t:t 'a 'b 'c 'd) : unit
+    requires { c t }
+    ensures { forall k1 k2:K.m 'b. CO.correct_for t.m.ord k1 /\
+      CO.correct_for t.m.ord k2 /\ CO.eq t.m.ord k1 k2 ->
+      t.m.func k1 = t.m.func k2 }
+    ensures { forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      match t.m.func k with
+      | None -> true
+      | Some d -> CO.correct_for t.m.ord (key d) /\ CO.eq t.m.ord (key d) k
+      end }
+  = ()
+  
+  let empty (ghost p1:type_params 'a 'b)
+    (ghost p2:type_params 'c 'd) (o:CO.O.t 'a 'b) : t 'a 'b 'c 'd
+    requires { p1.CO.O.make_params.inv o }
+    ensures { result.prm1 = p1 /\ result.prm2 = p2 }
+    ensures { c result }
+    ensures { p1.CO.O.make_params.mdl o = result.m.ord }
+    ensures { forall k:K.m 'b. CO.correct_for result.m.ord k ->
+      result.m.func k = None }
+  = { repr = Sel.empty (D.make_params p1 p2); order = o; prm1 = p1; prm2 = p2 }
+  
+  let singleton (ghost p1:type_params 'a 'b) (ghost p2:type_params 'c 'd)
+    (o:CO.O.t 'a 'b) (d:D.t 'a 'b 'c 'd) : t 'a 'b 'c 'd
+    requires { p1.CO.O.make_params.inv o }
+    requires { (D.make_params p1 p2).inv d }
+    requires { CO.correct_for (p1.CO.O.make_params.mdl o)
+      (key ((D.make_params p1 p2).mdl d)) }
+    ensures { result.prm1 = p1 /\ result.prm2 = p2 }
+    ensures { c result }
+    ensures { p1.CO.O.make_params.mdl o = result.m.ord }
+    ensures { forall k:K.m 'b. CO.correct_for result.m.ord k ->
+      if CO.eq result.m.ord k (key (result.dprm.mdl d))
+      then result.m.func k = Some (result.dprm.mdl d)
+      else result.m.func k = None }
+  = let res = { repr = Sel.singleton (D.make_params p1 p2) d;
+      order = o;
+      prm1 = p1;
+      prm2 = p2 } in
+    res
+  
+  let is_empty (ghost rd:ref (D.m 'b 'd)) (t:t 'a 'b 'c 'd) : bool
+    requires { c t }
+    ensures { result -> forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      t.m.func k = None }
+    ensures { not result -> CO.correct_for t.m.ord (key !rd) /\
+      t.m.func (key !rd) = Some !rd }
+  = let res = Sel.is_empty t.repr in
+    ghost if not res
+    then match t.repr.B.m.B.lis with
+      | Nil -> absurd
+      | Cons d _ -> rd := d
+      end;
+    res
+  
+  let param_copy (t:t 'a 'b 'c 'd)
+    (u:B.t (D.t 'a 'b 'c 'd) (D.m 'b 'd)) : t 'a 'b 'c 'd
+    ensures { result.repr = u }
+    ensures { result.order = t.order /\ result.m.ord = t.m.ord }
+    ensures { result.prm1 = t.prm1 }
+    ensures { result.prm2 = t.prm2 }
+  = { repr = u; order = t.order; prm1 = t.prm1; prm2 = t.prm2 }
+  
+  let decompose_min (t:t 'a 'b 'c 'd) : option (D.t 'a 'b 'c 'd,t 'a 'b 'c 'd)
+    requires { c t }
+    returns { None -> forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      t.m.func k = None
+      | Some (d,r) -> let dm = r.dprm.mdl d in
+        r.prm = t.prm /\ r.m.ord = t.m.ord /\ t.dprm.inv d /\
+        CO.correct_for t.m.ord dm.key /\
+        forall k:K.m 'b. CO.correct_for t.m.ord k ->
+          (CO.lt t.m.ord k dm.key -> t.m.func k = None) /\
+          (CO.eq t.m.ord k dm.key -> t.m.func k = Some dm) /\
+          (CO.le r.m.ord k dm.key -> r.m.func k = None) /\
+          (not CO.eq r.m.ord dm.key k -> r.m.func k = t.m.func k) }
+  = match Sel.decompose_front t.repr with
+    | None -> None
+    | Some (d,r) -> let r = param_copy t r in
+      assert { let om = r.m.ord in let dm = r.dprm.mdl d in
+        let lt = t.repr.B.m.B.lis in let lr = r.repr.B.m.B.lis in
+        CO.correct_for om dm.key && t.m.func = A.model om lt &&
+        r.m.func = A.model om lr && om = t.m.ord &&
+        lt = (Cons dm Nil) ++ lr && A.S.minorate om dm.key lr &&
+        A.S.increasing om lr };
+      Some (d,r)
+    end
+  
+  let decompose_max (t:t 'a 'b 'c 'd) : option (t 'a 'b 'c 'd,D.t 'a 'b 'c 'd)
+    requires { c t }
+    returns { None -> forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      t.m.func k = None
+      | Some (l,d) -> let dm = l.dprm.mdl d in
+        l.prm = t.prm /\ l.m.ord = t.m.ord /\ t.dprm.inv d /\
+        CO.correct_for t.m.ord dm.key /\
+        forall k:K.m 'b. CO.correct_for t.m.ord k ->
+          (CO.lt t.m.ord dm.key k -> t.m.func k = None) /\
+          (CO.eq t.m.ord dm.key k -> t.m.func k = Some dm) /\
+          (CO.le l.m.ord dm.key k -> l.m.func k = None) /\
+          (not CO.eq l.m.ord k dm.key -> l.m.func k = t.m.func k) }
+  = match Sel.decompose_back t.repr with
+    | None -> None
+    | Some (l,d) -> let l = param_copy t l in
+      assert { let om = l.m.ord in let dm = l.dprm.mdl d in
+        let lt = t.repr.B.m.B.lis in let ll = l.repr.B.m.B.lis in
+        CO.correct_for om dm.key && t.m.func = A.model om lt &&
+        l.m.func = A.model om ll && om = t.m.ord &&
+        lt = ll ++ (Cons dm Nil) && A.S.majorate om dm.key ll &&
+        A.S.increasing om ll };
+      Some (l,d)
+    end
+  
+  let add_min (d:D.t 'a 'b 'c 'd) (t:t 'a 'b 'c 'd) : t 'a 'b 'c 'd
+    requires { c t /\ t.dprm.inv d }
+    requires { CO.correct_for t.m.ord (t.dprm.mdl d).key }
+    requires { forall k:K.m 'b. CO.correct_for t.m.ord k /\
+      CO.le t.m.ord k (t.dprm.mdl d).key -> t.m.func k = None }
+    ensures { c result /\ result.prm = t.prm /\ result.m.ord = t.m.ord }
+    ensures { let dm = t.dprm.mdl d in
+      forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      (CO.lt t.m.ord k dm.key -> result.m.func k = None) /\
+      (CO.eq t.m.ord k dm.key -> result.m.func k = Some dm) /\
+      (not CO.eq t.m.ord dm.key k -> result.m.func k = t.m.func k) }
+  = let res = param_copy t (Sel.cons d t.repr) in
+    assert { let lt = t.repr.B.m.B.lis in
+      let lr = res.repr.B.m.B.lis in
+      let om = t.m.ord in let dm = t.dprm.mdl d in
+      res.m.func = A.model om lr && t.m.func = A.model om lt &&
+      lr = (Cons dm Nil) ++ lt && (not A.S.minorate om dm.key lt ->
+        (forall d. mem d lt ->
+        not (CO.correct_for om d.key /\
+             CO.lt om dm.key d.key) ->
+          A.correct om lt && CO.correct_for om d.key && CO.le om d.key dm.key
+          && A.appear om d.key lt && false)
+      && false) && A.S.increasing om lr };
+    res
+  
+  let add_max (t:t 'a 'b 'c 'd) (d:D.t 'a 'b 'c 'd) : t 'a 'b 'c 'd
+    requires { c t /\ t.dprm.inv d }
+    requires { CO.correct_for t.m.ord (t.dprm.mdl d).key }
+    requires { forall k:K.m 'b. CO.correct_for t.m.ord k /\
+      CO.le t.m.ord (t.dprm.mdl d).key k -> t.m.func k = None }
+    ensures { let dm = t.dprm.mdl d in
+      forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      (CO.lt t.m.ord dm.key k -> result.m.func k = None) /\
+      (CO.eq t.m.ord k dm.key -> result.m.func k = Some dm) /\
+      (not CO.eq t.m.ord dm.key k -> result.m.func k = t.m.func k) }
+  = let res = param_copy t (Sel.snoc t.repr d) in
+    assert { let lt = t.repr.B.m.B.lis in
+      let lr = res.repr.B.m.B.lis in
+      let om = t.m.ord in let dm = t.dprm.mdl d in
+      res.m.func = A.model om lr && t.m.func = A.model om lt &&
+      lr = lt ++ (Cons dm Nil) && (not A.S.majorate om dm.key lt ->
+        (forall d. mem d lt ->
+          not (CO.correct_for om d.key /\
+            CO.lt om d.key dm.key) ->
+          A.correct om lt && CO.correct_for om d.key && CO.le om dm.key d.key
+          && A.appear om d.key lt && false)
+        && false) && A.S.increasing om lr };
+    res
+  
+  let concat (l r:t 'a 'b 'c 'd) : t 'a 'b 'c 'd
+    requires { c l /\ c r /\ l.prm = r.prm /\ l.m.ord = r.m.ord }
+    requires { forall k1 k2. CO.correct_for l.m.ord k1 /\
+      CO.correct_for r.m.ord k2 /\ l.m.func k1 <> None /\
+      r.m.func k2 <> None -> CO.lt l.m.ord k1 k2 }
+    ensures { c result /\ result.prm = l.prm /\ result.m.ord = l.m.ord }
+    ensures { forall k. CO.correct_for l.m.ord k ->
+      match l.m.func k with None -> result.m.func k = r.m.func k
+      | s -> result.m.func k = s end }
+    ensures { forall k. CO.correct_for l.m.ord k ->
+      match r.m.func k with None -> result.m.func k = l.m.func k
+      | s -> result.m.func k = s end }
+    ensures { forall k. CO.correct_for l.m.ord k -> (result.m.func k = None <->
+      l.m.func k = None /\ r.m.func k = None) }
+  = let res = param_copy l (Sel.concat l.repr r.repr) in
+    assert { let ll = l.repr.B.m.B.lis in
+      let lr = r.repr.B.m.B.lis in
+      let om = l.m.ord in
+      l.m.func = A.model om ll && r.m.func = A.model om lr &&
+      (not A.S.precede om ll lr -> (forall d1 d2. mem d1 ll /\ mem d2 lr ->
+        not (CO.correct_for om d1.key /\
+             CO.correct_for om d2.key /\
+             CO.lt om d1.key d2.key) ->
+          A.correct om ll && A.correct om lr &&
+          CO.correct_for om d1.key && CO.correct_for om d2.key &&
+          A.appear om d1.key ll && A.appear om d2.key lr &&
+          l.m.func d1.key <> None && r.m.func d2.key <> None
+          && false) && false) &&
+      A.S.increasing om (ll++lr) && res.m.func = A.model om (ll++lr) };
+    res
+  
+  let get (k:K.t 'a 'b) (t:t 'a 'b 'c 'd) : option (D.t 'a 'b 'c 'd)
+    requires { c t /\ t.kprm.inv k }
+    requires { CO.correct_for t.m.ord (t.kprm.mdl k) }
+    returns { None -> let km = t.kprm.mdl k in
+      (forall k2. CO.correct_for t.m.ord k2 /\ CO.eq t.m.ord km k2 ->
+        t.m.func k2 = None) && t.m.func km = None
+      | Some d -> t.dprm.inv d /\ let km = t.kprm.mdl k in
+        let dm = t.dprm.mdl d in
+        CO.correct_for t.m.ord dm.key /\ CO.eq t.m.ord dm.key km /\
+        (forall k2. CO.correct_for t.m.ord k2 /\ CO.eq t.m.ord km k2 ->
+          t.m.func k2 = Some dm) && t.m.func km = Some dm = t.m.func dm.key }
+  = let r = Sel.default_position () in
+    let s = { o = t.order; k = k } in
+    let res = Sel.get t.prm1 t.prm2 r s t.repr in
+    let om = (CO.O.make_params t.prm1).mdl t.order in
+    let km = t.prm1.K.make_params.mdl k in
+    ghost match !r.middle with
+    | None -> A.model_cut om km !r.left !r.right
+    | Some rd -> A.model_split om rd !r.left !r.right
+    end;
+    res
+  
+  let add (d:D.t 'a 'b 'c 'd) (t:t 'a 'b 'c 'd) : t 'a 'b 'c 'd
+    requires { c t /\ t.dprm.inv d }
+    requires { CO.correct_for t.m.ord (t.dprm.mdl d).key }
+    ensures { c result /\ result.prm = t.prm /\ result.m.ord = t.m.ord }
+    ensures { let dm = t.dprm.mdl d in
+      (forall k:K.m 'b. CO.correct_for t.m.ord k ->
+       (CO.eq t.m.ord k dm.key -> result.m.func k = Some dm) /\
+       (not CO.eq t.m.ord k dm.key -> result.m.func k = t.m.func k)) &&
+      result.m.func dm.key = Some dm }
+  = let r = Sel.default_position () in
+    let s = { o = t.order; k = get_key t.prm1 t.prm2 d } in
+    let res = param_copy t (Sel.add t.prm1 t.prm2 r s d t.repr) in
+    let ll = !r.left in let lr = !r.right in
+    let om = (CO.O.make_params t.prm1).mdl t.order in
+    let dm = t.repr.B.prm.mdl d in
+    A.model_split om (t.repr.B.prm.mdl d) ll lr;
+    ghost match !r.middle with
+    | None -> A.model_cut om dm.key ll lr
+    | Some rd -> A.model_split om rd ll lr
+    end;
+    assert { forall k:K.m 'b. CO.correct_for t.m.ord k /\
+      CO.lt t.m.ord k dm.key -> res.m.func k = A.model om ll k = t.m.func k };
+    assert { forall k:K.m 'b. CO.correct_for t.m.ord k /\
+      CO.lt t.m.ord dm.key k -> res.m.func k = A.model om lr k = t.m.func k };
+    res
+  
+  let remove (k:K.t 'a 'b) (t:t 'a 'b 'c 'd) : t 'a 'b 'c 'd
+    requires { c t /\ t.kprm.inv k }
+    requires { CO.correct_for t.m.ord (t.kprm.mdl k) }
+    ensures { c result /\ result.prm = t.prm /\ result.m.ord = t.m.ord }
+    ensures { let km = t.kprm.mdl k in
+      (forall k2:K.m 'b. CO.correct_for t.m.ord k2 ->
+       (CO.eq t.m.ord k2 km -> result.m.func k2 = None) /\
+       (not CO.eq t.m.ord k2 km -> result.m.func k2 = t.m.func k2)) &&
+      result.m.func km = None }
+  = let r = Sel.default_position () in
+    let s = { o = t.order; k = k } in
+    let res = param_copy t (Sel.remove t.prm1 t.prm2 r s t.repr) in
+    let ll = !r.left in let lr = !r.right in
+    let om = (CO.O.make_params t.prm1).mdl t.order in
+    assert { A.S.precede om ll lr };
+    let km = t.prm1.K.make_params.mdl k in
+    A.model_cut om km ll lr;
+    ghost match !r.middle with
+    | None -> ()
+    | Some rd -> A.model_split om rd ll lr;
+      assert { forall k:K.m 'b. CO.correct_for t.m.ord k /\
+        CO.lt t.m.ord k km -> res.m.func k = A.model om ll k = t.m.func k };
+      assert { forall k:K.m 'b. CO.correct_for t.m.ord k /\
+        CO.lt t.m.ord km k -> res.m.func k = A.model om lr k = t.m.func k }
+    end;
+    res
+  
+  let split (k:K.t 'a 'b) (t:t 'a 'b 'c 'd) :
+    (t 'a 'b 'c 'd,option (D.t 'a 'b 'c 'd),t 'a 'b 'c 'd)
+    requires { c t /\ t.kprm.inv k }
+    requires { CO.correct_for t.m.ord (t.kprm.mdl k) }
+    returns { (lf,o,rg) ->
+      lf.prm = t.prm = rg.prm /\ lf.m.ord = t.m.ord = rg.m.ord /\
+      c lf /\ c rg /\
+      let om = t.m.ord in
+      let km = t.kprm.mdl k in
+      match o with
+      | None -> (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.eq om km k2 ->
+        t.m.func k2 = None) && t.m.func km = None
+      | Some d -> t.dprm.inv d /\ let dm = t.dprm.mdl d in
+        CO.correct_for om dm.key /\ CO.eq om km dm.key /\
+        (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.eq om km k2 ->
+          t.m.func k2 = Some dm) && t.m.func km = Some dm = t.m.func dm.key
+      end /\
+      (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.lt om k2 km ->
+        lf.m.func k2 = t.m.func k2) /\
+      (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.le om km k2 ->
+        lf.m.func k2 = None) /\
+      (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.lt om km k2 ->
+        rg.m.func k2 = t.m.func k2) /\
+      (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.le om k2 km ->
+        rg.m.func k2 = None) }
+  = let r = Sel.default_position () in
+    let s = { o = t.order; k = k } in
+    let (lf0,o,rg0) = Sel.split t.prm1 t.prm2 r s t.repr in
+    let lf = param_copy t lf0 in let rg = param_copy t rg0 in
+    let om = (CO.O.make_params t.prm1).mdl t.order in
+    let km = t.prm1.K.make_params.mdl k in
+    ghost match !r.middle with
+    | None -> A.model_cut om km !r.left !r.right
+    | Some rd -> A.model_split om rd !r.left !r.right;
+    end;
+    (lf,o,rg)
+    
+  
+end
+
