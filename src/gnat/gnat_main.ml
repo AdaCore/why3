@@ -119,7 +119,8 @@ and schedule_goal (g : Gnat_objectives.goal) =
    if Gnat_config.debug then begin
       Gnat_objectives.Save_VCs.save_vc g;
    end;
-   if Gnat_config.force then
+   if Gnat_config.force || (Gnat_config.prover.Whyconf.interactive
+                            && not g.Session.goal_verified) then
       actually_schedule_goal g
    else
       (* then implement reproving logic *)
@@ -145,7 +146,10 @@ let handle_obj obj =
         Gnat_report.register obj None None true ""
    end else begin
       match Gnat_objectives.next obj with
-      | Some g -> schedule_goal g
+      | Some g -> if Gnat_objectives.is_new_manual_proof g then
+                    Format.printf "created new file %s@."
+                                  (Gnat_objectives.create_prover_file g)
+                  else schedule_goal g
       | None -> ()
    end
 

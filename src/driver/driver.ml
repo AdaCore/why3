@@ -196,7 +196,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     drv_thprelude   = Mid.map List.rev !thprelude;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_meta        = !meta;
-    drv_res_parser = 
+    drv_res_parser =
       {
       prp_regexps     = List.rev !regexps;
       prp_timeregexps = List.rev !timeregexps;
@@ -324,25 +324,28 @@ let prove_task ~command ?timelimit ?memlimit ?old ?inplace drv task =
   let task = prepare_task drv task in
   prove_task_prepared ~command ?timelimit ?memlimit ?old ?inplace drv task
 
-let prove_task_server command ~timelimit ~memlimit drv task =
+let prove_task_server command ~timelimit ~memlimit ?old ?inplace drv task =
   let task = prepare_task drv task in
-  let fn = file_name_of_task drv task in
-  let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
-  let p = match drv.drv_printer with
-    | None -> raise NoPrinter
-    | Some p -> p
-  in
-  let fmt = Format.formatter_of_out_channel outc in
-  let printer = lookup_printer p
-    { Printer.env = drv.drv_env;
-      prelude     = drv.drv_prelude;
-      th_prelude  = drv.drv_thprelude;
-      blacklist   = drv.drv_blacklist;
-      filename    = fn } in
-  fprintf fmt "@[%a@]@?" (printer ?old:None) task;
-  close_out outc;
+  let fn = file_name_of_task ?old ?inplace drv task in
   let res_parser = drv.drv_res_parser in
-  prove_file_server ~command ~res_parser ~timelimit ~memlimit fn
+  match inplace with
+  | Some true ->
+     prove_file_server ~command ~res_parser ~timelimit ~memlimit ?inplace fn
+  | _ -> let fn, outc = Filename.open_temp_file "why_" ("_" ^ fn) in
+         let p = match drv.drv_printer with
+           | None -> raise NoPrinter
+           | Some p -> p
+         in
+         let fmt = Format.formatter_of_out_channel outc in
+         let printer = lookup_printer p
+                                      { Printer.env = drv.drv_env;
+                                        prelude     = drv.drv_prelude;
+                                        th_prelude  = drv.drv_thprelude;
+                                        blacklist   = drv.drv_blacklist;
+                                        filename    = fn } in
+         fprintf fmt "@[%a@]@?" (printer ?old:None) task;
+         close_out outc;
+         prove_file_server ~command ~res_parser ~timelimit ~memlimit fn
 
 (* exception report *)
 
@@ -367,4 +370,3 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | PSymExpected ls -> Format.fprintf fmt
       "%a is not a predicate symbol" Pretty.print_ls ls
   | e -> raise e)
-

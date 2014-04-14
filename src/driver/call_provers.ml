@@ -267,17 +267,20 @@ let gen_id =
 
 type save_data =
   { vc_file      : string;
+    is_temporary : bool;
     res_parser   : prover_result_parser;
   }
 
 let regexs = Hashtbl.create 17
 
-let prove_file_server ~res_parser ~command ~timelimit ~memlimit file =
+let prove_file_server ~res_parser ~command ~timelimit
+                      ~memlimit ?(inplace=false) file =
   let id = gen_id () in
   let cmd, _, _ =
     actualcommand command timelimit memlimit file in
   let saved_data =
     { vc_file      = file;
+      is_temporary = not inplace;
       res_parser   = res_parser } in
   Hashtbl.add regexs id saved_data;
   Prove_client.send_request ~id ~timelimit ~memlimit ~cmd;
@@ -303,7 +306,8 @@ let handle_answer answer =
   let id = answer.Prove_client.id in
   let save = Hashtbl.find regexs id in
   Hashtbl.remove regexs id;
-  Sys.remove save.vc_file;
+  if save.is_temporary then
+    Sys.remove save.vc_file;
   let out = read_and_delete_file answer.Prove_client.out_file in
   let ret = Unix.WEXITED answer.Prove_client.exit_code in
   let ans =

@@ -22,10 +22,18 @@ let add_goal g =
 let run_goal g =
   (* spawn a prover and return immediately. The return value is a tuple of type
      Call_provers.prover_call * Session.goal *)
+  let old, inplace, timeout =
+    match (Gnat_config.prover.Whyconf.interactive,
+           Session.PHprover.find_opt g.Session.goal_external_proofs
+                                     Gnat_config.prover.Whyconf.prover) with
+    | true, Some { Session.proof_edited_as = Some fn } ->
+       Some fn, Some true, 0
+    | _ -> None, None, Gnat_config.timeout in
   Driver.prove_task_server
     Gnat_config.prover.Whyconf.command
-    ~timelimit:Gnat_config.timeout
+    ~timelimit:timeout
     ~memlimit:0
+    ?old:old ?inplace:inplace
     Gnat_config.prover_driver
     (Session.goal_task g)
 
@@ -56,17 +64,22 @@ let handle_finished_call callback g res =
   (* On a pair of the type post_prover_call * goal, register the proof result
      in the session and call the callback *)
   let pas = (Session.Done res) in
+  let edit =
+    match Session.PHprover.find_opt g.Session.goal_external_proofs
+                                    Gnat_config.prover.Whyconf.prover with
+    | Some pa -> pa.Session.proof_edited_as
+    | _ -> None in
   let pa =
-    Session.add_external_proof
-      ~keygen:Keygen.keygen
-      ~obsolete:false
-      ~archived:false
-      ~timelimit:Gnat_config.timeout
-      ~memlimit:0
-      ~edit:None
-      g
-      Gnat_config.prover.Whyconf.prover
-      pas in
+       Session.add_external_proof
+         ~keygen:Keygen.keygen
+         ~obsolete:false
+         ~archived:false
+         ~timelimit:Gnat_config.timeout
+         ~memlimit:0
+         ~edit
+         g
+         Gnat_config.prover.Whyconf.prover
+         pas in
   callback pa pas
 
 let finished_goal callback rg id res =
