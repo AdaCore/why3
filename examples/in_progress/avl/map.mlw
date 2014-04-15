@@ -10,6 +10,7 @@ module MapBase
   use import list.List
   use import list.Append
   use import list.Mem
+  use import list.Length
   
   (* Move remaining parameters here. *)
   constant balancing : int
@@ -135,8 +136,12 @@ module MapBase
     ghost prm2 : type_params 'c 'd;
   }
   
+  (* Model: a finite association with respect to an ordering parameter.
+     The cardinal expose the finite part, and is mainly intended for
+     user variants. *)
   type m 'b 'd = {
     func : K.m 'b -> option (D.m 'b 'd);
+    card : int;
     ord : CO.O.m 'b;
   }
   
@@ -151,6 +156,7 @@ module MapBase
   
   function m (t:t 'a 'b 'c 'd) : m 'b 'd =
     { func = A.model (t.oprm.mdl t.order) t.repr.B.m.B.lis;
+      card = length t.repr.B.m.B.lis;
       ord = t.oprm.mdl t.order }
   
   predicate c (t:t 'a 'b 'c 'd) =
@@ -173,6 +179,7 @@ module MapBase
       | None -> true
       | Some d -> CO.correct_for t.m.ord (key d) /\ CO.eq t.m.ord (key d) k
       end }
+    ensures { t.m.card >= 0 }
   = ()
   
   let empty (ghost p1:type_params 'a 'b)
@@ -183,6 +190,7 @@ module MapBase
     ensures { p1.CO.O.make_params.mdl o = result.m.ord }
     ensures { forall k:K.m 'b. CO.correct_for result.m.ord k ->
       result.m.func k = None }
+    ensures { result.m.card = 0 }
   = { repr = Sel.empty (D.make_params p1 p2); order = o; prm1 = p1; prm2 = p2 }
   
   let singleton (ghost p1:type_params 'a 'b) (ghost p2:type_params 'c 'd)
@@ -198,6 +206,7 @@ module MapBase
       if CO.eq result.m.ord k (key (result.dprm.mdl d))
       then result.m.func k = Some (result.dprm.mdl d)
       else result.m.func k = None }
+    ensures { result.m.card = 1 }
   = let res = { repr = Sel.singleton (D.make_params p1 p2) d;
       order = o;
       prm1 = p1;
@@ -210,6 +219,7 @@ module MapBase
       t.m.func k = None }
     ensures { not result -> CO.correct_for t.m.ord (key !rd) /\
       t.m.func (key !rd) = Some !rd }
+    ensures { result <-> t.m.card = 0 }
   = let res = Sel.is_empty t.repr in
     ghost if not res
     then match t.repr.B.m.B.lis with
@@ -228,11 +238,12 @@ module MapBase
   
   let decompose_min (t:t 'a 'b 'c 'd) : option (D.t 'a 'b 'c 'd,t 'a 'b 'c 'd)
     requires { c t }
-    returns { None -> forall k:K.m 'b. CO.correct_for t.m.ord k ->
-      t.m.func k = None
+    returns { None -> (forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      t.m.func k = None) /\ t.m.card = 0
       | Some (d,r) -> let dm = r.dprm.mdl d in
         r.prm = t.prm /\ r.m.ord = t.m.ord /\ t.dprm.inv d /\
         CO.correct_for t.m.ord dm.key /\
+        t.m.card = r.m.card + 1 /\
         forall k:K.m 'b. CO.correct_for t.m.ord k ->
           (CO.lt t.m.ord k dm.key -> t.m.func k = None) /\
           (CO.eq t.m.ord k dm.key -> t.m.func k = Some dm) /\
@@ -252,11 +263,12 @@ module MapBase
   
   let decompose_max (t:t 'a 'b 'c 'd) : option (t 'a 'b 'c 'd,D.t 'a 'b 'c 'd)
     requires { c t }
-    returns { None -> forall k:K.m 'b. CO.correct_for t.m.ord k ->
-      t.m.func k = None
+    returns { None -> (forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      t.m.func k = None) /\ t.m.card = 0
       | Some (l,d) -> let dm = l.dprm.mdl d in
         l.prm = t.prm /\ l.m.ord = t.m.ord /\ t.dprm.inv d /\
         CO.correct_for t.m.ord dm.key /\
+        t.m.card = l.m.card + 1 /\
         forall k:K.m 'b. CO.correct_for t.m.ord k ->
           (CO.lt t.m.ord dm.key k -> t.m.func k = None) /\
           (CO.eq t.m.ord dm.key k -> t.m.func k = Some dm) /\
@@ -285,6 +297,7 @@ module MapBase
       (CO.lt t.m.ord k dm.key -> result.m.func k = None) /\
       (CO.eq t.m.ord k dm.key -> result.m.func k = Some dm) /\
       (not CO.eq t.m.ord dm.key k -> result.m.func k = t.m.func k) }
+    ensures { result.m.card = t.m.card + 1 }
   = let res = param_copy t (Sel.cons d t.repr) in
     assert { let lt = t.repr.B.m.B.lis in
       let lr = res.repr.B.m.B.lis in
@@ -310,6 +323,7 @@ module MapBase
       (CO.lt t.m.ord dm.key k -> result.m.func k = None) /\
       (CO.eq t.m.ord k dm.key -> result.m.func k = Some dm) /\
       (not CO.eq t.m.ord dm.key k -> result.m.func k = t.m.func k) }
+    ensures { result.m.card = t.m.card + 1 }
   = let res = param_copy t (Sel.snoc t.repr d) in
     assert { let lt = t.repr.B.m.B.lis in
       let lr = res.repr.B.m.B.lis in
@@ -338,6 +352,7 @@ module MapBase
       | s -> result.m.func k = s end }
     ensures { forall k. CO.correct_for l.m.ord k -> (result.m.func k = None <->
       l.m.func k = None /\ r.m.func k = None) }
+    ensures { result.m.card = l.m.card + r.m.card }
   = let res = param_copy l (Sel.concat l.repr r.repr) in
     assert { let ll = l.repr.B.m.B.lis in
       let lr = r.repr.B.m.B.lis in
@@ -361,7 +376,7 @@ module MapBase
     returns { None -> let km = t.kprm.mdl k in
       (forall k2. CO.correct_for t.m.ord k2 /\ CO.eq t.m.ord km k2 ->
         t.m.func k2 = None) && t.m.func km = None
-      | Some d -> t.dprm.inv d /\ let km = t.kprm.mdl k in
+      | Some d -> t.dprm.inv d /\ t.m.card > 0 /\ let km = t.kprm.mdl k in
         let dm = t.dprm.mdl d in
         CO.correct_for t.m.ord dm.key /\ CO.eq t.m.ord dm.key km /\
         (forall k2. CO.correct_for t.m.ord k2 /\ CO.eq t.m.ord km k2 ->
@@ -382,6 +397,9 @@ module MapBase
     requires { CO.correct_for t.m.ord (t.dprm.mdl d).key }
     ensures { c result /\ result.prm = t.prm /\ result.m.ord = t.m.ord }
     ensures { let dm = t.dprm.mdl d in
+      t.m.card <= result.m.card /\
+      (if t.m.func dm.key = None then result.m.card = t.m.card + 1
+        else result.m.card = t.m.card) /\
       (forall k:K.m 'b. CO.correct_for t.m.ord k ->
        (CO.eq t.m.ord k dm.key -> result.m.func k = Some dm) /\
        (not CO.eq t.m.ord k dm.key -> result.m.func k = t.m.func k)) &&
@@ -394,8 +412,12 @@ module MapBase
     let dm = t.repr.B.prm.mdl d in
     A.model_split om (t.repr.B.prm.mdl d) ll lr;
     ghost match !r.middle with
-    | None -> A.model_cut om dm.key ll lr
-    | Some rd -> A.model_split om rd ll lr
+    | None -> A.model_cut om dm.key ll lr;
+      assert { res.m.card = length (ll++Cons dm lr) =
+        1 + length (ll++lr) = t.m.card + 1 }
+    | Some rd -> A.model_split om rd ll lr;
+      assert { res.m.card = length (ll++Cons dm lr) =
+        length (ll ++ Cons rd lr) = t.m.card }
     end;
     assert { forall k:K.m 'b. CO.correct_for t.m.ord k /\
       CO.lt t.m.ord k dm.key -> res.m.func k = A.model om ll k = t.m.func k };
@@ -408,6 +430,9 @@ module MapBase
     requires { CO.correct_for t.m.ord (t.kprm.mdl k) }
     ensures { c result /\ result.prm = t.prm /\ result.m.ord = t.m.ord }
     ensures { let km = t.kprm.mdl k in
+      result.m.card <= t.m.card /\
+      (if t.m.func km = None then t.m.card = result.m.card
+        else t.m.card = result.m.card + 1) /\
       (forall k2:K.m 'b. CO.correct_for t.m.ord k2 ->
        (CO.eq t.m.ord k2 km -> result.m.func k2 = None) /\
        (not CO.eq t.m.ord k2 km -> result.m.func k2 = t.m.func k2)) &&
@@ -447,6 +472,10 @@ module MapBase
         (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.eq om km k2 ->
           t.m.func k2 = Some dm) && t.m.func km = Some dm = t.m.func dm.key
       end /\
+      ((if o = None
+        then t.m.card = lf.m.card + rg.m.card
+        else t.m.card = 1 + (lf.m.card + rg.m.card)) &&
+        t.m.card >= lf.m.card + rg.m.card) /\
       (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.lt om k2 km ->
         lf.m.func k2 = t.m.func k2) /\
       (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.le om km k2 ->
@@ -462,11 +491,14 @@ module MapBase
     let om = (CO.O.make_params t.prm1).mdl t.order in
     let km = t.prm1.K.make_params.mdl k in
     ghost match !r.middle with
-    | None -> A.model_cut om km !r.left !r.right
+    | None -> A.model_cut om km !r.left !r.right;
+      assert { t.m.card = length (!r.left ++ !r.right) =
+        lf.m.card + rg.m.card }
     | Some rd -> A.model_split om rd !r.left !r.right;
+      assert { t.m.card = length (!r.left ++ Cons rd !r.right) =
+        1 + lf.m.card + rg.m.card }
     end;
     (lf,o,rg)
-    
   
 end
 
@@ -521,6 +553,7 @@ module Map
   type t 'a 'b 'c 'd = MB.t 'a 'b 'c 'd
   type m 'b 'd = {
     func : K.m 'b -> option 'd;
+    card : int;
     ord : CO.O.m 'b;
   }
   predicate c (t:t 'a 'b 'c 'd) = MB.c t
@@ -538,13 +571,23 @@ module Map
   end
   function m (t:t 'a 'b 'c 'd) : m 'b 'd =
     { func = \k. oproj (t.MB.m.MB.func k);
-      ord = t.MB.m.MB.ord }
+      ord = t.MB.m.MB.ord;
+      card = t.MB.m.MB.card }
   
   let lemma m_def (t:t 'a 'b 'c 'd) : unit
     ensures { forall k. t.m.func k = None <-> t.MB.m.MB.func k = None }
     ensures { forall k k2 v. t.MB.m.MB.func k = Some (k2,v) ->
       t.m.func k = Some v }
     ensures { t.m.ord = t.MB.m.MB.ord }
+    ensures { t.m.card = t.MB.m.MB.card }
+  = ()
+  
+  let lemma correction (t:t 'a 'b 'c 'd) : unit
+    requires { c t }
+    ensures { forall k1 k2:K.m 'b. CO.correct_for t.m.ord k1 /\
+      CO.correct_for t.m.ord k2 /\ CO.eq t.m.ord k1 k2 ->
+      t.m.func k1 = t.m.func k2 }
+    ensures { t.m.card >= 0 }
   = ()
   
   let empty (ghost p1:type_params 'a 'b)
@@ -555,6 +598,7 @@ module Map
     ensures { p1.CO.O.make_params.mdl o = result.m.ord }
     ensures { forall k:K.m 'b. CO.correct_for result.m.ord k ->
       result.m.func k = None }
+    ensures { result.m.card = 0 }
   = MB.empty p1 p2 o
   
   let singleton (ghost p1:type_params 'a 'b) (ghost p2:type_params 'c 'd)
@@ -570,6 +614,7 @@ module Map
       if CO.eq result.m.ord k2 (result.kprm.mdl k)
       then result.m.func k2 = Some (result.prm2.mdl v)
       else result.m.func k2 = None }
+    ensures { result.m.card = 1 }
   = let d = (k,v) in
     let km = p1.K.make_params.mdl k in
     let dm = (D.make_params p1 p2).mdl d in
@@ -587,18 +632,19 @@ module Map
       t.m.func k = None }
     ensures { not result -> CO.correct_for t.m.ord !rk /\
       t.m.func !rk = Some !rv }
+    ensures { result <-> t.m.card = 0 }
   = let r = ref (!rk,!rv) in
     let res = MB.is_empty r t in
     let (a,b) = !r in rk := a;rv := b;res
   
   let decompose_min (t:t 'a 'b 'c 'd) : option ((K.t 'a 'b,'c),t 'a 'b 'c 'd)
     requires { c t }
-    returns { None -> forall k:K.m 'b. CO.correct_for t.m.ord k ->
-      t.m.func k = None
+    returns { None -> (forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      t.m.func k = None) /\ t.m.card = 0
       | Some ((k,v),r) -> let vm = t.prm2.mdl v in
         let km = r.kprm.mdl k in
         r.prm = t.prm /\ r.m.ord = t.m.ord /\ t.kprm.inv k /\ t.prm2.inv v /\
-        CO.correct_for t.m.ord km /\
+        CO.correct_for t.m.ord km /\ t.m.card = 1 + r.m.card /\
         forall k:K.m 'b. CO.correct_for t.m.ord k ->
           (CO.lt t.m.ord k km -> t.m.func k = None) /\
           (CO.eq t.m.ord k km -> t.m.func k = Some vm) /\
@@ -620,12 +666,12 @@ module Map
   
   let decompose_max (t:t 'a 'b 'c 'd) : option (t 'a 'b 'c 'd,(K.t 'a 'b,'c))
     requires { c t }
-    returns { None -> forall k:K.m 'b. CO.correct_for t.m.ord k ->
-      t.m.func k = None
+    returns { None -> (forall k:K.m 'b. CO.correct_for t.m.ord k ->
+      t.m.func k = None) /\ t.m.card = 0
       | Some (l,(k,v)) -> let vm = t.prm2.mdl v in
         let km = l.kprm.mdl k in
         l.prm = t.prm /\ l.m.ord = t.m.ord /\ t.kprm.inv k /\ t.prm2.inv v /\
-        CO.correct_for t.m.ord km /\
+        CO.correct_for t.m.ord km /\ t.m.card = 1 + l.m.card /\
         forall k:K.m 'b. CO.correct_for t.m.ord k ->
           (CO.lt t.m.ord km k -> t.m.func k = None) /\
           (CO.eq t.m.ord km k -> t.m.func k = Some vm) /\
@@ -655,6 +701,7 @@ module Map
       (CO.lt t.m.ord k km -> result.m.func k = None) /\
       (CO.eq t.m.ord k km -> result.m.func k = Some vm) /\
       (not CO.eq t.m.ord km k -> result.m.func k = t.m.func k) }
+    ensures { result.m.card = 1 + t.m.card }
   = let d = (k,v) in
     let res = MB.add_min d t in
     assert { let km = t.kprm.mdl k in let vm = t.prm2.mdl v in
@@ -676,6 +723,7 @@ module Map
       (CO.lt t.m.ord km k -> result.m.func k = None) /\
       (CO.eq t.m.ord km k -> result.m.func k = Some vm) /\
       (not CO.eq t.m.ord k km -> result.m.func k = t.m.func k) }
+    ensures { result.m.card = 1 + t.m.card }
   = let d = (k,v) in
     let res = MB.add_max t d in
     assert { let km = t.kprm.mdl k in let vm = t.prm2.mdl v in
@@ -700,6 +748,7 @@ module Map
       | s -> result.m.func k = s end }
     ensures { forall k. CO.correct_for l.m.ord k -> (result.m.func k = None <->
       l.m.func k = None /\ r.m.func k = None) }
+    ensures { result.m.card = l.m.card + r.m.card }
   = MB.concat l r
   
   let get (k:K.t 'a 'b) (t:t 'a 'b 'c 'd) : option 'c
@@ -708,7 +757,7 @@ module Map
     returns { None -> let km = t.kprm.mdl k in
         (forall k2. CO.correct_for t.m.ord k2 /\ CO.eq t.m.ord km k2 ->
           t.m.func k2 = None) && t.m.func km = None
-      | Some v -> t.prm2.inv v /\ let km = t.kprm.mdl k in
+      | Some v -> t.prm2.inv v /\ t.m.card > 0 /\ let km = t.kprm.mdl k in
         let vm = t.prm2.mdl v in
         (forall k2. CO.correct_for t.m.ord k2 /\ CO.eq t.m.ord km k2 ->
           t.m.func k2 = Some vm) && t.m.func km = Some vm }
@@ -722,6 +771,10 @@ module Map
     requires { CO.correct_for t.m.ord (t.kprm.mdl k) }
     ensures { c result /\ result.prm = t.prm /\ result.m.ord = t.m.ord }
     ensures { let vm = t.prm2.mdl v in let km = t.kprm.mdl k in
+      result.m.card >= t.m.card /\
+      (if t.m.func km = None
+       then result.m.card = t.m.card + 1
+       else result.m.card = t.m.card) /\
       (forall k:K.m 'b. CO.correct_for t.m.ord k ->
        (CO.eq t.m.ord k km -> result.m.func k = Some vm) /\
        (not CO.eq t.m.ord k km -> result.m.func k = t.m.func k)) &&
@@ -738,6 +791,10 @@ module Map
     requires { CO.correct_for t.m.ord (t.kprm.mdl k) }
     ensures { c result /\ result.prm = t.prm /\ result.m.ord = t.m.ord }
     ensures { let km = t.kprm.mdl k in
+      result.m.card <= t.m.card /\
+      (if t.m.func km = None
+       then result.m.card = t.m.card
+       else 1 + result.m.card = t.m.card) /\
       (forall k2:K.m 'b. CO.correct_for t.m.ord k2 ->
        (CO.eq t.m.ord k2 km -> result.m.func k2 = None) /\
        (not CO.eq t.m.ord k2 km -> result.m.func k2 = t.m.func k2)) &&
@@ -760,6 +817,10 @@ module Map
         (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.eq om km k2 ->
           t.m.func k2 = Some vm) && t.m.func km = Some vm
       end /\
+      t.m.card >= lf.m.card + rg.m.card /\
+      (if o = None
+       then t.m.card = lf.m.card + rg.m.card
+       else t.m.card = 1 + (lf.m.card + rg.m.card)) /\
       (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.lt om k2 km ->
         lf.m.func k2 = t.m.func k2) /\
       (forall k2:K.m 'b. CO.correct_for om k2 /\ CO.le om km k2 ->
@@ -825,6 +886,7 @@ module Set
   type t 'a 'b = MB.t 'a 'b 'a 'b
   type m 'b = {
     set : K.m 'b -> bool;
+    card : int;
     ord : CO.O.m 'b;
   }
   predicate c (t:t 'a 'b) = MB.c t /\ t.MB.prm1 = t.MB.prm2
@@ -839,13 +901,23 @@ module Set
   end
   function m (t:t 'a 'b) : m 'b =
     { set = \k. oproj (t.MB.m.MB.func k);
-      ord = t.MB.m.MB.ord }
+      ord = t.MB.m.MB.ord;
+      card = t.MB.m.MB.card }
   
   let lemma m_def (t:t 'a 'b) : unit
     ensures { forall k. not t.m.set k <-> t.MB.m.MB.func k = None }
     ensures { forall k v. t.MB.m.MB.func k = Some v ->
       t.m.set k }
     ensures { t.m.ord = t.MB.m.MB.ord }
+    ensures { t.m.card = t.MB.m.MB.card }
+  = ()
+  
+  let lemma correction (t:t 'a 'b) : unit
+    requires { c t }
+    ensures { forall k1 k2:K.m 'b. CO.correct_for t.m.ord k1 /\
+      CO.correct_for t.m.ord k2 /\ CO.eq t.m.ord k1 k2 ->
+      t.m.set k1 <-> t.m.set k2 }
+    ensures { t.m.card >= 0 }
   = ()
   
   let empty (ghost p:type_params 'a 'b) (o:CO.O.t 'a 'b) : t 'a 'b
@@ -855,6 +927,7 @@ module Set
     ensures { p.CO.O.make_params.mdl o = result.m.ord }
     ensures { forall k:K.m 'b. CO.correct_for result.m.ord k ->
       not result.m.set k }
+    ensures { result.m.card = 0 }
   = MB.empty p p o
   
   let singleton (ghost p:type_params 'a 'b) (o:CO.O.t 'a 'b)
@@ -868,6 +941,7 @@ module Set
     ensures { p.CO.O.make_params.mdl o = result.m.ord }
     ensures { forall k2:K.m 'b. CO.correct_for result.m.ord k2 ->
       result.m.set k2 <-> CO.eq result.m.ord k2 (result.kprm.mdl k) }
+    ensures { result.m.card = 1 }
   = MB.singleton p p o k
   
   let is_empty (ghost rk:ref (K.m 'b)) (t:t 'a 'b) : bool
@@ -876,14 +950,16 @@ module Set
       not t.m.set k }
     ensures { not result -> CO.correct_for t.m.ord !rk /\
       t.m.set !rk }
+    ensures { result <-> t.m.card = 0 }
   = MB.is_empty rk t
   
   let decompose_min (t:t 'a 'b) : option (K.t 'a 'b,t 'a 'b)
     requires { c t }
-    returns { None -> forall k:K.m 'b. CO.correct_for t.m.ord k -> not t.m.set k
+    returns { None -> t.m.card = 0 /\
+        forall k:K.m 'b. CO.correct_for t.m.ord k -> not t.m.set k
       | Some (k,r) -> let km = r.kprm.mdl k in
         r.prm = t.prm /\ r.m.ord = t.m.ord /\ t.kprm.inv k /\
-        CO.correct_for t.m.ord km /\
+        CO.correct_for t.m.ord km /\ t.m.card = 1 + r.m.card /\
         forall k:K.m 'b. CO.correct_for t.m.ord k ->
           (CO.lt t.m.ord k km -> not t.m.set k) /\
           (CO.eq t.m.ord k km -> t.m.set k) /\
@@ -893,10 +969,11 @@ module Set
   
   let decompose_max (t:t 'a 'b) : option (t 'a 'b,K.t 'a 'b)
     requires { c t }
-    returns { None -> forall k:K.m 'b. CO.correct_for t.m.ord k -> not t.m.set k
+    returns { None -> t.m.card = 0 /\
+        forall k:K.m 'b. CO.correct_for t.m.ord k -> not t.m.set k
       | Some (l,k) -> let km = l.kprm.mdl k in
         l.prm = t.prm /\ l.m.ord = t.m.ord /\ t.kprm.inv k /\
-        CO.correct_for t.m.ord km /\
+        CO.correct_for t.m.ord km /\ t.m.card = 1 + l.m.card /\
         forall k:K.m 'b. CO.correct_for t.m.ord k ->
           (CO.lt t.m.ord km k -> not t.m.set k) /\
           (CO.eq t.m.ord km k -> t.m.set k) /\
@@ -915,6 +992,7 @@ module Set
       (CO.lt t.m.ord k km -> not result.m.set k) /\
       (CO.eq t.m.ord k km -> result.m.set k) /\
       (not CO.eq t.m.ord km k -> result.m.set k <-> t.m.set k) }
+    ensures { result.m.card = 1 + t.m.card }
   = MB.add_min k t
   
   let add_max (t:t 'a 'b) (k:K.t 'a 'b) : t 'a 'b
@@ -928,6 +1006,7 @@ module Set
       (CO.lt t.m.ord km k -> not result.m.set k) /\
       (CO.eq t.m.ord km k -> result.m.set k) /\
       (not CO.eq t.m.ord k km -> result.m.set k <-> t.m.set k) }
+    ensures { result.m.card = 1 + t.m.card }
   = MB.add_max t k
   
   let concat (l r:t 'a 'b) : t 'a 'b
@@ -938,6 +1017,7 @@ module Set
     ensures { c result /\ result.prm = l.prm /\ result.m.ord = l.m.ord }
     ensures { forall k. CO.correct_for l.m.ord k -> result.m.set k <->
       (r.m.set k \/ l.m.set k) }
+    ensures { result.m.card = l.m.card + r.m.card }
   = MB.concat l r
   
   let mem (k:K.t 'a 'b) (t:t 'a 'b) : bool
@@ -946,6 +1026,7 @@ module Set
     ensures { result <-> t.m.set (t.kprm.mdl k) }
     ensures { result <-> (forall k2. CO.correct_for t.m.ord k2 /\
       CO.eq t.m.ord k2 (t.kprm.mdl k) -> t.m.set k2) }
+    ensures { result -> t.m.card > 0 }
   = match MB.get k t with None -> false | _ -> true end
   
   let add (k:K.t 'a 'b) (t:t 'a 'b) : t 'a 'b
@@ -953,6 +1034,10 @@ module Set
     requires { CO.correct_for t.m.ord (t.kprm.mdl k) }
     ensures { c result /\ result.prm = t.prm /\ result.m.ord = t.m.ord }
     ensures { let km = t.kprm.mdl k in
+      result.m.card >= t.m.card /\
+      (if t.m.set km
+       then result.m.card = t.m.card
+       else result.m.card = t.m.card + 1) /\
       (forall k:K.m 'b. CO.correct_for t.m.ord k ->
         (CO.eq t.m.ord k km -> result.m.set k) /\
         (t.m.set k -> result.m.set k) /\
@@ -965,6 +1050,10 @@ module Set
     requires { CO.correct_for t.m.ord (t.kprm.mdl k) }
     ensures { c result /\ result.prm = t.prm /\ result.m.ord = t.m.ord }
     ensures { let km = t.kprm.mdl k in
+      result.m.card <= t.m.card /\
+      (if t.m.set km
+       then 1 + result.m.card = t.m.card
+       else result.m.card = t.m.card) /\
       (forall k:K.m 'b. CO.correct_for t.m.ord k ->
         (CO.eq t.m.ord k km -> not result.m.set k) /\
         (result.m.set k -> t.m.set k) /\
@@ -982,6 +1071,10 @@ module Set
       (b <-> t.m.set km) /\
       (b <-> (forall k. CO.correct_for om k /\ CO.eq om k km ->
         t.m.set km)) /\
+      t.m.card >= lf.m.card + rg.m.card /\
+      (if b
+       then t.m.card = 1 + (lf.m.card + rg.m.card)
+       else t.m.card = lf.m.card + rg.m.card) /\
       (forall k. CO.correct_for om k /\ lf.m.set k -> t.m.set k) /\
       (forall k. CO.correct_for om k /\ rg.m.set k -> t.m.set k) /\
       (forall k. CO.correct_for om k /\ CO.lt om k km ->
