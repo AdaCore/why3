@@ -401,7 +401,7 @@ let mod_prelude env =
   let pd_exit = create_exn_decl xs_exit in
   let pd_old = create_val_decl (LetV Mlw_wp.pv_old) in
   let uc = empty_module env (id_fresh "Prelude") ["why3"] in
-  let uc = add_decl uc (Decl.create_ty_decl Mlw_wp.ts_mark) in
+  let uc = use_export_theory uc Mlw_wp.mark_theory in
   let uc = add_pdecl ~wp:false uc pd_old in
   let uc = add_pdecl ~wp:false uc pd_exit in
   close_module uc

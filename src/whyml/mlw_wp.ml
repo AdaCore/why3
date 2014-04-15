@@ -47,9 +47,14 @@ let fs_old =
   let ty = ty_var (create_tvsymbol (id_fresh "a")) in
   create_lsymbol (id_fresh "old") [ty] (Some ty)
 
+let mark_theory =
+  let uc = create_theory ~path:["why3"] (id_fresh "Mark") in
+  let uc = add_ty_decl uc ts_mark in
+  close_theory uc
+
 let th_mark_at =
   let uc = create_theory (id_fresh "WP builtins: at") in
-  let uc = add_ty_decl uc ts_mark in
+  let uc = use_export uc mark_theory in
   let uc = add_param_decl uc fs_at in
   close_theory uc
 
