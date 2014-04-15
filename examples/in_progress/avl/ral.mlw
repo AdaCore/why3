@@ -239,11 +239,6 @@ module RAL
     let (lf,md,rg) = Sel.split l.B.prm l.B.prm r sel l in
     match md with None -> absurd | Some md -> (lf,md,rg) end
   
-  constant default_params : type_params 'a 'a = {
-    inv = \n. true;
-    mdl = \x. x;
-  }
-  
   let harness (a b:t int int) : unit
     requires { length a.m > 43 /\ length b.m > 43 }
     requires { forall n:int. match nth n a.m with

@@ -16,6 +16,11 @@ module TypeParams
     mdl : 'a -> 'b;
   }
   
+  constant default_params : type_params 'a 'a = {
+    inv = \n. true;
+    mdl = \x. x;
+  }
+  
 end
 
 module Type0
