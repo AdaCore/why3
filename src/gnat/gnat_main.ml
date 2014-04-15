@@ -83,7 +83,9 @@ let rec handle_vc_result goal result prover_result =
            Gnat_objectives.Save_VCs.save_trace goal
          | _ -> ""
        in
-       Gnat_report.register obj (Some task) prover_result false tracefile
+       let filename = Gnat_manual.get_prover_file goal in
+       Gnat_report.register obj (Some task) prover_result
+                            false ?filename tracefile
    | Gnat_objectives.Work_Left ->
          match Gnat_objectives.next obj with
          | Some g -> schedule_goal g
@@ -146,10 +148,12 @@ let handle_obj obj =
         Gnat_report.register obj None None true ""
    end else begin
       match Gnat_objectives.next obj with
-      | Some g -> if Gnat_objectives.is_new_manual_proof g then
-                    Format.printf "created new file %s@."
-                                  (Gnat_objectives.create_prover_file g)
-                  else schedule_goal g
+      | Some g ->
+         if Gnat_manual.is_new_manual_proof g then
+           Gnat_report.register
+             obj None None false
+             ~filename:(Gnat_manual.create_prover_file g) ""
+         else schedule_goal g
       | None -> ()
    end
 

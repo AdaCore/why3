@@ -8,6 +8,7 @@ type msg =
     steps  : int;
     extra_msg : string;
     tracefile : string;
+    vc_file : string option;
   }
 
 type status =
@@ -59,7 +60,7 @@ let extract_steps_fail s =
     with _ -> None
   else None
 
-let register expl task result valid tracefile =
+let register expl task result valid ?filename tracefile =
   let time =
     match result with
     | None -> 0.0
@@ -96,14 +97,18 @@ let register expl task result valid tracefile =
     extra_msg     = msg;
     time          = time;
     steps         = steps;
-    tracefile     = tracefile } in
+    tracefile     = tracefile;
+    vc_file       = filename } in
   msg_set := msg :: !msg_set
 
 let print_msg fmt m =
   if m.result then Format.fprintf fmt "info: " else Format.fprintf fmt "warning: ";
   Format.fprintf fmt "%a" (Gnat_expl.print_reason ~proved:m.result)
     (Gnat_expl.get_reason m.expl);
-  if m.extra_msg <> "" then Format.fprintf fmt ", requires %s" m.extra_msg
+  (if m.extra_msg <> "" then Format.fprintf fmt ", requires %s" m.extra_msg);
+  match m.vc_file with
+  | None -> ()
+  | Some fn -> Format.fprintf fmt ", VC file: %s" fn
 
 let improve_sloc msg =
   match msg.improved_sloc with
@@ -147,9 +152,13 @@ let print_json_msg fmt m =
   (* ??? Trace file *)
   Format.fprintf fmt
      "{\"file\":\"%s\",\"line\":%d,\"col\":%d,\"message\":\"%s\",\
-       \"rule\":\"%s\",\"severity\":\"%s\",\"tracefile\":\"%s\",\
-       \"entity\":%a}@."
-    file line col msg rule severity m.tracefile print_json_entity ent
+       \"rule\":\"%s\",\"severity\":\"%s\",\"tracefile\":\"%s\","
+     file line col msg rule severity m.tracefile;
+  (match m.vc_file with
+  | None -> ()
+  | Some name -> Format.fprintf fmt "\"vc_file\":\"%s\"," name);
+    Format.fprintf fmt "\"entity\":%a}@."
+     print_json_entity ent
 
 let print_statistics fmt msg =
   if msg.steps <> 0 && msg.time <> 0.0 then
