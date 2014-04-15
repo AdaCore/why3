@@ -16,6 +16,7 @@ module TypeParams
     mdl : 'a -> 'b;
   }
   
+  (* For purely logical types. *)
   constant default_params : type_params 'a 'a = {
     inv = \n. true;
     mdl = \x. x;
