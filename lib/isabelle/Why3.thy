@@ -4,6 +4,8 @@ imports
   Why3_Set
   Why3_List
   Why3_Int
+  Why3_Bool
+  Why3_Number
 begin
 
 end

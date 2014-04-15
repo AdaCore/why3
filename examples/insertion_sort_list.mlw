@@ -1,23 +1,29 @@
 
 (* Sorting a list of integers using insertion sort *)
 
-module M
+module InsertionSort
 
-  use import int.Int
-  use import list.Length
-  use import list.SortedInt
+  type elt
+  predicate le elt elt
+
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  clone export list.Sorted      with type t = elt, predicate le  = le
   use import list.Permut
 
-  let rec insert x l variant { l }
+  let rec insert (x: elt) (l: list elt) : list elt
     requires { sorted l }
-    ensures { sorted result /\ permut (Cons x l) result }
+    ensures  { sorted result }
+    ensures  { permut (Cons x l) result }
+    variant  { l }
   = match l with
     | Nil -> Cons x Nil
-    | Cons y r -> if x <= y then Cons x l else Cons y (insert x r)
+    | Cons y r -> if le x y then Cons x l else Cons y (insert x r)
     end
 
-  let rec insertion_sort l variant { l }
-    ensures { sorted result /\ permut l result }
+  let rec insertion_sort (l: list elt) : list elt
+    ensures { sorted result }
+    ensures { permut l result }
+    variant { l }
   = match l with
     | Nil -> Nil
     | Cons x r -> insert x (insertion_sort r)

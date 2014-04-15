@@ -32,7 +32,7 @@ $(MAIN).opt: $(CMX) $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../defunctionalization.mlw
-	why3 -E ocaml ../defunctionalization.mlw -o .
+	why3 -E ocaml64 ../defunctionalization.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(WHY3) -annot -c $<

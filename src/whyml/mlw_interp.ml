@@ -77,6 +77,9 @@ let rec print_value fmt v =
       i := BigInt.succ !i
     done;
     fprintf fmt "]@]"
+  | Vapp(ls,vl) when is_fs_tuple ls ->
+    fprintf fmt "@[(%a)@]"
+      (Pp.print_list Pp.comma print_value) vl
   | Vapp(ls,vl) ->
     fprintf fmt "@[%a(%a)@]"
       Pretty.print_ls ls (Pp.print_list Pp.comma print_value) vl
@@ -1017,7 +1020,7 @@ let find_definition env ps =
     Some (Mps.find ps env.funenv)
   with
       Not_found ->
-        Mlw_decl.find_definition env.mknown ps 
+        Mlw_decl.find_definition env.mknown ps
 
 
 (* evaluate expressions *)

@@ -42,7 +42,7 @@
 
   let is_keyword2 = make_table [ "absurd"; "assert"; "assume";
     "ensures"; "check"; "invariant"; "raises"; "reads"; "requires";
-    "returns"; "variant"; "writes"; ]
+    "returns"; "variant"; "writes"; "diverges"; ]
 
   let get_loc lb =
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)

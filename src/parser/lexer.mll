@@ -290,7 +290,8 @@ and string = parse
         Buffer.clear string_buf;
         s }
   | "\\" (_ as c)
-      { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
+      { if c = '\n' then newline lexbuf;
+        Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
   | newline
       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof

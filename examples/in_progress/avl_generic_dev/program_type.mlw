@@ -1,0 +1,35 @@
+
+module Type0
+  
+  (* Program version of the type. *)
+  type t
+  (* Its logical model. *)
+  type m
+  (* Type invariant (c for correct). *)
+  predicate c t
+  (* get logical model (m for model). *)
+  function m t : m
+  
+end
+
+(* Variants with different number of type variables. *)
+
+module Type1
+  
+  type t 'a
+  type m 'a
+  predicate c (t 'a)
+  function m (t 'a) : m 'a
+  
+end
+
+module Type2
+  
+  type t 'a 'b
+  type m 'a 'b
+  predicate c (t 'a 'b)
+  function m (t 'a 'b) : m 'a 'b
+  
+end
+
+

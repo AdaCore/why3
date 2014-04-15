@@ -1,23 +1,99 @@
 
-(* Sorting a list of integers using mergesort *)
+(** {1 Sorting lists using mergesort}
 
-module M
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
 
-  use import int.Int
-  use import list.Length
-  use import list.SortedInt
-  use import list.Append
-  use import list.Permut
+module Elt
 
-  let split (l0 : list 'a)
+  use export int.Int
+  use export list.Length
+  use export list.Append
+  use export list.Permut
+
+  type elt
+  predicate le elt elt
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  clone export list.Sorted      with type t = elt, predicate le  = le
+
+end
+
+(** recursive (and naive) merging of two sorted lists *)
+
+module Merge (* : MergeSpec *)
+
+  clone export Elt
+
+  let rec merge (l1 l2: list elt) : list elt
+    requires { sorted l1 /\ sorted l2 }
+    ensures  { sorted result }
+    ensures  { permut result (l1 ++ l2) }
+    variant  { length l1 + length l2 }
+  = match l1, l2 with
+    | Nil, _ -> l2
+    | _, Nil -> l1
+    | Cons x1 r1, Cons x2 r2 ->
+       if le x1 x2 then Cons x1 (merge r1 l2) else Cons x2 (merge l1 r2)
+    end
+
+end
+
+(** tail recursive implementation *)
+
+module EfficientMerge (* : MergeSpec *)
+
+  clone export Elt
+  use import list.Mem
+  use import list.Reverse
+  use import list.RevAppend
+
+  lemma sorted_reverse_cons:
+    forall acc x1. sorted (reverse acc) ->
+    (forall x. mem x acc -> le x x1) -> sorted (reverse (Cons x1 acc))
+
+  let rec merge_aux (acc l1 l2: list elt) : list elt
+    requires { sorted (reverse acc) /\ sorted l1 /\ sorted l2 }
+    requires { forall x y: elt. mem x acc -> mem y l1 -> le x y }
+    requires { forall x y: elt. mem x acc -> mem y l2 -> le x y }
+    ensures  { sorted result }
+    ensures  { permut result (acc ++ l1 ++ l2) }
+    variant  { length l1 + length l2 }
+  = match l1, l2 with
+    | Nil, _ -> rev_append acc l2
+    | _, Nil -> rev_append acc l1
+    | Cons x1 r1, Cons x2 r2 ->
+       if le x1 x2 then merge_aux (Cons x1 acc) r1 l2
+                   else merge_aux (Cons x2 acc) l1 r2
+    end
+
+  let merge (l1 l2: list elt) : list elt
+    requires { sorted l1 /\ sorted l2 }
+    ensures  { sorted result /\ permut result (l1 ++ l2) }
+  =
+    merge_aux Nil l1 l2
+
+end
+
+(** Mergesort.
+
+    This implementation splits the input list in two according to even- and
+    odd-order elements (see function [split] below). Thus it is not stable.
+    For a stable implementation, see below module [OCamlMergesort]. *)
+
+module Mergesort
+
+  clone import Merge (* or EfficientMerge *)
+
+  let split (l0: list 'a) : (list 'a, list 'a)
     requires { length l0 >= 2 }
-    ensures { let (l1, l2) = result in
+    ensures  { let (l1, l2) = result in
       1 <= length l1 /\ 1 <= length l2 /\ permut l0 (l1 ++ l2) }
-  = let rec split_aux (l1 : list 'a) l2 l variant { length l }
+  = let rec split_aux (l1 l2 l: list 'a) : (list 'a, list 'a)
       requires { length l2 = length l1 \/ length l2 = length l1 + 1 }
-      ensures { let r1, r2 = result in
+      ensures  { let r1, r2 = result in
         (length r2 = length r1 \/ length r2 = length r1 + 1) /\
         permut (r1 ++ r2) (l1 ++ (l2 ++ l)) }
+      variant { length l }
     = match l with
       | Nil -> (l1, l2)
       | Cons x r -> split_aux l2 (Cons x l1) r
@@ -25,21 +101,191 @@ module M
     in
     split_aux Nil Nil l0
 
-  let rec merge l1 l2 variant { length l1 + length l2 }
-    requires { sorted l1 /\ sorted l2 }
-    ensures { sorted result /\ permut result (l1 ++ l2) }
-  = match l1, l2 with
-    | Nil, _ -> l2
-    | _, Nil -> l1
-    | Cons x1 r1, Cons x2 r2 ->
-       if x1 <= x2 then Cons x1 (merge r1 l2) else Cons x2 (merge l1 r2)
-    end
-
-  let rec mergesort l variant { length l }
+  let rec mergesort (l: list elt) : list elt
     ensures { sorted result /\ permut result l }
+    variant { length l }
   = match l with
       | Nil | Cons _ Nil -> l
       | _ -> let l1, l2 = split l in merge (mergesort l1) (mergesort l2)
     end
+
+end
+
+(** {2 OCaml's List.sort}
+
+    There are several ideas here:
+
+    - instead of splitting the list in two, sort takes the length of
+      the prefix to be sorted; hence there is nothing to do to get the
+      first half and the second half is obtained with chop (which does
+      not allocate at all)
+
+    - all functions are tail recursive. To avoid the extra cost of
+      List.rev, sort is duplicated in two versions that respectively
+      sort in order and in reverse order ([sort] and [sort_rev]) and
+      merge is duplicated as well ([rev_merge] and [rev_merge_rev]).
+
+    Note: this is a stable sort, but stability is not proved here.
+*)
+
+module OCamlMergesort
+
+  clone export Elt
+  use import list.Mem
+  use import list.Reverse
+  use import list.RevAppend
+
+  lemma sorted_reverse_cons:
+    forall acc x1. sorted (reverse acc) ->
+    (forall x. mem x acc -> le x x1) -> sorted (reverse (Cons x1 acc))
+
+  lemma sorted_rev_append: forall acc l: list elt.
+    sorted (reverse acc) ->
+    sorted l ->
+    (forall x y. mem x acc -> mem y l -> le x y) ->
+    sorted (reverse (rev_append l acc))
+
+  let rec rev_merge (l1 l2 accu: list elt) : list elt
+    requires { sorted (reverse accu) /\ sorted l1 /\ sorted l2 }
+    requires { forall x y: elt. mem x accu -> mem y l1 -> le x y }
+    requires { forall x y: elt. mem x accu -> mem y l2 -> le x y }
+    ensures  { sorted (reverse result) }
+    ensures  { permut result (accu ++ l1 ++ l2) }
+    variant  { length l1 + length l2 }
+  = match l1, l2 with
+    | Nil, _ -> rev_append l2 accu
+    | _, Nil -> rev_append l1 accu
+    | Cons h1 t1, Cons h2 t2 ->
+       if le h1 h2 then rev_merge t1 l2 (Cons h1 accu)
+                   else rev_merge l1 t2 (Cons h2 accu)
+    end
+
+  lemma sorted_reverse_mem:
+    forall x l. sorted (reverse (Cons x l)) -> forall y. mem y l -> le y x
+
+  lemma sorted_reverse_cons2:
+    forall x l. sorted (reverse (Cons x l)) -> sorted (reverse l)
+
+  let rec rev_merge_rev (l1 l2 accu: list elt) : list elt
+    requires { sorted accu /\ sorted (reverse l1) /\ sorted (reverse l2) }
+    requires { forall x y: elt. mem x accu -> mem y l1 -> le y x }
+    requires { forall x y: elt. mem x accu -> mem y l2 -> le y x }
+    ensures  { sorted result }
+    ensures  { permut result (accu ++ l1 ++ l2) }
+    variant  { length l1 + length l2 }
+  = match l1, l2 with
+    | Nil, _ -> rev_append l2 accu
+    | _, Nil -> rev_append l1 accu
+    | Cons h1 t1, Cons h2 t2 ->
+       if not (le h1 h2) then rev_merge_rev t1 l2 (Cons h1 accu)
+                         else rev_merge_rev l1 t2 (Cons h2 accu)
+    end
+
+  function prefix int (list 'a) : list 'a
+
+  axiom prefix_def1:
+    forall l: list 'a. prefix 0 l = Nil
+  axiom prefix_def2:
+    forall n: int, x: 'a, l: list 'a. n > 0 ->
+    prefix n (Cons x l) = Cons x (prefix (n-1) l)
+
+  let rec lemma prefix_length (n: int) (l: list 'a)
+    requires { 0 <= n <= length l } ensures { length (prefix n l) = n }
+    variant { n } =
+    if n > 0 then match l with Nil -> () | Cons _ r -> prefix_length (n-1) r end
+
+  let rec lemma prefix_append (n: int) (l1 l2: list 'a)
+    requires { length l1 <= n <= length l1 + length l2 }
+    ensures  { prefix n (l1 ++ l2) =
+               prefix (length l1) l1 ++ prefix (n - length l1) l2 }
+    variant  { l1 }
+  = match l1 with Nil -> () | Cons _ t -> prefix_append (n-1) t l2 end
+
+  let rec chop (n: int) (l: list 'a) : list 'a
+    requires { 0 <= n <= length l }
+    ensures  { l = prefix n l ++ result }
+    variant  { n }
+  =
+    if n = 0 then l else
+    match l with
+      | Cons _ t -> chop (n-1) t
+      | Nil -> absurd
+    end
+
+  (** [sort n l] sorts [prefix n l]
+      and [rev_sort n l]  sorts [prefix n l] in reverse order. *)
+
+  use import mach.int.Int
+
+  let rec sort (n: int) (l: list elt) : list elt
+    requires { 2 <= n <= length l }
+    ensures  { sorted result }
+    ensures  { permut result (prefix n l) }
+    variant  { n }
+  =
+    if n = 2 then match l with
+      | Cons x1 (Cons x2 _) ->
+          if le x1 x2 then Cons x1 (Cons x2 Nil) else Cons x2 (Cons x1 Nil)
+      | _ -> absurd
+    end else if n = 3 then match l with
+      | Cons x1 (Cons x2 (Cons x3 _)) ->
+           if le x1 x2 then
+             if le x2 x3 then Cons x1 (Cons x2 (Cons x3 Nil))
+             else if le x1 x3 then Cons x1 (Cons x3 (Cons x2 Nil))
+             else Cons x3 (Cons x1 (Cons x2 Nil))
+           else
+             if le x1 x3 then Cons x2 (Cons x1 (Cons x3 Nil))
+             else if le x2 x3 then Cons x2 (Cons x3 (Cons x1 Nil))
+             else Cons x3 (Cons x2 (Cons x1 Nil))
+       | _ -> absurd
+    end else begin
+      let n1 = n / 2 in
+      let n2 = n - n1 in
+      let l2 = chop n1 l in
+      assert { prefix n1 l ++ prefix n2 l2 = prefix n l };
+      let s1 = rev_sort n1 l in
+      let s2 = rev_sort n2 l2 in
+      rev_merge_rev s1 s2 Nil
+   end
+
+  with rev_sort (n: int) (l: list elt) : list elt
+    requires { 2 <= n <= length l }
+    ensures  { sorted (reverse result) }
+    ensures  { permut result (prefix n l) }
+    variant  { n }
+  =
+    if n = 2 then match l with
+      | Cons x1 (Cons x2 _) ->
+          if not (le x1 x2) then Cons x1 (Cons x2 Nil)
+          else Cons x2 (Cons x1 Nil)
+      | _ -> absurd
+    end else if n = 3 then match l with
+      | Cons x1 (Cons x2 (Cons x3 _)) ->
+           if not (le x1 x2) then
+             if not (le x2 x3) then Cons x1 (Cons x2 (Cons x3 Nil))
+             else if not (le x1 x3) then Cons x1 (Cons x3 (Cons x2 Nil))
+             else Cons x3 (Cons x1 (Cons x2 Nil))
+           else
+             if not (le x1 x3) then Cons x2 (Cons x1 (Cons x3 Nil))
+             else if not (le x2 x3) then Cons x2 (Cons x3 (Cons x1 Nil))
+             else Cons x3 (Cons x2 (Cons x1 Nil))
+       | _ -> absurd
+    end else begin
+      let n1 = n / 2 in
+      let n2 = n - n1 in
+      let l2 = chop n1 l in
+      assert { prefix n1 l ++ prefix n2 l2 = prefix n l };
+      let s1 = sort n1 l in
+      let s2 = sort n2 l2 in
+      rev_merge s1 s2 Nil
+    end
+
+  lemma permut_prefix: forall l: list elt. permut (prefix (length l) l) l
+
+  let mergesort (l: list elt) : list elt
+    ensures { sorted result /\ permut result l }
+  =
+    let n = length l in
+    if n < 2 then l else sort n l
 
 end

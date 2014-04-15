@@ -104,10 +104,6 @@ theory list.List
   syntax function Cons "(%1 :: %2)"
 end
 
-theory list.Length
-  syntax function length "(List.length %1)"
-end
-
 theory list.Mem
   syntax predicate mem "(List.mem %1 %2)"
 end
@@ -138,6 +134,37 @@ module ref.Ref
   syntax val      (:=)     "Pervasives.(:=)"
 end
 
+module stack.Stack
+  syntax type      t        "(%1 Stack.t)"
+  syntax val       create   "Stack.create"
+  syntax val       push     "Stack.push"
+  syntax exception Empty    "Stack.Empty"
+  syntax val       pop      "Stack.pop"
+  syntax val       top      "Stack.top"
+  syntax val       safe_pop "Stack.pop"
+  syntax val       safe_top "Stack.top"
+  syntax val       clear    "Stack.clear"
+  syntax val       copy     "Stack.copy"
+  syntax val       is_empty "Stack.is_empty"
+  syntax val       length   "Why3__IntAux.stack_length"
+end
+
+module queue.Queue
+  syntax type      t         "(%1 Queue.t)"
+  syntax val       create    "Queue.create"
+  syntax val       push      "Queue.push"
+  syntax exception Empty     "Queue.Empty"
+  syntax val       pop       "Queue.pop"
+  syntax val       peek      "Queue.peek"
+  syntax val       safe_pop  "Queue.pop"
+  syntax val       safe_peek "Queue.peek"
+  syntax val       clear     "Queue.clear"
+  syntax val       copy      "Queue.copy"
+  syntax val       is_empty  "Queue.is_empty"
+  syntax val       length    "Why3__IntAux.queue_length"
+  syntax val       transfer  "Queue.transfer"
+end
+
 module array.Array
   syntax type array "(%1 Why3__Array.t)"
 
@@ -156,6 +183,11 @@ module array.Array
   syntax val copy          "Why3__Array.copy"
   syntax val fill          "Why3__Array.fill"
   syntax val blit          "Why3__Array.blit"
+end
+
+module mach.int.Int
+  syntax val ( / ) "Why3__BigInt.computer_div"
+  syntax val ( % ) "Why3__BigInt.computer_mod"
 end
 
 module mach.int.Int31

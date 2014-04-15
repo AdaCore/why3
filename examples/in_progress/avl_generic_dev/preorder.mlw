@@ -1,0 +1,48 @@
+
+(* Full preorder theory,
+   containing lt and eq as well. *)
+theory FullParam
+  
+  type t 'a
+  type order 'a
+  predicate le (order 'a) (t 'a) (t 'a)
+  clone export relations_params.PreOrderParam with type t = t,
+    type param = order, predicate rel = le
+  predicate eq (order 'a) (t 'a) (t 'a)
+  axiom eq_def : forall o:order 'a,x y:t 'a.
+    correct_for o x /\ correct_for o y ->
+      (eq o x y <-> le o x y /\ le o y x)
+  predicate lt (order 'a) (t 'a) (t 'a)
+  axiom lt_def : forall o:order 'a,x y:t 'a.
+    correct_for o x /\ correct_for o y ->
+      (lt o x y <-> le o x y /\ not le o y x)
+  
+  clone relations_params.EquivalenceParam as Eq with type t = t,
+    type param = order, predicate correct_for = correct_for,
+    predicate rel = eq, lemma trans, lemma refl, lemma symm
+  
+  clone relations_params.PartialStrictOrderParam as Lt with type t = t,
+    type param = order, predicate correct_for = correct_for,
+    predicate rel = lt, lemma trans, lemma asymm
+  
+end
+
+(* Preorder + corresponding computable comparison. *)
+module ComputableParam
+  
+  use import int.Int
+  clone export program_type.Type1
+  clone program_type.Type1 as O
+  clone export FullParam with type t = m, type order = O.m
+  
+  (* Comparison is computable. *)
+  val compare (o:O.t 'a) (x y:t 'a) : int
+    requires { O.c o }
+    requires { correct_for o.O.m x.m /\ c x }
+    requires { correct_for o.O.m y.m /\ c y }
+    ensures { result > 0 <-> lt o.O.m y.m x.m }
+    ensures { result < 0 <-> lt o.O.m x.m y.m }
+    ensures { result = 0 <-> eq o.O.m x.m y.m }
+  
+end
+

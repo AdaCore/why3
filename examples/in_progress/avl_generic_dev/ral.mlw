@@ -1,0 +1,119 @@
+
+(* avl-based random-access lists. *)
+module RAL
+  
+  use import int.Int
+  use import list.NthLengthAppend
+  use import avl.SelectionTypes
+  
+  (* Data is trivial (random-access lists are fully polymorphic). *)
+  namespace Data
+    
+    type t 'a 'b = 'a
+    type m 'a 'b = 'a
+    predicate c (x:'a) = true
+    function m (x:'a) : 'a = x
+    
+  end
+  
+  (* Tree structure. Store additional information for fast index selection. *)
+  namespace Tree
+    
+    use import avl.ParamsTypes
+    
+    (* Store cardinal at every node. *)
+    type t 'a 'b =
+      | TEmpty
+      | TNode (t 'a 'b) 'a int (t 'a 'b) int
+    
+    function m (t:t 'a 'b) : m_base (Data.m 'a 'b) = match t with
+      | TEmpty -> Empty
+      | TNode l d _ r h -> Node (m l) d.Data.m (m r) h
+      end
+    
+    function cardinal (t:m_base (Data.m 'a 'b)) : int = match t with
+      | Empty -> 0
+      | Node l _ r _ -> cardinal l + cardinal r + 1
+      end
+    
+    predicate c (t:t 'a  'b) = match t with
+      | TEmpty -> true
+      | TNode l d card r _ -> Data.c d /\ card = cardinal t.m /\ c l /\ c r
+      end
+    
+    (* Those clones cannot be done yet... *)
+    let empty () : t 'a 'b
+      ensures { result.m = Empty }
+      ensures { c result }
+    = TEmpty
+    
+    let cardinal (t:t 'a 'b) : int
+      requires { c t }
+      ensures { result = cardinal t.m }
+    = match t with TEmpty -> 0 | TNode _ _ c _ _ -> c end
+    
+    let node (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) (h:int) : t 'a 'b
+      requires { c l /\ Data.c d /\ c r }
+      ensures { result.m = Node l.m d.Data.m r.m h }
+      ensures { c result }
+    = TNode l d (cardinal l + cardinal r + 1) r h
+    
+    let view (t:t 'a 'b) : view_base (t 'a 'b) (Data.t 'a 'b)
+      ensures { match result with
+        | VEmpty -> t.m = Empty
+        | VNode l d r h -> t.m = Node l.m d.Data.m r.m h /\
+          c l /\ Data.c d /\ c r
+        end }
+    = match t with TEmpty -> VEmpty | TNode l d _ r h -> VNode l d r h end
+    
+  end
+  
+  namespace S
+    
+    type t 'a 'b = int
+    type m 'a 'b = int
+    predicate c (x:int) = true
+    function m (x:int) : int = x
+    
+  end
+  
+  predicate selector_correct (s:S.m 'a 'b) (l:list (Data.m 'a 'b)) =
+    0 <= s < length l
+  
+  predicate selected (s:S.m 'a 'b) (e:position_base (Data.m 'a 'b)) =
+    length e.left = s /\ match e.middle with
+      | None -> e.right = Nil
+      | _ -> true
+      end
+  
+  clone import avl.Selection as Sel with namespace P.Data = Data,
+    namespace S = S, predicate selector_correct = selector_correct,
+    predicate selected = selected,
+    goal selector_correct_empty
+  
+  (* This clone cannot be done yet... *)
+  let selected_way (s:S.t 'a 'b)
+    (l:t 'a 'b) (d:P.Data.t 'a 'b) (r:t 'a 'b) : way 'a 'b
+    requires { l.m.inv = r.m.inv }
+    requires { Data.c d /\ l.m.inv d.Data.m }
+    requires { c l /\ c r /\ S.c s }
+    requires { selector_correct s.S.m (node_model l.m.lis d.P.Data.m r.m.lis) }
+    (* A selected position can be found by following the given way. *)
+    returns { Here -> selected s.S.m { left = l.m.lis;
+        middle = Some d.Data.m;
+        right = r.m.lis }
+      | Left sl -> selector_correct sl.S.m l.m.lis /\ S.c sl /\
+        forall e. selected sl.S.m e ->
+        selected s.S.m { e with right = node_model e.right d.Data.m r.m.lis }
+      | Right sr -> selector_correct sr.S.m r.m.lis /\ S.c sr /\
+        forall e. selected sr.S.m e ->
+        selected s.S.m { e with left = node_model l.m.lis d.Data.m e.left } }
+  = let cl = cardinal l in
+    if s < cl
+    then Left s
+    else if s > cl
+    then Right s
+    else Here
+  
+end
+

@@ -7,6 +7,7 @@ Require list.List.
 Require list.Length.
 Require list.Mem.
 Require list.Append.
+Require list.Reverse.
 
 (* Why3 goal *)
 Definition num_occ: forall {a:Type} {a_WT:WhyType a}, a -> (list a) -> Z.
@@ -81,5 +82,18 @@ simpl.
 rewrite IHl1.
 rewrite Zplus_assoc.
 now case why_decidable_eq.
+Qed.
+
+(* Why3 goal *)
+Lemma reverse_num_occ : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+  (l:(list a)), ((num_occ x l) = (num_occ x (Lists.List.rev l))).
+intros a a_WT x l.
+induction l; simpl.
+auto.
+rewrite Append_Num_Occ.
+rewrite <- IHl.
+ring_simplify.
+simpl (num_occ x (a0 :: nil))%list.
+ring.
 Qed.
 

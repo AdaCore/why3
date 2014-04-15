@@ -83,6 +83,15 @@ why3_open "list/HdTl.xml"
 why3_end
 
 
+why3_open "list/HdTlNoOpt.xml"
+
+why3_vc hd_cons by simp
+
+why3_vc tl_cons by simp
+
+why3_end
+
+
 section {* Relation between head, tail, and nth *}
 
 why3_open "list/NthHdTl.xml"
@@ -155,6 +164,121 @@ why3_vc Reverse_length by simp
 why3_vc reverse_append by simp
 
 why3_vc reverse_reverse by simp
+
+why3_end
+
+
+section {* Reverse append *}
+
+why3_open "list/RevAppend.xml"
+
+why3_vc rev_append_append_l
+  by (induct r arbitrary: t) simp_all
+
+why3_vc rev_append_append_r
+proof (induct s arbitrary: r)
+  case (Cons x xs)
+  show ?case by (simp add: Cons [symmetric])
+qed simp
+
+why3_vc rev_append_length
+  by (induct s arbitrary: t) simp_all
+
+why3_end
+
+
+section {* Zip *}
+
+why3_open "list/Combine.xml"
+
+why3_end
+
+
+section {* List with pairwise distinct elements *}
+
+why3_open "list/Distinct.xml"
+
+why3_vc distinct_zero by simp
+
+why3_vc distinct_one by simp
+
+why3_vc distinct_many using assms by simp
+
+why3_vc distinct_append using assms by auto
+
+why3_end
+
+
+section {* Number of occurrences in a list *}
+
+why3_open "list/NumOcc.xml"
+
+lemma num_occ_nonneg: "0 \<le> num_occ x xs"
+  by (induct xs) simp_all
+
+why3_vc Mem_Num_Occ
+proof (induct l)
+  case (Cons y ys)
+  from num_occ_nonneg [of y ys]
+  have "0 < 1 + num_occ y ys" by simp
+  with Cons show ?case by simp
+qed simp
+
+why3_vc Append_Num_Occ
+  by (induct l1) simp_all
+
+why3_end
+
+
+section {* Permutation of lists *}
+
+why3_open "list/Permut.xml"
+
+why3_vc Permut_refl by (simp add: permut_def)
+
+why3_vc Permut_sym using assms by (simp add: permut_def)
+
+why3_vc Permut_trans using assms by (simp add: permut_def)
+
+why3_vc Permut_cons using assms by (simp add: permut_def)
+
+why3_vc Permut_swap by (simp add: permut_def)
+
+why3_vc Permut_cons_append by (simp add: permut_def Append_Num_Occ)
+
+why3_vc Permut_assoc by (simp add: permut_def)
+
+why3_vc Permut_append using assms by (simp add: permut_def Append_Num_Occ)
+
+why3_vc Permut_append_swap by (simp add: permut_def Append_Num_Occ)
+
+why3_vc Permut_mem using assms by (simp add: permut_def Mem_Num_Occ)
+
+why3_vc Permut_length
+  using assms
+proof (induct l1 arbitrary: l2)
+  case Nil
+  then show ?case
+  proof (cases l2)
+    case (Cons x xs)
+    with Nil num_occ_nonneg [of x xs]
+    show ?thesis by (auto simp add: permut_def dest: spec [of _ x])
+  qed simp
+next
+  case (Cons x xs)
+  from `permut (x # xs) l2` have "x \<in> set l2"
+    by (rule Permut_mem) simp
+  then obtain ys zs where "l2 = ys @ x # zs"
+    by (auto simp add: in_set_conv_decomp)
+  with Cons have "permut (x # xs) (ys @ x # zs)" by simp
+  moreover have "permut (ys @ x # zs) ((x # zs) @ ys)"
+    by (rule Permut_append_swap)
+  ultimately have "permut (x # xs) ((x # zs) @ ys)"
+    by (rule Permut_trans)
+  then have "permut xs (zs @ ys)" by (simp add: permut_def)
+  then have "int (length xs) = int (length (zs @ ys))" by (rule Cons)
+  with `l2 = ys @ x # zs` show ?case by simp
+qed
 
 why3_end
 
