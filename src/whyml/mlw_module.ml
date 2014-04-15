@@ -535,7 +535,11 @@ let clone_export uc m minst inst =
               support@ specifications@ for@ partially@ applied@ symbols" in
         let spec = { aty.aty_spec with c_variant = []; c_letrec = 0 } in
         let lam = { l_args = aty.aty_args; l_expr = app; l_spec = spec } in
-        let fd = create_fun_defn (id_clone ps.ps_name) lam in
+        let (lp,md,nm) = restore_path ps.ps_name in
+        let sl = String.concat " " in
+        let nm = sl lp ^ "  " ^ md ^ "  " ^ sl nm in
+        let id = id_derive nm ps.ps_name in
+        let fd = create_fun_defn id lam in
         if fd.fun_ps.ps_ghost && not ps.ps_ghost then Loc.errorm
           "Program@ symbol@ instantiation@ must@ preserve@ ghostness";
         let oeff = aty.aty_spec.c_effect in
