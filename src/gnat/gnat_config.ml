@@ -200,6 +200,13 @@ let prover_merge m1 m2 =
     | (Some _ as x), _ -> x)
   m1 m2
 
+let editor_merge me1 me2 =
+  Whyconf.Meditor.merge (fun _ v1 v2 ->
+    match v1, v2 with
+    | None, x -> x
+    | (Some _ as x), _ -> x)
+  me1 me2
+
 let config =
    (* if a prover was given, read default config file and local config file *)
    try
@@ -212,7 +219,10 @@ let config =
            prover_merge
              (Whyconf.get_provers gnatprove_config)
              (Whyconf.get_provers conf) in
-         Whyconf.set_provers gnatprove_config provers
+         let editors = editor_merge (Whyconf.get_editors gnatprove_config)
+                                    (Whyconf.get_editors conf) in
+         Whyconf.set_editors (Whyconf.set_provers gnatprove_config provers)
+                             editors
       end
    with Rc.CannotOpen _ ->
       Gnat_util.abort_with_message "Cannot read file why3.conf."
@@ -261,6 +271,9 @@ let prover_driver : Driver.driver =
     Format.eprintf "Failed to load driver for prover: %a"
        Exn_printer.exn_printer e;
     Gnat_util.abort_with_message ""
+
+let prover_editor () =
+  Whyconf.editor_by_id config prover.Whyconf.editor
 
 (* freeze values *)
 

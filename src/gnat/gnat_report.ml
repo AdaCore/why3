@@ -156,9 +156,16 @@ let print_json_msg fmt m =
      file line col msg rule severity m.tracefile;
   (match m.vc_file with
   | None -> ()
-  | Some name -> Format.fprintf fmt "\"vc_file\":\"%s\"," name);
-    Format.fprintf fmt "\"entity\":%a}@."
-     print_json_entity ent
+  | Some name ->
+     Format.fprintf fmt "\"vc_file\":\"%s\","
+                    (Sys.getcwd () ^ Filename.dir_sep ^ name);
+     let editor = Gnat_config.prover_editor () in
+     let cmd_line =
+       List.fold_left (fun str s -> str ^ " " ^ s) editor.Whyconf.editor_command
+                      editor.Whyconf.editor_options in
+     Format.fprintf fmt "\"editor_cmd\":\"%s\"," cmd_line);
+     Format.fprintf fmt "\"entity\":%a}@."
+                    print_json_entity ent
 
 let print_statistics fmt msg =
   if msg.steps <> 0 && msg.time <> 0.0 then

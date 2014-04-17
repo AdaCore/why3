@@ -6,6 +6,7 @@ val config : Whyconf.config
 val env : Env.env
 val prover_driver : Driver.driver
 val prover : Whyconf.config_prover
+val prover_editor : unit -> Whyconf.config_editor
 
 (* Configuration settings given or determined by the command line *)
 
