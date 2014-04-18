@@ -333,7 +333,7 @@ void send_msg_to_client(pclient client,
       shutdown_with_msg("error when allocating client msg");
    }
    used = snprintf(msgbuf, len, "%s;%d;%.2f;%d;%s\n",
-                   id, exitcode, cpu_time,(timeout?1:0), outfile);
+                   id, exitcode, cpu_time, (timeout?1:0), outfile);
    if (used >= len) {
       shutdown_with_msg("message for client too long");
    }

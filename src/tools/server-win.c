@@ -155,9 +155,9 @@ void create_server_socket () {
       PIPE_TYPE_MESSAGE |       // message-type pipe
       PIPE_READMODE_MESSAGE |   // message read mode
       PIPE_WAIT,                // blocking mode
-      PIPE_UNLIMITED_INSTANCES,       // number of instances
-      BUFSIZE*sizeof(TCHAR),       // output buffer size
-      BUFSIZE*sizeof(TCHAR),       // input buffer size
+      PIPE_UNLIMITED_INSTANCES, // number of instances
+      BUFSIZE*sizeof(TCHAR),    // output buffer size
+      BUFSIZE*sizeof(TCHAR),    // input buffer size
       5000,                     // client time-out
       NULL);
    if (server->handle == INVALID_HANDLE_VALUE) {
@@ -383,6 +383,7 @@ void send_msg_to_client(pclient client,
                         char* outfile) {
    char* msgbuf;
    int len = 0;
+   int used;
    //len of id + semicolon
    len += strlen(id) + 1;
    // we assume a length of at most 9 for both exitcode and time, plus one for
@@ -394,8 +395,11 @@ void send_msg_to_client(pclient client,
    if (msgbuf == NULL) {
      shutdown_with_msg("error when allocating buffer for client msg");
    }
-   snprintf(msgbuf, len, "%s;%d;%.2f;%d;%s\n",
-      id, exitcode, cpu_time,(timeout?1:0), outfile);
+   used = snprintf(msgbuf, len, "%s;%d;%.2f;%d;%s\n",
+                   id, exitcode, cpu_time, (timeout?1:0), outfile);
+   if (used >= len) {
+      shutdown_with_msg("message for client too long");
+   }
    push_write_data(client->writebuf, msgbuf);
    try_write(client);
 }
@@ -537,8 +541,8 @@ int main(int argc, char **argv) {
                   break;
                default:
                   exit(1);
-               }
-               break;
+            }
+            break;
          case PROCESS:
             proc = (pproc) list_lookup(processes, key);
             if (proc != NULL) {
