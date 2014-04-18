@@ -1,3 +1,10 @@
+// This is the unix implementation of the VC server. It uses the poll
+// mechanism to wait for events, plus the "self pipe trick" to handle
+// terminating child processes.
+//
+// Contrary to the situation on windows, e.g. a read event means that the next
+// call to read() will not block.
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -39,6 +46,8 @@ typedef struct {
   char* outfile;
 } t_proc, *pproc;
 
+// the poll list is the list of file descriptors for which we monitor certain
+// events.
 struct pollfd* poll_list;
 int poll_num = 0;
 int poll_len = 0;
@@ -128,12 +137,15 @@ void server_accept_client() {
   }
   client = (pclient) malloc(sizeof(t_client));
   client->fd = fd;
-  client->readbuf = init_readbuf(1024);
+  client->readbuf = init_readbuf(READ_ONCE);
   client->writebuf = init_writebuf(parallel);
   list_append(clients, fd, (void*)client);
   add_to_poll_list(fd, POLLIN);
 }
 
+// The next two functions implement the "self pipe trick". A pipe is used as
+// boolean information whether child processes have terminated. The code is
+// "data to read on the pipe" = "child processes have terminated"
 static void sigchld_handle(int sig) {
   int saved_errno;
   saved_errno = errno;
@@ -417,7 +429,7 @@ void handle_msg(pclient client, int key) {
     }
     if (cur == max)
       break;
-    r = parse_request(buf+old, cur - old, key);
+    r = parse_request(buf + old, cur - old, key);
     if (r) {
       if (list_length(processes) < parallel) {
         run_request(r);
