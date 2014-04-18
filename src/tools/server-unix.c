@@ -4,7 +4,10 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
+#include <signal.h>
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
@@ -135,7 +138,7 @@ static void sigchld_handle(int sig) {
   int saved_errno;
   saved_errno = errno;
   if (write(cpipe[1], "x", 1) == -1 && errno != EAGAIN && errno != EINTR) {
-    shutdown_with_msg("error writing to pipe\n");
+    shutdown_with_msg("error writing to pipe");
   }
   errno = saved_errno;
 }
@@ -164,11 +167,18 @@ void setup_child_pipe() {
   }
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESTART;
-  sa.sa_handler = sigchld_handle;
+  sa.sa_handler = &sigchld_handle;
   if (sigaction(SIGCHLD, &sa, NULL) == -1) {
     shutdown_with_msg("error installing signal handler");
   }
   add_to_poll_list(cpipe[0], POLLIN);
+}
+
+/* Returns the size in bytes of the sun_path field of a struct
+   sockaddr_un. This should be defined in macro UNIX_PATH_MAX, which is not
+   always defined. */
+int unix_path_max() {
+  return sizeof(struct sockaddr_un) - offsetof(struct sockaddr_un, sun_path);
 }
 
 void server_init_listening(char* basename, int parallel) {
@@ -182,6 +192,9 @@ void server_init_listening(char* basename, int parallel) {
   poll_len = 2 + parallel;
   poll_list = (struct pollfd*) malloc(sizeof(struct pollfd) * poll_len);
   poll_num = 0;
+  if (strlen(basename) + 1 > unix_path_max()) {
+    shutdown_with_msg("basename too long");
+  }
   memcpy(addr.sun_path, basename, strlen(basename) + 1);
   server_sock = socket(AF_UNIX, SOCK_STREAM, 0);
   res = unlink(basename);
@@ -367,7 +380,7 @@ void run_request (prequest r) {
   assert (r != NULL);
 
   client = (pclient) list_lookup(clients, r->key);
-  if (client==NULL) {
+  if (client == NULL) {
     return;
   }
   out_descr = open_temp_file(current_dir, &outfile);
@@ -380,10 +393,10 @@ void run_request (prequest r) {
   close(out_descr);
 
   proc = (pproc) malloc(sizeof(t_proc));
-  proc->task_id         = r->id;
+  proc->task_id = r->id;
   proc->client_fd = r->key;
   proc->id = id;
-  proc->outfile    = outfile;
+  proc->outfile = outfile;
   list_append(processes, id, (void*) proc);
 }
 

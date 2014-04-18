@@ -8,8 +8,7 @@ typedef struct {
   int memlimit;
   char* cmd;   // the command to execute
   int numargs; // the length of the following array
-  char** args; // the arguments of the process to run, including the command,
-                // i.e. args[0] = cmd
+  char** args; // the arguments of the process to run (not including the command)
 } request, *prequest;
 
 //given a buffer str_req of meaningful data up to <len>, parse the client data

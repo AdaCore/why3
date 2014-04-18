@@ -1,7 +1,7 @@
-#include "request.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "request.h"
 
 //count the semicolons in <buf>, up to <len>
 int count_semicolons(char* buf, int len);
@@ -10,8 +10,8 @@ int count_semicolons(char* buf, int len);
 //semicolon. If a semicolon is found at index i, copy the substring from
 //<begin> to <i-1>, that is, excluding the semicolon, into <result>, which
 //will be allocated to contain that much space + a null terminator.
-//If no semicolon is found, the part of <buf> starting from <begin> up to len
-//is copied instead.
+//If no semicolon is found, the part of <buf> starting from <begin> up to <len-1>
+//is copied instead, and a null terminator added.
 int copy_up_to_semicolon(char* buf, int begin, int len, char** result);
 
 int count_semicolons(char* buf, int len) {
@@ -50,7 +50,7 @@ prequest parse_request(char* str_req, int len, int key) {
   char* tmp;
 
   numargs = count_semicolons(str_req, len) - 3;
-  if ( numargs < 0) {
+  if (numargs < 0) {
     return NULL;
   }
   req = (prequest) malloc(sizeof(request));
@@ -58,15 +58,11 @@ prequest parse_request(char* str_req, int len, int key) {
   req->numargs = numargs;
   pos = copy_up_to_semicolon(str_req, pos, len, &(req->id));
   pos = copy_up_to_semicolon(str_req, pos, len, &tmp);
-  if (tmp) {
-    req->timeout = atoi(tmp);
-    free(tmp);
-  }
+  req->timeout = atoi(tmp);
+  free(tmp);
   pos = copy_up_to_semicolon(str_req, pos, len, &tmp);
-  if (tmp) {
-    req->memlimit = atoi(tmp);
-    free(tmp);
-  }
+  req->memlimit = atoi(tmp);
+  free(tmp);
   pos = copy_up_to_semicolon(str_req, pos, len, &(req->cmd));
   req->args = (char**)malloc(sizeof(char*) * (numargs));
   for (i = 0; i < numargs; i++) {

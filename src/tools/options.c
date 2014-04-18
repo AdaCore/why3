@@ -10,7 +10,7 @@ char* basename = NULL;
 void parse_options(int argc, char **argv) {
   static struct option long_options[] = {
     /* These options set a flag. */
-    {"socket", required_argument,       0, 's'},
+    {"socket", required_argument, 0, 's'},
     {0, 0, 0, 0}
   };
   while (1) {
@@ -23,8 +23,10 @@ void parse_options(int argc, char **argv) {
 
      switch (c) {
        case 0:
-         // the case where a long option has been detected
-         break;
+         /* The case where a long option has been detected for --socket should
+            be handled like the short option, as a NULL value was given for the
+            corresponding flag in long_options. */
+         exit (1);
 
        case 'j':
          errno = 0;
@@ -45,7 +47,7 @@ void parse_options(int argc, char **argv) {
 
        case '?':
          /* getopt_long already printed an error message. */
-         break;
+         exit (1);
 
        default:
          exit (1);
