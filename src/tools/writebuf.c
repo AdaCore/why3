@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "writebuf.h"
 #include <stdio.h>
+#include "writebuf.h"
 
 pwritebuf init_writebuf(int capacity) {
    pwritebuf buf = (pwritebuf) malloc(sizeof(t_writebuf));
@@ -36,6 +36,7 @@ void have_written(pwritebuf b, int size) {
          b->len = strlen(b->data);
       } else {
          b->data = NULL;
+         b->len = 0;
       }
    }
 }

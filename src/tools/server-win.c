@@ -240,7 +240,7 @@ void run_request (prequest r) {
    }
    // CreateProcess does not allow more than 32767 bytes for command line parameter
    if (cmdlen > 32767) {
-     shutdown_with_msg("Error: parameter's length exceeds CreateProcess limits\n");
+     shutdown_with_msg("Error: parameter's length exceeds CreateProcess limits");
    }
    cmd = (char*) malloc(sizeof(char) * cmdlen + 1);
    if (cmd == NULL) {
@@ -503,7 +503,7 @@ int main(int argc, char **argv) {
          case SOCKET:
             if (key == server_key) {
                if (!res && GetLastError () != ERROR_PIPE_CONNECTED) {
-                  printf("error connecting client %ld\n", GetLastError());
+                  shutdown_with_msg("error connecting client");
                } else {
                   accept_client(key);
                }

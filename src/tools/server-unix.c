@@ -320,6 +320,7 @@ void send_msg_to_client(pclient client,
                         char* outfile) {
    char* msgbuf;
    int len = 0;
+   int used;
    //len of id + semicolon
    len += strlen(id) + 1;
    // we assume a length of at most 9 for both exitcode and time, plus one for
@@ -331,8 +332,11 @@ void send_msg_to_client(pclient client,
    if (msgbuf == NULL) {
       shutdown_with_msg("error when allocating client msg");
    }
-   snprintf(msgbuf, len, "%s;%d;%.2f;%d;%s\n",
-      id, exitcode, cpu_time,(timeout?1:0), outfile);
+   used = snprintf(msgbuf, len, "%s;%d;%.2f;%d;%s\n",
+                   id, exitcode, cpu_time,(timeout?1:0), outfile);
+   if (used >= len) {
+      shutdown_with_msg("message for client too long");
+   }
    queue_write(client, msgbuf);
 }
 
@@ -359,7 +363,7 @@ void handle_child_events() {
     }
     cpu_time =
       ((double) usage.ru_utime.tv_sec) +
-      ((double)usage.ru_utime.tv_usec / 1000000.0);
+      ((double) usage.ru_utime.tv_usec / 1000000.0);
     exit_code = 1;
     is_timeout = false;
     if (WIFSIGNALED(status)) {
