@@ -150,7 +150,7 @@ let actual_editor_cmd ?main filename cmd =
   let replace_func s =
     match (Str.matched_string s).[1] with
     | '%' -> "%"
-    | 'f' -> filename
+    | 'f' -> Sys.getcwd () ^ Filename.dir_sep ^ filename
     (* Can %t and %T be on an editor command line and have a meaning?
        Is it allowed by Why3config? *)
     | 't' -> string_of_int (Whyconf.timelimit m)
