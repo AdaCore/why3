@@ -139,6 +139,28 @@ let json_escape_msg =
     done;
     Buffer.contents b
 
+(* The function replaces %{f,t,T,m,l,d} to their corresponding values
+   in the string cmd.
+   This function is based on the Call_provers.actualcommand, for
+   some reason not in the Why3 API nor really convenient *)
+let actual_editor_cmd ?main filename cmd =
+  let m = match main with
+    | None -> Whyconf.get_main Gnat_config.config
+    | Some m -> m in
+  let replace_func s =
+    match (Str.matched_string s).[1] with
+    | '%' -> "%"
+    | 'f' -> filename
+    (* Can %t and %T be on an editor command line and have a meaning?
+       Is it allowed by Why3config? *)
+    | 't' -> string_of_int (Whyconf.timelimit m)
+    | 'T' -> string_of_int (succ (Whyconf.timelimit m))
+    | 'm' -> string_of_int (Whyconf.memlimit m)
+    | 'l' -> Whyconf.libdir m
+    | 'd' -> Whyconf.datadir m
+    | a ->  Char.escaped a in
+  Str.global_substitute (Str.regexp "%.") replace_func cmd
+
 let print_json_msg fmt m =
   let e = m.expl in
   (* ??? what about more complex slocs *)
@@ -163,7 +185,8 @@ let print_json_msg fmt m =
      let cmd_line =
        List.fold_left (fun str s -> str ^ " " ^ s) editor.Whyconf.editor_command
                       editor.Whyconf.editor_options in
-     Format.fprintf fmt "\"editor_cmd\":\"%s\"," cmd_line);
+     Format.fprintf fmt "\"editor_cmd\":\"%s\","
+                    (actual_editor_cmd name cmd_line));
      Format.fprintf fmt "\"entity\":%a}@."
                     print_json_entity ent
 
