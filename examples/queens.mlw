@@ -158,7 +158,7 @@ module NQueensSets
     ensures { result = !s /\ sorted !sol 0 !s /\
       forall t: solution.
         solution t <-> (exists i: int. 0 <= i < result /\ eq_sol t !sol[i]) }
-  = t3 (below q) empty empty
+  = t3 (interval 0 q) empty empty
 
 end
 
@@ -222,7 +222,7 @@ theory Bits "the 1-bits of an integer, as a set of integers"
     bits (x & -x) = singleton (min_elt (bits x))
 
   axiom bits_below:
-    forall n: int. 0 <= n < size -> bits (~(~0<<n)) = below n
+    forall n: int. 0 <= n < size -> bits (~(~0<<n)) = interval 0 n
 
 end
 

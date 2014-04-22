@@ -1,0 +1,104 @@
+
+(** Coincidence count
+
+    Exercise proposed by Rustan Leino at Dagstuhl seminar 14171, April 2014
+
+    You are given two sequences of integers, sorted in increasing
+    order and without duplicate elements, and you count the number of
+    elements that appear in both sequences (in linear time and constant
+    space).
+*)
+
+(*
+module MapSetOf
+
+  use import map.Map
+  use import set.Fset
+  use import int.Int
+
+  function setof (m: map int 'a) (l r: int) : set 'a
+
+  axiom setof_empty:
+    forall m: map int 'a, l r: int. r <= l -> setof m l r = empty
+
+  axiom setof_left:
+    forall m: map int 'a, l r: int. l < r ->
+    setof m l r = add m[l] (setof m (l+1) r)
+
+  lemma setof_right:
+    forall m: map int 'a, l r: int. l < r ->
+    setof m l r = add m[r-1] (setof m l (r-1))
+
+  lemma setof_trans:
+    forall m: map int 'a, l mid r: int. l <= mid <= r ->
+    setof m l r = union (setof m l mid) (setof m mid r)
+
+  lemma setof_exists:
+    forall m: map int 'a, l r: int, x: 'a.
+    mem x (setof m l r) <-> exists i: int. l <= i < r && x = m[i]
+
+end
+*)
+
+module CoincidenceCount
+
+  use import array.Array
+  use import ref.Refint
+  use import set.Fsetint
+  use import set.FsetComprehension
+
+  function setof (a: array 'a) : set 'a =
+    map (get a) (interval 0 (length a))
+
+  function drop (a: array 'a) (n: int) : set 'a =
+    map (get a) (interval n (length a))
+
+  lemma drop_left:
+    forall a: array 'a, n: int. 0 <= n < length a ->
+    drop a n == add a[n] (drop a (n+1))
+
+  predicate increasing (a: array int) =
+    forall i j: int. 0 <= i < j < length a -> a[i] < a[j]
+
+  function cc (a b: array int) : int =
+    cardinal (inter (setof a) (setof b))
+
+  lemma not_mem_inter_r:
+    forall a: array int, i: int, s: set int. 0 <= i < length a ->
+    not (mem a[i] s) -> inter (drop a i) s == inter (drop a (i+1)) s
+
+  lemma not_mem_inter_l:
+    forall a: array int, i: int, s: set int. 0 <= i < length a ->
+    not (mem a[i] s) -> inter s (drop a i) == inter s (drop a (i+1))
+
+  let coincidence_count (a b: array int) : int
+    requires { increasing a }
+    requires { increasing b }
+    ensures  { result = cc a b }
+  =
+    let i = ref 0 in
+    let j = ref 0 in
+    let c = ref 0 in
+    while !i < length a && !j < length b do
+      invariant { 0 <= !i <= length a }
+      invariant { 0 <= !j <= length b }
+      invariant { !c + cardinal (inter (drop a !i) (drop b !j)) = cc a b }
+      variant   { length a + length b - !i - !j }
+      if a[!i] < b[!j] then begin
+        assert { not (mem a[!i] (drop b !j)) };
+        incr i
+      end else if a[!i] > b[!j] then begin
+        assert { not (mem b[!j] (drop a !i)) };
+        incr j
+      end else begin
+        assert { inter (drop a !i) (drop b !j) ==
+                 add a[!i] (inter (drop a (!i+1)) (drop b (!j+1))) };
+        assert { not (mem a[!i] (drop a (!i+1))) };
+        incr i;
+        incr j;
+        incr c
+      end
+    done;
+    !c
+
+end
