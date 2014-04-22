@@ -1,23 +1,11 @@
 open Why3
 
-type report_mode = Fail | Fail_And_Proved | Statistics
-
 type proof_mode =
     Then_Split
   | No_WP
   | All_Split
   | Path_WP
   | No_Split
-
-type verbosity =
-  | Normal
-  | Quiet
-  | Verbose
-
-type warning_mode =
-  | Suppress
-  | Warn_Normal
-  | Treat_As_Error
 
 type limit_mode =
   | Limit_Check of Gnat_expl.check
@@ -27,18 +15,14 @@ let gnatprove_why3conf_file = "why3.conf"
 
 let default_timeout = 1
 
-let opt_verbose = ref Normal
 let opt_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
-let opt_report = ref Fail
 let opt_debug = ref false
 let opt_force = ref false
 let opt_proof_mode = ref Then_Split
 let opt_filename : string option ref = ref None
-let opt_ide_progress_bar = ref false
 let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
-let opt_warning_mode = ref Treat_As_Error
 let opt_proof_dir : string option ref = ref None
 
 let opt_limit_line : limit_mode option ref = ref None
@@ -51,28 +35,6 @@ let set_filename s =
       opt_filename := Some s
    else
       Gnat_util.abort_with_message "Only one file name should be given."
-
-let set_report s =
-   if s = "statistics" then
-      opt_report := Statistics
-   else if s = "all" then
-      opt_report := Fail_And_Proved
-   else if s = "fail" then
-     opt_report := Fail
-   else
-      Gnat_util.abort_with_message
-        "argument for option --report should be one of (fail|all|statistics)."
-
-let set_warning_mode s =
-   if s = "off" then
-      opt_warning_mode := Suppress
-   else if s = "continue" then
-      opt_warning_mode := Warn_Normal
-   else if s = "error" then
-      opt_warning_mode := Treat_As_Error
-   else
-      Gnat_util.abort_with_message
-        "argument for option --warnings should be one of (continue|off|error)."
 
 let set_proof_mode s =
    if s = "no_wp" then
@@ -110,9 +72,9 @@ let parse_line_spec caller s =
      match List.length args with
      | 2 -> Limit_Line (Gnat_loc.mk_loc_line fn line)
      | 4 -> let col = int_of_string (List.nth args 2) in
-            let check = Gnat_expl.reason_from_string (List.nth args 3) in
-            Limit_Check (Gnat_expl.mk_check check
-                                            (Gnat_loc.mk_loc fn line col None))
+(*             let check = Gnat_expl.reason_from_string (List.nth args 3) in *)
+            (* TODO fix me *)
+            Limit_Line (Gnat_loc.mk_loc fn line col None)
      | _ -> raise (Failure "bad arity")
    with
    | Failure "nth" ->
@@ -137,12 +99,6 @@ let usage_msg =
   "Usage: gnatwhy3 [options] file"
 
 let options = Arg.align [
-   "-v", Arg.Unit (fun () -> opt_verbose := Verbose),
-         " Output extra verbose information";
-   "--verbose", Arg.Unit (fun () -> opt_verbose := Verbose),
-         " Output extra verbose information";
-   "--quiet", Arg.Unit (fun () -> opt_verbose := Quiet),
-         " Be quiet";
    "-t", Arg.Int set_timeout,
           " Set the timeout in seconds (default is 1 second)";
    "--timeout", Arg.Int set_timeout,
@@ -157,16 +113,10 @@ let options = Arg.align [
           " Rerun VC generation and proofs, even when the result is up to date";
    "--force", Arg.Set opt_force,
           " Rerun VC generation and proofs, even when the result is up to date";
-   "--report", Arg.String set_report,
-          " Set report mode, one of (fail | all | statistics), default is fail";
    "--proof", Arg.String set_proof_mode,
           " Set proof mode, one of \
             (then_split|no_wp|all_split|path_wp|no_split) \
           , default is then_split";
-   "--warnings", Arg.String set_warning_mode,
-          " Set warning mode, one of \
-            (continue|off|error) \
-          , default is error";
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given \
            by \"file:line[:column:checkkind]\"";
@@ -176,8 +126,6 @@ let options = Arg.align [
           " Use prover given in argument instead of Alt-Ergo";
    "--socket", Arg.String set_socket_name,
           " The name of the socket to be used";
-   "--ide-progress-bar", Arg.Set opt_ide_progress_bar,
-          " Issue information on number of VCs proved";
    "--debug", Arg.Set opt_debug,
           " Enable debug mode";
    "--standalone", Arg.Set opt_standalone,
@@ -292,10 +240,7 @@ let timeout =
          if !opt_steps <> None then 0
          else default_timeout
 
-let verbose = !opt_verbose
-let report  = !opt_report
 let proof_mode = !opt_proof_mode
-let warning_mode = !opt_warning_mode
 let debug = !opt_debug
 let force = !opt_force
 let limit_line = !opt_limit_line
@@ -305,7 +250,6 @@ let limit_subp =
    | None -> None
    | Some s -> Some (Ident.create_label ("GP_Subp:" ^ s))
 
-let ide_progress_bar = !opt_ide_progress_bar
 let parallel = !opt_parallel
 
 let unit_name =

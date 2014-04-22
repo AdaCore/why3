@@ -1,11 +1,11 @@
 open Why3
 
 val register :
-     Gnat_expl.expl
+     Gnat_expl.check
   -> Task.task option                  (* task of the last goal *)
   -> Call_provers.prover_result option (* extra information about the run *)
   -> bool                              (* if the goal was proved or not *)
-  -> ?filename:string                  (* name of the file containing the vc
+  -> string option                     (* name of the file containing the vc
                                           (for manual provers) *)
   -> string                            (* the name of the trace file *)
     -> unit
@@ -14,11 +14,7 @@ val register :
    Use the empty string for the trace file if there is none.
    *)
 
-type status =
-  | Everything_Proved
-  | Unproved_Checks
-
-val print_messages : unit -> status
+val print_messages : unit -> unit
 (* print all messages that have been registered so far. Also
    print the result file. The return value describes whether "warning messages"
    have been issued (= unproved checks). *)

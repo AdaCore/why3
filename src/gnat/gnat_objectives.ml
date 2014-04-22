@@ -1,5 +1,4 @@
 open Why3
-open Gnat_expl
 
 type key = int
 (* The key type, with which we identify nodes in the Why3 VC tree *)
@@ -30,9 +29,7 @@ type subp =
    correctness formula for a subp), together with the entity information which
    describes it *)
 
-let get_subp_entity g = g.subp_entity
-
-type objective = Gnat_expl.expl
+type objective = Gnat_expl.check
 (* an objective is identified by its explanation, which contains the source
    location and the kind of the check *)
 
@@ -118,10 +115,10 @@ let empty_objective () =
    }
 
 (* The state of the module consists of these mutable structures *)
-let explmap : objective_rec Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
+let explmap : objective_rec Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 (* maps proof objectives to goals *)
 
-let goalmap : Gnat_expl.expl GoalMap.t = GoalMap.create 17
+let goalmap : Gnat_expl.check GoalMap.t = GoalMap.create 17
 (* maps goals to their objectives *)
 
 let total_nb_goals : int ref = ref 0
@@ -131,7 +128,7 @@ let nb_goals_done : int ref = ref 0
 let not_interesting : GoalSet.t = GoalSet.empty ()
 
 let clear () =
-   Gnat_expl.HExpl.clear explmap;
+   Gnat_expl.HCheck.clear explmap;
    GoalMap.clear goalmap;
    GoalSet.reset not_interesting;
    total_nb_goals := 0;
@@ -139,10 +136,10 @@ let clear () =
    nb_goals_done  := 0
 
 let find e =
-   try Gnat_expl.HExpl.find explmap e
+   try Gnat_expl.HCheck.find explmap e
    with Not_found ->
       let r = empty_objective () in
-      Gnat_expl.HExpl.add explmap e r;
+      Gnat_expl.HCheck.add explmap e r;
       incr nb_objectives;
       r
 
@@ -150,10 +147,10 @@ let add_to_objective ex go =
    let filter =
       match Gnat_config.limit_line with
       | Some (Gnat_config.Limit_Line l) ->
-         Gnat_loc.equal_line l (get_loc ex)
+         Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
       | Some (Gnat_config.Limit_Check c) ->
-         (c.reason = get_reason ex)
-         && (Gnat_loc.equal_orig_loc c.loc (get_loc ex))
+         (c.Gnat_expl.reason = Gnat_expl.get_reason ex)
+         && (Gnat_loc.equal_orig_loc c.Gnat_expl.sloc (Gnat_expl.get_loc ex))
       | None -> true
    in
    if filter then begin
@@ -179,7 +176,7 @@ let is_interesting x = not (is_not_interesting x)
 let next objective =
    (* this lookup should always succeed, otherwise it would mean we have a
       corrupt database *)
-   let obj_rec = Gnat_expl.HExpl.find explmap objective in
+   let obj_rec = Gnat_expl.HCheck.find explmap objective in
    try
       (* the [choose] can fail however, in that case we want to return
          [None] *)
@@ -280,7 +277,7 @@ let further_split goal =
 
 let register_result goal result =
    let obj = get_objective goal in
-   let obj_rec = Gnat_expl.HExpl.find explmap obj in
+   let obj_rec = Gnat_expl.HCheck.find explmap obj in
    incr nb_goals_done;
    if result then begin
       (* goal has been proved, we only need to store that info *)
@@ -313,7 +310,7 @@ let register_result goal result =
    end
 
 let objective_status obj =
-   let obj_rec = Gnat_expl.HExpl.find explmap obj in
+   let obj_rec = Gnat_expl.HCheck.find explmap obj in
    if GoalSet.is_empty obj_rec.to_be_proved then
       Proved
    else if GoalSet.is_empty obj_rec.to_be_scheduled then
@@ -323,8 +320,7 @@ let objective_status obj =
 
 
 let iter f =
-   let obj = Gnat_expl.HExpl.fold (fun k _ acc -> k :: acc) explmap [] in
-   let obj = List.sort Gnat_expl.expl_compare obj in
+   let obj = Gnat_expl.HCheck.fold (fun k _ acc -> k :: acc) explmap [] in
    List.iter f obj
 
 let get_num_goals () =
@@ -332,30 +328,6 @@ let get_num_goals () =
 
 let get_num_goals_done () =
    !nb_goals_done
-
-exception Found_Name of string
-
-let extract_subp_name subp =
-  (* given a top-level goal that corresponds to an Ada subprogram, extract the
-     subprogram name *)
-   let task = Session.goal_task subp in
-   let goal_ident = (Task.task_goal task).Decl.pr_name in
-   let label_set = goal_ident.Ident.id_label in
-   try
-     Ident.Slab.iter (fun lab ->
-       let s = lab.Ident.lab_string in
-       if Strings.starts_with s "GP_Pretty_Ada:" then
-         raise (Found_Name (String.sub s 14 (String.length s - 14)))
-       ) label_set;
-     assert false (* There must always be a label *)
-   with Found_Name s -> s
-
-let stat subp =
-   if Gnat_config.verbose <> Gnat_config.Quiet then begin
-      Format.printf "analyzing %s, %d checks@."
-        subp.subp_entity.Gnat_expl.subp_name !nb_objectives
-   end;
-   nb_objectives := 0
 
 let has_file session =
    (* Check whether the session has a file associated with it. Sessions without
@@ -403,7 +375,7 @@ let iter_leafs goal f =
                   | _ -> ()) t
          | _ -> ()) goal
 
-let iter_leaf_goals subp f = iter_leafs subp.subp_goal (f subp.subp_entity)
+let iter_leaf_goals subp f = iter_leafs subp.subp_goal f
 
 let goal_has_been_tried g =
    (* Check whether the goal has been tried already *)
@@ -496,31 +468,16 @@ let init () =
 let save_session () =
    Session.save_session Gnat_config.config (get_session ()).Session.session
 
-let display_progress () =
-   if Gnat_config.ide_progress_bar then begin
-      Format.printf "completed %d out of %d (%d%%)...@."
-      !nb_goals_done !total_nb_goals (!nb_goals_done * 100 / !total_nb_goals)
-   end
-
-let compare_by_sloc subp1 subp2 =
-   Gnat_loc.compare_loc
-     subp1.subp_entity.Gnat_expl.subp_loc
-     subp2.subp_entity.Gnat_expl.subp_loc
-
 let mk_subp_goal goal =
   { subp_goal = goal;
-    subp_entity =
-      { Gnat_expl.subp_name = extract_subp_name goal;
-        subp_loc = extract_sloc goal
-      }
+    subp_entity = extract_sloc goal
   }
 
 let iter_subps f =
    let acc = ref [] in
    iter_main_goals (fun g ->
      acc := mk_subp_goal g :: !acc);
-   let subps = List.sort compare_by_sloc !acc in
-   List.iter f subps
+   List.iter f !acc
 
 let matches_subp_filter subp =
    match Gnat_config.limit_subp with
@@ -533,17 +490,17 @@ let matches_subp_filter subp =
 
 module Save_VCs = struct
 
-   let count_map : (int ref) Gnat_expl.HExpl.t = Gnat_expl.HExpl.create 17
+   let count_map : (int ref) Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 
    module GM = GoalMap
 
    let goal_map : string GM.t = GM.create 17
 
-   let find expl =
-      try Gnat_expl.HExpl.find count_map expl
+   let find check =
+      try Gnat_expl.HCheck.find count_map check
       with Not_found ->
          let r = ref 0 in
-         Gnat_expl.HExpl.add count_map expl r;
+         Gnat_expl.HCheck.add count_map check r;
          r
 
    let vc_file goal =
@@ -555,33 +512,32 @@ module Save_VCs = struct
       f fmt;
       close_out cout
 
-   let vc_name expl =
-      let r = find expl in
+   let vc_name check =
+      let r = find check in
       incr r;
       let n = !r in
-      let base = Gnat_expl.to_filename expl in
+      let base = Gnat_expl.to_filename Gnat_config.unit_name check in
       let suffix = ".why" in
       if n = 1 then base ^ suffix
       else base ^ "_" ^ string_of_int n ^ suffix
 
    let save_vc goal =
-      let expl = get_objective goal in
+      let check = get_objective goal in
       let task = Session.goal_task goal in
       let dr = Gnat_config.prover_driver in
-      let vc_fn = vc_name expl in
+      let vc_fn = vc_name check in
       GM.add goal_map goal vc_fn;
       with_fmt_channel vc_fn
         (fun fmt ->
-          Driver.print_task dr vc_fn fmt task);
-      Format.printf "saved VC to %s@." vc_fn
+          Driver.print_task dr vc_fn fmt task)
 
    let compute_trace =
      let rec compute_trace acc f =
        let acc = Term.t_fold compute_trace acc f in
-       match Gnat_expl.extract_explanation f.Term.t_label with
+       match Gnat_expl.extract_sloc f.Term.t_label with
        (* it should be enough to look at the "sloc"s here, and not take into
           account the explanations. *)
-       | Gnat_expl.Sloc loc -> Gnat_loc.S.add loc acc
+       | Some loc -> Gnat_loc.S.add loc acc
        | _ -> acc
      in
      fun goal ->
@@ -589,8 +545,8 @@ module Save_VCs = struct
        compute_trace Gnat_loc.S.empty f
 
    let save_trace goal =
-      let expl = get_objective goal in
-      let base = Gnat_expl.to_filename ~goal expl in
+      let check = get_objective goal in
+      let base = Gnat_expl.to_filename Gnat_config.unit_name check in
       let trace = compute_trace goal in
       if not (Gnat_loc.S.is_empty trace) then begin
         let trace_fn = base ^ ".trace" in

@@ -13,19 +13,6 @@ val prover_editor : unit -> Whyconf.config_editor
 val timeout : int
 (* value of the -t/--timeout option, default value 10 *)
 
-type verbosity =
-  | Normal
-  | Quiet
-  | Verbose
-
-val verbose : verbosity
-(* true if option -v/--verbose was present *)
-
-type report_mode = Fail | Fail_And_Proved | Statistics
-(* In mode fail, only print failed proof objectives.
-   In mode fail_and_proved, print all proof objectives.
-   In mode statistics, additionally print steps and time taken by the VC *)
-
 type proof_mode =
     Then_Split
   | No_WP
@@ -40,15 +27,6 @@ type proof_mode =
    In mode No_Split, do not split VCs at all
    *)
 
-type warning_mode =
-  | Suppress
-  | Warn_Normal
-  | Treat_As_Error
-(* In mode Warn_Normal, exit code of gnatwhy3 is always 0; In mode
-   Treat_As_Error, exit code of gnatwhy3 is non-zero when unproved checks
-   exist, 0 otherwise.  Mode Suppress is ignored by gnatwhy3 (behaves like mode
-   Warn_Normal). Default is Treat_As_Error. *)
-
 type limit_mode =
   | Limit_Check of Gnat_expl.check
   | Limit_Line of Gnat_loc.loc
@@ -56,13 +34,8 @@ type limit_mode =
    --limit-line: - --limit-line=file:line -> Limit_Line
                  - --limit-line=file:line:checkkind -> Limit_Check *)
 
-val report : report_mode
-(* reflects value of option --report, default "Fail" *)
-
 val proof_mode : proof_mode
 (* reflects value of option --proof, default "Then_Split" *)
-
-val warning_mode : warning_mode
 
 val debug : bool
 (* true if option --debug was present *)
@@ -87,10 +60,6 @@ val limit_line : limit_mode option
 val limit_subp : Ident.label option
 (* set if option --limit-subp was given; we only prove VCs from that subprogram
    *)
-
-val ide_progress_bar : bool
-(* set if option --ide-progress-bar was given, to issue formatted output on
-   current numbers of VCs proved *)
 
 val parallel : int
 (* number of parallel processes that can be run in parallel for proving VCs *)

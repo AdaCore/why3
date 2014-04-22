@@ -24,8 +24,8 @@ let search_labels =
   (* fold over the term to find the explanation *)
   let rec search_labels acc f =
     let acc =
-      match Gnat_expl.extract_explanation f.t_label with
-      | Gnat_expl.Expl e -> Some e
+      match Gnat_expl.extract_check f.t_label with
+      | Some e -> Some e
       | _ -> acc
     in
     t_fold search_labels acc f
@@ -49,7 +49,7 @@ let rec is_trivial fml =
             is_trivial t) tbl
    | _ -> false
 
-let register_goal subp_entity goal =
+let register_goal goal =
    (* Register the goal by extracting the explanation and trace. If the goal is
     * trivial, do not register *)
    let task = Session.goal_task goal in
@@ -61,8 +61,7 @@ let register_goal subp_entity goal =
          Gnat_util.abort_with_message
          "Task has no tracability label."
    | _, Some c ->
-       let e = Gnat_expl.mk_expl_check c subp_entity in
-       Gnat_objectives.add_to_objective e goal
+       Gnat_objectives.add_to_objective c goal
 
 let rec handle_vc_result goal result prover_result =
    (* This function is called when the prover has returned from a VC.
@@ -71,11 +70,10 @@ let rec handle_vc_result goal result prover_result =
        prover_result  the actual proof result, to extract statistics
    *)
    let obj, status = Gnat_objectives.register_result goal result in
-   Gnat_objectives.display_progress ();
    let task = Session.goal_task goal in
    match status with
    | Gnat_objectives.Proved ->
-       Gnat_report.register obj (Some task) prover_result true ""
+       Gnat_report.register obj (Some task) prover_result true None ""
    | Gnat_objectives.Not_Proved ->
        let tracefile =
          match Gnat_config.proof_mode with
@@ -85,7 +83,7 @@ let rec handle_vc_result goal result prover_result =
        in
        let filename = Gnat_manual.get_prover_file goal in
        Gnat_report.register obj (Some task) prover_result
-                            false ?filename tracefile
+                            false filename tracefile
    | Gnat_objectives.Work_Left ->
          match Gnat_objectives.next obj with
          | Some g -> schedule_goal g
@@ -100,9 +98,6 @@ and interpret_result pa pas =
          let answer = r.Call_provers.pr_answer in
          if answer = Call_provers.HighFailure then begin
             Format.eprintf "An error occurred when calling the prover.@.";
-            if Gnat_config.verbose = Gnat_config.Verbose then begin
-               Format.eprintf "%s@." r.Call_provers.pr_output
-            end;
          end;
          handle_vc_result goal (answer = Call_provers.Valid) (Some r)
    | _ ->
@@ -151,14 +146,14 @@ and actually_schedule_goal g =
 let handle_obj obj =
    if Gnat_objectives.objective_status obj =
       Gnat_objectives.Proved then begin
-        Gnat_report.register obj None None true ""
+        Gnat_report.register obj None None true None ""
    end else begin
       match Gnat_objectives.next obj with
       | Some g ->
          if Gnat_manual.is_new_manual_proof g then
            Gnat_report.register
              obj None None false
-             ~filename:(Gnat_manual.create_prover_file g obj) ""
+             (Some (Gnat_manual.create_prover_file g obj)) ""
          else schedule_goal g
       | None -> ()
    end
@@ -166,8 +161,7 @@ let handle_obj obj =
 let normal_handle_one_subp subp =
    if Gnat_objectives.matches_subp_filter subp then begin
      Gnat_objectives.init_subp_vcs subp;
-     Gnat_objectives.iter_leaf_goals subp register_goal;
-     Gnat_objectives.stat subp;
+     Gnat_objectives.iter_leaf_goals subp register_goal
    end
 
 let all_split_subp subp =
@@ -206,12 +200,8 @@ let _ =
          Gnat_objectives.iter handle_obj;
          Gnat_objectives.do_scheduled_jobs interpret_result;
          Gnat_objectives.clear ();
-         let success = Gnat_report.print_messages () in
-         Gnat_objectives.save_session ();
-         if (Gnat_config.warning_mode = Gnat_config.Treat_As_Error &&
-            success = Gnat_report.Unproved_Checks)
-         then exit 1
-         else exit 0
+         Gnat_report.print_messages ();
+         Gnat_objectives.save_session ()
       | Gnat_config.All_Split ->
          Gnat_objectives.iter_subps all_split_subp
       | Gnat_config.No_WP ->

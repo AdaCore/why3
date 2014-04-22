@@ -1,21 +1,14 @@
 open Why3
 
 type msg =
-  { expl   : Gnat_expl.expl;
-    result : bool;
-    improved_sloc : Gnat_loc.simple_loc option;
-    time   : float;
-    steps  : int;
-    extra_msg : string;
-    tracefile : string;
-    vc_file : string option;
+  { check      : Gnat_expl.check;
+    result     : bool;
+    time       : float;
+    steps      : int;
+    extra_info : int option;
+    tracefile  : string;
+    vc_file    : string option;
   }
-
-type status =
-  | Everything_Proved
-  | Unproved_Checks
-
-let cmp msg1 msg2 = Gnat_expl.expl_compare msg1.expl msg2.expl
 
 let msg_set : msg list ref = ref []
 
@@ -60,84 +53,44 @@ let extract_steps_fail s =
     with _ -> None
   else None
 
-let register expl task result valid ?filename tracefile =
+let register check task result valid filename tracefile =
   let time =
     match result with
     | None -> 0.0
     | Some r -> r.Call_provers.pr_time in
   let steps =
-    if Gnat_config.report = Gnat_config.Statistics && result <> None then
-      let result = Opt.get result in
-      match result.Call_provers.pr_answer with
-      | Call_provers.Valid ->
-          begin match extract_steps result.Call_provers.pr_output with
-          | Some steps -> steps
-          | None -> 0
-          end
-      | Call_provers.Failure s ->
-          begin match extract_steps_fail s with
-          | Some steps -> steps
-          | None -> 0
-          end
-      | _ -> 0
-    else 0
-  in
-  let improved_sloc, msg =
-    if valid then None, ""
-    else if task = None then None, ""
-    else
-      let task = Opt.get task in
-      let first_sloc = List.hd (Gnat_expl.get_loc expl) in
-      let sloc, msg = Gnat_expl.improve_sloc first_sloc task in
-      Some sloc, msg in
+    match result with
+    | Some ({Call_provers.pr_answer = Call_provers.Valid } as r) ->
+        begin match extract_steps r.Call_provers.pr_output with
+        | Some steps -> steps
+        | None -> 0
+        end
+    | Some { Call_provers.pr_answer = Call_provers.Failure s } ->
+        begin match extract_steps_fail s with
+        | Some steps -> steps
+        | None -> 0
+        end
+    | _ -> 0 in
+  let extra_info =
+    if valid then None
+    else begin match task with
+      | None -> None
+      | Some t -> Gnat_expl.get_extra_info t
+    end in
   let msg =
-  { expl          = expl;
+  { check         = check;
     result        = valid;
-    improved_sloc = improved_sloc;
-    extra_msg     = msg;
+    extra_info    = extra_info;
     time          = time;
     steps         = steps;
     tracefile     = tracefile;
     vc_file       = filename } in
   msg_set := msg :: !msg_set
 
-let print_msg fmt m =
-  if m.result then Format.fprintf fmt "info: " else Format.fprintf fmt "warning: ";
-  Format.fprintf fmt "%a" (Gnat_expl.print_reason ~proved:m.result)
-    (Gnat_expl.get_reason m.expl);
-  (if m.extra_msg <> "" then Format.fprintf fmt ", requires %s" m.extra_msg);
-  match m.vc_file with
-  | None -> ()
-  | Some fn -> Format.fprintf fmt ", VC file: %s" fn
-
-let improve_sloc msg =
-  match msg.improved_sloc with
-  | None -> List.hd (Gnat_expl.get_loc msg.expl)
-  | Some l -> l
-
-let print_with_sloc fmt m =
-  match Gnat_expl.get_loc m.expl with
-  | [] -> assert false (* the sloc of a VC is never empty *)
-  | _ :: secondaries ->
-      let sloc = improve_sloc m in
-      Format.fprintf fmt "%a: %a" Gnat_loc.simple_print_loc sloc print_msg m;
-      List.iter (Gnat_loc.print_line_loc fmt) secondaries
-
-let print_json_entity fmt e =
-  let sl = List.hd e.Gnat_expl.subp_loc in
-  let file, line, _ = Gnat_loc.explode sl in
-  Format.fprintf fmt "{\"name\":\"%s\",\"file\":\"%s\",\"line\":%d}"
-  e.Gnat_expl.subp_name file line
-
-let json_escape_msg =
-  let b = Buffer.create 150 in
-  fun s ->
-    Buffer.reset b;
-    for i = 0 to String.length s - 1 do
-      if s.[i] = '"' then Buffer.add_char b '\\';
-      Buffer.add_char b s.[i];
-    done;
-    Buffer.contents b
+let get_info info  =
+    match info with
+    | None -> 0
+    | Some info -> info
 
 (* The function replaces %{f,t,T,m,l,d} to their corresponding values
    in the string cmd.
@@ -161,75 +114,47 @@ let actual_editor_cmd ?main filename cmd =
     | a ->  Char.escaped a in
   Str.global_substitute (Str.regexp "%.") replace_func cmd
 
-let print_json_msg fmt m =
-  let e = m.expl in
-  (* ??? what about more complex slocs *)
-  let loc = List.hd (Gnat_expl.get_loc e) in
-  let file, line, col = Gnat_loc.explode loc in
-  let ent = Gnat_expl.get_subp_entity e in
-  let msg = Pp.sprintf "%a" print_msg m in
-  let msg = json_escape_msg msg in
-  let severity = if m.result then "info" else "error" in
-  let rule = Gnat_expl.tag_of_reason (Gnat_expl.get_reason e) in
-  (* ??? Trace file *)
-  Format.fprintf fmt
-     "{\"file\":\"%s\",\"line\":%d,\"col\":%d,\"message\":\"%s\",\
-       \"rule\":\"%s\",\"severity\":\"%s\",\"tracefile\":\"%s\","
-     file line col msg rule severity m.tracefile;
-  (match m.vc_file with
+let string fmt s = Format.fprintf fmt "\"%s\"" s
+let int fmt d = Format.fprintf fmt "%d" d
+let bool fmt b = Format.fprintf fmt "%b" b
+
+let print_json_field key value_pr fmt value =
+  Format.fprintf fmt "%a : %a " string key value_pr value
+
+let print_trace_file fmt trace  =
+  if trace = "" then ()
+  else begin
+    Format.fprintf fmt ", ";
+    print_json_field "tracefile" string fmt trace
+  end
+
+let print_vc_file_info fmt vc_file =
+  match vc_file with
   | None -> ()
   | Some name ->
-     Format.fprintf fmt "\"vc_file\":\"%s\","
+      print_json_field "vc_file" string fmt
                     (Sys.getcwd () ^ Filename.dir_sep ^ name);
+      Format.fprintf fmt ",";
      let editor = Gnat_config.prover_editor () in
      let cmd_line =
        List.fold_left (fun str s -> str ^ " " ^ s) editor.Whyconf.editor_command
                       editor.Whyconf.editor_options in
-     Format.fprintf fmt "\"editor_cmd\":\"%s\","
-                    (actual_editor_cmd name cmd_line));
-     Format.fprintf fmt "\"entity\":%a}@."
-                    print_json_entity ent
+     print_json_field "editor_cmd" string fmt (actual_editor_cmd name cmd_line);
+     Format.fprintf fmt ","
 
-let print_statistics fmt msg =
-  if msg.steps <> 0 && msg.time <> 0.0 then
-    Format.fprintf fmt "%.2fs - %d steps" msg.time msg.steps
-  else if msg.steps <> 0 then
-    Format.fprintf fmt "%d steps" msg.steps
-  else if msg.time <> 0.0 then
-    Format.fprintf fmt "%.2fs" msg.time
+let print_json_msg fmt m =
+  Format.fprintf fmt "{%a, %a, %a, %a%a%a}"
+    (print_json_field "id" int) m.check.Gnat_expl.id
+    (print_json_field "reason" string)
+      (Gnat_expl.reason_to_ada m.check.Gnat_expl.reason)
+    (print_json_field "result" bool) m.result
+    (print_json_field "extra_info" int) (get_info m.extra_info)
+    print_trace_file m.tracefile
+    print_vc_file_info m.vc_file
 
-let write_proof_result_file l =
-  Pp.print_in_file (fun fmt ->
-    Format.fprintf fmt "[@.";
-    begin match l with
-    | [] -> ()
-    | x :: xs ->
-        print_json_msg fmt x;
-        List.iter (fun m -> Format.fprintf fmt ",%a" print_json_msg m) xs
-    end;
-    Format.fprintf fmt "]@."
-    ) (Gnat_config.unit_name ^ ".proof")
-
-let write_proof_result_file msg =
-  write_proof_result_file msg
+let print_msg_list fmt l =
+  Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma
+  print_json_msg fmt l
 
 let print_messages () =
-  let l = List.sort cmp !msg_set in
-  write_proof_result_file l;
-  let success = ref Everything_Proved in
-  List.iter (fun msg ->
-    if not msg.result then success := Unproved_Checks;
-    if not msg.result || Gnat_config.report <> Gnat_config.Fail then begin
-      (* we only print the message if asked for *)
-      if Gnat_config.ide_progress_bar then begin
-        (* special output in IDE mode *)
-        print_json_msg Format.std_formatter msg
-      end else begin
-        print_with_sloc Format.std_formatter msg;
-        if Gnat_config.report = Gnat_config.Statistics then
-          Format.printf "(%a)" print_statistics msg;
-        Format.printf "@.";
-      end
-    end
-  ) l;
-  !success
+  Format.printf "%a@." print_msg_list !msg_set

@@ -1,8 +1,9 @@
 open Why3
-open Gnat_loc
 
 (* If you change this type, chances are you also need to change the file
    vc_kinds.ads, and the SPARK UG *)
+
+type id = int
 
 type reason =
    | VC_Division_Check
@@ -26,12 +27,12 @@ type reason =
    | VC_Assert
    | VC_Raise
 
-type check = { loc : loc ; reason : reason }
+type check = { id : id ; reason : reason; sloc : Gnat_loc.loc }
+(* a check is equal to a check ID as provided by gnat2why, as well as a reason.
+   We need the reason because in the case of a loop invariant, there is a
+   single check id, but in fact two checks (initialization and preservation) *)
 
-type subp_entity =
-  { subp_name : string;
-    subp_loc  : loc
-  }
+type subp_entity = Gnat_loc.loc
 
 (* the type of labels that are used by gnatprove and recognized by gnatwhy3 *)
 type gp_label =
@@ -39,12 +40,12 @@ type gp_label =
   (* generic location label "GP_Sloc" *)
   | Gp_Subp of Gnat_loc.loc
   (* label "GP_Subp" used to indicate the location of the subprogram *)
-  | Gp_Sloc_VC of Gnat_loc.loc
-  (* label "GP_Subp" used to indicate the location of a VC *)
+  | Gp_VC_Id of int
+  (* label "GP_VC_Id" used to indicate the id of a VC *)
   | Gp_Reason of reason
   (* label "GP_Reason" used to indicate the kind of a VC *)
-  | Gp_Pretty_Ada of string
-  (* label "GP_Pretty_Ada" used to give the Ada source text for some
+  | Gp_Pretty_Ada of int
+  (* label "GP_Pretty_Ada" used to give an Ada source node for some
      predicate *)
 
 val read_label : string -> gp_label option
@@ -52,49 +53,34 @@ val read_label : string -> gp_label option
    is not one of the predefined labels. Return [None] if the string does not
    start with "GP_" *)
 
-type expl
+val check_compare : check -> check -> int
 
-val expl_compare : expl -> expl -> int
+val get_loc : check -> Gnat_loc.loc
+val get_reason : check -> reason
 
 val reason_from_string : string -> reason
-val print_reason : proved:bool -> Format.formatter -> reason -> unit
-val tag_of_reason : reason -> string
+(* parse a reason string from Ada into the OCaml type *)
+val reason_to_ada : reason -> string
+(* print a reason from the OCaml type into the Ada representation *)
 
-val simple_print_expl : Format.formatter -> expl -> unit
-(* simple text to represent VC, used for debugging *)
+val to_filename : string -> check -> string
+(* print a representation of a check that could serve as a filename *)
 
-val print_skipped : Format.formatter -> expl -> unit
-
-val to_filename : ?goal:'a Session.goal -> expl -> string
-(* print a representation of an explanation that could serve as a filename *)
-
-val mk_check : reason -> loc -> check
-
-val check_equal : check -> check -> bool
-
-val mk_expl : reason -> loc -> subp_entity -> expl
-(* [mk_expl reason l1 se]
+val mk_check : reason -> id -> Gnat_loc.loc -> check
+(* [mk_expl reason id]
      reason - the kind of check for this VC
-     l1     - the Ada location of the VC
-     se     - the entity information for the subprogram to which the VC belongs
+     id     - the id of the VC
 *)
 
-val mk_expl_check : check -> subp_entity -> expl
+module MCheck : Extmap.S with type key = check
+module HCheck : Hashtbl.S with type key = check
 
-val get_loc : expl -> loc
-val get_reason : expl -> reason
-val get_subp_entity : expl -> subp_entity
+val extract_check : Ident.Slab.t -> check option
+(* from a label set, extract the check info, if any *)
 
-module MExpl : Extmap.S with type key = expl
-module HExpl : Hashtbl.S with type key = expl
+val extract_sloc : Ident.Slab.t -> Gnat_loc.loc option
+(* from a label set, extract the sloc info it contains, if any *)
 
-type node_info =
-   | Expl of check
-   | Sloc of Gnat_loc.loc
-   | No_Info
-
-val extract_explanation : Ident.Slab.t -> node_info
-(* from a label set, extract the auxiliary information it contains *)
-
-val improve_sloc :
-  Gnat_loc.simple_loc -> Task.task -> Gnat_loc.simple_loc * string
+val get_extra_info : Task.task -> int option
+(* from a task node, extract the Gp_Pretty_Ada info that is contained in the
+ * rightmost goal node, if any *)

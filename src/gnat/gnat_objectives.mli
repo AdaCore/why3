@@ -20,9 +20,9 @@
 
 open Why3
 
-type objective = Gnat_expl.expl
-(* an objective is identified by its explanation, which contains the source
-   location and the kind of the check *)
+type objective = Gnat_expl.check
+(* an objective is identified by its check, which contains the check id and the
+   kind of the check *)
 
 type key = int
 
@@ -31,9 +31,6 @@ type goal = key Session.goal
 type subp
 (* An object of type "subp" represents all objectives for a given Ada
    subprogram. *)
-
-val get_subp_entity : subp -> Gnat_expl.subp_entity
-(* query the subprogram entity from a subp *)
 
 (* various possibilities to add objectives and goals to the database, and the
    "interesting" bit *)
@@ -91,7 +88,7 @@ val register_result : goal -> bool -> objective * status
 val iter : (objective -> unit) -> unit
 (* iterate over all objectives *)
 
-val iter_leaf_goals : subp -> (Gnat_expl.subp_entity -> goal -> unit) -> unit
+val iter_leaf_goals : subp -> (goal -> unit) -> unit
 (* iterate over all VCs of a subprogram. The callback will get an individual VC
    and the subp entity of the VC *)
 
@@ -100,9 +97,6 @@ val goal_has_been_tried : goal -> bool
 
 val objective_status : objective -> status
 (* query the status of the objective *)
-
-val stat : subp -> unit
-(* print statistics for this subprogram *)
 
 val get_num_goals : unit -> int
 (* return the total number of goals *)
@@ -125,9 +119,6 @@ val do_scheduled_jobs :
 
 val save_session : unit -> unit
 (* save the session; should be called on exit. *)
-
-val display_progress : unit -> unit
-(* print the progress as parsed by GPS to stdout *)
 
 module GoalMap : Hashtbl.S with type key = goal
 (* a map of goals *)
