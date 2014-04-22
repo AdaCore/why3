@@ -9,37 +9,6 @@
     space).
 *)
 
-(*
-module MapSetOf
-
-  use import map.Map
-  use import set.Fset
-  use import int.Int
-
-  function setof (m: map int 'a) (l r: int) : set 'a
-
-  axiom setof_empty:
-    forall m: map int 'a, l r: int. r <= l -> setof m l r = empty
-
-  axiom setof_left:
-    forall m: map int 'a, l r: int. l < r ->
-    setof m l r = add m[l] (setof m (l+1) r)
-
-  lemma setof_right:
-    forall m: map int 'a, l r: int. l < r ->
-    setof m l r = add m[r-1] (setof m l (r-1))
-
-  lemma setof_trans:
-    forall m: map int 'a, l mid r: int. l <= mid <= r ->
-    setof m l r = union (setof m l mid) (setof m mid r)
-
-  lemma setof_exists:
-    forall m: map int 'a, l r: int, x: 'a.
-    mem x (setof m l r) <-> exists i: int. l <= i < r && x = m[i]
-
-end
-*)
-
 module CoincidenceCount
 
   use import array.Array
