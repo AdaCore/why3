@@ -107,7 +107,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml src/session/xml.ml \
-	       lib/ocaml/why3__BigInt.ml
+	       lib/ocaml/why3__BigInt_compat.ml
 
 LIB_UTIL = config bigInt util opt lists strings extmap extset exthtbl weakhtbl \
 	   hashcons stdlib exn_printer pp debug loc print_tree \
@@ -167,18 +167,18 @@ $(LIBDEP): $(LIBGENERATED)
 
 ifeq (@enable_zarith@,yes)
 
-lib/ocaml/why3__BigInt.ml: config.status lib/ocaml/why3__BigInt_zarith.ml
+lib/ocaml/why3__BigInt_compat.ml: config.status lib/ocaml/why3__BigInt_zarith.ml
 	cp lib/ocaml/why3__BigInt_zarith.ml $@
 
 else
 
-lib/ocaml/why3__BigInt.ml: config.status lib/ocaml/why3__BigInt_num.ml
+lib/ocaml/why3__BigInt_compat.ml: config.status lib/ocaml/why3__BigInt_num.ml
 	cp lib/ocaml/why3__BigInt_num.ml $@
 
 endif
 
 clean::
-	rm -f lib/ocaml/why3__BigInt.ml
+	rm -f lib/ocaml/why3__BigInt_compat.ml
 
 # build targets
 
@@ -1199,7 +1199,7 @@ clean::
 # Ocaml realizations
 #######################
 
-OCAMLLIBS_FILES = why3__BigInt why3__IntAux why3__Array
+OCAMLLIBS_FILES = why3__BigInt_compat why3__BigInt why3__IntAux why3__Array
 
 OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
 
@@ -1215,7 +1215,7 @@ ifneq "$(MAKECMDGOALS)" "clean"
 include $(OCAMLLIBS_DEP)
 endif
 
-$(OCAMLLIBS_DEP): lib/ocaml/why3__BigInt.ml
+$(OCAMLLIBS_DEP): lib/ocaml/why3__BigInt_compat.ml
 
 depend: $(OCAMLLIBS_DEP)
 
