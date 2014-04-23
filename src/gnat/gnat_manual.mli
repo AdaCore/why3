@@ -11,3 +11,6 @@ val create_prover_file : goal -> string
 (* Get the file associated to the goal with the current manual prover.
    If the current prover is not manual None is returned *)
 val get_prover_file : goal -> string option
+
+(* rewrite the goal to it's prove file *)
+val rewrite_goal : goal -> unit
