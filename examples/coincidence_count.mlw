@@ -53,13 +53,11 @@ module CoincidenceCount
       invariant { 0 <= !j <= length b }
       invariant { !c + cardinal (inter (drop a !i) (drop b !j)) = cc a b }
       variant   { length a + length b - !i - !j }
-      if a[!i] < b[!j] then begin
-        assert { not (mem a[!i] (drop b !j)) };
+      if a[!i] < b[!j] then
         incr i
-      end else if a[!i] > b[!j] then begin
-        assert { not (mem b[!j] (drop a !i)) };
+      else if a[!i] > b[!j] then
         incr j
-      end else begin
+      else begin
         assert { inter (drop a !i) (drop b !j) ==
                  add a[!i] (inter (drop a (!i+1)) (drop b (!j+1))) };
         assert { not (mem a[!i] (drop a (!i+1))) };
