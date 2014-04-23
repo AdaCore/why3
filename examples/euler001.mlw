@@ -168,14 +168,33 @@ module Euler001
     let n15 = div (n-1) 15 in
     div (3 * n3 * (n3+1) + 5 * n5 * (n5+1) - 15 * n15 * (n15+1)) 2
 
+  (** Small test. Run it with
+
+     why3 examples/euler001.mlw --exec Euler001.run
+
+  *)
   let run () = solve 1000
     (* should return 233168 *)
 
+  (** for the Why3 bench *)
   exception BenchFailure
 
   let bench () raises { BenchFailure -> true } =
     let x = run () in
     if x <> 233168 then raise BenchFailure;
     x
+
+  (** for extraction *)
+
+  use import string.Char
+  use import io.StdIO
+
+  let go () = 
+    print_char (chr 71); (* G *)
+    print_char (chr 79); (* O *)
+    print_char (chr 58); (* : *)
+    print_char (chr 32); (*   *)
+    print_int (run ());
+    print_newline ()
 
 end

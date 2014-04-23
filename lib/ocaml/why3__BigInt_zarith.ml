@@ -67,3 +67,6 @@ let of_int64 = big_int_of_int64
 
 let power x y = try power_big x y with Invalid_argument _ -> zero
 
+let print n = Pervasives.print_string (to_string n)
+let chr n = Pervasives.char_of_int (to_int n)
+let code c = of_int (Pervasives.int_of_char c)

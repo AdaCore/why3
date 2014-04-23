@@ -5,7 +5,11 @@ ifeq ($(BENCH),yes)
   WHY3=../../bin/why3
   WHY3SHARE=../../share
 else
-  WHY3=$(BINDIR)/why3
+  ifeq ($(BINDIR),)
+    WHY3=why3
+  else
+    WHY3=$(BINDIR)/why3
+  endif
   WHY3SHARE=$(shell $(WHY3) --print-datadir)
 endif
 
