@@ -222,7 +222,8 @@ let t_shape_task ~version expl t =
   let push t () = Buffer.add_string b t in
   begin match version, expl with
   | SV3, Some s -> Buffer.add_string b s
-  | _ -> ()
+  | SV3, None
+  | (SV1 | SV2 ), _  -> ()
   end;
   let f = Task.task_goal_fmla t in
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () f in
