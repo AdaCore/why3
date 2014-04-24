@@ -853,7 +853,7 @@ let raw_add_task ~version ~(keygen:'a keygen) ~(expanded:bool) parent name expl 
   let key = keygen ~parent:parent_key () in
   let sum = Termcode.task_checksum ~version t in
   (* let shape = Termcode.t_shape_buf ~version (Task.task_goal_fmla t) in *)
-  let shape = Termcode.t_shape_task ~version t in
+  let shape = Termcode.t_shape_task ~version expl t in
   let goal = { goal_name = name;
                goal_expl = expl;
                goal_parent = parent;
@@ -1377,11 +1377,11 @@ let add_file ~keygen env ?format filename =
   let version = env.session.session_shape_version in
   let add_goal parent acc goal =
     let g =
-      let name,expl,task = Termcode.goal_expl_task ~root:true goal in
+      let name,expl = Termcode.goal_expl_task ~root:true goal in
       raw_add_task
         ~version
         ~keygen ~expanded:true
-        parent name expl task
+        parent name expl goal
     in g::acc
   in
   let add_theory acc rfile thname theory =
@@ -1432,7 +1432,7 @@ let add_transformation ?(init=notify) ?(notify=notify) ~keygen env_session trans
   let parent_goal_name = g.goal_name.Ident.id_string in
   let next_subgoal task =
     incr i;
-    let gid,expl,_ = Termcode.goal_expl_task ~root:false task in
+    let gid,expl = Termcode.goal_expl_task ~root:false task in
     let expl = match expl with
       | None -> string_of_int !i ^ "."
       | Some e -> string_of_int !i ^ ". " ^ e
@@ -1939,7 +1939,8 @@ let rec recover_sub_tasks ~theories env_session task g =
   *)
   let version = env_session.session.session_shape_version in
   let sum = Termcode.task_checksum ~version task in
-  let shape = Termcode.t_shape_task ~version task in
+  let _, expl = Termcode.goal_expl_task ~root:false task in
+  let shape = Termcode.t_shape_task ~version expl task in
   if not (Termcode.equal_checksum sum g.goal_checksum &&
           Termcode.equal_shape shape g.goal_shape) then
     raise (UnrecoverableTask g.goal_name);
@@ -2107,7 +2108,8 @@ let merge_file ~release ~keygen ~theories env ~allow_obsolete from_f to_f =
 let rec recompute_all_shapes_goal ~release g =
   let t = goal_task g in
   (* g.goal_shape <- Termcode.t_shape_buf (Task.task_goal_fmla t); *)
-  g.goal_shape <- Termcode.t_shape_task t;
+  let _, expl = Termcode.goal_expl_task ~root:false t in
+  g.goal_shape <- Termcode.t_shape_task expl t;
   g.goal_checksum <- Termcode.task_checksum t;
   if release then release_task g;
   iter_goal

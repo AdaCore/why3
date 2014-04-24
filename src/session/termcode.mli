@@ -11,8 +11,7 @@
 
 (** Explanations *)
 
-val goal_expl_task:
-  root:bool -> Task.task -> Ident.ident * string option * Task.task
+val goal_expl_task: root:bool -> Task.task -> Ident.ident * string option
 
 (** Shapes *)
 
@@ -26,7 +25,7 @@ val equal_shape: shape -> shape -> bool
 
 (* val t_shape_buf : ?version:int -> Term.term -> shape *)
   (** returns the shape of a given term *)
-val t_shape_task: ?version:int -> Task.task -> shape
+val t_shape_task: ?version:int -> string option -> Task.task -> shape
   (** returns the shape of a given task *)
 
 (** Checksums *)

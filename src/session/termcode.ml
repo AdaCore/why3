@@ -46,7 +46,7 @@ let goal_expl_task ~root task =
     let res = get_expl_fmla fmla in
     if res <> None || not root then res else check_expl gid.Ident.id_label
   in
-  gid, info, task
+  gid, info
 
 (* Shapes *)
 
@@ -217,14 +217,12 @@ let t_shape_buf ?(version=current_shape_version) t =
   Buffer.contents b
 *)
 
-let t_shape_task ~version t =
+let t_shape_task ~version expl t =
   let b = Buffer.create 17 in
   let push t () = Buffer.add_string b t in
-  begin match version with
-  | SV1 | SV2 -> ()
-  | SV3 ->
-    let _, expl, _ = goal_expl_task ~root:false t in
-    Opt.iter (Buffer.add_string b) expl
+  begin match version, expl with
+  | SV3, Some s -> Buffer.add_string b s
+  | _ -> ()
   end;
   let f = Task.task_goal_fmla t in
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () f in
