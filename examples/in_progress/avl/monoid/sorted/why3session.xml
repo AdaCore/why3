@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <file
+  name="../sorted.mlw"
+  verified="true"
+  expanded="false">
+  <theory
+   name="Base"
+   locfile="../sorted.mlw"
+   loclnum="4" loccnumb="7" loccnume="11"
+   verified="true"
+   expanded="false">
+   <goal
+    name="minorate_by_smaller"
+    locfile="../sorted.mlw"
+    loclnum="21" loccnumb="8" loccnume="27"
+    sum="42e01fbf61ca8d0681b336dbc0a0274f"
+    proved="true"
+    expanded="false"
+    shape="aminorateV0V2IarelV0V1AaminorateV1V2F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.00"/>
+    </proof>
+   </goal>
+   <goal
+    name="majorate_by_bigger"
+    locfile="../sorted.mlw"
+    loclnum="24" loccnumb="8" loccnume="26"
+    sum="df03771e1688d77fa91b07bdd3adc5e0"
+    proved="true"
+    expanded="false"
+    shape="amajorateV1V2IarelV0V1AamajorateV0V2F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="Increasing"
+   locfile="../sorted.mlw"
+   loclnum="29" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="false">
+   <goal
+    name="WP_parameter increasing_precede"
+    locfile="../sorted.mlw"
+    loclnum="42" loccnumb="16" loccnume="34"
+    expl="VC for increasing_precede"
+    sum="9969a4f64c4ebf0386accfdff4d09083"
+    proved="true"
+    expanded="false"
+    shape="CaprecedeV0V1AaincreasingV1AaincreasingV0qaincreasingainfix ++V0V1aNilaprecedeV0V1AaincreasingV1AaincreasingV0qaincreasingainfix ++V0V1IaprecedeV2V1AaincreasingV1AaincreasingV2qaincreasingainfix ++V2V1ACfaNilainfix =V3V2aConswVV0aConswVV0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for increasing_precede"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter increasing_precede.1"
+      locfile="../sorted.mlw"
+      loclnum="42" loccnumb="16" loccnume="34"
+      expl="1. postcondition"
+      sum="0a4ba65874f2c22311cc6710f1d6523a"
+      proved="true"
+      expanded="false"
+      shape="postconditionCaprecedeV0V1AaincreasingV1AaincreasingV0qaincreasingainfix ++V0V1aNiltaConswVV0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter increasing_precede.2"
+      locfile="../sorted.mlw"
+      loclnum="42" loccnumb="16" loccnume="34"
+      expl="2. variant decrease"
+      sum="1a88d4928c69892d46c0608ee485cb5e"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNilCfaNilainfix =V3V2aConswVV0aConswVV0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter increasing_precede.3"
+      locfile="../sorted.mlw"
+      loclnum="42" loccnumb="16" loccnume="34"
+      expl="3. postcondition"
+      sum="587d6b2ac29f72297ee2d67bed6da41d"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNilaprecedeV0V1AaincreasingV1AaincreasingV0qaincreasingainfix ++V0V1IaprecedeV2V1AaincreasingV1AaincreasingV2qaincreasingainfix ++V2V1aConswVV0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for increasing_precede"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.39"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter increasing_midpoint"
+    locfile="../sorted.mlw"
+    loclnum="51" loccnumb="12" loccnume="31"
+    expl="VC for increasing_midpoint"
+    sum="eb2f665f56648e1475e9acd748fd3eee"
+    proved="true"
+    expanded="false"
+    shape="amajorateV3V0AaminorateV3V2AaincreasingV2AaincreasingV0qaincreasingainfix ++V0aConsV1V2LakeyV1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for increasing_midpoint"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.26"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter increasing_snoc"
+    locfile="../sorted.mlw"
+    loclnum="57" loccnumb="12" loccnume="27"
+    expl="VC for increasing_snoc"
+    sum="3503194ca7ef4bf086be10572757e409"
+    proved="true"
+    expanded="false"
+    shape="amajorateakeyV1V0AaincreasingV0qaincreasingainfix ++V0aConsV1aNilF">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for increasing_snoc"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>
