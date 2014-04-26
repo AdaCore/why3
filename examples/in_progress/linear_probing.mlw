@@ -1,0 +1,149 @@
+
+(** Hash tables using linear probing *)
+
+module LinearProbing
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import option.Option
+  use import list.Mem
+  use import map.Map
+  use import array.Array
+
+  type key
+
+  constant dummy: key
+
+  function hash key : int
+
+  axiom hash_nonneg: forall k: key. 0 <= hash k
+
+  function bucket (k: key) (n: int) : int = mod (hash k) n
+
+  lemma bucket_bounds:
+    forall n: int. 0 < n ->
+    forall k: key. 0 <= bucket k n < n
+
+  (* j lies between l and r, cyclically *)
+  predicate between (l j r: int) =
+    l <= j <= r || r <= l <= j || j <= r <= l
+
+  clone import array.NumOfEq with type elt = key
+
+  type t = { mutable size: int;   (* total number of elements *)
+             mutable data: array key;    (* buckets *)
+       ghost mutable view: map key bool; (* pure model *)
+    }
+    (* at least one empty slot *)
+    invariant { 0 <= self.size < length self.data }
+    invariant { let n = Array.length self.data in
+                self.size + numof self.data dummy 0 n = n }
+    (* dummy not in the model *)
+    invariant { not (Map.get self.view dummy) }
+    (* any value in the array is in the model *)
+    invariant { forall i: int. 0 <= i < Array.length self.data ->
+                self.data[i] <> dummy -> Map.get self.view self.data[i] }
+    (* any value in the model is in the array *)
+    invariant { let n = Array.length self.data in
+                forall x: key. Map.get self.view x ->
+                exists i: int. 0 <= i < n && self.data[i] = x &&
+                  forall j: int. 0 <= j < n ->
+                  between (bucket x n) j i -> self.data[j] <> dummy }
+
+  let rec lemma dummy_const (a: array key) (n: int)
+    requires { 0 <= n } requires { forall i: int. 0 <= i < n -> a[i] = dummy }
+    variant { n } ensures { numof a dummy 0 n = n }
+  = if n > 0 then dummy_const a (n-1)
+
+  let create (n: int) : t
+    requires { 0 < n }
+    ensures  { forall x: key. not (Map.get result.view x) }
+  =
+    { size = 0; data = Array.make n dummy; view = Map.const false; }
+
+  let clear (h: t) : unit
+    writes  { h.size, h.data.elts, h.view }
+    ensures { h.size = 0 }
+    ensures { forall x: key. not (Map.get h.view x) }
+  =
+    h.size <- 0;
+    Array.fill h.data 0 (Array.length h.data) dummy;
+    h.view <- Map.const false
+
+  function next (n i: int) : int =
+    let i = i+1 in if i = n then 0 else i
+
+  let find (h: t) (x: key) : int
+    requires { x <> dummy }
+    ensures { h.data[result] = dummy && not (Map.get h.view x)
+           || h.data[result] = x     &&      Map.get h.view x  }
+  =
+    let n = Array.length h.data in
+    let rec find (i: int) : int
+      requires { 0 <= i < n }
+      requires { forall j: int. 0 <= j < n ->
+                 between (bucket x n) j i -> j < i ->
+                 h.data[j] <> dummy }
+      ensures  { 0 <= result < n }
+      ensures  { h.data[result] = dummy && not (Map.get h.view x)
+              || h.data[result] = x }
+    =
+      if h.data[i] = dummy || h.data[i] = x then i else find (next n i)
+    in
+    find (bucket x n)
+
+end
+
+(*
+
+  let resize h =
+    let old = h.data in
+    h.data <- Array.make (2 * Array.length h.data) h.dummy;
+    Array.iter (fun x -> h.data.(find h x) <- x) old
+
+  let add h x =
+    if 2 * h.size >= Array.length h.data then resize h;
+    let i = find h x in
+    if h.data.(i) == h.dummy then h.size <- h.size + 1;
+    h.data.(i) <- x
+
+  let mem h x =
+    h.data.(find h x) != h.dummy
+
+  let remove h x =
+    let n = Array.length h.data in
+    let rec delete j i =
+      let i = let i = i+1 in if i = n then 0 else i in
+      let xi = h.data.(i) in
+      if xi != h.dummy then begin
+        let r = X.hash xi mod n in
+        if j < r && r <= i || i < j && j < r || r <= i && i < j then
+          delete j i
+        else begin
+          h.data.(j) <- h.data.(i); h.data.(i) <- h.dummy; delete i i
+        end
+      end
+    in
+    let j = find h x in
+    if h.data.(j) != h.dummy then begin
+      h.data.(j) <- h.dummy;
+      delete j j;
+      h.size <- h.size - 1;
+    end
+
+  let iter f h =
+    Array.iter (fun x -> if x != h.dummy then f x) h.data
+
+  let fold f h init =
+    Array.fold_right (fun x acc -> if x != h.dummy then f x acc) h.data init
+
+  let copy h =
+    { size = h.size; dummy = h.dummy; data = Array.copy h.data }
+
+  let print fmt h =
+    Format.fprintf fmt "size = %d, length = %d@." h.size (Array.length h.data);
+    Array.iter (fun x ->
+      Format.fprintf fmt "%c" (if x == h.dummy then '.' else '#')) h.data
+
+*)
+

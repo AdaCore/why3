@@ -4,29 +4,17 @@
  <prover
   id="0"
   name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
   version="0.95.2"/>
  <prover
-  id="2"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="3"
+  id="1"
   name="CVC3"
   version="2.4.1"/>
  <prover
-  id="4"
+  id="2"
   name="Coq"
   version="8.4pl2"/>
  <prover
-  id="5"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="6"
+  id="3"
   name="Z3"
   version="3.2"/>
  <file
@@ -38,7 +26,7 @@
    locfile="../euler001.mlw"
    loclnum="8" loccnumb="7" loccnume="18"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="mod_div_unique"
     locfile="../euler001.mlw"
@@ -48,7 +36,7 @@
     expanded="false"
     shape="ainfix =V3amodV0V1Aainfix =V2adivV0V1Iainfix &lt;V3V1Aainfix &lt;=c0V3Aainfix =V0ainfix +ainfix *V2V1V3Aainfix &gt;V1c0Aainfix &gt;=V0c0F">
     <proof
-     prover="4"
+     prover="2"
      timelimit="5"
      memlimit="0"
      edited="euler001_DivModHints_mod_div_unique_1.v"
@@ -66,7 +54,7 @@
     expanded="false"
     shape="ainfix =amodainfix +V0c1V1ainfix +amodV0V1c1INainfix =amodainfix +V0c1V1c0Iainfix &gt;V1c0Aainfix &gt;=V0c0F">
     <proof
-     prover="4"
+     prover="2"
      timelimit="5"
      memlimit="0"
      edited="euler001_DivModHints_mod_succ_1_1.v"
@@ -84,7 +72,7 @@
     expanded="false"
     shape="ainfix =amodV0V1ainfix -V1c1Iainfix =amodainfix +V0c1V1c0Iainfix &gt;V1c0Aainfix &gt;=V0c0F">
     <proof
-     prover="4"
+     prover="2"
      timelimit="5"
      memlimit="0"
      edited="euler001_DivModHints_mod_succ_2_1.v"
@@ -102,15 +90,7 @@
     expanded="false"
     shape="ainfix =adivainfix +V0c1V1ainfix +adivV0V1c1Iainfix =amodainfix +V0c1V1c0Iainfix &gt;V1c0Aainfix &gt;=V0c0F">
     <proof
-     prover="2"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -135,15 +115,7 @@
      <result status="valid" time="2.20"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -151,15 +123,7 @@
      <result status="valid" time="0.10"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.14"/>
-    </proof>
-    <proof
-     prover="6"
+     prover="3"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -184,7 +148,7 @@
      <result status="valid" time="0.05"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -193,22 +157,6 @@
     </proof>
     <proof
      prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -233,7 +181,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -242,22 +190,6 @@
     </proof>
     <proof
      prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -282,15 +214,7 @@
      <result status="valid" time="0.03"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="35"
      memlimit="1000"
      obsolete="false"
@@ -298,15 +222,7 @@
      <result status="valid" time="0.02"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="6"
+     prover="3"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -331,15 +247,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -347,15 +255,7 @@
      <result status="valid" time="0.06"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -380,15 +280,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -396,15 +288,7 @@
      <result status="valid" time="0.08"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -421,7 +305,7 @@
     expanded="false"
     shape="ainfix =adivainfix +V0V1c2ainfix +adivV0c2adivV1c2Iainfix =amodV1c2c0Aainfix =amodV0c2c0F">
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -430,22 +314,6 @@
     </proof>
     <proof
      prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -462,7 +330,7 @@
     expanded="false"
     shape="ainfix =adivainfix -V0V1c2ainfix -adivV0c2adivV1c2Iainfix =amodV1c2c0Aainfix =amodV0c2c0F">
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -471,22 +339,6 @@
     </proof>
     <proof
      prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="6"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -500,7 +352,7 @@
    locfile="../euler001.mlw"
    loclnum="58" loccnumb="7" loccnume="24"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="tr_mod_2"
     locfile="../euler001.mlw"
@@ -510,7 +362,7 @@
     expanded="false"
     shape="ainfix =amodainfix *V0ainfix +V0c1c2c0Iainfix &gt;=V0c0F">
     <proof
-     prover="4"
+     prover="2"
      timelimit="5"
      memlimit="1000"
      edited="euler001_TriangularNumbers_tr_mod_2_1.v"
@@ -536,7 +388,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="6"
+     prover="3"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -561,7 +413,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -576,22 +428,6 @@
      archived="false">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
    </goal>
   </theory>
   <theory
@@ -599,7 +435,7 @@
    locfile="../euler001.mlw"
    loclnum="79" loccnumb="7" loccnume="18"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="mod_15"
     locfile="../euler001.mlw"
@@ -617,15 +453,7 @@
      <result status="valid" time="0.81"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.11"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -650,7 +478,7 @@
      <result status="valid" time="0.36"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -659,22 +487,6 @@
     </proof>
     <proof
      prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -699,15 +511,7 @@
      <result status="valid" time="4.68"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.12"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="10"
      memlimit="1000"
      obsolete="false"
@@ -724,12 +528,12 @@
     expanded="false"
     shape="apV0INainfix =amodV0c5c0Aainfix =amodV0c3c0Iapainfix -V0c1Iainfix &gt;V0c0F">
     <proof
-     prover="2"
+     prover="1"
      timelimit="10"
      memlimit="1000"
      obsolete="false"
      archived="false">
-     <result status="valid" time="0.44"/>
+     <result status="valid" time="2.94"/>
     </proof>
    </goal>
    <goal
@@ -741,15 +545,7 @@
     expanded="false"
     shape="apV0Iainfix =amodV0c5c0ANainfix =amodV0c3c0Iapainfix -V0c1Iainfix &gt;V0c0F">
     <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.22"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -766,15 +562,7 @@
     expanded="false"
     shape="apV0Iainfix =amodV0c5c0Aainfix =amodV0c3c0Iapainfix -V0c1Iainfix &gt;V0c0F">
     <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.19"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -791,15 +579,7 @@
     expanded="false"
     shape="apV0Iainfix &lt;=c0V0F">
     <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="5"
      memlimit="1000"
      obsolete="false"
@@ -824,15 +604,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -840,15 +612,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="6"
+     prover="3"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -873,15 +637,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="3"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -889,15 +645,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="5"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
+     prover="3"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -922,7 +670,7 @@
      <result status="valid" time="0.01"/>
     </proof>
     <proof
-     prover="2"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -931,22 +679,6 @@
     </proof>
     <proof
      prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="6"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -963,7 +695,7 @@
     expanded="false"
     shape="ainfix =asum_multiple_3_5_ltainfix +V0c1aclosed_formulaV0Iainfix &lt;=c0V0F">
     <proof
-     prover="4"
+     prover="2"
      timelimit="30"
      memlimit="1000"
      edited="euler001_SumMultiple_Closed_Formula_1.v"
@@ -978,7 +710,7 @@
    locfile="../euler001.mlw"
    loclnum="157" loccnumb="7" loccnume="15"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter solve"
     locfile="../euler001.mlw"
@@ -991,7 +723,7 @@
     <label
      name="expl:VC for solve"/>
     <proof
-     prover="2"
+     prover="1"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -1000,22 +732,6 @@
     </proof>
     <proof
      prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="6"
      timelimit="30"
      memlimit="1000"
      obsolete="false"
@@ -1055,7 +771,7 @@
     <label
      name="expl:VC for bench"/>
     <proof
-     prover="1"
+     prover="0"
      timelimit="5"
      memlimit="4000"
      obsolete="false"
@@ -1066,6 +782,7 @@
    <goal
     name="WP_parameter go"
     locfile="../euler001.mlw"
+<<<<<<< HEAD
     loclnum="193" loccnumb="6" loccnume="8"
     expl="VC for go"
     sum="0ac8af78cda25414bc3f614bbe49b1cf"
@@ -1179,6 +896,24 @@
       </proof>
      </goal>
     </transf>
+=======
+    loclnum="192" loccnumb="6" loccnume="8"
+    expl="VC for go"
+    sum="2eb916ae0bbffb9f85abd4e316b2b2c2"
+    proved="true"
+    expanded="false"
+    shape="ainfix &lt;=c32c255Aainfix &lt;=c0c32Aainfix &lt;=c58c255Aainfix &lt;=c0c58Aainfix &lt;=c79c255Aainfix &lt;=c0c79Aainfix &lt;=c71c255Aainfix &lt;=c0c71">
+    <label
+     name="expl:VC for go"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+>>>>>>> master
    </goal>
   </theory>
  </file>

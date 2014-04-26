@@ -1,0 +1,13 @@
+
+theory T
+
+use import option.Option 
+
+type t 'a = A | Lam (t (option 'a))
+
+inductive r (t 'a) (t 'a) =
+ | cas : forall x y:t (option 'a). r x y -> r (Lam x) (Lam y)
+
+goal G : true
+
+end
