@@ -4,11 +4,26 @@
 
 open BigInt__N
 
+let times10 a =
+  let a2 = add a a in
+  let a4 = add a2 a2 in
+  let a5 = add a4 a in
+  add a5 a5
+  
+let from_dec s =
+  let a = ref (from_small_int 0) in
+  for i=0 to String.length s - 1 do
+    match String.get s i with
+      | '0'..'9' as c -> 
+        let d = Char.code c - Char.code '0' in
+        a := add (times10 !a) (from_small_int d)
+      | _ -> invalid_arg "from_dec"
+  done;
+  !a
+
 let compute_result text =
   try
-    let t = from_small_int (int_of_string text) in
-    let a = add t t in
-    let a = add a t in
+    let a = from_dec text in
     for i=0 to Array.length a.digits - 1 do
       Format.fprintf Format.str_formatter "a[%d] = %d@." i a.digits.(i)
     done;
