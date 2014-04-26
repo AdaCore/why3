@@ -188,8 +188,11 @@ module Euler001
 
   use import string.Char
   use import io.StdIO
+  use import ref.Ref
 
-  let go () = 
+  let go () 
+   ensures { !cur_linenum = (old !cur_linenum) + 1 }
+  = 
     print_char (chr 71); (* G *)
     print_char (chr 79); (* O *)
     print_char (chr 58); (* : *)
