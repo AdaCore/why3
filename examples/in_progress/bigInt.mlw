@@ -9,6 +9,7 @@ module N
   use import ref.Ref
 
   use import int.Int
+  use import int.Power
   constant base : int = 32768
 
   type t = { mutable digits: array int31 }
@@ -19,21 +20,29 @@ module N
 
   predicate ok (x:t) = ok_array x.digits
 
-  function value_from (x:array int31) (n:int) : int
- 
-  axiom value_from_next:
-    forall x,n. 0 <= n < to_int x.length ->
-      value_from x n = to_int x[n] + base * value_from x (n+1)
- 
-  axiom value_from_end:
-    forall x,n. n = to_int x.length ->
-      value_from x n = 0
+  (* [value_sub x n m] denotes the integer represented by
+     the digits x[n..m-1] with lsb at index n *)
+  function value_sub (x:array int31) (n:int) (m:int) : int
+  (* =
+     if 0 <= n < x.length then
+       if n < m then
+        x.[n] + base * value_sub x (n+1) m
+       else 0
+     else (* meaning less ? *)
+  *)
+  axiom value_sub_next:
+    forall x,n,m. 0 <= n < to_int x.length /\ n < m ->
+      value_sub x n m = to_int x[n] + base * value_sub x (n+1) m
 
-  function value_array (x:array int31) : int = value_from x 0 
+  axiom value_sub_end:
+    forall x,n,m. 0 <= n <= to_int x.length /\ not n < m ->
+      value_sub x n m = 0
 
-  function value (x:t) : int = value_array x.digits 
-  
-  let from_small_int (n:int31) : t 
+  function value_array (x:array int31) : int = value_sub x 0 (to_int x.length)
+
+  function value (x:t) : int = value_array x.digits
+
+  let from_small_int (n:int31) : t
     requires { 0 <= to_int n < base }
     ensures { ok result }
     ensures { value result = to_int n }
@@ -42,12 +51,12 @@ module N
   { digits = a }
 
   exception TooManyDigits
-  
-  let add_array (x y:array int31) : array int31 
+
+  let add_array (x y:array int31) : array int31
     requires { ok_array x /\ ok_array y }
     requires { to_int x.length <= to_int y.length }
     ensures { ok_array result }
-    ensures { value_array result = value_array x + value_array y } 
+    ensures { value_array result = value_array x + value_array y }
     raises { TooManyDigits -> true }
   =
     let zero = of_int 0 in
@@ -62,11 +71,14 @@ module N
     while Int31.(<) !i l do
       invariant { 0 <= to_int !i <= to_int l }
       invariant { 0 <= to_int !carry <= 1 }
-      invariant { forall j. 0 <= j < to_int !i ->
-        0 <= to_int arr[j] < base }
+      invariant {
+        forall j. 0 <= j < to_int !i -> 0 <= to_int arr[j] < base }
+      invariant {
+        value_sub arr 0 (to_int !i) + (to_int !carry) * power base (to_int !i) =
+        value_sub x 0 (to_int !i) + value_sub y 0 (to_int !i) }
       variant { to_int l - to_int !i }
       let sum = Int31.(+) (Int31.(+) x[!i] y[!i]) !carry in
-      if Int31.(>=) sum base31 
+      if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
       i := Int31.(+) !i one;
@@ -78,7 +90,7 @@ module N
         0 <= to_int arr[j] < base }
       variant { to_int h - to_int !i }
       let sum = Int31.(+) y[!i] !carry in
-      if Int31.(>=) sum base31 
+      if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
       i := Int31.(+) !i one;
@@ -89,20 +101,19 @@ module N
   let add (x y:t) : t
     requires { ok x /\ ok y }
     ensures { ok result }
-    ensures { value result = value x + value y } 
+    ensures { value result = value x + value y }
     raises { TooManyDigits -> true }
   = let l1 = x.digits.length in
     let l2 = y.digits.length in
     let res =
-      if Int31.(<=) l1 l2 then 
-        add_array x.digits y.digits 
+      if Int31.(<=) l1 l2 then
+        add_array x.digits y.digits
       else add_array y.digits x.digits
     in
     { digits = res }
 
 
 end
-  
 
 
-  
+
