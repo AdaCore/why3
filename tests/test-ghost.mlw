@@ -1,0 +1,17 @@
+
+
+module M
+
+  type t = O | S t
+
+  let f () =
+     let ghost g (x:t) : t =
+        match x with O -> O | S y -> y end
+(*
+     with ghost h (x:t) : t = 
+        match x with O -> O | S y -> y end
+*)
+     in
+     ()
+
+end
