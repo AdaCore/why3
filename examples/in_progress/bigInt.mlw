@@ -4,6 +4,7 @@
 
 module N
 
+  use import map.Map
   use import mach.int.Int31
   use import mach.array.Array31
   use import ref.Ref
@@ -22,23 +23,39 @@ module N
 
   (* [value_sub x n m] denotes the integer represented by
      the digits x[n..m-1] with lsb at index n *)
-  function value_sub (x:array int31) (n:int) (m:int) : int
+  function value_sub (x:map int int31) (n:int) (m:int) (l:int): int
   (* =
-     if 0 <= n < x.length then
+     if 0 <= n < l then
        if n < m then
-        x.[n] + base * value_sub x (n+1) m
+        x.[n] + base * value_sub x (n+1) m l
        else 0
      else (* meaning less ? *)
   *)
   axiom value_sub_next:
-    forall x,n,m. 0 <= n < to_int x.length /\ n < m ->
-      value_sub x n m = to_int x[n] + base * value_sub x (n+1) m
+    forall x,n,m,l. 0 <= n < l /\ n < m ->
+      value_sub x n m l = to_int (Map.get x n) + base * value_sub x (n+1) m l
 
   axiom value_sub_end:
-    forall x,n,m. 0 <= n <= to_int x.length /\ not n < m ->
-      value_sub x n m = 0
+    forall x,n,m,l. n >= l \/ n >= m ->
+      value_sub x n m l = 0
 
-  function value_array (x:array int31) : int = value_sub x 0 (to_int x.length)
+  use map.MapEq
+
+  lemma value_sub_frame: 
+    forall x,y,n,m,l. 
+      MapEq.map_eq_sub x y n m ->
+      value_sub x n m l = value_sub y n m l
+
+  lemma value_sub_tail:
+    forall x,m,l. 0 <= m < l ->
+      value_sub x 0 (m+1) l = value_sub x 0 m l + to_int (Map.get x m) * power base m
+
+  lemma value_sub_tail_end:
+    forall x,m,l. m >= l ->
+      value_sub x 0 (m+1) l = value_sub x 0 m l 
+
+  function value_array (x:array int31) : int = 
+    value_sub x.elts 0 (to_int x.length) (to_int x.length)
 
   function value (x:t) : int = value_array x.digits
 
@@ -74,28 +91,56 @@ module N
       invariant {
         forall j. 0 <= j < to_int !i -> 0 <= to_int arr[j] < base }
       invariant {
-        value_sub arr 0 (to_int !i) + (to_int !carry) * power base (to_int !i) =
-        value_sub x 0 (to_int !i) + value_sub y 0 (to_int !i) }
+        value_sub arr.elts 0 (to_int !i) (to_int h + 1)
+        + (to_int !carry) * power base (to_int !i) =
+        value_sub x.elts 0 (to_int !i) (to_int l) 
+        + value_sub y.elts 0 (to_int !i) (to_int h) }
       variant { to_int l - to_int !i }
+      'L:
       let sum = Int31.(+) (Int31.(+) x[!i] y[!i]) !carry in
       if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
+      assert { 
+        MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
+      assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
+         value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) }; 
       i := Int31.(+) !i one;
     done;
     while Int31.(<) !i h do
-      invariant { 0 <= to_int !i <= to_int h }
+      invariant { to_int l <= to_int !i <= to_int h }
       invariant { 0 <= to_int !carry <= 1 }
       invariant { forall j. 0 <= j < to_int !i ->
         0 <= to_int arr[j] < base }
+      invariant {
+        value_sub arr.elts 0 (to_int !i) (to_int h + 1) 
+        + (to_int !carry) * power base (to_int !i) =
+        value_sub x.elts 0 (to_int !i) (to_int l) 
+        + value_sub y.elts 0 (to_int !i) (to_int h) }
       variant { to_int h - to_int !i }
+      'L:
       let sum = Int31.(+) y[!i] !carry in
       if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
+      assert { 
+        MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
+      assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
+         value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) }; 
+      assert { value_sub x.elts 0 (to_int !i + 1) (to_int l) =
+        value_sub x.elts 0 (to_int !i) (to_int l) };
       i := Int31.(+) !i one;
     done;
+    'L:
     arr[!i] <- !carry;
+    assert { 
+      MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
+    assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
+       value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) }; 
+    assert { value_sub x.elts 0 (to_int !i + 1) (to_int l) =
+      value_sub x.elts 0 (to_int !i) (to_int l) };
+    assert { value_sub y.elts 0 (to_int !i + 1) (to_int l) =
+      value_sub y.elts 0 (to_int !i) (to_int l) };
     arr
 
   let add (x y:t) : t
