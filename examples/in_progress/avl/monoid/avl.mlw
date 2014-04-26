@@ -613,6 +613,34 @@ module AVL
       end
     end
   
+  let rec extract (ghost r:ref (position (D.m 'b))) (s:selector 'a 'b)
+    (t:t 'a 'b) : (option (D.t 'a 'b),t 'a 'b)
+    requires { selector_correct t.prm s t.m.lis /\ c t }
+    ensures { selected t.prm s !r t.m.lis }
+    ensures { let (d,t2) = result in
+      c t2 /\ t2.prm = t.prm /\ t2.m.lis = !r.left ++ !r.right /\
+      1 >= t.m.hgt - t2.m.hgt >= 0 /\
+      match d with
+      | None -> !r.middle = None
+      | Some d2 -> !r.middle = Some (t.dprm.mdl d2) /\ t.dprm.inv d2
+      end }
+    variant { t.m.hgt }
+  = match view t with
+    | AEmpty -> r := { left = Nil; middle = None; right = Nil }; (None,t)
+    | ANode tl td tr _ _ -> match selected_way t.prm t.m.lis tl.m.lis tr.m.lis
+        s (total tl) td (total tr) with
+      | Left sl -> let (ol,nl) = extract r sl tl in
+        r := right_extend !r (t.dprm.mdl td) tr.m.lis; (ol,balance nl td tr)
+      | Right sr -> let (or,nr) = extract r sr tr in
+        r := left_extend tl.m.lis (t.dprm.mdl td) !r; (or,balance tl td nr)
+      | Here -> r := { left = tl.m.lis;
+          middle = Some (t.dprm.mdl td);
+          right = tr.m.lis };
+        (Some td,fuse tl tr)
+      end
+    end
+  
+  
   (* Split the avl according to the selector. *)
   let rec split (ghost r:ref (position (D.m 'b))) (s:selector 'a 'b)
     (t:t 'a 'b) : (t 'a 'b,option (D.t 'a 'b),t 'a 'b)
