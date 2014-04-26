@@ -48,8 +48,8 @@ module N
   let rec lemma value_sub_tail (x:map int int31) (n m l :int)
     requires { 0 <= n <= m < l }
     variant  { m - n }
-    ensures  { 
-      value_sub x n (m+1) l = 
+    ensures  {
+      value_sub x n (m+1) l =
         value_sub x n m l + to_int (Map.get x m) * power base (m-n) }
   = if n < m then value_sub_tail x (n+1) m l else ()
 
@@ -58,6 +58,20 @@ module N
     variant  { m - n }
     ensures  { value_sub x n (m+1) l = value_sub x n m l }
   = if n < m then value_sub_tail_end x (n+1) m l else ()
+
+
+  let rec lemma value_sub_shorten (x:map int int31) (n m l:int)
+    requires { 0 <= n <= m <= l }
+    variant { m - n }
+    ensures { value_sub x n m l = value_sub x n m m }
+  = if n < m then value_sub_shorten x (n+1) m l else ()
+
+  let rec lemma value_sub_leading_zeros (x:map int int31) (n m' m l:int)
+    requires { 0 <= n <= m' <= m <= l }
+    requires { forall i. m' <= i < m -> to_int (Map.get x i) = 0 }
+    variant { m - m' }
+    ensures { value_sub x n m l = value_sub x n m' l }
+  = if m' < m then value_sub_leading_zeros x n (m'+1) m l else ()
 
   function value_array (x:array int31) : int =
     value_sub x.elts 0 (to_int x.length) (to_int x.length)
@@ -90,11 +104,15 @@ module N
     let arr = Array31.make (Int31.(+) h one) zero in
     let carry = ref zero in
     let i = ref zero in
+    let non_null_idx = ref zero in
     while Int31.(<) !i l do
       invariant { 0 <= to_int !i <= to_int l }
       invariant { 0 <= to_int !carry <= 1 }
       invariant {
         forall j. 0 <= j < to_int !i -> 0 <= to_int arr[j] < base }
+      invariant { 0 <= to_int !non_null_idx <= to_int !i }
+      invariant {
+        forall j. to_int !non_null_idx < j < to_int !i -> to_int arr[j] = 0 }
       invariant {
         value_sub arr.elts 0 (to_int !i) (to_int h + 1)
         + (to_int !carry) * power base (to_int !i) =
@@ -106,6 +124,7 @@ module N
       if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
+      if Int31.ne arr[!i] zero then non_null_idx := !i;
       assert {
         MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
       assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
@@ -115,8 +134,11 @@ module N
     while Int31.(<) !i h do
       invariant { to_int l <= to_int !i <= to_int h }
       invariant { 0 <= to_int !carry <= 1 }
-      invariant { forall j. 0 <= j < to_int !i ->
-        0 <= to_int arr[j] < base }
+      invariant {
+        forall j. 0 <= j < to_int !i -> 0 <= to_int arr[j] < base }
+      invariant { 0 <= to_int !non_null_idx <= to_int !i }
+      invariant {
+        forall j. to_int !non_null_idx < j < to_int !i -> to_int arr[j] = 0 }
       invariant {
         value_sub arr.elts 0 (to_int !i) (to_int h + 1)
         + (to_int !carry) * power base (to_int !i) =
@@ -128,6 +150,7 @@ module N
       if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
+      if Int31.ne arr[!i] zero then non_null_idx := !i;
       assert {
         MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
       assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
@@ -140,7 +163,20 @@ module N
       MapEq.map_eq_sub arr.elts (at arr 'L).elts 0 (to_int !i) };
     assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
        value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) };
-    arr
+    assert { value_array arr = value_array x + value_array y };
+    if Int31.ne arr[!i] zero then non_null_idx := !i;
+    let len = Int31.(+) !non_null_idx one in
+    assert { value_sub arr.elts 0 (to_int !i + 1) (to_int h + 1) =
+      value_sub arr.elts 0 (to_int len) (to_int h + 1) } ;
+    assert { value_sub arr.elts 0 (to_int !i + 1) (to_int h + 1) =
+      value_sub arr.elts 0 (to_int len) (to_int len) } ;
+    let arr' = Array31.make len zero in
+    Array31.blit arr zero arr' zero len;
+    assert {
+      MapEq.map_eq_sub arr.elts arr'.elts 0 (to_int len) };
+    assert { value_sub arr.elts 0 (to_int len) (to_int len) =
+      value_sub arr'.elts 0 (to_int len) (to_int len) } ;
+    arr'
 
   let add (x y:t) : t
     requires { ok x /\ ok y }
@@ -209,8 +245,8 @@ module Z
   let rec lemma value_sub_tail (x:map int int31) (n m l :int)
     requires { 0 <= n <= m < l }
     variant  { m - n }
-    ensures  { 
-      value_sub x n (m+1) l = 
+    ensures  {
+      value_sub x n (m+1) l =
         value_sub x n m l + to_int (Map.get x m) * power base (m-n) }
   = if n < m then value_sub_tail x (n+1) m l else ()
 
@@ -269,7 +305,7 @@ module Z
       let sum = Int31.(+) (Int31.(+) x[!i] y[!i]) !carry in
       if Int31.(>=) sum max_digit31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
-        else 
+        else
       if Int31.(<) sum min_digit31
         then begin arr[!i] <- Int31.(+) sum base31; carry := minusone end
         else begin arr[!i] <- sum; carry := zero end;
@@ -294,7 +330,7 @@ module Z
       let sum = Int31.(+) y[!i] !carry in
       if Int31.(>=) sum max_digit31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
-        else 
+        else
       if Int31.(<) sum min_digit31
         then begin arr[!i] <- Int31.(+) sum base31; carry := minusone end
         else begin arr[!i] <- sum; carry := zero end;
