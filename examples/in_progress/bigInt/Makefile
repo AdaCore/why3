@@ -20,7 +20,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN=main
-GEN=bigInt__N
+GEN=map__Map bigInt__N
 OBJ=$(GEN) 
 
 GENML = $(addsuffix .ml, $(GEN))

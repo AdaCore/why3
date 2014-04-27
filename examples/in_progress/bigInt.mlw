@@ -97,10 +97,11 @@ module N
   =
     let zero = of_int 0 in
     let one = of_int 1 in
-    let base31 = of_int base in
+    let base31 = of_int 32768 in
+    assert { to_int base31 = base };
     let l = x.length in
     let h = y.length in
-    if Int31.(>=) h (of_int Int31.max_int31) then raise TooManyDigits;
+    if Int31.(>=) h (of_int 0x3FFFFFFF) then raise TooManyDigits;
     let arr = Array31.make (Int31.(+) h one) zero in
     let carry = ref zero in
     let i = ref zero in
