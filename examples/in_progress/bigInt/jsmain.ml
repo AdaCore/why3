@@ -2,33 +2,26 @@
 
 (* computation part  *)
 
-open BigInt__N
 
-let times10 a =
-  let a2 = add a a in
-  let a4 = add a2 a2 in
-  let a5 = add a4 a in
-  add a5 a5
-  
-let from_dec s =
-  let a = ref (from_small_int 0) in
-  for i=0 to String.length s - 1 do
-    match String.get s i with
-      | '0'..'9' as c -> 
-        let d = Char.code c - Char.code '0' in
-        a := add (times10 !a) (from_small_int d)
-      | _ -> invalid_arg "from_dec"
-  done;
-  !a
+let pr_expr fmt a =
+  let rec aux fmt i =
+    if i = Array.length a - 1 then
+      Format.fprintf fmt "%d" a.(i)
+    else
+      Format.fprintf fmt "\\( %a \\* 32768 \\)@ + %d"
+        aux (i+1) a.(i)
+  in
+  Format.fprintf fmt "@[%a@]@." aux 0
 
 let compute_result text =
   try
-    let a = from_dec text in
-    for i=0 to Array.length a.digits - 1 do
-      Format.fprintf Format.str_formatter "a[%d] = %d@." i a.digits.(i)
-    done;
+    let a,i = Parse.parse_dec text 0 in
+    let i = Parse.parse_sep_star text i in
+    let b,i = Parse.parse_dec text i in
+    let c = BigInt__N.add a b in
+    pr_expr Format.str_formatter c.BigInt__N.digits;
     Format.flush_str_formatter ()
-  with _ -> "error"
+  with Parse.SyntaxError -> "syntax error"
 
 (* HTML rendering *)
 

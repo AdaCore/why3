@@ -21,7 +21,7 @@ endif
 
 MAIN=main
 GEN=map__Map bigInt__N
-OBJ=$(GEN) 
+OBJ=$(GEN) parse
 
 GENML = $(addsuffix .ml, $(GEN))
 ML = $(addsuffix .ml, $(OBJ))
