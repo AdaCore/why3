@@ -120,6 +120,10 @@ let test () =
    interpret_0 p4)
 
 
+constant v3 : int = eval_0 p3
+
+goal eval_p3 : v3 = 1
+
 end
 
 
@@ -290,7 +294,7 @@ let test () =
 end
 
 
-(** {2 Defunctionalization with an alebraic variant} *)
+(** {2 Defunctionalization with an algebraic variant} *)
 
 module Defunctionalization2
 
