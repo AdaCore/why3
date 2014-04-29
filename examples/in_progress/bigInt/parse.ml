@@ -37,4 +37,13 @@ let parse_sep_star s idx =
   raise Exit
   with Exit -> !i
 
-  
+open Format
+
+let pr fmt a =
+  let a = a.digits in
+  let l = Array.length a in
+  fprintf fmt "%d" a.(l-1);
+  for i=l-2 downto 0 do
+    fprintf fmt "%04d" a.(i);
+  done
+

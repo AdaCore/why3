@@ -19,7 +19,10 @@ let compute_result text =
     let i = Parse.parse_sep_star text i in
     let b,i = Parse.parse_dec text i in
     let c = BigInt__N.add a b in
+(*
     pr_expr Format.str_formatter c.BigInt__N.digits;
+*)
+    Parse.pr Format.str_formatter c;
     Format.flush_str_formatter ()
   with Parse.SyntaxError -> "syntax error"
 
