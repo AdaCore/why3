@@ -11,11 +11,12 @@ module N
 
   use import int.Int
   use import int.Power
-  constant base : int = 32768
+  constant base : int = 10000
 
   type t = { mutable digits: array int31 }
 
   predicate ok_array (a:array int31) =
+    (to_int a.length >= 1 -> to_int a[to_int a.length - 1] <> 0) /\
     forall i:int. 0 <= i < to_int a.length ->
       0 <= to_int a[i] < base
 
@@ -82,9 +83,14 @@ module N
     requires { 0 <= to_int n < base }
     ensures { ok result }
     ensures { value result = to_int n }
-  =
-  let a = Array31.make (of_int 1) n in
-  { digits = a }
+  = let zero = of_int 0 in
+    let a =
+      if Int31.eq n zero then
+        Array31.make zero zero
+      else
+        Array31.make (of_int 1) n
+    in
+    { digits = a }
 
   exception TooManyDigits
 
@@ -97,7 +103,8 @@ module N
   =
     let zero = of_int 0 in
     let one = of_int 1 in
-    let base31 = of_int 32768 in
+    let minus_one = of_int (-1) in
+    let base31 = of_int 10000 in
     assert { to_int base31 = base };
     let l = x.length in
     let h = y.length in
@@ -105,13 +112,15 @@ module N
     let arr = Array31.make (Int31.(+) h one) zero in
     let carry = ref zero in
     let i = ref zero in
-    let non_null_idx = ref zero in
+    let non_null_idx = ref minus_one in
     while Int31.(<) !i l do
       invariant { 0 <= to_int !i <= to_int l }
       invariant { 0 <= to_int !carry <= 1 }
       invariant {
         forall j. 0 <= j < to_int !i -> 0 <= to_int arr[j] < base }
-      invariant { 0 <= to_int !non_null_idx <= to_int !i }
+      invariant { -1 <= to_int !non_null_idx < to_int !i }
+      invariant {
+        to_int !non_null_idx >= 0 -> to_int arr[to_int !non_null_idx] <> 0 }
       invariant {
         forall j. to_int !non_null_idx < j < to_int !i -> to_int arr[j] = 0 }
       invariant {
@@ -137,7 +146,9 @@ module N
       invariant { 0 <= to_int !carry <= 1 }
       invariant {
         forall j. 0 <= j < to_int !i -> 0 <= to_int arr[j] < base }
-      invariant { 0 <= to_int !non_null_idx <= to_int !i }
+      invariant { -1 <= to_int !non_null_idx < to_int !i }
+      invariant {
+        to_int !non_null_idx >= 0 -> to_int arr[to_int !non_null_idx] <> 0 }
       invariant {
         forall j. to_int !non_null_idx < j < to_int !i -> to_int arr[j] = 0 }
       invariant {
@@ -165,7 +176,13 @@ module N
     assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
        value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) };
     assert { value_array arr = value_array x + value_array y };
-    if Int31.ne arr[!i] zero then non_null_idx := !i;
+    abstract 
+     ensures { -1 <= to_int !non_null_idx <= to_int !i }
+     ensures { to_int !non_null_idx >= 0 -> to_int arr[to_int !non_null_idx] <> 0 }
+     ensures {
+        forall j. to_int !non_null_idx < j <= to_int !i -> to_int arr[j] = 0 }
+     (if Int31.ne arr[!i] zero then non_null_idx := !i)
+    end;
     let len = Int31.(+) !non_null_idx one in
     assert { value_sub arr.elts 0 (to_int !i + 1) (to_int h + 1) =
       value_sub arr.elts 0 (to_int len) (to_int h + 1) } ;
@@ -177,6 +194,10 @@ module N
       MapEq.map_eq_sub arr.elts arr'.elts 0 (to_int len) };
     assert { value_sub arr.elts 0 (to_int len) (to_int len) =
       value_sub arr'.elts 0 (to_int len) (to_int len) } ;
+    assert { to_int arr'.length >= 1 -> 
+               to_int arr'[to_int arr'.length - 1] <> 0 };
+    assert { forall j. 0 <= j < to_int arr'.length -> 
+               0 <= to_int arr'[j] < base };
     arr'
 
   let add (x y:t) : t
@@ -193,6 +214,62 @@ module N
     in
     { digits = res }
 
+(*
+  let rec mul_array (x y:array int31) : array int31
+    requires { ok_array x /\ ok_array y }
+    ensures { ok_array result }
+    ensures { value_array result = value_array x * value_array y }
+    raises { TooManyDigits -> true }
+  = let zero = of_int 0 in
+    let one = of_int 1 in
+    let two = of_int 2 in
+    let base31 = of_int 10000 in
+    assert { to_int base31 = base };
+    let l1 = x.digits.length in
+    let l2 = y.digits.length in
+    if Int31.(<=) l1 (of_int 1) && Int31.(<=) l1 (of_int 1) then
+       (* two small nums *)
+       let n = x.digits.[0] * y.digits.[0] in
+       let h = Int31.(/) n base31 in
+       let l = Int31.(-) n (Int31.(*) h base31) in
+       if Int31.eq h zero then
+          let arr = Array31.make one l in
+          { digits = arr }
+       else
+          let arr = Array31.make two l in
+          arr.(1) <- h;
+          { digits = arr }
+    else
+      let m = if Int31.(<=) l1 l2 then l2 else l1 in
+      let m2 = Int31.(/) m two in
+      let m' = Int31.(-) m m2 in
+      let low1 = Array31.make m2 zero in
+      Array31.blit x zero low1 zero m2; (* wrong if l1 < m2 ! *)
+      let low2 = Array31.make m2 zero in
+      Array31.blit y zero low2 zero m2; (* wrong if l2 < m2 ! *)
+      let high1 = Array31.make m' zero in
+      Array31.blit x m2 high1 zero m'; (* wrong if l1 < m ! *)
+      let high2 = Array31.make m' zero in
+      Array31.blit y m2 high2 zero m'; (* wrong if l2 < m ! *)
+      assert { value_array x = value_array low1 +
+                 power base m2 * value_array high1 };
+      assert { value_array y = value_array low2 +
+                 power base m2 * value_array high2 };
+      let z0 = mul_array low1 low2 in
+      let z1 = mul_array (add_array low1 high1) (add_array low2 high2)
+      let z2 = mul_array high1 high2 in
+      (*
+      return (z2*10^(2*m2))+((z1-z2-z0)*10^(m2))+(z0)
+      *)
+
+  let mul (x y:t) : t
+    requires { ok x /\ ok y }
+    ensures { ok result }
+    ensures { value result = value x * value y }
+    raises { TooManyDigits -> true }
+  = let res = mul_array x.digits y.digits in
+    { digits = res }
+*)
 
 end
 
