@@ -86,20 +86,18 @@ module Heap
   end
   
   (* Selector: nothing. *)
-  type selector 'a 'b = unit
+  type selector = unit
   
   (* Correction of a selector with respect to an avl:
      the avl list is non-empty. *)
   
-  predicate selector_correct 'd 'e (l:list 'g) =
-    l <> Nil
+  predicate selector_correct 'e (l:list 'g) = l <> Nil
   
-  predicate selected 'd 'e (e:position (D.m 'b)) (l:list (D.m 'b)) =
+  predicate selected 'e (e:position (D.m 'b)) (l:list (D.m 'b)) =
       match e.middle with
       | None -> false
       | Some d -> S.minorate d.key e.left /\ S.minorate d.key e.right
-      end /\
-      rebuild e = l
+      end /\ rebuild e = l
   
   let rec lemma monoid_sum_is_min (l:list (D.m 'b)) : unit
     ensures { let x = M.sum D.measure l in
@@ -110,9 +108,9 @@ module Heap
     variant { l }
   = match l with Cons _ q -> monoid_sum_is_min q | _ -> () end
   
-  let lemma selected_is_min (p:'c) (s:'d) (e:position (D.m 'b))
+  let lemma selected_is_min (s:'d) (e:position (D.m 'b))
     (l:list (D.m 'b)) : unit
-    requires { selected p s e l }
+    requires { selected s e l }
     ensures { match e.middle with
       | None -> false
       | Some d -> S.minorate d.key l && match M.sum D.measure l with
@@ -134,13 +132,13 @@ module Heap
     (* A selected position can be found by following the given way. *)
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.D.mp.mdl d);
-        right = rlis } in selected p s e2 base
-      | Left sl -> selector_correct p sl llis /\
-        forall e. selected p sl e llis ->
-          selected p s (right_extend e (p.D.mp.mdl d) rlis) base
-      | Right sr -> selector_correct p sr rlis /\
-        forall e. selected p sr e rlis ->
-          selected p s (left_extend llis (p.D.mp.mdl d) e) base }
+        right = rlis } in selected s e2 base
+      | Left sl -> selector_correct sl llis /\
+        forall e. selected sl e llis ->
+          selected s (right_extend e (p.D.mp.mdl d) rlis) base
+      | Right sr -> selector_correct sr rlis /\
+        forall e. selected sr e rlis ->
+          selected s (left_extend llis (p.D.mp.mdl d) e) base }
   = let kd = get_key p d in
     match sl , sr with
     | None , None -> Here
@@ -150,7 +148,7 @@ module Heap
       then if CO.compare kd b <= 0
         then Here
         else begin
-          assert { forall e. selected p () e rlis ->
+          assert { forall e. selected () e rlis ->
             match e.middle with
             | None -> false
             | Some d -> CO.eq d.key b.K.m && S.minorate d.key llis
@@ -159,7 +157,7 @@ module Heap
         end
       else if CO.compare a b <= 0
       then begin
-        assert { forall e. selected p () e llis ->
+        assert { forall e. selected () e llis ->
           match e.middle with
           | None -> false
           | Some d -> CO.eq d.key a.K.m && S.minorate d.key rlis
@@ -167,7 +165,7 @@ module Heap
         Left ()
       end
       else begin
-        assert { forall e. selected p () e rlis ->
+        assert { forall e. selected () e rlis ->
           match e.middle with
           | None -> false
           | Some d -> CO.eq d.key b.K.m && S.minorate d.key llis

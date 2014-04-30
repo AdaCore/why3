@@ -54,39 +54,38 @@ module RAL
   = match l with Cons _ q -> sum_measure_is_length q | _ -> () end
   
   (* Select an element or the hole before him (e.g holes starts at 0) *)
-  type sel = { index : int; hole : bool }
-  type selector 'a 'b = sel
+  type selector = { index : int; hole : bool }
   
   (* Correctness predicate for selector with respect to a list:
      between bounds. *)
-  predicate selector_correct (p:type_params 'a 'b) (s:sel) (l:list 'b) =
+  predicate selector_correct (s:selector) (l:list 'b) =
     0 <= s.index && (if s.hole then s.index <= length l else s.index < length l)
   
   (* Selection predicate: We are exactly at the index-th position of the
      rebuild list, and there is an element in the middle iff we are
      not trying to select a hole. *)
-  predicate selected 'e (s:sel) (e:position 'b) (l:list 'b) =
-    s.index = length e.left /\ (s.hole <-> e.middle = None) /\ rebuild e = l
+  predicate selected (s:selector) (e:position 'b) (l:list 'b) =
+    s.index = length e.left /\ (s.hole <-> e.middle = None)
   
   let selected_way (ghost p:type_params 'a 'b)
     (ghost base:list 'b)
     (ghost llis:list 'b)
     (ghost rlis:list 'b)
-    (s:sel) (sl:int) (d:'a) (sr:int) : way_base sel
+    (s:selector) (sl:int) (d:'a) (sr:int) : way_base selector
     requires { p.inv d }
     requires { base = llis ++ Cons (p.mdl d) rlis }
-    requires { selector_correct p s base }
+    requires { selector_correct s base }
     requires { sl = length llis /\ sr = length rlis }
     (* A selected position can be found by following the given way. *)
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.mdl d);
-        right = rlis } in selected p s e2 base
-      | Left sl -> selector_correct p sl llis /\
-        forall e. selected p sl e llis ->
-          selected p s (right_extend e (p.mdl d) rlis) base
-      | Right sr -> selector_correct p sr rlis /\
-        forall e. selected p sr e rlis ->
-          selected p s (left_extend llis (p.mdl d) e) base }
+        right = rlis } in selected s e2 base
+      | Left sl -> selector_correct sl llis /\
+        forall e. selected sl e llis ->
+          selected s (right_extend e (p.mdl d) rlis) base
+      | Right sr -> selector_correct sr rlis /\
+        forall e. selected sr e rlis ->
+          selected s (left_extend llis (p.mdl d) e) base }
   = (* Use the size information to decide
        where the index-th position is. *)
     let ind = s.index in

@@ -62,34 +62,32 @@ module MapBase
   end
   
   (* Selector: key. *)
-  type selector 'a 'b = K.t
+  type selector = K.t
   
   (* Correction of a selector with respect to a list:
      The list is sorted. *)
   
-  predicate selector_correct (p:type_params 'a 'b) (s:K.t) (l:list (D.m 'b)) =
+  predicate selector_correct (s:K.t) (l:list (D.m 'b)) =
     A.S.increasing l /\ K.c s
   
-  predicate selected (p:type_params 'a 'b) (s:K.t)
-    (e:position (D.m 'b)) (l:list (D.m 'b)) =
+  predicate selected (s:K.t) (e:position (D.m 'b)) (l:list (D.m 'b)) =
       (A.S.majorate s.K.m e.left /\ A.S.minorate s.K.m e.right /\
       A.S.increasing e.left /\ A.S.increasing e.right /\
       match e.middle with
       | None -> true
       | Some d2 -> CO.eq s.K.m d2.key
-      end) /\
-      rebuild e = l /\ selector_correct p s l
+      end) /\ rebuild e = l /\ selector_correct s l
   
   predicate selected_sem (s:K.t) (e:position (D.m 'b)) (l:list (D.m 'b)) =
-      forall k:K.m. (CO.lt k s.K.m -> A.model l k = A.model e.left k) /\
-        (CO.lt s.K.m k -> A.model l k = A.model e.right k) /\
-        (CO.eq k s.K.m -> A.model l k = e.middle) /\
-        (CO.le s.K.m k -> A.model e.left k = None) /\
-        (CO.le k s.K.m -> A.model e.right k = None)
+    forall k:K.m. (CO.lt k s.K.m -> A.model l k = A.model e.left k) /\
+      (CO.lt s.K.m k -> A.model l k = A.model e.right k) /\
+      (CO.eq k s.K.m -> A.model l k = e.middle) /\
+      (CO.le s.K.m k -> A.model e.left k = None) /\
+      (CO.le k s.K.m -> A.model e.right k = None)
   
-  let lemma selected_sem (p:type_params 'a 'b) (s:K.t)
+  let lemma selected_sem (s:K.t)
     (e:position (D.m 'b)) (l:list (D.m 'b)) : unit
-    requires { selected p s e l }
+    requires { selected s e l }
     ensures { selected_sem s e l }
   = match e.middle with
     | None -> A.model_cut s.K.m e.left e.right
@@ -103,17 +101,17 @@ module MapBase
     (s:K.t) (l:'e) (d:D.t 'a 'b) (r:'f) : way_base K.t
     requires { p.D.mp.inv d }
     requires { base = llis ++ Cons (p.D.mp.mdl d) rlis }
-    requires { selector_correct p s base }
+    requires { selector_correct s base }
     (* A selected position can be found by following the given way. *)
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.D.mp.mdl d);
-        right = rlis } in selected p s e2 base
-      | Left sl -> selector_correct p sl llis /\
-        forall e. selected p sl e llis ->
-          selected p s (right_extend e (p.D.mp.mdl d) rlis) base
-      | Right sr -> selector_correct p sr rlis /\
-        forall e. selected p sr e rlis ->
-          selected p s (left_extend llis (p.D.mp.mdl d) e) base }
+        right = rlis } in selected s e2 base
+      | Left sl -> selector_correct sl llis /\
+        forall e. selected sl e llis ->
+          selected s (right_extend e (p.D.mp.mdl d) rlis) base
+      | Right sr -> selector_correct sr rlis /\
+        forall e. selected sr e rlis ->
+          selected s (left_extend llis (p.D.mp.mdl d) e) base }
   = let kd = get_key p d in
     let cmp = CO.compare s kd in
     if cmp < 0

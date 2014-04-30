@@ -447,8 +447,7 @@ module AVL
     end
   
   (* Node constructor, any (correct) input. *)
-  let rec join (l:t 'a 'b) (d:D.t 'a 'b) (r:t 'a 'b) :
-    t 'a 'b
+  let rec join (l:t 'a 'b) (d:D.t 'a 'b) (r:t 'a 'b) : t 'a 'b
     requires { c l /\ l.dprm.inv d /\ c r /\ l.prm = r.prm }
     ensures { result.m.lis = node_model l.m.lis (l.dprm.mdl d) r.m.lis }
     ensures { c result /\ result.prm = l.prm }
@@ -502,51 +501,49 @@ module AVL
   use export SelectionTypes
   
   (* Parameter: selector type. *)
-  type selector 'a 'b
+  type selector
   
   (* Parameter: correctness predicate for a selector with respect to the list
      e.g the selector can select something in the list +
      representation invariants. *)
-  predicate selector_correct (type_params 'a 'b) (selector 'a 'b)
-    (list (D.m 'b))
+  predicate selector_correct selector (list (D.m 'b))
   
   (* Parameter: a position is selected by a selector in the
      list corresponding to the avl. *)
-  predicate selected (type_params 'a 'b) (selector 'a 'b)
-    (position (D.m 'b)) (list (D.m 'b))
+  predicate selected selector (position (D.m 'b)) (list (D.m 'b))
   
-  axiom selected_rebuild : forall p,s:selector 'a 'b,e,l.
-    selected p s e l -> rebuild e = l
+  (*axiom selected_rebuild : forall p,s:selector 'a 'b,e,l.
+    selected p s e l -> rebuild e = l*)
   
   (* way to the position. *)
-  type way 'a 'b = way_base (selector 'a 'b)
+  type way = way_base selector
   
   (* Parameter: a correct selector for the empty list
      always select its only possible position. *)
-  axiom selector_correct_empty : forall p,s:selector 'a 'b.
-    selector_correct p s Nil ->
-      selected p s { left = Nil ; middle = None ; right = Nil } Nil
+  axiom selector_correct_empty : forall s. let nil = (Nil:list (D.m 'b)) in
+    selector_correct s nil ->
+      selected s { left = Nil ; middle = None ; right = Nil } nil
   
   (* Parameter: branch on a node. *)
   val selected_way (ghost p:type_params 'a 'b)
     (ghost base:list (D.m 'b))
     (ghost llis:list (D.m 'b))
     (ghost rlis:list (D.m 'b))
-    (s:selector 'a 'b) (l:M.t) (d:D.t 'a 'b) (r:M.t) : way 'a 'b
+    (s:selector) (l:M.t) (d:D.t 'a 'b) (r:M.t) : way
     requires { M.c l /\ p.D.mp.inv d /\ M.c r }
     requires { base = node_model llis (p.D.mp.mdl d) rlis }
-    requires { selector_correct p s base }
+    requires { selector_correct s base }
     requires { l.M.m = M.sum D.measure llis /\ r.M.m = M.sum D.measure rlis }
     (* A selected position can be found by following the given way. *)
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.D.mp.mdl d);
-        right = rlis } in selected p s e2 base
-      | Left sl -> selector_correct p sl llis /\
-        forall e. selected p sl e llis ->
-          selected p s (right_extend e (p.D.mp.mdl d) rlis) base
-      | Right sr -> selector_correct p sr rlis /\
-        forall e. selected p sr e rlis ->
-          selected p s (left_extend llis (p.D.mp.mdl d) e) base }
+        right = rlis } in selected s e2 base
+      | Left sl -> selector_correct sl llis /\
+        forall e. selected sl e llis /\ rebuild e = llis ->
+          selected s (right_extend e (p.D.mp.mdl d) rlis) base
+      | Right sr -> selector_correct sr rlis /\
+        forall e. selected sr e rlis /\ rebuild e = rlis ->
+          selected s (left_extend llis (p.D.mp.mdl d) e) base }
   
   use import ref.Ref
   
@@ -559,11 +556,11 @@ module AVL
      and rebuild it with d in the middle (potentially erasing whatever
      was there before): build l ++ [d] ++ r.
      The reference is assigned to the selected position. *)
-  let rec add (ghost r:ref (position (D.m 'b))) (s:selector 'a 'b)
+  let rec add (ghost r:ref (position (D.m 'b))) (s:selector)
     (d:D.t 'a 'b) (t:t 'a 'b) : t 'a 'b
-    requires { selector_correct t.prm s t.m.lis /\ c t /\ t.dprm.inv d }
+    requires { selector_correct s t.m.lis /\ c t /\ t.dprm.inv d }
     ensures { result.m.lis = node_model !r.left (t.dprm.mdl d) !r.right }
-    ensures { selected t.prm s !r t.m.lis }
+    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
     ensures { c result /\ result.prm = t.prm }
     writes { r }
     (* not intended for export. *)
@@ -588,11 +585,11 @@ module AVL
   (* Split the avl using the given selector into l ++ (maybe) ++ r,
      and rebuild it without whatever was in the middle:
      build l ++ r. *)
-  let rec remove (ghost r:ref (position (D.m 'b))) (s:selector 'a 'b)
+  let rec remove (ghost r:ref (position (D.m 'b))) (s:selector)
     (t:t 'a 'b) : t 'a 'b
-    requires { selector_correct t.prm s t.m.lis /\ c t }
+    requires { selector_correct s t.m.lis /\ c t }
     ensures { result.m.lis = !r.left ++ !r.right }
-    ensures { selected t.prm s !r t.m.lis }
+    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
     ensures { c result /\ result.prm = t.prm }
     writes { r }
     (* not intended for export. *)
@@ -613,10 +610,10 @@ module AVL
       end
     end
   
-  let rec extract (ghost r:ref (position (D.m 'b))) (s:selector 'a 'b)
+  let rec extract (ghost r:ref (position (D.m 'b))) (s:selector)
     (t:t 'a 'b) : (option (D.t 'a 'b),t 'a 'b)
-    requires { selector_correct t.prm s t.m.lis /\ c t }
-    ensures { selected t.prm s !r t.m.lis }
+    requires { selector_correct s t.m.lis /\ c t }
+    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
     ensures { let (d,t2) = result in
       c t2 /\ t2.prm = t.prm /\ t2.m.lis = !r.left ++ !r.right /\
       1 >= t.m.hgt - t2.m.hgt >= 0 /\
@@ -642,10 +639,10 @@ module AVL
   
   
   (* Split the avl according to the selector. *)
-  let rec split (ghost r:ref (position (D.m 'b))) (s:selector 'a 'b)
+  let rec split (ghost r:ref (position (D.m 'b))) (s:selector)
     (t:t 'a 'b) : (t 'a 'b,option (D.t 'a 'b),t 'a 'b)
-    requires { selector_correct t.prm s t.m.lis /\ c t }
-    ensures { selected t.prm s !r t.m.lis }
+    requires { selector_correct s t.m.lis /\ c t }
+    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
     returns { (lf,o,rg) -> lf.m.lis = !r.left /\ rg.m.lis = !r.right /\
       (match o with
        | None -> !r.middle = None
@@ -673,10 +670,10 @@ module AVL
   
   (* Return the middle value obtained by splitting the avl with respect
      to the selector. *)
-  let rec get (ghost r:ref (position (D.m 'b))) (s:selector 'a 'b)
+  let rec get (ghost r:ref (position (D.m 'b))) (s:selector)
     (t:t 'a 'b) : option (D.t 'a 'b)
-    requires { selector_correct t.prm s t.m.lis /\ c t }
-    ensures { selected t.prm s !r t.m.lis }
+    requires { selector_correct s t.m.lis /\ c t }
+    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
     returns { None -> !r.middle = None
        | Some d -> !r.middle = Some (t.dprm.mdl d) /\ t.dprm.inv d }
     writes { r }
