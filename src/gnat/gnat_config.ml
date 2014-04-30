@@ -39,6 +39,7 @@ let opt_ide_progress_bar = ref false
 let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
 let opt_warning_mode = ref Treat_As_Error
+let opt_proof_dir : string option ref = ref None
 
 let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_subp : string option ref = ref None
@@ -126,6 +127,8 @@ let parse_line_spec caller s =
         ": incorrect line specification - invalid parameter number, must be \
          2 or 4")
 
+let set_proof_dir s = opt_proof_dir := Some  s
+
 let set_limit_line s = opt_limit_line := Some (parse_line_spec "limit-line" s)
 let set_limit_subp s = opt_limit_subp := Some s
 
@@ -176,6 +179,8 @@ let options = Arg.align [
           " Issue information on number of VCs proved";
    "--debug", Arg.Set opt_debug,
           " Enable debug mode";
+   "--proof-dir", Arg.String set_proof_dir,
+          " Specify directory to save session and manual proofs files";
 ]
 
 let filename =
@@ -307,6 +312,8 @@ let unit_name =
   else Filename.chop_extension filename
 
 let socket_name = !opt_socket_name
+
+let proof_dir = !opt_proof_dir
 
 (* when not doing proof, stop after typing to avoid cost of the WP *)
 let () =

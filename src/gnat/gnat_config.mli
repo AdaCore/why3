@@ -94,3 +94,5 @@ val parallel : int
 
 val socket_name : string
 (* name of the socket to be used for communication with the server *)
+
+val proof_dir : string option
