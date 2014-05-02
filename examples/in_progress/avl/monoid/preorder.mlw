@@ -1,0 +1,48 @@
+
+(* Full preorder theory,
+   containing lt and eq as well. *)
+theory Full
+  
+  type t
+  predicate le t t
+  clone export relations.PreOrder with type t = t, predicate rel = le
+  predicate eq t t
+  axiom eq_def : forall x y. eq x y <-> le x y /\ le y x
+  predicate lt t t
+  axiom lt_def : forall x y. lt x y <-> le x y /\ not le y x
+  
+  clone relations.Equivalence as Eq with type t = t,
+    predicate rel = eq, lemma Trans, lemma Refl, lemma Symm
+  
+  clone relations.PartialStrictOrder as Lt with type t = t,
+    predicate rel = lt, lemma Trans, lemma Asymm
+  
+end
+
+theory TotalFull
+  
+  clone export Full
+  clone export relations.Total with type t = t, predicate rel = le
+  clone relations.Total as Lt with type t = t,
+    predicate rel = le, goal Total
+  lemma lt_def2 : forall x y. lt x y <-> not le y x
+  
+end
+
+(* Total preorder + corresponding program types and computable comparison. *)
+module Computable
+  
+  use import int.Int
+  clone program_type.Type0 as T
+  clone export TotalFull with type t = T.m
+  
+  (* Comparison is computable. *)
+  val compare (x y:T.t) : int
+    requires { T.c x /\ T.c y }
+    ensures { let xm = x.T.m in let ym = y.T.m in
+        (result > 0 <-> lt ym xm) /\
+        (result < 0 <-> lt xm ym) /\
+        (result = 0 <-> eq xm ym) }
+  
+end
+

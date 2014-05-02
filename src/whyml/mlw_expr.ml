@@ -239,13 +239,6 @@ let create_psymbol_raw ~poly id ghost syms aty =
 
 (** specification *)
 
-let rec aty_pvset aty =
-  let spv = match aty.aty_result with
-    | VTarrow a -> aty_pvset a
-    | VTvalue _ -> Spv.empty in
-  let spv = spec_pvset spv aty.aty_spec in
-  List.fold_right Spv.remove aty.aty_args spv
-
 let rec aty_check vars aty =
   if aty.aty_spec.c_letrec <> 0 then invalid_arg "Mlw_expr.aty_check";
   let test_or_raise c = if not c then Loc.errorm
