@@ -30,7 +30,7 @@ module Heap
     type m = option K.m
     type t = option K.t
     constant zero : m = None
-    function add (x y:m) : m = match x with
+    function op (x y:m) : m = match x with
       | None -> y
       | Some a -> match y with
         | None -> x
@@ -40,7 +40,7 @@ module Heap
         end
       end
     let lemma assoc_m (x y z:m) : unit
-      ensures { add x (add y z) = add (add x y) z }
+      ensures { op x (op y z) = op (op x y) z }
     = match x , y , z with
       | None , _ , _ -> assert { true }
       | _ , None , _ -> assert { true }
@@ -48,20 +48,20 @@ module Heap
       | _ -> ()
       end
     let lemma neutral_m (x:m) : unit
-      ensures { add x zero = x = add zero x }
+      ensures { op x zero = x = op zero x }
     = match x with None -> () | _ -> assert { true } end
     clone export monoid.Monoid with type t = m,
-      constant zero = zero,function add = add,lemma assoc,lemma neutral
+      constant zero = zero,function op = op,lemma assoc,lemma neutral
     clone export monoid.MonoidListDef with type M.t = m,
-      constant M.zero = zero,function M.add = add,goal M.assoc,goal M.neutral
+      constant M.zero = zero,function M.op = op,goal M.assoc,goal M.neutral
     function m (x:t) : m = match x with None -> None | Some x -> Some x.K.m end
     predicate c (x:t) = match x with None -> true | Some x -> K.c x end
     let zero () : t
       ensures { result = None }
     = None
-    let add (x y:t) : t
+    let op (x y:t) : t
       requires { c x /\ c y }
-      ensures { result.m = add x.m y.m }
+      ensures { result.m = op x.m y.m }
       ensures { c result }
     = match x with
       | None -> y
@@ -75,7 +75,8 @@ module Heap
     
   end
   namespace D
-    (* ARGHH ! *)
+    (* Axiomatized to avoid an harmful behavior happening when
+       inlining meet higher-order. *)
     function measure (d:D.m 'b) : M.m
     axiom measure_def : forall d:D.m 'b. measure d = Some d.key
     let measure (ghost p:type_params 'a 'b) (d:D.t 'a 'b) : M.t
@@ -91,40 +92,40 @@ module Heap
   (* Correction of a selector with respect to an avl:
      the avl list is non-empty. *)
   
-  predicate selector_correct 'e (l:list 'g) = l <> Nil
+  predicate selection_possible 'e (l:list 'g) = l <> Nil
   
-  predicate selected 'e (e:position (D.m 'b)) (l:list (D.m 'b)) =
+  predicate selected 'e (e:split (D.m 'b)) (l:list (D.m 'b)) =
       match e.middle with
       | None -> false
-      | Some d -> S.minorate d.key e.left /\ S.minorate d.key e.right
+      | Some d -> S.lower_bound d.key e.left /\ S.lower_bound d.key e.right
       end /\ rebuild e = l
   
   let rec lemma monoid_sum_is_min (l:list (D.m 'b)) : unit
     ensures { let x = M.sum D.measure l in
       match x with
       | None -> l = Nil
-      | Some a -> S.minorate a l /\ (exists d. mem d l /\ CO.eq d.key a)
+      | Some a -> S.lower_bound a l /\ (exists d. mem d l /\ CO.eq d.key a)
       end }
     variant { l }
   = match l with Cons _ q -> monoid_sum_is_min q | _ -> () end
   
-  let lemma selected_is_min (s:'d) (e:position (D.m 'b))
+  let lemma selected_is_min (s:'d) (e:split (D.m 'b))
     (l:list (D.m 'b)) : unit
     requires { selected s e l }
     ensures { match e.middle with
       | None -> false
-      | Some d -> S.minorate d.key l && match M.sum D.measure l with
+      | Some d -> S.lower_bound d.key l && match M.sum D.measure l with
         | None -> false
         | Some k -> CO.eq d.key k
         end
       end }
   = ()
   
-  let selected_way (ghost p:type_params 'a 'b)
+  let selected_part (ghost p:type_params 'a 'b)
     (ghost base:list (D.m 'b))
     (ghost llis:list (D.m 'b))
     (ghost rlis:list (D.m 'b))
-    (s:unit) (sl:M.t) (d:D.t 'a 'b) (sr:M.t) : way_base unit
+    (s:unit) (sl:M.t) (d:D.t 'a 'b) (sr:M.t) : part_base unit
     requires { p.D.mp.inv d }
     requires { base = llis ++ Cons (p.D.mp.mdl d) rlis }
     requires { sl.M.m = M.sum D.measure llis /\ sr.M.m = M.sum D.measure rlis }
@@ -133,10 +134,10 @@ module Heap
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.D.mp.mdl d);
         right = rlis } in selected s e2 base
-      | Left sl -> selector_correct sl llis /\
+      | Left sl -> selection_possible sl llis /\
         forall e. selected sl e llis ->
           selected s (right_extend e (p.D.mp.mdl d) rlis) base
-      | Right sr -> selector_correct sr rlis /\
+      | Right sr -> selection_possible sr rlis /\
         forall e. selected sr e rlis ->
           selected s (left_extend llis (p.D.mp.mdl d) e) base }
   = let kd = get_key p d in
@@ -151,7 +152,7 @@ module Heap
           assert { forall e. selected () e rlis ->
             match e.middle with
             | None -> false
-            | Some d -> CO.eq d.key b.K.m && S.minorate d.key llis
+            | Some d -> CO.eq d.key b.K.m && S.lower_bound d.key llis
             end };
           Right ()
         end
@@ -160,7 +161,7 @@ module Heap
         assert { forall e. selected () e llis ->
           match e.middle with
           | None -> false
-          | Some d -> CO.eq d.key a.K.m && S.minorate d.key rlis
+          | Some d -> CO.eq d.key a.K.m && S.lower_bound d.key rlis
           end };
         Left ()
       end
@@ -168,7 +169,7 @@ module Heap
         assert { forall e. selected () e rlis ->
           match e.middle with
           | None -> false
-          | Some d -> CO.eq d.key b.K.m && S.minorate d.key llis
+          | Some d -> CO.eq d.key b.K.m && S.lower_bound d.key llis
           end };
         Right ()
       end
@@ -176,10 +177,10 @@ module Heap
   
   (* Full clone of the avl module. *)
   clone avl.AVL as Sel with type selector = selector,
-    predicate selector_correct = selector_correct,
+    predicate selection_possible = selection_possible,
     predicate selected = selected,
-    val selected_way = selected_way,
-    goal selector_correct_empty,
+    val selected_part = selected_part,
+    goal selection_empty,
     constant balancing = balancing,
     goal balancing_positive,
     type D.t = D.t,
@@ -192,21 +193,21 @@ module Heap
     function M.m = M.m,
     predicate M.c = M.c,
     constant M.zero = M.zero,
-    function M.add = M.add,
+    function M.op = M.op,
     goal M.assoc,
     goal M.neutral,
     function M.sum = M.sum,
     goal M.sum_def_nil,
     goal M.sum_def_cons,
     val M.zero = M.zero,
-    val M.add = M.add
+    val M.op = M.op
   
   type t 'a 'b = Sel.t 'a 'b
   
   (* Model: a bag of data. *)
   
   type m 'b = {
-    count : D.m 'b -> int;
+    bag : D.m 'b -> int;
     card : int;
   }
   
@@ -245,15 +246,15 @@ module Heap
   = match l with Nil -> () | Cons _ q -> as_bag_membership d q end
   
   function m (t:t 'a 'b) : m 'b =
-    { count = as_bag t.Sel.m.Sel.lis;
+    { bag = as_bag t.Sel.m.Sel.lis;
       card = length t.Sel.m.Sel.lis }
   let ghost m (t:t 'a 'b) : m 'b
     ensures { result = t.m }
-  = { count = as_bag t.Sel.m.Sel.lis;
+  = { bag = as_bag t.Sel.m.Sel.lis;
       card = length t.Sel.m.Sel.lis }
   
   let lemma m_def (t:t 'a 'b) : unit
-    ensures { t.m.count = as_bag t.Sel.m.Sel.lis }
+    ensures { t.m.bag = as_bag t.Sel.m.Sel.lis }
     ensures { t.m.card = length t.Sel.m.Sel.lis }
   = ()
   
@@ -265,12 +266,12 @@ module Heap
   (* Should be the exported part of the invariant. *)
   let lemma correction (t:t 'a 'b) : unit
     requires { c t }
-    ensures { forall d:D.m 'b. 0 <= t.m.count d <= t.m.card }
+    ensures { forall d:D.m 'b. 0 <= t.m.bag d <= t.m.card }
     ensures { t.m.card >= 0 }
   = ()
   
   let empty (ghost p:type_params 'a 'b) : t 'a 'b
-    ensures { forall d:D.m 'b. result.m.count d = 0 }
+    ensures { forall d:D.m 'b. result.m.bag d = 0 }
     ensures { result.m.card = 0 }
     ensures { c result /\ result.prm = p }
   = Sel.empty p
@@ -278,16 +279,16 @@ module Heap
   let singleton (ghost p:type_params 'a 'b) (d:D.t 'a 'b) : t 'a 'b
     requires { p.D.mp.inv d }
     ensures { let dm = p.D.mp.mdl d in
-      result.m.count dm = 1 /\
-      forall d2:D.m 'b. d2 <> dm -> result.m.count d2 = 0 }
+      result.m.bag dm = 1 /\
+      forall d2:D.m 'b. d2 <> dm -> result.m.bag d2 = 0 }
     ensures { result.m.card = 1 }
     ensures { c result /\ result.prm = p }
   = Sel.singleton p d
   
   let is_empty (ghost rd:ref (D.m 'b)) (t:t 'a 'b) : bool
     requires { c t }
-    ensures { result -> forall d:D.m 'b. t.m.count d = 0 }
-    ensures { not result -> t.m.count !rd > 0 }
+    ensures { result -> forall d:D.m 'b. t.m.bag d = 0 }
+    ensures { not result -> t.m.bag !rd > 0 }
     ensures { result <-> t.m.card = 0 }
   = let res = Sel.is_empty t in
     ghost if not res
@@ -301,7 +302,7 @@ module Heap
     requires { c l /\ c r /\ l.prm = r.prm }
     ensures { c result /\ result.prm = l.prm }
     ensures { result.m.card = l.m.card + r.m.card }
-    ensures { forall d. result.m.count d = l.m.count d + r.m.count d }
+    ensures { forall d. result.m.bag d = l.m.bag d + r.m.bag d }
   = Sel.concat l r
   
   let lemma remove_count (l:list 'a) (d:'a) (r:list 'a) : unit
@@ -311,15 +312,15 @@ module Heap
   
   let extract_min (t:t 'a 'b) : option (D.t 'a 'b,t 'a 'b)
     requires { c t }
-    returns { None -> t.m.card = 0 /\ (forall d. t.m.count d = 0)
+    returns { None -> t.m.card = 0 /\ (forall d. t.m.bag d = 0)
       | Some (d,e) -> c e /\ e.prm = t.prm /\ t.dprm.inv d /\
         t.m.card = e.m.card + 1 /\ let dm = t.dprm.mdl d in
-        t.m.count dm = e.m.count dm + 1 /\
-        (forall d2. d2 <> dm -> t.m.count d2 = e.m.count d2) /\
-        (forall d2. t.m.count d2 > 0 -> CO.le dm.key d2.key) }
+        t.m.bag dm = e.m.bag dm + 1 /\
+        (forall d2. d2 <> dm -> t.m.bag d2 = e.m.bag d2) /\
+        (forall d2. t.m.bag d2 > 0 -> CO.le dm.key d2.key) }
   = if Sel.is_empty t
     then None
-    else let (o,e) = Sel.extract (Sel.default_position ()) () t in
+    else let (o,e) = Sel.extract (Sel.default_split ()) () t in
       match o with
       | None -> absurd
       | Some d -> Some (d,e)
@@ -328,9 +329,9 @@ module Heap
   let min (t:t 'a 'b) : D.t 'a 'b
     requires { c t /\ t.m.card >= 1 }
     ensures { t.dprm.inv result /\ let dm = t.dprm.mdl result in
-      t.m.count dm > 0 /\ t.m.card > 0 /\
-      (forall d2. t.m.count d2 > 0 -> CO.le dm.key d2.key) }
-  = match Sel.get (Sel.default_position ()) () t with
+      t.m.bag dm > 0 /\ t.m.card > 0 /\
+      (forall d2. t.m.bag d2 > 0 -> CO.le dm.key d2.key) }
+  = match Sel.get (Sel.default_split ()) () t with
     | None -> absurd
     | Some d -> d
     end
@@ -338,10 +339,10 @@ module Heap
   let pop_min (ghost r:ref (D.m 'b)) (t:t 'a 'b) : t 'a 'b
     requires { c t /\ t.m.card >= 1 }
     ensures { c result /\ result.prm = t.prm /\ t.m.card = result.m.card + 1 /\
-      t.m.count !r = result.m.count !r + 1 /\
-      (forall d2. d2 <> !r -> t.m.count d2 = result.m.count d2) /\
-      (forall d2. t.m.count d2 > 0 -> CO.le !r.key d2.key) }
-  = let r0 = Sel.default_position () in
+      t.m.bag !r = result.m.bag !r + 1 /\
+      (forall d2. d2 <> !r -> t.m.bag d2 = result.m.bag d2) /\
+      (forall d2. t.m.bag d2 > 0 -> CO.le !r.key d2.key) }
+  = let r0 = Sel.default_split () in
     let res = Sel.remove r0 () t in
     r := match !r0.middle with None -> absurd | Some d -> d end;
     res
@@ -351,8 +352,8 @@ module Heap
     ensures { c result /\ result.prm = t.prm }
     ensures { result.m.card = t.m.card + 1 }
     ensures { let dm = t.dprm.mdl d in
-      result.m.count dm = t.m.count dm + 1 /\
-      (forall d2. d2 <> dm -> result.m.count d2 = t.m.count d2) }
+      result.m.bag dm = t.m.bag dm + 1 /\
+      (forall d2. d2 <> dm -> result.m.bag d2 = t.m.bag d2) }
   = Sel.cons d t
   
 end

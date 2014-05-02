@@ -43,20 +43,20 @@ module MapBase
     type m = unit
     type t = unit
     constant zero : unit = ()
-    function add (x y:unit) : unit = ()
+    function op (x y:unit) : unit = ()
     let lemma neutral_ (x:unit) : unit
-      ensures { add zero x = x = add x zero }
+      ensures { op zero x = x = op x zero }
     = match x with _ -> () end
     clone export monoid.Monoid with type t = m,
-      constant zero = zero,function add = add,lemma assoc,lemma neutral
+      constant zero = zero,function op = op,lemma assoc,lemma neutral
     clone export monoid.MonoidListDef with type M.t = m,
-      constant M.zero = zero,function M.add = add,goal M.assoc,goal M.neutral
+      constant M.zero = zero,function M.op = op,goal M.assoc,goal M.neutral
     function m (x:'a) : 'a = x
     predicate c (x:'a) = true
     let zero () : unit
       ensures { result = () }
     = ()
-    let add (x y:unit) : unit
+    let op (x y:unit) : unit
       ensures { result = () }
     = ()
   end
@@ -67,18 +67,21 @@ module MapBase
   (* Correction of a selector with respect to a list:
      The list is sorted. *)
   
-  predicate selector_correct (s:K.t) (l:list (D.m 'b)) =
+  predicate selection_possible (s:K.t) (l:list (D.m 'b)) =
     A.S.increasing l /\ K.c s
   
-  predicate selected (s:K.t) (e:position (D.m 'b)) (l:list (D.m 'b)) =
-      (A.S.majorate s.K.m e.left /\ A.S.minorate s.K.m e.right /\
-      A.S.increasing e.left /\ A.S.increasing e.right /\
+  predicate selected (s:K.t) (e:split (D.m 'b)) (l:list (D.m 'b)) =
+      (A.S.upper_bound s.K.m e.left /\ A.S.lower_bound s.K.m e.right /\
       match e.middle with
       | None -> true
       | Some d2 -> CO.eq s.K.m d2.key
-      end) /\ rebuild e = l /\ selector_correct s l
+      end)
+      (* Strictly speaking, not necessary because derivable from the context,
+         but makes easier to write some lemmas. *)
+      /\ A.S.increasing e.left /\ A.S.increasing e.right /\
+      rebuild e = l /\ selection_possible s l
   
-  predicate selected_sem (s:K.t) (e:position (D.m 'b)) (l:list (D.m 'b)) =
+  predicate selected_sem (s:K.t) (e:split (D.m 'b)) (l:list (D.m 'b)) =
     forall k:K.m. (CO.lt k s.K.m -> A.model l k = A.model e.left k) /\
       (CO.lt s.K.m k -> A.model l k = A.model e.right k) /\
       (CO.eq k s.K.m -> A.model l k = e.middle) /\
@@ -86,7 +89,7 @@ module MapBase
       (CO.le k s.K.m -> A.model e.right k = None)
   
   let lemma selected_sem (s:K.t)
-    (e:position (D.m 'b)) (l:list (D.m 'b)) : unit
+    (e:split (D.m 'b)) (l:list (D.m 'b)) : unit
     requires { selected s e l }
     ensures { selected_sem s e l }
   = match e.middle with
@@ -94,22 +97,21 @@ module MapBase
     | Some dm -> A.model_split dm e.left e.right
     end
   
-  let selected_way (ghost p:type_params 'a 'b)
+  let selected_part (ghost p:type_params 'a 'b)
     (ghost base:list (D.m 'b))
     (ghost llis:list (D.m 'b))
     (ghost rlis:list (D.m 'b))
-    (s:K.t) (l:'e) (d:D.t 'a 'b) (r:'f) : way_base K.t
+    (s:K.t) (l:'e) (d:D.t 'a 'b) (r:'f) : part_base K.t
     requires { p.D.mp.inv d }
     requires { base = llis ++ Cons (p.D.mp.mdl d) rlis }
-    requires { selector_correct s base }
-    (* A selected position can be found by following the given way. *)
+    requires { selection_possible s base }
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.D.mp.mdl d);
         right = rlis } in selected s e2 base
-      | Left sl -> selector_correct sl llis /\
+      | Left sl -> selection_possible sl llis /\
         forall e. selected sl e llis ->
           selected s (right_extend e (p.D.mp.mdl d) rlis) base
-      | Right sr -> selector_correct sr rlis /\
+      | Right sr -> selection_possible sr rlis /\
         forall e. selected sr e rlis ->
           selected s (left_extend llis (p.D.mp.mdl d) e) base }
   = let kd = get_key p d in
@@ -122,10 +124,10 @@ module MapBase
   
   (* Full clone of the avl module. *)
   clone avl.AVL as Sel with type selector = selector,
-    predicate selector_correct = selector_correct,
+    predicate selection_possible = selection_possible,
     predicate selected = selected,
-    val selected_way = selected_way,
-    goal selector_correct_empty,
+    val selected_part = selected_part,
+    goal selection_empty,
     constant balancing = balancing,
     goal balancing_positive,
     type D.t = D.t,
@@ -138,14 +140,14 @@ module MapBase
     function M.m = M.m,
     predicate M.c = M.c,
     constant M.zero = M.zero,
-    function M.add = M.add,
+    function M.op = M.op,
     goal M.assoc,
     goal M.neutral,
     function M.sum = M.sum,
     goal M.sum_def_nil,
     goal M.sum_def_cons,
     val M.zero = M.zero,
-    val M.add = M.add
+    val M.op = M.op
   
   type t 'a 'b = Sel.t 'a 'b
   
@@ -300,10 +302,10 @@ module MapBase
       | Some d -> t.dprm.inv d /\ t.m.card > 0 /\ let dm = t.dprm.mdl d in
         CO.eq dm.key k.K.m /\ (forall k2. CO.eq k.K.m k2 ->
           t.m.func k2 = Some dm) && t.m.func k.K.m = Some dm = t.m.func dm.key }
-  = let r = Sel.default_position () in
+  = let r = Sel.default_split () in
     Sel.get r k t
   
-  let add (d:D.t 'a 'b) (t:t 'a 'b) : t 'a 'b
+  let insert (d:D.t 'a 'b) (t:t 'a 'b) : t 'a 'b
     requires { c t /\ t.dprm.inv d }
     ensures { c result /\ result.prm = t.prm }
     ensures { let dm = t.dprm.mdl d in
@@ -313,9 +315,9 @@ module MapBase
       (forall k:K.m. (CO.eq k dm.key -> result.m.func k = Some dm) /\
        (not CO.eq k dm.key -> result.m.func k = t.m.func k)) &&
       result.m.func dm.key = Some dm }
-  = let r = Sel.default_position () in
+  = let r = Sel.default_split () in
     let k = get_key t.prm d in
-    Sel.add r k d t
+    Sel.insert r k d t
   
   let remove (k:K.t) (t:t 'a 'b) : t 'a 'b
     requires { c t /\ K.c k }
@@ -326,7 +328,7 @@ module MapBase
       (forall k2:K.m. (CO.eq k2 k.K.m -> result.m.func k2 = None) /\
        (not CO.eq k2 k.K.m -> result.m.func k2 = t.m.func k2)) &&
       result.m.func k.K.m = None }
-  = let r = Sel.default_position () in
+  = let r = Sel.default_split () in
     Sel.remove r k t
   
   let split (k:K.t) (t:t 'a 'b) : (t 'a 'b,option (D.t 'a 'b),t 'a 'b)
@@ -348,10 +350,12 @@ module MapBase
       (forall k2:K.m. CO.le k.K.m k2 -> lf.m.func k2 = None) /\
       (forall k2:K.m. CO.lt k.K.m k2 -> rg.m.func k2 = t.m.func k2) /\
       (forall k2:K.m. CO.le k2 k.K.m -> rg.m.func k2 = None) }
-  = let r = Sel.default_position () in
+  = let r = Sel.default_split () in
     Sel.split r k t
   
-  (* Internal, but makes set-theoretic routines easier. *)
+  (* Extension: set-theoretic-like routines. *)
+  
+  (* Internal, but makes those routines easier. *)
   
   let view (t:t 'a 'b) : Sel.view 'a 'b
     requires { c t }
@@ -660,7 +664,8 @@ module Map
       t.m.func k.K.m = None &&
       result.m.func k.K.m = Some vm }
     ensures { result.m.card = 1 + t.m.card }
-  = MB.add_min (k,v) t
+  = assert { t.prm.D.mp.mdl (k,v) = (K.m k,t.prm.mdl v) };
+    MB.add_min (k,v) t
   
   let add_max (t:t 'a 'b) (k:K.t) (v:'a) : t 'a 'b
     requires { c t /\ K.c k /\ t.prm.inv v }
@@ -671,7 +676,8 @@ module Map
       (CO.eq k.K.m k2 -> result.m.func k2 = Some vm) /\
       (not CO.eq k2 k.K.m -> result.m.func k2 = t.m.func k2) }
     ensures { result.m.card = 1 + t.m.card }
-  = MB.add_max t (k,v)
+  = assert { t.prm.D.mp.mdl (k,v) = (K.m k,t.prm.mdl v) };
+    MB.add_max t (k,v)
   
   let concat (l r:t 'a 'b) : t 'a 'b
     requires { c l /\ c r /\ l.prm = r.prm }
@@ -703,7 +709,7 @@ module Map
     | Some (_,v) -> Some v
     end
   
-  let add (k:K.t) (v:'a) (t:t 'a 'b) : t 'a 'b
+  let insert (k:K.t) (v:'a) (t:t 'a 'b) : t 'a 'b
     requires { c t /\ K.c k /\ t.prm.inv v }
     ensures { c result /\ result.prm = t.prm }
     ensures { let vm = t.prm.mdl v in result.m.card >= t.m.card /\
@@ -714,7 +720,7 @@ module Map
         (not CO.eq k2 k.K.m -> result.m.func k2 = t.m.func k2)) &&
       result.m.func k.K.m = Some vm }
   = let d = (k,v) in
-    let res = MB.add (k,v) t in
+    let res = MB.insert (k,v) t in
     assert { t.MB.dprm.mdl d = (k.K.m,t.prm.mdl v) };
     res
   
@@ -922,7 +928,7 @@ module Set
         (t.m.set k2 -> result.m.set k2) /\
         (not CO.eq k2 k.K.m -> result.m.set k2 -> t.m.set k2)) &&
         result.m.set k.K.m }
-  = MB.add k t
+  = MB.insert k t
   
   let remove (k:K.t) (t:t) : t
     requires { c t /\ K.c k }
@@ -956,6 +962,8 @@ module Set
     let o = abstract ensures { result <-> o <> None }
       match o with None -> false | _ -> true end end in
     (lf,o,rg)
+  
+  (* Extension: set-theoretic routines. *)
   
   let union (a b:t) : t
     requires { c a /\ c b }

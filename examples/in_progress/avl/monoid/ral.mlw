@@ -18,17 +18,17 @@ module RAL
     type m = int
     type t = int
     constant zero : int = 0
-    function add (x y:int) : int = x + y
+    function op (x y:int) : int = x + y
     clone export monoid.Monoid with type t = m,
-      constant zero = zero,function add = add,lemma assoc,lemma neutral
+      constant zero = zero,function op = op,lemma assoc,lemma neutral
     clone export monoid.MonoidListDef with type M.t = m,
-      constant M.zero = zero,function M.add = add,goal M.assoc,goal M.neutral
+      constant M.zero = zero,function M.op = op,goal M.assoc,goal M.neutral
     function m (x:'a) : 'a = x
     predicate c (_:'a) = true
     let zero () : int
       ensures { result = 0 }
     = 0
-    let add (x y:int) : int
+    let op (x y:int) : int
       ensures { result = x + y }
     = x + y
   end
@@ -38,9 +38,8 @@ module RAL
     type t 'a 'b = 'a
     type m 'b = 'b
     function mp (p:'a) : 'a = p
-    (* Feel shameful, but this is the only way right now that the function
-       doesn't get inlined where it should not, which severly mess up
-       with the HO encoding. *)
+    (* Axiomatized definition because of a harmful interference between
+       automatic inlining and higher-order encoding. *)
     function measure 'b : int
     axiom measure_def : forall x:'b. measure x = 1
     let measure (ghost _:'c) (x:'a) : int
@@ -58,32 +57,31 @@ module RAL
   
   (* Correctness predicate for selector with respect to a list:
      between bounds. *)
-  predicate selector_correct (s:selector) (l:list 'b) =
+  predicate selection_possible (s:selector) (l:list 'b) =
     0 <= s.index && (if s.hole then s.index <= length l else s.index < length l)
   
   (* Selection predicate: We are exactly at the index-th position of the
      rebuild list, and there is an element in the middle iff we are
      not trying to select a hole. *)
-  predicate selected (s:selector) (e:position 'b) (l:list 'b) =
+  predicate selected (s:selector) (e:split 'b) (l:list 'b) =
     s.index = length e.left /\ (s.hole <-> e.middle = None)
   
-  let selected_way (ghost p:type_params 'a 'b)
+  let selected_part (ghost p:type_params 'a 'b)
     (ghost base:list 'b)
     (ghost llis:list 'b)
     (ghost rlis:list 'b)
-    (s:selector) (sl:int) (d:'a) (sr:int) : way_base selector
+    (s:selector) (sl:int) (d:'a) (sr:int) : part_base selector
     requires { p.inv d }
     requires { base = llis ++ Cons (p.mdl d) rlis }
-    requires { selector_correct s base }
+    requires { selection_possible s base }
     requires { sl = length llis /\ sr = length rlis }
-    (* A selected position can be found by following the given way. *)
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.mdl d);
         right = rlis } in selected s e2 base
-      | Left sl -> selector_correct sl llis /\
+      | Left sl -> selection_possible sl llis /\
         forall e. selected sl e llis ->
           selected s (right_extend e (p.mdl d) rlis) base
-      | Right sr -> selector_correct sr rlis /\
+      | Right sr -> selection_possible sr rlis /\
         forall e. selected sr e rlis ->
           selected s (left_extend llis (p.mdl d) e) base }
   = (* Use the size information to decide
@@ -99,10 +97,10 @@ module RAL
   
   (* Full clone of the avl module. *)
   clone avl.AVL as Sel with type selector = selector,
-    predicate selector_correct = selector_correct,
+    predicate selection_possible = selection_possible,
     predicate selected = selected,
-    val selected_way = selected_way,
-    goal selector_correct_empty,
+    val selected_part = selected_part,
+    goal selection_empty,
     constant balancing = balancing,
     goal balancing_positive,
     type D.t = D.t,
@@ -115,14 +113,14 @@ module RAL
     function M.m = M.m,
     predicate M.c = M.c,
     constant M.zero = M.zero,
-    function M.add = M.add,
+    function M.op = M.op,
     goal M.assoc,
     goal M.neutral,
     function M.sum = M.sum,
     goal M.sum_def_nil,
     goal M.sum_def_cons,
     val M.zero = M.zero,
-    val M.add = M.add
+    val M.op = M.op
   
   type t 'a 'b = Sel.t 'a 'b
   (* There should be no need to talk about the height anymore,
@@ -220,8 +218,8 @@ module RAL
     ensures { length result.m = length l.m }
     ensures { forall i:int. i <> n -> nth i result.m = nth i l.m }
     ensures { nth n result.m = Some (l.prm.mdl d) }
-  = let ghost r = Sel.default_position () in
-    Sel.add r { index = n; hole = false } d l
+  = let ghost r = Sel.default_split () in
+    Sel.insert r { index = n; hole = false } d l
   
   (* Get the n-th element. *)
   let get (n:int) (l:t 'a 'b) : 'a
@@ -229,7 +227,7 @@ module RAL
     ensures { match nth n l.m with None -> false
       | Some d -> d = l.prm.mdl result end }
     ensures { l.prm.inv result }
-  = let ghost r = Sel.default_position () in
+  = let ghost r = Sel.default_split () in
     match Sel.get r { index = n; hole = false } l with
     | None -> absurd
     | Some d -> d
@@ -245,8 +243,8 @@ module RAL
     ensures { forall i:int. i < n -> nth i result.m = nth i l.m }
     ensures { forall i:int. i > n -> nth i result.m = nth (i-1) l.m }
     ensures { nth n result.m = Some (l.prm.mdl d) }
-  = let ghost r = Sel.default_position () in
-    Sel.add r { index = n; hole = true } d l
+  = let ghost r = Sel.default_split () in
+    Sel.insert r { index = n; hole = true } d l
   
   let remove (n:int) (l:t 'a 'b) : t 'a 'b
     requires { 0 <= n < length l.m }
@@ -255,7 +253,7 @@ module RAL
     ensures { length result.m = length l.m - 1 }
     ensures { forall i:int. i < n -> nth i result.m = nth i l.m }
     ensures { forall i:int. i >= n -> nth i result.m = nth (i+1) l.m }
-  = let ghost r = Sel.default_position () in
+  = let ghost r = Sel.default_split () in
     Sel.remove r { index = n; hole = false } l
   
   (* Cut the list between the (n-1)-th and n-th elements. *)
@@ -263,7 +261,7 @@ module RAL
     requires { 0 <= n <= length l.m /\ c l }
     returns { (lf,rg) -> l.m = lf.m ++ rg.m /\
       c lf /\ c rg /\ lf.prm = l.prm = rg.prm }
-  = let ghost r = Sel.default_position () in
+  = let ghost r = Sel.default_split () in
     let sel = { index = n; hole = true } in
     let (lf,_,rg) = Sel.split r sel l in
     (lf,rg)
@@ -273,7 +271,7 @@ module RAL
     requires { 0 <= n < length l.m /\ c l }
     returns { (lf,md,rg) -> l.m = lf.m ++ Cons (l.prm.mdl md) rg.m /\
       c lf /\ c rg /\ l.prm.inv md /\ lf.prm = l.prm = rg.prm }
-  = let ghost r = Sel.default_position () in
+  = let ghost r = Sel.default_split () in
     let sel = { index = n; hole = false } in
     let (lf,md,rg) = Sel.split r sel l in
     match md with None -> absurd | Some md -> (lf,md,rg) end

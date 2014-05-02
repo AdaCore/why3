@@ -9,20 +9,20 @@ theory Base
   clone import key_type.KeyType as K
   clone import relations.Transitive as O with type t = key
   
-  predicate minorate (x:key) (l:list (t 'a)) =
+  predicate lower_bound (x:key) (l:list (t 'a)) =
     (forall y. mem y l -> rel x y.key)
   
-  predicate majorate (x:key) (l:list (t 'a)) =
+  predicate upper_bound (x:key) (l:list (t 'a)) =
     (forall y. mem y l -> rel y.key x)
   
   predicate precede (l1 l2:list (t 'a)) =
     (forall x y. mem x l1 /\ mem y l2 -> rel x.key y.key)
   
-  lemma minorate_by_smaller : forall kdown kup,l:list (t 'a).
-    minorate kup l /\ rel kdown kup -> minorate kdown l
+  lemma smaller_lower_bound : forall kdown kup,l:list (t 'a).
+    lower_bound kup l /\ rel kdown kup -> lower_bound kdown l
   
-  lemma majorate_by_bigger : forall kdown kup,l:list (t 'a).
-    majorate kdown l /\ rel kdown kup -> majorate kup l
+  lemma bigger_upper_bound : forall kdown kup,l:list (t 'a).
+    upper_bound kdown l /\ rel kdown kup -> upper_bound kup l
   
 end
 
@@ -36,7 +36,7 @@ module Increasing
   predicate increasing (l:list (K.t 'a)) =
     match l with
     | Nil -> true
-    | Cons x q -> minorate x.K.key q /\ increasing q
+    | Cons x q -> lower_bound x.K.key q /\ increasing q
     end
   
   let rec lemma increasing_precede (l r:list (K.t 'a))
@@ -51,12 +51,12 @@ module Increasing
   let lemma increasing_midpoint (l:list (K.t 'a))
     (x:K.t 'a) (r:list (K.t 'a)) : unit
     ensures { let kx = K.key x in increasing (l++Cons x r) <->
-      increasing l /\ increasing r /\ minorate kx r /\ majorate kx l }
+      increasing l /\ increasing r /\ lower_bound kx r /\ upper_bound kx l }
   = ()
   
   let lemma increasing_snoc (l:list (K.t 'a)) (x:K.t 'a) : unit
     ensures { let kx = K.key x in increasing (l++Cons x Nil) <->
-      increasing l /\ majorate kx l }
+      increasing l /\ upper_bound kx l }
   = ()
   
 end

@@ -1,4 +1,7 @@
 
+(* Parameterize program types by their invariants and logical model.
+   This additional parameterization is rather administrative. *)
+
 module TypeParams
   
   use import HighOrd
@@ -18,6 +21,8 @@ module TypeParams
   
   (* For purely logical types. *)
   constant default_params : type_params 'a 'a
+  (* Definition axiomatized to avoid a very harmful effect
+     due to combination of inlining and higher-order. *)
   axiom default_params_def : (default_params:type_params 'a 'a) = {
     inv = \n. true;
     mdl = \x. x;
