@@ -1097,5 +1097,169 @@
     </transf>
    </goal>
   </theory>
+  <theory
+   name="EuclideanAlgorithm31"
+   locfile="../gcd.mlw"
+   loclnum="91" loccnumb="7" loccnume="27"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter euclid"
+    locfile="../gcd.mlw"
+    loclnum="96" loccnumb="10" loccnume="16"
+    expl="VC for euclid"
+    sum="c97bf923efd7df0ba08c127d1a0a44fc"
+    proved="true"
+    expanded="false"
+    shape="iainfix =ato_intV5agcdato_intV0ato_intV1Iainfix =ato_intV5agcdato_intV1ato_intV4FAainfix &gt;=ato_intV4c0Aainfix &gt;=ato_intV1c0Aainfix &lt;ato_intV4ato_intV1Aainfix &lt;=c0ato_intV1Iainfix =ato_intV4amodato_intV0ato_intV1FAain_boundsamodato_intV0ato_intV1ANainfix =ato_intV1c0ainfix =ato_intV0agcdato_intV0ato_intV1ainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FAain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+    <label
+     name="expl:VC for euclid"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter euclid.1"
+      locfile="../gcd.mlw"
+      loclnum="96" loccnumb="10" loccnume="16"
+      expl="1. integer overflow"
+      sum="77cb7de9c98c14363e1d0cccb3d93c23"
+      proved="true"
+      expanded="false"
+      shape="integer overflowain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      <label
+       name="expl:VC for euclid"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter euclid.2"
+      locfile="../gcd.mlw"
+      loclnum="96" loccnumb="10" loccnume="16"
+      expl="2. postcondition"
+      sum="760a5c0647aa2b256c67fccd062a7c6d"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =ato_intV0agcdato_intV0ato_intV1Iainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      <label
+       name="expl:VC for euclid"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter euclid.3"
+      locfile="../gcd.mlw"
+      loclnum="96" loccnumb="10" loccnume="16"
+      expl="3. division by zero"
+      sum="d297b1886e36e60a476d4915f1f12e29"
+      proved="true"
+      expanded="false"
+      shape="division by zeroNainfix =ato_intV1c0INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      <label
+       name="expl:VC for euclid"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter euclid.4"
+      locfile="../gcd.mlw"
+      loclnum="96" loccnumb="10" loccnume="16"
+      expl="4. integer overflow"
+      sum="744c070a0346ebb17972e8560fac031a"
+      proved="true"
+      expanded="false"
+      shape="integer overflowain_boundsamodato_intV0ato_intV1INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      <label
+       name="expl:VC for euclid"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.10"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter euclid.5"
+      locfile="../gcd.mlw"
+      loclnum="96" loccnumb="10" loccnume="16"
+      expl="5. variant decrease"
+      sum="d62333ee6c251f02089dbb510e0984e9"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseainfix &lt;ato_intV4ato_intV1Aainfix &lt;=c0ato_intV1Iainfix =ato_intV4amodato_intV0ato_intV1FIain_boundsamodato_intV0ato_intV1ANainfix =ato_intV1c0INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      <label
+       name="expl:VC for euclid"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.52"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter euclid.6"
+      locfile="../gcd.mlw"
+      loclnum="96" loccnumb="10" loccnume="16"
+      expl="6. precondition"
+      sum="fcf15f9a34b89b8036e0b220e14b7d19"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &gt;=ato_intV4c0Aainfix &gt;=ato_intV1c0Iainfix =ato_intV4amodato_intV0ato_intV1FIain_boundsamodato_intV0ato_intV1ANainfix =ato_intV1c0INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      <label
+       name="expl:VC for euclid"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter euclid.7"
+      locfile="../gcd.mlw"
+      loclnum="96" loccnumb="10" loccnume="16"
+      expl="7. postcondition"
+      sum="f477c5b2208489e4d744cadca57ab81f"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =ato_intV5agcdato_intV0ato_intV1Iainfix =ato_intV5agcdato_intV1ato_intV4FIainfix &gt;=ato_intV4c0Aainfix &gt;=ato_intV1c0Iainfix =ato_intV4amodato_intV0ato_intV1FIain_boundsamodato_intV0ato_intV1ANainfix =ato_intV1c0INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      <label
+       name="expl:VC for euclid"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="4000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.54"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
  </file>
 </why3session>

@@ -66,8 +66,8 @@ let of_int32 = big_int_of_int32
 let to_int64 = int64_of_big_int
 let of_int64 = big_int_of_int64
 
-let power x y = 
-  try power_big_int_positive_big_int x y 
+let power x y =
+  try power_big_int_positive_big_int x y
   with Invalid_argument _ -> zero
 
 let print n = Pervasives.print_string (to_string n)

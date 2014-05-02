@@ -4,15 +4,9 @@
 
 let compute_result text =
   try
-    let t = Parse.parse_term text in
-    let u = Vstte12_combinators__Combinators.reduction t in
-    Format.fprintf Format.str_formatter
-      "the normal form is %a" Parse.pr u;
-    Format.flush_str_formatter ()
-  with Parse.SyntaxError -> "syntax error"
-
-
-
+    let a,b = Scanf.sscanf text "%d %d" (fun x y -> x,y) in
+    string_of_int (Gcd__EuclideanAlgorithm31.euclid a b)
+  with _ -> "exception"
 
 
 
