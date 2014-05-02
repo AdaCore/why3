@@ -344,6 +344,7 @@ subst:
 | CONSTANT  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
 | FUNCTION  qualid EQUAL qualid { CSfsym (floc (), $2, $4) }
 | PREDICATE qualid EQUAL qualid { CSpsym (floc (), $2, $4) }
+| VAL       qualid EQUAL qualid { CSvsym (floc (), $2, $4) }
 | LEMMA     qualid              { CSlemma (floc (), $2) }
 | GOAL      qualid              { CSgoal  (floc (), $2) }
 ;

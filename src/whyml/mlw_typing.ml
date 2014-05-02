@@ -66,20 +66,24 @@ let add_decl_with_tuples uc d =
 let qloc = Typing.qloc
 let print_qualid = Typing.print_qualid
 
-let uc_find_ts uc p =
+let ns_find_ts ns p =
   let get_id_ts = function
     | PT pt -> pt.its_ts.ts_name
     | TS ts -> ts.ts_name in
-  Typing.find_qualid get_id_ts ns_find_type_symbol (get_namespace uc) p
+  Typing.find_qualid get_id_ts ns_find_type_symbol ns p
 
-let uc_find_ps uc p =
+let uc_find_ts uc p = ns_find_ts (get_namespace uc) p
+
+let ns_find_ps ns p =
   let get_id_ps = function
     | PV pv -> pv.pv_vs.vs_name
     | PS ps -> ps.ps_name
     | PL pl -> pl.pl_ls.ls_name
     | XS xs -> xs.xs_name
     | LS ls -> ls.ls_name in
-  Typing.find_qualid get_id_ps ns_find_prog_symbol (get_namespace uc) p
+  Typing.find_qualid get_id_ps ns_find_prog_symbol ns p
+
+let uc_find_ps uc p = ns_find_ps (get_namespace uc) p
 
 let uc_find_ls uc p =
   let ns = Theory.get_namespace (get_theory uc) in
@@ -1251,7 +1255,30 @@ let use_clone lib mmd mth uc loc (use,inst) =
     | Theory th, None -> use_export_theory uc th
     | Module m, Some inst ->
         Theory.warn_clone_not_abstract loc m.mod_theory;
-        clone_export uc m (Typing.type_inst (get_theory uc) m.mod_theory inst)
+        let pure_inst, prog_inst = List.partition (function
+          | CSvsym _ -> false | _ -> true) inst in
+        let pure_sm = Typing.type_inst (get_theory uc) m.mod_theory pure_inst in
+        let prog_sm = { inst_pv = Mpv.empty; inst_ps = Mps.empty } in
+        let prog_sm = List.fold_left (fun s i -> match i with
+          | CSvsym (loc,p,q) ->
+              begin match ns_find_ps m.mod_export p, uc_find_ps uc q with
+              | PV pv1, PV pv2 ->
+                  if Mpv.mem pv1 s.inst_pv then Loc.error ~loc
+                    (Theory.ClashSymbol pv1.pv_vs.vs_name.id_string);
+                  { s with inst_pv = Mpv.add pv1 pv2 s.inst_pv }
+              | PS ps1, PS ps2 ->
+                  if Mps.mem ps1 s.inst_ps then Loc.error ~loc
+                    (Theory.ClashSymbol ps1.ps_name.id_string);
+                  { s with inst_ps = Mps.add ps1 ps2 s.inst_ps }
+              | PV _, PS _ | PS _, PV _ -> Loc.errorm ~loc
+                  "type mismatch"
+              | PV _, _ | PS _, _ -> Loc.errorm ~loc
+                  "not a program symbol: %a" print_qualid q
+              | _ -> Loc.errorm ~loc
+                  "not a program symbol: %a" print_qualid p
+              end
+          | _ -> assert false) prog_sm prog_inst in
+        clone_export uc m prog_sm pure_sm
     | Theory th, Some inst ->
         Theory.warn_clone_not_abstract loc th;
         clone_export_theory uc th (Typing.type_inst (get_theory uc) th inst) in

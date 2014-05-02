@@ -120,6 +120,10 @@ let test () =
    interpret_0 p4)
 
 
+constant v3 : int = eval_0 p3
+
+goal eval_p3 : v3 = 1
+
 end
 
 
@@ -227,13 +231,7 @@ function size_e (e:expr) : int =
   | Sub e1 e2 -> 3 + size_e e1 + size_e e2
   end
 
-let rec lemma size_e_pos (e:expr) : unit
-  variant { e }
-  ensures { size_e e >= 1 }
-= match e with
-  | Cte _ -> ()
-  | Sub e1 e2 -> size_e_pos e1; size_e_pos e2
-  end
+lemma size_e_pos: forall e: expr. size_e e >= 1
 
 function size_c (c:cont) : int =
   match c with
@@ -242,14 +240,7 @@ function size_c (c:cont) : int =
   | A2 _ k -> 1 + size_c k
   end
 
-let rec lemma size_c_pos (c:cont) : unit
-  variant { c }
-  ensures { size_c c >= 0 }
-= match c with
-  | I -> ()
-  | A1 _ k -> size_c_pos k
-  | A2 _ k -> size_c_pos k
-  end
+lemma size_c_pos: forall c: cont. size_c c >= 0
 
 (** WhyML programs (declared with "let" instead of "function"),
    mutually recursive, resulting from de-functionalization *)
@@ -290,7 +281,7 @@ let test () =
 end
 
 
-(** {2 Defunctionalization with an alebraic variant} *)
+(** {2 Defunctionalization with an algebraic variant} *)
 
 module Defunctionalization2
 
@@ -512,15 +503,8 @@ function eval_1 (e:expr) (k:value -> 'a) : 'a =
 function interpret_1 (p : prog) : value = eval_1 p (\ n. n)
 
 
-let rec lemma cps_correct_expr (e:expr) : unit
-  variant { e }
-  ensures { forall k:value -> 'a. eval_1 e k = k (eval_0 e) }
-= match e with
-  | Cte _ -> ()
-  | Sub e1 e2 ->
-      cps_correct_expr e1;
-      cps_correct_expr e2
-  end
+lemma cps_correct_expr:
+  forall e: expr. forall k:value -> 'a. eval_1 e k = k (eval_0 e)
 
 lemma cps_correct: forall p. interpret_1 p = interpret_0 p
 
@@ -694,13 +678,7 @@ function size_e (e:expr) : int =
   | Sub e1 e2 -> 3 + size_e e1 + size_e e2
   end
 
-let rec lemma size_e_pos (e:expr) : unit
-  variant { e }
-  ensures { size_e e >= 1 }
-= match e with
-  | Cte _ -> ()
-  | Sub e1 e2 -> size_e_pos e1; size_e_pos e2
-  end
+lemma size_e_pos: forall e: expr. size_e e >= 1
 
 use Defunctionalization
 
@@ -711,14 +689,7 @@ function size_c (c:cont) : int =
   | B _ k -> 1 + size_c k
   end
 
-let rec lemma size_c_pos (c:cont) : unit
-  variant { c }
-  ensures { size_c c >= 0 }
-= match c with
-  | I -> ()
-  | A _ k -> size_c_pos k
-  | B _ k -> size_c_pos k
-  end
+lemma size_c_pos: forall c: cont. size_c c >= 0
 
 let rec continue_4 (c:cont) (v:int) : value
   requires { v >= 0 }
@@ -931,15 +902,7 @@ function size_c (c:context) : int =
   | Right _ c -> 1 + size_c c
   end
 
-let rec lemma size_c_pos (c:context) : unit
-  variant { c }
-  ensures { size_c c >= 0 }
-= match c with
-  | Empty -> ()
-  | Left c _ -> size_c_pos c
-  | Right _ c -> size_c_pos c
-  end
-
+lemma size_c_pos: forall c: context. size_c c >= 0
 
 
 let rec decompose_term (e:expr) (c:context) : (context, expr)
@@ -1154,14 +1117,7 @@ function size_c (c:context) : int =
   | Right _ c -> 1 + size_c c
   end
 
-let rec lemma size_c_pos (c:context) : unit
-  variant { c }
-  ensures { size_c c >= 0 }
-= match c with
-  | Empty -> ()
-  | Left c _ -> size_c_pos c
-  | Right _ c -> size_c_pos c
-  end
+lemma size_c_pos: forall c: context. size_c c >= 0
 
 function recompose (c:context) (e:expr) : expr =
   match c with

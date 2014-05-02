@@ -5,7 +5,6 @@ module RAL
   
   use import int.Int
   use import list.NthLengthAppend
-  use import avl.Base as B
   use import avl.SelectionTypes
   use import program_type.TypeParams
   use import ref.Ref
@@ -14,49 +13,79 @@ module RAL
   constant balancing : int
   axiom balancing_positive : balancing > 0
   
+  (* Monoid: integers here. *)
+  namespace M
+    type m = int
+    type t = int
+    constant zero : int = 0
+    function op (x y:int) : int = x + y
+    clone export monoid.Monoid with type t = m,
+      constant zero = zero,function op = op,lemma assoc,lemma neutral
+    clone export monoid.MonoidListDef with type M.t = m,
+      constant M.zero = zero,function M.op = op,goal M.assoc,goal M.neutral
+    function m (x:'a) : 'a = x
+    predicate c (_:'a) = true
+    let zero () : int
+      ensures { result = 0 }
+    = 0
+    let op (x y:int) : int
+      ensures { result = x + y }
+    = x + y
+  end
+  
+  (* Stored data type, fully polymorphic here. *)
+  namespace D
+    type t 'a 'b = 'a
+    type m 'b = 'b
+    function mp (p:'a) : 'a = p
+    (* Axiomatized definition because of a harmful interference between
+       automatic inlining and higher-order encoding. *)
+    function measure 'b : int
+    axiom measure_def : forall x:'b. measure x = 1
+    let measure (ghost _:'c) (x:'a) : int
+      ensures { result = 1 }
+    = 1
+  end
+  
+  let rec lemma sum_measure_is_length (l:list 'b) : unit
+    ensures { M.sum D.measure l = length l }
+    variant { l }
+  = match l with Cons _ q -> sum_measure_is_length q | _ -> () end
   
   (* Select an element or the hole before him (e.g holes starts at 0) *)
-  type selector 'a 'b 'c 'd = { index : int; hole : bool }
+  type selector = { index : int; hole : bool }
   
-  (* Correctness predicate for selector with respect to an avl:
+  (* Correctness predicate for selector with respect to a list:
      between bounds. *)
-  predicate selector_correct (p1:type_params 'a 'b) (p2:type_params 'c 'd)
-    (s:selector 'a 'b 'c 'd) (t:B.t 'a 'b) =
-    0 <= s.index && (if s.hole then s.index <= length t.m.lis
-      else s.index < length t.m.lis)
+  predicate selection_possible (s:selector) (l:list 'b) =
+    0 <= s.index && (if s.hole then s.index <= length l else s.index < length l)
   
   (* Selection predicate: We are exactly at the index-th position of the
      rebuild list, and there is an element in the middle iff we are
      not trying to select a hole. *)
-  predicate selected (p1:type_params 'a 'b) (p2:type_params 'c 'd)
-    (s:selector 'a 'b 'c 'd) (e:position 'b) (t:B.t 'a 'b) =
+  predicate selected (s:selector) (e:split 'b) (l:list 'b) =
     s.index = length e.left /\ (s.hole <-> e.middle = None)
   
-  (* Node branching. *)
-  let selected_way_impl (ghost p1:type_params 'a 'b)
-    (ghost p2:type_params 'c 'd)
-    (s:selector 'a 'b 'c 'd) (ghost base:t 'a 'b)
-    (l:t 'a 'b) (d:'a) (r:t 'a 'b) : way_base (selector 'a 'b 'c 'd)
-    requires { exists b. c_balancing b l /\ c_balancing b r  /\
-      c_balancing b base }
-    requires { l.prm = r.prm = base.prm /\ l.prm.inv d }
-    requires { let l0 = node_model l.m.lis (l.prm.mdl d) r.m.lis in
-      base.m.lis = l0 /\ selector_correct p1 p2 s base }
-    returns { Here -> let e2 = { left = l.m.lis;
-        middle = Some (l.prm.mdl d);
-        right = r.m.lis } in selected p1 p2 s e2 base /\
-          rebuild e2 = node_model l.m.lis (l.prm.mdl d) r.m.lis
-      | Left sl -> selector_correct p1 p2 sl l /\
-        forall e. selected p1 p2 sl e l /\ rebuild e = l.m.lis ->
-          let e2 = { e with right = node_model e.right (l.prm.mdl d) r.m.lis }
-          in selected p1 p2 s e2 base /\ rebuild e2 = base.m.lis
-      | Right sr -> selector_correct p1 p2 sr r /\
-        forall e. selected p1 p2 sr e r /\ rebuild e = r.m.lis ->
-          let e2 = { e with left = node_model l.m.lis (l.prm.mdl d) e.left } in
-          selected p1 p2 s e2 base /\ rebuild e2 = base.m.lis }
-  = (* Use the stored size information to decide
+  let selected_part (ghost p:type_params 'a 'b)
+    (ghost base:list 'b)
+    (ghost llis:list 'b)
+    (ghost rlis:list 'b)
+    (s:selector) (sl:int) (d:'a) (sr:int) : part_base selector
+    requires { p.inv d }
+    requires { base = llis ++ Cons (p.mdl d) rlis }
+    requires { selection_possible s base }
+    requires { sl = length llis /\ sr = length rlis }
+    returns { Here -> let e2 = { left = llis;
+        middle = Some (p.mdl d);
+        right = rlis } in selected s e2 base
+      | Left sl -> selection_possible sl llis /\
+        forall e. selected sl e llis ->
+          selected s (right_extend e (p.mdl d) rlis) base
+      | Right sr -> selection_possible sr rlis /\
+        forall e. selected sr e rlis ->
+          selected s (left_extend llis (p.mdl d) e) base }
+  = (* Use the size information to decide
        where the index-th position is. *)
-    let sl = B.size l in
     let ind = s.index in
     if ind > sl
     then Right { s with index = ind - sl - 1 }
@@ -66,34 +95,42 @@ module RAL
     then Left s
     else Here
   
-  (* Stored data type, fully polymorphic here. *)
-  namespace D
-    type t 'a 'b 'c 'd = 'a
-    type m 'b 'd = 'b
-    function make_params (p1:type_params 'a 'b)
-      (p2:type_params 'c 'd) : type_params (t 'a 'b 'c 'd) (m 'b 'd) = p1
-    
-  end
-  
-  (* Full clone of the avl selection module. *)
-  clone avl.Selection as Sel with type selector = selector,
-    predicate selector_correct = selector_correct,
+  (* Full clone of the avl module. *)
+  clone avl.AVL as Sel with type selector = selector,
+    predicate selection_possible = selection_possible,
     predicate selected = selected,
-    val selected_way = selected_way_impl,
-    goal selector_correct_empty,
+    val selected_part = selected_part,
+    goal selection_empty,
     constant balancing = balancing,
     goal balancing_positive,
-    namespace D = D
+    type D.t = D.t,
+    type D.m = D.m,
+    function D.mp = D.mp,
+    function D.measure = D.measure,
+    val D.measure = D.measure,
+    type M.t = M.t,
+    type M.m = M.m,
+    function M.m = M.m,
+    predicate M.c = M.c,
+    constant M.zero = M.zero,
+    function M.op = M.op,
+    goal M.assoc,
+    goal M.neutral,
+    function M.sum = M.sum,
+    goal M.sum_def_nil,
+    goal M.sum_def_cons,
+    val M.zero = M.zero,
+    val M.op = M.op
   
-  type t 'a 'b = B.t 'a 'b
+  type t 'a 'b = Sel.t 'a 'b
   (* There should be no need to talk about the height anymore,
      so we remove it from the model representation. *)
   type m 'b = list 'b
   predicate c (r:t 'a 'b) = Sel.c r
-  function m (r:t 'a 'b) : m 'b = r.B.m.B.lis
-  function prm (r:t 'a 'b) : type_params 'a 'b = r.B.prm
-  function make_params (p:type_params 'a 'b) : type_params (t 'a 'b) (m 'b) =
-    { inv = (\t. c t /\ prm t = p); mdl = (\t. m t) }
+  function m (r:t 'a 'b) : m 'b = r.Sel.m.Sel.lis
+  function prm (r:t 'a 'b) : type_params 'a 'b = r.Sel.prm
+  clone export program_type.Type1Prm with type t = t,type m = m,
+    predicate c = c,function m = m,function prm = prm
   
   (* Create an empty random-access list. *)
   let empty (ghost p:type_params 'a 'b) : t 'a 'b
@@ -171,7 +208,7 @@ module RAL
   let length (l:t 'a 'b) : int
     requires { c l }
     ensures { result = length l.m }
-  = size l
+  = Sel.total l
   
   (* Set the n-th element. *)
   let set (n:int) (d:'a) (l:t 'a 'b) : t 'a 'b
@@ -181,8 +218,8 @@ module RAL
     ensures { length result.m = length l.m }
     ensures { forall i:int. i <> n -> nth i result.m = nth i l.m }
     ensures { nth n result.m = Some (l.prm.mdl d) }
-  = let ghost r = Sel.default_position () in
-    Sel.add l.B.prm l.B.prm r { index = n; hole = false } d l
+  = let ghost r = Sel.default_split () in
+    Sel.insert r { index = n; hole = false } d l
   
   (* Get the n-th element. *)
   let get (n:int) (l:t 'a 'b) : 'a
@@ -190,8 +227,8 @@ module RAL
     ensures { match nth n l.m with None -> false
       | Some d -> d = l.prm.mdl result end }
     ensures { l.prm.inv result }
-  = let ghost r = Sel.default_position () in
-    match Sel.get l.B.prm l.B.prm r { index = n; hole = false } l with
+  = let ghost r = Sel.default_split () in
+    match Sel.get r { index = n; hole = false } l with
     | None -> absurd
     | Some d -> d
     end
@@ -206,8 +243,8 @@ module RAL
     ensures { forall i:int. i < n -> nth i result.m = nth i l.m }
     ensures { forall i:int. i > n -> nth i result.m = nth (i-1) l.m }
     ensures { nth n result.m = Some (l.prm.mdl d) }
-  = let ghost r = Sel.default_position () in
-    Sel.add l.B.prm l.B.prm r { index = n; hole = true } d l
+  = let ghost r = Sel.default_split () in
+    Sel.insert r { index = n; hole = true } d l
   
   let remove (n:int) (l:t 'a 'b) : t 'a 'b
     requires { 0 <= n < length l.m }
@@ -216,17 +253,17 @@ module RAL
     ensures { length result.m = length l.m - 1 }
     ensures { forall i:int. i < n -> nth i result.m = nth i l.m }
     ensures { forall i:int. i >= n -> nth i result.m = nth (i+1) l.m }
-  = let ghost r = Sel.default_position () in
-    Sel.remove l.B.prm l.B.prm r { index = n; hole = false } l
+  = let ghost r = Sel.default_split () in
+    Sel.remove r { index = n; hole = false } l
   
   (* Cut the list between the (n-1)-th and n-th elements. *)
   let cut (n:int) (l:t 'a 'b) : (t 'a 'b,t 'a 'b)
     requires { 0 <= n <= length l.m /\ c l }
     returns { (lf,rg) -> l.m = lf.m ++ rg.m /\
       c lf /\ c rg /\ lf.prm = l.prm = rg.prm }
-  = let ghost r = Sel.default_position () in
+  = let ghost r = Sel.default_split () in
     let sel = { index = n; hole = true } in
-    let (lf,_,rg) = Sel.split l.B.prm l.B.prm r sel l in
+    let (lf,_,rg) = Sel.split r sel l in
     (lf,rg)
   
   (* Split the list on the n-th element. *)
@@ -234,9 +271,9 @@ module RAL
     requires { 0 <= n < length l.m /\ c l }
     returns { (lf,md,rg) -> l.m = lf.m ++ Cons (l.prm.mdl md) rg.m /\
       c lf /\ c rg /\ l.prm.inv md /\ lf.prm = l.prm = rg.prm }
-  = let ghost r = Sel.default_position () in
+  = let ghost r = Sel.default_split () in
     let sel = { index = n; hole = false } in
-    let (lf,md,rg) = Sel.split l.B.prm l.B.prm r sel l in
+    let (lf,md,rg) = Sel.split r sel l in
     match md with None -> absurd | Some md -> (lf,md,rg) end
   
   let harness (a b:t int int) : unit
@@ -250,12 +287,12 @@ module RAL
     let b = set 1 10 b in
     let a = set 2 2 a in
     let b = set 2 20 b in
-    assert { nth 1 a.m = Some 1 /\ nth 42 a.m = Some 0 };
-    assert { nth 1 b.m = Some 10 /\ nth 42 b.m = Some 1 };
+    check { nth 1 a.m = Some 1 /\ nth 42 a.m = Some 0 };
+    check { nth 1 b.m = Some 10 /\ nth 42 b.m = Some 1 };
     let a = remove 1 a in 
     let b = remove 2 b in
-    assert { nth 1 a.m = Some 2 /\ nth 42 a.m = Some 0 };
-    assert { nth 2 b.m = Some 1 /\ nth 42 b.m = Some 1 }
+    check { nth 1 a.m = Some 2 /\ nth 42 a.m = Some 0 };
+    check { nth 2 b.m = Some 1 /\ nth 42 b.m = Some 1 }
   
   let harness2 () : unit
   = (* [] *)
@@ -267,11 +304,11 @@ module RAL
     (* [3] *)
     let b = match decompose_front a with
       | None -> absurd
-      | Some (d,tl) -> assert { d = 2 }; tl
+      | Some (d,tl) -> check { d = 2 }; tl
     end in
     (* [3;2;3] *)
     let a = concat b a in
-    assert { nth 1 a.m = Some 2 }
+    check { nth 1 a.m = Some 2 }
   
 end
 

@@ -896,6 +896,13 @@ and vty_vars = function
   | VTvalue ity -> ity.ity_vars
   | VTarrow aty -> aty_vars aty
 
+let rec aty_pvset aty =
+  let spv = match aty.aty_result with
+    | VTarrow a -> aty_pvset a
+    | VTvalue _ -> Spv.empty in
+  let spv = spec_pvset spv aty.aty_spec in
+  List.fold_right Spv.remove aty.aty_args spv
+
 let ity_of_vty = function
   | VTvalue ity -> ity
   | VTarrow _   -> ity_unit

@@ -1,4 +1,7 @@
 
+(* Parameterize program types by their invariants and logical model.
+   This additional parameterization is rather administrative. *)
+
 module TypeParams
   
   use import HighOrd
@@ -17,7 +20,10 @@ module TypeParams
   }
   
   (* For purely logical types. *)
-  constant default_params : type_params 'a 'a = {
+  constant default_params : type_params 'a 'a
+  (* Definition axiomatized to avoid a very harmful effect
+     due to combination of inlining and higher-order. *)
+  axiom default_params_def : (default_params:type_params 'a 'a) = {
     inv = \n. true;
     mdl = \x. x;
   }
@@ -37,7 +43,7 @@ module Type0
   (* get logical model (m for model). *)
   function m t : m
   (* Parametric information (for use in polymorphic code). *)
-  constant p : type_params t m = { inv = (\t. c t); mdl = (\t. m t) }
+  constant mp : type_params t m = { inv = (\t. c t); mdl = (\t. m t) }
   
 end
 
@@ -51,7 +57,7 @@ module Type1
   type t 'a 'b
   type m 'b
   (* Parametric model and invariants. *)
-  function make_params (type_params 'a 'b) : type_params (t 'a 'b) (m 'b)  
+  function mp (type_params 'a 'b) : type_params (t 'a 'b) (m 'b)  
   
 end
 
@@ -67,7 +73,7 @@ module Type1Prm
   predicate c (t 'a 'b)
   function m (t 'a 'b) : m 'b
   function prm (t 'a 'b) : type_params 'a 'b
-  function make_params (p:type_params 'a 'b) : type_params (t 'a 'b) (m 'b) =
+  function mp (p:type_params 'a 'b) : type_params (t 'a 'b) (m 'b) =
     { inv = (\t. c t /\ prm t = p);
       mdl = (\t. m t) }
   
@@ -79,7 +85,7 @@ module Type2
   
   type t 'a 'b 'c 'd
   type m 'b 'd
-  function make_params (type_params 'a 'b)
+  function mp (type_params 'a 'b)
     (type_params 'c 'd) : type_params (t 'a 'b 'c 'd) (m 'b 'd)
   
 end
@@ -94,7 +100,7 @@ module Type2Prm
   function m (t 'a 'b 'c 'd) : m 'b 'd
   function prm1 (t 'a 'b 'c 'd) : type_params 'a 'b
   function prm2 (t 'a 'b 'c 'd) : type_params 'c 'd
-  function make_params (p1:type_params 'a 'b) (p2:type_params 'c 'd) : 
+  function mp (p1:type_params 'a 'b) (p2:type_params 'c 'd) : 
     type_params (t 'a 'b 'c 'd) (m 'b 'd) =
     { inv = (\t. c t /\ prm1 t = p1 /\ prm2 t = p2);
       mdl = (\t. m t) }

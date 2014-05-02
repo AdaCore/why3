@@ -1,238 +1,248 @@
 
-(* AVL parameters: a binary tree structure
-   (exact representation is unknown), + a positive balancing
-   constant. *)
-module Params
-  
-  use import int.Int
-  
-  (* type for data stored in the nodes. *)
-  clone program_type.Type2 as Data
-  
-  (* Abstract binary tree structure. *)
-  namespace Tree
-    type m 'a 'b =
-      | Empty
-      | Node (m 'a 'b) (Data.m 'a 'b) (m 'a 'b) int
-    
-    clone export program_type.Type2 with type m = m
-    
-    type view 'a 'b =
-      | VEmpty
-      | VNode (t 'a 'b) (Data.t 'a 'b) (t 'a 'b) int
-    
-    (* Construction/pattern-matching over the tree. *)
-    val empty () : t 'a 'b
-      ensures { result.m = Empty }
-      ensures { c result }
-    
-    val node (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) (h:int) : t 'a 'b
-      requires { c l /\ Data.c d /\ c r }
-      ensures { result.m = Node l.m d.Data.m r.m h }
-      ensures { c result }
-    
-    val view (t:t 'a 'b) : view 'a 'b
-      ensures { match result with
-        | VEmpty -> t.m = Empty
-        | VNode l d r h -> t.m = Node l.m d.Data.m r.m h /\
-          c l /\ Data.c d /\ c r
-        end }
-    
-  end
-  
-  (* Balancing constant for the tree. This will bound
-     the height difference between the subtrees at a node of
-     the avl. Larger constant mean deeper trees but less
-     balancing operations. *)
-  constant balancing : int
-  axiom balancing_positive : balancing > 0
-  
-end
-
-(* AVL, modeled as a doubly-ended list + a non-negative height. *)
-module AVL
+(* Part factorized out (without parameters). *)
+module Base
   
   use import int.Int
   use import bool.Bool
   use import list.Append
+  use import list.Length
   use import HighOrd
-  use import option.Option
+  use import program_type.TypeParams
   
-  (* AVL Parameters. *)
-  clone import Params as P
+  (* tree representation. The two integer parameters corresponds
+     to height and size of the tree, stored at every node. *)
+  type tree 'a =
+    | Empty
+    | Node (tree 'a) 'a (tree 'a) int int
   
-  (* The model of an avl is morally a list. *)
-  type l 'a 'b = list (Data.m 'a 'b)
-  (* Excepted that we also expose an integer (the height of the tree),
-     and an additional invariant on data. *)
-  type m 'a 'b = {
-    lis : l 'a 'b;
+  (* Model of an avl. Intended to expose:
+     - The list representation.
+     - The height. *)
+  type m 'b = {
+    lis : list 'b;
     hgt : int;
-    inv : Data.m 'a 'b -> bool;
   }
   
   (* Shortcut. *)
-  function node_model (l:l 'a 'b) (d:Data.m 'a 'b) (r:l 'a 'b) : l 'a 'b =
+  function node_model (l:list 'a) (d:'a) (r:list 'a) : list 'a =
     l ++ Cons d r
   
-  (* list obtained from a tree by infix traversal. *)
-  function list_model (t:Tree.m 'a 'b) : l 'a 'b = match t with
-    | Tree.Empty -> Nil
-    | Tree.Node l d r _ -> node_model (list_model l) d (list_model r)
+  (* list obtained from a tree by infix traversal + model mapping. *)
+  function list_model (f:'a -> 'b) (t:tree 'a) : list 'b = match t with
+    | Empty -> Nil
+    | Node l d r _ _ -> node_model (list_model f l) (f d) (list_model f r)
     end
   
   (* Height of the tree. *)
-  function real_height (t:Tree.m 'a 'b) : int = match t with
-    | Tree.Empty -> 0
-    | Tree.Node l _ r _ -> let hl = real_height l in let hr = real_height r in
+  function real_height (t:tree 'a) : int = match t with
+    | Empty -> 0
+    | Node l _ r _ _ -> let hl = real_height l in let hr = real_height r in
       1 + if hl < hr then hr else hl
     end
   
-  let rec lemma real_height_nonnegative (t:Tree.m 'a 'b) : unit
+  (* Size of the tree. *)
+  function real_size (t:tree 'a) : int = match t with
+    | Empty -> 0
+    | Node l _ r _ _ -> real_size l + 1 + real_size r
+    end
+  
+  (* Height and size are non-negative. *)
+  let rec lemma real_height_and_size_nonnegatives (t:tree 'a) : unit
     ensures { real_height t >= 0 }
+    ensures { real_size t >= 0 }
     variant { t }
   = match t with
-    | Tree.Empty -> ()
-    | Tree.Node l _ r _ -> real_height_nonnegative l; real_height_nonnegative r
+    | Empty -> ()
+    | Node l _ r _ _ -> real_height_and_size_nonnegatives l;
+      real_height_and_size_nonnegatives r
     end
   
-  (* Balanced tree + correctness of stored height. *)
-  predicate balanced (t:Tree.m 'a 'b) = match t with
-    | Tree.Empty -> true
-    | Tree.Node l _ r h -> h = real_height t /\
+  (* Balanced tree + correctness of stored height and size. *)
+  predicate balanced (balancing:int) (t:tree 'a) = match t with
+    | Empty -> true
+    | Node l _ r h s -> h = real_height t /\
+      s = real_size t /\
       -balancing <= real_height r - real_height l <= balancing /\
-      balanced l /\ balanced r
+      balanced balancing l /\ balanced balancing r
     end
   
-  (* Well-formedness of the data is guaranteed by the parameters.
-     We also allow user to specify additional properties satisfied
-     by the stored data. *)
-  predicate avl_data_correct (inv:Data.m 'a 'b -> bool)
-    (t:Tree.m 'a 'b) = match t with
-    | Tree.Empty -> true
-    | Tree.Node l d r _ ->
+  (* Stored data correction. *)
+  predicate avl_data_correct (inv:'a -> bool)
+    (t:tree 'a) = match t with
+    | Empty -> true
+    | Node l d r _ _ ->
       avl_data_correct inv l /\ inv d /\ avl_data_correct inv r
     end
   
   (* Tree rotations are the core of balancing, so we show that
      they preserve the model. *)
-  lemma rotation_preserve_model : forall ld rd:Data.m 'a 'b,fl fm fr:l 'a 'b.
+  lemma rotation_preserve_model : forall ld rd:'a,fl fm fr:list 'a.
       node_model (node_model fl ld fm) rd fr =
         node_model fl ld (node_model fm rd fr)
   
   (* Avl type. *)
   type t 'a 'b = {
     (* Representation as a binary tree. *)
-    repr : Tree.t 'a 'b;
+    repr : tree 'a;
     (* Model. *)
-    ghost m : m 'a 'b;
+    ghost m : m 'b;
+    (* type parameters (this can be understood as being part of the
+       type information) *)
+    ghost prm : type_params 'a 'b;
   }
   
   (* Invariant. *)
-  predicate c (a:t 'a 'b) =
-    let tm = a.repr.Tree.m in
-    balanced tm /\
-    avl_data_correct a.m.inv tm /\
-    a.m.lis = list_model tm /\
-    a.m.hgt = real_height tm /\
-    Tree.c a.repr
+  predicate c_balancing (balancing:int) (a:t 'a 'b) =
+    let tree = a.repr in
+    balanced balancing tree /\
+    avl_data_correct a.prm.inv tree /\
+    a.m.lis = list_model a.prm.mdl tree /\
+    a.m.hgt = real_height tree
   
   (* Get the height of the avl. *)
-  let height (a:t 'a 'b) : int
-    requires { c a }
-    ensures { result = a.m.hgt }
-  = match Tree.view a.repr with Tree.VEmpty -> 0 | Tree.VNode _ _ _ h -> h end
+  let height (t:t 'a 'b) : int
+    requires { exists balancing. c_balancing balancing t }
+    ensures { result = t.m.hgt }
+  = match t.repr with
+    | Empty -> 0
+    | Node _ _ _ h _ -> h
+    end
   
+  (* Internal function, get the size of the avl. *)
+  let internal_size (t:t 'a 'b) : int
+    requires { exists balancing. c_balancing balancing t }
+    ensures { result = real_size t.repr }
+  = match t.repr with
+    | Empty -> 0
+    | Node _ _ _ _ s -> s
+    end
   
-  (* Constructors. *)
-  (* The empty avl. *)
-  let empty (ghost dinv:Data.m 'a 'b -> bool) : t 'a 'b
+  (* Get the size of the list representation (specification wrapper). *)
+  let size (t:t 'a 'b) : int
+    requires { exists balancing. c_balancing balancing t }
+    ensures { result = length t.m.lis }
+  = let s = internal_size t in
+    let p = t.prm in
+    let rec ghost aux (t:tree 'a) : unit
+      ensures { length (list_model p.mdl t) = real_size t }
+      variant { t }
+    = match t with Empty -> () | Node l _ r _ _ -> aux l; aux r end in
+    aux t.repr; s
+  
+end
+
+(* Doubly-ended lists as avl. *)
+module AVL
+  
+  use import int.Int
+  use import bool.Bool
+  use import list.Append
+  use import list.Length
+  use import HighOrd
+  use import program_type.TypeParams
+  use import option.Option
+  use import ref.Ref
+  use export Base
+  
+  (* Parameter: balancing.
+     The balancing can be any positive integer.
+     This is a trade-off between the cost of balancing and the cost of finding:
+     the bigger the balancing constant is, the lesser is the need for
+     balancing the tree, but the trees can be deeper. *)
+  constant balancing : int
+  (* Parameter: the balancing is positive. *)
+  axiom balancing_positive : balancing > 0
+  
+  predicate c (a:t 'a 'b) = c_balancing balancing a
+  
+  (* Make avl parameters for use in polymorphic code. *)
+  clone export program_type.Type1Prm with type t = t, type m = m,
+    predicate c = c, function m = m, function prm = prm
+  
+  (* Empty avl. *)
+  let empty (ghost p:type_params 'a 'b) : t 'a 'b
     ensures { c result }
     ensures { result.m.lis = Nil }
-    ensures { result.m.inv = dinv }
+    ensures { result.prm = p }
     ensures { result.m.hgt = 0 }
-  =
-    { repr = Tree.empty (); m = { lis = Nil; inv = dinv; hgt = 0 } }
+  = { repr = Empty; m = { lis = Nil; hgt = 0 }; prm = p }
   
-  (* Node. Restricted to perfect balancing. *)
-  let node (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : t 'a 'b
-    requires { l.m.inv = r.m.inv }
-    requires { c l /\ Data.c d /\ c r }
-    requires { r.m.inv d.Data.m }
+  (* Node constructor. Restricted to perfect balancing. *)
+  let node (l:t 'a 'b) (d:'a) (r:t 'a 'b) : t 'a 'b
+    requires { l.prm = r.prm }
+    requires { c l /\ r.prm.inv d /\ c r }
     requires { -balancing <= l.m.hgt - r.m.hgt <= balancing }
     ensures { c result }
-    ensures { result.m.inv = l.m.inv }
+    ensures { result.prm = l.prm }
     ensures { result.m.hgt =
       1 + if l.m.hgt < r.m.hgt then r.m.hgt else l.m.hgt }
-    ensures { result.m.lis = node_model l.m.lis d.Data.m r.m.lis }
-  =
-    let hl = height l in let hr = height r in
+    ensures { result.m.lis = node_model l.m.lis (l.prm.mdl d) r.m.lis }
+  = let hl = height l in let hr = height r in
     let h = 1 + if hl < hr then hr else hl in
-    { repr = Tree.node l.repr d r.repr h;
-      m = { lis = node_model l.m.lis d.Data.m r.m.lis;
-            inv = r.m.inv;
-            hgt = h } }
+    let sl = internal_size l in let sr = internal_size r in
+    let res = { repr = Node l.repr d r.repr h (sl + 1 + sr);
+      m = { lis = node_model l.m.lis (l.prm.mdl d) r.m.lis;
+            hgt = h };
+      prm = r.prm } in
+    res
   
-  (* Useful constructor. *)
-  let singleton (ghost dinv:Data.m 'a 'b -> bool) (d:Data.t 'a 'b) : t 'a 'b
-    requires { Data.c d /\ dinv d.Data.m }
+  (* Create a one-element avl. *)
+  let singleton (ghost p:type_params 'a 'b) (d:'a) : t 'a 'b
+    requires { p.inv d }
     ensures { c result }
-    ensures { result.m.inv = dinv }
-    ensures { result.m.lis = Cons d.Data.m Nil }
+    ensures { result.prm = p }
+    ensures { result.m.lis = Cons (p.mdl d) Nil }
     ensures { result.m.hgt = 1 }
-  =
-    let e = Tree.empty () in
-    { repr = Tree.node e d e 1;
-      m = { lis = Cons d.Data.m Nil; inv = dinv; hgt = 1 } }
-  
-  (* View of an avl, in similar fashion to Tree.view. *)
-  type view 'a 'b =
-    | AEmpty
-    | ANode (t 'a 'b) (Data.t 'a 'b) (t 'a 'b) int
-  
-  (* Pattern-matching. *)
-  let view (t:t 'a 'b) : view 'a 'b
-    requires { c t }
-    ensures { match result with
-      | AEmpty -> t.m.hgt = 0 /\ t.m.lis = Nil
-      | ANode l d r h -> t.m.lis = node_model l.m.lis d.Data.m r.m.lis /\
-        l.m.inv = t.m.inv = r.m.inv /\ c l /\ Data.c d /\ c r /\
-        t.m.inv d.Data.m /\
-        let hl = l.m.hgt in let hr = r.m.hgt in
-        -balancing <= hl - hr <= balancing /\
-         t.m.hgt = h = 1 + if hl < hr then hr else hl
-      end }
-  =
-    match Tree.view t.repr with
-    | Tree.VEmpty -> AEmpty
-    | Tree.VNode l d r h -> ANode
-      { repr = l; m = { lis = list_model l.Tree.m;
-                        inv = t.m.inv;
-                        hgt = real_height l.Tree.m } }
-      d
-      { repr = r; m = { lis = list_model r.Tree.m;
-                        inv = t.m.inv;
-                        hgt = real_height r.Tree.m } }
-      h
-    end
+  = { repr = Node Empty d Empty 1 1;
+      m = { lis = Cons (p.mdl d) Nil; hgt = 1 };
+      prm = p }
   
   (* Emptyness test. *)
   let is_empty (t:t 'a 'b) : bool
     requires { c t }
     ensures { result <-> match t.m.lis with Nil -> true | _ -> false end }
-  =
-    match Tree.view t.repr with
-    | Tree.VEmpty -> true
+  = match t.repr with
+    | Empty -> true
     | _ -> false
     end
   
+  (* View of an avl. *)
+  type view 'a 'b =
+    | AEmpty
+    | ANode (t 'a 'b) 'a (t 'a 'b) int
+  
+  (* Pattern-matching. Could be done directly over the representation,
+     but this rebuild the records. *)
+  let view (t:t 'a 'b) : view 'a 'b
+    requires { c t }
+    ensures { match result with
+      | AEmpty -> t.m.hgt = 0 /\ t.m.lis = Nil
+      | ANode l d r h -> let p = t.prm in
+        t.m.lis = node_model l.m.lis (p.mdl d) r.m.lis /\
+        l.prm = p = r.prm /\ c l /\ p.inv d /\ c r /\
+        let hl = l.m.hgt in let hr = r.m.hgt in
+        -balancing <= hl - hr <= balancing /\
+        t.m.hgt = h = 1 + if hl < hr then hr else hl
+      end }
+  = match t.repr with
+    | Empty -> AEmpty
+    | Node l d r h _ -> let p = t.prm in
+      ANode { repr = l;
+              m = { lis = list_model p.mdl l; hgt = real_height l };
+              prm = p }
+            d
+            { repr = r;
+              m = { lis = list_model p.mdl r; hgt = real_height r };
+              prm = p }
+            h
+    end
+  
   (* Node constructor, defective balancing allowed in input. *)
-  let balance (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : t 'a 'b
-    requires { l.m.inv = r.m.inv }
-    requires { c l /\ Data.c d /\ c r }
-    requires { r.m.inv d.Data.m }
+  let balance (l:t 'a 'b) (d:'a) (r:t 'a 'b) : t 'a 'b
+    requires { l.prm = r.prm }
+    requires { c l /\ l.prm.inv d /\ c r }
     requires { -balancing-1 <= l.m.hgt - r.m.hgt <= balancing+1 }
-    ensures { result.m.inv = l.m.inv }
+    ensures { result.prm = l.prm }
     ensures { let hl = l.m.hgt in let hr = r.m.hgt in
       let he = 1 + if hl < hr then hr else hl in
       let hres = result.m.hgt in
@@ -241,9 +251,8 @@ module AVL
          by at most one. *)
       (-balancing <= hl - hr <= balancing -> he = hres) }
     ensures { c result }
-    ensures { result.m.lis = node_model l.m.lis d.Data.m r.m.lis }
-  =
-    (* Wonderful case of automatic proof ! *)
+    ensures { result.m.lis = node_model l.m.lis (l.prm.mdl d) r.m.lis }
+  = (* Wonderful case of automatic proof ! *)
     let hl = height l in
     let hr = height r in
     let df = hl - hr in
@@ -273,17 +282,15 @@ module AVL
       end
     else node l d r
   
-  (* Decompose l ++ [d] ++ r as head::tail,avl version. Internal function. *)
-  let rec decompose_front_node
-    (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : (Data.t 'a 'b,t 'a 'b)
-    requires { c l /\ Data.c d /\ c r /\ l.m.inv = r.m.inv /\ l.m.inv d.Data.m }
+  (* Decompose l ++ [d] ++ r as head::tail, avl version. Internal function. *)
+  let rec decompose_front_node (l:t 'a 'b) (d:'a) (r:t 'a 'b) : ('a,t 'a 'b)
+    requires { c l /\ l.prm.inv d /\ c r /\ l.prm = r.prm }
     requires { -balancing <= l.m.hgt - r.m.hgt <= balancing }
-    returns { (d2,res) ->
-      node_model l.m.lis d.Data.m r.m.lis = Cons d2.Data.m res.m.lis /\
+    returns { (d2,res) -> let p = l.prm in
+      node_model l.m.lis (p.mdl d) r.m.lis = Cons (p.mdl d2) res.m.lis /\
       let hl = l.m.hgt in let hr = r.m.hgt in
       let he = 1 + if hl < hr then hr else hl in
-      0 <= he - res.m.hgt <= 1 /\ res.m.inv = r.m.inv /\ l.m.inv d2.Data.m /\
-      Data.c d2 /\ c res }
+      0 <= he - res.m.hgt <= 1 /\ res.prm = p /\ p.inv d2 /\ c res }
     variant { l.m.hgt }
   = match view l with
     | AEmpty -> (d,r)
@@ -292,26 +299,24 @@ module AVL
     end
   
   (* Pattern-matching over the model list front. *)
-  let decompose_front (t:t 'a 'b) : option (Data.t 'a 'b,t 'a 'b)
+  let decompose_front (t:t 'a 'b) : option ('a,t 'a 'b)
     requires { c t }
     returns { None -> t.m.lis = Nil
-      | Some (hd,tl) -> t.m.lis = Cons hd.Data.m tl.m.lis /\ c tl /\
-        tl.m.inv = t.m.inv /\ t.m.inv hd.Data.m /\ Data.c hd }
+      | Some (hd,tl) -> let p = t.prm in
+        t.m.lis = Cons (p.mdl hd) tl.m.lis /\ c tl /\ tl.prm = p /\ p.inv hd }
   = match view t with
     | AEmpty -> None
     | ANode l d r _ -> Some (decompose_front_node l d r)
     end
   
-  let rec decompose_back_node
-    (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : (t 'a 'b,Data.t 'a 'b)
-    requires { c l /\ Data.c d /\ c r /\ l.m.inv = r.m.inv /\ l.m.inv d.Data.m }
+  let rec decompose_back_node (l:t 'a 'b) (d:'a) (r:t 'a 'b) : (t 'a 'b,'a)
+    requires { c l /\ l.prm.inv d /\ c r /\ l.prm = r.prm }
     requires { -balancing <= l.m.hgt - r.m.hgt <= balancing }
-    returns { (res,d2) ->
-      node_model l.m.lis d.Data.m r.m.lis = res.m.lis ++ Cons d2.Data.m Nil /\
+    returns { (res,d2) -> let p = l.prm in
+      node_model l.m.lis (p.mdl d) r.m.lis = res.m.lis ++ Cons (p.mdl d2) Nil /\
       let hl = l.m.hgt in let hr = r.m.hgt in
       let he = 1 + if hl < hr then hr else hl in
-      0 <= he - res.m.hgt <= 1 /\ res.m.inv = r.m.inv /\ l.m.inv d2.Data.m /\
-      Data.c d2 /\ c res }
+      0 <= he - res.m.hgt <= 1 /\ res.prm = p /\ p.inv d2 /\ c res }
     variant { r.m.hgt }
   = match view r with
     | AEmpty -> (l,d)
@@ -320,21 +325,68 @@ module AVL
     end
   
   (* Pattern-matching over the model list back. *)
-  let decompose_back (t:t 'a 'b) : option (t 'a 'b,Data.t 'a 'b)
+  let decompose_back (t:t 'a 'b) : option (t 'a 'b,'a)
     requires { c t }
     returns { None -> t.m.lis = Nil
-      | Some (cotl,cohd) -> t.m.lis = cotl.m.lis ++ Cons cohd.Data.m Nil /\
-        c cotl /\ cotl.m.inv = t.m.inv /\ t.m.inv cohd.Data.m /\ Data.c cohd }
+      | Some (cotl,cohd) -> let p = t.prm in
+        t.m.lis = cotl.m.lis ++ Cons (p.mdl cohd) Nil /\
+        c cotl /\ cotl.prm = p /\ p.inv cohd }
   = match view t with
     | AEmpty -> None
     | ANode l d r _ -> Some (decompose_back_node l d r)
     end
   
-  (* Concatenation of avl, balancing hypothesis on inputs. *)
+  let rec front_node (ghost li:ref (list 'b)) (l:t 'a 'b) (d:'a) : 'a
+    requires { c l /\ l.prm.inv d }
+    ensures { let p = l.prm in
+      Cons (p.mdl result) !li = l.m.lis ++ Cons (p.mdl d) Nil /\ p.inv result }
+    variant { l.m.hgt }
+  = match view l with
+    | AEmpty -> li := Nil; d
+    | ANode l d2 r _ -> let res = front_node li l d2 in
+      li := !li ++ r.m.lis ++ Cons (r.prm.mdl d) Nil; res
+    end
+  
+  (* Get the front of a non-empty list. The ghost reference is used
+     to get an explicit view of the tail (no existential). *)
+  let front (ghost li:ref (list 'b)) (t:t 'a 'b) : 'a
+    requires { c t /\ match t.m.lis with Nil -> false | _ -> true end }
+    ensures { let p = t.prm in
+      p.inv result /\ Cons (p.mdl result) !li = t.m.lis }
+  = match view t with
+    | AEmpty -> absurd
+    | ANode l d2 r _ -> let res = front_node li l d2 in
+      li := !li ++ r.m.lis; res
+    end
+  
+  let rec back_node (ghost li:ref (list 'b)) (d:'a) (r:t 'a 'b) : 'a
+    requires { c r /\ r.prm.inv d }
+    ensures { let p = r.prm in
+      !li ++ Cons (p.mdl result) Nil = Cons (p.mdl d) r.m.lis /\ p.inv result }
+    variant { r.m.hgt }
+  = match view r with
+    | AEmpty -> li := Nil; d
+    | ANode l d2 r _ -> let res = back_node li d2 r in
+      li := Cons (r.prm.mdl d) l.m.lis ++ !li; res
+    end
+  
+  (* Get the back of a non-empty list. *)
+  let back (ghost li:ref (list 'b)) (t:t 'a 'b) : 'a
+    requires { c t /\ match t.m.lis with Nil -> false | _ -> true end }
+    ensures { let p = t.prm in p.inv result /\
+      !li ++ Cons (p.mdl result) Nil = t.m.lis }
+  = match view t with
+    | AEmpty -> absurd
+    | ANode l d2 r _ -> let res = back_node li d2 r in
+      li := l.m.lis ++ !li; res
+    end
+  
+  (* Concatenation of avl, suppose inputs balanced (e.g left and right
+     childs of a node) *)
   let fuse (l r:t 'a 'b) : t 'a 'b
-    requires { c l /\ c r /\ l.m.inv = r.m.inv }
+    requires { c l /\ c r /\ l.prm = r.prm }
     requires { -balancing <= l.m.hgt - r.m.hgt <= balancing }
-    ensures { c result /\ result.m.inv = l.m.inv }
+    ensures { c result /\ result.prm = l.prm }
     ensures { let hl = l.m.hgt in let hr = r.m.hgt in
       let he = 1 + if hl < hr then hr else hl in
       1 >= he - result.m.hgt >= 0 }
@@ -349,38 +401,36 @@ module AVL
       end
     end
   
-  
   (* list cons with avl. *)
-  let rec cons (d:Data.t 'a 'b) (t:t 'a 'b) : t 'a 'b
-    requires { Data.c d /\ c t /\ t.m.inv d.Data.m }
-    ensures { c result /\ result.m.inv = t.m.inv }
-    ensures { result.m.lis = Cons d.Data.m t.m.lis }
+  let rec cons (d:'a) (t:t 'a 'b) : t 'a 'b
+    requires { t.prm.inv d /\ c t }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { result.m.lis = Cons (t.prm.mdl d) t.m.lis }
     (* Not supposed to be exported, but necessary for implementation. *)
     ensures { 1 >= result.m.hgt - t.m.hgt >= 0 }
     variant { t.m.hgt }
   = match view t with
-    | AEmpty -> singleton t.m.inv d
+    | AEmpty -> singleton t.prm d
     | ANode l d2 r _ -> balance (cons d l) d2 r
     end
   
   (* Reverse cons. *)
-  let rec snoc (t:t 'a 'b) (d:Data.t 'a 'b) : t 'a 'b
-    requires { c t /\ Data.c d /\ t.m.inv d.Data.m }
-    ensures { c result /\ result.m.inv = t.m.inv }
-    ensures { result.m.lis = t.m.lis ++ Cons d.Data.m Nil }
+  let rec snoc (t:t 'a 'b) (d:'a) : t 'a 'b
+    requires { c t /\ t.prm.inv d }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { result.m.lis = t.m.lis ++ Cons (t.prm.mdl d) Nil }
     ensures { 1 >= result.m.hgt - t.m.hgt >= 0 }
     variant { t.m.hgt }
   = match view t with
-    | AEmpty -> singleton t.m.inv d
+    | AEmpty -> singleton t.prm d
     | ANode l d2 r _ -> balance l d2 (snoc r d)
     end
   
-  (* Node constructor, allow no balancing hypothesis at all. *)
-  let rec join (l:t 'a 'b) (d:Data.t 'a 'b) (r:t 'a 'b) : t 'a 'b
-    requires { c l /\ Data.c d /\ c r }
-    requires { l.m.inv = r.m.inv /\ l.m.inv d.Data.m }
-    ensures { result.m.lis = node_model l.m.lis d.Data.m r.m.lis }
-    ensures { c result /\ result.m.inv = l.m.inv }
+  (* Node constructor, any (correct) input. *)
+  let rec join (l:t 'a 'b) (d:'a) (r:t 'a 'b) : t 'a 'b
+    requires { c l /\ l.prm.inv d /\ c r /\ l.prm = r.prm }
+    ensures { result.m.lis = node_model l.m.lis (l.prm.mdl d) r.m.lis }
+    ensures { c result /\ result.prm = l.prm }
     (* Again, not supposed to be exported. *)
     ensures { let hl = l.m.hgt in let hr = r.m.hgt in
       let he = 1 + if hl < hr then hr else hl in let hres = result.m.hgt in
@@ -399,10 +449,10 @@ module AVL
       end
     end
   
-  (* Concatenation, no balancing hypothesis on inputs. *)
+  (* Concatenation, any (correct) input allowed. *)
   let concat (l:t 'a 'b) (r:t 'a 'b) : t 'a 'b
-    requires { c l /\ c r /\ l.m.inv = r.m.inv }
-    ensures { c result /\ result.m.inv = l.m.inv }
+    requires { c l /\ c r /\ l.prm = r.prm }
+    ensures { c result /\ result.prm = l.prm }
     ensures { result.m.lis = l.m.lis ++ r.m.lis }
   = match view l with
     | AEmpty -> r
@@ -414,8 +464,9 @@ module AVL
     end
   
   (* Efficient enumeration of avl elements.
-     Of course, it can be done by successful application of decompose,
-     but this is O(n*log(n)), while this method is O(n). *)
+     Of course, it can be done by successful application of
+     decompose_{front|back}, but this would be O(n*log(n)),
+     while this method is O(n). *)
   namespace Enum
     
     use import list.Reverse
@@ -426,132 +477,185 @@ module AVL
       variant { l1 }
     = match l1 with Cons _ q -> reverse_append_gen q l2 | _ -> () end
     
-    type base 'a 'b = End | More (Data.t 'a 'b) (t 'a 'b) (base 'a 'b)
+    (* Base representation. Basically the path to the current element. *)
+    type base 'a 'b = End | More 'a (t 'a 'b) (base 'a 'b)
     
     (* Model of a left-to-right enumeration. *)
-    function model_lr (e:base 'a 'b) : l 'a 'b =
+    function model_lr (f:'a -> 'b) (e:base 'a 'b) : list 'b =
       match e with
       | End -> Nil
-      | More d r q -> Cons d.Data.m (r.m.lis ++ model_lr q)
+      | More d r q -> Cons (f d) (r.m.lis ++ model_lr f q)
       end
     
     (* right-to-left version. *)
-    function model_rl (e:base 'a 'b) : l 'a 'b =
+    function model_rl (f:'a -> 'b) (e:base 'a 'b) : list 'b =
       match e with
       | End -> Nil
-      | More d l q -> Cons d.Data.m (reverse l.m.lis ++ model_rl q)
+      | More d l q -> Cons (f d) (reverse l.m.lis ++ model_rl f q)
       end
     
-    predicate base_correct (di:Data.m 'a 'b -> bool) (e:base 'a 'b) =
+    predicate base_correct (p:type_params 'a 'b) (e:base 'a 'b) =
       match e with
       | End -> true
-      | More d t next -> Data.c d /\ c t /\ base_correct di next /\
-        t.m.inv = di /\ di d.Data.m
+      | More d t next -> p.inv d /\ c t /\ base_correct p next /\ t.prm = p
       end
     
-    type m 'a 'b = {
-      inv : Data.m 'a 'b -> bool;
-      lis : l 'a 'b;
+    (* Model: a list, and a boolean. The boolean let us know
+       whether we are enumerating the elements from left to right (usual order)
+       or from right to left (reverse order). *)
+    type m 'b = {
+      lis : list 'b;
       left_to_right : bool;
     }
     
     type t 'a 'b = {
       repr : base 'a 'b;
-      ghost m : m 'a 'b;
+      ghost left_to_right_t : bool;
+      ghost prm : type_params 'a 'b;
     }
     
+    (* Model function. *)
+    function m (t:t 'a 'b) : m 'b =
+      { lis = if t.left_to_right_t
+          then model_lr t.prm.mdl t.repr
+          else model_rl t.prm.mdl t.repr;
+        left_to_right = t.left_to_right_t }
+    
+    (* Invariant. *)
     predicate c (e: t 'a 'b) =
-      base_correct e.m.inv e.repr /\
+      base_correct e.prm e.repr /\
       e.m.lis = if e.m.left_to_right
-        then model_lr e.repr
-        else model_rl e.repr
+        then model_lr e.prm.mdl e.repr
+        else model_rl e.prm.mdl e.repr
+    
+    clone export program_type.Type1Prm with type t = t, type m = m,
+      predicate c = c, function m = m, function prm = prm
+    
   end
   (* Trick to avoid aliasing. *)
   namespace Enum
     
     use import list.Reverse
-    let empty_enum (ghost ltr:bool)
-      (ghost dinv:Data.m 'a 'b -> bool) : Enum.t 'a 'b
+    
+    (* Create an empty enumeration going the given way. *)
+    let empty_enum (ghost ltr:bool) (ghost p:type_params 'a 'b) : Enum.t 'a 'b
       ensures { result.Enum.m.Enum.left_to_right = ltr }
       ensures { result.Enum.m.Enum.lis = Nil }
-      ensures { result.Enum.m.Enum.inv = dinv }
+      ensures { result.Enum.prm = p }
       ensures { Enum.c result }
-    = { Enum.repr = Enum.End;
-        Enum.m = { Enum.inv = dinv; Enum.lis = Nil; Enum.left_to_right = ltr } }
+    = let res = { Enum.repr = Enum.End;
+        Enum.left_to_right_t = ltr;
+        Enum.prm = p } in
+      assert { res.Enum.m.Enum.left_to_right = ltr };
+      assert { let m = res.Enum.m.Enum.lis in not m = Nil -> (if ltr
+        then m = Enum.model_lr p.mdl Enum.End && false
+        else m = Enum.model_rl p.mdl Enum.End && false) && false };
+      res
     
+    (* Add the elements of the avl in front of the given enumeration.
+       Requires a left-to-right enumeration. *)
     let rec enum_lr (t:t 'a 'b) (acc:Enum.t 'a 'b) : Enum.t 'a 'b
       requires { c t /\ Enum.c acc }
-      requires { let accm = acc.Enum.m in
-        accm.Enum.inv = t.m.inv /\ accm.Enum.left_to_right }
+      requires { acc.Enum.prm = t.prm /\ acc.Enum.m.Enum.left_to_right }
       ensures { Enum.c result /\ let rm = result.Enum.m in
-        rm.Enum.inv = t.m.inv /\ rm.Enum.left_to_right /\
+        result.Enum.prm = t.prm /\ rm.Enum.left_to_right /\
         rm.Enum.lis = t.m.lis ++ acc.Enum.m.Enum.lis }
       variant { t.m.hgt }
     = match view t with
       | AEmpty -> acc
-      | ANode l d r _ -> let accm = acc.Enum.m in
+      | ANode l d r _ -> let p = t.prm in
         enum_lr l { Enum.repr = Enum.More d r acc.Enum.repr;
-                    Enum.m = { accm with
-                      Enum.lis = Cons d.Data.m (r.m.lis ++ accm.Enum.lis) } }
+                    Enum.left_to_right_t = acc.Enum.left_to_right_t;
+                    Enum.prm = p }
       end
     
+    (* Add the elements of the avl in front of the given enumeration,
+       in reverse order. Requires a right-to-left enumeration. *)
     let rec enum_rl (t:t 'a 'b) (acc:Enum.t 'a 'b) : Enum.t 'a 'b
       requires { Enum.c acc /\ c t }
-      requires { let accm = acc.Enum.m in
-        accm.Enum.inv = t.m.inv /\ not accm.Enum.left_to_right }
+      requires { acc.Enum.prm = t.prm /\ not acc.Enum.m.Enum.left_to_right }
       ensures { Enum.c result /\ let rm = result.Enum.m in
-        rm.Enum.inv = t.m.inv /\ not rm.Enum.left_to_right /\
+        result.Enum.prm = t.prm /\ not rm.Enum.left_to_right /\
         rm.Enum.lis = reverse t.m.lis ++ acc.Enum.m.Enum.lis }
       variant { t.m.hgt }
     = match view t with
       | AEmpty -> acc
-      | ANode l d r _ -> let accm = acc.Enum.m in
-        let rl = reverse l.m.lis in
+      | ANode l d r _ -> let p = t.prm in
         enum_rl r { Enum.repr = Enum.More d l acc.Enum.repr;
-                    Enum.m = { accm with
-                      Enum.lis = Cons d.Data.m (rl ++ accm.Enum.lis) } }
+                    Enum.left_to_right_t = acc.Enum.left_to_right_t;
+                    Enum.prm = p }
       end
     
-    let decompose_lr (t:Enum.t 'a 'b) : option (Data.t 'a 'b,Enum.t 'a 'b)
+    (* left-to-right enumeration pattern-matching. *)
+    let decompose_lr (t:Enum.t 'a 'b) : option ('a,Enum.t 'a 'b)
       requires { Enum.c t }
       requires { t.Enum.m.Enum.left_to_right }
       returns { None -> t.Enum.m.Enum.lis = Nil
-        | Some (hd,tl) -> Data.c hd /\ Enum.c tl /\
-          let tlm = tl.Enum.m in let tm = t.Enum.m in
-          tlm.Enum.inv = tm.Enum.inv /\ tlm.Enum.inv hd.Data.m /\
-          tm.Enum.lis = Cons hd.Data.m tlm.Enum.lis }
+        | Some (hd,tl) -> let tlm = tl.Enum.m in let p = tl.Enum.prm in
+          p.inv hd /\ Enum.c tl /\ t.Enum.prm = p /\
+          t.Enum.m.Enum.lis = Cons (p.mdl hd) tlm.Enum.lis /\
+          tlm.Enum.left_to_right }
     = match t.Enum.repr with
       | Enum.End -> None
-      | Enum.More d r q -> let l0 = (* Feel justified, since for some reason current version of
-           Why3 refuse direct (ghost!) calls to the logic function.
-           I believe there is some obscure reason about ghost field
-           in avls that make Why3 believe it is an impure program type.
-           If current version of why3 supports it, one can simplify
-           those lines by removing the axiom. *)
-        any l 'a 'b ensures { result = Enum.model_lr q } in
-        let q' = { Enum.repr = q;
-          Enum.m = { t.Enum.m with Enum.lis = l0 } } in
+      | Enum.More d r q -> let q' = { Enum.repr = q;
+          Enum.left_to_right_t = t.Enum.left_to_right_t;
+          Enum.prm = t.Enum.prm } in
         Some (d,enum_lr r q')
       end
     
-    let decompose_rl (t:Enum.t 'a 'b) : option (Data.t 'a 'b,Enum.t 'a 'b)
+    (* right-to-left enumeration pattern-matching. *)
+    let decompose_rl (t:Enum.t 'a 'b) : option ('a,Enum.t 'a 'b)
       requires { Enum.c t }
       requires { not t.Enum.m.Enum.left_to_right }
       returns { None -> t.Enum.m.Enum.lis = Nil
-        | Some (hd,tl) -> Data.c hd /\ Enum.c tl /\
-          let tlm = tl.Enum.m in let tm = t.Enum.m in
-          tlm.Enum.inv = tm.Enum.inv /\ tlm.Enum.inv hd.Data.m /\
-          tm.Enum.lis = Cons hd.Data.m tlm.Enum.lis }
+        | Some (hd,tl) -> let tlm = tl.Enum.m in let p = tl.Enum.prm in
+          p.inv hd /\ Enum.c tl /\ t.Enum.prm = p /\
+          t.Enum.m.Enum.lis = Cons (p.mdl hd) tlm.Enum.lis /\
+          not tlm.Enum.left_to_right }
     = match t.Enum.repr with
       | Enum.End -> None
-      | Enum.More d l q -> let l0 = any l 'a 'b
-        ensures { result = Enum.model_rl q } in
-        let q' = { Enum.repr = q;
-          Enum.m = { t.Enum.m with Enum.lis = l0 } } in
+      | Enum.More d l q -> let q' = { Enum.repr = q;
+          Enum.left_to_right_t = t.Enum.left_to_right_t;
+          Enum.prm = t.Enum.prm } in
         Some (d,enum_rl l q')
       end
     
   end
+  
+end
+
+(* Part factorised out of selection module (for cloning). *)
+theory SelectionTypes
+  
+  use import list.List
+  use import option.Option
+  use import list.Append
+  use Base
+  
+  type position 'a = {
+    left : list 'a;
+    middle : option 'a;
+    right : list 'a;
+  }
+  
+  type way_base 'a = Left 'a
+    | Right 'a
+    | Here
+  
+  function rebuild (p:position 'a) : list 'a =
+    match p.middle with
+    | Some x -> Base.node_model p.left x p.right
+    | None -> p.left ++ p.right
+    end
+  
+  function option_to_list (o:option 'a) : list 'a =
+    match o with
+    | Some x -> Cons x Nil
+    | None -> Nil
+    end
+  
+  lemma rebuild_aternative_def : forall p:position 'a.
+    rebuild p = p.left ++ option_to_list p.middle ++ p.right
   
 end
 
@@ -564,13 +668,10 @@ end
      1) an element of the list, i.e a cut [...] ++  e ++ [...]
      2) a "hole" inside a list, i.e a cut [...] ++ [...]
      It happens (not a coincidence) that this it corresponds exactly to
-     the return type of split.
+     the return type of the split function.
    Possible usages:
    - Search over ordered avl, e.g ordered associative table.
-   - Cut at the "minimum element over k", in an ordered associative table.
    - Index search over an avl, e.g random access list
-     (the tree representation would need to store
-     the cardinal at every node for efficiency reasons)
    Note: it would also work for non-deterministic selection.
      The result would be unspecified within the set of selected elements. *)
 module Selection
@@ -579,1000 +680,223 @@ module Selection
   use import bool.Bool
   use import list.Append
   use import option.Option
+  use import program_type.TypeParams
   use import HighOrd
   
+  use export SelectionTypes
+  
+  (* Avl base. *)
   clone export AVL
   
-  (* Position inside a list l. *)
-  type position 'a 'b = {
-    left : l 'a 'b;
-    middle : option (P.Data.m 'a 'b);
-    right : l 'a 'b;
-  }
+  (* Parameter: shape of stored data. This is because the selector
+     might requires a special shape for stored data to work. *)
+  clone program_type.Type2 as D
   
-  function rebuild (p:position 'a 'b) : l 'a 'b =
-    match p.middle with
-    | None -> p.left ++ p.right
-    | Some d -> node_model p.left d p.right
-    end
+  (* shortcut *)
+  type s 'a 'b 'c 'd = t (D.t 'a 'b 'c 'd) (D.m 'b 'd)
   
-  function option_to_list (o:option 'a) : list 'a = match o with
-    | None -> Nil
-    | Some d -> Cons d Nil
-    end
+  (* Parameter: selector type. *)
+  type selector 'a 'b 'c 'd
   
-  lemma rebuild_alternative_def : forall p:position 'a 'b.
-    rebuild p = p.left ++ option_to_list p.middle ++ p.right
+  (* Parameter: correctness predicate for a selector with respect to the avl,
+     e.g the selector can select something in its list +
+     representation invariants. *)
+  predicate selector_correct (type_params 'a 'b) (type_params 'c 'd)
+    (selector 'a 'b 'c 'd) (s 'a 'b 'c 'd)
   
-  (* selector type. *)
-  clone program_type.Type2 as S
-  
-  (* Correctness of a selector with respect to a list. *)
-  predicate selector_correct (s:S.m 'a 'b) (l:l 'a 'b)
-  
-  (* A position is selected by a selector. *)
-  predicate selected (s:S.m 'a 'b) (e:position 'a 'b)
+  (* Parameter: a position is selected by a selector in the
+     list corresponding to the avl. *)
+  predicate selected (type_params 'a 'b) (type_params 'c 'd)
+    (selector 'a 'b 'c 'd) (position (D.m 'b 'd)) (s 'a 'b 'c 'd)
   
   (* way to the position. *)
-  type way 'a 'b = Left (S.t 'a 'b)
-    | Right (S.t 'a 'b)
-    | Here
+  type way 'a 'b 'c 'd = way_base (selector 'a 'b 'c 'd)
   
-  (* A correct selector always select the only possible position
-     in the empty list. *)
-  axiom selector_correct_empty : forall s:S.m 'a 'b.
-    selector_correct s Nil ->
-      selected s { left = Nil ; middle = None ; right = Nil }
+  (* Parameter: a correct selector for the empty list
+     always select its only possible position. *)
+  axiom selector_correct_empty : forall p1,p2,s:selector 'a 'b 'c 'd,t.
+    selector_correct p1 p2 s t /\ t.m.lis = Nil ->
+      selected p1 p2 s { left = Nil ; middle = None ; right = Nil } t
   
-  (* Branch on a position. *)
-  val selected_way (s:S.t 'a 'b)
-    (l:t 'a 'b) (d:P.Data.t 'a 'b) (r:t 'a 'b) : way 'a 'b
-    requires { l.m.inv = r.m.inv }
-    requires { P.Data.c d /\ l.m.inv d.P.Data.m }
-    requires { c l /\ c r /\ S.c s }
-    requires { selector_correct s.S.m (node_model l.m.lis d.P.Data.m r.m.lis) }
+  (* Parameter: branch on a node. *)
+  val selected_way (ghost p1:type_params 'a 'b) (ghost p2:type_params 'c 'd)
+    (s:selector 'a 'b 'c 'd) (ghost base:s 'a 'b 'c 'd)
+    (l:s 'a 'b 'c 'd) (d:D.t 'a 'b 'c 'd) (r:s 'a 'b 'c 'd) : way 'a 'b 'c 'd
+    requires { c l /\ c r /\ c base }
+    requires { l.prm = r.prm = base.prm = D.make_params p1 p2 /\ l.prm.inv d }
+    requires { let l0 = node_model l.m.lis (l.prm.mdl d) r.m.lis in
+      base.m.lis = l0 /\ selector_correct p1 p2 s base }
     (* A selected position can be found by following the given way. *)
-    returns { Here -> selected s.S.m { left = l.m.lis;
-        middle = Some d.P.Data.m;
-        right = r.m.lis }
-      | Left sl -> selector_correct sl.S.m l.m.lis /\ S.c sl /\
-        forall e. selected sl.S.m e ->
-        selected s.S.m { e with right = node_model e.right d.P.Data.m r.m.lis }
-      | Right sr -> selector_correct sr.S.m r.m.lis /\ S.c sr /\
-        forall e. selected sr.S.m e ->
-        selected s.S.m { e with left = node_model l.m.lis d.P.Data.m e.left } }
+    returns { Here -> let e2 = { left = l.m.lis;
+        middle = Some (l.prm.mdl d);
+        right = r.m.lis } in selected p1 p2 s e2 base /\
+          rebuild e2 = node_model l.m.lis (l.prm.mdl d) r.m.lis
+      | Left sl -> selector_correct p1 p2 sl l /\
+        forall e. selected p1 p2 sl e l /\ rebuild e = l.m.lis ->
+          let e2 = { e with right = node_model e.right (l.prm.mdl d) r.m.lis }
+          in selected p1 p2 s e2 base /\ rebuild e2 = base.m.lis
+      | Right sr -> selector_correct p1 p2 sr r /\
+        forall e. selected p1 p2 sr e r /\ rebuild e = r.m.lis ->
+          let e2 = { e with left = node_model l.m.lis (l.prm.mdl d) e.left } in
+          selected p1 p2 s e2 base /\ rebuild e2 = base.m.lis }
   
   use import ref.Ref
   
-  let ghost default_position () : position 'a 'b =
-    { left = Nil; middle = None; right = Nil }
+  (* Create a reference over a dummy position.
+     For use as argument for the functions taking such a reference. *)
+  let ghost default_position () : ref (position 'a) =
+    ref { left = Nil; middle = None; right = Nil }
   
-  let rec add (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
-    (d:P.Data.t 'a 'b) (t:t 'a 'b) : t 'a 'b
-    requires { selector_correct s.S.m t.m.lis }
-    requires { c t /\ S.c s /\ P.Data.c d /\ t.m.inv d.P.Data.m }
-    ensures { result.m.lis = node_model !r.left d.P.Data.m !r.right }
-    ensures { selected s.S.m !r /\ rebuild !r = t.m.lis }
-    ensures { c result /\ result.m.inv = t.m.inv }
+  (* Split the avl using the given selector into l ++ (maybe something) ++ r,
+     and rebuild it with d in the middle (potentially erasing whatever
+     was there before): build l ++ [d] ++ r.
+     The reference is assigned to the selected position. *)
+  let rec add (ghost p1:type_params 'a 'b) (ghost p2:type_params 'c 'd)
+    (ghost r:ref (position (D.m 'b 'd))) (s:selector 'a 'b 'c 'd)
+    (d:D.t 'a 'b 'c 'd) (t:s 'a 'b 'c 'd) : s 'a 'b 'c 'd
+    requires { selector_correct p1 p2 s t /\ c t /\ t.prm.inv d }
+    requires { t.prm = D.make_params p1 p2 }
+    ensures { result.m.lis = node_model !r.left (t.prm.mdl d) !r.right }
+    ensures { selected p1 p2 s !r t /\ rebuild !r = t.m.lis }
+    ensures { c result /\ result.prm = t.prm }
     writes { r }
     (* not intended for export. *)
     ensures { 1 >= result.m.hgt - t.m.hgt >= 0 }
     variant { t.m.hgt }
   = match view t with
-    | AEmpty -> r := { left = Nil; middle = None; right = Nil};
-      singleton t.m.inv d
-    | ANode tl td tr _ -> match selected_way s tl td tr with
-      | Left sl -> let nl = add r sl d tl in
-        r := { !r with right = node_model !r.right td.P.Data.m tr.m.lis };
+    | AEmpty -> r := { left = Nil; middle = None; right = Nil };
+      singleton t.prm d
+    | ANode tl td tr _ -> match selected_way p1 p2 s t tl td tr with
+      | Left sl -> let nl = add p1 p2 r sl d tl in
+        r := { !r with right = node_model !r.right (t.prm.mdl td) tr.m.lis };
         balance nl td tr
-      | Right sr -> let nr = add r sr d tr in
-        r := { !r with left = node_model tl.m.lis td.P.Data.m !r.left };
+      | Right sr -> let nr = add p1 p2 r sr d tr in
+        r := { !r with left = node_model tl.m.lis (t.prm.mdl td) !r.left };
         balance tl td nr
       | Here -> r := { left = tl.m.lis;
-          middle = Some td.P.Data.m;
+          middle = Some (t.prm.mdl td);
           right = tr.m.lis };
         node tl d tr
       end
     end
   
-  let rec remove (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
-    (t:t 'a 'b) : t 'a 'b
-    requires { selector_correct s.S.m t.m.lis }
-    requires { c t /\ S.c s }
+  (* Split the avl using the given selector into l ++ (maybe) ++ r,
+     and rebuild it without whatever was in the middle:
+     build l ++ r. *)
+  let rec remove (ghost p1:type_params 'a 'b) (ghost p2:type_params 'c 'd)
+    (ghost r:ref (position (D.m 'b 'd))) (s:selector 'a 'b 'c 'd)
+    (t:s 'a 'b 'c 'd) : s 'a 'b 'c 'd
+    requires { selector_correct p1 p2 s t /\ c t }
+    requires { t.prm = D.make_params p1 p2 }
     ensures { result.m.lis = !r.left ++ !r.right }
-    ensures { selected s.S.m !r /\ rebuild !r = t.m.lis }
-    ensures { c result /\ result.m.inv = t.m.inv }
+    ensures { selected p1 p2 s !r t /\ rebuild !r = t.m.lis }
+    ensures { c result /\ result.prm = t.prm }
     writes { r }
     (* not intended for export. *)
     ensures { 1 >= t.m.hgt - result.m.hgt >= 0 }
     variant { t.m.hgt }
   = match view t with
-    | AEmpty -> r := { left = Nil; middle = None; right = Nil};
-      t
-    | ANode tl td tr _ -> match selected_way s tl td tr with
-      | Left sl -> let nl = remove r sl tl in
-        r := { !r with right = node_model !r.right td.P.Data.m tr.m.lis };
+    | AEmpty -> r := { left = Nil; middle = None; right = Nil}; t
+    | ANode tl td tr _ -> match selected_way p1 p2 s t tl td tr with
+      | Left sl -> let nl = remove p1 p2 r sl tl in
+        r := { !r with right = node_model !r.right (t.prm.mdl td) tr.m.lis };
         balance nl td tr
-      | Right sr -> let nr = remove r sr tr in
-        r := { !r with left = node_model tl.m.lis td.P.Data.m !r.left };
+      | Right sr -> let nr = remove p1 p2 r sr tr in
+        r := { !r with left = node_model tl.m.lis (t.prm.mdl td) !r.left };
         balance tl td nr
       | Here -> r := { left = tl.m.lis;
-          middle = Some td.P.Data.m;
+          middle = Some (t.prm.mdl td);
           right = tr.m.lis };
         fuse tl tr
       end
     end
   
-  let rec split (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
-    (t:t 'a 'b) : (t 'a 'b,option (P.Data.t 'a 'b),t 'a 'b)
-    requires { selector_correct s.S.m t.m.lis }
-    requires { c t /\ S.c s }
-    ensures { selected s.S.m !r /\ rebuild !r = t.m.lis }
+  (* Split the avl according to the selector. *)
+  let rec split (ghost p1:type_params 'a 'b) (ghost p2:type_params 'c 'd)
+    (ghost r:ref (position (D.m 'b 'd))) (s:selector 'a 'b 'c 'd)
+    (t:s 'a 'b 'c 'd) : (s 'a 'b 'c 'd,option (D.t 'a 'b 'c 'd),s 'a 'b 'c 'd)
+    requires { selector_correct p1 p2 s t /\ c t }
+    requires { t.prm = D.make_params p1 p2 }
+    ensures { selected p1 p2 s !r t /\ rebuild !r = t.m.lis }
     returns { (lf,o,rg) -> lf.m.lis = !r.left /\ rg.m.lis = !r.right /\
       (match o with
        | None -> !r.middle = None
-       | Some d -> !r.middle = Some (d.P.Data.m) /\ P.Data.c d /\
-         t.m.inv d.P.Data.m
-       end) /\ c lf /\ c rg /\ lf.m.inv = t.m.inv = rg.m.inv }
+       | Some d -> !r.middle = Some (t.prm.mdl d) /\ t.prm.inv d
+       end) /\ c lf /\ c rg /\ lf.prm = t.prm = rg.prm }
     writes { r }
     variant { t.m.hgt }
   = match view t with
     | AEmpty -> r := { left = Nil; middle = None; right = Nil };
       (t,None,t)
-    | ANode tl td tr _ -> match selected_way s tl td tr with
-      | Left sl -> let (tll,tlo,tlr) = split r sl tl in
-        r := { !r with right = node_model !r.right td.P.Data.m tr.m.lis };
+    | ANode tl td tr _ -> match selected_way p1 p2 s t tl td tr with
+      | Left sl -> let (tll,tlo,tlr) = split p1 p2 r sl tl in
+        r := { !r with right = node_model !r.right (t.prm.mdl td) tr.m.lis };
         (tll,tlo,join tlr td tr)
-      | Right sr -> let (trl,tro,trr) = split r sr tr in
-        r := { !r with left = node_model tl.m.lis td.P.Data.m !r.left };
+      | Right sr -> let (trl,tro,trr) = split p1 p2 r sr tr in
+        r := { !r with left = node_model tl.m.lis (t.prm.mdl td) !r.left };
         (join tl td trl,tro,trr)
       | Here -> r := { left = tl.m.lis;
-          middle = Some td.P.Data.m;
+          middle = Some (t.prm.mdl td);
           right = tr.m.lis };
         (tl,Some td,tr)
       end
     end
   
-  let rec get (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
-    (t:t 'a 'b) : option (P.Data.t 'a 'b)
-    requires { selector_correct s.S.m t.m.lis }
-    requires { c t /\ S.c s }
-    ensures { selected s.S.m !r /\ rebuild !r = t.m.lis }
+  (* Return the middle value obtained by splitting the avl with respect
+     to the selector. *)
+  let rec get (ghost p1:type_params 'a 'b) (ghost p2:type_params 'c 'd)
+    (ghost r:ref (position (D.m 'b 'd))) (s:selector 'a 'b 'c 'd)
+    (t:s 'a 'b 'c 'd) : option (D.t 'a 'b 'c 'd)
+    requires { selector_correct p1 p2 s t /\ c t }
+    requires { t.prm = D.make_params p1 p2 }
+    ensures { selected p1 p2 s !r t /\ rebuild !r = t.m.lis }
     returns { None -> !r.middle = None
-       | Some d -> !r.middle = Some (d.P.Data.m) /\ P.Data.c d /\
-         t.m.inv d.P.Data.m }
+       | Some d -> !r.middle = Some (t.prm.mdl d) /\ t.prm.inv d }
     writes { r }
     variant { t.m.hgt }
   = match view t with
     | AEmpty -> r := { left = Nil; middle = None; right = Nil };
       None
-    | ANode tl td tr _ -> match selected_way s tl td tr with
-      | Left sl -> let res = get r sl tl in
-        r := { !r with right = node_model !r.right td.P.Data.m tr.m.lis };
+    | ANode tl td tr _ -> match selected_way p1 p2 s t tl td tr with
+      | Left sl -> let res = get p1 p2 r sl tl in
+        r := { !r with right = node_model !r.right (t.prm.mdl td) tr.m.lis };
         res
-      | Right sr -> let res = get r sr tr in
-        r := { !r with left = node_model tl.m.lis td.P.Data.m !r.left };
+      | Right sr -> let res = get p1 p2 r sr tr in
+        r := { !r with left = node_model tl.m.lis (t.prm.mdl td) !r.left };
         res
       | Here -> r := { left = tl.m.lis;
-          middle = Some td.P.Data.m;
+          middle = Some (t.prm.mdl td);
           right = tr.m.lis };
         Some td
       end
     end
   
-  let rec mem (ghost r:ref (position 'a 'b)) (s:S.t 'a 'b)
-    (t:t 'a 'b) : bool
-    requires { selector_correct s.S.m t.m.lis }
-    requires { c t /\ S.c s }
-    ensures { selected s.S.m !r /\ rebuild !r = t.m.lis }
+  (*
+  (* Check whether there is a middle value when splitting the avl
+     with respect to the selector. *)
+  let rec mem (ghost r:ref (position (D.m 'b 'd))) (s:selector 'a 'b 'c 'd)
+    (t:s 'a 'b 'c 'd) : bool
+    requires { selector_correct s t /\ c t }
+    ensures { selected s !r t /\ rebuild !r = t.m.lis }
     ensures { result <-> match !r.middle with None -> false | _ -> true end }
     writes { r }
     variant { t.m.hgt }
   = match view t with
     | AEmpty -> r := { left = Nil; middle = None; right = Nil };
       false
-    | ANode tl td tr _ -> match selected_way s tl td tr with
+    | ANode tl td tr _ -> match selected_way s t tl td tr with
       | Left sl -> let res = mem r sl tl in
-        r := { !r with right = node_model !r.right td.P.Data.m tr.m.lis };
+        r := { !r with right = node_model !r.right (t.prm.mdl td) tr.m.lis };
         res
       | Right sr -> let res = mem r sr tr in
-        r := { !r with left = node_model tl.m.lis td.P.Data.m !r.left };
+        r := { !r with left = node_model tl.m.lis (t.prm.mdl td) !r.left };
         res
       | Here -> r := { left = tl.m.lis;
-          middle = Some td.P.Data.m;
+          middle = Some (t.prm.mdl td);
           right = tr.m.lis };
         true
       end
-    end
+    end*)
   
 end
-
-(*
-module AVLSelection
-  
-  use import int.Int
-  use import bool.Bool
-  use import list.Append
-  use import option.Option
-  use import HighOrd
-  
-  clone import AVL as A
-  
-  (* Position in a list l: cut l either as
-     left ++ right or left ++ [middle] ++ right.
-     Note: position computation corresponds exactly to avl splitting. *)
-  type position 'a 'b = {
-    left : list_model 'a 'b;
-    middle : option (data_model 'a 'b);
-    right : list_model 'a 'b;
-  }
-  
-  
-  (* Data used to perform the selection. *)
-  type selector 'a 'b
-  
-  (* Correctness of the selector with respect to a list. *)
-  predicate selector_correct (s:selector 'a 'b) (l:list_model 'a 'b)
-  
-  (* A selector selects a position in a list. *)
-  predicate selected (s:selector 'a 'b) (e:position 'a 'b)
-    (l:list_model 'a 'b)
-  
-  (* Way to the position. *)
-  type way 'a 'b= Left (selector 'a 'b)
-    | Right (selector 'a 'b)
-    | Here
-  
-  (* Any selected position in a list is a correct
-     emplacement for this list. *)
-  axiom selected_append : forall s,e,l:list_model 'a 'b.
-    selected s e l /\ selector_correct s l -> match e.middle with
-      | Some d -> l = node_model e.left d e.right
-      | None -> l = e.left ++ e.right
-    end
-  (* A correct selector always select the only possible position
-     in the empty list. *)
-  axiom selector_correct_empty : forall s:selector 'a 'b.
-    selector_correct s Nil ->
-      selected s { left = Nil ; middle = None ; right = Nil } Nil
-  
-  (* Program version of way selection. *)
-  val selected_way (s:selector 'a 'b)
-    (l:avl 'a 'b) (d:data 'a 'b) (r:avl 'a 'b) : way 'a 'b
-    requires { l.data_inv = r.data_inv }
-    requires { data_correct d /\ l.data_inv (data_model d) }
-    requires { avl_correct l /\ avl_correct r }
-    requires { selector_correct s (node_model l.model (data_model d) r.model) }
-    (* A selected position can be found by following the given way. *)
-    returns { Here -> selected s { left = l.model;
-        middle = Some (data_model d);
-        right = r.model }
-        (node_model l.model (data_model d) r.model)
-      | Left sl -> selector_correct sl l.model /\
-        forall e. selected sl e l.model ->
-        selected s { e with right = node_model e.right (data_model d) r.model }
-          (node_model l.model (data_model d) r.model)
-      | Right sr -> selector_correct sr r.model /\
-        forall e. selected sr e r.model ->
-        selected s { e with left = node_model l.model (data_model d) e.left }
-          (node_model l.model (data_model d) r.model) }
-  
-  use import ref.Ref
-  
-  (* create a dummy position. *)
-  let ghost default_position () : position 'a 'b =
-    { left = Nil; middle = None; right = Nil }
-  
-  (* Selection-based destructive addition.
-     Note: both addition and removal could be implemented
-     by first splitting along the desired position,
-     then rebuilding the avl completely, but that would be
-     computationally more expensive. *)
-  let rec add (ghost r:ref (position 'a 'b)) (s:selector 'a 'b)
-    (d:data 'a 'b) (a:avl 'a 'b) : avl 'a 'b
-    requires { selector_correct s a.model }
-    requires { avl_correct a }
-    requires { data_correct d /\ a.data_inv (data_model d) }
-    ensures { result.model = node_model !r.left (data_model d) !r.right }
-    ensures { selected s !r a.model }
-    ensures { 1 >= avl_height result - avl_height a >= 0 }
-    ensures { avl_correct result }
-    ensures { result.data_inv = a.data_inv }
-    variant { avl_height a }
-    writes { r }
-  =
-    match view a with
-    | AEmpty -> r := { left = Nil; middle = None; right = Nil};
-      singleton a.data_inv d
-    | ANode al ad ar _ -> match selected_way s al ad ar with
-      | Left sl -> let nl = add r sl d al in
-        r := { !r with right =
-          node_model !r.right (data_model ad) ar.model };
-        balance nl ad ar
-      | Right sr -> let nr = add r sr d ar in
-        r := { !r with left =
-          node_model al.model (data_model ad) !r.left };
-        balance al ad nr
-      | Here -> r := { left = al.model;
-          middle = Some (data_model ad);
-          right = ar.model };
-        node al d ar
-      end
-    end
-  
-  (* Selection-based removal. *)
-  let rec remove (ghost r:ref (position 'a 'b)) (s:selector 'a 'b)
-    (a:avl 'a 'b) : avl 'a 'b
-    requires { selector_correct s a.model }
-    requires { avl_correct a }
-    ensures { result.model = !r.left ++ !r.right }
-    ensures { selected s !r a.model }
-    ensures { 1 >= avl_height a - avl_height result >= 0 }
-    ensures { avl_correct result }
-    ensures { result.data_inv = a.data_inv }
-    variant { avl_height a }
-    writes { r }
-  =
-    match view a with
-    | AEmpty -> r := { left = Nil; middle = None; right = Nil}; a
-    | ANode al ad ar _ -> match selected_way s al ad ar with
-      | Left sl -> let nl = remove r sl al in
-        r := { !r with right =
-          node_model !r.right (data_model ad) ar.model };
-        balance nl ad ar
-      | Right sr -> let nr = remove r sr ar in
-        r := { !r with left =
-          node_model al.model (data_model ad) !r.left };
-        balance al ad nr
-      | Here -> r := { left = al.model;
-          middle = Some (data_model ad);
-          right = ar.model };
-        fuse al ar
-      end
-    end
-  
-  (* Splitting. *)
-  let rec split (ghost p:ref (position 'a 'b)) (s:selector 'a 'b)
-    (a:avl 'a 'b) : (avl 'a 'b,option (data 'a 'b),avl 'a 'b)
-    requires { avl_correct a }
-    requires { selector_correct s a.model }
-    returns { (l,o,r) ->
-      !p.left = l.model /\ !p.right = r.model /\
-      !p.middle = match o with None -> None | Some d -> Some (data_model d) end
-      /\ selected s !p a.model /\
-      avl_correct l /\ avl_correct r /\ match o with
-        | None -> true | Some d -> data_correct d /\ a.data_inv (data_model d)
-      end /\ l.data_inv = a.data_inv /\ r.data_inv = a.data_inv }
-    variant { avl_height a }
-    writes { p }
-  =
-    match view a with
-    | AEmpty -> p := { left = Nil; middle = None; right = Nil };
-      (a,None,a)
-    | ANode al ad ar _ -> match selected_way s al ad ar with
-      | Left sl -> let (all,ald,alr) = split p sl al in
-        p := { !p with right =
-          node_model !p.right (data_model ad) ar.model };
-        (all,ald,join alr ad ar)
-      | Right sr -> let (arl,ard,arr) = split p sr ar in
-        p := { !p with left = node_model al.model (data_model ad) !p.left };
-        (join al ad arl,ard,arr)
-      | Here -> p := { left = al.model;
-        middle = Some (data_model ad);
-        right = ar.model };
-        (al,Some ad,ar)
-      end
-    end
-  
-  (* Less powerful variants of split, but more efficient
-     (less/none tree rebuilding). *)
-  
-  (* Get the selected element (if there is one). *)
-  let rec get (ghost p:ref (position 'a 'b)) (s:selector 'a 'b)
-    (a:avl 'a 'b) : option (data 'a 'b)
-    requires { avl_correct a }
-    requires { selector_correct s a.model }
-    ensures { !p.middle = match result with
-        | None -> None | Some d -> Some (data_model d)
-      end /\ selected s !p a.model /\ match result with
-        | None -> true | Some d -> data_correct d /\ a.data_inv (data_model d)
-      end }
-    variant { avl_height a }
-    writes { p }
-  =
-    match view a with
-    | AEmpty -> p := { left = Nil; middle = None; right = Nil }; None
-    | ANode al ad ar _ -> match selected_way s al ad ar with
-      | Left sl -> let res = get p sl al in
-        p := { !p with right =
-          node_model !p.right (data_model ad) ar.model }; res
-      | Right sr -> let res = get p sr ar in
-        p := { !p with left = node_model al.model (data_model ad) !p.left };
-        res
-      | Here -> p := { left = al.model;
-        middle = Some (data_model ad);
-        right = ar.model }; Some ad
-      end
-    end
-  
-  let rec mem (ghost p:ref (position 'a 'b)) (s:selector 'a 'b)
-    (a:avl 'a 'b) : bool
-    requires { avl_correct a }
-    requires { selector_correct s a.model }
-    ensures { (result <-> !p.middle <> None) /\
-      selected s !p a.model }
-    variant { avl_height a }
-    writes { p }
-  =
-    match view a with
-    | AEmpty -> p := { left = Nil; middle = None; right = Nil }; false
-    | ANode al ad ar _ -> match selected_way s al ad ar with
-      | Left sl -> let res = mem p sl al in
-        p := { !p with right =
-          node_model !p.right (data_model ad) ar.model }; res
-      | Right sr -> let res = mem p sr ar in
-        p := { !p with left = node_model al.model (data_model ad) !p.left };
-        res
-      | Here -> p := { left = al.model;
-        middle = Some (data_model ad);
-        right = ar.model }; true
-      end
-    end
-  
-end
-
-(* Instantiation to sorted (increasing) avl.
-   Those implement ordered associative tables. *)
-module AVLSorted
-  
-  use import int.Int
-  use import option.Option
-  use import bool.Bool
-  use import HighOrd
-  use import list.Append
-  use import list.Mem
-  use import list.Length
-  
-  clone import AVL as A
-  
-  (* Key used for ordering. *)
-  type key 'a
-  type key_model 'a
-  (* Key well-formedness. *)
-  predicate key_correct (key 'a)
-  (* Get key model. *)
-  function key_model (key 'a) : key_model 'a
-  (* Key from data in pure and impure (program) worlds. *)
-  function get_key_m (d:data_model 'a 'b) : key_model 'a
-  val get_key (d:data 'a 'b) : key 'a
-    requires { data_correct d }
-    ensures { key_correct result }
-    ensures { key_model result = get_key_m (data_model d) }
-  (* Parameter for ordering. *)
-  type order 'a
-  clone association_list.AssocSorted as AS with
-    type A.KT.key = key_model,
-    type A.KT.t = data_model,
-    type A.param = order
-  
-  
-  (*
-  
-  (* Comparison is computable. *)
-  val compare (o:order 'a) (k1 k2:key 'a) : int
-    requires { correct_for_order o (key_model k1) /\ key_correct k1 }
-    requires { correct_for_order o (key_model k2) /\ key_correct k2 }
-    ensures { result > 0 <-> lt o (key_model k2) (key_model k1) }
-    ensures { result < 0 <-> lt o (key_model k1) (key_model k2) }
-    ensures { result = 0 <-> eq o (key_model k1) (key_model k2) }
-  
-  predicate majorate (o:order 'a) (k:key_model 'a) (l:list_model 'a 'b) =
-    forall d0. mem d0 l -> let k0 = get_key_m d0 in
-      correct_for_order o k0 /\ lt o k0 k
-  
-  predicate minorate (o:order 'a) (k:key_model 'a) (l:list_model 'a 'b) =
-    forall d0. mem d0 l -> let k0 = get_key_m d0 in
-      correct_for_order o k0 /\ lt o k k0
-  
-  predicate sorted (o:order 'a) (l:list_model 'a 'b) = match l with
-      | Nil -> true
-      | Cons d q -> let k = get_key_m d in
-        correct_for_order o k /\ minorate o k q /\ sorted o q
-    end
-    
-  (* Sorted with a midpoint. *)
-  let rec lemma sorted_def_midpoint (o:order 'a) (l:list_model 'a 'b)
-    (d:data_model 'a 'b) (r:list_model 'a 'b) : unit
-    requires { correct_for_order o (get_key_m d) }
-    ensures { sorted o (node_model l d r) <->
-      (minorate o (get_key_m d) r /\
-        majorate o (get_key_m d) l /\
-        sorted o l /\
-        sorted o r) }
-    variant { l }
-  =
-    match l with
-      | Nil -> ()
-      | Cons _ ql -> sorted_def_midpoint o ql d r
-    end
-  
-  predicate before (o:order 'a) (l:list_model 'a 'b) (r:list_model 'a 'b) =
-    forall d1 d2. mem d1 l /\ mem d2 r ->
-      let k1 = get_key_m d1 in let k2 = get_key_m d2 in
-      correct_for_order o k1 /\ correct_for_order o k2 /\ lt o k1 k2
-  
-  (* Other variant: condition for a concatenation to be sorted. *)
-  let rec lemma sorted_def_concat (o:order 'a) (l:list_model 'a 'b)
-    (r:list_model 'a 'b) : unit
-    ensures { sorted o (l ++ r) <->
-      (sorted o l /\ sorted o r /\ before o l r) }
-    variant { l }
-  =
-    match l with
-      | Nil -> ()
-      | Cons _ ql -> sorted_def_concat o ql r
-    end
-  
-  type position 'a 'b = {
-    left : list_model 'a 'b;
-    middle : option (data_model 'a 'b);
-    right : list_model 'a 'b;
-  }
-  
-  (* Selection will be done by ordered key. *)
-  type selector 'a 'b = (order 'a,key 'a)
-  
-  (* Correctness is sortedness. *)
-  predicate selector_correct (s:selector 'a 'b) (l:list_model 'a 'b) =
-    let (o,k) = s in sorted o l /\ correct_for_order o (key_model k) /\
-      key_correct k
-    
-  (* Selected position is:
-     - The position of the element equivalent to the key for the
-       corresponding order.
-     - The position where it should be if it does not exists. *)
-  predicate selected (s:selector 'a 'b) (e:position 'a 'b)
-    (l:list_model 'a 'b) = let (o,k) = s in
-      sorted o e.left /\ sorted o e.right /\
-      minorate o (key_model k) e.right /\ majorate o (key_model k) e.left /\
-      match e.middle with
-        | None -> l = e.left ++ e.right
-        | Some d -> l = node_model e.left d e.right /\
-          eq o (get_key_m d) (key_model k) /\
-          correct_for_order o (get_key_m d)
-      end
-  
-  (* Way to the position. *)
-  type way 'a 'b= Left (selector 'a 'b)
-    | Right (selector 'a 'b)
-    | Here
-  
-  (* Way selection. *)
-  let selected_way (s:selector 'a 'b)
-    (l:avl 'a 'b) (d:data 'a 'b) (r:avl 'a 'b) : way 'a 'b
-    requires { l.data_inv = r.data_inv }
-    requires { data_correct d /\ l.data_inv (data_model d) }
-    requires { avl_correct l /\ avl_correct r }
-    requires { selector_correct s (node_model l.model (data_model d) r.model) }
-    returns { Here -> selected s { left = l.model;
-        middle = Some (data_model d);
-        right = r.model }
-        (node_model l.model (data_model d) r.model)
-      | Left sl -> selector_correct sl l.model /\
-        forall e. selected sl e l.model ->
-        selected s { e with right = node_model e.right (data_model d) r.model }
-          (node_model l.model (data_model d) r.model)
-      | Right sr -> selector_correct sr r.model /\
-        forall e. selected sr e r.model ->
-        selected s { e with left = node_model l.model (data_model d) e.left }
-          (node_model l.model (data_model d) r.model) }
-  =
-    let (o,k) = s in
-    let kd = get_key d in
-    let cmp = compare o k kd in
-    if cmp < 0
-    then Left s
-    else if cmp > 0
-    then Right s
-    else Here
-  
-  (* In an ideal world....
-     1) It would be nice to have the two cloned AVL modules unified
-        (they are intended to be the same), as well as the two (identical)
-        definitions of type way.
-     2) Routines (program code) could be used as argument. *)
-  (* clone import AVLSelection as F with
-       A = A,
-       type selector 'a 'b = selector 'a 'b,
-       predicate selector_correct = selector_correct,
-       predicate selected = selected,
-       type way 'a 'b = way 'a 'b,
-       lemma selected_append,
-       lemma selector_correct_empty,
-       val selected_way = selected_way*)
-  
-  (* And we would get this (or something close).
-     Right now, this is done by hand. *)
-  
-  namespace import F
-    use import ref.Ref
-    
-    lemma selected_append : forall s,e,l:list_model 'a 'b.
-      selected s e l /\ selector_correct s l -> match e.middle with
-        | Some d -> l = node_model e.left d e.right
-        | None -> l = e.left ++ e.right
-      end
-    
-    lemma selector_correct_empty : forall s:selector 'a 'b.
-      selector_correct s (Nil:list_model 'a 'b) ->
-        selected s { left = Nil ; middle = None ; right = Nil }
-          (Nil:list_model 'a 'b)
-    
-    val ghost default_position () : position 'a 'b
-  
-    val add (ghost r:ref (position 'a 'b)) (s:selector 'a 'b)
-      (d:data 'a 'b) (a:avl 'a 'b) : avl 'a 'b
-      requires { selector_correct s a.model }
-      requires { avl_correct a }
-      requires { data_correct d /\ a.data_inv (data_model d) }
-      ensures { result.model = node_model !r.left (data_model d) !r.right }
-      ensures { selected s !r a.model }
-      ensures { 1 >= avl_height result - avl_height a >= 0 }
-      ensures { avl_correct result }
-      ensures { result.data_inv = a.data_inv }
-      writes { r }
-  
-    val remove (ghost r:ref (position 'a 'b)) (s:selector 'a 'b)
-      (a:avl 'a 'b) : avl 'a 'b
-      requires { selector_correct s a.model }
-      requires { avl_correct a }
-      ensures { result.model = !r.left ++ !r.right }
-      ensures { selected s !r a.model }
-      ensures { 1 >= avl_height a - avl_height result >= 0 }
-      ensures { avl_correct result }
-      ensures { result.data_inv = a.data_inv }
-      writes { r }
-  
-    val split (ghost p:ref (position 'a 'b)) (s:selector 'a 'b)
-      (a:avl 'a 'b) : (avl 'a 'b,option (data 'a 'b),avl 'a 'b)
-      requires { avl_correct a }
-      requires { selector_correct s a.model }
-      returns { (l,o,r) ->
-        !p.left = l.model /\ !p.right = r.model /\
-        !p.middle = match o with None -> None | Some d -> Some (data_model d) end
-        /\ selected s !p a.model /\
-        avl_correct l /\ avl_correct r /\ match o with
-          | None -> true | Some d -> data_correct d /\ a.data_inv (data_model d)
-        end /\ l.data_inv = a.data_inv /\ r.data_inv = a.data_inv }
-      writes { p }
-    
-    val get (ghost p:ref (position 'a 'b)) (s:selector 'a 'b)
-      (a:avl 'a 'b) : option (data 'a 'b)
-      requires { avl_correct a }
-      requires { selector_correct s a.model }
-      ensures { !p.middle = match result with
-          | None -> None | Some d -> Some (data_model d)
-        end /\ selected s !p a.model /\ match result with
-          | None -> true | Some d -> data_correct d /\ a.data_inv (data_model d)
-        end }
-      writes { p }
-  
-    val mem (ghost p:ref (position 'a 'b)) (s:selector 'a 'b)
-      (a:avl 'a 'b) : bool
-      requires { avl_correct a }
-      requires { selector_correct s a.model }
-      ensures { (result <-> !p.middle <> None) /\
-        selected s !p a.model }
-      writes { p }
-  end
-  
-  (* Functional model. *)
-  type fun_model 'a 'b = key_model 'a -> option (data_model 'a 'b)
-  
-  function functional_model (o:order 'a)
-    (l:list_model 'a 'b) : fun_model 'a 'b =
-    match l with
-      | Nil -> \y.None
-      | Cons x q -> let f0 = functional_model o q in
-        \y. if correct_for_order o y &&
-          eq o y (get_key_m x) then Some x else f0 y
-    end
-  
-  type map 'a 'b = {
-    avl_repr : avl 'a 'b;
-    order : order 'a;
-    ghost fmodel : fun_model 'a 'b;
-  }
-  
-  function map_data_inv (m:map 'a 'b) : data_model 'a 'b -> bool =
-    m.avl_repr.data_inv
-  
-  predicate map_correct (m:map 'a 'b) =
-    avl_correct m.avl_repr /\
-    sorted m.order m.avl_repr.model /\
-    m.fmodel = functional_model m.order m.avl_repr.model /\
-    (forall d. m.map_data_inv d -> correct_for_order m.order (get_key_m d))
-  
-  (* A key that is either minorated/majorated in some list is not
-     represented in its functional model. *)
-  let rec lemma fun_model_minorate (o:order 'a) (k:key_model 'a)
-    (l:list_model 'a 'b) : unit
-    requires { sorted o l }
-    requires { minorate o k l }
-    requires { correct_for_order o k }
-    ensures { functional_model o l k = None }
-    variant { l }
-  = match l with Nil -> () | Cons _ ql -> fun_model_minorate o k ql end
-  
-  let rec lemma fun_model_majorate (o:order 'a) (k:key_model 'a)
-    (l:list_model 'a 'b) (r:list_model 'a 'b) : unit
-    requires { sorted o l }
-    requires { majorate o k l }
-    requires { correct_for_order o k }
-    ensures { functional_model o (l++r) k = functional_model o r k }
-    variant { l }
-  = match l with Nil -> () | Cons _ ql -> fun_model_majorate o k ql r end
-  
-  let rec lemma fun_model_selected (o:order 'a) (k:key 'a)
-    (p:position 'a 'b) (l:list_model 'a 'b) (ks:key_model 'a) : unit
-    requires { selected (o,k) p l }
-    requires { key_correct k }
-    requires { correct_for_order o (key_model k) }
-    requires { correct_for_order o ks }
-    ensures { eq o (key_model k) ks ->
-      functional_model o l ks = p.middle }
-    ensures { lt o (key_model k) ks ->
-      functional_model o l ks = functional_model o p.right ks }
-    ensures { le o ks (key_model k) ->
-      functional_model o p.right ks = None }
-    ensures { lt o ks (key_model k) ->
-      functional_model o l ks = functional_model o p.left ks }
-    ensures { le o (key_model k) ks ->
-      functional_model o p.left ks = None }
-    variant { p.left }
-  =
-    assert { l = p.left ++ (match p.middle with
-      | None -> Nil | Some d -> Cons d Nil end)
-      ++ p.right };
-    assert { match p.middle with None -> true | Some d ->
-      eq o (get_key_m d) (key_model k) /\
-      correct_for_order o (get_key_m d) end };
-    match p.left , l with
-      | Nil , Nil -> ()
-      | Nil , Cons _ _ -> let km = key_model k in
-        assert { eq o km ks -> not functional_model o l ks = p.middle ->
-          match p.middle with
-            | None -> minorate o ks p.right && false | Some d ->
-              let dk = get_key_m d in
-              eq o dk km &&
-              eq o ks dk && false end }
-      | _ , Nil -> absurd
-      | Cons xpl qpl , Cons _ ql ->
-        assert { let kpl = get_key_m xpl in
-          le o (key_model k) ks -> mem xpl p.left && lt o kpl (key_model k)
-          && not eq o kpl ks };
-        fun_model_selected o k { p with left = qpl } ql ks
-    end
-  
-  let rec lemma fun_model_concat (o:order 'a) (k:key_model 'a)
-    (l:list_model 'a 'b) (r:list_model 'a 'b) : unit
-    requires { sorted o l }
-    requires { sorted o r }
-    requires { before o l r }
-    requires { correct_for_order o k }
-    ensures { functional_model o (l++r) k = None <->
-      functional_model o l k = None /\ functional_model o r k = None }
-    ensures { forall d. functional_model o l k = Some d ->
-      functional_model o (l++r) k = Some d }
-    ensures { forall d. functional_model o r k = Some d ->
-      functional_model o (l++r) k = Some d }
-    variant { l }
-  = match l with Nil -> () | Cons _ ql -> fun_model_concat o k ql r end
-    
-  
-  (*
-  (* Functional model of a concatenation. *)
-  let rec lemma fun_model_concat (o:order 'a) (k:key_model 'a)
-    (l:list_model 'a 'b) (r:list_model 'a 'b) : unit
-    requires { sorted o l }
-    requires { sorted o r }
-    requires { minorate o k r }
-    requires { correct_for_order o k }
-    ensures { functional_model o (l++r) k = functional_model o l k }
-    variant { l }
-  = match l with Nil -> () | Cons _ ql -> fun_model_concat o k ql r end
-  
-  (* Node selection. *)
-  let rec lemma fun_model_node (o:order 'a) (k:key_model 'a)
-    (l:list_model 'a 'b) (d:data_model 'a 'b) (r:list_model 'a 'b) : unit
-    requires { sorted o (node_model l d r) }
-    requires { eq o k (get_key_m d) }
-    requires { correct_for_order o k }
-    ensures { functional_model o (node_model l d r) k = Some d }
-    variant { l }
-  = match l with Nil -> () | Cons _ ql -> fun_model_node o k ql d r end*)
-  
-  let rec lemma fun_model_incorrect (o:order 'a) (k:key_model 'a)
-    (l:list_model 'a 'b) : unit
-    requires { not(correct_for_order o k) }
-    ensures { functional_model o l k = None }
-    variant { l }
-  = match l with Nil -> () | Cons _ ql -> fun_model_incorrect o k ql end
-  
-  let rec lemma fun_model_nonnone (o:order 'a) (d:data_model 'a 'b)
-    (l:list_model 'a 'b) : unit
-    requires { sorted o l }
-    requires { mem d l }
-    ensures { functional_model o l (get_key_m d) <> None }
-    variant { l }
-  = match l with Nil -> () | Cons xl ql ->
-      if d <> xl
-      then fun_model_nonnone o d ql
-      else ()
-    end
-  
-  use import ref.Ref
-  
-  let map_empty (o:order 'a) (inv:data_model 'a 'b -> bool) : map 'a 'b
-    requires { forall d. inv d -> correct_for_order o (get_key_m d) }
-    ensures { result.order = o }
-    ensures { result.map_data_inv = inv }
-    ensures { forall k. result.fmodel k = None }
-    ensures { map_correct result }
-  =
-    let rp = empty inv in
-    { avl_repr = rp;
-      order = o;
-      fmodel = functional_model o rp.model }
-  
-  let map_singleton (o:order 'a) (inv:data_model 'a 'b -> bool)
-    (d:data 'a 'b) : map 'a 'b
-    requires { forall d. inv d -> correct_for_order o (get_key_m d) }
-    requires { data_correct d }
-    requires { inv (data_model d) }
-    ensures { result.order = o }
-    ensures { forall k. correct_for_order o k /\
-      eq o k (get_key_m (data_model d)) ->
-      result.fmodel k = Some (data_model d) }
-    ensures { forall k. not correct_for_order o k ->
-      result.fmodel k = None }
-    ensures { forall k. not eq o k (get_key_m (data_model d)) ->
-      result.fmodel k = None }
-    ensures { result.map_data_inv = inv }
-    ensures { map_correct result }
-  =
-    let rp = singleton inv d in
-    { avl_repr = rp;
-      order = o;
-      fmodel = functional_model o rp.model }
-  
-  let map_add (d:data 'a 'b) (m:map 'a 'b) : map 'a 'b
-    requires { m.map_data_inv (data_model d) /\ data_correct d }
-    requires { map_correct m }
-    ensures { forall k. not eq m.order k (get_key_m (data_model d)) ->
-      result.fmodel k = m.fmodel k }
-    ensures { forall k. not correct_for_order m.order k ->
-      result.fmodel k = m.fmodel k }
-    ensures { forall k. correct_for_order m.order k /\
-      eq m.order k (get_key_m (data_model d)) ->
-        result.fmodel k = Some (data_model d) }
-    ensures { result.order = m.order /\ result.map_data_inv = m.map_data_inv }
-    ensures { map_correct result }
-  =
-    let ghost r = ref (default_position ()) in
-    let k = get_key d in
-    let o = m.order in
-    let res0 = add r (o,k) d m.avl_repr in
-    let res = { avl_repr = res0;
-      order = m.order;
-      fmodel = functional_model o res0.model } in
-    assert { selected (o,k)
-      { !r with middle = Some (data_model d) } res0.model };
-    res
-  
-  let map_mem (k:key 'a) (m:map 'a 'b) : bool
-    requires { key_correct k /\ correct_for_order m.order (key_model k) }
-    requires { map_correct m }
-    ensures { forall k2. correct_for_order m.order k2 /\
-      eq m.order k2 (key_model k) -> (m.fmodel k2 <> None <-> result) }
-  =
-    let ghost r = ref (default_position ()) in
-    let o = m.order in
-    mem r (o,k) m.avl_repr
-  
-  let map_remove (k:key 'a) (m:map 'a 'b) : map 'a 'b
-    requires { key_correct k /\ correct_for_order m.order (key_model k) }
-    requires { map_correct m }
-    ensures { forall k2. not eq m.order k2 (key_model k) ->
-      result.fmodel k2 = m.fmodel k2 }
-    ensures { forall k2. not correct_for_order m.order k2 ->
-      result.fmodel k2 = m.fmodel k2 }
-    ensures { forall k2. correct_for_order m.order k2 /\
-      eq m.order k2 (key_model k) -> result.fmodel k2 = None }
-    ensures { result.order = m.order /\ result.map_data_inv = m.map_data_inv }
-    ensures { map_correct result }
-  =
-    let ghost r = ref (default_position ()) in
-    let o = m.order in
-    let res0 = remove r (o,k) m.avl_repr in
-    let res = { avl_repr = res0;
-      order = m.order;
-      fmodel = functional_model o res0.model } in
-    assert { selected (o,k) { !r with middle = None } res0.model };
-    res
-  
-  
-  let map_find (k:key 'a) (m:map 'a 'b) : option (data 'a 'b)
-    requires { key_correct k /\ correct_for_order m.order (key_model k) }
-    requires { map_correct m }
-    ensures { forall k2. correct_for_order m.order k2 /\
-      eq m.order k2 (key_model k) -> m.fmodel k2 = match result with
-        | None -> None | Some d -> Some (data_model d) end }
-    returns { None -> true
-      | Some d -> data_correct d /\ m.map_data_inv (data_model d) }
-  =
-    let ghost r = ref (default_position ()) in
-    let o = m.order in
-    get r (o,k) m.avl_repr
-  
-  let map_split (k:key 'a)
-    (m:map 'a 'b) : (map 'a 'b,option (data 'a 'b),map 'a 'b)
-    requires { key_correct k /\ correct_for_order m.order (key_model k) }
-    requires { map_correct m }
-    returns { (l,o,r) -> map_correct l /\ map_correct r /\
-      l.order = m.order /\ r.order = m.order /\
-      l.map_data_inv = m.map_data_inv /\ r.map_data_inv = m.map_data_inv /\
-      (forall k2. not correct_for_order m.order k2 ->
-        l.fmodel k2 = None = r.fmodel k2) /\
-      (forall k2. correct_for_order m.order k2 /\ le m.order k2 (key_model k) ->
-        r.fmodel k2 = None) /\
-      (forall k2. correct_for_order m.order k2 /\ le m.order (key_model k) k2 ->
-        l.fmodel k2 = None) /\
-      (forall k2. correct_for_order m.order k2 /\ lt m.order k2 (key_model k) ->
-        l.fmodel k2 = m.fmodel k2) /\
-      (forall k2. correct_for_order m.order k2 /\ lt m.order (key_model k) k2 ->
-        r.fmodel k2 = m.fmodel k2) /\
-      (forall k2. correct_for_order m.order k2 /\ eq m.order (key_model k) k2 ->
-        m.fmodel k2 = match o with
-          | None -> None
-          | Some d -> Some (data_model d)
-        end) /\ match o with
-          | None -> true
-          | Some d -> data_correct d /\ m.map_data_inv (data_model d)
-        end }
-  =
-    let ghost r = ref (default_position ()) in
-    let o = m.order in
-    let (l0,o0,r0) = split r (o,k) m.avl_repr in
-    let l = { avl_repr = l0;
-      order = m.order;
-      fmodel = functional_model o l0.model } in
-    let r = { avl_repr = r0;
-      order = m.order;
-      fmodel = functional_model o r0.model } in
-    (l,o0,r)
-  
-  let map_concat (m1 m2:map 'a 'b) : map 'a 'b
-    requires { map_correct m1 /\ map_correct m2 /\
-      m1.map_data_inv = m2.map_data_inv /\
-      m1.order = m2.order }
-    requires { forall k1 k2. m1.fmodel k1 <> None /\ m2.fmodel k2 <> None ->
-      lt m1.order k1 k2 }
-    ensures { map_correct result }
-    ensures { result.order = m1.order }
-    ensures { result.map_data_inv = m1.map_data_inv }
-    ensures { forall k. result.fmodel k = None <-> m1.fmodel k = None /\
-      m2.fmodel k = None }
-    ensures { forall k d. m1.fmodel k = Some d -> result.fmodel k = Some d }
-    ensures { forall k d. m2.fmodel k = Some d -> result.fmodel k = Some d }
-  =
-    let o = m2.order in
-    assert { before o m1.avl_repr.model m2.avl_repr.model };
-    let r0 = concat m1.avl_repr m2.avl_repr in
-    let res = { avl_repr = r0;
-      order = o;
-      fmodel = functional_model o r0.model } in
-    res
-  *)
-end*)
 
