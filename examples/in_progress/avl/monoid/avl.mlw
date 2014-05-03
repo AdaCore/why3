@@ -509,12 +509,8 @@ module AVL
      representation invariants. *)
   predicate selection_possible selector (list (D.m 'b))
   
-  (* Parameter: a position is selected by a selector in the
-     list corresponding to the avl. *)
-  predicate selected selector (split (D.m 'b)) (list (D.m 'b))
-  
-  (*axiom selected_rebuild : forall p,s:selector 'a 'b,e,l.
-    selected p s e l -> rebuild e = l*)
+  (* Parameter: a position is selected by a selector in the. *)
+  predicate selected selector (split (D.m 'b))
   
   (* Selected part. *)
   type part = part_base selector
@@ -523,28 +519,26 @@ module AVL
      always select its only possible position. *)
   axiom selection_empty : forall s. let nil = (Nil:list (D.m 'b)) in
     selection_possible s nil ->
-      selected s { left = Nil ; middle = None ; right = Nil } nil
+      selected s { left = nil ; middle = None ; right = nil }
   
   (* Parameter: branch on a node. *)
   val selected_part (ghost p:type_params 'a 'b)
-    (ghost base:list (D.m 'b))
     (ghost llis:list (D.m 'b))
     (ghost rlis:list (D.m 'b))
     (s:selector) (l:M.t) (d:D.t 'a 'b) (r:M.t) : part
     requires { M.c l /\ p.D.mp.inv d /\ M.c r }
-    requires { base = node_model llis (p.D.mp.mdl d) rlis }
-    requires { selection_possible s base }
+    requires { selection_possible s (node_model llis (p.D.mp.mdl d) rlis) }
     requires { l.M.m = M.sum D.measure llis /\ r.M.m = M.sum D.measure rlis }
     (* A selected position can be found by following the given way. *)
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.D.mp.mdl d);
-        right = rlis } in selected s e2 base
+        right = rlis } in selected s e2
       | Left sl -> selection_possible sl llis /\
-        forall e. selected sl e llis /\ rebuild e = llis ->
-          selected s (right_extend e (p.D.mp.mdl d) rlis) base
+        forall e. selected sl e /\ rebuild e = llis ->
+          selected s (right_extend e (p.D.mp.mdl d) rlis)
       | Right sr -> selection_possible sr rlis /\
-        forall e. selected sr e rlis /\ rebuild e = rlis ->
-          selected s (left_extend llis (p.D.mp.mdl d) e) base }
+        forall e. selected sr e /\ rebuild e = rlis ->
+          selected s (left_extend llis (p.D.mp.mdl d) e) }
   
   use import ref.Ref
   
@@ -561,7 +555,7 @@ module AVL
     (d:D.t 'a 'b) (t:t 'a 'b) : t 'a 'b
     requires { selection_possible s t.m.lis /\ c t /\ t.dprm.inv d }
     ensures { result.m.lis = node_model !r.left (t.dprm.mdl d) !r.right }
-    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
     ensures { c result /\ result.prm = t.prm }
     writes { r }
     (* not intended for export. *)
@@ -570,7 +564,7 @@ module AVL
   = match view t with
     | AEmpty -> r := { left = Nil; middle = None; right = Nil };
       singleton t.prm d
-    | ANode tl td tr _ _ -> match selected_part t.prm t.m.lis tl.m.lis tr.m.lis
+    | ANode tl td tr _ _ -> match selected_part t.prm tl.m.lis tr.m.lis
         s (total tl) td (total tr) with
       | Left sl -> let nl = insert r sl d tl in
         r := right_extend !r (t.dprm.mdl td) tr.m.lis; balance nl td tr
@@ -590,7 +584,7 @@ module AVL
     (t:t 'a 'b) : t 'a 'b
     requires { selection_possible s t.m.lis /\ c t }
     ensures { result.m.lis = !r.left ++ !r.right }
-    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
     ensures { c result /\ result.prm = t.prm }
     writes { r }
     (* not intended for export. *)
@@ -598,7 +592,7 @@ module AVL
     variant { t.m.hgt }
   = match view t with
     | AEmpty -> r := { left = Nil; middle = None; right = Nil}; t
-    | ANode tl td tr _ _ -> match selected_part t.prm t.m.lis tl.m.lis tr.m.lis
+    | ANode tl td tr _ _ -> match selected_part t.prm tl.m.lis tr.m.lis
         s (total tl) td (total tr) with
       | Left sl -> let nl = remove r sl tl in
         r := right_extend !r (t.dprm.mdl td) tr.m.lis; balance nl td tr
@@ -614,7 +608,7 @@ module AVL
   let rec extract (ghost r:ref (split (D.m 'b))) (s:selector)
     (t:t 'a 'b) : (option (D.t 'a 'b),t 'a 'b)
     requires { selection_possible s t.m.lis /\ c t }
-    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
     ensures { let (d,t2) = result in
       c t2 /\ t2.prm = t.prm /\ t2.m.lis = !r.left ++ !r.right /\
       1 >= t.m.hgt - t2.m.hgt >= 0 /\
@@ -625,7 +619,7 @@ module AVL
     variant { t.m.hgt }
   = match view t with
     | AEmpty -> r := { left = Nil; middle = None; right = Nil }; (None,t)
-    | ANode tl td tr _ _ -> match selected_part t.prm t.m.lis tl.m.lis tr.m.lis
+    | ANode tl td tr _ _ -> match selected_part t.prm tl.m.lis tr.m.lis
         s (total tl) td (total tr) with
       | Left sl -> let (ol,nl) = extract r sl tl in
         r := right_extend !r (t.dprm.mdl td) tr.m.lis; (ol,balance nl td tr)
@@ -643,7 +637,7 @@ module AVL
   let rec split (ghost r:ref (split (D.m 'b))) (s:selector)
     (t:t 'a 'b) : (t 'a 'b,option (D.t 'a 'b),t 'a 'b)
     requires { selection_possible s t.m.lis /\ c t }
-    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
     returns { (lf,o,rg) -> lf.m.lis = !r.left /\ rg.m.lis = !r.right /\
       (match o with
        | None -> !r.middle = None
@@ -654,7 +648,7 @@ module AVL
   = match view t with
     | AEmpty -> r := { left = Nil; middle = None; right = Nil };
       (t,None,t)
-    | ANode tl td tr _ _ -> match selected_part t.prm t.m.lis tl.m.lis tr.m.lis
+    | ANode tl td tr _ _ -> match selected_part t.prm tl.m.lis tr.m.lis
         s (total tl) td (total tr) with
       | Left sl -> let (tll,tlo,tlr) = split r sl tl in
         r := right_extend !r (t.dprm.mdl td) tr.m.lis;
@@ -674,14 +668,14 @@ module AVL
   let rec get (ghost r:ref (split (D.m 'b))) (s:selector)
     (t:t 'a 'b) : option (D.t 'a 'b)
     requires { selection_possible s t.m.lis /\ c t }
-    ensures { selected s !r t.m.lis /\ rebuild !r = t.m.lis }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
     returns { None -> !r.middle = None
        | Some d -> !r.middle = Some (t.dprm.mdl d) /\ t.dprm.inv d }
     writes { r }
     variant { t.m.hgt }
   = match view t with
     | AEmpty -> r := { left = Nil; middle = None; right = Nil }; None
-    | ANode tl td tr _ _ -> match selected_part t.prm t.m.lis tl.m.lis tr.m.lis
+    | ANode tl td tr _ _ -> match selected_part t.prm tl.m.lis tr.m.lis
         s (total tl) td (total tr) with
       | Left sl -> let res = get r sl tl in
         r := right_extend !r (t.dprm.mdl td) tr.m.lis; res

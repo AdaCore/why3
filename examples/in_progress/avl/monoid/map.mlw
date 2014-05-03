@@ -70,16 +70,17 @@ module MapBase
   predicate selection_possible (s:K.t) (l:list (D.m 'b)) =
     A.S.increasing l /\ K.c s
   
-  predicate selected (s:K.t) (e:split (D.m 'b)) (l:list (D.m 'b)) =
-      (A.S.upper_bound s.K.m e.left /\ A.S.lower_bound s.K.m e.right /\
-      match e.middle with
-      | None -> true
-      | Some d2 -> CO.eq s.K.m d2.key
-      end)
-      (* Strictly speaking, not necessary because derivable from the context,
-         but makes easier to write some lemmas. *)
-      /\ A.S.increasing e.left /\ A.S.increasing e.right /\
-      rebuild e = l /\ selection_possible s l
+  predicate selected (s:K.t) (e:split (D.m 'b)) =
+    let l = rebuild e in
+    (A.S.upper_bound s.K.m e.left /\ A.S.lower_bound s.K.m e.right /\
+    match e.middle with
+    | None -> true
+    | Some d2 -> CO.eq s.K.m d2.key
+    end)
+    (* Strictly speaking, not necessary because derivable from the context,
+       but makes easier to write some lemmas. *)
+    /\ A.S.increasing e.left /\ A.S.increasing e.right
+    /\ selection_possible s l
   
   predicate selected_sem (s:K.t) (e:split (D.m 'b)) (l:list (D.m 'b)) =
     forall k:K.m. (CO.lt k s.K.m -> A.model l k = A.model e.left k) /\
@@ -88,32 +89,29 @@ module MapBase
       (CO.le s.K.m k -> A.model e.left k = None) /\
       (CO.le k s.K.m -> A.model e.right k = None)
   
-  let lemma selected_sem (s:K.t)
-    (e:split (D.m 'b)) (l:list (D.m 'b)) : unit
-    requires { selected s e l }
-    ensures { selected_sem s e l }
+  let lemma selected_sem (s:K.t) (e:split (D.m 'b)) : unit
+    requires { selected s e }
+    ensures { selected_sem s e (rebuild e) }
   = match e.middle with
     | None -> A.model_cut s.K.m e.left e.right
     | Some dm -> A.model_split dm e.left e.right
     end
   
   let selected_part (ghost p:type_params 'a 'b)
-    (ghost base:list (D.m 'b))
     (ghost llis:list (D.m 'b))
     (ghost rlis:list (D.m 'b))
     (s:K.t) (l:'e) (d:D.t 'a 'b) (r:'f) : part_base K.t
     requires { p.D.mp.inv d }
-    requires { base = llis ++ Cons (p.D.mp.mdl d) rlis }
-    requires { selection_possible s base }
+    requires { selection_possible s (llis ++ Cons (p.D.mp.mdl d) rlis) }
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.D.mp.mdl d);
-        right = rlis } in selected s e2 base
+        right = rlis } in selected s e2
       | Left sl -> selection_possible sl llis /\
-        forall e. selected sl e llis ->
-          selected s (right_extend e (p.D.mp.mdl d) rlis) base
+        forall e. selected sl e /\ rebuild e = llis ->
+          selected s (right_extend e (p.D.mp.mdl d) rlis)
       | Right sr -> selection_possible sr rlis /\
-        forall e. selected sr e rlis ->
-          selected s (left_extend llis (p.D.mp.mdl d) e) base }
+        forall e. selected sr e /\ rebuild e = rlis ->
+          selected s (left_extend llis (p.D.mp.mdl d) e) }
   = let kd = get_key p d in
     let cmp = CO.compare s kd in
     if cmp < 0

@@ -63,27 +63,25 @@ module RAL
   (* Selection predicate: We are exactly at the index-th position of the
      rebuild list, and there is an element in the middle iff we are
      not trying to select a hole. *)
-  predicate selected (s:selector) (e:split 'b) (l:list 'b) =
+  predicate selected (s:selector) (e:split 'b) =
     s.index = length e.left /\ (s.hole <-> e.middle = None)
   
   let selected_part (ghost p:type_params 'a 'b)
-    (ghost base:list 'b)
     (ghost llis:list 'b)
     (ghost rlis:list 'b)
     (s:selector) (sl:int) (d:'a) (sr:int) : part_base selector
     requires { p.inv d }
-    requires { base = llis ++ Cons (p.mdl d) rlis }
-    requires { selection_possible s base }
+    requires { selection_possible s (llis ++ Cons (p.D.mp.mdl d) rlis) }
     requires { sl = length llis /\ sr = length rlis }
     returns { Here -> let e2 = { left = llis;
         middle = Some (p.mdl d);
-        right = rlis } in selected s e2 base
+        right = rlis } in selected s e2
       | Left sl -> selection_possible sl llis /\
-        forall e. selected sl e llis ->
-          selected s (right_extend e (p.mdl d) rlis) base
+        forall e. selected sl e /\ rebuild e = llis ->
+          selected s (right_extend e (p.mdl d) rlis)
       | Right sr -> selection_possible sr rlis /\
-        forall e. selected sr e rlis ->
-          selected s (left_extend llis (p.mdl d) e) base }
+        forall e. selected sr e /\ rebuild e = rlis ->
+          selected s (left_extend llis (p.mdl d) e) }
   = (* Use the size information to decide
        where the index-th position is. *)
     let ind = s.index in
