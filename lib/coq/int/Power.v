@@ -79,3 +79,12 @@ rewrite 3!power_is_exponentiation ; auto with zarith.
 apply Power_mult2 ; auto with zarith.
 Qed.
 
+Open Scope Z_scope.
+
+(* Why3 goal *)
+Lemma Power_monotonic : forall (x:Z) (n:Z) (m:Z), ((0%Z < x)%Z /\
+  ((0%Z <= n)%Z /\ (n <= m)%Z)) -> ((power x n) <= (power x m))%Z.
+intros.
+apply Z.pow_le_mono_r; auto with zarith.
+Qed.
+
