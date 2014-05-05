@@ -237,10 +237,35 @@ theory tptp.Real
   syntax function to_real "$to_real(%1)"
 end
 
+theory real.FromInt
+  syntax function from_int "$to_real(%1)"
+
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+end
+
 theory real.Truncate
-  syntax function floor    "$floor(%1)"
-  syntax function ceil     "$ceil(%1)"
-  syntax function truncate "$truncate(%1)"
+  syntax function floor    "$to_int(%1)"
+  syntax function ceil     "$to_int($ceil(%1))"
+  syntax function truncate "$to_int($truncate(%1))"
+
+  remove prop Truncate_int
+  remove prop Truncate_down_pos
+  remove prop Truncate_up_neg
+  remove prop Real_of_truncate
+  remove prop Truncate_monotonic
+  remove prop Truncate_monotonic_int1
+  remove prop Truncate_monotonic_int2
+  remove prop Floor_int
+  remove prop Ceil_int
+  remove prop Floor_down
+  remove prop Ceil_up
+  remove prop Floor_monotonic
+  remove prop Ceil_monotonic
 end
 
 theory tptp.RealTrunc
