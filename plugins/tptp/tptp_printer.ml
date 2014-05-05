@@ -96,7 +96,9 @@ let number_format = {
   Number.dec_real_support = Number.Number_default;
   Number.hex_real_support = Number.Number_unsupported;
   Number.frac_real_support = Number.Number_custom
-    (Number.PrintFracReal ("%s", "(%s * %s)", "(%s / %s)"));
+    (Number.PrintFracReal ("$to_real(%s)",
+      "$product($to_real(%s),$to_real(%s))",
+      "$quotient($to_real(%s),$to_real(%s))"));
   Number.def_real_support = Number.Number_unsupported;
 }
 
