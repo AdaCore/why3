@@ -151,7 +151,7 @@ end
 
 theory tptp.IntTrunc
   syntax function floor    "$floor(%1)"
-  syntax function ceil     "$ceil(%1)"
+  syntax function ceiling  "$ceiling(%1)"
   syntax function truncate "$truncate(%1)"
   syntax function round    "$round(%1)"
 
@@ -219,7 +219,7 @@ end
 
 theory tptp.RatTrunc
   syntax function floor    "$floor(%1)"
-  syntax function ceil     "$ceil(%1)"
+  syntax function ceiling  "$ceiling(%1)"
   syntax function truncate "$truncate(%1)"
   syntax function round    "$round(%1)"
 
@@ -258,7 +258,7 @@ end
 
 theory real.Truncate
   syntax function floor    "$to_int(%1)"
-  syntax function ceil     "$to_int($ceil(%1))"
+  syntax function ceil     "$to_int($ceiling(%1))"
   syntax function truncate "$to_int($truncate(%1))"
 
   remove prop Truncate_int
@@ -277,6 +277,9 @@ theory real.Truncate
 end
 
 theory tptp.RealTrunc
+  syntax function floor    "$floor(%1)"
+  syntax function ceiling  "$ceiling(%1)"
+  syntax function truncate "$truncate(%1)"
   syntax function round    "$round(%1)"
 
   syntax function to_int   "$to_int(%1)"
