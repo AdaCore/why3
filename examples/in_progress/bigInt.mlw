@@ -98,16 +98,29 @@ module N
     forall x y z. 0 <= x <= y -> power z x <= power z y
 *)
 
+  lemma power_non_neg:
+     forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
+
   lemma value_zero:
     forall x:array int31.
       let l = to_int x.length in
       l = 0 -> value_array x = 0
 
-  lemma value_bounds_sub:
+  lemma value_sub_upper_bound:
+    forall x:map int int31, n l:int. 0 <= n <= l ->
+    (forall i:int. 0 <= i < n -> 0 <= to_int (Map.get x i) < base) ->
+    value_sub x 0 n l < power base n
+
+  lemma value_sub_lower_bound:
+    forall x:map int int31, n l:int. 0 <= n <= l ->
+    (forall i:int. 0 <= i < n -> 0 <= to_int (Map.get x i) < base) ->
+    0 <= value_sub x 0 n l
+
+  lemma value_sub_lower_bound_tight:
     forall x:map int int31, n l:int. 0 < n <= l ->
     (forall i:int. 0 <= i < n-1 -> 0 <= to_int (Map.get x i) < base) ->
     0 < to_int (Map.get x (n-1)) < base ->
-    power base (n-1) <= value_sub x 0 n l < power base n
+    power base (n-1) <= value_sub x 0 n l
 
   lemma value_bounds_array:
     forall x:array int31. ok_array x ->
@@ -158,15 +171,57 @@ module N
           (* needed to be sure it is zero at normal exit ! *)
         invariant { 0 <= to_int !i <= to_int l1 }
         invariant {
-          value_array x = value_sub x.elts 0 (to_int !i) (to_int l1) + !acc
+          value_sub x.elts 0 (to_int !i) (to_int l1) = value_array x - !acc
         }
         invariant {
-          value_array y = value_sub y.elts 0 (to_int !i) (to_int l1) + !acc
+          value_sub y.elts 0 (to_int !i) (to_int l1) = value_array y - !acc
         }
         variant { to_int !i }
+        assert { value_array x - !acc =
+          value_sub x.elts 0 (to_int !i - 1) (to_int l1) +
+          power base (to_int !i - 1) * (to_int x[to_int !i - 1])
+          };
+        assert {  value_array y - !acc =
+          value_sub y.elts 0 (to_int !i - 1) (to_int l1) +
+          power base (to_int !i - 1) * (to_int y[to_int !i - 1])
+          };
         i := Int31.(-) !i one;
-        if Int31.(<) x[!i] y[!i] then (res := minus_one; raise Break);
-        if Int31.(>) x[!i] y[!i] then (res := one; raise Break);
+        if Int31.(<) x[!i] y[!i] then
+          begin
+          assert { value_sub y.elts 0 (to_int !i) (to_int l1) >= 0 };
+          assert { value_sub x.elts 0 (to_int !i) (to_int l1) <
+            power base (to_int !i)
+          };
+          assert { value_array y - !acc >=
+            power base (to_int !i) * (to_int y[to_int !i])
+          };
+          assert { to_int y[to_int !i] >= to_int x[to_int !i] + 1 };
+          assert { power base (to_int !i) * (to_int y[to_int !i]) >=
+                   power base (to_int !i) * (to_int x[to_int !i] + 1) };
+          assert { power base (to_int !i) * (to_int y[to_int !i]) >=
+                   power base (to_int !i) * (to_int x[to_int !i])
+                   + power base (to_int !i) };
+            res := minus_one;
+            raise Break;
+          end;
+        if Int31.(>) x[!i] y[!i] then
+          begin
+          assert { value_sub x.elts 0 (to_int !i) (to_int l1) >= 0 };
+          assert { value_sub y.elts 0 (to_int !i) (to_int l1) <
+            power base (to_int !i)
+          };
+          assert { value_array x - !acc >=
+            power base (to_int !i) * (to_int x[to_int !i])
+          };
+          assert { to_int x[to_int !i] >= to_int y[to_int !i] + 1 };
+          assert { power base (to_int !i) * (to_int x[to_int !i]) >=
+                   power base (to_int !i) * (to_int y[to_int !i] + 1) };
+          assert { power base (to_int !i) * (to_int x[to_int !i]) >=
+                   power base (to_int !i) * (to_int y[to_int !i])
+                   + power base (to_int !i) };
+            res := one;
+            raise Break
+          end;
         acc := !acc + power base (to_int !i) * to_int x[!i];
       done;
       raise Break
