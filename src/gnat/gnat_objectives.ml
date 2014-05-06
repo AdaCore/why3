@@ -460,54 +460,6 @@ let extract_sloc main_goal =
 let init_subp_vcs subp =
    apply_split_goal_if_needed subp.subp_goal
 
-(* Trunc the common "prefix" of two lists *)
-let rec trunc_common_part l1 l2 =
-  match l1, l2 with
-  | [], _ -> [], l2
-  | _, [] -> l1, []
-  | a :: q, b :: r -> if a = b then
-                        trunc_common_part q r
-                      else
-                        l1, l2
-
-(* Removes references to '..' in an absolute path
-   represented as list *)
-let rec simple_path = function
-  | h :: t ->
-     (match t with
-      | h2 :: t2 -> if h2 = Filename.parent_dir_name then simple_path t2
-                    else h :: simple_path t
-      | [] -> [ h ])
-  | [] -> []
-
-(* Return the absolute path of the filename given. The absolute path is
-   represented as a list of directories' names ended by the basename of
-   the file *)
-let absolute_path_list f =
-  let full_path =
-    if Filename.is_relative f then Filename.concat (Sys.getcwd ()) f
-    else f
-  in
-  let lpath = Str.split (Str.regexp_string Filename.dir_sep) full_path in
-  simple_path lpath
-
-(* Return the path of file relative to session. Both arguments must either be
-   absolute path or path relatives to the current directory *)
-let relative_path file session =
-  let file, session = trunc_common_part (absolute_path_list file)
-                                        (absolute_path_list session)
-  in
-  let nbdirs, nbparents =
-    List.fold_left (fun (dirs, par) se -> if se = Filename.parent_dir_name then
-                                            (dirs, par + 1)
-                                          else
-                                            (dirs + 1, par)) (0,0) session in
-  let rec repeat n s =  if n == 0 then ""
-                        else Filename.concat s (repeat (n - 1) s) in
-  Filename.concat (repeat (nbdirs - nbparents) Filename.parent_dir_name)
-                  (List.fold_left (fun path f -> Filename.concat path f)
-                                  "" file)
-
 let init () =
    Call_provers.set_socket_name Gnat_config.socket_name;
    let session_dir =
@@ -533,7 +485,7 @@ let init () =
       env_session, is_new_session in
    my_session := Some env_session;
    if is_new_session || not (has_file env_session) then begin
-      let rel_filename = relative_path Gnat_config.filename session_dir
+      let rel_filename = Sysutil.relativize_filename session_dir Gnat_config.filename
       in
       ignore
         (Session.add_file

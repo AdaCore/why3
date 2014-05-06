@@ -158,7 +158,7 @@ let handle_obj obj =
          if Gnat_manual.is_new_manual_proof g then
            Gnat_report.register
              obj None None false
-             ~filename:(Gnat_manual.create_prover_file g) ""
+             ~filename:(Gnat_manual.create_prover_file g obj) ""
          else schedule_goal g
       | None -> ()
    end
