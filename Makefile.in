@@ -251,6 +251,7 @@ endif
 	mkdir -p $(DATADIR)/why3/theories
 	mkdir -p $(DATADIR)/why3/modules/mach
 	mkdir -p $(DATADIR)/why3/drivers
+	mkdir -p $(DATADIR)/emacs/site-lisp/
 	cp -f theories/*.why $(DATADIR)/why3/theories
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
 	cp -f modules/mach/*.mlw $(DATADIR)/why3/modules/mach
@@ -262,9 +263,9 @@ endif
 	cp -f share/images/fatcow/*.png $(DATADIR)/why3/images/fatcow
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
-	cp -f share/emacs/why3.el $(DATADIR)/why3/emacs/why3.el
+	cp -f share/emacs/why3.el $(DATADIR)/emacs/site-lisp/why3.el
 ifneq ($(EMACS),no)
-	cp -f share/emacs/why3.elc $(DATADIR)/why3/emacs/why3.elc
+	cp -f share/emacs/why3.elc $(DATADIR)/emacs/site-lisp/why3.elc
 endif
 	cp -f share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
 	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
