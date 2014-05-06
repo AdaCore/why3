@@ -9,7 +9,7 @@ val send_request :
  cmd:string list->
   unit
 
-type answer = 
+type answer =
   {
     id        : int;
     exit_code : int;
