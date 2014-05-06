@@ -88,9 +88,29 @@ let finished_goal callback rg id res =
   handle_finished_call callback goal res;
   rg
 
+let server_pid = ref 0
+
+
+let init_proof_server () =
+  if Gnat_config.stand_alone then begin
+    server_pid :=
+      Unix.create_process "why3server"
+        [|"why3server"; "--socket"; Gnat_config.socket_name|]
+        Unix.stdin Unix.stdout Unix.stderr;
+    (* need to wait a bit before connecting. This is debug code, so not an
+       issue to wait a second *)
+    Unix.sleep 1
+  end;
+  Prove_client.connect ()
+
+let shut_down_proof_server () =
+    Prove_client.disconnect ();
+    if Gnat_config.stand_alone then
+      Unix.kill !server_pid 9
+
 let run callback =
   if not (Queue.is_empty goal_queue) then begin
-    Prove_client.connect ();
+    init_proof_server ();
     let handle_list =
       List.fold_left (fun acc (id, res) -> finished_goal callback acc id res)
     in
@@ -103,5 +123,5 @@ let run callback =
       else run running_goals
     in
     run empty;
-    Prove_client.disconnect ();
+    shut_down_proof_server ()
   end

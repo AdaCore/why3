@@ -44,6 +44,7 @@ let opt_proof_dir : string option ref = ref None
 let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_subp : string option ref = ref None
 let opt_socket_name : string ref = ref ""
+let opt_standalone = ref false
 
 let set_filename s =
    if !opt_filename = None then
@@ -179,6 +180,8 @@ let options = Arg.align [
           " Issue information on number of VCs proved";
    "--debug", Arg.Set opt_debug,
           " Enable debug mode";
+   "--standalone", Arg.Set opt_standalone,
+          " spawn its own VC server";
    "--proof-dir", Arg.String set_proof_dir,
           " Specify directory to save session and manual proofs files";
 ]
@@ -312,6 +315,8 @@ let unit_name =
   else Filename.chop_extension filename
 
 let socket_name = !opt_socket_name
+
+let stand_alone = !opt_standalone
 
 let proof_dir = !opt_proof_dir
 

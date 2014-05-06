@@ -67,6 +67,9 @@ val warning_mode : warning_mode
 val debug : bool
 (* true if option --debug was present *)
 
+val stand_alone : bool
+(* true if option --standalone was present *)
+
 val force : bool
 (* true of option --force/-f was present *)
 
