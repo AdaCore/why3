@@ -59,6 +59,7 @@ endif
 RUBBER = @RUBBER@
 HEVEA = @HEVEA@
 HACHA = @HACHA@
+EMACS = @EMACS@
 
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
@@ -81,6 +82,8 @@ EXTLIBS = str unix nums dynlink
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
+
+TARGET_EMACS = share/emacs/why3.elc
 
 ###############
 # main target
@@ -232,7 +235,11 @@ clean_old_install:
 	rm -rf $(OCAMLINSTALLLIB)/why3
 
 
+ifeq ($(EMACS),no)
 install_no_local:: clean_old_install
+else
+install_no_local:: clean_old_install $(TARGET_EMACS)
+endif
 	mkdir -p $(BINDIR)
 	mkdir -p $(DATADIR)/why3
 	mkdir -p $(DATADIR)/why3/images
@@ -256,6 +263,9 @@ install_no_local:: clean_old_install
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
 	cp -f share/emacs/why3.el $(DATADIR)/why3/emacs/why3.el
+ifneq ($(EMACS),no)
+	cp -f share/emacs/why3.elc $(DATADIR)/why3/emacs/why3.elc
+endif
 	cp -f share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
 	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 
@@ -274,6 +284,13 @@ install-lib: install_no_local_lib
 endif
 
 install-all: install install-lib
+
+##################
+# Why3 emacs mode
+##################
+
+%.elc: %.el
+	$(EMACS) --batch --no-init-file -f batch-byte-compile $<
 
 ##################
 # Why3 plugins

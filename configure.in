@@ -340,6 +340,9 @@ if test "$enable_html_doc" = yes ; then
    fi
 fi
 
+# checking for emacs
+AC_CHECK_PROG(EMACS,emacs,emacs,no)
+
 # checking for Zarith
 if test "$enable_zarith" = yes; then
    if test "$USEOCAMLFIND" = yes; then
@@ -739,6 +742,7 @@ AC_SUBST(enable_html_doc)
 AC_SUBST(RUBBER)
 AC_SUBST(HEVEA)
 AC_SUBST(HACHA)
+AC_SUBST(EMACS)
 
 AC_SUBST(enable_frama_c)
 
