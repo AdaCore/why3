@@ -249,16 +249,14 @@ theory Fsetint
   axiom min_elt_def1:
     forall s: set int. not (is_empty s) -> mem (min_elt s) s
   axiom min_elt_def2:
-    forall s: set int. not (is_empty s) ->
-    forall x: int. mem x s -> min_elt s <= x
+    forall s: set int. forall x: int. mem x s -> min_elt s <= x
 
   function max_elt (set int) : int
 
   axiom max_elt_def1:
     forall s: set int. not (is_empty s) -> mem (max_elt s) s
   axiom max_elt_def2:
-    forall s: set int. not (is_empty s) ->
-    forall x: int. mem x s -> x <= max_elt s
+    forall s: set int. forall x: int. mem x s -> x <= max_elt s
 
   function interval int int : set int
 
