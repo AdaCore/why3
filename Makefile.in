@@ -229,10 +229,12 @@ clean::
 # installation
 ###############
 
+# TODO: Clean this madness
 clean_old_install:
 	rm -f $(BINDIR)/why3*
 	rm -rf $(DATADIR)/why3
 	rm -rf $(OCAMLINSTALLLIB)/why3
+	rm -rf $(LIBDIR)/why3/plugins
 
 
 ifeq ($(EMACS),no)
@@ -400,7 +402,6 @@ clean::
 	rm -f lib/plugins/*
 
 install_no_local::
-	rm -rf $(LIBDIR)/why3/plugins
 	mkdir -p $(LIBDIR)/why3/plugins
 	cp -f $(foreach f,$(LIBPLUGCMO) $(LIBPLUGCMXS),$(wildcard $(f))) $(LIBDIR)/why3/plugins
 
