@@ -442,11 +442,13 @@ fun lookup_list sel lookup xs =
       ps)
   end;
 
+fun fact_binding s = Binding.qualify false "facts" (Binding.name s);
+
 fun mk_decl _ (Axiom ((s, id), ts)) thy =
       (case lookup_thm thy id of
          NONE =>
            (thy |> Specification.axiomatization
-              [] [((Binding.name s, []), ts)] |> snd,
+              [] [((fact_binding s, []), ts)] |> snd,
             true)
        | SOME thms =>
            if length thms = length ts andalso
@@ -791,7 +793,7 @@ fun prove_vc vc_name lthy =
     Specification.theorem Thm.theoremK NONE
       (fn thmss => (Local_Theory.background_theory
          (mark_proved vc_name (flat thmss))))
-      (Binding.name vc_name, []) [] [ctxt] stmt false lthy
+      (fact_binding vc_name, []) [] [ctxt] stmt false lthy
   end;
 
 val _ =
