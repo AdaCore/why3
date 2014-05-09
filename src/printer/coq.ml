@@ -429,9 +429,9 @@ let read_until re s i ch =
 
 let read_until_or_eof re s i ch =
   try
-    read_until re s i ch
+    read_until re s i ch; false
   with
-  | End_of_file -> ()
+  | End_of_file -> true
 
 let read_old_proof =
   let def = Str.regexp "\\(Definition\\|Notation\\|Lemma\\|Theorem\\|Variable\\|Hypothesis\\)[ ]+\\([^ :(.]+\\)" in
@@ -446,6 +446,7 @@ let read_old_proof =
     if not (Str.string_match def s 0) then raise (StringValue s);
     let kind = Str.matched_group 1 s in
     let name = Str.matched_group 2 s in
+    let end_app = ref "" in
     read_until def_end s (Str.match_end ()) ch;
     match kind with
     | "Variable" | "Hypothesis" -> Axiom name
@@ -455,19 +456,23 @@ let read_old_proof =
         else begin
           start := pos_in ch;
           let s = input_line ch in
+          let read_end start =
+            (* true if we reached EOF *)
+            if read_until_or_eof qed start 0 ch then
+              end_app := "Qed." in
           if Str.string_match old_intros s 0 then begin
             read_until old_end s (Str.match_end ()) ch;
             start := pos_in ch;
-            read_until_or_eof qed (input_line ch) 0 ch
+            read_end (input_line ch)
           end else
-            read_until_or_eof qed s 0 ch;
+            read_end s;
           Vernacular
         end in
       let len = pos_in ch - !start in
       let s = String.create len in
       seek_in ch !start;
       really_input ch s 0 len;
-      Query (name, k, s)
+      Query (name, k, s ^ !end_app)
   with StringValue s -> Other s
 
 (* Load old-style proofs where users were confined to a few sections. *)
