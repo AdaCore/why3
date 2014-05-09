@@ -45,9 +45,12 @@ let opt_string_of_bool b = if b then Some "true" else None
 
 (* identifiers *)
 
+let black_list =
+  ["o"; "O"]
+
 let fresh_printer () =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  create_ident_printer [] ~sanitizer:isanitize
+  create_ident_printer black_list ~sanitizer:isanitize
 
 let iprinter = fresh_printer ()
 
