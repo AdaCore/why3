@@ -263,23 +263,23 @@ and print_branch info defs fmt br =
   elem' "pat" (pair (print_pat info) (print_term info defs)) fmt q;
   Svs.iter forget_var p.pat_vars
 
+let rec dest_conj t = match t.t_node with
+  | Tbinop (Tand, f1, f2) -> dest_conj f1 @ dest_conj f2
+  | _ -> [t]
+
 let rec dest_rule vl fl t = match t.t_node with
   | Tquant (Tforall, fq) ->
       let vl', _tl, f = t_open_quant fq in
       dest_rule (vl @ vl') fl f
   | Tbinop (Timplies, f1, f2) ->
-      dest_rule vl (f1 :: fl) f2
-  | _ -> (vl, List.rev fl, t)
+      dest_rule vl (fl @ dest_conj f1) f2
+  | _ -> (vl, fl, t)
 
 let rec dest_forall vl t = match t.t_node with
   | Tquant (Tforall, fq) ->
       let vl', _tl, f = t_open_quant fq in
       dest_forall (vl @ vl') f
   | _ -> (vl, t)
-
-let rec dest_conj t = match t.t_node with
-  | Tbinop (Tand, f1, f2) -> dest_conj f1 @ dest_conj f2
-  | _ -> [t]
 
 (** Declarations *)
 
