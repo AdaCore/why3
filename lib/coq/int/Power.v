@@ -79,6 +79,13 @@ rewrite 3!power_is_exponentiation ; auto with zarith.
 apply Power_mult2 ; auto with zarith.
 Qed.
 
+(* Why3 goal *)
+Lemma Power_non_neg : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <= y)%Z) ->
+  (0%Z <= (power x y))%Z.
+intros x y (h1,h2).
+now apply Z.pow_nonneg.
+Qed.
+
 Open Scope Z_scope.
 
 (* Why3 goal *)
