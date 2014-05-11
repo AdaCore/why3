@@ -1,5 +1,9 @@
 
 
+(** {1 Multi-precision integer arithmetic} *)
+
+
+(** {1 Natural numbers} *)
 
 module N
 
@@ -11,10 +15,17 @@ module N
   use import int.Int
   use import int.Power
 
+  lemma ge_mult :
+    forall x y z:int. x >= y * z /\ y >= 0 /\ z >= 1 -> x >= y
+
   lemma power_non_neg:
      forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
 
-  (** limb can be any unsigned integer type *)
+  (** {2 unbounded precision natural numbers} 
+
+  these are represented by an array of "limbs". A limb is expected to
+  be a machine word, abstractly it can be any unsigned integer type 
+  *)
   type limb
 
   clone mach.int.Bounded_int as Limb
@@ -30,6 +41,7 @@ module N
 
   type t = { mutable digits: array limb }
 
+  (** {2 Integer value of a natural number} *)
 
   (** [value_sub x n m] denotes the integer represented by
      the digits x[n..m-1] with lsb at index n *)
@@ -89,7 +101,6 @@ module N
 
 
 
-
 (** {2 conversion from a small integer} *)
 
   let zero () =
@@ -103,21 +114,44 @@ module N
 
 (** {2 Comparisons} *)
 
-  lemma value_sub_upper_bound:
-    forall x:map int limb, x1 x2:int. x1 <= x2 ->
-    value_sub x x1 x2 < power radix (x2 - x1)
 
-  lemma value_sub_lower_bound:
-    forall x:map int limb, x1 x2:int. x1 <= x2 ->
-    0 <= value_sub x x1 x2
+  let rec lemma value_sub_lower_bound (x:map int limb) (x1 x2:int)
+    requires { x1 <= x2 }
+    variant  { x2 - x1 }
+    ensures  { 0 <= value_sub x x1 x2 }
+  = if x1 = x2 then () else 
+      begin
+        assert { value_sub x x1 x2 = l2i (Map.get x x1) + radix * value_sub x (x1+1) x2};
+        value_sub_lower_bound x (x1+1) x2
+      end
 
-  lemma value_sub_lower_bound_tight:
-    forall x:map int limb, x1 x2:int. x1 < x2 ->
-    power radix (x2-x1-1) *  l2i (Map.get x (x2-1)) <= value_sub x x1 x2
+  let rec lemma value_sub_upper_bound (x:map int limb) (x1 x2:int)
+    requires { x1 <= x2 }
+    variant  { x2 - x1 }
+    ensures  { value_sub x x1 x2 < power radix (x2 - x1) }
+  = if x1 = x2 then () else
+      begin
+      assert { value_sub x x1 x2 <= value_sub x x1 (x2-1) + power radix (x2-x1-1) * (radix - 1) };
+      value_sub_upper_bound x x1 (x2-1)
+      end
 
-  lemma value_sub_upper_bound_tight:
-    forall x:map int limb, x1 x2:int. x1 < x2 ->
-    value_sub x x1 x2 < power radix (x2-x1-1) *  (l2i (Map.get x (x2-1)) + 1)
+  let lemma value_sub_lower_bound_tight (x:map int limb) (x1 x2:int)
+    requires { x1 < x2 }
+    ensures  { power radix (x2-x1-1) *  l2i (Map.get x (x2-1)) <= value_sub x x1 x2 }
+  = assert   { value_sub x x1 x2 = value_sub x x1 (x2-1) 
+               + power radix (x2-x1-1) * l2i (Map.get x (x2-1)) }
+
+  let rec lemma value_sub_upper_bound_tight (x:map int limb) (x1 x2:int)
+    requires { x1 <= x2 }
+    variant  { x2 - x1 }
+    ensures  { value_sub x x1 x2 < power radix (x2-x1)  }
+  = if x1 = x2 then () else
+    value_sub_upper_bound_tight x x1 (x2-1)
+
+  let lemma value_sub_upper_bound_tighter (x:map int limb) (x1 x2:int)
+    requires { x1 < x2 }
+    ensures  { value_sub x x1 x2 < power radix (x2-x1-1) *  (l2i (Map.get x (x2-1)) + 1) }
+  = value_sub_upper_bound_tight x x1 (x2-1)
 
   exception Break31 int31
 
@@ -145,7 +179,9 @@ module N
         i := Int31.(-) !i one;
         if Limb.ne x[!i] limb_zero then
           begin
-            assert { value_sub x.elts (p2i x1) (p2i !i + 1) >= power radix (p2i !i - p2i x1) };
+            assert { value_sub x.elts (p2i x1) (p2i !i + 1) >=
+                     power radix (p2i !i - p2i x1) * l2i x[p2i !i] >= 
+                     power radix (p2i !i - p2i x1) };
             assert { value_sub x.elts (p2i x1) (p2i x2) = value_sub x.elts (p2i x1) (p2i !i + 1)
                       + power radix (p2i !i + 1 - p2i x1) * value_sub x.elts (p2i !i + 1) (p2i x2)};
             assert { value_sub x.elts (p2i x1) (p2i x2) >= power radix (p2i !i - p2i x1) };
