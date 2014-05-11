@@ -22,8 +22,8 @@ module N
   *)
   type limb
 
-  clone mach.int.Bounded_int as Limb
-    with type t = limb, constant min = zero (* from int.Int *)
+  clone mach.int.Unsigned as Limb
+    with type t = limb
 
   axiom limb_max_bound: 1 <= Limb.max
 
@@ -231,26 +231,34 @@ module N
 
   exception Break
 
-  val addc (x y:limb) (c:limb) : (limb,limb)
-    returns { (r,d) ->
-      l2i r + radix * l2i d =
-      l2i x + l2i y + l2i c }
-
-  val add_limb (x:array limb) (y:limb) (x1 x2:int31) : limb
+  let add_limb (x:array limb) (y:limb) (x1 x2:int31) : limb
     requires { 0 <= p2i x1 <= p2i x2 <= p2i x.length }
     writes  { x }
     ensures { forall j. 0 <= j < p2i x1 \/ p2i x2 <= j < p2i x.length -> x[j] = (old x)[j] }
     ensures { value_array x + power radix (p2i x2) * l2i result
       = value_array (old x) + power radix (p2i x1) * l2i y }
-(*
-  = let limb_zero = Limb.of_int 0 in
+  = 'Init:
+    let limb_zero = Limb.of_int 0 in
+    let one = Int31.of_int 1 in
     let i = ref x1 in
     let c = ref y in
     while Int31.(<) !i x2 && Limb.ne !c limb_zero do
-
+      invariant { forall j. 0 <= j < p2i x1 \/ p2i x2 <= j < p2i x.length ->
+                  x[j] = (at x 'Init)[j] }
+      invariant { p2i x1 <= p2i !i <= p2i x2 }
+      invariant {
+        value_array x + power radix (p2i !i) * l2i !c = 
+        value_array (at x 'Init) + power radix (p2i x1) * l2i y }
+      variant { p2i x2 - p2i !i }
+      let (r,c') = Limb.add_with_carry x[!i] limb_zero !c in
+      'L:
+      x[!i] <- r;
+      assert { value_array x = value_array (at x 'L)
+        + power radix (p2i !i) * (l2i r - l2i (at x 'L)[p2i !i]) };
+      c := c';
+      i := Int31.(+) !i one;
     done;
     !c
-*)
 
   let add_limbs (x y:array limb) (x1 x2 y1 y2:int31) : limb
     requires { 0 <= p2i x1 <= p2i x2 <= p2i x.length }
@@ -278,7 +286,7 @@ module N
         power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i !i) }
       variant { p2i y2 - p2i !i }
       let j = Int31.(+) x1 (Int31.(-) !i y1) in
-      let (r,c') = addc x[j] y[!i] !c in
+      let (r,c') = Limb.add_with_carry x[j] y[!i] !c in
       'L:
       x[j] <- r;
       assert { value_array x = value_array (at x 'L)

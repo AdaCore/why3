@@ -104,6 +104,22 @@ module Bounded_int
 
 end
 
+module Unsigned
+
+  use import int.Int
+
+  constant min_unsigned : int = 0
+
+  clone export Bounded_int with
+    constant min = min_unsigned
+
+  val add_with_carry (x y:t) (c:t) : (t,t)
+    returns { (r,d) ->
+      to_int r + (max+1) * to_int d =
+      to_int x + to_int y + to_int c }
+
+end
+
 module Int31
 
   use import int.Int
@@ -140,12 +156,10 @@ module UInt32
 
   type uint32
 
-  constant min_uint32 : int = 0x00000000
   constant max_uint32 : int = 0xffffffff
 
-  clone export Bounded_int with
+  clone export Unsigned with
     type t = uint32,
-    constant min = min_uint32,
     constant max = max_uint32
 
 end
@@ -188,12 +202,10 @@ module UInt64
 
   type uint64
 
-  constant min_uint64 : int =  0x0000000000000000
   constant max_uint64 : int =  0xffffffffffffffff
 
-  clone export Bounded_int with
+  clone export Unsigned with
     type t = uint64,
-    constant min = min_uint64,
     constant max = max_uint64
 
 end
