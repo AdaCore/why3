@@ -45,6 +45,14 @@ module mach.int.UInt32
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
   syntax val      (>)       "(>)"
+
+  (* direct realization of add_with_carry.
+     Remind that parameters x y and c are assumed to denote unsigned integers
+     less than 2^{32} *)
+  syntax val      add_with_carry "(fun x y c ->
+    let r = Int64.add x (Int64.add y c) in
+    (Int64.logand r 0xFFFFFFFFL,Int64.shift_right_logical r 32))"
+
 end
 
 module mach.int.Int63

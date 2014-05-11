@@ -20,6 +20,7 @@ module N
   these are represented by an array of "limbs". A limb is expected to
   be a machine word, abstractly it can be any unsigned integer type
   *)
+(* does not allow extraction...
   type limb
 
   clone mach.int.Unsigned as Limb
@@ -28,6 +29,21 @@ module N
   axiom limb_max_bound: 1 <= Limb.max
 
   constant radix : int = Limb.max + 1
+
+*)
+
+(* temporary: stick to uint32 *)
+
+  use mach.int.UInt32 as Limb
+
+  type limb = Limb.uint32
+
+  axiom limb_max_bound: 1 <= Limb.max_uint32
+
+  constant radix : int = Limb.max_uint32 + 1
+
+(**)
+
 
   function l2i (x:limb) : int = Limb.to_int x
 
@@ -312,7 +328,7 @@ module N
     let one = Int31.of_int 1 in
     let limb_zero = Limb.of_int 0 in
     let lx = x.length in
-    if Int31.eq lx (Int31.of_int Int31.max_int31) then raise TooManyDigits;
+    if Int31.eq lx (of_int 0x3FFFFFFF) then raise TooManyDigits;
     let r = Array31.make (Int31.(+) lx one) limb_zero in
     Array31.blit x zero r zero lx;
     assert { MapEq.map_eq_sub x.elts r.elts 0 (p2i lx) };
@@ -338,3 +354,15 @@ module N
       { digits = add_array y.digits x.digits }
 
 end
+
+
+
+(* does not work as expected
+module N64
+
+  use import mach.int.Int64
+
+  clone N with type limb = int64
+
+end
+*)
