@@ -76,6 +76,19 @@ module N
 
   function value (x:t) : int = value_array x.digits
 
+  let lemma value_sub_update (x:map int limb) (i n m:int) (v:limb)
+    requires { n <= i < m }
+    ensures {
+      value_sub (Map.set x i v) n m =
+      value_sub x n m + power radix (i - n) * (l2i v - l2i (Map.get x i))
+    }
+  = assert { MapEq.map_eq_sub x (Map.set x i v) n i };
+    assert { MapEq.map_eq_sub x (Map.set x i v) (i+1) m };
+    value_sub_concat x n i m;
+    value_sub_concat (Map.set x i v) n i m
+
+
+
 
 (** {2 conversion from a small integer} *)
 
@@ -188,10 +201,10 @@ module N
 
   exception Break
 
-  val addc (x y:limb) (c:bool) : (limb,bool)
+  val addc (x y:limb) (c:limb) : (limb,limb)
     returns { (r,d) ->
-      l2i r + (if d then radix else 0) =
-      l2i x + l2i y + (if c then 1 else 0) }
+      l2i r + radix * l2i d =
+      l2i x + l2i y + l2i c }
 
   val add_limb (x:array limb) (y:limb) (x1 x2:int31) : limb
     requires { 0 <= p2i x1 <= p2i x2 <= p2i x.length }
@@ -217,18 +230,22 @@ module N
     requires { 0 <= p2i y1 <= p2i y2 <= p2i y.length }
     requires { p2i x2 - p2i x1 >= p2i y2 - p2i y1 }
     writes { x }
-    ensures { value_array x + power radix (p2i x2) * l2i result
-      = value_array (old x) + power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i y2) }
+    ensures {
+      value_array x + power radix (p2i x2) * l2i result
+      = value_array (old x) +
+        power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i y2) }
   = 'Init:
+    let limb_zero = Limb.of_int 0 in
     let one = Int31.of_int 1 in
     let i = ref y1 in
-    let c = ref false in
+    let c = ref limb_zero in
     while Int31.(<) !i y2 do
       invariant { p2i y1 <= p2i !i <= p2i y2 }
       invariant {
         let j = p2i x1 + (p2i !i - p2i y1) in
-        value_array x + power radix j * (if !c then 1 else 0)
-      = value_array (at x 'Init) + power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i !i) }
+        value_array x + power radix j * l2i !c
+      = value_array (at x 'Init) +
+        power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i !i) }
       variant { p2i y2 - p2i !i }
       let j = Int31.(+) x1 (Int31.(-) !i y1) in
       let (r,c') = addc x[j] y[!i] !c in
@@ -239,24 +256,12 @@ module N
       assert { value_sub y.elts (p2i y1) (p2i !i + 1) =
          value_sub y.elts (p2i y1) (p2i !i)
          + power radix (p2i !i - p2i y1) * l2i y[p2i !i] };
-      assert { power radix (p2i j + 1) = power radix (p2i j) * radix };
+      assert { power radix (p2i x1 + (p2i !i + 1 - p2i y1)) = power radix (p2i j) * radix };
+      assert { power radix (p2i x1 + (p2i !i - p2i y1))
+             = power radix (p2i x1) * power radix (p2i !i - p2i y1) };
       c := c';
       i := Int31.(+) !i one;
-      assert { !c = False ->
-        let j = p2i x1 + (p2i !i - p2i y1) in
-        value_array x = value_array (at x 'Init) + power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i !i) };
-      assert { !c = True ->
-        let j = p2i x1 + (p2i !i - p2i y1) in
-        value_array x + power radix j
-      = value_array (at x 'Init) + power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i !i) };
-      assert { (if True then 1 else 0) = 0+1 };
-      assert { (if False then 1 else 0) = 0+0 };
-      assert {
-        let j = p2i x1 + (p2i !i - p2i y1) in
-        value_array x + power radix j * (if !c then 1 else 0)
-      = value_array (at x 'Init) + power radix (p2i x1) * value_sub y.elts (p2i y1) (p2i !i) };
     done;
-    if !c then add_limb x (Limb.of_int 1) (Int31.(+) x1 (Int31.(-) y2 y1)) x2
-    else Limb.of_int 0
+    add_limb x !c (Int31.(+) x1 (Int31.(-) y2 y1)) x2
 
 end
