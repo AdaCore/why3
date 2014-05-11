@@ -20,7 +20,9 @@ module N
   these are represented by an array of "limbs". A limb is expected to
   be a machine word, abstractly it can be any unsigned integer type
   *)
-(* does not allow extraction...
+
+(*i FIXME: does not allow extraction...
+
   type limb
 
   clone mach.int.Unsigned as Limb
@@ -32,7 +34,7 @@ module N
 
 *)
 
-(* temporary: stick to uint32 *)
+(*i temporary: stick to uint32 *)
 
   use mach.int.UInt32 as Limb
 
@@ -43,7 +45,6 @@ module N
   constant radix : int = Limb.max_uint32 + 1
 
 (**)
-
 
   function l2i (x:limb) : int = Limb.to_int x
 
@@ -362,7 +363,7 @@ module N
 
   let add_aux_in_place (x:t) (y:array limb) : unit
     requires { p2i x.digits.length >= p2i y.length }
-    (* what is the right clause ? writes   { x, x.digits } *)
+    writes   { x.digits, x.digits.elts } 
     ensures  { value x = value (old x) + value_array y }
     raises   { TooManyDigits -> true }
   = 'Init:
@@ -380,16 +381,13 @@ module N
     if Int31.eq lx (of_int 0x3FFFFFFF) then raise TooManyDigits;
     'L:
     enlarge x (Int31.(+) lx one);
-(*
-    assert { MapEq.map_eq_sub x.digits.elts r.elts 0 (p2i lx) };
-*)
     assert { l2i x.digits[p2i lx] = 0 };
     x.digits[lx] <- c;
     assert { value x = value_array (at x.digits 'L) + power radix (p2i lx) * l2i c };
     end
 
   let add_in_place (x y:t) : unit
-    (* writes  { x } *)
+    writes  { x.digits, x.digits.elts } 
     ensures { value x = value (old x) + value y }
     raises  { TooManyDigits -> true }
   = let lx = x.digits.length in
@@ -436,7 +434,7 @@ end
 
 
 
-(* does not work as expected
+(*i does not work as expected
 module N64
 
   use import mach.int.Int64
