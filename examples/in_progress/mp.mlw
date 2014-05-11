@@ -15,16 +15,10 @@ module N
   use import int.Int
   use import int.Power
 
-  lemma ge_mult :
-    forall x y z:int. x >= y * z /\ y >= 0 /\ z >= 1 -> x >= y
-
-  lemma power_non_neg:
-     forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
-
-  (** {2 unbounded precision natural numbers} 
+  (** {2 unbounded precision natural numbers}
 
   these are represented by an array of "limbs". A limb is expected to
-  be a machine word, abstractly it can be any unsigned integer type 
+  be a machine word, abstractly it can be any unsigned integer type
   *)
   type limb
 
@@ -119,7 +113,7 @@ module N
     requires { x1 <= x2 }
     variant  { x2 - x1 }
     ensures  { 0 <= value_sub x x1 x2 }
-  = if x1 = x2 then () else 
+  = if x1 = x2 then () else
       begin
         assert { value_sub x x1 x2 = l2i (Map.get x x1) + radix * value_sub x (x1+1) x2};
         value_sub_lower_bound x (x1+1) x2
@@ -138,7 +132,7 @@ module N
   let lemma value_sub_lower_bound_tight (x:map int limb) (x1 x2:int)
     requires { x1 < x2 }
     ensures  { power radix (x2-x1-1) *  l2i (Map.get x (x2-1)) <= value_sub x x1 x2 }
-  = assert   { value_sub x x1 x2 = value_sub x x1 (x2-1) 
+  = assert   { value_sub x x1 x2 = value_sub x x1 (x2-1)
                + power radix (x2-x1-1) * l2i (Map.get x (x2-1)) }
 
   let rec lemma value_sub_upper_bound_tight (x:map int limb) (x1 x2:int)
@@ -180,7 +174,7 @@ module N
         if Limb.ne x[!i] limb_zero then
           begin
             assert { value_sub x.elts (p2i x1) (p2i !i + 1) >=
-                     power radix (p2i !i - p2i x1) * l2i x[p2i !i] >= 
+                     power radix (p2i !i - p2i x1) * l2i x[p2i !i] >=
                      power radix (p2i !i - p2i x1) };
             assert { value_sub x.elts (p2i x1) (p2i x2) = value_sub x.elts (p2i x1) (p2i !i + 1)
                       + power radix (p2i !i + 1 - p2i x1) * value_sub x.elts (p2i !i + 1) (p2i x2)};
@@ -245,10 +239,7 @@ module N
   val add_limb (x:array limb) (y:limb) (x1 x2:int31) : limb
     requires { 0 <= p2i x1 <= p2i x2 <= p2i x.length }
     writes  { x }
-(*
-    ensures { MapEq.map_eq_sub (old x) x 0 (p2i x1) }
-    ensures { MapEq.map_eq_sub (old x) x (p2i x2) (p2i x.length) }
-*)
+    ensures { forall j. 0 <= j < p2i x1 \/ p2i x2 <= j < p2i x.length -> x[j] = (old x)[j] }
     ensures { value_array x + power radix (p2i x2) * l2i result
       = value_array (old x) + power radix (p2i x1) * l2i y }
 (*
@@ -266,6 +257,7 @@ module N
     requires { 0 <= p2i y1 <= p2i y2 <= p2i y.length }
     requires { p2i x2 - p2i x1 >= p2i y2 - p2i y1 }
     writes { x }
+    ensures { forall j. 0 <= j < p2i x1 \/ p2i x2 <= j < p2i x.length -> x[j] = (old x)[j] }
     ensures {
       value_array x + power radix (p2i x2) * l2i result
       = value_array (old x) +
@@ -276,6 +268,8 @@ module N
     let i = ref y1 in
     let c = ref limb_zero in
     while Int31.(<) !i y2 do
+      invariant { forall j. 0 <= j < p2i x1 \/ p2i x2 <= j < p2i x.length ->
+                  x[j] = (at x 'Init)[j] }
       invariant { p2i y1 <= p2i !i <= p2i y2 }
       invariant {
         let j = p2i x1 + (p2i !i - p2i y1) in
@@ -299,5 +293,40 @@ module N
       i := Int31.(+) !i one;
     done;
     add_limb x !c (Int31.(+) x1 (Int31.(-) y2 y1)) x2
+
+  exception TooManyDigits
+
+  let add_array (x y:array limb) : array limb
+    requires { p2i x.length >= p2i y.length }
+    ensures  { value_array result = value_array x + value_array y }
+    raises   { TooManyDigits -> true }
+  = let zero = Int31.of_int 0 in
+    let one = Int31.of_int 1 in
+    let limb_zero = Limb.of_int 0 in
+    let lx = x.length in
+    if Int31.eq lx (Int31.of_int Int31.max_int31) then raise TooManyDigits;
+    let r = Array31.make (Int31.(+) lx one) limb_zero in
+    Array31.blit x zero r zero lx;
+    assert { MapEq.map_eq_sub x.elts r.elts 0 (p2i lx) };
+    assert { l2i r[p2i lx] = 0 };
+    assert { value_array r = value_array x };
+    let c = add_limbs r y zero lx zero y.length in
+    assert {
+      value_array r + power radix (p2i lx) * l2i c = value_array x + value_array y };
+    'L:
+    assert { l2i r[p2i lx] = 0 };
+    r[lx] <- c;
+    assert { value_array r = value_array (at r 'L) + power radix (p2i lx) * l2i c };
+    r
+
+  let add (x y:t) : t
+    ensures { value result = value x + value y }
+    raises  { TooManyDigits -> true }
+  = let lx = x.digits.length in
+    let ly = y.digits.length in
+    if Int31.(>=) lx ly then
+      { digits = add_array x.digits y.digits }
+    else
+      { digits = add_array y.digits x.digits }
 
 end
