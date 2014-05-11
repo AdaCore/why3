@@ -178,7 +178,7 @@ module N
   = let limb_zero = Limb.of_int 0 in
     let zero = Int31.of_int 0 in
     let one = Int31.of_int 1 in
-    let minus_one = Int31.of_int (-1) in
+    let minus_one = Int31.(-_) one in
     let i = ref x2 in
     let x3 = Int31.(+) x1 (Int31.(-) y2 y1) in
     try
