@@ -113,6 +113,10 @@ module Unsigned
   clone export Bounded_int with
     constant min = min_unsigned
 
+  constant zero_unsigned : t
+
+  axiom zero_unsigned_is_zero : to_int zero_unsigned = 0
+
   val add_with_carry (x y:t) (c:t) : (t,t)
     returns { (r,d) ->
       to_int r + (max+1) * to_int d =

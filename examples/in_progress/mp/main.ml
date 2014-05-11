@@ -13,15 +13,23 @@ let input =
 open Mp__N
 
 let input_num =
-  try let a,i = Parse.parse_dec input 0 in a
+  try let a,i = Parse.parse_dec_ip input 0 in a
   with Parse.SyntaxError -> usage ()
 
 let () =
-  Format.printf "zero   : %a@." Parse.pr (zero ());
-  Format.printf "one    : %a@." Parse.pr (from_limb 1L);
-  Format.printf "2^{32} : %a@." Parse.pr (from_limb 0x100000000L);
-  Format.printf "input  : %a@." Parse.pr input_num;
-  let a = add input_num input_num in
-  Format.printf "times 2: %a@." Parse.pr a;
-  let a = add a input_num in
-  Format.printf "times 3: %a@." Parse.pr a
+  let z = zero () in
+  Format.printf "zero       : %a@." Parse.pr z;
+  let a = from_limb 1L in
+  Format.printf "one        : %a@." Parse.pr a;
+  let a = from_limb 0xFFFFFFFFL in
+  Format.printf "2^{32}-1   : %a@." Parse.pr a;
+  add_in_place z a;
+  Format.printf "0 + 2^{32}-1 : %a@." Parse.pr z;
+  add_in_place a (from_limb 1L);
+  Format.printf "2^{32}-1+1 : %a@." Parse.pr a;
+  let a = copy input_num in
+  Format.printf "input      : %a@." Parse.pr a;
+  add_in_place a input_num;
+  Format.printf "times 2    : %a@." Parse.pr a;
+  add_in_place a input_num ;
+  Format.printf "times 3    : %a@." Parse.pr a

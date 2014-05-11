@@ -5,11 +5,11 @@
 
 let compute_result text =
   try
-    let a,i = Parse.parse_dec text 0 in
+    let a,i = Parse.parse_dec_ip text 0 in
     let i = Parse.parse_sep_star text i in
-    let b,i = Parse.parse_dec text i in
-    let c = Mp__N.add a b in
-    Parse.pr Format.str_formatter c;
+    let b,i = Parse.parse_dec_ip text i in
+    Mp__N.add_in_place a b;
+    Parse.pr Format.str_formatter a;
     Format.flush_str_formatter ()
   with Parse.SyntaxError -> "syntax error"
 

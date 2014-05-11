@@ -23,8 +23,6 @@ MAIN=main
 GEN=map__Map mp__N
 OBJ=$(GEN) parse
 
-parse.cmo: mp__N.cmi
-
 GENML = $(addsuffix .ml, $(GEN))
 ML = $(addsuffix .ml, $(OBJ))
 CMO = $(addsuffix .cmo, $(OBJ))
@@ -35,6 +33,9 @@ OCAMLOPT=ocamlopt -noassert -inline 1000
 all: $(MAIN).$(OCAMLBEST)
 
 extract: $(GENML)
+
+parse.cmo: mp__N.cmo
+
 
 $(MAIN).byte: $(CMO)  $(MAIN).cmo
 	ocamlc $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -g -o $@ $^
