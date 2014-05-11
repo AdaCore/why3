@@ -1,6 +1,6 @@
 
 
-(** A library for arbitrary-precision integer arithmetic *)
+(** {1 A library for arbitrary-precision integer arithmetic} *)
 
 module N
 
@@ -11,16 +11,27 @@ module N
 
   use import int.Int
   use import int.Power
+
+(** {2 data type for unbound integers and invariants} *)
+
   constant base : int = 10000
+  (** a power of ten whose square fits on 31 bits *)
 
   type t = { mutable digits: array int31 }
+  (** an unbounded integer is stored in an array of 31 bits integers,
+      with all values between 0 included and [base] excluded
 
+      index 0 is the lsb. the msb is never 0.
+  *)
   predicate ok_array (a:array int31) =
     (to_int a.length >= 1 -> to_int a[to_int a.length - 1] <> 0) /\
     forall i:int. 0 <= i < to_int a.length ->
       0 <= to_int a[i] < base
 
   predicate ok (x:t) = ok_array x.digits
+
+
+(** {2 value stored in an array} *)
 
   (* [value_sub x n m] denotes the integer represented by
      the digits x[n..m-1] with lsb at index n *)
@@ -79,6 +90,46 @@ module N
 
   function value (x:t) : int = value_array x.digits
 
+
+(** {2 general lemmas} *)
+
+(* moved to stdlib
+  lemma power_monotonic:
+    forall x y z. 0 <= x <= y -> power z x <= power z y
+*)
+
+  lemma power_non_neg:
+     forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
+
+  lemma value_zero:
+    forall x:array int31.
+      let l = to_int x.length in
+      l = 0 -> value_array x = 0
+
+  lemma value_sub_upper_bound:
+    forall x:map int int31, n l:int. 0 <= n <= l ->
+    (forall i:int. 0 <= i < n -> 0 <= to_int (Map.get x i) < base) ->
+    value_sub x 0 n l < power base n
+
+  lemma value_sub_lower_bound:
+    forall x:map int int31, n l:int. 0 <= n <= l ->
+    (forall i:int. 0 <= i < n -> 0 <= to_int (Map.get x i) < base) ->
+    0 <= value_sub x 0 n l
+
+  lemma value_sub_lower_bound_tight:
+    forall x:map int int31, n l:int. 0 < n <= l ->
+    (forall i:int. 0 <= i < n-1 -> 0 <= to_int (Map.get x i) < base) ->
+    0 < to_int (Map.get x (n-1)) < base ->
+    power base (n-1) <= value_sub x 0 n l
+
+  lemma value_bounds_array:
+    forall x:array int31. ok_array x ->
+      let l = to_int x.length in
+      l > 0 -> power base (l-1) <= value_array x < power base l
+
+(** {2 conversion from a small integer} *)
+
+
   let from_small_int (n:int31) : t
     requires { 0 <= to_int n < base }
     ensures { ok result }
@@ -91,6 +142,98 @@ module N
         Array31.make (of_int 1) n
     in
     { digits = a }
+
+(** {2 Comparisons} *)
+
+  exception Break
+
+(* Comparisons *)
+
+  let compare_array (x y:array int31) : int31
+    requires { ok_array x /\ ok_array y }
+    ensures  { -1 <= to_int result <= 1 }
+    ensures  { to_int result = -1 -> value_array x < value_array y }
+    ensures  { to_int result = 0 -> value_array x = value_array y }
+    ensures  { to_int result = 1 -> value_array x > value_array y }
+  = let zero = of_int 0 in
+    let one = of_int 1 in
+    let minus_one = of_int (-1) in
+    let l1 = x.length in
+    let l2 = y.length in
+    if Int31.(<) l1 l2 then minus_one else
+      if Int31.(>) l1 l2 then one else
+    let i = ref l1 in
+    let res = ref zero in
+    let ghost acc = ref 0 in
+    try
+      while Int31.(>) !i zero do
+        invariant { to_int !res = 0 }
+          (* needed to be sure it is zero at normal exit ! *)
+        invariant { 0 <= to_int !i <= to_int l1 }
+        invariant {
+          value_sub x.elts 0 (to_int !i) (to_int l1) = value_array x - !acc
+        }
+        invariant {
+          value_sub y.elts 0 (to_int !i) (to_int l1) = value_array y - !acc
+        }
+        variant { to_int !i }
+        assert { value_array x - !acc =
+          value_sub x.elts 0 (to_int !i - 1) (to_int l1) +
+          power base (to_int !i - 1) * (to_int x[to_int !i - 1])
+          };
+        assert {  value_array y - !acc =
+          value_sub y.elts 0 (to_int !i - 1) (to_int l1) +
+          power base (to_int !i - 1) * (to_int y[to_int !i - 1])
+          };
+        i := Int31.(-) !i one;
+        if Int31.(<) x[!i] y[!i] then
+          begin
+          assert { value_sub y.elts 0 (to_int !i) (to_int l1) >= 0 };
+          assert { value_sub x.elts 0 (to_int !i) (to_int l1) <
+            power base (to_int !i)
+          };
+          assert { value_array y - !acc >=
+            power base (to_int !i) * (to_int y[to_int !i])
+          };
+          assert { to_int y[to_int !i] >= to_int x[to_int !i] + 1 };
+          assert { power base (to_int !i) * (to_int y[to_int !i]) >=
+                   power base (to_int !i) * (to_int x[to_int !i] + 1) };
+          assert { power base (to_int !i) * (to_int y[to_int !i]) >=
+                   power base (to_int !i) * (to_int x[to_int !i])
+                   + power base (to_int !i) };
+            res := minus_one;
+            raise Break;
+          end;
+        if Int31.(>) x[!i] y[!i] then
+          begin
+          assert { value_sub x.elts 0 (to_int !i) (to_int l1) >= 0 };
+          assert { value_sub y.elts 0 (to_int !i) (to_int l1) <
+            power base (to_int !i)
+          };
+          assert { value_array x - !acc >=
+            power base (to_int !i) * (to_int x[to_int !i])
+          };
+          assert { to_int x[to_int !i] >= to_int y[to_int !i] + 1 };
+          assert { power base (to_int !i) * (to_int x[to_int !i]) >=
+                   power base (to_int !i) * (to_int y[to_int !i] + 1) };
+          assert { power base (to_int !i) * (to_int x[to_int !i]) >=
+                   power base (to_int !i) * (to_int y[to_int !i])
+                   + power base (to_int !i) };
+            res := one;
+            raise Break
+          end;
+        acc := !acc + power base (to_int !i) * to_int x[!i];
+      done;
+      raise Break
+    with Break -> !res
+    end
+
+  let eq (x y:t) : bool
+    requires { ok x /\ ok y }
+    ensures  { if result then value x = value y else value x <> value y }
+  = Int31.eq (compare_array x.digits y.digits) (of_int 0)
+
+(** {2 arithmetic operations} *)
 
   exception TooManyDigits
 
@@ -176,7 +319,7 @@ module N
     assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
        value_sub (at arr 'L).elts 0 (to_int !i) (to_int h + 1) };
     assert { value_array arr = value_array x + value_array y };
-    abstract 
+    abstract
      ensures { -1 <= to_int !non_null_idx <= to_int !i }
      ensures { to_int !non_null_idx >= 0 -> to_int arr[to_int !non_null_idx] <> 0 }
      ensures {
@@ -194,9 +337,9 @@ module N
       MapEq.map_eq_sub arr.elts arr'.elts 0 (to_int len) };
     assert { value_sub arr.elts 0 (to_int len) (to_int len) =
       value_sub arr'.elts 0 (to_int len) (to_int len) } ;
-    assert { to_int arr'.length >= 1 -> 
+    assert { to_int arr'.length >= 1 ->
                to_int arr'[to_int arr'.length - 1] <> 0 };
-    assert { forall j. 0 <= j < to_int arr'.length -> 
+    assert { forall j. 0 <= j < to_int arr'.length ->
                0 <= to_int arr'[j] < base };
     arr'
 
@@ -214,7 +357,26 @@ module N
     in
     { digits = res }
 
+
+(* Multiplication: school book algorithm *)
 (*
+  let rec mul_array (x y:array int31) : array int31
+    requires { ok_array x /\ ok_array y }
+    ensures { ok_array result }
+    ensures { value_array result = value_array x * value_array y }
+    raises { TooManyDigits -> true }
+  = let zero = of_int 0 in
+    let one = of_int 1 in
+    let two = of_int 2 in
+    let base31 = of_int 10000 in
+    assert { to_int base31 = base };
+    let l1 = x.digits.length in
+    let l2 = y.digits.length in
+    TODO
+*)
+
+(* Multiplication: Karatsuba algorithm
+
   let rec mul_array (x y:array int31) : array int31
     requires { ok_array x /\ ok_array y }
     ensures { ok_array result }
@@ -233,8 +395,12 @@ module N
        let h = Int31.(/) n base31 in
        let l = Int31.(-) n (Int31.(*) h base31) in
        if Int31.eq h zero then
-          let arr = Array31.make one l in
-          { digits = arr }
+          if Int31.eq l zero then
+            let arr = Array31.make zero zero in
+            { digits = arr }
+          else
+            let arr = Array31.make one l in
+            { digits = arr }
        else
           let arr = Array31.make two l in
           arr.(1) <- h;
@@ -260,6 +426,8 @@ module N
       let z2 = mul_array high1 high2 in
       (*
       return (z2*10^(2*m2))+((z1-z2-z0)*10^(m2))+(z0)
+
+      -> we need subtraction !
       *)
 
   let mul (x y:t) : t

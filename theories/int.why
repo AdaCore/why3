@@ -235,6 +235,12 @@ theory Power
     goal CommutativeMonoid.Unit_def_l, goal CommutativeMonoid.Unit_def_r,
     goal CommutativeMonoid.Comm.Comm
 
+  lemma Power_non_neg:
+     forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
+
+  lemma Power_monotonic:
+    forall x n m:int. 0 < x /\ 0 <= n <= m -> power x n <= power x m
+
 end
 
 (** {2 Number of elements satisfying a given predicate}
