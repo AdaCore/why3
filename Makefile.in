@@ -229,12 +229,10 @@ clean::
 # installation
 ###############
 
-# TODO: Clean this madness
-clean_old_install:
-	rm -f $(BINDIR)/why3*
+clean_old_install::
+	rm -rf $(LIBDIR)/why3
 	rm -rf $(DATADIR)/why3
 	rm -rf $(OCAMLINSTALLLIB)/why3
-	rm -rf $(LIBDIR)/why3/plugins
 
 
 ifeq ($(EMACS),no)
@@ -243,6 +241,7 @@ else
 install_no_local:: clean_old_install $(TARGET_EMACS)
 endif
 	mkdir -p $(BINDIR)
+	mkdir -p $(LIBDIR)/why3
 	mkdir -p $(DATADIR)/why3
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/images/boomy
@@ -265,10 +264,6 @@ endif
 	cp -f share/images/fatcow/*.png $(DATADIR)/why3/images/fatcow
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
-	cp -f share/emacs/why3.el $(DATADIR)/emacs/site-lisp/why3.el
-ifneq ($(EMACS),no)
-	cp -f share/emacs/why3.elc $(DATADIR)/emacs/site-lisp/why3.elc
-endif
 	cp -f share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
 	cp -f share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 
@@ -300,6 +295,19 @@ uninstall: clean_old_install
 
 %.elc: %.el
 	$(EMACS) --batch --no-init-file -f batch-byte-compile $<
+
+clean_old_install::
+	rm -f $(DATADIR)/emacs/site-lisp/why3.el
+ifneq ($(EMACS),no)
+	rm -f $(DATADIR)/emacs/site-lisp/why3.elc
+endif
+
+install_no_local::
+	cp -f share/emacs/why3.el $(DATADIR)/emacs/site-lisp/why3.el
+ifneq ($(EMACS),no)
+	cp -f share/emacs/why3.elc $(DATADIR)/emacs/site-lisp/why3.elc
+endif
+
 
 ##################
 # Why3 plugins
@@ -431,6 +439,9 @@ bin/why3.byte: lib/why3/why3.cma src/main.cmo
 
 bin/why3: bin/why3.@OCAMLBEST@
 	ln -sf why3.@OCAMLBEST@ $@
+
+clean_old_install::
+	rm -f $(BINDIR)/why3$(EXE)
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
@@ -567,6 +578,9 @@ local_config: bin/why3config.@OCAMLBEST@
 	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/why3config.@OCAMLBEST@ \
 		--detect --conf_file why3.conf
 
+clean_old_install::
+	rm -f $(BINDIR)/why3config$(EXE)
+
 install_no_local::
 	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
 
@@ -625,6 +639,9 @@ clean::
 	rm -f src/ide/*.annot src/ide/*.dep src/ide/*~
 	rm -f bin/why3ide.byte bin/why3ide.opt bin/why3ide
 
+clean_old_install::
+	rm -f $(BINDIR)/why3ide$(EXE)
+
 install_no_local::
 	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
 
@@ -676,6 +693,9 @@ clean::
 	rm -f src/why3replayer/*.cm[iox] src/why3replayer/*.o
 	rm -f src/why3replayer/*.annot src/why3replayer/*.dep src/why3replayer/*~
 	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
+
+clean_old_install::
+	rm -f $(BINDIR)/why3replayer$(EXE)
 
 install_no_local::
 	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer$(EXE)
@@ -729,6 +749,9 @@ clean::
 	rm -f src/why3session/*.cm[iox] src/why3session/*.o
 	rm -f src/why3session/*.annot src/why3session/*.dep src/why3session/*~
 	rm -f bin/why3session.byte bin/why3session.opt bin/why3session
+
+clean_old_install::
+	rm -f $(BINDIR)/why3session$(EXE)
 
 install_no_local::
 	cp -f bin/why3session.@OCAMLBEST@ $(BINDIR)/why3session$(EXE)
@@ -784,6 +807,9 @@ clean::
 	rm -f src/why3bench/*.cm[iox] src/why3bench/*.o
 	rm -f src/why3bench/*.annot src/why3bench/*.dep src/why3bench/*~
 	rm -f bin/why3bench.byte bin/why3bench.opt bin/why3bench
+
+clean_old_install::
+	rm -f $(BINDIR)/why3bench$(EXE)
 
 install_no_local::
 	cp -f bin/why3bench.@OCAMLBEST@ $(BINDIR)/why3bench$(EXE)
@@ -1320,7 +1346,6 @@ clean::
 	rm -f lib/why3-cpulimit$(EXE) src/tools/*~
 
 install_no_local::
-	mkdir -p $(LIBDIR)/why3
 	cp -f lib/why3-cpulimit$(EXE) $(LIBDIR)/why3/why3-cpulimit$(EXE)
 	cp -f lib/why3-call-pvs $(LIBDIR)/why3/why3-call-pvs
 
@@ -1367,6 +1392,9 @@ clean::
 	rm -f src/tools/*.cm[iox] src/tools/*.o
 	rm -f src/tools/*.annot src/tools/*.dep src/tools/*~
 	rm -f bin/why3wc.byte bin/why3wc.opt bin/why3wc
+
+clean_old_install::
+	rm -f $(BINDIR)/why3wc$(EXE)
 
 install_no_local::
 	cp -f bin/why3wc.@OCAMLBEST@ $(BINDIR)/why3wc$(EXE)
@@ -1421,6 +1449,9 @@ clean::
 	rm -f src/why3doc/*.cm[iox] src/why3doc/*.o
 	rm -f src/why3doc/*.annot src/why3doc/*.dep src/why3doc/*~
 	rm -f bin/why3doc.byte bin/why3doc.opt bin/why3doc
+
+clean_old_install::
+	rm -f $(BINDIR)/why3doc$(EXE)
 
 install_no_local::
 	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc$(EXE)
@@ -1697,6 +1728,9 @@ clean::
 ##########
 # Install rules that require root, and thus appear last in the file!
 ##########
+
+clean_old_install::
+	rm -f /etc/bash_completion.d/why3
 
 install_no_local::
 	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
