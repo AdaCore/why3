@@ -118,19 +118,20 @@ module Unsigned
   axiom zero_unsigned_is_zero : to_int zero_unsigned = 0
 
   val add_with_carry (x y:t) (c:t) : (t,t)
+    requires { 0 <= to_int c <= 1 }
     returns { (r,d) ->
       to_int r + (max+1) * to_int d =
       to_int x + to_int y + to_int c }
 
-  val mul_with_carry (x y:t) : (t,t)
+  val add3 (x y z:t) : (t,t)
+    returns { (r,d) ->
+      to_int r + (max+1) * to_int d =
+      to_int x + to_int y + to_int z }
+
+  val mul_double (x y:t) : (t,t)
     returns { (r,d) ->
       to_int r + (max+1) * to_int d =
       to_int x * to_int y }
-
-  val fused_mul_add (x y:t) (c:t) : (t,t)
-    returns { (r,d) ->
-      to_int r + (max+1) * to_int d =
-      to_int x * to_int y + to_int c }
 
 end
 
