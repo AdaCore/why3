@@ -392,6 +392,7 @@ module N
     raises  { TooManyDigits -> true }
   = let lx = x.digits.length in
     let ly = y.digits.length in
+    (* TODO: predict carry to enlarge with 1 more cell if carry may occur *)
     if Int31.(<) lx ly then enlarge x ly;
     add_aux_in_place x y.digits
 
@@ -423,7 +424,8 @@ module N
   let add (x y:t) : t
     ensures { value result = value x + value y }
     raises  { TooManyDigits -> true }
-  = let lx = x.digits.length in
+  = (* TODO: just copy x or y and call add_in_place, and throw away add_array *)
+    let lx = x.digits.length in
     let ly = y.digits.length in
     if Int31.(>=) lx ly then
       { digits = add_array x.digits y.digits }
