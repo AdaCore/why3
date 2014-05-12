@@ -140,7 +140,7 @@ let option_list = Arg.align [
   "--eval", Arg.String add_opt_eval,
       "<id> Evaluate constant <id> in the last selected theory";
   "--exec", Arg.String add_opt_exec,
-      "<M.id> Execution function <id> in module <M>";
+      "<M.id> Execute function <id> in module <M>";
   "-C", Arg.String (fun s -> opt_config := Some s),
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),

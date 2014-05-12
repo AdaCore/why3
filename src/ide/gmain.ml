@@ -1618,7 +1618,7 @@ let eval const result =
               (Mstr.keys files)
         end
       | _ ->
-        "must be of the form 'file.module.ident'";
+        "must be of the form <filename>.<theory name>.<identifier>";
   in
   result#source_buffer#set_text msg
 
@@ -1640,7 +1640,7 @@ let evaluate_window () =
   in
   let vbox = GPack.vbox ~packing:frame#add () in
   let text =
-    "Enter the constant to evaluate under the form <theory name>.<identifier>"
+    "Enter the constant to evaluate under the form <filename>.<theory name>.<identifier>"
   in
   let _ = GMisc.label ~ypad:20 ~text ~xalign:0.5 ~packing:vbox#add () in
   let exec_entry =
