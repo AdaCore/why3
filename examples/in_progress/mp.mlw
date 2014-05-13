@@ -166,10 +166,9 @@ module N
 
 
   let rec lemma value_sub_lower_bound (x:map int limb) (x1 x2:int)
-    requires { x1 <= x2 }
     variant  { x2 - x1 }
     ensures  { 0 <= value_sub x x1 x2 }
-  = if x1 = x2 then () else
+  = if x2 <= x1 then () else
       begin
         assert { value_sub x x1 x2 = l2i (Map.get x x1) + radix * value_sub x (x1+1) x2};
         value_sub_lower_bound x (x1+1) x2
@@ -504,6 +503,21 @@ module N
       i := Int31.(+) !i one;
     done;
     !c
+
+  let mul (x y:t):t
+    ensures { value result = value x * value y }
+    raises  { TooManyDigits -> true }
+  = let limb_zero = Limb.of_int 0 in
+    let zero = Int31.of_int 0 in
+    let lx = x.digits.length in
+    let ly = y.digits.length in
+    if Int31.(>) lx (Int31.(-) (of_int 0x3FFFFFFF) ly) then raise TooManyDigits;
+    let zd = Array31.make (Int31.(+) lx ly) limb_zero in
+    assert { MapEq.map_eq_sub zd.elts (Map.const limb_zero) 0 (p2i lx + p2i ly) };
+    assert { value_sub zd.elts 0 (p2i lx + p2i ly) = 0 };
+    let c = mul_limbs zd x.digits y.digits zero zero lx zero ly in
+    assert { l2i c = 0 };
+    { digits = zd }
 
 end
 
