@@ -164,11 +164,7 @@ Axiom value_sub_lower_bound_tight : forall (x:(map.Map.map Z uint32)) (x1:Z)
   (x2 - 1%Z)%Z)))%Z <= (value_sub x x1 x2))%Z.
 
 Axiom value_sub_upper_bound_tight : forall (x:(map.Map.map Z uint32)) (x1:Z)
-  (x2:Z), (x1 <= x2)%Z -> ((value_sub x x1
-  x2) < (int.Power.power (4294967295%Z + 1%Z)%Z (x2 - x1)%Z))%Z.
-
-Axiom value_sub_upper_bound_tighter : forall (x:(map.Map.map Z uint32))
-  (x1:Z) (x2:Z), (x1 < x2)%Z -> ((value_sub x x1
+  (x2:Z), (x1 < x2)%Z -> ((value_sub x x1
   x2) < ((int.Power.power (4294967295%Z + 1%Z)%Z
   ((x2 - x1)%Z - 1%Z)%Z) * ((to_int1 (map.Map.get x
   (x2 - 1%Z)%Z)) + 1%Z)%Z)%Z)%Z.
@@ -222,8 +218,8 @@ revert h28.
 rewrite h6, 2!Zminus_0_r, Power.Power_0, Zmult_1_l.
 rewrite h14, h18, 2!Zplus_0_l.
 intros H1.
-assert (H2 := value_sub_upper_bound_tight x1 0 (to_int x) h1).
-assert (H3 := value_sub_upper_bound_tight y1 0 (to_int y) h2).
+assert (H2 := value_sub_upper_bound x1 0 (to_int x) h1).
+assert (H3 := value_sub_upper_bound y1 0 (to_int y) h2).
 rewrite Zminus_0_r in H2, H3.
 refine (_ (Zmult_lt_compat _ _ _ _ (conj _ H2) (conj _ H3))).
 apply Z.le_ngt.

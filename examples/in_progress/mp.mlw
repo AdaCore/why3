@@ -190,17 +190,10 @@ module N
   = assert   { value_sub x x1 x2 = value_sub x x1 (x2-1)
                + power radix (x2-x1-1) * l2i (Map.get x (x2-1)) }
 
-  let rec lemma value_sub_upper_bound_tight (x:map int limb) (x1 x2:int)
-    requires { x1 <= x2 }
-    variant  { x2 - x1 }
-    ensures  { value_sub x x1 x2 < power radix (x2-x1)  }
-  = if x1 = x2 then () else
-    value_sub_upper_bound_tight x x1 (x2-1)
-
-  let lemma value_sub_upper_bound_tighter (x:map int limb) (x1 x2:int)
+  let lemma value_sub_upper_bound_tight (x:map int limb) (x1 x2:int)
     requires { x1 < x2 }
     ensures  { value_sub x x1 x2 < power radix (x2-x1-1) *  (l2i (Map.get x (x2-1)) + 1) }
-  = value_sub_upper_bound_tight x x1 (x2-1)
+  = value_sub_upper_bound x x1 (x2-1)
 
   exception Break31 int31
 
