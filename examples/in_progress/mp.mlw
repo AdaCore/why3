@@ -364,7 +364,7 @@ module N
 
   let add_aux_in_place (x:t) (y:array limb) : unit
     requires { p2i x.digits.length >= p2i y.length }
-    writes   { x.digits, x.digits.elts } 
+    writes   { x.digits, x.digits.elts }
     ensures  { value x = value (old x) + value_array y }
     raises   { TooManyDigits -> true }
   = 'Init:
@@ -388,7 +388,7 @@ module N
     end
 
   let add_in_place (x y:t) : unit
-    writes  { x.digits, x.digits.elts } 
+    writes  { x.digits, x.digits.elts }
     ensures { value x = value (old x) + value y }
     raises  { TooManyDigits -> true }
   = let lx = x.digits.length in
@@ -440,7 +440,7 @@ module N
     requires { 0 <= p2i z1 }
     requires { p2i z1 + (p2i x2 - p2i x1) <= p2i z.length }
     writes { z }
-    ensures { forall j. 0 <= j < p2i z1 \/ p2i z1 + (p2i x2 - p2i x1) <= j < p2i x.length -> x[j] = (old x)[j] }
+    ensures { forall j. 0 <= j < p2i z1 \/ p2i z1 + (p2i x2 - p2i x1) <= j < p2i z.length -> z[j] = (old z)[j] }
     ensures { value_array z + power radix (p2i z1 + (p2i x2 - p2i x1)) * l2i result
       = value_array (old z) + power radix (p2i z1) * (value_sub x.elts (p2i x1) (p2i x2) * l2i y) }
   = 'Init:
@@ -449,7 +449,7 @@ module N
     let i = ref x1 in
     let c = ref limb_zero in
     while Int31.(<) !i x2 do
-      invariant { forall j. 0 <= j < p2i z1 \/ p2i z1 + (p2i x2 - p2i x1) <= j < p2i x.length ->
+      invariant { forall j. 0 <= j < p2i z1 \/ p2i z1 + (p2i x2 - p2i x1) <= j < p2i z.length ->
                   z[j] = (at z 'Init)[j] }
       invariant { p2i x1 <= p2i !i <= p2i x2 }
       invariant {
@@ -470,6 +470,40 @@ module N
     done;
     !c
 
+  let mul_limbs (z x y:array limb) (z1 x1 x2 y1 y2:int31) : limb
+    requires { 0 <= p2i x1 <= p2i x2 <= p2i x.length }
+    requires { 0 <= p2i y1 <= p2i y2 <= p2i y.length }
+    requires { 0 <= p2i z1 }
+    requires { p2i z1 + (p2i x2 - p2i x1) + (p2i y2 - p2i y1) <= p2i z.length }
+    writes { z }
+    ensures { forall j. 0 <= j < p2i z1 \/
+      p2i z1 + (p2i x2 - p2i x1) + (p2i y2 - p2i y1) <= j < p2i z.length ->
+      x[j] = (old x)[j] }
+    ensures { value_array z + power radix (p2i z1 + (p2i x2 - p2i x1) + (p2i y2 - p2i y1)) * l2i result
+      = value_array (old z) + power radix (p2i z1) * (value_sub x.elts (p2i x1) (p2i x2) * value_sub y.elts (p2i y1) (p2i y2)) }
+  = 'Init:
+    let limb_zero = Limb.of_int 0 in
+    let one = Int31.of_int 1 in
+    let c = ref limb_zero in
+    let i = ref y1 in
+    while Int31.(<) !i y2 do
+      invariant { forall j. 0 <= j < p2i z1 \/ p2i z1 + (p2i x2 - p2i x1) + (p2i y2 - p2i y1) <= j < p2i z.length ->
+                  z[j] = (at z 'Init)[j] }
+      invariant { p2i y1 <= p2i !i <= p2i y2 }
+      invariant {
+        value_array z + power radix (p2i z1 + (p2i x2 - p2i x1) + (p2i !i - p2i y1)) * l2i !c =
+        value_array (at z 'Init) + power radix (p2i z1) * (value_sub x.elts (p2i x1) (p2i x2) * value_sub y.elts (p2i y1) (p2i !i)) }
+      invariant { 0 <= l2i !c <= 1 }
+      variant { p2i y2 - p2i !i }
+      let j = Int31.(+) z1 (Int31.(-) !i y1) in
+      let d = mul_limb z x y[!i] j x1 x2 in
+      let k = Int31.(+) j (Int31.(-) x2 x1) in
+      let (v,c') = Limb.add_with_carry z[k] d !c in
+      z[k] <- v;
+      c := c';
+      i := Int31.(+) !i one;
+    done;
+    !c
 
 end
 
