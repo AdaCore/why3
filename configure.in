@@ -39,11 +39,7 @@
 #   OCAMLVERSION  the ocaml version number
 #   OCAMLWEB      "ocamlweb" (not mandatory)
 
-
-# check for one particular file of the sources
-# ADAPT THE FOLLOWING LINE TO YOUR SOURCES!
-
-AC_INIT(src/)
+AC_INIT([Why3], m4_esyscmd([. ./Version; echo -n "$VERSION"]))
 
 # verbosemake
 
@@ -671,7 +667,7 @@ fi
 dnl AC_CHECK_PROGS(PSVIEWER,gv evince)
 dnl AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
 
-. ./Version
+VERSION=$PACKAGE_VERSION
 
 BUILDDATE="$(date)"
 
