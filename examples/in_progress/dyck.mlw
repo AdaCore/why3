@@ -1,0 +1,60 @@
+
+theory Dyck
+
+  use export list.List
+  use export list.Append
+
+  type paren = L | R
+
+  type word = list paren
+
+  (* D -> eps | L D R D *)
+  inductive dyck word =
+  | Dyck_nil:
+      dyck Nil
+  | Dyck_ind:
+      forall w1 w2. dyck w1 -> dyck w2 -> dyck (Cons L (w1 ++ Cons R w2))
+
+  lemma dyck_concat:
+    forall w1 w2. dyck w1 -> dyck w2 -> dyck (w1 ++ w2)
+
+  (* the first letter, if any, must be L *)
+  lemma dyck_word_first:
+    forall w: word. dyck w ->
+    match w with Nil -> true | Cons c _ -> c = L end
+
+  lemma dyck_decomp:
+    forall w1 w2: word. dyck (w1 ++ w2) -> dyck w1 -> dyck w2
+
+end
+
+module Check
+
+  use import Dyck
+  use import list.Length
+
+  exception Failure
+
+  let rec is_dyck_rec (w: word) : word
+    ensures { exists p: word. dyck p && w = p ++ result &&
+              match result with Cons L _ -> false | _ -> true end }
+    raises  { Failure -> forall p s: word. w = p ++ s -> not (dyck p) }
+    variant { length w }
+  =
+    match w with
+    | Cons L w ->
+       match is_dyck_rec w with
+       | Cons R w -> is_dyck_rec w
+       | _        -> raise Failure
+       end
+    | _ ->
+       w
+    end
+
+  let is_dyck (w: word) : bool
+    ensures { result <-> dyck w }
+  =
+    try is_dyck_rec w = Nil with Failure -> false end
+
+end
+
