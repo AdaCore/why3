@@ -8,7 +8,7 @@
  <file
   name="../bintree.why"
   verified="true"
-  expanded="false">
+  expanded="true">
   <theory
    name="Tree"
    locfile="../bintree.why"
@@ -21,7 +21,7 @@
    locfile="../bintree.why"
    loclnum="10" loccnumb="7" loccnume="11"
    verified="true"
-   expanded="false">
+   expanded="true">
    <label
     name="number of nodes"/>
    <goal
@@ -30,12 +30,12 @@
     loclnum="20" loccnumb="8" loccnume="19"
     sum="cb8c289d9686ccc4e3509e0890619661"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=c0asizeV0F">
     <transf
      name="induction_ty_lex"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="size_nonneg.1"
       locfile="../bintree.why"
@@ -43,8 +43,40 @@
       expl="1."
       sum="12d53d1b4d232aed7f7f83d7cb5e3f42"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Cainfix &lt;=c0asizeV0aEmptyainfix &lt;=c0asizeV0Iainfix &lt;=c0asizeV1Iainfix &lt;=c0asizeV3aNodeVVVV0F">
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="size_empty"
+    locfile="../bintree.why"
+    loclnum="22" loccnumb="8" loccnume="18"
+    sum="b31540d42a20b62d3b95f5df6a1117e7"
+    proved="true"
+    expanded="true"
+    shape="ainfix =V0aEmptyqainfix =c0asizeV0F">
+    <transf
+     name="induction_ty_lex"
+     proved="true"
+     expanded="true">
+     <goal
+      name="size_empty.1"
+      locfile="../bintree.why"
+      loclnum="22" loccnumb="8" loccnume="18"
+      expl="1."
+      sum="c50dc79fc1bbfb85ca3062b724b8de5e"
+      proved="true"
+      expanded="false"
+      shape="Cainfix =V0aEmptyqainfix =c0asizeV0aEmptyainfix =V0aEmptyqainfix =c0asizeV0Iainfix =V1aEmptyqainfix =c0asizeV1Iainfix =V3aEmptyqainfix =c0asizeV3aNodeVVVV0F">
       <proof
        prover="0"
        timelimit="6"
@@ -60,31 +92,31 @@
   <theory
    name="Occ"
    locfile="../bintree.why"
-   loclnum="24" loccnumb="7" loccnume="10"
+   loclnum="26" loccnumb="7" loccnume="10"
    verified="true"
-   expanded="false">
+   expanded="true">
    <label
     name="occurrences in a binary tree"/>
    <goal
     name="occ_nonneg"
     locfile="../bintree.why"
-    loclnum="38" loccnumb="8" loccnume="18"
-    sum="f2106ad0f6afef73c8d8659379f4e159"
+    loclnum="36" loccnumb="8" loccnume="18"
+    sum="717594c52723f5c7e9666ab1ab6810b6"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix &lt;=c0aoccV0V1F">
     <transf
      name="induction_ty_lex"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="occ_nonneg.1"
       locfile="../bintree.why"
-      loclnum="38" loccnumb="8" loccnume="18"
+      loclnum="36" loccnumb="8" loccnume="18"
       expl="1."
-      sum="6ad4875c535741780c16685271aaf9e3"
+      sum="63d90ff251110ddb7e30c27b8bb421b1"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Cainfix &lt;=c0aoccV0V1aEmptyainfix &lt;=c0aoccV0V1Iainfix &lt;=c0aoccV0V2Iainfix &lt;=c0aoccV0V4aNodeVVVV1F">
       <proof
        prover="0"
@@ -101,7 +133,7 @@
   <theory
    name="Inorder"
    locfile="../bintree.why"
-   loclnum="46" loccnumb="7" loccnume="14"
+   loclnum="44" loccnumb="7" loccnume="14"
    verified="true"
    expanded="false">
    <label
@@ -110,7 +142,7 @@
   <theory
    name="Preorder"
    locfile="../bintree.why"
-   loclnum="58" loccnumb="7" loccnume="15"
+   loclnum="56" loccnumb="7" loccnume="15"
    verified="true"
    expanded="false">
    <label
@@ -119,29 +151,29 @@
   <theory
    name="InorderLength"
    locfile="../bintree.why"
-   loclnum="70" loccnumb="7" loccnume="20"
+   loclnum="68" loccnumb="7" loccnume="20"
    verified="true"
-   expanded="false">
+   expanded="true">
    <goal
     name="inorder_length"
     locfile="../bintree.why"
-    loclnum="76" loccnumb="8" loccnume="22"
-    sum="35f8a02ac76b338b12bc12823565d6c2"
+    loclnum="74" loccnumb="8" loccnume="22"
+    sum="e81c509b7e9a14f0ce5eba170b717974"
     proved="true"
-    expanded="false"
+    expanded="true"
     shape="ainfix =alengthainorderV0asizeV0F">
     <transf
      name="induction_ty_lex"
      proved="true"
-     expanded="false">
+     expanded="true">
      <goal
       name="inorder_length.1"
       locfile="../bintree.why"
-      loclnum="76" loccnumb="8" loccnume="22"
+      loclnum="74" loccnumb="8" loccnume="22"
       expl="1."
-      sum="a14cd8e33cdb1250c6764bf6b3d4c8b8"
+      sum="76c4ea67fd68f44ff3811c278c699051"
       proved="true"
-      expanded="false"
+      expanded="true"
       shape="Cainfix =alengthainorderV0asizeV0aEmptyainfix =alengthainorderV0asizeV0Iainfix =alengthainorderV1asizeV1Iainfix =alengthainorderV3asizeV3aNodeVVVV0F">
       <proof
        prover="0"
@@ -158,7 +190,7 @@
   <theory
    name="Zipper"
    locfile="../bintree.why"
-   loclnum="80" loccnumb="7" loccnume="13"
+   loclnum="78" loccnumb="7" loccnume="13"
    verified="true"
    expanded="false">
    <label
