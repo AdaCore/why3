@@ -1,0 +1,84 @@
+
+module SkewHeaps
+
+  use import bintree.Tree
+  use import bintree.Size
+
+  type elt
+
+  predicate le elt elt
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+
+  predicate eq (x y: elt) = le x y && le y x
+
+  clone import bintree.Occ with type elt = elt, predicate eq = eq
+
+  (* [e] is no greater than the root of [t], if any *)
+  predicate le_root (e: elt) (t: tree elt) = match t with
+    | Empty      -> true
+    | Node _ x _ -> le e x
+  end
+
+  (* [t] is a heap *)
+  predicate heap (t: tree elt) = match t with
+    | Empty      -> true
+    | Node l x r -> le_root x l && heap l && le_root x r && heap r
+  end
+
+  predicate is_minimum (x: elt) (t: tree elt) =
+    mem x t && forall e. mem e t -> le x e
+
+  (* the root is the smallest element *)
+  let rec lemma root_is_min (l: tree elt) (x: elt) (r: tree elt) : unit
+     requires { heap (Node l x r) } variant { size (Node l x r) }
+     ensures  { is_minimum x (Node l x r) }
+  =
+    match l with Empty -> () | Node ll lx lr -> root_is_min ll lx lr end;
+    match r with Empty -> () | Node rl rx rr -> root_is_min rl rx rr end;
+    ()
+
+  let get_min (t: tree elt) : elt
+    requires { heap t && t <> Empty }
+    ensures  { is_minimum result t }
+  =
+    match t with
+      | Empty      -> absurd
+      | Node _ x _ -> x
+    end
+
+  let rec merge (t1 t2: tree elt) : tree elt
+    requires { heap t1 && heap t2 }
+    ensures  { heap result }
+    ensures  { forall e. occ e result = occ e t1 + occ e t2 }
+    variant  { size t1 + size t2 }
+  =
+    match t1, t2 with
+    | Empty, _ -> t2
+    | _, Empty -> t1
+    | Node l1 x1 r1, Node l2 x2 r2 ->
+       if le x1 x2 then
+         Node (merge r1 t2) x1 l1
+       else
+         Node (merge r2 t1) x2 l2
+    end
+
+  let add (x: elt) (t: tree elt) : tree elt
+    requires { heap t }
+    ensures  { heap result }
+    ensures  { occ x result = occ x t + 1 }
+    ensures  { forall e. not (eq e x) -> occ e result = occ e t }
+  =
+    merge (Node Empty x Empty) t
+
+  let remove_minimum (t: tree elt) : tree elt
+    requires { heap t && t <> Empty }
+    ensures  { heap result }
+    ensures  { forall e. if is_minimum e t then occ e result = occ e t - 1
+                                           else occ e result = occ e t }
+  =
+    match t with
+      | Empty      -> absurd
+      | Node l _ r -> merge l r
+    end
+
+end
