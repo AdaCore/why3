@@ -2,16 +2,13 @@
 module SkewHeaps
 
   use import bintree.Tree
-  use import bintree.Size
+  use export bintree.Size
+  use export bintree.Occ
 
   type elt
 
   predicate le elt elt
   clone relations.TotalPreOrder with type t = elt, predicate rel = le
-
-  predicate eq (x y: elt) = le x y && le y x
-
-  clone import bintree.Occ with type elt = elt, predicate eq = eq
 
   (* [e] is no greater than the root of [t], if any *)
   predicate le_root (e: elt) (t: tree elt) = match t with
@@ -25,21 +22,44 @@ module SkewHeaps
     | Node l x r -> le_root x l && heap l && le_root x r && heap r
   end
 
+  function minimum (tree elt) : elt
+  axiom minimum_def: forall l x r. minimum (Node l x r) = x
+
   predicate is_minimum (x: elt) (t: tree elt) =
     mem x t && forall e. mem e t -> le x e
 
   (* the root is the smallest element *)
-  let rec lemma root_is_min (l: tree elt) (x: elt) (r: tree elt) : unit
-     requires { heap (Node l x r) } variant { size (Node l x r) }
-     ensures  { is_minimum x (Node l x r) }
+  let rec lemma root_is_min (t: tree elt) : unit
+     requires { heap t && 0 < size t }
+     ensures  { is_minimum (minimum t) t }
+     variant  { size t }
+  = match t with
+    | Empty -> absurd
+    | Node l _ r ->
+        if l <> Empty then root_is_min l;
+        if r <> Empty then root_is_min r
+    end
+
+  let empty () : tree elt
+    ensures { heap result }
+    ensures { size result = 0 }
+    ensures { forall e. not (mem e result) }
   =
-    match l with Empty -> () | Node ll lx lr -> root_is_min ll lx lr end;
-    match r with Empty -> () | Node rl rx rr -> root_is_min rl rx rr end;
-    ()
+    Empty
+
+  let is_empty (t: tree elt) : bool
+    ensures { result <-> size t = 0 }
+  =
+    t = Empty
+
+  let size (t: tree elt) : int
+    ensures { result = size t }
+  =
+    size t
 
   let get_min (t: tree elt) : elt
-    requires { heap t && t <> Empty }
-    ensures  { is_minimum result t }
+    requires { heap t && 0 < size t }
+    ensures  { result = minimum t }
   =
     match t with
       | Empty      -> absurd
@@ -50,6 +70,7 @@ module SkewHeaps
     requires { heap t1 && heap t2 }
     ensures  { heap result }
     ensures  { forall e. occ e result = occ e t1 + occ e t2 }
+    ensures  { size result = size t1 + size t2 }
     variant  { size t1 + size t2 }
   =
     match t1, t2 with
@@ -66,19 +87,60 @@ module SkewHeaps
     requires { heap t }
     ensures  { heap result }
     ensures  { occ x result = occ x t + 1 }
-    ensures  { forall e. not (eq e x) -> occ e result = occ e t }
+    ensures  { forall e. e <> x -> occ e result = occ e t }
+    ensures  { size result = size t + 1 }
   =
     merge (Node Empty x Empty) t
 
-  let remove_minimum (t: tree elt) : tree elt
-    requires { heap t && t <> Empty }
+  let remove_min (t: tree elt) : tree elt
+    requires { heap t && 0 < size t }
     ensures  { heap result }
-    ensures  { forall e. if is_minimum e t then occ e result = occ e t - 1
-                                           else occ e result = occ e t }
+    ensures  { occ (minimum t) result = occ (minimum t) t - 1 }
+    ensures  { forall e. e <> minimum t -> occ e result = occ e t }
+    ensures  { size result = size t - 1 }
   =
     match t with
       | Empty      -> absurd
       | Node l _ r -> merge l r
     end
+
+end
+
+(* application *)
+
+module HeapSort
+
+  use import SkewHeaps
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+  use import array.ArrayPermut
+  clone export array.Sorted with type elt = elt, predicate le = le
+  use import map.Occ as M
+  use import bintree.Occ as H
+
+  let heapsort (a: array elt) : unit
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
+  =
+    let n = length a in
+    let t = ref (empty ()) in
+    for i = 0 to n - 1 do
+      invariant { heap !t && size !t = i }
+      invariant { forall e.
+                  M.occ e a.elts i n + H.occ e !t = M.occ e a.elts 0 n }
+      t := add a[i] !t;
+      assert { M.occ a[i] a.elts i n = 1 + M.occ a[i] a.elts (i+1) n }
+    done;
+    'I:
+    for i = 0 to n - 1 do
+      invariant { sorted_sub a 0 i }
+      invariant { heap !t && size !t = n - i }
+      invariant { forall j. 0 <= j < i -> forall e. mem e !t -> le a[j] e }
+      invariant { forall e.
+                  M.occ e a.elts 0 i + H.occ e !t = M.occ e (at a.elts 'I) 0 n }
+      a[i] <- get_min !t;
+      t := remove_min !t
+    done
 
 end
