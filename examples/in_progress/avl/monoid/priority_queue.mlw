@@ -16,8 +16,13 @@ module PQueue
   axiom balancing_positive : balancing > 0
   
   clone export key_type.ProgramKeyType
+  
+  constant default_element : D.m 'b
+  
   clone preorder.Computable as CO with type T.t = K.t, type T.m = K.m,
     function T.m = K.m, predicate T.c = K.c
+  
+  (* End of parameter section. *)
   
   clone sorted.Base as S with type K.t = D.m,
     type K.key = K.m,
@@ -94,10 +99,14 @@ module PQueue
   
   predicate selection_possible 'e (l:list 'g) = l <> Nil
   
+  predicate lower_bound_strict (x:K.m) (l:list (D.m 'b)) =
+    (forall y. mem y l -> CO.lt x y.key)
+  
   predicate selected 'e (e:split (D.m 'b)) =
       match e.middle with
       | None -> false
-      | Some d -> S.lower_bound d.key e.left /\ S.lower_bound d.key e.right
+      | Some d -> S.lower_bound d.key e.right /\
+        lower_bound_strict d.key e.left
       end
   
   let rec lemma monoid_sum_is_min (l:list (D.m 'b)) : unit
@@ -138,38 +147,62 @@ module PQueue
         forall e. selected sr e /\ rebuild e = rlis ->
           selected s (left_extend llis (p.D.mp.mdl d) e) }
   = let kd = get_key p d in
+    monoid_sum_is_min llis;
+    monoid_sum_is_min rlis;
     match sl , sr with
     | None , None -> Here
     | None , Some a -> if CO.compare kd a <= 0 then Here else Right ()
-    | Some a , None -> if CO.compare kd a <= 0 then Here else Left ()
-    | Some a , Some b -> if CO.compare kd a <= 0
-      then if CO.compare kd b <= 0
-        then Here
-        else begin
-          assert { forall e. selected () e /\ rebuild e = rlis ->
-            match e.middle with
-            | None -> false
-            | Some d -> CO.eq d.key b.K.m && S.lower_bound d.key llis
-            end };
-          Right ()
-        end
+    | Some a , None -> if CO.compare kd a < 0 then Here else Left ()
+    | Some a , Some b -> if CO.compare kd b <= 0
+      then if CO.compare a kd <= 0
+        then Left ()
+        else Here
       else if CO.compare a b <= 0
-      then begin
-        assert { forall e. selected () e /\ rebuild e = llis ->
-          match e.middle with
-          | None -> false
-          | Some d -> CO.eq d.key a.K.m && S.lower_bound d.key rlis
-          end };
-        Left ()
+      then Left ()
+      else Right ()
+    end
+  
+  (* Fix: first minimum element of a list. Necessary to get constance
+     of the minimum element through code. *)
+  function first_minimum_acc (acc:D.m 'b) (l:list (D.m 'b)) : D.m 'b =
+    match l with
+    | Nil -> acc
+    | Cons x q -> if CO.le acc.key x.key
+      then first_minimum_acc acc q
+      else first_minimum_acc x q
+    end
+  
+  function first_minimum (l:list (D.m 'b)) : D.m 'b = match l with
+    | Nil -> default_element
+    | Cons x q -> first_minimum_acc x q
+    end
+  
+  let rec lemma first_minimum_caracterisation (e:split (D.m 'b)) : unit
+    requires { e.middle <> None /\ selected () e }
+    ensures { match e.middle with
+      | Some x -> first_minimum (rebuild e) = x
+      | None -> false
+      end }
+    variant { e.right }
+  = let mid = match e.middle with None -> absurd | Some x -> x end in
+    let rec aux (e:split (D.m 'b)) : unit
+      requires { e.middle = Some mid /\ selected () e }
+      ensures { forall acc:D.m 'b.
+        CO.lt mid.key acc.key -> first_minimum_acc acc (rebuild e) = mid }
+      variant { length e.left + length e.right }
+    = match e.left with
+      | Nil -> match e.right with
+        | Nil -> ()
+        | Cons _ q -> aux { e with right = q }
+        end
+      | Cons _ q -> aux { e with left = q }
+      end in
+    match e.left with
+    | Nil -> match e.right with
+      | Nil -> ()
+      | Cons _ q -> first_minimum_caracterisation { e with right = q }
       end
-      else begin
-        assert { forall e. selected () e /\ rebuild e = rlis ->
-          match e.middle with
-          | None -> false
-          | Some d -> CO.eq d.key b.K.m && S.lower_bound d.key llis
-          end };
-        Right ()
-      end
+    | Cons _ q -> aux { e with left = q }
     end
   
   (* Full clone of the avl module. *)
@@ -201,10 +234,15 @@ module PQueue
   
   type t 'a 'b = Sel.t 'a 'b
   
-  (* Model: a bag of data. *)
+  (* Model: a bag of data.
+     Fix: add a minimum element.
+     The point is that we need the returned minimum element
+     to be always the same, modulo preorder equivalence
+     is not enough. *)
   
   type m 'b = {
     bag : D.m 'b -> int;
+    minimum : D.m 'b;
     card : int;
   }
   
@@ -244,15 +282,19 @@ module PQueue
   
   function m (t:t 'a 'b) : m 'b =
     { bag = as_bag t.Sel.m.Sel.lis;
-      card = length t.Sel.m.Sel.lis }
+      card = length t.Sel.m.Sel.lis;
+      minimum = first_minimum t.Sel.m.Sel.lis }
+  
   let ghost m (t:t 'a 'b) : m 'b
     ensures { result = t.m }
   = { bag = as_bag t.Sel.m.Sel.lis;
-      card = length t.Sel.m.Sel.lis }
+      card = length t.Sel.m.Sel.lis;
+      minimum = first_minimum t.Sel.m.Sel.lis }
   
   let lemma m_def (t:t 'a 'b) : unit
     ensures { t.m.bag = as_bag t.Sel.m.Sel.lis }
     ensures { t.m.card = length t.Sel.m.Sel.lis }
+    ensures { t.m.minimum = first_minimum t.Sel.m.Sel.lis }
   = ()
   
   predicate c (t:t 'a 'b) = Sel.c t
@@ -265,7 +307,11 @@ module PQueue
     requires { c t }
     ensures { forall d:D.m 'b. 0 <= t.m.bag d <= t.m.card }
     ensures { t.m.card >= 0 }
-  = ()
+    ensures { t.m.card > 0 -> t.m.bag t.m.minimum > 0 }
+    ensures { forall d:D.m 'b. 0 < t.m.bag d -> CO.le t.m.minimum.key d.key }
+  = if t.m.card > 0
+    then let r0 = Sel.default_split () in
+      let _ = Sel.split r0 () t in ()
   
   let empty (ghost p:type_params 'a 'b) : t 'a 'b
     ensures { forall d:D.m 'b. result.m.bag d = 0 }
@@ -314,7 +360,7 @@ module PQueue
         t.m.card = e.m.card + 1 /\ let dm = t.dprm.mdl d in
         t.m.bag dm = e.m.bag dm + 1 /\
         (forall d2. d2 <> dm -> t.m.bag d2 = e.m.bag d2) /\
-        (forall d2. t.m.bag d2 > 0 -> CO.le dm.key d2.key) }
+        dm = t.m.minimum }
   = if Sel.is_empty t
     then None
     else let (o,e) = Sel.extract (Sel.default_split ()) () t in
@@ -327,21 +373,20 @@ module PQueue
     requires { c t /\ t.m.card >= 1 }
     ensures { t.dprm.inv result /\ let dm = t.dprm.mdl result in
       t.m.bag dm > 0 /\ t.m.card > 0 /\
-      (forall d2. t.m.bag d2 > 0 -> CO.le dm.key d2.key) }
+      dm = t.m.minimum }
   = match Sel.get (Sel.default_split ()) () t with
     | None -> absurd
     | Some d -> d
     end
   
-  let pop_min (ghost r:ref (D.m 'b)) (t:t 'a 'b) : t 'a 'b
+  let pop_min (t:t 'a 'b) : t 'a 'b
     requires { c t /\ t.m.card >= 1 }
     ensures { c result /\ result.prm = t.prm /\ t.m.card = result.m.card + 1 /\
-      t.m.bag !r = result.m.bag !r + 1 /\
-      (forall d2. d2 <> !r -> t.m.bag d2 = result.m.bag d2) /\
-      (forall d2. t.m.bag d2 > 0 -> CO.le !r.key d2.key) }
+      t.m.bag t.m.minimum = result.m.bag t.m.minimum + 1 /\
+      (forall d2. d2 <> t.m.minimum -> t.m.bag d2 = result.m.bag d2) }
   = let r0 = Sel.default_split () in
     let res = Sel.remove r0 () t in
-    r := match !r0.middle with None -> absurd | Some d -> d end;
+    assert { match !r0.middle with None -> false | Some _ -> true end };
     res
   
   let add (d:D.t 'a 'b) (t:t 'a 'b) : t 'a 'b
