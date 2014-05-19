@@ -1,4 +1,59 @@
 
+module Heap
+
+  use import int.Int
+
+  type elt
+  predicate le elt elt
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+
+  type t
+
+  function size t : int
+
+  function occ elt t : int
+
+  predicate mem (x: elt) (t: t) = occ x t > 0
+
+  function minimum t : elt
+
+  predicate is_minimum (x: elt) (t: t) =
+    mem x t && forall e. mem e t -> le x e
+
+  axiom min_is_min:
+    forall t: t. 0 < size t -> is_minimum (minimum t) t
+
+  val empty () : t
+    ensures { size result = 0 }
+    ensures { forall e. not (mem e result) }
+
+  val size (t: t) : int
+    ensures { result = size t }
+
+  val is_empty (t: t) : bool
+    ensures { result <-> size t = 0 }
+
+  val get_min (t: t) : elt
+    requires { 0 < size t }
+    ensures  { result = minimum t }
+
+  val merge (t1 t2: t) : t
+    ensures  { forall e. occ e result = occ e t1 + occ e t2 }
+    ensures  { size result = size t1 + size t2 }
+
+  val add (x: elt) (t: t) : t
+    ensures  { occ x result = occ x t + 1 }
+    ensures  { forall e. e <> x -> occ e result = occ e t }
+    ensures  { size result = size t + 1 }
+
+  val remove_min (t: t) : t
+    requires { 0 < size t }
+    ensures  { occ (minimum t) result = occ (minimum t) t - 1 }
+    ensures  { forall e. e <> minimum t -> occ e result = occ e t }
+    ensures  { size result = size t - 1 }
+
+end
+
 module SkewHeaps
 
   use import bintree.Tree
