@@ -132,15 +132,15 @@ let print_vc_file_info fmt vc_file =
   match vc_file with
   | None -> ()
   | Some name ->
-      print_json_field "vc_file" string fmt
-                    (Sys.getcwd () ^ Filename.dir_sep ^ name);
-      Format.fprintf fmt ",";
+     Format.fprintf fmt ",";
+     print_json_field "vc_file" string fmt
+                   (Sys.getcwd () ^ Filename.dir_sep ^ name);
+     Format.fprintf fmt ",";
      let editor = Gnat_config.prover_editor () in
      let cmd_line =
        List.fold_left (fun str s -> str ^ " " ^ s) editor.Whyconf.editor_command
                       editor.Whyconf.editor_options in
-     print_json_field "editor_cmd" string fmt (actual_editor_cmd name cmd_line);
-     Format.fprintf fmt ","
+     print_json_field "editor_cmd" string fmt (actual_editor_cmd name cmd_line)
 
 let print_json_msg fmt m =
   Format.fprintf fmt "{%a, %a, %a, %a%a%a}"
