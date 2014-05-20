@@ -52,15 +52,15 @@ let create_prover_file goal expl =
     get_project_dir (Filename.basename th.theory_parent.file_name) in
   let filename = Filename.concat (prover_files_dir proj_name)
                                  (compute_filename th goal expl) in
-  let _ = add_external_proof ~keygen:Gnat_sched.Keygen.keygen ~obsolete:false
-                              ~archived:false ~timelimit:0 ~memlimit:0
-                              ~edit:(Some filename) goal
-                              Gnat_config.prover.Whyconf.prover
-                              Unedited in
   let cout = open_out filename in
   let fmt = Format.formatter_of_out_channel cout in
   Driver.print_task Gnat_config.prover_driver filename fmt (goal_task goal);
   close_out cout;
+  let _ = add_external_proof ~keygen:Gnat_sched.Keygen.keygen ~obsolete:false
+                             ~archived:false ~timelimit:0 ~memlimit:0
+                             ~edit:(Some filename) goal
+                             Gnat_config.prover.Whyconf.prover
+                             Unedited in
   filename
 
 let get_prover_file goal =
