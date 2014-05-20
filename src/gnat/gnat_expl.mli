@@ -63,7 +63,7 @@ val reason_from_string : string -> reason
 val reason_to_ada : reason -> string
 (* print a reason from the OCaml type into the Ada representation *)
 
-val to_filename : string -> check -> string
+val to_filename : check -> string
 (* print a representation of a check that could serve as a filename *)
 
 val mk_check : reason -> id -> Gnat_loc.loc -> check

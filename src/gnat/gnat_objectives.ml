@@ -516,7 +516,7 @@ module Save_VCs = struct
       let r = find check in
       incr r;
       let n = !r in
-      let base = Gnat_expl.to_filename Gnat_config.unit_name check in
+      let base = Gnat_expl.to_filename check in
       let suffix = ".why" in
       if n = 1 then base ^ suffix
       else base ^ "_" ^ string_of_int n ^ suffix
@@ -546,7 +546,7 @@ module Save_VCs = struct
 
    let save_trace goal =
       let check = get_objective goal in
-      let base = Gnat_expl.to_filename Gnat_config.unit_name check in
+      let base = Gnat_expl.to_filename check in
       let trace = compute_trace goal in
       if not (Gnat_loc.S.is_empty trace) then begin
         let trace_fn = base ^ ".trace" in

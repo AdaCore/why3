@@ -91,6 +91,29 @@ let reason_to_ada reason =
    | VC_Assert                  -> "VC_ASSERT"
    | VC_Raise                   -> "VC_RAISE"
 
+let reason_to_string reason =
+   match reason with
+   | VC_Division_Check          -> "division_check"
+   | VC_Index_Check             -> "index_check"
+   | VC_Overflow_Check          -> "overflow_check"
+   | VC_Range_Check             -> "range_check"
+   | VC_Length_Check            -> "length_check"
+   | VC_Discriminant_Check      -> "discriminant_check"
+   | VC_Initial_Condition       -> "initial_condition"
+   | VC_Precondition            -> "precondition"
+   | VC_Precondition_Main       -> "main_precondition"
+   | VC_Postcondition           -> "main_postcondition"
+   | VC_Refined_Post            -> "refined_post"
+   | VC_Contract_Case           -> "contract_case"
+   | VC_Disjoint_Contract_Cases -> "disjoint_contract_cases"
+   | VC_Complete_Contract_Cases -> "complete_contract_cases"
+   | VC_Loop_Invariant          -> "loop_invariant"
+   | VC_Loop_Invariant_Init     -> "loop_invariant_init"
+   | VC_Loop_Invariant_Preserv  -> "loop_invariant_preserv"
+   | VC_Loop_Variant            -> "loop_variant"
+   | VC_Assert                  -> "assert"
+   | VC_Raise                   -> "raise"
+
 type gp_label =
   | Gp_Sloc of Gnat_loc.loc
   | Gp_Subp of Gnat_loc.loc
@@ -210,9 +233,10 @@ let get_extra_info task =
    let info = extract_msg (Task.task_goal_fmla task) in
    info.extra_node
 
-let to_filename unitname check =
-  Format.sprintf "%s_%d_%s"
-    unitname check.id (reason_to_ada check.reason)
+let to_filename check =
+  let file, line, col = Gnat_loc.explode (List.hd check.sloc) in
+  Format.sprintf "%s_%d_%d_%s"
+     file line col (reason_to_string check.reason)
 
 module CheckCmp = struct
    type t = check

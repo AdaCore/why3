@@ -44,7 +44,7 @@ let compute_filename theory goal expl =
                         theory.theory_parent.file_name
                         (goal_task goal) in
   let ext = get_file_extention why_fn in
-  (Gnat_expl.to_filename Gnat_config.unit_name expl) ^ ext
+  (Gnat_expl.to_filename expl) ^ ext
 
 let create_prover_file goal expl =
   let th = find_goal_theory goal in
