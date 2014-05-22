@@ -71,10 +71,11 @@ let parse_line_spec caller s =
      let line = int_of_string (List.nth args 1) in
      match List.length args with
      | 2 -> Limit_Line (Gnat_loc.mk_loc_line fn line)
-     | 4 -> let col = int_of_string (List.nth args 2) in
-(*             let check = Gnat_expl.reason_from_string (List.nth args 3) in *)
-            (* TODO fix me *)
-            Limit_Line (Gnat_loc.mk_loc fn line col None)
+     | 4 ->
+         let col = int_of_string (List.nth args 2) in
+         let check = Gnat_expl.reason_from_string (List.nth args 3) in
+         let loc = Gnat_loc.mk_loc fn line col None in
+         Limit_Check (Gnat_expl.mk_check check 0 loc)
      | _ -> raise (Failure "bad arity")
    with
    | Failure "nth" ->
