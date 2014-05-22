@@ -153,8 +153,10 @@ let print_json_msg fmt m =
     print_vc_file_info m.vc_file
 
 let print_msg_list fmt l =
-  Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma
-  print_json_msg fmt l
+  if l = [] then Format.printf "[]@."
+  else
+    Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma
+    print_json_msg fmt l
 
 let print_messages () =
   Format.printf "%a@." print_msg_list !msg_set
