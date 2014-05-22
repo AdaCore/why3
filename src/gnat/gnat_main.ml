@@ -96,9 +96,6 @@ and interpret_result pa pas =
    | Session.Done r ->
          let goal = pa.Session.proof_parent in
          let answer = r.Call_provers.pr_answer in
-         if answer = Call_provers.HighFailure then begin
-            Format.eprintf "An error occurred when calling the prover.@.";
-         end;
          handle_vc_result goal (answer = Call_provers.Valid) (Some r)
    | _ ->
          ()
