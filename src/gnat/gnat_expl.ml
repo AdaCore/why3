@@ -102,7 +102,7 @@ let reason_to_string reason =
    | VC_Initial_Condition       -> "initial_condition"
    | VC_Precondition            -> "precondition"
    | VC_Precondition_Main       -> "main_precondition"
-   | VC_Postcondition           -> "main_postcondition"
+   | VC_Postcondition           -> "postcondition"
    | VC_Refined_Post            -> "refined_post"
    | VC_Contract_Case           -> "contract_case"
    | VC_Disjoint_Contract_Cases -> "disjoint_contract_cases"
