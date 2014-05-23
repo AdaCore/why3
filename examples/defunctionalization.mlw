@@ -147,7 +147,7 @@ use import Expr
 
 use HighOrd
 
-function eval_1 (e:expr) (k:int -> 'a) : 'a =
+function eval_1 (e:expr) (k: int->'a) : 'a =
   match e with
     | Cte n -> k n
     | Sub e1 e2 ->
@@ -161,7 +161,7 @@ function interpret_1 (p : prog) : int = eval_1 p (\ n. n)
 
 use import DirectSem
 
-lemma cps_correct_expr: forall e:expr, k:int -> 'a. eval_1 e k = k (eval_0 e)
+lemma cps_correct_expr: forall e:expr, k: int->'a. eval_1 e k = k (eval_0 e)
 
 lemma cps_correct: forall p. interpret_1 p = interpret_0 p
 
