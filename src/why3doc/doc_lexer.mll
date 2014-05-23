@@ -146,6 +146,9 @@ rule scan fmt empty = parse
             if empty <> PrevEmpty then pp_print_string fmt "</div>";
             pp_print_string fmt "<pre>";
             scan fmt CurrEmpty lexbuf }
+  | "(**)"
+          { pp_print_string fmt "<span class=\"comment\">(**)</span>";
+            scan fmt NotEmpty lexbuf }
   | "(*"
           { pp_print_string fmt "<span class=\"comment\">(*";
             comment fmt true lexbuf;
