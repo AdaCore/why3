@@ -20,8 +20,12 @@ module WarshallAlgorithm
       0 <= x < k -> path m i x k -> path m x j k -> path m i j k
 
   lemma weakening:
-    forall m i j k1 k2. 0 <= k2 <= k1 ->
+    forall m i j k1 k2. 0 <= k1 <= k2 ->
     path m i j k1 -> path m i j k2
+  
+  lemma decomposition:
+    forall m i j k. 0 <= k /\ path m i j (k+1) ->
+      (path m i j k \/ (path m i k k /\ path m k j k))
 
   let transitive_closure (m: matrix bool) : matrix bool
     requires { m.rows = m.columns }
@@ -37,12 +41,15 @@ module WarshallAlgorithm
       for i = 0 to n - 1 do
         invariant { forall x y. 0 <= x < n -> 0 <= y < n ->
                     get t (x,y) <->
-                    (path m x y k || x < i && path m x y (k+1)) }
+                    if x < i
+                    then path m x y (k+1)
+                    else path m x y k }
         for j = 0 to n - 1 do
           invariant { forall x y. 0 <= x < n -> 0 <= y < n ->
                       get t (x,y) <->
-                      (path m x y k || x < i && path m x y (k+1)
-                                    || x = i && y < j && path m x y (k+1)) }
+                      if x < i \/ (x = i /\ y < j)
+                      then path m x y (k+1)
+                      else path m x y k }
           set t (i,j) (get t (i,j) || get t (i,k) && get t (k,j))
         done
       done
