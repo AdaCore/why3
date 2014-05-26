@@ -9,48 +9,54 @@
   id="1"
   name="CVC3"
   version="2.4.1"/>
+ <prover
+  id="2"
+  name="Coq"
+  version="8.4pl2"/>
  <file
   name="../warshall_algorithm.mlw"
-  verified="false"
+  verified="true"
   expanded="true">
   <theory
    name="WarshallAlgorithm"
    locfile="../warshall_algorithm.mlw"
    loclnum="7" loccnumb="7" loccnume="24"
-   verified="false"
+   verified="true"
    expanded="true">
    <goal
     name="weakening"
     locfile="../warshall_algorithm.mlw"
     loclnum="22" loccnumb="8" loccnume="17"
     sum="a2e646aaa8f449556f806942e2d8d262"
-    proved="false"
+    proved="true"
     expanded="true"
     shape="apathV0V1V2V4IapathV0V1V2V3Iainfix &lt;=V3V4Aainfix &lt;=c0V3F">
     <proof
-     prover="0"
-     timelimit="5"
+     prover="2"
+     timelimit="6"
      memlimit="1000"
+     edited="warshall_algorithm_WarshallAlgorithm_weakening_1.v"
      obsolete="false"
      archived="false">
-     <result status="timeout" time="4.99"/>
+     <result status="valid" time="2.68"/>
     </proof>
    </goal>
    <goal
     name="decomposition"
     locfile="../warshall_algorithm.mlw"
     loclnum="26" loccnumb="8" loccnume="21"
-    sum="c41441098c20244d0d25fa1568dc6de1"
-    proved="false"
+    sum="5c3846f3226e008f18b65844497f7f1e"
+    proved="true"
     expanded="true"
-    shape="apathV0V3V2V3AapathV0V1V3V3OapathV0V1V2V3IapathV0V1V2ainfix +V3c1Aainfix &lt;=c0V3F">
+    shape="apathV0V1V3V1AapathV0V2V1V1OapathV0V2V3V1IapathV0V2V3ainfix +V1c1FIainfix &lt;=c0V1F">
     <proof
-     prover="0"
-     timelimit="5"
+     prover="2"
+     timelimit="6"
      memlimit="1000"
-     obsolete="true"
+     edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"
+     obsolete="false"
      archived="false">
-     <result status="timeout" time="4.99"/>
+     <result status="valid" time="4.21"/>
     </proof>
    </goal>
    <goal
@@ -58,7 +64,7 @@
     locfile="../warshall_algorithm.mlw"
     loclnum="30" loccnumb="6" loccnume="24"
     expl="VC for transitive_closure"
-    sum="f86e03cf9ce52accb6ac209a7df9bf71"
+    sum="ecb64fac1c21c6319399699e8e2ee48c"
     proved="true"
     expanded="false"
     shape="apathV3V9V10V0qainfix =agetagetV8V9V10aTrueIainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V9V0Aainfix &lt;=c0V9FAainfix &lt;=c0V5Aainfix &lt;=c0V4IapathV3V11V12ainfix +V7c1qainfix =agetagetV8V11V12aTrueIainfix &lt;V12V0Aainfix &lt;=c0V12Iainfix &lt;V11V0Aainfix &lt;=c0V11FAapathV3V16V17ainfix +V13c1qainfix =agetagetV15V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIiapathV3V18V19V13apathV3V18V19ainfix +V13c1ainfix &lt;V18ainfix +V14c1qainfix =agetagetV15V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FAiapathV3V24V25V13apathV3V24V25ainfix +V13c1ainfix &lt;V24ainfix +V20c1qainfix =agetagetV22V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIiapathV3V26V27V13apathV3V26V27ainfix +V13c1ainfix &lt;V27ainfix +V21c1Aainfix =V26V20Oainfix &lt;V26V20qainfix =agetagetV22V26V27aTrueIainfix &lt;V27V0Aainfix &lt;=c0V27Iainfix &lt;V26V0Aainfix &lt;=c0V26FAiiiapathV3V30V31V13apathV3V30V31ainfix +V13c1ainfix &lt;V31ainfix +V28c1Aainfix =V30V20Oainfix &lt;V30V20qainfix =agetagetV29V30V31aTrueIainfix &lt;V31V0Aainfix &lt;=c0V31Iainfix &lt;V30V0Aainfix &lt;=c0V30FIainfix =V29asetV22V20asetagetV22V20V28aFalseAainfix &lt;=c0V5Aainfix &lt;=c0V4FAainfix &lt;V28V5Aainfix &lt;=c0V28Aainfix &lt;V20V4Aainfix &lt;=c0V20iapathV3V33V34V13apathV3V33V34ainfix +V13c1ainfix &lt;V34ainfix +V28c1Aainfix =V33V20Oainfix &lt;V33V20qainfix =agetagetV32V33V34aTrueIainfix &lt;V34V0Aainfix &lt;=c0V34Iainfix &lt;V33V0Aainfix &lt;=c0V33FIainfix =V32asetV22V20asetagetV22V20V28agetagetV22V13V28Aainfix &lt;=c0V5Aainfix &lt;=c0V4FAainfix &lt;V28V5Aainfix &lt;=c0V28Aainfix &lt;V20V4Aainfix &lt;=c0V20Aavalid_indexV23aTuple2V13V28ainfix =agetagetV22V20V13aTrueAavalid_indexV23aTuple2V20V13iapathV3V36V37V13apathV3V36V37ainfix +V13c1ainfix &lt;V37ainfix +V28c1Aainfix =V36V20Oainfix &lt;V36V20qainfix =agetagetV35V36V37aTrueIainfix &lt;V37V0Aainfix &lt;=c0V37Iainfix &lt;V36V0Aainfix &lt;=c0V36FIainfix =V35asetV22V20asetagetV22V20V28aTrueAainfix &lt;=c0V5Aainfix &lt;=c0V4FAainfix &lt;V28V5Aainfix &lt;=c0V28Aainfix &lt;V20V4Aainfix &lt;=c0V20ainfix =agetagetV22V20V28aTrueAavalid_indexV23aTuple2V20V28Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V38V39V13apathV3V38V39ainfix +V13c1ainfix &lt;V39V28Aainfix =V38V20Oainfix &lt;V38V20qainfix =agetagetV22V38V39aTrueIainfix &lt;V39V0Aainfix &lt;=c0V39Iainfix &lt;V38V0Aainfix &lt;=c0V38FIainfix &lt;=V28V21Aainfix &lt;=c0V28FLamk matrixV4V5V22FAiapathV3V40V41V13apathV3V40V41ainfix +V13c1ainfix &lt;V41c0Aainfix =V40V20Oainfix &lt;V40V20qainfix =agetagetV15V40V41aTrueIainfix &lt;V41V0Aainfix &lt;=c0V41Iainfix &lt;V40V0Aainfix &lt;=c0V40FIainfix &lt;=c0V21AiapathV3V42V43V13apathV3V42V43ainfix +V13c1ainfix &lt;V42ainfix +V20c1qainfix =agetagetV15V42V43aTrueIainfix &lt;V43V0Aainfix &lt;=c0V43Iainfix &lt;V42V0Aainfix &lt;=c0V42FIainfix &gt;c0V21Lainfix -V0c1IiapathV3V44V45V13apathV3V44V45ainfix +V13c1ainfix &lt;V44V20qainfix =agetagetV15V44V45aTrueIainfix &lt;V45V0Aainfix &lt;=c0V45Iainfix &lt;V44V0Aainfix &lt;=c0V44FIainfix &lt;=V20V14Aainfix &lt;=c0V20FFAiapathV3V46V47V13apathV3V46V47ainfix +V13c1ainfix &lt;V46c0qainfix =agetagetV8V46V47aTrueIainfix &lt;V47V0Aainfix &lt;=c0V47Iainfix &lt;V46V0Aainfix &lt;=c0V46FIainfix &lt;=c0V14AapathV3V48V49ainfix +V13c1qainfix =agetagetV8V48V49aTrueIainfix &lt;V49V0Aainfix &lt;=c0V49Iainfix &lt;V48V0Aainfix &lt;=c0V48FIainfix &gt;c0V14Lainfix -V0c1IapathV3V50V51V13qainfix =agetagetV8V50V51aTrueIainfix &lt;V51V0Aainfix &lt;=c0V51Iainfix &lt;V50V0Aainfix &lt;=c0V50FIainfix &lt;=V13V7Aainfix &lt;=c0V13FFAapathV3V52V53c0qainfix =agetagetV6V52V53aTrueIainfix &lt;V53V0Aainfix &lt;=c0V53Iainfix &lt;V52V0Aainfix &lt;=c0V52FIainfix &lt;=c0V7AapathV3V54V55V0qainfix =agetagetV6V54V55aTrueIainfix &lt;V55V0Aainfix &lt;=c0V55Iainfix &lt;V54V0Aainfix &lt;=c0V54FIainfix &gt;c0V7Lainfix -V0c1Iainfix =agetagetV6V56V57agetagetV2V56V57Iainfix &lt;V57V5Aainfix &lt;=c0V57FIainfix &lt;V56V4Aainfix &lt;=c0V56FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -73,7 +79,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="1. postcondition"
-      sum="8dd0b524191dd34e1882c67f4e47d1b4"
+      sum="f4d240f1afa91d782724b06e107b80d7"
       proved="true"
       expanded="false"
       shape="postconditionapathV3V8V9V0qainfix =agetagetV6V8V9aTrueIainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &gt;c0V7Lainfix -V0c1Iainfix =agetagetV6V10V11agetagetV2V10V11Iainfix &lt;V11V5Aainfix &lt;=c0V11FIainfix &lt;V10V4Aainfix &lt;=c0V10FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -93,7 +99,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="2. loop invariant init"
-      sum="a379aa2d553c11962db68513c829f34a"
+      sum="37849b1664f3137d77fad247e0c04c70"
       proved="true"
       expanded="false"
       shape="loop invariant initapathV3V8V9c0qainfix =agetagetV6V8V9aTrueIainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V8V0Aainfix &lt;=c0V8FIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V10V11agetagetV2V10V11Iainfix &lt;V11V5Aainfix &lt;=c0V11FIainfix &lt;V10V4Aainfix &lt;=c0V10FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -105,7 +111,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.04"/>
+       <result status="valid" time="0.15"/>
       </proof>
      </goal>
      <goal
@@ -113,7 +119,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="3. loop invariant preservation"
-      sum="37c28b3dda99a4c251214314437cdc65"
+      sum="9f283dd78631eb88cae1fcca40314c56"
       proved="true"
       expanded="false"
       shape="loop invariant preservationapathV3V11V12ainfix +V9c1qainfix =agetagetV8V11V12aTrueIainfix &lt;V12V0Aainfix &lt;=c0V12Iainfix &lt;V11V0Aainfix &lt;=c0V11FIainfix &gt;c0V10Lainfix -V0c1IapathV3V13V14V9qainfix =agetagetV8V13V14aTrueIainfix &lt;V14V0Aainfix &lt;=c0V14Iainfix &lt;V13V0Aainfix &lt;=c0V13FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V15V16agetagetV2V15V16Iainfix &lt;V16V5Aainfix &lt;=c0V16FIainfix &lt;V15V4Aainfix &lt;=c0V15FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -133,7 +139,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="4. loop invariant init"
-      sum="21a9b467db78c84e90365e99ff21ccec"
+      sum="bf8081e16ee856295f7be566eb962e87"
       proved="true"
       expanded="false"
       shape="loop invariant initiapathV3V11V12V9apathV3V11V12ainfix +V9c1ainfix &lt;V11c0qainfix =agetagetV8V11V12aTrueIainfix &lt;V12V0Aainfix &lt;=c0V12Iainfix &lt;V11V0Aainfix &lt;=c0V11FIainfix &lt;=c0V10Lainfix -V0c1IapathV3V13V14V9qainfix =agetagetV8V13V14aTrueIainfix &lt;V14V0Aainfix &lt;=c0V14Iainfix &lt;V13V0Aainfix &lt;=c0V13FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V15V16agetagetV2V15V16Iainfix &lt;V16V5Aainfix &lt;=c0V16FIainfix &lt;V15V4Aainfix &lt;=c0V15FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -153,7 +159,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="5. loop invariant preservation"
-      sum="27cd67813bcaa137fb0f137d194538b4"
+      sum="5fc6a3e437c9ad9ebc5ee7ef79a53e2a"
       proved="true"
       expanded="false"
       shape="loop invariant preservationiapathV3V14V15V9apathV3V14V15ainfix +V9c1ainfix &lt;V14ainfix +V12c1qainfix =agetagetV11V14V15aTrueIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &gt;c0V13Lainfix -V0c1IiapathV3V16V17V9apathV3V16V17ainfix +V9c1ainfix &lt;V16V12qainfix =agetagetV11V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V18V19V9qainfix =agetagetV8V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V20V21agetagetV2V20V21Iainfix &lt;V21V5Aainfix &lt;=c0V21FIainfix &lt;V20V4Aainfix &lt;=c0V20FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -168,7 +174,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="1. loop invariant preservation"
-        sum="20163db31b891182e980bda9f3986188"
+        sum="e2485c5aeefb2993725ac8b7f4ca3492"
         proved="true"
         expanded="false"
         shape="loop invariant preservationapathV3V14V15ainfix +V9c1Iainfix &lt;V14ainfix +V12c1Iainfix =agetagetV11V14V15aTrueIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &gt;c0V13Lainfix -V0c1IiapathV3V16V17V9apathV3V16V17ainfix +V9c1ainfix &lt;V16V12qainfix =agetagetV11V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V18V19V9qainfix =agetagetV8V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V20V21agetagetV2V20V21Iainfix &lt;V21V5Aainfix &lt;=c0V21FIainfix &lt;V20V4Aainfix &lt;=c0V20FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -188,7 +194,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="2. loop invariant preservation"
-        sum="5ac79004ad6867319ceaa5851a188805"
+        sum="5e7f1fc50e4a28ac6b372419dd733dcd"
         proved="true"
         expanded="false"
         shape="loop invariant preservationapathV3V14V15V9INainfix &lt;V14ainfix +V12c1Iainfix =agetagetV11V14V15aTrueIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &gt;c0V13Lainfix -V0c1IiapathV3V16V17V9apathV3V16V17ainfix +V9c1ainfix &lt;V16V12qainfix =agetagetV11V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V18V19V9qainfix =agetagetV8V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V20V21agetagetV2V20V21Iainfix &lt;V21V5Aainfix &lt;=c0V21FIainfix &lt;V20V4Aainfix &lt;=c0V20FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -208,7 +214,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="3. loop invariant preservation"
-        sum="c0718b8c55590db3271f9dee5db7b841"
+        sum="df701f98bf4e88cf985b9c426ed48f43"
         proved="true"
         expanded="false"
         shape="loop invariant preservationainfix =agetagetV11V14V15aTrueIiapathV3V14V15V9apathV3V14V15ainfix +V9c1ainfix &lt;V14ainfix +V12c1Iainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &gt;c0V13Lainfix -V0c1IiapathV3V16V17V9apathV3V16V17ainfix +V9c1ainfix &lt;V16V12qainfix =agetagetV11V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V18V19V9qainfix =agetagetV8V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V20V21agetagetV2V20V21Iainfix &lt;V21V5Aainfix &lt;=c0V21FIainfix &lt;V20V4Aainfix &lt;=c0V20FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -230,7 +236,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="6. loop invariant init"
-      sum="7e44b55496faa11a6cd85b21c226c8ad"
+      sum="168adf4abff3b4c1715dad13551c3782"
       proved="true"
       expanded="false"
       shape="loop invariant initiapathV3V14V15V9apathV3V14V15ainfix +V9c1ainfix &lt;V15c0Aainfix =V14V12Oainfix &lt;V14V12qainfix =agetagetV11V14V15aTrueIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix &lt;V14V0Aainfix &lt;=c0V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V16V17V9apathV3V16V17ainfix +V9c1ainfix &lt;V16V12qainfix =agetagetV11V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V18V19V9qainfix =agetagetV8V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V20V21agetagetV2V20V21Iainfix &lt;V21V5Aainfix &lt;=c0V21FIainfix &lt;V20V4Aainfix &lt;=c0V20FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -242,7 +248,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.06"/>
+       <result status="valid" time="0.22"/>
       </proof>
      </goal>
      <goal
@@ -250,7 +256,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="7. type invariant"
-      sum="805db877d17d75494b5e3ab520c282c9"
+      sum="dba81102ad788815229ceca6094cc377"
       proved="true"
       expanded="false"
       shape="type invariantainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V17V18V9apathV3V17V18ainfix +V9c1ainfix &lt;V18V16Aainfix =V17V12Oainfix &lt;V17V12qainfix =agetagetV14V17V18aTrueIainfix &lt;V18V0Aainfix &lt;=c0V18Iainfix &lt;V17V0Aainfix &lt;=c0V17FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V19V20V9apathV3V19V20ainfix +V9c1ainfix &lt;V19V12qainfix =agetagetV11V19V20aTrueIainfix &lt;V20V0Aainfix &lt;=c0V20Iainfix &lt;V19V0Aainfix &lt;=c0V19FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V21V22V9qainfix =agetagetV8V21V22aTrueIainfix &lt;V22V0Aainfix &lt;=c0V22Iainfix &lt;V21V0Aainfix &lt;=c0V21FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V23V24agetagetV2V23V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FIainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -270,7 +276,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="8. precondition"
-      sum="970701df3735e1149990f682fd69e88a"
+      sum="da24e59264b1305b8f0ed6ed904e372f"
       proved="true"
       expanded="false"
       shape="preconditionavalid_indexV15aTuple2V12V16Iainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V17V18V9apathV3V17V18ainfix +V9c1ainfix &lt;V18V16Aainfix =V17V12Oainfix &lt;V17V12qainfix =agetagetV14V17V18aTrueIainfix &lt;V18V0Aainfix &lt;=c0V18Iainfix &lt;V17V0Aainfix &lt;=c0V17FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V19V20V9apathV3V19V20ainfix +V9c1ainfix &lt;V19V12qainfix =agetagetV11V19V20aTrueIainfix &lt;V20V0Aainfix &lt;=c0V20Iainfix &lt;V19V0Aainfix &lt;=c0V19FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V21V22V9qainfix =agetagetV8V21V22aTrueIainfix &lt;V22V0Aainfix &lt;=c0V22Iainfix &lt;V21V0Aainfix &lt;=c0V21FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V23V24agetagetV2V23V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FIainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -290,7 +296,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="9. precondition"
-      sum="758ab175922ccffe620d0d17d5cba95d"
+      sum="70345a192bb7336c18aeb9b798a6de93"
       proved="true"
       expanded="false"
       shape="preconditionainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V17V18V9apathV3V17V18ainfix +V9c1ainfix &lt;V18V16Aainfix =V17V12Oainfix &lt;V17V12qainfix =agetagetV14V17V18aTrueIainfix &lt;V18V0Aainfix &lt;=c0V18Iainfix &lt;V17V0Aainfix &lt;=c0V17FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V19V20V9apathV3V19V20ainfix +V9c1ainfix &lt;V19V12qainfix =agetagetV11V19V20aTrueIainfix &lt;V20V0Aainfix &lt;=c0V20Iainfix &lt;V19V0Aainfix &lt;=c0V19FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V21V22V9qainfix =agetagetV8V21V22aTrueIainfix &lt;V22V0Aainfix &lt;=c0V22Iainfix &lt;V21V0Aainfix &lt;=c0V21FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V23V24agetagetV2V23V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FIainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -310,7 +316,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="10. loop invariant preservation"
-      sum="0bbb172f0627de79be1f98a9fee84f9a"
+      sum="f0e524d5d952b4e157ae3874a69f221a"
       proved="true"
       expanded="false"
       shape="loop invariant preservationiapathV3V18V19V9apathV3V18V19ainfix +V9c1ainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12qainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aTrueAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -325,7 +331,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="1. loop invariant preservation"
-        sum="623e8b98e7024792da25cbf7aaccdc76"
+        sum="98d4df5e53aec07a533b44b95fe49bff"
         proved="true"
         expanded="false"
         shape="loop invariant preservationapathV3V18V19ainfix +V9c1Iainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12Iainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aTrueAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -340,7 +346,7 @@
           locfile="../warshall_algorithm.mlw"
           loclnum="30" loccnumb="6" loccnume="24"
           expl="1. loop invariant preservation"
-          sum="badaffe7725eb27095f6b4cb7b68f988"
+          sum="40a77cab9898513ac0ad48065f51dd84"
           proved="true"
           expanded="false"
           shape="loop invariant preservationapathV3V18V19ainfix +V9c1Iainfix &lt;V18V12Iainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aTrueAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -360,7 +366,7 @@
           locfile="../warshall_algorithm.mlw"
           loclnum="30" loccnumb="6" loccnume="24"
           expl="2. loop invariant preservation"
-          sum="076ce8ccef9b13583dbfd369684d8035"
+          sum="9104609cd6a16d2ec8f9925c7d34680c"
           proved="true"
           expanded="false"
           shape="loop invariant preservationapathV3V18V19ainfix +V9c1Iainfix &lt;V19ainfix +V16c1Aainfix =V18V12Iainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aTrueAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -372,7 +378,7 @@
            memlimit="1000"
            obsolete="false"
            archived="false">
-           <result status="valid" time="0.04"/>
+           <result status="valid" time="0.16"/>
           </proof>
          </goal>
         </transf>
@@ -382,7 +388,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="2. loop invariant preservation"
-        sum="c851f978f5436450fc9cd3c3edbbbad5"
+        sum="210e2d422ffaa6b75abcbb27bcddd8bf"
         proved="true"
         expanded="false"
         shape="loop invariant preservationapathV3V18V19V9INainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12Iainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aTrueAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -402,7 +408,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="3. loop invariant preservation"
-        sum="0526757f3c62152cc68d221843da3206"
+        sum="39602ed4ce53f342cab988c34bac02c0"
         proved="true"
         expanded="false"
         shape="loop invariant preservationainfix =agetagetV17V18V19aTrueIiapathV3V18V19V9apathV3V18V19ainfix +V9c1ainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12Iainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aTrueAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -414,7 +420,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.05"/>
+         <result status="valid" time="0.16"/>
         </proof>
        </goal>
       </transf>
@@ -424,7 +430,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="11. precondition"
-      sum="275cf556bd43c1c96d4e9a3830178f3e"
+      sum="52575b042315de9477d2d0b1e2b23d6a"
       proved="true"
       expanded="false"
       shape="preconditionavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V17V18V9apathV3V17V18ainfix +V9c1ainfix &lt;V18V16Aainfix =V17V12Oainfix &lt;V17V12qainfix =agetagetV14V17V18aTrueIainfix &lt;V18V0Aainfix &lt;=c0V18Iainfix &lt;V17V0Aainfix &lt;=c0V17FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V19V20V9apathV3V19V20ainfix +V9c1ainfix &lt;V19V12qainfix =agetagetV11V19V20aTrueIainfix &lt;V20V0Aainfix &lt;=c0V20Iainfix &lt;V19V0Aainfix &lt;=c0V19FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V21V22V9qainfix =agetagetV8V21V22aTrueIainfix &lt;V22V0Aainfix &lt;=c0V22Iainfix &lt;V21V0Aainfix &lt;=c0V21FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V23V24agetagetV2V23V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FIainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -444,7 +450,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="12. precondition"
-      sum="b0bdf73d922b17659997d480ef752281"
+      sum="cc9fa4e14d81e6eef65332087f942043"
       proved="true"
       expanded="false"
       shape="preconditionavalid_indexV15aTuple2V9V16Iainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V17V18V9apathV3V17V18ainfix +V9c1ainfix &lt;V18V16Aainfix =V17V12Oainfix &lt;V17V12qainfix =agetagetV14V17V18aTrueIainfix &lt;V18V0Aainfix &lt;=c0V18Iainfix &lt;V17V0Aainfix &lt;=c0V17FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V19V20V9apathV3V19V20ainfix +V9c1ainfix &lt;V19V12qainfix =agetagetV11V19V20aTrueIainfix &lt;V20V0Aainfix &lt;=c0V20Iainfix &lt;V19V0Aainfix &lt;=c0V19FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V21V22V9qainfix =agetagetV8V21V22aTrueIainfix &lt;V22V0Aainfix &lt;=c0V22Iainfix &lt;V21V0Aainfix &lt;=c0V21FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V23V24agetagetV2V23V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FIainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -464,7 +470,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="13. precondition"
-      sum="9a600c3fc67a3412a9a1afb3f41c3e11"
+      sum="ce1a414202610dc49e84292487bf9d75"
       proved="true"
       expanded="false"
       shape="preconditionainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iavalid_indexV15aTuple2V9V16Iainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V17V18V9apathV3V17V18ainfix +V9c1ainfix &lt;V18V16Aainfix =V17V12Oainfix &lt;V17V12qainfix =agetagetV14V17V18aTrueIainfix &lt;V18V0Aainfix &lt;=c0V18Iainfix &lt;V17V0Aainfix &lt;=c0V17FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V19V20V9apathV3V19V20ainfix +V9c1ainfix &lt;V19V12qainfix =agetagetV11V19V20aTrueIainfix &lt;V20V0Aainfix &lt;=c0V20Iainfix &lt;V19V0Aainfix &lt;=c0V19FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V21V22V9qainfix =agetagetV8V21V22aTrueIainfix &lt;V22V0Aainfix &lt;=c0V22Iainfix &lt;V21V0Aainfix &lt;=c0V21FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V23V24agetagetV2V23V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FIainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -484,7 +490,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="14. loop invariant preservation"
-      sum="a91fd9ab207ae752224dd94a8bcfc6b1"
+      sum="011d96034bd0ddb2c77def805fa88381"
       proved="true"
       expanded="false"
       shape="loop invariant preservationiapathV3V18V19V9apathV3V18V19ainfix +V9c1ainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12qainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16agetagetV14V9V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iavalid_indexV15aTuple2V9V16Iainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -499,7 +505,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="1. loop invariant preservation"
-        sum="c17a36f78baa7a244e73548d0db121a0"
+        sum="8fbf523a7bcb1e7bf41594623b789fca"
         proved="true"
         expanded="false"
         shape="loop invariant preservationapathV3V18V19ainfix +V9c1Iainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12Iainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16agetagetV14V9V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iavalid_indexV15aTuple2V9V16Iainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -511,7 +517,7 @@
          memlimit="1000"
          obsolete="false"
          archived="false">
-         <result status="valid" time="0.04"/>
+         <result status="valid" time="0.15"/>
         </proof>
        </goal>
        <goal
@@ -519,7 +525,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="2. loop invariant preservation"
-        sum="f6fc0b6561b6174cdb5ba5fcf144809d"
+        sum="f90f4608e2f1ed55868170c1abae5234"
         proved="true"
         expanded="false"
         shape="loop invariant preservationapathV3V18V19V9INainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12Iainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16agetagetV14V9V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iavalid_indexV15aTuple2V9V16Iainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -539,7 +545,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="3. loop invariant preservation"
-        sum="2109d19d1eca160b4725a01b084fbe93"
+        sum="661894a01c6faf25fc587f568690022a"
         proved="true"
         expanded="false"
         shape="loop invariant preservationainfix =agetagetV17V18V19aTrueIiapathV3V18V19V9apathV3V18V19ainfix +V9c1ainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12Iainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16agetagetV14V9V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12Iavalid_indexV15aTuple2V9V16Iainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -561,7 +567,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="15. precondition"
-      sum="6bdc0af5ce90ce369acd529b04481050"
+      sum="a9c472ab4d9c6fdaa668b699dae0a68e"
       proved="true"
       expanded="false"
       shape="preconditionainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12INainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V17V18V9apathV3V17V18ainfix +V9c1ainfix &lt;V18V16Aainfix =V17V12Oainfix &lt;V17V12qainfix =agetagetV14V17V18aTrueIainfix &lt;V18V0Aainfix &lt;=c0V18Iainfix &lt;V17V0Aainfix &lt;=c0V17FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V19V20V9apathV3V19V20ainfix +V9c1ainfix &lt;V19V12qainfix =agetagetV11V19V20aTrueIainfix &lt;V20V0Aainfix &lt;=c0V20Iainfix &lt;V19V0Aainfix &lt;=c0V19FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V21V22V9qainfix =agetagetV8V21V22aTrueIainfix &lt;V22V0Aainfix &lt;=c0V22Iainfix &lt;V21V0Aainfix &lt;=c0V21FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V23V24agetagetV2V23V24Iainfix &lt;V24V5Aainfix &lt;=c0V24FIainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -581,7 +587,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="16. loop invariant preservation"
-      sum="c6e935678c15a356181752b54e8a50b5"
+      sum="bb7acbf83db488a3e60dbb1d6ee2b769"
       proved="true"
       expanded="false"
       shape="loop invariant preservationiapathV3V18V19V9apathV3V18V19ainfix +V9c1ainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12qainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aFalseAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12INainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -596,7 +602,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="1. loop invariant preservation"
-        sum="babf92a1b5e03cefe1f7f366f34dc09b"
+        sum="48ab68abfb7cc1efbef634b5e5d323b0"
         proved="true"
         expanded="false"
         shape="loop invariant preservationapathV3V18V19ainfix +V9c1Iainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12Iainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aFalseAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12INainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -616,7 +622,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="2. loop invariant preservation"
-        sum="16f14120367c65524957b6969a887881"
+        sum="e442ba5fecc08de1b18b3afd0993d12a"
         proved="true"
         expanded="false"
         shape="loop invariant preservationapathV3V18V19V9INainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12Iainfix =agetagetV17V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aFalseAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12INainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -636,7 +642,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="3. loop invariant preservation"
-        sum="eb8a826820c1560f128434e4df403fdc"
+        sum="4a2c6dce555192974950c40afa934dfc"
         proved="true"
         expanded="false"
         shape="loop invariant preservationainfix =agetagetV17V18V19aTrueIiapathV3V18V19V9apathV3V18V19ainfix +V9c1ainfix &lt;V19ainfix +V16c1Aainfix =V18V12Oainfix &lt;V18V12Iainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix =V17asetV14V12asetagetV14V12V16aFalseAainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix &lt;V16V5Aainfix &lt;=c0V16Aainfix &lt;V12V4Aainfix &lt;=c0V12INainfix =agetagetV14V12V9aTrueIavalid_indexV15aTuple2V12V9INainfix =agetagetV14V12V16aTrueIavalid_indexV15aTuple2V12V16Aainfix &lt;=c0V5Aainfix &lt;=c0V4IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V21V16Aainfix =V20V12Oainfix &lt;V20V12qainfix =agetagetV14V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V16V13Aainfix &lt;=c0V16FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V22V23V9apathV3V22V23ainfix +V9c1ainfix &lt;V22V12qainfix =agetagetV11V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V24V25V9qainfix =agetagetV8V24V25aTrueIainfix &lt;V25V0Aainfix &lt;=c0V25Iainfix &lt;V24V0Aainfix &lt;=c0V24FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V26V27agetagetV2V26V27Iainfix &lt;V27V5Aainfix &lt;=c0V27FIainfix &lt;V26V4Aainfix &lt;=c0V26FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -658,7 +664,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="17. loop invariant preservation"
-      sum="ab71499b8bae047e2252e28260217f8a"
+      sum="c05b1bb6917f202efef9dae112a1cd8c"
       proved="true"
       expanded="false"
       shape="loop invariant preservationiapathV3V16V17V9apathV3V16V17ainfix +V9c1ainfix &lt;V16ainfix +V12c1qainfix =agetagetV14V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIiapathV3V18V19V9apathV3V18V19ainfix +V9c1ainfix &lt;V19ainfix +V13c1Aainfix =V18V12Oainfix &lt;V18V12qainfix =agetagetV14V18V19aTrueIainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18FLamk matrixV4V5V14FIainfix &lt;=c0V13Lainfix -V0c1IiapathV3V20V21V9apathV3V20V21ainfix +V9c1ainfix &lt;V20V12qainfix =agetagetV11V20V21aTrueIainfix &lt;V21V0Aainfix &lt;=c0V21Iainfix &lt;V20V0Aainfix &lt;=c0V20FIainfix &lt;=V12V10Aainfix &lt;=c0V12FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V22V23V9qainfix =agetagetV8V22V23aTrueIainfix &lt;V23V0Aainfix &lt;=c0V23Iainfix &lt;V22V0Aainfix &lt;=c0V22FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V24V25agetagetV2V24V25Iainfix &lt;V25V5Aainfix &lt;=c0V25FIainfix &lt;V24V4Aainfix &lt;=c0V24FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -670,7 +676,7 @@
        memlimit="1000"
        obsolete="false"
        archived="false">
-       <result status="valid" time="0.20"/>
+       <result status="valid" time="0.29"/>
       </proof>
      </goal>
      <goal
@@ -678,7 +684,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="18. loop invariant preservation"
-      sum="f135b177b2b729face9088449f2c93a2"
+      sum="b71f6207c5ed5c1d8a4daab31be2a43b"
       proved="true"
       expanded="false"
       shape="loop invariant preservationapathV3V12V13ainfix +V9c1qainfix =agetagetV11V12V13aTrueIainfix &lt;V13V0Aainfix &lt;=c0V13Iainfix &lt;V12V0Aainfix &lt;=c0V12FIiapathV3V14V15V9apathV3V14V15ainfix +V9c1ainfix &lt;V14ainfix +V10c1qainfix =agetagetV11V14V15aTrueIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix &lt;V14V0Aainfix &lt;=c0V14FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V16V17V9qainfix =agetagetV8V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V18V19agetagetV2V18V19Iainfix &lt;V19V5Aainfix &lt;=c0V19FIainfix &lt;V18V4Aainfix &lt;=c0V18FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -693,7 +699,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="1. loop invariant preservation"
-        sum="b285a72c190aff657b8d95d883326600"
+        sum="b424b9b4827e4c344728e04005a82465"
         proved="true"
         expanded="false"
         shape="loop invariant preservationapathV3V12V13ainfix +V9c1Iainfix =agetagetV11V12V13aTrueIainfix &lt;V13V0Aainfix &lt;=c0V13Iainfix &lt;V12V0Aainfix &lt;=c0V12FIiapathV3V14V15V9apathV3V14V15ainfix +V9c1ainfix &lt;V14ainfix +V10c1qainfix =agetagetV11V14V15aTrueIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix &lt;V14V0Aainfix &lt;=c0V14FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V16V17V9qainfix =agetagetV8V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V18V19agetagetV2V18V19Iainfix &lt;V19V5Aainfix &lt;=c0V19FIainfix &lt;V18V4Aainfix &lt;=c0V18FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -713,7 +719,7 @@
         locfile="../warshall_algorithm.mlw"
         loclnum="30" loccnumb="6" loccnume="24"
         expl="2. loop invariant preservation"
-        sum="4d33fd7d77d6a88455b84891ec0a57db"
+        sum="b3ff506ad7e5b5495d61ef4a1109f0a7"
         proved="true"
         expanded="false"
         shape="loop invariant preservationainfix =agetagetV11V12V13aTrueIapathV3V12V13ainfix +V9c1Iainfix &lt;V13V0Aainfix &lt;=c0V13Iainfix &lt;V12V0Aainfix &lt;=c0V12FIiapathV3V14V15V9apathV3V14V15ainfix +V9c1ainfix &lt;V14ainfix +V10c1qainfix =agetagetV11V14V15aTrueIainfix &lt;V15V0Aainfix &lt;=c0V15Iainfix &lt;V14V0Aainfix &lt;=c0V14FFIainfix &lt;=c0V10Lainfix -V0c1IapathV3V16V17V9qainfix =agetagetV8V16V17aTrueIainfix &lt;V17V0Aainfix &lt;=c0V17Iainfix &lt;V16V0Aainfix &lt;=c0V16FIainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V18V19agetagetV2V18V19Iainfix &lt;V19V5Aainfix &lt;=c0V19FIainfix &lt;V18V4Aainfix &lt;=c0V18FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -735,7 +741,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="19. type invariant"
-      sum="56a9788e545b6779d6873552bd43b070"
+      sum="004ea18e6ddbc833c63633bf37a0b460"
       proved="true"
       expanded="false"
       shape="type invariantainfix &lt;=c0V5Aainfix &lt;=c0V4IapathV3V9V10ainfix +V7c1qainfix =agetagetV8V9V10aTrueIainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V9V0Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V11V12agetagetV2V11V12Iainfix &lt;V12V5Aainfix &lt;=c0V12FIainfix &lt;V11V4Aainfix &lt;=c0V11FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">
@@ -755,7 +761,7 @@
       locfile="../warshall_algorithm.mlw"
       loclnum="30" loccnumb="6" loccnume="24"
       expl="20. postcondition"
-      sum="83881614e0f46c400137d2d26c7bd72e"
+      sum="cc4208403c8353e427da8d2404819330"
       proved="true"
       expanded="false"
       shape="postconditionapathV3V9V10V0qainfix =agetagetV8V9V10aTrueIainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V9V0Aainfix &lt;=c0V9FIainfix &lt;=c0V5Aainfix &lt;=c0V4IapathV3V11V12ainfix +V7c1qainfix =agetagetV8V11V12aTrueIainfix &lt;V12V0Aainfix &lt;=c0V12Iainfix &lt;V11V0Aainfix &lt;=c0V11FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =agetagetV6V13V14agetagetV2V13V14Iainfix &lt;V14V5Aainfix &lt;=c0V14FIainfix &lt;V13V4Aainfix &lt;=c0V13FAainfix =V5V1Aainfix =V4V0Aainfix &lt;=c0V5Aainfix &lt;=c0V4FIainfix =V0V1Aainfix &lt;=c0V1Aainfix &lt;=c0V0Lamk matrixV0V1V2F">

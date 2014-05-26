@@ -2,7 +2,11 @@
 (** Warshall algorithm
 
     Computes the transitive closure of a graph implemented as a Boolean
-    matrix. *)
+    matrix.
+
+    Authors: Martin Clochard (École Normale Supérieure)
+             Jean-Christophe Filliâtre (CNRS)
+ *)
 
 module WarshallAlgorithm
 
@@ -22,9 +26,9 @@ module WarshallAlgorithm
   lemma weakening:
     forall m i j k1 k2. 0 <= k1 <= k2 ->
     path m i j k1 -> path m i j k2
-  
+
   lemma decomposition:
-    forall m i j k. 0 <= k /\ path m i j (k+1) ->
+    forall m k. 0 <= k -> forall i j. path m i j (k+1) ->
       (path m i j k \/ (path m i k k /\ path m k j k))
 
   let transitive_closure (m: matrix bool) : matrix bool
