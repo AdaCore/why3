@@ -15,7 +15,7 @@ open Whyconf
 open Theory
 
 let usage_msg = sprintf
-  "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
+  "Usage: %s [options] command [options]"
   (Filename.basename Sys.argv.(0))
 
 let version_msg = sprintf "Why3 platform, version %s (build date: %s)"

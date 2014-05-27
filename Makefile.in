@@ -429,8 +429,11 @@ src/tools/main.cmx: lib/why3/why3.cmxa
 src/tools/why3contraption.cmo: lib/why3/why3.cma
 src/tools/why3contraption.cmx: lib/why3/why3.cmxa
 
-byte: bin/why3.byte bin/why3contraption.byte
-opt:  bin/why3.opt bin/why3contraption.opt
+src/tools/why3prove.cmo: lib/why3/why3.cma
+src/tools/why3prove.cmx: lib/why3/why3.cmxa
+
+byte: bin/why3.byte bin/why3contraption.byte bin/why3prove.byte
+opt:  bin/why3.opt bin/why3contraption.opt bin/why3prove.opt
 
 bin/why3.opt: lib/why3/why3.cmxa src/tools/main.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -454,27 +457,42 @@ bin/why3contraption.byte: lib/why3/why3.cma src/tools/why3contraption.cmo
 bin/why3contraption: bin/why3contraption.@OCAMLBEST@
 	ln -sf why3contraption.@OCAMLBEST@ $@
 
+bin/why3prove.opt: lib/why3/why3.cmxa src/tools/why3prove.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3prove.byte: lib/why3/why3.cma src/tools/why3prove.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+bin/why3prove: bin/why3prove.@OCAMLBEST@
+	ln -sf why3prove.@OCAMLBEST@ $@
+
 clean_old_install::
-	rm -f $(BINDIR)/why3$(EXE) $(BINDIR)/why3contraption$(EXE)
+	rm -f $(BINDIR)/why3$(EXE) $(BINDIR)/why3contraption$(EXE) $(BINDIR)/why3prove$(EXE)
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 	cp -f bin/why3contraption.@OCAMLBEST@ $(BINDIR)/why3contraption$(EXE)
+	cp -f bin/why3prove.@OCAMLBEST@ $(TOOLDIR)/why3prove$(EXE)
 
-install_local: bin/why3 bin/why3contraption
+install_local: bin/why3 bin/why3contraption bin/why3prove
 
 ifneq "$(MAKECMDGOALS)" "clean"
 include src/tools/main.dep
 include src/tools/why3contraption.dep
+include src/tools/why3prove.dep
 endif
 
-depend: src/tools/main.dep src/tools/why3contraption.dep
+depend: src/tools/main.dep src/tools/why3contraption.dep src/tools/why3prove.dep
 
 clean::
 	rm -f src/tools/main.cm[iox] src/tools/main.annot src/tools/main.o src/tools/main.dep
 	rm -f src/tools/why3contraption.cm[iox] src/tools/why3contraption.annot src/tools/why3contraption.o src/tools/why3contraption.dep
+	rm -f src/tools/why3prove.cm[iox] src/tools/why3prove.annot src/tools/why3prove.o src/tools/why3prove.dep
 	rm -f bin/why3.byte bin/why3.opt bin/why3
 	rm -f bin/why3contraption.byte bin/why3contraption.opt bin/why3contraption
+	rm -f bin/why3prove.byte bin/why3prove.opt bin/why3prove
 
 ##############
 # test targets
