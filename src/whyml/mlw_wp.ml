@@ -66,11 +66,11 @@ let th_mark_old =
 
 let fs_now = create_lsymbol (id_fresh "%now") [] (Some ty_mark)
 let t_now = fs_app fs_now [] ty_mark
-let e_now = e_lapp fs_now [] (ity_pur ts_mark [])
+let e_now = e_ghost (e_lapp fs_now [] (ity_pur ts_mark []))
 
 (* [vs_old] appears in the postconditions given to the core API,
    which expects every vsymbol to be a pure part of a pvsymbol *)
-let pv_old = create_pvsymbol (id_fresh "%old") ity_mark
+let pv_old = create_pvsymbol ~ghost:true (id_fresh "%old") ity_mark
 let vs_old = pv_old.pv_vs
 let t_old  = t_var vs_old
 
