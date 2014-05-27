@@ -28,6 +28,7 @@ BINDIR  = $(DESTDIR)@bindir@
 LIBDIR  = $(DESTDIR)@libdir@
 DATADIR = $(DESTDIR)@datarootdir@
 MANDIR  = $(DESTDIR)@mandir@
+TOOLDIR = $(LIBDIR)/why3/commands
 
 # OS specific stuff
 EXE   = @EXE@
@@ -240,6 +241,7 @@ install_no_local:: clean_old_install $(TARGET_EMACS)
 endif
 	mkdir -p $(BINDIR)
 	mkdir -p $(LIBDIR)/why3
+	mkdir -p $(TOOLDIR)
 	mkdir -p $(DATADIR)/why3
 	mkdir -p $(DATADIR)/why3/images
 	mkdir -p $(DATADIR)/why3/images/boomy
@@ -421,41 +423,58 @@ install_no_local::
 # Why3
 ######
 
-src/main.cmo: lib/why3/why3.cma
-src/main.cmx: lib/why3/why3.cmxa
+src/tools/main.cmo: lib/why3/why3.cma
+src/tools/main.cmx: lib/why3/why3.cmxa
 
-byte: bin/why3.byte
-opt:  bin/why3.opt
+src/tools/why3contraption.cmo: lib/why3/why3.cma
+src/tools/why3contraption.cmx: lib/why3/why3.cmxa
 
-bin/why3.opt: lib/why3/why3.cmxa src/main.cmx
+byte: bin/why3.byte bin/why3contraption.byte
+opt:  bin/why3.opt bin/why3contraption.opt
+
+bin/why3.opt: lib/why3/why3.cmxa src/tools/main.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3.byte: lib/why3/why3.cma src/main.cmo
+bin/why3.byte: lib/why3/why3.cma src/tools/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3: bin/why3.@OCAMLBEST@
 	ln -sf why3.@OCAMLBEST@ $@
 
+bin/why3contraption.opt: lib/why3/why3.cmxa src/tools/why3contraption.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3contraption.byte: lib/why3/why3.cma src/tools/why3contraption.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+bin/why3contraption: bin/why3contraption.@OCAMLBEST@
+	ln -sf why3contraption.@OCAMLBEST@ $@
+
 clean_old_install::
-	rm -f $(BINDIR)/why3$(EXE)
+	rm -f $(BINDIR)/why3$(EXE) $(BINDIR)/why3contraption$(EXE)
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
+	cp -f bin/why3contraption.@OCAMLBEST@ $(BINDIR)/why3contraption$(EXE)
 
-install_local: bin/why3
+install_local: bin/why3 bin/why3contraption
 
 ifneq "$(MAKECMDGOALS)" "clean"
-include src/main.dep
+include src/tools/main.dep
+include src/tools/why3contraption.dep
 endif
 
-depend: src/main.dep
+depend: src/tools/main.dep src/tools/why3contraption.dep
 
 clean::
-	rm -f src/main.cm[iox] src/main.annot src/main.o src/main.dep
+	rm -f src/tools/main.cm[iox] src/tools/main.annot src/tools/main.o src/tools/main.dep
+	rm -f src/tools/why3contraption.cm[iox] src/tools/why3contraption.annot src/tools/why3contraption.o src/tools/why3contraption.dep
 	rm -f bin/why3.byte bin/why3.opt bin/why3
-	rm -f bin/why3ml.byte bin/why3ml.opt bin/why3ml
+	rm -f bin/why3contraption.byte bin/why3contraption.opt bin/why3contraption
 
 ##############
 # test targets
@@ -580,7 +599,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3config$(EXE)
 
 install_no_local::
-	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
+	cp -f bin/why3config.@OCAMLBEST@ $(TOOLDIR)/why3config$(EXE)
 
 install_local: bin/why3config
 
@@ -641,7 +660,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3ide$(EXE)
 
 install_no_local::
-	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
+	cp -f bin/why3ide.@OCAMLBEST@ $(TOOLDIR)/why3ide$(EXE)
 
 install_local: bin/why3ide
 
@@ -696,7 +715,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3replayer$(EXE)
 
 install_no_local::
-	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer$(EXE)
+	cp -f bin/why3replayer.@OCAMLBEST@ $(TOOLDIR)/why3replayer$(EXE)
 
 install_local: bin/why3replayer
 
@@ -752,7 +771,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3session$(EXE)
 
 install_no_local::
-	cp -f bin/why3session.@OCAMLBEST@ $(BINDIR)/why3session$(EXE)
+	cp -f bin/why3session.@OCAMLBEST@ $(TOOLDIR)/why3session$(EXE)
 
 install_local: bin/why3session
 
@@ -810,7 +829,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3bench$(EXE)
 
 install_no_local::
-	cp -f bin/why3bench.@OCAMLBEST@ $(BINDIR)/why3bench$(EXE)
+	cp -f bin/why3bench.@OCAMLBEST@ $(TOOLDIR)/why3bench$(EXE)
 
 install_local: bin/why3bench
 
@@ -1395,7 +1414,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3wc$(EXE)
 
 install_no_local::
-	cp -f bin/why3wc.@OCAMLBEST@ $(BINDIR)/why3wc$(EXE)
+	cp -f bin/why3wc.@OCAMLBEST@ $(TOOLDIR)/why3wc$(EXE)
 
 install_local: bin/why3wc
 
@@ -1452,7 +1471,7 @@ clean_old_install::
 	rm -f $(BINDIR)/why3doc$(EXE)
 
 install_no_local::
-	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc$(EXE)
+	cp -f bin/why3doc.@OCAMLBEST@ $(TOOLDIR)/why3doc$(EXE)
 
 install_local: bin/why3doc
 

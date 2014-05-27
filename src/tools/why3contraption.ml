@@ -803,6 +803,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C .. byte"
+compile-command: "unset LANG; make -C ../.. byte"
 End:
 *)
