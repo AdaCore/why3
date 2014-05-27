@@ -12,10 +12,10 @@ use import ref.Ref
 
 type prdata = PrChar char | PrInt int
 
-val flushed : ref (list (list prdata))
-val current_line : ref (list prdata)
-val cur_pos : ref int
-val cur_linenum: ref int
+val ghost flushed : ref (list (list prdata))
+val ghost current_line : ref (list prdata)
+val ghost cur_pos : ref int
+val ghost cur_linenum: ref int
 
 (** prints a character on standard output. *)
 val print_char (c:char) : unit

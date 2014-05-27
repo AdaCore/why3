@@ -2,15 +2,18 @@
 
 (* computation part  *)
 
+open Format
 
 let compute_result text =
   try
     let a,i = Parse.parse_dec_ip text 0 in
     let i = Parse.parse_sep_star text i in
     let b,i = Parse.parse_dec_ip text i in
+    let m = Mp__N.mul a b in
     Mp__N.add_in_place a b;
-    Parse.pr Format.str_formatter a;
-    Format.flush_str_formatter ()
+    fprintf str_formatter "addition = %a,@\nmultiplication = %a"
+      Parse.pr a Parse.pr m;
+    flush_str_formatter ()
   with Parse.SyntaxError -> "syntax error"
 
 (* HTML rendering *)
@@ -22,7 +25,7 @@ let node x = (x : #Dom.node Js.t :> Dom.node Js.t)
 let (<|) e l = List.iter (fun c -> Dom.appendChild e c) l; node e
 
 let html_of_string (d : Html.document Js.t) (s:string) =
-  d##createElement (Js.string "p") <|
+  d##createElement (Js.string "pre") <|
       [node (d##createTextNode (Js.string s))]
 
 let replace_child p n =
