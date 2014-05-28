@@ -7,9 +7,10 @@
 # export WHY3DATA=.
 # export WHY3LOADPATH=theories
 
-pgm=$1
+suffix=$1
 
 goods () {
+    pgm="bin/why3prove$suffix"
     for f in $1/*.[wm][hl][yw] ; do
 	echo -n "  $f... "
 	# running Why
@@ -26,6 +27,7 @@ goods () {
 }
 
 bads () {
+    pgm="bin/why3prove$suffix"
     for f in $1/*.[wm][hl][yw] ; do
 	echo -n "  $f... "
 	if $pgm $2 $f > /dev/null 2>&1; then
@@ -39,6 +41,7 @@ bads () {
 }
 
 drivers () {
+    pgm="bin/why3prove$suffix"
     for f in $1/*.drv; do
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
 	echo -n "  $f... "
@@ -53,6 +56,7 @@ drivers () {
 }
 
 valid_goals () {
+    pgm="bin/why3prove$suffix"
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
 	if $pgm -t 10 -P alt-ergo $f | grep -q -v Valid; then
@@ -67,6 +71,7 @@ valid_goals () {
 }
 
 invalid_goals () {
+    pgm="bin/why3prove$suffix"
     for f in $1/*.mlw; do
 	echo -n "  "$f"... "
 	if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
@@ -81,6 +86,7 @@ invalid_goals () {
 }
 
 execute () {
+    pgm="bin/why3execute$suffix"
     echo -n "$1 $2... "
     if $pgm $1 --exec $2 > /dev/null 2>&1; then
         echo "ok"
@@ -123,6 +129,7 @@ extract_and_run () {
 }
 
 list_stuff () {
+    pgm="bin/why3$suffix"
     echo -n "$1 "
     if $pgm $1 > /dev/null 2>&1; then
         echo "ok"
@@ -164,8 +171,8 @@ goods examples/logic
 goods examples
 goods examples/foveoos11-cm
 goods examples/hoare_logic
-goods examples/vacid_0_binary_heaps "-I examples/vacid_0_binary_heaps"
-goods examples/bitvectors "-I examples/bitvectors"
+goods examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps"
+goods examples/bitvectors "-L examples/bitvectors"
 goods examples/in_progress
 echo ""
 

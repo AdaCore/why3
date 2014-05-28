@@ -1554,7 +1554,7 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 	# desactivé car requiert findlib
 	# if test -d examples/runstrat ; then \
 	#  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
-	bash bench/bench "bin/why3.@OCAMLBEST@"
+	bash bench/bench ".@OCAMLBEST@"
 	@if test "@enable_coq_tactic@" = "yes"; then \
 	   echo "=== checking the Coq tactic ==="; \
 	   $(MAKE) test-coq-tactic.@OCAMLBEST@; fi
