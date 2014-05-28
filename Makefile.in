@@ -481,7 +481,7 @@ clean::
 # Why3 commands
 ###############
 
-TOOLS_FILES = args why3prove
+TOOLS_FILES = args why3prove why3realize
 
 TOOLSMODULES = $(addprefix src/tools/, $(TOOLS_FILES))
 
@@ -492,8 +492,8 @@ TOOLSCMX = $(addsuffix .cmx, $(TOOLSMODULES))
 $(TOOLSDEP): DEPFLAGS += -I src/tools
 $(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
 
-byte: bin/why3prove.byte
-opt:  bin/why3prove.opt
+byte: bin/why3prove.byte bin/why3realize.byte
+opt:  bin/why3prove.opt  bin/why3realize.opt
 
 bin/why3prove.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3prove.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -506,13 +506,25 @@ bin/why3prove.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3prove.cmo
 bin/why3prove: bin/why3prove.@OCAMLBEST@
 	ln -sf why3prove.@OCAMLBEST@ $@
 
+bin/why3realize.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3realize.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3realize.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3realize.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+bin/why3realize: bin/why3realize.@OCAMLBEST@
+	ln -sf why3realize.@OCAMLBEST@ $@
+
 clean_old_install::
 	rm -f $(TOOLDIR)/why3prove$(EXE)
 
 install_no_local::
 	cp -f bin/why3prove.@OCAMLBEST@ $(TOOLDIR)/why3prove$(EXE)
+	cp -f bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
 
-install_local: bin/why3prove
+install_local: bin/why3prove bin/why3realize
 
 ifneq "$(MAKECMDGOALS)" "clean"
 include $(TOOLSDEP)
@@ -523,7 +535,9 @@ depend: $(TOOLSDEP)
 clean::
 	rm -f src/tools/args.cm[iox] src/tools/args.annot src/tools/args.o src/tools/args.dep
 	rm -f src/tools/why3prove.cm[iox] src/tools/why3prove.annot src/tools/why3prove.o src/tools/why3prove.dep
+	rm -f src/tools/why3realize.cm[iox] src/tools/why3realize.annot src/tools/why3realize.o src/tools/why3realize.dep
 	rm -f bin/why3prove.byte bin/why3prove.opt bin/why3prove
+	rm -f bin/why3realize.byte bin/why3realize.opt bin/why3realize
 
 ##############
 # test targets
@@ -1078,31 +1092,31 @@ clean::
 update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp
 
 update-coq-int: bin/why3 drivers/coq-realizations.aux theories/int.why
-	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
+	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
 
 update-coq-bool: bin/why3 drivers/coq-realizations.aux theories/bool.why
-	for f in $(COQLIBS_BOOL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T bool.$$f -o lib/coq/bool/; done
+	for f in $(COQLIBS_BOOL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T bool.$$f -o lib/coq/bool/; done
 
 update-coq-real: bin/why3 drivers/coq-realizations.aux theories/real.why
-	for f in $(COQLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
+	for f in $(COQLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T real.$$f -o lib/coq/real/; done
 
 update-coq-number: bin/why3 drivers/coq-realizations.aux theories/number.why
-	for f in $(COQLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T number.$$f -o lib/coq/number/; done
+	for f in $(COQLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T number.$$f -o lib/coq/number/; done
 
 update-coq-set: bin/why3 drivers/coq-realizations.aux theories/set.why
-	for f in $(COQLIBS_SET_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T set.$$f -o lib/coq/set/; done
+	for f in $(COQLIBS_SET_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T set.$$f -o lib/coq/set/; done
 
 update-coq-map: bin/why3 drivers/coq-realizations.aux theories/map.why
-	for f in $(COQLIBS_MAP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T map.$$f -o lib/coq/map/; done
+	for f in $(COQLIBS_MAP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T map.$$f -o lib/coq/map/; done
 
 update-coq-list: bin/why3 drivers/coq-realizations.aux theories/list.why
-	for f in $(COQLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T list.$$f -o lib/coq/list/; done
+	for f in $(COQLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T list.$$f -o lib/coq/list/; done
 
 update-coq-option: bin/why3 drivers/coq-realizations.aux theories/option.why
-	for f in $(COQLIBS_OPTION_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T option.$$f -o lib/coq/option/; done
+	for f in $(COQLIBS_OPTION_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T option.$$f -o lib/coq/option/; done
 
 update-coq-fp: bin/why3 drivers/coq-realizations.aux theories/floating_point.why
-	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
+	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
 
 else
 
@@ -1176,11 +1190,11 @@ install_no_local::
 install_local: drivers/pvs-realizations.aux
 
 update-pvs: bin/why3 drivers/pvs-realizations.aux
-	for f in $(PVSLIBS_INT_FILES); do bin/why3 --realize -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
-	for f in $(PVSLIBS_REAL_FILES); do bin/why3 --realize -D drivers/pvs-realize.drv -T real.$$f -o lib/pvs/real/; done
-	for f in $(PVSLIBS_LIST_FILES); do bin/why3 --realize -D drivers/pvs-realize.drv -T list.$$f -o lib/pvs/list/; done
-	for f in $(PVSLIBS_NUMBER_FILES); do bin/why3 --realize -D drivers/pvs-realize.drv -T number.$$f -o lib/pvs/number/; done
-	for f in $(PVSLIBS_FP_FILES); do bin/why3 --realize -D drivers/pvs-realize.drv -T floating_point.$$f -o lib/pvs/floating_point/; done
+	for f in $(PVSLIBS_INT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
+	for f in $(PVSLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T real.$$f -o lib/pvs/real/; done
+	for f in $(PVSLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T list.$$f -o lib/pvs/list/; done
+	for f in $(PVSLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T number.$$f -o lib/pvs/number/; done
+	for f in $(PVSLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T floating_point.$$f -o lib/pvs/floating_point/; done
 
 else
 
@@ -1260,37 +1274,37 @@ $(ISABELLELIBS_INT): bin/why3 drivers/isabelle-realizations.aux \
 $(ISABELLELIBS_BOOL): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/bool.why
 	mkdir -p lib/isabelle/bool
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T bool.$(notdir $(basename $@)) -o lib/isabelle/bool/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T bool.$(notdir $(basename $@)) -o lib/isabelle/bool/
 
 $(ISABELLELIBS_REAL): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/real.why
 	mkdir -p lib/isabelle/real
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T real.$(notdir $(basename $@)) -o lib/isabelle/real/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T real.$(notdir $(basename $@)) -o lib/isabelle/real/
 
 $(ISABELLELIBS_NUMBER): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/number.why
 	mkdir -p lib/isabelle/number
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T number.$(notdir $(basename $@)) -o lib/isabelle/number/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T number.$(notdir $(basename $@)) -o lib/isabelle/number/
 
 $(ISABELLELIBS_SET): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/set.why
 	mkdir -p lib/isabelle/set
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T set.$(notdir $(basename $@)) -o lib/isabelle/set/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T set.$(notdir $(basename $@)) -o lib/isabelle/set/
 
 $(ISABELLELIBS_MAP): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/map.why
 	mkdir -p lib/isabelle/map
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T map.$(notdir $(basename $@)) -o lib/isabelle/map/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T map.$(notdir $(basename $@)) -o lib/isabelle/map/
 
 $(ISABELLELIBS_LIST): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/list.why
 	mkdir -p lib/isabelle/list
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T list.$(notdir $(basename $@)) -o lib/isabelle/list/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T list.$(notdir $(basename $@)) -o lib/isabelle/list/
 
 $(ISABELLELIBS_OPTION): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/option.why
 	mkdir -p lib/isabelle/option
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
 
 opt byte: update-isabelle
 
