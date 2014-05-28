@@ -190,7 +190,10 @@ let env =
    (* load plugins; may be needed for external provers *)
    if !opt_prover <> None then
      Whyconf.load_plugins config_main;
-   Env.create_env (Whyconf.loadpath config_main)
+   Env.create_env (match !opt_proof_dir with
+                   | Some dir -> (Filename.concat dir "_theories")
+                                 :: Whyconf.loadpath config_main
+                   | None -> Whyconf.loadpath config_main)
 
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
    Whyconf.get_provers config
