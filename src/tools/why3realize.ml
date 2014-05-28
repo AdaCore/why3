@@ -13,7 +13,7 @@ open Format
 open Why3
 
 let usage_msg = sprintf
-  "Usage: %s [options] -D <driver> -o <dir> [-T <theory> ...]"
+  "Usage: %s [options] -D <driver> -o <dir> -T <theory> ..."
   (Filename.basename Sys.argv.(0))
 
 let version_msg = sprintf "Why3 platform, version %s (build date: %s)"
@@ -46,8 +46,6 @@ let opt_driver = ref None
 let opt_output = ref None
 
 let option_list = [
-  "-", Arg.Unit (fun () -> add_opt_file "-"),
-      " Read the input file from stdin";
   "-T", Arg.String add_opt_theory,
       "<theory> Select <theory> in the input file or in the library";
   "--theory", Arg.String add_opt_theory,
@@ -57,11 +55,11 @@ let option_list = [
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
   "-D", Arg.String (fun s -> opt_driver := Some s),
-      "<file> Specify a prover's driver (conflicts with -P)";
+      "<file> Specify a realization driver";
   "--driver", Arg.String (fun s -> opt_driver := Some s),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir> Print the selected goals to separate files in <dir>";
+      "<dir> Write the realizations in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o" ]
 
