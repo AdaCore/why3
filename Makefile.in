@@ -481,7 +481,7 @@ clean::
 # Why3 commands
 ###############
 
-TOOLS_FILES = args why3prove why3realize
+TOOLS_FILES = args why3extract why3prove why3realize
 
 TOOLSMODULES = $(addprefix src/tools/, $(TOOLS_FILES))
 
@@ -492,8 +492,19 @@ TOOLSCMX = $(addsuffix .cmx, $(TOOLSMODULES))
 $(TOOLSDEP): DEPFLAGS += -I src/tools
 $(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
 
-byte: bin/why3prove.byte bin/why3realize.byte
-opt:  bin/why3prove.opt  bin/why3realize.opt
+byte: bin/why3extract.byte bin/why3prove.byte bin/why3realize.byte
+opt:  bin/why3extract.opt  bin/why3prove.opt  bin/why3realize.opt
+
+bin/why3extract.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3extract.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3extract.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3extract.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+bin/why3extract: bin/why3extract.@OCAMLBEST@
+	ln -sf why3extract.@OCAMLBEST@ $@
 
 bin/why3prove.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3prove.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -518,13 +529,13 @@ bin/why3realize: bin/why3realize.@OCAMLBEST@
 	ln -sf why3realize.@OCAMLBEST@ $@
 
 clean_old_install::
-	rm -f $(TOOLDIR)/why3prove$(EXE)
+	rm -f  $(TOOLDIR)/why3extract$(EXE) $(TOOLDIR)/why3prove$(EXE) $(TOOLDIR)/why3realize$(EXE)
 
 install_no_local::
 	cp -f bin/why3prove.@OCAMLBEST@ $(TOOLDIR)/why3prove$(EXE)
 	cp -f bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
 
-install_local: bin/why3prove bin/why3realize
+install_local: bin/why3extract bin/why3prove bin/why3realize
 
 ifneq "$(MAKECMDGOALS)" "clean"
 include $(TOOLSDEP)
@@ -534,8 +545,10 @@ depend: $(TOOLSDEP)
 
 clean::
 	rm -f src/tools/args.cm[iox] src/tools/args.annot src/tools/args.o src/tools/args.dep
+	rm -f src/tools/why3extract.cm[iox] src/tools/why3extract.annot src/tools/why3extract.o src/tools/why3extract.dep
 	rm -f src/tools/why3prove.cm[iox] src/tools/why3prove.annot src/tools/why3prove.o src/tools/why3prove.dep
 	rm -f src/tools/why3realize.cm[iox] src/tools/why3realize.annot src/tools/why3realize.o src/tools/why3realize.dep
+	rm -f bin/why3extract.byte bin/why3extract.opt bin/why3extract
 	rm -f bin/why3prove.byte bin/why3prove.opt bin/why3prove
 	rm -f bin/why3realize.byte bin/why3realize.opt bin/why3realize
 
@@ -1675,7 +1688,7 @@ test-runstrat: test-runstrat.$(OCAMLBEST)
 test-ocaml-extraction: bin/why3.opt lib/why3/why3extract.cmxa
 	@echo "driver ocaml32"
 	@mkdir -p tests/test-extraction
-	@cd tests ; ../bin/why3.opt -E ocaml32 \
+	@cd tests ; ../bin/why3extract.opt -D ocaml32 \
 	  test_extraction.mlw -o test-extraction
 	@cd tests/test-extraction/ ; \
 	  $(OCAMLOPT) @BIGINTINCLUDE@ -I ../../lib/why3 \
@@ -1683,7 +1696,7 @@ test-ocaml-extraction: bin/why3.opt lib/why3/why3extract.cmxa
 	  ref__Refint.ml test_extraction__TestExtraction.ml main.ml
 	@tests/test-extraction/a.out
 	@echo "driver ocaml64"
-	@cd tests ; ../bin/why3.opt -E ocaml64 \
+	@cd tests ; ../bin/why3extract.opt -D ocaml64 \
 	  test_extraction.mlw -o test-extraction
 	@cd tests/test-extraction/ ; \
 	  $(OCAMLOPT) @BIGINTINCLUDE@ -I ../../lib/why3 \
