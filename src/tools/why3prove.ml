@@ -80,11 +80,8 @@ let add_opt_meta meta =
   in
   opt_metas := (meta_name,meta_arg)::!opt_metas
 
-let opt_config = ref None
-let opt_extra = ref []
 let opt_parser = ref None
 let opt_prover = ref None
-let opt_loadpath = ref []
 let opt_driver = ref None
 let opt_output = ref None
 let opt_timelimit = ref None
@@ -95,9 +92,7 @@ let opt_task = ref None
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
 
-let opt_version = ref false
-
-let option_list = Arg.align [
+let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
       " Read the input file from stdin";
   "-T", Arg.String add_opt_theory,
@@ -108,16 +103,6 @@ let option_list = Arg.align [
       "<goal> Select <goal> in the last selected theory";
   "--goal", Arg.String add_opt_goal,
       " same as -G";
-  "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> Read configuration from <file>";
-  "--config", Arg.String (fun s -> opt_config := Some s),
-      " same as -C";
-  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-      "<file> Read additional configuration from <file>";
-  "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> Add <dir> to the library search path";
-  "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      " same as -L";
   "-P", Arg.String (fun s -> opt_prover := Some s),
       "<prover> Prove or print (with -o) the selected goals";
   "--prover", Arg.String (fun s -> opt_prover := Some s),
@@ -154,24 +139,14 @@ let option_list = Arg.align [
       " Print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
       " Print namespaces of selected theories";
-  Debug.Args.desc_debug_list;
   Debug.Args.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
   Debug.Args.desc_shortcut
-    "type_only" "--type-only" " Stop after type checking";
-  Debug.Args.desc_debug_all;
-  Debug.Args.desc_debug ]
+    "type_only" "--type-only" " Stop after type checking" ]
+
+let (env, config) =
+  Args.initialize option_list add_opt_file usage_msg
 
 let () = try
-  Arg.parse option_list add_opt_file usage_msg;
-
-  (** Configuration *)
-  let config = read_config !opt_config in
-  let config = List.fold_left merge_config config !opt_extra in
-  let main = get_main config in
-  Whyconf.load_plugins main;
-
-  Debug.Args.set_flags_selected ();
-
   if Queue.is_empty opt_queue then begin
     Arg.usage option_list usage_msg;
     exit 1
@@ -202,7 +177,8 @@ let () = try
       opt_print_theory := true
   end;
 
-  opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
+  let main = Whyconf.get_main config in
+
   if !opt_timelimit = None then opt_timelimit := Some (Whyconf.timelimit main);
   if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
   begin match !opt_prover with
@@ -411,7 +387,6 @@ let load_driver_extract env s =
 
 let () =
   try
-    let env = Env.create_env !opt_loadpath in
     let drv = Opt.map (load_driver env) !opt_driver in
     Queue.iter (do_input env drv) opt_queue
   with e when not (Debug.test_flag Debug.stack_trace) ->
