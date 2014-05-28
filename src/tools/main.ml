@@ -168,6 +168,14 @@ let () = try
   opt_list :=  Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
+  let commands = Sys.readdir command_path in
+  eprintf "%s@\n@\nAvailable commands:@." usage_msg;
+  Array.sort compare commands;
+  Array.iter (fun s ->
+    if String.length s > 4 && String.sub s 0 4 = "why3" then
+      eprintf "  %s@." (String.sub s 4 (String.length s - 4))
+  ) commands
+
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
