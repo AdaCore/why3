@@ -516,10 +516,8 @@ module Save_VCs = struct
       let r = find check in
       incr r;
       let n = !r in
-      let base = Gnat_expl.to_filename check in
-      let suffix = ".why" in
-      if n = 1 then base ^ suffix
-      else base ^ "_" ^ string_of_int n ^ suffix
+      let count_str = if n = 1 then "" else string_of_int n in
+      Pp.sprintf "%a%s.why" Gnat_expl.to_filename check count_str
 
    let save_vc goal =
       let check = get_objective goal in
@@ -546,10 +544,9 @@ module Save_VCs = struct
 
    let save_trace goal =
       let check = get_objective goal in
-      let base = Gnat_expl.to_filename check in
+      let trace_fn = Pp.sprintf "%a.trace" Gnat_expl.to_filename check in
       let trace = compute_trace goal in
       if not (Gnat_loc.S.is_empty trace) then begin
-        let trace_fn = base ^ ".trace" in
         with_fmt_channel trace_fn (fun fmt ->
            Gnat_loc.S.iter (fun l ->
               Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc

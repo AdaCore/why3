@@ -233,10 +233,12 @@ let get_extra_info task =
    let info = extract_msg (Task.task_goal_fmla task) in
    info.extra_node
 
-let to_filename check =
-  let file, line, col = Gnat_loc.explode (List.hd check.sloc) in
-  Format.sprintf "%s_%d_%d_%s"
-     file line col (reason_to_string check.reason)
+let to_filename fmt check =
+  List.iter (fun x ->
+      let file, line, col = Gnat_loc.explode x in
+      Format.fprintf fmt "%s_%d_%d_" file line col;
+  ) check.sloc;
+  Format.fprintf fmt "%s" (reason_to_string check.reason)
 
 module CheckCmp = struct
    type t = check
