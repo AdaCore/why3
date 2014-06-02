@@ -16,9 +16,6 @@ let usage_msg = sprintf
   "Usage: %s [options] -D <driver> -o <dir> -T <theory> ..."
   (Filename.basename Sys.argv.(0))
 
-let version_msg = sprintf "Why3 platform, version %s (build date: %s)"
-  Config.version Config.builddate
-
 let opt_queue = Queue.create ()
 
 let add_opt_file _ =
