@@ -8,12 +8,10 @@ module AllDistinct
   use import ref.Ref
   use import array.Array
 
-  constant m: int
-  axiom m_nonneg: 0 <= m
-
   exception Duplicate
 
-  let all_distinct (a: array int) : bool
+  let all_distinct (a: array int) (m:int) : bool
+    requires { 0 <= m }
     requires { forall i: int. 0 <= i < length a -> 0 <= a[i] < m }
     ensures  { result <-> forall i j: int. 0 <= i < length a ->
                           0 <= j < length a -> i <> j -> a[i] <> a[j] }
