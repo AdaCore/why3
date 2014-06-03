@@ -55,29 +55,10 @@ let rec hypo_deps hypo_term used_vars =
      else
        Svs.empty
   | Tbinop (Tor, t1, t2) ->
-     Svs.inter (hypo_deps t1 used_vars) (hypo_deps t2 used_vars)
+     Svs.union (hypo_deps t1 used_vars) (hypo_deps t2 used_vars)
   | Tbinop (Tand, t1, t2) ->
      Svs.union (hypo_deps t1 used_vars) (hypo_deps t2 used_vars)
   | _ -> Svs.empty
-
-(* Called a the level of a binary Timplies node, hypo_term should be the
-  right operand and imp_term the left one.
-  The function first checks if some of the hypothesis candidate to removal
-  are needed given the current hypothesis and puts them back in the term
-  tree.
-  Then we check if the current hypothesis is candidate to removal.  *)
-let check_hypothesis used_vars hypo_list hypo_term imp_term =
-  let hypo_vars = t_freevars (Mvs.empty) hypo_term in
-  let (needed, hypo_list, new_vars) =
-    part_needed_hypothesis hypo_vars hypo_list in
-  let imp_term = put_hypothesis_back needed imp_term in
-  let old_term = t_implies hypo_term imp_term in
-  let used_vars = Mvs.union map_union_cb new_vars used_vars in
-  let deps = hypo_deps hypo_term used_vars in
-  if Svs.is_empty deps then
-    Mvs.union map_union_cb used_vars hypo_vars, hypo_list, old_term
-  else
-    used_vars, { h = hypo_term; depend_vars = deps } :: hypo_list, imp_term
 
 (* This function simplifies the term [hypo_term] as possible. *)
 let rec simpl_hypo hypo_term vsl inside_vars =
@@ -116,6 +97,26 @@ let rec simpl_hypo hypo_term vsl inside_vars =
        hypo_term
   | _ -> hypo_term
 
+(* Called a the level of a binary Timplies node, hypo_term should be the
+  right operand and imp_term the left one.
+  The function first checks if some of the hypothesis candidate to removal
+  are needed given the current hypothesis and puts them back in the term
+  tree.
+  Then we check if the current hypothesis is candidate to removal.  *)
+let check_hypothesis used_vars hypo_list hypo_term imp_term =
+  let hypo_vars = t_freevars (Mvs.empty) hypo_term in
+  let (needed, hypo_list, new_vars) =
+    part_needed_hypothesis hypo_vars hypo_list in
+  let imp_term = put_hypothesis_back needed imp_term in
+  let used_vars = Mvs.union map_union_cb new_vars used_vars in
+  let deps = hypo_deps hypo_term used_vars in
+  if Svs.is_empty deps then
+    let old_term = t_implies (simpl_hypo hypo_term Mvs.empty Mvs.empty)
+                             imp_term
+    in
+    Mvs.union map_union_cb used_vars hypo_vars, hypo_list, old_term
+  else
+    used_vars, { h = hypo_term; depend_vars = deps } :: hypo_list, imp_term
 
 (* This function removes hypothesis depending on variable that will no longer
    exists since we met it's quantifier as we ascend through the tree.
