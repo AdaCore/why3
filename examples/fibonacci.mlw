@@ -86,7 +86,7 @@ module SmallestFibAbove
 
   let smallest_fib_above (x: int) : int
     requires { 0 <= x }
-    ensures  { exists k: int. 0 <= k /\ fib k <= x < fib (k+1) }
+    ensures  { exists k: int. 0 <= k /\ fib k <= x < fib (k+1) = result }
   =
     let a = ref 0 in
     let b = ref 1 in
