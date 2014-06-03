@@ -43,7 +43,7 @@ liblablgtk2-ocaml-dev liblablgtksourceview2-ocaml-dev
 It is also installable from sources, available from the site
 \url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
 
-\item For \texttt{why3bench}: The OCaml bindings of the sqlite3 library.
+\item For \texttt{why3 bench}: The OCaml bindings of the sqlite3 library.
 For Debian-based Linux distributions, you can install the package
 \begin{verbatim}
 libsqlite3-ocaml-dev
@@ -70,10 +70,10 @@ Installation is performed (as super-user if needed) using
 \begin{verbatim}
 make install
 \end{verbatim}
-Installation can be tested as follows: 
+Installation can be tested as follows:
 \begin{enumerate}
 \item install some external provers (see~Section~\ref{provers} below)
-\item run \verb|why3config --detect|
+\item run \verb|why3 config --detect|
 \item run some examples from the distribution, \eg you should
 obtain the following:
 \begin{verbatim}
@@ -136,10 +136,10 @@ executable command, \eg \texttt{cvc3} for CVC3. However, if you
 install several version of the same prover it is likely that you would
 use specialized executable names, such as \texttt{cvc3-2.2} or
 \texttt{cvc3-2.4.1}. To allow the \why detection process to recognize
-these, you can use the option \verb|--add-prover| to
-\texttt{why3config}, \eg
+these, you can use the option \verb|--add-prover| with the
+\texttt{config} command, \eg
 \begin{verbatim}
-why3config --detect --add-prover cvc3-2.4 /usr/local/bin/cvc3-2.4.1
+why3 config --detect --add-prover cvc3-2.4 /usr/local/bin/cvc3-2.4.1
 \end{verbatim}
 the first argument (here \verb|cvc3-2.4|) must be one of the class of
 provers known in the file \verb|provers-detection-data.conf| typically
@@ -177,12 +177,12 @@ each prover, in the \why configuration file. Within the GUI, you can
 discard these choices via the \textsf{Preferences} dialog.
 
 Outside the GUI, the prover upgrades are handled as follows. The
-\texttt{why3replayer} tool will just ignore proof attempts marked as
+\texttt{replayer} command will just ignore proof attempts marked as
 archived\index{archived}.
 Conversely, a non-archived proof attempt with a non-existent
-prover will be reported as a replay failure. The tool
-\texttt{why3session} allows you to perform move or copy operations on
-proof attempts in a fine-grain way, using filters, as detailed in
+prover will be reported as a replay failure. The
+\texttt{session} command performs move or copy operations on
+proof attempts in a fine-grained way, using filters, as detailed in
 Section~\ref{sec:why3session}.
 
 

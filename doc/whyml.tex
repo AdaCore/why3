@@ -38,12 +38,12 @@ They also provide extra features:
 Programs are contained in files with suffix \verb|.mlw|.
 They are handled by \texttt{why3}. For instance
 \begin{verbatim}
-  > why3 myfile.mlw
+> why3 prove myfile.mlw
 \end{verbatim}
 will display the verification conditions extracted from modules in
 file \texttt{myfile.mlw}, as a set of corresponding theories, and
 \begin{verbatim}
-  > why3 -P alt-ergo myfile.mlw
+> why3 prove -P alt-ergo myfile.mlw
 \end{verbatim}
 will run the SMT solver Alt-Ergo on these verification conditions.
 Program files are also handled by the GUI tool \texttt{why3ide}.
