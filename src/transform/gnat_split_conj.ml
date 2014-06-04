@@ -64,15 +64,27 @@ let post_def_axiom_regexp = Str.regexp ".*__\\(post\\|def\\)_axiom"
 
 let match_axiom s = Str.string_match post_def_axiom_regexp s 0
 
+let rec merge_univ_quant t acc =
+  match t.t_node with
+  | Tquant (Tforall, tq) -> let vs, tr, t = t_open_quant tq in
+                            if tr <> [] then
+                              let t = t_quant Tforall (t_close_quant vs tr t)
+                              in
+                              t_quant Tforall (t_close_quant acc [] t)
+                            else
+                              merge_univ_quant t (acc @ vs)
+  | _ -> t_quant Tforall (t_close_quant acc [] t)
+
 let split_axioms d =
   match d.d_node with
-  | Dprop (Paxiom, { pr_name = { Ident.id_string = s } }, term) ->
+  | Dprop (Paxiom, ({ pr_name = { Ident.id_string = s } } as prsym), term) ->
      if match_axiom s then
        let splitted_terms = split [] term in
-       List.rev_map (fun t -> let name = create_prsymbol (Ident.id_fresh s) in
+       List.rev_map (fun t -> let t = merge_univ_quant t [] in
+                              let name = create_prsymbol (Ident.id_fresh s) in
                               create_prop_decl Paxiom name t) splitted_terms
      else
-       [ d ]
+       [ create_prop_decl Paxiom prsym (merge_univ_quant term []) ]
   | _ -> [ d ]
 
 let split_conj_axioms = Trans.decl split_axioms None
