@@ -172,7 +172,47 @@ module Zeckendorf
     done;
     !l
 
-  (* TODO: a linear implementation *)
+  (* a more efficient, linear implementation *)
+
+  let zeckendorf_fast (n: int) : list int
+    requires { 0 <= n }
+    ensures  { wf 2 result }
+    ensures  { n = sum result }
+  =
+    if n = 0 then Nil else
+    let a = ref 1 in
+    let b = ref 1 in
+    let k = ref 1 in
+    while !b <= n do
+      invariant { 1 <= !k /\ !a = fib !k <= n /\ !b = fib (!k + 1) }
+      invariant { 1 <= !a /\ 1 <= !b }
+      variant   { 2*n - (!a + !b) }
+      let f = !a + !b in
+      a := !b;
+      b := f;
+      k := !k + 1
+    done;
+    assert { 2 <= !k /\ 1 <= !a = fib !k <= n < fib (!k + 1) = !b };
+    let l = ref (Cons !k Nil) in
+    let x = ref (n - !a) in
+    while !x > 0 do
+      invariant { 1 <= !k /\ !a = fib !k <= n /\ !x < !b = fib (!k + 1) }
+      invariant { 1 <= !a /\ 1 <= !b }
+      invariant { 0 <= !x <= n }
+      invariant { wf 2 !l }
+      invariant { !x + sum !l = n }
+      invariant { match !l with Nil -> true | Cons k _ -> !x < fib (k-1) end }
+      variant   { !k }
+      if !a <= !x then begin
+        x := !x - !a;
+        l := Cons !k !l
+      end;
+      k := !k - 1;
+      let tmp = !b - !a in
+      b := !a;
+      a := tmp
+   done;
+   !l
 
 end
 
