@@ -973,7 +973,7 @@
    locfile="../fibonacci.mlw"
    loclnum="80" loccnumb="7" loccnume="23"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter smallest_fib_above"
     locfile="../fibonacci.mlw"
@@ -981,7 +981,7 @@
     expl="VC for smallest_fib_above"
     sum="c69813f51ecfc06184cca298b1f8cdf8"
     proved="true"
-    expanded="true"
+    expanded="false"
     shape="iainfix =afibainfix +V3c1V1Aainfix &lt;V0afibainfix +V3c1Aainfix &lt;=afibV3V0Aainfix &lt;=c0V3Eainfix &lt;ainfix -ainfix *c2V0ainfix +V4V5ainfix -ainfix *c2V0ainfix +V2V1Aainfix &lt;=c0ainfix -ainfix *c2V0ainfix +V2V1Aainfix &lt;=c1V5Aainfix &lt;=c0V4Aainfix =V5afibainfix +V6c1Aainfix &lt;=afibV6V0Aainfix =V4afibV6Aainfix &lt;=c0V6EIainfix =V5ainfix +V2V1FIainfix =V4V1Fainfix &lt;=V1V0Iainfix &lt;=c1V1Aainfix &lt;=c0V2Aainfix =V1afibainfix +V7c1Aainfix &lt;=afibV7V0Aainfix =V2afibV7Aainfix &lt;=c0V7EFAainfix &lt;=c1c1Aainfix &lt;=c0c0Aainfix =c1afibainfix +V8c1Aainfix &lt;=afibV8V0Aainfix =c0afibV8Aainfix &lt;=c0V8EIainfix &lt;=c0V0F">
     <label
      name="expl:VC for smallest_fib_above"/>
@@ -996,9 +996,474 @@
    </goal>
   </theory>
   <theory
+   name="Zeckendorf"
+   locfile="../fibonacci.mlw"
+   loclnum="105" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter fib_nonneg"
+    locfile="../fibonacci.mlw"
+    loclnum="125" loccnumb="16" loccnume="26"
+    expl="VC for fib_nonneg"
+    sum="33108687e9c5b98282ab67be59459f0f"
+    proved="true"
+    expanded="true"
+    shape="iainfix &lt;=c0afibV0ainfix &lt;=c0afibV0Iainfix &lt;=c0afibV2Aainfix &lt;=c0V2Aainfix &lt;V2V0Aainfix &lt;=c0V0Lainfix -V0c1Iainfix &lt;=c0afibV1Aainfix &lt;=c0V1Aainfix &lt;V1V0Aainfix &lt;=c0V0Lainfix -V0c2ainfix &gt;V0c1Iainfix &lt;=c0V0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for fib_nonneg"/>
+    <proof
+     prover="1"
+     timelimit="6"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter fib_increasing"
+    locfile="../fibonacci.mlw"
+    loclnum="131" loccnumb="16" loccnume="30"
+    expl="VC for fib_increasing"
+    sum="407eb80b8a83c5b92a39e35448b7526f"
+    proved="true"
+    expanded="true"
+    shape="iainfix &lt;=afibV0afibV1ainfix &lt;=afibV0afibV1Iainfix &lt;=afibV2afibV1Aainfix &lt;=V2V1Aainfix &lt;=c0V2Aainfix &lt;ainfix -V1V2ainfix -V1V0Aainfix &lt;=c0ainfix -V1V0Lainfix +V0c1ainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for fib_increasing"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter fib_increasing.1"
+      locfile="../fibonacci.mlw"
+      loclnum="131" loccnumb="16" loccnume="30"
+      expl="1. variant decrease"
+      sum="eeb9e177d8bf629553a6b8cb4ba9f658"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseainfix &lt;ainfix -V1V2ainfix -V1V0Aainfix &lt;=c0ainfix -V1V0Lainfix +V0c1Iainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for fib_increasing"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_increasing.2"
+      locfile="../fibonacci.mlw"
+      loclnum="131" loccnumb="16" loccnume="30"
+      expl="2. precondition"
+      sum="cb694563623568dff32eeced02b2e3fb"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;=V2V1Aainfix &lt;=c0V2Lainfix +V0c1Iainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for fib_increasing"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_increasing.3"
+      locfile="../fibonacci.mlw"
+      loclnum="131" loccnumb="16" loccnume="30"
+      expl="3. postcondition"
+      sum="bc99d19243e3d7d5f2353440a7c64781"
+      proved="true"
+      expanded="true"
+      shape="postconditionainfix &lt;=afibV0afibV1Iainfix &lt;=afibV2afibV1Iainfix &lt;=V2V1Aainfix &lt;=c0V2Lainfix +V0c1Iainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for fib_increasing"/>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter fib_increasing.4"
+      locfile="../fibonacci.mlw"
+      loclnum="131" loccnumb="16" loccnume="30"
+      expl="4. postcondition"
+      sum="5b77f57336df5913f7b2b1dcb808433a"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix &lt;=afibV0afibV1INainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for fib_increasing"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter greatest_fib"
+    locfile="../fibonacci.mlw"
+    loclnum="137" loccnumb="6" loccnume="18"
+    expl="VC for greatest_fib"
+    sum="dcc47b6ae887f3b47ac361faa61ef865"
+    proved="true"
+    expanded="false"
+    shape="iainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1ainfix &lt;ainfix -ainfix *c2V0ainfix +V4V5ainfix -ainfix *c2V0ainfix +V3V2Aainfix &lt;=c0ainfix -ainfix *c2V0ainfix +V3V2Aainfix &lt;=c1V5Aainfix &lt;=c1V4Aainfix =V5afibainfix +V6c1Aainfix &lt;=afibV6V0Aainfix =V4afibV6Aainfix &lt;=c1V6Iainfix =V6ainfix +V1c1FIainfix =V5ainfix +V3V2FIainfix =V4V2Fainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FAainfix &lt;=c1c1Aainfix =c1afibainfix +c1c1Aainfix &lt;=afibc1V0Aainfix =c1afibc1Aainfix &lt;=c1c1Iainfix &lt;c0V0F">
+    <label
+     name="expl:VC for greatest_fib"/>
+    <proof
+     prover="9"
+     timelimit="6"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter zeckendorf"
+    locfile="../fibonacci.mlw"
+    loclnum="156" loccnumb="6" loccnume="16"
+    expl="VC for zeckendorf"
+    sum="fc2c4a90fde5d8c77d17e8bbd66c182f"
+    proved="true"
+    expanded="true"
+    shape="iainfix =V0asumV1Aawfc2V1ainfix &lt;V5V2Aainfix &lt;=c0V2ACtaNilainfix &lt;V5afibainfix -V7c1aConsVwV6Aainfix =ainfix +V5asumV6V0Aawfc2V6Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FAainfix &lt;c0V2ainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V8c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FAainfix =ainfix +V0asumaNilV0Aawfc2aNilAainfix &lt;=V0V0Aainfix &lt;=c0V0Iainfix &lt;=c0V0F">
+    <label
+     name="expl:VC for zeckendorf"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter zeckendorf.1"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="1. loop invariant init"
+      sum="cf2b0b0a9d0b701cc79893817420feb3"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix &lt;=V0V0Aainfix &lt;=c0V0Iainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.2"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="2. loop invariant init"
+      sum="dfdc3c57661be1107ddf11ccfef27f32"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initawfc2aNilIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.3"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="3. loop invariant init"
+      sum="6c7868f45e5623286c74eb17947b19ee"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =ainfix +V0asumaNilV0Iainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.4"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="4. precondition"
+      sum="dd7407ab90d7d3953b3f124838cc066b"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V3c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.5"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="5. loop invariant preservation"
+      sum="9ed129664c8571f1c14bee8721611372"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V7c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.07"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.6"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="6. loop invariant preservation"
+      sum="34d55e842777936b015356799c7e3cbf"
+      proved="true"
+      expanded="true"
+      shape="loop invariant preservationawfc2V6Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V7c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.7"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="7. loop invariant preservation"
+      sum="32f91e445a1faf386e9e3a2745f5d8e0"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =ainfix +V5asumV6V0Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V7c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.8"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="8. loop invariant preservation"
+      sum="08394bcd4fb2043bdc0cf589333b5ceb"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationCtaNilainfix &lt;V5afibainfix -V7c1aConsVwV6Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V8c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.9"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="9. loop variant decrease"
+      sum="bee2d921cf43cfbc4279374549e9a679"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;V5V2Aainfix &lt;=c0V2Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V7c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.10"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="10. postcondition"
+      sum="de9085ed4bd4445127e6031caea6088c"
+      proved="true"
+      expanded="false"
+      shape="postconditionawfc2V1INainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V3c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter zeckendorf.11"
+      locfile="../fibonacci.mlw"
+      loclnum="156" loccnumb="6" loccnume="16"
+      expl="11. postcondition"
+      sum="1524958090719fed955a065c75d06130"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =V0asumV1INainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V3c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      <label
+       name="expl:VC for zeckendorf"/>
+      <proof
+       prover="1"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof
+       prover="9"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+  <theory
    name="Mat22"
    locfile="../fibonacci.mlw"
-   loclnum="105" loccnumb="7" loccnume="12"
+   loclnum="177" loccnumb="7" loccnume="12"
    verified="true"
    expanded="true">
    <label
@@ -1007,13 +1472,13 @@
   <theory
    name="FibonacciLogarithmic"
    locfile="../fibonacci.mlw"
-   loclnum="127" loccnumb="7" loccnume="27"
+   loclnum="199" loccnumb="7" loccnume="27"
    verified="true"
-   expanded="true">
+   expanded="false">
    <goal
     name="WP_parameter logfib"
     locfile="../fibonacci.mlw"
-    loclnum="141" loccnumb="10" loccnume="16"
+    loclnum="213" loccnumb="10" loccnume="16"
     expl="VC for logfib"
     sum="d4dd7dccf6c1b8fab720f436a541a77a"
     proved="true"
@@ -1028,7 +1493,7 @@
      <goal
       name="WP_parameter logfib.1"
       locfile="../fibonacci.mlw"
-      loclnum="141" loccnumb="10" loccnume="16"
+      loclnum="213" loccnumb="10" loccnume="16"
       expl="1. postcondition"
       sum="69cb2f091b3a66334b2aacb49a0456e5"
       proved="true"
@@ -1072,7 +1537,7 @@
      <goal
       name="WP_parameter logfib.2"
       locfile="../fibonacci.mlw"
-      loclnum="141" loccnumb="10" loccnume="16"
+      loclnum="213" loccnumb="10" loccnume="16"
       expl="2. variant decrease"
       sum="a6278a43b357e52386379de92b22d9c4"
       proved="true"
@@ -1092,7 +1557,7 @@
      <goal
       name="WP_parameter logfib.3"
       locfile="../fibonacci.mlw"
-      loclnum="141" loccnumb="10" loccnume="16"
+      loclnum="213" loccnumb="10" loccnume="16"
       expl="3. precondition"
       sum="3f33fa6a056926fc563ba658c8f13f22"
       proved="true"
@@ -1120,7 +1585,7 @@
      <goal
       name="WP_parameter logfib.4"
       locfile="../fibonacci.mlw"
-      loclnum="141" loccnumb="10" loccnume="16"
+      loclnum="213" loccnumb="10" loccnume="16"
       expl="4. postcondition"
       sum="7b7a848fd3c85b5823edf5084297bfd1"
       proved="true"
@@ -1143,7 +1608,7 @@
    <goal
     name="fib_m"
     locfile="../fibonacci.mlw"
-    loclnum="164" loccnumb="8" loccnume="13"
+    loclnum="236" loccnumb="8" loccnume="13"
     sum="f4108c167ac378dc0bb2fbb56847e071"
     proved="true"
     expanded="false"
@@ -1161,7 +1626,7 @@
    <goal
     name="WP_parameter fibo"
     locfile="../fibonacci.mlw"
-    loclnum="168" loccnumb="6" loccnume="10"
+    loclnum="240" loccnumb="6" loccnume="10"
     expl="VC for fibo"
     sum="38ae29d3fc4fbfcdd946e1d92ff141b8"
     proved="true"
@@ -1189,7 +1654,7 @@
    <goal
     name="WP_parameter test0"
     locfile="../fibonacci.mlw"
-    loclnum="172" loccnumb="6" loccnume="11"
+    loclnum="244" loccnumb="6" loccnume="11"
     expl="VC for test0"
     sum="2ed01e39d6b5ac51495153ba59fe47f4"
     proved="true"
@@ -1209,7 +1674,7 @@
    <goal
     name="WP_parameter test1"
     locfile="../fibonacci.mlw"
-    loclnum="173" loccnumb="6" loccnume="11"
+    loclnum="245" loccnumb="6" loccnume="11"
     expl="VC for test1"
     sum="4e6f91b5630b53961359e65fde7720bc"
     proved="true"
@@ -1229,7 +1694,7 @@
    <goal
     name="WP_parameter test7"
     locfile="../fibonacci.mlw"
-    loclnum="174" loccnumb="6" loccnume="11"
+    loclnum="246" loccnumb="6" loccnume="11"
     expl="VC for test7"
     sum="39498e0eca6c3664c87cab69c3a69a21"
     proved="true"
@@ -1249,7 +1714,7 @@
    <goal
     name="WP_parameter test42"
     locfile="../fibonacci.mlw"
-    loclnum="175" loccnumb="6" loccnume="12"
+    loclnum="247" loccnumb="6" loccnume="12"
     expl="VC for test42"
     sum="6537eb059d9e6f5fd0a3502e6095fb1f"
     proved="true"
@@ -1269,7 +1734,7 @@
    <goal
     name="WP_parameter test2014"
     locfile="../fibonacci.mlw"
-    loclnum="176" loccnumb="6" loccnume="14"
+    loclnum="248" loccnumb="6" loccnume="14"
     expl="VC for test2014"
     sum="12ce06848394595336f904d4128638aa"
     proved="true"
@@ -1289,7 +1754,7 @@
    <goal
     name="WP_parameter bench"
     locfile="../fibonacci.mlw"
-    loclnum="180" loccnumb="6" loccnume="11"
+    loclnum="252" loccnumb="6" loccnume="11"
     expl="VC for bench"
     sum="822f4dbc4c001f31f7a546c376f270a7"
     proved="true"
