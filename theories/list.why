@@ -486,6 +486,18 @@ theory Prefix
 
 end
 
+theory Sum
+
+  use export List
+  use import int.Int
+
+  function sum (l: list int) : int = match l with
+  | Nil -> 0
+  | Cons x r -> x + sum r
+  end
+
+end
+
 (** {2 Induction on lists} *)
 
 theory Induction
