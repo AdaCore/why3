@@ -20,20 +20,224 @@
   <theory
    name="IterableList"
    locfile="../cursor.mlw"
-   loclnum="4" loccnumb="7" loccnume="19"
+   loclnum="15" loccnumb="7" loccnume="19"
    verified="true"
    expanded="true">
   </theory>
   <theory
+   name="TestCursor"
+   locfile="../cursor.mlw"
+   loclnum="50" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter sum"
+    locfile="../cursor.mlw"
+    loclnum="60" loccnumb="6" loccnume="9"
+    expl="VC for sum"
+    sum="f3c9198d6329747669302ad909be62c7"
+    proved="true"
+    expanded="true"
+    shape="iainfix =V4asumV2ainfix &lt;alengthV9alengthV5Aainfix &lt;=c0alengthV5AacoherentV0V11Aainfix =asumV2ainfix +V13asumV9Iainfix =V13ainfix +V4V12FIacoherentV0V11ACfaNilainfix =V9V15Aainfix =V10aConsV14V6Aainfix =V12V14aConsVVV5FLamk cursorV10V9FAacoherentV0V7ANainfix =V5aNilainfix =V8aTrueINainfix =V5aNilqainfix =V8aTrueFAacoherentV0V7IacoherentV0V7Aainfix =asumV2ainfix +V4asumV5Lamk cursorV6V5FAacoherentV0V3Aainfix =asumV2ainfix +c0asumV2IacoherentV0V3Lamk cursorV1V2F">
+    <label
+     name="expl:VC for sum"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="true">
+     <goal
+      name="WP_parameter sum.1"
+      locfile="../cursor.mlw"
+      loclnum="60" loccnumb="6" loccnume="9"
+      expl="1. loop invariant init"
+      sum="fe6a17b2698e27b84e002d7ad7ddb2c4"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initainfix =asumV2ainfix +c0asumV2IacoherentV0V3Lamk cursorV1V2F">
+      <label
+       name="expl:VC for sum"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sum.2"
+      locfile="../cursor.mlw"
+      loclnum="60" loccnumb="6" loccnume="9"
+      expl="2. loop invariant init"
+      sum="8e37bf24b26ff42db25805ddf114f06c"
+      proved="true"
+      expanded="false"
+      shape="loop invariant initacoherentV0V3IacoherentV0V3Lamk cursorV1V2F">
+      <label
+       name="expl:VC for sum"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sum.3"
+      locfile="../cursor.mlw"
+      loclnum="60" loccnumb="6" loccnume="9"
+      expl="3. precondition"
+      sum="ba9fe6a2e7658584dc8285351d558224"
+      proved="true"
+      expanded="false"
+      shape="preconditionacoherentV0V7IacoherentV0V7Aainfix =asumV2ainfix +V4asumV5Lamk cursorV6V5FIacoherentV0V3Lamk cursorV1V2F">
+      <label
+       name="expl:VC for sum"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sum.4"
+      locfile="../cursor.mlw"
+      loclnum="60" loccnumb="6" loccnume="9"
+      expl="4. precondition"
+      sum="71677e2e4b12ef2b9d4e941bed4a05be"
+      proved="true"
+      expanded="false"
+      shape="preconditionNainfix =V5aNilIainfix =V8aTrueINainfix =V5aNilqainfix =V8aTrueFIacoherentV0V7IacoherentV0V7Aainfix =asumV2ainfix +V4asumV5Lamk cursorV6V5FIacoherentV0V3Lamk cursorV1V2F">
+      <label
+       name="expl:VC for sum"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sum.5"
+      locfile="../cursor.mlw"
+      loclnum="60" loccnumb="6" loccnume="9"
+      expl="5. precondition"
+      sum="090bf2fc176dad13294343ca2de396c5"
+      proved="true"
+      expanded="false"
+      shape="preconditionacoherentV0V7Iainfix =V8aTrueINainfix =V5aNilqainfix =V8aTrueFIacoherentV0V7IacoherentV0V7Aainfix =asumV2ainfix +V4asumV5Lamk cursorV6V5FIacoherentV0V3Lamk cursorV1V2F">
+      <label
+       name="expl:VC for sum"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sum.6"
+      locfile="../cursor.mlw"
+      loclnum="60" loccnumb="6" loccnume="9"
+      expl="6. loop invariant preservation"
+      sum="5fc6650ae47b818bf1ca26daea5813af"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationainfix =asumV2ainfix +V13asumV9Iainfix =V13ainfix +V4V12FIacoherentV0V11ACfaNilainfix =V9V15Aainfix =V10aConsV14V6Aainfix =V12V14aConsVVV5FLamk cursorV10V9FIacoherentV0V7ANainfix =V5aNilIainfix =V8aTrueINainfix =V5aNilqainfix =V8aTrueFIacoherentV0V7IacoherentV0V7Aainfix =asumV2ainfix +V4asumV5Lamk cursorV6V5FIacoherentV0V3Lamk cursorV1V2F">
+      <label
+       name="expl:VC for sum"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.00"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sum.7"
+      locfile="../cursor.mlw"
+      loclnum="60" loccnumb="6" loccnume="9"
+      expl="7. loop invariant preservation"
+      sum="119f37e246d92072d445913ef08fd4bc"
+      proved="true"
+      expanded="false"
+      shape="loop invariant preservationacoherentV0V11Iainfix =V13ainfix +V4V12FIacoherentV0V11ACfaNilainfix =V9V15Aainfix =V10aConsV14V6Aainfix =V12V14aConsVVV5FLamk cursorV10V9FIacoherentV0V7ANainfix =V5aNilIainfix =V8aTrueINainfix =V5aNilqainfix =V8aTrueFIacoherentV0V7IacoherentV0V7Aainfix =asumV2ainfix +V4asumV5Lamk cursorV6V5FIacoherentV0V3Lamk cursorV1V2F">
+      <label
+       name="expl:VC for sum"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sum.8"
+      locfile="../cursor.mlw"
+      loclnum="60" loccnumb="6" loccnume="9"
+      expl="8. loop variant decrease"
+      sum="ce0d847c442d02dd63e41bf5fbf027ff"
+      proved="true"
+      expanded="false"
+      shape="loop variant decreaseainfix &lt;alengthV9alengthV5Aainfix &lt;=c0alengthV5Iainfix =V13ainfix +V4V12FIacoherentV0V11ACfaNilainfix =V9V15Aainfix =V10aConsV14V6Aainfix =V12V14aConsVVV5FLamk cursorV10V9FIacoherentV0V7ANainfix =V5aNilIainfix =V8aTrueINainfix =V5aNilqainfix =V8aTrueFIacoherentV0V7IacoherentV0V7Aainfix =asumV2ainfix +V4asumV5Lamk cursorV6V5FIacoherentV0V3Lamk cursorV1V2F">
+      <label
+       name="expl:VC for sum"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter sum.9"
+      locfile="../cursor.mlw"
+      loclnum="60" loccnumb="6" loccnume="9"
+      expl="9. postcondition"
+      sum="f74a412529ee44d5b3a7b1f27ea15f93"
+      proved="true"
+      expanded="true"
+      shape="postconditionainfix =V4asumV2INainfix =V8aTrueINainfix =V5aNilqainfix =V8aTrueFIacoherentV0V7IacoherentV0V7Aainfix =asumV2ainfix +V4asumV5Lamk cursorV6V5FIacoherentV0V3Lamk cursorV1V2F">
+      <label
+       name="expl:VC for sum"/>
+      <proof
+       prover="0"
+       timelimit="6"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+  <theory
    name="IntListCursor"
    locfile="../cursor.mlw"
-   loclnum="43" loccnumb="7" loccnume="20"
+   loclnum="81" loccnumb="7" loccnume="20"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter create"
     locfile="../cursor.mlw"
-    loclnum="62" loccnumb="6" loccnume="12"
+    loclnum="98" loccnumb="6" loccnume="12"
     expl="VC for create"
     sum="1ba9d173d2931ce14519cdcc754e49da"
     proved="true"
@@ -53,7 +257,7 @@
    <goal
     name="WP_parameter has_next"
     locfile="../cursor.mlw"
-    loclnum="68" loccnumb="6" loccnume="14"
+    loclnum="104" loccnumb="6" loccnume="14"
     expl="VC for has_next"
     sum="94563eddcae7e1e01f2fdf56f6c52dd0"
     proved="true"
@@ -73,7 +277,7 @@
    <goal
     name="WP_parameter next"
     locfile="../cursor.mlw"
-    loclnum="74" loccnumb="6" loccnume="10"
+    loclnum="110" loccnumb="6" loccnume="10"
     expl="VC for next"
     sum="cff98db32212b4562db98eabb7af3c54"
     proved="true"
@@ -94,13 +298,13 @@
   <theory
    name="TestListCursor"
    locfile="../cursor.mlw"
-   loclnum="91" loccnumb="7" loccnume="21"
+   loclnum="127" loccnumb="7" loccnume="21"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter list_sum"
     locfile="../cursor.mlw"
-    loclnum="100" loccnumb="6" loccnume="14"
+    loclnum="136" loccnumb="6" loccnume="14"
     expl="VC for list_sum"
     sum="94ca014dc18c1877b9d8da398276227a"
     proved="true"
@@ -115,7 +319,7 @@
      <goal
       name="WP_parameter list_sum.1"
       locfile="../cursor.mlw"
-      loclnum="100" loccnumb="6" loccnume="14"
+      loclnum="136" loccnumb="6" loccnume="14"
       expl="1. loop invariant init"
       sum="2875958e31e084bcb4ab00351cea6b3a"
       proved="true"
@@ -135,7 +339,7 @@
      <goal
       name="WP_parameter list_sum.2"
       locfile="../cursor.mlw"
-      loclnum="100" loccnumb="6" loccnume="14"
+      loclnum="136" loccnumb="6" loccnume="14"
       expl="2. loop invariant init"
       sum="0bb717541165c2f9462a3eddddb2f8e2"
       proved="true"
@@ -155,7 +359,7 @@
      <goal
       name="WP_parameter list_sum.3"
       locfile="../cursor.mlw"
-      loclnum="100" loccnumb="6" loccnume="14"
+      loclnum="136" loccnumb="6" loccnume="14"
       expl="3. precondition"
       sum="8684317bebcb318d245d87c8f73c0d08"
       proved="true"
@@ -175,7 +379,7 @@
      <goal
       name="WP_parameter list_sum.4"
       locfile="../cursor.mlw"
-      loclnum="100" loccnumb="6" loccnume="14"
+      loclnum="136" loccnumb="6" loccnume="14"
       expl="4. precondition"
       sum="7cbcc6244ea2e7d89544e2095250d971"
       proved="true"
@@ -195,7 +399,7 @@
      <goal
       name="WP_parameter list_sum.5"
       locfile="../cursor.mlw"
-      loclnum="100" loccnumb="6" loccnume="14"
+      loclnum="136" loccnumb="6" loccnume="14"
       expl="5. precondition"
       sum="7d8e6143c7e2823c5d45ec57b7595a8c"
       proved="true"
@@ -215,7 +419,7 @@
      <goal
       name="WP_parameter list_sum.6"
       locfile="../cursor.mlw"
-      loclnum="100" loccnumb="6" loccnume="14"
+      loclnum="136" loccnumb="6" loccnume="14"
       expl="6. loop invariant preservation"
       sum="0e1eeffd04da1e5dcf9dff0ebed806bb"
       proved="true"
@@ -235,7 +439,7 @@
      <goal
       name="WP_parameter list_sum.7"
       locfile="../cursor.mlw"
-      loclnum="100" loccnumb="6" loccnume="14"
+      loclnum="136" loccnumb="6" loccnume="14"
       expl="7. loop invariant preservation"
       sum="89e46ad9f15e3633ce55744eaf602f41"
       proved="true"
@@ -255,7 +459,7 @@
      <goal
       name="WP_parameter list_sum.8"
       locfile="../cursor.mlw"
-      loclnum="100" loccnumb="6" loccnume="14"
+      loclnum="136" loccnumb="6" loccnume="14"
       expl="8. loop variant decrease"
       sum="93f07a8d9d6ca82e80688c362fa17c34"
       proved="true"
@@ -275,7 +479,7 @@
      <goal
       name="WP_parameter list_sum.9"
       locfile="../cursor.mlw"
-      loclnum="100" loccnumb="6" loccnume="14"
+      loclnum="136" loccnumb="6" loccnume="14"
       expl="9. postcondition"
       sum="1dc02ff0e337edfed95bb7c5e5061252"
       proved="true"
@@ -298,13 +502,13 @@
   <theory
    name="IntArrayCursor"
    locfile="../cursor.mlw"
-   loclnum="126" loccnumb="7" loccnume="21"
+   loclnum="156" loccnumb="7" loccnume="21"
    verified="true"
    expanded="true">
    <goal
     name="WP_parameter create"
     locfile="../cursor.mlw"
-    loclnum="148" loccnumb="6" loccnume="12"
+    loclnum="178" loccnumb="6" loccnume="12"
     expl="VC for create"
     sum="33c45493cbcb6a80cfca99ccecbd16b5"
     proved="true"
@@ -324,7 +528,7 @@
    <goal
     name="WP_parameter has_next"
     locfile="../cursor.mlw"
-    loclnum="154" loccnumb="6" loccnume="14"
+    loclnum="184" loccnumb="6" loccnume="14"
     expl="VC for has_next"
     sum="b71a7515b12a07cf0085cb90c2a4c44e"
     proved="true"
@@ -344,7 +548,7 @@
    <goal
     name="WP_parameter reverse_cons"
     locfile="../cursor.mlw"
-    loclnum="160" loccnumb="16" loccnume="28"
+    loclnum="190" loccnumb="16" loccnume="28"
     expl="VC for reverse_cons"
     sum="6df060e81efec46aa89a4025648d8eb6"
     proved="true"
@@ -361,7 +565,7 @@
      <goal
       name="WP_parameter reverse_cons.1"
       locfile="../cursor.mlw"
-      loclnum="160" loccnumb="16" loccnume="28"
+      loclnum="190" loccnumb="16" loccnume="28"
       expl="1. variant decrease"
       sum="36fb1ee0987bd902b775b15e1f487cec"
       proved="true"
@@ -383,7 +587,7 @@
      <goal
       name="WP_parameter reverse_cons.2"
       locfile="../cursor.mlw"
-      loclnum="160" loccnumb="16" loccnume="28"
+      loclnum="190" loccnumb="16" loccnume="28"
       expl="2. precondition"
       sum="9dff9b987f33efdeb255a6f49a785f61"
       proved="true"
@@ -405,7 +609,7 @@
      <goal
       name="WP_parameter reverse_cons.3"
       locfile="../cursor.mlw"
-      loclnum="160" loccnumb="16" loccnume="28"
+      loclnum="190" loccnumb="16" loccnume="28"
       expl="3. postcondition"
       sum="ba9afd87db4de7f15b2dad7dfd329da4"
       proved="true"
@@ -427,7 +631,7 @@
      <goal
       name="WP_parameter reverse_cons.4"
       locfile="../cursor.mlw"
-      loclnum="160" loccnumb="16" loccnume="28"
+      loclnum="190" loccnumb="16" loccnume="28"
       expl="4. postcondition"
       sum="f4e234c9574f7dce05e3db1f417be65e"
       proved="true"
@@ -451,7 +655,7 @@
    <goal
     name="WP_parameter next"
     locfile="../cursor.mlw"
-    loclnum="167" loccnumb="6" loccnume="10"
+    loclnum="197" loccnumb="6" loccnume="10"
     expl="VC for next"
     sum="e92cbabb3a75e6e97189694ec5094282"
     proved="true"
@@ -466,7 +670,7 @@
      <goal
       name="WP_parameter next.1"
       locfile="../cursor.mlw"
-      loclnum="167" loccnumb="6" loccnume="10"
+      loclnum="197" loccnumb="6" loccnume="10"
       expl="1. unreachable point"
       sum="a740655583b32a0f4b9abf228daffa26"
       proved="true"
@@ -486,7 +690,7 @@
      <goal
       name="WP_parameter next.2"
       locfile="../cursor.mlw"
-      loclnum="167" loccnumb="6" loccnume="10"
+      loclnum="197" loccnumb="6" loccnume="10"
       expl="2. index in array bounds"
       sum="a5eb65ea140559ead42afd276b0bd626"
       proved="true"
@@ -506,7 +710,7 @@
      <goal
       name="WP_parameter next.3"
       locfile="../cursor.mlw"
-      loclnum="167" loccnumb="6" loccnume="10"
+      loclnum="197" loccnumb="6" loccnume="10"
       expl="3. postcondition"
       sum="e0079e34e8f4ac4f2c4d41cc773d79b6"
       proved="true"
@@ -534,7 +738,7 @@
      <goal
       name="WP_parameter next.4"
       locfile="../cursor.mlw"
-      loclnum="167" loccnumb="6" loccnume="10"
+      loclnum="197" loccnumb="6" loccnume="10"
       expl="4. postcondition"
       sum="f5b4d8df93f6a06f81c311841c3d9e6e"
       proved="true"
@@ -557,13 +761,13 @@
   <theory
    name="TestArrayCursor"
    locfile="../cursor.mlw"
-   loclnum="187" loccnumb="7" loccnume="22"
+   loclnum="217" loccnumb="7" loccnume="22"
    verified="true"
    expanded="false">
    <goal
     name="WP_parameter array_sum_array_to_list"
     locfile="../cursor.mlw"
-    loclnum="198" loccnumb="16" loccnume="39"
+    loclnum="228" loccnumb="16" loccnume="39"
     expl="VC for array_sum_array_to_list"
     sum="cb882cd1165f0e1566fb988dec377e3c"
     proved="true"
@@ -585,7 +789,7 @@
    <goal
     name="WP_parameter array_sum"
     locfile="../cursor.mlw"
-    loclnum="202" loccnumb="6" loccnume="15"
+    loclnum="232" loccnumb="6" loccnume="15"
     expl="VC for array_sum"
     sum="d68e6536170688bdc5f7fbcce0048d39"
     proved="true"
@@ -600,7 +804,7 @@
      <goal
       name="WP_parameter array_sum.1"
       locfile="../cursor.mlw"
-      loclnum="202" loccnumb="6" loccnume="15"
+      loclnum="232" loccnumb="6" loccnume="15"
       expl="1. loop invariant init"
       sum="2a179d7ac6b86eb1f1d399770681d760"
       proved="true"
@@ -620,7 +824,7 @@
      <goal
       name="WP_parameter array_sum.2"
       locfile="../cursor.mlw"
-      loclnum="202" loccnumb="6" loccnume="15"
+      loclnum="232" loccnumb="6" loccnume="15"
       expl="2. loop invariant init"
       sum="fd90363da2e864a6295896076c7cf658"
       proved="true"
@@ -640,7 +844,7 @@
      <goal
       name="WP_parameter array_sum.3"
       locfile="../cursor.mlw"
-      loclnum="202" loccnumb="6" loccnume="15"
+      loclnum="232" loccnumb="6" loccnume="15"
       expl="3. precondition"
       sum="34f85cbb41cc1ca1faacb29c90ecc75f"
       proved="true"
@@ -660,7 +864,7 @@
      <goal
       name="WP_parameter array_sum.4"
       locfile="../cursor.mlw"
-      loclnum="202" loccnumb="6" loccnume="15"
+      loclnum="232" loccnumb="6" loccnume="15"
       expl="4. precondition"
       sum="9c8888f7c70ab44bcc02755f319c158f"
       proved="true"
@@ -680,7 +884,7 @@
      <goal
       name="WP_parameter array_sum.5"
       locfile="../cursor.mlw"
-      loclnum="202" loccnumb="6" loccnume="15"
+      loclnum="232" loccnumb="6" loccnume="15"
       expl="5. precondition"
       sum="9596d0239124a0921fea9588fbe301fb"
       proved="true"
@@ -700,7 +904,7 @@
      <goal
       name="WP_parameter array_sum.6"
       locfile="../cursor.mlw"
-      loclnum="202" loccnumb="6" loccnume="15"
+      loclnum="232" loccnumb="6" loccnume="15"
       expl="6. loop invariant preservation"
       sum="a5fb6c00dab9934d11ed38b9ad653e54"
       proved="true"
@@ -720,7 +924,7 @@
      <goal
       name="WP_parameter array_sum.7"
       locfile="../cursor.mlw"
-      loclnum="202" loccnumb="6" loccnume="15"
+      loclnum="232" loccnumb="6" loccnume="15"
       expl="7. loop invariant preservation"
       sum="5e715621c4d6fc6fc1919a8eef69093d"
       proved="true"
@@ -740,7 +944,7 @@
      <goal
       name="WP_parameter array_sum.8"
       locfile="../cursor.mlw"
-      loclnum="202" loccnumb="6" loccnume="15"
+      loclnum="232" loccnumb="6" loccnume="15"
       expl="8. loop variant decrease"
       sum="439d564e4acf4f69ecdb36703f7718db"
       proved="true"
@@ -760,7 +964,7 @@
      <goal
       name="WP_parameter array_sum.9"
       locfile="../cursor.mlw"
-      loclnum="202" loccnumb="6" loccnume="15"
+      loclnum="232" loccnumb="6" loccnume="15"
       expl="9. postcondition"
       sum="06f37002bd5fcbe401e89ba82c5489a6"
       proved="true"

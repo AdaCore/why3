@@ -47,6 +47,34 @@ module IterableList
 
 end
 
+module TestCursor
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Sum
+  use import ref.Refint
+
+  clone import IterableList with type elt = int
+
+  (** sums all the remaining elements in the cursor *)
+  let sum (t: t) (c: cursor) : int
+    requires { coherent t c }
+    ensures  { result = old (sum c.to_do) }
+  =
+    let s = ref 0 in
+    'I:
+    while has_next t c do
+      invariant { at (sum c.to_do) 'I = !s + sum c.to_do }
+      invariant { coherent t c }
+      variant   { length c.to_do }
+      let x = next t c in
+      s += x
+    done;
+    !s
+
+end
+
 (** {2 Iteration over an immuable collection}
 
     here we choose a list of integers *)
