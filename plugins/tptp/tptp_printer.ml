@@ -47,9 +47,12 @@ let forget_tvar v = forget_id ident_printer v.tv_name
 
 type tptp_format = FOF | TFF0 | TFF1
 
+type tptp_number = TPTP | MetiTarski
+
 type info = {
   info_syn : syntax_map;
   info_fmt : tptp_format;
+  info_num : tptp_number;
   info_srt : ty Mty.t ref;
   info_urg : string list ref;
 }
@@ -102,6 +105,14 @@ let number_format = {
   Number.def_real_support = Number.Number_unsupported;
 }
 
+let number_format_metitarski = { number_format with
+  Number.frac_real_support = Number.Number_custom
+    (Number.PrintFracReal ("%s", "(%s * %s)", "(%s / %s)"));
+}
+
+let print_number info fmt c = Number.print (match info.info_num with
+  | TPTP -> number_format | MetiTarski -> number_format_metitarski) fmt c
+
 let rec print_app info fmt ls tl oty =
   match query_syntax info.info_syn ls.ls_name with
   | Some s -> syntax_arguments s (print_term info) fmt tl
@@ -124,7 +135,7 @@ and print_term info fmt t = match t.t_node with
   | Tapp (ls, tl) ->
       print_app info fmt ls tl t.t_ty
   | Tconst c ->
-      Number.print number_format fmt c
+      print_number info fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt "$let_tt(%a@ =@ %a,@ %a)"
@@ -243,10 +254,13 @@ let print_decl info fmt d = match d.d_node with
         head print_pr pr (print_fmla info) f
   | Dprop ((Plemma|Pskip), _, _) -> assert false
 
-let print_decls fm =
+let print_decls fm nm =
   let print_decl (sm,fm,ct) fmt d =
-    let info = { info_syn = sm;     info_fmt = fm;
-                 info_srt = ref ct; info_urg = ref [] } in
+    let info = { info_syn = sm;
+                 info_fmt = fm;
+                 info_num = nm;
+                 info_srt = ref ct;
+                 info_urg = ref [] } in
     try print_decl info fmt d;
         (sm,fm,!(info.info_srt)), !(info.info_urg)
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
@@ -255,8 +269,8 @@ let print_decls fm =
   Discriminate.on_syntax_map (fun sm ->
     Trans.fold print_decl ((sm,fm,Mty.empty),[]))
 
-let print_task fm =
-  let print_decls = print_decls fm in
+let print_task fm nm =
+  let print_decls = print_decls fm nm in
   fun args ?old:_ fmt task ->
     (* In trans-based p-printing [forget_all] is a no-no *)
     (* forget_all ident_printer; *)
@@ -268,9 +282,14 @@ let print_task fm =
     print (snd (Trans.apply print_decls task));
     pp_print_flush fmt ()
 
-let () = register_printer "tptp-tff0" (print_task TFF0) ~desc:"TPTP TFF0 format"
-let () = register_printer "tptp-tff1" (print_task TFF1) ~desc:"TPTP TFF1 format"
-let () = register_printer "tptp-fof"  (print_task FOF)  ~desc:"TPTP FOF format"
+let () =
+  register_printer "tptp-tff0" (print_task TFF0 TPTP) ~desc:"TPTP TFF0 format";
+  register_printer "tptp-tff1" (print_task TFF1 TPTP) ~desc:"TPTP TFF1 format";
+  register_printer "tptp-fof"  (print_task FOF  TPTP) ~desc:"TPTP FOF format"
+
+let () =
+  register_printer "metitarski" (print_task FOF MetiTarski)
+    ~desc:"MetiTarski TPTP format"
 
 (** DFG input format for SPASS >= 3.8
     (with the help of Daniel Wand)
@@ -406,6 +425,7 @@ let print_dfg args ?old:_ fmt task =
   let info = {
     info_syn = get_syntax_map task;
     info_fmt = FOF;
+    info_num = TPTP;
     info_urg = ref [];
     info_srt = ref Mty.empty } in
   let dl = Task.task_decls task in
