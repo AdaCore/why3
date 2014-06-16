@@ -26,7 +26,8 @@ module LinearProbing
 
   (* j lies between l and r, cyclically *)
   predicate between (l j r: int) =
-    l <= j <= r || r <= l <= j || j <= r <= l
+    (* l <= j <= r || r <= l <= j || j <= r <= l *)
+    l <= j < r || r < l <= j || j < r < l
 
   clone import array.NumOfEq with type elt = key
 
@@ -73,24 +74,67 @@ module LinearProbing
   function next (n i: int) : int =
     let i = i+1 in if i = n then 0 else i
 
-  let find (h: t) (x: key) : int
+  let find (a: array key) (x: key) : int
     requires { x <> dummy }
-    ensures { h.data[result] = dummy && not (Map.get h.view x)
-           || h.data[result] = x     &&      Map.get h.view x  }
+    requires { let n = Array.length a in 0 < n /\ numof a dummy 0 n > 0 }
+    ensures  { 0 <= result < Array.length a }
+    ensures  { a[result] = dummy || a[result] = x }
+    ensures  { forall j: int. 0 <= j < Array.length a ->
+               between (bucket x (Array.length a)) j result ->
+               a[j] <> x /\ a[j] <> dummy }
   =
-    let n = Array.length h.data in
+    let n = Array.length a in
     let rec find (i: int) : int
       requires { 0 <= i < n }
-      requires { forall j: int. 0 <= j < n ->
-                 between (bucket x n) j i -> j < i ->
-                 h.data[j] <> dummy }
+      requires { forall j: int. 0 <= j < n -> between (bucket x n) j i ->
+                 a[j] <> x /\ a[j] <> dummy }
       ensures  { 0 <= result < n }
-      ensures  { h.data[result] = dummy && not (Map.get h.view x)
-              || h.data[result] = x }
+      ensures  { a[result] = dummy || a[result] = x }
+      ensures  { forall j: int. 0 <= j < n -> between (bucket x n) j result ->
+                 a[j] <> x /\ a[j] <> dummy }
     =
-      if h.data[i] = dummy || h.data[i] = x then i else find (next n i)
+      if a[i] = dummy || a[i] = x then i else find (next n i)
     in
     find (bucket x n)
+
+  let mem (h: t) (x: key) : bool
+    requires { x <> dummy }
+    ensures  { result <-> Map.get h.view x }
+   =
+    h.data[find h.data x] <> dummy
+
+  let resize (h: t) : unit
+    writes  { h.data }
+    ensures { Array.length h.data = 2 * old (Array.length h.data) }
+  =
+    let n = Array.length h.data in
+    let n2 = 2 * n in
+    let a = Array.make n2 dummy in
+    for i = 0 to n - 1 do
+      invariant { numof a dummy 0 n2 = numof h.data dummy 0 i + n2 - i }
+      invariant { forall j: int. 0 <= j < n2 ->
+                  a[i] <> dummy -> Map.get h.view a[i] }
+      invariant { forall j: int. 0 <= j < i -> let x = h.data[i] in
+                  x <> dummy ->
+                  exists j2: int. 0 <= j2 < n2 ->
+                    a[j2] = x /\
+                    forall k: int. 0 <= k < n2 ->
+                    between (bucket x n) k j2 -> a[k] <> dummy }
+      let x = h.data[i] in
+      if x <> dummy then a[find a x] <- x
+    done;
+    h.data <- a
+
+  let add (h: t) (x: key) : unit
+    requires { x <> dummy }
+    writes   { h.size, h.data, h.data.elts, h.view }
+    ensures  { h.view = Map.set (old h.view) x True }
+   =
+    if 2 * (h.size + 1) >= Array.length h.data then resize h;
+    let i = find h.data x in
+    if h.data[i] = dummy then h.size <- h.size + 1;
+    ghost h.view <- Map.set h.view x True;
+    h.data[i] <- x
 
 end
 
@@ -106,9 +150,6 @@ end
     let i = find h x in
     if h.data.(i) == h.dummy then h.size <- h.size + 1;
     h.data.(i) <- x
-
-  let mem h x =
-    h.data.(find h x) != h.dummy
 
   let remove h x =
     let n = Array.length h.data in
