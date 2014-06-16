@@ -41,10 +41,7 @@ let (env, config) =
   Args.initialize option_list add_opt usage_msg
 
 let () =
-  if !opt_file = None then begin
-    Arg.usage option_list usage_msg;
-    exit 1
-  end
+  if !opt_file = None then Args.exit_with_usage option_list usage_msg
 
 let do_input f =
   let fname, cin =

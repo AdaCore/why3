@@ -32,6 +32,7 @@ let common_options = [
 
 let initialize options default usage =
   Arg.parse (Arg.align (List.append options common_options)) default usage;
+  if Debug.Args.option_list () then exit 0;
   let config = Whyconf.read_config !opt_config in
   let config = List.fold_left Whyconf.merge_config config !opt_extra in
   let main = Whyconf.get_main config in
@@ -39,3 +40,7 @@ let initialize options default usage =
   Debug.Args.set_flags_selected ();
   let lp = List.rev_append !opt_loadpath (Whyconf.loadpath main) in
   (Env.create_env lp, config)
+
+let exit_with_usage options usage =
+  Arg.usage (Arg.align (List.append options common_options)) usage;
+  exit 1

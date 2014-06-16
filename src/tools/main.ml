@@ -72,8 +72,9 @@ let command_path =
   | Some p -> Filename.concat p "bin"
   | None -> Filename.concat Config.libdir "commands"
 
-let command cmd =
-  let cmd = Filename.concat command_path ("why3" ^ cmd) in
+let command scmd =
+  let scmd = "why3" ^ scmd in
+  let cmd = Filename.concat command_path scmd in
   if not (Sys.file_exists cmd) then begin
     printf "'%s' is not a why3 command.@." cmd;
     exit 1
@@ -84,7 +85,7 @@ let command cmd =
   for i = !Arg.current + 1 to Array.length Sys.argv - 1 do
     args := Sys.argv.(i) :: !args;
   done;
-  Unix.execv cmd (Array.of_list (("why3" ^ cmd) :: List.rev !args))
+  Unix.execv cmd (Array.of_list (scmd :: List.rev !args))
 
 let () = try
   Arg.parse option_list command usage_msg;

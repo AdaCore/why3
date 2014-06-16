@@ -147,10 +147,7 @@ let (env, config) =
   Args.initialize option_list add_opt_file usage_msg
 
 let () = try
-  if Queue.is_empty opt_queue then begin
-    Arg.usage option_list usage_msg;
-    exit 1
-  end;
+  if Queue.is_empty opt_queue then Args.exit_with_usage option_list usage_msg;
 
   if !opt_prover <> None && !opt_driver <> None then begin
     eprintf "Options '-P'/'--prover' and \

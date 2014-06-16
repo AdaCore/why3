@@ -105,7 +105,7 @@ let (env, config) =
 
 let fname =
   match !opt_file with
-  | None -> Arg.usage option_list usage_msg; exit 1
+  | None -> Args.exit_with_usage option_list usage_msg
   | Some f -> f
 
 let found_upgraded_prover = ref false

@@ -64,10 +64,7 @@ let (env, config) =
   Args.initialize option_list add_opt_file usage_msg
 
 let () =
-  if Queue.is_empty opt_queue then begin
-    Arg.usage option_list usage_msg;
-    exit 1
-  end
+  if Queue.is_empty opt_queue then Args.exit_with_usage option_list usage_msg
 
 let opt_output =
   match !opt_output with
