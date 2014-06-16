@@ -529,6 +529,7 @@ install_spark2014:
 	mkdir -p $(DATADIR)/why3/theories
 	mkdir -p $(DATADIR)/why3/drivers
 	mkdir -p $(DATADIR)/why3/modules
+	mkdir -p $(DATADIR)/why3/libs
 	cp -f theories/*.why $(DATADIR)/why3/theories
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
 	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
@@ -536,7 +537,7 @@ install_spark2014:
 	cp -f bin/why3server$(EXE) $(BINDIR)/why3server$(EXE)
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
 	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
-
+	cp -rf lib/coq $(DATADIR)/why3/libs
 
 ##########
 # gallery
