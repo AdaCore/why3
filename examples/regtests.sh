@@ -38,7 +38,7 @@ run_dir () {
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
 	echo -n "Replaying $d ... "
-        ../bin/why3replayer.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP
+        ../bin/why3replay.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP
         ret=$?
 	if test "$ret" != "0"  ; then
 	    echo -n "FAILED (ret code=$ret):"

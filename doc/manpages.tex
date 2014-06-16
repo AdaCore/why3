@@ -449,7 +449,7 @@ each component to compare. Various formats can be used as outputs:
   represented in an array; the rows correspond to the
   compared components, the columns correspond to the result
   (Valid, Unknown, Timeout, Failure, Invalid) and the CPU time taken in seconds.
-\item average: summarizes the number of the five different answers
+\item[\texttt{average}] it summarizes the number of the five different answers
   for each component. It also gives the average time taken.
 \item[\texttt{timeline}] for each component, it gives the number of valid goals
   along the time (10 slices between 0 and the longest time a component
@@ -513,19 +513,19 @@ One can run all the bench given in one bench configuration file with
 why3 bench -B path_to_my_bench.rc
 \end{verbatim}
 
-\section{The \texttt{replayer} Command}
+\section{The \texttt{replay} Command}
 \label{sec:why3replayer}
 
-The \texttt{replayer} command is meant to execute the proofs
+The \texttt{replay} command is meant to execute the proofs
 stored in a \why session file, as produced by the IDE. Its
 main purpose is to play non-regression tests. For instance,
 \texttt{examples/regtests.sh} is a script that runs regression tests on
 all the examples.
-\index{replayer@\texttt{replayer}}
+\index{replay@\texttt{replay}}
 
 The tool is invoked in a terminal or a script using
 \begin{flushleft}\ttfamily
-  why3 replayer \textsl{[options] <project directory>}
+  why3 replay \textsl{[options] <project directory>}
 \end{flushleft}
 The session file \texttt{why3session.xml} stored in the given
 directory is loaded and all the proofs it contains are rerun. Then,

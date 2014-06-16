@@ -35,9 +35,7 @@ let debug = Debug.register_info_flag
 
 let () = Debug.set_flag debug
 
-let includes = ref []
-let file = ref None
-let opt_version = ref false
+let opt_file = ref None
 let opt_stats = ref true
 let opt_force = ref false
 let opt_obsolete_only = ref false
@@ -63,25 +61,11 @@ let set_opt_smoke = function
   | "deep" ->  opt_smoke := SD_Deep
   | _ -> assert false
 
-let opt_config = ref None
-let opt_extra = ref []
+let usage_msg = Format.sprintf
+  "Usage: %s [options] [<file.why>|<project directory>]"
+  (Filename.basename Sys.argv.(0))
 
-let spec = Arg.align [
-  ("-L",
-   Arg.String (fun s -> includes := s :: !includes),
-   "<s> add s to loadpath") ;
-  ("--library",
-   Arg.String (fun s -> includes := s :: !includes),
-   " same as -L") ;
-  ("-I",
-   Arg.String (fun s -> includes := s :: !includes),
-   " same as -L (obsolete)") ;
-  ("-C", Arg.String (fun s -> opt_config := Some s),
-   "<file> Read configuration from <file>") ;
-  ("--config", Arg.String (fun s -> opt_config := Some s),
-   " same as -C") ;
-  ("--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-   "<file> Read additional configuration from <file>") ;
+let option_list = [
   ("--force",
    Arg.Set opt_force,
    " enforce saving the session after replay") ;
@@ -102,45 +86,16 @@ let spec = Arg.align [
    " do not print statistics") ;
   ("-q",
    Arg.Unit (fun () -> Debug.unset_flag debug),
-   " run quietly") ;
-  ("-v",
-   Arg.Unit (fun () -> Debug.set_flag debug),
-   " print version information") ;
-(*
-  "--convert-unknown-provers", Arg.Set opt_convert_unknown_provers,
-  " try to find compatible provers for all unknown provers";
-*)
-  Debug.Args.desc_debug_list;
-  Debug.Args.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
-  Debug.Args.desc_shortcut
-    "type_only" "--type-only" " Stop after type checking";
-  Debug.Args.desc_debug_all;
-  Debug.Args.desc_debug;
+   " run quietly") ]
 
-]
-
-let version_msg = Format.sprintf "Why3 replayer, version %s (build date: %s)"
-  Config.version Config.builddate
-
-let usage_str = Format.sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]"
-  (Filename.basename Sys.argv.(0))
-
-let set_file f = match !file with
+let add_opt_file f = match !opt_file with
   | Some _ ->
       raise (Arg.Bad "only one parameter")
   | None ->
-      file := Some f
+      opt_file := Some f
 
-let () = Arg.parse spec set_file usage_str
-
-let () =
-  if !opt_version then begin
-    Format.printf "%s@." version_msg;
-    exit 0
-  end
-
-let () = if Debug.Args.option_list () then exit 0
+let (env, config) =
+  Args.initialize option_list add_opt_file usage_msg
 
 (* let () = *)
 (*   if !opt_smoke <> Session.SD_None && !opt_force then begin *)
@@ -148,27 +103,10 @@ let () = if Debug.Args.option_list () then exit 0
 (*     exit 1 *)
 (*   end *)
 
-
-let fname = match !file with
-  | None ->
-      Arg.usage spec usage_str;
-      exit 1
-  | Some f ->
-      f
-
-let config = Whyconf.read_config !opt_config
-let config = List.fold_left Whyconf.merge_config config !opt_extra
-
-let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
-  @ List.rev !includes
-
-let env = Env.create_env loadpath
-
-let () = Whyconf.load_plugins (Whyconf.get_main config)
-
-let () =
-  Debug.Args.set_flags_selected ();
-  if Debug.Args.option_list () then exit 0
+let fname =
+  match !opt_file with
+  | None -> Arg.usage option_list usage_msg; exit 1
+  | Some f -> f
 
 let found_upgraded_prover = ref false
 
@@ -490,6 +428,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3replayer.byte"
+compile-command: "unset LANG; make -C ../.. bin/why3replay.byte"
 End:
 *)

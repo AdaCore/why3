@@ -481,7 +481,7 @@ clean::
 # Why3 commands
 ###############
 
-TOOLS_BIN = why3execute why3extract why3prove why3realize
+TOOLS_BIN = why3execute why3extract why3prove why3realize why3replay
 TOOLS_FILES = args $(TOOLS_BIN)
 
 TOOLSMODULES = $(addprefix src/tools/, $(TOOLS_FILES))
@@ -540,6 +540,17 @@ bin/why3realize.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3realize
 bin/why3realize: bin/why3realize.@OCAMLBEST@
 	ln -sf why3realize.@OCAMLBEST@ $@
 
+bin/why3replay.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3replay.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3replay.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3replay.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+bin/why3replay: bin/why3replay.@OCAMLBEST@
+	ln -sf why3replay.@OCAMLBEST@ $@
+
 clean_old_install::
 	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE))
 
@@ -548,6 +559,7 @@ install_no_local::
 	cp -f bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
 	cp -f bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
 	cp -f bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
+	cp -f bin/why3replay.@OCAMLBEST@ $(TOOLDIR)/why3replay$(EXE)
 
 install_local: $(addprefix bin/,$(TOOLS_BIN))
 
@@ -563,10 +575,12 @@ clean::
 	rm -f src/tools/why3extract.cm[iox] src/tools/why3extract.annot src/tools/why3extract.o src/tools/why3extract.dep
 	rm -f src/tools/why3prove.cm[iox] src/tools/why3prove.annot src/tools/why3prove.o src/tools/why3prove.dep
 	rm -f src/tools/why3realize.cm[iox] src/tools/why3realize.annot src/tools/why3realize.o src/tools/why3realize.dep
+	rm -f src/tools/why3replay.cm[iox] src/tools/why3replay.annot src/tools/why3replay.o src/tools/why3replay.dep
 	rm -f bin/why3execute.byte bin/why3execute.opt bin/why3execute
 	rm -f bin/why3extract.byte bin/why3extract.opt bin/why3extract
 	rm -f bin/why3prove.byte bin/why3prove.opt bin/why3prove
 	rm -f bin/why3realize.byte bin/why3realize.opt bin/why3realize
+	rm -f bin/why3replay.byte bin/why3replay.opt bin/why3replay
 
 ##############
 # test targets
@@ -757,60 +771,6 @@ install_no_local::
 install_local: bin/why3ide
 
 endif
-
-
-###############
-# Replayer
-###############
-
-REPLAYER_FILES = replay
-
-REPLAYERMODULES = $(addprefix src/why3replayer/, $(REPLAYER_FILES))
-
-REPLAYERDEP = $(addsuffix .dep, $(REPLAYERMODULES))
-REPLAYERCMO = $(addsuffix .cmo, $(REPLAYERMODULES))
-REPLAYERCMX = $(addsuffix .cmx, $(REPLAYERMODULES))
-
-$(REPLAYERDEP): DEPFLAGS += -I src/why3replayer
-$(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/why3replayer
-
-# build targets
-
-byte: bin/why3replayer.byte
-opt:  bin/why3replayer.opt
-
-bin/why3replayer.opt: lib/why3/why3.cmxa $(REPLAYERCMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
-bin/why3replayer.byte: lib/why3/why3.cma $(REPLAYERCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-bin/why3replayer: bin/why3replayer.@OCAMLBEST@
-	ln -sf why3replayer.@OCAMLBEST@ $@
-
-# depend and clean targets
-
-ifneq "$(MAKECMDGOALS)" "clean"
-include $(REPLAYERDEP)
-endif
-
-depend: $(REPLAYERDEP)
-
-clean::
-	rm -f src/why3replayer/*.cm[iox] src/why3replayer/*.o
-	rm -f src/why3replayer/*.annot src/why3replayer/*.dep src/why3replayer/*~
-	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
-
-clean_old_install::
-	rm -f $(BINDIR)/why3replayer$(EXE)
-
-install_no_local::
-	cp -f bin/why3replayer.@OCAMLBEST@ $(TOOLDIR)/why3replayer$(EXE)
-
-install_local: bin/why3replayer
-
 
 ###############
 # Session
