@@ -111,6 +111,7 @@ let actual_editor_cmd ?main filename cmd =
     | 'm' -> string_of_int (Whyconf.memlimit m)
     | 'l' -> Whyconf.libdir m
     | 'd' -> Whyconf.datadir m
+    | 'o' -> Whyconf.libobjdir m
     | a ->  Char.escaped a in
   Str.global_substitute (Str.regexp "%.") replace_func cmd
 

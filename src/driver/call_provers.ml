@@ -173,6 +173,7 @@ let actualcommand command timelimit memlimit file =
        to prepare the command line in a separate function? *)
     | "l" -> Config.libdir
     | "d" -> Config.datadir
+    | "o" -> Config.libobjdir
     | _ -> failwith "unknown specifier, use %%f, %%t, %%m, %%l, or %%d"
   in
   List.map (Str.global_substitute cmd_regexp replace) arglist,

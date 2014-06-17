@@ -132,6 +132,7 @@ type config_editor = {
 type main = {
   libdir   : string;      (* "/usr/local/lib/why/" *)
   datadir  : string;      (* "/usr/local/share/why/" *)
+  libobjdir : string;
   loadpath  : string list;  (* "/usr/local/lib/why/theories" *)
   timelimit : int;
   (* default prover time limit in seconds (0 unlimited) *)
@@ -147,6 +148,9 @@ let libdir m =
   try
     Sys.getenv "WHY3LIB"
   with Not_found -> m.libdir
+
+let libobjdir m =
+  m.libobjdir
 
 let datadir m =
   try
@@ -208,6 +212,7 @@ let empty_main =
   {
     libdir = Config.libdir;
     datadir = Config.datadir;
+    libobjdir = Config.libobjdir;
     loadpath = [];
     timelimit = 5;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)
@@ -433,6 +438,7 @@ let load_main dirname section =
     raise WrongMagicNumber;
   { libdir    = get_string ~default:default_main.libdir section "libdir";
     datadir   = get_string ~default:default_main.datadir section "datadir";
+    libobjdir = get_string ~default:default_main.libobjdir section "libobjdir";
     loadpath  = List.map (absolute_filename dirname)
       (get_stringl ~default:[] section "loadpath");
     timelimit = get_int ~default:default_main.timelimit section "timelimit";

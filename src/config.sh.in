@@ -7,6 +7,7 @@ bindir="\"$BINDIR\""
 libdir="\"$LIBDIR/why3\""
 datadir="\"$DATADIR/why3\""
 localdir="None"
+libobjdir="Filename.current_dir_name"
 
 if [ "@enable_relocation@" = "yes" ]; then
     bindir='Filename.concat (Filename.dirname
@@ -31,6 +32,8 @@ let libdir    = $libdir
 let datadir   = $datadir
 let localdir  = $localdir
 
+let libobjdir = $libobjdir
+
 let compile_time_support = [ @COMPILETIMECOQ@ @COMPILETIMEPVS@ ]
 " > $config
 
@@ -42,4 +45,3 @@ OCAMLBEST   = @OCAMLBEST@
 BIGINTLIB   = @BIGINTLIB@
 INCLUDE     = @BIGINTINCLUDE@ -I $libdir/why3
 " > $makefileconfig
-

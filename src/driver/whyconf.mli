@@ -69,6 +69,8 @@ val get_main    : config  -> main
 val set_main    : config -> main                 -> config
 (** [set_main config main] replace the main section by the given one *)
 
+val libobjdir: main -> string
+
 val libdir: main -> string
 val datadir: main -> string
 val loadpath: main -> string list
