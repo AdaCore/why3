@@ -44,7 +44,7 @@ module N
 
   constant radix : int = Limb.max_uint32 + 1
 
-(**)
+(*  *)
 
   function l2i (x:limb) : int = Limb.to_int x
 
@@ -508,8 +508,8 @@ module N
     let zd = Array31.make (Int31.(+) lx ly) limb_zero in
     assert { MapEq.map_eq_sub zd.elts (Map.const limb_zero) 0 (p2i lx + p2i ly) };
     assert { value_sub zd.elts 0 (p2i lx + p2i ly) = 0 };
-    let c = mul_limbs zd x.digits y.digits zero zero lx zero ly in
-    assert { l2i c = 0 };
+    let _c = mul_limbs zd x.digits y.digits zero zero lx zero ly in
+    assert { l2i _c = 0 };
     { digits = zd }
 
 end
