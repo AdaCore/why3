@@ -33,8 +33,10 @@ cd `dirname $0`
 res=0
 export success=0
 export total=0
+export sessions=""
 
 run_dir () {
+    sessions="$sessions $1/*/why3session.xml"
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
 	echo -n "Replaying $d ... "
@@ -89,7 +91,9 @@ run_dir hoare_logic
 run_dir vacid_0_binary_heaps "-I vacid_0_binary_heaps"
 echo ""
 
-echo "Summary: $success/$total"
+echo "Summary       : $success/$total"
+echo "Sessions size : "`wc -cl $sessions | tail -1`
+
 exit $res
 
 
