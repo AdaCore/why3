@@ -25,7 +25,7 @@ The following commands are available:
   provers, on the command-line.
 \item[\texttt{realize}] generates interactive proof skeletons for
   \why input files.
-\item[\texttt{replayer}] replays the proofs stored in a session,
+\item[\texttt{replay}] replays the proofs stored in a session,
   for regression test purposes.
 \item[\texttt{session}] dumps various informations from a proof
   session, and possibly modifies the session.
@@ -444,7 +444,7 @@ library. It is designed to compare various components
 of automatic proofs: automatic provers, transformations, definitions
 of a theory. For that purpose, it tries to prove predefined goals using
 each component to compare. Various formats can be used as outputs:
-\begin{itemize}
+\begin{description}
 \item[\texttt{csv}] the simpler and more informative format; the results are
   represented in an array; the rows correspond to the
   compared components, the columns correspond to the result
@@ -454,7 +454,7 @@ each component to compare. Various formats can be used as outputs:
 \item[\texttt{timeline}] for each component, it gives the number of valid goals
   along the time (10 slices between 0 and the longest time a component
   takes to prove a goal)
-\end{itemize}
+\end{description}
 
 The compared components can be defined in an \emph{rc-file};
 \texttt{examples/misc/prgbench.rc} is an example of such a file. More
@@ -562,7 +562,6 @@ Options are:
 \begin{description}
 \item[\texttt{-s}] suppresses the output of the final tree view.
 \item[\texttt{-q}] runs quietly (no progress info).
-\item[\texttt{-I \textsl{<dir>}}] adds the given directory to the load path.
 \item[\texttt{-{}-force}] enforces saving the session, if all proof
   attempts replayed correctly, even if some goals are not proved.
 \item[\texttt{-{}-obsolete-only}] replays the proofs only if the session
@@ -577,10 +576,9 @@ The smoke detector tries to detect if the context is
 self-contradicting and, thus, that anything can be proved in this
 context. The smoke detector can't be run on an outdated session and does
 not modify the session.  It has three possible configurations:
-\begin{itemize}
-\item \texttt{none}: Do not run the smoke detector.
-
-\item \texttt{top}: The negation of each proved goal is sent with the
+\begin{description}
+\item[\texttt{none}] Do not run the smoke detector.
+\item[\texttt{top}] The negation of each proved goal is sent with the
   same timeout to the prover that proved the original goal.
 \begin{verbatim}
   Goal G : forall x:int. q x -> (p1 x \/ p2 x)
@@ -591,8 +589,7 @@ not modify the session.  It has three possible configurations:
 \end{verbatim}
   In other words, if the smoke detector is triggered, it means that the context
   of the goal \texttt{G} is self-contradicting.
-
-\item \texttt{deep}: This is the same technique as \texttt{top} but
+\item[\texttt{deep}] This is the same technique as \texttt{top} but
   the negation is pushed under the universal quantification (without
   changing them) and under the implication. The previous example
   becomes
@@ -604,9 +601,9 @@ not modify the session.  It has three possible configurations:
   the context of the goal \texttt{G} and its premises are
   self-contradicting. It should be clear that detecting smoke in that
   case does not necessarily means that there is a mistake: for
-  example, this could occur in the WP of a program with an infeasible
+  example, this could occur in the WP of a program with an unfeasible
   path.
-\end{itemize}
+\end{description}
 
 At the end of the replay, the name of the goals that triggered the
 smoke detector are printed:
@@ -1045,7 +1042,32 @@ same directory as output files. This CSS style can be modified manually,
 since regenerating the HTML documentation will not overwrite an existing
 \verb|style.css| file.
 
+\section{The \texttt{execute} Command}
+\label{sec:why3execute}
 
+\why can symbolically execute programs written using the \whyml language
+(extension \texttt{.mlw}).
+\index{execute@\texttt{execute}}
+
+\section{The \texttt{extract} Command}
+\label{sec:why3extract}
+
+\why can extract programs written using the \whyml language
+(extension \texttt{.mlw}) to OCaml.
+\index{extract@\texttt{extract}}
+
+\section{The \texttt{realize} Command}
+\label{sec:why3realize}
+
+\why can produce skeleton files for proof assistants that, once filled,
+realize the given theories. See also Section~\ref{sec:realizations}.
+\index{realize@\texttt{realize}}
+
+\section{The \texttt{wc} Command}
+\label{sec:why3wc}
+
+\why can give some token statistics about \why and \whyml source codes.
+\index{wc@\texttt{wc}}
 
 %%% Local Variables:
 %%% mode: latex
