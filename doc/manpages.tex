@@ -6,7 +6,7 @@ provided by the \why environment. The main command is \texttt{why3};
 it acts as an entry-point to all the features of \why. It is invoked
 as such
 \begin{verbatim}
-why3 [general options...] command [specific options...]
+why3 [general options...] <command> [specific options...]
 \end{verbatim}
 
 The following commands are available:
@@ -65,6 +65,7 @@ particular, option \verb|--help| displays the usage and options.
   \index{debug@\verb+--debug+}
 \item[\texttt{-{}-help}]
   displays the usage and the exact list of options for the given tool.
+  \index{help@\verb+--help+}
 \end{description}
 
 \section{The \texttt{config} Command}
@@ -111,9 +112,9 @@ If a supported prover is installed under a name
 that is not automatically recognized by \texttt{why3config},
 the option \verb|--add-prover| will add a specified binary
 to the configuration. For example, an Alt-Ergo executable
-\verb|/home/me/bin/alt-ergo-trunc| can be added as follows:
+\verb|/home/me/bin/alt-ergo-trunk| can be added as follows:
 \begin{verbatim}
-why3 config --add-prover alt-ergo /home/me/bin/alt-ergo-trunc
+why3 config --add-prover alt-ergo /home/me/bin/alt-ergo-trunk
 \end{verbatim}
 As the first argument, one should put a prover
 identification string. The list of known prover identifiers
@@ -551,7 +552,7 @@ file will be updated if both
 \item every goals are proved.
 \end{itemize}
 In other cases, you can use the IDE to update the session, or use the
-option \verb|-force| described below.
+option \verb|--force| described below.
 
 \paragraph{Exit code and options}
 
@@ -568,6 +569,8 @@ Options are:
   contains obsolete proof attempts.
 \item[\texttt{-{}-smoke-detector \{none|top|deep\}}] tries to detect
   if the context is self-contradicting.
+\item[\texttt{-{}-prover \textsl{<prover>}}] restricts the replay to the
+  selected provers only.
 \end{description}
 
 \paragraph{Smoke detector}
@@ -634,11 +637,11 @@ The available subcommands are as follows:
 \item[\texttt{copy}] duplicates some of the proofs, selected by a filter.
 \item[\texttt{copy-archive}] same as copy but also archives the
   original proofs\index{archived!proof attempt}.
-\item[\texttt{rm}] remove some of the proofs, selected by a filter.
+\item[\texttt{rm}] removes some of the proofs, selected by a filter.
 \end{description}
 
-The first three commands do not modify the sessions, whereas the four
-last modify them. Only the proof attempts recorded are modified. No
+The first three commands do not modify the sessions, whereas the last
+four modify them. Only the proof attempts recorded are modified. No
 prover is called on the modified or created proof attempts, and
 consequently the proof status is always marked as obsolete.
 
@@ -1046,14 +1049,14 @@ since regenerating the HTML documentation will not overwrite an existing
 \label{sec:why3execute}
 
 \why can symbolically execute programs written using the \whyml language
-(extension \texttt{.mlw}).
+(extension \texttt{.mlw}). See also Section~\ref{sec:execute}.
 \index{execute@\texttt{execute}}
 
 \section{The \texttt{extract} Command}
 \label{sec:why3extract}
 
 \why can extract programs written using the \whyml language
-(extension \texttt{.mlw}) to OCaml.
+(extension \texttt{.mlw}) to OCaml. See also Section~\ref{sec:extract}.
 \index{extract@\texttt{extract}}
 
 \section{The \texttt{realize} Command}
