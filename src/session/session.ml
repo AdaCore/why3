@@ -505,17 +505,20 @@ let save_status fmt s =
     | Done r -> save_result fmt r
 
 
+let save_bool_def name def fmt b =
+  if b <> def then fprintf fmt "@ %s=\"%b\"" name b
+
 let opt lab fmt = function
   | None -> ()
-  | Some s -> fprintf fmt "%s=\"%a\"@ " lab save_string s
+  | Some s -> fprintf fmt "@ %s=\"%a\"" lab save_string s
 
 let save_proof_attempt fmt (id,a) =
   fprintf fmt
-    "@\n@[<v 1><proof@ prover=\"%i\"@ timelimit=\"%d\"@ \
-memlimit=\"%d\"@ %aobsolete=\"%b\"@ archived=\"%b\">"
+    "@\n@[<hov 1><proof@ prover=\"%i\"@ timelimit=\"%d\"@ memlimit=\"%d\"%a%a%a>"
     id a.proof_timelimit a.proof_memlimit
-    (opt "edited") a.proof_edited_as a.proof_obsolete
-    a.proof_archived;
+    (opt "edited") a.proof_edited_as 
+    (save_bool_def "obsolete" false) a.proof_obsolete
+    (save_bool_def "archived" false) a.proof_archived;
   save_status fmt a.proof_state;
   fprintf fmt "@]@\n</proof>"
 
@@ -531,17 +534,16 @@ let save_ident fmt id =
         save_string file lnum cnumb cnume
 
 let save_label fmt s =
-  fprintf fmt "@\n@[<v 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
+  fprintf fmt "@\n@[<hov 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
 
 let rec save_goal provers fmt g =
   assert (Tc.string_of_shape g.goal_shape <> "");
   fprintf fmt
-    "@\n@[<v 1><goal@ %a@ %asum=\"%a\"@ proved=\"%b\"@ \
-expanded=\"%b\"@ shape=\"%a\">"
+    "@\n@[<hov 1><goal@ %a%a@ sum=\"%a\"@ proved=\"%b\"%a@ shape=\"%a\">"
     save_ident g.goal_name
     (opt "expl") g.goal_expl
     save_string (Tc.string_of_checksum g.goal_checksum)
-    g.goal_verified  g.goal_expanded
+    g.goal_verified  (save_bool_def "expanded" false) g.goal_expanded
     save_string (Tc.string_of_shape g.goal_shape);
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
   let l = PHprover.fold
@@ -556,34 +558,36 @@ expanded=\"%b\"@ shape=\"%a\">"
   fprintf fmt "@]@\n</goal>"
 
 and save_trans provers fmt t =
-  fprintf fmt "@\n@[<v 1><transf@ name=\"%a\"@ proved=\"%b\"@ expanded=\"%b\">"
-    save_string t.transf_name t.transf_verified t.transf_expanded;
+  fprintf fmt "@\n@[<hov 1><transf@ name=\"%a\"@ proved=\"%b\"%a>"
+    save_string t.transf_name t.transf_verified 
+    (save_bool_def "expanded" false) t.transf_expanded;
   List.iter (save_goal provers fmt) t.transf_goals;
   fprintf fmt "@]@\n</transf>"
 
 and save_metas provers fmt _ m =
-  fprintf fmt "@\n@[<v 1><metas@ proved=\"%b\"@ expanded=\"%b\">"
-    m.metas_verified m.metas_expanded;
+  fprintf fmt "@\n@[<hov 1><metas@ proved=\"%b\"%a>"
+    m.metas_verified 
+    (save_bool_def "expanded" false) m.metas_expanded;
   let save_pos fmt pos =
     fprintf fmt "ip_theory=\"%a\">" save_string pos.ip_theory;
-    List.iter (fprintf fmt "@\n@[<v 1><ip_library@ name=\"%a\"/>@]" save_string)
+    List.iter (fprintf fmt "@\n@[<hov 1><ip_library@ name=\"%a\"/>@]" save_string)
       pos.ip_library;
-    List.iter (fprintf fmt "@\n@[<v 1><ip_qualid@ name=\"%a\"/>@]" save_string)
+    List.iter (fprintf fmt "@\n@[<hov 1><ip_qualid@ name=\"%a\"/>@]" save_string)
       pos.ip_qualid;
   in
   let save_ts_pos fmt ts pos =
-    fprintf fmt "@\n@[<v 1><ts_pos@ name=\"%a\"@ arity=\"%i\"@ \
+    fprintf fmt "@\n@[<hov 1><ts_pos@ name=\"%a\"@ arity=\"%i\"@ \
     id=\"%i\"@ %a@]@\n</ts_pos>"
       save_string ts.ts_name.id_string (List.length ts.ts_args)
       (ts_hash ts) save_pos pos in
   let save_ls_pos fmt ls pos =
     (** TODO: add the signature? *)
-    fprintf fmt "@\n@[<v 1><ls_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</ls_pos>"
+    fprintf fmt "@\n@[<hov 1><ls_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</ls_pos>"
       save_string ls.ls_name.id_string
       (ls_hash ls) save_pos pos
   in
   let save_pr_pos fmt pr pos =
-    fprintf fmt "@\n@[<v 1><pr_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</pr_pos>"
+    fprintf fmt "@\n@[<hov 1><pr_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</pr_pos>"
       save_string pr.pr_name.id_string
       (pr_hash pr) save_pos pos
   in
@@ -596,21 +600,21 @@ and save_metas provers fmt _ m =
   fprintf fmt "@]@\n</metas>"
 
 and save_meta_args fmt s l =
-  fprintf fmt "@\n@[<v 1><meta@ name=\"%a\">" save_string s;
+  fprintf fmt "@\n@[<hov 1><meta@ name=\"%a\">" save_string s;
   let save_meta_arg fmt = function
-    | MAty ty -> fprintf fmt "@\n@[<v 1><meta_arg_ty/>";
+    | MAty ty -> fprintf fmt "@\n@[<hov 1><meta_arg_ty/>";
       save_ty fmt ty;
       fprintf fmt "@]@\n</meta_arg_ty>"
     | MAts ts ->
-      fprintf fmt "@\n@[<v 1><meta_arg_ts@ id=\"%i\"/>@]" (ts_hash ts)
+      fprintf fmt "@\n@[<hov 1><meta_arg_ts@ id=\"%i\"/>@]" (ts_hash ts)
     | MAls ls ->
-      fprintf fmt "@\n@[<v 1><meta_arg_ls@ id=\"%i\"/>@]" (ls_hash ls)
+      fprintf fmt "@\n@[<hov 1><meta_arg_ls@ id=\"%i\"/>@]" (ls_hash ls)
     | MApr pr ->
-      fprintf fmt "@\n@[<v 1><meta_arg_pr@ id=\"%i\"/>@]" (pr_hash pr)
+      fprintf fmt "@\n@[<hov 1><meta_arg_pr@ id=\"%i\"/>@]" (pr_hash pr)
     | MAstr s ->
-      fprintf fmt "@\n@[<v 1><meta_arg_str@ val=\"%s\"/>@]" s
+      fprintf fmt "@\n@[<hov 1><meta_arg_str@ val=\"%s\"/>@]" s
     | MAint i ->
-      fprintf fmt "@\n@[<v 1><meta_arg_int@ val=\"%i\"/>@]" i
+      fprintf fmt "@\n@[<hov 1><meta_arg_int@ val=\"%i\"/>@]" i
   in
   List.iter (save_meta_arg fmt) l;
   fprintf fmt "@]@\n</meta>"
@@ -618,31 +622,32 @@ and save_meta_args fmt s l =
 and save_ty fmt ty =
   match ty.ty_node with
   | Tyvar tv ->
-    fprintf fmt "@\n@[<v 1><ty_var@ id=\"%i\"/>@]" (tv_hash tv)
+    fprintf fmt "@\n@[<hov 1><ty_var@ id=\"%i\"/>@]" (tv_hash tv)
   | Tyapp (ts,l) ->
-    fprintf fmt "@\n@[<v 1><ty_app@ id=\"%i\"/>" (ts_hash ts);
+    fprintf fmt "@\n@[<hov 1><ty_app@ id=\"%i\"/>" (ts_hash ts);
     List.iter (save_ty fmt) l;
     fprintf fmt "@]@\n</ty_app>"
 
 let save_theory provers fmt t =
   fprintf fmt
-    "@\n@[<v 1><theory@ %a@ verified=\"%b\"@ expanded=\"%b\">"
+    "@\n@[<hov 1><theory@ %a@ verified=\"%b\"%a>"
     save_ident t.theory_name
-    t.theory_verified t.theory_expanded;
+    t.theory_verified 
+    (save_bool_def "expanded" false) t.theory_expanded;
   Ident.Slab.iter (save_label fmt) t.theory_name.Ident.id_label;
   List.iter (save_goal provers fmt) t.theory_goals;
   fprintf fmt "@]@\n</theory>"
 
 let save_file provers fmt _ f =
   fprintf fmt
-    "@\n@[<v 1><file@ name=\"%a\"@ %averified=\"%b\"@ expanded=\"%b\">"
+    "@\n@[<hov 1><file@ name=\"%a\"%a@ verified=\"%b\"%a>"
     save_string f.file_name (opt "format")
-    f.file_format f.file_verified f.file_expanded;
+    f.file_format f.file_verified (save_bool_def "expanded" false) f.file_expanded;
   List.iter (save_theory provers fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
 let save_prover fmt p (provers,id) =
-  fprintf fmt "@\n@[<v 1><prover@ id=\"%i\"@ \
+  fprintf fmt "@\n@[<hov 1><prover@ id=\"%i\"@ \
 name=\"%a\"@ version=\"%a\"%a/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
@@ -657,10 +662,10 @@ let save fname _config session =
   fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v2//EN\" \"http://why3.lri.fr/why3session.dtd\">@\n";
 (*
   let rel_file = Sysutil.relativize_filename !session_dir_for_save fname in
-  fprintf fmt "@[<v 1><why3session@ name=\"%a\" shape_version=\"%d\">"
+  fprintf fmt "@[<hov 1><why3session@ name=\"%a\" shape_version=\"%d\">"
     save_string rel_file session.session_shape_version;
 *)
-  fprintf fmt "@[<v 1><why3session shape_version=\"%d\">"
+  fprintf fmt "@[<hov 1><why3session shape_version=\"%d\">"
     session.session_shape_version;
   let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
     (Mprover.empty,0) in
@@ -1045,7 +1050,7 @@ let rec load_goal ~old_provers parent acc g =
         let expl = load_option "expl" g in
         let sum = Tc.checksum_of_string (string_attribute_def "sum" g "") in
         let shape = Tc.shape_of_string (string_attribute_def "shape" g "") in
-        let expanded = bool_attribute "expanded" g true in
+        let expanded = bool_attribute "expanded" g false in
         let mg =
           raw_add_no_task ~keygen ~expanded parent gname expl sum shape
         in
@@ -1079,7 +1084,7 @@ and load_proof_or_transf ~old_provers mg a =
         in
         let edit = load_option "edited" a in
         let edit = match edit with None | Some "" -> None | _ -> edit in
-        let obsolete = bool_attribute "obsolete" a true in
+        let obsolete = bool_attribute "obsolete" a false in
         let archived = bool_attribute "archived" a false in
         let timelimit = int_attribute_def "timelimit" a 2 in
         let memlimit = int_attribute_def "memlimit" a 0 in
@@ -1098,7 +1103,7 @@ and load_proof_or_transf ~old_provers mg a =
         ()
     | "transf" ->
         let trname = string_attribute "name" a in
-        let expanded = bool_attribute "expanded" a true in
+        let expanded = bool_attribute "expanded" a false in
         let mtr = raw_add_transformation ~keygen ~expanded mg trname in
         mtr.transf_goals <-
           List.rev
@@ -1216,7 +1221,7 @@ and load_metas ~old_provers mg a =
   in
   let metas_args =
     List.fold_left load_meta Mstr.empty metas_args in
-  let expanded = bool_attribute "expanded" a true in
+  let expanded = bool_attribute "expanded" a false in
   let metas = raw_add_metas ~keygen ~expanded mg metas_args idpos in
   let goal = match goal with
     | [] -> raise (LoadError (a,"No subgoal for this metas"))
@@ -1236,7 +1241,7 @@ let load_theory ~old_provers mf acc th =
   match th.Xml.name with
     | "theory" ->
         let thname = load_ident th in
-        let expanded = bool_attribute "expanded" th true in
+        let expanded = bool_attribute "expanded" th false in
         let mth = raw_add_theory ~keygen ~expanded mf thname in
         mth.theory_goals <-
           List.rev
@@ -1254,7 +1259,7 @@ let load_file session old_provers f =
     | "file" ->
         let fn = string_attribute "name" f in
         let fmt = load_option "format" f in
-        let expanded = bool_attribute "expanded" f true in
+        let expanded = bool_attribute "expanded" f false in
         let mf = raw_add_file ~keygen ~expanded session fn fmt in
         mf.file_theories <-
           List.rev
