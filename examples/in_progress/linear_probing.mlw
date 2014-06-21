@@ -178,30 +178,40 @@ module LinearProbing
     { size = h.size; data = Array.copy h.data;
       view = h.view; loc = h.loc; }
 
-end
-
-(*
-
-  let remove h x =
-    let n = Array.length h.data in
-    let rec delete j i =
+  let remove (h: t) (x: key) : unit
+    requires { x <> dummy }
+   =
+    let rec delete (a: array key) (j i: int) : unit
+      requires { 0 <= i < Array.length a }
+      requires { 0 <= j < Array.length a }
+      requires { a[j] = dummy }
+      ensures  { numof a dummy 0 (Array.length a) =
+                 numof (old a) dummy 0 (Array.length a) }
+     =
+      let n = Array.length a in
       let i = let i = i+1 in if i = n then 0 else i in
-      let xi = h.data.(i) in
-      if xi != h.dummy then begin
-        let r = X.hash xi mod n in
+      let xi = a[i] in
+      if xi <> dummy then begin
+        let r = bucket xi n in
         if j < r && r <= i || i < j && j < r || r <= i && i < j then
-          delete j i
+          delete a j i
         else begin
-          h.data.(j) <- h.data.(i); h.data.(i) <- h.dummy; delete i i
+          a[j] <- a[i]; a[i] <- dummy; delete a i i
         end
       end
     in
-    let j = find h x in
-    if h.data.(j) != h.dummy then begin
-      h.data.(j) <- h.dummy;
-      delete j j;
+    let j = find h.data x in
+    if h.data[j] <> dummy then begin
+      'L:
+      h.data[j] <- dummy;
+      assert { let n = Array.length h.data in
+               numof h.data dummy 0 (j+1) =
+               numof (at h.data 'L) dummy 0 (j+1) + 1 };
+      delete h.data j j;
+      h.view <- Map.set h.view x False;
       h.size <- h.size - 1;
     end
 
-*)
+end
+
 
