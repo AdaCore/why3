@@ -449,10 +449,36 @@ let get_session_proof_attempt pa = get_session_goal pa.proof_parent
 
 let get_used_provers session =
   let sprover = ref Sprover.empty in
-  session_iter_proof_attempt
+   session_iter_proof_attempt
     (fun pa -> sprover := Sprover.add pa.proof_prover !sprover)
-    session;
+     session;
   !sprover
+
+let get_used_provers_with_stats session =
+  let prover_table = PHprover.create 5 in
+  session_iter_proof_attempt
+    (fun pa ->
+      (* record mostly used pa.proof_timelimit pa.proof_memlimit *)
+      let prover = pa.proof_prover in
+      let timelimits,memlimits =
+        try PHprover.find prover_table prover
+        with Not_found ->
+          let x = (Hashtbl.create 5,Hashtbl.create 5) in
+          PHprover.add prover_table prover x;
+          x
+      in
+      let tf =
+        try Hashtbl.find timelimits pa.proof_timelimit
+        with Not_found -> 0
+      in
+      let mf =
+        try Hashtbl.find memlimits pa.proof_timelimit
+        with Not_found -> 0
+      in
+      Hashtbl.replace timelimits pa.proof_timelimit (tf+1);
+      Hashtbl.replace memlimits pa.proof_memlimit (mf+1))
+    session;
+  prover_table
 
 exception NoTask
 
@@ -482,7 +508,7 @@ let save_string fmt s =
 
 
 let save_result fmt r =
-  fprintf fmt "@\n<result status=\"%s\" time=\"%.2f\"/>"
+  fprintf fmt "@\n<result@ status=\"%s\"@ time=\"%.2f\"/>"
     (match r.Call_provers.pr_answer with
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"
@@ -500,7 +526,7 @@ let save_status fmt s =
     | Scheduled | Running | Interrupted | JustEdited ->
         fprintf fmt "@\n<undone/>"
     | InternalFailure msg ->
-        fprintf fmt "@\n<internalfailure reason=\"%a\"/>"
+        fprintf fmt "@\n<internalfailure@ reason=\"%a\"/>"
           save_string (Printexc.to_string msg)
     | Done r -> save_result fmt r
 
@@ -508,15 +534,20 @@ let save_status fmt s =
 let save_bool_def name def fmt b =
   if b <> def then fprintf fmt "@ %s=\"%b\"" name b
 
+let save_int_def name def fmt n =
+  if n <> def then fprintf fmt "@ %s=\"%d\"" name n
+
 let opt lab fmt = function
   | None -> ()
   | Some s -> fprintf fmt "@ %s=\"%a\"" lab save_string s
 
-let save_proof_attempt fmt (id,a) =
+let save_proof_attempt fmt ((id,tl,ml),a) =
   fprintf fmt
-    "@\n@[<hov 1><proof@ prover=\"%i\"@ timelimit=\"%d\"@ memlimit=\"%d\"%a%a%a>"
-    id a.proof_timelimit a.proof_memlimit
-    (opt "edited") a.proof_edited_as 
+    "@\n@[<hov 1><proof@ prover=\"%i\"%a%a%a%a%a>"
+    id
+    (save_int_def "timelimit" tl) a.proof_timelimit
+    (save_int_def "memlimit" ml) a.proof_memlimit
+    (opt "edited") a.proof_edited_as
     (save_bool_def "obsolete" false) a.proof_obsolete
     (save_bool_def "archived" false) a.proof_archived;
   save_status fmt a.proof_state;
@@ -524,6 +555,8 @@ let save_proof_attempt fmt (id,a) =
 
 let save_ident fmt id =
   fprintf fmt "name=\"%a\"" save_string id.Ident.id_string;
+(* location info is useless, and takes a lot of place *)
+(*
   match id.Ident.id_loc with
     | None -> ()
     | Some loc ->
@@ -532,6 +565,8 @@ let save_ident fmt id =
       fprintf fmt
         "@ locfile=\"%a\"@ loclnum=\"%i\" loccnumb=\"%i\" loccnume=\"%i\""
         save_string file lnum cnumb cnume
+*)
+  ()
 
 let save_label fmt s =
   fprintf fmt "@\n@[<hov 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
@@ -549,7 +584,7 @@ let rec save_goal provers fmt g =
   let l = PHprover.fold
     (fun _ a acc -> (Mprover.find a.proof_prover provers, a) :: acc)
     g.goal_external_proofs [] in
-  let l = List.sort (fun (i1,_) (i2,_) -> compare i1 i2) l in
+  let l = List.sort (fun ((i1,_,_),_) ((i2,_,_),_) -> compare i1 i2) l in
   List.iter (save_proof_attempt fmt) l;
   let l = PHstr.fold (fun _ t acc -> t :: acc) g.goal_transformations [] in
   let l = List.sort (fun t1 t2 -> compare t1.transf_name t2.transf_name) l in
@@ -559,14 +594,14 @@ let rec save_goal provers fmt g =
 
 and save_trans provers fmt t =
   fprintf fmt "@\n@[<hov 1><transf@ name=\"%a\"@ proved=\"%b\"%a>"
-    save_string t.transf_name t.transf_verified 
+    save_string t.transf_name t.transf_verified
     (save_bool_def "expanded" false) t.transf_expanded;
   List.iter (save_goal provers fmt) t.transf_goals;
   fprintf fmt "@]@\n</transf>"
 
 and save_metas provers fmt _ m =
   fprintf fmt "@\n@[<hov 1><metas@ proved=\"%b\"%a>"
-    m.metas_verified 
+    m.metas_verified
     (save_bool_def "expanded" false) m.metas_expanded;
   let save_pos fmt pos =
     fprintf fmt "ip_theory=\"%a\">" save_string pos.ip_theory;
@@ -632,7 +667,7 @@ let save_theory provers fmt t =
   fprintf fmt
     "@\n@[<hov 1><theory@ %a@ verified=\"%b\"%a>"
     save_ident t.theory_name
-    t.theory_verified 
+    t.theory_verified
     (save_bool_def "expanded" false) t.theory_expanded;
   Ident.Slab.iter (save_label fmt) t.theory_name.Ident.id_label;
   List.iter (save_goal provers fmt) t.theory_goals;
@@ -646,20 +681,33 @@ let save_file provers fmt _ f =
   List.iter (save_theory provers fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
-let save_prover fmt p (provers,id) =
-  fprintf fmt "@\n@[<hov 1><prover@ id=\"%i\"@ \
-name=\"%a\"@ version=\"%a\"%a/>@]"
+let save_prover fmt p (timelimits,memlimits) (provers,id) =
+  let mostfrequent_timelimit,_ =
+    Hashtbl.fold
+      (fun t f ((_,f') as t') -> if f > f' then (t,f) else t')
+      timelimits
+      (0,0)
+  in
+  let mostfrequent_memlimit,_ =
+    Hashtbl.fold
+      (fun m f ((_,f') as m') -> if f > f' then (m,f) else m')
+      memlimits
+      (0,0)
+  in
+  fprintf fmt "@\n@[<hov 1><prover@ id=\"%i\"@ name=\"%a\"@ \
+               version=\"%a\"%a@ timelimit=\"%d\"@ memlimit=\"%d\"/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
         save_string s)
-    p.C.prover_altern;
-  Mprover.add p id provers, id+1
+    p.C.prover_altern
+    mostfrequent_timelimit mostfrequent_memlimit;
+  Mprover.add p (id,mostfrequent_timelimit,mostfrequent_memlimit) provers, id+1
 
 let save fname _config session =
   let ch = open_out fname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
-  fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v2//EN\" \"http://why3.lri.fr/why3session.dtd\">@\n";
+  fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v5//EN\"@ \"http://why3.lri.fr/why3session.dtd\">@\n";
 (*
   let rel_file = Sysutil.relativize_filename !session_dir_for_save fname in
   fprintf fmt "@[<hov 1><why3session@ name=\"%a\" shape_version=\"%d\">"
@@ -667,7 +715,7 @@ let save fname _config session =
 *)
   fprintf fmt "@[<hov 1><why3session shape_version=\"%d\">"
     session.session_shape_version;
-  let provers,_ = Sprover.fold (save_prover fmt) (get_used_provers session)
+  let provers,_ = PHprover.fold (save_prover fmt) (get_used_provers_with_stats session)
     (Mprover.empty,0) in
   PHstr.iter (save_file provers fmt) session.session_files;
   fprintf fmt "@]@\n</why3session>";
@@ -1066,10 +1114,8 @@ and load_proof_or_transf ~old_provers mg a =
   match a.Xml.name with
     | "proof" ->
         let prover = string_attribute "prover" a in
-        let p =
-          try
-            let p = Mstr.find prover old_provers in
-            p
+        let (p,timelimit,memlimit) =
+          try Mstr.find prover old_provers
           with Not_found ->
             eprintf "[Error] prover not listing in header '%s'@." prover;
             raise (LoadError (a,"prover not listing in header"))
@@ -1086,8 +1132,8 @@ and load_proof_or_transf ~old_provers mg a =
         let edit = match edit with None | Some "" -> None | _ -> edit in
         let obsolete = bool_attribute "obsolete" a false in
         let archived = bool_attribute "archived" a false in
-        let timelimit = int_attribute_def "timelimit" a 2 in
-        let memlimit = int_attribute_def "memlimit" a 0 in
+        let timelimit = int_attribute_def "timelimit" a timelimit in
+        let memlimit = int_attribute_def "memlimit" a memlimit in
 (*
         if timelimit < 0 then begin
             eprintf "[Error] incorrect or unspecified  timelimit '%i'@."
@@ -1273,10 +1319,12 @@ let load_file session old_provers f =
         let name = string_attribute "name" f in
         let version = string_attribute "version" f in
         let altern = string_attribute_def "alternative" f "" in
+        let timelimit = int_attribute_def "timelimit" f 5 in
+        let memlimit = int_attribute_def "memlimit" f 1000 in
         let p = {C.prover_name = name;
                    prover_version = version;
                    prover_altern = altern} in
-        Mstr.add id p old_provers
+        Mstr.add id (p,timelimit,memlimit) old_provers
     | s ->
         eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
         old_provers
