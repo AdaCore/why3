@@ -1,508 +1,261 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="3"
-  name="Coq"
-  version="8.4pl3"/>
- <prover
-  id="4"
-  name="Z3"
-  version="2.19"/>
- <file
-  name="../vstte10_search_list.mlw"
-  verified="true"
+ <prover id="0" name="Alt-Ergo" version="0.95.1"/>
+ <prover id="1" name="CVC3" version="2.2"/>
+ <prover id="2" name="CVC3" version="2.4.1"/>
+ <prover id="3" name="Coq" version="8.4pl2"/>
+ <prover id="4" name="Z3" version="2.19"/>
+ <file name="../vstte10_search_list.mlw" verified="true"
   expanded="true">
-  <theory
-   name="SearchingALinkedList"
-   locfile="../vstte10_search_list.mlw"
-   loclnum="9" loccnumb="7" loccnume="27"
-   verified="true"
+  <theory name="SearchingALinkedList" locfile="../vstte10_search_list.mlw"
+   loclnum="9" loccnumb="7" loccnume="27" verified="true"
    expanded="true">
-   <goal
-    name="WP_parameter search"
-    locfile="../vstte10_search_list.mlw"
-    loclnum="22" loccnumb="10" loccnume="16"
-    expl="VC for search"
-    sum="8856ed4711cd8d2a5923a3e64acc85de"
-    proved="true"
-    expanded="true"
+   <goal name="WP_parameter search" locfile="../vstte10_search_list.mlw"
+    loclnum="22" loccnumb="10" loccnume="16" expl="VC for search"
+    sum="8856ed4711cd8d2a5923a3e64acc85de" proved="true" expanded="true"
     shape="Cano_zeroV1Aainfix =V0ainfix +V0alengthV1Oazero_atV1ainfix -V0V0Aainfix &lt;V0ainfix +V0alengthV1Aainfix &lt;=V0V0aNiliano_zeroV1Aainfix =V5ainfix +V0alengthV1Oazero_atV1ainfix -V5V0Aainfix &lt;V5ainfix +V0alengthV1Aainfix &lt;=V0V5Iano_zeroV3Aainfix =V5ainfix +V4alengthV3Oazero_atV3ainfix -V5V4Aainfix &lt;V5ainfix +V4alengthV3Aainfix &lt;=V4V5FACfaNilainfix =V6V3aConswVV1Lainfix +V0c1ano_zeroV1Aainfix =V0ainfix +V0alengthV1Oazero_atV1ainfix -V0V0Aainfix &lt;V0ainfix +V0alengthV1Aainfix &lt;=V0V0ainfix =V2c0aConsVVV1F">
-    <label
-     name="expl:VC for search"/>
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <label name="expl:VC for search"/>
+    <proof prover="0" timelimit="20"
+     memlimit="0">
      <result status="valid" time="0.07"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter search_list"
-    locfile="../vstte10_search_list.mlw"
-    loclnum="30" loccnumb="6" loccnume="17"
-    expl="VC for search_list"
-    sum="ba00e2426e2dfa01c0a0e5c0c55bf2dd"
-    proved="true"
-    expanded="true"
+   <goal name="WP_parameter search_list" locfile="../vstte10_search_list.mlw"
+    loclnum="30" loccnumb="6" loccnume="17" expl="VC for search_list"
+    sum="ba00e2426e2dfa01c0a0e5c0c55bf2dd" proved="true" expanded="true"
     shape="ano_zeroV0Aainfix =V1alengthV0Oazero_atV0V1Aainfix &lt;V1alengthV0Aainfix &lt;=c0V1Iano_zeroV0Aainfix =V1ainfix +c0alengthV0Oazero_atV0ainfix -V1c0Aainfix &lt;V1ainfix +c0alengthV0Aainfix &lt;=c0V1FF">
-    <label
-     name="expl:VC for search_list"/>
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <label name="expl:VC for search_list"/>
+    <proof prover="0" timelimit="20"
+     memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <proof prover="4" timelimit="5"
+     memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter head"
-    locfile="../vstte10_search_list.mlw"
-    loclnum="41" loccnumb="6" loccnume="10"
-    expl="VC for head"
-    sum="0ce1f22adfc574a706c5d0f2249ef2b4"
-    proved="true"
-    expanded="false"
+   <goal name="WP_parameter head" locfile="../vstte10_search_list.mlw"
+    loclnum="41" loccnumb="6" loccnume="10" expl="VC for head"
+    sum="0ce1f22adfc574a706c5d0f2249ef2b4" proved="true"
     shape="CfaNilCfaNilainfix =V1V2aConsVwV0aConsVwV0INainfix =V0aNilF">
-    <label
-     name="expl:VC for head"/>
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <label name="expl:VC for head"/>
+    <proof prover="0" timelimit="20"
+     memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <proof prover="4" timelimit="5"
+     memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter tail"
-    locfile="../vstte10_search_list.mlw"
-    loclnum="45" loccnumb="6" loccnume="10"
-    expl="VC for tail"
-    sum="78c218b2c84a7779cbf58d854cdc8d39"
-    proved="true"
-    expanded="false"
+   <goal name="WP_parameter tail" locfile="../vstte10_search_list.mlw"
+    loclnum="45" loccnumb="6" loccnume="10" expl="VC for tail"
+    sum="78c218b2c84a7779cbf58d854cdc8d39" proved="true"
     shape="CfaNilCfaNilainfix =V1V2aConswVV0aConswVV0INainfix =V0aNilF">
-    <label
-     name="expl:VC for tail"/>
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <label name="expl:VC for tail"/>
+    <proof prover="0" timelimit="20"
+     memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    <proof prover="4" timelimit="5"
+     memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter search_loop"
-    locfile="../vstte10_search_list.mlw"
-    loclnum="49" loccnumb="6" loccnume="17"
-    expl="VC for search_loop"
-    sum="84ce8bc633afb276231cfeddce5c2da8"
-    proved="true"
-    expanded="true"
+   <goal name="WP_parameter search_loop" locfile="../vstte10_search_list.mlw"
+    loclnum="49" loccnumb="6" loccnume="17" expl="VC for search_loop"
+    sum="84ce8bc633afb276231cfeddce5c2da8" proved="true" expanded="true"
     shape="iano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix &lt;V2alengthV0Aainfix &lt;=c0V2iano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix &lt;V2alengthV0Aainfix &lt;=c0V2CfaNilainfix =V7V6aConswVV1ANainfix =anthV8V0aSomec0Iainfix &lt;V8V4Aainfix &lt;=c0V8FAainfix =anthV9V6anthainfix +V4V9V0Iainfix &lt;=c0V9FAainfix =ainfix +V4alengthV6alengthV0Aainfix &lt;=c0V4Iainfix =V6V5FICfaNilainfix =V5V10aConswVV1FANainfix =V1aNilIainfix =V4ainfix +V2c1FNainfix =V3c0ICfaNilainfix =V3V11aConsVwV1FANainfix =V1aNilNainfix =V1aNilINainfix =anthV12V0aSomec0Iainfix &lt;V12V2Aainfix &lt;=c0V12FAainfix =anthV13V1anthainfix +V2V13V0Iainfix &lt;=c0V13FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FANainfix =anthV14V0aSomec0Iainfix &lt;V14c0Aainfix &lt;=c0V14FAainfix =anthV15V0anthainfix +c0V15V0Iainfix &lt;=c0V15FAainfix =ainfix +c0alengthV0alengthV0Aainfix &lt;=c0c0F">
-    <label
-     name="expl:VC for search_loop"/>
-    <transf
-     name="split_goal"
-     proved="true"
+    <label name="expl:VC for search_loop"/>
+    <transf name="split_goal" proved="true"
      expanded="true">
-     <goal
-      name="WP_parameter search_loop.1"
+     <goal name="WP_parameter search_loop.1"
       locfile="../vstte10_search_list.mlw"
-      loclnum="49" loccnumb="6" loccnume="17"
-      expl="1. loop invariant init"
-      sum="49c33b7dd0314a856e12853e10f2fed0"
-      proved="true"
-      expanded="false"
+      loclnum="49" loccnumb="6" loccnume="17" expl="1. loop invariant init"
+      sum="49c33b7dd0314a856e12853e10f2fed0" proved="true"
       shape="loop invariant initNainfix =anthV1V0aSomec0Iainfix &lt;V1c0Aainfix &lt;=c0V1FAainfix =anthV2V0anthainfix +c0V2V0Iainfix &lt;=c0V2FAainfix =ainfix +c0alengthV0alengthV0Aainfix &lt;=c0c0F">
-      <label
-       name="expl:VC for search_loop"/>
-      <proof
-       prover="0"
-       timelimit="20"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <label name="expl:VC for search_loop"/>
+      <proof prover="0" timelimit="20"
+       memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="1" timelimit="5"
+       memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="4" timelimit="5"
+       memlimit="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter search_loop.2"
+     <goal name="WP_parameter search_loop.2"
       locfile="../vstte10_search_list.mlw"
-      loclnum="49" loccnumb="6" loccnume="17"
-      expl="2. precondition"
-      sum="0ac905d470e4275aea0be3ad7903b0ed"
-      proved="true"
-      expanded="false"
+      loclnum="49" loccnumb="6" loccnume="17" expl="2. precondition"
+      sum="0ac905d470e4275aea0be3ad7903b0ed" proved="true"
       shape="preconditionNainfix =V1aNilINainfix =V1aNilINainfix =anthV3V0aSomec0Iainfix &lt;V3V2Aainfix &lt;=c0V3FAainfix =anthV4V1anthainfix +V2V4V0Iainfix &lt;=c0V4FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-      <label
-       name="expl:VC for search_loop"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <label name="expl:VC for search_loop"/>
+      <proof prover="0" timelimit="5"
+       memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="1"
-       timelimit="20"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="1" timelimit="20"
+       memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="4" timelimit="5"
+       memlimit="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter search_loop.3"
+     <goal name="WP_parameter search_loop.3"
       locfile="../vstte10_search_list.mlw"
-      loclnum="49" loccnumb="6" loccnume="17"
-      expl="3. precondition"
-      sum="90790bd3e4ea5f0311b1c0224d91446a"
-      proved="true"
-      expanded="false"
+      loclnum="49" loccnumb="6" loccnume="17" expl="3. precondition"
+      sum="90790bd3e4ea5f0311b1c0224d91446a" proved="true"
       shape="preconditionNainfix =V1aNilIainfix =V4ainfix +V2c1FINainfix =V3c0ICfaNilainfix =V3V5aConsVwV1FINainfix =V1aNilINainfix =V1aNilINainfix =anthV6V0aSomec0Iainfix &lt;V6V2Aainfix &lt;=c0V6FAainfix =anthV7V1anthainfix +V2V7V0Iainfix &lt;=c0V7FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-      <label
-       name="expl:VC for search_loop"/>
-      <proof
-       prover="0"
-       timelimit="20"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <label name="expl:VC for search_loop"/>
+      <proof prover="0" timelimit="20"
+       memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="1" timelimit="5"
+       memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="4" timelimit="5"
+       memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter search_loop.4"
+     <goal name="WP_parameter search_loop.4"
       locfile="../vstte10_search_list.mlw"
       loclnum="49" loccnumb="6" loccnume="17"
       expl="4. loop invariant preservation"
-      sum="e6ea50dac8ec07ad8b672e49a330dd46"
-      proved="true"
-      expanded="false"
+      sum="e6ea50dac8ec07ad8b672e49a330dd46" proved="true"
       shape="loop invariant preservationNainfix =anthV7V0aSomec0Iainfix &lt;V7V4Aainfix &lt;=c0V7FAainfix =anthV8V6anthainfix +V4V8V0Iainfix &lt;=c0V8FAainfix =ainfix +V4alengthV6alengthV0Aainfix &lt;=c0V4Iainfix =V6V5FICfaNilainfix =V5V9aConswVV1FINainfix =V1aNilIainfix =V4ainfix +V2c1FINainfix =V3c0ICfaNilainfix =V3V10aConsVwV1FINainfix =V1aNilINainfix =V1aNilINainfix =anthV11V0aSomec0Iainfix &lt;V11V2Aainfix &lt;=c0V11FAainfix =anthV12V1anthainfix +V2V12V0Iainfix &lt;=c0V12FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-      <label
-       name="expl:VC for search_loop"/>
-      <transf
-       name="split_goal"
-       proved="true"
-       expanded="false">
-       <goal
-        name="WP_parameter search_loop.4.1"
+      <label name="expl:VC for search_loop"/>
+      <transf name="split_goal"
+       proved="true">
+       <goal name="WP_parameter search_loop.4.1"
         locfile="../vstte10_search_list.mlw"
-        loclnum="49" loccnumb="6" loccnume="17"
-        expl="1."
-        sum="00c919b858e5d80a3590c7ddaf071055"
-        proved="true"
-        expanded="false"
+        loclnum="49" loccnumb="6" loccnume="17" expl="1."
+        sum="00c919b858e5d80a3590c7ddaf071055" proved="true"
         shape="ainfix &lt;=c0V4Iainfix =V6V5FICfaNilainfix =V5V7aConswVV1FINainfix =V1aNilIainfix =V4ainfix +V2c1FINainfix =V3c0ICfaNilainfix =V3V8aConsVwV1FINainfix =V1aNilINainfix =V1aNilINainfix =anthV9V0aSomec0Iainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =anthV10V1anthainfix +V2V10V0Iainfix &lt;=c0V10FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-        <label
-         name="expl:VC for search_loop"/>
-        <proof
-         prover="0"
-         timelimit="20"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
+        <label name="expl:VC for search_loop"/>
+        <proof prover="0" timelimit="20"
+         memlimit="0">
          <result status="valid" time="0.01"/>
         </proof>
-        <proof
-         prover="1"
-         timelimit="5"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
+        <proof prover="1" timelimit="5"
+         memlimit="0">
          <result status="valid" time="0.02"/>
         </proof>
-        <proof
-         prover="4"
-         timelimit="5"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
+        <proof prover="4" timelimit="5"
+         memlimit="0">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal
-        name="WP_parameter search_loop.4.2"
+       <goal name="WP_parameter search_loop.4.2"
         locfile="../vstte10_search_list.mlw"
-        loclnum="49" loccnumb="6" loccnume="17"
-        expl="2."
-        sum="3b8119da74f7313296a5f769d158e4ce"
-        proved="true"
-        expanded="false"
+        loclnum="49" loccnumb="6" loccnume="17" expl="2."
+        sum="3b8119da74f7313296a5f769d158e4ce" proved="true"
         shape="ainfix =ainfix +V4alengthV6alengthV0Iainfix =V6V5FICfaNilainfix =V5V7aConswVV1FINainfix =V1aNilIainfix =V4ainfix +V2c1FINainfix =V3c0ICfaNilainfix =V3V8aConsVwV1FINainfix =V1aNilINainfix =V1aNilINainfix =anthV9V0aSomec0Iainfix &lt;V9V2Aainfix &lt;=c0V9FAainfix =anthV10V1anthainfix +V2V10V0Iainfix &lt;=c0V10FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-        <label
-         name="expl:VC for search_loop"/>
-        <proof
-         prover="0"
-         timelimit="20"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
+        <label name="expl:VC for search_loop"/>
+        <proof prover="0" timelimit="20"
+         memlimit="0">
          <result status="valid" time="0.02"/>
         </proof>
-        <proof
-         prover="1"
-         timelimit="5"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
+        <proof prover="1" timelimit="5"
+         memlimit="0">
          <result status="valid" time="0.02"/>
         </proof>
-        <proof
-         prover="4"
-         timelimit="5"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
+        <proof prover="4" timelimit="5"
+         memlimit="0">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal
-        name="WP_parameter search_loop.4.3"
+       <goal name="WP_parameter search_loop.4.3"
         locfile="../vstte10_search_list.mlw"
-        loclnum="49" loccnumb="6" loccnume="17"
-        expl="3."
-        sum="f9f6a446d9f8f76d63f3b4d5d79f41e9"
-        proved="true"
-        expanded="false"
+        loclnum="49" loccnumb="6" loccnume="17" expl="3."
+        sum="f9f6a446d9f8f76d63f3b4d5d79f41e9" proved="true"
         shape="ainfix =anthV7V6anthainfix +V4V7V0Iainfix &lt;=c0V7FIainfix =V6V5FICfaNilainfix =V5V8aConswVV1FINainfix =V1aNilIainfix =V4ainfix +V2c1FINainfix =V3c0ICfaNilainfix =V3V9aConsVwV1FINainfix =V1aNilINainfix =V1aNilINainfix =anthV10V0aSomec0Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =anthV11V1anthainfix +V2V11V0Iainfix &lt;=c0V11FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-        <label
-         name="expl:VC for search_loop"/>
-        <proof
-         prover="3"
-         timelimit="5"
-         memlimit="0"
-         edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_3.v"
-         obsolete="false"
-         archived="false">
+        <label name="expl:VC for search_loop"/>
+        <proof prover="3" timelimit="5" memlimit="0"
+         edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_3.v">
          <result status="valid" time="1.19"/>
         </proof>
        </goal>
-       <goal
-        name="WP_parameter search_loop.4.4"
+       <goal name="WP_parameter search_loop.4.4"
         locfile="../vstte10_search_list.mlw"
-        loclnum="49" loccnumb="6" loccnume="17"
-        expl="4."
-        sum="ece3c7d90529f4cd34b9853e5058d000"
-        proved="true"
-        expanded="false"
+        loclnum="49" loccnumb="6" loccnume="17" expl="4."
+        sum="ece3c7d90529f4cd34b9853e5058d000" proved="true"
         shape="Nainfix =anthV7V0aSomec0Iainfix &lt;V7V4Aainfix &lt;=c0V7FIainfix =V6V5FICfaNilainfix =V5V8aConswVV1FINainfix =V1aNilIainfix =V4ainfix +V2c1FINainfix =V3c0ICfaNilainfix =V3V9aConsVwV1FINainfix =V1aNilINainfix =V1aNilINainfix =anthV10V0aSomec0Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =anthV11V1anthainfix +V2V11V0Iainfix &lt;=c0V11FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-        <label
-         name="expl:VC for search_loop"/>
-        <proof
-         prover="3"
-         timelimit="5"
-         memlimit="0"
-         edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_4.v"
-         obsolete="false"
-         archived="false">
+        <label name="expl:VC for search_loop"/>
+        <proof prover="3" timelimit="5" memlimit="0"
+         edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_4.v">
          <result status="valid" time="1.37"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal
-      name="WP_parameter search_loop.5"
+     <goal name="WP_parameter search_loop.5"
       locfile="../vstte10_search_list.mlw"
-      loclnum="49" loccnumb="6" loccnume="17"
-      expl="5. loop variant decrease"
-      sum="8b85f02c4b9a28df58b0136190f851b1"
-      proved="true"
-      expanded="false"
+      loclnum="49" loccnumb="6" loccnume="17" expl="5. loop variant decrease"
+      sum="8b85f02c4b9a28df58b0136190f851b1" proved="true"
       shape="loop variant decreaseCfaNilainfix =V7V6aConswVV1Iainfix =V6V5FICfaNilainfix =V5V8aConswVV1FINainfix =V1aNilIainfix =V4ainfix +V2c1FINainfix =V3c0ICfaNilainfix =V3V9aConsVwV1FINainfix =V1aNilINainfix =V1aNilINainfix =anthV10V0aSomec0Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =anthV11V1anthainfix +V2V11V0Iainfix &lt;=c0V11FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-      <label
-       name="expl:VC for search_loop"/>
-      <proof
-       prover="0"
-       timelimit="20"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <label name="expl:VC for search_loop"/>
+      <proof prover="0" timelimit="20"
+       memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="1" timelimit="5"
+       memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      <proof prover="2" timelimit="5"
+       memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter search_loop.6"
+     <goal name="WP_parameter search_loop.6"
       locfile="../vstte10_search_list.mlw"
-      loclnum="49" loccnumb="6" loccnume="17"
-      expl="6. postcondition"
-      sum="f6a04d304f6ceb09a6761758f2da6b44"
-      proved="true"
-      expanded="false"
+      loclnum="49" loccnumb="6" loccnume="17" expl="6. postcondition"
+      sum="f6a04d304f6ceb09a6761758f2da6b44" proved="true"
       shape="postconditionano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix &lt;V2alengthV0Aainfix &lt;=c0V2INNainfix =V3c0ICfaNilainfix =V3V4aConsVwV1FINainfix =V1aNilINainfix =V1aNilINainfix =anthV5V0aSomec0Iainfix &lt;V5V2Aainfix &lt;=c0V5FAainfix =anthV6V1anthainfix +V2V6V0Iainfix &lt;=c0V6FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-      <label
-       name="expl:VC for search_loop"/>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="0"
-       edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_1.v"
-       obsolete="false"
-       archived="false">
+      <label name="expl:VC for search_loop"/>
+      <proof prover="3" timelimit="5" memlimit="0"
+       edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_1.v">
        <result status="valid" time="1.18"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter search_loop.7"
+     <goal name="WP_parameter search_loop.7"
       locfile="../vstte10_search_list.mlw"
-      loclnum="49" loccnumb="6" loccnume="17"
-      expl="7. postcondition"
-      sum="453cfb5cb2e13823f28001a7bb6e7eaf"
-      proved="true"
-      expanded="false"
+      loclnum="49" loccnumb="6" loccnume="17" expl="7. postcondition"
+      sum="453cfb5cb2e13823f28001a7bb6e7eaf" proved="true"
       shape="postconditionano_zeroV0Aainfix =V2alengthV0Oazero_atV0V2Aainfix &lt;V2alengthV0Aainfix &lt;=c0V2INNainfix =V1aNilINainfix =anthV3V0aSomec0Iainfix &lt;V3V2Aainfix &lt;=c0V3FAainfix =anthV4V1anthainfix +V2V4V0Iainfix &lt;=c0V4FAainfix =ainfix +V2alengthV1alengthV0Aainfix &lt;=c0V2FF">
-      <label
-       name="expl:VC for search_loop"/>
-      <proof
-       prover="0"
-       timelimit="20"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <label name="expl:VC for search_loop"/>
+      <proof prover="0" timelimit="20"
+       memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="1" timelimit="5"
+       memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="4" timelimit="5"
+       memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>

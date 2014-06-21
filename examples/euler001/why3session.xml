@@ -1,801 +1,410 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
-  name="Coq"
-  version="8.4pl3"/>
- <prover
-  id="3"
-  name="Z3"
-  version="3.2"/>
- <file
-  name="../euler001.mlw"
-  verified="true"
+ <prover id="0" name="Alt-Ergo" version="0.95.2"/>
+ <prover id="1" name="CVC3" version="2.4.1"/>
+ <prover id="2" name="Coq" version="8.4pl2"/>
+ <prover id="3" name="Z3" version="3.2"/>
+ <file name="../euler001.mlw" verified="true"
   expanded="true">
-  <theory
-   name="DivModHints"
-   locfile="../euler001.mlw"
+  <theory name="DivModHints" locfile="../euler001.mlw"
    loclnum="8" loccnumb="7" loccnume="18"
-   verified="true"
-   expanded="false">
-   <goal
-    name="mod_div_unique"
-    locfile="../euler001.mlw"
+   verified="true">
+   <goal name="mod_div_unique" locfile="../euler001.mlw"
     loclnum="13" loccnumb="8" loccnume="22"
-    sum="c8978bd034ef31685cd436249a7f96b5"
-    proved="true"
-    expanded="false"
+    sum="c8978bd034ef31685cd436249a7f96b5" proved="true"
     shape="ainfix =V3amodV0V1Aainfix =V2adivV0V1Iainfix &lt;V3V1Aainfix &lt;=c0V3Aainfix =V0ainfix +ainfix *V2V1V3Aainfix &gt;V1c0Aainfix &gt;=V0c0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     edited="euler001_DivModHints_mod_div_unique_1.v"
-     obsolete="false"
-     archived="false">
+    <proof prover="2" timelimit="5" memlimit="0"
+     edited="euler001_DivModHints_mod_div_unique_1.v">
      <result status="valid" time="1.06"/>
     </proof>
    </goal>
-   <goal
-    name="mod_succ_1"
-    locfile="../euler001.mlw"
+   <goal name="mod_succ_1" locfile="../euler001.mlw"
     loclnum="17" loccnumb="8" loccnume="18"
-    sum="d95d924371149a44d319c8fd0690ef1e"
-    proved="true"
-    expanded="false"
+    sum="d95d924371149a44d319c8fd0690ef1e" proved="true"
     shape="ainfix =amodainfix +V0c1V1ainfix +amodV0V1c1INainfix =amodainfix +V0c1V1c0Iainfix &gt;V1c0Aainfix &gt;=V0c0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     edited="euler001_DivModHints_mod_succ_1_1.v"
-     obsolete="false"
-     archived="false">
+    <proof prover="2" timelimit="5" memlimit="0"
+     edited="euler001_DivModHints_mod_succ_1_1.v">
      <result status="valid" time="1.15"/>
     </proof>
    </goal>
-   <goal
-    name="mod_succ_2"
-    locfile="../euler001.mlw"
+   <goal name="mod_succ_2" locfile="../euler001.mlw"
     loclnum="21" loccnumb="8" loccnume="18"
-    sum="8a784c6c3642290501cd95c7389f2b8f"
-    proved="true"
-    expanded="false"
+    sum="8a784c6c3642290501cd95c7389f2b8f" proved="true"
     shape="ainfix =amodV0V1ainfix -V1c1Iainfix =amodainfix +V0c1V1c0Iainfix &gt;V1c0Aainfix &gt;=V0c0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     edited="euler001_DivModHints_mod_succ_2_1.v"
-     obsolete="false"
-     archived="false">
+    <proof prover="2" timelimit="5" memlimit="0"
+     edited="euler001_DivModHints_mod_succ_2_1.v">
      <result status="valid" time="1.14"/>
     </proof>
    </goal>
-   <goal
-    name="div_succ_1"
-    locfile="../euler001.mlw"
+   <goal name="div_succ_1" locfile="../euler001.mlw"
     loclnum="25" loccnumb="8" loccnume="18"
-    sum="08d86a44d1fc01bac0889b3651fa57ac"
-    proved="true"
-    expanded="false"
+    sum="08d86a44d1fc01bac0889b3651fa57ac" proved="true"
     shape="ainfix =adivainfix +V0c1V1ainfix +adivV0V1c1Iainfix =amodainfix +V0c1V1c0Iainfix &gt;V1c0Aainfix &gt;=V0c0F">
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.04"/>
     </proof>
    </goal>
-   <goal
-    name="div_succ_2"
-    locfile="../euler001.mlw"
+   <goal name="div_succ_2" locfile="../euler001.mlw"
     loclnum="29" loccnumb="8" loccnume="18"
-    sum="756ceeee8e2c4c56b44f3bab7f7e1389"
-    proved="true"
-    expanded="false"
+    sum="756ceeee8e2c4c56b44f3bab7f7e1389" proved="true"
     shape="ainfix =adivainfix +V0c1V1adivV0V1INainfix =amodainfix +V0c1V1c0Iainfix &gt;V1c0Aainfix &gt;=V0c0F">
-    <proof
-     prover="0"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="2.20"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.10"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.91"/>
     </proof>
    </goal>
-   <goal
-    name="mod2_mul2"
-    locfile="../euler001.mlw"
+   <goal name="mod2_mul2" locfile="../euler001.mlw"
     loclnum="33" loccnumb="8" loccnume="17"
-    sum="6a7e8eb3a0d1ff9caa32c2b09886d7d8"
-    proved="true"
-    expanded="false"
+    sum="6a7e8eb3a0d1ff9caa32c2b09886d7d8" proved="true"
     shape="ainfix =amodainfix *c2V0c2c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.05"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="mod2_mul2_aux"
-    locfile="../euler001.mlw"
+   <goal name="mod2_mul2_aux" locfile="../euler001.mlw"
     loclnum="36" loccnumb="8" loccnume="21"
-    sum="5891f8c71ddca269bbca79dff5480da7"
-    proved="true"
-    expanded="false"
+    sum="5891f8c71ddca269bbca79dff5480da7" proved="true"
     shape="ainfix =amodainfix *V1ainfix *c2V0c2c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="mod2_mul2_aux2"
-    locfile="../euler001.mlw"
+   <goal name="mod2_mul2_aux2" locfile="../euler001.mlw"
     loclnum="39" loccnumb="8" loccnume="22"
-    sum="28e0595d80d6df15bc356a7fc0164c08"
-    proved="true"
-    expanded="false"
+    sum="28e0595d80d6df15bc356a7fc0164c08" proved="true"
     shape="ainfix =amodainfix +ainfix *V1ainfix *c2V0ainfix *V2ainfix *c2V3c2c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.03"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="35"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="35"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.07"/>
     </proof>
    </goal>
-   <goal
-    name="div2_mul2"
-    locfile="../euler001.mlw"
+   <goal name="div2_mul2" locfile="../euler001.mlw"
     loclnum="42" loccnumb="8" loccnume="17"
-    sum="a00e38beb2042704e875615bafde0761"
-    proved="true"
-    expanded="false"
+    sum="a00e38beb2042704e875615bafde0761" proved="true"
     shape="ainfix =adivainfix *c2V0c2V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.06"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="div2_mul2_aux"
-    locfile="../euler001.mlw"
+   <goal name="div2_mul2_aux" locfile="../euler001.mlw"
     loclnum="45" loccnumb="8" loccnume="21"
-    sum="90abd643fffae8bdfacfb53d3660d307"
-    proved="true"
-    expanded="false"
+    sum="90abd643fffae8bdfacfb53d3660d307" proved="true"
     shape="ainfix =adivainfix *V1ainfix *c2V0c2ainfix *V1V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.08"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="div2_add"
-    locfile="../euler001.mlw"
+   <goal name="div2_add" locfile="../euler001.mlw"
     loclnum="48" loccnumb="8" loccnume="16"
-    sum="b6447f23fa84106b51aa77241ab4a279"
-    proved="true"
-    expanded="false"
+    sum="b6447f23fa84106b51aa77241ab4a279" proved="true"
     shape="ainfix =adivainfix +V0V1c2ainfix +adivV0c2adivV1c2Iainfix =amodV1c2c0Aainfix =amodV0c2c0F">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.04"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="div2_sub"
-    locfile="../euler001.mlw"
+   <goal name="div2_sub" locfile="../euler001.mlw"
     loclnum="52" loccnumb="8" loccnume="16"
-    sum="bb961a59aa9ee387b950adadc6b077a2"
-    proved="true"
-    expanded="false"
+    sum="bb961a59aa9ee387b950adadc6b077a2" proved="true"
     shape="ainfix =adivainfix -V0V1c2ainfix -adivV0c2adivV1c2Iainfix =amodV1c2c0Aainfix =amodV0c2c0F">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.04"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
-  <theory
-   name="TriangularNumbers"
-   locfile="../euler001.mlw"
+  <theory name="TriangularNumbers" locfile="../euler001.mlw"
    loclnum="58" loccnumb="7" loccnume="24"
-   verified="true"
-   expanded="false">
-   <goal
-    name="tr_mod_2"
-    locfile="../euler001.mlw"
+   verified="true">
+   <goal name="tr_mod_2" locfile="../euler001.mlw"
     loclnum="65" loccnumb="8" loccnume="16"
-    sum="d009c147b8522b08838943e94f78084a"
-    proved="true"
-    expanded="false"
+    sum="d009c147b8522b08838943e94f78084a" proved="true"
     shape="ainfix =amodainfix *V0ainfix +V0c1c2c0Iainfix &gt;=V0c0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     edited="euler001_TriangularNumbers_tr_mod_2_1.v"
-     obsolete="false"
-     archived="false">
+    <proof prover="2" timelimit="5" memlimit="1000"
+     edited="euler001_TriangularNumbers_tr_mod_2_1.v">
      <result status="valid" time="1.07"/>
     </proof>
    </goal>
-   <goal
-    name="tr_repr"
-    locfile="../euler001.mlw"
+   <goal name="tr_repr" locfile="../euler001.mlw"
     loclnum="70" loccnumb="8" loccnume="15"
-    sum="15106465998005ae09e22a161a94977f"
-    proved="true"
-    expanded="false"
+    sum="15106465998005ae09e22a161a94977f" proved="true"
     shape="ainfix =ainfix *V0ainfix +V0c1ainfix *c2atrV0Iainfix &gt;=V0c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="tr_succ"
-    locfile="../euler001.mlw"
+   <goal name="tr_succ" locfile="../euler001.mlw"
     loclnum="73" loccnumb="8" loccnume="15"
-    sum="865890a0046e16348f8303cedc34b23a"
-    proved="true"
-    expanded="false"
+    sum="865890a0046e16348f8303cedc34b23a" proved="true"
     shape="ainfix =atrainfix +V0c1ainfix +ainfix +atrV0V0c1Iainfix &gt;=V0c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
-  <theory
-   name="SumMultiple"
-   locfile="../euler001.mlw"
+  <theory name="SumMultiple" locfile="../euler001.mlw"
    loclnum="79" loccnumb="7" loccnume="18"
-   verified="true"
-   expanded="false">
-   <goal
-    name="mod_15"
-    locfile="../euler001.mlw"
+   verified="true">
+   <goal name="mod_15" locfile="../euler001.mlw"
     loclnum="111" loccnumb="8" loccnume="14"
-    sum="9075c2011b00058de37e2e7059292121"
-    proved="true"
-    expanded="false"
+    sum="9075c2011b00058de37e2e7059292121" proved="true"
     shape="ainfix =amodV0c5c0Aainfix =amodV0c3c0qainfix =amodV0c15c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.81"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.13"/>
     </proof>
    </goal>
-   <goal
-    name="Closed_formula_0"
-    locfile="../euler001.mlw"
+   <goal name="Closed_formula_0" locfile="../euler001.mlw"
     loclnum="115" loccnumb="8" loccnume="24"
-    sum="b361b70e5cbf8e2d76b2f7bbfe86e77f"
-    proved="true"
-    expanded="false"
+    sum="b361b70e5cbf8e2d76b2f7bbfe86e77f" proved="true"
     shape="apc0">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.22"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.14"/>
     </proof>
    </goal>
-   <goal
-    name="Closed_formula_n"
-    locfile="../euler001.mlw"
+   <goal name="Closed_formula_n" locfile="../euler001.mlw"
     loclnum="117" loccnumb="8" loccnume="24"
-    sum="254d76f488e003c91c7d833011727243"
-    proved="true"
-    expanded="false"
+    sum="254d76f488e003c91c7d833011727243" proved="true"
     shape="apV0INainfix =amodV0c5c0ANainfix =amodV0c3c0Iapainfix -V0c1Iainfix &gt;V0c0F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="10"
+     memlimit="1000">
      <result status="valid" time="4.68"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="10"
+     memlimit="1000">
      <result status="valid" time="1.62"/>
     </proof>
    </goal>
-   <goal
-    name="Closed_formula_n_3"
-    locfile="../euler001.mlw"
+   <goal name="Closed_formula_n_3" locfile="../euler001.mlw"
     loclnum="121" loccnumb="8" loccnume="26"
-    sum="9d5a1f4453fe6480edad3308f0404bf5"
-    proved="true"
-    expanded="false"
+    sum="9d5a1f4453fe6480edad3308f0404bf5" proved="true"
     shape="apV0INainfix =amodV0c5c0Aainfix =amodV0c3c0Iapainfix -V0c1Iainfix &gt;V0c0F">
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="10"
+     memlimit="1000">
      <result status="valid" time="2.94"/>
     </proof>
    </goal>
-   <goal
-    name="Closed_formula_n_5"
-    locfile="../euler001.mlw"
+   <goal name="Closed_formula_n_5" locfile="../euler001.mlw"
     loclnum="125" loccnumb="8" loccnume="26"
-    sum="bbce645fb3c88869122baf2e097bcf2d"
-    proved="true"
-    expanded="false"
+    sum="bbce645fb3c88869122baf2e097bcf2d" proved="true"
     shape="apV0Iainfix =amodV0c5c0ANainfix =amodV0c3c0Iapainfix -V0c1Iainfix &gt;V0c0F">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.37"/>
     </proof>
    </goal>
-   <goal
-    name="Closed_formula_n_15"
-    locfile="../euler001.mlw"
+   <goal name="Closed_formula_n_15" locfile="../euler001.mlw"
     loclnum="129" loccnumb="8" loccnume="27"
-    sum="48c2a423ea6e87929cb5ee5dc9f1a039"
-    proved="true"
-    expanded="false"
+    sum="48c2a423ea6e87929cb5ee5dc9f1a039" proved="true"
     shape="apV0Iainfix =amodV0c5c0Aainfix =amodV0c3c0Iapainfix -V0c1Iainfix &gt;V0c0F">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.30"/>
     </proof>
    </goal>
-   <goal
-    name="Closed_formula_ind"
-    locfile="../euler001.mlw"
+   <goal name="Closed_formula_ind" locfile="../euler001.mlw"
     loclnum="137" loccnumb="8" loccnume="26"
-    sum="bc6f923fa3def51a3c94714b12a727f6"
-    proved="true"
-    expanded="false"
+    sum="bc6f923fa3def51a3c94714b12a727f6" proved="true"
     shape="apV0Iainfix &lt;=c0V0F">
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="div_15"
-    locfile="../euler001.mlw"
+   <goal name="div_15" locfile="../euler001.mlw"
     loclnum="148" loccnumb="8" loccnume="14"
-    sum="283ebcba54397b4303881ba01358bb33"
-    proved="true"
-    expanded="false"
+    sum="283ebcba54397b4303881ba01358bb33" proved="true"
     shape="ainfix &gt;=adivV0c15c0Iainfix &lt;=c0V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="div_5"
-    locfile="../euler001.mlw"
+   <goal name="div_5" locfile="../euler001.mlw"
     loclnum="149" loccnumb="8" loccnume="13"
-    sum="48a31fcc19b3924661a02fb7894022a0"
-    proved="true"
-    expanded="false"
+    sum="48a31fcc19b3924661a02fb7894022a0" proved="true"
     shape="ainfix &gt;=adivV0c5c0Iainfix &lt;=c0V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="div_3"
-    locfile="../euler001.mlw"
+   <goal name="div_3" locfile="../euler001.mlw"
     loclnum="150" loccnumb="8" loccnume="13"
-    sum="2aed5f6570effde5cf940925cca959a3"
-    proved="true"
-    expanded="false"
+    sum="2aed5f6570effde5cf940925cca959a3" proved="true"
     shape="ainfix &gt;=adivV0c3c0Iainfix &lt;=c0V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="Closed_Formula"
-    locfile="../euler001.mlw"
+   <goal name="Closed_Formula" locfile="../euler001.mlw"
     loclnum="152" loccnumb="8" loccnume="22"
-    sum="7d0372d71bdf683508f8539086531ccd"
-    proved="true"
-    expanded="false"
+    sum="7d0372d71bdf683508f8539086531ccd" proved="true"
     shape="ainfix =asum_multiple_3_5_ltainfix +V0c1aclosed_formulaV0Iainfix &lt;=c0V0F">
-    <proof
-     prover="2"
-     timelimit="30"
-     memlimit="1000"
-     edited="euler001_SumMultiple_Closed_Formula_1.v"
-     obsolete="false"
-     archived="false">
+    <proof prover="2" timelimit="30" memlimit="1000"
+     edited="euler001_SumMultiple_Closed_Formula_1.v">
      <result status="valid" time="1.14"/>
     </proof>
    </goal>
   </theory>
-  <theory
-   name="Euler001"
-   locfile="../euler001.mlw"
+  <theory name="Euler001" locfile="../euler001.mlw"
    loclnum="157" loccnumb="7" loccnume="15"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter solve"
-    locfile="../euler001.mlw"
-    loclnum="163" loccnumb="6" loccnume="11"
-    expl="VC for solve"
-    sum="200296912b5b99c365d044e031f76312"
-    proved="true"
-    expanded="false"
+   verified="true">
+   <goal name="WP_parameter solve" locfile="../euler001.mlw"
+    loclnum="163" loccnumb="6" loccnume="11" expl="VC for solve"
+    sum="200296912b5b99c365d044e031f76312" proved="true"
     shape="ainfix =adivainfix -ainfix +ainfix *ainfix *c3V1ainfix +V1c1ainfix *ainfix *c5V2ainfix +V2c1ainfix *ainfix *c15V3ainfix +V3c1c2asum_multiple_3_5_ltV0Ladivainfix -V0c1c15Ladivainfix -V0c1c5Ladivainfix -V0c1c3Iainfix &gt;=V0c1F">
-    <label
-     name="expl:VC for solve"/>
-    <proof
-     prover="1"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <label name="expl:VC for solve"/>
+    <proof prover="1" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.06"/>
     </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="3" timelimit="30"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter run"
-    locfile="../euler001.mlw"
-    loclnum="176" loccnumb="6" loccnume="9"
-    expl="VC for run"
-    sum="284d1b9e6d12920da46e6f6c54a8037f"
-    proved="true"
-    expanded="false"
+   <goal name="WP_parameter run" locfile="../euler001.mlw"
+    loclnum="176" loccnumb="6" loccnume="9" expl="VC for run"
+    sum="284d1b9e6d12920da46e6f6c54a8037f" proved="true"
     shape="ainfix &gt;=c1000c1">
-    <label
-     name="expl:VC for run"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <label name="expl:VC for run"/>
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter bench"
-    locfile="../euler001.mlw"
-    loclnum="182" loccnumb="6" loccnume="11"
-    expl="VC for bench"
-    sum="5dada1ffeee7c305d1541d7f4093abcd"
-    proved="true"
-    expanded="false"
+   <goal name="WP_parameter bench" locfile="../euler001.mlw"
+    loclnum="182" loccnumb="6" loccnume="11" expl="VC for bench"
+    sum="5dada1ffeee7c305d1541d7f4093abcd" proved="true"
     shape="t">
-    <label
-     name="expl:VC for bench"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
+    <label name="expl:VC for bench"/>
+    <proof prover="0" timelimit="5"
+     memlimit="4000">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter go"
-    locfile="../euler001.mlw"
-    loclnum="193" loccnumb="6" loccnume="8"
-    expl="VC for go"
-    sum="0ac8af78cda25414bc3f614bbe49b1cf"
-    proved="true"
-    expanded="false"
+   <goal name="WP_parameter go" locfile="../euler001.mlw"
+    loclnum="193" loccnumb="6" loccnume="8" expl="VC for go"
+    sum="0ac8af78cda25414bc3f614bbe49b1cf" proved="true"
     shape="ainfix =V12ainfix +V0c1Iainfix =V15aConsareverseV11V3Aainfix =V12ainfix +V0c1Aainfix =V14aNilAainfix =V13c0FIainfix =V11aConsaPrCharamk charc32V9Aainfix =V10ainfix +V8c1FAainfix &lt;=c32c255Aainfix &lt;=c0c32Iainfix =V9aConsaPrCharamk charc58V7Aainfix =V8ainfix +V6c1FAainfix &lt;=c58c255Aainfix &lt;=c0c58Iainfix =V7aConsaPrCharamk charc79V5Aainfix =V6ainfix +V4c1FAainfix &lt;=c79c255Aainfix &lt;=c0c79Iainfix =V5aConsaPrCharamk charc71V2Aainfix =V4ainfix +V1c1FAainfix &lt;=c71c255Aainfix &lt;=c0c71F">
-    <label
-     name="expl:VC for go"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <label name="expl:VC for go"/>
+    <proof prover="0" timelimit="5"
+     memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
