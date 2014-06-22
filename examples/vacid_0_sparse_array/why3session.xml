@@ -1,246 +1,201 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.1"/>
- <prover id="1" name="Alt-Ergo" version="0.95.2"/>
- <prover id="2" name="CVC3" version="2.4.1"/>
- <prover id="3" name="Coq" version="8.4pl2"/>
- <prover id="4" name="Z3" version="3.2"/>
+ <prover id="0" name="CVC3" version="2.4.1" timelimit="17" memlimit="1000"/>
+ <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5"
+  memlimit="1000"/>
+ <prover id="2" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
+ <prover id="3" name="Z3" version="3.2" timelimit="17" memlimit="1000"/>
+ <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5"
+  memlimit="4000"/>
  <file name="../vacid_0_sparse_array.mlw" verified="true"
   expanded="true">
-  <theory name="SparseArray" locfile="../vacid_0_sparse_array.mlw"
-   loclnum="1" loccnumb="7" loccnume="18" verified="true"
+  <theory name="SparseArray" verified="true"
    expanded="true">
-   <goal name="WP_parameter create" locfile="../vacid_0_sparse_array.mlw"
-    loclnum="56" loccnumb="6" loccnume="12" expl="VC for create"
+   <goal name="WP_parameter create" expl="VC for create"
     sum="eabdca7c1c97fb9c3b9df09173cf0c70" proved="true"
     shape="ainfix =V5V0Aainfix =agetV4agetV2V6V6Aainfix &lt;agetV2V6V5Aainfix &lt;=c0agetV2V6Iainfix &lt;V6c0Aainfix &lt;=c0V6FAainfix =V3V1Aainfix =V5V3Aainfix &lt;=V5amaxlenAainfix &lt;=c0V5Aainfix &lt;=c0c0Iainfix =V5V0Aainfix &lt;=c0V5FIainfix =V3V0Aainfix &lt;=c0V3FIainfix =V1V0Aainfix &lt;=c0V1FIainfix &lt;=V0amaxlenAainfix &lt;=c0V0F">
     <label name="expl:VC for create"/>
-    <proof prover="0" timelimit="5"
-     memlimit="1000">
+    <proof prover="1">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="WP_parameter test" locfile="../vacid_0_sparse_array.mlw"
-    loclnum="67" loccnumb="6" loccnume="10" expl="VC for test"
+   <goal name="WP_parameter test" expl="VC for test"
     sum="febcb45642026d2ff914cadc9496aa22" proved="true"
     shape="iNais_eltV9V8ais_eltV9V8qainfix =agetV5V11V8Aainfix &lt;V11V4Aainfix &lt;=c0V11LagetV3V8Aainfix &lt;V8V2Aainfix &lt;=c0V8ainfix &lt;V10V6Aainfix &lt;=c0V10LagetV3V8Aainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V12V12Aainfix &lt;agetV5V12V0Aainfix &lt;=c0agetV5V12Iainfix &lt;V12V6Aainfix &lt;=c0V12FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
     <label name="expl:VC for test"/>
-    <proof prover="0" timelimit="5"
-     memlimit="1000">
+    <proof prover="1">
      <result status="valid" time="0.18"/>
     </proof>
    </goal>
-   <goal name="WP_parameter get" locfile="../vacid_0_sparse_array.mlw"
-    loclnum="72" loccnumb="6" loccnume="9" expl="VC for get"
+   <goal name="WP_parameter get" expl="VC for get"
     sum="c1df67abcbc6f1c85d420fa9cae728bf" proved="true"
     shape="iainfix =V7avalueV9V8ainfix =agetV1V8avalueV9V8Aainfix &lt;V8V0Aainfix &lt;=c0V8ainfix =V10aTrueIais_eltV9V8qainfix =V10aTrueFAainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V11V11Aainfix &lt;agetV5V11V0Aainfix &lt;=c0agetV5V11Iainfix &lt;V11V6Aainfix &lt;=c0V11FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
     <label name="expl:VC for get"/>
-    <proof prover="0" timelimit="5"
-     memlimit="1000">
+    <proof prover="1">
      <result status="valid" time="0.07"/>
     </proof>
    </goal>
-   <goal name="permutation" locfile="../vacid_0_sparse_array.mlw"
-    loclnum="84" loccnumb="8" loccnume="19"
-    sum="750f2fe99e6aaeb6bb246c90d95fb9f1" proved="true" expanded="true"
+   <goal name="permutation" sum="750f2fe99e6aaeb6bb246c90d95fb9f1"
+    proved="true" expanded="true"
     shape="ais_eltV0V1Iainfix &lt;V1alengthV0Aainfix &lt;=c0V1FIainfix =acardV0alengthV0Iainfix =amixfix []aindexV0amixfix []abackV0V2V2Aainfix &lt;amixfix []abackV0V2alengthavaluesV0Aainfix &lt;=c0amixfix []abackV0V2Iainfix &lt;V2acardV0Aainfix &lt;=c0V2FAainfix =alengthaindexV0alengthabackV0Aainfix =alengthavaluesV0alengthaindexV0Aainfix &lt;=alengthavaluesV0amaxlenAainfix &lt;=acardV0alengthavaluesV0Aainfix &lt;=c0acardV0F">
-    <proof prover="3" timelimit="5" memlimit="1000"
+    <proof prover="2"
      edited="vacid_0_sparse_array_2_SparseArray_permutation_1.v">
      <result status="valid" time="38.96"/>
     </proof>
    </goal>
-   <goal name="WP_parameter set" locfile="../vacid_0_sparse_array.mlw"
-    loclnum="96" loccnumb="6" loccnume="9" expl="VC for set"
+   <goal name="WP_parameter set" expl="VC for set"
     sum="676ab3d0c8ee2f67cf01bc8c04bdee98" proved="true" expanded="true"
     shape="iainfix =avalueV12V14avalueV10V14INainfix =V14V8FAainfix =avalueV12V8V9ainfix =avalueV18V19avalueV10V19INainfix =V19V8FAainfix =avalueV18V8V9Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix =agetV15agetV16V20V20Aainfix &lt;agetV16V20V0Aainfix &lt;=c0agetV16V20Iainfix &lt;V20V17Aainfix &lt;=c0V20FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V17V0Aainfix &lt;=c0V17Iainfix =V17ainfix +V6c1Lamk sparse_arrayamk arrayV0V11amk arrayV2V15amk arrayV4V16V17V7FIainfix =V16asetV5V6V8Aainfix &lt;=c0V4FAainfix &lt;V6V4Aainfix &lt;=c0V6Iainfix =V15asetV3V8V6Aainfix &lt;=c0V2FAainfix &lt;V8V2Aainfix &lt;=c0V8Aainfix &lt;V6V0Nainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFAainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V21V21Aainfix &lt;agetV5V21V0Aainfix &lt;=c0agetV5V21Iainfix &lt;V21V6Aainfix &lt;=c0V21FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FAainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V22V22Aainfix &lt;agetV5V22V0Aainfix &lt;=c0agetV5V22Iainfix &lt;V22V6Aainfix &lt;=c0V22FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
     <label name="expl:VC for set"/>
     <transf name="split_goal" proved="true"
      expanded="true">
-     <goal name="WP_parameter set.1" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="1. index in array bounds"
+     <goal name="WP_parameter set.1" expl="1. index in array bounds"
       sum="212510d32240c112d14f5b78bd9b301d" proved="true"
       shape="index in array boundsainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V11V11Aainfix &lt;agetV5V11V0Aainfix &lt;=c0agetV5V11Iainfix &lt;V11V6Aainfix &lt;=c0V11FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="17"
-       memlimit="1000">
+      <proof prover="1" timelimit="17">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.2" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="2. type invariant"
+     <goal name="WP_parameter set.2" expl="2. type invariant"
       sum="18266ad08546177c1d990dfaec370aef" proved="true"
       shape="type invariantainfix =agetV3agetV5V13V13Aainfix &lt;agetV5V13V0Aainfix &lt;=c0agetV5V13Iainfix &lt;V13V6Aainfix &lt;=c0V13FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V14V14Aainfix &lt;agetV5V14V0Aainfix &lt;=c0agetV5V14Iainfix &lt;V14V6Aainfix &lt;=c0V14FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.3" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="3. type invariant"
+     <goal name="WP_parameter set.3" expl="3. type invariant"
       sum="82ffe2b5b131a7b5db0d493de70641d0" proved="true"
       shape="type invariantainfix &lt;=c0V0Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V13V13Aainfix &lt;agetV5V13V0Aainfix &lt;=c0agetV5V13Iainfix &lt;V13V6Aainfix &lt;=c0V13FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.4" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="4. precondition"
+     <goal name="WP_parameter set.4" expl="4. precondition"
       sum="9eb76665734bbadc8056b138991f5306" proved="true"
       shape="preconditionainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;=c0V0Aainfix =agetV3agetV5V13V13Aainfix &lt;agetV5V13V0Aainfix &lt;=c0agetV5V13Iainfix &lt;V13V6Aainfix &lt;=c0V13FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V14V14Aainfix &lt;agetV5V14V0Aainfix &lt;=c0agetV5V14Iainfix &lt;V14V6Aainfix &lt;=c0V14FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.5" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="5. assertion"
+     <goal name="WP_parameter set.5" expl="5. assertion"
       sum="d6a9a46d93aca89e41d3d7750001c6fe" proved="true"
       shape="assertionainfix &lt;V6V0INainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V14V14Aainfix &lt;agetV5V14V0Aainfix &lt;=c0agetV5V14Iainfix &lt;V14V6Aainfix &lt;=c0V14FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V15V15Aainfix &lt;agetV5V15V0Aainfix &lt;=c0agetV5V15Iainfix &lt;V15V6Aainfix &lt;=c0V15FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
-       <result status="unknown" time="0.52"/>
-      </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="0" timelimit="5">
        <result status="valid" time="0.09"/>
       </proof>
-      <proof prover="4" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
+       <result status="unknown" time="0.52"/>
+      </proof>
+      <proof prover="3" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.6" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="6. index in array bounds"
+     <goal name="WP_parameter set.6" expl="6. index in array bounds"
       sum="742a68b20063bbf7f4c58b5febab7a8c" proved="true"
       shape="index in array boundsainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;V6V0INainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V14V14Aainfix &lt;agetV5V14V0Aainfix &lt;=c0agetV5V14Iainfix &lt;V14V6Aainfix &lt;=c0V14FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V15V15Aainfix &lt;agetV5V15V0Aainfix &lt;=c0agetV5V15Iainfix &lt;V15V6Aainfix &lt;=c0V15FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.7" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="7. index in array bounds"
+     <goal name="WP_parameter set.7" expl="7. index in array bounds"
       sum="10af0647641b1983dda17c2427bcfe82" proved="true"
       shape="index in array boundsainfix &lt;V6V4Aainfix &lt;=c0V6Iainfix =V14asetV3V8V6Aainfix &lt;=c0V2FIainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;V6V0INainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V15V15Aainfix &lt;agetV5V15V0Aainfix &lt;=c0agetV5V15Iainfix &lt;V15V6Aainfix &lt;=c0V15FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V16V16Aainfix &lt;agetV5V16V0Aainfix &lt;=c0agetV5V16Iainfix &lt;V16V6Aainfix &lt;=c0V16FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.8" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="8. type invariant"
+     <goal name="WP_parameter set.8" expl="8. type invariant"
       sum="b204f063242400571628175553a971d6" proved="true"
       shape="type invariantainfix =agetV14agetV15V18V18Aainfix &lt;agetV15V18V0Aainfix &lt;=c0agetV15V18Iainfix &lt;V18V16Aainfix &lt;=c0V18FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V16V0Aainfix &lt;=c0V16Iainfix =V16ainfix +V6c1Lamk sparse_arrayamk arrayV0V11amk arrayV2V14amk arrayV4V15V16V7FIainfix =V15asetV5V6V8Aainfix &lt;=c0V4FIainfix &lt;V6V4Aainfix &lt;=c0V6Iainfix =V14asetV3V8V6Aainfix &lt;=c0V2FIainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;V6V0INainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V19V19Aainfix &lt;agetV5V19V0Aainfix &lt;=c0agetV5V19Iainfix &lt;V19V6Aainfix &lt;=c0V19FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V20V20Aainfix &lt;agetV5V20V0Aainfix &lt;=c0agetV5V20Iainfix &lt;V20V6Aainfix &lt;=c0V20FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="2" timelimit="17"
-       memlimit="1000">
+      <proof prover="0">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="4" timelimit="17"
-       memlimit="1000">
+      <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.9" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="9. type invariant"
+     <goal name="WP_parameter set.9" expl="9. type invariant"
       sum="8f765b8b8fab05b7ba7912e7a43fa0c6" proved="true"
       shape="type invariantainfix &lt;=c0V2Iainfix =V16ainfix +V6c1Lamk sparse_arrayamk arrayV0V11amk arrayV2V14amk arrayV4V15V16V7FIainfix =V15asetV5V6V8Aainfix &lt;=c0V4FIainfix &lt;V6V4Aainfix &lt;=c0V6Iainfix =V14asetV3V8V6Aainfix &lt;=c0V2FIainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;V6V0INainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V18V18Aainfix &lt;agetV5V18V0Aainfix &lt;=c0agetV5V18Iainfix &lt;V18V6Aainfix &lt;=c0V18FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V19V19Aainfix &lt;agetV5V19V0Aainfix &lt;=c0agetV5V19Iainfix &lt;V19V6Aainfix &lt;=c0V19FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.10" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="10. type invariant"
+     <goal name="WP_parameter set.10" expl="10. type invariant"
       sum="43ae01325ca15a2e02495a9df8eb2773" proved="true"
       shape="type invariantainfix &lt;=c0V4Iainfix =V16ainfix +V6c1Lamk sparse_arrayamk arrayV0V11amk arrayV2V14amk arrayV4V15V16V7FIainfix =V15asetV5V6V8Aainfix &lt;=c0V4FIainfix &lt;V6V4Aainfix &lt;=c0V6Iainfix =V14asetV3V8V6Aainfix &lt;=c0V2FIainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;V6V0INainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V18V18Aainfix &lt;agetV5V18V0Aainfix &lt;=c0agetV5V18Iainfix &lt;V18V6Aainfix &lt;=c0V18FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V19V19Aainfix &lt;agetV5V19V0Aainfix &lt;=c0agetV5V19Iainfix &lt;V19V6Aainfix &lt;=c0V19FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter set.11" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="11. postcondition"
+     <goal name="WP_parameter set.11" expl="11. postcondition"
       sum="f3b188b7c3875faebbd01bbd2eb64f80" proved="true"
       shape="postconditionainfix =avalueV17V18avalueV10V18INainfix =V18V8FAainfix =avalueV17V8V9Iainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix =agetV14agetV15V19V19Aainfix &lt;agetV15V19V0Aainfix &lt;=c0agetV15V19Iainfix &lt;V19V16Aainfix &lt;=c0V19FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V16V0Aainfix &lt;=c0V16Iainfix =V16ainfix +V6c1Lamk sparse_arrayamk arrayV0V11amk arrayV2V14amk arrayV4V15V16V7FIainfix =V15asetV5V6V8Aainfix &lt;=c0V4FIainfix &lt;V6V4Aainfix &lt;=c0V6Iainfix =V14asetV3V8V6Aainfix &lt;=c0V2FIainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;V6V0INainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V20V20Aainfix &lt;agetV5V20V0Aainfix &lt;=c0agetV5V20Iainfix &lt;V20V6Aainfix &lt;=c0V20FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V21V21Aainfix &lt;agetV5V21V0Aainfix &lt;=c0agetV5V21Iainfix &lt;V21V6Aainfix &lt;=c0V21FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
       <transf name="split_goal_wp"
        proved="true">
-       <goal name="WP_parameter set.11.1"
-        locfile="../vacid_0_sparse_array.mlw"
-        loclnum="96" loccnumb="6" loccnume="9" expl="1."
+       <goal name="WP_parameter set.11.1" expl="1."
         sum="eb9767916e836cfeb7926bda4d93edf3" proved="true"
         shape="ainfix =avalueV17V8V9Iainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix =agetV14agetV15V18V18Aainfix &lt;agetV15V18V0Aainfix &lt;=c0agetV15V18Iainfix &lt;V18V16Aainfix &lt;=c0V18FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V16V0Aainfix &lt;=c0V16Iainfix =V16ainfix +V6c1Lamk sparse_arrayamk arrayV0V11amk arrayV2V14amk arrayV4V15V16V7FIainfix =V15asetV5V6V8Aainfix &lt;=c0V4FIainfix &lt;V6V4Aainfix &lt;=c0V6Iainfix =V14asetV3V8V6Aainfix &lt;=c0V2FIainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;V6V0INainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V19V19Aainfix &lt;agetV5V19V0Aainfix &lt;=c0agetV5V19Iainfix &lt;V19V6Aainfix &lt;=c0V19FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V20V20Aainfix &lt;agetV5V20V0Aainfix &lt;=c0agetV5V20Iainfix &lt;V20V6Aainfix &lt;=c0V20FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
         <label name="expl:VC for set"/>
-        <proof prover="0" timelimit="17"
-         memlimit="1000">
+        <proof prover="1" timelimit="17">
          <result status="valid" time="0.10"/>
         </proof>
        </goal>
-       <goal name="WP_parameter set.11.2"
-        locfile="../vacid_0_sparse_array.mlw"
-        loclnum="96" loccnumb="6" loccnume="9" expl="2."
+       <goal name="WP_parameter set.11.2" expl="2."
         sum="02c023e8f099b19b8e2aee7ac60f87bb" proved="true"
         shape="ainfix =avalueV17V18avalueV10V18INainfix =V18V8FIainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix =agetV14agetV15V19V19Aainfix &lt;agetV15V19V0Aainfix &lt;=c0agetV15V19Iainfix &lt;V19V16Aainfix &lt;=c0V19FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V16V0Aainfix &lt;=c0V16Iainfix =V16ainfix +V6c1Lamk sparse_arrayamk arrayV0V11amk arrayV2V14amk arrayV4V15V16V7FIainfix =V15asetV5V6V8Aainfix &lt;=c0V4FIainfix &lt;V6V4Aainfix &lt;=c0V6Iainfix =V14asetV3V8V6Aainfix &lt;=c0V2FIainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;V6V0INainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V20V20Aainfix &lt;agetV5V20V0Aainfix &lt;=c0agetV5V20Iainfix &lt;V20V6Aainfix &lt;=c0V20FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V21V21Aainfix &lt;agetV5V21V0Aainfix &lt;=c0agetV5V21Iainfix &lt;V21V6Aainfix &lt;=c0V21FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
         <label name="expl:VC for set"/>
-        <proof prover="0" timelimit="17"
-         memlimit="1000">
-         <result status="unknown" time="1.17"/>
-        </proof>
-        <proof prover="2" timelimit="17"
-         memlimit="1000">
+        <proof prover="0">
          <result status="valid" time="0.74"/>
         </proof>
-        <proof prover="4" timelimit="17"
-         memlimit="1000">
+        <proof prover="1" timelimit="17">
+         <result status="unknown" time="1.17"/>
+        </proof>
+        <proof prover="3">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter set.12" locfile="../vacid_0_sparse_array.mlw"
-      loclnum="96" loccnumb="6" loccnume="9" expl="12. postcondition"
+     <goal name="WP_parameter set.12" expl="12. postcondition"
       sum="62c46a7986217221eb654acd606703fd" proved="true"
       shape="postconditionainfix =avalueV12V14avalueV10V14INainfix =V14V8FAainfix =avalueV12V8V9INNainfix =V13aTrueIais_eltV12V8qainfix =V13aTrueFIainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V0Aainfix =agetV3agetV5V15V15Aainfix &lt;agetV5V15V0Aainfix &lt;=c0agetV5V15Iainfix &lt;V15V6Aainfix &lt;=c0V15FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Iainfix =V11asetV1V8V9Aainfix &lt;=c0V0Lamk sparse_arrayamk arrayV0V11amk arrayV2V3amk arrayV4V5V6V7FIainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V16V16Aainfix &lt;agetV5V16V0Aainfix &lt;=c0agetV5V16Iainfix &lt;V16V6Aainfix &lt;=c0V16FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7F">
       <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.17"/>
       </proof>
      </goal>
     </transf>
    </goal>
   </theory>
-  <theory name="Harness" locfile="../vacid_0_sparse_array.mlw"
-   loclnum="110" loccnumb="7" loccnume="14" verified="true"
+  <theory name="Harness" verified="true"
    expanded="true">
-   <goal name="WP_parameter harness" locfile="../vacid_0_sparse_array.mlw"
-    loclnum="120" loccnumb="6" loccnume="13" expl="VC for harness"
+   <goal name="WP_parameter harness" expl="VC for harness"
     sum="93b95e7f39038f7050d0c8cc0aea6dd8" proved="true"
     shape="ainfix =avalueV27c0adefaultAainfix &lt;c0V9Aainfix &lt;=c0c0Aainfix =avalueV22c0adefaultAainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix =avalueV27c5adefaultAainfix &lt;c5V9Aainfix &lt;=c0c5Aainfix =avalueV22c7adefaultAainfix &lt;c7V0Aainfix &lt;=c0c7Aainfix =avalueV27c7ac2Aainfix &lt;c7V9Aainfix &lt;=c0c7Aainfix =avalueV22c5ac1Aainfix &lt;c5V0Aainfix &lt;=c0c5Iainfix =avalueV27V28avalueV17V28INainfix =V28c7FAainfix =avalueV27c7ac2Aainfix &lt;=c0V13Aainfix &lt;=c0V11Aainfix &lt;=c0V9Aainfix =agetV25agetV24V29V29Aainfix &lt;agetV24V29V9Aainfix &lt;=c0agetV24V29Iainfix &lt;V29V23Aainfix &lt;=c0V29FAainfix =V11V13Aainfix =V9V11Aainfix &lt;=V9amaxlenAainfix &lt;=V23V9Aainfix &lt;=c0V23Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16FAainfix &lt;c7V9Aainfix &lt;=c0c7Iainfix =avalueV22V30avalueV8V30INainfix =V30c5FAainfix =avalueV22c5ac1Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV20agetV19V31V31Aainfix &lt;agetV19V31V0Aainfix &lt;=c0agetV19V31Iainfix &lt;V31V18Aainfix &lt;=c0V31FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V18V0Aainfix &lt;=c0V18Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7FAainfix &lt;c5V0Aainfix &lt;=c0c5Aainfix =avalueV17c7adefaultAainfix &lt;c7V9Aainfix &lt;=c0c7Aainfix =avalueV8c5adefaultAainfix &lt;c5V0Aainfix &lt;=c0c5Iainfix =V9c20Aainfix =V16adefaultAainfix =V15c0Aainfix &lt;=c0V13Aainfix &lt;=c0V11Aainfix &lt;=c0V9Aainfix =agetV12agetV14V32V32Aainfix &lt;agetV14V32V9Aainfix &lt;=c0agetV14V32Iainfix &lt;V32V15Aainfix &lt;=c0V32FAainfix =V11V13Aainfix =V9V11Aainfix &lt;=V9amaxlenAainfix &lt;=V15V9Aainfix &lt;=c0V15Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16FAainfix &lt;=c20amaxlenAainfix &lt;=c0c20Iainfix =V0c10Aainfix =V7adefaultAainfix =V6c0Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V33V33Aainfix &lt;agetV5V33V0Aainfix &lt;=c0agetV5V33Iainfix &lt;V33V6Aainfix &lt;=c0V33FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7FAainfix &lt;=c10amaxlenAainfix &lt;=c0c10">
     <label name="expl:VC for harness"/>
-    <proof prover="0" timelimit="5"
-     memlimit="1000">
+    <proof prover="1">
      <result status="valid" time="1.85"/>
     </proof>
    </goal>
-   <goal name="WP_parameter bench" locfile="../vacid_0_sparse_array.mlw"
-    loclnum="137" loccnumb="6" loccnume="11" expl="VC for bench"
+   <goal name="WP_parameter bench" expl="VC for bench"
     sum="8b6e6481a22063878fb808eeea92138d" proved="true"
     shape="ainfix &lt;c0V9Aainfix &lt;=c0c0Iainfix =avalueV22c0adefaultAainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix =avalueV27c5adefaultAainfix &lt;c5V9Aainfix &lt;=c0c5Iainfix =avalueV22c7adefaultAainfix &lt;c7V0Aainfix &lt;=c0c7Iainfix =avalueV27c7ac2Aainfix &lt;c7V9Aainfix &lt;=c0c7Iainfix =avalueV22c5ac1Aainfix &lt;c5V0Aainfix &lt;=c0c5Iainfix =avalueV27V28avalueV17V28INainfix =V28c7FAainfix =avalueV27c7ac2Aainfix &lt;=c0V13Aainfix &lt;=c0V11Aainfix &lt;=c0V9Aainfix =agetV25agetV24V29V29Aainfix &lt;agetV24V29V9Aainfix &lt;=c0agetV24V29Iainfix &lt;V29V23Aainfix &lt;=c0V29FAainfix =V11V13Aainfix =V9V11Aainfix &lt;=V9amaxlenAainfix &lt;=V23V9Aainfix &lt;=c0V23Lamk sparse_arrayamk arrayV9V26amk arrayV11V25amk arrayV13V24V23V16FAainfix &lt;c7V9Aainfix &lt;=c0c7Iainfix =avalueV22V30avalueV8V30INainfix =V30c5FAainfix =avalueV22c5ac1Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV20agetV19V31V31Aainfix &lt;agetV19V31V0Aainfix &lt;=c0agetV19V31Iainfix &lt;V31V18Aainfix &lt;=c0V31FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V18V0Aainfix &lt;=c0V18Lamk sparse_arrayamk arrayV0V21amk arrayV2V20amk arrayV4V19V18V7FAainfix &lt;c5V0Aainfix &lt;=c0c5Iainfix =avalueV17c7adefaultAainfix &lt;c7V9Aainfix &lt;=c0c7Iainfix =avalueV8c5adefaultAainfix &lt;c5V0Aainfix &lt;=c0c5Iainfix =V9c20Aainfix =V16adefaultAainfix =V15c0Aainfix &lt;=c0V13Aainfix &lt;=c0V11Aainfix &lt;=c0V9Aainfix =agetV12agetV14V32V32Aainfix &lt;agetV14V32V9Aainfix &lt;=c0agetV14V32Iainfix &lt;V32V15Aainfix &lt;=c0V32FAainfix =V11V13Aainfix =V9V11Aainfix &lt;=V9amaxlenAainfix &lt;=V15V9Aainfix &lt;=c0V15Lamk sparse_arrayamk arrayV9V10amk arrayV11V12amk arrayV13V14V15V16FAainfix &lt;=c20amaxlenAainfix &lt;=c0c20Iainfix =V0c10Aainfix =V7adefaultAainfix =V6c0Aainfix &lt;=c0V4Aainfix &lt;=c0V2Aainfix &lt;=c0V0Aainfix =agetV3agetV5V33V33Aainfix &lt;agetV5V33V0Aainfix &lt;=c0agetV5V33Iainfix &lt;V33V6Aainfix &lt;=c0V33FAainfix =V2V4Aainfix =V0V2Aainfix &lt;=V0amaxlenAainfix &lt;=V6V0Aainfix &lt;=c0V6Lamk sparse_arrayamk arrayV0V1amk arrayV2V3amk arrayV4V5V6V7FAainfix &lt;=c10amaxlenAainfix &lt;=c0c10">
     <label name="expl:VC for bench"/>
-    <proof prover="1" timelimit="5"
-     memlimit="4000">
+    <proof prover="4">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
