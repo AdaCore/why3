@@ -1,661 +1,512 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.1"/>
- <prover id="1" name="CVC3" version="2.2"/>
- <prover id="2" name="CVC3" version="2.4.1"/>
- <prover id="3" name="CVC4" version="1.2"/>
- <prover id="4" name="Coq" version="8.4pl2"/>
- <prover id="5" name="Z3" version="2.19"/>
- <prover id="6" name="Z3" version="3.2"/>
- <prover id="7" name="Z3" version="4.3.1"/>
+ <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
+ <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+ <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5"
+  memlimit="1000"/>
+ <prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
+ <prover id="4" name="CVC3" version="2.2" timelimit="10" memlimit="0"/>
+ <prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+ <prover id="6" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
+ <prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
  <file name="../decrease1.mlw" verified="true"
   expanded="true">
-  <theory name="Decrease1" locfile="../decrease1.mlw"
-   loclnum="8" loccnumb="7" loccnume="16" verified="true"
+  <theory name="Decrease1" verified="true"
    expanded="true">
-   <goal name="decrease1_induction" locfile="../decrease1.mlw"
-    loclnum="17" loccnumb="8" loccnume="27"
-    sum="961c136b53e2b0a5600f4c2e4dcb2cab" proved="true" expanded="true"
+   <goal name="decrease1_induction" sum="961c136b53e2b0a5600f4c2e4dcb2cab"
+    proved="true" expanded="true"
     shape="ainfix &gt;=amixfix []V0V2ainfix -ainfix +amixfix []V0V1V1V2Iainfix &lt;V2alengthV0Aainfix &lt;=V1V2Aainfix &lt;=c0V1FIadecrease1V0F">
-    <proof prover="4" timelimit="10" memlimit="0"
+    <proof prover="6"
      edited="decrease1_Decrease1_decrease1_induction_2.v">
      <result status="valid" time="1.10"/>
     </proof>
    </goal>
-   <goal name="WP_parameter search" locfile="../decrease1.mlw"
-    loclnum="23" loccnumb="6" loccnume="12" expl="VC for search"
+   <goal name="WP_parameter search" expl="VC for search"
     sum="3cfdff5a028701e3677754d2a68050f3" proved="true" expanded="true"
     shape="iNainfix =agetV1V4c0Iainfix &lt;V4V3Aainfix &lt;=c0V4FAainfix =agetV1V3c0Aainfix &lt;V3V0Aainfix &lt;=c0V3ONainfix =agetV1V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5FAainfix =V3aprefix -c1Laprefix -c1iiainfix &lt;ainfix -V0V6ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2ANainfix =agetV1V7c0Iainfix &lt;V7V0Iainfix &lt;V7V6Aainfix &lt;=c0V7FAainfix &lt;=c0V6Iainfix =V6ainfix +V2c1Fainfix &lt;ainfix -V0V8ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2ANainfix =agetV1V9c0Iainfix &lt;V9V0Iainfix &lt;V9V8Aainfix &lt;=c0V9FAainfix &lt;=c0V8Iainfix =V8ainfix +V2agetV1V2FAainfix &lt;V2V0Aainfix &lt;=c0V2ainfix &gt;agetV1V2c0Aainfix &lt;V2V0Aainfix &lt;=c0V2Nainfix =agetV1V10c0Iainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =agetV1V2c0Aainfix &lt;V2V0Aainfix &lt;=c0V2ONainfix =agetV1V11c0Iainfix &lt;V11V0Aainfix &lt;=c0V11FAainfix =V2aprefix -c1ainfix =agetV1V2c0Aainfix &lt;V2V0Aainfix &lt;=c0V2ainfix &lt;V2V0INainfix =agetV1V12c0Iainfix &lt;V12V0Iainfix &lt;V12V2Aainfix &lt;=c0V12FAainfix &lt;=c0V2FANainfix =agetV1V13c0Iainfix &lt;V13V0Iainfix &lt;V13c0Aainfix &lt;=c0V13FAainfix &lt;=c0c0Iadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
     <label name="expl:VC for search"/>
     <transf name="split_goal" proved="true"
      expanded="true">
-     <goal name="WP_parameter search.1" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12" expl="1. loop invariant init"
+     <goal name="WP_parameter search.1" expl="1. loop invariant init"
       sum="a55c66dd7cc2165e28cab99f05113695" proved="true" expanded="true"
       shape="loop invariant initainfix &lt;=c0c0Iadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search.2" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12" expl="2. loop invariant init"
+     <goal name="WP_parameter search.2" expl="2. loop invariant init"
       sum="44108b68db1c73d2c4c5ece30a7f6848" proved="true" expanded="true"
       shape="loop invariant initNainfix =agetV1V2c0Iainfix &lt;V2V0Iainfix &lt;V2c0Aainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="3">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search.3" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12" expl="3. index in array bounds"
+     <goal name="WP_parameter search.3" expl="3. index in array bounds"
       sum="5be4f05f69e28e31b09f0fc7a7e70d66" proved="true" expanded="true"
       shape="index in array boundsainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V3c0Iainfix &lt;V3V0Iainfix &lt;V3V2Aainfix &lt;=c0V3FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.02"/>
+      <proof prover="3">
+       <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="4">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
+      <proof prover="7">
+       <result status="valid" time="0.02"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter search.4" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12" expl="4. postcondition"
+     <goal name="WP_parameter search.4" expl="4. postcondition"
       sum="83fb688825d6f070c169bfe1c3d2c2e4" proved="true" expanded="true"
       shape="postconditionNainfix =agetV1V3c0Iainfix &lt;V3V2Aainfix &lt;=c0V3FAainfix =agetV1V2c0Aainfix &lt;V2V0Aainfix &lt;=c0V2ONainfix =agetV1V4c0Iainfix &lt;V4V0Aainfix &lt;=c0V4FAainfix =V2aprefix -c1Iainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V5c0Iainfix &lt;V5V0Iainfix &lt;V5V2Aainfix &lt;=c0V5FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="3">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="4">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search.5" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12" expl="5. index in array bounds"
+     <goal name="WP_parameter search.5" expl="5. index in array bounds"
       sum="a9b4dd17cdf827653126b1331a6bb5c7" proved="true" expanded="true"
       shape="index in array boundsainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V3c0Iainfix &lt;V3V0Iainfix &lt;V3V2Aainfix &lt;=c0V3FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="4">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="5">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search.6" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12" expl="6. index in array bounds"
+     <goal name="WP_parameter search.6" expl="6. index in array bounds"
       sum="ede02cbcaf258afe0e96c192159482be" proved="true" expanded="true"
       shape="index in array boundsainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V3c0Iainfix &lt;V3V0Iainfix &lt;V3V2Aainfix &lt;=c0V3FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="4">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="5">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search.7" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12"
-      expl="7. loop invariant preservation"
+     <goal name="WP_parameter search.7" expl="7. loop invariant preservation"
       sum="6d209c7c20f90367bb106e21200be5e1" proved="true" expanded="true"
       shape="loop invariant preservationainfix &lt;=c0V3Iainfix =V3ainfix +V2agetV1V2FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V4c0Iainfix &lt;V4V0Iainfix &lt;V4V2Aainfix &lt;=c0V4FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
+      <proof prover="7">
+       <result status="valid" time="0.02"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter search.8" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12"
-      expl="8. loop invariant preservation"
+     <goal name="WP_parameter search.8" expl="8. loop invariant preservation"
       sum="ce98ddee293983167dd02e56d611b8cc" proved="true" expanded="true"
       shape="loop invariant preservationNainfix =agetV1V4c0Iainfix &lt;V4V0Iainfix &lt;V4V3Aainfix &lt;=c0V4FIainfix =V3ainfix +V2agetV1V2FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V5c0Iainfix &lt;V5V0Iainfix &lt;V5V2Aainfix &lt;=c0V5FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.09"/>
-      </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.00"/>
       </proof>
+      <proof prover="7">
+       <result status="valid" time="0.09"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter search.9" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12" expl="9. loop variant decrease"
+     <goal name="WP_parameter search.9" expl="9. loop variant decrease"
       sum="f0c5c56af604a78ffa7a177bd6b10c73" proved="true" expanded="true"
       shape="loop variant decreaseainfix &lt;ainfix -V0V3ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2Iainfix =V3ainfix +V2agetV1V2FIainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V4c0Iainfix &lt;V4V0Iainfix &lt;V4V2Aainfix &lt;=c0V4FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search.10" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12"
+     <goal name="WP_parameter search.10"
       expl="10. loop invariant preservation"
       sum="ea1686d8f67e63cc91f80a9140a15561" proved="true" expanded="true"
       shape="loop invariant preservationainfix &lt;=c0V3Iainfix =V3ainfix +V2c1FINainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V4c0Iainfix &lt;V4V0Iainfix &lt;V4V2Aainfix &lt;=c0V4FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="2">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search.11" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12"
+     <goal name="WP_parameter search.11"
       expl="11. loop invariant preservation"
       sum="79a0f764a7967a065156284a5e8f67a3" proved="true" expanded="true"
       shape="loop invariant preservationNainfix =agetV1V4c0Iainfix &lt;V4V0Iainfix &lt;V4V3Aainfix &lt;=c0V4FIainfix =V3ainfix +V2c1FINainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V5c0Iainfix &lt;V5V0Iainfix &lt;V5V2Aainfix &lt;=c0V5FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search.12" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12"
-      expl="12. loop variant decrease" sum="0a1c9e1b3f2c6528ce077b9075b1b0e6"
-      proved="true" expanded="true"
+     <goal name="WP_parameter search.12" expl="12. loop variant decrease"
+      sum="0a1c9e1b3f2c6528ce077b9075b1b0e6" proved="true" expanded="true"
       shape="loop variant decreaseainfix &lt;ainfix -V0V3ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2Iainfix =V3ainfix +V2c1FINainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0INainfix =agetV1V4c0Iainfix &lt;V4V0Iainfix &lt;V4V2Aainfix &lt;=c0V4FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.02"/>
+      <proof prover="4">
+       <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
+      <proof prover="7">
+       <result status="valid" time="0.02"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter search.13" locfile="../decrease1.mlw"
-      loclnum="23" loccnumb="6" loccnume="12" expl="13. postcondition"
+     <goal name="WP_parameter search.13" expl="13. postcondition"
       sum="7a29f317b79c12123764b2483040d8c6" proved="true" expanded="true"
       shape="postconditionNainfix =agetV1V4c0Iainfix &lt;V4V3Aainfix &lt;=c0V4FAainfix =agetV1V3c0Aainfix &lt;V3V0Aainfix &lt;=c0V3ONainfix =agetV1V5c0Iainfix &lt;V5V0Aainfix &lt;=c0V5FAainfix =V3aprefix -c1Laprefix -c1INainfix &lt;V2V0INainfix =agetV1V6c0Iainfix &lt;V6V0Iainfix &lt;V6V2Aainfix &lt;=c0V6FAainfix &lt;=c0V2FIadecrease1amk arrayV0V1Aainfix &lt;=c0V0F">
       <label name="expl:VC for search"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="4">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter search_rec" locfile="../decrease1.mlw"
-    loclnum="43" loccnumb="10" loccnume="20" expl="VC for search_rec"
+   <goal name="WP_parameter search_rec" expl="VC for search_rec"
     sum="e363c0e86a1e6edbbb7a1ac98d5aac66" proved="true" expanded="true"
     shape="iNainfix =agetV1V5c0Iainfix &lt;V5V4Aainfix &lt;=V2V5FAainfix =agetV1V4c0Aainfix &lt;V4V0Aainfix &lt;=V2V4ONainfix =agetV1V6c0Iainfix &lt;V6V0Aainfix &lt;=V2V6FAainfix =V4aprefix -c1Laprefix -c1iiNainfix =agetV1V9c0Iainfix &lt;V9V8Aainfix &lt;=V2V9FAainfix =agetV1V8c0Aainfix &lt;V8V0Aainfix &lt;=V2V8ONainfix =agetV1V10c0Iainfix &lt;V10V0Aainfix &lt;=V2V10FAainfix =V8aprefix -c1INainfix =agetV1V11c0Iainfix &lt;V11V8Aainfix &lt;=V7V11FAainfix =agetV1V8c0Aainfix &lt;V8V0Aainfix &lt;=V7V8ONainfix =agetV1V12c0Iainfix &lt;V12V0Aainfix &lt;=V7V12FAainfix =V8aprefix -c1FAainfix &lt;=c0V7Aadecrease1V3Aainfix &lt;ainfix -V0V7ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2Lainfix +V2c1Nainfix =agetV1V15c0Iainfix &lt;V15V14Aainfix &lt;=V2V15FAainfix =agetV1V14c0Aainfix &lt;V14V0Aainfix &lt;=V2V14ONainfix =agetV1V16c0Iainfix &lt;V16V0Aainfix &lt;=V2V16FAainfix =V14aprefix -c1INainfix =agetV1V17c0Iainfix &lt;V17V14Aainfix &lt;=V13V17FAainfix =agetV1V14c0Aainfix &lt;V14V0Aainfix &lt;=V13V14ONainfix =agetV1V18c0Iainfix &lt;V18V0Aainfix &lt;=V13V18FAainfix =V14aprefix -c1FAainfix &lt;=c0V13Aadecrease1V3Aainfix &lt;ainfix -V0V13ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2Lainfix +V2agetV1V2Aainfix &lt;V2V0Aainfix &lt;=c0V2ainfix &gt;agetV1V2c0Aainfix &lt;V2V0Aainfix &lt;=c0V2Nainfix =agetV1V19c0Iainfix &lt;V19V2Aainfix &lt;=V2V19FAainfix =agetV1V2c0Aainfix &lt;V2V0Aainfix &lt;=V2V2ONainfix =agetV1V20c0Iainfix &lt;V20V0Aainfix &lt;=V2V20FAainfix =V2aprefix -c1ainfix =agetV1V2c0Aainfix &lt;V2V0Aainfix &lt;=c0V2ainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
     <label name="expl:VC for search_rec"/>
     <transf name="split_goal" proved="true"
      expanded="true">
-     <goal name="WP_parameter search_rec.1" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20"
-      expl="1. index in array bounds" sum="d6a8e89d360648c271bb46f913ece413"
-      proved="true" expanded="true"
+     <goal name="WP_parameter search_rec.1" expl="1. index in array bounds"
+      sum="d6a8e89d360648c271bb46f913ece413" proved="true" expanded="true"
       shape="index in array boundsainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="4">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_rec.2" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20" expl="2. postcondition"
+     <goal name="WP_parameter search_rec.2" expl="2. postcondition"
       sum="e50f43748a508108e41b1d92ff76e6ea" proved="true" expanded="true"
       shape="postconditionNainfix =agetV1V4c0Iainfix &lt;V4V2Aainfix &lt;=V2V4FAainfix =agetV1V2c0Aainfix &lt;V2V0Aainfix &lt;=V2V2ONainfix =agetV1V5c0Iainfix &lt;V5V0Aainfix &lt;=V2V5FAainfix =V2aprefix -c1Iainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_rec.3" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20"
-      expl="3. index in array bounds" sum="762a7dd9df5cfb9a831c4da6410ef4a6"
-      proved="true" expanded="true"
+     <goal name="WP_parameter search_rec.3" expl="3. index in array bounds"
+      sum="762a7dd9df5cfb9a831c4da6410ef4a6" proved="true" expanded="true"
       shape="index in array boundsainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="7">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_rec.4" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20"
-      expl="4. index in array bounds" sum="74993c6564242d51fd91e519d77916be"
-      proved="true" expanded="true"
+     <goal name="WP_parameter search_rec.4" expl="4. index in array bounds"
+      sum="74993c6564242d51fd91e519d77916be" proved="true" expanded="true"
       shape="index in array boundsainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="3">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_rec.5" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20" expl="5. variant decrease"
+     <goal name="WP_parameter search_rec.5" expl="5. variant decrease"
       sum="7ef8b0e0f71840d485eaeb08ab4391ba" proved="true"
       shape="variant decreaseainfix &lt;ainfix -V0V4ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2Lainfix +V2agetV1V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_rec.6" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20" expl="6. precondition"
+     <goal name="WP_parameter search_rec.6" expl="6. precondition"
       sum="04e634126ec6b518173ff6555ba7ab18" proved="true" expanded="true"
       shape="preconditionainfix &lt;=c0V4Aadecrease1V3Lainfix +V2agetV1V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.02"/>
+      <proof prover="4">
+       <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
+      <proof prover="7">
+       <result status="valid" time="0.02"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter search_rec.7" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20" expl="7. postcondition"
+     <goal name="WP_parameter search_rec.7" expl="7. postcondition"
       sum="a9af426a640e0bbdd715461798497b0a" proved="true" expanded="true"
       shape="postconditionNainfix =agetV1V6c0Iainfix &lt;V6V5Aainfix &lt;=V2V6FAainfix =agetV1V5c0Aainfix &lt;V5V0Aainfix &lt;=V2V5ONainfix =agetV1V7c0Iainfix &lt;V7V0Aainfix &lt;=V2V7FAainfix =V5aprefix -c1INainfix =agetV1V8c0Iainfix &lt;V8V5Aainfix &lt;=V4V8FAainfix =agetV1V5c0Aainfix &lt;V5V0Aainfix &lt;=V4V5ONainfix =agetV1V9c0Iainfix &lt;V9V0Aainfix &lt;=V4V9FAainfix =V5aprefix -c1FIainfix &lt;=c0V4Aadecrease1V3Lainfix +V2agetV1V2Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="3" timelimit="5"
-       memlimit="1000">
+      <proof prover="0">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.21"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_rec.8" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20" expl="8. variant decrease"
+     <goal name="WP_parameter search_rec.8" expl="8. variant decrease"
       sum="75742fba2f545033530d74b5fb9bb12b" proved="true"
       shape="variant decreaseainfix &lt;ainfix -V0V4ainfix -V0V2Aainfix &lt;=c0ainfix -V0V2Lainfix +V2c1INainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="2">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_rec.9" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20" expl="9. precondition"
+     <goal name="WP_parameter search_rec.9" expl="9. precondition"
       sum="8e446d801193faac81cc488e494442cf" proved="true" expanded="true"
       shape="preconditionainfix &lt;=c0V4Aadecrease1V3Lainfix +V2c1INainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="4">
        <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="5">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="7">
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter search_rec.10" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20" expl="10. postcondition"
+     <goal name="WP_parameter search_rec.10" expl="10. postcondition"
       sum="16518c1c765f91f9360f1ab7acbc2ee7" proved="true" expanded="true"
       shape="postconditionNainfix =agetV1V6c0Iainfix &lt;V6V5Aainfix &lt;=V2V6FAainfix =agetV1V5c0Aainfix &lt;V5V0Aainfix &lt;=V2V5ONainfix =agetV1V7c0Iainfix &lt;V7V0Aainfix &lt;=V2V7FAainfix =V5aprefix -c1INainfix =agetV1V8c0Iainfix &lt;V8V5Aainfix &lt;=V4V8FAainfix =agetV1V5c0Aainfix &lt;V5V0Aainfix &lt;=V4V5ONainfix =agetV1V9c0Iainfix &lt;V9V0Aainfix &lt;=V4V9FAainfix =V5aprefix -c1FIainfix &lt;=c0V4Aadecrease1V3Lainfix +V2c1INainfix &gt;agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2INainfix =agetV1V2c0Iainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="5">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="7">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
      </goal>
-     <goal name="WP_parameter search_rec.11" locfile="../decrease1.mlw"
-      loclnum="43" loccnumb="10" loccnume="20" expl="11. postcondition"
+     <goal name="WP_parameter search_rec.11" expl="11. postcondition"
       sum="f813ceddaee69abd3ce0d845b8a4703f" proved="true" expanded="true"
       shape="postconditionNainfix =agetV1V5c0Iainfix &lt;V5V4Aainfix &lt;=V2V5FAainfix =agetV1V4c0Aainfix &lt;V4V0Aainfix &lt;=V2V4ONainfix =agetV1V6c0Iainfix &lt;V6V0Aainfix &lt;=V2V6FAainfix =V4aprefix -c1Laprefix -c1INainfix &lt;V2V0Iainfix &lt;=c0V2Aadecrease1V3Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for search_rec"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="2" timelimit="5"
-       memlimit="1000">
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="5" timelimit="10"
-       memlimit="0">
+      <proof prover="3">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6" timelimit="5"
-       memlimit="1000">
+      <proof prover="4">
+       <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" timelimit="5"
-       memlimit="1000">
+      <proof prover="7">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>

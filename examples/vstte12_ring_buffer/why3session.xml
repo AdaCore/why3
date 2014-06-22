@@ -1,150 +1,118 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.1"/>
- <prover id="1" name="CVC3" version="2.4.1"/>
- <prover id="2" name="Coq" version="8.4pl2"/>
+ <prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+ <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10"
+  memlimit="1000"/>
+ <prover id="2" name="Coq" version="8.4pl3" timelimit="5" memlimit="4000"/>
  <file name="../vstte12_ring_buffer.mlw" verified="true"
   expanded="true">
-  <theory name="RingBuffer" locfile="../vstte12_ring_buffer.mlw"
-   loclnum="10" loccnumb="7" loccnume="17" verified="true"
+  <theory name="RingBuffer" verified="true"
    expanded="true">
-   <goal name="WP_parameter create" locfile="../vstte12_ring_buffer.mlw"
-    loclnum="42" loccnumb="6" loccnume="12" expl="VC for create"
+   <goal name="WP_parameter create" expl="VC for create"
     sum="93a4ac819186ebbe656859c60918ae12" proved="true"
     shape="ainfix =anthV2aNilaSomeagetaconstV1ainfix -ainfix +c0V2V0Iainfix &lt;=c0ainfix -ainfix +c0V2V0Aainfix =anthV2aNilaSomeagetaconstV1ainfix +c0V2Iainfix &lt;ainfix +c0V2V0Iainfix &lt;V2c0Aainfix &lt;=c0V2FAainfix =c0alengthaNilAainfix &lt;=c0V0Aainfix &lt;=c0c0Aainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Aainfix &gt;=V0c0Iainfix &gt;V0c0F">
     <label name="expl:VC for create"/>
-    <proof prover="0" timelimit="10"
-     memlimit="0">
+    <proof prover="1" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="WP_parameter length" locfile="../vstte12_ring_buffer.mlw"
-    loclnum="48" loccnumb="6" loccnume="12" expl="VC for length"
+   <goal name="WP_parameter length" expl="VC for length"
     sum="940c41c737ceef5cd7b22ed36c678e9e" proved="true"
     shape="t">
     <label name="expl:VC for length"/>
-    <proof prover="0" timelimit="10"
-     memlimit="0">
+    <proof prover="1" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="WP_parameter clear" locfile="../vstte12_ring_buffer.mlw"
-    loclnum="52" loccnumb="6" loccnume="11" expl="VC for clear"
+   <goal name="WP_parameter clear" expl="VC for clear"
     sum="8b6c722faf188f5d449494513e197797" proved="true"
     shape="ainfix =V5aNilAainfix =V6c0Aainfix =anthV7V5aSomeagetV3ainfix -ainfix +V0V7V2Iainfix &lt;=c0ainfix -ainfix +V0V7V2Aainfix =anthV7V5aSomeagetV3ainfix +V0V7Iainfix &lt;ainfix +V0V7V2Iainfix &lt;V7V6Aainfix &lt;=c0V7FAainfix =V6alengthV5Aainfix &lt;=V6V2Aainfix &lt;=c0V6Aainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6c0FIainfix =V5aNilFIainfix &lt;=c0V2Aainfix =anthV8V4aSomeagetV3ainfix -ainfix +V0V8V2Iainfix &lt;=c0ainfix -ainfix +V0V8V2Aainfix =anthV8V4aSomeagetV3ainfix +V0V8Iainfix &lt;ainfix +V0V8V2Iainfix &lt;V8V1Aainfix &lt;=c0V8FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
     <label name="expl:VC for clear"/>
-    <proof prover="0" timelimit="10"
-     memlimit="0">
+    <proof prover="1" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="WP_parameter push" locfile="../vstte12_ring_buffer.mlw"
-    loclnum="59" loccnumb="6" loccnume="10" expl="VC for push"
+   <goal name="WP_parameter push" expl="VC for push"
     sum="c35b970af93a44dcb794f7d17fd71478" proved="true"
     shape="ainfix =V6ainfix ++V4aConsV5aNilAainfix =V9ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV10V6aSomeagetV8ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V6aSomeagetV8ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V9Aainfix &lt;=c0V10FAainfix =V9alengthV6Aainfix &lt;=V9V2Aainfix &lt;=c0V9Aainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix &lt;=c0V2FAainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix &lt;=c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
     <label name="expl:VC for push"/>
     <transf name="split_goal"
      proved="true">
-     <goal name="WP_parameter push.1" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="59" loccnumb="6" loccnume="10" expl="1. index in array bounds"
+     <goal name="WP_parameter push.1" expl="1. index in array bounds"
       sum="440f851090c4fbfc13d98f2f433cbedf" proved="true"
       shape="index in array boundsainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix &lt;=c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix &lt;=c0V2Aainfix =anthV8V4aSomeagetV3ainfix -ainfix +V0V8V2Iainfix &lt;=c0ainfix -ainfix +V0V8V2Aainfix =anthV8V4aSomeagetV3ainfix +V0V8Iainfix &lt;ainfix +V0V8V2Iainfix &lt;V8V1Aainfix &lt;=c0V8FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for push"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter push.2" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="59" loccnumb="6" loccnume="10" expl="2. type invariant"
+     <goal name="WP_parameter push.2" expl="2. type invariant"
       sum="89c350ba195099f6aba402b316b456d8" proved="true"
       shape="type invariantainfix =anthV10V6aSomeagetV8ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V6aSomeagetV8ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V9Aainfix &lt;=c0V10FAainfix =V9alengthV6Aainfix &lt;=V9V2Aainfix &lt;=c0V9Aainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix &lt;=c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix &lt;=c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for push"/>
       <transf name="inline_goal"
        proved="true">
-       <goal name="WP_parameter push.2.1"
-        locfile="../vstte12_ring_buffer.mlw"
-        loclnum="59" loccnumb="6" loccnume="10" expl="1. type invariant"
+       <goal name="WP_parameter push.2.1" expl="1. type invariant"
         sum="3970830123b856955a58c075fdaefe90" proved="true"
         shape="type invariantainfix =anthV10V6aSomeagetV8ainfix -ainfix +V0V10V2Iainfix =c0ainfix -ainfix +V0V10V2Oainfix &lt;c0ainfix -ainfix +V0V10V2Aainfix =anthV10V6aSomeagetV8ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V9Aainfix =c0V10Oainfix &lt;c0V10FAainfix =V9alengthV6Aainfix =V9V2Oainfix &lt;V9V2Aainfix =c0V9Oainfix &lt;c0V9Aainfix &lt;V0V2Aainfix =c0V0Oainfix &lt;c0V0Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix =c0V2Oainfix &lt;c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix =c0iV7ainfix -V7V2ainfix &gt;=V7V2Oainfix &lt;c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix =c0V2Oainfix &lt;c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix =c0ainfix -ainfix +V0V11V2Oainfix &lt;c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix =c0V11Oainfix &lt;c0V11FAainfix =V1alengthV4Aainfix =V1V2Oainfix &lt;V1V2Aainfix =c0V1Oainfix &lt;c0V1Aainfix &lt;V0V2Aainfix =c0V0Oainfix &lt;c0V0F">
         <label name="expl:VC for push"/>
         <transf name="split_goal"
          proved="true">
-         <goal name="WP_parameter push.2.1.1"
-          locfile="../vstte12_ring_buffer.mlw"
-          loclnum="59" loccnumb="6" loccnume="10" expl="1."
+         <goal name="WP_parameter push.2.1.1" expl="1."
           sum="4cc085cf2cfa09b66016f086ee87fe96" proved="true"
           shape="ainfix =c0V0Oainfix &lt;c0V0Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix =c0V2Oainfix &lt;c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix =c0iV7ainfix -V7V2ainfix &gt;=V7V2Oainfix &lt;c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix =c0V2Oainfix &lt;c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix =c0ainfix -ainfix +V0V10V2Oainfix &lt;c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix =c0V10Oainfix &lt;c0V10FAainfix =V1alengthV4Aainfix =V1V2Oainfix &lt;V1V2Aainfix =c0V1Oainfix &lt;c0V1Aainfix &lt;V0V2Aainfix =c0V0Oainfix &lt;c0V0F">
           <label name="expl:VC for push"/>
-          <proof prover="0" timelimit="5"
-           memlimit="1000">
+          <proof prover="1" timelimit="5">
            <result status="valid" time="0.02"/>
           </proof>
          </goal>
-         <goal name="WP_parameter push.2.1.2"
-          locfile="../vstte12_ring_buffer.mlw"
-          loclnum="59" loccnumb="6" loccnume="10" expl="2."
+         <goal name="WP_parameter push.2.1.2" expl="2."
           sum="95fe528338cd640808009eaf1664048d" proved="true"
           shape="ainfix &lt;V0V2Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix =c0V2Oainfix &lt;c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix =c0iV7ainfix -V7V2ainfix &gt;=V7V2Oainfix &lt;c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix =c0V2Oainfix &lt;c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix =c0ainfix -ainfix +V0V10V2Oainfix &lt;c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix =c0V10Oainfix &lt;c0V10FAainfix =V1alengthV4Aainfix =V1V2Oainfix &lt;V1V2Aainfix =c0V1Oainfix &lt;c0V1Aainfix &lt;V0V2Aainfix =c0V0Oainfix &lt;c0V0F">
           <label name="expl:VC for push"/>
-          <proof prover="0" timelimit="5"
-           memlimit="1000">
+          <proof prover="1" timelimit="5">
            <result status="valid" time="0.02"/>
           </proof>
          </goal>
-         <goal name="WP_parameter push.2.1.3"
-          locfile="../vstte12_ring_buffer.mlw"
-          loclnum="59" loccnumb="6" loccnume="10" expl="3."
+         <goal name="WP_parameter push.2.1.3" expl="3."
           sum="940f909d058cd1c8495604e159f9f4d2" proved="true"
           shape="ainfix =c0V9Oainfix &lt;c0V9Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix =c0V2Oainfix &lt;c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix =c0iV7ainfix -V7V2ainfix &gt;=V7V2Oainfix &lt;c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix =c0V2Oainfix &lt;c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix =c0ainfix -ainfix +V0V10V2Oainfix &lt;c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix =c0V10Oainfix &lt;c0V10FAainfix =V1alengthV4Aainfix =V1V2Oainfix &lt;V1V2Aainfix =c0V1Oainfix &lt;c0V1Aainfix &lt;V0V2Aainfix =c0V0Oainfix &lt;c0V0F">
           <label name="expl:VC for push"/>
-          <proof prover="0" timelimit="5"
-           memlimit="1000">
+          <proof prover="1" timelimit="5">
            <result status="valid" time="0.02"/>
           </proof>
          </goal>
-         <goal name="WP_parameter push.2.1.4"
-          locfile="../vstte12_ring_buffer.mlw"
-          loclnum="59" loccnumb="6" loccnume="10" expl="4."
+         <goal name="WP_parameter push.2.1.4" expl="4."
           sum="b064014ec7910b6f74ed1eb4f8cebc8f" proved="true"
           shape="ainfix =V9V2Oainfix &lt;V9V2Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix =c0V2Oainfix &lt;c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix =c0iV7ainfix -V7V2ainfix &gt;=V7V2Oainfix &lt;c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix =c0V2Oainfix &lt;c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix =c0ainfix -ainfix +V0V10V2Oainfix &lt;c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix =c0V10Oainfix &lt;c0V10FAainfix =V1alengthV4Aainfix =V1V2Oainfix &lt;V1V2Aainfix =c0V1Oainfix &lt;c0V1Aainfix &lt;V0V2Aainfix =c0V0Oainfix &lt;c0V0F">
           <label name="expl:VC for push"/>
-          <proof prover="0" timelimit="10"
-           memlimit="0">
+          <proof prover="1" memlimit="0">
            <result status="valid" time="0.01"/>
           </proof>
          </goal>
-         <goal name="WP_parameter push.2.1.5"
-          locfile="../vstte12_ring_buffer.mlw"
-          loclnum="59" loccnumb="6" loccnume="10" expl="5."
+         <goal name="WP_parameter push.2.1.5" expl="5."
           sum="cf552d522706d92b4aab8a9d0f981721" proved="true"
           shape="ainfix =V9alengthV6Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix =c0V2Oainfix &lt;c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix =c0iV7ainfix -V7V2ainfix &gt;=V7V2Oainfix &lt;c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix =c0V2Oainfix &lt;c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix =c0ainfix -ainfix +V0V10V2Oainfix &lt;c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix =c0V10Oainfix &lt;c0V10FAainfix =V1alengthV4Aainfix =V1V2Oainfix &lt;V1V2Aainfix =c0V1Oainfix &lt;c0V1Aainfix &lt;V0V2Aainfix =c0V0Oainfix &lt;c0V0F">
           <label name="expl:VC for push"/>
-          <proof prover="0" timelimit="10"
-           memlimit="0">
+          <proof prover="1" memlimit="0">
            <result status="valid" time="0.03"/>
           </proof>
          </goal>
-         <goal name="WP_parameter push.2.1.6"
-          locfile="../vstte12_ring_buffer.mlw"
-          loclnum="59" loccnumb="6" loccnume="10" expl="6."
+         <goal name="WP_parameter push.2.1.6" expl="6."
           sum="09b0736cfcb250fe472eab51ae2c3ac3" proved="true"
           shape="ainfix =anthV10V6aSomeagetV8ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V9Aainfix =c0V10Oainfix &lt;c0V10FIainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix =c0V2Oainfix &lt;c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix =c0iV7ainfix -V7V2ainfix &gt;=V7V2Oainfix &lt;c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix =c0V2Oainfix &lt;c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix =c0ainfix -ainfix +V0V11V2Oainfix &lt;c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix =c0V11Oainfix &lt;c0V11FAainfix =V1alengthV4Aainfix =V1V2Oainfix &lt;V1V2Aainfix =c0V1Oainfix &lt;c0V1Aainfix &lt;V0V2Aainfix =c0V0Oainfix &lt;c0V0F">
           <label name="expl:VC for push"/>
-          <proof prover="0" timelimit="5"
-           memlimit="1000">
+          <proof prover="1" timelimit="5">
            <result status="valid" time="0.16"/>
           </proof>
          </goal>
-         <goal name="WP_parameter push.2.1.7"
-          locfile="../vstte12_ring_buffer.mlw"
-          loclnum="59" loccnumb="6" loccnume="10" expl="7."
+         <goal name="WP_parameter push.2.1.7" expl="7."
           sum="c07e3d9cb5bbe5efd9acbd2ba19554fa" proved="true"
           shape="ainfix =anthV10V6aSomeagetV8ainfix -ainfix +V0V10V2Iainfix =c0ainfix -ainfix +V0V10V2Oainfix &lt;c0ainfix -ainfix +V0V10V2Iainfix &lt;V10V9Aainfix =c0V10Oainfix &lt;c0V10FIainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix =c0V2Oainfix &lt;c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix =c0iV7ainfix -V7V2ainfix &gt;=V7V2Oainfix &lt;c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix =c0V2Oainfix &lt;c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix =c0ainfix -ainfix +V0V11V2Oainfix &lt;c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix =c0V11Oainfix &lt;c0V11FAainfix =V1alengthV4Aainfix =V1V2Oainfix &lt;V1V2Aainfix =c0V1Oainfix &lt;c0V1Aainfix &lt;V0V2Aainfix =c0V0Oainfix &lt;c0V0F">
           <label name="expl:VC for push"/>
-          <proof prover="0" timelimit="10"
-           memlimit="1000">
+          <proof prover="1">
            <result status="valid" time="0.08"/>
           </proof>
          </goal>
@@ -152,353 +120,291 @@
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter push.3" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="59" loccnumb="6" loccnume="10" expl="3. type invariant"
+     <goal name="WP_parameter push.3" expl="3. type invariant"
       sum="7e87cf6752c4101f7a6955db2ccd2787" proved="true"
       shape="type invariantainfix &lt;=c0V2Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix &lt;=c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix &lt;=c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix &lt;=c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix &lt;=c0V10FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for push"/>
-      <proof prover="0" timelimit="5"
-       memlimit="1000">
+      <proof prover="1" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter push.4" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="59" loccnumb="6" loccnume="10" expl="4. postcondition"
+     <goal name="WP_parameter push.4" expl="4. postcondition"
       sum="9eaeb941660d0a25cf5bbb6803a76e80" proved="true"
       shape="postconditionainfix =V9ainfix +V1c1Iainfix &lt;=c0V2Aainfix =anthV10V6aSomeagetV8ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V6aSomeagetV8ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V9Aainfix &lt;=c0V10FAainfix =V9alengthV6Aainfix &lt;=V9V2Aainfix &lt;=c0V9Aainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix &lt;=c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix &lt;=c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for push"/>
-      <proof prover="0" timelimit="30"
-       memlimit="1000">
+      <proof prover="1" timelimit="30">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter push.5" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="59" loccnumb="6" loccnume="10" expl="5. postcondition"
+     <goal name="WP_parameter push.5" expl="5. postcondition"
       sum="ebfbd53e7ca1d948cd1d8a44ec056cc7" proved="true"
       shape="postconditionainfix =V6ainfix ++V4aConsV5aNilIainfix &lt;=c0V2Aainfix =anthV10V6aSomeagetV8ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V6aSomeagetV8ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V9Aainfix &lt;=c0V10FAainfix =V9alengthV6Aainfix &lt;=V9V2Aainfix &lt;=c0V9Aainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V9ainfix +V1c1FIainfix =V8asetV3iV7ainfix -V7V2ainfix &gt;=V7V2V5Aainfix &lt;=c0V2FIainfix &lt;iV7ainfix -V7V2ainfix &gt;=V7V2V2Aainfix &lt;=c0iV7ainfix -V7V2ainfix &gt;=V7V2Lainfix +V0V1Iainfix =V6ainfix ++V4aConsV5aNilFIainfix &lt;V1V2Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for push"/>
-      <proof prover="0" timelimit="30"
-       memlimit="1000">
+      <proof prover="1" timelimit="30">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter head" locfile="../vstte12_ring_buffer.mlw"
-    loclnum="70" loccnumb="6" loccnume="10" expl="VC for head"
+   <goal name="WP_parameter head" expl="VC for head"
     sum="6f484700ecf2485df1bf67cedeb20fe4" proved="true"
     shape="CfaNilainfix =agetV3V0V5aConsVwV4Aainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV6V4aSomeagetV3ainfix -ainfix +V0V6V2Iainfix &lt;=c0ainfix -ainfix +V0V6V2Aainfix =anthV6V4aSomeagetV3ainfix +V0V6Iainfix &lt;ainfix +V0V6V2Iainfix &lt;V6V1Aainfix &lt;=c0V6FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
     <label name="expl:VC for head"/>
     <transf name="split_goal"
      proved="true">
-     <goal name="WP_parameter head.1" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="70" loccnumb="6" loccnume="10" expl="1. index in array bounds"
+     <goal name="WP_parameter head.1" expl="1. index in array bounds"
       sum="8015e77ddf56030d7f13ada39c8ac70c" proved="true"
       shape="index in array boundsainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV5V4aSomeagetV3ainfix -ainfix +V0V5V2Iainfix &lt;=c0ainfix -ainfix +V0V5V2Aainfix =anthV5V4aSomeagetV3ainfix +V0V5Iainfix &lt;ainfix +V0V5V2Iainfix &lt;V5V1Aainfix &lt;=c0V5FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for head"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter head.2" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="70" loccnumb="6" loccnume="10" expl="2. postcondition"
+     <goal name="WP_parameter head.2" expl="2. postcondition"
       sum="ead5c4b3a4e466dc107b1173f9ba4d19" proved="true"
       shape="postconditionCfaNilainfix =agetV3V0V5aConsVwV4Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV6V4aSomeagetV3ainfix -ainfix +V0V6V2Iainfix &lt;=c0ainfix -ainfix +V0V6V2Aainfix =anthV6V4aSomeagetV3ainfix +V0V6Iainfix &lt;ainfix +V0V6V2Iainfix &lt;V6V1Aainfix &lt;=c0V6FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for head"/>
-      <proof prover="2" timelimit="5" memlimit="1000"
+      <proof prover="2" memlimit="1000"
        edited="vstte12_ring_buffer_2_RingBuffer_WP_parameter_head_1.v">
        <result status="valid" time="1.19"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter pop" locfile="../vstte12_ring_buffer.mlw"
-    loclnum="75" loccnumb="6" loccnume="9" expl="VC for pop"
+   <goal name="WP_parameter pop" expl="VC for pop"
     sum="89e38fd8f7977b2dc214e40e67c22595" proved="true"
     shape="CfaNiliCfaNilainfix =V6V11Aainfix =V7V10aConsVVV4Aainfix =V8ainfix -V1c1Aainfix =anthV12V6aSomeagetV3ainfix -ainfix +V9V12V2Iainfix &lt;=c0ainfix -ainfix +V9V12V2Aainfix =anthV12V6aSomeagetV3ainfix +V9V12Iainfix &lt;ainfix +V9V12V2Iainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V9V2Aainfix &lt;=c0V9CfaNilainfix =V6V15Aainfix =V7V14aConsVVV4Aainfix =V8ainfix -V1c1Aainfix =anthV16V6aSomeagetV3ainfix -ainfix +V13V16V2Iainfix &lt;=c0ainfix -ainfix +V13V16V2Aainfix =anthV16V6aSomeagetV3ainfix +V13V16Iainfix &lt;ainfix +V13V16V2Iainfix &lt;V16V8Aainfix &lt;=c0V16FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V13V2Aainfix &lt;=c0V13Iainfix =V13c0Fainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Aainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV17V4aSomeagetV3ainfix -ainfix +V0V17V2Iainfix &lt;=c0ainfix -ainfix +V0V17V2Aainfix =anthV17V4aSomeagetV3ainfix +V0V17Iainfix &lt;ainfix +V0V17V2Iainfix &lt;V17V1Aainfix &lt;=c0V17FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
     <label name="expl:VC for pop"/>
     <transf name="split_goal"
      proved="true">
-     <goal name="WP_parameter pop.1" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="75" loccnumb="6" loccnume="9" expl="1. unreachable point"
+     <goal name="WP_parameter pop.1" expl="1. unreachable point"
       sum="5ba7f0c8ba3ce30768728eb9c8c7bf36" proved="true"
       shape="unreachable pointCfaNiltaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV6V4aSomeagetV3ainfix -ainfix +V0V6V2Iainfix &lt;=c0ainfix -ainfix +V0V6V2Aainfix =anthV6V4aSomeagetV3ainfix +V0V6Iainfix &lt;ainfix +V0V6V2Iainfix &lt;V6V1Aainfix &lt;=c0V6FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for pop"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter pop.2" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="75" loccnumb="6" loccnume="9" expl="2. index in array bounds"
+     <goal name="WP_parameter pop.2" expl="2. index in array bounds"
       sum="3ee4ee0add6909ccf942398b52d063bf" proved="true"
       shape="index in array boundsCtaNilainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV7V4aSomeagetV3ainfix -ainfix +V0V7V2Iainfix &lt;=c0ainfix -ainfix +V0V7V2Aainfix =anthV7V4aSomeagetV3ainfix +V0V7Iainfix &lt;ainfix +V0V7V2Iainfix &lt;V7V1Aainfix &lt;=c0V7FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for pop"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter pop.3" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="75" loccnumb="6" loccnume="9" expl="3. type invariant"
+     <goal name="WP_parameter pop.3" expl="3. type invariant"
       sum="c6f22dfa6c282c632fd69f846848bbcd" proved="true"
       shape="type invariantCtaNilainfix =anthV11V6aSomeagetV3ainfix -ainfix +V10V11V2Iainfix &lt;=c0ainfix -ainfix +V10V11V2Aainfix =anthV11V6aSomeagetV3ainfix +V10V11Iainfix &lt;ainfix +V10V11V2Iainfix &lt;V11V8Aainfix &lt;=c0V11FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V10V2Aainfix &lt;=c0V10Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV12V4aSomeagetV3ainfix -ainfix +V0V12V2Iainfix &lt;=c0ainfix -ainfix +V0V12V2Aainfix =anthV12V4aSomeagetV3ainfix +V0V12Iainfix &lt;ainfix +V0V12V2Iainfix &lt;V12V1Aainfix &lt;=c0V12FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for pop"/>
       <transf name="split_goal"
        proved="true">
-       <goal name="WP_parameter pop.3.1" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="1."
+       <goal name="WP_parameter pop.3.1" expl="1."
         sum="4b6f5dba9f6349f114dade667d0c92cf" proved="true"
         shape="CtaNilainfix &lt;=c0V10Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="10"
-         memlimit="0">
+        <proof prover="1" memlimit="0">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.3.2" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="2."
+       <goal name="WP_parameter pop.3.2" expl="2."
         sum="64d96a9e15c2c71f8ca37c2cf0e44420" proved="true"
         shape="CtaNilainfix &lt;V10V2Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="5"
-         memlimit="1000">
+        <proof prover="1" timelimit="5">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.3.3" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="3."
+       <goal name="WP_parameter pop.3.3" expl="3."
         sum="ab8dc70d2be08faaa7cb62243aaf381a" proved="true"
         shape="CtaNilainfix &lt;=c0V8Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="10"
-         memlimit="0">
+        <proof prover="1" memlimit="0">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.3.4" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="4."
+       <goal name="WP_parameter pop.3.4" expl="4."
         sum="290f849deb6d48f49b5edf683628b002" proved="true"
         shape="CtaNilainfix &lt;=V8V2Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="5"
-         memlimit="1000">
+        <proof prover="0" timelimit="5" memlimit="1000">
          <result status="valid" time="0.02"/>
         </proof>
-        <proof prover="1" timelimit="5"
-         memlimit="1000">
+        <proof prover="1" timelimit="5">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.3.5" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="5."
+       <goal name="WP_parameter pop.3.5" expl="5."
         sum="b225f3851949406c1f67a0d7e0f68106" proved="true"
         shape="CtaNilainfix =V8alengthV6Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="10"
-         memlimit="0">
+        <proof prover="1" memlimit="0">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.3.6" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="6."
+       <goal name="WP_parameter pop.3.6" expl="6."
         sum="f1986c6231daf5d524fa16fb80fd7dce" proved="true"
         shape="CtaNilainfix =anthV11V6aSomeagetV3ainfix +V10V11Iainfix &lt;ainfix +V10V11V2Iainfix &lt;V11V8Aainfix &lt;=c0V11FIainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV12V4aSomeagetV3ainfix -ainfix +V0V12V2Iainfix &lt;=c0ainfix -ainfix +V0V12V2Aainfix =anthV12V4aSomeagetV3ainfix +V0V12Iainfix &lt;ainfix +V0V12V2Iainfix &lt;V12V1Aainfix &lt;=c0V12FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="1" timelimit="5"
-         memlimit="1000">
+        <proof prover="0" timelimit="5" memlimit="1000">
          <result status="valid" time="0.06"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.3.7" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="7."
+       <goal name="WP_parameter pop.3.7" expl="7."
         sum="ed3aa1329c23ce4ddafb833e12d7bf64" proved="true"
         shape="CtaNilainfix =anthV11V6aSomeagetV3ainfix -ainfix +V10V11V2Iainfix &lt;=c0ainfix -ainfix +V10V11V2Iainfix &lt;V11V8Aainfix &lt;=c0V11FIainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV12V4aSomeagetV3ainfix -ainfix +V0V12V2Iainfix &lt;=c0ainfix -ainfix +V0V12V2Aainfix =anthV12V4aSomeagetV3ainfix +V0V12Iainfix &lt;ainfix +V0V12V2Iainfix &lt;V12V1Aainfix &lt;=c0V12FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="5"
-         memlimit="1000">
+        <proof prover="1" timelimit="5">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter pop.4" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="75" loccnumb="6" loccnume="9" expl="4. postcondition"
+     <goal name="WP_parameter pop.4" expl="4. postcondition"
       sum="d96ca05cbb71a55e1a093d7aa14e8de6" proved="true"
       shape="postconditionCtaNilainfix =V8ainfix -V1c1Iainfix =anthV11V6aSomeagetV3ainfix -ainfix +V10V11V2Iainfix &lt;=c0ainfix -ainfix +V10V11V2Aainfix =anthV11V6aSomeagetV3ainfix +V10V11Iainfix &lt;ainfix +V10V11V2Iainfix &lt;V11V8Aainfix &lt;=c0V11FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V10V2Aainfix &lt;=c0V10Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV12V4aSomeagetV3ainfix -ainfix +V0V12V2Iainfix &lt;=c0ainfix -ainfix +V0V12V2Aainfix =anthV12V4aSomeagetV3ainfix +V0V12Iainfix &lt;ainfix +V0V12V2Iainfix &lt;V12V1Aainfix &lt;=c0V12FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for pop"/>
-      <proof prover="0" timelimit="30"
-       memlimit="1000">
+      <proof prover="1" timelimit="30">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter pop.5" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="75" loccnumb="6" loccnume="9" expl="5. postcondition"
+     <goal name="WP_parameter pop.5" expl="5. postcondition"
       sum="e8300fd3f4757eb62cf6c695572172b8" proved="true"
       shape="postconditionCtaNilCfaNilainfix =V6V12Aainfix =V7V11aConsVVV4Iainfix =anthV13V6aSomeagetV3ainfix -ainfix +V10V13V2Iainfix &lt;=c0ainfix -ainfix +V10V13V2Aainfix =anthV13V6aSomeagetV3ainfix +V10V13Iainfix &lt;ainfix +V10V13V2Iainfix &lt;V13V8Aainfix &lt;=c0V13FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V10V2Aainfix &lt;=c0V10Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV14V4aSomeagetV3ainfix -ainfix +V0V14V2Iainfix &lt;=c0ainfix -ainfix +V0V14V2Aainfix =anthV14V4aSomeagetV3ainfix +V0V14Iainfix &lt;ainfix +V0V14V2Iainfix &lt;V14V1Aainfix &lt;=c0V14FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for pop"/>
       <transf name="split_goal_wp"
        proved="true">
-       <goal name="WP_parameter pop.5.1" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="1. postcondition"
+       <goal name="WP_parameter pop.5.1" expl="1. postcondition"
         sum="a3a1617df58a5297d5424605da2562bf" proved="true"
         shape="postconditionCtaNilCfaNiltaConsVVV4Iainfix =anthV13V6aSomeagetV3ainfix -ainfix +V10V13V2Iainfix &lt;=c0ainfix -ainfix +V10V13V2Aainfix =anthV13V6aSomeagetV3ainfix +V10V13Iainfix &lt;ainfix +V10V13V2Iainfix &lt;V13V8Aainfix &lt;=c0V13FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V10V2Aainfix &lt;=c0V10Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV14V4aSomeagetV3ainfix -ainfix +V0V14V2Iainfix &lt;=c0ainfix -ainfix +V0V14V2Aainfix =anthV14V4aSomeagetV3ainfix +V0V14Iainfix &lt;ainfix +V0V14V2Iainfix &lt;V14V1Aainfix &lt;=c0V14FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="5"
-         memlimit="1000">
+        <proof prover="1" timelimit="5">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.5.2" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="2. postcondition"
+       <goal name="WP_parameter pop.5.2" expl="2. postcondition"
         sum="1ff5ade35c32691010259c84223d2556" proved="true"
         shape="postconditionCtaNilCtaNilainfix =V7V11aConsVVV4Iainfix =anthV13V6aSomeagetV3ainfix -ainfix +V10V13V2Iainfix &lt;=c0ainfix -ainfix +V10V13V2Aainfix =anthV13V6aSomeagetV3ainfix +V10V13Iainfix &lt;ainfix +V10V13V2Iainfix &lt;V13V8Aainfix &lt;=c0V13FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V10V2Aainfix &lt;=c0V10Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV14V4aSomeagetV3ainfix -ainfix +V0V14V2Iainfix &lt;=c0ainfix -ainfix +V0V14V2Aainfix =anthV14V4aSomeagetV3ainfix +V0V14Iainfix &lt;ainfix +V0V14V2Iainfix &lt;V14V1Aainfix &lt;=c0V14FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="2" timelimit="5" memlimit="1000"
+        <proof prover="2" memlimit="1000"
          edited="vstte12_ring_buffer_2_RingBuffer_WP_parameter_pop_4.v">
          <result status="valid" time="1.25"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.5.3" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="3. postcondition"
+       <goal name="WP_parameter pop.5.3" expl="3. postcondition"
         sum="ae03cac2ee69d30d036812748f01f39f" proved="true"
         shape="postconditionCtaNilCtaNilainfix =V6V12aConsVVV4Iainfix =anthV13V6aSomeagetV3ainfix -ainfix +V10V13V2Iainfix &lt;=c0ainfix -ainfix +V10V13V2Aainfix =anthV13V6aSomeagetV3ainfix +V10V13Iainfix &lt;ainfix +V10V13V2Iainfix &lt;V13V8Aainfix &lt;=c0V13FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V10V2Aainfix &lt;=c0V10Iainfix =V10c0FIainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV14V4aSomeagetV3ainfix -ainfix +V0V14V2Iainfix &lt;=c0ainfix -ainfix +V0V14V2Aainfix =anthV14V4aSomeagetV3ainfix +V0V14Iainfix &lt;ainfix +V0V14V2Iainfix &lt;V14V1Aainfix &lt;=c0V14FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="5"
-         memlimit="1000">
+        <proof prover="1" timelimit="5">
          <result status="valid" time="0.00"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter pop.6" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="75" loccnumb="6" loccnume="9" expl="6. type invariant"
+     <goal name="WP_parameter pop.6" expl="6. type invariant"
       sum="0632cb5bece2309770af37c7c7af2540" proved="true"
       shape="type invariantCtaNilainfix =anthV10V6aSomeagetV3ainfix -ainfix +V9V10V2Iainfix &lt;=c0ainfix -ainfix +V9V10V2Aainfix =anthV10V6aSomeagetV3ainfix +V9V10Iainfix &lt;ainfix +V9V10V2Iainfix &lt;V10V8Aainfix &lt;=c0V10FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V9V2Aainfix &lt;=c0V9INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for pop"/>
       <transf name="split_goal"
        proved="true">
-       <goal name="WP_parameter pop.6.1" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="1."
+       <goal name="WP_parameter pop.6.1" expl="1."
         sum="d28d0eafba790e97e6ddc7eda041db0c" proved="true"
         shape="CtaNilainfix &lt;=c0V9INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix &lt;=c0V10FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="10"
-         memlimit="0">
+        <proof prover="1" memlimit="0">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.6.2" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="2."
+       <goal name="WP_parameter pop.6.2" expl="2."
         sum="c832d40cb13d561fe9952c8d8aab7fbf" proved="true"
         shape="CtaNilainfix &lt;V9V2INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix &lt;=c0V10FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="5"
-         memlimit="1000">
+        <proof prover="1" timelimit="5">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.6.3" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="3."
+       <goal name="WP_parameter pop.6.3" expl="3."
         sum="2d4a0bb6a533c57348ca2d20671f4999" proved="true"
         shape="CtaNilainfix &lt;=c0V8INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix &lt;=c0V10FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="10"
-         memlimit="0">
+        <proof prover="1" memlimit="0">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.6.4" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="4."
+       <goal name="WP_parameter pop.6.4" expl="4."
         sum="77d130e0bb1176be46866a870d8e64c5" proved="true"
         shape="CtaNilainfix &lt;=V8V2INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix &lt;=c0V10FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="5"
-         memlimit="1000">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="1" timelimit="5"
-         memlimit="1000">
+        <proof prover="0" timelimit="5" memlimit="1000">
          <result status="valid" time="0.02"/>
         </proof>
+        <proof prover="1" timelimit="5">
+         <result status="valid" time="0.01"/>
+        </proof>
        </goal>
-       <goal name="WP_parameter pop.6.5" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="5."
+       <goal name="WP_parameter pop.6.5" expl="5."
         sum="34d4dc9444a5e3d9518ce54af73f86a3" proved="true"
         shape="CtaNilainfix =V8alengthV6INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV10V4aSomeagetV3ainfix -ainfix +V0V10V2Iainfix &lt;=c0ainfix -ainfix +V0V10V2Aainfix =anthV10V4aSomeagetV3ainfix +V0V10Iainfix &lt;ainfix +V0V10V2Iainfix &lt;V10V1Aainfix &lt;=c0V10FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="10"
-         memlimit="0">
+        <proof prover="1" memlimit="0">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.6.6" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="6."
+       <goal name="WP_parameter pop.6.6" expl="6."
         sum="227ce013f8c7fad380732f8154ceb33b" proved="true"
         shape="CtaNilainfix =anthV10V6aSomeagetV3ainfix +V9V10Iainfix &lt;ainfix +V9V10V2Iainfix &lt;V10V8Aainfix &lt;=c0V10FINainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="1" timelimit="5"
-         memlimit="1000">
+        <proof prover="0" timelimit="5" memlimit="1000">
          <result status="valid" time="0.09"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.6.7" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="7."
+       <goal name="WP_parameter pop.6.7" expl="7."
         sum="6721d851a88e36a73ff7ff7f01599590" proved="true"
         shape="CtaNilainfix =anthV10V6aSomeagetV3ainfix -ainfix +V9V10V2Iainfix &lt;=c0ainfix -ainfix +V9V10V2Iainfix &lt;V10V8Aainfix &lt;=c0V10FINainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="2" timelimit="60" memlimit="4000"
+        <proof prover="2" timelimit="60"
          edited="vstte12_ring_buffer_RingBuffer_WP_parameter_pop_1.v">
          <result status="valid" time="1.36"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal name="WP_parameter pop.7" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="75" loccnumb="6" loccnume="9" expl="7. postcondition"
+     <goal name="WP_parameter pop.7" expl="7. postcondition"
       sum="973303f7b6bbdf5f2bb9da666f685efc" proved="true"
       shape="postconditionCtaNilainfix =V8ainfix -V1c1Iainfix =anthV10V6aSomeagetV3ainfix -ainfix +V9V10V2Iainfix &lt;=c0ainfix -ainfix +V9V10V2Aainfix =anthV10V6aSomeagetV3ainfix +V9V10Iainfix &lt;ainfix +V9V10V2Iainfix &lt;V10V8Aainfix &lt;=c0V10FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V9V2Aainfix &lt;=c0V9INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV11V4aSomeagetV3ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V4aSomeagetV3ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V1Aainfix &lt;=c0V11FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for pop"/>
-      <proof prover="0" timelimit="30"
-       memlimit="1000">
+      <proof prover="1" timelimit="30">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter pop.8" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="75" loccnumb="6" loccnume="9" expl="8. postcondition"
+     <goal name="WP_parameter pop.8" expl="8. postcondition"
       sum="13d25c78b2ed87748c7bf64a3bba8e55" proved="true"
       shape="postconditionCtaNilCfaNilainfix =V6V11Aainfix =V7V10aConsVVV4Iainfix =anthV12V6aSomeagetV3ainfix -ainfix +V9V12V2Iainfix &lt;=c0ainfix -ainfix +V9V12V2Aainfix =anthV12V6aSomeagetV3ainfix +V9V12Iainfix &lt;ainfix +V9V12V2Iainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V9V2Aainfix &lt;=c0V9INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV13V4aSomeagetV3ainfix -ainfix +V0V13V2Iainfix &lt;=c0ainfix -ainfix +V0V13V2Aainfix =anthV13V4aSomeagetV3ainfix +V0V13Iainfix &lt;ainfix +V0V13V2Iainfix &lt;V13V1Aainfix &lt;=c0V13FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for pop"/>
       <transf name="split_goal_wp"
        proved="true">
-       <goal name="WP_parameter pop.8.1" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="1. postcondition"
+       <goal name="WP_parameter pop.8.1" expl="1. postcondition"
         sum="f06a358e173bb624ffccf417e039f06e" proved="true"
         shape="postconditionCtaNilCfaNiltaConsVVV4Iainfix =anthV12V6aSomeagetV3ainfix -ainfix +V9V12V2Iainfix &lt;=c0ainfix -ainfix +V9V12V2Aainfix =anthV12V6aSomeagetV3ainfix +V9V12Iainfix &lt;ainfix +V9V12V2Iainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V9V2Aainfix &lt;=c0V9INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV13V4aSomeagetV3ainfix -ainfix +V0V13V2Iainfix &lt;=c0ainfix -ainfix +V0V13V2Aainfix =anthV13V4aSomeagetV3ainfix +V0V13Iainfix &lt;ainfix +V0V13V2Iainfix &lt;V13V1Aainfix &lt;=c0V13FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="5"
-         memlimit="1000">
+        <proof prover="1" timelimit="5">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.8.2" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="2. postcondition"
+       <goal name="WP_parameter pop.8.2" expl="2. postcondition"
         sum="34b4ea13d48bac17bc067dc93eb46b86" proved="true"
         shape="postconditionCtaNilCtaNilainfix =V7V10aConsVVV4Iainfix =anthV12V6aSomeagetV3ainfix -ainfix +V9V12V2Iainfix &lt;=c0ainfix -ainfix +V9V12V2Aainfix =anthV12V6aSomeagetV3ainfix +V9V12Iainfix &lt;ainfix +V9V12V2Iainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V9V2Aainfix &lt;=c0V9INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV13V4aSomeagetV3ainfix -ainfix +V0V13V2Iainfix &lt;=c0ainfix -ainfix +V0V13V2Aainfix =anthV13V4aSomeagetV3ainfix +V0V13Iainfix &lt;ainfix +V0V13V2Iainfix &lt;V13V1Aainfix &lt;=c0V13FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="2" timelimit="5" memlimit="1000"
+        <proof prover="2" memlimit="1000"
          edited="vstte12_ring_buffer_2_RingBuffer_WP_parameter_pop_3.v">
          <result status="valid" time="1.19"/>
         </proof>
        </goal>
-       <goal name="WP_parameter pop.8.3" locfile="../vstte12_ring_buffer.mlw"
-        loclnum="75" loccnumb="6" loccnume="9" expl="3. postcondition"
+       <goal name="WP_parameter pop.8.3" expl="3. postcondition"
         sum="193d2ec2fafe040b79a0c1b8698680c5" proved="true"
         shape="postconditionCtaNilCtaNilainfix =V6V11aConsVVV4Iainfix =anthV12V6aSomeagetV3ainfix -ainfix +V9V12V2Iainfix &lt;=c0ainfix -ainfix +V9V12V2Aainfix =anthV12V6aSomeagetV3ainfix +V9V12Iainfix &lt;ainfix +V9V12V2Iainfix &lt;V12V8Aainfix &lt;=c0V12FAainfix =V8alengthV6Aainfix &lt;=V8V2Aainfix &lt;=c0V8Aainfix &lt;V9V2Aainfix &lt;=c0V9INainfix =V9V2Iainfix =V9ainfix +V0c1FIainfix =V8ainfix -V1c1FLagetV3V0Iainfix &lt;V0V2Aainfix &lt;=c0V0Iainfix =V6V5FaConswVV4Iainfix &gt;V1c0Aainfix &lt;=c0V2Aainfix =anthV13V4aSomeagetV3ainfix -ainfix +V0V13V2Iainfix &lt;=c0ainfix -ainfix +V0V13V2Aainfix =anthV13V4aSomeagetV3ainfix +V0V13Iainfix &lt;ainfix +V0V13V2Iainfix &lt;V13V1Aainfix &lt;=c0V13FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0F">
         <label name="expl:VC for pop"/>
-        <proof prover="0" timelimit="5"
-         memlimit="1000">
+        <proof prover="1" timelimit="5">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
@@ -507,486 +413,374 @@
     </transf>
    </goal>
   </theory>
-  <theory name="Harness" locfile="../vstte12_ring_buffer.mlw"
-   loclnum="91" loccnumb="7" loccnume="14"
+  <theory name="Harness"
    verified="true">
-   <goal name="WP_parameter harness" locfile="../vstte12_ring_buffer.mlw"
-    loclnum="96" loccnumb="6" loccnume="13" expl="VC for harness"
+   <goal name="WP_parameter harness" expl="VC for harness"
     sum="6dec2af1d118fe165c931503260fa6ca" proved="true"
     shape="ainfix =V25c3ICfaNilainfix =V22V27Aainfix =V25V26aConsVVV18Aainfix =V23ainfix -V19c1Aainfix =anthV28V22aSomeagetV12ainfix -ainfix +V24V28V2Iainfix &lt;=c0ainfix -ainfix +V24V28V2Aainfix =anthV28V22aSomeagetV12ainfix +V24V28Iainfix &lt;ainfix +V24V28V2Iainfix &lt;V28V23Aainfix &lt;=c0V28FAainfix =V23alengthV22Aainfix &lt;=V23V2Aainfix &lt;=c0V23Aainfix &lt;V24V2Aainfix &lt;=c0V24FFAainfix &gt;V19c0Aainfix =V21c2ICfaNilainfix =V18V30Aainfix =V21V29aConsVVV14Aainfix =V19ainfix -V15c1Aainfix =anthV31V18aSomeagetV12ainfix -ainfix +V20V31V2Iainfix &lt;=c0ainfix -ainfix +V20V31V2Aainfix =anthV31V18aSomeagetV12ainfix +V20V31Iainfix &lt;ainfix +V20V31V2Iainfix &lt;V31V19Aainfix &lt;=c0V31FAainfix =V19alengthV18Aainfix &lt;=V19V2Aainfix &lt;=c0V19Aainfix &lt;V20V2Aainfix &lt;=c0V20FFAainfix &gt;V15c0Aainfix =V17c1ICfaNilainfix =V14V33Aainfix =V17V32aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV34V14aSomeagetV12ainfix -ainfix +V16V34V2Iainfix &lt;=c0ainfix -ainfix +V16V34V2Aainfix =anthV34V14aSomeagetV12ainfix +V16V34Iainfix &lt;ainfix +V16V34V2Iainfix &lt;V34V15Aainfix &lt;=c0V34FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFAainfix &gt;V13c0Iainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV35V11aSomeagetV12ainfix -ainfix +V0V35V2Iainfix &lt;=c0ainfix -ainfix +V0V35V2Aainfix =anthV35V11aSomeagetV12ainfix +V0V35Iainfix &lt;ainfix +V0V35V2Iainfix &lt;V35V13Aainfix &lt;=c0V35FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FAainfix &lt;V10V2Iainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV36V8aSomeagetV9ainfix -ainfix +V0V36V2Iainfix &lt;=c0ainfix -ainfix +V0V36V2Aainfix =anthV36V8aSomeagetV9ainfix +V0V36Iainfix &lt;ainfix +V0V36V2Iainfix &lt;V36V10Aainfix &lt;=c0V36FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FAainfix &lt;V7V2Iainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV37V5aSomeagetV6ainfix -ainfix +V0V37V2Iainfix &lt;=c0ainfix -ainfix +V0V37V2Aainfix =anthV37V5aSomeagetV6ainfix +V0V37Iainfix &lt;ainfix +V0V37V2Iainfix &lt;V37V7Aainfix &lt;=c0V37FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FAainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV38V4aSomeagetV3ainfix -ainfix +V0V38V2Iainfix &lt;=c0ainfix -ainfix +V0V38V2Aainfix =anthV38V4aSomeagetV3ainfix +V0V38Iainfix &lt;ainfix +V0V38V2Iainfix &lt;V38V1Aainfix &lt;=c0V38FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FAainfix &gt;c10c0">
     <label name="expl:VC for harness"/>
     <transf name="split_goal"
      proved="true">
-     <goal name="WP_parameter harness.1" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="1. precondition"
+     <goal name="WP_parameter harness.1" expl="1. precondition"
       sum="d95b712da10ce29ad1b7591df70fb45a" proved="true"
       shape="preconditionainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.2" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="2. precondition"
+     <goal name="WP_parameter harness.2" expl="2. precondition"
       sum="9cc0375df19d7f74ce61369d86968cbb" proved="true"
       shape="preconditionainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV5V4aSomeagetV3ainfix -ainfix +V0V5V2Iainfix &lt;=c0ainfix -ainfix +V0V5V2Aainfix =anthV5V4aSomeagetV3ainfix +V0V5Iainfix &lt;ainfix +V0V5V2Iainfix &lt;V5V1Aainfix &lt;=c0V5FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.3" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="3. precondition"
+     <goal name="WP_parameter harness.3" expl="3. precondition"
       sum="d5cfc313e4955ad8fe3b9a3468a84ab8" proved="true"
       shape="preconditionainfix &lt;V7V2Iainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV8V5aSomeagetV6ainfix -ainfix +V0V8V2Iainfix &lt;=c0ainfix -ainfix +V0V8V2Aainfix =anthV8V5aSomeagetV6ainfix +V0V8Iainfix &lt;ainfix +V0V8V2Iainfix &lt;V8V7Aainfix &lt;=c0V8FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV9V4aSomeagetV3ainfix -ainfix +V0V9V2Iainfix &lt;=c0ainfix -ainfix +V0V9V2Aainfix =anthV9V4aSomeagetV3ainfix +V0V9Iainfix &lt;ainfix +V0V9V2Iainfix &lt;V9V1Aainfix &lt;=c0V9FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
+      <proof prover="1" memlimit="0">
+       <result status="valid" time="0.01"/>
+      </proof>
      </goal>
-     <goal name="WP_parameter harness.4" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="4. precondition"
+     <goal name="WP_parameter harness.4" expl="4. precondition"
       sum="a7e89ab7614f9c19418b2bab62d3748a" proved="true"
       shape="preconditionainfix &lt;V10V2Iainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV11V8aSomeagetV9ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V8aSomeagetV9ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V10Aainfix &lt;=c0V11FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV12V5aSomeagetV6ainfix -ainfix +V0V12V2Iainfix &lt;=c0ainfix -ainfix +V0V12V2Aainfix =anthV12V5aSomeagetV6ainfix +V0V12Iainfix &lt;ainfix +V0V12V2Iainfix &lt;V12V7Aainfix &lt;=c0V12FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV13V4aSomeagetV3ainfix -ainfix +V0V13V2Iainfix &lt;=c0ainfix -ainfix +V0V13V2Aainfix =anthV13V4aSomeagetV3ainfix +V0V13Iainfix &lt;ainfix +V0V13V2Iainfix &lt;V13V1Aainfix &lt;=c0V13FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.5" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="5. precondition"
+     <goal name="WP_parameter harness.5" expl="5. precondition"
       sum="a9c8f91bbb5af2c3b5d1edfaea6d3c46" proved="true"
       shape="preconditionainfix &gt;V13c0Iainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV14V11aSomeagetV12ainfix -ainfix +V0V14V2Iainfix &lt;=c0ainfix -ainfix +V0V14V2Aainfix =anthV14V11aSomeagetV12ainfix +V0V14Iainfix &lt;ainfix +V0V14V2Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV15V8aSomeagetV9ainfix -ainfix +V0V15V2Iainfix &lt;=c0ainfix -ainfix +V0V15V2Aainfix =anthV15V8aSomeagetV9ainfix +V0V15Iainfix &lt;ainfix +V0V15V2Iainfix &lt;V15V10Aainfix &lt;=c0V15FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV16V5aSomeagetV6ainfix -ainfix +V0V16V2Iainfix &lt;=c0ainfix -ainfix +V0V16V2Aainfix =anthV16V5aSomeagetV6ainfix +V0V16Iainfix &lt;ainfix +V0V16V2Iainfix &lt;V16V7Aainfix &lt;=c0V16FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV17V4aSomeagetV3ainfix -ainfix +V0V17V2Iainfix &lt;=c0ainfix -ainfix +V0V17V2Aainfix =anthV17V4aSomeagetV3ainfix +V0V17Iainfix &lt;ainfix +V0V17V2Iainfix &lt;V17V1Aainfix &lt;=c0V17FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="15"
-       memlimit="0">
+      <proof prover="1" timelimit="15" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.6" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="6. assertion"
+     <goal name="WP_parameter harness.6" expl="6. assertion"
       sum="568938fc763146f35adf1f62d02a6bc6" proved="true"
       shape="assertionainfix =V17c1ICfaNilainfix =V14V19Aainfix =V17V18aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV20V14aSomeagetV12ainfix -ainfix +V16V20V2Iainfix &lt;=c0ainfix -ainfix +V16V20V2Aainfix =anthV20V14aSomeagetV12ainfix +V16V20Iainfix &lt;ainfix +V16V20V2Iainfix &lt;V20V15Aainfix &lt;=c0V20FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV21V11aSomeagetV12ainfix -ainfix +V0V21V2Iainfix &lt;=c0ainfix -ainfix +V0V21V2Aainfix =anthV21V11aSomeagetV12ainfix +V0V21Iainfix &lt;ainfix +V0V21V2Iainfix &lt;V21V13Aainfix &lt;=c0V21FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV22V8aSomeagetV9ainfix -ainfix +V0V22V2Iainfix &lt;=c0ainfix -ainfix +V0V22V2Aainfix =anthV22V8aSomeagetV9ainfix +V0V22Iainfix &lt;ainfix +V0V22V2Iainfix &lt;V22V10Aainfix &lt;=c0V22FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV23V5aSomeagetV6ainfix -ainfix +V0V23V2Iainfix &lt;=c0ainfix -ainfix +V0V23V2Aainfix =anthV23V5aSomeagetV6ainfix +V0V23Iainfix &lt;ainfix +V0V23V2Iainfix &lt;V23V7Aainfix &lt;=c0V23FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV24V4aSomeagetV3ainfix -ainfix +V0V24V2Iainfix &lt;=c0ainfix -ainfix +V0V24V2Aainfix =anthV24V4aSomeagetV3ainfix +V0V24Iainfix &lt;ainfix +V0V24V2Iainfix &lt;V24V1Aainfix &lt;=c0V24FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.89"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.7" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="7. precondition"
+     <goal name="WP_parameter harness.7" expl="7. precondition"
       sum="bbf184fe374f81bf0dd011ad1665932a" proved="true"
       shape="preconditionainfix &gt;V15c0Iainfix =V17c1ICfaNilainfix =V14V19Aainfix =V17V18aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV20V14aSomeagetV12ainfix -ainfix +V16V20V2Iainfix &lt;=c0ainfix -ainfix +V16V20V2Aainfix =anthV20V14aSomeagetV12ainfix +V16V20Iainfix &lt;ainfix +V16V20V2Iainfix &lt;V20V15Aainfix &lt;=c0V20FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV21V11aSomeagetV12ainfix -ainfix +V0V21V2Iainfix &lt;=c0ainfix -ainfix +V0V21V2Aainfix =anthV21V11aSomeagetV12ainfix +V0V21Iainfix &lt;ainfix +V0V21V2Iainfix &lt;V21V13Aainfix &lt;=c0V21FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV22V8aSomeagetV9ainfix -ainfix +V0V22V2Iainfix &lt;=c0ainfix -ainfix +V0V22V2Aainfix =anthV22V8aSomeagetV9ainfix +V0V22Iainfix &lt;ainfix +V0V22V2Iainfix &lt;V22V10Aainfix &lt;=c0V22FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV23V5aSomeagetV6ainfix -ainfix +V0V23V2Iainfix &lt;=c0ainfix -ainfix +V0V23V2Aainfix =anthV23V5aSomeagetV6ainfix +V0V23Iainfix &lt;ainfix +V0V23V2Iainfix &lt;V23V7Aainfix &lt;=c0V23FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV24V4aSomeagetV3ainfix -ainfix +V0V24V2Iainfix &lt;=c0ainfix -ainfix +V0V24V2Aainfix =anthV24V4aSomeagetV3ainfix +V0V24Iainfix &lt;ainfix +V0V24V2Iainfix &lt;V24V1Aainfix &lt;=c0V24FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.8" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="8. assertion"
+     <goal name="WP_parameter harness.8" expl="8. assertion"
       sum="66ba17701fc8fdc20dbaf8d450d22d7a" proved="true"
       shape="assertionainfix =V21c2ICfaNilainfix =V18V23Aainfix =V21V22aConsVVV14Aainfix =V19ainfix -V15c1Aainfix =anthV24V18aSomeagetV12ainfix -ainfix +V20V24V2Iainfix &lt;=c0ainfix -ainfix +V20V24V2Aainfix =anthV24V18aSomeagetV12ainfix +V20V24Iainfix &lt;ainfix +V20V24V2Iainfix &lt;V24V19Aainfix &lt;=c0V24FAainfix =V19alengthV18Aainfix &lt;=V19V2Aainfix &lt;=c0V19Aainfix &lt;V20V2Aainfix &lt;=c0V20FFIainfix &gt;V15c0Iainfix =V17c1ICfaNilainfix =V14V26Aainfix =V17V25aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV27V14aSomeagetV12ainfix -ainfix +V16V27V2Iainfix &lt;=c0ainfix -ainfix +V16V27V2Aainfix =anthV27V14aSomeagetV12ainfix +V16V27Iainfix &lt;ainfix +V16V27V2Iainfix &lt;V27V15Aainfix &lt;=c0V27FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV28V11aSomeagetV12ainfix -ainfix +V0V28V2Iainfix &lt;=c0ainfix -ainfix +V0V28V2Aainfix =anthV28V11aSomeagetV12ainfix +V0V28Iainfix &lt;ainfix +V0V28V2Iainfix &lt;V28V13Aainfix &lt;=c0V28FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV29V8aSomeagetV9ainfix -ainfix +V0V29V2Iainfix &lt;=c0ainfix -ainfix +V0V29V2Aainfix =anthV29V8aSomeagetV9ainfix +V0V29Iainfix &lt;ainfix +V0V29V2Iainfix &lt;V29V10Aainfix &lt;=c0V29FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV30V5aSomeagetV6ainfix -ainfix +V0V30V2Iainfix &lt;=c0ainfix -ainfix +V0V30V2Aainfix =anthV30V5aSomeagetV6ainfix +V0V30Iainfix &lt;ainfix +V0V30V2Iainfix &lt;V30V7Aainfix &lt;=c0V30FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV31V4aSomeagetV3ainfix -ainfix +V0V31V2Iainfix &lt;=c0ainfix -ainfix +V0V31V2Aainfix =anthV31V4aSomeagetV3ainfix +V0V31Iainfix &lt;ainfix +V0V31V2Iainfix &lt;V31V1Aainfix &lt;=c0V31FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="13"
-       memlimit="0">
+      <proof prover="1" timelimit="13" memlimit="0">
        <result status="valid" time="1.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.9" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="9. precondition"
+     <goal name="WP_parameter harness.9" expl="9. precondition"
       sum="716e504b7c984a1ea8aa1052d658006f" proved="true"
       shape="preconditionainfix &gt;V19c0Iainfix =V21c2ICfaNilainfix =V18V23Aainfix =V21V22aConsVVV14Aainfix =V19ainfix -V15c1Aainfix =anthV24V18aSomeagetV12ainfix -ainfix +V20V24V2Iainfix &lt;=c0ainfix -ainfix +V20V24V2Aainfix =anthV24V18aSomeagetV12ainfix +V20V24Iainfix &lt;ainfix +V20V24V2Iainfix &lt;V24V19Aainfix &lt;=c0V24FAainfix =V19alengthV18Aainfix &lt;=V19V2Aainfix &lt;=c0V19Aainfix &lt;V20V2Aainfix &lt;=c0V20FFIainfix &gt;V15c0Iainfix =V17c1ICfaNilainfix =V14V26Aainfix =V17V25aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV27V14aSomeagetV12ainfix -ainfix +V16V27V2Iainfix &lt;=c0ainfix -ainfix +V16V27V2Aainfix =anthV27V14aSomeagetV12ainfix +V16V27Iainfix &lt;ainfix +V16V27V2Iainfix &lt;V27V15Aainfix &lt;=c0V27FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV28V11aSomeagetV12ainfix -ainfix +V0V28V2Iainfix &lt;=c0ainfix -ainfix +V0V28V2Aainfix =anthV28V11aSomeagetV12ainfix +V0V28Iainfix &lt;ainfix +V0V28V2Iainfix &lt;V28V13Aainfix &lt;=c0V28FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV29V8aSomeagetV9ainfix -ainfix +V0V29V2Iainfix &lt;=c0ainfix -ainfix +V0V29V2Aainfix =anthV29V8aSomeagetV9ainfix +V0V29Iainfix &lt;ainfix +V0V29V2Iainfix &lt;V29V10Aainfix &lt;=c0V29FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV30V5aSomeagetV6ainfix -ainfix +V0V30V2Iainfix &lt;=c0ainfix -ainfix +V0V30V2Aainfix =anthV30V5aSomeagetV6ainfix +V0V30Iainfix &lt;ainfix +V0V30V2Iainfix &lt;V30V7Aainfix &lt;=c0V30FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV31V4aSomeagetV3ainfix -ainfix +V0V31V2Iainfix &lt;=c0ainfix -ainfix +V0V31V2Aainfix =anthV31V4aSomeagetV3ainfix +V0V31Iainfix &lt;ainfix +V0V31V2Iainfix &lt;V31V1Aainfix &lt;=c0V31FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness.10"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="96" loccnumb="6" loccnume="13" expl="10. assertion"
+     <goal name="WP_parameter harness.10" expl="10. assertion"
       sum="6b34c9fc95c34f70a4725cb40385c26e" proved="true"
       shape="assertionainfix =V25c3ICfaNilainfix =V22V27Aainfix =V25V26aConsVVV18Aainfix =V23ainfix -V19c1Aainfix =anthV28V22aSomeagetV12ainfix -ainfix +V24V28V2Iainfix &lt;=c0ainfix -ainfix +V24V28V2Aainfix =anthV28V22aSomeagetV12ainfix +V24V28Iainfix &lt;ainfix +V24V28V2Iainfix &lt;V28V23Aainfix &lt;=c0V28FAainfix =V23alengthV22Aainfix &lt;=V23V2Aainfix &lt;=c0V23Aainfix &lt;V24V2Aainfix &lt;=c0V24FFIainfix &gt;V19c0Iainfix =V21c2ICfaNilainfix =V18V30Aainfix =V21V29aConsVVV14Aainfix =V19ainfix -V15c1Aainfix =anthV31V18aSomeagetV12ainfix -ainfix +V20V31V2Iainfix &lt;=c0ainfix -ainfix +V20V31V2Aainfix =anthV31V18aSomeagetV12ainfix +V20V31Iainfix &lt;ainfix +V20V31V2Iainfix &lt;V31V19Aainfix &lt;=c0V31FAainfix =V19alengthV18Aainfix &lt;=V19V2Aainfix &lt;=c0V19Aainfix &lt;V20V2Aainfix &lt;=c0V20FFIainfix &gt;V15c0Iainfix =V17c1ICfaNilainfix =V14V33Aainfix =V17V32aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV34V14aSomeagetV12ainfix -ainfix +V16V34V2Iainfix &lt;=c0ainfix -ainfix +V16V34V2Aainfix =anthV34V14aSomeagetV12ainfix +V16V34Iainfix &lt;ainfix +V16V34V2Iainfix &lt;V34V15Aainfix &lt;=c0V34FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV35V11aSomeagetV12ainfix -ainfix +V0V35V2Iainfix &lt;=c0ainfix -ainfix +V0V35V2Aainfix =anthV35V11aSomeagetV12ainfix +V0V35Iainfix &lt;ainfix +V0V35V2Iainfix &lt;V35V13Aainfix &lt;=c0V35FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV36V8aSomeagetV9ainfix -ainfix +V0V36V2Iainfix &lt;=c0ainfix -ainfix +V0V36V2Aainfix =anthV36V8aSomeagetV9ainfix +V0V36Iainfix &lt;ainfix +V0V36V2Iainfix &lt;V36V10Aainfix &lt;=c0V36FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV37V5aSomeagetV6ainfix -ainfix +V0V37V2Iainfix &lt;=c0ainfix -ainfix +V0V37V2Aainfix =anthV37V5aSomeagetV6ainfix +V0V37Iainfix &lt;ainfix +V0V37V2Iainfix &lt;V37V7Aainfix &lt;=c0V37FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c10Aainfix &lt;=c0V2Aainfix =anthV38V4aSomeagetV3ainfix -ainfix +V0V38V2Iainfix &lt;=c0ainfix -ainfix +V0V38V2Aainfix =anthV38V4aSomeagetV3ainfix +V0V38Iainfix &lt;ainfix +V0V38V2Iainfix &lt;V38V1Aainfix &lt;=c0V38FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c10c0">
       <label name="expl:VC for harness"/>
-      <proof prover="0" timelimit="14"
-       memlimit="0">
+      <proof prover="1" timelimit="14" memlimit="0">
        <result status="valid" time="1.07"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter harness2" locfile="../vstte12_ring_buffer.mlw"
-    loclnum="106" loccnumb="6" loccnume="14" expl="VC for harness2"
+   <goal name="WP_parameter harness2" expl="VC for harness2"
     sum="e8594ee5b48cd891dc79c12714adf8c0" proved="true"
     shape="ainfix =V32c4ICfaNilainfix =V29V34Aainfix =V32V33aConsVVV25Aainfix =V30ainfix -V26c1Aainfix =anthV35V29aSomeagetV19ainfix -ainfix +V31V35V2Iainfix &lt;=c0ainfix -ainfix +V31V35V2Aainfix =anthV35V29aSomeagetV19ainfix +V31V35Iainfix &lt;ainfix +V31V35V2Iainfix &lt;V35V30Aainfix &lt;=c0V35FAainfix =V30alengthV29Aainfix &lt;=V30V2Aainfix &lt;=c0V30Aainfix &lt;V31V2Aainfix &lt;=c0V31FFAainfix &gt;V26c0Aainfix =V25aConsc4aNilAainfix =V28c3ICfaNilainfix =V25V37Aainfix =V28V36aConsVVV21Aainfix =V26ainfix -V22c1Aainfix =anthV38V25aSomeagetV19ainfix -ainfix +V27V38V2Iainfix &lt;=c0ainfix -ainfix +V27V38V2Aainfix =anthV38V25aSomeagetV19ainfix +V27V38Iainfix &lt;ainfix +V27V38V2Iainfix &lt;V38V26Aainfix &lt;=c0V38FAainfix =V26alengthV25Aainfix &lt;=V26V2Aainfix &lt;=c0V26Aainfix &lt;V27V2Aainfix &lt;=c0V27FFAainfix &gt;V22c0Aainfix =V21aConsc3aConsc4aNilAainfix =V24c2ICfaNilainfix =V21V40Aainfix =V24V39aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV41V21aSomeagetV19ainfix -ainfix +V23V41V2Iainfix &lt;=c0ainfix -ainfix +V23V41V2Aainfix =anthV41V21aSomeagetV19ainfix +V23V41Iainfix &lt;ainfix +V23V41V2Iainfix &lt;V41V22Aainfix &lt;=c0V41FAainfix =V22alengthV21Aainfix &lt;=V22V2Aainfix &lt;=c0V22Aainfix &lt;V23V2Aainfix &lt;=c0V23FFAainfix &gt;V20c0Aainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV42V18aSomeagetV19ainfix -ainfix +V16V42V2Iainfix &lt;=c0ainfix -ainfix +V16V42V2Aainfix =anthV42V18aSomeagetV19ainfix +V16V42Iainfix &lt;ainfix +V16V42V2Iainfix &lt;V42V20Aainfix &lt;=c0V42FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FAainfix &lt;V15V2Aainfix =V14aConsc2aConsc3aNilAainfix =V17c1ICfaNilainfix =V14V44Aainfix =V17V43aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV45V14aSomeagetV12ainfix -ainfix +V16V45V2Iainfix &lt;=c0ainfix -ainfix +V16V45V2Aainfix =anthV45V14aSomeagetV12ainfix +V16V45Iainfix &lt;ainfix +V16V45V2Iainfix &lt;V45V15Aainfix &lt;=c0V45FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFAainfix &gt;V13c0Aainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV46V11aSomeagetV12ainfix -ainfix +V0V46V2Iainfix &lt;=c0ainfix -ainfix +V0V46V2Aainfix =anthV46V11aSomeagetV12ainfix +V0V46Iainfix &lt;ainfix +V0V46V2Iainfix &lt;V46V13Aainfix &lt;=c0V46FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FAainfix &lt;V10V2Aainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV47V8aSomeagetV9ainfix -ainfix +V0V47V2Iainfix &lt;=c0ainfix -ainfix +V0V47V2Aainfix =anthV47V8aSomeagetV9ainfix +V0V47Iainfix &lt;ainfix +V0V47V2Iainfix &lt;V47V10Aainfix &lt;=c0V47FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FAainfix &lt;V7V2Aainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV48V5aSomeagetV6ainfix -ainfix +V0V48V2Iainfix &lt;=c0ainfix -ainfix +V0V48V2Aainfix =anthV48V5aSomeagetV6ainfix +V0V48Iainfix &lt;ainfix +V0V48V2Iainfix &lt;V48V7Aainfix &lt;=c0V48FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FAainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV49V4aSomeagetV3ainfix -ainfix +V0V49V2Iainfix &lt;=c0ainfix -ainfix +V0V49V2Aainfix =anthV49V4aSomeagetV3ainfix +V0V49Iainfix &lt;ainfix +V0V49V2Iainfix &lt;V49V1Aainfix &lt;=c0V49FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FAainfix &gt;c3c0">
     <label name="expl:VC for harness2"/>
     <transf name="split_goal"
      proved="true">
-     <goal name="WP_parameter harness2.1"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="1. precondition"
+     <goal name="WP_parameter harness2.1" expl="1. precondition"
       sum="1ff3da5dafd8019751263ac54dc7d27c" proved="true"
       shape="preconditionainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.2"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="2. precondition"
+     <goal name="WP_parameter harness2.2" expl="2. precondition"
       sum="09df1ce16481310ad8f77d9282754d45" proved="true"
       shape="preconditionainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV5V4aSomeagetV3ainfix -ainfix +V0V5V2Iainfix &lt;=c0ainfix -ainfix +V0V5V2Aainfix =anthV5V4aSomeagetV3ainfix +V0V5Iainfix &lt;ainfix +V0V5V2Iainfix &lt;V5V1Aainfix &lt;=c0V5FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.3"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="3. assertion"
+     <goal name="WP_parameter harness2.3" expl="3. assertion"
       sum="045ad1c082715ac69f3d872b41155453" proved="true"
       shape="assertionainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV8V5aSomeagetV6ainfix -ainfix +V0V8V2Iainfix &lt;=c0ainfix -ainfix +V0V8V2Aainfix =anthV8V5aSomeagetV6ainfix +V0V8Iainfix &lt;ainfix +V0V8V2Iainfix &lt;V8V7Aainfix &lt;=c0V8FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV9V4aSomeagetV3ainfix -ainfix +V0V9V2Iainfix &lt;=c0ainfix -ainfix +V0V9V2Aainfix =anthV9V4aSomeagetV3ainfix +V0V9Iainfix &lt;ainfix +V0V9V2Iainfix &lt;V9V1Aainfix &lt;=c0V9FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.4"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="4. precondition"
+     <goal name="WP_parameter harness2.4" expl="4. precondition"
       sum="6bb4abe05918ef88eb2c665111781b04" proved="true"
       shape="preconditionainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV8V5aSomeagetV6ainfix -ainfix +V0V8V2Iainfix &lt;=c0ainfix -ainfix +V0V8V2Aainfix =anthV8V5aSomeagetV6ainfix +V0V8Iainfix &lt;ainfix +V0V8V2Iainfix &lt;V8V7Aainfix &lt;=c0V8FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV9V4aSomeagetV3ainfix -ainfix +V0V9V2Iainfix &lt;=c0ainfix -ainfix +V0V9V2Aainfix =anthV9V4aSomeagetV3ainfix +V0V9Iainfix &lt;ainfix +V0V9V2Iainfix &lt;V9V1Aainfix &lt;=c0V9FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.5"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="5. assertion"
+     <goal name="WP_parameter harness2.5" expl="5. assertion"
       sum="0f43588571ae0a129654715199493383" proved="true"
       shape="assertionainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV11V8aSomeagetV9ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V8aSomeagetV9ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V10Aainfix &lt;=c0V11FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV12V5aSomeagetV6ainfix -ainfix +V0V12V2Iainfix &lt;=c0ainfix -ainfix +V0V12V2Aainfix =anthV12V5aSomeagetV6ainfix +V0V12Iainfix &lt;ainfix +V0V12V2Iainfix &lt;V12V7Aainfix &lt;=c0V12FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV13V4aSomeagetV3ainfix -ainfix +V0V13V2Iainfix &lt;=c0ainfix -ainfix +V0V13V2Aainfix =anthV13V4aSomeagetV3ainfix +V0V13Iainfix &lt;ainfix +V0V13V2Iainfix &lt;V13V1Aainfix &lt;=c0V13FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.08"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.6"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="6. precondition"
+     <goal name="WP_parameter harness2.6" expl="6. precondition"
       sum="231cef8a751dc622b6362b3fe0a3f89b" proved="true"
       shape="preconditionainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV11V8aSomeagetV9ainfix -ainfix +V0V11V2Iainfix &lt;=c0ainfix -ainfix +V0V11V2Aainfix =anthV11V8aSomeagetV9ainfix +V0V11Iainfix &lt;ainfix +V0V11V2Iainfix &lt;V11V10Aainfix &lt;=c0V11FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV12V5aSomeagetV6ainfix -ainfix +V0V12V2Iainfix &lt;=c0ainfix -ainfix +V0V12V2Aainfix =anthV12V5aSomeagetV6ainfix +V0V12Iainfix &lt;ainfix +V0V12V2Iainfix &lt;V12V7Aainfix &lt;=c0V12FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV13V4aSomeagetV3ainfix -ainfix +V0V13V2Iainfix &lt;=c0ainfix -ainfix +V0V13V2Aainfix =anthV13V4aSomeagetV3ainfix +V0V13Iainfix &lt;ainfix +V0V13V2Iainfix &lt;V13V1Aainfix &lt;=c0V13FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.7"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="7. assertion"
+     <goal name="WP_parameter harness2.7" expl="7. assertion"
       sum="1034bc69add43293d45286558ac7560f" proved="true"
       shape="assertionainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV14V11aSomeagetV12ainfix -ainfix +V0V14V2Iainfix &lt;=c0ainfix -ainfix +V0V14V2Aainfix =anthV14V11aSomeagetV12ainfix +V0V14Iainfix &lt;ainfix +V0V14V2Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV15V8aSomeagetV9ainfix -ainfix +V0V15V2Iainfix &lt;=c0ainfix -ainfix +V0V15V2Aainfix =anthV15V8aSomeagetV9ainfix +V0V15Iainfix &lt;ainfix +V0V15V2Iainfix &lt;V15V10Aainfix &lt;=c0V15FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV16V5aSomeagetV6ainfix -ainfix +V0V16V2Iainfix &lt;=c0ainfix -ainfix +V0V16V2Aainfix =anthV16V5aSomeagetV6ainfix +V0V16Iainfix &lt;ainfix +V0V16V2Iainfix &lt;V16V7Aainfix &lt;=c0V16FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV17V4aSomeagetV3ainfix -ainfix +V0V17V2Iainfix &lt;=c0ainfix -ainfix +V0V17V2Aainfix =anthV17V4aSomeagetV3ainfix +V0V17Iainfix &lt;ainfix +V0V17V2Iainfix &lt;V17V1Aainfix &lt;=c0V17FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="1" timelimit="10"
-       memlimit="1000">
+      <proof prover="0" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.8"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="8. precondition"
+     <goal name="WP_parameter harness2.8" expl="8. precondition"
       sum="a9240f5241cf097616f88ca0608d14bd" proved="true"
       shape="preconditionainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV14V11aSomeagetV12ainfix -ainfix +V0V14V2Iainfix &lt;=c0ainfix -ainfix +V0V14V2Aainfix =anthV14V11aSomeagetV12ainfix +V0V14Iainfix &lt;ainfix +V0V14V2Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV15V8aSomeagetV9ainfix -ainfix +V0V15V2Iainfix &lt;=c0ainfix -ainfix +V0V15V2Aainfix =anthV15V8aSomeagetV9ainfix +V0V15Iainfix &lt;ainfix +V0V15V2Iainfix &lt;V15V10Aainfix &lt;=c0V15FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV16V5aSomeagetV6ainfix -ainfix +V0V16V2Iainfix &lt;=c0ainfix -ainfix +V0V16V2Aainfix =anthV16V5aSomeagetV6ainfix +V0V16Iainfix &lt;ainfix +V0V16V2Iainfix &lt;V16V7Aainfix &lt;=c0V16FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV17V4aSomeagetV3ainfix -ainfix +V0V17V2Iainfix &lt;=c0ainfix -ainfix +V0V17V2Aainfix =anthV17V4aSomeagetV3ainfix +V0V17Iainfix &lt;ainfix +V0V17V2Iainfix &lt;V17V1Aainfix &lt;=c0V17FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.9"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="9. assertion"
+     <goal name="WP_parameter harness2.9" expl="9. assertion"
       sum="7c3e6dc3fc5bc6fe91e82b869c27a680" proved="true"
       shape="assertionainfix =V17c1ICfaNilainfix =V14V19Aainfix =V17V18aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV20V14aSomeagetV12ainfix -ainfix +V16V20V2Iainfix &lt;=c0ainfix -ainfix +V16V20V2Aainfix =anthV20V14aSomeagetV12ainfix +V16V20Iainfix &lt;ainfix +V16V20V2Iainfix &lt;V20V15Aainfix &lt;=c0V20FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV21V11aSomeagetV12ainfix -ainfix +V0V21V2Iainfix &lt;=c0ainfix -ainfix +V0V21V2Aainfix =anthV21V11aSomeagetV12ainfix +V0V21Iainfix &lt;ainfix +V0V21V2Iainfix &lt;V21V13Aainfix &lt;=c0V21FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV22V8aSomeagetV9ainfix -ainfix +V0V22V2Iainfix &lt;=c0ainfix -ainfix +V0V22V2Aainfix =anthV22V8aSomeagetV9ainfix +V0V22Iainfix &lt;ainfix +V0V22V2Iainfix &lt;V22V10Aainfix &lt;=c0V22FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV23V5aSomeagetV6ainfix -ainfix +V0V23V2Iainfix &lt;=c0ainfix -ainfix +V0V23V2Aainfix =anthV23V5aSomeagetV6ainfix +V0V23Iainfix &lt;ainfix +V0V23V2Iainfix &lt;V23V7Aainfix &lt;=c0V23FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV24V4aSomeagetV3ainfix -ainfix +V0V24V2Iainfix &lt;=c0ainfix -ainfix +V0V24V2Aainfix =anthV24V4aSomeagetV3ainfix +V0V24Iainfix &lt;ainfix +V0V24V2Iainfix &lt;V24V1Aainfix &lt;=c0V24FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.10"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="10. assertion"
+     <goal name="WP_parameter harness2.10" expl="10. assertion"
       sum="7aceecc5a47d534a8eaacd55ad199191" proved="true"
       shape="assertionainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V19Aainfix =V17V18aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV20V14aSomeagetV12ainfix -ainfix +V16V20V2Iainfix &lt;=c0ainfix -ainfix +V16V20V2Aainfix =anthV20V14aSomeagetV12ainfix +V16V20Iainfix &lt;ainfix +V16V20V2Iainfix &lt;V20V15Aainfix &lt;=c0V20FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV21V11aSomeagetV12ainfix -ainfix +V0V21V2Iainfix &lt;=c0ainfix -ainfix +V0V21V2Aainfix =anthV21V11aSomeagetV12ainfix +V0V21Iainfix &lt;ainfix +V0V21V2Iainfix &lt;V21V13Aainfix &lt;=c0V21FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV22V8aSomeagetV9ainfix -ainfix +V0V22V2Iainfix &lt;=c0ainfix -ainfix +V0V22V2Aainfix =anthV22V8aSomeagetV9ainfix +V0V22Iainfix &lt;ainfix +V0V22V2Iainfix &lt;V22V10Aainfix &lt;=c0V22FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV23V5aSomeagetV6ainfix -ainfix +V0V23V2Iainfix &lt;=c0ainfix -ainfix +V0V23V2Aainfix =anthV23V5aSomeagetV6ainfix +V0V23Iainfix &lt;ainfix +V0V23V2Iainfix &lt;V23V7Aainfix &lt;=c0V23FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV24V4aSomeagetV3ainfix -ainfix +V0V24V2Iainfix &lt;=c0ainfix -ainfix +V0V24V2Aainfix =anthV24V4aSomeagetV3ainfix +V0V24Iainfix &lt;ainfix +V0V24V2Iainfix &lt;V24V1Aainfix &lt;=c0V24FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="0">
        <result status="valid" time="0.06"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.11"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="11. precondition"
+     <goal name="WP_parameter harness2.11" expl="11. precondition"
       sum="e4f23b94c93febd783c3fd2ba55bd7b7" proved="true"
       shape="preconditionainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V19Aainfix =V17V18aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV20V14aSomeagetV12ainfix -ainfix +V16V20V2Iainfix &lt;=c0ainfix -ainfix +V16V20V2Aainfix =anthV20V14aSomeagetV12ainfix +V16V20Iainfix &lt;ainfix +V16V20V2Iainfix &lt;V20V15Aainfix &lt;=c0V20FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV21V11aSomeagetV12ainfix -ainfix +V0V21V2Iainfix &lt;=c0ainfix -ainfix +V0V21V2Aainfix =anthV21V11aSomeagetV12ainfix +V0V21Iainfix &lt;ainfix +V0V21V2Iainfix &lt;V21V13Aainfix &lt;=c0V21FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV22V8aSomeagetV9ainfix -ainfix +V0V22V2Iainfix &lt;=c0ainfix -ainfix +V0V22V2Aainfix =anthV22V8aSomeagetV9ainfix +V0V22Iainfix &lt;ainfix +V0V22V2Iainfix &lt;V22V10Aainfix &lt;=c0V22FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV23V5aSomeagetV6ainfix -ainfix +V0V23V2Iainfix &lt;=c0ainfix -ainfix +V0V23V2Aainfix =anthV23V5aSomeagetV6ainfix +V0V23Iainfix &lt;ainfix +V0V23V2Iainfix &lt;V23V7Aainfix &lt;=c0V23FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV24V4aSomeagetV3ainfix -ainfix +V0V24V2Iainfix &lt;=c0ainfix -ainfix +V0V24V2Aainfix =anthV24V4aSomeagetV3ainfix +V0V24Iainfix &lt;ainfix +V0V24V2Iainfix &lt;V24V1Aainfix &lt;=c0V24FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.12"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="12. assertion"
+     <goal name="WP_parameter harness2.12" expl="12. assertion"
       sum="957be6c1bd7263484406914bf10cb8d1" proved="true"
       shape="assertionainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV21V18aSomeagetV19ainfix -ainfix +V16V21V2Iainfix &lt;=c0ainfix -ainfix +V16V21V2Aainfix =anthV21V18aSomeagetV19ainfix +V16V21Iainfix &lt;ainfix +V16V21V2Iainfix &lt;V21V20Aainfix &lt;=c0V21FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FIainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V23Aainfix =V17V22aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV24V14aSomeagetV12ainfix -ainfix +V16V24V2Iainfix &lt;=c0ainfix -ainfix +V16V24V2Aainfix =anthV24V14aSomeagetV12ainfix +V16V24Iainfix &lt;ainfix +V16V24V2Iainfix &lt;V24V15Aainfix &lt;=c0V24FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV25V11aSomeagetV12ainfix -ainfix +V0V25V2Iainfix &lt;=c0ainfix -ainfix +V0V25V2Aainfix =anthV25V11aSomeagetV12ainfix +V0V25Iainfix &lt;ainfix +V0V25V2Iainfix &lt;V25V13Aainfix &lt;=c0V25FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV26V8aSomeagetV9ainfix -ainfix +V0V26V2Iainfix &lt;=c0ainfix -ainfix +V0V26V2Aainfix =anthV26V8aSomeagetV9ainfix +V0V26Iainfix &lt;ainfix +V0V26V2Iainfix &lt;V26V10Aainfix &lt;=c0V26FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV27V5aSomeagetV6ainfix -ainfix +V0V27V2Iainfix &lt;=c0ainfix -ainfix +V0V27V2Aainfix =anthV27V5aSomeagetV6ainfix +V0V27Iainfix &lt;ainfix +V0V27V2Iainfix &lt;V27V7Aainfix &lt;=c0V27FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV28V4aSomeagetV3ainfix -ainfix +V0V28V2Iainfix &lt;=c0ainfix -ainfix +V0V28V2Aainfix =anthV28V4aSomeagetV3ainfix +V0V28Iainfix &lt;ainfix +V0V28V2Iainfix &lt;V28V1Aainfix &lt;=c0V28FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="1" timelimit="10"
-       memlimit="1000">
+      <proof prover="0" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.13"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="13. precondition"
+     <goal name="WP_parameter harness2.13" expl="13. precondition"
       sum="510c6526ee973674c5477d56d9854571" proved="true"
       shape="preconditionainfix &gt;V20c0Iainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV21V18aSomeagetV19ainfix -ainfix +V16V21V2Iainfix &lt;=c0ainfix -ainfix +V16V21V2Aainfix =anthV21V18aSomeagetV19ainfix +V16V21Iainfix &lt;ainfix +V16V21V2Iainfix &lt;V21V20Aainfix &lt;=c0V21FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FIainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V23Aainfix =V17V22aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV24V14aSomeagetV12ainfix -ainfix +V16V24V2Iainfix &lt;=c0ainfix -ainfix +V16V24V2Aainfix =anthV24V14aSomeagetV12ainfix +V16V24Iainfix &lt;ainfix +V16V24V2Iainfix &lt;V24V15Aainfix &lt;=c0V24FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV25V11aSomeagetV12ainfix -ainfix +V0V25V2Iainfix &lt;=c0ainfix -ainfix +V0V25V2Aainfix =anthV25V11aSomeagetV12ainfix +V0V25Iainfix &lt;ainfix +V0V25V2Iainfix &lt;V25V13Aainfix &lt;=c0V25FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV26V8aSomeagetV9ainfix -ainfix +V0V26V2Iainfix &lt;=c0ainfix -ainfix +V0V26V2Aainfix =anthV26V8aSomeagetV9ainfix +V0V26Iainfix &lt;ainfix +V0V26V2Iainfix &lt;V26V10Aainfix &lt;=c0V26FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV27V5aSomeagetV6ainfix -ainfix +V0V27V2Iainfix &lt;=c0ainfix -ainfix +V0V27V2Aainfix =anthV27V5aSomeagetV6ainfix +V0V27Iainfix &lt;ainfix +V0V27V2Iainfix &lt;V27V7Aainfix &lt;=c0V27FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV28V4aSomeagetV3ainfix -ainfix +V0V28V2Iainfix &lt;=c0ainfix -ainfix +V0V28V2Aainfix =anthV28V4aSomeagetV3ainfix +V0V28Iainfix &lt;ainfix +V0V28V2Iainfix &lt;V28V1Aainfix &lt;=c0V28FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.14"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="14. assertion"
+     <goal name="WP_parameter harness2.14" expl="14. assertion"
       sum="4317bca012de63151007f0ae59581d6c" proved="true"
       shape="assertionainfix =V24c2ICfaNilainfix =V21V26Aainfix =V24V25aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV27V21aSomeagetV19ainfix -ainfix +V23V27V2Iainfix &lt;=c0ainfix -ainfix +V23V27V2Aainfix =anthV27V21aSomeagetV19ainfix +V23V27Iainfix &lt;ainfix +V23V27V2Iainfix &lt;V27V22Aainfix &lt;=c0V27FAainfix =V22alengthV21Aainfix &lt;=V22V2Aainfix &lt;=c0V22Aainfix &lt;V23V2Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV28V18aSomeagetV19ainfix -ainfix +V16V28V2Iainfix &lt;=c0ainfix -ainfix +V16V28V2Aainfix =anthV28V18aSomeagetV19ainfix +V16V28Iainfix &lt;ainfix +V16V28V2Iainfix &lt;V28V20Aainfix &lt;=c0V28FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FIainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V30Aainfix =V17V29aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV31V14aSomeagetV12ainfix -ainfix +V16V31V2Iainfix &lt;=c0ainfix -ainfix +V16V31V2Aainfix =anthV31V14aSomeagetV12ainfix +V16V31Iainfix &lt;ainfix +V16V31V2Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV32V11aSomeagetV12ainfix -ainfix +V0V32V2Iainfix &lt;=c0ainfix -ainfix +V0V32V2Aainfix =anthV32V11aSomeagetV12ainfix +V0V32Iainfix &lt;ainfix +V0V32V2Iainfix &lt;V32V13Aainfix &lt;=c0V32FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV33V8aSomeagetV9ainfix -ainfix +V0V33V2Iainfix &lt;=c0ainfix -ainfix +V0V33V2Aainfix =anthV33V8aSomeagetV9ainfix +V0V33Iainfix &lt;ainfix +V0V33V2Iainfix &lt;V33V10Aainfix &lt;=c0V33FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV34V5aSomeagetV6ainfix -ainfix +V0V34V2Iainfix &lt;=c0ainfix -ainfix +V0V34V2Aainfix =anthV34V5aSomeagetV6ainfix +V0V34Iainfix &lt;ainfix +V0V34V2Iainfix &lt;V34V7Aainfix &lt;=c0V34FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV35V4aSomeagetV3ainfix -ainfix +V0V35V2Iainfix &lt;=c0ainfix -ainfix +V0V35V2Aainfix =anthV35V4aSomeagetV3ainfix +V0V35Iainfix &lt;ainfix +V0V35V2Iainfix &lt;V35V1Aainfix &lt;=c0V35FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="1" timelimit="10"
-       memlimit="0">
+      <proof prover="0">
        <result status="valid" time="0.06"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.15"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="15. assertion"
+     <goal name="WP_parameter harness2.15" expl="15. assertion"
       sum="4411edaf5717baa5094e7bf61c5f73f8" proved="true"
       shape="assertionainfix =V21aConsc3aConsc4aNilIainfix =V24c2ICfaNilainfix =V21V26Aainfix =V24V25aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV27V21aSomeagetV19ainfix -ainfix +V23V27V2Iainfix &lt;=c0ainfix -ainfix +V23V27V2Aainfix =anthV27V21aSomeagetV19ainfix +V23V27Iainfix &lt;ainfix +V23V27V2Iainfix &lt;V27V22Aainfix &lt;=c0V27FAainfix =V22alengthV21Aainfix &lt;=V22V2Aainfix &lt;=c0V22Aainfix &lt;V23V2Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV28V18aSomeagetV19ainfix -ainfix +V16V28V2Iainfix &lt;=c0ainfix -ainfix +V16V28V2Aainfix =anthV28V18aSomeagetV19ainfix +V16V28Iainfix &lt;ainfix +V16V28V2Iainfix &lt;V28V20Aainfix &lt;=c0V28FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FIainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V30Aainfix =V17V29aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV31V14aSomeagetV12ainfix -ainfix +V16V31V2Iainfix &lt;=c0ainfix -ainfix +V16V31V2Aainfix =anthV31V14aSomeagetV12ainfix +V16V31Iainfix &lt;ainfix +V16V31V2Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV32V11aSomeagetV12ainfix -ainfix +V0V32V2Iainfix &lt;=c0ainfix -ainfix +V0V32V2Aainfix =anthV32V11aSomeagetV12ainfix +V0V32Iainfix &lt;ainfix +V0V32V2Iainfix &lt;V32V13Aainfix &lt;=c0V32FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV33V8aSomeagetV9ainfix -ainfix +V0V33V2Iainfix &lt;=c0ainfix -ainfix +V0V33V2Aainfix =anthV33V8aSomeagetV9ainfix +V0V33Iainfix &lt;ainfix +V0V33V2Iainfix &lt;V33V10Aainfix &lt;=c0V33FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV34V5aSomeagetV6ainfix -ainfix +V0V34V2Iainfix &lt;=c0ainfix -ainfix +V0V34V2Aainfix =anthV34V5aSomeagetV6ainfix +V0V34Iainfix &lt;ainfix +V0V34V2Iainfix &lt;V34V7Aainfix &lt;=c0V34FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV35V4aSomeagetV3ainfix -ainfix +V0V35V2Iainfix &lt;=c0ainfix -ainfix +V0V35V2Aainfix =anthV35V4aSomeagetV3ainfix +V0V35Iainfix &lt;ainfix +V0V35V2Iainfix &lt;V35V1Aainfix &lt;=c0V35FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.16"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="16. precondition"
+     <goal name="WP_parameter harness2.16" expl="16. precondition"
       sum="8f5f6a0c018bcdc315d013eec7682d59" proved="true"
       shape="preconditionainfix &gt;V22c0Iainfix =V21aConsc3aConsc4aNilIainfix =V24c2ICfaNilainfix =V21V26Aainfix =V24V25aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV27V21aSomeagetV19ainfix -ainfix +V23V27V2Iainfix &lt;=c0ainfix -ainfix +V23V27V2Aainfix =anthV27V21aSomeagetV19ainfix +V23V27Iainfix &lt;ainfix +V23V27V2Iainfix &lt;V27V22Aainfix &lt;=c0V27FAainfix =V22alengthV21Aainfix &lt;=V22V2Aainfix &lt;=c0V22Aainfix &lt;V23V2Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV28V18aSomeagetV19ainfix -ainfix +V16V28V2Iainfix &lt;=c0ainfix -ainfix +V16V28V2Aainfix =anthV28V18aSomeagetV19ainfix +V16V28Iainfix &lt;ainfix +V16V28V2Iainfix &lt;V28V20Aainfix &lt;=c0V28FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FIainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V30Aainfix =V17V29aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV31V14aSomeagetV12ainfix -ainfix +V16V31V2Iainfix &lt;=c0ainfix -ainfix +V16V31V2Aainfix =anthV31V14aSomeagetV12ainfix +V16V31Iainfix &lt;ainfix +V16V31V2Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV32V11aSomeagetV12ainfix -ainfix +V0V32V2Iainfix &lt;=c0ainfix -ainfix +V0V32V2Aainfix =anthV32V11aSomeagetV12ainfix +V0V32Iainfix &lt;ainfix +V0V32V2Iainfix &lt;V32V13Aainfix &lt;=c0V32FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV33V8aSomeagetV9ainfix -ainfix +V0V33V2Iainfix &lt;=c0ainfix -ainfix +V0V33V2Aainfix =anthV33V8aSomeagetV9ainfix +V0V33Iainfix &lt;ainfix +V0V33V2Iainfix &lt;V33V10Aainfix &lt;=c0V33FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV34V5aSomeagetV6ainfix -ainfix +V0V34V2Iainfix &lt;=c0ainfix -ainfix +V0V34V2Aainfix =anthV34V5aSomeagetV6ainfix +V0V34Iainfix &lt;ainfix +V0V34V2Iainfix &lt;V34V7Aainfix &lt;=c0V34FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV35V4aSomeagetV3ainfix -ainfix +V0V35V2Iainfix &lt;=c0ainfix -ainfix +V0V35V2Aainfix =anthV35V4aSomeagetV3ainfix +V0V35Iainfix &lt;ainfix +V0V35V2Iainfix &lt;V35V1Aainfix &lt;=c0V35FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.17"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="17. assertion"
+     <goal name="WP_parameter harness2.17" expl="17. assertion"
       sum="a9155347eaf71f89eaa73b060094e8fd" proved="true"
       shape="assertionainfix =V28c3ICfaNilainfix =V25V30Aainfix =V28V29aConsVVV21Aainfix =V26ainfix -V22c1Aainfix =anthV31V25aSomeagetV19ainfix -ainfix +V27V31V2Iainfix &lt;=c0ainfix -ainfix +V27V31V2Aainfix =anthV31V25aSomeagetV19ainfix +V27V31Iainfix &lt;ainfix +V27V31V2Iainfix &lt;V31V26Aainfix &lt;=c0V31FAainfix =V26alengthV25Aainfix &lt;=V26V2Aainfix &lt;=c0V26Aainfix &lt;V27V2Aainfix &lt;=c0V27FFIainfix &gt;V22c0Iainfix =V21aConsc3aConsc4aNilIainfix =V24c2ICfaNilainfix =V21V33Aainfix =V24V32aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV34V21aSomeagetV19ainfix -ainfix +V23V34V2Iainfix &lt;=c0ainfix -ainfix +V23V34V2Aainfix =anthV34V21aSomeagetV19ainfix +V23V34Iainfix &lt;ainfix +V23V34V2Iainfix &lt;V34V22Aainfix &lt;=c0V34FAainfix =V22alengthV21Aainfix &lt;=V22V2Aainfix &lt;=c0V22Aainfix &lt;V23V2Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV35V18aSomeagetV19ainfix -ainfix +V16V35V2Iainfix &lt;=c0ainfix -ainfix +V16V35V2Aainfix =anthV35V18aSomeagetV19ainfix +V16V35Iainfix &lt;ainfix +V16V35V2Iainfix &lt;V35V20Aainfix &lt;=c0V35FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FIainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V37Aainfix =V17V36aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV38V14aSomeagetV12ainfix -ainfix +V16V38V2Iainfix &lt;=c0ainfix -ainfix +V16V38V2Aainfix =anthV38V14aSomeagetV12ainfix +V16V38Iainfix &lt;ainfix +V16V38V2Iainfix &lt;V38V15Aainfix &lt;=c0V38FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV39V11aSomeagetV12ainfix -ainfix +V0V39V2Iainfix &lt;=c0ainfix -ainfix +V0V39V2Aainfix =anthV39V11aSomeagetV12ainfix +V0V39Iainfix &lt;ainfix +V0V39V2Iainfix &lt;V39V13Aainfix &lt;=c0V39FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV40V8aSomeagetV9ainfix -ainfix +V0V40V2Iainfix &lt;=c0ainfix -ainfix +V0V40V2Aainfix =anthV40V8aSomeagetV9ainfix +V0V40Iainfix &lt;ainfix +V0V40V2Iainfix &lt;V40V10Aainfix &lt;=c0V40FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV41V5aSomeagetV6ainfix -ainfix +V0V41V2Iainfix &lt;=c0ainfix -ainfix +V0V41V2Aainfix =anthV41V5aSomeagetV6ainfix +V0V41Iainfix &lt;ainfix +V0V41V2Iainfix &lt;V41V7Aainfix &lt;=c0V41FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV42V4aSomeagetV3ainfix -ainfix +V0V42V2Iainfix &lt;=c0ainfix -ainfix +V0V42V2Aainfix =anthV42V4aSomeagetV3ainfix +V0V42Iainfix &lt;ainfix +V0V42V2Iainfix &lt;V42V1Aainfix &lt;=c0V42FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.08"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.18"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="18. assertion"
+     <goal name="WP_parameter harness2.18" expl="18. assertion"
       sum="ee364455291eca8044d203c975a691ad" proved="true"
       shape="assertionainfix =V25aConsc4aNilIainfix =V28c3ICfaNilainfix =V25V30Aainfix =V28V29aConsVVV21Aainfix =V26ainfix -V22c1Aainfix =anthV31V25aSomeagetV19ainfix -ainfix +V27V31V2Iainfix &lt;=c0ainfix -ainfix +V27V31V2Aainfix =anthV31V25aSomeagetV19ainfix +V27V31Iainfix &lt;ainfix +V27V31V2Iainfix &lt;V31V26Aainfix &lt;=c0V31FAainfix =V26alengthV25Aainfix &lt;=V26V2Aainfix &lt;=c0V26Aainfix &lt;V27V2Aainfix &lt;=c0V27FFIainfix &gt;V22c0Iainfix =V21aConsc3aConsc4aNilIainfix =V24c2ICfaNilainfix =V21V33Aainfix =V24V32aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV34V21aSomeagetV19ainfix -ainfix +V23V34V2Iainfix &lt;=c0ainfix -ainfix +V23V34V2Aainfix =anthV34V21aSomeagetV19ainfix +V23V34Iainfix &lt;ainfix +V23V34V2Iainfix &lt;V34V22Aainfix &lt;=c0V34FAainfix =V22alengthV21Aainfix &lt;=V22V2Aainfix &lt;=c0V22Aainfix &lt;V23V2Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV35V18aSomeagetV19ainfix -ainfix +V16V35V2Iainfix &lt;=c0ainfix -ainfix +V16V35V2Aainfix =anthV35V18aSomeagetV19ainfix +V16V35Iainfix &lt;ainfix +V16V35V2Iainfix &lt;V35V20Aainfix &lt;=c0V35FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FIainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V37Aainfix =V17V36aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV38V14aSomeagetV12ainfix -ainfix +V16V38V2Iainfix &lt;=c0ainfix -ainfix +V16V38V2Aainfix =anthV38V14aSomeagetV12ainfix +V16V38Iainfix &lt;ainfix +V16V38V2Iainfix &lt;V38V15Aainfix &lt;=c0V38FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV39V11aSomeagetV12ainfix -ainfix +V0V39V2Iainfix &lt;=c0ainfix -ainfix +V0V39V2Aainfix =anthV39V11aSomeagetV12ainfix +V0V39Iainfix &lt;ainfix +V0V39V2Iainfix &lt;V39V13Aainfix &lt;=c0V39FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV40V8aSomeagetV9ainfix -ainfix +V0V40V2Iainfix &lt;=c0ainfix -ainfix +V0V40V2Aainfix =anthV40V8aSomeagetV9ainfix +V0V40Iainfix &lt;ainfix +V0V40V2Iainfix &lt;V40V10Aainfix &lt;=c0V40FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV41V5aSomeagetV6ainfix -ainfix +V0V41V2Iainfix &lt;=c0ainfix -ainfix +V0V41V2Aainfix =anthV41V5aSomeagetV6ainfix +V0V41Iainfix &lt;ainfix +V0V41V2Iainfix &lt;V41V7Aainfix &lt;=c0V41FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV42V4aSomeagetV3ainfix -ainfix +V0V42V2Iainfix &lt;=c0ainfix -ainfix +V0V42V2Aainfix =anthV42V4aSomeagetV3ainfix +V0V42Iainfix &lt;ainfix +V0V42V2Iainfix &lt;V42V1Aainfix &lt;=c0V42FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.08"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.19"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="19. precondition"
+     <goal name="WP_parameter harness2.19" expl="19. precondition"
       sum="ee722a280f0528dbcb70f84eebd36a3a" proved="true"
       shape="preconditionainfix &gt;V26c0Iainfix =V25aConsc4aNilIainfix =V28c3ICfaNilainfix =V25V30Aainfix =V28V29aConsVVV21Aainfix =V26ainfix -V22c1Aainfix =anthV31V25aSomeagetV19ainfix -ainfix +V27V31V2Iainfix &lt;=c0ainfix -ainfix +V27V31V2Aainfix =anthV31V25aSomeagetV19ainfix +V27V31Iainfix &lt;ainfix +V27V31V2Iainfix &lt;V31V26Aainfix &lt;=c0V31FAainfix =V26alengthV25Aainfix &lt;=V26V2Aainfix &lt;=c0V26Aainfix &lt;V27V2Aainfix &lt;=c0V27FFIainfix &gt;V22c0Iainfix =V21aConsc3aConsc4aNilIainfix =V24c2ICfaNilainfix =V21V33Aainfix =V24V32aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV34V21aSomeagetV19ainfix -ainfix +V23V34V2Iainfix &lt;=c0ainfix -ainfix +V23V34V2Aainfix =anthV34V21aSomeagetV19ainfix +V23V34Iainfix &lt;ainfix +V23V34V2Iainfix &lt;V34V22Aainfix &lt;=c0V34FAainfix =V22alengthV21Aainfix &lt;=V22V2Aainfix &lt;=c0V22Aainfix &lt;V23V2Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV35V18aSomeagetV19ainfix -ainfix +V16V35V2Iainfix &lt;=c0ainfix -ainfix +V16V35V2Aainfix =anthV35V18aSomeagetV19ainfix +V16V35Iainfix &lt;ainfix +V16V35V2Iainfix &lt;V35V20Aainfix &lt;=c0V35FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FIainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V37Aainfix =V17V36aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV38V14aSomeagetV12ainfix -ainfix +V16V38V2Iainfix &lt;=c0ainfix -ainfix +V16V38V2Aainfix =anthV38V14aSomeagetV12ainfix +V16V38Iainfix &lt;ainfix +V16V38V2Iainfix &lt;V38V15Aainfix &lt;=c0V38FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV39V11aSomeagetV12ainfix -ainfix +V0V39V2Iainfix &lt;=c0ainfix -ainfix +V0V39V2Aainfix =anthV39V11aSomeagetV12ainfix +V0V39Iainfix &lt;ainfix +V0V39V2Iainfix &lt;V39V13Aainfix &lt;=c0V39FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV40V8aSomeagetV9ainfix -ainfix +V0V40V2Iainfix &lt;=c0ainfix -ainfix +V0V40V2Aainfix =anthV40V8aSomeagetV9ainfix +V0V40Iainfix &lt;ainfix +V0V40V2Iainfix &lt;V40V10Aainfix &lt;=c0V40FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV41V5aSomeagetV6ainfix -ainfix +V0V41V2Iainfix &lt;=c0ainfix -ainfix +V0V41V2Aainfix =anthV41V5aSomeagetV6ainfix +V0V41Iainfix &lt;ainfix +V0V41V2Iainfix &lt;V41V7Aainfix &lt;=c0V41FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV42V4aSomeagetV3ainfix -ainfix +V0V42V2Iainfix &lt;=c0ainfix -ainfix +V0V42V2Aainfix =anthV42V4aSomeagetV3ainfix +V0V42Iainfix &lt;ainfix +V0V42V2Iainfix &lt;V42V1Aainfix &lt;=c0V42FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter harness2.20"
-      locfile="../vstte12_ring_buffer.mlw"
-      loclnum="106" loccnumb="6" loccnume="14" expl="20. assertion"
+     <goal name="WP_parameter harness2.20" expl="20. assertion"
       sum="cf779a701de53ddbd3a3926720d741b2" proved="true"
       shape="assertionainfix =V32c4ICfaNilainfix =V29V34Aainfix =V32V33aConsVVV25Aainfix =V30ainfix -V26c1Aainfix =anthV35V29aSomeagetV19ainfix -ainfix +V31V35V2Iainfix &lt;=c0ainfix -ainfix +V31V35V2Aainfix =anthV35V29aSomeagetV19ainfix +V31V35Iainfix &lt;ainfix +V31V35V2Iainfix &lt;V35V30Aainfix &lt;=c0V35FAainfix =V30alengthV29Aainfix &lt;=V30V2Aainfix &lt;=c0V30Aainfix &lt;V31V2Aainfix &lt;=c0V31FFIainfix &gt;V26c0Iainfix =V25aConsc4aNilIainfix =V28c3ICfaNilainfix =V25V37Aainfix =V28V36aConsVVV21Aainfix =V26ainfix -V22c1Aainfix =anthV38V25aSomeagetV19ainfix -ainfix +V27V38V2Iainfix &lt;=c0ainfix -ainfix +V27V38V2Aainfix =anthV38V25aSomeagetV19ainfix +V27V38Iainfix &lt;ainfix +V27V38V2Iainfix &lt;V38V26Aainfix &lt;=c0V38FAainfix =V26alengthV25Aainfix &lt;=V26V2Aainfix &lt;=c0V26Aainfix &lt;V27V2Aainfix &lt;=c0V27FFIainfix &gt;V22c0Iainfix =V21aConsc3aConsc4aNilIainfix =V24c2ICfaNilainfix =V21V40Aainfix =V24V39aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV41V21aSomeagetV19ainfix -ainfix +V23V41V2Iainfix &lt;=c0ainfix -ainfix +V23V41V2Aainfix =anthV41V21aSomeagetV19ainfix +V23V41Iainfix &lt;ainfix +V23V41V2Iainfix &lt;V41V22Aainfix &lt;=c0V41FAainfix =V22alengthV21Aainfix &lt;=V22V2Aainfix &lt;=c0V22Aainfix &lt;V23V2Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsc2aConsc3aConsc4aNilIainfix =V18ainfix ++V14aConsc4aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V2Aainfix =anthV42V18aSomeagetV19ainfix -ainfix +V16V42V2Iainfix &lt;=c0ainfix -ainfix +V16V42V2Aainfix =anthV42V18aSomeagetV19ainfix +V16V42Iainfix &lt;ainfix +V16V42V2Iainfix &lt;V42V20Aainfix &lt;=c0V42FAainfix =V20alengthV18Aainfix &lt;=V20V2Aainfix &lt;=c0V20Aainfix &lt;V16V2Aainfix &lt;=c0V16FIainfix &lt;V15V2Iainfix =V14aConsc2aConsc3aNilIainfix =V17c1ICfaNilainfix =V14V44Aainfix =V17V43aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV45V14aSomeagetV12ainfix -ainfix +V16V45V2Iainfix &lt;=c0ainfix -ainfix +V16V45V2Aainfix =anthV45V14aSomeagetV12ainfix +V16V45Iainfix &lt;ainfix +V16V45V2Iainfix &lt;V45V15Aainfix &lt;=c0V45FAainfix =V15alengthV14Aainfix &lt;=V15V2Aainfix &lt;=c0V15Aainfix &lt;V16V2Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsc1aConsc2aConsc3aNilIainfix =V11ainfix ++V8aConsc3aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V2Aainfix =anthV46V11aSomeagetV12ainfix -ainfix +V0V46V2Iainfix &lt;=c0ainfix -ainfix +V0V46V2Aainfix =anthV46V11aSomeagetV12ainfix +V0V46Iainfix &lt;ainfix +V0V46V2Iainfix &lt;V46V13Aainfix &lt;=c0V46FAainfix =V13alengthV11Aainfix &lt;=V13V2Aainfix &lt;=c0V13Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V10V2Iainfix =V8aConsc1aConsc2aNilIainfix =V8ainfix ++V5aConsc2aNilAainfix =V10ainfix +V7c1Aainfix &lt;=c0V2Aainfix =anthV47V8aSomeagetV9ainfix -ainfix +V0V47V2Iainfix &lt;=c0ainfix -ainfix +V0V47V2Aainfix =anthV47V8aSomeagetV9ainfix +V0V47Iainfix &lt;ainfix +V0V47V2Iainfix &lt;V47V10Aainfix &lt;=c0V47FAainfix =V10alengthV8Aainfix &lt;=V10V2Aainfix &lt;=c0V10Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V7V2Iainfix =V5aConsc1aNilIainfix =V5ainfix ++V4aConsc1aNilAainfix =V7ainfix +V1c1Aainfix &lt;=c0V2Aainfix =anthV48V5aSomeagetV6ainfix -ainfix +V0V48V2Iainfix &lt;=c0ainfix -ainfix +V0V48V2Aainfix =anthV48V5aSomeagetV6ainfix +V0V48Iainfix &lt;ainfix +V0V48V2Iainfix &lt;V48V7Aainfix &lt;=c0V48FAainfix =V7alengthV5Aainfix &lt;=V7V2Aainfix &lt;=c0V7Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &lt;V1V2Iainfix =V4aNilAainfix =V2c3Aainfix &lt;=c0V2Aainfix =anthV49V4aSomeagetV3ainfix -ainfix +V0V49V2Iainfix &lt;=c0ainfix -ainfix +V0V49V2Aainfix =anthV49V4aSomeagetV3ainfix +V0V49Iainfix &lt;ainfix +V0V49V2Iainfix &lt;V49V1Aainfix &lt;=c0V49FAainfix =V1alengthV4Aainfix &lt;=V1V2Aainfix &lt;=c0V1Aainfix &lt;V0V2Aainfix &lt;=c0V0FIainfix &gt;c3c0">
       <label name="expl:VC for harness2"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.10"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="WP_parameter test" locfile="../vstte12_ring_buffer.mlw"
-    loclnum="127" loccnumb="6" loccnume="10" expl="VC for test"
+   <goal name="WP_parameter test" expl="VC for test"
     sum="9af1bb08a9a73ead0a4a6a2f18a58c6a" proved="true"
     shape="ainfix =V28V2ICfaNilainfix =V25V30Aainfix =V28V29aConsVVV21Aainfix =V26ainfix -V22c1Aainfix =anthV31V25aSomeagetV19ainfix -ainfix +V27V31V5Iainfix &lt;=c0ainfix -ainfix +V27V31V5Aainfix =anthV31V25aSomeagetV19ainfix +V27V31Iainfix &lt;ainfix +V27V31V5Iainfix &lt;V31V26Aainfix &lt;=c0V31FAainfix =V26alengthV25Aainfix &lt;=V26V5Aainfix &lt;=c0V26Aainfix &lt;V27V5Aainfix &lt;=c0V27FFAainfix &gt;V22c0Aainfix =V24V1ICfaNilainfix =V21V33Aainfix =V24V32aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV34V21aSomeagetV19ainfix -ainfix +V23V34V5Iainfix &lt;=c0ainfix -ainfix +V23V34V5Aainfix =anthV34V21aSomeagetV19ainfix +V23V34Iainfix &lt;ainfix +V23V34V5Iainfix &lt;V34V22Aainfix &lt;=c0V34FAainfix =V22alengthV21Aainfix &lt;=V22V5Aainfix &lt;=c0V22Aainfix &lt;V23V5Aainfix &lt;=c0V23FFAainfix &gt;V20c0Aainfix =V18aConsV1aConsV2aNilIainfix =V18ainfix ++V14aConsV2aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V5Aainfix =anthV35V18aSomeagetV19ainfix -ainfix +V16V35V5Iainfix &lt;=c0ainfix -ainfix +V16V35V5Aainfix =anthV35V18aSomeagetV19ainfix +V16V35Iainfix &lt;ainfix +V16V35V5Iainfix &lt;V35V20Aainfix &lt;=c0V35FAainfix =V20alengthV18Aainfix &lt;=V20V5Aainfix &lt;=c0V20Aainfix &lt;V16V5Aainfix &lt;=c0V16FAainfix &lt;V15V5Aainfix =V14aConsV1aNilAainfix =V17V0ICfaNilainfix =V14V37Aainfix =V17V36aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV38V14aSomeagetV12ainfix -ainfix +V16V38V5Iainfix &lt;=c0ainfix -ainfix +V16V38V5Aainfix =anthV38V14aSomeagetV12ainfix +V16V38Iainfix &lt;ainfix +V16V38V5Iainfix &lt;V38V15Aainfix &lt;=c0V38FAainfix =V15alengthV14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;V16V5Aainfix &lt;=c0V16FFAainfix &gt;V13c0Aainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV39V11aSomeagetV12ainfix -ainfix +V3V39V5Iainfix &lt;=c0ainfix -ainfix +V3V39V5Aainfix =anthV39V11aSomeagetV12ainfix +V3V39Iainfix &lt;ainfix +V3V39V5Iainfix &lt;V39V13Aainfix &lt;=c0V39FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FAainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV40V8aSomeagetV9ainfix -ainfix +V3V40V5Iainfix &lt;=c0ainfix -ainfix +V3V40V5Aainfix =anthV40V8aSomeagetV9ainfix +V3V40Iainfix &lt;ainfix +V3V40V5Iainfix &lt;V40V10Aainfix &lt;=c0V40FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FAainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV41V7aSomeagetV6ainfix -ainfix +V3V41V5Iainfix &lt;=c0ainfix -ainfix +V3V41V5Aainfix =anthV41V7aSomeagetV6ainfix +V3V41Iainfix &lt;ainfix +V3V41V5Iainfix &lt;V41V4Aainfix &lt;=c0V41FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FAainfix &gt;c2c0F">
     <label name="expl:VC for test"/>
     <transf name="split_goal"
      proved="true">
-     <goal name="WP_parameter test.1" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="1. precondition"
+     <goal name="WP_parameter test.1" expl="1. precondition"
       sum="faf9b753be04a6d2476ac88190da9b5e" proved="true"
       shape="preconditionainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.2" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="2. precondition"
+     <goal name="WP_parameter test.2" expl="2. precondition"
       sum="114d5fb6dc3288bc2683b4eb2e8f1063" proved="true"
       shape="preconditionainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV8V7aSomeagetV6ainfix -ainfix +V3V8V5Iainfix &lt;=c0ainfix -ainfix +V3V8V5Aainfix =anthV8V7aSomeagetV6ainfix +V3V8Iainfix &lt;ainfix +V3V8V5Iainfix &lt;V8V4Aainfix &lt;=c0V8FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.3" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="3. precondition"
+     <goal name="WP_parameter test.3" expl="3. precondition"
       sum="08e914e493cca9a079dc44da91c6d1e4" proved="true"
       shape="preconditionainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV11V8aSomeagetV9ainfix -ainfix +V3V11V5Iainfix &lt;=c0ainfix -ainfix +V3V11V5Aainfix =anthV11V8aSomeagetV9ainfix +V3V11Iainfix &lt;ainfix +V3V11V5Iainfix &lt;V11V10Aainfix &lt;=c0V11FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV12V7aSomeagetV6ainfix -ainfix +V3V12V5Iainfix &lt;=c0ainfix -ainfix +V3V12V5Aainfix =anthV12V7aSomeagetV6ainfix +V3V12Iainfix &lt;ainfix +V3V12V5Iainfix &lt;V12V4Aainfix &lt;=c0V12FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.4" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="4. assertion"
+     <goal name="WP_parameter test.4" expl="4. assertion"
       sum="1ef42a13753d88df0a8f81ab91945a82" proved="true"
       shape="assertionainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV14V11aSomeagetV12ainfix -ainfix +V3V14V5Iainfix &lt;=c0ainfix -ainfix +V3V14V5Aainfix =anthV14V11aSomeagetV12ainfix +V3V14Iainfix &lt;ainfix +V3V14V5Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV15V8aSomeagetV9ainfix -ainfix +V3V15V5Iainfix &lt;=c0ainfix -ainfix +V3V15V5Aainfix =anthV15V8aSomeagetV9ainfix +V3V15Iainfix &lt;ainfix +V3V15V5Iainfix &lt;V15V10Aainfix &lt;=c0V15FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV16V7aSomeagetV6ainfix -ainfix +V3V16V5Iainfix &lt;=c0ainfix -ainfix +V3V16V5Aainfix =anthV16V7aSomeagetV6ainfix +V3V16Iainfix &lt;ainfix +V3V16V5Iainfix &lt;V16V4Aainfix &lt;=c0V16FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.56"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.5" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="5. precondition"
+     <goal name="WP_parameter test.5" expl="5. precondition"
       sum="b0efbca4ff88b04a37ca90f95389688b" proved="true"
       shape="preconditionainfix &gt;V13c0Iainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV14V11aSomeagetV12ainfix -ainfix +V3V14V5Iainfix &lt;=c0ainfix -ainfix +V3V14V5Aainfix =anthV14V11aSomeagetV12ainfix +V3V14Iainfix &lt;ainfix +V3V14V5Iainfix &lt;V14V13Aainfix &lt;=c0V14FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV15V8aSomeagetV9ainfix -ainfix +V3V15V5Iainfix &lt;=c0ainfix -ainfix +V3V15V5Aainfix =anthV15V8aSomeagetV9ainfix +V3V15Iainfix &lt;ainfix +V3V15V5Iainfix &lt;V15V10Aainfix &lt;=c0V15FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV16V7aSomeagetV6ainfix -ainfix +V3V16V5Iainfix &lt;=c0ainfix -ainfix +V3V16V5Aainfix =anthV16V7aSomeagetV6ainfix +V3V16Iainfix &lt;ainfix +V3V16V5Iainfix &lt;V16V4Aainfix &lt;=c0V16FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.6" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="6. assertion"
+     <goal name="WP_parameter test.6" expl="6. assertion"
       sum="6652daedbc21e0c049ad9335d8a24aa6" proved="true"
       shape="assertionainfix =V17V0ICfaNilainfix =V14V19Aainfix =V17V18aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV20V14aSomeagetV12ainfix -ainfix +V16V20V5Iainfix &lt;=c0ainfix -ainfix +V16V20V5Aainfix =anthV20V14aSomeagetV12ainfix +V16V20Iainfix &lt;ainfix +V16V20V5Iainfix &lt;V20V15Aainfix &lt;=c0V20FAainfix =V15alengthV14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;V16V5Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV21V11aSomeagetV12ainfix -ainfix +V3V21V5Iainfix &lt;=c0ainfix -ainfix +V3V21V5Aainfix =anthV21V11aSomeagetV12ainfix +V3V21Iainfix &lt;ainfix +V3V21V5Iainfix &lt;V21V13Aainfix &lt;=c0V21FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV22V8aSomeagetV9ainfix -ainfix +V3V22V5Iainfix &lt;=c0ainfix -ainfix +V3V22V5Aainfix =anthV22V8aSomeagetV9ainfix +V3V22Iainfix &lt;ainfix +V3V22V5Iainfix &lt;V22V10Aainfix &lt;=c0V22FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV23V7aSomeagetV6ainfix -ainfix +V3V23V5Iainfix &lt;=c0ainfix -ainfix +V3V23V5Aainfix =anthV23V7aSomeagetV6ainfix +V3V23Iainfix &lt;ainfix +V3V23V5Iainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.7" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="7. assertion"
+     <goal name="WP_parameter test.7" expl="7. assertion"
       sum="d858e44f9072c82ef88b75bab34c191d" proved="true"
       shape="assertionainfix =V14aConsV1aNilIainfix =V17V0ICfaNilainfix =V14V19Aainfix =V17V18aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV20V14aSomeagetV12ainfix -ainfix +V16V20V5Iainfix &lt;=c0ainfix -ainfix +V16V20V5Aainfix =anthV20V14aSomeagetV12ainfix +V16V20Iainfix &lt;ainfix +V16V20V5Iainfix &lt;V20V15Aainfix &lt;=c0V20FAainfix =V15alengthV14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;V16V5Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV21V11aSomeagetV12ainfix -ainfix +V3V21V5Iainfix &lt;=c0ainfix -ainfix +V3V21V5Aainfix =anthV21V11aSomeagetV12ainfix +V3V21Iainfix &lt;ainfix +V3V21V5Iainfix &lt;V21V13Aainfix &lt;=c0V21FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV22V8aSomeagetV9ainfix -ainfix +V3V22V5Iainfix &lt;=c0ainfix -ainfix +V3V22V5Aainfix =anthV22V8aSomeagetV9ainfix +V3V22Iainfix &lt;ainfix +V3V22V5Iainfix &lt;V22V10Aainfix &lt;=c0V22FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV23V7aSomeagetV6ainfix -ainfix +V3V23V5Iainfix &lt;=c0ainfix -ainfix +V3V23V5Aainfix =anthV23V7aSomeagetV6ainfix +V3V23Iainfix &lt;ainfix +V3V23V5Iainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.8" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="8. precondition"
+     <goal name="WP_parameter test.8" expl="8. precondition"
       sum="bfbb6d6f20a85a7da78ae8d7431d2bb2" proved="true"
       shape="preconditionainfix &lt;V15V5Iainfix =V14aConsV1aNilIainfix =V17V0ICfaNilainfix =V14V19Aainfix =V17V18aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV20V14aSomeagetV12ainfix -ainfix +V16V20V5Iainfix &lt;=c0ainfix -ainfix +V16V20V5Aainfix =anthV20V14aSomeagetV12ainfix +V16V20Iainfix &lt;ainfix +V16V20V5Iainfix &lt;V20V15Aainfix &lt;=c0V20FAainfix =V15alengthV14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;V16V5Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV21V11aSomeagetV12ainfix -ainfix +V3V21V5Iainfix &lt;=c0ainfix -ainfix +V3V21V5Aainfix =anthV21V11aSomeagetV12ainfix +V3V21Iainfix &lt;ainfix +V3V21V5Iainfix &lt;V21V13Aainfix &lt;=c0V21FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV22V8aSomeagetV9ainfix -ainfix +V3V22V5Iainfix &lt;=c0ainfix -ainfix +V3V22V5Aainfix =anthV22V8aSomeagetV9ainfix +V3V22Iainfix &lt;ainfix +V3V22V5Iainfix &lt;V22V10Aainfix &lt;=c0V22FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV23V7aSomeagetV6ainfix -ainfix +V3V23V5Iainfix &lt;=c0ainfix -ainfix +V3V23V5Aainfix =anthV23V7aSomeagetV6ainfix +V3V23Iainfix &lt;ainfix +V3V23V5Iainfix &lt;V23V4Aainfix &lt;=c0V23FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.9" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="9. assertion"
+     <goal name="WP_parameter test.9" expl="9. assertion"
       sum="534711c78a45d9ee9ca54cc4ec6c8461" proved="true"
       shape="assertionainfix =V18aConsV1aConsV2aNilIainfix =V18ainfix ++V14aConsV2aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V5Aainfix =anthV21V18aSomeagetV19ainfix -ainfix +V16V21V5Iainfix &lt;=c0ainfix -ainfix +V16V21V5Aainfix =anthV21V18aSomeagetV19ainfix +V16V21Iainfix &lt;ainfix +V16V21V5Iainfix &lt;V21V20Aainfix &lt;=c0V21FAainfix =V20alengthV18Aainfix &lt;=V20V5Aainfix &lt;=c0V20Aainfix &lt;V16V5Aainfix &lt;=c0V16FIainfix &lt;V15V5Iainfix =V14aConsV1aNilIainfix =V17V0ICfaNilainfix =V14V23Aainfix =V17V22aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV24V14aSomeagetV12ainfix -ainfix +V16V24V5Iainfix &lt;=c0ainfix -ainfix +V16V24V5Aainfix =anthV24V14aSomeagetV12ainfix +V16V24Iainfix &lt;ainfix +V16V24V5Iainfix &lt;V24V15Aainfix &lt;=c0V24FAainfix =V15alengthV14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;V16V5Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV25V11aSomeagetV12ainfix -ainfix +V3V25V5Iainfix &lt;=c0ainfix -ainfix +V3V25V5Aainfix =anthV25V11aSomeagetV12ainfix +V3V25Iainfix &lt;ainfix +V3V25V5Iainfix &lt;V25V13Aainfix &lt;=c0V25FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV26V8aSomeagetV9ainfix -ainfix +V3V26V5Iainfix &lt;=c0ainfix -ainfix +V3V26V5Aainfix =anthV26V8aSomeagetV9ainfix +V3V26Iainfix &lt;ainfix +V3V26V5Iainfix &lt;V26V10Aainfix &lt;=c0V26FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV27V7aSomeagetV6ainfix -ainfix +V3V27V5Iainfix &lt;=c0ainfix -ainfix +V3V27V5Aainfix =anthV27V7aSomeagetV6ainfix +V3V27Iainfix &lt;ainfix +V3V27V5Iainfix &lt;V27V4Aainfix &lt;=c0V27FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.08"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.10" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="10. precondition"
+     <goal name="WP_parameter test.10" expl="10. precondition"
       sum="a357c037b038b2bc743d96438fa4ef48" proved="true"
       shape="preconditionainfix &gt;V20c0Iainfix =V18aConsV1aConsV2aNilIainfix =V18ainfix ++V14aConsV2aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V5Aainfix =anthV21V18aSomeagetV19ainfix -ainfix +V16V21V5Iainfix &lt;=c0ainfix -ainfix +V16V21V5Aainfix =anthV21V18aSomeagetV19ainfix +V16V21Iainfix &lt;ainfix +V16V21V5Iainfix &lt;V21V20Aainfix &lt;=c0V21FAainfix =V20alengthV18Aainfix &lt;=V20V5Aainfix &lt;=c0V20Aainfix &lt;V16V5Aainfix &lt;=c0V16FIainfix &lt;V15V5Iainfix =V14aConsV1aNilIainfix =V17V0ICfaNilainfix =V14V23Aainfix =V17V22aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV24V14aSomeagetV12ainfix -ainfix +V16V24V5Iainfix &lt;=c0ainfix -ainfix +V16V24V5Aainfix =anthV24V14aSomeagetV12ainfix +V16V24Iainfix &lt;ainfix +V16V24V5Iainfix &lt;V24V15Aainfix &lt;=c0V24FAainfix =V15alengthV14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;V16V5Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV25V11aSomeagetV12ainfix -ainfix +V3V25V5Iainfix &lt;=c0ainfix -ainfix +V3V25V5Aainfix =anthV25V11aSomeagetV12ainfix +V3V25Iainfix &lt;ainfix +V3V25V5Iainfix &lt;V25V13Aainfix &lt;=c0V25FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV26V8aSomeagetV9ainfix -ainfix +V3V26V5Iainfix &lt;=c0ainfix -ainfix +V3V26V5Aainfix =anthV26V8aSomeagetV9ainfix +V3V26Iainfix &lt;ainfix +V3V26V5Iainfix &lt;V26V10Aainfix &lt;=c0V26FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV27V7aSomeagetV6ainfix -ainfix +V3V27V5Iainfix &lt;=c0ainfix -ainfix +V3V27V5Aainfix =anthV27V7aSomeagetV6ainfix +V3V27Iainfix &lt;ainfix +V3V27V5Iainfix &lt;V27V4Aainfix &lt;=c0V27FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.11" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="11. assertion"
+     <goal name="WP_parameter test.11" expl="11. assertion"
       sum="8a994e5f1e321cbd256528bf5c9016c3" proved="true"
       shape="assertionainfix =V24V1ICfaNilainfix =V21V26Aainfix =V24V25aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV27V21aSomeagetV19ainfix -ainfix +V23V27V5Iainfix &lt;=c0ainfix -ainfix +V23V27V5Aainfix =anthV27V21aSomeagetV19ainfix +V23V27Iainfix &lt;ainfix +V23V27V5Iainfix &lt;V27V22Aainfix &lt;=c0V27FAainfix =V22alengthV21Aainfix &lt;=V22V5Aainfix &lt;=c0V22Aainfix &lt;V23V5Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsV1aConsV2aNilIainfix =V18ainfix ++V14aConsV2aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V5Aainfix =anthV28V18aSomeagetV19ainfix -ainfix +V16V28V5Iainfix &lt;=c0ainfix -ainfix +V16V28V5Aainfix =anthV28V18aSomeagetV19ainfix +V16V28Iainfix &lt;ainfix +V16V28V5Iainfix &lt;V28V20Aainfix &lt;=c0V28FAainfix =V20alengthV18Aainfix &lt;=V20V5Aainfix &lt;=c0V20Aainfix &lt;V16V5Aainfix &lt;=c0V16FIainfix &lt;V15V5Iainfix =V14aConsV1aNilIainfix =V17V0ICfaNilainfix =V14V30Aainfix =V17V29aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV31V14aSomeagetV12ainfix -ainfix +V16V31V5Iainfix &lt;=c0ainfix -ainfix +V16V31V5Aainfix =anthV31V14aSomeagetV12ainfix +V16V31Iainfix &lt;ainfix +V16V31V5Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix =V15alengthV14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;V16V5Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV32V11aSomeagetV12ainfix -ainfix +V3V32V5Iainfix &lt;=c0ainfix -ainfix +V3V32V5Aainfix =anthV32V11aSomeagetV12ainfix +V3V32Iainfix &lt;ainfix +V3V32V5Iainfix &lt;V32V13Aainfix &lt;=c0V32FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV33V8aSomeagetV9ainfix -ainfix +V3V33V5Iainfix &lt;=c0ainfix -ainfix +V3V33V5Aainfix =anthV33V8aSomeagetV9ainfix +V3V33Iainfix &lt;ainfix +V3V33V5Iainfix &lt;V33V10Aainfix &lt;=c0V33FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV34V7aSomeagetV6ainfix -ainfix +V3V34V5Iainfix &lt;=c0ainfix -ainfix +V3V34V5Aainfix =anthV34V7aSomeagetV6ainfix +V3V34Iainfix &lt;ainfix +V3V34V5Iainfix &lt;V34V4Aainfix &lt;=c0V34FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.12" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="12. precondition"
+     <goal name="WP_parameter test.12" expl="12. precondition"
       sum="1903c8c214192c53cb5eae7d6f1a9953" proved="true"
       shape="preconditionainfix &gt;V22c0Iainfix =V24V1ICfaNilainfix =V21V26Aainfix =V24V25aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV27V21aSomeagetV19ainfix -ainfix +V23V27V5Iainfix &lt;=c0ainfix -ainfix +V23V27V5Aainfix =anthV27V21aSomeagetV19ainfix +V23V27Iainfix &lt;ainfix +V23V27V5Iainfix &lt;V27V22Aainfix &lt;=c0V27FAainfix =V22alengthV21Aainfix &lt;=V22V5Aainfix &lt;=c0V22Aainfix &lt;V23V5Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsV1aConsV2aNilIainfix =V18ainfix ++V14aConsV2aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V5Aainfix =anthV28V18aSomeagetV19ainfix -ainfix +V16V28V5Iainfix &lt;=c0ainfix -ainfix +V16V28V5Aainfix =anthV28V18aSomeagetV19ainfix +V16V28Iainfix &lt;ainfix +V16V28V5Iainfix &lt;V28V20Aainfix &lt;=c0V28FAainfix =V20alengthV18Aainfix &lt;=V20V5Aainfix &lt;=c0V20Aainfix &lt;V16V5Aainfix &lt;=c0V16FIainfix &lt;V15V5Iainfix =V14aConsV1aNilIainfix =V17V0ICfaNilainfix =V14V30Aainfix =V17V29aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV31V14aSomeagetV12ainfix -ainfix +V16V31V5Iainfix &lt;=c0ainfix -ainfix +V16V31V5Aainfix =anthV31V14aSomeagetV12ainfix +V16V31Iainfix &lt;ainfix +V16V31V5Iainfix &lt;V31V15Aainfix &lt;=c0V31FAainfix =V15alengthV14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;V16V5Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV32V11aSomeagetV12ainfix -ainfix +V3V32V5Iainfix &lt;=c0ainfix -ainfix +V3V32V5Aainfix =anthV32V11aSomeagetV12ainfix +V3V32Iainfix &lt;ainfix +V3V32V5Iainfix &lt;V32V13Aainfix &lt;=c0V32FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV33V8aSomeagetV9ainfix -ainfix +V3V33V5Iainfix &lt;=c0ainfix -ainfix +V3V33V5Aainfix =anthV33V8aSomeagetV9ainfix +V3V33Iainfix &lt;ainfix +V3V33V5Iainfix &lt;V33V10Aainfix &lt;=c0V33FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV34V7aSomeagetV6ainfix -ainfix +V3V34V5Iainfix &lt;=c0ainfix -ainfix +V3V34V5Aainfix =anthV34V7aSomeagetV6ainfix +V3V34Iainfix &lt;ainfix +V3V34V5Iainfix &lt;V34V4Aainfix &lt;=c0V34FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal name="WP_parameter test.13" locfile="../vstte12_ring_buffer.mlw"
-      loclnum="127" loccnumb="6" loccnume="10" expl="13. assertion"
+     <goal name="WP_parameter test.13" expl="13. assertion"
       sum="ac9f12bbf339c2e270101917686f2530" proved="true"
       shape="assertionainfix =V28V2ICfaNilainfix =V25V30Aainfix =V28V29aConsVVV21Aainfix =V26ainfix -V22c1Aainfix =anthV31V25aSomeagetV19ainfix -ainfix +V27V31V5Iainfix &lt;=c0ainfix -ainfix +V27V31V5Aainfix =anthV31V25aSomeagetV19ainfix +V27V31Iainfix &lt;ainfix +V27V31V5Iainfix &lt;V31V26Aainfix &lt;=c0V31FAainfix =V26alengthV25Aainfix &lt;=V26V5Aainfix &lt;=c0V26Aainfix &lt;V27V5Aainfix &lt;=c0V27FFIainfix &gt;V22c0Iainfix =V24V1ICfaNilainfix =V21V33Aainfix =V24V32aConsVVV18Aainfix =V22ainfix -V20c1Aainfix =anthV34V21aSomeagetV19ainfix -ainfix +V23V34V5Iainfix &lt;=c0ainfix -ainfix +V23V34V5Aainfix =anthV34V21aSomeagetV19ainfix +V23V34Iainfix &lt;ainfix +V23V34V5Iainfix &lt;V34V22Aainfix &lt;=c0V34FAainfix =V22alengthV21Aainfix &lt;=V22V5Aainfix &lt;=c0V22Aainfix &lt;V23V5Aainfix &lt;=c0V23FFIainfix &gt;V20c0Iainfix =V18aConsV1aConsV2aNilIainfix =V18ainfix ++V14aConsV2aNilAainfix =V20ainfix +V15c1Aainfix &lt;=c0V5Aainfix =anthV35V18aSomeagetV19ainfix -ainfix +V16V35V5Iainfix &lt;=c0ainfix -ainfix +V16V35V5Aainfix =anthV35V18aSomeagetV19ainfix +V16V35Iainfix &lt;ainfix +V16V35V5Iainfix &lt;V35V20Aainfix &lt;=c0V35FAainfix =V20alengthV18Aainfix &lt;=V20V5Aainfix &lt;=c0V20Aainfix &lt;V16V5Aainfix &lt;=c0V16FIainfix &lt;V15V5Iainfix =V14aConsV1aNilIainfix =V17V0ICfaNilainfix =V14V37Aainfix =V17V36aConsVVV11Aainfix =V15ainfix -V13c1Aainfix =anthV38V14aSomeagetV12ainfix -ainfix +V16V38V5Iainfix &lt;=c0ainfix -ainfix +V16V38V5Aainfix =anthV38V14aSomeagetV12ainfix +V16V38Iainfix &lt;ainfix +V16V38V5Iainfix &lt;V38V15Aainfix &lt;=c0V38FAainfix =V15alengthV14Aainfix &lt;=V15V5Aainfix &lt;=c0V15Aainfix &lt;V16V5Aainfix &lt;=c0V16FFIainfix &gt;V13c0Iainfix =V11aConsV0aConsV1aNilIainfix =V11ainfix ++V8aConsV1aNilAainfix =V13ainfix +V10c1Aainfix &lt;=c0V5Aainfix =anthV39V11aSomeagetV12ainfix -ainfix +V3V39V5Iainfix &lt;=c0ainfix -ainfix +V3V39V5Aainfix =anthV39V11aSomeagetV12ainfix +V3V39Iainfix &lt;ainfix +V3V39V5Iainfix &lt;V39V13Aainfix &lt;=c0V39FAainfix =V13alengthV11Aainfix &lt;=V13V5Aainfix &lt;=c0V13Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V10V5Iainfix =V8ainfix ++V7aConsV0aNilAainfix =V10ainfix +V4c1Aainfix &lt;=c0V5Aainfix =anthV40V8aSomeagetV9ainfix -ainfix +V3V40V5Iainfix &lt;=c0ainfix -ainfix +V3V40V5Aainfix =anthV40V8aSomeagetV9ainfix +V3V40Iainfix &lt;ainfix +V3V40V5Iainfix &lt;V40V10Aainfix &lt;=c0V40FAainfix =V10alengthV8Aainfix &lt;=V10V5Aainfix &lt;=c0V10Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &lt;V4V5Iainfix =V7aNilAainfix =V5c2Aainfix &lt;=c0V5Aainfix =anthV41V7aSomeagetV6ainfix -ainfix +V3V41V5Iainfix &lt;=c0ainfix -ainfix +V3V41V5Aainfix =anthV41V7aSomeagetV6ainfix +V3V41Iainfix &lt;ainfix +V3V41V5Iainfix &lt;V41V4Aainfix &lt;=c0V41FAainfix =V4alengthV7Aainfix &lt;=V4V5Aainfix &lt;=c0V4Aainfix &lt;V3V5Aainfix &lt;=c0V3FIainfix &gt;c2c0F">
       <label name="expl:VC for test"/>
-      <proof prover="0" timelimit="10"
-       memlimit="0">
+      <proof prover="1" memlimit="0">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
