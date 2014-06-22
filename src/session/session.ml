@@ -572,14 +572,15 @@ let save_label fmt s =
   fprintf fmt "@\n@[<hov 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
 
 let rec save_goal provers fmt g =
-  assert (Tc.string_of_shape g.goal_shape <> "");
+  let shape = Tc.string_of_shape g.goal_shape in
+  assert (shape <> "");
   fprintf fmt
-    "@\n@[<hov 1><goal@ %a%a@ sum=\"%a\"@ proved=\"%b\"%a@ shape=\"%a\">"
+    "@\n@[<hov 1><goal@ %a%a@ sum=\"%a\"%a@ shape=\"%a\">"
     save_ident g.goal_name
     (opt "expl") g.goal_expl
     save_string (Tc.string_of_checksum g.goal_checksum)
-    g.goal_verified  (save_bool_def "expanded" false) g.goal_expanded
-    save_string (Tc.string_of_shape g.goal_shape);
+    (save_bool_def "expanded" false) g.goal_expanded
+    save_string shape;
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
   let l = PHprover.fold
     (fun _ a acc -> (Mprover.find a.proof_prover provers, a) :: acc)
@@ -593,15 +594,14 @@ let rec save_goal provers fmt g =
   fprintf fmt "@]@\n</goal>"
 
 and save_trans provers fmt t =
-  fprintf fmt "@\n@[<hov 1><transf@ name=\"%a\"@ proved=\"%b\"%a>"
-    save_string t.transf_name t.transf_verified
+  fprintf fmt "@\n@[<hov 1><transf@ name=\"%a\"%a>"
+    save_string t.transf_name
     (save_bool_def "expanded" false) t.transf_expanded;
   List.iter (save_goal provers fmt) t.transf_goals;
   fprintf fmt "@]@\n</transf>"
 
 and save_metas provers fmt _ m =
-  fprintf fmt "@\n@[<hov 1><metas@ proved=\"%b\"%a>"
-    m.metas_verified
+  fprintf fmt "@\n@[<hov 1><metas%a>"
     (save_bool_def "expanded" false) m.metas_expanded;
   let save_pos fmt pos =
     fprintf fmt "ip_theory=\"%a\">" save_string pos.ip_theory;
@@ -665,9 +665,8 @@ and save_ty fmt ty =
 
 let save_theory provers fmt t =
   fprintf fmt
-    "@\n@[<hov 1><theory@ %a@ verified=\"%b\"%a>"
+    "@\n@[<hov 1><theory@ %a%a>"
     save_ident t.theory_name
-    t.theory_verified
     (save_bool_def "expanded" false) t.theory_expanded;
   Ident.Slab.iter (save_label fmt) t.theory_name.Ident.id_label;
   List.iter (save_goal provers fmt) t.theory_goals;
@@ -675,9 +674,9 @@ let save_theory provers fmt t =
 
 let save_file provers fmt _ f =
   fprintf fmt
-    "@\n@[<hov 1><file@ name=\"%a\"%a@ verified=\"%b\"%a>"
+    "@\n@[<hov 1><file@ name=\"%a\"%a%a>"
     save_string f.file_name (opt "format")
-    f.file_format f.file_verified (save_bool_def "expanded" false) f.file_expanded;
+    f.file_format (save_bool_def "expanded" false) f.file_expanded;
   List.iter (save_theory provers fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
