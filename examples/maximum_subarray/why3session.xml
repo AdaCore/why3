@@ -6,9 +6,9 @@
  <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5"
   memlimit="1000"/>
  <prover id="2" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
- <prover id="3" name="Coq" version="8.4pl2" timelimit="5" memlimit="1000"/>
- <prover id="4" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
- <prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+ <prover id="3" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
+ <prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+ <prover id="5" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
  <file name="../maximum_subarray.mlw"
   expanded="true">
   <theory name="Spec" expanded="true">
@@ -403,7 +403,7 @@
       sum="3ffed200db464ba4a1756d56ab1e00e6"
       shape="postconditionamaxsubV2V6IamaxsubloV2ainfix +V5c1V6Aainfix =V6asumV1V8V7Aainfix &lt;=V7V0Aainfix &lt;=V8V7Aainfix &lt;=V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix &lt;=c0V5Lainfix -V0c1Iainfix =V4c0FIainfix =V3c0FIainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for maximum_subarray"/>
-      <proof prover="4">
+      <proof prover="3">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
@@ -1268,7 +1268,7 @@
       sum="26f1d87f81de10c19a90de2341cd0f59"
       shape="loop invariant preservationainfix &lt;=asumV1V20V21V18Iainfix &lt;=V21ainfix +V16c1Aainfix &lt;=V4V21Aainfix &lt;=V20V4Aainfix &lt;=V2V20FIainfix =V19ainfix +V16c1FIainfix =V18V17FIainfix &gt;V17V14Iainfix =V17ainfix +asumV1V10V4asumV1V4ainfix +V16c1Iainfix =V17asumV1V10ainfix +V16c1Iainfix =V17ainfix +V13agetV1V16FIainfix &lt;V16V0Aainfix &lt;=c0V16Iainfix =V13asumV1V10V16Aainfix &lt;=asumV1V22V23V14Iainfix &lt;=V23V16Aainfix &lt;=V4V23Aainfix &lt;=V22V4Aainfix &lt;=V2V22FAainfix =V14asumV1V10V15Aainfix &lt;=V15V3Aainfix &lt;=V4V15Aainfix &lt;=V10V4Aainfix &lt;=V2V10Iainfix &lt;=V16V12Aainfix &lt;=V4V16FFIainfix &lt;=V4V12Lainfix -V3c1Iainfix =V11V9FIainfix &lt;=asumV1V24V4asumV1V10V4Iainfix &lt;=V24V4Aainfix &lt;=V2V24FIainfix =V8asumV1ainfix +ainfix -V2c1c1V4Aainfix &lt;=asumV1V25V4V9Iainfix &lt;=V25V4Aainfix &lt;ainfix -V2c1V25FAainfix =V9asumV1V10V6Aainfix =V4V6Aainfix &lt;=V10V4Aainfix &lt;=V2V10FIainfix &gt;=V7V2Lainfix -V4c1Iainfix =V6V4FIainfix =V5V4FLainfix +V2adivainfix -V3V2c2INainfix =V3V2Iainfix &lt;=V3V0Aainfix &lt;=V2V3Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for maximum_subarray_rec"/>
-      <proof prover="3"
+      <proof prover="5"
        edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_1.v">
        <result status="valid" time="1.48"/>
       </proof>
@@ -1296,7 +1296,7 @@
       sum="6892fcc2f4897147ba5b6ec4c459119e"
       shape="loop invariant preservationainfix &lt;=asumV1V18V19V14Iainfix &lt;=V19ainfix +V16c1Aainfix &lt;=V4V19Aainfix &lt;=V18V4Aainfix &lt;=V2V18FINainfix &gt;V17V14Iainfix =V17ainfix +asumV1V10V4asumV1V4ainfix +V16c1Iainfix =V17asumV1V10ainfix +V16c1Iainfix =V17ainfix +V13agetV1V16FIainfix &lt;V16V0Aainfix &lt;=c0V16Iainfix =V13asumV1V10V16Aainfix &lt;=asumV1V20V21V14Iainfix &lt;=V21V16Aainfix &lt;=V4V21Aainfix &lt;=V20V4Aainfix &lt;=V2V20FAainfix =V14asumV1V10V15Aainfix &lt;=V15V3Aainfix &lt;=V4V15Aainfix &lt;=V10V4Aainfix &lt;=V2V10Iainfix &lt;=V16V12Aainfix &lt;=V4V16FFIainfix &lt;=V4V12Lainfix -V3c1Iainfix =V11V9FIainfix &lt;=asumV1V22V4asumV1V10V4Iainfix &lt;=V22V4Aainfix &lt;=V2V22FIainfix =V8asumV1ainfix +ainfix -V2c1c1V4Aainfix &lt;=asumV1V23V4V9Iainfix &lt;=V23V4Aainfix &lt;ainfix -V2c1V23FAainfix =V9asumV1V10V6Aainfix =V4V6Aainfix &lt;=V10V4Aainfix &lt;=V2V10FIainfix &gt;=V7V2Lainfix -V4c1Iainfix =V6V4FIainfix =V5V4FLainfix +V2adivainfix -V3V2c2INainfix =V3V2Iainfix &lt;=V3V0Aainfix &lt;=V2V3Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
       <label name="expl:VC for maximum_subarray_rec"/>
-      <proof prover="3"
+      <proof prover="5"
        edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_3.v">
        <result status="valid" time="1.51"/>
       </proof>
@@ -1758,7 +1758,7 @@
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="5">
+      <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
