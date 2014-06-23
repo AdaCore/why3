@@ -297,6 +297,10 @@ why3_vc Power_mult using assms by (simp add: nat_mult_distrib power_mult)
 
 why3_vc Power_mult2 by (simp add: power_mult_distrib)
 
+why3_vc Power_non_neg using assms by simp
+
+why3_vc Power_monotonic using assms by (simp add: power_increasing)
+
 why3_end
 
 end

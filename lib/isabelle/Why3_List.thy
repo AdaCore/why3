@@ -165,6 +165,10 @@ why3_vc reverse_append by simp
 
 why3_vc reverse_reverse by simp
 
+why3_vc reverse_mem by simp
+
+why3_vc reverse_cons by simp
+
 why3_end
 
 
@@ -183,6 +187,9 @@ qed simp
 
 why3_vc rev_append_length
   by (induct s arbitrary: t) simp_all
+
+why3_vc rev_append_def
+  by (induct r arbitrary: s) simp_all
 
 why3_end
 
@@ -226,6 +233,9 @@ qed simp
 
 why3_vc Append_Num_Occ
   by (induct l1) simp_all
+
+why3_vc reverse_num_occ
+  by (induct l) (simp_all add: Append_Num_Occ)
 
 why3_end
 
