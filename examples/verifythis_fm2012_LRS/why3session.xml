@@ -8,10 +8,10 @@
  <prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="10"
   memlimit="1000"/>
  <prover id="4" name="Z3" version="2.19" timelimit="10" memlimit="1000"/>
- <prover id="5" name="Coq" version="8.4pl2" timelimit="6" memlimit="1000"/>
- <prover id="6" name="CVC3" version="2.2" timelimit="10" memlimit="1000"/>
- <prover id="7" name="Z3" version="4.3.1" timelimit="10" memlimit="4000"/>
- <prover id="8" name="Z3" version="3.2" timelimit="10" memlimit="4000"/>
+ <prover id="5" name="CVC3" version="2.2" timelimit="10" memlimit="1000"/>
+ <prover id="6" name="Z3" version="4.3.1" timelimit="10" memlimit="4000"/>
+ <prover id="7" name="Z3" version="3.2" timelimit="10" memlimit="4000"/>
+ <prover id="8" name="Coq" version="8.4pl3" timelimit="6" memlimit="1000"/>
  <prover id="9" name="Alt-Ergo" version="0.95.2" timelimit="5"
   memlimit="4000"/>
  <prover id="10" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
@@ -29,10 +29,10 @@
     <proof prover="4">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="7" memlimit="1000">
+    <proof prover="6" memlimit="1000">
      <result status="valid" time="0.03"/>
     </proof>
-    <proof prover="8" memlimit="1000">
+    <proof prover="7" memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
     <proof prover="9">
@@ -74,13 +74,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -109,13 +109,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="7" memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -147,13 +147,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="7" memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -187,10 +187,10 @@
       <proof prover="2" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" timelimit="5">
+      <proof prover="6" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="8" timelimit="5">
+      <proof prover="7" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -230,7 +230,7 @@
       <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -259,7 +259,7 @@
       <proof prover="3">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -313,13 +313,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -348,13 +348,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -380,13 +380,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -415,13 +415,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="9">
@@ -453,13 +453,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="9">
@@ -491,13 +491,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -526,7 +526,7 @@
       <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -555,13 +555,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -593,13 +593,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -631,13 +631,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -680,13 +680,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="7" memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -715,13 +715,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="7" memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -750,13 +750,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -782,7 +782,7 @@
       <proof prover="3">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -811,13 +811,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -849,13 +849,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -887,13 +887,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -925,13 +925,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
+       <result status="valid" time="0.00"/>
+      </proof>
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="8" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -963,13 +963,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -1020,13 +1020,13 @@
     <proof prover="4">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="6">
+    <proof prover="5">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="7" memlimit="1000">
+    <proof prover="6" memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof prover="8" memlimit="1000">
+    <proof prover="7" memlimit="1000">
      <result status="valid" time="0.01"/>
     </proof>
     <proof prover="9">
@@ -1067,13 +1067,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -1102,13 +1102,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -1140,13 +1140,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1175,13 +1175,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1210,13 +1210,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1248,13 +1248,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1286,13 +1286,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.07"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -1324,13 +1324,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -1359,7 +1359,7 @@
       <proof prover="3">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1382,7 +1382,7 @@
       <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1408,13 +1408,13 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1446,13 +1446,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1484,13 +1484,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
+       <result status="valid" time="0.03"/>
+      </proof>
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="7" memlimit="1000">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="8" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -1519,13 +1519,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1554,13 +1554,13 @@
       <proof prover="4">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -1592,13 +1592,13 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -1630,13 +1630,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -1668,13 +1668,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -1706,13 +1706,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -1744,13 +1744,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -1793,13 +1793,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.20"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -1822,7 +1822,7 @@
       <proof prover="2" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.05"/>
       </proof>
       <proof prover="9">
@@ -1842,7 +1842,7 @@
       <proof prover="3">
        <result status="valid" time="2.95"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1862,7 +1862,7 @@
       <proof prover="2" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="10">
@@ -1879,7 +1879,7 @@
       <proof prover="2" memlimit="1000">
        <result status="valid" time="0.08"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.08"/>
       </proof>
      </goal>
@@ -1893,7 +1893,7 @@
       <proof prover="2" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
@@ -1930,7 +1930,7 @@
       <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -1962,13 +1962,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -2014,13 +2014,13 @@
       <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.07"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.12"/>
       </proof>
       <proof prover="9">
@@ -2052,13 +2052,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -2090,13 +2090,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
+       <result status="valid" time="0.02"/>
+      </proof>
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="7" memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -2125,7 +2125,7 @@
       <proof prover="3">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -2157,13 +2157,13 @@
       <proof prover="4">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -2195,13 +2195,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -2230,7 +2230,7 @@
       <proof prover="3">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="9">
@@ -2262,13 +2262,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -2316,13 +2316,13 @@
     <proof prover="4">
      <result status="valid" time="0.03"/>
     </proof>
-    <proof prover="6">
+    <proof prover="5">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="7" memlimit="1000">
+    <proof prover="6" memlimit="1000">
      <result status="valid" time="0.04"/>
     </proof>
-    <proof prover="8" memlimit="1000">
+    <proof prover="7" memlimit="1000">
      <result status="valid" time="0.03"/>
     </proof>
     <proof prover="9">
@@ -2337,7 +2337,7 @@
    </goal>
    <goal name="permut_permutation" sum="b9895237dc27383b843f8c3387c50c20"
     shape="apermutationaeltsV1alengthV1IapermutationaeltsV0alengthV0Aapermut_allV0V1F">
-    <proof prover="5"
+    <proof prover="8"
      edited="verifythis_fm2012_lcp_SuffixArray_permut_permutation_1.v">
      <result status="valid" time="1.64"/>
     </proof>
@@ -2367,13 +2367,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -2405,13 +2405,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -2443,13 +2443,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -2478,7 +2478,7 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -2507,13 +2507,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -2545,13 +2545,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="9">
@@ -2583,13 +2583,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -2618,13 +2618,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -2653,13 +2653,13 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="9">
@@ -2691,13 +2691,13 @@
       <proof prover="4">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="9">
@@ -2729,13 +2729,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -2761,7 +2761,7 @@
       <proof prover="3">
        <result status="valid" time="0.08"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.07"/>
       </proof>
       <proof prover="9">
@@ -2798,13 +2798,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -2830,13 +2830,13 @@
       <proof prover="4">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -2862,13 +2862,13 @@
       <proof prover="4">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -2897,13 +2897,13 @@
       <proof prover="4">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -2985,7 +2985,7 @@
     <proof prover="3">
      <result status="valid" time="0.36"/>
     </proof>
-    <proof prover="6">
+    <proof prover="5">
      <result status="valid" time="0.10"/>
     </proof>
     <proof prover="9">
@@ -3017,13 +3017,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
       <proof prover="9">
@@ -3049,13 +3049,13 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -3084,13 +3084,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
       <proof prover="9">
@@ -3122,13 +3122,13 @@
       <proof prover="4">
        <result status="valid" time="0.08"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.07"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
       <proof prover="9">
@@ -3157,13 +3157,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
       <proof prover="9">
@@ -3189,13 +3189,13 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -3224,13 +3224,13 @@
       <proof prover="4">
        <result status="valid" time="0.08"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
       <proof prover="9">
@@ -3262,13 +3262,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -3297,13 +3297,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -3329,13 +3329,13 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -3364,13 +3364,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -3402,13 +3402,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -3437,13 +3437,13 @@
       <proof prover="4">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
       <proof prover="9">
@@ -3475,13 +3475,13 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -3513,13 +3513,13 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
       <proof prover="9">
@@ -3545,7 +3545,7 @@
       <proof prover="3">
        <result status="valid" time="0.16"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.07"/>
       </proof>
       <proof prover="9">
@@ -3562,7 +3562,7 @@
       <proof prover="2" memlimit="1000">
        <result status="valid" time="0.52"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.25"/>
       </proof>
      </goal>
@@ -3585,13 +3585,13 @@
       <proof prover="4">
        <result status="valid" time="0.08"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
       <proof prover="9">
@@ -3623,13 +3623,13 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="9">
@@ -3658,7 +3658,7 @@
       <proof prover="3">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="9">
@@ -3681,7 +3681,7 @@
       <proof prover="2" memlimit="1000">
        <result status="valid" time="0.59"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.23"/>
       </proof>
       <proof prover="10">
@@ -3704,7 +3704,7 @@
       <proof prover="3">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.13"/>
       </proof>
       <proof prover="9">
@@ -3718,9 +3718,9 @@
       sum="32da24c127665343c6b454926e9d0299"
       shape="assertionainfix =V15agetV6V17Aainfix =V14agetV6V16ANainfix =V16V17Aainfix &lt;V17V0Aainfix &lt;=c0V17Aainfix &lt;V16V0Aainfix &lt;=c0V16EIainfix &lt;V15V0Aainfix &lt;V14V15Aainfix &lt;=c0V14FIainfix &gt;=V12V20Iais_longest_common_prefixV2agetV6V18agetV6V19V20ANainfix =V18V19Aainfix &lt;V19V0Aainfix &lt;=c0V19Aainfix &lt;V18V0Aainfix &lt;=c0V18FIainfix &gt;=V12V23Iais_longest_common_prefixV2agetV6V21agetV6V22V23Aainfix &lt;V22ainfix +V10c1Aainfix &lt;V21V22Aainfix &lt;=c0V21FAais_longest_common_prefixV2V13V11V12ANainfix =V13V11Aainfix &lt;=V11V0Aainfix &lt;=c0V11Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V12V0Aainfix &lt;=c0V12FIainfix &lt;=c1V10Lainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for lrs"/>
-      <proof prover="5" timelimit="10"
+      <proof prover="8" timelimit="10"
        edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_10.v">
-       <result status="valid" time="41.53"/>
+       <result status="valid" time="31.98"/>
       </proof>
      </goal>
      <goal name="WP_parameter lrs.24" expl="24. postcondition"
@@ -3742,13 +3742,13 @@
       <proof prover="4">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
       <proof prover="9">
@@ -3780,13 +3780,13 @@
       <proof prover="4">
        <result status="valid" time="0.08"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="7" memlimit="1000">
+      <proof prover="6" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
-      <proof prover="8" memlimit="1000">
+      <proof prover="7" memlimit="1000">
        <result status="valid" time="0.06"/>
       </proof>
       <proof prover="9">
@@ -3815,7 +3815,7 @@
       <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.05"/>
       </proof>
       <proof prover="9">
@@ -3832,7 +3832,7 @@
       sum="ce3cb9841ab8e08779b4ce6736317216"
       shape="postconditionainfix &gt;=V12V16Iais_longest_common_prefixV2V14V15V16Aainfix &lt;V15V0Aainfix &lt;V14V15Aainfix &lt;=c0V14FIainfix =V18agetV6V20Aainfix =V17agetV6V19ANainfix =V19V20Aainfix &lt;V20V0Aainfix &lt;=c0V20Aainfix &lt;V19V0Aainfix &lt;=c0V19EIainfix &lt;V18V0Aainfix &lt;V17V18Aainfix &lt;=c0V17FIainfix &gt;=V12V23Iais_longest_common_prefixV2agetV6V21agetV6V22V23ANainfix =V21V22Aainfix &lt;V22V0Aainfix &lt;=c0V22Aainfix &lt;V21V0Aainfix &lt;=c0V21FIainfix &gt;=V12V26Iais_longest_common_prefixV2agetV6V24agetV6V25V26Aainfix &lt;V25ainfix +V10c1Aainfix &lt;V24V25Aainfix &lt;=c0V24FAais_longest_common_prefixV2V13V11V12ANainfix =V13V11Aainfix &lt;=V11V0Aainfix &lt;=c0V11Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=V12V0Aainfix &lt;=c0V12FIainfix &lt;=c1V10Lainfix -V0c1Iainfix =V9V0FIainfix =V8c0FIainfix =V7c0FIainfix =V4V1Aainfix =V3V0Aainfix &lt;=c0V5Aainfix &lt;=c0V3Aasorted_subamk arrayV3V4V6c0V5AapermutationV6V5Aainfix =V3V5FIainfix &gt;V0c0Aainfix &lt;=c0V0Lamk arrayV0V1F">
       <label name="expl:VC for lrs"/>
-      <proof prover="5" timelimit="5"
+      <proof prover="8" timelimit="5"
        edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_12.v">
        <result status="valid" time="31.44"/>
       </proof>
