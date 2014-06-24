@@ -48,13 +48,82 @@ let goal_expl_task ~root task =
   in
   gid, info, task
 
+(* ident dictionary for shapes *)
+
+let dict_table = Hashtbl.create 17
+let dict_count = ref 0
+
+let reset_dict () = Hashtbl.clear dict_table; dict_count := 0
+
+let get_name s b i =
+  try while !i < String.length s do
+    match String.get s !i with
+      | ')' -> incr i; raise Exit
+      | c -> incr i; Buffer.add_char b c
+    done;
+    invalid_arg "Termcode.get_name: missing closing parenthesis"
+  with Exit ->
+    let id = Buffer.contents b in
+    Hashtbl.add dict_table !dict_count id;
+    incr dict_count;
+    id
+
+let get_num s n i =
+  try while !i < String.length s do
+    match String.get s !i with
+      | ')' -> incr i; raise Exit
+      | '0'..'9' as c ->
+        incr i; n := !n * 10 + (Char.code c - Char.code '0')
+      | _ ->
+        invalid_arg "Termcode.get_num: decimal digit expected"
+    done;
+    invalid_arg "Termcode.get_num: missing closing parenthesis"
+  with Exit ->
+    try Hashtbl.find dict_table !n
+    with Not_found ->
+      invalid_arg "Termcode.get_num: invalid ident number"
+
+let get_id s i =
+  if !i >= String.length s then
+    invalid_arg "Termcode.get_id: missing closing parenthesis";
+  match String.get s !i with
+    | '0'..'9' as c ->
+      let n = ref (Char.code c - Char.code '0') in
+      incr i;
+      get_num s n i
+    | ')' -> invalid_arg "Termcode.get_id: unexpected closing parenthesis"
+    | c ->
+      let b = Buffer.create 17 in
+      Buffer.add_char b c;
+      incr i;
+      get_name s b i
+
 (* Shapes *)
 
 type shape = string
 let string_of_shape x = x
-let shape_of_string x = x
+let shape_of_string s =
+  let l = String.length s in
+  let r = Buffer.create l in
+  let i = ref 0 in
+  while !i < l do
+  match String.get s !i with
+    | '(' -> incr i; Buffer.add_string r (get_id s i)
+    | c -> Buffer.add_char r c; incr i
+  done;
+  Buffer.contents r
+
+(* tests
+let _ = reset_dict () ; shape_of_string "a(b)cde(0)"
+let _ = reset_dict () ; shape_of_string "a(bc)d(e)f(1)g(0)h"
+let _ = reset_dict () ; shape_of_string "(abc)(def)(1)(0)(1)"
+let _ = reset_dict () ; shape_of_string "(abcde)(fghij)(1)(0)(1)"
+*)
+
 let equal_shape (x:string) y = x = y
+(* unused
 let print_shape fmt s = Format.pp_print_string fmt (string_of_shape s)
+*)
 
 let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
