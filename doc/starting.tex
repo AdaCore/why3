@@ -52,10 +52,10 @@ apply on goals. The section ``Provers'' displays the provers that were
 detected as installed on your computer.%
 %BEGIN LATEX
 \footnote{If not done yet, you
-  must perform prover autodetection using \texttt{why3config
-    --detect-provers}}
+  must perform prover autodetection using \texttt{why3 config
+    -{}-detect-provers}}
 %END LATEX
-%HEVEA {} (If not done yet, you must perform prover autodetection using \texttt{why3config --detect-provers}.)
+%HEVEA {} (If not done yet, you must perform prover autodetection using \texttt{why3 config -{}-detect-provers}.)
 Three provers were detected, in this case,
 these are Alt-Ergo~\cite{ergo}, Coq~\cite{CoqArt} and
 Simplify~\cite{simplify05}.
@@ -100,14 +100,14 @@ get the display of Figure~\ref{fig:gui3}.
   \label{fig:gui3}
 \end{figure}
 
-The goal $G_1$ is now marked with a green ``checked'' icon in the
+Goal $G_1$ is now marked with a green ``checked'' icon in the
 status column. This means that the goal is proved by the Simplify
 prover. On the contrary, the two other goals are not proved, they remain
 marked with an orange question mark.
 
 You can immediately attempt to prove the remaining goals using another
-prover, \eg Alt-Ergo, by clicking on the corresponding button. The
-goal $G_3$ should be proved now, but not $G_2$.
+prover, \eg Alt-Ergo, by clicking on the corresponding button.
+Goal $G_3$ should be proved now, but not $G_2$.
 
 \subsection{Applying transformations}
 
@@ -154,7 +154,7 @@ explained below.
 \subsection{Modifying the input}
 
 Currently, the GUI does not allow to modify the input file. You must
-edit the file external by some editor of your choice. Let's assume we
+edit the file external by some editor of your choice. Let us assume we
 change the goal $G_2$ by replacing the first occurrence of true by
 false, \eg
 \begin{whycode}
@@ -209,9 +209,9 @@ Progress: 9/9
          +--goal G2 not proved
 Everything OK.
 \end{verbatim}
-The last line tells us that no difference was detected between the
-current run and the informations in the XML file. The tree above
-reminds us that the G2 is not proved.
+The last line tells us that no differences were detected between the
+current run and the run stored in the XML file. The tree above
+reminds us that $G_2$ is not proved.
 
 \subsection{Cleaning}
 
@@ -229,12 +229,12 @@ attempt for the same goal.
 \section{Getting Started with the \why Command}
 \label{sec:batch}
 
-The \texttt{prove} command allows to check the validity of goals with external
+The \texttt{prove} command makes it possible to check the validity of goals with external
 provers, in batch mode. This section presents the basic use of this
 tool. Refer to Section~\ref{sec:why3ref} for a more complete
 description of this tool and all its command-line options.
 
-The very first time you want to use Why, you should proceed with
+The very first time you want to use \why, you should proceed with
 autodetection of external provers. We have already seen how to do
 it in the \why GUI. On the command line, this is done as follows
 (here ``\texttt{>}'' is the prompt):
@@ -257,7 +257,7 @@ Simplify~\cite{simplify05}.
 Let us assume that we want to run Simplify on the HelloProof
 example. The command to type and its output are as follows, where the
 \verb|-P| option is followed by the unique prover identifier (as shown
-by \texttt{--list-provers} option).
+by \verb|--list-provers| option).
 \begin{verbatim}
 > why3 prove -P simplify hello_proof.why
 hello_proof.why HelloProof G1 : Valid (0.10s)
@@ -290,7 +290,7 @@ Known splitting transformations:
   split_intro
 \end{verbatim}
 Here is how you can split the goal $G_2$ before calling
-Simplify on resulting subgoals.
+Simplify on the resulting subgoals.
 \begin{verbatim}
 > why3 prove -P simplify hello_proof.why -a split_goal -T HelloProof -G G2
 hello_proof.why HelloProof G2 : Unknown: Unknown (0.00s)
