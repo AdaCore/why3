@@ -1181,10 +1181,10 @@ drivers/isabelle-realizations.aux: Makefile
 install_no_local::
 	cp -r lib/isabelle $(LIBDIR)/why3
 	cp drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
-	isabelle build -bc Why3
+	@echo disabled temporarily: isabelle build -bc Why3
 
 install_local::
-	isabelle build -bc Why3
+	@echo disabled temporarily: isabelle build -bc Why3
 
 
 update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
