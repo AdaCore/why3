@@ -1181,10 +1181,20 @@ drivers/isabelle-realizations.aux: Makefile
 install_no_local::
 	cp -r lib/isabelle $(LIBDIR)/why3
 	cp drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
-	@echo disabled temporarily: isabelle build -bc Why3
+	@(d=`isabelle components -l | grep why3`; \
+	  if test $$d != $(LIBDIR)/why3/isabelle; then \
+	    echo "Cannot build isabelle heap because component lib [$$d]"; \
+            echo "is not the same as the install dir [$(LIBDIR)/why3/isabelle]"; \
+	  else isabelle build -bc Why3 ; \
+	  fi)
 
 install_local::
-	@echo disabled temporarily: isabelle build -bc Why3
+	@(d=`isabelle components -l | grep why3`; \
+	  if test $$d != `pwd`/lib/isabelle; then \
+	    echo "Cannot build isabelle heap because component lib [$$d]"; \
+            echo "is not the same as the install dir [`pwd`/lib/isabelle]"; \
+	  else isabelle build -bc Why3 ; \
+	  fi)
 
 
 update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
