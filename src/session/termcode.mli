@@ -16,6 +16,8 @@ val goal_expl_task:
 
 (** Shapes *)
 
+val reset_dict : unit -> unit
+
 val current_shape_version : int
 
 type shape

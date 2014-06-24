@@ -714,6 +714,7 @@ let save fname _config session =
 *)
   fprintf fmt "@[<hov 1><why3session shape_version=\"%d\">"
     session.session_shape_version;
+  Tc.reset_dict ();
   let provers,_ = PHprover.fold (save_prover fmt) (get_used_provers_with_stats session)
     (Mprover.empty,0) in
   PHstr.iter (save_file provers fmt) session.session_files;
@@ -1356,6 +1357,7 @@ let read_session dir =
   (** If the xml is present we read it, otherwise we consider it empty *)
   if Sys.file_exists xml_filename then begin
     try
+      Tc.reset_dict ();
       let xml = Xml.from_file xml_filename in
       try
         load_session session xml.Xml.content;

@@ -48,12 +48,21 @@ let goal_expl_task ~root task =
   in
   gid, info, task
 
-(* ident dictionary for shapes *)
+(* {2 ident dictionaries for shapes} *)
 
 let dict_table = Hashtbl.create 17
 let dict_count = ref 0
+let reverse_ident_table = Hashtbl.create 17
+let reverse_dict_count = ref 0
 
-let reset_dict () = Hashtbl.clear dict_table; dict_count := 0
+let reset_dict () =
+  Hashtbl.clear dict_table;
+  Hashtbl.clear reverse_ident_table;
+  dict_count := 0;
+  reverse_dict_count := 0
+
+(* {3 direct table to read shapes from strings} *)
+
 
 let get_name s b i =
   try while !i < String.length s do
@@ -65,6 +74,9 @@ let get_name s b i =
   with Exit ->
     let id = Buffer.contents b in
     Hashtbl.add dict_table !dict_count id;
+(*
+    Format.eprintf "%d -> %s@." !dict_count id;
+*)
     incr dict_count;
     id
 
@@ -81,7 +93,8 @@ let get_num s n i =
   with Exit ->
     try Hashtbl.find dict_table !n
     with Not_found ->
-      invalid_arg "Termcode.get_num: invalid ident number"
+      invalid_arg
+        ("Termcode.get_num: invalid ident number " ^ string_of_int !n)
 
 let get_id s i =
   if !i >= String.length s then
@@ -98,11 +111,52 @@ let get_id s i =
       incr i;
       get_name s b i
 
-(* Shapes *)
+
+let store_id s i =
+  let b = Buffer.create 17 in
+  try while !i < String.length s do
+    match String.get s !i with
+      | ')' -> incr i; raise Exit
+      | c -> incr i; Buffer.add_char b c
+    done;
+    invalid_arg "Termcode.store_id: missing closing parenthesis"
+  with Exit ->
+    let id = Buffer.contents b in
+    try
+      let n = Hashtbl.find reverse_ident_table id in
+      string_of_int n
+    with
+        Not_found ->
+          Hashtbl.add reverse_ident_table id !reverse_dict_count;
+          incr reverse_dict_count;
+          id
+
+(* {2 Shapes} *)
 
 type shape = string
-let string_of_shape x = x
+
+let string_of_shape s =
+  try
+  let l = String.length s in
+  let r = Buffer.create l in
+  let i = ref 0 in
+  while !i < l do
+  match String.get s !i with
+    | '(' ->
+      Buffer.add_char r '(';
+      incr i;
+      Buffer.add_string r (store_id s i);
+      Buffer.add_char r ')'
+    | c -> Buffer.add_char r c; incr i
+  done;
+  Buffer.contents r
+  with e ->
+    Format.eprintf "Error while reading shape [%s]@." s;
+    raise e
+
+
 let shape_of_string s =
+  try
   let l = String.length s in
   let r = Buffer.create l in
   let i = ref 0 in
@@ -112,6 +166,9 @@ let shape_of_string s =
     | c -> Buffer.add_char r c; incr i
   done;
   Buffer.contents r
+  with e ->
+    Format.eprintf "Error while reading shape [%s]@." s;
+    raise e
 
 (* tests
 let _ = reset_dict () ; shape_of_string "a(b)cde(0)"
@@ -173,7 +230,23 @@ let tag_var = "V"
 let tag_wild = "w"
 let tag_as = "z"
 
-let ident_shape ~push id acc = push id.Ident.id_string acc
+
+let id_string_shape ~push id acc =
+  let l = String.length id in
+  if l <= 4 then push id acc else
+  (* sanity check *)
+  if (match String.get id 0 with
+      | '0'..'9' -> true
+      | _ ->
+        try
+          let (_:int) = String.index id ')' in
+          true
+        with Not_found -> false)
+    then push id acc
+    else push ")" (push id (push "(" acc))
+
+let ident_shape ~push id acc =
+  id_string_shape ~push id.Ident.id_string acc
 
 let const_shape ~push acc c =
   let b = Buffer.create 17 in
@@ -293,7 +366,9 @@ let t_shape_task ~version t =
   | SV1 | SV2 -> ()
   | SV3 ->
     let _, expl, _ = goal_expl_task ~root:false t in
-    Opt.iter (Buffer.add_string b) expl
+    match expl with
+      | None -> ()
+      | Some expl -> id_string_shape ~push expl () 
   end;
   let f = Task.task_goal_fmla t in
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () f in
