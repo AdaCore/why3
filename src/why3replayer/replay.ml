@@ -354,7 +354,7 @@ let add_to_check_no_smoke config some_merge_miss found_obs env_session sched =
           (if !found_upgraded_prover then ", upgraded prover" else "");
         if !opt_stats && n<m then print_statistics files;
         Debug.dprintf debug "Everything replayed OK.@.";
-        if found_obs || !found_upgraded_prover then save ();
+        if !opt_force || found_obs || !found_upgraded_prover then save ();
         exit 0
       end
     else
