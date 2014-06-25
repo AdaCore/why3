@@ -486,7 +486,7 @@ include .depend.gnat
 $(GNATCMX): lib/why3/why3.cmxa
 
 .depend.gnat:
-	$(OCAMLDEP) -slash -I src -I src/util -I src/gnat $(GNATML) $(GNATMLI) > $@
+	$(OCAMLDEP) -slash -I lib/why3 -I src -I src/util -I src/gnat $(GNATML) $(GNATMLI) > $@
 
 depend: .depend.gnat
 
