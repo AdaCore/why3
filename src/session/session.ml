@@ -509,7 +509,7 @@ let save_string fmt s =
 
 
 let save_result fmt r =
-  fprintf fmt "@\n<result@ status=\"%s\"@ time=\"%.2f\"/>"
+  fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"/>"
     (match r.Call_provers.pr_answer with
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"
@@ -523,11 +523,11 @@ let save_result fmt r =
 let save_status fmt s =
   match s with
     | Unedited ->
-        fprintf fmt "@\n<unedited/>"
+        fprintf fmt "<unedited/>"
     | Scheduled | Running | Interrupted | JustEdited ->
-        fprintf fmt "@\n<undone/>"
+        fprintf fmt "<undone/>"
     | InternalFailure msg ->
-        fprintf fmt "@\n<internalfailure@ reason=\"%a\"/>"
+        fprintf fmt "<internalfailure@ reason=\"%a\"/>"
           save_string (Printexc.to_string msg)
     | Done r -> save_result fmt r
 
@@ -544,7 +544,7 @@ let opt lab fmt = function
 
 let save_proof_attempt fmt ((id,tl,ml),a) =
   fprintf fmt
-    "@\n@[<hov 1><proof@ prover=\"%i\"%a%a%a%a%a>"
+    "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a%a>"
     id
     (save_int_def "timelimit" tl) a.proof_timelimit
     (save_int_def "memlimit" ml) a.proof_memlimit
@@ -552,7 +552,7 @@ let save_proof_attempt fmt ((id,tl,ml),a) =
     (save_bool_def "obsolete" false) a.proof_obsolete
     (save_bool_def "archived" false) a.proof_archived;
   save_status fmt a.proof_state;
-  fprintf fmt "@]@\n</proof>"
+  fprintf fmt "</proof>@]"
 
 let save_ident fmt id =
   fprintf fmt "name=\"%a\"" save_string id.Ident.id_string;
@@ -569,8 +569,10 @@ let save_ident fmt id =
 *)
   ()
 
+(*
 let save_label fmt s =
   fprintf fmt "@\n@[<hov 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
+*)
 
 type save_ctxt = {
   provers : (int * int * int) Mprover.t; ch_shapes : out_channel
@@ -581,7 +583,7 @@ let rec save_goal ctxt fmt g =
   assert (shape <> "");
   let checksum = Tc.string_of_checksum g.goal_checksum in
   fprintf fmt
-    "@\n@[<hov 1><goal@ %a%a@ sum=\"%a\"%a>"
+    "@\n@[<v 0>@[<h><goal@ %a%a@ sum=\"%a\"%a>@]"
     save_ident g.goal_name
     (opt "expl") g.goal_expl
     save_string checksum
@@ -590,7 +592,9 @@ let rec save_goal ctxt fmt g =
   output_char ctxt.ch_shapes ' ';
   output_string ctxt.ch_shapes shape;
   output_char ctxt.ch_shapes '\n';
+(*
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
+*)
   let l = PHprover.fold
     (fun _ a acc -> (Mprover.find a.proof_prover ctxt.provers, a) :: acc)
     g.goal_external_proofs [] in
@@ -603,7 +607,7 @@ let rec save_goal ctxt fmt g =
   fprintf fmt "@]@\n</goal>"
 
 and save_trans ctxt fmt t =
-  fprintf fmt "@\n@[<hov 1><transf@ name=\"%a\"%a>"
+  fprintf fmt "@\n@[<hov 1>@[<h><transf@ name=\"%a\"%a>@]"
     save_string t.transf_name
     (save_bool_def "expanded" false) t.transf_expanded;
   List.iter (save_goal ctxt fmt) t.transf_goals;
@@ -674,16 +678,18 @@ and save_ty fmt ty =
 
 let save_theory ctxt fmt t =
   fprintf fmt
-    "@\n@[<hov 1><theory@ %a%a>"
+    "@\n@[<v 1>@[<h><theory@ %a%a>@]"
     save_ident t.theory_name
     (save_bool_def "expanded" false) t.theory_expanded;
+(*
   Ident.Slab.iter (save_label fmt) t.theory_name.Ident.id_label;
+*)
   List.iter (save_goal ctxt fmt) t.theory_goals;
   fprintf fmt "@]@\n</theory>"
 
 let save_file ctxt fmt _ f =
   fprintf fmt
-    "@\n@[<hov 1><file@ name=\"%a\"%a%a>"
+    "@\n@[<v 0>@[<h><file@ name=\"%a\"%a%a>@]"
     save_string f.file_name (opt "format")
     f.file_format (save_bool_def "expanded" false) f.file_expanded;
   List.iter (save_theory ctxt fmt) f.file_theories;
@@ -702,7 +708,7 @@ let save_prover fmt p (timelimits,memlimits) (provers,id) =
       memlimits
       (0,0)
   in
-  fprintf fmt "@\n@[<hov 1><prover@ id=\"%i\"@ name=\"%a\"@ \
+  fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
                version=\"%a\"%a@ timelimit=\"%d\"@ memlimit=\"%d\"/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
@@ -722,7 +728,7 @@ let save fname shfname _config session =
     fprintf fmt "@[<hov 1><why3session@ name=\"%a\" shape_version=\"%d\">"
     save_string rel_file session.session_shape_version;
   *)
-  fprintf fmt "@[<hov 1><why3session shape_version=\"%d\">"
+  fprintf fmt "@[<v 0><why3session shape_version=\"%d\">"
     session.session_shape_version;
   Tc.reset_dict ();
   let provers,_ = PHprover.fold (save_prover fmt) (get_used_provers_with_stats session)
