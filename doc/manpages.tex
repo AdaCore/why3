@@ -87,7 +87,7 @@ tracking system.)
 
 The result of provers detection is stored in the user's
 configuration file (\verb+~/.why3.conf+ or, in the case of local
-installation, \verb+why3.conf+ in Why3 sources top directory). This file
+installation, \verb+why3.conf+ in \why sources top directory). This file
 is also human-readable, and advanced users may modify it in order to
 experiment with different ways of calling provers, \eg different
 versions of the same prover, or with different options.
@@ -143,15 +143,16 @@ The \texttt{prove} command executes the following steps:
 \item Parse and typecheck the given files using the correct parser in order
   to obtain a set of \why theories for each file. It uses
   the filename extension or the \verb|--format| option to choose
-  among the available parsers. The \verb|--list-format| option gives
-  the list of registered parsers.
+  among the available parsers. \verb|why3 --list-formats| lists
+  the registered parsers.
+  \index{list-formats@\verb+--list-formats+}
   \whyml modules are turned into
   theories containing verification conditions as goals.
 \item Extract the selected goals inside each of the selected theories
   into tasks. The goals and theories are selected using options
   \verb|-G/--goal| and \verb|-T/--theory|. Option
-  \verb|-T/--theory| applies to the last file appearing on the
-  command line, the option \verb|-G/--goal| applies to the last theory
+  \verb|-T/--theory| applies to the previous file appearing on the
+  command line. Option \verb|-G/--goal| applies to the previous theory
   appearing on the command line. If no theories are selected in a file,
   then every theory is considered as selected. If no goals are selected
   in a theory, then every goal is considered as selected.
@@ -159,21 +160,22 @@ The \texttt{prove} command executes the following steps:
   \index{goal@\verb+--goal+}
   \index{T@\verb+-T+|see{\texttt{-{}-theory}}}
   \index{theory@\verb+--theory+}
-\item Apply the transformation requested
+\item Apply the transformations requested
   with \verb|-a/--apply-transform| in their order of appearance on the
-  command line. \verb|--list-transforms| lists the known
-  transformations, plugins can add more of them.
+  command line. \verb|why3 --list-transforms| lists the known
+  transformations; plugins can add more of them.
   \index{a@\verb+-a+|see{\texttt{-{}-apply-transform}}}
   \index{apply-transform@\verb+--apply-transform+}
   \index{list-transforms@\verb+--list-transforms+}
 \item Apply the driver selected with the \verb|-D/--driver| option,
   or the driver of the prover selected with the \verb|-P/--prover|
-  option. \verb|--list-provers| lists the known provers, \ie the ones
+  option. \verb|why3 --list-provers| lists the known provers, \ie the ones
   that appear in the configuration file.
   \index{D@\verb+-D+|see{\texttt{-{}-driver}}}
   \index{driver@\verb+--driver+}
   \index{P@\verb+-P+|see{\texttt{-{}-prover}}}
   \index{prover@\verb+--prover+}
+  \index{list-provers@\verb+--list-provers+}
 \item If option \verb|-P/--prover| is given, call the selected prover
   on each generated task and print the results. If option
   \verb|-D/--driver| is given, print each generated task using
@@ -509,7 +511,6 @@ of the definitions is irrelevant. Notice that one can use
 axiomatizations.
 
 One can run all the bench given in one bench configuration file with
-\texttt{why3bench}:
 \begin{verbatim}
 why3 bench -B path_to_my_bench.rc
 \end{verbatim}
@@ -989,7 +990,7 @@ add the option \verb|-F| to force this behavior.
 
 
 
-\section{The \texttt{doc} command}
+\section{The \texttt{doc} Command}
 \label{sec:why3doc}
 
 This tool can produce HTML pages from \why source code.
