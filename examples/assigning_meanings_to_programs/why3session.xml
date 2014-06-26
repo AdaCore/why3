@@ -1,68 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
+ <prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+ <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10"
+  memlimit="0"/>
  <file
-  name="../assigning_meanings_to_programs.mlw"
-  verified="true"
-  expanded="false">
-  <theory
-   name="Sum"
-   locfile="../assigning_meanings_to_programs.mlw"
-   loclnum="3" loccnumb="7" loccnume="10"
-   verified="true"
+  name="../assigning_meanings_to_programs.mlw">
+  <theory name="Sum"
    expanded="true">
-   <goal
-    name="WP_parameter sum"
-    locfile="../assigning_meanings_to_programs.mlw"
-    loclnum="12" loccnumb="6" loccnume="9"
-    expl="VC for sum"
+   <goal name="WP_parameter sum" expl="VC for sum"
     sum="08be4365a1bbf3642e32e902d58a4e3c"
-    proved="true"
-    expanded="true"
-    shape="iainfix =V3asumV1c1ainfix +V2c1ainfix &lt;ainfix -V2V6ainfix -V2V4Aainfix &lt;=c0ainfix -V2V4Aainfix =V5asumV1c1V6Aainfix &lt;=V6ainfix +V2c1Aainfix &lt;=c1V6Iainfix =V6ainfix +V4c1FIainfix =V5ainfix +V3agetV1V4FAainfix &lt;V4V0Aainfix &lt;=c0V4ainfix &lt;=V4V2Iainfix =V3asumV1c1V4Aainfix &lt;=V4ainfix +V2c1Aainfix &lt;=c1V4FAainfix =c0asumV1c1c1Aainfix &lt;=c1ainfix +V2c1Aainfix &lt;=c1c1Iainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-    <label
-     name="expl:VC for sum"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    expanded="true">
+    <label name="expl:VC for sum"/>
+    <proof prover="1">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
-  <theory
-   name="Division"
-   locfile="../assigning_meanings_to_programs.mlw"
-   loclnum="27" loccnumb="7" loccnume="15"
-   verified="true"
+  <theory name="Division"
    expanded="true">
-   <goal
-    name="WP_parameter division"
-    locfile="../assigning_meanings_to_programs.mlw"
-    loclnum="38" loccnumb="6" loccnume="14"
-    expl="VC for division"
+   <goal name="WP_parameter division" expl="VC for division"
     sum="5a077cf4ab2c23e67ed74619034dc338"
-    proved="true"
-    expanded="true"
-    shape="iainfix =V0ainfix +ainfix *V3V1V2Aainfix &lt;V2V1Aainfix &lt;=c0V2ainfix &lt;V4V2Aainfix &lt;=c0V2Aainfix =V0ainfix +ainfix *V5V1V4Aainfix &lt;=c0V4Iainfix =V5ainfix +V3c1FIainfix =V4ainfix -V2V1Fainfix &gt;=V2V1Iainfix =V0ainfix +ainfix *V3V1V2Aainfix &lt;=c0V2FAainfix =V0ainfix +ainfix *c0V1V0Aainfix &lt;=c0V0Iainfix &lt;c0V1Aainfix &lt;=c0V0F">
-    <label
-     name="expl:VC for division"/>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    expanded="true">
+    <label name="expl:VC for division"/>
+    <proof prover="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>

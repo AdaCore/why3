@@ -5,39 +5,36 @@
  <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="3" memlimit="0"/>
  <prover id="1" name="MetiTarski" version="2.2" timelimit="3"
   memlimit="1000"/>
- <prover id="2" name="Coq" version="8.4pl3" timelimit="8" memlimit="1000"/>
- <prover id="3" name="Gappa" version="1.1.1" timelimit="2" memlimit="0"/>
- <file name="../my_cosine.why" verified="true"
+ <prover id="2" name="Gappa" version="1.1.1" timelimit="2" memlimit="0"/>
+ <prover id="3" name="Coq" version="8.4pl3" timelimit="8" memlimit="1000"/>
+ <file name="../my_cosine.why"
   expanded="true">
-  <theory name="CosineSingle" verified="true"
+  <theory name="CosineSingle"
    expanded="true">
    <goal name="MethodError" sum="fa917a528db6f39529f204d876e0c7c5"
-    proved="true" expanded="true"
-    shape="ainfix &lt;=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *V0V0acosV0c0x1.p-24Iainfix &lt;=aabsV0c0x1.p-5F">
+    expanded="true">
     <proof prover="1">
      <result status="valid" time="0.39"/>
     </proof>
-    <proof prover="2" edited="my_cosine_CosineSingle_MethodError_1.v">
+    <proof prover="3" edited="my_cosine_CosineSingle_MethodError_1.v">
      <result status="valid" time="3.79"/>
     </proof>
    </goal>
    <goal name="TotalErrorFullyExpanded"
-    sum="4526760675ec316b0fa6d6a797263752" proved="true" expanded="true"
-    shape="ainfix &lt;=aabsainfix -V3acosavalueV0c0x1.p-23Iainfix =V3aroundaNearestTiesToEvenainfix -c1.0V2Iainfix =V2aroundaNearestTiesToEvenainfix *c0.5V1Iainfix =V1aroundaNearestTiesToEvenainfix *avalueV0avalueV0FIainfix &lt;=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *avalueV0avalueV0acosavalueV0c0x1.p-24Iainfix &lt;=aabsavalueV0c0x1.p-5F">
-    <proof prover="3">
+    sum="4526760675ec316b0fa6d6a797263752"
+    expanded="true">
+    <proof prover="2">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="TotalErrorExpanded" sum="015837384308c99363f0d450f725d24c"
-    proved="true" expanded="true"
-    shape="ainfix &lt;=aabsainfix -V3acosavalueV0c0x1.p-23LaroundaNearestTiesToEvenainfix -c1.0V2LaroundaNearestTiesToEvenainfix *c0.5V1LaroundaNearestTiesToEvenainfix *avalueV0avalueV0Iainfix &lt;=aabsavalueV0c0x1.p-5F">
+    expanded="true">
     <proof prover="0">
      <result status="valid" time="2.34"/>
     </proof>
    </goal>
    <goal name="TotalError" sum="8ea5ffcbc3a2cd90c1252532cb1d1553"
-    proved="true" expanded="true"
-    shape="ainfix &lt;=aabsainfix -avalueV1acosavalueV0c0x1.p-23Lacos_singleV0Iainfix &lt;=aabsavalueV0c0x1.p-5F">
+    expanded="true">
     <proof prover="0" timelimit="10">
      <result status="valid" time="0.08"/>
     </proof>

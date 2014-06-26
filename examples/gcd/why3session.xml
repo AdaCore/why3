@@ -3,63 +3,58 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
  <prover id="0" name="CVC4" version="1.2" timelimit="10" memlimit="1000"/>
- <prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="1000"/>
- <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10"
+ <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10"
   memlimit="1000"/>
+ <prover id="2" name="CVC3" version="2.4.1" timelimit="10" memlimit="1000"/>
  <prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
  <prover id="4" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
- <prover id="5" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
- <prover id="6" name="Eprover" version="1.8-001" timelimit="6"
+ <prover id="5" name="Eprover" version="1.8-001" timelimit="6"
   memlimit="1000"/>
+ <prover id="6" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
  <prover id="7" name="Alt-Ergo" version="0.95.2" timelimit="6"
   memlimit="4000"/>
  <prover id="8" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
- <file name="../gcd.mlw" verified="true"
+ <file name="../gcd.mlw"
   expanded="true">
-  <theory name="EuclideanAlgorithm" verified="true"
+  <theory name="EuclideanAlgorithm"
    expanded="true">
    <goal name="WP_parameter euclid" expl="VC for euclid"
-    sum="818f8f1a6e4f765eebc1f6f1b6f1d3e8" proved="true"
-    shape="iainfix =agcdV1V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V1c0Aainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1ANainfix =V1c0ainfix =V0agcdV0V1ainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+    sum="818f8f1a6e4f765eebc1f6f1b6f1d3e8">
     <label name="expl:VC for euclid"/>
-    <transf name="split_goal"
-     proved="true">
+    <transf
+     name="split_goal">
      <goal name="WP_parameter euclid.1" expl="1. postcondition"
-      sum="dd9f821e339a882804c732f7db4d0ce9" proved="true"
-      shape="postconditionainfix =V0agcdV0V1Iainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="dd9f821e339a882804c732f7db4d0ce9">
       <label name="expl:VC for euclid"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="2" timelimit="2" memlimit="0">
+      <proof prover="1" timelimit="2" memlimit="0">
        <result status="valid" time="0.01"/>
+      </proof>
+      <proof prover="2" memlimit="0">
+       <result status="valid" time="0.02"/>
       </proof>
       <proof prover="3">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.2" expl="2. division by zero"
-      sum="2bd82cdbba9d02713ec942602f81d9f5" proved="true"
-      shape="division by zeroNainfix =V1c0INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="2bd82cdbba9d02713ec942602f81d9f5">
       <label name="expl:VC for euclid"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.3" expl="3. variant decrease"
-      sum="687a3a63a07237eaf9bfd182bc0d4fc6" proved="true"
-      shape="variant decreaseainfix &lt;V2V1Aainfix &lt;=c0V1LamodV0V1INainfix =V1c0INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="687a3a63a07237eaf9bfd182bc0d4fc6">
       <label name="expl:VC for euclid"/>
       <proof prover="1" timelimit="5">
-       <result status="valid" time="0.02"/>
+       <result status="valid" time="0.03"/>
       </proof>
       <proof prover="2" timelimit="5">
-       <result status="valid" time="0.03"/>
+       <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.4" expl="4. precondition"
-      sum="69e53674214063d97e487b77ceb3975d" proved="true"
-      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="69e53674214063d97e487b77ceb3975d">
       <label name="expl:VC for euclid"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
@@ -72,16 +67,15 @@
       </proof>
      </goal>
      <goal name="WP_parameter euclid.5" expl="5. postcondition"
-      sum="68b651ec17a62fc1b9adad1de78f8bcf" proved="true"
-      shape="postconditionainfix =agcdV1V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V1c0LamodV0V1INainfix =V1c0INainfix =V1c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="68b651ec17a62fc1b9adad1de78f8bcf">
       <label name="expl:VC for euclid"/>
       <proof prover="0">
        <result status="valid" time="0.03"/>
       </proof>
-      <proof prover="2">
+      <proof prover="1">
        <result status="valid" time="0.04"/>
       </proof>
-      <proof prover="5" timelimit="10"
+      <proof prover="6" timelimit="10"
        edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v">
        <result status="valid" time="1.12"/>
       </proof>
@@ -89,49 +83,43 @@
     </transf>
    </goal>
   </theory>
-  <theory name="EuclideanAlgorithmIterative" verified="true"
+  <theory name="EuclideanAlgorithmIterative"
    expanded="true">
    <goal name="WP_parameter euclid" expl="VC for euclid"
-    sum="e2e6f5addf2ea08975df892816a22894" proved="true"
-    shape="iainfix =V3agcdV0V1ainfix &lt;V4V2Aainfix &lt;=c0V2Aainfix =agcdV5V4agcdV0V1Aainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FANainfix =V2c0Nainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FAainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+    sum="e2e6f5addf2ea08975df892816a22894">
     <label name="expl:VC for euclid"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter euclid.1" expl="1. loop invariant init"
-      sum="99405581c4bd7cbb27d2bfe0b28b1b31" proved="true"
-      shape="loop invariant initainfix &gt;=V1c0Aainfix &gt;=V0c0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="99405581c4bd7cbb27d2bfe0b28b1b31">
       <label name="expl:VC for euclid"/>
-      <proof prover="2">
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.2" expl="2. division by zero"
-      sum="be51106e99b622711055b50cfda95e58" proved="true"
-      shape="division by zeroNainfix =V2c0INainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="be51106e99b622711055b50cfda95e58">
       <label name="expl:VC for euclid"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.3" expl="3. loop invariant preservation"
-      sum="8d83b66d01ce79cd59442200760b777a" proved="true"
-      shape="loop invariant preservationainfix &gt;=V4c0Aainfix &gt;=V5c0Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0INainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="8d83b66d01ce79cd59442200760b777a">
       <label name="expl:VC for euclid"/>
-      <proof prover="2">
+      <proof prover="1">
        <result status="valid" time="0.06"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.4" expl="4. loop invariant preservation"
-      sum="f1503358ed3434faa4605031930425a5" proved="true"
-      shape="loop invariant preservationainfix =agcdV5V4agcdV0V1Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0INainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="f1503358ed3434faa4605031930425a5">
       <label name="expl:VC for euclid"/>
-      <proof prover="2">
+      <proof prover="1">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.5" expl="5. loop variant decrease"
-      sum="62d6125f6169efe3a54dd0f2344b9acc" proved="true"
-      shape="loop variant decreaseainfix &lt;V4V2Aainfix &lt;=c0V2Iainfix =V5V2FIainfix =V4amodV3V2FINainfix =V2c0INainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="62d6125f6169efe3a54dd0f2344b9acc">
       <label name="expl:VC for euclid"/>
       <proof prover="0">
        <result status="valid" time="0.02"/>
@@ -141,92 +129,82 @@
       </proof>
      </goal>
      <goal name="WP_parameter euclid.6" expl="6. postcondition"
-      sum="436baabf3a337e8cd42e9e02c1b26e01" proved="true"
-      shape="postconditionainfix =V3agcdV0V1INNainfix =V2c0Iainfix =agcdV3V2agcdV0V1Aainfix &gt;=V2c0Aainfix &gt;=V3c0FIainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="436baabf3a337e8cd42e9e02c1b26e01">
       <label name="expl:VC for euclid"/>
-      <proof prover="2">
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
   </theory>
-  <theory name="BinaryGcd" verified="true"
+  <theory name="BinaryGcd"
    expanded="true">
-   <goal name="even1" sum="017c4b6d6656bd5b55d8b78362c7164f" proved="true"
-    shape="ainfix =V0ainfix *c2adivV0c2qaevenV0Iainfix &lt;=c0V0F">
+   <goal name="even1"
+    sum="017c4b6d6656bd5b55d8b78362c7164f">
     <proof prover="7" memlimit="1000">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
-   <goal name="odd1" sum="ff570122426b5f9cfbafd2c7dbadfecc" proved="true"
-    shape="ainfix =V0ainfix +ainfix *c2adivV0c2c1qNaevenV0Iainfix &lt;=c0V0F">
+   <goal name="odd1"
+    sum="ff570122426b5f9cfbafd2c7dbadfecc">
     <proof prover="7" memlimit="1000">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
-   <goal name="div_nonneg" sum="e585e7b6804f3165f148f2fcaa70e993"
-    proved="true"
-    shape="ainfix &lt;=c0adivV0c2Iainfix &lt;=c0V0F">
+   <goal name="div_nonneg"
+    sum="e585e7b6804f3165f148f2fcaa70e993">
     <proof prover="7" memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="gcd_even_even" sum="0c04d96fb822470774aec428d34b0fd1"
-    proved="true"
-    shape="ainfix =agcdainfix *c2V0ainfix *c2V1ainfix *c2agcdV0V1Iainfix &lt;=c0V0Iainfix &lt;=c0V1F">
+   <goal name="gcd_even_even"
+    sum="0c04d96fb822470774aec428d34b0fd1">
     <proof prover="7" memlimit="1000">
      <result status="valid" time="0.03"/>
     </proof>
    </goal>
-   <goal name="gcd_even_odd" sum="6b7fa572ba6c16235dd8a1fe05480a86"
-    proved="true"
-    shape="ainfix =agcdainfix *c2V0ainfix +ainfix *c2V1c1agcdV0ainfix +ainfix *c2V1c1Iainfix &lt;=c0V0Iainfix &lt;=c0V1F">
-    <proof prover="5" edited="gcd_BinaryGcd_gcd_even_odd_2.v">
+   <goal name="gcd_even_odd"
+    sum="6b7fa572ba6c16235dd8a1fe05480a86">
+    <proof prover="6" edited="gcd_BinaryGcd_gcd_even_odd_2.v">
      <result status="valid" time="0.94"/>
     </proof>
    </goal>
-   <goal name="gcd_even_odd2" sum="08369b073cacf47b002023a59500a305"
-    proved="true"
-    shape="ainfix =agcdV0V1agcdadivV0c2V1IaoddV1IaevenV0Iainfix &lt;=c0V0Iainfix &lt;=c0V1F">
+   <goal name="gcd_even_odd2"
+    sum="08369b073cacf47b002023a59500a305">
     <proof prover="7" memlimit="1000">
      <result status="valid" time="0.17"/>
     </proof>
    </goal>
-   <goal name="odd_odd_div2" sum="5b1358636ff88aa8457c360acacbdda5"
-    proved="true"
-    shape="ainfix =adivainfix -ainfix +ainfix *c2V0c1ainfix +ainfix *c2V1c1c2ainfix -V0V1Iainfix &lt;=c0V0Iainfix &lt;=c0V1F">
+   <goal name="odd_odd_div2"
+    sum="5b1358636ff88aa8457c360acacbdda5">
     <proof prover="4">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="WP_parameter gcd_odd_odd" expl="VC for gcd_odd_odd"
-    sum="5e6349717d0e6a3bb2f0d87fb77c5a4e" proved="true"
-    shape="ainfix =agcdainfix +ainfix *c2V0c1ainfix +ainfix *c2V1c1agcdainfix -V0V1ainfix +ainfix *c2V1c1Aainfix =agcdainfix +ainfix *c2V0c1ainfix +ainfix *c2V1c1agcdainfix -ainfix +ainfix *c2V0c1ainfix *c1ainfix +ainfix *c2V1c1ainfix +ainfix *c2V1c1Iainfix &lt;=V1V0Aainfix &lt;=c0V1F">
+    sum="5e6349717d0e6a3bb2f0d87fb77c5a4e">
     <label name="why3:lemma"/>
     <label name="expl:VC for gcd_odd_odd"/>
     <proof prover="7" timelimit="5">
      <result status="valid" time="0.05"/>
     </proof>
    </goal>
-   <goal name="gcd_odd_odd2" sum="6c859b16596dc1b9c3f76195fd6e5563"
-    proved="true"
-    shape="ainfix =agcdV0V1agcdadivainfix -V0V1c2V1IaoddV1IaoddV0Iainfix &lt;=V1V0Aainfix &lt;=c0V1F">
+   <goal name="gcd_odd_odd2"
+    sum="6c859b16596dc1b9c3f76195fd6e5563">
     <proof prover="7" memlimit="1000">
      <result status="valid" time="0.12"/>
     </proof>
    </goal>
    <goal name="WP_parameter binary_gcd" expl="VC for binary_gcd"
-    sum="e927be494a30b7021096c94d8713182e" proved="true"
-    shape="iiiiainfix =agcdV2V1agcdV0V1Aainfix &gt;=V1c0Aainfix &gt;=V2c0AalexaTuple2V1V2aTuple2V1V0Ladivainfix -V0V1c2ANainfix =c2c0ainfix =agcdV0V3agcdV0V1Aainfix &gt;=V3c0Aainfix &gt;=V0c0AalexaTuple2V3V0aTuple2V1V0LadivV1c2ANainfix =c2c0aevenV1iainfix =agcdV4V1agcdV0V1Aainfix &gt;=V1c0Aainfix &gt;=V4c0AalexaTuple2V1V4aTuple2V1V0LadivV0c2ANainfix =c2c0ainfix =ainfix *c2agcdV6V5agcdV0V1Aainfix &gt;=V5c0Aainfix &gt;=V6c0AalexaTuple2V5V6aTuple2V1V0LadivV0c2ANainfix =c2c0LadivV1c2ANainfix =c2c0aevenV1aevenV0ainfix =V0agcdV0V1ainfix =V1c0ainfix =agcdV1V0agcdV0V1Aainfix &gt;=V0c0Aainfix &gt;=V1c0AalexaTuple2V0V1aTuple2V1V0ainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+    sum="e927be494a30b7021096c94d8713182e">
     <label name="expl:VC for binary_gcd"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter binary_gcd.1" expl="1. variant decrease"
-      sum="172a9fb14c74c5f3f27c8b88472951f7" proved="true"
-      shape="variant decreasealexaTuple2V0V1aTuple2V1V0Iainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="172a9fb14c74c5f3f27c8b88472951f7">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -234,10 +212,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.2" expl="2. precondition"
-      sum="9e35f30732a3be09569366a062b91091" proved="true"
-      shape="preconditionainfix &gt;=V0c0Aainfix &gt;=V1c0Iainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="9e35f30732a3be09569366a062b91091">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -245,10 +222,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.3" expl="3. postcondition"
-      sum="96a062a2114b5aeecf7dfbdd0fadd809" proved="true"
-      shape="postconditionainfix =agcdV1V0agcdV0V1Iainfix &gt;=V0c0Aainfix &gt;=V1c0Iainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="96a062a2114b5aeecf7dfbdd0fadd809">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -256,10 +232,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.4" expl="4. postcondition"
-      sum="5c3e4819d8ddc495589a2d1bcbb6d94a" proved="true"
-      shape="postconditionainfix =V0agcdV0V1Iainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="5c3e4819d8ddc495589a2d1bcbb6d94a">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -267,34 +242,30 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.5" expl="5. division by zero"
-      sum="244d45ce8704605829b0241683bcd286" proved="true"
-      shape="division by zeroNainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="244d45ce8704605829b0241683bcd286">
       <label name="expl:VC for binary_gcd"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.6" expl="6. division by zero"
-      sum="f031f1e6222fc92ee03384f697b6acfe" proved="true"
-      shape="division by zeroNainfix =c2c0LadivV1c2INainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="f031f1e6222fc92ee03384f697b6acfe">
       <label name="expl:VC for binary_gcd"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.7" expl="7. variant decrease"
-      sum="08b39027e3f207611b59c63fd616963a" proved="true"
-      shape="variant decreasealexaTuple2V2V3aTuple2V1V0LadivV0c2INainfix =c2c0LadivV1c2INainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="08b39027e3f207611b59c63fd616963a">
       <label name="expl:VC for binary_gcd"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.8" expl="8. precondition"
-      sum="875c503c92d0c1c3c3d68ebcec6088cc" proved="true"
-      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V3c0LadivV0c2INainfix =c2c0LadivV1c2INainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="875c503c92d0c1c3c3d68ebcec6088cc">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -302,37 +273,33 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.9" expl="9. postcondition"
-      sum="8b09c52c71e22d520e7c7dad1059558e" proved="true"
-      shape="postconditionainfix =ainfix *c2agcdV3V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V3c0LadivV0c2INainfix =c2c0LadivV1c2INainfix =c2c0IaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="8b09c52c71e22d520e7c7dad1059558e">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="1" timelimit="6">
+      <proof prover="2" timelimit="6">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.14"/>
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.10" expl="10. division by zero"
-      sum="6ecadffc40a284cab2d28cfb1676fe8d" proved="true"
-      shape="division by zeroNainfix =c2c0INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="6ecadffc40a284cab2d28cfb1676fe8d">
       <label name="expl:VC for binary_gcd"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.11" expl="11. variant decrease"
-      sum="6f78e3ec6079a0518f2425797f3e9587" proved="true"
-      shape="variant decreasealexaTuple2V1V2aTuple2V1V0LadivV0c2INainfix =c2c0INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="6f78e3ec6079a0518f2425797f3e9587">
       <label name="expl:VC for binary_gcd"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.12" expl="12. precondition"
-      sum="798a003656d9b544c035cd9d4d08912f" proved="true"
-      shape="preconditionainfix &gt;=V1c0Aainfix &gt;=V2c0LadivV0c2INainfix =c2c0INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="798a003656d9b544c035cd9d4d08912f">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -340,10 +307,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.13" expl="13. postcondition"
-      sum="b7d657434120ac8c7873a91345af47c1" proved="true"
-      shape="postconditionainfix =agcdV2V1agcdV0V1Iainfix &gt;=V1c0Aainfix &gt;=V2c0LadivV0c2INainfix =c2c0INaevenV1IaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="b7d657434120ac8c7873a91345af47c1">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.23"/>
       </proof>
       <proof prover="8">
@@ -351,18 +317,16 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.14" expl="14. division by zero"
-      sum="4b066e0d5e1e18c9f1b7874639c91349" proved="true"
-      shape="division by zeroNainfix =c2c0IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="4b066e0d5e1e18c9f1b7874639c91349">
       <label name="expl:VC for binary_gcd"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.15" expl="15. variant decrease"
-      sum="febd61a71b3bd5352d98bb2791706195" proved="true"
-      shape="variant decreasealexaTuple2V2V0aTuple2V1V0LadivV1c2INainfix =c2c0IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="febd61a71b3bd5352d98bb2791706195">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="timeout" time="6.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -370,10 +334,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.16" expl="16. precondition"
-      sum="2129de9c47f93995d7d07c46b8f42f1a" proved="true"
-      shape="preconditionainfix &gt;=V2c0Aainfix &gt;=V0c0LadivV1c2INainfix =c2c0IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="2129de9c47f93995d7d07c46b8f42f1a">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -381,10 +344,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.17" expl="17. postcondition"
-      sum="459838b83450407f2b0b0797e72b2b67" proved="true"
-      shape="postconditionainfix =agcdV0V2agcdV0V1Iainfix &gt;=V2c0Aainfix &gt;=V0c0LadivV1c2INainfix =c2c0IaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="459838b83450407f2b0b0797e72b2b67">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.24"/>
       </proof>
       <proof prover="8">
@@ -392,16 +354,14 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.18" expl="18. division by zero"
-      sum="e09755fa44cc8bed284820d5323a968c" proved="true"
-      shape="division by zeroNainfix =c2c0INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="e09755fa44cc8bed284820d5323a968c">
       <label name="expl:VC for binary_gcd"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.19" expl="19. variant decrease"
-      sum="c07d8b9501d7e9c4e1fac0202fcc69c6" proved="true"
-      shape="variant decreasealexaTuple2V1V2aTuple2V1V0Ladivainfix -V0V1c2INainfix =c2c0INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="c07d8b9501d7e9c4e1fac0202fcc69c6">
       <label name="expl:VC for binary_gcd"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.08"/>
@@ -411,10 +371,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.20" expl="20. precondition"
-      sum="d2fcdf4cde434341b90b04a7b6ecd582" proved="true"
-      shape="preconditionainfix &gt;=V1c0Aainfix &gt;=V2c0Ladivainfix -V0V1c2INainfix =c2c0INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="d2fcdf4cde434341b90b04a7b6ecd582">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="3.84"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -425,10 +384,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter binary_gcd.21" expl="21. postcondition"
-      sum="ba2b4e3bcb6c321e218031582d938f70" proved="true"
-      shape="postconditionainfix =agcdV2V1agcdV0V1Iainfix &gt;=V1c0Aainfix &gt;=V2c0Ladivainfix -V0V1c2INainfix =c2c0INaevenV1INaevenV0INainfix =V1c0INainfix &gt;V1V0Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
+      sum="ba2b4e3bcb6c321e218031582d938f70">
       <label name="expl:VC for binary_gcd"/>
-      <proof prover="6">
+      <proof prover="5">
        <result status="valid" time="0.45"/>
       </proof>
       <proof prover="8">
@@ -438,65 +396,57 @@
     </transf>
    </goal>
   </theory>
-  <theory name="EuclideanAlgorithm31" verified="true"
+  <theory name="EuclideanAlgorithm31"
    expanded="true">
    <goal name="WP_parameter euclid" expl="VC for euclid"
-    sum="c97bf923efd7df0ba08c127d1a0a44fc" proved="true"
-    shape="iainfix =ato_intV5agcdato_intV0ato_intV1Iainfix =ato_intV5agcdato_intV1ato_intV4FAainfix &gt;=ato_intV4c0Aainfix &gt;=ato_intV1c0Aainfix &lt;ato_intV4ato_intV1Aainfix &lt;=c0ato_intV1Iainfix =ato_intV4amodato_intV0ato_intV1FAain_boundsamodato_intV0ato_intV1ANainfix =ato_intV1c0ainfix =ato_intV0agcdato_intV0ato_intV1ainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FAain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+    sum="c97bf923efd7df0ba08c127d1a0a44fc">
     <label name="expl:VC for euclid"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter euclid.1" expl="1. integer overflow"
-      sum="77cb7de9c98c14363e1d0cccb3d93c23" proved="true"
-      shape="integer overflowain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      sum="77cb7de9c98c14363e1d0cccb3d93c23">
       <label name="expl:VC for euclid"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.2" expl="2. postcondition"
-      sum="760a5c0647aa2b256c67fccd062a7c6d" proved="true"
-      shape="postconditionainfix =ato_intV0agcdato_intV0ato_intV1Iainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      sum="760a5c0647aa2b256c67fccd062a7c6d">
       <label name="expl:VC for euclid"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.3" expl="3. division by zero"
-      sum="d297b1886e36e60a476d4915f1f12e29" proved="true"
-      shape="division by zeroNainfix =ato_intV1c0INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      sum="d297b1886e36e60a476d4915f1f12e29">
       <label name="expl:VC for euclid"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.4" expl="4. integer overflow"
-      sum="744c070a0346ebb17972e8560fac031a" proved="true"
-      shape="integer overflowain_boundsamodato_intV0ato_intV1INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      sum="744c070a0346ebb17972e8560fac031a">
       <label name="expl:VC for euclid"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.10"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.5" expl="5. variant decrease"
-      sum="d62333ee6c251f02089dbb510e0984e9" proved="true"
-      shape="variant decreaseainfix &lt;ato_intV4ato_intV1Aainfix &lt;=c0ato_intV1Iainfix =ato_intV4amodato_intV0ato_intV1FIain_boundsamodato_intV0ato_intV1ANainfix =ato_intV1c0INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      sum="d62333ee6c251f02089dbb510e0984e9">
       <label name="expl:VC for euclid"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.52"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.6" expl="6. precondition"
-      sum="fcf15f9a34b89b8036e0b220e14b7d19" proved="true"
-      shape="preconditionainfix &gt;=ato_intV4c0Aainfix &gt;=ato_intV1c0Iainfix =ato_intV4amodato_intV0ato_intV1FIain_boundsamodato_intV0ato_intV1ANainfix =ato_intV1c0INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      sum="fcf15f9a34b89b8036e0b220e14b7d19">
       <label name="expl:VC for euclid"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter euclid.7" expl="7. postcondition"
-      sum="f477c5b2208489e4d744cadca57ab81f" proved="true"
-      shape="postconditionainfix =ato_intV5agcdato_intV0ato_intV1Iainfix =ato_intV5agcdato_intV1ato_intV4FIainfix &gt;=ato_intV4c0Aainfix &gt;=ato_intV1c0Iainfix =ato_intV4amodato_intV0ato_intV1FIain_boundsamodato_intV0ato_intV1ANainfix =ato_intV1c0INainfix =V3aTrueIainfix =ato_intV1ato_intV2qainfix =V3aTrueFIainfix =ato_intV2c0FIain_boundsc0Iainfix &gt;=ato_intV1c0Aainfix &gt;=ato_intV0c0F">
+      sum="f477c5b2208489e4d744cadca57ab81f">
       <label name="expl:VC for euclid"/>
       <proof prover="7" timelimit="5">
        <result status="valid" time="0.54"/>

@@ -6,51 +6,50 @@
  <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="20"
   memlimit="1000"/>
  <prover id="2" name="Coq" version="8.4pl3" timelimit="5" memlimit="4000"/>
- <file name="../vstte10_inverting.mlw" verified="true"
+ <file name="../vstte10_inverting.mlw"
   expanded="true">
-  <theory name="InvertingAnInjection" verified="true"
+  <theory name="InvertingAnInjection"
    expanded="true">
    <goal name="WP_parameter inverting" expl="VC for inverting"
-    sum="3f19a7e7a9ed8a987300581a77ed15c4" proved="true" expanded="true"
-    shape="ainjectiveV6V4Aainfix &lt;=c0V2Iainfix =agetV6agetV1V7V7Iainfix &lt;V7ainfix +V5c1Aainfix &lt;=c0V7FAainfix =agetV10agetV1V11V11Iainfix &lt;V11ainfix +V8c1Aainfix &lt;=c0V11FIainfix =V10asetV6V9V8Aainfix &lt;=c0V2FAainfix &lt;V9V2Aainfix &lt;=c0V9Aainfix &lt;=c0V2LagetV1V8Aainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix =agetV6agetV1V12V12Iainfix &lt;V12V8Aainfix &lt;=c0V12FIainfix &lt;=V8V5Aainfix &lt;=c0V8FFAainfix =agetV3agetV1V13V13Iainfix &lt;V13c0Aainfix &lt;=c0V13FIainfix &lt;=c0V5AainjectiveV3V4Iainfix &gt;c0V5Lainfix -V4c1IarangeV1V4AainjectiveV1V4Aainfix =V0V2Aainfix =V4V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+    sum="3f19a7e7a9ed8a987300581a77ed15c4"
+    expanded="true">
     <label name="expl:VC for inverting"/>
-    <transf name="split_goal" proved="true"
+    <transf name="split_goal"
      expanded="true">
      <goal name="WP_parameter inverting.1" expl="1. postcondition"
-      sum="e55d23c9b78f1df06a6d867dff439860" proved="true" expanded="true"
-      shape="postconditionainjectiveV3V4Iainfix &gt;c0V5Lainfix -V4c1IarangeV1V4AainjectiveV1V4Aainfix =V0V2Aainfix =V4V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+      sum="e55d23c9b78f1df06a6d867dff439860"
+      expanded="true">
       <label name="expl:VC for inverting"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting.2" expl="2. loop invariant init"
-      sum="e8ae3900304b604c7bd045460effe88e" proved="true" expanded="true"
-      shape="loop invariant initainfix =agetV3agetV1V6V6Iainfix &lt;V6c0Aainfix &lt;=c0V6FIainfix &lt;=c0V5Lainfix -V4c1IarangeV1V4AainjectiveV1V4Aainfix =V0V2Aainfix =V4V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+      sum="e8ae3900304b604c7bd045460effe88e"
+      expanded="true">
       <label name="expl:VC for inverting"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting.3" expl="3. index in array bounds"
-      sum="65e9a2d80f7bb1a5e23ac5c098562242" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix =agetV6agetV1V8V8Iainfix &lt;V8V7Aainfix &lt;=c0V8FIainfix &lt;=V7V5Aainfix &lt;=c0V7FFIainfix &lt;=c0V5Lainfix -V4c1IarangeV1V4AainjectiveV1V4Aainfix =V0V2Aainfix =V4V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+      sum="65e9a2d80f7bb1a5e23ac5c098562242"
+      expanded="true">
       <label name="expl:VC for inverting"/>
       <proof prover="1" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting.4" expl="4. type invariant"
-      sum="2786552208cea24fb84b3a60a5be2a05" proved="true"
-      shape="type invariantainfix &lt;=c0V2LagetV1V7Iainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix =agetV6agetV1V9V9Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &lt;=V7V5Aainfix &lt;=c0V7FFIainfix &lt;=c0V5Lainfix -V4c1IarangeV1V4AainjectiveV1V4Aainfix =V0V2Aainfix =V4V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+      sum="2786552208cea24fb84b3a60a5be2a05">
       <label name="expl:VC for inverting"/>
       <proof prover="1" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting.5" expl="5. index in array bounds"
-      sum="b9a5321800c758faa46172151a59c261" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V8V2Aainfix &lt;=c0V8Iainfix &lt;=c0V2LagetV1V7Iainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix =agetV6agetV1V9V9Iainfix &lt;V9V7Aainfix &lt;=c0V9FIainfix &lt;=V7V5Aainfix &lt;=c0V7FFIainfix &lt;=c0V5Lainfix -V4c1IarangeV1V4AainjectiveV1V4Aainfix =V0V2Aainfix =V4V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+      sum="b9a5321800c758faa46172151a59c261"
+      expanded="true">
       <label name="expl:VC for inverting"/>
       <proof prover="1" timelimit="5">
        <result status="valid" time="0.02"/>
@@ -58,24 +57,23 @@
      </goal>
      <goal name="WP_parameter inverting.6"
       expl="6. loop invariant preservation"
-      sum="2875c2e87928897b7988fb27d2af0719" proved="true" expanded="true"
-      shape="loop invariant preservationainfix =agetV9agetV1V10V10Iainfix &lt;V10ainfix +V7c1Aainfix &lt;=c0V10FIainfix =V9asetV6V8V7Aainfix &lt;=c0V2FIainfix &lt;V8V2Aainfix &lt;=c0V8Aainfix &lt;=c0V2LagetV1V7Iainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix =agetV6agetV1V11V11Iainfix &lt;V11V7Aainfix &lt;=c0V11FIainfix &lt;=V7V5Aainfix &lt;=c0V7FFIainfix &lt;=c0V5Lainfix -V4c1IarangeV1V4AainjectiveV1V4Aainfix =V0V2Aainfix =V4V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+      sum="2875c2e87928897b7988fb27d2af0719"
+      expanded="true">
       <label name="expl:VC for inverting"/>
       <proof prover="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting.7" expl="7. type invariant"
-      sum="315a483cb90dc805c426f7d428d3073c" proved="true"
-      shape="type invariantainfix &lt;=c0V2Iainfix =agetV6agetV1V7V7Iainfix &lt;V7ainfix +V5c1Aainfix &lt;=c0V7FFIainfix &lt;=c0V5Lainfix -V4c1IarangeV1V4AainjectiveV1V4Aainfix =V0V2Aainfix =V4V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+      sum="315a483cb90dc805c426f7d428d3073c">
       <label name="expl:VC for inverting"/>
       <proof prover="1" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting.8" expl="8. postcondition"
-      sum="957c7e899fbe3ac4657b33dc77302057" proved="true" expanded="true"
-      shape="postconditionainjectiveV6V4Iainfix &lt;=c0V2Iainfix =agetV6agetV1V7V7Iainfix &lt;V7ainfix +V5c1Aainfix &lt;=c0V7FFIainfix &lt;=c0V5Lainfix -V4c1IarangeV1V4AainjectiveV1V4Aainfix =V0V2Aainfix =V4V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+      sum="957c7e899fbe3ac4657b33dc77302057"
+      expanded="true">
       <label name="expl:VC for inverting"/>
       <proof prover="2"
        edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v">
@@ -85,54 +83,53 @@
     </transf>
    </goal>
    <goal name="WP_parameter inverting2" expl="VC for inverting2"
-    sum="dce82acffe0c74d17684cd8acf2efa3c" proved="true" expanded="true"
-    shape="ainfix =agetV4agetV1V5V5Iainfix &lt;V5V2Aainfix &lt;=c0V5FAainjectiveV4V2Aainfix &lt;=c0V2Iainfix =agetV4agetV1V6V6Iainfix &lt;V6ainfix +V3c1Aainfix &lt;=c0V6FAainfix =agetV9agetV1V10V10Iainfix &lt;V10ainfix +V7c1Aainfix &lt;=c0V10FIainfix =V9asetV4V8V7Aainfix &lt;=c0V2FAainfix &lt;V8V2Aainfix &lt;=c0V8Aainfix &lt;=c0V2LagetV1V7Aainfix &lt;V7V0Aainfix &lt;=c0V7Iainfix =agetV4agetV1V11V11Iainfix &lt;V11V7Aainfix &lt;=c0V11FIainfix &lt;=V7V3Aainfix &lt;=c0V7FFAainfix =agetaconstc0agetV1V12V12Iainfix &lt;V12c0Aainfix &lt;=c0V12FIainfix &lt;=c0V3Aainfix =agetaconstc0agetV1V13V13Iainfix &lt;V13V2Aainfix &lt;=c0V13FAainjectiveaconstc0V2Iainfix &gt;c0V3Lainfix -V2c1Iainfix &lt;=c0V2Aainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+    sum="dce82acffe0c74d17684cd8acf2efa3c"
+    expanded="true">
     <label name="expl:VC for inverting2"/>
-    <transf name="split_goal" proved="true"
+    <transf name="split_goal"
      expanded="true">
      <goal name="WP_parameter inverting2.1" expl="1. array creation size"
-      sum="8e20ad30279f0bef403b282c7241ed66" proved="true" expanded="true"
-      shape="array creation sizeainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+      sum="8e20ad30279f0bef403b282c7241ed66"
+      expanded="true">
       <label name="expl:VC for inverting2"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting2.2" expl="2. postcondition"
-      sum="a5d4ec756c727cd4a5109a5d55c6b882" proved="true" expanded="true"
-      shape="postconditionainfix =agetaconstc0agetV1V4V4Iainfix &lt;V4V2Aainfix &lt;=c0V4FAainjectiveaconstc0V2Iainfix &gt;c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+      sum="a5d4ec756c727cd4a5109a5d55c6b882"
+      expanded="true">
       <label name="expl:VC for inverting2"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting2.3" expl="3. loop invariant init"
-      sum="8315c83380f6db7d6c52a89f3797aedc" proved="true" expanded="true"
-      shape="loop invariant initainfix =agetaconstc0agetV1V4V4Iainfix &lt;V4c0Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+      sum="8315c83380f6db7d6c52a89f3797aedc"
+      expanded="true">
       <label name="expl:VC for inverting2"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting2.4" expl="4. index in array bounds"
-      sum="5d9ce8e021342eea96b3275d18d706f8" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV4agetV1V6V6Iainfix &lt;V6V5Aainfix &lt;=c0V6FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+      sum="5d9ce8e021342eea96b3275d18d706f8"
+      expanded="true">
       <label name="expl:VC for inverting2"/>
       <proof prover="1" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting2.5" expl="5. type invariant"
-      sum="d6284094690465d42b6b87d7ebaed6f9" proved="true"
-      shape="type invariantainfix &lt;=c0V2LagetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV4agetV1V7V7Iainfix &lt;V7V5Aainfix &lt;=c0V7FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+      sum="d6284094690465d42b6b87d7ebaed6f9">
       <label name="expl:VC for inverting2"/>
       <proof prover="1" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting2.6" expl="6. index in array bounds"
-      sum="42fb0b3f5e1c07167d6b21127399eeb7" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V6V2Aainfix &lt;=c0V6Iainfix &lt;=c0V2LagetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV4agetV1V7V7Iainfix &lt;V7V5Aainfix &lt;=c0V7FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+      sum="42fb0b3f5e1c07167d6b21127399eeb7"
+      expanded="true">
       <label name="expl:VC for inverting2"/>
       <proof prover="1" timelimit="5">
        <result status="valid" time="0.02"/>
@@ -140,30 +137,29 @@
      </goal>
      <goal name="WP_parameter inverting2.7"
       expl="7. loop invariant preservation"
-      sum="6d769a3cc530e2de6de523cc9fc67882" proved="true" expanded="true"
-      shape="loop invariant preservationainfix =agetV7agetV1V8V8Iainfix &lt;V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix =V7asetV4V6V5Aainfix &lt;=c0V2FIainfix &lt;V6V2Aainfix &lt;=c0V6Aainfix &lt;=c0V2LagetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV4agetV1V9V9Iainfix &lt;V9V5Aainfix &lt;=c0V9FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+      sum="6d769a3cc530e2de6de523cc9fc67882"
+      expanded="true">
       <label name="expl:VC for inverting2"/>
       <proof prover="1" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting2.8" expl="8. type invariant"
-      sum="5b74ffebe6d122a88474b468c900915e" proved="true"
-      shape="type invariantainfix &lt;=c0V2Iainfix =agetV4agetV1V5V5Iainfix &lt;V5ainfix +V3c1Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+      sum="5b74ffebe6d122a88474b468c900915e">
       <label name="expl:VC for inverting2"/>
       <proof prover="1" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter inverting2.9" expl="9. postcondition"
-      sum="10f147ce9622089c450208653f07a218" proved="true" expanded="true"
-      shape="postconditionainfix =agetV4agetV1V5V5Iainfix &lt;V5V2Aainfix &lt;=c0V5FAainjectiveV4V2Iainfix &lt;=c0V2Iainfix =agetV4agetV1V6V6Iainfix &lt;V6ainfix +V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+      sum="10f147ce9622089c450208653f07a218"
+      expanded="true">
       <label name="expl:VC for inverting2"/>
-      <transf name="split_goal" proved="true"
+      <transf name="split_goal"
        expanded="true">
        <goal name="WP_parameter inverting2.9.1" expl="1."
-        sum="ccbf9628a6fb834e693f84bd40f22d3c" proved="true" expanded="true"
-        shape="ainjectiveV4V2Iainfix &lt;=c0V2Iainfix =agetV4agetV1V5V5Iainfix &lt;V5ainfix +V3c1Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+        sum="ccbf9628a6fb834e693f84bd40f22d3c"
+        expanded="true">
         <label name="expl:VC for inverting2"/>
         <proof prover="2" timelimit="10" memlimit="0"
          edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting2_2.v">
@@ -171,8 +167,8 @@
         </proof>
        </goal>
        <goal name="WP_parameter inverting2.9.2" expl="2."
-        sum="8f84d5722af0ebda98f00f946d7f5a23" proved="true" expanded="true"
-        shape="ainfix =agetV4agetV1V5V5Iainfix &lt;V5V2Aainfix &lt;=c0V5FIainfix &lt;=c0V2Iainfix =agetV4agetV1V6V6Iainfix &lt;V6ainfix +V3c1Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V2c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0IarangeV1V2AainjectiveV1V2Aainfix =V2V0Aainfix &lt;=c0V0F">
+        sum="8f84d5722af0ebda98f00f946d7f5a23"
+        expanded="true">
         <label name="expl:VC for inverting2"/>
         <proof prover="1" timelimit="10" memlimit="0">
          <result status="valid" time="0.00"/>
@@ -183,121 +179,121 @@
     </transf>
    </goal>
   </theory>
-  <theory name="Test" verified="true"
+  <theory name="Test"
    expanded="true">
    <goal name="WP_parameter test" expl="VC for test"
-    sum="e4a5ebb355b1df90a56523ed037417e2" proved="true" expanded="true"
-    shape="ainfix =agetV11c9c0Aainfix =agetV11c8c2Aainfix =agetV11c7c4Aainfix =agetV11c6c9Aainfix =agetV11c5c8Aainfix =agetV11c4c5Aainfix =agetV11c3c1Aainfix =agetV11c2c3Aainfix =agetV11c1c7Aainfix =agetV11c0c6Iainfix =agetV11agetV9V12V12Iainfix &lt;V12c10Aainfix &lt;=c0V12FAainjectiveV11c10Aainfix =V10c10Aainfix &lt;=c0V10FAarangeV9c10AainjectiveV9c10Aainfix =agetV9c9c6Aainfix =agetV9c8c5Aainfix =agetV9c7c1Aainfix =agetV9c6c0Aainfix =agetV9c5c4Aainfix =agetV9c4c7Aainfix =agetV9c3c2Aainfix =agetV9c2c8Aainfix =agetV9c1c3Aainfix =agetV9c0c9Iainfix =V9asetV8c9c6Aainfix &lt;=c0c10FAainfix &lt;c9c10Aainfix &lt;=c0c9Iainfix =V8asetV7c8c5Aainfix &lt;=c0c10FAainfix &lt;c8c10Aainfix &lt;=c0c8Iainfix =V7asetV6c7c1Aainfix &lt;=c0c10FAainfix &lt;c7c10Aainfix &lt;=c0c7Iainfix =V6asetV5c6c0Aainfix &lt;=c0c10FAainfix &lt;c6c10Aainfix &lt;=c0c6Iainfix =V5asetV4c5c4Aainfix &lt;=c0c10FAainfix &lt;c5c10Aainfix &lt;=c0c5Iainfix =V4asetV3c4c7Aainfix &lt;=c0c10FAainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FAainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FAainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FAainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FAainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Aainfix &gt;=c10c0">
+    sum="e4a5ebb355b1df90a56523ed037417e2"
+    expanded="true">
     <label name="expl:VC for test"/>
-    <transf name="split_goal" proved="true"
+    <transf name="split_goal"
      expanded="true">
      <goal name="WP_parameter test.1" expl="1. array creation size"
-      sum="5fa94ba2df88f930b1ef87d4939dc3ee" proved="true" expanded="true"
-      shape="array creation sizeainfix &gt;=c10c0">
+      sum="5fa94ba2df88f930b1ef87d4939dc3ee"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.2" expl="2. index in array bounds"
-      sum="89f6c3dfc1a17e73ee26c20924246e47" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="89f6c3dfc1a17e73ee26c20924246e47"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.3" expl="3. index in array bounds"
-      sum="ed379084d858dbfd6032fde9d1fb61f0" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="ed379084d858dbfd6032fde9d1fb61f0"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" timelimit="10" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.4" expl="4. index in array bounds"
-      sum="e10aa2b3e0b6dc47d6135f134b96edbf" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="e10aa2b3e0b6dc47d6135f134b96edbf"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.5" expl="5. index in array bounds"
-      sum="1c98299f08a8c15cb9aca257a1402e1f" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="1c98299f08a8c15cb9aca257a1402e1f"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.6" expl="6. index in array bounds"
-      sum="4656eed09b03772324b26ddaa0db5838" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FIainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="4656eed09b03772324b26ddaa0db5838"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.7" expl="7. index in array bounds"
-      sum="70fee0d9db1f9c26f6603c9184ec4640" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c5c10Aainfix &lt;=c0c5Iainfix =V4asetV3c4c7Aainfix &lt;=c0c10FIainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FIainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="70fee0d9db1f9c26f6603c9184ec4640"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.8" expl="8. index in array bounds"
-      sum="01819ae474e3c3c433889fa7185e427f" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c6c10Aainfix &lt;=c0c6Iainfix =V5asetV4c5c4Aainfix &lt;=c0c10FIainfix &lt;c5c10Aainfix &lt;=c0c5Iainfix =V4asetV3c4c7Aainfix &lt;=c0c10FIainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FIainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="01819ae474e3c3c433889fa7185e427f"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.9" expl="9. index in array bounds"
-      sum="63e548e7abb90a5aed74883531749884" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c7c10Aainfix &lt;=c0c7Iainfix =V6asetV5c6c0Aainfix &lt;=c0c10FIainfix &lt;c6c10Aainfix &lt;=c0c6Iainfix =V5asetV4c5c4Aainfix &lt;=c0c10FIainfix &lt;c5c10Aainfix &lt;=c0c5Iainfix =V4asetV3c4c7Aainfix &lt;=c0c10FIainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FIainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="63e548e7abb90a5aed74883531749884"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.10" expl="10. index in array bounds"
-      sum="4fcdcd15e4e18ea0d182ac5ba7be3efa" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c8c10Aainfix &lt;=c0c8Iainfix =V7asetV6c7c1Aainfix &lt;=c0c10FIainfix &lt;c7c10Aainfix &lt;=c0c7Iainfix =V6asetV5c6c0Aainfix &lt;=c0c10FIainfix &lt;c6c10Aainfix &lt;=c0c6Iainfix =V5asetV4c5c4Aainfix &lt;=c0c10FIainfix &lt;c5c10Aainfix &lt;=c0c5Iainfix =V4asetV3c4c7Aainfix &lt;=c0c10FIainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FIainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="4fcdcd15e4e18ea0d182ac5ba7be3efa"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" timelimit="3" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.11" expl="11. index in array bounds"
-      sum="c8bf8883f237ff92e71b17487c2371e4" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c9c10Aainfix &lt;=c0c9Iainfix =V8asetV7c8c5Aainfix &lt;=c0c10FIainfix &lt;c8c10Aainfix &lt;=c0c8Iainfix =V7asetV6c7c1Aainfix &lt;=c0c10FIainfix &lt;c7c10Aainfix &lt;=c0c7Iainfix =V6asetV5c6c0Aainfix &lt;=c0c10FIainfix &lt;c6c10Aainfix &lt;=c0c6Iainfix =V5asetV4c5c4Aainfix &lt;=c0c10FIainfix &lt;c5c10Aainfix &lt;=c0c5Iainfix =V4asetV3c4c7Aainfix &lt;=c0c10FIainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FIainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="c8bf8883f237ff92e71b17487c2371e4"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.12" expl="12. assertion"
-      sum="142a97928a6c05eede9fea8875466355" proved="true" expanded="true"
-      shape="assertionainfix =agetV9c9c6Aainfix =agetV9c8c5Aainfix =agetV9c7c1Aainfix =agetV9c6c0Aainfix =agetV9c5c4Aainfix =agetV9c4c7Aainfix =agetV9c3c2Aainfix =agetV9c2c8Aainfix =agetV9c1c3Aainfix =agetV9c0c9Iainfix =V9asetV8c9c6Aainfix &lt;=c0c10FIainfix &lt;c9c10Aainfix &lt;=c0c9Iainfix =V8asetV7c8c5Aainfix &lt;=c0c10FIainfix &lt;c8c10Aainfix &lt;=c0c8Iainfix =V7asetV6c7c1Aainfix &lt;=c0c10FIainfix &lt;c7c10Aainfix &lt;=c0c7Iainfix =V6asetV5c6c0Aainfix &lt;=c0c10FIainfix &lt;c6c10Aainfix &lt;=c0c6Iainfix =V5asetV4c5c4Aainfix &lt;=c0c10FIainfix &lt;c5c10Aainfix &lt;=c0c5Iainfix =V4asetV3c4c7Aainfix &lt;=c0c10FIainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FIainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="142a97928a6c05eede9fea8875466355"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.10"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.13" expl="13. precondition"
-      sum="f708d9f7b33e22fe7eee81df3f1f0d82" proved="true" expanded="true"
-      shape="preconditionarangeV9c10AainjectiveV9c10Iainfix =agetV9c9c6Aainfix =agetV9c8c5Aainfix =agetV9c7c1Aainfix =agetV9c6c0Aainfix =agetV9c5c4Aainfix =agetV9c4c7Aainfix =agetV9c3c2Aainfix =agetV9c2c8Aainfix =agetV9c1c3Aainfix =agetV9c0c9Iainfix =V9asetV8c9c6Aainfix &lt;=c0c10FIainfix &lt;c9c10Aainfix &lt;=c0c9Iainfix =V8asetV7c8c5Aainfix &lt;=c0c10FIainfix &lt;c8c10Aainfix &lt;=c0c8Iainfix =V7asetV6c7c1Aainfix &lt;=c0c10FIainfix &lt;c7c10Aainfix &lt;=c0c7Iainfix =V6asetV5c6c0Aainfix &lt;=c0c10FIainfix &lt;c6c10Aainfix &lt;=c0c6Iainfix =V5asetV4c5c4Aainfix &lt;=c0c10FIainfix &lt;c5c10Aainfix &lt;=c0c5Iainfix =V4asetV3c4c7Aainfix &lt;=c0c10FIainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FIainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="f708d9f7b33e22fe7eee81df3f1f0d82"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.38"/>
       </proof>
      </goal>
      <goal name="WP_parameter test.14" expl="14. assertion"
-      sum="58a376c8a43018101a892ac8b508a2a0" proved="true" expanded="true"
-      shape="assertionainfix =agetV11c9c0Aainfix =agetV11c8c2Aainfix =agetV11c7c4Aainfix =agetV11c6c9Aainfix =agetV11c5c8Aainfix =agetV11c4c5Aainfix =agetV11c3c1Aainfix =agetV11c2c3Aainfix =agetV11c1c7Aainfix =agetV11c0c6Iainfix =agetV11agetV9V12V12Iainfix &lt;V12c10Aainfix &lt;=c0V12FAainjectiveV11c10Aainfix =V10c10Aainfix &lt;=c0V10FIarangeV9c10AainjectiveV9c10Iainfix =agetV9c9c6Aainfix =agetV9c8c5Aainfix =agetV9c7c1Aainfix =agetV9c6c0Aainfix =agetV9c5c4Aainfix =agetV9c4c7Aainfix =agetV9c3c2Aainfix =agetV9c2c8Aainfix =agetV9c1c3Aainfix =agetV9c0c9Iainfix =V9asetV8c9c6Aainfix &lt;=c0c10FIainfix &lt;c9c10Aainfix &lt;=c0c9Iainfix =V8asetV7c8c5Aainfix &lt;=c0c10FIainfix &lt;c8c10Aainfix &lt;=c0c8Iainfix =V7asetV6c7c1Aainfix &lt;=c0c10FIainfix &lt;c7c10Aainfix &lt;=c0c7Iainfix =V6asetV5c6c0Aainfix &lt;=c0c10FIainfix &lt;c6c10Aainfix &lt;=c0c6Iainfix =V5asetV4c5c4Aainfix &lt;=c0c10FIainfix &lt;c5c10Aainfix &lt;=c0c5Iainfix =V4asetV3c4c7Aainfix &lt;=c0c10FIainfix &lt;c4c10Aainfix &lt;=c0c4Iainfix =V3asetV2c3c2Aainfix &lt;=c0c10FIainfix &lt;c3c10Aainfix &lt;=c0c3Iainfix =V2asetV1c2c8Aainfix &lt;=c0c10FIainfix &lt;c2c10Aainfix &lt;=c0c2Iainfix =V1asetV0c1c3Aainfix &lt;=c0c10FIainfix &lt;c1c10Aainfix &lt;=c0c1Iainfix =V0asetaconstc0c0c9Aainfix &lt;=c0c10FIainfix &lt;c0c10Aainfix &lt;=c0c0Iainfix &lt;=c0c10Iainfix &gt;=c10c0">
+      sum="58a376c8a43018101a892ac8b508a2a0"
+      expanded="true">
       <label name="expl:VC for test"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.08"/>

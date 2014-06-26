@@ -1,534 +1,194 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <file
-  name="../same_fringe.mlw"
-  verified="true"
+ <prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+ <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5"
+  memlimit="1000"/>
+ <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5"
+  memlimit="4000"/>
+ <file name="../same_fringe.mlw"
   expanded="true">
-  <theory
-   name="SameFringe"
-   locfile="../same_fringe.mlw"
-   loclnum="8" loccnumb="7" loccnume="17"
-   verified="true"
+  <theory name="SameFringe"
    expanded="true">
-   <goal
-    name="WP_parameter enum"
-    locfile="../same_fringe.mlw"
-    loclnum="43" loccnumb="10" loccnume="14"
-    expl="VC for enum"
-    sum="20dbae19cea11357877b67d5ea193e7a"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aEmptyainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FACfaEmptyainfix =V7V2Oainfix =V6V2aNodeVwVV0aNodeVVVV0F">
-    <label
-     name="expl:VC for enum"/>
+   <goal name="WP_parameter enum" expl="VC for enum"
+    sum="20dbae19cea11357877b67d5ea193e7a">
+    <label name="expl:VC for enum"/>
     <transf
-     name="split_goal"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter enum.1"
-      locfile="../same_fringe.mlw"
-      loclnum="43" loccnumb="10" loccnume="14"
-      expl="1. postcondition"
-      sum="b1ed11343bba99c81e3b7904494f9ae8"
-      proved="true"
-      expanded="false"
-      shape="postconditionCainfix =aenum_elementsV1ainfix ++aelementsV0aenum_elementsV1aEmptytaNodeVVVV0F">
-      <label
-       name="expl:VC for enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     name="split_goal">
+     <goal name="WP_parameter enum.1" expl="1. postcondition"
+      sum="b1ed11343bba99c81e3b7904494f9ae8">
+      <label name="expl:VC for enum"/>
+      <proof prover="1" timelimit="10" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter enum.2"
-      locfile="../same_fringe.mlw"
-      loclnum="43" loccnumb="10" loccnume="14"
-      expl="2. variant decrease"
-      sum="58fcb86cb9b4b672051cae638deedc77"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaEmptyCfaEmptyainfix =V6V2Oainfix =V5V2aNodeVwVV0aNodeVVVV0F">
-      <label
-       name="expl:VC for enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter enum.2" expl="2. variant decrease"
+      sum="58fcb86cb9b4b672051cae638deedc77">
+      <label name="expl:VC for enum"/>
+      <proof prover="1" timelimit="10" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter enum.3"
-      locfile="../same_fringe.mlw"
-      loclnum="43" loccnumb="10" loccnume="14"
-      expl="3. postcondition"
-      sum="56b817e76f3bd615ce2e5e0a4b4b7593"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyainfix =aenum_elementsV5ainfix ++aelementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++aelementsV2aenum_elementsaNextV3V4V1FaNodeVVVV0F">
-      <label
-       name="expl:VC for enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter enum.3" expl="3. postcondition"
+      sum="56b817e76f3bd615ce2e5e0a4b4b7593">
+      <label name="expl:VC for enum"/>
+      <proof prover="1" timelimit="10" memlimit="0">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal
-    name="WP_parameter eq_enum"
-    locfile="../same_fringe.mlw"
-    loclnum="50" loccnumb="10" loccnume="17"
-    expl="VC for eq_enum"
-    sum="0d120c03ea08bd01dc3023291ee9c4ba"
-    proved="true"
-    expanded="false"
-    shape="CCiNainfix =aenum_elementsV0aenum_elementsV1ainfix =aenum_elementsV0aenum_elementsV1qainfix =V11aTrueIainfix =aenum_elementsV10aenum_elementsV9qainfix =V11aTrueFAainfix &lt;alengthaenum_elementsV10alengthaenum_elementsV0Aainfix &lt;=c0alengthaenum_elementsV0Iainfix =aenum_elementsV10ainfix ++aelementsV6aenum_elementsV7FIainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4Fainfix =V8aTrueIainfix =V5V2qainfix =V8aTrueFaNextVVVNainfix =aenum_elementsV0aenum_elementsV1wV0aNextVVVCainfix =aenum_elementsV0aenum_elementsV1aDoneNainfix =aenum_elementsV0aenum_elementsV1wV0aDoneV1F">
-    <label
-     name="expl:VC for eq_enum"/>
+   <goal name="WP_parameter eq_enum" expl="VC for eq_enum"
+    sum="0d120c03ea08bd01dc3023291ee9c4ba">
+    <label name="expl:VC for eq_enum"/>
     <transf
-     name="split_goal"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter eq_enum.1"
-      locfile="../same_fringe.mlw"
-      loclnum="50" loccnumb="10" loccnume="17"
-      expl="1. variant decrease"
-      sum="69995a1e51ce5dd8d434ed69cd31844c"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCCainfix &lt;alengthaenum_elementsV10alengthaenum_elementsV0Aainfix &lt;=c0alengthaenum_elementsV0Iainfix =aenum_elementsV10ainfix ++aelementsV6aenum_elementsV7FIainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =V8aTrueIainfix =V5V2qainfix =V8aTrueFaNextVVVtwV0aNextVVVtaDoneV1F">
-      <label
-       name="expl:VC for eq_enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     name="split_goal">
+     <goal name="WP_parameter eq_enum.1" expl="1. variant decrease"
+      sum="69995a1e51ce5dd8d434ed69cd31844c">
+      <label name="expl:VC for eq_enum"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof
-       prover="2"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      <proof prover="1" timelimit="10" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter eq_enum.2"
-      locfile="../same_fringe.mlw"
-      loclnum="50" loccnumb="10" loccnume="17"
-      expl="2. postcondition"
-      sum="f44d226acf3d45e48881db04af6a7553"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCainfix =aenum_elementsV0aenum_elementsV1qainfix =V11aTrueIainfix =aenum_elementsV10aenum_elementsV9qainfix =V11aTrueFIainfix =aenum_elementsV10ainfix ++aelementsV6aenum_elementsV7FIainfix =aenum_elementsV9ainfix ++aelementsV3aenum_elementsV4FIainfix =V8aTrueIainfix =V5V2qainfix =V8aTrueFaNextVVVtwV0aNextVVVtaDoneV1F">
-      <label
-       name="expl:VC for eq_enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter eq_enum.2" expl="2. postcondition"
+      sum="f44d226acf3d45e48881db04af6a7553">
+      <label name="expl:VC for eq_enum"/>
+      <proof prover="1" timelimit="10" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter eq_enum.3"
-      locfile="../same_fringe.mlw"
-      loclnum="50" loccnumb="10" loccnume="17"
-      expl="3. postcondition"
-      sum="e81e6c48d91062c7beb1a150bdda9817"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCNainfix =aenum_elementsV0aenum_elementsV1INainfix =V8aTrueIainfix =V5V2qainfix =V8aTrueFaNextVVVtwV0aNextVVVtaDoneV1F">
-      <label
-       name="expl:VC for eq_enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter eq_enum.3" expl="3. postcondition"
+      sum="e81e6c48d91062c7beb1a150bdda9817">
+      <label name="expl:VC for eq_enum"/>
+      <proof prover="1" timelimit="10">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter eq_enum.4"
-      locfile="../same_fringe.mlw"
-      loclnum="50" loccnumb="10" loccnume="17"
-      expl="4. postcondition"
-      sum="260368267daedf4ecea53ae86bdabd56"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCtaNextVVVNainfix =aenum_elementsV0aenum_elementsV1wV0aNextVVVtaDoneV1F">
-      <label
-       name="expl:VC for eq_enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter eq_enum.4" expl="4. postcondition"
+      sum="260368267daedf4ecea53ae86bdabd56">
+      <label name="expl:VC for eq_enum"/>
+      <proof prover="1" timelimit="10" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter eq_enum.5"
-      locfile="../same_fringe.mlw"
-      loclnum="50" loccnumb="10" loccnume="17"
-      expl="5. postcondition"
-      sum="9c57ac9bf363da31fa276699981d3e15"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNextVVVCainfix =aenum_elementsV0aenum_elementsV1aDonetwV0aDoneV1F">
-      <label
-       name="expl:VC for eq_enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter eq_enum.5" expl="5. postcondition"
+      sum="9c57ac9bf363da31fa276699981d3e15">
+      <label name="expl:VC for eq_enum"/>
+      <proof prover="1" timelimit="10" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter eq_enum.6"
-      locfile="../same_fringe.mlw"
-      loclnum="50" loccnumb="10" loccnume="17"
-      expl="6. postcondition"
-      sum="5e3a8f87f04d3d653fa08b33d1b959bb"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNextVVVCtaDoneNainfix =aenum_elementsV0aenum_elementsV1wV0aDoneV1F">
-      <label
-       name="expl:VC for eq_enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter eq_enum.6" expl="6. postcondition"
+      sum="5e3a8f87f04d3d653fa08b33d1b959bb">
+      <label name="expl:VC for eq_enum"/>
+      <proof prover="1" timelimit="10" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal
-    name="WP_parameter same_fringe"
-    locfile="../same_fringe.mlw"
-    loclnum="61" loccnumb="6" loccnume="17"
-    expl="VC for same_fringe"
-    sum="5c542283c1a572514f19bf6e1b8bd9fe"
-    proved="true"
-    expanded="false"
-    shape="ainfix =aelementsV0aelementsV1qainfix =V4aTrueIainfix =aenum_elementsV3aenum_elementsV2qainfix =V4aTrueFIainfix =aenum_elementsV3ainfix ++aelementsV0aenum_elementsaDoneFIainfix =aenum_elementsV2ainfix ++aelementsV1aenum_elementsaDoneFF">
-    <label
-     name="expl:VC for same_fringe"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter same_fringe" expl="VC for same_fringe"
+    sum="5c542283c1a572514f19bf6e1b8bd9fe">
+    <label name="expl:VC for same_fringe"/>
+    <proof prover="1" timelimit="10" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter test1"
-    locfile="../same_fringe.mlw"
-    loclnum="65" loccnumb="6" loccnume="11"
-    expl="VC for test1"
-    sum="df8bd32df13e4993368505fcac8b4225"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test1"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test1" expl="VC for test1"
+    sum="df8bd32df13e4993368505fcac8b4225">
+    <label name="expl:VC for test1"/>
+    <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter test2"
-    locfile="../same_fringe.mlw"
-    loclnum="66" loccnumb="6" loccnume="11"
-    expl="VC for test2"
-    sum="df8bd32df13e4993368505fcac8b4225"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test2"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test2" expl="VC for test2"
+    sum="df8bd32df13e4993368505fcac8b4225">
+    <label name="expl:VC for test2"/>
+    <proof prover="1">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter test3"
-    locfile="../same_fringe.mlw"
-    loclnum="67" loccnumb="6" loccnume="11"
-    expl="VC for test3"
-    sum="df8bd32df13e4993368505fcac8b4225"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test3"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test3" expl="VC for test3"
+    sum="df8bd32df13e4993368505fcac8b4225">
+    <label name="expl:VC for test3"/>
+    <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter leaf"
-    locfile="../same_fringe.mlw"
-    loclnum="72" loccnumb="6" loccnume="10"
-    expl="VC for leaf"
-    sum="480dd13cc223bead1df2abd5c8bc4dbe"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for leaf"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter leaf" expl="VC for leaf"
+    sum="480dd13cc223bead1df2abd5c8bc4dbe">
+    <label name="expl:VC for leaf"/>
+    <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter test4"
-    locfile="../same_fringe.mlw"
-    loclnum="74" loccnumb="6" loccnume="11"
-    expl="VC for test4"
-    sum="480dd13cc223bead1df2abd5c8bc4dbe"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test4"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test4" expl="VC for test4"
+    sum="480dd13cc223bead1df2abd5c8bc4dbe">
+    <label name="expl:VC for test4"/>
+    <proof prover="1">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter test5"
-    locfile="../same_fringe.mlw"
-    loclnum="75" loccnumb="6" loccnume="11"
-    expl="VC for test5"
-    sum="480dd13cc223bead1df2abd5c8bc4dbe"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test5"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test5" expl="VC for test5"
+    sum="480dd13cc223bead1df2abd5c8bc4dbe">
+    <label name="expl:VC for test5"/>
+    <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter bench"
-    locfile="../same_fringe.mlw"
-    loclnum="79" loccnumb="6" loccnume="11"
-    expl="VC for bench"
-    sum="480dd13cc223bead1df2abd5c8bc4dbe"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for bench"/>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter bench" expl="VC for bench"
+    sum="480dd13cc223bead1df2abd5c8bc4dbe">
+    <label name="expl:VC for bench"/>
+    <proof prover="2">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
-  <theory
-   name="Test"
-   locfile="../same_fringe.mlw"
-   loclnum="84" loccnumb="7" loccnume="11"
-   verified="true"
+  <theory name="Test"
    expanded="true">
-   <goal
-    name="WP_parameter test1"
-    locfile="../same_fringe.mlw"
-    loclnum="89" loccnumb="6" loccnume="11"
-    expl="VC for test1"
-    sum="400185f0819e56f62a5ba24986426f16"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test1"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test1" expl="VC for test1"
+    sum="400185f0819e56f62a5ba24986426f16">
+    <label name="expl:VC for test1"/>
+    <proof prover="1">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter test2"
-    locfile="../same_fringe.mlw"
-    loclnum="90" loccnumb="6" loccnume="11"
-    expl="VC for test2"
-    sum="400185f0819e56f62a5ba24986426f16"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test2"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test2" expl="VC for test2"
+    sum="400185f0819e56f62a5ba24986426f16">
+    <label name="expl:VC for test2"/>
+    <proof prover="1">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter test3"
-    locfile="../same_fringe.mlw"
-    loclnum="91" loccnumb="6" loccnume="11"
-    expl="VC for test3"
-    sum="400185f0819e56f62a5ba24986426f16"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test3"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test3" expl="VC for test3"
+    sum="400185f0819e56f62a5ba24986426f16">
+    <label name="expl:VC for test3"/>
+    <proof prover="1">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter leaf"
-    locfile="../same_fringe.mlw"
-    loclnum="96" loccnumb="6" loccnume="10"
-    expl="VC for leaf"
-    sum="cfaf27e07adc8c6933040b5f582d7189"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for leaf"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter leaf" expl="VC for leaf"
+    sum="cfaf27e07adc8c6933040b5f582d7189">
+    <label name="expl:VC for leaf"/>
+    <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter test4"
-    locfile="../same_fringe.mlw"
-    loclnum="98" loccnumb="6" loccnume="11"
-    expl="VC for test4"
-    sum="cfaf27e07adc8c6933040b5f582d7189"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test4"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test4" expl="VC for test4"
+    sum="cfaf27e07adc8c6933040b5f582d7189">
+    <label name="expl:VC for test4"/>
+    <proof prover="1">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter test5"
-    locfile="../same_fringe.mlw"
-    loclnum="99" loccnumb="6" loccnume="11"
-    expl="VC for test5"
-    sum="cfaf27e07adc8c6933040b5f582d7189"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for test5"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter test5" expl="VC for test5"
+    sum="cfaf27e07adc8c6933040b5f582d7189">
+    <label name="expl:VC for test5"/>
+    <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>

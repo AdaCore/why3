@@ -5,88 +5,81 @@
  <prover id="0" name="CVC3" version="2.4.1" timelimit="20" memlimit="0"/>
  <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="20"
   memlimit="0"/>
- <prover id="2" name="Coq" version="8.4pl3" timelimit="20" memlimit="0"/>
- <prover id="3" name="Z3" version="3.2" timelimit="8" memlimit="1000"/>
+ <prover id="2" name="Z3" version="3.2" timelimit="8" memlimit="1000"/>
+ <prover id="3" name="Coq" version="8.4pl3" timelimit="20" memlimit="0"/>
  <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5"
   memlimit="1000"/>
- <file name="../vstte10_queens.mlw" verified="true"
+ <file name="../vstte10_queens.mlw"
   expanded="true">
-  <theory name="NQueens" verified="true"
+  <theory name="NQueens"
    expanded="true">
    <goal name="eq_board_set" sum="e90922715e479af636c8b75d1bca5bf5"
-    proved="true" expanded="true"
-    shape="aeq_boardV0amixfix [&lt;-]V0V2V3V1Iainfix &lt;=V1V2F">
+    expanded="true">
     <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="eq_board_sym" sum="637819644163011d3643168b993182c1"
-    proved="true" expanded="true"
-    shape="aeq_boardV1V0V2Iaeq_boardV0V1V2F">
+    expanded="true">
     <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="eq_board_trans" sum="f0b4f151dbb5d7ec484c0e73914fa4aa"
-    proved="true" expanded="true"
-    shape="aeq_boardV0V2V3Iaeq_boardV1V2V3Iaeq_boardV0V1V3F">
+    expanded="true">
     <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="eq_board_extension" sum="54a24d995dd8545d3ae86b74e21d76fb"
-    proved="true" expanded="true"
-    shape="aeq_boardV0V1ainfix +V2c1Iainfix =amixfix []V0V2amixfix []V1V2Iaeq_boardV0V1V2F">
+    expanded="true">
     <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="consistent_row_eq" sum="218455c421e5730518f9bd283d093965"
-    proved="true" expanded="true"
-    shape="aconsistent_rowV1V2V3Iaconsistent_rowV0V2V3Iainfix &lt;V3V2Aainfix &lt;=c0V3FIaeq_boardV0V1ainfix +V2c1F">
+    expanded="true">
     <proof prover="1">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
    <goal name="WP_parameter check_is_consistent"
     expl="VC for check_is_consistent" sum="25f8299e5238557cb98f9a976920dd1a"
-    proved="true" expanded="true"
-    shape="ais_consistentV3V2Iaconsistent_rowV3V2V5Iainfix &lt;V5ainfix +V4c1Aainfix &lt;=c0V5FAiiiaconsistent_rowV3V2V9Iainfix &lt;V9ainfix +V6c1Aainfix &lt;=c0V9FNais_consistentV3V2ANaconsistent_rowV3V2V6ainfix =ainfix -V8V7ainfix -V2V6Nais_consistentV3V2ANaconsistent_rowV3V2V6ainfix =ainfix -V7V8ainfix -V2V6Nais_consistentV3V2ANaconsistent_rowV3V2V6ainfix =V7V8LagetV1V2Aainfix &lt;V2V0Aainfix &lt;=c0V2LagetV1V6Aainfix &lt;V6V0Aainfix &lt;=c0V6Iaconsistent_rowV3V2V10Iainfix &lt;V10V6Aainfix &lt;=c0V10FIainfix &lt;=V6V4Aainfix &lt;=c0V6FAaconsistent_rowV3V2V11Iainfix &lt;V11c0Aainfix &lt;=c0V11FIainfix &lt;=c0V4Aais_consistentV3V2Iainfix &gt;c0V4Lainfix -V2c1Iainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+    expanded="true">
     <label name="expl:VC for check_is_consistent"/>
     <proof prover="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal name="solution_eq_board" sum="eebc13bf873d22de55dc216b7e1b4dc9"
-    proved="true" expanded="true"
-    shape="asolutionV1V2IasolutionV0V2Iaeq_boardV0V1V2Iainfix =alengthV0alengthV1F">
-    <proof prover="2"
+    expanded="true">
+    <proof prover="2">
+     <result status="valid" time="0.06"/>
+    </proof>
+    <proof prover="3"
      edited="vstte10_queens_NQueens_solution_eq_board_1.v">
      <result status="valid" time="1.31"/>
     </proof>
-    <proof prover="3">
-     <result status="valid" time="0.06"/>
-    </proof>
    </goal>
    <goal name="WP_parameter bt_queens" expl="VC for bt_queens"
-    sum="77d4d232822bacc03aba77962a5ccaad" proved="true" expanded="true"
-    shape="iNasolutionV10V2Iaeq_boardV7V10V3Iais_boardV10V2Iainfix =V8V2Lamk arrayV8V9FAaeq_boardV7V4V3Aainfix &lt;=c0V0INasolutionV13V2Iainfix &lt;agetV12V3ainfix +V5c1Aainfix &lt;=c0agetV12V3Iaeq_boardV7V13V3Iais_boardV13V2Iainfix =V11V2Lamk arrayV11V12FAaeq_boardV7V4V3AiNasolutionV20V2Iainfix &lt;agetV19V3ainfix +V14c1Aainfix &lt;=c0agetV19V3Iaeq_boardV16V20V3Iais_boardV20V2Iainfix =V18V2Lamk arrayV18V19FAaeq_boardV16V4V3asolutionV23V2IasolutionV23V2Aainfix &lt;=c0V0Lamk arrayV0V22FANasolutionV28V2Iainfix &lt;agetV27V3ainfix +V14c1Aainfix &lt;=c0agetV27V3Iaeq_boardV25V28V3Iais_boardV28V2Iainfix =V26V2Lamk arrayV26V27FAaeq_boardV25V4V3INasolutionV31V2Iaeq_boardV25V31V21Iais_boardV31V2Iainfix =V29V2Lamk arrayV29V30FAaeq_boardV25V16V21Aainfix &lt;=c0V0Lamk arrayV0V24FAasolutionV16V21Aainfix &lt;=V21V2Aainfix &lt;=c0V21Aainfix =V0V2Aainfix &lt;ainfix -V2V21ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Lainfix +V3c1ainfix =V17aTrueIais_consistentV16V3qainfix =V17aTrueFAainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix =V15asetV6V3V14Aainfix &lt;=c0V0Lamk arrayV0V15FAainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V0INasolutionV34V2Iainfix &lt;agetV33V3V14Aainfix &lt;=c0agetV33V3Iaeq_boardV7V34V3Iais_boardV34V2Iainfix =V32V2Lamk arrayV32V33FAaeq_boardV7V4V3Iainfix &lt;=V14V5Aainfix &lt;=c0V14FLamk arrayV0V6FANasolutionV37V2Iainfix &lt;agetV36V3c0Aainfix &lt;=c0agetV36V3Iaeq_boardV4V37V3Iais_boardV37V2Iainfix =V35V2Lamk arrayV35V36FAaeq_boardV4V4V3Iainfix &lt;=c0V5ANasolutionV40V2Iaeq_boardV4V40V3Iais_boardV40V2Iainfix =V38V2Lamk arrayV38V39FAaeq_boardV4V4V3Iainfix &gt;c0V5Lainfix -V2c1asolutionV4V2ainfix =V3V2IasolutionV4V3Aainfix &lt;=V3V2Aainfix &lt;=c0V3Aainfix =V0V2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+    sum="77d4d232822bacc03aba77962a5ccaad"
+    expanded="true">
     <label name="expl:VC for bt_queens"/>
     <proof prover="0">
      <result status="valid" time="1.22"/>
     </proof>
    </goal>
    <goal name="WP_parameter queens" expl="VC for queens"
-    sum="be9085123de1cfc77f45a330f2c2e3c0" proved="true" expanded="true"
-    shape="asolutionV5V2IasolutionV5V2Aainfix &lt;=c0V0Lamk arrayV0V4FANasolutionV10V2Iais_boardV10V2Iainfix =V8V2Lamk arrayV8V9FINasolutionV13V2Iaeq_boardV7V13c0Iais_boardV13V2Iainfix =V11V2Lamk arrayV11V12FAaeq_boardV7V3c0Aainfix &lt;=c0V0Lamk arrayV0V6FAasolutionV3c0Aainfix &lt;=c0V2Aainfix &lt;=c0c0Aainfix =V0V2Iainfix =V0V2Aainfix &lt;=c0V0Lamk arrayV0V1F">
+    sum="be9085123de1cfc77f45a330f2c2e3c0"
+    expanded="true">
     <label name="expl:VC for queens"/>
     <proof prover="1">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal name="WP_parameter test8" expl="VC for test8"
-    sum="82a42a4c395dd56dc217087f030da199" proved="true" expanded="true"
-    shape="ainfix &gt;=c8c0">
+    sum="82a42a4c395dd56dc217087f030da199"
+    expanded="true">
     <label name="expl:VC for test8"/>
     <proof prover="4">
      <result status="valid" time="0.01"/>

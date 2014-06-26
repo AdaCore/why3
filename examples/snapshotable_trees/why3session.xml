@@ -1,598 +1,222 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <file
-  name="../snapshotable_trees.mlw"
-  verified="true"
+ <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10"
+  memlimit="1000"/>
+ <file name="../snapshotable_trees.mlw"
   expanded="true">
-  <theory
-   name="Tree"
-   locfile="../snapshotable_trees.mlw"
-   loclnum="12" loccnumb="7" loccnume="11"
-   verified="true"
-   expanded="false">
+  <theory name="Tree">
   </theory>
-  <theory
-   name="Enum"
-   locfile="../snapshotable_trees.mlw"
-   loclnum="39" loccnumb="7" loccnume="11"
-   verified="true"
+  <theory name="Enum"
    expanded="true">
-   <goal
-    name="WP_parameter enum"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="52" loccnumb="10" loccnume="14"
-    expl="VC for enum"
+   <goal name="WP_parameter enum" expl="VC for enum"
     sum="9c8c829143fb34587608a468cbd5cd6a"
-    proved="true"
-    expanded="true"
-    shape="Cainfix =aenum_elementsV1ainfix ++atree_elementsV0aenum_elementsV1aEmptyainfix =aenum_elementsV5ainfix ++atree_elementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++atree_elementsV2aenum_elementsaNextV3V4V1FACfaEmptyainfix =V7V2Oainfix =V6V2aNodeVwVV0aNodeVVVV0F">
-    <label
-     name="expl:VC for enum"/>
-    <transf
-     name="split_goal"
-     proved="true"
+    expanded="true">
+    <label name="expl:VC for enum"/>
+    <transf name="split_goal"
      expanded="true">
-     <goal
-      name="WP_parameter enum.1"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="52" loccnumb="10" loccnume="14"
-      expl="1. postcondition"
-      sum="f4cc863ccdf01b75ee086f5b9fe893f3"
-      proved="true"
-      expanded="false"
-      shape="postconditionCainfix =aenum_elementsV1ainfix ++atree_elementsV0aenum_elementsV1aEmptytaNodeVVVV0F">
-      <label
-       name="expl:VC for enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter enum.1" expl="1. postcondition"
+      sum="f4cc863ccdf01b75ee086f5b9fe893f3">
+      <label name="expl:VC for enum"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter enum.2"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="52" loccnumb="10" loccnume="14"
-      expl="2. variant decrease"
-      sum="d2846a46b886b2671b8dd44cb61b9bee"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaEmptyCfaEmptyainfix =V6V2Oainfix =V5V2aNodeVwVV0aNodeVVVV0F">
-      <label
-       name="expl:VC for enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter enum.2" expl="2. variant decrease"
+      sum="d2846a46b886b2671b8dd44cb61b9bee">
+      <label name="expl:VC for enum"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter enum.3"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="52" loccnumb="10" loccnume="14"
-      expl="3. postcondition"
-      sum="644d90a2f298b1cbdfe8c4ae9dd2821d"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyainfix =aenum_elementsV5ainfix ++atree_elementsV0aenum_elementsV1Iainfix =aenum_elementsV5ainfix ++atree_elementsV2aenum_elementsaNextV3V4V1FaNodeVVVV0F">
-      <label
-       name="expl:VC for enum"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter enum.3" expl="3. postcondition"
+      sum="644d90a2f298b1cbdfe8c4ae9dd2821d">
+      <label name="expl:VC for enum"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.06"/>
       </proof>
      </goal>
     </transf>
    </goal>
   </theory>
-  <theory
-   name="Iterator"
-   locfile="../snapshotable_trees.mlw"
-   loclnum="63" loccnumb="7" loccnume="15"
-   verified="true"
+  <theory name="Iterator"
    expanded="true">
-   <goal
-    name="WP_parameter create_iterator"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="72" loccnumb="6" loccnume="21"
-    expl="VC for create_iterator"
-    sum="065813d6a5a04e4c6ded3a3deb33c9c5"
-    proved="true"
-    expanded="false"
-    shape="ainfix =aenum_elementsV1atree_elementsV0Iainfix =aenum_elementsV1ainfix ++atree_elementsV0aenum_elementsaDoneFF">
-    <label
-     name="expl:VC for create_iterator"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter create_iterator" expl="VC for create_iterator"
+    sum="065813d6a5a04e4c6ded3a3deb33c9c5">
+    <label name="expl:VC for create_iterator"/>
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter hasNext"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="78" loccnumb="6" loccnume="13"
-    expl="VC for hasNext"
-    sum="99233385e2dc39186616d6935891f7c1"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for hasNext"/>
-    <proof
-     prover="0"
-     timelimit="15"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter hasNext" expl="VC for hasNext"
+    sum="99233385e2dc39186616d6935891f7c1">
+    <label name="expl:VC for hasNext"/>
+    <proof prover="0" timelimit="15">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter next"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="82" loccnumb="6" loccnume="10"
-    expl="VC for next"
-    sum="2001fea22463239fd72bee93462292bd"
-    proved="true"
-    expanded="false"
-    shape="CfaDoneainfix =aenum_elementsV0aConsV1aenum_elementsV5Iainfix =V5V4FIainfix =aenum_elementsV4ainfix ++atree_elementsV2aenum_elementsV3FaNextVVVV0INainfix =V0aDoneF">
-    <label
-     name="expl:VC for next"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter next" expl="VC for next"
+    sum="2001fea22463239fd72bee93462292bd">
+    <label name="expl:VC for next"/>
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>
   <theory
-   name="BSTree"
-   locfile="../snapshotable_trees.mlw"
-   loclnum="94" loccnumb="7" loccnume="13"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter bst_mem"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="110" loccnumb="10" loccnume="17"
-    expl="VC for bst_mem"
-    sum="08cce59c04e1c77b16d4a770d450875c"
-    proved="true"
-    expanded="false"
-    shape="CNamemV0V1aEmptyiiamemV0V1qainfix =V5aTrueIamemV0V4qainfix =V5aTrueFAabstV4ACfaEmptyainfix =V7V4Oainfix =V6V4aNodeVwVV1amemV0V1ainfix =V0V3amemV0V1qainfix =V8aTrueIamemV0V2qainfix =V8aTrueFAabstV2ACfaEmptyainfix =V10V2Oainfix =V9V2aNodeVwVV1ainfix &lt;V0V3aNodeVVVV1IabstV1F">
-    <label
-     name="expl:VC for bst_mem"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   name="BSTree">
+   <goal name="WP_parameter bst_mem" expl="VC for bst_mem"
+    sum="08cce59c04e1c77b16d4a770d450875c">
+    <label name="expl:VC for bst_mem"/>
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter bst_add"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="122" loccnumb="10" loccnume="17"
-    expl="VC for bst_add"
-    sum="4a228b3f709dbfb8c733ad34d4d30d2f"
-    proved="true"
-    expanded="false"
-    shape="CamemV3V1Oainfix =V3V0qamemV3V2FANamemV0V1AabstV2LaNodeaEmptyV0aEmptyaEmptyiiamemV0V1IamemV0V6AamemV9V1Oainfix =V9V0qamemV9V8FANamemV0V1AabstV8LaNodeV4V5V7IamemV10V6Oainfix =V10V0qamemV10V7FANamemV0V6AabstV7FAabstV6ACfaEmptyainfix =V12V6Oainfix =V11V6aNodeVwVV1amemV0V1IamemV0V4AamemV15V1Oainfix =V15V0qamemV15V14FANamemV0V1AabstV14LaNodeV13V5V6IamemV16V4Oainfix =V16V0qamemV16V13FANamemV0V4AabstV13FAabstV4ACfaEmptyainfix =V18V4Oainfix =V17V4aNodeVwVV1ainfix &lt;V0V5amemV0V1ainfix =V0V5aNodeVVVV1IabstV1F">
-    <label
-     name="expl:VC for bst_add"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter bst_add" expl="VC for bst_add"
+    sum="4a228b3f709dbfb8c733ad34d4d30d2f">
+    <label name="expl:VC for bst_add"/>
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.08"/>
     </proof>
    </goal>
   </theory>
-  <theory
-   name="ITree"
-   locfile="../snapshotable_trees.mlw"
-   loclnum="140" loccnumb="7" loccnume="12"
-   verified="true"
+  <theory name="ITree"
    expanded="true">
-   <goal
-    name="WP_parameter create"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="147" loccnumb="6" loccnume="12"
-    expl="VC for create"
-    sum="b92f222c8eba216d6d79f267816ab4fb"
-    proved="true"
-    expanded="false"
-    shape="abstaEmpty">
-    <label
-     name="expl:VC for create"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter create" expl="VC for create"
+    sum="b92f222c8eba216d6d79f267816ab4fb">
+    <label name="expl:VC for create"/>
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter contains"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="149" loccnumb="6" loccnume="14"
-    expl="VC for contains"
-    sum="29637d19c83ee489e0c8aa6a5756aa6b"
-    proved="true"
-    expanded="false"
-    shape="amemV1V0qainfix =V2aTrueIamemV1V0qainfix =V2aTrueFAabstV0IabstV0F">
-    <label
-     name="expl:VC for contains"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter contains" expl="VC for contains"
+    sum="29637d19c83ee489e0c8aa6a5756aa6b">
+    <label name="expl:VC for contains"/>
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter add"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="153" loccnumb="6" loccnume="9"
-    expl="VC for add"
+   <goal name="WP_parameter add" expl="VC for add"
     sum="a617230e206eba5061a1298fd8ce3ba7"
-    proved="true"
-    expanded="true"
-    shape="amemV2V0Oainfix =V2V1qamemV2V0FAamemV1V0IamemV1V0AamemV5V0Oainfix =V5V1qamemV5V4FANamemV1V0AabstV4Iainfix =V4V3FIamemV6V0Oainfix =V6V1qamemV6V3FANamemV1V0AabstV3FAabstV0IabstV0F">
-    <label
-     name="expl:VC for add"/>
-    <transf
-     name="split_goal"
-     proved="true"
+    expanded="true">
+    <label name="expl:VC for add"/>
+    <transf name="split_goal"
      expanded="true">
-     <goal
-      name="WP_parameter add.1"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="153" loccnumb="6" loccnume="9"
-      expl="1. precondition"
-      sum="499ef4afa67da1f57360a969d107980e"
-      proved="true"
-      expanded="false"
-      shape="preconditionabstV0IabstV0F">
-      <label
-       name="expl:VC for add"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter add.1" expl="1. precondition"
+      sum="499ef4afa67da1f57360a969d107980e">
+      <label name="expl:VC for add"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter add.2"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="153" loccnumb="6" loccnume="9"
-      expl="2. type invariant"
-      sum="fa06efa9d14f9ad9320f9984ed16ab41"
-      proved="true"
-      expanded="false"
-      shape="type invariantabstV3Iainfix =V3V2FIamemV4V0Oainfix =V4V1qamemV4V2FANamemV1V0AabstV2FIabstV0IabstV0F">
-      <label
-       name="expl:VC for add"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter add.2" expl="2. type invariant"
+      sum="fa06efa9d14f9ad9320f9984ed16ab41">
+      <label name="expl:VC for add"/>
+      <proof prover="0" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter add.3"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="153" loccnumb="6" loccnume="9"
-      expl="3. postcondition"
+     <goal name="WP_parameter add.3" expl="3. postcondition"
       sum="6894d71a8a6fecdfc4fec43f0b3267f7"
-      proved="true"
-      expanded="true"
-      shape="postconditionamemV4V0Oainfix =V4V1qamemV4V3FANamemV1V0IabstV3Iainfix =V3V2FIamemV5V0Oainfix =V5V1qamemV5V2FANamemV1V0AabstV2FIabstV0IabstV0F">
-      <label
-       name="expl:VC for add"/>
-      <transf
-       name="split_goal"
-       proved="true"
+      expanded="true">
+      <label name="expl:VC for add"/>
+      <transf name="split_goal"
        expanded="true">
-       <goal
-        name="WP_parameter add.3.1"
-        locfile="../snapshotable_trees.mlw"
-        loclnum="153" loccnumb="6" loccnume="9"
-        expl="1."
-        sum="071cd61babfd10791d169857e4d06e7c"
-        proved="true"
-        expanded="false"
-        shape="NamemV1V0IabstV3Iainfix =V3V2FIamemV4V0Oainfix =V4V1qamemV4V2FANamemV1V0AabstV2FIabstV0IabstV0F">
-        <label
-         name="expl:VC for add"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
+       <goal name="WP_parameter add.3.1" expl="1."
+        sum="071cd61babfd10791d169857e4d06e7c">
+        <label name="expl:VC for add"/>
+        <proof prover="0" memlimit="0">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal
-        name="WP_parameter add.3.2"
-        locfile="../snapshotable_trees.mlw"
-        loclnum="153" loccnumb="6" loccnume="9"
-        expl="2."
-        sum="4ed79697045be148a949430b4c28dea1"
-        proved="true"
-        expanded="false"
-        shape="amemV4V0Oainfix =V4V1IamemV4V3FIabstV3Iainfix =V3V2FIamemV5V0Oainfix =V5V1qamemV5V2FANamemV1V0AabstV2FIabstV0IabstV0F">
-        <label
-         name="expl:VC for add"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
+       <goal name="WP_parameter add.3.2" expl="2."
+        sum="4ed79697045be148a949430b4c28dea1">
+        <label name="expl:VC for add"/>
+        <proof prover="0" memlimit="0">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
-       <goal
-        name="WP_parameter add.3.3"
-        locfile="../snapshotable_trees.mlw"
-        loclnum="153" loccnumb="6" loccnume="9"
-        expl="3."
-        sum="0839936ef5c63ba18962d51f4971dc38"
-        proved="true"
-        expanded="false"
-        shape="amemV4V3IamemV4V0Oainfix =V4V1FIabstV3Iainfix =V3V2FIamemV5V0Oainfix =V5V1qamemV5V2FANamemV1V0AabstV2FIabstV0IabstV0F">
-        <label
-         name="expl:VC for add"/>
-        <proof
-         prover="0"
-         timelimit="10"
-         memlimit="0"
-         obsolete="false"
-         archived="false">
+       <goal name="WP_parameter add.3.3" expl="3."
+        sum="0839936ef5c63ba18962d51f4971dc38">
+        <label name="expl:VC for add"/>
+        <proof prover="0" memlimit="0">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal
-      name="WP_parameter add.4"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="153" loccnumb="6" loccnume="9"
-      expl="4. postcondition"
-      sum="e8f51dde8091da386c8683f09c8e29b5"
-      proved="true"
-      expanded="false"
-      shape="postconditionamemV2V0Oainfix =V2V1qamemV2V0FAamemV1V0IamemV1V0IabstV0IabstV0F">
-      <label
-       name="expl:VC for add"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter add.4" expl="4. postcondition"
+      sum="e8f51dde8091da386c8683f09c8e29b5">
+      <label name="expl:VC for add"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal
-    name="WP_parameter snapshot"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="158" loccnumb="6" loccnume="14"
-    expl="VC for snapshot"
-    sum="a363124a3e68abf2b108bce5f38e9c21"
-    proved="true"
-    expanded="false"
-    shape="t">
-    <label
-     name="expl:VC for snapshot"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter snapshot" expl="VC for snapshot"
+    sum="a363124a3e68abf2b108bce5f38e9c21">
+    <label name="expl:VC for snapshot"/>
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter iterator"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="160" loccnumb="6" loccnume="14"
-    expl="VC for iterator"
-    sum="adf7471c8fff088abb15b3f8e6603189"
-    proved="true"
-    expanded="false"
-    shape="ainfix =aenum_elementsV1atree_elementsV0Iainfix =aenum_elementsV1atree_elementsV0FIabstV0F">
-    <label
-     name="expl:VC for iterator"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter iterator" expl="VC for iterator"
+    sum="adf7471c8fff088abb15b3f8e6603189">
+    <label name="expl:VC for iterator"/>
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
   </theory>
-  <theory
-   name="Harness"
-   locfile="../snapshotable_trees.mlw"
-   loclnum="166" loccnumb="7" loccnume="14"
-   verified="true"
+  <theory name="Harness"
    expanded="true">
-   <goal
-    name="WP_parameter test"
-    locfile="../snapshotable_trees.mlw"
-    loclnum="170" loccnumb="6" loccnume="10"
-    expl="VC for test"
+   <goal name="WP_parameter test" expl="VC for test"
     sum="e85d3cb6a8dcf108147534b3a1ed82e1"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;alengthaenum_elementsV12alengthaenum_elementsV9Aainfix &lt;=c0alengthaenum_elementsV9AabstV15IamemV17V10Oainfix =V17V14qamemV17V15FAamemV14V10qainfix =V16aFalseAabstV15FFAabstV10Lainfix *V13c3Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFANainfix =V9aDoneIainfix =V11aTrueINainfix =V9aDoneqainfix =V11aTrueFIabstV10FAabstV5Iainfix =aenum_elementsV8atree_elementsV7FIabstV7FAamemc2V5IamemV18V3Oainfix =V18c3qamemV18V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV19V1Oainfix =V19c2qamemV19V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV20V0Oainfix =V20c1qamemV20V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
-    <label
-     name="expl:VC for test"/>
-    <transf
-     name="split_goal"
-     proved="true"
+    expanded="true">
+    <label name="expl:VC for test"/>
+    <transf name="split_goal"
      expanded="true">
-     <goal
-      name="WP_parameter test.1"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="170" loccnumb="6" loccnume="10"
-      expl="1. assertion"
-      sum="ea98fbfa118df58064770f727c903629"
-      proved="true"
-      expanded="false"
-      shape="assertionamemc2V5IamemV7V3Oainfix =V7c3qamemV7V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV8V1Oainfix =V8c2qamemV8V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV9V0Oainfix =V9c1qamemV9V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
-      <label
-       name="expl:VC for test"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter test.1" expl="1. assertion"
+      sum="ea98fbfa118df58064770f727c903629">
+      <label name="expl:VC for test"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter test.2"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="170" loccnumb="6" loccnume="10"
-      expl="2. loop invariant init"
-      sum="41488b01679c22f6596a2bda6a760704"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initabstV5Iainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV9V3Oainfix =V9c3qamemV9V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV10V1Oainfix =V10c2qamemV10V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV11V0Oainfix =V11c1qamemV11V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
-      <label
-       name="expl:VC for test"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter test.2" expl="2. loop invariant init"
+      sum="41488b01679c22f6596a2bda6a760704">
+      <label name="expl:VC for test"/>
+      <proof prover="0" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter test.3"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="170" loccnumb="6" loccnume="10"
-      expl="3. precondition"
-      sum="6d532e48a4de789b7ee81642116335a2"
-      proved="true"
-      expanded="false"
-      shape="preconditionNainfix =V9aDoneIainfix =V11aTrueINainfix =V9aDoneqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV12V3Oainfix =V12c3qamemV12V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV13V1Oainfix =V13c2qamemV13V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV14V0Oainfix =V14c1qamemV14V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
-      <label
-       name="expl:VC for test"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter test.3" expl="3. precondition"
+      sum="6d532e48a4de789b7ee81642116335a2">
+      <label name="expl:VC for test"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter test.4"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="170" loccnumb="6" loccnume="10"
-      expl="4. type invariant"
-      sum="abc443da970d105d8ab538928945fec4"
-      proved="true"
-      expanded="false"
-      shape="type invariantabstV10Lainfix *V13c3Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFINainfix =V9aDoneIainfix =V11aTrueINainfix =V9aDoneqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV15V3Oainfix =V15c3qamemV15V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV16V1Oainfix =V16c2qamemV16V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV17V0Oainfix =V17c1qamemV17V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
-      <label
-       name="expl:VC for test"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter test.4" expl="4. type invariant"
+      sum="abc443da970d105d8ab538928945fec4">
+      <label name="expl:VC for test"/>
+      <proof prover="0" timelimit="5">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter test.5"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="170" loccnumb="6" loccnume="10"
-      expl="5. loop invariant preservation"
-      sum="ed8156a5d9b9fa9fc02d856419edec2c"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationabstV15IamemV17V10Oainfix =V17V14qamemV17V15FAamemV14V10qainfix =V16aFalseAabstV15FFIabstV10Lainfix *V13c3Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFINainfix =V9aDoneIainfix =V11aTrueINainfix =V9aDoneqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV18V3Oainfix =V18c3qamemV18V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV19V1Oainfix =V19c2qamemV19V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV20V0Oainfix =V20c1qamemV20V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
-      <label
-       name="expl:VC for test"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter test.5" expl="5. loop invariant preservation"
+      sum="ed8156a5d9b9fa9fc02d856419edec2c">
+      <label name="expl:VC for test"/>
+      <proof prover="0" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter test.6"
-      locfile="../snapshotable_trees.mlw"
-      loclnum="170" loccnumb="6" loccnume="10"
-      expl="6. loop variant decrease"
-      sum="cfd96233e31298d8c0142184450aa388"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;alengthaenum_elementsV12alengthaenum_elementsV9Aainfix &lt;=c0alengthaenum_elementsV9IamemV17V10Oainfix =V17V14qamemV17V15FAamemV14V10qainfix =V16aFalseAabstV15FFIabstV10Lainfix *V13c3Iainfix =aenum_elementsV9aConsV13aenum_elementsV12FFINainfix =V9aDoneIainfix =V11aTrueINainfix =V9aDoneqainfix =V11aTrueFIabstV10FIainfix =aenum_elementsV8atree_elementsV7FIabstV7FIamemc2V5IamemV18V3Oainfix =V18c3qamemV18V5FAamemc3V3qainfix =V6aFalseAabstV5FFIamemV19V1Oainfix =V19c2qamemV19V3FAamemc2V1qainfix =V4aFalseAabstV3FFIamemV20V0Oainfix =V20c1qamemV20V1FAamemc1V0qainfix =V2aFalseAabstV1FFIabstV0F">
-      <label
-       name="expl:VC for test"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter test.6" expl="6. loop variant decrease"
+      sum="cfd96233e31298d8c0142184450aa388">
+      <label name="expl:VC for test"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>

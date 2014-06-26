@@ -10,179 +10,163 @@
  <prover id="4" name="Z3" version="2.19" timelimit="100" memlimit="0"/>
  <prover id="5" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
  <prover id="6" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
- <prover id="7" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
- <prover id="8" name="Z3" version="3.2" timelimit="30" memlimit="0"/>
+ <prover id="7" name="Z3" version="3.2" timelimit="30" memlimit="0"/>
+ <prover id="8" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
  <prover id="9" name="Alt-Ergo" version="0.95.2" timelimit="5"
   memlimit="4000"/>
  <prover id="10" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
- <file name="../vacid_0_red_black_trees.mlw" verified="true"
+ <file name="../vacid_0_red_black_trees.mlw"
   expanded="true">
-  <theory name="RedBlackTree" verified="true"
+  <theory name="RedBlackTree"
    expanded="true">
-   <goal name="memt_color" sum="55968f1e55bda24ec4578866fb8d6530"
-    proved="true"
-    shape="amemtaNodeV7V0V2V4V1V3V5IamemtaNodeV6V0V2V4V1V3V5F">
+   <goal name="memt_color"
+    sum="55968f1e55bda24ec4578866fb8d6530">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="lt_leaf" sum="4c8188b5f201c5cfb6a453477fcea768" proved="true"
-    shape="alt_treeV0aLeafF">
+   <goal name="lt_leaf"
+    sum="4c8188b5f201c5cfb6a453477fcea768">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="gt_leaf" sum="82ab4935cc76f9715d6a618ad8a7d725" proved="true"
-    shape="agt_treeV0aLeafF">
+   <goal name="gt_leaf"
+    sum="82ab4935cc76f9715d6a618ad8a7d725">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
-   <goal name="lt_tree_node" sum="e8d9c0f70933f4b3d05da6374d72748c"
-    proved="true"
-    shape="alt_treeV0aNodeV5V3V1V2V4Iainfix &lt;V1V0Ialt_treeV0V4Ialt_treeV0V3F">
+   <goal name="lt_tree_node"
+    sum="e8d9c0f70933f4b3d05da6374d72748c">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
-   <goal name="gt_tree_node" sum="2790bd88ed52989ea04ae52143242a0f"
-    proved="true"
-    shape="agt_treeV0aNodeV5V3V1V2V4Iainfix &lt;V0V1Iagt_treeV0V4Iagt_treeV0V3F">
+   <goal name="gt_tree_node"
+    sum="2790bd88ed52989ea04ae52143242a0f">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="lt_node_lt" sum="1a82642a5b75e3c4ecc11dd9e14ccc79"
-    proved="true"
-    shape="ainfix &lt;V1V0Ialt_treeV0aNodeV5V3V1V2V4F">
-    <proof prover="7"
+   <goal name="lt_node_lt"
+    sum="1a82642a5b75e3c4ecc11dd9e14ccc79">
+    <proof prover="8"
      edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v">
      <result status="valid" time="1.02"/>
     </proof>
    </goal>
-   <goal name="gt_node_gt" sum="1ccedc5d75773f464bed05695586b275"
-    proved="true"
-    shape="ainfix &lt;V0V1Iagt_treeV0aNodeV5V3V1V2V4F">
-    <proof prover="7"
+   <goal name="gt_node_gt"
+    sum="1ccedc5d75773f464bed05695586b275">
+    <proof prover="8"
      edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v">
      <result status="valid" time="1.05"/>
     </proof>
    </goal>
-   <goal name="lt_left" sum="9c26d0525ea51056e14abf42f8e94c9f" proved="true"
-    shape="alt_treeV0V3Ialt_treeV0aNodeV5V3V1V2V4F">
+   <goal name="lt_left"
+    sum="9c26d0525ea51056e14abf42f8e94c9f">
     <proof prover="6" timelimit="10" memlimit="0">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
-   <goal name="lt_right" sum="23bec5c8e3126eea5fdadfdc610d7bd9" proved="true"
-    shape="alt_treeV0V4Ialt_treeV0aNodeV5V3V1V2V4F">
+   <goal name="lt_right"
+    sum="23bec5c8e3126eea5fdadfdc610d7bd9">
     <proof prover="6" timelimit="10" memlimit="0">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
-   <goal name="gt_left" sum="7e0a3efdf9589cf76c42a4958c0bfeec" proved="true"
-    shape="agt_treeV0V3Iagt_treeV0aNodeV5V3V1V2V4F">
+   <goal name="gt_left"
+    sum="7e0a3efdf9589cf76c42a4958c0bfeec">
     <proof prover="6" timelimit="10" memlimit="0">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
-   <goal name="gt_right" sum="bd9e29cb94bfa0b33fa048b7929705bc" proved="true"
-    shape="agt_treeV0V4Iagt_treeV0aNodeV5V3V1V2V4F">
+   <goal name="gt_right"
+    sum="bd9e29cb94bfa0b33fa048b7929705bc">
     <proof prover="6" timelimit="10" memlimit="0">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
-   <goal name="lt_tree_not_in" sum="c41d293aa6a3b4f8146a62f6041d6f3d"
-    proved="true"
-    shape="NamemtV1V0V2FIalt_treeV0V1F">
+   <goal name="lt_tree_not_in"
+    sum="c41d293aa6a3b4f8146a62f6041d6f3d">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="lt_tree_trans" sum="699b471d84d1396cdc3d91e5440c2c42"
-    proved="true"
-    shape="alt_treeV1V2Ialt_treeV0V2FIainfix &lt;V0V1F">
+   <goal name="lt_tree_trans"
+    sum="699b471d84d1396cdc3d91e5440c2c42">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="gt_tree_not_in" sum="a0e04800339c6ff6b3890080a42c656f"
-    proved="true"
-    shape="NamemtV1V0V2FIagt_treeV0V1F">
+   <goal name="gt_tree_not_in"
+    sum="a0e04800339c6ff6b3890080a42c656f">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal name="gt_tree_trans" sum="8a1e571c5aa5ad8100f36ed6acd78f09"
-    proved="true"
-    shape="agt_treeV1V2Iagt_treeV0V2FIainfix &lt;V1V0F">
+   <goal name="gt_tree_trans"
+    sum="8a1e571c5aa5ad8100f36ed6acd78f09">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="bst_Leaf" sum="43262d7576272afb75eccf66cbd5b26d" proved="true"
-    shape="abstaLeaf">
+   <goal name="bst_Leaf"
+    sum="43262d7576272afb75eccf66cbd5b26d">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
-   <goal name="bst_left" sum="ba67f3a676dbaa747fb220b725300162" proved="true"
-    shape="abstV2IabstaNodeV4V2V0V1V3F">
+   <goal name="bst_left"
+    sum="ba67f3a676dbaa747fb220b725300162">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="bst_right" sum="8af95849f8e141c937f6c6b6f4316dcb"
-    proved="true"
-    shape="abstV3IabstaNodeV4V2V0V1V3F">
+   <goal name="bst_right"
+    sum="8af95849f8e141c937f6c6b6f4316dcb">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="bst_color" sum="8cb7840674aaa503908f91236ec4a605"
-    proved="true"
-    shape="abstaNodeV1V4V2V3V5IabstaNodeV0V4V2V3V5F">
+   <goal name="bst_color"
+    sum="8cb7840674aaa503908f91236ec4a605">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="rotate_left" sum="94a63e328dee89485a2859cb51f872b6"
-    proved="true"
-    shape="abstaNodeV9aNodeV10V4V0V2V5V1V3V6IabstaNodeV7V4V0V2aNodeV8V5V1V3V6F">
+   <goal name="rotate_left"
+    sum="94a63e328dee89485a2859cb51f872b6">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.15"/>
     </proof>
     <proof prover="4">
      <result status="timeout" time="99.60"/>
     </proof>
-    <proof prover="8" timelimit="100">
+    <proof prover="7" timelimit="100">
      <result status="timeout" time="99.39"/>
     </proof>
    </goal>
-   <goal name="rotate_right" sum="e0cabae118351a4faea08897f270728b"
-    proved="true"
-    shape="abstaNodeV7V4V0V2aNodeV8V5V1V3V6IabstaNodeV9aNodeV10V4V0V2V5V1V3V6F">
+   <goal name="rotate_right"
+    sum="e0cabae118351a4faea08897f270728b">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.14"/>
     </proof>
    </goal>
-   <goal name="rbtree_Leaf" sum="e7bae6f52cf9c70545b08aae60b0be3f"
-    proved="true"
-    shape="arbtreec0aLeaf">
+   <goal name="rbtree_Leaf"
+    sum="e7bae6f52cf9c70545b08aae60b0be3f">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal name="rbtree_Node1" sum="d45e0bc547482f3a415011a452f4aeb1"
-    proved="true"
-    shape="arbtreec0aNodeaRedaLeafV0V1aLeafF">
+   <goal name="rbtree_Node1"
+    sum="d45e0bc547482f3a415011a452f4aeb1">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.05"/>
     </proof>
    </goal>
-   <goal name="rbtree_left" sum="72e460f90f3c08f9d8e77d3b71494ddf"
-    proved="true"
-    shape="arbtreeV5V2EIarbtreeV6aNodeV4V2V0V1V3EF">
+   <goal name="rbtree_left"
+    sum="72e460f90f3c08f9d8e77d3b71494ddf">
     <proof prover="2">
      <result status="valid" time="0.00"/>
     </proof>
@@ -196,9 +180,8 @@
      <result status="valid" time="0.36"/>
     </proof>
    </goal>
-   <goal name="rbtree_right" sum="cef3902361733bb4b9f28b84eec78515"
-    proved="true"
-    shape="arbtreeV5V3EIarbtreeV6aNodeV4V2V0V1V3EF">
+   <goal name="rbtree_right"
+    sum="cef3902361733bb4b9f28b84eec78515">
     <proof prover="2">
      <result status="valid" time="0.00"/>
     </proof>
@@ -213,86 +196,75 @@
     </proof>
    </goal>
    <goal name="WP_parameter find" expl="VC for find"
-    sum="50f7eccf50fb21540950e4e36a8a7510" proved="true"
-    shape="CNamemtV0V1V2FaLeafiiNamemtV0V1V7FINamemtV6V1V8FAamemtV0V1V9IamemtV6V1V9FAabstV6ACfaLeafainfix =V11V6Oainfix =V10V6aNodewVwwVV0NamemtV0V1V12FINamemtV3V1V13FAamemtV0V1V14IamemtV3V1V14FAabstV3ACfaLeafainfix =V16V3Oainfix =V15V3aNodewVwwVV0ainfix &lt;V1V4amemtV0V1V5ainfix =V1V4aNodewVVVVV0IabstV0F">
+    sum="50f7eccf50fb21540950e4e36a8a7510">
     <label name="expl:VC for find"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter find.1" expl="1. exceptional postcondition"
-      sum="2977f6b91a0e0818b858916b90748e34" proved="true"
-      shape="exceptional postconditionCNamemtV0V1V2FaLeaftaNodewVVVVV0IabstV0F">
+      sum="2977f6b91a0e0818b858916b90748e34">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter find.2" expl="2. postcondition"
-      sum="3b0d598ebd7a9a49ab1d0ecebd8cb24a" proved="true"
-      shape="postconditionCtaLeafamemtV0V1V4Iainfix =V1V3aNodewVVVVV0IabstV0F">
+      sum="3b0d598ebd7a9a49ab1d0ecebd8cb24a">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter find.3" expl="3. variant decrease"
-      sum="ab8be71b43d287ff8be589e3a28354ef" proved="true"
-      shape="variant decreaseCtaLeafCfaLeafainfix =V7V2Oainfix =V6V2aNodewVwwVV0Iainfix &lt;V1V3INainfix =V1V3aNodewVVVVV0IabstV0F">
+      sum="ab8be71b43d287ff8be589e3a28354ef">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter find.4" expl="4. precondition"
-      sum="c5992c5fd03b77657ab8697f4fdcefda" proved="true"
-      shape="preconditionCtaLeafabstV2Iainfix &lt;V1V3INainfix =V1V3aNodewVVVVV0IabstV0F">
+      sum="c5992c5fd03b77657ab8697f4fdcefda">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter find.5" expl="5. postcondition"
-      sum="7ac9bf132a48cda012df265c8501d8f1" proved="true"
-      shape="postconditionCtaLeafamemtV0V1V6IamemtV2V1V6FIabstV2Iainfix &lt;V1V3INainfix =V1V3aNodewVVVVV0IabstV0F">
+      sum="7ac9bf132a48cda012df265c8501d8f1">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter find.6" expl="6. exceptional postcondition"
-      sum="32df533ab3190ffc4ae5037841eb020d" proved="true"
-      shape="exceptional postconditionCtaLeafNamemtV0V1V6FINamemtV2V1V7FIabstV2Iainfix &lt;V1V3INainfix =V1V3aNodewVVVVV0IabstV0F">
+      sum="32df533ab3190ffc4ae5037841eb020d">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter find.7" expl="7. variant decrease"
-      sum="f9593f1c40e62ed4b9c1e6783cc0ce5b" proved="true"
-      shape="variant decreaseCtaLeafCfaLeafainfix =V7V5Oainfix =V6V5aNodewVwwVV0INainfix &lt;V1V3INainfix =V1V3aNodewVVVVV0IabstV0F">
+      sum="f9593f1c40e62ed4b9c1e6783cc0ce5b">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter find.8" expl="8. precondition"
-      sum="ca1c55ec9ea7a725610fb5dec614ba5d" proved="true"
-      shape="preconditionCtaLeafabstV5INainfix &lt;V1V3INainfix =V1V3aNodewVVVVV0IabstV0F">
+      sum="ca1c55ec9ea7a725610fb5dec614ba5d">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter find.9" expl="9. postcondition"
-      sum="d534525e154a6d5890e9045004bb964c" proved="true"
-      shape="postconditionCtaLeafamemtV0V1V6IamemtV5V1V6FIabstV5INainfix &lt;V1V3INainfix =V1V3aNodewVVVVV0IabstV0F">
+      sum="d534525e154a6d5890e9045004bb964c">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter find.10" expl="10. exceptional postcondition"
-      sum="f33b72cf10f6d6088ca1235e901b951d" proved="true"
-      shape="exceptional postconditionCtaLeafNamemtV0V1V6FINamemtV5V1V7FIabstV5INainfix &lt;V1V3INainfix =V1V3aNodewVVVVV0IabstV0F">
+      sum="f33b72cf10f6d6088ca1235e901b951d">
       <label name="expl:VC for find"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
@@ -300,70 +272,61 @@
      </goal>
     </transf>
    </goal>
-   <goal name="rbtree_almost_rbtree" sum="dd684464feef5325410f29b00d8acdaa"
-    proved="true"
-    shape="aalmost_rbtreeV0V1IarbtreeV0V1F">
+   <goal name="rbtree_almost_rbtree"
+    sum="dd684464feef5325410f29b00d8acdaa">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.03"/>
     </proof>
    </goal>
    <goal name="rbtree_almost_rbtree_ex"
-    sum="fb7e5b68c1351405e04083d8e7991d1c" proved="true"
-    shape="aalmost_rbtreeV1V0EIarbtreeV2V0EF">
+    sum="fb7e5b68c1351405e04083d8e7991d1c">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="almost_rbtree_rbtree_black"
-    sum="bd9293a6a88b5f99ec31683712e11c95" proved="true"
-    shape="arbtreeV4aNodeaBlackV2V0V1V3Iaalmost_rbtreeV4aNodeaBlackV2V0V1V3F">
+    sum="bd9293a6a88b5f99ec31683712e11c95">
     <proof prover="3" timelimit="10" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="WP_parameter lbalance" expl="VC for lbalance"
-    sum="10cb711103dc754a3f565ea0550d8da2" proved="true"
-    shape="CiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V3Iaalmost_rbtreeV14V0FAabstV11LaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V16V17OamemtV0V16V17ainfix =V17V2ainfix =V16V1qamemtV15V16V17FAarbtreeainfix +V18c1V15IarbtreeV18V3Iaalmost_rbtreeV18V0FAabstV15LaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+    sum="10cb711103dc754a3f565ea0550d8da2">
     <label name="expl:VC for lbalance"/>
-    <transf name="split_goal"
-     proved="true">
+    <transf
+     name="split_goal">
      <goal name="WP_parameter lbalance.1" expl="1. postcondition"
-      sum="6e6a23afaf00d062bf7d17d682f86692" proved="true"
-      shape="postconditionCiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V3Iaalmost_rbtreeV14V0FAabstV11LaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+      sum="6e6a23afaf00d062bf7d17d682f86692">
       <label name="expl:VC for lbalance"/>
-      <transf name="split_goal"
-       proved="true">
+      <transf
+       name="split_goal">
        <goal name="WP_parameter lbalance.1.1" expl="1."
-        sum="94b6b3ffbc8343c703f76c421ce50ff1" proved="true"
-        shape="CabstV11LaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="94b6b3ffbc8343c703f76c421ce50ff1">
         <label name="expl:VC for lbalance"/>
         <proof prover="3" timelimit="12" memlimit="0">
          <result status="valid" time="2.18"/>
         </proof>
-        <proof prover="8" timelimit="10">
+        <proof prover="7" timelimit="10">
          <result status="timeout" time="9.96"/>
         </proof>
        </goal>
        <goal name="WP_parameter lbalance.1.2" expl="2."
-        sum="4fa22acc4ac2620efeda5adae3580e91" proved="true"
-        shape="Carbtreeainfix +V12c1V11IarbtreeV12V3Iaalmost_rbtreeV12V0FLaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="4fa22acc4ac2620efeda5adae3580e91">
         <label name="expl:VC for lbalance"/>
-        <proof prover="7" timelimit="100"
+        <proof prover="8" timelimit="100"
          edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_lbalance_1.v">
          <result status="valid" time="1.17"/>
         </proof>
        </goal>
        <goal name="WP_parameter lbalance.1.3" expl="3."
-        sum="b6bfcbc89082a95ed755e88bc079e2be" proved="true"
-        shape="Cainfix =V13V2Iainfix =V12V1IamemtV11V12V13FLaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="b6bfcbc89082a95ed755e88bc079e2be">
         <label name="expl:VC for lbalance"/>
         <proof prover="3" timelimit="100" memlimit="0">
          <result status="valid" time="3.26"/>
         </proof>
        </goal>
        <goal name="WP_parameter lbalance.1.4" expl="4."
-        sum="482b1b3fec639e2396e09de31ec1cadc" proved="true"
-        shape="CamemtV3V12V13OamemtV0V12V13INainfix =V12V1IamemtV11V12V13FLaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="482b1b3fec639e2396e09de31ec1cadc">
         <label name="expl:VC for lbalance"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.09"/>
@@ -376,8 +339,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter lbalance.1.5" expl="5."
-        sum="39f8c60d1ed7e0be7635c752f8b12ddd" proved="true"
-        shape="CamemtV11V12V13IiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1FLaNodeaRedaNodeaBlackV4V5V6V7V8V9aNodeaBlackV10V1V2V3aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="39f8c60d1ed7e0be7635c752f8b12ddd">
         <label name="expl:VC for lbalance"/>
         <proof prover="3" timelimit="6" memlimit="0">
          <result status="valid" time="2.43"/>
@@ -386,14 +348,12 @@
       </transf>
      </goal>
      <goal name="WP_parameter lbalance.2" expl="2. postcondition"
-      sum="bf2376fa14b6581978d84ea222dbd484" proved="true"
-      shape="postconditionCtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V3Iaalmost_rbtreeV14V0FAabstV11LaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+      sum="bf2376fa14b6581978d84ea222dbd484">
       <label name="expl:VC for lbalance"/>
-      <transf name="split_goal"
-       proved="true">
+      <transf
+       name="split_goal">
        <goal name="WP_parameter lbalance.2.1" expl="1."
-        sum="2ca362e483fec3eeb439b3f055417aa1" proved="true"
-        shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVabstV11LaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="2ca362e483fec3eeb439b3f055417aa1">
         <label name="expl:VC for lbalance"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.02"/>
@@ -406,14 +366,12 @@
         </proof>
        </goal>
        <goal name="WP_parameter lbalance.2.2" expl="2."
-        sum="70de4210a6f05adbbb6fdfabe48bfbd1" proved="true"
-        shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V12c1V11IarbtreeV12V3Iaalmost_rbtreeV12V0FLaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="70de4210a6f05adbbb6fdfabe48bfbd1">
         <label name="expl:VC for lbalance"/>
         <proof prover="3" timelimit="120">
          <result status="valid" time="30.13"/>
         </proof>
-        <metas
-         proved="true">
+        <metas>
          <ts_pos name="real" arity="0" id="2"
           ip_theory="BuiltIn">
           <ip_library name="why3"/>
@@ -898,14 +856,12 @@
           <meta_arg_ts id="337"/>
          </meta>
          <goal name="WP_parameter lbalance.2.2" expl="2."
-          sum="52f01c72d97849a97098c449ca64e077" proved="true"
-          shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V12c1V11IarbtreeV12V3Iaalmost_rbtreeV12V0FLaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+          sum="52f01c72d97849a97098c449ca64e077">
           <label name="expl:VC for lbalance"/>
-          <transf name="eliminate_builtin"
-           proved="true">
+          <transf
+           name="eliminate_builtin">
            <goal name="WP_parameter lbalance.2.2.1" expl="1."
-            sum="261334a62a620e6010035023bcbad223" proved="true"
-            shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVarbtreeainfix +V12c1V11IarbtreeV12V3Iaalmost_rbtreeV12V0FLaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+            sum="261334a62a620e6010035023bcbad223">
             <label name="expl:VC for lbalance"/>
             <proof prover="1" timelimit="10">
              <result status="valid" time="0.20"/>
@@ -919,8 +875,7 @@
         </metas>
        </goal>
        <goal name="WP_parameter lbalance.2.3" expl="3."
-        sum="4a6b1393bd9b0fcb51efc93f21817cac" proved="true"
-        shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVainfix =V13V2Iainfix =V12V1IamemtV11V12V13FLaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="4a6b1393bd9b0fcb51efc93f21817cac">
         <label name="expl:VC for lbalance"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.25"/>
@@ -930,8 +885,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter lbalance.2.4" expl="4."
-        sum="5b1921f9cadfd24282891bd95bae23e1" proved="true"
-        shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtV3V12V13OamemtV0V12V13INainfix =V12V1IamemtV11V12V13FLaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="5b1921f9cadfd24282891bd95bae23e1">
         <label name="expl:VC for lbalance"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.03"/>
@@ -944,8 +898,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter lbalance.2.5" expl="5."
-        sum="5e91b23807eb8fc210656134f3a1284d" proved="true"
-        shape="CtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVamemtV11V12V13IiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1FLaNodeaBlackV0V1V2V3wV0IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="5e91b23807eb8fc210656134f3a1284d">
         <label name="expl:VC for lbalance"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.13"/>
@@ -962,48 +915,42 @@
     </transf>
    </goal>
    <goal name="WP_parameter rbalance" expl="VC for rbalance"
-    sum="090d7ff88e0cd5d0ed1d63c999829cc8" proved="true"
-    shape="CiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V16V17OamemtV0V16V17ainfix =V17V2ainfix =V16V1qamemtV15V16V17FAarbtreeainfix +V18c1V15IarbtreeV18V0Iaalmost_rbtreeV18V3FAabstV15LaNodeaBlackV0V1V2V3wV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+    sum="090d7ff88e0cd5d0ed1d63c999829cc8">
     <label name="expl:VC for rbalance"/>
-    <transf name="split_goal"
-     proved="true">
+    <transf
+     name="split_goal">
      <goal name="WP_parameter rbalance.1" expl="1. postcondition"
-      sum="5b551e0b6b6fbd81a80ededea364758b" proved="true"
-      shape="postconditionCiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+      sum="5b551e0b6b6fbd81a80ededea364758b">
       <label name="expl:VC for rbalance"/>
-      <transf name="split_goal"
-       proved="true">
+      <transf
+       name="split_goal">
        <goal name="WP_parameter rbalance.1.1" expl="1."
-        sum="b929ddc0eef07c8be40fcd91765ea011" proved="true"
-        shape="CabstV11LaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="b929ddc0eef07c8be40fcd91765ea011">
         <label name="expl:VC for rbalance"/>
         <proof prover="3" timelimit="14" memlimit="0">
          <result status="valid" time="1.92"/>
         </proof>
-        <proof prover="8">
+        <proof prover="7">
          <result status="timeout" time="29.91"/>
         </proof>
        </goal>
        <goal name="WP_parameter rbalance.1.2" expl="2."
-        sum="272d428f121a3adf7d2a817acc5c0191" proved="true"
-        shape="Carbtreeainfix +V12c1V11IarbtreeV12V0Iaalmost_rbtreeV12V3FLaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="272d428f121a3adf7d2a817acc5c0191">
         <label name="expl:VC for rbalance"/>
-        <proof prover="7" timelimit="100"
+        <proof prover="8" timelimit="100"
          edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_rbalance_1.v">
          <result status="valid" time="1.17"/>
         </proof>
        </goal>
        <goal name="WP_parameter rbalance.1.3" expl="3."
-        sum="4c3b35a3ec59de3e7a33ec5eea7ba516" proved="true"
-        shape="Cainfix =V13V2Iainfix =V12V1IamemtV11V12V13FLaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="4c3b35a3ec59de3e7a33ec5eea7ba516">
         <label name="expl:VC for rbalance"/>
         <proof prover="3" timelimit="100" memlimit="0">
          <result status="valid" time="4.44"/>
         </proof>
        </goal>
        <goal name="WP_parameter rbalance.1.4" expl="4."
-        sum="87dd636b3eba9395c076647995e07bdf" proved="true"
-        shape="CamemtV3V12V13OamemtV0V12V13INainfix =V12V1IamemtV11V12V13FLaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="87dd636b3eba9395c076647995e07bdf">
         <label name="expl:VC for rbalance"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.10"/>
@@ -1016,8 +963,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter rbalance.1.5" expl="5."
-        sum="53669e7fcd572558f46b2ccc8c3584f8" proved="true"
-        shape="CamemtV11V12V13IiamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1FLaNodeaRedaNodeaBlackV0V1V2V4V5V6aNodeaBlackV7V8V9V10aNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVVtwV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="53669e7fcd572558f46b2ccc8c3584f8">
         <label name="expl:VC for rbalance"/>
         <proof prover="3" timelimit="6" memlimit="0">
          <result status="valid" time="2.19"/>
@@ -1026,14 +972,12 @@
       </transf>
      </goal>
      <goal name="WP_parameter rbalance.2" expl="2. postcondition"
-      sum="6f2f1e52f068445a8b347c0a15d0d019" proved="true"
-      shape="postconditionCtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaBlackV0V1V2V3wV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+      sum="6f2f1e52f068445a8b347c0a15d0d019">
       <label name="expl:VC for rbalance"/>
       <proof prover="3" timelimit="120">
        <result status="valid" time="29.93"/>
       </proof>
-      <metas
-       proved="true">
+      <metas>
        <ts_pos name="real" arity="0" id="2"
         ip_theory="BuiltIn">
         <ip_library name="why3"/>
@@ -1518,14 +1462,12 @@
         <meta_arg_ts id="337"/>
        </meta>
        <goal name="WP_parameter rbalance.2" expl="2. postcondition"
-        sum="91a21d407645bb1797ac303dd2a86d64" proved="true"
-        shape="postconditionCtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaBlackV0V1V2V3wV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+        sum="91a21d407645bb1797ac303dd2a86d64">
         <label name="expl:VC for rbalance"/>
-        <transf name="eliminate_builtin"
-         proved="true">
+        <transf
+         name="eliminate_builtin">
          <goal name="WP_parameter rbalance.2.1" expl="1. postcondition"
-          sum="eefc57875b5b97f2fbc84832cf5a0092" proved="true"
-          shape="postconditionCtaNodeaRedVVVaNodeaRedVVVVOaNodeaRedaNodeaRedVVVVVVViamemtV3V12V13OamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAarbtreeainfix +V14c1V11IarbtreeV14V0Iaalmost_rbtreeV14V3FAabstV11LaNodeaBlackV0V1V2V3wV3IabstV3AabstV0Aagt_treeV1V3Aalt_treeV1V0F">
+          sum="eefc57875b5b97f2fbc84832cf5a0092">
           <label name="expl:VC for rbalance"/>
           <proof prover="1" timelimit="10">
            <result status="valid" time="0.22"/>
@@ -1541,14 +1483,12 @@
     </transf>
    </goal>
    <goal name="WP_parameter insert" expl="VC for insert"
-    sum="17b7630fb81c79a4531c8d55a31b5761" proved="true"
-    shape="CiamemtV0V4V5ainfix =V5V2ainfix =V4V1qamemtV3V4V5FAamemtV3V1V2AarbtreeV6V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV6V3IarbtreeV6V0FAabstV3LaNodeaRedaLeafV1V2aLeafaLeafiiiamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV14V11IarbtreeV14V0FAabstV11LaNodeaRedV7V8V2V10iamemtV0V17V18ainfix =V18V2ainfix =V17V1qamemtV16V17V18FAamemtV16V1V2AarbtreeV19V16ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV19V16IarbtreeV19V0FAabstV16LaNodeaRedV7V8V9V15IiamemtV10V20V21ainfix =V21V2ainfix =V20V1qamemtV15V20V21FAamemtV15V1V2AarbtreeV22V15ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV22V15IarbtreeV22V10FAabstV15FAarbtreeV23V10EAabstV10ACfaLeafainfix =V25V10Oainfix =V24V10aNodewVwwVV0ainfix &lt;V8V1iamemtV0V28V29ainfix =V29V2ainfix =V28V1qamemtV27V28V29FAamemtV27V1V2AarbtreeV30V27ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV30V27IarbtreeV30V0FAabstV27LaNodeaRedV26V8V9V10IiamemtV7V31V32ainfix =V32V2ainfix =V31V1qamemtV26V31V32FAamemtV26V1V2AarbtreeV33V26ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV33V26IarbtreeV33V7FAabstV26FAarbtreeV34V7EAabstV7ACfaLeafainfix =V36V7Oainfix =V35V7aNodewVwwVV0ainfix &lt;V1V8aNodeaRedVVVViiiamemtV0V42V43ainfix =V43V2ainfix =V42V1qamemtV41V42V43FAamemtV41V1V2AarbtreeV44V41ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV44V41IarbtreeV44V0FAabstV41LaNodeaBlackV37V38V2V40iamemtV0V47V48ainfix =V48V2ainfix =V47V1qamemtV46V47V48FAamemtV46V1V2AarbtreeV49V46ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV49V46IarbtreeV49V0FAabstV46IiamemtV45V50V51OamemtV37V50V51ainfix =V51V39ainfix =V50V38qamemtV46V50V51FAarbtreeainfix +V52c1V46IarbtreeV52V37Iaalmost_rbtreeV52V45FAabstV46FAabstV45AabstV37Aagt_treeV38V45Aalt_treeV38V37IiamemtV40V53V54ainfix =V54V2ainfix =V53V1qamemtV45V53V54FAamemtV45V1V2AarbtreeV55V45ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV40Aaalmost_rbtreeV55V45IarbtreeV55V40FAabstV45FAarbtreeV56V40EAabstV40ACfaLeafainfix =V58V40Oainfix =V57V40aNodewVwwVV0ainfix &lt;V38V1iamemtV0V61V62ainfix =V62V2ainfix =V61V1qamemtV60V61V62FAamemtV60V1V2AarbtreeV63V60ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV63V60IarbtreeV63V0FAabstV60IiamemtV40V64V65OamemtV59V64V65ainfix =V65V39ainfix =V64V38qamemtV60V64V65FAarbtreeainfix +V66c1V60IarbtreeV66V40Iaalmost_rbtreeV66V59FAabstV60FAabstV40AabstV59Aagt_treeV38V40Aalt_treeV38V59IiamemtV37V67V68ainfix =V68V2ainfix =V67V1qamemtV59V67V68FAamemtV59V1V2AarbtreeV69V59ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV37Aaalmost_rbtreeV69V59IarbtreeV69V37FAabstV59FAarbtreeV70V37EAabstV37ACfaLeafainfix =V72V37Oainfix =V71V37aNodewVwwVV0ainfix &lt;V1V38aNodeaBlackVVVVV0IarbtreeV73V0EAabstV0F">
+    sum="17b7630fb81c79a4531c8d55a31b5761">
     <label name="expl:VC for insert"/>
-    <transf name="split_goal"
-     proved="true">
+    <transf
+     name="split_goal">
      <goal name="WP_parameter insert.1" expl="1. postcondition"
-      sum="801ccda575b9e05ff3848fe8fd700917" proved="true"
-      shape="postconditionCiamemtV0V4V5ainfix =V5V2ainfix =V4V1qamemtV3V4V5FAamemtV3V1V2AarbtreeV6V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV6V3IarbtreeV6V0FAabstV3LaNodeaRedaLeafV1V2aLeafaLeaftaNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV15V0EAabstV0F">
+      sum="801ccda575b9e05ff3848fe8fd700917">
       <label name="expl:VC for insert"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.04"/>
@@ -1561,16 +1501,14 @@
       </proof>
      </goal>
      <goal name="WP_parameter insert.2" expl="2. variant decrease"
-      sum="7a7b65350a9ac06cce4b1a552239359d" proved="true"
-      shape="variant decreaseCtaLeafCfaLeafainfix =V8V3Oainfix =V7V3aNodewVwwVV0Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV13V0EAabstV0F">
+      sum="7a7b65350a9ac06cce4b1a552239359d">
       <label name="expl:VC for insert"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter insert.3" expl="3. precondition"
-      sum="eec20defca855501d8591748aa06b647" proved="true"
-      shape="preconditionCtaLeafarbtreeV7V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV12V0EAabstV0F">
+      sum="eec20defca855501d8591748aa06b647">
       <label name="expl:VC for insert"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
@@ -1583,22 +1521,19 @@
       </proof>
      </goal>
      <goal name="WP_parameter insert.4" expl="4. postcondition"
-      sum="1af412a8ec959a2a55dd55ac228e16de" proved="true"
-      shape="postconditionCtaLeafiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV8V9V10FAamemtV8V1V2AarbtreeV11V8ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV11V8IarbtreeV11V0FAabstV8LaNodeaRedV7V4V5V6IiamemtV3V12V13ainfix =V13V2ainfix =V12V1qamemtV7V12V13FAamemtV7V1V2AarbtreeV14V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV3Aaalmost_rbtreeV14V7IarbtreeV14V3FAabstV7FIarbtreeV15V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV20V0EAabstV0F">
+      sum="1af412a8ec959a2a55dd55ac228e16de">
       <label name="expl:VC for insert"/>
-      <transf name="split_goal"
-       proved="true">
+      <transf
+       name="split_goal">
        <goal name="WP_parameter insert.4.1" expl="1."
-        sum="928924f0b965baabfc6d3f7b1fd4f714" proved="true"
-        shape="CtaLeafabstV8LaNodeaRedV7V4V5V6IiamemtV3V9V10ainfix =V10V2ainfix =V9V1qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV3Aaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV17V0EAabstV0F">
+        sum="928924f0b965baabfc6d3f7b1fd4f714">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal name="WP_parameter insert.4.2" expl="2."
-        sum="5b6b03d5d6a3e87d02947a5f8a688ebd" proved="true"
-        shape="CtaLeafaalmost_rbtreeV9V8IarbtreeV9V0FLaNodeaRedV7V4V5V6IiamemtV3V10V11ainfix =V11V2ainfix =V10V1qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV3Aaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV18V0EAabstV0F">
+        sum="5b6b03d5d6a3e87d02947a5f8a688ebd">
         <label name="expl:VC for insert"/>
         <proof prover="1" timelimit="6" memlimit="0">
          <result status="valid" time="0.12"/>
@@ -1608,8 +1543,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.4.3" expl="3."
-        sum="04b22f77e708064e19942a46f799d9aa" proved="true"
-        shape="CtaLeafarbtreeV9V8ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0IarbtreeV9V0FLaNodeaRedV7V4V5V6IiamemtV3V10V11ainfix =V11V2ainfix =V10V1qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV3Aaalmost_rbtreeV12V7IarbtreeV12V3FAabstV7FIarbtreeV13V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV18V0EAabstV0F">
+        sum="04b22f77e708064e19942a46f799d9aa">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.02"/>
@@ -1622,8 +1556,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.4.4" expl="4."
-        sum="a4e46bb78a5fd851a5829aff4711053e" proved="true"
-        shape="CtaLeafamemtV8V1V2LaNodeaRedV7V4V5V6IiamemtV3V9V10ainfix =V10V2ainfix =V9V1qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV3Aaalmost_rbtreeV11V7IarbtreeV11V3FAabstV7FIarbtreeV12V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV17V0EAabstV0F">
+        sum="a4e46bb78a5fd851a5829aff4711053e">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.02"/>
@@ -1636,16 +1569,14 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.4.5" expl="5."
-        sum="86f8c8a60de7c74cf9ac5007da4e4085" proved="true"
-        shape="CtaLeafainfix =V10V2Iainfix =V9V1IamemtV8V9V10FLaNodeaRedV7V4V5V6IiamemtV3V11V12ainfix =V12V2ainfix =V11V1qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV3Aaalmost_rbtreeV13V7IarbtreeV13V3FAabstV7FIarbtreeV14V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV19V0EAabstV0F">
+        sum="86f8c8a60de7c74cf9ac5007da4e4085">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.11"/>
         </proof>
        </goal>
        <goal name="WP_parameter insert.4.6" expl="6."
-        sum="0b4d352d84af89c43e3a507cf5123cf5" proved="true"
-        shape="CtaLeafamemtV0V9V10INainfix =V9V1IamemtV8V9V10FLaNodeaRedV7V4V5V6IiamemtV3V11V12ainfix =V12V2ainfix =V11V1qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV3Aaalmost_rbtreeV13V7IarbtreeV13V3FAabstV7FIarbtreeV14V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV19V0EAabstV0F">
+        sum="0b4d352d84af89c43e3a507cf5123cf5">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.12"/>
@@ -1655,8 +1586,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.4.7" expl="7."
-        sum="0e019bb5d23d2c32c332c2d6eb71b1cd" proved="true"
-        shape="CtaLeafamemtV8V9V10IiamemtV0V9V10ainfix =V10V2ainfix =V9V1FLaNodeaRedV7V4V5V6IiamemtV3V11V12ainfix =V12V2ainfix =V11V1qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV3Aaalmost_rbtreeV13V7IarbtreeV13V3FAabstV7FIarbtreeV14V3EAabstV3Iainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV19V0EAabstV0F">
+        sum="0e019bb5d23d2c32c332c2d6eb71b1cd">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.04"/>
@@ -1668,16 +1598,14 @@
       </transf>
      </goal>
      <goal name="WP_parameter insert.5" expl="5. variant decrease"
-      sum="8d4a1258d89fe8900172fcd467496ebe" proved="true"
-      shape="variant decreaseCtaLeafCfaLeafainfix =V8V6Oainfix =V7V6aNodewVwwVV0Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV13V0EAabstV0F">
+      sum="8d4a1258d89fe8900172fcd467496ebe">
       <label name="expl:VC for insert"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter insert.6" expl="6. precondition"
-      sum="8a3d39d9410cd13c73a076e2c16ddc26" proved="true"
-      shape="preconditionCtaLeafarbtreeV7V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV12V0EAabstV0F">
+      sum="8a3d39d9410cd13c73a076e2c16ddc26">
       <label name="expl:VC for insert"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
@@ -1690,22 +1618,19 @@
       </proof>
      </goal>
      <goal name="WP_parameter insert.7" expl="7. postcondition"
-      sum="556b7d18c7bfff42db1ee976d6bcbe83" proved="true"
-      shape="postconditionCtaLeafiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV8V9V10FAamemtV8V1V2AarbtreeV11V8ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV11V8IarbtreeV11V0FAabstV8LaNodeaRedV3V4V5V7IiamemtV6V12V13ainfix =V13V2ainfix =V12V1qamemtV7V12V13FAamemtV7V1V2AarbtreeV14V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV6Aaalmost_rbtreeV14V7IarbtreeV14V6FAabstV7FIarbtreeV15V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV20V0EAabstV0F">
+      sum="556b7d18c7bfff42db1ee976d6bcbe83">
       <label name="expl:VC for insert"/>
-      <transf name="split_goal"
-       proved="true">
+      <transf
+       name="split_goal">
        <goal name="WP_parameter insert.7.1" expl="1."
-        sum="744cc58318634533960ffaa964106fb5" proved="true"
-        shape="CtaLeafabstV8LaNodeaRedV3V4V5V7IiamemtV6V9V10ainfix =V10V2ainfix =V9V1qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV6Aaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV17V0EAabstV0F">
+        sum="744cc58318634533960ffaa964106fb5">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.05"/>
         </proof>
        </goal>
        <goal name="WP_parameter insert.7.2" expl="2."
-        sum="29b08479cfe9f052b5e28257e7db0f0b" proved="true"
-        shape="CtaLeafaalmost_rbtreeV9V8IarbtreeV9V0FLaNodeaRedV3V4V5V7IiamemtV6V10V11ainfix =V11V2ainfix =V10V1qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV6Aaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV18V0EAabstV0F">
+        sum="29b08479cfe9f052b5e28257e7db0f0b">
         <label name="expl:VC for insert"/>
         <proof prover="1" timelimit="6" memlimit="0">
          <result status="valid" time="0.12"/>
@@ -1715,8 +1640,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.7.3" expl="3."
-        sum="973e9f24941b05cb0ebad31d214ab401" proved="true"
-        shape="CtaLeafarbtreeV9V8ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0IarbtreeV9V0FLaNodeaRedV3V4V5V7IiamemtV6V10V11ainfix =V11V2ainfix =V10V1qamemtV7V10V11FAamemtV7V1V2AarbtreeV12V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV6Aaalmost_rbtreeV12V7IarbtreeV12V6FAabstV7FIarbtreeV13V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV18V0EAabstV0F">
+        sum="973e9f24941b05cb0ebad31d214ab401">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.03"/>
@@ -1729,8 +1653,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.7.4" expl="4."
-        sum="419e2ae19c8c55cc72e148d65e8547e7" proved="true"
-        shape="CtaLeafamemtV8V1V2LaNodeaRedV3V4V5V7IiamemtV6V9V10ainfix =V10V2ainfix =V9V1qamemtV7V9V10FAamemtV7V1V2AarbtreeV11V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV6Aaalmost_rbtreeV11V7IarbtreeV11V6FAabstV7FIarbtreeV12V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV17V0EAabstV0F">
+        sum="419e2ae19c8c55cc72e148d65e8547e7">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.02"/>
@@ -1743,8 +1666,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.7.5" expl="5."
-        sum="4d8e48dd1fcf8c067f1016de26afc632" proved="true"
-        shape="CtaLeafainfix =V10V2Iainfix =V9V1IamemtV8V9V10FLaNodeaRedV3V4V5V7IiamemtV6V11V12ainfix =V12V2ainfix =V11V1qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV6Aaalmost_rbtreeV13V7IarbtreeV13V6FAabstV7FIarbtreeV14V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV19V0EAabstV0F">
+        sum="4d8e48dd1fcf8c067f1016de26afc632">
         <label name="expl:VC for insert"/>
         <proof prover="1" timelimit="10" memlimit="0">
          <result status="valid" time="0.06"/>
@@ -1757,8 +1679,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.7.6" expl="6."
-        sum="cbcf9ef95ab219f226ff0d46cd563843" proved="true"
-        shape="CtaLeafamemtV0V9V10INainfix =V9V1IamemtV8V9V10FLaNodeaRedV3V4V5V7IiamemtV6V11V12ainfix =V12V2ainfix =V11V1qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV6Aaalmost_rbtreeV13V7IarbtreeV13V6FAabstV7FIarbtreeV14V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV19V0EAabstV0F">
+        sum="cbcf9ef95ab219f226ff0d46cd563843">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.12"/>
@@ -1768,8 +1689,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.7.7" expl="7."
-        sum="52269783a4b17c626774f27c12cea6ab" proved="true"
-        shape="CtaLeafamemtV8V9V10IiamemtV0V9V10ainfix =V10V2ainfix =V9V1FLaNodeaRedV3V4V5V7IiamemtV6V11V12ainfix =V12V2ainfix =V11V1qamemtV7V11V12FAamemtV7V1V2AarbtreeV13V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV6Aaalmost_rbtreeV13V7IarbtreeV13V6FAabstV7FIarbtreeV14V6EAabstV6Iainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV19V0EAabstV0F">
+        sum="52269783a4b17c626774f27c12cea6ab">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.04"/>
@@ -1781,24 +1701,21 @@
       </transf>
      </goal>
      <goal name="WP_parameter insert.8" expl="8. postcondition"
-      sum="0626d726771569bcc8c0cc16b6f6f01a" proved="true"
-      shape="postconditionCtaLeafiamemtV0V8V9ainfix =V9V2ainfix =V8V1qamemtV7V8V9FAamemtV7V1V2AarbtreeV10V7ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV10V7IarbtreeV10V0FAabstV7LaNodeaRedV3V4V2V6INainfix &lt;V4V1INainfix &lt;V1V4aNodeaRedVVVVtaNodeaBlackVVVVV0IarbtreeV15V0EAabstV0F">
+      sum="0626d726771569bcc8c0cc16b6f6f01a">
       <label name="expl:VC for insert"/>
       <proof prover="3" memlimit="0">
        <result status="valid" time="0.12"/>
       </proof>
      </goal>
      <goal name="WP_parameter insert.9" expl="9. variant decrease"
-      sum="fcc68ff19bd471539da872241dbeb2e9" proved="true"
-      shape="variant decreaseCtaLeaftaNodeaRedVVVVCfaLeafainfix =V12V7Oainfix =V11V7aNodewVwwVV0Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV13V0EAabstV0F">
+      sum="fcc68ff19bd471539da872241dbeb2e9">
       <label name="expl:VC for insert"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter insert.10" expl="10. precondition"
-      sum="0a62829d5c2224e86c42d2c7e14072e0" proved="true"
-      shape="preconditionCtaLeaftaNodeaRedVVVVarbtreeV11V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV12V0EAabstV0F">
+      sum="0a62829d5c2224e86c42d2c7e14072e0">
       <label name="expl:VC for insert"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
@@ -1811,22 +1728,19 @@
       </proof>
      </goal>
      <goal name="WP_parameter insert.11" expl="11. precondition"
-      sum="2ac00ed89e8d698614d8fd2b23bb7c94" proved="true"
-      shape="preconditionCtaLeaftaNodeaRedVVVVabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV14V11IarbtreeV14V7FAabstV11FIarbtreeV15V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV16V0EAabstV0F">
+      sum="2ac00ed89e8d698614d8fd2b23bb7c94">
       <label name="expl:VC for insert"/>
       <proof prover="3" memlimit="0">
        <result status="valid" time="0.07"/>
       </proof>
      </goal>
      <goal name="WP_parameter insert.12" expl="12. postcondition"
-      sum="10e9d6edfa380948b0ddc569b1f4d1c7" proved="true"
-      shape="postconditionCtaLeaftaNodeaRedVVVViamemtV0V13V14ainfix =V14V2ainfix =V13V1qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12IiamemtV10V16V17OamemtV11V16V17ainfix =V17V9ainfix =V16V8qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V10Iaalmost_rbtreeV18V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V19V20ainfix =V20V2ainfix =V19V1qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV21V11IarbtreeV21V7FAabstV11FIarbtreeV22V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV23V0EAabstV0F">
+      sum="10e9d6edfa380948b0ddc569b1f4d1c7">
       <label name="expl:VC for insert"/>
-      <transf name="split_goal"
-       proved="true">
+      <transf
+       name="split_goal">
        <goal name="WP_parameter insert.12.1" expl="1."
-        sum="21583b62f76a23ad5cbd47ed10c0eced" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVabstV12IiamemtV10V13V14OamemtV11V13V14ainfix =V14V9ainfix =V13V8qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V16V17ainfix =V17V2ainfix =V16V1qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV20V0EAabstV0F">
+        sum="21583b62f76a23ad5cbd47ed10c0eced">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.02"/>
@@ -1839,16 +1753,14 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.12.2" expl="2."
-        sum="90fed25a13ed24f5f0435a5ea64624c6" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiamemtV10V14V15OamemtV11V14V15ainfix =V15V9ainfix =V14V8qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V17V18ainfix =V18V2ainfix =V17V1qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV21V0EAabstV0F">
+        sum="90fed25a13ed24f5f0435a5ea64624c6">
         <label name="expl:VC for insert"/>
         <proof prover="6" timelimit="100" memlimit="0">
          <result status="valid" time="0.12"/>
         </proof>
        </goal>
        <goal name="WP_parameter insert.12.3" expl="3."
-        sum="e76bdc7d8e24789115b84521570bd7c7" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVarbtreeV13V12ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0IarbtreeV13V0FIiamemtV10V14V15OamemtV11V14V15ainfix =V15V9ainfix =V14V8qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V10Iaalmost_rbtreeV16V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V17V18ainfix =V18V2ainfix =V17V1qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV19V11IarbtreeV19V7FAabstV11FIarbtreeV20V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV21V0EAabstV0F">
+        sum="e76bdc7d8e24789115b84521570bd7c7">
         <label name="expl:VC for insert"/>
         <proof prover="0">
          <result status="valid" time="0.02"/>
@@ -1867,8 +1779,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.12.4" expl="4."
-        sum="3dbe639867a4a788d7807f45d8112d2d" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVamemtV12V1V2IiamemtV10V13V14OamemtV11V13V14ainfix =V14V9ainfix =V13V8qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V10Iaalmost_rbtreeV15V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V16V17ainfix =V17V2ainfix =V16V1qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV18V11IarbtreeV18V7FAabstV11FIarbtreeV19V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV20V0EAabstV0F">
+        sum="3dbe639867a4a788d7807f45d8112d2d">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.10"/>
@@ -1881,8 +1792,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.12.5" expl="5."
-        sum="0dbc9122cf001b8cb279b129c3dfbc94" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiamemtV10V15V16OamemtV11V15V16ainfix =V16V9ainfix =V15V8qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V18V19ainfix =V19V2ainfix =V18V1qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV22V0EAabstV0F">
+        sum="0dbc9122cf001b8cb279b129c3dfbc94">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.04"/>
@@ -1895,8 +1805,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.12.6" expl="6."
-        sum="da9616c78bbf2d33743cf0af94521660" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVamemtV0V13V14INainfix =V13V1IamemtV12V13V14FIiamemtV10V15V16OamemtV11V15V16ainfix =V16V9ainfix =V15V8qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V18V19ainfix =V19V2ainfix =V18V1qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV22V0EAabstV0F">
+        sum="da9616c78bbf2d33743cf0af94521660">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.04"/>
@@ -1909,8 +1818,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.12.7" expl="7."
-        sum="53d6d78c1a57c848fbbdee1458837e02" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVamemtV12V13V14IiamemtV0V13V14ainfix =V14V2ainfix =V13V1FIiamemtV10V15V16OamemtV11V15V16ainfix =V16V9ainfix =V15V8qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V10Iaalmost_rbtreeV17V11FAabstV12FIabstV10AabstV11Aagt_treeV8V10Aalt_treeV8V11IiamemtV7V18V19ainfix =V19V2ainfix =V18V1qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV7Aaalmost_rbtreeV20V11IarbtreeV20V7FAabstV11FIarbtreeV21V7EAabstV7Iainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV22V0EAabstV0F">
+        sum="53d6d78c1a57c848fbbdee1458837e02">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.13"/>
@@ -1919,16 +1827,14 @@
       </transf>
      </goal>
      <goal name="WP_parameter insert.13" expl="13. variant decrease"
-      sum="e5401e32ff1c5bc72fd612d976f94803" proved="true"
-      shape="variant decreaseCtaLeaftaNodeaRedVVVVCfaLeafainfix =V12V10Oainfix =V11V10aNodewVwwVV0Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV13V0EAabstV0F">
+      sum="e5401e32ff1c5bc72fd612d976f94803">
       <label name="expl:VC for insert"/>
       <proof prover="9">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter insert.14" expl="14. precondition"
-      sum="38fcb207e71b6e97d67653fe25d3713f" proved="true"
-      shape="preconditionCtaLeaftaNodeaRedVVVVarbtreeV11V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV12V0EAabstV0F">
+      sum="38fcb207e71b6e97d67653fe25d3713f">
       <label name="expl:VC for insert"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.02"/>
@@ -1941,22 +1847,19 @@
       </proof>
      </goal>
      <goal name="WP_parameter insert.15" expl="15. precondition"
-      sum="5889178bd4ba28e57ff41f53a9c5ce4a" proved="true"
-      shape="preconditionCtaLeaftaNodeaRedVVVVabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV14V11IarbtreeV14V10FAabstV11FIarbtreeV15V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV16V0EAabstV0F">
+      sum="5889178bd4ba28e57ff41f53a9c5ce4a">
       <label name="expl:VC for insert"/>
       <proof prover="3" memlimit="0">
        <result status="valid" time="0.07"/>
       </proof>
      </goal>
      <goal name="WP_parameter insert.16" expl="16. postcondition"
-      sum="353c480277b62d5ce69e26c41c1eaf97" proved="true"
-      shape="postconditionCtaLeaftaNodeaRedVVVViamemtV0V13V14ainfix =V14V2ainfix =V13V1qamemtV12V13V14FAamemtV12V1V2AarbtreeV15V12ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV15V12IarbtreeV15V0FAabstV12IiamemtV11V16V17OamemtV7V16V17ainfix =V17V9ainfix =V16V8qamemtV12V16V17FAarbtreeainfix +V18c1V12IarbtreeV18V7Iaalmost_rbtreeV18V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V19V20ainfix =V20V2ainfix =V19V1qamemtV11V19V20FAamemtV11V1V2AarbtreeV21V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV21V11IarbtreeV21V10FAabstV11FIarbtreeV22V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV23V0EAabstV0F">
+      sum="353c480277b62d5ce69e26c41c1eaf97">
       <label name="expl:VC for insert"/>
-      <transf name="split_goal"
-       proved="true">
+      <transf
+       name="split_goal">
        <goal name="WP_parameter insert.16.1" expl="1."
-        sum="4f7bd13ad4857202617ba1c30472ccfd" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVabstV12IiamemtV11V13V14OamemtV7V13V14ainfix =V14V9ainfix =V13V8qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V16V17ainfix =V17V2ainfix =V16V1qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV20V0EAabstV0F">
+        sum="4f7bd13ad4857202617ba1c30472ccfd">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.02"/>
@@ -1969,16 +1872,14 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.16.2" expl="2."
-        sum="f276c07a96420d4a3d5d2d7a08669d93" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVaalmost_rbtreeV13V12IarbtreeV13V0FIiamemtV11V14V15OamemtV7V14V15ainfix =V15V9ainfix =V14V8qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V17V18ainfix =V18V2ainfix =V17V1qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV21V0EAabstV0F">
+        sum="f276c07a96420d4a3d5d2d7a08669d93">
         <label name="expl:VC for insert"/>
         <proof prover="6" timelimit="100" memlimit="0">
          <result status="valid" time="0.10"/>
         </proof>
        </goal>
        <goal name="WP_parameter insert.16.3" expl="3."
-        sum="ae59c0419601f1b517e6bb109f7a65e0" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVarbtreeV13V12ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0IarbtreeV13V0FIiamemtV11V14V15OamemtV7V14V15ainfix =V15V9ainfix =V14V8qamemtV12V14V15FAarbtreeainfix +V16c1V12IarbtreeV16V7Iaalmost_rbtreeV16V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V17V18ainfix =V18V2ainfix =V17V1qamemtV11V17V18FAamemtV11V1V2AarbtreeV19V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV19V11IarbtreeV19V10FAabstV11FIarbtreeV20V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV21V0EAabstV0F">
+        sum="ae59c0419601f1b517e6bb109f7a65e0">
         <label name="expl:VC for insert"/>
         <proof prover="0">
          <result status="valid" time="0.02"/>
@@ -1997,8 +1898,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.16.4" expl="4."
-        sum="ca863372f995fd882a91e90b545a73cb" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVamemtV12V1V2IiamemtV11V13V14OamemtV7V13V14ainfix =V14V9ainfix =V13V8qamemtV12V13V14FAarbtreeainfix +V15c1V12IarbtreeV15V7Iaalmost_rbtreeV15V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V16V17ainfix =V17V2ainfix =V16V1qamemtV11V16V17FAamemtV11V1V2AarbtreeV18V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV18V11IarbtreeV18V10FAabstV11FIarbtreeV19V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV20V0EAabstV0F">
+        sum="ca863372f995fd882a91e90b545a73cb">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.10"/>
@@ -2011,16 +1911,14 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.16.5" expl="5."
-        sum="34302533319a58de1448534355da0fcc" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVainfix =V14V2Iainfix =V13V1IamemtV12V13V14FIiamemtV11V15V16OamemtV7V15V16ainfix =V16V9ainfix =V15V8qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V18V19ainfix =V19V2ainfix =V18V1qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV22V0EAabstV0F">
+        sum="34302533319a58de1448534355da0fcc">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.10"/>
         </proof>
        </goal>
        <goal name="WP_parameter insert.16.6" expl="6."
-        sum="bffb554d5d3c79eb7afd7932c8060369" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVamemtV0V13V14INainfix =V13V1IamemtV12V13V14FIiamemtV11V15V16OamemtV7V15V16ainfix =V16V9ainfix =V15V8qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V18V19ainfix =V19V2ainfix =V18V1qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV22V0EAabstV0F">
+        sum="bffb554d5d3c79eb7afd7932c8060369">
         <label name="expl:VC for insert"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.05"/>
@@ -2033,8 +1931,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter insert.16.7" expl="7."
-        sum="c2f4fa5d41cb64705b99fe69dd68dece" proved="true"
-        shape="CtaLeaftaNodeaRedVVVVamemtV12V13V14IiamemtV0V13V14ainfix =V14V2ainfix =V13V1FIiamemtV11V15V16OamemtV7V15V16ainfix =V16V9ainfix =V15V8qamemtV12V15V16FAarbtreeainfix +V17c1V12IarbtreeV17V7Iaalmost_rbtreeV17V11FAabstV12FIabstV11AabstV7Aagt_treeV8V11Aalt_treeV8V7IiamemtV10V18V19ainfix =V19V2ainfix =V18V1qamemtV11V18V19FAamemtV11V1V2AarbtreeV20V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV10Aaalmost_rbtreeV20V11IarbtreeV20V10FAabstV11FIarbtreeV21V10EAabstV10Iainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV22V0EAabstV0F">
+        sum="c2f4fa5d41cb64705b99fe69dd68dece">
         <label name="expl:VC for insert"/>
         <proof prover="3" memlimit="0">
          <result status="valid" time="0.13"/>
@@ -2043,8 +1940,7 @@
       </transf>
      </goal>
      <goal name="WP_parameter insert.17" expl="17. postcondition"
-      sum="c31437aac2989f31ae9d110f5b91f6c7" proved="true"
-      shape="postconditionCtaLeaftaNodeaRedVVVViamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV11V12V13FAamemtV11V1V2AarbtreeV14V11ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV14V11IarbtreeV14V0FAabstV11LaNodeaBlackV7V8V2V10INainfix &lt;V8V1INainfix &lt;V1V8aNodeaBlackVVVVV0IarbtreeV15V0EAabstV0F">
+      sum="c31437aac2989f31ae9d110f5b91f6c7">
       <label name="expl:VC for insert"/>
       <proof prover="3" memlimit="0">
        <result status="valid" time="0.16"/>
@@ -2053,14 +1949,12 @@
     </transf>
    </goal>
    <goal name="WP_parameter add" expl="VC for add"
-    sum="448cad126d2bff125c08304b844a56f9" proved="true"
-    shape="CiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV8V9V10FAamemtV8V1V2AarbtreeV11V8EAabstV8LaNodeaBlackV4V5V6V7aNodewVVVVfaLeafV3IiamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV3V12V13FAamemtV3V1V2AarbtreeV14V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV14V3IarbtreeV14V0FAabstV3FAarbtreeV15V0EAabstV0IarbtreeV16V0EAabstV0F">
+    sum="448cad126d2bff125c08304b844a56f9">
     <label name="expl:VC for add"/>
-    <transf name="split_goal"
-     proved="true">
+    <transf
+     name="split_goal">
      <goal name="WP_parameter add.1" expl="1. precondition"
-      sum="0c6e37ff4031441f9285084ab8998554" proved="true"
-      shape="preconditionarbtreeV3V0EAabstV0IarbtreeV4V0EAabstV0F">
+      sum="0c6e37ff4031441f9285084ab8998554">
       <label name="expl:VC for add"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.00"/>
@@ -2073,14 +1967,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter add.2" expl="2. postcondition"
-      sum="7a689ae1157ee262ec2dfebc2806a665" proved="true"
-      shape="postconditionCiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV8V9V10FAamemtV8V1V2AarbtreeV11V8EAabstV8LaNodeaBlackV4V5V6V7aNodewVVVVtaLeafV3IiamemtV0V12V13ainfix =V13V2ainfix =V12V1qamemtV3V12V13FAamemtV3V1V2AarbtreeV14V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV14V3IarbtreeV14V0FAabstV3FIarbtreeV15V0EAabstV0IarbtreeV16V0EAabstV0F">
+      sum="7a689ae1157ee262ec2dfebc2806a665">
       <label name="expl:VC for add"/>
-      <transf name="split_goal"
-       proved="true">
+      <transf
+       name="split_goal">
        <goal name="WP_parameter add.2.1" expl="1."
-        sum="91b66e3a65701bd6bdf50b6a540b4007" proved="true"
-        shape="CabstV8LaNodeaBlackV4V5V6V7aNodewVVVVtaLeafV3IiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV3V9V10FAamemtV3V1V2AarbtreeV11V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV11V3IarbtreeV11V0FAabstV3FIarbtreeV12V0EAabstV0IarbtreeV13V0EAabstV0F">
+        sum="91b66e3a65701bd6bdf50b6a540b4007">
         <label name="expl:VC for add"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.00"/>
@@ -2093,16 +1985,14 @@
         </proof>
        </goal>
        <goal name="WP_parameter add.2.2" expl="2."
-        sum="5958872c6d258cd2dfaf59dd18824fc1" proved="true"
-        shape="CarbtreeV9V8ELaNodeaBlackV4V5V6V7aNodewVVVVtaLeafV3IiamemtV0V10V11ainfix =V11V2ainfix =V10V1qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV12V3IarbtreeV12V0FAabstV3FIarbtreeV13V0EAabstV0IarbtreeV14V0EAabstV0F">
+        sum="5958872c6d258cd2dfaf59dd18824fc1">
         <label name="expl:VC for add"/>
-        <transf name="inline_goal"
-         proved="true">
+        <transf
+         name="inline_goal">
          <goal name="WP_parameter add.2.2.1" expl="1."
-          sum="239a0d193d4190f7639dfd2668056020" proved="true"
-          shape="CarbtreeV9V8ELaNodeaBlackV4V5V6V7aNodewVVVVtaLeafV3IiamemtV0V10V11ainfix =V11V2ainfix =V10V1qamemtV3V10V11FAamemtV3V1V2AarbtreeV12V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0ACainfix =V12c0aLeafarbtreeV12V14AarbtreeV12V13aNodeaRedVwwVarbtreeainfix -V12c1V16Aarbtreeainfix -V12c1V15aNodeaBlackVwwVV3IarbtreeV12V0FAabstV3FIarbtreeV17V0EAabstV0IarbtreeV18V0EAabstV0F">
+          sum="239a0d193d4190f7639dfd2668056020">
           <label name="expl:VC for add"/>
-          <proof prover="7"
+          <proof prover="8"
            edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v">
            <result status="valid" time="1.14"/>
           </proof>
@@ -2110,8 +2000,7 @@
         </transf>
        </goal>
        <goal name="WP_parameter add.2.3" expl="3."
-        sum="fdda92451b407ab33941121803fb226b" proved="true"
-        shape="CamemtV8V1V2LaNodeaBlackV4V5V6V7aNodewVVVVtaLeafV3IiamemtV0V9V10ainfix =V10V2ainfix =V9V1qamemtV3V9V10FAamemtV3V1V2AarbtreeV11V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV11V3IarbtreeV11V0FAabstV3FIarbtreeV12V0EAabstV0IarbtreeV13V0EAabstV0F">
+        sum="fdda92451b407ab33941121803fb226b">
         <label name="expl:VC for add"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.02"/>
@@ -2124,8 +2013,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter add.2.4" expl="4."
-        sum="eeee6c7c6bb31cb5c36772c047682520" proved="true"
-        shape="Cainfix =V10V2Iainfix =V9V1IamemtV8V9V10FLaNodeaBlackV4V5V6V7aNodewVVVVtaLeafV3IiamemtV0V11V12ainfix =V12V2ainfix =V11V1qamemtV3V11V12FAamemtV3V1V2AarbtreeV13V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV13V3IarbtreeV13V0FAabstV3FIarbtreeV14V0EAabstV0IarbtreeV15V0EAabstV0F">
+        sum="eeee6c7c6bb31cb5c36772c047682520">
         <label name="expl:VC for add"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.14"/>
@@ -2135,8 +2023,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter add.2.5" expl="5."
-        sum="4ce3edf8043c1fcd479a1cc1ae762bd6" proved="true"
-        shape="CamemtV0V9V10INainfix =V9V1IamemtV8V9V10FLaNodeaBlackV4V5V6V7aNodewVVVVtaLeafV3IiamemtV0V11V12ainfix =V12V2ainfix =V11V1qamemtV3V11V12FAamemtV3V1V2AarbtreeV13V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV13V3IarbtreeV13V0FAabstV3FIarbtreeV14V0EAabstV0IarbtreeV15V0EAabstV0F">
+        sum="4ce3edf8043c1fcd479a1cc1ae762bd6">
         <label name="expl:VC for add"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.01"/>
@@ -2146,8 +2033,7 @@
         </proof>
        </goal>
        <goal name="WP_parameter add.2.6" expl="6."
-        sum="eac30f12bd5a12e7d8b9dd4aba15814f" proved="true"
-        shape="CamemtV8V9V10IiamemtV0V9V10ainfix =V10V2ainfix =V9V1FLaNodeaBlackV4V5V6V7aNodewVVVVtaLeafV3IiamemtV0V11V12ainfix =V12V2ainfix =V11V1qamemtV3V11V12FAamemtV3V1V2AarbtreeV13V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV13V3IarbtreeV13V0FAabstV3FIarbtreeV14V0EAabstV0IarbtreeV15V0EAabstV0F">
+        sum="eac30f12bd5a12e7d8b9dd4aba15814f">
         <label name="expl:VC for add"/>
         <proof prover="1" memlimit="0">
          <result status="valid" time="0.02"/>
@@ -2159,8 +2045,7 @@
       </transf>
      </goal>
      <goal name="WP_parameter add.3" expl="3. unreachable point"
-      sum="a5e479d2802b0f0607af1dd972fdd3d5" proved="true"
-      shape="unreachable pointCtaNodewVVVVfaLeafV3IiamemtV0V8V9ainfix =V9V2ainfix =V8V1qamemtV3V8V9FAamemtV3V1V2AarbtreeV10V3ICfaNodeaRedwwwwtaNodeaBlackwwwwOaLeafV0Aaalmost_rbtreeV10V3IarbtreeV10V0FAabstV3FIarbtreeV11V0EAabstV0IarbtreeV12V0EAabstV0F">
+      sum="a5e479d2802b0f0607af1dd972fdd3d5">
       <label name="expl:VC for add"/>
       <proof prover="1" memlimit="0">
        <result status="valid" time="0.01"/>
@@ -2175,11 +2060,10 @@
     </transf>
    </goal>
   </theory>
-  <theory name="Vacid0"
-   verified="true">
+  <theory
+   name="Vacid0">
    <goal name="WP_parameter create" expl="VC for create"
-    sum="6dbbc59c469f330cc12162bef36aefd7" proved="true"
-    shape="ainfix =V2V0qamemaTuple2V0aLeafV1V2FAainvaTuple2V0aLeafF">
+    sum="6dbbc59c469f330cc12162bef36aefd7">
     <label name="expl:VC for create"/>
     <proof prover="1" memlimit="0">
      <result status="valid" time="0.02"/>
@@ -2192,8 +2076,7 @@
     </proof>
    </goal>
    <goal name="WP_parameter replace" expl="VC for replace"
-    sum="b71b65c37cbb71680d94e40771216ebb" proved="true"
-    shape="iamemaTuple2V0V1V7V8ainfix =V8V3ainfix =V7V2qamemaTuple2V5V6V7V8FAainfix =V5V0AainvaTuple2V5V6Iainfix =V6V4Aainfix =V5V0FIiamemtV1V9V10ainfix =V10V3ainfix =V9V2qamemtV4V9V10FAamemtV4V2V3AarbtreeV11V4EAabstV4FAarbtreeV12V1EAabstV1IainvaTuple2V0V1F">
+    sum="b71b65c37cbb71680d94e40771216ebb">
     <label name="expl:VC for replace"/>
     <proof prover="1" memlimit="0">
      <result status="valid" time="0.04"/>
@@ -2203,8 +2086,7 @@
     </proof>
    </goal>
    <goal name="WP_parameter lookup" expl="VC for lookup"
-    sum="b2c73bdffb2a4d37753c431302eefc64" proved="true"
-    shape="amemaTuple2V0V1V2V0INamemtV1V2V3FAamemaTuple2V0V1V2V4IamemtV1V2V4FAabstV1IainvaTuple2V0V1F">
+    sum="b2c73bdffb2a4d37753c431302eefc64">
     <label name="expl:VC for lookup"/>
     <proof prover="1" memlimit="0">
      <result status="valid" time="0.02"/>
@@ -2217,8 +2099,7 @@
     </proof>
    </goal>
    <goal name="WP_parameter remove" expl="VC for remove"
-    sum="36e710bc74746bfd16325f2d1031c6f1" proved="true"
-    shape="iamemaTuple2V0V1V5V6ainfix =V6V3ainfix =V5V2qamemaTuple2V3V4V5V6FAainfix =V3V0AainvaTuple2V3V4IiamemaTuple2V0V1V7V8ainfix =V8V0ainfix =V7V2qamemaTuple2V3V4V7V8FAainfix =V3V0AainvaTuple2V3V4FAainvaTuple2V0V1IainvaTuple2V0V1F">
+    sum="36e710bc74746bfd16325f2d1031c6f1">
     <label name="expl:VC for remove"/>
     <proof prover="1" memlimit="0">
      <result status="valid" time="0.01"/>

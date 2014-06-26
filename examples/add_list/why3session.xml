@@ -1,159 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
-  name="Z3"
-  version="3.2"/>
- <file
-  name="../add_list.mlw"
-  verified="true"
+ <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+ <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5"
+  memlimit="1000"/>
+ <prover id="2" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+ <file name="../add_list.mlw"
   expanded="true">
-  <theory
-   name="SumList"
-   locfile="../add_list.mlw"
-   loclnum="1" loccnumb="7" loccnume="14"
-   verified="true"
-   expanded="false">
+  <theory name="SumList">
   </theory>
-  <theory
-   name="AddListRec"
-   locfile="../add_list.mlw"
-   loclnum="28" loccnumb="7" loccnume="17"
-   verified="true"
+  <theory name="AddListRec"
    expanded="true">
-   <goal
-    name="WP_parameter sum"
-    locfile="../add_list.mlw"
-    loclnum="32" loccnumb="8" loccnume="11"
-    expl="VC for sum"
+   <goal name="WP_parameter sum" expl="VC for sum"
     sum="0ad629c2956d434cdf621a03e0b7c7ba"
-    proved="true"
-    expanded="true"
-    shape="Cainfix =c0.0aadd_realV0Aainfix =c0aadd_intV0aNilCainfix =V4aadd_realV0Aainfix =ainfix +V5V3aadd_intV0aIntegerVainfix =ainfix +.V6V4aadd_realV0Aainfix =V3aadd_intV0aRealVV1Iainfix =V4aadd_realV2Aainfix =V3aadd_intV2FACfaNilainfix =V7V2aConswVV0aConsVVV0F">
-    <label
-     name="expl:VC for sum"/>
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    expanded="true">
+    <label name="expl:VC for sum"/>
+    <proof prover="0">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="1">
+     <result status="valid" time="0.02"/>
+    </proof>
+    <proof prover="2">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter main"
-    locfile="../add_list.mlw"
-    loclnum="45" loccnumb="4" loccnume="8"
-    expl="VC for main"
+   <goal name="WP_parameter main" expl="VC for main"
     sum="6b4e350cd7d1b4015bab61dc01e96aec"
-    proved="true"
-    expanded="true"
-    shape="ainfix =V2c4.7Aainfix =V1c22Iainfix =V2aadd_realV0Aainfix =V1aadd_intV0FLaConsaIntegerc5aConsaRealc3.3aConsaIntegerc8aConsaRealc1.4aConsaIntegerc9aNil">
-    <label
-     name="expl:VC for main"/>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    expanded="true">
+    <label name="expl:VC for main"/>
+    <proof prover="0">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="2">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
   </theory>
-  <theory
-   name="AddListImp"
-   locfile="../add_list.mlw"
-   loclnum="57" loccnumb="7" loccnume="17"
-   verified="true"
+  <theory name="AddListImp"
    expanded="true">
-   <goal
-    name="WP_parameter sum"
-    locfile="../add_list.mlw"
-    loclnum="64" loccnumb="4" loccnume="7"
-    expl="VC for sum"
+   <goal name="WP_parameter sum" expl="VC for sum"
     sum="82f58e47d4e58d15d59a87efee2a6ad8"
-    proved="true"
-    expanded="true"
-    shape="ifCainfix =V2aadd_realV0Aainfix =V3aadd_intV0aNilCfaNilainfix =V8V7aConswVV1Aainfix =ainfix +.V2aadd_realV7aadd_realV0Aainfix =ainfix +V6aadd_intV7aadd_intV0Iainfix =V7V5FIainfix =V6ainfix +V3V4FaConsaIntegerVVCfaNilainfix =V13V12aConswVV1Aainfix =ainfix +.V11aadd_realV12aadd_realV0Aainfix =ainfix +V3aadd_intV12aadd_intV0Iainfix =V12V10FIainfix =V11ainfix +.V2V9FaConsaRealVVV1tIainfix =ainfix +.V2aadd_realV1aadd_realV0Aainfix =ainfix +V3aadd_intV1aadd_intV0FAainfix =ainfix +.c0.0aadd_realV0aadd_realV0Aainfix =ainfix +c0aadd_intV0aadd_intV0F">
-    <label
-     name="expl:VC for sum"/>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    expanded="true">
+    <label name="expl:VC for sum"/>
+    <proof prover="0">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="2">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter main"
-    locfile="../add_list.mlw"
-    loclnum="88" loccnumb="4" loccnume="8"
-    expl="VC for main"
+   <goal name="WP_parameter main" expl="VC for main"
     sum="9051692e9ac1a4d1f56386a0fd7d440f"
-    proved="true"
-    expanded="true"
-    shape="ainfix =V2c4.7Aainfix =V1c22Iainfix =V2aadd_realV0Aainfix =V1aadd_intV0FLaConsaIntegerc5aConsaRealc3.3aConsaIntegerc8aConsaRealc1.4aConsaIntegerc9aNil">
-    <label
-     name="expl:VC for main"/>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    expanded="true">
+    <label name="expl:VC for main"/>
+    <proof prover="0">
      <result status="valid" time="0.02"/>
     </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    <proof prover="2">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>

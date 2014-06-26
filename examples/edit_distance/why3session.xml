@@ -6,174 +6,162 @@
  <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5"
   memlimit="1000"/>
  <prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
- <prover id="3" name="Coq" version="8.4pl3" timelimit="10" memlimit="1000"/>
- <prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
- <file name="../edit_distance.mlw" verified="true"
+ <prover id="3" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+ <prover id="4" name="Coq" version="8.4pl3" timelimit="10" memlimit="1000"/>
+ <file name="../edit_distance.mlw"
   expanded="true">
-  <theory name="Word" verified="true"
+  <theory name="Word"
    expanded="true">
    <goal name="first_last_explicit" sum="ef8fef3d0c6be2a4be6efc8521f1ff3b"
-    proved="true" expanded="true"
-    shape="ainfix =ainfix ++abut_lastV1V0aConsalast_charV1V0aNilaConsV1V0F">
-    <proof prover="3" memlimit="0"
+    expanded="true">
+    <proof prover="4" memlimit="0"
      edited="edit_distance_Word_first_last_explicit_1.v">
      <result status="valid" time="1.03"/>
     </proof>
    </goal>
    <goal name="first_last" sum="1b2126228b08663c7f44527b4c037835"
-    proved="true" expanded="true"
-    shape="ainfix =alengthV2alengthV1Aainfix =ainfix ++V2aConsV3aNilaConsV0V1EF">
-    <proof prover="3" memlimit="0"
+    expanded="true">
+    <proof prover="4" memlimit="0"
      edited="edit_distance_Word_first_last_1.v">
      <result status="valid" time="1.06"/>
     </proof>
    </goal>
    <goal name="key_lemma_right" sum="eeae6297aa41d70f4ccc9ce1f5f8175c"
-    proved="true" expanded="true"
-    shape="ainfix &lt;=ainfix +V7alengthV5ainfix +V2c1AadistV6V4V7Aainfix =V0ainfix ++V5V6EIainfix =V1aConsV3V4FIadistV0V1V2F">
-    <proof prover="3" memlimit="0"
+    expanded="true">
+    <proof prover="4" memlimit="0"
      edited="edit_distance_Word_key_lemma_right_1.v">
      <result status="valid" time="1.04"/>
     </proof>
    </goal>
    <goal name="dist_symetry" sum="c812c080ec5b9f2b7fdf936910a2abe4"
-    proved="true" expanded="true"
-    shape="adistV1V0V2IadistV0V1V2F">
-    <proof prover="3" memlimit="0"
+    expanded="true">
+    <proof prover="4" memlimit="0"
      edited="edit_distance_Word_dist_symetry_1.v">
      <result status="valid" time="1.07"/>
     </proof>
    </goal>
    <goal name="key_lemma_left" sum="a4945a600bf2ef685947b0e588c68a95"
-    proved="true" expanded="true"
-    shape="ainfix &lt;=ainfix +V6alengthV4ainfix +V2c1AadistV0V5V6Aainfix =V1ainfix ++V4V5EIadistaConsV3V0V1V2F">
+    expanded="true">
     <proof prover="2">
      <result status="valid" time="0.06"/>
     </proof>
    </goal>
    <goal name="dist_concat_left" sum="8f257b4ea964f1dca5c4e1925be8e3ed"
-    proved="true" expanded="true"
-    shape="adistainfix ++V0V1V2ainfix +alengthV0V3IadistV1V2V3F">
-    <proof prover="3" memlimit="0"
+    expanded="true">
+    <proof prover="4" memlimit="0"
      edited="edit_distance_Word_dist_concat_left_1.v">
      <result status="valid" time="1.05"/>
     </proof>
    </goal>
    <goal name="dist_concat_right" sum="ebdd60377098c02614b414973d17cab9"
-    proved="true" expanded="true"
-    shape="adistV1ainfix ++V0V2ainfix +alengthV0V3IadistV1V2V3F">
+    expanded="true">
     <proof prover="1" timelimit="30" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="min_dist_equal" sum="e3ad8c244250562ab941bfc83925d902"
-    proved="true" expanded="true"
-    shape="amin_distaConsV2V0aConsV2V1V3Iamin_distV0V1V3F">
-    <proof prover="3" memlimit="0"
+    expanded="true">
+    <proof prover="4" memlimit="0"
      edited="edit_distance_Word_min_dist_equal_1.v">
      <result status="valid" time="1.13"/>
     </proof>
    </goal>
    <goal name="min_dist_diff" sum="dd162f041e0b2830366c3b3a1cee8080"
-    proved="true" expanded="true"
-    shape="amin_distaConsV2V0aConsV3V1ainfix +aminV4V5c1Iamin_distV0aConsV3V1V4Iamin_distaConsV2V0V1V5INainfix =V2V3F">
-    <proof prover="3" memlimit="0"
+    expanded="true">
+    <proof prover="4" memlimit="0"
      edited="edit_distance_Word_min_dist_diff_1.v">
      <result status="valid" time="1.13"/>
     </proof>
    </goal>
    <goal name="min_dist_eps" sum="bac860b2a90b2196c959e223817ae07e"
-    proved="true" expanded="true"
-    shape="amin_distaConsV1V0aNilainfix +V2c1Iamin_distV0aNilV2F">
-    <proof prover="3" timelimit="20" memlimit="0"
+    expanded="true">
+    <proof prover="4" timelimit="20" memlimit="0"
      edited="edit_distance_Word_min_dist_eps_1.v">
      <result status="valid" time="1.07"/>
     </proof>
    </goal>
    <goal name="min_dist_eps_length" sum="763e8b6a4b20a14c39bcad7665c720cd"
-    proved="true" expanded="true"
-    shape="amin_distaNilV0alengthV0F">
-    <proof prover="3" timelimit="20" memlimit="0"
+    expanded="true">
+    <proof prover="4" timelimit="20" memlimit="0"
      edited="edit_distance_Word_min_dist_eps_length_1.v">
      <result status="valid" time="1.08"/>
     </proof>
    </goal>
   </theory>
-  <theory name="EditDistance" verified="true"
+  <theory name="EditDistance"
    expanded="true">
    <goal name="suffix_length" sum="5c15e5b71772dae33bc2a57261088de0"
-    proved="true" expanded="true"
-    shape="ainfix =alengthasuffixV0V1ainfix -alengthV0V1Iainfix &lt;=V1alengthV0Aainfix &lt;=c0V1F">
-    <proof prover="3" timelimit="20" memlimit="0"
+    expanded="true">
+    <proof prover="4" timelimit="20" memlimit="0"
      edited="edit_distance_WP_EditDistance_suffix_length_1.v">
      <result status="valid" time="1.16"/>
     </proof>
    </goal>
    <goal name="WP_parameter distance" expl="VC for distance"
-    sum="991a5a46a1eb5137b90bc865bdb958a0" proved="true" expanded="true"
-    shape="amin_distasuffixV5c0asuffixV4c0agetV9c0Aainfix &lt;c0V6Aainfix &lt;=c0c0Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +ainfix -c0c1c1asuffixV4V10agetV9V10Iainfix &lt;=V10V2Aainfix &lt;=c0V10FAamin_distasuffixV5ainfix +ainfix -V11c1c1asuffixV4V16agetV15V16Iainfix &lt;=V16V2Aainfix &lt;=c0V16FIamin_distasuffixV5ainfix +V11c1asuffixV4ainfix +ainfix -c0c1c1V14Aamin_distasuffixV5ainfix +V11c1asuffixV4V17agetV15V17Iainfix &lt;=V17ainfix -c0c1Aainfix &lt;=c0V17FAamin_distasuffixV5V11asuffixV4V18agetV15V18Iainfix &lt;=V18V2Aainfix &lt;ainfix -c0c1V18FAiamin_distasuffixV5ainfix +V11c1asuffixV4ainfix +ainfix -V19c1c1V20Aamin_distasuffixV5ainfix +V11c1asuffixV4V23agetV22V23Iainfix &lt;=V23ainfix -V19c1Aainfix &lt;=c0V23FAamin_distasuffixV5V11asuffixV4V24agetV22V24Iainfix &lt;=V24V2Aainfix &lt;ainfix -V19c1V24FIainfix =V22asetV15V19ainfix +aminagetV15V19agetV15V21c1Aainfix &lt;=c0V6FAainfix &lt;V19V6Aainfix &lt;=c0V19Aainfix &lt;V19V6Aainfix &lt;=c0V19Aainfix &lt;V21V6Aainfix &lt;=c0V21Lainfix +V19c1amin_distasuffixV5ainfix +V11c1asuffixV4ainfix +ainfix -V19c1c1V20Aamin_distasuffixV5ainfix +V11c1asuffixV4V26agetV25V26Iainfix &lt;=V26ainfix -V19c1Aainfix &lt;=c0V26FAamin_distasuffixV5V11asuffixV4V27agetV25V27Iainfix &lt;=V27V2Aainfix &lt;ainfix -V19c1V27FIainfix =V25asetV15V19V14Aainfix &lt;=c0V6FAainfix &lt;V19V6Aainfix &lt;=c0V19ainfix =agetV1V11agetV3V19Aainfix &lt;V11V0Aainfix &lt;=c0V11Aainfix &lt;V19V2Aainfix &lt;=c0V19Iainfix =V20agetV15V19FAainfix &lt;V19V6Aainfix &lt;=c0V19Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V11c1asuffixV4ainfix +V19c1V14Aamin_distasuffixV5ainfix +V11c1asuffixV4V28agetV15V28Iainfix &lt;=V28V19Aainfix &lt;=c0V28FAamin_distasuffixV5V11asuffixV4V29agetV15V29Iainfix &lt;=V29V2Aainfix &lt;V19V29FIainfix &gt;=V19c0Aainfix &gt;=V13V19FFAamin_distasuffixV5ainfix +V11c1asuffixV4ainfix +V13c1agetV9V2Aamin_distasuffixV5ainfix +V11c1asuffixV4V30agetV12V30Iainfix &lt;=V30V13Aainfix &lt;=c0V30FAamin_distasuffixV5V11asuffixV4V31agetV12V31Iainfix &lt;=V31V2Aainfix &lt;V13V31FIainfix &gt;=V13c0Aamin_distasuffixV5ainfix +ainfix -V11c1c1asuffixV4V32agetV12V32Iainfix &lt;=V32V2Aainfix &lt;=c0V32FIainfix &lt;V13c0Lainfix -V2c1Iainfix =V12asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FAainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V11c1asuffixV4V33agetV9V33Iainfix &lt;=V33V2Aainfix &lt;=c0V33FIainfix &gt;=V11c0Aainfix &gt;=V8V11FFAamin_distasuffixV5ainfix +V8c1asuffixV4V34agetV7V34Iainfix &lt;=V34V2Aainfix &lt;=c0V34FIainfix &gt;=V8c0Aamin_distasuffixV5c0asuffixV4c0agetV7c0Aainfix &lt;c0V6Aainfix &lt;=c0c0Aainfix &lt;=c0V6Iainfix &lt;V8c0Lainfix -V0c1Iainfix =agetV7V35ainfix -V2V35Iainfix &lt;V35ainfix +V2c1Aainfix &lt;=c0V35FAainfix =agetV37V38ainfix -V2V38Iainfix &lt;V38ainfix +V36c1Aainfix &lt;=c0V38FIainfix =V37asetV7V36ainfix -V2V36Aainfix &lt;=c0V6FAainfix &lt;V36V6Aainfix &lt;=c0V36Aainfix &lt;=c0V6Iainfix =agetV7V39ainfix -V2V39Iainfix &lt;V39V36Aainfix &lt;=c0V39FIainfix &lt;=V36V2Aainfix &lt;=c0V36FFAainfix =agetaconstc0V40ainfix -V2V40Iainfix &lt;V40c0Aainfix &lt;=c0V40FIainfix &lt;=c0V2Aamin_distasuffixV5c0asuffixV4c0agetV42c0Aainfix &lt;c0V6Aainfix &lt;=c0c0Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +ainfix -c0c1c1asuffixV4V43agetV42V43Iainfix &lt;=V43V2Aainfix &lt;=c0V43FAamin_distasuffixV5ainfix +ainfix -V44c1c1asuffixV4V49agetV48V49Iainfix &lt;=V49V2Aainfix &lt;=c0V49FIamin_distasuffixV5ainfix +V44c1asuffixV4ainfix +ainfix -c0c1c1V47Aamin_distasuffixV5ainfix +V44c1asuffixV4V50agetV48V50Iainfix &lt;=V50ainfix -c0c1Aainfix &lt;=c0V50FAamin_distasuffixV5V44asuffixV4V51agetV48V51Iainfix &lt;=V51V2Aainfix &lt;ainfix -c0c1V51FAiamin_distasuffixV5ainfix +V44c1asuffixV4ainfix +ainfix -V52c1c1V53Aamin_distasuffixV5ainfix +V44c1asuffixV4V56agetV55V56Iainfix &lt;=V56ainfix -V52c1Aainfix &lt;=c0V56FAamin_distasuffixV5V44asuffixV4V57agetV55V57Iainfix &lt;=V57V2Aainfix &lt;ainfix -V52c1V57FIainfix =V55asetV48V52ainfix +aminagetV48V52agetV48V54c1Aainfix &lt;=c0V6FAainfix &lt;V52V6Aainfix &lt;=c0V52Aainfix &lt;V52V6Aainfix &lt;=c0V52Aainfix &lt;V54V6Aainfix &lt;=c0V54Lainfix +V52c1amin_distasuffixV5ainfix +V44c1asuffixV4ainfix +ainfix -V52c1c1V53Aamin_distasuffixV5ainfix +V44c1asuffixV4V59agetV58V59Iainfix &lt;=V59ainfix -V52c1Aainfix &lt;=c0V59FAamin_distasuffixV5V44asuffixV4V60agetV58V60Iainfix &lt;=V60V2Aainfix &lt;ainfix -V52c1V60FIainfix =V58asetV48V52V47Aainfix &lt;=c0V6FAainfix &lt;V52V6Aainfix &lt;=c0V52ainfix =agetV1V44agetV3V52Aainfix &lt;V44V0Aainfix &lt;=c0V44Aainfix &lt;V52V2Aainfix &lt;=c0V52Iainfix =V53agetV48V52FAainfix &lt;V52V6Aainfix &lt;=c0V52Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V44c1asuffixV4ainfix +V52c1V47Aamin_distasuffixV5ainfix +V44c1asuffixV4V61agetV48V61Iainfix &lt;=V61V52Aainfix &lt;=c0V61FAamin_distasuffixV5V44asuffixV4V62agetV48V62Iainfix &lt;=V62V2Aainfix &lt;V52V62FIainfix &gt;=V52c0Aainfix &gt;=V46V52FFAamin_distasuffixV5ainfix +V44c1asuffixV4ainfix +V46c1agetV42V2Aamin_distasuffixV5ainfix +V44c1asuffixV4V63agetV45V63Iainfix &lt;=V63V46Aainfix &lt;=c0V63FAamin_distasuffixV5V44asuffixV4V64agetV45V64Iainfix &lt;=V64V2Aainfix &lt;V46V64FIainfix &gt;=V46c0Aamin_distasuffixV5ainfix +ainfix -V44c1c1asuffixV4V65agetV45V65Iainfix &lt;=V65V2Aainfix &lt;=c0V65FIainfix &lt;V46c0Lainfix -V2c1Iainfix =V45asetV42V2ainfix +agetV42V2c1Aainfix &lt;=c0V6FAainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V44c1asuffixV4V66agetV42V66Iainfix &lt;=V66V2Aainfix &lt;=c0V66FIainfix &gt;=V44c0Aainfix &gt;=V41V44FFAamin_distasuffixV5ainfix +V41c1asuffixV4V67agetaconstc0V67Iainfix &lt;=V67V2Aainfix &lt;=c0V67FIainfix &gt;=V41c0Aamin_distasuffixV5c0asuffixV4c0agetaconstc0c0Aainfix &lt;c0V6Aainfix &lt;=c0c0Iainfix &lt;V41c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Aainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+    sum="991a5a46a1eb5137b90bc865bdb958a0"
+    expanded="true">
     <label name="expl:VC for distance"/>
-    <transf name="split_goal" proved="true"
+    <transf name="split_goal"
      expanded="true">
      <goal name="WP_parameter distance.1" expl="1. array creation size"
-      sum="75f603354f544c1bc4f919e257af6632" proved="true" expanded="true"
-      shape="array creation sizeainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="75f603354f544c1bc4f919e257af6632"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.2" expl="2. index in array bounds"
-      sum="9701f402862e955f050eab487a1b8b9f" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c0V6Aainfix &lt;=c0c0Iainfix &lt;V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="9701f402862e955f050eab487a1b8b9f"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.3" expl="3. postcondition"
-      sum="4778736819457f9fe5c82d0ec349180d" proved="true" expanded="true"
-      shape="postconditionamin_distasuffixV5c0asuffixV4c0agetaconstc0c0Iainfix &lt;c0V6Aainfix &lt;=c0c0Iainfix &lt;V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="4778736819457f9fe5c82d0ec349180d"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.4" expl="4. loop invariant init"
-      sum="81f68c7210a7183649376e4a68cd99fa" proved="true" expanded="true"
-      shape="loop invariant initamin_distasuffixV5ainfix +V7c1asuffixV4V8agetaconstc0V8Iainfix &lt;=V8V2Aainfix &lt;=c0V8FIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="81f68c7210a7183649376e4a68cd99fa"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.5" expl="5. type invariant"
-      sum="5098adef2d732c028e6a7712a7988bce" proved="true" expanded="true"
-      shape="type invariantainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V10agetV8V10Iainfix &lt;=V10V2Aainfix &lt;=c0V10FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="5098adef2d732c028e6a7712a7988bce"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.6" expl="6. index in array bounds"
-      sum="0d27f26d3c11737f4af991f10ddb4135" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V10agetV8V10Iainfix &lt;=V10V2Aainfix &lt;=c0V10FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="0d27f26d3c11737f4af991f10ddb4135"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.7" expl="7. index in array bounds"
-      sum="f749fe3219fb9394f7fa8c39fb0adfea" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V10agetV8V10Iainfix &lt;=V10V2Aainfix &lt;=c0V10FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="f749fe3219fb9394f7fa8c39fb0adfea"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.8" expl="8. index in array bounds"
-      sum="538035c68e29c353a710268186841d5f" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V10agetV8V10Iainfix &lt;=V10V2Aainfix &lt;=c0V10FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="538035c68e29c353a710268186841d5f"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -181,24 +169,24 @@
      </goal>
      <goal name="WP_parameter distance.9"
       expl="9. loop invariant preservation"
-      sum="9f2ecd62571fba67dad8c541c303b5d1" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +ainfix -V9c1c1asuffixV4V12agetV10V12Iainfix &lt;=V12V2Aainfix &lt;=c0V12FIainfix &lt;V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V13agetV8V13Iainfix &lt;=V13V2Aainfix &lt;=c0V13FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="9f2ecd62571fba67dad8c541c303b5d1"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.10" expl="10. loop invariant init"
-      sum="e2df7d3ba515394bde8773ade0b4ef9d" proved="true" expanded="true"
-      shape="loop invariant initamin_distasuffixV5V9asuffixV4V12agetV10V12Iainfix &lt;=V12V2Aainfix &lt;V11V12FIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V13agetV8V13Iainfix &lt;=V13V2Aainfix &lt;=c0V13FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="e2df7d3ba515394bde8773ade0b4ef9d"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.11" expl="11. loop invariant init"
-      sum="0e093420a6b6025c2263c2fdc0ddee35" proved="true" expanded="true"
-      shape="loop invariant initamin_distasuffixV5ainfix +V9c1asuffixV4V12agetV10V12Iainfix &lt;=V12V11Aainfix &lt;=c0V12FIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V13agetV8V13Iainfix &lt;=V13V2Aainfix &lt;=c0V13FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="0e093420a6b6025c2263c2fdc0ddee35"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="0">
        <result status="valid" time="0.03"/>
@@ -206,53 +194,53 @@
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="4">
+      <proof prover="3">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.12" expl="12. loop invariant init"
-      sum="329eb95b535fa386917c0583c0065d63" proved="true" expanded="true"
-      shape="loop invariant initamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V11c1agetV8V2Iainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V12agetV8V12Iainfix &lt;=V12V2Aainfix &lt;=c0V12FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="329eb95b535fa386917c0583c0065d63"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.13" expl="13. type invariant"
-      sum="1c73d961958bd88d748973652e83b3c3" proved="true" expanded="true"
-      shape="type invariantainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V15agetV13V15Iainfix &lt;=V15V14Aainfix &lt;=c0V15FAamin_distasuffixV5V9asuffixV4V16agetV13V16Iainfix &lt;=V16V2Aainfix &lt;V14V16FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V17agetV8V17Iainfix &lt;=V17V2Aainfix &lt;=c0V17FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="1c73d961958bd88d748973652e83b3c3"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.14" expl="14. index in array bounds"
-      sum="df533763d4d61bfa02879d9cc6e1ddde" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V15agetV13V15Iainfix &lt;=V15V14Aainfix &lt;=c0V15FAamin_distasuffixV5V9asuffixV4V16agetV13V16Iainfix &lt;=V16V2Aainfix &lt;V14V16FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V17agetV8V17Iainfix &lt;=V17V2Aainfix &lt;=c0V17FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="df533763d4d61bfa02879d9cc6e1ddde"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.15" expl="15. index in array bounds"
-      sum="03235be3d0288d1a1bd0f932f477a8aa" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V16agetV13V16Iainfix &lt;=V16V14Aainfix &lt;=c0V16FAamin_distasuffixV5V9asuffixV4V17agetV13V17Iainfix &lt;=V17V2Aainfix &lt;V14V17FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V18agetV8V18Iainfix &lt;=V18V2Aainfix &lt;=c0V18FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="03235be3d0288d1a1bd0f932f477a8aa"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.16" expl="16. index in array bounds"
-      sum="f428df9691fb6282d50bf75ea113083e" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V16agetV13V16Iainfix &lt;=V16V14Aainfix &lt;=c0V16FAamin_distasuffixV5V9asuffixV4V17agetV13V17Iainfix &lt;=V17V2Aainfix &lt;V14V17FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V18agetV8V18Iainfix &lt;=V18V2Aainfix &lt;=c0V18FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="f428df9691fb6282d50bf75ea113083e"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.17" expl="17. index in array bounds"
-      sum="59680c59574dd1618643d96f1f45e163" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V16agetV13V16Iainfix &lt;=V16V14Aainfix &lt;=c0V16FAamin_distasuffixV5V9asuffixV4V17agetV13V17Iainfix &lt;=V17V2Aainfix &lt;V14V17FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V18agetV8V18Iainfix &lt;=V18V2Aainfix &lt;=c0V18FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="59680c59574dd1618643d96f1f45e163"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -260,8 +248,8 @@
      </goal>
      <goal name="WP_parameter distance.18"
       expl="18. loop invariant preservation"
-      sum="11ffe18f291f0d8eff93db0471eb7a37" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5V9asuffixV4V17agetV16V17Iainfix &lt;=V17V2Aainfix &lt;ainfix -V14c1V17FIainfix =V16asetV13V14V12Aainfix &lt;=c0V6FIainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V18agetV13V18Iainfix &lt;=V18V14Aainfix &lt;=c0V18FAamin_distasuffixV5V9asuffixV4V19agetV13V19Iainfix &lt;=V19V2Aainfix &lt;V14V19FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V20agetV8V20Iainfix &lt;=V20V2Aainfix &lt;=c0V20FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="11ffe18f291f0d8eff93db0471eb7a37"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -269,8 +257,8 @@
      </goal>
      <goal name="WP_parameter distance.19"
       expl="19. loop invariant preservation"
-      sum="56b14bf1ec0bf5f507786c38c8e45c2e" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +V9c1asuffixV4V17agetV16V17Iainfix &lt;=V17ainfix -V14c1Aainfix &lt;=c0V17FIainfix =V16asetV13V14V12Aainfix &lt;=c0V6FIainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V18agetV13V18Iainfix &lt;=V18V14Aainfix &lt;=c0V18FAamin_distasuffixV5V9asuffixV4V19agetV13V19Iainfix &lt;=V19V2Aainfix &lt;V14V19FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V20agetV8V20Iainfix &lt;=V20V2Aainfix &lt;=c0V20FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="56b14bf1ec0bf5f507786c38c8e45c2e"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -278,32 +266,32 @@
      </goal>
      <goal name="WP_parameter distance.20"
       expl="20. loop invariant preservation"
-      sum="38c4df8d7b18cf424cda6c9a8c2bde6e" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +ainfix -V14c1c1V15Iainfix =V16asetV13V14V12Aainfix &lt;=c0V6FIainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V17agetV13V17Iainfix &lt;=V17V14Aainfix &lt;=c0V17FAamin_distasuffixV5V9asuffixV4V18agetV13V18Iainfix &lt;=V18V2Aainfix &lt;V14V18FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V19agetV8V19Iainfix &lt;=V19V2Aainfix &lt;=c0V19FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="38c4df8d7b18cf424cda6c9a8c2bde6e"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.21" expl="21. index in array bounds"
-      sum="712f283a807eaf9fed86e2131dc1a778" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V16V6Aainfix &lt;=c0V16Lainfix +V14c1INainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V17agetV13V17Iainfix &lt;=V17V14Aainfix &lt;=c0V17FAamin_distasuffixV5V9asuffixV4V18agetV13V18Iainfix &lt;=V18V2Aainfix &lt;V14V18FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V19agetV8V19Iainfix &lt;=V19V2Aainfix &lt;=c0V19FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="712f283a807eaf9fed86e2131dc1a778"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.22" expl="22. index in array bounds"
-      sum="66625d90ceca7942e1851e46abc47a5f" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;V16V6Aainfix &lt;=c0V16Lainfix +V14c1INainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V17agetV13V17Iainfix &lt;=V17V14Aainfix &lt;=c0V17FAamin_distasuffixV5V9asuffixV4V18agetV13V18Iainfix &lt;=V18V2Aainfix &lt;V14V18FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V19agetV8V19Iainfix &lt;=V19V2Aainfix &lt;=c0V19FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="66625d90ceca7942e1851e46abc47a5f"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.23" expl="23. index in array bounds"
-      sum="41f6fe0547defab9f762201a9235bb78" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;V16V6Aainfix &lt;=c0V16Lainfix +V14c1INainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V17agetV13V17Iainfix &lt;=V17V14Aainfix &lt;=c0V17FAamin_distasuffixV5V9asuffixV4V18agetV13V18Iainfix &lt;=V18V2Aainfix &lt;V14V18FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V19agetV8V19Iainfix &lt;=V19V2Aainfix &lt;=c0V19FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="41f6fe0547defab9f762201a9235bb78"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.01"/>
@@ -311,8 +299,8 @@
      </goal>
      <goal name="WP_parameter distance.24"
       expl="24. loop invariant preservation"
-      sum="d77bc0712f0db412310a2c20494997a2" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5V9asuffixV4V18agetV17V18Iainfix &lt;=V18V2Aainfix &lt;ainfix -V14c1V18FIainfix =V17asetV13V14ainfix +aminagetV13V14agetV13V16c1Aainfix &lt;=c0V6FIainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;V16V6Aainfix &lt;=c0V16Lainfix +V14c1INainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V19agetV13V19Iainfix &lt;=V19V14Aainfix &lt;=c0V19FAamin_distasuffixV5V9asuffixV4V20agetV13V20Iainfix &lt;=V20V2Aainfix &lt;V14V20FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V21agetV8V21Iainfix &lt;=V21V2Aainfix &lt;=c0V21FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="d77bc0712f0db412310a2c20494997a2"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="10">
        <result status="valid" time="0.02"/>
@@ -320,8 +308,8 @@
      </goal>
      <goal name="WP_parameter distance.25"
       expl="25. loop invariant preservation"
-      sum="50527861124aed6d8930eb50d1628b4b" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +V9c1asuffixV4V18agetV17V18Iainfix &lt;=V18ainfix -V14c1Aainfix &lt;=c0V18FIainfix =V17asetV13V14ainfix +aminagetV13V14agetV13V16c1Aainfix &lt;=c0V6FIainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;V16V6Aainfix &lt;=c0V16Lainfix +V14c1INainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V19agetV13V19Iainfix &lt;=V19V14Aainfix &lt;=c0V19FAamin_distasuffixV5V9asuffixV4V20agetV13V20Iainfix &lt;=V20V2Aainfix &lt;V14V20FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V21agetV8V21Iainfix &lt;=V21V2Aainfix &lt;=c0V21FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="50527861124aed6d8930eb50d1628b4b"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -329,8 +317,8 @@
      </goal>
      <goal name="WP_parameter distance.26"
       expl="26. loop invariant preservation"
-      sum="80f0f873815562c285d6714b5b288ccb" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +ainfix -V14c1c1V15Iainfix =V17asetV13V14ainfix +aminagetV13V14agetV13V16c1Aainfix &lt;=c0V6FIainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;V14V6Aainfix &lt;=c0V14Iainfix &lt;V16V6Aainfix &lt;=c0V16Lainfix +V14c1INainfix =agetV1V9agetV3V14Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;V14V2Aainfix &lt;=c0V14Iainfix =V15agetV13V14FIainfix &lt;V14V6Aainfix &lt;=c0V14Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +V14c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V18agetV13V18Iainfix &lt;=V18V14Aainfix &lt;=c0V18FAamin_distasuffixV5V9asuffixV4V19agetV13V19Iainfix &lt;=V19V2Aainfix &lt;V14V19FIainfix &gt;=V14c0Aainfix &gt;=V11V14FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V20agetV8V20Iainfix &lt;=V20V2Aainfix &lt;=c0V20FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="80f0f873815562c285d6714b5b288ccb"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.02"/>
@@ -338,56 +326,56 @@
      </goal>
      <goal name="WP_parameter distance.27"
       expl="27. loop invariant preservation"
-      sum="e10c16a51dee7cd7cf71c4c10ffaecdf" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +ainfix -V9c1c1asuffixV4V14agetV13V14Iainfix &lt;=V14V2Aainfix &lt;=c0V14FIamin_distasuffixV5ainfix +V9c1asuffixV4ainfix +ainfix -c0c1c1V12Aamin_distasuffixV5ainfix +V9c1asuffixV4V15agetV13V15Iainfix &lt;=V15ainfix -c0c1Aainfix &lt;=c0V15FAamin_distasuffixV5V9asuffixV4V16agetV13V16Iainfix &lt;=V16V2Aainfix &lt;ainfix -c0c1V16FFIainfix &gt;=V11c0Lainfix -V2c1Iainfix =V10asetV8V2ainfix +agetV8V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V9c1asuffixV4V17agetV8V17Iainfix &lt;=V17V2Aainfix &lt;=c0V17FIainfix &gt;=V9c0Aainfix &gt;=V7V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="e10c16a51dee7cd7cf71c4c10ffaecdf"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.28" expl="28. type invariant"
-      sum="35412ea3229438638d88fcd892a8a35c" proved="true" expanded="true"
-      shape="type invariantainfix &lt;=c0V6Iamin_distasuffixV5ainfix +ainfix -c0c1c1asuffixV4V9agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=c0V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="35412ea3229438638d88fcd892a8a35c"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.29" expl="29. index in array bounds"
-      sum="760c4692a63d70a0f48a13772fa013d0" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c0V6Aainfix &lt;=c0c0Iainfix &lt;=c0V6Iamin_distasuffixV5ainfix +ainfix -c0c1c1asuffixV4V9agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=c0V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="760c4692a63d70a0f48a13772fa013d0"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.30" expl="30. postcondition"
-      sum="0d4d2bf5cd17a35623862edaf754eae0" proved="true" expanded="true"
-      shape="postconditionamin_distasuffixV5c0asuffixV4c0agetV8c0Iainfix &lt;c0V6Aainfix &lt;=c0c0Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +ainfix -c0c1c1asuffixV4V9agetV8V9Iainfix &lt;=V9V2Aainfix &lt;=c0V9FFIainfix &gt;=V7c0Lainfix -V0c1Iainfix &gt;c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="0d4d2bf5cd17a35623862edaf754eae0"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.31" expl="31. loop invariant init"
-      sum="5c8a1288ade8c0223aa5b7f059948da2" proved="true" expanded="true"
-      shape="loop invariant initainfix =agetaconstc0V7ainfix -V2V7Iainfix &lt;V7c0Aainfix &lt;=c0V7FIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="5c8a1288ade8c0223aa5b7f059948da2"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.32" expl="32. type invariant"
-      sum="fe95384bc77b0147f17845581b440e77" proved="true" expanded="true"
-      shape="type invariantainfix &lt;=c0V6Iainfix =agetV7V9ainfix -V2V9Iainfix &lt;V9V8Aainfix &lt;=c0V9FIainfix &lt;=V8V2Aainfix &lt;=c0V8FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="fe95384bc77b0147f17845581b440e77"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.33" expl="33. index in array bounds"
-      sum="d9e447ccd2bda471360c6b4bdafd488a" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V8V6Aainfix &lt;=c0V8Iainfix &lt;=c0V6Iainfix =agetV7V9ainfix -V2V9Iainfix &lt;V9V8Aainfix &lt;=c0V9FIainfix &lt;=V8V2Aainfix &lt;=c0V8FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="d9e447ccd2bda471360c6b4bdafd488a"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -395,72 +383,72 @@
      </goal>
      <goal name="WP_parameter distance.34"
       expl="34. loop invariant preservation"
-      sum="6600fbbfc9456ee10da3d66a07d1a6c8" proved="true" expanded="true"
-      shape="loop invariant preservationainfix =agetV9V10ainfix -V2V10Iainfix &lt;V10ainfix +V8c1Aainfix &lt;=c0V10FIainfix =V9asetV7V8ainfix -V2V8Aainfix &lt;=c0V6FIainfix &lt;V8V6Aainfix &lt;=c0V8Aainfix &lt;=c0V6Iainfix =agetV7V11ainfix -V2V11Iainfix &lt;V11V8Aainfix &lt;=c0V11FIainfix &lt;=V8V2Aainfix &lt;=c0V8FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="6600fbbfc9456ee10da3d66a07d1a6c8"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.35" expl="35. type invariant"
-      sum="d6db9e22e377febe6100ccf0207d3ff5" proved="true" expanded="true"
-      shape="type invariantainfix &lt;=c0V6Iainfix &lt;V8c0Lainfix -V0c1Iainfix =agetV7V9ainfix -V2V9Iainfix &lt;V9ainfix +V2c1Aainfix &lt;=c0V9FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="d6db9e22e377febe6100ccf0207d3ff5"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.36" expl="36. index in array bounds"
-      sum="e2f97ed839c685c58f1497a8bd057494" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c0V6Aainfix &lt;=c0c0Iainfix &lt;=c0V6Iainfix &lt;V8c0Lainfix -V0c1Iainfix =agetV7V9ainfix -V2V9Iainfix &lt;V9ainfix +V2c1Aainfix &lt;=c0V9FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="e2f97ed839c685c58f1497a8bd057494"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.37" expl="37. postcondition"
-      sum="3d6f9ad0b49795dd6fed0395524dfc1a" proved="true" expanded="true"
-      shape="postconditionamin_distasuffixV5c0asuffixV4c0agetV7c0Iainfix &lt;c0V6Aainfix &lt;=c0c0Aainfix &lt;=c0V6Iainfix &lt;V8c0Lainfix -V0c1Iainfix =agetV7V9ainfix -V2V9Iainfix &lt;V9ainfix +V2c1Aainfix &lt;=c0V9FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="3d6f9ad0b49795dd6fed0395524dfc1a"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.38" expl="38. loop invariant init"
-      sum="aee90a0f98f9b9f2b15975eea2d610f8" proved="true" expanded="true"
-      shape="loop invariant initamin_distasuffixV5ainfix +V8c1asuffixV4V9agetV7V9Iainfix &lt;=V9V2Aainfix &lt;=c0V9FIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V10ainfix -V2V10Iainfix &lt;V10ainfix +V2c1Aainfix &lt;=c0V10FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="aee90a0f98f9b9f2b15975eea2d610f8"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.39" expl="39. type invariant"
-      sum="11d82985aa9c26b3ff80bea0d272e47d" proved="true" expanded="true"
-      shape="type invariantainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V11agetV9V11Iainfix &lt;=V11V2Aainfix &lt;=c0V11FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V12ainfix -V2V12Iainfix &lt;V12ainfix +V2c1Aainfix &lt;=c0V12FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="11d82985aa9c26b3ff80bea0d272e47d"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.40" expl="40. index in array bounds"
-      sum="d0c03f4930a8421144e05cab997145b7" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V11agetV9V11Iainfix &lt;=V11V2Aainfix &lt;=c0V11FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V12ainfix -V2V12Iainfix &lt;V12ainfix +V2c1Aainfix &lt;=c0V12FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="d0c03f4930a8421144e05cab997145b7"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.41" expl="41. index in array bounds"
-      sum="7db4402b139febb26d7460f4b348c424" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V11agetV9V11Iainfix &lt;=V11V2Aainfix &lt;=c0V11FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V12ainfix -V2V12Iainfix &lt;V12ainfix +V2c1Aainfix &lt;=c0V12FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="7db4402b139febb26d7460f4b348c424"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.42" expl="42. index in array bounds"
-      sum="605250a5d4a8224736648ee73784b869" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V11agetV9V11Iainfix &lt;=V11V2Aainfix &lt;=c0V11FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V12ainfix -V2V12Iainfix &lt;V12ainfix +V2c1Aainfix &lt;=c0V12FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="605250a5d4a8224736648ee73784b869"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -468,73 +456,73 @@
      </goal>
      <goal name="WP_parameter distance.43"
       expl="43. loop invariant preservation"
-      sum="668520aa8395fc48f5a393620b884e16" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +ainfix -V10c1c1asuffixV4V13agetV11V13Iainfix &lt;=V13V2Aainfix &lt;=c0V13FIainfix &lt;V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V14agetV9V14Iainfix &lt;=V14V2Aainfix &lt;=c0V14FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V15ainfix -V2V15Iainfix &lt;V15ainfix +V2c1Aainfix &lt;=c0V15FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="668520aa8395fc48f5a393620b884e16"
+      expanded="true">
       <label name="expl:VC for distance"/>
-      <proof prover="3" timelimit="5"
+      <proof prover="4" timelimit="5"
        edited="edit_distance_EditDistance_WP_parameter_distance_1.v">
        <result status="valid" time="1.49"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.44" expl="44. loop invariant init"
-      sum="d5ba034e31220aad02ba336d62145afb" proved="true" expanded="true"
-      shape="loop invariant initamin_distasuffixV5V10asuffixV4V13agetV11V13Iainfix &lt;=V13V2Aainfix &lt;V12V13FIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V14agetV9V14Iainfix &lt;=V14V2Aainfix &lt;=c0V14FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V15ainfix -V2V15Iainfix &lt;V15ainfix +V2c1Aainfix &lt;=c0V15FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="d5ba034e31220aad02ba336d62145afb"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.58"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.45" expl="45. loop invariant init"
-      sum="4616f7233abfd30bd40a10dd8e4c6d8e" proved="true" expanded="true"
-      shape="loop invariant initamin_distasuffixV5ainfix +V10c1asuffixV4V13agetV11V13Iainfix &lt;=V13V12Aainfix &lt;=c0V13FIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V14agetV9V14Iainfix &lt;=V14V2Aainfix &lt;=c0V14FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V15ainfix -V2V15Iainfix &lt;V15ainfix +V2c1Aainfix &lt;=c0V15FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="4616f7233abfd30bd40a10dd8e4c6d8e"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.46" expl="46. loop invariant init"
-      sum="97643d0dea909740a6b0239ed03710d4" proved="true" expanded="true"
-      shape="loop invariant initamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V12c1agetV9V2Iainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V13agetV9V13Iainfix &lt;=V13V2Aainfix &lt;=c0V13FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V14ainfix -V2V14Iainfix &lt;V14ainfix +V2c1Aainfix &lt;=c0V14FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="97643d0dea909740a6b0239ed03710d4"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.47" expl="47. type invariant"
-      sum="377a78875ce9766e752d592534127493" proved="true" expanded="true"
-      shape="type invariantainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V16agetV14V16Iainfix &lt;=V16V15Aainfix &lt;=c0V16FAamin_distasuffixV5V10asuffixV4V17agetV14V17Iainfix &lt;=V17V2Aainfix &lt;V15V17FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V18agetV9V18Iainfix &lt;=V18V2Aainfix &lt;=c0V18FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V19ainfix -V2V19Iainfix &lt;V19ainfix +V2c1Aainfix &lt;=c0V19FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="377a78875ce9766e752d592534127493"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.48" expl="48. index in array bounds"
-      sum="8b17655659d3f66bb308434481d7b353" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V16agetV14V16Iainfix &lt;=V16V15Aainfix &lt;=c0V16FAamin_distasuffixV5V10asuffixV4V17agetV14V17Iainfix &lt;=V17V2Aainfix &lt;V15V17FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V18agetV9V18Iainfix &lt;=V18V2Aainfix &lt;=c0V18FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V19ainfix -V2V19Iainfix &lt;V19ainfix +V2c1Aainfix &lt;=c0V19FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="8b17655659d3f66bb308434481d7b353"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.49" expl="49. index in array bounds"
-      sum="18a9c35bcf8c0e08f86d01e60690116b" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V17agetV14V17Iainfix &lt;=V17V15Aainfix &lt;=c0V17FAamin_distasuffixV5V10asuffixV4V18agetV14V18Iainfix &lt;=V18V2Aainfix &lt;V15V18FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V19agetV9V19Iainfix &lt;=V19V2Aainfix &lt;=c0V19FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V20ainfix -V2V20Iainfix &lt;V20ainfix +V2c1Aainfix &lt;=c0V20FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="18a9c35bcf8c0e08f86d01e60690116b"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.50" expl="50. index in array bounds"
-      sum="2633274e02fe79c0ec7d99dd08d0538f" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V17agetV14V17Iainfix &lt;=V17V15Aainfix &lt;=c0V17FAamin_distasuffixV5V10asuffixV4V18agetV14V18Iainfix &lt;=V18V2Aainfix &lt;V15V18FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V19agetV9V19Iainfix &lt;=V19V2Aainfix &lt;=c0V19FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V20ainfix -V2V20Iainfix &lt;V20ainfix +V2c1Aainfix &lt;=c0V20FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="2633274e02fe79c0ec7d99dd08d0538f"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.51" expl="51. index in array bounds"
-      sum="d91ae09e2ef8418d157bad223589d7f3" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V17agetV14V17Iainfix &lt;=V17V15Aainfix &lt;=c0V17FAamin_distasuffixV5V10asuffixV4V18agetV14V18Iainfix &lt;=V18V2Aainfix &lt;V15V18FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V19agetV9V19Iainfix &lt;=V19V2Aainfix &lt;=c0V19FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V20ainfix -V2V20Iainfix &lt;V20ainfix +V2c1Aainfix &lt;=c0V20FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="d91ae09e2ef8418d157bad223589d7f3"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -542,18 +530,18 @@
      </goal>
      <goal name="WP_parameter distance.52"
       expl="52. loop invariant preservation"
-      sum="5912299b45c93b853918b9a0263d3654" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5V10asuffixV4V18agetV17V18Iainfix &lt;=V18V2Aainfix &lt;ainfix -V15c1V18FIainfix =V17asetV14V15V13Aainfix &lt;=c0V6FIainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V19agetV14V19Iainfix &lt;=V19V15Aainfix &lt;=c0V19FAamin_distasuffixV5V10asuffixV4V20agetV14V20Iainfix &lt;=V20V2Aainfix &lt;V15V20FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V21agetV9V21Iainfix &lt;=V21V2Aainfix &lt;=c0V21FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V22ainfix -V2V22Iainfix &lt;V22ainfix +V2c1Aainfix &lt;=c0V22FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="5912299b45c93b853918b9a0263d3654"
+      expanded="true">
       <label name="expl:VC for distance"/>
-      <proof prover="3" timelimit="5"
+      <proof prover="4" timelimit="5"
        edited="edit_distance_WP_EditDistance_WP_parameter_distance_2.v">
        <result status="valid" time="1.26"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.53"
       expl="53. loop invariant preservation"
-      sum="0e40e3f01698f75fcec73c6d4056fccb" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +V10c1asuffixV4V18agetV17V18Iainfix &lt;=V18ainfix -V15c1Aainfix &lt;=c0V18FIainfix =V17asetV14V15V13Aainfix &lt;=c0V6FIainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V19agetV14V19Iainfix &lt;=V19V15Aainfix &lt;=c0V19FAamin_distasuffixV5V10asuffixV4V20agetV14V20Iainfix &lt;=V20V2Aainfix &lt;V15V20FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V21agetV9V21Iainfix &lt;=V21V2Aainfix &lt;=c0V21FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V22ainfix -V2V22Iainfix &lt;V22ainfix +V2c1Aainfix &lt;=c0V22FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="0e40e3f01698f75fcec73c6d4056fccb"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -561,32 +549,32 @@
      </goal>
      <goal name="WP_parameter distance.54"
       expl="54. loop invariant preservation"
-      sum="0e708c237366f7f06d4e3ffc9ef119c6" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +ainfix -V15c1c1V16Iainfix =V17asetV14V15V13Aainfix &lt;=c0V6FIainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V18agetV14V18Iainfix &lt;=V18V15Aainfix &lt;=c0V18FAamin_distasuffixV5V10asuffixV4V19agetV14V19Iainfix &lt;=V19V2Aainfix &lt;V15V19FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V20agetV9V20Iainfix &lt;=V20V2Aainfix &lt;=c0V20FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V21ainfix -V2V21Iainfix &lt;V21ainfix +V2c1Aainfix &lt;=c0V21FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="0e708c237366f7f06d4e3ffc9ef119c6"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.55" expl="55. index in array bounds"
-      sum="ee942360137dd9e6627b8e301e7635d1" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V17V6Aainfix &lt;=c0V17Lainfix +V15c1INainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V18agetV14V18Iainfix &lt;=V18V15Aainfix &lt;=c0V18FAamin_distasuffixV5V10asuffixV4V19agetV14V19Iainfix &lt;=V19V2Aainfix &lt;V15V19FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V20agetV9V20Iainfix &lt;=V20V2Aainfix &lt;=c0V20FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V21ainfix -V2V21Iainfix &lt;V21ainfix +V2c1Aainfix &lt;=c0V21FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="ee942360137dd9e6627b8e301e7635d1"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.56" expl="56. index in array bounds"
-      sum="3d1eeae41f610de088f31cea4bdd4c11" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;V17V6Aainfix &lt;=c0V17Lainfix +V15c1INainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V18agetV14V18Iainfix &lt;=V18V15Aainfix &lt;=c0V18FAamin_distasuffixV5V10asuffixV4V19agetV14V19Iainfix &lt;=V19V2Aainfix &lt;V15V19FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V20agetV9V20Iainfix &lt;=V20V2Aainfix &lt;=c0V20FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V21ainfix -V2V21Iainfix &lt;V21ainfix +V2c1Aainfix &lt;=c0V21FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="3d1eeae41f610de088f31cea4bdd4c11"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.57" expl="57. index in array bounds"
-      sum="3e4fc803417955d13c4ed29d111df57b" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;V17V6Aainfix &lt;=c0V17Lainfix +V15c1INainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V18agetV14V18Iainfix &lt;=V18V15Aainfix &lt;=c0V18FAamin_distasuffixV5V10asuffixV4V19agetV14V19Iainfix &lt;=V19V2Aainfix &lt;V15V19FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V20agetV9V20Iainfix &lt;=V20V2Aainfix &lt;=c0V20FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V21ainfix -V2V21Iainfix &lt;V21ainfix +V2c1Aainfix &lt;=c0V21FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="3e4fc803417955d13c4ed29d111df57b"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -594,18 +582,18 @@
      </goal>
      <goal name="WP_parameter distance.58"
       expl="58. loop invariant preservation"
-      sum="f6e4f8be77ddbf3fa84f9369e89e2116" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5V10asuffixV4V19agetV18V19Iainfix &lt;=V19V2Aainfix &lt;ainfix -V15c1V19FIainfix =V18asetV14V15ainfix +aminagetV14V15agetV14V17c1Aainfix &lt;=c0V6FIainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;V17V6Aainfix &lt;=c0V17Lainfix +V15c1INainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V20agetV14V20Iainfix &lt;=V20V15Aainfix &lt;=c0V20FAamin_distasuffixV5V10asuffixV4V21agetV14V21Iainfix &lt;=V21V2Aainfix &lt;V15V21FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V22agetV9V22Iainfix &lt;=V22V2Aainfix &lt;=c0V22FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V23ainfix -V2V23Iainfix &lt;V23ainfix +V2c1Aainfix &lt;=c0V23FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="f6e4f8be77ddbf3fa84f9369e89e2116"
+      expanded="true">
       <label name="expl:VC for distance"/>
-      <proof prover="3" timelimit="5"
+      <proof prover="4" timelimit="5"
        edited="edit_distance_WP_EditDistance_WP_parameter_distance_1.v">
        <result status="valid" time="1.39"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.59"
       expl="59. loop invariant preservation"
-      sum="224f63af45b7021ad24f3a7361a06541" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +V10c1asuffixV4V19agetV18V19Iainfix &lt;=V19ainfix -V15c1Aainfix &lt;=c0V19FIainfix =V18asetV14V15ainfix +aminagetV14V15agetV14V17c1Aainfix &lt;=c0V6FIainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;V17V6Aainfix &lt;=c0V17Lainfix +V15c1INainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V20agetV14V20Iainfix &lt;=V20V15Aainfix &lt;=c0V20FAamin_distasuffixV5V10asuffixV4V21agetV14V21Iainfix &lt;=V21V2Aainfix &lt;V15V21FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V22agetV9V22Iainfix &lt;=V22V2Aainfix &lt;=c0V22FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V23ainfix -V2V23Iainfix &lt;V23ainfix +V2c1Aainfix &lt;=c0V23FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="224f63af45b7021ad24f3a7361a06541"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -613,8 +601,8 @@
      </goal>
      <goal name="WP_parameter distance.60"
       expl="60. loop invariant preservation"
-      sum="0681d45133931b163cd51a95a102ec8a" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +ainfix -V15c1c1V16Iainfix =V18asetV14V15ainfix +aminagetV14V15agetV14V17c1Aainfix &lt;=c0V6FIainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;V15V6Aainfix &lt;=c0V15Iainfix &lt;V17V6Aainfix &lt;=c0V17Lainfix +V15c1INainfix =agetV1V10agetV3V15Iainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;V15V2Aainfix &lt;=c0V15Iainfix =V16agetV14V15FIainfix &lt;V15V6Aainfix &lt;=c0V15Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +V15c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V19agetV14V19Iainfix &lt;=V19V15Aainfix &lt;=c0V19FAamin_distasuffixV5V10asuffixV4V20agetV14V20Iainfix &lt;=V20V2Aainfix &lt;V15V20FIainfix &gt;=V15c0Aainfix &gt;=V12V15FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V21agetV9V21Iainfix &lt;=V21V2Aainfix &lt;=c0V21FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V22ainfix -V2V22Iainfix &lt;V22ainfix +V2c1Aainfix &lt;=c0V22FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="0681d45133931b163cd51a95a102ec8a"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -622,32 +610,32 @@
      </goal>
      <goal name="WP_parameter distance.61"
       expl="61. loop invariant preservation"
-      sum="a6c9dcf56c96b0b5965173f5bbf9a941" proved="true" expanded="true"
-      shape="loop invariant preservationamin_distasuffixV5ainfix +ainfix -V10c1c1asuffixV4V15agetV14V15Iainfix &lt;=V15V2Aainfix &lt;=c0V15FIamin_distasuffixV5ainfix +V10c1asuffixV4ainfix +ainfix -c0c1c1V13Aamin_distasuffixV5ainfix +V10c1asuffixV4V16agetV14V16Iainfix &lt;=V16ainfix -c0c1Aainfix &lt;=c0V16FAamin_distasuffixV5V10asuffixV4V17agetV14V17Iainfix &lt;=V17V2Aainfix &lt;ainfix -c0c1V17FFIainfix &gt;=V12c0Lainfix -V2c1Iainfix =V11asetV9V2ainfix +agetV9V2c1Aainfix &lt;=c0V6FIainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Iainfix &lt;V2V6Aainfix &lt;=c0V2Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +V10c1asuffixV4V18agetV9V18Iainfix &lt;=V18V2Aainfix &lt;=c0V18FIainfix &gt;=V10c0Aainfix &gt;=V8V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V19ainfix -V2V19Iainfix &lt;V19ainfix +V2c1Aainfix &lt;=c0V19FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="a6c9dcf56c96b0b5965173f5bbf9a941"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.62" expl="62. type invariant"
-      sum="0478750028dc50b743f85fcdfe8184d9" proved="true" expanded="true"
-      shape="type invariantainfix &lt;=c0V6Iamin_distasuffixV5ainfix +ainfix -c0c1c1asuffixV4V10agetV9V10Iainfix &lt;=V10V2Aainfix &lt;=c0V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V11ainfix -V2V11Iainfix &lt;V11ainfix +V2c1Aainfix &lt;=c0V11FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="0478750028dc50b743f85fcdfe8184d9"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.63" expl="63. index in array bounds"
-      sum="b0d6da41f57bcd5e523b315080e8d330" proved="true" expanded="true"
-      shape="index in array boundsainfix &lt;c0V6Aainfix &lt;=c0c0Iainfix &lt;=c0V6Iamin_distasuffixV5ainfix +ainfix -c0c1c1asuffixV4V10agetV9V10Iainfix &lt;=V10V2Aainfix &lt;=c0V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V11ainfix -V2V11Iainfix &lt;V11ainfix +V2c1Aainfix &lt;=c0V11FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="b0d6da41f57bcd5e523b315080e8d330"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter distance.64" expl="64. postcondition"
-      sum="c79fc491099ad7a62e5b7dca59e836a6" proved="true" expanded="true"
-      shape="postconditionamin_distasuffixV5c0asuffixV4c0agetV9c0Iainfix &lt;c0V6Aainfix &lt;=c0c0Aainfix &lt;=c0V6Iamin_distasuffixV5ainfix +ainfix -c0c1c1asuffixV4V10agetV9V10Iainfix &lt;=V10V2Aainfix &lt;=c0V10FFIainfix &gt;=V8c0Lainfix -V0c1Iainfix =agetV7V11ainfix -V2V11Iainfix &lt;V11ainfix +V2c1Aainfix &lt;=c0V11FFIainfix &lt;=c0V2Iainfix &lt;=c0V6Iainfix &gt;=V6c0Lainfix +V2c1Iainfix &lt;=c0V2Aainfix &lt;=c0V0Lamk arrayV0V1Lamk arrayV2V3F">
+      sum="c79fc491099ad7a62e5b7dca59e836a6"
+      expanded="true">
       <label name="expl:VC for distance"/>
       <proof prover="1" timelimit="30" memlimit="0">
        <result status="valid" time="0.02"/>
