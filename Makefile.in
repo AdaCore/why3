@@ -1258,7 +1258,7 @@ update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $
 $(ISABELLELIBS_INT): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/int.why
 	mkdir -p lib/isabelle/int
-	WHY3CONFIG="" bin/why3.@OCAMLBEST@ --realize -L theories -D drivers/isabelle-realize.drv -T int.$(notdir $(basename $@)) -o lib/isabelle/int/
+	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T int.$(notdir $(basename $@)) -o lib/isabelle/int/
 
 $(ISABELLELIBS_BOOL): bin/why3 drivers/isabelle-realizations.aux \
   drivers/isabelle-realize.drv drivers/isabelle-common.gen theories/bool.why
