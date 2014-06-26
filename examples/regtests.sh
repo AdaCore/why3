@@ -79,14 +79,14 @@ echo ""
 
 echo "=== Logic ==="
 run_dir logic
-run_dir bitvectors "-I bitvectors"
+run_dir bitvectors "-L bitvectors"
 echo ""
 
 echo "=== Programs ==="
 run_dir .
 run_dir foveoos11-cm
 run_dir hoare_logic
-run_dir vacid_0_binary_heaps "-I vacid_0_binary_heaps"
+run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 echo ""
 
 echo "Summary: $success/$total"
