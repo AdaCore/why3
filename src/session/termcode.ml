@@ -135,7 +135,8 @@ let store_id s i =
 
 type shape = string
 
-let string_of_shape s =
+let string_of_shape s = s
+(*
   try
   let l = String.length s in
   let r = Buffer.create l in
@@ -153,7 +154,7 @@ let string_of_shape s =
   with e ->
     Format.eprintf "Error while reading shape [%s]@." s;
     raise e
-
+*)
 
 let shape_of_string s =
   try
@@ -231,7 +232,9 @@ let tag_wild = "w"
 let tag_as = "z"
 
 
-let id_string_shape ~push id acc =
+let id_string_shape ~push id acc = 
+  push id acc
+(*
   let l = String.length id in
   if l <= 4 then push id acc else
   (* sanity check *)
@@ -244,6 +247,7 @@ let id_string_shape ~push id acc =
         with Not_found -> false)
     then push id acc
     else push ")" (push id (push "(" acc))
+*)
 
 let ident_shape ~push id acc =
   id_string_shape ~push id.Ident.id_string acc
