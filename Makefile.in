@@ -1551,7 +1551,7 @@ install_local:: bin/why3doc
 .PHONY: bench test
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
-  share/Makefile.config
+  share/Makefile.config bin/why3extract
 	$(MAKE) test-api-logic.@OCAMLBEST@
 	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
 	$(MAKE) test-api-mlw.@OCAMLBEST@
@@ -1678,7 +1678,7 @@ test-runstrat.opt: lib/why3/why3.cmxa lib/why3/META
 
 test-runstrat: test-runstrat.$(OCAMLBEST)
 
-test-ocaml-extraction: bin/why3.opt lib/why3/why3extract.cmxa
+test-ocaml-extraction: bin/why3.opt bin/why3extract.opt lib/why3/why3extract.cmxa
 	@echo "driver ocaml32"
 	@mkdir -p tests/test-extraction
 	@cd tests ; ../bin/why3extract.opt -D ocaml32 \
