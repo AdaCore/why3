@@ -185,23 +185,30 @@ module LinearProbing
 
   let remove (h: t) (x: key) : unit
     requires { x <> dummy }
-   =
-    let rec delete (a: array key) (j i: int) : unit
+    ensures  { h.view = Map.set (old h.view) x False }
+  =
+    let rec delete
+      (a: array key) (ghost loc: ref (map key int)) (j i: int) : unit
       requires { 0 <= i < Array.length a }
       requires { 0 <= j < Array.length a }
       requires { a[j] = dummy }
+      requires { forall i: int. 0 <= i < Array.length a ->
+                let x = a[i] in x <> dummy -> Map.get !loc x = i }
       ensures  { numof a dummy 0 (Array.length a) =
                  numof (old a) dummy 0 (Array.length a) }
      =
       let n = Array.length a in
-      let i = let i = i+1 in if i = n then 0 else i in
+      let i = next n i in
       let xi = a[i] in
       if xi <> dummy then begin
         let r = bucket xi n in
         if j < r && r <= i || i < j && j < r || r <= i && i < j then
-          delete a j i
+          delete a loc j i
         else begin
-          a[j] <- a[i]; a[i] <- dummy; delete a i i
+          a[j] <- a[i];
+          ghost loc := Map.set !loc a[i] j;
+          a[i] <- dummy;
+          delete a loc i i
         end
       end
     in
@@ -212,8 +219,10 @@ module LinearProbing
       assert { let n = Array.length h.data in
                numof h.data dummy 0 (j+1) =
                numof (at h.data 'L) dummy 0 (j+1) + 1 };
-      delete h.data j j;
-      h.view <- Map.set h.view x False;
+      ghost h.view <- Map.set h.view x False;
+      let l = ref h.loc in
+      delete h.data l j j;
+      ghost h.loc <- !l;
       h.size <- h.size - 1;
     end
 
