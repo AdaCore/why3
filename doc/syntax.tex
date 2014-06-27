@@ -11,7 +11,7 @@ These declarations can be directly written in the theory or taken from
 existing theories. The base logic of \why is first-order
 logic with polymorphic types.
 
-\section{Example 1: lists}
+\section{Example 1: Lists}
 
 %BEGIN LATEX
 Figure~\ref{fig:tutorial1} contains an example of \why input
@@ -56,7 +56,8 @@ theory Sorted
 end
 \end{whycode}
 %BEGIN LATEX
-\caption{Example of Why3 text.}
+\vspace*{-1em}%\hrulefill
+\caption{Example of \why text}
 \label{fig:tutorial1}
 \end{figure}
 %END LATEX
@@ -118,7 +119,7 @@ Note that the type signature of \lstinline{sorted} predicate does not
 include the name of a parameter (see \texttt{l} in the definition
 of \texttt{length}): it is unused and therefore optional.
 
-\section{Example 1 (continued): lists and abstract orderings}
+\section{Example 1 (continued): Lists and Abstract Orderings}
 
 In the previous section we have seen how a theory can reuse the
 declarations of another theory, coming either from the same input
@@ -171,7 +172,8 @@ theory SortedIntList
 end
 \end{whycode}
 %BEGIN LATEX
-\caption{Example of Why3 text (continued).}
+\vspace*{-1em}%\hrulefill
+\caption{Example of \why text (continued)}
 \label{fig:tutorial2}
 \end{figure}
 %END LATEX
@@ -307,10 +309,10 @@ namespace import O
   clone export Order
 end
 \end{whycode}
-However, since \why favours short theories over long and complex ones,
+However, since \why favors short theories over long and complex ones,
 this feature is rarely used.
 
-\section{Example 2: Einstein's problem}
+\section{Example 2: Einstein's Problem}
 \index{Einstein's logic problem}
 
 We now consider another, slightly more complex example: how to use \why
@@ -323,7 +325,7 @@ problem''.%
 The problem is stated as follows. Five persons, of five
 different nationalities, live in five houses in a row, all
 painted with different colors.
-These five persones own different pets, drink different beverages and
+These five persons own different pets, drink different beverages and
 smoke different brands of cigars.
 We are given the following information:
 \begin{itemize}

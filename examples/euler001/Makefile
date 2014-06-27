@@ -41,7 +41,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../euler001.mlw
-	$(WHY3) -E ocaml32 ../euler001.mlw -o .
+	$(WHY3)extract -D ocaml32 ../euler001.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<

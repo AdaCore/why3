@@ -41,7 +41,7 @@ $(MAIN).opt: $(CMX) $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../sudoku.mlw
-	$(WHY3) -E ocaml32 ../sudoku.mlw -o .
+	$(WHY3)extract -D ocaml32 ../sudoku.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<

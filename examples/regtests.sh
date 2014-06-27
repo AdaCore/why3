@@ -40,7 +40,7 @@ run_dir () {
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
 	echo -n "Replaying $d ... "
-        ../bin/why3replayer.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP
+        ../bin/why3replay.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP
         ret=$?
 	if test "$ret" != "0"  ; then
 	    echo -n "FAILED (ret code=$ret):"
@@ -81,14 +81,14 @@ echo ""
 
 echo "=== Logic ==="
 run_dir logic
-run_dir bitvectors "-I bitvectors"
+run_dir bitvectors "-L bitvectors"
 echo ""
 
 echo "=== Programs ==="
 run_dir .
 run_dir foveoos11-cm
 run_dir hoare_logic
-run_dir vacid_0_binary_heaps "-I vacid_0_binary_heaps"
+run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 echo ""
 
 echo "Summary       : $success/$total"
