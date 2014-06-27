@@ -444,7 +444,7 @@ clean_old_install::
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 
-install_local: bin/why3
+install_local:: bin/why3
 
 ifneq "$(MAKECMDGOALS)" "clean"
 include src/main.dep
@@ -582,7 +582,7 @@ clean_old_install::
 install_no_local::
 	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
 
-install_local: bin/why3config
+install_local:: bin/why3config
 
 ###############
 # IDE
@@ -643,7 +643,7 @@ clean_old_install::
 install_no_local::
 	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
 
-install_local: bin/why3ide
+install_local:: bin/why3ide
 
 endif
 
@@ -698,7 +698,7 @@ clean_old_install::
 install_no_local::
 	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer$(EXE)
 
-install_local: bin/why3replayer
+install_local:: bin/why3replayer
 
 
 ###############
@@ -754,7 +754,7 @@ clean_old_install::
 install_no_local::
 	cp -f bin/why3session.@OCAMLBEST@ $(BINDIR)/why3session$(EXE)
 
-install_local: bin/why3session
+install_local:: bin/why3session
 
 
 ###############
@@ -812,7 +812,7 @@ clean_old_install::
 install_no_local::
 	cp -f bin/why3bench.@OCAMLBEST@ $(BINDIR)/why3bench$(EXE)
 
-install_local: bin/why3bench
+install_local:: bin/why3bench
 
 endif
 
@@ -994,7 +994,7 @@ ifeq (@enable_coq_fp_libs@,yes)
 endif
 	cp drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
-install_local: $(COQVO) drivers/coq-realizations.aux
+install_local:: $(COQVO) drivers/coq-realizations.aux
 
 ifneq "$(MAKECMDGOALS)" "clean"
 ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
@@ -1105,7 +1105,7 @@ install_no_local::
 	cp $(addsuffix .pvs, $(PVSLIBS_FP)) $(LIBDIR)/why3/pvs/floating_point/
 	cp drivers/pvs-realizations.aux $(DATADIR)/why3/drivers/
 
-install_local: drivers/pvs-realizations.aux
+install_local:: drivers/pvs-realizations.aux
 
 update-pvs: bin/why3 drivers/pvs-realizations.aux
 	for f in $(PVSLIBS_INT_FILES); do bin/why3 --realize -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
@@ -1181,6 +1181,23 @@ drivers/isabelle-realizations.aux: Makefile
 install_no_local::
 	cp -r lib/isabelle $(LIBDIR)/why3
 	cp drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
+	@(d=`isabelle components -l | grep why3`; \
+	  if test $$d != $(LIBDIR)/why3/isabelle; then \
+	    echo "[Warning] Cannot pre-build the Isabelle heap because the";
+	    echo "  current Why3 path in Isabelle component configuration [$$d]"; \
+            echo "  is not the same as the current install dir [$(LIBDIR)/why3/isabelle]"; \
+	  else isabelle build -bc Why3 ; \
+	  fi)
+
+install_local::
+	@(d=`isabelle components -l | grep why3`; \
+	  if test $$d != `pwd`/lib/isabelle; then \
+	    echo "[Warning] Cannot pre-build the Isabelle heap because the";
+	    echo "  current Why3 path in Isabelle component configuration [$$d]"; \
+            echo "  is not the same as the current install dir [`pwd`/lib/isabelle]"; \
+	  else isabelle build -bc Why3 ; \
+	  fi)
+
 
 update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
 
@@ -1397,7 +1414,7 @@ clean_old_install::
 install_no_local::
 	cp -f bin/why3wc.@OCAMLBEST@ $(BINDIR)/why3wc$(EXE)
 
-install_local: bin/why3wc
+install_local:: bin/why3wc
 
 #########
 # why3doc
@@ -1454,7 +1471,7 @@ clean_old_install::
 install_no_local::
 	cp -f bin/why3doc.@OCAMLBEST@ $(BINDIR)/why3doc$(EXE)
 
-install_local: bin/why3doc
+install_local:: bin/why3doc
 
 ########
 # bench

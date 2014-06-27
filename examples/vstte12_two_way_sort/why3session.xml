@@ -1,577 +1,224 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.2"/>
+ <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10"
+  memlimit="1000"/>
+ <prover id="1" name="CVC3" version="2.2" timelimit="10" memlimit="1000"/>
+ <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="6"
+  memlimit="1000"/>
  <file
-  name="../vstte12_two_way_sort.mlw"
-  verified="true"
-  expanded="false">
+  name="../vstte12_two_way_sort.mlw">
   <theory
-   name="TwoWaySort"
-   locfile="../vstte12_two_way_sort.mlw"
-   loclnum="8" loccnumb="7" loccnume="17"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter two_way_sort"
-    locfile="../vstte12_two_way_sort.mlw"
-    loclnum="22" loccnumb="6" loccnume="18"
-    expl="VC for two_way_sort"
-    sum="73b5c4b9eba9e12d620c1ac0b1df2a0d"
-    proved="true"
-    expanded="false"
-    shape="iapermut_allV2V6AasortedV6Aainfix &lt;=c0V0iiainfix &lt;ainfix -V10V9ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Aapermut_allV2V8Aainfix =agetV7V11aTrueIainfix &lt;V11V0Aainfix &lt;V10V11FAainfix =agetV7V12aFalseIainfix &lt;V12V9Aainfix &lt;=c0V12FAainfix &lt;V10V0Aainfix &lt;=c0V9Iainfix =V10ainfix -V3c1FIainfix =V9ainfix +V4c1FIaexchangeV6V8V4V3Aainfix &lt;=c0V0Lamk arrayV0V7FAainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V4V0Aainfix &lt;=c0V4ainfix &lt;ainfix -V13V4ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Aapermut_allV2V6Aainfix =agetV5V14aTrueIainfix &lt;V14V0Aainfix &lt;V13V14FAainfix =agetV5V15aFalseIainfix &lt;V15V4Aainfix &lt;=c0V15FAainfix &lt;V13V0Aainfix &lt;=c0V4Iainfix =V13ainfix -V3c1Fainfix =agetV5V3aTrueAainfix &lt;V3V0Aainfix &lt;=c0V3ainfix &lt;ainfix -V3V16ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Aapermut_allV2V6Aainfix =agetV5V17aTrueIainfix &lt;V17V0Aainfix &lt;V3V17FAainfix =agetV5V18aFalseIainfix &lt;V18V16Aainfix &lt;=c0V18FAainfix &lt;V3V0Aainfix &lt;=c0V16Iainfix =V16ainfix +V4c1FNainfix =agetV5V4aTrueAainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0ainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V19aTrueIainfix &lt;V19V0Aainfix &lt;V3V19FAainfix =agetV5V20aFalseIainfix &lt;V20V4Aainfix &lt;=c0V20FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FAapermut_allV2V2Aainfix =agetV1V21aTrueIainfix &lt;V21V0Aainfix &lt;ainfix -V0c1V21FAainfix =agetV1V22aFalseIainfix &lt;V22c0Aainfix &lt;=c0V22FAainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Lamk arrayV0V1F">
-    <label
-     name="expl:VC for two_way_sort"/>
+   name="TwoWaySort">
+   <goal name="WP_parameter two_way_sort" expl="VC for two_way_sort"
+    sum="73b5c4b9eba9e12d620c1ac0b1df2a0d">
+    <label name="expl:VC for two_way_sort"/>
     <transf
-     name="split_goal"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter two_way_sort.1"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="1. loop invariant init"
-      sum="f824b5b025bfcfbe21bc57729fb49b26"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0c0Iainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     name="split_goal">
+     <goal name="WP_parameter two_way_sort.1" expl="1. loop invariant init"
+      sum="f824b5b025bfcfbe21bc57729fb49b26">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.2"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="2. loop invariant init"
-      sum="bb544e05c1b7dda0eeadf0c1c5e81d1c"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix =agetV1V3aFalseIainfix &lt;V3c0Aainfix &lt;=c0V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter two_way_sort.2" expl="2. loop invariant init"
+      sum="bb544e05c1b7dda0eeadf0c1c5e81d1c">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.3"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="3. loop invariant init"
-      sum="bf40f4cd3dd71c8e29a99d6acb4a07a8"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix =agetV1V3aTrueIainfix &lt;V3V0Aainfix &lt;ainfix -V0c1V3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter two_way_sort.3" expl="3. loop invariant init"
+      sum="bf40f4cd3dd71c8e29a99d6acb4a07a8">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.4"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="4. loop invariant init"
-      sum="f936e59d85fdf450439c05a0076dda4c"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initapermut_allV2V2Iainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter two_way_sort.4" expl="4. loop invariant init"
+      sum="f936e59d85fdf450439c05a0076dda4c">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.5"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="5. type invariant"
-      sum="f5c3bbd1f24da4128fe78215d766be60"
-      proved="true"
-      expanded="false"
-      shape="type invariantainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V7aTrueIainfix &lt;V7V0Aainfix &lt;V3V7FAainfix =agetV5V8aFalseIainfix &lt;V8V4Aainfix &lt;=c0V8FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter two_way_sort.5" expl="5. type invariant"
+      sum="f5c3bbd1f24da4128fe78215d766be60">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.6"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="6. index in array bounds"
-      sum="e7ea3d65ebe6fe992b42045ff0708f6b"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;V4V0Aainfix &lt;=c0V4Iainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V7aTrueIainfix &lt;V7V0Aainfix &lt;V3V7FAainfix =agetV5V8aFalseIainfix &lt;V8V4Aainfix &lt;=c0V8FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter two_way_sort.6" expl="6. index in array bounds"
+      sum="e7ea3d65ebe6fe992b42045ff0708f6b">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.7"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.7"
       expl="7. loop invariant preservation"
-      sum="5d1817a31a28d45afd3b43de3e477e7e"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;V3V0Aainfix &lt;=c0V7Iainfix =V7ainfix +V4c1FINainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V8aTrueIainfix &lt;V8V0Aainfix &lt;V3V8FAainfix =agetV5V9aFalseIainfix &lt;V9V4Aainfix &lt;=c0V9FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="5d1817a31a28d45afd3b43de3e477e7e">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.8"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.8"
       expl="8. loop invariant preservation"
-      sum="589a0ffe8d5e6c00603faad8f4016735"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =agetV5V8aFalseIainfix &lt;V8V7Aainfix &lt;=c0V8FIainfix =V7ainfix +V4c1FINainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V9aTrueIainfix &lt;V9V0Aainfix &lt;V3V9FAainfix =agetV5V10aFalseIainfix &lt;V10V4Aainfix &lt;=c0V10FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="589a0ffe8d5e6c00603faad8f4016735">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.9"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.9"
       expl="9. loop invariant preservation"
-      sum="f13bcf265228da3939adef2310ef28d7"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =agetV5V8aTrueIainfix &lt;V8V0Aainfix &lt;V3V8FIainfix =V7ainfix +V4c1FINainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V9aTrueIainfix &lt;V9V0Aainfix &lt;V3V9FAainfix =agetV5V10aFalseIainfix &lt;V10V4Aainfix &lt;=c0V10FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      sum="f13bcf265228da3939adef2310ef28d7">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.10"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.10"
       expl="10. loop invariant preservation"
-      sum="9bb57e6bc73a321a8a576aae58282394"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationapermut_allV2V6Iainfix =V7ainfix +V4c1FINainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V8aTrueIainfix &lt;V8V0Aainfix &lt;V3V8FAainfix =agetV5V9aFalseIainfix &lt;V9V4Aainfix &lt;=c0V9FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="9bb57e6bc73a321a8a576aae58282394">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.11"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.11"
       expl="11. loop variant decrease"
-      sum="83761f1a97d3de6db9639a411c27ca6b"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -V3V7ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Iainfix =V7ainfix +V4c1FINainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V8aTrueIainfix &lt;V8V0Aainfix &lt;V3V8FAainfix =agetV5V9aFalseIainfix &lt;V9V4Aainfix &lt;=c0V9FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      sum="83761f1a97d3de6db9639a411c27ca6b">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.12"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.12"
       expl="12. index in array bounds"
-      sum="5c199a496cf3ac31f4f8ef3072ca0afd"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V7aTrueIainfix &lt;V7V0Aainfix &lt;V3V7FAainfix =agetV5V8aFalseIainfix &lt;V8V4Aainfix &lt;=c0V8FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      sum="5c199a496cf3ac31f4f8ef3072ca0afd">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.13"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.13"
       expl="13. loop invariant preservation"
-      sum="31ba907d9bb3fc1ff7ae25144c231296"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;V7V0Aainfix &lt;=c0V4Iainfix =V7ainfix -V3c1FIainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V8aTrueIainfix &lt;V8V0Aainfix &lt;V3V8FAainfix =agetV5V9aFalseIainfix &lt;V9V4Aainfix &lt;=c0V9FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="31ba907d9bb3fc1ff7ae25144c231296">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.14"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.14"
       expl="14. loop invariant preservation"
-      sum="424fd94725e50b3fd3d3f06594870a2d"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =agetV5V8aFalseIainfix &lt;V8V4Aainfix &lt;=c0V8FIainfix =V7ainfix -V3c1FIainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V9aTrueIainfix &lt;V9V0Aainfix &lt;V3V9FAainfix =agetV5V10aFalseIainfix &lt;V10V4Aainfix &lt;=c0V10FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="424fd94725e50b3fd3d3f06594870a2d">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.15"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.15"
       expl="15. loop invariant preservation"
-      sum="ea83e3bdcafc2ed9f0c024ab2354a471"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =agetV5V8aTrueIainfix &lt;V8V0Aainfix &lt;V7V8FIainfix =V7ainfix -V3c1FIainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V9aTrueIainfix &lt;V9V0Aainfix &lt;V3V9FAainfix =agetV5V10aFalseIainfix &lt;V10V4Aainfix &lt;=c0V10FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      sum="ea83e3bdcafc2ed9f0c024ab2354a471">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.16"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.16"
       expl="16. loop invariant preservation"
-      sum="1b13c3e6255422c00216a1ec389675f8"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationapermut_allV2V6Iainfix =V7ainfix -V3c1FIainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V8aTrueIainfix &lt;V8V0Aainfix &lt;V3V8FAainfix =agetV5V9aFalseIainfix &lt;V9V4Aainfix &lt;=c0V9FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="1b13c3e6255422c00216a1ec389675f8">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.17"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.17"
       expl="17. loop variant decrease"
-      sum="78126a4996ce4cd3cf4341145ee5993a"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -V7V4ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Iainfix =V7ainfix -V3c1FIainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V8aTrueIainfix &lt;V8V0Aainfix &lt;V3V8FAainfix =agetV5V9aFalseIainfix &lt;V9V4Aainfix &lt;=c0V9FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      sum="78126a4996ce4cd3cf4341145ee5993a">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.18"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="18. precondition"
-      sum="f2743e0f4b185b514c12c0fa8aa3c000"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V4V0Aainfix &lt;=c0V4INainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V7aTrueIainfix &lt;V7V0Aainfix &lt;V3V7FAainfix =agetV5V8aFalseIainfix &lt;V8V4Aainfix &lt;=c0V8FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter two_way_sort.18" expl="18. precondition"
+      sum="f2743e0f4b185b514c12c0fa8aa3c000">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.19"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.19"
       expl="19. loop invariant preservation"
-      sum="df01d783e4630d9e3d3024c27e1ab963"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;V10V0Aainfix &lt;=c0V9Iainfix =V10ainfix -V3c1FIainfix =V9ainfix +V4c1FIaexchangeV6V8V4V3Aainfix &lt;=c0V0Lamk arrayV0V7FIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V4V0Aainfix &lt;=c0V4INainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V11aTrueIainfix &lt;V11V0Aainfix &lt;V3V11FAainfix =agetV5V12aFalseIainfix &lt;V12V4Aainfix &lt;=c0V12FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="df01d783e4630d9e3d3024c27e1ab963">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.20"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.20"
       expl="20. loop invariant preservation"
-      sum="8eb63768ec364656db8a10c396bc4364"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =agetV7V11aFalseIainfix &lt;V11V9Aainfix &lt;=c0V11FIainfix =V10ainfix -V3c1FIainfix =V9ainfix +V4c1FIaexchangeV6V8V4V3Aainfix &lt;=c0V0Lamk arrayV0V7FIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V4V0Aainfix &lt;=c0V4INainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V12aTrueIainfix &lt;V12V0Aainfix &lt;V3V12FAainfix =agetV5V13aFalseIainfix &lt;V13V4Aainfix &lt;=c0V13FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="8eb63768ec364656db8a10c396bc4364">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.21"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.21"
       expl="21. loop invariant preservation"
-      sum="84b8c7cedf83c2ee5e02ae7c0d2c448f"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =agetV7V11aTrueIainfix &lt;V11V0Aainfix &lt;V10V11FIainfix =V10ainfix -V3c1FIainfix =V9ainfix +V4c1FIaexchangeV6V8V4V3Aainfix &lt;=c0V0Lamk arrayV0V7FIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V4V0Aainfix &lt;=c0V4INainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V12aTrueIainfix &lt;V12V0Aainfix &lt;V3V12FAainfix =agetV5V13aFalseIainfix &lt;V13V4Aainfix &lt;=c0V13FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
+      sum="84b8c7cedf83c2ee5e02ae7c0d2c448f">
+      <label name="expl:VC for two_way_sort"/>
       <transf
-       name="split_goal"
-       proved="true"
-       expanded="false">
-       <goal
-        name="WP_parameter two_way_sort.21.1"
-        locfile="../vstte12_two_way_sort.mlw"
-        loclnum="22" loccnumb="6" loccnume="18"
+       name="split_goal">
+       <goal name="WP_parameter two_way_sort.21.1"
         expl="1. loop invariant preservation"
-        sum="84b8c7cedf83c2ee5e02ae7c0d2c448f"
-        proved="true"
-        expanded="false"
-        shape="loop invariant preservationainfix =agetV7V11aTrueIainfix &lt;V11V0Aainfix &lt;V10V11FIainfix =V10ainfix -V3c1FIainfix =V9ainfix +V4c1FIaexchangeV6V8V4V3Aainfix &lt;=c0V0Lamk arrayV0V7FIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V4V0Aainfix &lt;=c0V4INainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V12aTrueIainfix &lt;V12V0Aainfix &lt;V3V12FAainfix =agetV5V13aFalseIainfix &lt;V13V4Aainfix &lt;=c0V13FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-        <label
-         name="expl:VC for two_way_sort"/>
-        <proof
-         prover="2"
-         timelimit="10"
-         memlimit="1000"
-         obsolete="false"
-         archived="false">
+        sum="84b8c7cedf83c2ee5e02ae7c0d2c448f">
+        <label name="expl:VC for two_way_sort"/>
+        <proof prover="1">
          <result status="valid" time="0.20"/>
         </proof>
        </goal>
       </transf>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.22"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.22"
       expl="22. loop invariant preservation"
-      sum="5120ce31d4c367c1e01fb42a7fc02176"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationapermut_allV2V8Iainfix =V10ainfix -V3c1FIainfix =V9ainfix +V4c1FIaexchangeV6V8V4V3Aainfix &lt;=c0V0Lamk arrayV0V7FIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V4V0Aainfix &lt;=c0V4INainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V11aTrueIainfix &lt;V11V0Aainfix &lt;V3V11FAainfix =agetV5V12aFalseIainfix &lt;V12V4Aainfix &lt;=c0V12FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="5120ce31d4c367c1e01fb42a7fc02176">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.10"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.23"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter two_way_sort.23"
       expl="23. loop variant decrease"
-      sum="e7ce32c28ac30cedf148d00bb1091ea8"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -V10V9ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Iainfix =V10ainfix -V3c1FIainfix =V9ainfix +V4c1FIaexchangeV6V8V4V3Aainfix &lt;=c0V0Lamk arrayV0V7FIainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V4V0Aainfix &lt;=c0V4INainfix =agetV5V3aTrueIainfix &lt;V3V0Aainfix &lt;=c0V3INNainfix =agetV5V4aTrueIainfix &lt;V4V0Aainfix &lt;=c0V4Aainfix &lt;=c0V0Iainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V11aTrueIainfix &lt;V11V0Aainfix &lt;V3V11FAainfix =agetV5V12aFalseIainfix &lt;V12V4Aainfix &lt;=c0V12FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+      sum="e7ce32c28ac30cedf148d00bb1091ea8">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.24"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="24. type invariant"
-      sum="d403852503c5a8fa8a643daf4ffab43b"
-      proved="true"
-      expanded="false"
-      shape="type invariantainfix &lt;=c0V0INainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V7aTrueIainfix &lt;V7V0Aainfix &lt;V3V7FAainfix =agetV5V8aFalseIainfix &lt;V8V4Aainfix &lt;=c0V8FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter two_way_sort.24" expl="24. type invariant"
+      sum="d403852503c5a8fa8a643daf4ffab43b">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.25"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="25. postcondition"
-      sum="2395172409796941ed69388c375e7958"
-      proved="true"
-      expanded="false"
-      shape="postconditionasortedV6Iainfix &lt;=c0V0INainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V7aTrueIainfix &lt;V7V0Aainfix &lt;V3V7FAainfix =agetV5V8aFalseIainfix &lt;V8V4Aainfix &lt;=c0V8FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter two_way_sort.25" expl="25. postcondition"
+      sum="2395172409796941ed69388c375e7958">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter two_way_sort.26"
-      locfile="../vstte12_two_way_sort.mlw"
-      loclnum="22" loccnumb="6" loccnume="18"
-      expl="26. postcondition"
-      sum="bd6def528198148548ffd3dec4fb60d8"
-      proved="true"
-      expanded="false"
-      shape="postconditionapermut_allV2V6Iainfix &lt;=c0V0INainfix &lt;V4V3Iapermut_allV2V6Aainfix =agetV5V7aTrueIainfix &lt;V7V0Aainfix &lt;V3V7FAainfix =agetV5V8aFalseIainfix &lt;V8V4Aainfix &lt;=c0V8FAainfix &lt;V3V0Aainfix &lt;=c0V4Lamk arrayV0V5FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for two_way_sort"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter two_way_sort.26" expl="26. postcondition"
+      sum="bd6def528198148548ffd3dec4fb60d8">
+      <label name="expl:VC for two_way_sort"/>
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>

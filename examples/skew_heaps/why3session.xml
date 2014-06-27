@@ -1,1052 +1,382 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <prover
-  id="1"
-  name="CVC4"
-  version="1.2"/>
- <prover
-  id="2"
-  name="CVC4"
-  version="1.3"/>
- <file
-  name="../skew_heaps.mlw"
-  verified="true"
+ <prover id="0" name="CVC4" version="1.2" timelimit="6" memlimit="1000"/>
+ <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6"
+  memlimit="1000"/>
+ <prover id="2" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
+ <file name="../skew_heaps.mlw"
   expanded="true">
-  <theory
-   name="SkewHeaps"
-   locfile="../skew_heaps.mlw"
-   loclnum="2" loccnumb="7" loccnume="16"
-   verified="true"
+  <theory name="Heap" expanded="true">
+  </theory>
+  <theory name="SkewHeaps"
    expanded="true">
-   <goal
-    name="WP_parameter root_is_min"
-    locfile="../skew_heaps.mlw"
-    loclnum="32" loccnumb="16" loccnume="27"
-    expl="VC for root_is_min"
-    sum="06761dcf7b0ff8e99f9b575473b3eabb"
-    proved="true"
-    expanded="false"
-    shape="CfaEmptyiiais_minimumaminimumV0V0ais_minimumaminimumV0V0Iais_minimumaminimumV2V2Aainfix &lt;c0asizeV2AaheapV2Aainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0Nainfix =V2aEmptyiais_minimumaminimumV0V0ais_minimumaminimumV0V0Iais_minimumaminimumV2V2Aainfix &lt;c0asizeV2AaheapV2Aainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0Nainfix =V2aEmptyIais_minimumaminimumV1V1Aainfix &lt;c0asizeV1AaheapV1Aainfix &lt;asizeV1asizeV0Aainfix &lt;=c0asizeV0Nainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-    <label
-     name="why3:lemma"/>
-    <label
-     name="expl:VC for root_is_min"/>
+   <goal name="WP_parameter root_is_min" expl="VC for root_is_min"
+    sum="06761dcf7b0ff8e99f9b575473b3eabb">
+    <label name="why3:lemma"/>
+    <label name="expl:VC for root_is_min"/>
     <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter root_is_min.1"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="1. unreachable point"
-      sum="f0cbf4173bd6153fc36c5950914927f8"
-      proved="true"
-      expanded="false"
-      shape="unreachable pointCfaEmptytaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     name="split_goal_wp">
+     <goal name="WP_parameter root_is_min.1" expl="1. unreachable point"
+      sum="f0cbf4173bd6153fc36c5950914927f8">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.2"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="2. variant decrease"
-      sum="d5eb08c68728e250efe636a5f7c3109f"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaEmptyainfix &lt;asizeV1asizeV0Aainfix &lt;=c0asizeV0INainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.2" expl="2. variant decrease"
+      sum="d5eb08c68728e250efe636a5f7c3109f">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.3"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="3. precondition"
-      sum="c6cd00b132f37386ee629887d7c634a3"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaEmptyainfix &lt;c0asizeV1AaheapV1INainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.3" expl="3. precondition"
+      sum="c6cd00b132f37386ee629887d7c634a3">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.4"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="4. variant decrease"
-      sum="b9638e6c0164eae545df9113f64c454f"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaEmptyainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0INainfix =V2aEmptyIais_minimumaminimumV1V1Iainfix &lt;c0asizeV1AaheapV1INainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.4" expl="4. variant decrease"
+      sum="b9638e6c0164eae545df9113f64c454f">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.5"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="5. precondition"
-      sum="1b24215bc8c72a1fb164d3152f0b7bb1"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaEmptyainfix &lt;c0asizeV2AaheapV2INainfix =V2aEmptyIais_minimumaminimumV1V1Iainfix &lt;c0asizeV1AaheapV1INainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.5" expl="5. precondition"
+      sum="1b24215bc8c72a1fb164d3152f0b7bb1">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.6"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="6. postcondition"
-      sum="9a6d8ff32352e97ee2ab1eaa3a310ba9"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyais_minimumaminimumV0V0Iais_minimumaminimumV2V2Iainfix &lt;c0asizeV2AaheapV2INainfix =V2aEmptyIais_minimumaminimumV1V1Iainfix &lt;c0asizeV1AaheapV1INainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="2"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.6" expl="6. postcondition"
+      sum="9a6d8ff32352e97ee2ab1eaa3a310ba9">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="2">
        <result status="valid" time="0.07"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.7"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="7. postcondition"
-      sum="715ce1dc61f13fa38458704e9942d634"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyais_minimumaminimumV0V0INNainfix =V2aEmptyIais_minimumaminimumV1V1Iainfix &lt;c0asizeV1AaheapV1INainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="2"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.7" expl="7. postcondition"
+      sum="715ce1dc61f13fa38458704e9942d634">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="2">
        <result status="valid" time="0.09"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.8"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="8. variant decrease"
-      sum="c87be03400145131cf04104e248acd87"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaEmptyainfix &lt;asizeV2asizeV0Aainfix &lt;=c0asizeV0INainfix =V2aEmptyINNainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.8" expl="8. variant decrease"
+      sum="c87be03400145131cf04104e248acd87">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="1">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.9"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="9. precondition"
-      sum="ccb4c6893bf1ab9b996cb13e85657805"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaEmptyainfix &lt;c0asizeV2AaheapV2INainfix =V2aEmptyINNainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.9" expl="9. precondition"
+      sum="ccb4c6893bf1ab9b996cb13e85657805">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.10"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="10. postcondition"
-      sum="188837b5d428f73b9beab9f2a37642c1"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyais_minimumaminimumV0V0Iais_minimumaminimumV2V2Iainfix &lt;c0asizeV2AaheapV2INainfix =V2aEmptyINNainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="2"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.10" expl="10. postcondition"
+      sum="188837b5d428f73b9beab9f2a37642c1">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="2">
        <result status="valid" time="0.07"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter root_is_min.11"
-      locfile="../skew_heaps.mlw"
-      loclnum="32" loccnumb="16" loccnume="27"
-      expl="11. postcondition"
-      sum="63ec9a234a6b816de45895b877637e6f"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyais_minimumaminimumV0V0INNainfix =V2aEmptyINNainfix =V1aEmptyaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="why3:lemma"/>
-      <label
-       name="expl:VC for root_is_min"/>
-      <proof
-       prover="2"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter root_is_min.11" expl="11. postcondition"
+      sum="63ec9a234a6b816de45895b877637e6f">
+      <label name="why3:lemma"/>
+      <label name="expl:VC for root_is_min"/>
+      <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal
-    name="WP_parameter empty"
-    locfile="../skew_heaps.mlw"
-    loclnum="43" loccnumb="6" loccnume="11"
-    expl="VC for empty"
-    sum="6626f31179dd801d5b45da14eff3aec4"
-    proved="true"
-    expanded="false"
-    shape="Nainfix &lt;c0aoccV1V0FAainfix =asizeV0c0AaheapV0LaEmpty">
-    <label
-     name="expl:VC for empty"/>
-    <proof
-     prover="0"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter empty" expl="VC for empty"
+    sum="6626f31179dd801d5b45da14eff3aec4">
+    <label name="expl:VC for empty"/>
+    <proof prover="1">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter is_empty"
-    locfile="../skew_heaps.mlw"
-    loclnum="50" loccnumb="6" loccnume="14"
-    expl="VC for is_empty"
-    sum="5611b5a3d6d4a43826f4ac8a1e34d4db"
-    proved="true"
-    expanded="false"
-    shape="ainfix =asizeV0c0qainfix =V0aEmptyF">
-    <label
-     name="expl:VC for is_empty"/>
-    <proof
-     prover="0"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+   <goal name="WP_parameter is_empty" expl="VC for is_empty"
+    sum="5611b5a3d6d4a43826f4ac8a1e34d4db">
+    <label name="expl:VC for is_empty"/>
+    <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter size"
-    locfile="../skew_heaps.mlw"
-    loclnum="55" loccnumb="6" loccnume="10"
-    expl="VC for size"
+   <goal name="WP_parameter size" expl="VC for size"
     sum="f4f9529cbb334add60c93ba02754c8b2"
-    proved="true"
-    expanded="true"
-    shape="t">
-    <label
-     name="expl:VC for size"/>
-    <proof
-     prover="0"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
+    expanded="true">
+    <label name="expl:VC for size"/>
+    <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter get_min"
-    locfile="../skew_heaps.mlw"
-    loclnum="60" loccnumb="6" loccnume="13"
-    expl="VC for get_min"
-    sum="eb9da314c71c092ebf9738c9272c708e"
-    proved="true"
-    expanded="false"
-    shape="CfaEmptyainfix =V1aminimumV0aNodewVwV0Iainfix &lt;c0asizeV0AaheapV0F">
-    <label
-     name="expl:VC for get_min"/>
+   <goal name="WP_parameter get_min" expl="VC for get_min"
+    sum="eb9da314c71c092ebf9738c9272c708e">
+    <label name="expl:VC for get_min"/>
     <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter get_min.1"
-      locfile="../skew_heaps.mlw"
-      loclnum="60" loccnumb="6" loccnume="13"
-      expl="1. unreachable point"
-      sum="c4148bbb846460e09baaa03d114f375c"
-      proved="true"
-      expanded="false"
-      shape="unreachable pointCfaEmptytaNodewVwV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="expl:VC for get_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     name="split_goal_wp">
+     <goal name="WP_parameter get_min.1" expl="1. unreachable point"
+      sum="c4148bbb846460e09baaa03d114f375c">
+      <label name="expl:VC for get_min"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter get_min.2"
-      locfile="../skew_heaps.mlw"
-      loclnum="60" loccnumb="6" loccnume="13"
-      expl="2. postcondition"
-      sum="715c7affc9cb9eba446231eb3cce757b"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyainfix =V1aminimumV0aNodewVwV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="expl:VC for get_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter get_min.2" expl="2. postcondition"
+      sum="715c7affc9cb9eba446231eb3cce757b">
+      <label name="expl:VC for get_min"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal
-    name="WP_parameter merge"
-    locfile="../skew_heaps.mlw"
-    loclnum="69" loccnumb="10" loccnume="15"
-    expl="VC for merge"
-    sum="55d65da6eb4a8528a06ee1e9d49524c1"
-    proved="true"
-    expanded="false"
-    shape="CCiainfix =asizeV9ainfix +asizeV0asizeV1Aainfix =aoccV10V9ainfix +aoccV10V0aoccV10V1FAaheapV9LaNodeV8V3V2Iainfix =asizeV8ainfix +asizeV4asizeV0Aainfix =aoccV11V8ainfix +aoccV11V4aoccV11V0FAaheapV8FAaheapV0AaheapV4Aainfix &lt;ainfix +asizeV4asizeV0ainfix +asizeV0asizeV1Aainfix &lt;=c0ainfix +asizeV0asizeV1ainfix =asizeV13ainfix +asizeV0asizeV1Aainfix =aoccV14V13ainfix +aoccV14V0aoccV14V1FAaheapV13LaNodeV12V6V5Iainfix =asizeV12ainfix +asizeV7asizeV1Aainfix =aoccV15V12ainfix +aoccV15V7aoccV15V1FAaheapV12FAaheapV1AaheapV7Aainfix &lt;ainfix +asizeV7asizeV1ainfix +asizeV0asizeV1Aainfix &lt;=c0ainfix +asizeV0asizeV1aleV6V3aNodeVVVainfix =asizeV1ainfix +asizeV0asizeV1Aainfix =aoccV16V1ainfix +aoccV16V0aoccV16V1FAaheapV1aEmptyV0aNodeVVVCainfix =asizeV1ainfix +asizeV0asizeV1Aainfix =aoccV17V1ainfix +aoccV17V0aoccV17V1FAaheapV1aEmptyainfix =asizeV0ainfix +asizeV0asizeV1Aainfix =aoccV18V0ainfix +aoccV18V0aoccV18V1FAaheapV0wV0aEmptyV1IaheapV1AaheapV0F">
-    <label
-     name="expl:VC for merge"/>
+   <goal name="WP_parameter merge" expl="VC for merge"
+    sum="55d65da6eb4a8528a06ee1e9d49524c1">
+    <label name="expl:VC for merge"/>
     <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter merge.1"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="1. variant decrease"
-      sum="524a7d8e556036b4c2ccdf814f053715"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCCainfix &lt;ainfix +asizeV7asizeV1ainfix +asizeV0asizeV1Aainfix &lt;=c0ainfix +asizeV0asizeV1IaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     name="split_goal_wp">
+     <goal name="WP_parameter merge.1" expl="1. variant decrease"
+      sum="524a7d8e556036b4c2ccdf814f053715">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.2"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="2. precondition"
-      sum="d325daa44c9f7b1c70c0b0bbe49f3fa8"
-      proved="true"
-      expanded="false"
-      shape="preconditionCCaheapV1AaheapV7IaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.2" expl="2. precondition"
+      sum="d325daa44c9f7b1c70c0b0bbe49f3fa8">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.3"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="3. postcondition"
-      sum="dea60331a3589d0e57f37bc976c037a4"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCaheapV9LaNodeV8V6V5Iainfix =asizeV8ainfix +asizeV7asizeV1Aainfix =aoccV10V8ainfix +aoccV10V7aoccV10V1FAaheapV8FIaheapV1AaheapV7IaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="2"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.3" expl="3. postcondition"
+      sum="dea60331a3589d0e57f37bc976c037a4">
+      <label name="expl:VC for merge"/>
+      <proof prover="2">
        <result status="valid" time="0.12"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.4"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="4. postcondition"
-      sum="568c94c35947ea382613721da008ad72"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCainfix =aoccV10V9ainfix +aoccV10V0aoccV10V1FLaNodeV8V6V5Iainfix =asizeV8ainfix +asizeV7asizeV1Aainfix =aoccV11V8ainfix +aoccV11V7aoccV11V1FAaheapV8FIaheapV1AaheapV7IaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.4" expl="4. postcondition"
+      sum="568c94c35947ea382613721da008ad72">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.04"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.5"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="5. postcondition"
-      sum="3b4ea7d710382575a81e5cc279f60d23"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCainfix =asizeV9ainfix +asizeV0asizeV1LaNodeV8V6V5Iainfix =asizeV8ainfix +asizeV7asizeV1Aainfix =aoccV10V8ainfix +aoccV10V7aoccV10V1FAaheapV8FIaheapV1AaheapV7IaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.5" expl="5. postcondition"
+      sum="3b4ea7d710382575a81e5cc279f60d23">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.6"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="6. variant decrease"
-      sum="981a1007f9eb6cbe21ad74595a0b6878"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCCainfix &lt;ainfix +asizeV4asizeV0ainfix +asizeV0asizeV1Aainfix &lt;=c0ainfix +asizeV0asizeV1INaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.6" expl="6. variant decrease"
+      sum="981a1007f9eb6cbe21ad74595a0b6878">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.7"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="7. precondition"
-      sum="089168ac925e43e9b356227e408da27f"
-      proved="true"
-      expanded="false"
-      shape="preconditionCCaheapV0AaheapV4INaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.7" expl="7. precondition"
+      sum="089168ac925e43e9b356227e408da27f">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.8"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="8. postcondition"
-      sum="bb32d514ba657c673500674ccebdb2d5"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCaheapV9LaNodeV8V3V2Iainfix =asizeV8ainfix +asizeV4asizeV0Aainfix =aoccV10V8ainfix +aoccV10V4aoccV10V0FAaheapV8FIaheapV0AaheapV4INaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="2"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.8" expl="8. postcondition"
+      sum="bb32d514ba657c673500674ccebdb2d5">
+      <label name="expl:VC for merge"/>
+      <proof prover="2">
        <result status="valid" time="0.12"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.9"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="9. postcondition"
-      sum="f71fccb00e656e3fd4aae3add06e6efd"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCainfix =aoccV10V9ainfix +aoccV10V0aoccV10V1FLaNodeV8V3V2Iainfix =asizeV8ainfix +asizeV4asizeV0Aainfix =aoccV11V8ainfix +aoccV11V4aoccV11V0FAaheapV8FIaheapV0AaheapV4INaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.9" expl="9. postcondition"
+      sum="f71fccb00e656e3fd4aae3add06e6efd">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.10"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="10. postcondition"
-      sum="938163bb5a3f31a535d5272d04baa538"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCainfix =asizeV9ainfix +asizeV0asizeV1LaNodeV8V3V2Iainfix =asizeV8ainfix +asizeV4asizeV0Aainfix =aoccV10V8ainfix +aoccV10V4aoccV10V0FAaheapV8FIaheapV0AaheapV4INaleV6V3aNodeVVVtaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.10" expl="10. postcondition"
+      sum="938163bb5a3f31a535d5272d04baa538">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.11"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="11. postcondition"
-      sum="0825f3c762183a731919d67801900c2c"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCtaNodeVVVaheapV1aEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.11" expl="11. postcondition"
+      sum="0825f3c762183a731919d67801900c2c">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.12"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="12. postcondition"
-      sum="5e1ed9cf2c8238b97617623316ddf82e"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCtaNodeVVVainfix =aoccV8V1ainfix +aoccV8V0aoccV8V1FaEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.12" expl="12. postcondition"
+      sum="5e1ed9cf2c8238b97617623316ddf82e">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.13"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="13. postcondition"
-      sum="1fe0f61665dc697e70992149fb5824c4"
-      proved="true"
-      expanded="false"
-      shape="postconditionCCtaNodeVVVainfix =asizeV1ainfix +asizeV0asizeV1aEmptyV0aNodeVVVtaEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.13" expl="13. postcondition"
+      sum="1fe0f61665dc697e70992149fb5824c4">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.14"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="14. postcondition"
-      sum="5782e5838421ffc90bfcdbd721897cc3"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNodeVVVCaheapV1aEmptytwV0aEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.14" expl="14. postcondition"
+      sum="5782e5838421ffc90bfcdbd721897cc3">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.15"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="15. postcondition"
-      sum="951187b1b2631dcfe6f6e756cc478d9e"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNodeVVVCainfix =aoccV5V1ainfix +aoccV5V0aoccV5V1FaEmptytwV0aEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.15" expl="15. postcondition"
+      sum="951187b1b2631dcfe6f6e756cc478d9e">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.16"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="16. postcondition"
-      sum="b57627784975c6105e5998f7310090da"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNodeVVVCainfix =asizeV1ainfix +asizeV0asizeV1aEmptytwV0aEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.16" expl="16. postcondition"
+      sum="b57627784975c6105e5998f7310090da">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.17"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="17. postcondition"
-      sum="5f5bce86a7e716f3ebcb73eaf9724002"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNodeVVVCtaEmptyaheapV0wV0aEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.17" expl="17. postcondition"
+      sum="5f5bce86a7e716f3ebcb73eaf9724002">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.18"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="18. postcondition"
-      sum="68a7fa67e9d0cb491431263d2410a6a7"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNodeVVVCtaEmptyainfix =aoccV5V0ainfix +aoccV5V0aoccV5V1FwV0aEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.18" expl="18. postcondition"
+      sum="68a7fa67e9d0cb491431263d2410a6a7">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter merge.19"
-      locfile="../skew_heaps.mlw"
-      loclnum="69" loccnumb="10" loccnume="15"
-      expl="19. postcondition"
-      sum="111ef443960f872cc41db68bc306d680"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNodeVVVCtaEmptyainfix =asizeV0ainfix +asizeV0asizeV1wV0aEmptyV1IaheapV1AaheapV0F">
-      <label
-       name="expl:VC for merge"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter merge.19" expl="19. postcondition"
+      sum="111ef443960f872cc41db68bc306d680">
+      <label name="expl:VC for merge"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal
-    name="WP_parameter add"
-    locfile="../skew_heaps.mlw"
-    loclnum="86" loccnumb="6" loccnume="9"
-    expl="VC for add"
-    sum="ffc36d1206933c3bba0409744b64c1e4"
-    proved="true"
-    expanded="false"
-    shape="ainfix =asizeV3ainfix +asizeV1c1Aainfix =aoccV4V3aoccV4V1INainfix =V4V0FAainfix =aoccV0V3ainfix +aoccV0V1c1AaheapV3Iainfix =asizeV3ainfix +asizeV2asizeV1Aainfix =aoccV5V3ainfix +aoccV5V2aoccV5V1FAaheapV3FAaheapV1AaheapV2LaNodeaEmptyV0aEmptyIaheapV1F">
-    <label
-     name="expl:VC for add"/>
+   <goal name="WP_parameter add" expl="VC for add"
+    sum="ffc36d1206933c3bba0409744b64c1e4">
+    <label name="expl:VC for add"/>
     <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter add.1"
-      locfile="../skew_heaps.mlw"
-      loclnum="86" loccnumb="6" loccnume="9"
-      expl="1. precondition"
-      sum="614312a73882e742d0ad126f4cdebaeb"
-      proved="true"
-      expanded="false"
-      shape="preconditionaheapV1AaheapV2LaNodeaEmptyV0aEmptyIaheapV1F">
-      <label
-       name="expl:VC for add"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     name="split_goal_wp">
+     <goal name="WP_parameter add.1" expl="1. precondition"
+      sum="614312a73882e742d0ad126f4cdebaeb">
+      <label name="expl:VC for add"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter add.2"
-      locfile="../skew_heaps.mlw"
-      loclnum="86" loccnumb="6" loccnume="9"
-      expl="2. postcondition"
-      sum="8fd437e60ddec4428b96668667deea0d"
-      proved="true"
-      expanded="false"
-      shape="postconditionaheapV3Iainfix =asizeV3ainfix +asizeV2asizeV1Aainfix =aoccV4V3ainfix +aoccV4V2aoccV4V1FAaheapV3FIaheapV1AaheapV2LaNodeaEmptyV0aEmptyIaheapV1F">
-      <label
-       name="expl:VC for add"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter add.2" expl="2. postcondition"
+      sum="8fd437e60ddec4428b96668667deea0d">
+      <label name="expl:VC for add"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter add.3"
-      locfile="../skew_heaps.mlw"
-      loclnum="86" loccnumb="6" loccnume="9"
-      expl="3. postcondition"
-      sum="aab3092bb33901dc5a99c8b2688a24ee"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix =aoccV0V3ainfix +aoccV0V1c1Iainfix =asizeV3ainfix +asizeV2asizeV1Aainfix =aoccV4V3ainfix +aoccV4V2aoccV4V1FAaheapV3FIaheapV1AaheapV2LaNodeaEmptyV0aEmptyIaheapV1F">
-      <label
-       name="expl:VC for add"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter add.3" expl="3. postcondition"
+      sum="aab3092bb33901dc5a99c8b2688a24ee">
+      <label name="expl:VC for add"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter add.4"
-      locfile="../skew_heaps.mlw"
-      loclnum="86" loccnumb="6" loccnume="9"
-      expl="4. postcondition"
-      sum="05fcd55c15e0b1d5b9249e4f4aa5ae6d"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix =aoccV4V3aoccV4V1INainfix =V4V0FIainfix =asizeV3ainfix +asizeV2asizeV1Aainfix =aoccV5V3ainfix +aoccV5V2aoccV5V1FAaheapV3FIaheapV1AaheapV2LaNodeaEmptyV0aEmptyIaheapV1F">
-      <label
-       name="expl:VC for add"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter add.4" expl="4. postcondition"
+      sum="05fcd55c15e0b1d5b9249e4f4aa5ae6d">
+      <label name="expl:VC for add"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter add.5"
-      locfile="../skew_heaps.mlw"
-      loclnum="86" loccnumb="6" loccnume="9"
-      expl="5. postcondition"
-      sum="57e2f1ac838e8e5791e8db94d84a2cfe"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix =asizeV3ainfix +asizeV1c1Iainfix =asizeV3ainfix +asizeV2asizeV1Aainfix =aoccV4V3ainfix +aoccV4V2aoccV4V1FAaheapV3FIaheapV1AaheapV2LaNodeaEmptyV0aEmptyIaheapV1F">
-      <label
-       name="expl:VC for add"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter add.5" expl="5. postcondition"
+      sum="57e2f1ac838e8e5791e8db94d84a2cfe">
+      <label name="expl:VC for add"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal
-    name="WP_parameter remove_min"
-    locfile="../skew_heaps.mlw"
-    loclnum="95" loccnumb="6" loccnume="16"
-    expl="VC for remove_min"
-    sum="7ac973a459d239c0d6e652793b767481"
-    proved="true"
-    expanded="false"
-    shape="CfaEmptyainfix =asizeV3ainfix -asizeV0c1Aainfix =aoccV4V3aoccV4V0INainfix =V4aminimumV0FAainfix =aoccaminimumV0V3ainfix -aoccaminimumV0V0c1AaheapV3Iainfix =asizeV3ainfix +asizeV1asizeV2Aainfix =aoccV5V3ainfix +aoccV5V1aoccV5V2FAaheapV3FAaheapV2AaheapV1aNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-    <label
-     name="expl:VC for remove_min"/>
+   <goal name="WP_parameter remove_min" expl="VC for remove_min"
+    sum="7ac973a459d239c0d6e652793b767481">
+    <label name="expl:VC for remove_min"/>
     <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter remove_min.1"
-      locfile="../skew_heaps.mlw"
-      loclnum="95" loccnumb="6" loccnume="16"
-      expl="1. unreachable point"
-      sum="4c5d804caba6ef57842583c4bb746d8e"
-      proved="true"
-      expanded="false"
-      shape="unreachable pointCfaEmptytaNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="expl:VC for remove_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     name="split_goal_wp">
+     <goal name="WP_parameter remove_min.1" expl="1. unreachable point"
+      sum="4c5d804caba6ef57842583c4bb746d8e">
+      <label name="expl:VC for remove_min"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter remove_min.2"
-      locfile="../skew_heaps.mlw"
-      loclnum="95" loccnumb="6" loccnume="16"
-      expl="2. precondition"
-      sum="52abb7173220a995386aadef37809946"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaEmptyaheapV2AaheapV1aNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="expl:VC for remove_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter remove_min.2" expl="2. precondition"
+      sum="52abb7173220a995386aadef37809946">
+      <label name="expl:VC for remove_min"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter remove_min.3"
-      locfile="../skew_heaps.mlw"
-      loclnum="95" loccnumb="6" loccnume="16"
-      expl="3. postcondition"
-      sum="283baf991954996b4edac5042c123ca3"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyaheapV3Iainfix =asizeV3ainfix +asizeV1asizeV2Aainfix =aoccV4V3ainfix +aoccV4V1aoccV4V2FAaheapV3FIaheapV2AaheapV1aNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="expl:VC for remove_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter remove_min.3" expl="3. postcondition"
+      sum="283baf991954996b4edac5042c123ca3">
+      <label name="expl:VC for remove_min"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter remove_min.4"
-      locfile="../skew_heaps.mlw"
-      loclnum="95" loccnumb="6" loccnume="16"
-      expl="4. postcondition"
-      sum="a1c8b751aad78326cca12553072aff68"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyainfix =aoccaminimumV0V3ainfix -aoccaminimumV0V0c1Iainfix =asizeV3ainfix +asizeV1asizeV2Aainfix =aoccV4V3ainfix +aoccV4V1aoccV4V2FAaheapV3FIaheapV2AaheapV1aNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="expl:VC for remove_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter remove_min.4" expl="4. postcondition"
+      sum="a1c8b751aad78326cca12553072aff68">
+      <label name="expl:VC for remove_min"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter remove_min.5"
-      locfile="../skew_heaps.mlw"
-      loclnum="95" loccnumb="6" loccnume="16"
-      expl="5. postcondition"
-      sum="1b9d9dffa61c5ea65ff54b2d48c117ff"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyainfix =aoccV4V3aoccV4V0INainfix =V4aminimumV0FIainfix =asizeV3ainfix +asizeV1asizeV2Aainfix =aoccV5V3ainfix +aoccV5V1aoccV5V2FAaheapV3FIaheapV2AaheapV1aNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="expl:VC for remove_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter remove_min.5" expl="5. postcondition"
+      sum="1b9d9dffa61c5ea65ff54b2d48c117ff">
+      <label name="expl:VC for remove_min"/>
+      <proof prover="1">
        <result status="valid" time="0.07"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter remove_min.6"
-      locfile="../skew_heaps.mlw"
-      loclnum="95" loccnumb="6" loccnume="16"
-      expl="6. postcondition"
-      sum="c40d1aeed9242a5f5327b40f481e2807"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaEmptyainfix =asizeV3ainfix -asizeV0c1Iainfix =asizeV3ainfix +asizeV1asizeV2Aainfix =aoccV4V3ainfix +aoccV4V1aoccV4V2FAaheapV3FIaheapV2AaheapV1aNodeVwVV0Iainfix &lt;c0asizeV0AaheapV0F">
-      <label
-       name="expl:VC for remove_min"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter remove_min.6" expl="6. postcondition"
+      sum="c40d1aeed9242a5f5327b40f481e2807">
+      <label name="expl:VC for remove_min"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
@@ -1054,843 +384,306 @@
    </goal>
   </theory>
   <theory
-   name="HeapSort"
-   locfile="../skew_heaps.mlw"
-   loclnum="111" loccnumb="7" loccnume="15"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter heapsort"
-    locfile="../skew_heaps.mlw"
-    loclnum="122" loccnumb="6" loccnume="14"
-    expl="VC for heapsort"
-    sum="89315e4db287dce25153690e4d879781"
-    proved="true"
-    expanded="false"
-    shape="apermut_allV2V9AasortedV9Aainfix &lt;=c0V0Iainfix =ainfix +aoccV10V8c0ainfix +V6c1aoccV10V7aoccV10V1c0V0FAaleagetV8V11V12Iainfix &lt;c0aoccV12V7FIainfix &lt;V11ainfix +V6c1Aainfix &lt;=c0V11FAainfix =asizeV7ainfix -V0ainfix +V6c1AaheapV7Aasorted_subV9c0ainfix +V6c1Aainfix =ainfix +aoccV17V14c0ainfix +V13c1aoccV17V16aoccV17V1c0V0FAaleagetV14V18V19Iainfix &lt;c0aoccV19V16FIainfix &lt;V18ainfix +V13c1Aainfix &lt;=c0V18FAainfix =asizeV16ainfix -V0ainfix +V13c1AaheapV16Aasorted_subamk arrayV0V14c0ainfix +V13c1Iainfix =V16V15FIainfix =asizeV15ainfix -asizeV7c1Aainfix =aoccV20V15aoccV20V7INainfix =V20aminimumV7FAainfix =aoccaminimumV7V15ainfix -aoccaminimumV7V7c1AaheapV15FAainfix &lt;c0asizeV7AaheapV7Iainfix =V14asetV8V13aminimumV7Aainfix &lt;=c0V0FAainfix &lt;V13V0Aainfix &lt;=c0V13Aainfix &lt;=c0V0Aainfix &lt;c0asizeV7AaheapV7Iainfix =ainfix +aoccV21V8c0V13aoccV21V7aoccV21V1c0V0FAaleagetV8V22V23Iainfix &lt;c0aoccV23V7FIainfix &lt;V22V13Aainfix &lt;=c0V22FAainfix =asizeV7ainfix -V0V13AaheapV7Aasorted_subV9c0V13Iainfix &lt;=V13V6Aainfix &lt;=c0V13FLamk arrayV0V8FAainfix =ainfix +aoccV24V1c0c0aoccV24V5aoccV24V1c0V0FAaleagetV1V25V26Iainfix &lt;c0aoccV26V5FIainfix &lt;V25c0Aainfix &lt;=c0V25FAainfix =asizeV5ainfix -V0c0AaheapV5Aasorted_subV2c0c0Iainfix &lt;=c0V6Aapermut_allV2V2AasortedV2Iainfix &gt;c0V6Lainfix -V0c1Iainfix =ainfix +aoccV27V1ainfix +V4c1V0aoccV27V5aoccV27V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5Aainfix =ainfix +aoccV32V1ainfix +V28c1V0aoccV32V31aoccV32V1c0V0FAainfix =asizeV31ainfix +V28c1AaheapV31Aainfix =aoccagetV1V28V1V28V0ainfix +c1aoccagetV1V28V1ainfix +V28c1V0Iainfix =V31V30FIainfix =asizeV30ainfix +asizeV5c1Aainfix =aoccV33V30aoccV33V5INainfix =V33V29FAainfix =aoccV29V30ainfix +aoccV29V5c1AaheapV30FAaheapV5LagetV1V28Aainfix &lt;V28V0Aainfix &lt;=c0V28Iainfix =ainfix +aoccV34V1V28V0aoccV34V5aoccV34V1c0V0FAainfix =asizeV5V28AaheapV5Iainfix &lt;=V28V4Aainfix &lt;=c0V28FFAainfix =ainfix +aoccV35V1c0V0aoccV35V3aoccV35V1c0V0FAainfix =asizeV3c0AaheapV3Iainfix &lt;=c0V4Aapermut_allV2V39AasortedV39Aainfix &lt;=c0V0Iainfix =ainfix +aoccV40V38c0ainfix +V36c1aoccV40V37aoccV40V1c0V0FAaleagetV38V41V42Iainfix &lt;c0aoccV42V37FIainfix &lt;V41ainfix +V36c1Aainfix &lt;=c0V41FAainfix =asizeV37ainfix -V0ainfix +V36c1AaheapV37Aasorted_subV39c0ainfix +V36c1Aainfix =ainfix +aoccV47V44c0ainfix +V43c1aoccV47V46aoccV47V1c0V0FAaleagetV44V48V49Iainfix &lt;c0aoccV49V46FIainfix &lt;V48ainfix +V43c1Aainfix &lt;=c0V48FAainfix =asizeV46ainfix -V0ainfix +V43c1AaheapV46Aasorted_subamk arrayV0V44c0ainfix +V43c1Iainfix =V46V45FIainfix =asizeV45ainfix -asizeV37c1Aainfix =aoccV50V45aoccV50V37INainfix =V50aminimumV37FAainfix =aoccaminimumV37V45ainfix -aoccaminimumV37V37c1AaheapV45FAainfix &lt;c0asizeV37AaheapV37Iainfix =V44asetV38V43aminimumV37Aainfix &lt;=c0V0FAainfix &lt;V43V0Aainfix &lt;=c0V43Aainfix &lt;=c0V0Aainfix &lt;c0asizeV37AaheapV37Iainfix =ainfix +aoccV51V38c0V43aoccV51V37aoccV51V1c0V0FAaleagetV38V52V53Iainfix &lt;c0aoccV53V37FIainfix &lt;V52V43Aainfix &lt;=c0V52FAainfix =asizeV37ainfix -V0V43AaheapV37Aasorted_subV39c0V43Iainfix &lt;=V43V36Aainfix &lt;=c0V43FLamk arrayV0V38FAainfix =ainfix +aoccV54V1c0c0aoccV54V3aoccV54V1c0V0FAaleagetV1V55V56Iainfix &lt;c0aoccV56V3FIainfix &lt;V55c0Aainfix &lt;=c0V55FAainfix =asizeV3ainfix -V0c0AaheapV3Aasorted_subV2c0c0Iainfix &lt;=c0V36Aapermut_allV2V2AasortedV2Iainfix &gt;c0V36Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV57V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-    <label
-     name="expl:VC for heapsort"/>
+   name="HeapSort">
+   <goal name="WP_parameter heapsort" expl="VC for heapsort"
+    sum="89315e4db287dce25153690e4d879781">
+    <label name="expl:VC for heapsort"/>
     <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter heapsort.1"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="1. postcondition"
-      sum="4a99dbd0c4c11e7a3ed8efdf3cc39004"
-      proved="true"
-      expanded="false"
-      shape="postconditionasortedV2Iainfix &gt;c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV6V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     name="split_goal_wp">
+     <goal name="WP_parameter heapsort.1" expl="1. postcondition"
+      sum="4a99dbd0c4c11e7a3ed8efdf3cc39004">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.2"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="2. postcondition"
-      sum="31652c8aee275f2348e3a95d47af183a"
-      proved="true"
-      expanded="false"
-      shape="postconditionapermut_allV2V2Iainfix &gt;c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV6V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.2" expl="2. postcondition"
+      sum="31652c8aee275f2348e3a95d47af183a">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.3"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="3. loop invariant init"
-      sum="08eb94e31afc90620a5c1012210c4c45"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initasorted_subV2c0c0Iainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV6V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.3" expl="3. loop invariant init"
+      sum="08eb94e31afc90620a5c1012210c4c45">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.4"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="4. loop invariant init"
-      sum="b0514748a0de0eb6649a97e098207843"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix =asizeV3ainfix -V0c0AaheapV3Iainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV6V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.4" expl="4. loop invariant init"
+      sum="b0514748a0de0eb6649a97e098207843">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.5"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="5. loop invariant init"
-      sum="52adfc5b7bb4f45dd0f4263a76f9e670"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initaleagetV1V6V7Iainfix &lt;c0aoccV7V3FIainfix &lt;V6c0Aainfix &lt;=c0V6FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV8V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.5" expl="5. loop invariant init"
+      sum="52adfc5b7bb4f45dd0f4263a76f9e670">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.6"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="6. loop invariant init"
-      sum="ca08d5e761ff3c8f79e65c41babdafdd"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix =ainfix +aoccV6V1c0c0aoccV6V3aoccV6V1c0V0FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV7V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.6" expl="6. loop invariant init"
+      sum="ca08d5e761ff3c8f79e65c41babdafdd">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.7"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="7. precondition"
-      sum="16723a168ede43780f06b6b47bd9878d"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;c0asizeV6AaheapV6Iainfix =ainfix +aoccV10V7c0V9aoccV10V6aoccV10V1c0V0FAaleagetV7V11V12Iainfix &lt;c0aoccV12V6FIainfix &lt;V11V9Aainfix &lt;=c0V11FAainfix =asizeV6ainfix -V0V9AaheapV6Aasorted_subV8c0V9Iainfix &lt;=V9V5Aainfix &lt;=c0V9FLamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV13V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.7" expl="7. precondition"
+      sum="16723a168ede43780f06b6b47bd9878d">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.8"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="8. type invariant"
-      sum="74fe4acb84b79693f8b5f47a0de0d63b"
-      proved="true"
-      expanded="false"
-      shape="type invariantainfix &lt;=c0V0Iainfix &lt;c0asizeV6AaheapV6Iainfix =ainfix +aoccV10V7c0V9aoccV10V6aoccV10V1c0V0FAaleagetV7V11V12Iainfix &lt;c0aoccV12V6FIainfix &lt;V11V9Aainfix &lt;=c0V11FAainfix =asizeV6ainfix -V0V9AaheapV6Aasorted_subV8c0V9Iainfix &lt;=V9V5Aainfix &lt;=c0V9FLamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV13V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.8" expl="8. type invariant"
+      sum="74fe4acb84b79693f8b5f47a0de0d63b">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.9"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="9. index in array bounds"
-      sum="73a78c03e9a5014181d9e83b1b768b24"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;=c0V0Iainfix &lt;c0asizeV6AaheapV6Iainfix =ainfix +aoccV10V7c0V9aoccV10V6aoccV10V1c0V0FAaleagetV7V11V12Iainfix &lt;c0aoccV12V6FIainfix &lt;V11V9Aainfix &lt;=c0V11FAainfix =asizeV6ainfix -V0V9AaheapV6Aasorted_subV8c0V9Iainfix &lt;=V9V5Aainfix &lt;=c0V9FLamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV13V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.9" expl="9. index in array bounds"
+      sum="73a78c03e9a5014181d9e83b1b768b24">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.10"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="10. precondition"
-      sum="1d39ac9fdb3efb10ec84d4ef186f9483"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;c0asizeV6AaheapV6Iainfix =V10asetV7V9aminimumV6Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &lt;c0asizeV6AaheapV6Iainfix =ainfix +aoccV11V7c0V9aoccV11V6aoccV11V1c0V0FAaleagetV7V12V13Iainfix &lt;c0aoccV13V6FIainfix &lt;V12V9Aainfix &lt;=c0V12FAainfix =asizeV6ainfix -V0V9AaheapV6Aasorted_subV8c0V9Iainfix &lt;=V9V5Aainfix &lt;=c0V9FLamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV14V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.10" expl="10. precondition"
+      sum="1d39ac9fdb3efb10ec84d4ef186f9483">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.11"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.11"
       expl="11. loop invariant preservation"
-      sum="765627847ed58058c5183f81d2b04de5"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationasorted_subamk arrayV0V10c0ainfix +V9c1Iainfix =V12V11FIainfix =asizeV11ainfix -asizeV6c1Aainfix =aoccV13V11aoccV13V6INainfix =V13aminimumV6FAainfix =aoccaminimumV6V11ainfix -aoccaminimumV6V6c1AaheapV11FIainfix &lt;c0asizeV6AaheapV6Iainfix =V10asetV7V9aminimumV6Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &lt;c0asizeV6AaheapV6Iainfix =ainfix +aoccV14V7c0V9aoccV14V6aoccV14V1c0V0FAaleagetV7V15V16Iainfix &lt;c0aoccV16V6FIainfix &lt;V15V9Aainfix &lt;=c0V15FAainfix =asizeV6ainfix -V0V9AaheapV6Aasorted_subV8c0V9Iainfix &lt;=V9V5Aainfix &lt;=c0V9FLamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV17V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="765627847ed58058c5183f81d2b04de5">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.12"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.12"
       expl="12. loop invariant preservation"
-      sum="cdbb8550162f1d359efd5c19b3ae16e6"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =asizeV12ainfix -V0ainfix +V9c1AaheapV12Iainfix =V12V11FIainfix =asizeV11ainfix -asizeV6c1Aainfix =aoccV13V11aoccV13V6INainfix =V13aminimumV6FAainfix =aoccaminimumV6V11ainfix -aoccaminimumV6V6c1AaheapV11FIainfix &lt;c0asizeV6AaheapV6Iainfix =V10asetV7V9aminimumV6Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &lt;c0asizeV6AaheapV6Iainfix =ainfix +aoccV14V7c0V9aoccV14V6aoccV14V1c0V0FAaleagetV7V15V16Iainfix &lt;c0aoccV16V6FIainfix &lt;V15V9Aainfix &lt;=c0V15FAainfix =asizeV6ainfix -V0V9AaheapV6Aasorted_subV8c0V9Iainfix &lt;=V9V5Aainfix &lt;=c0V9FLamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV17V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="cdbb8550162f1d359efd5c19b3ae16e6">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.13"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.13"
       expl="13. loop invariant preservation"
-      sum="b609d02af7a51840a53c060adc315ce9"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationaleagetV10V13V14Iainfix &lt;c0aoccV14V12FIainfix &lt;V13ainfix +V9c1Aainfix &lt;=c0V13FIainfix =V12V11FIainfix =asizeV11ainfix -asizeV6c1Aainfix =aoccV15V11aoccV15V6INainfix =V15aminimumV6FAainfix =aoccaminimumV6V11ainfix -aoccaminimumV6V6c1AaheapV11FIainfix &lt;c0asizeV6AaheapV6Iainfix =V10asetV7V9aminimumV6Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &lt;c0asizeV6AaheapV6Iainfix =ainfix +aoccV16V7c0V9aoccV16V6aoccV16V1c0V0FAaleagetV7V17V18Iainfix &lt;c0aoccV18V6FIainfix &lt;V17V9Aainfix &lt;=c0V17FAainfix =asizeV6ainfix -V0V9AaheapV6Aasorted_subV8c0V9Iainfix &lt;=V9V5Aainfix &lt;=c0V9FLamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV19V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="b609d02af7a51840a53c060adc315ce9">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.05"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.14"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.14"
       expl="14. loop invariant preservation"
-      sum="77710b5308fa181af63515726905c9e5"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =ainfix +aoccV13V10c0ainfix +V9c1aoccV13V12aoccV13V1c0V0FIainfix =V12V11FIainfix =asizeV11ainfix -asizeV6c1Aainfix =aoccV14V11aoccV14V6INainfix =V14aminimumV6FAainfix =aoccaminimumV6V11ainfix -aoccaminimumV6V6c1AaheapV11FIainfix &lt;c0asizeV6AaheapV6Iainfix =V10asetV7V9aminimumV6Aainfix &lt;=c0V0FIainfix &lt;V9V0Aainfix &lt;=c0V9Aainfix &lt;=c0V0Iainfix &lt;c0asizeV6AaheapV6Iainfix =ainfix +aoccV15V7c0V9aoccV15V6aoccV15V1c0V0FAaleagetV7V16V17Iainfix &lt;c0aoccV17V6FIainfix &lt;V16V9Aainfix &lt;=c0V16FAainfix =asizeV6ainfix -V0V9AaheapV6Aasorted_subV8c0V9Iainfix &lt;=V9V5Aainfix &lt;=c0V9FLamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV18V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="77710b5308fa181af63515726905c9e5">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.15"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="15. type invariant"
-      sum="dea7dd775d1494d59851893309880d98"
-      proved="true"
-      expanded="false"
-      shape="type invariantainfix &lt;=c0V0Iainfix =ainfix +aoccV9V7c0ainfix +V5c1aoccV9V6aoccV9V1c0V0FAaleagetV7V10V11Iainfix &lt;c0aoccV11V6FIainfix &lt;V10ainfix +V5c1Aainfix &lt;=c0V10FAainfix =asizeV6ainfix -V0ainfix +V5c1AaheapV6Aasorted_subV8c0ainfix +V5c1Lamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV12V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.15" expl="15. type invariant"
+      sum="dea7dd775d1494d59851893309880d98">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.16"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="16. postcondition"
-      sum="2eb2426a013828255c2074a6693f6b45"
-      proved="true"
-      expanded="false"
-      shape="postconditionasortedV8Iainfix &lt;=c0V0Iainfix =ainfix +aoccV9V7c0ainfix +V5c1aoccV9V6aoccV9V1c0V0FAaleagetV7V10V11Iainfix &lt;c0aoccV11V6FIainfix &lt;V10ainfix +V5c1Aainfix &lt;=c0V10FAainfix =asizeV6ainfix -V0ainfix +V5c1AaheapV6Aasorted_subV8c0ainfix +V5c1Lamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV12V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.16" expl="16. postcondition"
+      sum="2eb2426a013828255c2074a6693f6b45">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.17"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="17. postcondition"
-      sum="483a5aa988d68ee5a6759902a79e177e"
-      proved="true"
-      expanded="false"
-      shape="postconditionapermut_allV2V8Iainfix &lt;=c0V0Iainfix =ainfix +aoccV9V7c0ainfix +V5c1aoccV9V6aoccV9V1c0V0FAaleagetV7V10V11Iainfix &lt;c0aoccV11V6FIainfix &lt;V10ainfix +V5c1Aainfix &lt;=c0V10FAainfix =asizeV6ainfix -V0ainfix +V5c1AaheapV6Aasorted_subV8c0ainfix +V5c1Lamk arrayV0V7FIainfix &lt;=c0V5Lainfix -V0c1Iainfix &gt;c0V4Lainfix -V0c1INainfix &lt;c0aoccV12V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.17" expl="17. postcondition"
+      sum="483a5aa988d68ee5a6759902a79e177e">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.18"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="18. loop invariant init"
-      sum="c83289d05dbaeb121fa153e92269bb49"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix =asizeV3c0AaheapV3Iainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV5V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.18" expl="18. loop invariant init"
+      sum="c83289d05dbaeb121fa153e92269bb49">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.19"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="19. loop invariant init"
-      sum="07f36301d257209bc71b5534afa69e6f"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix =ainfix +aoccV5V1c0V0aoccV5V3aoccV5V1c0V0FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV6V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.19" expl="19. loop invariant init"
+      sum="07f36301d257209bc71b5534afa69e6f">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.20"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="20. index in array bounds"
-      sum="7cf329fcd4cf98195a162d29eb8bd3ce"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix =ainfix +aoccV7V1V6V0aoccV7V5aoccV7V1c0V0FAainfix =asizeV5V6AaheapV5Iainfix &lt;=V6V4Aainfix &lt;=c0V6FFIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV8V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.20" expl="20. index in array bounds"
+      sum="7cf329fcd4cf98195a162d29eb8bd3ce">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.21"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="21. precondition"
-      sum="8a1a5843af43ce3a6e21190953fe6da3"
-      proved="true"
-      expanded="false"
-      shape="preconditionaheapV5LagetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix =ainfix +aoccV8V1V6V0aoccV8V5aoccV8V1c0V0FAainfix =asizeV5V6AaheapV5Iainfix &lt;=V6V4Aainfix &lt;=c0V6FFIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV9V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.21" expl="21. precondition"
+      sum="8a1a5843af43ce3a6e21190953fe6da3">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.22"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="22. assertion"
-      sum="eb19e673e92dd170299fd5eaa3e134d6"
-      proved="true"
-      expanded="false"
-      shape="assertionainfix =aoccagetV1V6V1V6V0ainfix +c1aoccagetV1V6V1ainfix +V6c1V0Iainfix =V9V8FIainfix =asizeV8ainfix +asizeV5c1Aainfix =aoccV10V8aoccV10V5INainfix =V10V7FAainfix =aoccV7V8ainfix +aoccV7V5c1AaheapV8FIaheapV5LagetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix =ainfix +aoccV11V1V6V0aoccV11V5aoccV11V1c0V0FAainfix =asizeV5V6AaheapV5Iainfix &lt;=V6V4Aainfix &lt;=c0V6FFIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV12V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="2"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="2.98"/>
+     <goal name="WP_parameter heapsort.22" expl="22. assertion"
+      sum="eb19e673e92dd170299fd5eaa3e134d6">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="2">
+       <result status="valid" time="3.75"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.23"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.23"
       expl="23. loop invariant preservation"
-      sum="4b9cce7b74fcbb6e203273d8fba9b65d"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =asizeV9ainfix +V6c1AaheapV9Iainfix =aoccagetV1V6V1V6V0ainfix +c1aoccagetV1V6V1ainfix +V6c1V0Iainfix =V9V8FIainfix =asizeV8ainfix +asizeV5c1Aainfix =aoccV10V8aoccV10V5INainfix =V10V7FAainfix =aoccV7V8ainfix +aoccV7V5c1AaheapV8FIaheapV5LagetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix =ainfix +aoccV11V1V6V0aoccV11V5aoccV11V1c0V0FAainfix =asizeV5V6AaheapV5Iainfix &lt;=V6V4Aainfix &lt;=c0V6FFIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV12V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="4b9cce7b74fcbb6e203273d8fba9b65d">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.24"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.24"
       expl="24. loop invariant preservation"
-      sum="6c09f14b799079cc3f282c2726d0dcbf"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =ainfix +aoccV10V1ainfix +V6c1V0aoccV10V9aoccV10V1c0V0FIainfix =aoccagetV1V6V1V6V0ainfix +c1aoccagetV1V6V1ainfix +V6c1V0Iainfix =V9V8FIainfix =asizeV8ainfix +asizeV5c1Aainfix =aoccV11V8aoccV11V5INainfix =V11V7FAainfix =aoccV7V8ainfix +aoccV7V5c1AaheapV8FIaheapV5LagetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix =ainfix +aoccV12V1V6V0aoccV12V5aoccV12V1c0V0FAainfix =asizeV5V6AaheapV5Iainfix &lt;=V6V4Aainfix &lt;=c0V6FFIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV13V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="6c09f14b799079cc3f282c2726d0dcbf">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="0">
        <result status="valid" time="4.60"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.25"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="25. postcondition"
-      sum="8bef5f1f1af8afd9c6899f8e0a816012"
-      proved="true"
-      expanded="false"
-      shape="postconditionasortedV2Iainfix &gt;c0V6Lainfix -V0c1Iainfix =ainfix +aoccV7V1ainfix +V4c1V0aoccV7V5aoccV7V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV8V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.25" expl="25. postcondition"
+      sum="8bef5f1f1af8afd9c6899f8e0a816012">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.26"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="26. postcondition"
-      sum="c7f808f7a7ec6c90df785584857c44b9"
-      proved="true"
-      expanded="false"
-      shape="postconditionapermut_allV2V2Iainfix &gt;c0V6Lainfix -V0c1Iainfix =ainfix +aoccV7V1ainfix +V4c1V0aoccV7V5aoccV7V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV8V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.26" expl="26. postcondition"
+      sum="c7f808f7a7ec6c90df785584857c44b9">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.27"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="27. loop invariant init"
-      sum="1f7e851dbc3dee0d79f3589e5527c1bf"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initasorted_subV2c0c0Iainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV7V1ainfix +V4c1V0aoccV7V5aoccV7V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV8V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.27" expl="27. loop invariant init"
+      sum="1f7e851dbc3dee0d79f3589e5527c1bf">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.28"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="28. loop invariant init"
-      sum="637fd69bc28ee500555861a6089fd10e"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix =asizeV5ainfix -V0c0AaheapV5Iainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV7V1ainfix +V4c1V0aoccV7V5aoccV7V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV8V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.28" expl="28. loop invariant init"
+      sum="637fd69bc28ee500555861a6089fd10e">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.29"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="29. loop invariant init"
-      sum="00aa9d9578dfd5dec4d186269ad65f6d"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initaleagetV1V7V8Iainfix &lt;c0aoccV8V5FIainfix &lt;V7c0Aainfix &lt;=c0V7FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV9V1ainfix +V4c1V0aoccV9V5aoccV9V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV10V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.29" expl="29. loop invariant init"
+      sum="00aa9d9578dfd5dec4d186269ad65f6d">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.30"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="30. loop invariant init"
-      sum="a24dc1a143d02a1e234305893acddf53"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix =ainfix +aoccV7V1c0c0aoccV7V5aoccV7V1c0V0FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV8V1ainfix +V4c1V0aoccV8V5aoccV8V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV9V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.30" expl="30. loop invariant init"
+      sum="a24dc1a143d02a1e234305893acddf53">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.03"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.31"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="31. precondition"
-      sum="b4ad67f4359bd9a881074f7e578f900a"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;c0asizeV7AaheapV7Iainfix =ainfix +aoccV11V8c0V10aoccV11V7aoccV11V1c0V0FAaleagetV8V12V13Iainfix &lt;c0aoccV13V7FIainfix &lt;V12V10Aainfix &lt;=c0V12FAainfix =asizeV7ainfix -V0V10AaheapV7Aasorted_subV9c0V10Iainfix &lt;=V10V6Aainfix &lt;=c0V10FLamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV14V1ainfix +V4c1V0aoccV14V5aoccV14V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV15V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.31" expl="31. precondition"
+      sum="b4ad67f4359bd9a881074f7e578f900a">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.32"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="32. type invariant"
-      sum="032e91565e5397fc7bfabbffae508747"
-      proved="true"
-      expanded="false"
-      shape="type invariantainfix &lt;=c0V0Iainfix &lt;c0asizeV7AaheapV7Iainfix =ainfix +aoccV11V8c0V10aoccV11V7aoccV11V1c0V0FAaleagetV8V12V13Iainfix &lt;c0aoccV13V7FIainfix &lt;V12V10Aainfix &lt;=c0V12FAainfix =asizeV7ainfix -V0V10AaheapV7Aasorted_subV9c0V10Iainfix &lt;=V10V6Aainfix &lt;=c0V10FLamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV14V1ainfix +V4c1V0aoccV14V5aoccV14V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV15V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.32" expl="32. type invariant"
+      sum="032e91565e5397fc7bfabbffae508747">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.33"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="33. index in array bounds"
-      sum="6cdfa334aef80f1bcb8d0f87990417a6"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;=c0V0Iainfix &lt;c0asizeV7AaheapV7Iainfix =ainfix +aoccV11V8c0V10aoccV11V7aoccV11V1c0V0FAaleagetV8V12V13Iainfix &lt;c0aoccV13V7FIainfix &lt;V12V10Aainfix &lt;=c0V12FAainfix =asizeV7ainfix -V0V10AaheapV7Aasorted_subV9c0V10Iainfix &lt;=V10V6Aainfix &lt;=c0V10FLamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV14V1ainfix +V4c1V0aoccV14V5aoccV14V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV15V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.33" expl="33. index in array bounds"
+      sum="6cdfa334aef80f1bcb8d0f87990417a6">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.34"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="34. precondition"
-      sum="2ac375c1b4a9f35cea68b6165a58a639"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;c0asizeV7AaheapV7Iainfix =V11asetV8V10aminimumV7Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0Iainfix &lt;c0asizeV7AaheapV7Iainfix =ainfix +aoccV12V8c0V10aoccV12V7aoccV12V1c0V0FAaleagetV8V13V14Iainfix &lt;c0aoccV14V7FIainfix &lt;V13V10Aainfix &lt;=c0V13FAainfix =asizeV7ainfix -V0V10AaheapV7Aasorted_subV9c0V10Iainfix &lt;=V10V6Aainfix &lt;=c0V10FLamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV15V1ainfix +V4c1V0aoccV15V5aoccV15V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV16V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.34" expl="34. precondition"
+      sum="2ac375c1b4a9f35cea68b6165a58a639">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.35"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.35"
       expl="35. loop invariant preservation"
-      sum="3525dc67a039bb483b08e2309cafe8e4"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationasorted_subamk arrayV0V11c0ainfix +V10c1Iainfix =V13V12FIainfix =asizeV12ainfix -asizeV7c1Aainfix =aoccV14V12aoccV14V7INainfix =V14aminimumV7FAainfix =aoccaminimumV7V12ainfix -aoccaminimumV7V7c1AaheapV12FIainfix &lt;c0asizeV7AaheapV7Iainfix =V11asetV8V10aminimumV7Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0Iainfix &lt;c0asizeV7AaheapV7Iainfix =ainfix +aoccV15V8c0V10aoccV15V7aoccV15V1c0V0FAaleagetV8V16V17Iainfix &lt;c0aoccV17V7FIainfix &lt;V16V10Aainfix &lt;=c0V16FAainfix =asizeV7ainfix -V0V10AaheapV7Aasorted_subV9c0V10Iainfix &lt;=V10V6Aainfix &lt;=c0V10FLamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV18V1ainfix +V4c1V0aoccV18V5aoccV18V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV19V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
+      sum="3525dc67a039bb483b08e2309cafe8e4">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
+       <result status="valid" time="0.12"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.36"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.36"
       expl="36. loop invariant preservation"
-      sum="6c099ed61d8d2041f1ebccc4f17bcaf9"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =asizeV13ainfix -V0ainfix +V10c1AaheapV13Iainfix =V13V12FIainfix =asizeV12ainfix -asizeV7c1Aainfix =aoccV14V12aoccV14V7INainfix =V14aminimumV7FAainfix =aoccaminimumV7V12ainfix -aoccaminimumV7V7c1AaheapV12FIainfix &lt;c0asizeV7AaheapV7Iainfix =V11asetV8V10aminimumV7Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0Iainfix &lt;c0asizeV7AaheapV7Iainfix =ainfix +aoccV15V8c0V10aoccV15V7aoccV15V1c0V0FAaleagetV8V16V17Iainfix &lt;c0aoccV17V7FIainfix &lt;V16V10Aainfix &lt;=c0V16FAainfix =asizeV7ainfix -V0V10AaheapV7Aasorted_subV9c0V10Iainfix &lt;=V10V6Aainfix &lt;=c0V10FLamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV18V1ainfix +V4c1V0aoccV18V5aoccV18V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV19V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="6c099ed61d8d2041f1ebccc4f17bcaf9">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.37"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.37"
       expl="37. loop invariant preservation"
-      sum="0ccccdce892b438a52a3f48574a35e00"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationaleagetV11V14V15Iainfix &lt;c0aoccV15V13FIainfix &lt;V14ainfix +V10c1Aainfix &lt;=c0V14FIainfix =V13V12FIainfix =asizeV12ainfix -asizeV7c1Aainfix =aoccV16V12aoccV16V7INainfix =V16aminimumV7FAainfix =aoccaminimumV7V12ainfix -aoccaminimumV7V7c1AaheapV12FIainfix &lt;c0asizeV7AaheapV7Iainfix =V11asetV8V10aminimumV7Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0Iainfix &lt;c0asizeV7AaheapV7Iainfix =ainfix +aoccV17V8c0V10aoccV17V7aoccV17V1c0V0FAaleagetV8V18V19Iainfix &lt;c0aoccV19V7FIainfix &lt;V18V10Aainfix &lt;=c0V18FAainfix =asizeV7ainfix -V0V10AaheapV7Aasorted_subV9c0V10Iainfix &lt;=V10V6Aainfix &lt;=c0V10FLamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV20V1ainfix +V4c1V0aoccV20V5aoccV20V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV21V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
+      sum="0ccccdce892b438a52a3f48574a35e00">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
+       <result status="valid" time="0.11"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.38"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
+     <goal name="WP_parameter heapsort.38"
       expl="38. loop invariant preservation"
-      sum="0acc049a8745ee37b6f568c4b62efa27"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =ainfix +aoccV14V11c0ainfix +V10c1aoccV14V13aoccV14V1c0V0FIainfix =V13V12FIainfix =asizeV12ainfix -asizeV7c1Aainfix =aoccV15V12aoccV15V7INainfix =V15aminimumV7FAainfix =aoccaminimumV7V12ainfix -aoccaminimumV7V7c1AaheapV12FIainfix &lt;c0asizeV7AaheapV7Iainfix =V11asetV8V10aminimumV7Aainfix &lt;=c0V0FIainfix &lt;V10V0Aainfix &lt;=c0V10Aainfix &lt;=c0V0Iainfix &lt;c0asizeV7AaheapV7Iainfix =ainfix +aoccV16V8c0V10aoccV16V7aoccV16V1c0V0FAaleagetV8V17V18Iainfix &lt;c0aoccV18V7FIainfix &lt;V17V10Aainfix &lt;=c0V17FAainfix =asizeV7ainfix -V0V10AaheapV7Aasorted_subV9c0V10Iainfix &lt;=V10V6Aainfix &lt;=c0V10FLamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV19V1ainfix +V4c1V0aoccV19V5aoccV19V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV20V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      sum="0acc049a8745ee37b6f568c4b62efa27">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="3.12"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.39"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="39. type invariant"
-      sum="31b037cd0f1669c2f15afa3ec87a60af"
-      proved="true"
-      expanded="false"
-      shape="type invariantainfix &lt;=c0V0Iainfix =ainfix +aoccV10V8c0ainfix +V6c1aoccV10V7aoccV10V1c0V0FAaleagetV8V11V12Iainfix &lt;c0aoccV12V7FIainfix &lt;V11ainfix +V6c1Aainfix &lt;=c0V11FAainfix =asizeV7ainfix -V0ainfix +V6c1AaheapV7Aasorted_subV9c0ainfix +V6c1Lamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV13V1ainfix +V4c1V0aoccV13V5aoccV13V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV14V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.39" expl="39. type invariant"
+      sum="31b037cd0f1669c2f15afa3ec87a60af">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.40"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="40. postcondition"
-      sum="04fdf31fe79d6ef5279b5ec0b7875fdb"
-      proved="true"
-      expanded="false"
-      shape="postconditionasortedV9Iainfix &lt;=c0V0Iainfix =ainfix +aoccV10V8c0ainfix +V6c1aoccV10V7aoccV10V1c0V0FAaleagetV8V11V12Iainfix &lt;c0aoccV12V7FIainfix &lt;V11ainfix +V6c1Aainfix &lt;=c0V11FAainfix =asizeV7ainfix -V0ainfix +V6c1AaheapV7Aasorted_subV9c0ainfix +V6c1Lamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV13V1ainfix +V4c1V0aoccV13V5aoccV13V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV14V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.40" expl="40. postcondition"
+      sum="04fdf31fe79d6ef5279b5ec0b7875fdb">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter heapsort.41"
-      locfile="../skew_heaps.mlw"
-      loclnum="122" loccnumb="6" loccnume="14"
-      expl="41. postcondition"
-      sum="35d50a8589a4bea3df5e328ca789adda"
-      proved="true"
-      expanded="false"
-      shape="postconditionapermut_allV2V9Iainfix &lt;=c0V0Iainfix =ainfix +aoccV10V8c0ainfix +V6c1aoccV10V7aoccV10V1c0V0FAaleagetV8V11V12Iainfix &lt;c0aoccV12V7FIainfix &lt;V11ainfix +V6c1Aainfix &lt;=c0V11FAainfix =asizeV7ainfix -V0ainfix +V6c1AaheapV7Aasorted_subV9c0ainfix +V6c1Lamk arrayV0V8FIainfix &lt;=c0V6Lainfix -V0c1Iainfix =ainfix +aoccV13V1ainfix +V4c1V0aoccV13V5aoccV13V1c0V0FAainfix =asizeV5ainfix +V4c1AaheapV5FIainfix &lt;=c0V4Lainfix -V0c1INainfix &lt;c0aoccV14V3FAainfix =asizeV3c0AaheapV3FIainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for heapsort"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+     <goal name="WP_parameter heapsort.41" expl="41. postcondition"
+      sum="35d50a8589a4bea3df5e328ca789adda">
+      <label name="expl:VC for heapsort"/>
+      <proof prover="1">
        <result status="valid" time="0.18"/>
       </proof>
      </goal>

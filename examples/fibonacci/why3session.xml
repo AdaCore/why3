@@ -2,49 +2,46 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Eprover" version="1.6" timelimit="5" memlimit="0"/>
- <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5"
+ <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5"
   memlimit="1000"/>
+ <prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="0"/>
  <prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
  <prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
- <prover id="4" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
- <prover id="5" name="Z3" version="4.3.1" timelimit="6" memlimit="4000"/>
- <prover id="6" name="Spass" version="3.7" timelimit="5" memlimit="0"/>
+ <prover id="4" name="Z3" version="4.3.1" timelimit="6" memlimit="4000"/>
+ <prover id="5" name="Spass" version="3.7" timelimit="5" memlimit="0"/>
+ <prover id="6" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
  <prover id="7" name="Alt-Ergo" version="0.95.2" timelimit="6"
   memlimit="4000"/>
  <prover id="8" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
  <prover id="9" name="Vampire" version="0.6" timelimit="3" memlimit="0"/>
- <file name="../fibonacci.mlw" verified="true"
+ <file name="../fibonacci.mlw"
   expanded="true">
-  <theory name="FibonacciTest"
-   verified="true">
-   <goal name="isfib_2_1" sum="15aab3978bc62f481e12635752c9bc36"
-    proved="true"
-    shape="ainfix =afibc2c1">
+  <theory
+   name="FibonacciTest">
+   <goal name="isfib_2_1"
+    sum="15aab3978bc62f481e12635752c9bc36">
     <proof prover="2" memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
-   <goal name="isfib_6_8" sum="dfb0ce3fd8b846f274e9692059e947b8"
-    proved="true"
-    shape="ainfix =afibc6c8">
+   <goal name="isfib_6_8"
+    sum="dfb0ce3fd8b846f274e9692059e947b8">
     <proof prover="2" memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
-   <goal name="not_isfib_2_2" sum="e3d5312d3d038b8ee04543dcda0ea242"
-    proved="true"
-    shape="Nainfix =afibc2c2">
-    <proof prover="0">
+   <goal name="not_isfib_2_2"
+    sum="e3d5312d3d038b8ee04543dcda0ea242">
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="1" memlimit="0">
+    <proof prover="1">
      <result status="valid" time="0.01"/>
     </proof>
     <proof prover="2" memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="6">
+    <proof prover="5">
      <result status="valid" time="0.02"/>
     </proof>
     <proof prover="9" timelimit="5">
@@ -52,34 +49,31 @@
     </proof>
    </goal>
   </theory>
-  <theory name="FibonacciLinear"
-   verified="true">
+  <theory
+   name="FibonacciLinear">
    <goal name="WP_parameter fib" expl="VC for fib"
-    sum="c33a40a92865042be99b0ff3d2abfc60" proved="true"
-    shape="ainfix =afibV0V3Iainfix =afibainfix +V1c1V3Aainfix =afibainfix +ainfix +V1c1c1V2Aainfix &lt;=ainfix +V1c1V0Aainfix &lt;=c0ainfix +V1c1Aainfix =afibainfix +V4c1V5Aainfix =afibainfix +ainfix +V4c1c1V6Aainfix &lt;=ainfix +V4c1V0Aainfix &lt;=c0ainfix +V4c1Iainfix =V6ainfix +V2V3FIainfix =V5V2FIainfix =afibV4V3Aainfix =afibainfix +V4c1V2Aainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix &lt;=V4V1Aainfix &lt;=c0V4FFAainfix =afibc0c0Aainfix =afibainfix +c0c1c1Aainfix &lt;=c0V0Aainfix &lt;=c0c0Iainfix &lt;=c0V1Aainfix =afibV0c0Iainfix &gt;c0V1Lainfix -V0c1Iainfix &gt;=V0c0F">
+    sum="c33a40a92865042be99b0ff3d2abfc60">
     <label name="expl:VC for fib"/>
     <proof prover="2" memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>
-  <theory name="FibRecGhost"
-   verified="true">
+  <theory
+   name="FibRecGhost">
    <label name="recursive version, using ghost code"/>
    <goal name="WP_parameter fib_aux" expl="VC for fib_aux"
-    sum="fa0648e548246a24e329cc43cbc2dd79" proved="true"
-    shape="iainfix =afibainfix +V5V4afibainfix +V0V3Aainfix =ainfix +V1V2afibainfix +V5c1Aainfix =V2afibV5Aainfix &lt;=c0V5Aainfix &gt;=V4c0Aainfix &lt;V4V3Aainfix &lt;=c0V3Lainfix +V0c1Lainfix -V3c1ainfix =V1afibainfix +V0V3ainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+    sum="fa0648e548246a24e329cc43cbc2dd79">
     <label name="expl:VC for fib_aux"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter fib_aux.1" expl="1. postcondition"
-      sum="00fd0627e82b0aba30173f5aa459ecfe" proved="true"
-      shape="postconditionainfix =V1afibainfix +V0V3Iainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      sum="00fd0627e82b0aba30173f5aa459ecfe">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" timelimit="5">
@@ -90,13 +84,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_aux.2" expl="2. variant decrease"
-      sum="cc6362fe1bd185bb34d04a9aecc0e420" proved="true"
-      shape="variant decreaseainfix &lt;V4V3Aainfix &lt;=c0V3Lainfix +V0c1Lainfix -V3c1INainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      sum="cc6362fe1bd185bb34d04a9aecc0e420">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" timelimit="5">
@@ -107,13 +100,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_aux.3" expl="3. precondition"
-      sum="99f1517a0e3c2ad76a5c9cf01ab1b4f9" proved="true"
-      shape="preconditionainfix &gt;=V4c0Lainfix +V0c1Lainfix -V3c1INainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      sum="99f1517a0e3c2ad76a5c9cf01ab1b4f9">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" timelimit="5">
@@ -124,13 +116,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_aux.4" expl="4. precondition"
-      sum="17d4faa3db0b651e60c6bda7441b0fe6" proved="true"
-      shape="preconditionainfix =ainfix +V1V2afibainfix +V5c1Aainfix =V2afibV5Aainfix &lt;=c0V5Lainfix +V0c1Lainfix -V3c1INainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      sum="17d4faa3db0b651e60c6bda7441b0fe6">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="8">
@@ -138,13 +129,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_aux.5" expl="5. postcondition"
-      sum="46b8a38fcab44f0e75405ae1479315a7" proved="true"
-      shape="postconditionainfix =afibainfix +V5V4afibainfix +V0V3Iainfix =ainfix +V1V2afibainfix +V5c1Aainfix =V2afibV5Aainfix &lt;=c0V5Aainfix &gt;=V4c0Lainfix +V0c1Lainfix -V3c1INainfix =V3c0Iainfix =V2afibainfix +V0c1Aainfix =V1afibV0Aainfix &lt;=c0V0Aainfix &gt;=V3c0F">
+      sum="46b8a38fcab44f0e75405ae1479315a7">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" timelimit="5">
@@ -157,19 +147,17 @@
     </transf>
    </goal>
    <goal name="WP_parameter fib" expl="VC for fib"
-    sum="02ca6fb4801985c3dcfbb97275bc862d" proved="true"
-    shape="ainfix =afibainfix +c0V0afibV0Aainfix =c1afibainfix +c0c1Aainfix =c0afibc0Aainfix &lt;=c0c0Aainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+    sum="02ca6fb4801985c3dcfbb97275bc862d">
     <label name="expl:VC for fib"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter fib.1" expl="1. precondition"
-      sum="e17a273bc9ac73440011c4f7bfb0dccc" proved="true"
-      shape="preconditionainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+      sum="e17a273bc9ac73440011c4f7bfb0dccc">
       <label name="expl:VC for fib"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" timelimit="5">
@@ -180,13 +168,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib.2" expl="2. precondition"
-      sum="48df7d6eecd66772f30be09340b2c6ae" proved="true"
-      shape="preconditionainfix =c1afibainfix +c0c1Aainfix =c0afibc0Aainfix &lt;=c0c0Iainfix &lt;=c0V0F">
+      sum="48df7d6eecd66772f30be09340b2c6ae">
       <label name="expl:VC for fib"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" timelimit="5">
@@ -197,13 +184,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib.3" expl="3. postcondition"
-      sum="96743058293856fce1e97c3d9e6257c2" proved="true"
-      shape="postconditionainfix =afibainfix +c0V0afibV0Iainfix =c1afibainfix +c0c1Aainfix =c0afibc0Aainfix &lt;=c0c0Aainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+      sum="96743058293856fce1e97c3d9e6257c2">
       <label name="expl:VC for fib"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" timelimit="5">
@@ -216,13 +202,12 @@
     </transf>
    </goal>
    <goal name="WP_parameter test42" expl="VC for test42"
-    sum="5e16391cd28cc4d718e7ebebb7c1fca2" proved="true"
-    shape="ainfix &lt;=c0c42">
+    sum="5e16391cd28cc4d718e7ebebb7c1fca2">
     <label name="expl:VC for test42"/>
     <proof prover="2">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="5" timelimit="5">
+    <proof prover="4" timelimit="5">
      <result status="valid" time="0.00"/>
     </proof>
     <proof prover="7" timelimit="5" memlimit="1000">
@@ -233,13 +218,12 @@
     </proof>
    </goal>
    <goal name="WP_parameter bench" expl="VC for bench"
-    sum="98619003152866c935bb2d4fb96d19f7" proved="true"
-    shape="t">
+    sum="98619003152866c935bb2d4fb96d19f7">
     <label name="expl:VC for bench"/>
     <proof prover="2">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="5" timelimit="5">
+    <proof prover="4" timelimit="5">
      <result status="valid" time="0.00"/>
     </proof>
     <proof prover="7" timelimit="5" memlimit="1000">
@@ -250,18 +234,16 @@
     </proof>
    </goal>
   </theory>
-  <theory name="FibRecNoGhost"
-   verified="true">
+  <theory
+   name="FibRecNoGhost">
    <label name="recursive version, without ghost code"/>
    <goal name="WP_parameter fib_aux" expl="VC for fib_aux"
-    sum="abad0fc6a6c557f10d7cd32e86dc689d" proved="true"
-    shape="iainfix =V5afibainfix +V6V2Iainfix =V1afibainfix +V6c1Aainfix =V0afibV6Aainfix &lt;=c0V6FIainfix =V5afibainfix +V7V3Iainfix =V4afibainfix +V7c1Aainfix =V1afibV7Aainfix &lt;=c0V7FFAainfix =V4afibainfix +V8c1Aainfix =V1afibV8Aainfix &lt;=c0V8EAainfix &gt;=V3c0Aainfix &lt;V3V2Aainfix &lt;=c0V2Lainfix +V0V1Lainfix -V2c1ainfix =V0afibainfix +V9V2Iainfix =V1afibainfix +V9c1Aainfix =V0afibV9Aainfix &lt;=c0V9Fainfix =V2c0Iainfix =V1afibainfix +V10c1Aainfix =V0afibV10Aainfix &lt;=c0V10EAainfix &gt;=V2c0F">
+    sum="abad0fc6a6c557f10d7cd32e86dc689d">
     <label name="expl:VC for fib_aux"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter fib_aux.1" expl="1. postcondition"
-      sum="b05783f4cde7e81581259b310f016e21" proved="true"
-      shape="postconditionainfix =V0afibainfix +V3V2Iainfix =V1afibainfix +V3c1Aainfix =V0afibV3Aainfix &lt;=c0V3FIainfix =V2c0Iainfix =V1afibainfix +V4c1Aainfix =V0afibV4Aainfix &lt;=c0V4EAainfix &gt;=V2c0F">
+      sum="b05783f4cde7e81581259b310f016e21">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
@@ -274,8 +256,7 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_aux.2" expl="2. variant decrease"
-      sum="fb33f040923d503761f1ac8dd546f5f6" proved="true"
-      shape="variant decreaseainfix &lt;V3V2Aainfix &lt;=c0V2Lainfix +V0V1Lainfix -V2c1INainfix =V2c0Iainfix =V1afibainfix +V5c1Aainfix =V0afibV5Aainfix &lt;=c0V5EAainfix &gt;=V2c0F">
+      sum="fb33f040923d503761f1ac8dd546f5f6">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
@@ -288,8 +269,7 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_aux.3" expl="3. precondition"
-      sum="d9536ff5ddafb7d15d52eb86bd12197a" proved="true"
-      shape="preconditionainfix &gt;=V3c0Lainfix +V0V1Lainfix -V2c1INainfix =V2c0Iainfix =V1afibainfix +V5c1Aainfix =V0afibV5Aainfix &lt;=c0V5EAainfix &gt;=V2c0F">
+      sum="d9536ff5ddafb7d15d52eb86bd12197a">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
@@ -302,13 +282,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_aux.4" expl="4. precondition"
-      sum="c0ce52b40ff9e1f4732ac54dd461baff" proved="true"
-      shape="preconditionainfix =V4afibainfix +V5c1Aainfix =V1afibV5Aainfix &lt;=c0V5ELainfix +V0V1Lainfix -V2c1INainfix =V2c0Iainfix =V1afibainfix +V6c1Aainfix =V0afibV6Aainfix &lt;=c0V6EAainfix &gt;=V2c0F">
+      sum="c0ce52b40ff9e1f4732ac54dd461baff">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="8">
@@ -316,13 +295,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_aux.5" expl="5. postcondition"
-      sum="ff1ab0dd98aa0b297144ad03625a66b1" proved="true"
-      shape="postconditionainfix =V5afibainfix +V6V2Iainfix =V1afibainfix +V6c1Aainfix =V0afibV6Aainfix &lt;=c0V6FIainfix =V5afibainfix +V7V3Iainfix =V4afibainfix +V7c1Aainfix =V1afibV7Aainfix &lt;=c0V7FFIainfix =V4afibainfix +V8c1Aainfix =V1afibV8Aainfix &lt;=c0V8EAainfix &gt;=V3c0Lainfix +V0V1Lainfix -V2c1INainfix =V2c0Iainfix =V1afibainfix +V9c1Aainfix =V0afibV9Aainfix &lt;=c0V9EAainfix &gt;=V2c0F">
+      sum="ff1ab0dd98aa0b297144ad03625a66b1">
       <label name="expl:VC for fib_aux"/>
       <proof prover="2">
        <result status="valid" time="0.07"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="8">
@@ -332,14 +310,12 @@
     </transf>
    </goal>
    <goal name="WP_parameter fib" expl="VC for fib"
-    sum="fc98a2f8a69c57ab706329a0a35ffad1" proved="true"
-    shape="ainfix =V1afibV0Iainfix =V1afibainfix +V2V0Iainfix =c1afibainfix +V2c1Aainfix =c0afibV2Aainfix &lt;=c0V2FFAainfix =c1afibainfix +V3c1Aainfix =c0afibV3Aainfix &lt;=c0V3EAainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+    sum="fc98a2f8a69c57ab706329a0a35ffad1">
     <label name="expl:VC for fib"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter fib.1" expl="1. precondition"
-      sum="e17a273bc9ac73440011c4f7bfb0dccc" proved="true"
-      shape="preconditionainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+      sum="e17a273bc9ac73440011c4f7bfb0dccc">
       <label name="expl:VC for fib"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
@@ -352,8 +328,7 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib.2" expl="2. precondition"
-      sum="9ce4e6725a3871813a57389b515de01e" proved="true"
-      shape="preconditionainfix =c1afibainfix +V1c1Aainfix =c0afibV1Aainfix &lt;=c0V1EIainfix &lt;=c0V0F">
+      sum="9ce4e6725a3871813a57389b515de01e">
       <label name="expl:VC for fib"/>
       <proof prover="2">
        <result status="valid" time="0.01"/>
@@ -366,13 +341,12 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib.3" expl="3. postcondition"
-      sum="c7a286f86f334aa5518b7efcffd82835" proved="true"
-      shape="postconditionainfix =V1afibV0Iainfix =V1afibainfix +V2V0Iainfix =c1afibainfix +V2c1Aainfix =c0afibV2Aainfix &lt;=c0V2FFIainfix =c1afibainfix +V3c1Aainfix =c0afibV3Aainfix &lt;=c0V3EAainfix &gt;=V0c0Iainfix &lt;=c0V0F">
+      sum="c7a286f86f334aa5518b7efcffd82835">
       <label name="expl:VC for fib"/>
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="5" timelimit="5">
+      <proof prover="4" timelimit="5">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="8">
@@ -382,23 +356,21 @@
     </transf>
    </goal>
   </theory>
-  <theory name="SmallestFibAbove"
-   verified="true">
+  <theory
+   name="SmallestFibAbove">
    <goal name="WP_parameter smallest_fib_above"
-    expl="VC for smallest_fib_above" sum="c69813f51ecfc06184cca298b1f8cdf8"
-    proved="true"
-    shape="iainfix =afibainfix +V3c1V1Aainfix &lt;V0afibainfix +V3c1Aainfix &lt;=afibV3V0Aainfix &lt;=c0V3Eainfix &lt;ainfix -ainfix *c2V0ainfix +V4V5ainfix -ainfix *c2V0ainfix +V2V1Aainfix &lt;=c0ainfix -ainfix *c2V0ainfix +V2V1Aainfix &lt;=c1V5Aainfix &lt;=c0V4Aainfix =V5afibainfix +V6c1Aainfix &lt;=afibV6V0Aainfix =V4afibV6Aainfix &lt;=c0V6EIainfix =V5ainfix +V2V1FIainfix =V4V1Fainfix &lt;=V1V0Iainfix &lt;=c1V1Aainfix &lt;=c0V2Aainfix =V1afibainfix +V7c1Aainfix &lt;=afibV7V0Aainfix =V2afibV7Aainfix &lt;=c0V7EFAainfix &lt;=c1c1Aainfix &lt;=c0c0Aainfix =c1afibainfix +V8c1Aainfix &lt;=afibV8V0Aainfix =c0afibV8Aainfix &lt;=c0V8EIainfix &lt;=c0V0F">
+    expl="VC for smallest_fib_above"
+    sum="c69813f51ecfc06184cca298b1f8cdf8">
     <label name="expl:VC for smallest_fib_above"/>
-    <proof prover="5" memlimit="1000">
+    <proof prover="4" memlimit="1000">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
   </theory>
-  <theory name="Zeckendorf" verified="true"
+  <theory name="Zeckendorf"
    expanded="true">
    <goal name="WP_parameter fib_nonneg" expl="VC for fib_nonneg"
-    sum="33108687e9c5b98282ab67be59459f0f" proved="true"
-    shape="iainfix &lt;=c0afibV0ainfix &lt;=c0afibV0Iainfix &lt;=c0afibV2Aainfix &lt;=c0V2Aainfix &lt;V2V0Aainfix &lt;=c0V0Lainfix -V0c1Iainfix &lt;=c0afibV1Aainfix &lt;=c0V1Aainfix &lt;V1V0Aainfix &lt;=c0V0Lainfix -V0c2ainfix &gt;V0c1Iainfix &lt;=c0V0F">
+    sum="33108687e9c5b98282ab67be59459f0f">
     <label name="why3:lemma"/>
     <label name="expl:VC for fib_nonneg"/>
     <proof prover="7" memlimit="1000">
@@ -406,15 +378,13 @@
     </proof>
    </goal>
    <goal name="WP_parameter fib_increasing" expl="VC for fib_increasing"
-    sum="407eb80b8a83c5b92a39e35448b7526f" proved="true"
-    shape="iainfix &lt;=afibV0afibV1ainfix &lt;=afibV0afibV1Iainfix &lt;=afibV2afibV1Aainfix &lt;=V2V1Aainfix &lt;=c0V2Aainfix &lt;ainfix -V1V2ainfix -V1V0Aainfix &lt;=c0ainfix -V1V0Lainfix +V0c1ainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+    sum="407eb80b8a83c5b92a39e35448b7526f">
     <label name="why3:lemma"/>
     <label name="expl:VC for fib_increasing"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter fib_increasing.1" expl="1. variant decrease"
-      sum="eeb9e177d8bf629553a6b8cb4ba9f658" proved="true"
-      shape="variant decreaseainfix &lt;ainfix -V1V2ainfix -V1V0Aainfix &lt;=c0ainfix -V1V0Lainfix +V0c1Iainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+      sum="eeb9e177d8bf629553a6b8cb4ba9f658">
       <label name="why3:lemma"/>
       <label name="expl:VC for fib_increasing"/>
       <proof prover="7" memlimit="1000">
@@ -422,8 +392,7 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_increasing.2" expl="2. precondition"
-      sum="cb694563623568dff32eeced02b2e3fb" proved="true"
-      shape="preconditionainfix &lt;=V2V1Aainfix &lt;=c0V2Lainfix +V0c1Iainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+      sum="cb694563623568dff32eeced02b2e3fb">
       <label name="why3:lemma"/>
       <label name="expl:VC for fib_increasing"/>
       <proof prover="7" memlimit="1000">
@@ -431,17 +400,15 @@
       </proof>
      </goal>
      <goal name="WP_parameter fib_increasing.3" expl="3. postcondition"
-      sum="bc99d19243e3d7d5f2353440a7c64781" proved="true"
-      shape="postconditionainfix &lt;=afibV0afibV1Iainfix &lt;=afibV2afibV1Iainfix &lt;=V2V1Aainfix &lt;=c0V2Lainfix +V0c1Iainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+      sum="bc99d19243e3d7d5f2353440a7c64781">
       <label name="why3:lemma"/>
       <label name="expl:VC for fib_increasing"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter fib_increasing.4" expl="4. postcondition"
-      sum="5b77f57336df5913f7b2b1dcb808433a" proved="true"
-      shape="postconditionainfix &lt;=afibV0afibV1INainfix &lt;V0V1Iainfix &lt;=V0V1Aainfix &lt;=c0V0F">
+      sum="5b77f57336df5913f7b2b1dcb808433a">
       <label name="why3:lemma"/>
       <label name="expl:VC for fib_increasing"/>
       <proof prover="7" memlimit="1000">
@@ -451,24 +418,21 @@
     </transf>
    </goal>
    <goal name="WP_parameter greatest_fib" expl="VC for greatest_fib"
-    sum="dcc47b6ae887f3b47ac361faa61ef865" proved="true"
-    shape="iainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1ainfix &lt;ainfix -ainfix *c2V0ainfix +V4V5ainfix -ainfix *c2V0ainfix +V3V2Aainfix &lt;=c0ainfix -ainfix *c2V0ainfix +V3V2Aainfix &lt;=c1V5Aainfix &lt;=c1V4Aainfix =V5afibainfix +V6c1Aainfix &lt;=afibV6V0Aainfix =V4afibV6Aainfix &lt;=c1V6Iainfix =V6ainfix +V1c1FIainfix =V5ainfix +V3V2FIainfix =V4V2Fainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FAainfix &lt;=c1c1Aainfix =c1afibainfix +c1c1Aainfix &lt;=afibc1V0Aainfix =c1afibc1Aainfix &lt;=c1c1Iainfix &lt;c0V0F">
+    sum="dcc47b6ae887f3b47ac361faa61ef865">
     <label name="expl:VC for greatest_fib"/>
-    <proof prover="5" memlimit="1000">
+    <proof prover="4" memlimit="1000">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal name="WP_parameter zeckendorf" expl="VC for zeckendorf"
-    sum="fc2c4a90fde5d8c77d17e8bbd66c182f" proved="true"
-    shape="iainfix =V0asumV1Aawfc2V1ainfix &lt;V5V2Aainfix &lt;=c0V2ACtaNilainfix &lt;V5afibainfix -V7c1aConsVwV6Aainfix =ainfix +V5asumV6V0Aawfc2V6Aainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FAainfix &lt;c0V2ainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V8c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FAainfix =ainfix +V0asumaNilV0Aawfc2aNilAainfix &lt;=V0V0Aainfix &lt;=c0V0Iainfix &lt;=c0V0F">
+    sum="fc2c4a90fde5d8c77d17e8bbd66c182f">
     <label name="expl:VC for zeckendorf"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter zeckendorf.1" expl="1. loop invariant init"
-      sum="cf2b0b0a9d0b701cc79893817420feb3" proved="true"
-      shape="loop invariant initainfix &lt;=V0V0Aainfix &lt;=c0V0Iainfix &lt;=c0V0F">
+      sum="cf2b0b0a9d0b701cc79893817420feb3">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -476,10 +440,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf.2" expl="2. loop invariant init"
-      sum="dfdc3c57661be1107ddf11ccfef27f32" proved="true"
-      shape="loop invariant initawfc2aNilIainfix &lt;=c0V0F">
+      sum="dfdc3c57661be1107ddf11ccfef27f32">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -487,10 +450,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf.3" expl="3. loop invariant init"
-      sum="6c7868f45e5623286c74eb17947b19ee" proved="true"
-      shape="loop invariant initainfix =ainfix +V0asumaNilV0Iainfix &lt;=c0V0F">
+      sum="6c7868f45e5623286c74eb17947b19ee">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -498,10 +460,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf.4" expl="4. precondition"
-      sum="dd7407ab90d7d3953b3f124838cc066b" proved="true"
-      shape="preconditionainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V3c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      sum="dd7407ab90d7d3953b3f124838cc066b">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -510,10 +471,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf.5"
       expl="5. loop invariant preservation"
-      sum="9ed129664c8571f1c14bee8721611372" proved="true"
-      shape="loop invariant preservationainfix &lt;=V5V0Aainfix &lt;=c0V5Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V7c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      sum="9ed129664c8571f1c14bee8721611372">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -522,8 +482,7 @@
      </goal>
      <goal name="WP_parameter zeckendorf.6"
       expl="6. loop invariant preservation"
-      sum="34d55e842777936b015356799c7e3cbf" proved="true"
-      shape="loop invariant preservationawfc2V6Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V7c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      sum="34d55e842777936b015356799c7e3cbf">
       <label name="expl:VC for zeckendorf"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.05"/>
@@ -531,10 +490,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf.7"
       expl="7. loop invariant preservation"
-      sum="32f91e445a1faf386e9e3a2745f5d8e0" proved="true"
-      shape="loop invariant preservationainfix =ainfix +V5asumV6V0Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V7c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      sum="32f91e445a1faf386e9e3a2745f5d8e0">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.03"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -543,18 +501,16 @@
      </goal>
      <goal name="WP_parameter zeckendorf.8"
       expl="8. loop invariant preservation"
-      sum="08394bcd4fb2043bdc0cf589333b5ceb" proved="true"
-      shape="loop invariant preservationCtaNilainfix &lt;V5afibainfix -V7c1aConsVwV6Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V8c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      sum="08394bcd4fb2043bdc0cf589333b5ceb">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf.9" expl="9. loop variant decrease"
-      sum="bee2d921cf43cfbc4279374549e9a679" proved="true"
-      shape="loop variant decreaseainfix &lt;V5V2Aainfix &lt;=c0V2Iainfix =V6aConsV3V1FIainfix =V5ainfix -V2V4FIainfix &lt;V2afibainfix +V3c1Aainfix &lt;=afibV3V2Aainfix =V4afibV3Aainfix &lt;=c1V4Aainfix &lt;=c2V3FIainfix &lt;c0V2Iainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V7c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      sum="bee2d921cf43cfbc4279374549e9a679">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -562,10 +518,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf.10" expl="10. postcondition"
-      sum="de9085ed4bd4445127e6031caea6088c" proved="true"
-      shape="postconditionawfc2V1INainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V3c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      sum="de9085ed4bd4445127e6031caea6088c">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -573,10 +528,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf.11" expl="11. postcondition"
-      sum="1524958090719fed955a065c75d06130" proved="true"
-      shape="postconditionainfix =V0asumV1INainfix &gt;V2c0ICtaNilainfix &lt;V2afibainfix -V3c1aConsVwV1Aainfix =ainfix +V2asumV1V0Aawfc2V1Aainfix &lt;=V2V0Aainfix &lt;=c0V2FIainfix &lt;=c0V0F">
+      sum="1524958090719fed955a065c75d06130">
       <label name="expl:VC for zeckendorf"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -586,33 +540,29 @@
     </transf>
    </goal>
    <goal name="WP_parameter zeckendorf_fast" expl="VC for zeckendorf_fast"
-    sum="0213974dd5e75f842e093303cb5b7080" proved="true"
-    shape="iiiainfix =V0asumV5Aawfc2V5iainfix &lt;V9V6Aainfix &lt;=c0V6ACtaNilainfix &lt;V4afibainfix -V12c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V10Aainfix &lt;=c1V11Aainfix =V10afibainfix +V9c1Aainfix &lt;V4V10Aainfix &lt;=afibV9V0Aainfix =V11afibV9Aainfix &lt;=c1V9Iainfix =V11ainfix -V7V8FIainfix =V10V8FIainfix =V9ainfix -V6c1Fainfix &lt;V15V6Aainfix &lt;=c0V6ACtaNilainfix &lt;V13afibainfix -V18c1aConsVwV14Aainfix =ainfix +V13asumV14V0Aawfc2V14Aainfix &lt;=V13V0Aainfix &lt;=c0V13Aainfix &lt;=c1V16Aainfix &lt;=c1V17Aainfix =V16afibainfix +V15c1Aainfix &lt;V13V16Aainfix &lt;=afibV15V0Aainfix =V17afibV15Aainfix &lt;=c1V15Iainfix =V17ainfix -V7V8FIainfix =V16V8FIainfix =V15ainfix -V6c1FIainfix =V14aConsV6V5FIainfix =V13ainfix -V4V8Fainfix &lt;=V8V4ainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V19c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FAainfix &lt;ainfix -V0V3afibainfix -V1c1Aainfix =ainfix +ainfix -V0V3asumaConsV1aNilV0Aawfc2aConsV1aNilAainfix &lt;=ainfix -V0V3V0Aainfix &lt;=c0ainfix -V0V3Aainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;ainfix -V0V3V2Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1Aainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1ainfix &lt;ainfix -ainfix *c2V0ainfix +V20V21ainfix -ainfix *c2V0ainfix +V3V2Aainfix &lt;=c0ainfix -ainfix *c2V0ainfix +V3V2Aainfix &lt;=c1V21Aainfix &lt;=c1V20Aainfix =V21afibainfix +V22c1Aainfix &lt;=afibV22V0Aainfix =V20afibV22Aainfix &lt;=c1V22Iainfix =V22ainfix +V1c1FIainfix =V21ainfix +V3V2FIainfix =V20V2Fainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FAainfix &lt;=c1c1Aainfix =c1afibainfix +c1c1Aainfix &lt;=afibc1V0Aainfix =c1afibc1Aainfix &lt;=c1c1ainfix =V0asumV23Aawfc2V23LaNilainfix =V0c0Iainfix &lt;=c0V0F">
+    sum="0213974dd5e75f842e093303cb5b7080">
     <label name="expl:VC for zeckendorf_fast"/>
-    <transf name="split_goal_wp"
-     proved="true">
+    <transf
+     name="split_goal_wp">
      <goal name="WP_parameter zeckendorf_fast.1" expl="1. postcondition"
-      sum="d1dbb8650c1a03d576456326783dfa50" proved="true"
-      shape="postconditionawfc2V1LaNilIainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="d1dbb8650c1a03d576456326783dfa50">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.2" expl="2. postcondition"
-      sum="face0ab4039e936a0ddfe8b53f9d01dd" proved="true"
-      shape="postconditionainfix =V0asumV1LaNilIainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="face0ab4039e936a0ddfe8b53f9d01dd">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.3"
-      expl="3. loop invariant init" sum="e8bdecb03bcd0c30d41fcdd17f204b07"
-      proved="true"
-      shape="loop invariant initainfix =c1afibainfix +c1c1Aainfix &lt;=afibc1V0Aainfix =c1afibc1Aainfix &lt;=c1c1INainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="3. loop invariant init"
+      sum="e8bdecb03bcd0c30d41fcdd17f204b07">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -620,9 +570,8 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.4"
-      expl="4. loop invariant init" sum="7f3e26f6d8be5054dc99c739740742b4"
-      proved="true"
-      shape="loop invariant initainfix &lt;=c1c1INainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="4. loop invariant init"
+      sum="7f3e26f6d8be5054dc99c739740742b4">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.00"/>
@@ -630,10 +579,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.5"
       expl="5. loop invariant preservation"
-      sum="8ccae58fa08f8a8caa8a65c7374cb777" proved="true"
-      shape="loop invariant preservationainfix =V5afibainfix +V6c1Aainfix &lt;=afibV6V0Aainfix =V4afibV6Aainfix &lt;=c1V6Iainfix =V6ainfix +V1c1FIainfix =V5ainfix +V3V2FIainfix =V4V2FIainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="8ccae58fa08f8a8caa8a65c7374cb777">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -642,27 +590,24 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.6"
       expl="6. loop invariant preservation"
-      sum="d1ee2af954de20cb653e607f89995d26" proved="true"
-      shape="loop invariant preservationainfix &lt;=c1V5Aainfix &lt;=c1V4Iainfix =V6ainfix +V1c1FIainfix =V5ainfix +V3V2FIainfix =V4V2FIainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="d1ee2af954de20cb653e607f89995d26">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.7"
-      expl="7. loop variant decrease" sum="5ef2d8eeef4ba46bb300b3e197b9bbb7"
-      proved="true"
-      shape="loop variant decreaseainfix &lt;ainfix -ainfix *c2V0ainfix +V4V5ainfix -ainfix *c2V0ainfix +V3V2Aainfix &lt;=c0ainfix -ainfix *c2V0ainfix +V3V2Iainfix =V6ainfix +V1c1FIainfix =V5ainfix +V3V2FIainfix =V4V2FIainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="7. loop variant decrease"
+      sum="5ef2d8eeef4ba46bb300b3e197b9bbb7">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.8" expl="8. assertion"
-      sum="d50bb1ac99261133e1edce75520ab7ff" proved="true"
-      shape="assertionainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="d50bb1ac99261133e1edce75520ab7ff">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -670,56 +615,50 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.9"
-      expl="9. loop invariant init" sum="2b2fe60b46452cd5d890a55cafd8e554"
-      proved="true"
-      shape="loop invariant initainfix =V2afibainfix +V1c1Aainfix &lt;ainfix -V0V3V2Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1Iainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="9. loop invariant init"
+      sum="2b2fe60b46452cd5d890a55cafd8e554">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.10"
-      expl="10. loop invariant init" sum="8b73c7d766ad8362f33c464e8346f2e0"
-      proved="true"
-      shape="loop invariant initainfix &lt;=c1V2Aainfix &lt;=c1V3Iainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="10. loop invariant init"
+      sum="8b73c7d766ad8362f33c464e8346f2e0">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.11"
-      expl="11. loop invariant init" sum="f0ed9c2868f39767a70721f14a8d03e5"
-      proved="true"
-      shape="loop invariant initainfix &lt;=ainfix -V0V3V0Aainfix &lt;=c0ainfix -V0V3Iainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="11. loop invariant init"
+      sum="f0ed9c2868f39767a70721f14a8d03e5">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.12"
-      expl="12. loop invariant init" sum="b2fe11daecc5b6cc21ad36043fc4fa79"
-      proved="true"
-      shape="loop invariant initawfc2aConsV1aNilIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="12. loop invariant init"
+      sum="b2fe11daecc5b6cc21ad36043fc4fa79">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.13"
-      expl="13. loop invariant init" sum="415c9f6c18d81c9133692b58d1ce82cc"
-      proved="true"
-      shape="loop invariant initainfix =ainfix +ainfix -V0V3asumaConsV1aNilV0Iainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="13. loop invariant init"
+      sum="415c9f6c18d81c9133692b58d1ce82cc">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.14"
-      expl="14. loop invariant init" sum="4b74d45795507421fc915403014c6394"
-      proved="true"
-      shape="loop invariant initainfix &lt;ainfix -V0V3afibainfix -V1c1Iainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="14. loop invariant init"
+      sum="4b74d45795507421fc915403014c6394">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -728,46 +667,40 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.15"
       expl="15. loop invariant preservation"
-      sum="afb6f0e97b48efa0701604a5654485e3" proved="true"
-      shape="loop invariant preservationainfix =V12afibainfix +V11c1Aainfix &lt;V9V12Aainfix &lt;=afibV11V0Aainfix =V13afibV11Aainfix &lt;=c1V11Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="afb6f0e97b48efa0701604a5654485e3">
       <label name="expl:VC for zeckendorf_fast"/>
-      <transf name="split_goal_wp"
-       proved="true">
+      <transf
+       name="split_goal_wp">
        <goal name="WP_parameter zeckendorf_fast.15.1" expl="1."
-        sum="cd4e61ed1c183bbd1ff4f7899c438de6" proved="true"
-        shape="ainfix &lt;=c1V11Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+        sum="cd4e61ed1c183bbd1ff4f7899c438de6">
         <label name="expl:VC for zeckendorf_fast"/>
-        <proof prover="5" memlimit="1000">
+        <proof prover="4" memlimit="1000">
          <result status="valid" time="0.02"/>
         </proof>
        </goal>
        <goal name="WP_parameter zeckendorf_fast.15.2" expl="2."
-        sum="1317854514eb4af1c10128bf9f64a798" proved="true"
-        shape="ainfix =V13afibV11Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+        sum="1317854514eb4af1c10128bf9f64a798">
         <label name="expl:VC for zeckendorf_fast"/>
-        <proof prover="5" memlimit="1000">
+        <proof prover="4" memlimit="1000">
          <result status="valid" time="0.00"/>
         </proof>
        </goal>
        <goal name="WP_parameter zeckendorf_fast.15.3" expl="3."
-        sum="fbebd457c74afed05e40319c15792cef" proved="true"
-        shape="ainfix &lt;=afibV11V0Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+        sum="fbebd457c74afed05e40319c15792cef">
         <label name="expl:VC for zeckendorf_fast"/>
         <proof prover="7" memlimit="1000">
          <result status="valid" time="0.04"/>
         </proof>
        </goal>
        <goal name="WP_parameter zeckendorf_fast.15.4" expl="4."
-        sum="3ae4e20465e717355ccec51a1f8e9aad" proved="true"
-        shape="ainfix &lt;V9V12Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+        sum="3ae4e20465e717355ccec51a1f8e9aad">
         <label name="expl:VC for zeckendorf_fast"/>
-        <proof prover="5" memlimit="1000">
+        <proof prover="4" memlimit="1000">
          <result status="valid" time="0.01"/>
         </proof>
        </goal>
        <goal name="WP_parameter zeckendorf_fast.15.5" expl="5."
-        sum="362fcda3ab143623792504e25083e082" proved="true"
-        shape="ainfix =V12afibainfix +V11c1Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+        sum="362fcda3ab143623792504e25083e082">
         <label name="expl:VC for zeckendorf_fast"/>
         <proof prover="7" memlimit="1000">
          <result status="valid" time="0.02"/>
@@ -777,10 +710,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.16"
       expl="16. loop invariant preservation"
-      sum="c495a33d0537a06b3c646ef34a543699" proved="true"
-      shape="loop invariant preservationainfix &lt;=c1V12Aainfix &lt;=c1V13Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="c495a33d0537a06b3c646ef34a543699">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" timelimit="3" memlimit="1000">
+      <proof prover="4" timelimit="3" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -789,8 +721,7 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.17"
       expl="17. loop invariant preservation"
-      sum="ee64c2d814fb63e62e79bb2d26d58eef" proved="true"
-      shape="loop invariant preservationainfix &lt;=V9V0Aainfix &lt;=c0V9Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="ee64c2d814fb63e62e79bb2d26d58eef">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.01"/>
@@ -798,8 +729,7 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.18"
       expl="18. loop invariant preservation"
-      sum="73ae64d9e78da3167aa7f49a6b6457f6" proved="true"
-      shape="loop invariant preservationawfc2V10Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="73ae64d9e78da3167aa7f49a6b6457f6">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="8" timelimit="6" memlimit="1000">
        <result status="valid" time="0.17"/>
@@ -807,8 +737,7 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.19"
       expl="19. loop invariant preservation"
-      sum="4309ad9b4a42316f1ce87c59c82b8069" proved="true"
-      shape="loop invariant preservationainfix =ainfix +V9asumV10V0Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="4309ad9b4a42316f1ce87c59c82b8069">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
@@ -816,10 +745,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.20"
       expl="20. loop invariant preservation"
-      sum="387c6cec4d1017ffc2ca592d4f9f3dba" proved="true"
-      shape="loop invariant preservationCtaNilainfix &lt;V9afibainfix -V14c1aConsVwV10Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V15c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="387c6cec4d1017ffc2ca592d4f9f3dba">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -827,9 +755,8 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.21"
-      expl="21. loop variant decrease" sum="1b30e69475d61700cc630dc2ffd2f539"
-      proved="true"
-      shape="loop variant decreaseainfix &lt;V11V6Aainfix &lt;=c0V6Iainfix =V13ainfix -V7V8FIainfix =V12V8FIainfix =V11ainfix -V6c1FIainfix =V10aConsV6V5FIainfix =V9ainfix -V4V8FIainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V14c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="21. loop variant decrease"
+      sum="1b30e69475d61700cc630dc2ffd2f539">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
@@ -837,10 +764,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.22"
       expl="22. loop invariant preservation"
-      sum="3ef17df8c9aae66511dfc9a4e0826c31" proved="true"
-      shape="loop invariant preservationainfix =V10afibainfix +V9c1Aainfix &lt;V4V10Aainfix &lt;=afibV9V0Aainfix =V11afibV9Aainfix &lt;=c1V9Iainfix =V11ainfix -V7V8FIainfix =V10V8FIainfix =V9ainfix -V6c1FINainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V12c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="3ef17df8c9aae66511dfc9a4e0826c31">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -849,10 +775,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.23"
       expl="23. loop invariant preservation"
-      sum="318449bba967173047e59d157f76e571" proved="true"
-      shape="loop invariant preservationainfix &lt;=c1V10Aainfix &lt;=c1V11Iainfix =V11ainfix -V7V8FIainfix =V10V8FIainfix =V9ainfix -V6c1FINainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V12c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="318449bba967173047e59d157f76e571">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -861,10 +786,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.24"
       expl="24. loop invariant preservation"
-      sum="6735cc114b91b62438349eb568c97de9" proved="true"
-      shape="loop invariant preservationainfix &lt;=V4V0Aainfix &lt;=c0V4Iainfix =V11ainfix -V7V8FIainfix =V10V8FIainfix =V9ainfix -V6c1FINainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V12c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="6735cc114b91b62438349eb568c97de9">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -873,10 +797,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.25"
       expl="25. loop invariant preservation"
-      sum="790183fbb352cea4b93d250a960f20d3" proved="true"
-      shape="loop invariant preservationawfc2V5Iainfix =V11ainfix -V7V8FIainfix =V10V8FIainfix =V9ainfix -V6c1FINainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V12c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="790183fbb352cea4b93d250a960f20d3">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -885,10 +808,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.26"
       expl="26. loop invariant preservation"
-      sum="5bf72cf3e730456f1be895f4409220ff" proved="true"
-      shape="loop invariant preservationainfix =ainfix +V4asumV5V0Iainfix =V11ainfix -V7V8FIainfix =V10V8FIainfix =V9ainfix -V6c1FINainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V12c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="5bf72cf3e730456f1be895f4409220ff">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -897,10 +819,9 @@
      </goal>
      <goal name="WP_parameter zeckendorf_fast.27"
       expl="27. loop invariant preservation"
-      sum="57315bb13fa167f6f6e994cac701dd36" proved="true"
-      shape="loop invariant preservationCtaNilainfix &lt;V4afibainfix -V12c1aConsVwV5Iainfix =V11ainfix -V7V8FIainfix =V10V8FIainfix =V9ainfix -V6c1FINainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V13c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="57315bb13fa167f6f6e994cac701dd36">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -908,19 +829,17 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.28"
-      expl="28. loop variant decrease" sum="fbcc60d3c6e34b916b1255f6f38f1e29"
-      proved="true"
-      shape="loop variant decreaseainfix &lt;V9V6Aainfix &lt;=c0V6Iainfix =V11ainfix -V7V8FIainfix =V10V8FIainfix =V9ainfix -V6c1FINainfix &lt;=V8V4Iainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V12c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      expl="28. loop variant decrease"
+      sum="fbcc60d3c6e34b916b1255f6f38f1e29">
       <label name="expl:VC for zeckendorf_fast"/>
       <proof prover="7" memlimit="1000">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.29" expl="29. postcondition"
-      sum="d26161ddd0d5d2fdfb9fd97d84005b7f" proved="true"
-      shape="postconditionawfc2V5INainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V9c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="d26161ddd0d5d2fdfb9fd97d84005b7f">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -928,10 +847,9 @@
       </proof>
      </goal>
      <goal name="WP_parameter zeckendorf_fast.30" expl="30. postcondition"
-      sum="5d70ce863f684b72fd269a2d6316487d" proved="true"
-      shape="postconditionainfix =V0asumV5INainfix &gt;V4c0ICtaNilainfix &lt;V4afibainfix -V9c1aConsVwV5Aainfix =ainfix +V4asumV5V0Aawfc2V5Aainfix &lt;=V4V0Aainfix &lt;=c0V4Aainfix &lt;=c1V7Aainfix &lt;=c1V8Aainfix =V7afibainfix +V6c1Aainfix &lt;V4V7Aainfix &lt;=afibV6V0Aainfix =V8afibV6Aainfix &lt;=c1V6FIainfix =afibainfix +V1c1V2Aainfix &lt;V0afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V3Aainfix &lt;=c2V1INainfix &lt;=V2V0Iainfix &lt;=c1V2Aainfix &lt;=c1V3Aainfix =V2afibainfix +V1c1Aainfix &lt;=afibV1V0Aainfix =V3afibV1Aainfix &lt;=c1V1FINainfix =V0c0Iainfix &lt;=c0V0F">
+      sum="5d70ce863f684b72fd269a2d6316487d">
       <label name="expl:VC for zeckendorf_fast"/>
-      <proof prover="5" memlimit="1000">
+      <proof prover="4" memlimit="1000">
        <result status="valid" time="0.00"/>
       </proof>
       <proof prover="7" memlimit="1000">
@@ -941,23 +859,20 @@
     </transf>
    </goal>
   </theory>
-  <theory name="Mat22" verified="true"
-   expanded="true">
+  <theory name="Mat22" expanded="true">
    <label name="2x2 integer matrices"/>
   </theory>
-  <theory name="FibonacciLogarithmic"
-   verified="true">
+  <theory
+   name="FibonacciLogarithmic">
    <goal name="WP_parameter logfib" expl="VC for logfib"
-    sum="d4dd7dccf6c1b8fab720f436a541a77a" proved="true"
-    shape="iiainfix =apoweramk tc1c1c1c0V0amk tainfix +V5V6V6V6V5Lainfix +ainfix *V4V4ainfix *V3V3Lainfix *V3ainfix +V2V4ainfix =apoweramk tc1c1c1c0V0amk tainfix +V7V8V8V8V7Lainfix *V3ainfix +V2V4Lainfix +ainfix *V2V2ainfix *V3V3ainfix =amodV0c2c0Lainfix +V2V3Iainfix =apoweramk tc1c1c1c0V1amk tainfix +V2V3V3V3V2FAainfix &gt;=V1c0Aainfix &lt;V1V0Aainfix &lt;=c0V0LadivV0c2ainfix =apoweramk tc1c1c1c0V0amk tainfix +c1c0c0c0c1ainfix =V0c0Iainfix &gt;=V0c0F">
+    sum="d4dd7dccf6c1b8fab720f436a541a77a">
     <label name="expl:VC for logfib"/>
-    <transf name="split_goal"
-     proved="true">
+    <transf
+     name="split_goal">
      <goal name="WP_parameter logfib.1" expl="1. postcondition"
-      sum="69cb2f091b3a66334b2aacb49a0456e5" proved="true"
-      shape="postconditionainfix =apoweramk tc1c1c1c0V0amk tainfix +c1c0c0c0c1Iainfix =V0c0Iainfix &gt;=V0c0F">
+      sum="69cb2f091b3a66334b2aacb49a0456e5">
       <label name="expl:VC for logfib"/>
-      <proof prover="1" memlimit="0">
+      <proof prover="0" memlimit="0">
        <result status="valid" time="0.01"/>
       </proof>
       <proof prover="2" memlimit="0">
@@ -971,16 +886,14 @@
       </proof>
      </goal>
      <goal name="WP_parameter logfib.2" expl="2. variant decrease"
-      sum="a6278a43b357e52386379de92b22d9c4" proved="true"
-      shape="variant decreaseainfix &lt;V1V0Aainfix &lt;=c0V0LadivV0c2INainfix =V0c0Iainfix &gt;=V0c0F">
+      sum="a6278a43b357e52386379de92b22d9c4">
       <label name="expl:VC for logfib"/>
-      <proof prover="1">
+      <proof prover="0">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter logfib.3" expl="3. precondition"
-      sum="3f33fa6a056926fc563ba658c8f13f22" proved="true"
-      shape="preconditionainfix &gt;=V1c0LadivV0c2INainfix =V0c0Iainfix &gt;=V0c0F">
+      sum="3f33fa6a056926fc563ba658c8f13f22">
       <label name="expl:VC for logfib"/>
       <proof prover="2" memlimit="0">
        <result status="valid" time="0.01"/>
@@ -990,28 +903,26 @@
       </proof>
      </goal>
      <goal name="WP_parameter logfib.4" expl="4. postcondition"
-      sum="7b7a848fd3c85b5823edf5084297bfd1" proved="true"
-      shape="postconditioniainfix =apoweramk tc1c1c1c0V0amk tainfix +V5V6V6V6V5Lainfix +ainfix *V4V4ainfix *V3V3Lainfix *V3ainfix +V2V4ainfix =apoweramk tc1c1c1c0V0amk tainfix +V7V8V8V8V7Lainfix *V3ainfix +V2V4Lainfix +ainfix *V2V2ainfix *V3V3ainfix =amodV0c2c0Lainfix +V2V3Iainfix =apoweramk tc1c1c1c0V1amk tainfix +V2V3V3V3V2FIainfix &gt;=V1c0LadivV0c2INainfix =V0c0Iainfix &gt;=V0c0F">
+      sum="7b7a848fd3c85b5823edf5084297bfd1">
       <label name="expl:VC for logfib"/>
-      <proof prover="4"
+      <proof prover="6"
        edited="fibonacci_WP_FibonacciLogarithmic_WP_parameter_logfib_1.v">
        <result status="valid" time="1.19"/>
       </proof>
      </goal>
     </transf>
    </goal>
-   <goal name="fib_m" sum="f4108c167ac378dc0bb2fbb56847e071" proved="true"
-    shape="ainfix =afibV0aa21V1Aainfix =afibainfix +V0c1aa11V1Lapoweram1110V0Iainfix &gt;=V0c0F">
-    <proof prover="4"
+   <goal name="fib_m"
+    sum="f4108c167ac378dc0bb2fbb56847e071">
+    <proof prover="6"
      edited="fibonacci_WP_FibonacciLogarithmic_fib_m_1.v">
      <result status="valid" time="1.05"/>
     </proof>
    </goal>
    <goal name="WP_parameter fibo" expl="VC for fibo"
-    sum="38ae29d3fc4fbfcdd946e1d92ff141b8" proved="true"
-    shape="ainfix =V2afibV0Iainfix =apoweramk tc1c1c1c0V0amk tainfix +V1V2V2V2V1FAainfix &gt;=V0c0Iainfix &gt;=V0c0F">
+    sum="38ae29d3fc4fbfcdd946e1d92ff141b8">
     <label name="expl:VC for fibo"/>
-    <proof prover="1" memlimit="0">
+    <proof prover="0" memlimit="0">
      <result status="valid" time="0.00"/>
     </proof>
     <proof prover="2" memlimit="0">
@@ -1019,48 +930,42 @@
     </proof>
    </goal>
    <goal name="WP_parameter test0" expl="VC for test0"
-    sum="2ed01e39d6b5ac51495153ba59fe47f4" proved="true"
-    shape="ainfix &gt;=c0c0">
+    sum="2ed01e39d6b5ac51495153ba59fe47f4">
     <label name="expl:VC for test0"/>
-    <proof prover="1">
+    <proof prover="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="WP_parameter test1" expl="VC for test1"
-    sum="4e6f91b5630b53961359e65fde7720bc" proved="true"
-    shape="ainfix &gt;=c1c0">
+    sum="4e6f91b5630b53961359e65fde7720bc">
     <label name="expl:VC for test1"/>
-    <proof prover="1">
+    <proof prover="0">
      <result status="valid" time="0.00"/>
     </proof>
    </goal>
    <goal name="WP_parameter test7" expl="VC for test7"
-    sum="39498e0eca6c3664c87cab69c3a69a21" proved="true"
-    shape="ainfix &gt;=c7c0">
+    sum="39498e0eca6c3664c87cab69c3a69a21">
     <label name="expl:VC for test7"/>
-    <proof prover="1">
+    <proof prover="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="WP_parameter test42" expl="VC for test42"
-    sum="6537eb059d9e6f5fd0a3502e6095fb1f" proved="true"
-    shape="ainfix &gt;=c42c0">
+    sum="6537eb059d9e6f5fd0a3502e6095fb1f">
     <label name="expl:VC for test42"/>
-    <proof prover="1">
+    <proof prover="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>
    <goal name="WP_parameter test2014" expl="VC for test2014"
-    sum="12ce06848394595336f904d4128638aa" proved="true"
-    shape="ainfix &gt;=c2014c0">
+    sum="12ce06848394595336f904d4128638aa">
     <label name="expl:VC for test2014"/>
     <proof prover="7" timelimit="5">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
    <goal name="WP_parameter bench" expl="VC for bench"
-    sum="822f4dbc4c001f31f7a546c376f270a7" proved="true"
-    shape="t">
+    sum="822f4dbc4c001f31f7a546c376f270a7">
     <label name="expl:VC for bench"/>
     <proof prover="7" timelimit="5">
      <result status="valid" time="0.01"/>

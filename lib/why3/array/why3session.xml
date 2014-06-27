@@ -6,13 +6,12 @@
  <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5"
   memlimit="1000"/>
  <prover id="2" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
- <file name="../../../modules/array.mlw" verified="true"
+ <file name="../../../modules/array.mlw"
   expanded="true">
-  <theory name="Array"
-   verified="true">
+  <theory
+   name="Array">
    <goal name="WP_parameter defensive_get" expl="VC for defensive_get"
-    sum="7a13ed9ce975d02c6a99da7953b5f8ad" proved="true"
-    shape="iiainfix &lt;V1V0Aainfix &lt;=c0V1Aainfix &lt;V1V0Aainfix &lt;=c0V1ainfix &gt;=V1V0Oainfix &lt;V1c0ainfix &gt;=V1V0ainfix &gt;=V1V0Oainfix &lt;V1c0ainfix &lt;V1c0Iainfix &lt;=c0V0F">
+    sum="7a13ed9ce975d02c6a99da7953b5f8ad">
     <label name="expl:VC for defensive_get"/>
     <proof prover="1">
      <result status="valid" time="0.01"/>
@@ -22,8 +21,7 @@
     </proof>
    </goal>
    <goal name="WP_parameter defensive_set" expl="VC for defensive_set"
-    sum="c4c143e53a37df4c34fec17c6b70b752" proved="true"
-    shape="iiainfix =asetV1V2V3V4Aainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix =V4asetV1V2V3Aainfix &lt;=c0V0FAainfix &lt;V2V0Aainfix &lt;=c0V2ainfix &gt;=V2V0Oainfix &lt;V2c0ainfix &gt;=V2V0ainfix &gt;=V2V0Oainfix &lt;V2c0ainfix &lt;V2c0Iainfix &lt;=c0V0F">
+    sum="c4c143e53a37df4c34fec17c6b70b752">
     <label name="expl:VC for defensive_set"/>
     <proof prover="1">
      <result status="valid" time="0.02"/>
@@ -33,8 +31,7 @@
     </proof>
    </goal>
    <goal name="WP_parameter fill" expl="VC for fill"
-    sum="050360d72701db35f693b2d9b75d7695" proved="true"
-    shape="ainfix =agetV6V7V4Iainfix &lt;V7ainfix +V2V3Aainfix &lt;=V2V7FAainfix =agetV6V8agetV1V8Iainfix &lt;V8V0Aainfix &lt;=ainfix +V2V3V8Oainfix &lt;V8V2Aainfix &lt;=c0V8FAainfix &lt;=c0V0Iainfix =agetV6V9V4Iainfix &lt;V9ainfix +V2ainfix +V5c1Aainfix &lt;=V2V9FAainfix =agetV6V10agetV1V10Iainfix &lt;V10V0Aainfix &lt;=ainfix +V2V3V10Oainfix &lt;V10V2Aainfix &lt;=c0V10FAainfix =agetV13V14V4Iainfix &lt;V14ainfix +V2ainfix +V11c1Aainfix &lt;=V2V14FAainfix =agetV13V15agetV1V15Iainfix &lt;V15V0Aainfix &lt;=ainfix +V2V3V15Oainfix &lt;V15V2Aainfix &lt;=c0V15FIainfix =V13asetV6V12V4Aainfix &lt;=c0V0FAainfix &lt;V12V0Aainfix &lt;=c0V12Aainfix &lt;=c0V0Lainfix +V2V11Iainfix =agetV6V16V4Iainfix &lt;V16ainfix +V2V11Aainfix &lt;=V2V16FAainfix =agetV6V17agetV1V17Iainfix &lt;V17V0Aainfix &lt;=ainfix +V2V3V17Oainfix &lt;V17V2Aainfix &lt;=c0V17FIainfix &lt;=V11V5Aainfix &lt;=c0V11FFAainfix =agetV1V18V4Iainfix &lt;V18ainfix +V2c0Aainfix &lt;=V2V18FIainfix &lt;=c0V5Aainfix =agetV1V19V4Iainfix &lt;V19ainfix +V2V3Aainfix &lt;=V2V19FIainfix &gt;c0V5Lainfix -V3c1Iainfix &lt;=ainfix +V2V3V0Aainfix &lt;=c0V3Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+    sum="050360d72701db35f693b2d9b75d7695">
     <label name="expl:VC for fill"/>
     <proof prover="1">
      <result status="valid" time="0.02"/>
@@ -44,45 +41,41 @@
     </proof>
    </goal>
   </theory>
-  <theory name="IntArraySorted" verified="true" expanded="true">
+  <theory name="IntArraySorted" expanded="true">
   </theory>
-  <theory name="Sorted" verified="true" expanded="true">
+  <theory name="Sorted" expanded="true">
   </theory>
-  <theory name="ArrayEq" verified="true" expanded="true">
+  <theory name="ArrayEq" expanded="true">
   </theory>
-  <theory name="ArrayExchange" verified="true" expanded="true">
+  <theory name="ArrayExchange" expanded="true">
   </theory>
-  <theory name="ArrayPermut" verified="true"
+  <theory name="ArrayPermut"
    expanded="true">
-   <goal name="exchange_permut_sub" sum="15a6358e332a91d7a40db598c04f3364"
-    proved="true"
-    shape="apermut_subV0V1V4V5Iainfix &lt;=V5alengthV0Iainfix &lt;=c0V4Iainfix &lt;V3V5Aainfix &lt;=V4V3Iainfix &lt;V2V5Aainfix &lt;=V4V2IaexchangeV0V1V2V3F">
+   <goal name="exchange_permut_sub"
+    sum="15a6358e332a91d7a40db598c04f3364">
     <proof prover="0"
      edited="array_ArrayPermut_exchange_permut_sub_1.v">
      <result status="valid" time="4.64"/>
     </proof>
    </goal>
-   <goal name="permut_sub_weakening" sum="875ea61b1f77300d3a162a9b3039c823"
-    proved="true"
-    shape="apermut_subV0V1V4V5Iainfix &lt;=V5alengthV0Aainfix &lt;=V3V5Iainfix &lt;=V4V2Aainfix &lt;=c0V4Iapermut_subV0V1V2V3F">
+   <goal name="permut_sub_weakening"
+    sum="875ea61b1f77300d3a162a9b3039c823">
     <proof prover="0"
      edited="array_ArrayPermut_permut_sub_weakening_2.v">
      <result status="valid" time="1.58"/>
     </proof>
    </goal>
    <goal name="exchange_permut_all" sum="ba0d955110562a10351bad58d7bb7d3d"
-    proved="true" expanded="true"
-    shape="apermut_allV0V1IaexchangeV0V1V2V3F">
+    expanded="true">
     <proof prover="2">
      <result status="valid" time="0.29"/>
     </proof>
    </goal>
   </theory>
-  <theory name="ArraySwap"
-   verified="true">
+  <theory
+   name="ArraySwap">
    <goal name="WP_parameter swap" expl="VC for swap"
-    sum="f44d39e79905e10fdc532d5709b823b7" proved="true"
-    shape="aexchangeamk arrayV0V1amk arrayV0V5V2V3Iainfix =V5asetV4V3agetV1V2Aainfix &lt;=c0V0FAainfix &lt;V3V0Aainfix &lt;=c0V3Iainfix =V4asetV1V2agetV1V3Aainfix &lt;=c0V0FAainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V2V0Aainfix &lt;=c0V2Iainfix &lt;V3V0Aainfix &lt;=c0V3Aainfix &lt;V2V0Aainfix &lt;=c0V2Aainfix &lt;=c0V0F">
+    sum="f44d39e79905e10fdc532d5709b823b7">
     <label name="expl:VC for swap"/>
     <proof prover="1">
      <result status="valid" time="0.00"/>
@@ -92,15 +85,15 @@
     </proof>
    </goal>
   </theory>
-  <theory name="ArraySum" verified="true" expanded="true">
+  <theory name="ArraySum" expanded="true">
   </theory>
-  <theory name="NumOfParam" verified="true" expanded="true">
+  <theory name="NumOfParam" expanded="true">
   </theory>
-  <theory name="NumOfEq" verified="true" expanded="true">
+  <theory name="NumOfEq" expanded="true">
   </theory>
-  <theory name="NumOf" verified="true" expanded="true">
+  <theory name="NumOf" expanded="true">
   </theory>
-  <theory name="ToList" verified="true" expanded="true">
+  <theory name="ToList" expanded="true">
   </theory>
  </file>
 </why3session>

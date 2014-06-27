@@ -1,272 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <file
-  name="../all_distinct.mlw"
-  verified="true"
+ <prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="6"
+  memlimit="1000"/>
+ <file name="../all_distinct.mlw"
   expanded="true">
-  <theory
-   name="AllDistinct"
-   locfile="../all_distinct.mlw"
-   loclnum="5" loccnumb="7" loccnume="18"
-   verified="true"
+  <theory name="AllDistinct"
    expanded="true">
-   <goal
-    name="WP_parameter all_distinct"
-    locfile="../all_distinct.mlw"
-    loclnum="13" loccnumb="6" loccnume="18"
-    expl="VC for all_distinct"
+   <goal name="WP_parameter all_distinct" expl="VC for all_distinct"
     sum="9cd8ab30056665aa598b63118511deb6"
-    proved="true"
-    expanded="true"
-    shape="Nainfix =agetV1V5agetV1V6INainfix =V5V6Iainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix &lt;V5V0Aainfix &lt;=c0V5FIainfix =agetV1V8V7Aainfix &lt;V8ainfix +V3c1Aainfix &lt;=c0V8Eqainfix =agetV4V7aTrueIainfix &lt;V7V2Aainfix &lt;=c0V7FANainfix =agetV1V9agetV1V10INainfix =V9V10Iainfix &lt;V10ainfix +V3c1Aainfix &lt;=c0V10Iainfix &lt;V9ainfix +V3c1Aainfix &lt;=c0V9FAiainfix =agetV1V15V14Aainfix &lt;V15ainfix +V11c1Aainfix &lt;=c0V15Eqainfix =agetV13V14aTrueIainfix &lt;V14V2Aainfix &lt;=c0V14FANainfix =agetV1V16agetV1V17INainfix =V16V17Iainfix &lt;V17ainfix +V11c1Aainfix &lt;=c0V17Iainfix &lt;V16ainfix +V11c1Aainfix &lt;=c0V16FIainfix =V13asetV4V12aTrueAainfix &lt;=c0V2FAainfix &lt;V12V2Aainfix &lt;=c0V12NNainfix =agetV1V18agetV1V19INainfix =V18V19Iainfix &lt;V19V0Aainfix &lt;=c0V19Iainfix &lt;V18V0Aainfix &lt;=c0V18Fainfix =agetV4V12aTrueAainfix &lt;V12V2Aainfix &lt;=c0V12Aainfix &lt;=c0V2LagetV1V11Aainfix &lt;V11V0Aainfix &lt;=c0V11Iainfix =agetV1V21V20Aainfix &lt;V21V11Aainfix &lt;=c0V21Eqainfix =agetV4V20aTrueIainfix &lt;V20V2Aainfix &lt;=c0V20FANainfix =agetV1V22agetV1V23INainfix =V22V23Iainfix &lt;V23V11Aainfix &lt;=c0V23Iainfix &lt;V22V11Aainfix &lt;=c0V22FIainfix &lt;=V11V3Aainfix &lt;=c0V11FFAainfix =agetV1V25V24Aainfix &lt;V25c0Aainfix &lt;=c0V25Eqainfix =agetaconstaFalseV24aTrueIainfix &lt;V24V2Aainfix &lt;=c0V24FANainfix =agetV1V26agetV1V27INainfix =V26V27Iainfix &lt;V27c0Aainfix &lt;=c0V27Iainfix &lt;V26c0Aainfix &lt;=c0V26FIainfix &lt;=c0V3ANainfix =agetV1V28agetV1V29INainfix =V28V29Iainfix &lt;V29V0Aainfix &lt;=c0V29Iainfix &lt;V28V0Aainfix &lt;=c0V28FIainfix &gt;c0V3Lainfix -V0c1Iainfix &lt;=c0V2Aainfix &gt;=V2c0Iainfix &lt;agetV1V30V2Aainfix &lt;=c0agetV1V30Iainfix &lt;V30V0Aainfix &lt;=c0V30FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-    <label
-     name="expl:VC for all_distinct"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
+    expanded="true">
+    <label name="expl:VC for all_distinct"/>
+    <transf name="split_goal_wp"
      expanded="true">
-     <goal
-      name="WP_parameter all_distinct.1"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="1. array creation size"
+     <goal name="WP_parameter all_distinct.1" expl="1. array creation size"
       sum="169dead4ca86d70a93945d7a849a4ddf"
-      proved="true"
-      expanded="true"
-      shape="array creation sizeainfix &gt;=V2c0Iainfix &lt;agetV1V3V2Aainfix &lt;=c0agetV1V3Iainfix &lt;V3V0Aainfix &lt;=c0V3FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.2"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="2. postcondition"
+     <goal name="WP_parameter all_distinct.2" expl="2. postcondition"
       sum="8d038b937a7ed02cbabc2d03293374eb"
-      proved="true"
-      expanded="true"
-      shape="postconditionNainfix =agetV1V4agetV1V5INainfix =V4V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix &lt;V4V0Aainfix &lt;=c0V4FIainfix &gt;c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V6V2Aainfix &lt;=c0agetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.3"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="3. loop invariant init"
+     <goal name="WP_parameter all_distinct.3" expl="3. loop invariant init"
       sum="f2a72af703403a88e25a697c4ddfa52a"
-      proved="true"
-      expanded="true"
-      shape="loop invariant initNainfix =agetV1V4agetV1V5INainfix =V4V5Iainfix &lt;V5c0Aainfix &lt;=c0V5Iainfix &lt;V4c0Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V6V2Aainfix &lt;=c0agetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.4"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="4. loop invariant init"
+     <goal name="WP_parameter all_distinct.4" expl="4. loop invariant init"
       sum="ce1590976f77ddc643d8fbdac4674fb8"
-      proved="true"
-      expanded="true"
-      shape="loop invariant initainfix =agetV1V5V4Aainfix &lt;V5c0Aainfix &lt;=c0V5Eqainfix =agetaconstaFalseV4aTrueIainfix &lt;V4V2Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V6V2Aainfix &lt;=c0agetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.5"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="5. index in array bounds"
+     <goal name="WP_parameter all_distinct.5" expl="5. index in array bounds"
       sum="f1a081032a623863f610a04ad56ba8cb"
-      proved="true"
-      expanded="true"
-      shape="index in array boundsainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1V7V6Aainfix &lt;V7V5Aainfix &lt;=c0V7Eqainfix =agetV4V6aTrueIainfix &lt;V6V2Aainfix &lt;=c0V6FANainfix =agetV1V8agetV1V9INainfix =V8V9Iainfix &lt;V9V5Aainfix &lt;=c0V9Iainfix &lt;V8V5Aainfix &lt;=c0V8FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V10V2Aainfix &lt;=c0agetV1V10Iainfix &lt;V10V0Aainfix &lt;=c0V10FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.6"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="6. type invariant"
+     <goal name="WP_parameter all_distinct.6" expl="6. type invariant"
       sum="0a3d6cdd22086870ccdd20acf950acb1"
-      proved="true"
-      expanded="true"
-      shape="type invariantainfix &lt;=c0V2LagetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1V8V7Aainfix &lt;V8V5Aainfix &lt;=c0V8Eqainfix =agetV4V7aTrueIainfix &lt;V7V2Aainfix &lt;=c0V7FANainfix =agetV1V9agetV1V10INainfix =V9V10Iainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;V9V5Aainfix &lt;=c0V9FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V11V2Aainfix &lt;=c0agetV1V11Iainfix &lt;V11V0Aainfix &lt;=c0V11FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.7"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="7. index in array bounds"
+     <goal name="WP_parameter all_distinct.7" expl="7. index in array bounds"
       sum="025eb7e13690ff51b15e41ac95352a8f"
-      proved="true"
-      expanded="true"
-      shape="index in array boundsainfix &lt;V6V2Aainfix &lt;=c0V6Iainfix &lt;=c0V2LagetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1V8V7Aainfix &lt;V8V5Aainfix &lt;=c0V8Eqainfix =agetV4V7aTrueIainfix &lt;V7V2Aainfix &lt;=c0V7FANainfix =agetV1V9agetV1V10INainfix =V9V10Iainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;V9V5Aainfix &lt;=c0V9FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V11V2Aainfix &lt;=c0agetV1V11Iainfix &lt;V11V0Aainfix &lt;=c0V11FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.8"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="8. postcondition"
+     <goal name="WP_parameter all_distinct.8" expl="8. postcondition"
       sum="abed04285d21c6c786ac5473f4cbb8fe"
-      proved="true"
-      expanded="true"
-      shape="postconditionNNainfix =agetV1V7agetV1V8INainfix =V7V8Iainfix &lt;V8V0Aainfix &lt;=c0V8Iainfix &lt;V7V0Aainfix &lt;=c0V7FIainfix =agetV4V6aTrueIainfix &lt;V6V2Aainfix &lt;=c0V6Aainfix &lt;=c0V2LagetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1V10V9Aainfix &lt;V10V5Aainfix &lt;=c0V10Eqainfix =agetV4V9aTrueIainfix &lt;V9V2Aainfix &lt;=c0V9FANainfix =agetV1V11agetV1V12INainfix =V11V12Iainfix &lt;V12V5Aainfix &lt;=c0V12Iainfix &lt;V11V5Aainfix &lt;=c0V11FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V13V2Aainfix &lt;=c0agetV1V13Iainfix &lt;V13V0Aainfix &lt;=c0V13FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.9"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="9. index in array bounds"
+     <goal name="WP_parameter all_distinct.9" expl="9. index in array bounds"
       sum="bd4aee6919c6b60b4e0886f97d37c2c3"
-      proved="true"
-      expanded="true"
-      shape="index in array boundsainfix &lt;V6V2Aainfix &lt;=c0V6INainfix =agetV4V6aTrueIainfix &lt;V6V2Aainfix &lt;=c0V6Aainfix &lt;=c0V2LagetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1V8V7Aainfix &lt;V8V5Aainfix &lt;=c0V8Eqainfix =agetV4V7aTrueIainfix &lt;V7V2Aainfix &lt;=c0V7FANainfix =agetV1V9agetV1V10INainfix =V9V10Iainfix &lt;V10V5Aainfix &lt;=c0V10Iainfix &lt;V9V5Aainfix &lt;=c0V9FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V11V2Aainfix &lt;=c0agetV1V11Iainfix &lt;V11V0Aainfix &lt;=c0V11FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.10"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter all_distinct.10"
       expl="10. loop invariant preservation"
       sum="b5160b76e1b3e97ac33d9a4547eb9ad5"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationNainfix =agetV1V8agetV1V9INainfix =V8V9Iainfix &lt;V9ainfix +V5c1Aainfix &lt;=c0V9Iainfix &lt;V8ainfix +V5c1Aainfix &lt;=c0V8FIainfix =V7asetV4V6aTrueAainfix &lt;=c0V2FIainfix &lt;V6V2Aainfix &lt;=c0V6INainfix =agetV4V6aTrueIainfix &lt;V6V2Aainfix &lt;=c0V6Aainfix &lt;=c0V2LagetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1V11V10Aainfix &lt;V11V5Aainfix &lt;=c0V11Eqainfix =agetV4V10aTrueIainfix &lt;V10V2Aainfix &lt;=c0V10FANainfix =agetV1V12agetV1V13INainfix =V12V13Iainfix &lt;V13V5Aainfix &lt;=c0V13Iainfix &lt;V12V5Aainfix &lt;=c0V12FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V14V2Aainfix &lt;=c0agetV1V14Iainfix &lt;V14V0Aainfix &lt;=c0V14FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.11"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
+     <goal name="WP_parameter all_distinct.11"
       expl="11. loop invariant preservation"
       sum="646cfed7474750745a5a8bffbd5d0672"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix =agetV1V9V8Aainfix &lt;V9ainfix +V5c1Aainfix &lt;=c0V9Eqainfix =agetV7V8aTrueIainfix &lt;V8V2Aainfix &lt;=c0V8FIainfix =V7asetV4V6aTrueAainfix &lt;=c0V2FIainfix &lt;V6V2Aainfix &lt;=c0V6INainfix =agetV4V6aTrueIainfix &lt;V6V2Aainfix &lt;=c0V6Aainfix &lt;=c0V2LagetV1V5Iainfix &lt;V5V0Aainfix &lt;=c0V5Iainfix =agetV1V11V10Aainfix &lt;V11V5Aainfix &lt;=c0V11Eqainfix =agetV4V10aTrueIainfix &lt;V10V2Aainfix &lt;=c0V10FANainfix =agetV1V12agetV1V13INainfix =V12V13Iainfix &lt;V13V5Aainfix &lt;=c0V13Iainfix &lt;V12V5Aainfix &lt;=c0V12FIainfix &lt;=V5V3Aainfix &lt;=c0V5FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V14V2Aainfix &lt;=c0agetV1V14Iainfix &lt;V14V0Aainfix &lt;=c0V14FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
-     <goal
-      name="WP_parameter all_distinct.12"
-      locfile="../all_distinct.mlw"
-      loclnum="13" loccnumb="6" loccnume="18"
-      expl="12. postcondition"
+     <goal name="WP_parameter all_distinct.12" expl="12. postcondition"
       sum="3010bad4861a5d4b8f8591549feced61"
-      proved="true"
-      expanded="true"
-      shape="postconditionNainfix =agetV1V5agetV1V6INainfix =V5V6Iainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix &lt;V5V0Aainfix &lt;=c0V5FIainfix =agetV1V8V7Aainfix &lt;V8ainfix +V3c1Aainfix &lt;=c0V8Eqainfix =agetV4V7aTrueIainfix &lt;V7V2Aainfix &lt;=c0V7FANainfix =agetV1V9agetV1V10INainfix =V9V10Iainfix &lt;V10ainfix +V3c1Aainfix &lt;=c0V10Iainfix &lt;V9ainfix +V3c1Aainfix &lt;=c0V9FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;=c0V2Iainfix &gt;=V2c0Iainfix &lt;agetV1V11V2Aainfix &lt;=c0agetV1V11Iainfix &lt;V11V0Aainfix &lt;=c0V11FAainfix &lt;=c0V2Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for all_distinct"/>
-      <proof
-       prover="0"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
+      expanded="true">
+      <label name="expl:VC for all_distinct"/>
+      <proof prover="0">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>

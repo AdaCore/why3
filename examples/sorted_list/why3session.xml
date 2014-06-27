@@ -1,54 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <file
-  name="../sorted_list.mlw"
-  verified="true"
+ <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="20"
+  memlimit="0"/>
+ <file name="../sorted_list.mlw"
   expanded="true">
-  <theory
-   name="FindInSortedList"
-   locfile="../sorted_list.mlw"
-   loclnum="3" loccnumb="7" loccnume="23"
-   verified="true"
+  <theory name="FindInSortedList"
    expanded="true">
-   <goal
-    name="Sorted_not_mem"
-    locfile="../sorted_list.mlw"
-    loclnum="9" loccnumb="8" loccnume="22"
-    sum="d417101248370f8a201ae14d52fd84e7"
-    proved="true"
-    expanded="true"
-    shape="NamemV0aConsV1V2IasortedaConsV1V2Iainfix &lt;V0V1F">
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+   <goal name="Sorted_not_mem" sum="d417101248370f8a201ae14d52fd84e7"
+    expanded="true">
+    <proof prover="0">
      <result status="valid" time="0.01"/>
     </proof>
    </goal>
-   <goal
-    name="WP_parameter find"
-    locfile="../sorted_list.mlw"
-    loclnum="13" loccnumb="10" loccnume="14"
-    expl="VC for find"
+   <goal name="WP_parameter find" expl="VC for find"
     sum="290251debf2caa8fc3ae34bf5196dc38"
-    proved="true"
-    expanded="true"
-    shape="CNamemV0V1aNiliiNamemV0V1amemV0V1qainfix =V4aTrueIamemV0V3qainfix =V4aTrueFAasortedV3ACfaNilainfix =V5V3aConswVV1ainfix &gt;V0V2amemV0V1ainfix =V0V2aConsVVV1IasortedV1F">
-    <label
-     name="expl:VC for find"/>
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
+    expanded="true">
+    <label name="expl:VC for find"/>
+    <proof prover="0">
      <result status="valid" time="0.02"/>
     </proof>
    </goal>

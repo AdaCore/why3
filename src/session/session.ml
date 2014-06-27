@@ -493,6 +493,7 @@ let goal_expl g = Opt.get_def g.goal_name.Ident.id_string g.goal_expl
 open Format
 
 let db_filename = "why3session.xml"
+let shape_filename = "why3shapes.dat"
 let session_dir_for_save = ref "."
 
 let save_string fmt s =
@@ -508,7 +509,7 @@ let save_string fmt s =
 
 
 let save_result fmt r =
-  fprintf fmt "@\n<result@ status=\"%s\"@ time=\"%.2f\"/>"
+  fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"/>"
     (match r.Call_provers.pr_answer with
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"
@@ -522,11 +523,11 @@ let save_result fmt r =
 let save_status fmt s =
   match s with
     | Unedited ->
-        fprintf fmt "@\n<unedited/>"
+        fprintf fmt "<unedited/>"
     | Scheduled | Running | Interrupted | JustEdited ->
-        fprintf fmt "@\n<undone/>"
+        fprintf fmt "<undone/>"
     | InternalFailure msg ->
-        fprintf fmt "@\n<internalfailure@ reason=\"%a\"/>"
+        fprintf fmt "<internalfailure@ reason=\"%a\"/>"
           save_string (Printexc.to_string msg)
     | Done r -> save_result fmt r
 
@@ -543,7 +544,7 @@ let opt lab fmt = function
 
 let save_proof_attempt fmt ((id,tl,ml),a) =
   fprintf fmt
-    "@\n@[<hov 1><proof@ prover=\"%i\"%a%a%a%a%a>"
+    "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a%a>"
     id
     (save_int_def "timelimit" tl) a.proof_timelimit
     (save_int_def "memlimit" ml) a.proof_memlimit
@@ -551,7 +552,7 @@ let save_proof_attempt fmt ((id,tl,ml),a) =
     (save_bool_def "obsolete" false) a.proof_obsolete
     (save_bool_def "archived" false) a.proof_archived;
   save_status fmt a.proof_state;
-  fprintf fmt "@]@\n</proof>"
+  fprintf fmt "</proof>@]"
 
 let save_ident fmt id =
   fprintf fmt "name=\"%a\"" save_string id.Ident.id_string;
@@ -568,39 +569,51 @@ let save_ident fmt id =
 *)
   ()
 
+(*
 let save_label fmt s =
   fprintf fmt "@\n@[<hov 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
+*)
 
-let rec save_goal provers fmt g =
+type save_ctxt = {
+  provers : (int * int * int) Mprover.t; ch_shapes : out_channel
+}
+
+let rec save_goal ctxt fmt g =
   let shape = Tc.string_of_shape g.goal_shape in
   assert (shape <> "");
+  let checksum = Tc.string_of_checksum g.goal_checksum in
   fprintf fmt
-    "@\n@[<hov 1><goal@ %a%a@ sum=\"%a\"%a@ shape=\"%a\">"
+    "@\n@[<v 0>@[<h><goal@ %a%a@ sum=\"%a\"%a>@]"
     save_ident g.goal_name
     (opt "expl") g.goal_expl
-    save_string (Tc.string_of_checksum g.goal_checksum)
-    (save_bool_def "expanded" false) g.goal_expanded
-    save_string shape;
+    save_string checksum
+    (save_bool_def "expanded" false) g.goal_expanded;
+  output_string ctxt.ch_shapes checksum;
+  output_char ctxt.ch_shapes ' ';
+  output_string ctxt.ch_shapes shape;
+  output_char ctxt.ch_shapes '\n';
+(*
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
+*)
   let l = PHprover.fold
-    (fun _ a acc -> (Mprover.find a.proof_prover provers, a) :: acc)
+    (fun _ a acc -> (Mprover.find a.proof_prover ctxt.provers, a) :: acc)
     g.goal_external_proofs [] in
   let l = List.sort (fun ((i1,_,_),_) ((i2,_,_),_) -> compare i1 i2) l in
   List.iter (save_proof_attempt fmt) l;
   let l = PHstr.fold (fun _ t acc -> t :: acc) g.goal_transformations [] in
   let l = List.sort (fun t1 t2 -> compare t1.transf_name t2.transf_name) l in
-  List.iter (save_trans provers fmt) l;
-  Mmetas_args.iter (save_metas provers fmt) g.goal_metas;
+  List.iter (save_trans ctxt fmt) l;
+  Mmetas_args.iter (save_metas ctxt fmt) g.goal_metas;
   fprintf fmt "@]@\n</goal>"
 
-and save_trans provers fmt t =
-  fprintf fmt "@\n@[<hov 1><transf@ name=\"%a\"%a>"
+and save_trans ctxt fmt t =
+  fprintf fmt "@\n@[<hov 1>@[<h><transf@ name=\"%a\"%a>@]"
     save_string t.transf_name
     (save_bool_def "expanded" false) t.transf_expanded;
-  List.iter (save_goal provers fmt) t.transf_goals;
+  List.iter (save_goal ctxt fmt) t.transf_goals;
   fprintf fmt "@]@\n</transf>"
 
-and save_metas provers fmt _ m =
+and save_metas ctxt fmt _ m =
   fprintf fmt "@\n@[<hov 1><metas%a>"
     (save_bool_def "expanded" false) m.metas_expanded;
   let save_pos fmt pos =
@@ -631,7 +644,7 @@ and save_metas provers fmt _ m =
   Mpr.iter (save_pr_pos fmt) m.metas_idpos.idpos_pr;
   Mstr.iter (fun s smeta_args ->
     Smeta_args.iter (save_meta_args fmt s) smeta_args) m.metas_added;
-  save_goal provers fmt m.metas_goal;
+  save_goal ctxt fmt m.metas_goal;
   fprintf fmt "@]@\n</metas>"
 
 and save_meta_args fmt s l =
@@ -663,21 +676,23 @@ and save_ty fmt ty =
     List.iter (save_ty fmt) l;
     fprintf fmt "@]@\n</ty_app>"
 
-let save_theory provers fmt t =
+let save_theory ctxt fmt t =
   fprintf fmt
-    "@\n@[<hov 1><theory@ %a%a>"
+    "@\n@[<v 1>@[<h><theory@ %a%a>@]"
     save_ident t.theory_name
     (save_bool_def "expanded" false) t.theory_expanded;
+(*
   Ident.Slab.iter (save_label fmt) t.theory_name.Ident.id_label;
-  List.iter (save_goal provers fmt) t.theory_goals;
+*)
+  List.iter (save_goal ctxt fmt) t.theory_goals;
   fprintf fmt "@]@\n</theory>"
 
-let save_file provers fmt _ f =
+let save_file ctxt fmt _ f =
   fprintf fmt
-    "@\n@[<hov 1><file@ name=\"%a\"%a%a>"
+    "@\n@[<v 0>@[<h><file@ name=\"%a\"%a%a>@]"
     save_string f.file_name (opt "format")
     f.file_format (save_bool_def "expanded" false) f.file_expanded;
-  List.iter (save_theory provers fmt) f.file_theories;
+  List.iter (save_theory ctxt fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
 let save_prover fmt p (timelimits,memlimits) (provers,id) =
@@ -693,7 +708,7 @@ let save_prover fmt p (timelimits,memlimits) (provers,id) =
       memlimits
       (0,0)
   in
-  fprintf fmt "@\n@[<hov 1><prover@ id=\"%i\"@ name=\"%a\"@ \
+  fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
                version=\"%a\"%a@ timelimit=\"%d\"@ memlimit=\"%d\"/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
     (fun fmt s -> if s <> "" then fprintf fmt "@ alternative=\"%a\""
@@ -702,30 +717,37 @@ let save_prover fmt p (timelimits,memlimits) (provers,id) =
     mostfrequent_timelimit mostfrequent_memlimit;
   Mprover.add p (id,mostfrequent_timelimit,mostfrequent_memlimit) provers, id+1
 
-let save fname _config session =
+let save fname shfname _config session =
   let ch = open_out fname in
+  let chsh = open_out shfname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
   fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v5//EN\"@ \"http://why3.lri.fr/why3session.dtd\">@\n";
-(*
-  let rel_file = Sysutil.relativize_filename !session_dir_for_save fname in
-  fprintf fmt "@[<hov 1><why3session@ name=\"%a\" shape_version=\"%d\">"
+  (*
+    let rel_file = Sysutil.relativize_filename !session_dir_for_save fname in
+    fprintf fmt "@[<hov 1><why3session@ name=\"%a\" shape_version=\"%d\">"
     save_string rel_file session.session_shape_version;
-*)
-  fprintf fmt "@[<hov 1><why3session shape_version=\"%d\">"
+  *)
+  fprintf fmt "@[<v 0><why3session shape_version=\"%d\">"
     session.session_shape_version;
+  Tc.reset_dict ();
   let provers,_ = PHprover.fold (save_prover fmt) (get_used_provers_with_stats session)
     (Mprover.empty,0) in
-  PHstr.iter (save_file provers fmt) session.session_files;
+  PHstr.iter
+    (save_file { provers = provers; ch_shapes = chsh} fmt)
+    session.session_files;
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";
-  close_out ch
+  close_out ch;
+  close_out chsh
 
 let save_session config session =
   let f = Filename.concat session.session_dir db_filename in
   Sysutil.backup_file f;
+  let fs = Filename.concat session.session_dir shape_filename in
+  Sysutil.backup_file fs;
   session_dir_for_save := session.session_dir;
-  save f config session
+  save f fs config session
 
 (*****************************)
 (*   update verified field   *)
@@ -1090,18 +1112,31 @@ let load_ident elt =
       Ident.id_fresh ~label name in
   Ident.id_register preid
 
-let rec load_goal ~old_provers parent acc g =
+type load_ctxt = {
+  old_provers : (Whyconf.prover * int * int) Mstr.t ;
+  shapes : (string, Tc.shape) Hashtbl.t
+}
+
+let rec load_goal ctxt parent acc g =
   match g.Xml.name with
     | "goal" ->
         let gname = load_ident g in
         let expl = load_option "expl" g in
-        let sum = Tc.checksum_of_string (string_attribute_def "sum" g "") in
-        let shape = Tc.shape_of_string (string_attribute_def "shape" g "") in
+        let csum = string_attribute_def "sum" g "" in
+        let sum = Tc.checksum_of_string csum in
+        let shape =
+          try Tc.shape_of_string (List.assoc "shape" g.Xml.attributes)
+          with Not_found -> 
+            try Hashtbl.find ctxt.shapes csum
+            with Not_found ->
+              Format.eprintf "[Warning] shape not found for goal %s@." csum;
+              Tc.shape_of_string ""
+        in
         let expanded = bool_attribute "expanded" g false in
         let mg =
           raw_add_no_task ~keygen ~expanded parent gname expl sum shape
         in
-        List.iter (load_proof_or_transf ~old_provers mg) g.Xml.elements;
+        List.iter (load_proof_or_transf ctxt mg) g.Xml.elements;
         mg.goal_verified <- goal_verified mg;
         mg::acc
     | "label" -> acc
@@ -1109,12 +1144,12 @@ let rec load_goal ~old_provers parent acc g =
         eprintf "[Warning] Session.load_goal: unexpected element '%s'@." s;
         acc
 
-and load_proof_or_transf ~old_provers mg a =
+and load_proof_or_transf ctxt mg a =
   match a.Xml.name with
     | "proof" ->
         let prover = string_attribute "prover" a in
         let (p,timelimit,memlimit) =
-          try Mstr.find prover old_provers
+          try Mstr.find prover ctxt.old_provers
           with Not_found ->
             eprintf "[Error] prover not listing in header '%s'@." prover;
             raise (LoadError (a,"prover not listing in header"))
@@ -1153,20 +1188,20 @@ and load_proof_or_transf ~old_provers mg a =
         mtr.transf_goals <-
           List.rev
           (List.fold_left
-             (load_goal ~old_provers (Parent_transf mtr))
+             (load_goal ctxt (Parent_transf mtr))
              [] a.Xml.elements);
         (* already done by raw_add_transformation:
            Hashtbl.add mg.transformations trname mtr *)
         (** The attribute "proved" is required but not read *)
         mtr.transf_verified <- transf_verified mtr
-    | "metas" -> load_metas ~old_provers mg a;
+    | "metas" -> load_metas ctxt mg a;
     | "label" -> ()
     | s ->
         eprintf
           "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
           s
 
-and load_metas ~old_provers mg a =
+and load_metas ctxt mg a =
   let hts = Hint.create 10 in
   let hls = Hint.create 10 in
   let hpr = Hint.create 10 in
@@ -1274,7 +1309,7 @@ and load_metas ~old_provers mg a =
     | _ ->
       raise (LoadError (a,"Only one goal can appear in a metas element")) in
   metas.metas_goal <-
-    List.hd (load_goal ~old_provers (Parent_metas metas) [] goal);
+    List.hd (load_goal ctxt (Parent_metas metas) [] goal);
   (* already done by raw_add_transformation:
      Hashtbl.add mg.transformations trname mtr *)
   (** The attribute "proved" is required but not read *)
@@ -1282,7 +1317,7 @@ and load_metas ~old_provers mg a =
 
 
 
-let load_theory ~old_provers mf acc th =
+let load_theory ctxt mf acc th =
   match th.Xml.name with
     | "theory" ->
         let thname = load_ident th in
@@ -1291,7 +1326,7 @@ let load_theory ~old_provers mf acc th =
         mth.theory_goals <-
           List.rev
           (List.fold_left
-             (load_goal ~old_provers (Parent_theory mth))
+             (load_goal ctxt (Parent_theory mth))
              [] th.Xml.elements);
         mth.theory_verified <- theory_verified mth;
         mth::acc
@@ -1299,7 +1334,7 @@ let load_theory ~old_provers mf acc th =
         eprintf "[Warning] Session.load_theory: unexpected element '%s'@." s;
         acc
 
-let load_file session old_provers f =
+let load_file session shapes old_provers f =
   match f.Xml.name with
     | "file" ->
         let fn = string_attribute "name" f in
@@ -1309,7 +1344,8 @@ let load_file session old_provers f =
         mf.file_theories <-
           List.rev
           (List.fold_left
-             (load_theory ~old_provers mf) [] f.Xml.elements);
+             (load_theory { old_provers = old_provers ;
+                            shapes = shapes } mf) [] f.Xml.elements);
         mf.file_verified <- file_verified mf;
         old_provers
     | "prover" ->
@@ -1328,43 +1364,87 @@ let load_file session old_provers f =
         eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
         old_provers
 
+(*
 let old_provers = ref Mstr.empty
+*)
 (* dead code
 let get_old_provers () = !old_provers
 *)
 
-let load_session session xml =
+let load_session session shapes xml =
   match xml.Xml.name with
     | "why3session" ->
       let shape_version = int_attribute_def "shape_version" xml 1 in
       session.session_shape_version <- shape_version;
       dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
       (** just to keep the old_provers somewhere *)
-      old_provers :=
-        List.fold_left (load_file session) Mstr.empty xml.Xml.elements;
+(*
+     old_provers := *)
+      let _ =
+        List.fold_left (load_file session shapes) Mstr.empty xml.Xml.elements
+      in
       dprintf debug "[Info] load_session: done@\n"
     | s ->
         eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
 
 exception OpenError of string
+
+let read_shapes ch =
+  let h = Hashtbl.create 97 in
+  let shape = Buffer.create 97 in
+  try
+    while true do
+      let sum = String.make 32 ' ' in
+      let nsum = input ch sum 0 32 in
+      if nsum = 0 then raise End_of_file;
+      if nsum <> 32 then 
+        raise 
+          (OpenError "shapes files corrupted (checksum too short), ignored");
+      if input_char ch <> ' ' then
+        raise (OpenError "shapes files corrupted (space missing), ignored");
+      Buffer.clear shape;        
+      try 
+        while true do
+          let c = input_char ch in
+          if c = '\n' then raise Exit;
+          Buffer.add_char shape c
+        done
+      with Exit -> 
+        Hashtbl.add h sum (Tc.shape_of_string (Buffer.contents shape))
+    done;
+    assert false
+  with End_of_file -> h
+
+
+
 type notask = unit
 let read_session dir =
   if not (Sys.file_exists dir && Sys.is_directory dir) then
     raise (OpenError (Pp.sprintf "%s is not an existing directory" dir));
   let xml_filename = Filename.concat dir db_filename in
+  let shape_filename = Filename.concat dir shape_filename in
   let session = empty_session dir in
   (** If the xml is present we read it, otherwise we consider it empty *)
   if Sys.file_exists xml_filename then begin
     try
+      Tc.reset_dict ();
       let xml = Xml.from_file xml_filename in
+      let shapes = 
+        try
+          let ch = open_in shape_filename in
+          let h = read_shapes ch in
+          close_in ch;
+          h
+        with Sys_error _ -> Hashtbl.create 1
+      in
       try
-        load_session session xml.Xml.content;
+        load_session session shapes xml.Xml.content;
       with Sys_error msg ->
         failwith ("Open session: sys error " ^ msg)
     with
-      | Sys_error _msg ->
+      | Sys_error msg ->
       (* xml does not exist yet *)
-        raise (OpenError "Can't open")
+        raise (OpenError msg)
       | Xml.Parse_error s ->
         Format.eprintf "XML database corrupted, ignored (%s)@." s;
       (* failwith

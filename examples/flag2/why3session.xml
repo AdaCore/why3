@@ -9,57 +9,54 @@
  <prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
  <prover id="4" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
  <prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
- <prover id="6" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
- <prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
- <file name="../flag2.mlw" verified="true"
+ <prover id="6" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+ <prover id="7" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
+ <file name="../flag2.mlw"
   expanded="true">
-  <theory name="Flag" verified="true"
+  <theory name="Flag"
    expanded="true">
    <goal name="nb_occ_split" sum="688d23b314b816c846c67423c8f733cf"
-    proved="true" expanded="true"
-    shape="ainfix =anb_occV0V1V3V4ainfix +anb_occV0V1V2V4anb_occV0V2V3V4Iainfix &lt;=V2V3Aainfix &lt;=V1V2F">
-    <proof prover="6" edited="flag2_WP_Flag_nb_occ_split_1.v">
+    expanded="true">
+    <proof prover="7" edited="flag2_WP_Flag_nb_occ_split_1.v">
      <result status="valid" time="1.32"/>
     </proof>
    </goal>
    <goal name="nb_occ_ext" sum="ba28fbdf7a706bf714f2c6680ba78a12"
-    proved="true" expanded="true"
-    shape="ainfix =anb_occV0V2V3V4anb_occV1V2V3V4Iainfix =agetV0V5agetV1V5Iainfix &lt;V5V3Aainfix &lt;=V2V5FF">
-    <proof prover="6" edited="flag2_Flag_nb_occ_ext_1.v">
+    expanded="true">
+    <proof prover="7" edited="flag2_Flag_nb_occ_ext_1.v">
      <result status="valid" time="1.13"/>
     </proof>
    </goal>
    <goal name="nb_occ_store_outside_up"
-    sum="e289b9717b2993b6f03a1190fba4729b" proved="true" expanded="true"
-    shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix &lt;=V2V3Aainfix &lt;=V1V2F">
+    sum="e289b9717b2993b6f03a1190fba4729b"
+    expanded="true">
     <proof prover="0">
      <result status="valid" time="0.01"/>
     </proof>
     <proof prover="2">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="6"
+    <proof prover="7"
      edited="flag2_WP_Flag_nb_occ_store_outside_up_1.v">
      <result status="valid" time="1.17"/>
     </proof>
    </goal>
    <goal name="nb_occ_store_outside_down"
-    sum="a93cf08c39d67d9e6a9ee1a71604c93f" proved="true" expanded="true"
-    shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix &lt;=V1V2Aainfix &lt;V3V1F">
+    sum="a93cf08c39d67d9e6a9ee1a71604c93f"
+    expanded="true">
     <proof prover="0">
      <result status="valid" time="0.01"/>
     </proof>
     <proof prover="2">
      <result status="valid" time="0.01"/>
     </proof>
-    <proof prover="6"
+    <proof prover="7"
      edited="flag2_WP_Flag_nb_occ_store_outside_down_1.v">
      <result status="valid" time="1.24"/>
     </proof>
    </goal>
    <goal name="nb_occ_store_eq_eq" sum="22c0f23d944c3fbf443ee1c2d4a62727"
-    proved="true" expanded="true"
-    shape="ainfix =anb_occasetV0V3V4V1V2V4anb_occV0V1V2V4Iainfix =agetV0V3V4Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
+    expanded="true">
     <proof prover="0">
      <result status="valid" time="0.01"/>
     </proof>
@@ -69,71 +66,68 @@
     <proof prover="2">
      <result status="valid" time="0.00"/>
     </proof>
-    <proof prover="7">
+    <proof prover="6">
      <result status="valid" time="0.11"/>
     </proof>
    </goal>
    <goal name="nb_occ_store_eq_neq" sum="f3a7136fe02adfbc438c30ddde870569"
-    proved="true" expanded="true"
-    shape="ainfix =anb_occasetV0V3V4V1V2V4ainfix +anb_occV0V1V2V4c1INainfix =agetV0V3V4Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
-    <proof prover="6" timelimit="10"
+    expanded="true">
+    <proof prover="7" timelimit="10"
      edited="flag2_WP_Flag_nb_occ_store_eq_neq_1.v">
      <result status="valid" time="5.50"/>
     </proof>
    </goal>
    <goal name="nb_occ_store_neq_eq" sum="3f7224abb88f2ed729cb5e00e6019b0c"
-    proved="true" expanded="true"
-    shape="ainfix =anb_occasetV0V3V5V1V2V4ainfix -anb_occV0V1V2V4c1Iainfix =agetV0V3V4INainfix =V4V5Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
+    expanded="true">
     <proof prover="5">
      <result status="valid" time="1.37"/>
     </proof>
-    <proof prover="7">
+    <proof prover="6">
      <result status="valid" time="0.14"/>
     </proof>
    </goal>
    <goal name="nb_occ_store_neq_neq" sum="06d2c1a5bf8c1a5564dc6b7292199b76"
-    proved="true" expanded="true"
-    shape="ainfix =anb_occasetV0V3V5V1V2V4anb_occV0V1V2V4INainfix =agetV0V3V4INainfix =V4V5Iainfix &lt;V3V2Aainfix &lt;=V1V3F">
+    expanded="true">
     <proof prover="5">
      <result status="valid" time="1.59"/>
     </proof>
-    <proof prover="7">
+    <proof prover="6">
      <result status="valid" time="0.12"/>
     </proof>
    </goal>
    <goal name="WP_parameter swap" expl="VC for swap"
-    sum="a7947f2cc5ed9c136d4e0c8afc7e4409" proved="true" expanded="true"
-    shape="ainfix =anb_occV4V5V6V7anb_occV0V5V6V7Iainfix &lt;V2V6Aainfix &lt;=V5V2Aainfix &lt;V1V6Aainfix &lt;=V5V1FAainfix =agetV4V8agetV0V8INainfix =V8V2ANainfix =V8V1FAainfix =agetV4V2agetV0V1Aainfix =agetV4V1agetV0V2Iainfix =V4asetV3V2agetV0V1FIainfix =V3asetV0V1agetV0V2FF">
+    sum="a7947f2cc5ed9c136d4e0c8afc7e4409"
+    expanded="true">
     <label name="expl:VC for swap"/>
-    <transf name="split_goal" proved="true"
+    <transf name="split_goal"
      expanded="true">
      <goal name="WP_parameter swap.1" expl="1. postcondition"
-      sum="0ae4e7ec6812c9ad876d116e0a3013c8" proved="true" expanded="true"
-      shape="postconditionainfix =agetV4V1agetV0V2Iainfix =V4asetV3V2agetV0V1FIainfix =V3asetV0V1agetV0V2FF">
+      sum="0ae4e7ec6812c9ad876d116e0a3013c8"
+      expanded="true">
       <label name="expl:VC for swap"/>
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter swap.2" expl="2. postcondition"
-      sum="4cd38e42e958a09215fccb82882ad961" proved="true" expanded="true"
-      shape="postconditionainfix =agetV4V2agetV0V1Iainfix =V4asetV3V2agetV0V1FIainfix =V3asetV0V1agetV0V2FF">
+      sum="4cd38e42e958a09215fccb82882ad961"
+      expanded="true">
       <label name="expl:VC for swap"/>
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter swap.3" expl="3. postcondition"
-      sum="3515eff5d2a7723c102a1bddd6146834" proved="true" expanded="true"
-      shape="postconditionainfix =agetV4V5agetV0V5INainfix =V5V2ANainfix =V5V1FIainfix =V4asetV3V2agetV0V1FIainfix =V3asetV0V1agetV0V2FF">
+      sum="3515eff5d2a7723c102a1bddd6146834"
+      expanded="true">
       <label name="expl:VC for swap"/>
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter swap.4" expl="4. postcondition"
-      sum="d4d7d8274c021f23e514ec0ac58e22e6" proved="true" expanded="true"
-      shape="postconditionainfix =anb_occV4V5V6V7anb_occV0V5V6V7Iainfix &lt;V2V6Aainfix &lt;=V5V2Aainfix &lt;V1V6Aainfix &lt;=V5V1FIainfix =V4asetV3V2agetV0V1FIainfix =V3asetV0V1agetV0V2FF">
+      sum="d4d7d8274c021f23e514ec0ac58e22e6"
+      expanded="true">
       <label name="expl:VC for swap"/>
       <proof prover="1">
        <result status="valid" time="0.06"/>
@@ -142,14 +136,14 @@
     </transf>
    </goal>
    <goal name="WP_parameter dutch_flag" expl="VC for dutch_flag"
-    sum="a3b9b57e75ce93fed09d5520ce3c3bc9" proved="true" expanded="true"
-    shape="iainfix =anb_occV5c0V1V6anb_occV0c0V1V6FAamonochromeV5V8V1aRedAamonochromeV5V7V8aWhiteAamonochromeV5c0V7aBlueEECainfix &lt;ainfix -V2V11ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =anb_occV9c0V1V12anb_occV0c0V1V12FAamonochromeV9V2V1aRedAamonochromeV9V10V11aWhiteAamonochromeV9c0V10aBlueAainfix &lt;=V2V1Aainfix &lt;=V11V2Aainfix &lt;=V10V11Aainfix &lt;=c0V10Iainfix =V11ainfix +V3c1FIainfix =V10ainfix +V4c1FIainfix =anb_occV9V13V14V15anb_occV5V13V14V15Iainfix &lt;V3V14Aainfix &lt;=V13V3Aainfix &lt;V4V14Aainfix &lt;=V13V4FAainfix =agetV9V16agetV5V16INainfix =V16V3ANainfix =V16V4FAainfix =agetV9V3agetV5V4Aainfix =agetV9V4agetV5V3FaBlueainfix &lt;ainfix -V2V17ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =anb_occV5c0V1V18anb_occV0c0V1V18FAamonochromeV5V2V1aRedAamonochromeV5V4V17aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V17V2Aainfix &lt;=V4V17Aainfix &lt;=c0V4Iainfix =V17ainfix +V3c1FaWhiteainfix &lt;ainfix -V19V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Aainfix =anb_occV20c0V1V21anb_occV0c0V1V21FAamonochromeV20V19V1aRedAamonochromeV20V4V3aWhiteAamonochromeV20c0V4aBlueAainfix &lt;=V19V1Aainfix &lt;=V3V19Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV20V22V23V24anb_occV5V22V23V24Iainfix &lt;V3V23Aainfix &lt;=V22V3Aainfix &lt;V19V23Aainfix &lt;=V22V19FAainfix =agetV20V25agetV5V25INainfix =V25V3ANainfix =V25V19FAainfix =agetV20V3agetV5V19Aainfix =agetV20V19agetV5V3FIainfix =V19ainfix -V2c1FaRedagetV5V3ainfix &lt;V3V2Iainfix =anb_occV5c0V1V26anb_occV0c0V1V26FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FAamonochromeV0V1V1aRedAamonochromeV0c0c0aWhiteAamonochromeV0c0c0aBlueAainfix &lt;=V1V1Aainfix &lt;=c0V1Aainfix &lt;=c0c0Aainfix &lt;=c0c0Iainfix &lt;=c0V1F">
+    sum="a3b9b57e75ce93fed09d5520ce3c3bc9"
+    expanded="true">
     <label name="expl:VC for dutch_flag"/>
-    <transf name="split_goal" proved="true"
+    <transf name="split_goal"
      expanded="true">
      <goal name="WP_parameter dutch_flag.1" expl="1. loop invariant init"
-      sum="c33b5a10de49d4154664fc2674753ace" proved="true" expanded="true"
-      shape="loop invariant initainfix &lt;=V1V1Aainfix &lt;=c0V1Aainfix &lt;=c0c0Aainfix &lt;=c0c0Iainfix &lt;=c0V1F">
+      sum="c33b5a10de49d4154664fc2674753ace"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -157,13 +151,13 @@
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.00"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.2" expl="2. loop invariant init"
-      sum="fb8ceb842e14c444739159620799809c" proved="true" expanded="true"
-      shape="loop invariant initamonochromeV0c0c0aBlueIainfix &lt;=c0V1F">
+      sum="fb8ceb842e14c444739159620799809c"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -171,13 +165,13 @@
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.3" expl="3. loop invariant init"
-      sum="6f243d6cc507f62ef35755def60c12bd" proved="true" expanded="true"
-      shape="loop invariant initamonochromeV0c0c0aWhiteIainfix &lt;=c0V1F">
+      sum="6f243d6cc507f62ef35755def60c12bd"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.00"/>
@@ -185,13 +179,13 @@
       <proof prover="2">
        <result status="valid" time="0.00"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.4" expl="4. loop invariant init"
-      sum="b672a6a2d03d0e5b7cbbceb692e1f4ec" proved="true" expanded="true"
-      shape="loop invariant initamonochromeV0V1V1aRedIainfix &lt;=c0V1F">
+      sum="b672a6a2d03d0e5b7cbbceb692e1f4ec"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.00"/>
@@ -199,14 +193,14 @@
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.5"
       expl="5. loop invariant preservation"
-      sum="7ca223537cebcd970bd1924b91a7b10c" proved="true" expanded="true"
-      shape="loop invariant preservationCainfix &lt;=V2V1Aainfix &lt;=V8V2Aainfix &lt;=V7V8Aainfix &lt;=c0V7Iainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V13anb_occV0c0V1V13FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="7ca223537cebcd970bd1924b91a7b10c"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -214,14 +208,14 @@
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.6"
       expl="6. loop invariant preservation"
-      sum="3469db74d51d9e756ee954250eb7e8ca" proved="true" expanded="true"
-      shape="loop invariant preservationCamonochromeV6c0V7aBlueIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V13anb_occV0c0V1V13FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="3469db74d51d9e756ee954250eb7e8ca"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -229,14 +223,14 @@
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.7"
       expl="7. loop invariant preservation"
-      sum="e3999e08087da04f2e51a7a54b3c64e6" proved="true" expanded="true"
-      shape="loop invariant preservationCamonochromeV6V7V8aWhiteIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V13anb_occV0c0V1V13FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="e3999e08087da04f2e51a7a54b3c64e6"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -244,14 +238,14 @@
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.8"
       expl="8. loop invariant preservation"
-      sum="65ca9609b48d5a8757805a97ad97a493" proved="true" expanded="true"
-      shape="loop invariant preservationCamonochromeV6V2V1aRedIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V13anb_occV0c0V1V13FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="65ca9609b48d5a8757805a97ad97a493"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.03"/>
@@ -259,14 +253,14 @@
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.9"
       expl="9. loop invariant preservation"
-      sum="4f8f8eff9e06e4f54ac80ba858c6f479" proved="true" expanded="true"
-      shape="loop invariant preservationCainfix =anb_occV6c0V1V9anb_occV0c0V1V9FIainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V10V11V12anb_occV5V10V11V12Iainfix &lt;V3V11Aainfix &lt;=V10V3Aainfix &lt;V4V11Aainfix &lt;=V10V4FAainfix =agetV6V13agetV5V13INainfix =V13V3ANainfix =V13V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V14anb_occV0c0V1V14FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="4f8f8eff9e06e4f54ac80ba858c6f479"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -280,13 +274,13 @@
       <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.10" expl="10. loop variant decrease"
-      sum="fd3c576d20ec952dd87b874cc6970781" proved="true" expanded="true"
-      shape="loop variant decreaseCainfix &lt;ainfix -V2V8ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V8ainfix +V3c1FIainfix =V7ainfix +V4c1FIainfix =anb_occV6V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V4V10Aainfix &lt;=V9V4FAainfix =agetV6V12agetV5V12INainfix =V12V3ANainfix =V12V4FAainfix =agetV6V3agetV5V4Aainfix =agetV6V4agetV5V3FaBluetaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V13anb_occV0c0V1V13FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="fd3c576d20ec952dd87b874cc6970781"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -300,14 +294,14 @@
       <proof prover="4">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.11"
       expl="11. loop invariant preservation"
-      sum="2886b3d49ef66d8e7af3725a0e6c1749" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBlueainfix &lt;=V2V1Aainfix &lt;=V6V2Aainfix &lt;=V4V6Aainfix &lt;=c0V4Iainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V7anb_occV0c0V1V7FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="2886b3d49ef66d8e7af3725a0e6c1749"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -315,14 +309,14 @@
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.12"
       expl="12. loop invariant preservation"
-      sum="39a0a8f6c78575aa43b2c3aafc0e71b3" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBlueamonochromeV5c0V4aBlueIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V7anb_occV0c0V1V7FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="39a0a8f6c78575aa43b2c3aafc0e71b3"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.00"/>
@@ -330,14 +324,14 @@
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.13"
       expl="13. loop invariant preservation"
-      sum="3b4d5044a01eda08c42e764b4c47cd0b" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBlueamonochromeV5V4V6aWhiteIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V7anb_occV0c0V1V7FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="3b4d5044a01eda08c42e764b4c47cd0b"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -345,14 +339,14 @@
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.14"
       expl="14. loop invariant preservation"
-      sum="bd280b32757f8914c102fe45d77b235d" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBlueamonochromeV5V2V1aRedIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V7anb_occV0c0V1V7FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="bd280b32757f8914c102fe45d77b235d"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -360,14 +354,14 @@
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.15"
       expl="15. loop invariant preservation"
-      sum="63ff91f5a00e835b6a88481abb3f3267" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBlueainfix =anb_occV5c0V1V7anb_occV0c0V1V7FIainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V8anb_occV0c0V1V8FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="63ff91f5a00e835b6a88481abb3f3267"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -381,13 +375,13 @@
       <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.16" expl="16. loop variant decrease"
-      sum="17f1084744bbb8033e1d501f673d23c4" proved="true" expanded="true"
-      shape="loop variant decreaseCtaBlueainfix &lt;ainfix -V2V6ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =V6ainfix +V3c1FaWhitetaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V7anb_occV0c0V1V7FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="17f1084744bbb8033e1d501f673d23c4"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -401,14 +395,14 @@
       <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.17"
       expl="17. loop invariant preservation"
-      sum="5c77b813a100cceb9677e9ffde7e3cac" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBluetaWhiteainfix &lt;=V6V1Aainfix &lt;=V3V6Aainfix &lt;=V4V3Aainfix &lt;=c0V4Iainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V12anb_occV0c0V1V12FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="5c77b813a100cceb9677e9ffde7e3cac"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -416,14 +410,14 @@
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.18"
       expl="18. loop invariant preservation"
-      sum="1056c1ed69cfc198886bc9a4257d53a1" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBluetaWhiteamonochromeV7c0V4aBlueIainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V12anb_occV0c0V1V12FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="1056c1ed69cfc198886bc9a4257d53a1"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.04"/>
@@ -431,14 +425,14 @@
       <proof prover="2">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.19"
       expl="19. loop invariant preservation"
-      sum="7d96198a43e988342a838d1b0725b37d" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBluetaWhiteamonochromeV7V4V3aWhiteIainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V12anb_occV0c0V1V12FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="7d96198a43e988342a838d1b0725b37d"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.04"/>
@@ -446,14 +440,14 @@
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.20"
       expl="20. loop invariant preservation"
-      sum="8aeec9ef6af4c61eb6241b7ecf04d549" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBluetaWhiteamonochromeV7V6V1aRedIainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V12anb_occV0c0V1V12FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="8aeec9ef6af4c61eb6241b7ecf04d549"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.03"/>
@@ -461,14 +455,14 @@
       <proof prover="2">
        <result status="valid" time="0.02"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.21"
       expl="21. loop invariant preservation"
-      sum="3dc721ac92a51bf9ff71cdd699452d74" proved="true" expanded="true"
-      shape="loop invariant preservationCtaBluetaWhiteainfix =anb_occV7c0V1V8anb_occV0c0V1V8FIainfix =anb_occV7V9V10V11anb_occV5V9V10V11Iainfix &lt;V3V10Aainfix &lt;=V9V3Aainfix &lt;V6V10Aainfix &lt;=V9V6FAainfix =agetV7V12agetV5V12INainfix =V12V3ANainfix =V12V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V13anb_occV0c0V1V13FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="3dc721ac92a51bf9ff71cdd699452d74"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.02"/>
@@ -482,13 +476,13 @@
       <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.22" expl="22. loop variant decrease"
-      sum="a7f0312c9f4b0d51183215c744486fcd" proved="true" expanded="true"
-      shape="loop variant decreaseCtaBluetaWhiteainfix &lt;ainfix -V6V3ainfix -V2V3Aainfix &lt;=c0ainfix -V2V3Iainfix =anb_occV7V8V9V10anb_occV5V8V9V10Iainfix &lt;V3V9Aainfix &lt;=V8V3Aainfix &lt;V6V9Aainfix &lt;=V8V6FAainfix =agetV7V11agetV5V11INainfix =V11V3ANainfix =V11V6FAainfix =agetV7V3agetV5V6Aainfix =agetV7V6agetV5V3FIainfix =V6ainfix -V2c1FaRedagetV5V3Iainfix &lt;V3V2Iainfix =anb_occV5c0V1V12anb_occV0c0V1V12FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="a7f0312c9f4b0d51183215c744486fcd"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -502,13 +496,13 @@
       <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.01"/>
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.23" expl="23. postcondition"
-      sum="ddfa2280d7e75b01898e23da40d0de42" proved="true" expanded="true"
-      shape="postconditionamonochromeV5V7V1aRedAamonochromeV5V6V7aWhiteAamonochromeV5c0V6aBlueEEINainfix &lt;V3V2Iainfix =anb_occV5c0V1V8anb_occV0c0V1V8FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="ddfa2280d7e75b01898e23da40d0de42"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -518,8 +512,8 @@
       </proof>
      </goal>
      <goal name="WP_parameter dutch_flag.24" expl="24. postcondition"
-      sum="1d345b55f122a934b8d676ec639ed0f1" proved="true" expanded="true"
-      shape="postconditionainfix =anb_occV5c0V1V6anb_occV0c0V1V6FINainfix &lt;V3V2Iainfix =anb_occV5c0V1V7anb_occV0c0V1V7FAamonochromeV5V2V1aRedAamonochromeV5V4V3aWhiteAamonochromeV5c0V4aBlueAainfix &lt;=V2V1Aainfix &lt;=V3V2Aainfix &lt;=V4V3Aainfix &lt;=c0V4FIainfix &lt;=c0V1F">
+      sum="1d345b55f122a934b8d676ec639ed0f1"
+      expanded="true">
       <label name="expl:VC for dutch_flag"/>
       <proof prover="1">
        <result status="valid" time="0.01"/>
@@ -530,7 +524,7 @@
       <proof prover="4">
        <result status="valid" time="0.01"/>
       </proof>
-      <proof prover="7">
+      <proof prover="6">
        <result status="valid" time="0.02"/>
       </proof>
      </goal>
