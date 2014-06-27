@@ -52,7 +52,8 @@ module LinearProbing
     invariant { not (Map.get self.view dummy) }
     (* any value in the array is in the model *)
     invariant { forall i: int. 0 <= i < Array.length self.data ->
-                self.data[i] <> dummy -> Map.get self.view self.data[i] }
+                let x = self.data[i] in x <> dummy ->
+                Map.get self.view x /\ Map.get self.loc x = i }
     (* any value in the model is in the array *)
     invariant { let n = Array.length self.data in
                 forall x: key. Map.get self.view x ->
@@ -96,19 +97,24 @@ module LinearProbing
                a[j] <> x /\ a[j] <> dummy }
   =
     let n = Array.length a in
+    let b = bucket x n in
     let ghost count = ref 0 in
     let rec find (i: int) : int
       requires { 0 <= i < n }
-      requires { forall j: int. 0 <= j < n -> between (bucket x n) j i ->
+      requires { numof a dummy 0 n > 0 }
+      requires { forall j: int. 0 <= j < n -> between b j i ->
                  a[j] <> x /\ a[j] <> dummy }
+      requires { if i >= b then numof a dummy b i = 0
+                 else numof a dummy b n = numof a dummy 0 i = 0 }
+      variant  { if i >= b then n - i + b else b - i }
       ensures  { 0 <= result < n }
       ensures  { a[result] = dummy || a[result] = x }
-      ensures  { forall j: int. 0 <= j < n -> between (bucket x n) j result ->
+      ensures  { forall j: int. 0 <= j < n -> between b j result ->
                  a[j] <> x /\ a[j] <> dummy }
     =
       if a[i] = dummy || a[i] = x then i else find (next n i)
     in
-    find (bucket x n)
+    find b
 
   let mem (h: t) (x: key) : bool
     requires { x <> dummy }
@@ -126,8 +132,8 @@ module LinearProbing
     let ghost l = ref (Map.const 0) in
     for i = 0 to n - 1 do
       invariant { numof a dummy 0 n2 = numof h.data dummy 0 i + n2 - i }
-      invariant { forall j: int. 0 <= j < n2 ->
-                  a[j] <> dummy -> Map.get h.view a[j] }
+      invariant { forall j: int. 0 <= j < n2 -> a[j] <> dummy ->
+                  Map.get h.view a[j] /\ Map.get !l a[j] = j }
       invariant { forall x: key. Map.get h.view x ->
                   let j = Map.get h.loc x in
                   if j < i then
@@ -140,7 +146,6 @@ module LinearProbing
       let x = h.data[i] in
       if x <> dummy then begin
         'L:
-        assert { Map.get h.loc x = i };
         let j = find a x in
         assert { a[j] = dummy };
         a[j] <- x;
