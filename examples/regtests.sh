@@ -34,9 +34,11 @@ res=0
 export success=0
 export total=0
 export sessions=""
+export shapes=""
 
 run_dir () {
     sessions="$sessions $1/*/why3session.xml"
+    shapes="$shapes $1/*/why3shapes.dat"
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
 	echo -n "Replaying $d ... "
@@ -93,6 +95,7 @@ echo ""
 
 echo "Summary       : $success/$total"
 echo "Sessions size : "`wc -cl $sessions | tail -1`
+echo "Shapes   size : "`wc -cl $shapes | tail -1`
 
 exit $res
 
