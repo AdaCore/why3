@@ -63,7 +63,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES =
+INCLUDES = @ZIPINCLUDE@
 OFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 BFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 
@@ -77,7 +77,7 @@ endif
 # external libraries common to all binaries
 
 EXTOBJS =
-EXTLIBS = str unix nums dynlink
+EXTLIBS = str unix nums dynlink @ZIPLIB@
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
@@ -108,10 +108,12 @@ LIBGENERATED = src/util/config.ml \
 	       src/util/rc.ml src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	       src/driver/driver_lexer.ml src/session/xml.ml \
-	       lib/ocaml/why3__BigInt_compat.ml
+	       src/driver/driver_lexer.ml \
+               src/session/compress.ml src/session/xml.ml \
+	       lib/ocaml/why3__BigInt_compat.ml 
 
-LIB_UTIL = config bigInt util opt lists strings extmap extset exthtbl weakhtbl \
+LIB_UTIL = config bigInt util opt lists strings \
+	   extmap extset exthtbl weakhtbl \
 	   hashcons stdlib exn_printer pp debug loc print_tree \
 	   cmdline warning sysutil rc plugin bigInt number pqueue
 
@@ -137,8 +139,6 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
 
-LIB_SESSION = xml termcode session session_tools session_scheduler
-
 LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
 	    mlw_dexpr mlw_typing mlw_driver mlw_ocaml \
 	    mlw_main mlw_interp
@@ -149,21 +149,36 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
-	      $(addprefix src/session/, $(LIB_SESSION)) \
 	      $(addprefix src/whyml/, $(LIB_WHYML))
 
-LIBDIRS = util core parser driver transform printer session whyml
+LIB_SESSION = compress xml termcode session session_tools session_scheduler
+
+LIBSESSIONMODULES = $(addprefix src/session/, $(LIB_SESSION)) 
+	      
+LIBDIRS = util core parser driver transform printer whyml
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
+
+LIBSESSIONDIRS = session 
+LIBSESSIONINCLUDES = $(addprefix -I src/, $(LIBSESSIONDIRS))
 
 LIBDEP = $(addsuffix .dep, $(LIBMODULES))
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
+LIBSESSIONDEP = $(addsuffix .dep, $(LIBSESSIONMODULES))
+LIBSESSIONCMO = $(addsuffix .cmo, $(LIBSESSIONMODULES))
+LIBSESSIONCMX = $(addsuffix .cmx, $(LIBSESSIONMODULES))
+
 $(LIBDEP): DEPFLAGS += $(LIBINCLUDES)
 $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
+$(LIBSESSIONDEP): DEPFLAGS += $(LIBSESSIONINCLUDES)
+$(LIBSESSIONCMO) $(LIBSESSIONCMX): INCLUDES += $(LIBSESSIONINCLUDES)
+$(LIBSESSIONCMX): OFLAGS += -for-pack Why3session
+
 $(LIBDEP): $(LIBGENERATED)
+$(LIBSESSIONDEP): $(LIBGENERATED)
 
 # Zarith
 
@@ -181,6 +196,23 @@ endif
 
 clean::
 	rm -f lib/ocaml/why3__BigInt_compat.ml
+
+# Ocamlzip
+
+ifeq (@enable_zip@,yes)
+
+src/session/compress.ml: config.status src/session/compress_z.ml
+	cp src/session/compress_z.ml $@
+
+else
+
+src/session/compress.ml: config.status src/session/compress_none.ml
+	cp src/session/compress_none.ml $@
+
+endif
+
+clean::
+	rm -f src/session/compress.ml
 
 # build targets
 
@@ -203,13 +235,32 @@ lib/why3/why3.cmx: $(LIBCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
 
+byte: lib/why3/why3session.cma
+opt:  lib/why3/why3session.cmxa
+
+lib/why3/why3session.cma: lib/why3/why3session.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
+
+lib/why3/why3session.cmxa: lib/why3/why3session.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) -a $(OFLAGS) -o $@ $^
+
+lib/why3/why3session.cmo: $(LIBSESSIONCMO)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -pack -o $@ $^
+
+lib/why3/why3session.cmx: $(LIBSESSIONCMX)
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
+
 # clean and depend
 
 ifneq "$(MAKECMDGOALS)" "clean"
-include $(LIBDEP)
+include $(LIBDEP) $(LIBSESSIONDEP)
 endif
 
-depend: $(LIBDEP)
+depend: $(LIBDEP) $(LIBSESSIONDEP)
 
 LIBSDIRS = src $(addprefix src/, $(LIBDIRS))
 LIBCLEAN = $(addsuffix /*.cm[iox], $(LIBSDIRS)) \
@@ -734,11 +785,11 @@ opt:  bin/why3ide.opt
 bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
 
-bin/why3ide.opt: lib/why3/why3.cmxa src/ide/resetgc.o $(IDECMX)
+bin/why3ide.opt: lib/why3/why3.cmxa lib/why3/why3session.cmxa src/ide/resetgc.o $(IDECMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3ide.byte: lib/why3/why3.cma src/ide/resetgc.o $(IDECMO)
+bin/why3ide.byte: lib/why3/why3.cma lib/why3/why3session.cma src/ide/resetgc.o $(IDECMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
 
@@ -772,6 +823,63 @@ install_local:: bin/why3ide
 
 endif
 
+# <<<<<<< HEAD
+# =======
+
+# ###############
+# # Replayer
+# ###############
+
+# REPLAYER_FILES = replay
+
+# REPLAYERMODULES = $(addprefix src/why3replayer/, $(REPLAYER_FILES))
+
+# REPLAYERDEP = $(addsuffix .dep, $(REPLAYERMODULES))
+# REPLAYERCMO = $(addsuffix .cmo, $(REPLAYERMODULES))
+# REPLAYERCMX = $(addsuffix .cmx, $(REPLAYERMODULES))
+
+# $(REPLAYERDEP): DEPFLAGS += -I src/why3replayer
+# $(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/why3replayer
+
+# # build targets
+
+# byte: bin/why3replayer.byte
+# opt:  bin/why3replayer.opt
+
+# bin/why3replayer.opt: lib/why3/why3.cmxa lib/why3/why3session.cmxa $(REPLAYERCMX)
+# 	$(if $(QUIET),@echo 'Linking  $@' &&) \
+# 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+# bin/why3replayer.byte: lib/why3/why3.cma lib/why3/why3session.cma $(REPLAYERCMO)
+# 	$(if $(QUIET),@echo 'Linking  $@' &&) \
+# 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+# bin/why3replayer: bin/why3replayer.@OCAMLBEST@
+# 	ln -sf why3replayer.@OCAMLBEST@ $@
+
+# # depend and clean targets
+
+# ifneq "$(MAKECMDGOALS)" "clean"
+# include $(REPLAYERDEP)
+# endif
+
+# depend: $(REPLAYERDEP)
+
+# clean::
+# 	rm -f src/why3replayer/*.cm[iox] src/why3replayer/*.o
+# 	rm -f src/why3replayer/*.annot src/why3replayer/*.dep src/why3replayer/*~
+# 	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
+
+# clean_old_install::
+# 	rm -f $(BINDIR)/why3replayer$(EXE)
+
+# install_no_local::
+# 	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer$(EXE)
+
+# install_local:: bin/why3replayer
+
+
+# >>>>>>> adding support for compressed files. Needs splitting the library into
 ###############
 # Session
 ###############
@@ -779,7 +887,7 @@ endif
 SESSION_FILES = why3session_lib why3session_copy why3session_info	\
 		why3session_latex why3session_html why3session_rm	\
 		why3session_output why3session_run why3session_csv	\
-		why3session
+		why3session_main
 
 SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))
 
@@ -795,11 +903,11 @@ $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
 byte: bin/why3session.byte
 opt:  bin/why3session.opt
 
-bin/why3session.opt: lib/why3/why3.cmxa $(SESSIONCMX)
+bin/why3session.opt: lib/why3/why3.cmxa lib/why3/why3session.cmxa $(SESSIONCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3session.byte: lib/why3/why3.cma $(SESSIONCMO)
+bin/why3session.byte: lib/why3/why3.cma lib/why3/why3session.cma $(SESSIONCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
@@ -904,7 +1012,7 @@ COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
 COQPTREES = kernel lib interp parsing proofs pretyping tactics library toplevel
-COQPINCLUDES = -I src/coq-tactic -I +camlp5 $(addprefix -I @COQLIB@/, $(COQPTREES))
+COQPINCLUDES = -I src/coq-tactic -I +camlp5 $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
 $(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
@@ -1345,7 +1453,7 @@ OCAMLLIBS_CMO = $(addsuffix .cmo, $(OCAMLLIBS_MODULES))
 OCAMLLIBS_CMX = $(addsuffix .cmx, $(OCAMLLIBS_MODULES))
 
 $(OCAMLLIBS_DEP): DEPFLAGS += -I src/util -I lib/ocaml @BIGINTINCLUDE@
-$(OCAMLLIBS_CMO) $(OCAMLLIBS_CMX): INCLUDES += -I src/util -I lib/ocaml  @BIGINTINCLUDE@
+$(OCAMLLIBS_CMO) $(OCAMLLIBS_CMX): INCLUDES += -I src/util -I lib/ocaml @BIGINTINCLUDE@
 $(OCAMLLIBS_CMX): OFLAGS += -for-pack Why3extract
 
 ifneq "$(MAKECMDGOALS)" "clean"
@@ -1646,16 +1754,16 @@ test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
 #test-shape: lib/why3/why3.cma
 #	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
 
-test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma
+test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma lib/why3/why3session.cma 
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
-	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null\
+	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma lib/why3/why3session.cma $< > /dev/null\
 	|| (rm -f why3session.xml;  \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f why3session.xml
 
-test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
+test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa lib/why3/why3session.cmxa 
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
-	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
+	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa lib/why3/why3session.cmxa  $< \
 	&& ./test-session.opt > /dev/null) \
 	|| (rm -f test-session.opt why3session.xml; \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)

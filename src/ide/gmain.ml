@@ -17,6 +17,9 @@ open Whyconf
 open Gconfig
 open Stdlib
 open Debug
+
+open Why3session
+
 module C = Whyconf
 
 external reset_gc : unit -> unit = "ml_reset_gc"

@@ -11,6 +11,7 @@
 
 open Format
 open Why3
+open Why3session
 open Why3session_lib
 
 module Hprover = Whyconf.Hprover

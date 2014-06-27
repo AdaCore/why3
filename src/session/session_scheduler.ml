@@ -10,10 +10,10 @@
 (********************************************************************)
 
 open Format
+open Why3
 open Session
-open Debug
 
-let debug = register_info_flag "scheduler"
+let debug = Debug.register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
          and@ transformation@ applications."
 
@@ -151,7 +151,7 @@ let set_maximum_running_proofs max sched =
   sched.maximum_running_proofs <- max
 
 let init max =
-  dprintf debug "[Sched] init scheduler max=%i@." max;
+  Debug.dprintf debug "[Sched] init scheduler max=%i@." max;
   { actions_queue = Queue.create ();
     maximum_running_proofs = max;
     running_proofs = [];
@@ -165,7 +165,7 @@ let init max =
 (* timeout handler *)
 
 let timeout_handler t =
-  dprintf debug "[Sched] Timeout handler called@.";
+  Debug.dprintf debug "[Sched] Timeout handler called@.";
   assert (not t.timeout_handler_running);
   t.timeout_handler_running <- true;
   (** Check if some action ended *)
@@ -189,7 +189,7 @@ let timeout_handler t =
       begin try
         let (callback,pre_call) = Queue.pop t.proof_attempts_queue in
         callback Running;
-        dprintf debug "[Sched] proof attempts started@.";
+        Debug.dprintf debug "[Sched] proof attempts started@.";
         let call = pre_call () in
         (Check_prover(callback,call))::l
       with Queue.Empty -> l
@@ -204,7 +204,7 @@ let timeout_handler t =
   let continue =
     match l with
       | [] ->
-          dprintf debug "[Sched] Timeout handler stopped@.";
+          Debug.dprintf debug "[Sched] Timeout handler stopped@.";
           false
       | _ -> true
   in
@@ -219,17 +219,17 @@ let run_timeout_handler t =
   if t.timeout_handler_activated then () else
     begin
       t.timeout_handler_activated <- true;
-      dprintf debug "[Sched] Timeout handler started@.";
+      Debug.dprintf debug "[Sched] Timeout handler started@.";
       O.timeout ~ms:100 (fun () -> timeout_handler t)
     end
 
 let schedule_any_timeout t callback =
-  dprintf debug "[Sched] schedule a new timeout@.";
+  Debug.dprintf debug "[Sched] schedule a new timeout@.";
   t.running_proofs <- (Any_timeout callback) :: t.running_proofs;
   run_timeout_handler t
 
 let schedule_check t callback =
-  dprintf debug "[Sched] add a new check@.";
+  Debug.dprintf debug "[Sched] add a new check@.";
   t.running_check <- callback :: t.running_check;
   run_timeout_handler t
 
@@ -261,7 +261,7 @@ let idle_handler t =
     true
   with Queue.Empty ->
     t.idle_handler_activated <- false;
-    dprintf debug "[Sched] idle_handler stopped@.";
+    Debug.dprintf debug "[Sched] idle_handler stopped@.";
     false
     | e when not (Debug.test_flag Debug.stack_trace) ->
       Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
@@ -274,7 +274,7 @@ let run_idle_handler t =
   if t.idle_handler_activated then () else
     begin
       t.idle_handler_activated <- true;
-      dprintf debug "[Sched] idle_handler started@.";
+      Debug.dprintf debug "[Sched] idle_handler started@.";
       O.idle (fun () -> idle_handler t)
     end
 
@@ -305,7 +305,7 @@ let cancel_scheduled_proofs t =
 
 let schedule_proof_attempt ~timelimit ~memlimit ?old ~inplace
     ~command ~driver ~callback t goal =
-  dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
+  Debug.dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
     (fun fmt g -> Format.pp_print_string fmt
       (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
   callback Scheduled;
@@ -316,7 +316,7 @@ let schedule_proof_attempt ~timelimit ~memlimit ?old ~inplace
   run_idle_handler t
 
 let schedule_edition t command filename callback =
-  dprintf debug "[Sched] Scheduling an edition@.";
+  Debug.dprintf debug "[Sched] Scheduling an edition@.";
   let precall =
     Call_provers.call_on_file ~command ~regexps:[] ~timeregexps:[]
       ~exitcodes:[(0,Call_provers.Unknown "")] ~redirect:false filename
@@ -326,7 +326,7 @@ let schedule_edition t command filename callback =
   run_timeout_handler t
 
 let schedule_delayed_action t callback =
-  dprintf debug "[Sched] Scheduling a delayed action@.";
+  Debug.dprintf debug "[Sched] Scheduling a delayed action@.";
   Queue.push (Action_delayed callback) t.actions_queue;
   run_idle_handler t
 
@@ -339,7 +339,7 @@ let update_session ?release ~allow_obsolete old_session env whyconf  =
   let (env_session,_,_) as res =
     update_session ?release
       ~keygen:O.create ~allow_obsolete old_session env whyconf in
-  dprintf debug "Init_session@\n";
+  Debug.dprintf debug "Init_session@\n";
   init_session env_session.session;
   res
 
@@ -722,7 +722,7 @@ let rec goal_iter_proof_attempt_with_release ~release f g =
   if release then release_task g
 
 let check_all ?(release=false) ?filter eS eT ~callback =
-  dprintf debug "[Sched] check all@.%a@." print_session eS.session;
+  Debug.dprintf debug "[Sched] check all@.%a@." print_session eS.session;
   let todo = Todo.create [] push_report callback in
   Todo.start todo;
   let check_top_goal g =
@@ -889,7 +889,7 @@ let edit_proof_v3 eS sched ~default_editor callback a =
         with Not_found -> default_editor
     in
     let file = update_edit_external_proof eS a in
-    dprintf debug "[Editing] goal %s with command '%s' on file %s@."
+    Debug.dprintf debug "[Editing] goal %s with command '%s' on file %s@."
       a.proof_parent.goal_name.Ident.id_string editor file;
     schedule_edition sched editor file (fun res -> callback a res)
 

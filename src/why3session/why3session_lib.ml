@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Why3
+open Why3session
 module S = Session
 module C = Whyconf
 

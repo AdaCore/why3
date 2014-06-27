@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Why3
 open Term
 
 (*******************************)
@@ -112,6 +113,7 @@ let get_id s i =
       get_name s b i
 
 
+(*
 let store_id s i =
   let b = Buffer.create 17 in
   try while !i < String.length s do
@@ -130,6 +132,7 @@ let store_id s i =
           Hashtbl.add reverse_ident_table id !reverse_dict_count;
           incr reverse_dict_count;
           id
+*)
 
 (* {2 Shapes} *)
 

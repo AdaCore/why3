@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Why3
+open Why3session
 open Why3session_lib
 open Format
 
