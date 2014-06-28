@@ -1757,7 +1757,7 @@ test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
 test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma lib/why3/why3session.cma 
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma lib/why3/why3session.cma $< > /dev/null\
-	|| (rm -f why3session.xml;  \
+	|| (rm -f why3session.xml why3shapes.dat why3shapes.gz;  \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f why3session.xml
 
@@ -1765,7 +1765,7 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa lib/why3
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa lib/why3/why3session.cmxa  $< \
 	&& ./test-session.opt > /dev/null) \
-	|| (rm -f test-session.opt why3session.xml; \
+	|| (rm -f test-session.opt why3session.xml why3shapes.dat why3shapes.gz; \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f test-session.opt why3session.xml
 
