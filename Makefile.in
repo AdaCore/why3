@@ -591,11 +591,11 @@ bin/why3realize.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3realize
 bin/why3realize: bin/why3realize.@OCAMLBEST@
 	ln -sf why3realize.@OCAMLBEST@ $@
 
-bin/why3replay.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3replay.cmx
+bin/why3replay.opt: lib/why3/why3.cmxa lib/why3/why3session.cmxa src/tools/args.cmx src/tools/why3replay.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3replay.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3replay.cmo
+bin/why3replay.byte: lib/why3/why3.cma lib/why3/why3session.cma src/tools/args.cmo src/tools/why3replay.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
