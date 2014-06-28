@@ -2,104 +2,47 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
- <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10"
-  memlimit="1000"/>
- <prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
- <file name="../zeros.mlw"
-  expanded="true">
-  <theory name="SetZeros"
-   expanded="true">
-   <goal name="WP_parameter set_zeros" expl="VC for set_zeros"
-    sum="006fbc44f64d4ce5c25674b081d172d4"
-    expanded="true">
-    <label name="expl:VC for set_zeros"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter set_zeros.1" expl="1. postcondition"
-      sum="f2eb0223a53bfbe3aae9d3f986c59a27"
-      expanded="true">
-      <label name="expl:VC for set_zeros"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set_zeros.2" expl="2. loop invariant init"
-      sum="c9d1f935b5041db3cc41b312e8fa154c"
-      expanded="true">
-      <label name="expl:VC for set_zeros"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set_zeros.3" expl="3. type invariant"
-      sum="86fc5b16645acd2ad8e11d2780d9ad99">
-      <label name="expl:VC for set_zeros"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set_zeros.4" expl="4. index in array bounds"
-      sum="d30795dc94412fb361c96a73890d5d50"
-      expanded="true">
-      <label name="expl:VC for set_zeros"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set_zeros.5"
-      expl="5. loop invariant preservation"
-      sum="72efd98f6053a71399cf9881358a683c"
-      expanded="true">
-      <label name="expl:VC for set_zeros"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set_zeros.6" expl="6. type invariant"
-      sum="33a4807984d2e2df7edd087b854d17f3">
-      <label name="expl:VC for set_zeros"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set_zeros.7" expl="7. postcondition"
-      sum="30ebf75ca808de08d1a164bccc568e42"
-      expanded="true">
-      <label name="expl:VC for set_zeros"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal name="WP_parameter harness" expl="VC for harness"
-    sum="728ceb695bcf55e95f6658506b19da01"
-    expanded="true">
-    <label name="expl:VC for harness"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter harness.1" expl="1. array creation size"
-      sum="cb2c92561876470b36831e12daf5565f"
-      expanded="true">
-      <label name="expl:VC for harness"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter harness.2" expl="2. assertion"
-      sum="02d26771abb35ffd344f98e4004bb95f"
-      expanded="true">
-      <label name="expl:VC for harness"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
+<file name="../zeros.mlw" expanded="true">
+<theory name="SetZeros" expanded="true">
+ <goal name="WP_parameter set_zeros" expl="VC for set_zeros" sum="006fbc44f64d4ce5c25674b081d172d4" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter set_zeros.1" expl="1. postcondition" sum="f2eb0223a53bfbe3aae9d3f986c59a27" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter set_zeros.2" expl="2. loop invariant init" sum="c9d1f935b5041db3cc41b312e8fa154c" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter set_zeros.3" expl="3. type invariant" sum="86fc5b16645acd2ad8e11d2780d9ad99">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter set_zeros.4" expl="4. index in array bounds" sum="d30795dc94412fb361c96a73890d5d50" expanded="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter set_zeros.5" expl="5. loop invariant preservation" sum="72efd98f6053a71399cf9881358a683c" expanded="true">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter set_zeros.6" expl="6. type invariant" sum="33a4807984d2e2df7edd087b854d17f3">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter set_zeros.7" expl="7. postcondition" sum="30ebf75ca808de08d1a164bccc568e42" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter harness" expl="VC for harness" sum="728ceb695bcf55e95f6658506b19da01" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter harness.1" expl="1. array creation size" sum="cb2c92561876470b36831e12daf5565f" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter harness.2" expl="2. assertion" sum="02d26771abb35ffd344f98e4004bb95f" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

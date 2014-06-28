@@ -2,103 +2,49 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
- <file name="../foveoos11_challenge1.mlw"
-  expanded="true">
-  <theory name="Max"
-   expanded="true">
-   <goal name="WP_parameter max" expl="VC for max"
-    sum="49694ff3c0b7ee9fa59a36b1479b2a4d"
-    expanded="true">
-    <label name="expl:VC for max"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter max.1" expl="1. loop invariant init"
-      sum="9b092f1d3784bc3efb8c356e9b908c2d">
-      <label name="expl:VC for max"/>
-      <proof prover="0" memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.2" expl="2. loop invariant init"
-      sum="d99a7407f3527f7eb7660c033a237331">
-      <label name="expl:VC for max"/>
-      <proof prover="0" timelimit="10">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.3" expl="3. index in array bounds"
-      sum="df8024fd5e8aa8e0d21e9c5c42b683bd">
-      <label name="expl:VC for max"/>
-      <proof prover="0" timelimit="10">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.4" expl="4. index in array bounds"
-      sum="7c40f1124f1cbdf7a36366a3be9e2dd5">
-      <label name="expl:VC for max"/>
-      <proof prover="0" timelimit="10">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.5" expl="5. loop invariant preservation"
-      sum="0939786fbd7b7374342e01e0ec0efa91">
-      <label name="expl:VC for max"/>
-      <proof prover="0" memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.6" expl="6. loop invariant preservation"
-      sum="b3b87f4e71a49defd20edd2126a40639">
-      <label name="expl:VC for max"/>
-      <proof prover="0" memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.7" expl="7. loop variant decrease"
-      sum="421b10ec26db647cb12cf4c521a89e74">
-      <label name="expl:VC for max"/>
-      <proof prover="0" timelimit="10">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.8" expl="8. loop invariant preservation"
-      sum="e282623a7e9ce7ebd052ca30e8573357">
-      <label name="expl:VC for max"/>
-      <proof prover="0" memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.9" expl="9. loop invariant preservation"
-      sum="14fd2e1207b74fb6effa8b887b984b9f">
-      <label name="expl:VC for max"/>
-      <proof prover="0" memlimit="1000">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.10" expl="10. loop variant decrease"
-      sum="abd87094a5f0185257307ed90eda13ff">
-      <label name="expl:VC for max"/>
-      <proof prover="0" timelimit="10">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.11" expl="11. postcondition"
-      sum="d33fed99e6983335a088626f339fbd3a">
-      <label name="expl:VC for max"/>
-      <proof prover="0" memlimit="1000">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter max.12" expl="12. postcondition"
-      sum="a897459fd4a60d0fadb3f1c3ceff2890">
-      <label name="expl:VC for max"/>
-      <proof prover="0" memlimit="1000">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
+<file name="../foveoos11_challenge1.mlw" expanded="true">
+<theory name="Max" expanded="true">
+ <goal name="WP_parameter max" expl="VC for max" sum="49694ff3c0b7ee9fa59a36b1479b2a4d" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter max.1" expl="1. loop invariant init" sum="9b092f1d3784bc3efb8c356e9b908c2d">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter max.2" expl="2. loop invariant init" sum="d99a7407f3527f7eb7660c033a237331">
+  <proof prover="0" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter max.3" expl="3. index in array bounds" sum="df8024fd5e8aa8e0d21e9c5c42b683bd">
+  <proof prover="0" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter max.4" expl="4. index in array bounds" sum="7c40f1124f1cbdf7a36366a3be9e2dd5">
+  <proof prover="0" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter max.5" expl="5. loop invariant preservation" sum="0939786fbd7b7374342e01e0ec0efa91">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter max.6" expl="6. loop invariant preservation" sum="b3b87f4e71a49defd20edd2126a40639">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter max.7" expl="7. loop variant decrease" sum="421b10ec26db647cb12cf4c521a89e74">
+  <proof prover="0" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter max.8" expl="8. loop invariant preservation" sum="e282623a7e9ce7ebd052ca30e8573357">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter max.9" expl="9. loop invariant preservation" sum="14fd2e1207b74fb6effa8b887b984b9f">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter max.10" expl="10. loop variant decrease" sum="abd87094a5f0185257307ed90eda13ff">
+  <proof prover="0" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter max.11" expl="11. postcondition" sum="d33fed99e6983335a088626f339fbd3a">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter max.12" expl="12. postcondition" sum="a897459fd4a60d0fadb3f1c3ceff2890">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

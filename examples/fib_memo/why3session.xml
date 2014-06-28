@@ -2,62 +2,30 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
- <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10"
-  memlimit="1000"/>
- <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="6"
-  memlimit="1000"/>
- <file name="../fib_memo.mlw"
-  expanded="true">
-  <theory name="FibMemo"
-   expanded="true">
-   <goal name="WP_parameter fibo" expl="VC for fibo"
-    sum="e187cac3698687bc29f82cf8eeb7ea39"
-    expanded="true">
-    <label name="expl:VC for fibo"/>
-    <proof prover="2">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter memo_fibo" expl="VC for memo_fibo"
-    sum="1750301045f2ea890bc0157e30003866"
-    expanded="true">
-    <label name="expl:VC for memo_fibo"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter memo_fibo.1" expl="1. postcondition"
-      sum="e5cf62d45bc6880f25b0ceb0146f31ba"
-      expanded="true">
-      <label name="expl:VC for memo_fibo"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter memo_fibo.2" expl="2. variant decrease"
-      sum="f2de9b54f1392bd1c8f14a5a1823f8ff">
-      <label name="expl:VC for memo_fibo"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter memo_fibo.3" expl="3. precondition"
-      sum="58b1dc4711d156d26d3f6c67b6ef18f2"
-      expanded="true">
-      <label name="expl:VC for memo_fibo"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter memo_fibo.4" expl="4. postcondition"
-      sum="0ab5cf2711cbc0ed05745c44a4ee4ddd"
-      expanded="true">
-      <label name="expl:VC for memo_fibo"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<file name="../fib_memo.mlw" expanded="true">
+<theory name="FibMemo" expanded="true">
+ <goal name="WP_parameter fibo" expl="VC for fibo" sum="e187cac3698687bc29f82cf8eeb7ea39" expanded="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter memo_fibo" expl="VC for memo_fibo" sum="1750301045f2ea890bc0157e30003866" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter memo_fibo.1" expl="1. postcondition" sum="e5cf62d45bc6880f25b0ceb0146f31ba" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter memo_fibo.2" expl="2. variant decrease" sum="f2de9b54f1392bd1c8f14a5a1823f8ff">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter memo_fibo.3" expl="3. precondition" sum="58b1dc4711d156d26d3f6c67b6ef18f2" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter memo_fibo.4" expl="4. postcondition" sum="0ab5cf2711cbc0ed05745c44a4ee4ddd" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -2,428 +2,188 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC4" version="1.2" timelimit="15" memlimit="1000"/>
- <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
- <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5"
-  memlimit="1000"/>
- <prover id="3" name="CVC3" version="2.2" timelimit="15" memlimit="1000"/>
- <prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
- <prover id="5" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
- <file name="../dijkstra.mlw"
-  expanded="true">
-  <theory name="DijkstraShortestPath"
-   expanded="true">
-   <goal name="WP_parameter relax" expl="VC for relax"
-    sum="8f32f48bea01f4ed5752830a112387be">
-    <label name="expl:VC for relax"/>
-    <transf
-     name="split_goal_wp">
-     <goal name="WP_parameter relax.1" expl="1. postcondition"
-      sum="aeb81bc9317d1907e9bf84f8b9ddaaff">
-      <label name="expl:VC for relax"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
+<prover id="0" name="CVC4" version="1.2" timelimit="15" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.2" timelimit="15" memlimit="1000"/>
+<prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
+<file name="../dijkstra.mlw" expanded="true">
+<theory name="DijkstraShortestPath" expanded="true">
+ <goal name="WP_parameter relax" expl="VC for relax" sum="8f32f48bea01f4ed5752830a112387be">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter relax.1" expl="1. postcondition" sum="aeb81bc9317d1907e9bf84f8b9ddaaff">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter relax.2" expl="2. postcondition" sum="eaef5f6a4e2eba27510c164fad3d20fb">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter relax.3" expl="3. postcondition" sum="2a013bc10ab4368dab267dcc92a9af2a">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter relax.4" expl="4. postcondition" sum="15ce5553d218667d241e6ed6b89e0166">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Length_nonneg" sum="438bec4c8d4639d6a7a61143ff2aa83b">
+ <proof prover="5" edited="dijkstra_DijkstraShortestPath_Length_nonneg_1.v"><result status="valid" time="1.07"/></proof>
+ </goal>
+ <goal name="Path_inversion" sum="7bb8eeb7acc4eef51735d794db4f89d9">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="Path_shortest_path" sum="22bf835a46cf6f0fb08d60ca0e1afbc6">
+ <proof prover="5" edited="dijkstra_DijkstraShortestPath_Path_shortest_path_1.v"><result status="valid" time="1.26"/></proof>
+ </goal>
+ <goal name="Main_lemma" sum="3f29de55aede380ca7b4f654b5ae02bf">
+ <proof prover="2"><result status="valid" time="1.72"/></proof>
+ </goal>
+ <goal name="Completeness_lemma" sum="0702a6e9f4432dae5ceec580977d832f">
+ <proof prover="5" edited="dijkstra_DijkstraShortestPath_Completeness_lemma_1.v"><result status="valid" time="1.17"/></proof>
+ </goal>
+ <goal name="WP_parameter shortest_path_code" expl="VC for shortest_path_code" sum="4b24f354a67f8b0aa7531f9922ac5988" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter shortest_path_code.1" expl="1. loop invariant init" sum="a5fff86cb29c55cc9b50f5bca67d29f2">
+  <proof prover="1"><result status="valid" time="0.20"/></proof>
+  <proof prover="4"><result status="valid" time="0.14"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.2" expl="2. loop invariant init" sum="f29d3d490b1e78dc76b9c9f69d6fd759">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.3" expl="3. loop invariant init" sum="5729a0d294abb5f230273432430dc021">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.4" expl="4. precondition" sum="3374fbe6abcf8c96f18f5d73128e5651">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.5" expl="5. assertion" sum="109480cbb5d4c43dce6a9c9f335cf1fc">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <proof prover="2" timelimit="15"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="4" timelimit="15"><result status="valid" time="0.58"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.6" expl="6. loop invariant init" sum="0e5264bbc6b4bfc9736946a1ce81d85c">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.7" expl="7. loop invariant init" sum="497a214e6d30bdc3f9149e846266cf01">
+  <transf name="inline_goal">
+   <goal name="WP_parameter shortest_path_code.7.1" expl="1. loop invariant init" sum="7bc37f73f4ce309feaf1fc5c74a694c3">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter shortest_path_code.7.1.1" expl="1." sum="fc68898478cf52023b26df9cf91dad54">
+    <proof prover="2"><result status="valid" time="0.03"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.7.1.2" expl="2." sum="faaa935bdf8c64b9e94b95c35ed2a975">
+    <proof prover="2"><result status="valid" time="0.01"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.7.1.3" expl="3." sum="2f9b9e202f8b4771cb2ed69ac7efc23b">
+    <proof prover="2" timelimit="30"><result status="valid" time="0.02"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.7.1.4" expl="4." sum="e720fb07385b10048a8210f3859baee7">
+    <proof prover="2" timelimit="30"><result status="valid" time="0.01"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.7.1.5" expl="5." sum="51472b9a45d0c486afe7a80a34ca789a">
+    <proof prover="2" timelimit="30"><result status="valid" time="0.16"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.7.1.6" expl="6." sum="52afe2b1e607ba153472eb2bb2f14d10">
+    <proof prover="2" timelimit="30"><result status="valid" time="0.41"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.7.1.7" expl="7." sum="7028acfffbaa6e2edeb6ae6fac2e99fb">
+    <proof prover="2" timelimit="30"><result status="valid" time="0.08"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.8" expl="8. loop invariant init" sum="b0a024f143aa083025ee5ee24f459b1b">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter shortest_path_code.8.1" expl="1. loop invariant init" sum="b0a024f143aa083025ee5ee24f459b1b">
+   <proof prover="2"><result status="valid" time="0.18"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.9" expl="9. precondition" sum="03dc5dabadbc87b526c7f13865e52dca">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.10" expl="10. assertion" sum="f618dae38a5ad80ac7c4ac22a72e332c">
+  <proof prover="4"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.11" expl="11. loop invariant preservation" sum="0bc4442164596c8bd83d88ff8ff3c4de">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.12" expl="12. loop invariant preservation" sum="6ead39a58d7f984f32ffd36e6448a5e5">
+  <transf name="inline_goal">
+   <goal name="WP_parameter shortest_path_code.12.1" expl="1. loop invariant preservation" sum="40565c279964e9ba571cf247c0e2e358">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter shortest_path_code.12.1.1" expl="1." sum="9b051eb437dc7927ae463dbe2c5cfc98">
+    <proof prover="2"><result status="valid" time="0.44"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.12.1.2" expl="2." sum="eba747aacbb3063fee227c0d5d67d224">
+    <proof prover="1" timelimit="10"><result status="valid" time="0.28"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.12.1.3" expl="3." sum="50a7c3695c6997192ed94fac6678d3c0">
+    <proof prover="2"><result status="valid" time="0.03"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.12.1.4" expl="4." sum="b407af2bab0ab4011f046d9953091dc4">
+    <proof prover="1" timelimit="10"><result status="valid" time="1.94"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.12.1.5" expl="5." sum="fb8e2b29225461fadb8357aa0c10e3ee">
+    <proof prover="2"><result status="valid" time="2.23"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.12.1.6" expl="6." sum="0610c5461a6a5613321152f6a0130365">
+    <proof prover="2"><result status="valid" time="0.42"/></proof>
+    </goal>
+    <goal name="WP_parameter shortest_path_code.12.1.7" expl="7." sum="75a24182b38eca60cd2ea9550a71bb4f">
+    <proof prover="5" timelimit="30" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_2.v"><result status="valid" time="12.63"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.13" expl="13. loop invariant preservation" sum="6297bbd76ea297ce9ee1c2aec2ec1edd">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter shortest_path_code.13.1" expl="1. loop invariant preservation" sum="6297bbd76ea297ce9ee1c2aec2ec1edd">
+   <transf name="inline_goal">
+    <goal name="WP_parameter shortest_path_code.13.1.1" expl="1. loop invariant preservation" sum="76128a03a580ab98029ab0600abcf198">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter shortest_path_code.13.1.1.1" expl="1. loop invariant preservation" sum="81e47b5c002b688fff83bec6a14c08b4">
+     <proof prover="1"><result status="valid" time="0.08"/></proof>
+     <proof prover="4"><result status="valid" time="3.26"/></proof>
      </goal>
-     <goal name="WP_parameter relax.2" expl="2. postcondition"
-      sum="eaef5f6a4e2eba27510c164fad3d20fb">
-      <label name="expl:VC for relax"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter relax.3" expl="3. postcondition"
-      sum="2a013bc10ab4368dab267dcc92a9af2a">
-      <label name="expl:VC for relax"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter relax.4" expl="4. postcondition"
-      sum="15ce5553d218667d241e6ed6b89e0166">
-      <label name="expl:VC for relax"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
+     <goal name="WP_parameter shortest_path_code.13.1.1.2" expl="2. loop invariant preservation" sum="a65eaab5fa0db9096779d83f738ac02e">
+     <proof prover="1"><result status="valid" time="0.39"/></proof>
      </goal>
     </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="Length_nonneg"
-    sum="438bec4c8d4639d6a7a61143ff2aa83b">
-    <proof prover="5"
-     edited="dijkstra_DijkstraShortestPath_Length_nonneg_1.v">
-     <result status="valid" time="1.07"/>
-    </proof>
-   </goal>
-   <goal name="Path_inversion"
-    sum="7bb8eeb7acc4eef51735d794db4f89d9">
-    <proof prover="2">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal name="Path_shortest_path"
-    sum="22bf835a46cf6f0fb08d60ca0e1afbc6">
-    <proof prover="5"
-     edited="dijkstra_DijkstraShortestPath_Path_shortest_path_1.v">
-     <result status="valid" time="1.26"/>
-    </proof>
-   </goal>
-   <goal name="Main_lemma"
-    sum="3f29de55aede380ca7b4f654b5ae02bf">
-    <proof prover="2">
-     <result status="valid" time="1.72"/>
-    </proof>
-   </goal>
-   <goal name="Completeness_lemma"
-    sum="0702a6e9f4432dae5ceec580977d832f">
-    <proof prover="5"
-     edited="dijkstra_DijkstraShortestPath_Completeness_lemma_1.v">
-     <result status="valid" time="1.17"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter shortest_path_code"
-    expl="VC for shortest_path_code" sum="4b24f354a67f8b0aa7531f9922ac5988"
-    expanded="true">
-    <label name="expl:VC for shortest_path_code"/>
-    <transf name="split_goal_wp"
-     expanded="true">
-     <goal name="WP_parameter shortest_path_code.1"
-      expl="1. loop invariant init"
-      sum="a5fff86cb29c55cc9b50f5bca67d29f2">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="1">
-       <result status="valid" time="0.20"/>
-      </proof>
-      <proof prover="4">
-       <result status="valid" time="0.14"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.2"
-      expl="2. loop invariant init"
-      sum="f29d3d490b1e78dc76b9c9f69d6fd759">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="1">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="4">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.3"
-      expl="3. loop invariant init"
-      sum="5729a0d294abb5f230273432430dc021">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="4">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.4" expl="4. precondition"
-      sum="3374fbe6abcf8c96f18f5d73128e5651">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.5" expl="5. assertion"
-      sum="109480cbb5d4c43dce6a9c9f335cf1fc">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="1">
-       <result status="valid" time="0.07"/>
-      </proof>
-      <proof prover="2" timelimit="15">
-       <result status="valid" time="0.05"/>
-      </proof>
-      <proof prover="3">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="4" timelimit="15">
-       <result status="valid" time="0.58"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.6"
-      expl="6. loop invariant init"
-      sum="0e5264bbc6b4bfc9736946a1ce81d85c">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="2">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.7"
-      expl="7. loop invariant init"
-      sum="497a214e6d30bdc3f9149e846266cf01">
-      <label name="expl:VC for shortest_path_code"/>
-      <transf
-       name="inline_goal">
-       <goal name="WP_parameter shortest_path_code.7.1"
-        expl="1. loop invariant init"
-        sum="7bc37f73f4ce309feaf1fc5c74a694c3">
-        <label name="expl:VC for shortest_path_code"/>
-        <transf
-         name="split_goal_wp">
-         <goal name="WP_parameter shortest_path_code.7.1.1" expl="1."
-          sum="fc68898478cf52023b26df9cf91dad54">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.7.1.2" expl="2."
-          sum="faaa935bdf8c64b9e94b95c35ed2a975">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2">
-           <result status="valid" time="0.01"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.7.1.3" expl="3."
-          sum="2f9b9e202f8b4771cb2ed69ac7efc23b">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2" timelimit="30">
-           <result status="valid" time="0.02"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.7.1.4" expl="4."
-          sum="e720fb07385b10048a8210f3859baee7">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2" timelimit="30">
-           <result status="valid" time="0.01"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.7.1.5" expl="5."
-          sum="51472b9a45d0c486afe7a80a34ca789a">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2" timelimit="30">
-           <result status="valid" time="0.16"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.7.1.6" expl="6."
-          sum="52afe2b1e607ba153472eb2bb2f14d10">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2" timelimit="30">
-           <result status="valid" time="0.41"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.7.1.7" expl="7."
-          sum="7028acfffbaa6e2edeb6ae6fac2e99fb">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2" timelimit="30">
-           <result status="valid" time="0.08"/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.8"
-      expl="8. loop invariant init"
-      sum="b0a024f143aa083025ee5ee24f459b1b">
-      <label name="expl:VC for shortest_path_code"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter shortest_path_code.8.1"
-        expl="1. loop invariant init"
-        sum="b0a024f143aa083025ee5ee24f459b1b">
-        <label name="expl:VC for shortest_path_code"/>
-        <proof prover="2">
-         <result status="valid" time="0.18"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.9" expl="9. precondition"
-      sum="03dc5dabadbc87b526c7f13865e52dca">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.10" expl="10. assertion"
-      sum="f618dae38a5ad80ac7c4ac22a72e332c">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="4">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.11"
-      expl="11. loop invariant preservation"
-      sum="0bc4442164596c8bd83d88ff8ff3c4de">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.12"
-      expl="12. loop invariant preservation"
-      sum="6ead39a58d7f984f32ffd36e6448a5e5">
-      <label name="expl:VC for shortest_path_code"/>
-      <transf
-       name="inline_goal">
-       <goal name="WP_parameter shortest_path_code.12.1"
-        expl="1. loop invariant preservation"
-        sum="40565c279964e9ba571cf247c0e2e358">
-        <label name="expl:VC for shortest_path_code"/>
-        <transf
-         name="split_goal_wp">
-         <goal name="WP_parameter shortest_path_code.12.1.1" expl="1."
-          sum="9b051eb437dc7927ae463dbe2c5cfc98">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2">
-           <result status="valid" time="0.44"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.12.1.2" expl="2."
-          sum="eba747aacbb3063fee227c0d5d67d224">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="1" timelimit="10">
-           <result status="valid" time="0.28"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.12.1.3" expl="3."
-          sum="50a7c3695c6997192ed94fac6678d3c0">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.12.1.4" expl="4."
-          sum="b407af2bab0ab4011f046d9953091dc4">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="1" timelimit="10">
-           <result status="valid" time="1.94"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.12.1.5" expl="5."
-          sum="fb8e2b29225461fadb8357aa0c10e3ee">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2">
-           <result status="valid" time="2.23"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.12.1.6" expl="6."
-          sum="0610c5461a6a5613321152f6a0130365">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="2">
-           <result status="valid" time="0.42"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter shortest_path_code.12.1.7" expl="7."
-          sum="75a24182b38eca60cd2ea9550a71bb4f">
-          <label name="expl:VC for shortest_path_code"/>
-          <proof prover="5" timelimit="30"
-           edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_2.v">
-           <result status="valid" time="12.63"/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.13"
-      expl="13. loop invariant preservation"
-      sum="6297bbd76ea297ce9ee1c2aec2ec1edd">
-      <label name="expl:VC for shortest_path_code"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter shortest_path_code.13.1"
-        expl="1. loop invariant preservation"
-        sum="6297bbd76ea297ce9ee1c2aec2ec1edd">
-        <label name="expl:VC for shortest_path_code"/>
-        <transf
-         name="inline_goal">
-         <goal name="WP_parameter shortest_path_code.13.1.1"
-          expl="1. loop invariant preservation"
-          sum="76128a03a580ab98029ab0600abcf198">
-          <label name="expl:VC for shortest_path_code"/>
-          <transf
-           name="split_goal_wp">
-           <goal name="WP_parameter shortest_path_code.13.1.1.1"
-            expl="1. loop invariant preservation"
-            sum="81e47b5c002b688fff83bec6a14c08b4">
-            <label name="expl:VC for shortest_path_code"/>
-            <proof prover="1">
-             <result status="valid" time="0.08"/>
-            </proof>
-            <proof prover="4">
-             <result status="valid" time="3.26"/>
-            </proof>
-           </goal>
-           <goal name="WP_parameter shortest_path_code.13.1.1.2"
-            expl="2. loop invariant preservation"
-            sum="a65eaab5fa0db9096779d83f738ac02e">
-            <label name="expl:VC for shortest_path_code"/>
-            <proof prover="1">
-             <result status="valid" time="0.39"/>
-            </proof>
-           </goal>
-          </transf>
-         </goal>
-        </transf>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.14"
-      expl="14. loop variant decrease"
-      sum="96101beb1c98785e0e11afb2f70e3298">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.15"
-      expl="15. loop invariant preservation"
-      sum="f5c42c65434fc369b734c19353126d25">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.16"
-      expl="16. loop invariant preservation"
-      sum="0ffeeac46cbb1fff045c9e567cd5c7c8">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="4">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.17"
-      expl="17. loop invariant preservation"
-      sum="c83f07fe73308623e3c22999a115098d"
-      expanded="true">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="5" timelimit="30"
-       edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_3.v">
-       <result status="valid" time="2.40"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.18"
-      expl="18. loop variant decrease"
-      sum="78905312faefa9b7223e5cbcdc0a15a5">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="2">
-       <result status="valid" time="0.07"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.19" expl="19. postcondition"
-      sum="4a8e7b6c317e81338b54de49d73dadb9">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.20" expl="20. postcondition"
-      sum="d5c644f754e568f21cbe00693bcda6f7">
-      <label name="expl:VC for shortest_path_code"/>
-      <proof prover="4">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.14" expl="14. loop variant decrease" sum="96101beb1c98785e0e11afb2f70e3298">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.15" expl="15. loop invariant preservation" sum="f5c42c65434fc369b734c19353126d25">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.16" expl="16. loop invariant preservation" sum="0ffeeac46cbb1fff045c9e567cd5c7c8">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.17" expl="17. loop invariant preservation" sum="c83f07fe73308623e3c22999a115098d" expanded="true">
+  <proof prover="5" timelimit="30" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_3.v"><result status="valid" time="2.40"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.18" expl="18. loop variant decrease" sum="78905312faefa9b7223e5cbcdc0a15a5">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.19" expl="19. postcondition" sum="4a8e7b6c317e81338b54de49d73dadb9">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter shortest_path_code.20" expl="20. postcondition" sum="d5c644f754e568f21cbe00693bcda6f7">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

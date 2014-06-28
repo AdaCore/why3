@@ -2,73 +2,34 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10"
-  memlimit="1000"/>
- <file name="../resizable_array.mlw"
-  expanded="true">
-  <theory name="ResizableArraySpec" expanded="true">
-  </theory>
-  <theory name="ResizableArrayImplem"
-   expanded="true">
-   <goal name="WP_parameter make" expl="VC for make"
-    sum="49a92595c3d8695ccd72b6782ec11c14"
-    expanded="true">
-    <label name="expl:VC for make"/>
-    <proof prover="0">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter mixfix []" expl="VC for mixfix []"
-    sum="7e5500204f557ef756994c75fb09d539"
-    expanded="true">
-    <label name="expl:VC for mixfix []"/>
-    <proof prover="0">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter mixfix []&lt;-" expl="VC for mixfix []&lt;-"
-    sum="7a8035b1a8cf0bc6628be31b53600119"
-    expanded="true">
-    <label name="expl:VC for mixfix []&lt;-"/>
-    <proof prover="0">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter resize" expl="VC for resize"
-    sum="e6a3c51f50c3a1258b711260271a2b8e"
-    expanded="true">
-    <label name="expl:VC for resize"/>
-    <proof prover="0" timelimit="5">
-     <result status="valid" time="0.07"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter append" expl="VC for append"
-    sum="c0cbdb540094e2852efbcfaa8de46cf5"
-    expanded="true">
-    <label name="expl:VC for append"/>
-    <proof prover="0">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory name="Test"
-   expanded="true">
-   <goal name="WP_parameter test1" expl="VC for test1"
-    sum="bc62a2bd01bc8f84e71684e8363270ea"
-    expanded="true">
-    <label name="expl:VC for test1"/>
-    <proof prover="0">
-     <result status="valid" time="0.09"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter test2" expl="VC for test2"
-    sum="1463820eb0ced8772f7de19e1e0cdb0d"
-    expanded="true">
-    <label name="expl:VC for test2"/>
-    <proof prover="0">
-     <result status="valid" time="0.38"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<file name="../resizable_array.mlw" expanded="true">
+<theory name="ResizableArraySpec" expanded="true">
+</theory>
+<theory name="ResizableArrayImplem" expanded="true">
+ <goal name="WP_parameter make" expl="VC for make" sum="49a92595c3d8695ccd72b6782ec11c14" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="WP_parameter mixfix []" expl="VC for mixfix []" sum="7e5500204f557ef756994c75fb09d539" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="WP_parameter mixfix []&lt;-" expl="VC for mixfix []&lt;-" sum="7a8035b1a8cf0bc6628be31b53600119" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="WP_parameter resize" expl="VC for resize" sum="e6a3c51f50c3a1258b711260271a2b8e" expanded="true">
+ <proof prover="0" timelimit="5"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="WP_parameter append" expl="VC for append" sum="c0cbdb540094e2852efbcfaa8de46cf5" expanded="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="Test" expanded="true">
+ <goal name="WP_parameter test1" expl="VC for test1" sum="bc62a2bd01bc8f84e71684e8363270ea" expanded="true">
+ <proof prover="0"><result status="valid" time="0.09"/></proof>
+ </goal>
+ <goal name="WP_parameter test2" expl="VC for test2" sum="1463820eb0ced8772f7de19e1e0cdb0d" expanded="true">
+ <proof prover="0"><result status="valid" time="0.38"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

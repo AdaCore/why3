@@ -2,305 +2,125 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC3" version="2.4.1" timelimit="20" memlimit="0"/>
- <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="20"
-  memlimit="1000"/>
- <prover id="2" name="Coq" version="8.4pl3" timelimit="5" memlimit="4000"/>
- <file name="../vstte10_inverting.mlw"
-  expanded="true">
-  <theory name="InvertingAnInjection"
-   expanded="true">
-   <goal name="WP_parameter inverting" expl="VC for inverting"
-    sum="3f19a7e7a9ed8a987300581a77ed15c4"
-    expanded="true">
-    <label name="expl:VC for inverting"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter inverting.1" expl="1. postcondition"
-      sum="e55d23c9b78f1df06a6d867dff439860"
-      expanded="true">
-      <label name="expl:VC for inverting"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting.2" expl="2. loop invariant init"
-      sum="e8ae3900304b604c7bd045460effe88e"
-      expanded="true">
-      <label name="expl:VC for inverting"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting.3" expl="3. index in array bounds"
-      sum="65e9a2d80f7bb1a5e23ac5c098562242"
-      expanded="true">
-      <label name="expl:VC for inverting"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting.4" expl="4. type invariant"
-      sum="2786552208cea24fb84b3a60a5be2a05">
-      <label name="expl:VC for inverting"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting.5" expl="5. index in array bounds"
-      sum="b9a5321800c758faa46172151a59c261"
-      expanded="true">
-      <label name="expl:VC for inverting"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting.6"
-      expl="6. loop invariant preservation"
-      sum="2875c2e87928897b7988fb27d2af0719"
-      expanded="true">
-      <label name="expl:VC for inverting"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting.7" expl="7. type invariant"
-      sum="315a483cb90dc805c426f7d428d3073c">
-      <label name="expl:VC for inverting"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting.8" expl="8. postcondition"
-      sum="957c7e899fbe3ac4657b33dc77302057"
-      expanded="true">
-      <label name="expl:VC for inverting"/>
-      <proof prover="2"
-       edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v">
-       <result status="valid" time="1.16"/>
-      </proof>
-     </goal>
-    </transf>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="20" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="20" memlimit="1000"/>
+<prover id="2" name="Coq" version="8.4pl3" timelimit="5" memlimit="4000"/>
+<file name="../vstte10_inverting.mlw" expanded="true">
+<theory name="InvertingAnInjection" expanded="true">
+ <goal name="WP_parameter inverting" expl="VC for inverting" sum="3f19a7e7a9ed8a987300581a77ed15c4" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter inverting.1" expl="1. postcondition" sum="e55d23c9b78f1df06a6d867dff439860" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting.2" expl="2. loop invariant init" sum="e8ae3900304b604c7bd045460effe88e" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting.3" expl="3. index in array bounds" sum="65e9a2d80f7bb1a5e23ac5c098562242" expanded="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting.4" expl="4. type invariant" sum="2786552208cea24fb84b3a60a5be2a05">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting.5" expl="5. index in array bounds" sum="b9a5321800c758faa46172151a59c261" expanded="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting.6" expl="6. loop invariant preservation" sum="2875c2e87928897b7988fb27d2af0719" expanded="true">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting.7" expl="7. type invariant" sum="315a483cb90dc805c426f7d428d3073c">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting.8" expl="8. postcondition" sum="957c7e899fbe3ac4657b33dc77302057" expanded="true">
+  <proof prover="2" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v"><result status="valid" time="1.16"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter inverting2" expl="VC for inverting2" sum="dce82acffe0c74d17684cd8acf2efa3c" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter inverting2.1" expl="1. array creation size" sum="8e20ad30279f0bef403b282c7241ed66" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting2.2" expl="2. postcondition" sum="a5d4ec756c727cd4a5109a5d55c6b882" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting2.3" expl="3. loop invariant init" sum="8315c83380f6db7d6c52a89f3797aedc" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting2.4" expl="4. index in array bounds" sum="5d9ce8e021342eea96b3275d18d706f8" expanded="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting2.5" expl="5. type invariant" sum="d6284094690465d42b6b87d7ebaed6f9">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting2.6" expl="6. index in array bounds" sum="42fb0b3f5e1c07167d6b21127399eeb7" expanded="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting2.7" expl="7. loop invariant preservation" sum="6d769a3cc530e2de6de523cc9fc67882" expanded="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting2.8" expl="8. type invariant" sum="5b74ffebe6d122a88474b468c900915e">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter inverting2.9" expl="9. postcondition" sum="10f147ce9622089c450208653f07a218" expanded="true">
+  <transf name="split_goal" expanded="true">
+   <goal name="WP_parameter inverting2.9.1" expl="1." sum="ccbf9628a6fb834e693f84bd40f22d3c" expanded="true">
+   <proof prover="2" timelimit="10" memlimit="0" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting2_2.v"><result status="valid" time="1.02"/></proof>
    </goal>
-   <goal name="WP_parameter inverting2" expl="VC for inverting2"
-    sum="dce82acffe0c74d17684cd8acf2efa3c"
-    expanded="true">
-    <label name="expl:VC for inverting2"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter inverting2.1" expl="1. array creation size"
-      sum="8e20ad30279f0bef403b282c7241ed66"
-      expanded="true">
-      <label name="expl:VC for inverting2"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.2" expl="2. postcondition"
-      sum="a5d4ec756c727cd4a5109a5d55c6b882"
-      expanded="true">
-      <label name="expl:VC for inverting2"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.3" expl="3. loop invariant init"
-      sum="8315c83380f6db7d6c52a89f3797aedc"
-      expanded="true">
-      <label name="expl:VC for inverting2"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.4" expl="4. index in array bounds"
-      sum="5d9ce8e021342eea96b3275d18d706f8"
-      expanded="true">
-      <label name="expl:VC for inverting2"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.5" expl="5. type invariant"
-      sum="d6284094690465d42b6b87d7ebaed6f9">
-      <label name="expl:VC for inverting2"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.6" expl="6. index in array bounds"
-      sum="42fb0b3f5e1c07167d6b21127399eeb7"
-      expanded="true">
-      <label name="expl:VC for inverting2"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.7"
-      expl="7. loop invariant preservation"
-      sum="6d769a3cc530e2de6de523cc9fc67882"
-      expanded="true">
-      <label name="expl:VC for inverting2"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.8" expl="8. type invariant"
-      sum="5b74ffebe6d122a88474b468c900915e">
-      <label name="expl:VC for inverting2"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter inverting2.9" expl="9. postcondition"
-      sum="10f147ce9622089c450208653f07a218"
-      expanded="true">
-      <label name="expl:VC for inverting2"/>
-      <transf name="split_goal"
-       expanded="true">
-       <goal name="WP_parameter inverting2.9.1" expl="1."
-        sum="ccbf9628a6fb834e693f84bd40f22d3c"
-        expanded="true">
-        <label name="expl:VC for inverting2"/>
-        <proof prover="2" timelimit="10" memlimit="0"
-         edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting2_2.v">
-         <result status="valid" time="1.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter inverting2.9.2" expl="2."
-        sum="8f84d5722af0ebda98f00f946d7f5a23"
-        expanded="true">
-        <label name="expl:VC for inverting2"/>
-        <proof prover="1" timelimit="10" memlimit="0">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-    </transf>
+   <goal name="WP_parameter inverting2.9.2" expl="2." sum="8f84d5722af0ebda98f00f946d7f5a23" expanded="true">
+   <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
    </goal>
-  </theory>
-  <theory name="Test"
-   expanded="true">
-   <goal name="WP_parameter test" expl="VC for test"
-    sum="e4a5ebb355b1df90a56523ed037417e2"
-    expanded="true">
-    <label name="expl:VC for test"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter test.1" expl="1. array creation size"
-      sum="5fa94ba2df88f930b1ef87d4939dc3ee"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.2" expl="2. index in array bounds"
-      sum="89f6c3dfc1a17e73ee26c20924246e47"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.3" expl="3. index in array bounds"
-      sum="ed379084d858dbfd6032fde9d1fb61f0"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" timelimit="10" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.4" expl="4. index in array bounds"
-      sum="e10aa2b3e0b6dc47d6135f134b96edbf"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.5" expl="5. index in array bounds"
-      sum="1c98299f08a8c15cb9aca257a1402e1f"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.6" expl="6. index in array bounds"
-      sum="4656eed09b03772324b26ddaa0db5838"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.7" expl="7. index in array bounds"
-      sum="70fee0d9db1f9c26f6603c9184ec4640"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.8" expl="8. index in array bounds"
-      sum="01819ae474e3c3c433889fa7185e427f"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.9" expl="9. index in array bounds"
-      sum="63e548e7abb90a5aed74883531749884"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.10" expl="10. index in array bounds"
-      sum="4fcdcd15e4e18ea0d182ac5ba7be3efa"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" timelimit="3" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.11" expl="11. index in array bounds"
-      sum="c8bf8883f237ff92e71b17487c2371e4"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.12" expl="12. assertion"
-      sum="142a97928a6c05eede9fea8875466355"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.13" expl="13. precondition"
-      sum="f708d9f7b33e22fe7eee81df3f1f0d82"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.38"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter test.14" expl="14. assertion"
-      sum="58a376c8a43018101a892ac8b508a2a0"
-      expanded="true">
-      <label name="expl:VC for test"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Test" expanded="true">
+ <goal name="WP_parameter test" expl="VC for test" sum="e4a5ebb355b1df90a56523ed037417e2" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter test.1" expl="1. array creation size" sum="5fa94ba2df88f930b1ef87d4939dc3ee" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter test.2" expl="2. index in array bounds" sum="89f6c3dfc1a17e73ee26c20924246e47" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter test.3" expl="3. index in array bounds" sum="ed379084d858dbfd6032fde9d1fb61f0" expanded="true">
+  <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter test.4" expl="4. index in array bounds" sum="e10aa2b3e0b6dc47d6135f134b96edbf" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter test.5" expl="5. index in array bounds" sum="1c98299f08a8c15cb9aca257a1402e1f" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter test.6" expl="6. index in array bounds" sum="4656eed09b03772324b26ddaa0db5838" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter test.7" expl="7. index in array bounds" sum="70fee0d9db1f9c26f6603c9184ec4640" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter test.8" expl="8. index in array bounds" sum="01819ae474e3c3c433889fa7185e427f" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter test.9" expl="9. index in array bounds" sum="63e548e7abb90a5aed74883531749884" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter test.10" expl="10. index in array bounds" sum="4fcdcd15e4e18ea0d182ac5ba7be3efa" expanded="true">
+  <proof prover="1" timelimit="3" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter test.11" expl="11. index in array bounds" sum="c8bf8883f237ff92e71b17487c2371e4" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter test.12" expl="12. assertion" sum="142a97928a6c05eede9fea8875466355" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter test.13" expl="13. precondition" sum="f708d9f7b33e22fe7eee81df3f1f0d82" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.38"/></proof>
+  </goal>
+  <goal name="WP_parameter test.14" expl="14. assertion" sum="58a376c8a43018101a892ac8b508a2a0" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

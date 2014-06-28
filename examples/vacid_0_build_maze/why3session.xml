@@ -2,185 +2,91 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC3" version="2.4.1" timelimit="30" memlimit="1000"/>
- <prover id="1" name="Z3" version="4.3.1" timelimit="30" memlimit="1000"/>
- <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="30"
-  memlimit="1000"/>
- <file name="../vacid_0_build_maze.mlw"
-  expanded="true">
-  <theory name="UnionFind_pure" expanded="true">
-  </theory>
-  <theory name="UnionFind_sig" expanded="true">
-  </theory>
-  <theory name="Graph" expanded="true">
-  </theory>
-  <theory name="Graph_sig" expanded="true">
-  </theory>
-  <theory name="BuildMaze"
-   expanded="true">
-   <goal name="Ineq1"
-    sum="170e918b0ac85f15e02057f148b64f87">
-    <transf
-     name="split_goal_wp">
-     <goal name="Ineq1.1" expl="1."
-      sum="fe1e16d74977de16f5afbc3368cd6088">
-      <proof prover="2">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="Ineq1.2" expl="2."
-      sum="ae1b8ed1c502d475a02dcafd91709424">
-      <proof prover="0">
-       <result status="valid" time="0.21"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal name="WP_parameter add_edge_and_union"
-    expl="VC for add_edge_and_union"
-    sum="b7245249afb45a57927dee5c30720145">
-    <label name="expl:VC for add_edge_and_union"/>
-    <transf
-     name="split_goal_wp">
-     <goal name="WP_parameter add_edge_and_union.1" expl="1. precondition"
-      sum="90f33000ba416210b1ff4fdced6885c4">
-      <label name="expl:VC for add_edge_and_union"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add_edge_and_union.2" expl="2. precondition"
-      sum="c81282b75b5a7e5b9889599158ffd437">
-      <label name="expl:VC for add_edge_and_union"/>
-      <proof prover="2">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add_edge_and_union.3" expl="3. postcondition"
-      sum="2865a69a244305138f2249856e723b51">
-      <label name="expl:VC for add_edge_and_union"/>
-      <proof prover="2">
-       <result status="valid" time="2.73"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal name="WP_parameter build_maze" expl="VC for build_maze"
-    sum="05037a2727883ac61b297182d41cd0b3"
-    expanded="true">
-    <label name="expl:VC for build_maze"/>
-    <transf name="split_goal_wp"
-     expanded="true">
-     <goal name="WP_parameter build_maze.1" expl="1. precondition"
-      sum="1075c2b186feeb38ef7a51410e01bbd1">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.2" expl="2. assertion"
-      sum="c4a890ccd6b3049e24ed62be90570d00">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.3" expl="3. loop invariant init"
-      sum="0c0a6a08f41e7b5fad4ee7370237624c">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.4" expl="4. precondition"
-      sum="986991b43fb77018c34fa916e13808cb">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.5" expl="5. precondition"
-      sum="62c743fb091dff5610900e994e31d5ee">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.6" expl="6. precondition"
-      sum="99afebb6eb24ee6a8f782296cd793a59">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.7" expl="7. assertion"
-      sum="fb9bf358c95550e0148b3c1773f3ff7f">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.8" expl="8. assertion"
-      sum="41a78bf93f3d8c897904fe1e00c7af55">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.9" expl="9. precondition"
-      sum="9fcefa521b87f9a1b929cfd23a89e9a2">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.30"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.10" expl="10. precondition"
-      sum="442e1adb6160cd44e1dacbb41826df34">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.29"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.11" expl="11. precondition"
-      sum="21e79c1a8c3f81fab9760e2abe9fa1b0">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="0">
-       <result status="valid" time="3.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.12"
-      expl="12. loop invariant preservation"
-      sum="85daa3622542d07b6459095ceec6b57a">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="17.78"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.13"
-      expl="13. loop invariant preservation"
-      sum="492971301609ac42e2ac57ea5dad36be">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="1.79"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.14"
-      expl="14. loop invariant preservation"
-      sum="48d43bed6e4613630123221908e664ee">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_maze.15" expl="15. postcondition"
-      sum="7abac006111934c5482c605ca7507bea">
-      <label name="expl:VC for build_maze"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="30" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.3.1" timelimit="30" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="30" memlimit="1000"/>
+<file name="../vacid_0_build_maze.mlw" expanded="true">
+<theory name="UnionFind_pure" expanded="true">
+</theory>
+<theory name="UnionFind_sig" expanded="true">
+</theory>
+<theory name="Graph" expanded="true">
+</theory>
+<theory name="Graph_sig" expanded="true">
+</theory>
+<theory name="BuildMaze" expanded="true">
+ <goal name="Ineq1" sum="170e918b0ac85f15e02057f148b64f87">
+ <transf name="split_goal_wp">
+  <goal name="Ineq1.1" expl="1." sum="fe1e16d74977de16f5afbc3368cd6088">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="Ineq1.2" expl="2." sum="ae1b8ed1c502d475a02dcafd91709424">
+  <proof prover="0"><result status="valid" time="0.21"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter add_edge_and_union" expl="VC for add_edge_and_union" sum="b7245249afb45a57927dee5c30720145">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter add_edge_and_union.1" expl="1. precondition" sum="90f33000ba416210b1ff4fdced6885c4">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter add_edge_and_union.2" expl="2. precondition" sum="c81282b75b5a7e5b9889599158ffd437">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter add_edge_and_union.3" expl="3. postcondition" sum="2865a69a244305138f2249856e723b51">
+  <proof prover="2"><result status="valid" time="2.73"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter build_maze" expl="VC for build_maze" sum="05037a2727883ac61b297182d41cd0b3" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter build_maze.1" expl="1. precondition" sum="1075c2b186feeb38ef7a51410e01bbd1">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.2" expl="2. assertion" sum="c4a890ccd6b3049e24ed62be90570d00">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.3" expl="3. loop invariant init" sum="0c0a6a08f41e7b5fad4ee7370237624c">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.4" expl="4. precondition" sum="986991b43fb77018c34fa916e13808cb">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.5" expl="5. precondition" sum="62c743fb091dff5610900e994e31d5ee">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.6" expl="6. precondition" sum="99afebb6eb24ee6a8f782296cd793a59">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.7" expl="7. assertion" sum="fb9bf358c95550e0148b3c1773f3ff7f">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.8" expl="8. assertion" sum="41a78bf93f3d8c897904fe1e00c7af55">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.9" expl="9. precondition" sum="9fcefa521b87f9a1b929cfd23a89e9a2">
+  <proof prover="2"><result status="valid" time="0.30"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.10" expl="10. precondition" sum="442e1adb6160cd44e1dacbb41826df34">
+  <proof prover="2"><result status="valid" time="0.29"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.11" expl="11. precondition" sum="21e79c1a8c3f81fab9760e2abe9fa1b0">
+  <proof prover="0"><result status="valid" time="3.50"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.12" expl="12. loop invariant preservation" sum="85daa3622542d07b6459095ceec6b57a">
+  <proof prover="2"><result status="valid" time="17.78"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.13" expl="13. loop invariant preservation" sum="492971301609ac42e2ac57ea5dad36be">
+  <proof prover="2"><result status="valid" time="1.79"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.14" expl="14. loop invariant preservation" sum="48d43bed6e4613630123221908e664ee">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter build_maze.15" expl="15. postcondition" sum="7abac006111934c5482c605ca7507bea">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

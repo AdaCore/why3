@@ -2,144 +2,58 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
- <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10"
-  memlimit="0"/>
- <prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
- <prover id="3" name="veriT" version="201310" timelimit="5" memlimit="4000"/>
- <file name="../mccarthy.mlw"
-  expanded="true">
-  <theory name="McCarthy91"
-   expanded="true">
-   <goal name="WP_parameter f91" expl="VC for f91"
-    sum="b4bc2875eac8410bbf400db454127714"
-    expanded="true">
-    <label name="expl:VC for f91"/>
-    <proof prover="0" timelimit="2">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof prover="1" timelimit="2">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="2" timelimit="2">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="3">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter f91_nonrec" expl="VC for f91_nonrec"
-    sum="1ed4d62bb25f1a93fab7830968d41d88"
-    expanded="true">
-    <label name="expl:VC for f91_nonrec"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter f91_nonrec.1" expl="1. loop invariant init"
-      sum="99821fdb8842a91d7deda4441eff2ebd"
-      expanded="true">
-      <label name="expl:VC for f91_nonrec"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="3">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter f91_nonrec.2"
-      expl="2. loop invariant preservation"
-      sum="06ec26f24367110577f61e032ba308d5"
-      expanded="true">
-      <label name="expl:VC for f91_nonrec"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="1">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="3">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter f91_nonrec.3" expl="3. loop variant decrease"
-      sum="4cc16d766f9bfea8c706a712473543d4"
-      expanded="true">
-      <label name="expl:VC for f91_nonrec"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="3">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter f91_nonrec.4"
-      expl="4. loop invariant preservation"
-      sum="c9dd0f925268cbda69c1fec728f402a5"
-      expanded="true">
-      <label name="expl:VC for f91_nonrec"/>
-      <proof prover="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="1">
-       <result status="valid" time="0.24"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="3">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter f91_nonrec.5" expl="5. loop variant decrease"
-      sum="aaa1005c01f190e89d8dd5eb47c5b43a"
-      expanded="true">
-      <label name="expl:VC for f91_nonrec"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="3">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter f91_nonrec.6" expl="6. postcondition"
-      sum="161d3b4554721e0b60bca0b5a845b922"
-      expanded="true">
-      <label name="expl:VC for f91_nonrec"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="1">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="3">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
+<prover id="3" name="veriT" version="201310" timelimit="5" memlimit="4000"/>
+<file name="../mccarthy.mlw" expanded="true">
+<theory name="McCarthy91" expanded="true">
+ <goal name="WP_parameter f91" expl="VC for f91" sum="b4bc2875eac8410bbf400db454127714" expanded="true">
+ <proof prover="0" timelimit="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" timelimit="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="2" timelimit="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="WP_parameter f91_nonrec" expl="VC for f91_nonrec" sum="1ed4d62bb25f1a93fab7830968d41d88" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter f91_nonrec.1" expl="1. loop invariant init" sum="99821fdb8842a91d7deda4441eff2ebd" expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter f91_nonrec.2" expl="2. loop invariant preservation" sum="06ec26f24367110577f61e032ba308d5" expanded="true">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter f91_nonrec.3" expl="3. loop variant decrease" sum="4cc16d766f9bfea8c706a712473543d4" expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter f91_nonrec.4" expl="4. loop invariant preservation" sum="c9dd0f925268cbda69c1fec728f402a5" expanded="true">
+  <proof prover="0"><result status="valid" time="0.24"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter f91_nonrec.5" expl="5. loop variant decrease" sum="aaa1005c01f190e89d8dd5eb47c5b43a" expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter f91_nonrec.6" expl="6. postcondition" sum="161d3b4554721e0b60bca0b5a845b922" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

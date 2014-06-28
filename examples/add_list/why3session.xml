@@ -2,66 +2,32 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
- <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5"
-  memlimit="1000"/>
- <prover id="2" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
- <file name="../add_list.mlw"
-  expanded="true">
-  <theory name="SumList">
-  </theory>
-  <theory name="AddListRec"
-   expanded="true">
-   <goal name="WP_parameter sum" expl="VC for sum"
-    sum="0ad629c2956d434cdf621a03e0b7c7ba"
-    expanded="true">
-    <label name="expl:VC for sum"/>
-    <proof prover="0">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="1">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="2">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter main" expl="VC for main"
-    sum="6b4e350cd7d1b4015bab61dc01e96aec"
-    expanded="true">
-    <label name="expl:VC for main"/>
-    <proof prover="0">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="2">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory name="AddListImp"
-   expanded="true">
-   <goal name="WP_parameter sum" expl="VC for sum"
-    sum="82f58e47d4e58d15d59a87efee2a6ad8"
-    expanded="true">
-    <label name="expl:VC for sum"/>
-    <proof prover="0">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="2">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter main" expl="VC for main"
-    sum="9051692e9ac1a4d1f56386a0fd7d440f"
-    expanded="true">
-    <label name="expl:VC for main"/>
-    <proof prover="0">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="2">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<file name="../add_list.mlw" expanded="true">
+<theory name="SumList">
+</theory>
+<theory name="AddListRec" expanded="true">
+ <goal name="WP_parameter sum" expl="VC for sum" sum="0ad629c2956d434cdf621a03e0b7c7ba" expanded="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter main" expl="VC for main" sum="6b4e350cd7d1b4015bab61dc01e96aec" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="AddListImp" expanded="true">
+ <goal name="WP_parameter sum" expl="VC for sum" sum="82f58e47d4e58d15d59a87efee2a6ad8" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter main" expl="VC for main" sum="9051692e9ac1a4d1f56386a0fd7d440f" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

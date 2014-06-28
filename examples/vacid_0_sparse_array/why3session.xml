@@ -2,183 +2,85 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC3" version="2.4.1" timelimit="17" memlimit="1000"/>
- <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5"
-  memlimit="1000"/>
- <prover id="2" name="Z3" version="3.2" timelimit="17" memlimit="1000"/>
- <prover id="3" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
- <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5"
-  memlimit="4000"/>
- <file name="../vacid_0_sparse_array.mlw"
-  expanded="true">
-  <theory name="SparseArray"
-   expanded="true">
-   <goal name="WP_parameter create" expl="VC for create"
-    sum="eabdca7c1c97fb9c3b9df09173cf0c70">
-    <label name="expl:VC for create"/>
-    <proof prover="1">
-     <result status="valid" time="0.02"/>
-    </proof>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="17" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="3.2" timelimit="17" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
+<file name="../vacid_0_sparse_array.mlw" expanded="true">
+<theory name="SparseArray" expanded="true">
+ <goal name="WP_parameter create" expl="VC for create" sum="eabdca7c1c97fb9c3b9df09173cf0c70">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter test" expl="VC for test" sum="febcb45642026d2ff914cadc9496aa22">
+ <proof prover="1"><result status="valid" time="0.18"/></proof>
+ </goal>
+ <goal name="WP_parameter get" expl="VC for get" sum="c1df67abcbc6f1c85d420fa9cae728bf">
+ <proof prover="1"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="permutation" sum="750f2fe99e6aaeb6bb246c90d95fb9f1" expanded="true">
+ <proof prover="3" edited="vacid_0_sparse_array_2_SparseArray_permutation_1.v"><result status="valid" time="31.67"/></proof>
+ </goal>
+ <goal name="WP_parameter set" expl="VC for set" sum="676ab3d0c8ee2f67cf01bc8c04bdee98" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter set.1" expl="1. index in array bounds" sum="212510d32240c112d14f5b78bd9b301d">
+  <proof prover="1" timelimit="17"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter set.2" expl="2. type invariant" sum="18266ad08546177c1d990dfaec370aef">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter set.3" expl="3. type invariant" sum="82ffe2b5b131a7b5db0d493de70641d0">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter set.4" expl="4. precondition" sum="9eb76665734bbadc8056b138991f5306">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter set.5" expl="5. assertion" sum="d6a9a46d93aca89e41d3d7750001c6fe">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.09"/></proof>
+  <proof prover="1"><result status="unknown" time="0.52"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter set.6" expl="6. index in array bounds" sum="742a68b20063bbf7f4c58b5febab7a8c">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter set.7" expl="7. index in array bounds" sum="10af0647641b1983dda17c2427bcfe82">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter set.8" expl="8. type invariant" sum="b204f063242400571628175553a971d6">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter set.9" expl="9. type invariant" sum="8f765b8b8fab05b7ba7912e7a43fa0c6">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter set.10" expl="10. type invariant" sum="43ae01325ca15a2e02495a9df8eb2773">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter set.11" expl="11. postcondition" sum="f3b188b7c3875faebbd01bbd2eb64f80">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter set.11.1" expl="1." sum="eb9767916e836cfeb7926bda4d93edf3">
+   <proof prover="1" timelimit="17"><result status="valid" time="0.10"/></proof>
    </goal>
-   <goal name="WP_parameter test" expl="VC for test"
-    sum="febcb45642026d2ff914cadc9496aa22">
-    <label name="expl:VC for test"/>
-    <proof prover="1">
-     <result status="valid" time="0.18"/>
-    </proof>
+   <goal name="WP_parameter set.11.2" expl="2." sum="02c023e8f099b19b8e2aee7ac60f87bb">
+   <proof prover="0"><result status="valid" time="0.74"/></proof>
+   <proof prover="1" timelimit="17"><result status="unknown" time="1.17"/></proof>
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter get" expl="VC for get"
-    sum="c1df67abcbc6f1c85d420fa9cae728bf">
-    <label name="expl:VC for get"/>
-    <proof prover="1">
-     <result status="valid" time="0.07"/>
-    </proof>
-   </goal>
-   <goal name="permutation" sum="750f2fe99e6aaeb6bb246c90d95fb9f1"
-    expanded="true">
-    <proof prover="3"
-     edited="vacid_0_sparse_array_2_SparseArray_permutation_1.v">
-     <result status="valid" time="31.67"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter set" expl="VC for set"
-    sum="676ab3d0c8ee2f67cf01bc8c04bdee98"
-    expanded="true">
-    <label name="expl:VC for set"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter set.1" expl="1. index in array bounds"
-      sum="212510d32240c112d14f5b78bd9b301d">
-      <label name="expl:VC for set"/>
-      <proof prover="1" timelimit="17">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.2" expl="2. type invariant"
-      sum="18266ad08546177c1d990dfaec370aef">
-      <label name="expl:VC for set"/>
-      <proof prover="1">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.3" expl="3. type invariant"
-      sum="82ffe2b5b131a7b5db0d493de70641d0">
-      <label name="expl:VC for set"/>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.4" expl="4. precondition"
-      sum="9eb76665734bbadc8056b138991f5306">
-      <label name="expl:VC for set"/>
-      <proof prover="1">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.5" expl="5. assertion"
-      sum="d6a9a46d93aca89e41d3d7750001c6fe">
-      <label name="expl:VC for set"/>
-      <proof prover="0" timelimit="5">
-       <result status="valid" time="0.09"/>
-      </proof>
-      <proof prover="1">
-       <result status="unknown" time="0.52"/>
-      </proof>
-      <proof prover="2" timelimit="5">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.6" expl="6. index in array bounds"
-      sum="742a68b20063bbf7f4c58b5febab7a8c">
-      <label name="expl:VC for set"/>
-      <proof prover="1">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.7" expl="7. index in array bounds"
-      sum="10af0647641b1983dda17c2427bcfe82">
-      <label name="expl:VC for set"/>
-      <proof prover="1">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.8" expl="8. type invariant"
-      sum="b204f063242400571628175553a971d6">
-      <label name="expl:VC for set"/>
-      <proof prover="0">
-       <result status="valid" time="0.05"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.9" expl="9. type invariant"
-      sum="8f765b8b8fab05b7ba7912e7a43fa0c6">
-      <label name="expl:VC for set"/>
-      <proof prover="1">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.10" expl="10. type invariant"
-      sum="43ae01325ca15a2e02495a9df8eb2773">
-      <label name="expl:VC for set"/>
-      <proof prover="1">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter set.11" expl="11. postcondition"
-      sum="f3b188b7c3875faebbd01bbd2eb64f80">
-      <label name="expl:VC for set"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter set.11.1" expl="1."
-        sum="eb9767916e836cfeb7926bda4d93edf3">
-        <label name="expl:VC for set"/>
-        <proof prover="1" timelimit="17">
-         <result status="valid" time="0.10"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter set.11.2" expl="2."
-        sum="02c023e8f099b19b8e2aee7ac60f87bb">
-        <label name="expl:VC for set"/>
-        <proof prover="0">
-         <result status="valid" time="0.74"/>
-        </proof>
-        <proof prover="1" timelimit="17">
-         <result status="unknown" time="1.17"/>
-        </proof>
-        <proof prover="2">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter set.12" expl="12. postcondition"
-      sum="62c46a7986217221eb654acd606703fd">
-      <label name="expl:VC for set"/>
-      <proof prover="1">
-       <result status="valid" time="0.17"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
-  <theory name="Harness"
-   expanded="true">
-   <goal name="WP_parameter harness" expl="VC for harness"
-    sum="93b95e7f39038f7050d0c8cc0aea6dd8">
-    <label name="expl:VC for harness"/>
-    <proof prover="1">
-     <result status="valid" time="1.85"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter bench" expl="VC for bench"
-    sum="8b6e6481a22063878fb808eeea92138d">
-    <label name="expl:VC for bench"/>
-    <proof prover="4">
-     <result status="valid" time="0.06"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+  <goal name="WP_parameter set.12" expl="12. postcondition" sum="62c46a7986217221eb654acd606703fd">
+  <proof prover="1"><result status="valid" time="0.17"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Harness" expanded="true">
+ <goal name="WP_parameter harness" expl="VC for harness" sum="93b95e7f39038f7050d0c8cc0aea6dd8">
+ <proof prover="1"><result status="valid" time="1.85"/></proof>
+ </goal>
+ <goal name="WP_parameter bench" expl="VC for bench" sum="8b6e6481a22063878fb808eeea92138d">
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>
