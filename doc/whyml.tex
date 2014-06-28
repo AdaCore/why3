@@ -38,12 +38,12 @@ They also provide extra features:
 Programs are contained in files with suffix \verb|.mlw|.
 They are handled by \texttt{why3}. For instance
 \begin{verbatim}
-  > why3 myfile.mlw
+> why3 prove myfile.mlw
 \end{verbatim}
 will display the verification conditions extracted from modules in
 file \texttt{myfile.mlw}, as a set of corresponding theories, and
 \begin{verbatim}
-  > why3 -P alt-ergo myfile.mlw
+> why3 prove -P alt-ergo myfile.mlw
 \end{verbatim}
 will run the SMT solver Alt-Ergo on these verification conditions.
 Program files are also handled by the GUI tool \texttt{why3ide}.
@@ -129,7 +129,7 @@ pattern matching immediately:
 
 We are now left with the function body itself, that is a code
 computing the sum and the maximum of all elements in \texttt{a}. With
-no surpise, it is as simple as introducing two local references
+no surprise, it is as simple as introducing two local references
 \begin{whycode}
     let sum = ref 0 in
     let max = ref 0 in
@@ -192,7 +192,7 @@ end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 1.}
+  \caption{Solution for VSTTE'10 competition problem 1}
   \label{fig:MaxAndSum}
 \end{figure}
 %END LATEX
@@ -315,7 +315,7 @@ end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 2.}
+  \caption{Solution for VSTTE'10 competition problem 2}
   \label{fig:Inverting}
 \end{figure}
 %END LATEX
@@ -441,7 +441,7 @@ end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 3.}
+  \caption{Solution for VSTTE'10 competition problem 3}
   \label{fig:LinkedList}
 \end{figure}
 %END LATEX
@@ -613,7 +613,7 @@ module NQueens
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 4 (1/2).}
+  \caption{Solution for VSTTE'10 competition problem 4 (1/2)}
   \label{fig:NQueens1}
 \end{figure}
 %END LATEX
@@ -766,7 +766,7 @@ end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 4 (2/2).}
+  \caption{Solution for VSTTE'10 competition problem 4 (2/2)}
   \label{fig:NQueens2}
 \end{figure}
 %END LATEX
@@ -947,7 +947,7 @@ end
 \end{whycode}
 %BEGIN LATEX
 \vspace*{-1em}%\hrulefill
-  \caption{Solution for VSTTE'10 competition problem 5.}
+  \caption{Solution for VSTTE'10 competition problem 5}
   \label{fig:AQueue}
 \end{figure}
 %END LATEX

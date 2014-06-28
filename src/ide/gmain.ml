@@ -39,21 +39,16 @@ let debug = Debug.lookup_flag "ide_info"
 let includes = ref []
 let files = Queue.create ()
 let opt_parser = ref None
-let opt_version = ref false
 let opt_config = ref None
 let opt_extra = ref []
-let opt_list_formats = ref false
 
 let spec = Arg.align [
   ("-L",
    Arg.String (fun s -> includes := s :: !includes),
-   "<s> add s to loadpath") ;
-  ("--library",
+   "<dir> Add <dir> to the library search path") ;
+  "--library",
    Arg.String (fun s -> includes := s :: !includes),
-   " same as -L") ;
-  ("-I",
-   Arg.String (fun s -> includes := s :: !includes),
-   " same as -L (obsolete)") ;
+   " same as -L" ;
   "-C", Arg.String (fun s -> opt_config := Some s),
       "<file> Read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
@@ -64,8 +59,6 @@ let spec = Arg.align [
       "<format> Select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
-  "--list-formats", Arg.Set opt_list_formats,
-      " List known input formats";
 (*
   ("-f",
    Arg.String (fun s -> input_files := s :: !input_files),
@@ -73,26 +66,14 @@ let spec = Arg.align [
 *)
   Debug.Args.desc_debug_list;
   Debug.Args.desc_debug_all;
-  Debug.Args.desc_debug;
-  ("-v",
-   Arg.Set opt_version,
-   " print version information") ;
+  Debug.Args.desc_debug
 ]
-
-let version_msg = sprintf "Why3 IDE, version %s (build date: %s)"
-  Config.version Config.builddate
 
 let usage_str = sprintf
   "Usage: %s [options] [<file.why>|<project directory> [<file.why> ...]]"
   (Filename.basename Sys.argv.(0))
 
 let () = Arg.parse spec (fun f -> Queue.add f files) usage_str
-
-let () =
-  if !opt_version then begin
-    printf "%s@." version_msg;
-    exit 0
-  end
 
 let () = Gconfig.read_config !opt_config !opt_extra
 
@@ -101,19 +82,6 @@ let () = C.load_plugins (Gconfig.get_main ())
 let () =
   Debug.Args.set_flags_selected ();
   if Debug.Args.option_list () then exit 0
-
-let () =
-  if !opt_list_formats then begin
-    let print1 fmt s = fprintf fmt "%S" s in
-    let print fmt (p, l, f) =
-      fprintf fmt "@[%s [%a]@\n  @[%a@]@]"
-        p (Pp.print_list Pp.comma print1) l
-        Pp.formatted f
-    in
-    printf "@[Known input formats:@\n  @[%a@]@]@."
-      (Pp.print_list Pp.newline print)
-      (List.sort Pervasives.compare (Env.list_formats ()))
-  end
 
 let () = if Queue.is_empty files then begin Arg.usage spec usage_str; exit 1 end
 

@@ -23,7 +23,7 @@ run_dir () {
         d=`dirname $f`
         b=`basename $d`
 	echo -n "Benchmarking $d ... "
-        ../bin/why3replayer.opt -bench $REPLAYOPT $2 $d 2> $TMPERR > $TMP
+        ../bin/why3replay.opt -bench $REPLAYOPT $2 $d 2> $TMPERR > $TMP
         ret=$?
 	if test "$ret" != "0"  ; then
 	    echo -n "FAILED (ret code=$ret):"

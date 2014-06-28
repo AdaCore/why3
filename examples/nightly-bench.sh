@@ -98,9 +98,9 @@ cp $OUT $REPORTDIR/regtests-$DATE
 
 echo "Ending time (UTC): "`date --utc +%H:%M` >> $REPORT
 
-# 2-line summary
+# 3-line summary
 echo "" >> $REPORT
-tail -2 $OUT >> $REPORT
+tail -3 $OUT >> $REPORT
 echo "" >> $REPORT
 
 # output the diff against previous run
