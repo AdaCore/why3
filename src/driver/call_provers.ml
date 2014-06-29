@@ -140,13 +140,14 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
     | "f" -> use_stdin := false; fin
     | "t" -> on_timelimit := true; string_of_int timelimit
     | "T" -> string_of_int (succ timelimit)
+    | "U" -> string_of_int (2 * timelimit + 1)
     | "m" -> string_of_int memlimit
     (* FIXME: libdir and datadir can be changed in the configuration file
        Should we pass them as additional arguments? Or would it be better
        to prepare the command line in a separate function? *)
     | "l" -> Config.libdir
     | "d" -> Config.datadir
-    | _ -> failwith "unknown specifier, use %%f, %%t, %%m, %%l, or %%d"
+    | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, or %d"
   in
   let subst s =
     try
