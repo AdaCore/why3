@@ -120,6 +120,8 @@ type config_prover = {
   interactive : bool;
   extra_options : string list;
   extra_drivers : string list;
+  configure_build : string;
+  build_commands : string list;
 }
 
 type config_editor = {
@@ -365,6 +367,8 @@ let load_prover dirname (provers,shortcuts) section =
         interactive = get_bool ~default:false section "interactive";
         extra_options = [];
         extra_drivers = [];
+        configure_build = get_string ~default:"" section "configure_build";
+        build_commands = get_stringl ~default:[] section "build_command";
       } provers in
     let lshort = get_stringl section ~default:[] "shortcut" in
     let shortcuts = add_prover_shortcuts shortcuts prover lshort in
@@ -621,9 +625,11 @@ let merge_config config filename =
           let opt = get_stringl ~default:[] section "option" in
           let drv = List.map (absolute_filename dirname)
             (get_stringl ~default:[] section "driver") in
+          let bcmd = get_stringl ~default:[] section "build_command" in
           { c with
             extra_options = opt @ c.extra_options;
-            extra_drivers = drv @ c.extra_drivers })
+            extra_drivers = drv @ c.extra_drivers;
+            build_commands = bcmd @ c.build_commands })
         provers
     ) config.provers prover_modifiers in
   let provers,shortcuts =

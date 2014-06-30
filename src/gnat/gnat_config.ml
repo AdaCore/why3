@@ -30,6 +30,8 @@ let opt_limit_subp : string option ref = ref None
 let opt_socket_name : string ref = ref ""
 let opt_standalone = ref false
 
+let opt_prepare_shared = ref false
+
 let set_filename s =
    if !opt_filename = None then
       opt_filename := Some s
@@ -133,20 +135,11 @@ let options = Arg.align [
           " spawn its own VC server";
    "--proof-dir", Arg.String set_proof_dir,
           " Specify directory to save session and manual proofs files";
+   "--prepare-shared", Arg.Set opt_prepare_shared,
+          " Build user libraries for manual provers";
 ]
 
-let filename =
-   let is_not_why_loc s =
-      not (Filename.check_suffix s "why" ||
-           Filename.check_suffix s "mlw") in
-   Arg.parse options set_filename usage_msg;
-   match !opt_filename with
-   | None -> Gnat_util.abort_with_message "No file given."
-   | Some s ->
-         if is_not_why_loc s then
-            Gnat_util.abort_with_message
-              (Printf.sprintf "Not a Why input file: %s." s);
-         s
+let () = Arg.parse options set_filename usage_msg
 
 let prover_merge m1 m2 =
   (* merge two prover maps; if they have share a key, keep the entry of the
@@ -168,7 +161,8 @@ let config =
    (* if a prover was given, read default config file and local config file *)
    try
      let gnatprove_config =
-       Whyconf.read_config (Some gnatprove_why3conf_file) in
+       if !opt_prepare_shared then Whyconf.read_config None
+       else Whyconf.read_config (Some gnatprove_why3conf_file) in
       if !opt_prover = None then gnatprove_config
       else begin
          let conf = Whyconf.read_config None in
@@ -183,17 +177,6 @@ let config =
       end
    with Rc.CannotOpen _ ->
       Gnat_util.abort_with_message "Cannot read file why3.conf."
-
-let config_main = Whyconf.get_main (config)
-
-let env =
-   (* load plugins; may be needed for external provers *)
-   if !opt_prover <> None then
-     Whyconf.load_plugins config_main;
-   Env.create_env (match !opt_proof_dir with
-                   | Some dir -> (Filename.concat dir "_theories")
-                                 :: Whyconf.loadpath config_main
-                   | None -> Whyconf.loadpath config_main)
 
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
    Whyconf.get_provers config
@@ -221,6 +204,141 @@ let prover : Whyconf.config_prover =
   | Whyconf.ProverAmbiguity _ ->
         Gnat_util.abort_with_message
           "Several provers match the selection."
+
+let config_main = Whyconf.get_main (config)
+
+let env =
+   (* load plugins; may be needed for external provers *)
+   if !opt_prover <> None then
+     Whyconf.load_plugins config_main;
+   Env.create_env (match !opt_proof_dir with
+                   | Some dir -> (Filename.concat dir "_theories")
+                                 :: Whyconf.loadpath config_main
+                   | None -> Whyconf.loadpath config_main)
+
+(* The function replaces %{f,t,T,m,l,d} to their corresponding values
+   in the string cmd.
+   This function is based on the Call_provers.actualcommand, for
+   some reason not in the Why3 API nor really convenient *)
+let actual_cmd ?main filename cmd =
+  let m = match main with
+    | None -> Whyconf.get_main config
+    | Some m -> m in
+  let replace_func s =
+    match (Str.matched_string s).[1] with
+    | '%' -> "%"
+    | 'f' -> Sys.getcwd () ^ Filename.dir_sep ^ filename
+    (* Can %t and %T be on an editor command line and have a meaning?
+       Is it allowed by Why3config? *)
+    | 't' -> string_of_int (Whyconf.timelimit m)
+    | 'T' -> string_of_int (succ (Whyconf.timelimit m))
+    | 'm' -> string_of_int (Whyconf.memlimit m)
+    | 'l' -> Whyconf.libdir m
+    | 'd' -> Whyconf.datadir m
+    | 'o' -> Whyconf.libobjdir m
+    | a ->  Char.escaped a in
+  Str.global_substitute (Str.regexp "%.") replace_func cmd
+
+(* function to build manual elements *)
+(* pass proof dir and prover as args *)
+
+let list_and_filter dir =
+  Array.fold_left (fun l f ->
+                   if not (Sys.is_directory (Filename.concat dir f)) then
+                     f :: l
+                   else l) [] (Sys.readdir dir)
+
+let build_shared proof_dir prover =
+  let prover_name = prover.Whyconf.prover.Whyconf.prover_name in
+  let shared_dir = Filename.concat proof_dir prover_name in
+  let vc_files = list_and_filter shared_dir in
+  let (unused, child_out) = Unix.pipe () in
+  (* No better idea to get rid of child output,
+     and I certainly don't want to parse it
+   *)
+  let user_dir = "user" in
+  let prover_dir = Filename.concat user_dir prover_name in
+  let update filenames =
+    List.fold_left
+      (fun need_update e ->
+       let odir_file = Filename.concat prover_dir e in
+       if not (Sys.file_exists odir_file) then
+         (
+           let orig_file = Filename.concat shared_dir e in
+           Unix.link orig_file odir_file;
+           true
+         )
+       else
+         need_update
+      ) false filenames
+  in
+
+  let exec_cmd cmd =
+    let hackish_filename =
+      List.fold_left (fun s fn -> s ^ " " ^ fn)
+                     (List.hd vc_files) (List.tl vc_files) in
+    let cmd = actual_cmd hackish_filename cmd in
+    let cmd_splitted = Cmdline.cmdline_split cmd in
+    let pid = Unix.fork () in
+    if pid = 0 then
+      (
+        Unix.dup2 child_out Unix.stdout;
+        Unix.dup2 child_out Unix.stderr;
+        Unix.close unused;
+        Unix.close child_out;
+        let () = Unix.execvp (List.hd cmd_splitted)
+                             (Array.of_list cmd_splitted) in
+        Unix.WEXITED (1)
+      )
+    else
+      (
+        let (_, status) = Unix.waitpid [] pid in
+        status
+      )
+  in
+
+  let check_success res msg =
+    match res with
+    | Unix.WEXITED 0 -> ()
+    | _ -> let () = Gnat_util.abort_with_message msg in ()
+  in
+
+  if vc_files <> [] then
+  (
+    if not (Sys.file_exists user_dir) then
+      Unix.mkdir user_dir 0o755;
+    if not (Sys.file_exists prover_dir) then
+      Unix.mkdir prover_dir 0o755;
+    let file_update = update vc_files in
+    let old_dir = Sys.getcwd () in
+    Sys.chdir prover_dir;
+    if file_update && prover.Whyconf.configure_build <> "" then
+      check_success (exec_cmd prover.Whyconf.configure_build)
+        "Problem during build configuration for prover shared files";
+    List.iter (fun cmd ->
+               if cmd <> "" then
+                 check_success (exec_cmd cmd)
+                               "Problem during build of prover shared files")
+              prover.Whyconf.build_commands;
+    Sys.chdir old_dir;
+    Unix.close unused;
+    Unix.close child_out
+  )
+
+let filename =
+   let is_not_why_loc s =
+      not (Filename.check_suffix s "why" ||
+           Filename.check_suffix s "mlw") in
+   match !opt_filename with
+   | None -> (match !opt_prepare_shared, !opt_proof_dir with
+             | (true, Some pdir) -> build_shared pdir prover;
+                                    let () = exit 0 in ""
+             | _ -> Gnat_util.abort_with_message "No file given.")
+   | Some s ->
+         if is_not_why_loc s then
+            Gnat_util.abort_with_message
+              (Printf.sprintf "Not a Why input file: %s." s);
+         s
 
 (* loading the driver driver *)
 let prover_driver : Driver.driver =

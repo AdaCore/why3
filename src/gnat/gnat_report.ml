@@ -92,29 +92,6 @@ let get_info info  =
     | None -> 0
     | Some info -> info
 
-(* The function replaces %{f,t,T,m,l,d} to their corresponding values
-   in the string cmd.
-   This function is based on the Call_provers.actualcommand, for
-   some reason not in the Why3 API nor really convenient *)
-let actual_editor_cmd ?main filename cmd =
-  let m = match main with
-    | None -> Whyconf.get_main Gnat_config.config
-    | Some m -> m in
-  let replace_func s =
-    match (Str.matched_string s).[1] with
-    | '%' -> "%"
-    | 'f' -> Sys.getcwd () ^ Filename.dir_sep ^ filename
-    (* Can %t and %T be on an editor command line and have a meaning?
-       Is it allowed by Why3config? *)
-    | 't' -> string_of_int (Whyconf.timelimit m)
-    | 'T' -> string_of_int (succ (Whyconf.timelimit m))
-    | 'm' -> string_of_int (Whyconf.memlimit m)
-    | 'l' -> Whyconf.libdir m
-    | 'd' -> Whyconf.datadir m
-    | 'o' -> Whyconf.libobjdir m
-    | a ->  Char.escaped a in
-  Str.global_substitute (Str.regexp "%.") replace_func cmd
-
 let string fmt s = Format.fprintf fmt "\"%s\"" s
 let int fmt d = Format.fprintf fmt "%d" d
 let bool fmt b = Format.fprintf fmt "%b" b
@@ -139,9 +116,11 @@ let print_vc_file_info fmt vc_file =
      Format.fprintf fmt ",";
      let editor = Gnat_config.prover_editor () in
      let cmd_line =
-       List.fold_left (fun str s -> str ^ " " ^ s) editor.Whyconf.editor_command
+       List.fold_left (fun str s -> str ^ " " ^ s)
+                      editor.Whyconf.editor_command
                       editor.Whyconf.editor_options in
-     print_json_field "editor_cmd" string fmt (actual_editor_cmd name cmd_line)
+     print_json_field "editor_cmd" string fmt
+                      (Gnat_config.actual_cmd name cmd_line)
 
 let print_json_msg fmt m =
   Format.fprintf fmt "{%a, %a, %a, %a%a%a}"

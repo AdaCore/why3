@@ -7,7 +7,7 @@ bindir="\"$BINDIR\""
 libdir="\"$LIBDIR/why3\""
 datadir="\"$DATADIR/why3\""
 localdir="None"
-libobjdir="Filename.current_dir_name"
+libobjdir="(Sys.getcwd ())"
 
 if [ "@enable_relocation@" = "yes" ]; then
     bindir='Filename.concat (Filename.dirname

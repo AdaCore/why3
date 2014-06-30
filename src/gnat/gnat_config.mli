@@ -68,3 +68,7 @@ val socket_name : string
 (* name of the socket to be used for communication with the server *)
 
 val proof_dir : string option
+
+val actual_cmd : ?main:Whyconf.main -> string -> string -> string
+(* [actual_cmd main filename cmd] replaces the different '%'
+   preceded terms in [cmd] by their corresponding values *)

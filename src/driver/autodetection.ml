@@ -87,7 +87,7 @@ let load_prover kind (id,section) =
     prover_id = id;
     prover_name = get_string section "name";
     prover_altern = get_string section ~default:"" "alternative";
-    compile_time_support = 
+    compile_time_support =
       get_bool section ~default:false "compile_time_support";
     execs = get_stringl section "exec";
     version_switch = get_string section ~default:"" "version_switch";
@@ -336,12 +336,12 @@ let detect_exec env main data acc exec_name =
     (* check if this prover needs compile-time support *)
     let missing_compile_time_support =
       if data.compile_time_support then
-        try 
+        try
           let compile_time_ver =
-            List.assoc data.prover_name Config.compile_time_support 
-          in 
+            List.assoc data.prover_name Config.compile_time_support
+          in
           if compile_time_ver <> ver then begin
-            eprintf 
+            eprintf
               "Found prover %s version %s, but Why3 was compiled with support for version %s@."
             data.prover_name ver compile_time_ver;
             true
@@ -349,7 +349,7 @@ let detect_exec env main data acc exec_name =
           else
             false
         with Not_found ->
-          eprintf 
+          eprintf
             "Found prover %s version %s, but Why3 wasn't compiled with support for it@."
             data.prover_name ver;
           true
@@ -388,7 +388,9 @@ let detect_exec env main data acc exec_name =
        in_place      = data.prover_in_place;
        interactive   = (match data.kind with ITP -> true | ATP -> false);
        extra_options = [];
-       extra_drivers = [] } in
+       extra_drivers = [];
+       configure_build = "";
+       build_commands = [] } in
 
     let priority = next_priority () in
     if good || old then begin

@@ -29,13 +29,16 @@ let prover_files_dir proj =
   match Gnat_config.proof_dir with
   | None -> ""
   | Some dir ->
-     let pdir =
-       Filename.concat (Filename.concat dir proj)
-                       Gnat_config.prover.Whyconf.prover.Whyconf.prover_name
+     let prover_dir = (Filename.concat
+                         dir
+                         Gnat_config.prover.Whyconf.prover.Whyconf.prover_name)
      in
-     if not (Sys.file_exists pdir) then
-       Unix.mkdir pdir 0o750;
-     Sysutil.relativize_filename (Sys.getcwd ()) pdir
+     if not (Sys.file_exists prover_dir) then
+       Unix.mkdir prover_dir 0o750;
+     let punit_dir = Filename.concat prover_dir proj in
+     if not (Sys.file_exists punit_dir) then
+       Unix.mkdir punit_dir 0o750;
+     Sysutil.relativize_filename (Sys.getcwd ()) punit_dir
 
 let compute_filename theory goal expl =
   let why_fn =
@@ -48,8 +51,9 @@ let compute_filename theory goal expl =
 
 let create_prover_file goal expl =
   let th = find_goal_theory goal in
-  let proj_name =
-    get_project_dir (Filename.basename th.theory_parent.file_name) in
+  let proj_name = Filename.basename
+                    (get_project_dir (Filename.basename
+                                        th.theory_parent.file_name)) in
   let filename = Filename.concat (prover_files_dir proj_name)
                                  (compute_filename th goal expl) in
   let cout = open_out filename in

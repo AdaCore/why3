@@ -439,7 +439,8 @@ let init () =
      match Gnat_config.proof_dir with
      | None -> project_dir
      | Some dir_name ->
-        Filename.concat dir_name (Filename.basename project_dir) in
+        Filename.concat (Filename.concat dir_name "sessions")
+                        (Filename.basename project_dir) in
    let env_session, is_new_session =
       (* either create a new session, or read an existing ession *)
       let session, is_new_session =
