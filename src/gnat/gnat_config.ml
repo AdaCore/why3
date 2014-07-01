@@ -243,10 +243,13 @@ let actual_cmd ?main filename cmd =
 (* pass proof dir and prover as args *)
 
 let list_and_filter dir =
-  Array.fold_left (fun l f ->
-                   if not (Sys.is_directory (Filename.concat dir f)) then
-                     f :: l
-                   else l) [] (Sys.readdir dir)
+  try
+    Array.fold_left (fun l f ->
+                     if not (Sys.is_directory (Filename.concat dir f)) then
+                       f :: l
+                     else l) [] (Sys.readdir dir)
+  with
+  | Sys_error _ -> []
 
 let build_shared proof_dir prover =
   let prover_name = prover.Whyconf.prover.Whyconf.prover_name in
