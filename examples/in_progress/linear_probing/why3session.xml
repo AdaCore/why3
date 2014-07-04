@@ -2,3474 +2,1340 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Eprover" version="1.6" timelimit="6" memlimit="1000"/>
- <prover id="1" name="CVC3" version="2.4.1" timelimit="6" memlimit="1000"/>
- <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="6"
-  memlimit="1000"/>
- <prover id="3" name="Z3" version="2.19" timelimit="6" memlimit="1000"/>
- <prover id="4" name="CVC4" version="1.1" timelimit="6" memlimit="1000"/>
- <prover id="5" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
- <prover id="6" name="Z3" version="3.2" timelimit="6" memlimit="1000"/>
- <prover id="7" name="Eprover" version="1.8-001" timelimit="6"
-  memlimit="1000"/>
- <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="6"
-  memlimit="1000"/>
- <file name="../linear_probing.mlw"
-  expanded="true">
-  <theory name="LinearProbing"
-   expanded="true">
-   <goal name="bucket_bounds"
-    sum="d440cd55cc70202923dbbd1af37e025d">
-    <proof prover="8">
-     <result status="valid" time="0.02"/>
-    </proof>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="6" memlimit="1000"/>
+<prover id="1" name="Z3" version="2.19" timelimit="6" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.2" timelimit="6" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<file name="../linear_probing.mlw" expanded="true">
+<theory name="HashedTypeWithDummy">
+ <goal name="WP_parameter neq" expl="VC for neq" sum="9d6350826f2f01c86f97a2d808902bde">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+</theory>
+<theory name="LinearProbing" expanded="true">
+ <goal name="bucket_bounds" sum="1d95dcf7d492d33ce5aad64970a49164">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter numof_eq" expl="VC for numof_eq" sum="d958b1347ac292d859fbc83e3099e33a">
+ <proof prover="3"><result status="valid" time="0.16"/></proof>
+ </goal>
+ <goal name="WP_parameter dummy_const" expl="VC for dummy_const" sum="5174af9fbdcac004be42cbd33c0bdaaf">
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter create" expl="VC for create" sum="ee4e0f871978a4f8e5520578a346ad3a">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter create.1" expl="1. array creation size" sum="ed159d083420cbcd5b0193ef70f2efa6">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter create.2" expl="2. type invariant" sum="5b0861e53b6536c38a769b1839a97f8e">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter create.3" expl="3. type invariant" sum="21d8241fa6cda724c2586e7a5780b0bd">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter create.4" expl="4. type invariant" sum="2991d0270ae3f7863204ab9e4a69e223">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter create.5" expl="5. type invariant" sum="14e480e68b6f699c760593c94a71ad08">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter create.6" expl="6. type invariant" sum="bef57513f473766366c193049be6b06c">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter create.7" expl="7. postcondition" sum="a71cbcea8ce05d7c3070784becdd507c">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter clear" expl="VC for clear" sum="2ad38e005a6e54cd810557e828158a93">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter clear.1" expl="1. precondition" sum="54a7ed1756e5835a789c34ab4af77c45">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter clear.2" expl="2. type invariant" sum="7a6a5d4fb395f0f49e583aaac145ca24">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter clear.3" expl="3. type invariant" sum="02e3e1daf1cb7b920600740cc30fc545">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter clear.4" expl="4. type invariant" sum="d25e2a2539e69df9d4fd4825437571f9">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter clear.5" expl="5. type invariant" sum="d907027e864d40315eb30b6dc21a711c">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter clear.6" expl="6. type invariant" sum="deb7bcb317b8792b07ff2699d05a085e">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter clear.7" expl="7. type invariant" sum="451bb5102116b70ec0f029cb8b8e5a8e">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter clear.8" expl="8. postcondition" sum="ec79ba2e0b049668a417cca35b9474b9">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter clear.9" expl="9. postcondition" sum="fe378c1c731bf68408c146a8f37b74f3">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter find" expl="VC for find" sum="f70660dce240484461dd4030c7c400e4">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter find.1" expl="1. index in array bounds" sum="a867e7fc1cfdd65b5b88dba8f8524e03">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter find.2" expl="2. postcondition" sum="d712eced158b6929036d365fd8c694bf">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.3" expl="3. postcondition" sum="294126b486984b56eac6f20c876320a0">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.4" expl="4. postcondition" sum="75c15bcefc0747bef9b9b610b9982aac">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.5" expl="5. index in array bounds" sum="53b59f39990793bbe871048ce1901b84">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.6" expl="6. postcondition" sum="8f3df8d62533dbce84c5372074347b24">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.7" expl="7. postcondition" sum="1d40bd3b14bc9c3ae07bb9b3f54a3725">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter find.8" expl="8. postcondition" sum="35a69aaf813ae4effde335b1b727cc8f">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.9" expl="9. variant decrease" sum="0c25d40f4f312e52b5ea5e9719177266">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter find.9.1" expl="1." sum="92e24a4924d3dcb05db2a4722f663307">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter numof_eq" expl="VC for numof_eq"
-    sum="6a9a7291683cbd4145e164d18607feac">
-    <label name="why3:lemma"/>
-    <label name="expl:VC for numof_eq"/>
-    <proof prover="5">
-     <result status="valid" time="0.03"/>
-    </proof>
+   <goal name="WP_parameter find.9.2" expl="2." sum="c4135fd79318d8fda28b2eb2a4699aff">
+   <proof prover="3"><result status="valid" time="0.09"/></proof>
    </goal>
-   <goal name="WP_parameter dummy_const" expl="VC for dummy_const"
-    sum="aa1739be9860e706aca87a6390c452a6">
-    <label name="why3:lemma"/>
-    <label name="expl:VC for dummy_const"/>
-    <proof prover="5">
-     <result status="valid" time="0.02"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter find.10" expl="10. precondition" sum="5840e8f7fe846c41d5f664729e933f42">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.11" expl="11. precondition" sum="9719366a2403d1844e0b16b66b4a3924">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter find.12" expl="12. precondition" sum="85327a48decb55c748707959eca7aeda">
+  <proof prover="4"><result status="valid" time="2.29"/></proof>
+  </goal>
+  <goal name="WP_parameter find.13" expl="13. precondition" sum="183620cafc0a497a5cf22c3dab8b772e">
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter find.14" expl="14. postcondition" sum="d77d7223e37b09e4c9deea6a7aba5084">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.15" expl="15. postcondition" sum="52636cc4a484c141c2b3b5db15658ba3">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter find.16" expl="16. postcondition" sum="3b5223343825c7500a39b4e38a31bfe8">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.17" expl="17. precondition" sum="1ad85bfe0c7ae4bb209753ab6354031d">
+  <proof prover="4"><result status="valid" time="0.17"/></proof>
+  </goal>
+  <goal name="WP_parameter find.18" expl="18. precondition" sum="45baae2f6b925beb7ede5145d5bc4a49">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.19" expl="19. precondition" sum="6424c689a368ef1f4209b15acdc59210">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.20" expl="20. precondition" sum="aded3deb5740a8a4eb45f597d1b6461f">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.21" expl="21. postcondition" sum="23262a77036e995dc3303a93144b91be">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter find.22" expl="22. postcondition" sum="6c6c6453b2bd6e9972c5f5d280f4f046">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.23" expl="23. postcondition" sum="e8e358692982a53c4bd29a94c811a0a7">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter mem" expl="VC for mem" sum="b4faf186e169b99e77c71b529cd3bbbf">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter mem.1" expl="1. precondition" sum="e81b76edaeb94e952209e065d321cc52">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter mem.2" expl="2. precondition" sum="cf6e9cc1309c7d32a4790bd9c6e3c50e">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mem.3" expl="3. index in array bounds" sum="3101dbf5148b96ec862a4752e40ddd4b">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mem.4" expl="4. postcondition" sum="5190dad98679cc54cfe9fd28be294ae3">
+  <proof prover="2"><result status="valid" time="0.34"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter resize" expl="VC for resize" sum="bcc600751a219fe3587208bbbb9b4b5b">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter resize.1" expl="1. array creation size" sum="5fa251d773d97478dd76ad251fdc818b">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.2" expl="2. type invariant" sum="74880d51fdfbe625792dce14b58b4b64">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.3" expl="3. type invariant" sum="0ddfad26c5b4d8bad9995a1ec99c15bb">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.4" expl="4. type invariant" sum="f60232933913757862df4ed0783926b8">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.5" expl="5. type invariant" sum="3bb05703e6c8f05605fd8d64f76d69b6">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.6" expl="6. type invariant" sum="7f9a4d6273c4128ddf08939355fd86d5">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter resize.6.1" expl="1. type invariant" sum="d58bace0e2890841bee4e0bbb05425d2">
+   <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter create" expl="VC for create"
-    sum="4d5a5c32fda52ade7e9e8fcacd242c28">
-    <label name="expl:VC for create"/>
-    <transf
-     name="split_goal_wp">
-     <goal name="WP_parameter create.1" expl="1. array creation size"
-      sum="cffe1373bf42f92bf6b996e2ce720f15">
-      <label name="expl:VC for create"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter create.2" expl="2. type invariant"
-      sum="e3c0fd818f9e9f21d45e847985af678e">
-      <label name="expl:VC for create"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter create.3" expl="3. type invariant"
-      sum="ce6dfdb1d6e7185fd9f47d285dd292b2">
-      <label name="expl:VC for create"/>
-      <proof prover="5">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter create.4" expl="4. type invariant"
-      sum="39059dcfbe0bf18d99a96a34c66e0ac4">
-      <label name="expl:VC for create"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter create.5" expl="5. type invariant"
-      sum="6482932609bb51e62dc9d92761aa44d2">
-      <label name="expl:VC for create"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter create.6" expl="6. type invariant"
-      sum="cf92f71ebd9df8f9de5e5598a7a7394c">
-      <label name="expl:VC for create"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter create.7" expl="7. postcondition"
-      sum="7377598a4f2ae586015188dc24049944">
-      <label name="expl:VC for create"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter resize.6.2" expl="2. type invariant" sum="5bb62e6ac7ec8893335e287735c04661">
+   <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter clear" expl="VC for clear"
-    sum="003ed72523032fd9c7b13c3f786da650">
-    <label name="expl:VC for clear"/>
-    <transf
-     name="split_goal_wp">
-     <goal name="WP_parameter clear.1" expl="1. precondition"
-      sum="8e85a5b48f137fce9641e4949286da65">
-      <label name="expl:VC for clear"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter clear.2" expl="2. type invariant"
-      sum="f9dd1ab94f7f7a7df8d569cb03077d28">
-      <label name="expl:VC for clear"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter clear.3" expl="3. type invariant"
-      sum="2c5361c14e72fd1becac5d0c7ae0c6ba">
-      <label name="expl:VC for clear"/>
-      <proof prover="5">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter clear.4" expl="4. type invariant"
-      sum="3d5f07122c667ad0616183073d3d9174">
-      <label name="expl:VC for clear"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter clear.5" expl="5. type invariant"
-      sum="4bca9da72b030a9b01d8ac9c433012a2">
-      <label name="expl:VC for clear"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter clear.6" expl="6. type invariant"
-      sum="090a58bcc32fd9998d473bc8f9e81c2b">
-      <label name="expl:VC for clear"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter clear.7" expl="7. type invariant"
-      sum="374e54634e582d825ed01b8e792d1c08">
-      <label name="expl:VC for clear"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter clear.8" expl="8. postcondition"
-      sum="6ce8c179895140ca8cd03876659729a4">
-      <label name="expl:VC for clear"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter clear.9" expl="9. postcondition"
-      sum="54a7944683afc0c3efab0f67bb144615">
-      <label name="expl:VC for clear"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter resize.6.3" expl="3. type invariant" sum="10b89dba28139b73660d317744c2cc8a">
+   <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter find" expl="VC for find"
-    sum="60c3863412ca8f5e62caef60771df630">
-    <label name="expl:VC for find"/>
-    <transf
-     name="split_goal_wp">
-     <goal name="WP_parameter find.1" expl="1. index in array bounds"
-      sum="dfe12a091f8d4dba9753fe5f98ce6ebb">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.2" expl="2. postcondition"
-      sum="e1d5ff53ee7a067db27337736f68c755">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.3" expl="3. postcondition"
-      sum="4d142418a2cad3be2c0f4b4f714d8e29">
-      <label name="expl:VC for find"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.4" expl="4. postcondition"
-      sum="a1719c488694944f91ec6287bb2b5947">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.5" expl="5. index in array bounds"
-      sum="5e0cdf00f8b69d861c526daaa17e602a">
-      <label name="expl:VC for find"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.6" expl="6. postcondition"
-      sum="6e63ce7c4bd3b2f2266e6011e41cb2bb">
-      <label name="expl:VC for find"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.7" expl="7. postcondition"
-      sum="a8042ca632436eaa1ec9d539472f7b75">
-      <label name="expl:VC for find"/>
-      <proof prover="5">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.8" expl="8. postcondition"
-      sum="b7a44ea493a553a7abc58786f75b3b33">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.9" expl="9. variant decrease"
-      sum="742a9c85dceb826de587d02c40892c6b">
-      <label name="expl:VC for find"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter find.9.1" expl="1."
-        sum="7f2fe427252c05e6bbadda8178eee807">
-        <label name="expl:VC for find"/>
-        <proof prover="8">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.9.2" expl="2."
-        sum="c0ae80cb30be5728f0bab53669e17b26">
-        <label name="expl:VC for find"/>
-        <proof prover="5">
-         <result status="valid" time="0.51"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.10" expl="10. precondition"
-      sum="623c5909ecd25e2080dfbb65d26cf3fb">
-      <label name="expl:VC for find"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.11" expl="11. precondition"
-      sum="fd9da6ed710c7f1a6a596dcf0994e866">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.12" expl="12. precondition"
-      sum="28aa603161d886d56498e9cf9446e092">
-      <label name="expl:VC for find"/>
-      <proof prover="2">
-       <result status="valid" time="1.94"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="1.92"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.13" expl="13. precondition"
-      sum="f258d67d3e681c07d39ab2e88909c075">
-      <label name="expl:VC for find"/>
-      <proof prover="5">
-       <result status="valid" time="1.18"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.14" expl="14. postcondition"
-      sum="531bd62ef59d22b1b18a45e80ba1156a">
-      <label name="expl:VC for find"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.15" expl="15. postcondition"
-      sum="15aa4ea9c3be762deea7a619defda42b">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.16" expl="16. postcondition"
-      sum="c9a191dcdc42480b9453ffdb5f9bedb1">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.17" expl="17. precondition"
-      sum="0d578fee337ec41a54b93e1c8cd99f70">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.46"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.18" expl="18. precondition"
-      sum="5c718d46b9f3595325c02b955d01149b">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.19" expl="19. precondition"
-      sum="9dcc8888d27a400f8c181c921f81252b">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.20" expl="20. precondition"
-      sum="7d866b148545fb0c9b5111a8cc4dca89">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.21" expl="21. postcondition"
-      sum="60e39f9faa6899a7029dbe206a10a485">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.22" expl="22. postcondition"
-      sum="2e2db9343d33ff7ca6795fa442dc45df">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.23" expl="23. postcondition"
-      sum="eeb03327c7ddfcf09e6f64dc48486e94">
-      <label name="expl:VC for find"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter resize.6.4" expl="4. type invariant" sum="cff6e4bcb2336803cd8808f64204c182">
+   <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter mem" expl="VC for mem"
-    sum="39868a912e073905dfdd884c7d017c7f">
-    <label name="expl:VC for mem"/>
-    <transf
-     name="split_goal_wp">
-     <goal name="WP_parameter mem.1" expl="1. precondition"
-      sum="27d828be6c0e220b381a60911b1df855">
-      <label name="expl:VC for mem"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter mem.2" expl="2. precondition"
-      sum="f6a01c71a27ce3d79a2e1c4098aee19c">
-      <label name="expl:VC for mem"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter mem.3" expl="3. index in array bounds"
-      sum="3505a81ee43b93a2937d942b90e86d74">
-      <label name="expl:VC for mem"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter mem.4" expl="4. postcondition"
-      sum="f1c9f933d17f6973d2fe10b48faa178f">
-      <label name="expl:VC for mem"/>
-      <metas>
-       <ts_pos name="real" arity="0" id="2"
-        ip_theory="BuiltIn">
-        <ip_library name="why3"/>
-        <ip_qualid name="real"/>
-       </ts_pos>
-       <ts_pos name="tuple0" arity="0" id="20"
-        ip_theory="Tuple0">
-        <ip_library name="why3"/>
-        <ip_qualid name="tuple0"/>
-       </ts_pos>
-       <ts_pos name="unit" arity="0" id="21"
-        ip_theory="Unit">
-        <ip_library name="why3"/>
-        <ip_qualid name="unit"/>
-       </ts_pos>
-       <ts_pos name="option" arity="1" id="43325"
-        ip_theory="Option">
-        <ip_library name="option"/>
-        <ip_qualid name="option"/>
-       </ts_pos>
-       <ts_pos name="list" arity="1" id="43329"
-        ip_theory="List">
-        <ip_library name="list"/>
-        <ip_qualid name="list"/>
-       </ts_pos>
-       <ts_pos name="ref" arity="1" id="45441"
-        ip_theory="Ref">
-        <ip_library name="ref"/>
-        <ip_qualid name="ref"/>
-       </ts_pos>
-       <ts_pos name="param" arity="0" id="46685"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="param"/>
-       </ts_pos>
-       <ts_pos name="t" arity="0" id="47033"
-        ip_theory="LinearProbing">
-        <ip_qualid name="t"/>
-       </ts_pos>
-       <ls_pos name="infix =" id="10"
-        ip_theory="BuiltIn">
-        <ip_library name="why3"/>
-        <ip_qualid name="infix ="/>
-       </ls_pos>
-       <ls_pos name="zero" id="41308"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="zero"/>
-       </ls_pos>
-       <ls_pos name="one" id="41309"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="one"/>
-       </ls_pos>
-       <ls_pos name="infix &lt;" id="41310"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="infix &lt;"/>
-       </ls_pos>
-       <ls_pos name="infix +" id="42397"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="infix +"/>
-       </ls_pos>
-       <ls_pos name="prefix -" id="42398"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="prefix -"/>
-       </ls_pos>
-       <ls_pos name="infix *" id="42399"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="infix *"/>
-       </ls_pos>
-       <ls_pos name="infix -" id="42447"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="infix -"/>
-       </ls_pos>
-       <ls_pos name="infix &gt;=" id="42467"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="infix &gt;="/>
-       </ls_pos>
-       <ls_pos name="abs" id="42512"
-        ip_theory="Abs">
-        <ip_library name="int"/>
-        <ip_qualid name="abs"/>
-       </ls_pos>
-       <ls_pos name="div" id="42763"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="div"/>
-       </ls_pos>
-       <ls_pos name="mod" id="42766"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="mod"/>
-       </ls_pos>
-       <ls_pos name="mem" id="43353"
-        ip_theory="Mem">
-        <ip_library name="list"/>
-        <ip_qualid name="mem"/>
-       </ls_pos>
-       <ls_pos name="get" id="43953"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="get"/>
-       </ls_pos>
-       <ls_pos name="set" id="43956"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="set"/>
-       </ls_pos>
-       <ls_pos name="mixfix []" id="43963"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="mixfix []"/>
-       </ls_pos>
-       <ls_pos name="mixfix [&lt;-]" id="43976"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="mixfix [&lt;-]"/>
-       </ls_pos>
-       <ls_pos name="const" id="44007"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="const"/>
-       </ls_pos>
-       <ls_pos name="prefix !" id="45447"
-        ip_theory="Ref">
-        <ip_library name="ref"/>
-        <ip_qualid name="prefix !"/>
-       </ls_pos>
-       <ls_pos name="get" id="45599"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="get"/>
-       </ls_pos>
-       <ls_pos name="set" id="45614"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="set"/>
-       </ls_pos>
-       <ls_pos name="mixfix []" id="45639"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="mixfix []"/>
-       </ls_pos>
-       <ls_pos name="mixfix [&lt;-]" id="45656"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="mixfix [&lt;-]"/>
-       </ls_pos>
-       <ls_pos name="make" id="45757"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="make"/>
-       </ls_pos>
-       <ls_pos name="dummy" id="46644"
-        ip_theory="LinearProbing">
-        <ip_qualid name="dummy"/>
-       </ls_pos>
-       <ls_pos name="hash" id="46645"
-        ip_theory="LinearProbing">
-        <ip_qualid name="hash"/>
-       </ls_pos>
-       <ls_pos name="pr" id="46689"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="pr"/>
-       </ls_pos>
-       <ls_pos name="num_of" id="46706"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of"/>
-       </ls_pos>
-       <ls_pos name="numof" id="46787"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="numof"/>
-       </ls_pos>
-       <ls_pos name="next" id="47850"
-        ip_theory="LinearProbing">
-        <ip_qualid name="next"/>
-       </ls_pos>
-       <pr_pos name="Assoc" id="42400"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Assoc"/>
-       </pr_pos>
-       <pr_pos name="Unit_def_l" id="42407"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Unit_def_l"/>
-       </pr_pos>
-       <pr_pos name="Unit_def_r" id="42410"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Unit_def_r"/>
-       </pr_pos>
-       <pr_pos name="Inv_def_l" id="42413"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Inv_def_l"/>
-       </pr_pos>
-       <pr_pos name="Inv_def_r" id="42416"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Inv_def_r"/>
-       </pr_pos>
-       <pr_pos name="Comm" id="42419"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Comm"/>
-        <ip_qualid name="Comm"/>
-       </pr_pos>
-       <pr_pos name="Assoc" id="42424"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Assoc"/>
-        <ip_qualid name="Assoc"/>
-       </pr_pos>
-       <pr_pos name="Mul_distr_l" id="42431"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Mul_distr_l"/>
-       </pr_pos>
-       <pr_pos name="Mul_distr_r" id="42438"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Mul_distr_r"/>
-       </pr_pos>
-       <pr_pos name="Comm" id="42456"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Comm"/>
-        <ip_qualid name="Comm"/>
-       </pr_pos>
-       <pr_pos name="Unitary" id="42461"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Unitary"/>
-       </pr_pos>
-       <pr_pos name="NonTrivialRing" id="42464"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="NonTrivialRing"/>
-       </pr_pos>
-       <pr_pos name="Refl" id="42476"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Refl"/>
-       </pr_pos>
-       <pr_pos name="Trans" id="42479"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Trans"/>
-       </pr_pos>
-       <pr_pos name="Antisymm" id="42486"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Antisymm"/>
-       </pr_pos>
-       <pr_pos name="Total" id="42491"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Total"/>
-       </pr_pos>
-       <pr_pos name="ZeroLessOne" id="42496"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="ZeroLessOne"/>
-       </pr_pos>
-       <pr_pos name="CompatOrderAdd" id="42497"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CompatOrderAdd"/>
-       </pr_pos>
-       <pr_pos name="CompatOrderMult" id="42504"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CompatOrderMult"/>
-       </pr_pos>
-       <pr_pos name="Abs_le" id="42517"
-        ip_theory="Abs">
-        <ip_library name="int"/>
-        <ip_qualid name="Abs_le"/>
-       </pr_pos>
-       <pr_pos name="Abs_pos" id="42522"
-        ip_theory="Abs">
-        <ip_library name="int"/>
-        <ip_qualid name="Abs_pos"/>
-       </pr_pos>
-       <pr_pos name="Div_mod" id="42769"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_mod"/>
-       </pr_pos>
-       <pr_pos name="Div_bound" id="42774"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_bound"/>
-       </pr_pos>
-       <pr_pos name="Mod_bound" id="42779"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_bound"/>
-       </pr_pos>
-       <pr_pos name="Div_sign_pos" id="42784"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_sign_pos"/>
-       </pr_pos>
-       <pr_pos name="Div_sign_neg" id="42789"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_sign_neg"/>
-       </pr_pos>
-       <pr_pos name="Mod_sign_pos" id="42794"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_sign_pos"/>
-       </pr_pos>
-       <pr_pos name="Mod_sign_neg" id="42799"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_sign_neg"/>
-       </pr_pos>
-       <pr_pos name="Rounds_toward_zero" id="42804"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Rounds_toward_zero"/>
-       </pr_pos>
-       <pr_pos name="Div_1" id="42809"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_1"/>
-       </pr_pos>
-       <pr_pos name="Mod_1" id="42812"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_1"/>
-       </pr_pos>
-       <pr_pos name="Div_inf" id="42815"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_inf"/>
-       </pr_pos>
-       <pr_pos name="Mod_inf" id="42820"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_inf"/>
-       </pr_pos>
-       <pr_pos name="Div_mult" id="42825"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_mult"/>
-       </pr_pos>
-       <pr_pos name="Mod_mult" id="42832"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_mult"/>
-       </pr_pos>
-       <pr_pos name="Select_eq" id="43989"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="Select_eq"/>
-       </pr_pos>
-       <pr_pos name="Select_neq" id="43998"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="Select_neq"/>
-       </pr_pos>
-       <pr_pos name="Const" id="44009"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="Const"/>
-       </pr_pos>
-       <pr_pos name="hash_nonneg" id="46647"
-        ip_theory="LinearProbing">
-        <ip_qualid name="hash_nonneg"/>
-       </pr_pos>
-       <pr_pos name="bucket_bounds" id="46662"
-        ip_theory="LinearProbing">
-        <ip_qualid name="bucket_bounds"/>
-       </pr_pos>
-       <pr_pos name="Num_of_empty" id="46707"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_empty"/>
-       </pr_pos>
-       <pr_pos name="Num_of_right_no_add" id="46712"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_right_no_add"/>
-       </pr_pos>
-       <pr_pos name="Num_of_right_add" id="46717"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_right_add"/>
-       </pr_pos>
-       <pr_pos name="Num_of_bounds" id="46722"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_bounds"/>
-       </pr_pos>
-       <pr_pos name="Num_of_append" id="46727"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_append"/>
-       </pr_pos>
-       <pr_pos name="Num_of_left_no_add" id="46733"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_left_no_add"/>
-       </pr_pos>
-       <pr_pos name="Num_of_left_add" id="46738"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_left_add"/>
-       </pr_pos>
-       <pr_pos name="Empty" id="46743"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Empty"/>
-       </pr_pos>
-       <pr_pos name="Full" id="46749"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Full"/>
-       </pr_pos>
-       <pr_pos name="num_of_increasing" id="46755"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of_increasing"/>
-       </pr_pos>
-       <pr_pos name="num_of_strictly_increasing" id="46761"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of_strictly_increasing"/>
-       </pr_pos>
-       <pr_pos name="num_of_change_any" id="46768"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of_change_any"/>
-       </pr_pos>
-       <pr_pos name="num_of_change_some" id="46776"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of_change_some"/>
-       </pr_pos>
-       <pr_pos name="numof_eq" id="47021"
-        ip_theory="LinearProbing">
-        <ip_qualid name="numof_eq"/>
-       </pr_pos>
-       <pr_pos name="dummy_const" id="47162"
-        ip_theory="LinearProbing">
-        <ip_qualid name="dummy_const"/>
-       </pr_pos>
-       <meta name="remove_logic">
-        <meta_arg_ls id="10"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="41308"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="41309"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="41310"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42397"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42398"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42399"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42447"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42467"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42512"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42763"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42766"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43353"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43953"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43956"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43963"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43976"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="44007"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45447"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45599"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45614"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45639"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45656"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45757"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46644"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46645"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46689"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46706"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46787"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="47850"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42400"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42407"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42410"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42413"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42416"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42419"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42424"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42431"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42438"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42456"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42461"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42464"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42476"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42479"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42486"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42491"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42496"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42497"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42504"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42517"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42522"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42769"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42774"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42779"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42784"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42789"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42794"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42799"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42804"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42809"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42812"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42815"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42820"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42825"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42832"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="43989"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="43998"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="44009"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46647"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46662"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46707"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46712"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46717"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46722"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46727"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46733"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46738"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46743"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46749"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46755"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46761"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46768"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46776"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="47021"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="47162"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="2"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="20"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="21"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="43325"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="43329"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="45441"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="46685"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="47033"/>
-       </meta>
-       <goal name="WP_parameter mem.4" expl="4. postcondition"
-        sum="69b544fff8f7dedb7bf672a556b8de37">
-        <label name="expl:VC for mem"/>
-        <transf
-         name="eliminate_builtin">
-         <goal name="WP_parameter mem.4.1" expl="1. postcondition"
-          sum="e19bc31680b6442c43de1b821689e560">
-          <label name="expl:VC for mem"/>
-          <proof prover="5" timelimit="30">
-           <result status="valid" time="0.01"/>
-          </proof>
-          <proof prover="8" timelimit="30">
-           <result status="valid" time="0.04"/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-      </metas>
-     </goal>
-    </transf>
+   <goal name="WP_parameter resize.6.5" expl="5. type invariant" sum="8b44ef891cd73cb99cfe1acaad7be34c">
+   <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter resize" expl="VC for resize"
-    sum="a8bb3732c9c02ed8393160de86a172bd">
-    <label name="expl:VC for resize"/>
-    <transf
-     name="split_goal_wp">
-     <goal name="WP_parameter resize.1" expl="1. array creation size"
-      sum="bfe307d19e507bd37100bb0a5803096d">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.2" expl="2. type invariant"
-      sum="6ce6e544d60f5c4b98f50b757d5f0591">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.3" expl="3. type invariant"
-      sum="c5e404ded2d9a2320e9a439973ac4073">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.4" expl="4. type invariant"
-      sum="b6c44581d5f33c9aba6b3e44b9303134">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.5" expl="5. type invariant"
-      sum="706090011eb62a1c1c717eb1b577cd34">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.6" expl="6. type invariant"
-      sum="8d914a28e44ea856042b6870cd8713d1">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.7" expl="7. type invariant"
-      sum="d1c60a9a945e06d0b453e9c83ba9e2ca">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.8" expl="8. postcondition"
-      sum="baa39da8fe2a54c3de7572bfed6793a4">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.9" expl="9. loop invariant init"
-      sum="3caa9edff8451a6abf14332ae01ae7e7">
-      <label name="expl:VC for resize"/>
-      <proof prover="5">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.10" expl="10. loop invariant init"
-      sum="ba29016f8132d4ea5ec830c79c017176">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.11" expl="11. loop invariant init"
-      sum="af4d1ae17d829543db201aea6e3693cd">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.12" expl="12. index in array bounds"
-      sum="a453a76790475cc0004161dfe02e2830">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.13" expl="13. type invariant"
-      sum="5cc6feba5b8c39a8436591250c8256af">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.14" expl="14. precondition"
-      sum="ab2d4fa421e2c9ac3e12bc77e05111c6">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.15" expl="15. precondition"
-      sum="3815572596acd2ce3390967ef26d80f3">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.16" expl="16. assertion"
-      sum="e7f6aae5e844e1f5cbadf261293fa625">
-      <label name="expl:VC for resize"/>
-      <proof prover="5">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.17" expl="17. index in array bounds"
-      sum="a394e1594ffa637e0929fb585c66bdd3">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.18" expl="18. assertion"
-      sum="db5a7ccf58e4f30e1160c4188cbc3352">
-      <label name="expl:VC for resize"/>
-      <proof prover="5">
-       <result status="valid" time="0.20"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.19"
-      expl="19. loop invariant preservation"
-      sum="5e9c7b3af19b338d43d3d34786028528">
-      <label name="expl:VC for resize"/>
-      <proof prover="5">
-       <result status="valid" time="0.15"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.20"
-      expl="20. loop invariant preservation"
-      sum="0d4f4e8b28030d9b00099f405ed47806">
-      <label name="expl:VC for resize"/>
-      <proof prover="5">
-       <result status="valid" time="1.43"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.21"
-      expl="21. loop invariant preservation"
-      sum="d885798258a07f7a5650ba3818ec3013">
-      <label name="expl:VC for resize"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter resize.21.1"
-        expl="1. loop invariant preservation"
-        sum="597b166a632fcffed37c77bd01f8f6f0">
-        <label name="expl:VC for resize"/>
-        <proof prover="8">
-         <result status="valid" time="1.47"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter resize.21.2"
-        expl="2. loop invariant preservation"
-        sum="87709da20a16bcdbd45e518044fccffe">
-        <label name="expl:VC for resize"/>
-        <proof prover="5">
-         <result status="valid" time="3.25"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter resize.21.3"
-        expl="3. loop invariant preservation"
-        sum="061e9c0dc22092b42800ec8e76fb1cac">
-        <label name="expl:VC for resize"/>
-        <proof prover="8">
-         <result status="valid" time="4.62"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter resize.21.4"
-        expl="4. loop invariant preservation"
-        sum="4d5ebb13da8362fcf9180bce66dd5592">
-        <label name="expl:VC for resize"/>
-        <proof prover="5">
-         <result status="valid" time="3.96"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter resize.21.5"
-        expl="5. loop invariant preservation"
-        sum="aa4fe338e233ad3d53e73235234f4713">
-        <label name="expl:VC for resize"/>
-        <metas>
-         <ts_pos name="real" arity="0" id="2"
-          ip_theory="BuiltIn">
-          <ip_library name="why3"/>
-          <ip_qualid name="real"/>
-         </ts_pos>
-         <ts_pos name="tuple0" arity="0" id="20"
-          ip_theory="Tuple0">
-          <ip_library name="why3"/>
-          <ip_qualid name="tuple0"/>
-         </ts_pos>
-         <ts_pos name="unit" arity="0" id="21"
-          ip_theory="Unit">
-          <ip_library name="why3"/>
-          <ip_qualid name="unit"/>
-         </ts_pos>
-         <ts_pos name="option" arity="1" id="43325"
-          ip_theory="Option">
-          <ip_library name="option"/>
-          <ip_qualid name="option"/>
-         </ts_pos>
-         <ts_pos name="list" arity="1" id="43329"
-          ip_theory="List">
-          <ip_library name="list"/>
-          <ip_qualid name="list"/>
-         </ts_pos>
-         <ts_pos name="ref" arity="1" id="45441"
-          ip_theory="Ref">
-          <ip_library name="ref"/>
-          <ip_qualid name="ref"/>
-         </ts_pos>
-         <ts_pos name="param" arity="0" id="46685"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="param"/>
-         </ts_pos>
-         <ts_pos name="t" arity="0" id="47033"
-          ip_theory="LinearProbing">
-          <ip_qualid name="t"/>
-         </ts_pos>
-         <ls_pos name="infix =" id="10"
-          ip_theory="BuiltIn">
-          <ip_library name="why3"/>
-          <ip_qualid name="infix ="/>
-         </ls_pos>
-         <ls_pos name="zero" id="41308"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="zero"/>
-         </ls_pos>
-         <ls_pos name="one" id="41309"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="one"/>
-         </ls_pos>
-         <ls_pos name="infix &lt;" id="41310"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="infix &lt;"/>
-         </ls_pos>
-         <ls_pos name="infix +" id="42397"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="infix +"/>
-         </ls_pos>
-         <ls_pos name="prefix -" id="42398"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="prefix -"/>
-         </ls_pos>
-         <ls_pos name="infix *" id="42399"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="infix *"/>
-         </ls_pos>
-         <ls_pos name="abs" id="42512"
-          ip_theory="Abs">
-          <ip_library name="int"/>
-          <ip_qualid name="abs"/>
-         </ls_pos>
-         <ls_pos name="div" id="42763"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="div"/>
-         </ls_pos>
-         <ls_pos name="mod" id="42766"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="mod"/>
-         </ls_pos>
-         <ls_pos name="mem" id="43353"
-          ip_theory="Mem">
-          <ip_library name="list"/>
-          <ip_qualid name="mem"/>
-         </ls_pos>
-         <ls_pos name="get" id="43953"
-          ip_theory="Map">
-          <ip_library name="map"/>
-          <ip_qualid name="get"/>
-         </ls_pos>
-         <ls_pos name="set" id="43956"
-          ip_theory="Map">
-          <ip_library name="map"/>
-          <ip_qualid name="set"/>
-         </ls_pos>
-         <ls_pos name="mixfix []" id="43963"
-          ip_theory="Map">
-          <ip_library name="map"/>
-          <ip_qualid name="mixfix []"/>
-         </ls_pos>
-         <ls_pos name="mixfix [&lt;-]" id="43976"
-          ip_theory="Map">
-          <ip_library name="map"/>
-          <ip_qualid name="mixfix [&lt;-]"/>
-         </ls_pos>
-         <ls_pos name="const" id="44007"
-          ip_theory="Map">
-          <ip_library name="map"/>
-          <ip_qualid name="const"/>
-         </ls_pos>
-         <ls_pos name="prefix !" id="45447"
-          ip_theory="Ref">
-          <ip_library name="ref"/>
-          <ip_qualid name="prefix !"/>
-         </ls_pos>
-         <ls_pos name="get" id="45599"
-          ip_theory="Array">
-          <ip_library name="array"/>
-          <ip_qualid name="get"/>
-         </ls_pos>
-         <ls_pos name="set" id="45614"
-          ip_theory="Array">
-          <ip_library name="array"/>
-          <ip_qualid name="set"/>
-         </ls_pos>
-         <ls_pos name="mixfix []" id="45639"
-          ip_theory="Array">
-          <ip_library name="array"/>
-          <ip_qualid name="mixfix []"/>
-         </ls_pos>
-         <ls_pos name="mixfix [&lt;-]" id="45656"
-          ip_theory="Array">
-          <ip_library name="array"/>
-          <ip_qualid name="mixfix [&lt;-]"/>
-         </ls_pos>
-         <ls_pos name="make" id="45757"
-          ip_theory="Array">
-          <ip_library name="array"/>
-          <ip_qualid name="make"/>
-         </ls_pos>
-         <ls_pos name="dummy" id="46644"
-          ip_theory="LinearProbing">
-          <ip_qualid name="dummy"/>
-         </ls_pos>
-         <ls_pos name="hash" id="46645"
-          ip_theory="LinearProbing">
-          <ip_qualid name="hash"/>
-         </ls_pos>
-         <ls_pos name="pr" id="46689"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="pr"/>
-         </ls_pos>
-         <ls_pos name="num_of" id="46706"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="num_of"/>
-         </ls_pos>
-         <ls_pos name="numof" id="46787"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="numof"/>
-         </ls_pos>
-         <ls_pos name="next" id="47850"
-          ip_theory="LinearProbing">
-          <ip_qualid name="next"/>
-         </ls_pos>
-         <pr_pos name="Assoc" id="42400"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="CommutativeGroup"/>
-          <ip_qualid name="Assoc"/>
-         </pr_pos>
-         <pr_pos name="Unit_def_l" id="42407"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="CommutativeGroup"/>
-          <ip_qualid name="Unit_def_l"/>
-         </pr_pos>
-         <pr_pos name="Unit_def_r" id="42410"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="CommutativeGroup"/>
-          <ip_qualid name="Unit_def_r"/>
-         </pr_pos>
-         <pr_pos name="Inv_def_l" id="42413"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="CommutativeGroup"/>
-          <ip_qualid name="Inv_def_l"/>
-         </pr_pos>
-         <pr_pos name="Inv_def_r" id="42416"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="CommutativeGroup"/>
-          <ip_qualid name="Inv_def_r"/>
-         </pr_pos>
-         <pr_pos name="Comm" id="42419"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="CommutativeGroup"/>
-          <ip_qualid name="Comm"/>
-          <ip_qualid name="Comm"/>
-         </pr_pos>
-         <pr_pos name="Assoc" id="42424"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="Assoc"/>
-          <ip_qualid name="Assoc"/>
-         </pr_pos>
-         <pr_pos name="Mul_distr_l" id="42431"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="Mul_distr_l"/>
-         </pr_pos>
-         <pr_pos name="Mul_distr_r" id="42438"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="Mul_distr_r"/>
-         </pr_pos>
-         <pr_pos name="Comm" id="42456"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="Comm"/>
-          <ip_qualid name="Comm"/>
-         </pr_pos>
-         <pr_pos name="Unitary" id="42461"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="Unitary"/>
-         </pr_pos>
-         <pr_pos name="NonTrivialRing" id="42464"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="NonTrivialRing"/>
-         </pr_pos>
-         <pr_pos name="Refl" id="42476"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="Refl"/>
-         </pr_pos>
-         <pr_pos name="Trans" id="42479"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="Trans"/>
-         </pr_pos>
-         <pr_pos name="Antisymm" id="42486"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="Antisymm"/>
-         </pr_pos>
-         <pr_pos name="Total" id="42491"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="Total"/>
-         </pr_pos>
-         <pr_pos name="ZeroLessOne" id="42496"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="ZeroLessOne"/>
-         </pr_pos>
-         <pr_pos name="CompatOrderAdd" id="42497"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="CompatOrderAdd"/>
-         </pr_pos>
-         <pr_pos name="CompatOrderMult" id="42504"
-          ip_theory="Int">
-          <ip_library name="int"/>
-          <ip_qualid name="CompatOrderMult"/>
-         </pr_pos>
-         <pr_pos name="Abs_le" id="42517"
-          ip_theory="Abs">
-          <ip_library name="int"/>
-          <ip_qualid name="Abs_le"/>
-         </pr_pos>
-         <pr_pos name="Abs_pos" id="42522"
-          ip_theory="Abs">
-          <ip_library name="int"/>
-          <ip_qualid name="Abs_pos"/>
-         </pr_pos>
-         <pr_pos name="Div_mod" id="42769"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Div_mod"/>
-         </pr_pos>
-         <pr_pos name="Div_bound" id="42774"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Div_bound"/>
-         </pr_pos>
-         <pr_pos name="Mod_bound" id="42779"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Mod_bound"/>
-         </pr_pos>
-         <pr_pos name="Div_sign_pos" id="42784"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Div_sign_pos"/>
-         </pr_pos>
-         <pr_pos name="Div_sign_neg" id="42789"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Div_sign_neg"/>
-         </pr_pos>
-         <pr_pos name="Mod_sign_pos" id="42794"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Mod_sign_pos"/>
-         </pr_pos>
-         <pr_pos name="Mod_sign_neg" id="42799"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Mod_sign_neg"/>
-         </pr_pos>
-         <pr_pos name="Rounds_toward_zero" id="42804"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Rounds_toward_zero"/>
-         </pr_pos>
-         <pr_pos name="Div_1" id="42809"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Div_1"/>
-         </pr_pos>
-         <pr_pos name="Mod_1" id="42812"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Mod_1"/>
-         </pr_pos>
-         <pr_pos name="Div_inf" id="42815"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Div_inf"/>
-         </pr_pos>
-         <pr_pos name="Mod_inf" id="42820"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Mod_inf"/>
-         </pr_pos>
-         <pr_pos name="Div_mult" id="42825"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Div_mult"/>
-         </pr_pos>
-         <pr_pos name="Mod_mult" id="42832"
-          ip_theory="ComputerDivision">
-          <ip_library name="int"/>
-          <ip_qualid name="Mod_mult"/>
-         </pr_pos>
-         <pr_pos name="Select_eq" id="43989"
-          ip_theory="Map">
-          <ip_library name="map"/>
-          <ip_qualid name="Select_eq"/>
-         </pr_pos>
-         <pr_pos name="Select_neq" id="43998"
-          ip_theory="Map">
-          <ip_library name="map"/>
-          <ip_qualid name="Select_neq"/>
-         </pr_pos>
-         <pr_pos name="Const" id="44009"
-          ip_theory="Map">
-          <ip_library name="map"/>
-          <ip_qualid name="Const"/>
-         </pr_pos>
-         <pr_pos name="hash_nonneg" id="46647"
-          ip_theory="LinearProbing">
-          <ip_qualid name="hash_nonneg"/>
-         </pr_pos>
-         <pr_pos name="bucket_bounds" id="46662"
-          ip_theory="LinearProbing">
-          <ip_qualid name="bucket_bounds"/>
-         </pr_pos>
-         <pr_pos name="Num_of_empty" id="46707"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="Num_of_empty"/>
-         </pr_pos>
-         <pr_pos name="Num_of_right_no_add" id="46712"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="Num_of_right_no_add"/>
-         </pr_pos>
-         <pr_pos name="Num_of_right_add" id="46717"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="Num_of_right_add"/>
-         </pr_pos>
-         <pr_pos name="Num_of_bounds" id="46722"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="Num_of_bounds"/>
-         </pr_pos>
-         <pr_pos name="Num_of_append" id="46727"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="Num_of_append"/>
-         </pr_pos>
-         <pr_pos name="Num_of_left_no_add" id="46733"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="Num_of_left_no_add"/>
-         </pr_pos>
-         <pr_pos name="Num_of_left_add" id="46738"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="Num_of_left_add"/>
-         </pr_pos>
-         <pr_pos name="Empty" id="46743"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="Empty"/>
-         </pr_pos>
-         <pr_pos name="Full" id="46749"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="Full"/>
-         </pr_pos>
-         <pr_pos name="num_of_increasing" id="46755"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="num_of_increasing"/>
-         </pr_pos>
-         <pr_pos name="num_of_strictly_increasing" id="46761"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="num_of_strictly_increasing"/>
-         </pr_pos>
-         <pr_pos name="num_of_change_any" id="46768"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="num_of_change_any"/>
-         </pr_pos>
-         <pr_pos name="num_of_change_some" id="46776"
-          ip_theory="LinearProbing">
-          <ip_qualid name="NumOfEq"/>
-          <ip_qualid name="NumOfParam"/>
-          <ip_qualid name="num_of_change_some"/>
-         </pr_pos>
-         <pr_pos name="numof_eq" id="47021"
-          ip_theory="LinearProbing">
-          <ip_qualid name="numof_eq"/>
-         </pr_pos>
-         <pr_pos name="dummy_const" id="47162"
-          ip_theory="LinearProbing">
-          <ip_qualid name="dummy_const"/>
-         </pr_pos>
-         <meta name="remove_logic">
-          <meta_arg_ls id="10"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="41308"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="41309"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="41310"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="42397"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="42398"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="42399"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="42512"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="42763"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="42766"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="43353"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="43953"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="43956"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="43963"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="43976"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="44007"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="45447"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="45599"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="45614"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="45639"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="45656"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="45757"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="46644"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="46645"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="46689"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="46706"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="46787"/>
-         </meta>
-         <meta name="remove_logic">
-          <meta_arg_ls id="47850"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42400"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42407"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42410"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42413"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42416"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42419"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42424"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42431"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42438"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42456"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42461"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42464"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42476"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42479"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42486"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42491"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42496"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42497"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42504"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42517"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42522"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42769"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42774"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42779"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42784"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42789"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42794"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42799"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42804"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42809"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42812"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42815"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42820"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42825"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="42832"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="43989"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="43998"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="44009"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46647"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46662"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46707"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46712"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46717"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46722"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46727"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46733"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46738"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46743"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46749"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46755"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46761"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46768"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="46776"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="47021"/>
-         </meta>
-         <meta name="remove_prop">
-          <meta_arg_pr id="47162"/>
-         </meta>
-         <meta name="remove_type">
-          <meta_arg_ts id="2"/>
-         </meta>
-         <meta name="remove_type">
-          <meta_arg_ts id="20"/>
-         </meta>
-         <meta name="remove_type">
-          <meta_arg_ts id="21"/>
-         </meta>
-         <meta name="remove_type">
-          <meta_arg_ts id="43325"/>
-         </meta>
-         <meta name="remove_type">
-          <meta_arg_ts id="43329"/>
-         </meta>
-         <meta name="remove_type">
-          <meta_arg_ts id="45441"/>
-         </meta>
-         <meta name="remove_type">
-          <meta_arg_ts id="46685"/>
-         </meta>
-         <meta name="remove_type">
-          <meta_arg_ts id="47033"/>
-         </meta>
-         <goal name="WP_parameter resize.21.5"
-          expl="5. loop invariant preservation"
-          sum="3998010c96ab274e2bfb3ef8e332db75">
-          <label name="expl:VC for resize"/>
-          <transf
-           name="eliminate_builtin">
-           <goal name="WP_parameter resize.21.5.1"
-            expl="1. loop invariant preservation"
-            sum="b8b1cb6ea0b60ec6b0a99e33442ea9c2">
-            <label name="expl:VC for resize"/>
-            <proof prover="1">
-             <result status="valid" time="0.08"/>
-            </proof>
-            <proof prover="8">
-             <result status="valid" time="0.26"/>
-            </proof>
-           </goal>
-          </transf>
-         </goal>
-        </metas>
-       </goal>
-       <goal name="WP_parameter resize.21.6"
-        expl="6. loop invariant preservation"
-        sum="31c032b6a36d872a1834b197c7a8f56c">
-        <label name="expl:VC for resize"/>
-        <proof prover="5">
-         <result status="valid" time="0.78"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter resize.22"
-      expl="22. loop invariant preservation"
-      sum="205ab9bd5095a408dabfa9acadd670e9">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.32"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.23"
-      expl="23. loop invariant preservation"
-      sum="441aea25acb5df6b3e6088e725374cdd">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.24"
-      expl="24. loop invariant preservation"
-      sum="5efcb05d5d56e3e84c849a1a9bf9a8cb">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.48"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.25" expl="25. type invariant"
-      sum="ecc9c67d7998bddef6a29c3c6ea9241e">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.26" expl="26. type invariant"
-      sum="706927830920b387cbde766919f6e670">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.27" expl="27. type invariant"
-      sum="18919a3ea808c255c52d066e4f765df6">
-      <label name="expl:VC for resize"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.28" expl="28. type invariant"
-      sum="4360db8195be79699c9a58ca86603b09">
-      <label name="expl:VC for resize"/>
-      <proof prover="5">
-       <result status="valid" time="0.07"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.29" expl="29. type invariant"
-      sum="38ab1d029eaf8152388809474584a63d">
-      <label name="expl:VC for resize"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter resize.29.1" expl="1. type invariant"
-        sum="dfb47eddc8d9f7934d7b3f6949c2d871">
-        <label name="expl:VC for resize"/>
-        <proof prover="5">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter resize.29.2" expl="2. type invariant"
-        sum="145aee668011d5c9cfd2f01944c72bd5">
-        <label name="expl:VC for resize"/>
-        <proof prover="5">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter resize.29.3" expl="3. type invariant"
-        sum="299dc29b23b4b55f7f5ea76c6528d858">
-        <label name="expl:VC for resize"/>
-        <proof prover="5">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter resize.29.4" expl="4. type invariant"
-        sum="9ccae6c5f61bda0fea834ccdb5e2fc63">
-        <label name="expl:VC for resize"/>
-        <proof prover="5">
-         <result status="valid" time="0.18"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter resize.29.5" expl="5. type invariant"
-        sum="fb9ce11b99426edb4b0c9e733787cc60">
-        <label name="expl:VC for resize"/>
-        <proof prover="4">
-         <result status="valid" time="0.52"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter resize.30" expl="30. type invariant"
-      sum="43d636b40f192f55f6ea2cbd8290dc5b">
-      <label name="expl:VC for resize"/>
-      <proof prover="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter resize.31" expl="31. postcondition"
-      sum="f20f5db1eecb4fbfd2a1ef240ad1cdf3">
-      <label name="expl:VC for resize"/>
-      <proof prover="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-    </transf>
+  </transf>
+  </goal>
+  <goal name="WP_parameter resize.7" expl="7. type invariant" sum="b0a050fd1280dee6e93f97b2f6df8b34">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.8" expl="8. postcondition" sum="e56bc2316566b2bc636673eb24e11b70">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.9" expl="9. loop invariant init" sum="2541b2093573fde0919a61151db4f1c2">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.78"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.10" expl="10. loop invariant init" sum="3fccb507d9a80d2066b55966c9f4606c">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.11" expl="11. loop invariant init" sum="71013fc3aafe35ad3401adb7e1c4b4b4">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.12" expl="12. index in array bounds" sum="a36c2656a67e8e1415feb317d6efd34c">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.13" expl="13. type invariant" sum="d3024d0c1e167a941f007876546626ce">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.14" expl="14. precondition" sum="eb7e9e1704ac0a9054634ce6b2e96cdc">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.15" expl="15. precondition" sum="7e7f495bfccfe14d0e508dbb75a5e8c2">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.16" expl="16. assertion" sum="967a534ab68ada59313684d95deb0c75">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.17" expl="17. index in array bounds" sum="4cd3e87fe867b58db7921992b3cc4069">
+  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.18" expl="18. assertion" sum="4e9b7a1a05933a627f977c00a2d38337">
+  <proof prover="3"><result status="valid" time="0.24"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.19" expl="19. loop invariant preservation" sum="ce0ac0804520e9dafd855befd8dd4221">
+  <proof prover="3" timelimit="20"><result status="valid" time="0.24"/></proof>
+  <metas>
+   <ts_pos name="real" arity="0" id="2"
+    ip_theory="BuiltIn">
+    <ip_library name="why3"/>
+    <ip_qualid name="real"/>
+   </ts_pos>
+   <ts_pos name="tuple0" arity="0" id="20"
+    ip_theory="Tuple0">
+    <ip_library name="why3"/>
+    <ip_qualid name="tuple0"/>
+   </ts_pos>
+   <ts_pos name="unit" arity="0" id="21"
+    ip_theory="Unit">
+    <ip_library name="why3"/>
+    <ip_qualid name="unit"/>
+   </ts_pos>
+   <ts_pos name="option" arity="1" id="2508"
+    ip_theory="Option">
+    <ip_library name="option"/>
+    <ip_qualid name="option"/>
+   </ts_pos>
+   <ts_pos name="list" arity="1" id="2512"
+    ip_theory="List">
+    <ip_library name="list"/>
+    <ip_qualid name="list"/>
+   </ts_pos>
+   <ts_pos name="ref" arity="1" id="4625"
+    ip_theory="Ref">
+    <ip_library name="ref"/>
+    <ip_qualid name="ref"/>
+   </ts_pos>
+   <ts_pos name="param" arity="0" id="5862"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="param"/>
+   </ts_pos>
+   <ts_pos name="t" arity="0" id="6253"
+    ip_theory="LinearProbing">
+    <ip_qualid name="t"/>
+   </ts_pos>
+   <ls_pos name="infix =" id="10"
+    ip_theory="BuiltIn">
+    <ip_library name="why3"/>
+    <ip_qualid name="infix ="/>
+   </ls_pos>
+   <ls_pos name="zero" id="353"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="zero"/>
+   </ls_pos>
+   <ls_pos name="one" id="354"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="one"/>
+   </ls_pos>
+   <ls_pos name="infix &lt;" id="355"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &lt;"/>
+   </ls_pos>
+   <ls_pos name="infix +" id="1447"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix +"/>
+   </ls_pos>
+   <ls_pos name="prefix -" id="1448"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="prefix -"/>
+   </ls_pos>
+   <ls_pos name="infix *" id="1449"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix *"/>
+   </ls_pos>
+   <ls_pos name="abs" id="1562"
+    ip_theory="Abs">
+    <ip_library name="int"/>
+    <ip_qualid name="abs"/>
+   </ls_pos>
+   <ls_pos name="div" id="1813"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="div"/>
+   </ls_pos>
+   <ls_pos name="mod" id="1816"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="mod"/>
+   </ls_pos>
+   <ls_pos name="keym" id="2460"
+    ip_theory="LinearProbing">
+    <ip_qualid name="HashedTypeWithDummy"/>
+    <ip_qualid name="keym"/>
+   </ls_pos>
+   <ls_pos name="eq" id="2463"
+    ip_theory="LinearProbing">
+    <ip_qualid name="HashedTypeWithDummy"/>
+    <ip_qualid name="eq"/>
+   </ls_pos>
+   <ls_pos name="hash" id="2489"
+    ip_theory="LinearProbing">
+    <ip_qualid name="HashedTypeWithDummy"/>
+    <ip_qualid name="hash"/>
+   </ls_pos>
+   <ls_pos name="dummy" id="2498"
+    ip_theory="LinearProbing">
+    <ip_qualid name="HashedTypeWithDummy"/>
+    <ip_qualid name="dummy"/>
+   </ls_pos>
+   <ls_pos name="mem" id="2536"
+    ip_theory="Mem">
+    <ip_library name="list"/>
+    <ip_qualid name="mem"/>
+   </ls_pos>
+   <ls_pos name="get" id="3137"
+    ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="get"/>
+   </ls_pos>
+   <ls_pos name="set" id="3140"
+    ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="set"/>
+   </ls_pos>
+   <ls_pos name="mixfix []" id="3147"
+    ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="mixfix []"/>
+   </ls_pos>
+   <ls_pos name="mixfix [&lt;-]" id="3160"
+    ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="mixfix [&lt;-]"/>
+   </ls_pos>
+   <ls_pos name="const" id="3191"
+    ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="const"/>
+   </ls_pos>
+   <ls_pos name="prefix !" id="4631"
+    ip_theory="Ref">
+    <ip_library name="ref"/>
+    <ip_qualid name="prefix !"/>
+   </ls_pos>
+   <ls_pos name="set" id="4798"
+    ip_theory="Array">
+    <ip_library name="array"/>
+    <ip_qualid name="set"/>
+   </ls_pos>
+   <ls_pos name="mixfix [&lt;-]" id="4840"
+    ip_theory="Array">
+    <ip_library name="array"/>
+    <ip_qualid name="mixfix [&lt;-]"/>
+   </ls_pos>
+   <ls_pos name="make" id="4941"
+    ip_theory="Array">
+    <ip_library name="array"/>
+    <ip_qualid name="make"/>
+   </ls_pos>
+   <ls_pos name="num_of" id="5874"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="num_of"/>
+   </ls_pos>
+   <ls_pos name="numofd" id="6232"
+    ip_theory="LinearProbing">
+    <ip_qualid name="numofd"/>
+   </ls_pos>
+   <ls_pos name="next" id="6956"
+    ip_theory="LinearProbing">
+    <ip_qualid name="next"/>
+   </ls_pos>
+   <pr_pos name="Assoc" id="1450"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Assoc"/>
+   </pr_pos>
+   <pr_pos name="Unit_def_l" id="1457"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Unit_def_l"/>
+   </pr_pos>
+   <pr_pos name="Unit_def_r" id="1460"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Unit_def_r"/>
+   </pr_pos>
+   <pr_pos name="Inv_def_l" id="1463"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Inv_def_l"/>
+   </pr_pos>
+   <pr_pos name="Inv_def_r" id="1466"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Inv_def_r"/>
+   </pr_pos>
+   <pr_pos name="Comm" id="1469"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Comm"/>
+    <ip_qualid name="Comm"/>
+   </pr_pos>
+   <pr_pos name="Assoc" id="1474"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Assoc"/>
+    <ip_qualid name="Assoc"/>
+   </pr_pos>
+   <pr_pos name="Mul_distr_l" id="1481"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Mul_distr_l"/>
+   </pr_pos>
+   <pr_pos name="Mul_distr_r" id="1488"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Mul_distr_r"/>
+   </pr_pos>
+   <pr_pos name="Comm" id="1506"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Comm"/>
+    <ip_qualid name="Comm"/>
+   </pr_pos>
+   <pr_pos name="Unitary" id="1511"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Unitary"/>
+   </pr_pos>
+   <pr_pos name="NonTrivialRing" id="1514"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="NonTrivialRing"/>
+   </pr_pos>
+   <pr_pos name="Refl" id="1526"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Refl"/>
+   </pr_pos>
+   <pr_pos name="Trans" id="1529"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Trans"/>
+   </pr_pos>
+   <pr_pos name="Antisymm" id="1536"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Antisymm"/>
+   </pr_pos>
+   <pr_pos name="Total" id="1541"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Total"/>
+   </pr_pos>
+   <pr_pos name="ZeroLessOne" id="1546"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="ZeroLessOne"/>
+   </pr_pos>
+   <pr_pos name="CompatOrderAdd" id="1547"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CompatOrderAdd"/>
+   </pr_pos>
+   <pr_pos name="CompatOrderMult" id="1554"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CompatOrderMult"/>
+   </pr_pos>
+   <pr_pos name="Abs_le" id="1567"
+    ip_theory="Abs">
+    <ip_library name="int"/>
+    <ip_qualid name="Abs_le"/>
+   </pr_pos>
+   <pr_pos name="Abs_pos" id="1572"
+    ip_theory="Abs">
+    <ip_library name="int"/>
+    <ip_qualid name="Abs_pos"/>
+   </pr_pos>
+   <pr_pos name="Div_mod" id="1819"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Div_mod"/>
+   </pr_pos>
+   <pr_pos name="Div_bound" id="1824"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Div_bound"/>
+   </pr_pos>
+   <pr_pos name="Mod_bound" id="1829"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Mod_bound"/>
+   </pr_pos>
+   <pr_pos name="Div_sign_pos" id="1834"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Div_sign_pos"/>
+   </pr_pos>
+   <pr_pos name="Div_sign_neg" id="1839"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Div_sign_neg"/>
+   </pr_pos>
+   <pr_pos name="Mod_sign_pos" id="1844"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Mod_sign_pos"/>
+   </pr_pos>
+   <pr_pos name="Mod_sign_neg" id="1849"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Mod_sign_neg"/>
+   </pr_pos>
+   <pr_pos name="Rounds_toward_zero" id="1854"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Rounds_toward_zero"/>
+   </pr_pos>
+   <pr_pos name="Div_1" id="1859"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Div_1"/>
+   </pr_pos>
+   <pr_pos name="Mod_1" id="1862"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Mod_1"/>
+   </pr_pos>
+   <pr_pos name="Div_inf" id="1865"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Div_inf"/>
+   </pr_pos>
+   <pr_pos name="Mod_inf" id="1870"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Mod_inf"/>
+   </pr_pos>
+   <pr_pos name="Div_mult" id="1875"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Div_mult"/>
+   </pr_pos>
+   <pr_pos name="Mod_mult" id="1882"
+    ip_theory="ComputerDivision">
+    <ip_library name="int"/>
+    <ip_qualid name="Mod_mult"/>
+   </pr_pos>
+   <pr_pos name="hash_nonneg" id="2490"
+    ip_theory="LinearProbing">
+    <ip_qualid name="HashedTypeWithDummy"/>
+    <ip_qualid name="hash_nonneg"/>
+   </pr_pos>
+   <pr_pos name="hash_eq" id="2493"
+    ip_theory="LinearProbing">
+    <ip_qualid name="HashedTypeWithDummy"/>
+    <ip_qualid name="hash_eq"/>
+   </pr_pos>
+   <pr_pos name="Select_eq" id="3173"
+    ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="Select_eq"/>
+   </pr_pos>
+   <pr_pos name="Select_neq" id="3182"
+    ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="Select_neq"/>
+   </pr_pos>
+   <pr_pos name="Const" id="3193"
+    ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="Const"/>
+   </pr_pos>
+   <pr_pos name="bucket_bounds" id="5838"
+    ip_theory="LinearProbing">
+    <ip_qualid name="bucket_bounds"/>
+   </pr_pos>
+   <pr_pos name="Num_of_empty" id="5875"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="Num_of_empty"/>
+   </pr_pos>
+   <pr_pos name="Num_of_right_add" id="5885"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="Num_of_right_add"/>
+   </pr_pos>
+   <pr_pos name="Num_of_bounds" id="5890"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="Num_of_bounds"/>
+   </pr_pos>
+   <pr_pos name="Num_of_left_no_add" id="5901"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="Num_of_left_no_add"/>
+   </pr_pos>
+   <pr_pos name="Num_of_left_add" id="5906"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="Num_of_left_add"/>
+   </pr_pos>
+   <pr_pos name="Empty" id="5911"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="Empty"/>
+   </pr_pos>
+   <pr_pos name="Full" id="5917"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="Full"/>
+   </pr_pos>
+   <pr_pos name="num_of_increasing" id="5923"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="num_of_increasing"/>
+   </pr_pos>
+   <pr_pos name="num_of_strictly_increasing" id="5929"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="num_of_strictly_increasing"/>
+   </pr_pos>
+   <pr_pos name="num_of_change_some" id="5944"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="num_of_change_some"/>
+   </pr_pos>
+   <pr_pos name="numof_eq" id="6122"
+    ip_theory="LinearProbing">
+    <ip_qualid name="NumOfDummy"/>
+    <ip_qualid name="numof_eq"/>
+   </pr_pos>
+   <meta name="remove_logic">
+    <meta_arg_ls id="10"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="353"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="354"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="355"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1447"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1448"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1449"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1562"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1813"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1816"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="2460"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="2463"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="2489"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="2498"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="2536"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="3137"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="3140"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="3147"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="3160"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="3191"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="4631"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="4798"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="4840"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="4941"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="5874"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="6232"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="6956"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1450"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1457"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1460"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1463"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1466"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1469"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1474"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1481"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1488"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1506"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1511"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1514"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1526"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1529"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1536"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1541"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1546"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1547"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1554"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1567"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1572"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1819"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1824"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1829"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1834"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1839"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1844"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1849"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1854"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1859"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1862"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1865"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1870"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1875"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1882"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="2490"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="2493"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="3173"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="3182"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="3193"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5838"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5875"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5885"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5890"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5901"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5906"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5911"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5917"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5923"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5929"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5944"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="6122"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="2"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="20"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="21"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="2508"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="2512"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="4625"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="5862"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="6253"/>
+   </meta>
+   <goal name="WP_parameter resize.19" expl="19. loop invariant preservation" sum="cf858913eab4fbd62a72b55f792341b9">
    </goal>
-   <goal name="WP_parameter add" expl="VC for add"
-    sum="6afda3185d253286da1f6bdeae1a123d">
-    <label name="expl:VC for add"/>
-    <transf
-     name="split_goal_wp">
-     <goal name="WP_parameter add.1" expl="1."
-      sum="fbb9d39fdff27ce4c6d0130574f50bde">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.2" expl="2."
-      sum="18d736b0bfb97c302197508dd7b7f221">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.3" expl="3. precondition"
-      sum="3248f85212b7d536265f7eb0a9c704c3">
-      <label name="expl:VC for add"/>
-      <proof prover="5">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.4" expl="4. precondition"
-      sum="e15557cb57a587cb83fd99f01d3f8e6f">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.5" expl="5. index in array bounds"
-      sum="a4e02435321187b5c1fd5d9fed008d8b">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.6" expl="6. index in array bounds"
-      sum="493446b8237f23bbff357591051cc3e3">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.7" expl="7. assertion"
-      sum="461646e2c2a5e3ef3e509b7c22ac1ab4">
-      <label name="expl:VC for add"/>
-      <proof prover="5">
-       <result status="valid" time="1.20"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.8" expl="8. type invariant"
-      sum="d2250f39cd1552a09b39cf2112654a47">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.9" expl="9. type invariant"
-      sum="9175568469e943b69416a6b9fde03907">
-      <label name="expl:VC for add"/>
-      <proof prover="5">
-       <result status="valid" time="0.20"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.10" expl="10. type invariant"
-      sum="06c1eeccb3aa2ba74389b8dca6578a5f">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.11" expl="11. type invariant"
-      sum="4f128dcf94e51c02ebab5410480c7d17">
-      <label name="expl:VC for add"/>
-      <proof prover="5">
-       <result status="valid" time="0.77"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.12" expl="12. type invariant"
-      sum="d91d74a814467345e7851b993adb06ff">
-      <label name="expl:VC for add"/>
-      <metas>
-       <ts_pos name="real" arity="0" id="2"
-        ip_theory="BuiltIn">
-        <ip_library name="why3"/>
-        <ip_qualid name="real"/>
-       </ts_pos>
-       <ts_pos name="tuple0" arity="0" id="20"
-        ip_theory="Tuple0">
-        <ip_library name="why3"/>
-        <ip_qualid name="tuple0"/>
-       </ts_pos>
-       <ts_pos name="unit" arity="0" id="21"
-        ip_theory="Unit">
-        <ip_library name="why3"/>
-        <ip_qualid name="unit"/>
-       </ts_pos>
-       <ts_pos name="option" arity="1" id="43325"
-        ip_theory="Option">
-        <ip_library name="option"/>
-        <ip_qualid name="option"/>
-       </ts_pos>
-       <ts_pos name="list" arity="1" id="43329"
-        ip_theory="List">
-        <ip_library name="list"/>
-        <ip_qualid name="list"/>
-       </ts_pos>
-       <ts_pos name="ref" arity="1" id="45441"
-        ip_theory="Ref">
-        <ip_library name="ref"/>
-        <ip_qualid name="ref"/>
-       </ts_pos>
-       <ts_pos name="param" arity="0" id="46685"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="param"/>
-       </ts_pos>
-       <ts_pos name="t" arity="0" id="47033"
-        ip_theory="LinearProbing">
-        <ip_qualid name="t"/>
-       </ts_pos>
-       <ls_pos name="infix =" id="10"
-        ip_theory="BuiltIn">
-        <ip_library name="why3"/>
-        <ip_qualid name="infix ="/>
-       </ls_pos>
-       <ls_pos name="zero" id="41308"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="zero"/>
-       </ls_pos>
-       <ls_pos name="one" id="41309"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="one"/>
-       </ls_pos>
-       <ls_pos name="infix &lt;" id="41310"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="infix &lt;"/>
-       </ls_pos>
-       <ls_pos name="infix +" id="42397"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="infix +"/>
-       </ls_pos>
-       <ls_pos name="prefix -" id="42398"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="prefix -"/>
-       </ls_pos>
-       <ls_pos name="infix *" id="42399"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="infix *"/>
-       </ls_pos>
-       <ls_pos name="infix &gt;=" id="42467"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="infix &gt;="/>
-       </ls_pos>
-       <ls_pos name="abs" id="42512"
-        ip_theory="Abs">
-        <ip_library name="int"/>
-        <ip_qualid name="abs"/>
-       </ls_pos>
-       <ls_pos name="div" id="42763"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="div"/>
-       </ls_pos>
-       <ls_pos name="mod" id="42766"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="mod"/>
-       </ls_pos>
-       <ls_pos name="mem" id="43353"
-        ip_theory="Mem">
-        <ip_library name="list"/>
-        <ip_qualid name="mem"/>
-       </ls_pos>
-       <ls_pos name="get" id="43953"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="get"/>
-       </ls_pos>
-       <ls_pos name="set" id="43956"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="set"/>
-       </ls_pos>
-       <ls_pos name="mixfix []" id="43963"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="mixfix []"/>
-       </ls_pos>
-       <ls_pos name="mixfix [&lt;-]" id="43976"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="mixfix [&lt;-]"/>
-       </ls_pos>
-       <ls_pos name="const" id="44007"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="const"/>
-       </ls_pos>
-       <ls_pos name="prefix !" id="45447"
-        ip_theory="Ref">
-        <ip_library name="ref"/>
-        <ip_qualid name="prefix !"/>
-       </ls_pos>
-       <ls_pos name="get" id="45599"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="get"/>
-       </ls_pos>
-       <ls_pos name="set" id="45614"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="set"/>
-       </ls_pos>
-       <ls_pos name="mixfix []" id="45639"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="mixfix []"/>
-       </ls_pos>
-       <ls_pos name="mixfix [&lt;-]" id="45656"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="mixfix [&lt;-]"/>
-       </ls_pos>
-       <ls_pos name="make" id="45757"
-        ip_theory="Array">
-        <ip_library name="array"/>
-        <ip_qualid name="make"/>
-       </ls_pos>
-       <ls_pos name="dummy" id="46644"
-        ip_theory="LinearProbing">
-        <ip_qualid name="dummy"/>
-       </ls_pos>
-       <ls_pos name="hash" id="46645"
-        ip_theory="LinearProbing">
-        <ip_qualid name="hash"/>
-       </ls_pos>
-       <ls_pos name="pr" id="46689"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="pr"/>
-       </ls_pos>
-       <ls_pos name="num_of" id="46706"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of"/>
-       </ls_pos>
-       <ls_pos name="numof" id="46787"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="numof"/>
-       </ls_pos>
-       <ls_pos name="next" id="47850"
-        ip_theory="LinearProbing">
-        <ip_qualid name="next"/>
-       </ls_pos>
-       <pr_pos name="Assoc" id="42400"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Assoc"/>
-       </pr_pos>
-       <pr_pos name="Unit_def_l" id="42407"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Unit_def_l"/>
-       </pr_pos>
-       <pr_pos name="Unit_def_r" id="42410"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Unit_def_r"/>
-       </pr_pos>
-       <pr_pos name="Inv_def_l" id="42413"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Inv_def_l"/>
-       </pr_pos>
-       <pr_pos name="Inv_def_r" id="42416"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Inv_def_r"/>
-       </pr_pos>
-       <pr_pos name="Comm" id="42419"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CommutativeGroup"/>
-        <ip_qualid name="Comm"/>
-        <ip_qualid name="Comm"/>
-       </pr_pos>
-       <pr_pos name="Assoc" id="42424"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Assoc"/>
-        <ip_qualid name="Assoc"/>
-       </pr_pos>
-       <pr_pos name="Mul_distr_l" id="42431"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Mul_distr_l"/>
-       </pr_pos>
-       <pr_pos name="Mul_distr_r" id="42438"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Mul_distr_r"/>
-       </pr_pos>
-       <pr_pos name="Comm" id="42456"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Comm"/>
-        <ip_qualid name="Comm"/>
-       </pr_pos>
-       <pr_pos name="Unitary" id="42461"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Unitary"/>
-       </pr_pos>
-       <pr_pos name="NonTrivialRing" id="42464"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="NonTrivialRing"/>
-       </pr_pos>
-       <pr_pos name="Refl" id="42476"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Refl"/>
-       </pr_pos>
-       <pr_pos name="Trans" id="42479"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Trans"/>
-       </pr_pos>
-       <pr_pos name="Antisymm" id="42486"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Antisymm"/>
-       </pr_pos>
-       <pr_pos name="Total" id="42491"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="Total"/>
-       </pr_pos>
-       <pr_pos name="ZeroLessOne" id="42496"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="ZeroLessOne"/>
-       </pr_pos>
-       <pr_pos name="CompatOrderAdd" id="42497"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CompatOrderAdd"/>
-       </pr_pos>
-       <pr_pos name="CompatOrderMult" id="42504"
-        ip_theory="Int">
-        <ip_library name="int"/>
-        <ip_qualid name="CompatOrderMult"/>
-       </pr_pos>
-       <pr_pos name="Abs_le" id="42517"
-        ip_theory="Abs">
-        <ip_library name="int"/>
-        <ip_qualid name="Abs_le"/>
-       </pr_pos>
-       <pr_pos name="Abs_pos" id="42522"
-        ip_theory="Abs">
-        <ip_library name="int"/>
-        <ip_qualid name="Abs_pos"/>
-       </pr_pos>
-       <pr_pos name="Div_mod" id="42769"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_mod"/>
-       </pr_pos>
-       <pr_pos name="Div_bound" id="42774"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_bound"/>
-       </pr_pos>
-       <pr_pos name="Mod_bound" id="42779"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_bound"/>
-       </pr_pos>
-       <pr_pos name="Div_sign_pos" id="42784"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_sign_pos"/>
-       </pr_pos>
-       <pr_pos name="Div_sign_neg" id="42789"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_sign_neg"/>
-       </pr_pos>
-       <pr_pos name="Mod_sign_pos" id="42794"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_sign_pos"/>
-       </pr_pos>
-       <pr_pos name="Mod_sign_neg" id="42799"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_sign_neg"/>
-       </pr_pos>
-       <pr_pos name="Rounds_toward_zero" id="42804"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Rounds_toward_zero"/>
-       </pr_pos>
-       <pr_pos name="Div_1" id="42809"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_1"/>
-       </pr_pos>
-       <pr_pos name="Mod_1" id="42812"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_1"/>
-       </pr_pos>
-       <pr_pos name="Div_inf" id="42815"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_inf"/>
-       </pr_pos>
-       <pr_pos name="Mod_inf" id="42820"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_inf"/>
-       </pr_pos>
-       <pr_pos name="Div_mult" id="42825"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Div_mult"/>
-       </pr_pos>
-       <pr_pos name="Mod_mult" id="42832"
-        ip_theory="ComputerDivision">
-        <ip_library name="int"/>
-        <ip_qualid name="Mod_mult"/>
-       </pr_pos>
-       <pr_pos name="Select_eq" id="43989"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="Select_eq"/>
-       </pr_pos>
-       <pr_pos name="Select_neq" id="43998"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="Select_neq"/>
-       </pr_pos>
-       <pr_pos name="Const" id="44009"
-        ip_theory="Map">
-        <ip_library name="map"/>
-        <ip_qualid name="Const"/>
-       </pr_pos>
-       <pr_pos name="hash_nonneg" id="46647"
-        ip_theory="LinearProbing">
-        <ip_qualid name="hash_nonneg"/>
-       </pr_pos>
-       <pr_pos name="bucket_bounds" id="46662"
-        ip_theory="LinearProbing">
-        <ip_qualid name="bucket_bounds"/>
-       </pr_pos>
-       <pr_pos name="Num_of_empty" id="46707"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_empty"/>
-       </pr_pos>
-       <pr_pos name="Num_of_right_no_add" id="46712"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_right_no_add"/>
-       </pr_pos>
-       <pr_pos name="Num_of_right_add" id="46717"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_right_add"/>
-       </pr_pos>
-       <pr_pos name="Num_of_bounds" id="46722"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_bounds"/>
-       </pr_pos>
-       <pr_pos name="Num_of_append" id="46727"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_append"/>
-       </pr_pos>
-       <pr_pos name="Num_of_left_no_add" id="46733"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_left_no_add"/>
-       </pr_pos>
-       <pr_pos name="Num_of_left_add" id="46738"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Num_of_left_add"/>
-       </pr_pos>
-       <pr_pos name="Empty" id="46743"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Empty"/>
-       </pr_pos>
-       <pr_pos name="Full" id="46749"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="Full"/>
-       </pr_pos>
-       <pr_pos name="num_of_increasing" id="46755"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of_increasing"/>
-       </pr_pos>
-       <pr_pos name="num_of_strictly_increasing" id="46761"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of_strictly_increasing"/>
-       </pr_pos>
-       <pr_pos name="num_of_change_any" id="46768"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of_change_any"/>
-       </pr_pos>
-       <pr_pos name="num_of_change_some" id="46776"
-        ip_theory="LinearProbing">
-        <ip_qualid name="NumOfEq"/>
-        <ip_qualid name="NumOfParam"/>
-        <ip_qualid name="num_of_change_some"/>
-       </pr_pos>
-       <pr_pos name="numof_eq" id="47021"
-        ip_theory="LinearProbing">
-        <ip_qualid name="numof_eq"/>
-       </pr_pos>
-       <pr_pos name="dummy_const" id="47162"
-        ip_theory="LinearProbing">
-        <ip_qualid name="dummy_const"/>
-       </pr_pos>
-       <meta name="remove_logic">
-        <meta_arg_ls id="10"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="41308"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="41309"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="41310"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42397"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42398"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42399"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42467"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42512"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42763"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="42766"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43353"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43953"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43956"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43963"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="43976"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="44007"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45447"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45599"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45614"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45639"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45656"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="45757"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46644"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46645"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46689"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46706"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="46787"/>
-       </meta>
-       <meta name="remove_logic">
-        <meta_arg_ls id="47850"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42400"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42407"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42410"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42413"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42416"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42419"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42424"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42431"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42438"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42456"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42461"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42464"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42476"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42479"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42486"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42491"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42496"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42497"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42504"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42517"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42522"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42769"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42774"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42779"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42784"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42789"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42794"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42799"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42804"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42809"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42812"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42815"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42820"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42825"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="42832"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="43989"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="43998"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="44009"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46647"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46662"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46707"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46712"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46717"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46722"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46727"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46733"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46738"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46743"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46749"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46755"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46761"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46768"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="46776"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="47021"/>
-       </meta>
-       <meta name="remove_prop">
-        <meta_arg_pr id="47162"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="2"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="20"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="21"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="43325"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="43329"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="45441"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="46685"/>
-       </meta>
-       <meta name="remove_type">
-        <meta_arg_ts id="47033"/>
-       </meta>
-       <goal name="WP_parameter add.12" expl="12. type invariant"
-        sum="14409cac8cc69e331d7c2646ecb5fc27">
-        <label name="expl:VC for add"/>
-        <transf
-         name="eliminate_builtin">
-         <goal name="WP_parameter add.12.1" expl="1. type invariant"
-          sum="7c3c0b473f2e430131c51972c01de072">
-          <label name="expl:VC for add"/>
-          <proof prover="5" timelimit="30">
-           <result status="valid" time="0.02"/>
-          </proof>
-          <proof prover="8">
-           <result status="valid" time="0.44"/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-      </metas>
-     </goal>
-     <goal name="WP_parameter add.13" expl="13. type invariant"
-      sum="acc2261c3bd0020173581d8b99483465">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.14" expl="14. postcondition"
-      sum="20614b87efded2bc2ef08e80cdb6f67d">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.15" expl="15. type invariant"
-      sum="a810102856c0f35afd9357442013fd2b">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.16" expl="16. type invariant"
-      sum="d3470ee43cce2708a4dedd2b1020ddf1">
-      <label name="expl:VC for add"/>
-      <proof prover="5">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.17" expl="17. type invariant"
-      sum="386f35145e40c5ebe5ee88f4b6f03a39">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.18" expl="18. type invariant"
-      sum="bbc5cec85f57af219408271f5bede8db">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.20"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.19" expl="19. type invariant"
-      sum="0423b90d74adfb12aeff84f21296094d">
-      <label name="expl:VC for add"/>
-      <proof prover="5">
-       <result status="valid" time="0.19"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.54"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter add.20" expl="20. postcondition"
-      sum="0fd26bed0115e5b60200b5e9d786b211">
-      <label name="expl:VC for add"/>
-      <proof prover="8">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-    </transf>
+  </metas>
+  </goal>
+  <goal name="WP_parameter resize.20" expl="20. loop invariant preservation" sum="89b101668c24b88f42c0a111997a5a25">
+  <proof prover="2"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.21" expl="21. loop invariant preservation" sum="94aa76259fdfb7624fc2d5661ffa916a">
+  <proof prover="2"><result status="valid" time="0.43"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.22" expl="22. loop invariant preservation" sum="7accc5fc7ad8d75b534b5e8f05b2b6e4">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.23" expl="23. loop invariant preservation" sum="55f1fc6c6ad05aea389540995a45b951">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.24" expl="24. loop invariant preservation" sum="4d8e1d8e0d5a9f336585a6fea526ef47">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter resize.24.1" expl="1. loop invariant preservation" sum="42a0f38fb63041473585476867a14089">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter copy" expl="VC for copy"
-    sum="d8347b3dcc311df869adc55f5e6ea344">
-    <label name="expl:VC for copy"/>
-    <proof prover="5">
-     <result status="valid" time="0.05"/>
-    </proof>
+   <goal name="WP_parameter resize.24.2" expl="2. loop invariant preservation" sum="a80705bc00261518b8362570696f1246">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter remove" expl="VC for remove"
-    sum="090573983998328c7f3e2f5f3d7b83e4"
-    expanded="true">
-    <label name="expl:VC for remove"/>
-    <transf name="split_goal_wp"
-     expanded="true">
-     <goal name="WP_parameter remove.1" expl="1. index in array bounds"
-      sum="504ff083a64063ccde45b8e2637f0d32">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.2" expl="2. precondition"
-      sum="9240c3809447a63fbe760f4bd73024a9">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.3" expl="3. precondition"
-      sum="6e571062340610ea9a241232b29281b4">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.4" expl="4. precondition"
-      sum="b60f8d4102f0e4cfb0d1efb0454f6293">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.07"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.5" expl="5. precondition"
-      sum="3c7620398d40992f577c20369e6cf623">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.13"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.6" expl="6. postcondition"
-      sum="83daa2713a6e6a239b98f61286776bd1">
-      <label name="expl:VC for remove"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.7" expl="7. index in array bounds"
-      sum="6cfb8ccdb367668a12f48a0c46863460">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.8" expl="8. index in array bounds"
-      sum="f41bb51c82efc65bafb627e2be293555">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.9" expl="9. index in array bounds"
-      sum="251b9cf1ab4e39c1c4cad4199a3f64a5">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.10" expl="10. index in array bounds"
-      sum="6eb02b70b6bbcbace2a03a3fb1c2752e">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.11" expl="11. precondition"
-      sum="0e0f12f66ec13a49c286c7492e9a8016">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.12" expl="12. precondition"
-      sum="0e0f12f66ec13a49c286c7492e9a8016">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.13" expl="13. precondition"
-      sum="c21fc289e9153d956383a920d0143c1c">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.14" expl="14. precondition"
-      sum="a405c35bf4f0d690cdf5491c87bf217f">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.15" expl="15. postcondition"
-      sum="f560f15779ce83b4ae845ded33498f54"
-      expanded="true">
-      <label name="expl:VC for remove"/>
-      <proof prover="0" obsolete="true">
-       <result status="timeout" time="5.97"/>
-      </proof>
-      <proof prover="2" obsolete="true">
-       <result status="timeout" time="5.97"/>
-      </proof>
-      <proof prover="3" obsolete="true">
-       <result status="timeout" time="5.97"/>
-      </proof>
-      <proof prover="5" obsolete="true">
-       <result status="timeout" time="5.97"/>
-      </proof>
-      <proof prover="6" obsolete="true">
-       <result status="timeout" time="5.98"/>
-      </proof>
-      <proof prover="7" obsolete="true">
-       <result status="timeout" time="5.98"/>
-      </proof>
-      <proof prover="8" obsolete="true">
-       <result status="timeout" time="5.97"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.16" expl="16. precondition"
-      sum="27d828be6c0e220b381a60911b1df855">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.17" expl="17. precondition"
-      sum="f6a01c71a27ce3d79a2e1c4098aee19c">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.18" expl="18. index in array bounds"
-      sum="3505a81ee43b93a2937d942b90e86d74">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.19" expl="19. index in array bounds"
-      sum="c3c6c263ff2e1f6970aeb5a56e269594">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.20" expl="20. assertion"
-      sum="2f095a20286720c27f0b423f21f11ba3">
-      <label name="expl:VC for remove"/>
-      <proof prover="5">
-       <result status="valid" time="0.25"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.21" expl="21. type invariant"
-      sum="38a4d098d6cbe7ed6c7062d6a1e850f2">
-      <label name="expl:VC for remove"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="5">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.22" expl="22. precondition"
-      sum="8a9eb5182cb4865b034d35ddb7942668">
-      <label name="expl:VC for remove"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.23" expl="23. precondition"
-      sum="8a9eb5182cb4865b034d35ddb7942668">
-      <label name="expl:VC for remove"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.24" expl="24. precondition"
-      sum="3c135a8790b5cf7318bfc5e4a35d1d97">
-      <label name="expl:VC for remove"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.25" expl="25. precondition"
-      sum="ac5912e4560091754038ab6a1652d4eb">
-      <label name="expl:VC for remove"/>
-      <proof prover="5">
-       <result status="valid" time="0.21"/>
-      </proof>
-      <proof prover="8">
-       <result status="timeout" time="5.98"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.26" expl="26. type invariant"
-      sum="287a629510e13266d5260a2b069bb5cb">
-      <label name="expl:VC for remove"/>
-      <proof prover="5">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.27" expl="27. type invariant"
-      sum="cd64f3bbdccc2a2a31ccc20311a3ca4c"
-      expanded="true">
-      <label name="expl:VC for remove"/>
-      <proof prover="5">
-       <result status="timeout" time="5.99"/>
-      </proof>
-      <proof prover="8">
-       <result status="timeout" time="5.98"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.28" expl="28. type invariant"
-      sum="19a7927924246007e0dd2b5460edc492">
-      <label name="expl:VC for remove"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.29" expl="29. type invariant"
-      sum="c09776dda00f19987d20b9711b7205e7"
-      expanded="true">
-      <label name="expl:VC for remove"/>
-      <proof prover="2" obsolete="true">
-       <result status="timeout" time="5.98"/>
-      </proof>
-      <proof prover="5">
-       <result status="timeout" time="6.00"/>
-      </proof>
-      <proof prover="8">
-       <result status="timeout" time="5.97"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.30" expl="30. type invariant"
-      sum="841b217899fcfa7ccb971d6ae2d34966">
-      <label name="expl:VC for remove"/>
-      <proof prover="5">
-       <result status="timeout" time="6.02"/>
-      </proof>
-      <proof prover="8">
-       <result status="timeout" time="5.98"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.31" expl="31. type invariant"
-      sum="b29ece617a585202aeb62b421baaf3dd">
-      <label name="expl:VC for remove"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.32" expl="32. postcondition"
-      sum="33ae28301b6d716a5b73b3ae80319e16">
-      <label name="expl:VC for remove"/>
-      <proof prover="5">
-       <undone/>
-      </proof>
-      <proof prover="8">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter remove.33" expl="33. postcondition"
-      sum="15f9ae8ff26438189479744eebfadd5f">
-      <label name="expl:VC for remove"/>
-      <proof prover="5">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter resize.24.3" expl="3. loop invariant preservation" sum="4ada8afbbf33a63237c31f6f1a5d3a27">
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
-  </theory>
- </file>
+   <goal name="WP_parameter resize.24.4" expl="4. loop invariant preservation" sum="544830e1526c9247c5b1f63bad87a584">
+   <proof prover="2"><result status="valid" time="0.15"/></proof>
+   <proof prover="3"><result status="valid" time="0.16"/></proof>
+   </goal>
+   <goal name="WP_parameter resize.24.5" expl="5. loop invariant preservation" sum="4869813da5c3a8d85370c3941fab7424">
+   <proof prover="2"><result status="valid" time="0.15"/></proof>
+   <proof prover="3"><result status="valid" time="0.15"/></proof>
+   </goal>
+   <goal name="WP_parameter resize.24.6" expl="6. loop invariant preservation" sum="9ecea39899ec86ae150852bb5c6875e7">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   <proof prover="3"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter resize.25" expl="25. type invariant" sum="d33a764206d0738744723381dc2d0779">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.26" expl="26. type invariant" sum="598e3428db065035238b542a76634cc8">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.27" expl="27. type invariant" sum="f46d191f57a9705cc1cc8839964fe16c">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.28" expl="28. type invariant" sum="5678bb824626888b95a1f2998378e1b8">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.29" expl="29. type invariant" sum="e85d231ee7160a35656bca1dc304c902">
+  <proof prover="4"><result status="valid" time="2.55"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.30" expl="30. type invariant" sum="da49539438f9cb6632d2e7f44eb6c1a6">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.31" expl="31. postcondition" sum="e04e05b7dce39420dab264caf2457fff">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter add" expl="VC for add" sum="07ce8c5a6a83cdebee129bdd60e84a44">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter add.1" expl="1." sum="8cb387a51fcdb82cd422e5ea5c14e9ae">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter add.2" expl="2." sum="78622bef470c6cd97c0fc0c40ce5860e">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter add.3" expl="3. precondition" sum="f8979673c9dfd7d6ed1a50e1aac95ac1">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter add.4" expl="4. precondition" sum="2cc2f8968deef2eee2686858f1cc0c4a">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter add.5" expl="5. index in array bounds" sum="726840a8dcd295f9ee6c982c0bd7680c">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter add.6" expl="6. index in array bounds" sum="8dc1dac5a525b949b91ae3d96f117c80">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter add.7" expl="7. assertion" sum="117ee2d9b469ce2f15f9e46b1a57263e">
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter add.8" expl="8. type invariant" sum="2934b86470483e2d88afe17d4ef35f1c">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter add.9" expl="9. type invariant" sum="2432f92e356cbb8b660484a9097e94e8">
+  <proof prover="3"><result status="valid" time="0.37"/></proof>
+  </goal>
+  <goal name="WP_parameter add.10" expl="10. type invariant" sum="dc24755bf1771e430b3630bfd31e186a">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter add.11" expl="11. type invariant" sum="9e9fe90d08d03538944185519145cd39">
+  <proof prover="3"><result status="valid" time="0.45"/></proof>
+  </goal>
+  <goal name="WP_parameter add.12" expl="12. type invariant" sum="d99f595df97dd6963b864d7b102080f4">
+  <proof prover="3"><result status="valid" time="1.27"/></proof>
+  </goal>
+  <goal name="WP_parameter add.13" expl="13. type invariant" sum="3842127f29ef70a65469439bbd83148e">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter add.14" expl="14. postcondition" sum="3371d8f2b5fe4a948089f308d0dc838e">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter add.15" expl="15. type invariant" sum="37278cfb29d03782ed8989d5e51112f0">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter add.16" expl="16. type invariant" sum="be5093358f485f698695797ba0065b53">
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter add.17" expl="17. type invariant" sum="02db9adbb94579bd5437076e5c98af8f">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter add.18" expl="18. type invariant" sum="28c43b9b4ca3ddf2e36476071ecc3440">
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter add.19" expl="19. type invariant" sum="227c8dce915c25d72a8648f17859a1f5">
+  <proof prover="3"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="WP_parameter add.20" expl="20. postcondition" sum="de3734ef33a7394e9fd96e96adf702e5">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter copy" expl="VC for copy" sum="128e0e8f78d0e5a40be16ac30bec643f">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter copy.1" expl="1. type invariant" sum="0bcd3bc7090eb9ce97152d99a64925b4">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter copy.2" expl="2. type invariant" sum="1b4ef172fa4954ff100fa27fad56261a">
+  <proof prover="3"><result status="valid" time="0.55"/></proof>
+  </goal>
+  <goal name="WP_parameter copy.3" expl="3. type invariant" sum="bdef91de5fc582625f6cb600c0a73534">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter copy.4" expl="4. type invariant" sum="e701e501e26518e11de143b6a48e35b9">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter copy.5" expl="5. type invariant" sum="93343e8f3ef0af20d3e3b710ffde7851">
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter delete" expl="VC for delete" sum="9f7d50153d92e6f9fdbe6f1e63b08b8f" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter delete.1" expl="1. index in array bounds" sum="31acda4c8d8f5613737c647b7d450e5c">
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.2" expl="2. variant decrease" sum="dd344526fe2e67dd01f942265e4bd238" expanded="true">
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="6.02"/></proof>
+  <proof prover="3"><result status="timeout" time="5.98"/></proof>
+  <proof prover="4"><result status="timeout" time="6.03"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.3" expl="3. precondition" sum="d9b061e56b02810adea520974d0b9fd1">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.4" expl="4. precondition" sum="aa2e29b29f43b9c3191df47d7ca8c9c0">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.5" expl="5. precondition" sum="86e4a83ddd6924ceca4d16d1399129a8">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.6" expl="6. precondition" sum="af9d50683939fb254216da56b6778bd6">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.7" expl="7. precondition" sum="bea31623434c73b93bf720e44c7b79f5" expanded="true">
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.92"/></proof>
+  <proof prover="3"><result status="timeout" time="6.09"/></proof>
+  <proof prover="4"><result status="timeout" time="6.20"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.8" expl="8. precondition" sum="a6a76d9cf7018d1ccec629d6b1dff207">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.9" expl="9. precondition" sum="877f75d3b1a83a4757cc67dc8612b8e5">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.10" expl="10. postcondition" sum="008b79dd31b7463bc063e4470066e609">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.11" expl="11. index in array bounds" sum="4c9d3eb3b26a1f497889dee901799e23">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.12" expl="12. index in array bounds" sum="03ae21fe491987dca5946aed5f51338a">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.13" expl="13. index in array bounds" sum="b1dfac5ccbc61045f3d83ba29f93fdfa">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.14" expl="14. index in array bounds" sum="53e01c7725b7b74ad47fb036abb276f1">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.15" expl="15. variant decrease" sum="9652855c270c2ca2a10b9377a3b8c27d" expanded="true">
+  <proof prover="1" obsolete="true"><result status="timeout" time="6.06"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.78"/></proof>
+  <proof prover="3"><result status="timeout" time="6.02"/></proof>
+  <proof prover="4"><result status="timeout" time="6.09"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.16" expl="16. precondition" sum="1d2a79b363794b6b58c5ab4f6a49e5ab">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.17" expl="17. precondition" sum="8ada723098270ebd2923840c0d2ded81">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.18" expl="18. precondition" sum="8ada723098270ebd2923840c0d2ded81">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.19" expl="19. precondition" sum="2e1a029a93c34635b33c2db519a3c08a">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.20" expl="20. precondition" sum="0f5bad2a393a0a3ecb8c81635de989c6" expanded="true">
+  <proof prover="1" obsolete="true"><result status="timeout" time="6.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="6.00"/></proof>
+  <proof prover="3"><result status="timeout" time="6.08"/></proof>
+  <proof prover="4"><result status="timeout" time="5.99"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.21" expl="21. precondition" sum="dd4019ba791da7ec4172a8f958a9e5b0">
+  <proof prover="1" obsolete="true"><undone/></proof>
+  <proof prover="2" obsolete="true"><undone/></proof>
+  <proof prover="3"><result status="valid" time="0.17"/></proof>
+  <proof prover="4"><result status="timeout" time="5.96"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.22" expl="22. precondition" sum="4cea692f8076428ddd7f5900b360314c" expanded="true">
+  <proof prover="1" obsolete="true"><result status="timeout" time="6.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.90"/></proof>
+  <proof prover="3"><result status="timeout" time="6.34"/></proof>
+  <proof prover="4"><result status="timeout" time="5.99"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.23" expl="23. postcondition" sum="12fc5f9a38f86a376137b28b1dcab846">
+  <proof prover="3"><result status="timeout" time="6.02"/></proof>
+  <proof prover="4"><result status="timeout" time="5.98"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter remove" expl="VC for remove" sum="7050de1b7abd5f705a1fc95fcafcf9ea" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter remove.1" expl="1. precondition" sum="e81b76edaeb94e952209e065d321cc52">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.2" expl="2. precondition" sum="cf6e9cc1309c7d32a4790bd9c6e3c50e">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.3" expl="3. index in array bounds" sum="3101dbf5148b96ec862a4752e40ddd4b">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.4" expl="4. index in array bounds" sum="08ea317cab2d6a757840b35494d7851c">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.5" expl="5. assertion" sum="719e0a0987620e9636a2506afad218e2">
+  <proof prover="3"><result status="valid" time="0.19"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="5.95"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.6" expl="6. type invariant" sum="15aa18e27d51d484192e801f8875ffd2">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.7" expl="7. precondition" sum="9dac5d8f94c0f1818452cb6774bb498d">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.8" expl="8. precondition" sum="9dac5d8f94c0f1818452cb6774bb498d">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.9" expl="9. precondition" sum="9dac5d8f94c0f1818452cb6774bb498d">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.10" expl="10. precondition" sum="55756d66169bda134a3e489e9ab928fb">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.11" expl="11. precondition" sum="ba85e47190013268da1da88914fb8940">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.12" expl="12. precondition" sum="80ffd89aaac6c49fed8a2d13ee6d6863">
+  <proof prover="3"><result status="valid" time="0.23"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.13" expl="13. precondition" sum="8c36749646148603577f25f4fbbea15c">
+  <proof prover="3" timelimit="20"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.14" expl="14. type invariant" sum="c9f15375fc3b925dfb142b58a71d165c">
+  <proof prover="3"><result status="valid" time="0.12"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.15" expl="15. type invariant" sum="bb500b135314549d829ca2bb6ec980fc">
+  <proof prover="3"><result status="valid" time="0.35"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="5.93"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.16" expl="16. type invariant" sum="e68d99d2ddd50f0909a7661eb9b8c38e">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.17" expl="17. type invariant" sum="6b14f078310d34178aadbc05513ac7a6" expanded="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="6.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="5.97"/></proof>
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter remove.17.1" expl="1. type invariant" sum="27e253c8adf9dbd57be279a86057377a" expanded="true">
+   <proof prover="1" obsolete="true"><result status="timeout" time="6.00"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.91"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="6.13"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="5.97"/></proof>
+   </goal>
+   <goal name="WP_parameter remove.17.2" expl="2. type invariant" sum="5df880bbcfffb0f251c879875bd98b12" expanded="true">
+   <proof prover="1" obsolete="true"><result status="timeout" time="6.02"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.95"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="6.30"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="6.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter remove.18" expl="18. type invariant" sum="b04d7b69c1ba4bf49ceab7b6ddf484fc" expanded="true">
+  <proof prover="3" obsolete="true"><result status="timeout" time="6.02"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter remove.18.1" expl="1. type invariant" sum="1f3723ee17ea11b5500ac62f77803eb9">
+   <proof prover="1" obsolete="true"><result status="timeout" time="6.02"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.83"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="6.68"/></proof>
+   </goal>
+   <goal name="WP_parameter remove.18.2" expl="2. type invariant" sum="aa531b2a8c252fb55284cb4a05af391e">
+   <proof prover="1" obsolete="true"><result status="timeout" time="6.07"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.76"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="6.10"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="6.37"/></proof>
+   </goal>
+   <goal name="WP_parameter remove.18.3" expl="3. type invariant" sum="c43b3d11e9790468727b59600b454336">
+   <proof prover="1" obsolete="true"><result status="timeout" time="6.02"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.88"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="6.72"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="6.00"/></proof>
+   </goal>
+   <goal name="WP_parameter remove.18.4" expl="4. type invariant" sum="a41218a5d19a3ee33fa92b61d03159f8">
+   <proof prover="1" obsolete="true"><result status="timeout" time="6.01"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.87"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="6.16"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
+   </goal>
+   <goal name="WP_parameter remove.18.5" expl="5. type invariant" sum="3f39d6d89ad8bcee3c9696c1346dcdef">
+   <proof prover="1" obsolete="true"><undone/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.86"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="6.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter remove.19" expl="19. type invariant" sum="eab9c14ebc37ce49c996d8b280fa7884">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.20" expl="20. postcondition" sum="be1337d60dbded886a25188c2a037a47">
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.21" expl="21. postcondition" sum="3978b208654901c6e978a47be17e182f">
+  <proof prover="3"><result status="valid" time="0.65"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>
