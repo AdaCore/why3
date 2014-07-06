@@ -435,23 +435,6 @@ if test "$enable_ide" = yes ; then
    fi
 fi
 
-dnl # checking for sqlite3
-dnl if test "$enable_ide" = yes ; then
-dnl    if test "$USEOCAMLFIND" = yes; then
-dnl       SQLITE3LIB=$(ocamlfind query sqlite3)
-dnl    fi
-dnl    if test -n "$SQLITE3LIB";then
-dnl       echo "ocamlfind found sqlite3 in $SQLITE3LIB"
-dnl    else
-dnl       SQLITE3LIB="+sqlite3"
-dnl       AC_CHECK_FILE($OCAMLLIB/sqlite3/sqlite3.cma,,enable_ide=no)
-dnl       if test "$enable_ide" = no; then
-dnl         AC_MSG_WARN(Lib sqlite3 not found, IDE disabled.)
-dnl    	reason_ide=" (sqlite3 not found)"
-dnl       fi
-dnl    fi
-dnl fi
-
 # checking for sqlite3
 if test "$enable_bench" = yes ; then
    if test "$USEOCAMLFIND" = yes; then
@@ -528,10 +511,6 @@ if test "$enable_coq_tactic" = yes -a "$CAMLP5O" = no; then
    enable_coq_tactic=no
    reason_coq_tactic=" (camlp5o not found)"
 fi
-
-# coq-tactic currently disabled
-dnl enable_coq_tactic=no
-dnl reason_coq_tactic=" (not yet implemented)"
 
 if test "$enable_coq_libs" = yes; then
    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
@@ -794,7 +773,6 @@ dnl AC_SUBST(PSVIEWER)
 dnl AC_SUBST(PDFVIEWER)
 
 # Finally create the Makefile from Makefile.in
-dnl AC_OUTPUT(Makefile)
 AC_CONFIG_FILES(Makefile src/config.sh doc/version.tex)
 AC_CONFIG_FILES(lib/why3/META)
 AC_CONFIG_FILES(src/jessie/Makefile)
@@ -812,55 +790,58 @@ AC_OUTPUT
 echo
 echo "                 Summary"
 echo "-----------------------------------------"
-echo "Verbose make            : $enable_verbose_make"
-echo "OCaml compiler          : yes"
-echo "    Version             : $OCAMLVERSION"
-echo "    Library path        : $OCAMLLIB"
-echo "    Native compilation  : $enable_native_code"
-echo "    Profiling           : $enable_profiling"
-echo "Zarith                  : $enable_zarith$reason_zarith"
-echo "Ocamlzip                : $enable_zip$reason_zip"
-echo "IDE                     : $enable_ide$reason_ide"
-echo "Bench tool              : $enable_bench$reason_bench"
-echo "Documentation           : $enable_doc$reason_doc"
-if test "$enable_doc" = yes ; then
-   echo "    HTML                : $enable_html_doc$reason_html_doc"
+echo "Verbose make                : $enable_verbose_make"
+echo "OCaml compiler              : yes"
+echo "    Version                 : $OCAMLVERSION"
+echo "    Library path            : $OCAMLLIB"
+echo "    Native compilation      : $enable_native_code"
+echo "    Profiling               : $enable_profiling"
+echo "Components"
+echo "    IDE command             : $enable_ide$reason_ide"
+echo "    Bench command           : $enable_bench$reason_bench"
+echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
+echo "    Compressed sessions     : $enable_zip$reason_zip"
+echo "    Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
+echo "    Frama-C support         : $enable_frama_c$reason_frama_c"
+if test "$enable_frama_c" = yes ; then
+   echo "        Version             : $FRAMAC_VERSION"
+   echo "        Share path          : $FRAMAC_SHARE"
+   echo "        Library path        : $FRAMAC_LIBDIR"
 fi
-echo "Coq support             : $enable_coq_support$reason_coq_support"
+echo "Documentation               : $enable_doc$reason_doc"
+if test "$enable_doc" = yes ; then
+   echo "    PDF                     : yes"
+   echo "    HTML                    : $enable_html_doc$reason_html_doc"
+fi
+echo "Support for interactive proof assistants"
+echo "    Coq                     : $enable_coq_support$reason_coq_support"
 if test "$enable_coq_support" = yes ; then
-   echo "    Version             : $COQVERSION"
-   echo "    Library path        : $COQLIB"
-   echo "    \"why3\" tactic       : $enable_coq_tactic$reason_coq_tactic"
-   echo "    Realization support : $enable_coq_libs$reason_coq_libs"
+   echo "        Version             : $COQVERSION"
+   echo "        Library path        : $COQLIB"
+   echo "        \"why3\" tactic       : $enable_coq_tactic$reason_coq_tactic"
+   echo "        Realization support : $enable_coq_libs$reason_coq_libs"
    if test "$enable_coq_libs" = yes ; then
-      echo "        FP arithmetic   : $enable_coq_fp_libs$reason_coq_fp_libs"
+      echo "            FP arithmetic   : $enable_coq_fp_libs$reason_coq_fp_libs"
    fi
 fi
-echo "PVS support             : $enable_pvs_support$reason_pvs_support"
+echo "    PVS                     : $enable_pvs_support$reason_pvs_support"
 if test "$enable_pvs_support" = yes ; then
-   echo "    Version             : $PVSVERSION"
-   echo "    Library path        : $PVSLIB"
-   echo "    Realization support : $enable_pvs_libs$reason_pvs_libs"
+   echo "        Version             : $PVSVERSION"
+   echo "        Library path        : $PVSLIB"
+   echo "        Realization support : $enable_pvs_libs$reason_pvs_libs"
 fi
-echo "Isabelle support        : $enable_isabelle_support$reason_isabelle_support"
+echo "    Isabelle                : $enable_isabelle_support$reason_isabelle_support"
 if test "$enable_isabelle_support" = yes ; then
-   echo "    Version             : $ISABELLEVERSION"
-   echo "    Realization support : $enable_isabelle_libs$reason_isabelle_libs"
+   echo "        Version             : $ISABELLEVERSION"
+   echo "        Realization support : $enable_isabelle_libs$reason_isabelle_libs"
 fi
-echo "Frama-C support         : $enable_frama_c$reason_frama_c"
-if test "$enable_frama_c" = yes ; then
-   echo "    Version             : $FRAMAC_VERSION"
-   echo "    Share path          : $FRAMAC_SHARE"
-   echo "    Library path        : $FRAMAC_LIBDIR"
-fi
-echo "Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
 if test "$enable_local" = yes ; then
-   echo "Installable             : no"
+   echo "Installable                 : no"
 else
-   echo "Installable             : yes"
-   echo "    Binary path         : $bindir"
-   echo "    Lib path            : $libdir/why3"
-   echo "    Data path           : $datarootdir/why3"
-   echo "    Ocaml Library       : $OCAMLINSTALLLIB/why3"
-   echo "    Relocatable         : $enable_relocation"
+   echo "Installable                 : yes"
+   echo "    Binary path             : $bindir"
+   echo "    Lib path                : $libdir/why3"
+   echo "    Data path               : $datarootdir/why3"
+   echo "    Ocaml Library           : $OCAMLINSTALLLIB/why3"
+   echo "    Relocatable             : $enable_relocation"
 fi
