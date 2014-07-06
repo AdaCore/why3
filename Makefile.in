@@ -822,63 +822,6 @@ install_local:: bin/why3ide
 
 endif
 
-# <<<<<<< HEAD
-# =======
-
-# ###############
-# # Replayer
-# ###############
-
-# REPLAYER_FILES = replay
-
-# REPLAYERMODULES = $(addprefix src/why3replayer/, $(REPLAYER_FILES))
-
-# REPLAYERDEP = $(addsuffix .dep, $(REPLAYERMODULES))
-# REPLAYERCMO = $(addsuffix .cmo, $(REPLAYERMODULES))
-# REPLAYERCMX = $(addsuffix .cmx, $(REPLAYERMODULES))
-
-# $(REPLAYERDEP): DEPFLAGS += -I src/why3replayer
-# $(REPLAYERCMO) $(REPLAYERCMX): INCLUDES += -I src/why3replayer
-
-# # build targets
-
-# byte: bin/why3replayer.byte
-# opt:  bin/why3replayer.opt
-
-# bin/why3replayer.opt: lib/why3/why3.cmxa lib/why3/why3session.cmxa $(REPLAYERCMX)
-# 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-# 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
-# bin/why3replayer.byte: lib/why3/why3.cma lib/why3/why3session.cma $(REPLAYERCMO)
-# 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-# 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-# bin/why3replayer: bin/why3replayer.@OCAMLBEST@
-# 	ln -sf why3replayer.@OCAMLBEST@ $@
-
-# # depend and clean targets
-
-# ifneq "$(MAKECMDGOALS)" "clean"
-# include $(REPLAYERDEP)
-# endif
-
-# depend: $(REPLAYERDEP)
-
-# clean::
-# 	rm -f src/why3replayer/*.cm[iox] src/why3replayer/*.o
-# 	rm -f src/why3replayer/*.annot src/why3replayer/*.dep src/why3replayer/*~
-# 	rm -f bin/why3replayer.byte bin/why3replayer.opt bin/why3replayer
-
-# clean_old_install::
-# 	rm -f $(BINDIR)/why3replayer$(EXE)
-
-# install_no_local::
-# 	cp -f bin/why3replayer.@OCAMLBEST@ $(BINDIR)/why3replayer$(EXE)
-
-# install_local:: bin/why3replayer
-
-
-# >>>>>>> adding support for compressed files. Needs splitting the library into
 ###############
 # Session
 ###############
