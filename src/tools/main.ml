@@ -15,7 +15,7 @@ open Whyconf
 open Theory
 
 let usage_msg = sprintf
-  "Usage: %s [options] command [options]"
+  "Usage: %s [options] <command> [options]"
   (Filename.basename Sys.argv.(0))
 
 let version_msg = sprintf "Why3 platform, version %s (build date: %s)"
@@ -72,13 +72,35 @@ let command_path =
   | Some p -> Filename.concat p "bin"
   | None -> Filename.concat Config.libdir "commands"
 
-let command scmd =
-  let scmd = "why3" ^ scmd in
-  let cmd = Filename.concat command_path scmd in
-  if not (Sys.file_exists cmd) then begin
-    printf "'%s' is not a why3 command.@." cmd;
-    exit 1
-  end;
+let available_commands () =
+  let commands = Sys.readdir command_path in
+  Array.sort String.compare commands;
+  let re = Str.regexp "^why3\\([^.]*\\)\\([.].*\\)?" in
+  let commands = Array.fold_left (fun acc v ->
+    if Str.string_match re v 0 then
+      let w = Str.matched_group 1 v in
+      match acc with
+      | (h,_)::_ when h = w -> acc
+      | _ -> (w, v) :: acc
+    else acc) [] commands in
+  List.rev commands
+
+let command sscmd =
+  let (scmd,cmd) =
+    let scmd = "why3" ^ sscmd in
+    let cmd = Filename.concat command_path scmd in
+    if Sys.file_exists cmd then (scmd, cmd)
+    else begin
+      let commands = available_commands () in
+      let scmd =
+	try List.assoc sscmd commands
+	with Not_found ->
+	  printf "'%s' is not a why3 command.@\n@\nAvailable commands:@." cmd;
+	  List.iter (fun (v,_) -> eprintf "  %s@." v) commands;
+	  exit 1 in
+      let cmd = Filename.concat command_path scmd in
+      (scmd, cmd)
+    end in
   let args = ref [] in
   (match !opt_config with Some v -> args := v :: "-C" :: !args | None -> ());
   List.iter (fun v -> args := v :: "-L" :: !args) (List.rev !opt_loadpath);
@@ -169,13 +191,8 @@ let () = try
   opt_list :=  Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
-  let commands = Sys.readdir command_path in
   eprintf "%s@\n@\nAvailable commands:@." usage_msg;
-  Array.sort compare commands;
-  Array.iter (fun s ->
-    if String.length s > 4 && String.sub s 0 4 = "why3" then
-      eprintf "  %s@." (String.sub s 4 (String.length s - 4))
-  ) commands
+  List.iter (fun (v,_) -> eprintf "  %s@." v) (available_commands ())
 
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
