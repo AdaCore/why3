@@ -35,6 +35,7 @@ let opt_list_formats = ref false
 let opt_list_metas = ref false
 
 let opt_version = ref false
+let opt_help = ref false
 
 let option_list = Arg.align [
   "-C", Arg.String (fun s -> opt_config := Some s),
@@ -65,7 +66,9 @@ let option_list = Arg.align [
   "--print-datadir", Arg.Set opt_print_datadir,
       " Print location of non-binary data (theories, modules, etc)";
   "--version", Arg.Set opt_version,
-      " Print version information" ]
+      " Print version information";
+  "--help", Arg.Set opt_help, " Display this list of options";
+  "-help", Arg.Set opt_help, " Display this list of options" ]
 
 let command_path =
   match Config.localdir with
@@ -95,7 +98,7 @@ let command sscmd =
       let scmd =
 	try List.assoc sscmd commands
 	with Not_found ->
-	  printf "'%s' is not a why3 command.@\n@\nAvailable commands:@." cmd;
+	  eprintf "'%s' is not a why3 command.@\n@\nAvailable commands:@." cmd;
 	  List.iter (fun (v,_) -> eprintf "  %s@." v) commands;
 	  exit 1 in
       let cmd = Filename.concat command_path scmd in
@@ -114,6 +117,11 @@ let () = try
 
   if !opt_version then begin
     printf "%s@." version_msg;
+    exit 0
+  end;
+  if !opt_help then begin
+    printf "%s@\nAvailable commands:@." (Arg.usage_string option_list usage_msg);
+    List.iter (fun (v,_) -> printf "  %s@." v) (available_commands ());
     exit 0
   end;
   if !opt_print_libdir then begin
@@ -191,8 +199,8 @@ let () = try
   opt_list :=  Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
-  eprintf "%s@\n@\nAvailable commands:@." usage_msg;
-  List.iter (fun (v,_) -> eprintf "  %s@." v) (available_commands ())
+  printf "%s@\n@\nAvailable commands:@." usage_msg;
+  List.iter (fun (v,_) -> printf "  %s@." v) (available_commands ())
 
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
