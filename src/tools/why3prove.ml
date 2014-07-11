@@ -18,7 +18,7 @@ open Task
 open Driver
 
 let usage_msg = sprintf
-  "Usage: why3 %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
+  "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
   (Filename.basename Sys.argv.(0))
 
 let opt_queue = Queue.create ()
@@ -144,7 +144,7 @@ let option_list = [
   Debug.Args.desc_shortcut
     "type_only" "--type-only" " stop after type checking" ]
 
-let config, env =
+let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () = try

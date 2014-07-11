@@ -27,27 +27,32 @@ let cmds =
     Why3session_run.cmd;
   |]
 
-let exec_name = Sys.argv.(0)
+let exec_name = Filename.basename Sys.argv.(0)
 
-let print_usage () =
+let print_usage fmt () =
   let maxl = Array.fold_left
     (fun acc e -> max acc (String.length e.cmd_name)) 0 cmds in
-  eprintf "%s <command> [options] <session directories>@\n@\navailable commands:@.@[<hov>%a@]@\n@."
+  fprintf fmt "Usage: %s <command> [options] <session directories>@\n@\n\
+      Available commands:@.@[<hov>%a@]@\n@."
     exec_name
     (Pp.print_iter1 Array.iter Pp.newline
-       (fun fmt e -> fprintf fmt "%s   @[<hov>%s@]"
+       (fun fmt e -> fprintf fmt "  %s   @[<hov>%s@]"
          (Strings.pad_right ' ' e.cmd_name maxl) e.cmd_desc)) cmds;
-  Arg.usage (Arg.align Why3session_lib.common_options) "common options:";
-  eprintf "@\nspecific command options: %s <command> -help@." exec_name;
-  exit 1
+  let usage = Arg.usage_string
+    (Arg.align Why3session_lib.common_options) "Common options:" in
+  fprintf fmt "%s@\nSpecific command options: %s <command> --help@."
+    usage exec_name
 
 let () =
-  if Array.length Sys.argv < 2 then print_usage ();
+  if Array.length Sys.argv < 2 then begin
+    print_usage err_formatter ();
+    exit 1
+  end;
   let cmd_name = Sys.argv.(1) in
   begin
     match cmd_name with
-      | "-h" | "--help" -> print_usage ()
-      | "-v" | "--version" -> print_version (); exit 0
+      | "-h" | "-help" | "--help" ->
+        print_usage std_formatter (); exit 0
       | _ -> ()
   end;
   let module M = struct exception Found of cmd end in
@@ -57,11 +62,12 @@ let () =
         if e.cmd_name = cmd_name
         then raise (M.Found e)) cmds;
       eprintf "command %s unknown@." cmd_name;
-      print_usage ()
+      print_usage err_formatter ();
+      exit 1
     with M.Found cmd -> cmd
   in
   incr Arg.current;
-  let cmd_usage = sprintf "%s %s [options]:" Sys.argv.(0) cmd_name in
+  let cmd_usage = sprintf "Usage: %s %s [options]" exec_name cmd_name in
   Arg.parse (Arg.align cmd.cmd_spec) anon_fun cmd_usage;
   try
     cmd.cmd_run ()

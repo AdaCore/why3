@@ -62,7 +62,7 @@ let set_opt_smoke = function
   | _ -> assert false
 
 let usage_msg = Format.sprintf
-  "Usage: why3 %s [options] [<file.why>|<project directory>]"
+  "Usage: %s [options] [<file.why>|<project directory>]"
   (Filename.basename Sys.argv.(0))
 
 let option_list = [
@@ -104,7 +104,7 @@ let add_opt_file f = match !opt_file with
   | None ->
       opt_file := Some f
 
-let config, env =
+let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 (* let () = *)

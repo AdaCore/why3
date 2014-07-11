@@ -786,14 +786,14 @@ module Args = struct
       Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
       exit 0
     end;
-    let config = read_config !opt_config in
-    let config = List.fold_left merge_config config !opt_extra in
+    let base_config = read_config !opt_config in
+    let config = List.fold_left merge_config base_config !opt_extra in
     let main = get_main config in
     load_plugins main;
     Debug.Args.set_flags_selected ();
     if Debug.Args.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
-    config, Env.create_env lp
+    config, base_config, Env.create_env lp
 
   let exit_with_usage options usage =
     Arg.usage (align_options options) usage;

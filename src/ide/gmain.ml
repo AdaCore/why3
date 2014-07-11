@@ -39,54 +39,35 @@ let debug = Debug.lookup_flag "ide_info"
 (* parsing command line *)
 (************************)
 
-let includes = ref []
 let files = Queue.create ()
 let opt_parser = ref None
-let opt_config = ref None
-let opt_extra = ref []
 
 let spec = Arg.align [
-  ("-L",
-   Arg.String (fun s -> includes := s :: !includes),
-   "<dir> Add <dir> to the library search path") ;
-  "--library",
-   Arg.String (fun s -> includes := s :: !includes),
-   " same as -L" ;
-  "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> Read configuration from <file>";
-  "--config", Arg.String (fun s -> opt_config := Some s),
-      " same as -C";
-  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-      "<file> Read additional configuration from <file>";
   "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> Select input format (default: \"why\")";
+      "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
 (*
-  ("-f",
+  "-f",
    Arg.String (fun s -> input_files := s :: !input_files),
-   "<f> add file f to the project (ignored if it is already there)") ;
+   "<file> add file to the project (ignored if it is already there)";
 *)
-  Debug.Args.desc_debug_list;
-  Debug.Args.desc_debug_all;
-  Debug.Args.desc_debug
 ]
 
 let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory> [<file.why> ...]]"
+  "Usage: %s [options] [<file.why>|<project directory>]..."
   (Filename.basename Sys.argv.(0))
 
-let () = Arg.parse spec (fun f -> Queue.add f files) usage_str
+let gconfig = try
+  let config, base_config, env =
+    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
+  if Queue.is_empty files then Whyconf.Args.exit_with_usage spec usage_str;
+  Gconfig.load_config config base_config env;
+  Gconfig.config ()
 
-let () = Gconfig.read_config !opt_config !opt_extra
-
-let () = C.load_plugins (Gconfig.get_main ())
-
-let () =
-  Debug.Args.set_flags_selected ();
-  if Debug.Args.option_list () then exit 0
-
-let () = if Queue.is_empty files then begin Arg.usage spec usage_str; exit 1 end
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "%a@." Exn_printer.exn_printer e;
+    exit 1
 
 let () =
   Debug.dprintf debug "[Info] Init the GTK interface...@?";
@@ -115,9 +96,7 @@ let (why_lang, any_lang) =
     | Some _ as l -> l in
   (why_lang, any_lang)
 
-
-
-(* Borrowed from Frama-C src/gui/source_manager.ml: 
+(* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
 let try_convert s =
   try
@@ -141,22 +120,6 @@ let source_text fname =
     try_convert buf
   with e when not (Debug.test_flag Debug.stack_trace) ->
     "Error while opening or reading file '" ^ fname ^ "':\n" ^ (Printexc.to_string e)
-
-(********************************)
-(* loading WhyIDE configuration *)
-(********************************)
-
-let loadpath = (C.loadpath (Gconfig.get_main ())) @ List.rev !includes
-
-let gconfig =
-  let c = Gconfig.config () in
-  c.env <- Env.create_env loadpath;
-(*
-  let provers = C.get_provers c.Gconfig.config in
-  c.provers <-
-    Util.Mstr.fold (Session.get_prover_data c.env) provers Util.Mstr.empty;
-*)
-  c
 
 (***************)
 (* Main window *)
@@ -637,7 +600,7 @@ module MA = struct
      let notify_timer_state =
        let c = ref 0 in
        fun t s r ->
-	 reset_gc ();
+         reset_gc ();
          incr c;
          monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
          monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
@@ -1636,7 +1599,7 @@ let evaluate_window () =
       files_map (0, [])
   in
   let (_store, column) =
-    GTree.store_of_list Gobject.Data.string file_names 
+    GTree.store_of_list Gobject.Data.string file_names
   in
   files_combo#set_text_column column;
   let ( _ : GtkSignal.id) = files_combo#connect#changed
@@ -1889,7 +1852,7 @@ let reload () =
     current_file := "";
     (** create a new environnement
         (in order to reload the files which are "use") *)
-    gconfig.env <- Env.create_env loadpath;
+    gconfig.env <- Env.create_env (Env.get_loadpath gconfig.env);
     (** reload the session *)
     let old_session = (env_session()).S.session in
     let new_env_session,(_:bool),(_:bool) =

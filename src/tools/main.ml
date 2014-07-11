@@ -89,11 +89,12 @@ let command sscmd =
   for i = 1 to Array.length Sys.argv - 1 do
     if i <> !Arg.current then args := Sys.argv.(i) :: !args;
   done;
-  Unix.execv cmd (Array.of_list (sscmd :: List.rev !args))
+  let scmd = "why3 " ^ sscmd in
+  Unix.execv cmd (Array.of_list (scmd :: List.rev !args))
 
 let () = try
   let extra_help fmt () = extra_help fmt (available_commands ()) in
-  let config,_ = Args.initialize ~extra_help option_list command usage_msg in
+  let config,_,_ = Args.initialize ~extra_help option_list command usage_msg in
 
   (** listings *)
 

@@ -239,7 +239,7 @@ module Args : sig
     ?extra_help : (Format.formatter -> unit -> unit) ->
     (string * Arg.spec * string) list ->
     (string -> unit) -> string ->
-    config * Env.env
+    config * config * Env.env
 
   val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
 end

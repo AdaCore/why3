@@ -15,7 +15,7 @@ open Stdlib
 open Theory
 
 let usage_msg = sprintf
-  "Usage: why3 %s [options] -D <driver> -o <dir> [[file|-] [-T <theory>]...]..."
+  "Usage: %s [options] -D <driver> -o <dir> [[file|-] [-T <theory>]...]..."
   (Filename.basename Sys.argv.(0))
 
 let opt_queue = Queue.create ()
@@ -71,7 +71,7 @@ let option_list = [
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o" ]
 
-let config, env =
+let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =

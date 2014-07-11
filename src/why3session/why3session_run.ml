@@ -358,7 +358,7 @@ let run () =
 
 let cmd =
   { cmd_spec     = spec;
-    cmd_desc     = "run the proof attempt that corresponds to the filter.";
+    cmd_desc     = "run the proof attempt that corresponds to the filter";
     cmd_name     = "run";
     cmd_run      = run;
   }

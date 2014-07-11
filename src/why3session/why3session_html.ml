@@ -48,7 +48,7 @@ let spec =
    Arg.Set_string output_dir,
    "<path> output directory ('-' for stdout)") ::
   ("--context", Arg.Set opt_context,
-   " adds context around the generated HTML code") ::
+   " add context around the generated HTML code") ::
   ("--style", Arg.Symbol (["simpletree";"jstree";"table"], set_opt_style),
    " style to use, defaults to '" ^ default_style ^ "'."
 ) ::
@@ -56,7 +56,7 @@ let spec =
     [Arg.String set_opt_pp_in;
      Arg.String set_opt_pp_cmd;
      Arg.String set_opt_pp_out],
-  "<suffix> <cmd> <out_suffix> declares a pretty-printer for edited proofs") ::
+  "<suffix> <cmd> <out_suffix> declare a pretty-printer for edited proofs") ::
   ("--coqdoc",
    Arg.Unit (fun ()->
     opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
@@ -555,7 +555,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc = "output session in HTML format.";
+    cmd_desc = "output session in HTML format";
     cmd_name = "html";
     cmd_run  = run;
   }

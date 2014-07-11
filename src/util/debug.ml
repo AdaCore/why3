@@ -98,7 +98,7 @@ module Args = struct
     let opt_list_flags = ref false in
     let desc =
       "--list-debug-flags", Arg.Set opt_list_flags,
-      " List known debug flags" in
+      " list known debug flags" in
     let list () =
       if !opt_list_flags then begin
         let list =
@@ -127,14 +127,14 @@ module Args = struct
     (option, Arg.Unit set_flag, desc)
 
   let desc_debug =
-    ("--debug", Arg.String add_flag, "<flag> Set a debug flag")
+    ("--debug", Arg.String add_flag, "<flag> set a debug flag")
 
   let opt_debug_all = ref false
 
   let desc_debug_all =
     let desc_debug =
       Pp.sprintf
-        " Set all debug flags that do not change Why3 behaviour" in
+        " set all debug flags that do not change Why3 behaviour" in
     ("--debug-all", Arg.Set opt_debug_all, desc_debug)
 
   let set_flags_selected () =

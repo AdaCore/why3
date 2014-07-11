@@ -32,7 +32,7 @@ let add_element s =
 let spec =
   ("-style",
    Arg.Set_int opt_style,
-   "<n> sets output style (1 or 2, default 1)") ::
+   "<n> set output style (1 or 2, default 1)") ::
   ("-o",
    Arg.Set_string opt_output_dir,
    "<dir> where to produce LaTeX files (default: session dir)") ::
@@ -472,7 +472,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc = "output session in LaTeX format.";
+    cmd_desc = "output session in LaTeX format";
     cmd_name = "latex";
     cmd_run  = run;
   }

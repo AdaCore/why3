@@ -19,16 +19,11 @@ let usage_msg =
   can be set to change the default paths.@."
     (Filename.basename Sys.argv.(0))
 
-let version_msg = sprintf
-  "Why3 configuration utility, version %s (build date: %s)"
-  Config.version Config.builddate
-
 (* let libdir = ref None *)
 (* let datadir = ref None *)
 let conf_file = ref None
 let autoprovers = ref false
 let autoplugins = ref false
-let opt_version = ref false
 
 let opt_list_prover_ids = ref false
 
@@ -47,31 +42,29 @@ let option_list = Arg.align [
   (* "--datadir", Arg.String (set_oref datadir), *)
   (* "<dir> set the data directory ($WHY3DATA)"; *)
   "-C", Arg.String (set_oref conf_file),
-  "<file> Config file to create";
+  "<file> config file to create";
   "--config", Arg.String (set_oref conf_file),
       " same as -C";
   "--detect-provers", Arg.Set autoprovers,
-  " Search for provers in $PATH";
+  " search for provers in $PATH";
   "--detect-plugins", Arg.Set autoplugins,
-  " Search for plugins in the default library directory";
+  " search for plugins in the default library directory";
   "--detect", Arg.Unit (fun () -> autoprovers := true; autoplugins := true),
-  " Search for both provers and plugins";
+  " search for both provers and plugins";
   "--add-prover", Arg.Tuple
     (let id = ref "" in
      [Arg.Set_string id;
       Arg.String (fun name -> Queue.add (!id, name) prover_bins)]),
-  "<id><file> Add a new prover executable";
+  "<id><file> add a new prover executable";
   "--list-prover-ids", Arg.Set opt_list_prover_ids,
-  " List known prover families";
+  " list known prover families";
   "--install-plugin", Arg.String add_plugin,
-  "<file> Install a plugin to the actual libdir";
+  "<file> install a plugin to the actual libdir";
   "--dont-save", Arg.Clear save,
-  " Do not modify the config file";
+  " do not modify the config file";
   Debug.Args.desc_debug_list;
   Debug.Args.desc_debug_all;
   Debug.Args.desc_debug;
-  "--version", Arg.Set opt_version,
-  " Print version information"
 ]
 
 let anon_file _ = Arg.usage option_list usage_msg; exit 1
@@ -125,10 +118,6 @@ let main () =
   Arg.parse option_list anon_file usage_msg;
 
   let opt_list = ref false in
-  if !opt_version then begin
-    opt_list := true;
-    printf "%s@." version_msg
-  end;
 
   (** Debug flag *)
   Debug.Args.set_flags_selected ();

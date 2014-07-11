@@ -323,11 +323,12 @@ and skip_until_nl = parse
     end;
     Queue.add file files
 
-  let usage = "why3 wc [options] files...\n\
+  let usage = Format.sprintf "Usage: %s [options] files...\n\
   \n\
   Counts tokens/lines in Why3 source files.\n\
   Assumes source files to be lexically well-formed.\n\
   If no source file is given, standard input is analyzed.\n"
+    (Filename.basename Sys.argv.(0))
 
   let () = Arg.parse spec add_file usage
 

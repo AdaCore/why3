@@ -40,8 +40,8 @@ type t =
       mutable session_nb_processes : int;
     }
 
-val read_config : string option -> string list -> unit
-(** None use the default config *)
+val load_config : Whyconf.config -> Whyconf.config -> Why3.Env.env -> unit
+(** [load_config config original_config env] creates and saves IDE config *)
 
 val init : unit -> unit
 
