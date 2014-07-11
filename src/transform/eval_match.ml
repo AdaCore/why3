@@ -111,7 +111,10 @@ and apply_cs_equ kn cs1 tl1 env t = match t.t_node with
   | _ -> assert false
 
 let eval_match ~inline kn t =
-  let rec eval env t = t_label_copy t (match t.t_node with
+  let rec eval stop env t =
+    let stop = stop || Slab.mem Split_goal.stop_split t.t_label in
+    let eval = eval stop in
+    t_label_copy t (match t.t_node with
     | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
         cs_equ kn env (eval env t1) (eval env t2)
     | Tapp (ls, [t1]) when is_projection kn ls ->
@@ -134,12 +137,14 @@ let eval_match ~inline kn t =
         with Exit -> branch_map eval env t1 bl1 end
     | Tquant (q, qf) ->
         let vl,tl,f,close = t_open_quant_cb qf in
-        let vl,tl,f = List.fold_left (add_quant kn) ([],tl,f) vl in
+        let vl,tl,f = if stop
+          then (List.rev vl,tl,f)
+          else List.fold_left (add_quant kn) ([],tl,f) vl in
         t_quant_simp q (close (List.rev vl) tl (eval env f))
     | _ ->
         t_map_simp (eval env) t)
   in
-  eval Mvs.empty t
+  eval false Mvs.empty t
 
 let rec linear vars t = match t.t_node with
   | Tvar x -> Svs.add_new Exit x vars
