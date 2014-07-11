@@ -6,11 +6,11 @@
 <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="20" memlimit="0"/>
 <prover id="2" name="Z3" version="3.2" timelimit="8" memlimit="1000"/>
 <prover id="3" name="Coq" version="8.4pl3" timelimit="20" memlimit="0"/>
-<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="0"/>
 <file name="../vstte10_queens.mlw" expanded="true">
 <theory name="NQueens" expanded="true">
  <goal name="eq_board_set" sum="e90922715e479af636c8b75d1bca5bf5" expanded="true">
- <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="eq_board_sym" sum="637819644163011d3643168b993182c1" expanded="true">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -31,14 +31,14 @@
  <proof prover="2"><result status="valid" time="0.06"/></proof>
  <proof prover="3" edited="vstte10_queens_NQueens_solution_eq_board_1.v"><result status="valid" time="1.31"/></proof>
  </goal>
- <goal name="WP_parameter bt_queens" expl="VC for bt_queens" sum="77d4d232822bacc03aba77962a5ccaad" expanded="true">
+ <goal name="WP_parameter bt_queens" expl="VC for bt_queens" sum="ad2b322585e35d80d2c78c57e19b433c" expanded="true">
  <proof prover="0"><result status="valid" time="1.22"/></proof>
  </goal>
- <goal name="WP_parameter queens" expl="VC for queens" sum="be9085123de1cfc77f45a330f2c2e3c0" expanded="true">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="WP_parameter queens" expl="VC for queens" sum="d0355b23d34bacd346b20ac1c8363015" expanded="true">
+ <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter test8" expl="VC for test8" sum="82a42a4c395dd56dc217087f030da199" expanded="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 </file>
