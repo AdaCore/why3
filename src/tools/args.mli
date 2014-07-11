@@ -11,7 +11,9 @@
 
 open Why3
 
-val initialize : (string * Arg.spec * string) list ->
+val initialize :
+  ?extra_help : (Format.formatter -> unit -> unit) ->
+  (string * Arg.spec * string) list ->
   (string -> unit) -> string -> Env.env * Whyconf.config
 
 val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
