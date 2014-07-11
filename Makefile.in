@@ -110,7 +110,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
                src/session/compress.ml src/session/xml.ml \
-	       lib/ocaml/why3__BigInt_compat.ml 
+	       lib/ocaml/why3__BigInt_compat.ml
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
@@ -153,12 +153,12 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 
 LIB_SESSION = compress xml termcode session session_tools session_scheduler
 
-LIBSESSIONMODULES = $(addprefix src/session/, $(LIB_SESSION)) 
-	      
+LIBSESSIONMODULES = $(addprefix src/session/, $(LIB_SESSION))
+
 LIBDIRS = util core parser driver transform printer whyml
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
-LIBSESSIONDIRS = session 
+LIBSESSIONDIRS = session
 LIBSESSIONINCLUDES = $(addprefix -I src/, $(LIBSESSIONDIRS))
 
 LIBDEP = $(addsuffix .dep, $(LIBMODULES))
@@ -469,29 +469,15 @@ install_no_local::
 	mkdir -p $(LIBDIR)/why3/plugins
 	cp -f $(foreach f,$(LIBPLUGCMO) $(LIBPLUGCMXS),$(wildcard $(f))) $(LIBDIR)/why3/plugins
 
-######
-# Why3
-######
-
-src/tools/main.cmo: lib/why3/why3.cma
-src/tools/main.cmx: lib/why3/why3.cmxa
+#################################
+# Old Why3 command, to be removed
+#################################
 
 src/tools/why3contraption.cmo: lib/why3/why3.cma
 src/tools/why3contraption.cmx: lib/why3/why3.cmxa
 
-byte: bin/why3.byte bin/why3contraption.byte
-opt:  bin/why3.opt  bin/why3contraption.opt
-
-bin/why3.opt: lib/why3/why3.cmxa src/tools/main.cmx
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
-bin/why3.byte: lib/why3/why3.cma src/tools/main.cmo
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-bin/why3: bin/why3.@OCAMLBEST@
-	ln -sf why3.@OCAMLBEST@ $@
+byte: bin/why3contraption.byte
+opt:  bin/why3contraption.opt
 
 bin/why3contraption.opt: lib/why3/why3.cmxa src/tools/why3contraption.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -501,30 +487,22 @@ bin/why3contraption.byte: lib/why3/why3.cma src/tools/why3contraption.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3contraption: bin/why3contraption.@OCAMLBEST@
-	ln -sf why3contraption.@OCAMLBEST@ $@
-
 clean_old_install::
-	rm -f $(BINDIR)/why3$(EXE) $(BINDIR)/why3contraption$(EXE)
+	rm -f $(BINDIR)/why3contraption$(EXE)
 
 install_no_local::
-	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 	cp -f bin/why3contraption.@OCAMLBEST@ $(BINDIR)/why3contraption$(EXE)
 
 install_local:: bin/why3 bin/why3contraption
 
 ifneq "$(MAKECMDGOALS)" "clean"
-include src/tools/main.dep
 include src/tools/why3contraption.dep
-include src/tools/why3prove.dep
 endif
 
-depend: src/tools/main.dep src/tools/why3contraption.dep
+depend: src/tools/why3contraption.dep
 
 clean::
-	rm -f src/tools/main.cm[iox] src/tools/main.annot src/tools/main.o src/tools/main.dep
 	rm -f src/tools/why3contraption.cm[iox] src/tools/why3contraption.annot src/tools/why3contraption.o src/tools/why3contraption.dep
-	rm -f bin/why3.byte bin/why3.opt bin/why3
 	rm -f bin/why3contraption.byte bin/why3contraption.opt bin/why3contraption
 
 ###############
@@ -532,7 +510,7 @@ clean::
 ###############
 
 TOOLS_BIN = why3execute why3extract why3prove why3realize why3replay
-TOOLS_FILES = args $(TOOLS_BIN)
+TOOLS_FILES = args main $(TOOLS_BIN)
 
 TOOLSMODULES = $(addprefix src/tools/, $(TOOLS_FILES))
 
@@ -543,8 +521,16 @@ TOOLSCMX = $(addsuffix .cmx, $(TOOLSMODULES))
 $(TOOLSDEP): DEPFLAGS += -I src/tools
 $(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
 
-byte: $(TOOLS_BIN:%=bin/%.byte)
-opt:  $(TOOLS_BIN:%=bin/%.opt)
+byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.byte)
+opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.opt)
+
+bin/why3.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/main.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/main.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/why3execute.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3execute.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -554,9 +540,6 @@ bin/why3execute.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3execute
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3execute: bin/why3execute.@OCAMLBEST@
-	ln -sf why3execute.@OCAMLBEST@ $@
-
 bin/why3extract.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3extract.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
@@ -564,9 +547,6 @@ bin/why3extract.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3extract
 bin/why3extract.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3extract.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-bin/why3extract: bin/why3extract.@OCAMLBEST@
-	ln -sf why3extract.@OCAMLBEST@ $@
 
 bin/why3prove.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3prove.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -576,9 +556,6 @@ bin/why3prove.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3prove.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3prove: bin/why3prove.@OCAMLBEST@
-	ln -sf why3prove.@OCAMLBEST@ $@
-
 bin/why3realize.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3realize.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
@@ -586,9 +563,6 @@ bin/why3realize.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3realize
 bin/why3realize.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3realize.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-bin/why3realize: bin/why3realize.@OCAMLBEST@
-	ln -sf why3realize.@OCAMLBEST@ $@
 
 bin/why3replay.opt: lib/why3/why3.cmxa lib/why3/why3session.cmxa src/tools/args.cmx src/tools/why3replay.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
@@ -598,20 +572,21 @@ bin/why3replay.byte: lib/why3/why3.cma lib/why3/why3session.cma src/tools/args.c
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3replay: bin/why3replay.@OCAMLBEST@
-	ln -sf why3replay.@OCAMLBEST@ $@
-
 clean_old_install::
-	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE))
+	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE)) $(BINDIR)/why3$(EXE)
 
 install_no_local::
+	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 	cp -f bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
 	cp -f bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
 	cp -f bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
 	cp -f bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
-	cp -f bin/why3replay.@OCAMLBEST@ $(TOOLDIR)/why3replay$(EXE)
+	cp -f bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
 
-install_local:: $(addprefix bin/,$(TOOLS_BIN))
+install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
+
+bin/%:	bin/%.@OCAMLBEST@
+	ln -sfr $< $@
 
 ifneq "$(MAKECMDGOALS)" "clean"
 include $(TOOLSDEP)
@@ -621,16 +596,15 @@ depend: $(TOOLSDEP)
 
 clean::
 	rm -f src/tools/args.cm[iox] src/tools/args.annot src/tools/args.o src/tools/args.dep
+	rm -f src/tools/main.cm[iox] src/tools/main.annot src/tools/main.o src/tools/main.dep
 	rm -f src/tools/why3execute.cm[iox] src/tools/why3execute.annot src/tools/why3execute.o src/tools/why3execute.dep
 	rm -f src/tools/why3extract.cm[iox] src/tools/why3extract.annot src/tools/why3extract.o src/tools/why3extract.dep
 	rm -f src/tools/why3prove.cm[iox] src/tools/why3prove.annot src/tools/why3prove.o src/tools/why3prove.dep
 	rm -f src/tools/why3realize.cm[iox] src/tools/why3realize.annot src/tools/why3realize.o src/tools/why3realize.dep
 	rm -f src/tools/why3replay.cm[iox] src/tools/why3replay.annot src/tools/why3replay.o src/tools/why3replay.dep
-	rm -f bin/why3execute.byte bin/why3execute.opt bin/why3execute
-	rm -f bin/why3extract.byte bin/why3extract.opt bin/why3extract
-	rm -f bin/why3prove.byte bin/why3prove.opt bin/why3prove
-	rm -f bin/why3realize.byte bin/why3realize.opt bin/why3realize
-	rm -f bin/why3replay.byte bin/why3replay.opt bin/why3replay
+	rm -f $(addprefix bin/,$(TOOLS_BIN))
+	rm -f $(TOOLS_BIN:%=bin/%.byte) $(TOOLS_BIN:%=bin/%.opt)
+	rm -f bin/why3.byte bin/why3.opt bin/why3
 
 ##############
 # test targets
@@ -664,7 +638,7 @@ gallery::
 	@for x in examples/*/why3session.xml ; do \
 	  d=`dirname $$x`; \
 	  f=`basename $$d`; \
-	  why3session html $$x; \
+	  why3 session html $$x; \
 	  echo "exporting $$f"; \
 	  mkdir -p $(GALLERYDIR)/$$f; \
 	  cp examples/$$f.mlw examples/$$f/why3session.html $(GALLERYDIR)/$$f/; \
@@ -679,7 +653,7 @@ gallery::
 	x=$*/why3session.xml; \
 	d=`dirname $$x`; \
 	f=`basename $$d`; \
-	why3session html $$x; \
+	why3 session html $$x; \
 	echo "exporting $$f"; \
 	mkdir -p $(GALLERYDIR)/$$f; \
 	if test -f examples/$$f.mlw; then cp examples/$$f.mlw $(GALLERYDIR)/$$f/; fi; \
@@ -729,9 +703,6 @@ bin/why3config.opt: lib/why3/why3.cmxa $(CONFIGCMX)
 bin/why3config.byte: lib/why3/why3.cma $(CONFIGCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-bin/why3config: bin/why3config.@OCAMLBEST@
-	ln -sf why3config.@OCAMLBEST@ $@
 
 # depend and clean targets
 
@@ -792,11 +763,9 @@ bin/why3ide.byte: lib/why3/why3.cma lib/why3/why3session.cma src/ide/resetgc.o $
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
 
-bin/why3ide: bin/why3ide.@OCAMLBEST@
-	ln -sf why3ide.@OCAMLBEST@ $@
-
 src/ide/resetgc.o: src/ide/resetgc.c
-	$(OCAMLC) -c -ccopt "-Wall -o $@" $<
+	$(if $(QUIET),@echo 'Ocamlc   $<' &&) \
+	    $(OCAMLC) -c -ccopt "-Wall -o $@" $<
 
 # depend and clean targets
 
@@ -853,9 +822,6 @@ bin/why3session.byte: lib/why3/why3.cma lib/why3/why3session.cma $(SESSIONCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3session: bin/why3session.@OCAMLBEST@
-	ln -sf why3session.@OCAMLBEST@ $@
-
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS)" "clean"
@@ -910,9 +876,6 @@ bin/why3bench.opt: lib/why3/why3.cmxa $(BENCHCMX)
 bin/why3bench.byte: lib/why3/why3.cma $(BENCHCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-bin/why3bench: bin/why3bench.@OCAMLBEST@
-	ln -sf why3bench.@OCAMLBEST@ $@
 
 # depend and clean targets
 
@@ -1434,14 +1397,10 @@ lib/why3/why3extract.cmx: $(OCAMLLIBS_CMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -pack -o $@ $^
 
-
-
 install_no_local_lib::
 	mkdir -p $(OCAMLINSTALLLIB)/why3
 	cp -f lib/why3/why3extract.cm* lib/why3/why3extract.[ao] \
 		$(OCAMLINSTALLLIB)/why3
-
-
 
 ################
 # Jessie3 plugin
@@ -1514,9 +1473,6 @@ bin/why3wc.byte: $(WHY3WCCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3wc: bin/why3wc.@OCAMLBEST@
-	ln -sf why3wc.@OCAMLBEST@ $@
-
 ifneq "$(MAKECMDGOALS)" "clean"
 include $(WHY3WCDEP)
 endif
@@ -1568,9 +1524,6 @@ bin/why3doc.opt: lib/why3/why3.cmxa $(WHY3DOCCMX)
 bin/why3doc.byte: lib/why3/why3.cma $(WHY3DOCCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-bin/why3doc: bin/why3doc.@OCAMLBEST@
-	ln -sf why3doc.@OCAMLBEST@ $@
 
 # depend and clean targets
 
@@ -1696,14 +1649,14 @@ test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
 #test-shape: lib/why3/why3.cma
 #	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
 
-test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma lib/why3/why3session.cma 
+test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma lib/why3/why3session.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma lib/why3/why3session.cma $< > /dev/null\
 	|| (rm -f why3session.xml why3shapes.dat why3shapes.gz;  \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f why3session.xml
 
-test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa lib/why3/why3session.cmxa 
+test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa lib/why3/why3session.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa lib/why3/why3session.cmxa  $< \
 	&& ./test-session.opt > /dev/null) \
