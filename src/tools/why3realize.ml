@@ -13,7 +13,7 @@ open Format
 open Why3
 
 let usage_msg = sprintf
-  "Usage: %s [options] -D <driver> -o <dir> -T <theory> ..."
+  "Usage: why3 %s [options] -D <driver> -o <dir> -T <theory> ..."
   (Filename.basename Sys.argv.(0))
 
 let opt_queue = Queue.create ()
@@ -44,27 +44,28 @@ let opt_output = ref None
 
 let option_list = [
   "-T", Arg.String add_opt_theory,
-      "<theory> Select <theory> in the input file or in the library";
+      "<theory> select <theory> in the input file or in the library";
   "--theory", Arg.String add_opt_theory,
       " same as -T";
   "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> Select input format (default: \"why\")";
+      "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
   "-D", Arg.String (fun s -> opt_driver := Some s),
-      "<file> Specify a realization driver";
+      "<file> specify a realization driver";
   "--driver", Arg.String (fun s -> opt_driver := Some s),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir> Write the realizations in <dir>";
+      "<dir> write the realizations in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o" ]
 
-let (env, config) =
-  Args.initialize option_list add_opt_file usage_msg
+let config, env =
+  Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =
-  if Queue.is_empty opt_queue then Args.exit_with_usage option_list usage_msg
+  if Queue.is_empty opt_queue then
+    Whyconf.Args.exit_with_usage option_list usage_msg
 
 let opt_output =
   match !opt_output with

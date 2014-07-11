@@ -93,7 +93,7 @@ let command sscmd =
 
 let () = try
   let extra_help fmt () = extra_help fmt (available_commands ()) in
-  let _, config = Args.initialize ~extra_help option_list command usage_msg in
+  let config,_ = Args.initialize ~extra_help option_list command usage_msg in
 
   (** listings *)
 

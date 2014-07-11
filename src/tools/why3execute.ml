@@ -14,7 +14,7 @@ open Why3
 open Stdlib
 
 let usage_msg = sprintf
-  "Usage: %s [options] file module.ident..."
+  "Usage: why3 %s [options] file module.ident..."
   (Filename.basename Sys.argv.(0))
 
 let opt_file = ref None
@@ -33,15 +33,15 @@ let opt_parser = ref None
 
 let option_list = [
   "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> Select input format (default: \"why\")";
+      "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F" ]
 
-let (env, config) =
-  Args.initialize option_list add_opt usage_msg
+let config, env =
+  Whyconf.Args.initialize option_list add_opt usage_msg
 
 let () =
-  if !opt_file = None then Args.exit_with_usage option_list usage_msg
+  if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
 
 let do_input f =
   let fname, cin =

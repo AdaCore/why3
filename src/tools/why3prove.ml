@@ -18,7 +18,7 @@ open Task
 open Driver
 
 let usage_msg = sprintf
-  "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
+  "Usage: why3 %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
   (Filename.basename Sys.argv.(0))
 
 let opt_queue = Queue.create ()
@@ -94,60 +94,62 @@ let opt_print_namespace = ref false
 
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
-      " Read the input file from stdin";
+      " read the input file from stdin";
   "-T", Arg.String add_opt_theory,
-      "<theory> Select <theory> in the input file or in the library";
+      "<theory> select <theory> in the input file or in the library";
   "--theory", Arg.String add_opt_theory,
       " same as -T";
   "-G", Arg.String add_opt_goal,
-      "<goal> Select <goal> in the last selected theory";
+      "<goal> select <goal> in the last selected theory";
   "--goal", Arg.String add_opt_goal,
       " same as -G";
   "-P", Arg.String (fun s -> opt_prover := Some s),
-      "<prover> Prove or print (with -o) the selected goals";
+      "<prover> prove or print (with -o) the selected goals";
   "--prover", Arg.String (fun s -> opt_prover := Some s),
       " same as -P";
   "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> Select input format (default: \"why\")";
+      "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
   "-t", Arg.Int (fun i -> opt_timelimit := Some i),
-      "<sec> Set the prover's time limit (default=10, no limit=0)";
+      "<sec> set the prover's time limit (default=10, no limit=0)";
   "--timelimit", Arg.Int (fun i -> opt_timelimit := Some i),
       " same as -t";
   "-m", Arg.Int (fun i -> opt_memlimit := Some i),
-      "<MiB> Set the prover's memory limit (default: no limit)";
+      "<MiB> set the prover's memory limit (default: no limit)";
   "--memlimit", Arg.Int (fun i -> opt_timelimit := Some i),
       " same as -m";
   "-a", Arg.String add_opt_trans,
-      "<transformation> Apply a transformation to every task";
+      "<transformation> apply a transformation to every task";
   "--apply-transform", Arg.String add_opt_trans,
       " same as -a";
   "-M", Arg.String add_opt_meta,
-      "<meta_name>[=<string>] Add a meta to every task";
+      "<meta_name>[=<string>] add a meta to every task";
   "--meta", Arg.String add_opt_meta,
       " same as -M";
   "-D", Arg.String (fun s -> opt_driver := Some (s, [])),
-      "<file> Specify a prover's driver (conflicts with -P)";
+      "<file> specify a prover's driver (conflicts with -P)";
   "--driver", Arg.String (fun s -> opt_driver := Some (s, [])),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir> Print the selected goals to separate files in <dir>";
+      "<dir> print the selected goals to separate files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o";
   "--print-theory", Arg.Set opt_print_theory,
-      " Print selected theories";
+      " print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
-      " Print namespaces of selected theories";
-  Debug.Args.desc_shortcut "parse_only" "--parse-only" " Stop after parsing";
+      " print namespaces of selected theories";
   Debug.Args.desc_shortcut
-    "type_only" "--type-only" " Stop after type checking" ]
+    "parse_only" "--parse-only" " stop after parsing";
+  Debug.Args.desc_shortcut
+    "type_only" "--type-only" " stop after type checking" ]
 
-let (env, config) =
-  Args.initialize option_list add_opt_file usage_msg
+let config, env =
+  Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () = try
-  if Queue.is_empty opt_queue then Args.exit_with_usage option_list usage_msg;
+  if Queue.is_empty opt_queue then
+    Whyconf.Args.exit_with_usage option_list usage_msg;
 
   if !opt_prover <> None && !opt_driver <> None then begin
     eprintf "Options '-P'/'--prover' and \

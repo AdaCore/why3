@@ -510,7 +510,7 @@ clean::
 ###############
 
 TOOLS_BIN = why3execute why3extract why3prove why3realize why3replay
-TOOLS_FILES = args main $(TOOLS_BIN)
+TOOLS_FILES = main $(TOOLS_BIN)
 
 TOOLSMODULES = $(addprefix src/tools/, $(TOOLS_FILES))
 
@@ -524,51 +524,51 @@ $(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
 byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.byte)
 opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.opt)
 
-bin/why3.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/main.cmx
+bin/why3.opt: lib/why3/why3.cmxa src/tools/main.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/main.cmo
+bin/why3.byte: lib/why3/why3.cma src/tools/main.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3execute.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3execute.cmx
+bin/why3execute.opt: lib/why3/why3.cmxa src/tools/why3execute.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3execute.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3execute.cmo
+bin/why3execute.byte: lib/why3/why3.cma src/tools/why3execute.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3extract.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3extract.cmx
+bin/why3extract.opt: lib/why3/why3.cmxa src/tools/why3extract.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3extract.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3extract.cmo
+bin/why3extract.byte: lib/why3/why3.cma src/tools/why3extract.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3prove.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3prove.cmx
+bin/why3prove.opt: lib/why3/why3.cmxa src/tools/why3prove.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3prove.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3prove.cmo
+bin/why3prove.byte: lib/why3/why3.cma src/tools/why3prove.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3realize.opt: lib/why3/why3.cmxa src/tools/args.cmx src/tools/why3realize.cmx
+bin/why3realize.opt: lib/why3/why3.cmxa src/tools/why3realize.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3realize.byte: lib/why3/why3.cma src/tools/args.cmo src/tools/why3realize.cmo
+bin/why3realize.byte: lib/why3/why3.cma src/tools/why3realize.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-bin/why3replay.opt: lib/why3/why3.cmxa lib/why3/why3session.cmxa src/tools/args.cmx src/tools/why3replay.cmx
+bin/why3replay.opt: lib/why3/why3.cmxa lib/why3/why3session.cmxa src/tools/why3replay.cmx
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3replay.byte: lib/why3/why3.cma lib/why3/why3session.cma src/tools/args.cmo src/tools/why3replay.cmo
+bin/why3replay.byte: lib/why3/why3.cma lib/why3/why3session.cma src/tools/why3replay.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
@@ -595,7 +595,6 @@ endif
 depend: $(TOOLSDEP)
 
 clean::
-	rm -f src/tools/args.cm[iox] src/tools/args.annot src/tools/args.o src/tools/args.dep
 	rm -f src/tools/main.cm[iox] src/tools/main.annot src/tools/main.o src/tools/main.dep
 	rm -f src/tools/why3execute.cm[iox] src/tools/why3execute.annot src/tools/why3execute.o src/tools/why3execute.dep
 	rm -f src/tools/why3extract.cm[iox] src/tools/why3extract.annot src/tools/why3extract.o src/tools/why3extract.dep

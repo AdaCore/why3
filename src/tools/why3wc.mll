@@ -238,7 +238,7 @@ and comment n = parse
 
 and read_header = parse
   | "(*"   { skip_header_comment lexbuf; skip_until_nl lexbuf;
-	     read_header lexbuf }
+             read_header lexbuf }
   | "\n"   { () }
   | space+ { read_header lexbuf }
   | _      { lexbuf.lex_curr_pos <- lexbuf.lex_curr_pos - 1 }
@@ -300,19 +300,19 @@ and skip_until_nl = parse
 
   let spec = Arg.align [
     "-t", Arg.Set tokens,
-      " Count tokens";
+      " count tokens";
     "--tokens", Arg.Set tokens,
       " same as -t";
     "-l", Arg.Clear tokens,
-      " Count lines (default)";
+      " count lines (default)";
     "--lines", Arg.Clear tokens,
       " same as -l";
     "-f", Arg.Set factor,
-      " Print spec/code ratio";
+      " print spec/code ratio";
     "--factor", Arg.Set factor,
       " same as -f";
     "-a", Arg.Clear skip_header,
-      " Count heading comments as well";
+      " count heading comments as well";
     "--do-not-skip-header", Arg.Clear skip_header,
       " same as -a";
   ]
@@ -323,7 +323,7 @@ and skip_until_nl = parse
     end;
     Queue.add file files
 
-  let usage = "why3wc [options] files...\n\
+  let usage = "why3 wc [options] files...\n\
   \n\
   Counts tokens/lines in Why3 source files.\n\
   Assumes source files to be lexically well-formed.\n\
