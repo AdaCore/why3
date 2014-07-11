@@ -85,9 +85,7 @@ let rec handle_vc_result goal result prover_result =
        Gnat_report.register obj (Some task) prover_result
                             false filename tracefile
    | Gnat_objectives.Work_Left ->
-         match Gnat_objectives.next obj with
-         | Some g -> schedule_goal g
-         | None -> ()
+       List.iter schedule_goal (Gnat_objectives.next obj)
 
 and interpret_result pa pas =
    (* callback function for the scheduler, here we filter if an interesting
@@ -146,13 +144,14 @@ let handle_obj obj =
         Gnat_report.register obj None None true None ""
    end else begin
       match Gnat_objectives.next obj with
-      | Some g ->
+      | [] -> ()
+      | (g::_) as l ->
+          (* for manual proof we only consider one goal *)
          if Gnat_manual.is_new_manual_proof g then
            Gnat_report.register
              obj None None false
              (Some (Gnat_manual.create_prover_file g obj)) ""
-         else schedule_goal g
-      | None -> ()
+         else List.iter schedule_goal l
    end
 
 let normal_handle_one_subp subp =

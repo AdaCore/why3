@@ -177,14 +177,18 @@ let next objective =
    (* this lookup should always succeed, otherwise it would mean we have a
       corrupt database *)
    let obj_rec = Gnat_expl.HCheck.find explmap objective in
-   try
-      (* the [choose] can fail however, in that case we want to return
-         [None] *)
-      let goal = GoalSet.choose obj_rec.to_be_scheduled in
-      GoalSet.remove obj_rec.to_be_scheduled goal;
-      Some goal
-   with Not_found ->
-      None
+   let rec build acc n =
+     if n = 0 then acc
+     else try
+        (* the [choose] can fail however, in that case we want to return
+           the goals found up to now *)
+        let goal = GoalSet.choose obj_rec.to_be_scheduled in
+        GoalSet.remove obj_rec.to_be_scheduled goal;
+        build (goal :: acc) (n-1)
+     with Not_found ->
+        acc
+   in
+   build [] Gnat_config.parallel
 
 let strategy =
   match Gnat_config.proof_mode with

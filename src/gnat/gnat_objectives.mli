@@ -10,8 +10,8 @@
    This module has the following functionality:
       - It answers queries to get the goals of an objective and the
         objective of a goal.
-      - It supports scheduling by providing a "next" function that will one by
-        one return each goal associated to an objective.
+      - It supports scheduling by providing a "next" function that will by
+      little chunks return all goals associated to an objective.
       - It allows registering prover results and keeps track of the status of
         an objective.
       - It defines the scheduler and initializes it, and all the goals,
@@ -56,10 +56,11 @@ val get_objective : goal -> objective
 (* get the objective associated with a goal *)
 
 (* Scheduling and proof *)
-val next : objective -> goal option
-(* For an objective, successive calls of [next] will return one by one all
-   goals associated to the objective. [None] is returned if no goals are left
-   One can add new goals to an objective at any time. *)
+val next : objective -> goal list
+(* For an objective, successive calls of [next] will return all goals
+   associated to the objective, by chunks of size Gnat_config.parallel. [] is
+   returned if no goals are left. One can add new goals to an objective at any
+   time. *)
 
 type status =
    | Proved
