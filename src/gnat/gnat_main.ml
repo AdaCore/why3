@@ -17,6 +17,7 @@
       - output the messages
 *)
 
+open Why3session
 open Why3
 open Term
 

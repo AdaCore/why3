@@ -1,3 +1,4 @@
+open Why3session
 open Why3
 
 type key = int

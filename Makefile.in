@@ -708,7 +708,7 @@ clean::
 # Why3server #
 ##############
 
-SERVER_MODULES:= logging arraylist options queue readbuf request writebuf main
+SERVER_MODULES:= logging arraylist options queue readbuf request writebuf server_main
 SERVER_C:= $(addprefix src/tools/, $(addsuffix .c, $(SERVER_MODULES)))
 SERVER_H:= $(addprefix src/tools/, $(addsuffix .h, $(SERVER_MODULES)))
 SERVER_O:= $(addprefix src/tools/, $(addsuffix .o, $(SERVER_MODULES)))

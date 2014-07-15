@@ -18,7 +18,7 @@
         correctly.
 *)
 
-open Why3
+open Why3session
 
 type objective = Gnat_expl.check
 (* an objective is identified by its check, which contains the check id and the

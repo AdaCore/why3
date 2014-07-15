@@ -1,4 +1,4 @@
-open Why3
+open Why3session
 
 type goal = int Session.goal
 
