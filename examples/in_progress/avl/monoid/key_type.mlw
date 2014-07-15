@@ -1,0 +1,28 @@
+
+(* Type with a key. Intended to factor elements/bindings representations
+   in sets/map-like structures, so it is essentially intended for two cases:
+   - t 'a = key
+   - t 'a = key * 'a *)
+theory KeyType
+  
+  type t 'a
+  type key
+  function key (t 'a) : key
+  
+end
+
+module ProgramKeyType
+  
+  use import program_type.TypeParams
+  clone program_type.Type0 as K
+  clone program_type.Type1 as D
+  
+  clone export KeyType with type t = D.m, type key = K.m
+  
+  val get_key (ghost p:type_params 'a 'b) (t:D.t 'a 'b) : K.t
+    requires { p.D.mp.inv t }
+    ensures { K.c result }
+    ensures { key (p.D.mp.mdl t) = result.K.m }
+  
+end
+

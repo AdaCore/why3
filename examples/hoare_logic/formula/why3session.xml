@@ -1,68 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
-  name="Vampire"
-  version="0.6"/>
- <file
-  name="../formula.why"
-  verified="true"
-  expanded="false">
-  <theory
-   name="Formula"
-   locfile="../formula.why"
-   loclnum="1" loccnumb="7" loccnume="14"
-   verified="true"
-   expanded="true">
-  </theory>
-  <theory
-   name="PropositionalCalculus"
-   locfile="../formula.why"
-   loclnum="21" loccnumb="7" loccnume="28"
-   verified="true"
-   expanded="true">
-   <goal
-    name="Test1"
-    locfile="../formula.why"
-    loclnum="47" loccnumb="7" loccnume="12"
-    sum="161a4ad6e899ec1a93d149896af71015"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aevalaForaFnotaFatomV0aFfalseV1aFalseLasetaconstaFalseV0aTrueLamk_identc0">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
+<prover id="2" name="Vampire" version="0.6" timelimit="5" memlimit="0"/>
+<file name="../formula.why">
+<theory name="Formula" expanded="true">
+</theory>
+<theory name="PropositionalCalculus" expanded="true">
+ <goal name="Test1" sum="161a4ad6e899ec1a93d149896af71015" expanded="true">
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.07"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

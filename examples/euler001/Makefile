@@ -5,7 +5,11 @@ ifeq ($(BENCH),yes)
   WHY3=../../bin/why3
   WHY3SHARE=../../share
 else
-  WHY3=$(BINDIR)/why3
+  ifeq ($(BINDIR),)
+    WHY3=why3
+  else
+    WHY3=$(BINDIR)/why3
+  endif
   WHY3SHARE=$(shell $(WHY3) --print-datadir)
 endif
 
@@ -37,7 +41,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../euler001.mlw
-	$(WHY3) -E ocaml32 ../euler001.mlw -o .
+	$(WHY3)extract -D ocaml32 ../euler001.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<

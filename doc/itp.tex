@@ -36,17 +36,21 @@ assistant) to ease some proofs.
 
 \subsection{Generating a realization}
 
-Generating the skeleton for a theory is done by passing to \why the
-\verb+--realize+ option, a driver suitable for realizations, the names of
+Generating the skeleton for a theory is done by passing to the
+\texttt{realize} command a driver suitable for realizations, the names of
 the theories to realize, and a target directory.
-\index{realize@\verb+--realize+}
+\index{realize@\texttt{realize}}
 
 \begin{verbatim}
-why3 --realize -D path/to/drivers/prover-realize.drv
-      -T env_path.theory_name -o path/to/target/dir/
+why3 realize -D path/to/drivers/prover-realize.drv
+             -T env_path.theory_name -o path/to/target/dir/
 \end{verbatim}
 \index{driver@\verb+--driver+}
 \index{theory@\verb+--theory+}
+
+The theory is looked into the files from the environment, \eg the standard
+library. If the theory is stored in a different location, option \texttt{-L}
+should be used.
 
 The name of the generated file is inferred from the theory name. If the
 target directory already contains a file with the same name, \why

@@ -15,6 +15,7 @@ module mach.int.Int32
   syntax val      (-_)      "( ~- )"
   syntax val      ( * )     "( * )"
   syntax val      ( / )     "( / )"
+  syntax val      ( % )     "(mod)"
   syntax val      eq        "(=)"
   syntax val      ne        "(<>)"
   syntax val      (<=)      "(<=)"
@@ -28,6 +29,7 @@ module mach.int.UInt32
   syntax converter of_int "%1"
 
   syntax function to_int "(Why3__BigInt.of_int %1)"
+  syntax constant zero_unsigned "0"
 
   syntax type     uint32    "int"
   syntax val      ( + )     "( + )"
@@ -35,12 +37,27 @@ module mach.int.UInt32
   syntax val      (-_)      "( ~- )"
   syntax val      ( * )     "( * )"
   syntax val      ( / )     "( / )"
+  syntax val      ( % )     "(mod)"
   syntax val      eq        "(=)"
   syntax val      ne        "(<>)"
   syntax val      (<=)      "(<=)"
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
   syntax val      (>)       "(>)"
+
+
+  syntax val      add_with_carry "(fun x y c ->
+    let r = x + y + c in
+    (r land 0xFFFFFFFF,r lsr 32))"
+
+  syntax val      add3 "(fun x y z ->
+    let r = x + y + z in
+    (r land 0xFFFFFFFF,r lsr 32))"
+
+  syntax val      mul_double "(fun x y ->
+    let r = Int64.mul (Int64.of_int x) (Int64.of_int y) in
+    (Int64.to_int (Int64.logand r 0xFFFFFFFFL),Int64.to_int (Int64.shift_right_logical r 32)))"
+
 end
 
 module mach.int.Int63
@@ -55,6 +72,7 @@ module mach.int.Int63
   syntax val      (-_)      "( ~- )"
   syntax val      ( * )     "( * )"
   syntax val      ( / )     "( / )"
+  syntax val      ( % )     "(mod)"
   syntax val      eq        "(=)"
   syntax val      ne        "(<>)"
   syntax val      (<=)      "(<=)"
@@ -75,6 +93,7 @@ module mach.int.Int64
   syntax val      (-_)      "Int64.neg"
   syntax val      ( * )     "Int64.mul"
   syntax val      (/)       "Int64.div"
+  syntax val      (%)       "Int64.mod"
   syntax val      eq        "(=)"
   syntax val      ne        "(<>)"
   syntax val      (<=)      "(<=)"

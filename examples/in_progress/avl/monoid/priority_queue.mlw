@@ -1,0 +1,402 @@
+
+module PQueue
+
+  use import int.Int
+  use import avl.SelectionTypes
+  use import program_type.TypeParams
+  use import option.Option
+  use import ref.Ref
+  use import list.List
+  use import list.Append
+  use import list.Mem
+  use import list.Length
+  
+  (* Move remaining parameters here. *)
+  constant balancing : int
+  axiom balancing_positive : balancing > 0
+  
+  clone export key_type.ProgramKeyType
+  
+  constant default_element : D.m 'b
+  
+  clone preorder.Computable as CO with type T.t = K.t, type T.m = K.m,
+    function T.m = K.m, predicate T.c = K.c
+  
+  (* End of parameter section. *)
+  
+  clone sorted.Base as S with type K.t = D.m,
+    type K.key = K.m,
+    function K.key = key,
+    predicate O.rel = CO.le,
+    goal O.Trans
+  
+  (* Monoid: ordered keys + infinity. *)
+  namespace M
+    type m = option K.m
+    type t = option K.t
+    constant zero : m = None
+    function op (x y:m) : m = match x with
+      | None -> y
+      | Some a -> match y with
+        | None -> x
+        | Some b -> if CO.lt a b
+          then x
+          else y
+        end
+      end
+    let lemma assoc_m (x y z:m) : unit
+      ensures { op x (op y z) = op (op x y) z }
+    = match x , y , z with
+      | None , _ , _ -> assert { true }
+      | _ , None , _ -> assert { true }
+      | _ , _ , None -> assert { true }
+      | _ -> ()
+      end
+    let lemma neutral_m (x:m) : unit
+      ensures { op x zero = x = op zero x }
+    = match x with None -> () | _ -> assert { true } end
+    clone export monoid.Monoid with type t = m,
+      constant zero = zero,function op = op,lemma assoc,lemma neutral
+    clone export monoid.MonoidListDef with type M.t = m,
+      constant M.zero = zero,function M.op = op,goal M.assoc,goal M.neutral
+    function m (x:t) : m = match x with None -> None | Some x -> Some x.K.m end
+    predicate c (x:t) = match x with None -> true | Some x -> K.c x end
+    let zero () : t
+      ensures { result = None }
+    = None
+    let op (x y:t) : t
+      requires { c x /\ c y }
+      ensures { result.m = op x.m y.m }
+      ensures { c result }
+    = match x with
+      | None -> y
+      | Some a -> match y with
+        | None -> x
+        | Some b -> if CO.compare a b < 0
+          then x
+          else y
+        end
+      end
+    
+  end
+  namespace D
+    (* Axiomatized to avoid an harmful behavior happening when
+       inlining meet higher-order. *)
+    function measure (d:D.m 'b) : M.m
+    axiom measure_def : forall d:D.m 'b. measure d = Some d.key
+    let measure (ghost p:type_params 'a 'b) (d:D.t 'a 'b) : M.t
+      requires { p.D.mp.inv d }
+      ensures { result.M.m = measure (p.D.mp.mdl d) }
+      ensures { M.c result }
+    = Some (get_key p d)
+  end
+  
+  (* Selector: nothing. *)
+  type selector = unit
+  
+  (* Correction of a selector with respect to an avl:
+     the avl list is non-empty. *)
+  
+  predicate selection_possible 'e (l:list 'g) = l <> Nil
+  
+  predicate lower_bound_strict (x:K.m) (l:list (D.m 'b)) =
+    (forall y. mem y l -> CO.lt x y.key)
+  
+  predicate selected 'e (e:split (D.m 'b)) =
+      match e.middle with
+      | None -> false
+      | Some d -> S.lower_bound d.key e.right /\
+        lower_bound_strict d.key e.left
+      end
+  
+  let rec lemma monoid_sum_is_min (l:list (D.m 'b)) : unit
+    ensures { let x = M.sum D.measure l in
+      match x with
+      | None -> l = Nil
+      | Some a -> S.lower_bound a l /\ (exists d. mem d l /\ CO.eq d.key a)
+      end }
+    variant { l }
+  = match l with Cons _ q -> monoid_sum_is_min q | _ -> () end
+  
+  let lemma selected_is_min (s:'d) (e:split (D.m 'b)) : unit
+    requires { selected s e }
+    ensures { let l = rebuild e in match e.middle with
+      | None -> false
+      | Some d -> S.lower_bound d.key l && match M.sum D.measure l with
+        | None -> false
+        | Some k -> CO.eq d.key k
+        end
+      end }
+  = ()
+  
+  let selected_part (ghost p:type_params 'a 'b)
+    (ghost llis:list (D.m 'b))
+    (ghost rlis:list (D.m 'b))
+    (s:unit) (sl:M.t) (d:D.t 'a 'b) (sr:M.t) : part_base unit
+    requires { p.D.mp.inv d }
+    requires { sl.M.m = M.sum D.measure llis /\ sr.M.m = M.sum D.measure rlis }
+    requires { M.c sl /\ M.c sr }
+    (* A selected position can be found by following the given way. *)
+    returns { Here -> let e2 = { left = llis;
+        middle = Some (p.D.mp.mdl d);
+        right = rlis } in selected s e2
+      | Left sl -> selection_possible sl llis /\
+        forall e. selected sl e /\ rebuild e = llis ->
+          selected s (right_extend e (p.D.mp.mdl d) rlis)
+      | Right sr -> selection_possible sr rlis /\
+        forall e. selected sr e /\ rebuild e = rlis ->
+          selected s (left_extend llis (p.D.mp.mdl d) e) }
+  = let kd = get_key p d in
+    monoid_sum_is_min llis;
+    monoid_sum_is_min rlis;
+    match sl , sr with
+    | None , None -> Here
+    | None , Some a -> if CO.compare kd a <= 0 then Here else Right ()
+    | Some a , None -> if CO.compare kd a < 0 then Here else Left ()
+    | Some a , Some b -> if CO.compare kd b <= 0
+      then if CO.compare a kd <= 0
+        then Left ()
+        else Here
+      else if CO.compare a b <= 0
+      then Left ()
+      else Right ()
+    end
+  
+  (* Fix: first minimum element of a list. Necessary to get constance
+     of the minimum element through code. *)
+  function first_minimum_acc (acc:D.m 'b) (l:list (D.m 'b)) : D.m 'b =
+    match l with
+    | Nil -> acc
+    | Cons x q -> if CO.le acc.key x.key
+      then first_minimum_acc acc q
+      else first_minimum_acc x q
+    end
+  
+  function first_minimum (l:list (D.m 'b)) : D.m 'b = match l with
+    | Nil -> default_element
+    | Cons x q -> first_minimum_acc x q
+    end
+  
+  let rec lemma first_minimum_caracterisation (e:split (D.m 'b)) : unit
+    requires { e.middle <> None /\ selected () e }
+    ensures { match e.middle with
+      | Some x -> first_minimum (rebuild e) = x
+      | None -> false
+      end }
+    variant { e.right }
+  = let mid = match e.middle with None -> absurd | Some x -> x end in
+    let rec aux (e:split (D.m 'b)) : unit
+      requires { e.middle = Some mid /\ selected () e }
+      ensures { forall acc:D.m 'b.
+        CO.lt mid.key acc.key -> first_minimum_acc acc (rebuild e) = mid }
+      variant { length e.left + length e.right }
+    = match e.left with
+      | Nil -> match e.right with
+        | Nil -> ()
+        | Cons _ q -> aux { e with right = q }
+        end
+      | Cons _ q -> aux { e with left = q }
+      end in
+    match e.left with
+    | Nil -> match e.right with
+      | Nil -> ()
+      | Cons _ q -> first_minimum_caracterisation { e with right = q }
+      end
+    | Cons _ q -> aux { e with left = q }
+    end
+  
+  (* Full clone of the avl module. *)
+  clone avl.AVL as Sel with type selector = selector,
+    predicate selection_possible = selection_possible,
+    predicate selected = selected,
+    val selected_part = selected_part,
+    goal selection_empty,
+    constant balancing = balancing,
+    goal balancing_positive,
+    type D.t = D.t,
+    type D.m = D.m,
+    function D.mp = D.mp,
+    function D.measure = D.measure,
+    val D.measure = D.measure,
+    type M.t = M.t,
+    type M.m = M.m,
+    function M.m = M.m,
+    predicate M.c = M.c,
+    constant M.zero = M.zero,
+    function M.op = M.op,
+    goal M.assoc,
+    goal M.neutral,
+    function M.sum = M.sum,
+    goal M.sum_def_nil,
+    goal M.sum_def_cons,
+    val M.zero = M.zero,
+    val M.op = M.op
+  
+  type t 'a 'b = Sel.t 'a 'b
+  
+  (* Model: a bag of data.
+     Fix: add a minimum element.
+     The point is that we need the returned minimum element
+     to be always the same, modulo preorder equivalence
+     is not enough. *)
+  
+  type m 'b = {
+    bag : D.m 'b -> int;
+    minimum : D.m 'b;
+    card : int;
+  }
+  
+  function prm (t:t 'a 'b) : type_params 'a 'b = t.Sel.prm
+  let ghost prm (t:t 'a 'b) : type_params 'a 'b
+    ensures { result = t.prm }
+  = t.Sel.prm
+  function dprm (t:t 'a 'b) : type_params (D.t 'a 'b) (D.m 'b) =
+    D.mp t.prm
+  let ghost dprm (t:t 'a 'b) : type_params (D.t 'a 'b) (D.m 'b)
+    ensures { result = t.dprm }
+  = D.mp t.prm
+  
+  constant empty_bag : 'a -> int = \x:'a. 0
+  function add_bag (x:'a) (f:'a -> int) : 'a -> int =
+    \y:'a. if y = x then f y + 1 else f y
+  
+  function as_bag (l:list 'a) : 'a -> int = match l with
+    | Nil -> empty_bag
+    | Cons x q -> add_bag x (as_bag q)
+    end
+  
+  let rec lemma as_bag_append (l r:list 'a) : unit
+    ensures { forall x:'a. as_bag (l++r) x = as_bag l x + as_bag r x }
+    variant { l }
+  = match l with Nil -> () | Cons _ q -> as_bag_append q r end
+  
+  let rec lemma as_bag_bounds (l:list 'a) : unit
+    ensures { forall x:'a. 0 <= as_bag l x <= length l }
+    variant { l }
+  = match l with Nil -> () | Cons _ q -> as_bag_bounds q end
+  
+  let rec lemma as_bag_membership (d:'a) (l:list 'a) : unit
+    ensures { as_bag l d > 0 <-> mem d l }
+    variant { l }
+  = match l with Nil -> () | Cons _ q -> as_bag_membership d q end
+  
+  function m (t:t 'a 'b) : m 'b =
+    { bag = as_bag t.Sel.m.Sel.lis;
+      card = length t.Sel.m.Sel.lis;
+      minimum = first_minimum t.Sel.m.Sel.lis }
+  
+  let ghost m (t:t 'a 'b) : m 'b
+    ensures { result = t.m }
+  = { bag = as_bag t.Sel.m.Sel.lis;
+      card = length t.Sel.m.Sel.lis;
+      minimum = first_minimum t.Sel.m.Sel.lis }
+  
+  let lemma m_def (t:t 'a 'b) : unit
+    ensures { t.m.bag = as_bag t.Sel.m.Sel.lis }
+    ensures { t.m.card = length t.Sel.m.Sel.lis }
+    ensures { t.m.minimum = first_minimum t.Sel.m.Sel.lis }
+  = ()
+  
+  predicate c (t:t 'a 'b) = Sel.c t
+  
+  clone export program_type.Type1Prm with type t = t, type m = m,
+    function m = m,predicate c = c,function prm = prm
+  
+  (* Should be the exported part of the invariant. *)
+  let lemma correction (t:t 'a 'b) : unit
+    requires { c t }
+    ensures { forall d:D.m 'b. 0 <= t.m.bag d <= t.m.card }
+    ensures { t.m.card >= 0 }
+    ensures { t.m.card > 0 -> t.m.bag t.m.minimum > 0 }
+    ensures { forall d:D.m 'b. 0 < t.m.bag d -> CO.le t.m.minimum.key d.key }
+  = if t.m.card > 0
+    then let r0 = Sel.default_split () in
+      let _ = Sel.split r0 () t in ()
+  
+  let empty (ghost p:type_params 'a 'b) : t 'a 'b
+    ensures { forall d:D.m 'b. result.m.bag d = 0 }
+    ensures { result.m.card = 0 }
+    ensures { c result /\ result.prm = p }
+  = Sel.empty p
+  
+  let singleton (ghost p:type_params 'a 'b) (d:D.t 'a 'b) : t 'a 'b
+    requires { p.D.mp.inv d }
+    ensures { let dm = p.D.mp.mdl d in
+      result.m.bag dm = 1 /\
+      forall d2:D.m 'b. d2 <> dm -> result.m.bag d2 = 0 }
+    ensures { result.m.card = 1 }
+    ensures { c result /\ result.prm = p }
+  = Sel.singleton p d
+  
+  let is_empty (ghost rd:ref (D.m 'b)) (t:t 'a 'b) : bool
+    requires { c t }
+    ensures { result -> forall d:D.m 'b. t.m.bag d = 0 }
+    ensures { not result -> t.m.bag !rd > 0 }
+    ensures { result <-> t.m.card = 0 }
+  = let res = Sel.is_empty t in
+    ghost if not res
+    then match t.Sel.m.Sel.lis with
+      | Nil -> absurd
+      | Cons d _ -> rd := d
+      end;
+    res
+  
+  let merge (l r:t 'a 'b) : t 'a 'b
+    requires { c l /\ c r /\ l.prm = r.prm }
+    ensures { c result /\ result.prm = l.prm }
+    ensures { result.m.card = l.m.card + r.m.card }
+    ensures { forall d. result.m.bag d = l.m.bag d + r.m.bag d }
+  = Sel.concat l r
+  
+  let lemma remove_count (l:list 'a) (d:'a) (r:list 'a) : unit
+    ensures { as_bag (l ++ Cons d r) d = as_bag (l++r) d + 1 }
+    ensures { forall d2. d2 <> d -> as_bag (l++Cons d r) d2 = as_bag (l++r) d2 }
+  = ()
+  
+  let extract_min (t:t 'a 'b) : option (D.t 'a 'b,t 'a 'b)
+    requires { c t }
+    returns { None -> t.m.card = 0 /\ (forall d. t.m.bag d = 0)
+      | Some (d,e) -> c e /\ e.prm = t.prm /\ t.dprm.inv d /\
+        t.m.card = e.m.card + 1 /\ let dm = t.dprm.mdl d in
+        t.m.bag dm = e.m.bag dm + 1 /\
+        (forall d2. d2 <> dm -> t.m.bag d2 = e.m.bag d2) /\
+        dm = t.m.minimum }
+  = if Sel.is_empty t
+    then None
+    else let (o,e) = Sel.extract (Sel.default_split ()) () t in
+      match o with
+      | None -> absurd
+      | Some d -> Some (d,e)
+      end
+  
+  let min (t:t 'a 'b) : D.t 'a 'b
+    requires { c t /\ t.m.card >= 1 }
+    ensures { t.dprm.inv result /\ let dm = t.dprm.mdl result in
+      t.m.bag dm > 0 /\ t.m.card > 0 /\
+      dm = t.m.minimum }
+  = match Sel.get (Sel.default_split ()) () t with
+    | None -> absurd
+    | Some d -> d
+    end
+  
+  let pop_min (t:t 'a 'b) : t 'a 'b
+    requires { c t /\ t.m.card >= 1 }
+    ensures { c result /\ result.prm = t.prm /\ t.m.card = result.m.card + 1 /\
+      t.m.bag t.m.minimum = result.m.bag t.m.minimum + 1 /\
+      (forall d2. d2 <> t.m.minimum -> t.m.bag d2 = result.m.bag d2) }
+  = let r0 = Sel.default_split () in
+    let res = Sel.remove r0 () t in
+    assert { match !r0.middle with None -> false | Some _ -> true end };
+    res
+  
+  let add (d:D.t 'a 'b) (t:t 'a 'b) : t 'a 'b
+    requires { c t /\ t.dprm.inv d }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { result.m.card = t.m.card + 1 }
+    ensures { let dm = t.dprm.mdl d in
+      result.m.bag dm = t.m.bag dm + 1 /\
+      (forall d2. d2 <> dm -> result.m.bag d2 = t.m.bag d2) }
+  = Sel.cons d t
+  
+end
+

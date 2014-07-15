@@ -11,6 +11,12 @@ let input =
   if Array.length Sys.argv <> 2 then usage ();
   Sys.argv.(1)
 
+let () =
+  if input = "go" then begin
+    Euler001__Euler001.go ();
+    exit 0
+  end
+
 let input_num =
   try
     Why3__BigInt.of_string input

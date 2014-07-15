@@ -167,6 +167,7 @@ let actualcommand command timelimit memlimit file =
     | "f" -> file
     | "t" -> on_timelimit := true; string_of_int timelimit
     | "T" -> string_of_int (succ timelimit)
+    | "U" -> string_of_int (2 * timelimit + 1)
     | "m" -> string_of_int memlimit
     (* FIXME: libdir and datadir can be changed in the configuration file
        Should we pass them as additional arguments? Or would it be better
@@ -174,7 +175,7 @@ let actualcommand command timelimit memlimit file =
     | "l" -> Config.libdir
     | "d" -> Config.datadir
     | "o" -> Config.libobjdir
-    | _ -> failwith "unknown specifier, use %%f, %%t, %%m, %%l, or %%d"
+    | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, or %d"
   in
   List.map (Str.global_substitute cmd_regexp replace) arglist,
   !use_stdin, !on_timelimit

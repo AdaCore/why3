@@ -27,6 +27,7 @@ val fs_old : Term.lsymbol
 
 val t_at_old : Term.term -> Term.term
 
+val mark_theory : Theory.theory
 val th_mark_at  : Theory.theory
 val th_mark_old : Theory.theory
 

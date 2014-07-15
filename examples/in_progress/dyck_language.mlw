@@ -38,6 +38,7 @@ module Check
   use import int.Int
   use import Dyck
 
+  (* open n w = L^n w *)
   function open (n: int) (w: word) : word
   axiom open0: forall w: word. open 0 w = w
   axiom openS: forall w: word, n: int. 0 < n ->

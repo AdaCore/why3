@@ -1,766 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
-  name="Eprover"
-  version="1.6"/>
- <prover
-  id="3"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="4"
-  name="Vampire"
-  version="0.6"/>
- <prover
-  id="5"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="6"
-  name="Z3"
-  version="3.2"/>
- <file
-  name="../int.why"
-  verified="true"
-  expanded="true">
-  <theory
-   name="Test"
-   locfile="../int.why"
-   loclnum="1" loccnumb="7" loccnume="11"
-   verified="true"
-   expanded="true">
-   <goal
-    name="G1"
-    locfile="../int.why"
-    loclnum="3" loccnumb="7" loccnume="9"
-    sum="8d0647d3abb7c603192ff28601668539"
-    proved="true"
-    expanded="true"
-    shape="ainfix =ainfix *c5c10c50">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.99"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.06"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="10.05"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="G2"
-    locfile="../int.why"
-    loclnum="4" loccnumb="7" loccnume="9"
-    sum="97144d0acc9b8bd1bad1122a8f7191de"
-    proved="true"
-    expanded="true"
-    shape="ainfix =ainfix +ainfix -ainfix +V0V0V0V0ainfix *c2V0F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.98"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.28"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="10.06"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="CompatOrderAdd"
-    locfile="../int.why"
-    loclnum="6" loccnumb="7" loccnume="21"
-    sum="5d11490b1d7d088a6bf112a44932b3ab"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=ainfix +V0V2ainfix +V1V2Iainfix &lt;=V0V1F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="CompatOrderMult"
-    locfile="../int.why"
-    loclnum="7" loccnumb="7" loccnume="22"
-    sum="91462f8acda3832be6fbd0cdf90d5f0b"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=ainfix *V0V2ainfix *V1V2Iainfix &lt;=c0V2Iainfix &lt;=V0V1F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.69"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="InvMult"
-    locfile="../int.why"
-    loclnum="9" loccnumb="7" loccnume="14"
-    sum="51eef8d087bd6d02479ef3cb557e89a5"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aprefix -ainfix *V0V1ainfix *V0aprefix -V1Aainfix =ainfix *aprefix -V0V1aprefix -ainfix *V0V1F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.86"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="InvSquare"
-    locfile="../int.why"
-    loclnum="10" loccnumb="7" loccnume="16"
-    sum="c9149917e0d510be4ccf785a82b14b30"
-    proved="true"
-    expanded="true"
-    shape="ainfix =ainfix *V0V0ainfix *aprefix -V0aprefix -V0F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.78"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="ZeroMult"
-    locfile="../int.why"
-    loclnum="11" loccnumb="7" loccnume="15"
-    sum="a6bf12bc346458eb9cf204f8fc3d7c9e"
-    proved="true"
-    expanded="true"
-    shape="ainfix =c0ainfix *c0V0Aainfix =ainfix *V0c0c0F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="SquareNonNeg1"
-    locfile="../int.why"
-    loclnum="12" loccnumb="7" loccnume="20"
-    sum="e9db2c88b3bf2068f8e5b674ba468e2f"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=c0ainfix *V0V0Iainfix &lt;=V0c0F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.17"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="10.06"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="SquareNonNeg"
-    locfile="../int.why"
-    loclnum="13" loccnumb="7" loccnume="19"
-    sum="417b71a75a86a78947ea3de997bd702b"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=c0ainfix *V0V0F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.41"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="9.98"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="ZeroLessOne"
-    locfile="../int.why"
-    loclnum="14" loccnumb="7" loccnume="18"
-    sum="0ebee072728fca65b73947dddd77ccdb"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=c0c1">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="MinMax"
-   locfile="../int.why"
-   loclnum="17" loccnumb="7" loccnume="13"
-   verified="true"
-   expanded="true">
-   <goal
-    name="G"
-    locfile="../int.why"
-    loclnum="20" loccnumb="7" loccnume="8"
-    sum="841ecc83289fbf1d3600cc0ea563ae04"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aminc1aminc3c2c1">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="4.96"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="9.96"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="10.03"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="3" memlimit="0"/>
+<prover id="2" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
+<prover id="4" name="Spass" version="3.7" timelimit="10" memlimit="1000"/>
+<prover id="5" name="Z3" version="3.2" timelimit="3" memlimit="0"/>
+<prover id="6" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
+<file name="../int.why" expanded="true">
+<theory name="Test" expanded="true">
+ <goal name="G1" sum="8d0647d3abb7c603192ff28601668539" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="timeout" time="4.99"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" memlimit="0"><result status="timeout" time="10.06"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="unknown" time="10.05"/></proof>
+ </goal>
+ <goal name="G2" sum="97144d0acc9b8bd1bad1122a8f7191de" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="timeout" time="4.98"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" memlimit="0"><result status="timeout" time="10.28"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="unknown" time="10.06"/></proof>
+ </goal>
+ <goal name="CompatOrderAdd" sum="5d11490b1d7d088a6bf112a44932b3ab" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="CompatOrderMult" sum="91462f8acda3832be6fbd0cdf90d5f0b" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="1.28"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="InvMult" sum="51eef8d087bd6d02479ef3cb557e89a5" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" timelimit="5"><result status="valid" time="0.86"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="InvSquare" sum="c9149917e0d510be4ccf785a82b14b30" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" timelimit="5"><result status="valid" time="0.78"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="ZeroMult" sum="a6bf12bc346458eb9cf204f8fc3d7c9e" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" timelimit="5"><result status="valid" time="0.05"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="SquareNonNeg1" sum="e9db2c88b3bf2068f8e5b674ba468e2f" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" memlimit="0"><result status="timeout" time="10.17"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="unknown" time="10.06"/></proof>
+ </goal>
+ <goal name="SquareNonNeg" sum="417b71a75a86a78947ea3de997bd702b" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.09"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" memlimit="0"><result status="timeout" time="10.41"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="unknown" time="9.98"/></proof>
+ </goal>
+ <goal name="ZeroLessOne" sum="0ebee072728fca65b73947dddd77ccdb" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" memlimit="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ </goal>
+</theory>
+<theory name="MinMax" expanded="true">
+ <goal name="G" sum="841ecc83289fbf1d3600cc0ea563ae04" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="timeout" time="4.96"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4" memlimit="0"><result status="timeout" time="9.96"/></proof>
+ <proof prover="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="6"><result status="unknown" time="10.03"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

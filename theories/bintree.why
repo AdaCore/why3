@@ -19,6 +19,26 @@ theory Size "number of nodes"
 
   lemma size_nonneg: forall t: tree 'a. 0 <= size t
 
+  lemma size_empty: forall t: tree 'a. 0 = size t <-> t = Empty
+
+end
+
+theory Occ "occurrences in a binary tree"
+
+  use export Tree
+  use export int.Int
+
+  function occ (x: 'a) (t: tree 'a) : int = match t with
+    | Empty      -> 0
+    | Node l y r -> (if y = x then 1 else 0) + occ x l + occ x r
+  end
+
+  lemma occ_nonneg:
+    forall x: 'a, t: tree 'a. 0 <= occ x t
+
+  predicate mem (x: 'a) (t: tree 'a) =
+    0 < occ x t
+
 end
 
 theory Inorder "inorder traversal"

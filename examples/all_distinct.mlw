@@ -1,0 +1,35 @@
+
+(** Check an array of integers for duplicate values,
+    using the fact that values are in interval [0,m-1]. *)
+
+module AllDistinct
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+
+  exception Duplicate
+
+  let all_distinct (a: array int) (m:int) : bool
+    requires { 0 <= m }
+    requires { forall i: int. 0 <= i < length a -> 0 <= a[i] < m }
+    ensures  { result <-> forall i j: int. 0 <= i < length a ->
+                          0 <= j < length a -> i <> j -> a[i] <> a[j] }
+  =
+   let dejavu = Array.make m False in
+   try
+     for k = 0 to Array.length a - 1 do
+       invariant { forall i j: int. 0 <= i < k ->
+                   0 <= j < k -> i <> j -> a[i] <> a[j] }
+       invariant { forall x: int. 0 <= x < m ->
+                   dejavu[x] <-> exists i: int. 0 <= i < k /\ a[i] = x }
+       let v = a[k] in
+       if dejavu[v] then raise Duplicate;
+       dejavu[v] <- True
+     done;
+     True
+   with Duplicate ->
+     False
+   end
+
+end

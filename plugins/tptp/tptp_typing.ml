@@ -171,7 +171,7 @@ let defined_arith ~loc denv env impl dw tl =
     | DF DFrem_t -> ns_find_ls th.th_export ["mod_t"]
     | DF DFrem_f -> ns_find_ls th.th_export ["mod_f"]
     | DF DFfloor -> ns_find_ls th.th_export ["floor"]
-    | DF DFceil -> ns_find_ls th.th_export ["ceil"]
+    | DF DFceil -> ns_find_ls th.th_export ["ceiling"]
     | DF DFtrunc -> ns_find_ls th.th_export ["truncate"]
     | DF DFround -> ns_find_ls th.th_export ["round"]
     | DF DFtoint -> ns_find_ls th.th_export ["to_int"]

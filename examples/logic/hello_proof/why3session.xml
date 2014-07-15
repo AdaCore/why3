@@ -1,127 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="Coq"
-  version="8.4pl2"/>
- <file
-  name="../hello_proof.why"
-  verified="false"
-  expanded="true">
-  <theory
-   name="HelloProof"
-   locfile="../hello_proof.why"
-   loclnum="1" loccnumb="7" loccnume="17"
-   verified="false"
-   expanded="true">
-   <label
-    name="My very first Why3 theory"/>
-   <goal
-    name="G1"
-    locfile="../hello_proof.why"
-    loclnum="3" loccnumb="7" loccnume="9"
-    sum="1ad4ea691c2d3b0a420f5b0819ebc531"
-    proved="true"
-    expanded="true"
-    shape="t">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="G2"
-    locfile="../hello_proof.why"
-    loclnum="5" loccnumb="7" loccnume="9"
-    sum="0e3662daa6ebd31c5507d50a137bde80"
-    proved="false"
-    expanded="true"
-    shape="fOtAfIt">
-    <proof
-     prover="0"
-     timelimit="4"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <transf
-     name="split_goal"
-     proved="false"
-     expanded="true">
-     <goal
-      name="G2.1"
-      locfile="../hello_proof.why"
-      loclnum="5" loccnumb="7" loccnume="9"
-      expl="1."
-      sum="31d04e6a30fba28299ff58e5a816f903"
-      proved="false"
-      expanded="true"
-      shape="fIt">
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.00"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="4"
-       memlimit="0"
-       edited="hello_proof_HelloProof_G2_1.v"
-       obsolete="false"
-       archived="false">
-       <result status="unknown" time="0.99"/>
-      </proof>
-     </goal>
-     <goal
-      name="G2.2"
-      locfile="../hello_proof.why"
-      loclnum="5" loccnumb="7" loccnume="9"
-      expl="2."
-      sum="4365d631549d91726642c97770a91572"
-      proved="true"
-      expanded="true"
-      shape="fOt">
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="G3"
-    locfile="../hello_proof.why"
-    loclnum="9" loccnumb="7" loccnume="9"
-    sum="4eba44cd7acdb218b035717684905f7f"
-    proved="true"
-    expanded="true"
-    shape="ainfix &gt;=ainfix *V0V0c0F">
-    <proof
-     prover="0"
-     timelimit="4"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
+<prover id="1" name="Coq" version="8.4pl3" timelimit="4" memlimit="0"/>
+<file name="../hello_proof.why" expanded="true">
+<theory name="HelloProof" expanded="true">
+ <goal name="G1" sum="1ad4ea691c2d3b0a420f5b0819ebc531" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="G2" sum="0e3662daa6ebd31c5507d50a137bde80" expanded="true">
+ <proof prover="0" timelimit="4"><result status="unknown" time="0.00"/></proof>
+ <transf name="split_goal" expanded="true">
+  <goal name="G2.1" expl="1." sum="31d04e6a30fba28299ff58e5a816f903" expanded="true">
+  <proof prover="0" memlimit="1000"><result status="unknown" time="0.00"/></proof>
+  <proof prover="1" edited="hello_proof_HelloProof_G2_1.v"><result status="unknown" time="0.99"/></proof>
+  </goal>
+  <goal name="G2.2" expl="2." sum="4365d631549d91726642c97770a91572" expanded="true">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="G3" sum="4eba44cd7acdb218b035717684905f7f" expanded="true">
+ <proof prover="0" timelimit="4"><result status="valid" time="0.00"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

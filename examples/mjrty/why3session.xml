@@ -1,545 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
-  name="Z3"
-  version="4.3.1"/>
- <file
-  name="../mjrty.mlw"
-  verified="true"
-  expanded="true">
-  <theory
-   name="Mjrty"
-   locfile="../mjrty.mlw"
-   loclnum="23" loccnumb="7" loccnume="12"
-   verified="true"
-   expanded="true">
-   <goal
-    name="WP_parameter mjrty"
-    locfile="../mjrty.mlw"
-    loclnum="36" loccnumb="6" loccnume="11"
-    expl="VC for mjrty"
-    sum="170ff315d684eaa3b32bd7cb4cae082d"
-    proved="true"
-    expanded="true"
-    shape="iiainfix &lt;=ainfix *c2anum_ofaTuple2V2V9c0V0V0FIainfix &lt;=ainfix *c2V8V0Aainfix =V8anum_ofaTuple2V2V5c0ainfix +V7c1Aiainfix &lt;=ainfix *c2V8V0Aainfix =V8anum_ofaTuple2V2V5c0ainfix +V10c1iainfix &lt;=ainfix *c2V11V0Aainfix =V11anum_ofaTuple2V2V5c0ainfix +V10c1ainfix &gt;ainfix *c2anum_ofaTuple2V2V5c0V0V0ainfix &gt;ainfix *c2V11V0Iainfix =V11ainfix +V8c1Fainfix =agetV1V10V5Aainfix &lt;V10V0Aainfix &lt;=c0V10Iainfix &lt;=ainfix *c2V8V0Aainfix =V8anum_ofaTuple2V2V5c0V10Iainfix &lt;=V10V7Aainfix &lt;=c0V10FFAainfix &lt;=ainfix *c2V6V0Aainfix =V6anum_ofaTuple2V2V5c0c0Iainfix &lt;=c0V7Aainfix &lt;=ainfix *c2anum_ofaTuple2V2V12c0V0V0FIainfix &gt;c0V7Lainfix -V0c1Iainfix =V6c0Fainfix &gt;ainfix *c2anum_ofaTuple2V2V5c0V0V0ainfix &gt;ainfix *c2V4V0ainfix &lt;=ainfix *c2anum_ofaTuple2V2V13c0V0V0Fainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V14c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V14V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4Aiiainfix &lt;=ainfix *c2anum_ofaTuple2V2V17c0ainfix +V15c1ainfix -ainfix +V15c1V16INainfix =V17V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V15c1V16ainfix -ainfix +V15c1V16Aainfix &lt;=V16anum_ofaTuple2V2V5c0ainfix +V15c1Aainfix &lt;=c0V16Iainfix =V16ainfix -V4c1Fainfix &lt;=ainfix *c2anum_ofaTuple2V2V19c0ainfix +V15c1ainfix -ainfix +V15c1V18INainfix =V19V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V15c1V18ainfix -ainfix +V15c1V18Aainfix &lt;=V18anum_ofaTuple2V2V5c0ainfix +V15c1Aainfix &lt;=c0V18Iainfix =V18ainfix +V4c1Fainfix =V5agetV1V15Aainfix &lt;V15V0Aainfix &lt;=c0V15ainfix &lt;=ainfix *c2anum_ofaTuple2V2V22c0ainfix +V15c1ainfix -ainfix +V15c1V21INainfix =V22V20FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V20c0ainfix +V15c1V21ainfix -ainfix +V15c1V21Aainfix &lt;=V21anum_ofaTuple2V2V20c0ainfix +V15c1Aainfix &lt;=c0V21Iainfix =V21c1FIainfix =V20agetV1V15FAainfix &lt;V15V0Aainfix &lt;=c0V15ainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V23c0V15ainfix -V15V4INainfix =V23V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V15V4ainfix -V15V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V15Aainfix &lt;=c0V4Iainfix &lt;=V15V3Aainfix &lt;=c0V15FFAainfix &lt;=ainfix *c2anum_ofaTuple2V2V24c0c0ainfix -c0c0INainfix =V24agetV1c0FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2agetV1c0c0c0c0ainfix -c0c0Aainfix &lt;=c0anum_ofaTuple2V2agetV1c0c0c0Aainfix &lt;=c0c0Iainfix &lt;=c0V3Aainfix &lt;=ainfix *c2anum_ofaTuple2V2V25c0V0V0FIainfix &gt;c0V3Lainfix -V0c1Aainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-    <label
-     name="expl:VC for mjrty"/>
-    <transf
-     name="split_goal"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter mjrty.1"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="1. index in array bounds"
-      sum="590510408eb6d2e1cd5f813cfbf612cb"
-      proved="true"
-      expanded="true"
-      shape="index in array boundsainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.2"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="2. exceptional postcondition"
-      sum="0d8ac5ea90675b3318f39fcf509b49fc"
-      proved="true"
-      expanded="true"
-      shape="exceptional postconditionainfix &lt;=ainfix *c2anum_ofaTuple2V2V4c0V0V0FIainfix &gt;c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.3"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="3. loop invariant init"
-      sum="e17a54401b08728e632eab180864f193"
-      proved="true"
-      expanded="true"
-      shape="loop invariant initainfix &lt;=c0anum_ofaTuple2V2agetV1c0c0c0Aainfix &lt;=c0c0Iainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.4"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="4. loop invariant init"
-      sum="52c140365b74fd3350af6753ecfa23ab"
-      proved="true"
-      expanded="true"
-      shape="loop invariant initainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2agetV1c0c0c0c0ainfix -c0c0Iainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.5"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="5. loop invariant init"
-      sum="c8e55d4a137026596104daeafb827762"
-      proved="true"
-      expanded="true"
-      shape="loop invariant initainfix &lt;=ainfix *c2anum_ofaTuple2V2V4c0c0ainfix -c0c0INainfix =V4agetV1c0FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.6"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="6. index in array bounds"
-      sum="5c2381fa5d776f725e3481fd09cf11d0"
-      proved="true"
-      expanded="true"
-      shape="index in array boundsainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V7c0V6ainfix -V6V4INainfix =V7V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.7"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="7. loop invariant preservation"
-      sum="eb91c19c8e2a0d05b02d2c9811519d63"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=V8anum_ofaTuple2V2V7c0ainfix +V6c1Aainfix &lt;=c0V8Iainfix =V8c1FIainfix =V7agetV1V6FIainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V9c0V6ainfix -V6V4INainfix =V9V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.18"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.8"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="8. loop invariant preservation"
-      sum="5f541648d16f429600b12ce8bed7d09b"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V7c0ainfix +V6c1V8ainfix -ainfix +V6c1V8Iainfix =V8c1FIainfix =V7agetV1V6FIainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V9c0V6ainfix -V6V4INainfix =V9V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.9"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="9. loop invariant preservation"
-      sum="c2a816e766a2d7b5abb1742e5391fc51"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=ainfix *c2anum_ofaTuple2V2V9c0ainfix +V6c1ainfix -ainfix +V6c1V8INainfix =V9V7FIainfix =V8c1FIainfix =V7agetV1V6FIainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V10c0V6ainfix -V6V4INainfix =V10V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.14"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.10"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="10. index in array bounds"
-      sum="f8cdea5b62de07cd33a92f8deda6fd9d"
-      proved="true"
-      expanded="true"
-      shape="index in array boundsainfix &lt;V6V0Aainfix &lt;=c0V6INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V7c0V6ainfix -V6V4INainfix =V7V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.11"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="11. loop invariant preservation"
-      sum="63c5d8f79b1935ad8b1687ac03eb58bb"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=V7anum_ofaTuple2V2V5c0ainfix +V6c1Aainfix &lt;=c0V7Iainfix =V7ainfix +V4c1FIainfix =V5agetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V8c0V6ainfix -V6V4INainfix =V8V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.12"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="12. loop invariant preservation"
-      sum="9effbbc2c443b8c256ed26efca36e262"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V6c1V7ainfix -ainfix +V6c1V7Iainfix =V7ainfix +V4c1FIainfix =V5agetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V8c0V6ainfix -V6V4INainfix =V8V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.13"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="13. loop invariant preservation"
-      sum="f30b913891ea6b642b50f9a1c3da391d"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=ainfix *c2anum_ofaTuple2V2V8c0ainfix +V6c1ainfix -ainfix +V6c1V7INainfix =V8V5FIainfix =V7ainfix +V4c1FIainfix =V5agetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V9c0V6ainfix -V6V4INainfix =V9V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.40"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.14"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="14. loop invariant preservation"
-      sum="0923cacde0a9322749e8be193813230b"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=V7anum_ofaTuple2V2V5c0ainfix +V6c1Aainfix &lt;=c0V7Iainfix =V7ainfix -V4c1FINainfix =V5agetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V8c0V6ainfix -V6V4INainfix =V8V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="30"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.15"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="15. loop invariant preservation"
-      sum="8b2331abb97bf9e70d06e99bf9f336a9"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V6c1V7ainfix -ainfix +V6c1V7Iainfix =V7ainfix -V4c1FINainfix =V5agetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V8c0V6ainfix -V6V4INainfix =V8V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="1"
-       timelimit="30"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.20"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.16"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="16. loop invariant preservation"
-      sum="9ddf3605b72e2d30b33ea5641a87cc34"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=ainfix *c2anum_ofaTuple2V2V8c0ainfix +V6c1ainfix -ainfix +V6c1V7INainfix =V8V5FIainfix =V7ainfix -V4c1FINainfix =V5agetV1V6Iainfix &lt;V6V0Aainfix &lt;=c0V6INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V9c0V6ainfix -V6V4INainfix =V9V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0V6V4ainfix -V6V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0V6Aainfix &lt;=c0V4Iainfix &lt;=V6V3Aainfix &lt;=c0V6FFIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.17"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="17. exceptional postcondition"
-      sum="6001806262bb94497330dfd84826d41a"
-      proved="true"
-      expanded="true"
-      shape="exceptional postconditionainfix &lt;=ainfix *c2anum_ofaTuple2V2V6c0V0V0FIainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V7c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V7V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.18"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="18. postcondition"
-      sum="c47bc55eecb390220d0650e15ca7e607"
-      proved="true"
-      expanded="true"
-      shape="postconditionainfix &gt;ainfix *c2anum_ofaTuple2V2V5c0V0V0Iainfix &gt;ainfix *c2V4V0INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V6c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V6V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.19"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="19. exceptional postcondition"
-      sum="ce148003d63af633532f316050f14302"
-      proved="true"
-      expanded="true"
-      shape="exceptional postconditionainfix &lt;=ainfix *c2anum_ofaTuple2V2V8c0V0V0FIainfix &gt;c0V7Lainfix -V0c1Iainfix =V6c0FINainfix &gt;ainfix *c2V4V0INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V9c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V9V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.20"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="20. loop invariant init"
-      sum="26ec4b0a6d86538877b9fb38d48dc053"
-      proved="true"
-      expanded="true"
-      shape="loop invariant initainfix &lt;=ainfix *c2V6V0Aainfix =V6anum_ofaTuple2V2V5c0c0Iainfix &lt;=c0V7Lainfix -V0c1Iainfix =V6c0FINainfix &gt;ainfix *c2V4V0INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V8c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V8V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.21"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="21. index in array bounds"
-      sum="5cf18135c77ea04b3570de716dca103e"
-      proved="true"
-      expanded="true"
-      shape="index in array boundsainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;=ainfix *c2V8V0Aainfix =V8anum_ofaTuple2V2V5c0V9Iainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =V6c0FINainfix &gt;ainfix *c2V4V0INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V10c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V10V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.22"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="22. postcondition"
-      sum="c4e3829289212836f3ff812a1809889e"
-      proved="true"
-      expanded="true"
-      shape="postconditionainfix &gt;ainfix *c2anum_ofaTuple2V2V5c0V0V0Iainfix &gt;ainfix *c2V10V0Iainfix =V10ainfix +V8c1FIainfix =agetV1V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;=ainfix *c2V8V0Aainfix =V8anum_ofaTuple2V2V5c0V9Iainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =V6c0FINainfix &gt;ainfix *c2V4V0INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V11c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V11V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="2"
-       timelimit="30"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.23"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="23. loop invariant preservation"
-      sum="084f030f73d0baaf2fcc3ebab3d5513b"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=ainfix *c2V10V0Aainfix =V10anum_ofaTuple2V2V5c0ainfix +V9c1INainfix &gt;ainfix *c2V10V0Iainfix =V10ainfix +V8c1FIainfix =agetV1V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;=ainfix *c2V8V0Aainfix =V8anum_ofaTuple2V2V5c0V9Iainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =V6c0FINainfix &gt;ainfix *c2V4V0INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V11c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V11V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.13"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.24"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="24. loop invariant preservation"
-      sum="36529eb807150b41c5dc1d483a72e0b7"
-      proved="true"
-      expanded="true"
-      shape="loop invariant preservationainfix &lt;=ainfix *c2V8V0Aainfix =V8anum_ofaTuple2V2V5c0ainfix +V9c1INainfix =agetV1V9V5Iainfix &lt;V9V0Aainfix &lt;=c0V9Iainfix &lt;=ainfix *c2V8V0Aainfix =V8anum_ofaTuple2V2V5c0V9Iainfix &lt;=V9V7Aainfix &lt;=c0V9FFIainfix &lt;=c0V7Lainfix -V0c1Iainfix =V6c0FINainfix &gt;ainfix *c2V4V0INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V10c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V10V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter mjrty.25"
-      locfile="../mjrty.mlw"
-      loclnum="36" loccnumb="6" loccnume="11"
-      expl="25. exceptional postcondition"
-      sum="a50d58b4249a274a1946f84e5afa4ace"
-      proved="true"
-      expanded="true"
-      shape="exceptional postconditionainfix &lt;=ainfix *c2anum_ofaTuple2V2V9c0V0V0FIainfix &lt;=ainfix *c2V8V0Aainfix =V8anum_ofaTuple2V2V5c0ainfix +V7c1FIainfix &lt;=c0V7Lainfix -V0c1Iainfix =V6c0FINainfix &gt;ainfix *c2V4V0INainfix =V4c0Iainfix &lt;=ainfix *c2anum_ofaTuple2V2V10c0ainfix +V3c1ainfix -ainfix +V3c1V4INainfix =V10V5FAainfix &lt;=ainfix *c2ainfix -anum_ofaTuple2V2V5c0ainfix +V3c1V4ainfix -ainfix +V3c1V4Aainfix &lt;=V4anum_ofaTuple2V2V5c0ainfix +V3c1Aainfix &lt;=c0V4FIainfix &lt;=c0V3Lainfix -V0c1Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;=c1V0Aainfix &lt;=c0V0Lamk arrayV0V1F">
-      <label
-       name="expl:VC for mjrty"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="30" memlimit="0"/>
+<prover id="2" name="Z3" version="4.3.1" timelimit="30" memlimit="1000"/>
+<file name="../mjrty.mlw" expanded="true">
+<theory name="Mjrty" expanded="true">
+ <goal name="WP_parameter mjrty" expl="VC for mjrty" sum="c41123b791dc208c110fda09c7c57828" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter mjrty.1" expl="1. index in array bounds" sum="635e40dfb03888a3c6566460298b495e" expanded="true">
+  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.2" expl="2. exceptional postcondition" sum="1546462a33ab84d2b32fe8a126fc016f" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.3" expl="3. loop invariant init" sum="0458fada3e2c98a13db73a7c7927e3f9" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.4" expl="4. loop invariant init" sum="82ed5edaa462d54b878affd29ed0f12d" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.5" expl="5. loop invariant init" sum="ff6d22b55c58ada795ca245180ab8f88" expanded="true">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.6" expl="6. index in array bounds" sum="4277bc394759b8916dc1a8cfe51a1f30" expanded="true">
+  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.7" expl="7. loop invariant preservation" sum="f16c47974c1efaa2d9c42dc79f53c239" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.8" expl="8. loop invariant preservation" sum="a9854c6ffe04a2550d05dfbf82a4034d" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.9" expl="9. loop invariant preservation" sum="acdb9d0993cee8731fea75d03ae4827f" expanded="true">
+  <proof prover="0"><result status="valid" time="0.14"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.10" expl="10. index in array bounds" sum="b937723d070becbf27e0339741679b33" expanded="true">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.11" expl="11. loop invariant preservation" sum="ea67b5a03edbfaab4661c6404391cb0f" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.12" expl="12. loop invariant preservation" sum="bc7fd714b4cc3978a6474fe6a1d2ca6a" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.13" expl="13. loop invariant preservation" sum="61349f8bb125edbda58aa4c1009f21f2" expanded="true">
+  <proof prover="0"><result status="valid" time="0.40"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.14" expl="14. loop invariant preservation" sum="12560250db182bf44ca72a16c44011e7" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.15" expl="15. loop invariant preservation" sum="fa71e2b65f8344a863286cafeca55068" expanded="true">
+  <proof prover="0" timelimit="30"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.16" expl="16. loop invariant preservation" sum="b42b59dbeb34a1ecea40bdc7cf06a6fd" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.17" expl="17. exceptional postcondition" sum="a735378d4251015b6b791475b1cddf39" expanded="true">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.18" expl="18. postcondition" sum="fd975e95b471961cd7a74fd29bda2122" expanded="true">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.19" expl="19. exceptional postcondition" sum="113a039b814cdd9fbf4b362b3141648d" expanded="true">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.20" expl="20. loop invariant init" sum="7fd074192a0f1aacb021bdbfbc5749f9" expanded="true">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.21" expl="21. index in array bounds" sum="def56096b77af7d2c8a7cb61f9c3dc95" expanded="true">
+  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.22" expl="22. postcondition" sum="682e5ee303bdf0baaf09ba16b4a610da" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.23" expl="23. loop invariant preservation" sum="26d2c3a4cd2a410852fe22eb46dc5dc5" expanded="true">
+  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.24" expl="24. loop invariant preservation" sum="3aaabbcb0c78505719b9f1a41efeeba2" expanded="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.25" expl="25. exceptional postcondition" sum="5a0d4edc335e01ebe99146de348cf5ec" expanded="true">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -200,9 +200,13 @@ let print_dec_real support fmt =
     (Some (PrintDecReal ("%s.%s", "%s.%se%s")))
     (fun (PrintDecReal (noexp,full)) i f e ->
       match e with
-      | None -> fprintf fmt noexp (remove_leading_zeros support i) f
+      | None -> fprintf fmt noexp
+          (remove_leading_zeros support i)
+          (if f = "" then "0" else f)
       | Some e -> fprintf fmt full
-	(remove_leading_zeros support i) f (remove_leading_zeros support e))
+          (remove_leading_zeros support i)
+          (if f = "" then "0" else f)
+          (remove_leading_zeros support e))
     (check_support support.frac_real_support None
     (fun (PrintFracReal (exp_zero, exp_pos, exp_neg)) i f e ->
       let f = if f = "0" then "" else f in
@@ -212,10 +216,10 @@ let print_dec_real support fmt =
         fprintf fmt exp_zero (remove_leading_zeros support (i ^ f))
       else if e > 0 then
         fprintf fmt exp_pos (remove_leading_zeros support (i ^ f))
-	  ("1" ^ String.make e '0')
+          ("1" ^ String.make e '0')
       else
         fprintf fmt exp_neg (remove_leading_zeros support (i ^ f))
-	  ("1" ^ String.make (-e) '0'))
+          ("1" ^ String.make (-e) '0'))
   (force_support support.def_real_support
     (fun def i f e -> fprintf fmt def (sprintf "%s_%s_e%s" i f
       (match e with None -> "0" | Some e -> remove_minus e)))
@@ -224,7 +228,9 @@ let print_dec_real support fmt =
 let print_hex_real support fmt =
   check_support support.hex_real_support
     (Some "0x%s.%sp%s")
-    (fun s i f e -> fprintf fmt s i f (Opt.get_def "0" e))
+    (fun s i f e -> fprintf fmt s i
+      (if f = "" then "0" else f)
+      (Opt.get_def "0" e))
   (* TODO: add support for decay to decimal floats *)
   (check_support support.frac_real_support None
     (fun (PrintFracReal (exp_zero, exp_pos, exp_neg)) i f e ->

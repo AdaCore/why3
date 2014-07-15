@@ -86,3 +86,21 @@ module BinaryGcd
                              else binary_gcd ((u - v) / 2) v
 
 end
+
+
+module EuclideanAlgorithm31
+
+  use import mach.int.Int31
+  use import number.Gcd
+
+  let rec euclid (u v: int31) : int31
+    variant  { to_int v }
+    requires { to_int u >= 0 /\ to_int v >= 0 }
+    ensures  { to_int result = gcd (to_int u) (to_int v) }
+  =
+    if Int31.eq v (of_int 0) then
+      u
+    else
+      euclid v (u % v)
+
+end

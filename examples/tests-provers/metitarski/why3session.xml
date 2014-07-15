@@ -1,153 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="MetiTarski"
-  version="2.2"/>
- <file
-  name="../metitarski.why"
-  verified="false"
-  expanded="true">
-  <theory
-   name="P"
-   locfile="../metitarski.why"
-   loclnum="1" loccnumb="7" loccnume="8"
-   verified="true"
-   expanded="true">
-   <goal
-    name="x_mul_x_pos"
-    locfile="../metitarski.why"
-    loclnum="5" loccnumb="7" loccnume="18"
-    sum="8bd3c15fa129991b779ea736e1b01557"
-    proved="true"
-    expanded="true"
-    shape="ainfix &gt;=ainfix *V0V0c0.0F">
-    <proof
-     prover="0"
-     timelimit="60"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.12"/>
-    </proof>
-   </goal>
-   <goal
-    name="sqr_pos"
-    locfile="../metitarski.why"
-    loclnum="10" loccnumb="7" loccnume="14"
-    sum="0a0f0cd12049ec862cc0dcc62d21973e"
-    proved="true"
-    expanded="true"
-    shape="ainfix &gt;=asqrV0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="4000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="P2"
-   locfile="../metitarski.why"
-   loclnum="15" loccnumb="7" loccnume="9"
-   verified="true"
-   expanded="true">
-   <goal
-    name="sqr_pos"
-    locfile="../metitarski.why"
-    loclnum="20" loccnumb="7" loccnume="14"
-    sum="b3be98a235ef6223d7f278d47672d2b3"
-    proved="true"
-    expanded="true"
-    shape="ainfix &gt;=asqrV0c0.0F">
-    <proof
-     prover="0"
-     timelimit="60"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="P3"
-   locfile="../metitarski.why"
-   loclnum="25" loccnumb="7" loccnume="9"
-   verified="false"
-   expanded="true">
-   <goal
-    name="cos_bound"
-    locfile="../metitarski.why"
-    loclnum="31" loccnumb="7" loccnume="16"
-    sum="cf3747929a885a77b6b6b07e74bc47c0"
-    proved="false"
-    expanded="true"
-    shape="ainfix &lt;=acosV0c1.0Aainfix &lt;=aprefix -c1.0acosV0F">
-    <proof
-     prover="0"
-     timelimit="60"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="2.62"/>
-    </proof>
-   </goal>
-   <goal
-    name="cos_bound_harder"
-    locfile="../metitarski.why"
-    loclnum="34" loccnumb="7" loccnume="23"
-    sum="8767edd2aaf3ff36ffbac224f7db223a"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=acosV0c1.0Aainfix &lt;=c0.7acosV0Iainfix &lt;=V0c0.7Aainfix &lt;=aprefix -c0.7V0F">
-    <proof
-     prover="0"
-     timelimit="60"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.19"/>
-    </proof>
-   </goal>
-   <goal
-    name="MethodErrorOK"
-    locfile="../metitarski.why"
-    loclnum="40" loccnumb="7" loccnume="20"
-    sum="c377d288fc69a245718c6573ac770c2a"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *V0V0acosV0c0x1.p-24Iainfix &lt;=aabsV0c0x1.p-5F">
-    <proof
-     prover="0"
-     timelimit="60"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.15"/>
-    </proof>
-   </goal>
-   <goal
-    name="MethodErrorWrong"
-    locfile="../metitarski.why"
-    loclnum="43" loccnumb="7" loccnume="23"
-    sum="f4d9640a1b835e7719de9e127b61ec15"
-    proved="false"
-    expanded="true"
-    shape="ainfix &lt;=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *V0V0acosV0c0x1.p-25Iainfix &lt;=aabsV0c0x1.p-5F">
-    <proof
-     prover="0"
-     timelimit="60"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="3.24"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="MetiTarski" version="2.2" timelimit="60" memlimit="4000"/>
+<file name="../metitarski.why" expanded="true">
+<theory name="P" expanded="true">
+ <goal name="x_mul_x_pos" sum="8bd3c15fa129991b779ea736e1b01557" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="sqr_pos" sum="0a0f0cd12049ec862cc0dcc62d21973e" expanded="true">
+ <proof prover="0" timelimit="5"><result status="valid" time="0.01"/></proof>
+ </goal>
+</theory>
+<theory name="P2" expanded="true">
+ <goal name="sqr_pos" sum="b3be98a235ef6223d7f278d47672d2b3" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.05"/></proof>
+ </goal>
+</theory>
+<theory name="P3" expanded="true">
+ <goal name="cos_bound" sum="cf3747929a885a77b6b6b07e74bc47c0" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="unknown" time="2.62"/></proof>
+ </goal>
+ <goal name="cos_bound_harder" sum="8767edd2aaf3ff36ffbac224f7db223a" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.19"/></proof>
+ </goal>
+ <goal name="MethodErrorOK" sum="c377d288fc69a245718c6573ac770c2a" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.15"/></proof>
+ </goal>
+ <goal name="MethodErrorWrong" sum="f4d9640a1b835e7719de9e127b61ec15" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="unknown" time="3.24"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

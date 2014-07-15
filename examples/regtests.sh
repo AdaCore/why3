@@ -33,12 +33,14 @@ cd `dirname $0`
 res=0
 export success=0
 export total=0
+export sessions=""
+export shapes=""
 
 run_dir () {
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
 	echo -n "Replaying $d ... "
-        ../bin/why3replayer.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP
+        ../bin/why3replay.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP
         ret=$?
 	if test "$ret" != "0"  ; then
 	    echo -n "FAILED (ret code=$ret):"
@@ -57,6 +59,8 @@ run_dir () {
 	fi
         total=`expr $total + 1`
     done
+    sessions="$sessions $1/*/why3session.xml"
+    shapes="$shapes $1/*/why3shapes.*"
 }
 
 echo "=== Standard Library ==="
@@ -79,17 +83,20 @@ echo ""
 
 echo "=== Logic ==="
 run_dir logic
-run_dir bitvectors "-I bitvectors"
+run_dir bitvectors "-L bitvectors"
 echo ""
 
 echo "=== Programs ==="
 run_dir .
 run_dir foveoos11-cm
 run_dir hoare_logic
-run_dir vacid_0_binary_heaps "-I vacid_0_binary_heaps"
+run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 echo ""
 
-echo "Summary: $success/$total"
+echo "Summary       : $success/$total"
+echo "Sessions size : "`wc -cl $sessions | tail -1`
+echo "Shapes   size : "`wc -cl $shapes | tail -1`
+
 exit $res
 
 

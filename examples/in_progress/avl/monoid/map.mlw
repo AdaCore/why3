@@ -1,0 +1,1051 @@
+
+module MapBase
+  
+  use import int.Int
+  use import avl.SelectionTypes
+  use import program_type.TypeParams
+  use import option.Option
+  use import ref.Ref
+  use import list.List
+  use import list.Append
+  use import list.Mem
+  use import list.Length
+  
+  (* Move remaining parameters here. *)
+  constant balancing : int
+  axiom balancing_positive : balancing > 0
+  
+  clone export key_type.ProgramKeyType
+  clone preorder.Computable as CO with type T.t = K.t, type T.m = K.m,
+    function T.m = K.m,
+    predicate T.c = K.c
+  namespace D
+    function measure 'a  : unit = ()
+    let measure (ghost _:'a) (x:'c) : unit
+      ensures { result = () }
+    = ()
+  end
+  
+  (* Full clone of association_list. *)
+  clone association_list.AssocSorted as A with type K.t = D.m,
+    type K.key = K.m,
+    function K.key = key,
+    predicate O.le = CO.le,
+    goal O.Refl,
+    goal O.Trans,
+    predicate O.eq = CO.eq,
+    goal O.eq_def,
+    predicate O.lt = CO.lt,
+    goal O.lt_def
+  
+  (* Monoid: unit here, no information is interesting to store. *)
+  namespace M
+    type m = unit
+    type t = unit
+    constant zero : unit = ()
+    function op (x y:unit) : unit = ()
+    let lemma neutral_ (x:unit) : unit
+      ensures { op zero x = x = op x zero }
+    = match x with _ -> () end
+    clone export monoid.Monoid with type t = m,
+      constant zero = zero,function op = op,lemma assoc,lemma neutral
+    clone export monoid.MonoidListDef with type M.t = m,
+      constant M.zero = zero,function M.op = op,goal M.assoc,goal M.neutral
+    function m (x:'a) : 'a = x
+    predicate c (x:'a) = true
+    let zero () : unit
+      ensures { result = () }
+    = ()
+    let op (x y:unit) : unit
+      ensures { result = () }
+    = ()
+  end
+  
+  (* Selector: key. *)
+  type selector = K.t
+  
+  (* Correction of a selector with respect to a list:
+     The list is sorted. *)
+  
+  predicate selection_possible (s:K.t) (l:list (D.m 'b)) =
+    A.S.increasing l /\ K.c s
+  
+  predicate selected (s:K.t) (e:split (D.m 'b)) =
+    let l = rebuild e in
+    (A.S.upper_bound s.K.m e.left /\ A.S.lower_bound s.K.m e.right /\
+    match e.middle with
+    | None -> true
+    | Some d2 -> CO.eq s.K.m d2.key
+    end)
+    (* Strictly speaking, not necessary because derivable from the context,
+       but makes easier to write some lemmas. *)
+    /\ A.S.increasing e.left /\ A.S.increasing e.right
+    /\ selection_possible s l
+  
+  predicate selected_sem (s:K.t) (e:split (D.m 'b)) (l:list (D.m 'b)) =
+    forall k:K.m. (CO.lt k s.K.m -> A.model l k = A.model e.left k) /\
+      (CO.lt s.K.m k -> A.model l k = A.model e.right k) /\
+      (CO.eq k s.K.m -> A.model l k = e.middle) /\
+      (CO.le s.K.m k -> A.model e.left k = None) /\
+      (CO.le k s.K.m -> A.model e.right k = None)
+  
+  let lemma selected_sem (s:K.t) (e:split (D.m 'b)) : unit
+    requires { selected s e }
+    ensures { selected_sem s e (rebuild e) }
+  = match e.middle with
+    | None -> A.model_cut s.K.m e.left e.right
+    | Some dm -> A.model_split dm e.left e.right
+    end
+  
+  let selected_part (ghost p:type_params 'a 'b)
+    (ghost llis:list (D.m 'b))
+    (ghost rlis:list (D.m 'b))
+    (s:K.t) (l:'e) (d:D.t 'a 'b) (r:'f) : part_base K.t
+    requires { p.D.mp.inv d }
+    requires { selection_possible s (llis ++ Cons (p.D.mp.mdl d) rlis) }
+    returns { Here -> let e2 = { left = llis;
+        middle = Some (p.D.mp.mdl d);
+        right = rlis } in selected s e2
+      | Left sl -> selection_possible sl llis /\
+        forall e. selected sl e /\ rebuild e = llis ->
+          selected s (right_extend e (p.D.mp.mdl d) rlis)
+      | Right sr -> selection_possible sr rlis /\
+        forall e. selected sr e /\ rebuild e = rlis ->
+          selected s (left_extend llis (p.D.mp.mdl d) e) }
+  = let kd = get_key p d in
+    let cmp = CO.compare s kd in
+    if cmp < 0
+    then Left s
+    else if cmp > 0
+    then Right s
+    else Here
+  
+  (* Full clone of the avl module. *)
+  clone avl.AVL as Sel with type selector = selector,
+    predicate selection_possible = selection_possible,
+    predicate selected = selected,
+    val selected_part = selected_part,
+    goal selection_empty,
+    constant balancing = balancing,
+    goal balancing_positive,
+    type D.t = D.t,
+    type D.m = D.m,
+    function D.mp = D.mp,
+    function D.measure = D.measure,
+    val D.measure = D.measure,
+    type M.t = M.t,
+    type M.m = M.m,
+    function M.m = M.m,
+    predicate M.c = M.c,
+    constant M.zero = M.zero,
+    function M.op = M.op,
+    goal M.assoc,
+    goal M.neutral,
+    function M.sum = M.sum,
+    goal M.sum_def_nil,
+    goal M.sum_def_cons,
+    val M.zero = M.zero,
+    val M.op = M.op
+  
+  type t 'a 'b = Sel.t 'a 'b
+  
+  (* Model: a finite association with respect to an ordering parameter.
+     The cardinal expose the finite part, and is mainly intended for
+     user variants. *)
+  type m 'b = {
+    func : K.m -> option (D.m 'b);
+    card : int;
+  }
+  
+  function prm (t:t 'a 'b) : type_params 'a 'b = t.Sel.prm
+  let ghost prm (t:t 'a 'b) : type_params 'a 'b
+    ensures { result = t.prm }
+  = t.Sel.prm
+  function dprm (t:t 'a 'b) : type_params (D.t 'a 'b) (D.m 'b) =
+    D.mp t.prm
+  let ghost dprm (t:t 'a 'b) : type_params (D.t 'a 'b) (D.m 'b)
+    ensures { result = t.dprm }
+  = D.mp t.prm
+  
+  function m (t:t 'a 'b) : m 'b =
+    { func = A.model t.Sel.m.Sel.lis; card = length t.Sel.m.Sel.lis }
+  let ghost m (t:t 'a 'b) : m 'b
+    ensures { result = t.m }
+  = { func = A.model t.Sel.m.Sel.lis; card = length t.Sel.m.Sel.lis }
+  
+  let lemma m_def (t:t 'a 'b) : unit
+    ensures { t.m.func = A.model t.Sel.m.Sel.lis }
+    ensures { t.m.card = length t.Sel.m.Sel.lis }
+  = ()
+  
+  predicate c (t:t 'a 'b) =
+    Sel.c t /\ A.S.increasing t.Sel.m.Sel.lis
+  
+  clone export program_type.Type1Prm with type t = t, type m = m,
+    function m = m,predicate c = c,function prm = prm
+  
+  (* Should be the exported part of the invariant. *)
+  let lemma correction (t:t 'a 'b) : unit
+    requires { c t }
+    ensures { forall k1 k2:K.m. CO.eq k1 k2 ->
+      t.m.func k1 = t.m.func k2 }
+    ensures { forall k:K.m. match t.m.func k with
+      | None -> true
+      | Some d -> CO.eq k d.key
+      end }
+    ensures { t.m.card >= 0 }
+  = ()
+  
+  let empty (ghost p:type_params 'a 'b) : t 'a 'b
+    ensures { result.prm = p }
+    ensures { c result }
+    ensures { forall k:K.m. result.m.func k = None }
+    ensures { result.m.card = 0 }
+  = Sel.empty p
+  
+  let singleton (ghost p:type_params 'a 'b) (d:D.t 'a 'b) : t 'a 'b
+    requires { p.D.mp.inv d }
+    ensures { result.prm = p }
+    ensures { c result }
+    ensures { (forall k:K.m. if CO.eq k (result.dprm.mdl d).key
+      then result.m.func k = Some (result.dprm.mdl d)
+      else result.m.func k = None) &&
+      result.m.func (result.dprm.mdl d).key = Some (result.dprm.mdl d) }
+    ensures { result.m.card = 1 }
+  = Sel.singleton p d
+  
+  let is_empty (ghost rd:ref (D.m 'b)) (t:t 'a 'b) : bool
+    requires { c t }
+    ensures { result -> forall k:K.m. t.m.func k = None }
+    ensures { not result -> t.m.func (key !rd) = Some !rd }
+    ensures { result <-> t.m.card = 0 }
+  = let res = Sel.is_empty t in
+    ghost if not res
+    then match t.Sel.m.Sel.lis with
+      | Nil -> absurd
+      | Cons d _ -> rd := d
+      end;
+    res
+  
+  let decompose_min (t:t 'a 'b) : option (D.t 'a 'b,t 'a 'b)
+    requires { c t }
+    returns { None -> (forall k:K.m. t.m.func k = None) /\ t.m.card = 0
+      | Some (d,r) -> let dm = r.dprm.mdl d in
+        r.prm = t.prm /\ t.dprm.inv d /\ c r /\ t.m.card = r.m.card + 1 /\
+        (forall k:K.m. (CO.lt k dm.key -> t.m.func k = None) /\
+          (CO.eq k dm.key -> t.m.func k = Some dm) /\
+          (CO.le k dm.key -> r.m.func k = None) /\
+          (not CO.eq dm.key k -> r.m.func k = t.m.func k)) &&
+        t.m.func dm.key = Some dm && r.m.func dm.key = None }
+  = Sel.decompose_front t
+  
+  let decompose_max (t:t 'a 'b) : option (t 'a 'b,D.t 'a 'b)
+    requires { c t }
+    returns { None -> (forall k:K.m. t.m.func k = None) /\ t.m.card = 0
+      | Some (l,d) -> let dm = l.dprm.mdl d in
+        l.prm = t.prm /\ t.dprm.inv d /\ c l /\ t.m.card = l.m.card + 1 /\
+        (forall k:K.m. (CO.lt dm.key k -> t.m.func k = None) /\
+          (CO.eq dm.key k -> t.m.func k = Some dm) /\
+          (CO.le dm.key k -> l.m.func k = None) /\
+          (not CO.eq k dm.key -> l.m.func k = t.m.func k)) &&
+        t.m.func dm.key = Some dm && l.m.func dm.key = None }
+  = Sel.decompose_back t
+  
+  let add_min (d:D.t 'a 'b) (t:t 'a 'b) : t 'a 'b
+    requires { c t /\ t.dprm.inv d }
+    requires { forall k:K.m. CO.le k (t.dprm.mdl d).key -> t.m.func k = None }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { let dm = t.dprm.mdl d in
+      (forall k:K.m. (CO.lt k dm.key -> result.m.func k = None) /\
+        (CO.eq k dm.key -> result.m.func k = Some dm) /\
+        (not CO.eq dm.key k -> result.m.func k = t.m.func k)) &&
+      t.m.func dm.key = None && result.m.func dm.key = Some dm }
+    ensures { result.m.card = t.m.card + 1 }
+  = Sel.cons d t
+  
+  let add_max (t:t 'a 'b) (d:D.t 'a 'b) : t 'a 'b
+    requires { c t /\ t.dprm.inv d }
+    requires { forall k:K.m. CO.le (t.dprm.mdl d).key k -> t.m.func k = None }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { let dm = t.dprm.mdl d in
+      (forall k:K.m. (CO.lt dm.key k -> result.m.func k = None) /\
+        (CO.eq k dm.key -> result.m.func k = Some dm) /\
+        (not CO.eq dm.key k -> result.m.func k = t.m.func k)) &&
+      t.m.func dm.key = None && result.m.func dm.key = Some dm }
+    ensures { result.m.card = t.m.card + 1 }
+  = Sel.snoc t d
+  
+  let concat (l r:t 'a 'b) : t 'a 'b
+    requires { c l /\ c r /\ l.prm = r.prm }
+    requires { forall k1 k2. l.m.func k1 <> None /\ r.m.func k2 <> None ->
+      CO.lt k1 k2 }
+    ensures { c result /\ result.prm = l.prm }
+    ensures { forall k. match l.m.func k with
+      | None -> result.m.func k = r.m.func k
+      | s -> result.m.func k = s
+      end }
+    ensures { forall k. match r.m.func k with
+      | None -> result.m.func k = l.m.func k
+      | s -> result.m.func k = s
+      end }
+    ensures { forall k. (result.m.func k = None <->
+      l.m.func k = None /\ r.m.func k = None) }
+    ensures { result.m.card = l.m.card + r.m.card }
+  = Sel.concat l r
+  
+  let get (k:K.t) (t:t 'a 'b) : option (D.t 'a 'b)
+    requires { c t /\ K.c k }
+    returns { None -> (forall k2. CO.eq k.K.m k2 ->
+        t.m.func k2 = None) && t.m.func k.K.m = None
+      | Some d -> t.dprm.inv d /\ t.m.card > 0 /\ let dm = t.dprm.mdl d in
+        CO.eq dm.key k.K.m /\ (forall k2. CO.eq k.K.m k2 ->
+          t.m.func k2 = Some dm) && t.m.func k.K.m = Some dm = t.m.func dm.key }
+  = let r = Sel.default_split () in
+    Sel.get r k t
+  
+  let insert (d:D.t 'a 'b) (t:t 'a 'b) : t 'a 'b
+    requires { c t /\ t.dprm.inv d }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { let dm = t.dprm.mdl d in
+      t.m.card <= result.m.card /\
+      (if t.m.func dm.key = None then result.m.card = t.m.card + 1
+        else result.m.card = t.m.card) /\
+      (forall k:K.m. (CO.eq k dm.key -> result.m.func k = Some dm) /\
+       (not CO.eq k dm.key -> result.m.func k = t.m.func k)) &&
+      result.m.func dm.key = Some dm }
+  = let r = Sel.default_split () in
+    let k = get_key t.prm d in
+    Sel.insert r k d t
+  
+  let remove (k:K.t) (t:t 'a 'b) : t 'a 'b
+    requires { c t /\ K.c k }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { result.m.card <= t.m.card /\
+      (if t.m.func k.K.m = None then t.m.card = result.m.card
+        else t.m.card = result.m.card + 1) /\
+      (forall k2:K.m. (CO.eq k2 k.K.m -> result.m.func k2 = None) /\
+       (not CO.eq k2 k.K.m -> result.m.func k2 = t.m.func k2)) &&
+      result.m.func k.K.m = None }
+  = let r = Sel.default_split () in
+    Sel.remove r k t
+  
+  let split (k:K.t) (t:t 'a 'b) : (t 'a 'b,option (D.t 'a 'b),t 'a 'b)
+    requires { c t /\ K.c k }
+    returns { (lf,o,rg) -> lf.prm = t.prm = rg.prm /\ c lf /\ c rg /\
+      match o with
+      | None -> (forall k2:K.m. CO.eq k.K.m k2 -> t.m.func k2 = None) &&
+        t.m.func k.K.m = None
+      | Some d -> t.dprm.inv d /\ let dm = t.dprm.mdl d in
+        CO.eq k.K.m dm.key /\
+        (forall k2:K.m. CO.eq k.K.m k2 -> t.m.func k2 = Some dm) &&
+        t.m.func k.K.m = Some dm = t.m.func dm.key
+      end /\
+      ((if o = None
+        then t.m.card = lf.m.card + rg.m.card
+        else t.m.card = 1 + (lf.m.card + rg.m.card)) &&
+        t.m.card >= lf.m.card + rg.m.card) /\
+      (forall k2:K.m. CO.lt k2 k.K.m -> lf.m.func k2 = t.m.func k2) /\
+      (forall k2:K.m. CO.le k.K.m k2 -> lf.m.func k2 = None) /\
+      (forall k2:K.m. CO.lt k.K.m k2 -> rg.m.func k2 = t.m.func k2) /\
+      (forall k2:K.m. CO.le k2 k.K.m -> rg.m.func k2 = None) }
+  = let r = Sel.default_split () in
+    Sel.split r k t
+  
+  (* Extension: set-theoretic-like routines. *)
+  
+  (* Internal, but makes those routines easier. *)
+  
+  let view (t:t 'a 'b) : Sel.view 'a 'b
+    requires { c t }
+    returns { Sel.AEmpty -> t.m.card = 0 /\
+        forall k:K.m. t.m.func k = None
+      | Sel.ANode l d r _ _ -> let dm = t.dprm.mdl d in c l /\ c r /\ t.dprm.inv d /\
+        l.prm = t.prm = r.prm /\ t.m.card = 1 + l.m.card + r.m.card /\
+        forall k:K.m. (CO.lt k dm.key -> t.m.func k = l.m.func k) /\
+          (CO.lt dm.key k -> t.m.func k = r.m.func k) /\
+          (CO.eq k dm.key -> t.m.func k = Some dm) /\
+          (CO.le dm.key k -> l.m.func k = None) /\
+          (CO.le k dm.key -> r.m.func k = None) }
+  = Sel.view t
+  
+  let join (l:t 'a 'b) (d:D.t 'a 'b) (r:t 'a 'b) : t 'a 'b
+    requires { c l /\ c r /\ l.prm = r.prm /\ l.dprm.inv d }
+    requires { let dm = l.dprm.mdl d in
+      forall k:K.m. (l.m.func k <> None -> CO.lt k dm.key) /\
+        (r.m.func k <> None -> CO.lt dm.key k) }
+    ensures { c result /\ result.prm = l.prm }
+    ensures { let dm = l.dprm.mdl d in
+      forall k:K.m. (CO.lt k dm.key -> result.m.func k = l.m.func k) /\
+        (CO.lt dm.key k -> result.m.func k = r.m.func k) /\
+        (CO.eq k dm.key -> result.m.func k = Some dm) }
+    ensures { result.m.card = 1 + l.m.card + r.m.card }
+  = Sel.join l d r
+  
+  let rec add_all (a:t 'a 'b) (t:t 'a 'b) : t 'a 'b
+    requires { c a /\ c t /\ a.prm = t.prm }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { forall k. if a.m.func k = None
+      then result.m.func k = t.m.func k
+      else result.m.func k = a.m.func k }
+    ensures { result.m.card >= a.m.card }
+    ensures { result.m.card >= t.m.card }
+    variant { a.m.card + t.m.card }
+  = match view a with
+    | Sel.AEmpty -> t
+    | Sel.ANode al ad ar ah _ -> match view t with
+      | Sel.AEmpty -> a
+      | Sel.ANode tl td tr th _ -> if ah <= th
+        then let tk = get_key t.prm td in
+          let (al,ad,ar) = split tk a in
+          let ul = add_all al tl in
+          let ur = add_all ar tr in
+          let ud = match ad with
+            | None -> td
+            | Some ad -> ad
+            end in
+          join ul ud ur
+        else let ak = get_key a.prm ad in
+          let (tl,_,tr) = split ak t in
+          let ul = add_all al tl in
+          let ur = add_all ar tr in
+          join ul ad ur
+      end
+    end
+  
+  let rec filter (p:t 'c 'd) (a:t 'a 'b) : t 'a 'b
+    requires { c a /\ c p }
+    ensures { c result /\ result.prm = a.prm }
+    ensures { forall k. if p.m.func k = None
+      then result.m.func k = None
+      else result.m.func k = a.m.func k }
+    ensures { result.m.card <= a.m.card }
+    ensures { result.m.card <= p.m.card }
+    variant { a.m.card + p.m.card }
+  = match view a with
+    | Sel.AEmpty -> a
+    | Sel.ANode al ad ar ah _ -> match view p with
+      | Sel.AEmpty -> empty a.prm
+      | Sel.ANode pl pd pr ph _ -> if ah <= ph
+        then let pk = get_key p.prm pd in
+          let (al,ad,ar) = split pk a in
+          let fl = filter pl al in
+          let fr = filter pr ar in
+          match ad with
+          | None -> concat fl fr
+          | Some ad -> join fl ad fr
+          end
+        else let ak = get_key a.prm ad in
+          let (pl,pd,pr) = split ak p in
+          let fl = filter pl al in
+          let fr = filter pr ar in
+          match pd with
+          | None -> concat fl fr
+          | _ -> join fl ad fr
+          end
+      end
+    end
+  
+  let rec remove_all (p:t 'c 'd) (a:t 'a 'b) : t 'a 'b
+    requires { c a /\ c p }
+    ensures { c result /\ result.prm = a.prm }
+    ensures { forall k. if p.m.func k = None
+      then result.m.func k = a.m.func k
+      else result.m.func k = None }
+    ensures { result.m.card <= a.m.card }
+    variant { a.m.card + p.m.card }
+  = match view a with
+    | Sel.AEmpty -> a
+    | Sel.ANode al ad ar ah _ -> match view p with
+      | Sel.AEmpty -> a
+      | Sel.ANode pl pd pr ph _ -> if ah <= ph
+        then let pk = get_key p.prm pd in
+          let (al,_,ar) = split pk a in
+          let fl = remove_all pl al in
+          let fr = remove_all pr ar in
+          concat fl fr
+        else let ak = get_key a.prm ad in
+          let (pl,pd,pr) = split ak p in
+          let fl = remove_all pl al in
+          let fr = remove_all pr ar in
+          match pd with
+          | None -> join fl ad fr
+          | _ -> concat fl fr
+          end
+      end
+    end
+  
+  let rec symdiff (a b:t 'a 'b) : t 'a 'b
+    requires { c a /\ c b /\ a.prm = b.prm }
+    ensures { c result /\ result.prm = a.prm }
+    ensures { forall k. (a.m.func k = None -> result.m.func k = b.m.func k) /\
+      (b.m.func k = None -> result.m.func k = a.m.func k) /\
+      (a.m.func k <> None /\ b.m.func k <> None -> result.m.func k = None) }
+    variant { a.m.card + b.m.card }
+  = match view a with
+    | Sel.AEmpty -> b
+    | Sel.ANode al ad ar ah _ -> match view b with
+      | Sel.AEmpty -> a
+      | Sel.ANode bl bd br bh _ -> if ah <= bh
+        then let bk = get_key b.prm bd in
+          let (al,ad,ar) = split bk a in
+          let sl = symdiff al bl in
+          let sr = symdiff ar br in
+          match ad with
+          | None -> join sl bd sr
+          | _ -> concat sl sr
+          end
+        else let ak = get_key a.prm ad in
+          let (bl,bd,br) = split ak b in
+          let sl = symdiff al bl in
+          let sr = symdiff ar br in
+          match bd with
+          | None -> join sl ad sr
+          | _ -> concat sl sr
+          end
+      end
+    end
+  
+end
+
+module Map
+  
+  use import int.Int
+  use import program_type.TypeParams
+  use import option.Option
+  use import ref.Ref
+  
+  (* Parameters. *)
+  constant balancing : int
+  axiom balancing_positive : balancing > 0
+  
+  (* Comparable key type. *)
+  clone program_type.Type0 as K
+  clone preorder.Computable as CO with type T.t = K.t, type T.m = K.m,
+    function T.m = K.m, predicate T.c = K.c
+  
+  (* stored type is a pair. *)
+  namespace D
+    
+    type t 'a 'b = (K.t,'a)
+    type m 'b = (K.m,'b)
+    function mp (p:type_params 'a 'b) : type_params (t 'a 'b) (m 'b) =
+      { inv = \pr. let (a,b) = pr in K.c a /\ p.inv b;
+        mdl = \pr. let (a,b) = pr in (a.K.m,p.mdl b) }
+    function key (t:m 'b) : K.m = let (a,_) = t in a
+    let get_key (ghost p:type_params 'a 'b) (t:t 'a 'b) : K.t
+      requires { p.mp.inv t }
+      ensures { K.c result }
+      ensures { key (p.mp.mdl t) = result.K.m }
+    = let (a,_) = t in a
+    
+  end
+  
+  clone MapBase as MB with constant balancing = balancing,
+    goal balancing_positive,
+    type K.t = K.t,
+    type K.m = K.m,
+    function K.m = K.m,
+    predicate K.c = K.c,
+    type D.t = D.t,
+    type D.m = D.m,
+    function D.mp = D.mp,
+    function key = D.key,
+    val get_key = D.get_key,
+    predicate CO.le = CO.le,
+    goal CO.Refl,
+    goal CO.Trans,
+    goal CO.Total,
+    predicate CO.lt = CO.lt,
+    goal CO.lt_def,
+    predicate CO.eq = CO.eq,
+    goal CO.eq_def,
+    val CO.compare = CO.compare
+  
+  type t 'a 'b = MB.t 'a 'b
+  type m 'b = {
+    func : K.m -> option 'b;
+    card : int;
+  }
+  predicate c (t:t 'a 'b) = MB.c t
+  function prm (t:t 'a 'b) : type_params 'a 'b = t.MB.prm
+  function oproj (o:option ('a,'b)) : option 'b = match o with
+  | None -> None
+  | Some (_,v) -> Some v
+  end
+  function m (t:t 'a 'b) : m 'b =
+    { func = \k. oproj (t.MB.m.MB.func k);
+      card = t.MB.m.MB.card }
+  
+  let lemma m_def (t:t 'a 'b) : unit
+    ensures { forall k. t.m.func k = None <-> t.MB.m.MB.func k = None }
+    ensures { forall k k2 v. t.MB.m.MB.func k = Some (k2,v) ->
+      t.m.func k = Some v }
+    ensures { forall k v. t.m.func k = Some v -> exists k2.
+      t.MB.m.MB.func k = Some (k2,v) /\ CO.eq k k2 }
+    ensures { t.m.card = t.MB.m.MB.card }
+  = assert { forall k v. t.m.func k = Some v -> (not exists k2.
+      t.MB.m.MB.func k = Some (k2,v) /\ CO.eq k k2) ->
+        match t.MB.m.MB.func k with
+        | None -> false
+        | Some x -> let (k2,v2) = x in k2 = x.D.key && CO.eq k k2 &&
+          v = v2 && false
+        end }
+  
+  let lemma correction (t:t 'a 'b) : unit
+    requires { c t }
+    ensures { forall k1 k2:K.m. CO.eq k1 k2 -> t.m.func k1 = t.m.func k2 }
+    ensures { t.m.card >= 0 }
+  = ()
+  
+  let empty (ghost p:type_params 'a 'b) : t 'a 'b
+    ensures { c result /\ result.prm = p }
+    ensures { forall k:K.m. result.m.func k = None }
+    ensures { result.m.card = 0 }
+  = MB.empty p
+  
+  let singleton (ghost p:type_params 'a 'b) (k:K.t) (v:'a) : t 'a 'b
+    requires { K.c k /\ p.inv v }
+    ensures { c result /\ result.prm = p }
+    ensures { (forall k2:K.m. if CO.eq k2 k.K.m
+      then result.m.func k2 = Some (result.prm.mdl v)
+      else result.m.func k2 = None) &&
+      result.m.func k.K.m = Some (result.prm.mdl v) }
+    ensures { result.m.card = 1 }
+  = MB.singleton p (k,v)
+  
+  let is_empty (ghost rk:ref K.m) (ghost rv:ref 'b)
+    (t:t 'a 'b) : bool
+    requires { c t }
+    ensures { result -> forall k:K.m. t.m.func k = None }
+    ensures { not result -> t.m.func !rk = Some !rv }
+    ensures { result <-> t.m.card = 0 }
+  = let r = ref (!rk,!rv) in
+    let res = MB.is_empty r t in
+    let (a,b) = !r in rk := a;rv := b;res
+  
+  let decompose_min (t:t 'a 'b) : option ((K.t,'a),t 'a 'b)
+    requires { c t }
+    returns { None -> (forall k:K.m. t.m.func k = None) /\ t.m.card = 0
+      | Some ((k,v),r) -> let vm = t.prm.mdl v in
+        r.prm = t.prm /\ K.c k /\ t.prm.inv v /\ c r /\
+        t.m.card = 1 + r.m.card /\
+        (forall k2:K.m. (CO.lt k2 k.K.m -> t.m.func k2 = None) /\
+          (CO.eq k2 k.K.m -> t.m.func k2 = Some vm) /\
+          (CO.le k2 k.K.m -> r.m.func k2 = None) /\
+          (not CO.eq k.K.m k2 -> r.m.func k2 = t.m.func k2)) &&
+        t.m.func k.K.m = Some vm &&
+        r.m.func k.K.m = None }
+  = MB.decompose_min t
+  
+  let decompose_max (t:t 'a 'b) : option (t 'a 'b,(K.t,'a))
+    requires { c t }
+    returns { None -> (forall k:K.m. t.m.func k = None) /\ t.m.card = 0
+      | Some (l,(k,v)) -> let vm = t.prm.mdl v in
+        l.prm = t.prm /\ K.c k /\ t.prm.inv v /\ c l /\
+        t.m.card = 1 + l.m.card /\
+        (forall k2:K.m. (CO.lt k.K.m k2 -> t.m.func k2 = None) /\
+          (CO.eq k.K.m k2 -> t.m.func k2 = Some vm) /\
+          (CO.le k.K.m k2 -> l.m.func k2 = None) /\
+          (not CO.eq k2 k.K.m -> l.m.func k2 = t.m.func k2)) &&
+        t.m.func k.K.m = Some vm &&
+        l.m.func k.K.m = None }
+  = MB.decompose_max t
+  
+  let add_min (k:K.t) (v:'a) (t:t 'a 'b) : t 'a 'b
+    requires { c t /\ K.c k /\ t.prm.inv v }
+    requires { forall k2:K.m. CO.le k2 k.K.m -> t.m.func k2 = None }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { let vm = t.prm.mdl v in
+      (forall k2:K.m. (CO.lt k2 k.K.m -> result.m.func k2 = None) /\
+        (CO.eq k2 k.K.m -> result.m.func k2 = Some vm) /\
+        (not CO.eq k.K.m k2 -> result.m.func k2 = t.m.func k2)) &&
+      t.m.func k.K.m = None &&
+      result.m.func k.K.m = Some vm }
+    ensures { result.m.card = 1 + t.m.card }
+  = assert { t.prm.D.mp.mdl (k,v) = (K.m k,t.prm.mdl v) };
+    MB.add_min (k,v) t
+  
+  let add_max (t:t 'a 'b) (k:K.t) (v:'a) : t 'a 'b
+    requires { c t /\ K.c k /\ t.prm.inv v }
+    requires { forall k2:K.m. CO.le k.K.m k2 -> t.m.func k2 = None }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { let vm = t.prm.mdl v in
+      forall k2:K.m. (CO.lt k.K.m k2 -> result.m.func k2 = None) /\
+      (CO.eq k.K.m k2 -> result.m.func k2 = Some vm) /\
+      (not CO.eq k2 k.K.m -> result.m.func k2 = t.m.func k2) }
+    ensures { result.m.card = 1 + t.m.card }
+  = assert { t.prm.D.mp.mdl (k,v) = (K.m k,t.prm.mdl v) };
+    MB.add_max t (k,v)
+  
+  let concat (l r:t 'a 'b) : t 'a 'b
+    requires { c l /\ c r /\ l.prm = r.prm }
+    requires { forall k1 k2. l.m.func k1 <> None /\ r.m.func k2 <> None ->
+      CO.lt k1 k2 }
+    ensures { c result /\ result.prm = l.prm }
+    ensures { forall k. match l.m.func k with
+      | None -> result.m.func k = r.m.func k
+      | s -> result.m.func k = s
+      end }
+    ensures { forall k. match r.m.func k with
+      | None -> result.m.func k = l.m.func k
+      | s -> result.m.func k = s
+      end }
+    ensures { forall k. (result.m.func k = None <->
+      l.m.func k = None /\ r.m.func k = None) }
+    ensures { result.m.card = l.m.card + r.m.card }
+  = MB.concat l r
+  
+  let get (k:K.t) (t:t 'a 'b) : option 'a
+    requires { c t /\ K.c k }
+    returns { None -> (forall k2. CO.eq k.K.m k2 ->
+        t.m.func k2 = None) && t.m.func k.K.m = None
+      | Some v -> t.prm.inv v /\ t.m.card > 0 /\ let vm = t.prm.mdl v in
+        (forall k2. CO.eq k.K.m k2 -> t.m.func k2 = Some vm) &&
+        t.m.func k.K.m = Some vm }
+  = match MB.get k t with
+    | None -> None
+    | Some (_,v) -> Some v
+    end
+  
+  let insert (k:K.t) (v:'a) (t:t 'a 'b) : t 'a 'b
+    requires { c t /\ K.c k /\ t.prm.inv v }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { let vm = t.prm.mdl v in result.m.card >= t.m.card /\
+      (if t.m.func k.K.m = None
+       then result.m.card = t.m.card + 1
+       else result.m.card = t.m.card) /\
+      (forall k2:K.m. (CO.eq k2 k.K.m -> result.m.func k2 = Some vm) /\
+        (not CO.eq k2 k.K.m -> result.m.func k2 = t.m.func k2)) &&
+      result.m.func k.K.m = Some vm }
+  = let d = (k,v) in
+    let res = MB.insert (k,v) t in
+    assert { t.MB.dprm.mdl d = (k.K.m,t.prm.mdl v) };
+    res
+  
+  let remove (k:K.t) (t:t 'a 'b) : t 'a 'b
+    requires { c t /\ K.c k }
+    ensures { c result /\ result.prm = t.prm }
+    ensures { result.m.card <= t.m.card /\
+      (if t.m.func k.K.m = None
+       then result.m.card = t.m.card
+       else 1 + result.m.card = t.m.card) /\
+      (forall k2:K.m. (CO.eq k2 k.K.m -> result.m.func k2 = None) /\
+       (not CO.eq k2 k.K.m -> result.m.func k2 = t.m.func k2)) &&
+      result.m.func k.K.m = None }
+  = MB.remove k t
+  
+  let split (k:K.t) (t:t 'a 'b) : (t 'a 'b,option 'a,t 'a 'b)
+    requires { c t /\ K.c k }
+    returns { (lf,o,rg) -> lf.prm = t.prm = rg.prm /\ c lf /\ c rg /\
+      match o with
+      | None -> (forall k2:K.m. CO.eq k.K.m k2 -> t.m.func k2 = None) &&
+        t.m.func k.K.m = None
+      | Some v -> t.prm.inv v /\ let vm = t.prm.mdl v in
+        (forall k2:K.m. CO.eq k.K.m k2 -> t.m.func k2 = Some vm) &&
+        t.m.func k.K.m = Some vm
+      end /\
+      t.m.card >= lf.m.card + rg.m.card /\
+      (if o = None
+       then t.m.card = lf.m.card + rg.m.card
+       else t.m.card = 1 + (lf.m.card + rg.m.card)) /\
+      (forall k2:K.m. CO.lt k2 k.K.m -> lf.m.func k2 = t.m.func k2) /\
+      (forall k2:K.m. CO.le k.K.m k2 -> lf.m.func k2 = None) /\
+      (forall k2:K.m. CO.lt k.K.m k2 -> rg.m.func k2 = t.m.func k2) /\
+      (forall k2:K.m. CO.le k2 k.K.m -> rg.m.func k2 = None) }
+  = let (lf,o,rg) = MB.split k t in
+    let o = abstract ensures { match o with None -> result = None
+        | Some (_,v) -> result = Some v end }
+        match o with None -> None | Some (_,v) -> Some v end end in
+    (lf,o,rg)
+  
+end
+
+module Set
+  
+  use import int.Int
+  use import program_type.TypeParams
+  use import option.Option
+  use import ref.Ref
+  
+  (* Parameters. *)
+  constant balancing : int
+  axiom balancing_positive : balancing > 0
+  
+  (* Comparable key type. *)
+  clone program_type.Type0 as K
+  clone preorder.Computable as CO with type T.t = K.t, type T.m = K.m,
+    function T.m = K.m, predicate T.c = K.c
+  
+  (* stored type is only the key. *)
+  namespace D
+    
+    type t 'a 'b = K.t
+    type m 'b = K.m
+    function mp 'c : type_params K.t K.m = K.mp
+    function key (t:'a) : 'a = t
+    let get_key (ghost _:'c) (t:'a) : 'a
+      ensures { result = t }
+    = t
+    
+  end
+  
+  clone MapBase as MB with constant balancing = balancing,
+    goal balancing_positive,
+    type K.t = K.t,
+    type K.m = K.m,
+    function K.m = K.m,
+    predicate K.c = K.c,
+    type D.t = D.t,
+    type D.m = D.m,
+    function D.mp = D.mp,
+    function key = D.key,
+    val get_key = D.get_key,
+    predicate CO.le = CO.le,
+    goal CO.Refl,
+    goal CO.Trans,
+    goal CO.Total,
+    predicate CO.lt = CO.lt,
+    goal CO.lt_def,
+    predicate CO.eq = CO.eq,
+    goal CO.eq_def,
+    val CO.compare = CO.compare
+  
+  type t = MB.t unit unit
+  type m = {
+    set : K.m -> bool;
+    card : int;
+  }
+  predicate c (t:t) = MB.c t /\ t.MB.prm = default_params
+  function oproj (o:option 'a) : bool = match o with
+  | None -> false
+  | Some _ -> true
+  end
+  function m (t:t) : m =
+    { set = \k. oproj (t.MB.m.MB.func k);
+      card = t.MB.m.MB.card }
+  
+  let lemma m_def (t:t) : unit
+    ensures { forall k. not t.m.set k <-> t.MB.m.MB.func k = None }
+    ensures { forall k v. t.MB.m.MB.func k = Some v ->
+      t.m.set k }
+    ensures { forall k. t.m.set k -> exists v. t.MB.m.MB.func k = Some v }
+    ensures { t.m.card = t.MB.m.MB.card }
+  = ()
+  
+  let lemma correction (t:t) : unit
+    requires { c t }
+    ensures { forall k1 k2:K.m. CO.eq k1 k2 -> (t.m.set k1 <-> t.m.set k2) }
+    ensures { t.m.card >= 0 }
+  = ()
+  
+  let empty () : t
+    ensures { c result }
+    ensures { forall k:K.m. not result.m.set k }
+    ensures { result.m.card = 0 }
+  = MB.empty default_params
+  
+  let singleton (k:K.t) : t
+    requires { K.c k }
+    ensures { c result }
+    ensures { forall k2:K.m. result.m.set k2 <-> CO.eq k2 k.K.m }
+    ensures { result.m.card = 1 }
+  = MB.singleton default_params k
+  
+  let is_empty (ghost rk:ref (K.m)) (t:t) : bool
+    requires { c t }
+    ensures { result -> forall k:K.m. not t.m.set k }
+    ensures { not result -> t.m.set !rk }
+    ensures { result <-> t.m.card = 0 }
+  = MB.is_empty rk t
+  
+  let decompose_min (t:t) : option (K.t,t)
+    requires { c t }
+    returns { None -> t.m.card = 0 /\ forall k:K.m. not t.m.set k
+      | Some (k,r) -> K.c k /\ c r /\ t.m.card = 1 + r.m.card /\
+        (forall k2:K.m. (CO.lt k2 k.K.m -> not t.m.set k2) /\
+          (CO.eq k2 k.K.m -> t.m.set k2) /\
+          (CO.le k2 k.K.m -> not r.m.set k2) /\
+          (not CO.eq k.K.m k2 -> r.m.set k2 <-> t.m.set k2))
+        && t.m.set k.K.m && not r.m.set k.K.m }
+  = MB.decompose_min t
+  
+  let decompose_max (t:t) : option (t,K.t)
+    requires { c t }
+    returns { None -> t.m.card = 0 /\ forall k:K.m. not t.m.set k
+      | Some (l,k) -> K.c k /\ c l /\ t.m.card = 1 + l.m.card /\
+        (forall k2:K.m. (CO.lt k.K.m k2 -> not t.m.set k2) /\
+          (CO.eq k.K.m k2 -> t.m.set k2) /\
+          (CO.le k.K.m k2 -> not l.m.set k2) /\
+          (not CO.eq k2 k.K.m -> l.m.set k2 <-> t.m.set k2))
+        && t.m.set k.K.m && not l.m.set k.K.m }
+  = MB.decompose_max t
+  
+  let add_min (k:K.t) (t:t) : t
+    requires { c t /\ K.c k }
+    requires { forall k2:K.m. CO.le k2 k.K.m -> not t.m.set k2 }
+    ensures { c result }
+    ensures { forall k2:K.m. (CO.lt k2 k.K.m -> not result.m.set k2) /\
+      (CO.eq k2 k.K.m -> result.m.set k2) /\
+      (not CO.eq k.K.m k2 -> result.m.set k2 <-> t.m.set k2) }
+    ensures { result.m.card = 1 + t.m.card }
+  = MB.add_min k t
+  
+  let add_max (t:t) (k:K.t) : t
+    requires { c t /\ K.c k }
+    requires { forall k2:K.m. CO.le k.K.m k2 -> not t.m.set k2 }
+    ensures { c result }
+    ensures { forall k2:K.m. (CO.lt k.K.m k2 -> not result.m.set k2) /\
+      (CO.eq k.K.m k2 -> result.m.set k2) /\
+      (not CO.eq k2 k.K.m -> result.m.set k2 <-> t.m.set k2) }
+    ensures { result.m.card = 1 + t.m.card }
+  = MB.add_max t k
+  
+  let concat (l r:t) : t
+    requires { c l /\ c r }
+    requires { forall k1 k2. l.m.set k1 /\ r.m.set k2 -> CO.lt k1 k2 }
+    ensures { c result }
+    ensures { forall k. result.m.set k <-> (r.m.set k \/ l.m.set k) }
+    ensures { result.m.card = l.m.card + r.m.card }
+  = MB.concat l r
+  
+  let mem (k:K.t) (t:t) : bool
+    requires { c t /\ K.c k }
+    ensures { result <-> t.m.set k.K.m }
+    ensures { result <-> (forall k2. CO.eq k2 k.K.m -> t.m.set k2) }
+    ensures { result -> t.m.card > 0 }
+  = match MB.get k t with None -> false | _ -> true end
+  
+  let add (k:K.t) (t:t) : t
+    requires { c t /\ K.c k }
+    ensures { c result }
+    ensures { result.m.card >= t.m.card /\
+      (if t.m.set k.K.m
+       then result.m.card = t.m.card
+       else result.m.card = t.m.card + 1) /\
+      (forall k2:K.m. (CO.eq k2 k.K.m -> result.m.set k2) /\
+        (t.m.set k2 -> result.m.set k2) /\
+        (not CO.eq k2 k.K.m -> result.m.set k2 -> t.m.set k2)) &&
+        result.m.set k.K.m }
+  = MB.insert k t
+  
+  let remove (k:K.t) (t:t) : t
+    requires { c t /\ K.c k }
+    ensures { c result }
+    ensures { result.m.card <= t.m.card /\
+      (if t.m.set k.K.m
+       then 1 + result.m.card = t.m.card
+       else result.m.card = t.m.card) /\
+      (forall k2:K.m. (CO.eq k2 k.K.m -> not result.m.set k2) /\
+        (result.m.set k2 -> t.m.set k2) /\
+        (not CO.eq k2 k.K.m -> t.m.set k2 -> result.m.set k2)) &&
+        not result.m.set k.K.m }
+  = MB.remove k t
+  
+  let split (k:K.t) (t:t) : (t,bool,t)
+    requires { c t /\ K.c k }
+    returns { (lf,b,rg) -> c lf /\ c rg /\
+      (b <-> t.m.set k.K.m) /\
+      (b <-> (forall k2. CO.eq k2 k.K.m -> t.m.set k2)) /\
+      t.m.card >= lf.m.card + rg.m.card /\
+      (if b
+       then t.m.card = 1 + (lf.m.card + rg.m.card)
+       else t.m.card = lf.m.card + rg.m.card) /\
+      (forall k. lf.m.set k -> t.m.set k) /\
+      (forall k. rg.m.set k -> t.m.set k) /\
+      (forall k2. CO.lt k2 k.K.m -> t.m.set k2 -> lf.m.set k2) /\
+      (forall k2. CO.lt k.K.m k2 -> t.m.set k2 -> rg.m.set k2) /\
+      (forall k2. CO.le k.K.m k2 -> not lf.m.set k2) /\
+      (forall k2. CO.le k2 k.K.m -> not rg.m.set k2) }
+  = let (lf,o,rg) = MB.split k t in
+    let o = abstract ensures { result <-> o <> None }
+      match o with None -> false | _ -> true end end in
+    (lf,o,rg)
+  
+  (* Extension: set-theoretic routines. *)
+  
+  let union (a b:t) : t
+    requires { c a /\ c b }
+    ensures { c result }
+    ensures { forall k. result.m.set k <-> a.m.set k \/ b.m.set k }
+    ensures { result.m.card >= a.m.card /\ result.m.card >= b.m.card }
+  = MB.add_all a b
+  
+  let inter (a b:t) : t
+    requires { c a /\ c b }
+    ensures { c result }
+    ensures { forall k. result.m.set k <-> a.m.set k /\ b.m.set k }
+    ensures { result.m.card <= a.m.card /\ result.m.card <= b.m.card }
+  = MB.filter a b
+  
+  let diff (a b:t) : t
+    requires { c a /\ c b }
+    ensures { c result }
+    ensures { forall k. result.m.set k <-> a.m.set k /\ not b.m.set k }
+    ensures { result.m.card <= a.m.card }
+  = MB.remove_all b a
+  
+  let symdiff (a b:t) : t
+    requires { c a /\ c b }
+    ensures { c result }
+    ensures { forall k. result.m.set k <-> not (a.m.set k <-> b.m.set k) }
+  = MB.symdiff a b
+  
+end
+
+(* Example with integer keys and fixed ordering. *)
+module IMapAndSet
+  
+  use import int.Int
+  use import program_type.TypeParams
+  
+  namespace K
+    type t = int
+    type m = int
+    function m (x:'a) : 'a = x
+    predicate c 'a = true
+  end
+  
+  constant balancing : int = 1
+  
+  predicate le (x y:int) = x <= y
+  predicate eq (x y:int) = x = y
+  predicate lt (x y:int) = x < y
+  
+  let compare (x y:int) : int
+    ensures { result = x - y }
+  = x - y
+  
+  clone Map as M with constant balancing = balancing,
+    goal balancing_positive,
+    type K.t = K.t,
+    type K.m = K.m,
+    function K.m = K.m,
+    predicate K.c = K.c,
+    predicate CO.le = le,
+    predicate CO.lt = lt,
+    predicate CO.eq = eq,
+    goal CO.lt_def,
+    goal CO.eq_def,
+    goal CO.Refl,
+    goal CO.Trans,
+    goal CO.Total,
+    val CO.compare = compare
+  
+  clone Set as S with constant balancing = balancing,
+    goal balancing_positive,
+    type K.t = K.t,
+    type K.m = K.m,
+    function K.m = K.m,
+    predicate K.c = K.c,
+    predicate CO.le = le,
+    predicate CO.lt = lt,
+    predicate CO.eq = eq,
+    goal CO.lt_def,
+    goal CO.eq_def,
+    goal CO.Refl,
+    goal CO.Trans,
+    goal CO.Total,
+    val CO.compare = compare
+  
+end
+

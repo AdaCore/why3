@@ -401,7 +401,7 @@ let mod_prelude env =
   let pd_exit = create_exn_decl xs_exit in
   let pd_old = create_val_decl (LetV Mlw_wp.pv_old) in
   let uc = empty_module env (id_fresh "Prelude") ["why3"] in
-  let uc = add_decl uc (Decl.create_ty_decl Mlw_wp.ts_mark) in
+  let uc = use_export_theory uc Mlw_wp.mark_theory in
   let uc = add_pdecl ~wp:false uc pd_old in
   let uc = add_pdecl ~wp:false uc pd_exit in
   close_module uc
@@ -425,7 +425,12 @@ let create_module env ?(path=[]) n =
 
 (** Clone *)
 
-let clone_export uc m inst =
+type mod_inst = {
+  inst_pv : pvsymbol Mpv.t;
+  inst_ps : psymbol Mps.t;
+}
+
+let clone_export uc m minst inst =
   let nth = Theory.clone_export uc.muc_theory m.mod_theory inst in
   let sm = match Theory.get_rev_decls nth with
     | { td_node = Clone (_,sm) } :: _ -> sm
@@ -492,6 +497,7 @@ let clone_export uc m inst =
     muc_decls = d :: uc.muc_decls;
     muc_known = known_add_decl (Theory.get_known nth) uc.muc_known d;
     muc_local = Sid.union uc.muc_local d.pd_news } in
+  let rnth = ref nth in
   let add_pd uc pd = match pd.pd_node with
     | PDtype its ->
         add_pdecl uc (create_ty_decl (conv_its its))
@@ -507,20 +513,60 @@ let clone_export uc m inst =
         (* TODO? Should we clone the defining expression and
            let it participate in the top-level module WP?
            If not, what do we do about its effects? *)
+    | PDval (LetV pv) when Mpv.mem pv minst.inst_pv ->
+        (* TODO: ensure that we do not introduce undetected aliases.
+           This may happen when the cloned module uses a base module
+           with a global variable, and then we instantiate another
+           global variable with it. *)
+          Loc.errorm "Cannot instantiate top-level variables"
     | PDval (LetV pv) ->
         let npv = conv_pv pv in
         Hid.add psh pv.pv_vs.vs_name (PV npv);
         mvs := Mvs.add pv.pv_vs npv.pv_vs !mvs;
         add_pdecl uc (create_val_decl (LetV npv))
-    | PDval (LetA ps) ->
+    | PDval (LetA ps) when Mps.mem ps minst.inst_ps ->
+        let nps = Mps.find ps minst.inst_ps in
         let aty = conv_aty !mvs ps.ps_aty in
-        let nps =
-          Mlw_expr.create_psymbol (id_clone ps.ps_name) ~ghost:ps.ps_ghost aty
-        in
+        let app = match aty.aty_result, nps.ps_aty.aty_result with
+          | VTvalue res, VTvalue _ ->
+              let argl = List.map (fun pv -> pv.pv_ity) aty.aty_args in
+              e_app (e_arrow nps argl res) (List.map e_value aty.aty_args)
+          | _ -> Loc.errorm "Program@ symbol@ instantiation@ does@ not@ \
+              support@ specifications@ for@ partially@ applied@ symbols" in
+        let spec = { aty.aty_spec with c_variant = []; c_letrec = 0 } in
+        let lam = { l_args = aty.aty_args; l_expr = app; l_spec = spec } in
+        let (lp,md,nm) = restore_path ps.ps_name in
+        let sl = String.concat " " in
+        let nm = sl lp ^ "  " ^ md ^ "  " ^ sl nm in
+        let id = id_derive nm ps.ps_name in
+        let fd = create_fun_defn id lam in
+        if fd.fun_ps.ps_ghost && not ps.ps_ghost then Loc.errorm
+          "Program@ symbol@ instantiation@ must@ preserve@ ghostness";
+        let oeff = aty.aty_spec.c_effect in
+        let neff = fd.fun_ps.ps_aty.aty_spec.c_effect in
+        if not (Sreg.subset neff.eff_writes oeff.eff_writes &&
+                Sexn.subset neff.eff_raises oeff.eff_raises &&
+                Sreg.subset neff.eff_ghostw oeff.eff_ghostw &&
+                Sexn.subset neff.eff_ghostx oeff.eff_ghostx &&
+                Mreg.submap (fun _ -> Opt.equal reg_equal)
+                  neff.eff_resets oeff.eff_resets &&
+                Stv.subset neff.eff_compar oeff.eff_compar &&
+                (oeff.eff_diverg || not neff.eff_diverg)) then
+          Loc.errorm "Extra effects in program symbol instantiation";
+        if not (Spv.subset nps.ps_pvset (aty_pvset aty)) then
+          Loc.errorm "Extra hidden state in program symbol instantiation";
+        rnth := Mlw_wp.wp_rec ~wp:true uc.muc_env uc.muc_known !rnth [fd];
         Hid.add psh ps.ps_name (PS nps);
+        uc
+    | PDval (LetA { ps_name = id; ps_ghost = ghost; ps_aty = aty }) ->
+        let aty = conv_aty !mvs aty in
+        let nps = Mlw_expr.create_psymbol (id_clone id) ~ghost aty in
+        Hid.add psh id (PS nps);
         add_pdecl uc (create_val_decl (LetA nps))
     | PDrec fdl ->
         let conv_fd uc { fun_ps = ps } =
+          if Mps.mem ps minst.inst_ps then
+            raise (Theory.CannotInstantiate ps.ps_name);
           let id = id_clone ps.ps_name in
           let aty = conv_aty !mvs ps.ps_aty in
           let vari = Spv.fold (fun pv l ->
@@ -537,11 +583,14 @@ let clone_export uc m inst =
     muc_known = merge_known uc.muc_known extras;
     muc_used = Sid.union uc.muc_used m.mod_used } in
   let uc = List.fold_left add_pd uc m.mod_decls in
+  let nth = !rnth in
   let g_ts _ = function
     | TS ts -> not (Mts.mem ts inst.inst_ts)
     | _ -> true in
   let g_ps _ = function
     | LS ls -> not (Mls.mem ls inst.inst_ls)
+    | PV pv -> not (Mpv.mem pv minst.inst_pv)
+    | PS ps -> not (Mps.mem ps minst.inst_ps)
     | _ -> true in
   let f_ts p = function
     | TS ts ->

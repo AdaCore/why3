@@ -47,9 +47,14 @@ let fs_old =
   let ty = ty_var (create_tvsymbol (id_fresh "a")) in
   create_lsymbol (id_fresh "old") [ty] (Some ty)
 
+let mark_theory =
+  let uc = create_theory ~path:["why3"] (id_fresh "Mark") in
+  let uc = add_ty_decl uc ts_mark in
+  close_theory uc
+
 let th_mark_at =
   let uc = create_theory (id_fresh "WP builtins: at") in
-  let uc = add_ty_decl uc ts_mark in
+  let uc = use_export uc mark_theory in
   let uc = add_param_decl uc fs_at in
   close_theory uc
 
@@ -61,11 +66,11 @@ let th_mark_old =
 
 let fs_now = create_lsymbol (id_fresh "%now") [] (Some ty_mark)
 let t_now = fs_app fs_now [] ty_mark
-let e_now = e_lapp fs_now [] (ity_pur ts_mark [])
+let e_now = e_ghost (e_lapp fs_now [] (ity_pur ts_mark []))
 
 (* [vs_old] appears in the postconditions given to the core API,
    which expects every vsymbol to be a pure part of a pvsymbol *)
-let pv_old = create_pvsymbol (id_fresh "%old") ity_mark
+let pv_old = create_pvsymbol ~ghost:true (id_fresh "%old") ity_mark
 let vs_old = pv_old.pv_vs
 let t_old  = t_var vs_old
 

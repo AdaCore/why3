@@ -49,10 +49,9 @@ struct
   let stats () = WH.stats htable
 end
 
-let combine acc n = n * 65599 + acc
-let combine2 acc n1 n2 = combine acc (combine n1 n2)
-let combine3 acc n1 n2 n3 = combine acc (combine n1 (combine n2 n3))
+let combine acc n = acc * 65599 + n
+let combine2 acc n1 n2 = combine (combine acc n1) n2
+let combine3 acc n1 n2 n3 = combine (combine2 acc n1 n2) n3
 let combine_list f acc l = List.fold_left (fun acc x -> combine acc (f x)) acc l
-let combine_option h = function None -> 0 | Some s -> (h s) + 1
+let combine_option h = function None -> -1 | Some s -> h s
 let combine_pair h1 h2 (a1,a2) = combine (h1 a1) (h2 a2)
-

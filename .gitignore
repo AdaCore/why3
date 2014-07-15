@@ -18,6 +18,7 @@ why3.conf
 *.vo
 *.vd
 *.glob
+*.elc
 \#*\#
 
 # /
@@ -55,6 +56,9 @@ why3.conf
 /bin/why3.byte
 /bin/why3.opt
 /bin/why3
+/bin/why3contraption.byte
+/bin/why3contraption.opt
+/bin/why3contraption
 /bin/why3ide.byte
 /bin/why3ide.opt
 /bin/why3ide
@@ -68,15 +72,21 @@ why3.conf
 /bin/why3doc.opt
 /bin/gnatwhy3.opt
 /bin/why3doc
-/bin/why3replayer.byte
-/bin/why3replayer.opt
-/bin/why3replayer
-/bin/why3html.byte
-/bin/why3html.opt
-/bin/why3html
-/bin/why3stats.byte
-/bin/why3stats.opt
-/bin/why3stats
+/bin/why3extract.byte
+/bin/why3extract.opt
+/bin/why3extract
+/bin/why3execute.byte
+/bin/why3execute.opt
+/bin/why3execute
+/bin/why3prove.byte
+/bin/why3prove.opt
+/bin/why3prove
+/bin/why3realize.byte
+/bin/why3realize.opt
+/bin/why3realize
+/bin/why3replay.byte
+/bin/why3replay.opt
+/bin/why3replay
 /bin/why3session.opt
 /bin/why3session.byte
 /bin/why3session
@@ -126,7 +136,7 @@ why3.conf
 /lib/why3/META
 
 # /lib/ocaml/
-/lib/ocaml/why3__BigInt.ml
+/lib/ocaml/why3__BigInt_compat.ml
 
 # /share/
 /share/emacs/semantic.cache
@@ -147,7 +157,9 @@ orphaned-proofs.prf
 pvsbin/
 
 # Isabelle
+/lib/isabelle/bool/
 /lib/isabelle/int/
+/lib/isabelle/number/
 /lib/isabelle/list/
 /lib/isabelle/map/
 /lib/isabelle/set/
@@ -173,6 +185,7 @@ pvsbin/
 
 # /src/session
 /src/session/xml.ml
+/src/session/compress.ml
 
 # /src/tools
 /src/tools/why3wc.ml
@@ -223,9 +236,18 @@ pvsbin/
 /examples/use_api/runstrat/makejob.opt
 /examples/use_api/runstrat/runstrat.opt
 /examples/vstte10_max_sum/*__*.ml
-/examples/euler001/euler001__*.ml
-/examples/sudoku/sudoku__*.ml
-/examples/in_progress/defunctionalization/defunctionalization__*.ml
+/examples/euler001/*__*.ml
+/examples/sudoku/*__*.ml
+/examples/gcd/*__*.ml
+/examples/gcd/jsmain.js
+/examples/defunctionalization/*__*.ml
+/examples/vstte12_combinators/jsmain.js
+/examples/vstte12_combinators/*__*.ml
+/examples/in_progress/bigInt/jsmain.js
+/examples/in_progress/bigInt/*__*.ml
+/examples/in_progress/mp/jsmain.js
+/examples/in_progress/mp/*__*.ml
+
 
 # modules
 /modules/string/
@@ -234,6 +256,7 @@ pvsbin/
 /modules/pqueue/
 /modules/mach/array/
 /modules/mach/int/
+
 
 # jessie3
 /src/jessie/.depend
@@ -244,6 +267,7 @@ pvsbin/
 /src/jessie/Makefile
 /src/jessie/literals.ml
 /src/jessie/ptests_local_config.ml
+/src/jessie/tests/basic/frama_c_journal.ml
 /src/jessie/tests/basic/result/*.log
 /src/jessie/tests/demo/result/*.log
 /trash

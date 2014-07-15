@@ -1,177 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <file
-  name="../vstte10_aqueue.mlw"
-  verified="true"
-  expanded="false">
-  <theory
-   name="AmortizedQueue"
-   locfile="../vstte10_aqueue.mlw"
-   loclnum="9" loccnumb="7" loccnume="21"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter empty"
-    locfile="../vstte10_aqueue.mlw"
-    loclnum="21" loccnumb="6" loccnume="11"
-    expl="VC for empty"
-    sum="f18de787996d2edeabd17cdb9246baa4"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix ++aNilareverseaNilaNilAainfix =alengthaNilc0Aainfix &gt;=c0alengthaNilAainfix =alengthaNilc0">
-    <label
-     name="expl:VC for empty"/>
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter head"
-    locfile="../vstte10_aqueue.mlw"
-    loclnum="24" loccnumb="6" loccnume="10"
-    expl="VC for head"
-    sum="89cf1838c1c480eb7a8ee060b446d37b"
-    proved="true"
-    expanded="false"
-    shape="CfaNilCfaNilainfix =V4V5aConsVwainfix ++V0areverseV2aConsVwV0INainfix =ainfix ++V0areverseV2aNilAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
-    <label
-     name="expl:VC for head"/>
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.12"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter create"
-    locfile="../vstte10_aqueue.mlw"
-    loclnum="32" loccnumb="6" loccnume="12"
-    expl="VC for create"
-    sum="bd786aba4d2f72d261df10483bf73abb"
-    proved="true"
-    expanded="false"
-    shape="iainfix =ainfix ++ainfix ++V0areverseV2areverseaNilainfix ++V0areverseV2Aainfix =alengthaNilc0Aainfix &gt;=ainfix +V1V3alengthaNilAainfix =alengthainfix ++V0areverseV2ainfix +V1V3ainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1ainfix &gt;=V1V3Iainfix =V3alengthV2Aainfix =V1alengthV0F">
-    <label
-     name="expl:VC for create"/>
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter tail"
-    locfile="../vstte10_aqueue.mlw"
-    loclnum="41" loccnumb="6" loccnume="10"
-    expl="VC for tail"
-    sum="0c188f2937c012ac90fa6b2d032acb4a"
-    proved="true"
-    expanded="false"
-    shape="CfaNilCfaNilainfix =ainfix ++V5areverseV7V9aConswVainfix ++V0areverseV2Iainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2Aainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6FAainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4aConswVV0INainfix =ainfix ++V0areverseV2aNilAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
-    <label
-     name="expl:VC for tail"/>
-    <transf
-     name="split_goal"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter tail.1"
-      locfile="../vstte10_aqueue.mlw"
-      loclnum="41" loccnumb="6" loccnume="10"
-      expl="1. unreachable point"
-      sum="fba146b0c646a74f27251e3bca8ae62f"
-      proved="true"
-      expanded="false"
-      shape="unreachable pointCfaNiltaConswVV0INainfix =ainfix ++V0areverseV2aNilAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
-      <label
-       name="expl:VC for tail"/>
-      <proof
-       prover="0"
-       timelimit="20"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter tail.2"
-      locfile="../vstte10_aqueue.mlw"
-      loclnum="41" loccnumb="6" loccnume="10"
-      expl="2. precondition"
-      sum="ce41d0e76f08d1a6cc8b9489de43c221"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4aConswVV0INainfix =ainfix ++V0areverseV2aNilAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
-      <label
-       name="expl:VC for tail"/>
-      <proof
-       prover="0"
-       timelimit="20"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter tail.3"
-      locfile="../vstte10_aqueue.mlw"
-      loclnum="41" loccnumb="6" loccnume="10"
-      expl="3. postcondition"
-      sum="242d4280ab32ae150dbef3787cff3822"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCfaNilainfix =ainfix ++V5areverseV7V9aConswVainfix ++V0areverseV2Iainfix =ainfix ++V5areverseV7ainfix ++V4areverseV2Aainfix =alengthV7V8Aainfix &gt;=V6alengthV7Aainfix =alengthV5V6FIainfix =V3alengthV2Aainfix =ainfix -V1c1alengthV4aConswVV0INainfix =ainfix ++V0areverseV2aNilAainfix =alengthV2V3Aainfix &gt;=V1alengthV2Aainfix =alengthV0V1F">
-      <label
-       name="expl:VC for tail"/>
-      <proof
-       prover="0"
-       timelimit="20"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.12"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter enqueue"
-    locfile="../vstte10_aqueue.mlw"
-    loclnum="49" loccnumb="6" loccnume="13"
-    expl="VC for enqueue"
-    sum="5672c157ef9a73f8feaeecdc10d4db47"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix ++V6areverseV8ainfix ++ainfix ++V1areverseV3aConsV0aNilIainfix =ainfix ++V6areverseV8ainfix ++V1areverseV5Aainfix =alengthV8V9Aainfix &gt;=V7alengthV8Aainfix =alengthV6V7FAainfix =ainfix +V4c1alengthV5Aainfix =V2alengthV1LaConsV0V3Iainfix =alengthV3V4Aainfix &gt;=V2alengthV3Aainfix =alengthV1V2F">
-    <label
-     name="expl:VC for enqueue"/>
-    <proof
-     prover="0"
-     timelimit="20"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="20" memlimit="0"/>
+<file name="../vstte10_aqueue.mlw">
+<theory name="AmortizedQueue">
+ <goal name="WP_parameter empty" expl="VC for empty" sum="2fe8fd3b5801222d4d19d71772f54a4a">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter head" expl="VC for head" sum="4f69ec5b0cfcaa81ca48a3fd6a232071">
+ <proof prover="0"><result status="valid" time="0.12"/></proof>
+ </goal>
+ <goal name="WP_parameter create" expl="VC for create" sum="b2a1155fed4f2547ff63f8bb9cbc1961">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="WP_parameter tail" expl="VC for tail" sum="2dd0d808fab7ca44ae071cd281103b32">
+ <transf name="split_goal">
+  <goal name="WP_parameter tail.1" expl="1. unreachable point" sum="b8eb6fe2d36df8d1a0a2edb7f085d768">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tail.2" expl="2. precondition" sum="6a41268a6060bab23d4f37fdc91cb5d7">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tail.3" expl="3. postcondition" sum="5f477ef3a50ae97f4b3c74fbb57e7ae3">
+  <proof prover="0"><result status="valid" time="0.12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter enqueue" expl="VC for enqueue" sum="e6f49b4744ea08d6ec4ef5150d956a48">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -1,145 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <file
-  name="../fib_memo.mlw"
-  verified="true"
-  expanded="true">
-  <theory
-   name="FibMemo"
-   locfile="../fib_memo.mlw"
-   loclnum="3" loccnumb="7" loccnume="14"
-   verified="true"
-   expanded="true">
-   <goal
-    name="WP_parameter fibo"
-    locfile="../fib_memo.mlw"
-    loclnum="29" loccnumb="10" loccnume="14"
-    expl="VC for fibo"
-    sum="fecb48e8fc4d7a5c368af18b3ca54644"
-    proved="true"
-    expanded="true"
-    shape="iainvV5Aainfix =ainfix +afibV4afibV2afibV0IainvV5FAainvV3Aainfix &lt;=c0V4Aainfix &lt;ainfix +ainfix *c2V4c1ainfix *c2V0Aainfix &lt;=c0ainfix *c2V0Lainfix -V0c1IainvV3FAainvV1Aainfix &lt;=c0V2Aainfix &lt;ainfix +ainfix *c2V2c1ainfix *c2V0Aainfix &lt;=c0ainfix *c2V0Lainfix -V0c2ainvV1Aainfix =V0afibV0ainfix &lt;=V0c1IainvV1Aainfix &lt;=c0V0FF">
-    <label
-     name="expl:VC for fibo"/>
-    <proof
-     prover="1"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter memo_fibo"
-    locfile="../fib_memo.mlw"
-    loclnum="38" loccnumb="7" loccnume="16"
-    expl="VC for memo_fibo"
-    sum="e8643d790b31ef3ed015ee955c2b771d"
-    proved="true"
-    expanded="true"
-    shape="ainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2LafibV0FAainvV1Aainfix &lt;=c0V0Aainfix &lt;ainfix *c2V0ainfix +ainfix *c2V0c1Aainfix &lt;=c0ainfix +ainfix *c2V0c1Iainfix =agetV1V0aNoneAainvV1Aainfix =V5afibV0Iainfix =agetV1V0aSomeV5FIainvV1Aainfix &lt;=c0V0FF">
-    <label
-     name="expl:VC for memo_fibo"/>
-    <transf
-     name="split_goal"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter memo_fibo.1"
-      locfile="../fib_memo.mlw"
-      loclnum="38" loccnumb="7" loccnume="16"
-      expl="1. postcondition"
-      sum="add45f61cf2c2f73b4bb3656a75d1093"
-      proved="true"
-      expanded="true"
-      shape="postconditionainvV1Aainfix =V2afibV0Iainfix =agetV1V0aSomeV2FIainvV1Aainfix &lt;=c0V0FF">
-      <label
-       name="expl:VC for memo_fibo"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter memo_fibo.2"
-      locfile="../fib_memo.mlw"
-      loclnum="38" loccnumb="7" loccnume="16"
-      expl="2. variant decrease"
-      sum="c1b54c2b8a4caa4ed12625b3781be505"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseainfix &lt;ainfix *c2V0ainfix +ainfix *c2V0c1Aainfix &lt;=c0ainfix +ainfix *c2V0c1Iainfix =agetV1V0aNoneIainvV1Aainfix &lt;=c0V0FF">
-      <label
-       name="expl:VC for memo_fibo"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter memo_fibo.3"
-      locfile="../fib_memo.mlw"
-      loclnum="38" loccnumb="7" loccnume="16"
-      expl="3. precondition"
-      sum="db263480dd5c3f26d2811f05e4c77980"
-      proved="true"
-      expanded="true"
-      shape="preconditionainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix &lt;=c0V0FF">
-      <label
-       name="expl:VC for memo_fibo"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter memo_fibo.4"
-      locfile="../fib_memo.mlw"
-      loclnum="38" loccnumb="7" loccnume="16"
-      expl="4. postcondition"
-      sum="7504a485752626786916e0645018ebc8"
-      proved="true"
-      expanded="true"
-      shape="postconditionainvV4Aainfix =V3afibV0Iainfix =V4asetV2V0aSomeV3FIainvV2LafibV0FIainvV1Aainfix &lt;=c0V0Iainfix =agetV1V0aNoneIainvV1Aainfix &lt;=c0V0FF">
-      <label
-       name="expl:VC for memo_fibo"/>
-      <proof
-       prover="2"
-       timelimit="10"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<file name="../fib_memo.mlw" expanded="true">
+<theory name="FibMemo" expanded="true">
+ <goal name="WP_parameter fibo" expl="VC for fibo" sum="e187cac3698687bc29f82cf8eeb7ea39" expanded="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter memo_fibo" expl="VC for memo_fibo" sum="1750301045f2ea890bc0157e30003866" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter memo_fibo.1" expl="1. postcondition" sum="e5cf62d45bc6880f25b0ceb0146f31ba" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter memo_fibo.2" expl="2. variant decrease" sum="f2de9b54f1392bd1c8f14a5a1823f8ff">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter memo_fibo.3" expl="3. precondition" sum="58b1dc4711d156d26d3f6c67b6ef18f2" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter memo_fibo.4" expl="4. postcondition" sum="0ab5cf2711cbc0ed05745c44a4ee4ddd" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

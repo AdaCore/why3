@@ -10,8 +10,6 @@ localdir="None"
 libobjdir="(Sys.getcwd ())"
 
 if [ "@enable_relocation@" = "yes" ]; then
-    bindir='Filename.concat (Filename.dirname
-        (Filename.dirname Sys.executable_name)) "bin"'
     libdir='Filename.concat (Filename.concat (Filename.dirname
         (Filename.dirname Sys.executable_name)) "lib") "why3"'
     datadir='Filename.concat (Filename.concat (Filename.dirname
@@ -37,6 +35,8 @@ let libobjdir = $libobjdir
 let compile_time_support = [ @COMPILETIMECOQ@ @COMPILETIMEPVS@ ]
 " > $config
 
+if [ "@enable_relocation@" = "no" ]; then
+
 echo "
 BINDIR      = $bindir
 LIBDIR      = $libdir
@@ -45,3 +45,4 @@ OCAMLBEST   = @OCAMLBEST@
 BIGINTLIB   = @BIGINTLIB@
 INCLUDE     = @BIGINTINCLUDE@ -I $libdir/why3
 " > $makefileconfig
+fi

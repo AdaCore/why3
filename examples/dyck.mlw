@@ -1,0 +1,88 @@
+
+(** Checking that a word is a Dyck word
+
+    Authors: Martin Clochard (École Normale Supérieure)
+             Jean-Christophe Filliâtre (CNRS)
+*)
+
+theory Dyck
+
+  use export list.List
+  use export list.Append
+
+  type paren = L | R
+
+  type word = list paren
+
+  (* D -> eps | L D R D *)
+  inductive dyck word =
+  | Dyck_nil:
+      dyck Nil
+  | Dyck_ind:
+      forall w1 w2. dyck w1 -> dyck w2 -> dyck (Cons L (w1 ++ Cons R w2))
+
+  (* the first letter, if any, must be L *)
+  lemma dyck_word_first:
+    forall w: word. dyck w ->
+    match w with Nil -> true | Cons c _ -> c = L end
+
+end
+
+module Check
+
+  use import Dyck
+  use import list.Length
+  use import ref.Ref
+
+  exception Failure
+
+  (* A fall of a word is a decomposition p ++ s with p a dyck word
+     and s a word not starting by L. *)
+  predicate fall (p s: word) = dyck p /\
+    match s with Cons L _ -> false | _ -> true end
+
+  let rec lemma same_prefix (p s s2: word) : unit
+    requires { p ++ s = p ++ s2 }
+    ensures { s = s2 }
+    variant { p }
+  = match p with Nil -> () | Cons _ q -> same_prefix q s s2 end
+
+  (* Compute the fall decomposition, if it exists. As a side-effect,
+     prove its unicity. *)
+  let rec is_dyck_rec (ghost p: ref word) (w: word) : word
+    ensures { w = !p ++ result && fall !p result &&
+      (forall p2 s: word. w = p2 ++ s /\ fall p2 s -> p2 = !p && s = result) }
+    writes { p }
+    raises  { Failure -> forall p s: word. w = p ++ s -> not fall p s }
+    variant { length w }
+  =
+    match w with
+    | Cons L w0 ->
+      let ghost p0 = ref Nil in
+      match is_dyck_rec p0 w0 with
+      | Cons _ w1 ->
+        assert { forall p s p1 p2: word.
+          dyck p /\ w = p ++ s /\ dyck p1 /\ dyck p2 /\
+          p = Cons L (p1 ++ Cons R p2) ->
+          w0 = p1 ++ (Cons R (p2 ++ s)) && p1 = !p0 && w1 = p2 ++ s };
+        let ghost p1 = ref Nil in
+        let w = is_dyck_rec p1 w1 in
+        p := Cons L (!p0 ++ Cons R !p1);
+        w
+      | _ ->
+        raise Failure
+      end
+    | _ ->
+      p := Nil; w
+    end
+
+  let is_dyck (w: word) : bool
+    ensures { result <-> dyck w }
+  =
+    try match is_dyck_rec (ref Nil) w with
+      | Nil -> true
+      | _ -> false
+    end with Failure -> false end
+
+end
+

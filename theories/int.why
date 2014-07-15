@@ -235,6 +235,12 @@ theory Power
     goal CommutativeMonoid.Unit_def_l, goal CommutativeMonoid.Unit_def_r,
     goal CommutativeMonoid.Comm.Comm
 
+  lemma Power_non_neg:
+     forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
+
+  lemma Power_monotonic:
+    forall x n m:int. 0 < x /\ 0 <= n <= m -> power x n <= power x m
+
 end
 
 (** {2 Number of elements satisfying a given predicate}
@@ -346,6 +352,22 @@ theory Fact
 
   axiom fact0: fact 0 = 1
   axiom factn: forall n:int. n >= 1 -> fact n = n * fact (n-1)
+
+(* in the new system it will be:
+
+  let rec function fact (n:int) : int =
+    requires { n >= 0 }
+    variant  { n }
+  = if n = 0 then 1 else n * fact (n-1)
+
+ with the semantics
+
+ function fact int : int
+ axiom fact_def : \forall n:int [fact n].
+   n >= 0 -> fact n = if n = 0 then 1 else n * fact (n-1)
+ 
+*)
+
 
 end
 

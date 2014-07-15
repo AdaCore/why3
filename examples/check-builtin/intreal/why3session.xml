@@ -1,439 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="3"
-  name="Gappa"
-  version="1.1.1"/>
- <prover
-  id="4"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="5"
-  name="Yices"
-  version="1.0.38"/>
- <prover
-  id="6"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="7"
-  name="Z3"
-  version="3.2"/>
- <file
-  name="../intreal.why"
-  verified="true"
-  expanded="false">
-  <theory
-   name="IntReal"
-   locfile="../intreal.why"
-   loclnum="2" loccnumb="7" loccnume="14"
-   verified="true"
-   expanded="true">
-   <goal
-    name="G1"
-    locfile="../intreal.why"
-    loclnum="8" loccnumb="7" loccnume="9"
-    sum="20a9da10f65ad62cec1ae41fb9a9d71b"
-    proved="true"
-    expanded="true"
-    shape="ainfix =afrom_intc2c2.0">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.74"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="G2"
-    locfile="../intreal.why"
-    loclnum="9" loccnumb="7" loccnume="9"
-    sum="f69bb91bf79a2c6956b624fd6916b968"
-    proved="true"
-    expanded="true"
-    shape="ainfix =afloorc1.5c1">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.86"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="9.98"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="G3"
-    locfile="../intreal.why"
-    loclnum="10" loccnumb="7" loccnume="9"
-    sum="09a0d87114554a16d4203a9d2b9567ba"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aceilc1.5c2">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.57"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.10"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="G4"
-    locfile="../intreal.why"
-    loclnum="11" loccnumb="7" loccnume="9"
-    sum="c3be63c39e15d2cad258c616a66a53cc"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aflooraprefix -.c1.5aprefix -c2">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.03"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="G5"
-    locfile="../intreal.why"
-    loclnum="12" loccnumb="7" loccnume="9"
-    sum="9b6b0eace0767b72da8841bb3219d1f9"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aceilaprefix -.c1.5aprefix -c1">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.04"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.66"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="G6"
-    locfile="../intreal.why"
-    loclnum="13" loccnumb="7" loccnume="9"
-    sum="b1eb99429bad84f7aed041a0daa6290a"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=afloorV0aceilV0F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.10"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="G7"
-    locfile="../intreal.why"
-    loclnum="14" loccnumb="7" loccnume="9"
-    sum="f02de38cfb5478cf0ebe31234ce59302"
-    proved="true"
-    expanded="true"
-    shape="Nainfix =afrom_intafloorV0V0Iainfix &lt;afloorV0aceilV0F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="10.24"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
+<prover id="3" name="CVC3" version="2.2" timelimit="10" memlimit="0"/>
+<prover id="4" name="Spass" version="3.7" timelimit="10" memlimit="0"/>
+<prover id="5" name="Yices" version="1.0.38" timelimit="10" memlimit="0"/>
+<prover id="6" name="Z3" version="3.2" timelimit="10" memlimit="0"/>
+<prover id="7" name="Gappa" version="1.1.1" timelimit="2" memlimit="0"/>
+<file name="../intreal.why">
+<theory name="IntReal" expanded="true">
+ <goal name="G1" sum="20a9da10f65ad62cec1ae41fb9a9d71b" expanded="true">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="timeout" time="10.74"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="G2" sum="f69bb91bf79a2c6956b624fd6916b968" expanded="true">
+ <proof prover="0"><result status="valid" time="0.86"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="timeout" time="9.98"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="G3" sum="09a0d87114554a16d4203a9d2b9567ba" expanded="true">
+ <proof prover="0"><result status="valid" time="1.57"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="timeout" time="10.10"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="G4" sum="c3be63c39e15d2cad258c616a66a53cc" expanded="true">
+ <proof prover="0"><result status="timeout" time="10.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="unknown" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="G5" sum="9b6b0eace0767b72da8841bb3219d1f9" expanded="true">
+ <proof prover="0"><result status="timeout" time="10.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="timeout" time="10.66"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="G6" sum="b1eb99429bad84f7aed041a0daa6290a" expanded="true">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.10"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="G7" sum="f02de38cfb5478cf0ebe31234ce59302" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="timeout" time="10.24"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

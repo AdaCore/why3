@@ -1,73 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="1"
-  name="Eprover"
-  version="1.4"/>
- <prover
-  id="2"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="3"
-  name="Z3"
-  version="4.3.1"/>
- <file
-  name="../los_problem.why"
-  verified="true"
-  expanded="true">
-  <theory
-   name="LosProblem"
-   locfile="../los_problem.why"
-   loclnum="4" loccnumb="7" loccnume="10"
-   verified="true"
-   expanded="true">
-   <goal
-    name="los_problem"
-    locfile="../los_problem.why"
-    loclnum="21" loccnumb="7" loccnume="18"
-    sum="33794f3860b4d7d47acff42cdf8abc48"
-    proved="true"
-    expanded="true"
-    shape="aqV0V1FOapV2V3F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Eprover" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<file name="../los_problem.why" expanded="true">
+<theory name="LosProblem" expanded="true">
+ <goal name="los_problem" sum="33794f3860b4d7d47acff42cdf8abc48" expanded="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -1,3765 +1,556 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="3"
-  name="CVC4"
-  version="1.0"/>
- <prover
-  id="4"
-  name="Coq"
-  version="8.4pl2"/>
- <prover
-  id="5"
-  name="Gappa"
-  version="1.1.1"/>
- <prover
-  id="6"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="7"
-  name="Z3"
-  version="3.2"/>
- <file
-  name="../power2.why"
-  verified="true"
-  expanded="true">
-  <theory
-   name="Pow2int"
-   locfile="../power2.why"
-   loclnum="1" loccnumb="7" loccnume="14"
-   verified="true"
-   expanded="true">
-   <goal
-    name="Power_1"
-    locfile="../power2.why"
-    loclnum="11" loccnumb="8" loccnume="15"
-    sum="9db538d30583480c14bfe9272b1ba120"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c1c2">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_sum"
-    locfile="../power2.why"
-    loclnum="13" loccnumb="8" loccnume="17"
-    sum="76d8c2f574bbcff7c424f645c786ab99"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2ainfix +V0V1ainfix *apow2V0apow2V1Iainfix &gt;=V1c0Aainfix &gt;=V0c0F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="power2_Pow2int_Power_sum_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.23"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2pos"
-    locfile="../power2.why"
-    loclnum="16" loccnumb="8" loccnume="15"
-    sum="e60b09f74f3316b227ed9edd4e67fa87"
-    proved="true"
-    expanded="false"
-    shape="ainfix &gt;apow2V0c0Iainfix &gt;=V0c0F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="power2_Pow2int_pow2pos_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.18"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_0"
-    locfile="../power2.why"
-    loclnum="18" loccnumb="8" loccnume="14"
-    sum="7a0bd3db02b2b10e9dfb0951c27e3d22"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c0c1">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_1"
-    locfile="../power2.why"
-    loclnum="19" loccnumb="8" loccnume="14"
-    sum="24cc19f60e370cd073e622605a6c10a3"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c1c2">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_2"
-    locfile="../power2.why"
-    loclnum="20" loccnumb="8" loccnume="14"
-    sum="0f77f86daf6da1e7de7cd67310a1a6da"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c2c4">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_3"
-    locfile="../power2.why"
-    loclnum="21" loccnumb="8" loccnume="14"
-    sum="b600cc9fd43987f7124cd93ef3debc76"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c3c8">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_4"
-    locfile="../power2.why"
-    loclnum="22" loccnumb="8" loccnume="14"
-    sum="b71a44ed216246692bc5d8f906344f82"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c4c16">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_5"
-    locfile="../power2.why"
-    loclnum="23" loccnumb="8" loccnume="14"
-    sum="f8a838b6378ead810937802485218558"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c5c32">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_6"
-    locfile="../power2.why"
-    loclnum="24" loccnumb="8" loccnume="14"
-    sum="f640ee31a5e72d1f555aba93aca97ae6"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c6c64">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_7"
-    locfile="../power2.why"
-    loclnum="25" loccnumb="8" loccnume="14"
-    sum="ad480b86cd38f8d9b15110ff25be5cd1"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c7c128">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_8"
-    locfile="../power2.why"
-    loclnum="26" loccnumb="8" loccnume="14"
-    sum="d303c2cf57ee362d2c6704ce15621b49"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c8c256">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_9"
-    locfile="../power2.why"
-    loclnum="27" loccnumb="8" loccnume="14"
-    sum="ae53c36d209a1935a5021d0ec820a61e"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c9c512">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_10"
-    locfile="../power2.why"
-    loclnum="28" loccnumb="8" loccnume="15"
-    sum="81cd827cc57389aea7303844c1d81c57"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c10c1024">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_11"
-    locfile="../power2.why"
-    loclnum="29" loccnumb="8" loccnume="15"
-    sum="928912db52d39836b3fdb56a7cb38c8b"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c11c2048">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_12"
-    locfile="../power2.why"
-    loclnum="30" loccnumb="8" loccnume="15"
-    sum="0576b0937ceece9fc42c55d556a9eeae"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c12c4096">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_13"
-    locfile="../power2.why"
-    loclnum="31" loccnumb="8" loccnume="15"
-    sum="858aadf50fae36f4c93daf2429d17dde"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c13c8192">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_14"
-    locfile="../power2.why"
-    loclnum="32" loccnumb="8" loccnume="15"
-    sum="0e02141f83d0a52806cddc6773c3dd68"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c14c16384">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_15"
-    locfile="../power2.why"
-    loclnum="33" loccnumb="8" loccnume="15"
-    sum="15df67cbbd8388709ccbd58606fb4fb0"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c15c32768">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.10"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_16"
-    locfile="../power2.why"
-    loclnum="34" loccnumb="8" loccnume="15"
-    sum="a53f006535d2de2d1b04578457816deb"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c16c65536">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_17"
-    locfile="../power2.why"
-    loclnum="35" loccnumb="8" loccnume="15"
-    sum="cdd17cc834203ab69b7ad3a080b2e708"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c17c131072">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.12"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_18"
-    locfile="../power2.why"
-    loclnum="36" loccnumb="8" loccnume="15"
-    sum="229840d385d402128316b934c0c13ddd"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c18c262144">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.15"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_19"
-    locfile="../power2.why"
-    loclnum="37" loccnumb="8" loccnume="15"
-    sum="712897e9606add562523adfa48d7dbcb"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c19c524288">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_20"
-    locfile="../power2.why"
-    loclnum="38" loccnumb="8" loccnume="15"
-    sum="6be2264aa572795caf7bb9a0b04b8605"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c20c1048576">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.17"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_21"
-    locfile="../power2.why"
-    loclnum="39" loccnumb="8" loccnume="15"
-    sum="d51d32b83f60541598a36773bca24d54"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c21c2097152">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.19"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_22"
-    locfile="../power2.why"
-    loclnum="40" loccnumb="8" loccnume="15"
-    sum="0858ad5efaec09490db4b0bd90dfbdf4"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c22c4194304">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_23"
-    locfile="../power2.why"
-    loclnum="41" loccnumb="8" loccnume="15"
-    sum="bb658115ef67406a392812ec69ba3b0c"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c23c8388608">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.24"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_24"
-    locfile="../power2.why"
-    loclnum="42" loccnumb="8" loccnume="15"
-    sum="967c58d251a19a803f37f3a7d7e92601"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c24c16777216">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_25"
-    locfile="../power2.why"
-    loclnum="43" loccnumb="8" loccnume="15"
-    sum="e688bafdd42af54f901105a25b616ab3"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c25c33554432">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.29"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_26"
-    locfile="../power2.why"
-    loclnum="44" loccnumb="8" loccnume="15"
-    sum="e6fc06ca62146918a4b88ea0ff4ad542"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c26c67108864">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_27"
-    locfile="../power2.why"
-    loclnum="45" loccnumb="8" loccnume="15"
-    sum="0c3fe718e4088c53bc17796c9057f92e"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c27c134217728">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.36"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.07"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_28"
-    locfile="../power2.why"
-    loclnum="46" loccnumb="8" loccnume="15"
-    sum="53ca3cc26289767605bd6250574e9f41"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c28c268435456">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.08"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.08"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_29"
-    locfile="../power2.why"
-    loclnum="47" loccnumb="8" loccnume="15"
-    sum="70354dfc66fe3d17977ac033085b5755"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c29c536870912">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.08"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_30"
-    locfile="../power2.why"
-    loclnum="48" loccnumb="8" loccnume="15"
-    sum="1508436548765bd0675aba91d0631671"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c30c1073741824">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_31"
-    locfile="../power2.why"
-    loclnum="49" loccnumb="8" loccnume="15"
-    sum="7aeb6bc5981b97c39a775ee47dd436f2"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c31c2147483648">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.47"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_32"
-    locfile="../power2.why"
-    loclnum="50" loccnumb="8" loccnume="15"
-    sum="0fd9b84b7f0743501b3aacedc80a827d"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c32c4294967296">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.49"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.50"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_33"
-    locfile="../power2.why"
-    loclnum="51" loccnumb="8" loccnume="15"
-    sum="5a3b42ec2d0f71c17f63071eb5dda108"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c33c8589934592">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.53"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.59"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_34"
-    locfile="../power2.why"
-    loclnum="52" loccnumb="8" loccnume="15"
-    sum="6e175e6fb9ac64632b7bd6a9818e643e"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c34c17179869184">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.59"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.60"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_35"
-    locfile="../power2.why"
-    loclnum="53" loccnumb="8" loccnume="15"
-    sum="c1348b9881520d1e5e4277e183cb173c"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c35c34359738368">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.62"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.62"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_36"
-    locfile="../power2.why"
-    loclnum="54" loccnumb="8" loccnume="15"
-    sum="977fd239d22fd3bb5d1a10749a821f99"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c36c68719476736">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.69"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.66"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_37"
-    locfile="../power2.why"
-    loclnum="55" loccnumb="8" loccnume="15"
-    sum="cb622c00dbc81888e04b50ad0149957b"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c37c137438953472">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.74"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.72"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_38"
-    locfile="../power2.why"
-    loclnum="56" loccnumb="8" loccnume="15"
-    sum="e01c8a73fc216a47b312031e07f22f7a"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c38c274877906944">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.77"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.78"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_39"
-    locfile="../power2.why"
-    loclnum="57" loccnumb="8" loccnume="15"
-    sum="8d3d400970f7225e53cd3fd9160ede4e"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c39c549755813888">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.83"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.83"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_40"
-    locfile="../power2.why"
-    loclnum="58" loccnumb="8" loccnume="15"
-    sum="ca217e9ccf3aa98a602a592d21fa8758"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c40c1099511627776">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.86"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.85"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_41"
-    locfile="../power2.why"
-    loclnum="59" loccnumb="8" loccnume="15"
-    sum="3b757732912a2e7c2549e6122b1b1605"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c41c2199023255552">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.95"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.98"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_42"
-    locfile="../power2.why"
-    loclnum="60" loccnumb="8" loccnume="15"
-    sum="7056efaf9ee64e6499835907f08328a3"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c42c4398046511104">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.95"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_43"
-    locfile="../power2.why"
-    loclnum="61" loccnumb="8" loccnume="15"
-    sum="359d5352f033f1c43d2de287397f8fb8"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c43c8796093022208">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.04"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.11"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_44"
-    locfile="../power2.why"
-    loclnum="62" loccnumb="8" loccnume="15"
-    sum="cf575a3496494b242e81cf0b9efa703c"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c44c17592186044416">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.09"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.17"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_45"
-    locfile="../power2.why"
-    loclnum="63" loccnumb="8" loccnume="15"
-    sum="2ea990fa0155816549ce1562f098fd7b"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c45c35184372088832">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.17"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.33"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_46"
-    locfile="../power2.why"
-    loclnum="64" loccnumb="8" loccnume="15"
-    sum="85ae57781694efa6b66e56ec48aa4430"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c46c70368744177664">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.24"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.42"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_47"
-    locfile="../power2.why"
-    loclnum="65" loccnumb="8" loccnume="15"
-    sum="743dee53dcc0d145ce6a087038ff199e"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c47c140737488355328">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.31"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.56"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_48"
-    locfile="../power2.why"
-    loclnum="66" loccnumb="8" loccnume="15"
-    sum="ffbfc569a9bef761aa390baa7fb094e3"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c48c281474976710656">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.34"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.76"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_49"
-    locfile="../power2.why"
-    loclnum="67" loccnumb="8" loccnume="15"
-    sum="bb5407c1cc4e634f4ebc4395f7acb202"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c49c562949953421312">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.47"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.85"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_50"
-    locfile="../power2.why"
-    loclnum="68" loccnumb="8" loccnume="15"
-    sum="5d34d94a38f8fee1acc65dd123e6e950"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c50c1125899906842624">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.50"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="7"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.10"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_51"
-    locfile="../power2.why"
-    loclnum="69" loccnumb="8" loccnume="15"
-    sum="b9749087b46399b6b218d1c2712a089e"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c51c2251799813685248">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.65"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="7"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.28"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_52"
-    locfile="../power2.why"
-    loclnum="70" loccnumb="8" loccnume="15"
-    sum="08329161c6c43243ff5a112c74f14da6"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c52c4503599627370496">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.67"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="8"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.56"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_53"
-    locfile="../power2.why"
-    loclnum="71" loccnumb="8" loccnume="15"
-    sum="8241d26f31d0cd1f23844c3f511c7c65"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c53c9007199254740992">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.79"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="9"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.64"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_54"
-    locfile="../power2.why"
-    loclnum="72" loccnumb="8" loccnume="15"
-    sum="2d2808d732204fdfe525e17b4c44d7be"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c54c18014398509481984">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="7"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.87"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="9"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="3.09"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_55"
-    locfile="../power2.why"
-    loclnum="73" loccnumb="8" loccnume="15"
-    sum="417090152a969867cc4687dc4c849149"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c55c36028797018963968">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="7"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.77"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="11"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="3.53"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_56"
-    locfile="../power2.why"
-    loclnum="74" loccnumb="8" loccnume="15"
-    sum="867c4f7fcad97d3ce4d0cf7b8a1b1170"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c56c72057594037927936">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="7"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.04"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_57"
-    locfile="../power2.why"
-    loclnum="75" loccnumb="8" loccnume="15"
-    sum="0b6b493faca30251acf22c9523c1c614"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c57c144115188075855872">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="7"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.18"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_58"
-    locfile="../power2.why"
-    loclnum="76" loccnumb="8" loccnume="15"
-    sum="ea8fa4ffe1496d1827660d3d0c009910"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c58c288230376151711744">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="7"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.26"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_59"
-    locfile="../power2.why"
-    loclnum="77" loccnumb="8" loccnume="15"
-    sum="db9158d64116e76a61639e8415375c73"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c59c576460752303423488">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="8"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.35"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_60"
-    locfile="../power2.why"
-    loclnum="78" loccnumb="8" loccnume="15"
-    sum="49eec54108e7f7ec71ffd1282f519bdd"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c60c1152921504606846976">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="8"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.45"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_61"
-    locfile="../power2.why"
-    loclnum="79" loccnumb="8" loccnume="15"
-    sum="2940ce5e869fc71827f04b3c56e4552e"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c61c2305843009213693952">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="8"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.83"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_62"
-    locfile="../power2.why"
-    loclnum="80" loccnumb="8" loccnume="15"
-    sum="1bf8a5f723e6dc68559fa673e202528a"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c62c4611686018427387904">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="9"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.70"/>
-    </proof>
-   </goal>
-   <goal
-    name="pow2_63"
-    locfile="../power2.why"
-    loclnum="81" loccnumb="8" loccnume="15"
-    sum="a6c9b02b2c8baa17417143ed7cbdf83b"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c63c9223372036854775808">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="9"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="3.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="Div_mult_inst"
-    locfile="../power2.why"
-    loclnum="86" loccnumb="8" loccnume="21"
-    sum="2e92673d9d39abb8e6e3077dc7c5180a"
-    proved="true"
-    expanded="false"
-    shape="ainfix =adivainfix +ainfix *V0c1V1V0ainfix +c1adivV1V0Iainfix &gt;V0c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="Div_double"
-    locfile="../power2.why"
-    loclnum="90" loccnumb="8" loccnume="18"
-    sum="bda4ae1019d1849b5d9cccb5a863b4ac"
-    proved="true"
-    expanded="false"
-    shape="ainfix =adivV0V1c1Iainfix &lt;V0ainfix *c2V1Aainfix &lt;=V1V0Aainfix &lt;c0V1F">
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-   </goal>
-   <goal
-    name="Div_pow"
-    locfile="../power2.why"
-    loclnum="93" loccnumb="8" loccnume="15"
-    sum="d2fc073ce351900def835eb86b4496ad"
-    proved="true"
-    expanded="false"
-    shape="ainfix =adivV0apow2ainfix -V1c1c1Iainfix &lt;V0apow2V1Aainfix &lt;=apow2ainfix -V1c1V0Iainfix &gt;V1c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.26"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.06"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="Div_double_neg"
-    locfile="../power2.why"
-    loclnum="96" loccnumb="8" loccnume="22"
-    sum="bfcff34bf93ddec105c5c4dbc51c88c7"
-    proved="true"
-    expanded="false"
-    shape="ainfix =adivV0V1aprefix -c2Iainfix &lt;aprefix -V1c0Aainfix &lt;V0aprefix -V1Aainfix &lt;=ainfix *aprefix -c2V1V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="4.24"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.16"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.54"/>
-    </proof>
-   </goal>
-   <goal
-    name="Div_pow2"
-    locfile="../power2.why"
-    loclnum="99" loccnumb="8" loccnume="16"
-    sum="8d27808b5e05937f232478240c70d2e0"
-    proved="true"
-    expanded="false"
-    shape="ainfix =adivV0apow2ainfix -V1c1aprefix -c2Iainfix &lt;V0aprefix -apow2ainfix -V1c1Aainfix &lt;=aprefix -apow2V1V0Iainfix &gt;V1c0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.24"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.12"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Mod_pow2_gen"
-    locfile="../power2.why"
-    loclnum="106" loccnumb="8" loccnume="20"
-    sum="71b1e029d6b788847da1f624fbed9c2e"
-    proved="true"
-    expanded="false"
-    shape="ainfix =amodadivainfix +V0apow2V1apow2V2c2amodadivV0apow2V2c2Iainfix &lt;V2V1Aainfix &lt;=c0V2F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="power2_Pow2int_Mod_pow2_gen_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.80"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="Pow2real"
-   locfile="../power2.why"
-   loclnum="113" loccnumb="7" loccnume="15"
-   verified="true"
-   expanded="true">
-   <goal
-    name="Power_s_all"
-    locfile="../power2.why"
-    loclnum="124" loccnumb="8" loccnume="19"
-    sum="986f9aaa5556230c80424aab0793fa41"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2ainfix +V0c1ainfix *.c2.0apow2V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_p_all"
-    locfile="../power2.why"
-    loclnum="126" loccnumb="8" loccnume="19"
-    sum="2ff7ad8bffed2a6a30d2ce49652c7219"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2ainfix -V0c1ainfix *.c0.5apow2V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_1_2"
-    locfile="../power2.why"
-    loclnum="128" loccnumb="8" loccnume="17"
-    sum="03e79b330f4cecfef8bd38094a2e0a86"
-    proved="true"
-    expanded="false"
-    shape="ainfix =c0.5ainfix /.c1.0c2.0">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_1"
-    locfile="../power2.why"
-    loclnum="130" loccnumb="8" loccnume="15"
-    sum="025606c4ef91c89b635196123e09ce8a"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2c1c2.0">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_neg1"
-    locfile="../power2.why"
-    loclnum="132" loccnumb="8" loccnume="18"
-    sum="7d90b4d0c5ff2048ad9b6e0cc522a2f3"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2aprefix -c1c0.5">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_non_null_aux"
-    locfile="../power2.why"
-    loclnum="134" loccnumb="8" loccnume="26"
-    sum="ce9e68aab48d157c05eff2dc779a6d44"
-    proved="true"
-    expanded="false"
-    shape="Nainfix =apow2V0c0.0Iainfix &gt;=V0c0F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="power2_Pow2real_Power_non_null_aux_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.21"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_neg_aux"
-    locfile="../power2.why"
-    loclnum="136" loccnumb="8" loccnume="21"
-    sum="5f37caf785ccc607240fda0b1593211c"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2aprefix -V0ainfix /.c1.0apow2V0Iainfix &gt;=V0c0F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="power2_Pow2real_Power_neg_aux_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.36"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_non_null"
-    locfile="../power2.why"
-    loclnum="138" loccnumb="8" loccnume="22"
-    sum="cc6bb73a62988c8a95e8810ed4cec406"
-    proved="true"
-    expanded="false"
-    shape="Nainfix =apow2V0c0.0F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="power2_Pow2real_Power_non_null_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.29"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_neg"
-    locfile="../power2.why"
-    loclnum="140" loccnumb="8" loccnume="17"
-    sum="5a2cee5c5484ad41b4e2310cd48f3914"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2aprefix -V0ainfix /.c1.0apow2V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.14"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.13"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_sum_aux"
-    locfile="../power2.why"
-    loclnum="142" loccnumb="8" loccnume="21"
-    sum="4d41ed47cd94160af21a07a3e0ca5643"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2ainfix +V0V1ainfix *.apow2V0apow2V1Iainfix &gt;=V1c0F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="power2_Pow2real_Power_sum_aux_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.38"/>
-    </proof>
-   </goal>
-   <goal
-    name="Power_sum"
-    locfile="../power2.why"
-    loclnum="144" loccnumb="8" loccnume="17"
-    sum="8f457a8610dc433f427ead885469beaf"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2ainfix +V0V1ainfix *.apow2V0apow2V1F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="power2_Pow2real_Power_sum_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.27"/>
-    </proof>
-   </goal>
-   <goal
-    name="Pow2_int_real"
-    locfile="../power2.why"
-    loclnum="149" loccnumb="8" loccnume="21"
-    sum="bad4162471b2f59ad9373295192dd218"
-    proved="true"
-    expanded="false"
-    shape="ainfix =apow2V0afrom_intapow2V0Iainfix &gt;=V0c0F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="power2_Pow2real_Pow2_int_real_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.20"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.0" timelimit="5" memlimit="1000"/>
+<prover id="4" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="6" name="Gappa" version="1.1.1" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
+<file name="../power2.why" expanded="true">
+<theory name="Pow2int" expanded="true">
+ <goal name="Power_1" sum="9db538d30583480c14bfe9272b1ba120">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Power_sum" sum="76d8c2f574bbcff7c424f645c786ab99">
+ <proof prover="7" edited="power2_Pow2int_Power_sum_1.v"><result status="valid" time="1.23"/></proof>
+ </goal>
+ <goal name="pow2pos" sum="e60b09f74f3316b227ed9edd4e67fa87">
+ <proof prover="7" edited="power2_Pow2int_pow2pos_1.v"><result status="valid" time="1.18"/></proof>
+ </goal>
+ <goal name="pow2_0" sum="7a0bd3db02b2b10e9dfb0951c27e3d22">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_1" sum="24cc19f60e370cd073e622605a6c10a3">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_2" sum="0f77f86daf6da1e7de7cd67310a1a6da">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_3" sum="b600cc9fd43987f7124cd93ef3debc76">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_4" sum="b71a44ed216246692bc5d8f906344f82">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_5" sum="f8a838b6378ead810937802485218558">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="pow2_6" sum="f640ee31a5e72d1f555aba93aca97ae6">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_7" sum="ad480b86cd38f8d9b15110ff25be5cd1">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_8" sum="d303c2cf57ee362d2c6704ce15621b49">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="pow2_9" sum="ae53c36d209a1935a5021d0ec820a61e">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="pow2_10" sum="81cd827cc57389aea7303844c1d81c57">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="pow2_11" sum="928912db52d39836b3fdb56a7cb38c8b">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="pow2_12" sum="0576b0937ceece9fc42c55d556a9eeae">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="pow2_13" sum="858aadf50fae36f4c93daf2429d17dde">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="pow2_14" sum="0e02141f83d0a52806cddc6773c3dd68">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.09"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="pow2_15" sum="15df67cbbd8388709ccbd58606fb4fb0">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.10"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="pow2_16" sum="a53f006535d2de2d1b04578457816deb">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="pow2_17" sum="cdd17cc834203ab69b7ad3a080b2e708">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.12"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="pow2_18" sum="229840d385d402128316b934c0c13ddd">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.15"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="pow2_19" sum="712897e9606add562523adfa48d7dbcb">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="pow2_20" sum="6be2264aa572795caf7bb9a0b04b8605">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.17"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="pow2_21" sum="d51d32b83f60541598a36773bca24d54">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.19"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="pow2_22" sum="0858ad5efaec09490db4b0bd90dfbdf4">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="pow2_23" sum="bb658115ef67406a392812ec69ba3b0c">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.24"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="pow2_24" sum="967c58d251a19a803f37f3a7d7e92601">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.07"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="pow2_25" sum="e688bafdd42af54f901105a25b616ab3">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.29"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="pow2_26" sum="e6fc06ca62146918a4b88ea0ff4ad542">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.07"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="pow2_27" sum="0c3fe718e4088c53bc17796c9057f92e">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.36"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="pow2_28" sum="53ca3cc26289767605bd6250574e9f41">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.08"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.08"/></proof>
+ </goal>
+ <goal name="pow2_29" sum="70354dfc66fe3d17977ac033085b5755">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.09"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.08"/></proof>
+ </goal>
+ <goal name="pow2_30" sum="1508436548765bd0675aba91d0631671">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.09"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.09"/></proof>
+ </goal>
+ <goal name="pow2_31" sum="7aeb6bc5981b97c39a775ee47dd436f2">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.47"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.09"/></proof>
+ </goal>
+ <goal name="pow2_32" sum="0fd9b84b7f0743501b3aacedc80a827d">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.49"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.50"/></proof>
+ </goal>
+ <goal name="pow2_33" sum="5a3b42ec2d0f71c17f63071eb5dda108">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.53"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.59"/></proof>
+ </goal>
+ <goal name="pow2_34" sum="6e175e6fb9ac64632b7bd6a9818e643e">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.59"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.60"/></proof>
+ </goal>
+ <goal name="pow2_35" sum="c1348b9881520d1e5e4277e183cb173c">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.62"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.62"/></proof>
+ </goal>
+ <goal name="pow2_36" sum="977fd239d22fd3bb5d1a10749a821f99">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.69"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.66"/></proof>
+ </goal>
+ <goal name="pow2_37" sum="cb622c00dbc81888e04b50ad0149957b">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.74"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.72"/></proof>
+ </goal>
+ <goal name="pow2_38" sum="e01c8a73fc216a47b312031e07f22f7a">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.77"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.78"/></proof>
+ </goal>
+ <goal name="pow2_39" sum="8d3d400970f7225e53cd3fd9160ede4e">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.83"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.83"/></proof>
+ </goal>
+ <goal name="pow2_40" sum="ca217e9ccf3aa98a602a592d21fa8758">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.86"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.85"/></proof>
+ </goal>
+ <goal name="pow2_41" sum="3b757732912a2e7c2549e6122b1b1605">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.95"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.98"/></proof>
+ </goal>
+ <goal name="pow2_42" sum="7056efaf9ee64e6499835907f08328a3">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.95"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="1.02"/></proof>
+ </goal>
+ <goal name="pow2_43" sum="359d5352f033f1c43d2de287397f8fb8">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="1.04"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="1.11"/></proof>
+ </goal>
+ <goal name="pow2_44" sum="cf575a3496494b242e81cf0b9efa703c">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="1.09"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="1.17"/></proof>
+ </goal>
+ <goal name="pow2_45" sum="2ea990fa0155816549ce1562f098fd7b">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="1.17"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="1.33"/></proof>
+ </goal>
+ <goal name="pow2_46" sum="85ae57781694efa6b66e56ec48aa4430">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="1.24"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="1.42"/></proof>
+ </goal>
+ <goal name="pow2_47" sum="743dee53dcc0d145ce6a087038ff199e">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="1.31"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5" timelimit="6"><result status="valid" time="1.56"/></proof>
+ </goal>
+ <goal name="pow2_48" sum="ffbfc569a9bef761aa390baa7fb094e3">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="1.34"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="5" timelimit="6"><result status="valid" time="1.76"/></proof>
+ </goal>
+ <goal name="pow2_49" sum="bb5407c1cc4e634f4ebc4395f7acb202">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="1.47"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5" timelimit="6"><result status="valid" time="1.85"/></proof>
+ </goal>
+ <goal name="pow2_50" sum="5d34d94a38f8fee1acc65dd123e6e950">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" timelimit="6"><result status="valid" time="1.50"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="5" timelimit="7"><result status="valid" time="2.10"/></proof>
+ </goal>
+ <goal name="pow2_51" sum="b9749087b46399b6b218d1c2712a089e">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="6"><result status="valid" time="1.65"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5" timelimit="7"><result status="valid" time="2.28"/></proof>
+ </goal>
+ <goal name="pow2_52" sum="08329161c6c43243ff5a112c74f14da6">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="6"><result status="valid" time="1.67"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="5" timelimit="8"><result status="valid" time="2.56"/></proof>
+ </goal>
+ <goal name="pow2_53" sum="8241d26f31d0cd1f23844c3f511c7c65">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="6"><result status="valid" time="1.79"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5" timelimit="9"><result status="valid" time="2.64"/></proof>
+ </goal>
+ <goal name="pow2_54" sum="2d2808d732204fdfe525e17b4c44d7be">
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="7"><result status="valid" time="1.87"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="5" timelimit="9"><result status="valid" time="3.09"/></proof>
+ </goal>
+ <goal name="pow2_55" sum="417090152a969867cc4687dc4c849149">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="7"><result status="valid" time="1.77"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5" timelimit="11"><result status="valid" time="3.53"/></proof>
+ </goal>
+ <goal name="pow2_56" sum="867c4f7fcad97d3ce4d0cf7b8a1b1170">
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" timelimit="7"><result status="valid" time="2.04"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="pow2_57" sum="0b6b493faca30251acf22c9523c1c614">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" timelimit="7"><result status="valid" time="2.18"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_58" sum="ea8fa4ffe1496d1827660d3d0c009910">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="7"><result status="valid" time="2.26"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="pow2_59" sum="db9158d64116e76a61639e8415375c73">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="8"><result status="valid" time="2.35"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_60" sum="49eec54108e7f7ec71ffd1282f519bdd">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="8"><result status="valid" time="2.45"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_61" sum="2940ce5e869fc71827f04b3c56e4552e">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="8"><result status="valid" time="2.44"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="pow2_62" sum="1bf8a5f723e6dc68559fa673e202528a">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="9"><result status="valid" time="2.70"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="pow2_63" sum="a6c9b02b2c8baa17417143ed7cbdf83b">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2" timelimit="9"><result status="valid" time="2.61"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Div_mult_inst" sum="2e92673d9d39abb8e6e3077dc7c5180a">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="Div_double" sum="bda4ae1019d1849b5d9cccb5a863b4ac">
+ <proof prover="3"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="Div_pow" sum="d2fc073ce351900def835eb86b4496ad">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.26"/></proof>
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="Div_double_neg" sum="bfcff34bf93ddec105c5c4dbc51c88c7">
+ <proof prover="0"><result status="valid" time="0.16"/></proof>
+ <proof prover="1"><result status="valid" time="4.24"/></proof>
+ <proof prover="3"><result status="valid" time="0.54"/></proof>
+ </goal>
+ <goal name="Div_pow2" sum="8d27808b5e05937f232478240c70d2e0">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.24"/></proof>
+ <proof prover="4"><result status="valid" time="0.12"/></proof>
+ </goal>
+ <goal name="Mod_pow2_gen" sum="71b1e029d6b788847da1f624fbed9c2e">
+ <proof prover="7" edited="power2_Pow2int_Mod_pow2_gen_1.v"><result status="valid" time="1.80"/></proof>
+ </goal>
+</theory>
+<theory name="Pow2real" expanded="true">
+ <goal name="Power_s_all" sum="986f9aaa5556230c80424aab0793fa41">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Power_p_all" sum="2ff7ad8bffed2a6a30d2ce49652c7219">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Power_1_2" sum="03e79b330f4cecfef8bd38094a2e0a86">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Power_1" sum="025606c4ef91c89b635196123e09ce8a">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Power_neg1" sum="7d90b4d0c5ff2048ad9b6e0cc522a2f3">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Power_non_null_aux" sum="ce9e68aab48d157c05eff2dc779a6d44">
+ <proof prover="7" edited="power2_Pow2real_Power_non_null_aux_1.v"><result status="valid" time="1.21"/></proof>
+ </goal>
+ <goal name="Power_neg_aux" sum="5f37caf785ccc607240fda0b1593211c">
+ <proof prover="7" edited="power2_Pow2real_Power_neg_aux_1.v"><result status="valid" time="1.36"/></proof>
+ </goal>
+ <goal name="Power_non_null" sum="cc6bb73a62988c8a95e8810ed4cec406">
+ <proof prover="7" edited="power2_Pow2real_Power_non_null_1.v"><result status="valid" time="1.29"/></proof>
+ </goal>
+ <goal name="Power_neg" sum="5a2cee5c5484ad41b4e2310cd48f3914">
+ <proof prover="1"><result status="valid" time="0.14"/></proof>
+ <proof prover="2"><result status="valid" time="1.13"/></proof>
+ </goal>
+ <goal name="Power_sum_aux" sum="4d41ed47cd94160af21a07a3e0ca5643">
+ <proof prover="7" edited="power2_Pow2real_Power_sum_aux_1.v"><result status="valid" time="1.38"/></proof>
+ </goal>
+ <goal name="Power_sum" sum="8f457a8610dc433f427ead885469beaf">
+ <proof prover="7" edited="power2_Pow2real_Power_sum_1.v"><result status="valid" time="1.27"/></proof>
+ </goal>
+ <goal name="Pow2_int_real" sum="bad4162471b2f59ad9373295192dd218">
+ <proof prover="7" edited="power2_Pow2real_Pow2_int_real_1.v"><result status="valid" time="1.20"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -150,7 +150,7 @@ end
 
 \section{Calling External Provers}
 
-To call an external prover, we need to access the Why configuration
+To call an external prover, we need to access the \why configuration
 file \texttt{why3.conf}, as it was built using the \texttt{why3config}
 command line tool or the \textsf{Detect Provers} menu of the graphical
 IDE. The following API calls allow to access the content of this
@@ -360,13 +360,13 @@ be done by a sequence of calls:
 \item closing the theory under construction, obtaining something of type \verb|Theory.theory|.
 \end{itemize}
 
-Creation of a theory named \verb|My_theory| is done by:
+Creation of a theory named \verb|My_theory| is done by
 \begin{ocamlcode}
 let my_theory : Theory.theory_uc = 
   Theory.create_theory (Ident.id_fresh "My_theory")
 \end{ocamlcode}
 
-First let us add the formula 1 above as a goal:
+First let us add formula 1 above as a goal:
 \begin{ocamlcode}
 let decl_goal1 : Decl.decl =
   Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1 
@@ -424,7 +424,7 @@ Finally, we close our theory under construction as follows.
 let my_theory : Theory.theory = Theory.close_theory my_theory  
 \end{ocamlcode}
 
-We can inspect what we did for example by printing that theory:
+We can inspect what we did by printing that theory:
 \begin{ocamlcode}
 let () = printf "@[theory is:@\n%a@]@." Pretty.print_theory my_theory
 \end{ocamlcode}
@@ -472,21 +472,22 @@ let () =
 
 One can run provers on those tasks exactly as we did above.
 
-\section{Applying transformations}
+\section{Applying Transformations}
 
 [TO BE COMPLETED]
 
-\section{Writing new functions on term}
+\section{Writing New Functions on Terms}
 
 [TO BE COMPLETED]
 % pattern-matching on terms, opening a quantifier
 
-\section{Proof sessions}
+\section{Proof Sessions}
 
-See the example \verb|examples/use_api/create_session.ml| of the distribution for
-an illustration on how to manipulate proof sessions from an OCaml program.
+See the example \verb|examples/use_api/create_session.ml| of the
+distribution for an illustration on how to manipulate proof sessions
+from an OCaml program.
 
-\section{ML programs}
+\section{ML Programs}
 
 There are two ways for building \whyml programs from OCaml. The first
 is to build untyped syntax trees for such \whyml programs, and then

@@ -9,19 +9,25 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Why3
+
 (** Explanations *)
 
 val goal_expl_task: root:bool -> Task.task -> Ident.ident * string option
 
 (** Shapes *)
 
+val reset_dict : unit -> unit
+
 val current_shape_version : int
 
 type shape
-val print_shape: Format.formatter -> shape -> unit
 val string_of_shape: shape -> string
 val shape_of_string: string -> shape
 val equal_shape: shape -> shape -> bool
+(* unused
+val print_shape: Format.formatter -> shape -> unit
+*)
 
 (* val t_shape_buf : ?version:int -> Term.term -> shape *)
   (** returns the shape of a given term *)

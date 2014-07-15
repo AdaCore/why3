@@ -1,239 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="3"
-  name="Coq"
-  version="8.4pl2"/>
- <prover
-  id="4"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="5"
-  name="Z3"
-  version="3.2"/>
- <file
-  name="../double.why"
-  verified="true"
-  expanded="true">
-  <theory
-   name="BV_double"
-   locfile="../double.why"
-   loclnum="1" loccnumb="7" loccnume="16"
-   verified="true"
-   expanded="false">
-  </theory>
-  <theory
-   name="TestDouble"
-   locfile="../double.why"
-   loclnum="65" loccnumb="7" loccnume="17"
-   verified="true"
-   expanded="true">
-   <goal
-    name="nth_one1"
-    locfile="../double.why"
-    loclnum="73" loccnumb="8" loccnume="16"
-    sum="9426856b7db1eaa0a7fbf98d0a1d6511"
-    proved="true"
-    expanded="true"
-    shape="ainfix =anthaoneV0aFalseIainfix &lt;=V0c51Aainfix &lt;=c0V0F">
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.33"/>
-    </proof>
-   </goal>
-   <goal
-    name="nth_one2"
-    locfile="../double.why"
-    loclnum="74" loccnumb="8" loccnume="16"
-    sum="b1c633079fda4d75118758023d1bd9d6"
-    proved="true"
-    expanded="true"
-    shape="ainfix =anthaoneV0aTrueIainfix &lt;=V0c61Aainfix &lt;=c52V0F">
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.23"/>
-    </proof>
-   </goal>
-   <goal
-    name="nth_one3"
-    locfile="../double.why"
-    loclnum="75" loccnumb="8" loccnume="16"
-    sum="7b13e3cc4204cfbf0bcadc9604a16925"
-    proved="true"
-    expanded="false"
-    shape="ainfix =anthaoneV0aFalseIainfix &lt;=V0c63Aainfix &lt;=c62V0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.31"/>
-    </proof>
-   </goal>
-   <goal
-    name="sign_one"
-    locfile="../double.why"
-    loclnum="77" loccnumb="8" loccnume="16"
-    sum="bdda75f77974f193214e8a50e2cd6d59"
-    proved="true"
-    expanded="false"
-    shape="ainfix =asignaoneaFalse">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.11"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.11"/>
-    </proof>
-   </goal>
-   <goal
-    name="exp_one"
-    locfile="../double.why"
-    loclnum="78" loccnumb="8" loccnume="15"
-    sum="0c3504d58a9734848a0cbc03bc51d27d"
-    proved="true"
-    expanded="false"
-    shape="ainfix =aexpaonec1023">
-    <proof
-     prover="0"
-     timelimit="30"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.63"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="30"
-     memlimit="1000"
-     edited="double_TestDouble_exp_one_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.21"/>
-    </proof>
-   </goal>
-   <goal
-    name="mantissa_one"
-    locfile="../double.why"
-    loclnum="79" loccnumb="8" loccnume="20"
-    sum="e7fa2f72bb2aada4371ebb33b3cc263e"
-    proved="true"
-    expanded="false"
-    shape="ainfix =amantissaaonec0">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.09"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.69"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="11"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="3.36"/>
-    </proof>
-   </goal>
-   <goal
-    name="double_value_of_1"
-    locfile="../double.why"
-    loclnum="81" loccnumb="8" loccnume="25"
-    sum="a43ae53878e69bc2d59a96e436eb69b9"
-    proved="true"
-    expanded="false"
-    shape="ainfix =adouble_of_bv64aonec1.0">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Coq" version="8.4pl3" timelimit="30" memlimit="1000"/>
+<file name="../double.why" expanded="true">
+<theory name="BV_double">
+</theory>
+<theory name="TestDouble" expanded="true">
+ <goal name="nth_one1" sum="9426856b7db1eaa0a7fbf98d0a1d6511" expanded="true">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.33"/></proof>
+ </goal>
+ <goal name="nth_one2" sum="b1c633079fda4d75118758023d1bd9d6" expanded="true">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.23"/></proof>
+ </goal>
+ <goal name="nth_one3" sum="7b13e3cc4204cfbf0bcadc9604a16925">
+ <proof prover="1"><result status="valid" time="0.31"/></proof>
+ </goal>
+ <goal name="sign_one" sum="bdda75f77974f193214e8a50e2cd6d59">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.11"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.11"/></proof>
+ </goal>
+ <goal name="exp_one" sum="0c3504d58a9734848a0cbc03bc51d27d">
+ <proof prover="1" timelimit="30"><result status="valid" time="1.96"/></proof>
+ <proof prover="5" edited="double_TestDouble_exp_one_1.v"><result status="valid" time="1.21"/></proof>
+ </goal>
+ <goal name="mantissa_one" sum="e7fa2f72bb2aada4371ebb33b3cc263e">
+ <proof prover="1"><result status="valid" time="0.09"/></proof>
+ <proof prover="2"><result status="valid" time="0.69"/></proof>
+ <proof prover="4" timelimit="11"><result status="valid" time="3.36"/></proof>
+ </goal>
+ <goal name="double_value_of_1" sum="a43ae53878e69bc2d59a96e436eb69b9">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

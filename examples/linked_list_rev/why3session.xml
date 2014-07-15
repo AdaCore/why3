@@ -1,436 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="3"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="4"
-  name="CVC4"
-  version="1.3"/>
- <prover
-  id="5"
-  name="Coq"
-  version="8.4pl2"/>
- <prover
-  id="6"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="7"
-  name="Z3"
-  version="3.2"/>
- <file
-  name="../linked_list_rev.mlw"
-  verified="true"
-  expanded="true">
-  <theory
-   name="ListReverse"
-   locfile="../linked_list_rev.mlw"
-   loclnum="10" loccnumb="7" loccnume="18"
-   verified="true"
-   expanded="true">
-  </theory>
-  <theory
-   name="InPlaceRev"
-   locfile="../linked_list_rev.mlw"
-   loclnum="36" loccnumb="7" loccnume="17"
-   verified="true"
-   expanded="true">
-   <goal
-    name="list_seg_frame"
-    locfile="../linked_list_rev.mlw"
-    loclnum="51" loccnumb="8" loccnume="22"
-    sum="9b241df45e48b87800669a0b38ae5f15"
-    proved="true"
-    expanded="true"
-    shape="alist_segV2V1V5anullINamemV3V5Aainfix =V1asetV0V3V4Aalist_segV2V0V5anullF">
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="0"
-     edited="linked_list_rev_WP_InPlaceRev_list_seg_frame_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.13"/>
-    </proof>
-   </goal>
-   <goal
-    name="list_seg_functional"
-    locfile="../linked_list_rev.mlw"
-    loclnum="56" loccnumb="8" loccnume="27"
-    sum="293a97503ce9692f4e5c7a10e00425fa"
-    proved="true"
-    expanded="true"
-    shape="ainfix =V1V2Ialist_segV3V0V2anullAalist_segV3V0V1anullF">
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="0"
-     edited="linked_list_rev_WP_InPlaceRev_list_seg_functional_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.49"/>
-    </proof>
-   </goal>
-   <goal
-    name="list_seg_sublistl"
-    locfile="../linked_list_rev.mlw"
-    loclnum="60" loccnumb="8" loccnume="25"
-    sum="9eb04ac7a439b5fd2b48db33aa3e0c57"
-    proved="true"
-    expanded="true"
-    shape="alist_segV4V0aConsV4V2anullIalist_segV3V0ainfix ++V1aConsV4V2anullF">
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="0"
-     edited="linked_list_rev_WP_InPlaceRev_list_seg_sublistl_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.36"/>
-    </proof>
-   </goal>
-   <goal
-    name="list_seg_no_repet"
-    locfile="../linked_list_rev.mlw"
-    loclnum="65" loccnumb="8" loccnume="25"
-    sum="d95f304edbc6bd9d3a40486c956ea807"
-    proved="true"
-    expanded="true"
-    shape="ano_repetV1Ialist_segV2V0V1anullF">
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="0"
-     edited="linked_list_rev_WP_InPlaceRev_list_seg_no_repet_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.49"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter in_place_reverse"
-    locfile="../linked_list_rev.mlw"
-    loclnum="73" loccnumb="6" loccnume="22"
-    expl="VC for in_place_reverse"
-    sum="de34bb9e0cb265ecd436fcc7733c72e0"
-    proved="true"
-    expanded="true"
-    shape="ialist_segV4V7areverseV1anullCfaNilainfix =V13V12aConswVV5Aainfix =ainfix ++areverseV12V11areverseV1AadisjointV12V11Aalist_segV9V8V11anullAalist_segV10V8V12anullIainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FAalist_segV4V8V3anullIainfix =V8asetV7V6V4FNainfix =V6anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFAainfix =ainfix ++areverseV1aNilareverseV1AadisjointV1aNilAalist_seganullV2aNilanullAalist_segV0V2V1anullIalist_segV0V2V1anullFF">
-    <label
-     name="expl:VC for in_place_reverse"/>
-    <transf
-     name="split_goal"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter in_place_reverse.1"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="1. loop invariant init"
-      sum="b4a2bb993c643a0196acaded508775fd"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initalist_segV0V2V1anullIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.2"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="2. loop invariant init"
-      sum="9148399a4b20b29fa32549ef6f79de9d"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initalist_seganullV2aNilanullIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.3"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="3. loop invariant init"
-      sum="1ef536e2ae5fa2010dec79e97370da0c"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initadisjointV1aNilIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.4"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="4. loop invariant init"
-      sum="7b25e822b010b5aebc42d8b713e54186"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix =ainfix ++areverseV1aNilareverseV1Ialist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="6"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="7"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.5"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="5. assertion"
-      sum="5dc83150e940aed42900e3c12239a1bf"
-      proved="true"
-      expanded="false"
-      shape="assertionalist_segV4V8V3anullIainfix =V8asetV7V6V4FINainfix =V6anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.20"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.6"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="6. loop invariant preservation"
-      sum="176403b0eadce46493c1ced53ab74f7f"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationalist_segV10V8V12anullIainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FINainfix =V6anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.19"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.7"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="7. loop invariant preservation"
-      sum="bfecf1728d4738d2ef75c1e1bcd855db"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationalist_segV9V8V11anullIainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FINainfix =V6anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.8"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="8. loop invariant preservation"
-      sum="eac85aa5e6bac9efa3a02588594dedf3"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationadisjointV12V11Iainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FINainfix =V6anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="4000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.12"/>
-      </proof>
-      <proof
-       prover="4"
-       timelimit="5"
-       memlimit="4000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.13"/>
-      </proof>
-      <proof
-       prover="7"
-       timelimit="5"
-       memlimit="4000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.9"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="9. loop invariant preservation"
-      sum="e65795c2eeb2ecbeb668d4fd992077be"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix =ainfix ++areverseV12V11areverseV1Iainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FINainfix =V6anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="1.27"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.10"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="10. loop variant decrease"
-      sum="d439748599ef7d6987089a27fee5c704"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseCfaNilainfix =V13V12aConswVV5Iainfix =V12atailV5FIainfix =V11aConsaheadV5V3FIainfix =V10agetV7V6FIainfix =V9V6FIalist_segV4V8V3anullIainfix =V8asetV7V6V4FINainfix =V6anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="4000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter in_place_reverse.11"
-      locfile="../linked_list_rev.mlw"
-      loclnum="73" loccnumb="6" loccnume="22"
-      expl="11. postcondition"
-      sum="09ee85ba2c7e41bf73ff886e4701e851"
-      proved="true"
-      expanded="false"
-      shape="postconditionalist_segV4V7areverseV1anullINNainfix =V6anullIainfix =ainfix ++areverseV5V3areverseV1AadisjointV5V3Aalist_segV4V7V3anullAalist_segV6V7V5anullFIalist_segV0V2V1anullFF">
-      <label
-       name="expl:VC for in_place_reverse"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.22"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="0"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
+<prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
+<prover id="3" name="CVC3" version="2.2" timelimit="5" memlimit="0"/>
+<prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="4000"/>
+<prover id="5" name="Coq" version="8.4pl3" timelimit="5" memlimit="0"/>
+<prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
+<prover id="7" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
+<file name="../linked_list_rev.mlw" expanded="true">
+<theory name="ListReverse" expanded="true">
+</theory>
+<theory name="InPlaceRev" expanded="true">
+ <goal name="list_seg_frame" sum="457ab55cb70135fbcfb7ab8f12b66d26" expanded="true">
+ <proof prover="5" edited="linked_list_rev_WP_InPlaceRev_list_seg_frame_1.v"><result status="valid" time="1.13"/></proof>
+ </goal>
+ <goal name="list_seg_functional" sum="1397b1c5039b5d3ee05f4d7ea4f4f920" expanded="true">
+ <proof prover="5" edited="linked_list_rev_WP_InPlaceRev_list_seg_functional_1.v"><result status="valid" time="1.08"/></proof>
+ </goal>
+ <goal name="list_seg_sublistl" sum="52f2ea9551eda8f6b1a4f692c2133407" expanded="true">
+ <proof prover="5" edited="linked_list_rev_WP_InPlaceRev_list_seg_sublistl_1.v"><result status="valid" time="1.05"/></proof>
+ </goal>
+ <goal name="list_seg_no_repet" sum="ae9d26c9f5a751d580e8de3bd4eaa804" expanded="true">
+ <proof prover="5" edited="linked_list_rev_WP_InPlaceRev_list_seg_no_repet_1.v"><result status="valid" time="1.07"/></proof>
+ </goal>
+ <goal name="WP_parameter in_place_reverse" expl="VC for in_place_reverse" sum="cf23dae5ea35ea9de5c6a3bbdd72ad2f" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter in_place_reverse.1" expl="1. loop invariant init" sum="631fa7212f5e1e07cee3ecc8d4d9464c">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.2" expl="2. loop invariant init" sum="fa5cdfab59eb8b4ca6d0ea7b51cc166c">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.3" expl="3. loop invariant init" sum="0bfe07bf9bbddc839218e1ba7857b3b0">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.4" expl="4. loop invariant init" sum="929254eff26cc33c6f8922fdd511b2c5">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.5" expl="5. assertion" sum="3490273bdd36eb3689c2ee64a1fbfacf">
+  <proof prover="1"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.6" expl="6. loop invariant preservation" sum="e68b548a7d5f4b1b3aa9ee090d192ccc">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.7" expl="7. loop invariant preservation" sum="0edfde33e39972f6d9274e15825a016a">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.8" expl="8. loop invariant preservation" sum="5c980be88241c9e8db43529e93ee9888">
+  <proof prover="0"><result status="valid" time="0.12"/></proof>
+  <proof prover="4"><result status="valid" time="0.10"/></proof>
+  <proof prover="7"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.9" expl="9. loop invariant preservation" sum="75643eb6c06f3adf7184981aee4f3dab">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.09"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.91"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.10" expl="10. loop variant decrease" sum="553acf0d86038e8db96bc6a4e5114414">
+  <proof prover="6"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter in_place_reverse.11" expl="11. postcondition" sum="e856b2664c65d601968b9153ed8f6d29">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.22"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -1,282 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="3"
-  name="CVC4"
-  version="1.2"/>
- <prover
-  id="4"
-  name="Coq"
-  version="8.4pl2"/>
- <prover
-  id="5"
-  name="MetiTarski"
-  version="2.2"/>
- <prover
-  id="6"
-  name="Z3"
-  version="3.2"/>
- <prover
-  id="7"
-  name="Z3"
-  version="4.3.1"/>
- <file
-  name="../lagrange_inequality.why"
-  verified="true"
-  expanded="true">
-  <theory
-   name="LagrangeInequality"
-   locfile="../lagrange_inequality.why"
-   loclnum="3" loccnumb="7" loccnume="25"
-   verified="true"
-   expanded="true">
-   <goal
-    name="norm2_pos"
-    locfile="../lagrange_inequality.why"
-    loclnum="24" loccnumb="8" loccnume="17"
-    sum="f2942a313345b6f3570a65ca2efea6a0"
-    proved="true"
-    expanded="true"
-    shape="ainfix &gt;=anorm2V0V1c0.0F">
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Lagrange"
-    locfile="../lagrange_inequality.why"
-    loclnum="28" loccnumb="8" loccnume="16"
-    sum="621df0eac1260a360b979069ef8f577b"
-    proved="true"
-    expanded="true"
-    shape="ainfix =ainfix *anorm2V0V1anorm2V2V3ainfix +asqradotV0V1V2V3asqrainfix -ainfix *V0V3ainfix *V1V2F">
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="CauchySchwarzInequality"
-   locfile="../lagrange_inequality.why"
-   loclnum="35" loccnumb="7" loccnume="30"
-   verified="true"
-   expanded="true">
-   <goal
-    name="CauchySchwarz_aux"
-    locfile="../lagrange_inequality.why"
-    loclnum="42" loccnumb="8" loccnume="25"
-    sum="60286fcac3b9b4b9700a8f992a019a7a"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=asqradotV0V1V2V3ainfix *anorm2V0V1anorm2V2V3F">
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.80"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="norm_pos"
-    locfile="../lagrange_inequality.why"
-    loclnum="50" loccnumb="8" loccnume="16"
-    sum="8d95da19d79cf7adc5069923d3af185e"
-    proved="true"
-    expanded="true"
-    shape="ainfix &gt;=anormV0V1c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="sqr_le_sqrt"
-    locfile="../lagrange_inequality.why"
-    loclnum="54" loccnumb="8" loccnume="19"
-    sum="f7a62278abbba47b82e22b6025bcbb68"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=V0asqrtV1Iainfix &lt;=asqrV0V1F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="4000"
-     edited="lagrange_inequality_CauchySchwarzInequality_sqr_le_sqrt_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.78"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-   <goal
-    name="CauchySchwarz"
-    locfile="../lagrange_inequality.why"
-    loclnum="57" loccnumb="8" loccnume="21"
-    sum="f2685cf8dd64430a204c41bfe4848046"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=adotV0V1V2V3ainfix *anormV0V1anormV2V3F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="4000"
-     edited="lagrange_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.50"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="TriangleInequality"
-   locfile="../lagrange_inequality.why"
-   loclnum="64" loccnumb="7" loccnume="25"
-   verified="true"
-   expanded="true">
-   <goal
-    name="triangle_aux"
-    locfile="../lagrange_inequality.why"
-    loclnum="77" loccnumb="8" loccnume="20"
-    sum="38f7f167c357b4f98d8401955497bc8e"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=anorm2ainfix +V0V2ainfix +V1V3asqrainfix +anormV0V1anormV2V3F">
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="sqr_sqrt_le"
-    locfile="../lagrange_inequality.why"
-    loclnum="82" loccnumb="8" loccnume="19"
-    sum="b418617e0ea0a9340d9518e31089e1ee"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=asqrtV0V1Iainfix &lt;=V0asqrV1Aainfix &lt;=c0.0V0Aainfix &lt;=c0.0V1F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.05"/>
-    </proof>
-   </goal>
-   <goal
-    name="triangle"
-    locfile="../lagrange_inequality.why"
-    loclnum="85" loccnumb="8" loccnume="16"
-    sum="d160993bac50590ad70307c4fb70b056"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=anormainfix +V0V2ainfix +V1V3ainfix +anormV0V1anormV2V3F">
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     edited="lagrange_inequality_TriangleInequality_triangle_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="1.23"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="3" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="MetiTarski" version="2.2" timelimit="5" memlimit="1000"/>
+<prover id="4" name="CVC3" version="2.2" timelimit="3" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="6" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Coq" version="8.4pl3" timelimit="5" memlimit="4000"/>
+<file name="../lagrange_inequality.why" expanded="true">
+<theory name="LagrangeInequality" expanded="true">
+ <goal name="norm2_pos" sum="f2942a313345b6f3570a65ca2efea6a0" expanded="true">
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Lagrange" sum="621df0eac1260a360b979069ef8f577b" expanded="true">
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+</theory>
+<theory name="CauchySchwarzInequality" expanded="true">
+ <goal name="CauchySchwarz_aux" sum="60286fcac3b9b4b9700a8f992a019a7a" expanded="true">
+ <proof prover="0"><result status="valid" time="0.80"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="norm_pos" sum="8d95da19d79cf7adc5069923d3af185e" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="sqr_le_sqrt" sum="f7a62278abbba47b82e22b6025bcbb68" expanded="true">
+ <proof prover="3"><result status="valid" time="0.04"/></proof>
+ <proof prover="7" edited="lagrange_inequality_CauchySchwarzInequality_sqr_le_sqrt_1.v"><result status="valid" time="1.78"/></proof>
+ </goal>
+ <goal name="CauchySchwarz" sum="f2685cf8dd64430a204c41bfe4848046" expanded="true">
+ <proof prover="7" edited="lagrange_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"><result status="valid" time="1.50"/></proof>
+ </goal>
+</theory>
+<theory name="TriangleInequality" expanded="true">
+ <goal name="triangle_aux" sum="38f7f167c357b4f98d8401955497bc8e" expanded="true">
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="sqr_sqrt_le" sum="b418617e0ea0a9340d9518e31089e1ee" expanded="true">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.05"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="triangle" sum="d160993bac50590ad70307c4fb70b056" expanded="true">
+ <proof prover="7" memlimit="1000" edited="lagrange_inequality_TriangleInequality_triangle_1.v"><result status="valid" time="1.23"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

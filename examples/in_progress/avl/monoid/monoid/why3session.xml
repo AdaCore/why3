@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <file
+  name="../monoid.mlw"
+  verified="true"
+  expanded="true">
+  <theory
+   name="Monoid"
+   locfile="../monoid.mlw"
+   loclnum="2" loccnumb="7" loccnume="13"
+   verified="true"
+   expanded="true">
+  </theory>
+  <theory
+   name="MonoidList"
+   locfile="../monoid.mlw"
+   loclnum="14" loccnumb="7" loccnume="17"
+   verified="true"
+   expanded="true">
+   <goal
+    name="WP_parameter sum_append"
+    locfile="../monoid.mlw"
+    loclnum="26" loccnumb="16" loccnume="26"
+    expl="VC for sum_append"
+    sum="ae30fca9a3b56ad657714f22093400f4"
+    proved="true"
+    expanded="true"
+    shape="Cainfix =asumV0ainfix ++V1V2aopasumV0V1asumV0V2Iainfix =asumV0ainfix ++V3V2aopasumV0V3asumV0V2ACfaNilainfix =V4V3aConswVV1aConswVainfix =asumV0ainfix ++V1V2aopasumV0V1asumV0V2wV1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for sum_append"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="MonoidListDef"
+   locfile="../monoid.mlw"
+   loclnum="33" loccnumb="7" loccnume="20"
+   verified="true"
+   expanded="true">
+   <goal
+    name="sum_def_nil"
+    locfile="../monoid.mlw"
+    loclnum="22" loccnumb="8" loccnume="19"
+    sum="0e664b10c26136c4f145c9d87c130dac"
+    proved="true"
+    expanded="true"
+    shape="ainfix =asumV0aNilazeroF">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="sum_def_cons"
+    locfile="../monoid.mlw"
+    loclnum="23" loccnumb="8" loccnume="20"
+    sum="24fccade2e910321d8504790441b897d"
+    proved="true"
+    expanded="true"
+    shape="ainfix =asumV0aConsV1V2aopainfix @V0V1asumV0V2F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+  </theory>
+  <theory
+   name="ComputableMonoid"
+   locfile="../monoid.mlw"
+   loclnum="52" loccnumb="7" loccnume="23"
+   verified="true"
+   expanded="true">
+  </theory>
+ </file>
+</why3session>

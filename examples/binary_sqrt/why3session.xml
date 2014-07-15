@@ -1,526 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
-  name="CVC4"
-  version="1.3"/>
- <prover
-  id="3"
-  name="Z3"
-  version="4.3.1"/>
- <file
-  name="../binary_sqrt.mlw"
-  verified="true"
-  expanded="true">
-  <theory
-   name="BinarySqrt"
-   locfile="../binary_sqrt.mlw"
-   loclnum="8" loccnumb="7" loccnume="17"
-   verified="true"
-   expanded="true">
-   <goal
-    name="WP_parameter sqrt"
-    locfile="../binary_sqrt.mlw"
-    loclnum="16" loccnumb="10" loccnume="14"
-    expl="VC for sqrt"
-    sum="2f48142e66f86f828944b2b4444e121e"
-    proved="true"
-    expanded="true"
-    shape="iainfix &lt;V0ainfix *ainfix +iV6ainfix +V6V1ainfix &lt;=ainfix *ainfix +V6V1ainfix +V6V1V0V1ainfix +iV6ainfix +V6V1ainfix &lt;=ainfix *ainfix +V6V1ainfix +V6V1V0V1Aainfix &lt;=ainfix *iV6ainfix +V6V1ainfix &lt;=ainfix *ainfix +V6V1ainfix +V6V1V0iV6ainfix +V6V1ainfix &lt;=ainfix *ainfix +V6V1ainfix +V6V1V0V0Iainfix &lt;V0ainfix *ainfix +V6V5ainfix +V6V5Aainfix &lt;=ainfix *V6V6V0FAainfix =V5ainfix *afrom_intV4V3Aainfix &gt;=V4c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0Aainfix &lt;ainfix -aceilainfix /amaxV0c1.0V3V4ainfix -aceilainfix /amaxV0c1.0V3V2Aainfix &lt;=c0ainfix -aceilainfix /amaxV0c1.0V3V2Lainfix *c2.0V1Lainfix *c2V2Aainfix &lt;=afrom_intV2ainfix /amaxV0c1.0V3Aainfix &lt;=ainfix /ainfix *afrom_intV2V3V3ainfix /amaxV0c1.0V3Aainfix &lt;=ainfix *ainfix *afrom_intV2V3ainfix /c1.0V3ainfix *amaxV0c1.0ainfix /c1.0V3Aainfix &gt;ainfix /c1.0V3c0.0Aainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0ainfix &lt;V0ainfix *ainfix +c0.0V1ainfix +c0.0V1Aainfix &lt;=ainfix *c0.0c0.0V0ainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-    <label
-     name="expl:VC for sqrt"/>
-    <transf
-     name="split_goal"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter sqrt.1"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="1. postcondition"
-      sum="930cac52353417990bb887760a9e0d6f"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix &lt;V0ainfix *ainfix +c0.0V1ainfix +c0.0V1Aainfix &lt;=ainfix *c0.0c0.0V0Iainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.2"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="2. assertion"
-      sum="95aa6b7bd6934a32cb478bf426b496ec"
-      proved="true"
-      expanded="false"
-      shape="assertionainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.3"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="3. assertion"
-      sum="814f4beff6fe1fa8ff5b578637992816"
-      proved="true"
-      expanded="false"
-      shape="assertionainfix &gt;ainfix /c1.0V3c0.0Iainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.4"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="4. assertion"
-      sum="dfb7031800efc58e780215fd62ea66f5"
-      proved="true"
-      expanded="false"
-      shape="assertionainfix &lt;=ainfix *ainfix *afrom_intV2V3ainfix /c1.0V3ainfix *amaxV0c1.0ainfix /c1.0V3Iainfix &gt;ainfix /c1.0V3c0.0Iainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.5"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="5. assertion"
-      sum="143b48cb7cee72f474c8858297f5eb19"
-      proved="true"
-      expanded="false"
-      shape="assertionainfix &lt;=ainfix /ainfix *afrom_intV2V3V3ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix *ainfix *afrom_intV2V3ainfix /c1.0V3ainfix *amaxV0c1.0ainfix /c1.0V3Iainfix &gt;ainfix /c1.0V3c0.0Iainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.6"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="6. assertion"
-      sum="4396794d87686e427bb0aebb559385b6"
-      proved="true"
-      expanded="false"
-      shape="assertionainfix &lt;=afrom_intV2ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix /ainfix *afrom_intV2V3V3ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix *ainfix *afrom_intV2V3ainfix /c1.0V3ainfix *amaxV0c1.0ainfix /c1.0V3Iainfix &gt;ainfix /c1.0V3c0.0Iainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="4.39"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.7"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="7. variant decrease"
-      sum="5b06530b9d368209d903e9d91d9e4182"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseainfix &lt;ainfix -aceilainfix /amaxV0c1.0V3V4ainfix -aceilainfix /amaxV0c1.0V3V2Aainfix &lt;=c0ainfix -aceilainfix /amaxV0c1.0V3V2Lainfix *c2.0V1Lainfix *c2V2Iainfix &lt;=afrom_intV2ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix /ainfix *afrom_intV2V3V3ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix *ainfix *afrom_intV2V3ainfix /c1.0V3ainfix *amaxV0c1.0ainfix /c1.0V3Iainfix &gt;ainfix /c1.0V3c0.0Iainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.27"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.8"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="8. precondition"
-      sum="af396d9f812039d722ce55092f1611e3"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;=c0.0V0Lainfix *c2.0V1Lainfix *c2V2Iainfix &lt;=afrom_intV2ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix /ainfix *afrom_intV2V3V3ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix *ainfix *afrom_intV2V3ainfix /c1.0V3ainfix *amaxV0c1.0ainfix /c1.0V3Iainfix &gt;ainfix /c1.0V3c0.0Iainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.9"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="9. precondition"
-      sum="228255f4c81393d5b46ebd149782cb23"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &gt;=V4c1Aainfix &gt;V3c0.0Lainfix *c2.0V1Lainfix *c2V2Iainfix &lt;=afrom_intV2ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix /ainfix *afrom_intV2V3V3ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix *ainfix *afrom_intV2V3ainfix /c1.0V3ainfix *amaxV0c1.0ainfix /c1.0V3Iainfix &gt;ainfix /c1.0V3c0.0Iainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.10"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="10. precondition"
-      sum="aac0c6fd62909777cc134f89f5a8a500"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix =V5ainfix *afrom_intV4V3Lainfix *c2.0V1Lainfix *c2V2Iainfix &lt;=afrom_intV2ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix /ainfix *afrom_intV2V3V3ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix *ainfix *afrom_intV2V3ainfix /c1.0V3ainfix *amaxV0c1.0ainfix /c1.0V3Iainfix &gt;ainfix /c1.0V3c0.0Iainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt.11"
-      locfile="../binary_sqrt.mlw"
-      loclnum="16" loccnumb="10" loccnume="14"
-      expl="11. postcondition"
-      sum="99fdae98c4c5124065b35bd678dd849a"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix &lt;V0ainfix *ainfix +iV6ainfix +V6V1ainfix &lt;=ainfix *ainfix +V6V1ainfix +V6V1V0V1ainfix +iV6ainfix +V6V1ainfix &lt;=ainfix *ainfix +V6V1ainfix +V6V1V0V1Aainfix &lt;=ainfix *iV6ainfix +V6V1ainfix &lt;=ainfix *ainfix +V6V1ainfix +V6V1V0iV6ainfix +V6V1ainfix &lt;=ainfix *ainfix +V6V1ainfix +V6V1V0V0Iainfix &lt;V0ainfix *ainfix +V6V5ainfix +V6V5Aainfix &lt;=ainfix *V6V6V0FIainfix =V5ainfix *afrom_intV4V3Aainfix &gt;=V4c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0Lainfix *c2.0V1Lainfix *c2V2Iainfix &lt;=afrom_intV2ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix /ainfix *afrom_intV2V3V3ainfix /amaxV0c1.0V3Iainfix &lt;=ainfix *ainfix *afrom_intV2V3ainfix /c1.0V3ainfix *amaxV0c1.0ainfix /c1.0V3Iainfix &gt;ainfix /c1.0V3c0.0Iainfix &lt;=ainfix *afrom_intV2V3amaxV0c1.0INainfix &lt;c1.0V1Aainfix &lt;V0V1Iainfix =V1ainfix *afrom_intV2V3Aainfix &gt;=V2c1Aainfix &gt;V3c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.38"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter sqrt_main"
-    locfile="../binary_sqrt.mlw"
-    loclnum="35" loccnumb="6" loccnume="15"
-    expl="VC for sqrt_main"
-    sum="c34a139793f399d5395639d3b7ce4df4"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;V0ainfix *ainfix +V2V1ainfix +V2V1Aainfix &lt;=ainfix *V2V2V0Iainfix &lt;V0ainfix *ainfix +V2V1ainfix +V2V1Aainfix &lt;=ainfix *V2V2V0FAainfix =V1ainfix *afrom_intc1V1Aainfix &gt;=c1c1Aainfix &gt;V1c0.0Aainfix &lt;=c0.0V0Iainfix &gt;V1c0.0Aainfix &lt;=c0.0V0F">
-    <label
-     name="expl:VC for sqrt_main"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter sqrt_main.1"
-      locfile="../binary_sqrt.mlw"
-      loclnum="35" loccnumb="6" loccnume="15"
-      expl="1. precondition"
-      sum="a4f4b305f07cc5e971c99ce1c17331e4"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;=c0.0V0Iainfix &gt;V1c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt_main"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt_main.2"
-      locfile="../binary_sqrt.mlw"
-      loclnum="35" loccnumb="6" loccnume="15"
-      expl="2. precondition"
-      sum="9b43683c9c4eff601a49aaa9410eeac0"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &gt;=c1c1Aainfix &gt;V1c0.0Iainfix &gt;V1c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt_main"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt_main.3"
-      locfile="../binary_sqrt.mlw"
-      loclnum="35" loccnumb="6" loccnume="15"
-      expl="3. precondition"
-      sum="735dc81a88955752d1d437dd00d880cf"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix =V1ainfix *afrom_intc1V1Iainfix &gt;V1c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt_main"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter sqrt_main.4"
-      locfile="../binary_sqrt.mlw"
-      loclnum="35" loccnumb="6" loccnume="15"
-      expl="4. postcondition"
-      sum="e85265bbf58abeb249a5a034be320f57"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix &lt;V0ainfix *ainfix +V2V1ainfix +V2V1Aainfix &lt;=ainfix *V2V2V0Iainfix &lt;V0ainfix *ainfix +V2V1ainfix +V2V1Aainfix &lt;=ainfix *V2V2V0FIainfix =V1ainfix *afrom_intc1V1Aainfix &gt;=c1c1Aainfix &gt;V1c0.0Aainfix &lt;=c0.0V0Iainfix &gt;V1c0.0Aainfix &lt;=c0.0V0F">
-      <label
-       name="expl:VC for sqrt_main"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="3"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
+<file name="../binary_sqrt.mlw" expanded="true">
+<theory name="BinarySqrt" expanded="true">
+ <goal name="WP_parameter sqrt" expl="VC for sqrt" sum="d25a3c0ea8edfcd623e6c047ca09fad5" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter sqrt.1" expl="1. postcondition" sum="19871722ba65be421a62a57da3b3f16d">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.2" expl="2. assertion" sum="a702f7f544c0300edfcbe76e8f782795">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.3" expl="3. assertion" sum="72103cbe6b7c4ccc99096b9b7a348139">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.4" expl="4. assertion" sum="5363dae742f6c969aa8addbf507e2714">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.5" expl="5. assertion" sum="6bf2148bd91e818a82b0971d7b9d9e30">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.6" expl="6. assertion" sum="29982125fd495c2a7b642b480e2574b1">
+  <proof prover="1"><result status="valid" time="4.39"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.7" expl="7. variant decrease" sum="4f3b89e0252d31f2fad81ad399e74a7f">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.27"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.8" expl="8. precondition" sum="d7cb8a8eda36e6a9d8caa63495827e74">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.9" expl="9. precondition" sum="47e7054825ef077f0c24d4390e518343">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.10" expl="10. precondition" sum="ec913fce000919fe171c3e23d0bed32e">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt.11" expl="11. postcondition" sum="521597c8e5279a701821dc56d364966f">
+  <proof prover="2"><result status="valid" time="0.38"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter sqrt_main" expl="VC for sqrt_main" sum="d6dc5d421c0f3b3991c06542877c8ced" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter sqrt_main.1" expl="1. precondition" sum="3a7291d34de0a630c653918c8a771acc">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt_main.2" expl="2. precondition" sum="16261fbd9c451aa163dd1e01b9874a83">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt_main.3" expl="3. precondition" sum="b99a2dcaff7c06eaa53d4c65dc5faf02">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter sqrt_main.4" expl="4. postcondition" sum="a9380c26c230dbe03a4fb5c5b7c30194">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

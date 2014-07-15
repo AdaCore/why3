@@ -307,3 +307,23 @@ module NumOf
 
   function numof (a: array elt) (l u: int) : int = num_of a l u
 end
+
+module ToList
+  use import int.Int
+  use import Array
+  use import list.List
+
+  function to_list (a: array 'a) (l u: int) : list 'a
+
+  axiom to_list_empty:
+    forall a: array 'a, l u: int. u <= l ->
+    to_list a l u = Nil
+
+  axiom to_list_cons:
+    forall a: array 'a, l u: int. l < u ->
+    to_list a l u = Cons a[l] (to_list a (l+1) u)
+
+  val to_list (a: array 'a) (l u: int) : list 'a
+    ensures { result = to_list a l u }
+
+end

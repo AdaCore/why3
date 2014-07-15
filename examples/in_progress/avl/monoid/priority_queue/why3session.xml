@@ -1,0 +1,2761 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.95.2"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="2"
+  name="CVC4"
+  version="1.3"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="4.3.1"/>
+ <file
+  name="../priority_queue.mlw"
+  verified="true"
+  expanded="false">
+  <theory
+   name="PQueue"
+   locfile="../priority_queue.mlw"
+   loclnum="2" loccnumb="7" loccnume="13"
+   verified="true"
+   expanded="false">
+   <goal
+    name="Trans"
+    locfile="../../../../../share/theories/relations.why"
+    loclnum="22" loccnumb="8" loccnume="13"
+    sum="625cac8b8aa12f4f947b00578ba8525b"
+    proved="true"
+    expanded="false"
+    shape="aleV0V2IaleV1V2IaleV0V1F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter assoc_m"
+    locfile="../priority_queue.mlw"
+    loclnum="47" loccnumb="14" loccnume="21"
+    expl="VC for assoc_m"
+    sum="48b567e37442a78cafcb8d700c9702e0"
+    proved="true"
+    expanded="false"
+    shape="CCCainfix =aopV0aopV1V2aopaopV0V1V2aNoneainfix =aopV0aopV1V2aopaopV0V1V2wV0aNoneCainfix =aopV0aopV1V2aopaopV0V1V2aNoneainfix =aopV0aopV1V2aopaopV0V1V2wV0wV1aNoneCCainfix =aopV0aopV1V2aopaopV0V1V2aNoneainfix =aopV0aopV1V2aopaopV0V1V2wV0aNoneCainfix =aopV0aopV1V2aopaopV0V1V2aNoneainfix =aopV0aopV1V2aopaopV0V1V2wV0wV1wV2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for assoc_m"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter assoc_m.1"
+      locfile="../priority_queue.mlw"
+      loclnum="47" loccnumb="14" loccnume="21"
+      expl="1. postcondition"
+      sum="52837c77a76ea4fdb3cceaf3ab5d822c"
+      proved="true"
+      expanded="false"
+      shape="postconditionCCCainfix =aopV0aopV1V2aopaopV0V1V2aNonetwV0aNonetwV1aNonetwV2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for assoc_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter assoc_m.2"
+      locfile="../priority_queue.mlw"
+      loclnum="47" loccnumb="14" loccnume="21"
+      expl="2. postcondition"
+      sum="761eb0808c2f8bb1f49bda68584e9cb0"
+      proved="true"
+      expanded="false"
+      shape="postconditionCCCtaNoneainfix =aopV0aopV1V2aopaopV0V1V2wV0aNonetwV1aNonetwV2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for assoc_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.01"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter assoc_m.3"
+      locfile="../priority_queue.mlw"
+      loclnum="47" loccnumb="14" loccnume="21"
+      expl="3. postcondition"
+      sum="22fa832fe94ff5376a63d0508b266503"
+      proved="true"
+      expanded="false"
+      shape="postconditionCCtaNoneCainfix =aopV0aopV1V2aopaopV0V1V2aNonetwV0wV1aNonetwV2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for assoc_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter assoc_m.4"
+      locfile="../priority_queue.mlw"
+      loclnum="47" loccnumb="14" loccnume="21"
+      expl="4. postcondition"
+      sum="ac99413e30b6e8246f59898b70aaaa5b"
+      proved="true"
+      expanded="false"
+      shape="postconditionCCtaNoneCtaNoneainfix =aopV0aopV1V2aopaopV0V1V2wV0wV1aNonetwV2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for assoc_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter assoc_m.5"
+      locfile="../priority_queue.mlw"
+      loclnum="47" loccnumb="14" loccnume="21"
+      expl="5. postcondition"
+      sum="45bebe4df389ad62bd08cecaf2bf4696"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCCainfix =aopV0aopV1V2aopaopV0V1V2aNonetwV0aNonetwV1wV2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for assoc_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter assoc_m.6"
+      locfile="../priority_queue.mlw"
+      loclnum="47" loccnumb="14" loccnume="21"
+      expl="6. postcondition"
+      sum="4fa598b849f3705da8658ec0b1e75af0"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCCtaNoneainfix =aopV0aopV1V2aopaopV0V1V2wV0aNonetwV1wV2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for assoc_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter assoc_m.7"
+      locfile="../priority_queue.mlw"
+      loclnum="47" loccnumb="14" loccnume="21"
+      expl="7. postcondition"
+      sum="ead3804f8883a7495aff697e67d01917"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCtaNoneCainfix =aopV0aopV1V2aopaopV0V1V2aNonetwV0wV1wV2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for assoc_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter assoc_m.8"
+      locfile="../priority_queue.mlw"
+      loclnum="47" loccnumb="14" loccnume="21"
+      expl="8. postcondition"
+      sum="2c0580b8aec984cd40028b814cc37bf3"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCtaNoneCtaNoneainfix =aopV0aopV1V2aopaopV0V1V2wV0wV1wV2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for assoc_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter neutral_m"
+    locfile="../priority_queue.mlw"
+    loclnum="55" loccnumb="14" loccnume="23"
+    expl="VC for neutral_m"
+    sum="2584eb8cf9607b58aaf64c7b4e18bd23"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =V0aopaNoneV0Aainfix =aopV0aNoneV0aNoneainfix =V0aopaNoneV0Aainfix =aopV0aNoneV0wV0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for neutral_m"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter neutral_m.1"
+      locfile="../priority_queue.mlw"
+      loclnum="55" loccnumb="14" loccnume="23"
+      expl="1. postcondition"
+      sum="dfa80475e7140245572ec728d3551a8d"
+      proved="true"
+      expanded="false"
+      shape="postconditionCainfix =V0aopaNoneV0Aainfix =aopV0aNoneV0aNonetwV0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for neutral_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter neutral_m.2"
+      locfile="../priority_queue.mlw"
+      loclnum="55" loccnumb="14" loccnume="23"
+      expl="2. postcondition"
+      sum="19df51424d05437edecd428aedc4f2a7"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneainfix =V0aopaNoneV0Aainfix =aopV0aNoneV0wV0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for neutral_m"/>
+      <proof
+       prover="2"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="assoc"
+    locfile="../monoid.mlw"
+    loclnum="9" loccnumb="8" loccnume="13"
+    sum="318b2792bc89b0d20e041d3d095bd582"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aopV0aopV1V2aopaopV0V1V2F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="neutral"
+    locfile="../monoid.mlw"
+    loclnum="10" loccnumb="8" loccnume="15"
+    sum="0828f06125962effca4c06c4ac613a6b"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V0aopazeroV0Aainfix =aopV0azeroV0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="assoc"
+    locfile="../monoid.mlw"
+    loclnum="9" loccnumb="8" loccnume="13"
+    sum="d909935e63aa722fa0f8d2fa76eafa5c"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aopV0aopV1V2aopaopV0V1V2F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="neutral"
+    locfile="../monoid.mlw"
+    loclnum="10" loccnumb="8" loccnume="15"
+    sum="dd9b80ee44d9209ee005f66f6723d7c4"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V0aopazeroV0Aainfix =aopV0azeroV0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter zero"
+    locfile="../priority_queue.mlw"
+    loclnum="64" loccnumb="8" loccnume="12"
+    expl="VC for zero"
+    sum="36e51cac979a1c1a2fdaf16ad2104589"
+    proved="true"
+    expanded="false"
+    shape="t">
+    <label
+     name="expl:VC for zero"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter op"
+    locfile="../priority_queue.mlw"
+    loclnum="67" loccnumb="8" loccnume="10"
+    expl="VC for op"
+    sum="31cf339656ff9ecadd2c08100e96f981"
+    proved="true"
+    expanded="false"
+    shape="CCtaNoneacV2aSomeVV1Aainfix =CaNoneaNoneaSomeamV3aSomeVV1aopCaNoneaNoneaSomeamV4aSomeVV0CaNoneaNoneaSomeamV5aSomeVV1aNoneCCtaNoneacV7aSomeVV0Aainfix =CaNoneaNoneaSomeamV8aSomeVV0aopCaNoneaNoneaSomeamV9aSomeVV0CaNoneaNoneaSomeamV10aSomeVV1aNoneCtaNoneacV13aSomeViV1V0ainfix &lt;V12c0Aainfix =CaNoneaNoneaSomeamV14aSomeViV1V0ainfix &lt;V12c0aopCaNoneaNoneaSomeamV15aSomeVV0CaNoneaNoneaSomeamV16aSomeVV1IaeqV17V18qainfix =V12c0AaltV17V18qainfix &lt;V12c0AaltV18V17qainfix &gt;V12c0LamV11LamV6FAacV11AacV6aSomeVV1aSomeVV0ICtaNoneacV19aSomeVV1ACtaNoneacV20aSomeVV0F">
+    <label
+     name="expl:VC for op"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.20"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter measure"
+    locfile="../priority_queue.mlw"
+    loclnum="87" loccnumb="8" loccnume="15"
+    expl="VC for measure"
+    sum="a6d792e8654365ae33053ee59849aff5"
+    proved="true"
+    expanded="false"
+    shape="acV4Aainfix =aSomeamV4ameasureainfix @amdlampV3V2Iainfix =akeyainfix @amdlampV3V2amV4AacV4FAainfix =ainfix @ainvampV3V2aTrueIainfix =ainfix @ainvampV3V2aTrueLamk type_paramsV0V1F">
+    <label
+     name="expl:VC for measure"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter monoid_sum_is_min"
+    locfile="../priority_queue.mlw"
+    loclnum="112" loccnumb="16" loccnume="33"
+    expl="VC for monoid_sum_is_min"
+    sum="4aa92d7852f534d4b89357e7ebfb0255"
+    proved="true"
+    expanded="false"
+    shape="CCainfix =V0aNilaNoneaeqakeyV3V2AamemV3V0EAalower_boundV2V0aSomeVasumeainfix =ainfix @V4V5ameasureV5FV0ICainfix =V1aNilaNoneaeqakeyV7V6AamemV7V1EAalower_boundV6V1aSomeVasumeainfix =ainfix @V8V9ameasureV9FV1ACfaNilainfix =V10V1aConswVV0aConswVCainfix =V0aNilaNoneaeqakeyV12V11AamemV12V0EAalower_boundV11V0aSomeVasumeainfix =ainfix @V13V14ameasureV14FV0wV0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for monoid_sum_is_min"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter monoid_sum_is_min.1"
+      locfile="../priority_queue.mlw"
+      loclnum="112" loccnumb="16" loccnume="33"
+      expl="1. variant decrease"
+      sum="e62d4a3fedec06aa787625e8d2aa5267"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCCfaNilainfix =V2V1aConswVV0aConswVtwV0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for monoid_sum_is_min"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter monoid_sum_is_min.2"
+      locfile="../priority_queue.mlw"
+      loclnum="112" loccnumb="16" loccnume="33"
+      expl="2. postcondition"
+      sum="0c33312a0746155772f36b981f2c2034"
+      proved="true"
+      expanded="false"
+      shape="postconditionCCainfix =V0aNilaNoneaeqakeyV3V2AamemV3V0EAalower_boundV2V0aSomeVasumeainfix =ainfix @V4V5ameasureV5FV0ICainfix =V1aNilaNoneaeqakeyV7V6AamemV7V1EAalower_boundV6V1aSomeVasumeainfix =ainfix @V8V9ameasureV9FV1aConswVtwV0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for monoid_sum_is_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter monoid_sum_is_min.2.1"
+        locfile="../priority_queue.mlw"
+        loclnum="112" loccnumb="16" loccnume="33"
+        expl="1. postcondition"
+        sum="1e3de65d092106d153759e513160deb1"
+        proved="true"
+        expanded="false"
+        shape="postconditionCCainfix =V0aNilaNonetaSomeVasumeainfix =ainfix @V3V4ameasureV4FV0ICainfix =V1aNilaNoneaeqakeyV6V5AamemV6V1EAalower_boundV5V1aSomeVasumeainfix =ainfix @V7V8ameasureV8FV1aConswVtwV0F">
+        <label
+         name="why3:lemma"/>
+        <label
+         name="expl:VC for monoid_sum_is_min"/>
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.19"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter monoid_sum_is_min.2.2"
+        locfile="../priority_queue.mlw"
+        loclnum="112" loccnumb="16" loccnume="33"
+        expl="2. postcondition"
+        sum="2098a68c5f60ebee3364ec3eabf46ca3"
+        proved="true"
+        expanded="false"
+        shape="postconditionCCtaNonealower_boundV2V0aSomeVasumeainfix =ainfix @V3V4ameasureV4FV0ICainfix =V1aNilaNoneaeqakeyV6V5AamemV6V1EAalower_boundV5V1aSomeVasumeainfix =ainfix @V7V8ameasureV8FV1aConswVtwV0F">
+        <label
+         name="why3:lemma"/>
+        <label
+         name="expl:VC for monoid_sum_is_min"/>
+        <proof
+         prover="1"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.93"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter monoid_sum_is_min.2.3"
+        locfile="../priority_queue.mlw"
+        loclnum="112" loccnumb="16" loccnume="33"
+        expl="3. postcondition"
+        sum="28eebc1cfbc54f9c7381db8ff4e47ece"
+        proved="true"
+        expanded="false"
+        shape="postconditionCCtaNoneaeqakeyV3V2AamemV3V0EaSomeVasumeainfix =ainfix @V4V5ameasureV5FV0ICainfix =V1aNilaNoneaeqakeyV7V6AamemV7V1EAalower_boundV6V1aSomeVasumeainfix =ainfix @V8V9ameasureV9FV1aConswVtwV0F">
+        <label
+         name="why3:lemma"/>
+        <label
+         name="expl:VC for monoid_sum_is_min"/>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.19"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter monoid_sum_is_min.3"
+      locfile="../priority_queue.mlw"
+      loclnum="112" loccnumb="16" loccnume="33"
+      expl="3. postcondition"
+      sum="28891a58ac7beeb6a7158898d5034b6d"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaConswVCainfix =V0aNilaNoneaeqakeyV3V2AamemV3V0EAalower_boundV2V0aSomeVasumeainfix =ainfix @V4V5ameasureV5FV0wV0F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for monoid_sum_is_min"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter selected_is_min"
+    locfile="../priority_queue.mlw"
+    loclnum="121" loccnumb="12" loccnume="27"
+    expl="VC for selected_is_min"
+    sum="b082f7b4dce9363426b139ea38a366eb"
+    proved="true"
+    expanded="false"
+    shape="CfaNoneCfaNoneaeqakeyV6V7aSomeVasumeainfix =ainfix @V8V9ameasureV9FV5Aalower_boundakeyV6V5aSomeVV2LarebuildV4IaselectedV0V4Lamk splitV1V2V3F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for selected_is_min"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter selected_is_min.1"
+      locfile="../priority_queue.mlw"
+      loclnum="121" loccnumb="12" loccnume="27"
+      expl="1. postcondition"
+      sum="b082f7b4dce9363426b139ea38a366eb"
+      proved="true"
+      expanded="false"
+      shape="postconditionCfaNoneCfaNoneaeqakeyV6V7aSomeVasumeainfix =ainfix @V8V9ameasureV9FV5Aalower_boundakeyV6V5aSomeVV2LarebuildV4IaselectedV0V4Lamk splitV1V2V3F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for selected_is_min"/>
+      <transf
+       name="split_goal_wp"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter selected_is_min.1.1"
+        locfile="../priority_queue.mlw"
+        loclnum="121" loccnumb="12" loccnume="27"
+        expl="1. postcondition"
+        sum="39ed22aa20ac431c136cec7dfa654ed1"
+        proved="true"
+        expanded="false"
+        shape="postconditionCfaNonetaSomeVV2LarebuildV4IaselectedV0V4Lamk splitV1V2V3F">
+        <label
+         name="why3:lemma"/>
+        <label
+         name="expl:VC for selected_is_min"/>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter selected_is_min.1.2"
+        locfile="../priority_queue.mlw"
+        loclnum="121" loccnumb="12" loccnume="27"
+        expl="2. postcondition"
+        sum="bfbedfa3c703e3859f5356971ee46875"
+        proved="true"
+        expanded="false"
+        shape="postconditionCtaNonealower_boundakeyV6V5aSomeVV2LarebuildV4IaselectedV0V4Lamk splitV1V2V3F">
+        <label
+         name="why3:lemma"/>
+        <label
+         name="expl:VC for selected_is_min"/>
+        <transf
+         name="inline_goal"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter selected_is_min.1.2.1"
+          locfile="../priority_queue.mlw"
+          loclnum="121" loccnumb="12" loccnume="27"
+          expl="1. postcondition"
+          sum="9f83976821d9719b28b9e47d431a4df8"
+          proved="true"
+          expanded="false"
+          shape="postconditionCtaNonealeakeyV6akeyV7IamemV7V5FaSomeVV2LarebuildV4ICfaNonealower_bound_strictakeyV8aleftV4Aalower_boundakeyV8arightV4aSomeVamiddleV4Lamk splitV1V2V3F">
+          <label
+           name="why3:lemma"/>
+          <label
+           name="expl:VC for selected_is_min"/>
+          <proof
+           prover="0"
+           timelimit="5"
+           memlimit="1000"
+           obsolete="false"
+           archived="false">
+           <result status="valid" time="0.20"/>
+          </proof>
+         </goal>
+        </transf>
+       </goal>
+       <goal
+        name="WP_parameter selected_is_min.1.3"
+        locfile="../priority_queue.mlw"
+        loclnum="121" loccnumb="12" loccnume="27"
+        expl="3. postcondition"
+        sum="bffe7596e192d28a389ac0c47a55cb19"
+        proved="true"
+        expanded="false"
+        shape="postconditionCtaNoneCfaNonetaSomeVasumeainfix =ainfix @V8V9ameasureV9FV5Ialower_boundakeyV6V5aSomeVV2LarebuildV4IaselectedV0V4Lamk splitV1V2V3F">
+        <label
+         name="why3:lemma"/>
+        <label
+         name="expl:VC for selected_is_min"/>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="0.13"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter selected_is_min.1.4"
+        locfile="../priority_queue.mlw"
+        loclnum="121" loccnumb="12" loccnume="27"
+        expl="4. postcondition"
+        sum="6af60fba77ba45108229d87d2ec7be24"
+        proved="true"
+        expanded="false"
+        shape="postconditionCtaNoneCtaNoneaeqakeyV6V7aSomeVasumeainfix =ainfix @V8V9ameasureV9FV5Ialower_boundakeyV6V5aSomeVV2LarebuildV4IaselectedV0V4Lamk splitV1V2V3F">
+        <label
+         name="why3:lemma"/>
+        <label
+         name="expl:VC for selected_is_min"/>
+        <proof
+         prover="2"
+         timelimit="5"
+         memlimit="1000"
+         obsolete="false"
+         archived="false">
+         <result status="valid" time="1.44"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter selected_part"
+    locfile="../priority_queue.mlw"
+    loclnum="132" loccnumb="6" loccnume="19"
+    expl="VC for selected_part"
+    sum="74d28cb258f5c5c440bba3c9e6d0a8b5"
+    proved="true"
+    expanded="false"
+    shape="CCiiaselectedV7amk splitainfix ++V2aConsainfix @amdlampV8V5V14V15V16Iainfix =arebuildV17V3AaselectedaTuple0V17Lamk splitV14V15V16FANainfix =V3aNilaselectedV7amk splitV18V19ainfix ++V20aConsainfix @amdlampV8V5V3Iainfix =arebuildV21V2AaselectedaTuple0V21Lamk splitV18V19V20FANainfix =V2aNilainfix &lt;=V13c0IaeqV22V23qainfix =V13c0AaltV22V23qainfix &lt;V13c0AaltV23V22qainfix &gt;V13c0LamV10LamV11FAacV10AacV11iaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3aselectedV7amk splitV25V26ainfix ++V27aConsainfix @amdlampV8V5V3Iainfix =arebuildV28V2AaselectedaTuple0V28Lamk splitV25V26V27FANainfix =V2aNilainfix &lt;=V24c0IaeqV29V30qainfix =V24c0AaltV29V30qainfix &lt;V24c0AaltV30V29qainfix &gt;V24c0LamV9LamV11FAacV9AacV11ainfix &lt;=V12c0IaeqV31V32qainfix =V12c0AaltV31V32qainfix &lt;V12c0AaltV32V31qainfix &gt;V12c0LamV10LamV9FAacV10AacV9aSomeViaselectedV7amk splitainfix ++V2aConsainfix @amdlampV8V5V34V35V36Iainfix =arebuildV37V3AaselectedaTuple0V37Lamk splitV34V35V36FANainfix =V3aNilaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3ainfix &lt;=V33c0IaeqV38V39qainfix =V33c0AaltV38V39qainfix &lt;V33c0AaltV39V38qainfix &gt;V33c0LamV10LamV9FAacV10AacV9aNoneV4aSomeVCiaselectedV7amk splitV42V43ainfix ++V44aConsainfix @amdlampV8V5V3Iainfix =arebuildV45V2AaselectedaTuple0V45Lamk splitV42V43V44FANainfix =V2aNilaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3ainfix &lt;V41c0IaeqV46V47qainfix =V41c0AaltV46V47qainfix &lt;V41c0AaltV47V46qainfix &gt;V41c0LamV40LamV9FAacV40AacV9aSomeVaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3aNoneV4aNoneV6ICainfix =V3aNilaNoneaeqakeyV49V48AamemV49V3EAalower_boundV48V3aSomeVasumeainfix =ainfix @V50V51ameasureV51FV3ICainfix =V2aNilaNoneaeqakeyV53V52AamemV53V2EAalower_boundV52V2aSomeVasumeainfix =ainfix @V54V55ameasureV55FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FAainfix =ainfix @ainvampV8V5aTrueICtaNoneacV56aSomeVV6ACtaNoneacV57aSomeVV4Aainfix =CaNoneaNoneaSomeamV58aSomeVV6asumeainfix =ainfix @V59V60ameasureV60FV3Aainfix =CaNoneaNoneaSomeamV61aSomeVV4asumeainfix =ainfix @V62V63ameasureV63FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+    <label
+     name="expl:VC for selected_part"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter selected_part.1"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="1. precondition"
+      sum="ea96644d4d1a972813bd878cb694fc55"
+      proved="true"
+      expanded="false"
+      shape="preconditionainfix =ainfix @ainvampV8V5aTrueICtaNoneacV9aSomeVV6ACtaNoneacV10aSomeVV4Aainfix =CaNoneaNoneaSomeamV11aSomeVV6asumeainfix =ainfix @V12V13ameasureV13FV3Aainfix =CaNoneaNoneaSomeamV14aSomeVV4asumeainfix =ainfix @V15V16ameasureV16FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.2"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="2. precondition"
+      sum="532682adc18df7de90a0be0d7462ff47"
+      proved="true"
+      expanded="false"
+      shape="preconditionCCacV10AacV9aSomeVtaNoneV4aSomeVtaNoneV6ICainfix =V3aNilaNoneaeqakeyV13V12AamemV13V3EAalower_boundV12V3aSomeVasumeainfix =ainfix @V14V15ameasureV15FV3ICainfix =V2aNilaNoneaeqakeyV17V16AamemV17V2EAalower_boundV16V2aSomeVasumeainfix =ainfix @V18V19ameasureV19FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV20aSomeVV6ACtaNoneacV21aSomeVV4Aainfix =CaNoneaNoneaSomeamV22aSomeVV6asumeainfix =ainfix @V23V24ameasureV24FV3Aainfix =CaNoneaNoneaSomeamV25aSomeVV4asumeainfix =ainfix @V26V27ameasureV27FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.3"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="3. precondition"
+      sum="c53672625129a8b52f6a9d0bb1971511"
+      proved="true"
+      expanded="false"
+      shape="preconditionCCacV9AacV11Iainfix &lt;=V12c0IaeqV13V14qainfix =V12c0AaltV13V14qainfix &lt;V12c0AaltV14V13qainfix &gt;V12c0LamV10LamV9FIacV10AacV9aSomeVtaNoneV4aSomeVtaNoneV6ICainfix =V3aNilaNoneaeqakeyV16V15AamemV16V3EAalower_boundV15V3aSomeVasumeainfix =ainfix @V17V18ameasureV18FV3ICainfix =V2aNilaNoneaeqakeyV20V19AamemV20V2EAalower_boundV19V2aSomeVasumeainfix =ainfix @V21V22ameasureV22FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV23aSomeVV6ACtaNoneacV24aSomeVV4Aainfix =CaNoneaNoneaSomeamV25aSomeVV6asumeainfix =ainfix @V26V27ameasureV27FV3Aainfix =CaNoneaNoneaSomeamV28aSomeVV4asumeainfix =ainfix @V29V30ameasureV30FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.4"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="4. postcondition"
+      sum="cb6f8bae3fbb89f41133411f4ee6863b"
+      proved="true"
+      expanded="false"
+      shape="postconditionCCiaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3aselectedV7amk splitV14V15ainfix ++V16aConsainfix @amdlampV8V5V3Iainfix =arebuildV17V2AaselectedaTuple0V17Lamk splitV14V15V16FANainfix =V2aNilainfix &lt;=V13c0IaeqV18V19qainfix =V13c0AaltV18V19qainfix &lt;V13c0AaltV19V18qainfix &gt;V13c0LamV9LamV11FIacV9AacV11Iainfix &lt;=V12c0IaeqV20V21qainfix =V12c0AaltV20V21qainfix &lt;V12c0AaltV21V20qainfix &gt;V12c0LamV10LamV9FIacV10AacV9aSomeVtaNoneV4aSomeVtaNoneV6ICainfix =V3aNilaNoneaeqakeyV23V22AamemV23V3EAalower_boundV22V3aSomeVasumeainfix =ainfix @V24V25ameasureV25FV3ICainfix =V2aNilaNoneaeqakeyV27V26AamemV27V2EAalower_boundV26V2aSomeVasumeainfix =ainfix @V28V29ameasureV29FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV30aSomeVV6ACtaNoneacV31aSomeVV4Aainfix =CaNoneaNoneaSomeamV32aSomeVV6asumeainfix =ainfix @V33V34ameasureV34FV3Aainfix =CaNoneaNoneaSomeamV35aSomeVV4asumeainfix =ainfix @V36V37ameasureV37FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <transf
+       name="introduce_premises"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter selected_part.4.1"
+        locfile="../priority_queue.mlw"
+        loclnum="132" loccnumb="6" loccnume="19"
+        expl="1. postcondition"
+        sum="9e236332aa883adfdb138b2a3a2b7118"
+        proved="true"
+        expanded="false"
+        shape="postconditionCCiaselectedasamk splitallisaSomeainfix @amdlampapadarlisaselectedasamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisIainfix =arebuildV7allisAaselectedaTuple0V7Lamk splitV4V5V6FANainfix =allisaNilainfix &lt;=V3c0IaeqV8V9qainfix =V3c0AaltV8V9qainfix &lt;V3c0AaltV9V8qainfix &gt;V3c0LamakdLamV1FIacakdAacV1Iainfix &lt;=V2c0IaeqV10V11qainfix =V2c0AaltV10V11qainfix &lt;V2c0AaltV11V10qainfix &gt;V2c0LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+        <label
+         name="expl:VC for selected_part"/>
+        <transf
+         name="inline_goal"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter selected_part.4.1.1"
+          locfile="../priority_queue.mlw"
+          loclnum="132" loccnumb="6" loccnume="19"
+          expl="1. postcondition"
+          sum="b3fb9645dc2d951ab6e76dda469bac14"
+          proved="true"
+          expanded="false"
+          shape="postconditionCCiCfaNonealower_bound_strictakeyV4aleftamk splitallisaSomeainfix @amdlampapadarlisAalower_boundakeyV4arightamk splitallisaSomeainfix @amdlampapadarlisaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisCfaNonealower_bound_strictakeyV9aleftamk splitV5V6ainfix ++V7aConsainfix @amdlampapadarlisAalower_boundakeyV9arightamk splitV5V6ainfix ++V7aConsainfix @amdlampapadarlisaSomeVamiddleamk splitV5V6ainfix ++V7aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV8aConsV10arightV8aSomeVainfix ++aleftV8arightV8aNoneamiddleV8allisACfaNonealower_bound_strictakeyV11aleftV8Aalower_boundakeyV11arightV8aSomeVamiddleV8Lamk splitV5V6V7FANainfix =allisaNilainfix =V3c0Oainfix &lt;V3c0IaeqV12V13qainfix =V3c0AaltV12V13qainfix &lt;V3c0AaltV13V12qainfix &lt;c0V3LamakdLamV1FIacakdAacV1Iainfix =V2c0Oainfix &lt;V2c0IaeqV14V15qainfix =V2c0AaltV14V15qainfix &lt;V2c0AaltV15V14qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+          <label
+           name="expl:VC for selected_part"/>
+          <transf
+           name="split_goal_wp"
+           proved="true"
+           expanded="false">
+           <goal
+            name="WP_parameter selected_part.4.1.1.1"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="1. postcondition"
+            sum="6097f2ec46effcc3078aa8d7d8529834"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCNainfix =allisaNilIainfix =V3c0Oainfix &lt;V3c0IaeqV4V5qainfix =V3c0AaltV4V5qainfix &lt;V3c0AaltV5V4qainfix &lt;c0V3LamakdLamV1FIacakdAacV1Iainfix =V2c0Oainfix &lt;V2c0IaeqV6V7qainfix =V2c0AaltV6V7qainfix &lt;V2c0AaltV7V6qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.04"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.4.1.1.2"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="2. postcondition"
+            sum="2312d50f109f7784b50ea8fc08f3637a"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCfaNonetaSomeVamiddleamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7allisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FIainfix =V3c0Oainfix &lt;V3c0IaeqV11V12qainfix =V3c0AaltV11V12qainfix &lt;V3c0AaltV12V11qainfix &lt;c0V3LamakdLamV1FIacakdAacV1Iainfix =V2c0Oainfix &lt;V2c0IaeqV13V14qainfix =V2c0AaltV13V14qainfix &lt;V2c0AaltV14V13qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.02"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.4.1.1.3"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="3. postcondition"
+            sum="62ab74cc7ec76abf3e1a0ab08d5d038b"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCtaNonealower_boundakeyV8arightamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisaSomeVamiddleamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7allisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FIainfix =V3c0Oainfix &lt;V3c0IaeqV11V12qainfix =V3c0AaltV11V12qainfix &lt;V3c0AaltV12V11qainfix &lt;c0V3LamakdLamV1FIacakdAacV1Iainfix =V2c0Oainfix &lt;V2c0IaeqV13V14qainfix =V2c0AaltV13V14qainfix &lt;V2c0AaltV14V13qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="2.81"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.4.1.1.4"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="4. postcondition"
+            sum="4d626a08addff95121dc913586548c4f"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCtaNonealower_bound_strictakeyV8aleftamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisaSomeVamiddleamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7allisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FIainfix =V3c0Oainfix &lt;V3c0IaeqV11V12qainfix =V3c0AaltV11V12qainfix &lt;V3c0AaltV12V11qainfix &lt;c0V3LamakdLamV1FIacakdAacV1Iainfix =V2c0Oainfix &lt;V2c0IaeqV13V14qainfix =V2c0AaltV13V14qainfix &lt;V2c0AaltV14V13qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.04"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.4.1.1.5"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="5. postcondition"
+            sum="edfa750a0d2575190177fd210900306b"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCfaNonetaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisINainfix =V3c0Oainfix &lt;V3c0IaeqV5V6qainfix =V3c0AaltV5V6qainfix &lt;V3c0AaltV6V5qainfix &lt;c0V3LamakdLamV1FIacakdAacV1Iainfix =V2c0Oainfix &lt;V2c0IaeqV7V8qainfix =V2c0AaltV7V8qainfix &lt;V2c0AaltV8V7qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.04"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.4.1.1.6"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="6. postcondition"
+            sum="51d7100564021c1ca0c9dc432be8fa5b"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCtaNonealower_boundakeyV4arightamk splitallisaSomeainfix @amdlampapadarlisaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisINainfix =V3c0Oainfix &lt;V3c0IaeqV5V6qainfix =V3c0AaltV5V6qainfix &lt;V3c0AaltV6V5qainfix &lt;c0V3LamakdLamV1FIacakdAacV1Iainfix =V2c0Oainfix &lt;V2c0IaeqV7V8qainfix =V2c0AaltV7V8qainfix &lt;V2c0AaltV8V7qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.59"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.4.1.1.7"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="7. postcondition"
+            sum="3f88128bd7b78de36745b300b9634564"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCtaNonealower_bound_strictakeyV4aleftamk splitallisaSomeainfix @amdlampapadarlisaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisINainfix =V3c0Oainfix &lt;V3c0IaeqV5V6qainfix =V3c0AaltV5V6qainfix &lt;V3c0AaltV6V5qainfix &lt;c0V3LamakdLamV1FIacakdAacV1Iainfix =V2c0Oainfix &lt;V2c0IaeqV7V8qainfix =V2c0AaltV7V8qainfix &lt;V2c0AaltV8V7qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="1.48"/>
+            </proof>
+           </goal>
+          </transf>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.5"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="5. precondition"
+      sum="ffb79a1af0c26e86fe2d5f436cca5b35"
+      proved="true"
+      expanded="false"
+      shape="preconditionCCacV10AacV11INainfix &lt;=V12c0IaeqV13V14qainfix =V12c0AaltV13V14qainfix &lt;V12c0AaltV14V13qainfix &gt;V12c0LamV10LamV9FIacV10AacV9aSomeVtaNoneV4aSomeVtaNoneV6ICainfix =V3aNilaNoneaeqakeyV16V15AamemV16V3EAalower_boundV15V3aSomeVasumeainfix =ainfix @V17V18ameasureV18FV3ICainfix =V2aNilaNoneaeqakeyV20V19AamemV20V2EAalower_boundV19V2aSomeVasumeainfix =ainfix @V21V22ameasureV22FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV23aSomeVV6ACtaNoneacV24aSomeVV4Aainfix =CaNoneaNoneaSomeamV25aSomeVV6asumeainfix =ainfix @V26V27ameasureV27FV3Aainfix =CaNoneaNoneaSomeamV28aSomeVV4asumeainfix =ainfix @V29V30ameasureV30FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.6"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="6. postcondition"
+      sum="6f91c6c4d05a0ebe11a9cca3c5174707"
+      proved="true"
+      expanded="false"
+      shape="postconditionCCiaselectedV7amk splitainfix ++V2aConsainfix @amdlampV8V5V14V15V16Iainfix =arebuildV17V3AaselectedaTuple0V17Lamk splitV14V15V16FANainfix =V3aNilaselectedV7amk splitV18V19ainfix ++V20aConsainfix @amdlampV8V5V3Iainfix =arebuildV21V2AaselectedaTuple0V21Lamk splitV18V19V20FANainfix =V2aNilainfix &lt;=V13c0IaeqV22V23qainfix =V13c0AaltV22V23qainfix &lt;V13c0AaltV23V22qainfix &gt;V13c0LamV10LamV11FIacV10AacV11INainfix &lt;=V12c0IaeqV24V25qainfix =V12c0AaltV24V25qainfix &lt;V12c0AaltV25V24qainfix &gt;V12c0LamV10LamV9FIacV10AacV9aSomeVtaNoneV4aSomeVtaNoneV6ICainfix =V3aNilaNoneaeqakeyV27V26AamemV27V3EAalower_boundV26V3aSomeVasumeainfix =ainfix @V28V29ameasureV29FV3ICainfix =V2aNilaNoneaeqakeyV31V30AamemV31V2EAalower_boundV30V2aSomeVasumeainfix =ainfix @V32V33ameasureV33FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV34aSomeVV6ACtaNoneacV35aSomeVV4Aainfix =CaNoneaNoneaSomeamV36aSomeVV6asumeainfix =ainfix @V37V38ameasureV38FV3Aainfix =CaNoneaNoneaSomeamV39aSomeVV4asumeainfix =ainfix @V40V41ameasureV41FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <transf
+       name="introduce_premises"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter selected_part.6.1"
+        locfile="../priority_queue.mlw"
+        loclnum="132" loccnumb="6" loccnume="19"
+        expl="1. postcondition"
+        sum="7034a7a793abb0f7d5aa3b7e100f1062"
+        proved="true"
+        expanded="false"
+        shape="postconditionCCiaselectedasamk splitainfix ++allisaConsainfix @amdlampapadV4V5V6Iainfix =arebuildV7arlisAaselectedaTuple0V7Lamk splitV4V5V6FANainfix =arlisaNilaselectedasamk splitV8V9ainfix ++V10aConsainfix @amdlampapadarlisIainfix =arebuildV11allisAaselectedaTuple0V11Lamk splitV8V9V10FANainfix =allisaNilainfix &lt;=V3c0IaeqV12V13qainfix =V3c0AaltV12V13qainfix &lt;V3c0AaltV13V12qainfix &gt;V3c0LamV0LamV1FIacV0AacV1INainfix &lt;=V2c0IaeqV14V15qainfix =V2c0AaltV14V15qainfix &lt;V2c0AaltV15V14qainfix &gt;V2c0LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+        <label
+         name="expl:VC for selected_part"/>
+        <transf
+         name="inline_goal"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter selected_part.6.1.1"
+          locfile="../priority_queue.mlw"
+          loclnum="132" loccnumb="6" loccnume="19"
+          expl="1. postcondition"
+          sum="b51020bb836cb9122364ea7cc05751f8"
+          proved="true"
+          expanded="false"
+          shape="postconditionCCiCfaNonealower_bound_strictakeyV8aleftamk splitainfix ++allisaConsainfix @amdlampapadV4V5V6Aalower_boundakeyV8arightamk splitainfix ++allisaConsainfix @amdlampapadV4V5V6aSomeVamiddleamk splitainfix ++allisaConsainfix @amdlampapadV4V5V6Iainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7arlisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FANainfix =arlisaNilCfaNonealower_bound_strictakeyV15aleftamk splitV11V12ainfix ++V13aConsainfix @amdlampapadarlisAalower_boundakeyV15arightamk splitV11V12ainfix ++V13aConsainfix @amdlampapadarlisaSomeVamiddleamk splitV11V12ainfix ++V13aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV14aConsV16arightV14aSomeVainfix ++aleftV14arightV14aNoneamiddleV14allisACfaNonealower_bound_strictakeyV17aleftV14Aalower_boundakeyV17arightV14aSomeVamiddleV14Lamk splitV11V12V13FANainfix =allisaNilainfix =V3c0Oainfix &lt;V3c0IaeqV18V19qainfix =V3c0AaltV18V19qainfix &lt;V3c0AaltV19V18qainfix &lt;c0V3LamV0LamV1FIacV0AacV1INainfix =V2c0Oainfix &lt;V2c0IaeqV20V21qainfix =V2c0AaltV20V21qainfix &lt;V2c0AaltV21V20qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+          <label
+           name="expl:VC for selected_part"/>
+          <transf
+           name="split_goal_wp"
+           proved="true"
+           expanded="false">
+           <goal
+            name="WP_parameter selected_part.6.1.1.1"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="1. postcondition"
+            sum="6d9390be9f7c377e29d4794a1ccddd1a"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCNainfix =allisaNilIainfix =V3c0Oainfix &lt;V3c0IaeqV4V5qainfix =V3c0AaltV4V5qainfix &lt;V3c0AaltV5V4qainfix &lt;c0V3LamV0LamV1FIacV0AacV1INainfix =V2c0Oainfix &lt;V2c0IaeqV6V7qainfix =V2c0AaltV6V7qainfix &lt;V2c0AaltV7V6qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.03"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.6.1.1.2"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="2. postcondition"
+            sum="e51fd035fe5a8a082c33dc6e7ddc46db"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCfaNonetaSomeVamiddleamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7allisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FIainfix =V3c0Oainfix &lt;V3c0IaeqV11V12qainfix =V3c0AaltV11V12qainfix &lt;V3c0AaltV12V11qainfix &lt;c0V3LamV0LamV1FIacV0AacV1INainfix =V2c0Oainfix &lt;V2c0IaeqV13V14qainfix =V2c0AaltV13V14qainfix &lt;V2c0AaltV14V13qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.03"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.6.1.1.3"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="3. postcondition"
+            sum="b5db57f1c65c45808b79b23eca8893ae"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCtaNonealower_boundakeyV8arightamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisaSomeVamiddleamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7allisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FIainfix =V3c0Oainfix &lt;V3c0IaeqV11V12qainfix =V3c0AaltV11V12qainfix &lt;V3c0AaltV12V11qainfix &lt;c0V3LamV0LamV1FIacV0AacV1INainfix =V2c0Oainfix &lt;V2c0IaeqV13V14qainfix =V2c0AaltV13V14qainfix &lt;V2c0AaltV14V13qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="2.08"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.6.1.1.4"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="4. postcondition"
+            sum="fc976afbb246eca9bf64e2f67e635a1d"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCtaNonealower_bound_strictakeyV8aleftamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisaSomeVamiddleamk splitV4V5ainfix ++V6aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7allisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FIainfix =V3c0Oainfix &lt;V3c0IaeqV11V12qainfix =V3c0AaltV11V12qainfix &lt;V3c0AaltV12V11qainfix &lt;c0V3LamV0LamV1FIacV0AacV1INainfix =V2c0Oainfix &lt;V2c0IaeqV13V14qainfix =V2c0AaltV13V14qainfix &lt;V2c0AaltV14V13qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="3"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.04"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.6.1.1.5"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="5. postcondition"
+            sum="658022e653a1db520949355f20c378a0"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCNainfix =arlisaNilINainfix =V3c0Oainfix &lt;V3c0IaeqV4V5qainfix =V3c0AaltV4V5qainfix &lt;V3c0AaltV5V4qainfix &lt;c0V3LamV0LamV1FIacV0AacV1INainfix =V2c0Oainfix &lt;V2c0IaeqV6V7qainfix =V2c0AaltV6V7qainfix &lt;V2c0AaltV7V6qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.03"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.6.1.1.6"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="6. postcondition"
+            sum="c8ff4957f7e43b57334ec3243d74099b"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCfaNonetaSomeVamiddleamk splitainfix ++allisaConsainfix @amdlampapadV4V5V6Iainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7arlisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FINainfix =V3c0Oainfix &lt;V3c0IaeqV11V12qainfix =V3c0AaltV11V12qainfix &lt;V3c0AaltV12V11qainfix &lt;c0V3LamV0LamV1FIacV0AacV1INainfix =V2c0Oainfix &lt;V2c0IaeqV13V14qainfix =V2c0AaltV13V14qainfix &lt;V2c0AaltV14V13qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.05"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.6.1.1.7"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="7. postcondition"
+            sum="04db1198dc352ad1fca44d2b4d5a526c"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCtaNonealower_boundakeyV8arightamk splitainfix ++allisaConsainfix @amdlampapadV4V5V6aSomeVamiddleamk splitainfix ++allisaConsainfix @amdlampapadV4V5V6Iainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7arlisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FINainfix =V3c0Oainfix &lt;V3c0IaeqV11V12qainfix =V3c0AaltV11V12qainfix &lt;V3c0AaltV12V11qainfix &lt;c0V3LamV0LamV1FIacV0AacV1INainfix =V2c0Oainfix &lt;V2c0IaeqV13V14qainfix =V2c0AaltV13V14qainfix &lt;V2c0AaltV14V13qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.04"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.6.1.1.8"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="8. postcondition"
+            sum="fb56d36b64219b52c8a626007a294cd7"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCCtaNonealower_bound_strictakeyV8aleftamk splitainfix ++allisaConsainfix @amdlampapadV4V5V6aSomeVamiddleamk splitainfix ++allisaConsainfix @amdlampapadV4V5V6Iainfix =Cainfix ++aleftV7aConsV9arightV7aSomeVainfix ++aleftV7arightV7aNoneamiddleV7arlisACfaNonealower_bound_strictakeyV10aleftV7Aalower_boundakeyV10arightV7aSomeVamiddleV7Lamk splitV4V5V6FINainfix =V3c0Oainfix &lt;V3c0IaeqV11V12qainfix =V3c0AaltV11V12qainfix &lt;V3c0AaltV12V11qainfix &lt;c0V3LamV0LamV1FIacV0AacV1INainfix =V2c0Oainfix &lt;V2c0IaeqV13V14qainfix =V2c0AaltV13V14qainfix &lt;V2c0AaltV14V13qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaSomeVtaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="2.24"/>
+            </proof>
+           </goal>
+          </transf>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.7"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="7. precondition"
+      sum="11708ec41f6b3f3ec3ec09cc9197eca8"
+      proved="true"
+      expanded="false"
+      shape="preconditionCCtaSomeVacV10AacV9aNoneV4aSomeVtaNoneV6ICainfix =V3aNilaNoneaeqakeyV13V12AamemV13V3EAalower_boundV12V3aSomeVasumeainfix =ainfix @V14V15ameasureV15FV3ICainfix =V2aNilaNoneaeqakeyV17V16AamemV17V2EAalower_boundV16V2aSomeVasumeainfix =ainfix @V18V19ameasureV19FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV20aSomeVV6ACtaNoneacV21aSomeVV4Aainfix =CaNoneaNoneaSomeamV22aSomeVV6asumeainfix =ainfix @V23V24ameasureV24FV3Aainfix =CaNoneaNoneaSomeamV25aSomeVV4asumeainfix =ainfix @V26V27ameasureV27FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.8"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="8. postcondition"
+      sum="19ae06e28d3785c55f1991fb492ed9e3"
+      proved="true"
+      expanded="false"
+      shape="postconditionCCtaSomeViaselectedV7amk splitainfix ++V2aConsainfix @amdlampV8V5V13V14V15Iainfix =arebuildV16V3AaselectedaTuple0V16Lamk splitV13V14V15FANainfix =V3aNilaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3ainfix &lt;=V12c0IaeqV17V18qainfix =V12c0AaltV17V18qainfix &lt;V12c0AaltV18V17qainfix &gt;V12c0LamV10LamV9FIacV10AacV9aNoneV4aSomeVtaNoneV6ICainfix =V3aNilaNoneaeqakeyV20V19AamemV20V3EAalower_boundV19V3aSomeVasumeainfix =ainfix @V21V22ameasureV22FV3ICainfix =V2aNilaNoneaeqakeyV24V23AamemV24V2EAalower_boundV23V2aSomeVasumeainfix =ainfix @V25V26ameasureV26FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV27aSomeVV6ACtaNoneacV28aSomeVV4Aainfix =CaNoneaNoneaSomeamV29aSomeVV6asumeainfix =ainfix @V30V31ameasureV31FV3Aainfix =CaNoneaNoneaSomeamV32aSomeVV4asumeainfix =ainfix @V33V34ameasureV34FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <transf
+       name="introduce_premises"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter selected_part.8.1"
+        locfile="../priority_queue.mlw"
+        loclnum="132" loccnumb="6" loccnume="19"
+        expl="1. postcondition"
+        sum="ec67b1e497ffe9d98934209975619aad"
+        proved="true"
+        expanded="false"
+        shape="postconditionCCtaSomeViaselectedasamk splitainfix ++allisaConsainfix @amdlampapadV3V4V5Iainfix =arebuildV6arlisAaselectedaTuple0V6Lamk splitV3V4V5FANainfix =arlisaNilaselectedasamk splitallisaSomeainfix @amdlampapadarlisainfix &lt;=V2c0IaeqV7V8qainfix =V2c0AaltV7V8qainfix &lt;V2c0AaltV8V7qainfix &gt;V2c0LamV0LamakdFIacV0AacakdaNoneaslaSomeVtaNoneasr">
+        <label
+         name="expl:VC for selected_part"/>
+        <transf
+         name="inline_goal"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter selected_part.8.1.1"
+          locfile="../priority_queue.mlw"
+          loclnum="132" loccnumb="6" loccnume="19"
+          expl="1. postcondition"
+          sum="b6256dd45ca42698631820dc4ae2c3a8"
+          proved="true"
+          expanded="false"
+          shape="postconditionCCtaSomeViCfaNonealower_bound_strictakeyV7aleftamk splitainfix ++allisaConsainfix @amdlampapadV3V4V5Aalower_boundakeyV7arightamk splitainfix ++allisaConsainfix @amdlampapadV3V4V5aSomeVamiddleamk splitainfix ++allisaConsainfix @amdlampapadV3V4V5Iainfix =Cainfix ++aleftV6aConsV8arightV6aSomeVainfix ++aleftV6arightV6aNoneamiddleV6arlisACfaNonealower_bound_strictakeyV9aleftV6Aalower_boundakeyV9arightV6aSomeVamiddleV6Lamk splitV3V4V5FANainfix =arlisaNilCfaNonealower_bound_strictakeyV10aleftamk splitallisaSomeainfix @amdlampapadarlisAalower_boundakeyV10arightamk splitallisaSomeainfix @amdlampapadarlisaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisainfix =V2c0Oainfix &lt;V2c0IaeqV11V12qainfix =V2c0AaltV11V12qainfix &lt;V2c0AaltV12V11qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaNoneaslaSomeVtaNoneasr">
+          <label
+           name="expl:VC for selected_part"/>
+          <transf
+           name="split_goal_wp"
+           proved="true"
+           expanded="false">
+           <goal
+            name="WP_parameter selected_part.8.1.1.1"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="1. postcondition"
+            sum="ebd8bc7362c1c6fa65d63229b2d608d5"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCtaSomeVCfaNonetaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisIainfix =V2c0Oainfix &lt;V2c0IaeqV4V5qainfix =V2c0AaltV4V5qainfix &lt;V2c0AaltV5V4qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.08"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.8.1.1.2"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="2. postcondition"
+            sum="01a3dd9897a64761c232adae74d5f270"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCtaSomeVCtaNonealower_boundakeyV3arightamk splitallisaSomeainfix @amdlampapadarlisaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisIainfix =V2c0Oainfix &lt;V2c0IaeqV4V5qainfix =V2c0AaltV4V5qainfix &lt;V2c0AaltV5V4qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.18"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.8.1.1.3"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="3. postcondition"
+            sum="db082b781fba5098ee4ddeb3f77a852c"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCtaSomeVCtaNonealower_bound_strictakeyV3aleftamk splitallisaSomeainfix @amdlampapadarlisaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisIainfix =V2c0Oainfix &lt;V2c0IaeqV4V5qainfix =V2c0AaltV4V5qainfix &lt;V2c0AaltV5V4qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="3"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.03"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.8.1.1.4"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="4. postcondition"
+            sum="9b3ea27ab3cb663826691cb8066ef094"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCtaSomeVNainfix =arlisaNilINainfix =V2c0Oainfix &lt;V2c0IaeqV3V4qainfix =V2c0AaltV3V4qainfix &lt;V2c0AaltV4V3qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="0"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.02"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.8.1.1.5"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="5. postcondition"
+            sum="d6715be64d16fc2f1dff1ed18a8f504a"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCtaSomeVCfaNonetaSomeVamiddleamk splitainfix ++allisaConsainfix @amdlampapadV3V4V5Iainfix =Cainfix ++aleftV6aConsV8arightV6aSomeVainfix ++aleftV6arightV6aNoneamiddleV6arlisACfaNonealower_bound_strictakeyV9aleftV6Aalower_boundakeyV9arightV6aSomeVamiddleV6Lamk splitV3V4V5FINainfix =V2c0Oainfix &lt;V2c0IaeqV10V11qainfix =V2c0AaltV10V11qainfix &lt;V2c0AaltV11V10qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.08"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.8.1.1.6"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="6. postcondition"
+            sum="17f99039a41db39ebab08e2cc5f455e4"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCtaSomeVCtaNonealower_boundakeyV7arightamk splitainfix ++allisaConsainfix @amdlampapadV3V4V5aSomeVamiddleamk splitainfix ++allisaConsainfix @amdlampapadV3V4V5Iainfix =Cainfix ++aleftV6aConsV8arightV6aSomeVainfix ++aleftV6arightV6aNoneamiddleV6arlisACfaNonealower_bound_strictakeyV9aleftV6Aalower_boundakeyV9arightV6aSomeVamiddleV6Lamk splitV3V4V5FINainfix =V2c0Oainfix &lt;V2c0IaeqV10V11qainfix =V2c0AaltV10V11qainfix &lt;V2c0AaltV11V10qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.08"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.8.1.1.7"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="7. postcondition"
+            sum="bdd9c805f75b5290380708c2d21a5774"
+            proved="true"
+            expanded="false"
+            shape="postconditionCCtaSomeVCtaNonealower_bound_strictakeyV7aleftamk splitainfix ++allisaConsainfix @amdlampapadV3V4V5aSomeVamiddleamk splitainfix ++allisaConsainfix @amdlampapadV3V4V5Iainfix =Cainfix ++aleftV6aConsV8arightV6aSomeVainfix ++aleftV6arightV6aNoneamiddleV6arlisACfaNonealower_bound_strictakeyV9aleftV6Aalower_boundakeyV9arightV6aSomeVamiddleV6Lamk splitV3V4V5FINainfix =V2c0Oainfix &lt;V2c0IaeqV10V11qainfix =V2c0AaltV10V11qainfix &lt;V2c0AaltV11V10qainfix &lt;c0V2LamV0LamakdFIacV0AacakdaNoneaslaSomeVtaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.30"/>
+            </proof>
+           </goal>
+          </transf>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.9"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="9. precondition"
+      sum="e2d21051c26f7bba9930891cee7d6405"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaSomeVCacV11AacV9aSomeVtaNoneV4aNoneV6ICainfix =V3aNilaNoneaeqakeyV13V12AamemV13V3EAalower_boundV12V3aSomeVasumeainfix =ainfix @V14V15ameasureV15FV3ICainfix =V2aNilaNoneaeqakeyV17V16AamemV17V2EAalower_boundV16V2aSomeVasumeainfix =ainfix @V18V19ameasureV19FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV20aSomeVV6ACtaNoneacV21aSomeVV4Aainfix =CaNoneaNoneaSomeamV22aSomeVV6asumeainfix =ainfix @V23V24ameasureV24FV3Aainfix =CaNoneaNoneaSomeamV25aSomeVV4asumeainfix =ainfix @V26V27ameasureV27FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.10"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="10. postcondition"
+      sum="1ebd8f3ad82cd60b11f8a448980ee609"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaSomeVCiaselectedV7amk splitV13V14ainfix ++V15aConsainfix @amdlampV8V5V3Iainfix =arebuildV16V2AaselectedaTuple0V16Lamk splitV13V14V15FANainfix =V2aNilaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3ainfix &lt;V12c0IaeqV17V18qainfix =V12c0AaltV17V18qainfix &lt;V12c0AaltV18V17qainfix &gt;V12c0LamV11LamV9FIacV11AacV9aSomeVtaNoneV4aNoneV6ICainfix =V3aNilaNoneaeqakeyV20V19AamemV20V3EAalower_boundV19V3aSomeVasumeainfix =ainfix @V21V22ameasureV22FV3ICainfix =V2aNilaNoneaeqakeyV24V23AamemV24V2EAalower_boundV23V2aSomeVasumeainfix =ainfix @V25V26ameasureV26FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV27aSomeVV6ACtaNoneacV28aSomeVV4Aainfix =CaNoneaNoneaSomeamV29aSomeVV6asumeainfix =ainfix @V30V31ameasureV31FV3Aainfix =CaNoneaNoneaSomeamV32aSomeVV4asumeainfix =ainfix @V33V34ameasureV34FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <transf
+       name="introduce_premises"
+       proved="true"
+       expanded="false">
+       <goal
+        name="WP_parameter selected_part.10.1"
+        locfile="../priority_queue.mlw"
+        loclnum="132" loccnumb="6" loccnume="19"
+        expl="1. postcondition"
+        sum="3521adae2aa213c2da360711ffd92b99"
+        proved="true"
+        expanded="false"
+        shape="postconditionCtaSomeVCiaselectedasamk splitV3V4ainfix ++V5aConsainfix @amdlampapadarlisIainfix =arebuildV6allisAaselectedaTuple0V6Lamk splitV3V4V5FANainfix =allisaNilaselectedasamk splitallisaSomeainfix @amdlampapadarlisainfix &lt;V2c0IaeqV7V8qainfix =V2c0AaltV7V8qainfix &lt;V2c0AaltV8V7qainfix &gt;V2c0LamV1LamakdFIacV1AacakdaSomeVtaNoneaslaNoneasr">
+        <label
+         name="expl:VC for selected_part"/>
+        <transf
+         name="inline_goal"
+         proved="true"
+         expanded="false">
+         <goal
+          name="WP_parameter selected_part.10.1.1"
+          locfile="../priority_queue.mlw"
+          loclnum="132" loccnumb="6" loccnume="19"
+          expl="1. postcondition"
+          sum="de0f36217d6fc09337f5b5af5b788aa9"
+          proved="true"
+          expanded="false"
+          shape="postconditionCtaSomeVCiCfaNonealower_bound_strictakeyV7aleftamk splitV3V4ainfix ++V5aConsainfix @amdlampapadarlisAalower_boundakeyV7arightamk splitV3V4ainfix ++V5aConsainfix @amdlampapadarlisaSomeVamiddleamk splitV3V4ainfix ++V5aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV6aConsV8arightV6aSomeVainfix ++aleftV6arightV6aNoneamiddleV6allisACfaNonealower_bound_strictakeyV9aleftV6Aalower_boundakeyV9arightV6aSomeVamiddleV6Lamk splitV3V4V5FANainfix =allisaNilCfaNonealower_bound_strictakeyV10aleftamk splitallisaSomeainfix @amdlampapadarlisAalower_boundakeyV10arightamk splitallisaSomeainfix @amdlampapadarlisaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisainfix &lt;V2c0IaeqV11V12qainfix =V2c0AaltV11V12qainfix &lt;V2c0AaltV12V11qainfix &lt;c0V2LamV1LamakdFIacV1AacakdaSomeVtaNoneaslaNoneasr">
+          <label
+           name="expl:VC for selected_part"/>
+          <transf
+           name="split_goal_wp"
+           proved="true"
+           expanded="false">
+           <goal
+            name="WP_parameter selected_part.10.1.1.1"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="1. postcondition"
+            sum="76e9d730613912d5461e51ae86219f7d"
+            proved="true"
+            expanded="false"
+            shape="postconditionCtaSomeVCCfaNonetaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisIainfix &lt;V2c0IaeqV4V5qainfix =V2c0AaltV4V5qainfix &lt;V2c0AaltV5V4qainfix &lt;c0V2LamV1LamakdFIacV1AacakdaSomeVtaNoneaslaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.07"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.10.1.1.2"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="2. postcondition"
+            sum="2af5d42c0bd94d7d124f499460468aed"
+            proved="true"
+            expanded="false"
+            shape="postconditionCtaSomeVCCtaNonealower_boundakeyV3arightamk splitallisaSomeainfix @amdlampapadarlisaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisIainfix &lt;V2c0IaeqV4V5qainfix =V2c0AaltV4V5qainfix &lt;V2c0AaltV5V4qainfix &lt;c0V2LamV1LamakdFIacV1AacakdaSomeVtaNoneaslaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.84"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.10.1.1.3"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="3. postcondition"
+            sum="e71c76d1d1f921b551b2a9530088b292"
+            proved="true"
+            expanded="false"
+            shape="postconditionCtaSomeVCCtaNonealower_bound_strictakeyV3aleftamk splitallisaSomeainfix @amdlampapadarlisaSomeVamiddleamk splitallisaSomeainfix @amdlampapadarlisIainfix &lt;V2c0IaeqV4V5qainfix =V2c0AaltV4V5qainfix &lt;V2c0AaltV5V4qainfix &lt;c0V2LamV1LamakdFIacV1AacakdaSomeVtaNoneaslaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="3"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="2.49"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.10.1.1.4"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="4. postcondition"
+            sum="72333e1fab64169fb9e477f98ac371ac"
+            proved="true"
+            expanded="false"
+            shape="postconditionCtaSomeVCNainfix =allisaNilINainfix &lt;V2c0IaeqV3V4qainfix =V2c0AaltV3V4qainfix &lt;V2c0AaltV4V3qainfix &lt;c0V2LamV1LamakdFIacV1AacakdaSomeVtaNoneaslaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.06"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.10.1.1.5"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="5. postcondition"
+            sum="b1f0a916b9676506b59bcbe1d9e4cde6"
+            proved="true"
+            expanded="false"
+            shape="postconditionCtaSomeVCCfaNonetaSomeVamiddleamk splitV3V4ainfix ++V5aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV6aConsV8arightV6aSomeVainfix ++aleftV6arightV6aNoneamiddleV6allisACfaNonealower_bound_strictakeyV9aleftV6Aalower_boundakeyV9arightV6aSomeVamiddleV6Lamk splitV3V4V5FINainfix &lt;V2c0IaeqV10V11qainfix =V2c0AaltV10V11qainfix &lt;V2c0AaltV11V10qainfix &lt;c0V2LamV1LamakdFIacV1AacakdaSomeVtaNoneaslaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.06"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.10.1.1.6"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="6. postcondition"
+            sum="721499d52f8b868659485f8602b327df"
+            proved="true"
+            expanded="false"
+            shape="postconditionCtaSomeVCCtaNonealower_boundakeyV7arightamk splitV3V4ainfix ++V5aConsainfix @amdlampapadarlisaSomeVamiddleamk splitV3V4ainfix ++V5aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV6aConsV8arightV6aSomeVainfix ++aleftV6arightV6aNoneamiddleV6allisACfaNonealower_bound_strictakeyV9aleftV6Aalower_boundakeyV9arightV6aSomeVamiddleV6Lamk splitV3V4V5FINainfix &lt;V2c0IaeqV10V11qainfix =V2c0AaltV10V11qainfix &lt;V2c0AaltV11V10qainfix &lt;c0V2LamV1LamakdFIacV1AacakdaSomeVtaNoneaslaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="1.91"/>
+            </proof>
+           </goal>
+           <goal
+            name="WP_parameter selected_part.10.1.1.7"
+            locfile="../priority_queue.mlw"
+            loclnum="132" loccnumb="6" loccnume="19"
+            expl="7. postcondition"
+            sum="7941872e5d05098cafa9d747dff81a23"
+            proved="true"
+            expanded="false"
+            shape="postconditionCtaSomeVCCtaNonealower_bound_strictakeyV7aleftamk splitV3V4ainfix ++V5aConsainfix @amdlampapadarlisaSomeVamiddleamk splitV3V4ainfix ++V5aConsainfix @amdlampapadarlisIainfix =Cainfix ++aleftV6aConsV8arightV6aSomeVainfix ++aleftV6arightV6aNoneamiddleV6allisACfaNonealower_bound_strictakeyV9aleftV6Aalower_boundakeyV9arightV6aSomeVamiddleV6Lamk splitV3V4V5FINainfix &lt;V2c0IaeqV10V11qainfix =V2c0AaltV10V11qainfix &lt;V2c0AaltV11V10qainfix &lt;c0V2LamV1LamakdFIacV1AacakdaSomeVtaNoneaslaNoneasr">
+            <label
+             name="expl:VC for selected_part"/>
+            <proof
+             prover="2"
+             timelimit="5"
+             memlimit="1000"
+             obsolete="false"
+             archived="false">
+             <result status="valid" time="0.06"/>
+            </proof>
+           </goal>
+          </transf>
+         </goal>
+        </transf>
+       </goal>
+      </transf>
+     </goal>
+     <goal
+      name="WP_parameter selected_part.11"
+      locfile="../priority_queue.mlw"
+      loclnum="132" loccnumb="6" loccnume="19"
+      expl="11. postcondition"
+      sum="ae36b263f68bf133d682e61b6822b2d6"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaSomeVCtaSomeVaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3aNoneV4aNoneV6ICainfix =V3aNilaNoneaeqakeyV13V12AamemV13V3EAalower_boundV12V3aSomeVasumeainfix =ainfix @V14V15ameasureV15FV3ICainfix =V2aNilaNoneaeqakeyV17V16AamemV17V2EAalower_boundV16V2aSomeVasumeainfix =ainfix @V18V19ameasureV19FV2Iainfix =akeyainfix @amdlampV8V5amV9AacV9FIainfix =ainfix @ainvampV8V5aTrueICtaNoneacV20aSomeVV6ACtaNoneacV21aSomeVV4Aainfix =CaNoneaNoneaSomeamV22aSomeVV6asumeainfix =ainfix @V23V24ameasureV24FV3Aainfix =CaNoneaNoneaSomeamV25aSomeVV4asumeainfix =ainfix @V26V27ameasureV27FV2Aainfix =ainfix @ainvampV8V5aTrueLamk type_paramsV0V1LaTuple0F">
+      <label
+       name="expl:VC for selected_part"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter first_minimum_caracterisation"
+    locfile="../priority_queue.mlw"
+    loclnum="180" loccnumb="16" loccnume="45"
+    expl="VC for first_minimum_caracterisation"
+    sum="ef874124e3a8a11ca2fdac0b93c91f56"
+    proved="true"
+    expanded="false"
+    shape="CfaNoneCCCainfix =Cadefault_elementaNilafirst_minimum_accV6V7aConsVVarebuildV3V5aSomeVfaNoneV1aNilCainfix =Cadefault_elementaNilafirst_minimum_accV11V12aConsVVarebuildV3V10aSomeVfaNoneV1ICainfix =Cadefault_elementaNilafirst_minimum_accV14V15aConsVVarebuildV9V13aSomeVfaNoneV1AaselectedaTuple0V9ANainfix =V1aNoneACfaNilainfix =V16V8aConswVV2Lamk splitV0V1V8aConswVV2aNilCainfix =Cadefault_elementaNilafirst_minimum_accV20V21aConsVVarebuildV3V19aSomeVfaNoneV1Iainfix =afirst_minimum_accV22arebuildV18V4IaltakeyV4akeyV22FAaselectedaTuple0V18Aainfix =V1aSomeV4Lamk splitV17V1V2aConswVV0ACCainfix =afirst_minimum_accV27arebuildV26V4IaltakeyV4akeyV27FaNilainfix =afirst_minimum_accV30arebuildV26V4IaltakeyV4akeyV30FIainfix =afirst_minimum_accV31arebuildV29V4IaltakeyV4akeyV31FAaselectedaTuple0V29Aainfix =V24aSomeV4Aainfix &lt;ainfix +alengthV23alengthV28ainfix +alengthV23alengthV25Aainfix &lt;=c0ainfix +alengthV23alengthV25Lamk splitV23V24V28aConswVV25aNilainfix =afirst_minimum_accV34arebuildV26V4IaltakeyV4akeyV34FIainfix =afirst_minimum_accV35arebuildV33V4IaltakeyV4akeyV35FAaselectedaTuple0V33Aainfix =V24aSomeV4Aainfix &lt;ainfix +alengthV32alengthV25ainfix +alengthV23alengthV25Aainfix &lt;=c0ainfix +alengthV23alengthV25Lamk splitV32V24V25aConswVV23IaselectedaTuple0V26Aainfix =V24aSomeV4Lamk splitV23V24V25FaSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for first_minimum_caracterisation"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter first_minimum_caracterisation.1"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="1. unreachable point"
+      sum="7a970bc6f123970c10f820b6f246785c"
+      proved="true"
+      expanded="false"
+      shape="unreachable pointCfaNonetaSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.2"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="2. postcondition"
+      sum="27d1866de3264cc48eb25d3940998d69"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCCainfix =afirst_minimum_accV9arebuildV8V4IaltakeyV4akeyV9FaNiltaConswVV7aNiltaConswVV5IaselectedaTuple0V8Aainfix =V6aSomeV4Lamk splitV5V6V7FaSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.3"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="3. variant decrease"
+      sum="5606339919d2b2fe57652cf528a82915"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNoneCCtaNilainfix &lt;ainfix +alengthV5alengthV9ainfix +alengthV5alengthV7Aainfix &lt;=c0ainfix +alengthV5alengthV7Lamk splitV5V6V9aConswVV7aNiltaConswVV5IaselectedaTuple0V8Aainfix =V6aSomeV4Lamk splitV5V6V7FaSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.4"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="4. precondition"
+      sum="e8cf991e1b006261a22410dff650e251"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaNoneCCtaNilaselectedaTuple0V10Aainfix =V6aSomeV4Lamk splitV5V6V9aConswVV7aNiltaConswVV5IaselectedaTuple0V8Aainfix =V6aSomeV4Lamk splitV5V6V7FaSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.91"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.5"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="5. postcondition"
+      sum="890bab09dd2d15aea283f11fa0e4013d"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCCtaNilainfix =afirst_minimum_accV11arebuildV8V4IaltakeyV4akeyV11FIainfix =afirst_minimum_accV12arebuildV10V4IaltakeyV4akeyV12FIaselectedaTuple0V10Aainfix =V6aSomeV4Lamk splitV5V6V9aConswVV7aNiltaConswVV5IaselectedaTuple0V8Aainfix =V6aSomeV4Lamk splitV5V6V7FaSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.72"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.6"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="6. variant decrease"
+      sum="9ae1ab7d6a8bdd062d2a501a462cffde"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNoneCtaNilainfix &lt;ainfix +alengthV9alengthV7ainfix +alengthV5alengthV7Aainfix &lt;=c0ainfix +alengthV5alengthV7Lamk splitV9V6V7aConswVV5IaselectedaTuple0V8Aainfix =V6aSomeV4Lamk splitV5V6V7FaSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.7"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="7. precondition"
+      sum="ead988a0bfe50b975cbbe54269a0fa0c"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaNoneCtaNilaselectedaTuple0V10Aainfix =V6aSomeV4Lamk splitV9V6V7aConswVV5IaselectedaTuple0V8Aainfix =V6aSomeV4Lamk splitV5V6V7FaSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.35"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.8"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="8. postcondition"
+      sum="b9ae5fa2f5ef5c593188cbfe9addee0a"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCtaNilainfix =afirst_minimum_accV11arebuildV8V4IaltakeyV4akeyV11FIainfix =afirst_minimum_accV12arebuildV10V4IaltakeyV4akeyV12FIaselectedaTuple0V10Aainfix =V6aSomeV4Lamk splitV9V6V7aConswVV5IaselectedaTuple0V8Aainfix =V6aSomeV4Lamk splitV5V6V7FaSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.83"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.9"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="9. postcondition"
+      sum="c90adba62dd8fa07927e0b291914e440"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCCCainfix =Cadefault_elementaNilafirst_minimum_accV6V7aConsVVarebuildV3V5aSomeVfaNoneV1aNiltaConswVV2aNiltaConswVV0aSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.10"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="10. variant decrease"
+      sum="234d37fc1bd2e6b9b4021b641166dae0"
+      proved="true"
+      expanded="false"
+      shape="variant decreaseCtaNoneCCtaNilCfaNilainfix =V7V5aConswVV2Lamk splitV0V1V5aConswVV2aNiltaConswVV0aSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.11"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="11. precondition"
+      sum="cb6b70eb3d2118e789060b0284873125"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaNoneCCtaNilaselectedaTuple0V6ANainfix =V1aNoneLamk splitV0V1V5aConswVV2aNiltaConswVV0aSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.37"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.12"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="12. postcondition"
+      sum="c87e28eb55c318ef51514f2494dda2d5"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCCtaNilCainfix =Cadefault_elementaNilafirst_minimum_accV8V9aConsVVarebuildV3V7aSomeVfaNoneV1ICainfix =Cadefault_elementaNilafirst_minimum_accV11V12aConsVVarebuildV6V10aSomeVfaNoneV1IaselectedaTuple0V6ANainfix =V1aNoneLamk splitV0V1V5aConswVV2aNiltaConswVV0aSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.11"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.13"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="13. precondition"
+      sum="8b3a8ce15ac0c8df390d893d75031674"
+      proved="true"
+      expanded="false"
+      shape="preconditionCtaNoneCtaNilaselectedaTuple0V6Aainfix =V1aSomeV4Lamk splitV5V1V2aConswVV0aSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.25"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter first_minimum_caracterisation.14"
+      locfile="../priority_queue.mlw"
+      loclnum="180" loccnumb="16" loccnume="45"
+      expl="14. postcondition"
+      sum="c904abe7445fcb00b6c8adf0c3a05a66"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneCtaNilCainfix =Cadefault_elementaNilafirst_minimum_accV8V9aConsVVarebuildV3V7aSomeVfaNoneV1Iainfix =afirst_minimum_accV10arebuildV6V4IaltakeyV4akeyV10FIaselectedaTuple0V6Aainfix =V1aSomeV4Lamk splitV5V1V2aConswVV0aSomeVV1IaselectedaTuple0V3ANainfix =V1aNoneLamk splitV0V1V2F">
+      <label
+       name="why3:lemma"/>
+      <label
+       name="expl:VC for first_minimum_caracterisation"/>
+      <proof
+       prover="3"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.40"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="assoc"
+    locfile="../monoid.mlw"
+    loclnum="9" loccnumb="8" loccnume="13"
+    sum="a8e4e54aee9b08a30a4496b7d63b3268"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aopV0aopV1V2aopaopV0V1V2F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="neutral"
+    locfile="../monoid.mlw"
+    loclnum="10" loccnumb="8" loccnume="15"
+    sum="c7be5da490805ec4d2df6048f9d4cfbf"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V0aopazeroV0Aainfix =aopV0azeroV0F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="sum_def_nil"
+    locfile="../monoid.mlw"
+    loclnum="22" loccnumb="8" loccnume="19"
+    sum="f47c48262e8548567912af9f263b2354"
+    proved="true"
+    expanded="false"
+    shape="ainfix =asumV0aNilazeroF">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="sum_def_cons"
+    locfile="../monoid.mlw"
+    loclnum="23" loccnumb="8" loccnume="20"
+    sum="042d62d97ab7f41603210f658ca95201"
+    proved="true"
+    expanded="false"
+    shape="ainfix =asumV0aConsV1V2aopainfix @V0V1asumV0V2F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="balancing_positive"
+    locfile="../avl.mlw"
+    loclnum="74" loccnumb="8" loccnume="26"
+    sum="822556d2880971946192ea89e16e8d5f"
+    proved="true"
+    expanded="false"
+    shape="ainfix &gt;abalancingc0">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="selection_empty"
+    locfile="../avl.mlw"
+    loclnum="520" loccnumb="8" loccnume="23"
+    sum="f4e94fa37d298270313bb753d0c12fce"
+    proved="true"
+    expanded="false"
+    shape="aselectedV0amk splitV1aNoneV1Iaselection_possibleV0V1LaNilF">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter avl  AVL  M zero"
+    locfile="../monoid.mlw"
+    loclnum="58" loccnumb="6" loccnume="10"
+    expl="VC for avl  AVL  M zero"
+    sum="14abf0b3ece9afb66e0e69f9c32d89d3"
+    proved="true"
+    expanded="false"
+    shape="t">
+    <label
+     name="expl:VC for avl  AVL  M zero"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter avl  AVL  M op"
+    locfile="../monoid.mlw"
+    loclnum="61" loccnumb="6" loccnume="8"
+    expl="VC for avl  AVL  M op"
+    sum="dea6502a37fa4866040df872c20f3532"
+    proved="true"
+    expanded="false"
+    shape="ainfix =CaNoneaNoneaSomeamV3aSomeVV2aopCaNoneaNoneaSomeamV4aSomeVV0CaNoneaNoneaSomeamV5aSomeVV1ACtaNoneacV6aSomeVV2ICtaNoneacV7aSomeVV2Aainfix =CaNoneaNoneaSomeamV8aSomeVV2aopCaNoneaNoneaSomeamV9aSomeVV0CaNoneaNoneaSomeamV10aSomeVV1FACtaNoneacV11aSomeVV1ACtaNoneacV12aSomeVV0ICtaNoneacV13aSomeVV1ACtaNoneacV14aSomeVV0F">
+    <label
+     name="expl:VC for avl  AVL  M op"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter avl  AVL  D measure"
+    locfile="../avl.mlw"
+    loclnum="62" loccnumb="8" loccnume="15"
+    expl="VC for avl  AVL  D measure"
+    sum="5f41393ddf15fc7bc9d039a1064dbea3"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ameasureainfix @amdlampV3V2CaNoneaNoneaSomeamV5aSomeVV4ACtaNoneacV6aSomeVV4ICtaNoneacV7aSomeVV4Aainfix =CaNoneaNoneaSomeamV8aSomeVV4ameasureainfix @amdlampV3V2FAainfix =ainfix @ainvampV3V2aTrueIainfix =ainfix @ainvampV3V2aTrueLamk type_paramsV0V1F">
+    <label
+     name="expl:VC for avl  AVL  D measure"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter avl  AVL  selected_part"
+    locfile="../avl.mlw"
+    loclnum="525" loccnumb="6" loccnume="19"
+    expl="VC for avl  AVL  selected_part"
+    sum="ca0af8ca41acf7c334e4b04302c7337f"
+    proved="true"
+    expanded="false"
+    shape="CaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3aHereaselectedV7amk splitV11V12ainfix ++V13aConsainfix @amdlampV8V5V3Iainfix =arebuildV14V2AaselectedV10V14Lamk splitV11V12V13FANainfix =V2aNilaLeftVaselectedV7amk splitainfix ++V2aConsainfix @amdlampV8V5V16V17V18Iainfix =arebuildV19V3AaselectedV15V19Lamk splitV16V17V18FANainfix =V3aNilaRightVV9ICaselectedV7amk splitV2aSomeainfix @amdlampV8V5V3aHereaselectedV7amk splitV21V22ainfix ++V23aConsainfix @amdlampV8V5V3Iainfix =arebuildV24V2AaselectedV20V24Lamk splitV21V22V23FANainfix =V2aNilaLeftVaselectedV7amk splitainfix ++V2aConsainfix @amdlampV8V5V26V27V28Iainfix =arebuildV29V3AaselectedV25V29Lamk splitV26V27V28FANainfix =V3aNilaRightVV9FACtaNoneacV30aSomeVV6ACtaNoneacV31aSomeVV4Aainfix =CaNoneaNoneaSomeamV32aSomeVV6asumeainfix =ainfix @V33V34ameasureV34FV3Aainfix =CaNoneaNoneaSomeamV35aSomeVV4asumeainfix =ainfix @V36V37ameasureV37FV2Aainfix =ainfix @ainvampV8V5aTrueIainfix =CaNoneaNoneaSomeamV38aSomeVV6asumeainfix =ainfix @V39V40ameasureV40FV3Aainfix =CaNoneaNoneaSomeamV41aSomeVV4asumeainfix =ainfix @V42V43ameasureV43FV2ANainfix =ainfix ++V2aConsainfix @amdlampV8V5V3aNilACtaNoneacV44aSomeVV6Aainfix =ainfix @ainvampV8V5aTrueACtaNoneacV45aSomeVV4Lamk type_paramsV0V1LaTuple0F">
+    <label
+     name="expl:VC for avl  AVL  selected_part"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.34"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter prm"
+    locfile="../priority_queue.mlw"
+    loclnum="250" loccnumb="12" loccnume="15"
+    expl="VC for prm"
+    sum="7948be35d31a89206265b8d8e2588f41"
+    proved="true"
+    expanded="false"
+    shape="t">
+    <label
+     name="expl:VC for prm"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter dprm"
+    locfile="../priority_queue.mlw"
+    loclnum="255" loccnumb="12" loccnume="16"
+    expl="VC for dprm"
+    sum="f71d1bc68ddf3ee5b6ba8b71e5286070"
+    proved="true"
+    expanded="false"
+    shape="t">
+    <label
+     name="expl:VC for dprm"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter as_bag_append"
+    locfile="../priority_queue.mlw"
+    loclnum="268" loccnumb="16" loccnume="29"
+    expl="VC for as_bag_append"
+    sum="7e9657cc0012e577994223b5f95207aa"
+    proved="true"
+    expanded="false"
+    shape="Cainfix =ainfix @aas_bagainfix ++V0V1V2ainfix +ainfix @aas_bagV0V2ainfix @aas_bagV1V2FaNilainfix =ainfix @aas_bagainfix ++V0V1V4ainfix +ainfix @aas_bagV0V4ainfix @aas_bagV1V4FIainfix =ainfix @aas_bagainfix ++V3V1V5ainfix +ainfix @aas_bagV3V5ainfix @aas_bagV1V5FACfaNilainfix =V6V3aConswVV0aConswVV0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for as_bag_append"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.16"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter as_bag_bounds"
+    locfile="../priority_queue.mlw"
+    loclnum="273" loccnumb="16" loccnume="29"
+    expl="VC for as_bag_bounds"
+    sum="2bc9978d85da0359645cd5792fba82be"
+    proved="true"
+    expanded="false"
+    shape="Cainfix &lt;=ainfix @aas_bagV0V1alengthV0Aainfix &lt;=c0ainfix @aas_bagV0V1FaNilainfix &lt;=ainfix @aas_bagV0V3alengthV0Aainfix &lt;=c0ainfix @aas_bagV0V3FIainfix &lt;=ainfix @aas_bagV2V4alengthV2Aainfix &lt;=c0ainfix @aas_bagV2V4FACfaNilainfix =V5V2aConswVV0aConswVV0F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for as_bag_bounds"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.05"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter as_bag_membership"
+    locfile="../priority_queue.mlw"
+    loclnum="278" loccnumb="16" loccnume="33"
+    expl="VC for as_bag_membership"
+    sum="025cc4e9354d919f7a3a2f2fd81cdbb9"
+    proved="true"
+    expanded="false"
+    shape="CamemV0V1qainfix &gt;ainfix @aas_bagV1V0c0aNilamemV0V1qainfix &gt;ainfix @aas_bagV1V0c0IamemV0V2qainfix &gt;ainfix @aas_bagV2V0c0ACfaNilainfix =V3V2aConswVV1aConswVV1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for as_bag_membership"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.06"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter m"
+    locfile="../priority_queue.mlw"
+    loclnum="288" loccnumb="12" loccnume="13"
+    expl="VC for m"
+    sum="f3aec24c47c6c0996d351c30cfd2e5ac"
+    proved="true"
+    expanded="false"
+    shape="ainfix =amk maas_bagV1Cadefault_elementaNilafirst_minimum_accV5V6aConsVVV1alengthV1amamk tV0amk mV1V2amk type_paramsV3V4F">
+    <label
+     name="expl:VC for m"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter m_def"
+    locfile="../priority_queue.mlw"
+    loclnum="294" loccnumb="12" loccnume="17"
+    expl="VC for m_def"
+    sum="44b32df663120df54471cc8447bae4f9"
+    proved="true"
+    expanded="false"
+    shape="ainfix =aminimumamV5Cadefault_elementaNilafirst_minimum_accV6V7aConsVVV1Aainfix =acardamV5alengthV1Aainfix =abagamV5aas_bagV1Lamk tV0amk mV1V2amk type_paramsV3V4F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for m_def"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.02"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter correction"
+    locfile="../priority_queue.mlw"
+    loclnum="306" loccnumb="12" loccnume="22"
+    expl="VC for correction"
+    sum="dc600fc6b5eeec321baf19780cfe5444"
+    proved="true"
+    expanded="false"
+    shape="ialeakeyaminimumamV5akeyV6Iainfix &lt;c0ainfix @abagamV5V6FAainfix &gt;ainfix @abagamV5aminimumamV5c0Iainfix &gt;acardamV5c0Aainfix &gt;=acardamV5c0Aainfix &lt;=ainfix @abagamV5V7acardamV5Aainfix &lt;=c0ainfix @abagamV5V7FaleakeyaminimumamV5akeyV22Iainfix &lt;c0ainfix @abagamV5V22FAainfix &gt;ainfix @abagamV5aminimumamV5c0Iainfix &gt;acardamV5c0Aainfix &gt;=acardamV5c0Aainfix &lt;=ainfix @abagamV5V23acardamV5Aainfix &lt;=c0ainfix @abagamV5V23FIainfix =V4V21Aainfix =V3V20Aainfix =V15V4Aainfix =V14V3Aacamk tV17amk mV18V19amk type_paramsV20V21Aacamk tV11amk mV12V13amk type_paramsV14V15ACainfix =V9aNoneaNoneainfix =ainfix @ainvampamk type_paramsV3V4V24aTrueAainfix =V9aSomeainfix @amdlampamk type_paramsV3V4V24aSomeVV16Aainfix =V18V10Aainfix =V12V8Aainfix =arebuildamk splitV8V9V10V1AaselectedaTuple0amk splitV8V9V10FFAacV5ANainfix =V1aNilainfix &gt;acardamV5c0IacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for correction"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.53"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter empty"
+    locfile="../priority_queue.mlw"
+    loclnum="316" loccnumb="6" loccnume="11"
+    expl="VC for empty"
+    sum="ecb0518307f2b80de326dba0f985d2ab"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V6V1Aainfix =V5V0AacV7Aainfix =acardamV7c0Aainfix =ainfix @abagamV7V8c0FIainfix =V4c0Aainfix =V6V1Aainfix =V5V0Aainfix =V3aNilAacV7Lamk tV2amk mV3V4amk type_paramsV5V6FF">
+    <label
+     name="expl:VC for empty"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.03"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter singleton"
+    locfile="../priority_queue.mlw"
+    loclnum="322" loccnumb="6" loccnume="15"
+    expl="VC for singleton"
+    sum="c3635c687b10051f1286987ea47912b5"
+    proved="true"
+    expanded="false"
+    shape="ainfix =V8V1Aainfix =V7V0AacV9Aainfix =acardamV9c1Aainfix =ainfix @abagamV9V11c0INainfix =V11V10FAainfix =ainfix @abagamV9V10c1Lainfix @amdlampV3V2Iainfix =V6c1Aainfix =V5aConsainfix @amdlampV3V2aNilAainfix =V8V1Aainfix =V7V0AacV9Lamk tV4amk mV5V6amk type_paramsV7V8FAainfix =ainfix @ainvampV3V2aTrueIainfix =ainfix @ainvampV3V2aTrueLamk type_paramsV0V1F">
+    <label
+     name="expl:VC for singleton"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.08"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter is_empty"
+    locfile="../priority_queue.mlw"
+    loclnum="331" loccnumb="6" loccnume="14"
+    expl="VC for is_empty"
+    sum="1ca26b525f32a5858106501feee4824e"
+    proved="true"
+    expanded="false"
+    shape="iainfix =acardamV6c0qainfix =V7aTrueAainfix &gt;ainfix @abagamV6V0c0INainfix =V7aTrueAainfix =ainfix @abagamV6V8c0FIainfix =V7aTrueCfaNilainfix =acardamV6c0qainfix =V7aTrueAainfix &gt;ainfix @abagamV6V10c0INainfix =V7aTrueAainfix =ainfix @abagamV6V11c0FIainfix =V7aTrueIainfix =V10V9FaConsVwV2Nainfix =V7aTrueICtaNilfwV2qainfix =V7aTrueFAacV6IacV6Lamk tV1amk mV2V3amk type_paramsV4V5F">
+    <label
+     name="expl:VC for is_empty"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.50"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter merge"
+    locfile="../priority_queue.mlw"
+    loclnum="344" loccnumb="6" loccnume="11"
+    expl="VC for merge"
+    sum="7c7307f8a27b9cec9e19314c8bc1fadc"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @abagamV17V18ainfix +ainfix @abagamV11V18ainfix @abagamV10V18FAainfix =acardamV17ainfix +acardamV11acardamV10Aainfix =V16V4Aainfix =V15V3AacV17Iainfix =V13ainfix ++V1V6Aainfix =V16V4Aainfix =V15V3AacV17Lamk tV12amk mV13V14amk type_paramsV15V16FAainfix =V4V9Aainfix =V3V8AacV10AacV11Iainfix =V4V9Aainfix =V3V8AacV10AacV11Lamk tV0amk mV1V2amk type_paramsV3V4Lamk tV5amk mV6V7amk type_paramsV8V9F">
+    <label
+     name="expl:VC for merge"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.28"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter remove_count"
+    locfile="../priority_queue.mlw"
+    loclnum="351" loccnumb="12" loccnume="24"
+    expl="VC for remove_count"
+    sum="5b63b8a2d19eb603fe7ed1930a35627b"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @aas_bagainfix ++V0aConsV1V2V3ainfix @aas_bagainfix ++V0V2V3INainfix =V3V1FAainfix =ainfix @aas_bagainfix ++V0aConsV1V2V1ainfix +ainfix @aas_bagainfix ++V0V2V1c1F">
+    <label
+     name="why3:lemma"/>
+    <label
+     name="expl:VC for remove_count"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.80"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter extract_min"
+    locfile="../priority_queue.mlw"
+    loclnum="356" loccnumb="6" loccnume="17"
+    expl="VC for extract_min"
+    sum="ca2ec930bc59d79923ebd233f663f86f"
+    proved="true"
+    expanded="false"
+    shape="iCfaNoneainfix =V18aminimumamV5Aainfix =ainfix @abagamV5V19ainfix @abagamV17V19INainfix =V19V18FAainfix =ainfix @abagamV5V18ainfix +ainfix @abagamV17V18c1Lainfix @amdlampamk type_paramsV3V4V16Aainfix =acardamV5ainfix +acardamV17c1Aainfix =ainfix @ainvampamk type_paramsV3V4V16aTrueAainfix =V15V4Aainfix =V14V3AacV17Lamk tV11amk mV12V13amk type_paramsV14V15aSomeVV10ICainfix =V8aNoneaNoneainfix =ainfix @ainvampamk type_paramsV3V4V20aTrueAainfix =V8aSomeainfix @amdlampamk type_paramsV3V4V20aSomeVV10Aainfix &gt;=ainfix -V2V13c0Aainfix &gt;=c1ainfix -V2V13Aainfix =V12ainfix ++V7V9Aainfix =V15V4Aainfix =V14V3Aacamk tV11amk mV12V13amk type_paramsV14V15Aainfix =arebuildamk splitV7V8V9V1AaselectedaTuple0amk splitV7V8V9FFAacV5ANainfix =V1aNilainfix =ainfix @abagamV5V21c0FAainfix =acardamV5c0ainfix =V6aTrueICtaNilfwV1qainfix =V6aTrueFAacV5IacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+    <label
+     name="expl:VC for extract_min"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter extract_min.1"
+      locfile="../priority_queue.mlw"
+      loclnum="356" loccnumb="6" loccnume="17"
+      expl="1. precondition"
+      sum="f9737c5aa303da61df0312c0769087f5"
+      proved="true"
+      expanded="false"
+      shape="preconditionacV5IacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+      <label
+       name="expl:VC for extract_min"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter extract_min.2"
+      locfile="../priority_queue.mlw"
+      loclnum="356" loccnumb="6" loccnume="17"
+      expl="2. postcondition"
+      sum="1c9ae3e21dc56adb6d616d61d1f11e0a"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =ainfix @abagamV5V7c0FAainfix =acardamV5c0Iainfix =V6aTrueICtaNilfwV1qainfix =V6aTrueFIacV5IacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+      <label
+       name="expl:VC for extract_min"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter extract_min.3"
+      locfile="../priority_queue.mlw"
+      loclnum="356" loccnumb="6" loccnume="17"
+      expl="3. precondition"
+      sum="5d884af644c63dd2207be29a3fb7eb1d"
+      proved="true"
+      expanded="false"
+      shape="preconditionacV5ANainfix =V1aNilINainfix =V6aTrueICtaNilfwV1qainfix =V6aTrueFIacV5IacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+      <label
+       name="expl:VC for extract_min"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter extract_min.4"
+      locfile="../priority_queue.mlw"
+      loclnum="356" loccnumb="6" loccnume="17"
+      expl="4. unreachable point"
+      sum="651e34273eae986aa8a38ed9fbd28c2f"
+      proved="true"
+      expanded="false"
+      shape="unreachable pointCfaNonetaSomeVV10ICainfix =V8aNoneaNoneainfix =ainfix @ainvampamk type_paramsV3V4V17aTrueAainfix =V8aSomeainfix @amdlampamk type_paramsV3V4V17aSomeVV10Aainfix &gt;=ainfix -V2V13c0Aainfix &gt;=c1ainfix -V2V13Aainfix =V12ainfix ++V7V9Aainfix =V15V4Aainfix =V14V3Aacamk tV11amk mV12V13amk type_paramsV14V15Aainfix =arebuildamk splitV7V8V9V1AaselectedaTuple0amk splitV7V8V9FFIacV5ANainfix =V1aNilINainfix =V6aTrueICtaNilfwV1qainfix =V6aTrueFIacV5IacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+      <label
+       name="expl:VC for extract_min"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.05"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter extract_min.5"
+      locfile="../priority_queue.mlw"
+      loclnum="356" loccnumb="6" loccnume="17"
+      expl="5. postcondition"
+      sum="2441c870988c6a373715794d85833e18"
+      proved="true"
+      expanded="false"
+      shape="postconditionCtaNoneainfix =V18aminimumamV5Aainfix =ainfix @abagamV5V19ainfix @abagamV17V19INainfix =V19V18FAainfix =ainfix @abagamV5V18ainfix +ainfix @abagamV17V18c1Lainfix @amdlampamk type_paramsV3V4V16Aainfix =acardamV5ainfix +acardamV17c1Aainfix =ainfix @ainvampamk type_paramsV3V4V16aTrueAainfix =V15V4Aainfix =V14V3AacV17Lamk tV11amk mV12V13amk type_paramsV14V15aSomeVV10ICainfix =V8aNoneaNoneainfix =ainfix @ainvampamk type_paramsV3V4V20aTrueAainfix =V8aSomeainfix @amdlampamk type_paramsV3V4V20aSomeVV10Aainfix &gt;=ainfix -V2V13c0Aainfix &gt;=c1ainfix -V2V13Aainfix =V12ainfix ++V7V9Aainfix =V15V4Aainfix =V14V3Aacamk tV11amk mV12V13amk type_paramsV14V15Aainfix =arebuildamk splitV7V8V9V1AaselectedaTuple0amk splitV7V8V9FFIacV5ANainfix =V1aNilINainfix =V6aTrueICtaNilfwV1qainfix =V6aTrueFIacV5IacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+      <label
+       name="expl:VC for extract_min"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.90"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter min"
+    locfile="../priority_queue.mlw"
+    loclnum="372" loccnumb="6" loccnume="9"
+    expl="VC for min"
+    sum="62af49775fb1c967598183d02cb37145"
+    proved="true"
+    expanded="false"
+    shape="CfaNoneainfix =V11aminimumamV5Aainfix &gt;acardamV5c0Aainfix &gt;ainfix @abagamV5V11c0Lainfix @amdlampamk type_paramsV3V4V10Aainfix =ainfix @ainvampamk type_paramsV3V4V10aTrueaSomeVV9ICainfix =V7aNoneaNoneainfix =ainfix @ainvampamk type_paramsV3V4V12aTrueAainfix =V7aSomeainfix @amdlampamk type_paramsV3V4V12aSomeVV9Aainfix =arebuildamk splitV6V7V8V1AaselectedaTuple0amk splitV6V7V8FFAacV5ANainfix =V1aNilIainfix &gt;=acardamV5c1AacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+    <label
+     name="expl:VC for min"/>
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.09"/>
+    </proof>
+   </goal>
+   <goal
+    name="WP_parameter pop_min"
+    locfile="../priority_queue.mlw"
+    loclnum="382" loccnumb="6" loccnume="13"
+    expl="VC for pop_min"
+    sum="0fa15c22a3e9055daad39c3265dd1523"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @abagamV5V15ainfix @abagamV14V15INainfix =V15aminimumamV5FAainfix =ainfix @abagamV5aminimumamV5ainfix +ainfix @abagamV14aminimumamV5c1Aainfix =acardamV5ainfix +acardamV14c1Aainfix =V13V4Aainfix =V12V3AacV14ACfaNonetaSomewV7Iainfix &gt;=ainfix -V2V11c0Aainfix &gt;=c1ainfix -V2V11Aainfix =V13V4Aainfix =V12V3AacV14Aainfix =arebuildamk splitV6V7V8V1AaselectedaTuple0amk splitV6V7V8Aainfix =V10ainfix ++V6V8Lamk tV9amk mV10V11amk type_paramsV12V13FFAacV5ANainfix =V1aNilIainfix &gt;=acardamV5c1AacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+    <label
+     name="expl:VC for pop_min"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter pop_min.1"
+      locfile="../priority_queue.mlw"
+      loclnum="382" loccnumb="6" loccnume="13"
+      expl="1. precondition"
+      sum="5828ff4d28da6d9372d0a1bff4cdd2f8"
+      proved="true"
+      expanded="false"
+      shape="preconditionacV5ANainfix =V1aNilIainfix &gt;=acardamV5c1AacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+      <label
+       name="expl:VC for pop_min"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.03"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter pop_min.2"
+      locfile="../priority_queue.mlw"
+      loclnum="382" loccnumb="6" loccnume="13"
+      expl="2. assertion"
+      sum="e634e1505115d7f37208c72554631bd6"
+      proved="true"
+      expanded="false"
+      shape="assertionCfaNonetaSomewV7Iainfix &gt;=ainfix -V2V11c0Aainfix &gt;=c1ainfix -V2V11Aainfix =V13V4Aainfix =V12V3AacV14Aainfix =arebuildamk splitV6V7V8V1AaselectedaTuple0amk splitV6V7V8Aainfix =V10ainfix ++V6V8Lamk tV9amk mV10V11amk type_paramsV12V13FFIacV5ANainfix =V1aNilIainfix &gt;=acardamV5c1AacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+      <label
+       name="expl:VC for pop_min"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.06"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter pop_min.3"
+      locfile="../priority_queue.mlw"
+      loclnum="382" loccnumb="6" loccnume="13"
+      expl="3. postcondition"
+      sum="e2eb141ecb5193732c7ecdb42f9bcf4b"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =ainfix @abagamV5V15ainfix @abagamV14V15INainfix =V15aminimumamV5FAainfix =ainfix @abagamV5aminimumamV5ainfix +ainfix @abagamV14aminimumamV5c1Aainfix =acardamV5ainfix +acardamV14c1Aainfix =V13V4Aainfix =V12V3AacV14ICfaNonetaSomewV7Iainfix &gt;=ainfix -V2V11c0Aainfix &gt;=c1ainfix -V2V11Aainfix =V13V4Aainfix =V12V3AacV14Aainfix =arebuildamk splitV6V7V8V1AaselectedaTuple0amk splitV6V7V8Aainfix =V10ainfix ++V6V8Lamk tV9amk mV10V11amk type_paramsV12V13FFIacV5ANainfix =V1aNilIainfix &gt;=acardamV5c1AacV5Lamk tV0amk mV1V2amk type_paramsV3V4F">
+      <label
+       name="expl:VC for pop_min"/>
+      <proof
+       prover="1"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="1.15"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+   <goal
+    name="WP_parameter add"
+    locfile="../priority_queue.mlw"
+    loclnum="392" loccnumb="6" loccnume="9"
+    expl="VC for add"
+    sum="de7a36ec9e9db9eed1405758656bdb09"
+    proved="true"
+    expanded="false"
+    shape="ainfix =ainfix @abagamV12V14ainfix @abagamV6V14INainfix =V14V13FAainfix =ainfix @abagamV12V13ainfix +ainfix @abagamV6V13c1Lainfix @amdlampamk type_paramsV4V5V0Aainfix =acardamV12ainfix +acardamV6c1Aainfix =V11V5Aainfix =V10V4AacV12Iainfix &gt;=ainfix -V9V3c0Aainfix &gt;=c1ainfix -V9V3Aainfix =V8aConsainfix @amdlampamk type_paramsV4V5V0V2Aainfix =V11V5Aainfix =V10V4AacV12Lamk tV7amk mV8V9amk type_paramsV10V11FAacV6Aainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueIainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueAacV6Lamk tV1amk mV2V3amk type_paramsV4V5F">
+    <label
+     name="expl:VC for add"/>
+    <transf
+     name="split_goal_wp"
+     proved="true"
+     expanded="false">
+     <goal
+      name="WP_parameter add.1"
+      locfile="../priority_queue.mlw"
+      loclnum="392" loccnumb="6" loccnume="9"
+      expl="1. precondition"
+      sum="267b3149e63ad858f96d8126ceeb1470"
+      proved="true"
+      expanded="false"
+      shape="preconditionacV6Aainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueIainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueAacV6Lamk tV1amk mV2V3amk type_paramsV4V5F">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.02"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.2"
+      locfile="../priority_queue.mlw"
+      loclnum="392" loccnumb="6" loccnume="9"
+      expl="2. postcondition"
+      sum="e6d0711b69adaee1d03bed392d397b85"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =V11V5Aainfix =V10V4AacV12Iainfix &gt;=ainfix -V9V3c0Aainfix &gt;=c1ainfix -V9V3Aainfix =V8aConsainfix @amdlampamk type_paramsV4V5V0V2Aainfix =V11V5Aainfix =V10V4AacV12Lamk tV7amk mV8V9amk type_paramsV10V11FIacV6Aainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueIainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueAacV6Lamk tV1amk mV2V3amk type_paramsV4V5F">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.04"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.3"
+      locfile="../priority_queue.mlw"
+      loclnum="392" loccnumb="6" loccnume="9"
+      expl="3. postcondition"
+      sum="39e0cdd5360b14c3b0ad0dde536ae74c"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =acardamV12ainfix +acardamV6c1Iainfix &gt;=ainfix -V9V3c0Aainfix &gt;=c1ainfix -V9V3Aainfix =V8aConsainfix @amdlampamk type_paramsV4V5V0V2Aainfix =V11V5Aainfix =V10V4AacV12Lamk tV7amk mV8V9amk type_paramsV10V11FIacV6Aainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueIainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueAacV6Lamk tV1amk mV2V3amk type_paramsV4V5F">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.14"/>
+      </proof>
+     </goal>
+     <goal
+      name="WP_parameter add.4"
+      locfile="../priority_queue.mlw"
+      loclnum="392" loccnumb="6" loccnume="9"
+      expl="4. postcondition"
+      sum="c41ef01c185d897a699946d8a74c6703"
+      proved="true"
+      expanded="false"
+      shape="postconditionainfix =ainfix @abagamV12V14ainfix @abagamV6V14INainfix =V14V13FAainfix =ainfix @abagamV12V13ainfix +ainfix @abagamV6V13c1Lainfix @amdlampamk type_paramsV4V5V0Iainfix &gt;=ainfix -V9V3c0Aainfix &gt;=c1ainfix -V9V3Aainfix =V8aConsainfix @amdlampamk type_paramsV4V5V0V2Aainfix =V11V5Aainfix =V10V4AacV12Lamk tV7amk mV8V9amk type_paramsV10V11FIacV6Aainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueIainfix =ainfix @ainvampamk type_paramsV4V5V0aTrueAacV6Lamk tV1amk mV2V3amk type_paramsV4V5F">
+      <label
+       name="expl:VC for add"/>
+      <proof
+       prover="0"
+       timelimit="5"
+       memlimit="1000"
+       obsolete="false"
+       archived="false">
+       <result status="valid" time="0.45"/>
+      </proof>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

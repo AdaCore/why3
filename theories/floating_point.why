@@ -603,11 +603,11 @@ theory GenFloatSpecMultiRounding
 
   predicate add_post (m:mode) (x y res:t) =
     ((* CASE 1 : normalized numbers *)
-     (abs(value x + value y) >= min_normalized /\
+     (abs(value x + value y) >= min_normalized ->
       abs(value res - (value x + value y)) <= eps_normalized * abs(value x + value y))
-     \/
+     /\
      (*CASE 2: denormalized numbers *)
-     (abs(value x + value y) <= min_normalized /\
+     (abs(value x + value y) <= min_normalized ->
       abs(value res - (value x + value y)) <= eta_normalized))
    /\
     exact res = exact x + exact y
@@ -617,11 +617,11 @@ theory GenFloatSpecMultiRounding
 
   predicate sub_post (m:mode) (x y res:t) =
     ((* CASE 1 : normalized numbers *)
-     (abs(value x - value y) >= min_normalized /\
+     (abs(value x - value y) >= min_normalized ->
       abs(value res - (value x - value y)) <= eps_normalized * abs(value x - value y))
-     \/
+     /\
      (*CASE 2: denormalized numbers *)
-     (abs(value x - value y) <= min_normalized /\
+     (abs(value x - value y) <= min_normalized ->
       abs(value res - (value x - value y)) <= eta_normalized))
    /\
     exact res = exact x - exact y
@@ -631,22 +631,22 @@ theory GenFloatSpecMultiRounding
 
   predicate mul_post (m:mode) (x y res:t) =
     ((* CASE 1 : normalized numbers *)
-      abs(value x * value y) >= min_normalized /\
-      abs(value res - (value x * value y)) <= eps_normalized * abs(value x * value y)
-     \/
+     (abs(value x * value y) >= min_normalized ->
+      abs(value res - (value x * value y)) <= eps_normalized * abs(value x * value y))
+     /\
      (*CASE 2: denormalized numbers *)
-      abs(value x * value y) <= min_normalized /\
-      abs(value res - (value x * value y)) <= eta_normalized)
+     (abs(value x * value y) <= min_normalized ->
+      abs(value res - (value x * value y)) <= eta_normalized))
    /\ exact res = exact x * exact y
    /\ model res = model x * model y
 
 
   predicate neg_post (m:mode) (x res:t) =
-   ( abs(value x) >= min_normalized /\
-     abs(value res - (- (value x))) <= eps_normalized * abs(value x)
-   \/
-     abs(value x) <= min_normalized /\
-     abs(value res- (- (value x))) <= eta_normalized)
+   ((abs(value x) >= min_normalized ->
+     abs(value res - (- value x)) <= eps_normalized * abs(- value x))
+    /\
+    (abs(value x) <= min_normalized ->
+     abs(value res - (- value x)) <= eta_normalized))
    /\ exact res = - exact x
    /\ model res = - model x
 

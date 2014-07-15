@@ -1,117 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <file
-  name="../division.mlw"
-  verified="true"
-  expanded="true">
-  <theory
-   name="Division"
-   locfile="../division.mlw"
-   loclnum="4" loccnumb="7" loccnume="15"
-   verified="true"
-   expanded="true">
-   <goal
-    name="WP_parameter division"
-    locfile="../division.mlw"
-    loclnum="9" loccnumb="6" loccnume="14"
-    expl="VC for division"
-    sum="17325b12d2a5ee97ba9722c3e954bfbb"
-    proved="true"
-    expanded="true"
-    shape="iainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix =ainfix +ainfix *V3V1V4V0Eainfix &lt;V6V2Aainfix &lt;=c0V2Aainfix &lt;=c0V6Aainfix =ainfix +ainfix *V5V1V6V0Iainfix =V6ainfix -V2V1FIainfix =V5ainfix +V3c1Fainfix &gt;=V2V1Iainfix &lt;=c0V2Aainfix =ainfix +ainfix *V3V1V2V0FAainfix &lt;=c0V0Aainfix =ainfix +ainfix *c0V1V0V0Iainfix &lt;c0V1Aainfix &lt;=c0V0F">
-    <label
-     name="expl:VC for division"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter division.1"
-      locfile="../division.mlw"
-      loclnum="9" loccnumb="6" loccnume="14"
-      expl="1. loop invariant init"
-      sum="23210e55ab366e193f6469f3dd8a7dc9"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix &lt;=c0V0Aainfix =ainfix +ainfix *c0V1V0V0Iainfix &lt;c0V1Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for division"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter division.2"
-      locfile="../division.mlw"
-      loclnum="9" loccnumb="6" loccnume="14"
-      expl="2. loop invariant preservation"
-      sum="4f68a1a401e16e01cbc0584a2d13e5a8"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;=c0V5Aainfix =ainfix +ainfix *V4V1V5V0Iainfix =V5ainfix -V2V1FIainfix =V4ainfix +V3c1FIainfix &gt;=V2V1Iainfix &lt;=c0V2Aainfix =ainfix +ainfix *V3V1V2V0FIainfix &lt;c0V1Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for division"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter division.3"
-      locfile="../division.mlw"
-      loclnum="9" loccnumb="6" loccnume="14"
-      expl="3. loop variant decrease"
-      sum="dbc2a65014dce06f159a71dd16dc7fff"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;V5V2Aainfix &lt;=c0V2Iainfix =V5ainfix -V2V1FIainfix =V4ainfix +V3c1FIainfix &gt;=V2V1Iainfix &lt;=c0V2Aainfix =ainfix +ainfix *V3V1V2V0FIainfix &lt;c0V1Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for division"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter division.4"
-      locfile="../division.mlw"
-      loclnum="9" loccnumb="6" loccnume="14"
-      expl="4. postcondition"
-      sum="0e720ad9c169791b83d053e9325c9ee3"
-      proved="true"
-      expanded="true"
-      shape="postconditionainfix &lt;V4V1Aainfix &lt;=c0V4Aainfix =ainfix +ainfix *V3V1V4V0EINainfix &gt;=V2V1Iainfix &lt;=c0V2Aainfix =ainfix +ainfix *V3V1V2V0FIainfix &lt;c0V1Aainfix &lt;=c0V0F">
-      <label
-       name="expl:VC for division"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<file name="../division.mlw" expanded="true">
+<theory name="Division" expanded="true">
+ <goal name="WP_parameter division" expl="VC for division" sum="3be80ec9874e12458fe48adae254a8f8" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter division.1" expl="1. loop invariant init" sum="394a2b099ea6779d53ed1135f9bca956">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter division.2" expl="2. loop invariant preservation" sum="bc8662e540975908b079798415968d9f">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter division.3" expl="3. loop variant decrease" sum="304a17bede656d31971976da48e433a5">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter division.4" expl="4. postcondition" sum="bac72b7bedcea0ffc205797a4ad961d5" expanded="true">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -3,7 +3,7 @@
 
 \index{Isabelle proof assistant}
 
-When using Isabelle from Why3, files generated from Why3 theories and
+When using Isabelle from \why, files generated from \why theories and
 goals are stored in a dedicated XML format. Those files should not be
 edited. Instead, the proofs must be completed in a file with the same
 name and extension \texttt{.thy}. This is the file that is opened when
@@ -13,23 +13,23 @@ using ``Edit'' action in \texttt{why3ide}.
 
 You need version Isabelle2013-2. Former versions are not supported.
 
-Isabelle must be installed before compiling Why3. After compilation
-and installation of Why3, you must manually add the path 
+Isabelle must be installed before compiling \why. After compilation
+and installation of \why, you must manually add the path
 \begin{verbatim}
 <Why3 lib dir>/isabelle
 \end{verbatim}
-into either the user file 
+into either the user file
 \begin{verbatim}
 .isabelle/Isabelle2013-2/etc/components
 \end{verbatim}
-or the system-wide file 
+or the system-wide file
 \begin{verbatim}
 <Isabelle install dir>/etc/components
 \end{verbatim}
 
 \subsection{Usage}
 
-The most convenient way to call Isabelle for discharging a Why3 goal
+The most convenient way to call Isabelle for discharging a \why goal
 is to start the Isabelle/jedit interface in server mode. In this mode,
 one must start the server once, before launching \texttt{why3ide},
 using
@@ -44,9 +44,9 @@ proof is completed, the user must send back the edited proof to
 
 \subsection{Realizations}
 
-Realizations must be designed in some \texttt{.thy} as follows. 
-The realization file corresponding to some Why3 file \url{f.why}
-should have the following form. 
+Realizations must be designed in some \texttt{.thy} as follows.
+The realization file corresponding to some \why file \texttt{f.why}
+should have the following form.
 \begin{verbatim}
 theory Why3_f
 imports Why3_Setup
@@ -56,7 +56,7 @@ section {* realization of theory T *}
 
 why3_open "f/T.xml"
 
-why3_vc <some lemma> 
+why3_vc <some lemma>
 <proof>
 
 why3_vc <some other lemma> by proof
@@ -66,7 +66,7 @@ why3_vc <some other lemma> by proof
 why3_end
 \end{verbatim}
 
-See directory \url{lib/isabelle} for examples.
+See directory \texttt{lib/isabelle} for examples.
 
 
 %%% Local Variables:

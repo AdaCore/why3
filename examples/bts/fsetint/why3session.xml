@@ -1,246 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="3"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="4"
-  name="Z3"
-  version="3.2"/>
- <file
-  name="../fsetint.why"
-  verified="false"
-  expanded="true">
-  <theory
-   name="Th1"
-   locfile="../fsetint.why"
-   loclnum="2" loccnumb="7" loccnume="10"
-   verified="false"
-   expanded="true">
-   <goal
-    name="l_false"
-    locfile="../fsetint.why"
-    loclnum="5" loccnumb="9" loccnume="16"
-    sum="0158150de9c97af9dd9820938313b4d5"
-    proved="false"
-    expanded="true"
-    shape="f">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="Th2"
-   locfile="../fsetint.why"
-   loclnum="9" loccnumb="7" loccnume="10"
-   verified="false"
-   expanded="true">
-   <goal
-    name="mem_integer"
-    locfile="../fsetint.why"
-    loclnum="13" loccnumb="8" loccnume="19"
-    sum="3658829cdb3f859e8fd24937b2513f62"
-    proved="false"
-    expanded="true"
-    shape="amemV0aintegerF">
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.02"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.11"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="foo"
-    locfile="../fsetint.why"
-    loclnum="15" loccnumb="7" loccnume="10"
-    sum="99afe7ade68f07f16139a57d95d5df7e"
-    proved="false"
-    expanded="true"
-    shape="f">
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.11"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.11"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="3.01"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="Th3"
-   locfile="../fsetint.why"
-   loclnum="20" loccnumb="7" loccnume="10"
-   verified="false"
-   expanded="true">
-   <goal
-    name="foo"
-    locfile="../fsetint.why"
-    loclnum="30" loccnumb="7" loccnume="10"
-    sum="52bcfd9d41d3af16c91a1eb062fedf94"
-    proved="false"
-    expanded="true"
-    shape="f">
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.01"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="3" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="3" memlimit="1000"/>
+<prover id="2" name="Z3" version="2.19" timelimit="3" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.2" timelimit="3" memlimit="1000"/>
+<prover id="4" name="Z3" version="3.2" timelimit="3" memlimit="1000"/>
+<file name="../fsetint.why" expanded="true">
+<theory name="Th1" expanded="true">
+ <goal name="l_false" sum="7c78f041d2bf4cd2fddce2d46a5543cb" expanded="true">
+ <proof prover="0" timelimit="5"><result status="unknown" time="0.01"/></proof>
+ <proof prover="1"><result status="timeout" time="3.01"/></proof>
+ <proof prover="2"><result status="timeout" time="3.01"/></proof>
+ <proof prover="3"><result status="timeout" time="3.01"/></proof>
+ <proof prover="4"><result status="timeout" time="3.01"/></proof>
+ </goal>
+</theory>
+<theory name="Th2" expanded="true">
+ <goal name="mem_integer" sum="3bc4406b7699570b9edb9708fda3a1af" expanded="true">
+ <proof prover="0"><result status="unknown" time="0.00"/></proof>
+ <proof prover="1"><result status="timeout" time="3.11"/></proof>
+ <proof prover="2"><result status="timeout" time="3.01"/></proof>
+ <proof prover="3"><result status="timeout" time="3.02"/></proof>
+ <proof prover="4"><result status="timeout" time="3.02"/></proof>
+ </goal>
+ <goal name="foo" sum="01c5ee18fef13e1c20ff33bd15ebd079" expanded="true">
+ <proof prover="0"><result status="unknown" time="0.00"/></proof>
+ <proof prover="1"><result status="timeout" time="3.11"/></proof>
+ <proof prover="2"><result status="timeout" time="3.01"/></proof>
+ <proof prover="3"><result status="timeout" time="3.11"/></proof>
+ <proof prover="4"><result status="timeout" time="3.01"/></proof>
+ </goal>
+</theory>
+<theory name="Th3" expanded="true">
+ <goal name="foo" sum="52bcfd9d41d3af16c91a1eb062fedf94" expanded="true">
+ <proof prover="0"><result status="unknown" time="0.00"/></proof>
+ <proof prover="1"><result status="unknown" time="0.00"/></proof>
+ <proof prover="2"><result status="unknown" time="0.01"/></proof>
+ <proof prover="3"><result status="unknown" time="0.00"/></proof>
+ <proof prover="4"><result status="unknown" time="0.01"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

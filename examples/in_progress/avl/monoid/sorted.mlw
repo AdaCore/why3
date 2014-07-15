@@ -1,0 +1,63 @@
+
+(* sorted list with respect to a key. *)
+
+theory Base
+  
+  use import list.List
+  use import list.Mem
+  
+  clone import key_type.KeyType as K
+  clone import relations.Transitive as O with type t = key
+  
+  predicate lower_bound (x:key) (l:list (t 'a)) =
+    (forall y. mem y l -> rel x y.key)
+  
+  predicate upper_bound (x:key) (l:list (t 'a)) =
+    (forall y. mem y l -> rel y.key x)
+  
+  predicate precede (l1 l2:list (t 'a)) =
+    (forall x y. mem x l1 /\ mem y l2 -> rel x.key y.key)
+  
+  lemma smaller_lower_bound : forall kdown kup,l:list (t 'a).
+    lower_bound kup l /\ rel kdown kup -> lower_bound kdown l
+  
+  lemma bigger_upper_bound : forall kdown kup,l:list (t 'a).
+    upper_bound kdown l /\ rel kdown kup -> upper_bound kup l
+  
+end
+
+module Increasing
+  
+  clone export Base
+  use import list.List
+  use import list.Append
+  use import list.Mem
+  
+  predicate increasing (l:list (K.t 'a)) =
+    match l with
+    | Nil -> true
+    | Cons x q -> lower_bound x.K.key q /\ increasing q
+    end
+  
+  let rec lemma increasing_precede (l r:list (K.t 'a))
+    ensures { increasing (l++r) <->
+      increasing l /\ increasing r /\ precede l r }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons _ q -> increasing_precede q r
+    end
+  
+  let lemma increasing_midpoint (l:list (K.t 'a))
+    (x:K.t 'a) (r:list (K.t 'a)) : unit
+    ensures { let kx = K.key x in increasing (l++Cons x r) <->
+      increasing l /\ increasing r /\ lower_bound kx r /\ upper_bound kx l }
+  = ()
+  
+  let lemma increasing_snoc (l:list (K.t 'a)) (x:K.t 'a) : unit
+    ensures { let kx = K.key x in increasing (l++Cons x Nil) <->
+      increasing l /\ upper_bound kx l }
+  = ()
+  
+end
+

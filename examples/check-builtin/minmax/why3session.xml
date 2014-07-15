@@ -1,114 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
-  name="Spass"
-  version="3.7"/>
- <prover
-  id="3"
-  name="Z3"
-  version="2.19"/>
- <file
-  name="../minmax.why"
-  verified="true"
-  expanded="false">
-  <theory
-   name="MinMax"
-   locfile="../minmax.why"
-   loclnum="1" loccnumb="7" loccnume="13"
-   verified="true"
-   expanded="true">
-   <goal
-    name="G"
-    locfile="../minmax.why"
-    loclnum="4" loccnumb="7" loccnume="8"
-    sum="07c9575e30638319092460f2418c2af0"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aminV0amaxaminV2V0V1V0IageV1V0IageV2V0IageV2V1F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="G2"
-    locfile="../minmax.why"
-    loclnum="7" loccnumb="7" loccnume="9"
-    sum="e3ef58808746e696507255c906979428"
-    proved="true"
-    expanded="true"
-    shape="ageV0V1Iainfix =amaxV0V1V0F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
+<prover id="3" name="Spass" version="3.7" timelimit="10" memlimit="0"/>
+<file name="../minmax.why">
+<theory name="MinMax" expanded="true">
+ <goal name="G" sum="07c9575e30638319092460f2418c2af0" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="G2" sum="e3ef58808746e696507255c906979428" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

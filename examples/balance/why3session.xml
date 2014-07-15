@@ -1,539 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <prover
-  id="2"
-  name="CVC4"
-  version="1.3"/>
- <file
-  name="../balance.mlw"
-  verified="true"
-  expanded="true">
-  <theory
-   name="Roberval"
-   locfile="../balance.mlw"
-   loclnum="8" loccnumb="7" loccnume="15"
-   verified="true"
-   expanded="false">
-  </theory>
-  <theory
-   name="Puzzle8"
-   locfile="../balance.mlw"
-   loclnum="43" loccnumb="7" loccnume="14"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter solve3"
-    locfile="../balance.mlw"
-    loclnum="57" loccnumb="6" loccnume="12"
-    expl="VC for solve3"
-    sum="27473b276e8ad85573bf61ca7992e027"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =V9ainfix -V5c1Aainfix =V2V3aRightainfix =V9ainfix -V5c1Aainfix =ainfix +V2c1V3aLeftainfix =V9ainfix -V5c1Aainfix =ainfix +V2c2V3aEqualV10Iainfix =V9ainfix -V5c1ACainfix &gt;V8V7aLeftainfix =V8V7aEqualainfix &lt;V8V7aRightV10FFAainfix &gt;V5c0LagetV1V2Aainfix &lt;V2V0Aainfix &lt;=c0V2LagetV1V6Aainfix &lt;V6V0Aainfix &lt;=c0V6Lainfix +V2c1Iaspecamk arrayV0V1V2ainfix +V2c3V3V4Aainfix &gt;=V5c1Aainfix &lt;=c0V0FF">
-    <label
-     name="expl:VC for solve3"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="WP_parameter solve8"
-    locfile="../balance.mlw"
-    loclnum="71" loccnumb="6" loccnume="12"
-    expl="VC for solve8"
-    sum="390784e66f3947429669e6772f3d668e"
-    proved="true"
-    expanded="false"
-    shape="CaspecV4c0ainfix +c0c3V2V3Aainfix &gt;=V8c1aRightaspecV4c3ainfix +c3c3V2V3Aainfix &gt;=V8c1aLeftCainfix =c6V2aRightainfix =c7V2wV13Iainfix =V12ainfix -V8c1ACainfix &gt;V11V10aLeftainfix =V11V10aEqualainfix &lt;V11V10aRightV13FFAainfix &gt;V8c0LagetV1c6Aainfix &lt;c6V0Aainfix &lt;=c0c6LagetV1c7Aainfix &lt;c7V0Aainfix &lt;=c0c7aEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFAainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Aainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;c1V0Aainfix &lt;=c0c1Aainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Aainfix &lt;c3V0Aainfix &lt;=c0c3Aainfix &lt;c4V0Aainfix &lt;=c0c4Aainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-    <label
-     name="expl:VC for solve8"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter solve8.1"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="1. index in array bounds"
-      sum="eeedfe7554063317ba6950ff2bdc41e0"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.2"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="2. index in array bounds"
-      sum="567e12e52df66916d63d7da21bf91f1f"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.3"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="3. index in array bounds"
-      sum="02ac3d7fb3c30fad08e6fa6c057fc559"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.4"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="4. index in array bounds"
-      sum="e7d856d4522848a97aa9f26bf0cf9a70"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.5"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="5. index in array bounds"
-      sum="2007aadf9b6dd18988f67a238e5865a2"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.6"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="6. index in array bounds"
-      sum="149ac39419592955c042d2d55538a78f"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.7"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="7. precondition"
-      sum="06631246354762bd1389a5ba4ff04cfb"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.8"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="8. precondition"
-      sum="c9e666c32cd96c77e05b3b40bb0c0ab6"
-      proved="true"
-      expanded="false"
-      shape="preconditionCainfix &gt;=V8c1aRighttaLefttaEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFIainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.9"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="9. precondition"
-      sum="338d14364c728747dfce59989e64d4e6"
-      proved="true"
-      expanded="false"
-      shape="preconditionCaspecV4c0ainfix +c0c3V2V3aRighttaLefttaEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFIainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.10"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="10. precondition"
-      sum="274d13e1221df21f226e0bb942191e1b"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaRightainfix &gt;=V8c1aLefttaEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFIainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.11"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="11. precondition"
-      sum="3de4e187e630d54612d2eac3d08016d7"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaRightaspecV4c3ainfix +c3c3V2V3aLefttaEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFIainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.12"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="12. index in array bounds"
-      sum="f3db0dec21695bbf9ae89a8af002b8ee"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsCtaRighttaLeftainfix &lt;c7V0Aainfix &lt;=c0c7aEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFIainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.13"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="13. index in array bounds"
-      sum="1ee5e9a007b5ace1557f39d97226863f"
-      proved="true"
-      expanded="false"
-      shape="index in array boundsCtaRighttaLeftainfix &lt;c6V0Aainfix &lt;=c0c6LagetV1c7Iainfix &lt;c7V0Aainfix &lt;=c0c7aEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFIainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.14"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="14. precondition"
-      sum="04aa396ec5f5d7453853704af26b8b26"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaRighttaLeftainfix &gt;V8c0LagetV1c6Iainfix &lt;c6V0Aainfix &lt;=c0c6LagetV1c7Iainfix &lt;c7V0Aainfix &lt;=c0c7aEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFIainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="1"
-       timelimit="6"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.15"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="15. postcondition"
-      sum="9fb4f0804157a53f686e3f273a34cebc"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaRighttaLeftCainfix =c6V2aRighttwV13Iainfix =V12ainfix -V8c1ACainfix &gt;V11V10aLeftainfix =V11V10aEqualainfix &lt;V11V10aRightV13FFIainfix &gt;V8c0LagetV1c6Iainfix &lt;c6V0Aainfix &lt;=c0c6LagetV1c7Iainfix &lt;c7V0Aainfix &lt;=c0c7aEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFIainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.13"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter solve8.16"
-      locfile="../balance.mlw"
-      loclnum="71" loccnumb="6" loccnume="12"
-      expl="16. postcondition"
-      sum="0b5fc46a512e51825ca956792ad78fe2"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaRighttaLeftCtaRightainfix =c7V2wV13Iainfix =V12ainfix -V8c1ACainfix &gt;V11V10aLeftainfix =V11V10aEqualainfix &lt;V11V10aRightV13FFIainfix &gt;V8c0LagetV1c6Iainfix &lt;c6V0Aainfix &lt;=c0c6LagetV1c7Iainfix &lt;c7V0Aainfix &lt;=c0c7aEqualV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFIainfix &gt;V5c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c2Iainfix &lt;c0V0Aainfix &lt;=c0c0Iainfix &lt;c1V0Aainfix &lt;=c0c1Iainfix &lt;c2V0Aainfix &lt;=c0c2Lainfix +ainfix +agetV1c3agetV1c4agetV1c5Iainfix &lt;c3V0Aainfix &lt;=c0c3Iainfix &lt;c4V0Aainfix &lt;=c0c4Iainfix &lt;c5V0Aainfix &lt;=c0c5IaspecV4c0c8V2V3Aainfix =V5c2Aainfix &lt;=c0V0FLamk arrayV0V1F">
-      <label
-       name="expl:VC for solve8"/>
-      <proof
-       prover="0"
-       timelimit="10"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.20"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.27"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
-  <theory
-   name="Puzzle12"
-   locfile="../balance.mlw"
-   loclnum="95" loccnumb="7" loccnume="15"
-   verified="true"
-   expanded="true">
-   <goal
-    name="WP_parameter solve12"
-    locfile="../balance.mlw"
-    loclnum="103" loccnumb="5" loccnume="12"
-    expl="VC for solve12"
-    sum="8795bb509b18d2eb83fccca2d2ad9e4d"
-    proved="true"
-    expanded="true"
-    shape="CCCainfix =aFalseV4Aainfix =c11V3aRightainfix =aTrueV4Aainfix =c11V3wV17Iainfix =V16ainfix -V12c1ACainfix &gt;V15V14aLeftainfix =V15V14aEqualainfix &lt;V15V14aRightV17FFAainfix &gt;V12c0LagetV1c0Aainfix &lt;c0V0Aainfix &lt;=c0c0LagetV1c11Aainfix &lt;c11V0Aainfix &lt;=c0c11aEqualCainfix =aTrueV4Aainfix =c8V3aEqualainfix =aFalseV4Aainfix =c10V3aRightainfix =aFalseV4Aainfix =c9V3aLeftV21Iainfix =V20ainfix -V12c1ACainfix &gt;V19V18aLeftainfix =V19V18aEqualainfix &lt;V19V18aRightV21FFAainfix &gt;V12c0LagetV1c9Aainfix &lt;c9V0Aainfix &lt;=c0c9LagetV1c10Aainfix &lt;c10V0Aainfix &lt;=c0c10aRightCainfix =aFalseV4Aainfix =c8V3aEqualainfix =aTrueV4Aainfix =c9V3aRightainfix =aTrueV4Aainfix =c10V3aLeftV25Iainfix =V24ainfix -V12c1ACainfix &gt;V23V22aLeftainfix =V23V22aEqualainfix &lt;V23V22aRightV25FFAainfix &gt;V12c0LagetV1c9Aainfix &lt;c9V0Aainfix &lt;=c0c9LagetV1c10Aainfix &lt;c10V0Aainfix &lt;=c0c10aLeftV13Iainfix =V12ainfix -V8c1ACainfix &gt;V11V10aLeftainfix =V11V10aEqualainfix &lt;V11V10aRightV13FFAainfix &gt;V8c0Lainfix +agetV1c0agetV1c8Aainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;c8V0Aainfix &lt;=c0c8Lainfix +agetV1c9agetV1c10Aainfix &lt;c9V0Aainfix &lt;=c0c9Aainfix &lt;c10V0Aainfix &lt;=c0c10aEqualCCainfix =aTrueV4Aainfix =c3V3aEqualainfix =aFalseV4Aainfix =c7V3aRightainfix =aFalseV4Aainfix =c6V3aLeftV33Iainfix =V32ainfix -V28c1ACainfix &gt;V31V30aLeftainfix =V31V30aEqualainfix &lt;V31V30aRightV33FFAainfix &gt;V28c0LagetV1c6Aainfix &lt;c6V0Aainfix &lt;=c0c6LagetV1c7Aainfix &lt;c7V0Aainfix &lt;=c0c7aEqualCainfix =aFalseV4Aainfix =c5V3aEqualainfix =aTrueV4Aainfix =c0V3aRightainfix =aTrueV4Aainfix =c1V3aLeftV37Iainfix =V36ainfix -V28c1ACainfix &gt;V35V34aLeftainfix =V35V34aEqualainfix &lt;V35V34aRightV37FFAainfix &gt;V28c0LagetV1c0Aainfix &lt;c0V0Aainfix &lt;=c0c0LagetV1c1Aainfix &lt;c1V0Aainfix &lt;=c0c1aRightCainfix =aTrueV4Aainfix =c2V3aEqualainfix =aFalseV4Aainfix =c4V3wV41Iainfix =V40ainfix -V28c1ACainfix &gt;V39V38aLeftainfix =V39V38aEqualainfix &lt;V39V38aRightV41FFAainfix &gt;V28c0LagetV1c4Aainfix &lt;c4V0Aainfix &lt;=c0c4LagetV1c8Aainfix &lt;c8V0Aainfix &lt;=c0c8aLeftV29Iainfix =V28ainfix -V8c1ACainfix &gt;V27V26aLeftainfix =V27V26aEqualainfix &lt;V27V26aRightV29FFAainfix &gt;V8c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c4Aainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;c1V0Aainfix &lt;=c0c1Aainfix &lt;c4V0Aainfix &lt;=c0c4Lainfix +ainfix +agetV1c2agetV1c5agetV1c8Aainfix &lt;c2V0Aainfix &lt;=c0c2Aainfix &lt;c5V0Aainfix &lt;=c0c5Aainfix &lt;c8V0Aainfix &lt;=c0c8aRightCCainfix =aFalseV4Aainfix =c3V3aEqualainfix =aTrueV4Aainfix =c6V3aRightainfix =aTrueV4Aainfix =c7V3aLeftV49Iainfix =V48ainfix -V44c1ACainfix &gt;V47V46aLeftainfix =V47V46aEqualainfix &lt;V47V46aRightV49FFAainfix &gt;V44c0LagetV1c6Aainfix &lt;c6V0Aainfix &lt;=c0c6LagetV1c7Aainfix &lt;c7V0Aainfix &lt;=c0c7aEqualCainfix =aTrueV4Aainfix =c4V3aEqualainfix =aFalseV4Aainfix =c5V3aRightainfix =aFalseV4Aainfix =c2V3aLeftV53Iainfix =V52ainfix -V44c1ACainfix &gt;V51V50aLeftainfix =V51V50aEqualainfix &lt;V51V50aRightV53FFAainfix &gt;V44c0LagetV1c2Aainfix &lt;c2V0Aainfix &lt;=c0c2LagetV1c5Aainfix &lt;c5V0Aainfix &lt;=c0c5aRightCainfix =aTrueV4Aainfix =c5V3aEqualainfix =aFalseV4Aainfix =c1V3aRightainfix =aFalseV4Aainfix =c0V3aLeftV57Iainfix =V56ainfix -V44c1ACainfix &gt;V55V54aLeftainfix =V55V54aEqualainfix &lt;V55V54aRightV57FFAainfix &gt;V44c0LagetV1c0Aainfix &lt;c0V0Aainfix &lt;=c0c0LagetV1c1Aainfix &lt;c1V0Aainfix &lt;=c0c1aLeftV45Iainfix =V44ainfix -V8c1ACainfix &gt;V43V42aLeftainfix =V43V42aEqualainfix &lt;V43V42aRightV45FFAainfix &gt;V8c0Lainfix +ainfix +agetV1c0agetV1c1agetV1c4Aainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;c1V0Aainfix &lt;=c0c1Aainfix &lt;c4V0Aainfix &lt;=c0c4Lainfix +ainfix +agetV1c2agetV1c5agetV1c8Aainfix &lt;c2V0Aainfix &lt;=c0c2Aainfix &lt;c5V0Aainfix &lt;=c0c5Aainfix &lt;c8V0Aainfix &lt;=c0c8aLeftV9Iainfix =V8ainfix -V5c1ACainfix &gt;V7V6aLeftainfix =V7V6aEqualainfix &lt;V7V6aRightV9FFAainfix &gt;V5c0Lainfix +ainfix +ainfix +agetV1c0agetV1c1agetV1c2agetV1c3Aainfix &lt;c0V0Aainfix &lt;=c0c0Aainfix &lt;c1V0Aainfix &lt;=c0c1Aainfix &lt;c2V0Aainfix &lt;=c0c2Aainfix &lt;c3V0Aainfix &lt;=c0c3Lainfix +ainfix +ainfix +agetV1c4agetV1c5agetV1c6agetV1c7Aainfix &lt;c4V0Aainfix &lt;=c0c4Aainfix &lt;c5V0Aainfix &lt;=c0c5Aainfix &lt;c6V0Aainfix &lt;=c0c6Aainfix &lt;c7V0Aainfix &lt;=c0c7Iiainfix &gt;agetV1V3V2ainfix &lt;agetV1V3V2ainfix =V4aTrueAainfix =agetV1V58V2INainfix =V58V3Iainfix &lt;V58c12Aainfix &lt;=c0V58FAainfix =c12V0Aainfix &lt;V3c12Aainfix &lt;=c0V3Aainfix =V5c3Aainfix &lt;=c0V0FF">
-    <label
-     name="expl:VC for solve12"/>
-    <proof
-     prover="2"
-     timelimit="6"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.29"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
+<file name="../balance.mlw" expanded="true">
+<theory name="Roberval">
+</theory>
+<theory name="Puzzle8">
+ <goal name="WP_parameter solve3" expl="VC for solve3" sum="b99690f38a8859fcbc376bfe11476985">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="WP_parameter solve8" expl="VC for solve8" sum="9841fc04de124860d6dbeb8c34375b9a">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter solve8.1" expl="1. index in array bounds" sum="e8636c6042a6fbb5009ffcaaf3a51728">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.2" expl="2. index in array bounds" sum="a719814bcc87c5699bcf9f906a0549dc">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.3" expl="3. index in array bounds" sum="aeaa011af7aadec3b5d860be903d6d84">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.4" expl="4. index in array bounds" sum="c7777f8b4f60d2f52579220995ba1901">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.5" expl="5. index in array bounds" sum="713ff67741edb2ca4f308d445dd7af57">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.6" expl="6. index in array bounds" sum="b59bd221e001b77d6a83147ee7cdc84e">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.7" expl="7. precondition" sum="450384f15c544017e2760bb39352e02f">
+  <proof prover="1" timelimit="6"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.8" expl="8. precondition" sum="852665f61acf27a7dd6a7ba0661fed64">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.9" expl="9. precondition" sum="c50d4db7e5e8e3f71494ccf12e09124e">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.10" expl="10. precondition" sum="f40c77965b3b599d0360e403bd9a64b4">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.11" expl="11. precondition" sum="c49dd839f25c60a0d250482a4e52b6ea">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.12" expl="12. index in array bounds" sum="699da9471162d3e1c4c1c07203095e21">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.13" expl="13. index in array bounds" sum="d99d36b57c8703dcb6b7ff793e47f492">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.14" expl="14. precondition" sum="4cb069f2aa1ac29a15155d968c2e2801">
+  <proof prover="1" timelimit="6"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.15" expl="15. postcondition" sum="aea0af9d5bdb85dfe629ea850b6a7ece">
+  <proof prover="0"><result status="valid" time="0.13"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter solve8.16" expl="16. postcondition" sum="450979a888923b6061e7a9e207019e40">
+  <proof prover="0"><result status="valid" time="0.20"/></proof>
+  <proof prover="1"><result status="valid" time="0.27"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Puzzle12" expanded="true">
+ <goal name="WP_parameter solve12" expl="VC for solve12" sum="35df6017b50d5ebebec76f7b875027ca" expanded="true">
+ <proof prover="2"><result status="valid" time="0.29"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -1,620 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
-  name="CVC4"
-  version="1.2"/>
- <prover
-  id="3"
-  name="Coq"
-  version="8.4pl2"/>
- <file
-  name="../there_and_back_again.mlw"
-  verified="true"
-  expanded="true">
-  <theory
-   name="Convolution"
-   locfile="../there_and_back_again.mlw"
-   loclnum="14" loccnumb="7" loccnume="18"
-   verified="true"
-   expanded="false">
-   <goal
-    name="WP_parameter convolution_rec"
-    locfile="../there_and_back_again.mlw"
-    loclnum="23" loccnumb="10" loccnume="25"
-    expl="VC for convolution_rec"
-    sum="290b82c4f15d2326ac28e36b73a9881c"
-    proved="true"
-    expanded="false"
-    shape="Cainfix =aNilacombineV0areverseV2Aainfix =alengthV2alengthV0Aainfix =V1ainfix ++V2V1EaNilCainfix =aConsaTuple2V3V7V5acombineV0areverseV9Aainfix =alengthV9alengthV0Aainfix =V1ainfix ++V9V8EaConsVVfwV6Iainfix =V5acombineV4areverseV10Aainfix =alengthV10alengthV4Aainfix =V1ainfix ++V10V6EFAainfix &lt;=alengthV4alengthV1ACfaNilainfix =V11V4aConswVV0aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
-    <label
-     name="expl:VC for convolution_rec"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter convolution_rec.1"
-      locfile="../there_and_back_again.mlw"
-      loclnum="23" loccnumb="10" loccnume="25"
-      expl="1. postcondition"
-      sum="96a76b9891ceb18ca3abe8e976756f39"
-      proved="true"
-      expanded="false"
-      shape="postconditionCainfix =aNilacombineV0areverseV2Aainfix =alengthV2alengthV0Aainfix =V1ainfix ++V2V1EaNiltaConsVVV0Iainfix &lt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for convolution_rec"/>
-      <proof
-       prover="1"
-       timelimit="120"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter convolution_rec.2"
-      locfile="../there_and_back_again.mlw"
-      loclnum="23" loccnumb="10" loccnume="25"
-      expl="2. variant decrease"
-      sum="13919f8fbe59df5f4506469444bff758"
-      proved="true"
-      expanded="false"
-      shape="variant decreaseCtaNilCfaNilainfix =V4V3aConswVV0aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for convolution_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter convolution_rec.3"
-      locfile="../there_and_back_again.mlw"
-      loclnum="23" loccnumb="10" loccnume="25"
-      expl="3. precondition"
-      sum="4dfbddac37e0d3ffa6cac0c1f511a759"
-      proved="true"
-      expanded="false"
-      shape="preconditionCtaNilainfix &lt;=alengthV3alengthV1aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for convolution_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter convolution_rec.4"
-      locfile="../there_and_back_again.mlw"
-      loclnum="23" loccnumb="10" loccnume="25"
-      expl="4. postcondition"
-      sum="3fd122b2900b7b9ecb654edfaa3fd3c2"
-      proved="true"
-      expanded="false"
-      shape="postconditionCtaNilCainfix =aConsaTuple2V2V6V4acombineV0areverseV8Aainfix =alengthV8alengthV0Aainfix =V1ainfix ++V8V7EaConsVVtwV5Iainfix =V4acombineV3areverseV9Aainfix =alengthV9alengthV3Aainfix =V1ainfix ++V9V5EFIainfix &lt;=alengthV3alengthV1aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for convolution_rec"/>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter convolution_rec.5"
-      locfile="../there_and_back_again.mlw"
-      loclnum="23" loccnumb="10" loccnume="25"
-      expl="5. unreachable point"
-      sum="82568785a522e5688823070beb29aa40"
-      proved="true"
-      expanded="false"
-      shape="unreachable pointCtaNilCtaConsVVfwV5Iainfix =V4acombineV3areverseV8Aainfix =alengthV8alengthV3Aainfix =V1ainfix ++V8V5EFIainfix &lt;=alengthV3alengthV1aConsVVV0Iainfix &lt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for convolution_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter convolution"
-    locfile="../there_and_back_again.mlw"
-    loclnum="38" loccnumb="6" loccnume="17"
-    expl="VC for convolution"
-    sum="64d82606ccbd320050f1b25aa738172f"
-    proved="true"
-    expanded="false"
-    shape="ainfix =V2acombineV0areverseV1Iainfix =V2acombineV0areverseV4Aainfix =alengthV4alengthV0Aainfix =V1ainfix ++V4V3EFAainfix &lt;=alengthV0alengthV1Iainfix =alengthV0alengthV1F">
-    <label
-     name="expl:VC for convolution"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="false">
-     <goal
-      name="WP_parameter convolution.1"
-      locfile="../there_and_back_again.mlw"
-      loclnum="38" loccnumb="6" loccnume="17"
-      expl="1. precondition"
-      sum="934575d90467b0bc019afd5a059ceac8"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;=alengthV0alengthV1Iainfix =alengthV0alengthV1F">
-      <label
-       name="expl:VC for convolution"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter convolution.2"
-      locfile="../there_and_back_again.mlw"
-      loclnum="38" loccnumb="6" loccnume="17"
-      expl="2. postcondition"
-      sum="7fbb9383641d6cc3494655f1120678fb"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix =V2acombineV0areverseV1Iainfix =V2acombineV0areverseV4Aainfix =alengthV4alengthV0Aainfix =V1ainfix ++V4V3EFIainfix &lt;=alengthV0alengthV1Iainfix =alengthV0alengthV1F">
-      <label
-       name="expl:VC for convolution"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
-  <theory
-   name="Palindrome"
-   locfile="../there_and_back_again.mlw"
-   loclnum="51" loccnumb="7" loccnume="17"
-   verified="true"
-   expanded="true">
-   <goal
-    name="WP_parameter palindrome_rec"
-    locfile="../there_and_back_again.mlw"
-    loclnum="66" loccnumb="10" loccnume="24"
-    expl="VC for palindrome_rec"
-    sum="9c8c18bdbc701639119acffb2393861a"
-    proved="true"
-    expanded="true"
-    shape="CCCNainfix =anthV8V0anthainfix -ainfix -alengthV1c1V8V0Aainfix &lt;V8alengthV1Aainfix &lt;=c0V8EINainfix =anthV9V7anthainfix -ainfix -alengthV5c1V9V7Aainfix &lt;V9alengthV5Aainfix &lt;=c0V9EACiNainfix =anthV13V0anthainfix -ainfix -alengthV1c1V13V0Aainfix &lt;V13alengthV1Aainfix &lt;=c0V13EapalV0alengthV1Aainfix =V0ainfix ++V14V12Aainfix =alengthV14alengthV1Eainfix =V6V11Aainfix =anthainfix -alengthV1c1V0aSomeV11aConsVVfaNilV10IapalV7alengthV5Aainfix =V7ainfix ++V15V10Aainfix =alengthV15alengthV5EFAainfix &gt;=alengthV7alengthV5ACfaNilainfix =V16V7aConswVV0aConsVVfwV0aConsVVCapalV0alengthV1Aainfix =V0ainfix ++V19V18Aainfix =alengthV19alengthV1EaConsVVfwV0aNilV3aConsVVapalV0alengthV1Aainfix =V0ainfix ++V20V0Aainfix =alengthV20alengthV1EaNilV1Iainfix &gt;=alengthV0alengthV1F">
-    <label
-     name="expl:VC for palindrome_rec"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter palindrome_rec.1"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="1. variant decrease"
-      sum="1c1da62ea7fab5aa0d318b54124c8c46"
-      proved="true"
-      expanded="true"
-      shape="variant decreaseCCCCfaNilainfix =V8V7aConswVV0aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.2"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="2. precondition"
-      sum="fd49aefa1249ad12c686db4abed1501a"
-      proved="true"
-      expanded="true"
-      shape="preconditionCCCainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.3"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="3. assertion"
-      sum="252dcf09cccf0b5b8a40cc27e64f0bb8"
-      proved="true"
-      expanded="true"
-      shape="assertionCCCCainfix =anthainfix -alengthV1c1V0aSomeV9aConsVVtaNilV8IapalV7alengthV5Aainfix =V7ainfix ++V11V8Aainfix =alengthV11alengthV5EFIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.4"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="4. postcondition"
-      sum="7b121208f0a17008d8faf260c6be342a"
-      proved="true"
-      expanded="true"
-      shape="postconditionCCCCainfix =V0ainfix ++V11V10Aainfix =alengthV11alengthV1EIainfix =V6V9Iainfix =anthainfix -alengthV1c1V0aSomeV9aConsVVtaNilV8IapalV7alengthV5Aainfix =V7ainfix ++V12V8Aainfix =alengthV12alengthV5EFIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.30"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.5"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="5. postcondition"
-      sum="d0490ce203d1441bedca870445d341b1"
-      proved="true"
-      expanded="true"
-      shape="postconditionCCCCapalV0alengthV1Iainfix =V6V9Iainfix =anthainfix -alengthV1c1V0aSomeV9aConsVVtaNilV8IapalV7alengthV5Aainfix =V7ainfix ++V11V8Aainfix =alengthV11alengthV5EFIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.13"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.6"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="6. exceptional postcondition"
-      sum="3bcec846f699ccf4b2026e40a909ee5f"
-      proved="true"
-      expanded="true"
-      shape="exceptional postconditionCCCCNainfix =anthV11V0anthainfix -ainfix -alengthV1c1V11V0Aainfix &lt;V11alengthV1Aainfix &lt;=c0V11EINainfix =V6V9Iainfix =anthainfix -alengthV1c1V0aSomeV9aConsVVtaNilV8IapalV7alengthV5Aainfix =V7ainfix ++V12V8Aainfix =alengthV12alengthV5EFIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.7"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="7. unreachable point"
-      sum="1f61c7d3bb301c549c0e9b68f6048f14"
-      proved="true"
-      expanded="true"
-      shape="unreachable pointCCCCtaConsVVfaNilV8IapalV7alengthV5Aainfix =V7ainfix ++V11V8Aainfix =alengthV11alengthV5EFIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.8"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="8. exceptional postcondition"
-      sum="b148eb0be8f9a97849bc0e64fb178b74"
-      proved="true"
-      expanded="true"
-      shape="exceptional postconditionCCCNainfix =anthV8V0anthainfix -ainfix -alengthV1c1V8V0Aainfix &lt;V8alengthV1Aainfix &lt;=c0V8EINainfix =anthV9V7anthainfix -ainfix -alengthV5c1V9V7Aainfix &lt;V9alengthV5Aainfix &lt;=c0V9EIainfix &gt;=alengthV7alengthV5aConsVVtwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="3"
-       timelimit="20"
-       memlimit="1000"
-       edited="there_and_back_again_Palindrome_WP_parameter_palindrome_rec_1.v"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="1.32"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.9"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="9. unreachable point"
-      sum="f9265e0ddca70ee9e09605871f1858be"
-      proved="true"
-      expanded="true"
-      shape="unreachable pointCCCtaConsVVfwV0aConsVVtaNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.10"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="10. postcondition"
-      sum="d4abc92728352bb4815df94636802dc0"
-      proved="true"
-      expanded="true"
-      shape="postconditionCCtaConsVVCainfix =V0ainfix ++V8V7Aainfix =alengthV8alengthV1EaConsVVtwV0aNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="4.39"/>
-      </proof>
-      <proof
-       prover="2"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.11"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="11. postcondition"
-      sum="ba2f46b3beb3be7034dce06ed3957ac5"
-      proved="true"
-      expanded="true"
-      shape="postconditionCCtaConsVVCapalV0alengthV1aConsVVtwV0aNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.12"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="12. unreachable point"
-      sum="466c49113475acc8016eaecf7c9f1c76"
-      proved="true"
-      expanded="true"
-      shape="unreachable pointCCtaConsVVCtaConsVVfwV0aNilV3aConsVVtaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.13"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="13. postcondition"
-      sum="b2c6e2d3cf4b586237ce25409f174f12"
-      proved="true"
-      expanded="true"
-      shape="postconditionCtaConsVVainfix =V0ainfix ++V4V0Aainfix =alengthV4alengthV1EaNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome_rec.14"
-      locfile="../there_and_back_again.mlw"
-      loclnum="66" loccnumb="10" loccnume="24"
-      expl="14. postcondition"
-      sum="860b998ddc6abfcf62b76fc7799f4163"
-      proved="true"
-      expanded="true"
-      shape="postconditionCtaConsVVapalV0alengthV1aNilV1Iainfix &gt;=alengthV0alengthV1F">
-      <label
-       name="expl:VC for palindrome_rec"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof
-       prover="1"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal
-    name="WP_parameter palindrome"
-    locfile="../there_and_back_again.mlw"
-    loclnum="88" loccnumb="6" loccnume="16"
-    expl="VC for palindrome"
-    sum="63f6602e868fe002c17903fa05d62d24"
-    proved="true"
-    expanded="true"
-    shape="NapalV0alengthV0INainfix =anthV1V0anthainfix -ainfix -alengthV0c1V1V0Aainfix &lt;V1alengthV0Aainfix &lt;=c0V1EAapalV0alengthV0IapalV0alengthV0Aainfix =V0ainfix ++V3V2Aainfix =alengthV3alengthV0EFAainfix &gt;=alengthV0alengthV0F">
-    <label
-     name="expl:VC for palindrome"/>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter palindrome.1"
-      locfile="../there_and_back_again.mlw"
-      loclnum="88" loccnumb="6" loccnume="16"
-      expl="1. precondition"
-      sum="b7fcd3b1f3f177a4b716e3342ad03eb1"
-      proved="true"
-      expanded="true"
-      shape="preconditionainfix &gt;=alengthV0alengthV0F">
-      <label
-       name="expl:VC for palindrome"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome.2"
-      locfile="../there_and_back_again.mlw"
-      loclnum="88" loccnumb="6" loccnume="16"
-      expl="2. postcondition"
-      sum="e09716e027d8c83a955aea16fbe6fd78"
-      proved="true"
-      expanded="true"
-      shape="postconditionapalV0alengthV0IapalV0alengthV0Aainfix =V0ainfix ++V2V1Aainfix =alengthV2alengthV0EFIainfix &gt;=alengthV0alengthV0F">
-      <label
-       name="expl:VC for palindrome"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter palindrome.3"
-      locfile="../there_and_back_again.mlw"
-      loclnum="88" loccnumb="6" loccnume="16"
-      expl="3. postcondition"
-      sum="8ce4a40f35247b1710014128a89be52e"
-      proved="true"
-      expanded="true"
-      shape="postconditionNapalV0alengthV0INainfix =anthV1V0anthainfix -ainfix -alengthV0c1V1V0Aainfix &lt;V1alengthV0Aainfix &lt;=c0V1EIainfix &gt;=alengthV0alengthV0F">
-      <label
-       name="expl:VC for palindrome"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.4pl3" timelimit="20" memlimit="1000"/>
+<file name="../there_and_back_again.mlw" expanded="true">
+<theory name="Convolution">
+ <goal name="WP_parameter convolution_rec" expl="VC for convolution_rec" sum="22faf431ac140b8b7d34f3293b8a62bc">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter convolution_rec.1" expl="1. postcondition" sum="2578338d236d385b43ab4fc5e13ecc2a">
+  <proof prover="2" timelimit="120"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter convolution_rec.2" expl="2. variant decrease" sum="58fe9655e71712006c4d108961ab8235">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter convolution_rec.3" expl="3. precondition" sum="f5a1ff8c6e6ca528baf5fd2645aa4871">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter convolution_rec.4" expl="4. postcondition" sum="30ca916d2de77d7836e6edaf4aa59226">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter convolution_rec.5" expl="5. unreachable point" sum="bcd1a3f4e8c1f94806b0a1a2efe8e0c7">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter convolution" expl="VC for convolution" sum="47bd5f6ce3b3a33fcb639be1178401ea">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter convolution.1" expl="1. precondition" sum="33b7e3fa21baef1f5528850d357347ea">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter convolution.2" expl="2. postcondition" sum="585a01daf53e72da42746dc842ae0114">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Palindrome" expanded="true">
+ <goal name="WP_parameter palindrome_rec" expl="VC for palindrome_rec" sum="dd552eb4487b09f2fb5cb966f1a1ba03" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter palindrome_rec.1" expl="1. variant decrease" sum="1a7a77a2b71d12a8f29292c7c0032432" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.2" expl="2. precondition" sum="ac9e85b375c6e7c6dbdffa8d13088ce7" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.3" expl="3. assertion" sum="8e5acc27f24c3c888305d7da4a95b51e" expanded="true">
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.4" expl="4. postcondition" sum="47b001718e81143a66d2ce685428f062" expanded="true">
+  <proof prover="0"><result status="valid" time="0.30"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.5" expl="5. postcondition" sum="32fc2bfbe40ce7a16a80e9b8afee640b" expanded="true">
+  <proof prover="1"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.6" expl="6. exceptional postcondition" sum="73ad5639e6af1dc25f1f797b6efaf5ce" expanded="true">
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.7" expl="7. unreachable point" sum="ea9ceb9e47703654db4620edd54076c5" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.8" expl="8. exceptional postcondition" sum="7b8665c0759287816f2d21516d87252d" expanded="true">
+  <proof prover="3" edited="there_and_back_again_Palindrome_WP_parameter_palindrome_rec_1.v"><result status="valid" time="1.32"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.9" expl="9. unreachable point" sum="102f622c5f6b32ba86e1ae09910dd0c6" expanded="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.10" expl="10. postcondition" sum="8903219d760c8ddd560216ed8097a389" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="3.51"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.11" expl="11. postcondition" sum="1f8372a46e1c3a17ca4823c821af42a6" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.12" expl="12. unreachable point" sum="60fca71367765252f9ba31446a6115e9" expanded="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.13" expl="13. postcondition" sum="f1095cdb88e521e35e8f8144a884e437" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome_rec.14" expl="14. postcondition" sum="98fb188919fbeafd2b93e7e5acaaf262" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter palindrome" expl="VC for palindrome" sum="ce72ff80fecefc0803403b1a085ff159" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter palindrome.1" expl="1. precondition" sum="5667369f374fab825af928fae9143a6b" expanded="true">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome.2" expl="2. postcondition" sum="cee6be324cc4a5f00b2ae34f1915510e" expanded="true">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter palindrome.3" expl="3. postcondition" sum="433d9c3cbbf49f33bf85b40fd469f835" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

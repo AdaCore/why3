@@ -14,7 +14,7 @@ The Coq tactic is installed in
 where \textit{why3-lib-dir} is \why's library directory, as reported
 by \verb+why3 --print-libdir+. This directory
 is automatically added to Coq's load path if you are
-calling Coq via \why (from \texttt{why3ide}, \texttt{why3replayer},
+calling Coq via \why (from \texttt{why3 ide}, \texttt{why3 replay},
 etc.). If you are calling Coq by yourself, you need to add
 this directory to Coq's load path, either using Coq's command line
 option \texttt{-I} or by adding
@@ -33,6 +33,7 @@ The Coq tactic is called \texttt{why3} and is used as follows:
 The string \textit{prover-name} identifies one of the automated theorem provers
 supported by \why, as reported by \verb+why3 --list-provers+
 (interactive provers excluded).
+\index{list-provers@\verb+--list-provers+}
 The current goal is then translated to \why's logic and the prover is
 called. If it reports the goal to be valid, then Coq's \texttt{admit}
 tactic is used to assume the goal. The prover is called with a time

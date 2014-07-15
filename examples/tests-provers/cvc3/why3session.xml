@@ -1,151 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="3"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="4"
-  name="Z3"
-  version="3.2"/>
- <file
-  name="../cvc3.why"
-  verified="false"
-  expanded="false">
-  <theory
-   name="Test"
-   locfile="../cvc3.why"
-   loclnum="3" loccnumb="7" loccnume="11"
-   verified="false"
-   expanded="true">
-   <goal
-    name="test1"
-    locfile="../cvc3.why"
-    loclnum="7" loccnumb="8" loccnume="13"
-    sum="9b11b843ad59e85065989141519c263a"
-    proved="false"
-    expanded="true"
-    shape="ainfix =ainfix /V0c0.0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.03"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="test2"
-    locfile="../cvc3.why"
-    loclnum="9" loccnumb="8" loccnume="13"
-    sum="b62fcf8b2a0e9e64aef1fc1f47e2a60c"
-    proved="false"
-    expanded="true"
-    shape="ainfix =ainfix /V0V0c1.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.02"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.11"/>
-    </proof>
-   </goal>
-   <goal
-    name="test3"
-    locfile="../cvc3.why"
-    loclnum="11" loccnumb="8" loccnume="13"
-    sum="287f4b56fa46976b1861658a4d661362"
-    proved="true"
-    expanded="true"
-    shape="f">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="unknown" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
+<prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
+<prover id="3" name="CVC3" version="2.2" timelimit="5" memlimit="0"/>
+<prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="0"/>
+<file name="../cvc3.why">
+<theory name="Test" expanded="true">
+ <goal name="test1" sum="9b11b843ad59e85065989141519c263a" expanded="true">
+ <proof prover="1"><result status="unknown" time="0.00"/></proof>
+ <proof prover="2"><result status="unknown" time="0.03"/></proof>
+ <proof prover="4"><result status="unknown" time="0.01"/></proof>
+ </goal>
+ <goal name="test2" sum="b62fcf8b2a0e9e64aef1fc1f47e2a60c" expanded="true">
+ <proof prover="0"><result status="unknown" time="0.01"/></proof>
+ <proof prover="1"><result status="unknown" time="0.00"/></proof>
+ <proof prover="2"><result status="timeout" time="5.02"/></proof>
+ <proof prover="3"><result status="unknown" time="0.01"/></proof>
+ <proof prover="4"><result status="timeout" time="5.11"/></proof>
+ </goal>
+ <goal name="test3" sum="287f4b56fa46976b1861658a4d661362" expanded="true">
+ <proof prover="1"><result status="unknown" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

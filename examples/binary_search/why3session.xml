@@ -1,647 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.2"/>
- <prover
-  id="1"
-  name="CVC4"
-  version="1.3"/>
- <prover
-  id="2"
-  name="Z3"
-  version="4.3.1"/>
- <file
-  name="../binary_search.mlw"
-  verified="true"
-  expanded="true">
-  <theory
-   name="BinarySearch"
-   locfile="../binary_search.mlw"
-   loclnum="5" loccnumb="7" loccnume="19"
-   verified="true"
-   expanded="true">
-   <goal
-    name="WP_parameter binary_search"
-    locfile="../binary_search.mlw"
-    loclnum="17" loccnumb="6" loccnume="19"
-    expl="VC for binary_search"
-    sum="f2be93ac5079fd20e85d57cd6badf8bf"
-    proved="true"
-    expanded="true"
-    shape="iNainfix =agetV1V5V2Iainfix &lt;V5V0Aainfix &lt;=c0V5Fiiainfix =agetV1V6V2Aainfix &lt;V6V0Aainfix &lt;=c0V6ainfix &lt;ainfix -V7V4ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Aainfix &lt;=V8V7Aainfix &lt;=V4V8Iainfix =agetV1V8V2Iainfix &lt;V8V0Aainfix &lt;=c0V8FAainfix &lt;V7V0Aainfix &lt;=c0V4Iainfix =V7ainfix -V6c1Fainfix &gt;agetV1V6V2Aainfix &lt;V6V0Aainfix &lt;=c0V6ainfix &lt;ainfix -V3V9ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Aainfix &lt;=V10V3Aainfix &lt;=V9V10Iainfix =agetV1V10V2Iainfix &lt;V10V0Aainfix &lt;=c0V10FAainfix &lt;V3V0Aainfix &lt;=c0V9Iainfix =V9ainfix +V6c1Fainfix &lt;agetV1V6V2Aainfix &lt;V6V0Aainfix &lt;=c0V6Aainfix &lt;=V6V3Aainfix &lt;=V4V6Lainfix +V4adivainfix -V3V4c2ainfix &lt;=V4V3Iainfix &lt;=V11V3Aainfix &lt;=V4V11Iainfix =agetV1V11V2Iainfix &lt;V11V0Aainfix &lt;=c0V11FAainfix &lt;V3V0Aainfix &lt;=c0V4FAainfix &lt;=V12ainfix -V0c1Aainfix &lt;=c0V12Iainfix =agetV1V12V2Iainfix &lt;V12V0Aainfix &lt;=c0V12FAainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0c0Iainfix &lt;=agetV1V13agetV1V14Iainfix &lt;V14V0Aainfix &lt;=V13V14Aainfix &lt;=c0V13FAainfix &lt;=c0V0F">
-    <label
-     name="expl:VC for binary_search"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.17"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="BinarySearchAnyMidPoint"
-   locfile="../binary_search.mlw"
-   loclnum="48" loccnumb="7" loccnume="30"
-   verified="true"
-   expanded="true">
-   <goal
-    name="WP_parameter binary_search"
-    locfile="../binary_search.mlw"
-    loclnum="60" loccnumb="6" loccnume="19"
-    expl="VC for binary_search"
-    sum="cdf50762585570bb24ffc75161b8653e"
-    proved="true"
-    expanded="true"
-    shape="iNainfix =agetV1V5V2Iainfix &lt;V5V0Aainfix &lt;=c0V5Fiiainfix =agetV1V6V2Aainfix &lt;V6V0Aainfix &lt;=c0V6ainfix &lt;ainfix -V7V4ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Aainfix &lt;=V8V7Aainfix &lt;=V4V8Iainfix =agetV1V8V2Iainfix &lt;V8V0Aainfix &lt;=c0V8FAainfix &lt;V7V0Aainfix &lt;=c0V4Iainfix =V7ainfix -V6c1Fainfix &gt;agetV1V6V2Aainfix &lt;V6V0Aainfix &lt;=c0V6ainfix &lt;ainfix -V3V9ainfix -V3V4Aainfix &lt;=c0ainfix -V3V4Aainfix &lt;=V10V3Aainfix &lt;=V9V10Iainfix =agetV1V10V2Iainfix &lt;V10V0Aainfix &lt;=c0V10FAainfix &lt;V3V0Aainfix &lt;=c0V9Iainfix =V9ainfix +V6c1Fainfix &lt;agetV1V6V2Aainfix &lt;V6V0Aainfix &lt;=c0V6Iainfix &lt;=V6V3Aainfix &lt;=V4V6FAainfix &lt;=V4V3ainfix &lt;=V4V3Iainfix &lt;=V11V3Aainfix &lt;=V4V11Iainfix =agetV1V11V2Iainfix &lt;V11V0Aainfix &lt;=c0V11FAainfix &lt;V3V0Aainfix &lt;=c0V4FAainfix &lt;=V12ainfix -V0c1Aainfix &lt;=c0V12Iainfix =agetV1V12V2Iainfix &lt;V12V0Aainfix &lt;=c0V12FAainfix &lt;ainfix -V0c1V0Aainfix &lt;=c0c0Iainfix &lt;=agetV1V13agetV1V14Iainfix &lt;V14V0Aainfix &lt;=V13V14Aainfix &lt;=c0V13FAainfix &lt;=c0V0F">
-    <label
-     name="expl:VC for binary_search"/>
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory
-   name="BinarySearchInt32"
-   locfile="../binary_search.mlw"
-   loclnum="89" loccnumb="7" loccnume="24"
-   verified="true"
-   expanded="true">
-   <goal
-    name="WP_parameter binary_search"
-    locfile="../binary_search.mlw"
-    loclnum="100" loccnumb="6" loccnume="19"
-    expl="VC for binary_search"
-    sum="f8939300ed40c99211ffd920dfbe3c1e"
-    proved="true"
-    expanded="true"
-    shape="iNainfix =agetV1V9V2Iainfix &lt;V9ato_intV0Aainfix &lt;=c0V9Fiiainfix =agetV1ato_intV13V2Aainfix &lt;ato_intV13ato_intV0Aainfix &lt;=c0ato_intV13ainfix &lt;ainfix -ato_intV18ato_intV7ainfix -ato_intV6ato_intV7Aainfix &lt;=c0ainfix -ato_intV6ato_intV7Aainfix &lt;=V19ato_intV18Aainfix &lt;=ato_intV7V19Iainfix =agetV1V19V2Iainfix &lt;V19ato_intV0Aainfix &lt;=c0V19FAainfix &lt;ato_intV18ato_intV0Aainfix &lt;=c0ato_intV7Iainfix =V18V17FIainfix =ato_intV17ainfix -ato_intV13ato_intV16FAain_boundsainfix -ato_intV13ato_intV16Iainfix =ato_intV16c1FAain_boundsc1ainfix =V15aTrueIainfix &gt;ato_intagetV1ato_intV13ato_intV2qainfix =V15aTrueFAainfix &lt;ato_intV13ato_intV0Aainfix &lt;=c0ato_intV13ainfix &lt;ainfix -ato_intV6ato_intV22ainfix -ato_intV6ato_intV7Aainfix &lt;=c0ainfix -ato_intV6ato_intV7Aainfix &lt;=V23ato_intV6Aainfix &lt;=ato_intV22V23Iainfix =agetV1V23V2Iainfix &lt;V23ato_intV0Aainfix &lt;=c0V23FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV22Iainfix =V22V21FIainfix =ato_intV21ainfix +ato_intV13ato_intV20FAain_boundsainfix +ato_intV13ato_intV20Iainfix =ato_intV20c1FAain_boundsc1ainfix =V14aTrueIainfix &lt;ato_intagetV1ato_intV13ato_intV2qainfix =V14aTrueFAainfix &lt;ato_intV13ato_intV0Aainfix &lt;=c0ato_intV13Aainfix &lt;=ato_intV13ato_intV6Aainfix &lt;=ato_intV7ato_intV13Iainfix =ato_intV13ainfix +ato_intV7ato_intV12FAain_boundsainfix +ato_intV7ato_intV12Iainfix =ato_intV12adivato_intV11ato_intV10FAain_boundsadivato_intV11ato_intV10ANainfix =ato_intV10c0Iainfix =ato_intV11ainfix -ato_intV6ato_intV7FAain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV10c2FAain_boundsc2ainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V24ato_intV6Aainfix &lt;=ato_intV7V24Iainfix =agetV1V24V2Iainfix &lt;V24ato_intV0Aainfix &lt;=c0V24FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FAainfix &lt;=V25ato_intV5Aainfix &lt;=ato_intV3V25Iainfix =agetV1V25V2Iainfix &lt;V25ato_intV0Aainfix &lt;=c0V25FAainfix &lt;ato_intV5ato_intV0Aainfix &lt;=c0ato_intV3Iainfix =ato_intV5ainfix -ato_intV0ato_intV4FAain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FAain_boundsc1Iainfix =ato_intV3c0FAain_boundsc0Iainfix &lt;=ato_intagetV1V26ato_intagetV1V27Iainfix &lt;V27ato_intV0Aainfix &lt;=V26V27Aainfix &lt;=c0V26FAainfix &lt;=c0ato_intV0F">
-    <label
-     name="expl:VC for binary_search"/>
-    <proof
-     prover="1"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.22"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="10"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <transf
-     name="split_goal_wp"
-     proved="true"
-     expanded="true">
-     <goal
-      name="WP_parameter binary_search.1"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="1. integer overflow"
-      sum="652697bebaea495903eba04af7fbfa87"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsc0Iainfix &lt;=ato_intagetV1V3ato_intagetV1V4Iainfix &lt;V4ato_intV0Aainfix &lt;=V3V4Aainfix &lt;=c0V3FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.2"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="2. integer overflow"
-      sum="9ff6907c24789d55ee262725c1f6736b"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V4ato_intagetV1V5Iainfix &lt;V5ato_intV0Aainfix &lt;=V4V5Aainfix &lt;=c0V4FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.3"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="3. integer overflow"
-      sum="a3c4193900e4f717e8dbdfe932cd5ebc"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V5ato_intagetV1V6Iainfix &lt;V6ato_intV0Aainfix &lt;=V5V6Aainfix &lt;=c0V5FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.4"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="4. loop invariant init"
-      sum="0fd708331bbf5c24c88c407434c55f7f"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix &lt;ato_intV5ato_intV0Aainfix &lt;=c0ato_intV3Iainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V6ato_intagetV1V7Iainfix &lt;V7ato_intV0Aainfix &lt;=V6V7Aainfix &lt;=c0V6FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.5"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="5. loop invariant init"
-      sum="94de7de8e64511178b69ac40ecb469b3"
-      proved="true"
-      expanded="false"
-      shape="loop invariant initainfix &lt;=V6ato_intV5Aainfix &lt;=ato_intV3V6Iainfix =agetV1V6V2Iainfix &lt;V6ato_intV0Aainfix &lt;=c0V6FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V7ato_intagetV1V8Iainfix &lt;V8ato_intV0Aainfix &lt;=V7V8Aainfix &lt;=c0V7FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.6"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="6. integer overflow"
-      sum="930ca88aca2eb11d521718af13f7d146"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V9ato_intV6Aainfix &lt;=ato_intV7V9Iainfix =agetV1V9V2Iainfix &lt;V9ato_intV0Aainfix &lt;=c0V9FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V10ato_intagetV1V11Iainfix &lt;V11ato_intV0Aainfix &lt;=V10V11Aainfix &lt;=c0V10FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.7"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="7. integer overflow"
-      sum="8acf5f83d4a98f1c3132f93c505a0c6e"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V10ato_intV6Aainfix &lt;=ato_intV7V10Iainfix =agetV1V10V2Iainfix &lt;V10ato_intV0Aainfix &lt;=c0V10FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V11ato_intagetV1V12Iainfix &lt;V12ato_intV0Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.8"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="8. division by zero"
-      sum="c290b52647f0d5e65c68ca9015e9bba2"
-      proved="true"
-      expanded="false"
-      shape="division by zeroNainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V11ato_intV6Aainfix &lt;=ato_intV7V11Iainfix =agetV1V11V2Iainfix &lt;V11ato_intV0Aainfix &lt;=c0V11FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V12ato_intagetV1V13Iainfix &lt;V13ato_intV0Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.9"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="9. integer overflow"
-      sum="0d3817e8989eee540a4d55f6d124505a"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsadivato_intV10ato_intV9Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V11ato_intV6Aainfix &lt;=ato_intV7V11Iainfix =agetV1V11V2Iainfix &lt;V11ato_intV0Aainfix &lt;=c0V11FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V12ato_intagetV1V13Iainfix &lt;V13ato_intV0Aainfix &lt;=V12V13Aainfix &lt;=c0V12FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.10"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="10. integer overflow"
-      sum="de7f9085fa267ef9e1dd849c3427cc74"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V12ato_intV6Aainfix &lt;=ato_intV7V12Iainfix =agetV1V12V2Iainfix &lt;V12ato_intV0Aainfix &lt;=c0V12FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V13ato_intagetV1V14Iainfix &lt;V14ato_intV0Aainfix &lt;=V13V14Aainfix &lt;=c0V13FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.32"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.11"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="11. assertion"
-      sum="e6f434486a8ad1bcb0244707a726f2df"
-      proved="true"
-      expanded="false"
-      shape="assertionainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V13ato_intV6Aainfix &lt;=ato_intV7V13Iainfix =agetV1V13V2Iainfix &lt;V13ato_intV0Aainfix &lt;=c0V13FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V14ato_intagetV1V15Iainfix &lt;V15ato_intV0Aainfix &lt;=V14V15Aainfix &lt;=c0V14FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.66"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.12"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="12. precondition"
-      sum="23ab74e94ac84d577b5f84947672f291"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V13ato_intV6Aainfix &lt;=ato_intV7V13Iainfix =agetV1V13V2Iainfix &lt;V13ato_intV0Aainfix &lt;=c0V13FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V14ato_intagetV1V15Iainfix &lt;V15ato_intV0Aainfix &lt;=V14V15Aainfix &lt;=c0V14FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.13"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="13. integer overflow"
-      sum="40ef9c1855a8494ca1206beb71ddf613"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsc1Iainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V14ato_intV6Aainfix &lt;=ato_intV7V14Iainfix =agetV1V14V2Iainfix &lt;V14ato_intV0Aainfix &lt;=c0V14FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V15ato_intagetV1V16Iainfix &lt;V16ato_intV0Aainfix &lt;=V15V16Aainfix &lt;=c0V15FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.14"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="14. integer overflow"
-      sum="d708f0a8ce7b0a5850e749d26d3b9677"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsainfix +ato_intV12ato_intV14Iainfix =ato_intV14c1FIain_boundsc1Iainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V15ato_intV6Aainfix &lt;=ato_intV7V15Iainfix =agetV1V15V2Iainfix &lt;V15ato_intV0Aainfix &lt;=c0V15FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V16ato_intagetV1V17Iainfix &lt;V17ato_intV0Aainfix &lt;=V16V17Aainfix &lt;=c0V16FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.15"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="15. loop invariant preservation"
-      sum="20cc1470a686f692f46f6992e497501f"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV16Iainfix =V16V15FIainfix =ato_intV15ainfix +ato_intV12ato_intV14FIain_boundsainfix +ato_intV12ato_intV14Iainfix =ato_intV14c1FIain_boundsc1Iainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V17ato_intV6Aainfix &lt;=ato_intV7V17Iainfix =agetV1V17V2Iainfix &lt;V17ato_intV0Aainfix &lt;=c0V17FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V18ato_intagetV1V19Iainfix &lt;V19ato_intV0Aainfix &lt;=V18V19Aainfix &lt;=c0V18FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.16"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="16. loop invariant preservation"
-      sum="f9fb3296a9d43a0607640b89beeabe37"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;=V17ato_intV6Aainfix &lt;=ato_intV16V17Iainfix =agetV1V17V2Iainfix &lt;V17ato_intV0Aainfix &lt;=c0V17FIainfix =V16V15FIainfix =ato_intV15ainfix +ato_intV12ato_intV14FIain_boundsainfix +ato_intV12ato_intV14Iainfix =ato_intV14c1FIain_boundsc1Iainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V18ato_intV6Aainfix &lt;=ato_intV7V18Iainfix =agetV1V18V2Iainfix &lt;V18ato_intV0Aainfix &lt;=c0V18FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V19ato_intagetV1V20Iainfix &lt;V20ato_intV0Aainfix &lt;=V19V20Aainfix &lt;=c0V19FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="3.81"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.17"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="17. loop variant decrease"
-      sum="1b91ead561a5bfde6f55f4cdfdbb3402"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -ato_intV6ato_intV16ainfix -ato_intV6ato_intV7Aainfix &lt;=c0ainfix -ato_intV6ato_intV7Iainfix =V16V15FIainfix =ato_intV15ainfix +ato_intV12ato_intV14FIain_boundsainfix +ato_intV12ato_intV14Iainfix =ato_intV14c1FIain_boundsc1Iainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V17ato_intV6Aainfix &lt;=ato_intV7V17Iainfix =agetV1V17V2Iainfix &lt;V17ato_intV0Aainfix &lt;=c0V17FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V18ato_intagetV1V19Iainfix &lt;V19ato_intV0Aainfix &lt;=V18V19Aainfix &lt;=c0V18FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.18"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="18. precondition"
-      sum="5e2b28018c4f90f39de6fc8eea51f8d9"
-      proved="true"
-      expanded="false"
-      shape="preconditionainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12INainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V14ato_intV6Aainfix &lt;=ato_intV7V14Iainfix =agetV1V14V2Iainfix &lt;V14ato_intV0Aainfix &lt;=c0V14FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V15ato_intagetV1V16Iainfix &lt;V16ato_intV0Aainfix &lt;=V15V16Aainfix &lt;=c0V15FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.19"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="19. integer overflow"
-      sum="6c2c79cca3ac804bf9ad4e696a9290ad"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsc1Iainfix =V14aTrueIainfix &gt;ato_intagetV1ato_intV12ato_intV2qainfix =V14aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12INainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V15ato_intV6Aainfix &lt;=ato_intV7V15Iainfix =agetV1V15V2Iainfix &lt;V15ato_intV0Aainfix &lt;=c0V15FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V16ato_intagetV1V17Iainfix &lt;V17ato_intV0Aainfix &lt;=V16V17Aainfix &lt;=c0V16FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.20"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="20. integer overflow"
-      sum="997886fa7b2de454796d5d345b47aa06"
-      proved="true"
-      expanded="false"
-      shape="integer overflowain_boundsainfix -ato_intV12ato_intV15Iainfix =ato_intV15c1FIain_boundsc1Iainfix =V14aTrueIainfix &gt;ato_intagetV1ato_intV12ato_intV2qainfix =V14aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12INainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V16ato_intV6Aainfix &lt;=ato_intV7V16Iainfix =agetV1V16V2Iainfix &lt;V16ato_intV0Aainfix &lt;=c0V16FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V17ato_intagetV1V18Iainfix &lt;V18ato_intV0Aainfix &lt;=V17V18Aainfix &lt;=c0V17FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.21"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="21. loop invariant preservation"
-      sum="b66517977b9771eb289507e3adbed646"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;ato_intV17ato_intV0Aainfix &lt;=c0ato_intV7Iainfix =V17V16FIainfix =ato_intV16ainfix -ato_intV12ato_intV15FIain_boundsainfix -ato_intV12ato_intV15Iainfix =ato_intV15c1FIain_boundsc1Iainfix =V14aTrueIainfix &gt;ato_intagetV1ato_intV12ato_intV2qainfix =V14aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12INainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V18ato_intV6Aainfix &lt;=ato_intV7V18Iainfix =agetV1V18V2Iainfix &lt;V18ato_intV0Aainfix &lt;=c0V18FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V19ato_intagetV1V20Iainfix &lt;V20ato_intV0Aainfix &lt;=V19V20Aainfix &lt;=c0V19FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.22"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="22. loop invariant preservation"
-      sum="462401d92b64bd4a0265e6e8939e077d"
-      proved="true"
-      expanded="false"
-      shape="loop invariant preservationainfix &lt;=V18ato_intV17Aainfix &lt;=ato_intV7V18Iainfix =agetV1V18V2Iainfix &lt;V18ato_intV0Aainfix &lt;=c0V18FIainfix =V17V16FIainfix =ato_intV16ainfix -ato_intV12ato_intV15FIain_boundsainfix -ato_intV12ato_intV15Iainfix =ato_intV15c1FIain_boundsc1Iainfix =V14aTrueIainfix &gt;ato_intagetV1ato_intV12ato_intV2qainfix =V14aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12INainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V19ato_intV6Aainfix &lt;=ato_intV7V19Iainfix =agetV1V19V2Iainfix &lt;V19ato_intV0Aainfix &lt;=c0V19FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V20ato_intagetV1V21Iainfix &lt;V21ato_intV0Aainfix &lt;=V20V21Aainfix &lt;=c0V20FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="3.54"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.23"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="23. loop variant decrease"
-      sum="0a8ed62d6fea1d6a7746328889498830"
-      proved="true"
-      expanded="false"
-      shape="loop variant decreaseainfix &lt;ainfix -ato_intV17ato_intV7ainfix -ato_intV6ato_intV7Aainfix &lt;=c0ainfix -ato_intV6ato_intV7Iainfix =V17V16FIainfix =ato_intV16ainfix -ato_intV12ato_intV15FIain_boundsainfix -ato_intV12ato_intV15Iainfix =ato_intV15c1FIain_boundsc1Iainfix =V14aTrueIainfix &gt;ato_intagetV1ato_intV12ato_intV2qainfix =V14aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12INainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V18ato_intV6Aainfix &lt;=ato_intV7V18Iainfix =agetV1V18V2Iainfix &lt;V18ato_intV0Aainfix &lt;=c0V18FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V19ato_intagetV1V20Iainfix &lt;V20ato_intV0Aainfix &lt;=V19V20Aainfix &lt;=c0V19FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.24"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="24. postcondition"
-      sum="fe3b453407104702b98090b358afb355"
-      proved="true"
-      expanded="false"
-      shape="postconditionainfix =agetV1ato_intV12V2Aainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12INainfix =V14aTrueIainfix &gt;ato_intagetV1ato_intV12ato_intV2qainfix =V14aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12INainfix =V13aTrueIainfix &lt;ato_intagetV1ato_intV12ato_intV2qainfix =V13aTrueFIainfix &lt;ato_intV12ato_intV0Aainfix &lt;=c0ato_intV12Iainfix &lt;=ato_intV12ato_intV6Aainfix &lt;=ato_intV7ato_intV12Iainfix =ato_intV12ainfix +ato_intV7ato_intV11FIain_boundsainfix +ato_intV7ato_intV11Iainfix =ato_intV11adivato_intV10ato_intV9FIain_boundsadivato_intV10ato_intV9ANainfix =ato_intV9c0Iainfix =ato_intV10ainfix -ato_intV6ato_intV7FIain_boundsainfix -ato_intV6ato_intV7Iainfix =ato_intV9c2FIain_boundsc2Iainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V15ato_intV6Aainfix &lt;=ato_intV7V15Iainfix =agetV1V15V2Iainfix &lt;V15ato_intV0Aainfix &lt;=c0V15FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V16ato_intagetV1V17Iainfix &lt;V17ato_intV0Aainfix &lt;=V16V17Aainfix &lt;=c0V16FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.46"/>
-      </proof>
-     </goal>
-     <goal
-      name="WP_parameter binary_search.25"
-      locfile="../binary_search.mlw"
-      loclnum="100" loccnumb="6" loccnume="19"
-      expl="25. exceptional postcondition"
-      sum="39569d7b69c04e1af720f3da0c4282be"
-      proved="true"
-      expanded="false"
-      shape="exceptional postconditionNainfix =agetV1V9V2Iainfix &lt;V9ato_intV0Aainfix &lt;=c0V9FINainfix =V8aTrueIainfix &lt;=ato_intV7ato_intV6qainfix =V8aTrueFIainfix &lt;=V10ato_intV6Aainfix &lt;=ato_intV7V10Iainfix =agetV1V10V2Iainfix &lt;V10ato_intV0Aainfix &lt;=c0V10FAainfix &lt;ato_intV6ato_intV0Aainfix &lt;=c0ato_intV7FIainfix =ato_intV5ainfix -ato_intV0ato_intV4FIain_boundsainfix -ato_intV0ato_intV4Iainfix =ato_intV4c1FIain_boundsc1Iainfix =ato_intV3c0FIain_boundsc0Iainfix &lt;=ato_intagetV1V11ato_intagetV1V12Iainfix &lt;V12ato_intV0Aainfix &lt;=V11V12Aainfix &lt;=c0V11FAainfix &lt;=c0ato_intV0F">
-      <label
-       name="expl:VC for binary_search"/>
-      <proof
-       prover="0"
-       timelimit="5"
-       memlimit="1000"
-       obsolete="false"
-       archived="false">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.3" timelimit="10" memlimit="1000"/>
+<file name="../binary_search.mlw" expanded="true">
+<theory name="BinarySearch" expanded="true">
+ <goal name="WP_parameter binary_search" expl="VC for binary_search" sum="f111c72f538ff096c2463a16d0ee1531" expanded="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" timelimit="10"><result status="valid" time="0.17"/></proof>
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ </goal>
+</theory>
+<theory name="BinarySearchAnyMidPoint" expanded="true">
+ <goal name="WP_parameter binary_search" expl="VC for binary_search" sum="2ef34a49a235644800280811fde7f825" expanded="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ </goal>
+</theory>
+<theory name="BinarySearchInt32" expanded="true">
+ <goal name="WP_parameter binary_search" expl="VC for binary_search" sum="2376bb8c282da41c650954824cc1850b" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.22"/></proof>
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter binary_search.1" expl="1. integer overflow" sum="40f616b4f4af1dac00f792adef7b0880">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.2" expl="2. integer overflow" sum="85c4626ae1fd225c0d69c56254d9957d">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.3" expl="3. integer overflow" sum="f6b0d107cec009c4e7b3234231e3761d">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.4" expl="4. loop invariant init" sum="eeb2ca9a16b6407ef254c52ac180e238">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.5" expl="5. loop invariant init" sum="5814ce7c648bef253c77a7d370145f0a">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.6" expl="6. integer overflow" sum="b49c1495adce6e681ab8ef6751ea48ff">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.7" expl="7. integer overflow" sum="0ec32669a0b3ae033514858b67106289">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.8" expl="8. division by zero" sum="54246d7493697063d630dc0c68020af0">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.9" expl="9. integer overflow" sum="88d9c84e323dc18df2116fafbd30832c">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.10" expl="10. integer overflow" sum="6fa725b77a6f6c333c46a26216cf8c1a">
+  <proof prover="1"><result status="valid" time="0.32"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.11" expl="11. assertion" sum="dd2be40951479ddc7210db78d36a5565">
+  <proof prover="1"><result status="valid" time="0.66"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.12" expl="12. index in array bounds" sum="d41932b6b03f6725783e9c9236fb1f59">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.13" expl="13. integer overflow" sum="773d69bd9242c91799cb983381401c70">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.14" expl="14. integer overflow" sum="9d4fa5d1b0a8100c166a506b7a092f16">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.15" expl="15. loop invariant preservation" sum="d264e441c17d414d9292966e45116c47">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.16" expl="16. loop invariant preservation" sum="ed011df4b8b1d0c5893a1af2887c0bd6">
+  <proof prover="1"><result status="valid" time="3.81"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.17" expl="17. loop variant decrease" sum="3ab1a9374df41cc7d8394f97c3ca9e5e">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.18" expl="18. index in array bounds" sum="6341b1810be2c112c88cf631409726ac">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.19" expl="19. integer overflow" sum="6215f0e8b0c6038389f3b43cea47e130">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.20" expl="20. integer overflow" sum="109b69b1615374c70ffd4e58660d488e">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.21" expl="21. loop invariant preservation" sum="8c3d9056d0aa844c8317eae7ae118f90">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.22" expl="22. loop invariant preservation" sum="371f2656f709291669b4ed3d83bee3b0">
+  <proof prover="1"><result status="valid" time="3.54"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.23" expl="23. loop variant decrease" sum="92659f917304b5e3db4ba9cd9f791512">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.24" expl="24. postcondition" sum="aa9ac58c17315f72d6e61dd4b89d5a29">
+  <proof prover="1"><result status="valid" time="0.46"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_search.25" expl="25. exceptional postcondition" sum="c7d932701023469e2e26d7583d4ac754">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

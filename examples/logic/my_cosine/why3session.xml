@@ -1,109 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="Coq"
-  version="8.4pl2"/>
- <prover
-  id="2"
-  name="Gappa"
-  version="1.1.1"/>
- <prover
-  id="3"
-  name="MetiTarski"
-  version="2.2"/>
- <file
-  name="../my_cosine.why"
-  verified="true"
-  expanded="true">
-  <theory
-   name="CosineSingle"
-   locfile="../my_cosine.why"
-   loclnum="1" loccnumb="7" loccnume="19"
-   verified="true"
-   expanded="true">
-   <goal
-    name="MethodError"
-    locfile="../my_cosine.why"
-    loclnum="13" loccnumb="6" loccnume="17"
-    sum="fa917a528db6f39529f204d876e0c7c5"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *V0V0acosV0c0x1.p-24Iainfix &lt;=aabsV0c0x1.p-5F">
-    <proof
-     prover="1"
-     timelimit="8"
-     memlimit="1000"
-     edited="my_cosine_CosineSingle_MethodError_1.v"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="3.79"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="3"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.39"/>
-    </proof>
-   </goal>
-   <goal
-    name="TotalErrorFullyExpanded"
-    locfile="../my_cosine.why"
-    loclnum="20" loccnumb="6" loccnume="29"
-    sum="4526760675ec316b0fa6d6a797263752"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=aabsainfix -V3acosavalueV0c0x1.p-23Iainfix =V3aroundaNearestTiesToEvenainfix -c1.0V2Iainfix =V2aroundaNearestTiesToEvenainfix *c0.5V1Iainfix =V1aroundaNearestTiesToEvenainfix *avalueV0avalueV0FIainfix &lt;=aabsainfix -ainfix -c1.0ainfix *c0.5ainfix *avalueV0avalueV0acosavalueV0c0x1.p-24Iainfix &lt;=aabsavalueV0c0x1.p-5F">
-    <proof
-     prover="2"
-     timelimit="2"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-   <goal
-    name="TotalErrorExpanded"
-    locfile="../my_cosine.why"
-    loclnum="31" loccnumb="6" loccnume="24"
-    sum="015837384308c99363f0d450f725d24c"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=aabsainfix -V3acosavalueV0c0x1.p-23LaroundaNearestTiesToEvenainfix -c1.0V2LaroundaNearestTiesToEvenainfix *c0.5V1LaroundaNearestTiesToEvenainfix *avalueV0avalueV0Iainfix &lt;=aabsavalueV0c0x1.p-5F">
-    <proof
-     prover="0"
-     timelimit="3"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="2.34"/>
-    </proof>
-   </goal>
-   <goal
-    name="TotalError"
-    locfile="../my_cosine.why"
-    loclnum="51" loccnumb="6" loccnume="16"
-    sum="8ea5ffcbc3a2cd90c1252532cb1d1553"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=aabsainfix -avalueV1acosavalueV0c0x1.p-23Lacos_singleV0Iainfix &lt;=aabsavalueV0c0x1.p-5F">
-    <proof
-     prover="0"
-     timelimit="10"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.08"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="3" memlimit="0"/>
+<prover id="1" name="MetiTarski" version="2.2" timelimit="3" memlimit="1000"/>
+<prover id="2" name="Gappa" version="1.1.1" timelimit="2" memlimit="0"/>
+<prover id="3" name="Coq" version="8.4pl3" timelimit="8" memlimit="1000"/>
+<file name="../my_cosine.why" expanded="true">
+<theory name="CosineSingle" expanded="true">
+ <goal name="MethodError" sum="fa917a528db6f39529f204d876e0c7c5" expanded="true">
+ <proof prover="1"><result status="valid" time="0.24"/></proof>
+ <proof prover="3" edited="my_cosine_CosineSingle_MethodError_1.v"><result status="valid" time="3.79"/></proof>
+ </goal>
+ <goal name="TotalErrorFullyExpanded" sum="4526760675ec316b0fa6d6a797263752" expanded="true">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="TotalErrorExpanded" sum="015837384308c99363f0d450f725d24c" expanded="true">
+ <proof prover="0"><result status="valid" time="2.34"/></proof>
+ </goal>
+ <goal name="TotalError" sum="8ea5ffcbc3a2cd90c1252532cb1d1553" expanded="true">
+ <proof prover="0" timelimit="10"><result status="valid" time="0.08"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

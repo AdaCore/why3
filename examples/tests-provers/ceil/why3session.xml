@@ -1,676 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.94"/>
- <prover
-  id="1"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="2"
-  name="CVC3"
-  version="2.2"/>
- <prover
-  id="3"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="4"
-  name="Gappa"
-  version="1.1.1"/>
- <prover
-  id="5"
-  name="Z3"
-  version="2.19"/>
- <prover
-  id="6"
-  name="Z3"
-  version="3.2"/>
- <prover
-  id="7"
-  name="Z3"
-  version="4.3.1"/>
- <file
-  name="../ceil.why"
-  verified="true"
-  expanded="true">
-  <theory
-   name="Ceil"
-   locfile="../ceil.why"
-   loclnum="1" loccnumb="7" loccnume="11"
-   verified="true"
-   expanded="true">
-   <goal
-    name="ceil_obvious"
-    locfile="../ceil.why"
-    loclnum="6" loccnumb="7" loccnume="19"
-    sum="75ec4700e0fef9885bbeb8f2bb30f8e9"
-    proved="true"
-    expanded="false"
-    shape="ainfix =aceilc0.1c1">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="4"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="unity"
-    locfile="../ceil.why"
-    loclnum="8" loccnumb="8" loccnume="13"
-    sum="3d618f2773c277c69d3c501bf7c9ee3d"
-    proved="true"
-    expanded="false"
-    shape="ainfix =V0ainfix *.c1.0V0Iainfix &gt;V0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="unity2"
-    locfile="../ceil.why"
-    loclnum="11" loccnumb="8" loccnume="14"
-    sum="f319dc9119647d72decba1985869a06a"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix /.V0V0ainfix /.ainfix *.c1.0V0V0Iainfix &gt;V0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="perm_div"
-    locfile="../ceil.why"
-    loclnum="14" loccnumb="8" loccnume="16"
-    sum="caa9c135ebad086ab4a3fadd7ad92344"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix /.ainfix *.V0V1V1ainfix *.V0ainfix /.V1V1Iainfix &gt;V1c0.0Aainfix &gt;V0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="timeout" time="5.07"/>
-    </proof>
-   </goal>
-   <goal
-    name="perm_div2"
-    locfile="../ceil.why"
-    loclnum="17" loccnumb="8" loccnume="17"
-    sum="083074e2fccefc1e9ca1ecf2b6ad7eae"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix /.ainfix *.V0V1V1ainfix *.ainfix /.V0V1V1Iainfix &gt;V1c0.0Aainfix &gt;V0c0.0F">
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="div_mult_perm"
-    locfile="../ceil.why"
-    loclnum="20" loccnumb="8" loccnume="21"
-    sum="6a79d10d8fbb1d531ef1feea932d876d"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix *.ainfix /.c1.0V0V0ainfix /.ainfix *.c1.0V0V0Iainfix &gt;V0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="b_div_b_is_one"
-    locfile="../ceil.why"
-    loclnum="23" loccnumb="8" loccnume="22"
-    sum="c89a4df292e82d44c8c50e0f49fe7846"
-    proved="true"
-    expanded="false"
-    shape="ainfix =c1.0ainfix /.V0V0Iainfix &gt;V0c0.0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="inverse_inverse_is_same"
-    locfile="../ceil.why"
-    loclnum="26" loccnumb="8" loccnume="31"
-    sum="2b46c1cba163382fb0b8bffecdd501bc"
-    proved="true"
-    expanded="false"
-    shape="ainfix =c1.0ainfix *.ainfix /.c1.0V0V0Iainfix &gt;V0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal
-    name="inverse_bigger_zero"
-    locfile="../ceil.why"
-    loclnum="29" loccnumb="8" loccnume="27"
-    sum="d7c4d768d5025307be499ece7479dcca"
-    proved="true"
-    expanded="false"
-    shape="ainfix &gt;ainfix /.c1.0V0c0.0Iainfix &gt;V0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="div_equals_mult_w_inverse"
-    locfile="../ceil.why"
-    loclnum="32" loccnumb="8" loccnume="33"
-    sum="a41095af1beb1dd9604e34a4b85e96b1"
-    proved="true"
-    expanded="false"
-    shape="ainfix =ainfix /.V0V1ainfix *.V0ainfix /.c1.0V1Iainfix &gt;V1c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="mult_bigger_zero"
-    locfile="../ceil.why"
-    loclnum="35" loccnumb="8" loccnume="24"
-    sum="71004fe1deed109cd44052fd3edb798f"
-    proved="true"
-    expanded="false"
-    shape="ainfix &gt;ainfix *.V0V1c0.0Iainfix &gt;V1c0.0Aainfix &gt;V0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="ceil_never_zero"
-    locfile="../ceil.why"
-    loclnum="38" loccnumb="7" loccnume="22"
-    sum="6b90bcd2de47704670cc76926d1297d0"
-    proved="true"
-    expanded="false"
-    shape="Nainfix =aceilainfix /.V0V1c0Iainfix &gt;V1c0.0Aainfix &gt;V0c0.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.04"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.10"/>
-    </proof>
-    <proof
-     prover="5"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="6"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="7"
-     timelimit="5"
-     memlimit="1000"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.94" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
+<prover id="4" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="6" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Gappa" version="1.1.1" timelimit="5" memlimit="1000"/>
+<file name="../ceil.why" expanded="true">
+<theory name="Ceil" expanded="true">
+ <goal name="ceil_obvious" sum="75ec4700e0fef9885bbeb8f2bb30f8e9">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="unity" sum="3d618f2773c277c69d3c501bf7c9ee3d">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="unity2" sum="f319dc9119647d72decba1985869a06a">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="perm_div" sum="caa9c135ebad086ab4a3fadd7ad92344">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="timeout" time="5.07"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="perm_div2" sum="083074e2fccefc1e9ca1ecf2b6ad7eae">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.03"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="div_mult_perm" sum="6a79d10d8fbb1d531ef1feea932d876d">
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.03"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="b_div_b_is_one" sum="c89a4df292e82d44c8c50e0f49fe7846">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="inverse_inverse_is_same" sum="2b46c1cba163382fb0b8bffecdd501bc">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.03"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="inverse_bigger_zero" sum="d7c4d768d5025307be499ece7479dcca">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="6"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="div_equals_mult_w_inverse" sum="a41095af1beb1dd9604e34a4b85e96b1">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="6"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="mult_bigger_zero" sum="71004fe1deed109cd44052fd3edb798f">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="ceil_never_zero" sum="6b90bcd2de47704670cc76926d1297d0">
+ <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.10"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

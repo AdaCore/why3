@@ -1,0 +1,66 @@
+
+module Monoid
+  
+  type t
+  
+  constant zero : t
+  function op (a b:t) : t
+  
+  axiom assoc : forall a b c:t. op a (op b c) = op (op a b) c
+  axiom neutral : forall x:t. op x zero = x = op zero x
+  
+end
+
+module MonoidList
+  
+  use import list.Append
+  use import HighOrd
+  clone import Monoid as M
+  
+  (* Because definitions cannot be replicated via cloning. *)
+  function sum (f:'a -> t) (l:list 'a) : t
+  axiom sum_def_nil : forall f:'a -> t. sum f Nil = zero
+  axiom sum_def_cons : forall f:'a -> t,x,q.
+    sum f (Cons x q) = op (f x) (sum f q)
+  
+  let rec lemma sum_append (f:'a -> t) (l r:list 'a) : unit
+    ensures { sum f (l ++ r) = op (sum f l) (sum f r) }
+    variant { l }
+  = match l with Cons _ q -> sum_append f q r | _ -> () end
+  
+end
+
+module MonoidListDef
+  use import list.List
+  use import HighOrd
+  
+  namespace M
+    type t
+    constant zero : t
+    function op (a b:t) : t
+  end
+  function sum (f:'a -> M.t) (l:list 'a) : M.t = match l with
+    | Nil -> M.zero
+    | Cons x q -> M.op (f x) (sum f q)
+    end
+  clone export MonoidList with type M.t = M.t,constant M.zero = M.zero,
+    function M.op = M.op,function sum = sum,
+    goal sum_def_nil,goal sum_def_cons
+  
+end
+
+module ComputableMonoid
+  
+  use import program_type.TypeParams
+  clone export program_type.Type0
+  clone export Monoid with type t = m
+  
+  val zero () : t
+    ensures { c result /\ result.m = zero }
+  
+  val op (a b:t) : t
+    requires { c a /\ c b }
+    ensures { c result /\ result.m = op a.m b.m }
+  
+end
+

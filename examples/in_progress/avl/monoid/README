@@ -1,0 +1,49 @@
+
+This development propose verified implementations of several data structures:
+random-access lists, priority queues, ordered set and maps. They are derived
+from a common parametric implementation of self-balancing binary trees in the
+style of Adelson-Velskii and Landis trees (AVL trees).
+
+Structure of the development:
+
+- program_type: Parametricity over invariants and logical model.
+  
+  In this development we assume that every type used in programs come with a
+  structural invariant, a type representing its logical model,
+  and a logical function computing the model. As every datatype we
+  implement follows that structure, we have to assume the same for
+  abstract datatypes (including type variables). This file describe
+  the corresponding parameters.
+  
+  /!\ NOTE: This is a necessary but rather administrative concern. For clarity,
+    it was omitted in the paper describing the development.
+
+- monoid: formalization of (computable) monoids
+
+- avl: Generic implementation of AVL trees using an abstract binary search
+  mechanism. Can be used directly as an implementation of catenable dequeues.
+
+- ral: Random-access sequences, with efficient catenation and positional
+  splitting
+
+- key_type: Formalization of data from which key can be extracted.
+
+- preorder: Formalization of (computable total) preorder.
+
+- priority_queue: Implementation of mergeable priority queues with respect to
+  abstract keys and computable preorder.
+
+- sorted: Formalization of increasing list + some facts about increasing lists
+  related to concatenation.
+
+- association_list: Formalization of association list + a number of facts
+  about (sorted) association lists, mostly related to concatenation.
+
+- map: Implementation of ordered associative arrays, and two specializations to
+  ordered set and maps.
+  
+  In addition to the operations derived directly from the generic AVL trees,
+  the implementation features set-theoretic operations
+  (union,intersection,(symmetric) difference).
+
+

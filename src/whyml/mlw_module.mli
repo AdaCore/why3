@@ -92,7 +92,13 @@ val restore_module : theory -> modul
 (** {2 Use and clone} *)
 
 val use_export : module_uc -> modul -> module_uc
-val clone_export : module_uc -> modul -> th_inst -> module_uc
+
+type mod_inst = {
+  inst_pv : pvsymbol Mpv.t;
+  inst_ps : psymbol Mps.t;
+}
+
+val clone_export : module_uc -> modul -> mod_inst -> th_inst -> module_uc
 
 (** {2 Logic decls} *)
 

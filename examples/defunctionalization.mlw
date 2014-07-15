@@ -9,8 +9,6 @@ at the {h <a href="http://jfla.inria.fr/2014/">JFLA 2014 conference</a>}
 *)
 
 
-(** {h } *)
-
 (** {2 Simple Arithmetic Expressions} *)
 
 module Expr
@@ -120,6 +118,10 @@ let test () =
    interpret_0 p4)
 
 
+constant v3 : int = eval_0 p3
+
+goal eval_p3 : v3 = 1
+
 end
 
 
@@ -143,7 +145,7 @@ use import Expr
 
 use HighOrd
 
-function eval_1 (e:expr) (k:int -> 'a) : 'a =
+function eval_1 (e:expr) (k: int->'a) : 'a =
   match e with
     | Cte n -> k n
     | Sub e1 e2 ->
@@ -157,7 +159,7 @@ function interpret_1 (p : prog) : int = eval_1 p (\ n. n)
 
 use import DirectSem
 
-lemma cps_correct_expr: forall e:expr, k:int -> 'a. eval_1 e k = k (eval_0 e)
+lemma cps_correct_expr: forall e:expr, k: int->'a. eval_1 e k = k (eval_0 e)
 
 lemma cps_correct: forall p. interpret_1 p = interpret_0 p
 
@@ -227,13 +229,7 @@ function size_e (e:expr) : int =
   | Sub e1 e2 -> 3 + size_e e1 + size_e e2
   end
 
-let rec lemma size_e_pos (e:expr) : unit
-  variant { e }
-  ensures { size_e e >= 1 }
-= match e with
-  | Cte _ -> ()
-  | Sub e1 e2 -> size_e_pos e1; size_e_pos e2
-  end
+lemma size_e_pos: forall e: expr. size_e e >= 1
 
 function size_c (c:cont) : int =
   match c with
@@ -242,14 +238,7 @@ function size_c (c:cont) : int =
   | A2 _ k -> 1 + size_c k
   end
 
-let rec lemma size_c_pos (c:cont) : unit
-  variant { c }
-  ensures { size_c c >= 0 }
-= match c with
-  | I -> ()
-  | A1 _ k -> size_c_pos k
-  | A2 _ k -> size_c_pos k
-  end
+lemma size_c_pos: forall c: cont. size_c c >= 0
 
 (** WhyML programs (declared with "let" instead of "function"),
    mutually recursive, resulting from de-functionalization *)
@@ -290,6 +279,114 @@ let test () =
 end
 
 
+(** {2 Defunctionalization with an algebraic variant} *)
+
+module Defunctionalization2
+
+use import Expr
+use import DirectSem
+
+(** {4 Exercise 0.2}
+
+  De-functionalize the continuation of [eval_1].
+{h <blockquote><pre>
+         cont ::= ...
+
+   continue_2 : cont -> value -> value
+       eval_2 : expression -> cont -> value
+  interpret_2 : program -> value
+</pre></blockquote>}
+  The data type [cont] represents the grammar of contexts.
+
+  The two mutually recursive functions [eval_2] and [continue_2]
+  implement an abstract machine, that is a state transition system.
+
+*)
+
+type cont = A1 expr cont | A2 int cont | I
+
+(** One would want to write in Why:
+{h <blockquote><pre>
+function eval_cont (c:cont) (v:int) : int =
+  match c with
+  | A1 e2 k ->
+    let v2 = eval_0 e2 in
+    eval_cont (A2 v k) v2
+  | A2 v1 k -> eval_cont k (v1 - v)
+  | I -> v
+  end
+</pre></blockquote>}
+But since the recursion is not structural, Why3 kernel rejects it
+(definitions in the logic part of the language must be total)
+
+We replace that with a relational definition, an inductive one.
+
+*)
+
+inductive eval_cont cont int int =
+| a1 :
+  forall e2:expr, k:cont, v:int, r:int.
+  eval_cont (A2 v k) (eval_0 e2) r -> eval_cont (A1 e2 k) v r
+| a2 :
+  forall v1:int, k:cont, v:int, r:int.
+  eval_cont k (v1 - v) r -> eval_cont (A2 v1 k) v r
+| a3 :
+  forall v:int. eval_cont I v v
+
+(** Peano naturals to serve as the measure for the termination proof *)
+
+type nat = S nat | O
+
+function size_e (e:expr) (acc:nat) : nat =
+  match e with
+  | Cte _ -> S acc
+  | Sub e1 e2 -> S (size_e e1 (S (size_e e2 (S acc))))
+  end
+
+function size_c (c:cont) (acc:nat) : nat =
+  match c with
+  | I -> acc
+  | A1 e2 k -> S (size_e e2 (S (size_c k acc)))
+  | A2 _ k -> S (size_c k acc)
+  end
+
+(** WhyML programs (declared with "let" instead of "function"),
+   mutually recursive, resulting from de-functionalization *)
+
+let rec continue_2 (c:cont) (v:int) : int
+  variant { size_c c O }
+  ensures { eval_cont c v result }
+  =
+  match c with
+    | A1 e2 k -> eval_2 e2 (A2 v k)
+    | A2 v1 k -> continue_2 k (v1 - v)
+    | I -> v
+  end
+
+with eval_2 (e:expr) (c:cont) : int
+  variant { size_e e (size_c c O) }
+  ensures { eval_cont c (eval_0 e) result }
+  =
+  match e with
+    | Cte n -> continue_2 c n
+    | Sub e1 e2 -> eval_2 e1 (A1 e2 c)
+  end
+
+(** The interpreter. The post-condition specifies that this program
+    computes the same thing as [eval_0] *)
+
+let interpret_2 (p:prog) : int
+  ensures { result = eval_0 p }
+  = eval_2 p I
+
+let test () =
+  (interpret_2 p0,
+   interpret_2 p1,
+   interpret_2 p2,
+   interpret_2 p3,
+   interpret_2 p4)
+
+end
 
 
 (** {2 Semantics with errors} *)
@@ -404,15 +501,8 @@ function eval_1 (e:expr) (k:value -> 'a) : 'a =
 function interpret_1 (p : prog) : value = eval_1 p (\ n. n)
 
 
-let rec lemma cps_correct_expr (e:expr) : unit
-  variant { e }
-  ensures { forall k:value -> 'a. eval_1 e k = k (eval_0 e) }
-= match e with
-  | Cte _ -> ()
-  | Sub e1 e2 ->
-      cps_correct_expr e1;
-      cps_correct_expr e2
-  end
+lemma cps_correct_expr:
+  forall e: expr. forall k:value -> 'a. eval_1 e k = k (eval_0 e)
 
 lemma cps_correct: forall p. interpret_1 p = interpret_0 p
 
@@ -586,13 +676,7 @@ function size_e (e:expr) : int =
   | Sub e1 e2 -> 3 + size_e e1 + size_e e2
   end
 
-let rec lemma size_e_pos (e:expr) : unit
-  variant { e }
-  ensures { size_e e >= 1 }
-= match e with
-  | Cte _ -> ()
-  | Sub e1 e2 -> size_e_pos e1; size_e_pos e2
-  end
+lemma size_e_pos: forall e: expr. size_e e >= 1
 
 use Defunctionalization
 
@@ -603,14 +687,7 @@ function size_c (c:cont) : int =
   | B _ k -> 1 + size_c k
   end
 
-let rec lemma size_c_pos (c:cont) : unit
-  variant { c }
-  ensures { size_c c >= 0 }
-= match c with
-  | I -> ()
-  | A _ k -> size_c_pos k
-  | B _ k -> size_c_pos k
-  end
+lemma size_c_pos: forall c: cont. size_c c >= 0
 
 let rec continue_4 (c:cont) (v:int) : value
   requires { v >= 0 }
@@ -823,15 +900,7 @@ function size_c (c:context) : int =
   | Right _ c -> 1 + size_c c
   end
 
-let rec lemma size_c_pos (c:context) : unit
-  variant { c }
-  ensures { size_c c >= 0 }
-= match c with
-  | Empty -> ()
-  | Left c _ -> size_c_pos c
-  | Right _ c -> size_c_pos c
-  end
-
+lemma size_c_pos: forall c: context. size_c c >= 0
 
 
 let rec decompose_term (e:expr) (c:context) : (context, expr)
@@ -1046,14 +1115,7 @@ function size_c (c:context) : int =
   | Right _ c -> 1 + size_c c
   end
 
-let rec lemma size_c_pos (c:context) : unit
-  variant { c }
-  ensures { size_c c >= 0 }
-= match c with
-  | Empty -> ()
-  | Left c _ -> size_c_pos c
-  | Right _ c -> size_c_pos c
-  end
+lemma size_c_pos: forall c: context. size_c c >= 0
 
 function recompose (c:context) (e:expr) : expr =
   match c with

@@ -1,158 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover
-  id="0"
-  name="Alt-Ergo"
-  version="0.95.1"/>
- <prover
-  id="1"
-  name="CVC3"
-  version="2.4.1"/>
- <prover
-  id="2"
-  name="Gappa"
-  version="1.1.1"/>
- <prover
-  id="3"
-  name="Z3"
-  version="2.19"/>
- <file
-  name="../floats.why"
-  verified="true"
-  expanded="false">
-  <theory
-   name="TestGappa"
-   locfile="../floats.why"
-   loclnum="2" loccnumb="7" loccnume="16"
-   verified="true"
-   expanded="true">
-   <goal
-    name="Round_single_01"
-    locfile="../floats.why"
-    loclnum="11" loccnumb="7" loccnume="22"
-    sum="06d732b89b84fea6125ee23ca1103488"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aroundaNearestTiesToEvenc0.1c0x1.99999ap-4">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Round_double_01"
-    locfile="../floats.why"
-    loclnum="14" loccnumb="7" loccnume="22"
-    sum="072a42fe9ec3fb077fa1eca6f815e6b5"
-    proved="true"
-    expanded="true"
-    shape="ainfix =aroundaNearestTiesToEvenc0.1c0x1.999999999999ap-4">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test00"
-    locfile="../floats.why"
-    loclnum="17" loccnumb="8" loccnume="14"
-    sum="2b683a91f92a6a0ffa8c0a3793c94f50"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=aprefix -c3.0V0Iainfix &lt;=aabsV0c2.0F">
-    <proof
-     prover="0"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof
-     prover="1"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-    <proof
-     prover="3"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.02"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test01"
-    locfile="../floats.why"
-    loclnum="19" loccnumb="8" loccnume="14"
-    sum="942055645283a6a64ed965649719407f"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=aabsainfix -ainfix *avalueV0avalueV0aroundaNearestTiesToEvenainfix *avalueV0avalueV0c0x1.p-52Iainfix &lt;=avalueV0c2.0Aainfix &lt;=aprefix -c2.0avalueV0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test02"
-    locfile="../floats.why"
-    loclnum="25" loccnumb="8" loccnume="14"
-    sum="0e9c1b7f7e7a70590a9293937188ac0e"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=aabsainfix -ainfix *avalueV1avalueV1aroundaNearestTiesToEvenainfix *avalueV0avalueV0c0x1.p-52Iainfix =V1V0Iainfix &lt;=aabsavalueV0c2.0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal
-    name="Test03"
-    locfile="../floats.why"
-    loclnum="32" loccnumb="8" loccnume="14"
-    sum="172095ee072c6f322501c1f6ed3dc877"
-    proved="true"
-    expanded="true"
-    shape="ainfix &lt;=asqrtainfix *ainfix -avalueV2ainfix *avalueV0avalueV0ainfix -avalueV1ainfix *avalueV0avalueV0c0x1.p-52Iainfix =V2V1Iainfix =avalueV1aroundaNearestTiesToEvenainfix *avalueV0avalueV0Iainfix &lt;=aabsavalueV0c2.0F">
-    <proof
-     prover="2"
-     timelimit="5"
-     memlimit="0"
-     obsolete="false"
-     archived="false">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
+<prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
+<prover id="3" name="Gappa" version="1.1.1" timelimit="5" memlimit="0"/>
+<file name="../floats.why">
+<theory name="TestGappa" expanded="true">
+ <goal name="Round_single_01" sum="06d732b89b84fea6125ee23ca1103488" expanded="true">
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Round_double_01" sum="072a42fe9ec3fb077fa1eca6f815e6b5" expanded="true">
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Test00" sum="2b683a91f92a6a0ffa8c0a3793c94f50" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Test01" sum="942055645283a6a64ed965649719407f" expanded="true">
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Test02" sum="0e9c1b7f7e7a70590a9293937188ac0e" expanded="true">
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="Test03" sum="172095ee072c6f322501c1f6ed3dc877" expanded="true">
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

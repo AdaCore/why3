@@ -10,7 +10,7 @@ The XML file follows the DTD given in \texttt{share/why3session.dtd} and reprodu
 \lstinputlisting{../share/why3session.dtd}
 
 
-\section{Provers detection data}
+\section{Prover Detection}
 \label{sec:proverdetecttiondata}
 
 All the necessary data configuration for the automatic detection of
@@ -26,12 +26,31 @@ file is reproduced below.
 }
 %END LATEX
 
-\section{The \texttt{why3.conf} configuration file}
+\section{The \texttt{why3.conf} Configuration File}
 \label{sec:whyconffile}
 \index{why3.conf@\texttt{why3.conf}}\index{configuration file}
 
-\begin{figure}[p]
+One can use a custom configuration file. The \why
+tools look for it in the following order:
+\begin{enumerate}
+\item the file specified by the \texttt{-C} or \texttt{-{}-config} options,
+\item the file specified by the environment variable
+  \texttt{WHY3CONFIG} if set,
+\item the file \texttt{\$HOME/.why3.conf}
+  (\texttt{\$USERPROFILE/.why3.conf} under Windows) or, in the case of
+  local installation, \texttt{why3.conf} in the top directory of \why sources.
+\end{enumerate}
+If none of these files exist, a built-in default configuration is used.
+
+The configuration file is a human-readable text file, which consists
+of association pairs arranged in sections.
 %BEGIN LATEX
+Figure~\ref{fig:why3conf} shows an example of configuration file.
+%END LATEX
+%HEVEA Below is an example of configuration file.
+
+%BEGIN LATEX
+\begin{figure}[p]
 {\footnotesize
 %END LATEX
 \begin{verbatim}
@@ -90,28 +109,10 @@ name = "CoqIDE"
 \end{verbatim}
 %BEGIN LATEX
 }
-%END LATEX
-  \caption{Sample why3.conf file}
+\caption{Sample \texttt{why3.conf} file}
 \label{fig:why3conf}
 \end{figure}
-
-
-
-One can use a custom configuration file. \texttt{why3config}
-and other \texttt{why3} tools look for it in the following order:
-\begin{enumerate}
-\item the file specified by the \texttt{-C} or \texttt{-{}-config} options,
-\item the file specified by the environment variable
-  \texttt{WHY3CONFIG} if set,
-\item the file \texttt{\$HOME/.why3.conf}
-  (\texttt{\$USERPROFILE/.why3.conf} under Windows) or, in the case of
-  local installation, \texttt{why3.conf} in Why3 sources top directory.
-\end{enumerate}
-If none of these files exists, a built-in default configuration is used.
-
-The configuration file is a human-readable text file, which consists
-of association pairs arranged in sections. Figure~\ref{fig:why3conf}
-shows an example of configuration file.
+%END LATEX
 
 A section begins with a header inside square brackets and ends at the
 beginning of the next section. The header of a
@@ -121,15 +122,16 @@ argument, \texttt{prover} is one family name, \texttt{coq} and
 \texttt{alt-ergo} are the family argument.
 
 Sections contain associations \texttt{key=value}. A value is either
-an integer (\eg{} -555), a boolean (true, false), or a string (\eg
-"emacs"). Some specific keys can be attributed multiple values and are
+an integer (\eg \texttt{-555}), a boolean (\texttt{true}, \texttt{false}),
+or a string (\eg \texttt{"emacs"}). Some specific keys can be attributed
+multiple values and are
 thus allowed to occur several times inside a given section. In that
 case, the relative order of these associations matter.
 
-\section{Drivers of External Provers}
+\section{Drivers for External Provers}
 \label{sec:drivers}
 
-Drivers of external provers are readable files from directory
+Drivers for external provers are readable files from directory
 \texttt{drivers}. Experimented users can modify them to change the way
 the external provers are called, in particular which transformations
 are applied to goals.
@@ -148,6 +150,7 @@ installation is given by
 \begin{verbatim}
 why3 --list-transforms
 \end{verbatim}
+\index{list-transforms@\verb+--list-transforms+}
 
 \subsection{Non-splitting transformations}
 
@@ -220,7 +223,6 @@ definitions~\cite{paskevich09rr}.
 
 \item[inline\_trivial]
   removes definitions of the form
-
 \begin{whycode}
 function  f x_1 ... x_n = (g e_1 ... e_k)
 predicate p x_1 ... x_n = (q e_1 ... e_k)
