@@ -523,7 +523,8 @@ module Save_VCs = struct
       incr r;
       let n = !r in
       let count_str = if n = 1 then "" else string_of_int n in
-      Pp.sprintf "%a%s.why" Gnat_expl.to_filename check count_str
+      let ext = Driver.get_extension Gnat_config.prover_driver in
+      Pp.sprintf "%a%s%s" Gnat_expl.to_filename check count_str ext
 
    let save_vc goal =
       let check = get_objective goal in

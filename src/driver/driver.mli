@@ -30,6 +30,9 @@ val file_of_task : driver -> string -> string -> Task.task -> string
     from  a goal in theory named [th] of filename [f]
 *)
 
+val get_extension : driver -> string
+(* return the file extension which is used for this driver *)
+
 val file_of_theory : driver -> string -> Theory.theory -> string
 (** [file_of_theory d f th] produces a filename
     for the prover of driver [d], for a theory [th] from filename [f] *)

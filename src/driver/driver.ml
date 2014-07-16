@@ -231,6 +231,16 @@ let get_filename drv input_file theory_name goal_name =
   in
   Str.global_substitute filename_regexp replace file
 
+let get_extension drv =
+  match drv.drv_filename with
+  | None -> ".dump"
+  | Some f ->
+      (* We search a bit naively for the first dot starting from the end, but
+         this will work fine for all current "filename" attributes in Why3
+         drivers *)
+      let i = String.rindex f '.' in
+      String.sub f i (String.length f - i)
+
 let file_of_task drv input_file theory_name task =
   get_filename drv input_file theory_name (task_goal task).pr_name.id_string
 
