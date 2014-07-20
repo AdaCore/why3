@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<file name="../topological_sorting.mlw">
+<theory name="Graph">
+</theory>
+<theory name="Static">
+ <goal name="WP_parameter dfs" expl="VC for dfs" sum="526b08a16b9fc3e80f8b42421956a021">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter dfs.1" expl="1. loop invariant init" sum="7516a3a1f1128ea0cbbd9f5de70e80ee">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.2" expl="2. loop invariant init" sum="6eb6097de9c456c8586870647535dc49">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.3" expl="3. loop invariant init" sum="4b5b3b513d6e4ffca526bc7a26acf483">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.4" expl="4. loop invariant init" sum="5556b1f58e8cb0ee9c21039df468f7cc">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.5" expl="5. variant decrease" sum="c869d2c97b728dc4f273a0133369ffc7">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.6" expl="6. precondition" sum="361eabb8b67804008928324a4ee44a0c">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.7" expl="7. precondition" sum="bdd199396256b403c7d37248eac02268">
+  <proof prover="0"><result status="valid" time="0.20"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.8" expl="8. precondition" sum="622bd3def9571f378e04a66ea7401eaa">
+  <proof prover="0"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.9" expl="9. loop invariant preservation" sum="abe6005860290eb3301a21e25364e8c2">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.10" expl="10. loop invariant preservation" sum="4aadf31fe1aec5668d9a6c215b9ca519">
+  <proof prover="0"><result status="valid" time="0.53"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.11" expl="11. loop invariant preservation" sum="ea5bf5f461b04153e77e30bb4869206d">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.12" expl="12. loop invariant preservation" sum="dd3acd85a7cf6d397caeaea8ff37de09">
+  <proof prover="0"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.13" expl="13. loop invariant preservation" sum="07bb20cb60b6d3671270b3a756bda101">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.14" expl="14. loop variant decrease" sum="6e15fef0ef2a4c24f6b3002c6662d593">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.15" expl="15. assertion" sum="267a83aa8d7b8f600e8c0015a9fa0218">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.16" expl="16. assertion" sum="6d485418a8bcc414a501d460e9e85e0e">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.17" expl="17. postcondition" sum="12ba0feac02566646147f5c78a2fa3d8">
+  <proof prover="0"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.18" expl="18. postcondition" sum="1e26cddc29227f77b22648d608ba6f3a">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.19" expl="19. postcondition" sum="63598385b114302abdab0d969ade5dae">
+  <transf name="inline_goal">
+   <goal name="WP_parameter dfs.19.1" expl="1. postcondition" sum="a7160331c5383950745a10afabbf4d75">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter dfs.19.1.1" expl="1." sum="df40bb5c653a60257f91bf11999e9cab">
+    <proof prover="0"><result status="valid" time="0.24"/></proof>
+    </goal>
+    <goal name="WP_parameter dfs.19.1.2" expl="2." sum="15ed44f6e88895813bfb13574a3d329b">
+    <proof prover="0"><result status="valid" time="0.06"/></proof>
+    </goal>
+    <goal name="WP_parameter dfs.19.1.3" expl="3." sum="ab38e4a608a4a633c71f6263c04e8fbe">
+    <transf name="inline_goal">
+     <goal name="WP_parameter dfs.19.1.3.1" expl="1." sum="8128ad5e4bc2733ee4d830c97336f77c">
+     <proof prover="0"><result status="valid" time="0.64"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter dfs.19.1.4" expl="4." sum="133a608ef08af3ff796b7238561827c5">
+    <proof prover="0"><result status="valid" time="0.09"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter dfs.20" expl="20. postcondition" sum="749d727b384d45924ee6529760118ccf">
+  <proof prover="0"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.21" expl="21. postcondition" sum="a5a930acb78fbb03a6c631a6ad74b871">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.22" expl="22. postcondition" sum="97324d00ede528123e57d56d3af4227a">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter dfs.23" expl="23. postcondition" sum="34071b304170b3875a11c0bab467b701">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter topo_order" expl="VC for topo_order" sum="6a310b1a70ac540d9f7a3210dec14f4e">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter topo_order.1" expl="1. loop invariant init" sum="3c2cb47cda3c66dd21e10b0203ac22d7">
+  <transf name="inline_goal">
+   <goal name="WP_parameter topo_order.1.1" expl="1. loop invariant init" sum="c7bbbe14f583299db2e804c95eab3e11">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter topo_order.1.1.1" expl="1." sum="3c694ed84dbedaa1041e8b952bec3e72">
+    <proof prover="0"><result status="valid" time="0.07"/></proof>
+    </goal>
+    <goal name="WP_parameter topo_order.1.1.2" expl="2." sum="46d75cf9d6e9e0981ee5e48795c3d190">
+    <proof prover="0"><result status="valid" time="0.03"/></proof>
+    </goal>
+    <goal name="WP_parameter topo_order.1.1.3" expl="3." sum="8b717a39f382f888693d8b02038512a5">
+    <proof prover="0"><result status="valid" time="0.06"/></proof>
+    </goal>
+    <goal name="WP_parameter topo_order.1.1.4" expl="4." sum="da79140b32d147a0a8002de3fc0b1560">
+    <proof prover="0"><result status="valid" time="0.06"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter topo_order.2" expl="2. loop invariant init" sum="047f476c533f9bfbbc6d954ddb2c5874">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.3" expl="3. loop invariant init" sum="50f09570ae5acb3bc7934b90c3391391">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.4" expl="4. loop invariant init" sum="5e615ba65e9b221a89479898aa7108bb">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.5" expl="5. precondition" sum="23892c18e59f8ff4aa686e39ddd12324">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.6" expl="6. precondition" sum="ab5427a60327387ce89e0e786c83d235">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.7" expl="7. precondition" sum="654a981075993ffc905608ca7ef312f0">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.8" expl="8. loop invariant preservation" sum="abd91c031e3229d7ad8557496849f785">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.9" expl="9. loop invariant preservation" sum="24b0df995d97ee2fa0618ed49c2b0ca0">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.10" expl="10. loop invariant preservation" sum="e8a15a92849ac8ddfdfd528e82f26f4e">
+  <proof prover="0"><result status="valid" time="0.41"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.11" expl="11. loop invariant preservation" sum="ecc6ad71cecf332c747f33ed958f2d5c">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.12" expl="12. loop variant decrease" sum="c0128f03972f41d3f099f1fa5cd1003e">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter topo_order.13" expl="13. postcondition" sum="0915c301624af2c166c620313db10a0d">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
