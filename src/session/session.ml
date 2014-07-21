@@ -379,7 +379,11 @@ module PTreeT = struct
     | Session s ->
       let l = ref [] in
       session_iter (fun a -> l := (Any a)::!l) s;
-      Filename.basename s.session_dir,!l
+      (** Previously "" was `Filename.basename s.session_dir` but
+          the tree depend on the filename given in input and not the content
+          which is not easy for diffing
+      *)
+      "",!l
 
 end
 
