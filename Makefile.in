@@ -843,62 +843,6 @@ install_no_local::
 install_local:: bin/why3session
 
 
-###############
-# Bench
-###############
-
-ifeq (@enable_bench@,yes)
-
-BENCH_FILES = worker db bench benchrc benchdb why3bench
-
-BENCHMODULES := $(addprefix src/why3bench/, $(BENCH_FILES))
-
-BENCHDEP = $(addsuffix .dep, $(BENCHMODULES))
-BENCHCMO = $(addsuffix .cmo, $(BENCHMODULES))
-BENCHCMX = $(addsuffix .cmx, $(BENCHMODULES))
-
-$(BENCHDEP): DEPFLAGS += -I src/why3bench
-$(BENCHCMO) $(BENCHCMX): INCLUDES += -I src/why3bench -I @SQLITE3LIB@
-
-# build targets
-
-byte: bin/why3bench.byte
-opt:  bin/why3bench.opt
-
-bin/why3bench.opt bin/why3bench.byte: INCLUDES += -thread -I +threads -I @SQLITE3LIB@
-bin/why3bench.opt bin/why3bench.byte: EXTLIBS += threads sqlite3
-
-bin/why3bench.opt: lib/why3/why3.cmxa $(BENCHCMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
-bin/why3bench.byte: lib/why3/why3.cma $(BENCHCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-# depend and clean targets
-
-ifneq "$(MAKECMDGOALS)" "clean"
-include $(BENCHDEP)
-endif
-
-depend: $(BENCHDEP)
-
-clean::
-	rm -f src/why3bench/*.cm[iox] src/why3bench/*.o
-	rm -f src/why3bench/*.annot src/why3bench/*.dep src/why3bench/*~
-	rm -f bin/why3bench.byte bin/why3bench.opt bin/why3bench
-
-clean_old_install::
-	rm -f $(BINDIR)/why3bench$(EXE)
-
-install_no_local::
-	cp -f bin/why3bench.@OCAMLBEST@ $(TOOLDIR)/why3bench$(EXE)
-
-install_local:: bin/why3bench
-
-endif
-
 ##############
 # Coq plugin
 ##############
