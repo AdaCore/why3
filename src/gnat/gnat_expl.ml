@@ -22,6 +22,11 @@ type reason =
    | VC_Loop_Variant
    | VC_Assert
    | VC_Raise
+   | VC_Weaker_Pre
+   | VC_Trivial_Weaker_Pre
+   | VC_Stronger_Post
+   | VC_Weaker_Classwide_Pre
+   | VC_Stronger_Classwide_Post
 
 type subp_entity = Gnat_loc.loc
 
@@ -64,6 +69,11 @@ let reason_from_string s =
    | "VC_LOOP_VARIANT"            -> VC_Loop_Variant
    | "VC_ASSERT"                  -> VC_Assert
    | "VC_RAISE"                   -> VC_Raise
+   | "VC_WEAKER_PRE"              -> VC_Weaker_Pre
+   | "VC_TRIVIAL_WEAKER_PRE"      -> VC_Trivial_Weaker_Pre
+   | "VC_STRONGER_POST"           -> VC_Stronger_Post
+   | "VC_WEAKER_CLASSWIDE_PRE"    -> VC_Weaker_Classwide_Pre
+   | "VC_STRONGER_CLASSWIDE_POST" -> VC_Stronger_Classwide_Post
    | _                            ->
        Format.printf "unknown VC reason: %s@." s;
        Gnat_util.abort_with_message ""
@@ -90,6 +100,11 @@ let reason_to_ada reason =
    | VC_Loop_Variant            -> "VC_LOOP_VARIANT"
    | VC_Assert                  -> "VC_ASSERT"
    | VC_Raise                   -> "VC_RAISE"
+   | VC_Weaker_Pre              -> "VC_WEAKER_PRE"
+   | VC_Trivial_Weaker_Pre      -> "VC_TRIVIAL_WEAKER_PRE"
+   | VC_Stronger_Post           -> "VC_STRONGER_POST"
+   | VC_Weaker_Classwide_Pre    -> "VC_WEAKER_CLASSWIDE_PRE"
+   | VC_Stronger_Classwide_Post -> "VC_STRONGER_CLASSWIDE_POST"
 
 let reason_to_string reason =
    match reason with
@@ -113,6 +128,11 @@ let reason_to_string reason =
    | VC_Loop_Variant            -> "loop_variant"
    | VC_Assert                  -> "assert"
    | VC_Raise                   -> "raise"
+   | VC_Weaker_Pre              -> "weaker_pre"
+   | VC_Trivial_Weaker_Pre      -> "trivial_weaker_pre"
+   | VC_Stronger_Post           -> "stronger_post"
+   | VC_Weaker_Classwide_Pre    -> "weaker_classwide_pre"
+   | VC_Stronger_Classwide_Post -> "stronger_classwide_post"
 
 type gp_label =
   | Gp_Sloc of Gnat_loc.loc

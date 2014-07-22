@@ -26,6 +26,11 @@ type reason =
    | VC_Loop_Variant
    | VC_Assert
    | VC_Raise
+   | VC_Weaker_Pre
+   | VC_Trivial_Weaker_Pre
+   | VC_Stronger_Post
+   | VC_Weaker_Classwide_Pre
+   | VC_Stronger_Classwide_Post
 
 type check = { id : id ; reason : reason; sloc : Gnat_loc.loc }
 (* a check is equal to a check ID as provided by gnat2why, as well as a reason.
@@ -58,6 +63,9 @@ val check_compare : check -> check -> int
 val get_loc : check -> Gnat_loc.loc
 val get_reason : check -> reason
 
+(* Conversion functions between a reason string and the OCaml type are
+   used only for debugging. The actual message tag is set by gnat2why directly.
+ *)
 val reason_from_string : string -> reason
 (* parse a reason string from Ada into the OCaml type *)
 val reason_to_ada : reason -> string
