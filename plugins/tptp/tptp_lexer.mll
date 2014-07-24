@@ -88,6 +88,7 @@
     "axiom", AXIOM;
     "cnf", CNF;
     "conjecture", CONJECTURE;
+    "corollary", COROLLARY;
     "definition", DEFINITION;
     "fof", FOF;
     "hypothesis", HYPOTHESIS;
