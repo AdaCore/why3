@@ -229,7 +229,7 @@ theory FsetInduction
 
   predicate p (set t)
 
-  axiom Induction :
+  lemma Induction :
     (forall s: set t. is_empty s -> p s) ->
     (forall s: set t. p s -> forall t: t.
       not (mem t s) -> p (add t s)) ->
