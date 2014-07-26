@@ -509,7 +509,7 @@ clean::
 # Why3 commands
 ###############
 
-TOOLS_BIN = why3execute why3extract why3prove why3realize why3replay
+TOOLS_BIN = why3config why3execute why3extract why3prove why3realize why3replay
 TOOLS_FILES = main $(TOOLS_BIN)
 
 TOOLSMODULES = $(addprefix src/tools/, $(TOOLS_FILES))
@@ -529,6 +529,14 @@ bin/why3.opt: lib/why3/why3.cmxa src/tools/main.cmx
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
 bin/why3.byte: lib/why3/why3.cma src/tools/main.cmo
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+bin/why3config.opt: lib/why3/why3.cmxa src/tools/why3config.cmx
+	$(if $(QUIET),@echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3config.byte: lib/why3/why3.cma src/tools/why3config.cmo
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
@@ -577,6 +585,7 @@ clean_old_install::
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
+	cp -f bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
 	cp -f bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
 	cp -f bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
 	cp -f bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
@@ -596,6 +605,7 @@ depend: $(TOOLSDEP)
 
 clean::
 	rm -f src/tools/main.cm[iox] src/tools/main.annot src/tools/main.o src/tools/main.dep
+	rm -f src/tools/why3config.cm[iox] src/tools/why3config.annot src/tools/why3config.o src/tools/why3config.dep
 	rm -f src/tools/why3execute.cm[iox] src/tools/why3execute.annot src/tools/why3execute.o src/tools/why3execute.dep
 	rm -f src/tools/why3extract.cm[iox] src/tools/why3extract.annot src/tools/why3extract.o src/tools/why3extract.dep
 	rm -f src/tools/why3prove.cm[iox] src/tools/why3prove.annot src/tools/why3prove.o src/tools/why3prove.dep
@@ -677,57 +687,6 @@ xml-validate-local:
 	@for x in `find examples/ -name why3session.xml`; do \
 	  xmllint --noout --dtdvalid share/why3session.dtd $$x 2>&1 | head -1; \
 	done
-
-########
-# Config
-########
-
-CONFIG_FILES = why3config
-
-CONFIGMODULES = $(addprefix src/why3config/, $(CONFIG_FILES))
-
-CONFIGDEP = $(addsuffix .dep, $(CONFIGMODULES))
-CONFIGCMO = $(addsuffix .cmo, $(CONFIGMODULES))
-CONFIGCMX = $(addsuffix .cmx, $(CONFIGMODULES))
-
-# build targets
-
-byte: bin/why3config.byte
-opt:  bin/why3config.opt
-
-bin/why3config.opt: lib/why3/why3.cmxa $(CONFIGCMX)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
-bin/why3config.byte: lib/why3/why3.cma $(CONFIGCMO)
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-# depend and clean targets
-
-ifneq "$(MAKECMDGOALS)" "clean"
-include $(CONFIGDEP)
-endif
-
-depend: $(CONFIGDEP)
-
-clean::
-	rm -f src/why3config/*.cm[iox] src/why3config/*.o
-	rm -f src/why3config/*.annot src/why3config/*.dep src/why3config/*~
-	rm -f src/why3config/*.output src/why3config/*.automaton
-	rm -f bin/why3config.byte bin/why3config.opt bin/why3config
-
-local_config: bin/why3config.@OCAMLBEST@
-	WHY3LIB=$(PWD) WHY3DATA=$(PWD)/share bin/why3config.@OCAMLBEST@ \
-		--detect --conf_file why3.conf
-
-clean_old_install::
-	rm -f $(BINDIR)/why3config$(EXE)
-
-install_no_local::
-	cp -f bin/why3config.@OCAMLBEST@ $(TOOLDIR)/why3config$(EXE)
-
-install_local:: bin/why3config
 
 ###############
 # IDE
