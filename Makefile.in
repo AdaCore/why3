@@ -595,7 +595,7 @@ install_no_local::
 install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
 
 bin/%:	bin/%.@OCAMLBEST@
-	ln -sfr $< $@
+	ln -sf $(notdir $<) $@
 
 ifneq "$(MAKECMDGOALS)" "clean"
 include $(TOOLSDEP)
