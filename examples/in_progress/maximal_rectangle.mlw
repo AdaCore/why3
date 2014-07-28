@@ -1,0 +1,504 @@
+(* Grands rectangles - Concours d'Informatique X-ENS PC 2014 *)
+
+
+(* Partie I *)
+module Search_in_array
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+ (* use import int.MinMax*)
+
+  (* Qeustion 1 *)
+ let nombreZeroDroite i tab n
+     requires { 1 <= i <= n < tab.length }
+     requires { forall k. i <= k <= n -> tab[k] = 1 \/ tab[k] = 0 }
+     ensures  { i <= result <= n + 1 }
+     ensures  { forall k. i <= k < result -> tab[k] = 0 }
+     ensures  { result <= n -> tab[result] = 1  }
+  =
+   let j = ref i in
+    while !j <= n && tab[!j] = 0 do
+      variant   { n - !j }
+      invariant { i <= !j <= n + 1}
+      invariant { forall k. i <= k < !j -> tab[k] = 0 }
+     j := !j + 1;
+    done;
+  !j
+
+(* Question 2 *)
+let nombreZeroMaximum tab n =
+    requires { 1 <= n < tab.length }
+    requires { forall k. 1 <= k <= n -> tab[k] = 1 \/ tab[k] = 0 }
+    ensures  { let (p,q) = result in
+                (1 <= p <= q <= n + 1) /\
+                (forall k. p <= k < q -> tab[k] = 0) }
+    ensures  { let (p,q) = result in
+                forall i j.
+                 (1 <= i <= j <= n + 1) ->
+                   (forall k. i <= k < j -> tab[k] = 0) ->
+                    j - i <= q - p }
+  let p    = ref 1 in
+  let q    = ref 1 in
+  let i    = ref 1  in
+  while !i <= n do
+   variant   { n - !i }
+   invariant { 1 <= !i <= n + 1 }
+   invariant { 1 <= !p <= !q <= !i }
+   invariant { forall k. !p <= k < !q -> tab[k]= 0 }
+   (*invariant { 2 <= !i -> !q <= n -> tab[!q] = 1 }*)
+   invariant { forall a b.
+                 (1 <= a <= b <= !i) ->
+                   (forall k. a <= k < b -> tab[k] = 0) ->
+                    b - a <= !q - !p }
+   invariant { 1 < !i <= n -> (tab[!i] = 1 \/ tab[!i-1] = 1) }
+    let next = nombreZeroDroite !i tab n in
+    begin
+      if next - !i > !q  - !p then begin p:= !i; q := next end;
+      i:= if !i = next then !i + 1 else next;
+    end
+  done;
+  (!p, !q)
+
+
+(*
+  (* Question 1 *)
+  let nombreZeroDroite i tab n
+     requires { 1 <= i <= n }
+     requires { n = tab.length - 1 }
+     requires { forall k. i <= k <= n -> tab[k] = 1 \/ tab[k] = 0 }
+     ensures  { 0 <= result <= n - i + 1 }
+     ensures  { forall k. 0 <= k < result -> tab[i + k] = 0 }
+     ensures  { let j = i + result in j <= n -> tab[j] = 1  }
+  =
+   let j = ref i in
+    while !j <= n && tab[!j] = 0 do
+      variant   { n - !j }
+      invariant { 0 <= !j - i <= n - i + 1}
+      invariant { forall k. 0 <= k < (!j - i) -> tab[i + k] = 0 }
+     j := !j + 1;
+    done;
+  !j - i
+
+  let test_0 () =
+    let tab = make 14 0 in
+     tab[0]<- (-1);
+     tab[1] <- 0; tab[2] <- 0;
+     tab[3] <- 1; tab[4] <- 1;
+     tab[5] <- 0; tab[6] <- 0; tab[7] <- 0;
+     tab[8] <- 1;
+     tab[9] <- 0; tab[10] <- 0; tab[11] <- 0;
+     tab[12] <- 1; tab[13] <- 1;
+     let n1 = nombreZeroDroite 4 tab 13  in
+      assert { n1 = 0 };
+     let n2 = nombreZeroDroite 6 tab 13  in
+      assert { n2 = 2 }
+
+
+
+(* Question 2 *)
+(*TODO*)
+let nombreZeroMaximum tab n =
+    requires { 1 <= n /\ n = tab.length - 1}
+    requires { forall k. 1 <= k <= n -> tab[k] = 1 \/ tab[k] = 0 }
+    ensures  { exists i.
+                (1 <= i <= n) /\
+                (0 <= result <= n - i + 1) /\
+                (forall k. 0 <= k < result -> tab[i + k] = 0) /\
+                (i + result <= n -> tab[i + result] = 1) }
+    ensures  { forall j ofs.
+                (1 <= j <= n) ->
+                 (0 <= ofs <= n - j + 1) ->
+                  (forall k. 0 <= k < ofs -> tab[j + k] = 0) ->
+                     ofs <= result }
+  let max = ref (nombreZeroDroite 1 tab n) in
+  let ghost max_i = ref 1 in
+  let i   = ref (if !max = 0 then 2 else !max + 1) in
+  while !i <= n do
+   variant   { n - !i }
+   invariant { 1 <= !i <= n + 1}
+   invariant { 1 <= !max_i < !i }
+   invariant {0 <= !max < !i - !max_i + 1 }
+   invariant {forall k. 0 <= k < !max -> tab[!max_i + k]= 0 }
+   invariant {!max_i + !max <= n -> tab[!max_i + !max] = 1  }
+   invariant { forall j ofs.
+                1 <= j <= !i ->
+                 (0 <= ofs <= !i - j + 1) ->
+                  (forall k. 0 <= k < ofs -> tab[j + k] = 0) ->
+                     ofs <= !max }
+
+     let ofs_i = nombreZeroDroite !i tab n in
+    begin
+      if ofs_i > !max then begin max := ofs_i; max_i := !i end;
+      if ofs_i = 0 then i := !i + 1 else i:= !i + ofs_i;
+    end
+  done;
+  !max
+*)
+
+end
+
+
+
+(* Partie II. De la 1D vers la 2D *)
+
+
+
+(* Partie III. Algorithme optimisé *)
+(*Questions 7 - 12 *)
+(*
+let rec calculeL_aux i histo l =
+  let j = ref i in
+  while !j > 1 && histo.(!j-1) >= histo.(i) do
+    j := calculeL_aux (!j-1) histo l
+  done;
+  l.(i) <- !j; !j
+
+let calculeL histo =
+  let l = Array.make (Array.length histo) 0 in
+  let i = ref (Array.length histo - 1) in
+  while !i > 0 do
+    let j = calculeL_aux !i histo l in
+    if j < !i then i := j else i := !i - 1
+  done;
+  l
+
+let rec calculeR_aux i histo r  =
+  let j = ref i in
+  while !j < Array.length histo - 1 && histo.(!j+1) >= histo.(i) do
+    j := calculeR_aux (!j+1) histo r
+  done;
+  r.(i) <- !j; !j
+
+let calculeR histo =
+  let r = Array.make (Array.length histo) 0 in
+  let i = ref 1 in
+  while !i < Array.length histo do
+    let j = calculeR_aux !i histo r in
+    if j > !i then i := j else i := !i + 1
+  done; r
+
+let calculeLR histo = (calculeL histo, calculeR histo)
+
+let plusGrandRectangleHistogramme lx histo =
+  let l, r = calculeLR histo in
+  let cx = ref 0 in
+  let ly = ref 0 in
+  let cy = ref 0 in
+  let s  = ref 0 in
+  for i = 1 to Array.length histo - 1 do
+    let s' = (r.(i) - (l.(i) - 1)) * histo.(i) in
+    if s' > !s  then
+      begin
+        cx := l.(i);
+        cy := r.(i);
+        ly := lx - (histo.(i) - 1);
+        s := s';
+      end
+  done;
+  ((lx, !cx), (!ly, !cy), !s)
+
+
+let res col =
+  let lx, cx, ly, cy, s = ref 0, ref 0, ref 0,ref 0, ref 0 in
+  for i = 1 to Array.length col - 1 do
+    let (lx', cx'), (ly', cy'), s' = plusGrandRectangleHistogramme i col.(i)  in
+    if s' > !s then
+      begin
+        lx := i;
+        cx := cx';
+        ly := ly';
+        cy := cy';
+        s := s';
+      end
+  done;
+  (!lx, !cx), (!ly, !cy), !s
+
+
+let histo = [|-1;3;1;2;4;2;2;0;1|]
+
+let col =
+  [|
+    [|-1 |];
+    [|-1; 1; 1; 0; 0; 1; 1; 1; 0 |];
+    [|-1; 2; 2; 1; 1; 0; 2; 2; 0 |];
+    [|-1; 0; 3; 2; 2; 1; 3; 3; 0 |];
+    [|-1; 1; 0; 3; 3; 2; 4; 4; 0 |];
+    [|-1; 2; 1; 0; 0; 3; 5; 5; 0 |];
+    [|-1; 3; 2; 0; 1; 4; 6; 6; 0 |];
+    [|-1; 4; 0; 0; 0; 5; 0; 7; 0 |];
+    [|-1; 5; 1; 0; 0; 6; 1; 8; 0;|]
+  |]
+
+let _ = plusGrandRectangleHistogramme 4 histo
+let _ = res col *)
+
+
+(************************************************)
+(*
+module Recherche_bidimensionnelle
+
+use import int.Int
+use import ref.Ref
+use import array.Array
+
+
+let rec calculeL_aux i histo l
+  requires {l.length = histo.length}
+  requires {0 <= i < histo.length }
+  ensures  {0 <= result <= i}
+  ensures  {forall k. result <= k <= i -> histo[k] >= histo[i]}
+  ensures  {result > 0 -> histo[result-1] < histo[i]}
+  ensures  {result = l[i]}
+  variant { i }
+  =
+   let j = ref i in
+    while !j > 0 && histo[!j-1] >= histo[i] do
+     variant {!j}
+     invariant {forall k. !j <= k <= i -> histo[k] >= histo[i]}
+     invariant {0 <= !j <= i }
+     j := calculeL_aux (!j-1) histo l
+    done;
+    l[i] <- !j; !j
+
+let calculeL i histo l
+  requires {l.length = histo.length}
+  requires {0 <= i < histo.length }
+  ensures  {forall k. result <= k <= i -> histo[k] >= histo[i]}
+  ensures  {result > 0 -> histo[result-1] < histo[i]}
+  ensures  {0 <= result <= i}
+  ensures  {result = l[i]}
+ = calculeL_aux i histo l
+
+let rec calculeR_aux i histo r
+  requires {r.length = histo.length}
+  requires {0 <= i < histo.length }
+  ensures  {i <= result < histo.length}
+  ensures  {forall k. i <= k <= result -> histo[k] >= histo[i]}
+  ensures  {result < histo.length - 1 -> histo[result+1] < histo[i]}
+  ensures  {result = r[i]}
+  variant { histo.length - i }
+  =
+   let j = ref i in
+    while !j < histo.length - 1 && histo[!j+1] >= histo[i] do
+     variant {histo.length - !j}
+     invariant {forall k. i <= k <= !j -> histo[k] >= histo[i]}
+     invariant {i <= !j < histo.length }
+     j := calculeR_aux (!j+1) histo r
+    done;
+    r[i] <- !j; !j
+
+let calculeR i histo r
+  requires {r.length = histo.length}
+  requires {0 <= i < histo.length }
+  ensures  {forall k. i <= k <= result -> histo[k] >= histo[i]}
+  ensures  {result < histo.length -1 -> histo[result+1] < histo[i]}
+  ensures  {i <= result < histo.length}
+  ensures  {result = r[i]}
+ = calculeR_aux i histo r
+
+
+let calculeLR i histo l r
+  requires {r.length = histo.length}
+  requires {l.length = histo.length}
+  requires {0 <= i < histo.length }
+  ensures  {
+   let (li, ri) = result in forall k. li <= k <= ri -> histo[i] <= histo[k]}
+  = (calculeL i histo l, calculeR i histo r)
+
+
+predicate is_li (i j: int) (histo : array int) =
+  0 <= j <= i < histo.length /\
+ (forall k. j <= k <= i -> histo[k] >= histo[i]) /\
+ (j > 0 -> histo[j-1] < histo[i])
+
+
+let test () =
+    let histo = make 8 0 in
+    let l     = make 8 0 in
+    histo[0] <- 3; histo[1] <- 1; histo[2] <- 2; histo[3] <- 4;
+    histo[4] <- 2; histo[5] <- 2; histo[6] <- 0; histo[7] <- 1;
+    let l0 = calculeL 0 histo l in
+     assert {l0 = 0 /\ is_li 0 0 histo};
+    let l1 = calculeL 1 histo l in
+     assert {l1 = 0 /\ is_li 1 0 histo};
+    let l2 = calculeL 2 histo l in
+     assert {histo[1] < histo[2]};
+     assert {not is_li 2 1 histo};
+     assert {l2 = 2 /\ is_li 2 2 histo};
+    let l3 = calculeL 3 histo l in
+     assert {l3 = 3 /\ is_li 3 3  histo};
+    let l4 = calculeL 4 histo l in
+     assert {l4 = 2 /\ is_li 4 2 histo};
+    let l5 = calculeL 5 histo l in
+     assert {l5 = 2 /\ is_li 5 2 histo};
+    let l6 = calculeL 6 histo l in
+     assert {l6 = 0 /\ is_li 6 0 histo};
+    let l7 = calculeL 7 histo l in
+     assert {l7 = 7 /\ is_li 7 7 histo};
+     assert {not is_li 7 6 histo};
+     assert {not is_li 7 5 histo};
+     assert {not is_li 7 2 histo};
+
+end *)
+
+(*
+let rec calcule i k
+  requires {0 < k}
+  requires {l.length > 0}
+  requires {l.length = histo.length}
+  requires {0 <= i < histo.length}
+  ensures  {0 <= result <= i }
+  variant { k }
+  =
+  let li = (aux i i (k-1)) in
+   l[i] <- li;
+   li
+
+with aux i j k
+  requires { l.length > 0 }
+  requires {0 <        k}
+  requires { l.length = histo.length }
+  requires { 0 <= i < histo.length }
+  requires { 0 <= j < histo.length }
+  requires { 0 <= j <= i}
+  ensures  { 0 <= result <= j}
+  variant {k}
+ =
+  if j = 0
+   then 0
+   else
+    if histo[j-1] < histo[i]
+     then j
+     else aux i (calcule (j-1) (k-1)) (k-1)
+*)
+
+    (* ((ri < histo.length -1 -> histo[ri+1] < histo[i])  /\ *)
+     (* li > 0 -> histo[li-1] < histo[i]) /\
+        (i <= ri < histo.length) /\
+         (0 <= li <= i)} *)
+(*(* Partie II. De la 1D vers la 2D *)
+module recherche_bidimen
+
+use import int.Int
+use import ref.Ref
+use import array.Array
+
+predicate is_li (i j: int) (histo : array int) =
+  0 <= j <= i < histo.length /\
+ (forall k. j <= k <= i -> histo[k] >= histo[i]) /\
+ (j > 0 -> histo[j-1] < histo[i])
+
+let rec f i j histo l =
+  requires {l.length = histo.length}
+  requires {forall k. j <= k <= i -> histo[k] >= histo[i]}
+  requires {0 <= j <= i < histo.length }
+  ensures  {is_li i result histo}
+  ensures  {result = l[i]}
+  variant {j}
+  let li =
+    if j = 0 then 0
+    else if histo[j-1] < histo[i] then j
+         else f i (f (j-1) (j-1) histo l) histo l
+  in l[i] <- li; li
+
+let calculeL i histo l =
+  requires {0 <= i < histo.length}
+  requires {l.length = histo.length}
+  ensures  {is_li i result histo}
+  ensures  {result = l[i]}
+ f i i histo l
+
+
+let test () =
+    let histo = make 8 0 in
+    let l     = make 8 0 in
+    histo[0] <- 3; histo[1] <- 1; histo[2] <- 2; histo[3] <- 4;
+    histo[4] <- 2; histo[5] <- 2; histo[6] <- 0; histo[7] <- 1;
+    let l0 = calculeL 0 histo l in
+     assert {l0 = 0 /\ is_li 0 0 histo};
+    let l1 = calculeL 1 histo l in
+     assert {l1 = 0 /\ is_li 1 0 histo};
+    let l2 = calculeL 2 histo l in
+     assert {histo[1] < histo[2]};
+     assert {not is_li 2 1 histo};
+     assert {l2 = 2 /\ is_li 2 2 histo};
+    let l3 = calculeL 3 histo l in
+     assert {l3 = 3 /\ is_li 3 3  histo};
+    let l4 = calculeL 4 histo l in
+     assert {l4 = 2 /\ is_li 4 2 histo};
+    let l5 = calculeL 5 histo l in
+     assert {l5 = 2 /\ is_li 5 2 histo};
+    let l6 = calculeL 6 histo l in
+     assert {l6 = 0 /\ is_li 6 0 histo};
+    let l7 = calculeL 7 histo l in
+     assert {l7 = 7 /\ is_li 7 7 histo};
+     assert {not is_li 7 6 histo};
+     assert {not is_li 7 5 histo};
+     assert {not is_li 7 2 histo};
+
+end
+
+module Histo_loop
+
+use import int.Int
+use import int.Lex2
+use import ref.Ref
+use import array.Array
+
+predicate is_li (i j: int) (histo : array int) =
+  0 <= j <= i < histo.length /\
+ (forall k. j <= k <= i -> histo[k] >= histo[i]) /\
+ (j > 0 -> histo[j-1] < histo[i])
+
+let rec calculeL_aux i histo l
+  requires {l.length = histo.length}
+  requires {0 <= i < histo.length }
+  ensures  {is_li i result histo}
+  ensures  {result = l[i]}
+  variant { i }
+  =
+   let j = ref i in
+    while !j > 0 && histo[!j-1] >= histo[i] do
+       variant {!j}
+       invariant {forall k. !j <= k <= i -> histo[k] >= histo[i]}
+       invariant {0 <= !j <= i }
+     j := calculeL_aux (!j-1) histo l
+    done;
+    l[i] <- !j; !j
+
+let calculeL i histo l
+  requires {l.length = histo.length}
+  requires {0 <= i < histo.length }
+  ensures  {is_li i result histo}
+  ensures  {result = l[i]}
+ = calculeL_aux i histo l
+
+let test () =
+    let histo = make 8 0 in
+    let l     = make 8 0 in
+    histo[0] <- 3; histo[1] <- 1; histo[2] <- 2; histo[3] <- 4;
+    histo[4] <- 2; histo[5] <- 2; histo[6] <- 0; histo[7] <- 1;
+    let l0 = calculeL 0 histo l in
+     assert {l0 = 0 /\ is_li 0 0 histo};
+    let l1 = calculeL 1 histo l in
+     assert {l1 = 0 /\ is_li 1 0 histo};
+    let l2 = calculeL 2 histo l in
+     assert {histo[1] < histo[2]};
+     assert {not is_li 2 1 histo};
+     assert {l2 = 2 /\ is_li 2 2 histo};
+    let l3 = calculeL 3 histo l in
+     assert {l3 = 3 /\ is_li 3 3  histo};
+    let l4 = calculeL 4 histo l in
+     assert {l4 = 2 /\ is_li 4 2 histo};
+    let l5 = calculeL 5 histo l in
+     assert {l5 = 2 /\ is_li 5 2 histo};
+    let l6 = calculeL 6 histo l in
+     assert {l6 = 0 /\ is_li 6 0 histo};
+    let l7 = calculeL 7 histo l in
+     assert {l7 = 7 /\ is_li 7 7 histo};
+     assert {not is_li 7 6 histo};
+     assert {not is_li 7 5 histo};
+     assert {not is_li 7 2 histo};
+
+end*)
