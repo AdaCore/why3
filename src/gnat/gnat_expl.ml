@@ -8,6 +8,7 @@ type reason =
    | VC_Range_Check
    | VC_Length_Check
    | VC_Discriminant_Check
+   | VC_Default_Initial_Condition
    | VC_Initial_Condition
    | VC_Precondition
    | VC_Precondition_Main
@@ -49,90 +50,93 @@ let get_loc c = c.sloc
 let get_reason c = c.reason
 let reason_from_string s =
    match s with
-   | "VC_DIVISION_CHECK"          -> VC_Division_Check
-   | "VC_INDEX_CHECK"             -> VC_Index_Check
-   | "VC_OVERFLOW_CHECK"          -> VC_Overflow_Check
-   | "VC_RANGE_CHECK"             -> VC_Range_Check
-   | "VC_LENGTH_CHECK"            -> VC_Length_Check
-   | "VC_DISCRIMINANT_CHECK"      -> VC_Discriminant_Check
-   | "VC_INITIAL_CONDITION"       -> VC_Initial_Condition
-   | "VC_PRECONDITION"            -> VC_Precondition
-   | "VC_PRECONDITION_MAIN"       -> VC_Precondition_Main
-   | "VC_POSTCONDITION"           -> VC_Postcondition
-   | "VC_REFINED_POST"            -> VC_Refined_Post
-   | "VC_CONTRACT_CASE"           -> VC_Contract_Case
-   | "VC_DISJOINT_CONTRACT_CASES" -> VC_Disjoint_Contract_Cases
-   | "VC_COMPLETE_CONTRACT_CASES" -> VC_Complete_Contract_Cases
-   | "VC_LOOP_INVARIANT"          -> VC_Loop_Invariant
-   | "VC_LOOP_INVARIANT_INIT"     -> VC_Loop_Invariant_Init
-   | "VC_LOOP_INVARIANT_PRESERV"  -> VC_Loop_Invariant_Preserv
-   | "VC_LOOP_VARIANT"            -> VC_Loop_Variant
-   | "VC_ASSERT"                  -> VC_Assert
-   | "VC_RAISE"                   -> VC_Raise
-   | "VC_WEAKER_PRE"              -> VC_Weaker_Pre
-   | "VC_TRIVIAL_WEAKER_PRE"      -> VC_Trivial_Weaker_Pre
-   | "VC_STRONGER_POST"           -> VC_Stronger_Post
-   | "VC_WEAKER_CLASSWIDE_PRE"    -> VC_Weaker_Classwide_Pre
-   | "VC_STRONGER_CLASSWIDE_POST" -> VC_Stronger_Classwide_Post
+   | "VC_DIVISION_CHECK"            -> VC_Division_Check
+   | "VC_INDEX_CHECK"               -> VC_Index_Check
+   | "VC_OVERFLOW_CHECK"            -> VC_Overflow_Check
+   | "VC_RANGE_CHECK"               -> VC_Range_Check
+   | "VC_LENGTH_CHECK"              -> VC_Length_Check
+   | "VC_DISCRIMINANT_CHECK"        -> VC_Discriminant_Check
+   | "VC_INITIAL_CONDITION"         -> VC_Initial_Condition
+   | "VC_DEFAULT_INITIAL_CONDITION" -> VC_Default_Initial_Condition
+   | "VC_PRECONDITION"              -> VC_Precondition
+   | "VC_PRECONDITION_MAIN"         -> VC_Precondition_Main
+   | "VC_POSTCONDITION"             -> VC_Postcondition
+   | "VC_REFINED_POST"              -> VC_Refined_Post
+   | "VC_CONTRACT_CASE"             -> VC_Contract_Case
+   | "VC_DISJOINT_CONTRACT_CASES"   -> VC_Disjoint_Contract_Cases
+   | "VC_COMPLETE_CONTRACT_CASES"   -> VC_Complete_Contract_Cases
+   | "VC_LOOP_INVARIANT"            -> VC_Loop_Invariant
+   | "VC_LOOP_INVARIANT_INIT"       -> VC_Loop_Invariant_Init
+   | "VC_LOOP_INVARIANT_PRESERV"    -> VC_Loop_Invariant_Preserv
+   | "VC_LOOP_VARIANT"              -> VC_Loop_Variant
+   | "VC_ASSERT"                    -> VC_Assert
+   | "VC_RAISE"                     -> VC_Raise
+   | "VC_WEAKER_PRE"                -> VC_Weaker_Pre
+   | "VC_TRIVIAL_WEAKER_PRE"        -> VC_Trivial_Weaker_Pre
+   | "VC_STRONGER_POST"             -> VC_Stronger_Post
+   | "VC_WEAKER_CLASSWIDE_PRE"      -> VC_Weaker_Classwide_Pre
+   | "VC_STRONGER_CLASSWIDE_POST"   -> VC_Stronger_Classwide_Post
    | _                            ->
        Format.printf "unknown VC reason: %s@." s;
        Gnat_util.abort_with_message ""
 
 let reason_to_ada reason =
    match reason with
-   | VC_Division_Check          -> "VC_DIVISION_CHECK"
-   | VC_Index_Check             -> "VC_INDEX_CHECK"
-   | VC_Overflow_Check          -> "VC_OVERFLOW_CHECK"
-   | VC_Range_Check             -> "VC_RANGE_CHECK"
-   | VC_Length_Check            -> "VC_LENGTH_CHECK"
-   | VC_Discriminant_Check      -> "VC_DISCRIMINANT_CHECK"
-   | VC_Initial_Condition       -> "VC_INITIAL_CONDITION"
-   | VC_Precondition            -> "VC_PRECONDITION"
-   | VC_Precondition_Main       -> "VC_PRECONDITION_MAIN"
-   | VC_Postcondition           -> "VC_POSTCONDITION"
-   | VC_Refined_Post            -> "VC_REFINED_POST"
-   | VC_Contract_Case           -> "VC_CONTRACT_CASE"
-   | VC_Disjoint_Contract_Cases -> "VC_DISJOINT_CONTRACT_CASES"
-   | VC_Complete_Contract_Cases -> "VC_COMPLETE_CONTRACT_CASES"
-   | VC_Loop_Invariant          -> "VC_LOOP_INVARIANT"
-   | VC_Loop_Invariant_Init     -> "VC_LOOP_INVARIANT_INIT"
-   | VC_Loop_Invariant_Preserv  -> "VC_LOOP_INVARIANT_PRESERV"
-   | VC_Loop_Variant            -> "VC_LOOP_VARIANT"
-   | VC_Assert                  -> "VC_ASSERT"
-   | VC_Raise                   -> "VC_RAISE"
-   | VC_Weaker_Pre              -> "VC_WEAKER_PRE"
-   | VC_Trivial_Weaker_Pre      -> "VC_TRIVIAL_WEAKER_PRE"
-   | VC_Stronger_Post           -> "VC_STRONGER_POST"
-   | VC_Weaker_Classwide_Pre    -> "VC_WEAKER_CLASSWIDE_PRE"
-   | VC_Stronger_Classwide_Post -> "VC_STRONGER_CLASSWIDE_POST"
+   | VC_Division_Check            -> "VC_DIVISION_CHECK"
+   | VC_Index_Check               -> "VC_INDEX_CHECK"
+   | VC_Overflow_Check            -> "VC_OVERFLOW_CHECK"
+   | VC_Range_Check               -> "VC_RANGE_CHECK"
+   | VC_Length_Check              -> "VC_LENGTH_CHECK"
+   | VC_Discriminant_Check        -> "VC_DISCRIMINANT_CHECK"
+   | VC_Initial_Condition         -> "VC_INITIAL_CONDITION"
+   | VC_Default_Initial_Condition -> "VC_DEFAULT_INITIAL_CONDITION"
+   | VC_Precondition              -> "VC_PRECONDITION"
+   | VC_Precondition_Main         -> "VC_PRECONDITION_MAIN"
+   | VC_Postcondition             -> "VC_POSTCONDITION"
+   | VC_Refined_Post              -> "VC_REFINED_POST"
+   | VC_Contract_Case             -> "VC_CONTRACT_CASE"
+   | VC_Disjoint_Contract_Cases   -> "VC_DISJOINT_CONTRACT_CASES"
+   | VC_Complete_Contract_Cases   -> "VC_COMPLETE_CONTRACT_CASES"
+   | VC_Loop_Invariant            -> "VC_LOOP_INVARIANT"
+   | VC_Loop_Invariant_Init       -> "VC_LOOP_INVARIANT_INIT"
+   | VC_Loop_Invariant_Preserv    -> "VC_LOOP_INVARIANT_PRESERV"
+   | VC_Loop_Variant              -> "VC_LOOP_VARIANT"
+   | VC_Assert                    -> "VC_ASSERT"
+   | VC_Raise                     -> "VC_RAISE"
+   | VC_Weaker_Pre                -> "VC_WEAKER_PRE"
+   | VC_Trivial_Weaker_Pre        -> "VC_TRIVIAL_WEAKER_PRE"
+   | VC_Stronger_Post             -> "VC_STRONGER_POST"
+   | VC_Weaker_Classwide_Pre      -> "VC_WEAKER_CLASSWIDE_PRE"
+   | VC_Stronger_Classwide_Post   -> "VC_STRONGER_CLASSWIDE_POST"
 
 let reason_to_string reason =
    match reason with
-   | VC_Division_Check          -> "division_check"
-   | VC_Index_Check             -> "index_check"
-   | VC_Overflow_Check          -> "overflow_check"
-   | VC_Range_Check             -> "range_check"
-   | VC_Length_Check            -> "length_check"
-   | VC_Discriminant_Check      -> "discriminant_check"
-   | VC_Initial_Condition       -> "initial_condition"
-   | VC_Precondition            -> "precondition"
-   | VC_Precondition_Main       -> "main_precondition"
-   | VC_Postcondition           -> "postcondition"
-   | VC_Refined_Post            -> "refined_post"
-   | VC_Contract_Case           -> "contract_case"
-   | VC_Disjoint_Contract_Cases -> "disjoint_contract_cases"
-   | VC_Complete_Contract_Cases -> "complete_contract_cases"
-   | VC_Loop_Invariant          -> "loop_invariant"
-   | VC_Loop_Invariant_Init     -> "loop_invariant_init"
-   | VC_Loop_Invariant_Preserv  -> "loop_invariant_preserv"
-   | VC_Loop_Variant            -> "loop_variant"
-   | VC_Assert                  -> "assert"
-   | VC_Raise                   -> "raise"
-   | VC_Weaker_Pre              -> "weaker_pre"
-   | VC_Trivial_Weaker_Pre      -> "trivial_weaker_pre"
-   | VC_Stronger_Post           -> "stronger_post"
-   | VC_Weaker_Classwide_Pre    -> "weaker_classwide_pre"
-   | VC_Stronger_Classwide_Post -> "stronger_classwide_post"
+   | VC_Division_Check            -> "division_check"
+   | VC_Index_Check               -> "index_check"
+   | VC_Overflow_Check            -> "overflow_check"
+   | VC_Range_Check               -> "range_check"
+   | VC_Length_Check              -> "length_check"
+   | VC_Discriminant_Check        -> "discriminant_check"
+   | VC_Initial_Condition         -> "initial_condition"
+   | VC_Default_Initial_Condition -> "default_initial_condition"
+   | VC_Precondition              -> "precondition"
+   | VC_Precondition_Main         -> "main_precondition"
+   | VC_Postcondition             -> "postcondition"
+   | VC_Refined_Post              -> "refined_post"
+   | VC_Contract_Case             -> "contract_case"
+   | VC_Disjoint_Contract_Cases   -> "disjoint_contract_cases"
+   | VC_Complete_Contract_Cases   -> "complete_contract_cases"
+   | VC_Loop_Invariant            -> "loop_invariant"
+   | VC_Loop_Invariant_Init       -> "loop_invariant_init"
+   | VC_Loop_Invariant_Preserv    -> "loop_invariant_preserv"
+   | VC_Loop_Variant              -> "loop_variant"
+   | VC_Assert                    -> "assert"
+   | VC_Raise                     -> "raise"
+   | VC_Weaker_Pre                -> "weaker_pre"
+   | VC_Trivial_Weaker_Pre        -> "trivial_weaker_pre"
+   | VC_Stronger_Post             -> "stronger_post"
+   | VC_Weaker_Classwide_Pre      -> "weaker_classwide_pre"
+   | VC_Stronger_Classwide_Post   -> "stronger_classwide_post"
 
 type gp_label =
   | Gp_Sloc of Gnat_loc.loc
