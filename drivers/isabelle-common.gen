@@ -104,7 +104,7 @@ theory list.Reverse
 end
 
 theory list.Mem
-  syntax predicate mem "<app><const name=\"Set.member\"/>%1<app><const name=\"List.set\"/>%2</app></app>"
+  syntax predicate mem "<app><const name=\"Set.member\"/>%1<app><const name=\"List.list.set\"/>%2</app></app>"
 end
 
 theory list.NthNoOpt
@@ -112,8 +112,8 @@ theory list.NthNoOpt
 end
 
 theory list.HdTlNoOpt
-  syntax function hd "<app><const name=\"List.hd\"/>%1</app>"
-  syntax function tl "<app><const name=\"List.tl\"/>%1</app>"
+  syntax function hd "<app><const name=\"List.list.hd\"/>%1</app>"
+  syntax function tl "<app><const name=\"List.list.tl\"/>%1</app>"
 end
 
 theory list.Distinct
@@ -148,7 +148,7 @@ end
 
 theory number.Parity
   syntax predicate even "<app><const name=\"Parity.even_odd_class.even\"/>%1</app>"
-  syntax predicate odd  "<app><const name=\"Parity.odd\"/>%1</app>"
+  syntax predicate odd  "<app><const name=\"Parity.even_odd_class.odd\"/>%1</app>"
 end
 
 theory number.Divisibility
@@ -160,7 +160,7 @@ theory number.Gcd
 end
 
 theory number.Prime
-  syntax predicate prime "<app><const name=\"Primes.prime_class.prime\"/>%1</app>"
+  syntax predicate prime "<app><const name=\"Primes.prime\"/><app><const name=\"Int.nat\"/>%1</app></app>"
 end
 
 theory number.Coprime

@@ -108,9 +108,9 @@ why3_vc Div_inf_neg
     zdiv_zminus1_eq_if div_pos_pos_trivial mod_pos_pos_trivial)
 
 why3_vc Div_mod
-  by (simp add: ediv_def emod_def mult_assoc [symmetric] abs_sgn)
+  by (simp add: ediv_def emod_def mult.assoc [symmetric] abs_sgn)
 
-why3_vc Div_mult using assms by (simp add: ediv_def add_commute)
+why3_vc Div_mult using assms by (simp add: ediv_def add.commute)
 
 why3_vc Div_bound
 proof -
@@ -145,7 +145,7 @@ why3_vc Mod_minus1_left
   using assms
   by (simp only: emod_def zmod_zminus1_eq_if) (simp add: mod_pos_pos_trivial)
 
-why3_vc Mod_mult using assms by (simp add: emod_def add_commute)
+why3_vc Mod_mult using assms by (simp add: emod_def add.commute)
 
 why3_vc Mod_bound using assms by (simp_all add: emod_def)
 
@@ -194,7 +194,7 @@ proof (cases "y = 0")
   case False
   with assms show ?thesis
     by (cases "z = 0")
-      (simp_all add: cdiv_def add_commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
+      (simp_all add: cdiv_def add.commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
 qed simp
 
 why3_vc Div_bound
@@ -224,7 +224,7 @@ proof (cases "y = 0")
   case False
   with assms show ?thesis
     by (cases "z = 0") (simp_all add: cmod_def
-      add_commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
+      add.commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
 qed simp
 
 why3_vc Mod_bound

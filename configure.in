@@ -574,7 +574,7 @@ else
         ISABELLEVERSION=`$ISABELLE version | sed -n -e 's|Isabelle\([[^:]]*\).*$|\1|p' `
 
         case $ISABELLEVERSION in
-          2013-2)
+          2014*)
 	        enable_isabelle_support=yes
                 AC_MSG_RESULT($ISABELLEVERSION)
                 ;;

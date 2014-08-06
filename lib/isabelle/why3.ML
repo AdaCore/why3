@@ -65,7 +65,7 @@ fun parse_xml s =
 (**** terms and types ****)
 
 (* replace occurrences of dummy_pattern by distinct variables *)
-fun replace_dummies (Const (@{const_name dummy_pattern}, T)) used =
+fun replace_dummies (Const (@{const_name Pure.dummy_pattern}, T)) used =
       let val (x, used') = Name.variant "x" used
       in (Free (x, T), used') end
   | replace_dummies (t $ u) used =
@@ -275,10 +275,10 @@ fun add_qualified add prep (s, x) thy =
      (Long_Name.base_name s, prep (Proof_Context.init_global thy) x) thy);
 
 val add_why3_const = add_qualified add_const_raw (fn ctxt => fn cname =>
-  fst (dest_Const (Proof_Context.read_const_proper ctxt false cname)));
+  fst (dest_Const (Proof_Context.read_const {proper = true, strict = false} ctxt cname)));
 
 val add_why3_type = add_qualified add_type_raw (fn ctxt => fn tyname =>
-  fst (dest_Type (Proof_Context.read_type_name_proper ctxt false tyname)));
+  fst (dest_Type (Proof_Context.read_type_name {proper = true, strict = false} ctxt tyname)));
 
 val add_why3_thm = add_qualified add_thm_raw Attrib.eval_thms;
 
@@ -780,10 +780,13 @@ fun show_status thy sel =
 
 (**** commands ****)
 
-fun why3_open ((name, consts), types) thy = process_decls
-  (map (apsnd (Sign.intern_const thy)) consts)
-  (map (apsnd (Sign.intern_type thy)) types)
-  (parse_xml (snd (Thy_Load.load_file thy (Path.explode name)))) thy;
+fun why3_open ((files, consts), types) thy =
+  let val ([{lines, ...}: Token.file], thy') = files thy;
+  in process_decls
+    (map (apsnd (Sign.intern_const thy)) consts)
+    (map (apsnd (Sign.intern_type thy)) types)
+    (parse_xml (cat_lines lines)) thy'
+  end;
 
 fun prove_vc vc_name lthy =
   let
@@ -799,7 +802,7 @@ fun prove_vc vc_name lthy =
 val _ =
   Outer_Syntax.command @{command_spec "why3_open"}
     "open a new Why3 environment and load a Why3-generated .xml file"
-    (Parse.name --
+    (Resources.provide_parse_files "why3_open" --
      Scan.optional (Parse.reserved "constants" |-- Parse.!!! (Scan.repeat1
        (Parse.name --| Args.$$$ "=" -- Parse.!!! Parse.xname))) [] --
      Scan.optional (Parse.reserved "types" |-- (Scan.repeat1
@@ -810,7 +813,7 @@ val _ =
   Outer_Syntax.command @{command_spec "why3_vc"}
     "enter into proof mode for a specific verification condition"
     (Parse.name >> (fn name =>
-      (Toplevel.print o Toplevel.local_theory_to_proof NONE (prove_vc name))));
+      (Toplevel.local_theory_to_proof NONE (prove_vc name))));
 
 val _ =
   Outer_Syntax.improper_command @{command_spec "why3_status"}

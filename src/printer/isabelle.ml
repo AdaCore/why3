@@ -160,7 +160,7 @@ let print_abs info pr fmt (v, t) =
 let p_type p = p.pat_ty
 
 let rec print_pat info fmt p = match p.pat_node with
-  | Pwild -> print_const fmt "dummy_pattern"
+  | Pwild -> print_const fmt "Pure.dummy_pattern"
   | Pvar v -> print_var info fmt v
   | Pas _ ->
       assert false
