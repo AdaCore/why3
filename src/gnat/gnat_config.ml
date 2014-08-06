@@ -1,4 +1,5 @@
 open Why3
+open Stdlib
 
 type proof_mode =
     Then_Split
@@ -12,6 +13,18 @@ type limit_mode =
   | Limit_Line of Gnat_loc.loc
 
 let gnatprove_why3conf_file = "why3.conf"
+
+let is_builtin_prover =
+  let builtin_provers =
+    Sstr.add "altergo" (Sstr.add "cvc4" Sstr.empty) in
+  (fun s ->
+    let s = String.lowercase s in
+    Sstr.mem s builtin_provers)
+
+let opt_builtin_prover opt_s =
+  match opt_s with
+  | None -> false
+  | Some s -> is_builtin_prover s
 
 let default_timeout = 1
 
@@ -141,29 +154,29 @@ let options = Arg.align [
 
 let () = Arg.parse options set_filename usage_msg
 
+let merge_opt_keep_first _ v1 v2 =
+  match v1, v2 with
+  | None, x -> x
+  | (Some _ as x), _ -> x
+
 let prover_merge m1 m2 =
-  (* merge two prover maps; if they have share a key, keep the entry of the
-     first map *)
-  Whyconf.Mprover.merge (fun _ v1 v2 ->
-    match v1, v2 with
-    | None, x -> x
-    | (Some _ as x), _ -> x)
-  m1 m2
+  Whyconf.Mprover.merge merge_opt_keep_first m1 m2
 
 let editor_merge me1 me2 =
-  Whyconf.Meditor.merge (fun _ v1 v2 ->
-    match v1, v2 with
-    | None, x -> x
-    | (Some _ as x), _ -> x)
-  me1 me2
+  Whyconf.Meditor.merge merge_opt_keep_first me1 me2
+
+let shortcut_merge s1 s2 =
+  Mstr.merge merge_opt_keep_first s1 s2
 
 let config =
-   (* if a prover was given, read default config file and local config file *)
+   (* We only read the default config file ($HOME/.why3.conf) if the option
+    * --prover was given, with a non-builtin prover *)
    try
      let gnatprove_config =
        if !opt_prepare_shared then Whyconf.read_config None
        else Whyconf.read_config (Some gnatprove_why3conf_file) in
-      if !opt_prover = None then gnatprove_config
+      if !opt_prover = None || opt_builtin_prover !opt_prover then
+        gnatprove_config
       else begin
          let conf = Whyconf.read_config None in
          let provers =
@@ -172,8 +185,12 @@ let config =
              (Whyconf.get_provers conf) in
          let editors = editor_merge (Whyconf.get_editors gnatprove_config)
                                     (Whyconf.get_editors conf) in
-         Whyconf.set_editors (Whyconf.set_provers gnatprove_config provers)
-                             editors
+         let shortcuts =
+           shortcut_merge (Whyconf.get_prover_shortcuts gnatprove_config)
+                          (Whyconf.get_prover_shortcuts conf) in
+         Whyconf.set_editors
+           (Whyconf.set_provers ~shortcuts gnatprove_config provers)
+           editors
       end
    with Rc.CannotOpen _ ->
       Gnat_util.abort_with_message "Cannot read file why3.conf."
