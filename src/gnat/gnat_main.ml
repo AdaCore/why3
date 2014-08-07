@@ -59,7 +59,7 @@ let register_goal goal =
    | true, None ->
          Gnat_objectives.set_not_interesting goal
    | _, None ->
-         Gnat_util.abort_with_message
+         Gnat_util.abort_with_message ~internal:true
          "Task has no tracability label."
    | _, Some c ->
        Gnat_objectives.add_to_objective c goal
@@ -206,4 +206,4 @@ let _ =
          ()
     with e ->
        let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
-       Gnat_util.abort_with_message s
+       Gnat_util.abort_with_message ~internal:true s

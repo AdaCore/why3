@@ -49,7 +49,8 @@ let set_filename s =
    if !opt_filename = None then
       opt_filename := Some s
    else
-      Gnat_util.abort_with_message "Only one file name should be given."
+      Gnat_util.abort_with_message ~internal:true
+      "Only one file name should be given."
 
 let set_proof_mode s =
    if s = "no_wp" then
@@ -63,7 +64,7 @@ let set_proof_mode s =
    else if s = "then_split" then
      opt_proof_mode := Then_Split
    else
-      Gnat_util.abort_with_message
+      Gnat_util.abort_with_message ~internal:true
         "argument for option --proof should be one of\
         (then_split|no_wp|all_split|path_wp|no_split)."
 
@@ -94,14 +95,14 @@ let parse_line_spec caller s =
      | _ -> raise (Failure "bad arity")
    with
    | Failure "nth" ->
-      Gnat_util.abort_with_message
+      Gnat_util.abort_with_message ~internal:true
       (caller ^ ": incorrect line specification - missing ':'")
    | Failure "int_of_string" ->
-      Gnat_util.abort_with_message
+      Gnat_util.abort_with_message ~internal:true
       (caller ^
         ": incorrect line specification - line or column field isn't a number")
    | Failure "bad arity" ->
-      Gnat_util.abort_with_message
+      Gnat_util.abort_with_message ~internal:true
       (caller ^
         ": incorrect line specification - invalid parameter number, must be \
          2 or 4")
@@ -193,7 +194,7 @@ let config =
            editors
       end
    with Rc.CannotOpen _ ->
-      Gnat_util.abort_with_message "Cannot read file why3.conf."
+      Gnat_util.abort_with_message ~internal:true "Cannot read file why3.conf."
 
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
    Whyconf.get_provers config
@@ -213,13 +214,13 @@ let prover : Whyconf.config_prover =
            Whyconf.Mprover.find conf provers
   with
   | Not_found ->
-        Gnat_util.abort_with_message
+        Gnat_util.abort_with_message ~internal:false
           "Default prover not installed or not configured."
   | Whyconf.ProverNotFound _ ->
-        Gnat_util.abort_with_message
+        Gnat_util.abort_with_message ~internal:false
           "Selected prover not installed or not configured."
   | Whyconf.ProverAmbiguity _ ->
-        Gnat_util.abort_with_message
+        Gnat_util.abort_with_message ~internal:false
           "Several provers match the selection."
 
 let config_main = Whyconf.get_main (config)
@@ -320,7 +321,7 @@ let build_shared proof_dir prover =
   let check_success res msg =
     match res with
     | Unix.WEXITED 0 -> ()
-    | _ -> let () = Gnat_util.abort_with_message msg in ()
+    | _ -> let () = Gnat_util.abort_with_message ~internal:true msg in ()
   in
 
   if vc_files <> [] then
@@ -353,10 +354,11 @@ let filename =
    | None -> (match !opt_prepare_shared, !opt_proof_dir with
              | (true, Some pdir) -> build_shared pdir prover;
                                     let () = exit 0 in ""
-             | _ -> Gnat_util.abort_with_message "No file given.")
+             | _ ->
+                 Gnat_util.abort_with_message ~internal:true "No file given.")
    | Some s ->
          if is_not_why_loc s then
-            Gnat_util.abort_with_message
+            Gnat_util.abort_with_message ~internal:true
               (Printf.sprintf "Not a Why input file: %s." s);
          s
 
@@ -366,9 +368,10 @@ let prover_driver : Driver.driver =
     Driver.load_driver env prover.Whyconf.driver
       prover.Whyconf.extra_drivers
   with e ->
-    Format.eprintf "Failed to load driver for prover: %a"
-       Exn_printer.exn_printer e;
-    Gnat_util.abort_with_message ""
+    let s =
+      Pp.sprintf "Failed to load driver for prover: %a"
+           Exn_printer.exn_printer e in
+    Gnat_util.abort_with_message ~internal:true s
 
 let prover_editor () =
   Whyconf.editor_by_id config prover.Whyconf.editor

@@ -74,7 +74,8 @@ let parse_loc =
             in
             parse_loc_list (new_loc :: acc) ~first:false rest
       | [] -> acc
-      | _ -> Gnat_util.abort_with_message "location list malformed."
+      | _ ->
+          Gnat_util.abort_with_message ~internal:true "location list malformed."
    in
    fun l -> List.rev (parse_loc_list [] ~first:true l)
 

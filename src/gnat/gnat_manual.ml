@@ -101,4 +101,5 @@ let rewrite_goal g =
      mv_file tmpfile fn;
      Unix.unlink tmpfile
   | None ->
-     Gnat_util.abort_with_message "rewritting goal not edited as a file."
+     Gnat_util.abort_with_message ~internal:true
+       "rewritten goal not edited as a file."

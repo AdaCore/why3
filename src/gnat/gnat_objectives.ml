@@ -233,7 +233,8 @@ let find_next_transformation goal =
   | Some s ->
       try next_transform s
       with Not_found ->
-        Gnat_util.abort_with_message "unknown transformation found"
+        Gnat_util.abort_with_message ~internal:true
+          "unknown transformation found"
 
 let is_full_split_goal goal =
    (* check whether the goal has been obtained by the last transformation in
@@ -429,7 +430,7 @@ let extract_sloc main_goal =
         | Some Gnat_expl.Gp_Subp loc -> raise (Found (loc))
         | _ -> ()
       ) label_set;
-      Gnat_util.abort_with_message
+      Gnat_util.abort_with_message ~internal:true
         (Pp.sprintf "could not find source location for subprogram %s"
         goal_ident.Ident.id_string)
    with Found l -> l

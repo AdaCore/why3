@@ -6,12 +6,21 @@ open Why3
 
    The output format is the following:
 
-     file = { "error" : string, results : list result }
+     file = { "error"    : string,
+              "internal" : bool,
+              "results"  : list result }
 
-   The "error" field is optional. If present, some internal error happened and
-   the value of that field contains the reason for it. In this case, the
-   "results" field will be empty. If the "error" field is not present, the
-   "results" field contains the list of proof results.
+   The "error" and "internal" fields are optional.  If the error field is
+   present, the "results" field will be empty. If the "error" field is not
+   present, the "results" field contains the list of proof results.
+
+   If the "error" field is present, some error happened and the value of that
+   field contains the reason for it. The "internal" field is present and
+   meaningful only of the "error" field ir present. If the "internal" field is
+   present and set to "true", the error is an internal error which exhibits
+   some misbehavior of the tool. If the field absent or set to "false", the
+   error should be interpreted as a misuse of the tool (e.g. invalid command
+   line options).
 
      result = { "id"         : int,
                 "reason"     : string,

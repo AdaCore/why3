@@ -1,8 +1,9 @@
 open Gnat_json
 
-let abort_with_message s =
-  Format.printf "{%a, %a}"
+let abort_with_message ~internal s =
+  Format.printf "{%a, %a, %a}"
   (print_json_field "error" string) s
+  (print_json_field "internal" bool) internal
   (print_json_field "results" (list int)) [];
   exit 1
 

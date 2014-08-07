@@ -77,8 +77,8 @@ let reason_from_string s =
    | "VC_WEAKER_CLASSWIDE_PRE"      -> VC_Weaker_Classwide_Pre
    | "VC_STRONGER_CLASSWIDE_POST"   -> VC_Stronger_Classwide_Post
    | _                            ->
-       Format.printf "unknown VC reason: %s@." s;
-       Gnat_util.abort_with_message ""
+       let s = Format.sprintf "unknown VC reason: %s@." s in
+       Gnat_util.abort_with_message ~internal:true s
 
 let reason_to_ada reason =
    match reason with
@@ -154,33 +154,35 @@ let read_label s =
            begin try
              Some (Gp_Pretty_Ada (int_of_string msg))
            with Failure _ ->
-              Format.printf "GP_Pretty_Ada: cannot parse string: %s" s;
-              Gnat_util.abort_with_message ""
+             let s =
+               Format.sprintf "GP_Pretty_Ada: cannot parse string: %s" s in
+              Gnat_util.abort_with_message ~internal:true s
            end
        | ["GP_Id"; msg] ->
            begin try
              Some (Gp_VC_Id (int_of_string msg))
            with Failure _ ->
-              Format.printf "GP_VC_Id: cannot parse string: %s" s;
-              Gnat_util.abort_with_message ""
+             let s = Format.sprintf "GP_VC_Id: cannot parse string: %s" s in
+              Gnat_util.abort_with_message ~internal:true s
            end
        | "GP_Sloc" :: rest ->
            begin try Some (Gp_Sloc (Gnat_loc.parse_loc rest))
            with Failure _ ->
-              Format.printf "GP_Sloc: cannot parse string: %s" s;
-              Gnat_util.abort_with_message ""
+             let s = Format.sprintf "GP_Sloc: cannot parse string: %s" s in
+              Gnat_util.abort_with_message ~internal:true s
            end
        | ["GP_Subp" ; file ; line ] ->
            begin try
              Some (Gp_Subp (Gnat_loc.mk_loc_line file (int_of_string line)))
            with Failure _ ->
-              Format.printf "GP_Subp: cannot parse string: %s" s;
-              Gnat_util.abort_with_message ""
+             let s = Format.sprintf "GP_Subp: cannot parse string: %s" s in
+              Gnat_util.abort_with_message ~internal:true s
            end
        | _ ->
-              Format.printf "cannot parse string: %s@." s;
-             Gnat_util.abort_with_message
-                 "found malformed GNATprove label"
+           let msg = "found malformed GNATprove label, " in
+           let s =
+             Format.sprintf "%s, cannot parse string: %s" msg s in
+           Gnat_util.abort_with_message ~internal:true s
     else None
 
 type my_expl =
@@ -213,7 +215,7 @@ let read_vc_labels s =
         | Some Gp_Sloc loc ->
             b.check_sloc <- Some loc
         | Some Gp_Subp _ ->
-             Gnat_util.abort_with_message
+             Gnat_util.abort_with_message ~internal:true
                  "read_vc_labels: GP_Subp unexpected here"
         | None ->
             ()
