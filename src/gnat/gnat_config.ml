@@ -80,36 +80,37 @@ let set_steps t =
 let set_socket_name s =
   opt_socket_name := s
 
-let parse_line_spec caller s =
+let parse_line_spec s =
    try
      let args = Str.split (Str.regexp_string ":") s in
-     let fn = List.hd args in
-     let line = int_of_string (List.nth args 1) in
-     match List.length args with
-     | 2 -> Limit_Line (Gnat_loc.mk_loc_line fn line)
-     | 4 ->
-         let col = int_of_string (List.nth args 2) in
-         let check = Gnat_expl.reason_from_string (List.nth args 3) in
+     match args with
+     | [] ->
+        Gnat_util.abort_with_message ~internal:true
+        ("limit-line: incorrect line specification - missing ':'")
+     | [fn;line] ->
+         let line = int_of_string line in
+         Limit_Line (Gnat_loc.mk_loc_line fn line)
+     | [fn;line;col;check] ->
+         let line = int_of_string line in
+         let col = int_of_string col in
+         let check = Gnat_expl.reason_from_string check in
          let loc = Gnat_loc.mk_loc fn line col None in
          Limit_Check (Gnat_expl.mk_check check 0 loc)
-     | _ -> raise (Failure "bad arity")
-   with
-   | Failure "nth" ->
+     | _ ->
       Gnat_util.abort_with_message ~internal:true
-      (caller ^ ": incorrect line specification - missing ':'")
+      (
+        "limit-line: incorrect line specification -\
+         invalid parameter number, must be \
+         2 or 4")
+  with
    | Failure "int_of_string" ->
       Gnat_util.abort_with_message ~internal:true
-      (caller ^
-        ": incorrect line specification - line or column field isn't a number")
-   | Failure "bad arity" ->
-      Gnat_util.abort_with_message ~internal:true
-      (caller ^
-        ": incorrect line specification - invalid parameter number, must be \
-         2 or 4")
+      ("limit-line: incorrect line specification -\
+        line or column field isn't a number")
 
 let set_proof_dir s = opt_proof_dir := Some  s
 
-let set_limit_line s = opt_limit_line := Some (parse_line_spec "limit-line" s)
+let set_limit_line s = opt_limit_line := Some (parse_line_spec s)
 let set_limit_subp s = opt_limit_subp := Some s
 
 let usage_msg =
