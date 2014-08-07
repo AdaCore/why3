@@ -1,7 +1,10 @@
+open Gnat_json
+
 let abort_with_message s =
-   Format.eprintf "%s" s;
-   Format.eprintf " Aborting.@.";
-   exit 1
+  Format.printf "{%a, %a}"
+  (print_json_field "error" string) s
+  (print_json_field "results" (list int)) [];
+  exit 1
 
 let colon = ':'
 

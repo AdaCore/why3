@@ -1,4 +1,5 @@
 open Why3
+open Gnat_json
 
 type msg =
   { check      : Gnat_expl.check;
@@ -92,13 +93,6 @@ let get_info info  =
     | None -> 0
     | Some info -> info
 
-let string fmt s = Format.fprintf fmt "\"%s\"" s
-let int fmt d = Format.fprintf fmt "%d" d
-let bool fmt b = Format.fprintf fmt "%b" b
-
-let print_json_field key value_pr fmt value =
-  Format.fprintf fmt "%a : %a " string key value_pr value
-
 let print_trace_file fmt trace  =
   if trace = "" then ()
   else begin
@@ -132,11 +126,6 @@ let print_json_msg fmt m =
     print_trace_file m.tracefile
     print_vc_file_info m.vc_file
 
-let print_msg_list fmt l =
-  if l = [] then Format.printf "[]@."
-  else
-    Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma
-    print_json_msg fmt l
-
 let print_messages () =
-  Format.printf "%a@." print_msg_list !msg_set
+  Format.printf "{%a}@."
+  (print_json_field "results" (list print_json_msg)) !msg_set

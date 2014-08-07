@@ -1,5 +1,39 @@
 open Why3
 
+(* This unit serves to
+   - store the proof results which should be output at the end;
+   - output them in JSON fomat.
+
+   The output format is the following:
+
+     file = { "error" : string, results : list result }
+
+   The "error" field is optional. If present, some internal error happened and
+   the value of that field contains the reason for it. In this case, the
+   "results" field will be empty. If the "error" field is not present, the
+   "results" field contains the list of proof results.
+
+     result = { "id"         : int,
+                "reason"     : string,
+                "result"     : bool,
+                "extra_info" : int,
+                "trace_file" : string,
+                "vc_file"    : string,
+                "editor_cmd" : string
+                }
+
+   The field "id" contains the id of the VC. The field "reason" identifies the
+   kind of the VC, such as "overflow_check" etc. The field "result" tells if
+   the VC has been proved or not. The field "extra_info" specifies more
+   precisely the part of the VC, it may be "0" if no extra information is
+   availabe. The field "trace_file" is optional and contains the name of a file
+   which contains some explanation of the VC. The fields "vc_file" and
+   "editor_cmd" are both optional and should be present at the same time. If
+   present, "vc_file" contains the name of a VC file to be used for manual
+   proof, and "editor_cmd" the command to spawn for an external editor for this
+   VC.
+   *)
+
 val register :
      Gnat_expl.check
   -> Task.task option                  (* task of the last goal *)

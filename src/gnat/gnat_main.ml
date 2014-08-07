@@ -205,6 +205,5 @@ let _ =
          (* we should never get here *)
          ()
     with e ->
-       Format.eprintf "Internal error:@.";
-       Format.eprintf "%a.@." Exn_printer.exn_printer e;
-       Gnat_util.abort_with_message ""
+       let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
+       Gnat_util.abort_with_message s
