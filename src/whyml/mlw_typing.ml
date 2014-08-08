@@ -91,15 +91,13 @@ let uc_find_ls uc p =
 
 (** parsing types *)
 
-let create_user_tv = Typing.create_user_tv
-
 let ity_of_pty ?(noop=true) uc pty =
   let rec get_ty = function
     | PPTtyvar ({id_loc = loc}, true) when noop ->
         Loc.errorm ~loc "Opaqueness@ annotations@ are@ only@ \
           allowed@ in@ the@ types@ of@ formal@ arguments"
     | PPTtyvar ({id = x}, _) ->
-        ity_var (create_user_tv x)
+        ity_var (tv_of_string x)
     | PPTtyapp (q, tyl) ->
         let tyl = List.map get_ty tyl in
         begin match uc_find_ts uc q with
@@ -117,7 +115,7 @@ let ity_of_pty ?(noop=true) uc pty =
   get_ty pty
 
 let rec opaque_tvs acc = function
-  | PPTtyvar (id, true) -> Stv.add (create_user_tv id.id) acc
+  | PPTtyvar (id, true) -> Stv.add (tv_of_string id.id) acc
   | PPTtyvar (_, false) -> acc
   | PPTtyapp (_, pl)
   | PPTtuple pl -> List.fold_left opaque_tvs acc pl
@@ -656,7 +654,7 @@ let add_type_invariant loc uc id params inv =
     | _ -> Loc.errorm ~loc "type %s does not have an invariant" id.id in
   let add_tv acc { id = id; id_loc = loc } =
     let e = Loc.Located (loc, DuplicateTypeVar id) in
-    Sstr.add_new e id acc, Typing.create_user_tv id in
+    Sstr.add_new e id acc, tv_of_string id in
   let _, tvl = Lists.map_fold_left add_tv Sstr.empty params in
   let ty = ty_app its.its_ts (List.map ty_var tvl) in
   let res = create_vsymbol (id_fresh x) ty in
@@ -815,7 +813,7 @@ let add_types ~wp uc tdl =
       let d = Mstr.find x def in
       let add_tv acc id =
         let e = Loc.Located (id.Ptree.id_loc, DuplicateTypeVar id.id) in
-        let tv = Typing.create_user_tv id.id in
+        let tv = tv_of_string id.id in
         Mstr.add_new e id.id tv acc in
       let vars = List.fold_left add_tv Mstr.empty d.td_params in
       let vl = List.map (fun id -> Mstr.find id.id vars) d.td_params in

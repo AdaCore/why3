@@ -105,7 +105,7 @@ endif
 ##############
 
 LIBGENERATED = src/util/config.ml \
-	       src/util/rc.ml src/parser/lexer.ml \
+	       src/util/rc.ml src/util/lexlib.ml src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
@@ -114,16 +114,16 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
-	   hashcons stdlib exn_printer pp debug loc print_tree \
+	   hashcons stdlib exn_printer pp debug loc lexlib print_tree \
 	   cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl theory \
 	   task pretty dterm env trans printer
 
-LIB_PARSER = ptree glob parser typing lexer
-
 LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf autodetection
+
+LIB_PARSER = ptree glob parser typing lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		eliminate_definition eliminate_algebraic \
@@ -145,8 +145,8 @@ LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
-	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
+	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
 	      $(addprefix src/whyml/, $(LIB_WHYML))
@@ -155,7 +155,7 @@ LIB_SESSION = compress xml termcode session session_tools session_scheduler
 
 LIBSESSIONMODULES = $(addprefix src/session/, $(LIB_SESSION))
 
-LIBDIRS = util core parser driver transform printer whyml
+LIBDIRS = util core driver parser transform printer whyml
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 LIBSESSIONDIRS = session

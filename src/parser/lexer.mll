@@ -11,19 +11,12 @@
 
 {
   open Format
-  open Lexing
   open Parser
 
-  (* lexical errors *)
-
   exception IllegalCharacter of char
-  exception UnterminatedComment
-  exception UnterminatedString
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalCharacter c -> fprintf fmt "illegal character %c" c
-    | UnterminatedComment -> fprintf fmt "unterminated comment"
-    | UnterminatedString -> fprintf fmt "unterminated string"
     | _ -> raise e)
 
   let keywords = Hashtbl.create 97
@@ -99,52 +92,8 @@
         "while", WHILE;
         "writes", WRITES;
       ]
-
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
-  let string_start_loc = ref Loc.dummy_position
-  let string_buf = Buffer.create 1024
-
-  let comment_start_loc = ref Loc.dummy_position
-
-  let char_for_backslash = function
-    | 'n' -> '\n'
-    | 't' -> '\t'
-    | c -> c
-
-  let update_loc lexbuf file line chars =
-    let pos = lexbuf.lex_curr_p in
-    let new_file = match file with None -> pos.pos_fname | Some s -> s in
-    lexbuf.lex_curr_p <-
-      { pos with
-          pos_fname = new_file;
-          pos_lnum = int_of_string line;
-          pos_bol = pos.pos_cnum - int_of_string chars;
-      }
-
-  let remove_leading_plus s =
-    let n = String.length s in
-    if n > 0 && s.[0] = '+' then String.sub s 1 (n-1) else s
-
-  let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)
-
-  let remove_underscores s =
-    if String.contains s '_' then begin
-      let count =
-        let nb = ref 0 in
-        String.iter (fun c -> if c = '_' then incr nb) s;
-        !nb in
-      let t = String.create (String.length s - count) in
-      let i = ref 0 in
-      String.iter (fun c -> if c <> '_' then (t.[!i] <-c; incr i)) s;
-      t
-    end else s
 }
 
-let newline = '\n'
 let space = [' ' '\t' '\r']
 let lalpha = ['a'-'z' '_']
 let ualpha = ['A'-'Z']
@@ -167,14 +116,15 @@ let op_char_pref = ['!' '?']
 rule token = parse
   | "##" space* ("\"" ([^ '\010' '\013' '"' ]* as file) "\"")?
     space* (digit+ as line) space* (digit+ as char) space* "##"
-      { update_loc lexbuf file line char; token lexbuf }
+      { Lexlib.update_loc lexbuf file (int_of_string line) (int_of_string char);
+        token lexbuf }
   | "#" space* "\"" ([^ '\010' '\013' '"' ]* as file) "\""
     space* (digit+ as line) space* (digit+ as bchar) space*
     (digit+ as echar) space* "#"
       { POSITION (Loc.user_position file (int_of_string line)
                  (int_of_string bchar) (int_of_string echar)) }
-  | newline
-      { newline lexbuf; token lexbuf }
+  | '\n'
+      { Lexlib.newline lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | '_'
@@ -184,27 +134,29 @@ rule token = parse
   | uident as id
       { UIDENT id }
   | ['0'-'9'] ['0'-'9' '_']* as s
-      { INTEGER (Number.int_const_dec (remove_underscores s)) }
+      { INTEGER (Number.int_const_dec (Lexlib.remove_underscores s)) }
   | '0' ['x' 'X'] (['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']* as s)
-      { INTEGER (Number.int_const_hex (remove_underscores s)) }
+      { INTEGER (Number.int_const_hex (Lexlib.remove_underscores s)) }
   | '0' ['o' 'O'] (['0'-'7'] ['0'-'7' '_']* as s)
-      { INTEGER (Number.int_const_oct (remove_underscores s)) }
+      { INTEGER (Number.int_const_oct (Lexlib.remove_underscores s)) }
   | '0' ['b' 'B'] (['0'-'1'] ['0'-'1' '_']* as s)
-      { INTEGER (Number.int_const_bin (remove_underscores s)) }
+      { INTEGER (Number.int_const_bin (Lexlib.remove_underscores s)) }
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
-      { FLOAT (Number.real_const_dec i f (Opt.map remove_leading_plus e)) }
+      { FLOAT (Number.real_const_dec i f
+          (Opt.map Lexlib.remove_leading_plus e)) }
   | '0' ['x' 'X'] (hexadigit+ as i) ("" as f) ['p' 'P'] (['-' '+']? digit+ as e)
   | '0' ['x' 'X'] (hexadigit+ as i) '.' (hexadigit* as f)
         (['p' 'P'] (['-' '+']? digit+ as e))?
   | '0' ['x' 'X'] (hexadigit* as i) '.' (hexadigit+ as f)
         (['p' 'P'] (['-' '+']? digit+ as e))?
-      { FLOAT (Number.real_const_hex i f (Opt.map remove_leading_plus e)) }
+      { FLOAT (Number.real_const_hex i f
+          (Opt.map Lexlib.remove_leading_plus e)) }
   | "(*)"
       { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
-      { comment_start_loc := loc lexbuf; comment lexbuf; token lexbuf }
+      { Lexlib.comment lexbuf; token lexbuf }
   | "~'" (lident as id)
       { OPAQUE_QUOTE_LIDENT id }
   | "'" (lident as id)
@@ -264,43 +216,13 @@ rule token = parse
   | op_char_4+ as s
       { OP4 s }
   | "\""
-      { string_start_loc := loc lexbuf; STRING (string lexbuf) }
+      { STRING (Lexlib.string lexbuf) }
   | eof
       { EOF }
   | _ as c
       { raise (IllegalCharacter c) }
 
-and comment = parse
-  | "(*)"
-      { comment lexbuf }
-  | "*)"
-      { () }
-  | "(*"
-      { comment lexbuf; comment lexbuf }
-  | newline
-      { newline lexbuf; comment lexbuf }
-  | eof
-      { raise (Loc.Located (!comment_start_loc, UnterminatedComment)) }
-  | _
-      { comment lexbuf }
-
-and string = parse
-  | "\""
-      { let s = Buffer.contents string_buf in
-        Buffer.clear string_buf;
-        s }
-  | "\\" (_ as c)
-      { if c = '\n' then newline lexbuf;
-        Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
-  | newline
-      { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
-  | eof
-      { raise (Loc.Located (!string_start_loc, UnterminatedString)) }
-  | _ as c
-      { Buffer.add_char string_buf c; string lexbuf }
-
 {
-
   let parse_logic_file env path lb =
     open_file token (Lexing.from_string "") (Typing.open_file env path);
     Loc.with_location (logic_file token) lb;

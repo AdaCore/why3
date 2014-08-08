@@ -9,12 +9,16 @@
 (*                                                                  *)
 (********************************************************************)
 
-val library_of_env : Env.env -> unit Env.library
+(** common functions to be used in lexers/parsers *)
 
-val parse_logic_file :
-  Env.env -> Env.pathname -> Lexing.lexbuf -> Theory.theory Stdlib.Mstr.t
+val newline : Lexing.lexbuf -> unit
 
-val parse_program_file :
-  Ptree.incremental -> Lexing.lexbuf -> unit
+val comment : Lexing.lexbuf -> unit
 
-val token_counter : Lexing.lexbuf -> int * int
+val string : Lexing.lexbuf -> string
+
+val update_loc : Lexing.lexbuf -> string option -> int -> int -> unit
+
+val remove_leading_plus : string -> string
+
+val remove_underscores : string -> string

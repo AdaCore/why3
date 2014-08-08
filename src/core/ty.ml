@@ -33,6 +33,13 @@ let tv_compare tv1 tv2 = id_compare tv1.tv_name tv2.tv_name
 
 let create_tvsymbol n = { tv_name = id_register n }
 
+let tv_of_string =
+  let hs = Hstr.create 17 in fun s ->
+  try Hstr.find hs s with Not_found ->
+  let tv = create_tvsymbol (id_fresh s) in
+  Hstr.add hs s tv;
+  tv
+
 (* type symbols and types *)
 
 type tysymbol = {

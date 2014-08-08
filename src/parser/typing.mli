@@ -12,7 +12,6 @@
 (** Typing environments *)
 
 open Stdlib
-open Ty
 open Term
 open Theory
 
@@ -39,7 +38,6 @@ val close_file : unit -> theory Mstr.t
 (** The following is exported for program typing (src/whyml/mlw_typing.ml) *)
 (***************************************************************************)
 
-val create_user_tv : string -> tvsymbol
 val create_user_id : Ptree.ident -> Ident.preid
 
 val qloc : Ptree.qualid -> Loc.position

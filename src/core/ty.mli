@@ -27,6 +27,8 @@ val tv_hash : tvsymbol -> int
 
 val create_tvsymbol : preid -> tvsymbol
 
+val tv_of_string : string -> tvsymbol
+
 (* type symbols and types *)
 
 type tysymbol = private {

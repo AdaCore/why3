@@ -120,7 +120,7 @@ let load_driver lib file extra_files =
     | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->
-              Ty.ty_var (Typing.create_user_tv x)
+              Ty.ty_var (Ty.tv_of_string x)
           | PTyapp ((loc,_) as q,tyl) ->
               let ts = find_ts th q in
               let tyl = List.map ty_of_pty tyl in
