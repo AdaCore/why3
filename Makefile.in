@@ -111,7 +111,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
                src/session/compress.ml src/session/xml.ml \
-	       lib/ocaml/why3__BigInt_compat.ml 
+	       lib/ocaml/why3__BigInt_compat.ml
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
@@ -157,12 +157,12 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 
 LIB_SESSION = compress xml termcode session session_tools session_scheduler
 
-LIBSESSIONMODULES = $(addprefix src/session/, $(LIB_SESSION)) 
-	      
+LIBSESSIONMODULES = $(addprefix src/session/, $(LIB_SESSION))
+
 LIBDIRS = util core parser driver transform printer whyml
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
-LIBSESSIONDIRS = session 
+LIBSESSIONDIRS = session
 LIBSESSIONINCLUDES = $(addprefix -I src/, $(LIBSESSIONDIRS))
 
 LIBDEP = $(addsuffix .dep, $(LIBMODULES))
@@ -740,7 +740,7 @@ install_spark2014:
 	mkdir -p $(DATADIR)/why3/libs
 	cp -f theories/*.why $(DATADIR)/why3/theories
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
-	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
+	cp -f drivers/*.drv drivers/*.gen drivers/*.aux $(DATADIR)/why3/drivers
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -f bin/why3server$(EXE) $(BINDIR)/why3server$(EXE)
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
@@ -1796,14 +1796,14 @@ test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
 #test-shape: lib/why3/why3.cma
 #	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) $? examples/test_shape.ml
 
-test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma lib/why3/why3session.cma 
+test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma lib/why3/why3session.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma lib/why3/why3session.cma $< > /dev/null\
 	|| (rm -f why3session.xml why3shapes.dat why3shapes.gz;  \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f why3session.xml
 
-test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa lib/why3/why3session.cmxa 
+test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa lib/why3/why3session.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa lib/why3/why3session.cmxa  $< \
 	&& ./test-session.opt > /dev/null) \
