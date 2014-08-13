@@ -32,7 +32,8 @@ type reason =
 type subp_entity = Gnat_loc.loc
 
 type id = int
-type check = { id : id ; reason : reason; sloc : Gnat_loc.loc }
+type check = { id : id; reason : reason; sloc : Gnat_loc.loc; shape : string }
+
 let check_compare a b =
   let c = Pervasives.compare a.id b.id in
   if c <> 0 then c
@@ -43,8 +44,9 @@ let check_equal a b =
 
 let check_hash e = Hashcons.combine (Hashtbl.hash e.id) (Hashtbl.hash e.reason)
 
-let mk_check reason id sloc =
-  { reason = reason; id = id ; sloc = sloc }
+let mk_check ?shape:shape reason id sloc =
+  { reason = reason; id = id ; sloc = sloc ;
+    shape = match shape with None -> "" | Some s -> s }
 
 let get_loc c = c.sloc
 let get_reason c = c.reason
@@ -144,6 +146,7 @@ type gp_label =
   | Gp_VC_Id of int
   | Gp_Reason of reason
   | Gp_Pretty_Ada of int
+  | Gp_Shape of string
 
 let read_label s =
     if Strings.starts_with s "GP_" then
@@ -178,9 +181,13 @@ let read_label s =
              let s = Format.sprintf "GP_Subp: cannot parse string: %s" s in
               Gnat_util.abort_with_message ~internal:true s
            end
+       | ["GP_Shape"; shape ] ->
+          begin
+            Some (Gp_Shape shape)
+          end
        | _ ->
-           let msg = "found malformed GNATprove label, " in
-           let s =
+          let msg = "found malformed GNATprove label, " in
+          let s =
              Format.sprintf "%s, cannot parse string: %s" msg s in
            Gnat_util.abort_with_message ~internal:true s
     else None
@@ -189,7 +196,8 @@ type my_expl =
    { mutable check_id : int option;
      mutable check_reason : reason option;
      mutable extra_node : int option;
-     mutable check_sloc : Gnat_loc.loc option
+     mutable check_sloc : Gnat_loc.loc option;
+     mutable shape : string option
    }
 (* The type that is used to extract information from a VC, is filled up field
    by field *)
@@ -201,7 +209,9 @@ let read_vc_labels s =
    let b = { check_id      = None;
              check_reason  = None;
              check_sloc    = None;
-             extra_node    = None } in
+             extra_node    = None;
+             shape         = None;
+           } in
    Ident.Slab.iter
      (fun x ->
         let s = x.Ident.lab_string in
@@ -217,6 +227,8 @@ let read_vc_labels s =
         | Some Gp_Subp _ ->
              Gnat_util.abort_with_message ~internal:true
                  "read_vc_labels: GP_Subp unexpected here"
+        | Some Gp_Shape shape ->
+           b.shape <- Some shape
         | None ->
             ()
      ) s;
@@ -237,8 +249,9 @@ let extract_check s =
      match read_vc_labels s with
      | { check_id = Some id ;
          check_reason = Some reason;
-         check_sloc = Some sloc } ->
-           Some (mk_check reason id sloc)
+         check_sloc = Some sloc;
+         shape = shape } ->
+           Some (mk_check ?shape reason id sloc)
      | _ -> None
 
 let extract_sloc s = (read_vc_labels s).check_sloc

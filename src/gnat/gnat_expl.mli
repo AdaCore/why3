@@ -33,7 +33,7 @@ type reason =
    | VC_Weaker_Classwide_Pre
    | VC_Stronger_Classwide_Post
 
-type check = { id : id ; reason : reason; sloc : Gnat_loc.loc }
+type check = { id : id ; reason : reason; sloc : Gnat_loc.loc; shape : string }
 (* a check is equal to a check ID as provided by gnat2why, as well as a reason.
    We need the reason because in the case of a loop invariant, there is a
    single check id, but in fact two checks (initialization and preservation) *)
@@ -53,6 +53,9 @@ type gp_label =
   | Gp_Pretty_Ada of int
   (* label "GP_Pretty_Ada" used to give an Ada source node for some
      predicate *)
+  | Gp_Shape of string
+  (* label "GP_Shape" used to give a shape of the Ada code that originated
+     the check *)
 
 val read_label : string -> gp_label option
 (* parse a string into a gp_label; abort if the label starts with "GP_" but
@@ -75,7 +78,7 @@ val reason_to_ada : reason -> string
 val to_filename : Format.formatter -> check -> unit
 (* print a representation of a check that could serve as a filename *)
 
-val mk_check : reason -> id -> Gnat_loc.loc -> check
+val mk_check : ?shape:string -> reason -> id -> Gnat_loc.loc -> check
 (* [mk_expl reason id]
      reason - the kind of check for this VC
      id     - the id of the VC

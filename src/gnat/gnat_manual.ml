@@ -4,6 +4,8 @@ open Why3
 
 type goal = int Session.goal
 
+let filename_limit = 246
+
 let is_new_manual_proof goal =
   Gnat_config.prover.Whyconf.interactive
   && match PHprover.find_opt goal.goal_external_proofs
@@ -41,22 +43,56 @@ let prover_files_dir proj =
        Unix.mkdir punit_dir 0o750;
      Sysutil.relativize_filename (Sys.getcwd ()) punit_dir
 
-let compute_filename theory goal expl =
+
+let resize_shape sh limit =
+  let index = ref 0 in
+  let sh_len = String.length sh in
+  let separator_re = Str.regexp "__" in
+  (try
+    while (sh_len - !index) >= limit do
+      index := (Str.search_forward separator_re sh !index) + 2
+    done;
+    String.sub sh !index (sh_len - !index)
+  with
+  | _ -> "")
+
+
+let compute_filename contain_dir theory goal expl =
   let why_fn =
     Driver.file_of_task Gnat_config.prover_driver
                         theory.theory_name.Ident.id_string
                         theory.theory_parent.file_name
                         (goal_task goal) in
   let ext = get_file_extention why_fn in
-  Pp.sprintf "%a%s" Gnat_expl.to_filename expl ext
+  let thname = (Ident.sanitizer Ident.char_to_alnumus
+                                Ident.char_to_alnumus
+                                theory.theory_name.Ident.id_string) in
+  (* Remove __subprogram_def from theory name *)
+  let thname = String.sub thname 0 ((String.length thname) - 16) in
+
+  (* Prevent generated filename from exeding usual filesystems limit.
+     2 character are reserved to differentiate files having name
+     collision *)
+  let shape = resize_shape expl.Gnat_expl.shape
+                           (filename_limit - ((String.length thname)
+                                              + (String.length ext) + 2)) in
+  let noext = Filename.concat contain_dir
+                              (Pp.sprintf "%s__%s" thname shape)
+  in
+  let num = ref 0 in
+  let filename = ref (noext ^ ext) in
+  while Sys.file_exists !filename do
+    num := !num + 1;
+    filename := noext ^ string_of_int !num ^ ext;
+  done;
+  !filename
 
 let create_prover_file goal expl =
   let th = find_goal_theory goal in
   let proj_name = Filename.basename
                     (get_project_dir (Filename.basename
                                         th.theory_parent.file_name)) in
-  let filename = Filename.concat (prover_files_dir proj_name)
-                                 (compute_filename th goal expl) in
+  let filename = compute_filename (prover_files_dir proj_name) th goal expl in
   let cout = open_out filename in
   let fmt = Format.formatter_of_out_channel cout in
   Driver.print_task Gnat_config.prover_driver filename fmt (goal_task goal);
