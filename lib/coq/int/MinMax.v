@@ -73,16 +73,14 @@ exact Zmin_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Max_sym : forall (x:Z) (y:Z), (y <= x)%Z ->
+Lemma Max_sym : forall (x:Z) (y:Z),
   ((ZArith.BinInt.Z.max x y) = (ZArith.BinInt.Z.max y x)).
-intros x y _.
-apply Zmax_comm.
+exact Zmax_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Min_sym : forall (x:Z) (y:Z), (y <= x)%Z ->
+Lemma Min_sym : forall (x:Z) (y:Z),
   ((ZArith.BinInt.Z.min x y) = (ZArith.BinInt.Z.min y x)).
-intros x y _.
-apply Zmin_comm.
+exact Zmin_comm.
 Qed.
 

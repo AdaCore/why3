@@ -42,8 +42,8 @@ theory MinMax
   axiom Min_x : forall x y:t. ge y x -> min x y = x
   axiom Min_y : forall x y:t. ge x y -> min x y = y
 
-  lemma Max_sym: forall x y:t. ge x y -> max x y = max y x
-  lemma Min_sym: forall x y:t. ge x y -> min x y = min y x
+  lemma Max_sym: forall x y:t. max x y = max y x
+  lemma Min_sym: forall x y:t. min x y = min y x
 
 (***
   function min (x y : t) : t
