@@ -1,11 +1,13 @@
 (* Why driver for SMTLIB2 syntax *)
 
 prelude ";;; this is a prelude for CVC4"
-prelude "(set-logic AUFNIRA)"
-(** A  : Array
-    UF : Uninterpreted Function
-    DT : Datatypes (not needed at the end ...)
+prelude "(set-logic AUFBVNIRA)"
+(** A    : Array
+    UF   : Uninterpreted Function
+    BV   : Bitvectors
     NIRA : NonLinear Integer Reals Arithmetic
+
+    Note that this logic is a CVC4 extension and not part of SMTLIB2.
 *)
 
 printer "smtv2"
@@ -66,9 +68,6 @@ theory algebra.OrderedField
 end
 
 theory int.Int
-
-  prelude ";;; this is a prelude for CVC4 integer arithmetic"
-
   syntax function zero "0"
   syntax function one  "1"
 
@@ -100,13 +99,60 @@ theory int.Int
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
-
 end
 
+theory int.Abs
+  syntax function abs "(abs %1)"
+  remove prop Abs_le
+  remove prop Abs_pos
+end
+
+theory int.MinMax
+   syntax function min "(ite (< %1 %2) %1 %2)"
+   syntax function max "(ite (< %1 %2) %2 %1)"
+
+   remove prop Max_is_ge
+   remove prop Max_is_some
+   remove prop Min_is_le
+   remove prop Min_is_some
+   remove prop Max_x
+   remove prop Max_y
+   remove prop Min_x
+   remove prop Min_y
+   remove prop Max_sym
+   remove prop Min_sym
+end
+
+theory int.EuclideanDivision
+   syntax function div "(div %1 %2)"
+   syntax function mod "(mod %1 %2)"
+
+   remove prop Div_mod
+   remove prop Div_bound
+   remove prop Mod_bound
+   remove prop Mod_1
+   remove prop Div_1
+   remove prop Div_inf
+   remove prop Div_inf_neg
+   remove prop Mod_0
+   remove prop Div_1_left
+   remove prop Div_minus1_left
+   remove prop Mod_1_left
+   remove prop Mod_minus1_left
+   remove prop Div_mult
+   remove prop Mod_mult
+end
+
+theory int.Div2
+   remove prop div2
+end
+
+theory int.ComputerDivision
+   (* really, you should use bitvectors here, but... *)
+end
 
 theory real.Real
-
-  prelude ";;; this is a prelude for CVC4 real arithmetic"
+  meta "encoding : kept" type real
 
   syntax function zero "0.0"
   syntax function one  "1.0"
@@ -123,28 +169,62 @@ theory real.Real
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
   remove prop CommutativeGroup.Assoc
   remove prop CommutativeGroup.Unit_def_l
   remove prop CommutativeGroup.Unit_def_r
   remove prop CommutativeGroup.Inv_def_l
   remove prop CommutativeGroup.Inv_def_r
+  remove prop CommutativeGroup.Comm.Comm
   remove prop Assoc.Assoc
   remove prop Mul_distr_l
   remove prop Mul_distr_r
   remove prop Comm.Comm
   remove prop Unitary
+  remove prop NonTrivialRing
   remove prop Inverse
   remove prop Refl
   remove prop Trans
   remove prop Antisymm
   remove prop Total
-  remove prop NonTrivialRing
-  remove prop CompatOrderAdd
   remove prop ZeroLessOne
+end
 
-  meta "encoding : kept" type real
+theory real.Truncate
+  syntax function truncate "(ite (>= %1 0.0)
+                                 (to_int %1)
+                                 (- (to_int (- %1))))"
+  syntax function floor "(to_int %1)"
+  syntax function ceil "(- 1 (to_int (- 1.0 %1))))"
 
+  remove prop Truncate_int
+  remove prop Truncate_down_pos
+  remove prop Truncate_up_neg
+  remove prop Real_of_truncate
+  remove prop Truncate_monotonic
+  remove prop Truncate_monotonic_int1
+  remove prop Truncate_monotonic_int2
+  remove prop Floor_int
+  remove prop Ceil_int
+  remove prop Floor_down
+  remove prop Ceil_up
+  remove prop Floor_monotonic
+  remove prop Ceil_monotonic
+end
+
+theory real.MinMax
+   syntax function min "(ite (< %1 %2) %1 %2)"
+   syntax function max "(ite (< %1 %2) %2 %1)"
+
+   remove prop Max_is_ge
+   remove prop Max_is_some
+   remove prop Min_is_le
+   remove prop Min_is_some
+   remove prop Max_x
+   remove prop Max_y
+   remove prop Min_x
+   remove prop Min_y
+   remove prop Max_sym
+   remove prop Min_sym
 end
 
 theory real.FromInt
@@ -160,7 +240,7 @@ theory real.FromInt
 end
 
 theory real.Abs
-  syntax function abs "(ite (<= 0.0 %1) (- %1) %1)"
+  syntax function abs "(ite (>= 0.0 %1) %1 (- %1))"
 
   remove prop Abs_le
   remove prop Abs_pos
@@ -191,49 +271,6 @@ theory bool.Ite
   meta "encoding : lskept" function ite
 end
 
-theory int.EuclideanDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-
-   remove prop Div_mod
-   remove prop Div_bound
-   remove prop Mod_bound
-   remove prop Mod_1
-   remove prop Div_1
-   remove prop Div_inf
-   remove prop Div_inf_neg
-   remove prop Mod_0
-   remove prop Div_1_left
-   remove prop Div_minus1_left
-   remove prop Mod_1_left
-   remove prop Mod_minus1_left
-   remove prop Div_mult
-   remove prop Mod_mult
-end
-
-theory int.Div2
-   remove prop div2
-end
-
-(*
-theory int.ComputerDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
-   remove prop Mod_bound
-   remove prop Div_mod
-   remove prop Mod_1
-   remove prop Div_1
-end
-*)
-
-(*
-theory real.Truncate
-  syntax function floor "(to_int %1)"
-  remove prop Floor_down
-  remove prop Floor_monotonic
-end
-*)
-
 theory map.Map
   syntax type map "(Array %1 %2)"
   meta "encoding : lskept" function get
@@ -244,10 +281,3 @@ theory map.Map
   syntax function set   "(store %1 %2 %3)"
 (*  syntax function const "(const[%t0] %1)" *)
 end
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)

@@ -81,14 +81,7 @@ end
 theory MinMax
 
   use import Real
-
-  function min real real : real
-  function max real real : real
-
-  axiom Max_is_ge   : forall x y:real. max x y >= x /\ max x y >= y
-  axiom Max_is_some : forall x y:real. max x y = x \/ max x y = y
-  axiom Min_is_le   : forall x y:real. min x y <= x /\ min x y <= y
-  axiom Min_is_some : forall x y:real. min x y = x \/ min x y = y
+  clone export comparison.MinMax with type t = real, predicate ge = (>=)
 
 end
 
@@ -389,4 +382,3 @@ theory Polar
     forall x y:real. y = hypot x y * sin (atan2 y x)
 
 end
-
