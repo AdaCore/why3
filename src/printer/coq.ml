@@ -245,7 +245,9 @@ and print_lrfmla opl opr info fmt f = match f.t_label with
       (print_list space print_label) ll (print_fnode false false info) f
 *)
 
-and print_tnode _opl opr info fmt t = match t.t_node with
+and print_tnode _opl opr info fmt t =
+  print_comments fmt "(*" ~end_tok:"*)" t;
+  match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
@@ -301,7 +303,9 @@ and print_tnode _opl opr info fmt t = match t.t_node with
     end
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
-and print_fnode opl opr info fmt f = match f.t_node with
+and print_fnode opl opr info fmt f =
+  print_comments fmt "(*" ~end_tok:"*)" f;
+  match f.t_node with
   | Tquant (Tforall,fq) ->
       let vl,_tl,f = t_open_quant fq in
       fprintf fmt (protect_on opr "@[<hov 1>forall @[<hov>%a@],@ @[<hov>%a@]@]")

@@ -20,6 +20,44 @@ open Decl
 open Theory
 open Task
 
+(** Comments *)
+let comment_regex = Str.regexp "comment:\\(.*\\)"
+let line_delim = Str.regexp "[\n\r]+"
+
+let check_comment lab acc =
+  if Str.string_match comment_regex lab.lab_string 0 then
+    let comment = String.sub lab.lab_string 8
+                             ((String.length lab.lab_string) - 8) in
+    comment :: acc
+  else
+    acc
+
+let split_lines = Str.split line_delim
+
+let print_comment fmt start_tok ?end_tok:(end_tok="") comment =
+  let com_lines = split_lines comment in
+  let block_width =
+    if end_tok <> "" then
+      List.fold_left (fun max s ->
+                      let len = String.length s in
+                      if max < len then len else max) 0 com_lines
+    else 0 in
+  fprintf fmt "@[";
+  let print_comment_line =
+    (fun s ->
+     fprintf fmt "%s %s" start_tok s;
+     let spaces = if block_width <> 0 then
+                    String.make (block_width - String.length s + 1) ' '
+                  else "" in
+     fprintf fmt "%s%s@\n" spaces end_tok) in
+  List.iter print_comment_line com_lines;
+  fprintf fmt "@]"
+
+let print_comments fmt start_tok ?end_tok:(end_tok="") term =
+  let comments = Slab.fold check_comment term.t_label [] in
+  List.iter (print_comment fmt start_tok ~end_tok) comments
+
+
 (** Register printers *)
 
 type prelude = string list
@@ -360,4 +398,3 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | NotImplemented (s) ->
       fprintf fmt "@[<hov 3> Unimplemented feature:@\n%s@]" s
   | e -> raise e)
-

@@ -16,6 +16,14 @@ open Decl
 open Theory
 open Task
 
+(** Comment *)
+
+val print_comments : Format.formatter -> string -> ?end_tok:string -> term -> unit
+(** Prints the comments of a term (if present) line by line and aligned.
+    [print_comment fmt "/*" ~end_tok:"*/" t] prints the labels starting
+    with "comment:" of term t to formatter fmt,
+    each line of the comment being surrounded by "/*" "*/". *)
+
 (** Register printers *)
 
 type prelude = string list
@@ -124,4 +132,3 @@ val catch_unsupportedTerm : (term -> 'a) -> (term -> 'a)
 val catch_unsupportedDecl : (decl -> 'a) -> (decl -> 'a)
 (** same as {! catch_unsupportedType} but use [UnsupportedDecl]
     instead of [UnsupportedType] *)
-
