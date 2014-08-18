@@ -1,0 +1,18 @@
+
+theory T
+
+  goal g1: true
+
+  goal g2: true /\ false
+
+  goal g3: true /\ true
+
+  goal g10: if true then 1=2 else 3=4
+
+  goal g11: let x=1 in x=2
+
+  use import int.Int
+
+  goal h1: 2+2=4
+
+end
