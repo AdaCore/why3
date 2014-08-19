@@ -63,6 +63,16 @@ let eval_int_op op ls l ty =
     end
   | _ -> t_app ls l ty
 
+let eval_int_uop op ls l ty =
+  match l with
+  | [{t_node = Tconst c1}] ->
+    begin
+      try const_of_big_int (op (big_int_of_const c1))
+      with NotNum | Division_by_zero ->
+        t_app ls l ty
+    end
+  | _ -> t_app ls l ty
+
 
 let built_in_theories =
   [ ["bool"],"Bool", [],
@@ -73,8 +83,8 @@ let built_in_theories =
     [ "infix +", None, eval_int_op BigInt.add;
       "infix -", None, eval_int_op BigInt.sub;
       "infix *", None, eval_int_op BigInt.mul;
-(*
       "prefix -", Some ls_minus, eval_int_uop BigInt.minus;
+(*
       "infix <", None, eval_int_rel BigInt.lt;
       "infix <=", None, eval_int_rel BigInt.le;
       "infix >", None, eval_int_rel BigInt.gt;
@@ -131,7 +141,8 @@ let get_builtins env =
 (* {2 the reduction machine} *)
 
 
-type rule = vsymbol list * term list * term
+type rule = Svs.t * term list * term
+
 type engine =
   { known_map : Decl.decl Ident.Mid.t;
     rules : rule list Mls.t;
@@ -251,7 +262,25 @@ let first_order_matching (vars : Svs.t) (largs : term list)
   in
   loop Mvs.empty largs args
 
+exception Irreducible
 
+let one_step_reduce engine ls args =
+  try
+    let rules = Mls.find ls engine.rules in
+    let rec loop rules =
+      match rules with
+        | [] -> raise Irreducible
+        | (vars,largs,rhs)::rem ->
+          begin
+            try
+              let sigma = first_order_matching vars largs args in
+              sigma,rhs
+            with NoMatch ->
+              loop rem
+          end
+    in loop rules
+  with Not_found ->
+    raise Irreducible
 
 let rec matching sigma t p =
   match p.pat_node with
@@ -433,8 +462,16 @@ and reduce_app engine st ls ty rem_cont =
           cont_stack = Keval(t,sigma) :: rem_cont;
         }
       | Decl.Dparam _ | Decl.Dind _ ->
-        (* TODO: try a rewrite rule *)
-        raise Not_found
+        (* try a rewrite rule *)
+        begin
+          try
+            let sigma,rhs = one_step_reduce engine ls args in
+            { value_stack = rem_st;
+              cont_stack = Keval(rhs,sigma) :: rem_cont;
+            }
+          with Irreducible ->
+            raise Not_found
+        end
       | Decl.Ddata dl ->
         (* constructor or projection *)
         match args with
@@ -511,7 +548,7 @@ let extract_rule t =
     match t.t_node with
       | Tquant(Tforall,q) ->
         let vs,_,t = t_open_quant q in
-        aux (acc @ vs) t
+        aux (List.fold_left (fun acc v -> Svs.add v acc) acc vs) t
       | Tbinop(Tiff,t1,t2) ->
         begin
           match t1.t_node with
@@ -531,7 +568,7 @@ let extract_rule t =
 
 
   in
-  aux [] t
+  aux Svs.empty t
 
 
 let add_rule t e =
