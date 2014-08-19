@@ -63,6 +63,16 @@ let eval_int_op op ls l ty =
     end
   | _ -> t_app ls l ty
 
+let eval_int_rel op ls l ty =
+  match l with
+  | [{t_node = Tconst c1};{t_node = Tconst c2}] ->
+    begin
+      try to_bool (op (big_int_of_const c1) (big_int_of_const c2))
+      with NotNum | Division_by_zero ->
+        t_app ls l ty
+    end
+  | _ -> t_app ls l ty
+
 let eval_int_uop op ls l ty =
   match l with
   | [{t_node = Tconst c1}] ->
@@ -84,14 +94,11 @@ let built_in_theories =
       "infix -", None, eval_int_op BigInt.sub;
       "infix *", None, eval_int_op BigInt.mul;
       "prefix -", Some ls_minus, eval_int_uop BigInt.minus;
-(*
       "infix <", None, eval_int_rel BigInt.lt;
       "infix <=", None, eval_int_rel BigInt.le;
       "infix >", None, eval_int_rel BigInt.gt;
       "infix >=", None, eval_int_rel BigInt.ge;
-*)
     ] ;
-(*
     ["int"],"MinMax", [],
     [ "min", None, eval_int_op BigInt.min;
       "max", None, eval_int_op BigInt.max;
@@ -104,6 +111,7 @@ let built_in_theories =
     [ "div", None, eval_int_op BigInt.euclidean_div;
       "mod", None, eval_int_op BigInt.euclidean_mod;
     ] ;
+(*
     ["map"],"Map", ["map", builtin_map_type],
     [ "const", Some ls_map_const, eval_map_const;
       "get", Some ls_map_get, eval_map_get;
