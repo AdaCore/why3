@@ -123,6 +123,8 @@ LIB_CORE = ident ty term pattern decl theory \
 LIB_DRIVER = call_provers driver_ast driver_parser driver_lexer driver \
 	     whyconf autodetection
 
+LIB_MLW	= ity
+
 LIB_PARSER = ptree glob parser typing lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
@@ -147,6 +149,7 @@ LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
+	      $(addprefix src/mlw/, $(LIB_MLW)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
@@ -156,7 +159,7 @@ LIB_SESSION = compress xml termcode session session_tools session_scheduler
 
 LIBSESSIONMODULES = $(addprefix src/session/, $(LIB_SESSION))
 
-LIBDIRS = util core driver parser transform printer whyml
+LIBDIRS = util core driver mlw parser transform printer whyml
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 LIBSESSIONDIRS = session
