@@ -344,24 +344,22 @@ let collect_rule_decl prs e d =
         Reduction_engine.add_rule t e
       else e
 
-let collect_rules prs t =
+let collect_rules env km prs t =
   Task.task_fold
     (fun e td -> match td.Theory.td_node with
       | Theory.Decl d -> collect_rule_decl prs e d
       | _ -> e)
-    (Reduction_engine.create ()) t
+    (Reduction_engine.create env km) t
 
-let normalize_goal (prs : Decl.Spr.t) task =
-  let engine = collect_rules prs task in
+let normalize_goal env (prs : Decl.Spr.t) task =
   match task with
   | Some
       { task_decl =
           { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
         task_prev = prev;
+        task_known = km;
       } ->
-(*
-    get_builtins env;
-*)
+    let engine = collect_rules env km prs task in
     let f = Reduction_engine.normalize engine f in
     begin match f.t_node with
     | Ttrue -> []
@@ -375,8 +373,8 @@ let normalize_goal (prs : Decl.Spr.t) task =
 let meta = Theory.register_meta "rewrite" [Theory.MTprsymbol]
   ~desc:"Declares@ the@ given@ prop@ as@ a@ rewrite@ rule."
 
-let normalize_transf =
-  Trans.on_tagged_pr meta (fun prs -> Trans.store (normalize_goal prs))
+let normalize_transf env =
+  Trans.on_tagged_pr meta (fun prs -> Trans.store (normalize_goal env prs))
 
-let () = Trans.register_transform_l "compute_in_goal" normalize_transf
+let () = Trans.register_env_transform_l "compute_in_goal" normalize_transf
   ~desc:"Normalize@ terms@ with@ respect@ to@ rewrite@ rules@ declared as metas"

@@ -1,8 +1,141 @@
 
 open Term
 
+
+
+
+
+
+(* {2 builtin symbols} *)
+
+let builtins = Hls.create 17
+
+let ls_minus = ref ps_equ (* temporary *)
+
+(* all builtin functions *)
+
+exception Undetermined
+
+let const_equality c1 c2 =
+  match c1,c2 with
+  | Number.ConstInt i1, Number.ConstInt i2 ->
+    BigInt.eq (Number.compute_int i1) (Number.compute_int i2)
+  | _ -> raise Undetermined
+
+let value_equality t1 t2 =
+  match (t1.t_node,t2.t_node) with
+  | Tconst c1, Tconst c2 -> const_equality c1 c2
+  | _ -> raise Undetermined
+
+let to_bool b = if b then t_true else t_false
+
+let eval_equ _ls l _ty =
+  match l with
+  | [t1;t2] ->
+    begin
+      try to_bool (value_equality t1 t2)
+      with Undetermined -> t_equ t1 t2
+    end
+  | _ -> assert false
+
+
+let eval_true _ls _l _ty = t_true
+
+let eval_false _ls _l _ty = t_false
+
+exception NotNum
+
+let big_int_of_const c =
+  match c with
+    | Number.ConstInt i -> Number.compute_int i
+    | _ -> raise NotNum
+
+let const_of_big_int n =
+  t_const (Number.ConstInt (Number.int_const_dec (BigInt.to_string n)))
+
+let eval_int_op op ls l ty =
+  match l with
+  | [{t_node = Tconst c1};{t_node = Tconst c2}] ->
+    begin
+      try const_of_big_int (op (big_int_of_const c1) (big_int_of_const c2))
+      with NotNum | Division_by_zero ->
+        t_app ls l ty
+    end
+  | _ -> t_app ls l ty
+
+
+let built_in_theories =
+  [ ["bool"],"Bool", [],
+    [ "True", None, eval_true ;
+      "False", None, eval_false ;
+    ] ;
+    ["int"],"Int", [],
+    [ "infix +", None, eval_int_op BigInt.add;
+      "infix -", None, eval_int_op BigInt.sub;
+      "infix *", None, eval_int_op BigInt.mul;
+(*
+      "prefix -", Some ls_minus, eval_int_uop BigInt.minus;
+      "infix <", None, eval_int_rel BigInt.lt;
+      "infix <=", None, eval_int_rel BigInt.le;
+      "infix >", None, eval_int_rel BigInt.gt;
+      "infix >=", None, eval_int_rel BigInt.ge;
+*)
+    ] ;
+(*
+    ["int"],"MinMax", [],
+    [ "min", None, eval_int_op BigInt.min;
+      "max", None, eval_int_op BigInt.max;
+    ] ;
+    ["int"],"ComputerDivision", [],
+    [ "div", None, eval_int_op BigInt.computer_div;
+      "mod", None, eval_int_op BigInt.computer_mod;
+    ] ;
+    ["int"],"EuclideanDivision", [],
+    [ "div", None, eval_int_op BigInt.euclidean_div;
+      "mod", None, eval_int_op BigInt.euclidean_mod;
+    ] ;
+    ["map"],"Map", ["map", builtin_map_type],
+    [ "const", Some ls_map_const, eval_map_const;
+      "get", Some ls_map_get, eval_map_get;
+      "set", Some ls_map_set, eval_map_set;
+    ] ;
+*)
+  ]
+
+let add_builtin_th env (l,n,t,d) =
+  try
+    let th = Env.find_theory env l n in
+    List.iter
+      (fun (id,r) ->
+        let ts = Theory.ns_find_ts th.Theory.th_export [id] in
+        r ts)
+      t;
+    List.iter
+      (fun (id,r,f) ->
+        let ls = Theory.ns_find_ls th.Theory.th_export [id] in
+        Hls.add builtins ls f;
+        match r with
+          | None -> ()
+          | Some r -> r := ls)
+      d
+  with Not_found ->
+    Format.eprintf "[Compute] theory %s not found@." n
+
+let get_builtins env =
+  Hls.clear builtins;
+  Hls.add builtins ps_equ eval_equ;
+  List.iter (add_builtin_th env) built_in_theories
+
+
+
+(* {2 the reduction machine} *)
+
+
 type rule = vsymbol list * term list * term
-type engine = rule list Mls.t
+type engine =
+  { known_map : Decl.decl Ident.Mid.t;
+    rules : rule list Mls.t;
+  }
 
 
 (*
@@ -120,8 +253,6 @@ let first_order_matching (vars : Svs.t) (largs : term list)
 
 
 
-exception Undetermined
-
 let rec matching sigma t p =
   match p.pat_node with
   | Pwild -> sigma
@@ -187,7 +318,7 @@ let rec reduce engine c =
       cont_stack = rem;
     }
   | st, Kapp(ls,ty) :: rem ->
-    reduce_app st ls ty rem
+    reduce_app engine st ls ty rem
   | [], Keps _ :: _ -> assert false
   | Term t :: st, Keps v :: rem ->
     { value_stack = Term (t_eps_close v t) :: st;
@@ -268,7 +399,7 @@ and reduce_eval st t sigma rem =
       cont_stack = rem;
     }
 
-and reduce_app st ls ty rem =
+and reduce_app engine st ls ty rem_cont =
   let rec extract_first n acc l =
     if n = 0 then acc,l else
       match l with
@@ -278,35 +409,41 @@ and reduce_app st ls ty rem =
   in
   let arity = List.length ls.ls_args in
   let args,rem_st = extract_first arity [] st in
-(*
   try
     let f = Hls.find builtins ls in
-    f ls tl ty
+    let t = f ls args ty in
+    { value_stack = Term t :: rem_st;
+      cont_stack = rem_cont;
+    }
   with Not_found ->
-*)
-(*
     try
-      let d = Ident.Mid.find ls.ls_name env.tknown in
+      let d = Ident.Mid.find ls.ls_name engine.known_map in
       match d.Decl.d_node with
       | Decl.Dtype _ | Decl.Dprop _ -> assert false
       | Decl.Dlogic dl ->
         (* regular definition *)
         let d = List.assq ls dl in
         let l,t = Decl.open_ls_defn d in
-        let env' = multibind_vs l tl env in
-        compute_in_term env' t
+        let sigma =
+          try
+            List.fold_right2 Mvs.add l args Mvs.empty
+          with Invalid_argument _ -> assert false
+        in
+        { value_stack = rem_st;
+          cont_stack = Keval(t,sigma) :: rem_cont;
+        }
       | Decl.Dparam _ | Decl.Dind _ ->
-        t_app ls tl ty
+        (* TODO: try a rewrite rule *)
+        raise Not_found
       | Decl.Ddata dl ->
         (* constructor or projection *)
-        match tl with
+        match args with
         | [ { t_node = Tapp(ls1,tl1) } ] ->
           (* if ls is a projection and ls1 is a constructor,
-
              we should compute that projection *)
           let rec iter dl =
             match dl with
-            | [] -> t_app ls tl ty
+            | [] -> raise Not_found
             | (_,csl) :: rem ->
               let rec iter2 csl =
                 match csl with
@@ -319,25 +456,23 @@ and reduce_app st ls ty rem =
                       match prs,tl1 with
                       | (Some pr)::prs, t::tl1 ->
                         if ls_equal ls pr
-                        then (* projection found! *) t
+                        then (* projection found! *)
+                          { value_stack = Term t :: rem_st;
+                            cont_stack = rem_cont;
+                          }
                         else
                           iter3 prs tl1
                       | None::prs, _::tl1 ->
                         iter3 prs tl1
-                      | _ -> t_app ls tl ty
+                      | _ -> raise Not_found
                     in iter3 prs tl1
                   else iter2 rem2
               in iter2 csl
           in iter dl
-        | _ -> t_app ls tl ty
+        | _ -> raise Not_found
     with Not_found ->
-*)
-(*
-      Format.eprintf "[Compute] definition of logic symbol %s not found@."
-        ls.ls_name.Ident.id_string;
-*)
       { value_stack = Term (t_app ls args ty) :: rem_st;
-        cont_stack = rem;
+        cont_stack = rem_cont;
       }
 
 
@@ -352,12 +487,58 @@ let rec many_steps engine c n =
       let c = reduce engine c in
       many_steps engine c (n-1)
 
-let normalize engine t = 
+let normalize engine t =
   let c = { value_stack = []; cont_stack = [Keval(t,Mvs.empty)] } in
   many_steps engine c 1000
 
-let create () = Mls.empty
+
+
+
+
+
+(* the rewrite engine *)
+
+let create env km =
+  get_builtins env;
+  { known_map = km ;
+    rules = Mls.empty;
+  }
 
 exception NotARewriteRule of string
 
-let add_rule _t _e = assert false
+let extract_rule t =
+  let rec aux acc t =
+    match t.t_node with
+      | Tquant(Tforall,q) ->
+        let vs,_,t = t_open_quant q in
+        aux (acc @ vs) t
+      | Tbinop(Tiff,t1,t2) ->
+        begin
+          match t1.t_node with
+            | Tapp(ls,args) -> acc,ls,args,t2
+            | _ -> raise
+              (NotARewriteRule "lhs of <-> should be a predicate symbol")
+        end
+      | Tapp(ls,[t1;t2]) when ls == ps_equ ->
+        begin
+          match t1.t_node with
+            | Tapp(ls,args) -> acc,ls,args,t2
+            | _ -> raise
+              (NotARewriteRule "lhs of = should be a function symbol")
+        end
+      | _ -> raise
+        (NotARewriteRule "rule should be of the form forall ... t1 = t2 or f1 <-> f2")
+
+
+  in
+  aux [] t
+
+
+let add_rule t e =
+  let vars,ls,args,r = extract_rule t in
+  let rules =
+    try Mls.find ls e.rules
+    with Not_found -> []
+  in
+  {e with rules = 
+      Mls.add ls ((vars,args,r)::rules) e.rules}

@@ -69,11 +69,14 @@ terms are normalized with respect to
 
 type engine
 
-val normalize : engine -> Term.term -> Term.term
-
-val create : unit -> engine
+val create : Env.env -> Decl.decl Ident.Mid.t -> engine
 
 exception NotARewriteRule of string
 
 val add_rule : Term.term -> engine -> engine
+
+
+
+val normalize : engine -> Term.term -> Term.term
+
 
