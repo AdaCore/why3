@@ -461,6 +461,8 @@ and reduce_app engine st ls ty rem_cont =
         (* regular definition *)
         let d = List.assq ls dl in
         let l,t = Decl.open_ls_defn d in
+        let type_subst = Ty.oty_match Ty.Mtv.empty ty t.t_ty in
+        let t = t_ty_subst type_subst Mvs.empty t in
         let sigma =
           try
             List.fold_right2 Mvs.add l args Mvs.empty
@@ -474,6 +476,17 @@ and reduce_app engine st ls ty rem_cont =
         begin
           try
             let sigma,rhs = one_step_reduce engine ls args in
+            let type_subst = Ty.oty_match Ty.Mtv.empty ty rhs.t_ty in
+            Format.eprintf "subst of rhs: ";
+            Ty.Mtv.iter
+              (fun tv ty -> Format.eprintf "%a -> %a,"
+                Pretty.print_tv tv Pretty.print_ty ty)
+              type_subst;
+            Format.eprintf "@.";
+            let rhs = t_ty_subst type_subst Mvs.empty rhs in
+            let sigma =
+              Mvs.map (t_ty_subst type_subst Mvs.empty) sigma
+            in
             { value_stack = rem_st;
               cont_stack = Keval(rhs,sigma) :: rem_cont;
             }
@@ -521,8 +534,6 @@ and reduce_app engine st ls ty rem_cont =
       }
 
 
-
-(* TODO *)
 
 let rec many_steps engine c n =
   match c.value_stack, c.cont_stack with
@@ -585,5 +596,5 @@ let add_rule t e =
     try Mls.find ls e.rules
     with Not_found -> []
   in
-  {e with rules = 
+  {e with rules =
       Mls.add ls ((vars,args,r)::rules) e.rules}

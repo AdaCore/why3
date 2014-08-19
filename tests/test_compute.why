@@ -42,7 +42,7 @@ theory TestList
 
   constant l1 : list int = Cons 12 (Cons 34 (Cons 56 Nil))
 
-  goal g1: match l1 with Nil -> 0 | Cons x y -> x end = 12
+  goal g1: match l1 with Nil -> 0 | Cons x _ -> x end = 12
 
   use import list.Length
 
@@ -55,8 +55,6 @@ theory TestList
 
   goal g3: hd l1 = 12
 
-(* typing bug
-
   use import list.Append
 
   constant l2 : list int =
@@ -66,7 +64,6 @@ theory TestList
 
   goal h2: length l2 = 5
 
-*)
 
 end
 
