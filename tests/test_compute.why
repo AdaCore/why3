@@ -15,4 +15,11 @@ theory T
 
   goal h1: 2+2=4
 
+  type t = { f : int }
+
+  goal i1: let x = { f = 4 } in x.f < 5
+
+  goal i2: let  x = { f = 4 } in
+    match x with { f = y } -> y + 1 > 3 end
+
 end

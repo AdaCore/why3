@@ -64,7 +64,7 @@ let ls_minus = ref ps_equ (* temporary *)
 
 let const_equality c1 c2 =
   match c1,c2 with
-  | Number.ConstInt i1, Number.ConstInt i2 -> 
+  | Number.ConstInt i1, Number.ConstInt i2 ->
     BigInt.eq (Number.compute_int i1) (Number.compute_int i2)
   | _ -> raise Undetermined
 
@@ -168,6 +168,7 @@ let add_builtin_th env (l,n,t,d) =
     Format.eprintf "[Compute] theory %s not found@." n
 
 let get_builtins env =
+  Hls.clear builtins;
   Hls.add builtins ps_equ eval_equ;
   List.iter (add_builtin_th env) built_in_theories
 
@@ -255,6 +256,7 @@ and compute_app env ls tl ty =
         match tl with
         | [ { t_node = Tapp(ls1,tl1) } ] ->
           (* if ls is a projection and ls1 is a constructor,
+
              we should compute that projection *)
           let rec iter dl =
             match dl with
@@ -322,6 +324,59 @@ let compute env task =
   | _ -> assert false
 
 let () =
-  Trans.register_env_transform_l "compute" 
+  Trans.register_env_transform_l "compute"
     (fun env -> Trans.store (compute env))
     ~desc:"Compute@ as@ much@ as@ possible"
+
+
+
+
+(* compute with rewrite rules *)
+
+
+
+let collect_rule_decl prs e d =
+  match d.Decl.d_node with
+    | Decl.Dtype _ | Decl.Ddata _ | Decl.Dparam _ | Decl.Dind  _
+    | Decl.Dlogic _ -> e
+    | Decl.Dprop(_, pr, t) ->
+      if Decl.Spr.mem pr prs then
+        Reduction_engine.add_rule t e
+      else e
+
+let collect_rules prs t =
+  Task.task_fold
+    (fun e td -> match td.Theory.td_node with
+      | Theory.Decl d -> collect_rule_decl prs e d
+      | _ -> e)
+    (Reduction_engine.create ()) t
+
+let normalize_goal (prs : Decl.Spr.t) task =
+  let engine = collect_rules prs task in
+  match task with
+  | Some
+      { task_decl =
+          { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
+        task_prev = prev;
+      } ->
+(*
+    get_builtins env;
+*)
+    let f = Reduction_engine.normalize engine f in
+    begin match f.t_node with
+    | Ttrue -> []
+    | _ ->
+      let d = Decl.create_prop_decl Pgoal pr f in
+      [Task.add_decl prev d]
+    end
+  | _ -> assert false
+
+
+let meta = Theory.register_meta "rewrite" [Theory.MTprsymbol]
+  ~desc:"Declares@ the@ given@ prop@ as@ a@ rewrite@ rule."
+
+let normalize_transf =
+  Trans.on_tagged_pr meta (fun prs -> Trans.store (normalize_goal prs))
+
+let () = Trans.register_transform_l "compute_in_goal" normalize_transf
+  ~desc:"Normalize@ terms@ with@ respect@ to@ rewrite@ rules@ declared as metas"
