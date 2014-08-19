@@ -4,6 +4,8 @@ open Decl
 open Task
 open Theory
 
+(* obsolete
+
 type env = {
   tknown : Decl.known_map;
   vsenv : term Mvs.t;
@@ -328,7 +330,7 @@ let () =
     (fun env -> Trans.store (compute env))
     ~desc:"Compute@ as@ much@ as@ possible"
 
-
+  *)
 
 
 (* compute with rewrite rules *)

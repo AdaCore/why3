@@ -68,15 +68,30 @@ terms are normalized with respect to
 *)
 
 type engine
+(** abstract type for reduction engines *)
 
 val create : Env.env -> Decl.decl Ident.Mid.t -> engine
+(** [create env known_map] creates a reduction engine with
+    . builtins theories (int.Int, etc.) extracted from [env]
+    . known declarations from [known_map]
+    . empty set of rewrite rules
+*)
 
 exception NotARewriteRule of string
 
 val add_rule : Term.term -> engine -> engine
+(** [add_rule t e] turns [t] into a new rewrite rule and returns the
+    new engine.
 
+    raise NotARewriteRule if [t] cannot be seen as a rewrite rule
+    according to the general rules given above.
+*)
 
 
 val normalize : engine -> Term.term -> Term.term
+(** [normalize e t] normalizes the term [t] with respect to the engine
+    [e]
 
+    TODO: specify the behavior when non-termination...
+*)
 
