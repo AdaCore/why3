@@ -223,8 +223,8 @@ type config = {
 exception NoMatch
 
 let first_order_matching (vars : Svs.t) (largs : term list)
-    (args : term list) : substitution =
-  let rec loop sigma largs args =
+    (args : term list) : Ty.ty Ty.Mtv.t * substitution =
+  let rec loop ((mt,mv) as sigma) largs args =
     match largs,args with
       | [],[] -> sigma
       | t1::r1, t2::r2 ->
@@ -236,13 +236,14 @@ let first_order_matching (vars : Svs.t) (largs : term list)
           match t1.t_node with
             | Tvar vs when Svs.mem vs vars ->
               begin
-                try let t = Mvs.find vs sigma in
+                try let t = Mvs.find vs mv in
                     if t_equal t t2 then
                       loop sigma r1 r2
                     else
                       raise NoMatch
                 with Not_found ->
-                  loop (Mvs.add vs t2 sigma) r1 r2
+                  loop (Ty.ty_match mt vs.vs_ty (t_type t2),
+                        Mvs.add vs t2 mv) r1 r2
               end
             | Tapp(ls1,args1) ->
               begin
@@ -273,7 +274,7 @@ let first_order_matching (vars : Svs.t) (largs : term list)
         end
       | _ -> raise NoMatch
   in
-  loop Mvs.empty largs args
+  loop (Ty.Mtv.empty, Mvs.empty) largs args
 
 exception Irreducible
 
@@ -295,16 +296,16 @@ let one_step_reduce engine ls args =
   with Not_found ->
     raise Irreducible
 
-let rec matching sigma t p =
+let rec matching ((mt,mv) as sigma) t p =
   match p.pat_node with
   | Pwild -> sigma
-  | Pvar v -> Mvs.add v t sigma
+  | Pvar v -> (mt,Mvs.add v t mv)
   | Por(p1,p2) ->
     begin
       try matching sigma t p1
       with NoMatch -> matching sigma t p2
     end
-  | Pas(p,v) -> matching (Mvs.add v t sigma) t p
+  | Pas(p,v) -> matching (mt,Mvs.add v t mv) t p
   | Papp(ls1,pl) ->
     match t.t_node with
       | Tapp(ls2,tl) ->
@@ -379,14 +380,38 @@ and reduce_match st u tbl sigma cont =
     | b::rem ->
       let p,t = t_open_branch b in
       try
-        let sigma' = matching sigma u p in
+        let (mt',mv') = matching (Ty.Mtv.empty,sigma) u p in
+        Format.eprintf "Pattern-matching succeeded:@\nmt' = @[";
+        Ty.Mtv.iter
+          (fun tv ty -> Format.eprintf "%a -> %a,"
+            Pretty.print_tv tv Pretty.print_ty ty)
+          mt';
+        Format.eprintf "@]@\n";
+        Format.eprintf "mv' = @[";
+        Mvs.iter
+          (fun v t -> Format.eprintf "%a -> %a,"
+            Pretty.print_vs v Pretty.print_term t)
+          mv';
+        Format.eprintf "@]@.";
+        Format.eprintf "branch before inst: %a@." Pretty.print_term t;
+        let mv'',t = t_subst_types mt' mv' t in
+        Format.eprintf "branch after types inst: %a@." Pretty.print_term t;
+        Format.eprintf "mv'' = @[";
+        Mvs.iter
+          (fun v t -> Format.eprintf "%a -> %a,"
+            Pretty.print_vs v Pretty.print_term t)
+          mv'';
+        Format.eprintf "@]@.";
         { value_stack = st;
-          cont_stack = Keval(t,sigma') :: cont;
+          cont_stack = Keval(t,mv'') :: cont;
         }
       with NoMatch -> iter rem
   in
   try iter tbl with Undetermined ->
-    { value_stack = Term (t_case u tbl) :: st;
+    { (* value_stack = Term (t_case u tbl) :: st; *)
+      (* FIXME: apply (t_subst sigma) on each branch of tbl !! *)
+      value_stack = Term (t_subst sigma (t_case u tbl)) :: st; 
+      (* DONE? *)
       cont_stack = cont;
     }
 
@@ -400,7 +425,7 @@ and reduce_eval st t sigma rem =
         { value_stack = Term t :: st ;
           cont_stack = rem;
         }
-      with Not_found -> 
+      with Not_found ->
         Format.eprintf "Tvar not found: %a@." Pretty.print_vs v;
         assert false
     end
@@ -467,33 +492,37 @@ and reduce_app engine st ls ty rem_cont =
       | Decl.Dlogic dl ->
         (* regular definition *)
         let d = List.assq ls dl in
-        let l,t = Decl.open_ls_defn d in
-        let type_subst = Ty.oty_match Ty.Mtv.empty t.t_ty ty in
-        let t = t_ty_subst type_subst Mvs.empty t in
-        let sigma =
-          try
-            List.fold_right2 Mvs.add l args Mvs.empty
-          with Invalid_argument _ -> assert false
+        let vl,e = Decl.open_ls_defn d in
+        let add (mt,mv) x y =
+          Ty.ty_match mt x.vs_ty (t_type y), Mvs.add x y mv
         in
+        let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl args in
+        let mt = Ty.oty_match mt e.t_ty ty in
+        let mv,e = t_subst_types mt mv e in
         { value_stack = rem_st;
-          cont_stack = Keval(t,sigma) :: rem_cont;
+          cont_stack = Keval(e,mv) :: rem_cont;
         }
       | Decl.Dparam _ | Decl.Dind _ ->
         (* try a rewrite rule *)
         begin
           try
+(*
             Format.eprintf "try a rewrite rule on %a@." Pretty.print_ls ls;
-            let sigma,rhs = one_step_reduce engine ls args in
+*)
+            let (mt,mv),rhs = one_step_reduce engine ls args in
+(*
             Format.eprintf "rhs = %a@." Pretty.print_term rhs;
             Format.eprintf "sigma = ";
             Mvs.iter
               (fun v t -> Format.eprintf "%a -> %a,"
                 Pretty.print_vs v Pretty.print_term t)
-              sigma;
+              (snd sigma);
             Format.eprintf "@.";
-            Format.eprintf "try a type match: %a and %a@." 
-              (Pp.print_option Pretty.print_ty) ty 
+            Format.eprintf "try a type match: %a and %a@."
+              (Pp.print_option Pretty.print_ty) ty
               (Pp.print_option Pretty.print_ty) rhs.t_ty;
+*)
+(*
             let type_subst = Ty.oty_match Ty.Mtv.empty rhs.t_ty ty in
             Format.eprintf "subst of rhs: ";
             Ty.Mtv.iter
@@ -512,8 +541,10 @@ and reduce_app engine st ls ty rem_cont =
                 Pretty.print_vs v Pretty.print_term t)
               sigma;
             Format.eprintf "@.";
+*)
+            let mv,rhs = t_subst_types mt mv rhs in
             { value_stack = rem_st;
-              cont_stack = Keval(rhs,sigma) :: rem_cont;
+              cont_stack = Keval(rhs,mv) :: rem_cont;
             }
           with Irreducible ->
             raise Not_found
@@ -569,7 +600,10 @@ let rec many_steps engine c n =
       many_steps engine c (n-1)
 
 let normalize engine t =
-  let c = { value_stack = []; cont_stack = [Keval(t,Mvs.empty)] } in
+  let c = { value_stack = [];
+            cont_stack = [Keval(t,Mvs.empty)] ;
+          }
+  in
   many_steps engine c 1000
 
 

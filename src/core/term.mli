@@ -396,6 +396,10 @@ val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
 (** [t_ty_subst mt mv t] substitutes simultaneously type variables by
     mapping [mt] and term variables by mapping [mv] in term [t] *)
 
+val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
+(** [t_subst_types mt mv t] substitutes type variables by
+    mapping [mt] simultaneously in substitution [mv] and in term [t] *)
+
 (** {2 Find free variables and type variables} *)
 
 val t_closed : term -> bool
