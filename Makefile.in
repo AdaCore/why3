@@ -1689,7 +1689,7 @@ doc/apidoc:
 apidoc: doc/apidoc $(FILESTODOC)
 	$(OCAMLDOC) -d doc/apidoc -html -t "Why3 API documentation" \
 		-keep-code $(INCLUDES) \
-		$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
+		$(LIBINCLUDES) $(LIBSESSIONINCLUDES) -I lib/why3 $(FILESTODOC)
 
 # could we include also the dependency graph ? -- someone
 # At least we can give a way to create it -- francois
