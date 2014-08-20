@@ -64,6 +64,8 @@ let register_goal goal =
    | _, Some c ->
        Gnat_objectives.add_to_objective c goal
 
+
+
 let rec handle_vc_result goal result prover_result =
    (* This function is called when the prover has returned from a VC.
        goal           is the VC that the prover has dealt with
@@ -86,7 +88,7 @@ let rec handle_vc_result goal result prover_result =
        Gnat_report.register obj (Some task) prover_result
                             false filename tracefile
    | Gnat_objectives.Work_Left ->
-       List.iter schedule_goal (Gnat_objectives.next obj)
+       List.iter (create_manual_or_schedule obj) (Gnat_objectives.next obj)
 
 and interpret_result pa pas =
    (* callback function for the scheduler, here we filter if an interesting
@@ -98,6 +100,13 @@ and interpret_result pa pas =
          handle_vc_result goal (answer = Call_provers.Valid) (Some r)
    | _ ->
          ()
+
+and create_manual_or_schedule obj goal =
+  if (Gnat_manual.is_new_manual_proof goal
+      && not goal.Session.goal_verified) then
+    Gnat_report.register obj None None false
+                         (Some (Gnat_manual.create_prover_file goal obj)) ""
+  else schedule_goal goal
 
 and schedule_goal (g : Gnat_objectives.goal) =
    (* schedule a goal for proof - the goal may not be scheduled actually,
@@ -146,13 +155,8 @@ let handle_obj obj =
    end else begin
       match Gnat_objectives.next obj with
       | [] -> ()
-      | (g::_) as l ->
-          (* for manual proof we only consider one goal *)
-         if Gnat_manual.is_new_manual_proof g then
-           Gnat_report.register
-             obj None None false
-             (Some (Gnat_manual.create_prover_file g obj)) ""
-         else List.iter schedule_goal l
+      | l ->
+         List.iter (create_manual_or_schedule obj) l
    end
 
 let normal_handle_one_subp subp =
@@ -174,7 +178,6 @@ let _ =
       done, we apply the split_goal transformation when needed, and we schedule
       the first VC of all objectives. When done, we save the session.
    *)
-
    (* save session on interrupt initiated by the user *)
    let save_session_and_exit signum =
      (* ignore all SIGINT, SIGHUP and SIGTERM, which may be received when
