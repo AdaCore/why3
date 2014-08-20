@@ -48,12 +48,15 @@ let big_int_of_value v =
 
 exception Undetermined
 
+(*
 let const_equality c1 c2 =
   match c1,c2 with
   | Number.ConstInt i1, Number.ConstInt i2 ->
     BigInt.eq (Number.compute_int i1) (Number.compute_int i2)
   | _ -> raise Undetermined
+*)
 
+(*
 let rec term_equality t1 t2 =
   match (t1.t_node,t2.t_node) with
   | Tconst c1, Tconst c2 -> const_equality c1 c2
@@ -64,7 +67,9 @@ let rec term_equality t1 t2 =
     if List.for_all2 term_equality tl1 tl2 then true else
       raise Undetermined
   | _ -> raise Undetermined
+*)
 
+(*
 let value_equality v1 v2 =
   match v1,v2 with
   | Int n1, Int n2 -> BigInt.eq n1 n2
@@ -77,6 +82,7 @@ let value_equality v1 v2 =
     end
   | Int _, Term _ | Term _, Int _ -> raise Undetermined
   | Term t1, Term t2 -> term_equality t1 t2
+*)
 
 (* {2 Builtin symbols} *)
 
@@ -87,6 +93,7 @@ let builtins = Hls.create 17
 
 let to_bool b = if b then t_true else t_false
 
+(*
 let eval_equ _ls l _ty =
   match l with
   | [t1;t2] ->
@@ -95,7 +102,7 @@ let eval_equ _ls l _ty =
       with Undetermined -> Term (t_equ (term_of_value t1) (term_of_value t2))
     end
   | _ -> assert false
-
+*)
 
 
 (*
@@ -205,7 +212,9 @@ let add_builtin_th env (l,n,t,d) =
 
 let get_builtins env =
   Hls.clear builtins;
+(* obsolete: equality is handled specifically in reduce_app
   Hls.add builtins ps_equ eval_equ;
+*)
   List.iter (add_builtin_th env) built_in_theories
 
 
@@ -535,6 +544,11 @@ and reduce_eval st t sigma rem =
     }
 
 and reduce_app engine st ls ty rem_cont =
+  if ls_equal ls ps_equ then
+    match st with
+    | t2 :: t1 :: rem_st -> reduce_equ rem_st t1 t2 rem_cont
+    | _ -> assert false
+  else
   let rec extract_first n acc l =
     if n = 0 then acc,l else
       match l with
@@ -655,6 +669,70 @@ and reduce_app engine st ls ty rem_cont =
       { value_stack = Term (t_app ls args ty) :: rem_st;
         cont_stack = rem_cont;
       }
+
+
+and reduce_equ (* engine *) st v1 v2 cont =
+  try
+    match v1,v2 with
+    | Int n1, Int n2 ->
+      let b = to_bool (BigInt.eq n1 n2) in
+      { value_stack = Term b :: st;
+        cont_stack = cont;
+      }
+    | Int n, Term {t_node = Tconst c} | Term {t_node = Tconst c}, Int n ->
+      begin
+        try
+          let n' = big_int_of_const c in
+          let b = to_bool (BigInt.eq n n') in
+          { value_stack = Term b :: st;
+            cont_stack = cont;
+          }
+        with NotNum -> raise Undetermined
+      end
+    | Int _,  Term _ | Term _,  Int _ -> raise Undetermined
+    | Term t1, Term t2 -> reduce_term_equ st t1 t2 cont
+  with Undetermined ->
+    { value_stack = Term (t_equ (term_of_value v1) (term_of_value v2)) :: st;
+      cont_stack = cont;
+    }
+
+and reduce_term_equ st t1 t2 cont =
+  match (t1.t_node,t2.t_node) with
+  | Tconst c1, Tconst c2 ->
+    begin
+      match c1,c2 with
+      | Number.ConstInt i1, Number.ConstInt i2 ->
+        let b = BigInt.eq (Number.compute_int i1) (Number.compute_int i2) in
+        { value_stack = Term (to_bool b) :: st;
+          cont_stack = cont;
+        }
+      | _ -> raise Undetermined
+    end
+  | Tapp(ls1,tl1), Tapp(ls2,tl2) when ls1.ls_constr > 0 && ls2.ls_constr > 0 ->
+    if ls_equal ls1 ls2 then
+      let rec aux sigma t tyl l1 l2 =
+        match tyl,l1,l2 with
+        | [],[],[] -> sigma,t
+        | ty::tyl, t1::tl1, t2::tl2 ->
+          let v1 = create_vsymbol (Ident.id_fresh "") ty in
+          let v2 = create_vsymbol (Ident.id_fresh "") ty in
+          aux
+            (Mvs.add v1 t1 (Mvs.add v2 t2 sigma))
+            (t_and_simp (t_equ (t_var v1) (t_var v2)) t)
+            tyl tl1 tl2
+        | _ ->  assert false
+      in
+      let sigma,t =
+        aux Mvs.empty t_true ls1.ls_args tl1 tl2
+      in
+      { value_stack = st;
+        cont_stack = Keval(t,sigma) :: cont;
+      }
+    else
+      { value_stack = Term t_false :: st;
+        cont_stack = cont;
+      }
+  | _ -> raise Undetermined
 
 
 
