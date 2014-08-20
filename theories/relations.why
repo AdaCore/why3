@@ -113,64 +113,6 @@ theory ReflTransClosure
     forall x y z: t. relTR x y -> relTR y z -> relTR x z
 end
 
-(***
-theory PreOrder
-
-  type t
-  predicate le t t
-  axiom Refl : forall x:t. le(x,x)
-  axiom Trans : forall x y z:t. le x y /\ le y z -> le x z
-
-end
-
-theory Equiv
-
-  type t
-
-  predicate eq t t
-
-  clone PreOrder with type t = t, predicate le = eq
-
-  axiom Symm : forall x y:t. eq x y -> eq y x
-
-end
-
-theory TotalPreOrder
-
-  type t
-  predicate le t t
-
-  clone export PreOrder with type t = t, predicate le = le
-
-  axiom Totality: forall x y:t. le x y \/ le y x
-
-end
-*)
-
-(***
-theory TotalOrder
-
-  type t
-
-  predicate eq t t
-  clone Equiv with type t = t, predicate eq = eq
-
-  predicate le t t
-  clone PreOrder with type t = t, predicate le = le
-
-
-  axiom Totality: forall x y:t. eq x y \/ le x y \/ le y x
-
-  predicate lt (x y : t) = le x y /\ not eq x y
-
-  lemma Lt_antirefl: forall x:t. not lt x x
-  lemma Lt_trans: forall x y z:t. lt x y /\ lt y z -> lt x z
-  lemma Le_lt_trans: forall x y z:t. le x y /\ lt y z -> lt x z
-  lemma Lt_le_trans: forall x y z:t. lt x y /\ le y z -> lt x z
-
-end
-*)
-
 theory Lex
 
   type t1
