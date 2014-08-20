@@ -204,7 +204,9 @@ theory Rinteger
 
    lemma l1 : forall x:int. x + 0 = x
 
-   meta "rewrite" prop l1
+   (* not allowed: + is a built-in symbol
+     meta "rewrite" prop l1
+     *)
 
    goal g1 : forall y. 2+2 = y
 

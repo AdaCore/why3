@@ -766,7 +766,20 @@ let create env km =
 
 exception NotARewriteRule of string
 
-let extract_rule t =
+let extract_rule km t =
+  let check_ls ls =
+    try let _ = Hls.find builtins ls in
+        raise (NotARewriteRule "root of lhs of rule must not be a built-in symbol")
+    with Not_found ->
+      let d = Ident.Mid.find ls.ls_name km in
+      match d.Decl.d_node with
+      | Decl.Dtype _ | Decl.Dprop _ -> assert false
+      | Decl.Dlogic _ ->
+        raise (NotARewriteRule "root of lhs of rule must not be defined symbol")
+      | Decl.Ddata _ ->
+        raise (NotARewriteRule "root of lhs of rule must not be a constructor nor a projection")
+      | Decl.Dparam _ | Decl.Dind _ -> ()
+  in
   let rec aux acc t =
     match t.t_node with
       | Tquant(Tforall,q) ->
@@ -775,14 +788,14 @@ let extract_rule t =
       | Tbinop(Tiff,t1,t2) ->
         begin
           match t1.t_node with
-            | Tapp(ls,args) -> acc,ls,args,t2
+            | Tapp(ls,args) -> check_ls ls; acc,ls,args,t2
             | _ -> raise
               (NotARewriteRule "lhs of <-> should be a predicate symbol")
         end
       | Tapp(ls,[t1;t2]) when ls == ps_equ ->
         begin
           match t1.t_node with
-            | Tapp(ls,args) -> acc,ls,args,t2
+            | Tapp(ls,args) -> check_ls ls; acc,ls,args,t2
             | _ -> raise
               (NotARewriteRule "lhs of = should be a function symbol")
         end
@@ -793,7 +806,7 @@ let extract_rule t =
 
 
 let add_rule t e =
-  let vars,ls,args,r = extract_rule t in
+  let vars,ls,args,r = extract_rule e.known_map t in
   let rules =
     try Mls.find ls e.rules
     with Not_found -> []

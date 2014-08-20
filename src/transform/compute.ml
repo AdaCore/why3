@@ -353,7 +353,12 @@ let collect_rule_decl prs e d =
     | Decl.Dlogic _ -> e
     | Decl.Dprop(_, pr, t) ->
       if Decl.Spr.mem pr prs then
-        Reduction_engine.add_rule t e
+        try
+          Reduction_engine.add_rule t e
+        with Reduction_engine.NotARewriteRule msg ->
+          Warning.emit "prop %a cannot be turned into a rewrite rule: %s"
+            Pretty.print_pr pr msg;
+          e
       else e
 
 let collect_rules env km prs t =
