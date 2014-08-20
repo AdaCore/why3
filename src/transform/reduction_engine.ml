@@ -379,6 +379,12 @@ let rec matching ((mt,mv) as sigma) t p =
       | _ -> raise Undetermined
 
 
+let rec extract_first n acc l =
+  if n = 0 then acc,l else
+    match l with
+    | x :: r ->
+      extract_first (n-1) (x::acc) r
+    | [] -> assert false
 
 
 let rec reduce engine c =
@@ -477,10 +483,7 @@ and reduce_match st u tbl sigma cont =
       with NoMatch -> iter rem
   in
   try iter tbl with Undetermined ->
-    { (* value_stack = Term (t_case u tbl) :: st; *)
-      (* FIXME: apply (t_subst sigma) on each branch of tbl !! *)
-      value_stack = Term (t_subst sigma (t_case u tbl)) :: st;
-      (* DONE? *)
+    { value_stack = Term (t_subst sigma (t_case u tbl)) :: st;
       cont_stack = cont;
     }
 
@@ -549,13 +552,6 @@ and reduce_app engine st ls ty rem_cont =
     | t2 :: t1 :: rem_st -> reduce_equ rem_st t1 t2 rem_cont
     | _ -> assert false
   else
-  let rec extract_first n acc l =
-    if n = 0 then acc,l else
-      match l with
-      | x :: r ->
-        extract_first (n-1) (x::acc) r
-      | [] -> assert false
-  in
   let arity = List.length ls.ls_args in
   let args,rem_st = extract_first arity [] st in
   try
@@ -736,20 +732,90 @@ and reduce_term_equ st t1 t2 cont =
 
 
 
-let rec many_steps engine c n =
+let rec reconstruct c =
   match c.value_stack, c.cont_stack with
   | [Term t], [] -> t
   | _, [] -> assert false
-  | _ -> if n = 0 then assert false else
-      let c = reduce engine c in
-      many_steps engine c (n-1)
+  | st, Keval (t,sigma) :: rem ->
+    reconstruct {
+      value_stack = (Term (t_subst sigma t)) :: st;
+      cont_stack = rem;
+    }
+  | [], Kif _ :: _ -> assert false
+  | v :: st, Kif(t2,t3,sigma) :: rem ->
+    reconstruct {
+      value_stack =
+        Term (t_if (term_of_value v) (t_subst sigma t2) (t_subst sigma t3)) :: st;
+      cont_stack = rem ;
+    }
+  | [], Klet _ :: _ -> assert false
+  | t1 :: st, Klet(v,t2,sigma) :: rem ->
+    reconstruct {
+      value_stack = Term(t_let_close v (term_of_value t1) (t_subst sigma t2)) :: st;
+      cont_stack = rem;
+    }
+  | [], Kcase _ :: _ -> assert false
+  | v :: st, Kcase(tbl,sigma) :: rem ->
+    reconstruct {
+      value_stack = Term (t_subst sigma (t_case (term_of_value v) tbl)) :: st;
+      cont_stack = rem;
+    }
+  | ([] | [_]), Kbinop _ :: _ -> assert false
+  | t1 :: t2 :: st, Kbinop op :: rem ->
+    reconstruct {
+      value_stack = Term (t_binary_simp op (term_of_value t1) (term_of_value t2)) :: st;
+      cont_stack = rem;
+    }
+  | [], Knot :: _ -> assert false
+  | t :: st, Knot :: rem ->
+    reconstruct {
+      value_stack = Term (t_not (term_of_value t)) :: st;
+      cont_stack = rem;
+    }
+  | st, Kapp(ls,ty) :: rem ->
+    let args,rem_st = extract_first (List.length ls.ls_args) [] st in
+    let args = List.map term_of_value args in
+    reconstruct {
+      value_stack = Term (t_app ls args ty) :: rem_st;
+      cont_stack = rem;
+    }
+  | [], Keps _ :: _ -> assert false
+  | t :: st, Keps v :: rem ->
+    reconstruct {
+      value_stack = Term (t_eps_close v (term_of_value t)) :: st;
+      cont_stack = rem;
+    }
+  | [], Kquant _ :: _ -> assert false
+  | t :: st, Kquant(q,vl,tr) :: rem ->
+    reconstruct {
+      value_stack = Term (t_quant_close q vl tr (term_of_value t)) :: st;
+      cont_stack = rem;
+    }
 
-let normalize engine t =
+
+(** iterated reductions *)
+
+let normalize ?(limit=1000) engine t0 =
+  let rec many_steps c n =
+    match c.value_stack, c.cont_stack with
+    | [Term t], [] -> t
+    | _, [] -> assert false
+    | _ ->
+      if n = limit then
+        begin
+          Warning.emit "reduction of term %a takes more than %d steps, aborted.@."
+            Pretty.print_term t0 limit;
+          reconstruct c
+        end
+      else
+        let c = reduce engine c in
+        many_steps c (n+1)
+  in
   let c = { value_stack = [];
-            cont_stack = [Keval(t,Mvs.empty)] ;
+            cont_stack = [Keval(t0,Mvs.empty)] ;
           }
   in
-  many_steps engine c 1000
+  many_steps c 0
 
 
 

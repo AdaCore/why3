@@ -198,6 +198,50 @@ theory Rgroup
 end
 
 
+theory NonTerm
+
+  type t
+
+  constant c : t
+
+  function f t : t
+
+  axiom a: f c = f (f c)
+
+  meta "rewrite" prop a
+
+  goal g: f c = f c
+
+  use import int.Int
+
+  type nat = O | S nat
+
+  function plus (n m:nat) : nat =
+    match n with
+    | O -> m
+    | S k -> S (plus k m)
+    end
+
+  function fib (n:nat) : nat =
+    match n with
+    | O -> O
+    | S O -> S O
+    | S (S n as m) -> plus (fib n) (fib m)
+    end
+
+  constant x : nat
+
+  goal g3 : fib (S (S (S O))) = x
+  goal g4 : fib (S (S (S (S O)))) = x
+  goal g5 : fib (S (S (S (S (S O))))) = x
+  goal g6 : fib (S (S (S (S (S (S O)))))) = x
+  goal g7 : fib (S (S (S (S (S (S (S O))))))) = x
+  goal g8 : fib (S (S (S (S (S (S (S (S O)))))))) = x
+  goal g9 : fib (S (S (S (S (S (S (S (S (S O))))))))) = x
+  goal g10 : fib (S (S (S (S (S (S (S (S (S (S O)))))))))) = x
+
+end
+
 theory Rinteger
 
    use export int.Int

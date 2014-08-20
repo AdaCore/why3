@@ -10,11 +10,7 @@
 (********************************************************************)
 
 
-(*********************
-
-{1 A reduction engine for Why3 terms}
-
-*************************)
+(** A reduction engine for Why3 terms *)
 
 (*
 terms are normalized with respect to
@@ -98,10 +94,11 @@ val add_rule : Term.term -> engine -> engine
 *)
 
 
-val normalize : engine -> Term.term -> Term.term
+val normalize : ?limit:int -> engine -> Term.term -> Term.term
 (** [normalize e t] normalizes the term [t] with respect to the engine
     [e]
 
-    TODO: specify the behavior when non-termination...
+    Optional parameter [limit] provides a maximum number of steps for execution.
+    (default 1000). When limit is reached, the partially reduced term is returned.
 *)
 
