@@ -99,6 +99,11 @@ val ty_s_any : (tysymbol -> bool) -> ty -> bool
 exception TypeMismatch of ty * ty
 
 val ty_match : ty Mtv.t -> ty -> ty -> ty Mtv.t
+(** [ty_match sigma0 pat sub] returns a type substitution [sigma] such
+    that [sigma pat = sub]. Raises TypeMismatch if no substitution
+    exists.
+*)
+
 val ty_inst  : ty Mtv.t -> ty -> ty
 val ty_freevars : Stv.t -> ty -> Stv.t
 val ty_closed : ty -> bool

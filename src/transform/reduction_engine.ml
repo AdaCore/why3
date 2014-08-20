@@ -9,16 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-
-
-
-
 open Term
-
-
-
-
-
 
 (* {2 builtin symbols} *)
 
@@ -409,7 +400,9 @@ and reduce_eval st t sigma rem =
         { value_stack = Term t :: st ;
           cont_stack = rem;
         }
-      with Not_found -> assert false
+      with Not_found -> 
+        Format.eprintf "Tvar not found: %a@." Pretty.print_vs v;
+        assert false
     end
   | Tif(t1,t2,t3) ->
     { value_stack = st;
@@ -475,7 +468,7 @@ and reduce_app engine st ls ty rem_cont =
         (* regular definition *)
         let d = List.assq ls dl in
         let l,t = Decl.open_ls_defn d in
-        let type_subst = Ty.oty_match Ty.Mtv.empty ty t.t_ty in
+        let type_subst = Ty.oty_match Ty.Mtv.empty t.t_ty ty in
         let t = t_ty_subst type_subst Mvs.empty t in
         let sigma =
           try
@@ -489,8 +482,19 @@ and reduce_app engine st ls ty rem_cont =
         (* try a rewrite rule *)
         begin
           try
+            Format.eprintf "try a rewrite rule on %a@." Pretty.print_ls ls;
             let sigma,rhs = one_step_reduce engine ls args in
-            let type_subst = Ty.oty_match Ty.Mtv.empty ty rhs.t_ty in
+            Format.eprintf "rhs = %a@." Pretty.print_term rhs;
+            Format.eprintf "sigma = ";
+            Mvs.iter
+              (fun v t -> Format.eprintf "%a -> %a,"
+                Pretty.print_vs v Pretty.print_term t)
+              sigma;
+            Format.eprintf "@.";
+            Format.eprintf "try a type match: %a and %a@." 
+              (Pp.print_option Pretty.print_ty) ty 
+              (Pp.print_option Pretty.print_ty) rhs.t_ty;
+            let type_subst = Ty.oty_match Ty.Mtv.empty rhs.t_ty ty in
             Format.eprintf "subst of rhs: ";
             Ty.Mtv.iter
               (fun tv ty -> Format.eprintf "%a -> %a,"
@@ -501,6 +505,13 @@ and reduce_app engine st ls ty rem_cont =
             let sigma =
               Mvs.map (t_ty_subst type_subst Mvs.empty) sigma
             in
+            Format.eprintf "rhs = %a@." Pretty.print_term rhs;
+            Format.eprintf "sigma = ";
+            Mvs.iter
+              (fun v t -> Format.eprintf "%a -> %a,"
+                Pretty.print_vs v Pretty.print_term t)
+              sigma;
+            Format.eprintf "@.";
             { value_stack = rem_st;
               cont_stack = Keval(rhs,sigma) :: rem_cont;
             }
@@ -598,8 +609,6 @@ let extract_rule t =
         end
       | _ -> raise
         (NotARewriteRule "rule should be of the form forall ... t1 = t2 or f1 <-> f2")
-
-
   in
   aux Svs.empty t
 
