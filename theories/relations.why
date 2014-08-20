@@ -1,6 +1,7 @@
 
 (** {1 Relations} *)
 
+(** {2 Relations and orders} *)
 
 theory EndoRelation
   type t
@@ -83,6 +84,8 @@ theory Inverse
   predicate inv_rel (x y : t) = rel y x
 end
 
+(** {2 Closures} *)
+
 theory ReflClosure
   clone export EndoRelation
 
@@ -113,6 +116,8 @@ theory ReflTransClosure
     forall x y z: t. relTR x y -> relTR y z -> relTR x z
 end
 
+(** {2 Lexicographic ordering} *)
+
 theory Lex
 
   type t1
@@ -139,6 +144,8 @@ theory MinMax
 
 end
 *)
+
+(** {2 Well-founded relation} *)
 
 theory WellFounded
 
