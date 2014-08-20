@@ -98,9 +98,11 @@ let eval_equ _ls l _ty =
 
 
 
+(*
 let eval_true _ls _l _ty = Term t_true
 
 let eval_false _ls _l _ty = Term t_false
+*)
 
 let t_app_value ls l ty =
   Term (t_app ls (List.map term_of_value l) ty)
@@ -144,10 +146,13 @@ let eval_int_uop op ls l ty =
 
 
 let built_in_theories =
-  [ ["bool"],"Bool", [],
+  [
+(*
+ ["bool"],"Bool", [],
     [ "True", None, eval_true ;
       "False", None, eval_false ;
     ] ;
+*)
     ["int"],"Int", [],
     [ "infix +", None, eval_int_op BigInt.add;
       "infix -", None, eval_int_op BigInt.sub;
@@ -216,7 +221,7 @@ type engine =
   }
 
 
-(*
+(* OBSOLETE COMMENT
 
   A configuration is a pair (t,s) where t is a stack of terms and s is a
   stack of function symbols.
@@ -481,8 +486,14 @@ and reduce_eval st t sigma rem =
           cont_stack = rem;
         }
       with Not_found ->
-        Format.eprintf "Tvar not found: %a@." Pretty.print_vs v;
-        assert false
+        (* this may happen, e.g when computing below a quantified formula *)
+        (*
+          Format.eprintf "Tvar not found: %a@." Pretty.print_vs v;
+          assert false
+        *)
+        { value_stack = Term t :: st ;
+          cont_stack = rem;
+        }
     end
   | Tif(t1,t2,t3) ->
     { value_stack = st;
