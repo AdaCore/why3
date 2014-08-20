@@ -11,13 +11,40 @@
 
 open Term
 
-(* {2 builtin symbols} *)
+(* {2 Values} *)
 
-let builtins = Hls.create 17
+type value =
+| Term of term    (* invariant: is in normal form *)
+| Int of BigInt.t
+
+let const_of_positive n =
+    t_const (Number.ConstInt (Number.int_const_dec (BigInt.to_string n)))
 
 let ls_minus = ref ps_equ (* temporary *)
 
-(* all builtin functions *)
+let const_of_big_int n =
+  if BigInt.ge n BigInt.zero then const_of_positive n else
+    let t = const_of_positive (BigInt.minus n) in
+    t_app_infer !ls_minus [t]
+
+let term_of_value v =
+  match v with
+  | Term t -> t
+  | Int n -> const_of_big_int n
+
+exception NotNum
+
+let big_int_of_const c =
+  match c with
+    | Number.ConstInt i -> Number.compute_int i
+    | _ -> raise NotNum
+
+let big_int_of_value v =
+  match v with
+  | Int n -> n
+  | Term {t_node = Tconst c } -> big_int_of_const c
+  | _ -> raise NotNum
+
 
 exception Undetermined
 
@@ -27,16 +54,36 @@ let const_equality c1 c2 =
     BigInt.eq (Number.compute_int i1) (Number.compute_int i2)
   | _ -> raise Undetermined
 
-let rec value_equality t1 t2 =
+let rec term_equality t1 t2 =
   match (t1.t_node,t2.t_node) with
   | Tconst c1, Tconst c2 -> const_equality c1 c2
   | Tapp(ls1,_), Tapp(ls2,_) when not (ls_equal ls1 ls2) ->
     if ls1.ls_constr > 0 && ls2.ls_constr > 0 then false else
       raise Undetermined
   | Tapp(ls1,tl1), Tapp(ls2,tl2) when ls_equal ls1 ls2 ->
-    if List.for_all2 value_equality tl1 tl2 then true else
+    if List.for_all2 term_equality tl1 tl2 then true else
       raise Undetermined
   | _ -> raise Undetermined
+
+let value_equality v1 v2 =
+  match v1,v2 with
+  | Int n1, Int n2 -> BigInt.eq n1 n2
+  | Int n, Term {t_node = Tconst c} | Term {t_node = Tconst c}, Int n ->
+    begin
+      try
+        let n' = big_int_of_const c in
+        BigInt.eq n n'
+      with NotNum -> raise Undetermined
+    end
+  | Int _, Term _ | Term _, Int _ -> raise Undetermined
+  | Term t1, Term t2 -> term_equality t1 t2
+
+(* {2 Builtin symbols} *)
+
+let builtins = Hls.create 17
+
+(* all builtin functions *)
+
 
 let to_bool b = if b then t_true else t_false
 
@@ -44,55 +91,56 @@ let eval_equ _ls l _ty =
   match l with
   | [t1;t2] ->
     begin
-      try to_bool (value_equality t1 t2)
-      with Undetermined -> t_equ t1 t2
+      try Term (to_bool (value_equality t1 t2))
+      with Undetermined -> Term (t_equ (term_of_value t1) (term_of_value t2))
     end
   | _ -> assert false
 
 
-let eval_true _ls _l _ty = t_true
 
-let eval_false _ls _l _ty = t_false
+let eval_true _ls _l _ty = Term t_true
 
-exception NotNum
+let eval_false _ls _l _ty = Term t_false
 
-let big_int_of_const c =
-  match c with
-    | Number.ConstInt i -> Number.compute_int i
-    | _ -> raise NotNum
-
-let const_of_big_int n =
-  t_const (Number.ConstInt (Number.int_const_dec (BigInt.to_string n)))
+let t_app_value ls l ty =
+  Term (t_app ls (List.map term_of_value l) ty)
 
 let eval_int_op op ls l ty =
   match l with
-  | [{t_node = Tconst c1};{t_node = Tconst c2}] ->
+  | [t1 ; t2] ->
     begin
-      try const_of_big_int (op (big_int_of_const c1) (big_int_of_const c2))
+      try
+        let n1 = big_int_of_value t1 in
+        let n2 = big_int_of_value t2 in
+        Int (op n1 n2)
       with NotNum | Division_by_zero ->
-        t_app ls l ty
+        t_app_value ls l ty
     end
-  | _ -> t_app ls l ty
+  | _ -> t_app_value ls l ty
 
 let eval_int_rel op ls l ty =
   match l with
-  | [{t_node = Tconst c1};{t_node = Tconst c2}] ->
+  | [t1 ; t2] ->
     begin
-      try to_bool (op (big_int_of_const c1) (big_int_of_const c2))
+      try
+        let n1 = big_int_of_value t1 in
+        let n2 = big_int_of_value t2 in
+        Term (to_bool (op n1 n2))
       with NotNum | Division_by_zero ->
-        t_app ls l ty
+        t_app_value ls l ty
     end
-  | _ -> t_app ls l ty
+  | _ -> t_app_value ls l ty
 
 let eval_int_uop op ls l ty =
   match l with
-  | [{t_node = Tconst c1}] ->
+  | [t1] ->
     begin
-      try const_of_big_int (op (big_int_of_const c1))
+      try
+        let n1 = big_int_of_value t1 in Int (op n1)
       with NotNum | Division_by_zero ->
-        t_app ls l ty
+        t_app_value ls l ty
     end
-  | _ -> t_app ls l ty
+  | _ -> t_app_value ls l ty
 
 
 let built_in_theories =
@@ -199,12 +247,6 @@ type engine =
 
 
 
-*)
-
-type value =
-| Term of term    (* invariant: is in normal form *)
-(* TODO, for optimization
-| Int of BigInt.t
 *)
 
 type substitution = term Mvs.t
@@ -344,24 +386,25 @@ let rec reduce engine c =
             Term (t_if t1 (t_subst sigma t2) (t_subst sigma t3)) :: st;
           cont_stack = rem ;
         }
-(* TODO
       | Int _ -> assert false (* would be ill-typed *)
-*)
     end
   | [], Klet _ :: _ -> assert false
-  | (Term t1) :: st, Klet(v,t2,sigma) :: rem ->
+  | t1 :: st, Klet(v,t2,sigma) :: rem ->
+    let t1 = term_of_value t1 in
     { value_stack = st;
       cont_stack = Keval(t2, Mvs.add v t1 sigma) :: rem;
     }
   | [], Kcase _ :: _ -> assert false
+  | Int _ :: _, Kcase _ :: _ -> assert false
   | (Term t1) :: st, Kcase(tbl,sigma) :: rem ->
     reduce_match st t1 tbl sigma rem
-  | ([] | [_]), Kbinop _ :: _ -> assert false
+  | ([] | [_] | Int _ :: _ | Term _ :: Int _ :: _), Kbinop _ :: _ -> assert false
   | (Term t1) :: (Term t2) :: st, Kbinop op :: rem ->
     { value_stack = Term (t_binary_simp op t1 t2) :: st;
       cont_stack = rem;
     }
   | [], Knot :: _ -> assert false
+  | Int _ :: _ , Knot :: _ -> assert false
   | (Term t) :: st, Knot :: rem ->
     { value_stack = Term (t_not t) :: st;
       cont_stack = rem;
@@ -369,11 +412,13 @@ let rec reduce engine c =
   | st, Kapp(ls,ty) :: rem ->
     reduce_app engine st ls ty rem
   | [], Keps _ :: _ -> assert false
+  | Int _ :: _ , Keps _ :: _ -> assert false
   | Term t :: st, Keps v :: rem ->
     { value_stack = Term (t_eps_close v t) :: st;
       cont_stack = rem;
     }
   | [], Kquant _ :: _ -> assert false
+  | Int _ :: _, Kquant _ :: _ -> assert false
   | Term t :: st, Kquant(q,vl,tr) :: rem ->
     { value_stack = Term (t_quant_close q vl tr t) :: st;
       cont_stack = rem;
@@ -420,7 +465,7 @@ and reduce_match st u tbl sigma cont =
   try iter tbl with Undetermined ->
     { (* value_stack = Term (t_case u tbl) :: st; *)
       (* FIXME: apply (t_subst sigma) on each branch of tbl !! *)
-      value_stack = Term (t_subst sigma (t_case u tbl)) :: st; 
+      value_stack = Term (t_subst sigma (t_case u tbl)) :: st;
       (* DONE? *)
       cont_stack = cont;
     }
@@ -482,7 +527,7 @@ and reduce_app engine st ls ty rem_cont =
   let rec extract_first n acc l =
     if n = 0 then acc,l else
       match l with
-      | Term x :: r ->
+      | x :: r ->
         extract_first (n-1) (x::acc) r
       | [] -> assert false
   in
@@ -491,10 +536,11 @@ and reduce_app engine st ls ty rem_cont =
   try
     let f = Hls.find builtins ls in
     let t = f ls args ty in
-    { value_stack = Term t :: rem_st;
+    { value_stack = t :: rem_st;
       cont_stack = rem_cont;
     }
   with Not_found ->
+    let args = List.map term_of_value args in
     try
       let d = Ident.Mid.find ls.ls_name engine.known_map in
       match d.Decl.d_node with
