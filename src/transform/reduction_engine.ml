@@ -27,9 +27,15 @@ let const_equality c1 c2 =
     BigInt.eq (Number.compute_int i1) (Number.compute_int i2)
   | _ -> raise Undetermined
 
-let value_equality t1 t2 =
+let rec value_equality t1 t2 =
   match (t1.t_node,t2.t_node) with
   | Tconst c1, Tconst c2 -> const_equality c1 c2
+  | Tapp(ls1,_), Tapp(ls2,_) when not (ls_equal ls1 ls2) ->
+    if ls1.ls_constr > 0 && ls2.ls_constr > 0 then false else
+      raise Undetermined
+  | Tapp(ls1,tl1), Tapp(ls2,tl2) when ls_equal ls1 ls2 ->
+    if List.for_all2 value_equality tl1 tl2 then true else
+      raise Undetermined
   | _ -> raise Undetermined
 
 let to_bool b = if b then t_true else t_false
@@ -381,6 +387,7 @@ and reduce_match st u tbl sigma cont =
       let p,t = t_open_branch b in
       try
         let (mt',mv') = matching (Ty.Mtv.empty,sigma) u p in
+(*
         Format.eprintf "Pattern-matching succeeded:@\nmt' = @[";
         Ty.Mtv.iter
           (fun tv ty -> Format.eprintf "%a -> %a,"
@@ -394,7 +401,9 @@ and reduce_match st u tbl sigma cont =
           mv';
         Format.eprintf "@]@.";
         Format.eprintf "branch before inst: %a@." Pretty.print_term t;
+*)
         let mv'',t = t_subst_types mt' mv' t in
+(*
         Format.eprintf "branch after types inst: %a@." Pretty.print_term t;
         Format.eprintf "mv'' = @[";
         Mvs.iter
@@ -402,6 +411,7 @@ and reduce_match st u tbl sigma cont =
             Pretty.print_vs v Pretty.print_term t)
           mv'';
         Format.eprintf "@]@.";
+*)
         { value_stack = st;
           cont_stack = Keval(t,mv'') :: cont;
         }
