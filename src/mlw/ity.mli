@@ -9,17 +9,17 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Ident
 open Ty
 
 (** {2 Individual types (first-order types w/o effects)} *)
 
 type itysymbol = private {
   its_ts      : tysymbol;     (** pure "snapshot" type symbol *)
-  its_def     : ity option;   (** is a type alias *)
   its_mutable : bool;         (** is a record with mutable fields *)
-  its_shared  : region list;  (** mutable shareable components *)
+  its_regions : region list;  (** mutable shareable components *)
   its_visible : bool list;    (** non-ghost shareable components *)
-  its_access  : bool list;    (** accessible type arguments *)
+  its_def     : ity option;   (** is a type alias *)
 }
 
 and ity = private {
@@ -33,7 +33,7 @@ and ity_node = private
   | Ityapp of itysymbol * ity list * region list
   | Itymut of itysymbol * ity list * region list * tvsymbol
 
-and region
+and region = ity (** regions are itys of the [Itymut] kind *)
 
 module Mits : Extmap.S with type key = itysymbol
 module Sits : Extset.S with module M = Mits
@@ -45,44 +45,35 @@ module Sity : Extset.S with module M = Mity
 module Hity : Exthtbl.S with type key = ity
 module Wity : Weakhtbl.S with type key = ity
 
-module Mreg : Extmap.S with type key = region
+module Mreg : Extmap.S with type key = region and type 'a t = 'a Mity.t
 module Sreg : Extset.S with module M = Mreg
-module Hreg : Exthtbl.S with type key = region
-module Wreg : Weakhtbl.S with type key = region
+module Hreg : Exthtbl.S with type key = region and type 'a t = 'a Hity.t
+module Wreg : Weakhtbl.S with type key = region and type 'a t = 'a Wity.t
 
 val its_equal : itysymbol -> itysymbol -> bool
 val ity_equal : ity -> ity -> bool
-val reg_equal : region -> region -> bool
 
 val its_hash : itysymbol -> int
 val ity_hash : ity -> int
-val reg_hash : region -> int
 
 exception BadItyArity of itysymbol * int
 exception BadRegArity of itysymbol * int
 exception DuplicateRegion of region
 exception UnboundRegion of region
-exception NotMutable of ity
 
-val ity_of_region : region -> ity
-val region_of_ity : ity -> region
-
-val open_region : region -> itysymbol * ity list * region list * tvsymbol
-
-(*
 (** creation of a symbol for type in programs *)
 val create_itysymbol :
-  preid ->
-    ?abst:bool -> ?priv:bool -> ?inv:bool -> ?ghost_reg:Sreg.t ->
-    tvsymbol list -> region list -> ity option -> itysymbol
+  preid -> tvsymbol list ->
+    bool -> (region * bool) list -> ity option -> itysymbol
 
 val restore_its : tysymbol -> itysymbol
   (** raises [Not_found] if the argument is not a its_ts *)
 
 val ity_var : tvsymbol -> ity
 val ity_pur : tysymbol -> ity list -> ity
-
 val ity_app : itysymbol -> ity list -> region list -> ity
+val ity_mut : itysymbol -> ity list -> region list -> tvsymbol -> ity
+
 val ity_app_fresh : itysymbol -> ity list -> ity
 
 val ty_of_ity : ity -> ty
@@ -90,7 +81,8 @@ val ty_of_ity : ity -> ty
 
 val ity_of_ty : ty -> ity
 (** replaces every [Tyapp] with [Itypur] *)
-*)
+
+val tv_of_region : region -> tvsymbol
 
 (** {2 Generic traversal functions} *)
 
@@ -119,9 +111,6 @@ val ity_r_all : (region -> bool) -> ity -> bool
 val ity_r_any : (region -> bool) -> ity -> bool
 
 val ity_r_occurs : region -> ity -> bool
-(*
-val its_clone : Theory.symbol_map -> itysymbol Mits.t * region Mreg.t
-*)
 
 val ity_closed    : ity -> bool
 val ity_immutable : ity -> bool
@@ -131,7 +120,6 @@ val ity_immutable : ity -> bool
 val ity_nonghost_reg : Sreg.t -> ity -> Sreg.t
 val lookup_nonghost_reg : Sreg.t -> ity -> bool
 
-(*
 (** {2 Built-in types} *)
 
 val ts_unit : tysymbol (** the same as [Ty.ts_tuple 0] *)
@@ -141,35 +129,17 @@ val ity_int : ity
 val ity_bool : ity
 val ity_unit : ity
 
-type ity_subst = private {
-  ity_subst_tv  : ity Mtv.t;
-  ity_subst_reg : region Mreg.t;
-}
+(** {2 Type matching and instantiation} *)
 
-exception RegionMismatch of region * region * ity_subst
-exception TypeMismatch of ity * ity * ity_subst
+exception TypeMismatch of ity * ity * ity Mtv.t
 
-val ity_subst_empty : ity_subst
+val ity_match : ity Mtv.t -> ity -> ity -> ity Mtv.t
 
-val ity_match : ity_subst -> ity -> ity -> ity_subst
-
-val reg_match : ity_subst -> region -> region -> ity_subst
+val ity_freeze : ity Mtv.t -> ity -> ity Mtv.t (* self-match *)
 
 val ity_equal_check : ity -> ity -> unit
 
-val reg_equal_check : region -> region -> unit
-
-val ity_full_inst : ity_subst -> ity -> ity
-
-val reg_full_inst : ity_subst -> region -> region
-
-(** {2 Varset manipulation} *)
-
-val vars_empty : varset
-
-val vars_union : varset -> varset -> varset
-
-val vars_freeze : varset -> ity_subst
+val ity_full_inst : ity Mtv.t -> ity -> ity
 
 (** {2 Exception symbols} *)
 
@@ -188,6 +158,7 @@ val create_xsymbol : preid -> ity -> xsymbol
 module Mexn: Extmap.S with type key = xsymbol
 module Sexn: Extset.S with module M = Mexn
 
+(*
 (** {2 Effects} *)
 
 type effect = private {
@@ -224,7 +195,7 @@ exception IllegalAlias of region
 exception IllegalCompar of tvsymbol * ity
 exception GhostDiverg
 
-val eff_full_inst : ity_subst -> effect -> effect
+val eff_full_inst : ity Mtv.t -> effect -> effect
 
 val eff_is_empty : effect -> bool
 
@@ -295,13 +266,13 @@ val vty_arrow : pvsymbol list -> ?spec:spec -> vty -> aty
 val aty_pvset : aty -> Spv.t
 (** raises [Not_found] if the spec contains non-pv variables *)
 
-val aty_vars_match : ity_subst -> aty -> ity list -> ity -> ity_subst
+val aty_vars_match : ity Mtv.t -> aty -> ity list -> ity -> ity Mtv.t
 (** this only compares the types of arguments and results, and ignores
     the spec. In other words, only the type variables and regions in
     [aty_vars aty] are matched. The caller should supply a "freezing"
     substitution that covers all external type variables and regions. *)
 
-val aty_full_inst : ity_subst -> aty -> aty
+val aty_full_inst : ity Mtv.t -> aty -> aty
 (** the substitution must cover not only [aty_vars aty] but
     also every type variable and every region in [aty_spec] *)
 
