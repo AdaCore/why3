@@ -123,6 +123,13 @@ let init max =
     idle_handler_activated = false
   }
 
+let notify_timer_state t continue =
+  O.notify_timer_state
+    (Queue.length t.actions_queue)
+    (Queue.length t.proof_attempts_queue) 
+    (List.length t.running_proofs);
+  continue
+
 (* timeout handler *)
 
 let timeout_handler t =
@@ -169,12 +176,9 @@ let timeout_handler t =
           false
       | _ -> true
   in
-  O.notify_timer_state
-    (Queue.length t.actions_queue)
-    (Queue.length t.proof_attempts_queue) (List.length l);
   t.timeout_handler_activated <- continue;
   t.timeout_handler_running <- false;
-  continue
+  notify_timer_state t continue
 
 let run_timeout_handler t =
   if t.timeout_handler_activated then () else
@@ -223,17 +227,17 @@ let idle_handler t =
     end
     else
       ignore (Unix.select [] [] [] 0.1);
-    true
+    notify_timer_state t true
   with
     | Queue.Empty ->
       t.idle_handler_activated <- false;
       Debug.dprintf debug "[Sched] idle_handler stopped@.";
-      false
+      notify_timer_state t false
     | e when not (Debug.test_flag Debug.stack_trace) ->
       Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
         Exn_printer.exn_printer e;
       eprintf "Session.idle_handler stopped@.";
-      false
+      notify_timer_state t false
 
 
 let run_idle_handler t =
@@ -491,7 +495,7 @@ let run_external_proof_v2 eS eT a callback =
       end
     | _ -> ()
     end;
-    callback a ap timelimit previous state 
+    callback a ap timelimit previous state
   in
   run_external_proof_v3 eS eT a callback
 
@@ -514,7 +518,7 @@ let run_external_proof eS eT ?callback a =
       | Starting -> ()
       | MissingProver -> c a Interrupted
       | MissingFile _ -> c a a.proof_state
-      | StatusChange s -> c a s 
+      | StatusChange s -> c a s
   in
   run_external_proof_v2 eS eT a callback
 
@@ -929,7 +933,7 @@ let convert_unknown_prover =
         | Icall_prover(p,timelimit,memlimit) ->
           let callback _pa res =
             match res with
-              | Scheduled | Running -> 
+              | Scheduled | Running ->
                 (* nothing to do yet *)
                 ()
               | Done { Call_provers.pr_answer = Call_provers.Valid } ->
@@ -939,13 +943,28 @@ let convert_unknown_prover =
                 (* proof did not succeed, goto to next step *)
                 let callback () = exec_strategy es sched (pc+1) strat g in
                 schedule_delayed_action sched callback
-              | Unedited | JustEdited -> 
+              | Unedited | JustEdited ->
                 (* should not happen *)
                 assert false
           in
           prover_on_goal es sched ~callback ~timelimit ~memlimit p g
-        | Itransform(_tr,_pcsuccess) ->
-          assert false (* TODO *)
+        | Itransform(trname,pcsuccess) ->
+          let callback ntr =
+            match ntr with
+              | None -> (* transformation failed *)
+                let callback () = exec_strategy es sched (pc+1) strat g in
+                schedule_delayed_action sched callback
+              | Some tr ->
+                List.iter
+                  (fun g ->
+                    let callback () =
+                      exec_strategy es sched pcsuccess strat g
+                    in
+                    schedule_delayed_action sched callback
+                  )
+                tr.transf_goals
+          in
+          transform_goal es sched ~callback trname g
         | Igoto pc ->
           exec_strategy es sched pc strat g
 

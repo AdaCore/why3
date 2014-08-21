@@ -1450,6 +1450,7 @@ let run_test_strategy () =
     [|
       M.Icall_prover(altergo.Whyconf.prover,1,1000);
       M.Icall_prover(cvc4.Whyconf.prover,1,1000);
+      M.Itransform(split_transformation,0); (* goto 0 on success *)
       M.Icall_prover(altergo.Whyconf.prover,10,4000);
       M.Icall_prover(cvc4.Whyconf.prover,10,4000);
     |]
