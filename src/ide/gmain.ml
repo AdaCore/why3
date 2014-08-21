@@ -208,13 +208,13 @@ let provers_box =
 
 let () = provers_frame#set_resize_mode `PARENT
 
-let transf_frame =
-  GBin.frame ~label:"Transformations" ~shadow_type:`ETCHED_OUT
+let strategies_frame =
+  GBin.frame ~label:"Strategies" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
-let transf_box =
+let strategies_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-  ~packing:transf_frame#add ()
+  ~packing:strategies_frame#add ()
 
 let tools_frame =
   GBin.frame ~label:"Tools" ~shadow_type:`ETCHED_OUT
@@ -1415,11 +1415,6 @@ let () =
          b#misc#set_tooltip_markup
            (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goals</b>"
               C.print_prover p);
-
-(* prend de la place pour rien
-         let i = GMisc.image ~pixbuf:(!image_prover) () in
-         let () = b#set_image i#coerce in
-*)
          let (_ : GtkSignal.id) =
            b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
@@ -1428,34 +1423,42 @@ let () =
   in
   add_gui_item add_item_provers
 
-let split_selected_goals () =
-  apply_trans_on_selection split_transformation
+let split_strategy =
+  [| M.Itransform(split_transformation,1) |]
 
-let inline_selected_goals () =
-  apply_trans_on_selection inline_transformation
+let inline_strategy =
+  [| M.Itransform(inline_transformation,1) |]
 
-
-
-let run_test_strategy () =
-  let strat =
-    let config = gconfig.Gconfig.config in
-    let altergo =
-      let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
-      Whyconf.filter_one_prover config fp
-    in
-    let cvc4 =
-      let fp = Whyconf.parse_filter_prover "CVC4" in
-      Whyconf.filter_one_prover config fp
-    in
-    [|
-      M.Icall_prover(altergo.Whyconf.prover,1,1000);
-      M.Icall_prover(cvc4.Whyconf.prover,1,1000);
-      M.Itransform(split_transformation,0); (* goto 0 on success *)
-      M.Icall_prover(altergo.Whyconf.prover,10,4000);
-      M.Icall_prover(cvc4.Whyconf.prover,10,4000);
-    |]
+let test_strategy () =
+  let config = gconfig.Gconfig.config in
+  let altergo =
+    let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+    Whyconf.filter_one_prover config fp
   in
-  apply_strategy_on_selection strat
+  let cvc4 =
+    let fp = Whyconf.parse_filter_prover "CVC4" in
+    Whyconf.filter_one_prover config fp
+  in
+  [|
+    M.Icall_prover(altergo.Whyconf.prover,1,1000);
+    M.Icall_prover(cvc4.Whyconf.prover,1,1000);
+    M.Itransform(split_transformation,0); (* goto 0 on success *)
+    M.Icall_prover(altergo.Whyconf.prover,10,4000);
+    M.Icall_prover(cvc4.Whyconf.prover,10,4000);
+  |]
+
+let strategies () : 
+    (string * Pp.formatted * M.strategy * 
+       (string * Gdk.keysym) option) list =
+  [ "Split", "Splits@ conjunctions@ of@ the@ goal", split_strategy, 
+    Some("s",GdkKeysyms._s);
+    "Inline", "Inline@ defined@ symbols", inline_strategy,
+    Some("i",GdkKeysyms._i);
+    "Blaster", "Blaster@ strategy", test_strategy (),
+    Some("b",GdkKeysyms._b);
+  ]
+
+
 
 let escape_text = Glib.Markup.escape_text
 let sanitize_markup x =
@@ -1464,7 +1467,11 @@ let sanitize_markup x =
     | c -> String.make 1 c in
   Ident.sanitizer remove remove (escape_text x)
 
-
+let string_of_desc desc =
+  let print_trans_desc fmt (x,r) =
+    fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
+  in Pp.string_of print_trans_desc desc
+  
 let () =
   let add_submenu_transform name get_trans () =
     let submenu = tools_factory#add_submenu name in
@@ -1473,10 +1480,8 @@ let () =
       let callback () = apply_trans_on_selection name in
       let ii = submenu#add_image_item
         ~label:(sanitize_markup name) ~callback () in
-      let print_trans_desc fmt (x,r) =
-        fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r in
-      ii#misc#set_tooltip_text
-        (Pp.string_of print_trans_desc desc) in
+      ii#misc#set_tooltip_text (string_of_desc desc)
+    in
     let trans = get_trans () in
     let trans = List.sort (fun (x,_) (y,_) -> String.compare x y) trans in
     List.iter iter trans
@@ -1499,14 +1504,26 @@ let () =
         let l = Trans.list_transforms () in
         List.filter (fun (x,_) -> x >= "f") l)
   in
-
   add_tool_separator ();
   add_tool_item "Copy" copy_on_selection;
   add_tool_item "Paste" paste_on_selection;
   add_tool_separator ();
-  add_tool_item "Split in selection" split_selected_goals;
-  add_tool_item "Inline in selection" inline_selected_goals;
-  add_tool_item "Test strategy" run_test_strategy;
+  let submenu = tools_factory#add_submenu "Strategies" in
+  let submenu = new GMenu.factory submenu ~accel_group in
+  let iter (name,desc,strat,k) =
+    let callback () = apply_strategy_on_selection strat in
+    let ii = submenu#add_image_item
+      ~label:(sanitize_markup name) ~callback () 
+    in
+    let name =
+      match k with
+        | None -> name
+        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
+    in
+    ii#misc#set_tooltip_text (string_of_desc (name,desc))
+  in
+  List.iter iter (strategies ());
+  add_tool_separator ();
   add_gui_item add_non_splitting_1;
   add_gui_item add_non_splitting_2;
   add_gui_item add_splitting;
@@ -1514,40 +1531,23 @@ let () =
   add_tool_item "Bisect in selection" apply_bisect_on_selection
 
 let () =
-  let b = GButton.button ~packing:transf_box#add ~label:"Split" () in
-  b#misc#set_tooltip_markup "Apply the transformation <tt>split_goal</tt> \
-to the <b>selected goals</b>";
-
-  let i = GMisc.image ~pixbuf:(!image_transf) () in
-  let () = b#set_image i#coerce in
-  let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:split_selected_goals
+  let iter (name,desc,strat,k) =
+    let b = GButton.button ~packing:strategies_box#add 
+      ~label:(sanitize_markup name) ()
+    in
+    let name =
+      match k with
+        | None -> name
+        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
+    in
+    b#misc#set_tooltip_markup (string_of_desc (name,desc));
+    let i = GMisc.image ~pixbuf:(!image_transf) () in
+    let () = b#set_image i#coerce in
+    let callback () = apply_strategy_on_selection strat in
+    let (_ : GtkSignal.id) = b#connect#pressed ~callback in
+    ()
   in
-  ()
-
-let () =
-  let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
-  b#misc#set_tooltip_markup "Apply the transformation <tt>inline_goal</tt> \
-to the <b>selected goals</b>";
-  let i = GMisc.image ~pixbuf:(!image_transf) () in
-  let () = b#set_image i#coerce in
-  let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:inline_selected_goals
-  in
-  ()
-
-let () =
-  let b = GButton.button ~packing:transf_box#add ~label:"Test Strategy" () in
-  b#misc#set_tooltip_markup "Apply the strategy <tt>test</tt> \
-to the <b>selected goals</b>";
-  let i = GMisc.image ~pixbuf:(!image_transf) () in
-  let () = b#set_image i#coerce in
-  let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:run_test_strategy
-  in
-  ()
-
-
+  List.iter iter (strategies ())
 
 
 (*************)
@@ -2144,13 +2144,21 @@ let () =
     let key = GdkEvent.Key.keyval ev in
     if key = GdkKeysyms._c then begin clean_selection (); true end else
     if key = GdkKeysyms._e then begin edit_current_proof (); true end else
-    if key = GdkKeysyms._i then begin inline_selected_goals (); true end else
     if key = GdkKeysyms._o then begin cancel_proofs (); true end else
     if key = GdkKeysyms._p then begin run_default_prover (); true end else
     if key = GdkKeysyms._r then begin replay_obsolete_proofs (); true end else
-    if key = GdkKeysyms._s then begin split_selected_goals (); true end else
     if key = GdkKeysyms._x then begin confirm_remove_selection (); true end else
-    false (* otherwise, use the default event handler *) in
+    (* strategy shortcuts *)
+    let rec iter l =
+      match l with 
+        | [] -> false (* otherwise, use the default event handler *) 
+        | (_,_,_,None) :: rem -> iter rem
+        | (_,_,s,Some(_,k)) :: rem ->
+          if key = k then begin apply_strategy_on_selection s; true end else
+            iter rem
+    in
+    iter (strategies ())
+  in
   ignore (goals_view#event#connect#key_press ~callback)
 
 

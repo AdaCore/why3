@@ -17,6 +17,9 @@ let debug = Debug.register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
          and@ transformation@ applications."
 
+let usleep t = ignore (Unix.select [] [] [] t)
+let default_delay_ms = 100 (* 0.1 seconds *)
+
 module Todo = struct
   type ('a,'b) todo =
       {mutable todo : int;
@@ -185,7 +188,7 @@ let run_timeout_handler t =
     begin
       t.timeout_handler_activated <- true;
       Debug.dprintf debug "[Sched] Timeout handler started@.";
-      O.timeout ~ms:100 (fun () -> timeout_handler t)
+      O.timeout ~ms:default_delay_ms (fun () -> timeout_handler t)
     end
 
 let schedule_any_timeout t callback =
@@ -226,7 +229,7 @@ let idle_handler t =
         | Action_delayed callback -> callback ()
     end
     else
-      ignore (Unix.select [] [] [] 0.1);
+      usleep (float default_delay_ms /. 1000.);
     notify_timer_state t true
   with
     | Queue.Empty ->
@@ -978,9 +981,6 @@ end
 
 module Base_scheduler (X : sig end)  =
   (struct
-
-    let usleep t = ignore (Unix.select [] [] [] t)
-
 
     let idle_handler = ref None
     let timeout_handler = ref None
