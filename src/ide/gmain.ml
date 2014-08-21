@@ -929,8 +929,7 @@ let apply_trans_on_selection tr =
        let a = get_any_from_row_reference r in
         M.transform (env_session()) sched
           ~context_unproved_goals_only:!context_unproved_goals_only
-          tr
-          a)
+          tr a)
     (get_selected_row_references ())
 
 
@@ -938,11 +937,9 @@ let apply_strategy_on_selection str =
   List.iter
     (fun r ->
       let a = get_any_from_row_reference r in
-      match a with
-        | S.Goal g ->
-          M.run_strategy_on_goal (env_session()) sched
-            str g
-        | _ -> ())
+      M.run_strategy (env_session()) sched
+        ~context_unproved_goals_only:!context_unproved_goals_only
+        str a)
     (get_selected_row_references ())
 
 
@@ -1460,7 +1457,7 @@ let strategies () :
   ]
 *)
 
-let loaded_strategies = ref [] 
+let loaded_strategies = ref []
 
 let strategies () =
   match !loaded_strategies with

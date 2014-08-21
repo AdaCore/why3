@@ -327,6 +327,11 @@ module Make(O: OBSERVER) : sig
     O.key Session.env_session -> t ->
     strategy -> O.key Session.goal -> unit
 
+  val run_strategy:
+    O.key Session.env_session -> t ->
+    context_unproved_goals_only:bool ->
+    strategy -> O.key Session.any -> unit
+
 end
 
 

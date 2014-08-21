@@ -938,7 +938,7 @@ let convert_unknown_prover =
               (SyntaxError
                  ("unable to parse goto argument '" ^ n ^ "' as an integer"))
         in
-        if g < 0 || g > max then 
+        if g < 0 || g > max then
           raise
             (SyntaxError ("goto index " ^ n ^ " is invalid"));
         Igoto g
@@ -961,7 +961,7 @@ let convert_unknown_prover =
               (SyntaxError
                  ("unable to parse timelimit argument '" ^ t ^ "'"))
         in
-        if timelimit <= 0 then 
+        if timelimit <= 0 then
           raise
             (SyntaxError ("timelimit " ^ t ^ " is invalid"));
         let memlimit =
@@ -971,7 +971,7 @@ let convert_unknown_prover =
               (SyntaxError
                  ("unable to parse memlimit argument '" ^ m ^ "'"))
         in
-        if memlimit <= 0 then 
+        if memlimit <= 0 then
           raise
             (SyntaxError ("memlimit " ^ m ^ " is invalid"));
         Icall_prover(p.Whyconf.prover,timelimit,memlimit)
@@ -979,11 +979,11 @@ let convert_unknown_prover =
         raise (SyntaxError "'c' expects exactly three arguments")
       | ["t";t;n] ->
         let () =
-          try 
+          try
             let _ = Trans.lookup_transform t env.env in
             ()
           with Trans.UnknownTrans _ ->
-          try 
+          try
             let _ = Trans.lookup_transform_l t env.env in
             ()
           with Trans.UnknownTrans _->
@@ -996,7 +996,7 @@ let convert_unknown_prover =
               (SyntaxError
                  ("unable to parse argument '" ^ n ^ "' as an integer"))
         in
-        if g < 0 || g > max then 
+        if g < 0 || g > max then
           raise
             (SyntaxError ("index " ^ n ^ " is invalid"));
         Itransform(t,g)
@@ -1055,6 +1055,21 @@ let convert_unknown_prover =
   let run_strategy_on_goal es sched strat g =
     let callback () = exec_strategy es sched 0 strat g in
     schedule_delayed_action sched callback
+
+
+  let run_strategy_on_goal_or_children ~context_unproved_goals_only
+      eS sched strat g =
+    goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only
+      (run_strategy_on_goal eS sched strat) g
+
+  let rec run_strategy eS sched ~context_unproved_goals_only strat a =
+    match a with
+    | Goal g | Proof_attempt {proof_parent = g} ->
+      run_strategy_on_goal_or_children ~context_unproved_goals_only
+        eS sched strat g
+    | _ ->
+      iter (run_strategy ~context_unproved_goals_only eS sched strat) a
+
 
 end
 
