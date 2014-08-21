@@ -134,16 +134,28 @@ theory Lex
 
 end
 
-(***
+(** {2 Minimum and maximum for total orders} *)
+
 theory MinMax
 
-  clone export TotalOrder
+  type t
+  predicate ge t t
 
-  function min t t : t
-  function max t t : t
+  clone TotalOrder with type t = t, predicate rel = ge
+
+  function max (x y : t) : t = if ge x y then x else y
+  function min (x y : t) : t = if ge x y then y else x
+
+  lemma Max_r : forall x y:t. ge y x -> max x y = y
+  lemma Min_l : forall x y:t. ge y x -> min x y = x
+
+  lemma Max_comm : forall x y:t. max x y = max y x
+  lemma Min_comm : forall x y:t. min x y = min y x
+
+  lemma Max_assoc : forall x y z:t. max (max x y) z = max x (max y z)
+  lemma Min_assoc : forall x y z:t. min (min x y) z = min x (min y z)
 
 end
-*)
 
 (** {2 Well-founded relation} *)
 
