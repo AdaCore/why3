@@ -210,6 +210,13 @@ theory real.Abs
 
 end
 
+theory real.MinMax
+
+  syntax function min "(Reals.Rbasic_fun.Rmin %1 %2)"
+  syntax function max "(Reals.Rbasic_fun.Rmax %1 %2)"
+
+end
+
 theory real.FromInt
 
   syntax function from_int "(Reals.Raxioms.IZR %1)"
