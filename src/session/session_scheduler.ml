@@ -928,7 +928,7 @@ let convert_unknown_prover =
   exception SyntaxError of string
 
   let parse_instr env max s =
-    match Strings.split s ' ' with
+    match Strings.split ' ' s with
       | [] -> raise (SyntaxError "unexpected empty instruction")
       | ["g";n] ->
         let g =

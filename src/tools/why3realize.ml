@@ -24,9 +24,8 @@ let add_opt_file _ =
     Use option -L if the containing files are not in the default loadpath.@.";
   exit 1
 
-let add_opt_theory =
-  let rdot = (Str.regexp "\\.") in fun x ->
-  let l = Str.split rdot x in
+let add_opt_theory x =
+  let l = Strings.split '.' x in
   let p, t = match List.rev l with
     | t::p -> List.rev p, t
     | _ -> assert false

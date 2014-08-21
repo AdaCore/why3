@@ -38,9 +38,8 @@ let add_opt_file x =
   Queue.push (Some x, tlist) opt_queue;
   opt_input := Some tlist
 
-let add_opt_theory =
-  let rdot = (Str.regexp "\\.") in fun x ->
-  let l = Str.split rdot x in
+let add_opt_theory x =
+  let l = Strings.split '.' x in
   let p, t = match List.rev l with
     | t::p -> List.rev p, t
     | _ -> assert false
@@ -71,7 +70,7 @@ let add_opt_goal x = match !opt_theory with
       eprintf "Option '-G'/'--goal' requires a theory.@.";
       exit 1
   | Some glist ->
-      let l = Str.split (Str.regexp "\\.") x in
+      let l = Strings.split '.' x in
       Queue.push (x, l) glist
 
 let add_opt_eval x = match !opt_theory_eval with
@@ -79,7 +78,7 @@ let add_opt_eval x = match !opt_theory_eval with
       eprintf "Option '--eval' requires a theory.@.";
       exit 1
   | Some elist ->
-      let l = Str.split (Str.regexp "\\.") x in
+      let l = Strings.split '.' x in
       Queue.push (x, l) elist
 
 let add_opt_exec x = Queue.push x opt_exec
@@ -563,7 +562,7 @@ let do_exec env fname cin exec =
     let mm, _thm = Mlw_main.read_channel lib [] fname cin in
     let do_exec x =
       let mid,name =
-        match Str.split (Str.regexp "\\.") x with
+        match Strings.split '.' x with
           | [m;i] -> m,i
           | _ ->
             Format.eprintf

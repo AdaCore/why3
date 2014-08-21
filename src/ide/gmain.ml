@@ -1588,7 +1588,7 @@ let run_factory = new GMenu.factory run_menu ~accel_group
 
 let eval const result =
   let msg =
-    match Str.split (Str.regexp "\\.") const with
+    match Strings.split '.' const with
       | [f;m;i] ->
         begin
           let e = env_session () in

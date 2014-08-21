@@ -426,15 +426,14 @@ let element_latex_stat_file f n table dir e =
 
 let element_latex_stat files n table dir e =
   eprintf "Element %s@." e;
-  let re_dot = Str.regexp "\\." in
-  match Str.split re_dot e with
+  match Strings.split '.' e with
     | [] -> ()
     | f :: r ->
       let found = ref false in
       S.PHstr.iter
         (fun fname file ->
           let fname = Filename.basename fname in
-          let fname = List.hd (Str.split re_dot fname) in
+          let fname = List.hd (Strings.split '.' fname) in
           if fname = f then
             begin
               found := true;

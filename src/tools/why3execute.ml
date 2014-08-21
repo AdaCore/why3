@@ -20,10 +20,9 @@ let usage_msg = sprintf
 let opt_file = ref None
 let opt_exec = Queue.create ()
 
-let add_opt =
-  let rdot = Str.regexp "\\." in fun x ->
+let add_opt x =
   if !opt_file = None then opt_file := Some x else
-  match Str.split rdot x with
+  match Strings.split '.' x with
   | [m;i] -> Queue.push (m,i) opt_exec
   | _ ->
     Format.eprintf "extra arguments must be of the form 'module.ident'@.";

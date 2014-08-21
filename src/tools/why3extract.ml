@@ -27,9 +27,8 @@ let add_opt_file x =
   Queue.push (Some x, tlist) opt_queue;
   opt_input := Some tlist
 
-let add_opt_theory =
-  let rdot = (Str.regexp "\\.") in fun x ->
-  let l = Str.split rdot x in
+let add_opt_theory x =
+  let l = Strings.split '.' x in
   let p, t = match List.rev l with
     | t::p -> List.rev p, t
     | _ -> assert false

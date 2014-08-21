@@ -33,9 +33,8 @@ let add_opt_file x =
   Queue.push (Some x, tlist) opt_queue;
   opt_input := Some tlist
 
-let add_opt_theory =
-  let rdot = (Str.regexp "\\.") in fun x ->
-  let l = Str.split rdot x in
+let add_opt_theory x =
+  let l = Strings.split '.' x in
   let p, t = match List.rev l with
     | t::p -> List.rev p, t
     | _ -> assert false
@@ -64,7 +63,7 @@ let add_opt_goal x = match !opt_theory with
       eprintf "Option '-G'/'--goal' requires a theory.@.";
       exit 1
   | Some glist ->
-      let l = Str.split (Str.regexp "\\.") x in
+      let l = Strings.split '.' x in
       Queue.push (x, l) glist
 
 let add_opt_trans x = opt_trans := x::!opt_trans

@@ -429,7 +429,7 @@ let print_task printer_args realize fmt task =
       match args with
       | [Theory.MAstr s1; Theory.MAstr _] ->
         let f,id =
-          let l = Strings.rev_split s1 '.' in
+          let l = Strings.rev_split '.' s1 in
           List.rev (List.tl l), List.hd l in
         let th = Env.find_theory printer_args.env f id in
         Mid.add th.Theory.th_name (th, s1) mid
