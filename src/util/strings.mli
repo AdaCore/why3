@@ -13,6 +13,8 @@
 
 val rev_split : string -> char -> string list
 
+val split : string -> char -> string list
+
 val ends_with : string -> string -> bool
 (** test if a string ends with another *)
 

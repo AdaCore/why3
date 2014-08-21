@@ -20,6 +20,8 @@ let rev_split s c =
       | Invalid_argument _ -> ""::acc in
   aux [] 0
 
+let split s c = List.rev (rev_split s c)
+
 let ends_with s suf =
   let rec aux s suf suflen offset i =
     i >= suflen || (s.[i + offset] = suf.[i]

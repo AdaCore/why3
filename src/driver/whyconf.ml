@@ -128,6 +128,43 @@ type config_editor = {
   editor_options : string list;
 }
 
+(** Strategies *)
+
+type config_strategy = {
+  strategy_name : string;
+  strategy_desc : Pp.formatted;
+  strategy_code : string array;
+}
+
+(* a default set of strategies *)
+let default_strategies =
+  List.map
+    (fun (name,desc,instrs) ->
+      let s = ref Rc.empty_section in
+      s := Rc.set_string !s "name" name;
+      s := Rc.set_string !s "desc" desc;
+      for i = 0 to Array.length instrs - 1 do
+        s := Rc.set_string !s ("l" ^ (string_of_int i)) instrs.(i);
+      done;
+      !s)
+    [ "Split", "Split@ conjunctions@ in@ goal", 
+      [|"t split_goal_wp 1"|];
+      "Inline", "Inline@ function@ symbols@ once", 
+      [|"t inline_goal 1"|];
+      "Blaster", "The@ blaster", 
+      [|"c Alt-Ergo,0.95.2 1 1000";
+        "c CVC4,1.4 1 1000";
+        "t split_goal_wp 0";
+        "c Alt-Ergo,0.95.2 10 4000";
+        "c CVC4,1.4 10 4000" |];
+    ]
+
+let get_strategies rc =
+  match get_simple_family rc "strategy" with
+    | [] -> default_strategies
+    | s -> s
+
+(** Main record *)
 
 type main = {
   libdir   : string;      (* "/usr/local/lib/why/" *)
@@ -202,6 +239,7 @@ type config = {
   prover_shortcuts : prover Mstr.t;
   editors   : config_editor Meditor.t;
   provers_upgrade_policy : prover_upgrade_policy Mprover.t;
+  strategies : config_strategy Mstr.t;
 }
 
 let empty_main =
@@ -428,6 +466,32 @@ let load_policy provers acc (_,section) =
         eprintf "[Warning] cannot load a policy: missing field '%s'@." s;
         acc
 
+let load_strategy strategies section =
+  try
+    let name = get_string section "name" in
+    let desc = get_string section "desc" in
+    let desc = Scanf.format_from_string desc "" in
+    let code = ref [] and i = ref 0 in
+    try
+      while true do
+        let instr = get_string section ("l" ^ (string_of_int !i)) in
+        code := instr :: !code;
+        incr i
+      done;
+      assert false
+    with MissingField _ ->
+      Mstr.add
+        name
+        { strategy_name = name;
+          strategy_desc = desc;
+          strategy_code = Array.of_list (List.rev !code);
+        }
+        strategies
+  with
+      MissingField s ->
+        eprintf "[Warning] cannot load a strategy: missing field '%s'@." s;
+        strategies
+
 let load_main dirname section =
   if get_int ~default:0 section "magic" <> magicnumber then
     raise WrongMagicNumber;
@@ -476,6 +540,8 @@ let get_config (filename,rc) =
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
   let policy = List.fold_left (load_policy provers) Mprover.empty policy in
+  let strategies = get_strategies rc in
+  let strategies = List.fold_left load_strategy Mstr.empty strategies in
   { conf_file = filename;
     config    = rc;
     main      = main;
@@ -483,6 +549,7 @@ let get_config (filename,rc) =
     prover_shortcuts = shortcuts;
     editors   = editors;
     provers_upgrade_policy = policy;
+    strategies = strategies;
   }
 
 let default_config conf_file =
@@ -708,6 +775,8 @@ let get_editors c = c.editors
 
 let editor_by_id whyconf id =
   Meditor.find id whyconf.editors
+
+let get_strategies config = config.strategies
 
 (******)
 

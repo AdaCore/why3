@@ -177,6 +177,16 @@ val get_policies : config -> prover_upgrade_policy Mprover.t
 
 val set_policies : config -> prover_upgrade_policy Mprover.t -> config
 
+(** strategies *)
+
+type config_strategy = {
+  strategy_name : string;
+  strategy_desc : Pp.formatted;
+  strategy_code : string array;
+}
+
+val get_strategies : config -> config_strategy Mstr.t
+
 (** filter prover *)
 type filter_prover
 

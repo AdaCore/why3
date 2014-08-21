@@ -129,7 +129,7 @@ let init max =
 let notify_timer_state t continue =
   O.notify_timer_state
     (Queue.length t.actions_queue)
-    (Queue.length t.proof_attempts_queue) 
+    (Queue.length t.proof_attempts_queue)
     (List.length t.running_proofs);
   continue
 
@@ -924,6 +924,86 @@ let convert_unknown_prover =
     | Icall_prover of Whyconf.prover * int * int (** timelimit, memlimit *)
     | Itransform of string * int (** successor state on success *)
     | Igoto of int (** goto state *)
+
+  exception SyntaxError of string
+
+  let parse_instr env max s =
+    match Strings.split s ' ' with
+      | [] -> raise (SyntaxError "unexpected empty instruction")
+      | ["g";n] ->
+        let g =
+          try int_of_string n
+          with Failure _ ->
+            raise
+              (SyntaxError
+                 ("unable to parse goto argument '" ^ n ^ "' as an integer"))
+        in
+        if g < 0 || g > max then 
+          raise
+            (SyntaxError ("goto index " ^ n ^ " is invalid"));
+        Igoto g
+      | "g" :: _ ->
+        raise (SyntaxError "'g' expects exactly one argument")
+      | ["c";p;t;m] ->
+        let p =
+          try
+            let fp = Whyconf.parse_filter_prover p in
+            Whyconf.filter_one_prover env.whyconf fp
+          with Whyconf.ProverNotFound _ ->
+            raise
+              (SyntaxError
+                 ("Prover " ^ p ^ " not installed or not configured"))
+        in
+        let timelimit =
+          try int_of_string t
+          with Failure _ ->
+            raise
+              (SyntaxError
+                 ("unable to parse timelimit argument '" ^ t ^ "'"))
+        in
+        if timelimit <= 0 then 
+          raise
+            (SyntaxError ("timelimit " ^ t ^ " is invalid"));
+        let memlimit =
+          try int_of_string m
+          with Failure _ ->
+            raise
+              (SyntaxError
+                 ("unable to parse memlimit argument '" ^ m ^ "'"))
+        in
+        if memlimit <= 0 then 
+          raise
+            (SyntaxError ("memlimit " ^ m ^ " is invalid"));
+        Icall_prover(p.Whyconf.prover,timelimit,memlimit)
+      | "c" :: _ ->
+        raise (SyntaxError "'c' expects exactly three arguments")
+      | ["t";t;n] ->
+        let () =
+          try 
+            let _ = Trans.lookup_transform t env.env in
+            ()
+          with Trans.UnknownTrans _ ->
+          try 
+            let _ = Trans.lookup_transform_l t env.env in
+            ()
+          with Trans.UnknownTrans _->
+            raise (SyntaxError ("transformation '" ^ t ^ "' is unknown"))
+        in
+        let g =
+          try int_of_string n
+          with Failure _ ->
+            raise
+              (SyntaxError
+                 ("unable to parse argument '" ^ n ^ "' as an integer"))
+        in
+        if g < 0 || g > max then 
+          raise
+            (SyntaxError ("index " ^ n ^ " is invalid"));
+        Itransform(t,g)
+      | "t" :: _ ->
+        raise (SyntaxError "'t' expects exactly one argument")
+      | s :: _ ->
+        raise (SyntaxError ("unknown instruction '" ^ s ^ "'"))
 
   type strategy = instruction array
 

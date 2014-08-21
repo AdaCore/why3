@@ -1447,20 +1447,49 @@ let test_strategy () =
     M.Icall_prover(cvc4.Whyconf.prover,10,4000);
   |]
 
-let strategies () : 
-    (string * Pp.formatted * M.strategy * 
+(*
+let strategies () :
+    (string * Pp.formatted * M.strategy *
        (string * Gdk.keysym) option) list =
-  [ "Split", "Splits@ conjunctions@ of@ the@ goal", split_strategy, 
+  [ "Split", "Splits@ conjunctions@ of@ the@ goal", split_strategy,
     Some("s",GdkKeysyms._s);
     "Inline", "Inline@ defined@ symbols", inline_strategy,
     Some("i",GdkKeysyms._i);
     "Blaster", "Blaster@ strategy", test_strategy (),
     Some("b",GdkKeysyms._b);
   ]
+*)
 
+let loaded_strategies = ref [] 
+
+let strategies () =
+  match !loaded_strategies with
+    | [] ->
+      let config = gconfig.Gconfig.config in
+      let strategies = Whyconf.get_strategies config in
+      let strategies =
+        Mstr.fold_left
+          (fun acc _ st ->
+            let name = st.Whyconf.strategy_name in
+            try
+              let code = st.Whyconf.strategy_code in
+              let len = Array.length code in
+              let code = Array.map (M.parse_instr (env_session()) len) code in
+              Format.eprintf "Strategy '%s' loaded.@." name;
+              (name, st.Whyconf.strategy_desc,code, None) :: acc
+            with M.SyntaxError msg ->
+              Format.eprintf "Loading strategy '%s' failed: %s@." name msg;
+              acc)
+          []
+          strategies
+      in
+      loaded_strategies := strategies;
+      strategies
+    | l -> l
 
 
 let escape_text = Glib.Markup.escape_text
+
 let sanitize_markup x =
   let remove = function
     | '_' -> "__"
@@ -1471,7 +1500,7 @@ let string_of_desc desc =
   let print_trans_desc fmt (x,r) =
     fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
   in Pp.string_of print_trans_desc desc
-  
+
 let () =
   let add_submenu_transform name get_trans () =
     let submenu = tools_factory#add_submenu name in
@@ -1513,7 +1542,7 @@ let () =
   let iter (name,desc,strat,k) =
     let callback () = apply_strategy_on_selection strat in
     let ii = submenu#add_image_item
-      ~label:(sanitize_markup name) ~callback () 
+      ~label:(sanitize_markup name) ~callback ()
     in
     let name =
       match k with
@@ -1532,7 +1561,7 @@ let () =
 
 let () =
   let iter (name,desc,strat,k) =
-    let b = GButton.button ~packing:strategies_box#add 
+    let b = GButton.button ~packing:strategies_box#add
       ~label:(sanitize_markup name) ()
     in
     let name =
@@ -2150,8 +2179,8 @@ let () =
     if key = GdkKeysyms._x then begin confirm_remove_selection (); true end else
     (* strategy shortcuts *)
     let rec iter l =
-      match l with 
-        | [] -> false (* otherwise, use the default event handler *) 
+      match l with
+        | [] -> false (* otherwise, use the default event handler *)
         | (_,_,_,None) :: rem -> iter rem
         | (_,_,s,Some(_,k)) :: rem ->
           if key = k then begin apply_strategy_on_selection s; true end else

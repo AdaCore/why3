@@ -319,6 +319,10 @@ module Make(O: OBSERVER) : sig
 
   type strategy = instruction array
 
+  exception SyntaxError of string
+
+  val parse_instr : O.key Session.env_session -> int -> string -> instruction
+
   val run_strategy_on_goal:
     O.key Session.env_session -> t ->
     strategy -> O.key Session.goal -> unit
