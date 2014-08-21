@@ -1873,6 +1873,7 @@ DISTRIB_TAR = $(DISTRIB_DIR).tar.gz
 # symbolic links in share/ ?
 
 EXTRA_DIST = configure doc/manual.pdf
+NODIST = examples/in_progress/ misc/ ROADMAP DEVELOPER.readme
 
 dist: $(EXTRA_DIST)
 	rm -rf $(DISTRIB_TAR) $(DISTRIB_DIR)
@@ -1880,9 +1881,7 @@ dist: $(EXTRA_DIST)
 	for d in `git ls-tree -d -r --name-only HEAD`; do mkdir $(DISTRIB_DIR)/$$d; done
 	for f in `git ls-tree -r --name-only HEAD` $(EXTRA_DIST); do cp $$f $(DISTRIB_DIR)/$$f; done
 	rm `find $(DISTRIB_DIR) -name .gitignore`
-	rm -rf  $(DISTRIB_DIR)/examples/in_progress
-	rm -rf  $(DISTRIB_DIR)/misc
-	cd $(DISTRIB_DIR); rm ROADMAP DEVELOPER.readme
+	cd $(DISTRIB_DIR); rm -rf $(NODIST)
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 
 
