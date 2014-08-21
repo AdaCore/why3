@@ -919,7 +919,7 @@ let set_archive_proofs b () =
     (get_selected_row_references ())
 
 (*****************************************************)
-(* method: split selected goals *)
+(* method: apply strategy on selected goals *)
 (*****************************************************)
 
 
@@ -932,6 +932,19 @@ let apply_trans_on_selection tr =
           tr
           a)
     (get_selected_row_references ())
+
+
+let apply_strategy_on_selection str =
+  List.iter
+    (fun r ->
+      let a = get_any_from_row_reference r in
+      match a with
+        | S.Goal g ->
+          M.run_strategy_on_goal (env_session()) sched
+            str g
+        | _ -> ())
+    (get_selected_row_references ())
+
 
 (*****************************************************)
 (* method: bisect goal *)
@@ -1421,6 +1434,28 @@ let split_selected_goals () =
 let inline_selected_goals () =
   apply_trans_on_selection inline_transformation
 
+
+
+let run_test_strategy () =
+  let strat =
+    let config = gconfig.Gconfig.config in
+    let altergo =
+      let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+      Whyconf.filter_one_prover config fp
+    in
+    let cvc4 =
+      let fp = Whyconf.parse_filter_prover "CVC4" in
+      Whyconf.filter_one_prover config fp
+    in
+    [|
+      M.Icall_prover(altergo.Whyconf.prover,1,1000);
+      M.Icall_prover(cvc4.Whyconf.prover,1,1000);
+      M.Icall_prover(altergo.Whyconf.prover,10,4000);
+      M.Icall_prover(cvc4.Whyconf.prover,10,4000);
+    |]
+  in
+  apply_strategy_on_selection strat
+
 let escape_text = Glib.Markup.escape_text
 let sanitize_markup x =
   let remove = function
@@ -1470,6 +1505,7 @@ let () =
   add_tool_separator ();
   add_tool_item "Split in selection" split_selected_goals;
   add_tool_item "Inline in selection" inline_selected_goals;
+  add_tool_item "Test strategy" run_test_strategy;
   add_gui_item add_non_splitting_1;
   add_gui_item add_non_splitting_2;
   add_gui_item add_splitting;
@@ -1496,6 +1532,17 @@ to the <b>selected goals</b>";
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
     b#connect#pressed ~callback:inline_selected_goals
+  in
+  ()
+
+let () =
+  let b = GButton.button ~packing:transf_box#add ~label:"Test Strategy" () in
+  b#misc#set_tooltip_markup "Apply the strategy <tt>test</tt> \
+to the <b>selected goals</b>";
+  let i = GMisc.image ~pixbuf:(!image_transf) () in
+  let () = b#set_image i#coerce in
+  let (_ : GtkSignal.id) =
+    b#connect#pressed ~callback:run_test_strategy
   in
   ()
 

@@ -310,7 +310,7 @@ let update_session ?release ~allow_obsolete old_session env whyconf  =
   O.reset ();
   let (env_session,_,_) as res =
     update_session ?release
-      ~keygen:O.create ~allow_obsolete old_session env whyconf 
+      ~keygen:O.create ~allow_obsolete old_session env whyconf
   in
   Debug.dprintf debug "Init_session@\n";
   init_session env_session.session;
@@ -491,7 +491,8 @@ let run_external_proof_v2 eS eT a callback =
       end
     | _ -> ()
     end;
-    callback a ap timelimit previous state in
+    callback a ap timelimit previous state 
+  in
   run_external_proof_v3 eS eT a callback
 
 let running = function
@@ -513,7 +514,8 @@ let run_external_proof eS eT ?callback a =
       | Starting -> ()
       | MissingProver -> c a Interrupted
       | MissingFile _ -> c a a.proof_state
-      | StatusChange s -> c a s in
+      | StatusChange s -> c a s 
+  in
   run_external_proof_v2 eS eT a callback
 
 let prover_on_goal eS eT ?callback ~timelimit ~memlimit p g =
@@ -907,6 +909,50 @@ let rec clean = function
 
 let convert_unknown_prover =
   Session_tools.convert_unknown_prover ~keygen:O.create
+
+
+  (** {2 User-defined strategies} *)
+
+  type instruction =
+    | Icall_prover of Whyconf.prover * int * int (** timelimit, memlimit *)
+    | Itransform of string * int (** successor state on success *)
+    | Igoto of int (** goto state *)
+
+  type strategy = instruction array
+
+  let rec exec_strategy es sched pc strat g =
+    if pc < 0 || pc >= Array.length strat then
+      (* halt the strategy *)
+      ()
+    else
+      match Array.get strat pc with
+        | Icall_prover(p,timelimit,memlimit) ->
+          let callback _pa res =
+            match res with
+              | Scheduled | Running -> 
+                (* nothing to do yet *)
+                ()
+              | Done { Call_provers.pr_answer = Call_provers.Valid } ->
+                (* proof succeeded, nothing more to do *)
+                ()
+              | Interrupted | InternalFailure _ | Done _ ->
+                (* proof did not succeed, goto to next step *)
+                let callback () = exec_strategy es sched (pc+1) strat g in
+                schedule_delayed_action sched callback
+              | Unedited | JustEdited -> 
+                (* should not happen *)
+                assert false
+          in
+          prover_on_goal es sched ~callback ~timelimit ~memlimit p g
+        | Itransform(_tr,_pcsuccess) ->
+          assert false (* TODO *)
+        | Igoto pc ->
+          exec_strategy es sched pc strat g
+
+
+  let run_strategy_on_goal es sched strat g =
+    let callback () = exec_strategy es sched 0 strat g in
+    schedule_delayed_action sched callback
 
 end
 
