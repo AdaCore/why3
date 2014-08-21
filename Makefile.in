@@ -1868,80 +1868,9 @@ NAME = why3-@VERSION@
 DISTRIB_DIR = distrib/$(NAME)
 DISTRIB_TAR = $(DISTRIB_DIR).tar.gz
 
-DISTRIB_FILES = Version Makefile.in configure.in configure \
-      src/jessie/Makefile.in \
-      AUTHORS README CHANGES INSTALL OCAML-LICENSE LICENSE \
-      src/config.sh.in \
-      src/*.ml* src/*.dep src/*/*.ml* src/*/*.dep src/*/*.c \
-      plugins/printer/.keepme plugins/*/*.ml* plugins/*/*.dep \
-      lib/why3/META.in lib/why3/why3.ml \
-      lib/why3-call-pvs \
-      doc/version.tex.in doc/manual.pdf \
-      drivers/*.drv drivers/*.gen \
-      examples/*.mlw examples/logic/*.why \
-      examples/tests-provers/*.why examples/check-builtin/*.why \
-      examples/bts/*.why \
-      examples/vacid_0_binary_heaps/*.why \
-      examples/vacid_0_binary_heaps/*.mlw \
-      examples/bitvectors/*.why \
-      examples/foveoos11-cm/*.mlw \
-      examples/*/*.xml examples/*/*/*.xml examples/*/*/*/*.xml \
-      examples/*/*.v   examples/*/*/*.v examples/*/*/*/*.v\
-      examples/*/*.pvs   examples/*/*/*.pvs examples/*/*/*/*.pvs \
-      examples/*/*.prf   examples/*/*/*.prf examples/*/*/*/*.prf \
-      examples/*/*.thy   examples/*/*/*.thy examples/*/*/*/*.thy \
-      examples/use_api/*.ml \
-      theories/*.why \
-      modules/*.mlw \
-      lib/coq/*.v lib/coq/*/*.v lib/coq-tactic/*.v \
-      lib/pvs/*/*.pvs lib/pvs/*/*.prf \
-      lib/isabelle/why3.ML lib/isabelle/ROOT lib/isabelle/*.thy \
-      lib/isabelle/etc lib/isabelle/Tools \
-      lib/ocaml/*.ml lib/ocaml/*.dep \
-      share/provers-detection-data.conf \
-      share/why3session.dtd \
-      share/javascript/*.js share/javascript/*.css \
-      share/javascript/themes/default/*.gif \
-      share/javascript/themes/default/*.png \
-      share/javascript/themes/default/*.css \
-      share/emacs/why3.el share/lang/*.lang \
-      share/images/icons.rc share/images/*.png share/images/*/*.png \
-      share/bash/why3 share/zsh/_why3 share/vim/why3.vim
-
 # TODO?
 # share/zsh ?
 # symbolic links in share/ ?
-
-distrib:: $(DISTRIB_TAR)
-
-rmdistrib:
-	rm -rf $(DISTRIB_DIR)
-
-redistrib: rmdistrib distrib
-
-$(DISTRIB_TAR): doc/manual.pdf
-	@if test -d $(DISTRIB_DIR); then \
-	  echo "Hum... there is already a directory $(NAME)"; \
-	  echo "Please increase the version number"; exit 1; \
-        fi
-	mkdir -p $(DISTRIB_DIR)
-	mkdir -p $(DISTRIB_DIR)/bin
-	mkdir -p $(DISTRIB_DIR)/share
-	mkdir -p $(DISTRIB_DIR)/lib
-	mkdir -p $(DISTRIB_DIR)/lib/plugins
-	mkdir -p $(DISTRIB_DIR)/lib/coq
-	mkdir -p $(DISTRIB_DIR)/lib/coq-tactic
-	mkdir -p $(DISTRIB_DIR)/lib/why3
-	ln -s ../drivers $(DISTRIB_DIR)/share/drivers
-	ln -s ../modules $(DISTRIB_DIR)/share/modules
-	ln -s ../theories $(DISTRIB_DIR)/share/theories
-	cp --parents $(DISTRIB_FILES) $(DISTRIB_DIR)
-	rm -rf $(DISTRIB_DIR)/examples/hoare_logic
-	rm -rf $(DISTRIB_DIR)/examples/misc
-	cd $(DISTRIB_DIR); rm -f $(LIBGENERATED) \
-          $(COQPGENERATED) $(WHY3DOCGENERATED) $(PLUGGENERATED)
-	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
-
 
 EXTRA_DIST = configure doc/manual.pdf
 
