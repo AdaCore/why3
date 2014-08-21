@@ -63,52 +63,14 @@ module type OBSERVER = sig
 
   val notify : key any -> unit
 
-(*
-  val unknown_prover :
-    key env_session -> Whyconf.prover -> Whyconf.prover option
-
-  val replace_prover : key proof_attempt -> key proof_attempt -> bool
-*)
-
   val uninstalled_prover :
     key env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
 
 end
 
+
+
 module Make(O : OBSERVER) = struct
-
-let notify = O.notify
-
-let rec init_any any =
-  O.init (key_any any) any;
-  iter init_any any
-
-let init_session session = session_iter init_any session
-
-(***************************)
-(*     session state       *)
-(***************************)
-
-(* type prover_option = *)
-(*   | Detected_prover of prover_data *)
-(*   | Undetected_prover of string *)
-
-(* let prover_id p = match p with *)
-(*   | Detected_prover p -> p.prover_id *)
-(*   | Undetected_prover s -> s *)
-
-(* dead code
-let theory_name t = t.theory_name
-let theory_key t = t.theory_key
-let verified t = t.theory_verified
-let goals t = t.theory_goals
-let theory_expanded t = t.theory_expanded
-*)
-
-let running = function
-  | Scheduled | Running -> true
-  | Unedited | JustEdited | Interrupted
-  | Done _ | InternalFailure _ -> false
 
 (*************************)
 (*         Scheduler     *)
@@ -118,7 +80,6 @@ type action =
   | Action_proof_attempt of int * int * string option * bool * string *
       Driver.driver * (proof_attempt_status -> unit) * Task.task
   | Action_delayed of (unit -> unit)
-
 
 type timeout_action =
   | Check_prover of (proof_attempt_status -> unit) * Call_provers.prover_call
@@ -147,7 +108,7 @@ type t =
     }
 
 let set_maximum_running_proofs max sched =
- (** TODO dequeue actions if maximum_running_proofs increase *)
+  (* TODO dequeue actions if maximum_running_proofs increase *)
   sched.maximum_running_proofs <- max
 
 let init max =
@@ -228,16 +189,19 @@ let schedule_any_timeout t callback =
   t.running_proofs <- (Any_timeout callback) :: t.running_proofs;
   run_timeout_handler t
 
+(* unused
 let schedule_check t callback =
   Debug.dprintf debug "[Sched] add a new check@.";
   t.running_check <- callback :: t.running_check;
   run_timeout_handler t
+*)
 
 (* idle handler *)
 
 let idle_handler t =
   try
-    if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then begin
+    if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then
+      begin
       match Queue.pop t.actions_queue with
         | Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                                callback,goal) ->
@@ -250,19 +214,21 @@ let idle_handler t =
                 Queue.push (callback,pre_call) t.proof_attempts_queue;
                 run_timeout_handler t
               with e when not (Debug.test_flag Debug.stack_trace) ->
-                Format.eprintf "@[Exception raise in Session.idle_handler:@ \
-%a@.@]"
+                Format.eprintf
+                  "@[Exception raise in Session.idle_handler:@ %a@.@]"
                   Exn_printer.exn_printer e;
                 callback (InternalFailure e)
             end
         | Action_delayed callback -> callback ()
-    end else
+    end
+    else
       ignore (Unix.select [] [] [] 0.1);
     true
-  with Queue.Empty ->
-    t.idle_handler_activated <- false;
-    Debug.dprintf debug "[Sched] idle_handler stopped@.";
-    false
+  with
+    | Queue.Empty ->
+      t.idle_handler_activated <- false;
+      Debug.dprintf debug "[Sched] idle_handler stopped@.";
+      false
     | e when not (Debug.test_flag Debug.stack_trace) ->
       Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
         Exn_printer.exn_printer e;
@@ -331,14 +297,21 @@ let schedule_delayed_action t callback =
   run_idle_handler t
 
 (**************************)
-(*  session function      *)
+(*  session functions     *)
 (**************************)
+
+let notify = O.notify
+
+let rec init_any any = O.init (key_any any) any; iter init_any any
+
+let init_session session = session_iter init_any session
 
 let update_session ?release ~allow_obsolete old_session env whyconf  =
   O.reset ();
   let (env_session,_,_) as res =
     update_session ?release
-      ~keygen:O.create ~allow_obsolete old_session env whyconf in
+      ~keygen:O.create ~allow_obsolete old_session env whyconf 
+  in
   Debug.dprintf debug "Init_session@\n";
   init_session env_session.session;
   res
@@ -353,18 +326,6 @@ let add_file env_session ?format f =
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
-(*
-let rec find_loadable_prover eS prover =
-  (** try the default one *)
-  match load_prover eS prover with
-    | None -> begin
-      (** If its not loadable ask for one*)
-      match O.unknown_prover eS prover with
-        | None -> None
-        | Some prover -> find_loadable_prover eS prover
-    end
-    | Some npc -> Some (prover,npc)
-*)
 
 let find_prover eS a =
   match load_prover eS a.proof_prover with
@@ -532,6 +493,11 @@ let run_external_proof_v2 eS eT a callback =
     end;
     callback a ap timelimit previous state in
   run_external_proof_v3 eS eT a callback
+
+let running = function
+  | Scheduled | Running -> true
+  | Unedited | JustEdited | Interrupted
+  | Done _ | InternalFailure _ -> false
 
 let run_external_proof_v2 eS eT a callback =
   (* Perhaps the test a.proof_archived should be done somewhere else *)
@@ -709,11 +675,6 @@ let check_external_proof eS eT todo a =
       Todo._done todo (g, ap, tl, r) in
   run_external_proof_v2 eS eT a callback
 
-(* dead code
-let check_goal_and_children eS eT todo g =
-  goal_iter_proof_attempt (check_external_proof eS eT todo) g
-*)
-
 let rec goal_iter_proof_attempt_with_release ~release f g =
   let iter g = goal_iter_proof_attempt_with_release ~release f g in
   PHprover.iter (fun _ a -> f a) g.goal_external_proofs;
@@ -852,32 +813,6 @@ let edit_proof_v3 eS sched ~default_editor callback a =
           *)
     ()
   | Some(_,npc,a) ->
-(*
-    let ap = a.proof_prover in
-    match find_loadable_prover eS a.proof_prover with
-      | None -> ()
-        (** Perhaps a new prover *)
-      | Some (nap,npc) ->
-          let g = a.proof_parent in
-          try
-            if nap == ap then raise Not_found;
-            let np_a = PHprover.find g.goal_external_proofs nap in
-            if O.replace_prover np_a a then begin
-              (** The notification will be done by the new proof_attempt *)
-              O.remove np_a.proof_key;
-              raise Not_found end
-          with Not_found ->
-          (** replace [a] by a new_proof attempt if [a.proof_prover] was not
-              loadable *)
-          let a = if nap == ap then a
-            else
-              let a = copy_external_proof
-                ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
-              O.init a.proof_key (Proof_attempt a);
-              a in
-          (** Now [a] is a proof_attempt of the lodable prover [nap] *)
-*)
-
     let editor =
       match npc.prover_config.Whyconf.editor with
       | "" -> default_editor
