@@ -154,11 +154,11 @@ let default_strategies =
       "Inline", "Inline@ function@ symbols@ once", "i",
       [|"t inline_goal 1"|];
       "My mini-blaster", "A@ simple@ blaster", "b",
-      [|"c Alt-Ergo,0.95.2 1 1000";
-        "c CVC4,1.4 1 1000";
+      [|"c Alt-Ergo,0.95.2, 1 1000";
+        "c CVC4,1.4, 1 1000";
         "t split_goal_wp 0";
-        "c Alt-Ergo,0.95.2 10 4000";
-        "c CVC4,1.4 10 4000" |];
+        "c Alt-Ergo,0.95.2, 10 4000";
+        "c CVC4,1.4, 10 4000" |];
     ]
 
 let get_strategies rc =

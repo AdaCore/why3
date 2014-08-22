@@ -949,10 +949,15 @@ let convert_unknown_prover =
           try
             let fp = Whyconf.parse_filter_prover p in
             Whyconf.filter_one_prover env.whyconf fp
-          with Whyconf.ProverNotFound _ ->
-            raise
-              (SyntaxError
-                 ("Prover " ^ p ^ " not installed or not configured"))
+          with
+          | Whyconf.ProverNotFound _ ->
+             raise
+               (SyntaxError
+                  ("Prover " ^ p ^ " not installed or not configured"))
+          | Whyconf.ProverAmbiguity _ ->
+             raise
+               (SyntaxError
+                  ("Prover description " ^ p ^ " is ambiguous"))
         in
         let timelimit =
           try int_of_string t
