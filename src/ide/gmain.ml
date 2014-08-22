@@ -490,7 +490,8 @@ let env_session () =
     | None -> assert false
     | Some e -> e
 
-let task_text t = Pp.string_of Pretty.print_task t
+let task_text t =
+  Pp.string_of ~max_boxes:42 Pretty.print_task t
 
 let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
