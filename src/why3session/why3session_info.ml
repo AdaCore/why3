@@ -15,6 +15,7 @@
 (**************************************************************************)
 
 open Why3
+open Why3session
 open Why3session_lib
 open Whyconf
 open Format
@@ -35,14 +36,14 @@ let spec =
   ("--edited-files", Arg.Set opt_print_edited,
    " edited proof scripts in the session" ) ::
   ("--stats", Arg.Set opt_stats_print,
-   " prints various proofs statistics" ) ::
+   " print various proofs statistics" ) ::
   ("--graph", Arg.Set opt_hist_print,
-   " outputs a graph of the total time needed for \
+   " print a graph of the total time needed for \
      proving a given number of goals for each provers" ) ::
   ("--tree", Arg.Set opt_tree_print,
    " session contents as a tree in textual format" ) ::
   ("--dir", Arg.Set opt_project_dir,
-   " prints the directory of the session" ) ::
+   " print the directory of the session" ) ::
   ("--print0", Arg.Set opt_print0,
    " use the null character instead of newline" ) ::
     common_options
@@ -451,7 +452,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc = "print informations and statistics about a session.";
+    cmd_desc = "print informations and statistics about a session";
     cmd_name = "info";
     cmd_run  = run;
   }

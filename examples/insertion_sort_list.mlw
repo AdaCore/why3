@@ -8,6 +8,7 @@ module InsertionSort
 
   clone relations.TotalPreOrder with type t = elt, predicate rel = le
   clone export list.Sorted      with type t = elt, predicate le  = le
+  use import list.List
   use import list.Permut
 
   let rec insert (x: elt) (l: list elt) : list elt

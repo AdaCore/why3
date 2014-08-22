@@ -2,118 +2,49 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="6"
-  memlimit="1000"/>
- <file name="../all_distinct.mlw"
-  expanded="true">
-  <theory name="AllDistinct"
-   expanded="true">
-   <goal name="WP_parameter all_distinct" expl="VC for all_distinct"
-    sum="9cd8ab30056665aa598b63118511deb6"
-    expanded="true">
-    <label name="expl:VC for all_distinct"/>
-    <transf name="split_goal_wp"
-     expanded="true">
-     <goal name="WP_parameter all_distinct.1" expl="1. array creation size"
-      sum="169dead4ca86d70a93945d7a849a4ddf"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.2" expl="2. postcondition"
-      sum="8d038b937a7ed02cbabc2d03293374eb"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.3" expl="3. loop invariant init"
-      sum="f2a72af703403a88e25a697c4ddfa52a"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.4" expl="4. loop invariant init"
-      sum="ce1590976f77ddc643d8fbdac4674fb8"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.5" expl="5. index in array bounds"
-      sum="f1a081032a623863f610a04ad56ba8cb"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.6" expl="6. type invariant"
-      sum="0a3d6cdd22086870ccdd20acf950acb1"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.7" expl="7. index in array bounds"
-      sum="025eb7e13690ff51b15e41ac95352a8f"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.8" expl="8. postcondition"
-      sum="abed04285d21c6c786ac5473f4cbb8fe"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.9" expl="9. index in array bounds"
-      sum="bd4aee6919c6b60b4e0886f97d37c2c3"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.10"
-      expl="10. loop invariant preservation"
-      sum="b5160b76e1b3e97ac33d9a4547eb9ad5"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.11"
-      expl="11. loop invariant preservation"
-      sum="646cfed7474750745a5a8bffbd5d0672"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_distinct.12" expl="12. postcondition"
-      sum="3010bad4861a5d4b8f8591549feced61"
-      expanded="true">
-      <label name="expl:VC for all_distinct"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<file name="../all_distinct.mlw" expanded="true">
+<theory name="AllDistinct" expanded="true">
+ <goal name="WP_parameter all_distinct" expl="VC for all_distinct" sum="9cd8ab30056665aa598b63118511deb6" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter all_distinct.1" expl="1. array creation size" sum="169dead4ca86d70a93945d7a849a4ddf" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.2" expl="2. postcondition" sum="8d038b937a7ed02cbabc2d03293374eb" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.3" expl="3. loop invariant init" sum="f2a72af703403a88e25a697c4ddfa52a" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.4" expl="4. loop invariant init" sum="ce1590976f77ddc643d8fbdac4674fb8" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.5" expl="5. index in array bounds" sum="f1a081032a623863f610a04ad56ba8cb" expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.6" expl="6. type invariant" sum="0a3d6cdd22086870ccdd20acf950acb1" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.7" expl="7. index in array bounds" sum="025eb7e13690ff51b15e41ac95352a8f" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.8" expl="8. postcondition" sum="abed04285d21c6c786ac5473f4cbb8fe" expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.9" expl="9. index in array bounds" sum="bd4aee6919c6b60b4e0886f97d37c2c3" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.10" expl="10. loop invariant preservation" sum="b5160b76e1b3e97ac33d9a4547eb9ad5" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.11" expl="11. loop invariant preservation" sum="646cfed7474750745a5a8bffbd5d0672" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_distinct.12" expl="12. postcondition" sum="3010bad4861a5d4b8f8591549feced61" expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

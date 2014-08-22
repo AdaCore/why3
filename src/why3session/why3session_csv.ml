@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Why3
+open Why3session
 open Why3session_lib
 open Format
 
@@ -74,23 +75,23 @@ let spec =
      opt_provers := (simple_read_opt_prover s)::!opt_provers),
    " select the provers")::
     ("--data", Arg.Set opt_data,
-     "For all the goals give the time taken by each provers that proved it.")::
+     " for all the goals give the time taken by each provers that proved it")::
     ("--aggregate", Arg.Set opt_aggregate,
      " aggregate all the input into one file named \
        aggregate_data.* and aggregate.*")::
     ("--value-not-valid", Arg.Set_string opt_value_not_valid,
      " value used when the external proof is not valid (only for --data)")::
     ("--valid_by_time", Arg.Set opt_by_time,
-     "Give the evolution of the number of goal proved \
+     " give the evolution of the number of goal proved \
       for each provers (default)")::
     ("--gnuplot", Arg.Symbol (["pdf";"png";"svg";"qt";"gp"],select_gnuplot),
-     "Run gnuplot on the produced file (currently only with --valid_by_time)\
+     " run gnuplot on the produced file (currently only with --valid_by_time)\
       (gp write the gnuplot script used for generating the other case)")::
     ("--gnuplot-x", Arg.Symbol (["time";"goals"],select_gnuplot_x),
-     "Select the data used for the x axes time or number of goal proved \
+     " select the data used for the x axes time or number of goal proved \
       (default time)")::
     ("--output-csv", Arg.Set opt_print_csv,
-     "print the csv, set byt default when --gnuplot is not set")::
+     " print the csv, set by default when --gnuplot is not set")::
     common_options
 
 (** Normal *)
@@ -358,7 +359,7 @@ let run () =
 let cmd =
   { cmd_spec = spec;
     cmd_desc =
-      "output session as a table or graph for simple processing or viewing.";
+      "output session as a table or graph for simple processing or viewing";
     cmd_name = "csv";
     cmd_run  = run;
   }

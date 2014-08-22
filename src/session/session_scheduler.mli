@@ -11,7 +11,8 @@
 
 (** Scheduling operations on sessions and calls to provers *)
 
-(*** One module for calling callback when it's time to *)
+(** {2 One module for calling callback when it's time to} *)
+
 module Todo : sig
   type ('a,'b) todo
 
@@ -29,8 +30,7 @@ module Todo : sig
 
 end
 
-(** Proof sessions *)
-
+open Why3
 open Session
 
 (** {2 Observers signature} *)
@@ -74,31 +74,20 @@ module type OBSERVER = sig
   val notify : key any -> unit
     (** notify modification of node of the session *)
 
-(*
-  val unknown_prover : key env_session -> Whyconf.prover ->
-    Whyconf.prover option
-    (** When a prover must be called on a task but it is currently
-      unknown another prover can be used instead. (the proof_attempt
-      will have the new prover) *)
-
-  val replace_prover : key proof_attempt -> key proof_attempt -> bool
-  (** If the previous function give a prover which already have a
-      proof attempt attached to the goal, this function is fired. If
-      [replace_prover to_be_removed to_be_copied] return [true] the
-      proof_attempt is replaced *)
-*)
-
   val uninstalled_prover :
     key env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
     (** When a prover must be called on a task but it is currently
         not installed, what policy to apply *)
+
 end
 
 (** {2 Main functor} *)
 
 module Make(O: OBSERVER) : sig
-
   (** A session, with the environment, and the configuration *)
+
+  (** {2 Scheduler} *)
+
   type t (** the scheduler environment *)
 
   val set_maximum_running_proofs : int -> t -> unit
@@ -106,10 +95,20 @@ module Make(O: OBSERVER) : sig
   val init : int -> t
   (** [init max] *)
 
-(** {2 static state of a session} *)
+
+(* not used
+  val schedule_check: t -> (unit -> bool) -> unit
+    (** test the check time to time, reschedule it if it returns true *)
+*)
+
+(* used by why3session_run, but it should not as it is a low-level scheduler
+  function *)
+  val schedule_any_timeout: t -> (unit -> bool) -> unit
+(** run it when an action slot/worker/cpu is available. Reschedule it if it
+    return true *)
 
 
-  (** {2 Save and load a state}      *)
+  (** {2 Save and load a state} *)
 
   val update_session :
     ?release:bool ->
@@ -139,24 +138,23 @@ module Make(O: OBSERVER) : sig
         the proof attempts are only scheduled for running, and they
         will be started asynchronously when processors are available.
 
-        ~context_unproved_goals_only indicates if verified goals must be
-        discarded
-    *)
+        ~context_unproved_goals_only indicates if prover must be run
+        on already proved goals or not *)
 
 
   val run_external_proof :
     O.key env_session -> t ->
     ?callback:(O.key proof_attempt -> proof_attempt_status -> unit) ->
     O.key proof_attempt -> unit
-  (** [redo_external_proof es sched ?timelimit p g] run
-  *)
+  (** [run_external_proof es sched ?callback p] reruns an existing
+      proof attempt [p] *)
 
 
   type run_external_status =
-  | Starting
-  | MissingProver
-  | MissingFile of string
-  | StatusChange of proof_attempt_status
+    | Starting
+    | MissingProver
+    | MissingFile of string
+    | StatusChange of proof_attempt_status
 
   val run_external_proof_v3 :
     O.key Session.env_session -> t -> O.key Session.proof_attempt ->
@@ -168,7 +166,7 @@ module Make(O: OBSERVER) : sig
       status]. run_external_proof_v3 don't change the existing proof
       attempt just can add new by O.uninstalled_prover. Be aware since
       the session is not modified there is no test to see if the
-      proof_attempt had already be started *)
+      proof_attempt had already been started *)
 
 
   val prover_on_goal :
@@ -177,7 +175,7 @@ module Make(O: OBSERVER) : sig
     timelimit:int -> memlimit:int ->
     Whyconf.prover -> O.key goal -> unit
   (** [prover_on_goal es sched ?timelimit p g] same as
-      {!redo_external_proof} but create or reuse existing proof_attempt
+      {!redo_external_proof} but creates or reuses existing proof_attempt
   *)
 
 
@@ -196,7 +194,7 @@ module Make(O: OBSERVER) : sig
     (** [transform es sched tr g] applies registered
         transformation [tr] on the given goal.
 
-        If keep_dumb_transformation is false (default)
+        If [keep_dumb_transformation] is false (default)
         and the transformation gives one task equal to [g]
         the transformation is not added (the callback is called with None).
         Otherwise the transformation is added and given to the callback.
@@ -211,27 +209,26 @@ module Make(O: OBSERVER) : sig
     (** [transform es sched tr a] applies registered
         transformation [tr] on all leaf goals under [a].
 
-        ~context_unproved_goals_only indicates if verified goals must be
-        discarded
-    *)
+        [~context_unproved_goals_only] indicates if the transformation
+        must be applied also on alreadt proved goals *)
 
   val edit_proof :
     O.key env_session -> t ->
     default_editor:string ->
     O.key proof_attempt -> unit
-    (** edit the given proof attempt using the appropriate editor *)
+  (** edits the given proof attempt using the appropriate editor *)
 
   val edit_proof_v3 :
     O.key env_session -> t ->
     default_editor:string ->
     callback:(O.key Session.proof_attempt ->  unit) ->
     O.key proof_attempt -> unit
-    (** edit the given proof attempt using the appropriate editor but don't
-        modify the session *)
+  (** edits the given proof attempt using the appropriate editor but
+      don't modify the session *)
 
 
   val cancel : O.key any -> unit
-    (** [cancel a] marks all proofs under [a] as obsolete *)
+  (** [cancel a] marks all proofs under [a] as obsolete *)
 
   val remove_proof_attempt : O.key proof_attempt -> unit
 
@@ -260,13 +257,13 @@ module Make(O: OBSERVER) : sig
     context_unproved_goals_only:bool -> O.key any -> unit
     (** [replay es sched ~obsolete_only ~context_unproved_goals_only a]
         reruns proofs under [a]
-        if obsolete_only is set then does not rerun non-obsolete proofs
-        if context_unproved_goals_only is set then don't rerun proofs
-        already 'valid'
+        if [obsolete_only] is set then does not rerun non-obsolete proofs
+        if [context_unproved_goals_only] is set then don't rerun proofs
+        already 'valid' (FIXME: its the opposite, no?)
     *)
 
   val check_all:
-    ?release:bool -> (** Can all the goal be release at the end? def: false *)
+    ?release:bool -> (** Can all the goals be released at the end? def: false *)
     ?filter:(O.key proof_attempt -> bool) ->
     O.key env_session -> t ->
     callback:((Ident.ident * Whyconf.prover * int * report) list -> unit) ->
@@ -298,12 +295,42 @@ module Make(O: OBSERVER) : sig
   val convert_unknown_prover : O.key env_session -> unit
     (** Same as {!Session_tools.convert_unknown_prover} *)
 
-  val schedule_check: t -> (unit -> bool) -> unit
-    (** test the check time to time, reschedule it if it returns true *)
+  (** {2 User-defined strategies} *)
 
-  val schedule_any_timeout: t -> (unit -> bool) -> unit
-    (** run it when an action slot/worker/cpu is available. Reschedule it if it
-        return true *)
+  (** A strategy is defined by a program declared under a simple
+      assembly-like form: instructions are indexed by integers
+      starting from 0 (the initial instruction counter). An
+      instruction is either
+      1) a call to a prover, with given time and mem limits
+        . on success, the program execution ends
+        . on any other result, the program execution continues on the next index
+      2) a application of a transformation
+        . on success, the execution continues to a explicitly given index
+        . on failure, execution continues on the next index
+      3) a goto instruction.
+
+      the execution halts when reaching a non-existing state
+  *)
+
+  type instruction =
+    | Icall_prover of Whyconf.prover * int * int (** timelimit, memlimit *)
+    | Itransform of string * int (** successor state on success *)
+    | Igoto of int (** goto state *)
+
+  type strategy = instruction array
+
+  exception SyntaxError of string
+
+  val parse_instr : O.key Session.env_session -> int -> string -> instruction
+
+  val run_strategy_on_goal:
+    O.key Session.env_session -> t ->
+    strategy -> O.key Session.goal -> unit
+
+  val run_strategy:
+    O.key Session.env_session -> t ->
+    context_unproved_goals_only:bool ->
+    strategy -> O.key Session.any -> unit
 
 end
 

@@ -1,6 +1,7 @@
 
 (** {1 Relations} *)
 
+(** {2 Relations and orders} *)
 
 theory EndoRelation
   type t
@@ -83,6 +84,8 @@ theory Inverse
   predicate inv_rel (x y : t) = rel y x
 end
 
+(** {2 Closures} *)
+
 theory ReflClosure
   clone export EndoRelation
 
@@ -113,63 +116,7 @@ theory ReflTransClosure
     forall x y z: t. relTR x y -> relTR y z -> relTR x z
 end
 
-(***
-theory PreOrder
-
-  type t
-  predicate le t t
-  axiom Refl : forall x:t. le(x,x)
-  axiom Trans : forall x y z:t. le x y /\ le y z -> le x z
-
-end
-
-theory Equiv
-
-  type t
-
-  predicate eq t t
-
-  clone PreOrder with type t = t, predicate le = eq
-
-  axiom Symm : forall x y:t. eq x y -> eq y x
-
-end
-
-theory TotalPreOrder
-
-  type t
-  predicate le t t
-
-  clone export PreOrder with type t = t, predicate le = le
-
-  axiom Totality: forall x y:t. le x y \/ le y x
-
-end
-*)
-
-(***
-theory TotalOrder
-
-  type t
-
-  predicate eq t t
-  clone Equiv with type t = t, predicate eq = eq
-
-  predicate le t t
-  clone PreOrder with type t = t, predicate le = le
-
-
-  axiom Totality: forall x y:t. eq x y \/ le x y \/ le y x
-
-  predicate lt (x y : t) = le x y /\ not eq x y
-
-  lemma Lt_antirefl: forall x:t. not lt x x
-  lemma Lt_trans: forall x y z:t. lt x y /\ lt y z -> lt x z
-  lemma Le_lt_trans: forall x y z:t. le x y /\ lt y z -> lt x z
-  lemma Lt_le_trans: forall x y z:t. lt x y /\ le y z -> lt x z
-
-end
-*)
+(** {2 Lexicographic ordering} *)
 
 theory Lex
 
@@ -187,16 +134,30 @@ theory Lex
 
 end
 
-(***
+(** {2 Minimum and maximum for total orders} *)
+
 theory MinMax
 
-  clone export TotalOrder
+  type t
+  predicate ge t t
 
-  function min t t : t
-  function max t t : t
+  clone TotalOrder with type t = t, predicate rel = ge
+
+  function max (x y : t) : t = if ge x y then x else y
+  function min (x y : t) : t = if ge x y then y else x
+
+  lemma Max_r : forall x y:t. ge y x -> max x y = y
+  lemma Min_l : forall x y:t. ge y x -> min x y = x
+
+  lemma Max_comm : forall x y:t. max x y = max y x
+  lemma Min_comm : forall x y:t. min x y = min y x
+
+  lemma Max_assoc : forall x y z:t. max (max x y) z = max x (max y z)
+  lemma Min_assoc : forall x y z:t. min (min x y) z = min x (min y z)
 
 end
-*)
+
+(** {2 Well-founded relation} *)
 
 theory WellFounded
 

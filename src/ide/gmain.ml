@@ -17,6 +17,9 @@ open Whyconf
 open Gconfig
 open Stdlib
 open Debug
+
+open Why3session
+
 module C = Whyconf
 
 external reset_gc : unit -> unit = "ml_reset_gc"
@@ -36,54 +39,35 @@ let debug = Debug.lookup_flag "ide_info"
 (* parsing command line *)
 (************************)
 
-let includes = ref []
 let files = Queue.create ()
 let opt_parser = ref None
-let opt_config = ref None
-let opt_extra = ref []
 
 let spec = Arg.align [
-  ("-L",
-   Arg.String (fun s -> includes := s :: !includes),
-   "<dir> Add <dir> to the library search path") ;
-  "--library",
-   Arg.String (fun s -> includes := s :: !includes),
-   " same as -L" ;
-  "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> Read configuration from <file>";
-  "--config", Arg.String (fun s -> opt_config := Some s),
-      " same as -C";
-  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-      "<file> Read additional configuration from <file>";
   "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> Select input format (default: \"why\")";
+      "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
 (*
-  ("-f",
+  "-f",
    Arg.String (fun s -> input_files := s :: !input_files),
-   "<f> add file f to the project (ignored if it is already there)") ;
+   "<file> add file to the project (ignored if it is already there)";
 *)
-  Debug.Args.desc_debug_list;
-  Debug.Args.desc_debug_all;
-  Debug.Args.desc_debug
 ]
 
 let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory> [<file.why> ...]]"
+  "Usage: %s [options] [<file.why>|<project directory>]..."
   (Filename.basename Sys.argv.(0))
 
-let () = Arg.parse spec (fun f -> Queue.add f files) usage_str
+let gconfig = try
+  let config, base_config, env =
+    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
+  if Queue.is_empty files then Whyconf.Args.exit_with_usage spec usage_str;
+  Gconfig.load_config config base_config env;
+  Gconfig.config ()
 
-let () = Gconfig.read_config !opt_config !opt_extra
-
-let () = C.load_plugins (Gconfig.get_main ())
-
-let () =
-  Debug.Args.set_flags_selected ();
-  if Debug.Args.option_list () then exit 0
-
-let () = if Queue.is_empty files then begin Arg.usage spec usage_str; exit 1 end
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "%a@." Exn_printer.exn_printer e;
+    exit 1
 
 let () =
   Debug.dprintf debug "[Info] Init the GTK interface...@?";
@@ -112,9 +96,7 @@ let (why_lang, any_lang) =
     | Some _ as l -> l in
   (why_lang, any_lang)
 
-
-
-(* Borrowed from Frama-C src/gui/source_manager.ml: 
+(* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
 let try_convert s =
   try
@@ -138,22 +120,6 @@ let source_text fname =
     try_convert buf
   with e when not (Debug.test_flag Debug.stack_trace) ->
     "Error while opening or reading file '" ^ fname ^ "':\n" ^ (Printexc.to_string e)
-
-(********************************)
-(* loading WhyIDE configuration *)
-(********************************)
-
-let loadpath = (C.loadpath (Gconfig.get_main ())) @ List.rev !includes
-
-let gconfig =
-  let c = Gconfig.config () in
-  c.env <- Env.create_env loadpath;
-(*
-  let provers = C.get_provers c.Gconfig.config in
-  c.provers <-
-    Util.Mstr.fold (Session.get_prover_data c.env) provers Util.Mstr.empty;
-*)
-  c
 
 (***************)
 (* Main window *)
@@ -242,13 +208,13 @@ let provers_box =
 
 let () = provers_frame#set_resize_mode `PARENT
 
-let transf_frame =
-  GBin.frame ~label:"Transformations" ~shadow_type:`ETCHED_OUT
+let strategies_frame =
+  GBin.frame ~label:"Strategies" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
 
-let transf_box =
+let strategies_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-  ~packing:transf_frame#add ()
+  ~packing:strategies_frame#add ()
 
 let tools_frame =
   GBin.frame ~label:"Tools" ~shadow_type:`ETCHED_OUT
@@ -634,7 +600,7 @@ module MA = struct
      let notify_timer_state =
        let c = ref 0 in
        fun t s r ->
-	 reset_gc ();
+         reset_gc ();
          incr c;
          monitor_waiting#set_text ("Waiting: " ^ (string_of_int t));
          monitor_scheduled#set_text ("Scheduled: " ^ (string_of_int s));
@@ -953,7 +919,7 @@ let set_archive_proofs b () =
     (get_selected_row_references ())
 
 (*****************************************************)
-(* method: split selected goals *)
+(* method: apply strategy on selected goals *)
 (*****************************************************)
 
 
@@ -963,9 +929,19 @@ let apply_trans_on_selection tr =
        let a = get_any_from_row_reference r in
         M.transform (env_session()) sched
           ~context_unproved_goals_only:!context_unproved_goals_only
-          tr
-          a)
+          tr a)
     (get_selected_row_references ())
+
+
+let apply_strategy_on_selection str =
+  List.iter
+    (fun r ->
+      let a = get_any_from_row_reference r in
+      M.run_strategy (env_session()) sched
+        ~context_unproved_goals_only:!context_unproved_goals_only
+        str a)
+    (get_selected_row_references ())
+
 
 (*****************************************************)
 (* method: bisect goal *)
@@ -1436,11 +1412,6 @@ let () =
          b#misc#set_tooltip_markup
            (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goals</b>"
               C.print_prover p);
-
-(* prend de la place pour rien
-         let i = GMisc.image ~pixbuf:(!image_prover) () in
-         let () = b#set_image i#coerce in
-*)
          let (_ : GtkSignal.id) =
            b#connect#pressed
              ~callback:(fun () -> prover_on_selected_goals p)
@@ -1449,19 +1420,119 @@ let () =
   in
   add_gui_item add_item_provers
 
-let split_selected_goals () =
-  apply_trans_on_selection split_transformation
+let split_strategy =
+  [| M.Itransform(split_transformation,1) |]
 
-let inline_selected_goals () =
-  apply_trans_on_selection inline_transformation
+let inline_strategy =
+  [| M.Itransform(inline_transformation,1) |]
+
+let test_strategy () =
+  let config = gconfig.Gconfig.config in
+  let altergo =
+    let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+    Whyconf.filter_one_prover config fp
+  in
+  let cvc4 =
+    let fp = Whyconf.parse_filter_prover "CVC4" in
+    Whyconf.filter_one_prover config fp
+  in
+  [|
+    M.Icall_prover(altergo.Whyconf.prover,1,1000);
+    M.Icall_prover(cvc4.Whyconf.prover,1,1000);
+    M.Itransform(split_transformation,0); (* goto 0 on success *)
+    M.Icall_prover(altergo.Whyconf.prover,10,4000);
+    M.Icall_prover(cvc4.Whyconf.prover,10,4000);
+  |]
+
+(*
+let strategies () :
+    (string * Pp.formatted * M.strategy *
+       (string * Gdk.keysym) option) list =
+  [ "Split", "Splits@ conjunctions@ of@ the@ goal", split_strategy,
+    Some("s",GdkKeysyms._s);
+    "Inline", "Inline@ defined@ symbols", inline_strategy,
+    Some("i",GdkKeysyms._i);
+    "Blaster", "Blaster@ strategy", test_strategy (),
+    Some("b",GdkKeysyms._b);
+  ]
+*)
+
+let loaded_strategies = ref []
+
+let load_shortcut s =
+  if String.length s <> 1 then None else
+  try
+    let key = match String.get s 0 with
+      | 'a' -> GdkKeysyms._a
+      | 'b' -> GdkKeysyms._b
+      | 'c' -> GdkKeysyms._c
+      | 'd' -> GdkKeysyms._d
+      | 'e' -> GdkKeysyms._e
+      | 'f' -> GdkKeysyms._f
+      | 'g' -> GdkKeysyms._g
+      | 'h' -> GdkKeysyms._h
+      | 'i' -> GdkKeysyms._i
+      | 'j' -> GdkKeysyms._j
+      | 'k' -> GdkKeysyms._k
+      | 'l' -> GdkKeysyms._l
+      | 'm' -> GdkKeysyms._m
+      | 'n' -> GdkKeysyms._n
+      | 'o' -> GdkKeysyms._o
+      | 'p' -> GdkKeysyms._p
+      | 'q' -> GdkKeysyms._q
+      | 'r' -> GdkKeysyms._r
+      | 's' -> GdkKeysyms._s
+      | 't' -> GdkKeysyms._t
+      | 'u' -> GdkKeysyms._u
+      | 'v' -> GdkKeysyms._v
+      | 'w' -> GdkKeysyms._w
+      | 'x' -> GdkKeysyms._x
+      | 'y' -> GdkKeysyms._y
+      | 'z' -> GdkKeysyms._z
+      | _ -> raise Not_found
+    in Some(s,key)
+  with Not_found -> None
+
+let strategies () =
+  match !loaded_strategies with
+    | [] ->
+      let config = gconfig.Gconfig.config in
+      let strategies = Whyconf.get_strategies config in
+      let strategies =
+        Mstr.fold_left
+          (fun acc _ st ->
+            let name = st.Whyconf.strategy_name in
+            try
+              let code = st.Whyconf.strategy_code in
+              let len = Array.length code in
+              let shortcut = load_shortcut st.Whyconf.strategy_shortcut in
+              let code = Array.map (M.parse_instr (env_session()) len) code in
+              Format.eprintf "Strategy '%s' loaded.@." name;
+              (name, st.Whyconf.strategy_desc,code, shortcut) :: acc
+            with M.SyntaxError msg ->
+              Format.eprintf "Loading strategy '%s' failed: %s@." name msg;
+              acc)
+          []
+          strategies
+      in
+      let strategies = List.rev strategies in
+      loaded_strategies := strategies;
+      strategies
+    | l -> l
+
 
 let escape_text = Glib.Markup.escape_text
+
 let sanitize_markup x =
   let remove = function
     | '_' -> "__"
     | c -> String.make 1 c in
   Ident.sanitizer remove remove (escape_text x)
 
+let string_of_desc desc =
+  let print_trans_desc fmt (x,r) =
+    fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
+  in Pp.string_of print_trans_desc desc
 
 let () =
   let add_submenu_transform name get_trans () =
@@ -1471,10 +1542,8 @@ let () =
       let callback () = apply_trans_on_selection name in
       let ii = submenu#add_image_item
         ~label:(sanitize_markup name) ~callback () in
-      let print_trans_desc fmt (x,r) =
-        fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r in
-      ii#misc#set_tooltip_text
-        (Pp.string_of print_trans_desc desc) in
+      ii#misc#set_tooltip_text (string_of_desc desc)
+    in
     let trans = get_trans () in
     let trans = List.sort (fun (x,_) (y,_) -> String.compare x y) trans in
     List.iter iter trans
@@ -1497,13 +1566,26 @@ let () =
         let l = Trans.list_transforms () in
         List.filter (fun (x,_) -> x >= "f") l)
   in
-
   add_tool_separator ();
   add_tool_item "Copy" copy_on_selection;
   add_tool_item "Paste" paste_on_selection;
   add_tool_separator ();
-  add_tool_item "Split in selection" split_selected_goals;
-  add_tool_item "Inline in selection" inline_selected_goals;
+  let submenu = tools_factory#add_submenu "Strategies" in
+  let submenu = new GMenu.factory submenu ~accel_group in
+  let iter (name,desc,strat,k) =
+    let callback () = apply_strategy_on_selection strat in
+    let ii = submenu#add_image_item
+      ~label:(sanitize_markup name) ~callback ()
+    in
+    let name =
+      match k with
+        | None -> name
+        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
+    in
+    ii#misc#set_tooltip_text (string_of_desc (name,desc))
+  in
+  List.iter iter (strategies ());
+  add_tool_separator ();
   add_gui_item add_non_splitting_1;
   add_gui_item add_non_splitting_2;
   add_gui_item add_splitting;
@@ -1511,29 +1593,23 @@ let () =
   add_tool_item "Bisect in selection" apply_bisect_on_selection
 
 let () =
-  let b = GButton.button ~packing:transf_box#add ~label:"Split" () in
-  b#misc#set_tooltip_markup "Apply the transformation <tt>split_goal</tt> \
-to the <b>selected goals</b>";
-
-  let i = GMisc.image ~pixbuf:(!image_transf) () in
-  let () = b#set_image i#coerce in
-  let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:split_selected_goals
+  let iter (name,desc,strat,k) =
+    let b = GButton.button ~packing:strategies_box#add
+      ~label:(sanitize_markup name) ()
+    in
+    let name =
+      match k with
+        | None -> name
+        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
+    in
+    b#misc#set_tooltip_markup (string_of_desc (name,desc));
+    let i = GMisc.image ~pixbuf:(!image_transf) () in
+    let () = b#set_image i#coerce in
+    let callback () = apply_strategy_on_selection strat in
+    let (_ : GtkSignal.id) = b#connect#pressed ~callback in
+    ()
   in
-  ()
-
-let () =
-  let b = GButton.button ~packing:transf_box#add ~label:"Inline" () in
-  b#misc#set_tooltip_markup "Apply the transformation <tt>inline_goal</tt> \
-to the <b>selected goals</b>";
-  let i = GMisc.image ~pixbuf:(!image_transf) () in
-  let () = b#set_image i#coerce in
-  let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:inline_selected_goals
-  in
-  ()
-
-
+  List.iter iter (strategies ())
 
 
 (*************)
@@ -1545,7 +1621,7 @@ let run_factory = new GMenu.factory run_menu ~accel_group
 
 let eval const result =
   let msg =
-    match Str.split (Str.regexp "\\.") const with
+    match Strings.split '.' const with
       | [f;m;i] ->
         begin
           let e = env_session () in
@@ -1633,7 +1709,7 @@ let evaluate_window () =
       files_map (0, [])
   in
   let (_store, column) =
-    GTree.store_of_list Gobject.Data.string file_names 
+    GTree.store_of_list Gobject.Data.string file_names
   in
   files_combo#set_text_column column;
   let ( _ : GtkSignal.id) = files_combo#connect#changed
@@ -1886,7 +1962,7 @@ let reload () =
     current_file := "";
     (** create a new environnement
         (in order to reload the files which are "use") *)
-    gconfig.env <- Env.create_env loadpath;
+    gconfig.env <- Env.create_env (Env.get_loadpath gconfig.env);
     (** reload the session *)
     let old_session = (env_session()).S.session in
     let new_env_session,(_:bool),(_:bool) =
@@ -2130,13 +2206,21 @@ let () =
     let key = GdkEvent.Key.keyval ev in
     if key = GdkKeysyms._c then begin clean_selection (); true end else
     if key = GdkKeysyms._e then begin edit_current_proof (); true end else
-    if key = GdkKeysyms._i then begin inline_selected_goals (); true end else
     if key = GdkKeysyms._o then begin cancel_proofs (); true end else
     if key = GdkKeysyms._p then begin run_default_prover (); true end else
     if key = GdkKeysyms._r then begin replay_obsolete_proofs (); true end else
-    if key = GdkKeysyms._s then begin split_selected_goals (); true end else
     if key = GdkKeysyms._x then begin confirm_remove_selection (); true end else
-    false (* otherwise, use the default event handler *) in
+    (* strategy shortcuts *)
+    let rec iter l =
+      match l with
+        | [] -> false (* otherwise, use the default event handler *)
+        | (_,_,_,None) :: rem -> iter rem
+        | (_,_,s,Some(_,k)) :: rem ->
+          if key = k then begin apply_strategy_on_selection s; true end else
+            iter rem
+    in
+    iter (strategies ())
+  in
   ignore (goals_view#event#connect#key_press ~callback)
 
 

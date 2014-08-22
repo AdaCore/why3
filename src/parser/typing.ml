@@ -99,20 +99,13 @@ let find_namespace_ns ns q =
 
 (** Parsing types *)
 
-let create_user_tv =
-  let hs = Hstr.create 17 in fun s ->
-  try Hstr.find hs s with Not_found ->
-  let tv = create_tvsymbol (id_fresh s) in
-  Hstr.add hs s tv;
-  tv
-
 let ty_of_pty ?(noop=true) uc pty =
   let rec get_ty = function
     | PPTtyvar ({id_loc = loc}, true) when noop ->
         Loc.errorm ~loc "Opaqueness@ annotations@ are@ only@ \
           allowed@ in@ function@ and@ predicate@ prototypes"
     | PPTtyvar ({id = x}, _) ->
-        ty_var (create_user_tv x)
+        ty_var (tv_of_string x)
     | PPTtyapp (q, tyl) ->
         let ts = find_tysymbol uc q in
         let tyl = List.map get_ty tyl in
@@ -129,7 +122,7 @@ let ty_of_pty ?(noop=true) uc pty =
 
 let opaque_tvs args =
   let rec opaque_tvs acc = function
-    | PPTtyvar (id, true) -> Stv.add (create_user_tv id.id) acc
+    | PPTtyvar (id, true) -> Stv.add (tv_of_string id.id) acc
     | PPTtyvar (_, false) -> acc
     | PPTtyapp (_, pl)
     | PPTtuple pl -> List.fold_left opaque_tvs acc pl
@@ -409,7 +402,7 @@ let add_types dl th =
       let vl = List.map (fun id ->
         if Hstr.mem vars id.id then
           Loc.error ~loc:id.id_loc (DuplicateTypeVar id.id);
-        let i = create_user_tv id.id in
+        let i = tv_of_string id.id in
         Hstr.add vars id.id i;
         i) d.td_params
       in
@@ -772,7 +765,7 @@ let type_inst th t s =
     | CStsym (loc,p,tvl,pty) ->
       let ts1 = find_tysymbol_ns t.th_export p in
       let id = id_user (ts1.ts_name.id_string ^ "_subst") loc in
-      let tvl = List.map (fun id -> create_user_tv id.id) tvl in
+      let tvl = List.map (fun id -> tv_of_string id.id) tvl in
       let def = Some (ty_of_pty th pty) in
       let ts2 = Loc.try3 ~loc create_tysymbol id tvl def in
       if Mts.mem ts1 s.inst_ts

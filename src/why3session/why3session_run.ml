@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Why3
+open Why3session
 open Why3session_lib
 open Whyconf
 open Session
@@ -357,7 +358,7 @@ let run () =
 
 let cmd =
   { cmd_spec     = spec;
-    cmd_desc     = "run the proof attempt that corresponds to the filter.";
+    cmd_desc     = "run the proof attempt that corresponds to the filter";
     cmd_name     = "run";
     cmd_run      = run;
   }

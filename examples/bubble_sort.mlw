@@ -1,0 +1,63 @@
+
+(* {1 Bubble sort} *)
+
+module BubbleSort
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+  use import array.IntArraySorted
+  use import array.ArraySwap
+  use import array.ArrayPermut
+  use import array.ArrayEq
+
+
+  let bubble_sort (a: array int)
+    ensures { permut_all (old a) a } 
+    ensures { sorted a }
+  = 'Init:
+    for i = length a - 1 downto 1 do
+      invariant { permut_all (at a 'Init) a }
+      invariant { sorted_sub a i (length a) }
+      invariant { forall k1 k2: int. 
+        0 <= k1 <= i < k2 < length a -> a[k1] <= a[k2] 
+      }
+      for j = 0 to i - 1 do
+        invariant { permut_all (at a 'Init) a }
+        invariant { sorted_sub a i (length a) }
+        invariant { forall k1 k2: int. 
+          0 <= k1 <= i < k2 < length a -> a[k1] <= a[k2] 
+        }
+        invariant { forall k. 0 <= k <= j -> a[k] <= a[j] }
+        if a[j] > a[j+1] then swap a j (j+1);
+      done;
+    done
+
+  let test1 () =
+    let a = make 3 0 in
+    a[0] <- 7; a[1] <- 3; a[2] <- 1; 
+    bubble_sort a;
+    a
+
+  let test2 () ensures { result.length = 8 } =
+    let a = make 8 0 in
+    a[0] <- 53; a[1] <- 91; a[2] <- 17; a[3] <- -5;
+    a[4] <- 413; a[5] <- 42; a[6] <- 69; a[7] <- 6;
+    bubble_sort a;
+    a
+
+  exception BenchFailure
+
+  let bench () raises { BenchFailure -> true } =
+    let a = test2 () in
+    if a[0] <> -5 then raise BenchFailure;
+    if a[1] <> 6 then raise BenchFailure;
+    if a[2] <> 17 then raise BenchFailure;
+    if a[3] <> 42 then raise BenchFailure;
+    if a[4] <> 53 then raise BenchFailure;
+    if a[5] <> 69 then raise BenchFailure;
+    if a[6] <> 91 then raise BenchFailure;
+    if a[7] <> 413 then raise BenchFailure;
+    a
+
+end

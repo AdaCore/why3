@@ -2,121 +2,58 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
- <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10"
-  memlimit="1000"/>
- <prover id="2" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
- <prover id="3" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
- <file name="../lcp.mlw"
-  expanded="true">
-  <theory name="LCP"
-   expanded="true">
-   <goal name="not_eqseq" sum="bd6c0f511baac2738ea601908ac93895"
-    expanded="true">
-    <proof prover="1">
-     <result status="valid" time="0.02"/>
-    </proof>
+<prover id="0" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="2" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
+<file name="../lcp.mlw" expanded="true">
+<theory name="LCP" expanded="true">
+ <goal name="not_eqseq" sum="bd6c0f511baac2738ea601908ac93895" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter lcp" expl="VC for lcp" sum="0096a636cf83295f7dd482fcdd19bbf4" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter lcp.1" expl="1. loop invariant init" sum="026c6ff354191d6901b83635b450a6a3">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter lcp.2" expl="2. index in array bounds" sum="f1ae67ae437ffdae335ce1323e46353f">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter lcp.3" expl="3. index in array bounds" sum="8f4ed4b6417f6ee3d331788575e36202">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter lcp.4" expl="4. loop invariant preservation" sum="964989f6ed3c292e99d38e43e6a471cc">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter lcp.5" expl="5. loop variant decrease" sum="3d93cd5c985f4a774bef64fed1dae1c9">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter lcp.6" expl="6. postcondition" sum="952ba4e8ce3873613cf5e21967a5b14d">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter lcp.7" expl="7. postcondition" sum="e3e1ed23ca67f40f8e5d48e565623aa3" expanded="true">
+  <transf name="inline_goal" expanded="true">
+   <goal name="WP_parameter lcp.7.1" expl="1. postcondition" sum="672d984ee102a56ae69f0b4d9ba531da" expanded="true">
+   <proof prover="0"><result status="valid" time="0.18"/></proof>
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter lcp" expl="VC for lcp"
-    sum="0096a636cf83295f7dd482fcdd19bbf4"
-    expanded="true">
-    <label name="expl:VC for lcp"/>
-    <transf name="split_goal_wp"
-     expanded="true">
-     <goal name="WP_parameter lcp.1" expl="1. loop invariant init"
-      sum="026c6ff354191d6901b83635b450a6a3">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter lcp.2" expl="2. index in array bounds"
-      sum="f1ae67ae437ffdae335ce1323e46353f">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter lcp.3" expl="3. index in array bounds"
-      sum="8f4ed4b6417f6ee3d331788575e36202">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter lcp.4" expl="4. loop invariant preservation"
-      sum="964989f6ed3c292e99d38e43e6a471cc">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter lcp.5" expl="5. loop variant decrease"
-      sum="3d93cd5c985f4a774bef64fed1dae1c9">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter lcp.6" expl="6. postcondition"
-      sum="952ba4e8ce3873613cf5e21967a5b14d">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter lcp.7" expl="7. postcondition"
-      sum="e3e1ed23ca67f40f8e5d48e565623aa3"
-      expanded="true">
-      <label name="expl:VC for lcp"/>
-      <transf name="inline_goal"
-       expanded="true">
-       <goal name="WP_parameter lcp.7.1" expl="1. postcondition"
-        sum="672d984ee102a56ae69f0b4d9ba531da"
-        expanded="true">
-        <label name="expl:VC for lcp"/>
-        <proof prover="0">
-         <result status="valid" time="0.18"/>
-        </proof>
-        <proof prover="2">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="3">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter lcp.8" expl="8. postcondition"
-      sum="0610781d61071320d54804ab8dabc680">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter lcp.9" expl="9. postcondition"
-      sum="28a148fc138695618c176e04f4928e3d">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter lcp.10" expl="10. postcondition"
-      sum="f57d00ecce8de0a8b7b8c44ddf714323">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter lcp.11" expl="11. postcondition"
-      sum="55c3d678210789a72e87e2fa4ce7e38e">
-      <label name="expl:VC for lcp"/>
-      <proof prover="1" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+  <goal name="WP_parameter lcp.8" expl="8. postcondition" sum="0610781d61071320d54804ab8dabc680">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter lcp.9" expl="9. postcondition" sum="28a148fc138695618c176e04f4928e3d">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter lcp.10" expl="10. postcondition" sum="f57d00ecce8de0a8b7b8c44ddf714323">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter lcp.11" expl="11. postcondition" sum="55c3d678210789a72e87e2fa4ce7e38e">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -35,14 +35,20 @@ module type S =
     type t
 
     val hashcons : t -> t
-      (** [hashcons n] hash-cons the value [n] i.e. returns
-          any existing value in the table equal to [n], if any;
-          otherwise, creates a new value with function [tag], stores it
-          in the table and returns it.
-      *)
+      (** [hashcons n] hash-cons value [n] i.e. returns any existing
+          value in the table equal to [n], if any; otherwise, creates
+          a new value with function [tag], stores it in the table and
+          returns it. *)
+
+    val unique : t -> t
+      (** [unique n] registers the new value [n] without hash-consing.
+          This should be used in case where the value is guaranteed to
+          be unique, i.e. not equal to any other value, old or future.
+          Unique values are not visited by [iter]. *)
 
     val iter : (t -> unit) -> unit
-      (** [iter f] iterates [f] over all elements of the table . *)
+      (** [iter f] iterates [f] over all elements of the table. *)
+
     val stats : unit -> int * int * int * int * int * int
       (** Return statistics on the table.  The numbers are, in order:
           table length, number of entries, sum of bucket lengths,

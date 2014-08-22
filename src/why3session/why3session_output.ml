@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Why3
+open Why3session
 open Why3session_lib
 open Session
 open Format
@@ -28,9 +29,9 @@ let opt_output_dir = ref None
 
 let spec =
   ["--output", Arg.String (fun s -> opt_output_dir := Some s),
-   " Set the directory where to output the files";
+   " set the directory where to output the files";
    "-o", Arg.String (fun s -> opt_output_dir := Some s),
-   " Same as --output"
+   " same as --output"
   ]@
     (force_obsolete_spec @ filter_spec @ common_options)
 
@@ -104,7 +105,7 @@ let run () =
 
 let cmd =
   { cmd_spec     = spec;
-    cmd_desc     = "output file send to the prover.";
+    cmd_desc     = "output file send to the prover";
     cmd_name     = "output";
     cmd_run      = run;
   }

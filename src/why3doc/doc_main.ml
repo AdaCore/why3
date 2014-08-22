@@ -20,7 +20,6 @@ let usage_msg = sprintf
   "Usage: %s [options...] [files...]"
   (Filename.basename Sys.argv.(0))
 
-let opt_loadpath = ref []
 let opt_output = ref None
 let opt_index = ref None (* default behavior *)
 let opt_title = ref None
@@ -28,33 +27,25 @@ let opt_body = ref false
 let opt_queue = Queue.create ()
 
 let option_list = Arg.align [
-  "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> Add <dir> to the library search path";
   "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir> Print files in <dir>";
+      "<dir> print files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o";
   "--stdlib-url", Arg.String Doc_def.set_stdlib_url,
-      "<url> Add links to <url> for files found on loadpath";
+      "<url> add links to <url> for files found on loadpath";
   "--index", Arg.Unit (fun () -> opt_index := Some true),
-    " generates an index file index.html";
+    " generate an index file index.html";
   "--no-index", Arg.Unit (fun () -> opt_index := Some false),
     " do not generate an index file index.html";
   "--title", Arg.String (fun s -> opt_title := Some s),
-    " <title> Set a title for the index page";
+    " <title> set a title for the index page";
   "--body-only", Arg.Set opt_body,
-    " Only produce the body of the HTML document";
+    " only produce the body of the HTML document";
 ]
 
-let add_opt_file x = Queue.add x opt_queue
-
-let () =
-  Arg.parse option_list add_opt_file usage_msg;
-  let config = Whyconf.read_config None in
-  let main = Whyconf.get_main config in
-  opt_loadpath := List.rev_append !opt_loadpath (Whyconf.loadpath main);
-  (* Doc_def.set_loadpath !opt_loadpath; *)
-  Doc_def.set_output_dir !opt_output
+let _,_,env =
+  Whyconf.Args.initialize option_list
+    (fun x -> Queue.add x opt_queue) usage_msg
 
 let index = match !opt_index with
   | Some b -> b
@@ -96,7 +87,7 @@ let print_file fname =
 let () =
   (* Queue.iter Doc_def.add_file opt_queue; *)
   try
-    let env = Env.create_env !opt_loadpath in
+    Doc_def.set_output_dir !opt_output;
     (* process files *)
     Queue.iter (do_file env) opt_queue;
     Queue.iter print_file opt_queue;

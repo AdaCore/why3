@@ -2,614 +2,275 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC4" version="1.2" timelimit="15" memlimit="1000"/>
- <prover id="1" name="CVC3" version="2.4.1" timelimit="20" memlimit="0"/>
- <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10"
-  memlimit="1000"/>
- <prover id="3" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
- <prover id="4" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
- <prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
- <prover id="6" name="Z3" version="3.2" timelimit="10" memlimit="0"/>
- <prover id="7" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
- <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5"
-  memlimit="4000"/>
- <prover id="9" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
- <file name="../vstte12_tree_reconstruction.mlw"
-  expanded="true">
-  <theory name="Tree"
-   expanded="true">
-   <goal name="depths_head"
-    sum="1e02adb939ddef7bbb7f6adb92349fce">
-    <proof prover="7"
-     edited="vstte12_tree_reconstruction_Tree_depths_head_1.v">
-     <result status="valid" time="1.05"/>
-    </proof>
+<prover id="0" name="CVC4" version="1.2" timelimit="15" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="20" memlimit="0"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="3" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="6" name="Z3" version="3.2" timelimit="10" memlimit="0"/>
+<prover id="7" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
+<prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
+<prover id="9" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
+<file name="../vstte12_tree_reconstruction.mlw" expanded="true">
+<theory name="Tree" expanded="true">
+ <goal name="depths_head" sum="1e02adb939ddef7bbb7f6adb92349fce">
+ <proof prover="7" edited="vstte12_tree_reconstruction_Tree_depths_head_1.v"><result status="valid" time="1.05"/></proof>
+ </goal>
+ <goal name="depths_unique" sum="53671fde11f04389b6d83929967d1f5a">
+ <proof prover="7" timelimit="30" edited="vstte12_tree_reconstruction_Tree_depths_unique_1.v"><result status="valid" time="1.11"/></proof>
+ </goal>
+ <goal name="depths_prefix" sum="0f58262dc74f13032cee8ff59aaf453d">
+ <proof prover="7" timelimit="20" edited="vstte12_tree_reconstruction_Tree_depths_prefix_1.v"><result status="valid" time="1.16"/></proof>
+ </goal>
+ <goal name="depths_prefix_simple" sum="402a1ec3019c68788177a952eebf880c">
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="timeout" time="4.97"/></proof>
+ <proof prover="5"><result status="valid" time="0.64"/></proof>
+ <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="4.95"/></proof>
+ <proof prover="9"><result status="valid" time="0.11"/></proof>
+ </goal>
+ <goal name="depths_subtree" sum="0f9ce809f4ce20cbb0aa5b9da7fea21b">
+ <proof prover="7" timelimit="20" edited="vstte12_tree_reconstruction_Tree_depths_subtree_1.v"><result status="valid" time="1.47"/></proof>
+ </goal>
+ <goal name="depths_unique2" sum="0e08b240fa95879b3cc6fa56db2f0b59">
+ <proof prover="7" timelimit="20" edited="vstte12_tree_reconstruction_Tree_depths_unique2_1.v"><result status="valid" time="1.32"/></proof>
+ </goal>
+</theory>
+<theory name="TreeReconstruction" expanded="true">
+ <goal name="WP_parameter build_rec" expl="VC for build_rec" sum="cf07f4fdd3e7c47a7546c6c7a132718e">
+ <transf name="split_goal">
+  <goal name="WP_parameter build_rec.1" expl="1. exceptional postcondition" sum="69aa7485503c212b2e39aaeeb277617a">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter build_rec.2" expl="2. exceptional postcondition" sum="24e8bc84f4df92816bf0cccad529163e">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="timeout" time="4.98"/></proof>
+  </goal>
+  <goal name="WP_parameter build_rec.3" expl="3. postcondition" sum="b6841d3e6e8dbcd1415d397fd24a3435">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter build_rec.4" expl="4. variant decrease" sum="5be9b7837c6507cb800f4eee51c79347">
+  <transf name="split_goal">
+   <goal name="WP_parameter build_rec.4.1" expl="1. variant decrease" sum="5be9b7837c6507cb800f4eee51c79347">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="depths_unique"
-    sum="53671fde11f04389b6d83929967d1f5a">
-    <proof prover="7" timelimit="30"
-     edited="vstte12_tree_reconstruction_Tree_depths_unique_1.v">
-     <result status="valid" time="1.11"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter build_rec.5" expl="5. variant decrease" sum="db4c2df6bb9cd1a8d9a4359c10dc98ae">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter build_rec.6" expl="6. postcondition" sum="8378a6f0a730054ae1065e7cc906b9e8">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter build_rec.7" expl="7. exceptional postcondition" sum="7e24fe9fc6a48bf55eadbec91e8f8b34">
+  <proof prover="7" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_3.v"><result status="valid" time="1.32"/></proof>
+  </goal>
+  <goal name="WP_parameter build_rec.8" expl="8. exceptional postcondition" sum="bdafe56f5626c34d84b89ab891e86923">
+  <proof prover="7" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_4.v"><result status="valid" time="1.18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter build" expl="VC for build" sum="0f1b7fa49df50d6547417d2625f571ab">
+ <transf name="split_goal">
+  <goal name="WP_parameter build.1" expl="1. postcondition" sum="9097c9db0cb35ac2efe57631c9038d90">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter build.2" expl="2. exceptional postcondition" sum="0fa2927b609c9821ba9870e1c680d435">
+  <proof prover="7" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_3.v"><result status="valid" time="1.12"/></proof>
+  </goal>
+  <goal name="WP_parameter build.3" expl="3. exceptional postcondition" sum="d8b432ec6f439f0ada9db5e40917479f">
+  <proof prover="7" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_4.v"><result status="valid" time="1.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Harness" expanded="true">
+ <goal name="WP_parameter harness" expl="VC for harness" sum="76323a7528b7d1868ce8d502f6d43257">
+ <transf name="split_goal">
+  <goal name="WP_parameter harness.1" expl="1. postcondition" sum="996d5d314236670a8e65441c2f2f056d">
+  <proof prover="7" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_3.v"><result status="valid" time="1.08"/></proof>
+  </goal>
+  <goal name="WP_parameter harness.2" expl="2." sum="b589e7180acf159dcd5284e98d0bc528">
+  <proof prover="7" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_4.v"><result status="valid" time="1.15"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter harness2" expl="VC for harness2" sum="f3fd91d3936c57a310c9841b68516555">
+ <proof prover="7" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness2_2.v"><result status="valid" time="1.17"/></proof>
+ </goal>
+</theory>
+<theory name="ZipperBasedTermination" expanded="true">
+ <goal name="WP_parameter tc" expl="VC for tc" sum="e91c740ed46c250049bb671260ad5019">
+ <transf name="split_goal">
+  <goal name="WP_parameter tc.1" expl="1. variant decrease" sum="8082ef1b7318759702974acdb64553ff">
+  <proof prover="2" timelimit="20" memlimit="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.2" expl="2. variant decrease" sum="3476491457da6db75fd0fb8b79bfa883">
+  <proof prover="2" timelimit="20" memlimit="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.3" expl="3. variant decrease" sum="11a3f8eca6c75e19324b03aeda30e0f9">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.4" expl="4. variant decrease" sum="d6fb6a9579116b7917eaaf3cfa3bd984">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.5" expl="5. variant decrease" sum="102960946d8c597622506caa68b88d45">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.05"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="ZipperBased" expanded="true">
+ <goal name="forest_depths_append" sum="dd80cb4deed3f543800dd012bdac4de2">
+ <proof prover="7" edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"><result status="valid" time="1.10"/></proof>
+ </goal>
+ <goal name="g_append" sum="68b4ca596c182dafd17f7dbba293ad58">
+ <proof prover="7" timelimit="20" edited="vstte12_tree_reconstruction_WP_ZipperBased_g_append_1.v"><result status="valid" time="1.59"/></proof>
+ </goal>
+ <goal name="right_nil" sum="c0f9c49aae66cc01d90e959cc15cd847">
+ <proof prover="7" timelimit="29" edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"><result status="valid" time="6.24"/></proof>
+ </goal>
+ <goal name="main_lemma" sum="32f344bdccb8aac93968609484f1a130">
+ <proof prover="7" timelimit="20" edited="vstte12_tree_reconstruction_WP_ZipperBased_main_lemma_1.v"><result status="valid" time="1.26"/></proof>
+ </goal>
+ <goal name="WP_parameter tc" expl="VC for tc" sum="4fffad31f6610e3e46d91b6f89dddbf9">
+ <transf name="split_goal">
+  <goal name="WP_parameter tc.1" expl="1. variant decrease" sum="491f81f4ab634d037f826600ecf980c5">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.2" expl="2. precondition" sum="72384167b9da64239ba519ffa9847457">
+  <transf name="split_goal">
+   <goal name="WP_parameter tc.2.1" expl="1." sum="adaf53b527685b5c04a48e3224f5cbbc">
+   <proof prover="1"><result status="valid" time="0.11"/></proof>
    </goal>
-   <goal name="depths_prefix"
-    sum="0f58262dc74f13032cee8ff59aaf453d">
-    <proof prover="7" timelimit="20"
-     edited="vstte12_tree_reconstruction_Tree_depths_prefix_1.v">
-     <result status="valid" time="1.16"/>
-    </proof>
+   <goal name="WP_parameter tc.2.2" expl="2." sum="9a8e9f04c4f04d1c1911337b734758f4">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="depths_prefix_simple"
-    sum="402a1ec3019c68788177a952eebf880c">
-    <proof prover="3">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="4">
-     <result status="valid" time="0.64"/>
-    </proof>
-    <proof prover="5">
-     <result status="timeout" time="4.97"/>
-    </proof>
-    <proof prover="6" timelimit="5" memlimit="1000">
-     <result status="timeout" time="4.95"/>
-    </proof>
-    <proof prover="9">
-     <result status="valid" time="0.11"/>
-    </proof>
+   <goal name="WP_parameter tc.2.3" expl="3." sum="1ae1b7bde089799a0293151750d85ffb">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="depths_subtree"
-    sum="0f9ce809f4ce20cbb0aa5b9da7fea21b">
-    <proof prover="7" timelimit="20"
-     edited="vstte12_tree_reconstruction_Tree_depths_subtree_1.v">
-     <result status="valid" time="1.47"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter tc.3" expl="3. postcondition" sum="0ac41a8a0dd9e696797652713e197fd1">
+  <proof prover="1" timelimit="30"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.4" expl="4. exceptional postcondition" sum="d399ce28f884539c70abf73f4eb7e625">
+  <proof prover="7" timelimit="20" edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_2.v"><result status="valid" time="1.39"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.5" expl="5. variant decrease" sum="8963d6a00a6a7247dca8cfcaa8e11cc9">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.6" expl="6. precondition" sum="2fbeab08f23e8dc69921e8116a57d5c1">
+  <transf name="split_goal">
+   <goal name="WP_parameter tc.6.1" expl="1." sum="71c27f32c6c35aa1a9369e969ca1c804">
+   <proof prover="2" timelimit="20" memlimit="0"><result status="valid" time="0.37"/></proof>
    </goal>
-   <goal name="depths_unique2"
-    sum="0e08b240fa95879b3cc6fa56db2f0b59">
-    <proof prover="7" timelimit="20"
-     edited="vstte12_tree_reconstruction_Tree_depths_unique2_1.v">
-     <result status="valid" time="1.32"/>
-    </proof>
+   <goal name="WP_parameter tc.6.2" expl="2." sum="042a47d159f4dd3cea21dceb0245eb59">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
-  </theory>
-  <theory name="TreeReconstruction"
-   expanded="true">
-   <goal name="WP_parameter build_rec" expl="VC for build_rec"
-    sum="cf07f4fdd3e7c47a7546c6c7a132718e">
-    <label name="expl:VC for build_rec"/>
-    <transf
-     name="split_goal">
-     <goal name="WP_parameter build_rec.1"
-      expl="1. exceptional postcondition"
-      sum="69aa7485503c212b2e39aaeeb277617a">
-      <label name="expl:VC for build_rec"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_rec.2"
-      expl="2. exceptional postcondition"
-      sum="24e8bc84f4df92816bf0cccad529163e">
-      <label name="expl:VC for build_rec"/>
-      <proof prover="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="5">
-       <result status="timeout" time="4.98"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_rec.3" expl="3. postcondition"
-      sum="b6841d3e6e8dbcd1415d397fd24a3435">
-      <label name="expl:VC for build_rec"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_rec.4" expl="4. variant decrease"
-      sum="5be9b7837c6507cb800f4eee51c79347">
-      <label name="expl:VC for build_rec"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter build_rec.4.1" expl="1. variant decrease"
-        sum="5be9b7837c6507cb800f4eee51c79347">
-        <label name="expl:VC for build_rec"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter build_rec.5" expl="5. variant decrease"
-      sum="db4c2df6bb9cd1a8d9a4359c10dc98ae">
-      <label name="expl:VC for build_rec"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_rec.6" expl="6. postcondition"
-      sum="8378a6f0a730054ae1065e7cc906b9e8">
-      <label name="expl:VC for build_rec"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_rec.7"
-      expl="7. exceptional postcondition"
-      sum="7e24fe9fc6a48bf55eadbec91e8f8b34">
-      <label name="expl:VC for build_rec"/>
-      <proof prover="7"
-       edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_3.v">
-       <result status="valid" time="1.32"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build_rec.8"
-      expl="8. exceptional postcondition"
-      sum="bdafe56f5626c34d84b89ab891e86923">
-      <label name="expl:VC for build_rec"/>
-      <proof prover="7"
-       edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_4.v">
-       <result status="valid" time="1.18"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter tc.6.3" expl="3." sum="b20ee4e6a3a082695a1e6343f755352a">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter build" expl="VC for build"
-    sum="0f1b7fa49df50d6547417d2625f571ab">
-    <label name="expl:VC for build"/>
-    <transf
-     name="split_goal">
-     <goal name="WP_parameter build.1" expl="1. postcondition"
-      sum="9097c9db0cb35ac2efe57631c9038d90">
-      <label name="expl:VC for build"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build.2" expl="2. exceptional postcondition"
-      sum="0fa2927b609c9821ba9870e1c680d435">
-      <label name="expl:VC for build"/>
-      <proof prover="7"
-       edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_3.v">
-       <result status="valid" time="1.12"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter build.3" expl="3. exceptional postcondition"
-      sum="d8b432ec6f439f0ada9db5e40917479f">
-      <label name="expl:VC for build"/>
-      <proof prover="7"
-       edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_4.v">
-       <result status="valid" time="1.00"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter tc.6.4" expl="4." sum="141e8e9742c0dd0cf2ac919fcec06cf3">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
-  </theory>
-  <theory name="Harness"
-   expanded="true">
-   <goal name="WP_parameter harness" expl="VC for harness"
-    sum="76323a7528b7d1868ce8d502f6d43257">
-    <label name="expl:VC for harness"/>
-    <transf
-     name="split_goal">
-     <goal name="WP_parameter harness.1" expl="1. postcondition"
-      sum="996d5d314236670a8e65441c2f2f056d">
-      <label name="expl:VC for harness"/>
-      <proof prover="7"
-       edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_3.v">
-       <result status="valid" time="1.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter harness.2" expl="2."
-      sum="b589e7180acf159dcd5284e98d0bc528">
-      <label name="expl:VC for harness"/>
-      <proof prover="7"
-       edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_4.v">
-       <result status="valid" time="1.15"/>
-      </proof>
-     </goal>
-    </transf>
+  </transf>
+  </goal>
+  <goal name="WP_parameter tc.7" expl="7. postcondition" sum="1f7df82f0301ef2df4e03aafd1b609a8">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.13"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.8" expl="8. exceptional postcondition" sum="ea8401418013631af71ba00c41f0923a">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.9" expl="9. postcondition" sum="51a013a1670bd9ce571fee3218ad1054">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.10" expl="10. exceptional postcondition" sum="158fe7741003fb58c82ee41c50bc22ed">
+  <proof prover="1" timelimit="30"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.11" expl="11. variant decrease" sum="431ccd477d479dac3cf9c18e7ec57574">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.12" expl="12. precondition" sum="d4659109cd6d34827f8cf62f6524c4d9">
+  <transf name="split_goal">
+   <goal name="WP_parameter tc.12.1" expl="1." sum="ea227869ac15b658287040ce244f27d7">
+   <proof prover="1"><result status="valid" time="0.11"/></proof>
    </goal>
-   <goal name="WP_parameter harness2" expl="VC for harness2"
-    sum="f3fd91d3936c57a310c9841b68516555">
-    <label name="expl:VC for harness2"/>
-    <proof prover="7"
-     edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness2_2.v">
-     <result status="valid" time="1.17"/>
-    </proof>
+   <goal name="WP_parameter tc.12.2" expl="2." sum="08a01a69b2e36b770c95ea8cd851231b">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
-  </theory>
-  <theory name="ZipperBasedTermination"
-   expanded="true">
-   <goal name="WP_parameter tc" expl="VC for tc"
-    sum="e91c740ed46c250049bb671260ad5019">
-    <label name="expl:VC for tc"/>
-    <transf
-     name="split_goal">
-     <goal name="WP_parameter tc.1" expl="1. variant decrease"
-      sum="8082ef1b7318759702974acdb64553ff">
-      <label name="expl:VC for tc"/>
-      <proof prover="2" timelimit="20" memlimit="0">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.2" expl="2. variant decrease"
-      sum="3476491457da6db75fd0fb8b79bfa883">
-      <label name="expl:VC for tc"/>
-      <proof prover="2" timelimit="20" memlimit="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.3" expl="3. variant decrease"
-      sum="11a3f8eca6c75e19324b03aeda30e0f9">
-      <label name="expl:VC for tc"/>
-      <proof prover="2" timelimit="5">
-       <result status="valid" time="0.07"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.4" expl="4. variant decrease"
-      sum="d6fb6a9579116b7917eaaf3cfa3bd984">
-      <label name="expl:VC for tc"/>
-      <proof prover="2" timelimit="5">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.5" expl="5. variant decrease"
-      sum="102960946d8c597622506caa68b88d45">
-      <label name="expl:VC for tc"/>
-      <proof prover="2" timelimit="5">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter tc.12.3" expl="3." sum="7861872a7de06b5e04f6d3fda9195ce5">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
-  </theory>
-  <theory name="ZipperBased"
-   expanded="true">
-   <goal name="forest_depths_append"
-    sum="dd80cb4deed3f543800dd012bdac4de2">
-    <proof prover="7"
-     edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v">
-     <result status="valid" time="1.10"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter tc.13" expl="13. postcondition" sum="516256d1506462739f2061ff5f955ad8">
+  <proof prover="7" edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_3.v"><result status="valid" time="1.15"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.14" expl="14. exceptional postcondition" sum="c354dfa6e54d3fab4eb657d012ace688">
+  <proof prover="7" timelimit="20" edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_4.v"><result status="valid" time="1.40"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.15" expl="15. variant decrease" sum="b493ba84ab27f3cc0c91970c77c8b39d">
+  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.16" expl="16. precondition" sum="7051d26d53df35aba95d78c81374a617">
+  <transf name="split_goal">
+   <goal name="WP_parameter tc.16.1" expl="1." sum="32d3ad06825beadde2e4e9e2b744bd78">
+   <proof prover="2" timelimit="32" memlimit="0"><result status="valid" time="0.52"/></proof>
    </goal>
-   <goal name="g_append"
-    sum="68b4ca596c182dafd17f7dbba293ad58">
-    <proof prover="7" timelimit="20"
-     edited="vstte12_tree_reconstruction_WP_ZipperBased_g_append_1.v">
-     <result status="valid" time="1.59"/>
-    </proof>
+   <goal name="WP_parameter tc.16.2" expl="2." sum="7564c44aceb95e47020d60afbf41253b">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="right_nil"
-    sum="c0f9c49aae66cc01d90e959cc15cd847">
-    <proof prover="7" timelimit="29"
-     edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v">
-     <result status="valid" time="6.24"/>
-    </proof>
+   <goal name="WP_parameter tc.16.3" expl="3." sum="eb2366af5b93a20f1e9d3a0a88317391">
+   <proof prover="1"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="main_lemma"
-    sum="32f344bdccb8aac93968609484f1a130">
-    <proof prover="7" timelimit="20"
-     edited="vstte12_tree_reconstruction_WP_ZipperBased_main_lemma_1.v">
-     <result status="valid" time="1.26"/>
-    </proof>
+   <goal name="WP_parameter tc.16.4" expl="4." sum="a9ce7e3aefa00687786d7fa2d6aca82e">
+   <proof prover="1"><result status="valid" time="0.12"/></proof>
    </goal>
-   <goal name="WP_parameter tc" expl="VC for tc"
-    sum="4fffad31f6610e3e46d91b6f89dddbf9">
-    <label name="expl:VC for tc"/>
-    <transf
-     name="split_goal">
-     <goal name="WP_parameter tc.1" expl="1. variant decrease"
-      sum="491f81f4ab634d037f826600ecf980c5">
-      <label name="expl:VC for tc"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.2" expl="2. precondition"
-      sum="72384167b9da64239ba519ffa9847457">
-      <label name="expl:VC for tc"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter tc.2.1" expl="1."
-        sum="adaf53b527685b5c04a48e3224f5cbbc">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.11"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.2.2" expl="2."
-        sum="9a8e9f04c4f04d1c1911337b734758f4">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.2.3" expl="3."
-        sum="1ae1b7bde089799a0293151750d85ffb">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter tc.3" expl="3. postcondition"
-      sum="0ac41a8a0dd9e696797652713e197fd1">
-      <label name="expl:VC for tc"/>
-      <proof prover="1" timelimit="30">
-       <result status="valid" time="0.22"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.4" expl="4. exceptional postcondition"
-      sum="d399ce28f884539c70abf73f4eb7e625">
-      <label name="expl:VC for tc"/>
-      <proof prover="7" timelimit="20"
-       edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_2.v">
-       <result status="valid" time="1.39"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.5" expl="5. variant decrease"
-      sum="8963d6a00a6a7247dca8cfcaa8e11cc9">
-      <label name="expl:VC for tc"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.6" expl="6. precondition"
-      sum="2fbeab08f23e8dc69921e8116a57d5c1">
-      <label name="expl:VC for tc"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter tc.6.1" expl="1."
-        sum="71c27f32c6c35aa1a9369e969ca1c804">
-        <label name="expl:VC for tc"/>
-        <proof prover="2" timelimit="20" memlimit="0">
-         <result status="valid" time="0.37"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.6.2" expl="2."
-        sum="042a47d159f4dd3cea21dceb0245eb59">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.6.3" expl="3."
-        sum="b20ee4e6a3a082695a1e6343f755352a">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.6.4" expl="4."
-        sum="141e8e9742c0dd0cf2ac919fcec06cf3">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter tc.7" expl="7. postcondition"
-      sum="1f7df82f0301ef2df4e03aafd1b609a8">
-      <label name="expl:VC for tc"/>
-      <proof prover="1" timelimit="10">
-       <result status="valid" time="0.13"/>
-      </proof>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.8" expl="8. exceptional postcondition"
-      sum="ea8401418013631af71ba00c41f0923a">
-      <label name="expl:VC for tc"/>
-      <proof prover="1" timelimit="10">
-       <result status="valid" time="0.06"/>
-      </proof>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.9" expl="9. postcondition"
-      sum="51a013a1670bd9ce571fee3218ad1054">
-      <label name="expl:VC for tc"/>
-      <proof prover="1" timelimit="10">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.10" expl="10. exceptional postcondition"
-      sum="158fe7741003fb58c82ee41c50bc22ed">
-      <label name="expl:VC for tc"/>
-      <proof prover="1" timelimit="30">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.11" expl="11. variant decrease"
-      sum="431ccd477d479dac3cf9c18e7ec57574">
-      <label name="expl:VC for tc"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.12" expl="12. precondition"
-      sum="d4659109cd6d34827f8cf62f6524c4d9">
-      <label name="expl:VC for tc"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter tc.12.1" expl="1."
-        sum="ea227869ac15b658287040ce244f27d7">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.11"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.12.2" expl="2."
-        sum="08a01a69b2e36b770c95ea8cd851231b">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.12.3" expl="3."
-        sum="7861872a7de06b5e04f6d3fda9195ce5">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter tc.13" expl="13. postcondition"
-      sum="516256d1506462739f2061ff5f955ad8">
-      <label name="expl:VC for tc"/>
-      <proof prover="7"
-       edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_3.v">
-       <result status="valid" time="1.15"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.14" expl="14. exceptional postcondition"
-      sum="c354dfa6e54d3fab4eb657d012ace688">
-      <label name="expl:VC for tc"/>
-      <proof prover="7" timelimit="20"
-       edited="vstte12_tree_reconstruction_WP_ZipperBased_WP_parameter_tc_4.v">
-       <result status="valid" time="1.40"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.15" expl="15. variant decrease"
-      sum="b493ba84ab27f3cc0c91970c77c8b39d">
-      <label name="expl:VC for tc"/>
-      <proof prover="8">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.16" expl="16. precondition"
-      sum="7051d26d53df35aba95d78c81374a617">
-      <label name="expl:VC for tc"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter tc.16.1" expl="1."
-        sum="32d3ad06825beadde2e4e9e2b744bd78">
-        <label name="expl:VC for tc"/>
-        <proof prover="2" timelimit="32" memlimit="0">
-         <result status="valid" time="0.52"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.16.2" expl="2."
-        sum="7564c44aceb95e47020d60afbf41253b">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.16.3" expl="3."
-        sum="eb2366af5b93a20f1e9d3a0a88317391">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.06"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter tc.16.4" expl="4."
-        sum="a9ce7e3aefa00687786d7fa2d6aca82e">
-        <label name="expl:VC for tc"/>
-        <proof prover="1">
-         <result status="valid" time="0.12"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter tc.17" expl="17. postcondition"
-      sum="e33854e691e1b35c08a9b4f712a9c243">
-      <label name="expl:VC for tc"/>
-      <proof prover="1" timelimit="10">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.18" expl="18. exceptional postcondition"
-      sum="e1482d5de9dfcbe15f5d4e5cfa3784d1">
-      <label name="expl:VC for tc"/>
-      <proof prover="1" timelimit="10">
-       <result status="valid" time="0.03"/>
-      </proof>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="6">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.19" expl="19. variant decrease"
-      sum="7447727bdae706853e4b701776f5177c">
-      <label name="expl:VC for tc"/>
-      <proof prover="8">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.20" expl="20. precondition"
-      sum="ba299ca1b15bb881b145dca1ed9b5146">
-      <label name="expl:VC for tc"/>
-      <proof prover="1">
-       <result status="valid" time="0.09"/>
-      </proof>
-      <proof prover="2" timelimit="15">
-       <result status="valid" time="1.62"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.21" expl="21. postcondition"
-      sum="647626399f5b6ddbb3d3f1ce71ee310b">
-      <label name="expl:VC for tc"/>
-      <proof prover="1" timelimit="10">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.22" expl="22. exceptional postcondition"
-      sum="67d2317c9905399c01c3df5dac9f9484">
-      <label name="expl:VC for tc"/>
-      <proof prover="1" timelimit="10">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="6">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter tc.23" expl="23. exceptional postcondition"
-      sum="9ed9af1f18aaf986c808c9c6fcd993b7">
-      <label name="expl:VC for tc"/>
-      <proof prover="1">
-       <result status="valid" time="0.14"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal name="map_leaf_depths"
-    sum="2ec166c5f96a8730e7ca5f971c2b5267">
-    <proof prover="7" timelimit="30"
-     edited="vstte12_tree_reconstruction_WP_ZipperBased_map_leaf_depths_1.v">
-     <result status="valid" time="1.08"/>
-    </proof>
-   </goal>
-   <goal name="map_leaf_only_leaf"
-    sum="87deff56769090b6d46a31e6ac7477b1">
-    <proof prover="7" timelimit="20"
-     edited="vstte12_tree_reconstruction_WP_ZipperBased_map_leaf_only_leaf_1.v">
-     <result status="valid" time="0.94"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter build" expl="VC for build"
-    sum="ffff9d7a0b19d3021dea702b808db942">
-    <label name="expl:VC for build"/>
-    <proof prover="2" timelimit="20" memlimit="0">
-     <result status="valid" time="0.04"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+  <goal name="WP_parameter tc.17" expl="17. postcondition" sum="e33854e691e1b35c08a9b4f712a9c243">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.18" expl="18. exceptional postcondition" sum="e1482d5de9dfcbe15f5d4e5cfa3784d1">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.19" expl="19. variant decrease" sum="7447727bdae706853e4b701776f5177c">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.20" expl="20. precondition" sum="ba299ca1b15bb881b145dca1ed9b5146">
+  <proof prover="1"><result status="valid" time="0.09"/></proof>
+  <proof prover="2" timelimit="15"><result status="valid" time="1.62"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.21" expl="21. postcondition" sum="647626399f5b6ddbb3d3f1ce71ee310b">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.22" expl="22. exceptional postcondition" sum="67d2317c9905399c01c3df5dac9f9484">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter tc.23" expl="23. exceptional postcondition" sum="9ed9af1f18aaf986c808c9c6fcd993b7">
+  <proof prover="1"><result status="valid" time="0.14"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="map_leaf_depths" sum="2ec166c5f96a8730e7ca5f971c2b5267">
+ <proof prover="7" timelimit="30" edited="vstte12_tree_reconstruction_WP_ZipperBased_map_leaf_depths_1.v"><result status="valid" time="1.08"/></proof>
+ </goal>
+ <goal name="map_leaf_only_leaf" sum="87deff56769090b6d46a31e6ac7477b1">
+ <proof prover="7" timelimit="20" edited="vstte12_tree_reconstruction_WP_ZipperBased_map_leaf_only_leaf_1.v"><result status="valid" time="0.94"/></proof>
+ </goal>
+ <goal name="WP_parameter build" expl="VC for build" sum="ffff9d7a0b19d3021dea702b808db942">
+ <proof prover="2" timelimit="20" memlimit="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

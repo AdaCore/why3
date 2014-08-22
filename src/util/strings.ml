@@ -11,7 +11,7 @@
 
 (* useful function on string *)
 
-let rev_split s c =
+let rev_split c s =
   let rec aux acc i =
     try
       let j = String.index_from s i c in
@@ -19,6 +19,8 @@ let rev_split s c =
     with Not_found -> (String.sub s i (String.length s - i))::acc
       | Invalid_argument _ -> ""::acc in
   aux [] 0
+
+let split c s = List.rev (rev_split c s)
 
 let ends_with s suf =
   let rec aux s suf suflen offset i =

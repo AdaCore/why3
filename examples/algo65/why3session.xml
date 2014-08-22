@@ -2,311 +2,138 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5"
-  memlimit="1000"/>
- <file name="../algo65.mlw"
-  expanded="true">
-  <theory name="Algo65"
-   expanded="true">
-   <goal name="WP_parameter find" expl="VC for find"
-    sum="6868a7addea3afd6aefa8d9aa500c4dc"
-    expanded="true">
-    <label name="expl:VC for find"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter find.1" expl="1. precondition"
-      sum="cf061e6b0c714b137f5b85834f75c045">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.2" expl="2. variant decrease"
-      sum="a220fe990bf8270627c276501ad45e38">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.3" expl="3. precondition"
-      sum="82a3df1ed87ce5e4bb60696b5f6a3825">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.4" expl="4. assertion"
-      sum="fca08a55f93b232b4ad0c12ac4cbe9ce">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.5" expl="5. assertion"
-      sum="611a958d5fef40cbafefc98b75bffa4d">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.6" expl="6. assertion"
-      sum="ed9124e274593de98fac324c81bf7245"
-      expanded="true">
-      <label name="expl:VC for find"/>
-      <transf name="split_goal_wp"
-       expanded="true">
-       <goal name="WP_parameter find.6.1" expl="1. assertion"
-        sum="3146622a4f15a5bf2b8b9cb7bf70dd43"
-        expanded="true">
-        <label name="expl:VC for find"/>
-        <proof prover="0" timelimit="6">
-         <result status="valid" time="0.19"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.6.2" expl="2. assertion"
-        sum="e7631e9a86bd4136b65da1d42a82c807">
-        <label name="expl:VC for find"/>
-        <proof prover="0">
-         <result status="valid" time="0.11"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.7" expl="7. variant decrease"
-      sum="d6f051702eae57638697208968e570d5">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.8" expl="8. precondition"
-      sum="a81e1cb1c269da1f11dab3955f3b9f53">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.9" expl="9. assertion"
-      sum="050916e733a8abc8f1240832dc4f8743">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.10" expl="10. assertion"
-      sum="b7afc00bc364084b94495440f0c56cd7">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.11" expl="11. assertion"
-      sum="b3b44a7e1c5e0e4d9cbd64f68acee82b">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.12" expl="12. postcondition"
-      sum="bb5774bdeb0f6de6e33539d629f1fc47">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.13" expl="13. postcondition"
-      sum="ace58a0a0af2452f20ba3cc6bee7a1ff">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.14" expl="14. postcondition"
-      sum="d4274f39a4d9a3988b0a9350791059c7">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.15" expl="15. assertion"
-      sum="23c7795c72accf45e816adc86111d0e6">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.16" expl="16. assertion"
-      sum="46601176c8bce521c2b5e8b3cdef9e46">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.38"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.17" expl="17. postcondition"
-      sum="5ca076829a6dca77ec3295edbc24e302">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.18" expl="18. postcondition"
-      sum="7ae7e503d1f1c56492aadee5e6c148a5">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.19" expl="19. postcondition"
-      sum="d699c7c1c0240e53b960aea5b968334c">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.31"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.20" expl="20. assertion"
-      sum="d51d465d2733ba90f6a8cd9b0d4188d5">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.21" expl="21. assertion"
-      sum="3bd11013b6347e5b0ce603840d0e61a8">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.22" expl="22. variant decrease"
-      sum="60dc3bbdbbe8c13cd4a598f9ca7970e1">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.23" expl="23. precondition"
-      sum="3e017f8cc37735ada2c643ca0277fd48">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.24" expl="24. assertion"
-      sum="7273309b4f11ac8b28fe9cf94cc0d5e9">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.25" expl="25. assertion"
-      sum="e5450e1070053b8b21b5524adc818bc5">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.26" expl="26. assertion"
-      sum="66a97e2afd938ff54fa2e76e2e63d72e"
-      expanded="true">
-      <label name="expl:VC for find"/>
-      <transf name="split_goal_wp"
-       expanded="true">
-       <goal name="WP_parameter find.26.1" expl="1. assertion"
-        sum="17565d374941f5cd2fdfc12fd5b46a2e"
-        expanded="true">
-        <label name="expl:VC for find"/>
-        <proof prover="0" timelimit="6">
-         <result status="valid" time="0.24"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter find.26.2" expl="2. assertion"
-        sum="b8157af81a7f2cea28ee5eba0529e815">
-        <label name="expl:VC for find"/>
-        <proof prover="0">
-         <result status="valid" time="0.25"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter find.27" expl="27. postcondition"
-      sum="4be978c8aa81e1e8d04f01cf77aec93e">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.28" expl="28. postcondition"
-      sum="594f0e3452dfe9da6eb6b5c601022102">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.32"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.29" expl="29. postcondition"
-      sum="81c6d96a20e09585b55e8209e4a60b6c">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.30" expl="30. assertion"
-      sum="a2c453f787c7d4ad06b1832977ba6964">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.31" expl="31. assertion"
-      sum="22301f65968a1948d798fb8f406315f8">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.32" expl="32. postcondition"
-      sum="28eb85680f8896c3847e6248c8cff17f">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.33" expl="33. postcondition"
-      sum="e399b60fde9a3c31959fdc79f480442f">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.34" expl="34. postcondition"
-      sum="4aeacf170cbb5f5cef8b2e7b5c219916">
-      <label name="expl:VC for find"/>
-      <proof prover="0" timelimit="15">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.35" expl="35. postcondition"
-      sum="43bc239a23be62b316053c7f739544a0">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.36" expl="36. postcondition"
-      sum="536d83e81ec3adde250c8e48eaac39e3">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter find.37" expl="37. postcondition"
-      sum="521f1f0810b6fc300bb37910e077f0f5">
-      <label name="expl:VC for find"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
+<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../algo65.mlw" expanded="true">
+<theory name="Algo65" expanded="true">
+ <goal name="WP_parameter find" expl="VC for find" sum="6868a7addea3afd6aefa8d9aa500c4dc" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter find.1" expl="1. precondition" sum="cf061e6b0c714b137f5b85834f75c045">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter find.2" expl="2. variant decrease" sum="a220fe990bf8270627c276501ad45e38">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter find.3" expl="3. precondition" sum="82a3df1ed87ce5e4bb60696b5f6a3825">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.4" expl="4. assertion" sum="fca08a55f93b232b4ad0c12ac4cbe9ce">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.5" expl="5. assertion" sum="611a958d5fef40cbafefc98b75bffa4d">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.6" expl="6. assertion" sum="ed9124e274593de98fac324c81bf7245" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter find.6.1" expl="1. assertion" sum="3146622a4f15a5bf2b8b9cb7bf70dd43" expanded="true">
+   <proof prover="0" timelimit="6"><result status="valid" time="0.19"/></proof>
    </goal>
-  </theory>
- </file>
+   <goal name="WP_parameter find.6.2" expl="2. assertion" sum="e7631e9a86bd4136b65da1d42a82c807">
+   <proof prover="0"><result status="valid" time="0.11"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter find.7" expl="7. variant decrease" sum="d6f051702eae57638697208968e570d5">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.8" expl="8. precondition" sum="a81e1cb1c269da1f11dab3955f3b9f53">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.9" expl="9. assertion" sum="050916e733a8abc8f1240832dc4f8743">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.10" expl="10. assertion" sum="b7afc00bc364084b94495440f0c56cd7">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.11" expl="11. assertion" sum="b3b44a7e1c5e0e4d9cbd64f68acee82b">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.12" expl="12. postcondition" sum="bb5774bdeb0f6de6e33539d629f1fc47">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.13" expl="13. postcondition" sum="ace58a0a0af2452f20ba3cc6bee7a1ff">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter find.14" expl="14. postcondition" sum="d4274f39a4d9a3988b0a9350791059c7">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter find.15" expl="15. assertion" sum="23c7795c72accf45e816adc86111d0e6">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.16" expl="16. assertion" sum="46601176c8bce521c2b5e8b3cdef9e46">
+  <proof prover="0"><result status="valid" time="0.38"/></proof>
+  </goal>
+  <goal name="WP_parameter find.17" expl="17. postcondition" sum="5ca076829a6dca77ec3295edbc24e302">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.18" expl="18. postcondition" sum="7ae7e503d1f1c56492aadee5e6c148a5">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.19" expl="19. postcondition" sum="d699c7c1c0240e53b960aea5b968334c">
+  <proof prover="0"><result status="valid" time="0.31"/></proof>
+  </goal>
+  <goal name="WP_parameter find.20" expl="20. assertion" sum="d51d465d2733ba90f6a8cd9b0d4188d5">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.21" expl="21. assertion" sum="3bd11013b6347e5b0ce603840d0e61a8">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter find.22" expl="22. variant decrease" sum="60dc3bbdbbe8c13cd4a598f9ca7970e1">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.23" expl="23. precondition" sum="3e017f8cc37735ada2c643ca0277fd48">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.24" expl="24. assertion" sum="7273309b4f11ac8b28fe9cf94cc0d5e9">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.25" expl="25. assertion" sum="e5450e1070053b8b21b5524adc818bc5">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter find.26" expl="26. assertion" sum="66a97e2afd938ff54fa2e76e2e63d72e" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter find.26.1" expl="1. assertion" sum="17565d374941f5cd2fdfc12fd5b46a2e" expanded="true">
+   <proof prover="0" timelimit="6"><result status="valid" time="0.24"/></proof>
+   </goal>
+   <goal name="WP_parameter find.26.2" expl="2. assertion" sum="b8157af81a7f2cea28ee5eba0529e815">
+   <proof prover="0"><result status="valid" time="0.25"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter find.27" expl="27. postcondition" sum="4be978c8aa81e1e8d04f01cf77aec93e">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.28" expl="28. postcondition" sum="594f0e3452dfe9da6eb6b5c601022102">
+  <proof prover="0"><result status="valid" time="0.32"/></proof>
+  </goal>
+  <goal name="WP_parameter find.29" expl="29. postcondition" sum="81c6d96a20e09585b55e8209e4a60b6c">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.30" expl="30. assertion" sum="a2c453f787c7d4ad06b1832977ba6964">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.31" expl="31. assertion" sum="22301f65968a1948d798fb8f406315f8">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter find.32" expl="32. postcondition" sum="28eb85680f8896c3847e6248c8cff17f">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.33" expl="33. postcondition" sum="e399b60fde9a3c31959fdc79f480442f">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.34" expl="34. postcondition" sum="4aeacf170cbb5f5cef8b2e7b5c219916">
+  <proof prover="0" timelimit="15"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter find.35" expl="35. postcondition" sum="43bc239a23be62b316053c7f739544a0">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.36" expl="36. postcondition" sum="536d83e81ec3adde250c8e48eaac39e3">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.37" expl="37. postcondition" sum="521f1f0810b6fc300bb37910e077f0f5">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

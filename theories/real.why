@@ -81,14 +81,11 @@ end
 theory MinMax
 
   use import Real
-
-  function min real real : real
-  function max real real : real
-
-  axiom Max_is_ge   : forall x y:real. max x y >= x /\ max x y >= y
-  axiom Max_is_some : forall x y:real. max x y = x \/ max x y = y
-  axiom Min_is_le   : forall x y:real. min x y <= x /\ min x y <= y
-  axiom Min_is_some : forall x y:real. min x y = x \/ min x y = y
+  clone export relations.MinMax with type t = real, predicate ge = (>=),
+    goal TotalOrder.Refl,
+    goal TotalOrder.Trans,
+    goal TotalOrder.Antisymm,
+    goal TotalOrder.Total
 
 end
 

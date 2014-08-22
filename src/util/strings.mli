@@ -11,7 +11,9 @@
 
 (** Useful functions on string *)
 
-val rev_split : string -> char -> string list
+val rev_split : char -> string -> string list
+
+val split : char -> string -> string list
 
 val ends_with : string -> string -> bool
 (** test if a string ends with another *)

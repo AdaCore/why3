@@ -229,7 +229,7 @@ theory FsetInduction
 
   predicate p (set t)
 
-  axiom Induction :
+  lemma Induction :
     (forall s: set t. is_empty s -> p s) ->
     (forall s: set t. p s -> forall t: t.
       not (mem t s) -> p (add t s)) ->
@@ -290,6 +290,49 @@ theory Min
       exists x:elt. mem x s /\ cost p x = min p s
 
 end
+
+(** sum on finite set *)
+theory FsetSum "Sum of the elements of a container limited to a finite set of keys"
+
+  use import int.Int
+  use import Fset as S
+
+  type key
+  type container
+
+  function f container key : int
+  (** [f c k] is the element associated to k in the container [c] *)
+
+  function sum container (set key) : int
+  (** [sum c s] is the sum Sum_{S.mem k s} f c k *)
+
+  axiom Sum_def_empty :
+    forall c : container. sum c S.empty = 0
+
+  axiom Sum_add:
+    forall c : container, s : set key, k: key.
+    not (mem k s) -> sum c (S.add k s) = sum c s + f c k
+
+  lemma Sum_remove:
+    forall c : container, s : set key, k: key.
+    mem k s -> sum c (S.remove k s) = sum c s - f c k
+
+  lemma Sum_def_choose :
+    forall c: container, s:set key.
+     not (S.is_empty s) ->
+      let k = S.choose s in
+      sum c s = f c k + sum c (S.remove k s)
+
+  lemma Sum_transitivity :
+    forall c : container, s1 s2 : set key.
+     sum c (S.union s1 s2) = sum c s1 + sum c s2 - sum c (S.inter s1 s2)
+
+  lemma Sum_eq :
+    forall c1 c2 : container, s : set key.
+    (forall k : key. S.mem k s -> f c1 k = f c2 k) -> sum c1 s = sum c2 s
+
+end
+
 
 (** {2 Sets realized as maps} *)
 

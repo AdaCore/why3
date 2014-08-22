@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Why3
+open Why3session
 open Why3session_lib
 open Session
 open Format
@@ -31,7 +32,7 @@ let spec =
   ("--clean",
    Arg.Unit (fun () -> set_remove Not_valid ();
      set_filter_verified_goal FT_Yes),
-   " Remove unsuccessful proof attempts \
+   " remove unsuccessful proof attempts \
 associated to proved goals (same as --filter-verified-goal --conservative)")::
   ("--interactive",
    Arg.Unit (set_remove Interactive), " ask before replacing proof_attempt")::
@@ -79,7 +80,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc     = "remove proof based on a filter.";
+    cmd_desc     = "remove proof based on a filter";
     cmd_name     = "rm";
     cmd_run      = run;
   }

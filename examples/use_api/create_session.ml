@@ -23,6 +23,8 @@ open Format
 
 (* opening the Why3 library *)
 open Why3
+(* opening the Why3 session library *)
+open Why3session
 
 
 (* access to the Why configuration *)

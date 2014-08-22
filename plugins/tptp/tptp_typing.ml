@@ -482,13 +482,12 @@ and let_defn denv env impl { e_node = n ; e_loc = loc } =
           let t = term denv enw impl e in
           Mstr.add s (SletF (tvl,mvs,vl,t)) env, s
     | _ -> assert false (* impossible *) in
-  let dig vl = function
+  let rec down vl = function
+    | Eqnt (Qforall,ul,d) -> down (vl @ ul) d.e_node
     | Ebin (BOequ,e1,e2) -> dig vl e1 true e2
     | Eequ (e1,e2) -> dig vl e1 false e2
     | _ -> assert false (* impossible *) in
-  match n with
-    | Eqnt (Qforall,vl,d) -> dig vl d.e_node
-    | d -> dig [] d
+  down [] n
 
 and ls_args denv env impl loc fs tvl gl mvs al =
   let rec args tvm tvl al = match tvl,al with

@@ -9,8 +9,8 @@ end
 
 theory Size "number of nodes"
 
-  use export Tree
-  use export int.Int
+  use import Tree
+  use import int.Int
 
   function size (t: tree 'a) : int = match t with
     | Empty -> 0
@@ -25,8 +25,8 @@ end
 
 theory Occ "occurrences in a binary tree"
 
-  use export Tree
-  use export int.Int
+  use import Tree
+  use import int.Int
 
   function occ (x: 'a) (t: tree 'a) : int = match t with
     | Empty      -> 0
@@ -43,8 +43,9 @@ end
 
 theory Inorder "inorder traversal"
 
-  use export Tree
-  use export list.Append
+  use import Tree
+  use import list.List
+  use import list.Append
 
   function inorder (t: tree 'a) : list 'a = match t with
     | Empty -> Nil
@@ -55,8 +56,9 @@ end
 
 theory Preorder "preorder traversal"
 
-  use export Tree
-  use export list.Append
+  use import Tree
+  use import list.List
+  use import list.Append
 
   function preorder (t: tree 'a) : list 'a = match t with
     | Empty -> Nil
@@ -67,8 +69,10 @@ end
 
 theory InorderLength
 
+  use import Tree
   use import Size
   use import Inorder
+  use import list.List
   use import list.Length
 
   lemma inorder_length: forall t: tree 'a. length (inorder t) = size t
@@ -77,7 +81,7 @@ end
 
 theory Zipper "Huet's zipper"
 
-  use export Tree
+  use import Tree
 
   type zipper 'a =
     | Top

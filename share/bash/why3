@@ -62,7 +62,7 @@ _why3()
                 grep -v '\[\(type\|proposition\|integer\)\]' |
                 grep -v '\] \[' | sed -e 's/(flag) //' |
                 sed -e 's/ \[string\]/=/')
-            COMPREPLY=( $(compgen -W "$metas" -- "$cur") )
+            COMPREPLY=( $( compgen -W "$metas" -- "$cur") )
             return 0
             ;;
         -D|--driver)
@@ -79,10 +79,10 @@ _why3()
             ;;
         --add-prover)
             ids=$($1 --list-prover-ids | grep -v '^Known \|^$')
-            COMPREPLY=( $(compgen -W "$ids" -- "$cur") )
+            COMPREPLY=( $( compgen -W "$ids" -- "$cur") )
             return 0
             ;;
-        -smoke-detector|--smoke-detector)
+        --smoke-detector)
             COMPREPLY=( $( compgen -W 'none top deep' -- "$cur" ) )
             return 0
             ;;
@@ -104,27 +104,27 @@ _why3()
             COMPREPLY=( $( compgen -W 'simple jstree' -- "$cur" ) )
             return 0
             ;;
+        session)
+            cmds=$($1 session --help | grep '^  [^-]' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$cmds --help -h" -- "$cur" ) )
+            return 0
+            ;;
     esac
 
-    if [[ $cword -eq 1 && "$1" == *why3session* ]] ; then
-        cmds=$($1 --help 2>&1 | tail -n +4 | head -n -2 | cut -d ' ' -f 1)
-        COMPREPLY=( $( compgen -W "$cmds -v --version -h --help" -- "$cur" ) )
+    if [ $cword -eq 1 ] ; then
+        cmds=$($1 --help 2>&1 | grep '^  [^ ]' | cut -d ' ' -f 3)
+        COMPREPLY=( $( compgen -W "$cmds" -- "$cur" ) )
         return 0
     fi
 
     _filedir
 
     case "$cur" in
-        -*) help="--help" ; [[ "$1" == *why3session* ]] && help="${words[1]} --help"
-            COMPREPLY+=( $( compgen -W '$( _parse_help "$1" "$help" )' -- "$cur" ) )
+        -*) words[cword]="--help"
+            opts=$(${words[@]} 2>/dev/null | grep '^  -' | cut -d ' ' -f 3)
+            COMPREPLY=( $( compgen -W "$opts" -- "$cur" ) )
             return 0
             ;;
     esac
 
-} && complete -F _why3 \
-    why3 why3ml why3ide why3config why3doc why3replay why3session \
-    why3.opt why3ml.opt why3ide.opt why3config.opt why3doc.opt \
-    why3replay.opt why3session.opt \
-    why3.byte why3ml.byte why3ide.byte why3config.byte why3doc.byte \
-    why3replay.byte why3session.byte
-
+} && complete -F _why3 why3 why3.opt why3.byte

@@ -63,10 +63,10 @@ val get_conf_file : config -> string
 (** {2 Main section} *)
 type main
 
-val get_main    : config  -> main
+val get_main : config -> main
 (** [get_main config] get the main section stored in the Rc file *)
 
-val set_main    : config -> main                 -> config
+val set_main : config -> main -> config
 (** [set_main config main] replace the main section by the given one *)
 
 val libdir: main -> string
@@ -87,11 +87,11 @@ val load_plugins : main -> unit
 
 (** {3 Prover's identifier} *)
 
-type prover =
-    { prover_name : string; (* "Alt-Ergo" *)
-      prover_version : string; (* "2.95" *)
-      prover_altern : string; (* "special" *)
-    }
+type prover = {
+  prover_name : string; (* "Alt-Ergo" *)
+  prover_version : string; (* "2.95" *)
+  prover_altern : string; (* "special" *)
+}
     (** record of necessary data for a given external prover *)
 
 val print_prover : Format.formatter -> prover -> unit
@@ -107,7 +107,7 @@ module Hprover  : Exthtbl.S with type key = prover
 (** {3 Prover configuration} *)
 
 type config_prover = {
-  prover : prover;  (* unique name for session *)
+  prover  : prover;   (* unique name for session *)
   command : string;   (* "exec why-limit %t %m alt-ergo %f" *)
   driver  : string;   (* "/usr/local/share/why/drivers/ergo-spec.drv" *)
   in_place: bool;     (* verification should be performed in-place *)
@@ -120,7 +120,7 @@ type config_prover = {
 val get_complete_command : config_prover -> string
 (** add the extra_options to the command *)
 
-val get_provers : config  -> config_prover Mprover.t
+val get_provers : config -> config_prover Mprover.t
 (** [get_provers config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)
 
@@ -156,7 +156,6 @@ val editor_by_id : config -> string -> config_editor
 (** return the configuration of the editor if found, otherwise return
     Not_found *)
 
-
 (** prover upgrade policy *)
 
 type prover_upgrade_policy =
@@ -177,6 +176,17 @@ val get_prover_upgrade_policy : config -> prover -> prover_upgrade_policy
 val get_policies : config -> prover_upgrade_policy Mprover.t
 
 val set_policies : config -> prover_upgrade_policy Mprover.t -> config
+
+(** strategies *)
+
+type config_strategy = {
+  strategy_name : string;
+  strategy_desc : Pp.formatted;
+  strategy_code : string array;
+  strategy_shortcut : string;
+}
+
+val get_strategies : config -> config_strategy Mstr.t
 
 (** filter prover *)
 type filter_prover
@@ -232,3 +242,15 @@ val set_section : config -> string -> Rc.section -> config
 val set_family  : config -> string -> Rc.family  -> config
 (** [set_family config name] Same as {!Rc.set_family} except name
     must not be prover *)
+
+(** Common command line options *)
+
+module Args : sig
+  val initialize :
+    ?extra_help : (Format.formatter -> unit -> unit) ->
+    (string * Arg.spec * string) list ->
+    (string -> unit) -> string ->
+    config * config * Env.env
+
+  val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
+end

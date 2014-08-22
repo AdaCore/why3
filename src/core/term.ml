@@ -1015,12 +1015,16 @@ let t_s_map fnT fnL t = t_gen_map fnT fnL (gen_mapV fnT (t_vars t)) t
 
 (* simultaneous substitution into types and terms *)
 
-let t_ty_subst mapT mapV t =
+let t_subst_types mapT mapV t =
   let fnT = ty_inst mapT in
   let m = gen_mapV fnT (t_vars t) in
   let t = t_gen_map fnT (fun ls -> ls) m t in
   let add _ v t m = vs_check v t; Mvs.add v t m in
   let m = Mvs.fold2_inter add m mapV Mvs.empty in
+  (m,t)
+
+let t_ty_subst mapT mapV t =
+  let m,t = t_subst_types mapT mapV t in
   t_subst_unsafe m t
 
 (* fold over symbols *)

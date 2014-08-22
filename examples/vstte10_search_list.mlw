@@ -9,9 +9,10 @@
 module SearchingALinkedList
 
   use import int.Int
-  use export list.List
-  use export list.Length
-  use export list.Nth
+  use import option.Option
+  use import list.List
+  use import list.Length
+  use import list.Nth
 
   predicate zero_at (l: list int) (i: int) =
     nth i l = Some 0 /\ forall j:int. 0 <= j < i -> nth j l <> Some 0

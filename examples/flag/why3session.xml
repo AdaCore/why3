@@ -2,293 +2,127 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5"
-  memlimit="1000"/>
- <file name="../flag.mlw"
-  expanded="true">
-  <theory name="Flag"
-   expanded="true">
-   <goal name="WP_parameter dutch_flag" expl="VC for dutch_flag"
-    sum="1e62d2e1b426a4e96c1925aedf7611b5"
-    expanded="true">
-    <label name="expl:VC for dutch_flag"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter dutch_flag.1" expl="1. loop invariant init"
-      sum="f90c35fda6dd08184283ccf2ce5984fd">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.2" expl="2. loop invariant init"
-      sum="2acf87bb2a2b33bafff5970d06e96f4a">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.3" expl="3. loop invariant init"
-      sum="845a1ebb93032373016355ddaf4b953d">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.4" expl="4. loop invariant init"
-      sum="c8d6dda473a67037953d6a1afa8c79ff">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.5" expl="5. loop invariant init"
-      sum="25ca1a8650642992e09dcae712865fe3">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.6" expl="6. type invariant"
-      sum="6324fe5989ec38cbe907a90d77900678">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.7" expl="7. index in array bounds"
-      sum="039541d362847887ab1be7daec031bf3">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.8" expl="8. precondition"
-      sum="8df42bd32f5147522be742895ca6f906">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.9"
-      expl="9. loop invariant preservation"
-      sum="e2d8619e90acb7c47742a39387be1443">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.10"
-      expl="10. loop invariant preservation"
-      sum="1817df204de80f0341b11c9e97ad4383">
-      <label name="expl:VC for dutch_flag"/>
-      <transf
-       name="inline_all">
-       <goal name="WP_parameter dutch_flag.10.1"
-        expl="1. loop invariant preservation"
-        sum="be44c98a32c8cb55824d1c9bdd432981">
-        <label name="expl:VC for dutch_flag"/>
-        <proof prover="0">
-         <result status="valid" time="0.22"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.11"
-      expl="11. loop invariant preservation"
-      sum="65f9300105436941b8f820e3472efc56">
-      <label name="expl:VC for dutch_flag"/>
-      <transf
-       name="inline_all">
-       <goal name="WP_parameter dutch_flag.11.1"
-        expl="1. loop invariant preservation"
-        sum="55efc52d3fda118c46efdce7a91da336">
-        <label name="expl:VC for dutch_flag"/>
-        <proof prover="0">
-         <result status="valid" time="0.46"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.12"
-      expl="12. loop invariant preservation"
-      sum="7de4ef3608ac003d80c01363396b359a">
-      <label name="expl:VC for dutch_flag"/>
-      <transf
-       name="inline_all">
-       <goal name="WP_parameter dutch_flag.12.1"
-        expl="1. loop invariant preservation"
-        sum="81d3c70ef0ae003e2365e778a1b8f20a">
-        <label name="expl:VC for dutch_flag"/>
-        <proof prover="0">
-         <result status="valid" time="0.41"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.13"
-      expl="13. loop invariant preservation"
-      sum="04a0a138242747766a72121d6d014028">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.31"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.14" expl="14. loop variant decrease"
-      sum="dc77a3b6a48fad8287cc14cab7d45edf">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.15"
-      expl="15. loop invariant preservation"
-      sum="d6b1c6f3e00afd5bca5994286d9ffe46">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.16"
-      expl="16. loop invariant preservation"
-      sum="18ac7f056c7e9ccdca0e558dcd52e690">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.17"
-      expl="17. loop invariant preservation"
-      sum="29b16fb6973bc048f9aaf4685718da88">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.18"
-      expl="18. loop invariant preservation"
-      sum="9087a5f66f755461add5b186041f7434">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.19"
-      expl="19. loop invariant preservation"
-      sum="84f6176e13e14884e86a3308dfe74aa0">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0" timelimit="35">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.20" expl="20. loop variant decrease"
-      sum="c81d5e65c7e72c159c1018b5177a7cd0">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.21" expl="21. precondition"
-      sum="3645c7115bc2659805ddd55c7ffcae12">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.22"
-      expl="22. loop invariant preservation"
-      sum="fed734a4ef6c1ca910c0dfaa2f8f7c69">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0" timelimit="8">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.23"
-      expl="23. loop invariant preservation"
-      sum="09d3556868e3b16274342e4980e9e5aa">
-      <label name="expl:VC for dutch_flag"/>
-      <transf
-       name="inline_all">
-       <goal name="WP_parameter dutch_flag.23.1"
-        expl="1. loop invariant preservation"
-        sum="6f6936a40550050bf6c481b68c43400c">
-        <label name="expl:VC for dutch_flag"/>
-        <proof prover="0">
-         <result status="valid" time="0.47"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.24"
-      expl="24. loop invariant preservation"
-      sum="873b440dafbcc0d895cef896fc9ff63d">
-      <label name="expl:VC for dutch_flag"/>
-      <transf
-       name="inline_all">
-       <goal name="WP_parameter dutch_flag.24.1"
-        expl="1. loop invariant preservation"
-        sum="4d0c3feb93dc7730ead4f0342229be1d">
-        <label name="expl:VC for dutch_flag"/>
-        <proof prover="0">
-         <result status="valid" time="0.33"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.25"
-      expl="25. loop invariant preservation"
-      sum="a76026249dd69d4df70550e36fb345c9">
-      <label name="expl:VC for dutch_flag"/>
-      <transf
-       name="inline_all">
-       <goal name="WP_parameter dutch_flag.25.1"
-        expl="1. loop invariant preservation"
-        sum="9645f89c2ca21378296baea12c091ebb">
-        <label name="expl:VC for dutch_flag"/>
-        <proof prover="0">
-         <result status="valid" time="0.26"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter dutch_flag.26"
-      expl="26. loop invariant preservation"
-      sum="088533d5155fac61d51868884f56a2a7">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.27"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.27" expl="27. loop variant decrease"
-      sum="2fbc33c4440b06920a58b5ad3598a91e">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.28" expl="28. type invariant"
-      sum="1c19113c06e83637f45d758424a9089e">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.29" expl="29. postcondition"
-      sum="f9cf5b2526646c04ece71ef94519a234">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0" timelimit="8">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter dutch_flag.30" expl="30. postcondition"
-      sum="412a4e752388d6d38747736fe3ca70b2">
-      <label name="expl:VC for dutch_flag"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
+<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../flag.mlw" expanded="true">
+<theory name="Flag" expanded="true">
+ <goal name="WP_parameter dutch_flag" expl="VC for dutch_flag" sum="1e62d2e1b426a4e96c1925aedf7611b5" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter dutch_flag.1" expl="1. loop invariant init" sum="f90c35fda6dd08184283ccf2ce5984fd">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.2" expl="2. loop invariant init" sum="2acf87bb2a2b33bafff5970d06e96f4a">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.3" expl="3. loop invariant init" sum="845a1ebb93032373016355ddaf4b953d">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.4" expl="4. loop invariant init" sum="c8d6dda473a67037953d6a1afa8c79ff">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.5" expl="5. loop invariant init" sum="25ca1a8650642992e09dcae712865fe3">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.6" expl="6. type invariant" sum="6324fe5989ec38cbe907a90d77900678">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.7" expl="7. index in array bounds" sum="039541d362847887ab1be7daec031bf3">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.8" expl="8. precondition" sum="8df42bd32f5147522be742895ca6f906">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.9" expl="9. loop invariant preservation" sum="e2d8619e90acb7c47742a39387be1443">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.10" expl="10. loop invariant preservation" sum="1817df204de80f0341b11c9e97ad4383">
+  <transf name="inline_all">
+   <goal name="WP_parameter dutch_flag.10.1" expl="1. loop invariant preservation" sum="be44c98a32c8cb55824d1c9bdd432981">
+   <proof prover="0"><result status="valid" time="0.22"/></proof>
    </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+  <goal name="WP_parameter dutch_flag.11" expl="11. loop invariant preservation" sum="65f9300105436941b8f820e3472efc56">
+  <transf name="inline_all">
+   <goal name="WP_parameter dutch_flag.11.1" expl="1. loop invariant preservation" sum="55efc52d3fda118c46efdce7a91da336">
+   <proof prover="0"><result status="valid" time="0.46"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter dutch_flag.12" expl="12. loop invariant preservation" sum="7de4ef3608ac003d80c01363396b359a">
+  <transf name="inline_all">
+   <goal name="WP_parameter dutch_flag.12.1" expl="1. loop invariant preservation" sum="81d3c70ef0ae003e2365e778a1b8f20a">
+   <proof prover="0"><result status="valid" time="0.41"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter dutch_flag.13" expl="13. loop invariant preservation" sum="04a0a138242747766a72121d6d014028">
+  <proof prover="0"><result status="valid" time="0.31"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.14" expl="14. loop variant decrease" sum="dc77a3b6a48fad8287cc14cab7d45edf">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.15" expl="15. loop invariant preservation" sum="d6b1c6f3e00afd5bca5994286d9ffe46">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.16" expl="16. loop invariant preservation" sum="18ac7f056c7e9ccdca0e558dcd52e690">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.17" expl="17. loop invariant preservation" sum="29b16fb6973bc048f9aaf4685718da88">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.18" expl="18. loop invariant preservation" sum="9087a5f66f755461add5b186041f7434">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.19" expl="19. loop invariant preservation" sum="84f6176e13e14884e86a3308dfe74aa0">
+  <proof prover="0" timelimit="35"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.20" expl="20. loop variant decrease" sum="c81d5e65c7e72c159c1018b5177a7cd0">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.21" expl="21. precondition" sum="3645c7115bc2659805ddd55c7ffcae12">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.22" expl="22. loop invariant preservation" sum="fed734a4ef6c1ca910c0dfaa2f8f7c69">
+  <proof prover="0" timelimit="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.23" expl="23. loop invariant preservation" sum="09d3556868e3b16274342e4980e9e5aa">
+  <transf name="inline_all">
+   <goal name="WP_parameter dutch_flag.23.1" expl="1. loop invariant preservation" sum="6f6936a40550050bf6c481b68c43400c">
+   <proof prover="0"><result status="valid" time="0.47"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter dutch_flag.24" expl="24. loop invariant preservation" sum="873b440dafbcc0d895cef896fc9ff63d">
+  <transf name="inline_all">
+   <goal name="WP_parameter dutch_flag.24.1" expl="1. loop invariant preservation" sum="4d0c3feb93dc7730ead4f0342229be1d">
+   <proof prover="0"><result status="valid" time="0.33"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter dutch_flag.25" expl="25. loop invariant preservation" sum="a76026249dd69d4df70550e36fb345c9">
+  <transf name="inline_all">
+   <goal name="WP_parameter dutch_flag.25.1" expl="1. loop invariant preservation" sum="9645f89c2ca21378296baea12c091ebb">
+   <proof prover="0"><result status="valid" time="0.26"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter dutch_flag.26" expl="26. loop invariant preservation" sum="088533d5155fac61d51868884f56a2a7">
+  <proof prover="0"><result status="valid" time="0.27"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.27" expl="27. loop variant decrease" sum="2fbc33c4440b06920a58b5ad3598a91e">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.28" expl="28. type invariant" sum="1c19113c06e83637f45d758424a9089e">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.29" expl="29. postcondition" sum="f9cf5b2526646c04ece71ef94519a234">
+  <proof prover="0" timelimit="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter dutch_flag.30" expl="30. postcondition" sum="412a4e752388d6d38747736fe3ca70b2">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

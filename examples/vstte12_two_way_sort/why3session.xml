@@ -2,228 +2,97 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10"
-  memlimit="1000"/>
- <prover id="1" name="CVC3" version="2.2" timelimit="10" memlimit="1000"/>
- <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="6"
-  memlimit="1000"/>
- <file
-  name="../vstte12_two_way_sort.mlw">
-  <theory
-   name="TwoWaySort">
-   <goal name="WP_parameter two_way_sort" expl="VC for two_way_sort"
-    sum="73b5c4b9eba9e12d620c1ac0b1df2a0d">
-    <label name="expl:VC for two_way_sort"/>
-    <transf
-     name="split_goal">
-     <goal name="WP_parameter two_way_sort.1" expl="1. loop invariant init"
-      sum="f824b5b025bfcfbe21bc57729fb49b26">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.2" expl="2. loop invariant init"
-      sum="bb544e05c1b7dda0eeadf0c1c5e81d1c">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.3" expl="3. loop invariant init"
-      sum="bf40f4cd3dd71c8e29a99d6acb4a07a8">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.4" expl="4. loop invariant init"
-      sum="f936e59d85fdf450439c05a0076dda4c">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.5" expl="5. type invariant"
-      sum="f5c3bbd1f24da4128fe78215d766be60">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.6" expl="6. index in array bounds"
-      sum="e7ea3d65ebe6fe992b42045ff0708f6b">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.7"
-      expl="7. loop invariant preservation"
-      sum="5d1817a31a28d45afd3b43de3e477e7e">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.8"
-      expl="8. loop invariant preservation"
-      sum="589a0ffe8d5e6c00603faad8f4016735">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.9"
-      expl="9. loop invariant preservation"
-      sum="f13bcf265228da3939adef2310ef28d7">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.10"
-      expl="10. loop invariant preservation"
-      sum="9bb57e6bc73a321a8a576aae58282394">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.11"
-      expl="11. loop variant decrease"
-      sum="83761f1a97d3de6db9639a411c27ca6b">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.12"
-      expl="12. index in array bounds"
-      sum="5c199a496cf3ac31f4f8ef3072ca0afd">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.13"
-      expl="13. loop invariant preservation"
-      sum="31ba907d9bb3fc1ff7ae25144c231296">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.14"
-      expl="14. loop invariant preservation"
-      sum="424fd94725e50b3fd3d3f06594870a2d">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.15"
-      expl="15. loop invariant preservation"
-      sum="ea83e3bdcafc2ed9f0c024ab2354a471">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.16"
-      expl="16. loop invariant preservation"
-      sum="1b13c3e6255422c00216a1ec389675f8">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.17"
-      expl="17. loop variant decrease"
-      sum="78126a4996ce4cd3cf4341145ee5993a">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.18" expl="18. precondition"
-      sum="f2743e0f4b185b514c12c0fa8aa3c000">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.19"
-      expl="19. loop invariant preservation"
-      sum="df01d783e4630d9e3d3024c27e1ab963">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.20"
-      expl="20. loop invariant preservation"
-      sum="8eb63768ec364656db8a10c396bc4364">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.21"
-      expl="21. loop invariant preservation"
-      sum="84b8c7cedf83c2ee5e02ae7c0d2c448f">
-      <label name="expl:VC for two_way_sort"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter two_way_sort.21.1"
-        expl="1. loop invariant preservation"
-        sum="84b8c7cedf83c2ee5e02ae7c0d2c448f">
-        <label name="expl:VC for two_way_sort"/>
-        <proof prover="1">
-         <result status="valid" time="0.20"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter two_way_sort.22"
-      expl="22. loop invariant preservation"
-      sum="5120ce31d4c367c1e01fb42a7fc02176">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.23"
-      expl="23. loop variant decrease"
-      sum="e7ce32c28ac30cedf148d00bb1091ea8">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.24" expl="24. type invariant"
-      sum="d403852503c5a8fa8a643daf4ffab43b">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" timelimit="5">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.25" expl="25. postcondition"
-      sum="2395172409796941ed69388c375e7958">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter two_way_sort.26" expl="26. postcondition"
-      sum="bd6def528198148548ffd3dec4fb60d8">
-      <label name="expl:VC for two_way_sort"/>
-      <proof prover="0" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.2" timelimit="10" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<file name="../vstte12_two_way_sort.mlw">
+<theory name="TwoWaySort">
+ <goal name="WP_parameter two_way_sort" expl="VC for two_way_sort" sum="73b5c4b9eba9e12d620c1ac0b1df2a0d">
+ <transf name="split_goal">
+  <goal name="WP_parameter two_way_sort.1" expl="1. loop invariant init" sum="f824b5b025bfcfbe21bc57729fb49b26">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.2" expl="2. loop invariant init" sum="bb544e05c1b7dda0eeadf0c1c5e81d1c">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.3" expl="3. loop invariant init" sum="bf40f4cd3dd71c8e29a99d6acb4a07a8">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.4" expl="4. loop invariant init" sum="f936e59d85fdf450439c05a0076dda4c">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.5" expl="5. type invariant" sum="f5c3bbd1f24da4128fe78215d766be60">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.6" expl="6. index in array bounds" sum="e7ea3d65ebe6fe992b42045ff0708f6b">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.7" expl="7. loop invariant preservation" sum="5d1817a31a28d45afd3b43de3e477e7e">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.8" expl="8. loop invariant preservation" sum="589a0ffe8d5e6c00603faad8f4016735">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.9" expl="9. loop invariant preservation" sum="f13bcf265228da3939adef2310ef28d7">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.10" expl="10. loop invariant preservation" sum="9bb57e6bc73a321a8a576aae58282394">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.11" expl="11. loop variant decrease" sum="83761f1a97d3de6db9639a411c27ca6b">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.12" expl="12. index in array bounds" sum="5c199a496cf3ac31f4f8ef3072ca0afd">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.13" expl="13. loop invariant preservation" sum="31ba907d9bb3fc1ff7ae25144c231296">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.14" expl="14. loop invariant preservation" sum="424fd94725e50b3fd3d3f06594870a2d">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.15" expl="15. loop invariant preservation" sum="ea83e3bdcafc2ed9f0c024ab2354a471">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.16" expl="16. loop invariant preservation" sum="1b13c3e6255422c00216a1ec389675f8">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.17" expl="17. loop variant decrease" sum="78126a4996ce4cd3cf4341145ee5993a">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.18" expl="18. precondition" sum="f2743e0f4b185b514c12c0fa8aa3c000">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.19" expl="19. loop invariant preservation" sum="df01d783e4630d9e3d3024c27e1ab963">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.20" expl="20. loop invariant preservation" sum="8eb63768ec364656db8a10c396bc4364">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.21" expl="21. loop invariant preservation" sum="84b8c7cedf83c2ee5e02ae7c0d2c448f">
+  <transf name="split_goal">
+   <goal name="WP_parameter two_way_sort.21.1" expl="1. loop invariant preservation" sum="84b8c7cedf83c2ee5e02ae7c0d2c448f">
+   <proof prover="1"><result status="valid" time="0.20"/></proof>
    </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+  <goal name="WP_parameter two_way_sort.22" expl="22. loop invariant preservation" sum="5120ce31d4c367c1e01fb42a7fc02176">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.23" expl="23. loop variant decrease" sum="e7ce32c28ac30cedf148d00bb1091ea8">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.24" expl="24. type invariant" sum="d403852503c5a8fa8a643daf4ffab43b">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.25" expl="25. postcondition" sum="2395172409796941ed69388c375e7958">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter two_way_sort.26" expl="26. postcondition" sum="bd6def528198148548ffd3dec4fb60d8">
+  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

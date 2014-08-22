@@ -13,7 +13,6 @@
   open Format
   open Lexing
   open Driver_parser
-  open Lexer
 
   exception IllegalCharacter of char
 
@@ -67,13 +66,13 @@ let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%'
 
 rule token = parse
   | '\n'
-      { newline lexbuf; token lexbuf }
+      { Lexlib.newline lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | "(*)"
       { LEFTPAR_STAR_RIGHTPAR }
   | "(*"
-      { comment lexbuf; token lexbuf }
+      { Lexlib.comment lexbuf; token lexbuf }
   | '_'
       { UNDERSCORE }
   | ident as id
@@ -99,16 +98,15 @@ rule token = parse
   | op_char+ as op
       { OPERATOR op }
   | "\""
-      { STRING (string lexbuf) }
+      { STRING (Lexlib.string lexbuf) }
   | "import" space*  "\""
-      { INPUT (string lexbuf) }
+      { INPUT (Lexlib.string lexbuf) }
   | eof
       { EOF }
   | _ as c
       { raise (IllegalCharacter c) }
 
 {
-
   let parse_file_gen parse input_lexbuf lexbuf =
     let s = Stack.create () in
     Stack.push lexbuf s;

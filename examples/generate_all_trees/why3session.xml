@@ -2,453 +2,184 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
- <prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
- <prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
- <prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5"
-  memlimit="1000"/>
- <prover id="4" name="Z3" version="2.19" timelimit="14" memlimit="0"/>
- <prover id="5" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
- <prover id="6" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
- <prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
- <prover id="8" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
- <file name="../generate_all_trees.mlw"
-  expanded="true">
-  <theory name="GenerateAllTrees"
-   expanded="true">
-   <goal name="size_nonneg" sum="d171c451939ca408a320d9c99f00789c"
-    expanded="true">
-    <proof prover="8"
-     edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v">
-     <result status="valid" time="1.08"/>
-    </proof>
+<prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Z3" version="2.19" timelimit="14" memlimit="0"/>
+<prover id="5" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="6" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="8" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
+<file name="../generate_all_trees.mlw" expanded="true">
+<theory name="GenerateAllTrees" expanded="true">
+ <goal name="size_nonneg" sum="d171c451939ca408a320d9c99f00789c" expanded="true">
+ <proof prover="8" edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v"><result status="valid" time="1.08"/></proof>
+ </goal>
+ <goal name="size_left" sum="696314047fb4d353c46e96e9930264e2" expanded="true">
+ <proof prover="7"><result status="valid" time="0.14"/></proof>
+ </goal>
+ <goal name="all_trees_0" sum="fb6c25ee5404e95da1aff880570e3df8" expanded="true">
+ <proof prover="8" edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v"><result status="valid" time="1.12"/></proof>
+ </goal>
+ <goal name="tree_diff" sum="3afd2f952c084848eca1fcdb8d6a5e43" expanded="true">
+ <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter combine" expl="VC for combine" sum="d5b630abfbc9fa4f5533c98ec7488e24" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter combine.1" expl="1. postcondition" sum="c16e5b4fd987c41913d92b194c50a1f4" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.2" expl="2. postcondition" sum="353a8108faab14ec727ec29c07cc229c" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.3" expl="3. postcondition" sum="33f14a8ba307a1ca860419739744f947" expanded="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.4" expl="4. postcondition" sum="b539dea83fcdd1829b9391aa682fedbf" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.5" expl="5. variant decrease" sum="64896fcbe5fe5b51178b186c011138f9" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.6" expl="6. precondition" sum="64c49dd60febb7131c7d0cbc5a4a8c7d" expanded="true">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.7" expl="7. postcondition" sum="86a2c3ea38861058311947a475cb21ff" expanded="true">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.8" expl="8. postcondition" sum="b652f966ddff87d3680269a6c7691772" expanded="true">
+  <transf name="split_goal" expanded="true">
+   <goal name="WP_parameter combine.8.1" expl="1. postcondition" sum="a7779370ab1c65bd316f061c7aed85d2" expanded="true">
+   <proof prover="1"><result status="valid" time="0.01"/></proof>
+   <proof prover="5"><result status="valid" time="0.09"/></proof>
+   <proof prover="8" edited="generate_all_trees_WP_GenerateAllTrees_WP_parameter_combine_2.v"><result status="valid" time="1.15"/></proof>
    </goal>
-   <goal name="size_left" sum="696314047fb4d353c46e96e9930264e2"
-    expanded="true">
-    <proof prover="7">
-     <result status="valid" time="0.14"/>
-    </proof>
+   <goal name="WP_parameter combine.8.2" expl="2. postcondition" sum="276952a27b8017986839195deb1467d6" expanded="true">
+   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.84"/></proof>
    </goal>
-   <goal name="all_trees_0" sum="fb6c25ee5404e95da1aff880570e3df8"
-    expanded="true">
-    <proof prover="8"
-     edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v">
-     <result status="valid" time="1.12"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter combine.9" expl="9. variant decrease" sum="4e9a0beb0319b05d16065e8ba75f737e" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.10" expl="10. precondition" sum="c45ebf3a21df7ec70c429dc97dd643b7" expanded="true">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.11" expl="11. precondition" sum="65a609afab7cf13fb78a74bd3f1e6380" expanded="true">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.12" expl="12. postcondition" sum="42ad20a2bfc5e9f7135fa7f79c31a9f9" expanded="true">
+  <proof prover="3"><result status="valid" time="0.24"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.13" expl="13. postcondition" sum="5fa9120ba96c7e9c9f8ec1e0cabec0f1" expanded="true">
+  <transf name="split_goal" expanded="true">
+   <goal name="WP_parameter combine.13.1" expl="1. postcondition" sum="0848fc1fd1379ef555958e717b1bd366" expanded="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
    </goal>
-   <goal name="tree_diff" sum="3afd2f952c084848eca1fcdb8d6a5e43"
-    expanded="true">
-    <proof prover="3" timelimit="10" memlimit="0">
-     <result status="valid" time="0.02"/>
-    </proof>
+   <goal name="WP_parameter combine.13.2" expl="2. postcondition" sum="1e94739a540841e58bdb47caed5a4c93" expanded="true">
+   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="4.94"/></proof>
    </goal>
-   <goal name="WP_parameter combine" expl="VC for combine"
-    sum="d5b630abfbc9fa4f5533c98ec7488e24"
-    expanded="true">
-    <label name="expl:VC for combine"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter combine.1" expl="1. postcondition"
-      sum="c16e5b4fd987c41913d92b194c50a1f4"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.2" expl="2. postcondition"
-      sum="353a8108faab14ec727ec29c07cc229c"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.3" expl="3. postcondition"
-      sum="33f14a8ba307a1ca860419739744f947"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.4" expl="4. postcondition"
-      sum="b539dea83fcdd1829b9391aa682fedbf"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.5" expl="5. variant decrease"
-      sum="64896fcbe5fe5b51178b186c011138f9"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.6" expl="6. precondition"
-      sum="64c49dd60febb7131c7d0cbc5a4a8c7d"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3" timelimit="10" memlimit="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.7" expl="7. postcondition"
-      sum="86a2c3ea38861058311947a475cb21ff"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="2">
-       <result status="valid" time="0.10"/>
-      </proof>
-      <proof prover="6">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.8" expl="8. postcondition"
-      sum="b652f966ddff87d3680269a6c7691772"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <transf name="split_goal"
-       expanded="true">
-       <goal name="WP_parameter combine.8.1" expl="1. postcondition"
-        sum="a7779370ab1c65bd316f061c7aed85d2"
-        expanded="true">
-        <label name="expl:VC for combine"/>
-        <proof prover="1">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="5">
-         <result status="valid" time="0.09"/>
-        </proof>
-        <proof prover="8"
-         edited="generate_all_trees_WP_GenerateAllTrees_WP_parameter_combine_2.v">
-         <result status="valid" time="1.15"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter combine.8.2" expl="2. postcondition"
-        sum="276952a27b8017986839195deb1467d6"
-        expanded="true">
-        <label name="expl:VC for combine"/>
-        <proof prover="3" timelimit="10" memlimit="0">
-         <result status="valid" time="0.84"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter combine.9" expl="9. variant decrease"
-      sum="4e9a0beb0319b05d16065e8ba75f737e"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.10" expl="10. precondition"
-      sum="c45ebf3a21df7ec70c429dc97dd643b7"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3" timelimit="10" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.11" expl="11. precondition"
-      sum="65a609afab7cf13fb78a74bd3f1e6380"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3" timelimit="10" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.12" expl="12. postcondition"
-      sum="42ad20a2bfc5e9f7135fa7f79c31a9f9"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3">
-       <result status="valid" time="0.24"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.13" expl="13. postcondition"
-      sum="5fa9120ba96c7e9c9f8ec1e0cabec0f1"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <transf name="split_goal"
-       expanded="true">
-       <goal name="WP_parameter combine.13.1" expl="1. postcondition"
-        sum="0848fc1fd1379ef555958e717b1bd366"
-        expanded="true">
-        <label name="expl:VC for combine"/>
-        <proof prover="4">
-         <result status="valid" time="0.05"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter combine.13.2" expl="2. postcondition"
-        sum="1e94739a540841e58bdb47caed5a4c93"
-        expanded="true">
-        <label name="expl:VC for combine"/>
-        <proof prover="3" timelimit="10" memlimit="0">
-         <result status="valid" time="4.94"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter combine.14" expl="14. precondition"
-      sum="abd150c9f0a30c376bb13cfe64e58245"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3" timelimit="10" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.15" expl="15. postcondition"
-      sum="381ec4b1f4482507b6438bf768af3ffe"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <proof prover="3">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter combine.16" expl="16. postcondition"
-      sum="618a4ab84e305eb90ae358cddc32231c"
-      expanded="true">
-      <label name="expl:VC for combine"/>
-      <transf name="split_goal"
-       expanded="true">
-       <goal name="WP_parameter combine.16.1" expl="1. postcondition"
-        sum="e7aeec38f4300a8f4c6ae4100ac8b647"
-        expanded="true">
-        <label name="expl:VC for combine"/>
-        <proof prover="3" timelimit="10" memlimit="0">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter combine.16.2" expl="2. postcondition"
-        sum="75803eb61b0d5a408eabf36a010cc7fe"
-        expanded="true">
-        <label name="expl:VC for combine"/>
-        <proof prover="3" timelimit="10" memlimit="0">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-    </transf>
+  </transf>
+  </goal>
+  <goal name="WP_parameter combine.14" expl="14. precondition" sum="abd150c9f0a30c376bb13cfe64e58245" expanded="true">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.15" expl="15. postcondition" sum="381ec4b1f4482507b6438bf768af3ffe" expanded="true">
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter combine.16" expl="16. postcondition" sum="618a4ab84e305eb90ae358cddc32231c" expanded="true">
+  <transf name="split_goal" expanded="true">
+   <goal name="WP_parameter combine.16.1" expl="1. postcondition" sum="e7aeec38f4300a8f4c6ae4100ac8b647" expanded="true">
+   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter all_trees" expl="VC for all_trees"
-    sum="bbd30e132f8b4fb50472406b50344fac"
-    expanded="true">
-    <label name="expl:VC for all_trees"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter all_trees.1" expl="1. array creation size"
-      sum="9e52e566ede896f842991a7e4d606f9e"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3" timelimit="10" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.2" expl="2. index in array bounds"
-      sum="9e820ddbaa94215af96d3e82ba10a500"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.3" expl="3. postcondition"
-      sum="c3d26e7f5657954f1d2a251155879751"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3" timelimit="10" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.4" expl="4. loop invariant init"
-      sum="ba52ac7a47a4feccf1ac4f7a6c81d8b4"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.5" expl="5. type invariant"
-      sum="66c7920fcf3d4f034aed3bcfca81d15d"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.6" expl="6. index in array bounds"
-      sum="24366d0cd1ace19b30261933bc603777"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3" timelimit="10" memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.7"
-      expl="7. loop invariant preservation"
-      sum="7b68d27622b89b04ffd90d36355c9cb2"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.8" expl="8. loop invariant init"
-      sum="b01f922f94429ed57c28e0a249d23646"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.9" expl="9. loop invariant init"
-      sum="e8698890ca8d75eddd35f85a89a406f6"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.10" expl="10. loop invariant init"
-      sum="3e8bf55b3fe6606f990da14345621c2b"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.11" expl="11. type invariant"
-      sum="969219982632222fbf2043a4838b105d"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.12" expl="12. index in array bounds"
-      sum="b4f1a52c1d1ef66d647a00dad9da2f69"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.13" expl="13. index in array bounds"
-      sum="d5b9311629767a05331a6fe93ec2fb87"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.14" expl="14. index in array bounds"
-      sum="f8bf76852f324b641ee9b5cae5f88e4a"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.15" expl="15. precondition"
-      sum="59d538cfe0ee18e9ff277be2d0dee06d"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.16" expl="16. index in array bounds"
-      sum="54fb6da1711a49daa4ba6e461335573a"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.17"
-      expl="17. loop invariant preservation"
-      sum="8539967a183ec12998b2fac5d237b71e"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.18"
-      expl="18. loop invariant preservation"
-      sum="926d46145ef1421abf40f2d52e14a3da"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.19"
-      expl="19. loop invariant preservation"
-      sum="e89d00078628fa89879887c35f2407e1"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <transf name="split_goal_wp"
-       expanded="true">
-       <goal name="WP_parameter all_trees.19.1"
-        expl="1. loop invariant preservation"
-        sum="68b1141d196339a37c005a38ca91f131"
-        expanded="true">
-        <label name="expl:VC for all_trees"/>
-        <proof prover="0">
-         <result status="valid" time="0.37"/>
-        </proof>
-        <proof prover="2">
-         <result status="valid" time="0.12"/>
-        </proof>
-        <proof prover="6">
-         <result status="valid" time="0.05"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter all_trees.19.2"
-        expl="2. loop invariant preservation"
-        sum="cbfd7e0ab361c2e3734e9254425d2c51"
-        expanded="true">
-        <label name="expl:VC for all_trees"/>
-        <proof prover="3">
-         <result status="valid" time="4.38"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter all_trees.20"
-      expl="20. loop invariant preservation"
-      sum="09d6acf2d2f8ff4c6f563a670cc5bf06"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.21" expl="21. type invariant"
-      sum="ebe88fd4508b50d8dba1701bfb997533"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter all_trees.22" expl="22. postcondition"
-      sum="8bbda6a5b6aedd8c1dd908df0cae7d4c"
-      expanded="true">
-      <label name="expl:VC for all_trees"/>
-      <proof prover="3" timelimit="10" memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter combine.16.2" expl="2. postcondition" sum="75803eb61b0d5a408eabf36a010cc7fe" expanded="true">
+   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter all_trees" expl="VC for all_trees" sum="bbd30e132f8b4fb50472406b50344fac" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter all_trees.1" expl="1. array creation size" sum="9e52e566ede896f842991a7e4d606f9e" expanded="true">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.2" expl="2. index in array bounds" sum="9e820ddbaa94215af96d3e82ba10a500" expanded="true">
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.3" expl="3. postcondition" sum="c3d26e7f5657954f1d2a251155879751" expanded="true">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.4" expl="4. loop invariant init" sum="ba52ac7a47a4feccf1ac4f7a6c81d8b4" expanded="true">
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.5" expl="5. type invariant" sum="66c7920fcf3d4f034aed3bcfca81d15d" expanded="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.6" expl="6. index in array bounds" sum="24366d0cd1ace19b30261933bc603777" expanded="true">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.7" expl="7. loop invariant preservation" sum="7b68d27622b89b04ffd90d36355c9cb2" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.8" expl="8. loop invariant init" sum="b01f922f94429ed57c28e0a249d23646" expanded="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.9" expl="9. loop invariant init" sum="e8698890ca8d75eddd35f85a89a406f6" expanded="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.10" expl="10. loop invariant init" sum="3e8bf55b3fe6606f990da14345621c2b" expanded="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.11" expl="11. type invariant" sum="969219982632222fbf2043a4838b105d" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.12" expl="12. index in array bounds" sum="b4f1a52c1d1ef66d647a00dad9da2f69" expanded="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.13" expl="13. index in array bounds" sum="d5b9311629767a05331a6fe93ec2fb87" expanded="true">
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.14" expl="14. index in array bounds" sum="f8bf76852f324b641ee9b5cae5f88e4a" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.15" expl="15. precondition" sum="59d538cfe0ee18e9ff277be2d0dee06d" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.16" expl="16. index in array bounds" sum="54fb6da1711a49daa4ba6e461335573a" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.17" expl="17. loop invariant preservation" sum="8539967a183ec12998b2fac5d237b71e" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.18" expl="18. loop invariant preservation" sum="926d46145ef1421abf40f2d52e14a3da" expanded="true">
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.19" expl="19. loop invariant preservation" sum="e89d00078628fa89879887c35f2407e1" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter all_trees.19.1" expl="1. loop invariant preservation" sum="68b1141d196339a37c005a38ca91f131" expanded="true">
+   <proof prover="0"><result status="valid" time="0.37"/></proof>
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   <proof prover="6"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="WP_parameter all_trees.19.2" expl="2. loop invariant preservation" sum="cbfd7e0ab361c2e3734e9254425d2c51" expanded="true">
+   <proof prover="3"><result status="valid" time="4.98"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter all_trees.20" expl="20. loop invariant preservation" sum="09d6acf2d2f8ff4c6f563a670cc5bf06" expanded="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.21" expl="21. type invariant" sum="ebe88fd4508b50d8dba1701bfb997533" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter all_trees.22" expl="22. postcondition" sum="8bbda6a5b6aedd8c1dd908df0cae7d4c" expanded="true">
+  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

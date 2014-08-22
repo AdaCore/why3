@@ -45,7 +45,11 @@ end
 theory MinMax
 
   use import Int
-  clone export comparison.MinMax with type t = int, predicate ge = (>=)
+  clone export relations.MinMax with type t = int, predicate ge = (>=),
+    goal TotalOrder.Refl,
+    goal TotalOrder.Trans,
+    goal TotalOrder.Antisymm,
+    goal TotalOrder.Total
 
 end
 
@@ -346,7 +350,7 @@ end
 
 theory Fact
 
-  use export Int
+  use import Int
 
   function fact int : int
 
@@ -469,7 +473,7 @@ end
 
 theory Fibonacci "Fibonacci numbers"
 
-  use export Int
+  use import Int
 
   function fib int : int
 

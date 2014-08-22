@@ -2,128 +2,60 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="10"
-  memlimit="1000"/>
- <prover id="1" name="CVC4" version="1.3" timelimit="10" memlimit="1000"/>
- <file name="../insertion_sort_list.mlw"
-  expanded="true">
-  <theory name="InsertionSort"
-   expanded="true">
-   <goal name="WP_parameter insert" expl="VC for insert"
-    sum="b1e3a8adba56ddc55f0223eb8a7854a5"
-    expanded="true">
-    <label name="expl:VC for insert"/>
-    <transf name="split_goal_wp"
-     expanded="true">
-     <goal name="WP_parameter insert.1" expl="1. postcondition"
-      sum="f340d3fb8712874a12dc92ae7ba9e864">
-      <label name="expl:VC for insert"/>
-      <proof prover="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insert.2" expl="2. postcondition"
-      sum="2e1a8483414ebe4773ac1932b7ebb289">
-      <label name="expl:VC for insert"/>
-      <proof prover="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insert.3" expl="3. postcondition"
-      sum="c2b3b533a1e34a37af3de669e83717b5">
-      <label name="expl:VC for insert"/>
-      <proof prover="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insert.4" expl="4. postcondition"
-      sum="3b7f06cd232ebbf42ece69e36e703d6a">
-      <label name="expl:VC for insert"/>
-      <proof prover="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insert.5" expl="5. variant decrease"
-      sum="96d4ce2a29f29773a841d9d633d7da13">
-      <label name="expl:VC for insert"/>
-      <proof prover="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insert.6" expl="6. precondition"
-      sum="09fb8011ab1bddfba227ce9126854ed9">
-      <label name="expl:VC for insert"/>
-      <proof prover="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insert.7" expl="7. postcondition"
-      sum="92293d851faaac9122b902f8dbb29428">
-      <label name="expl:VC for insert"/>
-      <proof prover="0">
-       <result status="valid" time="0.50"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insert.8" expl="8. postcondition"
-      sum="62d6ae4ed0ec678885e0f9e1c52dfab7"
-      expanded="true">
-      <label name="expl:VC for insert"/>
-      <proof prover="1">
-       <result status="valid" time="0.20"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-   <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort"
-    sum="217d5aaa298196f42719ac78e3396f2b"
-    expanded="true">
-    <label name="expl:VC for insertion_sort"/>
-    <transf name="split_goal_wp"
-     expanded="true">
-     <goal name="WP_parameter insertion_sort.1" expl="1. postcondition"
-      sum="d3a68f82201736397a3d1eb3f216ad9a">
-      <label name="expl:VC for insertion_sort"/>
-      <proof prover="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insertion_sort.2" expl="2. postcondition"
-      sum="88a372bf0f6ff03a3e5ae54a9925ddcb">
-      <label name="expl:VC for insertion_sort"/>
-      <proof prover="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insertion_sort.3" expl="3. variant decrease"
-      sum="e5265d088dfec5b22fdb534f26be07cb">
-      <label name="expl:VC for insertion_sort"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insertion_sort.4" expl="4. precondition"
-      sum="f0413209aa7c0a412f3411d5497e0472">
-      <label name="expl:VC for insertion_sort"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insertion_sort.5" expl="5. postcondition"
-      sum="f9c96857ba8438850b391bd6f7a2ffe0">
-      <label name="expl:VC for insertion_sort"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter insertion_sort.6" expl="6. postcondition"
-      sum="567bb560ec8c8c0c3d7d293c879b0f5b">
-      <label name="expl:VC for insertion_sort"/>
-      <proof prover="0">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="10" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.3" timelimit="10" memlimit="1000"/>
+<file name="../insertion_sort_list.mlw" expanded="true">
+<theory name="InsertionSort" expanded="true">
+ <goal name="WP_parameter insert" expl="VC for insert" sum="b1e3a8adba56ddc55f0223eb8a7854a5" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter insert.1" expl="1. postcondition" sum="f340d3fb8712874a12dc92ae7ba9e864">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.2" expl="2. postcondition" sum="2e1a8483414ebe4773ac1932b7ebb289">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.3" expl="3. postcondition" sum="c2b3b533a1e34a37af3de669e83717b5">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.4" expl="4. postcondition" sum="3b7f06cd232ebbf42ece69e36e703d6a">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.5" expl="5. variant decrease" sum="96d4ce2a29f29773a841d9d633d7da13">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.6" expl="6. precondition" sum="09fb8011ab1bddfba227ce9126854ed9">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.7" expl="7. postcondition" sum="92293d851faaac9122b902f8dbb29428">
+  <proof prover="0"><result status="valid" time="0.50"/></proof>
+  </goal>
+  <goal name="WP_parameter insert.8" expl="8. postcondition" sum="62d6ae4ed0ec678885e0f9e1c52dfab7" expanded="true">
+  <proof prover="1"><result status="valid" time="0.20"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter insertion_sort" expl="VC for insertion_sort" sum="217d5aaa298196f42719ac78e3396f2b" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter insertion_sort.1" expl="1. postcondition" sum="d3a68f82201736397a3d1eb3f216ad9a">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter insertion_sort.2" expl="2. postcondition" sum="88a372bf0f6ff03a3e5ae54a9925ddcb">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter insertion_sort.3" expl="3. variant decrease" sum="e5265d088dfec5b22fdb534f26be07cb">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter insertion_sort.4" expl="4. precondition" sum="f0413209aa7c0a412f3411d5497e0472">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter insertion_sort.5" expl="5. postcondition" sum="f9c96857ba8438850b391bd6f7a2ffe0">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter insertion_sort.6" expl="6. postcondition" sum="567bb560ec8c8c0c3d7d293c879b0f5b">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -2,60 +2,34 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="MetiTarski" version="2.2" timelimit="60"
-  memlimit="4000"/>
- <file name="../metitarski.why"
-  expanded="true">
-  <theory name="P"
-   expanded="true">
-   <goal name="x_mul_x_pos" sum="8bd3c15fa129991b779ea736e1b01557"
-    expanded="true">
-    <proof prover="0" memlimit="1000">
-     <result status="valid" time="0.00"/>
-    </proof>
-   </goal>
-   <goal name="sqr_pos" sum="0a0f0cd12049ec862cc0dcc62d21973e"
-    expanded="true">
-    <proof prover="0" timelimit="5">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory name="P2"
-   expanded="true">
-   <goal name="sqr_pos" sum="b3be98a235ef6223d7f278d47672d2b3"
-    expanded="true">
-    <proof prover="0" memlimit="1000">
-     <result status="valid" time="0.05"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory name="P3"
-   expanded="true">
-   <goal name="cos_bound" sum="cf3747929a885a77b6b6b07e74bc47c0"
-    expanded="true">
-    <proof prover="0" memlimit="1000">
-     <result status="unknown" time="2.62"/>
-    </proof>
-   </goal>
-   <goal name="cos_bound_harder" sum="8767edd2aaf3ff36ffbac224f7db223a"
-    expanded="true">
-    <proof prover="0" memlimit="1000">
-     <result status="valid" time="0.19"/>
-    </proof>
-   </goal>
-   <goal name="MethodErrorOK" sum="c377d288fc69a245718c6573ac770c2a"
-    expanded="true">
-    <proof prover="0" memlimit="1000">
-     <result status="valid" time="0.15"/>
-    </proof>
-   </goal>
-   <goal name="MethodErrorWrong" sum="f4d9640a1b835e7719de9e127b61ec15"
-    expanded="true">
-    <proof prover="0" memlimit="1000">
-     <result status="unknown" time="3.24"/>
-    </proof>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="MetiTarski" version="2.2" timelimit="60" memlimit="4000"/>
+<file name="../metitarski.why" expanded="true">
+<theory name="P" expanded="true">
+ <goal name="x_mul_x_pos" sum="8bd3c15fa129991b779ea736e1b01557" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="sqr_pos" sum="0a0f0cd12049ec862cc0dcc62d21973e" expanded="true">
+ <proof prover="0" timelimit="5"><result status="valid" time="0.01"/></proof>
+ </goal>
+</theory>
+<theory name="P2" expanded="true">
+ <goal name="sqr_pos" sum="b3be98a235ef6223d7f278d47672d2b3" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.05"/></proof>
+ </goal>
+</theory>
+<theory name="P3" expanded="true">
+ <goal name="cos_bound" sum="cf3747929a885a77b6b6b07e74bc47c0" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="unknown" time="2.62"/></proof>
+ </goal>
+ <goal name="cos_bound_harder" sum="8767edd2aaf3ff36ffbac224f7db223a" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.19"/></proof>
+ </goal>
+ <goal name="MethodErrorOK" sum="c377d288fc69a245718c6573ac770c2a" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.15"/></proof>
+ </goal>
+ <goal name="MethodErrorWrong" sum="f4d9640a1b835e7719de9e127b61ec15" expanded="true">
+ <proof prover="0" memlimit="1000"><result status="unknown" time="3.24"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

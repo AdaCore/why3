@@ -2,687 +2,305 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
- <prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
- <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10"
-  memlimit="1000"/>
- <prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
- <prover id="4" name="Z3" version="3.2" timelimit="10" memlimit="0"/>
- <prover id="5" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
- <prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5"
-  memlimit="1000"/>
- <prover id="7" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
- <file name="../vstte12_combinators.mlw"
-  expanded="true">
-  <theory name="Combinators"
-   expanded="true">
-   <goal name="red_left"
-    sum="71bf56eef94c8ef1ad56ba539763d8ff">
-    <proof prover="4">
-     <result status="valid" time="3.35"/>
-    </proof>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Z3" version="3.2" timelimit="10" memlimit="0"/>
+<prover id="5" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
+<file name="../vstte12_combinators.mlw" expanded="true">
+<theory name="Combinators" expanded="true">
+ <goal name="red_left" sum="71bf56eef94c8ef1ad56ba539763d8ff">
+ <proof prover="4"><result status="valid" time="3.35"/></proof>
+ </goal>
+ <goal name="red_right" sum="b13bf2404fd3c686038587040d5418e7">
+ <proof prover="4"><result status="valid" time="3.55"/></proof>
+ </goal>
+ <goal name="red_star_left" sum="2d9c32e50ec9f3083319c9d3bdf3b0a4">
+ <proof prover="5" timelimit="10" memlimit="0" edited="vstte12_combinators_WP_Combinators_red_star_left_1.v"><result status="valid" time="1.00"/></proof>
+ </goal>
+ <goal name="red_star_right" sum="b234589d09635cad17c0f21e24b9718b">
+ <proof prover="5" timelimit="10" memlimit="0" edited="vstte12_combinators_WP_Combinators_red_star_right_1.v"><result status="valid" time="1.03"/></proof>
+ </goal>
+ <goal name="WP_parameter reduction" expl="VC for reduction" sum="608d23af25540450646fbdab4ede1a6e">
+ <transf name="split_goal">
+  <goal name="WP_parameter reduction.1" expl="1. postcondition" sum="9d1634e5a8089d978f6a0474e03de9c8">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction.2" expl="2. postcondition" sum="7b8debced2c2ef3d3580c4acb73a0096">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction.3" expl="3. postcondition" sum="4e7c26c2af67224969e62beb07fe98be">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction.3.1" expl="1." sum="a87c98e74509850e9702f1eeca650b96">
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_1.v"><result status="valid" time="0.99"/></proof>
+   <proof prover="7"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="red_right"
-    sum="b13bf2404fd3c686038587040d5418e7">
-    <proof prover="4">
-     <result status="valid" time="3.55"/>
-    </proof>
+   <goal name="WP_parameter reduction.3.2" expl="2." sum="5d4f9cf0cf799bcafa469d2d37a1f0ce">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
    </goal>
-   <goal name="red_star_left"
-    sum="2d9c32e50ec9f3083319c9d3bdf3b0a4">
-    <proof prover="5" timelimit="10" memlimit="0"
-     edited="vstte12_combinators_WP_Combinators_red_star_left_1.v">
-     <result status="valid" time="1.00"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction.4" expl="4. postcondition" sum="8f4ec0564d2f9525cc4b4753e01bfb27">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction.4.1" expl="1." sum="7d8b1f0545ca371d0187c58103e72275">
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_2.v"><result status="valid" time="1.01"/></proof>
+   <proof prover="7"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="red_star_right"
-    sum="b234589d09635cad17c0f21e24b9718b">
-    <proof prover="5" timelimit="10" memlimit="0"
-     edited="vstte12_combinators_WP_Combinators_red_star_right_1.v">
-     <result status="valid" time="1.03"/>
-    </proof>
+   <goal name="WP_parameter reduction.4.2" expl="2." sum="4c1095273a52a5b56ba73387802a93bb">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
    </goal>
-   <goal name="WP_parameter reduction" expl="VC for reduction"
-    sum="608d23af25540450646fbdab4ede1a6e">
-    <label name="expl:VC for reduction"/>
-    <transf
-     name="split_goal">
-     <goal name="WP_parameter reduction.1" expl="1. postcondition"
-      sum="9d1634e5a8089d978f6a0474e03de9c8">
-      <label name="expl:VC for reduction"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction.2" expl="2. postcondition"
-      sum="7b8debced2c2ef3d3580c4acb73a0096">
-      <label name="expl:VC for reduction"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction.3" expl="3. postcondition"
-      sum="4e7c26c2af67224969e62beb07fe98be">
-      <label name="expl:VC for reduction"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction.3.1" expl="1."
-        sum="a87c98e74509850e9702f1eeca650b96">
-        <label name="expl:VC for reduction"/>
-        <proof prover="3">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof prover="5"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_1.v">
-         <result status="valid" time="0.99"/>
-        </proof>
-        <proof prover="7">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction.3.2" expl="2."
-        sum="5d4f9cf0cf799bcafa469d2d37a1f0ce">
-        <label name="expl:VC for reduction"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction.4" expl="4. postcondition"
-      sum="8f4ec0564d2f9525cc4b4753e01bfb27">
-      <label name="expl:VC for reduction"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction.4.1" expl="1."
-        sum="7d8b1f0545ca371d0187c58103e72275">
-        <label name="expl:VC for reduction"/>
-        <proof prover="3">
-         <result status="valid" time="0.03"/>
-        </proof>
-        <proof prover="5"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_2.v">
-         <result status="valid" time="1.01"/>
-        </proof>
-        <proof prover="7">
-         <result status="valid" time="0.06"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction.4.2" expl="2."
-        sum="4c1095273a52a5b56ba73387802a93bb">
-        <label name="expl:VC for reduction"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction.5" expl="5. postcondition"
-      sum="0d5c8dcbab8b19505c7b30ca0b1c05ce">
-      <label name="expl:VC for reduction"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction.5.1" expl="1."
-        sum="a00eda0ca087e9dd4bd0082e4450cef7">
-        <label name="expl:VC for reduction"/>
-        <proof prover="3">
-         <result status="valid" time="0.07"/>
-        </proof>
-        <proof prover="5"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_3.v">
-         <result status="valid" time="1.00"/>
-        </proof>
-        <proof prover="7">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction.5.2" expl="2."
-        sum="17ac5dbc5199fff4bf4afd95fb3b2edc">
-        <label name="expl:VC for reduction"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction.6" expl="6. postcondition"
-      sum="ffd3465a67ba79c580effeab9bf6794e">
-      <label name="expl:VC for reduction"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction.6.1" expl="1."
-        sum="9e121ca554c074d939064ca91d0acab7">
-        <label name="expl:VC for reduction"/>
-        <proof prover="1">
-         <result status="valid" time="4.92"/>
-        </proof>
-        <proof prover="3">
-         <result status="valid" time="0.04"/>
-        </proof>
-        <proof prover="5"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_4.v">
-         <result status="valid" time="0.99"/>
-        </proof>
-        <proof prover="7">
-         <result status="valid" time="0.08"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction.6.2" expl="2."
-        sum="46bf7b4672a1f8b93bda7fd48c7d6596">
-        <label name="expl:VC for reduction"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction.7" expl="7. postcondition"
-      sum="dd5b06b69107e66354e48aab7ba0f658">
-      <label name="expl:VC for reduction"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction.7.1" expl="1."
-        sum="c9dee023667d7bda056045c6be0e072e">
-        <label name="expl:VC for reduction"/>
-        <proof prover="5"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_5.v">
-         <result status="valid" time="1.00"/>
-        </proof>
-        <proof prover="7">
-         <result status="valid" time="1.22"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction.7.2" expl="2."
-        sum="60ef8e3d30aa260c908dc352310d0b2a">
-        <label name="expl:VC for reduction"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction.8" expl="8. unreachable point"
-      sum="14eeb3a5e0cedeea2f3e11874afe3974">
-      <label name="expl:VC for reduction"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-    </transf>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction.5" expl="5. postcondition" sum="0d5c8dcbab8b19505c7b30ca0b1c05ce">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction.5.1" expl="1." sum="a00eda0ca087e9dd4bd0082e4450cef7">
+   <proof prover="3"><result status="valid" time="0.07"/></proof>
+   <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_3.v"><result status="valid" time="1.00"/></proof>
+   <proof prover="7"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter test_SKK" expl="VC for test_SKK"
-    sum="135e2adae2fbaac2b5a4457a40e32130">
-    <label name="expl:VC for test_SKK"/>
-    <proof prover="6">
-     <result status="valid" time="0.01"/>
-    </proof>
+   <goal name="WP_parameter reduction.5.2" expl="2." sum="17ac5dbc5199fff4bf4afd95fb3b2edc">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="reducible_or_value"
-    sum="3f751f6d16db58b0a069cc45fd61fecf">
-    <proof prover="5"
-     edited="vstte12_combinators_WP_Combinators_reducible_or_value_1.v">
-     <result status="valid" time="1.15"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction.6" expl="6. postcondition" sum="ffd3465a67ba79c580effeab9bf6794e">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction.6.1" expl="1." sum="9e121ca554c074d939064ca91d0acab7">
+   <proof prover="1"><result status="valid" time="5.52"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_4.v"><result status="valid" time="0.99"/></proof>
+   <proof prover="7"><result status="valid" time="0.08"/></proof>
    </goal>
-   <goal name="irreducible_is_value"
-    sum="ca2ae03a232c9d11b08960ce272b217b">
-    <proof prover="5"
-     edited="vstte12_combinators_WP_Combinators_irreducible_is_value_1.v">
-     <result status="valid" time="2.58"/>
-    </proof>
+   <goal name="WP_parameter reduction.6.2" expl="2." sum="46bf7b4672a1f8b93bda7fd48c7d6596">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="only_K_reduces"
-    sum="9789c1eee3b955ed32a8f48db1f6d366">
-    <proof prover="5"
-     edited="vstte12_combinators_WP_Combinators_only_K_reduces_1.v">
-     <result status="valid" time="1.23"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction.7" expl="7. postcondition" sum="dd5b06b69107e66354e48aab7ba0f658">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction.7.1" expl="1." sum="c9dee023667d7bda056045c6be0e072e">
+   <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction_5.v"><result status="valid" time="1.00"/></proof>
+   <proof prover="7"><result status="valid" time="1.22"/></proof>
    </goal>
-   <goal name="size_nonneg"
-    sum="4a7f7dda1ecd28c9f77f64865b159822">
-    <proof prover="5"
-     edited="vstte12_combinators_WP_Combinators_size_nonneg_1.v">
-     <result status="valid" time="0.92"/>
-    </proof>
+   <goal name="WP_parameter reduction.7.2" expl="2." sum="60ef8e3d30aa260c908dc352310d0b2a">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter reduction2" expl="VC for reduction2"
-    sum="576b89e7147b41d78b8db4a9e1f718b2">
-    <label name="expl:VC for reduction2"/>
-    <transf
-     name="split_goal">
-     <goal name="WP_parameter reduction2.1" expl="1. postcondition"
-      sum="02585366a079277f6e765fda8ddb6615">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.2" expl="2. postcondition"
-      sum="d0224dfb739de0be85fc3e3561f0de3b">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.3" expl="3. variant decrease"
-      sum="c96bc7ca67b6c03b7dff9ddefb4d00ed">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" timelimit="15">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.4" expl="4. precondition"
-      sum="55bf25ae857a93a7542b87d47ce9abd4">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.5" expl="5. variant decrease"
-      sum="9e7de4c08b1c931f8476dc7659e72efd">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" timelimit="15">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.6" expl="6. precondition"
-      sum="bff560560d03902d58d074c9e1d3efb0">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.7" expl="7. postcondition"
-      sum="7b0739697d2d55e2bcab337dca70acbc">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.8" expl="8. variant decrease"
-      sum="e7e357e4a8ceda7a00405d9ad0fedca4">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" timelimit="15">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.9" expl="9. precondition"
-      sum="c4855e468fe131af668bfbd97cbb3797">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.10" expl="10. postcondition"
-      sum="55c94ce06f5acfa3086e7d36688ddc7a">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.11" expl="11. variant decrease"
-      sum="2c790eb17c72030d007b4146b741b1c7">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" timelimit="15">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.12" expl="12. precondition"
-      sum="b91c5e37db9eca212924156ce1ae4263">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.13" expl="13. postcondition"
-      sum="e45477ea4d0f11baa632f466fe835f6a">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.14" expl="14. variant decrease"
-      sum="632d99ba4c18967e79456027b2137eea">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" timelimit="15">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.15" expl="15. precondition"
-      sum="e73b22501c1875f28456367f08c241a7">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.16" expl="16. postcondition"
-      sum="d3877d904607b9e8bb10eef9b3028838">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.17" expl="17. variant decrease"
-      sum="ac340d6d1c002450735f3a6471853b81">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" timelimit="15">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.18" expl="18. precondition"
-      sum="a6732c437a1e1b0019a156f9ec56f58e">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.19" expl="19. variant decrease"
-      sum="3db72dff09647a465465a4d1db7f434b">
-      <label name="expl:VC for reduction2"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction2.19.1" expl="1. variant decrease"
-        sum="67ab933793c8184ae7242d38993c3d6a">
-        <label name="expl:VC for reduction2"/>
-        <proof prover="0" timelimit="5" memlimit="1000">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="1">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction2.19.2" expl="2. variant decrease"
-        sum="c7b1c67ce29571674d73a30d8d3de0be">
-        <label name="expl:VC for reduction2"/>
-        <proof prover="0" timelimit="5" memlimit="1000">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="1">
-         <result status="valid" time="0.05"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction2.19.3" expl="3. variant decrease"
-        sum="79abfd5b6c75a97374d6f01ad099f1af">
-        <label name="expl:VC for reduction2"/>
-        <proof prover="0" timelimit="5" memlimit="1000">
-         <result status="valid" time="0.16"/>
-        </proof>
-        <proof prover="1">
-         <result status="valid" time="0.31"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction2.20" expl="20. precondition"
-      sum="6909df9f496b084ca7890e14599631ff">
-      <label name="expl:VC for reduction2"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction2.20.1" expl="1. precondition"
-        sum="6909df9f496b084ca7890e14599631ff">
-        <label name="expl:VC for reduction2"/>
-        <proof prover="0" timelimit="5" memlimit="1000">
-         <result status="valid" time="0.08"/>
-        </proof>
-        <proof prover="1">
-         <result status="valid" time="0.58"/>
-        </proof>
-        <proof prover="5"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction2_2.v">
-         <result status="valid" time="0.92"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction2.21" expl="21. postcondition"
-      sum="8c20b20358487c2213bb1646e4b27e1c">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction2.22" expl="22. unreachable point"
-      sum="614b7d30d190ad737da0df190321aeb7">
-      <label name="expl:VC for reduction2"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-    </transf>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction.8" expl="8. unreachable point" sum="14eeb3a5e0cedeea2f3e11874afe3974">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter test_SKK" expl="VC for test_SKK" sum="135e2adae2fbaac2b5a4457a40e32130">
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="reducible_or_value" sum="3f751f6d16db58b0a069cc45fd61fecf">
+ <proof prover="5" edited="vstte12_combinators_WP_Combinators_reducible_or_value_1.v"><result status="valid" time="1.15"/></proof>
+ </goal>
+ <goal name="irreducible_is_value" sum="ca2ae03a232c9d11b08960ce272b217b">
+ <proof prover="5" edited="vstte12_combinators_WP_Combinators_irreducible_is_value_1.v"><result status="valid" time="3.02"/></proof>
+ </goal>
+ <goal name="only_K_reduces" sum="9789c1eee3b955ed32a8f48db1f6d366">
+ <proof prover="5" edited="vstte12_combinators_WP_Combinators_only_K_reduces_1.v"><result status="valid" time="1.23"/></proof>
+ </goal>
+ <goal name="size_nonneg" sum="4a7f7dda1ecd28c9f77f64865b159822">
+ <proof prover="5" edited="vstte12_combinators_WP_Combinators_size_nonneg_1.v"><result status="valid" time="0.92"/></proof>
+ </goal>
+ <goal name="WP_parameter reduction2" expl="VC for reduction2" sum="576b89e7147b41d78b8db4a9e1f718b2">
+ <transf name="split_goal">
+  <goal name="WP_parameter reduction2.1" expl="1. postcondition" sum="02585366a079277f6e765fda8ddb6615">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.2" expl="2. postcondition" sum="d0224dfb739de0be85fc3e3561f0de3b">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.3" expl="3. variant decrease" sum="c96bc7ca67b6c03b7dff9ddefb4d00ed">
+  <proof prover="2" timelimit="15"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.4" expl="4. precondition" sum="55bf25ae857a93a7542b87d47ce9abd4">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.5" expl="5. variant decrease" sum="9e7de4c08b1c931f8476dc7659e72efd">
+  <proof prover="2" timelimit="15"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.6" expl="6. precondition" sum="bff560560d03902d58d074c9e1d3efb0">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.7" expl="7. postcondition" sum="7b0739697d2d55e2bcab337dca70acbc">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.8" expl="8. variant decrease" sum="e7e357e4a8ceda7a00405d9ad0fedca4">
+  <proof prover="2" timelimit="15"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.9" expl="9. precondition" sum="c4855e468fe131af668bfbd97cbb3797">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.10" expl="10. postcondition" sum="55c94ce06f5acfa3086e7d36688ddc7a">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.11" expl="11. variant decrease" sum="2c790eb17c72030d007b4146b741b1c7">
+  <proof prover="2" timelimit="15"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.12" expl="12. precondition" sum="b91c5e37db9eca212924156ce1ae4263">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.13" expl="13. postcondition" sum="e45477ea4d0f11baa632f466fe835f6a">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.14" expl="14. variant decrease" sum="632d99ba4c18967e79456027b2137eea">
+  <proof prover="2" timelimit="15"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.15" expl="15. precondition" sum="e73b22501c1875f28456367f08c241a7">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.16" expl="16. postcondition" sum="d3877d904607b9e8bb10eef9b3028838">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.17" expl="17. variant decrease" sum="ac340d6d1c002450735f3a6471853b81">
+  <proof prover="2" timelimit="15"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.18" expl="18. precondition" sum="a6732c437a1e1b0019a156f9ec56f58e">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.19" expl="19. variant decrease" sum="3db72dff09647a465465a4d1db7f434b">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction2.19.1" expl="1. variant decrease" sum="67ab933793c8184ae7242d38993c3d6a">
+   <proof prover="0" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="1"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="ks1"
-    sum="e96f26b7bc7e637a62bc7fba4dcab357">
-    <proof prover="2" memlimit="0">
-     <result status="valid" time="0.01"/>
-    </proof>
+   <goal name="WP_parameter reduction2.19.2" expl="2. variant decrease" sum="c7b1c67ce29571674d73a30d8d3de0be">
+   <proof prover="0" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+   <proof prover="1"><result status="valid" time="0.05"/></proof>
    </goal>
-   <goal name="only_K_ks"
-    sum="715b436d9491ebe9c8623b9e8fc65723">
-    <proof prover="5"
-     edited="vstte12_combinators_WP_Combinators_only_K_ks_1.v">
-     <result status="valid" time="0.92"/>
-    </proof>
+   <goal name="WP_parameter reduction2.19.3" expl="3. variant decrease" sum="79abfd5b6c75a97374d6f01ad099f1af">
+   <proof prover="0" timelimit="5" memlimit="1000"><result status="valid" time="0.16"/></proof>
+   <proof prover="1"><result status="valid" time="0.31"/></proof>
    </goal>
-   <goal name="ks_inversion"
-    sum="88e50a49c351fadbbdc52b6c7096eebc">
-    <proof prover="2" memlimit="0">
-     <result status="valid" time="0.01"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction2.20" expl="20. precondition" sum="6909df9f496b084ca7890e14599631ff">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction2.20.1" expl="1. precondition" sum="6909df9f496b084ca7890e14599631ff">
+   <proof prover="0" timelimit="5" memlimit="1000"><result status="valid" time="0.08"/></proof>
+   <proof prover="1"><result status="valid" time="0.58"/></proof>
+   <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction2_2.v"><result status="valid" time="0.92"/></proof>
    </goal>
-   <goal name="ks_injective"
-    sum="1353104da733a6ba6adb4e56c62672ea">
-    <proof prover="5"
-     edited="vstte12_combinators_WP_Combinators_ks_injective_1.v">
-     <result status="valid" time="1.24"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction2.21" expl="21. postcondition" sum="8c20b20358487c2213bb1646e4b27e1c">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction2.22" expl="22. unreachable point" sum="614b7d30d190ad737da0df190321aeb7">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.09"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="ks1" sum="e96f26b7bc7e637a62bc7fba4dcab357">
+ <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="only_K_ks" sum="715b436d9491ebe9c8623b9e8fc65723">
+ <proof prover="5" edited="vstte12_combinators_WP_Combinators_only_K_ks_1.v"><result status="valid" time="0.92"/></proof>
+ </goal>
+ <goal name="ks_inversion" sum="88e50a49c351fadbbdc52b6c7096eebc">
+ <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="ks_injective" sum="1353104da733a6ba6adb4e56c62672ea">
+ <proof prover="5" edited="vstte12_combinators_WP_Combinators_ks_injective_1.v"><result status="valid" time="1.24"/></proof>
+ </goal>
+ <goal name="WP_parameter reduction3" expl="VC for reduction3" sum="f6b5a83b34d8cd2eaac8f7c20df46314">
+ <transf name="split_goal">
+  <goal name="WP_parameter reduction3.1" expl="1. postcondition" sum="edf377e716733c2047530a299a306160">
+  <proof prover="2" timelimit="13" memlimit="0"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.2" expl="2. postcondition" sum="f91ec3c08c237fe441d26dd538daa730">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction3.2.1" expl="1." sum="7db2f9e69ecdf926201c999601eeae09">
+   <proof prover="0"><result status="valid" time="0.01"/></proof>
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+   <proof prover="4"><result status="valid" time="0.00"/></proof>
    </goal>
-   <goal name="WP_parameter reduction3" expl="VC for reduction3"
-    sum="f6b5a83b34d8cd2eaac8f7c20df46314">
-    <label name="expl:VC for reduction3"/>
-    <transf
-     name="split_goal">
-     <goal name="WP_parameter reduction3.1" expl="1. postcondition"
-      sum="edf377e716733c2047530a299a306160">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="2" timelimit="13" memlimit="0">
-       <result status="valid" time="0.07"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.2" expl="2. postcondition"
-      sum="f91ec3c08c237fe441d26dd538daa730">
-      <label name="expl:VC for reduction3"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction3.2.1" expl="1."
-        sum="7db2f9e69ecdf926201c999601eeae09">
-        <label name="expl:VC for reduction3"/>
-        <proof prover="0">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="4">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction3.2.2" expl="2."
-        sum="c27fa8aa5fe1ab35e47a3cd16b135b3b">
-        <label name="expl:VC for reduction3"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction3.3" expl="3. precondition"
-      sum="da28d7b158c835a224a73fa515b0fd39">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.4" expl="4. precondition"
-      sum="b06e2ca746542a2e3a39c2162eac77f4">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="0">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.5" expl="5. postcondition"
-      sum="961c73b6c887f32f1d10e2d9e6d8ac2a">
-      <label name="expl:VC for reduction3"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction3.5.1" expl="1."
-        sum="75dfd475b12d89c5e5bee4ad898e34ff">
-        <label name="expl:VC for reduction3"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction3.5.2" expl="2."
-        sum="de002c639cf2191e0aae2df7062fa251">
-        <label name="expl:VC for reduction3"/>
-        <proof prover="5"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_3.v">
-         <result status="valid" time="2.33"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction3.5.3" expl="3."
-        sum="89f864c4b1b32dd283c97a993a91a763">
-        <label name="expl:VC for reduction3"/>
-        <proof prover="5"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_4.v">
-         <result status="valid" time="1.67"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction3.6" expl="6. precondition"
-      sum="7a704cd3cafbf1fb1b9e3050f9c98bef">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="0">
-       <result status="valid" time="0.05"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.7" expl="7. postcondition"
-      sum="0f42c8b2a0d2d3f9ab5edb6aefc0fcf9">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="5"
-       edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_6.v">
-       <result status="valid" time="1.56"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.8" expl="8. precondition"
-      sum="6ebd46d8a702d9bf3597d609c66730e0">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="0">
-       <result status="valid" time="0.09"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.9" expl="9. postcondition"
-      sum="5a8116e764999b573aecddf147c8bb74">
-      <label name="expl:VC for reduction3"/>
-      <transf
-       name="split_goal">
-       <goal name="WP_parameter reduction3.9.1" expl="1."
-        sum="60e6d3482eb65c8e1a61423fe1461de6">
-        <label name="expl:VC for reduction3"/>
-        <proof prover="0">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.06"/>
-        </proof>
-        <proof prover="4">
-         <result status="valid" time="0.16"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction3.9.2" expl="2."
-        sum="5136cb8932b263f6992cc4801affb1e2">
-        <label name="expl:VC for reduction3"/>
-        <proof prover="5"
-         edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_5.v">
-         <result status="valid" time="1.36"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter reduction3.9.3" expl="3."
-        sum="503553bee636ddf743907595be738ea7">
-        <label name="expl:VC for reduction3"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.11"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter reduction3.10" expl="10. precondition"
-      sum="7f76374937cc1f8145f81e6d3b0779ef">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="0">
-       <result status="valid" time="0.07"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.11" expl="11. postcondition"
-      sum="1ee4c0159c008788695e81aedee18a42">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="5"
-       edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_9.v">
-       <result status="valid" time="1.62"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.12" expl="12. precondition"
-      sum="e4e582bcb6394d3f467c713fc7aa5558">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="0">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.13" expl="13. precondition"
-      sum="190934ffdfdd3984088c9b400a615b12">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="5"
-       edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_7.v">
-       <result status="valid" time="1.61"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.14" expl="14. postcondition"
-      sum="a34014ed2516a387c6a54bec7ff97e30">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="5"
-       edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_8.v">
-       <result status="valid" time="1.57"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter reduction3.15" expl="15. unreachable point"
-      sum="d625258bf87d474808c87f8db848934e">
-      <label name="expl:VC for reduction3"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.08"/>
-      </proof>
-      <proof prover="4">
-       <result status="valid" time="0.04"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter reduction3.2.2" expl="2." sum="c27fa8aa5fe1ab35e47a3cd16b135b3b">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="ks_value"
-    sum="704bd208b5f901fc3b429c9297c030b4">
-    <proof prover="5"
-     edited="vstte12_combinators_WP_Combinators_ks_value_1.v">
-     <result status="valid" time="0.97"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction3.3" expl="3. precondition" sum="da28d7b158c835a224a73fa515b0fd39">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.4" expl="4. precondition" sum="b06e2ca746542a2e3a39c2162eac77f4">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.5" expl="5. postcondition" sum="961c73b6c887f32f1d10e2d9e6d8ac2a">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction3.5.1" expl="1." sum="75dfd475b12d89c5e5bee4ad898e34ff">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="ks_even_odd"
-    sum="42830f4a95edd3de23cb05c684e43b3d">
-    <proof prover="5"
-     edited="vstte12_combinators_WP_Combinators_ks_even_odd_1.v">
-     <result status="valid" time="0.96"/>
-    </proof>
+   <goal name="WP_parameter reduction3.5.2" expl="2." sum="de002c639cf2191e0aae2df7062fa251">
+   <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_3.v"><result status="valid" time="2.33"/></proof>
    </goal>
-  </theory>
- </file>
+   <goal name="WP_parameter reduction3.5.3" expl="3." sum="89f864c4b1b32dd283c97a993a91a763">
+   <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_4.v"><result status="valid" time="1.67"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction3.6" expl="6. precondition" sum="7a704cd3cafbf1fb1b9e3050f9c98bef">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.7" expl="7. postcondition" sum="0f42c8b2a0d2d3f9ab5edb6aefc0fcf9">
+  <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_6.v"><result status="valid" time="1.56"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.8" expl="8. precondition" sum="6ebd46d8a702d9bf3597d609c66730e0">
+  <proof prover="0"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.9" expl="9. postcondition" sum="5a8116e764999b573aecddf147c8bb74">
+  <transf name="split_goal">
+   <goal name="WP_parameter reduction3.9.1" expl="1." sum="60e6d3482eb65c8e1a61423fe1461de6">
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
+   <proof prover="2" memlimit="0"><result status="valid" time="0.06"/></proof>
+   <proof prover="4"><result status="valid" time="0.16"/></proof>
+   </goal>
+   <goal name="WP_parameter reduction3.9.2" expl="2." sum="5136cb8932b263f6992cc4801affb1e2">
+   <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_5.v"><result status="valid" time="1.36"/></proof>
+   </goal>
+   <goal name="WP_parameter reduction3.9.3" expl="3." sum="503553bee636ddf743907595be738ea7">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.11"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter reduction3.10" expl="10. precondition" sum="7f76374937cc1f8145f81e6d3b0779ef">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.11" expl="11. postcondition" sum="1ee4c0159c008788695e81aedee18a42">
+  <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_9.v"><result status="valid" time="1.62"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.12" expl="12. precondition" sum="e4e582bcb6394d3f467c713fc7aa5558">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.13" expl="13. precondition" sum="190934ffdfdd3984088c9b400a615b12">
+  <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_7.v"><result status="valid" time="1.61"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.14" expl="14. postcondition" sum="a34014ed2516a387c6a54bec7ff97e30">
+  <proof prover="5" edited="vstte12_combinators_WP_Combinators_WP_parameter_reduction3_8.v"><result status="valid" time="1.57"/></proof>
+  </goal>
+  <goal name="WP_parameter reduction3.15" expl="15. unreachable point" sum="d625258bf87d474808c87f8db848934e">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.08"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="ks_value" sum="704bd208b5f901fc3b429c9297c030b4">
+ <proof prover="5" edited="vstte12_combinators_WP_Combinators_ks_value_1.v"><result status="valid" time="0.97"/></proof>
+ </goal>
+ <goal name="ks_even_odd" sum="42830f4a95edd3de23cb05c684e43b3d">
+ <proof prover="5" edited="vstte12_combinators_WP_Combinators_ks_even_odd_1.v"><result status="valid" time="0.96"/></proof>
+ </goal>
+</theory>
+</file>
 </why3session>

@@ -85,7 +85,7 @@ type name = string
 type file = string
 
 type role =
-  | Axiom | Hypothesis | Definition  | Assumption
+  | Axiom | Hypothesis | Definition  | Assumption | Corollary
   | Lemma | Theorem    | Conjecture  | Negated_conjecture | Type
 
 type input =

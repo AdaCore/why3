@@ -37,8 +37,6 @@ export sessions=""
 export shapes=""
 
 run_dir () {
-    sessions="$sessions $1/*/why3session.xml"
-    shapes="$shapes $1/*/why3shapes.dat"
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
 	echo -n "Replaying $d ... "
@@ -61,6 +59,8 @@ run_dir () {
 	fi
         total=`expr $total + 1`
     done
+    sessions="$sessions $1/*/why3session.xml"
+    shapes="$shapes $1/*/why3shapes.*"
 }
 
 echo "=== Standard Library ==="

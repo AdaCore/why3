@@ -27,9 +27,8 @@ let add_opt_file x =
   Queue.push (Some x, tlist) opt_queue;
   opt_input := Some tlist
 
-let add_opt_theory =
-  let rdot = (Str.regexp "\\.") in fun x ->
-  let l = Str.split rdot x in
+let add_opt_theory x =
+  let l = Strings.split '.' x in
   let p, t = match List.rev l with
     | t::p -> List.rev p, t
     | _ -> assert false
@@ -53,30 +52,30 @@ let opt_output = ref None
 
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
-      " Read the input file from stdin";
+      " read the input file from stdin";
   "-T", Arg.String add_opt_theory,
-      "<theory> Select <theory> in the input file or in the library";
+      "<theory> select <theory> in the input file or in the library";
   "--theory", Arg.String add_opt_theory,
       " same as -T";
   "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> Select input format (default: \"why\")";
+      "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
   "-D", Arg.String (fun s -> opt_driver := Some s),
-      "<file> Specify a driver";
+      "<file> specify a driver";
   "--driver", Arg.String (fun s -> opt_driver := Some s),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir> Print the selected goals to separate files in <dir>";
+      "<dir> print the selected goals to separate files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o" ]
 
-let (env, config) =
-  Args.initialize option_list add_opt_file usage_msg
+let config, _, env =
+  Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =
   if Queue.is_empty opt_queue then
-    Args.exit_with_usage option_list usage_msg
+    Whyconf.Args.exit_with_usage option_list usage_msg
 
 let opt_output =
   match !opt_output with

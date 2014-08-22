@@ -2,234 +2,99 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
- <prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="1000"/>
- <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10"
-  memlimit="1000"/>
- <prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
- <prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
- <prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
- <prover id="6" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
- <file name="../sf.mlw"
-  expanded="true">
-  <theory name="HoareLogic"
-   expanded="true">
-   <goal name="WP_parameter slow_subtraction" expl="VC for slow_subtraction"
-    sum="162b1a6e293bbb51bac3931d97a3a45d"
-    expanded="true">
-    <label name="expl:VC for slow_subtraction"/>
-    <proof prover="2" memlimit="0">
-     <result status="valid" time="0.00"/>
-    </proof>
+<prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
+<prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="6" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
+<file name="../sf.mlw" expanded="true">
+<theory name="HoareLogic" expanded="true">
+ <goal name="WP_parameter slow_subtraction" expl="VC for slow_subtraction" sum="162b1a6e293bbb51bac3931d97a3a45d" expanded="true">
+ <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="WP_parameter reduce_to_zero" expl="VC for reduce_to_zero" sum="3df7f3c721b32f3cf52b8b40e06573eb" expanded="true">
+ <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="WP_parameter slow_addition" expl="VC for slow_addition" sum="f9a3b73a313dd17c40a521275094e29c" expanded="true">
+ <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="even_not_odd" sum="060b8a578a12f91fcc9a6f1abc68cdf0" expanded="true">
+ <proof prover="6" edited="sf_WP_HoareLogic_even_not_odd_1.v"><result status="valid" time="1.05"/></proof>
+ </goal>
+ <goal name="WP_parameter parity" expl="VC for parity" sum="8d54b0a414237b9838b9ecabb08230f5" expanded="true">
+ <proof prover="2" memlimit="0"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="WP_parameter sqrt" expl="VC for sqrt" sum="dec738e50c1ec5bf8ed74f6a3cdfbf34" expanded="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="WP_parameter factorial" expl="VC for factorial" sum="bca3816c3e4875cfd8e47572930e6dc7" expanded="true">
+ <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+</theory>
+<theory name="MoreHoareLogic" expanded="true">
+ <goal name="WP_parameter list_sum" expl="VC for list_sum" sum="1fdaa1a4eabd084c51631006b7627b09" expanded="true">
+ <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="WP_parameter list_member" expl="VC for list_member" sum="90ec845383e191e12bcaddcd93221454" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter list_member.1" expl="1. loop invariant init" sum="e7ca4b3c2774c9a0ac24c5e875fa978a" expanded="true">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter list_member.2" expl="2. precondition" sum="c9ea15f800b6974e6ec9f3ea408be6f8" expanded="true">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter list_member.3" expl="3. precondition" sum="65f63f659c447128101d73ecf0aa5224" expanded="true">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter list_member.4" expl="4. loop invariant preservation" sum="8230959a4ea0706c9126ea078c4d8d07" expanded="true">
+  <transf name="split_goal" expanded="true">
+   <goal name="WP_parameter list_member.4.1" expl="1." sum="0b16de92981096e0e543a3305e1fad58" expanded="true">
+   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter reduce_to_zero" expl="VC for reduce_to_zero"
-    sum="3df7f3c721b32f3cf52b8b40e06573eb"
-    expanded="true">
-    <label name="expl:VC for reduce_to_zero"/>
-    <proof prover="2" memlimit="0">
-     <result status="valid" time="0.00"/>
-    </proof>
+   <goal name="WP_parameter list_member.4.2" expl="2." sum="22ba714cbe75a810f4f3385fd9308e4a" expanded="true">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter slow_addition" expl="VC for slow_addition"
-    sum="f9a3b73a313dd17c40a521275094e29c"
-    expanded="true">
-    <label name="expl:VC for slow_addition"/>
-    <proof prover="2" memlimit="0">
-     <result status="valid" time="0.01"/>
-    </proof>
+   <goal name="WP_parameter list_member.4.3" expl="3." sum="8d403041ddb1d5736188ae5b01bac3f4" expanded="true">
+   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="even_not_odd" sum="060b8a578a12f91fcc9a6f1abc68cdf0"
-    expanded="true">
-    <proof prover="6" edited="sf_WP_HoareLogic_even_not_odd_1.v">
-     <result status="valid" time="1.05"/>
-    </proof>
+  </transf>
+  </goal>
+  <goal name="WP_parameter list_member.5" expl="5. loop variant decrease" sum="d047d26a7db789f8ac18f7736fe1dba3" expanded="true">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter list_member.6" expl="6. precondition" sum="52e323291962d0866edb32126e978283" expanded="true">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter list_member.7" expl="7. loop invariant preservation" sum="7bdb8566e76fcad2a53418b07e8ec836" expanded="true">
+  <transf name="split_goal" expanded="true">
+   <goal name="WP_parameter list_member.7.1" expl="1." sum="cf601d9e9e0b9d432ea02dbb1ddf04b0" expanded="true">
+   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter parity" expl="VC for parity"
-    sum="8d54b0a414237b9838b9ecabb08230f5"
-    expanded="true">
-    <label name="expl:VC for parity"/>
-    <proof prover="2" memlimit="0">
-     <result status="valid" time="0.07"/>
-    </proof>
+   <goal name="WP_parameter list_member.7.2" expl="2." sum="bfa8291a78c6682be575d9975d87d044" expanded="true">
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
+   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
+   <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter sqrt" expl="VC for sqrt"
-    sum="dec738e50c1ec5bf8ed74f6a3cdfbf34"
-    expanded="true">
-    <label name="expl:VC for sqrt"/>
-    <proof prover="2" timelimit="5">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="3">
-     <result status="valid" time="0.01"/>
-    </proof>
-    <proof prover="4">
-     <result status="valid" time="0.02"/>
-    </proof>
-    <proof prover="5">
-     <result status="valid" time="0.00"/>
-    </proof>
+   <goal name="WP_parameter list_member.7.3" expl="3." sum="9d6340cac43039b8c3a1bd60d33c5330" expanded="true">
+   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter factorial" expl="VC for factorial"
-    sum="bca3816c3e4875cfd8e47572930e6dc7"
-    expanded="true">
-    <label name="expl:VC for factorial"/>
-    <proof prover="2" memlimit="0">
-     <result status="valid" time="0.01"/>
-    </proof>
-   </goal>
-  </theory>
-  <theory name="MoreHoareLogic"
-   expanded="true">
-   <goal name="WP_parameter list_sum" expl="VC for list_sum"
-    sum="1fdaa1a4eabd084c51631006b7627b09"
-    expanded="true">
-    <label name="expl:VC for list_sum"/>
-    <proof prover="2" memlimit="0">
-     <result status="valid" time="0.03"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter list_member" expl="VC for list_member"
-    sum="90ec845383e191e12bcaddcd93221454"
-    expanded="true">
-    <label name="expl:VC for list_member"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter list_member.1" expl="1. loop invariant init"
-      sum="e7ca4b3c2774c9a0ac24c5e875fa978a"
-      expanded="true">
-      <label name="expl:VC for list_member"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.00"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter list_member.2" expl="2. precondition"
-      sum="c9ea15f800b6974e6ec9f3ea408be6f8"
-      expanded="true">
-      <label name="expl:VC for list_member"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter list_member.3" expl="3. precondition"
-      sum="65f63f659c447128101d73ecf0aa5224"
-      expanded="true">
-      <label name="expl:VC for list_member"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter list_member.4"
-      expl="4. loop invariant preservation"
-      sum="8230959a4ea0706c9126ea078c4d8d07"
-      expanded="true">
-      <label name="expl:VC for list_member"/>
-      <transf name="split_goal"
-       expanded="true">
-       <goal name="WP_parameter list_member.4.1" expl="1."
-        sum="0b16de92981096e0e543a3305e1fad58"
-        expanded="true">
-        <label name="expl:VC for list_member"/>
-        <proof prover="1" memlimit="0">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter list_member.4.2" expl="2."
-        sum="22ba714cbe75a810f4f3385fd9308e4a"
-        expanded="true">
-        <label name="expl:VC for list_member"/>
-        <proof prover="2" memlimit="0">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter list_member.4.3" expl="3."
-        sum="8d403041ddb1d5736188ae5b01bac3f4"
-        expanded="true">
-        <label name="expl:VC for list_member"/>
-        <proof prover="1" memlimit="0">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter list_member.5" expl="5. loop variant decrease"
-      sum="d047d26a7db789f8ac18f7736fe1dba3"
-      expanded="true">
-      <label name="expl:VC for list_member"/>
-      <proof prover="1" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter list_member.6" expl="6. precondition"
-      sum="52e323291962d0866edb32126e978283"
-      expanded="true">
-      <label name="expl:VC for list_member"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter list_member.7"
-      expl="7. loop invariant preservation"
-      sum="7bdb8566e76fcad2a53418b07e8ec836"
-      expanded="true">
-      <label name="expl:VC for list_member"/>
-      <transf name="split_goal"
-       expanded="true">
-       <goal name="WP_parameter list_member.7.1" expl="1."
-        sum="cf601d9e9e0b9d432ea02dbb1ddf04b0"
-        expanded="true">
-        <label name="expl:VC for list_member"/>
-        <proof prover="1" memlimit="0">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter list_member.7.2" expl="2."
-        sum="bfa8291a78c6682be575d9975d87d044"
-        expanded="true">
-        <label name="expl:VC for list_member"/>
-        <proof prover="0">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="1" timelimit="5">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="2" timelimit="5">
-         <result status="valid" time="0.01"/>
-        </proof>
-        <proof prover="4">
-         <result status="valid" time="0.02"/>
-        </proof>
-        <proof prover="5">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter list_member.7.3" expl="3."
-        sum="9d6340cac43039b8c3a1bd60d33c5330"
-        expanded="true">
-        <label name="expl:VC for list_member"/>
-        <proof prover="1" memlimit="0">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter list_member.8" expl="8. loop variant decrease"
-      sum="e249313140e167bec1524a8b6c3e8036"
-      expanded="true">
-      <label name="expl:VC for list_member"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter list_member.9" expl="9. postcondition"
-      sum="a179caabe688c9147a65065addc72c7a"
-      expanded="true">
-      <label name="expl:VC for list_member"/>
-      <proof prover="2" memlimit="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+  <goal name="WP_parameter list_member.8" expl="8. loop variant decrease" sum="e249313140e167bec1524a8b6c3e8036" expanded="true">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter list_member.9" expl="9. postcondition" sum="a179caabe688c9147a65065addc72c7a" expanded="true">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

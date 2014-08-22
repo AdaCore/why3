@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Why3
+
 (** Proof sessions
 
     Define all the functions needed for managing a session:

@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Why3
+open Why3session
 open Why3session_lib
 open Whyconf
 open Session
@@ -188,7 +189,7 @@ but@ one@ is@ needed.@.";
 
 let cmd_copy =
   { cmd_spec     = spec;
-    cmd_desc     = "copy proof based on a filter.";
+    cmd_desc     = "copy proof based on a filter";
     cmd_name     = "copy";
     cmd_run      = run ~action:Copy;
   }
@@ -196,7 +197,7 @@ let cmd_copy =
 
 let cmd_archive =
   { cmd_spec     = spec;
-    cmd_desc     = "same as copy but archive the source.";
+    cmd_desc     = "same as copy but archive the source";
     cmd_name     = "copy-archive";
     cmd_run      = run ~action:CopyArchive;
   }
@@ -204,7 +205,7 @@ let cmd_archive =
 
 let cmd_mod =
   { cmd_spec = spec;
-    cmd_desc     = "modify proof based on filter.";
+    cmd_desc     = "modify proof based on filter";
     cmd_name     = "mod";
     cmd_run      = run ~action:Mod;
   }

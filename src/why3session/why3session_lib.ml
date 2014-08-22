@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Why3
+open Why3session
 module S = Session
 module C = Whyconf
 
@@ -30,20 +31,9 @@ let files = Queue.create ()
 let iter_files f = Queue.iter f files
 let anon_fun (f:string) = Queue.add f files
 
-let opt_version = ref false
-
-let print_version () =
-  Format.printf "Why3 session, version %s (build date: %s)@."
-    Config.version Config.builddate
-
 let read_simple_spec () =
-  if !opt_version then begin
-    print_version (); exit 0
-  end;
   Debug.Args.set_flags_selected ();
   Debug.Args.option_list ()
-
-
 
 let opt_config = ref None
 let opt_loadpath = ref []
@@ -51,16 +41,15 @@ let opt_extra = ref []
 
 let common_options = [
   "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> reads configuration from <file>";
+      "<file> read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
       "<file> same as -C";
   "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-      "<file> reads additional configuration from <file>";
+      "<file> read additional configuration from <file>";
   "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> adds <dir> to the library search path";
+      "<dir> add <dir> to the library search path";
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> same as -L";
-  "-v", Arg.Set opt_version, " prints version information" ;
   Debug.Args.desc_shortcut "verbose" "--verbose" "increase verbosity";
   Debug.Args.desc_debug_list;
   Debug.Args.desc_debug_all;
@@ -98,7 +87,7 @@ let filter_prover = Stack.create ()
 
 let read_opt_prover s =
   try
-    let l = Strings.rev_split s ',' in
+    let l = Strings.rev_split ',' s in
     match l with
     | [altern;version;name] when List.for_all (fun s -> s.[0] <> '^') l ->
       Prover {Whyconf.prover_name = name;

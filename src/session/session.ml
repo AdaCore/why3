@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Debug
+open Why3
 open Stdlib
 open Ty
 open Ident
@@ -379,7 +379,11 @@ module PTreeT = struct
     | Session s ->
       let l = ref [] in
       session_iter (fun a -> l := (Any a)::!l) s;
-      Filename.basename s.session_dir,!l
+      (** Previously "" was `Filename.basename s.session_dir` but
+          the tree depend on the filename given in input and not the content
+          which is not easy for diffing
+      *)
+      "",!l
 
 end
 
@@ -404,7 +408,7 @@ let empty_session ?shape_version dir =
 let create_session ?shape_version project_dir =
   if not (Sys.file_exists project_dir) then
     begin
-      dprintf debug
+      Debug.dprintf debug
         "[Info] '%s' does not exists. Creating directory of that name \
  for the project@." project_dir;
       Unix.mkdir project_dir 0o777
@@ -494,6 +498,7 @@ open Format
 
 let db_filename = "why3session.xml"
 let shape_filename = "why3shapes.dat"
+let compressed_shape_filename = "why3shapes.gz"
 let session_dir_for_save = ref "."
 
 let save_string fmt s =
@@ -574,8 +579,11 @@ let save_label fmt s =
   fprintf fmt "@\n@[<hov 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
 *)
 
+module Compr = Compress.Compress_z
+
 type save_ctxt = {
-  provers : (int * int * int) Mprover.t; ch_shapes : out_channel
+  provers : (int * int * int) Mprover.t;
+  ch_shapes : Compr.out_channel;
 }
 
 let rec save_goal ctxt fmt g =
@@ -588,10 +596,10 @@ let rec save_goal ctxt fmt g =
     (opt "expl") g.goal_expl
     save_string checksum
     (save_bool_def "expanded" false) g.goal_expanded;
-  output_string ctxt.ch_shapes checksum;
-  output_char ctxt.ch_shapes ' ';
-  output_string ctxt.ch_shapes shape;
-  output_char ctxt.ch_shapes '\n';
+  Compr.output_string ctxt.ch_shapes checksum ;
+  Compr.output_char ctxt.ch_shapes ' ';
+  Compr.output_string ctxt.ch_shapes shape;
+  Compr.output_char ctxt.ch_shapes '\n';
 (*
   Ident.Slab.iter (save_label fmt) g.goal_name.Ident.id_label;
 *)
@@ -719,7 +727,7 @@ let save_prover fmt p (timelimits,memlimits) (provers,id) =
 
 let save fname shfname _config session =
   let ch = open_out fname in
-  let chsh = open_out shfname in
+  let chsh = Compr.open_out shfname in
   let fmt = formatter_of_out_channel ch in
   fprintf fmt "<?xml version=\"1.0\" encoding=\"UTF-8\"?>@\n";
   fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v5//EN\"@ \"http://why3.lri.fr/why3session.dtd\">@\n";
@@ -739,14 +747,17 @@ let save fname shfname _config session =
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";
   close_out ch;
-  close_out chsh
+  Compr.close_out chsh
 
 let save_session config session =
   let f = Filename.concat session.session_dir db_filename in
   Sysutil.backup_file f;
   let fs = Filename.concat session.session_dir shape_filename in
   Sysutil.backup_file fs;
+  let fz = Filename.concat session.session_dir compressed_shape_filename in
+  Sysutil.backup_file fz;
   session_dir_for_save := session.session_dir;
+  let fs = if Compress.compression_supported then fz else fs in
   save f fs config session
 
 (*****************************)
@@ -1114,7 +1125,7 @@ let load_ident elt =
 
 type load_ctxt = {
   old_provers : (Whyconf.prover * int * int) Mstr.t ;
-  shapes : (string, Tc.shape) Hashtbl.t
+  shapes : ((string, Tc.shape) Hashtbl.t) option
 }
 
 let rec load_goal ctxt parent acc g =
@@ -1126,11 +1137,14 @@ let rec load_goal ctxt parent acc g =
         let sum = Tc.checksum_of_string csum in
         let shape =
           try Tc.shape_of_string (List.assoc "shape" g.Xml.attributes)
-          with Not_found -> 
-            try Hashtbl.find ctxt.shapes csum
-            with Not_found ->
-              Format.eprintf "[Warning] shape not found for goal %s@." csum;
-              Tc.shape_of_string ""
+          with Not_found ->
+            match ctxt.shapes with
+              | None -> Tc.shape_of_string ""
+              | Some h ->
+                try Hashtbl.find h csum
+                with Not_found ->
+                  Format.eprintf "[Warning] shape not found for goal %s@." csum;
+                  Tc.shape_of_string ""
         in
         let expanded = bool_attribute "expanded" g false in
         let mg =
@@ -1376,66 +1390,102 @@ let load_session session shapes xml =
     | "why3session" ->
       let shape_version = int_attribute_def "shape_version" xml 1 in
       session.session_shape_version <- shape_version;
-      dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
+      Debug.dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
       (** just to keep the old_provers somewhere *)
 (*
      old_provers := *)
       let _ =
         List.fold_left (load_file session shapes) Mstr.empty xml.Xml.elements
       in
-      dprintf debug "[Info] load_session: done@\n"
+      Debug.dprintf debug "[Info] load_session: done@\n"
     | s ->
         eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
 
 exception OpenError of string
 
-let read_shapes ch =
+module ReadShapes (C:Compress.S) = struct
+
+let read_shapes fn =
+  let ch = C.open_in fn in
   let h = Hashtbl.create 97 in
   let shape = Buffer.create 97 in
   try
     while true do
-      let sum = String.make 32 ' ' in
-      let nsum = input ch sum 0 32 in
+      let sum = String.create 32 in
+      let nsum = C.input ch sum 0 32 in
       if nsum = 0 then raise End_of_file;
-      if nsum <> 32 then 
-        raise 
-          (OpenError "shapes files corrupted (checksum too short), ignored");
-      if input_char ch <> ' ' then
+      if nsum <> 32 then
+        begin
+          try
+            C.really_input ch sum nsum (32-nsum)
+          with End_of_file ->
+            raise
+              (OpenError
+                 ("shapes files corrupted (checksum '" ^
+                     (String.sub sum 0 nsum) ^
+                     "' too short), ignored"))
+        end;
+      if try C.input_char ch <> ' ' with End_of_file -> true then
         raise (OpenError "shapes files corrupted (space missing), ignored");
-      Buffer.clear shape;        
-      try 
+      Buffer.clear shape;
+      try
         while true do
-          let c = input_char ch in
+          let c = C.input_char ch in
           if c = '\n' then raise Exit;
           Buffer.add_char shape c
         done
-      with Exit -> 
-        Hashtbl.add h sum (Tc.shape_of_string (Buffer.contents shape))
+      with 
+        | End_of_file ->
+          raise (OpenError "shapes files corrupted (premature end of file), ignored");
+        | Exit ->
+          Hashtbl.add h sum (Tc.shape_of_string (Buffer.contents shape))
     done;
     assert false
-  with End_of_file -> h
+  with End_of_file -> C.close_in ch; h
 
+end
 
+module ReadShapesNoCompress = ReadShapes(Compress.Compress_none)
+module ReadShapesCompress = ReadShapes(Compress.Compress_z)
 
 type notask = unit
 let read_session dir =
   if not (Sys.file_exists dir && Sys.is_directory dir) then
     raise (OpenError (Pp.sprintf "%s is not an existing directory" dir));
   let xml_filename = Filename.concat dir db_filename in
-  let shape_filename = Filename.concat dir shape_filename in
   let session = empty_session dir in
   (** If the xml is present we read it, otherwise we consider it empty *)
   if Sys.file_exists xml_filename then begin
     try
       Tc.reset_dict ();
       let xml = Xml.from_file xml_filename in
-      let shapes = 
+      let shapes =
         try
-          let ch = open_in shape_filename in
-          let h = read_shapes ch in
-          close_in ch;
-          h
-        with Sys_error _ -> Hashtbl.create 1
+          let compressed_shape_filename =
+            Filename.concat dir compressed_shape_filename
+          in
+          if Sys.file_exists compressed_shape_filename then
+            if Compress.compression_supported then
+              Some (ReadShapesCompress.read_shapes compressed_shape_filename)
+            else
+              begin
+                Format.eprintf "[Warning] could not read goal shapes because \
+                                Why3 was not compiled with compress support@.";
+                None
+              end
+          else
+            let shape_filename = Filename.concat dir shape_filename in
+            if Sys.file_exists shape_filename then
+              Some (ReadShapesNoCompress.read_shapes shape_filename)
+            else
+              begin
+                Format.eprintf "[Warning] could not find goal shapes file@.";
+                None
+              end
+        with e ->
+          Format.eprintf "[Warning] failed to read goal shapes: %s@."
+            (Printexc.to_string e);
+          None
       in
       try
         load_session session shapes xml.Xml.content;
@@ -1950,7 +2000,7 @@ let merge_metas_in_task ~theories env task from_metas =
       Hts.add hts from_ts to_ts;
       Mts.add to_ts ip idpos_ts
     with e ->
-      dprintf debug "[merge metas]@ can't@ find@ ident@ %a@ because@ %a@\n"
+      Debug.dprintf debug "[merge metas]@ can't@ find@ ident@ %a@ because@ %a@\n"
         print_ident_path ip Exn_printer.exn_printer e;
       idpos_ts
   ) Mts.empty from_metas.metas_idpos.idpos_ts in
@@ -1961,7 +2011,7 @@ let merge_metas_in_task ~theories env task from_metas =
       Hls.add hls from_ls to_ls;
       Mls.add to_ls ip idpos_ls
     with e ->
-      dprintf debug "[merge metas]@ can't@ find@ ident@ %a@ because@ %a@\n"
+      Debug.dprintf debug "[merge metas]@ can't@ find@ ident@ %a@ because@ %a@\n"
         print_ident_path ip Exn_printer.exn_printer e;
       idpos_ls
   ) Mls.empty from_metas.metas_idpos.idpos_ls in
@@ -1972,7 +2022,7 @@ let merge_metas_in_task ~theories env task from_metas =
       Hpr.add hpr from_pr to_pr;
       Mpr.add to_pr ip idpos_pr
     with e ->
-      dprintf debug "[merge metas]@ can't@ find@ ident@ %a@ because@ %a"
+      Debug.dprintf debug "[merge metas]@ can't@ find@ ident@ %a@ because@ %a"
         print_ident_path ip Exn_printer.exn_printer e;
       idpos_pr
   ) Mpr.empty from_metas.metas_idpos.idpos_pr in
@@ -2012,7 +2062,7 @@ let merge_metas_in_task ~theories env task from_metas =
           | Ts_not_found ts ->
             obsolete := true;
             let pos = Mts.find ts from_metas.metas_idpos.idpos_ts in
-            dprintf debug
+            Debug.dprintf debug
               "Remove the meta %a during merge because \
                the type symbol %a can't be found@\n"
               print_meta (meta_name,meta_args)
@@ -2021,7 +2071,7 @@ let merge_metas_in_task ~theories env task from_metas =
           | Ls_not_found ls ->
             obsolete := true;
             let pos = Mls.find ls from_metas.metas_idpos.idpos_ls in
-            dprintf debug
+            Debug.dprintf debug
               "Remove the meta %a during merge because \
                the logic symbol %a can't be found@\n"
               print_meta (meta_name,meta_args)
@@ -2030,7 +2080,7 @@ let merge_metas_in_task ~theories env task from_metas =
           | Pr_not_found pr ->
             obsolete := true;
             let pos = Mpr.find pr from_metas.metas_idpos.idpos_pr in
-            dprintf debug
+            Debug.dprintf debug
               "Remove the meta %a during merge because \
                the proposition symbol %a can't be found@\n"
               print_meta (meta_name,meta_args)
@@ -2041,7 +2091,7 @@ let merge_metas_in_task ~theories env task from_metas =
       (Mstr.add meta_name smeta_args metas,task)
     with
     | Theory.UnknownMeta s ->
-      dprintf debug "Remove a meta during merge: meta %s unknown@\n" s;
+      Debug.dprintf debug "Remove a meta during merge: meta %s unknown@\n" s;
       acc
   in
   let goal,task = Task.task_separate_goal task in
@@ -2124,20 +2174,20 @@ and merge_trans ~keygen ~theories env to_goal _ from_transf =
   try
     let from_transf_name = from_transf.transf_name in
     let to_goal_name = to_goal.goal_name in
-    dprintf debug "[Reload] transformation %s for goal %s @\n"
+    Debug.dprintf debug "[Reload] transformation %s for goal %s @\n"
       from_transf_name to_goal_name.Ident.id_string;
     let to_transf =
       try
         add_registered_transformation
           ~keygen env from_transf_name to_goal
       with exn when not (Debug.test_flag Debug.stack_trace) ->
-        dprintf debug "[Reload] transformation %s produce an error:%a"
+        Debug.dprintf debug "[Reload] transformation %s produce an error:%a"
           from_transf_name Exn_printer.exn_printer exn;
         raise Exit
     in
     set_transf_expanded to_transf from_transf.transf_expanded;
     let associated =
-      dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
+      Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
         env.session.session_shape_version;
       AssoGoals.associate from_transf.transf_goals to_transf.transf_goals
     in
@@ -2152,7 +2202,7 @@ and merge_trans ~keygen ~theories env to_goal _ from_transf =
 (** convert the ident from the old task to the ident at the same
     position in the new task *)
 and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
-  dprintf debug "[Reload] metas for goal %s@\n"
+  Debug.dprintf debug "[Reload] metas for goal %s@\n"
     to_goal.goal_name.Ident.id_string;
 
   let task,metas,to_idpos,obsolete =
@@ -2168,14 +2218,14 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
       to_goal.goal_name to_goal.goal_expl task
   in
   to_metas.metas_goal <- to_goal;
-  dprintf debug "[Reload] metas done@\n";
+  Debug.dprintf debug "[Reload] metas done@\n";
   merge_any_goal ~keygen ~theories env obsolete from_metas.metas_goal to_goal
 
 and merge_metas ~keygen ~theories env to_goal s from_metas =
   try
     merge_metas_aux ~keygen ~theories env to_goal s from_metas
   with exn ->
-    dprintf debug "[merge metas] error %a during merge, metas removed@\n"
+    Debug.dprintf debug "[merge metas] error %a during merge, metas removed@\n"
       Exn_printer.exn_printer exn
 
 exception OutdatedSession
@@ -2196,7 +2246,7 @@ let merge_theory
         let goal_obsolete = to_goal.goal_checksum <> from_goal.goal_checksum in
         if goal_obsolete then
           begin
-            dprintf debug "[Reload] Goal %s.%s has changed@\n"
+            Debug.dprintf debug "[Reload] Goal %s.%s has changed@\n"
               to_th.theory_name.Ident.id_string
               to_goal.goal_name.Ident.id_string;
             if not allow_obsolete then raise OutdatedSession;
@@ -2212,7 +2262,7 @@ let merge_theory
     ) to_th.theory_goals
 
 let merge_file ~release ~keygen ~theories env ~allow_obsolete from_f to_f =
-  dprintf debug "[Info] merge_file, shape_version = %d@\n"
+  Debug.dprintf debug "[Info] merge_file, shape_version = %d@\n"
     env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
   let from_theories = List.fold_left
@@ -2234,7 +2284,7 @@ let merge_file ~release ~keygen ~theories env ~allow_obsolete from_f to_f =
         | Not_found -> raise OutdatedSession
     )
     to_f.file_theories;
-  dprintf debug "[Info] merge_file, done@\n"
+  Debug.dprintf debug "[Info] merge_file, done@\n"
 
 let rec recompute_all_shapes_goal ~release g =
   let t = goal_task g in
@@ -2260,7 +2310,7 @@ let recompute_all_shapes ~release session =
 
 let update_session
     ?(release=false) ~keygen ~allow_obsolete old_session env whyconf =
-  dprintf debug "[Info] update_session: shape_version = %d@\n"
+  Debug.dprintf debug "[Info] update_session: shape_version = %d@\n"
     old_session.session_shape_version;
   let new_session =
     create_session ~shape_version:old_session.session_shape_version
@@ -2280,13 +2330,13 @@ let update_session
   found_missed_goals := false;
   let files =
     PHstr.fold (fun _ old_file acc ->
-      dprintf debug "[Load] file '%s'@\n" old_file.file_name;
+      Debug.dprintf debug "[Load] file '%s'@\n" old_file.file_name;
       let new_file = add_file
         ~keygen new_env_session
         ?format:old_file.file_format old_file.file_name
       in
       let theories = Opt.get new_file.file_for_recovery in
-      dprintf debug "[Merge] file '%s'@\n" old_file.file_name;
+      Debug.dprintf debug "[Merge] file '%s'@\n" old_file.file_name;
       merge_file ~keygen ~theories
         ~release:(release && (not will_recompute_shape))
           new_env_session ~allow_obsolete old_file new_file;
@@ -2298,12 +2348,12 @@ let update_session
       Mstr.empty
   in
   new_env_session.files <- files;
-  dprintf debug "[Info] update_session: done@\n";
+  Debug.dprintf debug "[Info] update_session: done@\n";
   let obsolete =
     if will_recompute_shape
     then
       begin
-        dprintf debug "[Info] update_session: recompute shapes@\n";
+        Debug.dprintf debug "[Info] update_session: recompute shapes@\n";
         recompute_all_shapes ~release new_session;
         true
       end
@@ -2391,7 +2441,7 @@ and add_metas_to_goal ~keygen env to_goal from_metas =
             task s)
         task0 from_metas.metas_added
     with exn ->
-      dprintf debug "[Paste] addition of metas produces an error:%a"
+      Debug.dprintf debug "[Paste] addition of metas produces an error:%a"
         Exn_printer.exn_printer exn;
       raise Paste_error  in
   let task = add_tdecl task goal in
@@ -2412,19 +2462,19 @@ and add_proof_to_goal ~keygen env to_goal from_proof_attempt =
 and add_transf_to_goal ~keygen env to_goal from_transf =
   let from_transf_name = from_transf.transf_name in
   let to_goal_name = to_goal.goal_name in
-  dprintf debug "[Paste] transformation %s for goal %s @\n"
+  Debug.dprintf debug "[Paste] transformation %s for goal %s @\n"
     from_transf_name to_goal_name.Ident.id_string;
   let to_transf =
     try
       add_registered_transformation
         ~keygen env from_transf_name to_goal
     with exn when not (Debug.test_flag Debug.stack_trace) ->
-      dprintf debug "[Paste] transformation %s produce an error:%a"
+      Debug.dprintf debug "[Paste] transformation %s produce an error:%a"
         from_transf_name Exn_printer.exn_printer exn;
       raise Paste_error
   in
   let associated =
-    dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
+    Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
       env.session.session_shape_version;
     AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
@@ -2439,17 +2489,17 @@ let get_project_dir fname =
   let d =
     if Sys.is_directory fname then fname
     else if Filename.basename fname = db_filename then begin
-      dprintf debug "Info: found db file '%s'@." fname;
+      Debug.dprintf debug "Info: found db file '%s'@." fname;
       Filename.dirname fname
     end
     else
       begin
-        dprintf debug "Info: found regular file '%s'@." fname;
+        Debug.dprintf debug "Info: found regular file '%s'@." fname;
         try Filename.chop_extension fname
         with Invalid_argument _ -> fname^".w3s"
       end
   in
-  dprintf debug "Info: using '%s' as directory for the project@." d;
+  Debug.dprintf debug "Info: using '%s' as directory for the project@." d;
   d
 
 let key_any = function

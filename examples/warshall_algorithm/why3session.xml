@@ -2,315 +2,135 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
- <prover id="1" name="Coq" version="8.4pl3" timelimit="6" memlimit="1000"/>
- <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5"
-  memlimit="1000"/>
- <file name="../warshall_algorithm.mlw"
-  expanded="true">
-  <theory name="WarshallAlgorithm"
-   expanded="true">
-   <goal name="weakening" sum="a2e646aaa8f449556f806942e2d8d262"
-    expanded="true">
-    <proof prover="1"
-     edited="warshall_algorithm_WarshallAlgorithm_weakening_1.v">
-     <result status="valid" time="0.97"/>
-    </proof>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.4pl3" timelimit="6" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../warshall_algorithm.mlw" expanded="true">
+<theory name="WarshallAlgorithm" expanded="true">
+ <goal name="weakening" sum="a2e646aaa8f449556f806942e2d8d262" expanded="true">
+ <proof prover="1" edited="warshall_algorithm_WarshallAlgorithm_weakening_1.v"><result status="valid" time="0.97"/></proof>
+ </goal>
+ <goal name="decomposition" sum="5c3846f3226e008f18b65844497f7f1e" expanded="true">
+ <proof prover="1" edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"><result status="valid" time="1.52"/></proof>
+ </goal>
+ <goal name="WP_parameter transitive_closure" expl="VC for transitive_closure" sum="ecb64fac1c21c6319399699e8e2ee48c">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter transitive_closure.1" expl="1. postcondition" sum="f4d240f1afa91d782724b06e107b80d7">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.2" expl="2. loop invariant init" sum="37849b1664f3137d77fad247e0c04c70">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.3" expl="3. loop invariant preservation" sum="9f283dd78631eb88cae1fcca40314c56">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.4" expl="4. loop invariant init" sum="bf8081e16ee856295f7be566eb962e87">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.5" expl="5. loop invariant preservation" sum="5fc6a3e437c9ad9ebc5ee7ef79a53e2a">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter transitive_closure.5.1" expl="1. loop invariant preservation" sum="e2485c5aeefb2993725ac8b7f4ca3492">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
    </goal>
-   <goal name="decomposition" sum="5c3846f3226e008f18b65844497f7f1e"
-    expanded="true">
-    <proof prover="1"
-     edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v">
-     <result status="valid" time="1.52"/>
-    </proof>
+   <goal name="WP_parameter transitive_closure.5.2" expl="2. loop invariant preservation" sum="5e7f1fc50e4a28ac6b372419dd733dcd">
+   <proof prover="2"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter transitive_closure"
-    expl="VC for transitive_closure"
-    sum="ecb64fac1c21c6319399699e8e2ee48c">
-    <label name="expl:VC for transitive_closure"/>
-    <transf
-     name="split_goal_wp">
-     <goal name="WP_parameter transitive_closure.1" expl="1. postcondition"
-      sum="f4d240f1afa91d782724b06e107b80d7">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.2"
-      expl="2. loop invariant init"
-      sum="37849b1664f3137d77fad247e0c04c70">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.03"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.3"
-      expl="3. loop invariant preservation"
-      sum="9f283dd78631eb88cae1fcca40314c56">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.4"
-      expl="4. loop invariant init"
-      sum="bf8081e16ee856295f7be566eb962e87">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.08"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.5"
-      expl="5. loop invariant preservation"
-      sum="5fc6a3e437c9ad9ebc5ee7ef79a53e2a">
-      <label name="expl:VC for transitive_closure"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter transitive_closure.5.1"
-        expl="1. loop invariant preservation"
-        sum="e2485c5aeefb2993725ac8b7f4ca3492">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="2">
-         <result status="valid" time="0.07"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter transitive_closure.5.2"
-        expl="2. loop invariant preservation"
-        sum="5e7f1fc50e4a28ac6b372419dd733dcd">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="2">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter transitive_closure.5.3"
-        expl="3. loop invariant preservation"
-        sum="df701f98bf4e88cf985b9c426ed48f43">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="2">
-         <result status="valid" time="0.00"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter transitive_closure.6"
-      expl="6. loop invariant init"
-      sum="168adf4abff3b4c1715dad13551c3782">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.7" expl="7. type invariant"
-      sum="dba81102ad788815229ceca6094cc377">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.8" expl="8. precondition"
-      sum="da24e59264b1305b8f0ed6ed904e372f">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.9" expl="9. precondition"
-      sum="70345a192bb7336c18aeb9b798a6de93">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.10"
-      expl="10. loop invariant preservation"
-      sum="f0e524d5d952b4e157ae3874a69f221a">
-      <label name="expl:VC for transitive_closure"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter transitive_closure.10.1"
-        expl="1. loop invariant preservation"
-        sum="98d4df5e53aec07a533b44b95fe49bff">
-        <label name="expl:VC for transitive_closure"/>
-        <transf
-         name="split_all_full">
-         <goal name="WP_parameter transitive_closure.10.1.1"
-          expl="1. loop invariant preservation"
-          sum="40a77cab9898513ac0ad48065f51dd84">
-          <label name="expl:VC for transitive_closure"/>
-          <proof prover="2">
-           <result status="valid" time="0.02"/>
-          </proof>
-         </goal>
-         <goal name="WP_parameter transitive_closure.10.1.2"
-          expl="2. loop invariant preservation"
-          sum="9104609cd6a16d2ec8f9925c7d34680c">
-          <label name="expl:VC for transitive_closure"/>
-          <proof prover="2">
-           <result status="valid" time="0.03"/>
-          </proof>
-         </goal>
-        </transf>
-       </goal>
-       <goal name="WP_parameter transitive_closure.10.2"
-        expl="2. loop invariant preservation"
-        sum="210e2d422ffaa6b75abcbb27bcddd8bf">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="2">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter transitive_closure.10.3"
-        expl="3. loop invariant preservation"
-        sum="39602ed4ce53f342cab988c34bac02c0">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="2">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter transitive_closure.11" expl="11. precondition"
-      sum="52575b042315de9477d2d0b1e2b23d6a">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.12" expl="12. precondition"
-      sum="cc9fa4e14d81e6eef65332087f942043">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.13" expl="13. precondition"
-      sum="ce1a414202610dc49e84292487bf9d75">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.14"
-      expl="14. loop invariant preservation"
-      sum="011d96034bd0ddb2c77def805fa88381">
-      <label name="expl:VC for transitive_closure"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter transitive_closure.14.1"
-        expl="1. loop invariant preservation"
-        sum="8fbf523a7bcb1e7bf41594623b789fca">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="0">
-         <result status="valid" time="0.15"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter transitive_closure.14.2"
-        expl="2. loop invariant preservation"
-        sum="f90f4608e2f1ed55868170c1abae5234">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="2">
-         <result status="valid" time="0.07"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter transitive_closure.14.3"
-        expl="3. loop invariant preservation"
-        sum="661894a01c6faf25fc587f568690022a">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="0">
-         <result status="valid" time="0.07"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter transitive_closure.15" expl="15. precondition"
-      sum="a9c472ab4d9c6fdaa668b699dae0a68e">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.16"
-      expl="16. loop invariant preservation"
-      sum="bb7acbf83db488a3e60dbb1d6ee2b769">
-      <label name="expl:VC for transitive_closure"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter transitive_closure.16.1"
-        expl="1. loop invariant preservation"
-        sum="48ab68abfb7cc1efbef634b5e5d323b0">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="0">
-         <result status="valid" time="0.03"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter transitive_closure.16.2"
-        expl="2. loop invariant preservation"
-        sum="e442ba5fecc08de1b18b3afd0993d12a">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="2">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter transitive_closure.16.3"
-        expl="3. loop invariant preservation"
-        sum="4a2c6dce555192974950c40afa934dfc">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="0">
-         <result status="valid" time="0.04"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter transitive_closure.17"
-      expl="17. loop invariant preservation"
-      sum="c05b1bb6917f202efef9dae112a1cd8c">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.10"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.18"
-      expl="18. loop invariant preservation"
-      sum="b71f6207c5ed5c1d8a4daab31be2a43b">
-      <label name="expl:VC for transitive_closure"/>
-      <transf
-       name="split_goal_wp">
-       <goal name="WP_parameter transitive_closure.18.1"
-        expl="1. loop invariant preservation"
-        sum="b424b9b4827e4c344728e04005a82465">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="2">
-         <result status="valid" time="0.02"/>
-        </proof>
-       </goal>
-       <goal name="WP_parameter transitive_closure.18.2"
-        expl="2. loop invariant preservation"
-        sum="b3ff506ad7e5b5495d61ef4a1109f0a7">
-        <label name="expl:VC for transitive_closure"/>
-        <proof prover="2">
-         <result status="valid" time="0.01"/>
-        </proof>
-       </goal>
-      </transf>
-     </goal>
-     <goal name="WP_parameter transitive_closure.19"
-      expl="19. type invariant"
-      sum="004ea18e6ddbc833c63633bf37a0b460">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter transitive_closure.20" expl="20. postcondition"
-      sum="cc4208403c8353e427da8d2404819330">
-      <label name="expl:VC for transitive_closure"/>
-      <proof prover="2">
-       <result status="valid" time="0.06"/>
-      </proof>
-     </goal>
-    </transf>
+   <goal name="WP_parameter transitive_closure.5.3" expl="3. loop invariant preservation" sum="df701f98bf4e88cf985b9c426ed48f43">
+   <proof prover="2"><result status="valid" time="0.00"/></proof>
    </goal>
-  </theory>
- </file>
+  </transf>
+  </goal>
+  <goal name="WP_parameter transitive_closure.6" expl="6. loop invariant init" sum="168adf4abff3b4c1715dad13551c3782">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.7" expl="7. type invariant" sum="dba81102ad788815229ceca6094cc377">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.8" expl="8. precondition" sum="da24e59264b1305b8f0ed6ed904e372f">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.9" expl="9. precondition" sum="70345a192bb7336c18aeb9b798a6de93">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.10" expl="10. loop invariant preservation" sum="f0e524d5d952b4e157ae3874a69f221a">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter transitive_closure.10.1" expl="1. loop invariant preservation" sum="98d4df5e53aec07a533b44b95fe49bff">
+   <transf name="split_all_full">
+    <goal name="WP_parameter transitive_closure.10.1.1" expl="1. loop invariant preservation" sum="40a77cab9898513ac0ad48065f51dd84">
+    <proof prover="2"><result status="valid" time="0.02"/></proof>
+    </goal>
+    <goal name="WP_parameter transitive_closure.10.1.2" expl="2. loop invariant preservation" sum="9104609cd6a16d2ec8f9925c7d34680c">
+    <proof prover="2"><result status="valid" time="0.03"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="WP_parameter transitive_closure.10.2" expl="2. loop invariant preservation" sum="210e2d422ffaa6b75abcbb27bcddd8bf">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="WP_parameter transitive_closure.10.3" expl="3. loop invariant preservation" sum="39602ed4ce53f342cab988c34bac02c0">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter transitive_closure.11" expl="11. precondition" sum="52575b042315de9477d2d0b1e2b23d6a">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.12" expl="12. precondition" sum="cc9fa4e14d81e6eef65332087f942043">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.13" expl="13. precondition" sum="ce1a414202610dc49e84292487bf9d75">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.14" expl="14. loop invariant preservation" sum="011d96034bd0ddb2c77def805fa88381">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter transitive_closure.14.1" expl="1. loop invariant preservation" sum="8fbf523a7bcb1e7bf41594623b789fca">
+   <proof prover="0"><result status="valid" time="0.15"/></proof>
+   </goal>
+   <goal name="WP_parameter transitive_closure.14.2" expl="2. loop invariant preservation" sum="f90f4608e2f1ed55868170c1abae5234">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="WP_parameter transitive_closure.14.3" expl="3. loop invariant preservation" sum="661894a01c6faf25fc587f568690022a">
+   <proof prover="0"><result status="valid" time="0.07"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter transitive_closure.15" expl="15. precondition" sum="a9c472ab4d9c6fdaa668b699dae0a68e">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.16" expl="16. loop invariant preservation" sum="bb7acbf83db488a3e60dbb1d6ee2b769">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter transitive_closure.16.1" expl="1. loop invariant preservation" sum="48ab68abfb7cc1efbef634b5e5d323b0">
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="WP_parameter transitive_closure.16.2" expl="2. loop invariant preservation" sum="e442ba5fecc08de1b18b3afd0993d12a">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="WP_parameter transitive_closure.16.3" expl="3. loop invariant preservation" sum="4a2c6dce555192974950c40afa934dfc">
+   <proof prover="0"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter transitive_closure.17" expl="17. loop invariant preservation" sum="c05b1bb6917f202efef9dae112a1cd8c">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.18" expl="18. loop invariant preservation" sum="b71f6207c5ed5c1d8a4daab31be2a43b">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter transitive_closure.18.1" expl="1. loop invariant preservation" sum="b424b9b4827e4c344728e04005a82465">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter transitive_closure.18.2" expl="2. loop invariant preservation" sum="b3ff506ad7e5b5495d61ef4a1109f0a7">
+   <proof prover="2"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter transitive_closure.19" expl="19. type invariant" sum="004ea18e6ddbc833c63633bf37a0b460">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter transitive_closure.20" expl="20. postcondition" sum="cc4208403c8353e427da8d2404819330">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>

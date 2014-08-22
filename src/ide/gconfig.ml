@@ -9,10 +9,10 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Format
 open Why3
 open Rc
 open Whyconf
+open Why3session
 
 let debug = Debug.register_info_flag "ide_info"
   ~desc:"Print@ why3ide@ debugging@ messages."
@@ -200,7 +200,7 @@ let load_altern alterns (_,section) =
   Mprover.add unknown known alterns
 *)
 
-let load_config config original_config =
+let load_config config original_config env =
   let main = get_main config in
   let ide  = match Whyconf.get_section config "ide" with
     | None -> default_ide
@@ -209,8 +209,6 @@ let load_config config original_config =
   (* let alterns = *)
   (*   List.fold_left load_altern *)
   (*     Mprover.empty (get_family config "alternative_prover") in *)
-  (* temporary sets env to empty *)
-  let env = Env.create_env [] in
   set_labels_flag ide.ide_show_labels;
   set_locs_flag ide.ide_show_locs;
   { window_height = ide.ide_window_height;
@@ -305,25 +303,14 @@ let save_config t =
   let config = Whyconf.set_section config "ide" ide in
   Whyconf.save_config config
 
-let read_config conf_file extra_files =
-  try
-    let config = Whyconf.read_config conf_file in
-    let merged_config = List.fold_left Whyconf.merge_config config extra_files in
-    load_config merged_config config
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "@.%a@." Exn_printer.exn_printer e;
-    exit 1
-
-let config,read_config =
+let config,load_config =
   let config = ref None in
   (fun () ->
     match !config with
       | None -> invalid_arg "configuration not yet loaded"
       | Some conf -> conf),
-  (fun conf_file extra_files ->
-    (*Debug.dprintf debug "[Info] reading config file...@?";*)
-    let c = read_config conf_file extra_files in
-    (*Debug.dprintf debug " done.@.";*)
+  (fun conf base_conf env ->
+    let c = load_config conf base_conf env in
     config := Some c)
 
 let save_config () = save_config (config ())

@@ -139,7 +139,32 @@ and no epsilon
 
 
 
-==================== Roadmap for release 0.83 ========================
+==================== Roadmap for release 0.84 ========================
+
+== TODOs ==
+
+* verifier support des nouveaux prouveurs: Coq8.4pl4, Isabelle-2014,
+  CVC4 1.4, yices2 (quantifiers ?)  beagle ? driver TPTP TFA ? autres ?
+
+* completer le fichier CHANGES
+** nouvelle facon d'appeler les outils "why3 xxx ..."
+** strategies de preuve
+** transformation "compute_in_goal"
+** support de nouveaux prouveurs
+** nouvelle structure des fichiers de session et de shape (compatibilité)
+** new examples ? 
+
+* ajouter dans les instructions de release ci-dessous la procedure de
+  fabrication du paquet opam
+
+* documentation des nouvelles features higher-order
+
+* eliminate_match:
+** faire un cas particulier pour "bool", le match pouvant se traduire
+   vers ite qui est supporté par pas mal de prouveurs
+** introduire des symboles _match non polymorphes differents pour
+   chaque instance necessaires. plutot qu'un seul symbole _match
+   polymorphe.
 
 == New Features to announce ==
 
@@ -166,7 +191,7 @@ See CHANGES
 * test distrib/why3-0.84.tar.gz
 * install web page for why2 which includes an updated page for the
   quick migration guide. (sources are in CVS repository
-  ~filliatr/ARCHIVE/www/why). 
+  ~filliatr/ARCHIVE/www/why).
 * put on the web page
  - why3-0.84.tar.gz
    cp distrib/why3-0.84.tar.gz /users/www-perso/projets/why3/download
@@ -224,16 +249,6 @@ See CHANGES
 * The next commit : add +git to the version in file Version
 
 
-== TODOs ==
-
-* documentation des nouvelles features higher-order
-
-* eliminate_match:
-** faire un cas particulier pour "bool", le match pouvant se traduire
-   vers ite qui est supporté par pas mal de prouveurs
-** introduire des symboles _match non polymorphes differents pour
-   chaque instance necessaires. plutot qu'un seul symbole _match
-   polymorphe.
 
 ==================== Roadmap for release 0.83 ========================
 

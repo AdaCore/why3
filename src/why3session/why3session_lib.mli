@@ -11,6 +11,7 @@
 
 open Why3
 open Whyconf
+open Why3session
 
 val verbose: Debug.flag
 
@@ -30,10 +31,6 @@ type cmd =
 val iter_files : (string -> unit) -> unit
 val anon_fun : Arg.anon_fun
 
-(** print_version *)
-val print_version : unit -> unit
-
-
 (** {2 Spec for version, debug} *)
 (* val simple_spec : spec_list *)
 
@@ -49,9 +46,9 @@ val read_env_spec : unit -> Env.env * Whyconf.config * bool
 (** read_simple_spec also *)
 
 val read_update_session :
-  allow_obsolete:bool -> Why3.Env.env ->
-  Why3.Whyconf.config -> string ->
-  unit Why3.Session.env_session * bool * bool
+  allow_obsolete:bool -> Env.env ->
+  Whyconf.config -> string ->
+  unit Session.env_session * bool * bool
 
 (** {2 Spec for filtering } *)
 type filter_prover

@@ -2,109 +2,47 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
- <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5"
-  memlimit="1000"/>
- <prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
- <prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
- <prover id="3" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
- <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="30"
-  memlimit="1000"/>
- <file name="../bresenham.mlw"
-  expanded="true">
-  <theory name="M"
-   expanded="true">
-   <goal name="closest" sum="472a5d038bef87fcbfb94fa2e7253191"
-    expanded="true">
-    <proof prover="3" edited="bresenham_M_closest_1.v">
-     <result status="valid" time="1.29"/>
-    </proof>
-   </goal>
-   <goal name="WP_parameter bresenham" expl="VC for bresenham"
-    sum="c273b5a8d99bf83f043f35169bda938e"
-    expanded="true">
-    <label name="expl:VC for bresenham"/>
-    <transf name="split_goal"
-     expanded="true">
-     <goal name="WP_parameter bresenham.1" expl="1. loop invariant init"
-      sum="ed65b836fad1f9e81238b52f26b3793b"
-      expanded="true">
-      <label name="expl:VC for bresenham"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-      <proof prover="1">
-       <result status="valid" time="0.00"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter bresenham.2" expl="2. loop invariant init"
-      sum="1f431337ccd802b522a98f30abadccae"
-      expanded="true">
-      <label name="expl:VC for bresenham"/>
-      <proof prover="0">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter bresenham.3" expl="3. assertion"
-      sum="34351a2fcaf0596c940f5c34b7545156"
-      expanded="true">
-      <label name="expl:VC for bresenham"/>
-      <proof prover="0" timelimit="30">
-       <result status="valid" time="1.86"/>
-      </proof>
-      <proof prover="4">
-       <result status="valid" time="1.80"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter bresenham.4"
-      expl="4. loop invariant preservation"
-      sum="74d2dd38d47dd2952bd12873b5e1bd85"
-      expanded="true">
-      <label name="expl:VC for bresenham"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="1">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.01"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter bresenham.5"
-      expl="5. loop invariant preservation"
-      sum="49fe8a7e169678e5aaf592b78ff8cebd"
-      expanded="true">
-      <label name="expl:VC for bresenham"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter bresenham.6"
-      expl="6. loop invariant preservation"
-      sum="3ac02f3d978219fa286a8d3d74638379"
-      expanded="true">
-      <label name="expl:VC for bresenham"/>
-      <proof prover="1">
-       <result status="valid" time="0.02"/>
-      </proof>
-      <proof prover="2">
-       <result status="valid" time="0.28"/>
-      </proof>
-     </goal>
-     <goal name="WP_parameter bresenham.7"
-      expl="7. loop invariant preservation"
-      sum="ff4fa86e8ee958cfa266e050e0feb12a"
-      expanded="true">
-      <label name="expl:VC for bresenham"/>
-      <proof prover="0">
-       <result status="valid" time="0.02"/>
-      </proof>
-     </goal>
-    </transf>
-   </goal>
-  </theory>
- </file>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
+<prover id="3" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="30" memlimit="1000"/>
+<file name="../bresenham.mlw" expanded="true">
+<theory name="M" expanded="true">
+ <goal name="closest" sum="472a5d038bef87fcbfb94fa2e7253191" expanded="true">
+ <proof prover="3" edited="bresenham_M_closest_1.v"><result status="valid" time="1.52"/></proof>
+ </goal>
+ <goal name="WP_parameter bresenham" expl="VC for bresenham" sum="c273b5a8d99bf83f043f35169bda938e" expanded="true">
+ <transf name="split_goal" expanded="true">
+  <goal name="WP_parameter bresenham.1" expl="1. loop invariant init" sum="ed65b836fad1f9e81238b52f26b3793b" expanded="true">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter bresenham.2" expl="2. loop invariant init" sum="1f431337ccd802b522a98f30abadccae" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter bresenham.3" expl="3. assertion" sum="34351a2fcaf0596c940f5c34b7545156" expanded="true">
+  <proof prover="1" timelimit="30"><result status="valid" time="1.86"/></proof>
+  <proof prover="4"><result status="valid" time="1.80"/></proof>
+  </goal>
+  <goal name="WP_parameter bresenham.4" expl="4. loop invariant preservation" sum="74d2dd38d47dd2952bd12873b5e1bd85" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter bresenham.5" expl="5. loop invariant preservation" sum="49fe8a7e169678e5aaf592b78ff8cebd" expanded="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter bresenham.6" expl="6. loop invariant preservation" sum="3ac02f3d978219fa286a8d3d74638379" expanded="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.28"/></proof>
+  </goal>
+  <goal name="WP_parameter bresenham.7" expl="7. loop invariant preservation" sum="ff4fa86e8ee958cfa266e050e0feb12a" expanded="true">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
 </why3session>
