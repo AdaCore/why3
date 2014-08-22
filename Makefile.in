@@ -586,6 +586,7 @@ bin/why3replay.byte: lib/why3/why3.cma lib/why3/why3session.cma src/tools/why3re
 
 clean_old_install::
 	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE)) $(BINDIR)/why3$(EXE)
+	rm -f $(BINDIR)/why3config$(EXE) $(BINDIR)/why3bench$(EXE) $(BINDIR)/why3replayer$(EXE) 
 
 install_no_local::
 	cp -f bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
