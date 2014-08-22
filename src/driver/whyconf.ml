@@ -134,24 +134,26 @@ type config_strategy = {
   strategy_name : string;
   strategy_desc : Pp.formatted;
   strategy_code : string array;
+  strategy_shortcut : string;
 }
 
 (* a default set of strategies *)
 let default_strategies =
   List.map
-    (fun (name,desc,instrs) ->
+    (fun (name,desc,shortcut,instrs) ->
       let s = ref Rc.empty_section in
       s := Rc.set_string !s "name" name;
       s := Rc.set_string !s "desc" desc;
+      s := Rc.set_string !s "shortcut" shortcut;
       for i = 0 to Array.length instrs - 1 do
         s := Rc.set_string !s ("l" ^ (string_of_int i)) instrs.(i);
       done;
       !s)
-    [ "Split", "Split@ conjunctions@ in@ goal", 
+    [ "Split", "Split@ conjunctions@ in@ goal", "s",
       [|"t split_goal_wp 1"|];
-      "Inline", "Inline@ function@ symbols@ once", 
+      "Inline", "Inline@ function@ symbols@ once", "i",
       [|"t inline_goal 1"|];
-      "Blaster", "The@ blaster", 
+      "My mini-blaster", "A@ simple@ blaster", "b",
       [|"c Alt-Ergo,0.95.2 1 1000";
         "c CVC4,1.4 1 1000";
         "t split_goal_wp 0";
@@ -470,6 +472,7 @@ let load_strategy strategies section =
   try
     let name = get_string section "name" in
     let desc = get_string section "desc" in
+    let shortcut = get_string ~default:"" section "shortcut" in
     let desc = Scanf.format_from_string desc "" in
     let code = ref [] and i = ref 0 in
     try
@@ -485,6 +488,7 @@ let load_strategy strategies section =
         { strategy_name = name;
           strategy_desc = desc;
           strategy_code = Array.of_list (List.rev !code);
+          strategy_shortcut = shortcut;
         }
         strategies
   with

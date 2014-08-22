@@ -183,6 +183,7 @@ type config_strategy = {
   strategy_name : string;
   strategy_desc : Pp.formatted;
   strategy_code : string array;
+  strategy_shortcut : string;
 }
 
 val get_strategies : config -> config_strategy Mstr.t

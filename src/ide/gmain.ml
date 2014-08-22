@@ -1459,6 +1459,40 @@ let strategies () :
 
 let loaded_strategies = ref []
 
+let load_shortcut s =
+  if String.length s <> 1 then None else
+  try
+    let key = match String.get s 0 with
+      | 'a' -> GdkKeysyms._a
+      | 'b' -> GdkKeysyms._b
+      | 'c' -> GdkKeysyms._c
+      | 'd' -> GdkKeysyms._d
+      | 'e' -> GdkKeysyms._e
+      | 'f' -> GdkKeysyms._f
+      | 'g' -> GdkKeysyms._g
+      | 'h' -> GdkKeysyms._h
+      | 'i' -> GdkKeysyms._i
+      | 'j' -> GdkKeysyms._j
+      | 'k' -> GdkKeysyms._k
+      | 'l' -> GdkKeysyms._l
+      | 'm' -> GdkKeysyms._m
+      | 'n' -> GdkKeysyms._n
+      | 'o' -> GdkKeysyms._o
+      | 'p' -> GdkKeysyms._p
+      | 'q' -> GdkKeysyms._q
+      | 'r' -> GdkKeysyms._r
+      | 's' -> GdkKeysyms._s
+      | 't' -> GdkKeysyms._t
+      | 'u' -> GdkKeysyms._u
+      | 'v' -> GdkKeysyms._v
+      | 'w' -> GdkKeysyms._w
+      | 'x' -> GdkKeysyms._x
+      | 'y' -> GdkKeysyms._y
+      | 'z' -> GdkKeysyms._z
+      | _ -> raise Not_found
+    in Some(s,key)
+  with Not_found -> None
+
 let strategies () =
   match !loaded_strategies with
     | [] ->
@@ -1471,15 +1505,17 @@ let strategies () =
             try
               let code = st.Whyconf.strategy_code in
               let len = Array.length code in
+              let shortcut = load_shortcut st.Whyconf.strategy_shortcut in
               let code = Array.map (M.parse_instr (env_session()) len) code in
               Format.eprintf "Strategy '%s' loaded.@." name;
-              (name, st.Whyconf.strategy_desc,code, None) :: acc
+              (name, st.Whyconf.strategy_desc,code, shortcut) :: acc
             with M.SyntaxError msg ->
               Format.eprintf "Loading strategy '%s' failed: %s@." name msg;
               acc)
           []
           strategies
       in
+      let strategies = List.rev strategies in
       loaded_strategies := strategies;
       strategies
     | l -> l
