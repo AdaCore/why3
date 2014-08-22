@@ -197,6 +197,14 @@ let () =
   in ()
 
 
+let strategies_frame =
+  GBin.frame ~label:"Strategies" ~shadow_type:`ETCHED_OUT
+    ~packing:(tools_window_vbox#pack ~expand:false) ()
+
+let strategies_box =
+  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+  ~packing:strategies_frame#add ()
+
 let provers_frame =
   GBin.frame ~label:"Provers" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
@@ -208,14 +216,6 @@ let provers_box =
 
 let () = provers_frame#set_resize_mode `PARENT
 
-let strategies_frame =
-  GBin.frame ~label:"Strategies" ~shadow_type:`ETCHED_OUT
-    ~packing:(tools_window_vbox#pack ~expand:false) ()
-
-let strategies_box =
-  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-  ~packing:strategies_frame#add ()
-
 let tools_frame =
   GBin.frame ~label:"Tools" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
@@ -223,14 +223,6 @@ let tools_frame =
 let tools_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
   ~packing:tools_frame#add ()
-
-let cleaning_frame =
-  GBin.frame ~label:"Cleaning" ~shadow_type:`ETCHED_OUT
-    ~packing:(tools_window_vbox#pack ~expand:false) ()
-
-let cleaning_box =
-  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-  ~packing:cleaning_frame#add ()
 
 let monitor_frame =
   GBin.frame ~label:"Proof monitoring" ~shadow_type:`ETCHED_OUT
@@ -2158,7 +2150,7 @@ let () =
   add_tool_item "Clean selection" clean_selection
 
 let () =
-  let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
+  let b = GButton.button ~packing:tools_box#add ~label:"Remove" () in
   b#misc#set_tooltip_markup "Remove selected <b>proof attempts</b> and \
 <b>transformations</b>";
   let i = GMisc.image ~pixbuf:(!image_remove) () in
@@ -2168,7 +2160,7 @@ let () =
   in ()
 
 let () =
-  let b = GButton.button ~packing:cleaning_box#add ~label:"Clean" () in
+  let b = GButton.button ~packing:tools_box#add ~label:"Clean" () in
   b#misc#set_tooltip_markup "Remove unsuccessful <b>proof attempts</b> \
 associated to proved goals";
   let i = GMisc.image ~pixbuf:(!image_cleaning) () in
