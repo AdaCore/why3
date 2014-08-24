@@ -1125,7 +1125,9 @@ let load_ident elt =
 
 type load_ctxt = {
   old_provers : (Whyconf.prover * int * int) Mstr.t ;
+(*
   shapes : ((string, Tc.shape) Hashtbl.t) option
+*)
 }
 
 let rec load_goal ctxt parent acc g =
@@ -1137,7 +1139,8 @@ let rec load_goal ctxt parent acc g =
         let sum = Tc.checksum_of_string csum in
         let shape =
           try Tc.shape_of_string (List.assoc "shape" g.Xml.attributes)
-          with Not_found ->
+          with Not_found -> Tc.shape_of_string ""
+(*
             match ctxt.shapes with
               | None -> Tc.shape_of_string ""
               | Some h ->
@@ -1145,6 +1148,7 @@ let rec load_goal ctxt parent acc g =
                 with Not_found ->
                   Format.eprintf "[Warning] shape not found for goal %s@." csum;
                   Tc.shape_of_string ""
+*)
         in
         let expanded = bool_attribute "expanded" g false in
         let mg =
@@ -1348,7 +1352,7 @@ let load_theory ctxt mf acc th =
         eprintf "[Warning] Session.load_theory: unexpected element '%s'@." s;
         acc
 
-let load_file session shapes old_provers f =
+let load_file session old_provers f =
   match f.Xml.name with
     | "file" ->
         let fn = string_attribute "name" f in
@@ -1358,8 +1362,7 @@ let load_file session shapes old_provers f =
         mf.file_theories <-
           List.rev
           (List.fold_left
-             (load_theory { old_provers = old_provers ;
-                            shapes = shapes } mf) [] f.Xml.elements);
+             (load_theory { old_provers = old_provers } mf) [] f.Xml.elements);
         mf.file_verified <- file_verified mf;
         old_provers
     | "prover" ->
@@ -1385,7 +1388,7 @@ let old_provers = ref Mstr.empty
 let get_old_provers () = !old_provers
 *)
 
-let load_session session shapes xml =
+let load_session session xml =
   match xml.Xml.name with
     | "why3session" ->
       let shape_version = int_attribute_def "shape_version" xml 1 in
@@ -1395,7 +1398,7 @@ let load_session session shapes xml =
 (*
      old_provers := *)
       let _ =
-        List.fold_left (load_file session shapes) Mstr.empty xml.Xml.elements
+        List.fold_left (load_file session) Mstr.empty xml.Xml.elements
       in
       Debug.dprintf debug "[Info] load_session: done@\n"
     | s ->
@@ -1405,48 +1408,124 @@ exception OpenError of string
 
 module ReadShapes (C:Compress.S) = struct
 
-let read_shapes fn =
-  let ch = C.open_in fn in
-  let h = Hashtbl.create 97 in
-  let shape = Buffer.create 97 in
-  try
-    while true do
-      let sum = String.create 32 in
-      let nsum = C.input ch sum 0 32 in
-      if nsum = 0 then raise End_of_file;
-      if nsum <> 32 then
-        begin
-          try
-            C.really_input ch sum nsum (32-nsum)
-          with End_of_file ->
-            raise
-              (OpenError
-                 ("shapes files corrupted (checksum '" ^
-                     (String.sub sum 0 nsum) ^
-                     "' too short), ignored"))
-        end;
-      if try C.input_char ch <> ' ' with End_of_file -> true then
-        raise (OpenError "shapes files corrupted (space missing), ignored");
-      Buffer.clear shape;
+let shape = Buffer.create 97
+let sum = String.create 32
+
+let read_sum_and_shape ch =
+  let nsum = C.input ch sum 0 32 in
+  if nsum = 0 then raise End_of_file;
+  if nsum <> 32 then
+    begin
       try
-        while true do
-          let c = C.input_char ch in
-          if c = '\n' then raise Exit;
-          Buffer.add_char shape c
-        done
-      with 
-        | End_of_file ->
-          raise (OpenError "shapes files corrupted (premature end of file), ignored");
-        | Exit ->
-          Hashtbl.add h sum (Tc.shape_of_string (Buffer.contents shape))
-    done;
-    assert false
-  with End_of_file -> C.close_in ch; h
+        C.really_input ch sum nsum (32-nsum)
+      with End_of_file ->
+        raise
+          (OpenError
+             ("shapes files corrupted (checksum '" ^
+                 (String.sub sum 0 nsum) ^
+                 "' too short), ignored"))
+    end;
+  if try C.input_char ch <> ' ' with End_of_file -> true then
+      raise (OpenError "shapes files corrupted (space missing), ignored");
+    Buffer.clear shape;
+    try
+      while true do
+        let c = C.input_char ch in
+        if c = '\n' then raise Exit;
+        Buffer.add_char shape c
+      done;
+      assert false
+    with
+      | End_of_file ->
+        raise (OpenError "shapes files corrupted (premature end of file), ignored");
+      | Exit -> sum, Buffer.contents shape
+
+let replace_goal_attributes attrs sum shape =
+  let attrs =
+    try
+      let old_sum = List.assoc "sum" attrs in
+      if sum <> old_sum then
+        begin
+          Format.eprintf "old sum = %s ; new sum = %s@." old_sum sum;
+          exit 2
+        end;
+      attrs
+    with Not_found -> ("sum", sum) :: attrs
+  in
+  ("shape",shape) :: attrs
+
+let rec read_shapes_goal ch g =
+  match g.Xml.name with
+    | "goal" ->
+      let sum,shape = read_sum_and_shape ch in
+      let attrs = replace_goal_attributes g.Xml.attributes sum shape in
+      { g with
+        Xml.attributes = attrs;
+        Xml.elements =
+          List.rev
+            (List.rev_map (read_shapes_theory_or_transf ch) g.Xml.elements) }
+    | _ -> g
+
+and read_shapes_theory_or_transf ch t =
+  match t.Xml.name with
+    | "theory" | "transf" | "metas" ->
+      { t with Xml.elements =
+          List.rev
+            (List.rev_map (read_shapes_goal ch) t.Xml.elements) }
+    | _ -> t
+
+let read_shapes_file ch file =
+  match file.Xml.name with
+    | "file" ->
+      { file with Xml.elements =
+          List.rev
+            (List.rev_map (read_shapes_theory_or_transf ch) file.Xml.elements) }
+    | _ -> file
+
+let read_shapes_session ch ses =
+  { ses with Xml.elements =
+      List.rev
+        (List.rev_map (read_shapes_file ch) ses.Xml.elements) }
+
+let read_shapes fn xml =
+  let ch = C.open_in fn in
+  try
+    { xml with Xml.content = read_shapes_session ch xml.Xml.content }
+  with e -> C.close_in ch; raise e
+
 
 end
 
 module ReadShapesNoCompress = ReadShapes(Compress.Compress_none)
 module ReadShapesCompress = ReadShapes(Compress.Compress_z)
+
+let import_shapes dir xml =
+  try
+  let compressed_shape_filename =
+    Filename.concat dir compressed_shape_filename
+  in
+  if Sys.file_exists compressed_shape_filename then
+    if Compress.compression_supported then
+     ReadShapesCompress.read_shapes compressed_shape_filename xml
+    else
+      begin
+        Format.eprintf "[Warning] could not read goal shapes because \
+                                Why3 was not compiled with compress support@.";
+        xml
+      end
+  else
+    let shape_filename = Filename.concat dir shape_filename in
+    if Sys.file_exists shape_filename then
+      ReadShapesNoCompress.read_shapes shape_filename xml
+    else
+      begin
+        Format.eprintf "[Warning] could not find goal shapes file@.";
+        xml
+      end
+with e ->
+  Format.eprintf "[Warning] failed to read goal shapes: %s@."
+    (Printexc.to_string e);
+  xml
 
 type notask = unit
 let read_session dir =
@@ -1459,36 +1538,9 @@ let read_session dir =
     try
       Tc.reset_dict ();
       let xml = Xml.from_file xml_filename in
-      let shapes =
-        try
-          let compressed_shape_filename =
-            Filename.concat dir compressed_shape_filename
-          in
-          if Sys.file_exists compressed_shape_filename then
-            if Compress.compression_supported then
-              Some (ReadShapesCompress.read_shapes compressed_shape_filename)
-            else
-              begin
-                Format.eprintf "[Warning] could not read goal shapes because \
-                                Why3 was not compiled with compress support@.";
-                None
-              end
-          else
-            let shape_filename = Filename.concat dir shape_filename in
-            if Sys.file_exists shape_filename then
-              Some (ReadShapesNoCompress.read_shapes shape_filename)
-            else
-              begin
-                Format.eprintf "[Warning] could not find goal shapes file@.";
-                None
-              end
-        with e ->
-          Format.eprintf "[Warning] failed to read goal shapes: %s@."
-            (Printexc.to_string e);
-          None
-      in
+      let xml = import_shapes dir xml in
       try
-        load_session session shapes xml.Xml.content;
+        load_session session xml.Xml.content;
       with Sys_error msg ->
         failwith ("Open session: sys error " ^ msg)
     with
