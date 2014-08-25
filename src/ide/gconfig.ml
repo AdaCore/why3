@@ -268,7 +268,7 @@ let debug_save_config n c =
 *)
 
 let save_config t =
-  Debug.dprintf debug "[Info] saving IDE config file@.";
+  Debug.dprintf debug "[GUI config] saving IDE config file@.";
   (* taking original config, without the extra_config *)
   let config = t.original_config in
   (* copy possibly modified settings to original config *)
@@ -480,7 +480,7 @@ let resize_images size =
   ()
 
 let init () =
-  Debug.dprintf debug "[Info] reading icons...@?";
+  Debug.dprintf debug "[GUI config] reading icons...@?";
   load_icon_names ();
   why_icon := image "logo-why";
   resize_images 20;
@@ -997,7 +997,7 @@ let run_auto_detection gconfig =
   ()
 *)
 
-(*let () = Debug.dprintf debug "[Info] end of configuration initialization@."*)
+(*let () = Debug.dprintf debug "[GUI config] end of configuration initialization@."*)
 
 let uninstalled_prover c eS unknown =
   try

@@ -70,7 +70,7 @@ let gconfig = try
     exit 1
 
 let () =
-  Debug.dprintf debug "[Info] Init the GTK interface...@?";
+  Debug.dprintf debug "[GUI] Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());
   Debug.dprintf debug " done.@.";
   Gconfig.init ()
@@ -311,7 +311,7 @@ let () =
   view_time_column#set_visible true
 
 let goals_model,goals_view =
-  Debug.dprintf debug "[Info] Creating tree model...@?";
+  Debug.dprintf debug "[GUI] Creating tree model...@?";
   let model = GTree.tree_store cols in
   let view = GTree.view ~model ~packing:scrollview#add () in
   let () = view#selection#set_mode (* `SINGLE *) `MULTIPLE in
@@ -702,18 +702,18 @@ let project_dir =
       if Sys.is_directory fname then
         begin
           Debug.dprintf debug
-            "[Info] found directory '%s' for the project@." fname;
+            "[GUI] found directory '%s' for the project@." fname;
           fname
         end
       else
         if Queue.is_empty files then (* that was the only file *) begin
-          Debug.dprintf debug "[Info] found regular file '%s'@." fname;
+          Debug.dprintf debug "[GUI] found regular file '%s'@." fname;
           let d =
             try Filename.chop_extension fname
             with Invalid_argument _ -> fname
           in
           Debug.dprintf debug
-            "[Info] using '%s' as directory for the project@." d;
+            "[GUI] using '%s' as directory for the project@." d;
           Queue.push fname files; (** we need to open [fname] *)
           d
         end
@@ -733,7 +733,7 @@ let project_dir =
 let () =
   if not (Sys.file_exists project_dir) then
     begin
-      Debug.dprintf debug "[Info] '%s' does not exist. \
+      Debug.dprintf debug "[GUI] '%s' does not exist. \
         Creating directory of that name for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end
@@ -804,7 +804,7 @@ let () =
 
 let sched =
   try
-    Debug.dprintf debug "@[<hov 2>[Info] Opening session...@\n";
+    Debug.dprintf debug "@[<hov 2>[GUI session] Opening session...@\n";
     let session =
       if Sys.file_exists project_dir then
         S.read_session project_dir
@@ -815,10 +815,10 @@ let sched =
       M.update_session ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config
     in
-    Debug.dprintf debug "@]@\n[Info] Opening session: update done@.  @[<hov 2>";
+    Debug.dprintf debug "@]@\n[GUI session] Opening session: update done@.  @[<hov 2>";
     let sched = M.init (gconfig.session_nb_processes)
     in
-    Debug.dprintf debug "@]@\n[Info] Opening session: done@.";
+    Debug.dprintf debug "@]@\n[GUI session] Opening session: done@.";
     session_needs_saving := false;
     current_env_session := Some env;
     sched
@@ -834,12 +834,12 @@ let sched =
 
 let open_file ?(start=false) f =
   let f = Sysutil.relativize_filename project_dir f in
-  Debug.dprintf debug "Adding file '%s'@." f;
+  Debug.dprintf debug "[GUI session] Adding file '%s'@." f;
   if S.PHstr.mem (env_session()).S.session.S.session_files f then
-    Debug.dprintf debug "[Info] file %s already in database@." f
+    Debug.dprintf debug "[GUI] file %s already in database@." f
   else
     try
-      Debug.dprintf debug "[Info] adding file %s in database@." f;
+      Debug.dprintf debug "[GUI] adding file %s in database@." f;
       ignore (M.add_file (env_session()) ?format:!opt_parser f);
     with e ->
       if start
@@ -1174,7 +1174,7 @@ let (_ : GMenu.image_menu_item) =
 
 let save_session () =
   if !session_needs_saving then begin
-    Debug.dprintf debug "[Info] saving session@.";
+    Debug.dprintf debug "[GUI] saving session@.";
     S.save_session gconfig.config (env_session()).S.session;
     session_needs_saving := false;
   end
@@ -1500,10 +1500,10 @@ let strategies () =
               let len = Array.length code in
               let shortcut = load_shortcut st.Whyconf.strategy_shortcut in
               let code = Array.map (M.parse_instr (env_session()) len) code in
-              Format.eprintf "Strategy '%s' loaded.@." name;
+              Format.eprintf "[GUI] Strategy '%s' loaded.@." name;
               (name, st.Whyconf.strategy_desc,code, shortcut) :: acc
             with M.SyntaxError msg ->
-              Format.eprintf "Loading strategy '%s' failed: %s@." name msg;
+              Format.eprintf "[GUI warning] Loading strategy '%s' failed: %s@." name msg;
               acc)
           []
           strategies

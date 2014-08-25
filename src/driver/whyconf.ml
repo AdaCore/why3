@@ -155,11 +155,9 @@ let default_strategies =
       [|"t inline_goal 1"|];
     ]
 
-let get_strategies rc =
+let get_strategies ?(default=[]) rc =
   match get_simple_family rc "strategy" with
-    | [] ->
-      Format.eprintf "[Info] using the default set of strategies@.";
-      default_strategies
+    | [] -> default
     | s -> s
 
 (** Main record *)
@@ -540,7 +538,7 @@ let get_config (filename,rc) =
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
   let policy = List.fold_left (load_policy provers) Mprover.empty policy in
-  let strategies = get_strategies rc in
+  let strategies = get_strategies ~default:default_strategies rc in
   let strategies = List.fold_left load_strategy Mstr.empty strategies in
   { conf_file = filename;
     config    = rc;
@@ -648,7 +646,7 @@ let filter_one_prover whyconf fp =
 (** merge config *)
 
 let merge_config config filename =
-  Format.eprintf "[Info] reading extra configuration file %s@." filename;
+  Format.eprintf "[Config] reading extra configuration file %s@." filename;
   let dirname = get_dirname filename in
   let rc = Rc.from_file filename in
   (** modify main *)
