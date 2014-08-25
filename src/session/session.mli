@@ -135,6 +135,7 @@ and 'a theory = private
     { mutable theory_key : 'a;
       theory_name : Ident.ident;
       theory_parent : 'a file;
+      mutable theory_checksum : Termcode.checksum; 
       mutable theory_goals : 'a goal list;
       (** Not mutated after the creation *)
       mutable theory_verified : bool;

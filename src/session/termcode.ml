@@ -558,7 +558,7 @@ module Checksum = struct
 
   let tdecl b d = match d.Theory.td_node with
     | Theory.Decl d -> decl b d
-    | Theory.Use _ -> assert false
+    | Theory.Use th -> char b 'U'; ident b th.Theory.th_name
     | Theory.Clone (th, _) ->
         char b 'C'; ident b th.Theory.th_name; list string b th.Theory.th_path
     | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
@@ -597,9 +597,21 @@ module Checksum = struct
       let _,_,dnew = Trans.apply tr t in
       Digest.to_hex dnew
 
+
   let task ~version t = match version with
     | CV1 -> task_v1 t
     | CV2 -> task_v2 t
+
+  let theory_v1_v2 t =
+    let c = ref 0 in
+    let m = ref Ident.Mid.empty in
+    let b = Buffer.create 8192 in
+    List.iter (tdecl (CV2,c,m,b)) t.Theory.th_decls;
+    Digest.to_hex (Buffer.contents b)
+
+  let theory ~version t = match version with
+    | CV1 | CV2 -> theory_v1_v2 t
+
 end
 
 let task_checksum ?(version=current_shape_version) t =
@@ -609,6 +621,14 @@ let task_checksum ?(version=current_shape_version) t =
     | _ -> assert false
   in
   Checksum.task ~version t
+
+let theory_checksum ?(version=current_shape_version) t =
+  let version = match version with
+    | 1 | 2 | 3 -> CV1
+    | 4 -> CV2
+    | _ -> assert false
+  in
+  Checksum.theory ~version t
 
 (*************************************************************)
 (* Pairing of new and old subgoals                           *)

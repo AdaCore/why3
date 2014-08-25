@@ -196,6 +196,7 @@ and 'a theory =
     { mutable theory_key : 'a;
       theory_name : Ident.ident;
       theory_parent : 'a file;
+      mutable theory_checksum : Termcode.checksum;
       mutable theory_goals : 'a goal list;
       mutable theory_verified : bool;
       mutable theory_expanded : bool;
@@ -688,9 +689,11 @@ and save_ty fmt ty =
     fprintf fmt "@]@\n</ty_app>"
 
 let save_theory ctxt fmt t =
+  let checksum = Tc.string_of_checksum t.theory_checksum in
   fprintf fmt
-    "@\n@[<v 1>@[<h><theory@ %a%a>@]"
+    "@\n@[<v 1>@[<h><theory@ %a@ sum=\"%a\"%a>@]"
     save_ident t.theory_name
+    save_string checksum
     (save_bool_def "expanded" false) t.theory_expanded;
 (*
   Ident.Slab.iter (save_label fmt) t.theory_name.Ident.id_label;
@@ -727,14 +730,14 @@ let save_prover ctxt fmt p (timelimits,memlimits) provers =
       let occurs = Hashtbl.create 7 in
       PHprover.iter (fun _ n -> Hashtbl.add occurs n ()) ctxt.prover_ids;
       let id = ref 0 in
-      try 
-        while true do 
+      try
+        while true do
           try
             let _ = Hashtbl.find occurs !id in incr id
           with Not_found -> raise Exit
             done;
         assert false
-      with Exit -> 
+      with Exit ->
         PHprover.add ctxt.prover_ids p !id;
         !id
   in
@@ -1018,12 +1021,14 @@ let raw_add_metas ~(keygen:'a keygen) ~(expanded:bool) g added idpos =
   g.goal_metas <- Mmetas_args.add added ms g.goal_metas;
   ms
 
-let raw_add_theory ~(keygen:'a keygen) ~(expanded:bool) mfile thname =
+let raw_add_theory ~(keygen:'a keygen) ~(expanded:bool) 
+    ~(checksum:Tc.checksum) mfile thname =
   let parent = mfile.file_key in
   let key = keygen ~parent () in
   let mth = { theory_name = thname;
               theory_key = key;
               theory_parent = mfile;
+              theory_checksum = checksum;
               theory_goals = [];
               theory_verified = false;
               theory_expanded = expanded;
@@ -1371,7 +1376,8 @@ let load_theory ctxt mf acc th =
     | "theory" ->
         let thname = load_ident th in
         let expanded = bool_attribute "expanded" th false in
-        let mth = raw_add_theory ~keygen ~expanded mf thname in
+        let checksum = Tc.dumb_checksum in
+        let mth = raw_add_theory ~keygen ~expanded ~checksum mf thname in
         mth.theory_goals <-
           List.rev
           (List.fold_left
@@ -1674,8 +1680,9 @@ let add_file ~keygen env ?format filename =
     in g::acc
   in
   let add_theory acc rfile thname theory =
+    let checksum = Tc.theory_checksum theory in
     let rtheory =
-      raw_add_theory ~keygen ~expanded:true rfile thname
+      raw_add_theory ~keygen ~expanded:true ~checksum rfile thname
     in
     let parent = Parent_theory rtheory in
     let tasks = List.rev (Task.split_theory theory None None) in
@@ -2248,6 +2255,7 @@ let rec recover_sub_tasks ~theories env_session task g =
 let recover_theory_tasks env_session th =
   let theories = Opt.get_exn NoTask th.theory_parent.file_for_recovery in
   let theory = Opt.get_exn NoTask th.theory_task in
+  th.theory_checksum <- Tc.theory_checksum theory;
   let tasks = List.rev (Task.split_theory theory None None) in
   List.iter2 (recover_sub_tasks ~theories env_session) tasks th.theory_goals
 

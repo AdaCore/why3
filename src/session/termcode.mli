@@ -46,6 +46,8 @@ val dumb_checksum: checksum
 
 val task_checksum : ?version:int -> Task.task -> checksum
 
+val theory_checksum : ?version:int -> Theory.theory -> checksum
+
 (** Pairing algorithm *)
 
 module type S = sig
