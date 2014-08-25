@@ -19,9 +19,9 @@
       elements : element list;
     }
 
-  let mk_element ~fixattrs name attrs elems =
+  let mk_element name attrs elems =
     { name = name;
-      attributes = fixattrs name attrs;
+      attributes = attrs;
       elements = List.rev elems;
     }
 
@@ -35,12 +35,12 @@
 
   let buf = Buffer.create 17
 
-  let rec pop_all ~fixattrs group_stack element_stack =
+  let rec pop_all group_stack element_stack =
     match group_stack with
       | [] -> element_stack
       | (elem,att,elems)::g ->
-          let e = mk_element ~fixattrs elem att element_stack in
-          pop_all ~fixattrs g (e::elems)
+          let e = mk_element elem att element_stack in
+          pop_all g (e::elems)
 
   exception Parse_error of string
 
@@ -107,7 +107,7 @@ and elements fixattrs group_stack element_stack = parse
                Why3.Debug.dprintf debug
                  "[Xml warning] Xml element `%s' closed by `%s'@."
                  elem celem;
-             let e = mk_element ~fixattrs elem att element_stack in
+             let e = mk_element elem att element_stack in
              elements fixattrs g (e::stack) lexbuf
        }
   | '<'
@@ -118,7 +118,7 @@ and elements fixattrs group_stack element_stack = parse
          | [] -> element_stack
          | (elem,_,_)::_ ->
              Why3.Debug.dprintf debug "[Xml warning] unclosed Xml element `%s'@." elem;
-             pop_all ~fixattrs group_stack element_stack
+             pop_all group_stack element_stack
       }
   | _ as c
       { parse_error ("invalid element starting with " ^ String.make 1 c) }
@@ -130,9 +130,11 @@ and attributes fixattrs groupe_stack element_stack elem acc = parse
       { let v = value lexbuf in
         attributes fixattrs groupe_stack element_stack elem ((key,v)::acc) lexbuf }
   | '>'
-      { elements fixattrs ((elem,acc,element_stack)::groupe_stack) [] lexbuf }
+      { let acc = fixattrs elem acc in
+        elements fixattrs ((elem,acc,element_stack)::groupe_stack) [] lexbuf }
   | "/>"
-      { let e = mk_element ~fixattrs elem acc [] in
+      { let acc = fixattrs elem acc in
+        let e = mk_element elem acc [] in
         elements fixattrs groupe_stack (e::element_stack) lexbuf }
   | _ as c
       { parse_error ("'>' expected, got " ^ String.make 1 c) }
