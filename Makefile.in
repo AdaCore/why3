@@ -324,6 +324,7 @@ endif
 install_no_local_lib::
 	mkdir -p $(OCAMLINSTALLLIB)/why3
 	cp -f lib/why3/why3.cm* lib/why3/why3.[ao] \
+		lib/why3/why3session.cm* lib/why3/why3session.[ao] \
 		lib/why3/META $(OCAMLINSTALLLIB)/why3
 
 ifeq (@enable_local@,yes)

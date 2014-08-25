@@ -739,8 +739,10 @@ let save fname shfname _config session =
   fprintf fmt "@[<v 0><why3session shape_version=\"%d\">"
     session.session_shape_version;
   Tc.reset_dict ();
-  let provers,_ = PHprover.fold (save_prover fmt) (get_used_provers_with_stats session)
-    (Mprover.empty,0) in
+  let provers,_ =
+    PHprover.fold (save_prover fmt) (get_used_provers_with_stats session)
+      (Mprover.empty,0)
+  in
   PHstr.iter
     (save_file { provers = provers; ch_shapes = chsh} fmt)
     session.session_files;
