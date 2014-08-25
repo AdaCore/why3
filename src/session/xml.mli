@@ -9,10 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
+type attributes = (string * string) list
 
 type element =
     { name : string;
-      attributes : (string * string) list;
+      attributes : attributes;
       elements : element list;
     }
 
@@ -26,7 +27,8 @@ type t =
 
 exception Parse_error of string
 
-val from_file : string -> t
+val from_file : 
+  ?fixattrs:(string -> attributes -> attributes) -> string -> t
   (** returns the list of XML elements from the given file.
       raise [Sys_error] if the file cannot be opened.
       raise [Parse_error] if the file does not follow XML syntax

@@ -1440,7 +1440,10 @@ let read_sum_and_shape ch =
         raise (OpenError "shapes files corrupted (premature end of file), ignored");
       | Exit -> sum, Buffer.contents shape
 
-let replace_goal_attributes attrs sum shape =
+
+let fix_attributes ch name attrs =
+  if name = "goal" then
+  let sum,shape = read_sum_and_shape ch in
   let attrs =
     try
       let old_sum = List.assoc "sum" attrs in
@@ -1453,7 +1456,9 @@ let replace_goal_attributes attrs sum shape =
     with Not_found -> ("sum", sum) :: attrs
   in
   ("shape",shape) :: attrs
+  else attrs
 
+(*
 let rec read_shapes_goal ch g =
   match g.Xml.name with
     | "goal" ->
@@ -1492,40 +1497,47 @@ let read_shapes fn xml =
   try
     { xml with Xml.content = read_shapes_session ch xml.Xml.content }
   with e -> C.close_in ch; raise e
+*)
 
-
+let read_xml_and_shapes xml_fn compressed_fn =
+  let ch = C.open_in compressed_fn in
+  try
+    Xml.from_file ~fixattrs:(fix_attributes ch) xml_fn
+  with
+      e -> C.close_in ch; raise e
 end
 
 module ReadShapesNoCompress = ReadShapes(Compress.Compress_none)
 module ReadShapesCompress = ReadShapes(Compress.Compress_z)
 
-let import_shapes dir xml =
+let read_file_session_and_shapes dir xml_filename =
   try
   let compressed_shape_filename =
     Filename.concat dir compressed_shape_filename
   in
   if Sys.file_exists compressed_shape_filename then
     if Compress.compression_supported then
-     ReadShapesCompress.read_shapes compressed_shape_filename xml
+     ReadShapesCompress.read_xml_and_shapes
+       xml_filename compressed_shape_filename
     else
       begin
         Format.eprintf "[Warning] could not read goal shapes because \
                                 Why3 was not compiled with compress support@.";
-        xml
+        Xml.from_file xml_filename
       end
   else
     let shape_filename = Filename.concat dir shape_filename in
     if Sys.file_exists shape_filename then
-      ReadShapesNoCompress.read_shapes shape_filename xml
+      ReadShapesNoCompress.read_xml_and_shapes xml_filename shape_filename
     else
       begin
         Format.eprintf "[Warning] could not find goal shapes file@.";
-        xml
+        Xml.from_file xml_filename
       end
 with e ->
   Format.eprintf "[Warning] failed to read goal shapes: %s@."
     (Printexc.to_string e);
-  xml
+  Xml.from_file xml_filename
 
 type notask = unit
 let read_session dir =
@@ -1537,8 +1549,11 @@ let read_session dir =
   if Sys.file_exists xml_filename then begin
     try
       Tc.reset_dict ();
+      let xml = read_file_session_and_shapes dir xml_filename in
+(*
       let xml = Xml.from_file xml_filename in
       let xml = import_shapes dir xml in
+*)
       try
         load_session session xml.Xml.content;
       with Sys_error msg ->
