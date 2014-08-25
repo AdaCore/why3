@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
+<file name="../vm.mlw" expanded="true">
+<theory name="ReflTransClosure" expanded="true">
+ <goal name="transZero" sum="5f576931016c6e98a82af4eb636fe96b" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="transOne" sum="82b3748ce6112311cfc4ad0fed4a6acb">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="transition_star_one" sum="38add69295b2304d8481416ed2bc245d">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="WP_parameter trans_star" expl="VC for trans_star" sum="810b09de5d400a18ebdbff965c9e4a3b">
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="transition_star_transitive" sum="4e21189c07ea29a045e6b2320a077ab7">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="Vm" expanded="true">
+ <goal name="codeseq_at_app_right" sum="0b8a571ad0b8d9ed101bbce6ac5b93ed" expanded="true">
+ <proof prover="2"><result status="valid" time="0.28"/></proof>
+ </goal>
+ <goal name="codeseq_at_app_left" sum="43d50744644159935e1cbb0a6447b570" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
