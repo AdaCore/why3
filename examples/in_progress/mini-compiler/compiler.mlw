@@ -107,6 +107,7 @@ module Compiler_logic
   ensures { forall p ms. result.pre p ms <-> ibinop_pre p ms}
   ensures { forall p ms ms'. result.post p ms ms' <-> iadd_post p ms ms' }
   ensures { total_correctness result }
+  ensures { result.code.length = 1 }
   = let res = {code = Cons Iadd Nil; pre  = ibinop_pre ; post = iadd_post } in
     assert {
      forall p ms. res.pre p ms ->
