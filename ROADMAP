@@ -231,6 +231,13 @@ See CHANGES
  - make everything writeable for the group
    chmod -R g+w /users/www-perso/projets/why3
 
+* prepare for the OPAM package
+
+. update opam/url: url and checksum of why-0.84.tar.gz 
+   (use "md5sum distrib/why3-0.84.tar.gz")
+. update opam/descr if necessary
+. update opam/opam with correct dependencies and such
+
 * make a last commit:
  - git commit -m "release 0.84"
  - add tag 0.84 to the git repository, using
@@ -241,6 +248,43 @@ See CHANGES
 
 * add a new version to the bugtracker:
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
+
+
+* test the OPAM package
+
+  . with opam 1.2:
+    opam pin add why3 --kind=git <...>/why3/.git
+    (it runs "opam install why3")
+  . with opam < 1.2:
+   
+    - first step: have a local copy of opam-repository if not done yet, e.g.:
+
+      git clone git@github.com:claudemarche/opam-repository.git
+      cd opam-repository/
+      git remote add opam https://github.com/ocaml/opam-repository.git
+
+      or, if you already have one, make sure it is up-to-date:
+
+      git pull --ff-only opam master
+
+    - second step:
+ 
+      opam repository add local ~/recherche/opam-repository
+      opam install why3
+      (* test it, e.g. 
+         cp example/quicksort.mlw ~/tmp
+         why3ide ~/tmp/quicksort.mlw *)
+      opam remove why3
+      opam repository remove local
+
+
+* make a pull request on OPAM
+
+  cd packages/why3
+  cp -r <source why3>/opam why3.0.84
+  git add why3.0.84
+  commit et push
+  sur github: creer un pull request
 
 * produce the Why3 part of Toccata gallery
   -> add also a tar.gz and a ZIP file of it (this is done by doing
