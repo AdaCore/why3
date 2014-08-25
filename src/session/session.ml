@@ -499,7 +499,7 @@ let goal_expl g = Opt.get_def g.goal_name.Ident.id_string g.goal_expl
 open Format
 
 let db_filename = "why3session.xml"
-let shape_filename = "why3shapes.dat"
+let shape_filename = "why3shapes"
 let compressed_shape_filename = "why3shapes.gz"
 let session_dir_for_save = ref "."
 
