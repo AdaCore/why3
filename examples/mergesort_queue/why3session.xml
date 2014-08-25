@@ -2,15 +2,15 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.2" timelimit="6" memlimit="1000"/>
-<prover id="2" name="Eprover" version="1.6" timelimit="16" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="6" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.0" timelimit="6" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="10" memlimit="0"/>
+<prover id="1" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.2" timelimit="6" memlimit="1000"/>
+<prover id="3" name="Eprover" version="1.6" timelimit="16" memlimit="1000"/>
+<prover id="4" name="CVC3" version="2.4.1" timelimit="6" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.0" timelimit="6" memlimit="1000"/>
 <prover id="7" name="CVC3" version="2.2" timelimit="6" memlimit="1000"/>
-<prover id="8" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
+<prover id="8" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <prover id="10" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
 <file name="../mergesort_queue.mlw" expanded="true">
@@ -27,10 +27,10 @@
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.4" expl="4. loop invariant init" sum="2032e4158a2c4962d479c03e25baa5c6">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.5" expl="5. precondition" sum="0824ce1f41e12e409b533f7f9e77f21e">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.6" expl="6. loop invariant preservation" sum="2420db2b86dd7801ac2a56bf31a48171">
   <proof prover="9"><result status="valid" time="0.01"/></proof>
@@ -42,13 +42,13 @@
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.9" expl="9. loop invariant preservation" sum="735cebb3058904dfc5d61fb011ce4583">
-  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter merge.10" expl="10. loop variant decrease" sum="ce77a70267eda5b48f6f1e5441b470c4">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.11" expl="11. precondition" sum="8b42a321248a44d8079738eb4e479f5a">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.12" expl="12. loop invariant preservation" sum="0527164e0a162ca750fca4a262c24b83">
   <proof prover="10"><result status="valid" time="0.37"/></proof>
@@ -60,20 +60,20 @@
   <proof prover="9"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter merge.15" expl="15. loop invariant preservation" sum="36328611ec4d7a8585d32922a2bf9f40">
-  <proof prover="0"><result status="valid" time="0.10"/></proof>
-  <proof prover="3" timelimit="5"><result status="valid" time="0.09"/></proof>
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter merge.16" expl="16. loop variant decrease" sum="3fa138cc796da88ae30e91b3f64b71fa">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.17" expl="17. precondition" sum="5f80ff48bac7707a564c5e7d034a2097">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.18" expl="18. precondition" sum="3ad19655c38c3e8eacd345a9ff7fde1c">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.19" expl="19. precondition" sum="d455fc9d7354ac3d88e559b206adb87f">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.20" expl="20. loop invariant preservation" sum="9fa787f60773d3afb5e88c423f288219">
   <proof prover="10"><result status="valid" time="0.55"/></proof>
@@ -82,35 +82,35 @@
   <proof prover="10"><result status="valid" time="0.53"/></proof>
   </goal>
   <goal name="WP_parameter merge.22" expl="22. loop invariant preservation" sum="8221b41bda71b34d11c5ef3d8f200006">
-  <proof prover="3"><result status="valid" time="2.46"/></proof>
+  <proof prover="4"><result status="valid" time="2.46"/></proof>
   </goal>
   <goal name="WP_parameter merge.23" expl="23. loop invariant preservation" sum="1d7766eb80a528abfbe3802c5c4dbafc">
-  <proof prover="0"><result status="valid" time="0.12"/></proof>
-  <proof prover="3" timelimit="5"><result status="valid" time="0.29"/></proof>
+  <proof prover="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.29"/></proof>
   </goal>
   <goal name="WP_parameter merge.24" expl="24. loop variant decrease" sum="8b971e31509583a7c0ad980470a239c4">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.25" expl="25. precondition" sum="4a7ee8bbfe15a7b71c11eb36452925e2">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.26" expl="26. loop invariant preservation" sum="e284c1eca91180463e9db69136735990">
   <proof prover="10"><result status="valid" time="0.40"/></proof>
   </goal>
   <goal name="WP_parameter merge.27" expl="27. loop invariant preservation" sum="cfb9aafaff683c7bc71e5be78737067a">
-  <proof prover="3"><result status="valid" time="2.59"/></proof>
+  <proof prover="4"><result status="valid" time="2.59"/></proof>
   </goal>
   <goal name="WP_parameter merge.28" expl="28. loop invariant preservation" sum="a7d555a73b321971b35aa008c044dd30">
   <proof prover="10"><result status="valid" time="0.58"/></proof>
   </goal>
   <goal name="WP_parameter merge.29" expl="29. loop invariant preservation" sum="60563376b8f3f205d587cd4bcbe6efff">
-  <proof prover="8" edited="mergesort_queue_MergesortQueue_WP_parameter_merge_3.v"><result status="valid" time="1.02"/></proof>
+  <proof prover="0" edited="mergesort_queue_MergesortQueue_WP_parameter_merge_3.v"><result status="valid" time="1.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.30" expl="30. loop variant decrease" sum="a1c9f0696fa390af7934becc2906baf1">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.31" expl="31. precondition" sum="ded692c87aadf63d15b1f4ed7e0c6990">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.32" expl="32. loop invariant preservation" sum="7f3eed970327db41dce8b52344becf06">
   <proof prover="10"><result status="valid" time="0.54"/></proof>
@@ -122,14 +122,14 @@
   <proof prover="10"><result status="valid" time="0.55"/></proof>
   </goal>
   <goal name="WP_parameter merge.35" expl="35. loop invariant preservation" sum="be1a1cf24652d6326a1dbc037c705614">
-  <proof prover="0"><result status="valid" time="0.11"/></proof>
-  <proof prover="3" timelimit="5"><result status="valid" time="1.07"/></proof>
+  <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="1.07"/></proof>
   </goal>
   <goal name="WP_parameter merge.36" expl="36. loop variant decrease" sum="4deb70f6db3a92c34c395d91bec1d247">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.37" expl="37. precondition" sum="a3126a79484bf0238dbd36cc44638fe4">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.38" expl="38. loop invariant preservation" sum="a98e5a96a48bcbf5531e6399dad68080">
   <proof prover="9"><result status="valid" time="0.02"/></proof>
@@ -142,19 +142,19 @@
   <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.41" expl="41. loop invariant preservation" sum="2dfdf723dd30eb9958b23c2839fba76a">
-  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter merge.42" expl="42. loop variant decrease" sum="49d77cc98570e02c4146c949e2e4ccc7">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.43" expl="43. precondition" sum="f85228e940c078547f7e3b80c434a188">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.44" expl="44. precondition" sum="8007484cdc0015f97c2d039ee51c2b67">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.45" expl="45. precondition" sum="b98be62a5f9bb3a98314433d20624549">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.46" expl="46. loop invariant preservation" sum="61b3a3a4f6d4eee1c1769d4b7c835820">
   <proof prover="9"><result status="valid" time="0.02"/></proof>
@@ -168,13 +168,13 @@
   <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter merge.49" expl="49. loop invariant preservation" sum="94f6443d67f4666902effddfe7fdf487">
-  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter merge.50" expl="50. loop variant decrease" sum="45666e171be65fb99392cc60e18729ac">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter merge.51" expl="51. precondition" sum="5e6d0c8fe6f5267a62b97a5588b3afd2">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.52" expl="52. loop invariant preservation" sum="1b600e66497a0b63ca5517c78d494332">
   <proof prover="9"><result status="valid" time="0.02"/></proof>
@@ -188,18 +188,18 @@
   <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter merge.55" expl="55. loop invariant preservation" sum="d3cf9a13c95032043e1bb17fac756fae">
-  <proof prover="4"><result status="valid" time="0.09"/></proof>
+  <proof prover="5"><result status="valid" time="0.09"/></proof>
   <proof prover="9"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter merge.56" expl="56. loop variant decrease" sum="2e5ea3576f5b0d9460eba5c857355c20">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.57" expl="57. postcondition" sum="d9a6fa555965cd875af2a32011b53f8d">
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.58" expl="58. postcondition" sum="4ed7a226f52217075b89248cf0c30b44">
-  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="2.10"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="2.10"/></proof>
   <proof prover="9"><result status="valid" time="1.26"/></proof>
   </goal>
  </transf>
@@ -219,8 +219,8 @@
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.5" expl="5. loop invariant preservation" sum="660e1e3c806b9ff82848da724ea2e423">
-  <proof prover="0" timelimit="16"><result status="valid" time="4.54"/></proof>
-  <proof prover="2"><result status="valid" time="0.84"/></proof>
+  <proof prover="1" timelimit="16"><result status="valid" time="4.54"/></proof>
+  <proof prover="3"><result status="valid" time="0.84"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.6" expl="6. loop invariant preservation" sum="4733495b6e02aade18a0095bd50e8a4f">
   <proof prover="9"><result status="valid" time="0.06"/></proof>
@@ -229,12 +229,12 @@
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.8" expl="8. loop invariant preservation" sum="775378b847319478e6784f7f6f74abca">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.50"/></proof>
-  <proof prover="1"><result status="valid" time="0.89"/></proof>
-  <proof prover="3"><result status="valid" time="0.13"/></proof>
-  <proof prover="5"><result status="valid" time="0.36"/></proof>
-  <proof prover="6"><result status="valid" time="0.85"/></proof>
+  <proof prover="1" timelimit="6"><result status="valid" time="0.50"/></proof>
+  <proof prover="2"><result status="valid" time="0.89"/></proof>
+  <proof prover="4"><result status="valid" time="0.13"/></proof>
+  <proof prover="6"><result status="valid" time="0.36"/></proof>
   <proof prover="7"><result status="valid" time="0.12"/></proof>
+  <proof prover="8"><result status="valid" time="0.85"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.9" expl="9. loop invariant preservation" sum="4232b5a1eb8dfc098fd1ab076031d794">
   <proof prover="9"><result status="valid" time="0.06"/></proof>
@@ -263,7 +263,7 @@
   <proof prover="9"><result status="valid" time="0.42"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.17" expl="17. assertion" sum="50367563506d41b9e944ef10cfe9e057">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="4"><result status="valid" time="0.08"/></proof>
   <proof prover="9"><result status="unknown" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.18" expl="18. postcondition" sum="0f9c21611e18d418b797db85fbb7a33a">

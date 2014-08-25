@@ -3,84 +3,84 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="30" memlimit="4000"/>
-<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="4000"/>
-<prover id="4" name="Z3" version="4.3.1" timelimit="30" memlimit="4000"/>
+<prover id="1" name="Coq" version="8.4pl4" timelimit="5" memlimit="4000"/>
+<prover id="2" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="30" memlimit="4000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="4000"/>
 <prover id="5" name="CVC3" version="2.2" timelimit="30" memlimit="4000"/>
-<prover id="6" name="Z3" version="3.2" timelimit="30" memlimit="4000"/>
-<prover id="7" name="Coq" version="8.4pl3" timelimit="5" memlimit="4000"/>
+<prover id="6" name="Z3" version="4.3.1" timelimit="30" memlimit="4000"/>
+<prover id="7" name="Z3" version="3.2" timelimit="30" memlimit="4000"/>
 <prover id="8" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
 <file name="../blocking_semantics5.mlw" expanded="true">
 <theory name="Syntax" expanded="true">
  <goal name="mident_decide" sum="1af291375f0e959221525db6779f6b66">
- <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="ident_decide" sum="0d55365c4e34db74de09fcd2db032f27">
- <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="decide_is_skip" sum="de8cf71a5fca10d1ca1ee242ed2cbe9f">
- <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 <theory name="SemOp" expanded="true">
  <goal name="get_stack_eq" sum="e626de9777b8a23c021b3af01387dc3e">
- <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
- <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.03"/></proof>
- <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
+ <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <proof prover="7" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="get_stack_neq" sum="50584a6f1d15129494e8c35736320073">
- <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
- <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.20"/></proof>
+ <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.03"/></proof>
  <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.20"/></proof>
+ <proof prover="7" timelimit="5" memlimit="1000"><result status="valid" time="0.20"/></proof>
  </goal>
  <goal name="steps_non_neg" sum="4a53b5af6153e16c82acd7e19fe6c6a4">
- <proof prover="7" memlimit="1000" edited="blocking_semantics5_SemOp_steps_non_neg_1.v"><result status="valid" time="1.02"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_SemOp_steps_non_neg_1.v"><result status="valid" time="1.02"/></proof>
  </goal>
 </theory>
 <theory name="TestSemantics" expanded="true">
  <goal name="Test13" sum="42d52e52581cdffdecaead14a36f2cfe">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Test42" sum="832819c689e94bbc403eb568c3b21854">
- <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="Test0" sum="8c596de9d0529f6b1ee16e38c7a2fbb4">
- <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="Test55" sum="9134d7bc2a39b19246af9a04ee75b523">
  <proof prover="0"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="Ass42" sum="59ecc164a3b90eebf7ea9123a42d3623">
- <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
+ <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="If42" sum="86fa18f56133ce14a38dc4d987cca686">
- <proof prover="7" timelimit="6" memlimit="1000" edited="blocking_semantics5_TestSemantics_If42_1.v"><result status="valid" time="1.85"/></proof>
+ <proof prover="1" timelimit="6" memlimit="1000" edited="blocking_semantics5_TestSemantics_If42_1.v"><result status="valid" time="1.85"/></proof>
  </goal>
 </theory>
 <theory name="Typing">
 </theory>
 <theory name="TypingAndSemantics" expanded="true">
  <goal name="type_inversion" sum="b9c7ea0e64c85565e48fb72add4383db">
- <proof prover="2" timelimit="5" memlimit="1000"><result status="unknown" time="0.93"/></proof>
- <proof prover="3" memlimit="1000"><result status="unknown" time="0.02"/></proof>
- <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
+ <proof prover="1" timelimit="6" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_type_inversion_1.v"><result status="valid" time="1.65"/></proof>
+ <proof prover="3" timelimit="5" memlimit="1000"><result status="unknown" time="0.93"/></proof>
+ <proof prover="4" memlimit="1000"><result status="unknown" time="0.02"/></proof>
  <proof prover="5" timelimit="5" memlimit="1000"><result status="unknown" time="0.04"/></proof>
- <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
- <proof prover="7" timelimit="6" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_type_inversion_1.v"><result status="valid" time="1.65"/></proof>
+ <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
+ <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
  <transf name="induction_ty_lex">
   <goal name="type_inversion.1" expl="1." sum="02a4d45753db6d806b6b111167d0f81a">
-  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.10"/></proof>
-  <proof prover="3" memlimit="1000"><result status="valid" time="0.08"/></proof>
-  <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.07"/></proof>
+  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.10"/></proof>
+  <proof prover="4" memlimit="1000"><result status="valid" time="0.08"/></proof>
   <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
   <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.07"/></proof>
+  <proof prover="7" timelimit="5" memlimit="1000"><result status="valid" time="0.07"/></proof>
   </goal>
  </transf>
  </goal>
@@ -89,79 +89,79 @@
   <goal name="eval_type_term.1" expl="1." sum="d6378ab86d501a427c77ae53de17a819">
   <transf name="split_goal_wp">
    <goal name="eval_type_term.1.1" expl="1." sum="97e187f0b015488ee3eb6fb907819ddb">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.04"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.07"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.04"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.04"/></proof>
    </goal>
    <goal name="eval_type_term.1.2" expl="2." sum="b0555e2fda697ec7ad75af6bef76fd70">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.06"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
    </goal>
    <goal name="eval_type_term.1.3" expl="3." sum="b053234923f7a5a0d1d4a3c4c6ee76e2">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.08"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.08"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
    </goal>
    <goal name="eval_type_term.1.4" expl="4." sum="56e675d55c80e44dfce7d10f712f5c26">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="4.98"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_eval_type_term_1.v"><result status="valid" time="2.52"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="4.98"/></proof>
    <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_eval_type_term_1.v"><result status="valid" time="2.52"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="type_preservation" sum="420c6b3b731fe1a9c62d162e46e0b9d5">
- <proof prover="7" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_type_preservation_1.v"><result status="valid" time="2.53"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_TypingAndSemantics_type_preservation_1.v"><result status="valid" time="2.53"/></proof>
  </goal>
 </theory>
 <theory name="FreshVariables" expanded="true">
  <goal name="Cons_append" sum="28205410704fc461005607a42281b899">
- <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="Append_nil_l" sum="c2495ba2a67fe137e189315d7c7758fb">
- <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="eval_msubst_term" sum="bde0897dc004b3be9efd7ec81a18be0e">
  <transf name="induction_ty_lex">
   <goal name="eval_msubst_term.1" expl="1." sum="e23334d6c9ad53d125a025e393a3bf75">
   <transf name="split_goal_wp">
    <goal name="eval_msubst_term.1.1" expl="1." sum="464488d244bf546ed94b813fcbf4b204">
-   <proof prover="2" timelimit="5"><result status="valid" time="0.04"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" timelimit="5"><result status="timeout" time="4.98"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" timelimit="5"><result status="valid" time="0.04"/></proof>
-   <proof prover="6" timelimit="5"><result status="timeout" time="4.97"/></proof>
+   <proof prover="6" timelimit="5"><result status="timeout" time="4.98"/></proof>
+   <proof prover="7" timelimit="5"><result status="timeout" time="4.97"/></proof>
    </goal>
    <goal name="eval_msubst_term.1.2" expl="2." sum="aaadbaed7511adb848ded56176ad7049">
-   <proof prover="2" timelimit="5"><result status="valid" time="0.04"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" timelimit="5"><result status="timeout" time="5.21"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" timelimit="5"><result status="valid" time="0.04"/></proof>
-   <proof prover="6" timelimit="5"><result status="timeout" time="5.03"/></proof>
+   <proof prover="6" timelimit="5"><result status="timeout" time="5.21"/></proof>
+   <proof prover="7" timelimit="5"><result status="timeout" time="5.03"/></proof>
    </goal>
    <goal name="eval_msubst_term.1.3" expl="3." sum="e15631af93ec563e0a43c57c5a4bb254">
-   <proof prover="2" timelimit="5"><result status="valid" time="0.04"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="4" timelimit="5"><result status="timeout" time="4.99"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.05"/></proof>
    <proof prover="5" timelimit="5"><result status="valid" time="0.04"/></proof>
-   <proof prover="6" timelimit="5"><result status="timeout" time="4.97"/></proof>
+   <proof prover="6" timelimit="5"><result status="timeout" time="4.99"/></proof>
+   <proof prover="7" timelimit="5"><result status="timeout" time="4.97"/></proof>
    </goal>
    <goal name="eval_msubst_term.1.4" expl="4." sum="0c75fc75cf04a9021a42b65e68abc902">
-   <proof prover="2" timelimit="5"><result status="valid" time="0.06"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.12"/></proof>
-   <proof prover="4" timelimit="5"><result status="timeout" time="5.08"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.06"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.12"/></proof>
    <proof prover="5" timelimit="5"><result status="valid" time="0.05"/></proof>
-   <proof prover="6" timelimit="5"><result status="timeout" time="5.07"/></proof>
+   <proof prover="6" timelimit="5"><result status="timeout" time="5.08"/></proof>
+   <proof prover="7" timelimit="5"><result status="timeout" time="5.07"/></proof>
    </goal>
   </transf>
   </goal>
@@ -172,90 +172,90 @@
   <goal name="eval_msubst.1" expl="1." sum="0c6a552897cbcee66ce038227bbf035d">
   <transf name="split_goal_wp">
    <goal name="eval_msubst.1.1" expl="1." sum="07d4366873c1f437928c99a15c2ef2d3">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.10"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.46"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.10"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.05"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.03"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.46"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.03"/></proof>
    </goal>
    <goal name="eval_msubst.1.2" expl="2." sum="a2ed89a1a9649b26e5772a6b3a7e7665">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.08"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.42"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.08"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.08"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.42"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.08"/></proof>
    </goal>
    <goal name="eval_msubst.1.3" expl="3." sum="394a31bfa3bc5e0cf50aba08af87ed61">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.10"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" timelimit="60" memlimit="1000"><result status="outofmemory" time="5.47"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.10"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.08"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.09"/></proof>
+   <proof prover="6" timelimit="60" memlimit="1000"><result status="outofmemory" time="5.47"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.09"/></proof>
    </goal>
    <goal name="eval_msubst.1.4" expl="4." sum="2d815ed316a63a8089fd97643278d8d2">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.09"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.74"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.09"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.06"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.10"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.10"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.74"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.10"/></proof>
    </goal>
    <goal name="eval_msubst.1.5" expl="5." sum="1aac371a1f5eb34506dcfd9e2cbd7051">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.55"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.55"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.55"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.08"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.04"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.55"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.04"/></proof>
    </goal>
    <goal name="eval_msubst.1.6" expl="6." sum="8ac13b27b32c6333414807cf9228e40b">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.08"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.52"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.08"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.08"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.04"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.52"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.04"/></proof>
    </goal>
    <goal name="eval_msubst.1.7" expl="7." sum="0135639982923a21cf9295355ca1eee8">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.30"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.53"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.30"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.07"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.09"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.04"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.53"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.04"/></proof>
    </goal>
    <goal name="eval_msubst.1.8" expl="8." sum="38301f332319212aa091f5cb7e377ae1">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.09"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.43"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.09"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.09"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.03"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.43"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.03"/></proof>
    </goal>
    <goal name="eval_msubst.1.9" expl="9." sum="e01e45956e5629ed4dd5e8b785004d01">
-   <proof prover="2" memlimit="1000"><result status="valid" time="5.75"/></proof>
-   <proof prover="3" timelimit="30" memlimit="1000"><result status="valid" time="1.52"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.51"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_msubst_1.v"><result status="valid" time="1.36"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="5.75"/></proof>
+   <proof prover="4" timelimit="30" memlimit="1000"><result status="valid" time="1.52"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.70"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.10"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_msubst_1.v"><result status="valid" time="1.36"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.51"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.10"/></proof>
    </goal>
    <goal name="eval_msubst.1.10" expl="10." sum="bd8db0f71e9174203604d714f8924cdc">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.05"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.17"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.42"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.05"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.17"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="1.10"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.05"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.42"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.05"/></proof>
    </goal>
    <goal name="eval_msubst.1.11" expl="11." sum="d0e3ef3d6c08ad15b73d1b7990cf40b2">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.03"/></proof>
-   <proof prover="3" timelimit="30" memlimit="1000"><result status="outofmemory" time="8.63"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.44"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_msubst_2.v"><result status="valid" time="2.57"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.03"/></proof>
+   <proof prover="4" timelimit="30" memlimit="1000"><result status="outofmemory" time="8.63"/></proof>
    <proof prover="5" memlimit="1000"><result status="timeout" time="30.07"/></proof>
-   <proof prover="6" memlimit="1000"><result status="outofmemory" time="23.13"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_msubst_2.v"><result status="valid" time="2.57"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.44"/></proof>
+   <proof prover="7" memlimit="1000"><result status="outofmemory" time="23.13"/></proof>
    </goal>
    <goal name="eval_msubst.1.12" expl="12." sum="5502c1d20dbfebd562d75fa9f31d8219">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.03"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.77"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="5.49"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.03"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.77"/></proof>
    <proof prover="5" memlimit="1000"><result status="timeout" time="30.07"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.04"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="5.49"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.04"/></proof>
    </goal>
   </transf>
   </goal>
@@ -266,33 +266,33 @@
   <goal name="eval_swap_term.1" expl="1." sum="da19b1f679dd41ec9ae04f23627c247f">
   <transf name="split_goal_wp">
    <goal name="eval_swap_term.1.1" expl="1." sum="0868a9f8394d44749c513755ae759793">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.08"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" memlimit="1000"><result status="timeout" time="29.85"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.08"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" timelimit="5"><result status="valid" time="0.04"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="31.86"/></proof>
+   <proof prover="6" memlimit="1000"><result status="timeout" time="29.85"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="31.86"/></proof>
    </goal>
    <goal name="eval_swap_term.1.2" expl="2." sum="c28a05d73adaf026a62d8bb41444a2d9">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.06"/></proof>
-   <proof prover="3" timelimit="30" memlimit="1000"><result status="timeout" time="30.06"/></proof>
-   <proof prover="4" memlimit="1000"><result status="timeout" time="29.86"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_swap_term_1.v"><result status="valid" time="1.69"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.06"/></proof>
+   <proof prover="4" timelimit="30" memlimit="1000"><result status="timeout" time="30.06"/></proof>
    <proof prover="5" memlimit="1000"><result status="timeout" time="30.04"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.87"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_swap_term_1.v"><result status="valid" time="2.00"/></proof>
+   <proof prover="6" memlimit="1000"><result status="timeout" time="29.86"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.87"/></proof>
    </goal>
    <goal name="eval_swap_term.1.3" expl="3." sum="b0e46436db8757bf3ffef20068298980">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
    <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="4" memlimit="1000"><result status="timeout" time="29.88"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.05"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.87"/></proof>
+   <proof prover="6" memlimit="1000"><result status="timeout" time="29.88"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.87"/></proof>
    </goal>
    <goal name="eval_swap_term.1.4" expl="4." sum="4dfa985a76af48710769eb7d0138cfb9">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.25"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
-   <proof prover="4" memlimit="1000"><result status="timeout" time="29.98"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.25"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.16"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.86"/></proof>
+   <proof prover="6" memlimit="1000"><result status="timeout" time="29.98"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.86"/></proof>
    </goal>
   </transf>
   </goal>
@@ -303,134 +303,134 @@
   <goal name="eval_swap_gen.1" expl="1." sum="79bf60eb42daf7b0553d34c7c571dbd4">
   <transf name="split_goal_wp">
    <goal name="eval_swap_gen.1.1" expl="1." sum="4575b5e7fc011cd6cd143aaaffc408ba">
-   <proof prover="2"><result status="valid" time="0.24"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.04"/></proof>
-   <proof prover="4"><result status="timeout" time="30.16"/></proof>
+   <proof prover="3"><result status="valid" time="0.24"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.04"/></proof>
    <proof prover="5"><result status="valid" time="0.05"/></proof>
-   <proof prover="6"><result status="timeout" time="30.04"/></proof>
+   <proof prover="6"><result status="timeout" time="30.16"/></proof>
+   <proof prover="7"><result status="timeout" time="30.04"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.2" expl="2." sum="fd1360774f686aad7939380019eaea1f">
-   <proof prover="2"><result status="valid" time="0.23"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.15"/></proof>
-   <proof prover="4"><result status="timeout" time="30.16"/></proof>
+   <proof prover="3"><result status="valid" time="0.23"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.15"/></proof>
    <proof prover="5"><result status="valid" time="0.05"/></proof>
-   <proof prover="6"><result status="timeout" time="30.17"/></proof>
+   <proof prover="6"><result status="timeout" time="30.16"/></proof>
+   <proof prover="7"><result status="timeout" time="30.17"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.3" expl="3." sum="a672418a513d7dccfde41519d386c721">
-   <proof prover="2"><result status="valid" time="0.43"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.10"/></proof>
-   <proof prover="4"><result status="timeout" time="30.07"/></proof>
+   <proof prover="3"><result status="valid" time="0.43"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.10"/></proof>
    <proof prover="5"><result status="valid" time="0.26"/></proof>
-   <proof prover="6"><result status="timeout" time="29.75"/></proof>
+   <proof prover="6"><result status="timeout" time="30.07"/></proof>
+   <proof prover="7"><result status="timeout" time="29.75"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.4" expl="4." sum="4cf24b5a059755c7049f09d0c7ee883b">
-   <proof prover="2"><result status="valid" time="0.46"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.11"/></proof>
-   <proof prover="4"><result status="timeout" time="30.16"/></proof>
+   <proof prover="3"><result status="valid" time="0.46"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.11"/></proof>
    <proof prover="5"><result status="valid" time="0.27"/></proof>
-   <proof prover="6"><result status="timeout" time="29.17"/></proof>
+   <proof prover="6"><result status="timeout" time="30.16"/></proof>
+   <proof prover="7"><result status="timeout" time="29.17"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.5" expl="5." sum="634ab59fdabbb9b513c1a63e54c7d5e6">
-   <proof prover="2"><result status="valid" time="0.37"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.05"/></proof>
-   <proof prover="4"><result status="timeout" time="30.16"/></proof>
+   <proof prover="3"><result status="valid" time="0.37"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.05"/></proof>
    <proof prover="5"><result status="valid" time="0.22"/></proof>
-   <proof prover="6"><result status="timeout" time="30.09"/></proof>
+   <proof prover="6"><result status="timeout" time="30.16"/></proof>
+   <proof prover="7"><result status="timeout" time="30.09"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.6" expl="6." sum="d3f99dbb3f62926a3e782498c9686b65">
-   <proof prover="2"><result status="valid" time="0.34"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.16"/></proof>
-   <proof prover="4"><result status="timeout" time="30.15"/></proof>
+   <proof prover="3"><result status="valid" time="0.34"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.16"/></proof>
    <proof prover="5"><result status="valid" time="0.21"/></proof>
-   <proof prover="6"><result status="timeout" time="30.10"/></proof>
+   <proof prover="6"><result status="timeout" time="30.15"/></proof>
+   <proof prover="7"><result status="timeout" time="30.10"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.7" expl="7." sum="4271fd83e1431e0f5f5cc3308d751831">
-   <proof prover="2"><result status="valid" time="0.41"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.04"/></proof>
-   <proof prover="4"><result status="timeout" time="30.08"/></proof>
+   <proof prover="3"><result status="valid" time="0.41"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.04"/></proof>
    <proof prover="5"><result status="valid" time="0.25"/></proof>
-   <proof prover="6"><result status="timeout" time="29.06"/></proof>
+   <proof prover="6"><result status="timeout" time="30.08"/></proof>
+   <proof prover="7"><result status="timeout" time="29.06"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.8" expl="8." sum="79c809fc5154c45aede25c4593f6aa98">
-   <proof prover="2"><result status="valid" time="0.42"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.04"/></proof>
-   <proof prover="4"><result status="timeout" time="30.16"/></proof>
+   <proof prover="3"><result status="valid" time="0.42"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.04"/></proof>
    <proof prover="5"><result status="valid" time="0.24"/></proof>
-   <proof prover="6"><result status="timeout" time="29.11"/></proof>
+   <proof prover="6"><result status="timeout" time="30.16"/></proof>
+   <proof prover="7"><result status="timeout" time="29.11"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.9" expl="9." sum="3d0638b4ec6641b989cdc31674252bd8">
-   <proof prover="2"><result status="timeout" time="30.06"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.14"/></proof>
-   <proof prover="4"><result status="timeout" time="30.16"/></proof>
+   <proof prover="3"><result status="timeout" time="30.06"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.14"/></proof>
    <proof prover="5"><result status="timeout" time="30.01"/></proof>
-   <proof prover="6"><result status="timeout" time="30.11"/></proof>
+   <proof prover="6"><result status="timeout" time="30.16"/></proof>
+   <proof prover="7"><result status="timeout" time="30.11"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.10" expl="10." sum="27d7c1b6229c110ffe3225cfa3fe0857">
-   <proof prover="2"><result status="timeout" time="30.07"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.15"/></proof>
-   <proof prover="4"><result status="timeout" time="30.13"/></proof>
+   <proof prover="3"><result status="timeout" time="30.07"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.15"/></proof>
    <proof prover="5"><result status="timeout" time="30.02"/></proof>
-   <proof prover="6"><result status="timeout" time="30.10"/></proof>
+   <proof prover="6"><result status="timeout" time="30.13"/></proof>
+   <proof prover="7"><result status="timeout" time="30.10"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.11" expl="11." sum="f8ac7c6ceab04249464d08533a827bf9">
-   <proof prover="2"><result status="timeout" time="30.08"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="9.52"/></proof>
-   <proof prover="4"><result status="timeout" time="30.10"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_swap_gen_1.v"><result status="valid" time="2.00"/></proof>
+   <proof prover="3"><result status="timeout" time="30.08"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="9.52"/></proof>
    <proof prover="5"><result status="timeout" time="30.05"/></proof>
-   <proof prover="6"><result status="timeout" time="30.14"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_swap_gen_1.v"><result status="valid" time="2.00"/></proof>
+   <proof prover="6"><result status="timeout" time="30.10"/></proof>
+   <proof prover="7"><result status="timeout" time="30.14"/></proof>
    </goal>
    <goal name="eval_swap_gen.1.12" expl="12." sum="67af17c66bcc5a03b7d16f347d6f16d0">
-   <proof prover="2"><result status="timeout" time="30.05"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="9.77"/></proof>
-   <proof prover="4"><result status="timeout" time="30.07"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_swap_gen_2.v"><result status="valid" time="2.00"/></proof>
+   <proof prover="3"><result status="timeout" time="30.05"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="8.68"/></proof>
    <proof prover="5"><result status="timeout" time="30.06"/></proof>
-   <proof prover="6"><result status="timeout" time="30.12"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_swap_gen_2.v"><result status="valid" time="2.00"/></proof>
+   <proof prover="6"><result status="timeout" time="30.07"/></proof>
+   <proof prover="7"><result status="timeout" time="30.12"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="eval_swap" sum="2b6eb28e8ed079debf72922481f9611f">
- <proof prover="2" timelimit="5"><result status="timeout" time="5.02"/></proof>
- <proof prover="3"><result status="timeout" time="5.05"/></proof>
- <proof prover="4" timelimit="5"><result status="timeout" time="5.03"/></proof>
+ <proof prover="1" edited="blocking_semantics5_FreshVariables_eval_swap_3.v"><result status="valid" time="1.07"/></proof>
+ <proof prover="3" timelimit="5"><result status="timeout" time="5.02"/></proof>
+ <proof prover="4"><result status="timeout" time="5.05"/></proof>
  <proof prover="5" timelimit="5"><result status="timeout" time="5.01"/></proof>
- <proof prover="6" timelimit="5"><result status="timeout" time="4.98"/></proof>
- <proof prover="7" edited="blocking_semantics5_FreshVariables_eval_swap_3.v"><result status="valid" time="1.07"/></proof>
+ <proof prover="6" timelimit="5"><result status="timeout" time="5.03"/></proof>
+ <proof prover="7" timelimit="5"><result status="timeout" time="4.98"/></proof>
  </goal>
  <goal name="eval_term_change_free" sum="8dc7d2eb4ef2851f8ae9f1e3ef4bd391">
  <transf name="induction_ty_lex">
   <goal name="eval_term_change_free.1" expl="1." sum="2bb3f9458b9254f54f7492b2673e885f">
   <transf name="split_goal_wp">
    <goal name="eval_term_change_free.1.1" expl="1." sum="bf31b10e4bdca9d34c2bb4386246d992">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" timelimit="20" memlimit="1000"><result status="outofmemory" time="8.46"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="6" timelimit="20" memlimit="1000"><result status="timeout" time="20.18"/></proof>
+   <proof prover="6" timelimit="20" memlimit="1000"><result status="outofmemory" time="6.96"/></proof>
+   <proof prover="7" timelimit="20" memlimit="1000"><result status="timeout" time="20.18"/></proof>
    </goal>
    <goal name="eval_term_change_free.1.2" expl="2." sum="0f39dfa2a31ff2bf52384c8c0691ec80">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" timelimit="20" memlimit="1000"><result status="outofmemory" time="7.34"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.11"/></proof>
-   <proof prover="6" timelimit="20" memlimit="1000"><result status="timeout" time="20.06"/></proof>
+   <proof prover="6" timelimit="20" memlimit="1000"><result status="outofmemory" time="7.34"/></proof>
+   <proof prover="7" timelimit="20" memlimit="1000"><result status="timeout" time="20.06"/></proof>
    </goal>
    <goal name="eval_term_change_free.1.3" expl="3." sum="ad8947e29972161013c3d711050918e7">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="7.30"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.03"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.88"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="7.30"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.88"/></proof>
    </goal>
    <goal name="eval_term_change_free.1.4" expl="4." sum="7190e3dd26342432726cd5b9e92ee273">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="7.40"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.07"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.03"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.76"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="7.40"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.76"/></proof>
    </goal>
   </transf>
   </goal>
@@ -441,91 +441,91 @@
   <goal name="eval_change_free.1" expl="1." sum="f50c2e768ee17ba4adbd89841e2d9d4f">
   <transf name="split_goal_wp">
    <goal name="eval_change_free.1.1" expl="1." sum="7a8c3b965b5166641797419b8ea7a0a8">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="7.61"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.05"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.85"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="7.61"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.85"/></proof>
    </goal>
    <goal name="eval_change_free.1.2" expl="2." sum="eb132e5cb5630fc41461bdeab4764a3b">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.15"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="7.48"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.15"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.06"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.88"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="7.48"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.88"/></proof>
    </goal>
    <goal name="eval_change_free.1.3" expl="3." sum="da4c1bf014619fbaccc83a7d4bfdea8f">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.08"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="7.18"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.08"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.84"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="7.18"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.84"/></proof>
    </goal>
    <goal name="eval_change_free.1.4" expl="4." sum="a28cdca5da1c2b30e59cb39a4aa2188d">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.12"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="7.73"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.12"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.84"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="7.73"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.84"/></proof>
    </goal>
    <goal name="eval_change_free.1.5" expl="5." sum="b1c68b8f481c4201f0252dae01e4258c">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="4" timelimit="20" memlimit="1000"><result status="outofmemory" time="7.64"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.05"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="6" timelimit="20" memlimit="1000"><result status="timeout" time="21.34"/></proof>
+   <proof prover="6" timelimit="20" memlimit="1000"><result status="outofmemory" time="7.64"/></proof>
+   <proof prover="7" timelimit="20" memlimit="1000"><result status="timeout" time="21.34"/></proof>
    </goal>
    <goal name="eval_change_free.1.6" expl="6." sum="893089dec74f1f8b066f63729f5af4d9">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.06"/></proof>
    <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="7.24"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.06"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.08"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="7.24"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.08"/></proof>
    </goal>
    <goal name="eval_change_free.1.7" expl="7." sum="b912c77341f09c42d1b0ead9e55a2bfb">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.07"/></proof>
    <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="7.46"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.07"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.88"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="7.46"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.88"/></proof>
    </goal>
    <goal name="eval_change_free.1.8" expl="8." sum="ece76c5b5c51792b6a03a51d92d40c31">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="8.20"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="29.87"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="6.94"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="29.87"/></proof>
    </goal>
    <goal name="eval_change_free.1.9" expl="9." sum="2d5f2c07722494a650ca4afd4eeaa926">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.29"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.58"/></proof>
-   <proof prover="4" timelimit="20" memlimit="1000"><result status="outofmemory" time="7.74"/></proof>
-   <proof prover="6" timelimit="20" memlimit="1000"><result status="timeout" time="20.06"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_2.v"><result status="valid" time="1.11"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_2.v"><result status="valid" time="1.11"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.29"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.58"/></proof>
+   <proof prover="6" timelimit="20" memlimit="1000"><result status="outofmemory" time="7.74"/></proof>
+   <proof prover="7" timelimit="20" memlimit="1000"><result status="timeout" time="20.06"/></proof>
    </goal>
    <goal name="eval_change_free.1.10" expl="10." sum="87e14bf84798c76d866728980e640274">
-   <proof prover="2" memlimit="1000"><result status="valid" time="0.50"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="4" timelimit="20" memlimit="1000"><result status="outofmemory" time="7.17"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_1.v"><result status="valid" time="1.12"/></proof>
+   <proof prover="3" memlimit="1000"><result status="valid" time="0.50"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.07"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.39"/></proof>
-   <proof prover="6" timelimit="20" memlimit="1000"><result status="timeout" time="20.04"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_1.v"><result status="valid" time="1.12"/></proof>
+   <proof prover="6" timelimit="20" memlimit="1000"><result status="outofmemory" time="7.17"/></proof>
+   <proof prover="7" timelimit="20" memlimit="1000"><result status="timeout" time="20.04"/></proof>
    </goal>
    <goal name="eval_change_free.1.11" expl="11." sum="d91cee662a70cc54093d8dc16fe642bd">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.10"/></proof>
-   <proof prover="3" timelimit="30" memlimit="1000"><result status="timeout" time="30.01"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="8.07"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_4.v"><result status="valid" time="2.00"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.10"/></proof>
+   <proof prover="4" timelimit="30" memlimit="1000"><result status="timeout" time="30.01"/></proof>
    <proof prover="5" memlimit="1000"><result status="timeout" time="30.10"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.02"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_4.v"><result status="valid" time="2.00"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="7.02"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.02"/></proof>
    </goal>
    <goal name="eval_change_free.1.12" expl="12." sum="9535f87515b785163744e092292cf7dc">
-   <proof prover="2" memlimit="1000"><result status="timeout" time="30.06"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.18"/></proof>
-   <proof prover="4" memlimit="1000"><result status="outofmemory" time="7.89"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_3.v"><result status="valid" time="1.53"/></proof>
+   <proof prover="3" memlimit="1000"><result status="timeout" time="30.06"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.18"/></proof>
    <proof prover="5" memlimit="1000"><result status="timeout" time="30.07"/></proof>
-   <proof prover="6" memlimit="1000"><result status="timeout" time="30.04"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_FreshVariables_eval_change_free_3.v"><result status="valid" time="1.53"/></proof>
+   <proof prover="6" memlimit="1000"><result status="outofmemory" time="6.98"/></proof>
+   <proof prover="7" memlimit="1000"><result status="timeout" time="30.04"/></proof>
    </goal>
   </transf>
   </goal>
@@ -534,33 +534,33 @@
 </theory>
 <theory name="HoareLogic" expanded="true">
  <goal name="many_steps_seq" sum="d7ccd2e6c34fcd64ad26aebbd41db170">
- <proof prover="7" memlimit="1000" edited="blocking_semantics5_HoareLogic_many_steps_seq_1.v"><result status="valid" time="1.73"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_many_steps_seq_1.v"><result status="valid" time="1.73"/></proof>
  </goal>
  <goal name="consequence_rule" sum="ee004ffcb203dddc70529472f702daae">
- <proof prover="2" memlimit="1000"><result status="valid" time="0.15"/></proof>
+ <proof prover="3" memlimit="1000"><result status="valid" time="0.15"/></proof>
  <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="skip_rule" sum="9ffa071ec99026cdbcb3868f809f17fc">
- <proof prover="7" memlimit="1000" edited="blocking_semantics5_HoareLogic_skip_rule_1.v"><result status="valid" time="1.14"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_skip_rule_1.v"><result status="valid" time="1.14"/></proof>
  </goal>
  <goal name="assign_rule" sum="5c311c45b9e819d18b247614334038a2">
- <proof prover="7" timelimit="12" memlimit="1000" edited="blocking_semantics5_HoareLogic_assign_rule_1.v"><result status="valid" time="1.96"/></proof>
+ <proof prover="1" timelimit="12" memlimit="1000" edited="blocking_semantics5_HoareLogic_assign_rule_1.v"><result status="valid" time="1.96"/></proof>
  </goal>
  <goal name="seq_rule" sum="f014db044d04f950060627bce8025954">
- <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
- <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.09"/></proof>
+ <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
+ <proof prover="7" timelimit="5" memlimit="1000"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="if_rule" sum="5e272d1a4b4e3f275c2905e3f7b9facd">
- <proof prover="7" memlimit="1000" edited="blocking_semantics5_HoareLogic_if_rule_1.v"><result status="valid" time="1.71"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_if_rule_1.v"><result status="valid" time="1.71"/></proof>
  </goal>
  <goal name="assert_rule" sum="69cff99e5c69a8529f8f3114276558d3">
- <proof prover="7" memlimit="1000" edited="blocking_semantics5_HoareLogic_assert_rule_1.v"><result status="valid" time="1.23"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_assert_rule_1.v"><result status="valid" time="1.23"/></proof>
  </goal>
  <goal name="assert_rule_ext" sum="367ac75edfe3c031865bca10df667da8">
- <proof prover="7" memlimit="1000" edited="blocking_semantics5_HoareLogic_assert_rule_ext_1.v"><result status="valid" time="1.20"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_assert_rule_ext_1.v"><result status="valid" time="1.20"/></proof>
  </goal>
  <goal name="while_rule" sum="3827f0957c01f352322075e0dd899ad0">
- <proof prover="7" memlimit="1000" edited="blocking_semantics5_HoareLogic_while_rule_1.v"><result status="valid" time="1.39"/></proof>
+ <proof prover="1" memlimit="1000" edited="blocking_semantics5_HoareLogic_while_rule_1.v"><result status="valid" time="1.39"/></proof>
  </goal>
 </theory>
 <theory name="WP" expanded="true">
@@ -569,47 +569,47 @@
   <goal name="monotonicity.1" expl="1." sum="bf6cfd2216388fafd7255616e72e5690">
   <transf name="split_goal_wp">
    <goal name="monotonicity.1.1" expl="1." sum="f47b3cafcc4bc6832d8cab2f62544314">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.08"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.10"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.08"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.09"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.10"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="monotonicity.1.2" expl="2." sum="40b8777bc21a611e1dc14d5c92e6022e">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.06"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="5.03"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.06"/></proof>
+   <proof prover="1" timelimit="30" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_1.v"><result status="valid" time="1.67"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.06"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="5.03"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="timeout" time="5.10"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
-   <proof prover="7" timelimit="30" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_1.v"><result status="valid" time="1.67"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.06"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
    </goal>
    <goal name="monotonicity.1.3" expl="3." sum="5bc6e1065c0cfd12954a222a004d85b1">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.14"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.14"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.06"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.11"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.02"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.02"/></proof>
    </goal>
    <goal name="monotonicity.1.4" expl="4." sum="0452f3de7b77be3f427212ee7c7cab78">
    <proof prover="0"><result status="timeout" time="5.07"/></proof>
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.24"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.10"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_2.v"><result status="valid" time="1.64"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_2.v"><result status="valid" time="1.64"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.24"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.10"/></proof>
    </goal>
    <goal name="monotonicity.1.5" expl="5." sum="c4f9fe53b99b95944572f1b5be2882b3">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.09"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="5.01"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="4.99"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.09"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="5.01"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="4.98"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="4.99"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="4.98"/></proof>
    </goal>
    <goal name="monotonicity.1.6" expl="6." sum="1e01fe9b9ffc1780c47dd81aab1803e9">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="5.12"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_3.v"><result status="valid" time="1.16"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="5.12"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="timeout" time="5.06"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.12"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_monotonicity_3.v"><result status="valid" time="1.16"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.12"/></proof>
    </goal>
   </transf>
   </goal>
@@ -620,118 +620,118 @@
   <goal name="distrib_conj.1" expl="1." sum="5de34d496b8b451122787f7f2c867afd">
   <transf name="split_goal_wp">
    <goal name="distrib_conj.1.1" expl="1." sum="f18d27f7289a17b1ec3038500848ad09">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.07"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="4.99"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.07"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.06"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="4.98"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="4.99"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="4.98"/></proof>
    </goal>
    <goal name="distrib_conj.1.2" expl="2." sum="3dec1216530678a5098b60a68ff58b77">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.11"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="6.79"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.10"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_1.v"><result status="valid" time="2.03"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.11"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="5.48"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="timeout" time="5.08"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.08"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_1.v"><result status="valid" time="2.03"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.10"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.08"/></proof>
    </goal>
    <goal name="distrib_conj.1.3" expl="3." sum="6a2f92af2c35dcc08d1e2f928bb849a0">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.09"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="5.06"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_2.v"><result status="valid" time="1.58"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.09"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="5.06"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_2.v"><result status="valid" time="1.90"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
    </goal>
    <goal name="distrib_conj.1.4" expl="4." sum="6361b6c61a2292fc4f59972e8931ef68">
    <proof prover="0"><result status="valid" time="0.08"/></proof>
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="4.97"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.96"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.13"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="4.97"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.96"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.58"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.08"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.13"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.08"/></proof>
    </goal>
    <goal name="distrib_conj.1.5" expl="5." sum="686551510a71076cfd9dc0aad3344021">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.40"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.40"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.40"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.40"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.27"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.01"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.05"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.01"/></proof>
    </goal>
    <goal name="distrib_conj.1.6" expl="6." sum="28216dca0dacf99686e647db75c2db7b">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.10"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="5.01"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.11"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_3.v"><result status="valid" time="1.31"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.10"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="5.01"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.02"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_distrib_conj_3.v"><result status="valid" time="1.31"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.11"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.02"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="wp_preserved_by_reduction" sum="e3c6aa38a0d45c9b311d10d9fc2e868b">
- <proof prover="7" edited="blocking_semantics5_WP_wp_preserved_by_reduction_4.v"><result status="valid" time="4.74"/></proof>
+ <proof prover="1" edited="blocking_semantics5_WP_wp_preserved_by_reduction_4.v"><result status="valid" time="4.74"/></proof>
  </goal>
  <goal name="progress" sum="98cfa13bb8c52ca8ea29317ddc9fb01c">
  <transf name="induction_ty_lex">
   <goal name="progress.1" expl="1." sum="3b65f48e9caf86285795bec456728f87">
   <transf name="split_goal_wp">
    <goal name="progress.1.1" expl="1." sum="d730e90cae906d29d0d06e3d4666d07c">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="valid" time="0.00"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.06"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.05"/></proof>
    <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.00"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="valid" time="0.00"/></proof>
    </goal>
    <goal name="progress.1.2" expl="2." sum="d4995292f29a02328bf7c59b98576493">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.02"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="5.04"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.08"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_progress_1.v"><result status="valid" time="1.17"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.02"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="5.04"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="timeout" time="5.09"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.02"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_progress_1.v"><result status="valid" time="1.17"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.08"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.02"/></proof>
    </goal>
    <goal name="progress.1.3" expl="3." sum="6d258cfcd4e994e7d8c2c6ee64893a3d">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.09"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="5.03"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.12"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_progress_2.v"><result status="valid" time="1.56"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.09"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="5.03"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="timeout" time="5.11"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.01"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_progress_2.v"><result status="valid" time="1.56"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.12"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.01"/></proof>
    </goal>
    <goal name="progress.1.4" expl="4." sum="c1448edd96d0aec3640f78ecbc4f40bd">
    <proof prover="0"><result status="timeout" time="4.97"/></proof>
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="4.99"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="4.99"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="4.96"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="4.97"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_progress_3.v"><result status="valid" time="1.18"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_progress_3.v"><result status="valid" time="1.18"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="4.99"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="4.99"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="4.96"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="4.97"/></proof>
    </goal>
    <goal name="progress.1.5" expl="5." sum="d7322285192bc851cad769d57d35b780">
-   <proof prover="1"><result status="valid" time="0.20"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_progress_4.v"><result status="valid" time="1.15"/></proof>
+   <proof prover="2"><result status="valid" time="0.20"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.31"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_progress_4.v"><result status="valid" time="1.15"/></proof>
    <proof prover="8"><result status="valid" time="0.34"/></proof>
    </goal>
    <goal name="progress.1.6" expl="6." sum="e029023c534e26ba5d1733ae0f639040">
-   <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.09"/></proof>
-   <proof prover="3" memlimit="1000"><result status="timeout" time="5.05"/></proof>
-   <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.11"/></proof>
+   <proof prover="1" memlimit="1000" edited="blocking_semantics5_WP_progress_5.v"><result status="valid" time="1.19"/></proof>
+   <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.09"/></proof>
+   <proof prover="4" memlimit="1000"><result status="timeout" time="5.05"/></proof>
    <proof prover="5" timelimit="5" memlimit="1000"><result status="timeout" time="5.06"/></proof>
-   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
-   <proof prover="7" memlimit="1000" edited="blocking_semantics5_WP_progress_5.v"><result status="valid" time="1.19"/></proof>
+   <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.11"/></proof>
+   <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.03"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="wp_soundness" sum="12c4f2200b4a57f9f463223dc0788a64">
- <proof prover="2" timelimit="5" memlimit="1000"><result status="timeout" time="5.11"/></proof>
- <proof prover="3" memlimit="1000"><result status="timeout" time="5.01"/></proof>
- <proof prover="4" timelimit="5" memlimit="1000"><result status="timeout" time="5.04"/></proof>
+ <proof prover="1" timelimit="30" memlimit="1000" edited="blocking_semantics5_WP_wp_soundness_1.v"><result status="valid" time="1.27"/></proof>
+ <proof prover="3" timelimit="5" memlimit="1000"><result status="timeout" time="5.11"/></proof>
+ <proof prover="4" memlimit="1000"><result status="timeout" time="5.01"/></proof>
  <proof prover="5" timelimit="5" memlimit="1000"><result status="timeout" time="5.01"/></proof>
- <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
- <proof prover="7" timelimit="30" memlimit="1000" edited="blocking_semantics5_WP_wp_soundness_1.v"><result status="valid" time="1.27"/></proof>
+ <proof prover="6" timelimit="5" memlimit="1000"><result status="timeout" time="5.04"/></proof>
+ <proof prover="7" timelimit="5" memlimit="1000"><result status="timeout" time="5.07"/></proof>
  </goal>
 </theory>
 </file>

@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
 <prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <file name="../muller.mlw">
@@ -11,77 +11,77 @@
  <goal name="WP_parameter compact" expl="VC for compact" sum="43de849a15a3d5e4bbee4378005e6d16">
  <transf name="split_goal">
   <goal name="WP_parameter compact.1" expl="1. array creation size" sum="de32224b73ea988687d86e7bf59a8248">
-  <proof prover="0" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compact.2" expl="2. loop invariant init" sum="f2a1fa190de55dc138663bb5c85c7d09">
-  <proof prover="0" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compact.3" expl="3. index in array bounds" sum="97a7493f345542cb396878ff151d7c52">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compact.4" expl="4. index in array bounds" sum="8792f42f4ca862b0902d4d56d2b2d41c">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter compact.5" expl="5. type invariant" sum="24accb9e6facffec13db31ca18dcdd78">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter compact.6" expl="6. index in array bounds" sum="1f5ea0d9c49c010f506cdea9c5c465e0">
-  <proof prover="0" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compact.7" expl="7. loop invariant preservation" sum="331200b37148cb232955535adeb8e0a7">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter compact.8" expl="8. loop invariant preservation" sum="11bd60182805fcbf5c6c95c9b68f7578">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter compact.9" expl="9. loop invariant init" sum="c4dd4e9724b9cfab79a150f9c67b5b93">
-  <proof prover="0" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compact.10" expl="10. index in array bounds" sum="a6668685520a30caa1153009516692fb">
-  <proof prover="0" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compact.11" expl="11. loop invariant preservation" sum="78f703d82ee524357e2e42d912e67001">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compact.12" expl="12. loop invariant preservation" sum="3d5abd0dbbc57f42df70d1867ff95c67">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter compact.13" expl="13. array creation size" sum="84d0e3acc3e05f326c4a26e460aba839">
-  <proof prover="0" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compact.14" expl="14. loop invariant init" sum="dae9e9e52a0af69854dd31f41244f35a">
-  <proof prover="0" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compact.15" expl="15. index in array bounds" sum="b0aeb00467eac9387a08383499dece78">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter compact.16" expl="16. index in array bounds" sum="e0ff31095c783d9f484a312db11d88c8">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compact.17" expl="17. type invariant" sum="7906665e1ca9bab4ffe2fd13863da5b4">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter compact.18" expl="18. index in array bounds" sum="a9ca4546321bbef18a77150f040ac6fc">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter compact.19" expl="19. loop invariant preservation" sum="709d9b5acfffaa4e7db444c783b69466">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter compact.20" expl="20. loop invariant preservation" sum="8b3d2682525d4eb190113fcf35c3560b">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>

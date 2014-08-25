@@ -2,45 +2,45 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Coq" version="8.4pl3" timelimit="30" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="30" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
+<prover id="4" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <file name="../double.why" expanded="true">
 <theory name="BV_double">
 </theory>
 <theory name="TestDouble" expanded="true">
  <goal name="nth_one1" sum="9426856b7db1eaa0a7fbf98d0a1d6511" expanded="true">
- <proof prover="1" timelimit="3"><result status="valid" time="0.33"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.33"/></proof>
  </goal>
  <goal name="nth_one2" sum="b1c633079fda4d75118758023d1bd9d6" expanded="true">
- <proof prover="1" timelimit="3"><result status="valid" time="0.23"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.23"/></proof>
  </goal>
  <goal name="nth_one3" sum="7b13e3cc4204cfbf0bcadc9604a16925">
- <proof prover="1"><result status="valid" time="0.31"/></proof>
+ <proof prover="2"><result status="valid" time="0.31"/></proof>
  </goal>
  <goal name="sign_one" sum="bdda75f77974f193214e8a50e2cd6d59">
- <proof prover="0"><result status="valid" time="0.03"/></proof>
  <proof prover="1"><result status="valid" time="0.03"/></proof>
- <proof prover="2"><result status="valid" time="0.11"/></proof>
- <proof prover="3"><result status="valid" time="0.02"/></proof>
- <proof prover="4"><result status="valid" time="0.11"/></proof>
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ <proof prover="3"><result status="valid" time="0.11"/></proof>
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="5"><result status="valid" time="0.11"/></proof>
  </goal>
  <goal name="exp_one" sum="0c3504d58a9734848a0cbc03bc51d27d">
- <proof prover="1" timelimit="30"><result status="valid" time="1.96"/></proof>
- <proof prover="5" edited="double_TestDouble_exp_one_1.v"><result status="valid" time="1.21"/></proof>
+ <proof prover="0" edited="double_TestDouble_exp_one_1.v"><result status="valid" time="1.21"/></proof>
+ <proof prover="2" timelimit="30"><result status="valid" time="1.96"/></proof>
  </goal>
  <goal name="mantissa_one" sum="e7fa2f72bb2aada4371ebb33b3cc263e">
- <proof prover="1"><result status="valid" time="0.09"/></proof>
- <proof prover="2"><result status="valid" time="0.69"/></proof>
- <proof prover="4" timelimit="11"><result status="valid" time="3.36"/></proof>
+ <proof prover="2"><result status="valid" time="0.09"/></proof>
+ <proof prover="3"><result status="valid" time="0.69"/></proof>
+ <proof prover="5" timelimit="11"><result status="valid" time="3.36"/></proof>
  </goal>
  <goal name="double_value_of_1" sum="a43ae53878e69bc2d59a96e436eb69b9">
- <proof prover="0"><result status="valid" time="0.03"/></proof>
- <proof prover="1"><result status="valid" time="0.04"/></proof>
- <proof prover="3"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
 </file>

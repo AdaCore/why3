@@ -3,11 +3,11 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
-<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Yices" version="1.0.38" timelimit="5" memlimit="0"/>
-<prover id="5" name="Coq" version="8.4pl3" timelimit="5" memlimit="0"/>
+<prover id="1" name="Coq" version="8.4pl4" timelimit="5" memlimit="0"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
+<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Yices" version="1.0.38" timelimit="5" memlimit="0"/>
 <file name="../sorted_list.why" expanded="true">
 <theory name="Order" expanded="true">
 </theory>
@@ -15,19 +15,19 @@
 </theory>
 <theory name="SortedList" expanded="true">
  <goal name="sorted_inf" sum="85715fd191f60af72e520336d517bb3f" expanded="true">
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="sorted_mem" sum="650981b340ea06664b11226642065d85" expanded="true">
- <proof prover="5" edited="sorted_list_SortedList_sorted_mem_1.v"><result status="valid" time="0.98"/></proof>
+ <proof prover="1" edited="sorted_list_SortedList_sorted_mem_1.v"><result status="valid" time="0.98"/></proof>
  </goal>
 </theory>
 <theory name="SortedIntList" expanded="true">
  <goal name="sorted123" sum="1c52af23643757c56c161436e0be9c4b" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 </file>

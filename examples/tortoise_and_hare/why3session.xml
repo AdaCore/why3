@@ -2,23 +2,23 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
-<prover id="1" name="Coq" version="8.4pl3" timelimit="10" memlimit="0"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="10" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
 <file name="../tortoise_and_hare.mlw" expanded="true">
 <theory name="TortoiseAndHare" expanded="true">
  <goal name="cycle_induction" sum="644a54455c49ac11e64a95bc1747fe62" expanded="true">
- <proof prover="1" edited="tortoise_and_hare_WP_TortoiseAndHare_cycle_induction_1.v"><result status="valid" time="1.02"/></proof>
+ <proof prover="0" edited="tortoise_and_hare_WP_TortoiseAndHare_cycle_induction_1.v"><result status="valid" time="1.02"/></proof>
  </goal>
  <goal name="WP_parameter tortoise_hare" expl="VC for tortoise_hare" sum="00592f1427748db5b93dbdc993463608" expanded="true">
  <transf name="split_goal" expanded="true">
   <goal name="WP_parameter tortoise_hare.1" expl="1. loop invariant init" sum="7e7215ca73bf2cf27f38876220330f95" expanded="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter tortoise_hare.2" expl="2. loop invariant preservation" sum="5d3140290c2927996cf36bf8421d3b18" expanded="true">
-  <proof prover="1" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_2.v"><result status="valid" time="1.40"/></proof>
+  <proof prover="0" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_2.v"><result status="valid" time="1.40"/></proof>
   </goal>
   <goal name="WP_parameter tortoise_hare.3" expl="3. loop variant decrease" sum="bd5478063922ae362cfba88f3e8c2570" expanded="true">
-  <proof prover="1" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_1.v"><result status="valid" time="1.36"/></proof>
+  <proof prover="0" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_1.v"><result status="valid" time="1.36"/></proof>
   </goal>
  </transf>
  </goal>

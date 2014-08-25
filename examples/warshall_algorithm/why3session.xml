@@ -2,16 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Coq" version="8.4pl3" timelimit="6" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="6" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../warshall_algorithm.mlw" expanded="true">
 <theory name="WarshallAlgorithm" expanded="true">
  <goal name="weakening" sum="a2e646aaa8f449556f806942e2d8d262" expanded="true">
- <proof prover="1" edited="warshall_algorithm_WarshallAlgorithm_weakening_1.v"><result status="valid" time="0.97"/></proof>
+ <proof prover="0" edited="warshall_algorithm_WarshallAlgorithm_weakening_1.v"><result status="valid" time="0.97"/></proof>
  </goal>
  <goal name="decomposition" sum="5c3846f3226e008f18b65844497f7f1e" expanded="true">
- <proof prover="1" edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"><result status="valid" time="1.52"/></proof>
+ <proof prover="0" edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"><result status="valid" time="1.52"/></proof>
  </goal>
  <goal name="WP_parameter transitive_closure" expl="VC for transitive_closure" sum="ecb64fac1c21c6319399699e8e2ee48c">
  <transf name="split_goal_wp">
@@ -84,13 +84,13 @@
   <goal name="WP_parameter transitive_closure.14" expl="14. loop invariant preservation" sum="011d96034bd0ddb2c77def805fa88381">
   <transf name="split_goal_wp">
    <goal name="WP_parameter transitive_closure.14.1" expl="1. loop invariant preservation" sum="8fbf523a7bcb1e7bf41594623b789fca">
-   <proof prover="0"><result status="valid" time="0.15"/></proof>
+   <proof prover="1"><result status="valid" time="0.15"/></proof>
    </goal>
    <goal name="WP_parameter transitive_closure.14.2" expl="2. loop invariant preservation" sum="f90f4608e2f1ed55868170c1abae5234">
    <proof prover="2"><result status="valid" time="0.07"/></proof>
    </goal>
    <goal name="WP_parameter transitive_closure.14.3" expl="3. loop invariant preservation" sum="661894a01c6faf25fc587f568690022a">
-   <proof prover="0"><result status="valid" time="0.07"/></proof>
+   <proof prover="1"><result status="valid" time="0.07"/></proof>
    </goal>
   </transf>
   </goal>
@@ -100,13 +100,13 @@
   <goal name="WP_parameter transitive_closure.16" expl="16. loop invariant preservation" sum="bb7acbf83db488a3e60dbb1d6ee2b769">
   <transf name="split_goal_wp">
    <goal name="WP_parameter transitive_closure.16.1" expl="1. loop invariant preservation" sum="48ab68abfb7cc1efbef634b5e5d323b0">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <proof prover="1"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="WP_parameter transitive_closure.16.2" expl="2. loop invariant preservation" sum="e442ba5fecc08de1b18b3afd0993d12a">
    <proof prover="2"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="WP_parameter transitive_closure.16.3" expl="3. loop invariant preservation" sum="4a2c6dce555192974950c40afa934dfc">
-   <proof prover="0"><result status="valid" time="0.04"/></proof>
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>

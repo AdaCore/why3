@@ -2,246 +2,246 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
-<prover id="3" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Coq" version="8.4pl3" timelimit="10" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="10" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
+<prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <file name="../edit_distance.mlw" expanded="true">
 <theory name="Word" expanded="true">
- <goal name="first_last_explicit" sum="ef8fef3d0c6be2a4be6efc8521f1ff3b" expanded="true">
- <proof prover="4" memlimit="0" edited="edit_distance_Word_first_last_explicit_1.v"><result status="valid" time="1.03"/></proof>
+ <goal name="first_last_explicit" sum="2739803e70394b600745bc7a90079256" expanded="true">
+ <proof prover="0" memlimit="0" edited="edit_distance_Word_first_last_explicit_1.v"><result status="valid" time="1.03"/></proof>
  </goal>
- <goal name="first_last" sum="1b2126228b08663c7f44527b4c037835" expanded="true">
- <proof prover="4" memlimit="0" edited="edit_distance_Word_first_last_1.v"><result status="valid" time="1.06"/></proof>
+ <goal name="first_last" sum="d88ee451f29d7069ae753cc07595f074" expanded="true">
+ <proof prover="0" memlimit="0" edited="edit_distance_Word_first_last_1.v"><result status="valid" time="1.06"/></proof>
  </goal>
- <goal name="key_lemma_right" sum="eeae6297aa41d70f4ccc9ce1f5f8175c" expanded="true">
- <proof prover="4" memlimit="0" edited="edit_distance_Word_key_lemma_right_1.v"><result status="valid" time="1.04"/></proof>
+ <goal name="key_lemma_right" sum="14bb01ffb48aa3ca06293af0cd2003e9" expanded="true">
+ <proof prover="0" memlimit="0" edited="edit_distance_Word_key_lemma_right_1.v"><result status="valid" time="1.04"/></proof>
  </goal>
- <goal name="dist_symetry" sum="c812c080ec5b9f2b7fdf936910a2abe4" expanded="true">
- <proof prover="4" memlimit="0" edited="edit_distance_Word_dist_symetry_1.v"><result status="valid" time="1.07"/></proof>
+ <goal name="dist_symetry" sum="65df692ce25a6af3afdfb28d89982b35" expanded="true">
+ <proof prover="0" memlimit="0" edited="edit_distance_Word_dist_symetry_1.v"><result status="valid" time="1.07"/></proof>
  </goal>
- <goal name="key_lemma_left" sum="a4945a600bf2ef685947b0e588c68a95" expanded="true">
- <proof prover="2"><result status="valid" time="0.06"/></proof>
+ <goal name="key_lemma_left" sum="71563dcbf08a461ee9fdab42bcc4cdc1" expanded="true">
+ <proof prover="3"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="dist_concat_left" sum="8f257b4ea964f1dca5c4e1925be8e3ed" expanded="true">
- <proof prover="4" memlimit="0" edited="edit_distance_Word_dist_concat_left_1.v"><result status="valid" time="1.05"/></proof>
+ <goal name="dist_concat_left" sum="9f560be83bdb50adb50d273f16f84b57" expanded="true">
+ <proof prover="0" memlimit="0" edited="edit_distance_Word_dist_concat_left_1.v"><result status="valid" time="1.05"/></proof>
  </goal>
- <goal name="dist_concat_right" sum="ebdd60377098c02614b414973d17cab9" expanded="true">
- <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
+ <goal name="dist_concat_right" sum="143f3f23e2a38fbaec36d8c142e8e117" expanded="true">
+ <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="min_dist_equal" sum="e3ad8c244250562ab941bfc83925d902" expanded="true">
- <proof prover="4" memlimit="0" edited="edit_distance_Word_min_dist_equal_1.v"><result status="valid" time="1.13"/></proof>
+ <goal name="min_dist_equal" sum="5c108dd68853769228cea66da8fd4b5b" expanded="true">
+ <proof prover="0" memlimit="0" edited="edit_distance_Word_min_dist_equal_1.v"><result status="valid" time="1.13"/></proof>
  </goal>
- <goal name="min_dist_diff" sum="dd162f041e0b2830366c3b3a1cee8080" expanded="true">
- <proof prover="4" memlimit="0" edited="edit_distance_Word_min_dist_diff_1.v"><result status="valid" time="1.13"/></proof>
+ <goal name="min_dist_diff" sum="b0fa65818f4069fbe043a5463b3e6612" expanded="true">
+ <proof prover="0" memlimit="0" edited="edit_distance_Word_min_dist_diff_1.v"><result status="valid" time="1.13"/></proof>
  </goal>
- <goal name="min_dist_eps" sum="bac860b2a90b2196c959e223817ae07e" expanded="true">
- <proof prover="4" timelimit="20" memlimit="0" edited="edit_distance_Word_min_dist_eps_1.v"><result status="valid" time="1.07"/></proof>
+ <goal name="min_dist_eps" sum="06b732111dbc1f68d6f6e420c1e79992" expanded="true">
+ <proof prover="0" timelimit="20" memlimit="0" edited="edit_distance_Word_min_dist_eps_1.v"><result status="valid" time="1.07"/></proof>
  </goal>
- <goal name="min_dist_eps_length" sum="763e8b6a4b20a14c39bcad7665c720cd" expanded="true">
- <proof prover="4" timelimit="20" memlimit="0" edited="edit_distance_Word_min_dist_eps_length_1.v"><result status="valid" time="1.08"/></proof>
+ <goal name="min_dist_eps_length" sum="647410d9ebed78d070b92258a6521c8a" expanded="true">
+ <proof prover="0" timelimit="20" memlimit="0" edited="edit_distance_Word_min_dist_eps_length_1.v"><result status="valid" time="1.08"/></proof>
  </goal>
 </theory>
 <theory name="EditDistance" expanded="true">
- <goal name="suffix_length" sum="5c15e5b71772dae33bc2a57261088de0" expanded="true">
- <proof prover="4" timelimit="20" memlimit="0" edited="edit_distance_WP_EditDistance_suffix_length_1.v"><result status="valid" time="1.16"/></proof>
+ <goal name="suffix_length" sum="672f235e32d19d197a4915085727a73f" expanded="true">
+ <proof prover="0" timelimit="20" memlimit="0" edited="edit_distance_WP_EditDistance_suffix_length_1.v"><result status="valid" time="1.16"/></proof>
  </goal>
- <goal name="WP_parameter distance" expl="VC for distance" sum="991a5a46a1eb5137b90bc865bdb958a0" expanded="true">
+ <goal name="WP_parameter distance" expl="VC for distance" sum="c58c788f09318d1e596e9e45e47570d6" expanded="true">
  <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter distance.1" expl="1. array creation size" sum="75f603354f544c1bc4f919e257af6632" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.1" expl="1. array creation size" sum="a8091aded02bfffa16e6cf0a3476ee7d" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.2" expl="2. index in array bounds" sum="9701f402862e955f050eab487a1b8b9f" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.2" expl="2. index in array bounds" sum="16e99cee31af1bdee378f1dd70e373a0" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.3" expl="3. postcondition" sum="4778736819457f9fe5c82d0ec349180d" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.00"/></proof>
+  <goal name="WP_parameter distance.3" expl="3. postcondition" sum="d33941e0208b188a01e7bfa4f95e9184" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter distance.4" expl="4. loop invariant init" sum="81f68c7210a7183649376e4a68cd99fa" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.4" expl="4. loop invariant init" sum="00369b6f20144b104eaee020a54928ae" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.5" expl="5. type invariant" sum="5098adef2d732c028e6a7712a7988bce" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.5" expl="5. type invariant" sum="9937f87201400967eb81290f04af2ce2" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.6" expl="6. index in array bounds" sum="0d27f26d3c11737f4af991f10ddb4135" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.6" expl="6. index in array bounds" sum="c6930bb97b5cf6b57a2dd7d15c5bbb4b" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.7" expl="7. index in array bounds" sum="f749fe3219fb9394f7fa8c39fb0adfea" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.7" expl="7. index in array bounds" sum="bde8752d372bad98d64d9a58350df819" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.8" expl="8. index in array bounds" sum="538035c68e29c353a710268186841d5f" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.8" expl="8. index in array bounds" sum="39f921b996cc1ae9e8c0e1b7a1571d06" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.9" expl="9. loop invariant preservation" sum="9f2ecd62571fba67dad8c541c303b5d1" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.9" expl="9. loop invariant preservation" sum="38309b2929b41a380e1ed6c2bb0320b0" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.10" expl="10. loop invariant init" sum="e2df7d3ba515394bde8773ade0b4ef9d" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.10" expl="10. loop invariant init" sum="70484209d58207ba7cebdb459466b883" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.11" expl="11. loop invariant init" sum="0e093420a6b6025c2263c2fdc0ddee35" expanded="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter distance.12" expl="12. loop invariant init" sum="329eb95b535fa386917c0583c0065d63" expanded="true">
+  <goal name="WP_parameter distance.11" expl="11. loop invariant init" sum="7e9973ff148c55a47662ed02014a4cc8" expanded="true">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter distance.13" expl="13. type invariant" sum="1c73d961958bd88d748973652e83b3c3" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.12" expl="12. loop invariant init" sum="ac17644343f2921202a126d959bb8e99" expanded="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter distance.14" expl="14. index in array bounds" sum="df533763d4d61bfa02879d9cc6e1ddde" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.13" expl="13. type invariant" sum="1f9e08160f8463c91aa1acd74035a164" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.15" expl="15. index in array bounds" sum="03235be3d0288d1a1bd0f932f477a8aa" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.14" expl="14. index in array bounds" sum="130e026770d444aa560d457af7d36365" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.16" expl="16. index in array bounds" sum="f428df9691fb6282d50bf75ea113083e" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.15" expl="15. index in array bounds" sum="0b5b12879c095f2a37205abc55ce33a1" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.17" expl="17. index in array bounds" sum="59680c59574dd1618643d96f1f45e163" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.16" expl="16. index in array bounds" sum="5000f93dcd13769c0a2c3a152f60ee56" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.18" expl="18. loop invariant preservation" sum="11ffe18f291f0d8eff93db0471eb7a37" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.17" expl="17. index in array bounds" sum="ed6316b2666f4fa1608ca96edfc23f20" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.19" expl="19. loop invariant preservation" sum="56b14bf1ec0bf5f507786c38c8e45c2e" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.18" expl="18. loop invariant preservation" sum="dae71b72e0fdd4d2288cdcc495eb3b03" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.20" expl="20. loop invariant preservation" sum="38c4df8d7b18cf424cda6c9a8c2bde6e" expanded="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter distance.19" expl="19. loop invariant preservation" sum="bb527b930ec01d647948d1a51d3ddc06" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.21" expl="21. index in array bounds" sum="712f283a807eaf9fed86e2131dc1a778" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.20" expl="20. loop invariant preservation" sum="6d6c551f6203606eee83df8bc227619c" expanded="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter distance.22" expl="22. index in array bounds" sum="66625d90ceca7942e1851e46abc47a5f" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.21" expl="21. index in array bounds" sum="caf3491da40c217febc29745d76dce17" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.23" expl="23. index in array bounds" sum="41f6fe0547defab9f762201a9235bb78" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.22" expl="22. index in array bounds" sum="94c75dcba1c0fe2b4a60d425becc0a70" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.24" expl="24. loop invariant preservation" sum="d77bc0712f0db412310a2c20494997a2" expanded="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.23" expl="23. index in array bounds" sum="10edc4503f4520ecd84821ffe3788f7e" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.25" expl="25. loop invariant preservation" sum="50527861124aed6d8930eb50d1628b4b" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.24" expl="24. loop invariant preservation" sum="2dbe0e4c82f90336b1240bb6daa1c9fc" expanded="true">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.26" expl="26. loop invariant preservation" sum="80f0f873815562c285d6714b5b288ccb" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.25" expl="25. loop invariant preservation" sum="f9098a131394c87c0f8d5c2b0c074fcc" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.27" expl="27. loop invariant preservation" sum="e10c16a51dee7cd7cf71c4c10ffaecdf" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.26" expl="26. loop invariant preservation" sum="2e58594d5495325807384c333e313197" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.28" expl="28. type invariant" sum="35412ea3229438638d88fcd892a8a35c" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.27" expl="27. loop invariant preservation" sum="995ab87cbcb7463aec1a4a2269bac6ac" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.29" expl="29. index in array bounds" sum="760c4692a63d70a0f48a13772fa013d0" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.28" expl="28. type invariant" sum="287ede32d90b319508657e4cfe2bafee" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.30" expl="30. postcondition" sum="0d4d2bf5cd17a35623862edaf754eae0" expanded="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter distance.29" expl="29. index in array bounds" sum="cb5be3772d1674ce8aa1410ffd96d461" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.31" expl="31. loop invariant init" sum="5c8a1288ade8c0223aa5b7f059948da2" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.30" expl="30. postcondition" sum="3a7c85bfd2c82bf0340167771ccab1fa" expanded="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter distance.32" expl="32. type invariant" sum="fe95384bc77b0147f17845581b440e77" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.31" expl="31. loop invariant init" sum="27e5b36a17c401e3cc18569a99e9f0a1" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.33" expl="33. index in array bounds" sum="d9e447ccd2bda471360c6b4bdafd488a" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.32" expl="32. type invariant" sum="b9d660922139dea584c31840321f11fd" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.34" expl="34. loop invariant preservation" sum="6600fbbfc9456ee10da3d66a07d1a6c8" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.33" expl="33. index in array bounds" sum="acbb2af67077d75d6148c1c1f2ce4665" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.35" expl="35. type invariant" sum="d6db9e22e377febe6100ccf0207d3ff5" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.34" expl="34. loop invariant preservation" sum="dd8be6e0383a14a9bd5d8ec20e8a5ad8" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.36" expl="36. index in array bounds" sum="e2f97ed839c685c58f1497a8bd057494" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.35" expl="35. type invariant" sum="647fba05119deaeb051d9370e81b51aa" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.37" expl="37. postcondition" sum="3d6f9ad0b49795dd6fed0395524dfc1a" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.36" expl="36. index in array bounds" sum="976620df57e8175926fcae123ff2995f" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.38" expl="38. loop invariant init" sum="aee90a0f98f9b9f2b15975eea2d610f8" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.37" expl="37. postcondition" sum="7158c3d89eed960ca4ed21575bb48e11" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.39" expl="39. type invariant" sum="11d82985aa9c26b3ff80bea0d272e47d" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.38" expl="38. loop invariant init" sum="401bf9db9946e15e5f535d4e0f07d421" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.40" expl="40. index in array bounds" sum="d0c03f4930a8421144e05cab997145b7" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.39" expl="39. type invariant" sum="b4f12b895f1060428f23311e282ac703" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.41" expl="41. index in array bounds" sum="7db4402b139febb26d7460f4b348c424" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.40" expl="40. index in array bounds" sum="5638178c8585d10bb7acd207c11b2045" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.42" expl="42. index in array bounds" sum="605250a5d4a8224736648ee73784b869" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.41" expl="41. index in array bounds" sum="eb8f452fc81f2fdfa6a0900f5e45e78d" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.43" expl="43. loop invariant preservation" sum="668520aa8395fc48f5a393620b884e16" expanded="true">
-  <proof prover="4" timelimit="5" edited="edit_distance_EditDistance_WP_parameter_distance_1.v"><result status="valid" time="1.49"/></proof>
+  <goal name="WP_parameter distance.42" expl="42. index in array bounds" sum="60b216ecb0e96e2d1fcb83da788c0da1" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.44" expl="44. loop invariant init" sum="d5ba034e31220aad02ba336d62145afb" expanded="true">
-  <proof prover="1"><result status="valid" time="0.58"/></proof>
+  <goal name="WP_parameter distance.43" expl="43. loop invariant preservation" sum="13a028e11f1220983ef58c881a0486e7" expanded="true">
+  <proof prover="0" timelimit="5" edited="edit_distance_EditDistance_WP_parameter_distance_1.v"><result status="valid" time="1.49"/></proof>
   </goal>
-  <goal name="WP_parameter distance.45" expl="45. loop invariant init" sum="4616f7233abfd30bd40a10dd8e4c6d8e" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter distance.44" expl="44. loop invariant init" sum="782943153dfdfb6402a349584584e975" expanded="true">
+  <proof prover="2"><result status="valid" time="0.58"/></proof>
   </goal>
-  <goal name="WP_parameter distance.46" expl="46. loop invariant init" sum="97643d0dea909740a6b0239ed03710d4" expanded="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter distance.45" expl="45. loop invariant init" sum="df0e66a55886f304fbadef198254ca7c" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter distance.47" expl="47. type invariant" sum="377a78875ce9766e752d592534127493" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.46" expl="46. loop invariant init" sum="4680b2e52f28b7b64a8b1d95c2a72f03" expanded="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter distance.48" expl="48. index in array bounds" sum="8b17655659d3f66bb308434481d7b353" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.47" expl="47. type invariant" sum="3056dc95ee6c7ac0abcad9b603fadc87" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.49" expl="49. index in array bounds" sum="18a9c35bcf8c0e08f86d01e60690116b" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.48" expl="48. index in array bounds" sum="798596b036e9e24b8b87148c9a307931" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.50" expl="50. index in array bounds" sum="2633274e02fe79c0ec7d99dd08d0538f" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.49" expl="49. index in array bounds" sum="6b1c35d91069daa39da35f92635c6891" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.51" expl="51. index in array bounds" sum="d91ae09e2ef8418d157bad223589d7f3" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.50" expl="50. index in array bounds" sum="f8ba5facf912fce91c8e8a032fdde224" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.52" expl="52. loop invariant preservation" sum="5912299b45c93b853918b9a0263d3654" expanded="true">
-  <proof prover="4" timelimit="5" edited="edit_distance_WP_EditDistance_WP_parameter_distance_2.v"><result status="valid" time="1.26"/></proof>
+  <goal name="WP_parameter distance.51" expl="51. index in array bounds" sum="f3a8e22ca9fbbc5b2b4069d15e65c39e" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.53" expl="53. loop invariant preservation" sum="0e40e3f01698f75fcec73c6d4056fccb" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.52" expl="52. loop invariant preservation" sum="d0d4f30e4ba6c2f538578d6ed71e19b4" expanded="true">
+  <proof prover="0" timelimit="5" edited="edit_distance_WP_EditDistance_WP_parameter_distance_2.v"><result status="valid" time="1.26"/></proof>
   </goal>
-  <goal name="WP_parameter distance.54" expl="54. loop invariant preservation" sum="0e708c237366f7f06d4e3ffc9ef119c6" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.53" expl="53. loop invariant preservation" sum="f5eaeb95b83205edf8a642711440d5a8" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.55" expl="55. index in array bounds" sum="ee942360137dd9e6627b8e301e7635d1" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.54" expl="54. loop invariant preservation" sum="5fbc37e9e126b6e074e7c70507e67208" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.56" expl="56. index in array bounds" sum="3d1eeae41f610de088f31cea4bdd4c11" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.55" expl="55. index in array bounds" sum="25f481a2834e5428a23a8688b609076f" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.57" expl="57. index in array bounds" sum="3e4fc803417955d13c4ed29d111df57b" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.56" expl="56. index in array bounds" sum="b903dee5d0d47778950a3d1dfd3b2782" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.58" expl="58. loop invariant preservation" sum="f6e4f8be77ddbf3fa84f9369e89e2116" expanded="true">
-  <proof prover="4" timelimit="5" edited="edit_distance_WP_EditDistance_WP_parameter_distance_1.v"><result status="valid" time="1.39"/></proof>
+  <goal name="WP_parameter distance.57" expl="57. index in array bounds" sum="12a898ed625c5ba7162eeb60ff6cb614" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.59" expl="59. loop invariant preservation" sum="224f63af45b7021ad24f3a7361a06541" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.58" expl="58. loop invariant preservation" sum="b6c977be92e2694cd2d237c3cb7cc0ba" expanded="true">
+  <proof prover="0" timelimit="5" edited="edit_distance_WP_EditDistance_WP_parameter_distance_1.v"><result status="valid" time="1.39"/></proof>
   </goal>
-  <goal name="WP_parameter distance.60" expl="60. loop invariant preservation" sum="0681d45133931b163cd51a95a102ec8a" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.59" expl="59. loop invariant preservation" sum="db01775cd8be7c5a271369c52be44557" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.61" expl="61. loop invariant preservation" sum="a6c9dcf56c96b0b5965173f5bbf9a941" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.60" expl="60. loop invariant preservation" sum="511dc48d553d233a78beda1bd9225ca7" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.62" expl="62. type invariant" sum="0478750028dc50b743f85fcdfe8184d9" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.61" expl="61. loop invariant preservation" sum="5c89fa585ddd61d7915f1d85af7e1fb2" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter distance.63" expl="63. index in array bounds" sum="b0d6da41f57bcd5e523b315080e8d330" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter distance.62" expl="62. type invariant" sum="0f3b659e02c72e7957f009203b099b65" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter distance.64" expl="64. postcondition" sum="c79fc491099ad7a62e5b7dca59e836a6" expanded="true">
-  <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter distance.63" expl="63. index in array bounds" sum="a79aca97ff9478726278c926a8ffd598" expanded="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter distance.64" expl="64. postcondition" sum="0bcea0b4dcc2075729c27ac94c01c97b" expanded="true">
+  <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>

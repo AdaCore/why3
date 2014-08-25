@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
-<prover id="1" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Coq" version="8.4pl3" timelimit="10" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="10" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
+<prover id="2" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
 <file name="../insertion_sort_naive.mlw" expanded="true">
@@ -12,100 +12,100 @@
  <goal name="WP_parameter sort" expl="VC for sort" sum="4193375765ae2a921cc89fa5a49c9cd5">
  <transf name="split_goal_wp">
   <goal name="WP_parameter sort.1" expl="1. postcondition" sum="4c407ba32451c516bd45ab151f95f3da">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.2" expl="2. postcondition" sum="0bb545ce1f0bd654ee194ad3ef48c69f">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.3" expl="3. loop invariant init" sum="eec0ec69b48d0dea33d52499fd418072">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.4" expl="4. loop invariant init" sum="4909085e474d05b5e14f42df505e007a">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.5" expl="5. loop invariant init" sum="df50f56d906e827228cb7dcf45c452b6">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.6" expl="6. loop invariant init" sum="99562a46982c9a9daf8bd624a44ccd8c">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.7" expl="7. loop invariant init" sum="7cbe2bc0840c73e4f1f6384ff1f371ab">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.8" expl="8. loop invariant init" sum="6abd5071dbb1975cb60d3a5c521f9dc6">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.9" expl="9. loop invariant init" sum="7379f22a51c41eca60a726eedddb8f3e">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.10" expl="10. type invariant" sum="3075b8a960451a4d31f57578cf8193df">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.11" expl="11. index in array bounds" sum="2f12363c20ea961669b49cb1023dcaf9">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.12" expl="12. index in array bounds" sum="3a0111dee72b34d59bc5f389e8ef2444">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.13" expl="13. index in array bounds" sum="a036c7b49d3c2183b8b594dd59f321b3">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.14" expl="14. index in array bounds" sum="fe27f9587959eb45ad64bde355458c14">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.15" expl="15. index in array bounds" sum="4e0a1dd5899d21b772ae4d3d2faeb438">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.16" expl="16. index in array bounds" sum="1550369b1e8f663af562174621c64543">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.17" expl="17. assertion" sum="c6a32d486a594d64eb8f5d35d1d59030">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.18" expl="18. loop invariant preservation" sum="56f13d81d00105f340d27039fe263b56">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.19" expl="19. loop invariant preservation" sum="1d92fbb13b89ba9be0f1b8cb2482c456">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.34"/></proof>
   </goal>
   <goal name="WP_parameter sort.20" expl="20. loop invariant preservation" sum="0932d3bcf5a0985eb8a53342b80b0a30">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="1.22"/></proof>
   </goal>
   <goal name="WP_parameter sort.21" expl="21. loop invariant preservation" sum="48c368abb4a5622c36e6df883aa3ef2f">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.04"/></proof>
   <proof prover="3"><result status="valid" time="2.61"/></proof>
   </goal>
   <goal name="WP_parameter sort.22" expl="22. loop invariant preservation" sum="f4f7f6106c7fc6dd3b0e8f9bcb8cfc71">
@@ -115,34 +115,34 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.24" expl="24. loop invariant preservation" sum="480c37e48c91bfa855136a159e079c29">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter sort.25" expl="25. loop invariant preservation" sum="a7d1a6f6aac2c3b9b4eada37cf7fc22b">
   <proof prover="3"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter sort.26" expl="26. loop invariant preservation" sum="99adefdf8cecb32592011239987863e5">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.27" expl="27. loop invariant preservation" sum="c473a1859a1ccd0534ade87e2eba315f">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.28" expl="28. type invariant" sum="9687ebe6233cf29b01a05b32f59552a4">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.29" expl="29. postcondition" sum="6f873fa7bde5340bff42401937c4b857">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.30" expl="30. postcondition" sum="d0cbe4edf51e7350bfc9ee9954d89185">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
@@ -173,7 +173,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.8" expl="8. loop invariant init" sum="9718934a8bc889d350786b829fc4c875">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter sort.9" expl="9. loop invariant init" sum="48da3071fbc358f760de960bff34d615">
@@ -207,7 +207,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.19" expl="19. loop invariant preservation" sum="f7bd3fa18a34cbd726be184d6dcb0114">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter sort.20" expl="20. loop invariant preservation" sum="b26f0de7ed26de891ebd37e3cd28be9c">
@@ -215,7 +215,7 @@
   <proof prover="4" memlimit="1000"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter sort.21" expl="21. loop invariant preservation" sum="33d897a9260e9365ef4477c4e26d7627">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="3"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="WP_parameter sort.22" expl="22. loop invariant preservation" sum="d7fca2e5d29fe5ced006be9e9b89061e">
@@ -310,7 +310,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.20" expl="20. loop invariant preservation" sum="c18ba71d98dccdba78ee64471c4497aa">
-  <proof prover="0" timelimit="10" memlimit="1000"><result status="valid" time="0.13"/></proof>
+  <proof prover="1" timelimit="10" memlimit="1000"><result status="valid" time="0.13"/></proof>
   <proof prover="3"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter sort.21" expl="21. loop invariant preservation" sum="c8c2e1be7def547531f7d41b7e102ef0">
@@ -408,14 +408,14 @@
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter sort.19" expl="19. loop invariant preservation" sum="245fa830deac4f37cfc728842099e25e">
-  <proof prover="0" timelimit="10" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <proof prover="1" timelimit="10" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="WP_parameter sort.20" expl="20. loop invariant preservation" sum="a991a2783a978971b3be50e54a52fadc">
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter sort.21" expl="21. loop invariant preservation" sum="7e8b731d0f57b8de9b6a783f1dc3518f" expanded="true">
-  <proof prover="2" edited="insertion_sort_naive_InsertionSortParamBad_WP_parameter_sort_1.v"><result status="valid" time="31.53"/></proof>
+  <proof prover="0" edited="insertion_sort_naive_InsertionSortParamBad_WP_parameter_sort_1.v"><result status="valid" time="31.53"/></proof>
   </goal>
   <goal name="WP_parameter sort.22" expl="22. loop invariant preservation" sum="6313a4527b502da9bd20fe52d5c3f73a">
   <transf name="inline_goal">
@@ -431,7 +431,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.25" expl="25. loop invariant preservation" sum="1a20010b0017d538e27f6673e16c398e" expanded="true">
-  <proof prover="2" edited="insertion_sort_naive_InsertionSortParamBad_WP_parameter_sort_2.v"><result status="valid" time="36.27"/></proof>
+  <proof prover="0" edited="insertion_sort_naive_InsertionSortParamBad_WP_parameter_sort_2.v"><result status="valid" time="32.14"/></proof>
   </goal>
   <goal name="WP_parameter sort.26" expl="26. loop invariant preservation" sum="96cf827d2b8c9c47cb286c188fe1f8bf">
   <proof prover="3"><result status="valid" time="0.01"/></proof>

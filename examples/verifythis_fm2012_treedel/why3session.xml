@@ -2,39 +2,39 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Eprover" version="1.6" timelimit="5" memlimit="4000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="4000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
-<prover id="2" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
-<prover id="3" name="Z3" version="3.2" timelimit="5" memlimit="4000"/>
-<prover id="4" name="Coq" version="8.4pl3" timelimit="5" memlimit="4000"/>
+<prover id="2" name="Eprover" version="1.6" timelimit="5" memlimit="4000"/>
+<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
+<prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="4000"/>
 <prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <prover id="6" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
 <prover id="7" name="Vampire" version="0.6" timelimit="5" memlimit="4000"/>
 <file name="../verifythis_fm2012_treedel.mlw">
 <theory name="Memory">
  <goal name="WP_parameter get_left" expl="VC for get_left" sum="c537b9d37b673665ee870c118cfe66e2">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="5"><result status="valid" time="0.01"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="7"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="WP_parameter get_right" expl="VC for get_right" sum="c537b9d37b673665ee870c118cfe66e2">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="7"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="WP_parameter get_data" expl="VC for get_data" sum="c537b9d37b673665ee870c118cfe66e2">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="5"><result status="valid" time="0.01"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="7"><result status="valid" time="0.00"/></proof>
@@ -46,17 +46,17 @@
   <goal name="inorder_zip.1" expl="1." sum="2d9130054b91b0afbf2daa5f82da96c7">
   <transf name="split_goal_wp">
    <goal name="inorder_zip.1.1" expl="1." sum="b3d669688a291c641efa5397b7a67aee">
-   <proof prover="0"><result status="valid" time="0.00"/></proof>
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="2"><result status="valid" time="0.04"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="2"><result status="valid" time="0.00"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    <proof prover="5"><result status="valid" time="0.01"/></proof>
    <proof prover="6"><result status="valid" time="0.03"/></proof>
    <proof prover="7"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="inorder_zip.1.2" expl="2." sum="ce8e0d3dd9093384689862d0a121f2dd">
-   <proof prover="0"><result status="valid" time="0.43"/></proof>
    <proof prover="1"><result status="valid" time="3.00"/></proof>
+   <proof prover="2"><result status="valid" time="0.43"/></proof>
    <proof prover="5"><result status="valid" time="0.06"/></proof>
    <proof prover="6"><result status="valid" time="0.13"/></proof>
    </goal>
@@ -65,259 +65,259 @@
  </transf>
  </goal>
  <goal name="WP_parameter tree_left" expl="VC for tree_left" sum="234ecc1375a2b07580879e20480a0e83">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
  <proof prover="5"><result status="valid" time="0.02"/></proof>
  <proof prover="6"><result status="valid" time="0.03"/></proof>
  <proof prover="7"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="WP_parameter tree_right" expl="VC for tree_right" sum="a13b9eb77c9ac320405fffda7adf5287">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
  <proof prover="5"><result status="valid" time="0.01"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  <proof prover="7"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="main_lemma" sum="6ca4fdeb31a5bb44e8d5d29fffdd787c">
- <proof prover="4" edited="verifythis_fm2012_treedel_Treedel_main_lemma_1.v"><result status="valid" time="37.98"/></proof>
+ <proof prover="0" edited="verifythis_fm2012_treedel_Treedel_main_lemma_1.v"><result status="valid" time="33.98"/></proof>
  </goal>
  <goal name="WP_parameter search_tree_delete_min" expl="VC for search_tree_delete_min" sum="4f259dbeec8bd1d1651c69776330c3ad">
  <transf name="split_goal_wp">
   <goal name="WP_parameter search_tree_delete_min.1" expl="1. precondition" sum="9bd1839b76a7be7c787d6846e3999e45">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.2" expl="2. precondition" sum="639e6ea182035ba06935b527c5492796">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.3" expl="3. precondition" sum="ca25783a7dde3f5470c180231bf6a977">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.4" expl="4. unreachable point" sum="68b62949dd2215c3cab76076fdcd0b20">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.5" expl="5. assertion" sum="37491cd57f0ac0e96cfbc8717a0556a7">
-  <proof prover="0"><result status="valid" time="0.81"/></proof>
   <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.81"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="3.06"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.6" expl="6. postcondition" sum="c333cdf94733fd444b7204fc4ac98966">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="5.43"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="5.43"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.25"/></proof>
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   <proof prover="7"><result status="valid" time="4.39"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.7" expl="7. precondition" sum="4f79860b22491637dde576ed2e086307">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.8" expl="8. precondition" sum="013c5ec5f29dd9cac048e9c7bda6b0b1">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.9" expl="9. precondition" sum="73576f5aef2bc15b0ac4e38f4e32943a">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.10" expl="10. loop invariant init" sum="38f8ba980d69ed9194c485722f2db168">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.11" expl="11. loop invariant init" sum="503b4ac071346e134e2b471fd38ef36b">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.12" expl="12. loop invariant init" sum="3323fa5a5e1ef9cf3cda6a7150916a86">
-  <proof prover="0"><result status="valid" time="1.15"/></proof>
   <proof prover="1"><result status="valid" time="0.14"/></proof>
-  <proof prover="2"><result status="valid" time="0.12"/></proof>
-  <proof prover="3"><result status="valid" time="0.10"/></proof>
+  <proof prover="2"><result status="valid" time="1.15"/></proof>
+  <proof prover="3"><result status="valid" time="0.12"/></proof>
+  <proof prover="4"><result status="valid" time="0.10"/></proof>
   <proof prover="5"><result status="valid" time="0.08"/></proof>
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   <proof prover="7"><result status="valid" time="3.63"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.13" expl="13. assertion" sum="209204ab4b8ab36e931fee54f6b38eca">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.14" expl="14. precondition" sum="7688b86f1e23c3807e759cb1540d8a27">
-  <proof prover="0"><result status="valid" time="0.08"/></proof>
   <proof prover="1"><result status="valid" time="0.09"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.15" expl="15. precondition" sum="c482fcb0156f4a59f654a39bc5119546">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.07"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.16" expl="16. precondition" sum="1d765d7043eadc43c5feb560cf4b3dd4">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.17" expl="17. loop invariant preservation" sum="7997bb8a519a569f1fdc133bbea1437d">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.18" expl="18. loop invariant preservation" sum="b514fb38356c54ff34fa60fbee4abaeb">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.19" expl="19. loop invariant preservation" sum="873f01491aa4541a01d65606d5ddfef0">
-  <proof prover="0"><result status="valid" time="2.57"/></proof>
   <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="2.57"/></proof>
   <proof prover="5"><result status="valid" time="0.10"/></proof>
   <proof prover="6"><result status="valid" time="0.06"/></proof>
   <proof prover="7"><result status="valid" time="3.52"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.20" expl="20. loop variant decrease" sum="da506e898584e9d422f6d32e4a3da7ec">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.21" expl="21. assertion" sum="d1292a32c23800e82d5b7ab4737f4bc8">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.22" expl="22. assertion" sum="f688f888cea986c7b6e65658f6f182f1">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.23" expl="23. precondition" sum="c25f562a94f366aee8cfebae5c31cda0">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.24" expl="24. precondition" sum="1922d2a0fe0b9a551ebb1066c19e2ba3">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.25" expl="25. precondition" sum="7807a4b22b545a405bd6e6327010084c">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
   <proof prover="1"><result status="valid" time="0.05"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
   <proof prover="5"><result status="valid" time="0.05"/></proof>
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.26" expl="26. assertion" sum="05bf50a956ce4fe33684b3eca7c61b5c">
-  <proof prover="0"><result status="valid" time="1.20"/></proof>
   <proof prover="1"><result status="valid" time="0.16"/></proof>
-  <proof prover="2"><result status="valid" time="0.11"/></proof>
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="2"><result status="valid" time="1.20"/></proof>
+  <proof prover="3"><result status="valid" time="0.11"/></proof>
+  <proof prover="4"><result status="valid" time="0.09"/></proof>
   <proof prover="5"><result status="valid" time="0.22"/></proof>
   <proof prover="6"><result status="valid" time="0.05"/></proof>
   <proof prover="7"><result status="valid" time="2.98"/></proof>
   </goal>
   <goal name="WP_parameter search_tree_delete_min.27" expl="27. precondition" sum="d11a9938c1a7ef66525d60ec7ae7852b">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
@@ -330,21 +330,21 @@
    <proof prover="7"><result status="valid" time="3.44"/></proof>
    </goal>
    <goal name="WP_parameter search_tree_delete_min.28.2" expl="2." sum="ba3de2a248e131097fe62dd90d88d263">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
-   <proof prover="3"><result status="valid" time="0.11"/></proof>
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.11"/></proof>
    <proof prover="6"><result status="valid" time="0.09"/></proof>
    <proof prover="7"><result status="valid" time="3.06"/></proof>
    </goal>
    <goal name="WP_parameter search_tree_delete_min.28.3" expl="3." sum="6b6bfab9ac546de9aab7c2fc82105755">
-   <proof prover="2"><result status="valid" time="0.08"/></proof>
    <proof prover="3"><result status="valid" time="0.08"/></proof>
+   <proof prover="4"><result status="valid" time="0.08"/></proof>
    <proof prover="6"><result status="valid" time="0.45"/></proof>
    <proof prover="7"><result status="valid" time="4.07"/></proof>
    </goal>
    <goal name="WP_parameter search_tree_delete_min.28.4" expl="4." sum="f664ed5acdbffd7fc525b9381c414594">
-   <proof prover="0"><result status="valid" time="0.11"/></proof>
-   <proof prover="4" memlimit="1000" edited="verifythis_fm2012_treedel_Treedel_WP_parameter_search_tree_delete_min_2.v"><result status="valid" time="1.35"/></proof>
+   <proof prover="0" memlimit="1000" edited="verifythis_fm2012_treedel_Treedel_WP_parameter_search_tree_delete_min_2.v"><result status="valid" time="1.35"/></proof>
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
    <proof prover="6"><result status="valid" time="0.10"/></proof>
    <proof prover="7"><result status="valid" time="0.60"/></proof>
    </goal>

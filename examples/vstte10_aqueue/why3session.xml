@@ -5,29 +5,29 @@
 <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="20" memlimit="0"/>
 <file name="../vstte10_aqueue.mlw">
 <theory name="AmortizedQueue">
- <goal name="WP_parameter empty" expl="VC for empty" sum="2fe8fd3b5801222d4d19d71772f54a4a">
+ <goal name="WP_parameter empty" expl="VC for empty" sum="5d6ffd311571fec260db1db15286d9a5">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter head" expl="VC for head" sum="4f69ec5b0cfcaa81ca48a3fd6a232071">
+ <goal name="WP_parameter head" expl="VC for head" sum="5bda8a6f2c1b2fe52345fab026d157fb">
  <proof prover="0"><result status="valid" time="0.12"/></proof>
  </goal>
- <goal name="WP_parameter create" expl="VC for create" sum="b2a1155fed4f2547ff63f8bb9cbc1961">
+ <goal name="WP_parameter create" expl="VC for create" sum="317e261a8a44dc3a455d604b725075cb">
  <proof prover="0"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="WP_parameter tail" expl="VC for tail" sum="2dd0d808fab7ca44ae071cd281103b32">
+ <goal name="WP_parameter tail" expl="VC for tail" sum="3653f669b20fe5b6a31b8b56f7ad60d1">
  <transf name="split_goal">
-  <goal name="WP_parameter tail.1" expl="1. unreachable point" sum="b8eb6fe2d36df8d1a0a2edb7f085d768">
+  <goal name="WP_parameter tail.1" expl="1. unreachable point" sum="175282d740680faa406b401e5f86eac6">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter tail.2" expl="2. precondition" sum="6a41268a6060bab23d4f37fdc91cb5d7">
+  <goal name="WP_parameter tail.2" expl="2. precondition" sum="f1456b0a164e27fdbf39740e80e07d54">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter tail.3" expl="3. postcondition" sum="5f477ef3a50ae97f4b3c74fbb57e7ae3">
+  <goal name="WP_parameter tail.3" expl="3. postcondition" sum="ec3f002bf5dd50c9afabb801cafdb5d5">
   <proof prover="0"><result status="valid" time="0.12"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter enqueue" expl="VC for enqueue" sum="e6f49b4744ea08d6ec4ef5150d956a48">
+ <goal name="WP_parameter enqueue" expl="VC for enqueue" sum="4c63bde9f8d3e9b372ca2112be757ef6">
  <proof prover="0"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
