@@ -153,17 +153,13 @@ let default_strategies =
       [|"t split_goal_wp 1"|];
       "Inline", "Inline@ function@ symbols@ once", "i",
       [|"t inline_goal 1"|];
-      "My mini-blaster", "A@ simple@ blaster", "b",
-      [|"c Alt-Ergo,0.95.2, 1 1000";
-        "c CVC4,1.4, 1 1000";
-        "t split_goal_wp 0";
-        "c Alt-Ergo,0.95.2, 10 4000";
-        "c CVC4,1.4, 10 4000" |];
     ]
 
 let get_strategies rc =
   match get_simple_family rc "strategy" with
-    | [] -> default_strategies
+    | [] ->
+      Format.eprintf "[Info] using the default set of strategies@.";
+      default_strategies
     | s -> s
 
 (** Main record *)
@@ -652,6 +648,7 @@ let filter_one_prover whyconf fp =
 (** merge config *)
 
 let merge_config config filename =
+  Format.eprintf "[Info] reading extra configuration file %s@." filename;
   let dirname = get_dirname filename in
   let rc = Rc.from_file filename in
   (** modify main *)
@@ -663,6 +660,11 @@ let merge_config config filename =
       let plugins =
         (get_stringl ~default:[] rc "plugin") @ config.main.plugins in
       { config.main with loadpath = loadpath; plugins = plugins } in
+  (** get more strategies *)
+  let more_strategies = get_strategies rc in
+  let strategies =
+    List.fold_left load_strategy config.strategies more_strategies
+  in
   (** modify provers *)
   let create_filter_prover section =
     try
@@ -706,7 +708,7 @@ let merge_config config filename =
     ) config.editors editor_modifiers in
   (** add editors *)
   let editors = List.fold_left load_editor editors (get_family rc "editor") in
-  { config with main = main; provers = provers;
+  { config with main = main; provers = provers; strategies = strategies;
     prover_shortcuts = shortcuts; editors = editors }
 
 let save_config config =
