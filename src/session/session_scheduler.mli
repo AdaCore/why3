@@ -111,6 +111,7 @@ module Make(O: OBSERVER) : sig
   (** {2 Save and load a state} *)
 
   val update_session :
+    use_shapes:bool ->
     ?release:bool ->
     allow_obsolete:bool ->
     'key session ->

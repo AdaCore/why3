@@ -63,7 +63,8 @@ let keygen ?parent () = ()
 (* create an empty session in the current directory *)
 let env_session,_,_ =
   let dummy_session : unit Session.session = Session.create_session "." in
-  Session.update_session ~keygen ~allow_obsolete:true dummy_session env config
+  Session.update_session ~use_shapes:false ~keygen ~allow_obsolete:true 
+    dummy_session env config
 
 (* adds a file in the new session *)
 let file : unit Session.file = 

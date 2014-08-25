@@ -74,8 +74,9 @@ let read_env_spec () =
 
 let read_update_session ~allow_obsolete env config fname =
   let project_dir = Session.get_project_dir fname in
-  let session = Session.read_session project_dir in
-  Session.update_session ~keygen:(fun ?parent:_ _ -> ())
+  let session,use_shapes = Session.read_session project_dir in
+  (* FIXME: set use_shapes depending on what was loaded from disk *)
+  Session.update_session ~use_shapes ~keygen:(fun ?parent:_ _ -> ())
     ~allow_obsolete session env config
 
 (** filter *)

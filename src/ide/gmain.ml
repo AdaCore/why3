@@ -805,14 +805,14 @@ let () =
 let sched =
   try
     Debug.dprintf debug "@[<hov 2>[GUI session] Opening session...@\n";
-    let session =
+    let session,use_shapes =
       if Sys.file_exists project_dir then
         S.read_session project_dir
       else
-        S.create_session project_dir
+        S.create_session project_dir, false
     in
     let env,(_:bool),(_:bool) =
-      M.update_session ~allow_obsolete:true session gconfig.env
+      M.update_session ~use_shapes ~allow_obsolete:true session gconfig.env
         gconfig.Gconfig.config
     in
     Debug.dprintf debug "@]@\n[GUI session] Opening session: update done@.  @[<hov 2>";
@@ -1959,7 +1959,8 @@ let reload () =
     (** reload the session *)
     let old_session = (env_session()).S.session in
     let new_env_session,(_:bool),(_:bool) =
-      M.update_session ~allow_obsolete:true old_session gconfig.env
+      (* use_shapes is true since session is in memory *)
+      M.update_session ~use_shapes:true ~allow_obsolete:true old_session gconfig.env
         gconfig.Gconfig.config
     in
     current_env_session := Some new_env_session

@@ -58,13 +58,18 @@ module type S = sig
 end
 
 module Pairing(Old: S)(New: S) : sig
-  val associate:
+  val associate: use_shapes:bool ->
     Old.t list -> New.t list -> (New.t * (Old.t * bool) option) list
     (** Associate new goals to (possibly) old goals
         Each new goal is mapped either to
-        - [None]: no pairing at all
-        - [Some (h, false)]: exact matching (equal checksums)
-        - [Some (h, true)]: inexact matching (goal obsolete)
+        - [None]: no old goal associated
+        - [Some (h, false)]: the matching is exact (same checksums)
+        - [Some (h, true)]: inexact matching (thus proofs for the new goal 
+          must be assumed obsolete)
+
+        if [use_shapes] is set, the clever algorithm matching shapes is used,
+        otherwise a simple association in the given order of goals is done.
 
         Note: in the output, goals appear in the same order as in [newgoals] *)
+
 end

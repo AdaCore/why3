@@ -763,9 +763,16 @@ module Pairing(Old: S)(New: S) = struct
     end;
     Array.to_list result
 
-(*
-  let associate oldgoals newgoals =
-    try List.map2 (fun o n -> n, Some (o, true)) oldgoals newgoals
-    with Invalid_argument _ -> associate oldgoals newgoals
-*)
+  let simple_associate oldgoals newgoals =
+    let rec aux acc o n =
+      match o,n with
+        | _, [] -> acc
+        | [], n :: rem_n -> aux ((n,None)::acc) [] rem_n
+        | o :: rem_o, n :: rem_n -> aux ((n,Some(o,true))::acc) rem_o rem_n
+    in
+    aux [] oldgoals newgoals
+
+  let associate ~use_shapes =
+    if use_shapes then associate else simple_associate
+
 end

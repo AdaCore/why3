@@ -313,10 +313,10 @@ let rec init_any any = O.init (key_any any) any; iter init_any any
 
 let init_session session = session_iter init_any session
 
-let update_session ?release ~allow_obsolete old_session env whyconf  =
+let update_session ~use_shapes ?release ~allow_obsolete old_session env whyconf  =
   O.reset ();
   let (env_session,_,_) as res =
-    update_session ?release
+    update_session ~use_shapes ?release
       ~keygen:O.create ~allow_obsolete old_session env whyconf
   in
   Debug.dprintf debug "Init_session@\n";

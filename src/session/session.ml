@@ -1487,22 +1487,26 @@ let read_sum_and_shape ch =
       | Exit -> sum, Buffer.contents shape
 
 
-let fix_attributes ch name attrs =
-  if name = "goal" then
-  let sum,shape = read_sum_and_shape ch in
-  let attrs =
-    try
-      let old_sum = List.assoc "sum" attrs in
-      if sum <> old_sum then
-        begin
-          Format.eprintf "old sum = %s ; new sum = %s@." old_sum sum;
-          exit 2
-        end;
-      attrs
-    with Not_found -> ("sum", sum) :: attrs
-  in
-  ("shape",shape) :: attrs
-  else attrs
+  let use_shapes = ref true
+
+  let fix_attributes ch name attrs =
+    if name = "goal" then
+      try 
+        let sum,shape = read_sum_and_shape ch in
+        let attrs =
+          try
+            let old_sum = List.assoc "sum" attrs in
+            if sum <> old_sum then
+              begin
+                Format.eprintf "old sum = %s ; new sum = %s@." old_sum sum;
+                exit 2
+              end;
+            attrs
+          with Not_found -> ("sum", sum) :: attrs
+        in
+        ("shape",shape) :: attrs
+      with _ -> use_shapes := false; attrs
+    else attrs
 
 (*
 let rec read_shapes_goal ch g =
@@ -1546,9 +1550,11 @@ let read_shapes fn xml =
 *)
 
 let read_xml_and_shapes xml_fn compressed_fn =
+  use_shapes := true;
   let ch = C.open_in compressed_fn in
   try
-    Xml.from_file ~fixattrs:(fix_attributes ch) xml_fn
+    let xml = Xml.from_file ~fixattrs:(fix_attributes ch) xml_fn in
+    xml, !use_shapes
   with
       e -> C.close_in ch; raise e
 end
@@ -1569,7 +1575,7 @@ let read_file_session_and_shapes dir xml_filename =
       begin
         Format.eprintf "[Warning] could not read goal shapes because \
                                 Why3 was not compiled with compress support@.";
-        Xml.from_file xml_filename
+        Xml.from_file xml_filename, false
       end
   else
     let shape_filename = Filename.concat dir shape_filename in
@@ -1578,12 +1584,12 @@ let read_file_session_and_shapes dir xml_filename =
     else
       begin
         Format.eprintf "[Warning] could not find goal shapes file@.";
-        Xml.from_file xml_filename
+        Xml.from_file xml_filename, false
       end
 with e ->
   Format.eprintf "[Warning] failed to read goal shapes: %s@."
     (Printexc.to_string e);
-  Xml.from_file xml_filename
+  Xml.from_file xml_filename, false
 
 type notask = unit
 let read_session dir =
@@ -1591,30 +1597,29 @@ let read_session dir =
     raise (OpenError (Pp.sprintf "%s is not an existing directory" dir));
   let xml_filename = Filename.concat dir db_filename in
   let session = empty_session dir in
+  let use_shapes =
   (** If the xml is present we read it, otherwise we consider it empty *)
-  if Sys.file_exists xml_filename then begin
-    try
-      Tc.reset_dict ();
-      let xml = read_file_session_and_shapes dir xml_filename in
-(*
-      let xml = Xml.from_file xml_filename in
-      let xml = import_shapes dir xml in
-*)
+    if Sys.file_exists xml_filename then 
       try
-        load_session session xml.Xml.content;
-      with Sys_error msg ->
-        failwith ("Open session: sys error " ^ msg)
-    with
-      | Sys_error msg ->
-      (* xml does not exist yet *)
-        raise (OpenError msg)
-      | Xml.Parse_error s ->
-        Format.eprintf "XML database corrupted, ignored (%s)@." s;
-      (* failwith
-         ("Open session: XML database corrupted (%s)@." ^ s) *)
-        raise (OpenError "XML corrupted")
-  end;
-  session
+        Tc.reset_dict ();
+        let xml,use_shapes = read_file_session_and_shapes dir xml_filename in
+        try
+          load_session session xml.Xml.content;
+          use_shapes
+        with Sys_error msg ->
+          failwith ("Open session: sys error " ^ msg)
+      with
+        | Sys_error msg ->
+        (* xml does not exist yet *)
+          raise (OpenError msg)
+        | Xml.Parse_error s ->
+          Format.eprintf "XML database corrupted, ignored (%s)@." s;
+        (* failwith
+           ("Open session: XML database corrupted (%s)@." ^ s) *)
+          raise (OpenError "XML corrupted")
+  else false
+  in
+  session, use_shapes
 
 
 (*******************************)
@@ -2011,6 +2016,7 @@ let print_external_proof fmt p =
 (** Pairing *)
 
 module AssoGoals : sig
+  val set_use_shapes : bool -> unit
   val associate : 'a goal list -> 'b goal list ->
     ('b goal * ('a goal * bool) option) list
 end = struct
@@ -2040,6 +2046,9 @@ end = struct
   open ToGoal
   open FromGoal
 
+  let use_shapes = ref true
+  let set_use_shapes b = use_shapes := b
+
   let associate (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
       ('tto goal * ('ffrom goal * bool) option) list =
     let from_goals : ffrom goal list =
@@ -2047,7 +2056,7 @@ end = struct
     let to_goals   : tto goal list =
       Obj.magic (to_goals : 'tto goal list) in
     let associated : (tto goal * (ffrom goal * bool) option) list =
-      AssoGoals.associate from_goals to_goals in
+      AssoGoals.associate ~use_shapes:!use_shapes from_goals to_goals in
     (Obj.magic associated : ('tto goal * ('ffrom goal * bool) option) list)
 
 end
@@ -2423,10 +2432,11 @@ let recompute_all_shapes ~release session =
   session.session_shape_version <- Termcode.current_shape_version;
   iter_session (recompute_all_shapes_file ~release) session
 
-let update_session
+let update_session ~use_shapes
     ?(release=false) ~keygen ~allow_obsolete old_session env whyconf =
   Debug.dprintf debug "[Info] update_session: shape_version = %d@\n"
     old_session.session_shape_version;
+  AssoGoals.set_use_shapes use_shapes;
   let new_session =
     create_session ~shape_version:old_session.session_shape_version
       old_session.session_dir

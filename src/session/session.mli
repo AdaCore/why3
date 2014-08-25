@@ -186,9 +186,11 @@ type notask
 (** A phantom type which is used for sessions which don't contain any task. The
     only such sessions are sessions that come from {!read_session} *)
 
-val read_session : string -> notask session
+val read_session : string -> notask session * bool
 (** Read a session stored on the disk. It returns a session without any
-    task attached to goals *)
+    task attached to goals.
+    the returned boolean is set when there was shapes read from disk.
+*)
 
 val save_session : Whyconf.config -> 'key session -> unit
 (** Save a session on disk *)
@@ -230,6 +232,7 @@ type 'key keygen = ?parent:'key -> unit -> 'key
 exception OutdatedSession
 
 val update_session :
+  use_shapes:bool ->
   ?release:bool (* default false *)  ->
   keygen:'a keygen ->
   allow_obsolete:bool -> 'b session ->
