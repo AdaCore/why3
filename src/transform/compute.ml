@@ -14,8 +14,13 @@ open Decl
 open Task
 open Theory
 
-let meta = Theory.register_meta "rewrite" [Theory.MTprsymbol]
+let meta_rewrite = Theory.register_meta "rewrite" [Theory.MTprsymbol]
   ~desc:"Declares@ the@ given@ proposition@ as@ a@ rewrite@ rule."
+
+let meta_begin_compute_context =
+  Theory.register_meta "begin_compute_context" []
+    ~desc:"Marks@ the@ position@ where@ computations@ are@ done@ by@ \
+           transformation@ 'compute_in_context'."
 
 let collect_rule_decl prs e d =
   match d.Decl.d_node with
@@ -57,8 +62,11 @@ let normalize_goal env (prs : Decl.Spr.t) task =
   | _ -> assert false
 
 
-let normalize_transf env =
-  Trans.on_tagged_pr meta (fun prs -> Trans.store (normalize_goal env prs))
+let normalize_goal_transf env =
+  Trans.on_tagged_pr meta_rewrite
+    (fun prs -> Trans.store (normalize_goal env prs))
 
-let () = Trans.register_env_transform_l "compute_in_goal" normalize_transf
-  ~desc:"Normalize@ terms@ with@ respect@ to@ rewrite@ rules@ declared as metas"
+let () = 
+  Trans.register_env_transform_l "compute_in_goal" normalize_goal_transf
+  ~desc:"Performs@ possible@ computations@ in@ goal, including@ by@ \
+         declared@ rewrite@ rules"
