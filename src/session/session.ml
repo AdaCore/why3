@@ -217,6 +217,7 @@ and 'a file =
 and 'a session =
     { session_files : 'a file PHstr.t;
       mutable session_shape_version : int;
+      session_prover_ids : int PHprover.t;
       session_dir   : string; (** Absolute path *)
     }
 
@@ -402,6 +403,7 @@ let empty_session ?shape_version dir =
   in
   { session_files = PHstr.create 3;
     session_shape_version = shape_version;
+    session_prover_ids = PHprover.create 7;
     session_dir   = dir;
   }
 
@@ -582,6 +584,7 @@ let save_label fmt s =
 module Compr = Compress.Compress_z
 
 type save_ctxt = {
+  prover_ids : int PHprover.t;
   provers : (int * int * int) Mprover.t;
   ch_shapes : Compr.out_channel;
 }
@@ -703,7 +706,7 @@ let save_file ctxt fmt _ f =
   List.iter (save_theory ctxt fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
-let save_prover fmt p (timelimits,memlimits) (provers,id) =
+let save_prover ctxt fmt p (timelimits,memlimits) provers =
   let mostfrequent_timelimit,_ =
     Hashtbl.fold
       (fun t f ((_,f') as t') -> if f > f' then (t,f) else t')
@@ -716,6 +719,25 @@ let save_prover fmt p (timelimits,memlimits) (provers,id) =
       memlimits
       (0,0)
   in
+  let id =
+    try
+      PHprover.find ctxt.prover_ids p
+    with Not_found ->
+      (* we need to find an unused prover id *)
+      let occurs = Hashtbl.create 7 in
+      PHprover.iter (fun _ n -> Hashtbl.add occurs n ()) ctxt.prover_ids;
+      let id = ref 0 in
+      try 
+        while true do 
+          try
+            let _ = Hashtbl.find occurs !id in incr id
+          with Not_found -> raise Exit
+            done;
+        assert false
+      with Exit -> 
+        PHprover.add ctxt.prover_ids p !id;
+        !id
+  in
   fprintf fmt "@\n@[<h><prover@ id=\"%i\"@ name=\"%a\"@ \
                version=\"%a\"%a@ timelimit=\"%d\"@ memlimit=\"%d\"/>@]"
     id save_string p.C.prover_name save_string p.C.prover_version
@@ -723,7 +745,7 @@ let save_prover fmt p (timelimits,memlimits) (provers,id) =
         save_string s)
     p.C.prover_altern
     mostfrequent_timelimit mostfrequent_memlimit;
-  Mprover.add p (id,mostfrequent_timelimit,mostfrequent_memlimit) provers, id+1
+  Mprover.add p (id,mostfrequent_timelimit,mostfrequent_memlimit) provers
 
 let save fname shfname _config session =
   let ch = open_out fname in
@@ -739,12 +761,18 @@ let save fname shfname _config session =
   fprintf fmt "@[<v 0><why3session shape_version=\"%d\">"
     session.session_shape_version;
   Tc.reset_dict ();
-  let provers,_ =
-    PHprover.fold (save_prover fmt) (get_used_provers_with_stats session)
-      (Mprover.empty,0)
+  let ctxt =
+    { prover_ids = session.session_prover_ids;
+      provers = Mprover.empty;
+      ch_shapes = chsh;
+    }
+  in
+  let provers =
+    PHprover.fold (save_prover ctxt fmt) (get_used_provers_with_stats session)
+      Mprover.empty
   in
   PHstr.iter
-    (save_file { provers = provers; ch_shapes = chsh} fmt)
+    (save_file { ctxt with provers = provers; ch_shapes = chsh} fmt)
     session.session_files;
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";
@@ -1126,7 +1154,7 @@ let load_ident elt =
   Ident.id_register preid
 
 type load_ctxt = {
-  old_provers : (Whyconf.prover * int * int) Mstr.t ;
+  old_provers : (Whyconf.prover * int * int) Mint.t ;
 (*
   shapes : ((string, Tc.shape) Hashtbl.t) option
 *)
@@ -1167,40 +1195,41 @@ let rec load_goal ctxt parent acc g =
 and load_proof_or_transf ctxt mg a =
   match a.Xml.name with
     | "proof" ->
+      begin
         let prover = string_attribute "prover" a in
-        let (p,timelimit,memlimit) =
-          try Mstr.find prover ctxt.old_provers
-          with Not_found ->
-            eprintf "[Error] prover not listing in header '%s'@." prover;
-            raise (LoadError (a,"prover not listing in header"))
-        in
-        let res = match a.Xml.elements with
-          | [r] -> load_result r
-          | [] -> Interrupted
-          | _ ->
-            eprintf "[Error] Too many result elements@.";
-            raise (LoadError (a,"too many result elements"))
-
-        in
-        let edit = load_option "edited" a in
-        let edit = match edit with None | Some "" -> None | _ -> edit in
-        let obsolete = bool_attribute "obsolete" a false in
-        let archived = bool_attribute "archived" a false in
-        let timelimit = int_attribute_def "timelimit" a timelimit in
-        let memlimit = int_attribute_def "memlimit" a memlimit in
-(*
-        if timelimit < 0 then begin
-            eprintf "[Error] incorrect or unspecified  timelimit '%i'@."
-              timelimit;
-            raise (LoadError (a,sprintf "incorrect or unspecified timelimit %i"
-              timelimit))
-        end;
-*)
-        let (_ : 'a proof_attempt) =
-          add_external_proof ~keygen ~archived ~obsolete
-            ~timelimit ~memlimit ~edit mg p res
-        in
-        ()
+        try
+          let prover = int_of_string prover in
+          let (p,timelimit,memlimit) =Mint.find prover ctxt.old_provers in
+          let res = match a.Xml.elements with
+            | [r] -> load_result r
+            | [] -> Interrupted
+            | _ ->
+              eprintf "[Error] Too many result elements@.";
+              raise (LoadError (a,"too many result elements"))
+          in
+          let edit = load_option "edited" a in
+          let edit = match edit with None | Some "" -> None | _ -> edit in
+          let obsolete = bool_attribute "obsolete" a false in
+          let archived = bool_attribute "archived" a false in
+          let timelimit = int_attribute_def "timelimit" a timelimit in
+          let memlimit = int_attribute_def "memlimit" a memlimit in
+        (*
+          if timelimit < 0 then begin
+          eprintf "[Error] incorrect or unspecified  timelimit '%i'@."
+          timelimit;
+          raise (LoadError (a,sprintf "incorrect or unspecified timelimit %i"
+          timelimit))
+          end;
+        *)
+          let (_ : 'a proof_attempt) =
+            add_external_proof ~keygen ~archived ~obsolete
+              ~timelimit ~memlimit ~edit mg p res
+          in
+          ()
+        with Failure _ | Not_found ->
+          eprintf "[Error] prover id not listed in header '%s'@." prover;
+          raise (LoadError (a,"prover not listing in header"))
+      end
     | "transf" ->
         let trname = string_attribute "name" a in
         let expanded = bool_attribute "expanded" a false in
@@ -1370,15 +1399,22 @@ let load_file session old_provers f =
     | "prover" ->
       (** The id is just for the session file *)
         let id = string_attribute "id" f in
-        let name = string_attribute "name" f in
-        let version = string_attribute "version" f in
-        let altern = string_attribute_def "alternative" f "" in
-        let timelimit = int_attribute_def "timelimit" f 5 in
-        let memlimit = int_attribute_def "memlimit" f 1000 in
-        let p = {C.prover_name = name;
-                   prover_version = version;
-                   prover_altern = altern} in
-        Mstr.add id (p,timelimit,memlimit) old_provers
+        begin
+          try
+            let id = int_of_string id in
+            let name = string_attribute "name" f in
+            let version = string_attribute "version" f in
+            let altern = string_attribute_def "alternative" f "" in
+            let timelimit = int_attribute_def "timelimit" f 5 in
+            let memlimit = int_attribute_def "memlimit" f 1000 in
+            let p = {C.prover_name = name;
+                     prover_version = version;
+                     prover_altern = altern} in
+            Mint.add id (p,timelimit,memlimit) old_provers
+          with Failure _ ->
+            eprintf "[Warning] Session.load_file: unexpected non-numeric prover id '%s'@." id;
+            old_provers
+        end
     | s ->
         eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
         old_provers
@@ -1397,11 +1433,13 @@ let load_session session xml =
       session.session_shape_version <- shape_version;
       Debug.dprintf debug "[Info] load_session: shape version is %d@\n" shape_version;
       (** just to keep the old_provers somewhere *)
-(*
-     old_provers := *)
-      let _ =
-        List.fold_left (load_file session) Mstr.empty xml.Xml.elements
+      let old_provers =
+        List.fold_left (load_file session) Mint.empty xml.Xml.elements
       in
+      Mint.iter
+        (fun id (p,_,_) ->
+          PHprover.replace session.session_prover_ids p id)
+        old_provers;
       Debug.dprintf debug "[Info] load_session: done@\n"
     | s ->
         eprintf "[Warning] Session.load_session: unexpected element '%s'@." s

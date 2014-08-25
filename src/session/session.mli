@@ -157,6 +157,7 @@ and 'a file = private
 and 'a session = private
     { session_files : 'a file PHstr.t;
       mutable session_shape_version : int;
+      session_prover_ids : int PHprover.t;
       session_dir   : string;
     }
 
