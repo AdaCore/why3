@@ -143,7 +143,7 @@ type 'a goal =
     goal_name : Ident.ident;
     goal_expl : expl;
     goal_parent : 'a goal_parent;
-    mutable goal_checksum : Tc.checksum;
+    mutable goal_checksum : Tc.checksum option;
     mutable goal_shape : Tc.shape;
     mutable goal_verified : bool;
     mutable goal_task: task_option;
@@ -196,7 +196,7 @@ and 'a theory =
     { mutable theory_key : 'a;
       theory_name : Ident.ident;
       theory_parent : 'a file;
-      mutable theory_checksum : Termcode.checksum;
+      mutable theory_checksum : Termcode.checksum option;
       mutable theory_goals : 'a goal list;
       mutable theory_verified : bool;
       mutable theory_expanded : bool;
@@ -546,9 +546,11 @@ let save_bool_def name def fmt b =
 let save_int_def name def fmt n =
   if n <> def then fprintf fmt "@ %s=\"%d\"" name n
 
-let opt lab fmt = function
+let opt pr lab fmt = function
   | None -> ()
-  | Some s -> fprintf fmt "@ %s=\"%a\"" lab save_string s
+  | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
+
+let opt_string = opt save_string
 
 let save_proof_attempt fmt ((id,tl,ml),a) =
   fprintf fmt
@@ -556,7 +558,7 @@ let save_proof_attempt fmt ((id,tl,ml),a) =
     id
     (save_int_def "timelimit" tl) a.proof_timelimit
     (save_int_def "memlimit" ml) a.proof_memlimit
-    (opt "edited") a.proof_edited_as
+    (opt_string "edited") a.proof_edited_as
     (save_bool_def "obsolete" false) a.proof_obsolete
     (save_bool_def "archived" false) a.proof_archived;
   save_status fmt a.proof_state;
@@ -590,17 +592,24 @@ type save_ctxt = {
   ch_shapes : Compr.out_channel;
 }
 
+let save_checksum fmt s =
+  fprintf fmt "%s" (Tc.string_of_checksum s)
+
 let rec save_goal ctxt fmt g =
   let shape = Tc.string_of_shape g.goal_shape in
   assert (shape <> "");
-  let checksum = Tc.string_of_checksum g.goal_checksum in
   fprintf fmt
-    "@\n@[<v 0>@[<h><goal@ %a%a@ sum=\"%a\"%a>@]"
+    "@\n@[<v 0>@[<h><goal@ %a%a%a%a>@]"
     save_ident g.goal_name
-    (opt "expl") g.goal_expl
-    save_string checksum
+    (opt_string "expl") g.goal_expl
+    (opt save_checksum "sum") g.goal_checksum
     (save_bool_def "expanded" false) g.goal_expanded;
-  Compr.output_string ctxt.ch_shapes checksum ;
+  let sum =
+    match g.goal_checksum with
+    | None -> assert false
+    | Some s -> Tc.string_of_checksum s
+  in
+  Compr.output_string ctxt.ch_shapes sum;
   Compr.output_char ctxt.ch_shapes ' ';
   Compr.output_string ctxt.ch_shapes shape;
   Compr.output_char ctxt.ch_shapes '\n';
@@ -689,11 +698,10 @@ and save_ty fmt ty =
     fprintf fmt "@]@\n</ty_app>"
 
 let save_theory ctxt fmt t =
-  let checksum = Tc.string_of_checksum t.theory_checksum in
   fprintf fmt
     "@\n@[<v 1>@[<h><theory@ %a@ sum=\"%a\"%a>@]"
     save_ident t.theory_name
-    save_string checksum
+    (opt save_checksum "sum") t.theory_checksum
     (save_bool_def "expanded" false) t.theory_expanded;
 (*
   Ident.Slab.iter (save_label fmt) t.theory_name.Ident.id_label;
@@ -704,7 +712,7 @@ let save_theory ctxt fmt t =
 let save_file ctxt fmt _ f =
   fprintf fmt
     "@\n@[<v 0>@[<h><file@ name=\"%a\"%a%a>@]"
-    save_string f.file_name (opt "format")
+    save_string f.file_name (opt_string "format")
     f.file_format (save_bool_def "expanded" false) f.file_expanded;
   List.iter (save_theory ctxt fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
@@ -969,7 +977,7 @@ let raw_add_task ~version ~(keygen:'a keygen) ~(expanded:bool) parent name expl 
     | Parent_metas  mms -> mms.metas_key
   in
   let key = keygen ~parent:parent_key () in
-  let sum = Termcode.task_checksum ~version t in
+  let sum = Some (Termcode.task_checksum ~version t) in
   (* let shape = Termcode.t_shape_buf ~version (Task.task_goal_fmla t) in *)
   let shape = Termcode.t_shape_task ~version t in
   let goal = { goal_name = name;
@@ -1021,8 +1029,8 @@ let raw_add_metas ~(keygen:'a keygen) ~(expanded:bool) g added idpos =
   g.goal_metas <- Mmetas_args.add added ms g.goal_metas;
   ms
 
-let raw_add_theory ~(keygen:'a keygen) ~(expanded:bool) 
-    ~(checksum:Tc.checksum) mfile thname =
+let raw_add_theory ~(keygen:'a keygen) ~(expanded:bool)
+    ~(checksum:Tc.checksum option) mfile thname =
   let parent = mfile.file_key in
   let key = keygen ~parent () in
   let mth = { theory_name = thname;
@@ -1086,6 +1094,11 @@ let string_attribute_def field r def=
   try
     List.assoc field r.Xml.attributes
   with Not_found -> def
+
+let string_attribute_opt field r =
+  try
+    Some (List.assoc field r.Xml.attributes)
+  with Not_found -> None
 
 let string_attribute field r =
   try
@@ -1170,8 +1183,8 @@ let rec load_goal ctxt parent acc g =
     | "goal" ->
         let gname = load_ident g in
         let expl = load_option "expl" g in
-        let csum = string_attribute_def "sum" g "" in
-        let sum = Tc.checksum_of_string csum in
+        let csum = string_attribute_opt "sum" g in
+        let sum = Opt.map Tc.checksum_of_string csum in
         let shape =
           try Tc.shape_of_string (List.assoc "shape" g.Xml.attributes)
           with Not_found -> Tc.shape_of_string ""
@@ -1376,7 +1389,8 @@ let load_theory ctxt mf acc th =
     | "theory" ->
         let thname = load_ident th in
         let expanded = bool_attribute "expanded" th false in
-        let checksum = Tc.dumb_checksum in
+        let csum = string_attribute_opt "sum" th in
+        let checksum = Opt.map Tc.checksum_of_string csum in
         let mth = raw_add_theory ~keygen ~expanded ~checksum mf thname in
         mth.theory_goals <-
           List.rev
@@ -1491,7 +1505,7 @@ let read_sum_and_shape ch =
 
   let fix_attributes ch name attrs =
     if name = "goal" then
-      try 
+      try
         let sum,shape = read_sum_and_shape ch in
         let attrs =
           try
@@ -1556,7 +1570,7 @@ let read_xml_and_shapes xml_fn compressed_fn =
     let xml = Xml.from_file ~fixattrs:(fix_attributes ch) xml_fn in
     xml, !use_shapes
   with
-      e when not (Debug.test_flag Debug.stack_trace) -> 
+      e when not (Debug.test_flag Debug.stack_trace) ->
         C.close_in ch; raise e
 end
 
@@ -1600,7 +1614,7 @@ let read_session dir =
   let session = empty_session dir in
   let use_shapes =
   (** If the xml is present we read it, otherwise we consider it empty *)
-    if Sys.file_exists xml_filename then 
+    if Sys.file_exists xml_filename then
       try
         Tc.reset_dict ();
         let xml,use_shapes = read_file_session_and_shapes dir xml_filename in
@@ -1686,7 +1700,7 @@ let add_file ~keygen env ?format filename =
     in g::acc
   in
   let add_theory acc rfile thname theory =
-    let checksum = Tc.theory_checksum theory in
+    let checksum = Some (Tc.theory_checksum theory) in
     let rtheory =
       raw_add_theory ~keygen ~expanded:true ~checksum rfile thname
     in
@@ -2246,8 +2260,10 @@ let rec recover_sub_tasks ~theories env_session task g =
   let version = env_session.session.session_shape_version in
   let sum = Termcode.task_checksum ~version task in
   let shape = Termcode.t_shape_task ~version task in
-  if not (Termcode.equal_checksum sum g.goal_checksum &&
-          Termcode.equal_shape shape g.goal_shape) then
+  if not ((match g.goal_checksum with
+          | None -> false
+          | Some s -> Termcode.equal_checksum sum s) &&
+       Termcode.equal_shape shape g.goal_shape) then
     raise (UnrecoverableTask g.goal_name);
   PHstr.iter (fun _ t ->
       let task = goal_task g in
@@ -2265,7 +2281,7 @@ let rec recover_sub_tasks ~theories env_session task g =
 let recover_theory_tasks env_session th =
   let theories = Opt.get_exn NoTask th.theory_parent.file_for_recovery in
   let theory = Opt.get_exn NoTask th.theory_task in
-  th.theory_checksum <- Tc.theory_checksum theory;
+  th.theory_checksum <- Some (Tc.theory_checksum theory);
   let tasks = List.rev (Task.split_theory theory None None) in
   List.iter2 (recover_sub_tasks ~theories env_session) tasks th.theory_goals
 
@@ -2363,12 +2379,30 @@ let merge_theory
       Mstr.add g.goal_name.Ident.id_string g from_goals)
     Mstr.empty from_th.theory_goals
   in
+(**)
+  Format.eprintf
+    "theory %s: old sum = %a, new sum = %a@."
+    to_th.theory_name.id_string
+    (Pp.print_option Tc.print_checksum) from_th.theory_checksum
+    (Pp.print_option Tc.print_checksum) to_th.theory_checksum;
+ (**)
+  let theory_is_fully_up_to_date =
+    match from_th.theory_checksum, to_th.theory_checksum with
+    | _, None -> assert false
+    | None, _ -> false
+    | Some s1, Some s2 -> Tc.equal_checksum s1 s2
+  in
   List.iter
     (fun to_goal ->
       try
         let from_goal =
           Mstr.find to_goal.goal_name.Ident.id_string from_goals in
-        let goal_obsolete = to_goal.goal_checksum <> from_goal.goal_checksum in
+        let goal_obsolete =
+          match to_goal.goal_checksum, from_goal.goal_checksum with
+          | None, _ -> assert false
+          | Some _, None -> not theory_is_fully_up_to_date
+          | Some s1, Some s2 -> not (Tc.equal_checksum s1 s2)
+        in
         if goal_obsolete then
           begin
             Debug.dprintf debug "[Reload] Goal %s.%s has changed@\n"
@@ -2413,9 +2447,8 @@ let merge_file ~release ~keygen ~theories env ~allow_obsolete from_f to_f =
 
 let rec recompute_all_shapes_goal ~release g =
   let t = goal_task g in
-  (* g.goal_shape <- Termcode.t_shape_buf (Task.task_goal_fmla t); *)
   g.goal_shape <- Termcode.t_shape_task t;
-  g.goal_checksum <- Termcode.task_checksum t;
+  g.goal_checksum <- Some (Termcode.task_checksum t);
   if release then release_task g;
   iter_goal
     (fun _pa -> ())

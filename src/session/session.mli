@@ -82,7 +82,7 @@ type 'a goal = private
       goal_name : Ident.ident; (** The ident of the task *)
       goal_expl : expl;
       goal_parent : 'a goal_parent;
-      mutable goal_checksum : Termcode.checksum;  (** checksum of the task *)
+      mutable goal_checksum : Termcode.checksum option;  (** checksum of the task *)
       mutable goal_shape : Termcode.shape;  (** shape of the task *)
       mutable goal_verified : bool;
       mutable goal_task: task_option;
@@ -135,7 +135,7 @@ and 'a theory = private
     { mutable theory_key : 'a;
       theory_name : Ident.ident;
       theory_parent : 'a file;
-      mutable theory_checksum : Termcode.checksum; 
+      mutable theory_checksum : Termcode.checksum option;
       mutable theory_goals : 'a goal list;
       (** Not mutated after the creation *)
       mutable theory_verified : bool;

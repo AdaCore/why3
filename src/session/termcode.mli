@@ -52,7 +52,7 @@ val theory_checksum : ?version:int -> Theory.theory -> checksum
 
 module type S = sig
   type t
-  val checksum : t -> checksum
+  val checksum : t -> checksum option
   val shape    : t -> shape
   val name     : t -> Ident.ident
 end

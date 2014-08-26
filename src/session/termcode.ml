@@ -670,7 +670,7 @@ let theory_checksum ?(version=current_shape_version) t =
 
 module type S = sig
   type t
-  val checksum : t -> string
+  val checksum : t -> checksum option
   val shape    : t -> string
   val name     : t -> Ident.ident
 end
