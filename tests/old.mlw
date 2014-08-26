@@ -1,0 +1,19 @@
+
+
+module T
+
+  use import int.Int
+  use import module ref.Ref
+
+  val x : ref int
+
+  val f () : { } unit writes x { !x = !(old x) + 1 }
+
+  let t () =
+     x := 3;
+     f ();
+     assert { !x = 5 }
+
+
+end
+ 

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session SYSTEM "why3session.dtd">
+<why3session
+ name="label/why3session.xml">
+ <prover
+  id="alt-ergo"
+  name="Alt-Ergo"
+  version="0.93"/>
+ <prover
+  id="coq"
+  name="Coq"
+  version="8.2pl1"/>
+ <prover
+  id="cvc3"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="eprover"
+  name="Eprover"
+  version="1.4 Namring"/>
+ <prover
+  id="gappa"
+  name="Gappa"
+  version="0.15.1"/>
+ <prover
+  id="simplify"
+  name="Simplify"
+  version="1.5.4"/>
+ <prover
+  id="spass"
+  name="Spass"
+  version="3.7"/>
+ <prover
+  id="vampire"
+  name="Vampire"
+  version="0.6"/>
+ <prover
+  id="verit"
+  name="veriT"
+  version="dev"/>
+ <prover
+  id="yices"
+  name="Yices"
+  version="1.0.25"/>
+ <prover
+  id="z3"
+  name="Z3"
+  version="3.2"/>
+ <file
+  name="../label.mlw"
+  verified="false"
+  expanded="true">
+  <theory
+   name="WP M"
+   verified="false"
+   expanded="true">
+   <goal
+    name="WP_parameter f"
+    expl="assertion"
+    sum="ecb85905588ad84376c625fd8e5511e9"
+    proved="false"
+    expanded="true"
+    shape="ainfix =V0c2Aainfix =V0c1Aainfix =V1c2Aainfix =V0c1Iainfix =V2c3FIainfix =V1c2FIainfix =V0c1F">
+    <proof
+     prover="alt-ergo"
+     timelimit="3"
+     edited=""
+     obsolete="false">
+     <result status="unknown" time="0.04"/>
+    </proof>
+    <transf
+     name="split_goal"
+     proved="false"
+     expanded="true">
+     <goal
+      name="WP_parameter f.1"
+      expl="assertion"
+      sum="ecb85905588ad84376c625fd8e5511e9"
+      proved="false"
+      expanded="true"
+      shape="ainfix =V0c2Aainfix =V0c1Aainfix =V1c2Aainfix =V0c1Iainfix =V2c3FIainfix =V1c2FIainfix =V0c1F">
+      <transf
+       name="split_goal"
+       proved="false"
+       expanded="true">
+       <goal
+        name="WP_parameter f.1.1"
+        expl="parameter f"
+        sum="c055105fb0958547432da606054dabfe"
+        proved="true"
+        expanded="true"
+        shape="ainfix =V0c1Iainfix =V2c3FIainfix =V1c2FIainfix =V0c1F">
+        <proof
+         prover="alt-ergo"
+         timelimit="3"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter f.1.2"
+        expl="parameter f"
+        sum="44fff4576af0cf26c8e962a6ccf3abb6"
+        proved="true"
+        expanded="true"
+        shape="ainfix =V1c2Iainfix =V2c3FIainfix =V1c2FIainfix =V0c1F">
+        <proof
+         prover="alt-ergo"
+         timelimit="3"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.02"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter f.1.3"
+        expl="parameter f"
+        sum="c055105fb0958547432da606054dabfe"
+        proved="true"
+        expanded="true"
+        shape="ainfix =V0c1Iainfix =V2c3FIainfix =V1c2FIainfix =V0c1F">
+        <proof
+         prover="alt-ergo"
+         timelimit="3"
+         edited=""
+         obsolete="false">
+         <result status="valid" time="0.03"/>
+        </proof>
+       </goal>
+       <goal
+        name="WP_parameter f.1.4"
+        expl="parameter f"
+        sum="45b9b2f1f85ed8ea51c35862d873727a"
+        proved="false"
+        expanded="true"
+        shape="ainfix =V0c2Iainfix =V2c3FIainfix =V1c2FIainfix =V0c1F">
+        <proof
+         prover="alt-ergo"
+         timelimit="3"
+         edited=""
+         obsolete="false">
+         <result status="unknown" time="0.03"/>
+        </proof>
+       </goal>
+      </transf>
+     </goal>
+    </transf>
+   </goal>
+  </theory>
+ </file>
+</why3session>

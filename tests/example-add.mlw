@@ -1,0 +1,165 @@
+module TestModule
+
+(* module imports *)
+use import int.Int
+
+use import module ref.Ref
+
+use import bool.Bool
+
+use import list.List
+use import list.Length
+use import list.Nth
+
+use import real.RealInfix
+use import real.Abs
+
+(* global variables declarations *)
+val status : ref int
+
+(* variables type declarations *)
+type mm_integer = int
+type mm_float = real
+
+type or_integer_float = Integer mm_integer | Real mm_float
+type list_or_integer_float = list or_integer_float
+
+(* exceptions type declarations *)
+type return_type = (int, real)
+
+(* exceptions declarations *)
+exception BreakLoop return_type
+
+
+(* logical definitions of type tests  *)
+function type_test_or_integer_float_to_integer (x: or_integer_float) : bool =
+	match x with
+	| Integer mm_integer -> True
+	| Real mm_float -> False
+	end
+
+function type_test_or_integer_float_to_float (x: or_integer_float) : bool =
+	match x with
+	| Integer mm_integer -> False
+	| Real mm_float -> True
+	end
+
+(* auxiliary definitions and declarations *)
+function get_nth (i: int) (l: list_or_integer_float) : or_integer_float =
+match nth i l with
+| None -> Real 0.0
+| Some x -> x
+end
+
+axiom def_nth0: forall i: int, l: list_or_integer_float. 0 <= i < length(l) -> nth i l <> None
+
+(*axiom def_length0: forall l: list_or_integer_float. length(l) > 0*)
+
+(* logical type conversion functions *)
+function or_integer_float_to_integer (e: or_integer_float) : mm_integer =
+match e with
+| Integer mm_integer -> mm_integer
+| Real mm_float -> 1
+end
+
+function or_integer_float_to_float (e: or_integer_float) : mm_float =
+match e with
+| Integer mm_integer -> 1.0
+| Real mm_float -> mm_float
+end
+
+(* logical auxiliary functions for specification *)
+function add0 (e: list_or_integer_float) (i: int) (j: int) : mm_integer =
+if i < j then
+match e with
+| Nil -> 0
+| Cons h t -> if type_test_or_integer_float_to_integer (h) = True then
+		or_integer_float_to_integer (h) + add0 (t) (i+1) (j)
+	      else
+		add0 (t) (i+1) (j)
+end
+else
+0
+
+function add1 (e: list_or_integer_float) (i: int) (j: int) : mm_float =
+if i < j then
+match e with
+| Nil -> 0.0
+| Cons h t -> if type_test_or_integer_float_to_float (h) = True then
+		or_integer_float_to_float (h) +. add1 (t)(i+1)(j)
+	      else
+		add1 (t)(i+1)(j)
+end
+else
+0.0
+
+(* logical translation of procedure "sum (l: list(Or(integer, float)):[integer, float]" *)
+let sum (l: list_or_integer_float) : (int, real) =
+{true}
+	try
+	  status := 0;
+	    let si = ref 0 in
+	      let sf = ref 0.0 in
+		let x = ref (any or_integer_float) in
+		for i = 0 to length(l)-1 do
+                invariant { !status >= 0 && (!si = add0(l)(0)(i) && !sf = add1(l)(0)(i) &&
+  	(forall i0: int . 0 <= i0 < i -> ( type_test_or_integer_float_to_integer (get_nth i0 l) = True ->
+   					or_integer_float_to_integer (get_nth i0 l) <> 0 ) )
+  	&& (forall i0: int . 0 <= i0 < i -> ( type_test_or_integer_float_to_float (get_nth i0 l) = True ->
+   					or_integer_float_to_float (get_nth i0 l) >=. 0.5 ) ) )}
+		  status := i;
+                  x := get_nth i l;
+			if type_test_or_integer_float_to_integer (!x) = True then 
+			  if or_integer_float_to_integer (!x) = 0 then
+			    raise (BreakLoop (!si,!sf))
+			  else
+			    si := !si + or_integer_float_to_integer (!x)
+			else
+			  if type_test_or_integer_float_to_float (!x) = True then 
+			    if or_integer_float_to_float (!x) <. 0.5 then
+			      raise (BreakLoop (!si,!sf))
+			    else
+			      sf := !sf +. or_integer_float_to_float (!x)
+		done;
+		status := -1;
+		(!si,!sf)
+	with BreakLoop excp ->
+	match excp with
+	| (a0, a1) -> (a0, a1)
+	end
+	end
+{
+let (si0, sf0) = result in
+( !status = -1 
+  && si0 = add0(l)(0)(length(l)) 
+  && sf0 = add1(l)(0)(length(l))
+  && (forall i0: int . 0 <= i0 < length(l) ->  ( type_test_or_integer_float_to_integer (get_nth i0 l) = True ->
+   or_integer_float_to_integer (get_nth i0 l) <> 0 ) )
+  && (forall i0: int . 0 <= i0 < length(l) -> ( type_test_or_integer_float_to_float (get_nth i0 l) = True ->
+   or_integer_float_to_float (get_nth i0 l) >=. 0.5 ) )
+)
+||
+( 0 <= !status < length(l)
+  && si0 = add0(l)(0)(!status)
+  && sf0 = add1(l)(0)(!status)
+  && ( (type_test_or_integer_float_to_integer (get_nth !status l) = True 
+        && or_integer_float_to_integer (get_nth !status l) = 0) 
+      || 
+       (type_test_or_integer_float_to_float (get_nth !status l) = True 
+        && or_integer_float_to_float (get_nth !status l) <. 0.5)
+     )
+  && (forall i0: int . 0 <= i0 < !status -> ( type_test_or_integer_float_to_integer (get_nth i0 l) = True ->
+   or_integer_float_to_integer (get_nth i0 l) <> 0 ) )
+  && (forall i0: int . 0 <= i0 < !status -> ( type_test_or_integer_float_to_float (get_nth i0 l) = True ->
+   or_integer_float_to_float (get_nth i0 l) >=. 0.5 ) )
+)
+}
+
+let main () =
+  let l = Cons (Integer 5) (Cons (Real 3.3) (Cons (Integer 8) (Cons (Real 1.4) (Cons (Integer 9) Nil)))) in
+  let (s,f) = sum (l) in
+  assert { !status = -1 };
+  assert { s = 22 };
+  assert { f = 4.7 }
+
+end

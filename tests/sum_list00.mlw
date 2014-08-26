@@ -1,0 +1,145 @@
+theory SumList
+
+use export int.Int
+use export real.RealInfix
+use export list.List
+use export list.Length
+use export list.Nth
+
+type or_integer_float = Integer int | Real real
+
+(* nth element of the list *)
+function get_nth (i: int) (e: list or_integer_float) : or_integer_float =
+match nth i e with
+| None -> Integer (-1)
+| Some x -> x
+end
+
+(* no integer zero till x (excluding) *)
+predicate no_zero_int (e: list or_integer_float) (x: int) =
+forall j: int. 0 <= j < x /\ x < length(e) -> 
+match nth j e with
+| None -> true
+| Some y -> match y with
+	    | (Integer n) -> n <> 0
+            | (Real r) -> true
+	    end
+end
+
+(* no real less than 0.5 till x (excluding) *)
+predicate no_zero_real (e: list or_integer_float) (x: int) =
+forall j: int. 0 <= j < x /\ x < length(e) -> 
+match nth j e with
+| None -> true
+| Some y -> match y with
+	    | (Integer n) -> true
+            | (Real r) -> r >=. 0.5
+	    end
+end
+
+(* no integer zero and no real less than 0.5 till x (excluding) *)
+predicate no_zero (e: list or_integer_float) (x: int) =
+forall j: int. 0 <= j < x /\ x < length(e) -> 
+match nth j e with
+| None -> true
+| Some y -> match y with
+	    | (Integer n) -> n <> 0
+            | (Real r) -> r >=. 0.5
+	    end
+end
+
+(* integer zero at  x *)
+predicate zero_at_int (e: list or_integer_float) (x: int) =
+match nth x e with
+| None -> false
+| Some y -> match y with
+	    | (Integer n) -> n = 0
+            | (Real r) -> false
+	    end
+end
+
+(* real less than 0.5 at  x *)
+predicate zero_at_real (e: list or_integer_float) (x: int) =
+match nth x e with
+| None -> false
+| Some y -> match y with
+	    | (Integer n) -> false
+            | (Real r) -> r <. 0.5
+	    end
+end
+					   
+
+(* sum integers in a list *)
+function add_int (e: list or_integer_float) (i: int) (j: int) : int =
+if i < j then
+  match e with
+  | Nil -> 0
+  | Cons (Integer n) t -> if n = 0 then 0 else n + add_int t (i+1) j
+  | Cons _ t -> add_int t (i+1) j
+  end
+else
+0
+
+(* sum reals in a list *)
+function add_real (e: list or_integer_float) (i: int) (j: int) : real =
+if i < j then
+  match e with
+  | Nil -> 0.0
+  | Cons (Real x) t -> if x <. 0.5 then 0.0 else x +. add_real t (i+1) j
+  | Cons _ t -> add_real t (i+1) j
+  end
+else
+0.0
+
+end
+
+module SumList
+
+use import SumList
+use import module ref.Ref
+
+val status: ref int
+
+exception Break
+
+let sum (l: list or_integer_float) : (int, real) =
+  { true }
+  status := 0;
+  let si = ref 0 in
+  let sf = ref 0.0 in
+  let x = ref (any or_integer_float) in
+  try
+    for i = 0 to length(l) - 1 do
+    invariant { !si = add_int (l) (0) (!status) /\ !sf = add_real (l) (0) (!status)
+		/\ 0 <= !status < length(l)
+              }
+     status := i;
+     x := get_nth i l;
+     match !x with
+	| (Integer n) -> if n = 0 then raise Break else si := !si + n
+        | (Real r) -> if r <. 0.5 then raise Break else sf := !sf +. r
+     end
+   done;
+   status := -1;
+   (!si, !sf)
+  with Break -> (!si, !sf)
+  end
+  { let (si, sf) = result in 
+	( !status = -1 /\ si = add_int (l) (0) (length(l)) /\ sf = add_real (l) (0) (length(l)) 
+		/\ no_zero (l) (length(l)) ) \/
+        ( 0 <= !status < length(l) /\ si = add_int (l) (0) (!status) /\ sf = add_real (l) (0) (!status) 
+		/\ no_zero_int (l) (!status) /\ no_zero_real (l) (!status) 
+		/\ ( zero_at_int (l) (!status) \/ zero_at_real (l) (!status) ) )
+  }
+
+
+let main () =
+  let l =
+    Cons (Integer 5) (Cons (Real 3.3) (Cons (Integer 8)
+      (Cons (Real 1.4) (Cons (Integer 9) Nil))))
+  in
+  let (s,f) = sum l in
+  assert { s = 22 };
+  assert { f = 4.7 }
+
+end

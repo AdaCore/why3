@@ -1,0 +1,11 @@
+
+
+theory T
+
+  use import real.Real
+  use import real.MinMax
+
+  goal g: forall e p: real.
+    (2.0 * e + p + max e p) / 4.0 = max ((e+p)/2.0) ((3.0*e+p)/4.0)
+
+end 
