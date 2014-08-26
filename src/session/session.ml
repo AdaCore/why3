@@ -1556,7 +1556,8 @@ let read_xml_and_shapes xml_fn compressed_fn =
     let xml = Xml.from_file ~fixattrs:(fix_attributes ch) xml_fn in
     xml, !use_shapes
   with
-      e -> C.close_in ch; raise e
+      e when not (Debug.test_flag Debug.stack_trace) -> 
+        C.close_in ch; raise e
 end
 
 module ReadShapesNoCompress = ReadShapes(Compress.Compress_none)

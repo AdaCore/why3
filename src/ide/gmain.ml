@@ -822,7 +822,7 @@ let sched =
     session_needs_saving := false;
     current_env_session := Some env;
     sched
-  with e ->
+  with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "@[Error while opening session:@ %a@.@]"
       Exn_printer.exn_printer e;
     exit 1
