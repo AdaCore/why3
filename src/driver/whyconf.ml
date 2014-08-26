@@ -153,6 +153,8 @@ let default_strategies =
       [|"t split_goal_wp 1"|];
       "Inline", "Inline@ function@ symbols@ once", "i",
       [|"t inline_goal 1"|];
+      "Compute", "Compute@ in@ goal", "c",
+      [|"t compute_in_goal 1"|];
     ]
 
 let get_strategies ?(default=[]) rc =

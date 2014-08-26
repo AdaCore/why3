@@ -511,7 +511,7 @@ let show_legend_window () =
   ib image_prover;
   i "   External prover\n";
   ib image_transf;
-  i "   Transformation\n";
+  i "   Transformation or strategy\n";
   it "Status column\n";
   ib image_undone;
   i "   External proof attempt not done\n";
