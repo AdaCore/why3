@@ -16,8 +16,9 @@ Require real.Trigonometry.
 Theorem MethodError : forall (x:R),
   ((Reals.Rbasic_fun.Rabs x) <= (1 / 32)%R)%R ->
   ((Reals.Rbasic_fun.Rabs ((1%R - ((05 / 10)%R * (x * x)%R)%R)%R - (Reals.Rtrigo_def.cos x))%R) <= (1 / 16777216)%R)%R.
+(* Why3 intros x h1. *)
 intros x h1.
 Require Import Interval_tactic.
-
+interval with (i_bisect_diff x).
 Qed.
 
