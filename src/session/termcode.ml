@@ -235,7 +235,7 @@ let tag_wild = "w"
 let tag_as = "z"
 
 
-let id_string_shape ~push id acc = 
+let id_string_shape ~push id acc =
   push id acc
 (*
   let l = String.length id in
@@ -375,7 +375,7 @@ let t_shape_task ~version t =
     let _, expl, _ = goal_expl_task ~root:false t in
     match expl with
       | None -> ()
-      | Some expl -> id_string_shape ~push expl () 
+      | Some expl -> id_string_shape ~push expl ()
   end;
   let f = Task.task_goal_fmla t in
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () f in
@@ -428,10 +428,13 @@ module Checksum = struct
     | CV1 -> ident_v1 b id
     | CV2 -> ident_v2 b id
 
-  let const b c =
+  let const =
     let buf = Buffer.create 17 in
-    Format.bprintf buf "%a" Pretty.print_const c;
-    string b (Buffer.contents buf)
+    fun b c ->
+      Format.bprintf buf "%a" Pretty.print_const c;
+      let s = Buffer.contents buf in
+      Buffer.clear buf;
+      string b s
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
@@ -556,12 +559,35 @@ module Checksum = struct
     | Theory.MAstr s -> char b 's'; string b s
     | Theory.MAint i -> char b 'i'; int b i
 
-  let tdecl b d = match d.Theory.td_node with
+  let rec tdecl b d = match d.Theory.td_node with
     | Theory.Decl d -> decl b d
-    | Theory.Use th -> char b 'U'; ident b th.Theory.th_name
+    | Theory.Use th -> 
+      char b 'U'; ident b th.Theory.th_name; list string b th.Theory.th_path;
+      string b (theory_v2 th)
     | Theory.Clone (th, _) ->
         char b 'C'; ident b th.Theory.th_name; list string b th.Theory.th_path
     | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
+
+  and theory_v2_aux t =
+    let c = ref 0 in
+    let m = ref Ident.Mid.empty in
+    let b = Buffer.create 8192 in
+    List.iter (tdecl (CV2,c,m,b)) t.Theory.th_decls;
+    let dnew = Digest.string (Buffer.contents b) in
+    Digest.to_hex dnew
+
+  and theory_v2 =
+    let table = Ident.Wid.create 17 in
+    fun t ->
+      try Ident.Wid.find table t.Theory.th_name
+      with Not_found ->
+        let v = theory_v2_aux t in
+        Ident.Wid.set table t.Theory.th_name v;
+        v
+
+  let theory ~version t = match version with
+    | CV1 -> assert false
+    | CV2 -> theory_v2 t
 
   let task_v1 =
     let c = ref 0 in
@@ -601,16 +627,6 @@ module Checksum = struct
   let task ~version t = match version with
     | CV1 -> task_v1 t
     | CV2 -> task_v2 t
-
-  let theory_v1_v2 t =
-    let c = ref 0 in
-    let m = ref Ident.Mid.empty in
-    let b = Buffer.create 8192 in
-    List.iter (tdecl (CV2,c,m,b)) t.Theory.th_decls;
-    Digest.to_hex (Buffer.contents b)
-
-  let theory ~version t = match version with
-    | CV1 | CV2 -> theory_v1_v2 t
 
 end
 
