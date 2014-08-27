@@ -2379,13 +2379,11 @@ let merge_theory
       Mstr.add g.goal_name.Ident.id_string g from_goals)
     Mstr.empty from_th.theory_goals
   in
-(**)
-  Format.eprintf
-    "theory %s: old sum = %a, new sum = %a@."
+  Debug.dprintf debug
+    "[Theory checksum] theory %s: old sum = %a, new sum = %a@."
     to_th.theory_name.id_string
     (Pp.print_option Tc.print_checksum) from_th.theory_checksum
     (Pp.print_option Tc.print_checksum) to_th.theory_checksum;
- (**)
   let theory_is_fully_up_to_date =
     match from_th.theory_checksum, to_th.theory_checksum with
     | _, None -> assert false
