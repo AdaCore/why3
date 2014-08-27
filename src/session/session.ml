@@ -699,7 +699,7 @@ and save_ty fmt ty =
 
 let save_theory ctxt fmt t =
   fprintf fmt
-    "@\n@[<v 1>@[<h><theory@ %a@ sum=\"%a\"%a>@]"
+    "@\n@[<v 1>@[<h><theory@ %a%a%a>@]"
     save_ident t.theory_name
     (opt save_checksum "sum") t.theory_checksum
     (save_bool_def "expanded" false) t.theory_expanded;
