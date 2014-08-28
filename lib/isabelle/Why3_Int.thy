@@ -80,6 +80,10 @@ why3_vc Min_comm by simp
 
 why3_vc Min_assoc by simp
 
+why3_vc max_def by auto
+
+why3_vc min_def by auto
+
 why3_end
 
 
