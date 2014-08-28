@@ -26,12 +26,14 @@
     mutable temp: int;
   }
 
-  let create_code env = {
-    env = env;
-    instr = Array.make 10 (Igoto 0);
-    next = 0; temp = 0;
-    labels = Hashtbl.create 17;
-  }
+  let create_code env =
+    let h = Hashtbl.create 17 in
+    Hashtbl.add h "exit" { defined = Some (-1); temporary = 0 };
+    { env = env;
+      instr = Array.make 10 (Igoto 0);
+      next = 0;
+      temp = 1;
+      labels = h; }
 
   let enlarge_code code =
     let old = code.instr in
