@@ -296,42 +296,14 @@ module Make(O: OBSERVER) : sig
   val convert_unknown_prover : O.key env_session -> unit
     (** Same as {!Session_tools.convert_unknown_prover} *)
 
-  (** {2 User-defined strategies} *)
-
-  (** A strategy is defined by a program declared under a simple
-      assembly-like form: instructions are indexed by integers
-      starting from 0 (the initial instruction counter). An
-      instruction is either
-      1) a call to a prover, with given time and mem limits
-        . on success, the program execution ends
-        . on any other result, the program execution continues on the next index
-      2) a application of a transformation
-        . on success, the execution continues to a explicitly given index
-        . on failure, execution continues on the next index
-      3) a goto instruction.
-
-      the execution halts when reaching a non-existing state
-  *)
-
-  type instruction =
-    | Icall_prover of Whyconf.prover * int * int (** timelimit, memlimit *)
-    | Itransform of string * int (** successor state on success *)
-    | Igoto of int (** goto state *)
-
-  type strategy = instruction array
-
-  exception SyntaxError of string
-
-  val parse_instr : O.key Session.env_session -> int -> string -> instruction
-
   val run_strategy_on_goal:
     O.key Session.env_session -> t ->
-    strategy -> O.key Session.goal -> unit
+    Strategy.t -> O.key Session.goal -> unit
 
   val run_strategy:
     O.key Session.env_session -> t ->
     context_unproved_goals_only:bool ->
-    strategy -> O.key Session.any -> unit
+    Strategy.t -> O.key Session.any -> unit
 
 end
 

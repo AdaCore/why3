@@ -110,6 +110,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
                src/session/compress.ml src/session/xml.ml \
+	       src/session/strategy_parser.ml \
 	       lib/ocaml/why3__BigInt_compat.ml
 
 LIB_UTIL = config bigInt util opt lists strings \
@@ -155,7 +156,8 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
 	      $(addprefix src/whyml/, $(LIB_WHYML))
 
-LIB_SESSION = compress xml termcode session session_tools session_scheduler
+LIB_SESSION = compress xml termcode session session_tools strategy \
+              strategy_parser session_scheduler
 
 LIBSESSIONMODULES = $(addprefix src/session/, $(LIB_SESSION))
 

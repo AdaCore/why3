@@ -133,7 +133,7 @@ type config_editor = {
 type config_strategy = {
   strategy_name : string;
   strategy_desc : Pp.formatted;
-  strategy_code : string array;
+  strategy_code : string;
   strategy_shortcut : string;
 }
 
@@ -468,22 +468,14 @@ let load_strategy strategies section =
   try
     let name = get_string section "name" in
     let desc = get_string section "desc" in
-    let shortcut = get_string ~default:"" section "shortcut" in
     let desc = Scanf.format_from_string desc "" in
-    let code = ref [] and i = ref 0 in
-    try
-      while true do
-        let instr = get_string section ("l" ^ (string_of_int !i)) in
-        code := instr :: !code;
-        incr i
-      done;
-      assert false
-    with MissingField _ ->
-      Mstr.add
-        name
+    let shortcut = get_string ~default:"" section "shortcut" in
+    let code = get_string section "code" in
+    Mstr.add
+      name
         { strategy_name = name;
           strategy_desc = desc;
-          strategy_code = Array.of_list (List.rev !code);
+          strategy_code = code;
           strategy_shortcut = shortcut;
         }
         strategies

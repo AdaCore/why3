@@ -1414,10 +1414,10 @@ let () =
   add_gui_item add_item_provers
 
 let split_strategy =
-  [| M.Itransform(split_transformation,1) |]
+  [| Strategy.Itransform(split_transformation,1) |]
 
 let inline_strategy =
-  [| M.Itransform(inline_transformation,1) |]
+  [| Strategy.Itransform(inline_transformation,1) |]
 
 let test_strategy () =
   let config = gconfig.Gconfig.config in
@@ -1430,11 +1430,11 @@ let test_strategy () =
     Whyconf.filter_one_prover config fp
   in
   [|
-    M.Icall_prover(altergo.Whyconf.prover,1,1000);
-    M.Icall_prover(cvc4.Whyconf.prover,1,1000);
-    M.Itransform(split_transformation,0); (* goto 0 on success *)
-    M.Icall_prover(altergo.Whyconf.prover,10,4000);
-    M.Icall_prover(cvc4.Whyconf.prover,10,4000);
+    Strategy.Icall_prover(altergo.Whyconf.prover,1,1000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,1,1000);
+    Strategy.Itransform(split_transformation,0); (* goto 0 on success *)
+    Strategy.Icall_prover(altergo.Whyconf.prover,10,4000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,10,4000);
   |]
 
 (*
@@ -1497,13 +1497,13 @@ let strategies () =
             let name = st.Whyconf.strategy_name in
             try
               let code = st.Whyconf.strategy_code in
-              let len = Array.length code in
+              let code = Strategy_parser.parse (env_session()) code in
               let shortcut = load_shortcut st.Whyconf.strategy_shortcut in
-              let code = Array.map (M.parse_instr (env_session()) len) code in
               Format.eprintf "[GUI] Strategy '%s' loaded.@." name;
-              (name, st.Whyconf.strategy_desc,code, shortcut) :: acc
-            with M.SyntaxError msg ->
-              Format.eprintf "[GUI warning] Loading strategy '%s' failed: %s@." name msg;
+              (name, st.Whyconf.strategy_desc, code, shortcut) :: acc
+            with Strategy_parser.SyntaxError msg ->
+              Format.eprintf
+                "[GUI warning] Loading strategy '%s' failed: %s@." name msg;
               acc)
           []
           strategies
