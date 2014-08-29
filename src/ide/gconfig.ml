@@ -12,7 +12,6 @@
 open Why3
 open Rc
 open Whyconf
-open Why3session
 
 let debug = Debug.register_info_flag "ide_info"
   ~desc:"Print@ why3ide@ debugging@ messages."

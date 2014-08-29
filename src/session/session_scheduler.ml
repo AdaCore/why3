@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Format
-open Why3
 open Session
 
 let debug = Debug.register_info_flag "scheduler"

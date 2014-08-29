@@ -11,7 +11,6 @@
 
 open Why3
 open Whyconf
-open Why3session
 
 val verbose: Debug.flag
 

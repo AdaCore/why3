@@ -46,7 +46,7 @@
 
   let parse_error s = raise (Parse_error s)
 
-  let debug = Why3.Debug.register_info_flag "xml"
+  let debug = Debug.register_info_flag "xml"
     ~desc:"Print@ the@ XML@ parser@ debugging@ messages."
 }
 
@@ -68,7 +68,7 @@ rule xml_prolog fixattrs = parse
 | "<?xml" space+ "version=\"1.0\"" space+ "encoding=\"UTF-8\"" space+ "?>"
     { xml_doctype fixattrs "1.0" "" lexbuf }
 | "<?xml" ([^'?']|'?'[^'>'])* "?>"
-    { Why3.Debug.dprintf debug "[Xml warning] prolog ignored@.";
+    { Debug.dprintf debug "[Xml warning] prolog ignored@.";
       xml_doctype fixattrs "1.0" "" lexbuf }
 | _
     { parse_error "wrong prolog" }
@@ -98,26 +98,26 @@ and elements fixattrs group_stack element_stack = parse
   | "</" (ident as celem) space* '>'
       { match group_stack with
          | [] ->
-             Why3.Debug.dprintf debug
+             Debug.dprintf debug
                "[Xml warning] unexpected closing Xml element `%s'@."
                celem;
              elements fixattrs group_stack element_stack lexbuf
          | (elem,att,stack)::g ->
              if celem <> elem then
-               Why3.Debug.dprintf debug
+               Debug.dprintf debug
                  "[Xml warning] Xml element `%s' closed by `%s'@."
                  elem celem;
              let e = mk_element elem att element_stack in
              elements fixattrs g (e::stack) lexbuf
        }
   | '<'
-      { Why3.Debug.dprintf debug "[Xml warning] unexpected '<'@.";
+      { Debug.dprintf debug "[Xml warning] unexpected '<'@.";
         elements fixattrs group_stack element_stack lexbuf }
   | eof
       { match group_stack with
          | [] -> element_stack
          | (elem,_,_)::_ ->
-             Why3.Debug.dprintf debug "[Xml warning] unclosed Xml element `%s'@." elem;
+             Debug.dprintf debug "[Xml warning] unclosed Xml element `%s'@." elem;
              pop_all group_stack element_stack
       }
   | _ as c

@@ -13,7 +13,7 @@
 
 This file builds a new session from a given file.
 
-To each goal is added as many proof attempts as provers 
+To each goal is added as many proof attempts as provers
 found in the configuration.
 
 
@@ -23,9 +23,6 @@ open Format
 
 (* opening the Why3 library *)
 open Why3
-(* opening the Why3 session library *)
-open Why3session
-
 
 (* access to the Why configuration *)
 
@@ -63,11 +60,11 @@ let keygen ?parent () = ()
 (* create an empty session in the current directory *)
 let env_session,_,_ =
   let dummy_session : unit Session.session = Session.create_session "." in
-  Session.update_session ~use_shapes:false ~keygen ~allow_obsolete:true 
+  Session.update_session ~use_shapes:false ~keygen ~allow_obsolete:true
     dummy_session env config
 
 (* adds a file in the new session *)
-let file : unit Session.file = 
+let file : unit Session.file =
   let file_name = "examples/logic/hello_proof.why" in
   try
     Session.add_file keygen env_session file_name
@@ -77,7 +74,7 @@ let file : unit Session.file =
     exit 1
 
 (* explore the theories in that file *)
-let theories = file.Session.file_theories 
+let theories = file.Session.file_theories
 let () = eprintf "%d theories found@." (List.length theories)
 
 (* add proof attempts for each goals in the theories *)
@@ -94,7 +91,7 @@ let add_proofs_attempts g =
           ~memlimit:1000
           ~edit:None
           g p.Whyconf.prover Session.Scheduled
-      in ()) 
+      in ())
     provers
 
 let () =

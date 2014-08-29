@@ -11,7 +11,6 @@
 
 open Format
 open Why3
-open Why3session
 
 (** {2 Warnings} *)
 

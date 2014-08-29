@@ -30,7 +30,6 @@ module Todo : sig
 
 end
 
-open Why3
 open Session
 
 (** {2 Observers signature} *)

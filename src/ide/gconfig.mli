@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Why3
-open Why3session
 
 type t =
     { mutable window_width : int;
