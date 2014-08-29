@@ -928,7 +928,7 @@ let print_task printer_args realize ?old fmt task =
         let f,id =
           let l = Strings.rev_split '.' s1 in
           List.rev (List.tl l), List.hd l in
-        let th = Env.find_theory printer_args.env f id in
+        let th = Env.read_theory printer_args.env f id in
         Mid.add th.Theory.th_name (th, if s2 = "" then s1 else s2) mid
       | _ -> assert false
     ) Mid.empty task in

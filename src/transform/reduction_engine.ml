@@ -192,23 +192,20 @@ let built_in_theories =
   ]
 
 let add_builtin_th env (l,n,t,d) =
-  try
-    let th = Env.find_theory env l n in
-    List.iter
-      (fun (id,r) ->
-        let ts = Theory.ns_find_ts th.Theory.th_export [id] in
-        r ts)
-      t;
-    List.iter
-      (fun (id,r,f) ->
-        let ls = Theory.ns_find_ls th.Theory.th_export [id] in
-        Hls.add builtins ls f;
-        match r with
-          | None -> ()
-          | Some r -> r := ls)
-      d
-  with Not_found ->
-    Format.eprintf "[Compute] theory %s not found@." n
+  let th = Env.read_theory env l n in
+  List.iter
+    (fun (id,r) ->
+      let ts = Theory.ns_find_ts th.Theory.th_export [id] in
+      r ts)
+    t;
+  List.iter
+    (fun (id,r,f) ->
+      let ls = Theory.ns_find_ls th.Theory.th_export [id] in
+      Hls.add builtins ls f;
+      match r with
+        | None -> ()
+        | Some r -> r := ls)
+    d
 
 let get_builtins env =
   Hls.clear builtins;

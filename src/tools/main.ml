@@ -129,7 +129,7 @@ let () = try
     in
     printf "@[Known input formats:@\n  @[%a@]@]@."
       (Pp.print_list Pp.newline2 print)
-      (List.sort Pervasives.compare (Env.list_formats ()))
+      (List.sort Pervasives.compare (Env.list_formats Env.base_language))
   end;
   if !opt_list_provers then begin
     opt_list := true;

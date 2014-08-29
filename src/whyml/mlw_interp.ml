@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Format
-open Stdlib
 open Term
 
 
@@ -436,31 +435,25 @@ let built_in_theories =
   ]
 
 let add_builtin_th env (l,n,t,d) =
-  try
-    let th = Env.find_theory env l n in
-    List.iter
-      (fun (id,r) ->
-        let ts = Theory.ns_find_ts th.Theory.th_export [id] in
-        r ts)
-      t;
-    List.iter
-      (fun (id,r,f) ->
-        let ls = Theory.ns_find_ls th.Theory.th_export [id] in
-        Hls.add builtins ls f;
-        match r with
-          | None -> ()
-          | Some r -> r := ls)
-      d
-  with Not_found ->
-    eprintf "[Warning] theory %s not found@." n
+  let th = Env.read_theory env l n in
+  List.iter
+    (fun (id,r) ->
+      let ts = Theory.ns_find_ts th.Theory.th_export [id] in
+      r ts)
+    t;
+  List.iter
+    (fun (id,r,f) ->
+      let ls = Theory.ns_find_ls th.Theory.th_export [id] in
+      Hls.add builtins ls f;
+      match r with
+        | None -> ()
+        | Some r -> r := ls)
+    d
 
 let get_builtins env =
   Hls.add builtins ps_equ eval_equ;
   Hls.add builtins Mlw_wp.fs_now eval_now;
   List.iter (add_builtin_th env) built_in_theories
-
-
-
 
 (* promotes logic value v of program type ty into a program value,
    e.g if
@@ -536,7 +529,8 @@ let to_program_value env s ty v =
         match regions with
         | [] -> s,v
         | _ ->
-          eprintf "@[<hov 2>error while converting logic value (%a:%a) to a program value:@ regions should be empty, not@ [%a]@]@."
+          eprintf "@[<hov 2>error while converting logic value (%a:%a) \
+              to a program value:@ regions should be empty, not@ [%a]@]@."
             print_value v Mlw_pretty.print_vty ty
             (Pp.print_list Pp.comma Mlw_pretty.print_reg) regions;
           assert false
@@ -698,7 +692,7 @@ let exec_array_set _env s _vty args =
 
 let built_in_modules =
   [
-   "array","Array",
+   ["array"],"Array",
     ["array", builtin_array_type],
     ["make", None, exec_array_make ;
      "mixfix []", None, exec_array_get ;
@@ -708,40 +702,26 @@ let built_in_modules =
     ] ;
   ]
 
-let add_builtin_mo lib (l,n,t,d) =
-  try
-(*
-    eprintf "[interp] looking for mlw file %s@." l;
-*)
-    let mods, _ths = Env.read_lib_file lib [l] in
-    let mo = Mstr.find n mods in
-    let exp = mo.Mlw_module.mod_export in
-    let kn = mo.Mlw_module.mod_known in
-    List.iter
-      (fun (id,r) ->
-(*
-        eprintf "[interp] looking for type %s@." id;
-*)
-        let its = Mlw_module.ns_find_its exp [id] in
-        r kn its)
-      t;
-    List.iter
-      (fun (id,r,f) ->
-(*
-        eprintf "[interp] looking for function %s@." id;
-*)
-        let ps = Mlw_module.ns_find_ps exp [id] in
-        Hps.add builtin_progs ps f;
-        match r with
-          | None -> ()
-          | Some r -> r := ps)
-      d
-  with Not_found ->
-    Format.eprintf "[Warning] module %s not found@." n
+let add_builtin_mo env (l,n,t,d) =
+  let mo = Mlw_module.read_module env l n in
+  let exp = mo.Mlw_module.mod_export in
+  let kn = mo.Mlw_module.mod_known in
+  List.iter
+    (fun (id,r) ->
+      let its = Mlw_module.ns_find_its exp [id] in
+      r kn its)
+    t;
+  List.iter
+    (fun (id,r,f) ->
+      let ps = Mlw_module.ns_find_ps exp [id] in
+      Hps.add builtin_progs ps f;
+      match r with
+        | None -> ()
+        | Some r -> r := ps)
+    d
 
 let get_builtin_progs lib =
   List.iter (add_builtin_mo lib) built_in_modules
-
 
 let get_vs env vs =
   try
@@ -1289,7 +1269,7 @@ let eval_global_expr env mkm tkm _writes e =
     p_expr e;
 *)
   get_builtins env;
-  get_builtin_progs (Mlw_main.library_of_env env);
+  get_builtin_progs env;
   let env = {
     mknown = mkm;
     tknown = tkm;

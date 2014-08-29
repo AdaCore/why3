@@ -431,7 +431,7 @@ let print_task printer_args realize fmt task =
         let f,id =
           let l = Strings.rev_split '.' s1 in
           List.rev (List.tl l), List.hd l in
-        let th = Env.find_theory printer_args.env f id in
+        let th = Env.read_theory printer_args.env f id in
         Mid.add th.Theory.th_name (th, s1) mid
       | _ -> assert false
     ) Mid.empty task in

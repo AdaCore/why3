@@ -246,9 +246,9 @@ and comment_line = parse
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
     let ast = Loc.with_location (tptp_file token) lb in
-    (), Tptp_typing.typecheck env path ast
+    Tptp_typing.typecheck env path ast
 
-  let _library_of_env = Env.register_format "tptp" ["p";"ax"] read_channel
+  let () = Env.register_format "tptp" ["p";"ax"] Env.base_language read_channel
     ~desc:"TPTP format (CNF FOF FOFX TFF)"
 
 }

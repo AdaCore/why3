@@ -1633,7 +1633,7 @@ let set_file_expanded f b =
 (* add a why file from a session *)
 (** Read file and sort theories by location *)
 let read_file env ?format fn =
-  let theories = Env.read_file env ?format fn in
+  let theories = Env.read_file Env.base_language env ?format fn in
   let ltheories =
     Mstr.fold
       (fun name th acc ->
@@ -2085,17 +2085,9 @@ let merge_metas_in_task ~theories env task from_metas =
   let hpr = Hpr.create 10 in
   let obsolete = ref false in
 
-  (** TODO: replace that when retrieve theory will give the formats *)
-  let rec read_theory ip = function
-    | [] -> raise (Env.LibFileNotFound ip.ip_library)
-    | format::formats ->
-        try Env.read_theory ~format env.env ip.ip_library ip.ip_theory
-        with Env.LibFileNotFound _ | Env.TheoryNotFound _ ->
-          read_theory ip formats
-  in
   let read_theory ip =
     if ip.ip_library = [] then Mstr.find ip.ip_theory theories
-    else read_theory ip ["why";"whyml"] in
+    else Env.read_theory env.env ip.ip_library ip.ip_theory in
 
   let to_idpos_ts = Mts.fold_left (fun idpos_ts from_ts ip ->
     try

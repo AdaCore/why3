@@ -67,7 +67,7 @@ let css =
 
 let do_file env fname =
   try
-    ignore (Env.read_file env fname)
+    ignore (Env.read_file Env.base_language env fname)
   with e ->
     eprintf "warning: could not read file '%s'@." fname;
     eprintf "(%a)@." Exn_printer.exn_printer e

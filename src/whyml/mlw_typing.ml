@@ -15,7 +15,6 @@ open Ty
 open Term
 open Decl
 open Theory
-open Env
 open Ptree
 
 open Mlw_ty
@@ -1071,71 +1070,20 @@ let add_types ~wp uc tdl = match tdl with
 
 (** Use/Clone of theories and modules *)
 
-type mlw_contents = modul Mstr.t
-type mlw_library = mlw_contents library
-type mlw_file = mlw_contents * Theory.theory Mstr.t
-
-let find_theory loc lib path s =
-  (* search first in .mlw files or among the built-ins *)
-  let thm =
-    try Some (Env.read_lib_theory lib path s)
-    with LibFileNotFound _ | TheoryNotFound _ -> None
-  in
-  (* search also in .why files, unless the theory is built-in *)
-  let th =
-    if path = [] || path = ["why3"] then None else
-    try Some (Env.find_theory (Env.env_of_library lib) path s)
-    with LibFileNotFound _ | TheoryNotFound _ -> None
-  in
-  match thm, th with
-    | Some _, Some _ ->
-        Loc.errorm ~loc
-          "a module/theory %s is defined both in Why and WhyML libraries" s
-    | None, None -> Loc.error ~loc (Env.TheoryNotFound (path, s))
-    | None, Some t | Some t, None -> t
-
-let find_theory loc lib mt path s = match path with
+let find_theory loc env mt path s = match path with
+  | _::_ -> (* theory in file path *)
+      Loc.try3 ~loc Env.read_theory env path s
   | [] -> (* local theory *)
-      begin try Mstr.find s mt with Not_found -> find_theory loc lib [] s end
-  | _ :: _ -> (* theory in file path *)
-      find_theory loc lib path s
+      try Mstr.find s mt with Not_found ->
+      Loc.try3 ~loc Env.read_theory env path s
 
-type theory_or_module = Theory of Theory.theory | Module of modul
-
-let print_path fmt sl =
-  Pp.print_list (Pp.constant_string ".") Format.pp_print_string fmt sl
-
-let find_module loc lib path s =
-  (* search first in .mlw files *)
-  let m, thm =
-    try
-      let mm, mt = Env.read_lib_file lib path in
-      Mstr.find_opt s mm, Mstr.find_opt s mt
-    with
-      | LibFileNotFound _ -> None, None
-  in
-  (* search also in .why files *)
-  let th =
-    try Some (Env.find_theory (Env.env_of_library lib) path s)
-    with LibFileNotFound _ | TheoryNotFound _ -> None
-  in
-  match m, thm, th with
-    | Some _, None, _ -> assert false
-    | _, Some _, Some _ ->
-        Loc.errorm ~loc
-          "a module/theory %s is defined both in Why and WhyML libraries" s
-    | None, None, None ->
-        Loc.errorm ~loc "Theory/module not found: %a" print_path (path @ [s])
-    | Some m, Some _, None -> Module m
-    | None, Some t, None | None, None, Some t -> Theory t
-
-let find_module loc lib mm mt path s = match path with
+let find_module loc env mm mt path s = match path with
+  | _::_ -> (* module/theory in file path *)
+      Loc.try3 ~loc read_module_or_theory env path s
   | [] -> (* local module/theory *)
-      begin try Module (Mstr.find s mm)
-        with Not_found -> begin try Theory (Mstr.find s mt)
-          with Not_found -> find_module loc lib [] s end end
-  | _ :: _ -> (* module/theory in file path *)
-      find_module loc lib path s
+      try Module (Mstr.find s mm) with Not_found ->
+      try Theory (Mstr.find s mt) with Not_found ->
+      Loc.try3 ~loc read_module_or_theory env path s
 
 (** Top level *)
 
@@ -1211,11 +1159,11 @@ let add_pdecl ~wp loc uc d =
   if Debug.test_flag Typing.debug_parse_only then uc else
   Loc.try3 ~loc (add_pdecl ~wp) loc uc d
 
-let use_clone_pure lib mth uc loc (use,inst) =
+let use_clone_pure env mth uc loc (use,inst) =
   let path, s = match use.use_theory with
     | Qdot (p,id) -> Typing.string_list_of_qualid p, id
     | Qident id -> [], id in
-  let th = find_theory loc lib mth path s.id in
+  let th = find_theory loc env mth path s.id in
   if Debug.test_flag Glob.flag then Glob.use s.id_loc th.th_name;
   (* open namespace, if any *)
   let uc = match use.use_import with
@@ -1232,15 +1180,15 @@ let use_clone_pure lib mth uc loc (use,inst) =
     | Some (import, _) -> Theory.close_namespace uc import
     | None -> uc
 
-let use_clone_pure lib mth uc loc use =
+let use_clone_pure env mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try5 ~loc use_clone_pure lib mth uc loc use
+  Loc.try5 ~loc use_clone_pure env mth uc loc use
 
-let use_clone lib mmd mth uc loc (use,inst) =
+let use_clone env mmd mth uc loc (use,inst) =
   let path, s = match use.use_theory with
     | Qdot (p,id) -> Typing.string_list_of_qualid p, id
     | Qident id -> [], id in
-  let mth = find_module loc lib mmd mth path s.id in
+  let mth = find_module loc env mmd mth path s.id in
   if Debug.test_flag Glob.flag then Glob.use s.id_loc
     (match mth with Module m -> m.mod_theory.th_name | Theory th -> th.th_name);
   (* open namespace, if any *)
@@ -1285,9 +1233,9 @@ let use_clone lib mmd mth uc loc (use,inst) =
     | Some (import, _) -> close_namespace uc import
     | None -> uc
 
-let use_clone lib mmd mth uc loc use =
+let use_clone env mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try6 ~loc use_clone lib mmd mth uc loc use
+  Loc.try6 ~loc use_clone env mmd mth uc loc use
 
 let close_theory (mmd,mth) uc =
   if Debug.test_flag Typing.debug_parse_only then (mmd,mth) else
@@ -1313,8 +1261,7 @@ let open_file, close_file =
   let tuc  = Stack.create () in
   let muc  = Stack.create () in
   let lenv = Stack.create () in
-  let open_file lib path =
-    let env = Env.env_of_library lib in
+  let open_file env path =
     let wp = path = [] && Debug.test_noflag Typing.debug_type_only in
     Stack.push (Mstr.empty,Mstr.empty) lenv;
     let open_theory id = Stack.push false inm;
@@ -1337,8 +1284,8 @@ let open_file, close_file =
     let new_pdecl loc d =
       Stack.push (add_pdecl ~wp loc (Stack.pop muc) d) muc in
     let use_clone loc use = let (mmd,mth) = Stack.top lenv in if Stack.top inm
-      then Stack.push (use_clone lib mmd mth (Stack.pop muc) loc use) muc
-      else Stack.push (use_clone_pure lib mth (Stack.pop tuc) loc use) tuc in
+      then Stack.push (use_clone env mmd mth (Stack.pop muc) loc use) muc
+      else Stack.push (use_clone_pure env mth (Stack.pop tuc) loc use) tuc in
     { open_theory = open_theory;
       close_theory = close_theory;
       open_module = open_module;
@@ -1359,7 +1306,4 @@ let () = Exn_printer.register (fun fmt e -> match e with
       Format.fprintf fmt "Type parameter %s is used twice" s
   | UnboundTypeVar s ->
       Format.fprintf fmt "Unbound type variable '%s" s
-  | TooLateInvariant ->
-      Format.fprintf fmt
-        "Cannot add a type invariant after another program declaration"
   | _ -> raise e)

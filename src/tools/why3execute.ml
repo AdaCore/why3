@@ -47,13 +47,7 @@ let do_input f =
     match f with
     | "-" -> "stdin", stdin
     | f   -> f, open_in f in
-  if not (!opt_parser = Some "whyml" || Filename.check_suffix fname ".mlw") then
-    begin
-      eprintf "Execution is available only for mlw files@.";
-      exit 1
-    end;
-  let lib = Mlw_main.library_of_env env in
-  let mm, _thm = Mlw_main.read_channel lib [] fname cin in
+  let mm, _thm = Env.read_channel Mlw_module.mlw_language env fname cin in
   let do_exec (mid,name) =
     let m = try Mstr.find mid mm with Not_found ->
       eprintf "Module '%s' not found.@." mid;

@@ -248,12 +248,10 @@ rule token = parse
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    (), parse_logic_file env path lb
+    parse_logic_file env path lb
 
-  let library_of_env = Env.register_format "why" ["why"] read_channel
+  let () = Env.register_format "why" ["why"] Env.base_language read_channel
     ~desc:"Why@ logical@ language"
-
-  let parse_logic_file env = parse_logic_file (library_of_env env)
 }
 
 (*

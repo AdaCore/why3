@@ -74,7 +74,7 @@ let opt_output =
   | Some d -> d
 
 let opt_driver =
-  match !opt_driver with
+  try match !opt_driver with
   | None ->
     eprintf "Driver (-D) is required.@.";
     exit 1
@@ -83,14 +83,12 @@ let opt_driver =
       if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
       else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv")) in
     Driver.load_driver env s []
-
-
-let do_global_theory (tname,p,t) =
-  let format = Opt.get_def "why" !opt_parser in
-  let th = try Env.read_theory ~format env p t with Env.TheoryNotFound _ ->
-    eprintf "Theory '%s' not found.@." tname;
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-  in
+
+let do_global_theory (_tname,p,t) =
+  let th = Env.read_theory env p t in
   let task = Task.use_export None th in
   let dest = Driver.file_of_theory opt_driver "lib" th in
   let file = Filename.concat opt_output dest in

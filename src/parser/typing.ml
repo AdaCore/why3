@@ -665,9 +665,9 @@ let prop_kind = function
 let find_theory env lenv q = match q with
   | Qident { id = id } -> (* local theory *)
       begin try Mstr.find id lenv
-      with Not_found -> read_lib_theory env [] id end
+      with Not_found -> read_theory env [] id end
   | Qdot (p, { id = id }) -> (* theory in file f *)
-      read_lib_theory env (string_list_of_qualid p) id
+      read_theory env (string_list_of_qualid p) id
 
 let rec clone_ns kn sl path ns2 ns1 s =
   let qualid fmt path = Pp.print_list
