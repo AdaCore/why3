@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
+<file name="../association_list.mlw" expanded="true">
+<theory name="Assoc" sum="51b4c11f081064e3b4d325b694706c49">
+ <goal name="appear_append" sum="5cbdce3c762c74acf1cb66ef7929cac3">
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="WP_parameter model_domain" expl="VC for model_domain" sum="92e56ac5ba7120552dbd9b31ea1c03e4">
+ <proof prover="2"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="WP_parameter model_key" expl="VC for model_key" sum="a62f513551d51f68f7bf7274ec7fa2bc">
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="WP_parameter model_congruence" expl="VC for model_congruence" sum="74b6a1d42ac17ba99534e9abb688b15c">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter model_congruence.1" expl="1. variant decrease" sum="fe73a75f3af6950f0640430458feac49">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter model_congruence.2" expl="2. precondition" sum="e4d12e2c5f96dc21fd0b548161939bb3">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter model_congruence.3" expl="3. postcondition" sum="3fc6b634c6464489b12cd88d09c1b714">
+  <proof prover="2"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="WP_parameter model_congruence.4" expl="4. postcondition" sum="e8400f9d404e6f7196747af3ce50d41f">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter model_unique" expl="VC for model_unique" sum="70a48f930e99d24c2f920a09ce89787e">
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="WP_parameter model_singleton" expl="VC for model_singleton" sum="9e1f65943793e1492142da0974983d77">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter model_concat" expl="VC for model_concat" sum="7a62a2d7738cc4e29d11d9e297619ece">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter model_concat.1" expl="1. postcondition" sum="2908373cf6c35c58321b09d6396e3147">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter model_concat.2" expl="2. postcondition" sum="2cca90b0062e27cdf98fe6d11eeed988">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter model_concat.3" expl="3. postcondition" sum="b8b1b60dd188d43b287899f552ce108e">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter model_concat.4" expl="4. postcondition" sum="d75c2fdc38950fef136435d48fdc9a50">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter model_concat.5" expl="5. variant decrease" sum="cb498b90b9bb7b9bec34710fc3499b58">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter model_concat.6" expl="6. precondition" sum="3e89707fc31026dd69618d532147a4dc">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter model_concat.7" expl="7. postcondition" sum="3b611d0c99fafd2dfab57aeb5cde40bb">
+  <proof prover="1"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="WP_parameter model_concat.8" expl="8. postcondition" sum="21271033edce0b04319deb13b120cde5">
+  <proof prover="1"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter model_concat.9" expl="9. postcondition" sum="ce1444e14e83ef00706876e04a92fcec">
+  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter model_concat.10" expl="10. postcondition" sum="30a51ad2a0099a9fc46b3097d7f9476b">
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="AssocSorted" sum="d893e987157b1d0812b75c65f363bef5" expanded="true">
+ <goal name="Refl" sum="bd68cf5556485d4e4b24f8140e5fcd67">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="Trans" sum="5fb40a6d287b0d7ac73e32d51e14a3fb">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="Symm" sum="5a0d026001e97426f05bd10f506d1b42">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="Trans" sum="5e3c67976655b616e0bef03d1dd1fbf7">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter increasing_unique" expl="VC for increasing_unique" sum="03f6af66f3e7749a998b86279e2862f4">
+ <proof prover="2"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="WP_parameter model_cut" expl="VC for model_cut" sum="e13f7b41191b0d8d7ed1ec53417153ba">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter model_cut.1" expl="1. assertion" sum="a134c81e5f906e77af9765a19796380f">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter model_cut.2" expl="2. assertion" sum="12665e93cd647a7168984df4e15500c1">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter model_cut.2.1" expl="1. assertion" sum="a2c1adf0d07a49d10e022f5576eded9d">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.2.2" expl="2. assertion" sum="12aa3d4260003aab6568c1adfa685e50">
+   <proof prover="2"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.2.3" expl="3. assertion" sum="168e8b779ef53acb9814b2890ff9ae00">
+   <proof prover="2"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.2.4" expl="4. assertion" sum="f3ee89b033ce2d824097e4f0d7919ec1">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.2.5" expl="5. assertion" sum="7e6e4a0da1783bc61833c81b51e7aa7a">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.2.6" expl="6. assertion" sum="a890eda2f61ef10ccb9f2ba41f70c2b0">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter model_cut.3" expl="3. assertion" sum="b64a6c3fc5c944150cd047628229280b">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter model_cut.3.1" expl="1. assertion" sum="11fc863a88316fcaba3eea6986541a49">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.3.2" expl="2. assertion" sum="9948f220cf719b895bdd9e96b6e3dc7f">
+   <proof prover="2"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.3.3" expl="3. assertion" sum="151eba2a7b0ac2df9caa4b45c5ac8b1a">
+   <proof prover="2"><result status="valid" time="0.08"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.3.4" expl="4. assertion" sum="bc7a0013949a533792c90ed5ccbc0c5c">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.3.5" expl="5. assertion" sum="432a9d478793190fba92c2ccf17128ef">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.3.6" expl="6. assertion" sum="e5b7d04572afd57071bd95a8862780ee">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter model_cut.4" expl="4. assertion" sum="cfbc907899cd34eeb8cca5dbceec41a1">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter model_cut.4.1" expl="1. assertion" sum="b16ccf8a311e0add137605a7c3c51d53">
+   <proof prover="3"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.4.2" expl="2. assertion" sum="7cda319a7b0a8a8c57aa082c8c94bfcb">
+   <proof prover="3"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="WP_parameter model_cut.4.3" expl="3. assertion" sum="9d7f3d139c611615ea4cd94dc79d9def">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter model_cut.5" expl="5. postcondition" sum="2364af598953d0888a832ec42adb2af9">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter model_cut.6" expl="6. postcondition" sum="0a778083fbb6a59736dfdf111b1b651b">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter model_cut.7" expl="7. postcondition" sum="93d8b0e1b3b8fa0e5a32c3cb7edfedec">
+  <proof prover="2"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="WP_parameter model_cut.8" expl="8. postcondition" sum="c8c69c493dc15d6098e7fdd24b594b56">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter model_cut.9" expl="9. postcondition" sum="483c174a72fae713d6876546a1538f68">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter model_split" expl="VC for model_split" sum="249363bf1fbb8089fa11c8b0984f7cc5">
+ <proof prover="0"><result status="valid" time="0.92"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
