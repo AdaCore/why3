@@ -1407,41 +1407,6 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 # test targets
 ###############
 
-test2: bin/why3.byte $(TOOLS)
-	bin/why3.byte tests/test-jcf.why
-
-test: bin/why3.byte plugins.byte $(TOOLS)
-	mkdir -p output_why3
-	bin/why3.byte -D drivers/why3.drv -o output_why3 tests/test-jcf.why
-	# bin/why3.byte -D drivers/alt_ergo.drv tests/test-jcf.why -T Test -G G
-	# bin/why3.byte -P alt-ergo --timelimit 3 tests/test-jcf.why -T Test -G G
-	# bin/why3.byte -D drivers/coq.drv tests/test-jcf.why -T Test -G G
-	echo bin/why3.byte -P alt-ergo --timelimit 1 --prove theories/real.why
-	@printf "*** Checking Coq file generation ***\\n"
-	@mkdir -p output_coq
-	@for i in int.Abs int.EuclideanDivision int.ComputerDivision  \
-		real.Abs real.FromIntTest real.SquareTest \
-		real.ExpLogTest real.PowerTest real.TrigonometryTest \
-		floating_point.Test map.TestBv32 \
-		; do \
-	  printf "Generating Coq file for $$i\\n" && \
-	  	bin/why3.byte -P coq -o output_coq -T $$i ; done
-	@printf "*** Checking Coq compilation ***\\n"
-	@for i in output_coq/*.v; do printf "coq $$i\\n" && coqc $$i ; done
-
-testl: bin/why3.byte
-	ocamlrun -bt bin/why3.byte tests/test-pgm-jcf.mlw
-	ocamlrun -bt bin/why3.byte -P alt-ergo tests/test-pgm-jcf.mlw
-
-testl-debug: bin/why3.opt
-	bin/why3.opt --debug program_typing tests/test-pgm-jcf.mlw
-
-testl-ide: bin/why3ide.opt
-	bin/why3ide.opt tests/test-pgm-jcf.mlw
-
-testl-type: bin/why3.byte
-	ocamlrun -bt bin/why3.byte --type-only tests/test-pgm-jcf.mlw
-
 test-api-logic.byte: examples/use_api/logic.ml lib/why3/why3.cma
 	$(if $(QUIET),@echo 'Ocaml    $<' &&) \
 	ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null \
