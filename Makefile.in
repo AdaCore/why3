@@ -435,42 +435,6 @@ install_no_local::
 	mkdir -p $(LIBDIR)/why3/plugins
 	cp -f $(foreach f,$(LIBPLUGCMO) $(LIBPLUGCMXS),$(wildcard $(f))) $(LIBDIR)/why3/plugins
 
-#################################
-# Old Why3 command, to be removed
-#################################
-
-src/tools/why3contraption.cmo: lib/why3/why3.cma
-src/tools/why3contraption.cmx: lib/why3/why3.cmxa
-
-byte: bin/why3contraption.byte
-opt:  bin/why3contraption.opt
-
-bin/why3contraption.opt: lib/why3/why3.cmxa src/tools/why3contraption.cmx
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
-bin/why3contraption.byte: lib/why3/why3.cma src/tools/why3contraption.cmo
-	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-clean_old_install::
-	rm -f $(BINDIR)/why3contraption$(EXE)
-
-install_no_local::
-	cp -f bin/why3contraption.@OCAMLBEST@ $(BINDIR)/why3contraption$(EXE)
-
-install_local:: bin/why3 bin/why3contraption
-
-ifneq "$(MAKECMDGOALS)" "clean"
-include src/tools/why3contraption.dep
-endif
-
-depend: src/tools/why3contraption.dep
-
-clean::
-	rm -f src/tools/why3contraption.cm[iox] src/tools/why3contraption.annot src/tools/why3contraption.o src/tools/why3contraption.dep
-	rm -f bin/why3contraption.byte bin/why3contraption.opt bin/why3contraption
-
 ###############
 # Why3 commands
 ###############
