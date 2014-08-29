@@ -949,7 +949,7 @@ endif
 
 install_local:: $(COQVO) drivers/coq-realizations.aux
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 ifneq "$(MAKECMDGOALS:update-coq%=update-coq)" "update-coq"
 include $(COQVD)
 endif
@@ -957,8 +957,10 @@ endif
 
 depend: $(COQVD)
 
-clean::
+clean-coq:
 	rm -f $(COQVO) $(COQVD) $(addsuffix .glob, $(COQLIBS_FILES))
+
+clean:: clean-coq
 
 update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp
 
