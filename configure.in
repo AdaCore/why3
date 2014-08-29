@@ -72,7 +72,7 @@ AC_ARG_ENABLE(zarith,
     enable_zarith=yes)
 
 
-# Ocamlzip
+# camlzip
 
 AC_ARG_ENABLE(zip,
     AS_HELP_STRING([--enable-zip], [use LZ compression to store session files]),,
@@ -373,19 +373,19 @@ fi
 
 
 
-# checking for Ocamlzip
+# checking for camlzip
 if test "$enable_zip" = yes; then
    if test "$USEOCAMLFIND" = yes; then
       ZIPINCLUDE=$(ocamlfind query zip)
    fi
    if test -n "$ZIPINCLUDE"; then
-      echo "ocamlfind found ocamlzip in $ZIPINCLUDE"
+      echo "ocamlfind found camlzip in $ZIPINCLUDE"
       ZIPINCLUDE="-I $ZIPINCLUDE"
    else
       AC_CHECK_FILE($OCAMLLIB/zip/zip.cma,,enable_zip=no)
       if test "$enable_zip" = no; then
-         AC_MSG_WARN([Lib Ocamlzip not found, sessions files will not be compressed.])
-         reason_zip=" (ocamlzip not found)"
+         AC_MSG_WARN([Lib camlzip not found, sessions files will not be compressed.])
+         reason_zip=" (camlzip not found)"
       else
          ZIPINCLUDE="-I +zip"
       fi
