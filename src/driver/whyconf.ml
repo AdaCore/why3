@@ -140,21 +140,19 @@ type config_strategy = {
 (* a default set of strategies *)
 let default_strategies =
   List.map
-    (fun (name,desc,shortcut,instrs) ->
+    (fun (name,desc,shortcut,code) ->
       let s = ref Rc.empty_section in
       s := Rc.set_string !s "name" name;
       s := Rc.set_string !s "desc" desc;
       s := Rc.set_string !s "shortcut" shortcut;
-      for i = 0 to Array.length instrs - 1 do
-        s := Rc.set_string !s ("l" ^ (string_of_int i)) instrs.(i);
-      done;
+      s := Rc.set_string !s "code" code;
       !s)
     [ "Split", "Split@ conjunctions@ in@ goal", "s",
-      [|"t split_goal_wp 1"|];
+      "t split_goal_wp exit";
       "Inline", "Inline@ function@ symbols@ once", "i",
-      [|"t inline_goal 1"|];
+      "t inline_goal exit";
       "Compute", "Compute@ in@ goal", "c",
-      [|"t compute_in_goal 1"|];
+      "t compute_in_goal exit";
     ]
 
 let get_strategies ?(default=[]) rc =

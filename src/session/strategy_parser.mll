@@ -89,7 +89,7 @@
 
   let integer msg s =
     try int_of_string s
-    with Failure _ -> error "unabel to parse %s argument '%s'" msg s
+    with Failure _ -> error "unable to parse %s argument '%s'" msg s
 
   let transform code t =
     try
