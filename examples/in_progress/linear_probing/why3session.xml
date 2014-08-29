@@ -2,255 +2,244 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="6" memlimit="1000"/>
-<prover id="1" name="Z3" version="2.19" timelimit="6" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.2" timelimit="6" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.2" timelimit="6" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.94" timelimit="6" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="6" memlimit="1000"/>
+<prover id="3" name="Z3" version="2.19" timelimit="6" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.4" timelimit="10" memlimit="4000"/>
+<prover id="5" name="CVC4" version="1.1" timelimit="6" memlimit="1000"/>
+<prover id="6" name="CVC3" version="2.2" timelimit="6" memlimit="1000"/>
+<prover id="7" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <file name="../linear_probing.mlw" expanded="true">
-<theory name="HashedTypeWithDummy">
+<theory name="HashedTypeWithDummy" sum="99ef21e84daaa1b6e5e06500f9690e8b">
  <goal name="WP_parameter neq" expl="VC for neq" sum="9d6350826f2f01c86f97a2d808902bde">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="8"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="LinearProbing" expanded="true">
+<theory name="LinearProbing" sum="445ce72f0659e4b4e21a1a1d3c99cdc3" expanded="true">
  <goal name="bucket_bounds" sum="1d95dcf7d492d33ce5aad64970a49164">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="8"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter numof_eq" expl="VC for numof_eq" sum="d958b1347ac292d859fbc83e3099e33a">
- <proof prover="3"><result status="valid" time="0.16"/></proof>
+ <proof prover="7"><result status="valid" time="0.16"/></proof>
  </goal>
  <goal name="WP_parameter dummy_const" expl="VC for dummy_const" sum="5174af9fbdcac004be42cbd33c0bdaaf">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="7"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter create" expl="VC for create" sum="ee4e0f871978a4f8e5520578a346ad3a">
+ <goal name="WP_parameter create" expl="VC for create" sum="3ef84371a465df52766d309128b35592">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter create.1" expl="1. array creation size" sum="ed159d083420cbcd5b0193ef70f2efa6">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter create.1" expl="1. array creation size" sum="ca45b08088925f73eca119305eec8cc7">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter create.2" expl="2. type invariant" sum="5b0861e53b6536c38a769b1839a97f8e">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter create.2" expl="2. type invariant" sum="bce69194d628b8af67609abed2582901">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter create.3" expl="3. type invariant" sum="21d8241fa6cda724c2586e7a5780b0bd">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter create.3" expl="3. type invariant" sum="aeb281f68477e7df653dd1f3cd7f98d0">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter create.4" expl="4. type invariant" sum="2991d0270ae3f7863204ab9e4a69e223">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter create.4" expl="4. type invariant" sum="fe7d73719316c3107328a190230d9c92">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter create.5" expl="5. type invariant" sum="14e480e68b6f699c760593c94a71ad08">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter create.6" expl="6. type invariant" sum="bef57513f473766366c193049be6b06c">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter create.7" expl="7. postcondition" sum="a71cbcea8ce05d7c3070784becdd507c">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter create.5" expl="5. postcondition" sum="87b37d3ee323e8b6b74926099352f10a">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter clear" expl="VC for clear" sum="2ad38e005a6e54cd810557e828158a93">
+ <goal name="WP_parameter clear" expl="VC for clear" sum="5531acd4fdc29dc5fd8e9a3dc26271d3">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter clear.1" expl="1. precondition" sum="54a7ed1756e5835a789c34ab4af77c45">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter clear.1" expl="1. precondition" sum="fef108b6a5b8e808afc421edcde3dd29">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter clear.2" expl="2. type invariant" sum="7a6a5d4fb395f0f49e583aaac145ca24">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter clear.2" expl="2. type invariant" sum="04db96bebccda074164a294be056036f">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter clear.3" expl="3. type invariant" sum="02e3e1daf1cb7b920600740cc30fc545">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter clear.3" expl="3. type invariant" sum="3a3728e8e6908b106d9f18d192deb44b">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter clear.4" expl="4. type invariant" sum="d25e2a2539e69df9d4fd4825437571f9">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter clear.4" expl="4. type invariant" sum="50347c671de8ba97d09b9a3baabb8ec3">
+  <proof prover="2"><result status="valid" time="0.59"/></proof>
   </goal>
-  <goal name="WP_parameter clear.5" expl="5. type invariant" sum="d907027e864d40315eb30b6dc21a711c">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter clear.5" expl="5. type invariant" sum="f5ea891fbb77b5595f9197699fef11ca">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter clear.6" expl="6. type invariant" sum="deb7bcb317b8792b07ff2699d05a085e">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter clear.6" expl="6. postcondition" sum="8eca4d813a5ebf77d7b58a99703b1460">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter clear.7" expl="7. type invariant" sum="451bb5102116b70ec0f029cb8b8e5a8e">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter clear.8" expl="8. postcondition" sum="ec79ba2e0b049668a417cca35b9474b9">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter clear.9" expl="9. postcondition" sum="fe378c1c731bf68408c146a8f37b74f3">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter clear.7" expl="7. postcondition" sum="403ca55ed8a2a137bbb68f84918de238">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter find" expl="VC for find" sum="f70660dce240484461dd4030c7c400e4">
+ <goal name="WP_parameter find" expl="VC for find" sum="4868c8374b28d09d0a4216c761cb0f8b">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter find.1" expl="1. index in array bounds" sum="a867e7fc1cfdd65b5b88dba8f8524e03">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter find.1" expl="1. index in array bounds" sum="fcf7216ae1ea6946d5b31dd74226a979">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter find.2" expl="2. postcondition" sum="d712eced158b6929036d365fd8c694bf">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter find.2" expl="2. postcondition" sum="b8046f0fcb4b58f051b9ab2294859090">
+  <proof prover="8"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.3" expl="3. postcondition" sum="294126b486984b56eac6f20c876320a0">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.3" expl="3. postcondition" sum="a40622471974d6c7974471942a7aa42b">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.4" expl="4. postcondition" sum="75c15bcefc0747bef9b9b610b9982aac">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.4" expl="4. postcondition" sum="614a6e14f779bb88bbdac7ad74e36718">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.5" expl="5. index in array bounds" sum="53b59f39990793bbe871048ce1901b84">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter find.5" expl="5. index in array bounds" sum="7374298f8c6530660005415828691296">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.6" expl="6. postcondition" sum="8f3df8d62533dbce84c5372074347b24">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter find.6" expl="6. postcondition" sum="8bc31ea4dde7ec684be800291583a24c">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.7" expl="7. postcondition" sum="1d40bd3b14bc9c3ae07bb9b3f54a3725">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter find.7" expl="7. postcondition" sum="b56ae3bb11987f349d905e42f1d3fca6">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter find.8" expl="8. postcondition" sum="35a69aaf813ae4effde335b1b727cc8f">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.8" expl="8. postcondition" sum="107ad2e225f159d19d91d05241478042">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.9" expl="9. variant decrease" sum="0c25d40f4f312e52b5ea5e9719177266">
+  <goal name="WP_parameter find.9" expl="9. variant decrease" sum="1b7573e5e5b0537d2f5bbd60223081c9">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter find.9.1" expl="1." sum="92e24a4924d3dcb05db2a4722f663307">
-   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   <goal name="WP_parameter find.9.1" expl="1." sum="7b25a0e17421b77572db2e9f2d48aace">
+   <proof prover="8"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter find.9.2" expl="2." sum="c4135fd79318d8fda28b2eb2a4699aff">
-   <proof prover="3"><result status="valid" time="0.09"/></proof>
+   <goal name="WP_parameter find.9.2" expl="2." sum="8c9bbbab3735a15220e82728d8dc430b">
+   <proof prover="7"><result status="valid" time="0.09"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find.10" expl="10. precondition" sum="5840e8f7fe846c41d5f664729e933f42">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.10" expl="10. precondition" sum="d1f15a0ad564206b7f469f3a9747c8c8">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.11" expl="11. precondition" sum="9719366a2403d1844e0b16b66b4a3924">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter find.11" expl="11. precondition" sum="7ecd2e9a4d3dcd8865890f2d56414cc6">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter find.12" expl="12. precondition" sum="85327a48decb55c748707959eca7aeda">
-  <proof prover="4"><result status="valid" time="2.29"/></proof>
+  <goal name="WP_parameter find.12" expl="12. precondition" sum="6bc2bc3897437fb354c1e6b10cd567b0">
+  <proof prover="8"><result status="valid" time="2.29"/></proof>
   </goal>
-  <goal name="WP_parameter find.13" expl="13. precondition" sum="183620cafc0a497a5cf22c3dab8b772e">
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <goal name="WP_parameter find.13" expl="13. precondition" sum="0544d3667b470ca94ff875f416bad538">
+  <proof prover="7"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter find.14" expl="14. postcondition" sum="d77d7223e37b09e4c9deea6a7aba5084">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter find.14" expl="14. postcondition" sum="f70dd921c79ce6b0d8af61726259fbf4">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.15" expl="15. postcondition" sum="52636cc4a484c141c2b3b5db15658ba3">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter find.15" expl="15. postcondition" sum="945db06caac581c4221d13da2468e54b">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter find.16" expl="16. postcondition" sum="3b5223343825c7500a39b4e38a31bfe8">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.16" expl="16. postcondition" sum="b8b323f36eaa132a0e0282683d332cd6">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.17" expl="17. precondition" sum="1ad85bfe0c7ae4bb209753ab6354031d">
-  <proof prover="4"><result status="valid" time="0.17"/></proof>
+  <goal name="WP_parameter find.17" expl="17. precondition" sum="b4092fbe3072f15e476ef50cc5191307">
+  <proof prover="8"><result status="valid" time="0.17"/></proof>
   </goal>
-  <goal name="WP_parameter find.18" expl="18. precondition" sum="45baae2f6b925beb7ede5145d5bc4a49">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.18" expl="18. precondition" sum="7f081de7d36f6961b307f8042a48bc43">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.19" expl="19. precondition" sum="6424c689a368ef1f4209b15acdc59210">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.19" expl="19. precondition" sum="4bc78b6d76ae5297c7ef2c1bb13aad78">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.20" expl="20. precondition" sum="aded3deb5740a8a4eb45f597d1b6461f">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter find.20" expl="20. precondition" sum="a5f7a22ebee2096e1fcd64c5b0bea4a2">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.21" expl="21. postcondition" sum="23262a77036e995dc3303a93144b91be">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter find.21" expl="21. postcondition" sum="2fe3ecd08265b1bed99c6bff8279be05">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter find.22" expl="22. postcondition" sum="6c6c6453b2bd6e9972c5f5d280f4f046">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter find.22" expl="22. postcondition" sum="7cd3926135a42e9eaea328681689caf2">
+  <proof prover="8"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.23" expl="23. postcondition" sum="e8e358692982a53c4bd29a94c811a0a7">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter mem" expl="VC for mem" sum="b4faf186e169b99e77c71b529cd3bbbf">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter mem.1" expl="1. precondition" sum="e81b76edaeb94e952209e065d321cc52">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter mem.2" expl="2. precondition" sum="cf6e9cc1309c7d32a4790bd9c6e3c50e">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter mem.3" expl="3. index in array bounds" sum="3101dbf5148b96ec862a4752e40ddd4b">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter mem.4" expl="4. postcondition" sum="5190dad98679cc54cfe9fd28be294ae3">
-  <proof prover="2"><result status="valid" time="0.34"/></proof>
+  <goal name="WP_parameter find.23" expl="23. postcondition" sum="7309f1ea54c276f0afda06fa55bb8d20">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter resize" expl="VC for resize" sum="bcc600751a219fe3587208bbbb9b4b5b">
+ <goal name="WP_parameter mem" expl="VC for mem" sum="8f6e8e2a356565700c4a482137d1b253">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter resize.1" expl="1. array creation size" sum="5fa251d773d97478dd76ad251fdc818b">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter mem.1" expl="1. precondition" sum="951cc8104a6419b208e2f6a703deb114">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter resize.2" expl="2. type invariant" sum="74880d51fdfbe625792dce14b58b4b64">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter mem.2" expl="2. precondition" sum="94708b2d45c1bd812ad038f28262fe55">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter resize.3" expl="3. type invariant" sum="0ddfad26c5b4d8bad9995a1ec99c15bb">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter mem.3" expl="3. index in array bounds" sum="2dcd466db5b4e417616fd134a17c3cf0">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter resize.4" expl="4. type invariant" sum="f60232933913757862df4ed0783926b8">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter mem.4" expl="4. postcondition" sum="f9b9b4603637eed8a72f9432a6bc08c3">
+  <proof prover="6"><result status="valid" time="0.81"/></proof>
   </goal>
-  <goal name="WP_parameter resize.5" expl="5. type invariant" sum="3bb05703e6c8f05605fd8d64f76d69b6">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+ </transf>
+ </goal>
+ <goal name="WP_parameter resize" expl="VC for resize" sum="046fdc43b083fbe6709b66df7f5cf180">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter resize.1" expl="1. array creation size" sum="cc533c94cc88991dca8c413f9b080ed2">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter resize.6" expl="6. type invariant" sum="7f9a4d6273c4128ddf08939355fd86d5">
+  <goal name="WP_parameter resize.2" expl="2. type invariant" sum="a2ab85928f0d6e049ff2b4fcf5ae0193">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.3" expl="3. type invariant" sum="973366a4cad0e4b9dbf1fefabc19f8e7">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.4" expl="4. type invariant" sum="d313c97bb0bb05a6c8a633b4ed48fd85">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.5" expl="5. type invariant" sum="953473eb03a01ecb06db434cb1b3d42b">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.6" expl="6. postcondition" sum="276562979978a03879761f7f6dfe0d34">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.7" expl="7. loop invariant init" sum="07470b7527ec0fc389c2d0642f48acd4">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.78"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.8" expl="8. loop invariant init" sum="1999f63f3cd4e1d9b6a5a48dc95b8a08">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter resize.9" expl="9. loop invariant init" sum="642dafb9df250498b4af7aade57ba01a">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter resize.6.1" expl="1. type invariant" sum="d58bace0e2890841bee4e0bbb05425d2">
-   <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter resize.9.1" expl="1. loop invariant init" sum="53d4281dde0590c54e7e00b8ee282ea2">
+   <proof prover="8"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter resize.6.2" expl="2. type invariant" sum="5bb62e6ac7ec8893335e287735c04661">
-   <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter resize.9.2" expl="2. loop invariant init" sum="170ae248edc518fd57a7fef18122a9d1">
+   <proof prover="8"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter resize.6.3" expl="3. type invariant" sum="10b89dba28139b73660d317744c2cc8a">
-   <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter resize.9.3" expl="3. loop invariant init" sum="cb050342c1591e44bd6f759c610f0217">
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter resize.6.4" expl="4. type invariant" sum="cff6e4bcb2336803cd8808f64204c182">
-   <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter resize.9.4" expl="4. loop invariant init" sum="05072f1a57672b4304687871bc6b028a">
+   <proof prover="8"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter resize.6.5" expl="5. type invariant" sum="8b44ef891cd73cb99cfe1acaad7be34c">
-   <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter resize.9.5" expl="5. loop invariant init" sum="1cf6a424e1aa994f5f32f5167ec22f74">
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter resize.9.6" expl="6. loop invariant init" sum="d6cbb0b557fab039bc2c8d429302a3b7">
+   <proof prover="8"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter resize.7" expl="7. type invariant" sum="b0a050fd1280dee6e93f97b2f6df8b34">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter resize.10" expl="10. index in array bounds" sum="c1cb34e3cbf45400a5d5d20fd942b7c9">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter resize.8" expl="8. postcondition" sum="e56bc2316566b2bc636673eb24e11b70">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter resize.11" expl="11. type invariant" sum="a7f0bb3a2c2d160fc9b3b21b3f03738e">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter resize.9" expl="9. loop invariant init" sum="2541b2093573fde0919a61151db4f1c2">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.78"/></proof>
+  <goal name="WP_parameter resize.12" expl="12. precondition" sum="aca417cd3380152cc0e95c48c7a11c0f">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter resize.10" expl="10. loop invariant init" sum="3fccb507d9a80d2066b55966c9f4606c">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter resize.13" expl="13. precondition" sum="b95875e4c0094414343bc964017d54e0">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter resize.11" expl="11. loop invariant init" sum="71013fc3aafe35ad3401adb7e1c4b4b4">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter resize.14" expl="14. assertion" sum="7f6437494756b4555b413109e099e867">
+  <proof prover="7"><result status="valid" time="0.27"/></proof>
   </goal>
-  <goal name="WP_parameter resize.12" expl="12. index in array bounds" sum="a36c2656a67e8e1415feb317d6efd34c">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter resize.15" expl="15. index in array bounds" sum="9f3eb80fb069202bce0135afaf21aa29">
+  <proof prover="8" timelimit="20"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter resize.13" expl="13. type invariant" sum="d3024d0c1e167a941f007876546626ce">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter resize.16" expl="16. assertion" sum="18b3b8bee2e367f31dbae57d15f8788f">
+  <proof prover="7"><result status="valid" time="0.24"/></proof>
   </goal>
-  <goal name="WP_parameter resize.14" expl="14. precondition" sum="eb7e9e1704ac0a9054634ce6b2e96cdc">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter resize.15" expl="15. precondition" sum="7e7f495bfccfe14d0e508dbb75a5e8c2">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter resize.16" expl="16. assertion" sum="967a534ab68ada59313684d95deb0c75">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter resize.17" expl="17. index in array bounds" sum="4cd3e87fe867b58db7921992b3cc4069">
-  <proof prover="4" timelimit="20"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter resize.18" expl="18. assertion" sum="4e9b7a1a05933a627f977c00a2d38337">
-  <proof prover="3"><result status="valid" time="0.24"/></proof>
-  </goal>
-  <goal name="WP_parameter resize.19" expl="19. loop invariant preservation" sum="ce0ac0804520e9dafd855befd8dd4221">
-  <proof prover="3" timelimit="20"><result status="valid" time="0.24"/></proof>
+  <goal name="WP_parameter resize.17" expl="17. loop invariant preservation" sum="79685a349b521263316502c87e351a2f">
+  <proof prover="7" timelimit="20"><result status="valid" time="0.24"/></proof>
   <metas>
    <ts_pos name="real" arity="0" id="2"
     ip_theory="BuiltIn">
@@ -267,27 +256,27 @@
     <ip_library name="why3"/>
     <ip_qualid name="unit"/>
    </ts_pos>
-   <ts_pos name="option" arity="1" id="2508"
+   <ts_pos name="option" arity="1" id="2559"
     ip_theory="Option">
     <ip_library name="option"/>
     <ip_qualid name="option"/>
    </ts_pos>
-   <ts_pos name="list" arity="1" id="2512"
+   <ts_pos name="list" arity="1" id="2563"
     ip_theory="List">
     <ip_library name="list"/>
     <ip_qualid name="list"/>
    </ts_pos>
-   <ts_pos name="ref" arity="1" id="4625"
+   <ts_pos name="ref" arity="1" id="4725"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="ref"/>
    </ts_pos>
-   <ts_pos name="param" arity="0" id="5862"
+   <ts_pos name="param" arity="0" id="5962"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="param"/>
    </ts_pos>
-   <ts_pos name="t" arity="0" id="6253"
+   <ts_pos name="t" arity="0" id="6393"
     ip_theory="LinearProbing">
     <ip_qualid name="t"/>
    </ts_pos>
@@ -296,398 +285,398 @@
     <ip_library name="why3"/>
     <ip_qualid name="infix ="/>
    </ls_pos>
-   <ls_pos name="zero" id="353"
+   <ls_pos name="zero" id="380"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="zero"/>
    </ls_pos>
-   <ls_pos name="one" id="354"
+   <ls_pos name="one" id="381"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="one"/>
    </ls_pos>
-   <ls_pos name="infix &lt;" id="355"
+   <ls_pos name="infix &lt;" id="382"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="infix &lt;"/>
    </ls_pos>
-   <ls_pos name="infix +" id="1447"
+   <ls_pos name="infix +" id="1551"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="infix +"/>
    </ls_pos>
-   <ls_pos name="prefix -" id="1448"
+   <ls_pos name="prefix -" id="1552"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="prefix -"/>
    </ls_pos>
-   <ls_pos name="infix *" id="1449"
+   <ls_pos name="infix *" id="1553"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="infix *"/>
    </ls_pos>
-   <ls_pos name="abs" id="1562"
+   <ls_pos name="abs" id="1666"
     ip_theory="Abs">
     <ip_library name="int"/>
     <ip_qualid name="abs"/>
    </ls_pos>
-   <ls_pos name="div" id="1813"
+   <ls_pos name="div" id="1864"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="div"/>
    </ls_pos>
-   <ls_pos name="mod" id="1816"
+   <ls_pos name="mod" id="1867"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="mod"/>
    </ls_pos>
-   <ls_pos name="keym" id="2460"
+   <ls_pos name="keym" id="2511"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="keym"/>
    </ls_pos>
-   <ls_pos name="eq" id="2463"
+   <ls_pos name="eq" id="2514"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="eq"/>
    </ls_pos>
-   <ls_pos name="hash" id="2489"
+   <ls_pos name="hash" id="2540"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="hash"/>
    </ls_pos>
-   <ls_pos name="dummy" id="2498"
+   <ls_pos name="dummy" id="2549"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="dummy"/>
    </ls_pos>
-   <ls_pos name="mem" id="2536"
+   <ls_pos name="mem" id="2587"
     ip_theory="Mem">
     <ip_library name="list"/>
     <ip_qualid name="mem"/>
    </ls_pos>
-   <ls_pos name="get" id="3137"
+   <ls_pos name="get" id="3237"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="get"/>
    </ls_pos>
-   <ls_pos name="set" id="3140"
+   <ls_pos name="set" id="3240"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="set"/>
    </ls_pos>
-   <ls_pos name="mixfix []" id="3147"
+   <ls_pos name="mixfix []" id="3247"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="mixfix []"/>
    </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="3160"
+   <ls_pos name="mixfix [&lt;-]" id="3260"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="mixfix [&lt;-]"/>
    </ls_pos>
-   <ls_pos name="const" id="3191"
+   <ls_pos name="const" id="3291"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="const"/>
    </ls_pos>
-   <ls_pos name="prefix !" id="4631"
+   <ls_pos name="prefix !" id="4731"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="prefix !"/>
    </ls_pos>
-   <ls_pos name="set" id="4798"
+   <ls_pos name="set" id="4898"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="set"/>
    </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="4840"
+   <ls_pos name="mixfix [&lt;-]" id="4940"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="mixfix [&lt;-]"/>
    </ls_pos>
-   <ls_pos name="make" id="4941"
+   <ls_pos name="make" id="5041"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="make"/>
    </ls_pos>
-   <ls_pos name="num_of" id="5874"
+   <ls_pos name="num_of" id="5974"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="num_of"/>
    </ls_pos>
-   <ls_pos name="numofd" id="6232"
+   <ls_pos name="numofd" id="6332"
     ip_theory="LinearProbing">
     <ip_qualid name="numofd"/>
    </ls_pos>
-   <ls_pos name="next" id="6956"
+   <ls_pos name="next" id="7005"
     ip_theory="LinearProbing">
     <ip_qualid name="next"/>
    </ls_pos>
-   <pr_pos name="Assoc" id="1450"
+   <pr_pos name="Assoc" id="1554"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Assoc"/>
    </pr_pos>
-   <pr_pos name="Unit_def_l" id="1457"
+   <pr_pos name="Unit_def_l" id="1561"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Unit_def_l"/>
    </pr_pos>
-   <pr_pos name="Unit_def_r" id="1460"
+   <pr_pos name="Unit_def_r" id="1564"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Unit_def_r"/>
    </pr_pos>
-   <pr_pos name="Inv_def_l" id="1463"
+   <pr_pos name="Inv_def_l" id="1567"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Inv_def_l"/>
    </pr_pos>
-   <pr_pos name="Inv_def_r" id="1466"
+   <pr_pos name="Inv_def_r" id="1570"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Inv_def_r"/>
    </pr_pos>
-   <pr_pos name="Comm" id="1469"
+   <pr_pos name="Comm" id="1573"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CommutativeGroup"/>
     <ip_qualid name="Comm"/>
     <ip_qualid name="Comm"/>
    </pr_pos>
-   <pr_pos name="Assoc" id="1474"
+   <pr_pos name="Assoc" id="1578"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Assoc"/>
     <ip_qualid name="Assoc"/>
    </pr_pos>
-   <pr_pos name="Mul_distr_l" id="1481"
+   <pr_pos name="Mul_distr_l" id="1585"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Mul_distr_l"/>
    </pr_pos>
-   <pr_pos name="Mul_distr_r" id="1488"
+   <pr_pos name="Mul_distr_r" id="1592"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Mul_distr_r"/>
    </pr_pos>
-   <pr_pos name="Comm" id="1506"
+   <pr_pos name="Comm" id="1610"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Comm"/>
     <ip_qualid name="Comm"/>
    </pr_pos>
-   <pr_pos name="Unitary" id="1511"
+   <pr_pos name="Unitary" id="1615"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Unitary"/>
    </pr_pos>
-   <pr_pos name="NonTrivialRing" id="1514"
+   <pr_pos name="NonTrivialRing" id="1618"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="NonTrivialRing"/>
    </pr_pos>
-   <pr_pos name="Refl" id="1526"
+   <pr_pos name="Refl" id="1630"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Refl"/>
    </pr_pos>
-   <pr_pos name="Trans" id="1529"
+   <pr_pos name="Trans" id="1633"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Trans"/>
    </pr_pos>
-   <pr_pos name="Antisymm" id="1536"
+   <pr_pos name="Antisymm" id="1640"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Antisymm"/>
    </pr_pos>
-   <pr_pos name="Total" id="1541"
+   <pr_pos name="Total" id="1645"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="Total"/>
    </pr_pos>
-   <pr_pos name="ZeroLessOne" id="1546"
+   <pr_pos name="ZeroLessOne" id="1650"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="ZeroLessOne"/>
    </pr_pos>
-   <pr_pos name="CompatOrderAdd" id="1547"
+   <pr_pos name="CompatOrderAdd" id="1651"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CompatOrderAdd"/>
    </pr_pos>
-   <pr_pos name="CompatOrderMult" id="1554"
+   <pr_pos name="CompatOrderMult" id="1658"
     ip_theory="Int">
     <ip_library name="int"/>
     <ip_qualid name="CompatOrderMult"/>
    </pr_pos>
-   <pr_pos name="Abs_le" id="1567"
+   <pr_pos name="Abs_le" id="1671"
     ip_theory="Abs">
     <ip_library name="int"/>
     <ip_qualid name="Abs_le"/>
    </pr_pos>
-   <pr_pos name="Abs_pos" id="1572"
+   <pr_pos name="Abs_pos" id="1676"
     ip_theory="Abs">
     <ip_library name="int"/>
     <ip_qualid name="Abs_pos"/>
    </pr_pos>
-   <pr_pos name="Div_mod" id="1819"
+   <pr_pos name="Div_mod" id="1870"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_mod"/>
    </pr_pos>
-   <pr_pos name="Div_bound" id="1824"
+   <pr_pos name="Div_bound" id="1875"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_bound"/>
    </pr_pos>
-   <pr_pos name="Mod_bound" id="1829"
+   <pr_pos name="Mod_bound" id="1880"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_bound"/>
    </pr_pos>
-   <pr_pos name="Div_sign_pos" id="1834"
+   <pr_pos name="Div_sign_pos" id="1885"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_sign_pos"/>
    </pr_pos>
-   <pr_pos name="Div_sign_neg" id="1839"
+   <pr_pos name="Div_sign_neg" id="1890"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_sign_neg"/>
    </pr_pos>
-   <pr_pos name="Mod_sign_pos" id="1844"
+   <pr_pos name="Mod_sign_pos" id="1895"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_sign_pos"/>
    </pr_pos>
-   <pr_pos name="Mod_sign_neg" id="1849"
+   <pr_pos name="Mod_sign_neg" id="1900"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_sign_neg"/>
    </pr_pos>
-   <pr_pos name="Rounds_toward_zero" id="1854"
+   <pr_pos name="Rounds_toward_zero" id="1905"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Rounds_toward_zero"/>
    </pr_pos>
-   <pr_pos name="Div_1" id="1859"
+   <pr_pos name="Div_1" id="1910"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_1"/>
    </pr_pos>
-   <pr_pos name="Mod_1" id="1862"
+   <pr_pos name="Mod_1" id="1913"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_1"/>
    </pr_pos>
-   <pr_pos name="Div_inf" id="1865"
+   <pr_pos name="Div_inf" id="1916"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_inf"/>
    </pr_pos>
-   <pr_pos name="Mod_inf" id="1870"
+   <pr_pos name="Mod_inf" id="1921"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_inf"/>
    </pr_pos>
-   <pr_pos name="Div_mult" id="1875"
+   <pr_pos name="Div_mult" id="1926"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Div_mult"/>
    </pr_pos>
-   <pr_pos name="Mod_mult" id="1882"
+   <pr_pos name="Mod_mult" id="1933"
     ip_theory="ComputerDivision">
     <ip_library name="int"/>
     <ip_qualid name="Mod_mult"/>
    </pr_pos>
-   <pr_pos name="hash_nonneg" id="2490"
+   <pr_pos name="hash_nonneg" id="2541"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="hash_nonneg"/>
    </pr_pos>
-   <pr_pos name="hash_eq" id="2493"
+   <pr_pos name="hash_eq" id="2544"
     ip_theory="LinearProbing">
     <ip_qualid name="HashedTypeWithDummy"/>
     <ip_qualid name="hash_eq"/>
    </pr_pos>
-   <pr_pos name="Select_eq" id="3173"
+   <pr_pos name="Select_eq" id="3273"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Select_eq"/>
    </pr_pos>
-   <pr_pos name="Select_neq" id="3182"
+   <pr_pos name="Select_neq" id="3282"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Select_neq"/>
    </pr_pos>
-   <pr_pos name="Const" id="3193"
+   <pr_pos name="Const" id="3293"
     ip_theory="Map">
     <ip_library name="map"/>
     <ip_qualid name="Const"/>
    </pr_pos>
-   <pr_pos name="bucket_bounds" id="5838"
+   <pr_pos name="bucket_bounds" id="5938"
     ip_theory="LinearProbing">
     <ip_qualid name="bucket_bounds"/>
    </pr_pos>
-   <pr_pos name="Num_of_empty" id="5875"
+   <pr_pos name="Num_of_empty" id="5975"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="Num_of_empty"/>
    </pr_pos>
-   <pr_pos name="Num_of_right_add" id="5885"
+   <pr_pos name="Num_of_right_add" id="5985"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="Num_of_right_add"/>
    </pr_pos>
-   <pr_pos name="Num_of_bounds" id="5890"
+   <pr_pos name="Num_of_bounds" id="5990"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="Num_of_bounds"/>
    </pr_pos>
-   <pr_pos name="Num_of_left_no_add" id="5901"
+   <pr_pos name="Num_of_left_no_add" id="6001"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="Num_of_left_no_add"/>
    </pr_pos>
-   <pr_pos name="Num_of_left_add" id="5906"
+   <pr_pos name="Num_of_left_add" id="6006"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="Num_of_left_add"/>
    </pr_pos>
-   <pr_pos name="Empty" id="5911"
+   <pr_pos name="Empty" id="6011"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="Empty"/>
    </pr_pos>
-   <pr_pos name="Full" id="5917"
+   <pr_pos name="Full" id="6017"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="Full"/>
    </pr_pos>
-   <pr_pos name="num_of_increasing" id="5923"
+   <pr_pos name="num_of_increasing" id="6023"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="num_of_increasing"/>
    </pr_pos>
-   <pr_pos name="num_of_strictly_increasing" id="5929"
+   <pr_pos name="num_of_strictly_increasing" id="6029"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="num_of_strictly_increasing"/>
    </pr_pos>
-   <pr_pos name="num_of_change_some" id="5944"
+   <pr_pos name="num_of_change_some" id="6044"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="num_of_change_some"/>
    </pr_pos>
-   <pr_pos name="numof_eq" id="6122"
+   <pr_pos name="numof_eq" id="6222"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="numof_eq"/>
@@ -696,178 +685,145 @@
     <meta_arg_ls id="10"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="353"/>
+    <meta_arg_ls id="380"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="354"/>
+    <meta_arg_ls id="381"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="355"/>
+    <meta_arg_ls id="382"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1447"/>
+    <meta_arg_ls id="1551"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1448"/>
+    <meta_arg_ls id="1552"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1449"/>
+    <meta_arg_ls id="1553"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1562"/>
+    <meta_arg_ls id="1666"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1813"/>
+    <meta_arg_ls id="1864"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="1816"/>
+    <meta_arg_ls id="1867"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2460"/>
+    <meta_arg_ls id="2511"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2463"/>
+    <meta_arg_ls id="2514"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2489"/>
+    <meta_arg_ls id="2540"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2498"/>
+    <meta_arg_ls id="2549"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="2536"/>
+    <meta_arg_ls id="2587"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3137"/>
+    <meta_arg_ls id="3237"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3140"/>
+    <meta_arg_ls id="3240"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3147"/>
+    <meta_arg_ls id="3247"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3160"/>
+    <meta_arg_ls id="3260"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="3191"/>
+    <meta_arg_ls id="3291"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4631"/>
+    <meta_arg_ls id="4731"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4798"/>
+    <meta_arg_ls id="4898"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4840"/>
+    <meta_arg_ls id="4940"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4941"/>
+    <meta_arg_ls id="5041"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="5874"/>
+    <meta_arg_ls id="5974"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="6232"/>
+    <meta_arg_ls id="6332"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="6956"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1450"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1457"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1460"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1463"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1466"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1469"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1474"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1481"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1488"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1506"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1511"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1514"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1526"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1529"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1536"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1541"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1546"/>
-   </meta>
-   <meta name="remove_prop">
-    <meta_arg_pr id="1547"/>
+    <meta_arg_ls id="7005"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="1554"/>
    </meta>
    <meta name="remove_prop">
+    <meta_arg_pr id="1561"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1564"/>
+   </meta>
+   <meta name="remove_prop">
     <meta_arg_pr id="1567"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1572"/>
+    <meta_arg_pr id="1570"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1819"/>
+    <meta_arg_pr id="1573"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1824"/>
+    <meta_arg_pr id="1578"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1829"/>
+    <meta_arg_pr id="1585"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1834"/>
+    <meta_arg_pr id="1592"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1839"/>
+    <meta_arg_pr id="1610"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1844"/>
+    <meta_arg_pr id="1615"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1849"/>
+    <meta_arg_pr id="1618"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1854"/>
+    <meta_arg_pr id="1630"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1859"/>
+    <meta_arg_pr id="1633"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1862"/>
+    <meta_arg_pr id="1640"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1865"/>
+    <meta_arg_pr id="1645"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1650"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1651"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1658"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1671"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1676"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="1870"/>
@@ -876,58 +832,91 @@
     <meta_arg_pr id="1875"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="1882"/>
+    <meta_arg_pr id="1880"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2490"/>
+    <meta_arg_pr id="1885"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2493"/>
+    <meta_arg_pr id="1890"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3173"/>
+    <meta_arg_pr id="1895"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3182"/>
+    <meta_arg_pr id="1900"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3193"/>
+    <meta_arg_pr id="1905"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5838"/>
+    <meta_arg_pr id="1910"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5875"/>
+    <meta_arg_pr id="1913"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5885"/>
+    <meta_arg_pr id="1916"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5890"/>
+    <meta_arg_pr id="1921"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5901"/>
+    <meta_arg_pr id="1926"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5906"/>
+    <meta_arg_pr id="1933"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5911"/>
+    <meta_arg_pr id="2541"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5917"/>
+    <meta_arg_pr id="2544"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5923"/>
+    <meta_arg_pr id="3273"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5929"/>
+    <meta_arg_pr id="3282"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="5944"/>
+    <meta_arg_pr id="3293"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="6122"/>
+    <meta_arg_pr id="5938"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5975"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5985"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="5990"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="6001"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="6006"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="6011"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="6017"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="6023"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="6029"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="6044"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="6222"/>
    </meta>
    <meta name="remove_type">
     <meta_arg_ts id="2"/>
@@ -939,400 +928,535 @@
     <meta_arg_ts id="21"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2508"/>
+    <meta_arg_ts id="2559"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2512"/>
+    <meta_arg_ts id="2563"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="4625"/>
+    <meta_arg_ts id="4725"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="5862"/>
+    <meta_arg_ts id="5962"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="6253"/>
+    <meta_arg_ts id="6393"/>
    </meta>
-   <goal name="WP_parameter resize.19" expl="19. loop invariant preservation" sum="cf858913eab4fbd62a72b55f792341b9">
+   <goal name="WP_parameter resize.17" expl="17. loop invariant preservation" sum="490b8369dbc17a1d2ade000228e62a44">
    </goal>
   </metas>
   </goal>
-  <goal name="WP_parameter resize.20" expl="20. loop invariant preservation" sum="89b101668c24b88f42c0a111997a5a25">
-  <proof prover="2"><result status="valid" time="0.23"/></proof>
+  <goal name="WP_parameter resize.18" expl="18. loop invariant preservation" sum="674e41a4ce6869f9870b3ced831bbd2c">
+  <proof prover="6"><result status="valid" time="0.23"/></proof>
   </goal>
-  <goal name="WP_parameter resize.21" expl="21. loop invariant preservation" sum="94aa76259fdfb7624fc2d5661ffa916a">
-  <proof prover="2"><result status="valid" time="0.43"/></proof>
+  <goal name="WP_parameter resize.19" expl="19. loop invariant preservation" sum="3eed7f5cdb1ea48d4dad7a43db47c8ec">
+  <proof prover="6"><result status="valid" time="0.94"/></proof>
   </goal>
-  <goal name="WP_parameter resize.22" expl="22. loop invariant preservation" sum="7accc5fc7ad8d75b534b5e8f05b2b6e4">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter resize.20" expl="20. loop invariant preservation" sum="a056adacc8feb5f51c08551dfe52b29d">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter resize.23" expl="23. loop invariant preservation" sum="55f1fc6c6ad05aea389540995a45b951">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter resize.21" expl="21. loop invariant preservation" sum="a2bdd239d451e34b255043c69040b5db">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter resize.24" expl="24. loop invariant preservation" sum="4d8e1d8e0d5a9f336585a6fea526ef47">
+  <goal name="WP_parameter resize.22" expl="22. loop invariant preservation" sum="401700caa6a6f6243dd49d583b43f259">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter resize.24.1" expl="1. loop invariant preservation" sum="42a0f38fb63041473585476867a14089">
-   <proof prover="2"><result status="valid" time="0.10"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter resize.22.1" expl="1. loop invariant preservation" sum="03d69cf844a0505d5fbe0c9581ed2ba3">
+   <proof prover="6"><result status="valid" time="0.24"/></proof>
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter resize.24.2" expl="2. loop invariant preservation" sum="a80705bc00261518b8362570696f1246">
-   <proof prover="2"><result status="valid" time="0.10"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter resize.22.2" expl="2. loop invariant preservation" sum="6dd3f1b97d435b0470b08c76b435dcc9">
+   <proof prover="6"><result status="valid" time="0.23"/></proof>
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter resize.24.3" expl="3. loop invariant preservation" sum="4ada8afbbf33a63237c31f6f1a5d3a27">
-   <proof prover="2"><result status="valid" time="0.11"/></proof>
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter resize.22.3" expl="3. loop invariant preservation" sum="51980f02aab9285ef1465f6fd6ce0d91">
+   <proof prover="6"><result status="valid" time="0.29"/></proof>
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter resize.24.4" expl="4. loop invariant preservation" sum="544830e1526c9247c5b1f63bad87a584">
-   <proof prover="2"><result status="valid" time="0.15"/></proof>
-   <proof prover="3"><result status="valid" time="0.16"/></proof>
+   <goal name="WP_parameter resize.22.4" expl="4. loop invariant preservation" sum="643b2a75b48d0aaef0647914b7608565">
+   <proof prover="6"><result status="valid" time="0.15"/></proof>
+   <proof prover="7"><result status="valid" time="0.16"/></proof>
    </goal>
-   <goal name="WP_parameter resize.24.5" expl="5. loop invariant preservation" sum="4869813da5c3a8d85370c3941fab7424">
-   <proof prover="2"><result status="valid" time="0.15"/></proof>
-   <proof prover="3"><result status="valid" time="0.15"/></proof>
+   <goal name="WP_parameter resize.22.5" expl="5. loop invariant preservation" sum="2fad223d9ab363d598bfb58ca20848f9">
+   <proof prover="6"><result status="valid" time="0.15"/></proof>
+   <proof prover="7"><result status="valid" time="0.35"/></proof>
    </goal>
-   <goal name="WP_parameter resize.24.6" expl="6. loop invariant preservation" sum="9ecea39899ec86ae150852bb5c6875e7">
-   <proof prover="2"><result status="valid" time="0.04"/></proof>
-   <proof prover="3"><result status="valid" time="0.06"/></proof>
+   <goal name="WP_parameter resize.22.6" expl="6. loop invariant preservation" sum="d8ed13f8913969e558f33ddadcd4ed2f">
+   <proof prover="6"><result status="valid" time="0.04"/></proof>
+   <proof prover="7"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter resize.25" expl="25. type invariant" sum="d33a764206d0738744723381dc2d0779">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter resize.23" expl="23. type invariant" sum="e57bb81500188e9485e3d5feb18d2e4d">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter resize.26" expl="26. type invariant" sum="598e3428db065035238b542a76634cc8">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter resize.24" expl="24. type invariant" sum="93dea93610e763df8fc163c688a76db5">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter resize.27" expl="27. type invariant" sum="f46d191f57a9705cc1cc8839964fe16c">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter resize.25" expl="25. type invariant" sum="8f68ceec580828605b93e44a7250164c">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter resize.25.1" expl="1. type invariant" sum="8f68ceec580828605b93e44a7250164c">
+   <proof prover="7"><result status="valid" time="0.11"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter resize.28" expl="28. type invariant" sum="5678bb824626888b95a1f2998378e1b8">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter resize.26" expl="26. type invariant" sum="18a7379ff07e46653c1a7ab4e70f2c4e">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter resize.29" expl="29. type invariant" sum="e85d231ee7160a35656bca1dc304c902">
-  <proof prover="4"><result status="valid" time="2.55"/></proof>
-  </goal>
-  <goal name="WP_parameter resize.30" expl="30. type invariant" sum="da49539438f9cb6632d2e7f44eb6c1a6">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter resize.31" expl="31. postcondition" sum="e04e05b7dce39420dab264caf2457fff">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter resize.27" expl="27. postcondition" sum="47ecc4f9bd3be24edffccbf426dd3360">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter add" expl="VC for add" sum="07ce8c5a6a83cdebee129bdd60e84a44">
+ <goal name="WP_parameter add" expl="VC for add" sum="c3ceeeca6d5af4a27eba6dda1e3d3ac3">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter add.1" expl="1." sum="8cb387a51fcdb82cd422e5ea5c14e9ae">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter add.1" expl="1." sum="2223f4e1ee2168539ac9d684b4078fe3">
+  <proof prover="8"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter add.2" expl="2." sum="78622bef470c6cd97c0fc0c40ce5860e">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter add.2" expl="2." sum="164053702b35b02f49e00c293eef0c60">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add.3" expl="3. precondition" sum="f8979673c9dfd7d6ed1a50e1aac95ac1">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter add.3" expl="3. precondition" sum="1629ab397bbc056243dc4a80a458aba5">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter add.4" expl="4. precondition" sum="2cc2f8968deef2eee2686858f1cc0c4a">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter add.4" expl="4. precondition" sum="2dcd95a7b119d01593ec8b353c6f25f0">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add.5" expl="5. index in array bounds" sum="726840a8dcd295f9ee6c982c0bd7680c">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter add.5" expl="5. index in array bounds" sum="e5ee2f9730f268c4578c9013407143a3">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add.6" expl="6. index in array bounds" sum="8dc1dac5a525b949b91ae3d96f117c80">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter add.6" expl="6. index in array bounds" sum="a593b068230ea8446dbd53e0be6f132c">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add.7" expl="7. assertion" sum="117ee2d9b469ce2f15f9e46b1a57263e">
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <goal name="WP_parameter add.7" expl="7. assertion" sum="f5426bf7477a9b9181ddf9d5b5fa3af8">
+  <proof prover="7"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter add.8" expl="8. type invariant" sum="2934b86470483e2d88afe17d4ef35f1c">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter add.8" expl="8. type invariant" sum="8282906c8b353dca8475ab79cbd9db00">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add.9" expl="9. type invariant" sum="2432f92e356cbb8b660484a9097e94e8">
-  <proof prover="3"><result status="valid" time="0.37"/></proof>
+  <goal name="WP_parameter add.9" expl="9. type invariant" sum="4a9b776953b30c2038b1d096731694b0">
+  <proof prover="7"><result status="valid" time="1.10"/></proof>
   </goal>
-  <goal name="WP_parameter add.10" expl="10. type invariant" sum="dc24755bf1771e430b3630bfd31e186a">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter add.10" expl="10. type invariant" sum="7f34788baa299a0d5e44913163fb2b97">
+  <transf name="inline_goal">
+   <goal name="WP_parameter add.10.1" expl="1. type invariant" sum="b5de8e87351b0a0a5af0336ebd24e63c">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter add.10.1.1" expl="1." sum="be8175aadb95aebd151d7954aa0f798b">
+    <proof prover="8" timelimit="1"><result status="valid" time="0.04"/></proof>
+    </goal>
+    <goal name="WP_parameter add.10.1.2" expl="2." sum="aa9dc158ddf21a80668da659b75b83e0">
+    <proof prover="4"><result status="valid" time="4.96"/></proof>
+    <proof prover="7"><result status="valid" time="1.67"/></proof>
+    </goal>
+    <goal name="WP_parameter add.10.1.3" expl="3." sum="dec14bfda23b9c8943949d97ce5cbf53">
+    <proof prover="7"><result status="valid" time="0.91"/></proof>
+    </goal>
+    <goal name="WP_parameter add.10.1.4" expl="4." sum="4ff624bbfa6ec745f77a4e085666d7ea">
+    <proof prover="7"><result status="valid" time="0.37"/></proof>
+    </goal>
+    <goal name="WP_parameter add.10.1.5" expl="5." sum="2df057e812a51e271dae5d0afb09c1cf">
+    <proof prover="7"><result status="valid" time="0.37"/></proof>
+    </goal>
+    <goal name="WP_parameter add.10.1.6" expl="6." sum="e5800c93d2309bc6672b0eeefd5d6ee9">
+    <proof prover="7"><result status="valid" time="0.59"/></proof>
+    </goal>
+    <goal name="WP_parameter add.10.1.7" expl="7." sum="63c0aed272c078cb039ebb60e1eaea7c">
+    <proof prover="4"><result status="valid" time="6.36"/></proof>
+    </goal>
+    <goal name="WP_parameter add.10.1.8" expl="8." sum="492031756c519a7ba59c92fd9e945abe">
+    <proof prover="7"><result status="valid" time="1.98"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter add.11" expl="11. type invariant" sum="9e9fe90d08d03538944185519145cd39">
-  <proof prover="3"><result status="valid" time="0.45"/></proof>
+  <goal name="WP_parameter add.11" expl="11. type invariant" sum="b0e6f162d5dc1f296272041ee7091e45">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add.12" expl="12. type invariant" sum="d99f595df97dd6963b864d7b102080f4">
-  <proof prover="3"><result status="valid" time="1.27"/></proof>
+  <goal name="WP_parameter add.12" expl="12. postcondition" sum="81999d7cc5332ef8dcde0774b41321ea">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter add.13" expl="13. type invariant" sum="3842127f29ef70a65469439bbd83148e">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter add.13" expl="13. type invariant" sum="b0403c1efc2a69e5092d85b39703b6cf">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add.14" expl="14. postcondition" sum="3371d8f2b5fe4a948089f308d0dc838e">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter add.14" expl="14. type invariant" sum="31dcd0b46ecf1d73d49ffdb93b76fc07">
+  <proof prover="7"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter add.15" expl="15. type invariant" sum="37278cfb29d03782ed8989d5e51112f0">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter add.15" expl="15. type invariant" sum="bc48cf4e8ddfd929b181de9cb5a36ac4">
+  <proof prover="7"><result status="valid" time="1.04"/></proof>
   </goal>
-  <goal name="WP_parameter add.16" expl="16. type invariant" sum="be5093358f485f698695797ba0065b53">
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
-  </goal>
-  <goal name="WP_parameter add.17" expl="17. type invariant" sum="02db9adbb94579bd5437076e5c98af8f">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter add.18" expl="18. type invariant" sum="28c43b9b4ca3ddf2e36476071ecc3440">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
-  </goal>
-  <goal name="WP_parameter add.19" expl="19. type invariant" sum="227c8dce915c25d72a8648f17859a1f5">
-  <proof prover="3"><result status="valid" time="0.11"/></proof>
-  </goal>
-  <goal name="WP_parameter add.20" expl="20. postcondition" sum="de3734ef33a7394e9fd96e96adf702e5">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter add.16" expl="16. postcondition" sum="adc82be647a43132548d8a78e1aa9d37">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter copy" expl="VC for copy" sum="128e0e8f78d0e5a40be16ac30bec643f">
+ <goal name="WP_parameter copy" expl="VC for copy" sum="1358f7fc70c9d2ce54bbfd4f37a92a8e">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter copy.1" expl="1. type invariant" sum="0bcd3bc7090eb9ce97152d99a64925b4">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter copy.1" expl="1. type invariant" sum="af4f395fbb312293c1440371d0b61dfe">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter copy.2" expl="2. type invariant" sum="1b4ef172fa4954ff100fa27fad56261a">
-  <proof prover="3"><result status="valid" time="0.55"/></proof>
+  <goal name="WP_parameter copy.2" expl="2. type invariant" sum="98ab62cd9ef98aef282d511e35254864">
+  <proof prover="7"><result status="valid" time="1.35"/></proof>
   </goal>
-  <goal name="WP_parameter copy.3" expl="3. type invariant" sum="bdef91de5fc582625f6cb600c0a73534">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter copy.4" expl="4. type invariant" sum="e701e501e26518e11de143b6a48e35b9">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter copy.5" expl="5. type invariant" sum="93343e8f3ef0af20d3e3b710ffde7851">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter copy.3" expl="3. type invariant" sum="a17b89b2c403bd4450ba4aa013cf9d7a">
+  <proof prover="7"><result status="valid" time="0.78"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter delete" expl="VC for delete" sum="9f7d50153d92e6f9fdbe6f1e63b08b8f" expanded="true">
+ <goal name="WP_parameter delete" expl="VC for delete" sum="5e23af559e5dea284654dd6a0af27de4" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter delete.1" expl="1. index in array bounds" sum="31acda4c8d8f5613737c647b7d450e5c">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter delete.1" expl="1. index in array bounds" sum="9e3922d6ce0f141f7b11eeb851f735eb">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.2" expl="2. variant decrease" sum="dd344526fe2e67dd01f942265e4bd238" expanded="true">
-  <proof prover="1" obsolete="true"><result status="timeout" time="5.98"/></proof>
-  <proof prover="2" obsolete="true"><result status="timeout" time="6.02"/></proof>
-  <proof prover="3"><result status="timeout" time="5.98"/></proof>
-  <proof prover="4"><result status="timeout" time="6.03"/></proof>
+  <goal name="WP_parameter delete.2" expl="2. variant decrease" sum="ec2896c3c9ebc39eb031d4b598d237df">
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.96"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="6.06"/></proof>
+  <proof prover="4" timelimit="1" memlimit="1000" obsolete="true"><result status="timeout" time="0.99"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.78"/></proof>
+  <proof prover="7" obsolete="true"><result status="timeout" time="6.02"/></proof>
+  <proof prover="8" timelimit="1" obsolete="true"><result status="timeout" time="0.99"/></proof>
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter delete.2.1" expl="1." sum="0c13ef6ab5f38e10a19573b76718c0c1">
+   <proof prover="8" timelimit="1"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.2.2" expl="2." sum="65b6e5aea6b348a54f4758bb03555243">
+   <proof prover="4" obsolete="true"><result status="timeout" time="9.99"/></proof>
+   <proof prover="7"><undone/></proof>
+   <proof prover="8"><result status="timeout" time="5.92"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter delete.3" expl="3. precondition" sum="d9b061e56b02810adea520974d0b9fd1">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter delete.3" expl="3. precondition" sum="32aa0b547f111f3e98fc728b87420f76">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.4" expl="4. precondition" sum="aa2e29b29f43b9c3191df47d7ca8c9c0">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter delete.4" expl="4. precondition" sum="eb37b790987d7a47b0e29f77de2aa945">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter delete.5" expl="5. precondition" sum="86e4a83ddd6924ceca4d16d1399129a8">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter delete.5" expl="5. precondition" sum="d9fcda6b2e297dea84bd0563682a1d47">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.6" expl="6. precondition" sum="af9d50683939fb254216da56b6778bd6">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter delete.6" expl="6. precondition" sum="fb85d8aaa53b0b05c23247e0e5ea89a5">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter delete.7" expl="7. precondition" sum="bea31623434c73b93bf720e44c7b79f5" expanded="true">
-  <proof prover="1" obsolete="true"><result status="timeout" time="5.98"/></proof>
-  <proof prover="2" obsolete="true"><result status="timeout" time="5.92"/></proof>
-  <proof prover="3"><result status="timeout" time="6.09"/></proof>
-  <proof prover="4"><result status="timeout" time="6.20"/></proof>
+  <goal name="WP_parameter delete.7" expl="7. precondition" sum="466f2a80d266fc54cbb1c4d41a9840bb">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.8" expl="8. precondition" sum="a6a76d9cf7018d1ccec629d6b1dff207">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter delete.8" expl="8. precondition" sum="ad29047fa97f4491980267be19662ada" expanded="true">
+  <proof prover="4" timelimit="1" memlimit="1000"><result status="timeout" time="0.99"/></proof>
+  <proof prover="7"><result status="timeout" time="5.99"/></proof>
+  <proof prover="8" timelimit="1"><result status="timeout" time="1.00"/></proof>
+  <transf name="introduce_premises" expanded="true">
+   <goal name="WP_parameter delete.8.1" expl="1." sum="24347e2ae6f3af70ecb3b6cc9c0ed618" expanded="true">
+   <transf name="inline_goal" expanded="true">
+    <goal name="WP_parameter delete.8.1.1" expl="1." sum="7ddb85897d79a092134490fb07dc4e1c" expanded="true">
+    <proof prover="4" timelimit="60" memlimit="1000"><result status="timeout" time="59.76"/></proof>
+    <proof prover="7" timelimit="60"><result status="timeout" time="59.88"/></proof>
+    <proof prover="8" timelimit="60"><result status="timeout" time="59.68"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter delete.9" expl="9. precondition" sum="877f75d3b1a83a4757cc67dc8612b8e5">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter delete.9" expl="9. precondition" sum="f7ba12e6191857e7ca210917e6988e9d">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.10" expl="10. postcondition" sum="008b79dd31b7463bc063e4470066e609">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter delete.10" expl="10. precondition" sum="cf584dd2ebbdea80d423e2e7989e626e" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter delete.10.1" expl="1. precondition" sum="b32599c3568214fb79766a466a0ba8bd">
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.10.2" expl="2. precondition" sum="306ae2a1d5c50d7950b5910ac40d83b0">
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.10.3" expl="3. precondition" sum="7ed444e9548ef9565c96184652a7d375">
+   <proof prover="8" timelimit="1"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.10.4" expl="4. precondition" sum="2a71ef1f0b572a8273e1855d0f924f3f">
+   <proof prover="8" timelimit="1"><result status="valid" time="0.14"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.10.5" expl="5. precondition" sum="0aaad6b57808caac630fed748237a1ca" expanded="true">
+   <transf name="introduce_premises" expanded="true">
+    <goal name="WP_parameter delete.10.5.1" expl="1." sum="df3eb8cc5ec9dcd154deee7080ea095e" expanded="true">
+    <transf name="inline_goal" expanded="true">
+     <goal name="WP_parameter delete.10.5.1.1" expl="1." sum="ef35e75cddd98efa7149be5eb65e5af0" expanded="true">
+     <transf name="inline_goal" expanded="true">
+      <goal name="WP_parameter delete.10.5.1.1.1" expl="1." sum="ddbf9072ba96f8a3e2541ae1152d9871" expanded="true">
+      <transf name="inline_goal" expanded="true">
+       <goal name="WP_parameter delete.10.5.1.1.1.1" expl="1." sum="70908ef2a194281e4a9020d9fba72f08" expanded="true">
+       <transf name="inline_goal" expanded="true">
+        <goal name="WP_parameter delete.10.5.1.1.1.1.1" expl="1." sum="cffaf58964d4f52182d37a50284d75b2" expanded="true">
+        <proof prover="4" timelimit="6" memlimit="1000"><result status="timeout" time="5.99"/></proof>
+        <proof prover="7"><result status="timeout" time="5.99"/></proof>
+        <proof prover="8" timelimit="30"><result status="timeout" time="29.86"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter delete.11" expl="11. index in array bounds" sum="4c9d3eb3b26a1f497889dee901799e23">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter delete.11" expl="11. precondition" sum="64a2e8ab2182081aa5b28816737ee263">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.12" expl="12. index in array bounds" sum="03ae21fe491987dca5946aed5f51338a">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter delete.12" expl="12. postcondition" sum="37b777d317d5292a33e56dfa9b6ceb8d">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter delete.13" expl="13. index in array bounds" sum="b1dfac5ccbc61045f3d83ba29f93fdfa">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter delete.13" expl="13. postcondition" sum="2ec21507eb915f97e805137ba3d2d68f">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter delete.14" expl="14. index in array bounds" sum="53e01c7725b7b74ad47fb036abb276f1">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter delete.14" expl="14. index in array bounds" sum="c36ef930da7c8d1e59672ab219b67135">
+  <proof prover="7"><result status="valid" time="0.05"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.15" expl="15. variant decrease" sum="9652855c270c2ca2a10b9377a3b8c27d" expanded="true">
-  <proof prover="1" obsolete="true"><result status="timeout" time="6.06"/></proof>
-  <proof prover="2" obsolete="true"><result status="timeout" time="5.78"/></proof>
-  <proof prover="3"><result status="timeout" time="6.02"/></proof>
-  <proof prover="4"><result status="timeout" time="6.09"/></proof>
+  <goal name="WP_parameter delete.15" expl="15. index in array bounds" sum="7059a7978240f3d7f6145d8b30e97556">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.16" expl="16. precondition" sum="1d2a79b363794b6b58c5ab4f6a49e5ab">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter delete.16" expl="16. index in array bounds" sum="e94fa7363de553976c9dfe0bde8e230c">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter delete.17" expl="17. precondition" sum="8ada723098270ebd2923840c0d2ded81">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter delete.17" expl="17. index in array bounds" sum="504de8ee66a7230b3f8180ca405873cd">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter delete.18" expl="18. precondition" sum="8ada723098270ebd2923840c0d2ded81">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter delete.18" expl="18. variant decrease" sum="9033da125b89f2836e172b6a4679b104">
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="6.02"/></proof>
+  <proof prover="7" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  <proof prover="8" obsolete="true"><result status="timeout" time="6.03"/></proof>
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter delete.18.1" expl="1." sum="d800faac1844ebdc43f95dac8960d45d">
+   <proof prover="8"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.18.2" expl="2." sum="822ef0075e3147805aa53955538ee1bd">
+   <proof prover="0" obsolete="true"><result status="timeout" time="5.98"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="5.95"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="9.92"/></proof>
+   <proof prover="7"><undone/></proof>
+   <proof prover="8"><result status="timeout" time="5.90"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter delete.19" expl="19. precondition" sum="2e1a029a93c34635b33c2db519a3c08a">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter delete.19" expl="19. precondition" sum="22f5a6085cafaf652ec6ca2028c41acb">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter delete.20" expl="20. precondition" sum="0f5bad2a393a0a3ecb8c81635de989c6" expanded="true">
-  <proof prover="1" obsolete="true"><result status="timeout" time="6.02"/></proof>
-  <proof prover="2" obsolete="true"><result status="timeout" time="6.00"/></proof>
-  <proof prover="3"><result status="timeout" time="6.08"/></proof>
-  <proof prover="4"><result status="timeout" time="5.99"/></proof>
+  <goal name="WP_parameter delete.20" expl="20. precondition" sum="d107d422febb3d611fc51831e082f050">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.21" expl="21. precondition" sum="dd4019ba791da7ec4172a8f958a9e5b0">
-  <proof prover="1" obsolete="true"><undone/></proof>
-  <proof prover="2" obsolete="true"><undone/></proof>
-  <proof prover="3"><result status="valid" time="0.17"/></proof>
-  <proof prover="4"><result status="timeout" time="5.96"/></proof>
+  <goal name="WP_parameter delete.21" expl="21. precondition" sum="d107d422febb3d611fc51831e082f050">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.22" expl="22. precondition" sum="4cea692f8076428ddd7f5900b360314c" expanded="true">
-  <proof prover="1" obsolete="true"><result status="timeout" time="6.01"/></proof>
-  <proof prover="2" obsolete="true"><result status="timeout" time="5.90"/></proof>
-  <proof prover="3"><result status="timeout" time="6.34"/></proof>
-  <proof prover="4"><result status="timeout" time="5.99"/></proof>
+  <goal name="WP_parameter delete.22" expl="22. precondition" sum="cfdb02ed66e0605fcc9abb584380f0bb">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter delete.23" expl="23. postcondition" sum="12fc5f9a38f86a376137b28b1dcab846">
-  <proof prover="3"><result status="timeout" time="6.02"/></proof>
-  <proof prover="4"><result status="timeout" time="5.98"/></proof>
+  <goal name="WP_parameter delete.23" expl="23. precondition" sum="63fcf5f0d0d2e71fc811eb754e2cf6a1">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.24" expl="24. precondition" sum="2ccf5dea07f5df1307d30aa63085669e" expanded="true">
+  <proof prover="4" timelimit="1" memlimit="1000"><result status="timeout" time="0.99"/></proof>
+  <proof prover="7"><result status="timeout" time="6.00"/></proof>
+  <proof prover="8" timelimit="1"><result status="timeout" time="0.99"/></proof>
+  <transf name="introduce_premises" expanded="true">
+   <goal name="WP_parameter delete.24.1" expl="1." sum="f5db0122a38d60498c81da39922d270d" expanded="true">
+   <transf name="inline_goal" expanded="true">
+    <goal name="WP_parameter delete.24.1.1" expl="1." sum="967586b694f96320ba0e9fbdfe571588" expanded="true">
+    <proof prover="4" timelimit="60" memlimit="1000"><result status="timeout" time="60.06"/></proof>
+    <proof prover="7" timelimit="60"><result status="timeout" time="59.91"/></proof>
+    <proof prover="8" timelimit="60"><result status="timeout" time="59.66"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter delete.25" expl="25. precondition" sum="c3a142a93a6ab66cf32b8af5bfe4cc41">
+  <proof prover="7"><result status="valid" time="0.57"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.26" expl="26. precondition" sum="f710d68d6ee2bccb1ea525c441188584">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter delete.26.1" expl="1. precondition" sum="39583072922be8cfebe1c04a14d97473">
+   <proof prover="7"><result status="valid" time="0.13"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.26.2" expl="2. precondition" sum="3924c9cefac90fb8c3967c647dc3f19d">
+   <proof prover="7"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.26.3" expl="3. precondition" sum="1b76c9291562591db54c78c1da80ea82">
+   <proof prover="7"><result status="valid" time="0.15"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.26.4" expl="4. precondition" sum="6cce770833a0065f203545333bd16763">
+   <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.15"/></proof>
+   <proof prover="7"><result status="valid" time="0.40"/></proof>
+   </goal>
+   <goal name="WP_parameter delete.26.5" expl="5. precondition" sum="98ebc7fcb3c60f6466e6af6e6286cd3a">
+   <transf name="introduce_premises">
+    <goal name="WP_parameter delete.26.5.1" expl="1." sum="265238706e9d65b4b29e0cf8495762e3">
+    <transf name="inline_goal">
+     <goal name="WP_parameter delete.26.5.1.1" expl="1." sum="92ef1c2e1601cc9736a1492d4716646f">
+     <transf name="inline_goal">
+      <goal name="WP_parameter delete.26.5.1.1.1" expl="1." sum="74f5446382a52c775e512fb869dd4d33">
+      <transf name="inline_goal">
+       <goal name="WP_parameter delete.26.5.1.1.1.1" expl="1." sum="7d66e2e4f41fbb286a78b9020c97d1d9">
+       <transf name="inline_goal">
+        <goal name="WP_parameter delete.26.5.1.1.1.1.1" expl="1." sum="9f599ebc0f2cb3dbfe2729d9d9fd32e2">
+        <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="2.12"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter delete.27" expl="27. precondition" sum="4b6915b170841e0e41a5d99b85ef60bd">
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.96"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="6.01"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="10.00"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.90"/></proof>
+  <proof prover="7"><undone/></proof>
+  <proof prover="8"><result status="timeout" time="5.98"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.28" expl="28. postcondition" sum="83d27934189b9dab33cc9887a25b1565">
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.80"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="9.99"/></proof>
+  <proof prover="7"><undone/></proof>
+  <proof prover="8"><result status="timeout" time="5.98"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.29" expl="29. postcondition" sum="abcda73bcedae3b375f123bf653165ba">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter delete.30" expl="30. postcondition" sum="13cfa5e28486250d360f872780f7cc7b" expanded="true">
+  <transf name="inline_goal" expanded="true">
+   <goal name="WP_parameter delete.30.1" expl="1. postcondition" sum="63272284d55a94f9e7c5f8a548eb14c0" expanded="true">
+   <transf name="split_goal_wp" expanded="true">
+    <goal name="WP_parameter delete.30.1.1" expl="1." sum="30ec790c388ae375137c33032518bd67">
+    <proof prover="8"><result status="valid" time="0.03"/></proof>
+    </goal>
+    <goal name="WP_parameter delete.30.1.2" expl="2." sum="77296b9f203e24aff87160140e5910ad">
+    <proof prover="8"><result status="valid" time="0.30"/></proof>
+    </goal>
+    <goal name="WP_parameter delete.30.1.3" expl="3." sum="cd53465bdcfa9865ed08134a2658d7b4">
+    <proof prover="8"><result status="valid" time="0.32"/></proof>
+    </goal>
+    <goal name="WP_parameter delete.30.1.4" expl="4." sum="58876f9befcf1c5dcb8b7063d86d8021">
+    <proof prover="8"><result status="valid" time="0.04"/></proof>
+    </goal>
+    <goal name="WP_parameter delete.30.1.5" expl="5." sum="a7b1e5269e5fb4b77b5469b6a541beba">
+    <proof prover="8"><result status="valid" time="0.04"/></proof>
+    </goal>
+    <goal name="WP_parameter delete.30.1.6" expl="6." sum="665d417cbd7d83ac85d7f55f9dec6b74">
+    <proof prover="8"><result status="valid" time="0.06"/></proof>
+    </goal>
+    <goal name="WP_parameter delete.30.1.7" expl="7." sum="a1a49e0658d421b1c9f427466fb1f178">
+    <proof prover="8"><result status="valid" time="0.32"/></proof>
+    </goal>
+    <goal name="WP_parameter delete.30.1.8" expl="8." sum="ed84c053a8d6deaf151b2ecd99fb0a7b" expanded="true">
+    <proof prover="0" obsolete="true"><result status="timeout" time="5.99"/></proof>
+    <proof prover="4" timelimit="60" memlimit="1000"><result status="timeout" time="59.92"/></proof>
+    <proof prover="5" obsolete="true"><result status="timeout" time="5.99"/></proof>
+    <proof prover="7" timelimit="60"><result status="timeout" time="59.81"/></proof>
+    <proof prover="8" timelimit="60"><result status="timeout" time="59.93"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter remove" expl="VC for remove" sum="7050de1b7abd5f705a1fc95fcafcf9ea" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter remove.1" expl="1. precondition" sum="e81b76edaeb94e952209e065d321cc52">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <goal name="WP_parameter remove" expl="VC for remove" sum="ca470add62a9fee21bb302a5b56c0aae">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter remove.1" expl="1. precondition" sum="951cc8104a6419b208e2f6a703deb114">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.2" expl="2. precondition" sum="cf6e9cc1309c7d32a4790bd9c6e3c50e">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter remove.2" expl="2. precondition" sum="94708b2d45c1bd812ad038f28262fe55">
+  <proof prover="8"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter remove.3" expl="3. index in array bounds" sum="3101dbf5148b96ec862a4752e40ddd4b">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove.3" expl="3. index in array bounds" sum="2dcd466db5b4e417616fd134a17c3cf0">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.4" expl="4. index in array bounds" sum="08ea317cab2d6a757840b35494d7851c">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove.4" expl="4. index in array bounds" sum="c12c0754a1668abba35e97c585f8bfdd">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.5" expl="5. assertion" sum="719e0a0987620e9636a2506afad218e2">
-  <proof prover="3"><result status="valid" time="0.19"/></proof>
-  <proof prover="4" obsolete="true"><result status="timeout" time="5.95"/></proof>
+  <goal name="WP_parameter remove.5" expl="5. assertion" sum="f17de38d3e57250df4e55eb8d8a88127">
+  <proof prover="7"><result status="valid" time="0.19"/></proof>
+  <proof prover="8" obsolete="true"><result status="timeout" time="5.95"/></proof>
   </goal>
-  <goal name="WP_parameter remove.6" expl="6. type invariant" sum="15aa18e27d51d484192e801f8875ffd2">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter remove.6" expl="6. type invariant" sum="12ca0e16502365220c8624408002ec63">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter remove.7" expl="7. precondition" sum="9dac5d8f94c0f1818452cb6774bb498d">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove.7" expl="7. precondition" sum="9f27052ee6a40818d381c44348760b04">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.8" expl="8. precondition" sum="9dac5d8f94c0f1818452cb6774bb498d">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove.8" expl="8. precondition" sum="9f27052ee6a40818d381c44348760b04">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.9" expl="9. precondition" sum="9dac5d8f94c0f1818452cb6774bb498d">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove.9" expl="9. precondition" sum="9f27052ee6a40818d381c44348760b04">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.10" expl="10. precondition" sum="55756d66169bda134a3e489e9ab928fb">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove.10" expl="10. precondition" sum="f0f39b842abb5c19461f671e43fad091">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.11" expl="11. precondition" sum="ba85e47190013268da1da88914fb8940">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter remove.11" expl="11. precondition" sum="ec5ff8725dac3d916017aa9fa0173569">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.12" expl="12. precondition" sum="80ffd89aaac6c49fed8a2d13ee6d6863">
-  <proof prover="3"><result status="valid" time="0.23"/></proof>
-  <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  <goal name="WP_parameter remove.12" expl="12. precondition" sum="7334bfca52dff7a7086889e6fd86bdff">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter remove.13" expl="13. precondition" sum="8c36749646148603577f25f4fbbea15c">
-  <proof prover="3" timelimit="20"><result status="valid" time="0.18"/></proof>
+  <goal name="WP_parameter remove.13" expl="13. precondition" sum="e24ea0cd389a2b126ec4e26c3f9528ed">
+  <proof prover="7"><result status="valid" time="0.49"/></proof>
+  <proof prover="8" obsolete="true"><result status="timeout" time="5.98"/></proof>
   </goal>
-  <goal name="WP_parameter remove.14" expl="14. type invariant" sum="c9f15375fc3b925dfb142b58a71d165c">
-  <proof prover="3"><result status="valid" time="0.12"/></proof>
-  <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  <goal name="WP_parameter remove.14" expl="14. precondition" sum="c1d65130b44346a43fd9c23c262956f2">
+  <proof prover="8"><result status="valid" time="1.28"/></proof>
   </goal>
-  <goal name="WP_parameter remove.15" expl="15. type invariant" sum="bb500b135314549d829ca2bb6ec980fc">
-  <proof prover="3"><result status="valid" time="0.35"/></proof>
-  <proof prover="4" obsolete="true"><result status="timeout" time="5.93"/></proof>
+  <goal name="WP_parameter remove.15" expl="15. precondition" sum="9a4d143f452571d9b3cca2ac86477f15">
+  <proof prover="7" timelimit="20"><result status="valid" time="0.18"/></proof>
   </goal>
-  <goal name="WP_parameter remove.16" expl="16. type invariant" sum="e68d99d2ddd50f0909a7661eb9b8c38e">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter remove.16" expl="16. type invariant" sum="e22c0fa47db30c13726de4b09e2f3556">
+  <proof prover="7"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter remove.17" expl="17. type invariant" sum="6b14f078310d34178aadbc05513ac7a6" expanded="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="5.98"/></proof>
-  <proof prover="3" obsolete="true"><result status="timeout" time="6.00"/></proof>
-  <proof prover="4" obsolete="true"><result status="timeout" time="5.97"/></proof>
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter remove.17.1" expl="1. type invariant" sum="27e253c8adf9dbd57be279a86057377a" expanded="true">
-   <proof prover="1" obsolete="true"><result status="timeout" time="6.00"/></proof>
-   <proof prover="2" obsolete="true"><result status="timeout" time="5.91"/></proof>
-   <proof prover="3" obsolete="true"><result status="timeout" time="6.13"/></proof>
-   <proof prover="4" obsolete="true"><result status="timeout" time="5.97"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.17.2" expl="2. type invariant" sum="5df880bbcfffb0f251c879875bd98b12" expanded="true">
-   <proof prover="1" obsolete="true"><result status="timeout" time="6.02"/></proof>
-   <proof prover="2" obsolete="true"><result status="timeout" time="5.95"/></proof>
-   <proof prover="3" obsolete="true"><result status="timeout" time="6.30"/></proof>
-   <proof prover="4" obsolete="true"><result status="timeout" time="6.02"/></proof>
+  <goal name="WP_parameter remove.17" expl="17. type invariant" sum="84c27d1b3a7cf09ab0a8a1f66e154c32">
+  <proof prover="7"><result status="valid" time="0.46"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.18" expl="18. type invariant" sum="b93e781e18caebaa23a0112d5e2566c7">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter remove.18.1" expl="1. type invariant" sum="b93e781e18caebaa23a0112d5e2566c7">
+   <proof prover="8"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter remove.18" expl="18. type invariant" sum="b04d7b69c1ba4bf49ceab7b6ddf484fc" expanded="true">
-  <proof prover="3" obsolete="true"><result status="timeout" time="6.02"/></proof>
-  <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter remove.18.1" expl="1. type invariant" sum="1f3723ee17ea11b5500ac62f77803eb9">
-   <proof prover="1" obsolete="true"><result status="timeout" time="6.02"/></proof>
-   <proof prover="2" obsolete="true"><result status="timeout" time="5.83"/></proof>
-   <proof prover="3" obsolete="true"><result status="timeout" time="5.99"/></proof>
-   <proof prover="4" obsolete="true"><result status="timeout" time="6.68"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.18.2" expl="2. type invariant" sum="aa531b2a8c252fb55284cb4a05af391e">
-   <proof prover="1" obsolete="true"><result status="timeout" time="6.07"/></proof>
-   <proof prover="2" obsolete="true"><result status="timeout" time="5.76"/></proof>
-   <proof prover="3" obsolete="true"><result status="timeout" time="6.10"/></proof>
-   <proof prover="4" obsolete="true"><result status="timeout" time="6.37"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.18.3" expl="3. type invariant" sum="c43b3d11e9790468727b59600b454336">
-   <proof prover="1" obsolete="true"><result status="timeout" time="6.02"/></proof>
-   <proof prover="2" obsolete="true"><result status="timeout" time="5.88"/></proof>
-   <proof prover="3" obsolete="true"><result status="timeout" time="6.72"/></proof>
-   <proof prover="4" obsolete="true"><result status="timeout" time="6.00"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.18.4" expl="4. type invariant" sum="a41218a5d19a3ee33fa92b61d03159f8">
-   <proof prover="1" obsolete="true"><result status="timeout" time="6.01"/></proof>
-   <proof prover="2" obsolete="true"><result status="timeout" time="5.87"/></proof>
-   <proof prover="3" obsolete="true"><result status="timeout" time="6.16"/></proof>
-   <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
-   </goal>
-   <goal name="WP_parameter remove.18.5" expl="5. type invariant" sum="3f39d6d89ad8bcee3c9696c1346dcdef">
-   <proof prover="1" obsolete="true"><undone/></proof>
-   <proof prover="2" obsolete="true"><result status="timeout" time="5.86"/></proof>
-   <proof prover="3" obsolete="true"><result status="timeout" time="5.99"/></proof>
-   <proof prover="4" obsolete="true"><result status="timeout" time="6.05"/></proof>
-   </goal>
-  </transf>
+  <goal name="WP_parameter remove.19" expl="19. type invariant" sum="87dea29e4d9b8ffb3be25ed121078d94">
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter remove.19" expl="19. type invariant" sum="eab9c14ebc37ce49c996d8b280fa7884">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter remove.20" expl="20. postcondition" sum="d3236a2049dc9ece7fdcf18b08e6c788">
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter remove.20" expl="20. postcondition" sum="be1337d60dbded886a25188c2a037a47">
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter remove.21" expl="21. postcondition" sum="3978b208654901c6e978a47be17e182f">
-  <proof prover="3"><result status="valid" time="0.65"/></proof>
-  <proof prover="4" obsolete="true"><result status="timeout" time="5.98"/></proof>
+  <goal name="WP_parameter remove.21" expl="21. postcondition" sum="2dbefdeeee4ddc17d4655810f5bcf861">
+  <proof prover="7"><result status="valid" time="0.07"/></proof>
+  <proof prover="8" obsolete="true"><result status="timeout" time="5.98"/></proof>
   </goal>
  </transf>
  </goal>

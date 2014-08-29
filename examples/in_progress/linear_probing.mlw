@@ -64,6 +64,25 @@ module LinearProbing
   end
   function numofd (a: array key) (l u: int) : int = NumOfDummy.num_of a l u
 
+  predicate valid (data: array key) (view: map keym bool) (loc : map keym int) =
+    (* dummy not in the model *)
+    not (Map.get view dummym)
+    /\
+    (* any value in the array is in the model *)
+    (forall i: int. 0 <= i < Array.length data ->
+       let x = data[i] in neq x dummy ->
+       Map.get view (keym x) /\ Map.get loc (keym x) = i)
+    /\
+    (* any value in the model is in the array *)
+    (let n = Array.length data in
+     forall x: key. Map.get view (keym x) ->
+        let i = Map.get loc (keym x) in
+        0 <= i < n && eq data[i] x &&
+        forall j: int. 0 <= j < n ->
+          between (bucket x n) j i ->
+          neq data[j] x /\ neq data[j] dummy)
+          (* TODO ^^^^^^^^^^^^^^^^^^ is actually provable *)
+
   type t = { mutable size: int;   (* total number of elements *)
              mutable data: array key;    (* buckets *)
        ghost mutable view: map keym bool; (* pure model *)
@@ -73,20 +92,7 @@ module LinearProbing
     invariant { 0 <= self.size < length self.data }
     invariant { let n = Array.length self.data in
                 self.size + numofd self.data 0 n = n }
-    (* dummy not in the model *)
-    invariant { not (Map.get self.view dummym) }
-    (* any value in the array is in the model *)
-    invariant { forall i: int. 0 <= i < Array.length self.data ->
-                let x = self.data[i] in neq x dummy ->
-                Map.get self.view (keym x) /\ Map.get self.loc (keym x) = i }
-    (* any value in the model is in the array *)
-    invariant { let n = Array.length self.data in
-                forall x: key. Map.get self.view (keym x) ->
-                let i = Map.get self.loc (keym x) in
-                0 <= i < n && eq self.data[i] x &&
-                forall j: int. 0 <= j < n ->
-                  between (bucket x n) j i ->
-                  neq self.data[j] x /\ neq self.data[j] dummy }
+    invariant { valid self.data self.view self.loc }
 
   let create (n: int) : t
     requires { 0 < n }
@@ -203,20 +209,36 @@ module LinearProbing
     { size = h.size; data = Array.copy h.data;
       view = h.view; loc = h.loc; }
 
-  let rec delete (a: array key) (ghost loc: ref (map keym int))
+  (* j is the hole just created by remove (see below) and this function
+     restores the data structure invariant for elements
+     to the right of j if needed, starting at index i *)
+  let rec delete (a: array key)
+                 (ghost loc: ref (map keym int)) (ghost view: map keym bool)
                  (ghost i0: int) (j i: int) : unit
     requires { 0 <= i0 < Array.length a }
     requires { 0 <= j < Array.length a }
     requires { 0 <= i < Array.length a }
     requires { a[j] = dummy }
+    requires { not (Map.get view dummym) }
     requires { forall k: int. (between i0 k i || k = i) -> j <> k ->
                neq a[k] dummy }
     requires { forall k: int. 0 <= k < Array.length a ->
-               let x = a[k] in neq x dummy -> Map.get !loc (keym x) = k }
+               let x = a[k] in neq x dummy ->
+               Map.get view (keym x) /\ Map.get !loc (keym x) = k }
+    (* any value in the model is in the array *)
+    requires { let n = Array.length a in
+               forall x: key. Map.get view (keym x) ->
+                 let k = Map.get !loc (keym x) in
+                 0 <= k < n && eq a[k] x &&
+                 forall l: int. 0 <= l < n -> between (bucket x n) l k ->
+                   neq a[l] x /\
+                   (neq a[l] dummy \/
+                    l = j /\ between j i k) }
     requires { numofd a 0 (Array.length a) >= 2 }
     variant  { if i >= i0 then Array.length a - i + i0 else i0 - i }
     ensures  { numofd a 0 (Array.length a) =
                numofd (old a) 0 (Array.length a) }
+    ensures  { valid a view !loc }
    =
     let n = Array.length a in
     let i = next n i in
@@ -224,12 +246,14 @@ module LinearProbing
     if neq xi dummy then begin
       let r = bucket xi n in
       if j < r && r <= i || i < j && j < r || r <= i && i < j then
-        delete a loc i0 j i
+        (* the hash index r lies cyclically between j and i *)
+        delete a loc view i0 j i
       else begin
+        (* the hole j lies cyclically between hash index r and i *)
         a[j] <- a[i];
         ghost loc := Map.set !loc (keym a[i]) j;
         a[i] <- dummy;
-        delete a loc i0 i i
+        delete a loc view i0 i i
       end
     end
 
@@ -246,7 +270,7 @@ module LinearProbing
                numofd (at h.data 'L) 0 (j+1) + 1 };
       ghost h.view <- Map.set h.view (keym x) False;
       let l = ref h.loc in
-      delete h.data l j j j;
+      delete h.data l h.view j j j;
       ghost h.loc <- !l;
       h.size <- h.size - 1;
     end
