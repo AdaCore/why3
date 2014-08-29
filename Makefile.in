@@ -222,7 +222,7 @@ lib/why3/why3.cmx: $(LIBCMX)
 
 # clean and depend
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(LIBDEP)
 endif
 
@@ -421,7 +421,7 @@ PLUGCLEAN = $(addsuffix /*.cm[iox], $(PLUGSDIRS)) \
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(PLUGDEP)
 endif
 
@@ -528,7 +528,7 @@ install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
 bin/%:	bin/%.@OCAMLBEST@
 	ln -sf $(notdir $<) $@
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(TOOLSDEP)
 endif
 
@@ -658,7 +658,7 @@ src/ide/resetgc.o: src/ide/resetgc.c
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(IDEDEP)
 endif
 
@@ -713,7 +713,7 @@ bin/why3session.byte: lib/why3/why3.cma $(SESSIONCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(SESSIONDEP)
 endif
 
@@ -789,7 +789,7 @@ src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq-tactic/why3tac.cmxs
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(COQPDEP)
 endif
 
@@ -1196,7 +1196,7 @@ $(OCAMLLIBS_DEP): DEPFLAGS += -I src/util -I lib/ocaml @BIGINTINCLUDE@
 $(OCAMLLIBS_CMO) $(OCAMLLIBS_CMX): INCLUDES += -I src/util -I lib/ocaml @BIGINTINCLUDE@
 $(OCAMLLIBS_CMX): OFLAGS += -for-pack Why3extract
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(OCAMLLIBS_DEP)
 endif
 
@@ -1308,7 +1308,7 @@ bin/why3wc.byte: $(WHY3WCCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
 	    $(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(WHY3WCDEP)
 endif
 
@@ -1362,7 +1362,7 @@ bin/why3doc.byte: lib/why3/why3.cma $(WHY3DOCCMO)
 
 # depend and clean targets
 
-ifneq "$(MAKECMDGOALS)" "clean"
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 include $(WHY3DOCDEP)
 endif
 
