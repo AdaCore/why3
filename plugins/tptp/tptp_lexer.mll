@@ -248,7 +248,7 @@ and comment_line = parse
     let ast = Loc.with_location (tptp_file token) lb in
     Tptp_typing.typecheck env path ast
 
-  let () = Env.register_format "tptp" ["p";"ax"] Env.base_language read_channel
+  let () = Env.register_format Env.base_language "tptp" ["p";"ax"] read_channel
     ~desc:"TPTP format (CNF FOF FOFX TFF)"
 
 }

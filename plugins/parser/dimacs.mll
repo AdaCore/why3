@@ -132,7 +132,7 @@ let parse _env _path filename cin =
   let th_uc = Theory.add_prop_decl th_uc Decl.Pgoal pr Term.t_false in
   Mstr.singleton "Cnf" (Theory.close_theory th_uc)
 
-let () = Env.register_format "dimacs" ["cnf"] Env.base_language parse
+let () = Env.register_format Env.base_language "dimacs" ["cnf"] parse
   ~desc:"@[<hov>Parser for dimacs format.@]"
 }
 

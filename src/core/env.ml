@@ -52,6 +52,8 @@ let get_loadpath env = Sstr.elements env.env_path
 
 type 'a format_parser = env -> pathname -> filename -> in_channel -> 'a
 
+type format_info = fformat * extension list * Pp.formatted
+
 module Hpath = Hashtbl.Make(struct
   type t = pathname
   let hash = Hashtbl.hash
@@ -61,13 +63,21 @@ end)
 type 'a language = {
   memo : 'a Hpath.t;
   push : pathname -> 'a -> unit;
-  mutable fmts : (fformat * extension list * Pp.formatted) list;
+  regf : format_info -> unit format_parser -> unit;
+  regb : (pathname -> unit) -> unit;
+  mutable fmts : unit format_parser Mstr.t;
+  mutable bins : (pathname -> unit) list;
+  mutable info : format_info list;
 }
 
 let base_language = {
   memo = Hpath.create 17;
   push = (fun _ _ -> ());
-  fmts = [];
+  regf = (fun _ _ -> ());
+  regb = (fun _ -> ());
+  fmts = Mstr.empty;
+  bins = [];
+  info = [];
 }
 
 exception LibraryConflict of pathname
@@ -76,50 +86,50 @@ let store lang path c =
   lang.push path c;
   Hpath.add lang.memo path c
 
-let store lang path c =
-  if path = [] then store lang path c
-  else try
-    let d = Hpath.find lang.memo path in
-    if c != d then raise (LibraryConflict path)
-  with Not_found -> store lang path c
+let store lang path c = match path with
+  | "why3" :: _ ->
+      begin try
+        let d = Hpath.find lang.memo path in
+        if c != d then raise (LibraryConflict path)
+      with Not_found -> store lang path c end
+  | _ ->
+      assert (path = [] || not (Hpath.mem lang.memo path));
+      store lang path c
 
-let retrieve_file lang ff path =
-  try Hpath.find lang.memo path
-  with Not_found -> raise (InvalidFormat ff)
+let register_format lang (ff,_,_ as inf) fp =
+  lang.regf inf fp;
+  lang.fmts <- Mstr.add_new (KnownFormat ff) ff fp lang.fmts;
+  lang.info <- inf :: lang.info
 
-let retrieve_lib lang path =
-  try Hpath.find lang.memo path
-  with Not_found -> raise (LibraryNotFound path)
+let add_builtin lang bp =
+  lang.regb bp;
+  lang.bins <- bp :: lang.bins
 
 let register_language parent convert = {
   memo = Hpath.create 17;
   push = (fun path c -> store parent path (convert c));
-  fmts = [];
+  regf = (fun inf fp -> register_format parent inf fp);
+  regb = (fun bp -> add_builtin parent bp);
+  fmts = Mstr.empty;
+  bins = [];
+  info = [];
 }
 
 let extension_table = ref Mstr.empty
-let format_table = ref Mstr.empty
-let builtin_list = ref []
 
-let register_format ~desc ff extl lang fp =
-  let fp env path fn ch = store lang path (fp env path fn ch) in
-  format_table := Mstr.add_new (KnownFormat ff) ff fp !format_table;
+let register_format ~desc lang ff extl fp =
   let add_ext m e = Mstr.change (function
     | Some ff -> raise (KnownExtension (e,ff))
     | None -> Some ff) e m in
   extension_table := List.fold_left add_ext !extension_table extl;
-  lang.fmts <- (ff,extl,desc) :: lang.fmts
-
-let list_formats lang = List.rev lang.fmts (* older to newer *)
+  let fp env path fn ch = store lang path (fp env path fn ch) in
+  register_format lang (ff,extl,desc) fp
 
 let add_builtin lang bp =
   let bp path = store lang ("why3" :: path) (bp path) in
-  builtin_list := bp :: !builtin_list
+  add_builtin lang bp
 
-let read_builtin lang path =
-  let read bp = try bp path with Not_found -> () in
-  List.iter read !builtin_list;
-  retrieve_lib lang ("why3" :: path)
+let list_formats lang = List.rev lang.info (* older to newer *)
 
 (** Input file parsing *)
 
@@ -129,35 +139,37 @@ let get_extension file =
   let n = String.length s + 1 in
   String.sub file n (String.length file - n)
 
-let get_format file =
-  let ext = get_extension file in
-  Mstr.find_exn (UnknownExtension ext) ext !extension_table
-
 let get_format ?format file = match format with
   | Some ff -> ff
-  | None -> get_format file
+  | None ->
+      let ext = get_extension file in
+      Mstr.find_exn (UnknownExtension ext) ext !extension_table
 
-let get_parser ff =
-  Mstr.find_exn (UnknownFormat ff) ff !format_table
+let get_parser lang ff =
+  try Mstr.find ff lang.fmts
+  with Not_found ->
+    if Mstr.mem ff base_language.fmts
+      then raise (InvalidFormat ff)
+      else raise (UnknownFormat ff)
 
 let read_channel ?format lang env file ch =
   let ff = get_format ?format file in
-  let fp = get_parser ff in
+  let fp = get_parser lang ff in
   fp env [] file ch;
-  retrieve_file lang ff []
+  Hpath.find lang.memo []
 
-let read_file_raw ?format lang env path file =
+let read_lib_file ?format lang env path file =
   let ff = get_format ?format file in
-  let fp = get_parser ff in
+  let fp = get_parser lang ff in
   let ch = open_in file in
-  begin try fp env path file ch; close_in ch
-  with exn -> close_in ch; raise exn; end;
-  retrieve_file lang ff path
+  try fp env path file ch; close_in ch
+  with exn -> close_in ch; raise exn
 
 let read_file ?format lang env file =
-  read_file_raw ?format lang env [] file
+  read_lib_file ?format lang env [] file;
+  Hpath.find lang.memo []
 
-(** Navigation in the library *)
+(** Library file parsing *)
 
 let locate_library env path =
   if path = [] || path = ["why3"]
@@ -182,40 +194,33 @@ let locate_library env path =
 
 exception CircularDependency of pathname
 
-let read_library lang env path =
-  let file = locate_library env path in
-  read_file_raw lang env path file
+let read_library lang env = function
+  | "why3" :: path ->
+      let read bp = try bp path with Not_found -> () in
+      List.iter read lang.bins
+  | path ->
+      let file = locate_library env path in
+      read_lib_file lang env path file
 
 let libstack = Hpath.create 17
 
 let read_library lang env path =
   if Hpath.mem libstack path then
     raise (CircularDependency path);
-  Hpath.add libstack path ();
   try
-    let c = read_library lang env path in
+    Hpath.add libstack path ();
+    read_library lang env path;
+    Hpath.remove libstack path
+  with exn ->
     Hpath.remove libstack path;
-    c
-  with e ->
-    Hpath.remove libstack path;
-    raise e
-
-let read_library lang env = function
-  | "why3" :: path -> read_builtin lang path
-  | path -> read_library lang env path
+    raise exn
 
 let read_library lang env path =
   let path = if path = [] then ["why3"] else path in
   try Hpath.find lang.memo path with Not_found ->
-  if Hpath.mem base_language.memo path then begin
-    match path with (* loaded for another format *)
-    | "why3" :: _ ->
-        raise (LibraryNotFound path)
-    | _ ->
-        let file = locate_library env path in
-        raise (InvalidFormat (get_format file))
-  end else
-    read_library lang env path
+  read_library lang env path;
+  try Hpath.find lang.memo path with Not_found ->
+  raise (LibraryNotFound path)
 
 let read_theory env path s =
   let path = if path = [] then ["why3"; s] else path in
@@ -269,8 +274,8 @@ let () = Exn_printer.register
   | AmbiguousPath (f1,f2) -> Format.fprintf fmt
       "Ambiguous path:@ both %s@ and %s@ match" f1 f2
   | InvalidFormat f -> Format.fprintf fmt
-      "Input format %s is unsuitable for the desired content" f
+      "Input format `%s' is unsuitable for the desired content" f
   | LibraryConflict sl -> Format.fprintf fmt
-      "Conflicting definitions for library %a" print_path sl
+      "Conflicting definitions for builtin library %a" print_path sl
   | _ -> raise exn
   end

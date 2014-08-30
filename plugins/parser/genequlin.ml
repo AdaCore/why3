@@ -125,7 +125,7 @@ let read_channel env path filename cin =
   (** Return the map with the theory *)
   Mstr.singleton "EquLin" (close_theory th_uc)
 
-let () = Env.register_format "equlin" ["equlin"] Env.base_language read_channel
+let () = Env.register_format Env.base_language "equlin" ["equlin"] read_channel
   ~desc:"@[<hov>Generate@ random@ linear@ arithmetic@ problems.@ \
     The@ first@ line@ gives@ the@ seed.@ Each@ other@ line@ \
     describes@ a@ goal@ and@ contains@ three@ numbers:@]@\n  \

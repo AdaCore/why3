@@ -31,5 +31,5 @@ let read_channel env path file c =
   end;
   mm, tm
 
-let () = Env.register_format "whyml" ["mlw"] mlw_language read_channel
-  ~desc:"WhyML programming language"
+let () = Env.register_format mlw_language "whyml" ["mlw"] read_channel
+  ~desc:"WhyML@ programming@ language"

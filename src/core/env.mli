@@ -83,10 +83,10 @@ exception KnownExtension of extension * fformat
 
 val register_format :
   desc:Pp.formatted ->
-  fformat -> extension list -> 'a language -> 'a format_parser -> unit
-(** [register_format ~desc format_name exts lang parser] registers a new
-    format [fname] for files with extensions from the string list [exts]
-    (without the separating dot).
+  'a language -> fformat -> extension list -> 'a format_parser -> unit
+(** [register_format ~desc lang fname exts parser] registers a new format
+    [fname] for files with extensions from the string list [exts] (without
+    the separating dot).
 
     @raise KnownFormat [name] if the format is already registered
     @raise KnownExtension [ext,name] if a parser for [ext] is already
