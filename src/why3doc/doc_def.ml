@@ -22,10 +22,11 @@ let dir_sep = Str.regexp_string Filename.dir_sep
 
 let output_file fname =
   let fname = Filename.chop_extension fname in
-  let f = Str.global_replace dir_sep "." fname in
   let base = match !output_dir with
-    | None -> f
-    | Some dir -> Filename.concat dir f
+    | None -> fname
+    | Some dir ->
+      let f = Str.global_replace dir_sep "." fname in
+      Filename.concat dir f
   in
   base ^ ".html"
 
@@ -86,4 +87,3 @@ let locate id =
     try Mlw_module.restore_path id with Not_found -> Theory.restore_path id in
   let url = if lp = [] then "" else make_url (String.concat "." lp) in
   url ^ "#" ^ anchor id
-
