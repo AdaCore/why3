@@ -173,16 +173,10 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
         let td = create_meta m (List.map convert al) in
         add_meta th td meta
   in
-  let add_local th (loc,rule) =
-    try add_local th rule with e -> raise (Loc.Located (loc,e))
-  in
+  let add_local th (loc,rule) = Loc.try2 ~loc add_local th rule in
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
-    let th =
-      try Env.read_theory env f id
-      with e when not (Debug.test_flag Debug.stack_trace) ->
-        raise (Loc.Located (loc,e))
-    in
+    let th = Loc.try3 ~loc Env.read_theory env f id in
     qualid := q;
     List.iter (add_local th) trl
   in

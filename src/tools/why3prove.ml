@@ -344,15 +344,14 @@ let do_input env drv = function
   | None, tlist ->
       Queue.iter (do_global_theory env drv) tlist
   | Some f, tlist ->
-      let fname, cin = match f with
-        | "-" -> "stdin", stdin
-        | f   -> f, open_in f
+      let format = !opt_parser in
+      let fname, m = match f with
+        | "-" -> "stdin",
+            Env.read_channel Env.base_language ?format env "stdin" stdin
+        | fname -> fname,
+            Env.read_file Env.base_language ?format env fname
       in
-      let m = Env.read_channel ?format:!opt_parser
-        Env.base_language env fname cin in
-      close_in cin;
-      if Debug.test_flag Typing.debug_type_only then
-        ()
+      if Debug.test_flag Typing.debug_type_only then ()
       else
         if Queue.is_empty tlist then
           let glist = Queue.create () in

@@ -173,25 +173,24 @@ let do_extract_module_from fname mm thm (tname,_,t) =
 
 let do_local_extract fname cin tlist =
   let env = opt_driver.Mlw_driver.drv_env in
-  if !opt_parser = Some "whyml" || Filename.check_suffix fname ".mlw" then begin
-    let mm, thm = Env.read_channel Mlw_module.mlw_language env fname cin in
-    if Queue.is_empty tlist then begin
-      let do_m t m thm =
-        do_extract_module ~fname m; Mstr.remove t thm in
+  let format = !opt_parser in
+  try
+    let mm, thm =
+      Env.read_channel ?format Mlw_module.mlw_language env fname cin in
+    if Queue.is_empty tlist then
+      let do_m t m thm = do_extract_module ~fname m; Mstr.remove t thm in
       let thm = Mstr.fold do_m mm thm in
       Mstr.iter (fun _ th -> do_extract_theory ~fname th) thm
-    end else
+    else
       Queue.iter (do_extract_module_from fname mm thm) tlist
-  end else begin
-    let m = Env.read_channel ?format:!opt_parser
-      Env.base_language env fname cin in
+  with Env.InvalidFormat _ ->
+    let m = Env.read_channel ?format Env.base_language env fname cin in
     if Queue.is_empty tlist then
       let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
       let do_th _ (_,th) = do_extract_theory ~fname th in
       Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
     else
       Queue.iter (do_extract_theory_from fname m) tlist
-  end
 
 let do_input = function
   | None, tlist ->
