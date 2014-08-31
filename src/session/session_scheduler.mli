@@ -110,9 +110,11 @@ module Make(O: OBSERVER) : sig
   (** {2 Save and load a state} *)
 
   val update_session :
-    use_shapes:bool ->
+    ctxt:update_context ->
+(*
     ?release:bool ->
     allow_obsolete:bool ->
+*)
     'key session ->
     Env.env -> Whyconf.config ->
     O.key env_session * bool * bool

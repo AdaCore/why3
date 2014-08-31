@@ -810,8 +810,14 @@ let sched =
         S.create_session project_dir, false
     in
     let env,(_:bool),(_:bool) =
-      M.update_session ~use_shapes ~allow_obsolete:true session gconfig.env
-        gconfig.Gconfig.config
+      let ctxt = {
+        S.allow_obsolete_goals = true;
+        S.release_tasks = false;
+        S.use_shapes_for_pairing_sub_goals = use_shapes;
+        S.theory_is_fully_up_to_date = false;
+      }
+      in
+      M.update_session ~ctxt session gconfig.env gconfig.Gconfig.config
     in
     Debug.dprintf debug "@]@\n[GUI session] Opening session: update done@.  @[<hov 2>";
     let sched = M.init (gconfig.session_nb_processes)
@@ -1958,8 +1964,14 @@ let reload () =
     let old_session = (env_session()).S.session in
     let new_env_session,(_:bool),(_:bool) =
       (* use_shapes is true since session is in memory *)
-      M.update_session ~use_shapes:true ~allow_obsolete:true old_session gconfig.env
-        gconfig.Gconfig.config
+      let ctxt = {
+        S.allow_obsolete_goals = true;
+        S.release_tasks = false;
+        S.use_shapes_for_pairing_sub_goals = true;
+        S.theory_is_fully_up_to_date = false;
+      }
+      in
+      M.update_session ~ctxt old_session gconfig.env gconfig.Gconfig.config
     in
     current_env_session := Some new_env_session
   with

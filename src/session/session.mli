@@ -187,7 +187,15 @@ type notask
 val read_session : string -> notask session * bool
 (** Read a session stored on the disk. It returns a session without any
     task attached to goals.
-    the returned boolean is set when there was shapes read from disk.
+
+    The returned boolean is set when there was shapes read from disk.
+
+    raises [SessionFileError msg] if the database file cannot be read
+    correctly.
+
+    raises [ShapesFileError msg] if the database extra file for shapes
+    cannot be read.
+
 *)
 
 val save_session : Whyconf.config -> 'key session -> unit
@@ -228,12 +236,26 @@ type 'key keygen = ?parent:'key -> unit -> 'key
 (** type of functions which can generate keys *)
 
 exception OutdatedSession
+exception ShapesFileError of string
+exception SessionFileError of string
 
-val update_session :
+type update_context =
+  { allow_obsolete_goals : bool;
+    release_tasks : bool;
+    use_shapes_for_pairing_sub_goals : bool;
+    theory_is_fully_up_to_date : bool;
+  }
+
+val update_session : ctxt:update_context ->
+(*
   use_shapes:bool ->
   ?release:bool (* default false *)  ->
+*)
   keygen:'a keygen ->
-  allow_obsolete:bool -> 'b session ->
+(*
+  allow_obsolete:bool ->
+*)
+'b session ->
   Env.env -> Whyconf.config -> 'a env_session * bool * bool
 (** reload the given session with the given environnement :
     - the files are reloaded
@@ -249,7 +271,8 @@ val update_session :
     If the merge generated new unpaired goals is indicated by
     the third result.
 
-    raises [Failure msg] if the database file cannot be read correctly
+    raises [OutdatedSession] if the session is obsolete and
+    [allow_obsolete] is false]
 
 *)
 

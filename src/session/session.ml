@@ -1463,7 +1463,8 @@ let load_session session xml =
     | s ->
         eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
 
-exception OpenError of string
+exception ShapesFileError of string
+exception SessionFileError of string
 
 module ReadShapes (C:Compress.S) = struct
 
@@ -1479,13 +1480,13 @@ let read_sum_and_shape ch =
         C.really_input ch sum nsum (32-nsum)
       with End_of_file ->
         raise
-          (OpenError
+          (ShapesFileError
              ("shapes files corrupted (checksum '" ^
                  (String.sub sum 0 nsum) ^
                  "' too short), ignored"))
     end;
   if try C.input_char ch <> ' ' with End_of_file -> true then
-      raise (OpenError "shapes files corrupted (space missing), ignored");
+      raise (ShapesFileError "shapes files corrupted (space missing), ignored");
     Buffer.clear shape;
     try
       while true do
@@ -1496,7 +1497,7 @@ let read_sum_and_shape ch =
       assert false
     with
       | End_of_file ->
-        raise (OpenError "shapes files corrupted (premature end of file), ignored");
+        raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
       | Exit -> sum, Buffer.contents shape
 
 
@@ -1512,7 +1513,9 @@ let read_sum_and_shape ch =
             if sum <> old_sum then
               begin
                 Format.eprintf "old sum = %s ; new sum = %s@." old_sum sum;
-                exit 2
+                raise
+                  (ShapesFileError
+                     "shapes files corrupted (sums do not correspond)")
               end;
             attrs
           with Not_found -> ("sum", sum) :: attrs
@@ -1521,56 +1524,15 @@ let read_sum_and_shape ch =
       with _ -> use_shapes := false; attrs
     else attrs
 
-(*
-let rec read_shapes_goal ch g =
-  match g.Xml.name with
-    | "goal" ->
-      let sum,shape = read_sum_and_shape ch in
-      let attrs = replace_goal_attributes g.Xml.attributes sum shape in
-      { g with
-        Xml.attributes = attrs;
-        Xml.elements =
-          List.rev
-            (List.rev_map (read_shapes_theory_or_transf ch) g.Xml.elements) }
-    | _ -> g
-
-and read_shapes_theory_or_transf ch t =
-  match t.Xml.name with
-    | "theory" | "transf" | "metas" ->
-      { t with Xml.elements =
-          List.rev
-            (List.rev_map (read_shapes_goal ch) t.Xml.elements) }
-    | _ -> t
-
-let read_shapes_file ch file =
-  match file.Xml.name with
-    | "file" ->
-      { file with Xml.elements =
-          List.rev
-            (List.rev_map (read_shapes_theory_or_transf ch) file.Xml.elements) }
-    | _ -> file
-
-let read_shapes_session ch ses =
-  { ses with Xml.elements =
-      List.rev
-        (List.rev_map (read_shapes_file ch) ses.Xml.elements) }
-
-let read_shapes fn xml =
-  let ch = C.open_in fn in
-  try
-    { xml with Xml.content = read_shapes_session ch xml.Xml.content }
-  with e -> C.close_in ch; raise e
-*)
-
 let read_xml_and_shapes xml_fn compressed_fn =
   use_shapes := true;
-  let ch = C.open_in compressed_fn in
   try
+    let ch = C.open_in compressed_fn in
     let xml = Xml.from_file ~fixattrs:(fix_attributes ch) xml_fn in
+    C.close_in ch;
     xml, !use_shapes
-  with
-      e when not (Debug.test_flag Debug.stack_trace) ->
-        C.close_in ch; raise e
+  with Sys_error msg ->
+    raise (ShapesFileError ("cannot open shapes file for reading: " ^ msg))
 end
 
 module ReadShapesNoCompress = ReadShapes(Compress.Compress_none)
@@ -1608,7 +1570,7 @@ with e ->
 type notask = unit
 let read_session dir =
   if not (Sys.file_exists dir && Sys.is_directory dir) then
-    raise (OpenError (Pp.sprintf "%s is not an existing directory" dir));
+    raise (SessionFileError (Pp.sprintf "%s is not an existing directory" dir));
   let xml_filename = Filename.concat dir db_filename in
   let session = empty_session dir in
   let use_shapes =
@@ -1625,12 +1587,10 @@ let read_session dir =
       with
         | Sys_error msg ->
         (* xml does not exist yet *)
-          raise (OpenError msg)
+          raise (SessionFileError msg)
         | Xml.Parse_error s ->
           Format.eprintf "XML database corrupted, ignored (%s)@." s;
-        (* failwith
-           ("Open session: XML database corrupted (%s)@." ^ s) *)
-          raise (OpenError "XML corrupted")
+          raise (SessionFileError "XML corrupted")
   else false
   in
   session, use_shapes
@@ -2031,7 +1991,8 @@ let print_external_proof fmt p =
 
 module AssoGoals : sig
   val set_use_shapes : bool -> unit
-  val associate : 'a goal list -> 'b goal list ->
+  val associate : theory_was_fully_up_to_date:bool ->
+    'a goal list -> 'b goal list ->
     ('b goal * ('a goal * bool) option) list
 end = struct
 (** When Why3 will require 3.12 put all of that in a function using
@@ -2063,14 +2024,18 @@ end = struct
   let use_shapes = ref true
   let set_use_shapes b = use_shapes := b
 
-  let associate (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
+  let associate ~theory_was_fully_up_to_date 
+      (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
       ('tto goal * ('ffrom goal * bool) option) list =
     let from_goals : ffrom goal list =
       Obj.magic (from_goals : 'ffrom goal list) in
     let to_goals   : tto goal list =
       Obj.magic (to_goals : 'tto goal list) in
     let associated : (tto goal * (ffrom goal * bool) option) list =
-      AssoGoals.associate ~use_shapes:!use_shapes from_goals to_goals in
+      AssoGoals.associate 
+        ~theory_was_fully_up_to_date
+        ~use_shapes:!use_shapes from_goals to_goals 
+    in
     (Obj.magic associated : ('tto goal * ('ffrom goal * bool) option) list)
 
 end
@@ -2250,6 +2215,13 @@ let rec release_sub_tasks g =
 
 exception UnrecoverableTask of Ident.ident
 
+type update_context =
+  { allow_obsolete_goals : bool;
+    release_tasks : bool;
+    use_shapes_for_pairing_sub_goals : bool;
+    theory_is_fully_up_to_date : bool;
+  }
+
 let rec recover_sub_tasks ~theories env_session task g =
   g.goal_task <- Some task;
   (** Check that the sum and shape don't change (the order is kept)
@@ -2300,17 +2272,17 @@ let goal_task_or_recover env_session g =
 (** merge session *)
 
 (** ~theories is the current theory library path empty : [] *)
-let rec merge_any_goal ~keygen ~theories env obsolete from_goal to_goal =
+let rec merge_any_goal ~ctxt ~keygen ~theories env obsolete from_goal to_goal =
   set_goal_expanded to_goal from_goal.goal_expanded;
   PHprover.iter (merge_proof ~keygen obsolete to_goal)
     from_goal.goal_external_proofs;
-  PHstr.iter (merge_trans ~keygen ~theories env to_goal)
+  PHstr.iter (merge_trans ~ctxt ~keygen ~theories env to_goal)
     from_goal.goal_transformations;
-  Mmetas_args.iter (merge_metas ~keygen ~theories env to_goal)
+  Mmetas_args.iter (merge_metas ~ctxt ~keygen ~theories env to_goal)
     from_goal.goal_metas
 
 
-and merge_trans ~keygen ~theories env to_goal _ from_transf =
+and merge_trans ~ctxt ~keygen ~theories env to_goal _ from_transf =
   try
     let from_transf_name = from_transf.transf_name in
     let to_goal_name = to_goal.goal_name in
@@ -2329,11 +2301,13 @@ and merge_trans ~keygen ~theories env to_goal _ from_transf =
     let associated =
       Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
         env.session.session_shape_version;
-      AssoGoals.associate from_transf.transf_goals to_transf.transf_goals
+      AssoGoals.associate 
+        ~theory_was_fully_up_to_date:ctxt.theory_is_fully_up_to_date
+        from_transf.transf_goals to_transf.transf_goals
     in
     List.iter (function
       | (to_goal, Some (from_goal, obsolete)) ->
-        merge_any_goal ~keygen ~theories env obsolete  from_goal to_goal
+        merge_any_goal ~ctxt ~keygen ~theories env obsolete  from_goal to_goal
       | (_, None) ->
         found_missed_goals := true)
       associated
@@ -2341,7 +2315,7 @@ and merge_trans ~keygen ~theories env to_goal _ from_transf =
 
 (** convert the ident from the old task to the ident at the same
     position in the new task *)
-and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
+and merge_metas_aux ~ctxt ~keygen ~theories env to_goal _ from_metas =
   Debug.dprintf debug "[Reload] metas for goal %s@\n"
     to_goal.goal_name.Ident.id_string;
 
@@ -2359,19 +2333,18 @@ and merge_metas_aux ~keygen ~theories env to_goal _ from_metas =
   in
   to_metas.metas_goal <- to_goal;
   Debug.dprintf debug "[Reload] metas done@\n";
-  merge_any_goal ~keygen ~theories env obsolete from_metas.metas_goal to_goal
+  merge_any_goal ~ctxt ~keygen ~theories env obsolete from_metas.metas_goal to_goal
 
-and merge_metas ~keygen ~theories env to_goal s from_metas =
+and merge_metas ~ctxt ~keygen ~theories env to_goal s from_metas =
   try
-    merge_metas_aux ~keygen ~theories env to_goal s from_metas
+    merge_metas_aux ~ctxt ~keygen ~theories env to_goal s from_metas
   with exn ->
     Debug.dprintf debug "[merge metas] error %a during merge, metas removed@\n"
       Exn_printer.exn_printer exn
 
 exception OutdatedSession
 
-let merge_theory
-    ~release ~keygen ~theories env ~allow_obsolete from_th to_th =
+let merge_theory ~ctxt ~keygen ~theories env from_th to_th =
   set_theory_expanded to_th from_th.theory_expanded;
   let from_goals = List.fold_left
     (fun from_goals g ->
@@ -2383,11 +2356,12 @@ let merge_theory
     to_th.theory_name.id_string
     (Pp.print_option Tc.print_checksum) from_th.theory_checksum
     (Pp.print_option Tc.print_checksum) to_th.theory_checksum;
-  let theory_is_fully_up_to_date =
-    match from_th.theory_checksum, to_th.theory_checksum with
-    | _, None -> assert false
-    | None, _ -> false
-    | Some s1, Some s2 -> Tc.equal_checksum s1 s2
+  let ctxt = { ctxt with theory_is_fully_up_to_date =
+      match from_th.theory_checksum, to_th.theory_checksum with
+      | _, None -> assert false
+      | None, _ -> false
+      | Some s1, Some s2 -> Tc.equal_checksum s1 s2
+    }
   in
   List.iter
     (fun to_goal ->
@@ -2397,7 +2371,7 @@ let merge_theory
         let goal_obsolete =
           match to_goal.goal_checksum, from_goal.goal_checksum with
           | None, _ -> assert false
-          | Some _, None -> not theory_is_fully_up_to_date
+          | Some _, None -> not ctxt.theory_is_fully_up_to_date
           | Some s1, Some s2 -> not (Tc.equal_checksum s1 s2)
         in
         if goal_obsolete then
@@ -2405,19 +2379,20 @@ let merge_theory
             Debug.dprintf debug "[Reload] Goal %s.%s has changed@\n"
               to_th.theory_name.Ident.id_string
               to_goal.goal_name.Ident.id_string;
-            if not allow_obsolete then raise OutdatedSession;
+            if not ctxt.allow_obsolete_goals then raise OutdatedSession;
             found_obsolete := true;
           end;
-        merge_any_goal ~keygen ~theories env goal_obsolete from_goal to_goal;
-        if release then release_sub_tasks to_goal
+        merge_any_goal ~ctxt ~keygen ~theories env goal_obsolete 
+          from_goal to_goal;
+        if ctxt.release_tasks then release_sub_tasks to_goal
       with
-        | Not_found when allow_obsolete ->
+        | Not_found when ctxt.allow_obsolete_goals ->
           found_missed_goals := true;
-          if release then release_sub_tasks to_goal
+          if ctxt.release_tasks then release_sub_tasks to_goal
         | Not_found -> raise OutdatedSession
     ) to_th.theory_goals
 
-let merge_file ~release ~keygen ~theories env ~allow_obsolete from_f to_f =
+let merge_file ~ctxt ~keygen ~theories env from_f to_f =
   Debug.dprintf debug "[Info] merge_file, shape_version = %d@\n"
     env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
@@ -2434,9 +2409,9 @@ let merge_file ~release ~keygen ~theories env ~allow_obsolete from_f to_f =
           (* TODO: remove this later when all sessions are updated *)
           with Not_found -> Mstr.find ("WP "^name) from_theories
         in
-        merge_theory ~release ~keygen ~theories env ~allow_obsolete from_th to_th
+        merge_theory ~ctxt ~keygen ~theories env from_th to_th
       with
-        | Not_found when allow_obsolete -> ()
+        | Not_found when ctxt.allow_obsolete_goals -> ()
         | Not_found -> raise OutdatedSession
     )
     to_f.file_theories;
@@ -2463,11 +2438,12 @@ let recompute_all_shapes ~release session =
   session.session_shape_version <- Termcode.current_shape_version;
   iter_session (recompute_all_shapes_file ~release) session
 
-let update_session ~use_shapes
-    ?(release=false) ~keygen ~allow_obsolete old_session env whyconf =
+let update_session ~ctxt
+    (* ?(release=false) *) ~keygen (* ~allow_obsolete *) old_session
+    env whyconf =
   Debug.dprintf debug "[Info] update_session: shape_version = %d@\n"
     old_session.session_shape_version;
-  AssoGoals.set_use_shapes use_shapes;
+  AssoGoals.set_use_shapes ctxt.use_shapes_for_pairing_sub_goals;
   let new_session =
     create_session ~shape_version:old_session.session_shape_version
       old_session.session_dir
@@ -2493,9 +2469,10 @@ let update_session ~use_shapes
       in
       let theories = Opt.get new_file.file_for_recovery in
       Debug.dprintf debug "[Merge] file '%s'@\n" old_file.file_name;
-      merge_file ~keygen ~theories
-        ~release:(release && (not will_recompute_shape))
-          new_env_session ~allow_obsolete old_file new_file;
+      let ctxt = { ctxt with
+        release_tasks = ctxt.release_tasks && (not will_recompute_shape) }
+      in
+      merge_file ~ctxt ~keygen ~theories new_env_session old_file new_file;
       let fname =
         Filename.basename (Filename.chop_extension old_file.file_name)
       in
@@ -2510,7 +2487,7 @@ let update_session ~use_shapes
     then
       begin
         Debug.dprintf debug "[Info] update_session: recompute shapes@\n";
-        recompute_all_shapes ~release new_session;
+        recompute_all_shapes ~release:ctxt.release_tasks new_session;
         true
       end
     else
@@ -2632,7 +2609,9 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
   let associated =
     Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
       env.session.session_shape_version;
-    AssoGoals.associate from_transf.transf_goals to_transf.transf_goals in
+    AssoGoals.associate 
+      ~theory_was_fully_up_to_date:false
+      from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
   | (to_goal, Some (from_goal, _obsolete)) ->
     add_goal_to_parent ~keygen env from_goal to_goal

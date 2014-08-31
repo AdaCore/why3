@@ -560,7 +560,7 @@ module Checksum = struct
 
   let rec tdecl b d = match d.Theory.td_node with
     | Theory.Decl d -> decl b d
-    | Theory.Use th -> 
+    | Theory.Use th ->
       char b 'U'; ident b th.Theory.th_name; list string b th.Theory.th_path;
       string b (theory_v2 th)
     | Theory.Clone (th, _) ->
@@ -735,19 +735,26 @@ module Pairing(Old: S)(New: S) = struct
       with Not_found -> assert false in
     (* phase 1: pair goals with identical checksums *)
     let old_checksums = Hashtbl.create 17 in
-    let add oldg = Hashtbl.add old_checksums (Old.checksum oldg) oldg in
-    List.iter add oldgoals;
+    let add acc oldg = match Old.checksum oldg with
+      | None -> mk_node (Old oldg) :: acc
+      | Some s -> Hashtbl.add old_checksums s oldg; acc
+    in
+    let old_goals_without_checksum =
+      List.fold_left add [] oldgoals
+    in
     let collect acc newg =
-      let c = New.checksum newg in
       try
-        let oldg = Hashtbl.find old_checksums c in
-        Hashtbl.remove old_checksums c;
-        result.(new_goal_index newg) <- (newg, Some (oldg, false));
-        acc
+        match New.checksum newg with
+        | None -> raise Not_found
+        | Some c ->
+          let oldg = Hashtbl.find old_checksums c in
+          Hashtbl.remove old_checksums c;
+          result.(new_goal_index newg) <- (newg, Some (oldg, false));
+          acc
       with Not_found ->
         mk_node (New newg) :: acc
     in
-    let newgoals = List.fold_left collect [] newgoals in
+    let newgoals = List.fold_left collect old_goals_without_checksum newgoals in
     let add _ oldg acc = mk_node (Old oldg) :: acc in
     let allgoals = Hashtbl.fold add old_checksums newgoals in
     Hashtbl.clear old_checksums;
@@ -778,16 +785,19 @@ module Pairing(Old: S)(New: S) = struct
     end;
     Array.to_list result
 
-  let simple_associate oldgoals newgoals =
+  let simple_associate ~obsolete oldgoals newgoals =
     let rec aux acc o n =
       match o,n with
         | _, [] -> acc
         | [], n :: rem_n -> aux ((n,None)::acc) [] rem_n
-        | o :: rem_o, n :: rem_n -> aux ((n,Some(o,true))::acc) rem_o rem_n
+        | o :: rem_o, n :: rem_n -> aux ((n,Some(o,obsolete))::acc) rem_o rem_n
     in
     aux [] oldgoals newgoals
 
-  let associate ~use_shapes =
-    if use_shapes then associate else simple_associate
+  let associate ~theory_was_fully_up_to_date ~use_shapes =
+    if use_shapes then
+      associate
+    else
+      simple_associate ~obsolete:(not theory_was_fully_up_to_date)
 
 end

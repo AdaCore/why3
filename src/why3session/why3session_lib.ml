@@ -75,9 +75,15 @@ let read_env_spec () =
 let read_update_session ~allow_obsolete env config fname =
   let project_dir = Session.get_project_dir fname in
   let session,use_shapes = Session.read_session project_dir in
-  (* FIXME: set use_shapes depending on what was loaded from disk *)
-  Session.update_session ~use_shapes ~keygen:(fun ?parent:_ _ -> ())
-    ~allow_obsolete session env config
+  let ctxt = {
+    S.allow_obsolete_goals = allow_obsolete;
+    S.release_tasks = false;
+    S.use_shapes_for_pairing_sub_goals = use_shapes;
+    S.theory_is_fully_up_to_date = false;
+  } 
+  in
+  let keygen ?parent:_ _ = () in
+  Session.update_session ~ctxt ~keygen session env config
 
 (** filter *)
 type filter_prover =
