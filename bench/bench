@@ -107,7 +107,15 @@ extract_and_run () {
         if BENCH=yes make -C $1 > /dev/null 2>&1; then
            echo -n "execute... "
            if $1/main.opt $3 > /dev/null 2>&1; then
-              echo "ok"
+               echo -n "doc... "
+               if BENCH=yes make -C $1 doc > /dev/null 2>&1; then
+                   echo "ok"
+               else
+                   echo "documentation failed!"
+                   echo BENCH=yes make -C $1 doc
+                   BENCH=yes make -C $1 doc
+                   exit 1
+               fi
            else
               echo "execution failed!"
               echo $1/main.opt $3

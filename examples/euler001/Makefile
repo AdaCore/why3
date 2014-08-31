@@ -32,6 +32,10 @@ all: $(MAIN).$(OCAMLBEST)
 
 extract: $(ML)
 
+doc:
+	$(WHY3) doc ../euler001.mlw
+	$(WHY3) session html .
+
 $(MAIN).byte: $(CMO)  $(MAIN).cmo
 	ocamlc $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ $^
 
