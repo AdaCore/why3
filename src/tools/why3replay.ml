@@ -400,14 +400,8 @@ let () =
     O.verbose := Debug.test_flag debug;
     let env_session,found_obs,some_merge_miss =
       let session, use_shapes = S.read_session project_dir in
-      let ctxt = {
-        S.allow_obsolete_goals = true;
-        S.release_tasks = false;
-        S.use_shapes_for_pairing_sub_goals = use_shapes;
-        S.theory_is_fully_up_to_date = false;
-      }
-      in
-      M.update_session ~ctxt session env config
+      M.update_session ~allow_obsolete:true ~release:false ~use_shapes
+        session env config
     in
     Debug.dprintf debug " done.@.";
     if !opt_obsolete_only && not found_obs

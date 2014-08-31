@@ -53,21 +53,27 @@ let provers =
     provers
     []
 
+let dummy_keygen ?parent () = ()
 
 (* a dummy keygen function for sessions *)
-let keygen ?parent () = ()
-
 (* create an empty session in the current directory *)
 let env_session,_,_ =
   let dummy_session : unit Session.session = Session.create_session "." in
-  Session.update_session ~use_shapes:false ~keygen ~allow_obsolete:true
-    dummy_session env config
+  let ctxt = {
+    Session.allow_obsolete_goals = true;
+    Session.release_tasks = false;
+    Session.use_shapes_for_pairing_sub_goals = false;
+    Session.theory_is_fully_up_to_date = false;
+    Session.keygen = dummy_keygen;
+  }
+  in
+  Session.update_session ~ctxt dummy_session env config
 
 (* adds a file in the new session *)
 let file : unit Session.file =
   let file_name = "examples/logic/hello_proof.why" in
   try
-    Session.add_file keygen env_session file_name
+    Session.add_file ~keygen:dummy_keygen env_session file_name
   with e ->
     eprintf "@[Error while reading file@ '%s':@ %a@.@]" file_name
       Exn_printer.exn_printer e;
@@ -84,7 +90,7 @@ let add_proofs_attempts g =
     (fun (p,d) ->
       let _pa : unit Session.proof_attempt =
         Session.add_external_proof
-          ~keygen
+          ~keygen:dummy_keygen
           ~obsolete:true
           ~archived:false
           ~timelimit:5

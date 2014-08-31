@@ -312,10 +312,19 @@ let rec init_any any = O.init (key_any any) any; iter init_any any
 
 let init_session session = session_iter init_any session
 
-let update_session ~ctxt old_session env whyconf  =
+let update_session ~allow_obsolete ~release ~use_shapes
+    old_session env whyconf  =
   O.reset ();
+  let ctxt = {
+    allow_obsolete_goals = allow_obsolete;
+    release_tasks = release;
+    use_shapes_for_pairing_sub_goals = use_shapes;
+    theory_is_fully_up_to_date = false; (* dummy initialisation *)
+    keygen = O.create;
+  }
+  in
   let (env_session,_,_) as res =
-    update_session ~ctxt ~keygen:O.create old_session env whyconf
+    update_session ~ctxt old_session env whyconf
   in
   Debug.dprintf debug "Init_session@\n";
   init_session env_session.session;

@@ -239,24 +239,16 @@ exception OutdatedSession
 exception ShapesFileError of string
 exception SessionFileError of string
 
-type update_context =
+type 'key update_context =
   { allow_obsolete_goals : bool;
     release_tasks : bool;
     use_shapes_for_pairing_sub_goals : bool;
     theory_is_fully_up_to_date : bool;
+    keygen : 'key keygen;
   }
 
-val update_session : ctxt:update_context ->
-(*
-  use_shapes:bool ->
-  ?release:bool (* default false *)  ->
-*)
-  keygen:'a keygen ->
-(*
-  allow_obsolete:bool ->
-*)
-'b session ->
-  Env.env -> Whyconf.config -> 'a env_session * bool * bool
+val update_session : ctxt:'key update_context -> 'a session ->
+  Env.env -> Whyconf.config -> 'key env_session * bool * bool
 (** reload the given session with the given environnement :
     - the files are reloaded
     - apply again the transformation

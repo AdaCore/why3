@@ -80,9 +80,9 @@ let read_update_session ~allow_obsolete env config fname =
     S.release_tasks = false;
     S.use_shapes_for_pairing_sub_goals = use_shapes;
     S.theory_is_fully_up_to_date = false;
-  } 
+    S.keygen = fun ?parent:_ _ -> ();
+  }
   in
-  let keygen ?parent:_ _ = () in
   Session.update_session ~ctxt ~keygen session env config
 
 (** filter *)

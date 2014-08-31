@@ -1107,7 +1107,7 @@ let string_attribute field r =
       field r.Xml.name;
     assert false
 
-let keygen ?parent:_ () = ()
+let dummy_keygen ?parent:_ () = ()
 
 let load_result r =
   match r.Xml.name with
@@ -1199,7 +1199,7 @@ let rec load_goal ctxt parent acc g =
         in
         let expanded = bool_attribute "expanded" g false in
         let mg =
-          raw_add_no_task ~keygen ~expanded parent gname expl sum shape
+          raw_add_no_task ~keygen:dummy_keygen ~expanded parent gname expl sum shape
         in
         List.iter (load_proof_or_transf ctxt mg) g.Xml.elements;
         mg.goal_verified <- goal_verified mg;
@@ -1239,7 +1239,7 @@ and load_proof_or_transf ctxt mg a =
           end;
         *)
           let (_ : 'a proof_attempt) =
-            add_external_proof ~keygen ~archived ~obsolete
+            add_external_proof ~keygen:dummy_keygen ~archived ~obsolete
               ~timelimit ~memlimit ~edit mg p res
           in
           ()
@@ -1250,7 +1250,7 @@ and load_proof_or_transf ctxt mg a =
     | "transf" ->
         let trname = string_attribute "name" a in
         let expanded = bool_attribute "expanded" a false in
-        let mtr = raw_add_transformation ~keygen ~expanded mg trname in
+        let mtr = raw_add_transformation ~keygen:dummy_keygen ~expanded mg trname in
         mtr.transf_goals <-
           List.rev
           (List.fold_left
@@ -1368,7 +1368,7 @@ and load_metas ctxt mg a =
   let metas_args =
     List.fold_left load_meta Mstr.empty metas_args in
   let expanded = bool_attribute "expanded" a false in
-  let metas = raw_add_metas ~keygen ~expanded mg metas_args idpos in
+  let metas = raw_add_metas ~keygen:dummy_keygen ~expanded mg metas_args idpos in
   let goal = match goal with
     | [] -> raise (LoadError (a,"No subgoal for this metas"))
     | [goal] -> goal
@@ -1390,7 +1390,7 @@ let load_theory ctxt mf acc th =
         let expanded = bool_attribute "expanded" th false in
         let csum = string_attribute_opt "sum" th in
         let checksum = Opt.map Tc.checksum_of_string csum in
-        let mth = raw_add_theory ~keygen ~expanded ~checksum mf thname in
+        let mth = raw_add_theory ~keygen:dummy_keygen ~expanded ~checksum mf thname in
         mth.theory_goals <-
           List.rev
           (List.fold_left
@@ -1408,7 +1408,7 @@ let load_file session old_provers f =
         let fn = string_attribute "name" f in
         let fmt = load_option "format" f in
         let expanded = bool_attribute "expanded" f false in
-        let mf = raw_add_file ~keygen ~expanded session fn fmt in
+        let mf = raw_add_file ~keygen:dummy_keygen ~expanded session fn fmt in
         mf.file_theories <-
           List.rev
           (List.fold_left
@@ -2215,11 +2215,12 @@ let rec release_sub_tasks g =
 
 exception UnrecoverableTask of Ident.ident
 
-type update_context =
+type 'key update_context =
   { allow_obsolete_goals : bool;
     release_tasks : bool;
     use_shapes_for_pairing_sub_goals : bool;
     theory_is_fully_up_to_date : bool;
+    keygen : 'key keygen;
   }
 
 let rec recover_sub_tasks ~theories env_session task g =
@@ -2272,17 +2273,17 @@ let goal_task_or_recover env_session g =
 (** merge session *)
 
 (** ~theories is the current theory library path empty : [] *)
-let rec merge_any_goal ~ctxt ~keygen ~theories env obsolete from_goal to_goal =
+let rec merge_any_goal ~ctxt ~theories env obsolete from_goal to_goal =
   set_goal_expanded to_goal from_goal.goal_expanded;
-  PHprover.iter (merge_proof ~keygen obsolete to_goal)
+  PHprover.iter (merge_proof ~keygen:ctxt.keygen obsolete to_goal)
     from_goal.goal_external_proofs;
-  PHstr.iter (merge_trans ~ctxt ~keygen ~theories env to_goal)
+  PHstr.iter (merge_trans ~ctxt ~theories env to_goal)
     from_goal.goal_transformations;
-  Mmetas_args.iter (merge_metas ~ctxt ~keygen ~theories env to_goal)
+  Mmetas_args.iter (merge_metas ~ctxt ~theories env to_goal)
     from_goal.goal_metas
 
 
-and merge_trans ~ctxt ~keygen ~theories env to_goal _ from_transf =
+and merge_trans ~ctxt ~theories env to_goal _ from_transf =
   try
     let from_transf_name = from_transf.transf_name in
     let to_goal_name = to_goal.goal_name in
@@ -2291,7 +2292,7 @@ and merge_trans ~ctxt ~keygen ~theories env to_goal _ from_transf =
     let to_transf =
       try
         add_registered_transformation
-          ~keygen env from_transf_name to_goal
+          ~keygen:ctxt.keygen env from_transf_name to_goal
       with exn when not (Debug.test_flag Debug.stack_trace) ->
         Debug.dprintf debug "[Reload] transformation %s produce an error:%a"
           from_transf_name Exn_printer.exn_printer exn;
@@ -2307,7 +2308,7 @@ and merge_trans ~ctxt ~keygen ~theories env to_goal _ from_transf =
     in
     List.iter (function
       | (to_goal, Some (from_goal, obsolete)) ->
-        merge_any_goal ~ctxt ~keygen ~theories env obsolete  from_goal to_goal
+        merge_any_goal ~ctxt ~theories env obsolete  from_goal to_goal
       | (_, None) ->
         found_missed_goals := true)
       associated
@@ -2315,7 +2316,7 @@ and merge_trans ~ctxt ~keygen ~theories env to_goal _ from_transf =
 
 (** convert the ident from the old task to the ident at the same
     position in the new task *)
-and merge_metas_aux ~ctxt ~keygen ~theories env to_goal _ from_metas =
+and merge_metas_aux ~ctxt ~theories env to_goal _ from_metas =
   Debug.dprintf debug "[Reload] metas for goal %s@\n"
     to_goal.goal_name.Ident.id_string;
 
@@ -2323,28 +2324,28 @@ and merge_metas_aux ~ctxt ~keygen ~theories env to_goal _ from_metas =
     merge_metas_in_task ~theories env (goal_task to_goal) from_metas in
 
   let to_metas =
-    raw_add_metas ~keygen ~expanded:from_metas.metas_expanded
+    raw_add_metas ~keygen:ctxt.keygen ~expanded:from_metas.metas_expanded
       to_goal metas to_idpos
   in
   let to_goal =
     raw_add_task ~version:env.session.session_shape_version
-      ~keygen (Parent_metas to_metas) ~expanded:true
+      ~keygen:ctxt.keygen (Parent_metas to_metas) ~expanded:true
       to_goal.goal_name to_goal.goal_expl task
   in
   to_metas.metas_goal <- to_goal;
   Debug.dprintf debug "[Reload] metas done@\n";
-  merge_any_goal ~ctxt ~keygen ~theories env obsolete from_metas.metas_goal to_goal
+  merge_any_goal ~ctxt ~theories env obsolete from_metas.metas_goal to_goal
 
-and merge_metas ~ctxt ~keygen ~theories env to_goal s from_metas =
+and merge_metas ~ctxt ~theories env to_goal s from_metas =
   try
-    merge_metas_aux ~ctxt ~keygen ~theories env to_goal s from_metas
+    merge_metas_aux ~ctxt ~theories env to_goal s from_metas
   with exn ->
     Debug.dprintf debug "[merge metas] error %a during merge, metas removed@\n"
       Exn_printer.exn_printer exn
 
 exception OutdatedSession
 
-let merge_theory ~ctxt ~keygen ~theories env from_th to_th =
+let merge_theory ~ctxt ~theories env from_th to_th =
   set_theory_expanded to_th from_th.theory_expanded;
   let from_goals = List.fold_left
     (fun from_goals g ->
@@ -2382,8 +2383,7 @@ let merge_theory ~ctxt ~keygen ~theories env from_th to_th =
             if not ctxt.allow_obsolete_goals then raise OutdatedSession;
             found_obsolete := true;
           end;
-        merge_any_goal ~ctxt ~keygen ~theories env goal_obsolete 
-          from_goal to_goal;
+        merge_any_goal ~ctxt ~theories env goal_obsolete from_goal to_goal;
         if ctxt.release_tasks then release_sub_tasks to_goal
       with
         | Not_found when ctxt.allow_obsolete_goals ->
@@ -2392,7 +2392,7 @@ let merge_theory ~ctxt ~keygen ~theories env from_th to_th =
         | Not_found -> raise OutdatedSession
     ) to_th.theory_goals
 
-let merge_file ~ctxt ~keygen ~theories env from_f to_f =
+let merge_file ~ctxt ~theories env from_f to_f =
   Debug.dprintf debug "[Info] merge_file, shape_version = %d@\n"
     env.session.session_shape_version;
   set_file_expanded to_f from_f.file_expanded;
@@ -2409,7 +2409,7 @@ let merge_file ~ctxt ~keygen ~theories env from_f to_f =
           (* TODO: remove this later when all sessions are updated *)
           with Not_found -> Mstr.find ("WP "^name) from_theories
         in
-        merge_theory ~ctxt ~keygen ~theories env from_th to_th
+        merge_theory ~ctxt ~theories env from_th to_th
       with
         | Not_found when ctxt.allow_obsolete_goals -> ()
         | Not_found -> raise OutdatedSession
@@ -2438,9 +2438,7 @@ let recompute_all_shapes ~release session =
   session.session_shape_version <- Termcode.current_shape_version;
   iter_session (recompute_all_shapes_file ~release) session
 
-let update_session ~ctxt
-    (* ?(release=false) *) ~keygen (* ~allow_obsolete *) old_session
-    env whyconf =
+let update_session ~ctxt old_session env whyconf =
   Debug.dprintf debug "[Info] update_session: shape_version = %d@\n"
     old_session.session_shape_version;
   AssoGoals.set_use_shapes ctxt.use_shapes_for_pairing_sub_goals;
@@ -2464,7 +2462,7 @@ let update_session ~ctxt
     PHstr.fold (fun _ old_file acc ->
       Debug.dprintf debug "[Load] file '%s'@\n" old_file.file_name;
       let new_file = add_file
-        ~keygen new_env_session
+        ~keygen:ctxt.keygen new_env_session
         ?format:old_file.file_format old_file.file_name
       in
       let theories = Opt.get new_file.file_for_recovery in
@@ -2472,7 +2470,7 @@ let update_session ~ctxt
       let ctxt = { ctxt with
         release_tasks = ctxt.release_tasks && (not will_recompute_shape) }
       in
-      merge_file ~ctxt ~keygen ~theories new_env_session old_file new_file;
+      merge_file ~ctxt ~theories new_env_session old_file new_file;
       let fname =
         Filename.basename (Filename.chop_extension old_file.file_name)
       in
