@@ -22,8 +22,6 @@ exception KnownFormat of fformat
 exception UnknownFormat of fformat
 exception InvalidFormat of fformat
 exception UnspecifiedFormat
-
-exception KnownExtension of extension * fformat
 exception UnknownExtension of extension
 
 exception LibraryNotFound of pathname
@@ -118,18 +116,20 @@ let register_language parent convert = {
 let extension_table = ref Mstr.empty
 
 let register_format ~desc lang ff extl fp =
-  let add_ext m e = Mstr.change (function
-    | Some ff -> raise (KnownExtension (e,ff))
-    | None -> Some ff) e m in
-  extension_table := List.fold_left add_ext !extension_table extl;
   let fp env path fn ch = store lang path (fp env path fn ch) in
-  register_format lang (ff,extl,desc) fp
+  register_format lang (ff,extl,desc) fp;
+  let add_ext m e = Mstr.add e ff m in
+  extension_table := List.fold_left add_ext !extension_table extl
 
 let add_builtin lang bp =
   let bp path = store lang ("why3" :: path) (bp path) in
   add_builtin lang bp
 
-let list_formats lang = List.rev lang.info (* older to newer *)
+let list_formats lang =
+  let filter_ext (ff,extl,desc) =
+    let filt e = Mstr.find e !extension_table = ff in
+    ff, List.filter filt extl, desc in
+  List.rev_map filter_ext lang.info
 
 (** Input file parsing *)
 
@@ -267,8 +267,6 @@ let () = Exn_printer.register
       "Unknown input format: %s" s
   | UnknownExtension s -> Format.fprintf fmt
       "Unknown file extension: `%s'" s
-  | KnownExtension (s,f) -> Format.fprintf fmt
-      "File extension `%s' is already registered for input format %s" s f
   | UnspecifiedFormat -> Format.fprintf fmt
       "Format not specified"
   | AmbiguousPath (f1,f2) -> Format.fprintf fmt

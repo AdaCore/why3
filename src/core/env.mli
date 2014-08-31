@@ -79,18 +79,16 @@ type 'a format_parser = env -> pathname -> filename -> in_channel -> 'a
     to be used in error messages. *)
 
 exception KnownFormat of fformat
-exception KnownExtension of extension * fformat
 
 val register_format :
   desc:Pp.formatted ->
   'a language -> fformat -> extension list -> 'a format_parser -> unit
 (** [register_format ~desc lang fname exts parser] registers a new format
     [fname] for files with extensions from the string list [exts] (without
-    the separating dot).
+    the separating dot). Any previous associations of extensions from [exts]
+    to other formats are overridden.
 
-    @raise KnownFormat [name] if the format is already registered
-    @raise KnownExtension [ext,name] if a parser for [ext] is already
-      registered for format [name] *)
+    @raise KnownFormat [name] if the format is already registered *)
 
 val list_formats :
   'a language -> (fformat * extension list * Pp.formatted) list
