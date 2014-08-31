@@ -1,4 +1,26 @@
 
+
+BENCH ?= no
+
+ifeq ($(BENCH),yes)
+  WHY3=../../bin/why3
+  WHY3SHARE=../../share
+else
+  ifeq ($(BINDIR),)
+    WHY3=why3
+  else
+    WHY3=$(BINDIR)/why3
+  endif
+  WHY3SHARE=$(shell $(WHY3) --print-datadir)
+endif
+
+include $(WHY3SHARE)/Makefile.config
+
+ifeq ($(BENCH),yes)
+  INCLUDE += -I ../../lib/why3
+endif
+
+
 MAIN = main
 OBJ = defunctionalization__Expr \
 	defunctionalization__DirectSem \
@@ -12,36 +34,37 @@ CMX = $(addsuffix .cmx, $(OBJ))
 
 ZARITH = $(shell ocamlfind query -i-format zarith)
 NUMLIB = zarith
-WHY3   = $(shell ocamlfind query -i-format why3)
 
 OCAMLOPT = ocamlopt -noassert -inline 1000
 
 all: $(MAIN).opt
 
+extract: $(ML)
+
 doc:
-	why3doc ../defunctionalization.mlw
-	why3session html ../defunctionalization.mlw
-	firefox defunctionalization.mlw.html defunctionalization.html &
+	$(WHY3) doc ../defunctionalization.mlw
+	$(WHY3) session html ../defunctionalization.mlw
+	@echo firefox ../defunctionalization.html why3session.html
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
-	ocamlc -g $(ZARITH) $(WHY3) $(NUMLIB).cma why3extract.cma -o $@ $^
+	ocamlc -g $(ZARITH) $(INCLUDE) $(NUMLIB).cma why3extract.cma -o $@ $^
 
 $(MAIN).opt: $(CMX) $(MAIN).cmx
-	$(OCAMLOPT) $(ZARITH) $(WHY3) $(NUMLIB).cmxa why3extract.cmxa -o $@ $^
+	$(OCAMLOPT) $(ZARITH) $(INCLUDE) $(NUMLIB).cmxa why3extract.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../defunctionalization.mlw
-	why3 -E ocaml64 ../defunctionalization.mlw -o .
+	$(WHY3) extract -D ocaml64 ../defunctionalization.mlw -o .
 
 %.cmx: %.ml
-	$(OCAMLOPT) $(WHY3) -annot -c $<
+	$(OCAMLOPT) $(INCLUDE) -annot -c $<
 
 %.cmo: %.ml
-	ocamlc $(WHY3) -annot -g -c $<
+	ocamlc $(INCLUDE) -annot -g -c $<
 
 %.cmi: %.mli
-	ocamlc $(WHY3) -annot -g -c $<
+	ocamlc $(INCLUDE) -annot -g -c $<
 
 clean::
 	rm -f $(ML) *.cm[xio] $(MAIN).opt
