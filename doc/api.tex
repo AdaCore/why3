@@ -296,7 +296,7 @@ let two : Term.term =
 let four : Term.term = 
   Term.t_const (Number.ConstInt (Number.int_const_dec "4"))
 let int_theory : Theory.theory =
-  Env.find_theory env ["int"] "Int"
+  Env.read_theory env ["int"] "Int"
 let plus_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
 let two_plus_two : Term.term =
