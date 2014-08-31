@@ -83,7 +83,7 @@ let read_update_session ~allow_obsolete env config fname =
     S.keygen = fun ?parent:_ _ -> ();
   }
   in
-  Session.update_session ~ctxt ~keygen session env config
+  Session.update_session ~ctxt session env config
 
 (** filter *)
 type filter_prover =
