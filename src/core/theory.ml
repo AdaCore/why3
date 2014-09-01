@@ -502,7 +502,10 @@ let empty_clones s = {
 (* populate the clone structure *)
 
 let rec cl_find_ts cl ts =
-  if not (Sid.mem ts.ts_name cl.cl_local) then ts
+  if not (Sid.mem ts.ts_name cl.cl_local) then
+    let td = Opt.map (cl_trans_ty cl) ts.ts_def in
+    if Opt.equal ty_equal ts.ts_def td then ts else
+    create_tysymbol (id_clone ts.ts_name) ts.ts_args td
   else try Mts.find ts cl.ts_table
   with Not_found ->
     let td' = Opt.map (cl_trans_ty cl) ts.ts_def in
