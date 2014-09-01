@@ -85,7 +85,7 @@ let print_file fname =
   close_out c
 
 let () =
-  (* Queue.iter Doc_def.add_file opt_queue; *)
+  Queue.iter Doc_def.add_local_file opt_queue;
   try
     Doc_def.set_output_dir !opt_output;
     (* process files *)

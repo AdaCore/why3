@@ -12,6 +12,8 @@
 open Why3
 open Ident
 
+val add_local_file: string -> unit
+
 (* records definition locations *)
 
 val set_output_dir: string option -> unit
