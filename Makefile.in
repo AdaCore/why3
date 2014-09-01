@@ -1098,10 +1098,10 @@ drivers/isabelle-realizations.aux: Makefile
 	) > $@
 
 install_no_local::
-	cp -r lib/isabelle $(LIBDIR)/why3
-	cp drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
-	@(d=`isabelle components -l | grep why3`; \
-	  if test "$$d" != $(LIBDIR)/why3/isabelle; then \
+	cp -r lib/isabelle "$(LIBDIR)/why3"
+	cp drivers/isabelle-realizations.aux "$(DATADIR)/why3/drivers/"
+	@(d=`isabelle components -l | grep why3 | sed -e 's/^ *//' `; \
+	  if test "$$d" != "$(LIBDIR)/why3/isabelle"; then \
 	    echo "[Warning] Cannot pre-build the Isabelle heap because the"; \
 	    echo "  current Why3 path in Isabelle component configuration [$$d]"; \
             echo "  is not the same as the current install dir [$(LIBDIR)/why3/isabelle]"; \
@@ -1109,8 +1109,8 @@ install_no_local::
 	  fi)
 
 install_local::
-	@(d=`isabelle components -l | grep why3`; \
-	  if test "$$d" != `pwd`/lib/isabelle; then \
+	@(d=`isabelle components -l | grep why3 | sed -e 's/^ *//'`; \
+	  if test "$$d" != "`pwd`/lib/isabelle"; then \
 	    echo "[Warning] Cannot pre-build the Isabelle heap because the"; \
 	    echo "  current Why3 path in Isabelle component configuration [$$d]"; \
             echo "  is not the same as the current install dir [`pwd`/lib/isabelle]"; \
