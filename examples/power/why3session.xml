@@ -7,52 +7,52 @@
 <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
 <file name="../power.mlw" expanded="true">
-<theory name="FastExponentiation" expanded="true">
- <goal name="WP_parameter fast_exp" expl="VC for fast_exp" sum="3232ef99ced6f4d5c737e0e24c9a5e77" expanded="true">
+<theory name="FastExponentiation" sum="b1ee91d5c248138c43271c0f11b810d9" expanded="true">
+ <goal name="WP_parameter fast_exp" expl="VC for fast_exp" expanded="true">
  <proof prover="2" timelimit="3" memlimit="0"><result status="valid" time="0.39"/></proof>
  </goal>
- <goal name="WP_parameter fast_exp_imperative" expl="VC for fast_exp_imperative" sum="850c1472b1d27f7c74ab029871500360" expanded="true">
+ <goal name="WP_parameter fast_exp_imperative" expl="VC for fast_exp_imperative" expanded="true">
  <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter fast_exp_imperative.1" expl="1. loop invariant init" sum="0ec5c0522c41546048d227e5496d3d6b" expanded="true">
+  <goal name="WP_parameter fast_exp_imperative.1" expl="1. loop invariant init" expanded="true">
   <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.2" expl="2. loop invariant preservation" sum="f07e593ce5501cf076603b2002d1fc28" expanded="true">
+  <goal name="WP_parameter fast_exp_imperative.2" expl="2. loop invariant preservation" expanded="true">
   <transf name="split_goal" expanded="true">
-   <goal name="WP_parameter fast_exp_imperative.2.1" expl="1." sum="ed8afda76e87b76fbb18f7ae7ecc04fe" expanded="true">
+   <goal name="WP_parameter fast_exp_imperative.2.1" expl="1." expanded="true">
    <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter fast_exp_imperative.2.2" expl="2." sum="d47f5b17b7681897d31bcc1632a46a22" expanded="true">
+   <goal name="WP_parameter fast_exp_imperative.2.2" expl="2." expanded="true">
    <proof prover="0" edited="power_M_WP_parameter_fast_exp_imperative_1.v"><result status="valid" time="1.28"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.3" expl="3. loop variant decrease" sum="4dc9f8898f61119dde4864ad921292a8" expanded="true">
+  <goal name="WP_parameter fast_exp_imperative.3" expl="3. loop variant decrease" expanded="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.4" expl="4. loop invariant preservation" sum="35d75185c038b0d9af0899422c092e68" expanded="true">
+  <goal name="WP_parameter fast_exp_imperative.4" expl="4. loop invariant preservation" expanded="true">
   <transf name="split_goal" expanded="true">
-   <goal name="WP_parameter fast_exp_imperative.4.1" expl="1." sum="b43106c191040f1e2afe183767e32cb7" expanded="true">
+   <goal name="WP_parameter fast_exp_imperative.4.1" expl="1." expanded="true">
    <proof prover="1"><result status="valid" time="0.01"/></proof>
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter fast_exp_imperative.4.2" expl="2." sum="601aaf308e607d1081d34481fe73c40b" expanded="true">
+   <goal name="WP_parameter fast_exp_imperative.4.2" expl="2." expanded="true">
    <proof prover="0" edited="power_WP_M_WP_parameter_fast_exp_imperative_3.v"><result status="valid" time="1.29"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.5" expl="5. loop variant decrease" sum="29ff95fe97374abb4c6b1f4af3755f40" expanded="true">
+  <goal name="WP_parameter fast_exp_imperative.5" expl="5. loop variant decrease" expanded="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.6" expl="6. postcondition" sum="51117c09ab27b8f68e98a1877a7e23b6" expanded="true">
+  <goal name="WP_parameter fast_exp_imperative.6" expl="6. postcondition" expanded="true">
   <transf name="split_goal" expanded="true">
-   <goal name="WP_parameter fast_exp_imperative.6.1" expl="1. postcondition" sum="51117c09ab27b8f68e98a1877a7e23b6" expanded="true">
+   <goal name="WP_parameter fast_exp_imperative.6.1" expl="1. postcondition" expanded="true">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>

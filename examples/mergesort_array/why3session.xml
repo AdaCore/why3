@@ -11,802 +11,802 @@
 <prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.3" timelimit="30" memlimit="1000"/>
 <file name="../mergesort_array.mlw" expanded="true">
-<theory name="Elt">
+<theory name="Elt" sum="dd0cb9e4e45e2fe7a26ed4a5931f7b8d">
 </theory>
-<theory name="Merge" expanded="true">
- <goal name="WP_parameter merge" expl="VC for merge" sum="390247f104b4d5912efb3a63eb4bd75c">
+<theory name="Merge" sum="5059985307832567da14ce9cd4201e5a" expanded="true">
+ <goal name="WP_parameter merge" expl="VC for merge">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter merge.1" expl="1. postcondition" sum="61334c568e0574e261ed20625a28e9b2">
+  <goal name="WP_parameter merge.1" expl="1. postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.2" expl="2. postcondition" sum="6b357283609360816dac95256407c0dc">
+  <goal name="WP_parameter merge.2" expl="2. postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.3" expl="3. loop invariant init" sum="d186f579efcb5fe9e2f34da0cd136e78">
+  <goal name="WP_parameter merge.3" expl="3. loop invariant init">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.4" expl="4. loop invariant init" sum="d987aed978ada5bcc27b5392b603cc8a">
+  <goal name="WP_parameter merge.4" expl="4. loop invariant init">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.5" expl="5. loop invariant init" sum="8af309428ada2668f74498df5e4adb33">
+  <goal name="WP_parameter merge.5" expl="5. loop invariant init">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.6" expl="6. loop invariant init" sum="70d78fe782781a9e059a5f67a4dd4c4d">
+  <goal name="WP_parameter merge.6" expl="6. loop invariant init">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.7" expl="7. loop invariant init" sum="c4f78b93c0f32ec972907c12b2a34e95">
+  <goal name="WP_parameter merge.7" expl="7. loop invariant init">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.8" expl="8. loop invariant init" sum="c2ab9a04169f4b351a85a3f847521b5a">
+  <goal name="WP_parameter merge.8" expl="8. loop invariant init">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.9" expl="9. index in array bounds" sum="36fff0dd7cf9755dddf36f17378c9295">
+  <goal name="WP_parameter merge.9" expl="9. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.10" expl="10. type invariant" sum="1f9c169b5fcf297d5844423c712cf32a">
+  <goal name="WP_parameter merge.10" expl="10. type invariant">
   <proof prover="6" timelimit="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter merge.11" expl="11. index in array bounds" sum="b31c3bf8300eeed74da71cf3154bdc1f">
+  <goal name="WP_parameter merge.11" expl="11. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.12" expl="12. loop invariant preservation" sum="0a34690623d1ece1e413ddc5d4e42fca">
+  <goal name="WP_parameter merge.12" expl="12. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.13" expl="13. loop invariant preservation" sum="e282aac164b310c18d543311d6956702">
+  <goal name="WP_parameter merge.13" expl="13. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.14" expl="14. loop invariant preservation" sum="e78e93c3f14635348e3ca1eb765b5ad0">
+  <goal name="WP_parameter merge.14" expl="14. loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter merge.15" expl="15. loop invariant preservation" sum="165cda1124ee03b8451b1a0e0df08ae0">
+  <goal name="WP_parameter merge.15" expl="15. loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter merge.16" expl="16. loop invariant preservation" sum="a205fc9795b5871b0327caf1b533f2d8">
+  <goal name="WP_parameter merge.16" expl="16. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter merge.17" expl="17. loop invariant preservation" sum="e728496a827d6c0e2c4c83ddbb95d3e6">
-  <proof prover="2"><result status="valid" time="1.04"/></proof>
+  <goal name="WP_parameter merge.17" expl="17. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="1.32"/></proof>
   </goal>
-  <goal name="WP_parameter merge.18" expl="18. loop invariant preservation" sum="a9f9a5e2ba022d529912c4769a42fec1">
+  <goal name="WP_parameter merge.18" expl="18. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter merge.19" expl="19. index in array bounds" sum="be4556d3d4c3b135e47bfe981fc7b3a5">
+  <goal name="WP_parameter merge.19" expl="19. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.20" expl="20. index in array bounds" sum="967b68b593ef9adb3b58d539c8e24955">
+  <goal name="WP_parameter merge.20" expl="20. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.21" expl="21. index in array bounds" sum="047a69bc93dc33c4e51038a5b5525541">
+  <goal name="WP_parameter merge.21" expl="21. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.22" expl="22. type invariant" sum="5f697517b6cb7f28e59c032d6e621c01">
+  <goal name="WP_parameter merge.22" expl="22. type invariant">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.23" expl="23. index in array bounds" sum="b96eb77a68b6640eae5960bbbaa4bbca">
+  <goal name="WP_parameter merge.23" expl="23. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.24" expl="24. loop invariant preservation" sum="d80c5416e55ca3e4d5b3a69d4fb30d7c">
+  <goal name="WP_parameter merge.24" expl="24. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.25" expl="25. loop invariant preservation" sum="236853dafadc07c7f86ad8e2322387a2">
+  <goal name="WP_parameter merge.25" expl="25. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.26" expl="26. loop invariant preservation" sum="d47b3893507aec97396fe34cfc98507b">
+  <goal name="WP_parameter merge.26" expl="26. loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter merge.27" expl="27. loop invariant preservation" sum="fa6a50426a6a04d91dbecc550b0ce45e">
+  <goal name="WP_parameter merge.27" expl="27. loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter merge.28" expl="28. loop invariant preservation" sum="75fdeb33c6783e1ecbcc6d18a294bbe0">
+  <goal name="WP_parameter merge.28" expl="28. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter merge.29" expl="29. loop invariant preservation" sum="e48500d19f6362e86cb2de1f44da13c4">
+  <goal name="WP_parameter merge.29" expl="29. loop invariant preservation">
   <proof prover="5"><result status="valid" time="1.34"/></proof>
   </goal>
-  <goal name="WP_parameter merge.30" expl="30. loop invariant preservation" sum="80ad3964483452bd28459e09954804ce">
+  <goal name="WP_parameter merge.30" expl="30. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.31" expl="31. index in array bounds" sum="2ac900f5734b396dc4693b2eb9a5d5ae">
+  <goal name="WP_parameter merge.31" expl="31. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.32" expl="32. type invariant" sum="dcfb254f77ce72b7628570b02c037301">
+  <goal name="WP_parameter merge.32" expl="32. type invariant">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.33" expl="33. index in array bounds" sum="e4d33aa42375adb249de3be4c7fa7614">
+  <goal name="WP_parameter merge.33" expl="33. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.34" expl="34. loop invariant preservation" sum="9e0066029c21b715a9d08c1fe673e622">
+  <goal name="WP_parameter merge.34" expl="34. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.35" expl="35. loop invariant preservation" sum="de7c3fe8ea099e2a8d388555417aedca">
+  <goal name="WP_parameter merge.35" expl="35. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter merge.36" expl="36. loop invariant preservation" sum="9840e1e6a0da840ca2309c1a7d2a0f4a">
+  <goal name="WP_parameter merge.36" expl="36. loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter merge.37" expl="37. loop invariant preservation" sum="3466f4525ff782f91150fc566b4ae1a0">
+  <goal name="WP_parameter merge.37" expl="37. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.07"/></proof>
   <proof prover="7" timelimit="10"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter merge.38" expl="38. loop invariant preservation" sum="d76232c3cca5b078a223c94c03357ab3">
+  <goal name="WP_parameter merge.38" expl="38. loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter merge.39" expl="39. loop invariant preservation" sum="2fb7a323edb0f4b9934488fa93d62f1f">
+  <goal name="WP_parameter merge.39" expl="39. loop invariant preservation">
   <proof prover="2"><result status="valid" time="1.64"/></proof>
   </goal>
-  <goal name="WP_parameter merge.40" expl="40. loop invariant preservation" sum="fc43b7799cc545c137f8080c982c8799">
+  <goal name="WP_parameter merge.40" expl="40. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.41" expl="41. index in array bounds" sum="b41654e3349fdfb082d0ebc7200f54f6">
+  <goal name="WP_parameter merge.41" expl="41. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.42" expl="42. type invariant" sum="4fd3abd13a097595c0a8a81627a4023c">
+  <goal name="WP_parameter merge.42" expl="42. type invariant">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.43" expl="43. index in array bounds" sum="4fc7f9f7f929109d0a0118e15eda9a78">
+  <goal name="WP_parameter merge.43" expl="43. index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.44" expl="44. loop invariant preservation" sum="fb53d46d04787bfdef24636f7d74362f">
+  <goal name="WP_parameter merge.44" expl="44. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.45" expl="45. loop invariant preservation" sum="80353db2259d2b917306caf400872e5f">
+  <goal name="WP_parameter merge.45" expl="45. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.46" expl="46. loop invariant preservation" sum="996cb37174b87a417a02a25e309ed308">
+  <goal name="WP_parameter merge.46" expl="46. loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter merge.47" expl="47. loop invariant preservation" sum="8d735fc6e2537920aa02e7a7d85969fe">
+  <goal name="WP_parameter merge.47" expl="47. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter merge.48" expl="48. loop invariant preservation" sum="9af9a53301bb3c788763dc92d68be883">
+  <goal name="WP_parameter merge.48" expl="48. loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter merge.49" expl="49. loop invariant preservation" sum="d182cfef1355627453da651187feb6a7">
+  <goal name="WP_parameter merge.49" expl="49. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.60"/></proof>
   </goal>
-  <goal name="WP_parameter merge.50" expl="50. loop invariant preservation" sum="780a4b6f1e614f26505ebb503d6aae6c">
+  <goal name="WP_parameter merge.50" expl="50. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.51" expl="51. type invariant" sum="0b36ccbbbfb980a9ce56371d38d81903">
+  <goal name="WP_parameter merge.51" expl="51. type invariant">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.52" expl="52. postcondition" sum="f80a43338d5e1e3e31f927c6618d2696">
+  <goal name="WP_parameter merge.52" expl="52. postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.53" expl="53. postcondition" sum="6a131747ab087835d8bbaf5b5ff99ca0">
+  <goal name="WP_parameter merge.53" expl="53. postcondition">
   <transf name="inline_goal">
-   <goal name="WP_parameter merge.53.1" expl="1. postcondition" sum="97712bdd46551307d6d2cf2d473ab39b">
+   <goal name="WP_parameter merge.53.1" expl="1. postcondition">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter merge.53.1.1" expl="1." sum="a5cee0cdfdfba97e0cad5229b99f3d19">
+    <goal name="WP_parameter merge.53.1.1" expl="1.">
     <proof prover="6" timelimit="40"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.2" expl="2." sum="1baed8d369cbc753b0d14a95575ca955">
+    <goal name="WP_parameter merge.53.1.2" expl="2.">
     <proof prover="6" timelimit="40"><result status="valid" time="0.05"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.3" expl="3." sum="f5c11c437704c4cce4cf2434ed29978b">
+    <goal name="WP_parameter merge.53.1.3" expl="3.">
     <proof prover="6" timelimit="40"><result status="valid" time="0.04"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.4" expl="4." sum="edffb335cc8a2f6e39e81e290990db15">
+    <goal name="WP_parameter merge.53.1.4" expl="4.">
     <proof prover="6" timelimit="40"><result status="valid" time="0.05"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.5" expl="5." sum="a96841a30b0f8afe5b019740854bec92">
+    <goal name="WP_parameter merge.53.1.5" expl="5.">
     <proof prover="6" timelimit="40"><result status="valid" time="0.04"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.6" expl="6." sum="effaa18a1521e642a62f2a073dfc4994">
+    <goal name="WP_parameter merge.53.1.6" expl="6.">
     <proof prover="4"><result status="valid" time="0.06"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter merge.54" expl="54. postcondition" sum="efbfeb6f5b1a77da0ce00885646e1bc2">
+  <goal name="WP_parameter merge.54" expl="54. postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter merge_using" expl="VC for merge_using" sum="47738caae8a9db238c44b1a7b7463bf4">
+ <goal name="WP_parameter merge_using" expl="VC for merge_using">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter merge_using.1" expl="1. index in array bounds" sum="9e6d0d6bd82c994c654982162c6cb2d3">
+  <goal name="WP_parameter merge_using.1" expl="1. index in array bounds">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.2" expl="2. index in array bounds" sum="5dede657dbe9d1c13de8b32727f2e919">
+  <goal name="WP_parameter merge_using.2" expl="2. index in array bounds">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.3" expl="3. assertion" sum="ba88fae6e7dba0a86ed9491b65492d0c">
+  <goal name="WP_parameter merge_using.3" expl="3. assertion">
   <proof prover="1" timelimit="20"><result status="valid" time="0.05"/></proof>
   <proof prover="6" timelimit="20"><result status="valid" time="0.02"/></proof>
   <proof prover="7" timelimit="20"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.4" expl="4. postcondition" sum="bb398cc7d76a972ebfccc8199c7bd5a0">
+  <goal name="WP_parameter merge_using.4" expl="4. postcondition">
   <proof prover="6"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.5" expl="5. postcondition" sum="535e41e3578e2af00567b921719283af">
+  <goal name="WP_parameter merge_using.5" expl="5. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.6" expl="6. precondition" sum="036f7e9a251dd6a4ff6d76a744f35ac4">
+  <goal name="WP_parameter merge_using.6" expl="6. precondition">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.7" expl="7. precondition" sum="f3b24e2260e7068a82aa5ec1db93b5f2">
+  <goal name="WP_parameter merge_using.7" expl="7. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.8" expl="8. precondition" sum="80e641b3ce715a1481002c23b7e6d33d">
+  <goal name="WP_parameter merge_using.8" expl="8. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.9" expl="9. precondition" sum="6419417f402287865613acd72e3787fc">
+  <goal name="WP_parameter merge_using.9" expl="9. precondition">
   <proof prover="6"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.10" expl="10. precondition" sum="77101cca0e8aa019c6724d2e7a03b45f">
+  <goal name="WP_parameter merge_using.10" expl="10. precondition">
   <proof prover="6"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.11" expl="11. assertion" sum="ff05df5e909c368d5d386a6f79c15568">
+  <goal name="WP_parameter merge_using.11" expl="11. assertion">
   <transf name="inline_goal">
-   <goal name="WP_parameter merge_using.11.1" expl="1. assertion" sum="3772bc3269f653ffe74fee170b9e0302">
+   <goal name="WP_parameter merge_using.11.1" expl="1. assertion">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter merge_using.11.1.1" expl="1." sum="0ec951ea2f566775094d20596e70bf83">
+    <goal name="WP_parameter merge_using.11.1.1" expl="1.">
     <proof prover="6" timelimit="20"><result status="valid" time="0.08"/></proof>
     </goal>
-    <goal name="WP_parameter merge_using.11.1.2" expl="2." sum="47da5007676933cecf85e7c0e0fd569d">
+    <goal name="WP_parameter merge_using.11.1.2" expl="2.">
     <proof prover="7" timelimit="20"><result status="valid" time="0.35"/></proof>
     </goal>
-    <goal name="WP_parameter merge_using.11.1.3" expl="3." sum="1cac8d65dcf901c31c0a49be0ea9f25f">
+    <goal name="WP_parameter merge_using.11.1.3" expl="3.">
     <proof prover="6" timelimit="20"><result status="valid" time="0.05"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter merge_using.12" expl="12. postcondition" sum="b46597aceda00a886603ecb38963c415">
+  <goal name="WP_parameter merge_using.12" expl="12. postcondition">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.13" expl="13. postcondition" sum="b4fb52ccecefbfd2c9c5ab3a2461080e">
+  <goal name="WP_parameter merge_using.13" expl="13. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.14" expl="14. postcondition" sum="838061f9b1675561960bdb5e9ecc26f1">
+  <goal name="WP_parameter merge_using.14" expl="14. postcondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.15" expl="15. postcondition" sum="627a560cfc23161d5f296d17bd441684">
+  <goal name="WP_parameter merge_using.15" expl="15. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.16" expl="16. postcondition" sum="8f365dc4446a85c3150a48e406378388">
+  <goal name="WP_parameter merge_using.16" expl="16. postcondition">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="TopDownMergesort" expanded="true">
- <goal name="WP_parameter mergesort_rec" expl="VC for mergesort_rec" sum="8a343cbdaefe2d793a2944855a79ceb8">
+<theory name="TopDownMergesort" sum="aad47dc7ef4d89212cb2ec7d729f9980" expanded="true">
+ <goal name="WP_parameter mergesort_rec" expl="VC for mergesort_rec">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter mergesort_rec.1" expl="1. division by zero" sum="0e73261ad68f2549031f7ce83303af66">
+  <goal name="WP_parameter mergesort_rec.1" expl="1. division by zero">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.2" expl="2. assertion" sum="3dbef571007d76dd04b1856e344655f8">
+  <goal name="WP_parameter mergesort_rec.2" expl="2. assertion">
   <proof prover="6" timelimit="10"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.3" expl="3. variant decrease" sum="a734911de44d1500b05cc277a3a2f5c5">
+  <goal name="WP_parameter mergesort_rec.3" expl="3. variant decrease">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.4" expl="4. precondition" sum="344880013cd2ef9e0fdfc6d35daee582">
+  <goal name="WP_parameter mergesort_rec.4" expl="4. precondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.5" expl="5. assertion" sum="83bb85961c195003f0975cab10462efb">
+  <goal name="WP_parameter mergesort_rec.5" expl="5. assertion">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.6" expl="6. variant decrease" sum="3ecbc8a007f4c0c46e5aea4557f98469">
+  <goal name="WP_parameter mergesort_rec.6" expl="6. variant decrease">
   <proof prover="6" timelimit="10"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.7" expl="7. precondition" sum="4259fad986bfb335d2a8d3f31271c254">
+  <goal name="WP_parameter mergesort_rec.7" expl="7. precondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.8" expl="8. assertion" sum="c8691ad26fc137ae509b54bfb5741e7a">
+  <goal name="WP_parameter mergesort_rec.8" expl="8. assertion">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.9" expl="9. precondition" sum="f85f370ed78c4f00bc87857d650838ad">
+  <goal name="WP_parameter mergesort_rec.9" expl="9. precondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.10" expl="10. precondition" sum="01bf1bf05965f50d0d66770f09441405">
-  <proof prover="6"><result status="valid" time="3.04"/></proof>
+  <goal name="WP_parameter mergesort_rec.10" expl="10. precondition">
+  <proof prover="6"><result status="valid" time="3.73"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.11" expl="11. precondition" sum="a8fa1fdac2e790d9752fd90dbf147a8d">
+  <goal name="WP_parameter mergesort_rec.11" expl="11. precondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.12" expl="12. postcondition" sum="129fc50ef396e0090edb5f38bde062c8">
+  <goal name="WP_parameter mergesort_rec.12" expl="12. postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.13" expl="13. postcondition" sum="ac0732d02a68662484b756a1f8e9c1fb">
-  <proof prover="6"><result status="valid" time="1.43"/></proof>
+  <goal name="WP_parameter mergesort_rec.13" expl="13. postcondition">
+  <proof prover="6"><result status="valid" time="1.94"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.14" expl="14. postcondition" sum="21a62c1b825c540f71cf68a8e2f918f4">
+  <goal name="WP_parameter mergesort_rec.14" expl="14. postcondition">
   <proof prover="6" timelimit="30"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.15" expl="15. postcondition" sum="e69f646f47ea84b1173ebb3f80e5f587">
+  <goal name="WP_parameter mergesort_rec.15" expl="15. postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter mergesort" expl="VC for mergesort" sum="150c918117607f72a9ad3ddc8181c113">
+ <goal name="WP_parameter mergesort" expl="VC for mergesort">
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="BottomUpMergesort" expanded="true">
- <goal name="WP_parameter bottom_up_mergesort" expl="VC for bottom_up_mergesort" sum="c338c0ca5d4b545f1acd9dc4b11e530e">
+<theory name="BottomUpMergesort" sum="f3f6bfb7acc6af12aa723408e81b923c" expanded="true">
+ <goal name="WP_parameter bottom_up_mergesort" expl="VC for bottom_up_mergesort">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter bottom_up_mergesort.1" expl="1. loop invariant init" sum="d10067baef78ff2176ec1eac84e070fd">
+  <goal name="WP_parameter bottom_up_mergesort.1" expl="1. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.2" expl="2. loop invariant init" sum="b517598c47e2a229323ae3f265acf03b">
+  <goal name="WP_parameter bottom_up_mergesort.2" expl="2. loop invariant init">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.3" expl="3. loop invariant init" sum="77aa1201da5bf32385bf2fdafd407579">
+  <goal name="WP_parameter bottom_up_mergesort.3" expl="3. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.4" expl="4. loop invariant init" sum="ea0c0eab3b8f34e2c3930659a296a878">
+  <goal name="WP_parameter bottom_up_mergesort.4" expl="4. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.5" expl="5. loop invariant init" sum="c52552560e1dbbeae4d9acadfa31c038">
+  <goal name="WP_parameter bottom_up_mergesort.5" expl="5. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.6" expl="6. loop invariant init" sum="e82391d668e63676f534ac5c4260647f">
+  <goal name="WP_parameter bottom_up_mergesort.6" expl="6. loop invariant init">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.7" expl="7. loop invariant init" sum="eeaacc37289186f5404949be70a108eb">
+  <goal name="WP_parameter bottom_up_mergesort.7" expl="7. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.8" expl="8. assertion" sum="ee40282364b2d6b510e0202c3e335dd0">
+  <goal name="WP_parameter bottom_up_mergesort.8" expl="8. assertion">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.9" expl="9. assertion" sum="d27c4e6f580abfbe952353656b0a9075">
+  <goal name="WP_parameter bottom_up_mergesort.9" expl="9. assertion">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.10" expl="10. assertion" sum="22915027b7f9a57926b297665f2f0285">
+  <goal name="WP_parameter bottom_up_mergesort.10" expl="10. assertion">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.11" expl="11. type invariant" sum="f97cd0d760055d4384a5ad2fe8a70f33">
+  <goal name="WP_parameter bottom_up_mergesort.11" expl="11. type invariant">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.12" expl="12. type invariant" sum="23e245d0717e349d4b615824424a6c51">
+  <goal name="WP_parameter bottom_up_mergesort.12" expl="12. type invariant">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.13" expl="13. precondition" sum="f999d5817a73e67e49728dcd1c8ae8d1">
+  <goal name="WP_parameter bottom_up_mergesort.13" expl="13. precondition">
   <proof prover="6"><result status="valid" time="0.39"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.14" expl="14. precondition" sum="99b68de9c54df3fe27eb3bd7e2160b17">
+  <goal name="WP_parameter bottom_up_mergesort.14" expl="14. precondition">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.15" expl="15. precondition" sum="25b6615b5aba546ec60c6ea2c44e0fb0">
+  <goal name="WP_parameter bottom_up_mergesort.15" expl="15. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.16" expl="16. assertion" sum="da26d13e69e3d1a9960fe24e11202dfe">
+  <goal name="WP_parameter bottom_up_mergesort.16" expl="16. assertion">
   <proof prover="6"><result status="valid" time="0.31"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.17" expl="17. assertion" sum="9d3d4b77a800189b0f3d7758aa3fb62d">
-  <proof prover="7" timelimit="6"><result status="valid" time="1.34"/></proof>
+  <goal name="WP_parameter bottom_up_mergesort.17" expl="17. assertion">
+  <proof prover="7" timelimit="6"><result status="valid" time="1.67"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.18" expl="18. assertion" sum="b5292cdc703e818e4d5ddec76c0ed676">
+  <goal name="WP_parameter bottom_up_mergesort.18" expl="18. assertion">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.19" expl="19. assertion" sum="c2dac7a5f935a250e21a8e93dfba0f73">
+  <goal name="WP_parameter bottom_up_mergesort.19" expl="19. assertion">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.20" expl="20. assertion" sum="c3afe1e93b19c51dd545b82cff3e322b">
+  <goal name="WP_parameter bottom_up_mergesort.20" expl="20. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter bottom_up_mergesort.20.1" expl="1. assertion" sum="1a11c61a2dc53cd871711a3e98eccb58">
+   <goal name="WP_parameter bottom_up_mergesort.20.1" expl="1. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.20.2" expl="2. assertion" sum="cb03cb632b6a5b7ff89431018e09939f">
+   <goal name="WP_parameter bottom_up_mergesort.20.2" expl="2. assertion">
    <proof prover="1"><result status="valid" time="0.48"/></proof>
    <proof prover="4" timelimit="10"><result status="timeout" time="9.98"/></proof>
    <proof prover="5"><result status="timeout" time="9.98"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.21" expl="21. assertion" sum="66dba69382bca522453f08d2f62c3911">
+  <goal name="WP_parameter bottom_up_mergesort.21" expl="21. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter bottom_up_mergesort.21.1" expl="1. assertion" sum="2902a4aea6dab326aa00f77d515adbf7">
+   <goal name="WP_parameter bottom_up_mergesort.21.1" expl="1. assertion">
    <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.2" expl="2. assertion" sum="c16a47c9d169274d6b65c8c76a6d91c6">
+   <goal name="WP_parameter bottom_up_mergesort.21.2" expl="2. assertion">
    <proof prover="2" timelimit="10"><result status="valid" time="0.04"/></proof>
    <proof prover="3"><result status="valid" time="0.05"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.3" expl="3. assertion" sum="e70f0cc37fcdd1fdafe8f86a2138ef4d">
+   <goal name="WP_parameter bottom_up_mergesort.21.3" expl="3. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.4" expl="4. assertion" sum="ae29ddd303aca48e8ceb3d5656220bba">
+   <goal name="WP_parameter bottom_up_mergesort.21.4" expl="4. assertion">
    <proof prover="1"><result status="valid" time="0.51"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.5" expl="5. assertion" sum="8cea901d905a095d9023f00387e8e06e">
+   <goal name="WP_parameter bottom_up_mergesort.21.5" expl="5. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.6" expl="6. assertion" sum="3af498c6395e019fb99b76f93915a66c">
+   <goal name="WP_parameter bottom_up_mergesort.21.6" expl="6. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.22" expl="22. loop invariant preservation" sum="8315ab8cfb6e0a953d5e43d25eecb6c1">
+  <goal name="WP_parameter bottom_up_mergesort.22" expl="22. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   <proof prover="7" timelimit="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.23" expl="23. loop invariant preservation" sum="9b0c94faeb1b8dad3100b297c416f70a">
+  <goal name="WP_parameter bottom_up_mergesort.23" expl="23. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.24" expl="24. loop invariant preservation" sum="f0df1aab6ae077fdbf3a4e5fa09f2496">
+  <goal name="WP_parameter bottom_up_mergesort.24" expl="24. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.25" expl="25. loop invariant preservation" sum="c45d846e051ee597f0c553f86c8b68b6">
+  <goal name="WP_parameter bottom_up_mergesort.25" expl="25. loop invariant preservation">
   <proof prover="6" timelimit="10"><result status="valid" time="0.13"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.26" expl="26. loop variant decrease" sum="edaf6fc33caf05683874d41881f332a5">
+  <goal name="WP_parameter bottom_up_mergesort.26" expl="26. loop variant decrease">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.27" expl="27. assertion" sum="8bff1d83dc53aca047e3c53aefbbfa8f">
+  <goal name="WP_parameter bottom_up_mergesort.27" expl="27. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter bottom_up_mergesort.27.1" expl="1. assertion" sum="9f35623c3c9fa6c5df1374c1b3946d99">
+   <goal name="WP_parameter bottom_up_mergesort.27.1" expl="1. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.2" expl="2. assertion" sum="323c804b01febdb58c56fec1993c669f">
+   <goal name="WP_parameter bottom_up_mergesort.27.2" expl="2. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.05"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.3" expl="3. assertion" sum="436e8a8093a90c8d3d77126479630ccf">
+   <goal name="WP_parameter bottom_up_mergesort.27.3" expl="3. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.4" expl="4. assertion" sum="100db22892bdc6a2a9cd9c743e3ff157">
+   <goal name="WP_parameter bottom_up_mergesort.27.4" expl="4. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.5" expl="5. assertion" sum="cd0dc810455e82f3772f35bf9a22f21e">
+   <goal name="WP_parameter bottom_up_mergesort.27.5" expl="5. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.6" expl="6. assertion" sum="22337d862b7e0bffb9f48c200df52dfe">
+   <goal name="WP_parameter bottom_up_mergesort.27.6" expl="6. assertion">
    <proof prover="6" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.28" expl="28. loop invariant preservation" sum="2308019c8f10f1e796f4e1e61691de0e">
+  <goal name="WP_parameter bottom_up_mergesort.28" expl="28. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.29" expl="29. loop invariant preservation" sum="ab0aba363a0244d733e751f17c942fcf">
+  <goal name="WP_parameter bottom_up_mergesort.29" expl="29. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.30" expl="30. loop invariant preservation" sum="a9ed5e53e48f022c59d092c2d7488c48">
+  <goal name="WP_parameter bottom_up_mergesort.30" expl="30. loop invariant preservation">
   <proof prover="0" edited="mergesort_array_BottomUpMergesort_WP_parameter_bottom_up_mergesort_1.v"><result status="valid" time="1.35"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.31" expl="31. loop variant decrease" sum="820b0a7e41b02fab79680336623232fd">
+  <goal name="WP_parameter bottom_up_mergesort.31" expl="31. loop variant decrease">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.32" expl="32. assertion" sum="ae599acbeb451240e7e6f076303537bc">
+  <goal name="WP_parameter bottom_up_mergesort.32" expl="32. assertion">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.33" expl="33. type invariant" sum="7df582035500011050042c377d457eb8">
+  <goal name="WP_parameter bottom_up_mergesort.33" expl="33. type invariant">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.34" expl="34. postcondition" sum="43538c72f31b905eb2b454c0d744ad0c">
+  <goal name="WP_parameter bottom_up_mergesort.34" expl="34. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.35" expl="35. postcondition" sum="f850b86c7b87603668fc8bd77314b3fa">
+  <goal name="WP_parameter bottom_up_mergesort.35" expl="35. postcondition">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   <proof prover="7" timelimit="6"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="NaturalMergesort">
- <goal name="WP_parameter find_run" expl="VC for find_run" sum="4c76c79241933f5cdd73dac58fe6c394">
+<theory name="NaturalMergesort" sum="2e1d89f0efe00fc2c0afbd4eaf96d73a">
+ <goal name="WP_parameter find_run" expl="VC for find_run">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter find_run.1" expl="1. loop invariant init" sum="59a0afbaa67a206b210da3c2a13bdaf9">
+  <goal name="WP_parameter find_run.1" expl="1. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.2" expl="2. loop invariant init" sum="6d4ec5f0f7887147428d81872a507737">
+  <goal name="WP_parameter find_run.2" expl="2. loop invariant init">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.3" expl="3. index in array bounds" sum="94da1487be95d3195b8c195fa203b0af">
+  <goal name="WP_parameter find_run.3" expl="3. index in array bounds">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.4" expl="4. index in array bounds" sum="f8de4467b8aef4747d18321601596c89">
+  <goal name="WP_parameter find_run.4" expl="4. index in array bounds">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.5" expl="5. loop invariant preservation" sum="45a871b2a7b77f5854563803680a4d24">
+  <goal name="WP_parameter find_run.5" expl="5. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.6" expl="6. loop invariant preservation" sum="8a2fece88509eb2aaa87d6a74eca39c3">
+  <goal name="WP_parameter find_run.6" expl="6. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.7" expl="7. loop variant decrease" sum="8f6b1684fc235df597d07cfe21f8fb59">
+  <goal name="WP_parameter find_run.7" expl="7. loop variant decrease">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.8" expl="8. postcondition" sum="a649b56cd83a8a747789222763d9bf77">
+  <goal name="WP_parameter find_run.8" expl="8. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.9" expl="9. postcondition" sum="7512dd2b2d4cd68441fbb6c24ecd779f">
+  <goal name="WP_parameter find_run.9" expl="9. postcondition">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.10" expl="10. postcondition" sum="104c3e157d05f8db88282aa816a6114d">
+  <goal name="WP_parameter find_run.10" expl="10. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.11" expl="11. postcondition" sum="8ce48fcf6bfe3c05b4a3cbcecea80b82">
+  <goal name="WP_parameter find_run.11" expl="11. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.12" expl="12. postcondition" sum="0d3bbf234361a38ed75819a0ef2340fc">
+  <goal name="WP_parameter find_run.12" expl="12. postcondition">
   <proof prover="6"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.13" expl="13. postcondition" sum="d2225a6705d5df9f0efd98aa9bf53e20">
+  <goal name="WP_parameter find_run.13" expl="13. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter natural_mergesort" expl="VC for natural_mergesort" sum="08c5b1da9aefe54de6a26059d364fe7b">
+ <goal name="WP_parameter natural_mergesort" expl="VC for natural_mergesort">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter natural_mergesort.1" expl="1. loop invariant init" sum="3c6f3f844ff7d3e2ba0d66fc9cbc0875">
+  <goal name="WP_parameter natural_mergesort.1" expl="1. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.2" expl="2. loop invariant init" sum="0d7432eb6e9ddb0b70376beb1cd266d0">
+  <goal name="WP_parameter natural_mergesort.2" expl="2. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.3" expl="3. loop invariant init" sum="99961ada376684ddbe01754ec958fd14">
+  <goal name="WP_parameter natural_mergesort.3" expl="3. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.4" expl="4. loop invariant init" sum="e55de36251e878532af4e9f3a3ae6090">
+  <goal name="WP_parameter natural_mergesort.4" expl="4. loop invariant init">
   <proof prover="6"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.5" expl="5. loop invariant init" sum="9c15dd7d578b2cd342e4323e2cf8647f">
+  <goal name="WP_parameter natural_mergesort.5" expl="5. loop invariant init">
   <proof prover="6"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.6" expl="6. loop invariant init" sum="a072a8ef92161818b95d31cab0b227cd">
+  <goal name="WP_parameter natural_mergesort.6" expl="6. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.7" expl="7. type invariant" sum="1ba395b627681935828278f902071c9c">
+  <goal name="WP_parameter natural_mergesort.7" expl="7. type invariant">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.8" expl="8. precondition" sum="ea3fba782368ff9fdd054c79266b0602">
+  <goal name="WP_parameter natural_mergesort.8" expl="8. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.9" expl="9. postcondition" sum="3dfa8bcc264943779aed29a970a43eb9">
+  <goal name="WP_parameter natural_mergesort.9" expl="9. postcondition">
   <proof prover="6"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.10" expl="10. postcondition" sum="e9a4b2120dfa9af77ad21a0afc489fa8">
+  <goal name="WP_parameter natural_mergesort.10" expl="10. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.11" expl="11. loop invariant preservation" sum="f03985fb28f0fa7ecb6cff36b31f23ca">
+  <goal name="WP_parameter natural_mergesort.11" expl="11. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.12" expl="12. loop invariant preservation" sum="d8a77befe0c415df4742aacb065f940b">
+  <goal name="WP_parameter natural_mergesort.12" expl="12. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.13" expl="13. loop variant decrease" sum="496b8e50721085b09640c69ec7ec5eeb">
+  <goal name="WP_parameter natural_mergesort.13" expl="13. loop variant decrease">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter natural_mergesort.13.1" expl="1." sum="c7a29c6bd732e51f061dcae7e3cf0bd5">
+   <goal name="WP_parameter natural_mergesort.13.1" expl="1.">
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter natural_mergesort.13.2" expl="2." sum="d3b94d71d4624bdf5870f628f5b91eb6">
+   <goal name="WP_parameter natural_mergesort.13.2" expl="2.">
    <proof prover="6"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter natural_mergesort.14" expl="14. precondition" sum="9f3b151ba145d6b0afebf82903f7bfef">
+  <goal name="WP_parameter natural_mergesort.14" expl="14. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.15" expl="15. type invariant" sum="d5330ff40d358b9bab99e82d1069f7f4">
+  <goal name="WP_parameter natural_mergesort.15" expl="15. type invariant">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.16" expl="16. precondition" sum="1aa0daefd8e11343e738ec1cdf4871d5">
+  <goal name="WP_parameter natural_mergesort.16" expl="16. precondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.17" expl="17. precondition" sum="fca69bdd9c23890612d2c85fe48d3f18">
+  <goal name="WP_parameter natural_mergesort.17" expl="17. precondition">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.18" expl="18. precondition" sum="144f70a5db27092fab98c6554a7d1681">
+  <goal name="WP_parameter natural_mergesort.18" expl="18. precondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.19" expl="19. assertion" sum="e8bf0df17066714d9b0fd688b809a553">
+  <goal name="WP_parameter natural_mergesort.19" expl="19. assertion">
   <proof prover="6"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.20" expl="20. assertion" sum="7039960b07b396ba67eefa5c9ab5c4ff">
+  <goal name="WP_parameter natural_mergesort.20" expl="20. assertion">
   <proof prover="1" timelimit="6"><result status="valid" time="2.18"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.21" expl="21. loop invariant preservation" sum="0322031babc6fbac91e830338442cb79">
+  <goal name="WP_parameter natural_mergesort.21" expl="21. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.22" expl="22. loop invariant preservation" sum="cefc929793c6fc7217c4fdb9e3e250d1">
+  <goal name="WP_parameter natural_mergesort.22" expl="22. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.17"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.23" expl="23. loop invariant preservation" sum="46e121e5a443d48475b3d8a555ee696c">
+  <goal name="WP_parameter natural_mergesort.23" expl="23. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.24" expl="24. loop invariant preservation" sum="bf6bcdf4859df28393a1a3b40c1a0c20">
+  <goal name="WP_parameter natural_mergesort.24" expl="24. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.26"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.25" expl="25. loop invariant preservation" sum="9341ccba12232f62861e3d835f158ab8">
+  <goal name="WP_parameter natural_mergesort.25" expl="25. loop invariant preservation">
   <proof prover="7" timelimit="6"><result status="valid" time="0.14"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.26" expl="26. loop variant decrease" sum="b8ba76a51a04974a227baafaf97d6788">
+  <goal name="WP_parameter natural_mergesort.26" expl="26. loop variant decrease">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.27" expl="27. loop invariant preservation" sum="31ff35b3a2fcf5d72d01b45b0e270b81">
+  <goal name="WP_parameter natural_mergesort.27" expl="27. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.28" expl="28. loop invariant preservation" sum="d1bbdab7f6b5f068f78057a5ea5c05e9">
+  <goal name="WP_parameter natural_mergesort.28" expl="28. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.29" expl="29. loop invariant preservation" sum="6dec9d4f03a059fcfe0368b75addc709">
-  <proof prover="6"><result status="valid" time="5.89"/></proof>
+  <goal name="WP_parameter natural_mergesort.29" expl="29. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="8.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.30" expl="30. loop invariant preservation" sum="512c1a361005fbce25d98f74bbd8b7f5">
+  <goal name="WP_parameter natural_mergesort.30" expl="30. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.31" expl="31. loop invariant preservation" sum="15f03683e52a77804bcaaaf669fb98df">
+  <goal name="WP_parameter natural_mergesort.31" expl="31. loop invariant preservation">
   <proof prover="7" timelimit="6"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.32" expl="32. loop variant decrease" sum="dea9495c1c6465d4c576c668b47cc9af">
+  <goal name="WP_parameter natural_mergesort.32" expl="32. loop variant decrease">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.33" expl="33. loop invariant preservation" sum="af8df0880df735bf8dade31c21044669">
+  <goal name="WP_parameter natural_mergesort.33" expl="33. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.34" expl="34. loop invariant preservation" sum="750d48b37c315104ebf434659e7ff8b9">
+  <goal name="WP_parameter natural_mergesort.34" expl="34. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.35" expl="35. loop variant decrease" sum="9e7c2d3fa0ab7113505765c0940bbb15">
+  <goal name="WP_parameter natural_mergesort.35" expl="35. loop variant decrease">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter natural_mergesort.35.1" expl="1." sum="4faf45a0e0524c1c9e7af62368895406">
+   <goal name="WP_parameter natural_mergesort.35.1" expl="1.">
    <proof prover="6"><result status="valid" time="0.05"/></proof>
    </goal>
-   <goal name="WP_parameter natural_mergesort.35.2" expl="2." sum="68f42d2f16fd6db22ec58a35aed6ed3c">
+   <goal name="WP_parameter natural_mergesort.35.2" expl="2.">
    <proof prover="6"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter natural_mergesort.36" expl="36. postcondition" sum="1233e46f861a82459a75a74d99fee269">
+  <goal name="WP_parameter natural_mergesort.36" expl="36. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.37" expl="37. postcondition" sum="d2b7cbd81819fac004643a94feab4586">
+  <goal name="WP_parameter natural_mergesort.37" expl="37. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter naturalrec" expl="VC for naturalrec" sum="38a259b93717db8629f958ee1de50887">
+ <goal name="WP_parameter naturalrec" expl="VC for naturalrec">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter naturalrec.1" expl="1. postcondition" sum="15fe91076c096f3a015e958f1f69f40c">
+  <goal name="WP_parameter naturalrec.1" expl="1. postcondition">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.2" expl="2. postcondition" sum="a265bad0dba677f8ad68d063fb20c022">
+  <goal name="WP_parameter naturalrec.2" expl="2. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.3" expl="3. postcondition" sum="f17ebde6390cb2a200f3239ea91d2c5b">
+  <goal name="WP_parameter naturalrec.3" expl="3. postcondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.4" expl="4. precondition" sum="e25b61e9ad611606fbbc31ddbac7e90f">
+  <goal name="WP_parameter naturalrec.4" expl="4. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.5" expl="5. postcondition" sum="2e89b87a175e29d81b4f693dabdfe49e">
+  <goal name="WP_parameter naturalrec.5" expl="5. postcondition">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.6" expl="6. postcondition" sum="0edf7190fbdb0c910c9b92ee96914eb5">
+  <goal name="WP_parameter naturalrec.6" expl="6. postcondition">
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.7" expl="7. postcondition" sum="26f79dfd0321feee67e478d1a4c77ee8">
+  <goal name="WP_parameter naturalrec.7" expl="7. postcondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.8" expl="8. postcondition" sum="36ee8a8ae66e8e6f1d9a35e81744768d">
+  <goal name="WP_parameter naturalrec.8" expl="8. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.9" expl="9. postcondition" sum="9baa0f687629e227098c66df73a9d543">
+  <goal name="WP_parameter naturalrec.9" expl="9. postcondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.10" expl="10. postcondition" sum="134efa847aad3f786dedf5595dc8c7d6">
+  <goal name="WP_parameter naturalrec.10" expl="10. postcondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.11" expl="11. loop invariant init" sum="27c4207e370d604fc835de8a79f1e703">
+  <goal name="WP_parameter naturalrec.11" expl="11. loop invariant init">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.12" expl="12. loop invariant init" sum="835ae8b4711e5e096b5089f50ff77e92">
+  <goal name="WP_parameter naturalrec.12" expl="12. loop invariant init">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.13" expl="13. loop invariant init" sum="e33a612f71b1e258755b1675c60893a3">
+  <goal name="WP_parameter naturalrec.13" expl="13. loop invariant init">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.14" expl="14. variant decrease" sum="01e6b5d34b48690d3c9a4741b77a182b">
+  <goal name="WP_parameter naturalrec.14" expl="14. variant decrease">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.15" expl="15. type invariant" sum="664836481758b0edf0e6eb8ff306ca04">
+  <goal name="WP_parameter naturalrec.15" expl="15. type invariant">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.16" expl="16. type invariant" sum="8179d500e36f1c10804457308f6d9da8">
+  <goal name="WP_parameter naturalrec.16" expl="16. type invariant">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.17" expl="17. precondition" sum="5ec5b13a14c4d6b402b6ef36dacb2c9f">
+  <goal name="WP_parameter naturalrec.17" expl="17. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.18" expl="18. precondition" sum="b05afa0fa0c1f76ce498c31738e8fbeb">
+  <goal name="WP_parameter naturalrec.18" expl="18. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.19" expl="19. assertion" sum="537b2dbb0b04839ae2b9226c1debc6e5">
-  <proof prover="7" timelimit="6"><result status="valid" time="1.08"/></proof>
+  <goal name="WP_parameter naturalrec.19" expl="19. assertion">
+  <proof prover="7" timelimit="6"><result status="valid" time="1.30"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.20" expl="20. precondition" sum="58f240869ee9f91c240b42d8ef9f2445">
+  <goal name="WP_parameter naturalrec.20" expl="20. precondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter naturalrec.20.1" expl="1." sum="186bff439c5a7aa7c05702352b52abfb">
+   <goal name="WP_parameter naturalrec.20.1" expl="1.">
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.2" expl="2." sum="dffd6bd3f6722920044f9f872c6e45a1">
+   <goal name="WP_parameter naturalrec.20.2" expl="2.">
    <proof prover="6"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.3" expl="3." sum="6800e35efb8f1499eb1c0050cb488c1e">
+   <goal name="WP_parameter naturalrec.20.3" expl="3.">
    <proof prover="6"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.4" expl="4." sum="5a528d9912b500bd287c353749ce6166">
+   <goal name="WP_parameter naturalrec.20.4" expl="4.">
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.5" expl="5." sum="0fef006e0ea107a3c411eeae90aa3d2e">
+   <goal name="WP_parameter naturalrec.20.5" expl="5.">
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter naturalrec.21" expl="21. precondition" sum="aab01abd9eba09046c1cfe50769ce8c7">
-  <proof prover="6"><result status="valid" time="2.18"/></proof>
+  <goal name="WP_parameter naturalrec.21" expl="21. precondition">
+  <proof prover="6"><result status="valid" time="2.61"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.22" expl="22. precondition" sum="a8e019a7d9655510c0bf0b0f14c8eb3c">
+  <goal name="WP_parameter naturalrec.22" expl="22. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.23" expl="23. assertion" sum="cef7c6ec6e06234c14c959c243ac05a0">
+  <goal name="WP_parameter naturalrec.23" expl="23. assertion">
   <proof prover="6"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.24" expl="24. assertion" sum="37bd8933ae7a66b93d1d8173a65101a9">
+  <goal name="WP_parameter naturalrec.24" expl="24. assertion">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.25" expl="25. postcondition" sum="11276c3bea816129404e0bfd7d84bec0">
+  <goal name="WP_parameter naturalrec.25" expl="25. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.26" expl="26. postcondition" sum="fbddc26d86792507e9544e13abef956e">
+  <goal name="WP_parameter naturalrec.26" expl="26. postcondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.27" expl="27. postcondition" sum="f6abeb6d9bf7d76e99e765e5bdecf256">
+  <goal name="WP_parameter naturalrec.27" expl="27. postcondition">
   <proof prover="6"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.28" expl="28. postcondition" sum="330ddf26708263bccd8a2b166251432e">
+  <goal name="WP_parameter naturalrec.28" expl="28. postcondition">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.29" expl="29. loop invariant preservation" sum="00b529ae831435ae243b52a0b54078db">
+  <goal name="WP_parameter naturalrec.29" expl="29. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.30" expl="30. loop invariant preservation" sum="51d0c9d5fc42ad4fc17caa5bdae3e020">
+  <goal name="WP_parameter naturalrec.30" expl="30. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.31" expl="31. loop invariant preservation" sum="d5896ca3feef34071585df4b61e19e90">
+  <goal name="WP_parameter naturalrec.31" expl="31. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.32" expl="32. loop invariant preservation" sum="518b46bd8e5c569233979bd285602004">
+  <goal name="WP_parameter naturalrec.32" expl="32. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.33" expl="33. type invariant" sum="0e8c1f74b605616d7ee1b0ba46ceccf0">
+  <goal name="WP_parameter naturalrec.33" expl="33. type invariant">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.34" expl="34. type invariant" sum="0108cd7c2fca8bf98a98f696c68a4cd7">
+  <goal name="WP_parameter naturalrec.34" expl="34. type invariant">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.35" expl="35. postcondition" sum="7157e0abd1ab6aabc65644fd1bceb1c7">
+  <goal name="WP_parameter naturalrec.35" expl="35. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.36" expl="36. postcondition" sum="08b813245277ce86faa3ccf1937417f9">
+  <goal name="WP_parameter naturalrec.36" expl="36. postcondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.37" expl="37. postcondition" sum="4e201d78db67e881bc948526e574f4cf">
+  <goal name="WP_parameter naturalrec.37" expl="37. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.38" expl="38. postcondition" sum="ac6df0f34ec7923278eed18ed1efbd30">
+  <goal name="WP_parameter naturalrec.38" expl="38. postcondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter natural_mergesort2" expl="VC for natural_mergesort2" sum="1f0330db6e6d7737c6d379a162e3d925">
+ <goal name="WP_parameter natural_mergesort2" expl="VC for natural_mergesort2">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter natural_mergesort2.1" expl="1. precondition" sum="ad354e8898ac1c4c72b1b97202b5a3fc">
+  <goal name="WP_parameter natural_mergesort2.1" expl="1. precondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort2.2" expl="2. precondition" sum="b9db808f9026355704097d0720c541a9">
+  <goal name="WP_parameter natural_mergesort2.2" expl="2. precondition">
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort2.3" expl="3. postcondition" sum="79a12493cf71d6577eae768b9d95da6a">
+  <goal name="WP_parameter natural_mergesort2.3" expl="3. postcondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort2.4" expl="4. postcondition" sum="c06391045029bc7d02827ef502a55d51">
+  <goal name="WP_parameter natural_mergesort2.4" expl="4. postcondition">
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>

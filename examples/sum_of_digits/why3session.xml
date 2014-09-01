@@ -7,58 +7,58 @@
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../sum_of_digits.mlw" expanded="true">
-<theory name="Euler290" expanded="true">
- <goal name="Base" sum="3f88a105c1e73e27cbc5e33c85834698">
+<theory name="Euler290" sum="d0cb567a4eb4a7b7fe6184f74fadb44f" expanded="true">
+ <goal name="Base">
  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Empty" sum="a85e67fee680433c89eb2a0ccebb51cb">
+ <goal name="Empty">
  <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="Induc" sum="24a3a9e29c39591a1fbe7dc11f5d5092" expanded="true">
+ <goal name="Induc" expanded="true">
  </goal>
- <goal name="WP_parameter sd" expl="VC for sd" sum="a42b5757b20767b80dde6f8d45176ef6">
+ <goal name="WP_parameter sd" expl="VC for sd">
  <proof prover="2" timelimit="10"><result status="valid" time="0.22"/></proof>
  </goal>
- <goal name="WP_parameter f" expl="VC for f" sum="a2af3517002db139cf39fee42c0df842" expanded="true">
+ <goal name="WP_parameter f" expl="VC for f" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter f.1" expl="1. precondition" sum="0d578d6be6d736b23a495c8000aa1a88">
+  <goal name="WP_parameter f.1" expl="1. precondition">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter f.2" expl="2. postcondition" sum="54f84b9365705b52282b1ff030b775a4">
+  <goal name="WP_parameter f.2" expl="2. postcondition">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter f.3" expl="3. postcondition" sum="3dd1b872d0ca2c7024e3bf1c2bb161de">
+  <goal name="WP_parameter f.3" expl="3. postcondition">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter f.4" expl="4. loop invariant init" sum="e1176fa9d29dbab13e76d74b2e744e18">
+  <goal name="WP_parameter f.4" expl="4. loop invariant init">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter f.5" expl="5. variant decrease" sum="63ebef9007b63e332483c1ce0d1efb9d">
+  <goal name="WP_parameter f.5" expl="5. variant decrease">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter f.6" expl="6. precondition" sum="b236ff0fe37e5ea68187ad233d408def">
+  <goal name="WP_parameter f.6" expl="6. precondition">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter f.7" expl="7. assertion" sum="df76b119649a366c47ca2f6745c7f1c7">
+  <goal name="WP_parameter f.7" expl="7. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter f.7.1" expl="1." sum="bbadf7097f71988878048cd71bf0ea18">
+   <goal name="WP_parameter f.7.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.30"/></proof>
    </goal>
-   <goal name="WP_parameter f.7.2" expl="2." sum="538697ecde556620cd44ce1c83f980fa">
+   <goal name="WP_parameter f.7.2" expl="2.">
    <proof prover="2"><result status="valid" time="0.07"/></proof>
    </goal>
-   <goal name="WP_parameter f.7.3" expl="3." sum="72bc0b46e18918b4c341adc920011abf">
+   <goal name="WP_parameter f.7.3" expl="3.">
    <proof prover="2"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter f.8" expl="8. loop invariant preservation" sum="5a4eb51da9790dac33f543eae5d6b9a7">
+  <goal name="WP_parameter f.8" expl="8. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.86"/></proof>
+  <proof prover="2"><result status="valid" time="1.06"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter f.9" expl="9. postcondition" sum="8c689d07ab3f3ccd5585f65e6aa96ee8">
+  <goal name="WP_parameter f.9" expl="9. postcondition">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>

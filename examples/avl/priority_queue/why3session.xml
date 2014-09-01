@@ -8,75 +8,75 @@
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../priority_queue.mlw">
 <theory name="PQueue" sum="676f1bd969386fee8625cf44dbec8564">
- <goal name="Trans" sum="543f959a76b9bc30bcda73658ed736e5">
+ <goal name="Trans">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter assoc_m" expl="VC for assoc_m" sum="1b25e494fed2b9420f51bdfbe922cee6">
+ <goal name="WP_parameter assoc_m" expl="VC for assoc_m">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter assoc_m.1" expl="1. postcondition" sum="c49eca935f19964807bac24359e417af">
+  <goal name="WP_parameter assoc_m.1" expl="1. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter assoc_m.2" expl="2. postcondition" sum="97721e11fa5860d0d18f8ebce28f35d8">
+  <goal name="WP_parameter assoc_m.2" expl="2. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter assoc_m.3" expl="3. postcondition" sum="9136d3a3f31e5c0ef6e0029553b300a8">
+  <goal name="WP_parameter assoc_m.3" expl="3. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter assoc_m.4" expl="4. postcondition" sum="67df26cab57d4efa48129a7ea794c480">
+  <goal name="WP_parameter assoc_m.4" expl="4. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter assoc_m.5" expl="5. postcondition" sum="e4843ec3eb153d806871faff85e41903">
+  <goal name="WP_parameter assoc_m.5" expl="5. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter assoc_m.6" expl="6. postcondition" sum="cd9b3482090fdfe981b6e187293651b8">
+  <goal name="WP_parameter assoc_m.6" expl="6. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter assoc_m.7" expl="7. postcondition" sum="0c81a873d90fb3cb05db7ca5349f5fca">
+  <goal name="WP_parameter assoc_m.7" expl="7. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter assoc_m.8" expl="8. postcondition" sum="85c96bb6d3cb08bd73c540e9c2da6be3">
+  <goal name="WP_parameter assoc_m.8" expl="8. postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter neutral_m" expl="VC for neutral_m" sum="988367906dff11835f32b7e9fa9d6565">
+ <goal name="WP_parameter neutral_m" expl="VC for neutral_m">
  <proof prover="1"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="assoc" sum="4bfe7939eed3fe08332ccd95e5ae1b40">
+ <goal name="assoc">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="neutral" sum="ec4bc74d9999e8137fa0476632efbe58">
+ <goal name="neutral">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="assoc" sum="54b85be71caeb2d484892e8142e961f6">
+ <goal name="assoc">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="neutral" sum="4a3c73bbfdf4561bc94d1007f27c1232">
+ <goal name="neutral">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter zero" expl="VC for zero" sum="c24fb712b1f89ab2a4c95735341f3039">
+ <goal name="WP_parameter zero" expl="VC for zero">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter op" expl="VC for op" sum="eeb7e80ab5ae6abc0f671866ed3829fe">
+ <goal name="WP_parameter op" expl="VC for op">
  <proof prover="3"><result status="valid" time="0.09"/></proof>
  </goal>
- <goal name="WP_parameter measure" expl="VC for measure" sum="2688be41e005cabb8357eb0a50319fa9">
+ <goal name="WP_parameter measure" expl="VC for measure">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter monoid_sum_is_min" expl="VC for monoid_sum_is_min" sum="f2c92352b45c7c450fd196a57d411f95">
+ <goal name="WP_parameter monoid_sum_is_min" expl="VC for monoid_sum_is_min">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter monoid_sum_is_min.1" expl="1. variant decrease" sum="e1328fb5c92a9b9926fc501f07def640">
+  <goal name="WP_parameter monoid_sum_is_min.1" expl="1. variant decrease">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter monoid_sum_is_min.2" expl="2. postcondition" sum="88c28b0e3f43cb7743891c28640eb2f0">
+  <goal name="WP_parameter monoid_sum_is_min.2" expl="2. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter monoid_sum_is_min.2.1" expl="1. postcondition" sum="edd0c603ec72a799f9d32408c6dc60ac">
+   <goal name="WP_parameter monoid_sum_is_min.2.1" expl="1. postcondition">
    <proof prover="0"><result status="valid" time="0.11"/></proof>
    </goal>
-   <goal name="WP_parameter monoid_sum_is_min.2.2" expl="2. postcondition" sum="cee8ef461d73e88ad2a8ccc492a94943">
+   <goal name="WP_parameter monoid_sum_is_min.2.2" expl="2. postcondition">
    <proof prover="0"><result status="valid" time="0.26"/></proof>
    </goal>
-   <goal name="WP_parameter monoid_sum_is_min.2.3" expl="3. postcondition" sum="0173b883530aac4d4bdaa4c8c18736f8">
+   <goal name="WP_parameter monoid_sum_is_min.2.3" expl="3. postcondition">
    <metas>
     <ts_pos name="real" arity="0" id="2"
      ip_theory="BuiltIn">
@@ -720,9 +720,9 @@
     <meta name="remove_type">
      <meta_arg_ts id="8797"/>
     </meta>
-    <goal name="WP_parameter monoid_sum_is_min.2.3" expl="3. postcondition" sum="a00ba7233786a422aa675457823abf14">
+    <goal name="WP_parameter monoid_sum_is_min.2.3" expl="3. postcondition">
     <transf name="eliminate_builtin">
-     <goal name="WP_parameter monoid_sum_is_min.2.3.1" expl="1. postcondition" sum="fdea2bdf0dca78c3485275600b32f7e7">
+     <goal name="WP_parameter monoid_sum_is_min.2.3.1" expl="1. postcondition">
      <proof prover="1"><result status="valid" time="0.07"/></proof>
      </goal>
     </transf>
@@ -731,51 +731,51 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter monoid_sum_is_min.3" expl="3. postcondition" sum="25e5cf12f1e9d8851ea62651e3880290">
+  <goal name="WP_parameter monoid_sum_is_min.3" expl="3. postcondition">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter selected_is_min" expl="VC for selected_is_min" sum="43da1bae0140c0b02b8167cac51752fb">
+ <goal name="WP_parameter selected_is_min" expl="VC for selected_is_min">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter selected_is_min.1" expl="1. postcondition" sum="43da1bae0140c0b02b8167cac51752fb">
+  <goal name="WP_parameter selected_is_min.1" expl="1. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter selected_is_min.1.1" expl="1. postcondition" sum="7f8dec002102398ecd625544101d336f">
+   <goal name="WP_parameter selected_is_min.1.1" expl="1. postcondition">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter selected_is_min.1.2" expl="2. postcondition" sum="1c026bf8e8ae7dc34d3bcbab1e4d46dc">
+   <goal name="WP_parameter selected_is_min.1.2" expl="2. postcondition">
    <proof prover="3"><result status="valid" time="1.73"/></proof>
    </goal>
-   <goal name="WP_parameter selected_is_min.1.3" expl="3. postcondition" sum="b2be137268fde15e145339988af2ed55">
+   <goal name="WP_parameter selected_is_min.1.3" expl="3. postcondition">
    <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter selected_is_min.1.4" expl="4. postcondition" sum="33d00871001ed7d7b79fd31e84ba6105">
-   <proof prover="1"><result status="valid" time="0.69"/></proof>
+   <goal name="WP_parameter selected_is_min.1.4" expl="4. postcondition">
+   <proof prover="1"><result status="valid" time="0.45"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter selected_part" expl="VC for selected_part" sum="428b8cca16f813c24358390792b46105">
+ <goal name="WP_parameter selected_part" expl="VC for selected_part">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter selected_part.1" expl="1. postcondition" sum="fe68c19e9a1954839e4e9f872eb28a6d">
+  <goal name="WP_parameter selected_part.1" expl="1. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter selected_part.1.1" expl="1. postcondition" sum="553923041054ca3b02986553fe1aa881">
+   <goal name="WP_parameter selected_part.1.1" expl="1. postcondition">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter selected_part.1.2" expl="2. postcondition" sum="d416ad15d3af9d7f11f0792dbff53a7c">
+   <goal name="WP_parameter selected_part.1.2" expl="2. postcondition">
    <transf name="introduce_premises">
-    <goal name="WP_parameter selected_part.1.2.1" expl="1. postcondition" sum="dba21e86e493e4cff92ebd3996c819f8">
+    <goal name="WP_parameter selected_part.1.2.1" expl="1. postcondition">
     <transf name="inline_goal">
-     <goal name="WP_parameter selected_part.1.2.1.1" expl="1. postcondition" sum="f93cced7d1a0f6251e0866f10ef874fa">
+     <goal name="WP_parameter selected_part.1.2.1.1" expl="1. postcondition">
      <transf name="split_goal_wp">
-      <goal name="WP_parameter selected_part.1.2.1.1.1" expl="1. postcondition" sum="dd392a4f6116bd0ba7beeac1d8eeb5ac">
+      <goal name="WP_parameter selected_part.1.2.1.1.1" expl="1. postcondition">
       <proof prover="3"><result status="valid" time="0.05"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.1.2.1.1.2" expl="2. postcondition" sum="f8e8b9b038e7ee58edd0412b968312bd">
+      <goal name="WP_parameter selected_part.1.2.1.1.2" expl="2. postcondition">
       <proof prover="1" timelimit="30"><result status="valid" time="10.51"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.1.2.1.1.3" expl="3. postcondition" sum="8038e380fd0f7ead9bebc0fb77136e3a">
+      <goal name="WP_parameter selected_part.1.2.1.1.3" expl="3. postcondition">
       <proof prover="3"><result status="valid" time="0.05"/></proof>
       </goal>
      </transf>
@@ -784,29 +784,29 @@
     </goal>
    </transf>
    </goal>
-   <goal name="WP_parameter selected_part.1.3" expl="3. postcondition" sum="bb4b794072043a929e71202c1f64b098">
-   <proof prover="3"><result status="valid" time="0.83"/></proof>
+   <goal name="WP_parameter selected_part.1.3" expl="3. postcondition">
+   <proof prover="3"><result status="valid" time="0.59"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter selected_part.2" expl="2. postcondition" sum="50f748cba4d7f4e24d318462acbc799e">
+  <goal name="WP_parameter selected_part.2" expl="2. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter selected_part.2.1" expl="1. postcondition" sum="08a2ac48f8bf341950af2bc1ae539874">
+   <goal name="WP_parameter selected_part.2.1" expl="1. postcondition">
    <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter selected_part.2.2" expl="2. postcondition" sum="a27a57a35c402375b1231cd804028593">
+   <goal name="WP_parameter selected_part.2.2" expl="2. postcondition">
    <transf name="introduce_premises">
-    <goal name="WP_parameter selected_part.2.2.1" expl="1. postcondition" sum="6a66ec0a4ddefcc68bdcd745f47500e6">
+    <goal name="WP_parameter selected_part.2.2.1" expl="1. postcondition">
     <transf name="inline_goal">
-     <goal name="WP_parameter selected_part.2.2.1.1" expl="1. postcondition" sum="da64a566c6d5ee248f48b499443d6e15">
+     <goal name="WP_parameter selected_part.2.2.1.1" expl="1. postcondition">
      <transf name="split_goal_wp">
-      <goal name="WP_parameter selected_part.2.2.1.1.1" expl="1. postcondition" sum="b6151b90102f43f02cb05bf9454c0c84">
+      <goal name="WP_parameter selected_part.2.2.1.1.1" expl="1. postcondition">
       <proof prover="3"><result status="valid" time="0.05"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.2.2.1.1.2" expl="2. postcondition" sum="645ef6fd8b767f2fadfc267833617214">
-      <proof prover="1" timelimit="20"><result status="valid" time="13.52"/></proof>
+      <goal name="WP_parameter selected_part.2.2.1.1.2" expl="2. postcondition">
+      <proof prover="1" timelimit="20"><result status="valid" time="10.75"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.2.2.1.1.3" expl="3. postcondition" sum="75802125f229cbf037de3ec6be685ef8">
+      <goal name="WP_parameter selected_part.2.2.1.1.3" expl="3. postcondition">
       <proof prover="3"><result status="valid" time="0.07"/></proof>
       </goal>
      </transf>
@@ -815,23 +815,23 @@
     </goal>
    </transf>
    </goal>
-   <goal name="WP_parameter selected_part.2.3" expl="3. postcondition" sum="10be1dfebe7d55467aff47c0d5780d6d">
+   <goal name="WP_parameter selected_part.2.3" expl="3. postcondition">
    <proof prover="3"><result status="valid" time="0.05"/></proof>
    </goal>
-   <goal name="WP_parameter selected_part.2.4" expl="4. postcondition" sum="f356fe0c12245545292513db4e22573e">
+   <goal name="WP_parameter selected_part.2.4" expl="4. postcondition">
    <transf name="introduce_premises">
-    <goal name="WP_parameter selected_part.2.4.1" expl="1. postcondition" sum="38ba5bc9d489448d88f4755975c3e4ae">
+    <goal name="WP_parameter selected_part.2.4.1" expl="1. postcondition">
     <transf name="inline_goal">
-     <goal name="WP_parameter selected_part.2.4.1.1" expl="1. postcondition" sum="2cdb120aee7264edf221c900fbca845b">
+     <goal name="WP_parameter selected_part.2.4.1.1" expl="1. postcondition">
      <transf name="split_goal_wp">
-      <goal name="WP_parameter selected_part.2.4.1.1.1" expl="1. postcondition" sum="ff5da1bcca8bca7e2df7668bda0f5add">
+      <goal name="WP_parameter selected_part.2.4.1.1.1" expl="1. postcondition">
       <proof prover="3"><result status="valid" time="0.06"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.2.4.1.1.2" expl="2. postcondition" sum="2cb8c215d006b0afa463a5db5624d2f7">
+      <goal name="WP_parameter selected_part.2.4.1.1.2" expl="2. postcondition">
       <proof prover="3"><result status="valid" time="0.07"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.2.4.1.1.3" expl="3. postcondition" sum="596c13692f54ee7275b435aa93471c8c">
-      <proof prover="1" timelimit="20"><result status="valid" time="16.88"/></proof>
+      <goal name="WP_parameter selected_part.2.4.1.1.3" expl="3. postcondition">
+      <proof prover="1" timelimit="20"><result status="valid" time="13.32"/></proof>
       </goal>
      </transf>
      </goal>
@@ -841,27 +841,27 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter selected_part.3" expl="3. postcondition" sum="3d833ee50a07d491f6189f43fab24ac2">
+  <goal name="WP_parameter selected_part.3" expl="3. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter selected_part.3.1" expl="1. postcondition" sum="42c215abb414e6ee2cc219e2920c63da">
+   <goal name="WP_parameter selected_part.3.1" expl="1. postcondition">
    <proof prover="3"><result status="valid" time="0.07"/></proof>
    </goal>
-   <goal name="WP_parameter selected_part.3.2" expl="2. postcondition" sum="c262cd16d0dc24eb1f959ca66fa6c3be">
+   <goal name="WP_parameter selected_part.3.2" expl="2. postcondition">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter selected_part.3.3" expl="3. postcondition" sum="6505df3ca4fa4c8359d777af8fbafb50">
+   <goal name="WP_parameter selected_part.3.3" expl="3. postcondition">
    <transf name="introduce_premises">
-    <goal name="WP_parameter selected_part.3.3.1" expl="1. postcondition" sum="19fb73f748cf1f7d5614cc93af16fb6b">
+    <goal name="WP_parameter selected_part.3.3.1" expl="1. postcondition">
     <transf name="inline_goal">
-     <goal name="WP_parameter selected_part.3.3.1.1" expl="1. postcondition" sum="e1f85706d02d4ca5e47b1691482a3a1a">
+     <goal name="WP_parameter selected_part.3.3.1.1" expl="1. postcondition">
      <transf name="split_goal_wp">
-      <goal name="WP_parameter selected_part.3.3.1.1.1" expl="1. postcondition" sum="411bc5ed0ddad749a444262271b4b877">
+      <goal name="WP_parameter selected_part.3.3.1.1.1" expl="1. postcondition">
       <proof prover="3"><result status="valid" time="0.06"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.3.3.1.1.2" expl="2. postcondition" sum="1952d1134e0f162670e4ba4f4c74897b">
+      <goal name="WP_parameter selected_part.3.3.1.1.2" expl="2. postcondition">
       <proof prover="3"><result status="valid" time="0.04"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.3.3.1.1.3" expl="3. postcondition" sum="112eaf809f12925323c67e206d453800">
+      <goal name="WP_parameter selected_part.3.3.1.1.3" expl="3. postcondition">
       <proof prover="1"><result status="valid" time="0.79"/></proof>
       </goal>
      </transf>
@@ -872,27 +872,27 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter selected_part.4" expl="4. postcondition" sum="1dfb7d909a1086ff30140d7a79140edb">
+  <goal name="WP_parameter selected_part.4" expl="4. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter selected_part.4.1" expl="1. postcondition" sum="5c59466de46f37dbf7d7028e6dab53ac">
+   <goal name="WP_parameter selected_part.4.1" expl="1. postcondition">
    <proof prover="3"><result status="valid" time="0.17"/></proof>
    </goal>
-   <goal name="WP_parameter selected_part.4.2" expl="2. postcondition" sum="6d9fb43cad49de40471d28f48f0d7608">
+   <goal name="WP_parameter selected_part.4.2" expl="2. postcondition">
    <proof prover="3"><result status="valid" time="0.05"/></proof>
    </goal>
-   <goal name="WP_parameter selected_part.4.3" expl="3. postcondition" sum="424933a1eac4a4d95ad8b490ce864b7e">
+   <goal name="WP_parameter selected_part.4.3" expl="3. postcondition">
    <transf name="introduce_premises">
-    <goal name="WP_parameter selected_part.4.3.1" expl="1. postcondition" sum="5f618aa5c4162203e22c019d627e9b53">
+    <goal name="WP_parameter selected_part.4.3.1" expl="1. postcondition">
     <transf name="inline_goal">
-     <goal name="WP_parameter selected_part.4.3.1.1" expl="1. postcondition" sum="39301bd3907bb574c0ff8018e5e96bf9">
+     <goal name="WP_parameter selected_part.4.3.1.1" expl="1. postcondition">
      <transf name="split_goal_wp">
-      <goal name="WP_parameter selected_part.4.3.1.1.1" expl="1. postcondition" sum="a0a89487772bc8bac123941fabad8333">
+      <goal name="WP_parameter selected_part.4.3.1.1.1" expl="1. postcondition">
       <proof prover="3"><result status="valid" time="0.07"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.4.3.1.1.2" expl="2. postcondition" sum="4d4abfae9406d2b5826672a3c115d8bf">
+      <goal name="WP_parameter selected_part.4.3.1.1.2" expl="2. postcondition">
       <proof prover="1"><result status="valid" time="0.73"/></proof>
       </goal>
-      <goal name="WP_parameter selected_part.4.3.1.1.3" expl="3. postcondition" sum="e8b7f27d7739801eca4558edc3deede3">
+      <goal name="WP_parameter selected_part.4.3.1.1.3" expl="3. postcondition">
       <proof prover="3"><result status="valid" time="0.06"/></proof>
       </goal>
      </transf>
@@ -903,40 +903,40 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter selected_part.5" expl="5. postcondition" sum="669b18b0e5e19d4c219237c145481229">
+  <goal name="WP_parameter selected_part.5" expl="5. postcondition">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter first_minimum_caracterisation" expl="VC for first_minimum_caracterisation" sum="628db175b48efb0caa5ae8aa2d5ff98c">
+ <goal name="WP_parameter first_minimum_caracterisation" expl="VC for first_minimum_caracterisation">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter first_minimum_caracterisation.1" expl="1. unreachable point" sum="7af1e2e0758f3b9f956542a6d6b9f785">
+  <goal name="WP_parameter first_minimum_caracterisation.1" expl="1. unreachable point">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.2" expl="2. postcondition" sum="15eaf8fd64e9c2fa08f1e49fa2acc53a">
+  <goal name="WP_parameter first_minimum_caracterisation.2" expl="2. postcondition">
   <proof prover="3"><result status="valid" time="0.35"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.3" expl="3. variant decrease" sum="7988600910f9e26dd87792ade2ccb215">
+  <goal name="WP_parameter first_minimum_caracterisation.3" expl="3. variant decrease">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.4" expl="4. precondition" sum="e3fe4c190b6417e10903be9611590eb6">
+  <goal name="WP_parameter first_minimum_caracterisation.4" expl="4. precondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter first_minimum_caracterisation.4.1" expl="1." sum="7bd58a4442deb9323c1aaff6a641f785">
+   <goal name="WP_parameter first_minimum_caracterisation.4.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter first_minimum_caracterisation.4.2" expl="2." sum="2e6eeaa6b3d4e24775e9217eb49f46d6">
+   <goal name="WP_parameter first_minimum_caracterisation.4.2" expl="2.">
    <transf name="introduce_premises">
-    <goal name="WP_parameter first_minimum_caracterisation.4.2.1" expl="1." sum="7d542e71f52d4906c8756c585198f21d">
+    <goal name="WP_parameter first_minimum_caracterisation.4.2.1" expl="1.">
     <transf name="inline_goal">
-     <goal name="WP_parameter first_minimum_caracterisation.4.2.1.1" expl="1." sum="7c27771d63396b67948e7d13acd52dab">
+     <goal name="WP_parameter first_minimum_caracterisation.4.2.1.1" expl="1.">
      <transf name="split_goal_wp">
-      <goal name="WP_parameter first_minimum_caracterisation.4.2.1.1.1" expl="1." sum="e807a4e046f8dfbb92154c862a59c0d0">
+      <goal name="WP_parameter first_minimum_caracterisation.4.2.1.1.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
-      <goal name="WP_parameter first_minimum_caracterisation.4.2.1.1.2" expl="2." sum="21cf8e008301c424f8e3caf7c5c366dc">
+      <goal name="WP_parameter first_minimum_caracterisation.4.2.1.1.2" expl="2.">
       <proof prover="0"><result status="valid" time="0.08"/></proof>
       </goal>
-      <goal name="WP_parameter first_minimum_caracterisation.4.2.1.1.3" expl="3." sum="0e44d5d02e9ee715cb5269396f641ef2">
+      <goal name="WP_parameter first_minimum_caracterisation.4.2.1.1.3" expl="3.">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
      </transf>
@@ -947,42 +947,42 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.5" expl="5. postcondition" sum="6fbaa275098e7f98c8418346a1bb6d25">
+  <goal name="WP_parameter first_minimum_caracterisation.5" expl="5. postcondition">
   <proof prover="1"><result status="valid" time="2.92"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.6" expl="6. variant decrease" sum="779951d4ea157b3df9b036d8fd7f98b8">
+  <goal name="WP_parameter first_minimum_caracterisation.6" expl="6. variant decrease">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.7" expl="7. precondition" sum="3203d2fb423bcf455e2d32a8fa59e365">
+  <goal name="WP_parameter first_minimum_caracterisation.7" expl="7. precondition">
   <proof prover="3"><result status="valid" time="1.09"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.8" expl="8. postcondition" sum="01241a2a82a9ed7cff49302fb7ccc105">
-  <proof prover="0"><result status="valid" time="3.07"/></proof>
+  <goal name="WP_parameter first_minimum_caracterisation.8" expl="8. postcondition">
+  <proof prover="0"><result status="valid" time="2.45"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.9" expl="9. postcondition" sum="031bf9324e6bb752fcffdae7f52d4826">
+  <goal name="WP_parameter first_minimum_caracterisation.9" expl="9. postcondition">
   <proof prover="3"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.10" expl="10. variant decrease" sum="1db668a5b5b86ac737afda759a657efc">
+  <goal name="WP_parameter first_minimum_caracterisation.10" expl="10. variant decrease">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.11" expl="11. precondition" sum="6050db1d135e2fb9fce31c79dac2eb3d">
+  <goal name="WP_parameter first_minimum_caracterisation.11" expl="11. precondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter first_minimum_caracterisation.11.1" expl="1." sum="1da06ede9159f6b501064ff513e20895">
+   <goal name="WP_parameter first_minimum_caracterisation.11.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter first_minimum_caracterisation.11.2" expl="2." sum="1acd47a9a72b56f7ace5c6ce526d50bb">
+   <goal name="WP_parameter first_minimum_caracterisation.11.2" expl="2.">
    <transf name="introduce_premises">
-    <goal name="WP_parameter first_minimum_caracterisation.11.2.1" expl="1." sum="33310582ef2334f8236a40864d2efe95">
+    <goal name="WP_parameter first_minimum_caracterisation.11.2.1" expl="1.">
     <transf name="inline_goal">
-     <goal name="WP_parameter first_minimum_caracterisation.11.2.1.1" expl="1." sum="a1b5a7cb77e3b9115f561e0f888e3267">
+     <goal name="WP_parameter first_minimum_caracterisation.11.2.1.1" expl="1.">
      <transf name="split_goal_wp">
-      <goal name="WP_parameter first_minimum_caracterisation.11.2.1.1.1" expl="1." sum="c87ae4c704c2067881e052ba973366e5">
+      <goal name="WP_parameter first_minimum_caracterisation.11.2.1.1.1" expl="1.">
       <proof prover="3"><result status="valid" time="0.03"/></proof>
       </goal>
-      <goal name="WP_parameter first_minimum_caracterisation.11.2.1.1.2" expl="2." sum="b04c32fae117415f6888374f1070bcba">
+      <goal name="WP_parameter first_minimum_caracterisation.11.2.1.1.2" expl="2.">
       <proof prover="0"><result status="valid" time="0.20"/></proof>
       </goal>
-      <goal name="WP_parameter first_minimum_caracterisation.11.2.1.1.3" expl="3." sum="b6a36f3aa22453db8414ff19a5f25a99">
+      <goal name="WP_parameter first_minimum_caracterisation.11.2.1.1.3" expl="3.">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
      </transf>
@@ -993,164 +993,164 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.12" expl="12. postcondition" sum="a78b2db1b370bcb9892203c04121b57a">
+  <goal name="WP_parameter first_minimum_caracterisation.12" expl="12. postcondition">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.13" expl="13. precondition" sum="dbcd3f094db6bf8d2bf4fc6ebfb23c34">
+  <goal name="WP_parameter first_minimum_caracterisation.13" expl="13. precondition">
   <proof prover="3"><result status="valid" time="0.29"/></proof>
   </goal>
-  <goal name="WP_parameter first_minimum_caracterisation.14" expl="14. postcondition" sum="e7acd5e59f9ab0466b8a015cfb2dd039">
+  <goal name="WP_parameter first_minimum_caracterisation.14" expl="14. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter first_minimum_caracterisation.14.1" expl="1. postcondition" sum="d855bcaf5ad631406b138176c51e7c0a">
+   <goal name="WP_parameter first_minimum_caracterisation.14.1" expl="1. postcondition">
    <proof prover="2"><result status="valid" time="0.29"/></proof>
    </goal>
-   <goal name="WP_parameter first_minimum_caracterisation.14.2" expl="2. postcondition" sum="1e101c516278f0d5fc5fe1f6a0d6df72">
+   <goal name="WP_parameter first_minimum_caracterisation.14.2" expl="2. postcondition">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="assoc" sum="13e6b318bb9119fc53d0649043ecfea0">
+ <goal name="assoc">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="neutral" sum="9613526020dff6b0af30948e333e3118">
+ <goal name="neutral">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="sum_def_nil" sum="4cd23d9b0e85d525e55116ffea123f21">
+ <goal name="sum_def_nil">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="sum_def_cons" sum="889ae388b8d7bbda7a552c2859a6cd4f">
+ <goal name="sum_def_cons">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="balancing_positive" sum="be83a936808f521d1fd9e240326357bf">
+ <goal name="balancing_positive">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="selection_empty" sum="37d2ca1ca73fbfb4504752df4aba87a9">
+ <goal name="selection_empty">
  <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  M zero" expl="VC for avl  AVL  M zero" sum="2944e67358b8c6796b805e3f711e0526">
+ <goal name="WP_parameter avl  AVL  M zero" expl="VC for avl  AVL  M zero">
  <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  M op" expl="VC for avl  AVL  M op" sum="2944e67358b8c6796b805e3f711e0526">
+ <goal name="WP_parameter avl  AVL  M op" expl="VC for avl  AVL  M op">
  <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  D measure" expl="VC for avl  AVL  D measure" sum="2944e67358b8c6796b805e3f711e0526">
+ <goal name="WP_parameter avl  AVL  D measure" expl="VC for avl  AVL  D measure">
  <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  selected_part" expl="VC for avl  AVL  selected_part" sum="6bf87a309b55bfaa78ae32ac1bb34131">
+ <goal name="WP_parameter avl  AVL  selected_part" expl="VC for avl  AVL  selected_part">
  <proof prover="3"><result status="valid" time="0.13"/></proof>
  </goal>
- <goal name="WP_parameter as_bag_append" expl="VC for as_bag_append" sum="abf21f467f732ac9d249ca6e1b0b4557">
+ <goal name="WP_parameter as_bag_append" expl="VC for as_bag_append">
  <proof prover="3"><result status="valid" time="0.27"/></proof>
  </goal>
- <goal name="WP_parameter as_bag_bounds" expl="VC for as_bag_bounds" sum="b5d00c0250fb7b56ac73d06261b751e4">
+ <goal name="WP_parameter as_bag_bounds" expl="VC for as_bag_bounds">
  <proof prover="3"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="WP_parameter as_bag_membership" expl="VC for as_bag_membership" sum="cf38fa5e6d449b23bcc9b9cce46c4e53">
+ <goal name="WP_parameter as_bag_membership" expl="VC for as_bag_membership">
  <proof prover="3"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="WP_parameter m" expl="VC for m" sum="053691e618633b008d6a0bd222f82768">
+ <goal name="WP_parameter m" expl="VC for m">
  <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter correction" expl="VC for correction" sum="7e1c9575bcf999b1c6ac1c78b551b74d">
+ <goal name="WP_parameter correction" expl="VC for correction">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter correction.1" expl="1. precondition" sum="477403e22ab934f90a5967be7a9cf1d7">
+  <goal name="WP_parameter correction.1" expl="1. precondition">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter correction.2" expl="2. postcondition" sum="55184ef2b2e8da21bf67ec41c313276a">
+  <goal name="WP_parameter correction.2" expl="2. postcondition">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter correction.3" expl="3. postcondition" sum="b6ab03b465f9cc627a9d585d3e639554">
+  <goal name="WP_parameter correction.3" expl="3. postcondition">
   <proof prover="3"><result status="valid" time="0.40"/></proof>
   </goal>
-  <goal name="WP_parameter correction.4" expl="4. postcondition" sum="76f60995a153ce6199522f36baf1230e">
+  <goal name="WP_parameter correction.4" expl="4. postcondition">
   <proof prover="3"><result status="valid" time="0.26"/></proof>
   </goal>
-  <goal name="WP_parameter correction.5" expl="5. postcondition" sum="90d708b7266a302982762d7223398a2d">
+  <goal name="WP_parameter correction.5" expl="5. postcondition">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter correction.6" expl="6. postcondition" sum="9945fc37d52fc326db1e57742ce47c27">
+  <goal name="WP_parameter correction.6" expl="6. postcondition">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter correction.7" expl="7. postcondition" sum="5021bf517d0d6ad83570aacafe0b755a">
+  <goal name="WP_parameter correction.7" expl="7. postcondition">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter empty" expl="VC for empty" sum="4332c65de7e553936303f437fb04824e">
+ <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="3"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="WP_parameter singleton" expl="VC for singleton" sum="90d3c54907357703e72521424e932fd3">
+ <goal name="WP_parameter singleton" expl="VC for singleton">
  <proof prover="3"><result status="valid" time="0.19"/></proof>
  </goal>
- <goal name="WP_parameter is_empty" expl="VC for is_empty" sum="ac2aae74c3b182faa926b1d6e92ac14c">
+ <goal name="WP_parameter is_empty" expl="VC for is_empty">
  <proof prover="3"><result status="valid" time="0.32"/></proof>
  </goal>
- <goal name="WP_parameter merge" expl="VC for merge" sum="8355919859c56210233627496b3b5b57">
+ <goal name="WP_parameter merge" expl="VC for merge">
  <proof prover="3"><result status="valid" time="0.17"/></proof>
  </goal>
- <goal name="WP_parameter remove_count" expl="VC for remove_count" sum="498e4f41c3130bf12d50f71b9d961c7f">
+ <goal name="WP_parameter remove_count" expl="VC for remove_count">
  <proof prover="3"><result status="valid" time="0.46"/></proof>
  </goal>
- <goal name="WP_parameter extract_min" expl="VC for extract_min" sum="ab7fc47e1d2ebca6e442637d1df92489">
+ <goal name="WP_parameter extract_min" expl="VC for extract_min">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter extract_min.1" expl="1. precondition" sum="d03d670dbb45f6dd700f1cdefa741aa5">
+  <goal name="WP_parameter extract_min.1" expl="1. precondition">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter extract_min.2" expl="2. postcondition" sum="e5b31b37ceaddc17569fd87a9296c9c8">
+  <goal name="WP_parameter extract_min.2" expl="2. postcondition">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter extract_min.3" expl="3. precondition" sum="4a432af5618f6181bc2309df8131f78e">
+  <goal name="WP_parameter extract_min.3" expl="3. precondition">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter extract_min.4" expl="4. unreachable point" sum="7625bec1f1da0bdb79da85159819f017">
+  <goal name="WP_parameter extract_min.4" expl="4. unreachable point">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter extract_min.5" expl="5. postcondition" sum="890f835e90290b8c3cf74d986842db8c">
+  <goal name="WP_parameter extract_min.5" expl="5. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter extract_min.5.1" expl="1. postcondition" sum="695910ebf7c2548a345b8a87d3542698">
+   <goal name="WP_parameter extract_min.5.1" expl="1. postcondition">
    <proof prover="3"><result status="valid" time="0.30"/></proof>
    </goal>
-   <goal name="WP_parameter extract_min.5.2" expl="2. postcondition" sum="d98fa7f5400eef793cd22ddac57fd611">
+   <goal name="WP_parameter extract_min.5.2" expl="2. postcondition">
    <proof prover="1"><result status="valid" time="0.38"/></proof>
    </goal>
-   <goal name="WP_parameter extract_min.5.3" expl="3. postcondition" sum="510b1e5a986845b8266c2b1c3e37a2b7">
+   <goal name="WP_parameter extract_min.5.3" expl="3. postcondition">
    <proof prover="1"><result status="valid" time="0.51"/></proof>
    </goal>
-   <goal name="WP_parameter extract_min.5.4" expl="4. postcondition" sum="4444f7869dd14605f238fbd7259a3249">
+   <goal name="WP_parameter extract_min.5.4" expl="4. postcondition">
    <proof prover="3"><result status="valid" time="0.12"/></proof>
    </goal>
-   <goal name="WP_parameter extract_min.5.5" expl="5. postcondition" sum="195962deb9d947d1341ac4ecdeaa871f">
+   <goal name="WP_parameter extract_min.5.5" expl="5. postcondition">
    <proof prover="3"><result status="valid" time="0.05"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter min" expl="VC for min" sum="eedf391eba03696857e7d1955c886575">
+ <goal name="WP_parameter min" expl="VC for min">
  <proof prover="3"><result status="valid" time="0.11"/></proof>
  </goal>
- <goal name="WP_parameter pop_min" expl="VC for pop_min" sum="0f6d95922af4da2825175252915d218a">
+ <goal name="WP_parameter pop_min" expl="VC for pop_min">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter pop_min.1" expl="1. precondition" sum="beb8e2b6b0cb65b51dcedc0ba2c0cb52">
+  <goal name="WP_parameter pop_min.1" expl="1. precondition">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter pop_min.2" expl="2. assertion" sum="90846723b95ab2492c77c03c4fce1414">
+  <goal name="WP_parameter pop_min.2" expl="2. assertion">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter pop_min.3" expl="3. postcondition" sum="9ece115dc8079dbd61189d4b7e3e1ef4">
+  <goal name="WP_parameter pop_min.3" expl="3. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter pop_min.3.1" expl="1." sum="4cbb3153c22a9013fa4804f23a74d315">
+   <goal name="WP_parameter pop_min.3.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.14"/></proof>
    </goal>
-   <goal name="WP_parameter pop_min.3.2" expl="2." sum="0065da5cd7e815282da3dd09eb578bc7">
+   <goal name="WP_parameter pop_min.3.2" expl="2.">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter pop_min.3.3" expl="3." sum="3f78cadc014120284515bc770a7fb3c0">
+   <goal name="WP_parameter pop_min.3.3" expl="3.">
    <proof prover="3"><result status="valid" time="1.22"/></proof>
    </goal>
-   <goal name="WP_parameter pop_min.3.4" expl="4." sum="0bdaf09f3139b078b5a79646cd190e41">
+   <goal name="WP_parameter pop_min.3.4" expl="4.">
    <metas>
     <ts_pos name="real" arity="0" id="2"
      ip_theory="BuiltIn">
@@ -1945,9 +1945,9 @@
     <meta name="remove_type">
      <meta_arg_ts id="10793"/>
     </meta>
-    <goal name="WP_parameter pop_min.3.4" expl="4." sum="b54584dd61ec256ae4e193b7568a6579">
+    <goal name="WP_parameter pop_min.3.4" expl="4.">
     <transf name="eliminate_builtin">
-     <goal name="WP_parameter pop_min.3.4.1" expl="1." sum="738a42ec813e85b1817251f8899fb82c">
+     <goal name="WP_parameter pop_min.3.4.1" expl="1.">
      <proof prover="3"><result status="valid" time="0.12"/></proof>
      </goal>
     </transf>
@@ -1958,15 +1958,15 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter add" expl="VC for add" sum="a55d95fb41e01c3e63a837d57132c149">
+ <goal name="WP_parameter add" expl="VC for add">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter add.1" expl="1. precondition" sum="3a3271dad5a52f4a7b5d71e8c941ff07">
+  <goal name="WP_parameter add.1" expl="1. precondition">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter add.2" expl="2. postcondition" sum="200db9a0e6ebe21481813983e9a126f7">
+  <goal name="WP_parameter add.2" expl="2. postcondition">
   <proof prover="3"><result status="valid" time="0.47"/></proof>
   </goal>
-  <goal name="WP_parameter add.3" expl="3. postcondition" sum="3f145a5e87389014deb508775d9ac9e8">
+  <goal name="WP_parameter add.3" expl="3. postcondition">
   <proof prover="3"><result status="valid" time="0.13"/></proof>
   </goal>
  </transf>

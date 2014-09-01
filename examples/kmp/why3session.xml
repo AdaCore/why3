@@ -6,244 +6,244 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
 <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <file name="../kmp.mlw" expanded="true">
-<theory name="KnuthMorrisPratt" expanded="true">
- <goal name="matches_empty" sum="37a6a31fd980dcabdc7a73c62c7bcee3">
+<theory name="KnuthMorrisPratt" sum="2aa22352c871a48c7feae61c99f82b20" expanded="true">
+ <goal name="matches_empty">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="matches_right_extension" sum="a00dc728eccad66b8b37036dcef1636a">
+ <goal name="matches_right_extension">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="matches_contradiction_at_first" sum="86bba81000479497439aced43dde2199">
+ <goal name="matches_contradiction_at_first">
  <proof prover="0" memlimit="0" edited="kmp_WP_KnuthMorrisPratt_matches_contradiction_at_first_1.v"><result status="valid" time="1.17"/></proof>
  </goal>
- <goal name="matches_contradiction_at_i" sum="bbdcc840d7eaae7b0e699920d7f32938">
+ <goal name="matches_contradiction_at_i">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="matches_right_weakening" sum="5a8568357685294629ecff33881fd060">
+ <goal name="matches_right_weakening">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="matches_left_weakening" sum="435c536a821624899cbcaead7298663d">
+ <goal name="matches_left_weakening">
  <proof prover="0" memlimit="0" edited="kmp_WP_KnuthMorrisPratt_matches_left_weakening_1.v"><result status="valid" time="1.21"/></proof>
  </goal>
- <goal name="matches_sym" sum="7c1916b184b0b9ea7b067ba5d30ac04e">
+ <goal name="matches_sym">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="matches_trans" sum="f12a4ad88d6c1fdc52ca18f3e5715794">
+ <goal name="matches_trans">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="next_iteration" sum="60d58dc6b2df4da6d3cc382409d0332b">
+ <goal name="next_iteration">
  <proof prover="0" memlimit="0" edited="kmp_WP_KnuthMorrisPratt_next_iteration_1.v"><result status="valid" time="1.30"/></proof>
  </goal>
- <goal name="next_is_maximal" sum="68727ef791a8a8ddaa1cf1bcc823545e">
+ <goal name="next_is_maximal">
  <proof prover="0" memlimit="0" edited="kmp_WP_KnuthMorrisPratt_next_is_maximal_1.v"><result status="valid" time="1.22"/></proof>
  </goal>
- <goal name="next_1_0" sum="7090185c33d912be685f7c3871e8c568">
+ <goal name="next_1_0">
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter initnext" expl="VC for initnext" sum="d6a75105c701c7d66cd0ec15351a7247" expanded="true">
+ <goal name="WP_parameter initnext" expl="VC for initnext" expanded="true">
  <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter initnext.1" expl="1. array creation size" sum="a428dcaa91bf416bb6bcc1155332e31d">
+  <goal name="WP_parameter initnext.1" expl="1. array creation size">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.2" expl="2. index in array bounds" sum="b0e24331e9f1a23b1a64924aaa173191">
+  <goal name="WP_parameter initnext.2" expl="2. index in array bounds">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.3" expl="3. loop invariant init" sum="21bdf587b2ddc6fcb3d671f29512904c">
+  <goal name="WP_parameter initnext.3" expl="3. loop invariant init">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.4" expl="4. loop invariant init" sum="c4b4d7d56a0512d787810a777a95f865">
+  <goal name="WP_parameter initnext.4" expl="4. loop invariant init">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.5" expl="5. loop invariant init" sum="decd40037d45e821995edd6140aeea0e">
+  <goal name="WP_parameter initnext.5" expl="5. loop invariant init">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.6" expl="6. loop invariant init" sum="257f5674fd118d1fa55277060845521f">
+  <goal name="WP_parameter initnext.6" expl="6. loop invariant init">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.7" expl="7. index in array bounds" sum="591cc2da8c295106073e2709665339c2">
+  <goal name="WP_parameter initnext.7" expl="7. index in array bounds">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.8" expl="8. index in array bounds" sum="a4d45956bcc8eaffd62d87186034eb04">
+  <goal name="WP_parameter initnext.8" expl="8. index in array bounds">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.9" expl="9. type invariant" sum="4f4882a40479c1949ac81d93a8c53b2d">
+  <goal name="WP_parameter initnext.9" expl="9. type invariant">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.10" expl="10. index in array bounds" sum="c1d67f7ed1cb51e761680efc5e5a4538">
+  <goal name="WP_parameter initnext.10" expl="10. index in array bounds">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.11" expl="11. loop invariant preservation" sum="ac47a1d1bcd79d25026daa686fd63ed3">
+  <goal name="WP_parameter initnext.11" expl="11. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.12" expl="12. loop invariant preservation" sum="9909bf8ef6a5200b1895da240dca7c92">
+  <goal name="WP_parameter initnext.12" expl="12. loop invariant preservation">
   <proof prover="2" timelimit="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.13" expl="13. loop invariant preservation" sum="582052edbd29ee529e4ac3c119a96ca9" expanded="true">
+  <goal name="WP_parameter initnext.13" expl="13. loop invariant preservation" expanded="true">
   <proof prover="0" timelimit="7" edited="kmp_WP_KnuthMorrisPratt_WP_parameter_initnext_2.v"><result status="valid" time="1.09"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.14" expl="14. loop invariant preservation" sum="7d4f0a56e3d3e9311b13a1175c573902">
+  <goal name="WP_parameter initnext.14" expl="14. loop invariant preservation">
   <transf name="inline_goal">
-   <goal name="WP_parameter initnext.14.1" expl="1. loop invariant preservation" sum="740b322cdc2b8aaf262dde8cd4d38c56">
+   <goal name="WP_parameter initnext.14.1" expl="1. loop invariant preservation">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter initnext.14.1.1" expl="1. loop invariant preservation" sum="498a51bd5d7ccc24c7e3769756e7bc6b">
+    <goal name="WP_parameter initnext.14.1.1" expl="1. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.07"/></proof>
     </goal>
-    <goal name="WP_parameter initnext.14.1.2" expl="2. loop invariant preservation" sum="19c649094f210ab75d067a3d9520f695">
+    <goal name="WP_parameter initnext.14.1.2" expl="2. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.05"/></proof>
     </goal>
-    <goal name="WP_parameter initnext.14.1.3" expl="3. loop invariant preservation" sum="3ab869a779995446a3802dbf1ec71ce7">
+    <goal name="WP_parameter initnext.14.1.3" expl="3. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.06"/></proof>
     </goal>
-    <goal name="WP_parameter initnext.14.1.4" expl="4. loop invariant preservation" sum="d82412e13dad010520ab4bf9e1798c10">
+    <goal name="WP_parameter initnext.14.1.4" expl="4. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.25"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter initnext.15" expl="15. loop variant decrease" sum="796b2add7818cd74d44225de95477c2b">
+  <goal name="WP_parameter initnext.15" expl="15. loop variant decrease">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.16" expl="16. type invariant" sum="781aed251c163ee8b2c23d2a732c5d48">
+  <goal name="WP_parameter initnext.16" expl="16. type invariant">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.17" expl="17. index in array bounds" sum="4c774fee804fd1428d7d782ea463d17b">
+  <goal name="WP_parameter initnext.17" expl="17. index in array bounds">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.18" expl="18. loop invariant preservation" sum="36cd24452434324180f6176a22067766">
+  <goal name="WP_parameter initnext.18" expl="18. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.19" expl="19. loop invariant preservation" sum="4dd6c50ee2420905546c84ce6b3ee6db">
+  <goal name="WP_parameter initnext.19" expl="19. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.20" expl="20. loop invariant preservation" sum="ff69fe2da9d6ca8fd4f4ece74623b87b" expanded="true">
-  <proof prover="0" timelimit="7" edited="kmp_WP_KnuthMorrisPratt_WP_parameter_initnext_3.v"><result status="valid" time="1.15"/></proof>
+  <goal name="WP_parameter initnext.20" expl="20. loop invariant preservation" expanded="true">
+  <proof prover="0" timelimit="7" edited="kmp_WP_KnuthMorrisPratt_WP_parameter_initnext_3.v"><result status="valid" time="1.37"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.21" expl="21. loop invariant preservation" sum="69c3062b8ffb797da6a0ec1a886e2d42">
+  <goal name="WP_parameter initnext.21" expl="21. loop invariant preservation">
   <transf name="inline_goal">
-   <goal name="WP_parameter initnext.21.1" expl="1. loop invariant preservation" sum="61f4c553c45cdfa9f644bd25274e1574">
+   <goal name="WP_parameter initnext.21.1" expl="1. loop invariant preservation">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter initnext.21.1.1" expl="1. loop invariant preservation" sum="0a66479c75a57a12702964de5c335bfa">
+    <goal name="WP_parameter initnext.21.1.1" expl="1. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter initnext.21.1.2" expl="2. loop invariant preservation" sum="a45e915ee2ad16c8c9e9f12732a7786b">
+    <goal name="WP_parameter initnext.21.1.2" expl="2. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="WP_parameter initnext.21.1.3" expl="3. loop invariant preservation" sum="50f3d11ae94f4c35c4b9126271d40689">
+    <goal name="WP_parameter initnext.21.1.3" expl="3. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.11"/></proof>
     </goal>
-    <goal name="WP_parameter initnext.21.1.4" expl="4. loop invariant preservation" sum="6d0a2ec0aeaaaa761a5abce03d158709">
+    <goal name="WP_parameter initnext.21.1.4" expl="4. loop invariant preservation">
     <proof prover="2"><result status="valid" time="0.37"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter initnext.22" expl="22. loop variant decrease" sum="20603c25b9bba49f51cf305ee929c6dc">
+  <goal name="WP_parameter initnext.22" expl="22. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.23" expl="23. type invariant" sum="4614ac9ad068e74342d8c2ff2ef04852">
+  <goal name="WP_parameter initnext.23" expl="23. type invariant">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.24" expl="24. index in array bounds" sum="10c2790752e35ed38990952559df4ce4">
+  <goal name="WP_parameter initnext.24" expl="24. index in array bounds">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.25" expl="25. loop invariant preservation" sum="c5c494349fe6687802cfdbea7ac44393">
+  <goal name="WP_parameter initnext.25" expl="25. loop invariant preservation">
   <proof prover="2" timelimit="7"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.26" expl="26. loop invariant preservation" sum="ced53e2ce0c4909077cdf630ce7b2a07">
+  <goal name="WP_parameter initnext.26" expl="26. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.47"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.27" expl="27. loop invariant preservation" sum="7dd69195ac5b64f5a6cde177aa587b10" expanded="true">
+  <goal name="WP_parameter initnext.27" expl="27. loop invariant preservation" expanded="true">
   <proof prover="0" timelimit="7" edited="kmp_WP_KnuthMorrisPratt_WP_parameter_initnext_4.v"><result status="valid" time="1.37"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.28" expl="28. loop invariant preservation" sum="b17ee82ecbe361d38947b2b231c0fd44">
+  <goal name="WP_parameter initnext.28" expl="28. loop invariant preservation">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.29" expl="29. loop variant decrease" sum="12a7594fbb29a61abc3d897218685033">
+  <goal name="WP_parameter initnext.29" expl="29. loop variant decrease">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.30" expl="30. type invariant" sum="0442579f12540cf30ad6f2854b0bda82">
+  <goal name="WP_parameter initnext.30" expl="30. type invariant">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.31" expl="31. postcondition" sum="0af43fa81ed409a497f66b0e1d93092e">
+  <goal name="WP_parameter initnext.31" expl="31. postcondition">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter initnext.32" expl="32. postcondition" sum="44d8618db0034684245b1d176e8e4968">
+  <goal name="WP_parameter initnext.32" expl="32. postcondition">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter kmp" expl="VC for kmp" sum="36db72d8f7896e9913e6c836ee55d90f">
+ <goal name="WP_parameter kmp" expl="VC for kmp">
  <transf name="split_goal">
-  <goal name="WP_parameter kmp.1" expl="1. precondition" sum="9cb29281cfa1707535c84e52f1c3bcad">
+  <goal name="WP_parameter kmp.1" expl="1. precondition">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.2" expl="2. loop invariant init" sum="949bcce7357a4f11489d6edca3a2c4fb">
+  <goal name="WP_parameter kmp.2" expl="2. loop invariant init">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.3" expl="3. loop invariant init" sum="5014fd9004f7cd661975611a6c5cf486">
+  <goal name="WP_parameter kmp.3" expl="3. loop invariant init">
   <proof prover="1" timelimit="15" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.4" expl="4. loop invariant init" sum="d2966d57e3267947968335f773c44125">
+  <goal name="WP_parameter kmp.4" expl="4. loop invariant init">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.5" expl="5. index in array bounds" sum="b9ff54b1105b66c6f7bd68a4c835feda">
+  <goal name="WP_parameter kmp.5" expl="5. index in array bounds">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.6" expl="6. index in array bounds" sum="86741f2bf04c5513e9e4806daa94cc42">
+  <goal name="WP_parameter kmp.6" expl="6. index in array bounds">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.7" expl="7. loop invariant preservation" sum="5ee9eee328edc2430db842a0a04b6458">
+  <goal name="WP_parameter kmp.7" expl="7. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.8" expl="8. loop invariant preservation" sum="77c89a94e10eca8420431eb7055a6ed0">
+  <goal name="WP_parameter kmp.8" expl="8. loop invariant preservation">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.9" expl="9. loop invariant preservation" sum="4cd771ad7b3cd46902fcb9251e8c60e0">
+  <goal name="WP_parameter kmp.9" expl="9. loop invariant preservation">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.10" expl="10. loop variant decrease" sum="de590b4bc3a84bffd515cb4435adb1c1">
+  <goal name="WP_parameter kmp.10" expl="10. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.11" expl="11. loop invariant preservation" sum="0bade831abdbece4c2dd34cd908ab8ae">
+  <goal name="WP_parameter kmp.11" expl="11. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.12" expl="12. loop invariant preservation" sum="0c756c7e2c743ea2fd2cac7dde161bd0">
+  <goal name="WP_parameter kmp.12" expl="12. loop invariant preservation">
   <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.13" expl="13. loop invariant preservation" sum="3f7a7cbdb8e6a2b13fc0c6d12a9fbe78">
+  <goal name="WP_parameter kmp.13" expl="13. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.14" expl="14. loop variant decrease" sum="d7521d399ad83335c50299ca2ec67488">
+  <goal name="WP_parameter kmp.14" expl="14. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.15" expl="15. index in array bounds" sum="ef5d86e98ca3123f303a82fb5d061931">
+  <goal name="WP_parameter kmp.15" expl="15. index in array bounds">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.16" expl="16. loop invariant preservation" sum="f31d9dd2a006af8469e71be4147e4d9f">
+  <goal name="WP_parameter kmp.16" expl="16. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.17" expl="17. loop invariant preservation" sum="7a685a812aa8e1a42c0bee6d34c17347">
+  <goal name="WP_parameter kmp.17" expl="17. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.57"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.18" expl="18. loop invariant preservation" sum="8687c7ff2a98196be71254550d95de52">
-  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="4.25"/></proof>
+  <goal name="WP_parameter kmp.18" expl="18. loop invariant preservation">
+  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="4.97"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.19" expl="19. loop variant decrease" sum="cb7a774dbaa91031c03b59562652c363">
+  <goal name="WP_parameter kmp.19" expl="19. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.20" expl="20. postcondition" sum="88b920768cc5022d2bcb833545a4b2e7">
+  <goal name="WP_parameter kmp.20" expl="20. postcondition">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.21" expl="21. postcondition" sum="9557d78feeba3cd57a490598022c057c">
+  <goal name="WP_parameter kmp.21" expl="21. postcondition">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.22" expl="22. postcondition" sum="ef094d9eefaf3a33bad901cc5a5a11c1">
+  <goal name="WP_parameter kmp.22" expl="22. postcondition">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter kmp.23" expl="23. postcondition" sum="e7f1472d58f2237dbff307d241bdd648">
+  <goal name="WP_parameter kmp.23" expl="23. postcondition">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>

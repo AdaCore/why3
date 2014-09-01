@@ -6,292 +6,292 @@
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
 <file name="../skew_heaps.mlw" expanded="true">
-<theory name="Heap" expanded="true">
+<theory name="Heap" sum="1fa8c7da237c6420498a3eb86073ff36" expanded="true">
 </theory>
-<theory name="SkewHeaps" expanded="true">
- <goal name="WP_parameter root_is_min" expl="VC for root_is_min" sum="36be678d01ab2832fd5dd39bf24d9828">
+<theory name="SkewHeaps" sum="60eb21b3146d944dddb16b319e44c139" expanded="true">
+ <goal name="WP_parameter root_is_min" expl="VC for root_is_min">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter root_is_min.1" expl="1. unreachable point" sum="421ebd73f642bfaa0099def5e8c7bd3c">
+  <goal name="WP_parameter root_is_min.1" expl="1. unreachable point">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.2" expl="2. variant decrease" sum="ffdb26504e701e716ffec015b5b5a708">
+  <goal name="WP_parameter root_is_min.2" expl="2. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.3" expl="3. precondition" sum="9b211d32d38567a9dd567c9fcde0f5be">
+  <goal name="WP_parameter root_is_min.3" expl="3. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.4" expl="4. variant decrease" sum="c7cbc0605711e15a4fbe3d36dc38349c">
+  <goal name="WP_parameter root_is_min.4" expl="4. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.5" expl="5. precondition" sum="c24dc580f27958f5267302e863477c36">
+  <goal name="WP_parameter root_is_min.5" expl="5. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.6" expl="6. postcondition" sum="6e7bb7a66a0f8e9263d0b144188e3c9b">
+  <goal name="WP_parameter root_is_min.6" expl="6. postcondition">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.7" expl="7. postcondition" sum="5beda056928fd0cbbc28420498571afd">
+  <goal name="WP_parameter root_is_min.7" expl="7. postcondition">
   <proof prover="2"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.8" expl="8. variant decrease" sum="fd914691eb5bff3a8f0053c58096bbd1">
+  <goal name="WP_parameter root_is_min.8" expl="8. variant decrease">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.9" expl="9. precondition" sum="6d757b295299dc29b948f1f10251f6d9">
+  <goal name="WP_parameter root_is_min.9" expl="9. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.10" expl="10. postcondition" sum="980539bef4a6715cef38154015e5818e">
+  <goal name="WP_parameter root_is_min.10" expl="10. postcondition">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter root_is_min.11" expl="11. postcondition" sum="9b17137066e53b6659d28419c2859ba6">
+  <goal name="WP_parameter root_is_min.11" expl="11. postcondition">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter empty" expl="VC for empty" sum="0373e67e847a8fa254b24cde898b7ddf">
+ <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter is_empty" expl="VC for is_empty" sum="1676dba74c870b18a3b64e78dabecd56">
+ <goal name="WP_parameter is_empty" expl="VC for is_empty">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter size" expl="VC for size" sum="55d00ef12a87f5ebc642863a793d4742" expanded="true">
+ <goal name="WP_parameter size" expl="VC for size" expanded="true">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter get_min" expl="VC for get_min" sum="467470026eb81be68c072327fe00ba53">
+ <goal name="WP_parameter get_min" expl="VC for get_min">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter get_min.1" expl="1. unreachable point" sum="61148418c5d1cb941768379dbb0854d9">
+  <goal name="WP_parameter get_min.1" expl="1. unreachable point">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter get_min.2" expl="2. postcondition" sum="0f9177d51c250a5a2c396117b89843c7">
+  <goal name="WP_parameter get_min.2" expl="2. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter merge" expl="VC for merge" sum="5212617bcd072173a7200355996f063b">
+ <goal name="WP_parameter merge" expl="VC for merge">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter merge.1" expl="1. variant decrease" sum="586f78185a0d633a4475caff4ae17053">
+  <goal name="WP_parameter merge.1" expl="1. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.2" expl="2. precondition" sum="dff4eb83a85743230ef7373020756235">
+  <goal name="WP_parameter merge.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.3" expl="3. postcondition" sum="bc98dc42c9211a600ce02748c15248d5">
+  <goal name="WP_parameter merge.3" expl="3. postcondition">
   <proof prover="2"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter merge.4" expl="4. postcondition" sum="8e4b3879aa25728eb17f374c75f8f94a">
+  <goal name="WP_parameter merge.4" expl="4. postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter merge.5" expl="5. postcondition" sum="c8b077b66f20654ca1327ca3b28a2a10">
+  <goal name="WP_parameter merge.5" expl="5. postcondition">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter merge.6" expl="6. variant decrease" sum="d8d061d20c761890a06ad0bdacb05671">
+  <goal name="WP_parameter merge.6" expl="6. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.7" expl="7. precondition" sum="c1d780b93c117ec6ce93957fd2fb7c57">
+  <goal name="WP_parameter merge.7" expl="7. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.8" expl="8. postcondition" sum="eb4e118d29ae209565db18b1f1ea6551">
+  <goal name="WP_parameter merge.8" expl="8. postcondition">
   <proof prover="2"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter merge.9" expl="9. postcondition" sum="0bcba80c961b64996973efbcdee3c3e4">
+  <goal name="WP_parameter merge.9" expl="9. postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.10" expl="10. postcondition" sum="2331c65c4dafcc2b4931fd2626662b5a">
+  <goal name="WP_parameter merge.10" expl="10. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.11" expl="11. postcondition" sum="92e09d7721f25540269c2c08e2689de2">
+  <goal name="WP_parameter merge.11" expl="11. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.12" expl="12. postcondition" sum="e02027916cde4eecfba804c4d631286a">
+  <goal name="WP_parameter merge.12" expl="12. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.13" expl="13. postcondition" sum="9f18048eb71bcf2c71b72a43fb688cee">
+  <goal name="WP_parameter merge.13" expl="13. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.14" expl="14. postcondition" sum="3a78937fa763ff8e66ad1709cd30fd20">
+  <goal name="WP_parameter merge.14" expl="14. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.15" expl="15. postcondition" sum="6a56cff68f5a2a924d1aa9854c603908">
+  <goal name="WP_parameter merge.15" expl="15. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.16" expl="16. postcondition" sum="72af10e850411033da6cb99d60eff758">
+  <goal name="WP_parameter merge.16" expl="16. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.17" expl="17. postcondition" sum="834dc634edee72703934a3bee55ef656">
+  <goal name="WP_parameter merge.17" expl="17. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.18" expl="18. postcondition" sum="37781835a13163eed6876c9a328c5ffb">
+  <goal name="WP_parameter merge.18" expl="18. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.19" expl="19. postcondition" sum="16fe82498ff9b5c2c5b7df6a63ea504e">
+  <goal name="WP_parameter merge.19" expl="19. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter add" expl="VC for add" sum="b4ced98882ef525cdadf8024f6e2086e">
+ <goal name="WP_parameter add" expl="VC for add">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter add.1" expl="1. precondition" sum="b65b0f7f189a40f16ba4fc0c8dbb1595">
+  <goal name="WP_parameter add.1" expl="1. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter add.2" expl="2. postcondition" sum="d2003db9691e9f78a284d6f7a8ed6d79">
+  <goal name="WP_parameter add.2" expl="2. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter add.3" expl="3. postcondition" sum="4c911742f58ee1fd6e46b9d89949723a">
+  <goal name="WP_parameter add.3" expl="3. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter add.4" expl="4. postcondition" sum="1253b5131d900426a76709dd7ef2a610">
+  <goal name="WP_parameter add.4" expl="4. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter add.5" expl="5. postcondition" sum="8acd9b231f0a2256f376940a940603cd">
+  <goal name="WP_parameter add.5" expl="5. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter remove_min" expl="VC for remove_min" sum="0c7d764b86d0d1e9b477a8a0320e81d4">
+ <goal name="WP_parameter remove_min" expl="VC for remove_min">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter remove_min.1" expl="1. unreachable point" sum="a558ab9f21ebadc79d4ceae4451d78d2">
+  <goal name="WP_parameter remove_min.1" expl="1. unreachable point">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter remove_min.2" expl="2. precondition" sum="0105080960bb9a0a389b0d6422f02b60">
+  <goal name="WP_parameter remove_min.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter remove_min.3" expl="3. postcondition" sum="cffbabd893f04f6acb6806d681fdd55c">
+  <goal name="WP_parameter remove_min.3" expl="3. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter remove_min.4" expl="4. postcondition" sum="7b839ef02b76ad40143cb6a49576c540">
+  <goal name="WP_parameter remove_min.4" expl="4. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter remove_min.5" expl="5. postcondition" sum="d701bb26669b6381198c894dd8f0cddf">
+  <goal name="WP_parameter remove_min.5" expl="5. postcondition">
   <proof prover="1"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter remove_min.6" expl="6. postcondition" sum="b2f37d2e8ceeb038a48b0293b0e5f6cc">
+  <goal name="WP_parameter remove_min.6" expl="6. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="HeapSort">
- <goal name="WP_parameter heapsort" expl="VC for heapsort" sum="22407024df5b5e356dbc23e22ec9f21f">
+<theory name="HeapSort" sum="7a798df0076c3d58ad9f2fae967f6310">
+ <goal name="WP_parameter heapsort" expl="VC for heapsort">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter heapsort.1" expl="1. postcondition" sum="2eaba5fc6bf918f0db0fe7a5ea5e4a36">
+  <goal name="WP_parameter heapsort.1" expl="1. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.2" expl="2. postcondition" sum="f8025ea803e7b8e33411df12a07cb7de">
+  <goal name="WP_parameter heapsort.2" expl="2. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.3" expl="3. loop invariant init" sum="b5df6dcda348b92ab23c3729baccca1c">
+  <goal name="WP_parameter heapsort.3" expl="3. loop invariant init">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.4" expl="4. loop invariant init" sum="8738b8a1d63a7fc5bdde43f0d51d24b8">
+  <goal name="WP_parameter heapsort.4" expl="4. loop invariant init">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.5" expl="5. loop invariant init" sum="a7291068672b44f86e47d2efbde9eae5">
+  <goal name="WP_parameter heapsort.5" expl="5. loop invariant init">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.6" expl="6. loop invariant init" sum="4fcb056f09d2a81e7dedd8b65077d5d9">
+  <goal name="WP_parameter heapsort.6" expl="6. loop invariant init">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.7" expl="7. precondition" sum="f43dcfa19def60c62343f73799f8ac62">
+  <goal name="WP_parameter heapsort.7" expl="7. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.8" expl="8. type invariant" sum="8638750081f135752806c2196d7a13ac">
+  <goal name="WP_parameter heapsort.8" expl="8. type invariant">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.9" expl="9. index in array bounds" sum="7148b951b09fdb48ed9d8d3b46b7e626">
+  <goal name="WP_parameter heapsort.9" expl="9. index in array bounds">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.10" expl="10. precondition" sum="0313dbfe1900ad1d9b70b1d1b45b52ee">
+  <goal name="WP_parameter heapsort.10" expl="10. precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.11" expl="11. loop invariant preservation" sum="49e47ea51932c43a75d181f8beff0ced">
+  <goal name="WP_parameter heapsort.11" expl="11. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.12" expl="12. loop invariant preservation" sum="63db2f81e898a31a792472d491d844b6">
+  <goal name="WP_parameter heapsort.12" expl="12. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.13" expl="13. loop invariant preservation" sum="458707976bc321cf02e0cefd50e0d96e">
+  <goal name="WP_parameter heapsort.13" expl="13. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.14" expl="14. loop invariant preservation" sum="2ae3de111094b31a161c4c2bdc94c009">
+  <goal name="WP_parameter heapsort.14" expl="14. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.15" expl="15. type invariant" sum="da74d0dc26d88963b103079c8290c86b">
+  <goal name="WP_parameter heapsort.15" expl="15. type invariant">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.16" expl="16. postcondition" sum="f6c8665c341a4300d2c234dc86df68fa">
+  <goal name="WP_parameter heapsort.16" expl="16. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.17" expl="17. postcondition" sum="5d080e4b80d031a0380551a8c328ce16">
+  <goal name="WP_parameter heapsort.17" expl="17. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.18" expl="18. loop invariant init" sum="49d35cece0cb9b0479a5b2652e9a7f22">
+  <goal name="WP_parameter heapsort.18" expl="18. loop invariant init">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.19" expl="19. loop invariant init" sum="8b6c23b4ecf24c8d7b95b567c2dd4546">
+  <goal name="WP_parameter heapsort.19" expl="19. loop invariant init">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.20" expl="20. index in array bounds" sum="37ed86380153b32cf598f1ee5c95f7aa">
+  <goal name="WP_parameter heapsort.20" expl="20. index in array bounds">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.21" expl="21. precondition" sum="9448472c14f257f70c51e8c671ea83d9">
+  <goal name="WP_parameter heapsort.21" expl="21. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.22" expl="22. assertion" sum="dee3c3fdd58c62cca169f72bc164ca2b">
-  <proof prover="2"><result status="valid" time="3.01"/></proof>
+  <goal name="WP_parameter heapsort.22" expl="22. assertion">
+  <proof prover="2"><result status="valid" time="3.82"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.23" expl="23. loop invariant preservation" sum="a843fe060fc9b458967618773c6d060d">
+  <goal name="WP_parameter heapsort.23" expl="23. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.24" expl="24. loop invariant preservation" sum="74a11b236c3693712d72b242cd6f8d4f">
-  <proof prover="0"><result status="valid" time="4.60"/></proof>
+  <goal name="WP_parameter heapsort.24" expl="24. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="5.49"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.25" expl="25. postcondition" sum="bec8678f3695e77721c344b691846728">
+  <goal name="WP_parameter heapsort.25" expl="25. postcondition">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.26" expl="26. postcondition" sum="c2a8b6525f5ed402d0662e3f51d4f271">
+  <goal name="WP_parameter heapsort.26" expl="26. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.27" expl="27. loop invariant init" sum="2583f5bc0108b3ac134f8b3b77cbed27">
+  <goal name="WP_parameter heapsort.27" expl="27. loop invariant init">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.28" expl="28. loop invariant init" sum="eb6b8afc6b25dbaee2398bf3ed1f56c1">
+  <goal name="WP_parameter heapsort.28" expl="28. loop invariant init">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.29" expl="29. loop invariant init" sum="b27b215e0d571f47185e848db37684e7">
+  <goal name="WP_parameter heapsort.29" expl="29. loop invariant init">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.30" expl="30. loop invariant init" sum="b8cfbefbc4840cb7d8801761a92e9d89">
+  <goal name="WP_parameter heapsort.30" expl="30. loop invariant init">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.31" expl="31. precondition" sum="3f217b9dba269fa8ead9dcc3352257eb">
+  <goal name="WP_parameter heapsort.31" expl="31. precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.32" expl="32. type invariant" sum="8f9810a6af3331b43c0a1cf416b519b3">
+  <goal name="WP_parameter heapsort.32" expl="32. type invariant">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.33" expl="33. index in array bounds" sum="964833575e96994be57c0be443d00160">
+  <goal name="WP_parameter heapsort.33" expl="33. index in array bounds">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.34" expl="34. precondition" sum="a231f213aacf94693093093288391a90">
+  <goal name="WP_parameter heapsort.34" expl="34. precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.35" expl="35. loop invariant preservation" sum="7697460737df42baf459381301580cf8">
+  <goal name="WP_parameter heapsort.35" expl="35. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.36" expl="36. loop invariant preservation" sum="a098a01f8dcdeb223e902b33635de66b">
+  <goal name="WP_parameter heapsort.36" expl="36. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.37" expl="37. loop invariant preservation" sum="d323d5caa2b5e42d2a6366a4050eef1a">
+  <goal name="WP_parameter heapsort.37" expl="37. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.38" expl="38. loop invariant preservation" sum="ec7ff33c43c07c5ccc6c8c7c47adabf5">
+  <goal name="WP_parameter heapsort.38" expl="38. loop invariant preservation">
   <proof prover="1"><result status="valid" time="3.12"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.39" expl="39. type invariant" sum="211fc2031b54c53e70d0091809ccefd7">
+  <goal name="WP_parameter heapsort.39" expl="39. type invariant">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.40" expl="40. postcondition" sum="3b868de4a80fff4ae992ea7dfd3be7ab">
+  <goal name="WP_parameter heapsort.40" expl="40. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter heapsort.41" expl="41. postcondition" sum="ce61e37549b003fd033de24441e84a74">
+  <goal name="WP_parameter heapsort.41" expl="41. postcondition">
   <proof prover="1"><result status="valid" time="0.18"/></proof>
   </goal>
  </transf>

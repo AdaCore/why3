@@ -11,149 +11,149 @@
 <prover id="6" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <file name="../vstte12_bfs.mlw" expanded="true">
-<theory name="Graph" expanded="true">
- <goal name="path_nonneg" sum="65a895db27949200452b0e46ce23efdb">
+<theory name="Graph" sum="6a18a3b020e119b86c664b39af73ae41" expanded="true">
+ <goal name="path_nonneg">
  <proof prover="1" edited="vstte12_bfs_Graph_path_nonneg_1.v"><result status="valid" time="1.04"/></proof>
  </goal>
- <goal name="path_inversion" sum="2d4714fb14a13c07b2b7855c33ece124">
+ <goal name="path_inversion">
  <proof prover="1" edited="vstte12_bfs_Graph_path_inversion_1.v"><result status="valid" time="1.08"/></proof>
  </goal>
- <goal name="path_closure" sum="314af75d0c723db839ba3a987e141727">
+ <goal name="path_closure">
  <proof prover="1" edited="vstte12_bfs_Graph_path_closure_1.v"><result status="valid" time="1.04"/></proof>
  </goal>
 </theory>
-<theory name="BFS" expanded="true">
- <goal name="WP_parameter fill_next" expl="VC for fill_next" sum="9d71047824f9b2fc74e4451751cb47b3" expanded="true">
+<theory name="BFS" sum="f0fa9b5f97d4308c823eca2d18198a9e" expanded="true">
+ <goal name="WP_parameter fill_next" expl="VC for fill_next" expanded="true">
  <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter fill_next.1" expl="1. loop invariant init" sum="6e5131db462cbefbcd5e1d4a9204ed09">
+  <goal name="WP_parameter fill_next.1" expl="1. loop invariant init">
   <proof prover="3" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter fill_next.2" expl="2. precondition" sum="18ab4c0ceb6ffa8f7148a2dd060c5f0f">
+  <goal name="WP_parameter fill_next.2" expl="2. precondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter fill_next.3" expl="3. loop invariant preservation" sum="79dc61adf2bddfbe1b7a6a520f625c88">
+  <goal name="WP_parameter fill_next.3" expl="3. loop invariant preservation">
   <transf name="split_goal">
-   <goal name="WP_parameter fill_next.3.1" expl="1." sum="353af4f8cc1ede3b12c698de9c661b7f">
-   <proof prover="3" timelimit="20" memlimit="0"><result status="valid" time="2.24"/></proof>
+   <goal name="WP_parameter fill_next.3.1" expl="1.">
+   <proof prover="3" timelimit="20" memlimit="0"><result status="valid" time="2.83"/></proof>
    </goal>
-   <goal name="WP_parameter fill_next.3.2" expl="2." sum="653693114e99e63882ebbb0777519856">
+   <goal name="WP_parameter fill_next.3.2" expl="2.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter fill_next.3.3" expl="3." sum="1d35e8b4cfbf307a5c2d145e92601b9f">
+   <goal name="WP_parameter fill_next.3.3" expl="3.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.24"/></proof>
    </goal>
-   <goal name="WP_parameter fill_next.3.4" expl="4." sum="2948ed13f947b6062ef6b06a418580b0">
+   <goal name="WP_parameter fill_next.3.4" expl="4.">
    <proof prover="5"><result status="valid" time="0.01"/></proof>
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter fill_next.4" expl="4. loop variant decrease" sum="a3d5bcc29afc9f16e67e34cd79b5605c">
+  <goal name="WP_parameter fill_next.4" expl="4. loop variant decrease">
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter fill_next.5" expl="5. loop invariant preservation" sum="877cdec0c7697cd2de5a62b7f6b388ff">
+  <goal name="WP_parameter fill_next.5" expl="5. loop invariant preservation">
   <transf name="split_goal">
-   <goal name="WP_parameter fill_next.5.1" expl="1." sum="688b7bcf751923c1fedc2bc6ff8bb8f3">
+   <goal name="WP_parameter fill_next.5.1" expl="1.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter fill_next.5.2" expl="2." sum="29bcc423a16ac6d78c25161f5d0dc60d">
+   <goal name="WP_parameter fill_next.5.2" expl="2.">
    <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter fill_next.5.3" expl="3." sum="2bfefd3fa8e5edf6cc3a10f2a0846065">
+   <goal name="WP_parameter fill_next.5.3" expl="3.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter fill_next.5.4" expl="4." sum="6fff19f353ea32a52c91b47192bdbd0f">
+   <goal name="WP_parameter fill_next.5.4" expl="4.">
    <transf name="inline_goal">
-    <goal name="WP_parameter fill_next.5.4.1" expl="1." sum="664741532b5dbdf1b742aa3760d89cc7">
+    <goal name="WP_parameter fill_next.5.4.1" expl="1.">
     <proof prover="2" memlimit="0"><result status="valid" time="0.06"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter fill_next.6" expl="6. loop variant decrease" sum="64176842dd57c2bceb1bd9c062d09833">
+  <goal name="WP_parameter fill_next.6" expl="6. loop variant decrease">
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter fill_next.7" expl="7. postcondition" sum="4f559cd30815b60eccf3e98231bbe70b">
+  <goal name="WP_parameter fill_next.7" expl="7. postcondition">
   <transf name="split_goal">
-   <goal name="WP_parameter fill_next.7.1" expl="1." sum="fd4628bf6430f39b4da4adbf99edfd7e">
+   <goal name="WP_parameter fill_next.7.1" expl="1.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter fill_next.7.2" expl="2." sum="dda0e1e4fa7f84c8fb69d375cfb7bc12">
+   <goal name="WP_parameter fill_next.7.2" expl="2.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.20"/></proof>
    </goal>
-   <goal name="WP_parameter fill_next.7.3" expl="3." sum="bf0d49d09d35dfc90394017b76896dc0">
+   <goal name="WP_parameter fill_next.7.3" expl="3.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter bfs" expl="VC for bfs" sum="acecbcbdeb51e76425674eea34809ffd" expanded="true">
+ <goal name="WP_parameter bfs" expl="VC for bfs" expanded="true">
  <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter bfs.1" expl="1. loop invariant init" sum="bb18484151c0368e3db05c1b9cc88080">
+  <goal name="WP_parameter bfs.1" expl="1. loop invariant init">
   <transf name="split_goal">
-   <goal name="WP_parameter bfs.1.1" expl="1." sum="2f4adb6622b6be22b83dac40088a1d0b">
+   <goal name="WP_parameter bfs.1.1" expl="1.">
    <proof prover="3" memlimit="0"><result status="valid" time="0.18"/></proof>
    </goal>
-   <goal name="WP_parameter bfs.1.2" expl="2." sum="05d0951ba8256cd6ee28f002db56a3a2">
+   <goal name="WP_parameter bfs.1.2" expl="2.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bfs.1.3" expl="3." sum="4a0d7a807246befecd70216c7b2f8693">
+   <goal name="WP_parameter bfs.1.3" expl="3.">
    <transf name="inline_goal">
-    <goal name="WP_parameter bfs.1.3.1" expl="1." sum="63c87627d6b3bddaf5ccc47ca97d34e1">
+    <goal name="WP_parameter bfs.1.3.1" expl="1.">
     <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
     </goal>
    </transf>
    </goal>
-   <goal name="WP_parameter bfs.1.4" expl="4." sum="c0965a43f807d7704cd20da8a52b9024">
+   <goal name="WP_parameter bfs.1.4" expl="4.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bfs.2" expl="2. precondition" sum="5c994e86e89701784ee72c6f8f835131">
+  <goal name="WP_parameter bfs.2" expl="2. precondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bfs.3" expl="3. exceptional postcondition" sum="a1706df45a926a7461499bdbedd8340e">
+  <goal name="WP_parameter bfs.3" expl="3. exceptional postcondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter bfs.4" expl="4. precondition" sum="f0f50562e7a39b3df332d94e09a8df70">
+  <goal name="WP_parameter bfs.4" expl="4. precondition">
   <transf name="split_goal">
-   <goal name="WP_parameter bfs.4.1" expl="1." sum="98f5579a789a8793ab0c392a2dc38605">
+   <goal name="WP_parameter bfs.4.1" expl="1.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.20"/></proof>
    </goal>
-   <goal name="WP_parameter bfs.4.2" expl="2." sum="159f5f3956d1da75456399c2332efd21">
+   <goal name="WP_parameter bfs.4.2" expl="2.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter bfs.4.3" expl="3." sum="8a9faceb9f04e23a58687969db96579f">
+   <goal name="WP_parameter bfs.4.3" expl="3.">
    <transf name="inline_goal">
-    <goal name="WP_parameter bfs.4.3.1" expl="1." sum="d1a8e4dd3dc5d27af7771dd210197785">
+    <goal name="WP_parameter bfs.4.3.1" expl="1.">
     <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bfs.5" expl="5. loop invariant preservation" sum="6e1e3a6044bc19de4035faf64a173dcc">
+  <goal name="WP_parameter bfs.5" expl="5. loop invariant preservation">
   <transf name="split_goal">
-   <goal name="WP_parameter bfs.5.1" expl="1." sum="2e0d4192aefe2c8da0080d1cf85142f7">
+   <goal name="WP_parameter bfs.5.1" expl="1.">
    <transf name="inline_goal">
-    <goal name="WP_parameter bfs.5.1.1" expl="1." sum="31e985b3a48e321ec04c1a7752e50ac1">
+    <goal name="WP_parameter bfs.5.1.1" expl="1.">
     <transf name="split_goal">
-     <goal name="WP_parameter bfs.5.1.1.1" expl="1." sum="c2c8dc62b4711cb3b1681eca848365d5">
+     <goal name="WP_parameter bfs.5.1.1.1" expl="1.">
      <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
      </goal>
-     <goal name="WP_parameter bfs.5.1.1.2" expl="2." sum="24f1a5a1fb96a99f76d6aed3d7d17ed7">
+     <goal name="WP_parameter bfs.5.1.1.2" expl="2.">
      <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
      </goal>
-     <goal name="WP_parameter bfs.5.1.1.3" expl="3." sum="ffbc0972bc3834c4c0d757b8a967bc1e">
+     <goal name="WP_parameter bfs.5.1.1.3" expl="3.">
      <proof prover="3" memlimit="0"><result status="valid" time="0.06"/></proof>
      </goal>
-     <goal name="WP_parameter bfs.5.1.1.4" expl="4." sum="99852de702495c67db520f69edbf3e4b">
+     <goal name="WP_parameter bfs.5.1.1.4" expl="4.">
      <proof prover="3" memlimit="0"><result status="valid" time="0.04"/></proof>
      </goal>
-     <goal name="WP_parameter bfs.5.1.1.5" expl="5." sum="4e358a6f26793a1e390142a6b2a7c2ac">
-     <proof prover="2" timelimit="5"><result status="timeout" time="4.95"/></proof>
+     <goal name="WP_parameter bfs.5.1.1.5" expl="5.">
+     <proof prover="2" timelimit="5"><result status="timeout" time="4.30"/></proof>
      <proof prover="6"><result status="timeout" time="4.96"/></proof>
      <metas>
       <ts_pos name="real" arity="0" id="2"
@@ -723,9 +723,9 @@
       <meta name="remove_type">
        <meta_arg_ts id="3846"/>
       </meta>
-      <goal name="WP_parameter bfs.5.1.1.5" expl="5." sum="8578f82630b7469408268da999a50ff0">
+      <goal name="WP_parameter bfs.5.1.1.5" expl="5.">
       <transf name="eliminate_builtin">
-       <goal name="WP_parameter bfs.5.1.1.5.1" expl="1." sum="bff4d8394adf0a30eff26a180eb1c48d">
+       <goal name="WP_parameter bfs.5.1.1.5.1" expl="1.">
        <proof prover="3" timelimit="45"><result status="valid" time="2.74"/></proof>
        <proof prover="5"><result status="valid" time="0.33"/></proof>
        </goal>
@@ -733,52 +733,52 @@
       </goal>
      </metas>
      </goal>
-     <goal name="WP_parameter bfs.5.1.1.6" expl="6." sum="eff36e3282a41d257e02f704051b5b96">
+     <goal name="WP_parameter bfs.5.1.1.6" expl="6.">
      <proof prover="2" memlimit="0"><result status="valid" time="0.44"/></proof>
      </goal>
-     <goal name="WP_parameter bfs.5.1.1.7" expl="7." sum="3d82721312db08fa9fc575cb96a2fd68">
+     <goal name="WP_parameter bfs.5.1.1.7" expl="7.">
      <proof prover="2" memlimit="0"><result status="valid" time="0.05"/></proof>
      </goal>
-     <goal name="WP_parameter bfs.5.1.1.8" expl="8." sum="044ed69b1986e14d5e2b61704145ac6b">
+     <goal name="WP_parameter bfs.5.1.1.8" expl="8.">
      <proof prover="2" memlimit="0"><result status="valid" time="0.08"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="WP_parameter bfs.5.2" expl="2." sum="a07d63f7bd4e3f8bc967c4a04bd94381">
+   <goal name="WP_parameter bfs.5.2" expl="2.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bfs.5.3" expl="3." sum="36825db6a140c5558a5285b77153981b">
+   <goal name="WP_parameter bfs.5.3" expl="3.">
    <proof prover="4"><result status="valid" time="2.77"/></proof>
    <proof prover="6"><result status="timeout" time="4.97"/></proof>
    </goal>
-   <goal name="WP_parameter bfs.5.4" expl="4." sum="8e2a47d89362eb31745adfdff035fb9d">
+   <goal name="WP_parameter bfs.5.4" expl="4.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bfs.6" expl="6. loop invariant preservation" sum="a6ed03033492f611c4385ff7122b47dd">
+  <goal name="WP_parameter bfs.6" expl="6. loop invariant preservation">
   <transf name="split_goal">
-   <goal name="WP_parameter bfs.6.1" expl="1." sum="b0a63ddf4f42c1975130c8b08bebd9a0">
+   <goal name="WP_parameter bfs.6.1" expl="1.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
    </goal>
-   <goal name="WP_parameter bfs.6.2" expl="2." sum="40c3dfaf54e6f10d694fcb12c692ca58">
+   <goal name="WP_parameter bfs.6.2" expl="2.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter bfs.6.3" expl="3." sum="64114ef37d02e91993aaf62d3b2f0e2c">
+   <goal name="WP_parameter bfs.6.3" expl="3.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bfs.6.4" expl="4." sum="445849395b89f5b1e14938c606ef2d31">
+   <goal name="WP_parameter bfs.6.4" expl="4.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bfs.7" expl="7. assertion" sum="6f6fc0a150dae36bc873d875831f07cf">
+  <goal name="WP_parameter bfs.7" expl="7. assertion">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bfs.8" expl="8. postcondition" sum="bc0f362abfcdd2f19b15f006f52bdee1">
+  <goal name="WP_parameter bfs.8" expl="8. postcondition">
   <proof prover="1" edited="vstte12_bfs_WP_BFS_WP_parameter_bfs_1.v"><result status="valid" time="1.24"/></proof>
   </goal>
  </transf>

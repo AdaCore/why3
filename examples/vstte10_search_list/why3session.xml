@@ -8,71 +8,71 @@
 <prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
 <prover id="4" name="CVC3" version="2.2" timelimit="5" memlimit="0"/>
 <file name="../vstte10_search_list.mlw" expanded="true">
-<theory name="SearchingALinkedList" expanded="true">
- <goal name="WP_parameter search" expl="VC for search" sum="1e80cadd171f45329a3ccf4a2e6ae6ef" expanded="true">
+<theory name="SearchingALinkedList" sum="dc91549c1b09c478ce4021c96c89c893" expanded="true">
+ <goal name="WP_parameter search" expl="VC for search" expanded="true">
  <proof prover="2"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="WP_parameter search_list" expl="VC for search_list" sum="a9409d866d3d7552007c1520043d8d44" expanded="true">
+ <goal name="WP_parameter search_list" expl="VC for search_list" expanded="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter head" expl="VC for head" sum="8751cbf8c2a662a47ee17a3de1f93c96">
+ <goal name="WP_parameter head" expl="VC for head">
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter tail" expl="VC for tail" sum="dff1efe0e48893e9d06b9afce491b314">
+ <goal name="WP_parameter tail" expl="VC for tail">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter search_loop" expl="VC for search_loop" sum="0e976e0e05f9ae5307c70a4c39daa3f4" expanded="true">
+ <goal name="WP_parameter search_loop" expl="VC for search_loop" expanded="true">
  <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter search_loop.1" expl="1. loop invariant init" sum="55b70ff90213d9518f58bc63639b9d2b">
+  <goal name="WP_parameter search_loop.1" expl="1. loop invariant init">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.2" expl="2. precondition" sum="6d9433b711d451ce5b64ee14fe108079">
+  <goal name="WP_parameter search_loop.2" expl="2. precondition">
   <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4" timelimit="20"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.3" expl="3. precondition" sum="c836deb5eba1f3e57197fe6869e0a177">
+  <goal name="WP_parameter search_loop.3" expl="3. precondition">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.4" expl="4. loop invariant preservation" sum="08808cc6a3b49bc29486a0d75fbfd41b">
+  <goal name="WP_parameter search_loop.4" expl="4. loop invariant preservation">
   <transf name="split_goal">
-   <goal name="WP_parameter search_loop.4.1" expl="1." sum="42c0a0c9390eb50306e5f6b941ee6294">
+   <goal name="WP_parameter search_loop.4.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.01"/></proof>
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter search_loop.4.2" expl="2." sum="3ed83efb89a5a066dbb302e88a3b2e27">
+   <goal name="WP_parameter search_loop.4.2" expl="2.">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter search_loop.4.3" expl="3." sum="5869b93b940130c7fd8be5f4ab4e218f">
+   <goal name="WP_parameter search_loop.4.3" expl="3.">
    <proof prover="0" edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_3.v"><result status="valid" time="1.19"/></proof>
    </goal>
-   <goal name="WP_parameter search_loop.4.4" expl="4." sum="4d616c01d139fffa43b6e14767fea6ac">
+   <goal name="WP_parameter search_loop.4.4" expl="4.">
    <proof prover="0" edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_4.v"><result status="valid" time="1.37"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter search_loop.5" expl="5. loop variant decrease" sum="26166b20c6cee31276d6117ce9713d65">
+  <goal name="WP_parameter search_loop.5" expl="5. loop variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.6" expl="6. postcondition" sum="983ca6e092f23f7b90f3080819594027">
+  <goal name="WP_parameter search_loop.6" expl="6. postcondition">
   <proof prover="0" edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_1.v"><result status="valid" time="1.18"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.7" expl="7. postcondition" sum="1825ef60edf461464519e5fe5c10055d">
+  <goal name="WP_parameter search_loop.7" expl="7. postcondition">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>

@@ -3,69 +3,69 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="4000"/>
+<prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="4000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
-<prover id="3" name="Eprover" version="1.6" timelimit="5" memlimit="4000"/>
-<prover id="4" name="Spass" version="3.7" timelimit="5" memlimit="4000"/>
-<prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
+<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="4000"/>
+<prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
+<prover id="5" name="Spass" version="3.7" timelimit="5" memlimit="4000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" memlimit="4000"/>
 <prover id="7" name="Vampire" version="0.6" timelimit="5" memlimit="4000"/>
 <file name="../f_puzzle.why" expanded="true">
-<theory name="Puzzle" expanded="true">
+<theory name="Puzzle" sum="7f063336fc1eba9e600aaee320819694" expanded="true">
 </theory>
-<theory name="Step1" expanded="true">
- <goal name="base" sum="39689b82d69b15930cd81f176af90ef4">
+<theory name="Step1" sum="219e5eebba7f9cc75d64f1172db4b0c8" expanded="true">
+ <goal name="base">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.01"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="7"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="induction_step" sum="d6e76acb288540b6b9aaa7312a659da5">
- <proof prover="5"><result status="valid" time="0.40"/></proof>
+ <goal name="induction_step">
+ <proof prover="4"><result status="valid" time="0.40"/></proof>
  <proof prover="6"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Solution" expanded="true">
- <goal name="L3" sum="36709b55a8f5922bf40878d6878be8ff" expanded="true">
- <proof prover="3"><result status="valid" time="0.00"/></proof>
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+<theory name="Solution" sum="6ea38b5d2cf802eb21b0655c68ce4454" expanded="true">
+ <goal name="L3" expanded="true">
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.06"/></proof>
  <proof prover="7"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="L4" sum="a343e14063ca5af269a85c481644f3aa" expanded="true">
+ <goal name="L4" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="1" memlimit="1000"><result status="valid" time="3.67"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="3.20"/></proof>
- <proof prover="5"><result status="valid" time="3.22"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="3.22"/></proof>
  </goal>
- <goal name="base" sum="2df912a52818f0c1a9d6b4f60ff2ba67" expanded="true">
- <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <goal name="base" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="0.02"/></proof>
- <proof prover="4"><result status="valid" time="0.03"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.03"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  <proof prover="7"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="induction_step" sum="2898ba3e9132acc724c20bfaf7d7a921" expanded="true">
- <proof prover="1"><result status="valid" time="0.90"/></proof>
+ <goal name="induction_step" expanded="true">
+ <proof prover="3"><result status="valid" time="0.90"/></proof>
  </goal>
- <goal name="L5" sum="eeb312cceedce39280614c467f32f808" expanded="true">
- <proof prover="3"><result status="valid" time="0.05"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <goal name="L5" expanded="true">
+ <proof prover="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="5"><result status="valid" time="0.01"/></proof>
  <proof prover="7"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="L6" sum="60d3f66042d33333b33809740b18653e" expanded="true">
- <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <goal name="L6" expanded="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="G" sum="8a9334cea5260840350cd0ee5e73be26" expanded="true">
+ <goal name="G" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="5" memlimit="1000"><result status="valid" time="0.35"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.35"/></proof>
  <proof prover="6"><result status="valid" time="0.14"/></proof>
  </goal>
 </theory>

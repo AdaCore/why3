@@ -4,34 +4,34 @@
 <why3session shape_version="4">
 <prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="CVC3" version="2.2" timelimit="3" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="3" memlimit="1000"/>
 <file name="../triangle_inequality.why" expanded="true">
-<theory name="CauchySchwarzInequality" expanded="true">
- <goal name="norm2_pos" sum="f2942a313345b6f3570a65ca2efea6a0" expanded="true">
+<theory name="CauchySchwarzInequality" sum="dc3381aca3376b586e77a9b3163136af" expanded="true">
+ <goal name="norm2_pos" expanded="true">
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="p_expr" sum="08eae1e4b8962ee9b3b907754da60346" expanded="true">
+ <goal name="p_expr" expanded="true">
  <proof prover="4" timelimit="30"><result status="valid" time="0.01"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="p_pos" sum="183fa02ff485b7ee9d0e98434d31bf8e" expanded="true">
+ <goal name="p_pos" expanded="true">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="mul_div_simpl" sum="a38a39776c4f09ed2be61bb7687e813f" expanded="true">
+ <goal name="mul_div_simpl" expanded="true">
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="p_val_part" sum="43da0df79efce0006d1f3c45688b53fe" expanded="true">
- <proof prover="2"><result status="timeout" time="4.98"/></proof>
+ <goal name="p_val_part" expanded="true">
+ <proof prover="3"><result status="timeout" time="4.98"/></proof>
  <metas
   expanded="true">
   <ts_pos name="int" arity="0" id="1"
@@ -392,67 +392,67 @@
   <meta name="remove_type">
    <meta_arg_ts id="1"/>
   </meta>
-  <goal name="p_val_part" sum="8c1ac50d98ab9bbcdb4936c7dd6afcb7" expanded="true">
+  <goal name="p_val_part" expanded="true">
   <transf name="eliminate_builtin" expanded="true">
-   <goal name="p_val_part.1" expl="1." sum="9970669d6a34f12f8d2845905621bb25" expanded="true">
-   <proof prover="2" timelimit="45"><result status="valid" time="32.03"/></proof>
+   <goal name="p_val_part.1" expl="1." expanded="true">
+   <proof prover="3" timelimit="45"><result status="valid" time="32.03"/></proof>
    <proof prover="5"><result status="valid" time="0.00"/></proof>
    </goal>
   </transf>
   </goal>
  </metas>
  </goal>
- <goal name="p_val_part_pos" sum="b1161bee2473e1c0b2d7d7d709953d7f" expanded="true">
+ <goal name="p_val_part_pos" expanded="true">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="p_val_part_pos_aux" sum="6f11d629b489d88d5521e905c9d0f015" expanded="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <goal name="p_val_part_pos_aux" expanded="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="CauchySchwarz_aux_non_null" sum="6f19fa060988ef87c62c2800170668be" expanded="true">
+ <goal name="CauchySchwarz_aux_non_null" expanded="true">
  <proof prover="0" edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_aux_non_null_1.v"><result status="valid" time="1.24"/></proof>
  </goal>
- <goal name="norm_null" sum="a26427271ff1c4783264b4c2f4f10663" expanded="true">
- <proof prover="2"><result status="valid" time="0.06"/></proof>
+ <goal name="norm_null" expanded="true">
+ <proof prover="3"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="CauchySchwarz_aux_null" sum="6ac22df77002b681f8b7e38d902ef878" expanded="true">
- <proof prover="2"><result status="valid" time="0.06"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <goal name="CauchySchwarz_aux_null" expanded="true">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.06"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.28"/></proof>
  </goal>
- <goal name="CauchySchwarz_aux" sum="86ae4b0e8cf73798b6c3494b28c82b1a" expanded="true">
+ <goal name="CauchySchwarz_aux" expanded="true">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="norm_pos" sum="86f0f12eba2112c185a8545571e31b2e" expanded="true">
+ <goal name="norm_pos" expanded="true">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="sqr_le_sqrt" sum="0a178a39432ba890171836112b39f762" expanded="true">
- <proof prover="2"><result status="valid" time="0.03"/></proof>
+ <goal name="sqr_le_sqrt" expanded="true">
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="CauchySchwarz" sum="229cd6ccfda4028463e788ff3f6be09b" expanded="true">
+ <goal name="CauchySchwarz" expanded="true">
  <proof prover="0" edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"><result status="valid" time="1.47"/></proof>
  </goal>
 </theory>
-<theory name="TriangleInequality" expanded="true">
- <goal name="triangle_aux" sum="33952381e557344e84bb491c9f64c16b" expanded="true">
+<theory name="TriangleInequality" sum="9750749520b829d454b096485b914935" expanded="true">
+ <goal name="triangle_aux" expanded="true">
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="sqr_sqrt_le" sum="e557e89c047f8d1a408aaca1fe73a44a" expanded="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <goal name="sqr_sqrt_le" expanded="true">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="triangle" sum="3da8bdacfa236065e36c40b302eb0cb4" expanded="true">
+ <goal name="triangle" expanded="true">
  <proof prover="0" edited="triangle_inequality_TriangleInequality_triangle_1.v"><result status="valid" time="1.27"/></proof>
  </goal>
 </theory>

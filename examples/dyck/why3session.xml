@@ -7,75 +7,75 @@
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../dyck.mlw" expanded="true">
-<theory name="Dyck" expanded="true">
- <goal name="dyck_word_first" sum="f384d2cc618d1de098e65c1186399f1d" expanded="true">
+<theory name="Dyck" sum="000e9461c6d198595c982a00e08500b3" expanded="true">
+ <goal name="dyck_word_first" expanded="true">
  <proof prover="2" timelimit="6"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="Check" expanded="true">
- <goal name="WP_parameter same_prefix" expl="VC for same_prefix" sum="dcb14e08e8ab6eb15dd9cb50d01a00e3">
+<theory name="Check" sum="43ac8934430c7c3ca32bea5e09fe43b9" expanded="true">
+ <goal name="WP_parameter same_prefix" expl="VC for same_prefix">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter is_dyck_rec" expl="VC for is_dyck_rec" sum="aa0df784a36bf5978f98ef8738357366" expanded="true">
+ <goal name="WP_parameter is_dyck_rec" expl="VC for is_dyck_rec" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter is_dyck_rec.1" expl="1. variant decrease" sum="8d59955d0cdfa70927e377f831339388">
+  <goal name="WP_parameter is_dyck_rec.1" expl="1. variant decrease">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.2" expl="2. assertion" sum="44b912b899b7205df34db3c68fbbd659">
+  <goal name="WP_parameter is_dyck_rec.2" expl="2. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter is_dyck_rec.2.1" expl="1. assertion" sum="9461cee86e8dd1c4d009f897b5423676">
+   <goal name="WP_parameter is_dyck_rec.2.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.16"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.2.2" expl="2. assertion" sum="1031183809e838e2083b2a3c7b10a1a7">
+   <goal name="WP_parameter is_dyck_rec.2.2" expl="2. assertion">
    <proof prover="2"><result status="valid" time="0.34"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.2.3" expl="3. assertion" sum="fd41447065433779408f31182f8004cc">
+   <goal name="WP_parameter is_dyck_rec.2.3" expl="3. assertion">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.3" expl="3. variant decrease" sum="f64a473b39d7b6c94ffeb2d5ed9a38a5">
+  <goal name="WP_parameter is_dyck_rec.3" expl="3. variant decrease">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.4" expl="4. postcondition" sum="a4a91515fb10492def2aa51e162aabec">
+  <goal name="WP_parameter is_dyck_rec.4" expl="4. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter is_dyck_rec.4.1" expl="1." sum="f6357b93bd6cb9b67ae3eaf768e71765">
+   <goal name="WP_parameter is_dyck_rec.4.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.18"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.4.2" expl="2." sum="0d01ea738ccfa434c229d408824839be">
+   <goal name="WP_parameter is_dyck_rec.4.2" expl="2.">
    <proof prover="2"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.4.3" expl="3." sum="7b6c7777254aa03e368c88ab594b9d76">
+   <goal name="WP_parameter is_dyck_rec.4.3" expl="3.">
    <proof prover="2"><result status="valid" time="0.12"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.4.4" expl="4." sum="df9ab1962df417b17dff9774acb19a37">
+   <goal name="WP_parameter is_dyck_rec.4.4" expl="4.">
    <proof prover="3"><result status="valid" time="0.16"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.4.5" expl="5." sum="4d7cce234f9316c0043fc707a30cad44">
+   <goal name="WP_parameter is_dyck_rec.4.5" expl="5.">
    <proof prover="2"><result status="valid" time="0.20"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.5" expl="5. exceptional postcondition" sum="3fa156323d7a0af9730c4a575c886d6a">
+  <goal name="WP_parameter is_dyck_rec.5" expl="5. exceptional postcondition">
   <proof prover="0"><result status="valid" time="0.58"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.6" expl="6. exceptional postcondition" sum="b244c068ac534114b7446b80a646d385" expanded="true">
+  <goal name="WP_parameter is_dyck_rec.6" expl="6. exceptional postcondition" expanded="true">
   <proof prover="3"><result status="valid" time="0.53"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.7" expl="7. exceptional postcondition" sum="d328ca41623634dd81d4a44e60f48de0">
+  <goal name="WP_parameter is_dyck_rec.7" expl="7. exceptional postcondition">
   <proof prover="3"><result status="valid" time="0.51"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.8" expl="8. postcondition" sum="1ac2a9e2e8fdcbba9737253c9e5543cd">
+  <goal name="WP_parameter is_dyck_rec.8" expl="8. postcondition">
   <proof prover="2"><result status="valid" time="0.37"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter is_dyck" expl="VC for is_dyck" sum="830c3c98dc4b022a03c03137f89c804e" expanded="true">
+ <goal name="WP_parameter is_dyck" expl="VC for is_dyck" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter is_dyck.1" expl="1. postcondition" sum="2c36f7905682ba526cdf6307072a527b">
+  <goal name="WP_parameter is_dyck.1" expl="1. postcondition">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck.2" expl="2. postcondition" sum="eb92aff55628b8eea351095a10b269d8" expanded="true">
+  <goal name="WP_parameter is_dyck.2" expl="2. postcondition" expanded="true">
   <metas
    expanded="true">
    <ts_pos name="real" arity="0" id="2"
@@ -450,16 +450,16 @@
    <meta name="remove_type">
     <meta_arg_ts id="4387"/>
    </meta>
-   <goal name="WP_parameter is_dyck.2" expl="2. postcondition" sum="a9cfffcbab61977b4d5d5282301156c1" expanded="true">
+   <goal name="WP_parameter is_dyck.2" expl="2. postcondition" expanded="true">
    <transf name="eliminate_builtin" expanded="true">
-    <goal name="WP_parameter is_dyck.2.1" expl="1. postcondition" sum="5ade5d7c5cd53338af1e203cc2efd43d" expanded="true">
+    <goal name="WP_parameter is_dyck.2.1" expl="1. postcondition" expanded="true">
     <proof prover="0"><result status="valid" time="0.94"/></proof>
     </goal>
    </transf>
    </goal>
   </metas>
   </goal>
-  <goal name="WP_parameter is_dyck.3" expl="3. postcondition" sum="7d0b351778a124de81a7f83e03cfc564" expanded="true">
+  <goal name="WP_parameter is_dyck.3" expl="3. postcondition" expanded="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>

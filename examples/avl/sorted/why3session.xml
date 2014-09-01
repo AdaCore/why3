@@ -5,29 +5,29 @@
 <prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../sorted.mlw">
 <theory name="Increasing" sum="bcc64f427a1238869e3e039391cf9ce5">
- <goal name="smaller_lower_bound" sum="ba889eb8945aa4f6ab43c5cc0df7441d">
+ <goal name="smaller_lower_bound">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="bigger_upper_bound" sum="42fe743458b5d05facef8c7efe15022f">
+ <goal name="bigger_upper_bound">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter increasing_precede" expl="VC for increasing_precede" sum="fdc47db56d87ea4c849b5193033b57c9">
+ <goal name="WP_parameter increasing_precede" expl="VC for increasing_precede">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter increasing_precede.1" expl="1. postcondition" sum="74de179e08da7226319b629239d33cc1">
+  <goal name="WP_parameter increasing_precede.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter increasing_precede.2" expl="2. variant decrease" sum="7096b1b7b7f580266ac074a08f39b20b">
+  <goal name="WP_parameter increasing_precede.2" expl="2. variant decrease">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter increasing_precede.3" expl="3. postcondition" sum="422d2e19ece95bae12ec8789ebf325eb">
+  <goal name="WP_parameter increasing_precede.3" expl="3. postcondition">
   <proof prover="0"><result status="valid" time="0.39"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter increasing_midpoint" expl="VC for increasing_midpoint" sum="c7f9a878a5a621e2d56684872ee0d9c1">
+ <goal name="WP_parameter increasing_midpoint" expl="VC for increasing_midpoint">
  <proof prover="0"><result status="valid" time="0.26"/></proof>
  </goal>
- <goal name="WP_parameter increasing_snoc" expl="VC for increasing_snoc" sum="05a92b28f33fdd4b5992a61f49ad1918">
+ <goal name="WP_parameter increasing_snoc" expl="VC for increasing_snoc">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
