@@ -598,10 +598,12 @@ let rec save_goal ctxt fmt g =
   let shape = Tc.string_of_shape g.goal_shape in
   assert (shape <> "");
   fprintf fmt
-    "@\n@[<v 0>@[<h><goal@ %a%a%a%a>@]"
+    "@\n@[<v 0>@[<h><goal@ %a%a%a>@]"
     save_ident g.goal_name
     (opt_string "expl") g.goal_expl
+(* no more checksum in why3session.xml
     (opt save_checksum "sum") g.goal_checksum
+*)
     (save_bool_def "expanded" false) g.goal_expanded;
   let sum =
     match g.goal_checksum with
@@ -1498,7 +1500,7 @@ let read_sum_and_shape ch =
     with
       | End_of_file ->
         raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
-      | Exit -> sum, Buffer.contents shape
+      | Exit -> String.copy sum, Buffer.contents shape
 
 
   let use_shapes = ref true
@@ -2024,7 +2026,7 @@ end = struct
   let use_shapes = ref true
   let set_use_shapes b = use_shapes := b
 
-  let associate ~theory_was_fully_up_to_date 
+  let associate ~theory_was_fully_up_to_date
       (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
       ('tto goal * ('ffrom goal * bool) option) list =
     let from_goals : ffrom goal list =
@@ -2032,9 +2034,9 @@ end = struct
     let to_goals   : tto goal list =
       Obj.magic (to_goals : 'tto goal list) in
     let associated : (tto goal * (ffrom goal * bool) option) list =
-      AssoGoals.associate 
+      AssoGoals.associate
         ~theory_was_fully_up_to_date
-        ~use_shapes:!use_shapes from_goals to_goals 
+        ~use_shapes:!use_shapes from_goals to_goals
     in
     (Obj.magic associated : ('tto goal * ('ffrom goal * bool) option) list)
 
@@ -2302,7 +2304,7 @@ and merge_trans ~ctxt ~theories env to_goal _ from_transf =
     let associated =
       Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
         env.session.session_shape_version;
-      AssoGoals.associate 
+      AssoGoals.associate
         ~theory_was_fully_up_to_date:ctxt.theory_is_fully_up_to_date
         from_transf.transf_goals to_transf.transf_goals
     in
@@ -2364,11 +2366,19 @@ let merge_theory ~ctxt ~theories env from_th to_th =
       | Some s1, Some s2 -> Tc.equal_checksum s1 s2
     }
   in
+  Debug.dprintf debug
+    "[Theory checksum] fully up to date = %b@."
+    ctxt.theory_is_fully_up_to_date;
   List.iter
     (fun to_goal ->
       try
         let from_goal =
           Mstr.find to_goal.goal_name.Ident.id_string from_goals in
+        Debug.dprintf debug
+          "[Goal checksum] goal %s: old sum = %a, new sum = %a@."
+          to_goal.goal_name.Ident.id_string
+          (Pp.print_option Tc.print_checksum) from_goal.goal_checksum
+          (Pp.print_option Tc.print_checksum) to_goal.goal_checksum;
         let goal_obsolete =
           match to_goal.goal_checksum, from_goal.goal_checksum with
           | None, _ -> assert false
@@ -2607,7 +2617,7 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
   let associated =
     Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
       env.session.session_shape_version;
-    AssoGoals.associate 
+    AssoGoals.associate
       ~theory_was_fully_up_to_date:false
       from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
