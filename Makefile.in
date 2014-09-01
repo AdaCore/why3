@@ -1872,7 +1872,7 @@ lib/why3/META: lib/why3/META.in config.status
 	./config.status chmod --file $@
 
 configure: configure.in Version
-	autoconf
+	autoconf -f
 
 ###################
 # clean and depend
