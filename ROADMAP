@@ -138,26 +138,6 @@ and no epsilon
 * detect editors
 *** check if coqide and also emacs/proof-general is installed
 
-
-
-==================== Roadmap for release 0.84 ========================
-
-== TODOs ==
-
-* verifier support des nouveaux prouveurs: Coq8.4pl4, Isabelle-2014,
-  CVC4 1.4, yices2 (quantifiers ?)  beagle ? driver TPTP TFA ? autres ?
-
-* completer le fichier CHANGES
-** nouvelle facon d'appeler les outils "why3 xxx ..."
-** strategies de preuve
-** transformation "compute_in_goal"
-** support de nouveaux prouveurs
-** nouvelle structure des fichiers de session et de shape (compatibilité)
-** new examples ? 
-
-* ajouter dans les instructions de release ci-dessous la procedure de
-  fabrication du paquet opam
-
 * documentation des nouvelles features higher-order
 
 * eliminate_match:
@@ -167,29 +147,49 @@ and no epsilon
    chaque instance necessaires. plutot qu'un seul symbole _match
    polymorphe.
 
+==================== Roadmap for release 0.84 ========================
+
+== TODOs ==
+
+* verifier support des nouveaux prouveurs: Coq8.4pl4, Isabelle-2014,
+  CVC4 1.4, yices2 (quantifiers ?)  beagle ? driver TPTP TFA ? autres ?
+
+* completer le fichier CHANGES
+** nouvelle facon d'appeler les outils "why3 xxx ..." DONE
+** strategies de preuve, NO for next release only
+** transformation "compute_in_goal", DONE, but rewrite rules not documented
+** support de nouveaux prouveurs, DONE
+** nouvelle structure des fichiers de session et de shape (compatibilité), DONE
+** new examples ? BOF
+
+* ajouter dans les instructions de release ci-dessous la procedure de
+  fabrication du paquet opam DONE
+
 == New Features to announce ==
 
 See CHANGES
 
 == Final preparation ==
 
-* inform Jerry James <loganjerry@gmail.com> so that he can test the
-  Fedora package
 * faire une passe sur le BTS
 * do "make update-coq" and "make", fix Coq realizations if needed
 * check that nightly bench is OK
 * check that "make xml-validate-local" is OK
   (see below : copy the dtd on the web)
-* put 0.84 in file Version
+* put 0.84 in file Version, and then run ./config.status
 * check/update the content of the About dialog in src/ide/gconfig.ml
   around lines 550-600
 * check headers
 * check the file CHANGES, add the release date
-* manual in PDF: check that macro \todo is commented out
-    in ./macros.tex, and then "make doc"
+* manual in PDF:
+** update the date in doc/manual.tex (near \whyversion{})
+** check that macro \todo is commented out in doc/macros.tex
+** and then "make doc"
   (check that manual in HTML is also generated, doc/html/index.html)
 * do "make dist"
 * test distrib/why3-0.84.tar.gz
+* inform Jerry James <loganjerry@gmail.com> so that he can test the
+  Fedora package
 * install web page for why2 which includes an updated page for the
   quick migration guide. (sources are in CVS repository
   ~filliatr/ARCHIVE/www/why).
@@ -233,7 +233,7 @@ See CHANGES
 
 * prepare for the OPAM package
 
-. update opam/url: url and checksum of why-0.84.tar.gz 
+. update opam/url: url and checksum of why-0.84.tar.gz
    (use "md5sum distrib/why3-0.84.tar.gz")
 . update opam/descr if necessary
 . update opam/opam with correct dependencies and such
@@ -256,7 +256,7 @@ See CHANGES
     opam pin add why3 --kind=git <...>/why3/.git
     (it runs "opam install why3")
   . with opam < 1.2:
-   
+
     - first step: have a local copy of opam-repository if not done yet, e.g.:
 
       git clone git@github.com:claudemarche/opam-repository.git
@@ -268,10 +268,10 @@ See CHANGES
       git pull --ff-only opam master
 
     - second step:
- 
+
       opam repository add local ~/recherche/opam-repository
       opam install why3
-      (* test it, e.g. 
+      (* test it, e.g.
          cp example/quicksort.mlw ~/tmp
          why3ide ~/tmp/quicksort.mlw *)
       opam remove why3
@@ -1351,8 +1351,3 @@ The main new features of interest in the GUI are
 
 Any question, remark or bug report concerning only Why3 should be done
 using the Why3 public discussion list and bug tracker.
-
-
-
-
-
