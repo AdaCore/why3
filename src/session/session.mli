@@ -184,6 +184,9 @@ type notask
 (** A phantom type which is used for sessions which don't contain any task. The
     only such sessions are sessions that come from {!read_session} *)
 
+exception ShapesFileError of string
+exception SessionFileError of string
+
 val read_session : string -> notask session * bool
 (** Read a session stored on the disk. It returns a session without any
     task attached to goals.
@@ -236,8 +239,6 @@ type 'key keygen = ?parent:'key -> unit -> 'key
 (** type of functions which can generate keys *)
 
 exception OutdatedSession
-exception ShapesFileError of string
-exception SessionFileError of string
 
 type 'key update_context =
   { allow_obsolete_goals : bool;
@@ -264,7 +265,7 @@ val update_session : ctxt:'key update_context -> 'a session ->
     the third result.
 
     raises [OutdatedSession] if the session is obsolete and
-    [allow_obsolete] is false]
+    [allow_obsolete] is false
 
 *)
 
