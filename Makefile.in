@@ -588,6 +588,22 @@ gallery::
 	  cd ..; \
 	done
 
+.PHONY: gallery-subs
+
+GALLERYSUBS=avl
+
+gallery-subs::
+	@for d in $(GALLERYSUBS) ; do \
+	  echo "exporting examples/$$d"; \
+	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
+	  cd examples/$$d; \
+	  why3 -L . doc --stdlib-url http://why3.lri.fr/stdlib/ *.mlw -o $(GALLERYDIR)/$$d; \
+	  cd ..; \
+	  zip -r $(GALLERYDIR)/$$d/$$d.zip $$d; \
+	  cd ..; \
+	done
+
+
 %-gallery::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
 	x=$*/why3session.xml; \
