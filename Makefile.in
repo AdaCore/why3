@@ -1634,7 +1634,7 @@ clean::
 ##########
 
 clean_old_install::
-	rm -f /etc/bash_completion.d/why3
+	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then rm -f /etc/bash_completion.d/why3; fi
 
 install_no_local::
 	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then cp -f share/bash/why3 /etc/bash_completion.d; fi
