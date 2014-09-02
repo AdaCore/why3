@@ -27,9 +27,8 @@ let add_opt_file x =
   Queue.push (Some x, tlist) opt_queue;
   opt_input := Some tlist
 
-let add_opt_theory =
-  let rdot = (Str.regexp "\\.") in fun x ->
-  let l = Str.split rdot x in
+let add_opt_theory x =
+  let l = Strings.split '.' x in
   let p, t = match List.rev l with
     | t::p -> List.rev p, t
     | _ -> assert false
@@ -53,30 +52,30 @@ let opt_output = ref None
 
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
-      " Read the input file from stdin";
+      " read the input file from stdin";
   "-T", Arg.String add_opt_theory,
-      "<theory> Select <theory> in the input file or in the library";
+      "<theory> select <theory> in the input file or in the library";
   "--theory", Arg.String add_opt_theory,
       " same as -T";
   "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> Select input format (default: \"why\")";
+      "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F";
   "-D", Arg.String (fun s -> opt_driver := Some s),
-      "<file> Specify a driver";
+      "<file> specify a driver";
   "--driver", Arg.String (fun s -> opt_driver := Some s),
       " same as -D";
   "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir> Print the selected goals to separate files in <dir>";
+      "<dir> print the selected goals to separate files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o" ]
 
-let (env, config) =
-  Args.initialize option_list add_opt_file usage_msg
+let config, _, env =
+  Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =
   if Queue.is_empty opt_queue then
-    Args.exit_with_usage option_list usage_msg
+    Whyconf.Args.exit_with_usage option_list usage_msg
 
 let opt_output =
   match !opt_output with
@@ -86,7 +85,7 @@ let opt_output =
   | Some d -> d
 
 let opt_driver =
-  match !opt_driver with
+  try match !opt_driver with
   | None ->
     eprintf "Driver (-D) is required.@.";
     exit 1
@@ -94,8 +93,10 @@ let opt_driver =
     let s =
       if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
       else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv")) in
-    let lib = Mlw_main.library_of_env env in
-    Mlw_driver.load_driver lib s []
+    Mlw_driver.load_driver env s []
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+    eprintf "%a@." Exn_printer.exn_printer e;
+    exit 1
 
 let extract_to ?fname th extract =
   let file = Filename.concat opt_output (Mlw_ocaml.extract_filename ?fname th) in
@@ -148,24 +149,11 @@ let rec do_extract_module ?fname m =
       | None    -> do_extract_theory ?fname th' in
   use_iter extract_use m.Mlw_module.mod_theory
 
-let do_global_extract (tname,p,t) =
-  let lib = opt_driver.Mlw_driver.drv_lib in
-  try
-    let mm, thm = Env.read_lib_file lib p in
-    try
-      let m = Mstr.find t mm in
-      do_extract_module m
-    with Not_found ->
-      let th = Mstr.find t thm in
-      do_extract_theory th
-  with Env.LibFileNotFound _ | Not_found -> try
-    let format = Opt.get_def "why" !opt_parser in
-    let env = Env.env_of_library lib in
-    let th = Env.read_theory ~format env p t in
-    do_extract_theory th
-  with Env.LibFileNotFound _ | Env.TheoryNotFound _ ->
-    eprintf "Theory/module '%s' not found.@." tname;
-    exit 1
+let do_global_extract (_,p,t) =
+  let env = opt_driver.Mlw_driver.drv_env in
+  match Mlw_module.read_module_or_theory env p t with
+  | Mlw_module.Module m -> do_extract_module m
+  | Mlw_module.Theory t -> do_extract_theory t
 
 let do_extract_theory_from fname m (tname,_,t) =
   let th = try Mstr.find t m with Not_found ->
@@ -184,25 +172,25 @@ let do_extract_module_from fname mm thm (tname,_,t) =
     exit 1
 
 let do_local_extract fname cin tlist =
-  let lib = opt_driver.Mlw_driver.drv_lib in
-  if !opt_parser = Some "whyml" || Filename.check_suffix fname ".mlw" then begin
-    let mm, thm = Mlw_main.read_channel lib [] fname cin in
-    if Queue.is_empty tlist then begin
-      let do_m t m thm =
-        do_extract_module ~fname m; Mstr.remove t thm in
+  let env = opt_driver.Mlw_driver.drv_env in
+  let format = !opt_parser in
+  try
+    let mm, thm =
+      Env.read_channel ?format Mlw_module.mlw_language env fname cin in
+    if Queue.is_empty tlist then
+      let do_m t m thm = do_extract_module ~fname m; Mstr.remove t thm in
       let thm = Mstr.fold do_m mm thm in
       Mstr.iter (fun _ th -> do_extract_theory ~fname th) thm
-    end else
+    else
       Queue.iter (do_extract_module_from fname mm thm) tlist
-  end else begin
-    let m = Env.read_channel ?format:!opt_parser env fname cin in
+  with Env.InvalidFormat _ ->
+    let m = Env.read_channel ?format Env.base_language env fname cin in
     if Queue.is_empty tlist then
       let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
       let do_th _ (_,th) = do_extract_theory ~fname th in
       Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
     else
       Queue.iter (do_extract_theory_from fname m) tlist
-  end
 
 let do_input = function
   | None, tlist ->

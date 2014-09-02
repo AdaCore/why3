@@ -1,4 +1,4 @@
-open Why3session
+open Why3
 
 type key = int
 (* The key type, with which we identify nodes in the Why3 VC tree *)

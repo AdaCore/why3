@@ -9,8 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Why3
-
 (** Explanations *)
 
 val goal_expl_task: root:bool -> Task.task -> Ident.ident * string option
@@ -45,23 +43,33 @@ val dumb_checksum: checksum
 
 val task_checksum : ?version:int -> Task.task -> checksum
 
+val theory_checksum : ?version:int -> Theory.theory -> checksum
+
 (** Pairing algorithm *)
 
 module type S = sig
   type t
-  val checksum : t -> checksum
+  val checksum : t -> checksum option
   val shape    : t -> shape
   val name     : t -> Ident.ident
 end
 
 module Pairing(Old: S)(New: S) : sig
-  val associate:
+  val associate: theory_was_fully_up_to_date:bool -> use_shapes:bool ->
     Old.t list -> New.t list -> (New.t * (Old.t * bool) option) list
     (** Associate new goals to (possibly) old goals
         Each new goal is mapped either to
-        - [None]: no pairing at all
-        - [Some (h, false)]: exact matching (equal checksums)
-        - [Some (h, true)]: inexact matching (goal obsolete)
+        - [None]: no old goal associated
+        - [Some (h, false)]: the matching is exact (same checksums)
+        - [Some (h, true)]: inexact matching (thus proofs for the new goal 
+          must be assumed obsolete)
+
+        if [use_shapes] is set, the clever algorithm matching shapes is used,
+        otherwise a simple association in the given order of goals is done.
+
+        if [theory_was_fully_up_to_date] is set, then all resulting
+        goals are marked as non-obsolete, whatever their checksums are.
 
         Note: in the output, goals appear in the same order as in [newgoals] *)
+
 end

@@ -1,0 +1,15 @@
+
+theory T
+
+  use import bool.Bool
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Nth
+
+
+  goal G : forall l: list 'a. length l >= 3 -> exists i j:int, x:'a. i <> j /\ nth i l = Some x /\ nth j l = Some x
+
+  goal g1: forall x:int. x >= 0 -> -x <= 0
+
+end

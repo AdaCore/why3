@@ -1,0 +1,15 @@
+
+
+module M
+  
+  use import int.Int
+
+  lemma l1: 1 = 1
+
+  let f (x:int) : int 
+    ensures { result > 0 } 
+  =
+    (* assert { x > 0 }; *)
+    42
+
+end

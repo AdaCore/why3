@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../monoid.mlw">
+<theory name="Monoid" sum="17d1ff16242df7a3b2e7d4292aca9c4c">
+</theory>
+<theory name="MonoidSum" sum="664c08bfadf863f0189070400301b285">
+ <goal name="WP_parameter sum_append" expl="VC for sum_append">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ </goal>
+</theory>
+<theory name="MonoidSumDef" sum="fa955d3a9aa320fff31c6ec120555b0c">
+ <goal name="sum_def_nil">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="sum_def_cons">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="ComputableMonoid" sum="c2e44e6bbfbd447428a63f1982102329">
+</theory>
+</file>
+</why3session>

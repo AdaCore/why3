@@ -3,92 +3,92 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="10" memlimit="1000"/>
-<prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="15" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
-<prover id="5" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
-<prover id="6" name="Z3" version="3.2" timelimit="15" memlimit="0"/>
-<prover id="7" name="Coq" version="8.4pl3" timelimit="5" memlimit="4000"/>
+<prover id="1" name="Coq" version="8.4pl4" timelimit="5" memlimit="4000"/>
+<prover id="2" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="15" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
+<prover id="6" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Z3" version="3.2" timelimit="15" memlimit="0"/>
 <prover id="8" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
 <file name="../bellman_ford.mlw" expanded="true">
-<theory name="Graph" expanded="true">
- <goal name="vertices_cardinal_pos" sum="b53f5921e10c8afb9006fe710f5e239e" expanded="true">
- <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+<theory name="Graph" sum="46be35fe664351bae1b42549c641f33c" expanded="true">
+ <goal name="vertices_cardinal_pos" expanded="true">
+ <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="path_in_vertices" sum="06e5c788d62947e760a274766425f577" expanded="true">
- <proof prover="7" timelimit="10" memlimit="0" edited="bf_Graph_path_in_vertices_2.v"><result status="valid" time="1.04"/></proof>
+ <goal name="path_in_vertices" expanded="true">
+ <proof prover="1" timelimit="10" memlimit="0" edited="bf_Graph_path_in_vertices_2.v"><result status="valid" time="1.04"/></proof>
  </goal>
- <goal name="long_path_decomposition_pigeon1" sum="f0f7e31c25a12d45a3ad5dc9fe881499" expanded="true">
- <proof prover="7" timelimit="8" memlimit="1000" edited="bellman_ford_Graph_long_path_decomposition_pigeon1_1.v"><result status="valid" time="1.55"/></proof>
+ <goal name="long_path_decomposition_pigeon1" expanded="true">
+ <proof prover="1" timelimit="8" memlimit="1000" edited="bellman_ford_Graph_long_path_decomposition_pigeon1_1.v"><result status="valid" time="1.55"/></proof>
  </goal>
- <goal name="long_path_decomposition_pigeon2" sum="63a6266f8603de0769159337ca28ae4f" expanded="true">
- <proof prover="3"><result status="valid" time="0.06"/></proof>
+ <goal name="long_path_decomposition_pigeon2" expanded="true">
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="long_path_decomposition_pigeon3" sum="80a24999193f86edd4df497d838bd516" expanded="true">
- <proof prover="7" timelimit="7" memlimit="1000" edited="bellman_ford_Graph_long_path_decomposition_pigeon3_1.v"><result status="valid" time="1.80"/></proof>
+ <goal name="long_path_decomposition_pigeon3" expanded="true">
+ <proof prover="1" timelimit="7" memlimit="1000" edited="bellman_ford_Graph_long_path_decomposition_pigeon3_1.v"><result status="valid" time="1.80"/></proof>
  </goal>
- <goal name="long_path_decomposition" sum="23fb64f5e5dd1b6dbd03d1f091879b05" expanded="true">
- <proof prover="7" memlimit="1000" edited="bellman_ford_Graph_long_path_decomposition_1.v"><result status="valid" time="1.47"/></proof>
+ <goal name="long_path_decomposition" expanded="true">
+ <proof prover="1" memlimit="1000" edited="bellman_ford_Graph_long_path_decomposition_1.v"><result status="valid" time="1.47"/></proof>
  </goal>
- <goal name="simple_path" sum="a3c5122f1aaf999a3e09f307916627e4" expanded="true">
- <proof prover="7" timelimit="10" memlimit="0" edited="bf_Graph_simple_path_1.v"><result status="valid" time="2.22"/></proof>
+ <goal name="simple_path" expanded="true">
+ <proof prover="1" timelimit="10" memlimit="0" edited="bf_Graph_simple_path_1.v"><result status="valid" time="2.22"/></proof>
  </goal>
- <goal name="key_lemma_1" sum="70b203d2fb9a7d1caed9a15d173c6ee9" expanded="true">
- <proof prover="7" timelimit="10" memlimit="0" edited="bf_Graph_key_lemma_1_1.v"><result status="valid" time="2.93"/></proof>
+ <goal name="key_lemma_1" expanded="true">
+ <proof prover="1" timelimit="10" memlimit="0" edited="bf_Graph_key_lemma_1_1.v"><result status="valid" time="2.93"/></proof>
  </goal>
 </theory>
-<theory name="BellmanFord" expanded="true">
- <goal name="key_lemma_2" sum="05949fab40d8974a00cc9811526df03d" expanded="true">
- <proof prover="7" edited="bf_WP_BellmanFord_key_lemma_2_1.v"><result status="valid" time="25.23"/></proof>
+<theory name="BellmanFord" sum="644d60aec66130c042ada7e765cc41a0" expanded="true">
+ <goal name="key_lemma_2" expanded="true">
+ <proof prover="1" edited="bf_WP_BellmanFord_key_lemma_2_1.v"><result status="valid" time="20.51"/></proof>
  </goal>
- <goal name="WP_parameter relax" expl="VC for relax" sum="429ad2b1a6b64cc935964dc39f6b7db4" expanded="true">
+ <goal name="WP_parameter relax" expl="VC for relax" expanded="true">
  <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter relax.1" expl="1. postcondition" sum="3936e30a84a4e73b0f20e80f686c871c" expanded="true">
+  <goal name="WP_parameter relax.1" expl="1. postcondition" expanded="true">
   <transf name="inline_goal" expanded="true">
-   <goal name="WP_parameter relax.1.1" expl="1. postcondition" sum="107eb16554294cea19ea5d4426377898" expanded="true">
+   <goal name="WP_parameter relax.1.1" expl="1. postcondition" expanded="true">
    <transf name="split_goal" expanded="true">
-    <goal name="WP_parameter relax.1.1.1" expl="1. postcondition" sum="8a38391a2b8023c4cb8a3d9b7c83ae11" expanded="true">
-    <proof prover="7" timelimit="10" memlimit="0" edited="bf_WP_BellmanFord_WP_parameter_relax_7.v"><result status="valid" time="1.63"/></proof>
+    <goal name="WP_parameter relax.1.1.1" expl="1. postcondition" expanded="true">
+    <proof prover="1" timelimit="10" memlimit="0" edited="bf_WP_BellmanFord_WP_parameter_relax_7.v"><result status="valid" time="1.63"/></proof>
     </goal>
-    <goal name="WP_parameter relax.1.1.2" expl="2. postcondition" sum="0fe723bc01e593ca850d11ca9fe43fb0" expanded="true">
-    <proof prover="2" memlimit="0"><result status="valid" time="0.22"/></proof>
+    <goal name="WP_parameter relax.1.1.2" expl="2. postcondition" expanded="true">
+    <proof prover="3" memlimit="0"><result status="valid" time="0.22"/></proof>
     </goal>
-    <goal name="WP_parameter relax.1.1.3" expl="3. postcondition" sum="162785f88876ebf8ebdfd0e586704f37" expanded="true">
-    <proof prover="2" memlimit="0"><result status="valid" time="0.62"/></proof>
+    <goal name="WP_parameter relax.1.1.3" expl="3. postcondition" expanded="true">
+    <proof prover="3" memlimit="0"><result status="valid" time="0.42"/></proof>
     </goal>
-    <goal name="WP_parameter relax.1.1.4" expl="4. postcondition" sum="f616484826d28906296c5064806b66a2" expanded="true">
-    <proof prover="2" memlimit="0"><result status="valid" time="0.25"/></proof>
-    <proof prover="3" timelimit="18" memlimit="0"><result status="valid" time="0.89"/></proof>
+    <goal name="WP_parameter relax.1.1.4" expl="4. postcondition" expanded="true">
+    <proof prover="3" memlimit="0"><result status="valid" time="0.25"/></proof>
+    <proof prover="4" timelimit="18" memlimit="0"><result status="valid" time="0.89"/></proof>
     </goal>
-    <goal name="WP_parameter relax.1.1.5" expl="5. postcondition" sum="8b5a1456f3d4ead3619b3f038a083b4c" expanded="true">
-    <proof prover="2" memlimit="0"><result status="valid" time="0.45"/></proof>
+    <goal name="WP_parameter relax.1.1.5" expl="5. postcondition" expanded="true">
+    <proof prover="3" memlimit="0"><result status="valid" time="0.45"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter relax.2" expl="2. postcondition" sum="517e2497aee242d2213d819d12592a43" expanded="true">
+  <goal name="WP_parameter relax.2" expl="2. postcondition" expanded="true">
   <transf name="inline_goal" expanded="true">
-   <goal name="WP_parameter relax.2.1" expl="1. postcondition" sum="df31f990bb179991336aff0e72def585" expanded="true">
+   <goal name="WP_parameter relax.2.1" expl="1. postcondition" expanded="true">
    <transf name="split_goal" expanded="true">
-    <goal name="WP_parameter relax.2.1.1" expl="1. postcondition" sum="b6ffaebfc230f6cbfa344cf297abfdc3" expanded="true">
-    <proof prover="2" memlimit="0"><result status="valid" time="0.12"/></proof>
-    <proof prover="3" timelimit="15" memlimit="0"><result status="valid" time="0.04"/></proof>
+    <goal name="WP_parameter relax.2.1.1" expl="1. postcondition" expanded="true">
+    <proof prover="3" memlimit="0"><result status="valid" time="0.12"/></proof>
+    <proof prover="4" timelimit="15" memlimit="0"><result status="valid" time="0.04"/></proof>
     </goal>
-    <goal name="WP_parameter relax.2.1.2" expl="2. postcondition" sum="235156fc29b70c946126b6dcf4d49c2d" expanded="true">
-    <proof prover="2" memlimit="0"><result status="valid" time="0.28"/></proof>
-    <proof prover="3" timelimit="15" memlimit="0"><result status="valid" time="0.28"/></proof>
+    <goal name="WP_parameter relax.2.1.2" expl="2. postcondition" expanded="true">
+    <proof prover="3" memlimit="0"><result status="valid" time="0.28"/></proof>
+    <proof prover="4" timelimit="15" memlimit="0"><result status="valid" time="0.28"/></proof>
     </goal>
-    <goal name="WP_parameter relax.2.1.3" expl="3. postcondition" sum="075891715faa47a9404d6004b75498b3" expanded="true">
-    <proof prover="2" memlimit="0"><result status="valid" time="0.28"/></proof>
+    <goal name="WP_parameter relax.2.1.3" expl="3. postcondition" expanded="true">
+    <proof prover="3" memlimit="0"><result status="valid" time="0.28"/></proof>
     </goal>
-    <goal name="WP_parameter relax.2.1.4" expl="4. postcondition" sum="dc9b41e6689825672c77c7e826ee5774" expanded="true">
-    <proof prover="2" memlimit="0"><result status="valid" time="0.08"/></proof>
-    <proof prover="3" timelimit="15" memlimit="0"><result status="valid" time="0.07"/></proof>
+    <goal name="WP_parameter relax.2.1.4" expl="4. postcondition" expanded="true">
+    <proof prover="3" memlimit="0"><result status="valid" time="0.08"/></proof>
+    <proof prover="4" timelimit="15" memlimit="0"><result status="valid" time="0.07"/></proof>
     </goal>
-    <goal name="WP_parameter relax.2.1.5" expl="5. postcondition" sum="5c79f0cbbb7af85119788c66b2e8fbd8" expanded="true">
-    <proof prover="2" memlimit="0"><result status="valid" time="0.13"/></proof>
+    <goal name="WP_parameter relax.2.1.5" expl="5. postcondition" expanded="true">
+    <proof prover="3" memlimit="0"><result status="valid" time="0.13"/></proof>
     </goal>
    </transf>
    </goal>
@@ -96,138 +96,138 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter bellman_ford" expl="VC for bellman_ford" sum="1ef9a114b5cec15978d360e0c7e0ca60" expanded="true">
+ <goal name="WP_parameter bellman_ford" expl="VC for bellman_ford" expanded="true">
  <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter bellman_ford.1" expl="1. assertion" sum="9380df2341a08ae2153ea1be5444df7a" expanded="true">
+  <goal name="WP_parameter bellman_ford.1" expl="1. assertion" expanded="true">
   <transf name="inline_goal" expanded="true">
-   <goal name="WP_parameter bellman_ford.1.1" expl="1. assertion" sum="7c6b7cc8b2221ca95bc2873101e6810a" expanded="true">
+   <goal name="WP_parameter bellman_ford.1.1" expl="1. assertion" expanded="true">
    <transf name="split_goal_wp" expanded="true">
-    <goal name="WP_parameter bellman_ford.1.1.1" expl="1. assertion" sum="407659f6c3975ebcc19cd8bd868dfea7" expanded="true">
-    <proof prover="1"><result status="valid" time="0.11"/></proof>
-    <proof prover="5"><result status="valid" time="3.12"/></proof>
+    <goal name="WP_parameter bellman_ford.1.1.1" expl="1. assertion" expanded="true">
+    <proof prover="2"><result status="valid" time="0.11"/></proof>
+    <proof prover="6"><result status="valid" time="3.12"/></proof>
     <proof prover="8"><result status="valid" time="0.16"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.1.1.2" expl="2. assertion" sum="033b77deaf474f328d69d1146c3ff01d" expanded="true">
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
+    <goal name="WP_parameter bellman_ford.1.1.2" expl="2. assertion" expanded="true">
+    <proof prover="4"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.1.1.3" expl="3. assertion" sum="c778939075c92dbd0c9ff2e0b5dbf423" expanded="true">
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
+    <goal name="WP_parameter bellman_ford.1.1.3" expl="3. assertion" expanded="true">
+    <proof prover="4"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.1.1.4" expl="4. assertion" sum="4e7dfcd19446e75320a289068a333998" expanded="true">
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
+    <goal name="WP_parameter bellman_ford.1.1.4" expl="4. assertion" expanded="true">
+    <proof prover="4"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.1.1.5" expl="5. assertion" sum="18823ce9161eee58cea4526f3ecb2c6e" expanded="true">
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
+    <goal name="WP_parameter bellman_ford.1.1.5" expl="5. assertion" expanded="true">
+    <proof prover="4"><result status="valid" time="0.03"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bellman_ford.2" expl="2. loop invariant init" sum="59d6899678476704fe2a9718033b13ad" expanded="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter bellman_ford.2" expl="2. loop invariant init" expanded="true">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.3" expl="3. precondition" sum="f4c30831eb46d01864503d0c71031c1d" expanded="true">
-  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter bellman_ford.3" expl="3. precondition" expanded="true">
+  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.4" expl="4. exceptional postcondition" sum="4af87fa6db9bfa92f3289758feef93a4" expanded="true">
-  <proof prover="7" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_20.v"><result status="valid" time="2.66"/></proof>
+  <goal name="WP_parameter bellman_ford.4" expl="4. exceptional postcondition" expanded="true">
+  <proof prover="1" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_20.v"><result status="valid" time="2.09"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.5" expl="5. loop invariant preservation" sum="be056799ea660063c1d98b9e84fa71aa" expanded="true">
-  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="3.25"/></proof>
+  <goal name="WP_parameter bellman_ford.5" expl="5. loop invariant preservation" expanded="true">
+  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="3.25"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.6" expl="6. loop variant decrease" sum="726bbe5d9c3829c0e877cdf962088371" expanded="true">
-  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter bellman_ford.6" expl="6. loop variant decrease" expanded="true">
+  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.7" expl="7. assertion" sum="7ef5502853d707f5071be7e68abbae79" expanded="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter bellman_ford.7" expl="7. assertion" expanded="true">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.8" expl="8. postcondition" sum="d31ce1ad869813a1876b5b2460bd97f7" expanded="true">
+  <goal name="WP_parameter bellman_ford.8" expl="8. postcondition" expanded="true">
   <transf name="split_goal" expanded="true">
-   <goal name="WP_parameter bellman_ford.8.1" expl="1. postcondition" sum="deed884afdc39ec1015b75ac5ac187b3" expanded="true">
-   <proof prover="2" memlimit="0"><result status="valid" time="0.07"/></proof>
-   <proof prover="3"><result status="valid" time="0.06"/></proof>
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter bellman_ford.8.1" expl="1. postcondition" expanded="true">
+   <proof prover="3" memlimit="0"><result status="valid" time="0.07"/></proof>
+   <proof prover="4"><result status="valid" time="0.06"/></proof>
+   <proof prover="5"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter bellman_ford.8.2" expl="2. postcondition" sum="0ce3147f0c096a635e3d73b3fa3ff53e" expanded="true">
-   <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.10"/></proof>
+   <goal name="WP_parameter bellman_ford.8.2" expl="2. postcondition" expanded="true">
+   <proof prover="3" timelimit="30" memlimit="0"><result status="valid" time="0.10"/></proof>
    </goal>
-   <goal name="WP_parameter bellman_ford.8.3" expl="3. postcondition" sum="1c4b72888844e21e856e75edfe18f9b7" expanded="true">
-   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
-   <proof prover="3" timelimit="10"><result status="valid" time="8.56"/></proof>
-   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   <goal name="WP_parameter bellman_ford.8.3" expl="3. postcondition" expanded="true">
+   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
+   <proof prover="4" timelimit="10"><result status="valid" time="7.38"/></proof>
+   <proof prover="5"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bellman_ford.9" expl="9. loop invariant init" sum="5058bb8273927b19db6063089ac47d40" expanded="true">
+  <goal name="WP_parameter bellman_ford.9" expl="9. loop invariant init" expanded="true">
   <transf name="inline_goal" expanded="true">
-   <goal name="WP_parameter bellman_ford.9.1" expl="1. loop invariant init" sum="28a22c92b160de6b28a8a11a851cfbd4" expanded="true">
+   <goal name="WP_parameter bellman_ford.9.1" expl="1. loop invariant init" expanded="true">
    <transf name="split_goal_wp" expanded="true">
-    <goal name="WP_parameter bellman_ford.9.1.1" expl="1. loop invariant init" sum="33cbf4def31c9d57ac568edfc7f04ca2" expanded="true">
-    <proof prover="1"><result status="valid" time="0.12"/></proof>
+    <goal name="WP_parameter bellman_ford.9.1.1" expl="1. loop invariant init" expanded="true">
+    <proof prover="2"><result status="valid" time="0.12"/></proof>
     <proof prover="8"><result status="valid" time="0.16"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.9.1.2" expl="2. loop invariant init" sum="1f8399159ba753ea5b2248e75c42414b" expanded="true">
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
+    <goal name="WP_parameter bellman_ford.9.1.2" expl="2. loop invariant init" expanded="true">
+    <proof prover="4"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.9.1.3" expl="3. loop invariant init" sum="8fd4e2b394877701bbc03c75d3b50530" expanded="true">
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
+    <goal name="WP_parameter bellman_ford.9.1.3" expl="3. loop invariant init" expanded="true">
+    <proof prover="4"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.9.1.4" expl="4. loop invariant init" sum="9ec66ac39b9ea8ef9c9a25197fdc97c6" expanded="true">
-    <proof prover="3"><result status="valid" time="0.03"/></proof>
+    <goal name="WP_parameter bellman_ford.9.1.4" expl="4. loop invariant init" expanded="true">
+    <proof prover="4"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.9.1.5" expl="5. loop invariant init" sum="bda0f46883979a6146b0789a8fd4774e" expanded="true">
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
+    <goal name="WP_parameter bellman_ford.9.1.5" expl="5. loop invariant init" expanded="true">
+    <proof prover="4"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bellman_ford.10" expl="10. loop invariant init" sum="5128537618143d9425c31ab4533b3c81" expanded="true">
+  <goal name="WP_parameter bellman_ford.10" expl="10. loop invariant init" expanded="true">
   <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter bellman_ford.10.1" expl="1." sum="549aa9b8b2ad17bb0749a5f59284f222" expanded="true">
-   <proof prover="3" timelimit="10"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter bellman_ford.10.1" expl="1." expanded="true">
+   <proof prover="4" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bellman_ford.10.2" expl="2." sum="43d3b696b0ae03ff0784b19a5b540e9d" expanded="true">
-   <proof prover="3" timelimit="10"><result status="valid" time="0.13"/></proof>
+   <goal name="WP_parameter bellman_ford.10.2" expl="2." expanded="true">
+   <proof prover="4" timelimit="10"><result status="valid" time="0.13"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bellman_ford.11" expl="11. precondition" sum="97fe72a4350f9ddda47119936266a9fc" expanded="true">
-  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter bellman_ford.11" expl="11. precondition" expanded="true">
+  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.12" expl="12. precondition" sum="034c2785e9f7aafaf12599bb00d06da9" expanded="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter bellman_ford.12" expl="12. precondition" expanded="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.13" expl="13. precondition" sum="a2d096926c0d2d708ed6f24386be2800" expanded="true">
-  <proof prover="3" timelimit="15"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter bellman_ford.13" expl="13. precondition" expanded="true">
+  <proof prover="4" timelimit="15"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.14" expl="14. loop invariant preservation" sum="0c263abf505c8607e820d9283f475774" expanded="true">
+  <goal name="WP_parameter bellman_ford.14" expl="14. loop invariant preservation" expanded="true">
   <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter bellman_ford.14.1" expl="1." sum="e644cfbf9a235d4842c7adb24bd41858" expanded="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter bellman_ford.14.1" expl="1." expanded="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bellman_ford.14.2" expl="2." sum="29e9dbaefd1ec0ad3b62420999435c2c" expanded="true">
+   <goal name="WP_parameter bellman_ford.14.2" expl="2." expanded="true">
    <transf name="inline_goal" expanded="true">
-    <goal name="WP_parameter bellman_ford.14.2.1" expl="1." sum="29a2158109c094604b587009affc4cd0" expanded="true">
+    <goal name="WP_parameter bellman_ford.14.2.1" expl="1." expanded="true">
     <transf name="split_goal_wp" expanded="true">
-     <goal name="WP_parameter bellman_ford.14.2.1.1" expl="1." sum="ab714e10f40f4d41d64a6d0b73e3affd" expanded="true">
-     <proof prover="2" timelimit="30"><result status="valid" time="0.35"/></proof>
-     <proof prover="3" timelimit="10"><result status="valid" time="0.05"/></proof>
+     <goal name="WP_parameter bellman_ford.14.2.1.1" expl="1." expanded="true">
+     <proof prover="3" timelimit="30"><result status="valid" time="0.35"/></proof>
+     <proof prover="4" timelimit="10"><result status="valid" time="0.05"/></proof>
      </goal>
-     <goal name="WP_parameter bellman_ford.14.2.1.2" expl="2." sum="0b345f770fcfc3eda537dadecca5f612" expanded="true">
-     <proof prover="2" timelimit="5"><result status="valid" time="0.68"/></proof>
-     <proof prover="3" timelimit="10"><result status="valid" time="1.91"/></proof>
+     <goal name="WP_parameter bellman_ford.14.2.1.2" expl="2." expanded="true">
+     <proof prover="3" timelimit="5"><result status="valid" time="0.68"/></proof>
+     <proof prover="4" timelimit="10"><result status="valid" time="1.50"/></proof>
      </goal>
-     <goal name="WP_parameter bellman_ford.14.2.1.3" expl="3." sum="12bc72b0550c285feef683705c43298d" expanded="true">
-     <proof prover="2"><result status="valid" time="22.10"/></proof>
+     <goal name="WP_parameter bellman_ford.14.2.1.3" expl="3." expanded="true">
+     <proof prover="3"><result status="valid" time="18.39"/></proof>
      </goal>
-     <goal name="WP_parameter bellman_ford.14.2.1.4" expl="4." sum="3ed1e3714b14d7b2852db5a4906a90bc" expanded="true">
-     <proof prover="2" timelimit="33"><result status="valid" time="0.13"/></proof>
-     <proof prover="3" timelimit="10"><result status="valid" time="0.10"/></proof>
+     <goal name="WP_parameter bellman_ford.14.2.1.4" expl="4." expanded="true">
+     <proof prover="3" timelimit="33"><result status="valid" time="0.13"/></proof>
+     <proof prover="4" timelimit="10"><result status="valid" time="0.10"/></proof>
      </goal>
-     <goal name="WP_parameter bellman_ford.14.2.1.5" expl="5." sum="02be100c80fbc6486e38ea11b6ecbc24" expanded="true">
+     <goal name="WP_parameter bellman_ford.14.2.1.5" expl="5." expanded="true">
      <proof prover="0"><result status="valid" time="0.12"/></proof>
-     <proof prover="2"><result status="valid" time="12.74"/></proof>
+     <proof prover="3"><result status="valid" time="12.74"/></proof>
      </goal>
     </transf>
     </goal>
@@ -235,83 +235,83 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bellman_ford.15" expl="15. loop variant decrease" sum="e59cdd39888af3546a78abdcffa4db2a" expanded="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter bellman_ford.15" expl="15. loop variant decrease" expanded="true">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.16" expl="16. assertion" sum="1cb19ccad603568fa7938fc307cbef7f" expanded="true">
+  <goal name="WP_parameter bellman_ford.16" expl="16. assertion" expanded="true">
   <transf name="inline_goal" expanded="true">
-   <goal name="WP_parameter bellman_ford.16.1" expl="1. assertion" sum="f5af9d0fd2c79bacf2a012b1a59e9d92" expanded="true">
-   <proof prover="3" timelimit="54"><result status="valid" time="4.64"/></proof>
+   <goal name="WP_parameter bellman_ford.16.1" expl="1. assertion" expanded="true">
+   <proof prover="4" timelimit="54"><result status="valid" time="4.64"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bellman_ford.17" expl="17. loop invariant preservation" sum="1cd902204755a0380610ec2fee6e40b1" expanded="true">
+  <goal name="WP_parameter bellman_ford.17" expl="17. loop invariant preservation" expanded="true">
   <transf name="inline_goal" expanded="true">
-   <goal name="WP_parameter bellman_ford.17.1" expl="1. loop invariant preservation" sum="fc66974d027df2289fa16b437b0d7836" expanded="true">
+   <goal name="WP_parameter bellman_ford.17.1" expl="1. loop invariant preservation" expanded="true">
    <transf name="split_goal_wp" expanded="true">
-    <goal name="WP_parameter bellman_ford.17.1.1" expl="1. loop invariant preservation" sum="5c602b01d8999e4a5d414201e6c170fe" expanded="true">
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
+    <goal name="WP_parameter bellman_ford.17.1.1" expl="1. loop invariant preservation" expanded="true">
+    <proof prover="4"><result status="valid" time="0.04"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.17.1.2" expl="2. loop invariant preservation" sum="b6b792324d5e72b086f6f1eb57b5a38f" expanded="true">
-    <proof prover="7" timelimit="30" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_17.v"><result status="valid" time="1.74"/></proof>
+    <goal name="WP_parameter bellman_ford.17.1.2" expl="2. loop invariant preservation" expanded="true">
+    <proof prover="1" timelimit="30" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_17.v"><result status="valid" time="1.74"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.17.1.3" expl="3. loop invariant preservation" sum="19e7c88e3a984ed8be72451e5a193523" expanded="true">
-    <proof prover="2" timelimit="5"><result status="valid" time="0.04"/></proof>
-    <proof prover="3"><result status="valid" time="0.07"/></proof>
-    <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
+    <goal name="WP_parameter bellman_ford.17.1.3" expl="3. loop invariant preservation" expanded="true">
+    <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
+    <proof prover="4"><result status="valid" time="0.07"/></proof>
+    <proof prover="7" timelimit="5" memlimit="1000"><result status="valid" time="0.04"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.17.1.4" expl="4. loop invariant preservation" sum="74774574039e27b5772c7de5f27d1f53" expanded="true">
-    <proof prover="7" timelimit="30" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_18.v"><result status="valid" time="1.99"/></proof>
+    <goal name="WP_parameter bellman_ford.17.1.4" expl="4. loop invariant preservation" expanded="true">
+    <proof prover="1" timelimit="30" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_18.v"><result status="valid" time="1.99"/></proof>
     </goal>
-    <goal name="WP_parameter bellman_ford.17.1.5" expl="5. loop invariant preservation" sum="d0286b09e38a2f197004521bb9bc53a3" expanded="true">
-    <proof prover="3" timelimit="15"><result status="valid" time="0.04"/></proof>
+    <goal name="WP_parameter bellman_ford.17.1.5" expl="5. loop invariant preservation" expanded="true">
+    <proof prover="4" timelimit="15"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bellman_ford.18" expl="18. assertion" sum="1bfbead64fc4e70c7d4ec8ea6d967442" expanded="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter bellman_ford.18" expl="18. assertion" expanded="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.19" expl="19. loop invariant init" sum="1321e65c7cda5d782b26776aec53f3c8" expanded="true">
-  <proof prover="3" timelimit="15" memlimit="0"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter bellman_ford.19" expl="19. loop invariant init" expanded="true">
+  <proof prover="4" timelimit="15" memlimit="0"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.20" expl="20. precondition" sum="585354ecd85070782f9b84038d08ef82" expanded="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter bellman_ford.20" expl="20. precondition" expanded="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.21" expl="21. exceptional postcondition" sum="9ff9c3ce780c4a7044665a1bea94c426" expanded="true">
-  <proof prover="7" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_15.v"><result status="valid" time="3.16"/></proof>
+  <goal name="WP_parameter bellman_ford.21" expl="21. exceptional postcondition" expanded="true">
+  <proof prover="1" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_15.v"><result status="valid" time="3.16"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.22" expl="22. loop invariant preservation" sum="971d18d8adf7b6a93e1c72c339eed3e9" expanded="true">
+  <goal name="WP_parameter bellman_ford.22" expl="22. loop invariant preservation" expanded="true">
   <transf name="split_goal" expanded="true">
-   <goal name="WP_parameter bellman_ford.22.1" expl="1." sum="83cfa2f4a9e18bfd4a4da58bd014cd2d" expanded="true">
-   <proof prover="3" timelimit="15" memlimit="0"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter bellman_ford.22.1" expl="1." expanded="true">
+   <proof prover="4" timelimit="15" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter bellman_ford.22.2" expl="2." sum="c41d563025fa5ef8e3d8862289359724" expanded="true">
-   <proof prover="3" timelimit="31" memlimit="0"><result status="valid" time="0.27"/></proof>
+   <goal name="WP_parameter bellman_ford.22.2" expl="2." expanded="true">
+   <proof prover="4" timelimit="31" memlimit="0"><result status="valid" time="0.27"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bellman_ford.23" expl="23. loop variant decrease" sum="540e6918fc2fbb5155da74f057c51949" expanded="true">
-  <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter bellman_ford.23" expl="23. loop variant decrease" expanded="true">
+  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.24" expl="24. assertion" sum="3c189ffc909d21e2cb57142e842ff001" expanded="true">
-  <proof prover="3" timelimit="15" memlimit="0"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter bellman_ford.24" expl="24. assertion" expanded="true">
+  <proof prover="4" timelimit="15" memlimit="0"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter bellman_ford.25" expl="25. postcondition" sum="5c39e8171591a217011339e84775ba8c" expanded="true">
+  <goal name="WP_parameter bellman_ford.25" expl="25. postcondition" expanded="true">
   <transf name="split_goal" expanded="true">
-   <goal name="WP_parameter bellman_ford.25.1" expl="1. postcondition" sum="ec0e1f582b1b1788ca87b468593b1e5f" expanded="true">
-   <proof prover="2" memlimit="0"><result status="valid" time="0.13"/></proof>
-   <proof prover="3" timelimit="15" memlimit="0"><result status="valid" time="0.11"/></proof>
-   <proof prover="6"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter bellman_ford.25.1" expl="1. postcondition" expanded="true">
+   <proof prover="3" memlimit="0"><result status="valid" time="0.13"/></proof>
+   <proof prover="4" timelimit="15" memlimit="0"><result status="valid" time="0.11"/></proof>
+   <proof prover="7"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter bellman_ford.25.2" expl="2. postcondition" sum="9b914086e46b315f5149a4a649e873c6" expanded="true">
-   <proof prover="7" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_19.v"><result status="valid" time="1.39"/></proof>
+   <goal name="WP_parameter bellman_ford.25.2" expl="2. postcondition" expanded="true">
+   <proof prover="1" memlimit="1000" edited="bf_WP_BellmanFord_WP_parameter_bellman_ford_19.v"><result status="valid" time="1.39"/></proof>
    </goal>
-   <goal name="WP_parameter bellman_ford.25.3" expl="3. postcondition" sum="fc6d39a49ded066dafef15c14a9e99a7" expanded="true">
-   <proof prover="2" memlimit="0"><result status="valid" time="0.14"/></proof>
-   <proof prover="3" timelimit="15" memlimit="0"><result status="valid" time="0.05"/></proof>
-   <proof prover="6"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter bellman_ford.25.3" expl="3. postcondition" expanded="true">
+   <proof prover="3" memlimit="0"><result status="valid" time="0.14"/></proof>
+   <proof prover="4" timelimit="15" memlimit="0"><result status="valid" time="0.05"/></proof>
+   <proof prover="7"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>

@@ -12,10 +12,13 @@
 <!ELEMENT file (theory*)>
 <!ATTLIST file name CDATA #REQUIRED>
 <!ATTLIST file expanded CDATA #IMPLIED>
+<!ATTLIST file verified CDATA #IMPLIED>
 
 <!ELEMENT theory (label*,goal*)>
 <!ATTLIST theory name CDATA #REQUIRED>
 <!ATTLIST theory expanded CDATA #IMPLIED>
+<!ATTLIST theory verified CDATA #IMPLIED>
+<!ATTLIST theory sum CDATA #IMPLIED>
 <!ATTLIST theory locfile CDATA #IMPLIED>
 <!ATTLIST theory loclnum CDATA #IMPLIED>
 <!ATTLIST theory loccnumb CDATA #IMPLIED>
@@ -24,8 +27,9 @@
 <!ELEMENT goal (label*, proof*, transf*, metas*)>
 <!ATTLIST goal name CDATA #REQUIRED>
 <!ATTLIST goal expl CDATA #IMPLIED>
-<!ATTLIST goal sum CDATA #REQUIRED>
+<!ATTLIST goal sum CDATA #IMPLIED>
 <!ATTLIST goal shape CDATA #IMPLIED>
+<!ATTLIST goal proved CDATA #IMPLIED>
 <!ATTLIST goal expanded CDATA #IMPLIED>
 <!ATTLIST goal locfile CDATA #IMPLIED>
 <!ATTLIST goal loclnum CDATA #IMPLIED>
@@ -52,12 +56,14 @@
 <!ELEMENT transf (goal*)>
 <!ATTLIST transf name CDATA #REQUIRED>
 <!ATTLIST transf expanded CDATA #IMPLIED>
+<!ATTLIST transf proved CDATA #IMPLIED>
 
 <!ELEMENT label EMPTY>
 <!ATTLIST label name CDATA #REQUIRED>
 
 <!ELEMENT metas (ts_pos*,ls_pos*,pr_pos*,meta*,goal)>
 <!ATTLIST metas expanded CDATA #IMPLIED>
+<!ATTLIST metas proved CDATA #IMPLIED>
 
 <!ELEMENT ts_pos (ip_library*,ip_qualid+)>
 <!ATTLIST ts_pos name CDATA #REQUIRED>

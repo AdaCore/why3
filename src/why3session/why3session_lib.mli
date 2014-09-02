@@ -11,7 +11,6 @@
 
 open Why3
 open Whyconf
-open Why3session
 
 val verbose: Debug.flag
 
@@ -30,10 +29,6 @@ type cmd =
 (** {2 Anonymous argument} *)
 val iter_files : (string -> unit) -> unit
 val anon_fun : Arg.anon_fun
-
-(** print_version *)
-val print_version : unit -> unit
-
 
 (** {2 Spec for version, debug} *)
 (* val simple_spec : spec_list *)

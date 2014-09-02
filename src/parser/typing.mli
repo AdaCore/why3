@@ -12,7 +12,6 @@
 (** Typing environments *)
 
 open Stdlib
-open Ty
 open Term
 open Theory
 
@@ -24,14 +23,14 @@ val debug_type_only : Debug.flag
 val add_decl : Loc.position -> theory_uc -> Ptree.decl -> theory_uc
 
 val add_use_clone :
-  unit Env.library -> theory Mstr.t -> theory_uc ->
+  Env.env -> theory Mstr.t -> theory_uc ->
     Loc.position -> Ptree.use_clone -> theory_uc
 
 val close_namespace : Loc.position -> bool -> theory_uc -> theory_uc
 
 val close_theory : theory Mstr.t -> theory_uc -> theory Mstr.t
 
-val open_file : unit Env.library -> Env.pathname -> Ptree.incremental
+val open_file : Env.env -> Env.pathname -> Ptree.incremental
 
 val close_file : unit -> theory Mstr.t
 
@@ -39,7 +38,6 @@ val close_file : unit -> theory Mstr.t
 (** The following is exported for program typing (src/whyml/mlw_typing.ml) *)
 (***************************************************************************)
 
-val create_user_tv : string -> tvsymbol
 val create_user_id : Ptree.ident -> Ident.preid
 
 val qloc : Ptree.qualid -> Loc.position

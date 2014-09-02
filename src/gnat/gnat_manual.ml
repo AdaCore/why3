@@ -1,6 +1,5 @@
-open Why3session
-open Session
 open Why3
+open Session
 
 type goal = int Session.goal
 

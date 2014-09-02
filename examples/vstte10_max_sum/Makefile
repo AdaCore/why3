@@ -5,7 +5,11 @@ ifeq ($(BENCH),yes)
   WHY3=../../bin/why3
   WHY3SHARE=../../share
 else
-  WHY3=$(BINDIR)/why3
+  ifeq ($(BINDIR),)
+    WHY3=why3
+  else
+    WHY3=$(BINDIR)/why3
+  endif
   WHY3SHARE=$(shell $(WHY3) --print-datadir)
 endif
 
@@ -27,6 +31,10 @@ OCAMLOPT=ocamlopt -noassert -inline 1000
 all: $(MAIN).$(OCAMLBEST)
 
 extract: $(ML)
+
+doc:
+	$(WHY3) doc ../vstte10_max_sum.mlw
+	$(WHY3) session html .
 
 $(MAIN).byte: $(CMO)  $(MAIN).cmo
 	ocamlc $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ $^

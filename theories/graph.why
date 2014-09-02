@@ -3,8 +3,8 @@
 
 theory Path
 
-  use export list.List
-  use export list.Append
+  use import list.List
+  use import list.Append
 
   type vertex
 
@@ -45,7 +45,9 @@ end
 theory IntPathWeight
 
   clone export Path
-  use export int.Int
+  use import int.Int
+  use import list.List
+  use import list.Append
 
   function weight vertex vertex : int
 

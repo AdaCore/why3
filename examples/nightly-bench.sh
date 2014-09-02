@@ -3,7 +3,7 @@
 
 case "$1" in
   "-mail")
-        REPORTBYMAIL=yes;;
+        REPORTBYMAIL=$2;;
   "")
         REPORTBYMAIL=no;;
   *)
@@ -21,11 +21,10 @@ DATE=`date --utc +%Y-%m-%d`
 SUBJECT="Why3 nightly bench:"
 
 notify() {
-    if test "$REPORTBYMAIL" == "yes"; then
-        mail -s "$SUBJECT" why3-commits@lists.gforge.inria.fr < $REPORT
-        # mail -s "$SUBJECT" Claude.Marche@inria.fr < $REPORT
-    else
+    if test "$REPORTBYMAIL" == "no"; then
         cat $REPORT
+    else
+        mail -s "$SUBJECT" $REPORTBYMAIL < $REPORT
     fi
     exit 0
 }

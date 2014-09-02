@@ -11,7 +11,6 @@
 
 open Format
 open Why3
-open Why3session
 
 (** {2 Warnings} *)
 
@@ -66,27 +65,37 @@ let usage_msg = Format.sprintf
   (Filename.basename Sys.argv.(0))
 
 let option_list = [
+  ("-f",
+   Arg.Set opt_force,
+   " enforce saving the session after replay");
   ("--force",
    Arg.Set opt_force,
-   " enforce saving the session after replay") ;
+   " same as -f");
   ("--obsolete-only",
    Arg.Set opt_obsolete_only,
    " replay only if session is obsolete") ;
+  ("-P",
+   Arg.String (fun s ->
+     opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
+   "<prover> restrict replay to given prover");
+  ("--prover",
+   Arg.String (fun s ->
+     opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
+   " same as -P");
   ("--smoke-detector",
    Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
    " try to detect if the context is self-contradicting") ;
   ("--bench",
    Arg.Set opt_bench, " run as bench (experimental)");
-  ("--prover",
-   Arg.String (fun s ->
-     opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
-   "<prover> restrict replay to given prover");
-  ("-s",
+  ("--no-stats",
    Arg.Clear opt_stats,
    " do not print statistics") ;
   ("-q",
    Arg.Unit (fun () -> Debug.unset_flag debug),
-   " run quietly") ]
+   " run quietly");
+  ("--quiet",
+   Arg.Unit (fun () -> Debug.unset_flag debug),
+   " same as -q") ]
 
 let add_opt_file f = match !opt_file with
   | Some _ ->
@@ -94,8 +103,8 @@ let add_opt_file f = match !opt_file with
   | None ->
       opt_file := Some f
 
-let (env, config) =
-  Args.initialize option_list add_opt_file usage_msg
+let config, _, env =
+  Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 (* let () = *)
 (*   if !opt_smoke <> Session.SD_None && !opt_force then begin *)
@@ -105,7 +114,7 @@ let (env, config) =
 
 let fname =
   match !opt_file with
-  | None -> Args.exit_with_usage option_list usage_msg
+  | None -> Whyconf.Args.exit_with_usage option_list usage_msg
   | Some f -> f
 
 let found_upgraded_prover = ref false
@@ -342,9 +351,9 @@ let add_to_check_smoke env_session sched =
 let add_to_check config some_merge_miss found_obs =
   match !opt_smoke with
     | SD_None -> add_to_check_no_smoke config some_merge_miss found_obs;
-    | _ -> 
+    | _ ->
       assert (not some_merge_miss);
-      assert (not found_obs); 
+      assert (not found_obs);
       add_to_check_smoke
 
 let transform_smoke env_session =
@@ -390,11 +399,12 @@ let () =
     Debug.dprintf debug "Opening session...@?";
     O.verbose := Debug.test_flag debug;
     let env_session,found_obs,some_merge_miss =
-      let session = S.read_session project_dir in
-      M.update_session ~allow_obsolete:true session env config
+      let session, use_shapes = S.read_session project_dir in
+      M.update_session ~allow_obsolete:true ~release:false ~use_shapes
+        session env config
     in
     Debug.dprintf debug " done.@.";
-    if !opt_obsolete_only && not found_obs 
+    if !opt_obsolete_only && not found_obs
     then
       begin
         eprintf "Session is not obsolete, hence not replayed@.";

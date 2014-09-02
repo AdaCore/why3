@@ -11,7 +11,6 @@
 
 open Format
 open Why3
-open Why3session
 open Why3session_lib
 
 module Hprover = Whyconf.Hprover
@@ -48,7 +47,7 @@ let spec =
    Arg.Set_string output_dir,
    "<path> output directory ('-' for stdout)") ::
   ("--context", Arg.Set opt_context,
-   " adds context around the generated HTML code") ::
+   " add context around the generated HTML code") ::
   ("--style", Arg.Symbol (["simpletree";"jstree";"table"], set_opt_style),
    " style to use, defaults to '" ^ default_style ^ "'."
 ) ::
@@ -56,7 +55,7 @@ let spec =
     [Arg.String set_opt_pp_in;
      Arg.String set_opt_pp_cmd;
      Arg.String set_opt_pp_out],
-  "<suffix> <cmd> <out_suffix> declares a pretty-printer for edited proofs") ::
+  "<suffix> <cmd> <out_suffix> declare a pretty-printer for edited proofs") ::
   ("--coqdoc",
    Arg.Unit (fun ()->
     opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
@@ -72,7 +71,7 @@ type context =
 
 let run_file (context : context) print_session fname =
   let project_dir = Session.get_project_dir fname in
-  let session = Session.read_session project_dir in
+  let session,_use_shapes = Session.read_session project_dir in
   let output_dir =
     if !output_dir = "" then project_dir else !output_dir
   in
@@ -555,7 +554,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc = "output session in HTML format.";
+    cmd_desc = "output session in HTML format";
     cmd_name = "html";
     cmd_run  = run;
   }

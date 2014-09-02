@@ -170,6 +170,6 @@ let float_lift th_from_int th_real =
 let () =
   Trans.register_env_transform ~desc:"float literals" "float_literal"
     (fun env ->
-      let th_from_int = Env.find_theory env ["real"] "FromInt" in
-      let th_real = Env.find_theory env ["real"] "Real" in
+      let th_from_int = Env.read_theory env ["real"] "FromInt" in
+      let th_real = Env.read_theory env ["real"] "Real" in
       float_lift th_from_int th_real)

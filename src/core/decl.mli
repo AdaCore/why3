@@ -51,7 +51,7 @@ val ls_defn_decrease : ls_defn -> int list
     from a declaration; on the result of [make_ls_defn],
     [ls_defn_decrease] will always return an empty list. *)
 
-(** {2 Inductive predicate declaration} *)
+(** {2 Proposition names} *)
 
 type prsymbol = private {
   pr_name : ident;
@@ -67,6 +67,8 @@ val create_prsymbol : preid -> prsymbol
 val pr_equal : prsymbol -> prsymbol -> bool
 
 val pr_hash : prsymbol -> int
+
+(** {2 Inductive predicate declaration} *)
 
 type ind_decl = lsymbol * (prsymbol * term) list
 

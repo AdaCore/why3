@@ -10,10 +10,19 @@
 (********************************************************************)
 
 {
+
+  type attributes = (string * string) list
+
   type element =
     { name : string;
       attributes : (string * string) list;
       elements : element list;
+    }
+
+  let mk_element name attrs elems =
+    { name = name;
+      attributes = attrs;
+      elements = List.rev elems;
     }
 
   type t =
@@ -30,18 +39,14 @@
     match group_stack with
       | [] -> element_stack
       | (elem,att,elems)::g ->
-          let e = {
-            name = elem;
-            attributes = att;
-            elements = List.rev element_stack;
-          }
-          in pop_all g (e::elems)
+          let e = mk_element elem att element_stack in
+          pop_all g (e::elems)
 
   exception Parse_error of string
 
   let parse_error s = raise (Parse_error s)
 
-  let debug = Why3.Debug.register_info_flag "xml"
+  let debug = Debug.register_info_flag "xml"
     ~desc:"Print@ the@ XML@ parser@ debugging@ messages."
 }
 
@@ -55,24 +60,24 @@ let mantissa = ['e''E'] sign? digit+
 let real = sign? digit* '.' digit* mantissa?
 let escape = ['\\''"''n''t''r']
 
-rule xml_prolog = parse
+rule xml_prolog fixattrs = parse
 | space+
-    { xml_prolog lexbuf }
+    { xml_prolog fixattrs lexbuf }
 | "<?xml" space+ "version=\"1.0\"" space+ "?>"
-    { xml_doctype "1.0" "" lexbuf }
+    { xml_doctype fixattrs "1.0" "" lexbuf }
 | "<?xml" space+ "version=\"1.0\"" space+ "encoding=\"UTF-8\"" space+ "?>"
-    { xml_doctype "1.0" "" lexbuf }
+    { xml_doctype fixattrs "1.0" "" lexbuf }
 | "<?xml" ([^'?']|'?'[^'>'])* "?>"
-    { Why3.Debug.dprintf debug "[Xml warning] prolog ignored@.";
-      xml_doctype "1.0" "" lexbuf }
+    { Debug.dprintf debug "[Xml warning] prolog ignored@.";
+      xml_doctype fixattrs "1.0" "" lexbuf }
 | _
     { parse_error "wrong prolog" }
 
-and xml_doctype version encoding = parse
+and xml_doctype fixattrs version encoding = parse
 | space+
-    { xml_doctype version encoding lexbuf }
+    { xml_doctype fixattrs version encoding lexbuf }
 | "<!DOCTYPE" space+ (ident as doctype) space+ [^'>']* ">"
-    { match elements [] [] lexbuf with
+    { match elements fixattrs [] [] lexbuf with
          | [x] ->
             { version = version;
               encoding = encoding;
@@ -85,57 +90,52 @@ and xml_doctype version encoding = parse
 | _
     { parse_error "wrong DOCTYPE" }
 
-and elements group_stack element_stack = parse
+and elements fixattrs group_stack element_stack = parse
   | space+
-      { elements group_stack element_stack lexbuf }
+      { elements fixattrs group_stack element_stack lexbuf }
   | '<' (ident as elem)
-      { attributes group_stack element_stack elem [] lexbuf }
+      { attributes fixattrs group_stack element_stack elem [] lexbuf }
   | "</" (ident as celem) space* '>'
       { match group_stack with
          | [] ->
-             Why3.Debug.dprintf debug
+             Debug.dprintf debug
                "[Xml warning] unexpected closing Xml element `%s'@."
                celem;
-             elements group_stack element_stack lexbuf
+             elements fixattrs group_stack element_stack lexbuf
          | (elem,att,stack)::g ->
              if celem <> elem then
-               Why3.Debug.dprintf debug
+               Debug.dprintf debug
                  "[Xml warning] Xml element `%s' closed by `%s'@."
                  elem celem;
-             let e = {
-                name = elem;
-                attributes = att;
-                elements = List.rev element_stack;
-             }
-             in elements g (e::stack) lexbuf
+             let e = mk_element elem att element_stack in
+             elements fixattrs g (e::stack) lexbuf
        }
   | '<'
-      { Why3.Debug.dprintf debug "[Xml warning] unexpected '<'@.";
-        elements group_stack element_stack lexbuf }
+      { Debug.dprintf debug "[Xml warning] unexpected '<'@.";
+        elements fixattrs group_stack element_stack lexbuf }
   | eof
       { match group_stack with
          | [] -> element_stack
          | (elem,_,_)::_ ->
-             Why3.Debug.dprintf debug "[Xml warning] unclosed Xml element `%s'@." elem;
+             Debug.dprintf debug "[Xml warning] unclosed Xml element `%s'@." elem;
              pop_all group_stack element_stack
       }
   | _ as c
       { parse_error ("invalid element starting with " ^ String.make 1 c) }
 
-and attributes groupe_stack element_stack elem acc = parse
+and attributes fixattrs groupe_stack element_stack elem acc = parse
   | space+
-      { attributes groupe_stack element_stack elem acc lexbuf }
+      { attributes fixattrs groupe_stack element_stack elem acc lexbuf }
   | (ident as key) space* '='
       { let v = value lexbuf in
-        attributes groupe_stack element_stack elem ((key,v)::acc) lexbuf }
+        attributes fixattrs groupe_stack element_stack elem ((key,v)::acc) lexbuf }
   | '>'
-      { elements ((elem,acc,element_stack)::groupe_stack) [] lexbuf }
+      { let acc = fixattrs elem acc in
+        elements fixattrs ((elem,acc,element_stack)::groupe_stack) [] lexbuf }
   | "/>"
-      { let e = { name = elem ;
-                  attributes = acc;
-                  elements = [] }
-        in
-        elements groupe_stack (e::element_stack) lexbuf }
+      { let acc = fixattrs elem acc in
+        let e = mk_element elem acc [] in
+        elements fixattrs groupe_stack (e::element_stack) lexbuf }
   | _ as c
       { parse_error ("'>' expected, got " ^ String.make 1 c) }
   | eof
@@ -178,10 +178,10 @@ and string_val = parse
 
 {
 
-  let from_file f =
+  let from_file ?(fixattrs=fun _ a -> a) f =
       let c = open_in f in
       let lb = Lexing.from_channel c in
-      let t = xml_prolog lb in
+      let t = xml_prolog fixattrs lb in
       close_in c;
       t
 

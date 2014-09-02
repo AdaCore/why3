@@ -122,7 +122,7 @@ An arithmetic goal: 2+2 = 4
 let two : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "2"))
 let four : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "4"))
 let int_theory : Theory.theory =
-  Env.find_theory env ["int"] "Int"
+  Env.read_theory env ["int"] "Int"
 let plus_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
 let two_plus_two : Term.term = Term.fs_app plus_symbol [two;two] Ty.ty_int
@@ -301,13 +301,10 @@ declaration of
 
 *)
 
-
 (* import the ref.Ref module *)
 
-let ref_modules, ref_theories =
-  Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
-
-let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
+let ref_module : Mlw_module.modul =
+  Mlw_module.read_module env ["ref"] "Ref"
 
 let ref_type : Mlw_ty.T.itysymbol =
   Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]

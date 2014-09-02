@@ -9,8 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Why3
-
 (** Proof sessions
 
     Define all the functions needed for managing a session:
@@ -82,7 +80,7 @@ type 'a goal = private
       goal_name : Ident.ident; (** The ident of the task *)
       goal_expl : expl;
       goal_parent : 'a goal_parent;
-      mutable goal_checksum : Termcode.checksum;  (** checksum of the task *)
+      mutable goal_checksum : Termcode.checksum option;  (** checksum of the task *)
       mutable goal_shape : Termcode.shape;  (** shape of the task *)
       mutable goal_verified : bool;
       mutable goal_task: task_option;
@@ -135,6 +133,7 @@ and 'a theory = private
     { mutable theory_key : 'a;
       theory_name : Ident.ident;
       theory_parent : 'a file;
+      mutable theory_checksum : Termcode.checksum option;
       mutable theory_goals : 'a goal list;
       (** Not mutated after the creation *)
       mutable theory_verified : bool;
@@ -157,6 +156,7 @@ and 'a file = private
 and 'a session = private
     { session_files : 'a file PHstr.t;
       mutable session_shape_version : int;
+      session_prover_ids : int PHprover.t;
       session_dir   : string;
     }
 
@@ -184,9 +184,22 @@ type notask
 (** A phantom type which is used for sessions which don't contain any task. The
     only such sessions are sessions that come from {!read_session} *)
 
-val read_session : string -> notask session
+exception ShapesFileError of string
+exception SessionFileError of string
+
+val read_session : string -> notask session * bool
 (** Read a session stored on the disk. It returns a session without any
-    task attached to goals *)
+    task attached to goals.
+
+    The returned boolean is set when there was shapes read from disk.
+
+    raises [SessionFileError msg] if the database file cannot be read
+    correctly.
+
+    raises [ShapesFileError msg] if the database extra file for shapes
+    cannot be read.
+
+*)
 
 val save_session : Whyconf.config -> 'key session -> unit
 (** Save a session on disk *)
@@ -227,11 +240,16 @@ type 'key keygen = ?parent:'key -> unit -> 'key
 
 exception OutdatedSession
 
-val update_session :
-  ?release:bool (* default false *)  ->
-  keygen:'a keygen ->
-  allow_obsolete:bool -> 'b session ->
-  Env.env -> Whyconf.config -> 'a env_session * bool * bool
+type 'key update_context =
+  { allow_obsolete_goals : bool;
+    release_tasks : bool;
+    use_shapes_for_pairing_sub_goals : bool;
+    theory_is_fully_up_to_date : bool;
+    keygen : 'key keygen;
+  }
+
+val update_session : ctxt:'key update_context -> 'a session ->
+  Env.env -> Whyconf.config -> 'key env_session * bool * bool
 (** reload the given session with the given environnement :
     - the files are reloaded
     - apply again the transformation
@@ -246,7 +264,8 @@ val update_session :
     If the merge generated new unpaired goals is indicated by
     the third result.
 
-    raises [Failure msg] if the database file cannot be read correctly
+    raises [OutdatedSession] if the session is obsolete and
+    [allow_obsolete] is false
 
 *)
 

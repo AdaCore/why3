@@ -1,0 +1,310 @@
+
+theory Test
+
+  goal g1: true
+
+  goal g2: true /\ false
+
+  goal g3: true /\ true
+
+  goal g10: if true then 1=1 else 3=4
+
+  goal g11: let x=1 in x=1
+
+end
+
+theory TestArith
+
+  use import int.Int
+
+  goal h1: 2+2=4
+
+  goal h2: 2+(-2)=0
+
+  goal h3: 10 = 0xA
+
+  function g int : int
+
+  axiom g4: g 4 = 7
+
+  meta "rewrite" prop g4
+
+  goal j1: g (2+2) = 7
+
+  use import int.Power
+
+  meta "rewrite" prop Power_0
+(* not a rule: conditional
+  meta "rewrite" prop Power_s
+*)
+  goal k1: power 4 3 = 64
+
+end
+
+theory TestRecord
+
+  use import int.Int
+
+  type t = { f : int }
+
+  goal i1: let x = { f = 4 } in x.f < 5
+
+  goal i2: let  x = { f = 4 } in
+    match x with { f = y } -> y + 1 > 3 end
+
+end
+
+
+
+theory TestList
+
+  use import int.Int
+
+  use import list.List
+
+  constant l1 : list int = Cons 12 (Cons 34 (Cons 56 Nil))
+
+  goal g1: match l1 with Nil -> 0 | Cons x _ -> x end = 12
+
+  use import list.Length
+
+  goal g2: length l1 = 3
+
+  use import list.HdTlNoOpt
+
+  meta "rewrite" prop hd_cons
+  meta "rewrite" prop tl_cons
+
+  goal g3: hd l1 = 12
+
+  use import list.Append
+
+  constant l2 : list int =
+    Cons 12 (Cons 34 (Cons 56 Nil)) ++ Cons 78 (Cons 90 Nil)
+
+  goal h1: l2 = l1
+
+  goal h2: length l2 = 5
+
+  goal h3: forall x y:int. Cons x Nil = Cons y Nil
+
+end
+
+
+
+
+theory Rstandard
+
+   type t
+
+   constant u : t
+
+   constant a : t
+
+   function f t t : t
+
+   function g t : t
+
+   axiom a1 : g a = a
+
+   meta "rewrite" prop a1
+
+
+
+   constant b : t
+
+   axiom a2 : f b b = g b
+
+   meta "rewrite" prop a2
+
+
+   function h t : t
+
+   axiom a3 : forall x:t. f (h x) a = g x
+
+   meta "rewrite" prop a3
+
+   function i t t : t
+
+   axiom a4 : forall x y:t. i x y = f x y
+
+   meta "rewrite" prop a4
+
+   function j t t : t
+
+   axiom a5 : forall x:t. j x x = x
+
+   meta "rewrite" prop a5
+
+end
+
+theory TestStandard
+
+   use import Rstandard
+
+   goal g00 : u = g a
+
+   goal g01 : f (g (g a)) u = f a (g a)
+
+   goal g02 : u = f b b
+
+   goal g03 : f (f b b) (g b) = f u (f b b)
+
+   goal g04 : f (h u) a = f (h a) a
+
+   goal g05 : i a b = u
+
+   goal g06 : j a b = u
+
+   goal g07 : j a a = u
+
+end
+
+
+theory Rgroup
+
+  type t
+
+  function ( * ) t t : t
+
+  function e : t
+
+  function i t : t
+
+  axiom assoc : forall x y z:t. (x * y) * z = x * (y * z)
+
+  meta "rewrite" prop assoc
+
+  axiom id_left : forall x:t. e * x = x
+
+  meta "rewrite" prop id_left
+
+  axiom inv_left : forall x:t. i x * x = e
+
+  meta "rewrite" prop inv_left
+
+  constant a:t
+  constant b:t
+  constant c:t
+
+  goal g0: (a * b) * c = e
+
+  goal g01: (a * e) * c = a * c
+
+  goal g1: (b * i a) * a = b
+
+  goal g2: ((b * i a) * a) * a = b * a
+
+end
+
+
+theory NonTerm
+
+  type t
+
+  constant c : t
+
+  function f t : t
+
+  axiom a: f c = f (f c)
+
+  meta "rewrite" prop a
+
+  goal g: f c = f c
+
+  use import int.Int
+
+  type nat = O | S nat
+
+  function plus (n m:nat) : nat =
+    match n with
+    | O -> m
+    | S k -> S (plus k m)
+    end
+
+  function fib (n:nat) : nat =
+    match n with
+    | O -> O
+    | S O -> S O
+    | S (S n as m) -> plus (fib n) (fib m)
+    end
+
+  constant x : nat
+
+  goal g3 : fib (S (S (S O))) = x
+  goal g4 : fib (S (S (S (S O)))) = x
+  goal g5 : fib (S (S (S (S (S O))))) = x
+  goal g6 : fib (S (S (S (S (S (S O)))))) = x
+  goal g7 : fib (S (S (S (S (S (S (S O))))))) = x
+  goal g8 : fib (S (S (S (S (S (S (S (S O)))))))) = x
+  goal g9 : fib (S (S (S (S (S (S (S (S (S O))))))))) = x
+  goal g10 : fib (S (S (S (S (S (S (S (S (S (S O)))))))))) = x
+
+end
+
+theory Rinteger
+
+   use export int.Int
+
+   lemma l1 : forall x:int. x + 0 = x
+
+   (* not allowed: + is a built-in symbol
+     meta "rewrite" prop l1
+     *)
+
+   goal g1 : forall y. 2+2 = y
+
+   goal g2 : forall y.  0 + y + 0 + y - y = y
+
+end
+
+theory TestInteger
+
+   use import Rinteger
+
+   predicate f1 (y:int) = y > 0 /\ true
+
+   goal g1 : true /\ false
+
+   predicate f2 (y:int) = y + 0 >= 1
+
+   function f3 (y:int) : int = y + 0
+
+   goal g2 : 1 + 0 = 1
+
+   goal g3 : 1 + 0 >= 1
+
+end
+
+
+theory MoreSets
+
+use export set.Set
+
+meta "rewrite" prop mem_empty
+
+meta "rewrite" prop add_def1
+
+meta "rewrite" prop union_def1
+
+end
+
+theory TestSets
+
+use import MoreSets
+
+type t = A | B | C | D
+
+goal g00 : mem A empty
+
+
+goal g01 : mem A (add B empty)
+
+goal g015 : mem A (singleton B)
+
+
+goal g02 : mem A (union (add B empty) (add C empty))
+
+goal g025 : mem A (union (singleton B) (singleton C))
+
+end

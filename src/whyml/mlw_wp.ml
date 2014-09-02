@@ -48,7 +48,7 @@ let fs_old =
   create_lsymbol (id_fresh "old") [ty] (Some ty)
 
 let mark_theory =
-  let uc = create_theory ~path:["why3"] (id_fresh "Mark") in
+  let uc = create_theory ~path:["why3";"Mark"] (id_fresh "Mark") in
   let uc = add_ty_decl uc ts_mark in
   close_theory uc
 
@@ -968,7 +968,7 @@ let add_wp_decl km name f uc =
   Theory.add_decl uc d
 
 let mk_env env km th =
-  let th_int = Env.find_theory env ["int"] "Int" in
+  let th_int = Env.read_theory env ["int"] "Int" in
   { prog_known = km;
     pure_known = Theory.get_known th;
     global_env = env;

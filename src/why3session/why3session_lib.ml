@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Why3
-open Why3session
+
 module S = Session
 module C = Whyconf
 
@@ -31,20 +31,9 @@ let files = Queue.create ()
 let iter_files f = Queue.iter f files
 let anon_fun (f:string) = Queue.add f files
 
-let opt_version = ref false
-
-let print_version () =
-  Format.printf "Why3 session, version %s (build date: %s)@."
-    Config.version Config.builddate
-
 let read_simple_spec () =
-  if !opt_version then begin
-    print_version (); exit 0
-  end;
   Debug.Args.set_flags_selected ();
   Debug.Args.option_list ()
-
-
 
 let opt_config = ref None
 let opt_loadpath = ref []
@@ -52,16 +41,15 @@ let opt_extra = ref []
 
 let common_options = [
   "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> reads configuration from <file>";
+      "<file> read configuration from <file>";
   "--config", Arg.String (fun s -> opt_config := Some s),
       "<file> same as -C";
   "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-      "<file> reads additional configuration from <file>";
+      "<file> read additional configuration from <file>";
   "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> adds <dir> to the library search path";
+      "<dir> add <dir> to the library search path";
   "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> same as -L";
-  "-v", Arg.Set opt_version, " prints version information" ;
   Debug.Args.desc_shortcut "verbose" "--verbose" "increase verbosity";
   Debug.Args.desc_debug_list;
   Debug.Args.desc_debug_all;
@@ -86,9 +74,16 @@ let read_env_spec () =
 
 let read_update_session ~allow_obsolete env config fname =
   let project_dir = Session.get_project_dir fname in
-  let session = Session.read_session project_dir in
-  Session.update_session ~keygen:(fun ?parent:_ _ -> ())
-    ~allow_obsolete session env config
+  let session,use_shapes = Session.read_session project_dir in
+  let ctxt = {
+    S.allow_obsolete_goals = allow_obsolete;
+    S.release_tasks = false;
+    S.use_shapes_for_pairing_sub_goals = use_shapes;
+    S.theory_is_fully_up_to_date = false;
+    S.keygen = fun ?parent:_ _ -> ();
+  }
+  in
+  Session.update_session ~ctxt session env config
 
 (** filter *)
 type filter_prover =
@@ -99,7 +94,7 @@ let filter_prover = Stack.create ()
 
 let read_opt_prover s =
   try
-    let l = Strings.rev_split s ',' in
+    let l = Strings.rev_split ',' s in
     match l with
     | [altern;version;name] when List.for_all (fun s -> s.[0] <> '^') l ->
       Prover {Whyconf.prover_name = name;

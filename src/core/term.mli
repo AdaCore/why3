@@ -9,10 +9,10 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Terms and Formulas *)
+
 open Ident
 open Ty
-
-(** Terms and Formulas *)
 
 (** {2 Variable symbols} *)
 
@@ -145,13 +145,13 @@ module Mterm : Extmap.S with type key = term
 module Sterm : Extset.S with module M = Mterm
 module Hterm : Exthtbl.S with type key = term
 
-(** term equality modulo alpha-equivalence and location *)
+(** {2 term equality modulo alpha-equivalence and location} *)
 
 val t_compare : term -> term -> int
 val t_equal : term -> term -> bool
 val t_hash : term -> int
 
-(** Bindings *)
+(** {2 Bindings} *)
 
 (** close bindings *)
 
@@ -177,7 +177,7 @@ val t_open_quant_cb :
   term_quant -> vsymbol list * trigger * term *
               (vsymbol list -> trigger -> term -> term_quant)
 
-(** Type checking *)
+(** {2 Type checking} *)
 
 exception TermExpected of term
 exception FmlaExpected of term
@@ -191,7 +191,7 @@ val t_prop : term -> term
 val t_ty_check : term -> ty option -> unit
 (** [t_ty_check t ty] checks that the type of [t] is [ty] *)
 
-(** Smart constructors for terms and formulas *)
+(** {2 Smart constructors for terms and formulas} *)
 
 val t_app  : lsymbol -> term list -> ty option -> term
 val fs_app : lsymbol -> term list -> ty -> term
@@ -274,9 +274,10 @@ val t_forall_close_merge : vsymbol list -> term -> term
     merges variable lists if [f] is already universally quantified;
     reuses triggers of [f], if any, otherwise puts no triggers. *)
 
-(** Built-in symbols *)
+(** {2 Built-in symbols} *)
 
-val ps_equ : lsymbol  (* equality predicate *)
+val ps_equ : lsymbol
+(** equality predicate *)
 
 val t_equ : term -> term -> term
 val t_neq : term -> term -> term
@@ -373,7 +374,7 @@ module TermTF : sig
     ('a -> term -> 'a * term) -> 'a -> trigger -> 'a * trigger
 end
 
-(** Map/fold over free variables *)
+(** {2 Map/fold over free variables} *)
 
 val t_v_map : (vsymbol -> term) -> term -> term
 val t_v_fold : ('a -> vsymbol -> 'a) -> 'a -> term -> 'a
@@ -384,14 +385,24 @@ val t_v_count : ('a -> vsymbol -> int -> 'a) -> 'a -> term -> 'a
 
 val t_v_occurs : vsymbol -> term -> int
 
-(** Variable substitution *)
+(** {2 Variable substitution} *)
 
-val t_subst : term Mvs.t -> term -> term
 val t_subst_single : vsymbol -> term -> term -> term
+(** [t_subst_single v t1 t2] substitutes variable [v] in [t2] by [t1] *)
+val t_subst : term Mvs.t -> term -> term
+(** [t_subst m t] substitutes variables in [t] by the variable mapping [m] *)
 
 val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
+(** [t_ty_subst mt mv t] substitutes simultaneously type variables by
+    mapping [mt] and term variables by mapping [mv] in term [t] *)
 
-(** Find free variables and type variables *)
+val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
+(** [t_subst_types mt mv t] substitutes type variables by
+    mapping [mt] simultaneously in substitution [mv] and in term [t].
+    beware that this operation may rename the variables in t
+*)
+
+(** {2 Find free variables and type variables} *)
 
 val t_closed : term -> bool
 
@@ -401,7 +412,7 @@ val t_freevars : int Mvs.t -> term -> int Mvs.t
 
 val t_ty_freevars : Stv.t -> term -> Stv.t
 
-(** Map/fold over types and logical symbols in terms and patterns *)
+(** {2 Map/fold over types and logical symbols in terms and patterns} *)
 
 val t_gen_map :
   (ty -> ty) -> (lsymbol -> lsymbol) -> vsymbol Mvs.t -> term -> term
@@ -415,7 +426,7 @@ val t_s_any : (ty -> bool) -> (lsymbol -> bool) -> term -> bool
 val t_ty_map : (ty -> ty) -> term -> term
 val t_ty_fold : ('a -> ty -> 'a) -> 'a -> term -> 'a
 
-(* Map/fold over applications in terms (but not in patterns!) *)
+(** Map/fold over applications in terms (but not in patterns!) *)
 
 val t_app_map :
   (lsymbol -> ty list -> ty option -> lsymbol) -> term -> term
@@ -423,7 +434,7 @@ val t_app_map :
 val t_app_fold :
   ('a -> lsymbol -> ty list -> ty option -> 'a) -> 'a -> term -> 'a
 
-(** Subterm occurrence check and replacement *)
+(** {2 Subterm occurrence check and replacement} *)
 
 val t_occurs  : term -> term -> bool
 val t_replace : term -> term -> term -> term

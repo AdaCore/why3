@@ -10,21 +10,13 @@
 (********************************************************************)
 
 open Stdlib
-open Theory
 
-(** Local type aliases and exceptions *)
+(** Local type aliases *)
 
 type fformat = string (* format name *)
 type filename = string (* file name *)
 type extension = string (* file extension *)
 type pathname = string list (* library path *)
-
-exception KnownFormat of fformat
-exception UnknownFormat of fformat
-exception UnknownExtension of extension
-exception UnspecifiedFormat
-exception LibFileNotFound of pathname
-exception TheoryNotFound of pathname * string
 
 (** Library environment *)
 
@@ -41,93 +33,136 @@ val create_env : filename list -> env
 val get_loadpath : env -> filename list
 (** returns the loadpath of a given environment *)
 
+(** Input languages *)
+
+type 'a language
+
+val base_language : Theory.theory Mstr.t language
+(** [base_language] is the root of the tree of supported languages.
+    Any input language must be translatable into pure theories for
+    the purposes of verification. *)
+
+val register_language : 'a language -> ('b -> 'a) -> 'b language
+(** [register_language parent convert] adds a leaf to the language tree.
+    The [convert] function provides translation from the new language to
+    [parent]. *)
+
+val add_builtin : 'a language -> (pathname -> 'a) -> unit
+(** [add_builtin lang builtin] adds new builtin libraries to [lang].
+    The [builtin] function is called by [read_library] (below) for any
+    library path that starts with "why3" (this prefix is not passed to
+    [builtin]). For all library paths not covered by [builtin] it must
+    raise [Not_found].
+
+    By convention, every builtin theory of the base language is placed
+    under a separate pathname that ends with the name of the theory.
+    For example, the full qualified name of the [Builtin] theory is
+    [why3.Builtin.Builtin]. The name of the theory is duplicated in
+    the library path to ensure that every builtin theory is obtained
+    from a separate call to [builtin], which permits to generate
+    builtin theories on demand.
+
+    If there are several definitions of a builtin library for a given
+    language and path, they must be physically identical, otherwise
+    [LibraryConflict] is raised. For example, if an offspring language
+    provides extended definitions of builtin theories, they must be
+    [convert]'ed into exactly the same singleton [theory Mstr.t] maps
+    as stored for the base language. *)
+
+type 'a format_parser = env -> pathname -> filename -> in_channel -> 'a
+(** [(fn : 'a format_parser) env path file ch] parses the in_channel [ch]
+    and returns the language-specific contents of type ['a]. References
+    to libraries in the input file are resolved via [env]. If the parsed
+    file is itself a library file, the argument [path] contains the fully
+    qualified library path of the file, which can be put in the identifiers.
+    The string argument [file] indicates the origin of the stream (file name)
+    to be used in error messages. *)
+
+exception KnownFormat of fformat
+
+val register_format :
+  desc:Pp.formatted ->
+  'a language -> fformat -> extension list -> 'a format_parser -> unit
+(** [register_format ~desc lang fname exts parser] registers a new format
+    [fname] for files with extensions from the string list [exts] (without
+    the separating dot). Any previous associations of extensions from [exts]
+    to other formats are overridden.
+
+    @raise KnownFormat [name] if the format is already registered *)
+
+val list_formats :
+  'a language -> (fformat * extension list * Pp.formatted) list
+(** [list_formats lang] returns the list of registered formats that can
+    be translated to [lang]. Use [list_formats base_language] to obtain
+    the list of all registered formats. *)
+
+(** Language-specific parsers *)
+
+exception InvalidFormat of fformat
+exception UnknownFormat of fformat
+exception UnknownExtension of extension
+exception UnspecifiedFormat
+
 val read_channel :
-  ?format:fformat -> env -> filename -> in_channel -> theory Mstr.t
-(** [read_channel ?format env path file ch] returns the theories in [ch].
-    When given, [format] enforces the format, otherwise we choose
-    the format according to [file]'s extension. Nothing ensures
+  ?format:fformat -> 'a language -> env -> filename -> in_channel -> 'a
+(** [read_channel ?format lang env file ch] returns the contents of [ch]
+    in language [lang]. When given, [format] enforces the format, otherwise
+    we choose the parser according to [file]'s extension. Nothing ensures
     that [ch] corresponds to the contents of [file].
 
+    @raise InvalidFormat [format] if the format, given in the parameter
+      or determined from the file's extension, does not translate to [lang]
     @raise UnknownFormat [format] if the format is not registered
     @raise UnknownExtension [s] if the extension [s] is not known
       to any registered parser
     @raise UnspecifiedFormat if format is not given and [file]
       has no extension *)
 
-val read_file : ?format:fformat -> env -> filename -> theory Mstr.t
-(** [read_file ?format env file] returns the theories in [file].
-    When given, [format] enforces the format, otherwise we choose
-    the format according to [file]'s extension. *)
+val read_file : ?format:fformat -> 'a language -> env -> filename -> 'a
+(** an open-close wrapper around [read_channel] *)
 
-val read_theory : format:fformat -> env -> pathname -> string -> theory
-(** [read_theory ~format env path th] returns the theory [path.th]
-    from the library. The parameter [format] specifies the format
-    of the library file to look for.
+exception LibraryNotFound of pathname
+exception LibraryConflict of pathname
+exception AmbiguousPath of filename * filename
 
-    @raise UnknownFormat [format] if the format is not registered
-    @raise LibFileNotFound [path] if the library file was not found
-    @raise TheoryNotFound if the theory was not found in the file *)
+val read_library : 'a language -> env -> pathname -> 'a
+(** [read_lib_file lang env path] returns the contents of the library
+    file specified by [path]. If [path] starts with ["why3"] then the
+    [builtin] functions of the language are called on [List.tl path].
+    If [path] is empty, [builtin] are called on the empty path.
 
-val find_theory : env -> pathname -> string -> theory
-(** the same as [read_theory ~format:"why"]
+    @raise InvalidFormat [format] if the format of the library file,
+      determined from the file's extension, does not translate to [lang]
+    @raise LibraryNotFound [path] if the library file was not found
+    @raise LibraryConflict [path] if a bultin library has several
+      non-physically-equal definitions
+    @raise AmbiguousPath [(file1,file2)] if [env] contains two library
+      files corresponding to [path] *)
 
-    This function is left for compatibility purposes and may be
-    removed in future versions of Why3. *)
-
-(** Input formats *)
-
-type 'a library
-(** part of the environment restricted to a particular format *)
-
-type 'a read_format =
-  'a library -> pathname -> filename -> in_channel -> 'a * theory Mstr.t
-(** [(fn : 'a read_format) lib path file ch] parses the channel [ch]
-    and returns the format-specific contents of type ['a] and a set of
-    logical theories. References to the library files of the same format
-    are resolved via [lib]. If the parsed file is itself a part of
-    the library, the argument [path] contains the fully qualified
-    library name of the file, which can be put in the identifiers.
-    The string argument [file] indicates the origin of the stream
-    (e.g. file name) to be used in error messages. *)
-
-val register_format :
-  desc:Pp.formatted ->
-  fformat -> extension list -> 'a read_format -> (env -> 'a library)
-(** [register_format fname exts read] registers a new format [fname]
-    for files with extensions from the string list [exts] (without
-    the separating dot); [read] is the function to perform parsing.
-    Returns a function that maps an environment to a format-specific
-    library inside it.
-
-    @raise KnownFormat [name] if the format is already registered *)
-
-val env_of_library : 'a library -> env
-(** [env_of_library lib] returns the environment of [lib] *)
-
-val list_formats : unit -> (fformat * extension list * Pp.formatted) list
-(** [list_formats ()] returns the list of registered formats *)
-
-val read_lib_file : 'a library -> pathname -> 'a * theory Mstr.t
-(** [read_lib_file lib path] retrieves the contents of a library file
-
-    @raise LibFileNotFound [path] if the library file was not found *)
-
-val read_lib_theory : 'a library -> pathname -> string -> theory
-(** [read_lib_theory lib path th] returns the theory [path.th]
-    from the library. This is the same as [read_theory] above,
-    but the format is determined by [lib] and not by the extra
-    [format] parameter.
-
-    @raise LibFileNotFound [path] if the library file was not found
-    @raise TheoryNotFound if the theory was not found in the file *)
-
-val locate_lib_file : env -> fformat -> pathname -> filename
-(** [locate_lib_file env format path] finds a library file in a given
-    environment, knowing its format and its library path
+val locate_library : env -> pathname -> filename
+(** [locate_lib_file env path] returns the location of the library
+    file specified by [path].
 
     This is a low-level function that allows to accees a library file
-    without parsing it. Do not use it without a good reason to do.
+    without parsing it. Do not use it without a good reason.
 
-    @raise LibFileNotFound [path] if the library file was not found
-    @raise UnknownFormat [format] if the format is not registered *)
+    @raise LibraryNotFound [path] if the library file was not found
+    @raise AmbiguousPath [(file1,file2)] if [env] contains two library
+      files corresponding to [path]
+    @raise InvalidArgument if the library path starts with "why3" or
+      is empty. *)
 
+exception TheoryNotFound of pathname * string
+
+val read_theory : env -> pathname -> string -> Theory.theory
+(** [read_theory env path th] returns the theory [path.th] from
+    the library. If [path] is empty, it is assumed to be ["why3".th],
+    that is, [read_theory env [] "Bool"] will look for the builtin
+    theory [why3.Bool.Bool] (see [register_language]).
+
+    @raise LibraryNotFound [path] if the library file was not found
+    @raise LibraryConflict [path] if a bultin library has several
+      non-physically-equal definitions
+    @raise AmbiguousPath [(file1,file2)] if [env] contains two library
+      files corresponding to [path]
+    @raise TheoryNotFound if the theory was not found in the file *)

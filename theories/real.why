@@ -81,7 +81,11 @@ end
 theory MinMax
 
   use import Real
-  clone export comparison.MinMax with type t = real, predicate ge = (>=)
+  clone export relations.MinMax with type t = real, predicate ge = (>=),
+    goal TotalOrder.Refl,
+    goal TotalOrder.Trans,
+    goal TotalOrder.Antisymm,
+    goal TotalOrder.Total
 
 end
 

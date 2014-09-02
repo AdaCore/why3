@@ -2,731 +2,731 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
-<prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
-<prover id="5" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
+<prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <file name="../maximum_subarray.mlw" expanded="true">
-<theory name="Spec" expanded="true">
+<theory name="Spec" sum="0b3189ea5a1ab15e2f33644d17c2de2d" expanded="true">
 </theory>
-<theory name="Algo1">
- <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray" sum="e886a1001305705320304ac74afca243">
+<theory name="Algo1" sum="01bcac4665a3ce970e57a972c17167a9">
+ <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter maximum_subarray.1" expl="1. postcondition" sum="41ce48645cd358152d863212f8db83d6">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.1" expl="1. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition" sum="c8f5d10b9a1769ef34022e149b1dbab3">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.3" expl="3. loop invariant init" sum="2745aea37eb6b0d106fe7d68681a5838">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.3" expl="3. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.4" expl="4. loop invariant init" sum="414bc5199067941b3a7d2e9ca3647646">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.4" expl="4. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.5" expl="5. loop invariant preservation" sum="04f4a5a22fe5cc0f292afc55cbd3ae16">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.5" expl="5. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.6" expl="6. loop invariant preservation" sum="b8eb1b80443020eb62f75be53e311341">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.6" expl="6. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.7" expl="7. loop invariant init" sum="b49ce984ab78c5750bb688c330632058">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
+  <goal name="WP_parameter maximum_subarray.7" expl="7. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.8" expl="8. loop invariant init" sum="cff5b3fa7b394381269bb6f3048de853">
+  <goal name="WP_parameter maximum_subarray.8" expl="8. loop invariant init">
   <transf name="inline_goal">
-   <goal name="WP_parameter maximum_subarray.8.1" expl="1. loop invariant init" sum="dc00f51df3c7d8f72c07e7154cfa7e5a">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter maximum_subarray.8.1" expl="1. loop invariant init">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maximum_subarray.9" expl="9. loop invariant init" sum="b44a868837992c6d731ae5ab177e81c3">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.9" expl="9. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.10" expl="10. assertion" sum="441ca9c54fd1e2af2e582f9c70320037">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.10" expl="10. assertion">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.11" expl="11. loop invariant preservation" sum="588fcfd4014d045d7605c6ada9cd66ec">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.11" expl="11. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.12" expl="12. loop invariant preservation" sum="bd099ddaf2be0fe09db635f4ed556134">
+  <goal name="WP_parameter maximum_subarray.12" expl="12. loop invariant preservation">
   <transf name="inline_goal">
-   <goal name="WP_parameter maximum_subarray.12.1" expl="1. loop invariant preservation" sum="b48b465204617016fe28f83b87f1e690">
+   <goal name="WP_parameter maximum_subarray.12.1" expl="1. loop invariant preservation">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter maximum_subarray.12.1.1" expl="1. loop invariant preservation" sum="b48b465204617016fe28f83b87f1e690">
-    <proof prover="1" timelimit="10"><result status="valid" time="0.05"/></proof>
+    <goal name="WP_parameter maximum_subarray.12.1.1" expl="1. loop invariant preservation">
+    <proof prover="2" timelimit="10"><result status="valid" time="0.05"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maximum_subarray.13" expl="13. loop invariant preservation" sum="328a146534b5a5997fb945387695b1fe">
+  <goal name="WP_parameter maximum_subarray.13" expl="13. loop invariant preservation">
   <transf name="inline_goal">
-   <goal name="WP_parameter maximum_subarray.13.1" expl="1. loop invariant preservation" sum="9a67a01a618556000ca9539a3d4daf68">
+   <goal name="WP_parameter maximum_subarray.13.1" expl="1. loop invariant preservation">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter maximum_subarray.13.1.1" expl="1. loop invariant preservation" sum="9a67a01a618556000ca9539a3d4daf68">
-    <proof prover="1" timelimit="10"><result status="valid" time="0.04"/></proof>
+    <goal name="WP_parameter maximum_subarray.13.1.1" expl="1. loop invariant preservation">
+    <proof prover="2" timelimit="10"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maximum_subarray.14" expl="14. loop invariant preservation" sum="51bd2b0fe844e9c4632cc7d5f0f0ead7">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.14" expl="14. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.15" expl="15. loop invariant preservation" sum="bedc5ab59c4b2b1f562633b38f25f39f">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.15" expl="15. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.16" expl="16. loop invariant preservation" sum="eb8769ac98f1f99a06740d9601625c27">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.16" expl="16. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.17" expl="17. loop invariant init" sum="22d4c366c94199bf4c59cf6c0d538c54">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.17" expl="17. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.18" expl="18. loop invariant init" sum="9b55ea90c65715901125a1f98c0ca21f">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.18" expl="18. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.19" expl="19. index in array bounds" sum="09e8acbd53d21beec25ae62281d3b156">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.19" expl="19. index in array bounds">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.20" expl="20. loop invariant preservation" sum="f77a155bf95432294b441c4bbcbd9060">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.20" expl="20. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.21" expl="21. loop invariant preservation" sum="567e2eb122a475424a0a4a93a4fd7be8">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.21" expl="21. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.22" expl="22. assertion" sum="8bd937538018333a6dd322fd40416f78">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.22" expl="22. assertion">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.23" expl="23. loop invariant preservation" sum="2e1659fc4ff212b62e889bbdca887a8c">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.23" expl="23. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.24" expl="24. loop invariant preservation" sum="917d753c01d10561b76f7dc5e6fb6dc4">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.24" expl="24. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.25" expl="25. loop invariant preservation" sum="20c5130905726aa1dfbf6634aa00c033">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.25" expl="25. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.26" expl="26. loop invariant preservation" sum="637ba15296ecfddc901f81eeb48af7bb">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.26" expl="26. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.27" expl="27. loop invariant preservation" sum="55ff401ab9ec7c1ed30b93a60b63f7a6">
+  <goal name="WP_parameter maximum_subarray.27" expl="27. loop invariant preservation">
   <transf name="inline_goal">
-   <goal name="WP_parameter maximum_subarray.27.1" expl="1. loop invariant preservation" sum="5e8f742dec0817544953e30cd64a65eb">
+   <goal name="WP_parameter maximum_subarray.27.1" expl="1. loop invariant preservation">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter maximum_subarray.27.1.1" expl="1. loop invariant preservation" sum="5e8f742dec0817544953e30cd64a65eb">
-    <proof prover="1" timelimit="10"><result status="valid" time="0.04"/></proof>
+    <goal name="WP_parameter maximum_subarray.27.1.1" expl="1. loop invariant preservation">
+    <proof prover="2" timelimit="10"><result status="valid" time="0.04"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maximum_subarray.28" expl="28. loop invariant preservation" sum="2efd7ca1e11d153a57666d753979fa13">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter maximum_subarray.28" expl="28. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.29" expl="29. loop invariant preservation" sum="e053c53e12967a54a809aa44e3603949">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter maximum_subarray.29" expl="29. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.30" expl="30. loop invariant preservation" sum="8f874f1cfb448047211ab5667aa0708a">
+  <goal name="WP_parameter maximum_subarray.30" expl="30. loop invariant preservation">
   <transf name="inline_goal">
-   <goal name="WP_parameter maximum_subarray.30.1" expl="1. loop invariant preservation" sum="f562acf8deec1a65119ad6c9bd30f41b">
+   <goal name="WP_parameter maximum_subarray.30.1" expl="1. loop invariant preservation">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter maximum_subarray.30.1.1" expl="1. loop invariant preservation" sum="f562acf8deec1a65119ad6c9bd30f41b">
-    <proof prover="1" timelimit="10"><result status="valid" time="1.83"/></proof>
+    <goal name="WP_parameter maximum_subarray.30.1.1" expl="1. loop invariant preservation">
+    <proof prover="2" timelimit="10"><result status="valid" time="1.83"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maximum_subarray.31" expl="31. postcondition" sum="489b7c0254ec9c642ea93a118b2c03b9">
+  <goal name="WP_parameter maximum_subarray.31" expl="31. postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter maximum_subarray.31.1" expl="1." sum="a6f28079e90529d014c7ac21a524278a">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter maximum_subarray.31.1" expl="1.">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter maximum_subarray.31.2" expl="2." sum="7f152fe09396a1d455c953290c645866">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
+   <goal name="WP_parameter maximum_subarray.31.2" expl="2.">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="WP_parameter maximum_subarray.31.3" expl="3." sum="bca3f309f43bf9839c9dead217c6f90e">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter maximum_subarray.31.3" expl="3.">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter maximum_subarray.31.4" expl="4." sum="977753cfc6b8228923ee8f3d5874a0b5">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.32" expl="32. postcondition" sum="3ffed200db464ba4a1756d56ab1e00e6">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Algo2">
- <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray" sum="a6c16a0401490c1bc33ba7cbf4b32fd9">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter maximum_subarray.1" expl="1. postcondition" sum="41ce48645cd358152d863212f8db83d6">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition" sum="c8f5d10b9a1769ef34022e149b1dbab3">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.3" expl="3. loop invariant init" sum="d93428425db2c2535a40bed1e0ae6ed0">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.4" expl="4. loop invariant init" sum="414bc5199067941b3a7d2e9ca3647646">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.5" expl="5. loop invariant preservation" sum="fe2cc739099c466628dbb945a1ba4d25">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.6" expl="6. loop invariant preservation" sum="90538eea5bd23f4859295e17c25b9991">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.7" expl="7. loop invariant init" sum="e055375112eb657d4bfb2d019151bfb9">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.8" expl="8. loop invariant init" sum="7c150b6bd7aa720b5e0064ecb86d1499">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.9" expl="9. loop invariant init" sum="751fd8bb7f0c2e78ccc9cdd06d87ea5d">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.10" expl="10. loop invariant init" sum="c1d446b76af17995c86e6469b3d11503">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.11" expl="11. index in array bounds" sum="97c6d23fb2017b2474bf0ec40bfbc616">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.12" expl="12. assertion" sum="87d99622100cfeca423878f2da44971f">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.13" expl="13. loop invariant preservation" sum="bece5985d85e49cb84c42e76cec3d16a">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.14" expl="14. loop invariant preservation" sum="b7e5800026ef6d10dfca7e48f78c4603">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.15" expl="15. loop invariant preservation" sum="85346c203792e9305442fb5fc9d8753b">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.16" expl="16. loop invariant preservation" sum="0e4ebee16a9f6be96af7b2042a42ebc9">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.17" expl="17. loop invariant preservation" sum="b813880dbf48ea37a4910ab2aa27a17b">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.18" expl="18. loop invariant preservation" sum="1ce17e2313648357c66ed2ce9a98ca13">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.19" expl="19. loop invariant preservation" sum="94d6de3f8e91ad74e83c33d9406316cd">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.20" expl="20. loop invariant preservation" sum="fa032620511d662071edc1b0b4453492">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.21" expl="21. loop invariant preservation" sum="bb68b32e5484248fba1bed348a488954">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.22" expl="22. loop invariant preservation" sum="12e6c8d44471e0b07144b6a16d6f7ddf">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.23" expl="23. postcondition" sum="2c7d21021978d1b1f01642dc9ebb4a85">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.24" expl="24. postcondition" sum="f786a0815bdba94649d62343d9f2ba35">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Algo3" expanded="true">
- <goal name="WP_parameter maximum_subarray_rec" expl="VC for maximum_subarray_rec" sum="7353308190ca08fbc4a1e24a3a07205c">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter maximum_subarray_rec.1" expl="1. postcondition" sum="ae96c9a2d2cf7e53b15b1cef240590db">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.2" expl="2. postcondition" sum="30f2bf8fff4c632720502e56871e8cef">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.3" expl="3. assertion" sum="f529ee18a8e19c68e6a07aec9edd0be1">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.4" expl="4. variant decrease" sum="0223abcc617e72664dbf617e2b67342a">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.5" expl="5. precondition" sum="4f2e89fb899a3da307810e8d42ddd73d">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.6" expl="6. variant decrease" sum="a197be1d8f4713fe9722a09cce6619e2">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.7" expl="7. precondition" sum="02dc9cd68a405807edec6233befc6e49">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.8" expl="8. postcondition" sum="ade655df053041c0c3adf0d18471cf9a">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.9" expl="9. postcondition" sum="88c8fba4c52521251e8b19e34140da45">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.10" expl="10. postcondition" sum="be0df2c551e901176a54c7812b141c00">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.11" expl="11. postcondition" sum="ffe03fd6ecd5be8000148e94fcb22858">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.12" expl="12. variant decrease" sum="a6fef56f2ba70f10010a72292a5473ee">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.13" expl="13. precondition" sum="27f62ba4adcb370f6f5e28ed1bef35f6">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.14" expl="14. postcondition" sum="aa767d93d86627efebb1fe100e24ea19">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.15" expl="15. postcondition" sum="a7e06b76c34598e322920b64e68ea3a0">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.16" expl="16. postcondition" sum="a6bc446a4b4d7c77711f0e3232f80146">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.17" expl="17. postcondition" sum="cde85ab564b6743f96738853200878bb">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.18" expl="18. loop invariant init" sum="f8220373e9bf6a5e93433438b92b50cb">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.19" expl="19. loop invariant init" sum="034afe7b31ac6b546c462ee50048665c">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.20" expl="20. loop invariant init" sum="8e1f578c5286d3328f7bc63835d0e864">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.21" expl="21. index in array bounds" sum="959f33c1826fd3aaf939092084d9ee75">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.22" expl="22. assertion" sum="65f473b376ff25375d64f1767792b785">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.23" expl="23. assertion" sum="d94c1e3cec9dfb0a2c477cb7b2b8dab4">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.24" expl="24. loop invariant preservation" sum="4902651d33c4ca4cf00ba29adf15e11c">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.25" expl="25. loop invariant preservation" sum="d2068bc0838220a10982c2bdb03139b3">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.26" expl="26. loop invariant preservation" sum="3adc6e61a7853e8fdae424c3bbf88f44">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter maximum_subarray_rec.26.1" expl="1. loop invariant preservation" sum="3adc6e61a7853e8fdae424c3bbf88f44">
-   <proof prover="1"><result status="valid" time="0.01"/></proof>
+   <goal name="WP_parameter maximum_subarray.31.4" expl="4.">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maximum_subarray_rec.27" expl="27. loop invariant preservation" sum="aade6da20e0ba2b0ff4de54551636683">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.28" expl="28. loop invariant preservation" sum="affd7ad7f6fc66c57e83968e412e7231">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.29" expl="29. loop invariant preservation" sum="7f76d07ea21322b08d399a5d8922a46c">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.30" expl="30. variant decrease" sum="4b8c70e013e3119eae6330d541712435">
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.31" expl="31. precondition" sum="b2997dff0f6f256dec5fbaa58f77d881">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.32" expl="32. variant decrease" sum="913c9d7af1bf4f273e345040086b32e0">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.33" expl="33. precondition" sum="41627a52f898b7d089eaac30c8b561d9">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.34" expl="34. postcondition" sum="f7adaff88bfeffc98e52ee294d01c4f2">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.35" expl="35. postcondition" sum="45d786a8be44429b18226ebd7268e14c">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.36" expl="36. postcondition" sum="24d4396cfaddc3f8d1e12c9f6263349c">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.37" expl="37. postcondition" sum="cab563c7030ed6ba5f525e9a65950c78">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.38" expl="38. variant decrease" sum="c070039f71a561ec0ca9e584c5bfb70f">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.39" expl="39. precondition" sum="7cdc8ab465b9f28032a8d0c00f49211f">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.40" expl="40. postcondition" sum="f6ba8d498bb895f478fe148be75a1a23">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.41" expl="41. postcondition" sum="aac243eb98e029df2e280a71f53a8f22">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.42" expl="42. postcondition" sum="0e9a3aef2536575118120863f3b730d6">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.43" expl="43. postcondition" sum="d4ce37d569116994268a7d9d7c6524ed">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.44" expl="44. loop invariant init" sum="579dddf65105629b3cc2da9e53441bef">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.45" expl="45. loop invariant init" sum="e03e9bd4f2657c50c48e27c89f105bf6">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.46" expl="46. loop invariant init" sum="a2b4d5f10a925ca58622d6f831cb5632">
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.47" expl="47. index in array bounds" sum="d5710608c8ce91685715b307f0b95190">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.48" expl="48. assertion" sum="26016d86c4dc9afe1ec06909675962de">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.49" expl="49. loop invariant preservation" sum="95697b062a20bcc68779715d72cb0534">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.50" expl="50. loop invariant preservation" sum="2f9a0f3be1347b05e4c33dc2f14e602e">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.51" expl="51. loop invariant preservation" sum="83812406c6204655f34d972ebd15e2b0">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.52" expl="52. loop invariant preservation" sum="cc7862ba2bafe5ad47ae4cdd873d2431">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.53" expl="53. loop invariant preservation" sum="6ca28eb05123c291b58247f072719f02">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.54" expl="54. loop invariant preservation" sum="651d63e499f061aff5051973e256c0e2">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.55" expl="55. assertion" sum="38ffaf60c38f6157c87e3d297473ce51">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.56" expl="56. variant decrease" sum="1f1abafa377cc6c3a5945dca8b7b9700">
-  <proof prover="1"><result status="valid" time="0.11"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.57" expl="57. precondition" sum="01e7812fcefd60f0be7d9fbfa28bf02a">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.58" expl="58. variant decrease" sum="63c3a7933154a9cc42e08856f1f08ddb">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.59" expl="59. precondition" sum="22a7e46eba087ff99f6face30fd59649">
-  <proof prover="1"><result status="valid" time="0.18"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.60" expl="60. postcondition" sum="35949f3a719985a9a1069c7c9a2a7f52">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.61" expl="61. postcondition" sum="82b626e77e7cbc1e78753b20d182d9c3">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.62" expl="62. postcondition" sum="76f055addaa120e15073bd75dca20aa2">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.63" expl="63. postcondition" sum="7367a29d695b2a43f2fe208d3cf4ecac">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.64" expl="64. variant decrease" sum="d5e8d8136d7803133ad14f6513f682c0">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.65" expl="65. precondition" sum="93627098c56b67ecd824bd63c971aafb">
-  <proof prover="1"><result status="valid" time="0.27"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.66" expl="66. postcondition" sum="221854daa534b6fd30f5dfe1ced01d73">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.67" expl="67. postcondition" sum="22440c0125536ec3412ee8ccf1e3c850">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.68" expl="68. postcondition" sum="4620e5a17d54a56b1d82aff631104782">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.69" expl="69. postcondition" sum="d9ea6cf9744960fe291a486dbf3aa769">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.70" expl="70. loop invariant init" sum="f301f9a1e7cc6ea42546464adeeaff16">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.71" expl="71. loop invariant init" sum="e4d1aef90b497dabe0661ded4c18182f">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.72" expl="72. loop invariant init" sum="9e97b992d6befa3e69fe373a390ae961">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.73" expl="73. index in array bounds" sum="950d688b56d8ed39f1e19ee7c78fd4e8">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.74" expl="74. assertion" sum="c39323c7a112636e310bac58b8f7881f">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.75" expl="75. assertion" sum="0a44c6fc0aa73c4f20a499b7001dabf5">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.76" expl="76. loop invariant preservation" sum="d8a028df078ff3dd6107d6cd19f02d23">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.77" expl="77. loop invariant preservation" sum="26f1d87f81de10c19a90de2341cd0f59">
-  <proof prover="5" edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_1.v"><result status="valid" time="1.48"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.78" expl="78. loop invariant preservation" sum="7a08d9ee1693c7afdf22897b1a2c394a">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.79" expl="79. loop invariant preservation" sum="bbeeca46e950b903f4ce245b362c4525">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.80" expl="80. loop invariant preservation" sum="6892fcc2f4897147ba5b6ec4c459119e">
-  <proof prover="5" edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_3.v"><result status="valid" time="1.51"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.81" expl="81. loop invariant preservation" sum="e351122f93a460eb0d42cf96e24f830c">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.82" expl="82. variant decrease" sum="eb051784c4c74f220bf678e182addc17">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.83" expl="83. precondition" sum="d0407c8ab18eeaf9c0883726d6e1307b">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.84" expl="84. variant decrease" sum="82a1c41d065fb16e577415cc1be8787e">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.85" expl="85. precondition" sum="cd33a7f2684491724661454f882a330a">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.86" expl="86. postcondition" sum="4dfddf7b83de75fc8676f313ee331da4">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.87" expl="87. postcondition" sum="24ab1e0b0bb5b7b120362909a71a2304">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.88" expl="88. postcondition" sum="c56ebeb1c3668f7201e2fd53a260b6de">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.89" expl="89. postcondition" sum="991dab53127567f949a287b5af9815e2">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.90" expl="90. variant decrease" sum="69666c0b864e2dde5972722bcee90321">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.91" expl="91. precondition" sum="ca9e34174ac4e32674536c489d476ce2">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.92" expl="92. postcondition" sum="33db71607be7c841167ce5a8ec9f1099">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.93" expl="93. postcondition" sum="cac4970cb06f7ea748b90bc9d870f165">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.94" expl="94. postcondition" sum="53a7e3fe20eb1ce9053cbb9cb55049fa">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray_rec.95" expl="95. postcondition" sum="b7fed4fde936bc23b54b68721f9de222">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray" sum="be98d23595b32dc7cf09f5d4b45e21f5">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter maximum_subarray.1" expl="1. precondition" sum="d5307ac5540366c705b313e1ff01bafe">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition" sum="33afd3660a939170538d2cb373404a4f">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.3" expl="3. postcondition" sum="bd0a24b98a313d7555b01b732695ac51">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.05"/></proof>
-  </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Algo4">
- <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray" sum="9df1c7cdc1ae4a8a95512b497be0fd06">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter maximum_subarray.1" expl="1. postcondition" sum="41ce48645cd358152d863212f8db83d6">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition" sum="c8f5d10b9a1769ef34022e149b1dbab3">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.3" expl="3. loop invariant init" sum="4915f5ed6c87bf699c67404a1888927a">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.4" expl="4. loop invariant init" sum="b4747f5c677e59ac0290ad3acd88d3a6">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.5" expl="5. loop invariant init" sum="55cc9716590ef6d780cd97fd09c20b26">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.6" expl="6. loop invariant init" sum="0a2f6b46cc8d90f837975e71ac0d80fc">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.7" expl="7. index in array bounds" sum="9aa87fea5398abd117b9dd748df9b5b9">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.8" expl="8. loop invariant preservation" sum="80c215484dc60af4881b2963bf7a92ed">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.9" expl="9. loop invariant preservation" sum="5be9909b21d93e5323ced07794a2a5bb">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.08"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.10" expl="10. loop invariant preservation" sum="aa7b1011b215eae515858c0b5ce65f6b">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.11" expl="11. loop invariant preservation" sum="9c8b83e23b4004f81d96bc7fa6eddf43">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.12" expl="12. loop invariant preservation" sum="f96c0757b68738602918b1466c84d5f6">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.13" expl="13. loop invariant preservation" sum="bfe4c973b46e3391698dac29b08b7231">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.14" expl="14. loop invariant preservation" sum="a01f6269771284441fab146fd6e40334">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.15" expl="15. loop invariant preservation" sum="500013786bf055f6bc555f7f6a13540a">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.16" expl="16. index in array bounds" sum="7df85305d416b8796439dbf83094ac93">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.17" expl="17. loop invariant preservation" sum="966fe4ad2b718e90d666e69c2824bdb5">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter maximum_subarray.17.1" expl="1." sum="97e08d6491522d90ddbacfc6c8eb31c9">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-   </goal>
-   <goal name="WP_parameter maximum_subarray.17.2" expl="2." sum="be052719a5485682c0cc8977d208089d">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="WP_parameter maximum_subarray.17.3" expl="3." sum="49d05b2a9306ff053d94d60c2af9d719">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="WP_parameter maximum_subarray.17.4" expl="4." sum="c03f6ec5e6434812a0c94213b7d127d2">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="WP_parameter maximum_subarray.17.5" expl="5." sum="bf75d5e9549808df80f96ef145e7cfab">
-   <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.18" expl="18. loop invariant preservation" sum="9777d668f04212aa34b30987b9132134">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.08"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.19" expl="19. loop invariant preservation" sum="bed973972f4901c508e050f8cd55fb0b">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.20" expl="20. loop invariant preservation" sum="dd16bec6d3659a51a473a5d172d5fe47">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.07"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.21" expl="21. loop invariant preservation" sum="7dbdde589adb9ae54adc33aa961ce64e">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.22" expl="22. loop invariant preservation" sum="f5386b99b02c2ff252f65ddbf46f181d">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.23" expl="23. loop invariant preservation" sum="1cde36f47ddf0d72cd0132ef186cad26">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.24" expl="24. loop invariant preservation" sum="954b654f0a05b86f776628f69ed8cdc7">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.25" expl="25. postcondition" sum="287aa3973cb660ebd65a7604df9b9640">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.26" expl="26. postcondition" sum="fe5f79587e917e874ff3a88373eb7bb3">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
-  </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Algo5">
- <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray" sum="1368d6bf62bf6a3f33f651f37735712c">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter maximum_subarray.1" expl="1. postcondition" sum="2b7d77a0a602eff80f2860e6d433b73a">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition" sum="0ab45c07dd37e08678dd01a5763b049d">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.32" expl="32. postcondition">
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.3" expl="3. loop invariant init" sum="b44c93a7027d6ec7840fb34284363d9a">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+ </transf>
+ </goal>
+</theory>
+<theory name="Algo2" sum="09a639f641fcf5d648651749bab00257">
+ <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter maximum_subarray.1" expl="1. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.4" expl="4. loop invariant init" sum="2889d98bdc304493d11fa90fd0038824">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.5" expl="5. loop invariant init" sum="9859ede453190d69825d083cea960da5">
+  <goal name="WP_parameter maximum_subarray.3" expl="3. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.4" expl="4. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.5" expl="5. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.6" expl="6. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.7" expl="7. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.8" expl="8. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.9" expl="9. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.10" expl="10. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.11" expl="11. index in array bounds">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.12" expl="12. assertion">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.13" expl="13. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.14" expl="14. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.15" expl="15. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.16" expl="16. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.17" expl="17. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.18" expl="18. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.19" expl="19. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.20" expl="20. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.21" expl="21. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.22" expl="22. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.23" expl="23. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.24" expl="24. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Algo3" sum="856cd48ef05a53c2f223145a5e62295b" expanded="true">
+ <goal name="WP_parameter maximum_subarray_rec" expl="VC for maximum_subarray_rec">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter maximum_subarray_rec.1" expl="1. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.2" expl="2. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.3" expl="3. assertion">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.4" expl="4. variant decrease">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.5" expl="5. precondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.6" expl="6. variant decrease">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.7" expl="7. precondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.8" expl="8. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.9" expl="9. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.10" expl="10. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.11" expl="11. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.12" expl="12. variant decrease">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.13" expl="13. precondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.14" expl="14. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.15" expl="15. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.16" expl="16. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.17" expl="17. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.18" expl="18. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.19" expl="19. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.20" expl="20. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.21" expl="21. index in array bounds">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.22" expl="22. assertion">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.23" expl="23. assertion">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.24" expl="24. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.25" expl="25. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.26" expl="26. loop invariant preservation">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter maximum_subarray_rec.26.1" expl="1. loop invariant preservation">
+   <proof prover="2"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.27" expl="27. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.28" expl="28. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.29" expl="29. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.30" expl="30. variant decrease">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.31" expl="31. precondition">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.32" expl="32. variant decrease">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.33" expl="33. precondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.34" expl="34. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.35" expl="35. postcondition">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.36" expl="36. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.37" expl="37. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.38" expl="38. variant decrease">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.39" expl="39. precondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.40" expl="40. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.41" expl="41. postcondition">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.42" expl="42. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.43" expl="43. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.44" expl="44. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.45" expl="45. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.46" expl="46. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.47" expl="47. index in array bounds">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.48" expl="48. assertion">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.49" expl="49. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.50" expl="50. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.51" expl="51. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.52" expl="52. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.53" expl="53. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.54" expl="54. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.55" expl="55. assertion">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.56" expl="56. variant decrease">
+  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.57" expl="57. precondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.58" expl="58. variant decrease">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.59" expl="59. precondition">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.60" expl="60. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.61" expl="61. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.62" expl="62. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.63" expl="63. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.64" expl="64. variant decrease">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.65" expl="65. precondition">
+  <proof prover="2"><result status="valid" time="0.27"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.66" expl="66. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.67" expl="67. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.68" expl="68. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.69" expl="69. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.70" expl="70. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.71" expl="71. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.72" expl="72. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.73" expl="73. index in array bounds">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.74" expl="74. assertion">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.75" expl="75. assertion">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.76" expl="76. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.77" expl="77. loop invariant preservation">
+  <proof prover="0" edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_1.v"><result status="valid" time="1.74"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.78" expl="78. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.79" expl="79. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.80" expl="80. loop invariant preservation">
+  <proof prover="0" edited="maximum_subarray_Algo3_WP_parameter_maximum_subarray_rec_3.v"><result status="valid" time="1.82"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.81" expl="81. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.82" expl="82. variant decrease">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.83" expl="83. precondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.84" expl="84. variant decrease">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.85" expl="85. precondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.86" expl="86. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.87" expl="87. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.88" expl="88. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.89" expl="89. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.90" expl="90. variant decrease">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.91" expl="91. precondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.92" expl="92. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.93" expl="93. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.94" expl="94. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray_rec.95" expl="95. postcondition">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter maximum_subarray.1" expl="1. precondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.3" expl="3. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.05"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Algo4" sum="a2e5db81cc2b46c7747164ade6612e4b">
+ <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter maximum_subarray.1" expl="1. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.3" expl="3. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.4" expl="4. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.5" expl="5. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.6" expl="6. loop invariant init">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.7" expl="7. index in array bounds">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.8" expl="8. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.9" expl="9. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.10" expl="10. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.11" expl="11. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.12" expl="12. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.13" expl="13. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.14" expl="14. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.15" expl="15. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.16" expl="16. index in array bounds">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.17" expl="17. loop invariant preservation">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter maximum_subarray.17.1" expl="1.">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
+   </goal>
+   <goal name="WP_parameter maximum_subarray.17.2" expl="2.">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter maximum_subarray.17.3" expl="3.">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter maximum_subarray.17.4" expl="4.">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter maximum_subarray.17.5" expl="5.">
+   <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.18" expl="18. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.19" expl="19. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.20" expl="20. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.21" expl="21. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.22" expl="22. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.23" expl="23. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.24" expl="24. loop invariant preservation">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.25" expl="25. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.26" expl="26. postcondition">
+  <proof prover="2" timelimit="10"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Algo5" sum="f1cb036564dea8824d2235ef28b3caf5">
+ <goal name="WP_parameter maximum_subarray" expl="VC for maximum_subarray">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter maximum_subarray.1" expl="1. postcondition">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.2" expl="2. postcondition">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.6" expl="6. loop invariant init" sum="2889d98bdc304493d11fa90fd0038824">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.3" expl="3. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.7" expl="7. index in array bounds" sum="7591633838a2ce9b770450d4dd9b1dbe">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <goal name="WP_parameter maximum_subarray.4" expl="4. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.8" expl="8. loop invariant preservation" sum="5fa85bf92d70f136323481a0ac8c6709">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter maximum_subarray.5" expl="5. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.9" expl="9. loop invariant preservation" sum="0f2710737f078fa531816a1042f9b804">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.6" expl="6. loop invariant init">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.10" expl="10. loop invariant preservation" sum="7ccb2dba57ba0c9e97bee15cd6f2c73d">
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <goal name="WP_parameter maximum_subarray.7" expl="7. index in array bounds">
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.11" expl="11. loop invariant preservation" sum="bca41060a58c15271d62337c92b4811a">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.8" expl="8. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.12" expl="12. loop invariant preservation" sum="3c0aea4e26a41f0c3be8836b1909a602">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter maximum_subarray.9" expl="9. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.13" expl="13. loop invariant preservation" sum="dd8f34257d9514ee27eba952d414fdae">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.10" expl="10. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.14" expl="14. loop invariant preservation" sum="7f459bc4b9712f74a4117f73985705a2">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter maximum_subarray.11" expl="11. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.15" expl="15. loop invariant preservation" sum="018ae768e99ca6dce3adedfb4dcafd03">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.12" expl="12. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.16" expl="16. loop invariant preservation" sum="ecb089ca328d54a01ab020a3ca2a9696">
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <goal name="WP_parameter maximum_subarray.13" expl="13. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.17" expl="17. loop invariant preservation" sum="a179ea1b4797bc899fea3a0a2c52ae0c">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.14" expl="14. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.18" expl="18. loop invariant preservation" sum="db5600d19ff337d95c8d65d2b5812f8a">
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <goal name="WP_parameter maximum_subarray.15" expl="15. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.19" expl="19. loop invariant preservation" sum="41e8d5f674ed800edb26918092b9b7e0">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.16" expl="16. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.20" expl="20. loop invariant preservation" sum="a778af44926a5d66b6aed8e048ea1fcf">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter maximum_subarray.17" expl="17. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.21" expl="21. loop invariant preservation" sum="b62cd0d96c613385a39a43afaebc21b9">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.18" expl="18. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.22" expl="22. loop invariant preservation" sum="ef15e04894d4e83aa4570e14f0301433">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter maximum_subarray.19" expl="19. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.23" expl="23. loop invariant preservation" sum="15000b6f0c0b22c5b7f7885dce51e369">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.20" expl="20. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.24" expl="24. postcondition" sum="e2679959be766db99e1480224f427c81">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.21" expl="21. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum_subarray.25" expl="25. postcondition" sum="6947fc3f886d3edf1f5a9461391eeff9">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter maximum_subarray.22" expl="22. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.23" expl="23. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.24" expl="24. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter maximum_subarray.25" expl="25. postcondition">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>

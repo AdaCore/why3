@@ -120,3 +120,19 @@ val add_invariant : module_uc -> itysymbol -> post -> module_uc
 (** {2 Builtin symbols} *)
 
 val xs_exit : xsymbol (* exception used to break the loops *)
+
+(** {2 WhyML language} *)
+
+open Env
+
+type mlw_file = modul Mstr.t * theory Mstr.t
+
+val mlw_language : mlw_file language
+
+exception ModuleNotFound of pathname * string
+exception ModuleOrTheoryNotFound of pathname * string
+
+type module_or_theory = Module of modul | Theory of theory
+
+val read_module : env -> pathname -> string -> modul
+val read_module_or_theory : env -> pathname -> string -> module_or_theory

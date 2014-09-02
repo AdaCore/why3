@@ -1,0 +1,19 @@
+
+module M
+
+  use import module ref.Ref
+
+  val x: ref int
+
+  let f () =
+     x := 1;
+     'L1:
+     x := 2;
+     'L2:
+     x := 3;
+     assert { (at !x 'L1) = 1 /\ (at !x 'L2) = 2 /\
+              (at (at !x 'L1) 'L2) = 1 /\
+              (at (at !x 'L2) 'L1) = 2 }
+
+end
+

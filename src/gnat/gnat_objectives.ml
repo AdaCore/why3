@@ -1,4 +1,3 @@
-open Why3session
 open Why3
 
 type key = int
@@ -451,13 +450,18 @@ let init () =
       (* either create a new session, or read an existing ession *)
       let session, is_new_session =
          if Sys.file_exists session_dir then
-            Session.read_session session_dir, false
+           let session, _ = Session.read_session session_dir in
+            session , false
          else
-           Session.create_session  session_dir, true in
+           Session.create_session session_dir, true in
       let env_session, (_:bool), (_:bool) =
          Session.update_session
-           ~keygen:Gnat_sched.Keygen.keygen
-           ~allow_obsolete:true
+           ~ctxt:{
+             Session.allow_obsolete_goals = true;
+             release_tasks = false;
+             use_shapes_for_pairing_sub_goals = true;
+             theory_is_fully_up_to_date = true;
+             keygen = Gnat_sched.Keygen.keygen }
            session
            Gnat_config.env
            Gnat_config.config in

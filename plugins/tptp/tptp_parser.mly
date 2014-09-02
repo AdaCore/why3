@@ -47,7 +47,7 @@ let () = Why3.Exn_printer.register (fun fmt exn -> match exn with
 
 /* keywords */
 
-%token ASSUMPTION AXIOM CNF CONJECTURE DEFINITION FOF
+%token ASSUMPTION AXIOM CNF CONJECTURE COROLLARY DEFINITION FOF
 %token HYPOTHESIS INCLUDE LEMMA NEGATED_CONJECTURE TFF
 %token THEOREM TYPE
 
@@ -96,6 +96,7 @@ role:
 | LEMMA               { Lemma }
 | THEOREM             { Theorem }
 | CONJECTURE          { Conjecture }
+| COROLLARY           { Corollary }
 | NEGATED_CONJECTURE  { Negated_conjecture }
 | TYPE                { Type }
 | LWORD               { raise (UnsupportedRole $1) }
@@ -186,25 +187,27 @@ arguments:
 ;
 
 formula_def:
-| BANG LEFTSQ varlist RIGHTSQ COLON formula_def_inner
+| BANG LEFTSQ varlist RIGHTSQ COLON formula_def
   { mk_e (Eqnt (Qforall,$3,$6)) }
 | formula_def_inner
   { $1 }
 ;
 
 term_def:
-| BANG LEFTSQ varlist RIGHTSQ COLON term_def_inner
+| BANG LEFTSQ varlist RIGHTSQ COLON term_def
   { mk_e (Eqnt (Qforall,$3,$6)) }
 | term_def_inner
   { $1 }
 ;
 
 formula_def_inner:
-| def_lhs LRARROW formula  { mk_e (Ebin (BOequ,$1,$3)) }
+| def_lhs LRARROW formula             { mk_e (Ebin (BOequ,$1,$3)) }
+| LEFTPAR formula_def_inner RIGHTPAR  { $2 }
 ;
 
 term_def_inner:
-| def_lhs EQUAL term       { mk_e (Eequ ($1,$3)) }
+| def_lhs EQUAL term              { mk_e (Eequ ($1,$3)) }
+| LEFTPAR term_def_inner RIGHTPAR { $2 }
 ;
 
 def_lhs:
@@ -242,11 +245,11 @@ top_type:
 | atomic_type      { [],([],$1) }
 | mapping_type     { [],$1 }
 | quantified_type  { $1 }
+| LEFTPAR top_type RIGHTPAR  { $2 }
 ;
 
 quantified_type:
 | PI LEFTSQ varlist RIGHTSQ COLON monotype  { $3,$6 }
-| LEFTPAR quantified_type RIGHTPAR          { $2 }
 ;
 
 monotype:
@@ -256,7 +259,6 @@ monotype:
 
 mapping_type:
 | unitary_type GT atomic_type    { $1,$3 }
-| LEFTPAR mapping_type RIGHTPAR  { $2 }
 ;
 
 unitary_type:
@@ -267,7 +269,6 @@ unitary_type:
 xprod_type:
 | atomic_type STAR atomic_type  { [$1;$3] }
 | xprod_type STAR atomic_type   { $1 @ [$3] }
-| LEFTPAR xprod_type RIGHTPAR   { $2 }
 ;
 
 /* atomic type */

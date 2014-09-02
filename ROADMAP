@@ -62,6 +62,7 @@
 * M1. preuve d'un petit compilateur, pas de pb de lieur,
    eventuellement outils pour les preuves par recurrence
    a la Leino, + fct size automatique
+  DONE (Stage M1 de Leon)
 
 * M2. Lieur en Why3, POPLmark challenge. vers
    un theorie et/ou un module réutilisable de lieurs
@@ -137,40 +138,78 @@ and no epsilon
 * detect editors
 *** check if coqide and also emacs/proof-general is installed
 
+* documentation des nouvelles features higher-order
 
+* eliminate_match:
+** faire un cas particulier pour "bool", le match pouvant se traduire
+   vers ite qui est supporté par pas mal de prouveurs
+** introduire des symboles _match non polymorphes differents pour
+   chaque instance necessaires. plutot qu'un seul symbole _match
+   polymorphe.
 
-==================== Roadmap for release 0.83 ========================
+==================== Roadmap for release 0.84 ========================
+
+== TODOs ==
+
+* verifier support des nouveaux prouveurs: Coq8.4pl4, Isabelle-2014,
+  CVC4 1.4, yices2 (quantifiers ?)  beagle ? driver TPTP TFA ? autres ?
+
+* completer le fichier CHANGES
+** nouvelle facon d'appeler les outils "why3 xxx ..." DONE
+** strategies de preuve, NO for next release only
+** transformation "compute_in_goal", DONE, but rewrite rules not documented
+** support de nouveaux prouveurs, DONE
+** nouvelle structure des fichiers de session et de shape (compatibilité), DONE
+** new examples ? BOF
+
+* ajouter dans les instructions de release ci-dessous la procedure de
+  fabrication du paquet opam DONE
 
 == New Features to announce ==
+
+Release Notes:
+
+A major visible change in this release is the way Why3 commands are
+invoked: instead of several executables why3, why3config, why3ide,
+why3replay, why3session, etc., there is only one Why3 executable
+called why3, and the former executables are available as commands given
+as first argument, e.g. "why3 config", "why3 ide", etc.
+
+Another quite visible change is that session files are split in two
+parts, as detailed below in the detailed changes.
 
 See CHANGES
 
 == Final preparation ==
 
-* inform Jerry James <loganjerry@gmail.com> so that he can test the
-  Fedora package
 * faire une passe sur le BTS
 * do "make update-coq" and "make", fix Coq realizations if needed
 * check that nightly bench is OK
 * check that "make xml-validate-local" is OK
   (see below : copy the dtd on the web)
-* put 0.84 in file Version
+* put 0.84 in file Version, and then run ./config.status
 * check/update the content of the About dialog in src/ide/gconfig.ml
   around lines 550-600
 * check headers
 * check the file CHANGES, add the release date
-* manual in PDF: check that macro \todo is commented out
-    in ./macros.tex, and then "make doc"
+* manual in PDF:
+** update the date in doc/manual.tex (near \whyversion{})
+** check that macro \todo is commented out in doc/macros.tex
+** and then "make doc"
   (check that manual in HTML is also generated, doc/html/index.html)
 * do "make dist"
 * test distrib/why3-0.84.tar.gz
+* put on the web page why3-0.84.tar.gz:
+  cp distrib/why3-0.84.tar.gz /users/www-perso/projets/why3/download
+* inform Jerry James <loganjerry@gmail.com> so that he can test the
+  Fedora package
 * install web page for why2 which includes an updated page for the
   quick migration guide. (sources are in CVS repository
-  ~filliatr/ARCHIVE/www/why). 
+  ~filliatr/ARCHIVE/www/why).
+* move distrib from Why3 site to Inria forge:
+** remove /users/www-perso/projets/why3/download/why3-0.84.tar.gz
+** upload distrib/why3-0.84.tar.gz to https://gforge.inria.fr/frs/?group_id=2990
 * put on the web page
- - why3-0.84.tar.gz
-   cp distrib/why3-0.84.tar.gz /users/www-perso/projets/why3/download
-
  - the manual in PDF
    cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.84.pdf
 
@@ -196,6 +235,7 @@ See CHANGES
 
  - update the main HTML page (sources are in repository why3-www)
    edit index.html
+   make (to check validity)
    make export
 
  - add links to extra resources like
@@ -205,8 +245,15 @@ See CHANGES
  - make everything writeable for the group
    chmod -R g+w /users/www-perso/projets/why3
 
+* prepare for the OPAM package
+
+. update opam/url: url and checksum of why-0.84.tar.gz
+   (use "md5sum distrib/why3-0.84.tar.gz")
+. update opam/descr if necessary
+. update opam/opam with correct dependencies and such
+
 * make a last commit:
- - git commit -m "release 0.84"
+ - git commit -am "release 0.84"
  - add tag 0.84 to the git repository, using
    git tag 0.84
  - do not forget to push it using
@@ -216,6 +263,46 @@ See CHANGES
 * add a new version to the bugtracker:
   https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
 
+
+* test the OPAM package
+
+  . with opam 1.2:
+    opam pin add why3 --kind=git <...>/why3/.git
+    (it runs "opam install why3")
+  . with opam < 1.2:
+
+    - first step: have a local copy of opam-repository if not done yet, e.g.:
+
+        git clone git@github.com:claudemarche/opam-repository.git
+        cd opam-repository/
+        git remote add opam https://github.com/ocaml/opam-repository.git
+
+      or, if you already have one, make sure it is up-to-date:
+
+        git pull --ff-only opam master
+
+    - second step: copy why3 opam files into it :
+
+      cd packages/why3
+      cp -r <source why3>/opam why3.0.84
+
+    - second step:
+
+      opam repository add local <...>/opam-repository
+      opam install why3
+      (* test it, e.g.
+         cp example/quicksort.mlw ~/tmp
+         why3 ide ~/tmp/quicksort.mlw *)
+      opam remove why3
+      opam repository remove local
+
+
+* make a pull request on OPAM
+
+  git add why3.0.84
+  commit et push
+  sur github: creer un pull request
+
 * produce the Why3 part of Toccata gallery
   -> add also a tar.gz and a ZIP file of it (this is done by doing
   "make gallery-files" in the sources of the Toccata web pages)
@@ -224,16 +311,6 @@ See CHANGES
 * The next commit : add +git to the version in file Version
 
 
-== TODOs ==
-
-* documentation des nouvelles features higher-order
-
-* eliminate_match:
-** faire un cas particulier pour "bool", le match pouvant se traduire
-   vers ite qui est supporté par pas mal de prouveurs
-** introduire des symboles _match non polymorphes differents pour
-   chaque instance necessaires. plutot qu'un seul symbole _match
-   polymorphe.
 
 ==================== Roadmap for release 0.83 ========================
 
@@ -1291,8 +1368,3 @@ The main new features of interest in the GUI are
 
 Any question, remark or bug report concerning only Why3 should be done
 using the Why3 public discussion list and bug tracker.
-
-
-
-
-

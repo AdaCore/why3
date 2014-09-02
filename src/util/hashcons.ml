@@ -24,6 +24,7 @@ module type S =
   sig
     type t
     val hashcons : t -> t
+    val unique : t -> t
     val iter : (t -> unit) -> unit
     val stats : unit -> int * int * int * int * int * int
   end
@@ -43,6 +44,11 @@ struct
     let o = WH.merge htable d in
     if o == d then incr next_tag;
     o
+
+  let unique d =
+    let d = H.tag !next_tag d in
+    incr next_tag;
+    d
 
   let iter f = WH.iter f htable
 

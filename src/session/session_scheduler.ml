@@ -10,12 +10,14 @@
 (********************************************************************)
 
 open Format
-open Why3
 open Session
 
 let debug = Debug.register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
          and@ transformation@ applications."
+
+let usleep t = ignore (Unix.select [] [] [] t)
+let default_delay_ms = 100 (* 0.1 seconds *)
 
 module Todo = struct
   type ('a,'b) todo =
@@ -63,52 +65,14 @@ module type OBSERVER = sig
 
   val notify : key any -> unit
 
-(*
-  val unknown_prover :
-    key env_session -> Whyconf.prover -> Whyconf.prover option
-
-  val replace_prover : key proof_attempt -> key proof_attempt -> bool
-*)
-
   val uninstalled_prover :
     key env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
 
 end
 
+
+
 module Make(O : OBSERVER) = struct
-
-let notify = O.notify
-
-let rec init_any any =
-  O.init (key_any any) any;
-  iter init_any any
-
-let init_session session = session_iter init_any session
-
-(***************************)
-(*     session state       *)
-(***************************)
-
-(* type prover_option = *)
-(*   | Detected_prover of prover_data *)
-(*   | Undetected_prover of string *)
-
-(* let prover_id p = match p with *)
-(*   | Detected_prover p -> p.prover_id *)
-(*   | Undetected_prover s -> s *)
-
-(* dead code
-let theory_name t = t.theory_name
-let theory_key t = t.theory_key
-let verified t = t.theory_verified
-let goals t = t.theory_goals
-let theory_expanded t = t.theory_expanded
-*)
-
-let running = function
-  | Scheduled | Running -> true
-  | Unedited | JustEdited | Interrupted
-  | Done _ | InternalFailure _ -> false
 
 (*************************)
 (*         Scheduler     *)
@@ -118,7 +82,6 @@ type action =
   | Action_proof_attempt of int * int * string option * bool * string *
       Driver.driver * (proof_attempt_status -> unit) * Task.task
   | Action_delayed of (unit -> unit)
-
 
 type timeout_action =
   | Check_prover of (proof_attempt_status -> unit) * Call_provers.prover_call
@@ -147,7 +110,7 @@ type t =
     }
 
 let set_maximum_running_proofs max sched =
- (** TODO dequeue actions if maximum_running_proofs increase *)
+  (* TODO dequeue actions if maximum_running_proofs increase *)
   sched.maximum_running_proofs <- max
 
 let init max =
@@ -161,6 +124,13 @@ let init max =
     timeout_handler_running = false;
     idle_handler_activated = false
   }
+
+let notify_timer_state t continue =
+  O.notify_timer_state
+    (Queue.length t.actions_queue)
+    (Queue.length t.proof_attempts_queue)
+    (List.length t.running_proofs);
+  continue
 
 (* timeout handler *)
 
@@ -208,19 +178,16 @@ let timeout_handler t =
           false
       | _ -> true
   in
-  O.notify_timer_state
-    (Queue.length t.actions_queue)
-    (Queue.length t.proof_attempts_queue) (List.length l);
   t.timeout_handler_activated <- continue;
   t.timeout_handler_running <- false;
-  continue
+  notify_timer_state t continue
 
 let run_timeout_handler t =
   if t.timeout_handler_activated then () else
     begin
       t.timeout_handler_activated <- true;
       Debug.dprintf debug "[Sched] Timeout handler started@.";
-      O.timeout ~ms:100 (fun () -> timeout_handler t)
+      O.timeout ~ms:default_delay_ms (fun () -> timeout_handler t)
     end
 
 let schedule_any_timeout t callback =
@@ -228,16 +195,19 @@ let schedule_any_timeout t callback =
   t.running_proofs <- (Any_timeout callback) :: t.running_proofs;
   run_timeout_handler t
 
+(* unused
 let schedule_check t callback =
   Debug.dprintf debug "[Sched] add a new check@.";
   t.running_check <- callback :: t.running_check;
   run_timeout_handler t
+*)
 
 (* idle handler *)
 
 let idle_handler t =
   try
-    if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then begin
+    if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then
+      begin
       match Queue.pop t.actions_queue with
         | Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
                                callback,goal) ->
@@ -250,24 +220,26 @@ let idle_handler t =
                 Queue.push (callback,pre_call) t.proof_attempts_queue;
                 run_timeout_handler t
               with e when not (Debug.test_flag Debug.stack_trace) ->
-                Format.eprintf "@[Exception raise in Session.idle_handler:@ \
-%a@.@]"
+                Format.eprintf
+                  "@[Exception raise in Session.idle_handler:@ %a@.@]"
                   Exn_printer.exn_printer e;
                 callback (InternalFailure e)
             end
         | Action_delayed callback -> callback ()
-    end else
-      ignore (Unix.select [] [] [] 0.1);
-    true
-  with Queue.Empty ->
-    t.idle_handler_activated <- false;
-    Debug.dprintf debug "[Sched] idle_handler stopped@.";
-    false
+    end
+    else
+      usleep (float default_delay_ms /. 1000.);
+    notify_timer_state t true
+  with
+    | Queue.Empty ->
+      t.idle_handler_activated <- false;
+      Debug.dprintf debug "[Sched] idle_handler stopped@.";
+      notify_timer_state t false
     | e when not (Debug.test_flag Debug.stack_trace) ->
       Format.eprintf "@[Exception raise in Session.idle_handler:@ %a@.@]"
         Exn_printer.exn_printer e;
       eprintf "Session.idle_handler stopped@.";
-      false
+      notify_timer_state t false
 
 
 let run_idle_handler t =
@@ -334,14 +306,29 @@ let schedule_delayed_action t callback =
   run_idle_handler t
 
 (**************************)
-(*  session function      *)
+(*  session functions     *)
 (**************************)
 
-let update_session ?release ~allow_obsolete old_session env whyconf  =
+let notify = O.notify
+
+let rec init_any any = O.init (key_any any) any; iter init_any any
+
+let init_session session = session_iter init_any session
+
+let update_session ~allow_obsolete ~release ~use_shapes
+    old_session env whyconf  =
   O.reset ();
+  let ctxt = {
+    allow_obsolete_goals = allow_obsolete;
+    release_tasks = release;
+    use_shapes_for_pairing_sub_goals = use_shapes;
+    theory_is_fully_up_to_date = false; (* dummy initialisation *)
+    keygen = O.create;
+  }
+  in
   let (env_session,_,_) as res =
-    update_session ?release
-      ~keygen:O.create ~allow_obsolete old_session env whyconf in
+    update_session ~ctxt old_session env whyconf
+  in
   Debug.dprintf debug "Init_session@\n";
   init_session env_session.session;
   res
@@ -356,18 +343,6 @@ let add_file env_session ?format f =
 (*****************************************************)
 (* method: run a given prover on each unproved goals *)
 (*****************************************************)
-(*
-let rec find_loadable_prover eS prover =
-  (** try the default one *)
-  match load_prover eS prover with
-    | None -> begin
-      (** If its not loadable ask for one*)
-      match O.unknown_prover eS prover with
-        | None -> None
-        | Some prover -> find_loadable_prover eS prover
-    end
-    | Some npc -> Some (prover,npc)
-*)
 
 let find_prover eS a =
   match load_prover eS a.proof_prover with
@@ -533,8 +508,14 @@ let run_external_proof_v2 eS eT a callback =
       end
     | _ -> ()
     end;
-    callback a ap timelimit previous state in
+    callback a ap timelimit previous state
+  in
   run_external_proof_v3 eS eT a callback
+
+let running = function
+  | Scheduled | Running -> true
+  | Unedited | JustEdited | Interrupted
+  | Done _ | InternalFailure _ -> false
 
 let run_external_proof_v2 eS eT a callback =
   (* Perhaps the test a.proof_archived should be done somewhere else *)
@@ -550,7 +531,8 @@ let run_external_proof eS eT ?callback a =
       | Starting -> ()
       | MissingProver -> c a Interrupted
       | MissingFile _ -> c a a.proof_state
-      | StatusChange s -> c a s in
+      | StatusChange s -> c a s
+  in
   run_external_proof_v2 eS eT a callback
 
 let prover_on_goal eS eT ?callback ~timelimit ~memlimit p g =
@@ -712,11 +694,6 @@ let check_external_proof eS eT todo a =
       Todo._done todo (g, ap, tl, r) in
   run_external_proof_v2 eS eT a callback
 
-(* dead code
-let check_goal_and_children eS eT todo g =
-  goal_iter_proof_attempt (check_external_proof eS eT todo) g
-*)
-
 let rec goal_iter_proof_attempt_with_release ~release f g =
   let iter g = goal_iter_proof_attempt_with_release ~release f g in
   PHprover.iter (fun _ a -> f a) g.goal_external_proofs;
@@ -855,32 +832,6 @@ let edit_proof_v3 eS sched ~default_editor callback a =
           *)
     ()
   | Some(_,npc,a) ->
-(*
-    let ap = a.proof_prover in
-    match find_loadable_prover eS a.proof_prover with
-      | None -> ()
-        (** Perhaps a new prover *)
-      | Some (nap,npc) ->
-          let g = a.proof_parent in
-          try
-            if nap == ap then raise Not_found;
-            let np_a = PHprover.find g.goal_external_proofs nap in
-            if O.replace_prover np_a a then begin
-              (** The notification will be done by the new proof_attempt *)
-              O.remove np_a.proof_key;
-              raise Not_found end
-          with Not_found ->
-          (** replace [a] by a new_proof attempt if [a.proof_prover] was not
-              loadable *)
-          let a = if nap == ap then a
-            else
-              let a = copy_external_proof
-                ~notify ~keygen:O.create ~prover:nap ~env_session:eS a in
-              O.init a.proof_key (Proof_attempt a);
-              a in
-          (** Now [a] is a proof_attempt of the lodable prover [nap] *)
-*)
-
     let editor =
       match npc.prover_config.Whyconf.editor with
       | "" -> default_editor
@@ -976,14 +927,77 @@ let rec clean = function
 let convert_unknown_prover =
   Session_tools.convert_unknown_prover ~keygen:O.create
 
+  open Strategy
+
+  let rec exec_strategy es sched pc strat g =
+    if pc < 0 || pc >= Array.length strat then
+      (* halt the strategy *)
+      ()
+    else
+      match Array.get strat pc with
+        | Icall_prover(p,timelimit,memlimit) ->
+          let callback _pa res =
+            match res with
+              | Scheduled | Running ->
+                (* nothing to do yet *)
+                ()
+              | Done { Call_provers.pr_answer = Call_provers.Valid } ->
+                (* proof succeeded, nothing more to do *)
+                ()
+              | Interrupted | InternalFailure _ | Done _ ->
+                (* proof did not succeed, goto to next step *)
+                let callback () = exec_strategy es sched (pc+1) strat g in
+                schedule_delayed_action sched callback
+              | Unedited | JustEdited ->
+                (* should not happen *)
+                assert false
+          in
+          prover_on_goal es sched ~callback ~timelimit ~memlimit p g
+        | Itransform(trname,pcsuccess) ->
+          let callback ntr =
+            match ntr with
+              | None -> (* transformation failed *)
+                let callback () = exec_strategy es sched (pc+1) strat g in
+                schedule_delayed_action sched callback
+              | Some tr ->
+                List.iter
+                  (fun g ->
+                    let callback () =
+                      exec_strategy es sched pcsuccess strat g
+                    in
+                    schedule_delayed_action sched callback
+                  )
+                tr.transf_goals
+          in
+          transform_goal es sched ~callback trname g
+        | Igoto pc ->
+          exec_strategy es sched pc strat g
+
+
+  let run_strategy_on_goal es sched strat g =
+    let callback () = exec_strategy es sched 0 strat g in
+    schedule_delayed_action sched callback
+
+
+  let run_strategy_on_goal_or_children ~context_unproved_goals_only
+      eS sched strat g =
+    goal_iter_leaf_goal ~unproved_only:context_unproved_goals_only
+      (run_strategy_on_goal eS sched strat) g
+
+  let rec run_strategy eS sched ~context_unproved_goals_only strat a =
+    match a with
+    | Goal g | Proof_attempt {proof_parent = g} ->
+      run_strategy_on_goal_or_children ~context_unproved_goals_only
+        eS sched strat g
+    | _ ->
+      iter (run_strategy ~context_unproved_goals_only eS sched strat) a
+
+
 end
 
 
 module Base_scheduler (X : sig end)  =
   (struct
-
-    let usleep t = ignore (Unix.select [] [] [] t)
-
 
     let idle_handler = ref None
     let timeout_handler = ref None

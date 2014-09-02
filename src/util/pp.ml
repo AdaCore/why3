@@ -166,9 +166,12 @@ let rec print_list_opt sep print fmt = function
       notempty1 || notempty2
 
 
-let string_of p x =
+let string_of ?max_boxes p x =
   let b = Buffer.create 100 in
   let fmt = formatter_of_buffer b in
+  Opt.iter (fun x ->
+    Format.pp_set_ellipsis_text fmt "...";
+    Format.pp_set_max_boxes fmt x) max_boxes;
   fprintf fmt "%a@?" p x;
   Buffer.contents b
 

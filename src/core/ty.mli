@@ -9,9 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Types *)
+
 open Ident
 
-(** Types *)
+(** {2 Type variables} *)
 
 type tvsymbol = private {
   tv_name : ident;
@@ -27,7 +29,9 @@ val tv_hash : tvsymbol -> int
 
 val create_tvsymbol : preid -> tvsymbol
 
-(* type symbols and types *)
+val tv_of_string : string -> tvsymbol
+
+(** {2 Type symbols and types} *)
 
 type tysymbol = private {
   ts_name : ident;
@@ -72,7 +76,8 @@ val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
 val ty_var : tvsymbol -> ty
 val ty_app : tysymbol -> ty list -> ty
 
-(** {3 generic traversal functions} *)
+(** {2 Generic traversal functions} *)
+
 (** traverse only one level of constructor, if you want full traversal
     you need to call those function inside your function *)
 val ty_map : (ty -> ty) -> ty -> ty
@@ -80,14 +85,16 @@ val ty_fold : ('a -> ty -> 'a) -> 'a -> ty -> 'a
 val ty_all : (ty -> bool) -> ty -> bool
 val ty_any : (ty -> bool) -> ty -> bool
 
-(** {3 variable-wise map/fold} *)
+(** {2 Variable-wise map/fold} *)
+
 (** visits every variable of the type *)
 val ty_v_map : (tvsymbol -> ty) -> ty -> ty
 val ty_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> ty -> 'a
 val ty_v_all : (tvsymbol -> bool) -> ty -> bool
 val ty_v_any : (tvsymbol -> bool) -> ty -> bool
 
-(** {3 symbol-wise map/fold} *)
+(** {2 Symbol-wise map/fold} *)
+
 (** visits every symbol of the type *)
 val ty_s_map : (tysymbol -> tysymbol) -> ty -> ty
 val ty_s_fold : ('a -> tysymbol -> 'a) -> 'a -> ty -> 'a
@@ -97,6 +104,11 @@ val ty_s_any : (tysymbol -> bool) -> ty -> bool
 exception TypeMismatch of ty * ty
 
 val ty_match : ty Mtv.t -> ty -> ty -> ty Mtv.t
+(** [ty_match sigma0 pat sub] returns a type substitution [sigma] such
+    that [sigma pat = sub]. Raises TypeMismatch if no substitution
+    exists.
+*)
+
 val ty_inst  : ty Mtv.t -> ty -> ty
 val ty_freevars : Stv.t -> ty -> Stv.t
 val ty_closed : ty -> bool

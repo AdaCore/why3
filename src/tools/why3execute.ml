@@ -20,10 +20,9 @@ let usage_msg = sprintf
 let opt_file = ref None
 let opt_exec = Queue.create ()
 
-let add_opt =
-  let rdot = Str.regexp "\\." in fun x ->
+let add_opt x =
   if !opt_file = None then opt_file := Some x else
-  match Str.split rdot x with
+  match Strings.split '.' x with
   | [m;i] -> Queue.push (m,i) opt_exec
   | _ ->
     Format.eprintf "extra arguments must be of the form 'module.ident'@.";
@@ -33,28 +32,24 @@ let opt_parser = ref None
 
 let option_list = [
   "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> Select input format (default: \"why\")";
+      "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
       " same as -F" ]
 
-let (env, config) =
-  Args.initialize option_list add_opt usage_msg
+let config, _, env =
+  Whyconf.Args.initialize option_list add_opt usage_msg
 
 let () =
-  if !opt_file = None then Args.exit_with_usage option_list usage_msg
+  if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
 
 let do_input f =
-  let fname, cin =
-    match f with
-    | "-" -> "stdin", stdin
-    | f   -> f, open_in f in
-  if not (!opt_parser = Some "whyml" || Filename.check_suffix fname ".mlw") then
-    begin
-      eprintf "Execution is available only for mlw files@.";
-      exit 1
-    end;
-  let lib = Mlw_main.library_of_env env in
-  let mm, _thm = Mlw_main.read_channel lib [] fname cin in
+  let format = !opt_parser in
+  let mm, _thm = match f with
+    | "-" ->
+        Env.read_channel Mlw_module.mlw_language ?format env "stdin" stdin
+    | file ->
+        Env.read_file Mlw_module.mlw_language ?format env file
+  in
   let do_exec (mid,name) =
     let m = try Mstr.find mid mm with Not_found ->
       eprintf "Module '%s' not found.@." mid;

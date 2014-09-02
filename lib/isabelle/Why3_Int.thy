@@ -68,25 +68,21 @@ section {* Minimum and Maximum *}
 
 why3_open "int/MinMax.xml"
 
-why3_vc Max_x using assms by simp
+why3_vc Max_r using assms by simp
 
-why3_vc Max_y using assms by simp
+why3_vc Max_comm by simp
 
-why3_vc Max_sym by simp
+why3_vc Max_assoc by simp
 
-why3_vc Max_is_ge by simp_all
+why3_vc Min_l using assms by simp
 
-why3_vc Max_is_some by auto
+why3_vc Min_comm by simp
 
-why3_vc Min_x using assms by simp
+why3_vc Min_assoc by simp
 
-why3_vc Min_y using assms by simp
+why3_vc max_def by auto
 
-why3_vc Min_sym by simp
-
-why3_vc Min_is_le by simp_all
-
-why3_vc Min_is_some by auto
+why3_vc min_def by auto
 
 why3_end
 
@@ -116,9 +112,9 @@ why3_vc Div_inf_neg
     zdiv_zminus1_eq_if div_pos_pos_trivial mod_pos_pos_trivial)
 
 why3_vc Div_mod
-  by (simp add: ediv_def emod_def mult_assoc [symmetric] abs_sgn)
+  by (simp add: ediv_def emod_def mult.assoc [symmetric] abs_sgn)
 
-why3_vc Div_mult using assms by (simp add: ediv_def add_commute)
+why3_vc Div_mult using assms by (simp add: ediv_def add.commute)
 
 why3_vc Div_bound
 proof -
@@ -153,7 +149,7 @@ why3_vc Mod_minus1_left
   using assms
   by (simp only: emod_def zmod_zminus1_eq_if) (simp add: mod_pos_pos_trivial)
 
-why3_vc Mod_mult using assms by (simp add: emod_def add_commute)
+why3_vc Mod_mult using assms by (simp add: emod_def add.commute)
 
 why3_vc Mod_bound using assms by (simp_all add: emod_def)
 
@@ -202,7 +198,7 @@ proof (cases "y = 0")
   case False
   with assms show ?thesis
     by (cases "z = 0")
-      (simp_all add: cdiv_def add_commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
+      (simp_all add: cdiv_def add.commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
 qed simp
 
 why3_vc Div_bound
@@ -232,7 +228,7 @@ proof (cases "y = 0")
   case False
   with assms show ?thesis
     by (cases "z = 0") (simp_all add: cmod_def
-      add_commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
+      add.commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
 qed simp
 
 why3_vc Mod_bound

@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Why3
-open Why3session
 open Why3session_lib
 open Format
 
@@ -32,7 +31,7 @@ let add_element s =
 let spec =
   ("-style",
    Arg.Set_int opt_style,
-   "<n> sets output style (1 or 2, default 1)") ::
+   "<n> set output style (1 or 2, default 1)") ::
   ("-o",
    Arg.Set_string opt_output_dir,
    "<dir> where to produce LaTeX files (default: session dir)") ::
@@ -426,15 +425,14 @@ let element_latex_stat_file f n table dir e =
 
 let element_latex_stat files n table dir e =
   eprintf "Element %s@." e;
-  let re_dot = Str.regexp "\\." in
-  match Str.split re_dot e with
+  match Strings.split '.' e with
     | [] -> ()
     | f :: r ->
       let found = ref false in
       S.PHstr.iter
         (fun fname file ->
           let fname = Filename.basename fname in
-          let fname = List.hd (Str.split re_dot fname) in
+          let fname = List.hd (Strings.split '.' fname) in
           if fname = f then
             begin
               found := true;
@@ -458,7 +456,7 @@ let table () = if !opt_longtable then "longtable" else "tabular"
 
 let run_one fname =
   let project_dir = Session.get_project_dir fname in
-  let session = Session.read_session project_dir in
+  let session,_use_shapes = Session.read_session project_dir in
   let dir = if !opt_output_dir = "" then project_dir else
       !opt_output_dir
   in
@@ -472,7 +470,7 @@ let run () =
 
 let cmd =
   { cmd_spec = spec;
-    cmd_desc = "output session in LaTeX format.";
+    cmd_desc = "output session in LaTeX format";
     cmd_name = "latex";
     cmd_run  = run;
   }

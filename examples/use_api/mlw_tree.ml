@@ -31,7 +31,7 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
 let int_theory : Theory.theory =
-  Env.find_theory env ["int"] "Int"
+  Env.read_theory env ["int"] "Int"
 
 let mul_int : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
@@ -40,11 +40,9 @@ let unit_type = Ty.ty_tuple []
 
 (* start a parsing *)
 
-let lib = Mlw_main.library_of_env env
-
 let pathname = [] (* dummy pathname *)
 
-let t : Ptree.incremental = Mlw_typing.open_file lib pathname
+let t : Ptree.incremental = Mlw_typing.open_file env pathname
 
 open Ptree
 

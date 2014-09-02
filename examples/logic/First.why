@@ -1,0 +1,13 @@
+theory First
+
+  type t
+  constant c : t
+  predicate a
+  predicate p t
+  predicate q t
+  function f (t) : t
+
+  goal P1 : (forall x:t. p(x)) -> (exists x:t. p(x))
+  goal P5 : (forall x:t. p(x) -> p(f(x))) -> forall x:t.p(x) -> p(f(f(x)))
+
+end

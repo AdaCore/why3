@@ -31,7 +31,7 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
 let int_theory : Theory.theory =
-  Env.find_theory env ["int"] "Int"
+  Env.read_theory env ["int"] "Int"
 
 let mul_int : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
@@ -96,10 +96,8 @@ declaration of
 
 (* import the ref.Ref module *)
 
-let ref_modules, ref_theories =
-  Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
-
-let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
+let ref_module : Mlw_module.modul =
+  Mlw_module.read_module env ["ref"] "Ref"
 
 let ref_type : Mlw_ty.T.itysymbol =
   Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]

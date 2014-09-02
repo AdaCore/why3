@@ -9,6 +9,3 @@
 (*                                                                  *)
 (********************************************************************)
 
-val read_channel : Mlw_module.modul Stdlib.Mstr.t Env.read_format
-
-val library_of_env : Env.env -> Mlw_module.modul Stdlib.Mstr.t Env.library

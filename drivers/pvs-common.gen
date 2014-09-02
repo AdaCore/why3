@@ -157,10 +157,12 @@ theory real.MinMax
   syntax function min "min(%1, %2)"
   syntax function max "max(%1, %2)"
 
-  remove prop Max_is_ge
-  remove prop Max_is_some
-  remove prop Min_is_le
-  remove prop Min_is_some
+  remove prop Max_r
+  remove prop Min_l
+  remove prop Max_comm
+  remove prop Min_comm
+  remove prop Max_assoc
+  remove prop Min_assoc
 end
 
 theory real.RealInfix

@@ -1,0 +1,105 @@
+theory Imp
+  use import state.State
+  use import bool.Bool
+  use import int.Int
+
+
+  (* ************************ SYNTAX ************************ *)
+  type aexpr =
+    | Anum int
+    | Avar id
+    | Aadd aexpr aexpr
+    | Asub aexpr aexpr
+    | Amul aexpr aexpr
+
+  type bexpr =
+    | Btrue
+    | Bfalse
+    | Band bexpr bexpr
+    | Bnot bexpr
+    | Beq aexpr aexpr
+    | Ble aexpr aexpr
+
+  type com =
+    | Cskip
+    | Cassign id aexpr
+    | Cseq com com
+    | Cif bexpr com com
+    | Cwhile bexpr com
+
+
+  (* ************************  SEMANTICS ************************ *)
+  function aeval  (st: state) (e: aexpr) : int =
+    match e with
+      | Anum n      -> n
+      | Avar x      -> st[x]
+      | Aadd e1 e2  -> aeval st e1 + aeval st e2
+      | Asub e1 e2  -> aeval st e1 - aeval st e2
+      | Amul e1 e2  -> aeval st e1 * aeval st e2
+
+    end
+
+  function beval (st : state) (b: bexpr) : bool =
+   match b with
+    | Btrue      -> True
+    | Bfalse     -> False
+    | Bnot b'    -> notb (beval st b')
+    | Band b1 b2 -> andb (beval st b1) (beval st b2)
+    | Beq a1 a2  ->
+       if (aeval st a1) = (aeval st a2) then True else False
+    | Ble a1 a2 ->
+       if (aeval st a1) <= (aeval st a2) then True else False
+   end
+
+ lemma inversion_beval_t :
+   forall a1 a2: aexpr, m: state.
+    beval m (Beq a1 a2) = True -> aeval m a1 = aeval m a2
+
+ lemma inversion_beval_f :
+   forall a1 a2: aexpr, m: state.
+    beval m (Beq a1 a2) = False -> aeval m a1 <> aeval m a2
+
+ inductive ceval state com state =
+     (* skip *)
+     | E_Skip :
+        forall m: state. ceval m Cskip m
+
+     (* assignement *)
+     | E_Ass  :
+        forall m: state, a: aexpr, n: int, x: id.
+         aeval m a = n ->
+          ceval m (Cassign x a) m[x <- n]
+
+     (* sequence *)
+     | E_Seq :
+        forall cmd1 cmd2: com, m0 m1 m2: state.
+         ceval m0 cmd1 m1 ->
+          ceval m1 cmd2 m2 ->
+           ceval m0 (Cseq cmd1 cmd2) m2
+
+     (* if then else *)
+     | E_IfTrue :
+        forall m0 m1: state, cond: bexpr, cmd1 cmd2: com.
+         beval m0 cond = True ->
+          ceval m0 cmd1 m1 ->
+           ceval m0 (Cif cond cmd1 cmd2) m1
+
+     | E_IfFalse :
+        forall m0 m1: state, cond: bexpr, cmd1 cmd2: com.
+         beval m0 cond = False ->
+          ceval m0 cmd2 m1 ->
+           ceval m0 (Cif cond cmd1 cmd2) m1
+
+     (* while *)
+     | E_WhileEnd :
+        forall cond: bexpr, m: state, body: com.
+         beval m cond = False ->
+          ceval m (Cwhile cond body) m
+
+     | E_WhileLoop :
+        forall mi mj mf: state, cond: bexpr, body: com.
+         beval mi cond = True  ->
+          ceval mi body mj ->
+           ceval mj (Cwhile cond body) mf ->
+            ceval mi (Cwhile cond body) mf
+end

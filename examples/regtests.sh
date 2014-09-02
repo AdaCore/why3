@@ -91,6 +91,7 @@ run_dir .
 run_dir foveoos11-cm
 run_dir hoare_logic
 run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
+run_dir avl "-L avl"
 echo ""
 
 echo "Summary       : $success/$total"

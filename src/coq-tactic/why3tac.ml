@@ -303,9 +303,9 @@ let print_dep fmt =
 (* the task under construction *)
 let task = ref None
 
-let th_int = lazy (Env.find_theory env ["int"] "Int")
-let th_eucl = lazy (Env.find_theory env ["int"] "EuclideanDivision")
-let th_real = lazy (Env.find_theory env ["real"] "Real")
+let th_int = lazy (Env.read_theory env ["int"] "Int")
+let th_eucl = lazy (Env.read_theory env ["int"] "EuclideanDivision")
+let th_real = lazy (Env.read_theory env ["real"] "Real")
 
 let why_constant_int dep s =
   task := Task.use_export !task (Lazy.force th_int);

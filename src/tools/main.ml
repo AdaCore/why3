@@ -18,122 +18,85 @@ let usage_msg = sprintf
   "Usage: %s [options] <command> [options]"
   (Filename.basename Sys.argv.(0))
 
-let version_msg = sprintf "Why3 platform, version %s (build date: %s)"
-  Config.version Config.builddate
-
-let opt_config = ref None
-let opt_extra = ref []
-let opt_loadpath = ref []
-
-let opt_print_libdir = ref false
-let opt_print_datadir = ref false
-
 let opt_list_transforms = ref false
 let opt_list_printers = ref false
 let opt_list_provers = ref false
 let opt_list_formats = ref false
 let opt_list_metas = ref false
 
-let opt_version = ref false
-
-let option_list = Arg.align [
-  "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> Read configuration from <file>";
-  "--config", Arg.String (fun s -> opt_config := Some s),
-      " same as -C";
-  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-      "<file> Read additional configuration from <file>";
-  "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> Add <dir> to the library search path";
-  "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      " same as -L";
+let option_list = [
   "--list-transforms", Arg.Set opt_list_transforms,
-      " List known transformations";
+      " list known transformations";
   "--list-printers", Arg.Set opt_list_printers,
-      " List known printers";
+      " list known printers";
   "--list-provers", Arg.Set opt_list_provers,
-      " List known provers";
+      " list known provers";
   "--list-formats", Arg.Set opt_list_formats,
-      " List known input formats";
+      " list known input formats";
   "--list-metas", Arg.Set opt_list_metas,
-      " List known metas";
-  Debug.Args.desc_debug_list;
-  Debug.Args.desc_debug_all;
-  Debug.Args.desc_debug;
-  "--print-libdir", Arg.Set opt_print_libdir,
-      " Print location of binary components (plugins, etc)";
-  "--print-datadir", Arg.Set opt_print_datadir,
-      " Print location of non-binary data (theories, modules, etc)";
-  "--version", Arg.Set opt_version,
-      " Print version information" ]
+      " list known metas";
+  "--print-libdir",
+      Arg.Unit (fun _ -> printf "%s@." Config.libdir; exit 0),
+      " print location of binary components (plugins, etc)";
+  "--print-datadir",
+      Arg.Unit (fun _ -> printf "%s@." Config.datadir; exit 0),
+      " print location of non-binary data (theories, modules, etc)";
+  "--version",
+      Arg.Unit (fun _ -> printf "Why3 platform, version %s (build date: %s)@."
+        Config.version Config.builddate; exit 0),
+      " print version information";
+]
 
-let command_path =
-  match Config.localdir with
+let command_path = match Config.localdir with
   | Some p -> Filename.concat p "bin"
   | None -> Filename.concat Config.libdir "commands"
+
+let extra_help fmt commands =
+  fprintf fmt "@\nAvailable commands:@.";
+  List.iter (fun (v,_) -> fprintf fmt "  %s@." v) commands
 
 let available_commands () =
   let commands = Sys.readdir command_path in
   Array.sort String.compare commands;
-  let re = Str.regexp "^why3\\([^.]*\\)\\([.].*\\)?" in
+  let re = Str.regexp "^why3\\([^.]+\\)\\([.].*\\)?" in
   let commands = Array.fold_left (fun acc v ->
     if Str.string_match re v 0 then
       let w = Str.matched_group 1 v in
       match acc with
+      | _ when w = "contraption" -> acc
       | (h,_)::_ when h = w -> acc
       | _ -> (w, v) :: acc
     else acc) [] commands in
   List.rev commands
 
 let command sscmd =
-  let (scmd,cmd) =
+  let cmd =
     let scmd = "why3" ^ sscmd in
     let cmd = Filename.concat command_path scmd in
-    if Sys.file_exists cmd then (scmd, cmd)
+    if cmd <> "" && cmd <> "contraption" && Sys.file_exists cmd
+    then cmd
     else begin
       let commands = available_commands () in
       let scmd =
-	try List.assoc sscmd commands
-	with Not_found ->
-	  printf "'%s' is not a why3 command.@\n@\nAvailable commands:@." cmd;
-	  List.iter (fun (v,_) -> eprintf "  %s@." v) commands;
-	  exit 1 in
-      let cmd = Filename.concat command_path scmd in
-      (scmd, cmd)
+        try List.assoc sscmd commands
+        with Not_found ->
+          eprintf "'%s' is not a Why3 command.@\n%a"
+            sscmd extra_help commands;
+          exit 1 in
+      Filename.concat command_path scmd
     end in
   let args = ref [] in
-  (match !opt_config with Some v -> args := v :: "-C" :: !args | None -> ());
-  List.iter (fun v -> args := v :: "-L" :: !args) (List.rev !opt_loadpath);
-  for i = !Arg.current + 1 to Array.length Sys.argv - 1 do
-    args := Sys.argv.(i) :: !args;
+  for i = 1 to Array.length Sys.argv - 1 do
+    if i <> !Arg.current then args := Sys.argv.(i) :: !args;
   done;
+  let scmd = "why3 " ^ sscmd in
   Unix.execv cmd (Array.of_list (scmd :: List.rev !args))
 
 let () = try
-  Arg.parse option_list command usage_msg;
+  let extra_help fmt () = extra_help fmt (available_commands ()) in
+  let config,_,_ = Args.initialize ~extra_help option_list command usage_msg in
 
-  if !opt_version then begin
-    printf "%s@." version_msg;
-    exit 0
-  end;
-  if !opt_print_libdir then begin
-    printf "%s@." Config.libdir;
-    exit 0
-  end;
-  if !opt_print_datadir then begin
-    printf "%s@." Config.datadir;
-    exit 0
-  end;
-
-  (** Configuration *)
-  let config = read_config !opt_config in
-  let config = List.fold_left merge_config config !opt_extra in
-  let main = get_main config in
-  Whyconf.load_plugins main;
-
-  Debug.Args.set_flags_selected ();
-
-  (** listings*)
+  (** listings *)
 
   let sort_pair (x,_) (y,_) = String.compare x y in
   let opt_list = ref false in
@@ -166,7 +129,7 @@ let () = try
     in
     printf "@[Known input formats:@\n  @[%a@]@]@."
       (Pp.print_list Pp.newline2 print)
-      (List.sort Pervasives.compare (Env.list_formats ()))
+      (List.sort Pervasives.compare (Env.list_formats Env.base_language))
   end;
   if !opt_list_provers then begin
     opt_list := true;
@@ -188,11 +151,9 @@ let () = try
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline2 print) (List.sort cmp (Theory.list_metas ()))
   end;
-  opt_list :=  Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
-  eprintf "%s@\n@\nAvailable commands:@." usage_msg;
-  List.iter (fun (v,_) -> eprintf "  %s@." v) (available_commands ())
+  printf "@[%s%a@]" usage_msg extra_help ()
 
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;

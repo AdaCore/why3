@@ -46,7 +46,7 @@ let rec read_lines () =
   if String.contains s '\n' then begin
     let s = Buffer.contents buf ^ s in
     Buffer.clear buf;
-    let l = Strings.rev_split s '\n' in
+    let l = Strings.rev_split '\n' s in
     match l with
     | [] -> assert false
     | [x] -> [x]
@@ -66,7 +66,7 @@ let bool_of_timeout_string s =
   if s = "1" then true else false
 
 let read_answer s =
-  let l = Strings.rev_split s ';' in
+  let l = Strings.rev_split ';' s in
   match l with
   | [ out_file ; timeout_s; time_s; exit_s; id ] ->
     { id = int_of_string id;

@@ -40,7 +40,8 @@ module MaxAndSum2
 
   let max_sum (a: array int) (n: int)
     requires { n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
-    ensures { let (s, m) = result in s = sum a 0 n /\ is_max a 0 n m /\ s <= n * m }
+    ensures  { let (s, m) = result in
+               s = sum a 0 n /\ is_max a 0 n m /\ s <= n * m }
   = let s = ref 0 in
     let m = ref 0 in
     for i = 0 to n - 1 do
