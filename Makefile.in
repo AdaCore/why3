@@ -1043,11 +1043,11 @@ install_no_local::
 install_local:: drivers/pvs-realizations.aux
 
 update-pvs: bin/why3realize.@OCAMLBEST@ drivers/pvs-realizations.aux
-	for f in $(PVSLIBS_INT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
-	for f in $(PVSLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T real.$$f -o lib/pvs/real/; done
-	for f in $(PVSLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T list.$$f -o lib/pvs/list/; done
-	for f in $(PVSLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T number.$$f -o lib/pvs/number/; done
-	for f in $(PVSLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -D drivers/pvs-realize.drv -T floating_point.$$f -o lib/pvs/floating_point/; done
+	for f in $(PVSLIBS_INT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/pvs-realize.drv -T int.$$f -o lib/pvs/int/; done
+	for f in $(PVSLIBS_REAL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/pvs-realize.drv -T real.$$f -o lib/pvs/real/; done
+	for f in $(PVSLIBS_LIST_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/pvs-realize.drv -T list.$$f -o lib/pvs/list/; done
+	for f in $(PVSLIBS_NUMBER_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/pvs-realize.drv -T number.$$f -o lib/pvs/number/; done
+	for f in $(PVSLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/pvs-realize.drv -T floating_point.$$f -o lib/pvs/floating_point/; done
 
 else
 
@@ -1116,23 +1116,22 @@ drivers/isabelle-realizations.aux: Makefile
 install_no_local::
 	cp -r lib/isabelle "$(LIBDIR)/why3"
 	cp drivers/isabelle-realizations.aux "$(DATADIR)/why3/drivers/"
-	@(d=`isabelle components -l | grep why3 | sed -e 's/^ *//' `; \
-	  if test "$$d" != "$(LIBDIR)/why3/isabelle"; then \
-	    echo "[Warning] Cannot pre-build the Isabelle heap because the"; \
-	    echo "  current Why3 path in Isabelle component configuration [$$d]"; \
-            echo "  is not the same as the current install dir [$(LIBDIR)/why3/isabelle]"; \
-	  else (isabelle build -bc Why3 ; true) \
+	@(if isabelle components -l | grep -q "$(LIBDIR)/why3/isabelle$$"; then \
+	    isabelle build -bc Why3; true; \
+	  else \
+	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \
+	    echo "  the Isabelle component configuration does not contain"; \
+            echo "  [$(LIBDIR)/why3/isabelle]"; \
 	  fi)
 
 install_local::
-	@(d=`isabelle components -l | grep why3 | sed -e 's/^ *//'`; \
-	  if test "$$d" != "`pwd`/lib/isabelle"; then \
-	    echo "[Warning] Cannot pre-build the Isabelle heap because the"; \
-	    echo "  current Why3 path in Isabelle component configuration [$$d]"; \
-            echo "  is not the same as the current install dir [`pwd`/lib/isabelle]"; \
-	  else (isabelle build -bc Why3 ; true)\
+	@(if isabelle components -l | grep -q "`pwd`/lib/isabelle$$"; then \
+	    isabelle build -bc Why3; true; \
+	  else \
+	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \
+	    echo "  the Isabelle component configuration does not contain"; \
+            echo "  [`pwd`/lib/isabelle]"; \
 	  fi)
-
 
 update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
 
