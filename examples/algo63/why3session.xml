@@ -7,7 +7,7 @@
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Vampire" version="0.6" timelimit="6" memlimit="1000"/>
 <file name="../algo63.mlw" expanded="true">
-<theory name="Algo63" sum="39524f328d620876c4043a001b22f3de" expanded="true">
+<theory name="Algo63" sum="b6665076843efa8c48db39e5c86d119a" expanded="true">
  <goal name="WP_parameter exchange" expl="VC for exchange">
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
@@ -491,36 +491,11 @@
   <goal name="WP_parameter partition.4" expl="4. postcondition">
   <proof prover="1"><result status="valid" time="1.92"/></proof>
   <metas>
-   <ts_pos name="real" arity="0" id="2"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="real"/>
-   </ts_pos>
-   <ts_pos name="bool" arity="0" id="3"
-    ip_theory="Bool">
-    <ip_library name="why3"/>
-    <ip_qualid name="bool"/>
-   </ts_pos>
-   <ts_pos name="tuple0" arity="0" id="20"
-    ip_theory="Tuple0">
-    <ip_library name="why3"/>
-    <ip_qualid name="tuple0"/>
-   </ts_pos>
-   <ts_pos name="unit" arity="0" id="21"
-    ip_theory="Unit">
-    <ip_library name="why3"/>
-    <ip_qualid name="unit"/>
-   </ts_pos>
    <ts_pos name="ref" arity="1" id="2336"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="ref"/>
    </ts_pos>
-   <ls_pos name="infix =" id="10"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="infix ="/>
-   </ls_pos>
    <ls_pos name="zero" id="288"
     ip_theory="Int">
     <ip_library name="int"/>
@@ -766,9 +741,6 @@
     <ip_qualid name="occ_pos"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="10"/>
-   </meta>
-   <meta name="remove_logic">
     <meta_arg_ls id="288"/>
    </meta>
    <meta name="remove_logic">
@@ -908,18 +880,6 @@
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="3001"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="2"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="3"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="20"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="21"/>
    </meta>
    <meta name="remove_type">
     <meta_arg_ts id="2336"/>

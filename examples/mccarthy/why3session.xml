@@ -2,47 +2,47 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
 <prover id="2" name="Z3" version="3.2" timelimit="10" memlimit="0"/>
 <prover id="3" name="veriT" version="201310" timelimit="5" memlimit="4000"/>
 <file name="../mccarthy.mlw" expanded="true">
-<theory name="McCarthy91" sum="07974fb6f44e79c82bfe8056427fd06c" expanded="true">
+<theory name="McCarthy91" sum="875f850351459a50e602fa45a657bea1" expanded="true">
  <goal name="WP_parameter f91" expl="VC for f91" expanded="true">
- <proof prover="0" timelimit="2"><result status="valid" time="0.00"/></proof>
- <proof prover="1" timelimit="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="0" timelimit="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="1" timelimit="2"><result status="valid" time="0.00"/></proof>
  <proof prover="2" timelimit="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="WP_parameter f91_nonrec" expl="VC for f91_nonrec" expanded="true">
  <transf name="split_goal" expanded="true">
   <goal name="WP_parameter f91_nonrec.1" expl="1. loop invariant init" expanded="true">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter f91_nonrec.2" expl="2. loop invariant preservation" expanded="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter f91_nonrec.3" expl="3. loop variant decrease" expanded="true">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter f91_nonrec.4" expl="4. loop invariant preservation" expanded="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.39"/></proof>
+  <proof prover="0"><result status="valid" time="0.24"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter f91_nonrec.5" expl="5. loop variant decrease" expanded="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>

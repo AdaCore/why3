@@ -7,7 +7,7 @@
 <prover id="2" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../priority_queue.mlw">
-<theory name="PQueue" sum="676f1bd969386fee8625cf44dbec8564">
+<theory name="PQueue" sum="43d94f2f459569d40d93b24723828ae5">
  <goal name="Trans">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -78,31 +78,6 @@
    </goal>
    <goal name="WP_parameter monoid_sum_is_min.2.3" expl="3. postcondition">
    <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="bool" arity="0" id="3"
-     ip_theory="Bool">
-     <ip_library name="why3"/>
-     <ip_qualid name="bool"/>
-    </ts_pos>
-    <ts_pos name="pred" arity="1" id="8"
-     ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_qualid name="pred"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
     <ts_pos name="split" arity="1" id="4666"
      ip_theory="SelectionTypes">
      <ip_library name="avl"/>
@@ -118,11 +93,6 @@
      <ip_library name="ref"/>
      <ip_qualid name="ref"/>
     </ts_pos>
-    <ts_pos name="tuple3" arity="3" id="7646"
-     ip_theory="Tuple3">
-     <ip_library name="why3"/>
-     <ip_qualid name="tuple3"/>
-    </ts_pos>
     <ts_pos name="t" arity="0" id="8490"
      ip_theory="PQueue">
      <ip_qualid name="M"/>
@@ -132,16 +102,6 @@
      ip_theory="PQueue">
      <ip_qualid name="selector"/>
     </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="infix @" id="15"
-     ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_qualid name="infix @"/>
-    </ls_pos>
     <ls_pos name="zero" id="454"
      ip_theory="Int">
      <ip_library name="int"/>
@@ -481,12 +441,6 @@
      <ip_qualid name="neutral"/>
     </pr_pos>
     <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="15"/>
-    </meta>
-    <meta name="remove_logic">
      <meta_arg_ls id="454"/>
     </meta>
     <meta name="remove_logic">
@@ -688,21 +642,6 @@
      <meta_arg_pr id="8626"/>
     </meta>
     <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="3"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="8"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
-    </meta>
-    <meta name="remove_type">
      <meta_arg_ts id="4666"/>
     </meta>
     <meta name="remove_type">
@@ -710,9 +649,6 @@
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="4739"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="7646"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="8490"/>
@@ -744,7 +680,7 @@
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter selected_is_min.1.2" expl="2. postcondition">
-   <proof prover="3"><result status="valid" time="1.73"/></proof>
+   <proof prover="3"><result status="valid" time="1.42"/></proof>
    </goal>
    <goal name="WP_parameter selected_is_min.1.3" expl="3. postcondition">
    <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -1152,31 +1088,6 @@
    </goal>
    <goal name="WP_parameter pop_min.3.4" expl="4.">
    <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="bool" arity="0" id="3"
-     ip_theory="Bool">
-     <ip_library name="why3"/>
-     <ip_qualid name="bool"/>
-    </ts_pos>
-    <ts_pos name="pred" arity="1" id="8"
-     ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_qualid name="pred"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="tuple2" arity="2" id="1170"
-     ip_theory="Tuple2">
-     <ip_library name="why3"/>
-     <ip_qualid name="tuple2"/>
-    </ts_pos>
     <ts_pos name="part_base" arity="1" id="4671"
      ip_theory="SelectionTypes">
      <ip_library name="avl"/>
@@ -1186,11 +1097,6 @@
      ip_theory="Ref">
      <ip_library name="ref"/>
      <ip_qualid name="ref"/>
-    </ts_pos>
-    <ts_pos name="tuple3" arity="3" id="7646"
-     ip_theory="Tuple3">
-     <ip_library name="why3"/>
-     <ip_qualid name="tuple3"/>
     </ts_pos>
     <ts_pos name="t" arity="0" id="8490"
      ip_theory="PQueue">
@@ -1215,16 +1121,6 @@
      ip_theory="PQueue">
      <ip_qualid name="t"/>
     </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="infix @" id="15"
-     ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_qualid name="infix @"/>
-    </ls_pos>
     <ls_pos name="zero" id="454"
      ip_theory="Int">
      <ip_library name="int"/>
@@ -1649,12 +1545,6 @@
      <ip_qualid name="correction"/>
     </pr_pos>
     <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="15"/>
-    </meta>
-    <meta name="remove_logic">
      <meta_arg_ls id="454"/>
     </meta>
     <meta name="remove_logic">
@@ -1907,28 +1797,10 @@
      <meta_arg_pr id="11433"/>
     </meta>
     <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="3"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="8"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="1170"/>
-    </meta>
-    <meta name="remove_type">
      <meta_arg_ts id="4671"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="4739"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="7646"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="8490"/>

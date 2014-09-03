@@ -7,12 +7,12 @@
 <prover id="2" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <file name="../linear_probing.mlw">
-<theory name="HashedTypeWithDummy" sum="99ef21e84daaa1b6e5e06500f9690e8b">
+<theory name="HashedTypeWithDummy" sum="d94d851b62db3a6f6e3894e0c5356598">
  <goal name="WP_parameter neq" expl="VC for neq">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="LinearProbing" sum="fb7fd8d4d0d8967dbe3362ca21561f71">
+<theory name="LinearProbing" sum="81e6c82eb9357b93e9234b6bd83e97d7">
  <goal name="bucket_bounds">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -46,26 +46,6 @@
   </goal>
   <goal name="WP_parameter numof_update.3" expl="3. postcondition">
   <metas>
-   <ts_pos name="real" arity="0" id="2"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="real"/>
-   </ts_pos>
-   <ts_pos name="bool" arity="0" id="3"
-    ip_theory="Bool">
-    <ip_library name="why3"/>
-    <ip_qualid name="bool"/>
-   </ts_pos>
-   <ts_pos name="tuple0" arity="0" id="20"
-    ip_theory="Tuple0">
-    <ip_library name="why3"/>
-    <ip_qualid name="tuple0"/>
-   </ts_pos>
-   <ts_pos name="unit" arity="0" id="21"
-    ip_theory="Unit">
-    <ip_library name="why3"/>
-    <ip_qualid name="unit"/>
-   </ts_pos>
    <ts_pos name="option" arity="1" id="3869"
     ip_theory="Option">
     <ip_library name="option"/>
@@ -86,11 +66,6 @@
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="param"/>
    </ts_pos>
-   <ls_pos name="infix =" id="10"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="infix ="/>
-   </ls_pos>
    <ls_pos name="zero" id="1690"
     ip_theory="Int">
     <ip_library name="int"/>
@@ -497,9 +472,6 @@
     <ip_qualid name="dummy_const"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="10"/>
-   </meta>
-   <meta name="remove_logic">
     <meta_arg_ls id="1690"/>
    </meta>
    <meta name="remove_logic">
@@ -740,18 +712,6 @@
     <meta_arg_pr id="7638"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="3"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="20"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="21"/>
-   </meta>
-   <meta name="remove_type">
     <meta_arg_ts id="3869"/>
    </meta>
    <meta name="remove_type">
@@ -862,21 +822,6 @@
   </goal>
   <goal name="WP_parameter find.12" expl="12. precondition">
   <metas>
-   <ts_pos name="real" arity="0" id="2"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="real"/>
-   </ts_pos>
-   <ts_pos name="tuple0" arity="0" id="20"
-    ip_theory="Tuple0">
-    <ip_library name="why3"/>
-    <ip_qualid name="tuple0"/>
-   </ts_pos>
-   <ts_pos name="unit" arity="0" id="21"
-    ip_theory="Unit">
-    <ip_library name="why3"/>
-    <ip_qualid name="unit"/>
-   </ts_pos>
    <ts_pos name="option" arity="1" id="3869"
     ip_theory="Option">
     <ip_library name="option"/>
@@ -901,11 +846,6 @@
     ip_theory="LinearProbing">
     <ip_qualid name="t"/>
    </ts_pos>
-   <ls_pos name="infix =" id="10"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="infix ="/>
-   </ls_pos>
    <ls_pos name="zero" id="1690"
     ip_theory="Int">
     <ip_library name="int"/>
@@ -1343,9 +1283,6 @@
     <ip_qualid name="dummy_const"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="10"/>
-   </meta>
-   <meta name="remove_logic">
     <meta_arg_ls id="1690"/>
    </meta>
    <meta name="remove_logic">
@@ -1604,15 +1541,6 @@
     <meta_arg_pr id="7638"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="20"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="21"/>
-   </meta>
-   <meta name="remove_type">
     <meta_arg_ts id="3869"/>
    </meta>
    <meta name="remove_type">
@@ -1853,21 +1781,6 @@
     </goal>
     <goal name="WP_parameter add.10.1.2" expl="2.">
     <metas>
-     <ts_pos name="real" arity="0" id="2"
-      ip_theory="BuiltIn">
-      <ip_library name="why3"/>
-      <ip_qualid name="real"/>
-     </ts_pos>
-     <ts_pos name="tuple0" arity="0" id="20"
-      ip_theory="Tuple0">
-      <ip_library name="why3"/>
-      <ip_qualid name="tuple0"/>
-     </ts_pos>
-     <ts_pos name="unit" arity="0" id="21"
-      ip_theory="Unit">
-      <ip_library name="why3"/>
-      <ip_qualid name="unit"/>
-     </ts_pos>
      <ts_pos name="option" arity="1" id="3869"
       ip_theory="Option">
       <ip_library name="option"/>
@@ -1892,11 +1805,6 @@
       ip_theory="LinearProbing">
       <ip_qualid name="t"/>
      </ts_pos>
-     <ls_pos name="infix =" id="10"
-      ip_theory="BuiltIn">
-      <ip_library name="why3"/>
-      <ip_qualid name="infix ="/>
-     </ls_pos>
      <ls_pos name="zero" id="1690"
       ip_theory="Int">
       <ip_library name="int"/>
@@ -2333,9 +2241,6 @@
       <ip_qualid name="dummy_const"/>
      </pr_pos>
      <meta name="remove_logic">
-      <meta_arg_ls id="10"/>
-     </meta>
-     <meta name="remove_logic">
       <meta_arg_ls id="1690"/>
      </meta>
      <meta name="remove_logic">
@@ -2594,15 +2499,6 @@
       <meta_arg_pr id="7638"/>
      </meta>
      <meta name="remove_type">
-      <meta_arg_ts id="2"/>
-     </meta>
-     <meta name="remove_type">
-      <meta_arg_ts id="20"/>
-     </meta>
-     <meta name="remove_type">
-      <meta_arg_ts id="21"/>
-     </meta>
-     <meta name="remove_type">
       <meta_arg_ts id="3869"/>
      </meta>
      <meta name="remove_type">
@@ -2662,21 +2558,6 @@
   </goal>
   <goal name="WP_parameter add.15" expl="15. type invariant">
   <metas>
-   <ts_pos name="real" arity="0" id="2"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="real"/>
-   </ts_pos>
-   <ts_pos name="tuple0" arity="0" id="20"
-    ip_theory="Tuple0">
-    <ip_library name="why3"/>
-    <ip_qualid name="tuple0"/>
-   </ts_pos>
-   <ts_pos name="unit" arity="0" id="21"
-    ip_theory="Unit">
-    <ip_library name="why3"/>
-    <ip_qualid name="unit"/>
-   </ts_pos>
    <ts_pos name="option" arity="1" id="3869"
     ip_theory="Option">
     <ip_library name="option"/>
@@ -2697,11 +2578,6 @@
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="param"/>
    </ts_pos>
-   <ls_pos name="infix =" id="10"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="infix ="/>
-   </ls_pos>
    <ls_pos name="zero" id="1690"
     ip_theory="Int">
     <ip_library name="int"/>
@@ -3119,9 +2995,6 @@
     <ip_qualid name="num_of_change_some"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="10"/>
-   </meta>
-   <meta name="remove_logic">
     <meta_arg_ls id="1690"/>
    </meta>
    <meta name="remove_logic">
@@ -3368,15 +3241,6 @@
     <meta_arg_pr id="7354"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="20"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="21"/>
-   </meta>
-   <meta name="remove_type">
     <meta_arg_ts id="3869"/>
    </meta>
    <meta name="remove_type">
@@ -3409,21 +3273,6 @@
   </goal>
   <goal name="WP_parameter copy.2" expl="2. type invariant">
   <metas>
-   <ts_pos name="real" arity="0" id="2"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="real"/>
-   </ts_pos>
-   <ts_pos name="tuple0" arity="0" id="20"
-    ip_theory="Tuple0">
-    <ip_library name="why3"/>
-    <ip_qualid name="tuple0"/>
-   </ts_pos>
-   <ts_pos name="unit" arity="0" id="21"
-    ip_theory="Unit">
-    <ip_library name="why3"/>
-    <ip_qualid name="unit"/>
-   </ts_pos>
    <ts_pos name="option" arity="1" id="3869"
     ip_theory="Option">
     <ip_library name="option"/>
@@ -3448,11 +3297,6 @@
     ip_theory="LinearProbing">
     <ip_qualid name="t"/>
    </ts_pos>
-   <ls_pos name="infix =" id="10"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="infix ="/>
-   </ls_pos>
    <ls_pos name="zero" id="1690"
     ip_theory="Int">
     <ip_library name="int"/>
@@ -3845,9 +3689,6 @@
     <ip_qualid name="dummy_const"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="10"/>
-   </meta>
-   <meta name="remove_logic">
     <meta_arg_ls id="1690"/>
    </meta>
    <meta name="remove_logic">
@@ -4079,15 +3920,6 @@
     <meta_arg_pr id="7638"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="20"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="21"/>
-   </meta>
-   <meta name="remove_type">
     <meta_arg_ts id="3869"/>
    </meta>
    <meta name="remove_type">
@@ -4149,21 +3981,6 @@
   <transf name="split_goal_wp">
    <goal name="WP_parameter find_dummy.10.1" expl="1. precondition">
    <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
     <ts_pos name="option" arity="1" id="3869"
      ip_theory="Option">
      <ip_library name="option"/>
@@ -4188,11 +4005,6 @@
      ip_theory="LinearProbing">
      <ip_qualid name="t"/>
     </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
     <ls_pos name="zero" id="1690"
      ip_theory="Int">
      <ip_library name="int"/>
@@ -4614,9 +4426,6 @@
      <ip_qualid name="dummy_const"/>
     </pr_pos>
     <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
      <meta_arg_ls id="1690"/>
     </meta>
     <meta name="remove_logic">
@@ -4864,15 +4673,6 @@
     </meta>
     <meta name="remove_prop">
      <meta_arg_pr id="7638"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="3869"/>
@@ -4900,21 +4700,6 @@
    </goal>
    <goal name="WP_parameter find_dummy.10.2" expl="2. precondition">
    <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
     <ts_pos name="option" arity="1" id="3869"
      ip_theory="Option">
      <ip_library name="option"/>
@@ -4939,11 +4724,6 @@
      ip_theory="LinearProbing">
      <ip_qualid name="t"/>
     </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
     <ls_pos name="zero" id="1690"
      ip_theory="Int">
      <ip_library name="int"/>
@@ -5365,9 +5145,6 @@
      <ip_qualid name="dummy_const"/>
     </pr_pos>
     <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
      <meta_arg_ls id="1690"/>
     </meta>
     <meta name="remove_logic">
@@ -5615,15 +5392,6 @@
     </meta>
     <meta name="remove_prop">
      <meta_arg_pr id="7638"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="3869"/>
@@ -5839,21 +5607,6 @@
   <transf name="split_goal_wp">
    <goal name="WP_parameter delete.38.1" expl="1. precondition">
    <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
     <ts_pos name="option" arity="1" id="3869"
      ip_theory="Option">
      <ip_library name="option"/>
@@ -5878,11 +5631,6 @@
      ip_theory="LinearProbing">
      <ip_qualid name="t"/>
     </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
     <ls_pos name="zero" id="1690"
      ip_theory="Int">
      <ip_library name="int"/>
@@ -6325,9 +6073,6 @@
      <ip_qualid name="dummy_const"/>
     </pr_pos>
     <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
      <meta_arg_ls id="1690"/>
     </meta>
     <meta name="remove_logic">
@@ -6587,15 +6332,6 @@
     </meta>
     <meta name="remove_prop">
      <meta_arg_pr id="7638"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="3869"/>
@@ -6623,21 +6359,6 @@
    </goal>
    <goal name="WP_parameter delete.38.2" expl="2. precondition">
    <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
     <ts_pos name="option" arity="1" id="3869"
      ip_theory="Option">
      <ip_library name="option"/>
@@ -6662,11 +6383,6 @@
      ip_theory="LinearProbing">
      <ip_qualid name="t"/>
     </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
     <ls_pos name="zero" id="1690"
      ip_theory="Int">
      <ip_library name="int"/>
@@ -7109,9 +6825,6 @@
      <ip_qualid name="dummy_const"/>
     </pr_pos>
     <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
      <meta_arg_ls id="1690"/>
     </meta>
     <meta name="remove_logic">
@@ -7371,15 +7084,6 @@
     </meta>
     <meta name="remove_prop">
      <meta_arg_pr id="7638"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="3869"/>
@@ -7420,21 +7124,6 @@
    </goal>
    <goal name="WP_parameter delete.39.4" expl="4. precondition">
    <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
     <ts_pos name="option" arity="1" id="3869"
      ip_theory="Option">
      <ip_library name="option"/>
@@ -7455,11 +7144,6 @@
      <ip_qualid name="NumOfDummy"/>
      <ip_qualid name="param"/>
     </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
     <ls_pos name="zero" id="1690"
      ip_theory="Int">
      <ip_library name="int"/>
@@ -7902,9 +7586,6 @@
      <ip_qualid name="dummy_const"/>
     </pr_pos>
     <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
      <meta_arg_ls id="1690"/>
     </meta>
     <meta name="remove_logic">
@@ -8164,15 +7845,6 @@
     </meta>
     <meta name="remove_prop">
      <meta_arg_pr id="7638"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="3869"/>
@@ -8281,21 +7953,6 @@
   </goal>
   <goal name="WP_parameter remove.11" expl="11. precondition">
   <metas>
-   <ts_pos name="real" arity="0" id="2"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="real"/>
-   </ts_pos>
-   <ts_pos name="tuple0" arity="0" id="20"
-    ip_theory="Tuple0">
-    <ip_library name="why3"/>
-    <ip_qualid name="tuple0"/>
-   </ts_pos>
-   <ts_pos name="unit" arity="0" id="21"
-    ip_theory="Unit">
-    <ip_library name="why3"/>
-    <ip_qualid name="unit"/>
-   </ts_pos>
    <ts_pos name="option" arity="1" id="3869"
     ip_theory="Option">
     <ip_library name="option"/>
@@ -8320,11 +7977,6 @@
     ip_theory="LinearProbing">
     <ip_qualid name="t"/>
    </ts_pos>
-   <ls_pos name="infix =" id="10"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="infix ="/>
-   </ls_pos>
    <ls_pos name="zero" id="1690"
     ip_theory="Int">
     <ip_library name="int"/>
@@ -8748,9 +8400,6 @@
     <ip_qualid name="dummy_const"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="10"/>
-   </meta>
-   <meta name="remove_logic">
     <meta_arg_ls id="1690"/>
    </meta>
    <meta name="remove_logic">
@@ -9000,15 +8649,6 @@
     <meta_arg_pr id="7638"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="20"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="21"/>
-   </meta>
-   <meta name="remove_type">
     <meta_arg_ts id="3869"/>
    </meta>
    <meta name="remove_type">
@@ -9061,21 +8701,6 @@
   </goal>
   <goal name="WP_parameter remove.21" expl="21. precondition">
   <metas>
-   <ts_pos name="real" arity="0" id="2"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="real"/>
-   </ts_pos>
-   <ts_pos name="tuple0" arity="0" id="20"
-    ip_theory="Tuple0">
-    <ip_library name="why3"/>
-    <ip_qualid name="tuple0"/>
-   </ts_pos>
-   <ts_pos name="unit" arity="0" id="21"
-    ip_theory="Unit">
-    <ip_library name="why3"/>
-    <ip_qualid name="unit"/>
-   </ts_pos>
    <ts_pos name="option" arity="1" id="3869"
     ip_theory="Option">
     <ip_library name="option"/>
@@ -9100,11 +8725,6 @@
     ip_theory="LinearProbing">
     <ip_qualid name="t"/>
    </ts_pos>
-   <ls_pos name="infix =" id="10"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="infix ="/>
-   </ls_pos>
    <ls_pos name="zero" id="1690"
     ip_theory="Int">
     <ip_library name="int"/>
@@ -9523,9 +9143,6 @@
     <ip_qualid name="dummy_const"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="10"/>
-   </meta>
-   <meta name="remove_logic">
     <meta_arg_ls id="1690"/>
    </meta>
    <meta name="remove_logic">
@@ -9770,15 +9387,6 @@
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="7638"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="2"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="20"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="21"/>
    </meta>
    <meta name="remove_type">
     <meta_arg_ts id="3869"/>
@@ -9806,21 +9414,6 @@
   </goal>
   <goal name="WP_parameter remove.22" expl="22. precondition">
   <metas>
-   <ts_pos name="real" arity="0" id="2"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="real"/>
-   </ts_pos>
-   <ts_pos name="tuple0" arity="0" id="20"
-    ip_theory="Tuple0">
-    <ip_library name="why3"/>
-    <ip_qualid name="tuple0"/>
-   </ts_pos>
-   <ts_pos name="unit" arity="0" id="21"
-    ip_theory="Unit">
-    <ip_library name="why3"/>
-    <ip_qualid name="unit"/>
-   </ts_pos>
    <ts_pos name="option" arity="1" id="3869"
     ip_theory="Option">
     <ip_library name="option"/>
@@ -9845,11 +9438,6 @@
     ip_theory="LinearProbing">
     <ip_qualid name="t"/>
    </ts_pos>
-   <ls_pos name="infix =" id="10"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="infix ="/>
-   </ls_pos>
    <ls_pos name="zero" id="1690"
     ip_theory="Int">
     <ip_library name="int"/>
@@ -10268,9 +9856,6 @@
     <ip_qualid name="dummy_const"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="10"/>
-   </meta>
-   <meta name="remove_logic">
     <meta_arg_ls id="1690"/>
    </meta>
    <meta name="remove_logic">
@@ -10515,15 +10100,6 @@
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="7638"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="2"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="20"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="21"/>
    </meta>
    <meta name="remove_type">
     <meta_arg_ts id="3869"/>

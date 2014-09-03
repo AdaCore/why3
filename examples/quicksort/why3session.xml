@@ -8,7 +8,7 @@
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../quicksort.mlw" expanded="true">
-<theory name="Quicksort" sum="81f799a9c67f725937f3a2309f75ed07">
+<theory name="Quicksort" sum="889e37625370dc554ed2032e41d5842a">
  <goal name="WP_parameter quick_rec" expl="VC for quick_rec">
  <transf name="split_goal_wp">
   <goal name="WP_parameter quick_rec.1" expl="1. index in array bounds">
@@ -188,7 +188,7 @@
      <proof prover="3"><result status="valid" time="3.55"/></proof>
      </goal>
      <goal name="WP_parameter quick_rec.37.1.1.3" expl="3.">
-     <proof prover="3" timelimit="30"><result status="valid" time="13.65"/></proof>
+     <proof prover="3" timelimit="30"><result status="valid" time="10.92"/></proof>
      </goal>
      <goal name="WP_parameter quick_rec.37.1.1.4" expl="4.">
      <proof prover="0"><result status="valid" time="0.10"/></proof>
@@ -220,17 +220,17 @@
  <proof prover="3" timelimit="5"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Shuffle" sum="3d962d75252938dec303f49b856b138e" expanded="true">
+<theory name="Shuffle" sum="6d66435cfe2ffe263d1074ead4f7d286" expanded="true">
  <goal name="WP_parameter shuffle" expl="VC for shuffle">
  <proof prover="3" timelimit="1"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
-<theory name="QuicksortWithShuffle" sum="2584d7f224cbf7b3fb9e30de0cab1fbb" expanded="true">
+<theory name="QuicksortWithShuffle" sum="196f755d83e88bbe4adf85235f88956b" expanded="true">
  <goal name="WP_parameter qs" expl="VC for qs" expanded="true">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="Quicksort3way" sum="37fbb3ebef7c8c36e21131ccd9a9ad49">
+<theory name="Quicksort3way" sum="f6cad4a26046c576b70cbac887b368fc">
  <goal name="WP_parameter quick_rec" expl="VC for quick_rec">
  <transf name="split_goal_wp">
   <goal name="WP_parameter quick_rec.1" expl="1. index in array bounds">
@@ -370,36 +370,11 @@
   </goal>
   <goal name="WP_parameter quick_rec.39" expl="39. assertion">
   <metas>
-   <ts_pos name="real" arity="0" id="2"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="real"/>
-   </ts_pos>
-   <ts_pos name="bool" arity="0" id="3"
-    ip_theory="Bool">
-    <ip_library name="why3"/>
-    <ip_qualid name="bool"/>
-   </ts_pos>
-   <ts_pos name="tuple0" arity="0" id="20"
-    ip_theory="Tuple0">
-    <ip_library name="why3"/>
-    <ip_qualid name="tuple0"/>
-   </ts_pos>
-   <ts_pos name="unit" arity="0" id="21"
-    ip_theory="Unit">
-    <ip_library name="why3"/>
-    <ip_qualid name="unit"/>
-   </ts_pos>
    <ts_pos name="ref" arity="1" id="2319"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="ref"/>
    </ts_pos>
-   <ls_pos name="infix =" id="10"
-    ip_theory="BuiltIn">
-    <ip_library name="why3"/>
-    <ip_qualid name="infix ="/>
-   </ls_pos>
    <ls_pos name="zero" id="271"
     ip_theory="Int">
     <ip_library name="int"/>
@@ -695,9 +670,6 @@
     <ip_qualid name="exchange_permut_all"/>
    </pr_pos>
    <meta name="remove_logic">
-    <meta_arg_ls id="10"/>
-   </meta>
-   <meta name="remove_logic">
     <meta_arg_ls id="271"/>
    </meta>
    <meta name="remove_logic">
@@ -869,18 +841,6 @@
     <meta_arg_pr id="3674"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="2"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="3"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="20"/>
-   </meta>
-   <meta name="remove_type">
-    <meta_arg_ts id="21"/>
-   </meta>
-   <meta name="remove_type">
     <meta_arg_ts id="2319"/>
    </meta>
    <goal name="WP_parameter quick_rec.39" expl="39. assertion">
@@ -916,7 +876,7 @@
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="7946bcb0c9bfce81c011b42681ca0df6">
+<theory name="Test" sum="73b11200d969672a16104801ee256d2b">
  <goal name="WP_parameter test1" expl="VC for test1">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>

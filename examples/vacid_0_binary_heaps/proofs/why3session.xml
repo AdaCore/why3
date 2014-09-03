@@ -18,7 +18,7 @@
 <prover id="13" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="14" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
 <file name="../heapsort.mlw">
-<theory name="HeapSort" sum="4b0dfacf40bb09dd83b887414641c46f">
+<theory name="HeapSort" sum="fcbe4872edb005820574ead08bf9a474">
  <goal name="Min_of_sorted">
  <proof prover="1" timelimit="3" edited="heapsort_WP_HeapSort_Min_of_sorted_1.v"><result status="valid" time="1.52"/></proof>
  </goal>
@@ -157,7 +157,7 @@
   </goal>
   <goal name="WP_parameter heapSort.19" expl="19. assertion">
   <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="13"><result status="valid" time="3.73"/></proof>
+  <proof prover="13"><result status="valid" time="2.56"/></proof>
   </goal>
   <goal name="WP_parameter heapSort.20" expl="20. loop invariant preservation">
   <transf name="split_goal">
@@ -196,7 +196,7 @@
 </theory>
 </file>
 <file name="../heap.why">
-<theory name="Heap" sum="1854c4b247db6efcc688add4a3e29844">
+<theory name="Heap" sum="9719b6f25863a4eef5e5faf07d11d392">
  <goal name="Parent_inf">
  <proof prover="4" timelimit="5" memlimit="0"><result status="valid" time="0.01"/></proof>
  <proof prover="6" timelimit="5" memlimit="0"><result status="valid" time="0.00"/></proof>
@@ -299,7 +299,7 @@
 </theory>
 </file>
 <file name="../bag_of_integers.why">
-<theory name="Bag_integers" sum="1e96544444c29fba2705b305514009ef">
+<theory name="Bag_integers" sum="928ac69731c83c6151c1d20195514b63">
  <goal name="Min_bag_union1">
  <proof prover="3" memlimit="0"><result status="valid" time="0.02"/></proof>
  <proof prover="4" timelimit="5" memlimit="0"><result status="valid" time="0.01"/></proof>
@@ -319,7 +319,7 @@
 </theory>
 </file>
 <file name="../test_harness.mlw">
-<theory name="TestHarness" sum="af2c442b6af6a010d4456e5d0af0f6fb">
+<theory name="TestHarness" sum="c7302209c09b13e9a279217858946704">
  <goal name="WP_parameter testHarness" expl="VC for testHarness">
  <transf name="split_goal">
   <goal name="WP_parameter testHarness.1" expl="1. array creation size">
@@ -328,7 +328,7 @@
   <proof prover="9" memlimit="0"><result status="valid" time="0.01"/></proof>
   <proof prover="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   <proof prover="12"><result status="valid" time="0.00"/></proof>
-  <proof prover="14" timelimit="13" memlimit="0"><result status="valid" time="1.90"/></proof>
+  <proof prover="14" timelimit="13" memlimit="0"><result status="valid" time="1.59"/></proof>
   </goal>
   <goal name="WP_parameter testHarness.2" expl="2. index in array bounds">
   <proof prover="4" memlimit="0"><result status="valid" time="0.02"/></proof>
@@ -394,7 +394,7 @@
 </theory>
 </file>
 <file name="../elements.why">
-<theory name="Elements" sum="f25884712568f9caa0566deb28532b7e">
+<theory name="Elements" sum="d09162db63fcf2cf900bb419d8d45e2e">
  <goal name="Elements_singleton">
  <proof prover="6" timelimit="5" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -427,7 +427,7 @@
 </theory>
 </file>
 <file name="../heap_implem.mlw">
-<theory name="Implementation" sum="5d6c99c43a48a77231c9efd8ac3939e3">
+<theory name="Implementation" sum="f06509e80a106a7bf720c337f6310f13">
  <goal name="Is_heap_min">
  <proof prover="1" edited="heap_implem_WP_Implementation_Is_heap_min_1.v"><result status="valid" time="1.23"/></proof>
  </goal>
@@ -996,11 +996,11 @@
 </theory>
 </file>
 <file name="../abstract_heap.mlw">
-<theory name="AbstractHeap" sum="207173b792cc7b09a941a86b0e56f2a3">
+<theory name="AbstractHeap" sum="d07094f9d320a437b51d4d0f3e61998a">
 </theory>
 </file>
 <file name="../heap_model.why">
-<theory name="Model" sum="ab495688ac411a6851230efc1647edf1">
+<theory name="Model" sum="095a564e7054cd3045ef986a6d42ebf2">
  <goal name="Model_empty">
  <proof prover="3" memlimit="0"><result status="valid" time="0.02"/></proof>
  <proof prover="4" timelimit="5" memlimit="0"><result status="valid" time="0.01"/></proof>

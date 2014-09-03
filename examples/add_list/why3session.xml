@@ -2,30 +2,30 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <file name="../add_list.mlw" expanded="true">
-<theory name="SumList" sum="3880e7768b9fbb987ee1c04cefb36cde">
+<theory name="SumList" sum="f3a2d317efe6eddf41eac0ece9e8d2e4">
 </theory>
-<theory name="AddListRec" sum="0e8ef89f2db251f08e2ead111b715f73" expanded="true">
+<theory name="AddListRec" sum="5643b575103f0531dc30435fcf1c0530" expanded="true">
  <goal name="WP_parameter sum" expl="VC for sum" expanded="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter main" expl="VC for main" expanded="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+<theory name="AddListImp" sum="147c5200701a0989a7074713bedae134" expanded="true">
+ <goal name="WP_parameter sum" expl="VC for sum" expanded="true">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter main" expl="VC for main" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
-</theory>
-<theory name="AddListImp" sum="e32a291b70f70653cf52bd57a896af4d" expanded="true">
- <goal name="WP_parameter sum" expl="VC for sum" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="WP_parameter main" expl="VC for main" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>

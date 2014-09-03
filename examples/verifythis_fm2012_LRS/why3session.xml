@@ -15,7 +15,7 @@
 <prover id="10" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
 <prover id="11" name="Vampire" version="0.6" timelimit="5" memlimit="4000"/>
 <file name="../verifythis_fm2012_LRS.mlw" expanded="true">
-<theory name="LCP" sum="52346277113d8a2b892a463e3b9f697d" expanded="true">
+<theory name="LCP" sum="2168b6fca45ab60255c4a6e5a796a2c0" expanded="true">
  <goal name="not_common_prefix_if_last_char_are_different">
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  <proof prover="5"><result status="valid" time="0.01"/></proof>
@@ -107,12 +107,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="LCP_test" sum="fd6486b4389874f9e00e0ac3d291708d">
+<theory name="LCP_test" sum="d995f43487f9366ee8911814f5323c11">
  <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="9"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="SuffixSort" sum="494f01982cbab34563901f8f03cfabb7" expanded="true">
+<theory name="SuffixSort" sum="de3179151797f030ee8d3852087a93fd" expanded="true">
  <goal name="WP_parameter compare" expl="VC for compare">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compare.1" expl="1. postcondition">
@@ -546,7 +546,7 @@
   </goal>
   <goal name="WP_parameter sort.15" expl="15. precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="2.62"/></proof>
+  <proof prover="2"><result status="valid" time="1.98"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.06"/></proof>
@@ -643,14 +643,14 @@
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
   <proof prover="6"><result status="valid" time="0.05"/></proof>
-  <proof prover="9"><result status="valid" time="2.16"/></proof>
+  <proof prover="9"><result status="valid" time="1.84"/></proof>
   </goal>
   <goal name="WP_parameter sort.24" expl="24. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="3.57"/></proof>
+  <proof prover="4"><result status="valid" time="3.00"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="9"><result status="valid" time="6.07"/></proof>
+  <proof prover="9"><result status="valid" time="4.80"/></proof>
   <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.25" expl="25. loop invariant preservation">
@@ -804,12 +804,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixSort_test" sum="4a7ab9c64c964d4d7e07a02fe8b48d66">
+<theory name="SuffixSort_test" sum="f75f4a9c3e609a8de76c4821e397faf6">
  <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="9" memlimit="1000"><result status="valid" time="2.69"/></proof>
  </goal>
 </theory>
-<theory name="SuffixArray" sum="d93c923c39b37542f0c58b5cd4ecc521" expanded="true">
+<theory name="SuffixArray" sum="d04ac7ddabc481c7e9abdb147f4ed544" expanded="true">
  <goal name="WP_parameter select" expl="VC for select">
  <proof prover="1"><result status="valid" time="0.03"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -1032,12 +1032,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixArray_test" sum="67ba9483186ae81969f2f1f445d03b92">
+<theory name="SuffixArray_test" sum="9b95fc6369fe469ab6f3e90304e0c763">
  <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="LRS" sum="ae80fb6a2c7f52b66c8f39dcb638a27b" expanded="true">
+<theory name="LRS" sum="f971013ed84743cd83987ebdd82dbadf" expanded="true">
  <goal name="lcp_sym">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -1344,12 +1344,12 @@
   <proof prover="11"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter lrs.27" expl="27. postcondition">
-  <proof prover="0" timelimit="5" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_12.v"><result status="valid" time="37.23"/></proof>
+  <proof prover="0" timelimit="5" edited="verifythis_fm2012_lcp_LRS_WP_parameter_lrs_12.v"><result status="valid" time="42.15"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="LRS_test" sum="8c9963f446ab408c8acdf131bda4b82f">
+<theory name="LRS_test" sum="46cf67bc7a4adfa6ba144b728e82003a">
  <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="9" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
