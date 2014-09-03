@@ -45,7 +45,7 @@ end
 theory MinMax
 
   use import Int
-  clone export relations.MinMax with type t = int, predicate ge = (>=),
+  clone export relations.MinMax with type t = int, predicate le = (<=),
     goal TotalOrder.Refl,
     goal TotalOrder.Trans,
     goal TotalOrder.Antisymm,

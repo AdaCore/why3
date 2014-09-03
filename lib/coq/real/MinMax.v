@@ -7,45 +7,51 @@ Require real.Real.
 Require Import Rbasic_fun.
 
 (* Why3 comment *)
-(* max is replaced with (Reals.Rbasic_fun.Rmax x x1) by the coq driver *)
+(* min is replaced with (Reals.Rbasic_fun.Rmin x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma max_def : forall (x:R) (y:R), ((y <= x)%R ->
-  ((Reals.Rbasic_fun.Rmax x y) = x)) /\ ((~ (y <= x)%R) ->
-  ((Reals.Rbasic_fun.Rmax x y) = y)).
+Lemma min_def : forall (x:R) (y:R), ((x <= y)%R ->
+  ((Reals.Rbasic_fun.Rmin x y) = x)) /\ ((~ (x <= y)%R) ->
+  ((Reals.Rbasic_fun.Rmin x y) = y)).
 Proof.
 intros x y.
 split ; intros H.
-now apply Rmax_left.
-apply Rmax_right.
+now apply Rmin_left.
+apply Rmin_right.
 now apply Rlt_le, Rnot_le_lt.
 Qed.
 
 (* Why3 comment *)
-(* min is replaced with (Reals.Rbasic_fun.Rmin x x1) by the coq driver *)
+(* max is replaced with (Reals.Rbasic_fun.Rmax x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma min_def : forall (x:R) (y:R), ((y <= x)%R ->
-  ((Reals.Rbasic_fun.Rmin x y) = y)) /\ ((~ (y <= x)%R) ->
-  ((Reals.Rbasic_fun.Rmin x y) = x)).
+Lemma max_def : forall (x:R) (y:R), ((x <= y)%R ->
+  ((Reals.Rbasic_fun.Rmax x y) = y)) /\ ((~ (x <= y)%R) ->
+  ((Reals.Rbasic_fun.Rmax x y) = x)).
 Proof.
 intros x y.
 split ; intros H.
-now apply Rmin_right.
-apply Rmin_left.
+now apply Rmax_right.
+apply Rmax_left.
 now apply Rlt_le, Rnot_le_lt.
 Qed.
 
 (* Why3 goal *)
-Lemma Max_r : forall (x:R) (y:R), (x <= y)%R ->
-  ((Reals.Rbasic_fun.Rmax x y) = y).
-exact Rmax_right.
+Lemma Min_r : forall (x:R) (y:R), (y <= x)%R ->
+  ((Reals.Rbasic_fun.Rmin x y) = y).
+exact Rmin_right.
 Qed.
 
 (* Why3 goal *)
-Lemma Min_l : forall (x:R) (y:R), (x <= y)%R ->
-  ((Reals.Rbasic_fun.Rmin x y) = x).
-exact Rmin_left.
+Lemma Max_l : forall (x:R) (y:R), (y <= x)%R ->
+  ((Reals.Rbasic_fun.Rmax x y) = x).
+exact Rmax_left.
+Qed.
+
+(* Why3 goal *)
+Lemma Min_comm : forall (x:R) (y:R),
+  ((Reals.Rbasic_fun.Rmin x y) = (Reals.Rbasic_fun.Rmin y x)).
+exact Rmin_comm.
 Qed.
 
 (* Why3 goal *)
@@ -55,9 +61,25 @@ exact Rmax_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Min_comm : forall (x:R) (y:R),
-  ((Reals.Rbasic_fun.Rmin x y) = (Reals.Rbasic_fun.Rmin y x)).
-exact Rmin_comm.
+Lemma Min_assoc : forall (x:R) (y:R) (z:R),
+  ((Reals.Rbasic_fun.Rmin (Reals.Rbasic_fun.Rmin x y) z) = (Reals.Rbasic_fun.Rmin x (Reals.Rbasic_fun.Rmin y z))).
+Proof.
+intros x y z.
+destruct (Rle_or_lt x y) as [Hxy|Hxy].
+rewrite Rmin_left with (1 := Hxy).
+destruct (Rle_or_lt x z) as [Hxz|Hxz].
+rewrite Rmin_left with (1 := Hxz).
+apply eq_sym, Rmin_left.
+now apply Rmin_case.
+rewrite (Rmin_right y z).
+reflexivity.
+apply Rlt_le.
+now apply Rlt_le_trans with x.
+rewrite (Rmin_right x y) by now apply Rlt_le.
+apply eq_sym, Rmin_right.
+apply Rlt_le.
+apply Rle_lt_trans with (2 := Hxy).
+apply Rmin_l.
 Qed.
 
 (* Why3 goal *)
@@ -83,32 +105,5 @@ rewrite Rmax_left.
 apply eq_sym, Rmax_left.
 apply Rmax_case ; now apply Rlt_le.
 now apply Rlt_le.
-Qed.
-
-Lemma Rmin_max_opp :
-  forall x y : R,
-  Rmin x y = Ropp (Rmax (-x) (-y)).
-Proof.
-intros x y.
-destruct (Rle_or_lt x y) as [H|H].
-rewrite Rmin_left, Rmax_left.
-apply eq_sym, Ropp_involutive.
-now apply Ropp_le_contravar.
-exact H.
-rewrite Rmin_right, Rmax_right.
-apply eq_sym, Ropp_involutive.
-now apply Ropp_le_contravar, Rlt_le.
-now apply Rlt_le.
-Qed.
-
-(* Why3 goal *)
-Lemma Min_assoc : forall (x:R) (y:R) (z:R),
-  ((Reals.Rbasic_fun.Rmin (Reals.Rbasic_fun.Rmin x y) z) = (Reals.Rbasic_fun.Rmin x (Reals.Rbasic_fun.Rmin y z))).
-Proof.
-intros x y z.
-rewrite !Rmin_max_opp.
-apply f_equal.
-rewrite !Ropp_involutive.
-apply Max_assoc.
 Qed.
 
