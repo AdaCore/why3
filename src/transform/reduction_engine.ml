@@ -221,9 +221,16 @@ let get_builtins env =
 
 type rule = Svs.t * term list * term
 
+type params =
+  { compute_defs : bool;
+    compute_builtin : bool;
+    compute_def_set : Term.Sls.t;
+  }
+
 type engine =
   { known_map : Decl.decl Ident.Mid.t;
     rules : rule list Mls.t;
+    params : params;
   }
 
 
@@ -561,23 +568,8 @@ and reduce_app engine st ls ty rem_cont =
     let args = List.map term_of_value args in
     try
       let d = Ident.Mid.find ls.ls_name engine.known_map in
-      match d.Decl.d_node with
-      | Decl.Dtype _ | Decl.Dprop _ -> assert false
-      | Decl.Dlogic dl ->
-        (* regular definition *)
-        let d = List.assq ls dl in
-        let vl,e = Decl.open_ls_defn d in
-        let add (mt,mv) x y =
-          Ty.ty_match mt x.vs_ty (t_type y), Mvs.add x y mv
-        in
-        let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl args in
-        let mt = Ty.oty_match mt e.t_ty ty in
-        let mv,e = t_subst_types mt mv e in
-        { value_stack = rem_st;
-          cont_stack = Keval(e,mv) :: rem_cont;
-        }
-      | Decl.Dparam _ | Decl.Dind _ ->
-        (* try a rewrite rule *)
+      let rewrite () =
+      (* try a rewrite rule *)
         begin
           try
 (*
@@ -622,7 +614,28 @@ and reduce_app engine st ls ty rem_cont =
             }
           with Irreducible ->
             raise Not_found
-        end
+        end in
+      match d.Decl.d_node with
+      | Decl.Dtype _ | Decl.Dprop _ -> assert false
+      | Decl.Dlogic dl ->
+        (* regular definition *)
+        let d = List.assq ls dl in
+        if engine.params.compute_defs ||
+           Term.Sls.mem ls engine.params.compute_def_set
+        then begin
+          let vl,e = Decl.open_ls_defn d in
+          let add (mt,mv) x y =
+            Ty.ty_match mt x.vs_ty (t_type y), Mvs.add x y mv
+          in
+          let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl args in
+          let mt = Ty.oty_match mt e.t_ty ty in
+          let mv,e = t_subst_types mt mv e in
+          { value_stack = rem_st;
+            cont_stack = Keval(e,mv) :: rem_cont;
+          }
+        end else rewrite ()
+      | Decl.Dparam _ | Decl.Dind _ ->
+        rewrite ()
       | Decl.Ddata dl ->
         (* constructor or projection *)
         match args with
@@ -821,10 +834,13 @@ let normalize ?(limit=1000) engine t0 =
 
 (* the rewrite engine *)
 
-let create env km =
-  get_builtins env;
+let create p env km =
+  if p.compute_builtin
+  then get_builtins env
+  else Hls.clear builtins;
   { known_map = km ;
     rules = Mls.empty;
+    params = p;
   }
 
 exception NotARewriteRule of string

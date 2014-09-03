@@ -76,7 +76,18 @@ terms are normalized with respect to
 type engine
 (** abstract type for reduction engines *)
 
-val create : Env.env -> Decl.decl Ident.Mid.t -> engine
+type params = {
+  compute_defs : bool;
+  compute_builtin : bool;
+  compute_def_set : Term.Sls.t;
+}
+(** Configuration of the engine.
+   . [compute_defs]: if set to true, automatically compute symbols using
+     known definitions. Otherwise, only symbols in [compute_def_set]
+     will be computed.
+   . [compute_builtin]: if set to true, compute builtin functions. *)
+
+val create : params -> Env.env -> Decl.decl Ident.Mid.t -> engine
 (** [create env known_map] creates a reduction engine with
     . builtins theories (int.Int, etc.) extracted from [env]
     . known declarations from [known_map]
