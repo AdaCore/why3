@@ -426,7 +426,7 @@ let rec reduce engine c =
     reduce_match st t1 tbl sigma rem
   | ([] | [_] | Int _ :: _ | Term _ :: Int _ :: _), Kbinop _ :: _ -> assert false
   | (Term t1) :: (Term t2) :: st, Kbinop op :: rem ->
-    { value_stack = Term (t_binary_simp op t1 t2) :: st;
+    { value_stack = Term (t_binary_simp op t2 t1) :: st;
       cont_stack = rem;
     }
   | [], Knot :: _ -> assert false
