@@ -39,7 +39,7 @@
 </theory>
 <theory name="TreeReconstruction" sum="0ed645a052b2d891a86e054761860165" expanded="true">
  <goal name="WP_parameter build_rec" expl="VC for build_rec">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter build_rec.1" expl="1. exceptional postcondition">
   <proof prover="3" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -51,7 +51,7 @@
   <proof prover="3" memlimit="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter build_rec.4" expl="4. variant decrease">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter build_rec.4.1" expl="1. variant decrease">
    <proof prover="3" memlimit="0"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -72,7 +72,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter build" expl="VC for build">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter build.1" expl="1. postcondition">
   <proof prover="3" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -87,7 +87,7 @@
 </theory>
 <theory name="Harness" sum="49e0c4ef2f1af23fccd87c289ddaea8a" expanded="true">
  <goal name="WP_parameter harness" expl="VC for harness">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter harness.1" expl="1. postcondition">
   <proof prover="1" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_3.v"><result status="valid" time="1.08"/></proof>
   </goal>
@@ -102,7 +102,7 @@
 </theory>
 <theory name="ZipperBasedTermination" sum="f12f04004a46b97e2b556b5d00601b46" expanded="true">
  <goal name="WP_parameter tc" expl="VC for tc">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter tc.1" expl="1. variant decrease">
   <proof prover="3" timelimit="20" memlimit="0"><result status="valid" time="0.05"/></proof>
   </goal>
@@ -135,12 +135,12 @@
  <proof prover="1" timelimit="20" edited="vstte12_tree_reconstruction_WP_ZipperBased_main_lemma_1.v"><result status="valid" time="1.31"/></proof>
  </goal>
  <goal name="WP_parameter tc" expl="VC for tc">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter tc.1" expl="1. variant decrease">
   <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter tc.2" expl="2. precondition">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter tc.2.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.11"/></proof>
    </goal>
@@ -162,7 +162,7 @@
   <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter tc.6" expl="6. precondition">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter tc.6.1" expl="1.">
    <proof prover="3" timelimit="20" memlimit="0"><result status="valid" time="0.37"/></proof>
    </goal>
@@ -195,7 +195,7 @@
   <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter tc.12" expl="12. precondition">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter tc.12.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.11"/></proof>
    </goal>
@@ -217,7 +217,7 @@
   <proof prover="8"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter tc.16" expl="16. precondition">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter tc.16.1" expl="1.">
    <proof prover="3" timelimit="32" memlimit="0"><result status="valid" time="0.52"/></proof>
    </goal>

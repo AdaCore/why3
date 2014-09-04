@@ -12,7 +12,7 @@
 <file name="../optimal_replay.mlw" expanded="true">
 <theory name="OptimalReplay" sum="1fdf083e4b86c6fb71d8b4ddbcd7acec" expanded="true">
  <goal name="WP_parameter distance" expl="VC for distance" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter distance.1" expl="1. array creation size">
   <proof prover="3" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -95,7 +95,7 @@
   <goal name="WP_parameter distance.25" expl="25. assertion" expanded="true">
   <transf name="inline_goal" expanded="true">
    <goal name="WP_parameter distance.25.1" expl="1. assertion" expanded="true">
-   <transf name="split_goal" expanded="true">
+   <transf name="split_goal_wp" expanded="true">
     <goal name="WP_parameter distance.25.1.1" expl="1. assertion">
     <proof prover="3" memlimit="0"><result status="valid" time="0.01"/></proof>
     </goal>

@@ -8,7 +8,7 @@
 </theory>
 <theory name="Enum" sum="0a3e9642f02e0cd10cda591905f051f0" expanded="true">
  <goal name="WP_parameter enum" expl="VC for enum" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter enum.1" expl="1. postcondition">
   <proof prover="0" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -48,7 +48,7 @@
  <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter add" expl="VC for add" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter add.1" expl="1. precondition">
   <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -56,7 +56,7 @@
   <proof prover="0" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter add.3" expl="3. postcondition" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter add.3.1" expl="1.">
    <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -82,7 +82,7 @@
 </theory>
 <theory name="Harness" sum="f9e582118df0edd8e6248eb3097491fa" expanded="true">
  <goal name="WP_parameter test" expl="VC for test" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter test.1" expl="1. assertion">
   <proof prover="0" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>

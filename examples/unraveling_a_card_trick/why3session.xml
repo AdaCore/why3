@@ -19,7 +19,7 @@
 </theory>
 <theory name="GilbreathCardTrick" sum="d3d9178c788a7f970144e634c7b597f7" expanded="true">
  <goal name="WP_parameter shuffle" expl="VC for shuffle">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter shuffle.1" expl="1. loop invariant init">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -179,12 +179,12 @@
  </transf>
  </goal>
  <goal name="WP_parameter card_trick" expl="VC for card_trick">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter card_trick.1" expl="1. assertion">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter card_trick.2" expl="2. postcondition">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter card_trick.2.1" expl="1.">
    <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -200,7 +200,7 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter card_trick.5" expl="5. loop invariant preservation">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter card_trick.5.1" expl="1.">
    <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.05"/></proof>
    </goal>
@@ -216,7 +216,7 @@
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter card_trick.7" expl="7. postcondition">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter card_trick.7.1" expl="1.">
    <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.04"/></proof>
    </goal>

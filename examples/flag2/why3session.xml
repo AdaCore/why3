@@ -46,7 +46,7 @@
  <proof prover="7"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="WP_parameter swap" expl="VC for swap" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter swap.1" expl="1. postcondition" expanded="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -62,7 +62,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter dutch_flag" expl="VC for dutch_flag" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter dutch_flag.1" expl="1. loop invariant init" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>

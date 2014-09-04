@@ -26,7 +26,7 @@
  <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter combine" expl="VC for combine" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter combine.1" expl="1. postcondition" expanded="true">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -50,7 +50,7 @@
   <proof prover="7"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter combine.8" expl="8. postcondition" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter combine.8.1" expl="1. postcondition" expanded="true">
    <proof prover="1" edited="generate_all_trees_WP_GenerateAllTrees_WP_parameter_combine_2.v"><result status="valid" time="1.15"/></proof>
    <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -74,7 +74,7 @@
   <proof prover="4"><result status="valid" time="0.24"/></proof>
   </goal>
   <goal name="WP_parameter combine.13" expl="13. postcondition" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter combine.13.1" expl="1. postcondition" expanded="true">
    <proof prover="5"><result status="valid" time="0.05"/></proof>
    </goal>
@@ -90,7 +90,7 @@
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter combine.16" expl="16. postcondition" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter combine.16.1" expl="1. postcondition" expanded="true">
    <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
@@ -102,7 +102,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter all_trees" expl="VC for all_trees" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter all_trees.1" expl="1. array creation size" expanded="true">
   <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>

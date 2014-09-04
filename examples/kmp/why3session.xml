@@ -41,7 +41,7 @@
  <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="WP_parameter initnext" expl="VC for initnext" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter initnext.1" expl="1. array creation size">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -176,7 +176,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter kmp" expl="VC for kmp">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter kmp.1" expl="1. precondition">
   <proof prover="2" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>

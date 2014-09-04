@@ -8,7 +8,7 @@
 <file name="../vstte12_two_way_sort.mlw">
 <theory name="TwoWaySort" sum="8a5bb32e1b1f7fc679259140decbd486">
  <goal name="WP_parameter two_way_sort" expl="VC for two_way_sort">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter two_way_sort.1" expl="1. loop invariant init">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -70,7 +70,7 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter two_way_sort.21" expl="21. loop invariant preservation">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter two_way_sort.21.1" expl="1. loop invariant preservation">
    <proof prover="1"><result status="valid" time="0.20"/></proof>
    </goal>

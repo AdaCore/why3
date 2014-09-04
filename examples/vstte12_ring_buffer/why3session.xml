@@ -17,14 +17,14 @@
  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="WP_parameter push" expl="VC for push">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter push.1" expl="1. index in array bounds">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter push.2" expl="2. type invariant">
   <transf name="inline_goal">
    <goal name="WP_parameter push.2.1" expl="1. type invariant">
-   <transf name="split_goal">
+   <transf name="split_goal_wp">
     <goal name="WP_parameter push.2.1.1" expl="1.">
     <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
     </goal>
@@ -62,7 +62,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter head" expl="VC for head">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter head.1" expl="1. index in array bounds">
   <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -72,7 +72,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter pop" expl="VC for pop">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter pop.1" expl="1. unreachable point">
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -80,7 +80,7 @@
   <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter pop.3" expl="3. type invariant">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter pop.3.1" expl="1.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
@@ -122,7 +122,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter pop.6" expl="6. type invariant">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter pop.6.1" expl="1.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
@@ -168,7 +168,7 @@
 </theory>
 <theory name="Harness" sum="205c29be88c5517a026e809085b61eb2">
  <goal name="WP_parameter harness" expl="VC for harness">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter harness.1" expl="1. precondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -203,7 +203,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter harness2" expl="VC for harness2">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter harness2.1" expl="1. precondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -267,7 +267,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter test" expl="VC for test">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter test.1" expl="1. precondition">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>

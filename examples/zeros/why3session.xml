@@ -8,7 +8,7 @@
 <file name="../zeros.mlw" expanded="true">
 <theory name="SetZeros" sum="f4c45d50dc695efc468f271f93bd04db" expanded="true">
  <goal name="WP_parameter set_zeros" expl="VC for set_zeros" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter set_zeros.1" expl="1. postcondition" expanded="true">
   <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -34,7 +34,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter harness" expl="VC for harness" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter harness.1" expl="1. array creation size" expanded="true">
   <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>

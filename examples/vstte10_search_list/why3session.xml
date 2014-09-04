@@ -28,7 +28,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="WP_parameter search_loop" expl="VC for search_loop" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter search_loop.1" expl="1. loop invariant init">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -45,7 +45,7 @@
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter search_loop.4" expl="4. loop invariant preservation">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter search_loop.4.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.01"/></proof>
    <proof prover="3"><result status="valid" time="0.02"/></proof>

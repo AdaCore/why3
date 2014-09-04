@@ -19,7 +19,7 @@
 </theory>
 <theory name="CountingSort" sum="865e6abe69816fef0093b6f9c8509aa7">
  <goal name="WP_parameter counting_sort" expl="VC for counting_sort">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter counting_sort.1" expl="1. array creation size">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -255,7 +255,7 @@
 </theory>
 <theory name="InPlaceCountingSort" sum="0f7e194423cc9d616e20bf0dab301e13">
  <goal name="WP_parameter in_place_counting_sort" expl="VC for in_place_counting_sort">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter in_place_counting_sort.1" expl="1. array creation size">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -492,7 +492,7 @@
 </theory>
 <theory name="Harness" sum="bb8ec9d065aa47c0593e7a58c0ea4eb8">
  <goal name="WP_parameter harness" expl="VC for harness">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter harness.1" expl="1. array creation size">
   <proof prover="3" timelimit="20"><result status="valid" time="0.02"/></proof>
   </goal>

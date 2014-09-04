@@ -9,7 +9,7 @@
 <file name="../find.mlw" expanded="true">
 <theory name="FIND" sum="4aa63090bb3fc7badaf802a8703db86c" expanded="true">
  <goal name="WP_parameter find" expl="VC for find" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter find.1" expl="1. loop invariant init">
   <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
@@ -32,7 +32,7 @@
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter find.8" expl="8. loop invariant preservation">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter find.8.1" expl="1.">
    <proof prover="1"><result status="valid" time="0.06"/></proof>
    <proof prover="2" memlimit="0"><result status="valid" time="0.05"/></proof>
@@ -56,7 +56,7 @@
   </goal>
   <goal name="WP_parameter find.11" expl="11. index in array bounds">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter find.11.1" expl="1.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -68,7 +68,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter find.12" expl="12. loop invariant preservation">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter find.12.1" expl="1.">
    <proof prover="1"><result status="valid" time="0.06"/></proof>
    </goal>
@@ -132,7 +132,7 @@
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter find.29" expl="29. loop invariant preservation">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter find.29.1" expl="1.">
    <proof prover="2" memlimit="0"><result status="valid" time="0.14"/></proof>
    </goal>
