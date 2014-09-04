@@ -308,8 +308,10 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     else
                       raise NoMatch
                 with Not_found ->
-                  loop (Ty.ty_match mt vs.vs_ty (t_type t2),
-                        Mvs.add vs t2 mv) r1 r2
+                  try 
+                    let ts = Ty.ty_match mt vs.vs_ty (t_type t2) in
+                    loop (ts,Mvs.add vs t2 mv) r1 r2
+                  with Ty.TypeMismatch _ -> raise NoMatch
               end
             | Tapp(ls1,args1) ->
               begin
