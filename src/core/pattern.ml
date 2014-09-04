@@ -40,16 +40,18 @@ let compile ~get_constructors ~mk_case ~mk_let tl rl =
         in
         (* map every constructor occurring at the head
          * of the pattern list to the list of its args *)
-        let types =
-          let rec populate acc p = match p.pat_node with
+        let types, cslist =
+          let rec populate (css,csl as acc) p = match p.pat_node with
             | Pwild | Pvar _ -> acc
             | Pas (p,_) -> populate acc p
             | Por (p,q) -> populate (populate acc p) q
-            | Papp (fs,pl) when is_constr fs -> Mls.add fs pl acc
+            | Papp (fs,pl) when is_constr fs ->
+                if Mls.mem fs css then acc else
+                Mls.add fs pl css, (fs,pl) :: csl
             | Papp (fs,_) -> raise (ConstructorExpected (fs,ty))
           in
           let populate acc (pl,_) = populate acc (List.hd pl) in
-          List.fold_left populate Mls.empty rl
+          List.fold_left populate (Mls.empty,[]) rl
         in
         (* dispatch every case to a primitive constructor/wild case *)
         let cases,wilds =
@@ -123,14 +125,14 @@ let compile ~get_constructors ~mk_case ~mk_let tl rl =
             let base = if no_wilds then []
               else [pat_wild ty, comp_wilds ()]
             in
-            let add cs ql acc =
+            let add acc (cs,ql) =
               let get_vs q = create_vsymbol (id_fresh "x") q.pat_ty in
               let vl = List.rev_map get_vs ql in
               let pl = List.rev_map pat_var vl in
               let al = List.rev_map t_var vl in
               (pat_app cs pl ty, comp_cases cs al) :: acc
             in
-            mk_case t (Mls.fold add types base)
+            mk_case t (List.fold_left add base cslist)
   in
   compile tl rl
 
