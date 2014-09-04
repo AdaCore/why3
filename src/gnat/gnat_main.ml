@@ -20,17 +20,24 @@
 open Why3
 open Term
 
-let search_labels =
-  (* fold over the term to find the explanation *)
-  let rec search_labels acc f =
-    let acc =
-      match Gnat_expl.extract_check f.t_label with
-      | Some e -> Some e
-      | _ -> acc
-    in
-    t_fold search_labels acc f
+let rec search_labels t =
+  let acc =
+   match t.t_node with
+   | Tbinop (Timplies,_, t) -> search_labels t
+   | Tlet (_,tb) | Teps tb ->
+         let _, t = t_open_bound tb in
+         search_labels t
+   | Tquant (_,tq) ->
+         let _,_,t = t_open_quant tq in
+         search_labels t
+   | Tnot t ->
+         search_labels t
+   | _ -> None
   in
-  search_labels None
+  match acc with
+  | None -> Gnat_expl.extract_check t.t_label
+  | Some _ -> acc
+
 let rec is_trivial fml =
    (* Check wether the formula is trivial.  *)
    match fml.t_node with
