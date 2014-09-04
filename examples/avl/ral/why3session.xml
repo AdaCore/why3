@@ -4,28 +4,28 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<file name="../ral.mlw">
-<theory name="RAL" sum="b85ea65c6b3b2e84fb0a259ea33ee2c5">
- <goal name="assoc">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+<file name="../ral.mlw" expanded="true">
+<theory name="RAL" sum="b85ea65c6b3b2e84fb0a259ea33ee2c5" expanded="true">
+ <goal name="M.assoc">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="neutral">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="M.neutral">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="assoc">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="M.M.assoc">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="neutral">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="M.M.neutral">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter zero" expl="VC for zero">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="M.WP_parameter zero" expl="VC for zero">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter op" expl="VC for op">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="M.WP_parameter op" expl="VC for op">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter measure" expl="VC for measure">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="D.WP_parameter measure" expl="VC for measure">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter sum_measure_is_length" expl="VC for sum_measure_is_length">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -33,35 +33,35 @@
  <goal name="WP_parameter selected_part" expl="VC for selected_part">
  <proof prover="1"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="assoc">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="Sel.M.assoc">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="neutral">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="Sel.M.neutral">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="sum_def_nil">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="Sel.M.sum_def_nil">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="sum_def_cons">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="Sel.M.sum_def_cons">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="balancing_positive">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="Sel.balancing_positive">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="selection_empty">
- <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <goal name="Sel.selection_empty">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  M zero" expl="VC for avl  AVL  M zero">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="Sel.WP_parameter avl  AVL  M zero" expl="VC for avl  AVL  M zero">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  M op" expl="VC for avl  AVL  M op">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="Sel.WP_parameter avl  AVL  M op" expl="VC for avl  AVL  M op">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  D measure" expl="VC for avl  AVL  D measure">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="Sel.WP_parameter avl  AVL  D measure" expl="VC for avl  AVL  D measure">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter avl  AVL  selected_part" expl="VC for avl  AVL  selected_part">
- <proof prover="1"><result status="valid" time="0.30"/></proof>
+ <goal name="Sel.WP_parameter avl  AVL  selected_part" expl="VC for avl  AVL  selected_part">
+ <proof prover="1" timelimit="3"><result status="valid" time="0.57"/></proof>
  </goal>
  <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="1"><result status="valid" time="0.02"/></proof>

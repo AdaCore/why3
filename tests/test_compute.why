@@ -1,4 +1,15 @@
 
+theory A
+
+  predicate p
+  predicate q
+
+  goal G1 : p /\ q
+  goal G2 : p -> q
+  goal G3 : p && q
+
+end
+
 theory Test
 
   goal g1: true

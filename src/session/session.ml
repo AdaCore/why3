@@ -491,7 +491,13 @@ exception NoTask
 let goal_task g = Opt.get_exn NoTask g.goal_task
 let goal_task_option g = g.goal_task
 
-let goal_expl g = Opt.get_def g.goal_name.Ident.id_string g.goal_expl
+let goal_expl g = 
+  match g.goal_expl with
+  | Some s -> s
+  | None -> 
+    try let _,_,l = restore_path g.goal_name in
+        String.concat "." l
+    with Not_found -> g.goal_name.Ident.id_string
 
 (************************)
 (* saving state on disk *)
@@ -564,25 +570,14 @@ let save_proof_attempt fmt ((id,tl,ml),a) =
   fprintf fmt "</proof>@]"
 
 let save_ident fmt id =
-  fprintf fmt "name=\"%a\"" save_string id.Ident.id_string;
-(* location info is useless, and takes a lot of place *)
-(*
-  match id.Ident.id_loc with
-    | None -> ()
-    | Some loc ->
-      let file,lnum,cnumb,cnume = Loc.get loc in
-      let file = Sysutil.relativize_filename !session_dir_for_save file in
-      fprintf fmt
-        "@ locfile=\"%a\"@ loclnum=\"%i\" loccnumb=\"%i\" loccnume=\"%i\""
-        save_string file lnum cnumb cnume
-*)
-  ()
-
-(*
-let save_label fmt s =
-  fprintf fmt "@\n@[<hov 1><label@ name=\"%a\"/>@]" save_string s.Ident.lab_string
-*)
-
+  let n=
+    try
+      let (_,_,l) = Theory.restore_path id in
+      String.concat "." l
+    with Not_found -> id.Ident.id_string
+  in
+  fprintf fmt "name=\"%a\"" save_string n
+  
 module Compr = Compress.Compress_z
 
 type save_ctxt = {
@@ -2364,8 +2359,13 @@ let merge_theory ~ctxt ~theories env from_th to_th =
   List.iter
     (fun to_goal ->
       try
-        let from_goal =
-          Mstr.find to_goal.goal_name.Ident.id_string from_goals in
+        let to_goal_name = 
+          try 
+            let (_,_,l) = restore_path to_goal.goal_name
+            in String.concat "." l
+          with Not_found -> to_goal.goal_name.Ident.id_string
+        in
+        let from_goal = Mstr.find to_goal_name from_goals in
         Debug.dprintf debug
           "[Goal checksum] goal %s: old sum = %a, new sum = %a@."
           to_goal.goal_name.Ident.id_string
