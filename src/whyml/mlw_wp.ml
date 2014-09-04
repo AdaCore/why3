@@ -1774,12 +1774,12 @@ and fast_wp_desc (env : wp_env) (s : Subst.t) (r : res_type) (e : expr)
       (* NE: inv[r -> r'] *)
       (* EX: ex(e1)[r -> r'] *)
       let havoc_state, glue = Subst.havoc env (regs_of_writes e1.e_effect) s in
-      let init_inv = t_label_add expl_loop_init (Subst.term s inv) in
+      let init_inv = wp_expl expl_loop_init (Subst.term s inv) in
       let inv_hypo =
         t_and_simp glue (Subst.term havoc_state inv) in
       let wp1 = fast_wp_expr env havoc_state r e1 in
       let post_inv =
-        t_label_add expl_loop_keep (Subst.term wp1.post.s inv) in
+        wp_expl expl_loop_keep (Subst.term wp1.post.s inv) in
         (* preservation also includes the "OK" of the loop body, the overall
            form is:
            I => (OK /\ (NE => I' /\ V))
