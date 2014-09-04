@@ -2,31 +2,31 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="3" memlimit="1000"/>
 <file name="../preorder.mlw" expanded="true">
 <theory name="Full" sum="0df41be1fb7bb26bae15dbe14d586fe2" expanded="true">
- <goal name="Refl" expanded="true">
+ <goal name="Eq.Refl" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Trans" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <goal name="Eq.Trans" expanded="true">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="Symm" expanded="true">
+ <goal name="Eq.Symm" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Trans" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <goal name="Lt.Trans" expanded="true">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="Asymm" expanded="true">
+ <goal name="Lt.Asymm" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 <theory name="TotalFull" sum="61c9ee6dbbea5bfd91d2f112d248610f" expanded="true">
- <goal name="Total" expanded="true">
+ <goal name="Lt.Total" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="lt_def2" expanded="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="0" timelimit="5"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 <theory name="Computable" sum="ef6a8a7f312f6483dc02c98e04f9a75e" expanded="true">
