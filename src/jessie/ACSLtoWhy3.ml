@@ -83,7 +83,7 @@ let () = Self.result "Loading Why3 theories..."
 let int_type : Ty.ty = Ty.ty_int
 let int_theory : Theory.theory =
   try
-    Env.find_theory env ["int"] "Int"
+    Env.read_theory env ["int"] "Int"
   with e ->
     Self.fatal "Exception raised while loading int theory:@ %a"
       Exn_printer.exn_printer e
@@ -98,12 +98,12 @@ let gt_int : Term.lsymbol = find int_theory "infix >"
 let lt_int : Term.lsymbol = find int_theory "infix <"
 
 let computer_div_theory : Theory.theory =
-  Env.find_theory env ["int"] "ComputerDivision"
+  Env.read_theory env ["int"] "ComputerDivision"
 let div_int : Term.lsymbol = find computer_div_theory "div"
 
 (* real.Real theory *)
 let real_type : Ty.ty = Ty.ty_real
-let real_theory : Theory.theory = Env.find_theory env ["real"] "Real"
+let real_theory : Theory.theory = Env.read_theory env ["real"] "Real"
 let add_real : Term.lsymbol = find real_theory "infix +"
 let sub_real : Term.lsymbol = find real_theory "infix -"
 let minus_real : Term.lsymbol = find real_theory "prefix -"
@@ -111,7 +111,7 @@ let mul_real : Term.lsymbol = find real_theory "infix *"
 let ge_real : Term.lsymbol = find real_theory "infix >="
 
 (* map.Map theory *)
-let map_theory : Theory.theory = Env.find_theory env ["map"] "Map"
+let map_theory : Theory.theory = Env.read_theory env ["map"] "Map"
 let map_ts : Ty.tysymbol = find_type map_theory "map"
 (* let map_type (t:Ty.ty) : Ty.ty = Ty.ty_app map_ts [t] *)
 let map_get : Term.lsymbol = find map_theory "get"
@@ -130,14 +130,18 @@ let find_ls mo s = find mo.Mlw_module.mod_theory s
 
 (* ref.Ref module *)
 
+(*
 let ref_modules, ref_theories =
   try
-    Env.read_lib_file (Mlw_main.library_of_env env) ["ref"]
+    Env.read_library (Env.locate_library env) ["ref"]
   with e ->
     Self.fatal "Exception raised while loading ref module:@ %a"
       Exn_printer.exn_printer e
 
 let ref_module : Mlw_module.modul = Stdlib.Mstr.find "Ref" ref_modules
+*)
+let ref_module : Mlw_module.modul =
+  Mlw_module.read_module env ["ref"] "Ref"
 
 let ref_type : Mlw_ty.T.itysymbol =
   Mlw_module.ns_find_its ref_module.Mlw_module.mod_export ["ref"]
@@ -152,19 +156,26 @@ let set_fun : Mlw_expr.psymbol = find_ps ref_module "infix :="
 
 (* mach_int.Int32 module *)
 
+(*
 let mach_int_modules, _mach_int_theories =
   try
     Env.read_lib_file (Mlw_main.library_of_env env) ["mach";"int"]
   with e ->
     Self.fatal "Exception raised while loading mach.int modules:@ %a"
       Exn_printer.exn_printer e
+*)
 
+(*
 let int32_module : Mlw_module.modul =
   try
     Self.result "Looking up module mach.int.Int32";
     Stdlib.Mstr.find "Int32" mach_int_modules
   with Not_found ->
     Self.fatal "Module mach.int.Int32 not found"
+*)
+
+let int32_module =
+  Mlw_module.read_module env ["mach";"int"] "Int32"
 
 let int32_type : Why3.Ty.tysymbol =
   Mlw_module.ns_find_ts int32_module.Mlw_module.mod_export ["int32"]
@@ -195,12 +206,16 @@ let int32ofint_fun : Mlw_expr.psymbol = find_ps int32_module "of_int"
 
 (* mach_int.Int64 module *)
 
+(*
 let int64_module : Mlw_module.modul =
   try
     Self.result "Looking up module mach.int.Int64";
     Stdlib.Mstr.find "Int64" mach_int_modules
   with Not_found ->
     Self.fatal "Module mach.int.Int64 not found"
+*)
+let int64_module =
+  Mlw_module.read_module env ["mach";"int"] "Int64"
 
 let int64_type : Why3.Ty.tysymbol =
   Mlw_module.ns_find_ts int64_module.Mlw_module.mod_export ["int64"]

@@ -126,7 +126,7 @@ exception LibraryConflict of pathname
 exception AmbiguousPath of filename * filename
 
 val read_library : 'a language -> env -> pathname -> 'a
-(** [read_lib_file lang env path] returns the contents of the library
+(** [read_library lang env path] returns the contents of the library
     file specified by [path]. If [path] starts with ["why3"] then the
     [builtin] functions of the language are called on [List.tl path].
     If [path] is empty, [builtin] are called on the empty path.
@@ -140,7 +140,7 @@ val read_library : 'a language -> env -> pathname -> 'a
       files corresponding to [path] *)
 
 val locate_library : env -> pathname -> filename
-(** [locate_lib_file env path] returns the location of the library
+(** [locate_library env path] returns the location of the library
     file specified by [path].
 
     This is a low-level function that allows to accees a library file
