@@ -88,7 +88,7 @@ let normalize_goal_transf_few env =
           } in
   normalize_goal_transf p env
 
-let () = 
+let () =
   Trans.register_env_transform_l "compute_in_goal" normalize_goal_transf_all
   ~desc:"Performs@ possible@ computations@ in@ goal, including@ by@ \
          declared@ rewrite@ rules"
