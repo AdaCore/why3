@@ -2,40 +2,22 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
-<prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
-<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="0"/>
-<prover id="4" name="Yices" version="1.0.38" timelimit="5" memlimit="0"/>
-<prover id="5" name="Gappa" version="1.1.1" timelimit="5" memlimit="0"/>
-<prover id="6" name="Vampire" version="0.6" timelimit="5" memlimit="0"/>
-<file name="../ns_clone.why">
-<theory name="Sig" sum="87be239b06179b061435a6c834ba7fa7" expanded="true">
+<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../ns_clone.why" expanded="true">
+<theory name="Sig" sum="87be239b06179b061435a6c834ba7fa7">
 </theory>
 <theory name="Struct" sum="5351aaf9ed117996f606b8a74b5f1fb8" expanded="true">
- <goal name="AddMem" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6"><result status="valid" time="0.00"/></proof>
+ <goal name="Sig.AddMem" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Shared" sum="c75f102113605d27f4cb3b7a222b94eb" expanded="true">
+<theory name="Shared" sum="c75f102113605d27f4cb3b7a222b94eb">
 </theory>
-<theory name="AbstractUser" sum="bd409165e6a775c3acc26c0c6ffb936a" expanded="true">
+<theory name="AbstractUser" sum="bd409165e6a775c3acc26c0c6ffb936a">
 </theory>
 <theory name="ConcreteUser" sum="46408c39d47cee29688f1d5fc43d3afc" expanded="true">
- <goal name="AddMem" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6"><result status="valid" time="0.00"/></proof>
+ <goal name="Sig.AddMem" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 </file>
