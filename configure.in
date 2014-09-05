@@ -309,6 +309,13 @@ else
    OCAMLINSTALLLIB=$OCAMLLIB
 fi
 
+# bin-annot
+case "$OCAMLVERSION" in
+  0.*|1.*|2.*|3.*)
+        enable_bin_annot=no;;
+  *)
+        enable_bin_annot=yes;;
+esac
 
 # checking for rubber
 if test "$enable_doc" = yes ; then
@@ -693,6 +700,7 @@ AC_SUBST(OCAMLGRAPHLIB)
 dnl AC_SUBST(OCAMLWEB)
 
 AC_SUBST(enable_profiling)
+AC_SUBST(enable_bin_annot)
 
 AC_SUBST(CAMLP5O)
 
