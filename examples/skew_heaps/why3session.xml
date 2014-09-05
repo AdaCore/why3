@@ -2,11 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.2" timelimit="6" memlimit="1000"/>
+<prover id="0" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
 <file name="../skew_heaps.mlw" expanded="true">
-<theory name="Heap" sum="c1911f1af713ae3f21f7eec8f1ca4c26" expanded="true">
+<theory name="Heap" sum="c1911f1af713ae3f21f7eec8f1ca4c26">
 </theory>
 <theory name="SkewHeaps" sum="6a91e994a989db6c2b9e7e80ad197512" expanded="true">
  <goal name="WP_parameter root_is_min" expl="VC for root_is_min">
@@ -27,10 +26,10 @@
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter root_is_min.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter root_is_min.7" expl="7. postcondition">
-  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  <proof prover="0"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter root_is_min.8" expl="8. variant decrease">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
@@ -39,10 +38,10 @@
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter root_is_min.10" expl="10. postcondition">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="WP_parameter root_is_min.11" expl="11. postcondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
@@ -52,7 +51,7 @@
  <goal name="WP_parameter is_empty" expl="VC for is_empty">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter size" expl="VC for size" expanded="true">
+ <goal name="WP_parameter size" expl="VC for size">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="WP_parameter get_min" expl="VC for get_min">
@@ -74,7 +73,7 @@
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.3" expl="3. postcondition">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter merge.4" expl="4. postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
@@ -89,7 +88,7 @@
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.8" expl="8. postcondition">
-  <proof prover="2"><result status="valid" time="0.12"/></proof>
+  <proof prover="0"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter merge.9" expl="9. postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
@@ -101,7 +100,7 @@
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.12" expl="12. postcondition">
-  <proof prover="1"><result status="timeout" time="5.98"/></proof>
+  <proof prover="0"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="WP_parameter merge.13" expl="13. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -116,7 +115,7 @@
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.17" expl="17. postcondition">
-  <proof prover="1"><result status="timeout" time="5.99"/></proof>
+  <proof prover="0"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="WP_parameter merge.18" expl="18. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -168,7 +167,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="HeapSort" sum="f7ae733aad5436fe0a747259d57989ba">
+<theory name="HeapSort" sum="f7ae733aad5436fe0a747259d57989ba" expanded="true">
  <goal name="WP_parameter heapsort" expl="VC for heapsort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter heapsort.1" expl="1. postcondition">
@@ -235,13 +234,13 @@
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.22" expl="22. assertion">
-  <proof prover="2"><result status="valid" time="3.32"/></proof>
+  <proof prover="0"><result status="valid" time="0.74"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.23" expl="23. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.24" expl="24. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="4.67"/></proof>
+  <proof prover="0"><result status="valid" time="1.84"/></proof>
   </goal>
   <goal name="WP_parameter heapsort.25" expl="25. postcondition">
   <proof prover="1"><result status="valid" time="0.00"/></proof>

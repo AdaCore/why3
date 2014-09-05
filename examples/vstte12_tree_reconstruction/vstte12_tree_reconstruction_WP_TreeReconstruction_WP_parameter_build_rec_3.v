@@ -78,23 +78,21 @@ Theorem WP_parameter_build_rec : forall (d:Z) (s:(list Z)), forall (x:Z)
   ((forall (t:tree) (s':(list Z)), ~ ((Init.Datatypes.app (depths (d + 1%Z)%Z
   t) s') = result1)) -> forall (t:tree) (s':(list Z)),
   ~ ((Init.Datatypes.app (depths d t) s') = s)))).
-(* Why3 intros d s x x1 h1 h2 h3 result result1 h4 h5 t s'. *)
+intros d s x x1 h1 h2 h3 result result1 h4 h5 t s'.
+subst.
 intuition.
-destruct s; intuition.
-rename z into h. rename s into t.
-rename result into l. rename result1 into sl.
-destruct t1 as [_|t1 t2].
-(* t1 = Leaf *)
-simpl in H3.
-injection H3.
+destruct t as [_|t1 t2].
+(* t = Leaf *)
+simpl in H.
+injection H.
 omega.
-(* t1 = Node t1 t2 *)
-simpl in H3.
-rewrite <- Append.Append_assoc in H3.
-rewrite H1 in H3.
-generalize (depths_unique _ _ _ _ _ H3).
+(* t = Node t1 t2 *)
+simpl in H.
+rewrite <- Append.Append_assoc in H.
+rewrite h4 in H.
+generalize (depths_unique _ _ _ _ _ H).
 intuition.
 subst t1.
-apply (H2 t2 s'); intuition.
+apply (h5 t2 s'); intuition.
 Qed.
 
