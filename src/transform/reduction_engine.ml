@@ -46,70 +46,15 @@ let big_int_of_value v =
   | _ -> raise NotNum
 
 
-exception Undetermined
-
-(*
-let const_equality c1 c2 =
-  match c1,c2 with
-  | Number.ConstInt i1, Number.ConstInt i2 ->
-    BigInt.eq (Number.compute_int i1) (Number.compute_int i2)
-  | _ -> raise Undetermined
-*)
-
-(*
-let rec term_equality t1 t2 =
-  match (t1.t_node,t2.t_node) with
-  | Tconst c1, Tconst c2 -> const_equality c1 c2
-  | Tapp(ls1,_), Tapp(ls2,_) when not (ls_equal ls1 ls2) ->
-    if ls1.ls_constr > 0 && ls2.ls_constr > 0 then false else
-      raise Undetermined
-  | Tapp(ls1,tl1), Tapp(ls2,tl2) when ls_equal ls1 ls2 ->
-    if List.for_all2 term_equality tl1 tl2 then true else
-      raise Undetermined
-  | _ -> raise Undetermined
-*)
-
-(*
-let value_equality v1 v2 =
-  match v1,v2 with
-  | Int n1, Int n2 -> BigInt.eq n1 n2
-  | Int n, Term {t_node = Tconst c} | Term {t_node = Tconst c}, Int n ->
-    begin
-      try
-        let n' = big_int_of_const c in
-        BigInt.eq n n'
-      with NotNum -> raise Undetermined
-    end
-  | Int _, Term _ | Term _, Int _ -> raise Undetermined
-  | Term t1, Term t2 -> term_equality t1 t2
-*)
-
 (* {2 Builtin symbols} *)
 
 let builtins = Hls.create 17
 
 (* all builtin functions *)
 
+exception Undetermined
 
 let to_bool b = if b then t_true else t_false
-
-(*
-let eval_equ _ls l _ty =
-  match l with
-  | [t1;t2] ->
-    begin
-      try Term (to_bool (value_equality t1 t2))
-      with Undetermined -> Term (t_equ (term_of_value t1) (term_of_value t2))
-    end
-  | _ -> assert false
-*)
-
-
-(*
-let eval_true _ls _l _ty = Term t_true
-
-let eval_false _ls _l _ty = Term t_false
-*)
 
 let t_app_value ls l ty =
   Term (t_app ls (List.map term_of_value l) ty)
@@ -209,9 +154,6 @@ let add_builtin_th env (l,n,t,d) =
 
 let get_builtins env =
   Hls.clear builtins;
-(* obsolete: equality is handled specifically in reduce_app
-  Hls.add builtins ps_equ eval_equ;
-*)
   List.iter (add_builtin_th env) built_in_theories
 
 
@@ -555,9 +497,17 @@ and reduce_eval st t sigma rem =
 and reduce_app engine st ls ty rem_cont =
   if ls_equal ls ps_equ then
     match st with
-    | t2 :: t1 :: rem_st -> reduce_equ rem_st t1 t2 rem_cont
+    | t2 :: t1 :: rem_st -> 
+      begin
+        try
+          reduce_equ rem_st t1 t2 rem_cont
+        with Undetermined ->
+          reduce_app_no_equ engine st ls ty rem_cont
+      end
     | _ -> assert false
-  else
+  else reduce_app_no_equ engine st ls ty rem_cont
+
+and reduce_app_no_equ engine st ls ty rem_cont =
   let arity = List.length ls.ls_args in
   let args,rem_st = extract_first arity [] st in
   try
@@ -680,7 +630,9 @@ and reduce_app engine st ls ty rem_cont =
 
 
 and reduce_equ (* engine *) st v1 v2 cont =
+(*
   try
+*)
     match v1,v2 with
     | Int n1, Int n2 ->
       let b = to_bool (BigInt.eq n1 n2) in
@@ -699,10 +651,12 @@ and reduce_equ (* engine *) st v1 v2 cont =
       end
     | Int _,  Term _ | Term _,  Int _ -> raise Undetermined
     | Term t1, Term t2 -> reduce_term_equ st t1 t2 cont
+(*
   with Undetermined ->
     { value_stack = Term (t_equ (term_of_value v1) (term_of_value v2)) :: st;
       cont_stack = cont;
     }
+*)
 
 and reduce_term_equ st t1 t2 cont =
   match (t1.t_node,t2.t_node) with
@@ -775,7 +729,7 @@ let rec reconstruct c =
   | ([] | [_]), Kbinop _ :: _ -> assert false
   | t1 :: t2 :: st, Kbinop op :: rem ->
     reconstruct {
-      value_stack = Term (t_binary_simp op (term_of_value t1) (term_of_value t2)) :: st;
+      value_stack = Term (t_binary_simp op (term_of_value t2) (term_of_value t1)) :: st;
       cont_stack = rem;
     }
   | [], Knot :: _ -> assert false

@@ -8,6 +8,21 @@ theory A
   goal G2 : p -> q
   goal G3 : p && q
 
+  use import bool.Bool
+
+  type t
+
+  function f t : bool
+  predicate r t 
+
+  axiom a : forall x:t. f x = True <-> r x
+
+  constant c : t
+
+  meta "rewrite" prop a
+
+  goal g : f c <-> r c
+
 end
 
 theory Test
