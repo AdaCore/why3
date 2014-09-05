@@ -59,7 +59,15 @@ let to_bool b = if b then t_true else t_false
 let t_app_value ls l ty =
   Term (t_app ls (List.map term_of_value l) ty)
 
-let eval_int_op op ls l ty =
+let is_zero v =
+  try BigInt.eq (big_int_of_value v) BigInt.zero
+  with NotNum -> false
+
+let is_one v =
+  try BigInt.eq (big_int_of_value v) BigInt.one
+  with NotNum -> false
+
+let eval_int_op op simpl ls l ty =
   match l with
   | [t1 ; t2] ->
     begin
@@ -68,9 +76,39 @@ let eval_int_op op ls l ty =
         let n2 = big_int_of_value t2 in
         Int (op n1 n2)
       with NotNum | Division_by_zero ->
-        t_app_value ls l ty
+        simpl ls t1 t2 ty
     end
   | _ -> t_app_value ls l ty
+
+let simpl_none ls t1 t2 ty =
+  t_app_value ls [t1;t2] ty
+
+let simpl_add ls t1 t2 ty =
+  if is_zero t1 then t2 else
+  if is_zero t2 then t1 else
+  t_app_value ls [t1;t2] ty
+
+let simpl_sub ls t1 t2 ty =
+  if is_zero t2 then t1 else
+  t_app_value ls [t1;t2] ty
+
+let simpl_mul ls t1 t2 ty =
+  if is_zero t1 then t1 else
+  if is_zero t2 then t2 else
+  if is_one t1 then t2 else
+  if is_one t2 then t1 else
+  t_app_value ls [t1;t2] ty
+
+let simpl_divmod ls t1 t2 ty =
+  if is_zero t1 then t1 else
+  if is_one t2 then t1 else
+  t_app_value ls [t1;t2] ty
+
+let simpl_minmax ls v1 v2 ty =
+  match v1,v2 with
+  | Term t1, Term t2 ->
+    if t_equal t1 t2 then v1 else t_app_value ls [v1;v2] ty
+  | _ -> t_app_value ls [v1;v2] ty
 
 let eval_int_rel op ls l ty =
   match l with
@@ -106,9 +144,9 @@ let built_in_theories =
     ] ;
 *)
     ["int"],"Int", [],
-    [ "infix +", None, eval_int_op BigInt.add;
-      "infix -", None, eval_int_op BigInt.sub;
-      "infix *", None, eval_int_op BigInt.mul;
+    [ "infix +", None, eval_int_op BigInt.add simpl_add;
+      "infix -", None, eval_int_op BigInt.sub simpl_sub;
+      "infix *", None, eval_int_op BigInt.mul simpl_mul;
       "prefix -", Some ls_minus, eval_int_uop BigInt.minus;
       "infix <", None, eval_int_rel BigInt.lt;
       "infix <=", None, eval_int_rel BigInt.le;
@@ -116,16 +154,16 @@ let built_in_theories =
       "infix >=", None, eval_int_rel BigInt.ge;
     ] ;
     ["int"],"MinMax", [],
-    [ "min", None, eval_int_op BigInt.min;
-      "max", None, eval_int_op BigInt.max;
+    [ "min", None, eval_int_op BigInt.min simpl_minmax;
+      "max", None, eval_int_op BigInt.max simpl_minmax;
     ] ;
     ["int"],"ComputerDivision", [],
-    [ "div", None, eval_int_op BigInt.computer_div;
-      "mod", None, eval_int_op BigInt.computer_mod;
+    [ "div", None, eval_int_op BigInt.computer_div simpl_divmod;
+      "mod", None, eval_int_op BigInt.computer_mod simpl_divmod;
     ] ;
     ["int"],"EuclideanDivision", [],
-    [ "div", None, eval_int_op BigInt.euclidean_div;
-      "mod", None, eval_int_op BigInt.euclidean_mod;
+    [ "div", None, eval_int_op BigInt.euclidean_div simpl_divmod;
+      "mod", None, eval_int_op BigInt.euclidean_mod simpl_divmod;
     ] ;
 (*
     ["map"],"Map", ["map", builtin_map_type],
@@ -250,7 +288,7 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     else
                       raise NoMatch
                 with Not_found ->
-                  try 
+                  try
                     let ts = Ty.ty_match mt vs.vs_ty (t_type t2) in
                     loop (ts,Mvs.add vs t2 mv) r1 r2
                   with Ty.TypeMismatch _ -> raise NoMatch
@@ -497,7 +535,7 @@ and reduce_eval st t sigma rem =
 and reduce_app engine st ls ty rem_cont =
   if ls_equal ls ps_equ then
     match st with
-    | t2 :: t1 :: rem_st -> 
+    | t2 :: t1 :: rem_st ->
       begin
         try
           reduce_equ rem_st t1 t2 rem_cont
@@ -659,6 +697,11 @@ and reduce_equ (* engine *) st v1 v2 cont =
 *)
 
 and reduce_term_equ st t1 t2 cont =
+  if t_equal t1 t2 then
+    { value_stack = Term t_true :: st;
+      cont_stack = cont;
+    }
+  else
   match (t1.t_node,t2.t_node) with
   | Tconst c1, Tconst c2 ->
     begin

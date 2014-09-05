@@ -65,6 +65,32 @@ theory TestArith
 *)
   goal k1: power 4 3 = 64
 
+  constant n : int
+
+  goal l1: n+0 = n
+  goal l2: 0+n = n
+  goal l3: n+1 = n
+  goal l4: n*0 = n
+  goal l5: 0*n = n
+  goal l6: n*1 = n
+  goal l7: 1*n = n
+  goal l8: n-0 = n
+  goal l9: 0-n = n
+
+  use import int.ComputerDivision
+
+  goal m1: div 0 1 = 42
+  goal m2: div n 1 = 42
+  goal m3: div 0 n = 42
+  goal m4: div n n = 42
+
+  use import int.MinMax
+
+  goal n1: max 3 4 = n
+  goal n2: max n n = 42
+  goal n3: min n n = 42
+  goal n4: min 3 4 = n
+
 end
 
 theory TestRecord
