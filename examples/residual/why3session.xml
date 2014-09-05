@@ -4,56 +4,56 @@
 <why3session shape_version="4">
 <prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../residual.mlw" expanded="true">
 <theory name="Residuals" sum="949ee5137347bb66e9c75ace865f067b" expanded="true">
  <goal name="WP_parameter accepts_epsilon" expl="VC for accepts_epsilon">
  <transf name="split_goal_wp">
   <goal name="WP_parameter accepts_epsilon.1" expl="1. postcondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.2" expl="2. postcondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.3" expl="3. postcondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.4" expl="4. variant decrease">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.5" expl="5. postcondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.6" expl="6. variant decrease">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.7" expl="7. postcondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.8" expl="8. variant decrease">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.9" expl="9. variant decrease">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.10" expl="10. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter accepts_epsilon.10.1" expl="1. postcondition">
    <proof prover="1"><result status="valid" time="0.01"/></proof>
-   <proof prover="2"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="WP_parameter accepts_epsilon.10.2" expl="2. postcondition">
-   <proof prover="3"><result status="valid" time="0.12"/></proof>
+   <proof prover="4"><result status="valid" time="0.12"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter accepts_epsilon.11" expl="11. postcondition">
-  <proof prover="3"><result status="valid" time="0.17"/></proof>
+  <proof prover="4"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="WP_parameter accepts_epsilon.12" expl="12. postcondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
@@ -61,83 +61,83 @@
  <proof prover="0" edited="residual_Residuals_inversion_mem_star_gen_1.v"><result status="valid" time="1.14"/></proof>
  </goal>
  <goal name="inversion_mem_star">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter residual" expl="VC for residual" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter residual.1" expl="1. postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter residual.2" expl="2. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter residual.3" expl="3. postcondition">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.12"/></proof>
+  <proof prover="4"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter residual.4" expl="4. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.35"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter residual.5" expl="5. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter residual.6" expl="6. postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter residual.7" expl="7. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter residual.8" expl="8. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter residual.9" expl="9. postcondition" expanded="true">
-  <proof prover="0" edited="residual_Residuals_WP_parameter_residual_1.v"><result status="valid" time="1.26"/></proof>
-  </goal>
-  <goal name="WP_parameter residual.10" expl="10. variant decrease">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
+  <goal name="WP_parameter residual.9" expl="9. postcondition" expanded="true">
+  <proof prover="0" edited="residual_Residuals_WP_parameter_residual_1.v"><result status="valid" time="1.14"/></proof>
+  </goal>
+  <goal name="WP_parameter residual.10" expl="10. variant decrease">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
   <goal name="WP_parameter residual.11" expl="11. postcondition" expanded="true">
-  <proof prover="0" edited="residual_Residuals_WP_parameter_residual_3.v"><result status="valid" time="1.19"/></proof>
+  <proof prover="0" edited="residual_Residuals_WP_parameter_residual_3.v"><result status="valid" time="1.09"/></proof>
   </goal>
   <goal name="WP_parameter residual.12" expl="12. variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="1.15"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter residual.13" expl="13. postcondition" expanded="true">
-  <proof prover="0" edited="residual_Residuals_WP_parameter_residual_2.v"><result status="valid" time="1.10"/></proof>
+  <proof prover="0" edited="residual_Residuals_WP_parameter_residual_2.v"><result status="valid" time="1.04"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter decide_mem" expl="VC for decide_mem">
  <transf name="split_goal_wp">
   <goal name="WP_parameter decide_mem.1" expl="1. postcondition">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter decide_mem.2" expl="2. variant decrease">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter decide_mem.3" expl="3. postcondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>

@@ -2,14 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="7" memlimit="0"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="7" memlimit="0"/>
 <prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
 <file name="../array_max.mlw" expanded="true">
 <theory name="ArrayMax" sum="06ec121fdada4e9dc1a78ddddc222c9c" expanded="true">
  <goal name="WP_parameter max" expl="VC for max" expanded="true">
- <proof prover="0"><result status="timeout" time="7.00"/></proof>
- <proof prover="1"><result status="valid" time="0.05"/></proof>
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
+ <proof prover="1"><result status="timeout" time="7.00"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>

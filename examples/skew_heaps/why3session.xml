@@ -8,7 +8,7 @@
 <file name="../skew_heaps.mlw" expanded="true">
 <theory name="Heap" sum="c1911f1af713ae3f21f7eec8f1ca4c26" expanded="true">
 </theory>
-<theory name="SkewHeaps" sum="539ccfcc83769c1671f56a2a10d96777" expanded="true">
+<theory name="SkewHeaps" sum="6a91e994a989db6c2b9e7e80ad197512" expanded="true">
  <goal name="WP_parameter root_is_min" expl="VC for root_is_min">
  <transf name="split_goal_wp">
   <goal name="WP_parameter root_is_min.1" expl="1. unreachable point">
@@ -67,14 +67,14 @@
  </goal>
  <goal name="WP_parameter merge" expl="VC for merge">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter merge.1" expl="1. variant decrease">
+  <goal name="WP_parameter merge.1" expl="1. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.2" expl="2. precondition">
+  <goal name="WP_parameter merge.2" expl="2. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.3" expl="3. postcondition">
-  <proof prover="2"><result status="valid" time="0.12"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter merge.4" expl="4. postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
@@ -82,10 +82,10 @@
   <goal name="WP_parameter merge.5" expl="5. postcondition">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter merge.6" expl="6. variant decrease">
+  <goal name="WP_parameter merge.6" expl="6. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.7" expl="7. precondition">
+  <goal name="WP_parameter merge.7" expl="7. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.8" expl="8. postcondition">
@@ -94,14 +94,14 @@
   <goal name="WP_parameter merge.9" expl="9. postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.10" expl="10. postcondition">
+  <goal name="WP_parameter merge.10" expl="10. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter merge.11" expl="11. postcondition">
+  <goal name="WP_parameter merge.11" expl="11. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.12" expl="12. postcondition">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="timeout" time="5.98"/></proof>
   </goal>
   <goal name="WP_parameter merge.13" expl="13. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -109,14 +109,14 @@
   <goal name="WP_parameter merge.14" expl="14. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.15" expl="15. postcondition">
+  <goal name="WP_parameter merge.15" expl="15. variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.16" expl="16. postcondition">
+  <goal name="WP_parameter merge.16" expl="16. precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.17" expl="17. postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="timeout" time="5.99"/></proof>
   </goal>
   <goal name="WP_parameter merge.18" expl="18. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -168,7 +168,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="HeapSort" sum="991a4e5882b97b01d0130f85fd4144d0">
+<theory name="HeapSort" sum="f7ae733aad5436fe0a747259d57989ba">
  <goal name="WP_parameter heapsort" expl="VC for heapsort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter heapsort.1" expl="1. postcondition">
