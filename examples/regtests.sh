@@ -64,7 +64,7 @@ run_dir () {
 }
 
 echo "=== Standard Library ==="
-run_dir ../lib/why3
+run_dir stdlib
 echo ""
 
 echo "=== Tests ==="

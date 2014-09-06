@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<file name="../../../theories/bintree.why" expanded="true">
+<theory name="Tree" sum="208c972190eb44f8b7351a2a7178896b">
+</theory>
+<theory name="Size" sum="1b4362b7d1c7f5d591b7cebb29436eb3" expanded="true">
+ <goal name="size_nonneg" expanded="true">
+ <transf name="induction_ty_lex" expanded="true">
+  <goal name="size_nonneg.1" expl="1." expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="size_empty" expanded="true">
+ <transf name="induction_ty_lex" expanded="true">
+  <goal name="size_empty.1" expl="1.">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Occ" sum="28b23ceca3e03201b4d6c1cb076df8df" expanded="true">
+ <goal name="occ_nonneg" expanded="true">
+ <transf name="induction_ty_lex" expanded="true">
+  <goal name="occ_nonneg.1" expl="1." expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Inorder" sum="2d88f35ea90c25deb909cfdd20759a20">
+</theory>
+<theory name="Preorder" sum="8e4a9c3c1f301dc9f0123151fd0ef6df">
+</theory>
+<theory name="InorderLength" sum="705873080e4ccf1add2d294ce9d1af26" expanded="true">
+ <goal name="inorder_length" expanded="true">
+ <transf name="induction_ty_lex" expanded="true">
+  <goal name="inorder_length.1" expl="1." expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Zipper" sum="5ac1b9482fd084daf1b2d94fa61274e1">
+</theory>
+</file>
+</why3session>
