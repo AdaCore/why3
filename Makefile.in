@@ -1802,6 +1802,9 @@ src/jessie/Makefile: src/jessie/Makefile.in config.status
 src/config.sh: src/config.sh.in config.status
 	./config.status chmod --file $@
 
+.merlin: .merlin.in config.status
+	./config.status chmod --file $@
+
 src/util/config.ml share/Makefile.config: src/config.sh
 	$(if $(QUIET),@echo 'Generate $@' &&) \
 	    BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) DATADIR=$(DATADIR) src/config.sh
@@ -1830,7 +1833,7 @@ configure: configure.in Version
 .PHONY: distclean
 
 distclean: clean
-	rm -f config.status config.cache config.log \
+	rm -f config.status config.cache config.log .merlin \
 	    Makefile src/util/config.ml doc/version.tex
 
 depend:
