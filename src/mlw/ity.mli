@@ -11,27 +11,44 @@
 
 open Ident
 open Ty
+open Term
 
 (** {2 Individual types (first-order types w/o effects)} *)
 
 type itysymbol = private {
-  its_ts      : tysymbol;     (** pure "snapshot" type symbol *)
-  its_mutable : bool;         (** is a record with mutable fields *)
-  its_regions : region list;  (** mutable shareable components *)
-  its_visible : bool list;    (** non-ghost shareable components *)
-  its_def     : ity option;   (** is a type alias *)
+  its_ts      : tysymbol;       (** pure "snapshot" type symbol *)
+  its_private : bool;           (** is a private/abstract type *)
+  its_mutable : bool;           (** is a record with mutable fields *)
+  its_mfields : pvsymbol Mvs.t; (** mutable fields *)
+  its_regions : region list;    (** mutable shareable components *)
+  its_reg_vis : bool list;      (** non-ghost shareable components *)
+  its_arg_vis : bool list;      (** non-ghost type parameters *)
+  its_arg_upd : bool list;      (** updatable type parameters *)
+  its_arg_pur : bool list;      (** immutable type parameters *)
+  its_def     : ity option;     (** is a type alias *)
 }
 
 and ity = private {
   ity_node : ity_node;
+  ity_pure : bool;
   ity_tag  : Weakhtbl.tag;
 }
 
 and ity_node = private
-  | Ityvar of tvsymbol
-  | Itypur of tysymbol  * ity list
-  | Ityapp of itysymbol * ity list * region list
   | Itymut of itysymbol * ity list * region list * tvsymbol
+    (** record with mutable fields and shareable components *)
+  | Ityapp of itysymbol * ity list * region list
+    (** algebraic type with shareable components *)
+  | Itypur of itysymbol * ity list
+    (** immutable type or a snapshot of a mutable type *)
+  | Ityvar of tvsymbol
+    (** type variable *)
+
+and pvsymbol = private {
+  pv_vs    : vsymbol;
+  pv_ity   : ity;
+  pv_ghost : bool;
+}
 
 and region = ity (** regions are itys of the [Itymut] kind *)
 
@@ -50,11 +67,18 @@ module Sreg : Extset.S with module M = Mreg
 module Hreg : Exthtbl.S with type key = region and type 'a t = 'a Hity.t
 module Wreg : Weakhtbl.S with type key = region and type 'a t = 'a Wity.t
 
+module Mpv  : Extmap.S with type key = pvsymbol
+module Spv  : Extset.S with module M = Mpv
+module Hpv  : Exthtbl.S with type key = pvsymbol
+module Wpv  : Weakhtbl.S with type key = pvsymbol
+
 val its_equal : itysymbol -> itysymbol -> bool
 val ity_equal : ity -> ity -> bool
+val pv_equal  : pvsymbol -> pvsymbol -> bool
 
 val its_hash : itysymbol -> int
 val ity_hash : ity -> int
+val pv_hash  : pvsymbol -> int
 
 exception BadItyArity of itysymbol * int
 exception BadRegArity of itysymbol * int
@@ -63,14 +87,22 @@ exception UnboundRegion of region
 
 (** creation of a symbol for type in programs *)
 val create_itysymbol :
-  preid -> tvsymbol list ->
-    bool -> (region * bool) list -> ity option -> itysymbol
+  preid -> (tvsymbol * bool * bool * bool) list ->
+    bool -> bool -> (region * bool) list ->
+    Spv.t -> ity option -> itysymbol
+
+val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
 
 val restore_its : tysymbol -> itysymbol
   (** raises [Not_found] if the argument is not a its_ts *)
 
-val ity_var : tvsymbol -> ity
-val ity_pur : tysymbol -> ity list -> ity
+val restore_pv : vsymbol -> pvsymbol
+(** raises [Not_found] if the argument is not a [pv_vs] *)
+
+exception NonUpdatable of itysymbol * ity
+
+val ity_var : tvsymbol  -> ity
+val ity_pur : itysymbol -> ity list -> ity
 val ity_app : itysymbol -> ity list -> region list -> ity
 val ity_mut : itysymbol -> ity list -> region list -> tvsymbol -> ity
 
@@ -80,7 +112,10 @@ val ty_of_ity : ity -> ty
 (** all aliases expanded, all regions removed *)
 
 val ity_of_ty : ty -> ity
-(** replaces every [Tyapp] with [Itypur] *)
+(** snapshot type, raises [Invalid_argument] for any non-its *)
+
+val ity_purify : ity -> ity
+(** snapshot type *)
 
 val tv_of_region : region -> tvsymbol
 
@@ -92,11 +127,10 @@ val ity_any : (ity -> bool) -> ity -> bool
 
 (** {2 Traversal functions on type symbols} *)
 
-val ity_s_fold :
-  ('a -> itysymbol -> 'a) -> ('a -> tysymbol -> 'a) -> 'a -> ity -> 'a
+val ity_s_fold : ('a -> itysymbol -> 'a) -> 'a -> ity -> 'a
 
-val ity_s_all : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
-val ity_s_any : (itysymbol -> bool) -> (tysymbol -> bool) -> ity -> bool
+val ity_s_all : (itysymbol -> bool) -> ity -> bool
+val ity_s_any : (itysymbol -> bool) -> ity -> bool
 
 val ity_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> ity -> 'a
 
@@ -115,17 +149,21 @@ val ity_r_occurs : region -> ity -> bool
 val ity_closed    : ity -> bool
 val ity_immutable : ity -> bool
 
-(* detect non-ghost regions *)
+(* detect non-ghost type variables and regions *)
 
-val ity_nonghost_reg : Sreg.t -> ity -> Sreg.t
-val lookup_nonghost_reg : Sreg.t -> ity -> bool
+val ity_r_visible : Sreg.t -> ity -> Sreg.t
+val ity_v_visible : Stv.t  -> ity -> Stv.t
 
 (** {2 Built-in types} *)
 
 val ts_unit : tysymbol (** the same as [Ty.ts_tuple 0] *)
 val ty_unit : ty
 
-val ity_int : ity
+val its_int  : itysymbol
+val its_bool : itysymbol
+val its_unit : itysymbol
+
+val ity_int  : ity
 val ity_bool : ity
 val ity_unit : ity
 

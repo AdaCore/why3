@@ -12,81 +12,66 @@
 open Stdlib
 open Ident
 open Ty
+open Term
 
 (** {2 Individual types (first-order types w/o effects)} *)
 
 type itysymbol = {
-  its_ts      : tysymbol;   (** pure "snapshot" type symbol *)
-  its_mutable : bool;       (** is a record with mutable fields *)
-  its_regions : ity list;   (** mutable shareable components *)
-  its_visible : bool list;  (** non-ghost shareable components *)
-  its_def     : ity option; (** is a type alias *)
+  its_ts      : tysymbol;       (** pure "snapshot" type symbol *)
+  its_private : bool;           (** is a private/abstract type *)
+  its_mutable : bool;           (** is a record with mutable fields *)
+  its_mfields : pvsymbol Mvs.t; (** mutable fields *)
+  its_regions : region list;    (** mutable shareable components *)
+  its_reg_vis : bool list;      (** non-ghost shareable components *)
+  its_arg_vis : bool list;      (** non-ghost type parameters *)
+  its_arg_upd : bool list;      (** updatable type parameters *)
+  its_arg_pur : bool list;      (** immutable type parameters *)
+  its_def     : ity option;     (** is a type alias *)
 }
 
 and ity = {
   ity_node : ity_node;
+  ity_pure : bool;
   ity_tag  : Weakhtbl.tag;
 }
 
 and ity_node =
-  | Ityvar of tvsymbol
-  | Itypur of tysymbol  * ity list
-  | Ityapp of itysymbol * ity list * region list
   | Itymut of itysymbol * ity list * region list * tvsymbol
+    (** record with mutable fields and shareable components *)
+  | Ityapp of itysymbol * ity list * region list
+    (** algebraic type with shareable components *)
+  | Itypur of itysymbol * ity list
+    (** immutable type or a snapshot of a mutable type *)
+  | Ityvar of tvsymbol
+    (** type variable *)
+
+and pvsymbol = {
+  pv_vs    : vsymbol;
+  pv_ity   : ity;
+  pv_ghost : bool;
+}
 
 and region = ity (** regions are itys of the [Itymut] kind *)
-
-(* value type symbols *)
 
 module Itsym = MakeMSHW (struct
   type t = itysymbol
   let tag its = its.its_ts.ts_name.id_tag
 end)
 
-module Sits = Itsym.S
-module Mits = Itsym.M
-module Hits = Itsym.H
-module Wits = Itsym.W
-
-let its_equal : itysymbol -> itysymbol -> bool = (==)
-let ity_equal : ity       -> ity       -> bool = (==)
-
-let its_hash its = id_hash its.its_ts.ts_name
-let ity_hash ity = Weakhtbl.tag_hash ity.ity_tag
-
-module Hsity = Hashcons.Make (struct
-  type t = ity
-
-  let equal ity1 ity2 = match ity1.ity_node, ity2.ity_node with
-    | Ityvar v1, Ityvar v2 ->
-        tv_equal v1 v2
-    | Itypur (s1,l1), Itypur (s2,l2) ->
-        ts_equal s1 s2 &&
-        List.for_all2 ity_equal l1 l2
-    | Ityapp (s1,l1,r1), Ityapp (s2,l2,r2) ->
-        its_equal s1 s2 &&
-        List.for_all2 ity_equal l1 l2 &&
-        List.for_all2 ity_equal r1 r2
-    | Itymut (_,_,_,v1), Itymut (_,_,_,v2) ->
-        tv_equal v1 v2
-    | _ -> false
-
-  let hash ity = match ity.ity_node with
-    | Itypur (s,tl) ->
-        Hashcons.combine_list ity_hash (ts_hash s) tl
-    | Ityapp (s,tl,rl) ->
-        Hashcons.combine_list ity_hash
-          (Hashcons.combine_list ity_hash (its_hash s) tl) rl
-    | Ityvar v | Itymut (_,_,_,v) ->
-        tv_hash v
-
-  let tag n ity = { ity with ity_tag = Weakhtbl.create_tag n }
-end)
-
 module Ity = MakeMSHW (struct
   type t = ity
   let tag ity = ity.ity_tag
 end)
+
+module PVsym = MakeMSHW (struct
+  type t = pvsymbol
+  let tag pv = pv.pv_vs.vs_name.id_tag
+end)
+
+module Sits = Itsym.S
+module Mits = Itsym.M
+module Hits = Itsym.H
+module Wits = Itsym.W
 
 module Sity = Ity.S
 module Mity = Ity.M
@@ -98,8 +83,68 @@ module Mreg = Mity
 module Hreg = Hity
 module Wreg = Wity
 
+module Spv = PVsym.S
+module Mpv = PVsym.M
+module Hpv = PVsym.H
+module Wpv = PVsym.W
+
+(* value type symbols *)
+
+let its_equal : itysymbol -> itysymbol -> bool = (==)
+let ity_equal : ity       -> ity       -> bool = (==)
+let pv_equal  : pvsymbol  -> pvsymbol  -> bool = (==)
+
+let its_hash its = id_hash its.its_ts.ts_name
+let ity_hash ity = Weakhtbl.tag_hash ity.ity_tag
+let pv_hash  pv  = id_hash pv.pv_vs.vs_name
+
+exception NonUpdatable of itysymbol * ity
+
+module Hsity = Hashcons.Make (struct
+  type t = ity
+
+  let equal ity1 ity2 = match ity1.ity_node, ity2.ity_node with
+    | Ityvar v1, Ityvar v2 ->
+        tv_equal v1 v2
+    | Itypur (s1,l1), Itypur (s2,l2) ->
+        its_equal s1 s2 &&
+        List.for_all2 ity_equal l1 l2
+    | Ityapp (s1,l1,r1), Ityapp (s2,l2,r2) ->
+        its_equal s1 s2 &&
+        List.for_all2 ity_equal l1 l2 &&
+        List.for_all2 ity_equal r1 r2
+    | Itymut (_,_,_,v1), Itymut (_,_,_,v2) ->
+        tv_equal v1 v2
+    | _ -> false
+
+  let hash ity = match ity.ity_node with
+    | Itypur (s,tl) ->
+        Hashcons.combine_list ity_hash (its_hash s) tl
+    | Ityapp (s,tl,rl) ->
+        Hashcons.combine_list ity_hash
+          (Hashcons.combine_list ity_hash (its_hash s) tl) rl
+    | Ityvar v | Itymut (_,_,_,v) ->
+        tv_hash v
+
+  let check_upd s acc upd ity =
+    if not (upd || ity.ity_pure) then raise (NonUpdatable (s,ity));
+    acc && ity.ity_pure
+
+  let pure ity = match ity.ity_node with
+    | Ityvar _ -> true
+    | Itypur (s,tl) -> List.fold_left2 (check_upd s) true s.its_arg_upd tl
+    | Ityapp (_,_,[]) -> assert false
+    | Ityapp (s,tl,_) -> List.fold_left2 (check_upd s) false s.its_arg_upd tl
+    | Itymut (s,tl,_,_) -> List.fold_left2 (check_upd s) false s.its_arg_upd tl
+
+  let tag n ity = { ity with
+    ity_pure = pure ity;
+    ity_tag  = Weakhtbl.create_tag n }
+end)
+
 let mk_ity n = {
   ity_node = n;
+  ity_pure = true;
   ity_tag  = Weakhtbl.dummy_tag;
 }
 
@@ -143,22 +188,19 @@ let ity_any pr ity =
 
 (* symbol-wise map/fold *)
 
-let rec ity_s_fold fits fts acc ity =
-  let fold acc ity = ity_s_fold fits fts acc ity in
+let rec ity_s_fold fits acc ity =
+  let fold acc ity = ity_s_fold fits acc ity in
   let fold acc ityl = List.fold_left fold acc ityl in
   match ity.ity_node with
-  | Itymut (s,tl,rl,_) | Ityapp (s,tl,rl) ->
-      fold (fold (fits acc s) tl) rl
-  | Itypur (s,tl) -> fold (fts acc s) tl
+  | Itymut (s,tl,rl,_) | Ityapp (s,tl,rl) -> fold (fold (fits acc s) tl) rl
+  | Itypur (s,tl) -> fold (fits acc s) tl
   | Ityvar _ -> acc
 
-let ity_s_all pits pts ity =
-  try ity_s_fold (Util.all_fn pits) (Util.all_fn pts) true ity
-  with Util.FoldSkip -> false
+let ity_s_all pits ity =
+  try ity_s_fold (Util.all_fn pits) true ity with Util.FoldSkip -> false
 
-let ity_s_any pits pts ity =
-  try ity_s_fold (Util.any_fn pits) (Util.any_fn pts) false ity
-  with Util.FoldSkip -> true
+let ity_s_any pits ity =
+  try ity_s_fold (Util.any_fn pits) false ity with Util.FoldSkip -> true
 
 (* traversal functions on type variables and regions *)
 
@@ -198,30 +240,31 @@ let ity_r_any pr ity =
 
 let ity_r_occurs r ity = ity_r_any (ity_equal r) ity
 
-let ity_immutable ity = ity_r_all (fun _ -> false) ity
+let ity_immutable ity = not ity.ity_pure
 
 (* detect non-ghost type variables and regions *)
 
-let rec fold_nonghost on_reg acc ity =
-  let fnt acc ity = fold_nonghost on_reg acc ity in
+let rec fold_visible on_var on_reg acc ity =
+  let fnt acc ity = fold_visible on_var on_reg acc ity in
   let fnr acc vis ity = if vis then fnt acc ity else acc in
   match ity.ity_node with
-  | Ityvar _ -> acc
-  | Itypur (_,tl) -> List.fold_left fnt acc tl
-  | Ityapp ({its_visible = vis},tl,rl) ->
-      let acc = List.fold_left2 fnr acc vis rl in
-      List.fold_left fnt acc tl
-  | Itymut ({its_visible = vis},tl,rl,_) ->
+  | Ityvar tv ->
+      on_var tv acc
+  | Itypur (s,tl) ->
+      List.fold_left2 fnr acc s.its_arg_vis tl
+  | Ityapp (s,tl,rl) ->
+      let acc = List.fold_left2 fnr acc s.its_reg_vis rl in
+      List.fold_left2 fnr acc s.its_arg_vis tl
+  | Itymut (s,tl,rl,_) ->
       let acc = on_reg ity acc in
-      let acc = List.fold_left2 fnr acc vis rl in
-      List.fold_left fnt acc tl
+      let acc = List.fold_left2 fnr acc s.its_reg_vis rl in
+      List.fold_left2 fnr acc s.its_arg_vis tl
 
-let ity_nonghost_reg regs ity = fold_nonghost Sreg.add regs ity
+let ity_r_visible regs ity =
+  fold_visible (fun _ acc -> acc) Sreg.add regs ity
 
-let lookup_nonghost_reg regs ity =
-  try fold_nonghost (fun r acc ->
-    if Sreg.mem r regs then raise Util.FoldSkip else acc) false ity
-  with Util.FoldSkip -> true
+let ity_v_visible vars ity =
+  fold_visible Stv.add (fun _ acc -> acc) vars ity
 
 (* smart constructors *)
 
@@ -254,7 +297,7 @@ let rec ity_match sbs ity1 ity2 = match ity1.ity_node, ity2.ity_node with
   | Ityapp (s1,l1,r1), Ityapp (s2,l2,r2) when its_equal s1 s2 ->
       let sbs = List.fold_left2 ity_match sbs l1 l2 in
       List.fold_left2 ity_match sbs r1 r2
-  | Itypur (s1, l1), Itypur (s2, l2) when ts_equal s1 s2 ->
+  | Itypur (s1, l1), Itypur (s2, l2) when its_equal s1 s2 ->
       List.fold_left2 ity_match sbs l1 l2
   | Ityvar v1, _ ->
       Mtv.add v1 ity2 sbs
@@ -268,21 +311,21 @@ let ity_freeze sbs ity = ity_match sbs ity ity
 
 let rec ty_of_ity ity = match ity.ity_node with
   | Ityvar v -> ty_var v
-  | Itypur (s,tl) -> ty_app s (List.map ty_of_ity tl)
-  | Ityapp (s,tl,_) | Itymut (s,tl,_,_) ->
+  | Itypur (s,tl) | Ityapp (s,tl,_) | Itymut (s,tl,_,_) ->
       ty_app s.its_ts (List.map ty_of_ity tl)
 
-let rec ity_of_ty ty = match ty.ty_node with
-  | Tyvar v -> ity_var v
-  | Tyapp (s,tl) -> ity_pur_unsafe s (List.map ity_of_ty tl)
+let rec ity_purify ity = match ity.ity_node with
+  | Ityvar _ -> ity
+  | Itypur (s,tl) | Ityapp (s,tl,_) | Itymut (s,tl,_,_) ->
+      ity_pur_unsafe s (List.map ity_purify tl)
 
 let ity_pur s tl =
-  if List.length s.ts_args <> List.length tl then
-    raise (Ty.BadTypeArity (s, List.length tl));
-  match s.ts_def with
-  | Some ty ->
-      let sbs = List.fold_right2 Mtv.add s.ts_args tl Mtv.empty in
-      ity_full_inst sbs (ity_of_ty ty)
+  if List.length s.its_ts.ts_args <> List.length tl then
+    raise (BadItyArity (s, List.length tl));
+  match s.its_def with
+  | Some ity ->
+      let sbs = List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty in
+      ity_full_inst sbs (ity_purify ity)
   | None ->
       ity_pur_unsafe s tl
 
@@ -310,6 +353,8 @@ let ity_app sbs s tl rl = match s.its_def with
       ity_mut_fresh_unsafe s tl rl
   | Some ity ->
       ity_full_inst sbs ity
+  | None when rl = [] ->
+      ity_pur_unsafe s tl
   | None ->
       ity_app_unsafe s tl rl
 
@@ -349,57 +394,131 @@ let ity_app s tl rl =
 
 let create_itysymbol_unsafe, restore_its =
   let ts_to_its = Wts.create 17 in
-  (fun ~ts ~mut ~regs ~vis ~def ->
+  (fun ~ts ~pri ~mut ~fld ~regs ~rvis ~avis ~aupd ~apur ~def ->
     let its = {
       its_ts      = ts;
+      its_private = pri;
       its_mutable = mut;
+      its_mfields = fld;
       its_regions = regs;
-      its_visible = vis;
+      its_reg_vis = rvis;
+      its_arg_vis = avis;
+      its_arg_upd = aupd;
+      its_arg_pur = apur;
       its_def     = def;
     } in
     Wts.set ts_to_its ts its;
     its),
   Wts.find ts_to_its
 
-let create_itysymbol name args mut regvis def =
+let create_itysymbol name args pri mut regs fld def =
+  (* prepare arguments *)
+  let args, avis, aupd, apur = List.fold_right
+    (fun (tv,v,u,p) (args,avis,aupd,apur) ->
+      tv::args, v::avis, u::aupd, p::apur) args ([],[],[],[]) in
+  let regs, rvis = List.split regs in
+  let fld = Spv.fold (fun pv acc ->
+    Mvs.add pv.pv_vs pv acc) fld Mvs.empty in
+  (* create_tysymbol checks that args contains no duplicates
+     and covers every type variable in def *)
   let puredef = Opt.map ty_of_ity def in
   let ts = create_tysymbol name args puredef in
-  let regs, vis = List.split regvis in
   (* all regions *)
-  let add s r = Sreg.add_new (DuplicateRegion r) r s in
-  let sregs = List.fold_left add Sreg.empty regs in
+  let add_r s r = match r.ity_node with
+    | Itymut _ -> Sreg.add_new (DuplicateRegion r) r s
+    | _ -> invalid_arg "Ity.create_itysymbol" in
+  let sregs = List.fold_left add_r Sreg.empty regs in
   (* all type variables *)
   let sargs = List.fold_right Stv.add args Stv.empty in
-  (* each type variable in [regs] must be in [args] *)
+  (* each type variable in [regs] and [fld] must be in [args] *)
   let check_v () v =
-    if not (Stv.mem v sargs) then raise (UnboundTypeVar v) in
-  List.fold_left (ity_v_fold check_v) () regs;
-  (* each lower region in [def] must be in [regs] *)
+    if not (Stv.mem v sargs) then raise (Ty.UnboundTypeVar v) in
+  let check_var ity = ity_v_fold check_v () ity in
+  List.iter check_var regs;
+  Mvs.iter (fun _ pv -> check_var pv.pv_ity) fld;
+  (* each surface region in [fld] must be in [regs] *)
   let check_r r =
     if not (Sreg.mem r sregs) then raise (UnboundRegion r) in
-  let rec check () ity = match ity.ity_node with
-    | Itymut (_,_,rl,_) ->
+  let rec check_reg ity = match ity.ity_node with
+    | Itymut _ -> check_r ity
+    | Ityapp (_,tl,rl) ->
         List.iter check_r rl;
-        ity_fold check () ity
-    | _ ->
-        ity_fold check () ity in
-  Opt.fold check () def;
+        List.iter check_reg tl
+    | Itypur (_,tl) ->
+        List.iter check_reg tl
+    | Ityvar _ -> () in
+  Mvs.iter (fun _ pv -> check_reg pv.pv_ity) fld;
+  (* each lower surface region in [def] must be in [regs] *)
+  let check_reg () ity = match ity.ity_node with
+    | Itymut (_,tl,rl,_) ->
+        List.iter check_r rl;
+        List.iter check_reg tl
+    | _ -> check_reg ity in
+  Opt.fold check_reg () def;
   (* the alias is mutable if and only if the symbol is *)
   let check = function
     | Some { ity_node = Itymut _ } -> mut
     | Some _ -> not mut
     | None -> true in
   if not (check def) then invalid_arg "Ity.create_itysymbol";
-  (* each invisible region must be invisible in [def] *)
-  let visible = Opt.fold ity_nonghost_reg Sreg.empty def in
-  let check (r,v) =
-    if not v && Sreg.mem r visible then invalid_arg "Ity.create_itysymbol" in
-  List.iter check regvis;
+  (* if we have mutable fields then we are mutable *)
+  if not (mut || Mvs.is_empty fld) then
+    invalid_arg "Ity.create_itysymbol";
+  (* if we are an alias then we are not private and have no fields *)
+  if def <> None && (pri || not (Mvs.is_empty fld)) then
+    invalid_arg "Ity.create_itysymbol";
+  (* each invisible type variable and region must be invisible in [def] *)
+  let v_visible = Opt.fold ity_v_visible Stv.empty def in
+  let r_visible = Opt.fold ity_r_visible Sreg.empty def in
+  let check_v vis v = if not vis && Stv.mem v v_visible
+      then invalid_arg "Ity.create_itysymbol" in
+  let check_r vis r = if not vis && Sreg.mem r r_visible
+      then invalid_arg "Ity.create_itysymbol" in
+  List.iter2 check_v avis args;
+  List.iter2 check_r rvis regs;
+  (* TODO: updatability vs [def] and every other invariant *)
   (* create the type symbol *)
-  create_itysymbol_unsafe ~ts ~def ~mut ~regs ~vis
+  create_itysymbol_unsafe ~ts ~pri ~mut ~fld ~regs ~rvis ~avis ~aupd ~apur ~def
+
+(** pvsymbol creation *)
+
+let create_pvsymbol id ghost ity = {
+  pv_vs    = create_vsymbol id (ty_of_ity ity);
+  pv_ity   = ity;
+  pv_ghost = ghost;
+}
+
+let create_pvsymbol, restore_pv =
+  let vs_to_pv = Wvs.create 17 in
+  (fun id ?(ghost=false) ity ->
+    let pv = create_pvsymbol id ghost ity in
+    Wvs.set vs_to_pv pv.pv_vs pv;
+    pv),
+  (fun vs -> Wvs.find vs_to_pv vs)
+
+(** builtin symbols *)
+
+let rec ity_of_ty ty = match ty.ty_node with
+  | Tyvar v -> ity_var v
+  | Tyapp (s,tl) ->
+      let s = try restore_its s with Not_found ->
+        invalid_arg "Ity.ity_of_ty" in
+      ity_pur_unsafe s (List.map ity_of_ty tl)
 
 let ts_unit = ts_tuple 0
 let ty_unit = ty_tuple []
+
+let its_int = create_itysymbol_unsafe
+    ~ts:ts_int ~pri:false ~mut:false ~fld:Mvs.empty
+    ~regs:[] ~rvis:[] ~avis:[] ~aupd:[] ~apur:[] ~def:None
+
+let its_bool = create_itysymbol_unsafe
+    ~ts:ts_bool ~pri:false ~mut:false ~fld:Mvs.empty
+    ~regs:[] ~rvis:[] ~avis:[] ~aupd:[] ~apur:[] ~def:None
+
+let its_unit = create_itysymbol_unsafe
+    ~ts:ts_unit ~pri:false ~mut:false ~fld:Mvs.empty
+    ~regs:[] ~rvis:[] ~avis:[] ~aupd:[] ~apur:[] ~def:None
 
 let ity_int  = ity_of_ty Ty.ty_int
 let ity_bool = ity_of_ty Ty.ty_bool
