@@ -11,6 +11,8 @@
 
 (** Useful option combinators *)
 
+val inhabited : 'a option -> bool
+
 val get : 'a option -> 'a
 
 val get_exn : exn -> 'a option -> 'a

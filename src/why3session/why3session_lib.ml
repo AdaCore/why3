@@ -204,9 +204,9 @@ let iter_proof_attempt_by_filter iter filters f session =
   (** three value *)
   let three_value f v p =
     let iter_obsolete a =
-      match v with
-        | FT_No  when not (p a) -> f a
-        | FT_Yes when     (p a) -> f a
+      match v, p a with
+        | FT_No, false -> f a
+        | FT_Yes, true -> f a
         | _ -> () (** FT_All treated after *) in
     if v = FT_All then f else iter_obsolete in
   (** obsolete *)
@@ -215,9 +215,10 @@ let iter_proof_attempt_by_filter iter filters f session =
   let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
   (** verified_goal *)
   let f = three_value f filters.verified_goal
-    (fun a -> a.S.proof_parent.S.goal_verified) in
+    (fun a -> Opt.inhabited a.S.proof_parent.S.goal_verified) in
   (** verified *)
-  let f = three_value f filters.verified S.proof_verified in
+  let f = three_value f filters.verified 
+    (fun p -> Opt.inhabited (S.proof_verified p)) in
   (** status *)
   let f = if filters.status = [] then f else
       (fun a -> match a.S.proof_state with

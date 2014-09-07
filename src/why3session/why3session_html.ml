@@ -167,7 +167,7 @@ let rec num_lines acc tr =
     fprintf fmt "<tr>";
     for _i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
     fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
-      (color_of_status ~dark:false) tr.S.transf_verified
+      (color_of_status ~dark:false) (Opt.inhabited tr.S.transf_verified)
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
     fprintf fmt "%s</td>" tr.transf_name ;
@@ -187,7 +187,8 @@ let rec num_lines acc tr =
     if not is_first then fprintf fmt "<tr>";
     (* for i=1 to 0 (\* depth-1 *\) do fprintf fmt "<td></td>" done; *)
     fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
-      (color_of_status ~dark:false) g.S.goal_verified (max_depth - depth + 1);
+      (color_of_status ~dark:false) (Opt.inhabited g.S.goal_verified)
+      (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
     fprintf fmt "%s</td>" (S.goal_expl g);
 (*    for i=depth to max_depth-1 do fprintf fmt "<td></td>" done; *)
@@ -208,8 +209,10 @@ let rec num_lines acc tr =
     let provers = List.sort Whyconf.Prover.compare provers in
     let name = th.S.theory_name.Ident.id_string in
     fprintf fmt "<h2><font color=\"#%a\">Theory \"%s\": %s</font></h2>@\n"
-      (color_of_status ~dark:true) th.S.theory_verified
-      name (if th.S.theory_verified then "fully verified" else "not fully verified")
+      (color_of_status ~dark:true) (Opt.inhabited th.S.theory_verified)
+      name
+      (if Opt.inhabited th.S.theory_verified
+       then "fully verified" else "not fully verified")
     ;
 
     fprintf fmt "<table border=\"1\"><tr><td colspan=\"%d\">Obligations</td>" depth;
@@ -395,7 +398,7 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
     fprintf fmt
       "@[<hov><li rel='transf'><a href='#'>\
 <span %a>%s</span></a>@,<ul>%a</ul></li>@]"
-      print_verified tr.transf_verified
+      print_verified (Opt.inhabited tr.transf_verified)
       tr.transf_name
       (Pp.print_list Pp.newline print_goal) tr.transf_goals
 
@@ -403,7 +406,7 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
     fprintf fmt
       "@[<hov><li rel='goal'><a href='#'>\
 <span %a>%s</a></a>@,<ul>%a%a</ul></li>@]"
-      print_verified g.goal_verified
+      print_verified (Opt.inhabited g.goal_verified)
       g.goal_name.Ident.id_string
       (Pp.print_iter2 PHprover.iter Pp.newline Pp.nothing
          Pp.nothing print_proof_attempt)
@@ -416,7 +419,7 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
     fprintf fmt
       "@[<hov><li rel='theory'><a href='#'>\
 <span %a>%s</span></a>@,<ul>%a</ul></li>@]"
-      print_verified th.theory_verified
+      print_verified (Opt.inhabited th.theory_verified)
       th.theory_name.Ident.id_string
       (Pp.print_list Pp.newline print_goal) th.theory_goals in
 
@@ -424,7 +427,7 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
     fprintf fmt
       "@[<hov><li rel='file'><a href='#'>\
 <span %a>%s</span></a>@,<ul>%a</ul></li>@]"
-      print_verified f.file_verified
+      print_verified (Opt.inhabited f.file_verified)
       f.file_name
       (Pp.print_list Pp.newline print_theory) f.file_theories in
 

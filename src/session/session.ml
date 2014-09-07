@@ -144,7 +144,7 @@ type 'a goal =
     goal_parent : 'a goal_parent;
     mutable goal_checksum : Tc.checksum option;
     mutable goal_shape : Tc.shape;
-    mutable goal_verified : bool;
+    mutable goal_verified : float option;
     mutable goal_task: task_option;
     mutable goal_expanded : bool;
     goal_external_proofs : 'a proof_attempt PHprover.t;
@@ -174,7 +174,7 @@ and 'a metas =
     metas_added : metas_args;
     metas_idpos : idpos;
     metas_parent : 'a goal;
-    mutable metas_verified : bool;
+    mutable metas_verified : float option;
     mutable metas_goal : 'a goal;
     (** Not mutated after the creation *)
     mutable metas_expanded : bool;
@@ -185,7 +185,7 @@ and 'a transf =
       transf_name : string;
       (** Why3 tranformation name *)
       transf_parent : 'a goal;
-      mutable transf_verified : bool;
+      mutable transf_verified : float option;
       mutable transf_goals : 'a goal list;
       (** Not mutated after the creation of the session *)
       mutable transf_expanded : bool;
@@ -197,7 +197,7 @@ and 'a theory =
       theory_parent : 'a file;
       mutable theory_checksum : Termcode.checksum option;
       mutable theory_goals : 'a goal list;
-      mutable theory_verified : bool;
+      mutable theory_verified : float option;
       mutable theory_expanded : bool;
       mutable theory_task : Theory.theory hide;
     }
@@ -209,7 +209,7 @@ and 'a file =
       file_parent : 'a session;
       mutable file_theories: 'a theory list;
       (** Not mutated after the creation *)
-      mutable file_verified : bool;
+      mutable file_verified : float option;
       mutable file_expanded : bool;
       mutable file_for_recovery : Theory.theory Mstr.t hide;
     }
@@ -279,7 +279,7 @@ let iter_proof_attempt f = function
     | Metas m -> metas_iter_proof_attempt f m
 
 let rec goal_iter_leaf_goal ~unproved_only f g =
-  if not (g.goal_verified && unproved_only) then
+  if not (Opt.inhabited g.goal_verified && unproved_only) then
     let r = ref true in
     PHstr.iter
       (fun _ t -> r := false;
@@ -344,15 +344,15 @@ module PTreeT = struct
     | Any t ->
       let s = match t with
         | File f ->
-          if f.file_verified
+          if Opt.inhabited f.file_verified
           then f.file_name
           else f.file_name^"?"
         | Theory th ->
-          if th.theory_verified
+          if Opt.inhabited th.theory_verified
           then th.theory_name.Ident.id_string
           else th.theory_name.Ident.id_string^"?"
         | Goal g ->
-          if g.goal_verified
+          if Opt.inhabited g.goal_verified
           then g.goal_name.Ident.id_string
           else g.goal_name.Ident.id_string^"?"
         | Proof_attempt pr ->
@@ -366,11 +366,11 @@ module PTreeT = struct
             (if pr.proof_obsolete then "O" else "")
             (if pr.proof_archived then "A" else "")
         | Transf tr ->
-          if tr.transf_verified
+          if Opt.inhabited tr.transf_verified
           then tr.transf_name
           else tr.transf_name^"?"
         | Metas metas ->
-          if metas.metas_verified
+          if Opt.inhabited metas.metas_verified
           then "metas..."
           else "metas..."^"?"
       in
@@ -803,38 +803,50 @@ let save_session config session =
 type 'a notify = 'a any -> unit
 let notify : 'a notify = fun _ -> ()
 
+let compute_verified get l =
+  List.fold_left (fun acc t -> 
+    match acc,get t with
+    | Some x, Some y -> Some (x +. y)
+    | _ -> None) (Some 0.0) l
+
 let file_verified f =
-  List.for_all (fun t -> t.theory_verified) f.file_theories
+  compute_verified (fun t -> t.theory_verified) f.file_theories
 
 let theory_verified t =
-  List.for_all (fun g -> g.goal_verified) t.theory_goals
+  compute_verified (fun g -> g.goal_verified) t.theory_goals
 
 let transf_verified t =
-  List.for_all (fun g -> g.goal_verified) t.transf_goals
+  compute_verified (fun g -> g.goal_verified) t.transf_goals
 
 let metas_verified m = m.metas_goal.goal_verified
 
 let proof_verified a =
-  (not a.proof_obsolete) &&
+  if a.proof_obsolete then None else
     match a.proof_state with
-      | Done { Call_provers.pr_answer = Call_provers.Valid} -> true
-      | _ -> false
+      | Done { Call_provers.pr_answer = Call_provers.Valid;
+               Call_provers.pr_time = t } -> Some t
+      | _ -> None
 
 let goal_verified g =
-    try
-      PHprover.iter
-        (fun _ a ->
-          if proof_verified a
-          then raise Exit)
-        g.goal_external_proofs;
-      PHstr.iter
-        (fun _ t -> if t.transf_verified then raise Exit)
-        g.goal_transformations;
-      Mmetas_args.iter
-        (fun _ t -> if t.metas_verified then raise Exit)
-        g.goal_metas;
-      false
-    with Exit -> true
+  let acc = ref None in
+  let accumulate v =
+    match v with
+    | None -> ()
+    | Some t ->
+      match !acc with
+      | Some x -> acc := Some (x +. t)
+      | None -> acc := v
+  in
+  PHprover.iter
+    (fun _ a -> accumulate (proof_verified a))
+    g.goal_external_proofs;
+  PHstr.iter
+    (fun _ t -> accumulate t.transf_verified)
+    g.goal_transformations;
+  Mmetas_args.iter
+      (fun _ t -> accumulate t.metas_verified)
+    g.goal_metas;
+  !acc
 
 let check_file_verified notify f =
   let b = file_verified f in
@@ -960,7 +972,7 @@ let raw_add_no_task ~(keygen:'a keygen) ~(expanded:bool) parent name expl sum sh
                goal_external_proofs = PHprover.create 7;
                goal_transformations = PHstr.create 3;
                goal_metas = Mmetas_args.empty;
-               goal_verified = false;
+               goal_verified = None;
                goal_expanded = expanded;
              }
   in
@@ -986,7 +998,7 @@ let raw_add_task ~version ~(keygen:'a keygen) ~(expanded:bool) parent name expl 
                goal_external_proofs = PHprover.create 7;
                goal_transformations = PHstr.create 3;
                goal_metas = Mmetas_args.empty;
-               goal_verified = false;
+               goal_verified = None;
                goal_expanded = expanded;
              }
   in
@@ -1001,7 +1013,7 @@ let raw_add_transformation ~(keygen:'a keygen) ~(expanded:bool) g name =
   let key = keygen ~parent () in
   let tr = { transf_name = name;
              transf_parent = g;
-             transf_verified = false;
+             transf_verified = None;
              transf_key = key;
              transf_goals = [];
              transf_expanded = expanded;
@@ -1016,7 +1028,7 @@ let raw_add_metas ~(keygen:'a keygen) ~(expanded:bool) g added idpos =
   let ms = { metas_added = added;
              metas_idpos = idpos;
              metas_parent = g;
-             metas_verified = false;
+             metas_verified = None;
              metas_key = key;
              metas_goal = g;
              metas_expanded = expanded;
@@ -1034,7 +1046,7 @@ let raw_add_theory ~(keygen:'a keygen) ~(expanded:bool)
               theory_parent = mfile;
               theory_checksum = checksum;
               theory_goals = [];
-              theory_verified = false;
+              theory_verified = None;
               theory_expanded = expanded;
               theory_task = None;
             }
@@ -1047,7 +1059,7 @@ let raw_add_file ~(keygen:'a keygen) ~(expanded:bool) session f fmt =
                 file_key = key;
                 file_format = fmt;
                 file_theories = [];
-                file_verified = false;
+                file_verified = None;
                 file_expanded = expanded;
                 file_parent  = session;
                 file_for_recovery = None;

@@ -82,7 +82,7 @@ type 'a goal = private
       goal_parent : 'a goal_parent;
       mutable goal_checksum : Termcode.checksum option;  (** checksum of the task *)
       mutable goal_shape : Termcode.shape;  (** shape of the task *)
-      mutable goal_verified : bool;
+      mutable goal_verified : float option;
       mutable goal_task: task_option;
       mutable goal_expanded : bool;
       goal_external_proofs : 'a proof_attempt PHprover.t;
@@ -112,7 +112,7 @@ and 'a metas =
     metas_added : metas_args;
     metas_idpos : idpos;
     metas_parent : 'a goal;
-    mutable metas_verified : bool;
+    mutable metas_verified : float option;
     mutable metas_goal : 'a goal;
     (** Not mutated after the creation *)
     mutable metas_expanded : bool;
@@ -123,7 +123,7 @@ and 'a transf = private
       transf_name : string;
       (** Why3 transformation name *)
       transf_parent : 'a goal;
-      mutable transf_verified : bool;
+      mutable transf_verified : float option;
       mutable transf_goals : 'a goal list;
       (** Not mutated after the creation *)
       mutable transf_expanded : bool;
@@ -136,7 +136,7 @@ and 'a theory = private
       mutable theory_checksum : Termcode.checksum option;
       mutable theory_goals : 'a goal list;
       (** Not mutated after the creation *)
-      mutable theory_verified : bool;
+      mutable theory_verified : float option;
       mutable theory_expanded : bool;
       mutable theory_task : Theory.theory hide;
     }
@@ -148,7 +148,7 @@ and 'a file = private
       file_parent : 'a session;
       mutable file_theories: 'a theory list;
       (** Not mutated after the creation *)
-      mutable file_verified : bool;
+      mutable file_verified : float option;
       mutable file_expanded : bool;
       mutable file_for_recovery : Theory.theory Mstr.t hide;
     }
@@ -300,9 +300,9 @@ val goal_task_option : 'key goal -> Task.task option
 val goal_expl : 'key goal -> string
 (** Return the explication of a goal *)
 
-val proof_verified : 'key proof_attempt -> bool
-(** Return true if the proof is not obsolete and the result is valid *)
-
+val proof_verified : 'key proof_attempt -> float option
+(** Return [Some t] if the proof is not obsolete and the result is
+    valid. [t] is the time needed to solved it *)
 
 val get_used_provers : 'a session -> Whyconf.Sprover.t
 (** Get the set of provers which appear in the session *)

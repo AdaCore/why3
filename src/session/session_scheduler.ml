@@ -890,16 +890,16 @@ let remove_metas t =
   remove_metas ~notify t
 
 let rec clean = function
-  | Goal g when g.goal_verified ->
+  | Goal g when Opt.inhabited g.goal_verified ->
     iter_goal
       (fun a ->
         if a.proof_obsolete || not (proof_successful_or_just_edited a) then
           remove_proof_attempt a)
       (fun t ->
-        if not t.transf_verified then remove_transformation t
+        if not (Opt.inhabited t.transf_verified) then remove_transformation t
         else transf_iter clean t)
       (fun m ->
-        if not m.metas_verified then remove_metas m
+        if not (Opt.inhabited m.metas_verified) then remove_metas m
         else metas_iter clean m)
       g
   | Goal g ->
@@ -913,7 +913,7 @@ let rec clean = function
         *)
         transf_iter clean t)
       (fun m ->
-        if not m.metas_verified then remove_metas m
+        if not (Opt.inhabited m.metas_verified) then remove_metas m
         else metas_iter clean m)
       g
   | Proof_attempt a -> clean (Goal a.proof_parent)
