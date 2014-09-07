@@ -198,7 +198,7 @@ let rec num_lines acc tr =
       (fun _ tr -> print_transf fmt depth max_depth provers tr)
       g.goal_transformations
 
-  let print_theory fmt th =
+  let print_theory fn fmt th =
     let depth = theory_depth th in
     if depth > 0 then
     let provers = Hprover.create 9 in
@@ -207,13 +207,20 @@ let rec num_lines acc tr =
       Hprover.fold (fun _ pr acc -> pr :: acc) provers []
     in
     let provers = List.sort Whyconf.Prover.compare provers in
-    let name = th.S.theory_name.Ident.id_string in
-    fprintf fmt "<h2><font color=\"#%a\">Theory \"%s\": %s</font></h2>@\n"
+    let name =
+      try
+        let (l,t,_) = Theory.restore_path th.theory_name in
+        String.concat "." ([fn]@l@[t])
+      with Not_found -> fn ^ "." ^ th.theory_name.Ident.id_string
+    in
+    fprintf fmt "<h2><font color=\"#%a\">Theory \"%s\": "
       (color_of_status ~dark:true) (Opt.inhabited th.S.theory_verified)
-      name
-      (if Opt.inhabited th.S.theory_verified
-       then "fully verified" else "not fully verified")
-    ;
+      name;
+    begin match th.S.theory_verified with
+    | Some t -> fprintf fmt "fully verified in %.02f s" t
+    | None -> fprintf fmt "not fully verified"
+    end;
+    fprintf fmt "</font></h2>@\n";
 
     fprintf fmt "<table border=\"1\"><tr><td colspan=\"%d\">Obligations</td>" depth;
     (* fprintf fmt "<table border=\"1\"><tr><td>Obligations</td>"; *)
@@ -226,8 +233,10 @@ let rec num_lines acc tr =
 
   let print_file fmt f =
     (* fprintf fmt "<h1>File %s</h1>@\n" f.file_name; *)
+    let fn = Filename.basename f.file_name in
+    let fn = Filename.chop_extension fn in
     fprintf fmt "%a"
-      (Pp.print_list Pp.newline print_theory) f.file_theories
+      (Pp.print_list Pp.newline (print_theory fn)) f.file_theories
 
   let print_session name fmt s =
     fprintf fmt "<h1>Why3 Proof Results for Project \"%s\"</h1>@\n" name;
@@ -416,11 +425,17 @@ onclick=\"showedited('%s'); return false;\">%a : %a</a></li>@]"
       g.goal_transformations in
 
   let print_theory fmt th =
+    let name =
+      try
+        let (l,t,_) = Theory.restore_path th.theory_name in
+        String.concat "." (l@[t])
+      with Not_found -> th.theory_name.Ident.id_string
+    in
     fprintf fmt
       "@[<hov><li rel='theory'><a href='#'>\
 <span %a>%s</span></a>@,<ul>%a</ul></li>@]"
       print_verified (Opt.inhabited th.theory_verified)
-      th.theory_name.Ident.id_string
+      name
       (Pp.print_list Pp.newline print_goal) th.theory_goals in
 
   let print_file fmt f =
