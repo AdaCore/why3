@@ -21,10 +21,12 @@ let meta_rewrite = Theory.register_meta "rewrite" [Theory.MTprsymbol]
 let meta_rewrite_def = Theory.register_meta "rewrite_def" [Theory.MTlsymbol]
   ~desc:"Declares@ the@ definition@ of@ the@ symbol@ as@ as@ rewrite@ rule."
 
+(* not yet used
 let meta_begin_compute_context =
   Theory.register_meta "begin_compute_context" []
     ~desc:"Marks@ the@ position@ where@ computations@ are@ done@ by@ \
            transformation@ 'compute_in_context'."
+*)
 
 let collect_rule_decl prs e d =
   match d.Decl.d_node with

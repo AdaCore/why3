@@ -17,6 +17,11 @@ type value =
 | Term of term    (* invariant: is in normal form *)
 | Int of BigInt.t
 
+let v_label_copy orig v =
+  match v with
+  | Int _ -> v
+  | Term t -> Term (t_label_copy orig t)
+
 let const_of_positive n =
     t_const (Number.ConstInt (Number.int_const_dec (BigInt.to_string n)))
 
@@ -80,8 +85,10 @@ let eval_int_op op simpl ls l ty =
     end
   | _ -> t_app_value ls l ty
 
+(* unused anymore, for the moment
 let simpl_none ls t1 t2 ty =
   t_app_value ls [t1;t2] ty
+*)
 
 let simpl_add ls t1 t2 ty =
   if is_zero t1 then t2 else
@@ -262,7 +269,8 @@ type cont =
 
 type config = {
   value_stack : value list;
-  cont_stack : cont list;
+  cont_stack : (cont * term) list;
+  (* second term is the original term, for label and loc copy *)
 }
 
 
@@ -376,61 +384,65 @@ let rec extract_first n acc l =
 let rec reduce engine c =
   match c.value_stack, c.cont_stack with
   | _, [] -> assert false
-  | st, Keval (t,sigma) :: rem -> reduce_eval st t sigma rem
-  | [], Kif _ :: _ -> assert false
-  | v :: st, Kif(t2,t3,sigma) :: rem ->
+  | st, (Keval (t,sigma),orig) :: rem -> reduce_eval st t ~orig sigma rem
+  | [], (Kif _, _) :: _ -> assert false
+  | v :: st, (Kif(t2,t3,sigma), orig) :: rem ->
     begin
       match v with
       | Term { t_node = Ttrue } ->
         { value_stack = st ;
-          cont_stack = Keval(t2,sigma) :: rem }
+          cont_stack = (Keval(t2,sigma),t_label_copy orig t2)  :: rem }
       | Term { t_node = Tfalse } ->
         { value_stack = st ;
-          cont_stack = Keval(t3,sigma) :: rem }
+          cont_stack = (Keval(t3,sigma),t_label_copy orig t3) :: rem }
       | Term t1 ->
         { value_stack =
-            Term (t_if t1 (t_subst sigma t2) (t_subst sigma t3)) :: st;
+            Term
+              (t_label_copy orig
+                 (t_if t1 (t_subst sigma t2) (t_subst sigma t3))) :: st;
           cont_stack = rem ;
         }
       | Int _ -> assert false (* would be ill-typed *)
     end
-  | [], Klet _ :: _ -> assert false
-  | t1 :: st, Klet(v,t2,sigma) :: rem ->
+  | [], (Klet _, _) :: _ -> assert false
+  | t1 :: st, (Klet(v,t2,sigma), orig) :: rem ->
     let t1 = term_of_value t1 in
     { value_stack = st;
-      cont_stack = Keval(t2, Mvs.add v t1 sigma) :: rem;
+      cont_stack =
+        (Keval(t2, Mvs.add v t1 sigma), t_label_copy orig t2) :: rem;
     }
-  | [], Kcase _ :: _ -> assert false
-  | Int _ :: _, Kcase _ :: _ -> assert false
-  | (Term t1) :: st, Kcase(tbl,sigma) :: rem ->
-    reduce_match st t1 tbl sigma rem
-  | ([] | [_] | Int _ :: _ | Term _ :: Int _ :: _), Kbinop _ :: _ -> assert false
-  | (Term t1) :: (Term t2) :: st, Kbinop op :: rem ->
-    { value_stack = Term (t_binary_simp op t2 t1) :: st;
+  | [], (Kcase _, _) :: _ -> assert false
+  | Int _ :: _, (Kcase _, _) :: _ -> assert false
+  | (Term t1) :: st, (Kcase(tbl,sigma), orig) :: rem ->
+    reduce_match st t1 ~orig tbl sigma rem
+  | ([] | [_] | Int _ :: _ | Term _ :: Int _ :: _),
+    (Kbinop _, _) :: _ -> assert false
+  | (Term t1) :: (Term t2) :: st, (Kbinop op, orig) :: rem ->
+    { value_stack = Term (t_label_copy orig (t_binary_simp op t2 t1)) :: st;
       cont_stack = rem;
     }
-  | [], Knot :: _ -> assert false
-  | Int _ :: _ , Knot :: _ -> assert false
-  | (Term t) :: st, Knot :: rem ->
-    { value_stack = Term (t_not t) :: st;
+  | [], (Knot,_) :: _ -> assert false
+  | Int _ :: _ , (Knot,_) :: _ -> assert false
+  | (Term t) :: st, (Knot, orig) :: rem ->
+    { value_stack = Term (t_label_copy orig (t_not t)) :: st;
       cont_stack = rem;
     }
-  | st, Kapp(ls,ty) :: rem ->
-    reduce_app engine st ls ty rem
-  | [], Keps _ :: _ -> assert false
-  | Int _ :: _ , Keps _ :: _ -> assert false
-  | Term t :: st, Keps v :: rem ->
-    { value_stack = Term (t_eps_close v t) :: st;
+  | st, (Kapp(ls,ty), orig) :: rem ->
+    reduce_app engine st ~orig ls ty rem
+  | [], (Keps _, _) :: _ -> assert false
+  | Int _ :: _ , (Keps _, _) :: _ -> assert false
+  | Term t :: st, (Keps v, orig) :: rem ->
+    { value_stack = Term (t_label_copy orig (t_eps_close v t)) :: st;
       cont_stack = rem;
     }
-  | [], Kquant _ :: _ -> assert false
-  | Int _ :: _, Kquant _ :: _ -> assert false
-  | Term t :: st, Kquant(q,vl,tr) :: rem ->
-    { value_stack = Term (t_quant_close q vl tr t) :: st;
+  | [], (Kquant _, _) :: _ -> assert false
+  | Int _ :: _, (Kquant _, _) :: _ -> assert false
+  | Term t :: st, (Kquant(q,vl,tr), orig) :: rem ->
+    { value_stack = Term (t_label_copy orig (t_quant_close q vl tr t)) :: st;
       cont_stack = rem;
     }
 
-and reduce_match st u tbl sigma cont =
+and reduce_match st u ~orig tbl sigma cont =
   let rec iter tbl =
     match tbl with
     | [] -> assert false (* pattern matching not exhaustive *)
@@ -464,23 +476,24 @@ and reduce_match st u tbl sigma cont =
         Format.eprintf "@]@.";
 *)
         { value_stack = st;
-          cont_stack = Keval(t,mv'') :: cont;
+          cont_stack = (Keval(t,mv''), t_label_copy orig t) :: cont;
         }
       with NoMatch -> iter rem
   in
   try iter tbl with Undetermined ->
-    { value_stack = Term (t_subst sigma (t_case u tbl)) :: st;
+    { value_stack =
+        Term (t_label_copy orig (t_subst sigma (t_case u tbl))) :: st;
       cont_stack = cont;
     }
 
 
-and reduce_eval st t sigma rem =
+and reduce_eval st t ~orig sigma rem =
   match t.t_node with
   | Tvar v ->
     begin
       try
         let t = Mvs.find v sigma in
-        { value_stack = Term t :: st ;
+        { value_stack = Term (t_label_copy orig t) :: st ;
           cont_stack = rem;
         }
       with Not_found ->
@@ -489,69 +502,71 @@ and reduce_eval st t sigma rem =
           Format.eprintf "Tvar not found: %a@." Pretty.print_vs v;
           assert false
         *)
-        { value_stack = Term t :: st ;
+        { value_stack = Term (t_label_copy orig t) :: st ;
           cont_stack = rem;
         }
     end
   | Tif(t1,t2,t3) ->
     { value_stack = st;
-      cont_stack = Keval(t1,sigma) :: Kif(t2,t3,sigma) :: rem;
+      cont_stack = (Keval(t1,sigma),t1) :: (Kif(t2,t3,sigma),t) :: rem;
     }
   | Tlet(t1,tb) ->
     let v,t2 = t_open_bound tb in
     { value_stack = st ;
-      cont_stack = Keval(t1,sigma) :: Klet(v,t2,sigma) :: rem }
+      cont_stack = (Keval(t1,sigma),t1) :: (Klet(v,t2,sigma),orig) :: rem }
   | Tcase(t1,tbl) ->
     { value_stack = st;
-      cont_stack = Keval(t1,sigma) :: Kcase(tbl,sigma) :: rem }
+      cont_stack = (Keval(t1,sigma),t1) :: (Kcase(tbl,sigma),orig) :: rem }
   | Tbinop(op,t1,t2) ->
     { value_stack = st;
-      cont_stack = Keval(t1,sigma) :: Keval(t2,sigma) :: Kbinop op :: rem;
+      cont_stack =
+        (Keval(t1,sigma),t1) ::
+          (Keval(t2,sigma),t2) :: (Kbinop op, orig) :: rem;
     }
   | Tnot t1 ->
     { value_stack = st;
-      cont_stack = Keval(t1,sigma) :: Knot :: rem;
+      cont_stack = (Keval(t1,sigma),t1) :: (Knot,orig) :: rem;
     }
   | Teps tb ->
     let v,t1 = t_open_bound tb in
     { value_stack = st ;
-      cont_stack = Keval(t1,sigma) :: Keps v :: rem;
+      cont_stack = (Keval(t1,sigma),t1) :: (Keps v,orig) :: rem;
     }
   | Tquant(q,tq) ->
     let vl,tr,t1 = t_open_quant tq in
     { value_stack = st;
-      cont_stack = Keval(t1,sigma) :: Kquant(q,vl,tr) :: rem;
+      cont_stack = (Keval(t1,sigma),t1) :: (Kquant(q,vl,tr),orig) :: rem;
     }
   | Tapp(ls,tl) ->
-    let args = List.rev_map (fun t -> Keval(t,sigma)) tl in
+    let args = List.rev_map (fun t -> (Keval(t,sigma),t)) tl in
     { value_stack = st;
-      cont_stack = List.rev_append args (Kapp(ls,t.t_ty) :: rem);
+      cont_stack = List.rev_append args ((Kapp(ls,t.t_ty),orig) :: rem);
     }
   | Ttrue | Tfalse | Tconst _ ->
-    { value_stack = Term t :: st;
+    { value_stack = Term (t_label_copy orig t) :: st;
       cont_stack = rem;
     }
 
-and reduce_app engine st ls ty rem_cont =
+and reduce_app engine st ls ~orig ty rem_cont =
   if ls_equal ls ps_equ then
     match st with
     | t2 :: t1 :: rem_st ->
       begin
         try
-          reduce_equ rem_st t1 t2 rem_cont
+          reduce_equ ~orig rem_st t1 t2 rem_cont
         with Undetermined ->
-          reduce_app_no_equ engine st ls ty rem_cont
+          reduce_app_no_equ engine st ls ~orig ty rem_cont
       end
     | _ -> assert false
-  else reduce_app_no_equ engine st ls ty rem_cont
+  else reduce_app_no_equ engine st ls ~orig ty rem_cont
 
-and reduce_app_no_equ engine st ls ty rem_cont =
+and reduce_app_no_equ engine st ls ~orig ty rem_cont =
   let arity = List.length ls.ls_args in
   let args,rem_st = extract_first arity [] st in
   try
     let f = Hls.find builtins ls in
-    let t = f ls args ty in
-    { value_stack = t :: rem_st;
+    let v = f ls args ty in
+    { value_stack = (v_label_copy orig v) :: rem_st;
       cont_stack = rem_cont;
     }
   with Not_found ->
@@ -600,7 +615,7 @@ and reduce_app_no_equ engine st ls ty rem_cont =
 *)
             let mv,rhs = t_subst_types mt mv rhs in
             { value_stack = rem_st;
-              cont_stack = Keval(rhs,mv) :: rem_cont;
+              cont_stack = (Keval(rhs,mv),orig) :: rem_cont;
             }
           with Irreducible ->
             raise Not_found
@@ -621,7 +636,7 @@ and reduce_app_no_equ engine st ls ty rem_cont =
           let mt = Ty.oty_match mt e.t_ty ty in
           let mv,e = t_subst_types mt mv e in
           { value_stack = rem_st;
-            cont_stack = Keval(e,mv) :: rem_cont;
+            cont_stack = (Keval(e,mv),orig) :: rem_cont;
           }
         end else rewrite ()
       | Decl.Dparam _ | Decl.Dind _ ->
@@ -648,7 +663,8 @@ and reduce_app_no_equ engine st ls ty rem_cont =
                       | (Some pr)::prs, t::tl1 ->
                         if ls_equal ls pr
                         then (* projection found! *)
-                          { value_stack = Term t :: rem_st;
+                          { value_stack =
+                              (Term (t_label_copy orig t)) :: rem_st;
                             cont_stack = rem_cont;
                           }
                         else
@@ -662,19 +678,19 @@ and reduce_app_no_equ engine st ls ty rem_cont =
           in iter dl
         | _ -> raise Not_found
     with Not_found ->
-      { value_stack = Term (t_app ls args ty) :: rem_st;
+      { value_stack = Term (t_label_copy orig (t_app ls args ty)) :: rem_st;
         cont_stack = rem_cont;
       }
 
 
-and reduce_equ (* engine *) st v1 v2 cont =
+and reduce_equ (* engine *) ~orig st v1 v2 cont =
 (*
   try
 *)
     match v1,v2 with
     | Int n1, Int n2 ->
       let b = to_bool (BigInt.eq n1 n2) in
-      { value_stack = Term b :: st;
+      { value_stack = Term (t_label_copy orig b) :: st;
         cont_stack = cont;
       }
     | Int n, Term {t_node = Tconst c} | Term {t_node = Tconst c}, Int n ->
@@ -682,13 +698,13 @@ and reduce_equ (* engine *) st v1 v2 cont =
         try
           let n' = big_int_of_const c in
           let b = to_bool (BigInt.eq n n') in
-          { value_stack = Term b :: st;
+          { value_stack = Term (t_label_copy orig b) :: st;
             cont_stack = cont;
           }
         with NotNum -> raise Undetermined
       end
     | Int _,  Term _ | Term _,  Int _ -> raise Undetermined
-    | Term t1, Term t2 -> reduce_term_equ st t1 t2 cont
+    | Term t1, Term t2 -> reduce_term_equ ~orig st t1 t2 cont
 (*
   with Undetermined ->
     { value_stack = Term (t_equ (term_of_value v1) (term_of_value v2)) :: st;
@@ -696,9 +712,9 @@ and reduce_equ (* engine *) st v1 v2 cont =
     }
 *)
 
-and reduce_term_equ st t1 t2 cont =
+and reduce_term_equ ~orig st t1 t2 cont =
   if t_equal t1 t2 then
-    { value_stack = Term t_true :: st;
+    { value_stack = Term (t_label_copy orig t_true) :: st;
       cont_stack = cont;
     }
   else
@@ -708,7 +724,7 @@ and reduce_term_equ st t1 t2 cont =
       match c1,c2 with
       | Number.ConstInt i1, Number.ConstInt i2 ->
         let b = BigInt.eq (Number.compute_int i1) (Number.compute_int i2) in
-        { value_stack = Term (to_bool b) :: st;
+        { value_stack = Term (t_label_copy orig (to_bool b)) :: st;
           cont_stack = cont;
         }
       | _ -> raise Undetermined
@@ -731,10 +747,10 @@ and reduce_term_equ st t1 t2 cont =
         aux Mvs.empty t_true ls1.ls_args tl1 tl2
       in
       { value_stack = st;
-        cont_stack = Keval(t,sigma) :: cont;
+        cont_stack = (Keval(t,sigma),orig) :: cont;
       }
     else
-      { value_stack = Term t_false :: st;
+      { value_stack = Term (t_label_copy orig t_false) :: st;
         cont_stack = cont;
       }
   | _ -> raise Undetermined
@@ -745,59 +761,36 @@ let rec reconstruct c =
   match c.value_stack, c.cont_stack with
   | [Term t], [] -> t
   | _, [] -> assert false
-  | st, Keval (t,sigma) :: rem ->
+  | _, (k,orig) :: rem ->
+    let t, st = 
+      match c.value_stack, k with
+      | st, Keval (t,sigma) -> (t_subst sigma t), st
+      | [], Kif _ -> assert false
+      | v :: st, Kif(t2,t3,sigma) ->
+        (t_if (term_of_value v) (t_subst sigma t2) (t_subst sigma t3)), st
+      | [], Klet _ -> assert false
+      | t1 :: st, Klet(v,t2,sigma) ->
+        (t_let_close v (term_of_value t1) (t_subst sigma t2)), st
+      | [], Kcase _ -> assert false
+      | v :: st, Kcase(tbl,sigma) ->
+        (t_subst sigma (t_case (term_of_value v) tbl)), st
+      | ([] | [_]), Kbinop _ -> assert false
+      | t1 :: t2 :: st, Kbinop op ->
+        (t_binary_simp op (term_of_value t2) (term_of_value t1)), st
+      | [], Knot -> assert false
+      | t :: st, Knot -> (t_not (term_of_value t)), st
+      | st, Kapp(ls,ty) ->
+        let args,rem_st = extract_first (List.length ls.ls_args) [] st in
+        let args = List.map term_of_value args in
+        (t_app ls args ty), rem_st
+      | [], Keps _ -> assert false
+      | t :: st, Keps v -> (t_eps_close v (term_of_value t)), st
+      | [], Kquant _ -> assert false
+      | t :: st, Kquant(q,vl,tr) ->
+        (t_quant_close q vl tr (term_of_value t)), st
+    in
     reconstruct {
-      value_stack = (Term (t_subst sigma t)) :: st;
-      cont_stack = rem;
-    }
-  | [], Kif _ :: _ -> assert false
-  | v :: st, Kif(t2,t3,sigma) :: rem ->
-    reconstruct {
-      value_stack =
-        Term (t_if (term_of_value v) (t_subst sigma t2) (t_subst sigma t3)) :: st;
-      cont_stack = rem ;
-    }
-  | [], Klet _ :: _ -> assert false
-  | t1 :: st, Klet(v,t2,sigma) :: rem ->
-    reconstruct {
-      value_stack = Term(t_let_close v (term_of_value t1) (t_subst sigma t2)) :: st;
-      cont_stack = rem;
-    }
-  | [], Kcase _ :: _ -> assert false
-  | v :: st, Kcase(tbl,sigma) :: rem ->
-    reconstruct {
-      value_stack = Term (t_subst sigma (t_case (term_of_value v) tbl)) :: st;
-      cont_stack = rem;
-    }
-  | ([] | [_]), Kbinop _ :: _ -> assert false
-  | t1 :: t2 :: st, Kbinop op :: rem ->
-    reconstruct {
-      value_stack = Term (t_binary_simp op (term_of_value t2) (term_of_value t1)) :: st;
-      cont_stack = rem;
-    }
-  | [], Knot :: _ -> assert false
-  | t :: st, Knot :: rem ->
-    reconstruct {
-      value_stack = Term (t_not (term_of_value t)) :: st;
-      cont_stack = rem;
-    }
-  | st, Kapp(ls,ty) :: rem ->
-    let args,rem_st = extract_first (List.length ls.ls_args) [] st in
-    let args = List.map term_of_value args in
-    reconstruct {
-      value_stack = Term (t_app ls args ty) :: rem_st;
-      cont_stack = rem;
-    }
-  | [], Keps _ :: _ -> assert false
-  | t :: st, Keps v :: rem ->
-    reconstruct {
-      value_stack = Term (t_eps_close v (term_of_value t)) :: st;
-      cont_stack = rem;
-    }
-  | [], Kquant _ :: _ -> assert false
-  | t :: st, Kquant(q,vl,tr) :: rem ->
-    reconstruct {
-      value_stack = Term (t_quant_close q vl tr (term_of_value t)) :: st;
+      value_stack = (Term (t_label_copy orig t)) :: st;
       cont_stack = rem;
     }
 
@@ -821,7 +814,7 @@ let normalize ?(limit=1000) engine t0 =
         many_steps c (n+1)
   in
   let c = { value_stack = [];
-            cont_stack = [Keval(t0,Mvs.empty)] ;
+            cont_stack = [Keval(t0,Mvs.empty),t0] ;
           }
   in
   many_steps c 0
