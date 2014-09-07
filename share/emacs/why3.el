@@ -136,14 +136,14 @@
             (indent-line-to cur-indent)
           (indent-line-to 0)))))))
 
-; compile will propose "why3ide file" is no Makefile is present
+; compile will propose "why3 ide file" is no Makefile is present
 
 (add-hook 'why3-mode-hook
           (lambda ()
             (unless (file-exists-p "Makefile")
               (set (make-local-variable 'compile-command)
                    (let ((file (file-name-nondirectory buffer-file-name)))
-                     (format "why3ide %s" file))))))
+                     (format "why3 ide %s" file))))))
 
 
 
