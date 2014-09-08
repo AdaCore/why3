@@ -9,51 +9,58 @@ module Compiler_logic
   use import HighOrd
 
 
-
+   
+  (* Unary predicates over machine states *)
   type pred  = machine_state -> bool
+  
+  (* Postcondition type (first argument is old state) *)
   type post  = machine_state -> pred
 
   (* Hoare triples with explicit pre & post *)
-  type codespec =
+  type hl =
    { code: code;
      ghost pre : pos -> pred;
      ghost post: pos -> post }
-
- (* Weakest Precondition Calculus *)
+ 
+ (* Code with weakest precondition wp_correctness. *)
   type wp =
    { wcode : code;
      ghost wp : pos -> pred -> pred }
-
-  (*
-  function offset (ms : machine_state) (ofs: pos) : machine_state
-    = match ms
-      with (VMS p s m) -> (VMS (p + ofs) s m) end *)
-
-
-
+ 
+ (* Machine transition independence for a piece of code with respect
+    to the rest of the code. *)
  predicate contextual_irrelevance (c : code) (p: pos) (ms1 ms2 : machine_state)
   = forall c_global: code.
      codeseq_at c_global p c ->
       transition_star c_global ms1 ms2
-
- predicate total_correctness (cs : codespec) =
+  
+ (* (Total) correctness for hoare triple. *)
+ predicate hl_correctness (cs : hl) =
    forall p: pos, ms : machine_state. cs.pre p ms ->
       exists ms' : machine_state. cs.post p ms ms'
       /\ contextual_irrelevance cs.code p ms ms'
-
- predicate transformer (code : wp) =
+ 
+ (* Invariant for code with WP wp_correctness. *)
+ predicate wp_correctness (code : wp) =
   forall p: pos, post : pred, ms: machine_state.
    (code.wp p post) ms ->
     exists ms' : machine_state. (post ms')
     /\ contextual_irrelevance code.wcode p ms ms'
 
-
+ 
+ (* WP combinator for sequence. *)
  function seq_wp (s1 s2: wp) : pos -> pred -> pred =
   \p q. s1.wp p (s2.wp (p + s1.wcode.length) q)
-
+ 
+ lemma seq_wp_def : forall s1 s2 p q.
+   seq_wp s1 s2 p q = s1.wp p (s2.wp (p+s1.wcode.length) q)
+ 
+ meta rewrite prop seq_wp_def
+ 
+ (* Code combinator for sequence, with wp. *)
  let (~) (s1 s2 : wp) : wp
-  requires { transformer s1 /\ transformer s2 }
-  ensures  { transformer result }
+  requires { wp_correctness s1 /\ wp_correctness s2 }
+  ensures  { wp_correctness result }
   ensures  { result.wp = seq_wp s1 s2 }
   ensures  { result.wcode.length = s1.wcode.length + s2.wcode.length }
   = let wcode = s1.wcode ++ s2.wcode in
@@ -70,43 +77,50 @@ module Compiler_logic
    };
    res
 
- function towp_wp (c : codespec) : pos -> pred -> pred =
+ (* WP transformer for hoare triples. *)
+ function towp_wp (c : hl) : pos -> pred -> pred =
   \p q ms. c.pre p ms && (forall ms'. c.post p ms ms' -> q ms')
 
+ lemma towp_wp_def : forall c p q ms.
+   towp_wp c p q ms = (c.pre p ms && (forall ms'. c.post p ms ms' -> q ms'))
+ 
+ meta rewrite prop towp_wp_def
 
- let (!!) (c: codespec) : wp
- requires { total_correctness c }
- ensures  { transformer result  }
+ 
+ (* Unwrap code with hoare triple into code with wp.
+    Analogous to function call/abstract block. *)
+ let (!!) (c: hl) : wp
+ requires { hl_correctness c }
+ ensures  { wp_correctness result  }
  ensures  { result.wcode = c.code }
  ensures  { result.wp = towp_wp c }
  =  { wcode = c.code; wp = any pos -> pred -> pred ensures {result = towp_wp c}}
-
+ 
+ (* Equip code with pre/post-condition. That is here that proof happen.
+    (P -> wp (c,Q)). Anologous to checking function/abstract block
+    specification. *)
  let hoare (ghost pre: pos -> pred) (c: wp)
-           (ghost post: pos -> machine_state -> pred) : codespec
- requires { transformer c }
+           (ghost post: pos -> machine_state -> pred) : hl
+ requires { wp_correctness c }
  requires { forall p ms. pre p ms -> (c.wp p (post p ms)) ms }
  ensures  { result.code = c.wcode }
- ensures  { total_correctness result }
+ ensures  { hl_correctness result }
  ensures  { result.pre = pre /\ result.post = post }
  = { code = c.wcode ; pre = pre; post = post }
 
-
-
-
+ (* Specification of builtin binary operators. *)
  constant ibinop_pre : pos -> pred =
   \p ms . exists n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m
-
 
  function iadd_post : pos -> machine_state -> pred =
    \p ms ms'. forall n1 n2 s m.
       ms = VMS p (push n2 (push n1 s)) m  ->
       ms' = VMS (p + 1) (push (n1 + n2) s) m
 
-
- let iaddf () : codespec
+ let iaddf () : hl
   ensures { forall p ms. result.pre p ms <-> ibinop_pre p ms}
   ensures { forall p ms ms'. result.post p ms ms' <-> iadd_post p ms ms' }
-  ensures { total_correctness result }
+  ensures { hl_correctness result }
   ensures { result.code.length = 1 }
   = let res = {code = Cons Iadd Nil; pre  = ibinop_pre ; post = iadd_post } in
     assert {
@@ -137,8 +151,8 @@ module Compile_aexpr
   use import Compiler_logic
 
 
-
-
+  (* arithmetic expression compiler. *)
+  
   function aexpr_post (a:aexpr) (len:pos) : pos -> machine_state -> pred =
   \ p ms ms'.
    match ms with
@@ -150,11 +164,11 @@ module Compile_aexpr
     | VMS p' _ _ -> p = p'
    end
 
-  let rec compile_aexpr (a : aexpr) :  codespec
+  let rec compile_aexpr (a : aexpr) :  hl
     variant { a }
     ensures { result.pre = aexpr_pre }
     ensures { result.post = aexpr_post a result.code.length }
-    ensures {total_correctness result}
+    ensures {hl_correctness result}
     = let c = match a with
      | Anum n -> absurd (* iconst n *)
      | Avar x ->  absurd (* ivar x *)
