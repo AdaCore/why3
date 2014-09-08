@@ -202,36 +202,32 @@ val create_xsymbol : preid -> ity -> xsymbol
 module Mexn: Extmap.S with type key = xsymbol
 module Sexn: Extset.S with module M = Mexn
 
-(*
 (** {2 Effects} *)
 
 type effect = private {
-  eff_writes : Sreg.t;
+  eff_writes : Spv.t Mreg.t;
   eff_raises : Sexn.t;
-  eff_ghostw : Sreg.t; (** ghost writes *)
-  eff_ghostx : Sexn.t; (** ghost raises *)
-  (* if r1 -> Some r2 then r1 appears in ty(r2) *)
-  eff_resets : region option Mreg.t;
-  eff_compar : Stv.t;
+  eff_resets : Sreg.t;
   eff_diverg : bool;
 }
 
 val eff_empty : effect
 val eff_equal : effect -> effect -> bool
 val eff_union : effect -> effect -> effect
-val eff_ghostify : bool -> effect -> effect
 
-val eff_write : effect -> ?ghost:bool -> region -> effect
-val eff_raise : effect -> ?ghost:bool -> xsymbol -> effect
+val eff_is_empty : effect -> bool
+
+val eff_write : effect -> region -> pvsymbol option -> effect
+val eff_raise : effect -> xsymbol -> effect
+val eff_catch : effect -> xsymbol -> effect
 val eff_reset : effect -> region -> effect
 
-val eff_refresh : effect -> region -> region -> effect
-val eff_assign : effect -> ?ghost:bool -> region -> ity -> effect
-
-val eff_compare : effect -> tvsymbol -> effect
 val eff_diverge : effect -> effect
 
-val eff_remove_raise : effect -> xsymbol -> effect
+val eff_assign : effect -> (region * pvsymbol * ity) list -> effect
+
+(*
+val eff_refresh : effect -> region -> region -> effect
 
 val eff_stale_region : effect -> varset -> bool
 
@@ -240,8 +236,6 @@ exception IllegalCompar of tvsymbol * ity
 exception GhostDiverg
 
 val eff_full_inst : ity Mtv.t -> effect -> effect
-
-val eff_is_empty : effect -> bool
 
 (** {2 Specification} *)
 
@@ -265,24 +259,6 @@ type spec = {
 }
 
 (** {2 Program variables} *)
-
-type pvsymbol = private {
-  pv_vs    : vsymbol;
-  pv_ity   : ity;
-  pv_ghost : bool;
-}
-
-module Mpv : Extmap.S with type key = pvsymbol
-module Spv : Extset.S with module M = Mpv
-module Hpv : Exthtbl.S with type key = pvsymbol
-module Wpv : Weakhtbl.S with type key = pvsymbol
-
-val pv_equal : pvsymbol -> pvsymbol -> bool
-
-val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
-
-val restore_pv : vsymbol -> pvsymbol
-(** raises [Not_found] if the argument is not a [pv_vs] *)
 
 val t_pvset : Spv.t -> term -> Spv.t
 (** raises [Not_found] if the term contains non-pv variables *)

@@ -483,6 +483,9 @@ let create_itysymbol name args pri mut regs fld def =
   let nu = Opt.fold nonupd nu def in
   List.iter2 (fun upd v -> if upd && Stv.mem v nu then
     invalid_arg "Ity.create_itysymbol") aupd args;
+  (* NOTE: record/constructor fields must be pairwise separated,
+     but this should be checked during the type declaration, [fld]
+     is not enough *)
   (* create the type symbol *)
   create_itysymbol_unsafe ~ts ~pri ~mut ~fld ~regs ~rvis ~avis ~aupd ~def
 
@@ -569,99 +572,122 @@ end)
 module Sexn = Exn.S
 module Mexn = Exn.M
 
-(*
 (* effects *)
 type effect = {
-  eff_writes : Sreg.t;
+  eff_writes : Spv.t Mreg.t;
   eff_raises : Sexn.t;
-  eff_ghostw : Sreg.t; (* ghost writes *)
-  eff_ghostx : Sexn.t; (* ghost raises *)
-  (* if r1 -> Some r2 then r1 appears in ty(r2) *)
-  eff_resets : region option Mreg.t;
-  eff_compar : Stv.t;
+  eff_resets : Sreg.t;
   eff_diverg : bool;
 }
 
 let eff_empty = {
-  eff_writes = Sreg.empty;
+  eff_writes = Mreg.empty;
   eff_raises = Sexn.empty;
-  eff_ghostw = Sreg.empty;
-  eff_ghostx = Sexn.empty;
-  eff_resets = Mreg.empty;
-  eff_compar = Stv.empty;
+  eff_resets = Sreg.empty;
   eff_diverg = false;
 }
 
 let eff_is_empty e =
-  Sreg.is_empty e.eff_writes &&
+  Mreg.is_empty e.eff_writes &&
   Sexn.is_empty e.eff_raises &&
-  Sreg.is_empty e.eff_ghostw &&
-  Sexn.is_empty e.eff_ghostx &&
-  Mreg.is_empty e.eff_resets &&
-  (* eff_compar is not a side effect *)
+  Sreg.is_empty e.eff_resets &&
   not e.eff_diverg
 
 let eff_equal e1 e2 =
-  Sreg.equal e1.eff_writes e2.eff_writes &&
+  Mreg.equal Spv.equal e1.eff_writes e2.eff_writes &&
   Sexn.equal e1.eff_raises e2.eff_raises &&
-  Sreg.equal e1.eff_ghostw e2.eff_ghostw &&
-  Sexn.equal e1.eff_ghostx e2.eff_ghostx &&
-  Mreg.equal (Opt.equal reg_equal) e1.eff_resets e2.eff_resets &&
-  Stv.equal e1.eff_compar e2.eff_compar &&
+  Sreg.equal e1.eff_resets e2.eff_resets &&
   e1.eff_diverg = e2.eff_diverg
 
-let join_reset _key v1 v2 = match v1, v2 with
-  | Some r1, Some r2 ->
-      if reg_equal r1 r2 then Some v1 else
-      if reg_occurs r1 r2.reg_ity.ity_vars then Some v2 else
-      if reg_occurs r2 r1.reg_ity.ity_vars then Some v1 else
-      Some None
-  | _ -> Some None
+let fld_union _ f1 f2 = Some (Spv.union f1 f2)
 
 let eff_union x y = {
-  eff_writes = Sreg.union x.eff_writes y.eff_writes;
+  eff_writes = Mreg.union fld_union x.eff_writes y.eff_writes;
   eff_raises = Sexn.union x.eff_raises y.eff_raises;
-  eff_ghostw = Sreg.union x.eff_ghostw y.eff_ghostw;
-  eff_ghostx = Sexn.union x.eff_ghostx y.eff_ghostx;
-  eff_resets = Mreg.union join_reset x.eff_resets y.eff_resets;
-  eff_compar = Stv.union x.eff_compar y.eff_compar;
+  eff_resets = Sreg.union x.eff_resets y.eff_resets;
   eff_diverg = x.eff_diverg || y.eff_diverg;
 }
 
-exception GhostDiverg
+let eff_write e r f =
+  begin match r.ity_node, f with
+    | Itymut (s,_,_,_), Some f when Mvs.mem f.pv_vs s.its_mfields -> ()
+    | Itymut _, None -> ()
+    | _, _ -> invalid_arg "Ity.eff_write"
+  end;
+  let add fs = match f, fs with
+    | Some f, Some fs -> Some (Spv.add f fs)
+    | Some f, None    -> Some (Spv.singleton f)
+    | None,   Some fs -> Some fs
+    | None,   None    -> Some Spv.empty in
+  { e with eff_writes = Mreg.change add r e.eff_writes }
 
-let eff_ghostify e = {
-  eff_writes = Sreg.empty;
-  eff_raises = Sexn.empty;
-  eff_ghostw = Sreg.union e.eff_writes e.eff_ghostw;
-  eff_ghostx = Sexn.union e.eff_raises e.eff_ghostx;
-  eff_resets = e.eff_resets;
-  eff_compar = e.eff_compar;
-    (* from the code extraction point of view, we can allow comparing
-       opaque types in the ghost code, as it is never extracted.
-       However, if we consider Coq realisations, we have to treat
-       some pure types (e.g., maps) as opaque, too, and never compare
-       them even in pure formulas. Therefore, we play safe and forbid
-       comparison of opaque types in the ghost code. *)
-  eff_diverg = if e.eff_diverg then raise GhostDiverg else false;
-}
+let eff_raise e x = { e with eff_raises = Sexn.add x e.eff_raises }
+let eff_catch e x = { e with eff_raises = Sexn.remove x e.eff_raises }
 
-let eff_ghostify gh e = if gh then eff_ghostify e else e
-
-let eff_write e ?(ghost=false) r = if ghost
-  then { e with eff_ghostw = Sreg.add r e.eff_ghostw }
-  else { e with eff_writes = Sreg.add r e.eff_writes }
-
-let eff_raise e ?(ghost=false) x = if ghost
-  then { e with eff_ghostx = Sexn.add x e.eff_ghostx }
-  else { e with eff_raises = Sexn.add x e.eff_raises }
-
-let eff_reset e r = { e with eff_resets = Mreg.add r None e.eff_resets }
-
-let eff_compare e tv = { e with eff_compar = Stv.add tv e.eff_compar }
+let eff_reset e r = match r.ity_node with
+  | Itymut _ -> { e with eff_resets = Sreg.add r e.eff_resets }
+  | _ -> invalid_arg "Ity.eff_reset"
 
 let eff_diverge e = { e with eff_diverg = true }
 
+exception AssignPrivate of ity
+
+(* freeze type variables and regions outside modified fields *)
+let freeze_of_writes wr =
+  let freeze_of_write r fs frz =
+    let s,tl,rl,_ = open_region r in
+    let frz = List.fold_left ity_freeze frz tl in
+    let freeze_unhit frz r reg =
+      (* fields are unaliased in [s], therefore if region [r] from
+          [s.its_regions] occurs in [f.pv_ity], it cannot occur in
+          any other field of [s], and therefore [reg] doesn't need
+          to be frozen. If [reg] or subregions of [reg] are aliased
+          with other fields of the modified value, they will occur
+          in the instances of other regions in [s.its_regions], and
+          will be frozen there. *)
+      let hit f _ = ity_r_occurs r f.pv_ity in
+      if Mpv.exists hit fs then frz else ity_freeze frz reg in
+    List.fold_left2 freeze_unhit frz s.its_regions rl in
+  Mreg.fold freeze_of_write wr Mtv.empty
+
+let eff_assign e asl =
+  let seen,e = List.fold_left (fun (seen,e) (r,f,ity) ->
+    begin match r.ity_node with
+      | Itymut (s,_,_,_) when s.its_private -> raise (AssignPrivate r)
+      | Itymut (s,_,_,_) when Mvs.mem f.pv_vs s.its_mfields -> ()
+      | _ -> invalid_arg "Ity.eff_assign"
+    end;
+    let seen = Mreg.change (fun fs -> Some (match fs with
+      | Some fs -> Mpv.add_new (Invalid_argument "Ity.eff_assign") f ity fs
+      | None    -> Mpv.singleton f ity)) r seen in
+    seen, eff_write e r (Some f)) (Mreg.empty,e) asl in
+  (* type variables and regions outside modified fields are frozen *)
+  let frz = freeze_of_writes seen in
+  (* non-frozen regions are allowed to be renamed, preserving aliases *)
+  let sbst, sbsf = Mreg.fold (fun r fs acc ->
+    let s,tl,rl,_ = open_region r in
+    let sbs = List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty in
+    let sbs = List.fold_left2 ity_match sbs s.its_regions rl in
+    Mpv.fold (fun pv ity (sbst,sbsf) ->
+      let fity = ity_full_inst sbs pv.pv_ity in
+      ity_match sbst fity ity,
+      ity_match sbsf ity fity) fs acc) seen (frz,frz) in
+  (* every RHS region is reset unless it is preserved *)
+  let e = Mtv.fold (fun v r e ->
+    if Mtv.mem v sbst then e else
+    let s,tl,rl,_ = open_region r in
+    (* [ity_mut_unsafe] will ignore [s], [tl], and [rl], and will
+       restore (via hash-consing) the type corresponding to [v].
+       We could use [ity_mut_unsafe ts_unit [] [] v] instead. *)
+    let r = ity_mut_unsafe s tl rl v in
+    eff_reset e r) sbsf e in
+  e
+(*
+  (* every region not instantiated to itself is refreshed *)
+  let refr = Mreg.fold (fun r _ refr ->
+*)
+
+(*
 exception IllegalAlias of region
 exception IllegalCompar of tvsymbol * ity
 
@@ -690,11 +716,6 @@ let eff_assign e ?(ghost=false) r ty =
   let add_left k v m = if reg_equal k v then m else Mreg.add k (Some r) m in
   let reset = Mreg.fold add_left sub.ity_subst_reg reset in
   { e with eff_resets = Mreg.union join_reset e.eff_resets reset }
-
-let eff_remove_raise e x = { e with
-  eff_raises = Sexn.remove x e.eff_raises;
-  eff_ghostx = Sexn.remove x e.eff_ghostx;
-}
 
 let eff_full_inst sbs e =
   let s = sbs.ity_subst_reg in
@@ -845,38 +866,6 @@ let spec_check ~full_xpost c ty =
       (Sexn.choose (Mexn.set_diff c.c_effect.eff_ghostx c.c_xpost)))
 
 (** program variables *)
-
-type pvsymbol = {
-  pv_vs    : vsymbol;
-  pv_ity   : ity;
-  pv_ghost : bool;
-}
-
-module PVsym = MakeMSHW (struct
-  type t = pvsymbol
-  let tag pv = pv.pv_vs.vs_name.id_tag
-end)
-
-module Spv = PVsym.S
-module Mpv = PVsym.M
-module Hpv = PVsym.H
-module Wpv = PVsym.W
-
-let pv_equal : pvsymbol -> pvsymbol -> bool = (==)
-
-let create_pvsymbol id ghost ity = {
-  pv_vs    = create_vsymbol id (ty_of_ity ity);
-  pv_ity   = ity;
-  pv_ghost = ghost;
-}
-
-let create_pvsymbol, restore_pv =
-  let vs_to_pv = Wvs.create 17 in
-  (fun id ?(ghost=false) ity ->
-    let pv = create_pvsymbol id ghost ity in
-    Wvs.set vs_to_pv pv.pv_vs pv;
-    pv),
-  (fun vs -> Wvs.find vs_to_pv vs)
 
 let pvs_of_vss pvs vss =
   Mvs.fold (fun vs _ s -> Spv.add (restore_pv vs) s) vss pvs
