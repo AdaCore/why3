@@ -558,7 +558,61 @@ and reduce_app engine st ls ~orig ty rem_cont =
           reduce_app_no_equ engine st ls ~orig ty rem_cont
       end
     | _ -> assert false
-  else reduce_app_no_equ engine st ls ~orig ty rem_cont
+  else
+    if ls_equal ls fs_func_app then
+      match st with
+      | t2 :: t1 :: rem_st -> reduce_func_app ~orig ty rem_st t1 t2 rem_cont
+      | _ ->  assert false
+    else
+      reduce_app_no_equ engine st ls ~orig ty rem_cont
+
+and reduce_func_app ~orig ty rem_st t1 t2 rem_cont =
+  try
+    Format.eprintf "[compute] found (... @@ ...)@.";
+    (* attempt to decompile t1 under the form
+       (epsilon fc. forall x. fc @ x = body)
+       that is equivalent to \x.body *)
+    match t1 with
+    | Term { t_node = Teps tb } ->
+      Format.eprintf "[compute] found (Teps(fc,...) @@ ...) @.";
+      let fc,t = Term.t_open_bound tb in
+      begin match t.t_node with
+      | Tquant(Tforall,tq) ->
+        Format.eprintf "[compute] found (Teps(fc,Tforall ...) @@ ...) @.";
+        let vl,_,t = t_open_quant tq in
+        begin
+          match vl with
+          | [x] ->
+            Format.eprintf "[compute] found (Teps(fc,Tforall x...) @@ ...) @.";
+            begin
+              match t.t_node with
+              | Tapp(ls1,
+                     [{t_node =
+                         Tapp(ls2,
+                              [{t_node = Tvar v1};{t_node = Tvar v2}])};
+                      body])
+                  when ls_equal ls1 ps_equ && ls_equal ls2 fs_func_app &&
+                    vs_equal v1 fc && vs_equal v2 x ->
+                (* GOT IT ! *)
+                Format.eprintf "[compute] found (Teps(fc,Tforall x. fc@@x = body) @@ ...) @.";
+                let t2 = term_of_value t2 in
+                { value_stack = rem_st;
+                  cont_stack =
+                    (Keval(body, Mvs.add x t2 Mvs.empty), 
+                     t_label_copy orig body) :: rem_cont;
+                }
+              | _ -> raise Undetermined
+            end
+          | _ -> raise Undetermined
+        end
+      | _ -> raise Undetermined
+      end
+    | _ -> raise Undetermined
+  with Undetermined ->
+    { value_stack =
+        (v_label_copy orig (t_app_value fs_func_app [t1;t2] ty)) :: rem_st;
+      cont_stack = rem_cont;
+    }
 
 and reduce_app_no_equ engine st ls ~orig ty rem_cont =
   let arity = List.length ls.ls_args in
@@ -762,7 +816,7 @@ let rec reconstruct c =
   | [Term t], [] -> t
   | _, [] -> assert false
   | _, (k,orig) :: rem ->
-    let t, st = 
+    let t, st =
       match c.value_stack, k with
       | st, Keval (t,sigma) -> (t_subst sigma t), st
       | [], Kif _ -> assert false

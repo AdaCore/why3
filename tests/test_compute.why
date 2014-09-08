@@ -1,4 +1,22 @@
 
+theory Lambda
+
+use import int.Int
+use import HighOrd
+
+constant f : int -> int = (\x:int.x+1)
+
+constant a : int
+
+goal g1: f 42 = a
+
+constant compose : ('b -> 'c) -> ('a -> 'b) -> ('a -> 'c) = 
+         (\f:'b->'c.(\g:'a->'b.(\x:'a.f (g x))))
+
+goal g2: compose f f 42 = a
+
+end
+
 theory A
 
   predicate p
