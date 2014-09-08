@@ -338,6 +338,16 @@ module Compile_aexpr
          any pos -> post ensures { result = aexpr_post a c.wcode.length }
         in hoare pre c post
 
+
+  let compile_aexpr_natural (a: aexpr) : code
+    ensures { forall c p s m.
+              codeseq_at c p result ->
+              transition_star c
+                (VMS  p                                    s  m)
+                (VMS (p + length result) (push (aeval m a) s) m) }
+  =
+    (compile_aexpr a).code
+
 end
 
 
