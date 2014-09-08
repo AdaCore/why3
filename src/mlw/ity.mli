@@ -24,7 +24,6 @@ type itysymbol = private {
   its_reg_vis : bool list;      (** non-ghost shareable components *)
   its_arg_vis : bool list;      (** non-ghost type parameters *)
   its_arg_upd : bool list;      (** updatable type parameters *)
-  its_arg_pur : bool list;      (** immutable type parameters *)
   its_def     : ity option;     (** is a type alias *)
 }
 
@@ -87,7 +86,7 @@ exception UnboundRegion of region
 
 (** creation of a symbol for type in programs *)
 val create_itysymbol :
-  preid -> (tvsymbol * bool * bool * bool) list ->
+  preid -> (tvsymbol * bool * bool) list ->
     bool -> bool -> (region * bool) list ->
     Spv.t -> ity option -> itysymbol
 
@@ -134,6 +133,8 @@ val ity_s_any : (itysymbol -> bool) -> ity -> bool
 
 val ity_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> ity -> 'a
 
+val ity_freevars : Stv.t -> ity -> Stv.t
+
 val ity_v_all : (tvsymbol -> bool) -> ity -> bool
 val ity_v_any : (tvsymbol -> bool) -> ity -> bool
 
@@ -160,12 +161,17 @@ val ts_unit : tysymbol (** the same as [Ty.ts_tuple 0] *)
 val ty_unit : ty
 
 val its_int  : itysymbol
+val its_real : itysymbol
 val its_bool : itysymbol
 val its_unit : itysymbol
 
 val ity_int  : ity
+val ity_real : ity
 val ity_bool : ity
 val ity_unit : ity
+
+val its_tuple : int -> itysymbol
+val ity_tuple : ity list -> ity
 
 (** {2 Type matching and instantiation} *)
 

@@ -25,7 +25,6 @@ type itysymbol = {
   its_reg_vis : bool list;      (** non-ghost shareable components *)
   its_arg_vis : bool list;      (** non-ghost type parameters *)
   its_arg_upd : bool list;      (** updatable type parameters *)
-  its_arg_pur : bool list;      (** immutable type parameters *)
   its_def     : ity option;     (** is a type alias *)
 }
 
@@ -208,6 +207,8 @@ let rec ity_v_fold fn acc ity = match ity.ity_node with
   | Ityvar v -> fn acc v
   | _ -> ity_fold (ity_v_fold fn) acc ity
 
+let ity_freevars s ity = ity_v_fold (fun s v -> Stv.add v s) s ity
+
 let ity_v_all pr ity =
   try ity_v_fold (Util.all_fn pr) true ity with Util.FoldSkip -> false
 
@@ -222,15 +223,9 @@ let rec ity_r_fold fn acc ity =
   let ffn acc ity = ity_r_fold fn acc ity in
   match ity.ity_node with
   | Ityvar _ -> acc
-  | Itypur (_,tl) ->
-      List.fold_left ffn acc tl
-  | Ityapp (_,tl,rl) ->
-      let acc = List.fold_left ffn acc rl in
-      List.fold_left ffn acc tl
-  | Itymut (_,tl,rl,_) ->
-      let acc = fn acc ity in
-      let acc = List.fold_left ffn acc rl in
-      List.fold_left ffn acc tl
+  | Itypur (_,tl) -> List.fold_left ffn acc tl
+  | Ityapp (_,tl,rl) -> List.fold_left ffn (List.fold_left fn acc rl) tl
+  | Itymut _ -> fn acc ity
 
 let ity_r_all pr ity =
   try ity_r_fold (Util.all_fn pr) true ity with Util.FoldSkip -> false
@@ -238,7 +233,12 @@ let ity_r_all pr ity =
 let ity_r_any pr ity =
   try ity_r_fold (Util.any_fn pr) false ity with Util.FoldSkip -> true
 
-let ity_r_occurs r ity = ity_r_any (ity_equal r) ity
+let ity_r_occurs reg ity =
+  let rec check r = ity_equal r reg ||
+    let _, tl, rl, _ = open_region r in
+    List.exists (ity_r_any check) tl ||
+    List.exists (ity_r_any check) rl in
+  ity_r_any check ity
 
 let ity_immutable ity = not ity.ity_pure
 
@@ -249,22 +249,22 @@ let rec fold_visible on_var on_reg acc ity =
   let fnr acc vis ity = if vis then fnt acc ity else acc in
   match ity.ity_node with
   | Ityvar tv ->
-      on_var tv acc
+      on_var acc tv
   | Itypur (s,tl) ->
       List.fold_left2 fnr acc s.its_arg_vis tl
   | Ityapp (s,tl,rl) ->
       let acc = List.fold_left2 fnr acc s.its_reg_vis rl in
       List.fold_left2 fnr acc s.its_arg_vis tl
   | Itymut (s,tl,rl,_) ->
-      let acc = on_reg ity acc in
+      let acc = on_reg acc ity in
       let acc = List.fold_left2 fnr acc s.its_reg_vis rl in
       List.fold_left2 fnr acc s.its_arg_vis tl
 
 let ity_r_visible regs ity =
-  fold_visible (fun _ acc -> acc) Sreg.add regs ity
+  fold_visible (fun s _ -> s) (fun s r -> Sreg.add r s) regs ity
 
 let ity_v_visible vars ity =
-  fold_visible Stv.add (fun _ acc -> acc) vars ity
+  fold_visible (fun s v -> Stv.add v s) (fun s _ -> s) vars ity
 
 (* smart constructors *)
 
@@ -394,7 +394,7 @@ let ity_app s tl rl =
 
 let create_itysymbol_unsafe, restore_its =
   let ts_to_its = Wts.create 17 in
-  (fun ~ts ~pri ~mut ~fld ~regs ~rvis ~avis ~aupd ~apur ~def ->
+  (fun ~ts ~pri ~mut ~fld ~regs ~rvis ~avis ~aupd ~def ->
     let its = {
       its_ts      = ts;
       its_private = pri;
@@ -404,7 +404,6 @@ let create_itysymbol_unsafe, restore_its =
       its_reg_vis = rvis;
       its_arg_vis = avis;
       its_arg_upd = aupd;
-      its_arg_pur = apur;
       its_def     = def;
     } in
     Wts.set ts_to_its ts its;
@@ -413,9 +412,9 @@ let create_itysymbol_unsafe, restore_its =
 
 let create_itysymbol name args pri mut regs fld def =
   (* prepare arguments *)
-  let args, avis, aupd, apur = List.fold_right
-    (fun (tv,v,u,p) (args,avis,aupd,apur) ->
-      tv::args, v::avis, u::aupd, p::apur) args ([],[],[],[]) in
+  let args, avis, aupd = List.fold_right
+    (fun (tv,v,u) (args,avis,aupd) ->
+      tv::args, v::avis, u::aupd) args ([],[],[]) in
   let regs, rvis = List.split regs in
   let fld = Spv.fold (fun pv acc ->
     Mvs.add pv.pv_vs pv acc) fld Mvs.empty in
@@ -437,27 +436,20 @@ let create_itysymbol name args pri mut regs fld def =
   List.iter check_var regs;
   Mvs.iter (fun _ pv -> check_var pv.pv_ity) fld;
   (* each surface region in [fld] must be in [regs] *)
-  let check_r r =
+  let check_r () r =
     if not (Sreg.mem r sregs) then raise (UnboundRegion r) in
-  let rec check_reg ity = match ity.ity_node with
-    | Itymut _ -> check_r ity
-    | Ityapp (_,tl,rl) ->
-        List.iter check_r rl;
-        List.iter check_reg tl
-    | Itypur (_,tl) ->
-        List.iter check_reg tl
-    | Ityvar _ -> () in
+  let check_reg ity = ity_r_fold check_r () ity in
   Mvs.iter (fun _ pv -> check_reg pv.pv_ity) fld;
   (* each lower surface region in [def] must be in [regs] *)
   let check_reg () ity = match ity.ity_node with
     | Itymut (_,tl,rl,_) ->
-        List.iter check_r rl;
+        List.iter check_reg rl;
         List.iter check_reg tl
     | _ -> check_reg ity in
   Opt.fold check_reg () def;
   (* the alias is mutable if and only if the symbol is *)
   let check = function
-    | Some { ity_node = Itymut _ } -> mut
+    | Some {ity_node = Itymut _} -> mut
     | Some _ -> not mut
     | None -> true in
   if not (check def) then invalid_arg "Ity.create_itysymbol";
@@ -467,18 +459,39 @@ let create_itysymbol name args pri mut regs fld def =
   (* if we are an alias then we are not private and have no fields *)
   if def <> None && (pri || not (Mvs.is_empty fld)) then
     invalid_arg "Ity.create_itysymbol";
+  (* if we are private, we have no subregions and all args are non-updateble *)
+  if pri && (regs <> [] || List.exists (fun u -> u) aupd) then
+    invalid_arg "Ity.create_itysymbol";
   (* each invisible type variable and region must be invisible in [def] *)
   let v_visible = Opt.fold ity_v_visible Stv.empty def in
   let r_visible = Opt.fold ity_r_visible Sreg.empty def in
-  let check_v vis v = if not vis && Stv.mem v v_visible
-      then invalid_arg "Ity.create_itysymbol" in
-  let check_r vis r = if not vis && Sreg.mem r r_visible
-      then invalid_arg "Ity.create_itysymbol" in
+  let check_v vis v = if not vis && Stv.mem v v_visible then
+      invalid_arg "Ity.create_itysymbol" in
+  let check_r vis r = if not vis && Sreg.mem r r_visible then
+      invalid_arg "Ity.create_itysymbol" in
   List.iter2 check_v avis args;
   List.iter2 check_r rvis regs;
-  (* TODO: updatability vs [def] and every other invariant *)
+  (* each updatable type variable is updatable in [regs], [fld], and [def] *)
+  let rec nonupd acc upd ity = match ity.ity_node with
+    | _ when not upd -> ity_freevars acc ity
+    | Itypur (s,tl) | Ityapp (s,tl,_) | Itymut (s,tl,_,_) ->
+        List.fold_left2 nonupd acc s.its_arg_upd tl
+    | Ityvar _ -> acc in
+  let nonupd acc ity = nonupd acc true ity in
+  let nu = List.fold_left nonupd Stv.empty regs in
+  let nu = Mvs.fold (fun _ pv s -> nonupd s pv.pv_ity) fld nu in
+  let nu = Opt.fold nonupd nu def in
+  List.iter2 (fun upd v -> if upd && Stv.mem v nu then
+    invalid_arg "Ity.create_itysymbol") aupd args;
   (* create the type symbol *)
-  create_itysymbol_unsafe ~ts ~pri ~mut ~fld ~regs ~rvis ~avis ~aupd ~apur ~def
+  create_itysymbol_unsafe ~ts ~pri ~mut ~fld ~regs ~rvis ~avis ~aupd ~def
+
+let rec ity_of_ty ty = match ty.ty_node with
+  | Tyvar v -> ity_var v
+  | Tyapp (s,tl) ->
+      let s = try restore_its s with Not_found ->
+        invalid_arg "Ity.ity_of_ty" in
+      ity_pur_unsafe s (List.map ity_of_ty tl)
 
 (** pvsymbol creation *)
 
@@ -498,31 +511,36 @@ let create_pvsymbol, restore_pv =
 
 (** builtin symbols *)
 
-let rec ity_of_ty ty = match ty.ty_node with
-  | Tyvar v -> ity_var v
-  | Tyapp (s,tl) ->
-      let s = try restore_its s with Not_found ->
-        invalid_arg "Ity.ity_of_ty" in
-      ity_pur_unsafe s (List.map ity_of_ty tl)
-
-let ts_unit = ts_tuple 0
-let ty_unit = ty_tuple []
-
 let its_int = create_itysymbol_unsafe
     ~ts:ts_int ~pri:false ~mut:false ~fld:Mvs.empty
-    ~regs:[] ~rvis:[] ~avis:[] ~aupd:[] ~apur:[] ~def:None
+    ~regs:[] ~rvis:[] ~avis:[] ~aupd:[] ~def:None
+
+let its_real = create_itysymbol_unsafe
+    ~ts:ts_real ~pri:false ~mut:false ~fld:Mvs.empty
+    ~regs:[] ~rvis:[] ~avis:[] ~aupd:[] ~def:None
 
 let its_bool = create_itysymbol_unsafe
     ~ts:ts_bool ~pri:false ~mut:false ~fld:Mvs.empty
-    ~regs:[] ~rvis:[] ~avis:[] ~aupd:[] ~apur:[] ~def:None
+    ~regs:[] ~rvis:[] ~avis:[] ~aupd:[] ~def:None
 
-let its_unit = create_itysymbol_unsafe
-    ~ts:ts_unit ~pri:false ~mut:false ~fld:Mvs.empty
-    ~regs:[] ~rvis:[] ~avis:[] ~aupd:[] ~apur:[] ~def:None
+let ity_int  = ity_pur its_int  []
+let ity_real = ity_pur its_real []
+let ity_bool = ity_pur its_bool []
 
-let ity_int  = ity_of_ty Ty.ty_int
-let ity_bool = ity_of_ty Ty.ty_bool
-let ity_unit = ity_of_ty ty_unit
+let its_tuple = Hint.memo 17 (fun n ->
+  let ts = ts_tuple n in
+  let ll = List.map (fun _ -> true) ts.ts_args in
+  create_itysymbol_unsafe
+    ~ts:ts ~pri:false ~mut:false ~fld:Mvs.empty
+    ~regs:[] ~rvis:[] ~avis:ll ~aupd:ll ~def:None)
+
+let ity_tuple tl = ity_pur (its_tuple (List.length tl)) tl
+
+let ts_unit  = ts_tuple  0
+let its_unit = its_tuple 0
+
+let ty_unit  = ty_tuple  []
+let ity_unit = ity_tuple []
 
 (** computation types (with effects) *)
 
