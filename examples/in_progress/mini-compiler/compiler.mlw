@@ -285,25 +285,37 @@ let imulf () : hl
   ensures { result.code.length = 1   /\  hl_correctness result}
   = create_binop imul mul
 
-(*type cond = int -> int -> bool
+(********************************************************************)
+(********************************************************************)
+type cond = int -> int -> bool
 
-function icjump_post (cond : cond) : pos -> machine_state -> pred =
+function icjump_post (cond : cond) (ofs: int) : pos -> post =
   \p ms ms'. forall n1 n2 s m.
-    ms  = VMS    p     (push n2 (push n1 s)) m  ->
-    (cond n1 n2 -> ms' = VMS (p+ofs+1)  s   m) /\
+    ms  = VMS    p      (push n2 (push n1 s))       m  ->
+    (cond n1 n2 ->     ms' = VMS (p + ofs + 1)  s   m) /\
     (not cond n1 n2 -> ms' = VMS (p+1) s m)
 
-let make_cjump (code_cond:code) (ghost cond:cond) (ghost ofs:pos) : hl
+lemma icjump_post_lemma:
+  forall cond ofs p ms ms'.
+   icjump_post cond ofs p ms ms' =
+    forall n1 n2 s m.
+     ms  = VMS    p      (push n2 (push n1 s))       m  ->
+     (cond n1 n2 ->     ms' = VMS (p + ofs + 1)  s   m) /\
+     (not cond n1 n2 -> ms' = VMS (p+1) s m)
+
+meta rewrite prop icjump_post_lemma
+
+let create_cjump (code_cond:code) (ghost cond:cond) (ghost ofs:pos) : hl
   requires { forall c: code, p1, n1 n2: int.
-    codeseq_at c p1 cjmp ->
+    codeseq_at c p1 code_cond ->
     let p2 = (if cond n1 n2 then p1 + 1 + ofs else p1 + 1) in
     forall s:stack, m: state.
       transition c
-    	  (VMS p1 (push n2 (push n1 s)) m)
+    	    (VMS p1 (push n2 (push n1 s)) m)
    	    (VMS p2           s           m) }
-  ensures { result.pre   = ibinop_pre /\ result.post  = icjump_post cond }
+  ensures { result.pre   = ibinop_pre /\ result.post  = icjump_post cond ofs}
   ensures { result.code  = code_cond /\ hl_correctness result }
-= let res = {code = code_binop; pre  = ibinop_pre ; post = ibinop_post op }
+= let res = {code = code_cond; pre  = ibinop_pre ; post = icjump_post cond ofs}
   in assert {
     forall p ms. res.pre p ms ->
       not (exists ms' : machine_state. res.post p ms ms' /\
@@ -311,10 +323,12 @@ let make_cjump (code_cond:code) (ghost cond:cond) (ghost ofs:pos) : hl
       match ms with
         | VMS p' (Cons n2 (Cons n1 s)) m -> p' = p &&
            if cond n1 n2
-           then let ms' = VMS (p+ofs+1) (push (cond n1 n2) s) m in
+           then let ms' = VMS (p+ofs+1) s m in
+              contextual_irrelevance res.code p ms ms' && false
+           else let ms' = VMS (p+1) s m in
               contextual_irrelevance res.code p ms ms' && false
         | _ -> false end && false };
-    res*)
+    res
 
 end
 
@@ -377,14 +391,28 @@ module Compile_aexpr
   =
     (compile_aexpr a).code
 
-  
-  (*function bexpr_post (b:bexpr) (out_t:pos) (out_f:pos) : pos -> post =
+end
+
+module Compile_bexpr
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import imp.Imp
+  use import vm.Vm
+  use import state.State
+  use import Compiler_logic
+  use import Builtin_spec
+  use import Compile_aexpr
+
+  function bexpr_post (b:bexpr) (out_t:pos) (out_f:pos) : pos -> post =
     \p ms ms' -> match ms with
       | VMS _ s m -> if beval b m
         then ms' = VMS (p+out_t) s m
         else ms' = VMS (p+out_f) s m
       end
-  
+
   lemma bexpr_post_def : forall b out_t out_f p ms ms'.
     bexpr_post b out_t out_f p ms ms' =
       match ms with
@@ -392,10 +420,15 @@ module Compile_aexpr
         then ms' = VMS (p+out_t) s m
         else ms' = VMS (p+out_f) s m
       end
-  
-  meta rewrite prop bexpr_post_def*)
-  
-  
+
+  meta rewrite prop bexpr_post_def
+
+ (* TODO *)
+ (*definir les conditionnelles *)
+ (*spec de ibranch*)
+ (*règles méta *)
+ (*écrire le compilateur*)
+
 end
 
 
