@@ -21,6 +21,13 @@ let meta_rewrite = Theory.register_meta "rewrite" [Theory.MTprsymbol]
 let meta_rewrite_def = Theory.register_meta "rewrite_def" [Theory.MTlsymbol]
   ~desc:"Declares@ the@ definition@ of@ the@ symbol@ as@ as@ rewrite@ rule."
 
+let meta_compute_max_steps = Theory.register_meta "compute_max_steps"
+  [Theory.MTint]
+  ~desc:"Maximal@ number@ of@ reduction@ steps@ done@ by@ compute@ \
+         transformation"
+
+let compute_max_steps = ref 1000
+
 (* not yet used
 let meta_begin_compute_context =
   Theory.register_meta "begin_compute_context" []
@@ -57,7 +64,7 @@ let normalize_goal p env (prs : Decl.Spr.t) task =
         task_known = km;
       } ->
     let engine = collect_rules p env km prs task in
-    let f = normalize engine f in
+    let f = normalize ~limit:!compute_max_steps engine f in
     begin match f.t_node with
     | Ttrue -> []
     | _ ->

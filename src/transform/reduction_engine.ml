@@ -925,7 +925,7 @@ let rec reconstruct c =
 
 (** iterated reductions *)
 
-let normalize ?(limit=1000) engine t0 =
+let normalize ~limit engine t0 =
   let rec many_steps c n =
     match c.value_stack, c.cont_stack with
     | [Term t], [] -> t

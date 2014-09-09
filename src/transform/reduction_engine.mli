@@ -105,11 +105,11 @@ val add_rule : Term.term -> engine -> engine
 *)
 
 
-val normalize : ?limit:int -> engine -> Term.term -> Term.term
+val normalize : limit:int -> engine -> Term.term -> Term.term
 (** [normalize e t] normalizes the term [t] with respect to the engine
     [e]
 
-    Optional parameter [limit] provides a maximum number of steps for execution.
-    (default 1000). When limit is reached, the partially reduced term is returned.
+    parameter [limit] provides a maximum number of steps for execution.
+    When limit is reached, the partially reduced term is returned.
 *)
 
