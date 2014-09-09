@@ -15,6 +15,14 @@ constant compose : ('b -> 'c) -> ('a -> 'b) -> ('a -> 'c) =
 
 goal g2: compose f f 42 = a
 
+constant h : int -> int
+
+axiom a1 : h 42 = 56
+
+meta "rewrite" prop a1
+
+goal g3: h 42 = 4
+
 end
 
 theory A
@@ -109,6 +117,15 @@ theory TestArith
   goal n3: min n n = 42
   goal n4: min 3 4 = n
 
+
+  function f int : int
+  
+  axiom a42 : f 42 + 43 = 56
+
+  meta rewrite prop a42
+
+  goal o1 : f (6*7) + (42 + 1) = n
+
 end
 
 theory TestRecord
@@ -157,6 +174,14 @@ theory TestList
   goal h2: length l2 = 5
 
   goal h3: forall x y:int. Cons x Nil = Cons y Nil
+
+  constant l3 : list int
+
+  axiom dangerous: Cons 12 Nil = l3
+
+  meta rewrite prop dangerous
+
+  goal i1: l3 = Nil ++ Nil
 
 end
 

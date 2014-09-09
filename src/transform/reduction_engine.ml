@@ -61,7 +61,7 @@ exception Undetermined
 
 let to_bool b = if b then t_true else t_false
 
-let t_app_value ls l ty =
+let _t_app_value ls l ty =
   Term (t_app ls (List.map term_of_value l) ty)
 
 let is_zero v =
@@ -83,41 +83,61 @@ let eval_int_op op simpl ls l ty =
       with NotNum | Division_by_zero ->
         simpl ls t1 t2 ty
     end
-  | _ -> t_app_value ls l ty
+  | _ -> assert false (* t_app_value ls l ty *)
 
 (* unused anymore, for the moment
 let simpl_none ls t1 t2 ty =
   t_app_value ls [t1;t2] ty
 *)
 
-let simpl_add ls t1 t2 ty =
+let simpl_add _ls t1 t2 _ty =
   if is_zero t1 then t2 else
   if is_zero t2 then t1 else
+  raise Undetermined
+(*
   t_app_value ls [t1;t2] ty
+*)
 
-let simpl_sub ls t1 t2 ty =
+let simpl_sub _ls t1 t2 _ty =
   if is_zero t2 then t1 else
+  raise Undetermined
+(*
   t_app_value ls [t1;t2] ty
+*)
 
-let simpl_mul ls t1 t2 ty =
+let simpl_mul _ls t1 t2 _ty =
   if is_zero t1 then t1 else
   if is_zero t2 then t2 else
   if is_one t1 then t2 else
   if is_one t2 then t1 else
+  raise Undetermined
+(*
   t_app_value ls [t1;t2] ty
+*)
 
-let simpl_divmod ls t1 t2 ty =
+let simpl_divmod _ls t1 t2 _ty =
   if is_zero t1 then t1 else
   if is_one t2 then t1 else
+  raise Undetermined
+(*
   t_app_value ls [t1;t2] ty
+*)
 
-let simpl_minmax ls v1 v2 ty =
+let simpl_minmax _ls v1 v2 _ty =
   match v1,v2 with
   | Term t1, Term t2 ->
-    if t_equal t1 t2 then v1 else t_app_value ls [v1;v2] ty
-  | _ -> t_app_value ls [v1;v2] ty
-
-let eval_int_rel op ls l ty =
+    if t_equal t1 t2 then v1 else 
+      raise Undetermined
+  (*
+    t_app_value ls [v1;v2] ty
+  *)
+  | _ -> 
+    raise Undetermined
+(*
+  t_app_value ls [v1;v2] ty
+*)
+      
+let eval_int_rel op _ls l _ty =
   match l with
   | [t1 ; t2] ->
     begin
@@ -126,20 +146,23 @@ let eval_int_rel op ls l ty =
         let n2 = big_int_of_value t2 in
         Term (to_bool (op n1 n2))
       with NotNum | Division_by_zero ->
-        t_app_value ls l ty
+        raise Undetermined
+    (*        t_app_value ls l ty *)
     end
-  | _ -> t_app_value ls l ty
+  | _ -> assert false
+    (* t_app_value ls l ty *)
 
-let eval_int_uop op ls l ty =
+let eval_int_uop op _ls l _ty =
   match l with
   | [t1] ->
     begin
       try
         let n1 = big_int_of_value t1 in Int (op n1)
       with NotNum | Division_by_zero ->
-        t_app_value ls l ty
+        raise Undetermined
+    (*       t_app_value ls l ty *)
     end
-  | _ -> t_app_value ls l ty
+  | _ -> assert false 
 
 
 let built_in_theories =
@@ -561,13 +584,18 @@ and reduce_app engine st ls ~orig ty rem_cont =
   else
     if ls_equal ls fs_func_app then
       match st with
-      | t2 :: t1 :: rem_st -> reduce_func_app ~orig ty rem_st t1 t2 rem_cont
+      | t2 :: t1 :: rem_st -> 
+        begin
+          try
+            reduce_func_app ~orig ty rem_st t1 t2 rem_cont
+          with Undetermined ->
+            reduce_app_no_equ engine st ls ~orig ty rem_cont
+        end
       | _ ->  assert false
     else
       reduce_app_no_equ engine st ls ~orig ty rem_cont
 
-and reduce_func_app ~orig ty rem_st t1 t2 rem_cont =
-  try
+and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
     (* attempt to decompile t1 under the form
        (epsilon fc. forall x. fc @ x = body)
        that is equivalent to \x.body *)
@@ -659,11 +687,6 @@ and reduce_func_app ~orig ty rem_st t1 t2 rem_cont =
       | _ -> raise Undetermined
       end
     | _ -> raise Undetermined
-  with Undetermined ->
-    { value_stack =
-        (v_label_copy orig (t_app_value fs_func_app [t1;t2] ty)) :: rem_st;
-      cont_stack = rem_cont;
-    }
 
 and reduce_app_no_equ engine st ls ~orig ty rem_cont =
   let arity = List.length ls.ls_args in
@@ -674,7 +697,7 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
     { value_stack = (v_label_copy orig v) :: rem_st;
       cont_stack = rem_cont;
     }
-  with Not_found ->
+  with Not_found | Undetermined ->
     let args = List.map term_of_value args in
     try
       let d = Ident.Mid.find ls.ls_name engine.known_map in
@@ -942,7 +965,8 @@ let create p env km =
 
 exception NotARewriteRule of string
 
-let extract_rule km t =
+let extract_rule _km t =
+(*
   let check_ls ls =
     try let _ = Hls.find builtins ls in
         raise (NotARewriteRule "root of lhs of rule must not be a built-in symbol")
@@ -956,6 +980,7 @@ let extract_rule km t =
         raise (NotARewriteRule "root of lhs of rule must not be a constructor nor a projection")
       | Decl.Dparam _ | Decl.Dind _ -> ()
   in
+*)
   let rec aux acc t =
     match t.t_node with
       | Tquant(Tforall,q) ->
@@ -964,14 +989,14 @@ let extract_rule km t =
       | Tbinop(Tiff,t1,t2) ->
         begin
           match t1.t_node with
-            | Tapp(ls,args) -> check_ls ls; acc,ls,args,t2
+            | Tapp(ls,args) -> (* check_ls ls; *) acc,ls,args,t2
             | _ -> raise
               (NotARewriteRule "lhs of <-> should be a predicate symbol")
         end
       | Tapp(ls,[t1;t2]) when ls == ps_equ ->
         begin
           match t1.t_node with
-            | Tapp(ls,args) -> check_ls ls; acc,ls,args,t2
+            | Tapp(ls,args) -> (* check_ls ls; *) acc,ls,args,t2
             | _ -> raise
               (NotARewriteRule "lhs of = should be a function symbol")
         end
