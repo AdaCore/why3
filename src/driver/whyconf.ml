@@ -402,7 +402,7 @@ let load_prover dirname (provers,shortcuts) section =
         extra_options = [];
         extra_drivers = [];
         configure_build = get_string ~default:"" section "configure_build";
-        build_commands = get_stringl ~default:[] section "build_command";
+        build_commands = get_stringl ~default:[] section "build_commands";
       } provers in
     let lshort = get_stringl section ~default:[] "shortcut" in
     let shortcuts = add_prover_shortcuts shortcuts prover lshort in
