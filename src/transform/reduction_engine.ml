@@ -577,50 +577,83 @@ and reduce_func_app ~orig ty rem_st t1 t2 rem_cont =
       begin match t.t_node with
       | Tquant(Tforall,tq) ->
         let vl,trig,t = t_open_quant tq in
-        begin
-        match t.t_node with
-          | Tapp (ls1,[lhs;body]) when ls_equal ls1 ps_equ ->
-            let rvl = List.rev vl in
-            let rec remove_var lhs rvh rvt = match lhs.t_node with
-              | Tapp (ls2,[lhs1;{t_node = Tvar v1} as arg])
-                when ls_equal ls2 fs_func_app && vs_equal v1 rvh ->
-                begin
-                match rvt , lhs1 with
-                | rvh::rvt , _ ->
-                  let lhs1 , fc2 = remove_var lhs1 rvh rvt in
-                  let lhs2 = t_app ls2 [lhs1;arg] lhs.t_ty in
-                  t_label_copy lhs lhs2 , fc2
-                | [] , { t_node = Tvar fc1 } when vs_equal fc1 fc ->
-                  let fcn = fc.vs_name in
-                  let fc2 = Ident.id_derive fcn.Ident.id_string fcn in
-                  let fc2 = create_vsymbol fc2 (t_type lhs) in
-                  t_label_copy lhs (t_var fc2) , fc2
-                | _ -> raise Undetermined
-                end
+        let process lhs body equ elim =
+          let rvl = List.rev vl in
+          let rec remove_var lhs rvh rvt = match lhs.t_node with
+            | Tapp (ls2,[lhs1;{t_node = Tvar v1} as arg])
+              when ls_equal ls2 fs_func_app && vs_equal v1 rvh ->
+              begin
+              match rvt , lhs1 with
+              | rvh::rvt , _ ->
+                let lhs1 , fc2 = remove_var lhs1 rvh rvt in
+                let lhs2 = t_app ls2 [lhs1;arg] lhs.t_ty in
+                t_label_copy lhs lhs2 , fc2
+              | [] , { t_node = Tvar fc1 } when vs_equal fc1 fc ->
+                let fcn = fc.vs_name in
+                let fc2 = Ident.id_derive fcn.Ident.id_string fcn in
+                let fc2 = create_vsymbol fc2 (t_type lhs) in
+                t_label_copy lhs (t_var fc2) , fc2
               | _ -> raise Undetermined
+              end
+            | _ -> raise Undetermined
+          in
+          begin
+          match rvl with
+          | rvh :: rvt -> let lhs , fc2 = remove_var lhs rvh rvt in
+            let (vh,vl) = match vl with
+            | [] -> assert false
+            | vh::vl -> (vh,vl)
             in
+            let t2 = term_of_value t2 in
             begin
-            match rvl with
-            | rvh :: rvt -> let lhs , fc2 = remove_var lhs rvh rvt in
-              let (vh,vl) = match vl with
-              | [] -> assert false
-              | vh::vl -> (vh,vl)
-              in
-              let body = match vl with
-              | [] -> body
-              | _ -> 
-                let eq = t_label_copy t (t_app ps_equ [lhs;body] None) in
-                let tq = t_quant Tforall (t_close_quant vl trig eq) in
-                t_label_copy t (t_eps_close fc2 tq)
-              in
-              let t2 = term_of_value t2 in
+            match vl with
+            | [] -> elim body vh t2
+            | _ ->
+              let eq = equ lhs body in
+              let tq = t_quant Tforall (t_close_quant vl trig eq) in
+              let body = t_label_copy t (t_eps_close fc2 tq) in
               { value_stack = rem_st;
                 cont_stack =
                   (Keval(body,Mvs.add vh t2 Mvs.empty),
                    t_label_copy orig body) :: rem_cont;
               }
-            | _ -> raise Undetermined
             end
+          | _ -> raise Undetermined
+          end
+        in
+        begin
+        match t.t_node with
+          | Tapp (ls1,[lhs;body]) when ls_equal ls1 ps_equ ->
+            let equ lhs body = t_label_copy t (t_app ps_equ [lhs;body] None) in
+            let elim body vh t2 = {
+              value_stack = rem_st;
+              cont_stack =
+                (Keval(body,Mvs.add vh t2 Mvs.empty),
+                 t_label_copy orig body) :: rem_cont;
+            } in
+            process lhs body equ elim
+          | Tbinop (Tiff,
+            ({t_node=Tapp (ls1,[lhs;tr])} as teq),
+            body)
+            when ls_equal ls1 ps_equ && t_equal tr t_bool_true ->
+            let equ lhs body =
+              let lhs = t_label_copy teq (t_app ps_equ [lhs;tr] None) in
+              t_label_copy t (t_binary Tiff lhs body) in
+            let elim body vh t2 =
+              match rem_cont with
+              | (Keval (tr,_),_) :: (Kapp (ls,_),_) :: rem_cont
+                when t_equal tr t_bool_true && ls_equal ls ps_equ ->
+                { value_stack = rem_st;
+                  cont_stack =
+                    (Keval(body,Mvs.add vh t2 Mvs.empty),
+                     t_label_copy orig body) :: rem_cont }
+              | _ ->
+                let body = t_if body t_bool_true t_bool_false in
+                { value_stack = rem_st;
+                  cont_stack =
+                  (Keval(body,Mvs.add vh t2 Mvs.empty),
+                  t_label_copy orig body) :: rem_cont } in
+            process lhs body equ elim
           | _ -> raise Undetermined
         end
       | _ -> raise Undetermined
