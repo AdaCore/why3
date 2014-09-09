@@ -331,6 +331,9 @@ theory NonTerm
   goal g5 : fib (S (S (S (S (S O))))) = x
   goal g6 : fib (S (S (S (S (S (S O)))))) = x
   goal g7 : fib (S (S (S (S (S (S (S O))))))) = x
+
+  meta "compute_max_steps" 100000
+
   goal g8 : fib (S (S (S (S (S (S (S (S O)))))))) = x
   goal g9 : fib (S (S (S (S (S (S (S (S (S O))))))))) = x
   goal g10 : fib (S (S (S (S (S (S (S (S (S (S O)))))))))) = x
