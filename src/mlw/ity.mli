@@ -146,6 +146,7 @@ val ity_r_all : (region -> bool) -> ity -> bool
 val ity_r_any : (region -> bool) -> ity -> bool
 
 val ity_r_occurs : region -> ity -> bool
+val ity_r_stale  : region -> Sreg.t -> ity -> bool
 
 val ity_closed    : ity -> bool
 val ity_immutable : ity -> bool

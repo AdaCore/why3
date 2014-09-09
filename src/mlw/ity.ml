@@ -235,9 +235,17 @@ let ity_r_any pr ity =
 
 let ity_r_occurs reg ity =
   let rec check r = ity_equal r reg ||
-    let _, tl, rl, _ = open_region r in
+    let _,tl,rl,_ = open_region r in
     List.exists (ity_r_any check) tl ||
-    List.exists (ity_r_any check) rl in
+    List.exists check rl in
+  ity_r_any check ity
+
+let ity_r_stale reg sreg ity =
+  let rec check r = ity_equal r reg ||
+    if Sreg.mem r sreg then false else
+    let _,tl,rl,_ = open_region r in
+    List.exists (ity_r_any check) tl ||
+    List.exists check rl in
   ity_r_any check ity
 
 let ity_immutable ity = not ity.ity_pure
@@ -649,6 +657,11 @@ let freeze_of_writes wr =
       if Mpv.exists hit fs then frz else ity_freeze frz reg in
     List.fold_left2 freeze_unhit frz s.its_regions rl in
   Mreg.fold freeze_of_write wr Mtv.empty
+
+let merge_covers reg sreg1 sreg2 =
+  Sreg.union
+    (Sreg.filter (fun r -> not (ity_r_stale reg sreg1 r)) sreg2)
+    (Sreg.filter (fun r -> not (ity_r_stale reg sreg2 r)) sreg1)
 
 let eff_assign e asl =
   let seen,e = List.fold_left (fun (seen,e) (r,f,ity) ->
