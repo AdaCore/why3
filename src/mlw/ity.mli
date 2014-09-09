@@ -225,7 +225,13 @@ val eff_reset : effect -> region -> effect
 
 val eff_diverge : effect -> effect
 
-val eff_assign : effect -> (region * pvsymbol * ity) list -> effect
+type refresh = Sreg.t Mreg.t
+
+val eff_assign : effect -> (region * pvsymbol * ity) list -> effect * refresh
+
+val refresh_of_effect : effect -> refresh
+
+val merge_refresh : effect -> refresh -> refresh -> effect * refresh
 
 (*
 val eff_refresh : effect -> region -> region -> effect

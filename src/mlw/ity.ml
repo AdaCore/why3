@@ -658,10 +658,7 @@ let freeze_of_writes wr =
     List.fold_left2 freeze_unhit frz s.its_regions rl in
   Mreg.fold freeze_of_write wr Mtv.empty
 
-let merge_covers reg sreg1 sreg2 =
-  Sreg.union
-    (Sreg.filter (fun r -> not (ity_r_stale reg sreg1 r)) sreg2)
-    (Sreg.filter (fun r -> not (ity_r_stale reg sreg2 r)) sreg1)
+type refresh = Sreg.t Mreg.t
 
 let eff_assign e asl =
   let seen,e = List.fold_left (fun (seen,e) (r,f,ity) ->
@@ -686,19 +683,46 @@ let eff_assign e asl =
       ity_match sbst fity ity,
       ity_match sbsf ity fity) fs acc) seen (frz,frz) in
   (* every RHS region is reset unless it is preserved *)
+  let rst = Mtv.set_diff sbsf sbst in
   let e = Mtv.fold (fun v r e ->
-    if Mtv.mem v sbst then e else
     let s,tl,rl,_ = open_region r in
     (* [ity_mut_unsafe] will ignore [s], [tl], and [rl], and will
        restore (via hash-consing) the type corresponding to [v].
        We could use [ity_mut_unsafe ts_unit [] [] v] instead. *)
-    let r = ity_mut_unsafe s tl rl v in
-    eff_reset e r) sbsf e in
-  e
-(*
+    eff_reset e (ity_mut_unsafe s tl rl v)) rst e in
   (* every region not instantiated to itself is refreshed *)
-  let refr = Mreg.fold (fun r _ refr ->
-*)
+  let rfr = Mreg.fold (fun r _ rfr ->
+    let sbst = Mtv.inter (fun v reg i -> match i.ity_node with
+      | Itymut (_,_,_,u) when not (tv_equal u v) -> Some reg
+      | _ -> None) (ity_match Mtv.empty r r) sbst in
+    let add_rfr _ reg rfr = Mreg.change (function
+        | Some cvr -> Some (Sreg.add r cvr)
+        | None     -> Some (Sreg.singleton r)) reg rfr in
+    Mtv.fold add_rfr sbst rfr) seen Mreg.empty in
+  e, rfr
+
+let refresh_of_effect e =
+  let frz = freeze_of_writes e.eff_writes in
+  Mreg.fold (fun r _ rfr ->
+    let sbst = Mtv.set_diff (ity_match Mtv.empty r r) frz in
+    let add_rfr _ reg rfr = Mreg.change (function
+        | Some cvr -> Some (Sreg.add r cvr)
+        | None     -> Some (Sreg.singleton r)) reg rfr in
+    Mtv.fold add_rfr sbst rfr) e.eff_writes Mreg.empty
+
+let merge_covers reg cvr1 cvr2 = Sreg.union
+  (Sreg.filter (fun r -> not (ity_r_stale reg cvr1 r)) cvr2)
+  (Sreg.filter (fun r -> not (ity_r_stale reg cvr2 r)) cvr1)
+
+let merge_refresh e rfr1 rfr2 =
+  let e = ref e in
+  let merge reg cvr1 cvr2 =
+    let cvr = merge_covers reg cvr1 cvr2 in
+    if Sreg.is_empty cvr
+      then (e := eff_reset !e reg; None)
+      else Some cvr in
+  let rfr = Mreg.union merge rfr1 rfr2 in
+  !e, rfr
 
 (*
 exception IllegalAlias of region
