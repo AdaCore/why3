@@ -568,40 +568,58 @@ and reduce_app engine st ls ~orig ty rem_cont =
 
 and reduce_func_app ~orig ty rem_st t1 t2 rem_cont =
   try
-    Format.eprintf "[compute] found (... @@ ...)@.";
     (* attempt to decompile t1 under the form
        (epsilon fc. forall x. fc @ x = body)
        that is equivalent to \x.body *)
     match t1 with
     | Term { t_node = Teps tb } ->
-      Format.eprintf "[compute] found (Teps(fc,...) @@ ...) @.";
       let fc,t = Term.t_open_bound tb in
       begin match t.t_node with
       | Tquant(Tforall,tq) ->
-        Format.eprintf "[compute] found (Teps(fc,Tforall ...) @@ ...) @.";
-        let vl,_,t = t_open_quant tq in
+        let vl,trig,t = t_open_quant tq in
         begin
-          match vl with
-          | [x] ->
-            Format.eprintf "[compute] found (Teps(fc,Tforall x...) @@ ...) @.";
-            begin
-              match t.t_node with
-              | Tapp(ls1,
-                     [{t_node =
-                         Tapp(ls2,
-                              [{t_node = Tvar v1};{t_node = Tvar v2}])};
-                      body])
-                  when ls_equal ls1 ps_equ && ls_equal ls2 fs_func_app &&
-                    vs_equal v1 fc && vs_equal v2 x ->
-                (* GOT IT ! *)
-                Format.eprintf "[compute] found (Teps(fc,Tforall x. fc@@x = body) @@ ...) @.";
-                let t2 = term_of_value t2 in
-                { value_stack = rem_st;
-                  cont_stack =
-                    (Keval(body, Mvs.add x t2 Mvs.empty), 
-                     t_label_copy orig body) :: rem_cont;
-                }
+        match t.t_node with
+          | Tapp (ls1,[lhs;body]) when ls_equal ls1 ps_equ ->
+            let rvl = List.rev vl in
+            let rec remove_var lhs rvh rvt = match lhs.t_node with
+              | Tapp (ls2,[lhs1;{t_node = Tvar v1} as arg])
+                when ls_equal ls2 fs_func_app && vs_equal v1 rvh ->
+                begin
+                match rvt , lhs1 with
+                | rvh::rvt , _ ->
+                  let lhs1 , fc2 = remove_var lhs1 rvh rvt in
+                  let lhs2 = t_app ls2 [lhs1;arg] lhs.t_ty in
+                  t_label_copy lhs lhs2 , fc2
+                | [] , { t_node = Tvar fc1 } when vs_equal fc1 fc ->
+                  let fcn = fc.vs_name in
+                  let fc2 = Ident.id_derive fcn.Ident.id_string fcn in
+                  let fc2 = create_vsymbol fc2 (t_type lhs) in
+                  t_label_copy lhs (t_var fc2) , fc2
+                | _ -> raise Undetermined
+                end
               | _ -> raise Undetermined
+            in
+            begin
+            match rvl with
+            | rvh :: rvt -> let lhs , fc2 = remove_var lhs rvh rvt in
+              let (vh,vl) = match vl with
+              | [] -> assert false
+              | vh::vl -> (vh,vl)
+              in
+              let body = match vl with
+              | [] -> body
+              | _ -> 
+                let eq = t_label_copy t (t_app ps_equ [lhs;body] None) in
+                let tq = t_quant Tforall (t_close_quant vl trig eq) in
+                t_label_copy t (t_eps_close fc2 tq)
+              in
+              let t2 = term_of_value t2 in
+              { value_stack = rem_st;
+                cont_stack =
+                  (Keval(body,Mvs.add vh t2 Mvs.empty),
+                   t_label_copy orig body) :: rem_cont;
+              }
+            | _ -> raise Undetermined
             end
           | _ -> raise Undetermined
         end
