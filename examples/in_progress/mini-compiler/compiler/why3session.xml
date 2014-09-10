@@ -2,14 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
+<prover id="0" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../compiler.mlw" expanded="true">
-<theory name="Compiler_logic" sum="9ff0c45a0383d3ec252b17f3cb6957d0">
+<theory name="Compiler_logic" sum="7dca4e8b231785d2ce5469a576d074ce">
  <goal name="seq_wp_lemma">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="WP_parameter infix ~" expl="VC for infix ~">
  <transf name="split_goal_wp">
@@ -32,10 +32,10 @@
  </transf>
  </goal>
  <goal name="fork_wp_lemma">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter prefix ?" expl="VC for prefix ?">
- <proof prover="2"><result status="valid" time="0.05"/></proof>
+ <goal name="WP_parameter infix %" expl="VC for infix %">
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="towp_wp_lemma">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -54,7 +54,25 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Builtin_spec" sum="a81fb0a5012be4eb8441775835335bde" expanded="true">
+<theory name="Builtin_spec" sum="638eb1be6ed948b316e81135447b1ee9" expanded="true">
+ <goal name="inil_post_lemma">
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="WP_parameter inil" expl="VC for inil">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter inil.1" expl="1. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter inil.1.1" expl="1.">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="WP_parameter inil.1.2" expl="2.">
+   <proof prover="3"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
  <goal name="iconst_post_lemma">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -107,11 +125,43 @@
   </goal>
  </transf>
  </goal>
+ <goal name="isetvar_pre_lemma">
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="isetvar_post_lemma">
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="WP_parameter isetvarf" expl="VC for isetvarf" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter isetvarf.1" expl="1. assertion" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter isetvarf.1.1" expl="1. assertion">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="WP_parameter isetvarf.1.2" expl="2. assertion">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="WP_parameter isetvarf.1.3" expl="3. assertion">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="WP_parameter isetvarf.1.4" expl="4. assertion">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="WP_parameter isetvarf.1.5" expl="5. assertion">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter isetvarf.2" expl="2. postcondition">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+ </transf>
+ </goal>
  <goal name="ibinop_pre_lemma">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="ibinop_post_lemma">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="WP_parameter create_binop" expl="VC for create_binop">
  <transf name="split_goal_wp">
@@ -143,13 +193,13 @@
  </transf>
  </goal>
  <goal name="plus_lemma">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="sub_lemma">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="mul_lemma">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="WP_parameter iaddf" expl="VC for iaddf">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -160,13 +210,58 @@
  <goal name="WP_parameter imulf" expl="VC for imulf">
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
+ <goal name="ibranch_post_lemma">
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="WP_parameter ibranch" expl="VC for ibranch">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter ibranch.1" expl="1. assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter ibranch.1.1" expl="1. assertion">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="WP_parameter ibranch.1.2" expl="2. assertion">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="WP_parameter ibranch.1.3" expl="3. assertion">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="WP_parameter ibranch.1.4" expl="4. assertion">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter ibranch.2" expl="2. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter ibranch.2.1" expl="1.">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="WP_parameter ibranch.2.2" expl="2.">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
  <goal name="icjump_post_lemma">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter create_cjump" expl="VC for create_cjump" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter create_cjump.1" expl="1. assertion" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+ <goal name="beq_lemma">
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="bne_lemma">
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="ble_lemma">
+ <proof prover="2"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="bgt_lemma">
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="WP_parameter create_cjump" expl="VC for create_cjump">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter create_cjump.1" expl="1. assertion">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter create_cjump.1.1" expl="1. assertion">
    <proof prover="2"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -198,106 +293,442 @@
   </goal>
  </transf>
  </goal>
+ <goal name="WP_parameter ibeqf" expl="VC for ibeqf">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter ibeqf.1" expl="1. precondition">
+  <transf name="eliminate_if">
+   <goal name="WP_parameter ibeqf.1.1" expl="1. precondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter ibeqf.1.1.1" expl="1. precondition">
+    <proof prover="2"><result status="valid" time="0.10"/></proof>
+    </goal>
+    <goal name="WP_parameter ibeqf.1.1.2" expl="2. precondition">
+    <proof prover="2"><result status="valid" time="0.08"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter ibeqf.2" expl="2. postcondition">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter ibeqf.3" expl="3. postcondition">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter ibnef" expl="VC for ibnef">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter ibnef.1" expl="1. precondition">
+  <transf name="eliminate_if">
+   <goal name="WP_parameter ibnef.1.1" expl="1. precondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter ibnef.1.1.1" expl="1. precondition">
+    <proof prover="2"><result status="valid" time="0.08"/></proof>
+    </goal>
+    <goal name="WP_parameter ibnef.1.1.2" expl="2. precondition">
+    <proof prover="2"><result status="valid" time="0.09"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter ibnef.2" expl="2. postcondition">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter ibnef.3" expl="3. postcondition">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter iblef" expl="VC for iblef">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter iblef.1" expl="1. precondition">
+  <transf name="eliminate_if">
+   <goal name="WP_parameter iblef.1.1" expl="1. precondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter iblef.1.1.1" expl="1. precondition">
+    <proof prover="2"><result status="valid" time="0.09"/></proof>
+    </goal>
+    <goal name="WP_parameter iblef.1.1.2" expl="2. precondition">
+    <proof prover="2"><result status="valid" time="0.12"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter iblef.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter iblef.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter ibgtf" expl="VC for ibgtf">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter ibgtf.1" expl="1. precondition">
+  <transf name="eliminate_if">
+   <goal name="WP_parameter ibgtf.1.1" expl="1. precondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter ibgtf.1.1.1" expl="1. precondition">
+    <proof prover="2"><result status="valid" time="0.14"/></proof>
+    </goal>
+    <goal name="WP_parameter ibgtf.1.1.2" expl="2. precondition">
+    <proof prover="2"><result status="valid" time="0.11"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter ibgtf.2" expl="2. postcondition">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter ibgtf.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.09"/></proof>
+  </goal>
+ </transf>
+ </goal>
 </theory>
-<theory name="Compile_aexpr" sum="a744e72188164efaa300cb3f21f166b8" expanded="true">
+<theory name="Compile_aexpr" sum="522f8946f69c12899b22e49d363c7641" expanded="true">
  <goal name="aexpr_post_lemma">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="WP_parameter compile_aexpr" expl="VC for compile_aexpr">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compile_aexpr.1" expl="1. precondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.2" expl="2. precondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.3" expl="3. precondition">
   <transf name="simplify_trivial_quantification_in_goal">
    <goal name="WP_parameter compile_aexpr.3.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_aexpr.3.1.1" expl="1.">
-    <proof prover="2"><result status="valid" time="0.06"/></proof>
+    <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter compile_aexpr.4" expl="4. postcondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.5" expl="5. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.6" expl="6. postcondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.7" expl="7. precondition">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.8" expl="8. precondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.9" expl="9. precondition">
   <transf name="simplify_trivial_quantification_in_goal">
    <goal name="WP_parameter compile_aexpr.9.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_aexpr.9.1.1" expl="1.">
-    <proof prover="2"><result status="valid" time="0.06"/></proof>
+    <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter compile_aexpr.10" expl="10. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.11" expl="11. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.12" expl="12. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.13" expl="13. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.14" expl="14. variant decrease">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.15" expl="15. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.16" expl="16. variant decrease">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.17" expl="17. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.18" expl="18. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.19" expl="19. precondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.20" expl="20. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.21" expl="21. precondition">
   <transf name="simplify_trivial_quantification_in_goal">
    <goal name="WP_parameter compile_aexpr.21.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter compile_aexpr.21.1.1" expl="1.">
+    <proof prover="2" obsolete="true"><result status="valid" time="0.19"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.22" expl="22. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.23" expl="23. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.24" expl="24. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.25" expl="25. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.26" expl="26. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.27" expl="27. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.28" expl="28. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.29" expl="29. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.30" expl="30. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.31" expl="31. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.32" expl="32. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.33" expl="33. precondition">
+  <transf name="simplify_trivial_quantification">
+   <goal name="WP_parameter compile_aexpr.33.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_aexpr.33.1.1" expl="1.">
+    <proof prover="2" obsolete="true"><result status="valid" time="0.12"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.34" expl="34. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.35" expl="35. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.36" expl="36. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.37" expl="37. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.38" expl="38. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.15"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.39" expl="39. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.40" expl="40. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.41" expl="41. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.42" expl="42. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.43" expl="43. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.44" expl="44. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.45" expl="45. precondition">
+  <transf name="simplify_trivial_quantification">
+   <goal name="WP_parameter compile_aexpr.45.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_aexpr.45.1.1" expl="1.">
+    <proof prover="2" obsolete="true"><result status="valid" time="0.14"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.46" expl="46. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.47" expl="47. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr.48" expl="48. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter compile_aexpr_natural" expl="VC for compile_aexpr_natural" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter compile_aexpr_natural.1" expl="1. assertion" expanded="true">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_aexpr_natural.2" expl="2. postcondition" expanded="true">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.11"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Compile_bexpr" sum="c071b4d712a2d0ee7ca309f052870a01" expanded="true">
+ <goal name="bexpr_post_def">
+ <proof prover="2" obsolete="true"><result status="valid" time="0.10"/></proof>
+ </goal>
+ <goal name="exn_b1_lemma">
+ <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="WP_parameter compile_bexpr" expl="VC for compile_bexpr">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter compile_bexpr.1" expl="1. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.2" expl="2. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.3" expl="3. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.3.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_bexpr.3.1.1" expl="1.">
+    <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.4" expl="4. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.5" expl="5. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.6" expl="6. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.7" expl="7. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.8" expl="8. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.9" expl="9. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.9.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_bexpr.9.1.1" expl="1.">
+    <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.10" expl="10. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.11" expl="11. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.12" expl="12. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.13" expl="13. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.14" expl="14. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.15" expl="15. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.15.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_bexpr.15.1.1" expl="1.">
+    <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.16" expl="16. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.17" expl="17. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.18" expl="18. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.19" expl="19. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.20" expl="20. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.21" expl="21. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.21.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_bexpr.21.1.1" expl="1.">
+    <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.22" expl="22. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.23" expl="23. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.24" expl="24. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.25" expl="25. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.26" expl="26. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.27" expl="27. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.28" expl="28. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.28.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_bexpr.28.1.1" expl="1.">
     <transf name="split_goal_wp">
-     <goal name="WP_parameter compile_aexpr.21.1.1.1" expl="1.">
-     <proof prover="2"><result status="valid" time="0.04"/></proof>
+     <goal name="WP_parameter compile_bexpr.28.1.1.1" expl="1.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
      </goal>
-     <goal name="WP_parameter compile_aexpr.21.1.1.2" expl="2.">
-     <proof prover="2"><result status="valid" time="0.05"/></proof>
+     <goal name="WP_parameter compile_bexpr.28.1.1.2" expl="2.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.15"/></proof>
      </goal>
-     <goal name="WP_parameter compile_aexpr.21.1.1.3" expl="3.">
-     <proof prover="2"><result status="valid" time="0.12"/></proof>
-     </goal>
-     <goal name="WP_parameter compile_aexpr.21.1.1.4" expl="4.">
-     <proof prover="2"><result status="valid" time="0.06"/></proof>
+     <goal name="WP_parameter compile_bexpr.28.1.1.3" expl="3.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.15"/></proof>
      </goal>
     </transf>
     </goal>
@@ -305,113 +736,586 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter compile_aexpr.22" expl="22. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter compile_bexpr.29" expl="29. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.23" expl="23. postcondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter compile_bexpr.30" expl="30. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.24" expl="24. postcondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter compile_bexpr.31" expl="31. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.25" expl="25. precondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter compile_bexpr.32" expl="32. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.26" expl="26. variant decrease">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter compile_bexpr.33" expl="33. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.27" expl="27. precondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter compile_bexpr.34" expl="34. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.28" expl="28. variant decrease">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <goal name="WP_parameter compile_bexpr.35" expl="35. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.29" expl="29. precondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter compile_bexpr.36" expl="36. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.30" expl="30. precondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter compile_bexpr.37" expl="37. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.31" expl="31. precondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter compile_bexpr.38" expl="38. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.32" expl="32. precondition">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter compile_aexpr.33" expl="33. precondition">
-  <transf name="simplify_trivial_quantification">
-   <goal name="WP_parameter compile_aexpr.33.1" expl="1.">
+  <goal name="WP_parameter compile_bexpr.39" expl="39. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.39.1" expl="1.">
    <transf name="compute_specified">
-    <goal name="WP_parameter compile_aexpr.33.1.1" expl="1.">
-    <proof prover="2"><result status="valid" time="0.14"/></proof>
+    <goal name="WP_parameter compile_bexpr.39.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter compile_bexpr.39.1.1.1" expl="1.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.39.1.1.2" expl="2.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.15"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.39.1.1.3" expl="3.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.13"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.39.1.1.4" expl="4.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.39.1.1.5" expl="5.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.52"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.39.1.1.6" expl="6.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.41"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter compile_aexpr.34" expl="34. postcondition">
-  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  <goal name="WP_parameter compile_bexpr.40" expl="40. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.35" expl="35. postcondition">
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <goal name="WP_parameter compile_bexpr.41" expl="41. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.36" expl="36. postcondition">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter compile_bexpr.42" expl="42. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.37" expl="37. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter compile_bexpr.43" expl="43. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.38" expl="38. variant decrease">
-  <proof prover="2"><result status="valid" time="0.15"/></proof>
+  <goal name="WP_parameter compile_bexpr.44" expl="44. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.39" expl="39. precondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter compile_bexpr.45" expl="45. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.40" expl="40. variant decrease">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <goal name="WP_parameter compile_bexpr.46" expl="46. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.41" expl="41. precondition">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter compile_bexpr.47" expl="47. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.42" expl="42. precondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter compile_bexpr.48" expl="48. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.43" expl="43. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter compile_aexpr.44" expl="44. precondition">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter compile_aexpr.45" expl="45. precondition">
-  <transf name="simplify_trivial_quantification">
-   <goal name="WP_parameter compile_aexpr.45.1" expl="1.">
+  <goal name="WP_parameter compile_bexpr.49" expl="49. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.49.1" expl="1.">
    <transf name="compute_specified">
-    <goal name="WP_parameter compile_aexpr.45.1.1" expl="1.">
-    <proof prover="2"><result status="valid" time="0.11"/></proof>
+    <goal name="WP_parameter compile_bexpr.49.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter compile_bexpr.49.1.1.1" expl="1.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.49.1.1.2" expl="2.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.49.1.1.3" expl="3.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.49.1.1.4" expl="4.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.20"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.49.1.1.5" expl="5.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.30"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter compile_aexpr.46" expl="46. postcondition">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter compile_bexpr.50" expl="50. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.47" expl="47. postcondition">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <goal name="WP_parameter compile_bexpr.51" expl="51. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter compile_aexpr.48" expl="48. postcondition">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <goal name="WP_parameter compile_bexpr.52" expl="52. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.53" expl="53. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.54" expl="54. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.55" expl="55. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.56" expl="56. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.57" expl="57. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.58" expl="58. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.59" expl="59. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.59.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_bexpr.59.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter compile_bexpr.59.1.1.1" expl="1.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.59.1.1.2" expl="2.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.59.1.1.3" expl="3.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.59.1.1.4" expl="4.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.18"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.59.1.1.5" expl="5.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.17"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.60" expl="60. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.61" expl="61. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.62" expl="62. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.63" expl="63. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.64" expl="64. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.65" expl="65. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.66" expl="66. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.67" expl="67. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.68" expl="68. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.69" expl="69. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.69.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_bexpr.69.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter compile_bexpr.69.1.1.1" expl="1.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.69.1.1.2" expl="2.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.69.1.1.3" expl="3.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.11"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.69.1.1.4" expl="4.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.26"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.69.1.1.5" expl="5.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.25"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.70" expl="70. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.71" expl="71. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.72" expl="72. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.73" expl="73. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.74" expl="74. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.75" expl="75. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.76" expl="76. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.77" expl="77. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.78" expl="78. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.79" expl="79. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_bexpr.79.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_bexpr.79.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter compile_bexpr.79.1.1.1" expl="1.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.79.1.1.2" expl="2.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.79.1.1.3" expl="3.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.10"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.79.1.1.4" expl="4.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.25"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_bexpr.79.1.1.5" expl="5.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.24"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.80" expl="80. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.81" expl="81. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_bexpr.82" expl="82. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter compile_aexpr_natural" expl="VC for compile_aexpr_natural" expanded="true">
+ <goal name="WP_parameter compile_bexpr_natural" expl="VC for compile_bexpr_natural" expanded="true">
+ <proof prover="2" obsolete="true"><result status="valid" time="2.01"/></proof>
+ </goal>
+</theory>
+<theory name="Compile_com" sum="1c0d44e416ed4635faded9f642a24af9" expanded="true">
+ <goal name="com_pre_lemma" expanded="true">
+ <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+ </goal>
+ <goal name="com_post_lemma" expanded="true">
+ <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+ </goal>
+ <goal name="WP_parameter compile_com" expl="VC for compile_com" expanded="true">
+ <proof prover="2" obsolete="true"><result status="unknown" time="0.06"/></proof>
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter compile_aexpr_natural.1" expl="1. postcondition" expanded="true">
-  <transf name="simplify_trivial_quantification_in_goal" expanded="true">
-   <goal name="WP_parameter compile_aexpr_natural.1.1" expl="1." expanded="true">
-   <proof prover="0" edited="compiler_Compile_aexpr_WP_parameter_compile_aexpr_natural_1.v" obsolete="true"><result status="valid" time="1.55"/></proof>
+  <goal name="WP_parameter compile_com.1" expl="1. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.2" expl="2. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.3" expl="3. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_com.3.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_com.3.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter compile_com.3.1.1.1" expl="1.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.3.1.1.2" expl="2.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.3.1.1.3" expl="3.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.3.1.1.4" expl="4.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
   </transf>
+  </goal>
+  <goal name="WP_parameter compile_com.4" expl="4. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.5" expl="5. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.6" expl="6. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.7" expl="7. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.8" expl="8. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.9" expl="9. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.10" expl="10. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.11" expl="11. precondition">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_com.11.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_com.11.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter compile_com.11.1.1.1" expl="1.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.11.1.1.2" expl="2.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.11.1.1.3" expl="3.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.10"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.11.1.1.4" expl="4.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.11"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.11.1.1.5" expl="5.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.58"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_com.12" expl="12. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.13" expl="13. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.14" expl="14. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.15" expl="15. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.16" expl="16. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.17" expl="17. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.18" expl="18. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.19" expl="19. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.20" expl="20. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.21" expl="21. precondition" expanded="true">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="WP_parameter compile_com.21.1" expl="1.">
+   <transf name="compute_specified">
+    <goal name="WP_parameter compile_com.21.1.1" expl="1.">
+    <transf name="split_goal_wp">
+     <goal name="WP_parameter compile_com.21.1.1.1" expl="1.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.12"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.21.1.1.2" expl="2.">
+     <proof prover="3" obsolete="true"><result status="valid" time="0.31"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.21.1.1.3" expl="3.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.21.1.1.4" expl="4.">
+     <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.21.1.1.5" expl="5.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.11"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.21.1.1.6" expl="6.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.15"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.21.1.1.7" expl="7.">
+     <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_com.22" expl="22. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.23" expl="23. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.24" expl="24. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.25" expl="25. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.26" expl="26. variant decrease">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.27" expl="27. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.28" expl="28. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.29" expl="29. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.30" expl="30. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.31" expl="31. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.32" expl="32. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.33" expl="33. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.34" expl="34. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.35" expl="35. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.36" expl="36. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.37" expl="37. precondition" expanded="true">
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.52"/></proof>
+  <transf name="simplify_trivial_quantification_in_goal" expanded="true">
+   <goal name="WP_parameter compile_com.37.1" expl="1." expanded="true">
+   <transf name="compute_specified" expanded="true">
+    <goal name="WP_parameter compile_com.37.1.1" expl="1." expanded="true">
+    <transf name="split_goal_wp" expanded="true">
+     <goal name="WP_parameter compile_com.37.1.1.1" expl="1.">
+     <proof prover="2"><result status="valid" time="0.08"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.2" expl="2." expanded="true">
+     <proof prover="2"><result status="valid" time="0.08"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.3" expl="3.">
+     <proof prover="2"><result status="valid" time="0.18"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.4" expl="4.">
+     <proof prover="0" obsolete="true"><result status="timeout" time="5.00"/></proof>
+     <proof prover="1"><result status="valid" time="0.05"/></proof>
+     <proof prover="2" obsolete="true"><result status="timeout" time="4.99"/></proof>
+     <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.5" expl="5.">
+     <proof prover="2"><result status="valid" time="0.10"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.6" expl="6.">
+     <proof prover="2"><result status="valid" time="0.58"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.7" expl="7.">
+     <proof prover="2"><result status="valid" time="0.11"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.8" expl="8.">
+     <proof prover="2"><result status="valid" time="0.13"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.9" expl="9.">
+     <proof prover="2"><result status="valid" time="0.17"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.10" expl="10.">
+     <proof prover="2"><result status="valid" time="0.11"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.11" expl="11.">
+     <proof prover="2"><result status="valid" time="0.66"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.12" expl="12.">
+     <proof prover="2"><result status="valid" time="0.13"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.13" expl="13.">
+     <proof prover="2"><result status="valid" time="0.27"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.14" expl="14.">
+     <proof prover="2"><result status="valid" time="0.21"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.15" expl="15.">
+     <proof prover="2"><result status="valid" time="0.19"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.16" expl="16.">
+     <proof prover="0"><result status="timeout" time="5.00"/></proof>
+     <proof prover="1"><result status="timeout" time="4.99"/></proof>
+     <proof prover="2"><result status="timeout" time="4.99"/></proof>
+     <proof prover="3"><result status="timeout" time="5.01"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.17" expl="17.">
+     <proof prover="0" obsolete="true"><result status="timeout" time="5.00"/></proof>
+     <proof prover="1"><result status="timeout" time="4.99"/></proof>
+     <proof prover="2" obsolete="true"><result status="timeout" time="4.99"/></proof>
+     <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.18" expl="18.">
+     <proof prover="2"><result status="valid" time="0.13"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.19" expl="19.">
+     <proof prover="2"><result status="valid" time="0.22"/></proof>
+     </goal>
+     <goal name="WP_parameter compile_com.37.1.1.20" expl="20.">
+     <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
+     <proof prover="1"><result status="timeout" time="4.99"/></proof>
+     <proof prover="2" obsolete="true"><result status="timeout" time="4.99"/></proof>
+     <proof prover="3" obsolete="true"><result status="timeout" time="5.01"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter compile_com.38" expl="38. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.39" expl="39. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.40" expl="40. postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="WP_parameter compile_com.41" expl="41. unreachable point">
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.22"/></proof>
   </goal>
  </transf>
  </goal>
