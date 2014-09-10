@@ -207,8 +207,8 @@ module Sexn: Extset.S with module M = Mexn
 
 type effect = private {
   eff_writes : Spv.t Mreg.t;
+  eff_resets : Sreg.t Mreg.t;
   eff_raises : Sexn.t;
-  eff_resets : Sreg.t;
   eff_diverg : bool;
 }
 
@@ -225,21 +225,14 @@ val eff_reset : effect -> region -> effect
 
 val eff_diverge : effect -> effect
 
-type refresh = Sreg.t Mreg.t
+val eff_assign : effect -> (region * pvsymbol * ity) list -> effect
 
-val eff_assign : effect -> (region * pvsymbol * ity) list -> effect * refresh
-
-val refresh_of_effect : effect -> refresh
-
-val merge_refresh : effect -> refresh -> refresh -> effect * refresh
+val refresh_of_effect : effect -> effect
 
 (*
-val eff_refresh : effect -> region -> region -> effect
-
 val eff_stale_region : effect -> varset -> bool
 
 exception IllegalAlias of region
-exception IllegalCompar of tvsymbol * ity
 exception GhostDiverg
 
 val eff_full_inst : ity Mtv.t -> effect -> effect

@@ -583,36 +583,40 @@ module Mexn = Exn.M
 (* effects *)
 type effect = {
   eff_writes : Spv.t Mreg.t;
+  eff_resets : Sreg.t Mreg.t;
   eff_raises : Sexn.t;
-  eff_resets : Sreg.t;
   eff_diverg : bool;
 }
 
 let eff_empty = {
   eff_writes = Mreg.empty;
+  eff_resets = Mreg.empty;
   eff_raises = Sexn.empty;
-  eff_resets = Sreg.empty;
   eff_diverg = false;
 }
 
 let eff_is_empty e =
   Mreg.is_empty e.eff_writes &&
+  Mreg.is_empty e.eff_resets &&
   Sexn.is_empty e.eff_raises &&
-  Sreg.is_empty e.eff_resets &&
   not e.eff_diverg
 
 let eff_equal e1 e2 =
   Mreg.equal Spv.equal e1.eff_writes e2.eff_writes &&
+  Mreg.equal Sreg.equal e1.eff_resets e2.eff_resets &&
   Sexn.equal e1.eff_raises e2.eff_raises &&
-  Sreg.equal e1.eff_resets e2.eff_resets &&
   e1.eff_diverg = e2.eff_diverg
 
-let fld_union _ f1 f2 = Some (Spv.union f1 f2)
+let merge_fields _ f1 f2 = Some (Spv.union f1 f2)
+
+let merge_covers reg c1 c2 = Some (Sreg.union
+  (Sreg.filter (fun r -> not (ity_r_stale reg c1 r)) c2)
+  (Sreg.filter (fun r -> not (ity_r_stale reg c2 r)) c1))
 
 let eff_union x y = {
-  eff_writes = Mreg.union fld_union x.eff_writes y.eff_writes;
+  eff_writes = Mreg.union merge_fields x.eff_writes y.eff_writes;
+  eff_resets = Mreg.union merge_covers x.eff_resets y.eff_resets;
   eff_raises = Sexn.union x.eff_raises y.eff_raises;
-  eff_resets = Sreg.union x.eff_resets y.eff_resets;
   eff_diverg = x.eff_diverg || y.eff_diverg;
 }
 
@@ -633,7 +637,7 @@ let eff_raise e x = { e with eff_raises = Sexn.add x e.eff_raises }
 let eff_catch e x = { e with eff_raises = Sexn.remove x e.eff_raises }
 
 let eff_reset e r = match r.ity_node with
-  | Itymut _ -> { e with eff_resets = Sreg.add r e.eff_resets }
+  | Itymut _ -> { e with eff_resets = Mreg.add r Sreg.empty e.eff_resets }
   | _ -> invalid_arg "Ity.eff_reset"
 
 let eff_diverge e = { e with eff_diverg = true }
@@ -657,8 +661,6 @@ let freeze_of_writes wr =
       if Mpv.exists hit fs then frz else ity_freeze frz reg in
     List.fold_left2 freeze_unhit frz s.its_regions rl in
   Mreg.fold freeze_of_write wr Mtv.empty
-
-type refresh = Sreg.t Mreg.t
 
 let eff_assign e asl =
   let seen,e = List.fold_left (fun (seen,e) (r,f,ity) ->
@@ -694,35 +696,22 @@ let eff_assign e asl =
   let rfr = Mreg.fold (fun r _ rfr ->
     let sbst = Mtv.inter (fun v reg i -> match i.ity_node with
       | Itymut (_,_,_,u) when not (tv_equal u v) -> Some reg
-      | _ -> None) (ity_match Mtv.empty r r) sbst in
+      | _ -> None) (ity_freeze Mtv.empty r) sbst in
     let add_rfr _ reg rfr = Mreg.change (function
         | Some cvr -> Some (Sreg.add r cvr)
         | None     -> Some (Sreg.singleton r)) reg rfr in
     Mtv.fold add_rfr sbst rfr) seen Mreg.empty in
-  e, rfr
+  { e with eff_resets = Mreg.union merge_covers e.eff_resets rfr }
 
 let refresh_of_effect e =
   let frz = freeze_of_writes e.eff_writes in
-  Mreg.fold (fun r _ rfr ->
-    let sbst = Mtv.set_diff (ity_match Mtv.empty r r) frz in
+  let rfr = Mreg.fold (fun r _ rfr ->
+    let sbst = Mtv.set_diff (ity_freeze Mtv.empty r) frz in
     let add_rfr _ reg rfr = Mreg.change (function
         | Some cvr -> Some (Sreg.add r cvr)
         | None     -> Some (Sreg.singleton r)) reg rfr in
-    Mtv.fold add_rfr sbst rfr) e.eff_writes Mreg.empty
-
-let merge_covers reg cvr1 cvr2 = Sreg.union
-  (Sreg.filter (fun r -> not (ity_r_stale reg cvr1 r)) cvr2)
-  (Sreg.filter (fun r -> not (ity_r_stale reg cvr2 r)) cvr1)
-
-let merge_refresh e rfr1 rfr2 =
-  let e = ref e in
-  let merge reg cvr1 cvr2 =
-    let cvr = merge_covers reg cvr1 cvr2 in
-    if Sreg.is_empty cvr
-      then (e := eff_reset !e reg; None)
-      else Some cvr in
-  let rfr = Mreg.union merge rfr1 rfr2 in
-  !e, rfr
+    Mtv.fold add_rfr sbst rfr) e.eff_writes Mreg.empty in
+  { e with eff_resets = Mreg.union merge_covers e.eff_resets rfr }
 
 (*
 exception IllegalAlias of region
