@@ -43,7 +43,7 @@ let get_indice i =
   else assert false
 
 let init_vars th_uc nb_var =
-  let a = Array.create (nb_var*2) Term.t_true in
+  let a = Array.make (nb_var*2) Term.t_true in
   let th = ref th_uc in
   for i = nb_var downto -nb_var do
     if i <> 0 then
