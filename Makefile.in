@@ -282,7 +282,7 @@ endif
 
 install_no_local_lib::
 	mkdir -p $(OCAMLINSTALLLIB)/why3
-	cp -f $(addprefix lib/why3/why3., $(INSTALLED_LIB_EXTS)) \
+	cp -f $(wildcard $(addprefix lib/why3/why3., $(INSTALLED_LIB_EXTS))) \
 		lib/why3/META $(OCAMLINSTALLLIB)/why3
 
 ifeq (@enable_local@,yes)
@@ -420,7 +420,7 @@ GENERATED += $(PLUGGENERATED)
 
 install_no_local::
 	mkdir -p $(LIBDIR)/why3/plugins
-	cp -f $(foreach f,$(LIBPLUGCMO) $(LIBPLUGCMXS),$(wildcard $(f))) $(LIBDIR)/why3/plugins
+	cp -f $(wildcard $(LIBPLUGCMO) $(LIBPLUGCMXS)) $(LIBDIR)/why3/plugins
 
 ###############
 # Why3 commands
@@ -1224,7 +1224,7 @@ lib/why3/why3extract.cmx: $(OCAMLLIBS_CMX)
 
 install_no_local_lib::
 	mkdir -p $(OCAMLINSTALLLIB)/why3
-	cp -f $(addprefix lib/why3/why3extract., $(INSTALLED_LIB_EXTS)) \
+	cp -f $(wildcard $(addprefix lib/why3/why3extract., $(INSTALLED_LIB_EXTS))) \
 	  $(OCAMLINSTALLLIB)/why3
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
@@ -1255,7 +1255,7 @@ jessie.opt: src/jessie/Makefile lib/why3/why3.cmxa
 
 install_no_local::
 	mkdir -p $(FRAMAC_LIBDIR)/plugins/
-	cp -f $(addprefix src/jessie/Jessie3., $(INSTALLED_LIB_EXTS)) \
+	cp -f $(wildcard $(addprefix src/jessie/Jessie3., $(INSTALLED_LIB_EXTS))) \
 	  $(FRAMAC_LIBDIR)/plugins/
 
 clean::
