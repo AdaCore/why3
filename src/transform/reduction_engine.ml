@@ -461,7 +461,7 @@ let rec reduce engine c =
   | [], (Kquant _, _) :: _ -> assert false
   | Int _ :: _, (Kquant _, _) :: _ -> assert false
   | Term t :: st, (Kquant(q,vl,tr), orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_quant_close q vl tr t)) :: st;
+    { value_stack = Term (t_label_copy orig (t_quant_close_simp q vl tr t)) :: st;
       cont_stack = rem;
     }
 
@@ -915,7 +915,7 @@ let rec reconstruct c =
       | t :: st, Keps v -> (t_eps_close v (term_of_value t)), st
       | [], Kquant _ -> assert false
       | t :: st, Kquant(q,vl,tr) ->
-        (t_quant_close q vl tr (term_of_value t)), st
+        (t_quant_close_simp q vl tr (term_of_value t)), st
     in
     reconstruct {
       value_stack = (Term (t_label_copy orig t)) :: st;
