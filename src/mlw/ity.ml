@@ -103,8 +103,6 @@ module Hsity = Hashcons.Make (struct
   type t = ity
 
   let equal ity1 ity2 = match ity1.ity_node, ity2.ity_node with
-    | Ityvar v1, Ityvar v2 ->
-        tv_equal v1 v2
     | Itypur (s1,l1), Itypur (s2,l2) ->
         its_equal s1 s2 &&
         List.for_all2 ity_equal l1 l2
@@ -112,7 +110,8 @@ module Hsity = Hashcons.Make (struct
         its_equal s1 s2 &&
         List.for_all2 ity_equal l1 l2 &&
         List.for_all2 ity_equal r1 r2
-    | Itymut (_,_,_,v1), Itymut (_,_,_,v2) ->
+    | (Ityvar v1 | Itymut (_,_,_,v1)),
+      (Ityvar v2 | Itymut (_,_,_,v2)) ->
         tv_equal v1 v2
     | _ -> false
 
@@ -147,7 +146,7 @@ let mk_ity n = {
   ity_tag  = Weakhtbl.dummy_tag;
 }
 
-let ity_var n = Hsity.hashcons (mk_ity (Ityvar n))
+let ity_var_unsafe n = Hsity.hashcons (mk_ity (Ityvar n))
 let ity_pur_unsafe s tl = Hsity.hashcons (mk_ity (Itypur (s,tl)))
 let ity_app_unsafe s tl rl = Hsity.hashcons (mk_ity (Ityapp (s,tl,rl)))
 let ity_mut_unsafe s tl rl v = Hsity.hashcons (mk_ity (Itymut (s,tl,rl,v)))
@@ -165,11 +164,12 @@ let ity_mut_fresh_unsafe s tl rl =
 
 let ity_mut_known_unsafe s tl rl v =
   let ity = ity_mut_unsafe s tl rl v in
-  let s',tl',rl',_ = open_region ity in
-  assert (its_equal s s');
-  assert (Lists.equal ity_equal tl tl');
-  assert (Lists.equal ity_equal rl rl');
-  ity
+  match ity.ity_node with
+  | Itymut (s',tl',rl',_)
+    when its_equal s s' &&
+         Lists.equal ity_equal tl tl' &&
+         Lists.equal ity_equal rl rl' -> ity
+  | _ -> invalid_arg "Ity.ity_mut"
 
 (* generic traversal functions *)
 
@@ -326,6 +326,12 @@ let rec ity_purify ity = match ity.ity_node with
   | Ityvar _ -> ity
   | Itypur (s,tl) | Ityapp (s,tl,_) | Itymut (s,tl,_,_) ->
       ity_pur_unsafe s (List.map ity_purify tl)
+
+let ity_var v =
+  let ity = ity_var_unsafe v in
+  match ity.ity_node with
+  | Ityvar _ -> ity
+  | _ -> invalid_arg "Ity.ity_var"
 
 let ity_pur s tl =
   if List.length s.its_ts.ts_args <> List.length tl then
@@ -680,26 +686,27 @@ let eff_assign e asl =
     let s,tl,rl,_ = open_region r in
     let sbs = List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty in
     let sbs = List.fold_left2 ity_match sbs s.its_regions rl in
+    (* TODO: catch the TypeMismatch exception and produce a reasonable
+       error message *)
     Mpv.fold (fun pv ity (sbst,sbsf) ->
       let fity = ity_full_inst sbs pv.pv_ity in
       ity_match sbst fity ity,
       ity_match sbsf ity fity) fs acc) seen (frz,frz) in
   (* every RHS region is reset unless it is preserved *)
   let rst = Mtv.set_diff sbsf sbst in
-  let e = Mtv.fold (fun v r e ->
-    let s,tl,rl,_ = open_region r in
-    (* [ity_mut_unsafe] will ignore [s], [tl], and [rl], and will
-       restore (via hash-consing) the type corresponding to [v].
-       We could use [ity_mut_unsafe ts_unit [] [] v] instead. *)
-    eff_reset e (ity_mut_unsafe s tl rl v)) rst e in
+  let e = Mtv.fold (fun v _ e ->
+    (* since type variables are frozen, they can't appear in [rst].
+       Thus, [v] has to be a region variable, and [ity_var_unsafe]
+       will restore the corresponging region via hash-consing. *)
+    eff_reset e (ity_var_unsafe v)) rst e in
   (* every region not instantiated to itself is refreshed *)
   let rfr = Mreg.fold (fun r _ rfr ->
     let sbst = Mtv.inter (fun v reg i -> match i.ity_node with
       | Itymut (_,_,_,u) when not (tv_equal u v) -> Some reg
       | _ -> None) (ity_freeze Mtv.empty r) sbst in
     let add_rfr _ reg rfr = Mreg.change (function
-        | Some cvr -> Some (Sreg.add r cvr)
-        | None     -> Some (Sreg.singleton r)) reg rfr in
+      | Some cvr -> Some (Sreg.add r cvr)
+      | None     -> Some (Sreg.singleton r)) reg rfr in
     Mtv.fold add_rfr sbst rfr) seen Mreg.empty in
   { e with eff_resets = Mreg.union merge_covers e.eff_resets rfr }
 
@@ -708,53 +715,37 @@ let refresh_of_effect e =
   let rfr = Mreg.fold (fun r _ rfr ->
     let sbst = Mtv.set_diff (ity_freeze Mtv.empty r) frz in
     let add_rfr _ reg rfr = Mreg.change (function
-        | Some cvr -> Some (Sreg.add r cvr)
-        | None     -> Some (Sreg.singleton r)) reg rfr in
+      | Some cvr -> Some (Sreg.add r cvr)
+      | None     -> Some (Sreg.singleton r)) reg rfr in
     Mtv.fold add_rfr sbst rfr) e.eff_writes Mreg.empty in
   { e with eff_resets = Mreg.union merge_covers e.eff_resets rfr }
 
 (*
 exception IllegalAlias of region
-exception IllegalCompar of tvsymbol * ity
-
-let eff_refresh e r u =
-  if not (reg_occurs r u.reg_ity.ity_vars) then
-    invalid_arg "Mlw_ty.eff_refresh";
-  let reset = Mreg.singleton r (Some u) in
-  { e with eff_resets = Mreg.union join_reset e.eff_resets reset }
-
-let eff_assign e ?(ghost=false) r ty =
-  let e = eff_write e ~ghost r in
-  let sub = ity_match ity_subst_empty r.reg_ity ty in
-  (* assignment cannot instantiate type variables *)
-  let check tv ity = match ity.ity_node with
-    | Ityvar tv' -> tv_equal tv tv'
-    | _ -> false in
-  if not (Mtv.for_all check sub.ity_subst_tv) then
-    raise (TypeMismatch (r.reg_ity,ty,ity_subst_empty));
-  (* r:t[r1,r2] <- t[r1,r1] introduces an alias *)
-  let add_right _ v s = Sreg.add_new (IllegalAlias v) v s in
-  ignore (Mreg.fold add_right sub.ity_subst_reg Sreg.empty);
-  (* every region on the rhs must be erased *)
-  let add_right k v m = if reg_equal k v then m else Mreg.add v None m in
-  let reset = Mreg.fold add_right sub.ity_subst_reg Mreg.empty in
-  (* ...except those which occur on the lhs : they are preserved under r *)
-  let add_left k v m = if reg_equal k v then m else Mreg.add k (Some r) m in
-  let reset = Mreg.fold add_left sub.ity_subst_reg reset in
-  { e with eff_resets = Mreg.union join_reset e.eff_resets reset }
 
 let eff_full_inst sbs e =
-  let s = sbs.ity_subst_reg in
   (* modified or reset regions in e *)
-  let wr = Mreg.map (Util.const ()) e.eff_resets in
-  let wr = Sreg.union e.eff_writes wr in
-  let wr = Sreg.union e.eff_ghostw wr in
+  let wrt = Mreg.map (Util.const ()) e.eff_writes in
+  let rst = Mreg.map (Util.const ()) e.eff_resets in
+  let wrt = Sreg.union wrt rst in
+
+  let aff = Sreg.fold (fun r acc ->
+    Sreg.add (ity_full_inst sbs r) acc) wrt Sreg.empty in
+
+  let check_inst v ity acc =
+    let i = ity_var_unsafe v in
+    match i.ity_node with
+    | Ityvar _ -> Sreg.iter (fun r ->
+        if ity_r_occurs r ity then raise (IllegalAlias r)) aff
+    |
+
   (* read-only regions in e *)
   let ro = Sreg.diff (Mreg.map (Util.const ()) s) wr in
   (* all modified or reset regions are instantiated into distinct regions *)
-  let add_affected r acc =
-    let r = Mreg.find r s in Sreg.add_new (IllegalAlias r) r acc in
-  let wr = Sreg.fold add_affected wr Sreg.empty in
+  let add_affected reg acc =
+    let reg = ity_full_inst sbs reg in
+    Sreg.add_new (IllegalAlias reg) reg acc in
+  let wrt = Sreg.fold add_affected wrt Sreg.empty in
   (* all read-only regions are instantiated outside wr *)
   let add_readonly r =
     let r = Mreg.find r s in if Sreg.mem r wr then raise (IllegalAlias r) in
