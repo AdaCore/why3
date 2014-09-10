@@ -407,7 +407,7 @@ let set_row_status row b =
   match b with
   | Some t ->
     goals_model#set ~row:row#iter ~column:status_column !image_yes;
-    let t = Format.sprintf "%.2f" t in 
+    let t = Format.sprintf "%.2f" t in
     goals_model#set ~row:row#iter ~column:time_column t
   | None ->
     goals_model#set ~row:row#iter ~column:status_column !image_unknown;
@@ -768,7 +768,10 @@ let file_info = GMisc.label ~text:""
 
 let warnings = Queue.create ()
 
-let record_warning ?loc msg = Queue.push (loc,msg) warnings
+let record_warning ?loc msg =
+  Format.eprintf "%awarning: %s@."
+    (Pp.print_option Loc.report_position) loc msg;
+  Queue.push (loc,msg) warnings
 
 let () = Warning.set_hook record_warning
 
