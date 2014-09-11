@@ -151,33 +151,38 @@ module Compiler_logic
       end
 
      meta rewrite prop trivial_pre_lemma
-  
+
   inductive acc ('a -> 'a -> bool) 'a =
-  | Acc : forall r,x:'a. (forall y. r y x -> acc r y) -> acc r x
-  
-  function loop_post (inv:'a -> pos -> pred)
+  | Acc : forall r, x:'a. (forall y. r y x -> acc r y) -> acc r x
+
+  function loop_preservation
+    (inv:'a -> pos -> pred)
     (var:'a -> pos -> post)
-    (post:'a -> pos -> post)
-    (x:'a)
-    (p:pos)
-    (ms:machine_state) : pred =
-    \ms'. (inv x p ms /\ var x p ms' ms) \/ post x p ms ms'
+    (post:'a -> pos -> pred) : 'a -> pos -> post =
+    \x p ms ms'. (inv x p ms' /\ var x p ms' ms) \/ post x p ms'
 
-  meta rewrite_def function loop_post
+  meta rewrite_def function loop_preservation
 
-  (* Variant of hoare triplet introduction rule for looping code. *)
-  let make_loop (c:wp 'a)
+  function forget_old (post: 'a -> pos -> pred) : 'a -> pos -> post =
+   \x p ms . post x p
+
+  meta rewrite_def function forget_old
+
+ (* Variant of hoare triplet introduction rule for looping code. *)
+  let make_loop_hl (c:hl 'a)
     (ghost inv:'a -> pos -> pred)
     (ghost var: 'a -> pos -> post)
-    (ghost post : 'a -> pos -> post) : hl 'a
-    requires { wp_correctness c }
+    (ghost post : 'a -> pos -> pred) : hl 'a
+    requires { hl_correctness c }
     requires { forall x p ms. inv x p ms -> acc (var x p) ms }
-    requires { forall x p ms. inv x p ms ->
-      (c.wp x p (loop_post inv var post x p ms)) ms }
-    ensures { result.pre = inv /\ result.post = post }
-    ensures { result.code.length = c.wcode.length /\ hl_correctness result }
-  = { code = c.wcode ; pre = inv ; post = post }
-  
+    requires { c.pre = inv }
+    requires { c.post = loop_preservation inv var post }
+    ensures { result.pre = inv /\ result.post = forget_old post }
+    ensures { result.code.length = c.code.length /\ hl_correctness result }
+  = { code = c.code ; pre = inv ; post = forget_old post }
+
+
+
 end
 
 

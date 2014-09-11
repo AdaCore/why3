@@ -185,6 +185,35 @@ module Compile_com
   meta rewrite_def function exn_bool_old
 
 
+  function loop_invariant (c: com) : ('a,machine_state) -> pos -> pred =
+  \ x p msi. let ms0 = snd x in
+     match ms0, msi with
+      | VMS _ s0 m0, VMS pi si mi ->
+        pi = p /\ s0 = si /\ exists mf. ceval m0 c mf /\ ceval mi c mf
+     end
+
+  meta rewrite_def function loop_invariant
+
+
+  function loop_post (c : com) (len: pos) : ('a,machine_state) -> pos -> pred =
+   \ x p msf. let ms0 = snd x in
+     match ms0, msf with
+      | VMS _ s0 m0, VMS pf sf mf ->
+        pf = p + len /\ s0 = sf /\ ceval m0 c mf
+     end
+
+  meta rewrite_def function loop_post
+
+  function loop_variant (c : com) (test: bexpr) : ('a -> pos -> post) =
+   \ x p msj msi.
+     match msj, msi with
+      | VMS pj sj mj, VMS pi si mi ->
+       pj = pi /\ sj = si /\ ceval mi c mj /\ beval mi test = True
+     end
+
+  meta rewrite_def function loop_variant
+
+
   let rec compile_com (cmd: com) : hl 'a
   variant  { cmd }
   ensures  { result.pre = com_pre cmd }
@@ -201,12 +230,45 @@ module Compile_com
         $ compile_bexpr cond False (code_true.code.length + 1) ~
         (($ code_true ~ $ ibranchf code_false.code.length) % exn_bool cond False)  ~
         ($ code_false % exn_bool_old cond True)
-       | _        -> absurd
+       | Cwhile test body  ->
+          let code_body = compile_com body in
+           let body_length = length code_body.code + 1 in
+            let code_test = compile_bexpr test False (body_length) in
+           let ofs = (length code_test.code + body_length) in
+            let wp_while = $ code_test ~
+              ($ code_body ~ $ ibranchf (- ofs)) % exn_bool test False in
+            let ghost inv  = loop_invariant cmd in
+            let ghost var  = loop_variant body test  in
+            let ghost post = loop_post cmd ofs in
+            let hl_while = hoare inv wp_while (loop_preservation inv var post) in
+            $ inil () ~ $ make_loop_hl hl_while inv var post
       end
      in
     let ghost pre  = com_pre cmd in
     let ghost post = com_post cmd res.wcode.length  in
-        hoare pre res post
+    hoare pre res post
+
+
+
+
+ let compile_com_natural (com: com) : code
+    ensures {
+     forall c p s m m'.
+        ceval m com m' ->
+         codeseq_at c p result ->
+          transition_star c
+           (VMS  p s  m)
+            (VMS (p + length result) s m') }
+  = let res =  compile_com com : hl unit in
+   assert { forall p s m m'. ceval m com m' -> res.pre () p (VMS p s m) };
+   res.code
+
+
+ let compile_program (prog : com) : code
+   ensures { forall  mi mf: state.
+    ceval mi prog mf -> vm_terminates result mi mf }
+  = compile_com_natural prog ++ ihalt
+
 
 
 end

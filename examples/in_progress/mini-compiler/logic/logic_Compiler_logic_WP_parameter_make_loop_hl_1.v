@@ -431,55 +431,54 @@ Inductive acc {a:Type} {a_WT:WhyType a}: (func a (func a bool)) -> a ->
   | Acc : forall (r:(func a (func a bool))) (x:a), (forall (y:a),
       ((infix_at (infix_at r y) x) = true) -> (acc r y)) -> (acc r x).
 
-Parameter loop_post: forall {a:Type} {a_WT:WhyType a}, (func a (func Z (func
-  machine_state bool))) -> (func a (func Z (func machine_state (func
-  machine_state bool)))) -> (func a (func Z (func machine_state (func
-  machine_state bool)))) -> a -> Z -> machine_state -> (func machine_state
-  bool).
+Parameter loop_preservation: forall {a:Type} {a_WT:WhyType a}, (func a (func
+  Z (func machine_state bool))) -> (func a (func Z (func machine_state (func
+  machine_state bool)))) -> (func a (func Z (func machine_state bool))) ->
+  (func a (func Z (func machine_state (func machine_state bool)))).
 
-Axiom loop_post_def : forall {a:Type} {a_WT:WhyType a}, forall (inv:(func a
-  (func Z (func machine_state bool)))) (var:(func a (func Z (func
-  machine_state (func machine_state bool))))) (post2:(func a (func Z (func
-  machine_state (func machine_state bool))))) (x:a) (p:Z) (ms:machine_state)
-  (ms':machine_state), ((infix_at (loop_post inv var post2 x p ms)
-  ms') = true) <-> ((((infix_at (infix_at (infix_at inv x) p) ms) = true) /\
-  ((infix_at (infix_at (infix_at (infix_at var x) p) ms') ms) = true)) \/
-  ((infix_at (infix_at (infix_at (infix_at post2 x) p) ms) ms') = true)).
+Axiom loop_preservation_def : forall {a:Type} {a_WT:WhyType a},
+  forall (inv:(func a (func Z (func machine_state bool)))) (var:(func a (func
+  Z (func machine_state (func machine_state bool))))) (post2:(func a (func Z
+  (func machine_state bool)))) (x:a) (p:Z) (ms:machine_state)
+  (ms':machine_state),
+  ((infix_at (infix_at (infix_at (infix_at (loop_preservation inv var post2)
+  x) p) ms) ms') = true) <-> ((((infix_at (infix_at (infix_at inv x) p)
+  ms') = true) /\ ((infix_at (infix_at (infix_at (infix_at var x) p) ms')
+  ms) = true)) \/ ((infix_at (infix_at (infix_at post2 x) p) ms') = true)).
+
+Parameter forget_old: forall {a:Type} {a_WT:WhyType a}, (func a (func Z (func
+  machine_state bool))) -> (func a (func Z (func machine_state (func
+  machine_state bool)))).
+
+Axiom forget_old_def : forall {a:Type} {a_WT:WhyType a}, forall (post2:(func
+  a (func Z (func machine_state bool)))) (x:a) (p:Z) (ms:machine_state),
+  ((infix_at (infix_at (infix_at (forget_old post2) x) p)
+  ms) = (infix_at (infix_at post2 x) p)).
+
+Require Import Why3.
+Ltac ae := why3 "Alt-Ergo,0.95.2,".
+Ltac cvc := why3 "CVC4,1.4,".
 
 (* Why3 goal *)
-Theorem WP_parameter_make_loop : forall {a:Type} {a_WT:WhyType a},
-  forall (c:(list instr)) (c1:(func a (func Z (func (func machine_state bool)
-  (func machine_state bool))))) (inv:(func a (func Z (func machine_state
-  bool)))) (var:(func a (func Z (func machine_state (func machine_state
-  bool))))) (post2:(func a (func Z (func machine_state (func machine_state
-  bool))))), ((forall (x:a) (p:Z) (post3:(func machine_state bool))
-  (ms:machine_state), ((infix_at (infix_at (infix_at (infix_at (wp1 (mk_wp c
-  c1)) x) p) post3) ms) = true) -> exists ms':machine_state, ((infix_at post3
-  ms') = true) /\ (contextual_irrelevance (wcode (mk_wp c c1)) p ms ms')) /\
+Theorem WP_parameter_make_loop_hl : forall {a:Type} {a_WT:WhyType a},
+  forall (c:(list instr)) (c1:(func a (func Z (func machine_state bool))))
+  (c2:(func a (func Z (func machine_state (func machine_state bool)))))
+  (inv:(func a (func Z (func machine_state bool)))) (var:(func a (func Z
+  (func machine_state (func machine_state bool))))) (post2:(func a (func Z
+  (func machine_state bool)))), ((hl_correctness (mk_hl c c1 c2)) /\
   ((forall (x:a) (p:Z) (ms:machine_state), ((infix_at (infix_at (infix_at inv
   x) p) ms) = true) -> (acc (infix_at (infix_at var x) p) ms)) /\
-  forall (x:a) (p:Z) (ms:machine_state), ((infix_at (infix_at (infix_at inv
-  x) p) ms) = true) -> ((infix_at (infix_at (infix_at (infix_at c1 x) p)
-  (loop_post inv var post2 x p ms)) ms) = true))) -> forall (x:a) (p:Z)
-  (ms:machine_state), ((infix_at (infix_at (infix_at (pre (mk_hl c inv
-  post2)) x) p) ms) = true) -> exists ms':machine_state,
-  ((infix_at (infix_at (infix_at (infix_at (post1 (mk_hl c inv post2)) x) p)
-  ms) ms') = true) /\ (contextual_irrelevance (code1 (mk_hl c inv post2)) p
-  ms ms').
-intros a a_WT c c1 inv var post2 (h1,(h2,h3)) x p ms h4.
+  ((c1 = inv) /\ (c2 = (loop_preservation inv var post2))))) ->
+  (hl_correctness (mk_hl c inv (forget_old post2))).
+(* Why3 intros a a_WT c c1 c2 inv var post2 (h1,(h2,(h3,h4))). *)
+intros a a_WT c c1 c2 inv var post2 (h1,(h2,(h3,h4))).
+unfold hl_correctness in *.
+intros.
 simpl in *.
-remember h4 as h5 eqn:eqn;clear eqn.
-apply h2 in h4.
-remember (infix_at (infix_at var x) p) as R eqn:eqR.
-induction h4.
-remember h5 as h6 eqn:eqn;clear eqn.
-apply h3 in h5.
-apply h1 in h5.
-destruct h5 as [ms' [h7 h8]].
-apply loop_post_def in h7.
-destruct h7 as [[h9 h10]|h9].
-
-
-
+remember H as H' eqn : eqn; clear eqn.
+apply h2 in H'.
+remember (infix_at (infix_at var x) p) as R eqn : eqR.
+induction H'.
+ae.
 Qed.
 

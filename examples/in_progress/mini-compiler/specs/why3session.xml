@@ -7,12 +7,10 @@
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../specs.mlw" expanded="true">
-<theory name="VM_arith_instr_spec" sum="286760edf6bd01966f483d98d4242ea2">
+<theory name="VM_arith_instr_spec" sum="89f02e7f809e0639fc6e34941844fd75">
  <goal name="WP_parameter iconstf" expl="VC for iconstf">
- <proof prover="2" obsolete="true"><result status="unknown" time="0.07"/></proof>
  <transf name="split_goal_wp">
   <goal name="WP_parameter iconstf.1" expl="1. assertion">
-  <proof prover="2" obsolete="true"><result status="unknown" time="0.05"/></proof>
   <transf name="split_goal_wp">
    <goal name="WP_parameter iconstf.1.1" expl="1. assertion">
    <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -29,14 +27,12 @@
   </transf>
   </goal>
   <goal name="WP_parameter iconstf.2" expl="2. postcondition">
-  <proof prover="2" obsolete="true"><result status="unknown" time="0.06"/></proof>
   <transf name="split_goal_wp">
    <goal name="WP_parameter iconstf.2.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="WP_parameter iconstf.2.2" expl="2.">
    <proof prover="0"><result status="valid" time="0.08"/></proof>
-   <proof prover="2" obsolete="true"><result status="unknown" time="0.05"/></proof>
    </goal>
   </transf>
   </goal>
@@ -83,10 +79,8 @@
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="WP_parameter create_binop" expl="VC for create_binop">
- <proof prover="2" obsolete="true"><result status="unknown" time="0.15"/></proof>
  <transf name="split_goal_wp">
   <goal name="WP_parameter create_binop.1" expl="1. assertion">
-  <proof prover="2" obsolete="true"><result status="unknown" time="0.07"/></proof>
   <transf name="split_goal_wp">
    <goal name="WP_parameter create_binop.1.1" expl="1. assertion">
    <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -123,7 +117,7 @@
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
 </theory>
-<theory name="VM_bool_instr_spec" sum="d5a1cc70de787ba183b03ea3799f894c" expanded="true">
+<theory name="VM_bool_instr_spec" sum="32274015eab190519cb2670676a7edbf" expanded="true">
  <goal name="WP_parameter inil" expl="VC for inil">
  <transf name="split_goal_wp">
   <goal name="WP_parameter inil.1" expl="1. postcondition">
