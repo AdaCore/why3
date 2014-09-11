@@ -7,7 +7,7 @@
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../specs.mlw" expanded="true">
-<theory name="VM_arith_instr_spec" sum="286760edf6bd01966f483d98d4242ea2" expanded="true">
+<theory name="VM_arith_instr_spec" sum="286760edf6bd01966f483d98d4242ea2">
  <goal name="WP_parameter iconstf" expl="VC for iconstf">
  <proof prover="2" obsolete="true"><result status="unknown" time="0.07"/></proof>
  <transf name="split_goal_wp">
@@ -236,16 +236,16 @@
  <goal name="WP_parameter ibgtf" expl="VC for ibgtf">
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="isetvar_pre_lemma" expanded="true">
+ <goal name="isetvar_pre_lemma">
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
- <goal name="isetvar_post_lemma" expanded="true">
+ <goal name="isetvar_post_lemma">
  <proof prover="2"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="WP_parameter isetvarf" expl="VC for isetvarf" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter isetvarf.1" expl="1. assertion" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter isetvarf" expl="VC for isetvarf">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter isetvarf.1" expl="1. assertion">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter isetvarf.1.1" expl="1. assertion">
    <proof prover="2"><result status="valid" time="0.06"/></proof>
    </goal>
@@ -263,8 +263,8 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter isetvarf.2" expl="2. postcondition" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter isetvarf.2" expl="2. postcondition">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter isetvarf.2.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.04"/></proof>
    </goal>
