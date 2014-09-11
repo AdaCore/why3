@@ -1,0 +1,304 @@
+(* Specification of builtin instructions. *)
+module VM_arith_instr_spec
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import vm.Vm
+  use import state.State
+  use import HighOrd
+  use import logic.Compiler_logic
+
+(* Iconst spec *)
+  function iconst_post (n:int) : 'a -> pos -> post =
+    \x p ms ms'. forall s m.
+     ms  = VMS   p       s      m ->
+     ms' = VMS (p+1) (push n s) m
+  meta rewrite_def function iconst_post
+
+  let iconstf (n: int) : hl 'a
+    ensures { result.pre  = trivial_pre  /\ result.post = iconst_post n  }
+    ensures { result.code.length = 1     /\ hl_correctness result }
+  = let res  =
+    { pre = trivial_pre; code = iconst n; post = iconst_post n } in
+    assert {
+     forall x p ms. res.pre x p ms ->
+      not (exists ms' : machine_state. res.post x p ms ms' /\
+      contextual_irrelevance res.code p ms ms') ->
+      match ms with
+        | VMS p' s m -> p' = p &&
+           let ms' = VMS (p+1) (push n s) m in
+              contextual_irrelevance res.code p ms ms' && false
+        | _ -> false end && false };
+   res
+
+(* Ivar spec *)
+ function ivar_post (x:id) : 'a -> pos -> post =
+    \a p ms ms'. forall s m.
+     ms  = VMS   p       s      m ->
+     ms' = VMS (p+1) (push m[x] s) m
+ meta rewrite_def function ivar_post
+
+ let ivarf (x: id) : hl 'a
+  ensures { result.pre  = trivial_pre /\ result.post = ivar_post x  }
+  ensures { result.code.length = 1    /\ hl_correctness result }
+ = let res  =
+    { pre = trivial_pre; code = ivar x; post = ivar_post x } in
+    assert {
+     forall a p ms. res.pre a p ms ->
+      not (exists ms' : machine_state. res.post a p ms ms' /\
+      contextual_irrelevance res.code p ms ms') ->
+      match ms with
+        | VMS p' s m -> p' = p &&
+           let ms' = VMS (p+1) (push m[x] s) m in
+              contextual_irrelevance res.code p ms ms' && false
+        | _ -> false end && false };
+   res
+
+
+(* Binary arithmetic operators specification (Iadd, Isub, Imul) *)
+  type binop = int -> int -> int
+
+  constant ibinop_pre : 'a -> pos -> pred =
+    \x p ms . exists n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m
+
+  lemma ibinop_pre_lemma:
+   forall x:'a, p ms. ibinop_pre x p ms =
+    exists n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m
+
+  meta rewrite prop ibinop_pre_lemma
+
+  function ibinop_post (op : binop) : 'a -> pos -> machine_state -> pred =
+   \x p ms ms'. forall n1 n2 s m.
+      ms  = VMS    p     (push n2 (push n1 s)) m  ->
+      ms' = VMS (p + 1)  (push (op n1 n2) s)   m
+
+  lemma ibinop_post_lemma:
+   forall op, x:'a, p ms ms'.
+    ibinop_post op x p ms ms' =
+     forall n1 n2 s m.
+      ms  = VMS    p     (push n2 (push n1 s)) m  ->
+      ms' = VMS (p + 1)  (push (op n1 n2) s)   m
+
+  meta rewrite prop ibinop_post_lemma
+
+  let create_binop (code_binop: code) (ghost op : binop) : hl 'a
+    requires {
+     forall c: code, p: pos.
+       codeseq_at c p code_binop ->
+        forall n1 n2: int, s: stack, m: state.
+	 transition c
+	  (VMS    p      (push n2 (push n1 s))        m)
+	  (VMS (p + 1)   (push (op n1 n2)    s)    m) }
+    ensures { result.pre   = ibinop_pre /\ result.post  = ibinop_post op }
+    ensures { result.code  = code_binop /\ hl_correctness result }
+  = let res = {code = code_binop; pre  = ibinop_pre ; post = ibinop_post op }
+    in assert {
+     forall x p ms. res.pre x p ms ->
+      not (exists ms' : machine_state. res.post x p ms ms' /\
+      contextual_irrelevance res.code p ms ms') ->
+      match ms with
+        | VMS p' (Cons n2 (Cons n1 s)) m -> p' = p &&
+           let ms' = VMS (p+1) (push (op n1 n2) s) m in
+              contextual_irrelevance res.code p ms ms' && false
+        | _ -> false end && false };
+    res
+
+  constant plus : binop = \x y. x + y
+  meta rewrite_def function plus
+
+  constant sub : binop = \x y. x - y
+  meta rewrite_def function sub
+
+  constant mul : binop = \x y. x * y
+  meta rewrite_def function mul
+
+  let iaddf () : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = ibinop_post plus }
+    ensures { result.code.length = 1   /\  hl_correctness result}
+  = create_binop iadd plus
+
+  let isubf () : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = ibinop_post sub }
+    ensures { result.code.length = 1   /\  hl_correctness result}
+  = create_binop isub sub
+
+  let imulf () : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = ibinop_post mul }
+    ensures { result.code.length = 1   /\  hl_correctness result}
+  = create_binop imul mul
+
+end
+
+module VM_bool_instr_spec
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import vm.Vm
+  use import state.State
+  use import HighOrd
+  use import logic.Compiler_logic
+  use import VM_arith_instr_spec
+
+
+
+
+(* Inil spec *)
+  function inil_post : 'a -> pos -> post =
+    \x p ms ms'. ms = ms'
+  meta rewrite_def function inil_post
+
+  let inil () : hl 'a
+    ensures { result.pre = trivial_pre /\ result.post = inil_post }
+    ensures { result.code.length = 0   /\ hl_correctness result   }
+  =  { pre = trivial_pre; code = Nil; post = inil_post }
+
+
+(* Ibranch specification *)
+  function ibranch_post (ofs: pos) : 'a -> pos -> post =
+    \x p ms ms'. forall s m. ms = VMS p s m -> ms' = VMS (p + 1 + ofs) s m
+  meta rewrite_def function ibranch_post
+
+  let ibranchf (ofs : pos) : hl 'a
+    ensures { result.pre = trivial_pre /\ result.post = ibranch_post ofs }
+    ensures { result.code.length = 1   /\ hl_correctness result          }
+   =
+   let res = { pre = trivial_pre; code = ibranch ofs; post = ibranch_post ofs }
+   in assert { forall x p ms. res.pre x p ms ->
+      not (exists ms' : machine_state. res.post x p ms ms' /\
+      contextual_irrelevance res.code p ms ms') ->
+      match ms with
+        | VMS p' s m -> p' = p &&
+           let ms' = VMS (p+1+ofs) s m in
+              contextual_irrelevance res.code p ms ms' && false
+        | _ -> false end && false   };
+   res
+
+  type cond = int -> int -> bool
+
+  function icjump_post (cond : cond) (ofs: int) : 'a -> pos -> post =
+   \x p ms ms'. forall n1 n2 s m.
+    ms  = VMS    p      (push n2 (push n1 s))       m  ->
+    (cond n1 n2 ->     ms' = VMS (p + ofs + 1)  s   m) /\
+    (not cond n1 n2 -> ms' = VMS (p+1) s m)
+
+  lemma icjump_post_lemma:
+   forall cond ofs, x:'a, p ms ms'.
+    icjump_post cond ofs x p ms ms' =
+     forall n1 n2 s m.
+      ms  = VMS    p      (push n2 (push n1 s))       m  ->
+      (cond n1 n2 ->     ms' = VMS (p + ofs + 1)  s   m) /\
+      (not cond n1 n2 -> ms' = VMS (p+1) s m)
+
+   meta rewrite prop icjump_post_lemma
+
+
+(*  binary Boolean operators specification (Ibeq, Ibne, Ible, Ibgt) *)
+  constant beq : cond = \x y. x = y
+  lemma beq_lemma :  forall x y. beq x y = (x = y)
+  meta rewrite  prop beq_lemma
+
+  constant bne : cond = \x y. x <> y
+  lemma bne_lemma :  forall x y. bne x y = (x <> y)
+  meta rewrite  prop bne_lemma
+
+  constant ble : cond = \x y. x <= y
+  lemma ble_lemma :  forall x y. ble x y = (x <= y)
+  meta rewrite  prop ble_lemma
+
+  constant bgt : cond = \x y. x > y
+  lemma bgt_lemma :  forall x y. bgt x y = (x > y)
+  meta rewrite prop bgt_lemma
+
+
+  let create_cjump (code_cond:code) (ghost cond:cond) (ghost ofs:pos) : hl 'a
+   requires { forall c: code, p1, n1 n2: int.
+    codeseq_at c p1 code_cond ->
+    let p2 = (if cond n1 n2 then p1 + 1 + ofs else p1 + 1) in
+    forall s:stack, m: state.
+      transition c
+    	    (VMS p1 (push n2 (push n1 s)) m)
+   	    (VMS p2           s           m) }
+  ensures { result.pre   = ibinop_pre /\ result.post  = icjump_post cond ofs}
+  ensures { result.code  = code_cond /\ hl_correctness result }
+= let res = {code = code_cond; pre  = ibinop_pre ; post = icjump_post cond ofs}
+  in assert {
+    forall x p ms. res.pre x p ms ->
+      not (exists ms' : machine_state. res.post x p ms ms' /\
+      contextual_irrelevance res.code p ms ms') ->
+      match ms with
+        | VMS p' (Cons n2 (Cons n1 s)) m -> p' = p &&
+           if cond n1 n2
+           then let ms' = VMS (p+ofs+1) s m in
+              contextual_irrelevance res.code p ms ms' && false
+           else let ms' = VMS (p+1) s m in
+              contextual_irrelevance res.code p ms ms' && false
+        | _ -> false end && false };
+    res
+
+
+let ibeqf (ofs : pos) : hl 'a
+  ensures { result.pre  = ibinop_pre /\ result.post = icjump_post beq ofs }
+  ensures { result.code.length = 1   /\ hl_correctness result }
+  = create_cjump (ibeq ofs) beq ofs
+
+let ibnef (ofs : pos) : hl 'a
+  ensures { result.pre  = ibinop_pre /\ result.post = icjump_post bne ofs }
+  ensures { result.code.length = 1   /\ hl_correctness result }
+  = create_cjump (ibne ofs) bne ofs
+
+
+let iblef (ofs : pos) : hl 'a
+  ensures { result.pre  = ibinop_pre /\ result.post = icjump_post ble ofs }
+  ensures { result.code.length = 1   /\ hl_correctness result }
+  = create_cjump (ible ofs) ble ofs
+
+let ibgtf (ofs : pos) : hl 'a
+  ensures { result.pre  = ibinop_pre /\ result.post = icjump_post bgt ofs }
+  ensures { result.code.length = 1   /\ hl_correctness result }
+  = create_cjump (ibgt ofs) bgt ofs
+
+constant isetvar_pre : 'a -> pos -> pred =
+   \x p ms . exists n s m. ms = VMS p (push n s) m
+
+   lemma isetvar_pre_lemma:
+    forall x:'a,  p ms. isetvar_pre x p ms =
+     exists n s m. ms = VMS p (push n s) m
+
+    meta rewrite prop isetvar_pre_lemma
+
+  function isetvar_post (x:id) : 'a -> pos -> post =
+    \a p ms ms'. forall s n m.
+     ms  = VMS   p       (push n s) m ->
+     ms' = VMS (p+1)             s  m[ x <- n]
+
+    lemma isetvar_post_lemma:
+     forall x, a: 'a, p ms ms'.
+      isetvar_post x a p ms ms' =
+      forall s n m.
+      ms  = VMS   p       (push n s) m ->
+      ms' = VMS (p+1)             s  m[ x <- n]
+
+     meta rewrite prop isetvar_post_lemma
+
+ let isetvarf (x: id) : hl 'a
+  ensures { result.pre  = isetvar_pre /\ result.post = isetvar_post x  }
+  ensures { result.code.length = 1    /\ hl_correctness result }
+ = let res  =
+    { pre = isetvar_pre; code = isetvar x; post = isetvar_post x } in
+    assert {
+     forall a p ms. res.pre a p ms ->
+      not (exists ms' : machine_state. res.post a p ms ms' /\
+      contextual_irrelevance res.code p ms ms') ->
+      match ms with
+        | VMS p' (Cons n s) m -> p' = p &&
+           let ms' = VMS (p+1)  s m[x<-n] in
+              contextual_irrelevance res.code p ms ms' && false
+        | _ -> false end && false };
+   res
+
+end
+(*
+Local Variables:
+compile-command: "why3 ide -L . specs.mlw"
+End:
+*)
