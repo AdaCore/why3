@@ -703,6 +703,10 @@ let eff_full_inst sbs e =
   let add_readonly r =
     let r = Mreg.find r s in if Sreg.mem r wr then raise (IllegalAlias r) in
   Sreg.iter add_readonly ro;
+  (* all type variables are instantiated outside wr *)
+  let check_tv _ ity = Sreg.iter (fun r ->
+    if reg_occurs r ity.ity_vars then raise (IllegalAlias r)) wr in
+  Mtv.iter check_tv sbs.ity_subst_tv;
   (* calculate instantiated effect *)
   let add_sreg r acc = Sreg.add (Mreg.find r s) acc in
   let add_mreg r v acc =
