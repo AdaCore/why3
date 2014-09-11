@@ -229,14 +229,11 @@ val eff_assign : effect -> (region * pvsymbol * ity) list -> effect
 
 val refresh_of_effect : effect -> effect
 
-(*
-val eff_stale_region : effect -> varset -> bool
-
 exception IllegalAlias of region
-exception GhostDiverg
 
 val eff_full_inst : ity Mtv.t -> effect -> effect
 
+(*
 (** {2 Specification} *)
 
 type pre = term          (** precondition: pre_fmla *)

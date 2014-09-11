@@ -720,53 +720,38 @@ let refresh_of_effect e =
     Mtv.fold add_rfr sbst rfr) e.eff_writes Mreg.empty in
   { e with eff_resets = Mreg.union merge_covers e.eff_resets rfr }
 
-(*
 exception IllegalAlias of region
 
 let eff_full_inst sbs e =
-  (* modified or reset regions in e *)
-  let wrt = Mreg.map (Util.const ()) e.eff_writes in
-  let rst = Mreg.map (Util.const ()) e.eff_resets in
-  let wrt = Sreg.union wrt rst in
+  (* all modified or reset regions in e must be instantiated
+     into distinct regions *)
+  let inst fn src = Mreg.fold (fun r v acc ->
+    let r = ity_full_inst sbs r in
+    Mreg.add_new (IllegalAlias r) r (fn v) acc) src Mreg.empty in
+  let writes = inst (fun fld -> fld) e.eff_writes in
+  let resets = inst (inst (fun () -> ())) e.eff_resets in
+  let impact = Mreg.merge (fun r fld cvr -> match fld, cvr with
+    | Some _, Some _ -> raise (IllegalAlias r)
+    | _ -> Some ()) writes resets in
+  (* all type variables must be instantiated into types that are
+     not affected by the effect, and all unaffected regions must
+     be instantiated into regions outside [impact].
 
-  let aff = Sreg.fold (fun r acc ->
-    Sreg.add (ity_full_inst sbs r) acc) wrt Sreg.empty in
+     Now, every region in the instantiated execution is either
+     brought in by the type substitution and thus is unaffected,
+     or instantiates one of the original regions and is affected
+     if and only if the original one is. *)
+  let check_inst v dst = match ity_var_unsafe v with
+    | {ity_node = Ityvar _} -> Sreg.iter (fun r ->
+        if ity_r_occurs r dst then raise (IllegalAlias r)) impact
+    | reg when Mreg.mem reg e.eff_writes -> ()
+    | reg when Mreg.mem reg e.eff_resets -> ()
+    | _   when Sreg.mem dst impact -> raise (IllegalAlias dst)
+    | _ -> () in
+  Mtv.iter check_inst sbs;
+  { e with eff_writes = writes; eff_resets = resets }
 
-  let check_inst v ity acc =
-    let i = ity_var_unsafe v in
-    match i.ity_node with
-    | Ityvar _ -> Sreg.iter (fun r ->
-        if ity_r_occurs r ity then raise (IllegalAlias r)) aff
-    |
-
-  (* read-only regions in e *)
-  let ro = Sreg.diff (Mreg.map (Util.const ()) s) wr in
-  (* all modified or reset regions are instantiated into distinct regions *)
-  let add_affected reg acc =
-    let reg = ity_full_inst sbs reg in
-    Sreg.add_new (IllegalAlias reg) reg acc in
-  let wrt = Sreg.fold add_affected wrt Sreg.empty in
-  (* all read-only regions are instantiated outside wr *)
-  let add_readonly r =
-    let r = Mreg.find r s in if Sreg.mem r wr then raise (IllegalAlias r) in
-  Sreg.iter add_readonly ro;
-  (* calculate instantiated effect *)
-  let add_sreg r acc = Sreg.add (Mreg.find r s) acc in
-  let add_mreg r v acc =
-    Mreg.add (Mreg.find r s) (Opt.map (fun v -> Mreg.find v s) v) acc in
-  (* compute compared type variables *)
-  let add_stv tv acc =
-    let ity = Mtv.find tv sbs.ity_subst_tv in
-    let check () _ = raise (IllegalCompar (tv,ity)) in
-    ity_s_fold check (fun () _ -> ()) () ity;
-    Stv.union acc ity.ity_vars.vars_tv in
-  { e with
-    eff_writes = Sreg.fold add_sreg e.eff_writes Sreg.empty;
-    eff_ghostw = Sreg.fold add_sreg e.eff_ghostw Sreg.empty;
-    eff_resets = Mreg.fold add_mreg e.eff_resets Mreg.empty;
-    eff_compar = Stv.fold  add_stv  e.eff_compar Stv.empty;
-  }
-
+(*
 let eff_filter vars e =
   let check r = reg_occurs r vars in
   let reset r = function
