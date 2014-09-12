@@ -344,16 +344,16 @@ theory Rinteger
 
    use export int.Int
 
-   lemma l1 : forall x:int. x + 0 = x
-
-   (* not allowed: + is a built-in symbol
-     meta "rewrite" prop l1
-     *)
-
    goal g1 : forall y. 2+2 = y
 
    goal g2 : forall y.  0 + y + 0 + y - y = y
 
+   lemma l1 : forall x y z:int. (x + y) + z = z + (y + x)
+
+   function f int : int
+
+   goal g3 : (f 1 + f 2) + f 3 = f 4
+ 
 end
 
 theory TestInteger
