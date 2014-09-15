@@ -1106,6 +1106,7 @@ install_no_local::
 	cp -r lib/isabelle "$(LIBDIR)/why3"
 	cp drivers/isabelle-realizations.aux "$(DATADIR)/why3/drivers/"
 	@(if isabelle components -l | grep -q "$(LIBDIR)/why3/isabelle$$"; then \
+	    echo "Building the Why3 heap for Isabelle/HOL:"; \
 	    isabelle build -bc Why3; true; \
 	  else \
 	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \
@@ -1115,6 +1116,7 @@ install_no_local::
 
 install_local::
 	@(if isabelle components -l | grep -q "`pwd`/lib/isabelle$$"; then \
+	    echo "Building the Why3 heap for Isabelle/HOL:"; \
 	    isabelle build -bc Why3; true; \
 	  else \
 	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \

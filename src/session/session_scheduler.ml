@@ -319,7 +319,9 @@ let update_session ~allow_obsolete ~release ~use_shapes
     allow_obsolete_goals = allow_obsolete;
     release_tasks = release;
     use_shapes_for_pairing_sub_goals = use_shapes;
+(*
     theory_is_fully_up_to_date = false; (* dummy initialisation *)
+ *)
     keygen = O.create;
   }
   in
@@ -777,18 +779,7 @@ let transformation_on_goal_aux eS tr keep_dumb_transformation g =
   let subgoals = Trans.apply_transform tr eS.env gtask in
   let b = keep_dumb_transformation ||
     match subgoals with
-      | [task] ->
-              (* let s1 = task_checksum (get_task g) in *)
-              (* let s2 = task_checksum task in *)
-              (* (\* *)
-              (*   eprintf "Transformation returned only one task.
-                   sum before = %s, sum after = %s@." (task_checksum g.task)
-                   (task_checksum task); *)
-              (*   eprintf "addresses: %x %x@." (Obj.magic g.task)
-                   (Obj.magic task); *)
-              (* *\) *)
-              (* s1 <> s2 *)
-        not (Task.task_equal task gtask)
+      | [task] -> not (Task.task_equal task gtask)
       | _ -> true
   in
   if b then

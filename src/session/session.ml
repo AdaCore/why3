@@ -287,6 +287,25 @@ let rec goal_iter_leaf_goal ~unproved_only f g =
       g.goal_transformations;
     if !r then f g
 
+let rec fold_all_sub_goals_of_goal f acc g =
+  let acc =
+    PHstr.fold
+      (fun _ tr acc ->
+       List.fold_left (fold_all_sub_goals_of_goal f) acc tr.transf_goals)
+      g.goal_transformations acc
+  in
+  let acc =
+    Mmetas_args.fold
+      (fun _ m acc ->
+       fold_all_sub_goals_of_goal f acc m.metas_goal)
+      g.goal_metas acc
+  in
+  f acc g
+
+let fold_all_sub_goals_of_theory f acc th =
+  List.fold_left (fold_all_sub_goals_of_goal f) acc th.theory_goals
+
+
 (** iterators not reccursive *)
 let iter_goal fp ft fm g =
   PHprover.iter (fun _ a -> fp a) g.goal_external_proofs;
@@ -491,10 +510,10 @@ exception NoTask
 let goal_task g = Opt.get_exn NoTask g.goal_task
 let goal_task_option g = g.goal_task
 
-let goal_expl g = 
+let goal_expl g =
   match g.goal_expl with
   | Some s -> s
-  | None -> 
+  | None ->
     try let _,_,l = restore_path g.goal_name in
         String.concat "." l
     with Not_found -> g.goal_name.Ident.id_string
@@ -596,9 +615,6 @@ let rec save_goal ctxt fmt g =
     "@\n@[<v 0>@[<h><goal@ %a%a%a>@]"
     save_ident g.goal_name
     (opt_string "expl") g.goal_expl
-(* no more checksum in why3session.xml
-    (opt save_checksum "sum") g.goal_checksum
-*)
     (save_bool_def "expanded" false) g.goal_expanded;
   let sum =
     match g.goal_checksum with
@@ -693,15 +709,30 @@ and save_ty fmt ty =
     List.iter (save_ty fmt) l;
     fprintf fmt "@]@\n</ty_app>"
 
+module CombinedTheoryChecksum = struct
+
+ let b = Buffer.create 1024
+
+ let f () g =
+    match g.goal_checksum with
+    | None -> assert false
+    | Some c -> Buffer.add_string b (Tc.string_of_checksum c)
+
+ let compute th =
+   let () = fold_all_sub_goals_of_theory f () th in
+   let c = Tc.buffer_checksum b in
+   Buffer.clear b; c
+
+end
+
 let save_theory ctxt fmt t =
+  let c = CombinedTheoryChecksum.compute t in
+  t.theory_checksum <- Some c;
   fprintf fmt
     "@\n@[<v 1>@[<h><theory@ %a%a%a>@]"
     save_ident t.theory_name
     (opt save_checksum "sum") t.theory_checksum
     (save_bool_def "expanded" false) t.theory_expanded;
-(*
-  Ident.Slab.iter (save_label fmt) t.theory_name.Ident.id_label;
-*)
   List.iter (save_goal ctxt fmt) t.theory_goals;
   fprintf fmt "@]@\n</theory>"
 
@@ -804,7 +835,7 @@ type 'a notify = 'a any -> unit
 let notify : 'a notify = fun _ -> ()
 
 let compute_verified get l =
-  List.fold_left (fun acc t -> 
+  List.fold_left (fun acc t ->
     match acc,get t with
     | Some x, Some y -> Some (x +. y)
     | _ -> None) (Some 0.0) l
@@ -944,6 +975,11 @@ let set_memlimit memlimit a = a.proof_memlimit <- memlimit
 
 let set_obsolete ?(notify=notify) a =
   a.proof_obsolete <- true;
+  notify (Proof_attempt a);
+  check_goal_proved notify a.proof_parent
+
+let set_non_obsolete a =
+  a.proof_obsolete <- false;
   notify (Proof_attempt a);
   check_goal_proved notify a.proof_parent
 
@@ -1668,7 +1704,7 @@ let add_file ~keygen env ?format filename =
     in g::acc
   in
   let add_theory acc rfile thname theory =
-    let checksum = Some (Tc.theory_checksum theory) in
+    let checksum = None (* Some (Tc.theory_checksum theory) *) in
     let rtheory =
       raw_add_theory ~keygen ~expanded:true ~checksum rfile thname
     in
@@ -2000,7 +2036,7 @@ let print_external_proof fmt p =
 
 module AssoGoals : sig
   val set_use_shapes : bool -> unit
-  val associate : theory_was_fully_up_to_date:bool ->
+  val associate : (* theory_was_fully_up_to_date:bool -> *)
     'a goal list -> 'b goal list ->
     ('b goal * ('a goal * bool) option) list
 end = struct
@@ -2033,7 +2069,7 @@ end = struct
   let use_shapes = ref true
   let set_use_shapes b = use_shapes := b
 
-  let associate ~theory_was_fully_up_to_date
+  let associate
       (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
       ('tto goal * ('ffrom goal * bool) option) list =
     let from_goals : ffrom goal list =
@@ -2042,7 +2078,6 @@ end = struct
       Obj.magic (to_goals : 'tto goal list) in
     let associated : (tto goal * (ffrom goal * bool) option) list =
       AssoGoals.associate
-        ~theory_was_fully_up_to_date
         ~use_shapes:!use_shapes from_goals to_goals
     in
     (Obj.magic associated : ('tto goal * ('ffrom goal * bool) option) list)
@@ -2220,7 +2255,9 @@ type 'key update_context =
   { allow_obsolete_goals : bool;
     release_tasks : bool;
     use_shapes_for_pairing_sub_goals : bool;
+(* not used anymore
     theory_is_fully_up_to_date : bool;
+*)
     keygen : 'key keygen;
   }
 
@@ -2254,7 +2291,7 @@ let rec recover_sub_tasks ~theories env_session task g =
 let recover_theory_tasks env_session th =
   let theories = Opt.get_exn NoTask th.theory_parent.file_for_recovery in
   let theory = Opt.get_exn NoTask th.theory_task in
-  th.theory_checksum <- Some (Tc.theory_checksum theory);
+  th.theory_checksum <- None (* Some (Tc.theory_checksum theory) *);
   let tasks = List.rev (Task.split_theory theory None None) in
   List.iter2 (recover_sub_tasks ~theories env_session) tasks th.theory_goals
 
@@ -2304,7 +2341,7 @@ and merge_trans ~ctxt ~theories env to_goal _ from_transf =
       Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
         env.session.session_shape_version;
       AssoGoals.associate
-        ~theory_was_fully_up_to_date:ctxt.theory_is_fully_up_to_date
+        (* ~theory_was_fully_up_to_date:ctxt.theory_is_fully_up_to_date *)
         from_transf.transf_goals to_transf.transf_goals
     in
     List.iter (function
@@ -2358,6 +2395,7 @@ let merge_theory ~ctxt ~theories env from_th to_th =
     to_th.theory_name.id_string
     (Pp.print_option Tc.print_checksum) from_th.theory_checksum
     (Pp.print_option Tc.print_checksum) to_th.theory_checksum;
+(*
   let ctxt = { ctxt with theory_is_fully_up_to_date =
       match from_th.theory_checksum, to_th.theory_checksum with
       | _, None -> assert false
@@ -2368,11 +2406,12 @@ let merge_theory ~ctxt ~theories env from_th to_th =
   Debug.dprintf debug
     "[Theory checksum] fully up to date = %b@."
     ctxt.theory_is_fully_up_to_date;
+ *)
   List.iter
     (fun to_goal ->
       try
-        let to_goal_name = 
-          try 
+        let to_goal_name =
+          try
             let (_,_,l) = restore_path to_goal.goal_name
             in String.concat "." l
           with Not_found -> to_goal.goal_name.Ident.id_string
@@ -2386,7 +2425,7 @@ let merge_theory ~ctxt ~theories env from_th to_th =
         let goal_obsolete =
           match to_goal.goal_checksum, from_goal.goal_checksum with
           | None, _ -> assert false
-          | Some _, None -> not ctxt.theory_is_fully_up_to_date
+          | Some _, None -> true (* not ctxt.theory_is_fully_up_to_date *)
           | Some s1, Some s2 -> not (Tc.equal_checksum s1 s2)
         in
         if goal_obsolete then
@@ -2404,7 +2443,29 @@ let merge_theory ~ctxt ~theories env from_th to_th =
           found_missed_goals := true;
           if ctxt.release_tasks then release_sub_tasks to_goal
         | Not_found -> raise OutdatedSession
-    ) to_th.theory_goals
+    ) to_th.theory_goals;
+  if not ctxt.use_shapes_for_pairing_sub_goals then
+    begin
+      Debug.dprintf
+        debug
+        "[Session] since shapes were not used for pairing, we compute the \
+         checksum of the full theory, to estimate the obsolete status for \
+         goals.@.";
+      let to_checksum = CombinedTheoryChecksum.compute to_th in
+      let same_checksum =
+        match from_th.theory_checksum with
+        | None -> false
+        | Some c -> Tc.equal_checksum c to_checksum
+      in
+      Debug.dprintf
+        debug
+        "[Session] from_checksum = %a, to_checksum = %a@."
+        (Pp.print_option save_checksum) from_th.theory_checksum
+        save_checksum to_checksum;
+      if same_checksum then
+        (* we set all_goals as non obsolete *)
+        theory_iter_proof_attempt set_non_obsolete to_th
+   end
 
 let merge_file ~ctxt ~theories env from_f to_f =
   Debug.dprintf debug "[Info] merge_file, shape_version = %d@\n"
@@ -2622,7 +2683,7 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
     Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
       env.session.session_shape_version;
     AssoGoals.associate
-      ~theory_was_fully_up_to_date:false
+      (* ~theory_was_fully_up_to_date:false *)
       from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
   | (to_goal, Some (from_goal, _obsolete)) ->

@@ -244,7 +244,7 @@ type 'key update_context =
   { allow_obsolete_goals : bool;
     release_tasks : bool;
     use_shapes_for_pairing_sub_goals : bool;
-    theory_is_fully_up_to_date : bool;
+(*    theory_is_fully_up_to_date : bool;*)
     keygen : 'key keygen;
   }
 
@@ -511,6 +511,9 @@ val goal_iter_leaf_goal :
 (** iter all the goals which are a leaf
     (no transformations are applied on it) *)
 
+val fold_all_sub_goals_of_theory :
+  ('a -> 'key goal -> 'a) -> 'a -> 'key theory -> 'a
+
 (** {3 not recursive} *)
 
 val iter_goal :
@@ -522,8 +525,8 @@ val iter_transf :
   ('key goal -> unit) -> 'key transf -> unit
 val iter_metas :
   ('key goal -> unit) -> 'key metas -> unit
-val iter_theory :
-  ('key goal -> unit) -> 'key theory -> unit
+val iter_theory : ('key goal -> unit) -> 'key theory -> unit
+  (** [iter_theory f th] applies [f] to all root goals of theory [th] *)
 val iter_file :
   ('key theory -> unit) -> 'key file -> unit
 val iter_session :

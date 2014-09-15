@@ -396,6 +396,10 @@ let checksum_of_string x = x
 let equal_checksum x y = (x : checksum) = y
 let dumb_checksum = ""
 
+let buffer_checksum b =
+  let s = Buffer.contents b in
+  Digest.to_hex (Digest.string s)
+
 type checksum_version = CV1 | CV2
 
 module Checksum = struct
@@ -584,9 +588,11 @@ module Checksum = struct
         Ident.Wid.set table t.Theory.th_name v;
         v
 
+(* not used anymore
   let theory ~version t = match version with
     | CV1 -> assert false
     | CV2 -> theory_v2 t
+ *)
 
   let task_v1 =
     let c = ref 0 in
@@ -637,6 +643,7 @@ let task_checksum ?(version=current_shape_version) t =
   in
   Checksum.task ~version t
 
+(* not used anymore
 let theory_checksum ?(version=current_shape_version) t =
   let version = match version with
     | 1 | 2 | 3 -> CV1
@@ -644,6 +651,7 @@ let theory_checksum ?(version=current_shape_version) t =
     | _ -> assert false
   in
   Checksum.theory ~version t
+ *)
 
 (*************************************************************)
 (* Pairing of new and old subgoals                           *)
@@ -785,19 +793,19 @@ module Pairing(Old: S)(New: S) = struct
     end;
     Array.to_list result
 
-  let simple_associate ~obsolete oldgoals newgoals =
+  let simple_associate (* ~obsolete *) oldgoals newgoals =
     let rec aux acc o n =
       match o,n with
         | _, [] -> acc
         | [], n :: rem_n -> aux ((n,None)::acc) [] rem_n
-        | o :: rem_o, n :: rem_n -> aux ((n,Some(o,obsolete))::acc) rem_o rem_n
+        | o :: rem_o, n :: rem_n -> aux ((n,Some(o,true))::acc) rem_o rem_n
     in
     aux [] oldgoals newgoals
 
-  let associate ~theory_was_fully_up_to_date ~use_shapes =
+  let associate (* ~theory_was_fully_up_to_date *) ~use_shapes =
     if use_shapes then
       associate
     else
-      simple_associate ~obsolete:(not theory_was_fully_up_to_date)
+      simple_associate (* ~obsolete:(not theory_was_fully_up_to_date) *)
 
 end
