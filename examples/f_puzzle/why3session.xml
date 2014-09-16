@@ -2,51 +2,51 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
-<prover id="1" name="Eprover" version="1.6" timelimit="5" memlimit="4000"/>
+<prover id="0" name="Eprover" version="1.6" timelimit="5" memlimit="4000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="4000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
-<prover id="4" name="Spass" version="3.7" timelimit="5" memlimit="4000"/>
+<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="4000"/>
+<prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="4000"/>
 <prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <prover id="7" name="Vampire" version="0.6" timelimit="5" memlimit="4000"/>
 <file name="../f_puzzle.why" expanded="true">
-<theory name="Puzzle" sum="c28a9098aca966a5b6be27971f39edfd" expanded="true">
+<theory name="Puzzle" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Step1" sum="bc13bde4f2c8bceab112ae7ebae7511b" expanded="true">
+<theory name="Step1" sum="c6982815f07de3d63e8073ac62ff3ef6" expanded="true">
  <goal name="I1.base" expanded="true">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
- <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="5" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="I1.induction_step" expanded="true">
- <proof prover="3" memlimit="1000"><result status="valid" time="0.37"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.37"/></proof>
  <proof prover="5" memlimit="1000"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
-<theory name="Solution" sum="1338aca4cdd1fc92aef5bcb65937c49e" expanded="true">
+<theory name="Solution" sum="91b74543979bf87712b2c979d9d3726a" expanded="true">
  <goal name="L3" expanded="true">
- <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.06"/></proof>
  <proof prover="7"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="L4" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1" memlimit="1000"><result status="valid" time="3.20"/></proof>
+ <proof prover="0" memlimit="1000"><result status="valid" time="3.20"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="3.22"/></proof>
+ <proof prover="4"><result status="valid" time="3.22"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="I2.base" expanded="true">
- <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
- <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
- <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
+ <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="5" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="6" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.01"/></proof>
@@ -365,7 +365,7 @@
   <goal name="I2.induction_step" expanded="true">
   <transf name="eliminate_builtin" expanded="true">
    <goal name="induction_step.1" expl="1." expanded="true">
-   <proof prover="3" memlimit="1000"><result status="valid" time="0.00"/></proof>
+   <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
    <proof prover="5" memlimit="1000"><result status="valid" time="0.16"/></proof>
    <proof prover="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
    </goal>
@@ -374,17 +374,17 @@
  </metas>
  </goal>
  <goal name="L5" expanded="true">
- <proof prover="1"><result status="valid" time="0.05"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="7"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="L6" expanded="true">
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="G" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3" memlimit="1000"><result status="valid" time="0.35"/></proof>
+ <proof prover="4" memlimit="1000"><result status="valid" time="0.35"/></proof>
  <proof prover="5"><result status="valid" time="0.14"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  </goal>

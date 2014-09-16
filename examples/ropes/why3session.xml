@@ -3,20 +3,20 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Z3" version="2.19" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
 <file name="../ropes.mlw" expanded="true">
-<theory name="String" sum="5ada3910f694338e2b0cc28647e87cf8" expanded="true">
+<theory name="String" sum="04c184afc88e2f64cbd9da57b75cf764" expanded="true">
  <goal name="app_assoc">
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
-<theory name="Sig" sum="91da9eb9482d154246685685ba223de8">
+<theory name="Sig" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Rope" sum="0d5cbd2aa6f9fe47a351ee60ecdfa599" expanded="true">
+<theory name="Rope" sum="a2845fa35f778bd40008cbd354d95b6b" expanded="true">
  <goal name="rope_length_is_string_length">
  <transf name="induction_ty_lex">
   <goal name="rope_length_is_string_length.1" expl="1.">
@@ -175,7 +175,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Balance" sum="1270ce586871fce354eea643c5556963" expanded="true">
+<theory name="Balance" sum="0326e74337578a5c56ecb5c13fdb929b" expanded="true">
  <goal name="WP_parameter string_of_array_concat" expl="VC for string_of_array_concat">
  <transf name="split_goal_wp">
   <goal name="WP_parameter string_of_array_concat.1" expl="1. variant decrease">
@@ -305,8 +305,8 @@
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter insert.15" expl="15. precondition" expanded="true">
-  <proof prover="1"><result status="valid" time="3.81"/></proof>
-  <proof prover="2"><result status="valid" time="4.59"/></proof>
+  <proof prover="1"><result status="valid" time="4.59"/></proof>
+  <proof prover="2"><result status="valid" time="3.81"/></proof>
   </goal>
   <goal name="WP_parameter insert.16" expl="16. assertion">
   <proof prover="5" timelimit="30"><result status="valid" time="1.94"/></proof>

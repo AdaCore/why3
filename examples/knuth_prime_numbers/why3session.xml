@@ -4,69 +4,69 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="4000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="10" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="10" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="4000"/>
 <prover id="4" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
 <prover id="5" name="CVC3" version="2.2" timelimit="10" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../knuth_prime_numbers.mlw" expanded="true">
-<theory name="PrimeNumbers" sum="a4155f6e0766c540fe2919c02b1c752c" expanded="true">
+<theory name="PrimeNumbers" sum="3a516751476c7d18c8997f24cdb57dd2" expanded="true">
  <goal name="exists_prime">
  <proof prover="1" timelimit="10" memlimit="0" edited="knuth_prime_numbers_WP_PrimeNumbers_exists_prime_1.v"><result status="valid" time="1.41"/></proof>
  </goal>
  <goal name="WP_parameter prime_numbers" expl="VC for prime_numbers">
  <transf name="split_goal_wp">
   <goal name="WP_parameter prime_numbers.1" expl="1. array creation size">
-  <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.2" expl="2. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.3" expl="3. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.4" expl="4. postcondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3" memlimit="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" memlimit="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.5" expl="5. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.6" expl="6. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.7" expl="7. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.8" expl="8. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.9" expl="9. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.10" expl="10. assertion">
   <proof prover="1" edited="knuth_prime_numbers_WP_PrimeNumbers_WP_parameter_prime_numbers_5.v"><result status="valid" time="1.50"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.11" expl="11. variant decrease">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.12" expl="12. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.13" expl="13. precondition">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.14" expl="14. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter prime_numbers.14.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="WP_parameter prime_numbers.14.2" expl="2.">
    <proof prover="1" edited="knuth_prime_numbers_WP_PrimeNumbers_WP_parameter_prime_numbers_6.v"><result status="valid" time="1.68"/></proof>
@@ -74,30 +74,30 @@
   </transf>
   </goal>
   <goal name="WP_parameter prime_numbers.15" expl="15. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.16" expl="16. precondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.17" expl="17. precondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.06"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.18" expl="18. postcondition">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.19" expl="19. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.20" expl="20. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.21" expl="21. variant decrease">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.22" expl="22. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter prime_numbers.22.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="WP_parameter prime_numbers.22.2" expl="2.">
    <proof prover="1" edited="knuth_prime_numbers_WP_PrimeNumbers_WP_parameter_prime_numbers_7.v"><result status="valid" time="1.73"/></proof>
@@ -105,52 +105,52 @@
   </transf>
   </goal>
   <goal name="WP_parameter prime_numbers.23" expl="23. precondition">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.24" expl="24. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.25" expl="25. precondition">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.26" expl="26. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.27" expl="27. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.28" expl="28. postcondition">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.29" expl="29. assertion">
   <proof prover="1" edited="knuth_prime_numbers_WP_PrimeNumbers_WP_parameter_prime_numbers_4.v"><result status="valid" time="3.35"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.30" expl="30. postcondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.31" expl="31. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.32" expl="32. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.33" expl="33. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.34" expl="34. precondition">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.35" expl="35. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.36" expl="36. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.37" expl="37. precondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.38" expl="38. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.39" expl="39. loop invariant preservation">
   <transf name="inline_goal">
@@ -158,7 +158,7 @@
    <transf name="split_goal_wp">
     <goal name="WP_parameter prime_numbers.39.1.1" expl="1.">
     <proof prover="0"><result status="valid" time="0.97"/></proof>
-    <proof prover="2" memlimit="1000"><result status="valid" time="0.09"/></proof>
+    <proof prover="3" memlimit="1000"><result status="valid" time="0.09"/></proof>
     <proof prover="6"><result status="valid" time="0.01"/></proof>
     <proof prover="7"><result status="valid" time="0.03"/></proof>
     </goal>
@@ -1164,8 +1164,8 @@
      <transf name="eliminate_builtin" expanded="true">
       <goal name="WP_parameter prime_numbers.39.1.3.1" expl="1." expanded="true">
       <proof prover="0" timelimit="10"><result status="valid" time="0.04"/></proof>
-      <proof prover="2" timelimit="10" memlimit="1000"><result status="valid" time="0.80"/></proof>
-      <proof prover="3"><result status="valid" time="0.05"/></proof>
+      <proof prover="2"><result status="valid" time="0.05"/></proof>
+      <proof prover="3" timelimit="10" memlimit="1000"><result status="valid" time="0.80"/></proof>
       <proof prover="5"><result status="valid" time="0.11"/></proof>
       </goal>
      </transf>
@@ -2169,8 +2169,8 @@
      <goal name="WP_parameter prime_numbers.39.1.4" expl="4." expanded="true">
      <transf name="eliminate_builtin" expanded="true">
       <goal name="WP_parameter prime_numbers.39.1.4.1" expl="1." expanded="true">
-      <proof prover="2" timelimit="10" memlimit="1000"><result status="valid" time="2.54"/></proof>
-      <proof prover="3"><result status="valid" time="0.06"/></proof>
+      <proof prover="2"><result status="valid" time="0.06"/></proof>
+      <proof prover="3" timelimit="10" memlimit="1000"><result status="valid" time="2.54"/></proof>
       <proof prover="5"><result status="valid" time="0.12"/></proof>
       </goal>
      </transf>
@@ -2182,19 +2182,19 @@
   </transf>
   </goal>
   <goal name="WP_parameter prime_numbers.40" expl="40. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.41" expl="41. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.42" expl="42. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.26"/></proof>
+  <proof prover="3"><result status="valid" time="0.26"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.43" expl="43. type invariant">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.44" expl="44. postcondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
