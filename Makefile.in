@@ -1820,7 +1820,7 @@ doc/version.tex: doc/version.tex.in config.status
 config.status: configure
 	./config.status --recheck
 
-opt byte: lib/why3/META
+opt byte: lib/why3/META .merlin
 
 lib/why3/META: lib/why3/META.in config.status
 	./config.status chmod --file $@
