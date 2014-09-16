@@ -198,28 +198,40 @@ each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
 
 \subsection{Simplification by Computation}
 
-The transformation \verb|compute_in_goal| simplifies the goal by applying several kind of simplifications:
+Those transformations simplifies the goal by applying several kind of
+simplifications. The transformations differ only by the kind of rules they
+apply:
+
+\verb|compute_in_goal| aggressively apply all known
+computation/simplification rules
+
 \index{compute-in-goal@\verb+compute_in_goal+}
+
+\verb|compute_specified| perform rewriting using only buitlin operators and
+user-provided rules
+
+\index{compute-specified@\verb+compute_specified+}
 
 \begin{itemize}
 \item Computations with built-in symbols, \eg operations on integers,
   when applied to explicit constants, are evaluated. This includes
   evaluation of equality when a decision can be made (on integer
-  constants, on constructors of algebraic data types) and Boolean
-  evaluation. At best, these computations reduce the goal to
-  \verb|true| and the transformation thus does not produce any sub-goal.
+  constants, on constructors of algebraic data types), Boolean
+  evaluation, simplification of pattern-matching/conditional expression,
+  extraction of record fields, and beta-reduction.
+  At best, these computations reduce the goal to
+  \verb|true| and the transformations thus does not produce any sub-goal.
   For example, a goal
-  like \verb|6*7=42| is solved by this transformation.
-\item Unfolding of definitions, as done by \verb|inline_goal|. By
-  default, all definitions are unfolded, including recursive ones. The
-  user can restrict the definitions that are unfolded using the meta
-  \verb|rewrite_def| attached to a logic symbol, \eg
+  like \verb|6*7=42| is solved by those transformations.
+\item Unfolding of definitions, as done by \verb|inline_goal|.
+  \verb|compute_in_goal| unfold all definitions, including recursive ones.
+  For \verb|compute_specified|, the user can enable unfolding of a specific
+  logic symbol by attaching the meta \verb|rewrite_def| to the symbol.
 \begin{whycode}
 function sqr (x:int) : int = x * x
 
 meta "rewrite_def" function sqr
 \end{whycode}
-  Once this meta is used, no other definitions are unfolded.
 \item Rewriting using axioms or lemmas declared as rewrite rules. When
   an axiom (or a lemma) has one of the forms
 \begin{whycode}

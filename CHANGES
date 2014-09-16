@@ -19,9 +19,10 @@ transformations
     . perform beta-reduction when possible
     . the maximal number of reduction steps can be increased using meta
       "compute_max_steps"
-    . unfolding of definitions can be controlled using meta
-      "rewrite_def"
     . the transformation is documented in details in the manual
+  o new transformation "compute_specified":
+    less aggressive variant of "compute_in_goal".
+    Unfolding of definitions is controlled using meta "rewrite_def".
   o fixed a bug in "eliminate_if" when applied on inductive definitions
 
 provers

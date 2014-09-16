@@ -100,7 +100,7 @@ let normalize_goal_transf_all env =
 
 let normalize_goal_transf_few env =
   let p = { compute_defs = false;
-            compute_builtin = false;
+            compute_builtin = true;
             compute_def_set = Term.Mls.empty;
           } in
   normalize_goal_transf p env
