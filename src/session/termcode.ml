@@ -802,10 +802,10 @@ module Pairing(Old: S)(New: S) = struct
     in
     aux [] oldgoals newgoals
 
-  let associate (* ~theory_was_fully_up_to_date *) ~use_shapes =
+  let associate ~use_shapes =
     if use_shapes then
       associate
     else
-      simple_associate (* ~obsolete:(not theory_was_fully_up_to_date) *)
+      simple_associate
 
 end

@@ -319,9 +319,6 @@ let update_session ~allow_obsolete ~release ~use_shapes
     allow_obsolete_goals = allow_obsolete;
     release_tasks = release;
     use_shapes_for_pairing_sub_goals = use_shapes;
-(*
-    theory_is_fully_up_to_date = false; (* dummy initialisation *)
- *)
     keygen = O.create;
   }
   in

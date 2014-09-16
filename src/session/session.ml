@@ -2036,7 +2036,7 @@ let print_external_proof fmt p =
 
 module AssoGoals : sig
   val set_use_shapes : bool -> unit
-  val associate : (* theory_was_fully_up_to_date:bool -> *)
+  val associate :
     'a goal list -> 'b goal list ->
     ('b goal * ('a goal * bool) option) list
 end = struct
@@ -2090,6 +2090,7 @@ end
 
 let found_obsolete = ref false
 let found_missed_goals = ref false
+let found_missed_goals_in_theory = ref false
 
 let merge_proof ~keygen obsolete to_goal _ from_proof =
   let obsolete = obsolete || from_proof.proof_obsolete in
@@ -2255,9 +2256,6 @@ type 'key update_context =
   { allow_obsolete_goals : bool;
     release_tasks : bool;
     use_shapes_for_pairing_sub_goals : bool;
-(* not used anymore
-    theory_is_fully_up_to_date : bool;
-*)
     keygen : 'key keygen;
   }
 
@@ -2341,14 +2339,13 @@ and merge_trans ~ctxt ~theories env to_goal _ from_transf =
       Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
         env.session.session_shape_version;
       AssoGoals.associate
-        (* ~theory_was_fully_up_to_date:ctxt.theory_is_fully_up_to_date *)
         from_transf.transf_goals to_transf.transf_goals
     in
     List.iter (function
       | (to_goal, Some (from_goal, obsolete)) ->
         merge_any_goal ~ctxt ~theories env obsolete  from_goal to_goal
       | (_, None) ->
-        found_missed_goals := true)
+        found_missed_goals_in_theory := true)
       associated
   with Exit -> ()
 
@@ -2384,6 +2381,7 @@ and merge_metas ~ctxt ~theories env to_goal s from_metas =
 exception OutdatedSession
 
 let merge_theory ~ctxt ~theories env from_th to_th =
+  found_missed_goals_in_theory := false;
   set_theory_expanded to_th from_th.theory_expanded;
   let from_goals = List.fold_left
     (fun from_goals g ->
@@ -2395,18 +2393,6 @@ let merge_theory ~ctxt ~theories env from_th to_th =
     to_th.theory_name.id_string
     (Pp.print_option Tc.print_checksum) from_th.theory_checksum
     (Pp.print_option Tc.print_checksum) to_th.theory_checksum;
-(*
-  let ctxt = { ctxt with theory_is_fully_up_to_date =
-      match from_th.theory_checksum, to_th.theory_checksum with
-      | _, None -> assert false
-      | None, _ -> false
-      | Some s1, Some s2 -> Tc.equal_checksum s1 s2
-    }
-  in
-  Debug.dprintf debug
-    "[Theory checksum] fully up to date = %b@."
-    ctxt.theory_is_fully_up_to_date;
- *)
   List.iter
     (fun to_goal ->
       try
@@ -2425,7 +2411,7 @@ let merge_theory ~ctxt ~theories env from_th to_th =
         let goal_obsolete =
           match to_goal.goal_checksum, from_goal.goal_checksum with
           | None, _ -> assert false
-          | Some _, None -> true (* not ctxt.theory_is_fully_up_to_date *)
+          | Some _, None -> true
           | Some s1, Some s2 -> not (Tc.equal_checksum s1 s2)
         in
         if goal_obsolete then
@@ -2440,11 +2426,13 @@ let merge_theory ~ctxt ~theories env from_th to_th =
         if ctxt.release_tasks then release_sub_tasks to_goal
       with
         | Not_found when ctxt.allow_obsolete_goals ->
-          found_missed_goals := true;
+          found_missed_goals_in_theory := true;
           if ctxt.release_tasks then release_sub_tasks to_goal
         | Not_found -> raise OutdatedSession
     ) to_th.theory_goals;
-  if not ctxt.use_shapes_for_pairing_sub_goals then
+  if not (ctxt.use_shapes_for_pairing_sub_goals ||
+            !found_missed_goals_in_theory)
+  then
     begin
       Debug.dprintf
         debug
@@ -2465,7 +2453,8 @@ let merge_theory ~ctxt ~theories env from_th to_th =
       if same_checksum then
         (* we set all_goals as non obsolete *)
         theory_iter_proof_attempt set_non_obsolete to_th
-   end
+    end;
+  found_missed_goals := !found_missed_goals || !found_missed_goals_in_theory
 
 let merge_file ~ctxt ~theories env from_f to_f =
   Debug.dprintf debug "[Info] merge_file, shape_version = %d@\n"
@@ -2683,7 +2672,6 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
     Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
       env.session.session_shape_version;
     AssoGoals.associate
-      (* ~theory_was_fully_up_to_date:false *)
       from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
   | (to_goal, Some (from_goal, _obsolete)) ->

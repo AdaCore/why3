@@ -244,7 +244,6 @@ type 'key update_context =
   { allow_obsolete_goals : bool;
     release_tasks : bool;
     use_shapes_for_pairing_sub_goals : bool;
-(*    theory_is_fully_up_to_date : bool;*)
     keygen : 'key keygen;
   }
 

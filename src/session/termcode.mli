@@ -60,7 +60,7 @@ module type S = sig
 end
 
 module Pairing(Old: S)(New: S) : sig
-  val associate: (* theory_was_fully_up_to_date:bool -> *)
+  val associate:
     use_shapes:bool ->
     Old.t list -> New.t list -> (New.t * (Old.t * bool) option) list
     (** Associate new goals to (possibly) old goals
@@ -72,9 +72,6 @@ module Pairing(Old: S)(New: S) : sig
 
         if [use_shapes] is set, the clever algorithm matching shapes is used,
         otherwise a simple association in the given order of goals is done.
-
-        (* if [theory_was_fully_up_to_date] is set, then all resulting *)
-        (* goals are marked as non-obsolete, whatever their checksums are. *)
 
         Note: in the output, goals appear in the same order as in [newgoals] *)
 
