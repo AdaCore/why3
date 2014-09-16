@@ -169,12 +169,15 @@ predicate p x_1 ... x_n = (q e_1 ... e_k)
 \end{whycode}
 when each $e_i$ is either a ground term or one of the $x_j$, and
 each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
+\index{inline-trivial@\verb+inline_trivial+}
 
 \item[inline\_goal] expands all outermost symbols of the goal that
   have a non-recursive definition.
+\index{inline-goal@\verb+inline_goal+}
 
 \item[inline\_all]
   expands all non-recursive definitions.
+\index{inline-all@\verb+inline_all+}
 
 \end{description}
 
@@ -182,7 +185,8 @@ each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
 \subsection{Induction Transformations}
 
 \begin{itemize}
-\item Induction of an algebraic data type: \verb|induction_ty_lex|
+\item Induction on an algebraic data type: \verb|induction_ty_lex|
+\index{induction-ty-lex@\verb+induction_ty_lex+}
 
 [TO BE COMPLETED]
 
@@ -194,38 +198,40 @@ each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
 
 \subsection{Simplification by Computation}
 
-The transformation \verb|compute_in_goal| simplifies the goal by applying several kind of simplifications.
+The transformation \verb|compute_in_goal| simplifies the goal by applying several kind of simplifications:
+\index{compute-in-goal@\verb+compute_in_goal+}
 
 \begin{itemize}
 \item Computations with built-in symbols, \eg operations on integers,
   when applied to explicit constants, are evaluated. This includes
   evaluation of equality when a decision can be made (on integer
   constants, on constructors of algebraic data types) and Boolean
-  evaluation. At best, these computation we reduce the goal to
-  \verb|true| and then just returns no sub-goal. For example, a goal
+  evaluation. At best, these computations reduce the goal to
+  \verb|true| and the transformation thus does not produce any sub-goal.
+  For example, a goal
   like \verb|6*7=42| is solved by this transformation.
 \item Unfolding of definitions, as done by \verb|inline_goal|. By
   default, all definitions are unfolded, including recursive ones. The
   user can restrict the definitions that are unfolded using the meta
-  \verb|rewrite_def| attached to logic symbol, \eg
+  \verb|rewrite_def| attached to a logic symbol, \eg
 \begin{whycode}
 function sqr (x:int) : int = x * x
 
 meta "rewrite_def" function sqr
 \end{whycode}
-  once this meta is used, any other definitions are not unfolded.
+  Once this meta is used, no other definitions are unfolded.
 \item Rewriting using axioms or lemmas declared as rewrite rules. When
-  an axiom (or a lemma) has one of the form
+  an axiom (or a lemma) has one of the forms
 \begin{whycode}
-  axiom a: forall ... t1 = t2
+axiom a: forall ... t1 = t2
 \end{whycode}
   or
 \begin{whycode}
-  axiom a: forall ... f1 <-> f2
+axiom a: forall ... f1 <-> f2
 \end{whycode}
   then the user can declare
 \begin{whycode}
-  meta "rewrite" axiom a
+meta "rewrite" axiom a
 \end{whycode}
   to turn this axiom into a rewrite rules. Rewriting is always done
   from left to right. Beware that there is no check for termination
@@ -234,11 +240,11 @@ meta "rewrite_def" function sqr
   this transformation can take an arbitrarily large number of steps,
   or even not terminate. For this reason, the number of steps is
   bounded by a maximal value, which is set by default to 1000. This
-  value can be enlarged by another meta, \eg
+  value can be increased by another meta, \eg
 \begin{whycode}
 meta "compute_max_steps" 1_000_000
 \end{whycode}
-  When this maximal is reached, the current, non-fully reduced, goal
+  When this upper limit is reached, the partly-reduced goal
   is returned as the result of the transformation.
 \end{itemize}
 
@@ -250,43 +256,62 @@ meta "compute_max_steps" 1_000_000
 
 \item[eliminate\_algebraic] replaces algebraic data types by first-order
 definitions~\cite{paskevich09rr}.
+\index{eliminate-algebraic@\verb+eliminate_algebraic+}
 
 \item[eliminate\_builtin] removes definitions of symbols that are
   declared as builtin in the driver, \ie with a ``syntax'' rule.
+\index{eliminate-builtin@\verb+eliminate_builtin+}
+
 \item[eliminate\_definition\_func]
   replaces all function definitions with axioms.
+\index{eliminate-definition-func@\verb+eliminate_definition_func+}
+
 \item[eliminate\_definition\_pred]
   replaces all predicate definitions with axioms.
+\index{eliminate-definition-pred@\verb+eliminate_definition_pred+}
+
 \item[eliminate\_definition]
   applies both transformations above.
+\index{eliminate-definition@\verb+eliminate_definition+}
+
 \item[eliminate\_mutual\_recursion]
   replaces mutually recursive definitions with axioms.
+\index{eliminate-mutual-recursion@\verb+eliminate_mutual_recursion+}
+
 \item[eliminate\_recursion]
   replaces all recursive definitions with axioms.
+\index{eliminate-recursion@\verb+eliminate_recursion+}
 
 \item[eliminate\_if\_term] replaces terms of the form \texttt{if
     formula then t2 else t3} by lifting them at the level of formulas.
   This may introduce \texttt{if then else } in formulas.
+\index{eliminate-if-term@\verb+eliminate_if_term+}
 
 \item[eliminate\_if\_fmla] replaces formulas of the form \texttt{if f1 then f2
   else f3} by an equivalent formula using implications and other
   connectives.
+\index{eliminate-if-fmla@\verb+eliminate_if_fmla+}
 
 \item[eliminate\_if]
   applies both transformations above.
+\index{eliminate-if@\verb+eliminate_if+}
 
 \item[eliminate\_inductive] replaces inductive predicates by
   (incomplete) axiomatic definitions, \ie construction axioms and
   an inversion axiom.
+\index{eliminate-inductive@\verb+eliminate_inductive+}
 
 \item[eliminate\_let\_fmla]
   eliminates \texttt{let} by substitution, at the predicate level.
+\index{eliminate-let-fmla@\verb+eliminate_let_fmla+}
 
 \item[eliminate\_let\_term]
   eliminates \texttt{let} by substitution, at the term level.
+\index{eliminate-let-term@\verb+eliminate_let_term+}
 
 \item[eliminate\_let]
   applies both transformations above.
+\index{eliminate-let@\verb+eliminate_let+}
 
 % \item[encoding\_decorate\_mono]
 
@@ -294,9 +319,11 @@ definitions~\cite{paskevich09rr}.
 
 \item[encoding\_smt]
   encodes polymorphic types into monomorphic type~\cite{conchon08smt}.
+\index{encoding-smt@\verb+encoding_smt+}
 
 \item[encoding\_tptp]
   encodes theories into unsorted logic. %~\cite{cruanes10}.
+\index{encoding-tptp@\verb+encoding_tptp+}
 
 % \item[filter\_trigger] *)
 
@@ -309,16 +336,19 @@ definitions~\cite{paskevich09rr}.
 
 \item[introduce\_premises] moves antecedents of implications and
   universal quantifications of the goal into the premises of the task.
+\index{introduce-premises@\verb+introduce_premises+}
 
 % \item[remove\_triggers] *)
 %   removes the triggers in all quantifications. *)
 
 \item[simplify\_array] automatically rewrites the task using the lemma
-  \verb|Select_eq| of theory \verb|array.Array|.
+  \verb|Select_eq| of theory \verb|map.Map|.
+\index{simplify-array@\verb+simplify_array+}
 
 \item[simplify\_formula] reduces trivial equalities $t=t$ to true and
   then simplifies propositional structure: removes true, false, simplifies
   $f \land f$ to $f$, etc.
+\index{simplify-formula@\verb+simplify_formula+}
 
 \item[simplify\_recursive\_definition] reduces mutually recursive
   definitions if they are not really mutually recursive, \eg
@@ -332,6 +362,7 @@ function g : ... = e
 function f : ... = ... g ...
 \end{whycode}
 if $f$ does not occur in $e$.
+\index{simplify-recursive-definition@\verb+simplify_recursive_definition+}
 
 \item[simplify\_trivial\_quantification]
   simplifies quantifications of the form
@@ -348,12 +379,15 @@ P(t)
 \end{whycode}
   More generally, it applies this simplification whenever $x=t$ appears
   in a negative position.
+\index{simplify-trivial-quantification@\verb+simplify_trivial_quantification+}
 
 \item[simplify\_trivial\_quantification\_in\_goal]
   is the same as above but it applies only in the goal.
+\index{simplify-trivial-quantification-in-goal@\verb+simplify_trivial_quantification_in_goal+}
 
 \item[split\_premise]
   splits conjunctive premises.
+\index{split-premise@\verb+split_premise+}
 
 \end{description}
 
@@ -363,23 +397,29 @@ P(t)
 
 \item[full\_split\_all]
   performs both \texttt{split\_premise} and \texttt{full\_split\_goal}.
+\index{full-split-all@\verb+full_split_all+}
 
 \item[full\_split\_goal] puts the goal in a conjunctive form,
   returns the corresponding set of subgoals. The number of subgoals
   generated may be exponential in the size of the initial goal.
+\index{full-split-goal@\verb+full_split_goal+}
 
 \item[simplify\_formula\_and\_task] is the same as \texttt{simplify\_formula}
   but it also removes the goal if it is equivalent to true.
+\index{full-split-all@\verb+full_split_all+}
 
 \item[split\_all]
   performs both \texttt{split\_premise} and \texttt{split\_goal}.
+\index{split-all@\verb+split_all+}
 
 \item[split\_goal] if the goal is a conjunction of goals, returns the
   corresponding set of subgoals. The number of subgoals generated is linear in
   the size of the initial goal.
+\index{split-goal@\verb+split_goal+}
 
 \item[split\_intro]
   moves the antecedents into the premises when a goal is an implication.
+\index{split-intro@\verb+split_intro+}
 
 \end{description}
 
