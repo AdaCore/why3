@@ -141,9 +141,11 @@ are applied to goals.
 \section{Transformations}
 \label{sec:transformations}
 
-Here is a quick documentation of provided transformations. We give
-first the non-splitting ones, \eg those which produce one goal as
-result, and others which produces any number of goals.
+This section documents the available transformations. We first
+describe the most important ones, and then we provide a quick
+documentation of the others, first the non-splitting ones, \eg those
+which produce exactly one goal as result, and the others which produce any
+number of goals.
 
 Notice that the set of available transformations in your own
 installation is given by
@@ -152,7 +154,97 @@ why3 --list-transforms
 \end{verbatim}
 \index{list-transforms@\verb+--list-transforms+}
 
-\subsection{Non-splitting transformations}
+\subsection{Inlining definitions}
+
+Those transformations generally amount to replace some applications of
+function or predicate symbols with its definition.
+
+\begin{description}
+
+\item[inline\_trivial]
+  expands and removes definitions of the form
+\begin{whycode}
+function  f x_1 ... x_n = (g e_1 ... e_k)
+predicate p x_1 ... x_n = (q e_1 ... e_k)
+\end{whycode}
+when each $e_i$ is either a ground term or one of the $x_j$, and
+each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
+
+\item[inline\_goal] expands all outermost symbols of the goal that
+  have a non-recursive definition.
+
+\item[inline\_all]
+  expands all non-recursive definitions.
+
+\end{description}
+
+
+\subsection{Induction Transformations}
+
+\begin{itemize}
+\item Induction of an algebraic data type: \verb|induction_ty_lex|
+
+[TO BE COMPLETED]
+
+\item Induction on a inductive predicate:
+
+[TO BE COMPLETED]
+
+\end{itemize}
+
+\subsection{Simplification by Computation}
+
+The transformation \verb|compute_in_goal| simplifies the goal by applying several kind of simplifications.
+
+\begin{itemize}
+\item Computations with built-in symbols, \eg operations on integers,
+  when applied to explicit constants, are evaluated. This includes
+  evaluation of equality when a decision can be made (on integer
+  constants, on constructors of algebraic data types) and Boolean
+  evaluation. At best, these computation we reduce the goal to
+  \verb|true| and then just returns no sub-goal. For example, a goal
+  like \verb|6*7=42| is solved by this transformation.
+\item Unfolding of definitions, as done by \verb|inline_goal|. By
+  default, all definitions are unfolded, including recursive ones. The
+  user can restrict the definitions that are unfolded using the meta
+  \verb|rewrite_def| attached to logic symbol, \eg
+\begin{whycode}
+function sqr (x:int) : int = x * x
+
+meta "rewrite_def" function sqr
+\end{whycode}
+  once this meta is used, any other definitions are not unfolded.
+\item Rewriting using axioms or lemmas declared as rewrite rules. When
+  an axiom (or a lemma) has one of the form
+\begin{whycode}
+  axiom a: forall ... t1 = t2
+\end{whycode}
+  or
+\begin{whycode}
+  axiom a: forall ... f1 <-> f2
+\end{whycode}
+  then the user can declare
+\begin{whycode}
+  meta "rewrite" axiom a
+\end{whycode}
+  to turn this axiom into a rewrite rules. Rewriting is always done
+  from left to right. Beware that there is no check for termination
+  nor for confluence of the set of rewrite rules declared.
+\item Bound on the number of reduction: the computations performed by
+  this transformation can take an arbitrarily large number of steps,
+  or even not terminate. For this reason, the number of steps is
+  bounded by a maximal value, which is set by default to 1000. This
+  value can be enlarged by another meta, \eg
+\begin{whycode}
+meta "compute_max_steps" 1_000_000
+\end{whycode}
+  When this maximal is reached, the current, non-fully reduced, goal
+  is returned as the result of the transformation.
+\end{itemize}
+
+
+
+\subsection{Other Non-Splitting Transformations}
 
 \begin{description}
 
@@ -215,21 +307,6 @@ definitions~\cite{paskevich09rr}.
 % \item[hypothesis\_selection] *)
 %   Filter hypothesis of goals~\cite{couchot07ftp,cruanes10}. *)
 
-\item[inline\_all]
-  expands all non-recursive definitions.
-
-\item[inline\_goal] expands all outermost symbols of the goal that
-  have a non-recursive definition.
-
-\item[inline\_trivial]
-  removes definitions of the form
-\begin{whycode}
-function  f x_1 ... x_n = (g e_1 ... e_k)
-predicate p x_1 ... x_n = (q e_1 ... e_k)
-\end{whycode}
-when each $e_i$ is either a ground term or one of the $x_j$, and
-each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
-
 \item[introduce\_premises] moves antecedents of implications and
   universal quantifications of the goal into the premises of the task.
 
@@ -258,17 +335,17 @@ if $f$ does not occur in $e$.
 
 \item[simplify\_trivial\_quantification]
   simplifies quantifications of the form
-\begin{verbatim}
+\begin{whycode}
 forall x, x=t -> P(x)
-\end{verbatim}
+\end{whycode}
 or
-\begin{verbatim}
+\begin{whycode}
 forall x, t=x -> P(x)
-\end{verbatim}
+\end{whycode}
 when $x$ does not occur in $t$ into
-\begin{verbatim}
+\begin{whycode}
 P(t)
-\end{verbatim}
+\end{whycode}
   More generally, it applies this simplification whenever $x=t$ appears
   in a negative position.
 
@@ -280,7 +357,7 @@ P(t)
 
 \end{description}
 
-\subsection{Splitting transformations}
+\subsection{Other Splitting Transformations}
 
 \begin{description}
 
