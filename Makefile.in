@@ -50,6 +50,12 @@ COQDEP    = @COQDEP@
 CAMLP5O   = @CAMLP5O@
 FRAMAC_LIBDIR = $(DESTDIR)@FRAMAC_LIBDIR@
 
+ifeq (@enable_menhirLib@,yes)
+MENHIR	  = @MENHIR@ --table
+else
+MENHIR	  = @MENHIR@
+endif
+
 DEPFLAGS  = -slash -I lib/why3
 ifeq (@OCAMLBEST@,opt)
 DEPFLAGS += -native
@@ -63,7 +69,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @ZIPINCLUDE@
+INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
 OFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 BFLAGS = -w Aer-41-44-45 -dtypes -g -I lib/why3 $(INCLUDES)
 
@@ -81,14 +87,14 @@ endif
 
 # external libraries common to all binaries
 
-EXTOBJS =
+EXTOBJS = @MENHIRLIB@
 EXTLIBS = str unix nums dynlink @ZIPLIB@
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
 
 INSTALLED_LIB_EXTS = a cma cmx cmi cmxa cmxs
-COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti annot dep output
+COMPILED_LIB_EXTS = $(INSTALLED_LIB_EXTS) o cmo cmt cmti annot dep conflicts
 
 TARGET_EMACS = share/emacs/why3.elc
 
@@ -770,13 +776,19 @@ opt:  src/coq-tactic/.why3-vo-opt
 src/coq-tactic/coqCompat.ml: src/coq-tactic/coqCompat@coq_compat_version@.ml
 	cp -f $< $@
 
+lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@)
+lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
+
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @MENHIRLIB@)
+
 lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared $(addsuffix .cmxa, @ZIPLIB@) $^
+	    $(OCAMLOPT) $(OFLAGS) -o $@ -shared $^
 
 lib/coq-tactic/why3tac.cma: lib/why3/why3.cma $(COQPCMO)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
-	    $(OCAMLC) -a $(BFLAGS) -o $@ $(addsuffix .cma, @ZIPLIB@) $^
+	    $(OCAMLC) -a $(BFLAGS) -o $@ $^
 
 src/coq-tactic/g_why3tac.ml: src/coq-tactic/g_why3tac.ml4
 	$(if $(QUIET),@echo 'Camlp5   $<' &&) \
@@ -1632,6 +1644,14 @@ clean::
 %.cmi: %.mli
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
+# supress "unused rec" warning for Menhir-produced files
+%.cmo: %.ml %.mly
+	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) -w -39 $<
+
+# supress "unused rec" warning for Menhir-produced files
+%.cmx: %.ml %.mly
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) $(OCAMLOPT) -c $(OFLAGS) -w -39 $<
+
 %.cmo: %.ml
 	$(if $(QUIET),@echo 'Ocamlc   $<' &&) $(OCAMLC) -c $(BFLAGS) $<
 
@@ -1651,7 +1671,7 @@ clean::
 	$(if $(QUIET),@echo 'Ocamllex $<' &&) $(OCAMLLEX) $<
 
 %.ml %.mli: %.mly
-	$(if $(QUIET),@echo 'Ocamlyacc $<' &&) $(OCAMLYACC) -v $<
+	$(if $(QUIET),@echo 'Menhir $<' &&) $(MENHIR) --explain --strict $<
 
 %.dep: %.ml %.mli
 	$(if $(QUIET),@echo 'Ocamldep $<' &&) $(OCAMLDEP) $(DEPFLAGS) $< $<i > $@

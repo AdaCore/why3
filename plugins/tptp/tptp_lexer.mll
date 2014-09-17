@@ -20,19 +20,15 @@
   (* lexical errors *)
 
   exception IllegalCharacter of char
+  exception IllegalLexeme of string
   exception UnterminatedComment
-(* dead code
-  exception UnterminatedString
-*)
   exception UnknownDDW of string
   exception UnknownDW of string
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalCharacter c -> fprintf fmt "illegal character %c" c
+    | IllegalLexeme s -> fprintf fmt "illegal lexeme %s" s
     | UnterminatedComment -> fprintf fmt "unterminated comment"
-(* dead code
-    | UnterminatedString -> fprintf fmt "unterminated string"
-*)
     | UnknownDDW s -> fprintf fmt "unknown system_word %s" s
     | UnknownDW s -> fprintf fmt "unknown defined_word %s" s
     | _ -> raise e)
@@ -86,16 +82,16 @@
   let () = List.iter (fun (x,y) -> Hashtbl.add keywords x y) [
     "assumption", ASSUMPTION;
     "axiom", AXIOM;
-    "cnf", CNF;
+    "cnf", CNFK;
     "conjecture", CONJECTURE;
     "corollary", COROLLARY;
     "definition", DEFINITION;
-    "fof", FOF;
+    "fof", FOFK;
     "hypothesis", HYPOTHESIS;
     "include", INCLUDE;
     "lemma", LEMMA;
     "negated_conjecture", NEGATED_CONJECTURE;
-    "tff", TFF;
+    "tff", TFFK;
     "theorem", THEOREM;
     "type", TYPE;
   ]
@@ -164,7 +160,7 @@ rule token = parse
   | '-'  (natural as i) ('.' (digit+ as f))? (['e' 'E'] ('-'   natural as e))?
       { REALNEGNUM (i,f,e) }
   | "/*/"
-      { SLASH_STAR_SLASH }
+      { raise (IllegalLexeme "/*/") }
   | "/*"
       { comment_start_loc := loc lexbuf; comment_block lexbuf; token lexbuf }
   | "%"
