@@ -232,7 +232,7 @@ theory real.FromInt
 end
 
 theory real.Abs
-  syntax function abs "(ite (>= 0.0 %1) %1 (- %1))"
+  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
 
   remove prop Abs_le
   remove prop Abs_pos
