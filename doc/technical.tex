@@ -184,22 +184,45 @@ each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
 
 \subsection{Induction Transformations}
 
-\begin{itemize}
-\item Induction on an algebraic data type: \verb|induction_ty_lex|
-\index{induction-ty-lex@\verb+induction_ty_lex+}
+\begin{description}
+\item[induction\_ty\_lex]:
+  \index{induction-ty-lex@\verb+induction_ty_lex+}
+  This transformation performs structural, lexicographic induction on
+  goals involving universally quantified variables of algebraic data
+  types, such as lists, trees, etc. For instance, it transforms the
+  following goal
+\begin{whycode}
+goal G: forall l: list 'a. length l >= 0
+\end{whycode}
+  into this one:
+\begin{whycode}
+goal G :
+  forall l:list 'a.
+     match l with
+     | Nil -> length l >= 0
+     | Cons a l1 -> length l1 >= 0 -> length l >= 0
+     end
+\end{whycode}
+  When induction can be applied to several variables, the transformation
+  picks one heuristically. A label \verb|induction| can be used to
+  force induction over one particular variable, \emph{e.g.},
+\begin{whycode}
+goal G: forall l1 "induction" l2 l3: list 'a.
+        l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
+\end{whycode}
+  If such a label is used on several variables, a lexicographic
+  induction is performed on these variables, from left to right.
+
+\item[] Induction on inductive predicates.
 
 [TO BE COMPLETED]
 
-\item Induction on a inductive predicate:
-
-[TO BE COMPLETED]
-
-\end{itemize}
+\end{description}
 
 \subsection{Simplification by Computation}
 
-Those transformations simplifies the goal by applying several kind of
-simplifications. The transformations differ only by the kind of rules they
+These transformations simplify the goal by applying several kinds of
+simplification. The transformations differ only by the kind of rules they
 apply:
 
 \verb|compute_in_goal| aggressively apply all known
