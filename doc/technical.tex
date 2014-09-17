@@ -204,37 +204,40 @@ goal G :
      end
 \end{whycode}
   When induction can be applied to several variables, the transformation
-  picks one heuristically. A label \verb|induction| can be used to
-  force induction over one particular variable, \emph{e.g.},
+  picks one heuristically. A label \verb|"induction"| can be used to
+  force induction over one particular variable, \eg with
 \begin{whycode}
 goal G: forall l1 "induction" l2 l3: list 'a.
         l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
 \end{whycode}
-  If such a label is used on several variables, a lexicographic
-  induction is performed on these variables, from left to right.
+induction will be applied on \verb|l1|. If this label is attached on
+several variables, a lexicographic induction is performed on these
+variables, from left to right.
 
-\item[] Induction on inductive predicates.
+%\item[] Induction on inductive predicates.
 
-[TO BE COMPLETED]
+%[TO BE COMPLETED]
+
+% TODO: implement also induction on int !
 
 \end{description}
 
 \subsection{Simplification by Computation}
 
 These transformations simplify the goal by applying several kinds of
-simplification. The transformations differ only by the kind of rules they
-apply:
+simplification, described below. The transformations differ only by
+the kind of rules they apply:
+\begin{description}
+\item[compute\_in\_goal] aggressively applies all known
+  computation/simplification rules
+  \index{compute-in-goal@\verb+compute_in_goal+}
 
-\verb|compute_in_goal| aggressively apply all known
-computation/simplification rules
+\item[compute\_specified] performs rewriting using only built-in
+  operators and user-provided rules
+  \index{compute-specified@\verb+compute_specified+}
+\end{description}
 
-\index{compute-in-goal@\verb+compute_in_goal+}
-
-\verb|compute_specified| perform rewriting using only built-in operators and
-user-provided rules
-
-\index{compute-specified@\verb+compute_specified+}
-
+The kinds of simplification are as follows.
 \begin{itemize}
 \item Computations with built-in symbols, \eg operations on integers,
   when applied to explicit constants, are evaluated. This includes
@@ -252,7 +255,6 @@ user-provided rules
   logic symbol by attaching the meta \verb|rewrite_def| to the symbol.
 \begin{whycode}
 function sqr (x:int) : int = x * x
-
 meta "rewrite_def" function sqr
 \end{whycode}
 \item Rewriting using axioms or lemmas declared as rewrite rules. When
@@ -268,21 +270,22 @@ axiom a: forall ... f1 <-> f2
 \begin{whycode}
 meta "rewrite" axiom a
 \end{whycode}
-  to turn this axiom into a rewrite rules. Rewriting is always done
+  to turn this axiom into a rewrite rule. Rewriting is always done
   from left to right. Beware that there is no check for termination
   nor for confluence of the set of rewrite rules declared.
-\item Bound on the number of reduction: the computations performed by
-  this transformation can take an arbitrarily large number of steps,
-  or even not terminate. For this reason, the number of steps is
-  bounded by a maximal value, which is set by default to 1000. This
-  value can be increased by another meta, \eg
+\end{itemize}
+
+\paragraph{Bound on the number of reductions}
+The computations performed by these transformations can take an
+arbitrarily large number of steps, or even not terminate. For this
+reason, the number of steps is bounded by a maximal value, which is
+set by default to 1000. This value can be increased by another meta,
+\eg
 \begin{whycode}
 meta "compute_max_steps" 1_000_000
 \end{whycode}
-  When this upper limit is reached, the partly-reduced goal
-  is returned as the result of the transformation.
-\end{itemize}
-
+When this upper limit is reached, a warning is issued, and the
+partly-reduced goal is returned as the result of the transformation.
 
 
 \subsection{Other Non-Splitting Transformations}
