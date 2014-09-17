@@ -253,7 +253,9 @@ See CHANGES
 
       or, if you already have one, make sure it is up-to-date:
 
-        git pull --ff-only opam master
+        git fetch opam
+        git reset --hard opam/master
+        git push
 
     - second step: copy why3 opam files into it :
 
@@ -274,7 +276,8 @@ See CHANGES
 * make a pull request on OPAM
 
   git add why3.0.85
-  commit et push
+  git commit -am "new package version why3 0.85"
+  git push
   sur github: creer un pull request
 
 * produce the Why3 part of Toccata gallery
