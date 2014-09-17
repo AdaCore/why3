@@ -521,7 +521,7 @@ let create_ind_decl s idl =
     match g.t_node with
       | Tapp (s, tl) when ls_equal s ps ->
           List.iter2 check_tl ps.ls_args tl;
-          (try ignore (List.for_all (f_pos_ps sps (Some true)) cls)
+          (try ignore (List.for_all (f_pos_ps sps (Some true)) (g::cls))
           with Found ls -> raise (NonPositiveIndDecl (ps, pr, ls)));
           (* check for unbound type variables *)
           let gtv = t_ty_freevars Stv.empty g in
