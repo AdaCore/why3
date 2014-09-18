@@ -4,330 +4,334 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="5" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
-<prover id="6" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="7" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
 <file name="../tower_of_hanoi.mlw" expanded="true">
-<theory name="Hanoi" sum="3ec613d7791605b4802d060f62a972b4">
+<theory name="Hanoi" sum="527bc9a86686113d1e60c41bdc3fb9c5">
  <goal name="WP_parameter move" expl="VC for move">
- <proof prover="2"><result status="valid" time="0.05"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
- <proof prover="5"><result status="valid" time="0.17"/></proof>
- <proof prover="6"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.05"/></proof>
+ <proof prover="5" obsolete="true"><result status="valid" time="0.17"/></proof>
+ <proof prover="7"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter hanoi_rec" expl="VC for hanoi_rec">
  <transf name="split_goal_wp">
   <goal name="WP_parameter hanoi_rec.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.63"/></proof>
-  <proof prover="5"><result status="valid" time="0.61"/></proof>
-  <proof prover="6"><result status="valid" time="0.67"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.63"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.61"/></proof>
+  <proof prover="7"><result status="valid" time="0.67"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.2" expl="2. precondition">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.3" expl="3. precondition">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="5"><result status="valid" time="0.22"/></proof>
-  <proof prover="6"><result status="valid" time="1.12"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.22"/></proof>
+  <proof prover="7"><result status="valid" time="1.12"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.4" expl="4. precondition">
-  <proof prover="2"><result status="valid" time="0.10"/></proof>
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="5"><result status="valid" time="0.13"/></proof>
-  <proof prover="6"><result status="valid" time="1.34"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.10"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.13"/></proof>
+  <proof prover="7"><result status="valid" time="1.34"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.5" expl="5. precondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.6" expl="6. precondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.7" expl="7. variant decrease">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.13"/></proof>
-  <proof prover="5"><result status="valid" time="0.61"/></proof>
-  <proof prover="6"><result status="valid" time="1.24"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.13"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.61"/></proof>
+  <proof prover="7"><result status="valid" time="1.24"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.8" expl="8. precondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.9" expl="9. precondition">
-  <proof prover="2"><result status="valid" time="0.10"/></proof>
-  <proof prover="3"><result status="valid" time="1.14"/></proof>
-  <proof prover="5"><result status="valid" time="1.95"/></proof>
-  <proof prover="6"><result status="valid" time="1.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="1.14"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.10"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="1.95"/></proof>
+  <proof prover="7"><result status="valid" time="1.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.10" expl="10. precondition">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="1.10"/></proof>
-  <proof prover="6"><result status="valid" time="1.16"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="1.10"/></proof>
+  <proof prover="7"><result status="valid" time="1.16"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.12" expl="12. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.13" expl="13. postcondition">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.14" expl="14. postcondition">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.15" expl="15. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter tower_of_hanoi" expl="VC for tower_of_hanoi">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.08"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
- <proof prover="5"><result status="valid" time="0.03"/></proof>
- <proof prover="6"><result status="valid" time="0.02"/></proof>
+ <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.08"/></proof>
+ <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+ <proof prover="7"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="Tower_of_Hanoi" sum="e650406137f72b33da6fbcd1cb59cd6a" expanded="true">
+<theory name="Tower_of_Hanoi" sum="e14c66f0c53e98d59d95177ce8a5a413" expanded="true">
+ <goal name="RevSorted.Transitive.Trans">
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
+ </goal>
  <goal name="WP_parameter move" expl="VC for move">
  <proof prover="1"><result status="valid" time="0.03"/></proof>
- <proof prover="2"><result status="valid" time="0.17"/></proof>
- <proof prover="3"><result status="valid" time="0.02"/></proof>
- <proof prover="6"><result status="valid" time="0.04"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.17"/></proof>
+ <proof prover="7"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="WP_parameter hanoi_rec" expl="VC for hanoi_rec">
  <transf name="split_goal_wp">
   <goal name="WP_parameter hanoi_rec.1" expl="1. variant decrease">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="1.46"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="1.46"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.73"/></proof>
-  <proof prover="6"><result status="valid" time="1.23"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.73"/></proof>
+  <proof prover="7"><result status="valid" time="1.23"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.2" expl="2. precondition">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.82"/></proof>
-  <proof prover="5"><result status="valid" time="0.71"/></proof>
-  <proof prover="6"><result status="valid" time="0.37"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.82"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.71"/></proof>
+  <proof prover="7"><result status="valid" time="0.60"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.3" expl="3. precondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.08"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.08"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.4" expl="4. precondition">
   <proof prover="1"><result status="valid" time="0.14"/></proof>
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="5"><result status="valid" time="0.22"/></proof>
-  <proof prover="6"><result status="valid" time="0.03"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.22"/></proof>
+  <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.5" expl="5. precondition">
   <proof prover="1"><result status="valid" time="0.15"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5" timelimit="20"><result status="valid" time="0.19"/></proof>
-  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" timelimit="20" obsolete="true"><result status="valid" time="0.19"/></proof>
+  <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.6" expl="6. precondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.05"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.05"/></proof>
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.7" expl="7. precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.05"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.8" expl="8. variant decrease">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="2.31"/></proof>
+  <proof prover="7"><result status="valid" time="2.31"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.9" expl="9. precondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.10" expl="10. precondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.11" expl="11. precondition">
   <proof prover="1"><result status="valid" time="0.24"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="5"><result status="valid" time="0.07"/></proof>
-  <proof prover="6"><result status="valid" time="0.05"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.07"/></proof>
+  <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.12" expl="12. precondition">
   <proof prover="1"><result status="valid" time="0.26"/></proof>
-  <proof prover="3"><result status="valid" time="0.30"/></proof>
-  <proof prover="6"><result status="valid" time="1.82"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.30"/></proof>
+  <proof prover="7"><result status="valid" time="1.82"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.13" expl="13. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.14" expl="14. postcondition">
   <proof prover="1"><result status="valid" time="0.28"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.10"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.10"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
-  <proof prover="5"><result status="valid" time="0.81"/></proof>
-  <proof prover="6"><result status="valid" time="0.44"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.81"/></proof>
+  <proof prover="7"><result status="valid" time="0.44"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.15" expl="15. postcondition">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.05"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.16" expl="16. unreachable point">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.17" expl="17. postcondition">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="5"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.05"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.06"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter hanoi_rec.18" expl="18. postcondition">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.06"/></proof>
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter tower_of_hanoi" expl="VC for tower_of_hanoi">
  <transf name="split_goal_wp">
   <goal name="WP_parameter tower_of_hanoi.1" expl="1. precondition">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter tower_of_hanoi.2" expl="2. precondition">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.12"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.06"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter tower_of_hanoi.3" expl="3. precondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter tower_of_hanoi.4" expl="4. precondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter tower_of_hanoi.5" expl="5. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter tower_of_hanoi.6" expl="6. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>

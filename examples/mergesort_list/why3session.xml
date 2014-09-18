@@ -2,577 +2,1210 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Eprover" version="1.6" timelimit="6" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="6" memlimit="1000"/>
-<prover id="2" name="Z3" version="2.19" timelimit="6" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
-<prover id="4" name="Spass" version="3.7" timelimit="10" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
-<prover id="6" name="CVC3" version="2.2" timelimit="6" memlimit="1000"/>
-<prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
-<prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="6" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.1" timelimit="10" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <file name="../mergesort_list.mlw" expanded="true">
-<theory name="Elt" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Elt" sum="f5c537c37e9fac9baf0147e1e940244b">
+ <goal name="Transitive.Trans">
+ <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
+ </goal>
 </theory>
-<theory name="Merge" sum="4da394421f517d7531b7670efde9979c" expanded="true">
+<theory name="Merge" sum="ec4620a645a6ec4bd6489df3c251bb0a">
  <goal name="WP_parameter merge" expl="VC for merge">
  <transf name="split_goal_wp">
   <goal name="WP_parameter merge.1" expl="1. postcondition">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.2" expl="2. postcondition">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.3" expl="3. postcondition">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.4" expl="4. postcondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.5" expl="5. postcondition">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.6" expl="6. postcondition">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.7" expl="7. variant decrease">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter merge.8" expl="8. precondition">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
+  <goal name="WP_parameter merge.7" expl="7. variant decrease">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter merge.8" expl="8. precondition">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
   <goal name="WP_parameter merge.9" expl="9. postcondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="1.38"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="2.03"/></proof>
   </goal>
   <goal name="WP_parameter merge.10" expl="10. postcondition">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="8"><result status="valid" time="0.00"/></proof>
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter merge.11" expl="11. variant decrease">
-  <proof prover="8"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter merge.12" expl="12. precondition">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.13" expl="13. postcondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="1.48"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="2.27"/></proof>
   </goal>
   <goal name="WP_parameter merge.14" expl="14. postcondition">
-  <proof prover="3"><result status="valid" time="0.31"/></proof>
+  <proof prover="1"><result status="valid" time="0.31"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="EfficientMerge" sum="b880335875d65fb958fdcc145ef37b26" expanded="true">
+<theory name="EfficientMerge" sum="0114e3fc05a68e58b01610126d62c13f">
  <goal name="sorted_reverse_cons">
- <proof prover="1"><result status="valid" time="0.28"/></proof>
- <proof prover="5" timelimit="6"><result status="valid" time="0.34"/></proof>
+ <proof prover="0"><result status="valid" time="0.48"/></proof>
+ <proof prover="2" timelimit="6"><result status="valid" time="0.34"/></proof>
  </goal>
  <goal name="WP_parameter merge_aux" expl="VC for merge_aux">
  <transf name="split_goal_wp">
   <goal name="WP_parameter merge_aux.1" expl="1. postcondition">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.2" expl="2. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter merge_aux.2.1" expl="1. postcondition">
-   <proof prover="0"><result status="valid" time="0.05"/></proof>
-   <proof prover="1"><result status="valid" time="0.10"/></proof>
-   <proof prover="3"><result status="valid" time="0.03"/></proof>
-   <proof prover="5" timelimit="6"><result status="valid" time="0.02"/></proof>
-   <proof prover="8"><result status="valid" time="0.08"/></proof>
+   <proof prover="0"><result status="valid" time="0.10"/></proof>
+   <proof prover="1"><result status="valid" time="0.03"/></proof>
+   <proof prover="2" timelimit="6"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.08"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter merge_aux.3" expl="3. postcondition">
-  <proof prover="8"><result status="valid" time="0.09"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.4" expl="4. postcondition">
-  <proof prover="3"><result status="valid" time="0.75"/></proof>
+  <proof prover="1"><result status="valid" time="0.80"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.5" expl="5. postcondition">
-  <proof prover="8"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.6" expl="6. postcondition">
-  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.7" expl="7. variant decrease">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.8" expl="8. precondition">
-  <proof prover="3"><result status="valid" time="0.25"/></proof>
+  <proof prover="1"><result status="valid" time="0.26"/></proof>
   <transf name="split_goal_wp">
    <goal name="WP_parameter merge_aux.8.1" expl="1.">
-   <proof prover="4"><result status="valid" time="0.07"/></proof>
-   <proof prover="5"><result status="valid" time="0.44"/></proof>
-   <proof prover="8"><result status="valid" time="1.48"/></proof>
+   <proof prover="2"><result status="valid" time="0.59"/></proof>
+   <proof prover="3"><result status="valid" time="1.39"/></proof>
    </goal>
    <goal name="WP_parameter merge_aux.8.2" expl="2.">
-   <proof prover="8"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter merge_aux.8.3" expl="3.">
-   <proof prover="8"><result status="valid" time="0.03"/></proof>
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter merge_aux.9" expl="9. precondition">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
-  <proof prover="5"><result status="valid" time="2.41"/></proof>
-  <proof prover="8"><result status="valid" time="0.09"/></proof>
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="2.60"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.10" expl="10. precondition">
-  <proof prover="3"><result status="valid" time="0.38"/></proof>
-  <proof prover="5"><result status="valid" time="0.92"/></proof>
+  <proof prover="1"><result status="valid" time="0.40"/></proof>
+  <proof prover="2"><result status="valid" time="1.13"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.11" expl="11. postcondition">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.12" expl="12. postcondition">
-  <proof prover="8"><result status="valid" time="2.14"/></proof>
+  <proof prover="3"><result status="valid" time="2.46"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.13" expl="13. variant decrease">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="8"><result status="valid" time="0.06"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.14" expl="14. precondition">
-  <proof prover="0"><result status="valid" time="0.55"/></proof>
-  <proof prover="3"><result status="valid" time="0.14"/></proof>
-  <proof prover="8"><result status="valid" time="4.06"/></proof>
+  <proof prover="1"><result status="valid" time="0.14"/></proof>
+  <proof prover="3"><result status="valid" time="4.06"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.15" expl="15. precondition">
-  <proof prover="3"><result status="valid" time="0.47"/></proof>
+  <proof prover="1"><result status="valid" time="0.47"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.16" expl="16. precondition">
-  <proof prover="8"><result status="valid" time="0.14"/></proof>
+  <proof prover="3"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.17" expl="17. postcondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.18" expl="18. postcondition">
-  <proof prover="1"><result status="valid" time="0.53"/></proof>
+  <proof prover="0"><result status="valid" time="0.53"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter merge" expl="VC for merge">
  <transf name="split_goal_wp">
   <goal name="WP_parameter merge.1" expl="1. precondition">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter merge.2" expl="2. precondition">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.3" expl="3. precondition">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter merge.4" expl="4. postcondition">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Mergesort" sum="e0e0999cbafa269942aac80ff1eaf32b" expanded="true">
+<theory name="Mergesort" sum="0105dba18167ed706164be02a49a48f2">
  <goal name="WP_parameter split" expl="VC for split">
  <transf name="split_goal_wp">
   <goal name="WP_parameter split.1" expl="1. postcondition">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter split.2" expl="2. variant decrease">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter split.3" expl="3. precondition">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter split.4" expl="4. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter split.4.1" expl="1.">
-   <proof prover="8"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter split.4.2" expl="2.">
-   <proof prover="3"><result status="valid" time="0.81"/></proof>
+   <proof prover="1"><result status="valid" time="0.81"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter split.5" expl="5. precondition">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter split.6" expl="6. postcondition">
-  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter mergesort" expl="VC for mergesort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter mergesort.1" expl="1. postcondition">
-  <proof prover="8"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.2" expl="2. postcondition">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.3" expl="3. precondition">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.4" expl="4. variant decrease">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.5" expl="5. variant decrease">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.6" expl="6. precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter mergesort.6.1" expl="1.">
-   <proof prover="8"><result status="valid" time="0.00"/></proof>
+   <proof prover="3"><result status="valid" time="0.00"/></proof>
    </goal>
    <goal name="WP_parameter mergesort.6.2" expl="2.">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
-   <proof prover="8" timelimit="5"><result status="valid" time="0.01"/></proof>
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter mergesort.7" expl="7. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter mergesort.7.1" expl="1.">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
-   <proof prover="8" timelimit="5"><result status="valid" time="0.01"/></proof>
+   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="WP_parameter mergesort.7.2" expl="2.">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.18"/></proof>
+   <proof prover="1" timelimit="5"><result status="valid" time="0.18"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="OCamlMergesort" sum="821d5233cbffe7cb9b87614067b1d446" expanded="true">
+<theory name="OCamlMergesort" sum="3f35dbbdc9d39afb0ba6416cea2813a1" expanded="true">
  <goal name="sorted_reverse_cons">
- <proof prover="1" timelimit="10"><result status="valid" time="0.38"/></proof>
+ <proof prover="0" timelimit="10"><result status="valid" time="0.38"/></proof>
  </goal>
  <goal name="sorted_rev_append">
- <proof prover="5" timelimit="5"><result status="valid" time="0.10"/></proof>
- <proof prover="7"><result status="valid" time="0.09"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.10"/></proof>
  </goal>
  <goal name="WP_parameter rev_merge" expl="VC for rev_merge">
  <transf name="split_goal_wp">
   <goal name="WP_parameter rev_merge.1" expl="1. postcondition">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.2" expl="2. postcondition">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.3" expl="3. postcondition">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.4" expl="4. postcondition">
-  <proof prover="3"><result status="valid" time="0.63"/></proof>
+  <proof prover="1"><result status="valid" time="0.89"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.5" expl="5. postcondition">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.6" expl="6. postcondition">
-  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.7" expl="7. variant decrease">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.8" expl="8. precondition">
-  <proof prover="8"><result status="valid" time="4.29"/></proof>
+  <proof prover="3"><result status="valid" time="4.29"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.9" expl="9. precondition">
-  <proof prover="8"><result status="valid" time="0.09"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.10" expl="10. precondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.36"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.36"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.11" expl="11. postcondition">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.12" expl="12. postcondition">
-  <proof prover="8"><result status="valid" time="2.08"/></proof>
+  <proof prover="3"><result status="valid" time="2.55"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.13" expl="13. variant decrease">
-  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.14" expl="14. precondition">
-  <proof prover="8"><result status="valid" time="3.88"/></proof>
+  <proof prover="3"><result status="valid" time="3.88"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.15" expl="15. precondition">
-  <proof prover="8"><result status="valid" time="1.00"/></proof>
+  <proof prover="3"><result status="valid" time="1.35"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.16" expl="16. precondition">
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.17" expl="17. postcondition">
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge.18" expl="18. postcondition">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="1"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="sorted_reverse_mem">
- <proof prover="3"><result status="valid" time="0.75"/></proof>
+ <goal name="sorted_reverse_mem" expanded="true">
+ <metas
+  expanded="true">
+  <ts_pos name="real" arity="0" id="2"
+   ip_theory="BuiltIn">
+   <ip_library name="why3"/>
+   <ip_library name="BuiltIn"/>
+   <ip_qualid name="real"/>
+  </ts_pos>
+  <ts_pos name="bool" arity="0" id="3"
+   ip_theory="Bool">
+   <ip_library name="why3"/>
+   <ip_library name="Bool"/>
+   <ip_qualid name="bool"/>
+  </ts_pos>
+  <ts_pos name="tuple0" arity="0" id="20"
+   ip_theory="Tuple0">
+   <ip_library name="why3"/>
+   <ip_library name="Tuple0"/>
+   <ip_qualid name="tuple0"/>
+  </ts_pos>
+  <ts_pos name="unit" arity="0" id="21"
+   ip_theory="Unit">
+   <ip_library name="why3"/>
+   <ip_library name="Unit"/>
+   <ip_qualid name="unit"/>
+  </ts_pos>
+  <ts_pos name="&apos;mark" arity="0" id="54"
+   ip_theory="Mark">
+   <ip_library name="why3"/>
+   <ip_library name="Mark"/>
+   <ip_qualid name="&apos;mark"/>
+  </ts_pos>
+  <ts_pos name="tuple2" arity="2" id="1058"
+   ip_theory="Tuple2">
+   <ip_library name="why3"/>
+   <ip_library name="Tuple2"/>
+   <ip_qualid name="tuple2"/>
+  </ts_pos>
+  <ls_pos name="infix =" id="10"
+   ip_theory="BuiltIn">
+   <ip_library name="why3"/>
+   <ip_library name="BuiltIn"/>
+   <ip_qualid name="infix ="/>
+  </ls_pos>
+  <ls_pos name="zero" id="342"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="zero"/>
+  </ls_pos>
+  <ls_pos name="one" id="343"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="one"/>
+  </ls_pos>
+  <ls_pos name="infix &lt;" id="344"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="infix &lt;"/>
+  </ls_pos>
+  <ls_pos name="infix &gt;" id="347"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="infix &gt;"/>
+  </ls_pos>
+  <ls_pos name="infix &lt;=" id="356"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="infix &lt;="/>
+  </ls_pos>
+  <ls_pos name="infix +" id="1513"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="infix +"/>
+  </ls_pos>
+  <ls_pos name="prefix -" id="1514"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="prefix -"/>
+  </ls_pos>
+  <ls_pos name="infix *" id="1515"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="infix *"/>
+  </ls_pos>
+  <ls_pos name="infix -" id="1563"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="infix -"/>
+  </ls_pos>
+  <ls_pos name="infix &gt;=" id="1583"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="infix &gt;="/>
+  </ls_pos>
+  <ls_pos name="length" id="2396"
+   ip_theory="Length">
+   <ip_library name="list"/>
+   <ip_qualid name="length"/>
+  </ls_pos>
+  <ls_pos name="rev_append" id="4044"
+   ip_theory="RevAppend">
+   <ip_library name="list"/>
+   <ip_qualid name="rev_append"/>
+  </ls_pos>
+  <ls_pos name="num_occ" id="4333"
+   ip_theory="NumOcc">
+   <ip_library name="list"/>
+   <ip_qualid name="num_occ"/>
+  </ls_pos>
+  <ls_pos name="permut" id="4375"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="permut"/>
+  </ls_pos>
+  <ls_pos name="le" id="5828"
+   ip_theory="OCamlMergesort">
+   <ip_qualid name="le"/>
+  </ls_pos>
+  <pr_pos name="Assoc" id="1516"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="CommutativeGroup"/>
+   <ip_qualid name="Assoc"/>
+  </pr_pos>
+  <pr_pos name="Unit_def_l" id="1523"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="CommutativeGroup"/>
+   <ip_qualid name="Unit_def_l"/>
+  </pr_pos>
+  <pr_pos name="Unit_def_r" id="1526"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="CommutativeGroup"/>
+   <ip_qualid name="Unit_def_r"/>
+  </pr_pos>
+  <pr_pos name="Inv_def_l" id="1529"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="CommutativeGroup"/>
+   <ip_qualid name="Inv_def_l"/>
+  </pr_pos>
+  <pr_pos name="Inv_def_r" id="1532"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="CommutativeGroup"/>
+   <ip_qualid name="Inv_def_r"/>
+  </pr_pos>
+  <pr_pos name="Comm" id="1535"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="CommutativeGroup"/>
+   <ip_qualid name="Comm"/>
+   <ip_qualid name="Comm"/>
+  </pr_pos>
+  <pr_pos name="Assoc" id="1540"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="Assoc"/>
+   <ip_qualid name="Assoc"/>
+  </pr_pos>
+  <pr_pos name="Mul_distr_l" id="1547"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="Mul_distr_l"/>
+  </pr_pos>
+  <pr_pos name="Mul_distr_r" id="1554"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="Mul_distr_r"/>
+  </pr_pos>
+  <pr_pos name="Comm" id="1572"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="Comm"/>
+   <ip_qualid name="Comm"/>
+  </pr_pos>
+  <pr_pos name="Unitary" id="1577"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="Unitary"/>
+  </pr_pos>
+  <pr_pos name="NonTrivialRing" id="1580"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="NonTrivialRing"/>
+  </pr_pos>
+  <pr_pos name="Refl" id="1592"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="Refl"/>
+  </pr_pos>
+  <pr_pos name="Trans" id="1595"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="Trans"/>
+  </pr_pos>
+  <pr_pos name="Antisymm" id="1602"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="Antisymm"/>
+  </pr_pos>
+  <pr_pos name="Total" id="1607"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="Total"/>
+  </pr_pos>
+  <pr_pos name="ZeroLessOne" id="1612"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="ZeroLessOne"/>
+  </pr_pos>
+  <pr_pos name="CompatOrderAdd" id="1613"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="CompatOrderAdd"/>
+  </pr_pos>
+  <pr_pos name="CompatOrderMult" id="1620"
+   ip_theory="Int">
+   <ip_library name="int"/>
+   <ip_qualid name="CompatOrderMult"/>
+  </pr_pos>
+  <pr_pos name="Length_nonnegative" id="2406"
+   ip_theory="Length">
+   <ip_library name="list"/>
+   <ip_qualid name="Length_nonnegative"/>
+  </pr_pos>
+  <pr_pos name="Length_nil" id="2409"
+   ip_theory="Length">
+   <ip_library name="list"/>
+   <ip_qualid name="Length_nil"/>
+  </pr_pos>
+  <pr_pos name="Append_assoc" id="3946"
+   ip_theory="Append">
+   <ip_library name="list"/>
+   <ip_qualid name="Append_assoc"/>
+  </pr_pos>
+  <pr_pos name="Append_l_nil" id="3953"
+   ip_theory="Append">
+   <ip_library name="list"/>
+   <ip_qualid name="Append_l_nil"/>
+  </pr_pos>
+  <pr_pos name="Append_length" id="3956"
+   ip_theory="Append">
+   <ip_library name="list"/>
+   <ip_qualid name="Append_length"/>
+  </pr_pos>
+  <pr_pos name="mem_append" id="3961"
+   ip_theory="Append">
+   <ip_library name="list"/>
+   <ip_qualid name="mem_append"/>
+  </pr_pos>
+  <pr_pos name="mem_decomp" id="3968"
+   ip_theory="Append">
+   <ip_library name="list"/>
+   <ip_qualid name="mem_decomp"/>
+  </pr_pos>
+  <pr_pos name="reverse_append" id="4010"
+   ip_theory="Reverse">
+   <ip_library name="list"/>
+   <ip_qualid name="reverse_append"/>
+  </pr_pos>
+  <pr_pos name="reverse_cons" id="4017"
+   ip_theory="Reverse">
+   <ip_library name="list"/>
+   <ip_qualid name="reverse_cons"/>
+  </pr_pos>
+  <pr_pos name="cons_reverse" id="4022"
+   ip_theory="Reverse">
+   <ip_library name="list"/>
+   <ip_qualid name="cons_reverse"/>
+  </pr_pos>
+  <pr_pos name="reverse_reverse" id="4027"
+   ip_theory="Reverse">
+   <ip_library name="list"/>
+   <ip_qualid name="reverse_reverse"/>
+  </pr_pos>
+  <pr_pos name="Reverse_length" id="4035"
+   ip_theory="Reverse">
+   <ip_library name="list"/>
+   <ip_qualid name="Reverse_length"/>
+  </pr_pos>
+  <pr_pos name="rev_append_append_l" id="4061"
+   ip_theory="RevAppend">
+   <ip_library name="list"/>
+   <ip_qualid name="rev_append_append_l"/>
+  </pr_pos>
+  <pr_pos name="rev_append_length" id="4068"
+   ip_theory="RevAppend">
+   <ip_library name="list"/>
+   <ip_qualid name="rev_append_length"/>
+  </pr_pos>
+  <pr_pos name="rev_append_def" id="4073"
+   ip_theory="RevAppend">
+   <ip_library name="list"/>
+   <ip_qualid name="rev_append_def"/>
+  </pr_pos>
+  <pr_pos name="rev_append_append_r" id="4078"
+   ip_theory="RevAppend">
+   <ip_library name="list"/>
+   <ip_qualid name="rev_append_append_r"/>
+  </pr_pos>
+  <pr_pos name="Num_Occ_Positive" id="4352"
+   ip_theory="NumOcc">
+   <ip_library name="list"/>
+   <ip_qualid name="Num_Occ_Positive"/>
+  </pr_pos>
+  <pr_pos name="Mem_Num_Occ" id="4357"
+   ip_theory="NumOcc">
+   <ip_library name="list"/>
+   <ip_qualid name="Mem_Num_Occ"/>
+  </pr_pos>
+  <pr_pos name="Append_Num_Occ" id="4362"
+   ip_theory="NumOcc">
+   <ip_library name="list"/>
+   <ip_qualid name="Append_Num_Occ"/>
+  </pr_pos>
+  <pr_pos name="reverse_num_occ" id="4369"
+   ip_theory="NumOcc">
+   <ip_library name="list"/>
+   <ip_qualid name="reverse_num_occ"/>
+  </pr_pos>
+  <pr_pos name="Permut_refl" id="4387"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_refl"/>
+  </pr_pos>
+  <pr_pos name="Permut_sym" id="4390"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_sym"/>
+  </pr_pos>
+  <pr_pos name="Permut_trans" id="4395"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_trans"/>
+  </pr_pos>
+  <pr_pos name="Permut_cons" id="4402"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_cons"/>
+  </pr_pos>
+  <pr_pos name="Permut_swap" id="4409"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_swap"/>
+  </pr_pos>
+  <pr_pos name="Permut_cons_append" id="4416"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_cons_append"/>
+  </pr_pos>
+  <pr_pos name="Permut_assoc" id="4423"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_assoc"/>
+  </pr_pos>
+  <pr_pos name="Permut_append" id="4430"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_append"/>
+  </pr_pos>
+  <pr_pos name="Permut_append_swap" id="4439"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_append_swap"/>
+  </pr_pos>
+  <pr_pos name="Permut_mem" id="4444"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_mem"/>
+  </pr_pos>
+  <pr_pos name="Permut_length" id="4451"
+   ip_theory="Permut">
+   <ip_library name="list"/>
+   <ip_qualid name="Permut_length"/>
+  </pr_pos>
+  <pr_pos name="Refl" id="5829"
+   ip_theory="OCamlMergesort">
+   <ip_qualid name="TotalPreOrder"/>
+   <ip_qualid name="Refl"/>
+  </pr_pos>
+  <pr_pos name="Trans" id="5832"
+   ip_theory="OCamlMergesort">
+   <ip_qualid name="TotalPreOrder"/>
+   <ip_qualid name="Trans"/>
+  </pr_pos>
+  <pr_pos name="Total" id="5839"
+   ip_theory="OCamlMergesort">
+   <ip_qualid name="TotalPreOrder"/>
+   <ip_qualid name="Total"/>
+  </pr_pos>
+  <pr_pos name="sorted_mem" id="5867"
+   ip_theory="OCamlMergesort">
+   <ip_qualid name="sorted_mem"/>
+  </pr_pos>
+  <pr_pos name="sorted_reverse_cons" id="5883"
+   ip_theory="OCamlMergesort">
+   <ip_qualid name="sorted_reverse_cons"/>
+  </pr_pos>
+  <pr_pos name="sorted_rev_append" id="5893"
+   ip_theory="OCamlMergesort">
+   <ip_qualid name="sorted_rev_append"/>
+  </pr_pos>
+  <meta name="remove_logic">
+   <meta_arg_ls id="10"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="342"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="343"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="344"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="347"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="356"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="1513"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="1514"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="1515"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="1563"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="1583"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="2396"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="4044"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="4333"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="4375"/>
+  </meta>
+  <meta name="remove_logic">
+   <meta_arg_ls id="5828"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1516"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1523"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1526"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1529"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1532"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1535"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1540"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1547"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1554"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1572"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1577"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1580"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1592"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1595"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1602"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1607"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1612"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1613"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="1620"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="2406"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="2409"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="3946"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="3953"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="3956"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="3961"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="3968"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4010"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4017"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4022"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4027"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4035"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4061"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4068"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4073"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4078"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4352"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4357"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4362"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4369"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4387"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4390"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4395"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4402"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4409"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4416"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4423"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4430"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4439"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4444"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="4451"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="5829"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="5832"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="5839"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="5867"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="5883"/>
+  </meta>
+  <meta name="remove_prop">
+   <meta_arg_pr id="5893"/>
+  </meta>
+  <meta name="remove_type">
+   <meta_arg_ts id="2"/>
+  </meta>
+  <meta name="remove_type">
+   <meta_arg_ts id="3"/>
+  </meta>
+  <meta name="remove_type">
+   <meta_arg_ts id="20"/>
+  </meta>
+  <meta name="remove_type">
+   <meta_arg_ts id="21"/>
+  </meta>
+  <meta name="remove_type">
+   <meta_arg_ts id="54"/>
+  </meta>
+  <meta name="remove_type">
+   <meta_arg_ts id="1058"/>
+  </meta>
+  <goal name="sorted_reverse_mem" expanded="true">
+  <transf name="eliminate_builtin" expanded="true">
+   <goal name="sorted_reverse_mem.1" expl="1." expanded="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.11"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </metas>
  </goal>
  <goal name="sorted_reverse_cons2">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter rev_merge_rev" expl="VC for rev_merge_rev">
  <transf name="split_goal_wp">
   <goal name="WP_parameter rev_merge_rev.1" expl="1. postcondition">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.2" expl="2. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter rev_merge_rev.2.1" expl="1. postcondition">
-   <proof prover="1" timelimit="5"><result status="valid" time="0.10"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.10"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter rev_merge_rev.3" expl="3. postcondition">
-  <proof prover="1"><result status="valid" time="0.21"/></proof>
-  <proof prover="3"><result status="valid" time="0.18"/></proof>
+  <proof prover="0"><result status="valid" time="0.21"/></proof>
+  <proof prover="1"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.4" expl="4. postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.26"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="0.42"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.5" expl="5. postcondition">
-  <proof prover="8"><result status="valid" time="0.16"/></proof>
+  <proof prover="3"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.6" expl="6. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.7" expl="7. variant decrease">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.8" expl="8. precondition">
-  <proof prover="3" timelimit="10"><result status="valid" time="0.05"/></proof>
+  <proof prover="1" timelimit="10"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.9" expl="9. precondition">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.10" expl="10. precondition">
-  <proof prover="3"><result status="valid" time="0.63"/></proof>
+  <proof prover="1"><result status="valid" time="0.59"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.11" expl="11. postcondition">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.12" expl="12. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="2.21"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="1.86"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.13" expl="13. variant decrease">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.14" expl="14. precondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.34"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.34"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.15" expl="15. precondition">
-  <proof prover="8"><result status="valid" time="3.59"/></proof>
+  <proof prover="3"><result status="valid" time="3.59"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.16" expl="16. precondition">
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.17" expl="17. postcondition">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.18" expl="18. postcondition">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.52"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="0.52"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter prefix_length" expl="VC for prefix_length">
- <proof prover="8"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="WP_parameter prefix_append" expl="VC for prefix_append">
- <proof prover="8"><result status="valid" time="1.12"/></proof>
+ <proof prover="3"><result status="valid" time="1.12"/></proof>
  </goal>
  <goal name="WP_parameter chop" expl="VC for chop">
- <proof prover="8"><result status="valid" time="0.05"/></proof>
+ <proof prover="3"><result status="valid" time="0.05"/></proof>
  </goal>
  <goal name="WP_parameter sort" expl="VC for sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter sort.1" expl="1. postcondition">
-  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter sort.2" expl="2. postcondition">
-  <proof prover="8"><result status="valid" time="4.54"/></proof>
+  <proof prover="3"><result status="valid" time="5.35"/></proof>
   </goal>
   <goal name="WP_parameter sort.3" expl="3. unreachable point">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.4" expl="4. unreachable point">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.5" expl="5. postcondition">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter sort.6" expl="6. postcondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="2.54"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="2.77"/></proof>
   </goal>
   <goal name="WP_parameter sort.7" expl="7. postcondition">
-  <proof prover="3"><result status="valid" time="0.14"/></proof>
+  <proof prover="1"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="WP_parameter sort.8" expl="8. postcondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="2.95"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="2.95"/></proof>
   </goal>
   <goal name="WP_parameter sort.9" expl="9. postcondition">
-  <proof prover="3"><result status="valid" time="0.11"/></proof>
+  <proof prover="1"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="WP_parameter sort.10" expl="10. postcondition">
-  <proof prover="3"><result status="valid" time="2.29"/></proof>
+  <proof prover="1"><result status="valid" time="2.29"/></proof>
   </goal>
   <goal name="WP_parameter sort.11" expl="11. postcondition">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="1"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter sort.12" expl="12. postcondition">
-  <proof prover="3"><result status="valid" time="2.76"/></proof>
+  <proof prover="1"><result status="valid" time="3.20"/></proof>
   </goal>
   <goal name="WP_parameter sort.13" expl="13. unreachable point">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.14" expl="14. unreachable point">
-  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="WP_parameter sort.15" expl="15. unreachable point">
-  <proof prover="1"><result status="valid" time="0.12"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" timelimit="6"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="WP_parameter sort.16" expl="16. division by zero">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.17" expl="17. precondition">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter sort.18" expl="18. assertion">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.09"/></proof>
-  <proof prover="7"><result status="valid" time="0.41"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter sort.19" expl="19. variant decrease">
-  <proof prover="8"><result status="valid" time="0.20"/></proof>
+  <proof prover="3"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="WP_parameter sort.20" expl="20. precondition">
-  <proof prover="8"><result status="valid" time="0.22"/></proof>
+  <proof prover="3"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter sort.21" expl="21. variant decrease">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter sort.22" expl="22. precondition">
-  <proof prover="8"><result status="valid" time="0.24"/></proof>
+  <proof prover="3"><result status="valid" time="0.39"/></proof>
   </goal>
   <goal name="WP_parameter sort.23" expl="23. precondition">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter sort.24" expl="24. precondition">
-  <proof prover="8"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter sort.25" expl="25. precondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sort.26" expl="26. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter sort.27" expl="27. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.04"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter rev_sort" expl="VC for rev_sort">
  <transf name="split_goal_wp">
   <goal name="WP_parameter rev_sort.1" expl="1. postcondition">
-  <proof prover="3"><result status="valid" time="0.10"/></proof>
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.2" expl="2. postcondition">
-  <proof prover="8"><result status="valid" time="3.09"/></proof>
+  <proof prover="3"><result status="valid" time="3.77"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.3" expl="3. unreachable point">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter rev_sort.4" expl="4. unreachable point">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
+  <goal name="WP_parameter rev_sort.4" expl="4. unreachable point">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
   <goal name="WP_parameter rev_sort.5" expl="5. postcondition">
-  <proof prover="3"><result status="valid" time="0.38"/></proof>
+  <proof prover="1"><result status="valid" time="2.83"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.6" expl="6. postcondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="2.14"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="2.62"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.7" expl="7. postcondition">
-  <proof prover="3"><result status="valid" time="0.49"/></proof>
+  <proof prover="1"><result status="valid" time="0.49"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.8" expl="8. postcondition">
-  <proof prover="3"><result status="valid" time="2.99"/></proof>
+  <proof prover="1"><result status="valid" time="2.99"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.9" expl="9. postcondition">
-  <proof prover="3"><result status="valid" time="0.42"/></proof>
+  <proof prover="1"><result status="valid" time="2.72"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.10" expl="10. postcondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="2.10"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="2.61"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.11" expl="11. postcondition">
-  <proof prover="3"><result status="valid" time="0.48"/></proof>
+  <proof prover="1"><result status="valid" time="0.64"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.12" expl="12. postcondition">
-  <proof prover="3" timelimit="5"><result status="valid" time="2.62"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="3.04"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.13" expl="13. unreachable point">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.14" expl="14. unreachable point">
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.15" expl="15. unreachable point">
-  <proof prover="6"><result status="valid" time="0.08"/></proof>
-  <proof prover="7" timelimit="6"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.16" expl="16. division by zero">
-  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.17" expl="17. precondition">
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.18" expl="18. assertion">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.09"/></proof>
-  <proof prover="7"><result status="valid" time="0.41"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.19" expl="19. variant decrease">
-  <proof prover="8"><result status="valid" time="0.31"/></proof>
+  <proof prover="3"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.20" expl="20. precondition">
-  <proof prover="8"><result status="valid" time="0.22"/></proof>
+  <proof prover="3"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.21" expl="21. variant decrease">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.22" expl="22. precondition">
-  <proof prover="8"><result status="valid" time="0.24"/></proof>
+  <proof prover="3"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.23" expl="23. precondition">
-  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.24" expl="24. precondition">
-  <proof prover="8"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.25" expl="25. precondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.26" expl="26. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter rev_sort.27" expl="27. postcondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.03"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="permut_prefix">
  <transf name="induction_ty_lex">
   <goal name="permut_prefix.1" expl="1.">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.06"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.06"/></proof>
   </goal>
  </transf>
  </goal>
@@ -583,20 +1216,20 @@
    <goal name="WP_parameter mergesort.1.1" expl="1.">
    <transf name="induction_ty_lex">
     <goal name="WP_parameter mergesort.1.1.1" expl="1.">
-    <proof prover="8" timelimit="5"><result status="valid" time="0.02"/></proof>
+    <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="WP_parameter mergesort.1.2" expl="2.">
-   <proof prover="8" timelimit="5"><result status="valid" time="0.01"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter mergesort.2" expl="2. precondition">
-  <proof prover="8" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter mergesort.3" expl="3. postcondition">
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>

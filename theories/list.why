@@ -168,7 +168,7 @@ theory Append
   end
 
   lemma Append_assoc:
-    forall l1 l2 l3: list 'a.
+    forall l1 "induction" l2 l3: list 'a.
     l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
 
   lemma Append_l_nil:
@@ -178,12 +178,12 @@ theory Append
   use import int.Int
 
   lemma Append_length:
-    forall l1 l2: list 'a. length (l1 ++ l2) = length l1 + length l2
+    forall l1 "induction" l2: list 'a. length (l1 ++ l2) = length l1 + length l2
 
   use import Mem
 
   lemma mem_append:
-    forall x: 'a, l1 l2: list 'a.
+    forall x: 'a, l1 "induction" l2: list 'a.
     mem x (l1 ++ l2) <-> mem x l1 \/ mem x l2
 
   lemma mem_decomp:
@@ -204,7 +204,7 @@ theory NthLengthAppend
     i < length l1 -> nth i (l1 ++ l2) = nth i l1
 
   lemma nth_append_2:
-    forall l1 l2: list 'a, i: int.
+    forall l1 "induction" l2: list 'a, i: int.
     length l1 <= i -> nth i (l1 ++ l2) = nth (i - length l1) l2
 
 end
@@ -228,6 +228,11 @@ theory Reverse
   lemma reverse_cons:
     forall l: list 'a, x: 'a.
     reverse (Cons x l) = reverse l ++ Cons x Nil
+
+
+  lemma cons_reverse:
+    forall l: list 'a, x: 'a.
+    Cons x (reverse l) = reverse (l ++ Cons x Nil)
 
   lemma reverse_reverse:
     forall l: list 'a. reverse (reverse l) = l
@@ -259,24 +264,27 @@ theory RevAppend
   use import Append
 
   lemma rev_append_append_l:
-    forall r s t: list 'a.
+    forall r "induction" s t: list 'a.
       rev_append (r ++ s) t = rev_append s (rev_append r t)
 
-  lemma rev_append_append_r:
-    forall r s t: list 'a.
-      rev_append r (s ++ t) = rev_append (rev_append s r) t
+
 
   use import int.Int
   use import Length
 
   lemma rev_append_length:
-    forall s t: list 'a.
+    forall s "induction" t: list 'a.
       length (rev_append s t) = length s + length t
 
   use import Reverse
 
   lemma rev_append_def:
-    forall r s: list 'a. rev_append r s = reverse r ++ s
+    forall r "induction" s: list 'a. rev_append r s = reverse r ++ s
+
+
+  lemma rev_append_append_r:
+    forall r s t: list 'a.
+      rev_append r (s ++ t) = rev_append (rev_append s r) t
 
 end
 
@@ -302,6 +310,7 @@ theory Sorted
 
   type t
   predicate le t t
+  clone relations.Transitive with type t = t, predicate rel = le
 
   inductive sorted (l: list t) =
     | Sorted_Nil:
@@ -321,7 +330,7 @@ theory Sorted
   use import Append
 
   lemma sorted_append:
-    forall l1 l2: list t.
+    forall  l1 "induction" l2: list t.
     (sorted l1 /\ sorted l2 /\ (forall x y: t. mem x l1 -> mem y l2 -> le x y))
     <->
     sorted (l1 ++ l2)
@@ -333,7 +342,7 @@ end
 theory SortedInt
 
   use import int.Int
-  clone export Sorted with type t = int, predicate le = (<=)
+  clone export Sorted with type t = int, predicate le = (<=), goal Transitive.Trans
 
 end
 
@@ -341,12 +350,13 @@ theory RevSorted
 
   type t
   predicate le t t
+  clone import relations.Transitive with type t = t, predicate rel = le
   predicate ge (x y: t) = le y x
 
   use import List
 
-  clone Sorted as Incr with type t = t, predicate le = le
-  clone Sorted as Decr with type t = t, predicate le = ge
+  clone Sorted as Incr with type t = t, predicate le = le, goal Transitive.Trans
+  clone Sorted as Decr with type t = t, predicate le = ge, goal Transitive.Trans
 
   predicate compat (s t: list t) =
     match s, t with
@@ -357,12 +367,12 @@ theory RevSorted
   use import RevAppend
 
   lemma rev_append_sorted_incr:
-    forall s t: list t.
+    forall s "induction" t: list t.
       Incr.sorted (rev_append s t) <->
         Decr.sorted s /\ Incr.sorted t /\ compat s t
 
   lemma rev_append_sorted_decr:
-    forall s t: list t.
+    forall s "induction" t: list t.
       Decr.sorted (rev_append s t) <->
         Incr.sorted s /\ Decr.sorted t /\ compat t s
 
@@ -382,6 +392,8 @@ theory NumOcc
     end
   (** number of occurrences of [x] in [l] *)
 
+  lemma Num_Occ_Positive: forall x:'a, l: list 'a. num_occ x l >= 0
+
   use import Mem
 
   lemma Mem_Num_Occ :
@@ -390,7 +402,7 @@ theory NumOcc
   use import Append
 
   lemma Append_Num_Occ :
-    forall x: 'a, l1 l2: list 'a.
+    forall x: 'a, l1 "induction" l2: list 'a.
     num_occ x (l1 ++ l2) = num_occ x l1 + num_occ x l2
 
   use import Reverse
@@ -472,7 +484,7 @@ theory Distinct
   use import Append
 
   lemma distinct_append:
-    forall l1 l2: list 'a.
+    forall l1 "induction" l2: list 'a.
     distinct l1 -> distinct l2 -> (forall x:'a. mem x l1 -> not (mem x l2)) ->
     distinct (l1 ++ l2)
 
@@ -586,7 +598,6 @@ theory ListRich
   use export Append
   use export Reverse
   use export RevAppend
-  use export Sorted
   use export NumOcc
   use export Permut
 
