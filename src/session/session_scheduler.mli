@@ -113,7 +113,7 @@ module Make(O: OBSERVER) : sig
     allow_obsolete:bool ->
     release:bool ->
     use_shapes:bool ->
-    'key session ->
+    O.key session ->
     Env.env -> Whyconf.config ->
     O.key env_session * bool * bool
   (**

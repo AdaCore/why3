@@ -791,12 +791,23 @@ module Pairing(Old: S)(New: S) = struct
         end
       done
     end;
-    Array.to_list result
+    let detached =
+      List.fold_left
+        (fun acc x ->
+         if x.valid then
+           match x.elt with
+           | Old g -> g :: acc
+           | New _ -> acc
+         else acc)
+        [] allgoals
+    in
+    Debug.dprintf debug "[assoc] %d detached goals@." (List.length detached);
+    Array.to_list result, detached
 
-  let simple_associate (* ~obsolete *) oldgoals newgoals =
+  let simple_associate oldgoals newgoals =
     let rec aux acc o n =
       match o,n with
-        | _, [] -> acc
+        | old, [] -> acc,old
         | [], n :: rem_n -> aux ((n,None)::acc) [] rem_n
         | o :: rem_o, n :: rem_n -> aux ((n,Some(o,true))::acc) rem_o rem_n
     in

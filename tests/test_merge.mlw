@@ -1,15 +1,11 @@
 
 
-module M
-  
+theory T
+
   use import int.Int
 
-  lemma l1: 1 = 1
+  predicate p int
 
-  let f (x:int) : int 
-    ensures { result > 0 } 
-  =
-    (* assert { x > 0 }; *)
-    42
+  goal g: p 3 /\ p 4 /\ p 5
 
 end

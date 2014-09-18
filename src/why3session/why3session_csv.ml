@@ -117,7 +117,7 @@ let rec print_line fmt provers a =
 
 let run_one_normal filter_provers fmt fname =
   let project_dir = Session.get_project_dir fname in
-  let session,_use_shapes = Session.read_session project_dir in
+  let session,_use_shapes = Session.read_session_no_keys project_dir in
   let provers = Session.get_used_provers session in
   let provers =
     match filter_provers with
@@ -168,7 +168,7 @@ let grab_valid_time provers_time provers pa =
 
 let run_one_by_time provers_time filter_provers fname =
   let project_dir = Session.get_project_dir fname in
-  let session,_use_shapes = Session.read_session project_dir in
+  let session,_use_shapes = Session.read_session_no_keys project_dir in
   let provers = Session.get_used_provers session in
   let provers =
     match filter_provers with

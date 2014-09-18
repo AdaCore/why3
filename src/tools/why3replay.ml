@@ -401,7 +401,7 @@ let () =
     Debug.dprintf debug "Opening session...@?";
     O.verbose := Debug.test_flag debug;
     let env_session,found_obs,some_merge_miss =
-      let session, use_shapes = S.read_session project_dir in
+      let session, use_shapes = S.read_session ~keygen:O.create project_dir in
       M.update_session ~allow_obsolete:true ~release:false ~use_shapes
         session env config
     in

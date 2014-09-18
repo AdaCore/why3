@@ -127,7 +127,11 @@ and 'a transf = private
       mutable transf_goals : 'a goal list;
       (** Not mutated after the creation *)
       mutable transf_expanded : bool;
+      mutable transf_detached : 'a detached option;
     }
+
+and 'a detached = private
+    { detached_goals: 'a goal list; }
 
 and 'a theory = private
     { mutable theory_key : 'a;
@@ -139,6 +143,7 @@ and 'a theory = private
       mutable theory_verified : float option;
       mutable theory_expanded : bool;
       mutable theory_task : Theory.theory hide;
+      mutable theory_detached : 'a detached option;
     }
 
 and 'a file = private
@@ -180,14 +185,13 @@ val get_project_dir : string -> string
 
 (** {2 Read/Write} *)
 
-type notask
-(** A phantom type which is used for sessions which don't contain any task. The
-    only such sessions are sessions that come from {!read_session} *)
+type 'key keygen = ?parent:'key -> unit -> 'key
+(** type of functions which can generate keys *)
 
 exception ShapesFileError of string
 exception SessionFileError of string
 
-val read_session : string -> notask session * bool
+val read_session : keygen:'key keygen -> string -> 'key session * bool
 (** Read a session stored on the disk. It returns a session without any
     task attached to goals.
 
@@ -200,6 +204,8 @@ val read_session : string -> notask session * bool
     cannot be read.
 
 *)
+
+val read_session_no_keys: string -> unit session * bool
 
 val save_session : Whyconf.config -> 'key session -> unit
 (** Save a session on disk *)
@@ -235,9 +241,6 @@ val unload_provers : 'a env_session -> unit
 
 (** {2 Update session} *)
 
-type 'key keygen = ?parent:'key -> unit -> 'key
-(** type of functions which can generate keys *)
-
 exception OutdatedSession
 
 type 'key update_context =
@@ -247,7 +250,7 @@ type 'key update_context =
     keygen : 'key keygen;
   }
 
-val update_session : ctxt:'key update_context -> 'a session ->
+val update_session : ctxt:'key update_context -> 'key session ->
   Env.env -> Whyconf.config -> 'key env_session * bool * bool
 (** reload the given session with the given environnement :
     - the files are reloaded
