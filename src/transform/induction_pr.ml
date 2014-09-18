@@ -164,11 +164,12 @@ let induction_l label induct kn t =
     zip cindep (substitute_clause induct vsi ls argl goal c)) cl
 
 
-let induction_l label induct = function
-  | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
+let induction_l label induct task = match task with
+  | Some { task_decl ={ td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
 	   task_prev = prev;
 	   task_known = kn } ->
-    List.map (add_prop_decl prev Pgoal pr) (induction_l label induct kn f)
+    begin try List.map (add_prop_decl prev Pgoal pr) (induction_l label induct kn f)
+    with Ind_not_found -> [task] end
   | _ -> assert false
 
 
