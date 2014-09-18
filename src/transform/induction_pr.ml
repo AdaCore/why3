@@ -16,6 +16,9 @@ open Decl
 open Theory
 open Task
 
+let lab_ind = create_label "induction"
+let lab_inv = create_label "inversion"
+
 type context = {
  c_node : context_node;
  c_label: Slab.t;
@@ -52,15 +55,15 @@ let locate kn label t =
       let locate_rhs find_any =
         let ctx, ind, goal = locate_inductive find_any rhs in
         make_context (Cimplies (lhs, ctx)) t, ind, goal in
-      let slab () = Slab.filter (fun v -> v.lab_string = label) lhs.t_label
-      in if find_any || not (Slab.is_empty (slab ()))
+      let slab () = Slab.mem label lhs.t_label
+      in if find_any || (slab ())
         then
           match lhs.t_node with
             | Tapp (ls, argl) ->
               begin
                   match find_inductive_cases kn ls with
                     | []  -> locate_rhs find_any
-                    | cl  -> if find_any && Slab.is_empty (slab ()) then
+                    | cl  -> if find_any && not (slab ()) then
                         (* take first labeled inductive in rhs if any.
                            Otherwise, take lhs*)
                         try
@@ -88,7 +91,7 @@ let partition ctx vsi =
       aux ctx2 vsi_acc cindep cdep
     | Cforall (vsl, ctx2) ->
       let add c = function
-        | [] -> c
+        | []  -> c
         | vl  -> make_context_ctx (Cforall (vl, c)) ctx in
       let vsl = List.filter (fun v -> not (Mvs.mem v vsi)) vsl in
       let vdep, vindep = List.partition (fun v -> Mvs.mem v vsi_acc) vsl in
@@ -118,11 +121,11 @@ let introduce_equalities vsi paraml argl goal =
 
 let rec zip ctx goal = match ctx.c_node with
   | Hole -> goal
-  | Cimplies (t, ctx2) ->
+  | Cimplies (t, ctx2)  ->
     zip ctx2 (t_label ?loc:ctx.c_loc ctx.c_label (t_implies t goal))
   | Cforall (vsl, ctx2) ->
     zip ctx2 (t_label ?loc:ctx.c_loc ctx.c_label (t_forall_close vsl [] goal))
-  | Clet (vs, t, ctx2) ->
+  | Clet (vs, t, ctx2)  ->
     zip ctx2 (t_label ?loc:ctx.c_loc ctx.c_label (t_let_close vs t goal))
 
 
@@ -175,11 +178,11 @@ let induction_l label induct task = match task with
 
 
 let () =
-  Trans.register_transform_l "induction_pr" (Trans.store (induction_l "induction" true))
+  Trans.register_transform_l "induction_pr" (Trans.store (induction_l lab_ind true))
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ inductive@ predicates."
 
 let () =
-  Trans.register_transform_l "inversion_pr" (Trans.store (induction_l "inversion" false))
+  Trans.register_transform_l "inversion_pr" (Trans.store (induction_l lab_inv false))
     ~desc:"Invert@ inductive@ predicate."
 
 
