@@ -51,13 +51,13 @@ theory Imp
        if (aeval st a1) <= (aeval st a2) then True else False
    end
 
- lemma inversion_beval_t :
+(* lemma inversion_beval_t :
    forall a1 a2: aexpr, m: state.
     beval m (Beq a1 a2) = True -> aeval m a1 = aeval m a2
 
  lemma inversion_beval_f :
    forall a1 a2: aexpr, m: state.
-    beval m (Beq a1 a2) = False -> aeval m a1 <> aeval m a2
+    beval m (Beq a1 a2) = False -> aeval m a1 <> aeval m a2 *)
 
  inductive ceval state com state =
      (* skip *)
@@ -104,7 +104,9 @@ theory Imp
             ceval mi (Cwhile cond body) mf
 
 
-    lemma ceval_deterministic:
-      forall c mi mf1 mf2. ceval mi c mf1 -> ceval mi c mf2 -> mf1 = mf2
+     lemma ceval_deterministic_aux :
+      forall c mi mf1. ceval mi c mf1 -> forall mf2. ("inversion" ceval mi c mf2) -> mf1 = mf2
 
+    lemma ceval_deterministic :
+      forall c mi mf1 mf2. ceval mi c mf1 ->  ceval mi c mf2 -> mf1 = mf2
 end

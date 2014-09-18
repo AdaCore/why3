@@ -2,33 +2,32 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Vampire" version="0.6" timelimit="5" memlimit="1000"/>
 <file name="../vm.mlw" expanded="true">
-<theory name="ReflTransClosure" sum="858a40c1dde55e8befdaee8ae005e423">
- <goal name="transZero">
+<theory name="ReflTransClosure" sum="41f42e2f3926adcb698b8698151507f0" expanded="true">
+ <goal name="transition_star_one" expanded="true">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="transOne">
- <proof prover="0"><result status="valid" time="0.04"/></proof>
- </goal>
- <goal name="transition_star_one">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- </goal>
- <goal name="WP_parameter trans_star" expl="VC for trans_star">
- <proof prover="1"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="transition_star_transitive">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <goal name="transition_star_transitive" expanded="true">
+ <transf name="induction_pr" expanded="true">
+  <goal name="transition_star_transitive.1" expl="1.">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="transition_star_transitive.2" expl="2." expanded="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
-<theory name="Vm" sum="030cc7eb9172e9aca56370af11cf7236" expanded="true">
+<theory name="Vm" sum="ff0e2f36dbba20610ead4bbdaf34a210" expanded="true">
  <goal name="codeseq_at_app_right">
- <proof prover="2"><result status="valid" time="0.28"/></proof>
+ <proof prover="3"><result status="valid" time="0.28"/></proof>
  </goal>
  <goal name="codeseq_at_app_left">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 </file>

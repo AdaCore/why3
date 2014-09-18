@@ -179,7 +179,14 @@ module Compiler_logic
     requires { c.post = loop_preservation inv var post }
     ensures { result.pre = inv /\ result.post = forget_old post }
     ensures { result.code.length = c.code.length /\ hl_correctness result }
-  = { code = c.code ; pre = inv ; post = forget_old post }
+  =
+    let res = { code = c.code ; pre = inv ; post = forget_old post } in
+    assert { forall x p ms.  inv x p ms ->
+             acc (var x p) ms &&
+              exists ms'.
+               contextual_irrelevance res.code p ms ms' /\
+                forget_old post x p ms ms' };
+    res
 
 
 

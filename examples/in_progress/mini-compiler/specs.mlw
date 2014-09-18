@@ -61,25 +61,29 @@ module VM_arith_instr_spec
   constant ibinop_pre : 'a -> pos -> pred =
     \x p ms . exists n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m
 
-  lemma ibinop_pre_lemma:
+  meta rewrite_def function ibinop_pre
+
+  (*lemma ibinop_pre_lemma:
    forall x:'a, p ms. ibinop_pre x p ms =
     exists n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m
 
-  meta rewrite prop ibinop_pre_lemma
+  meta rewrite prop ibinop_pre_lemma*)
 
   function ibinop_post (op : binop) : 'a -> pos -> machine_state -> pred =
    \x p ms ms'. forall n1 n2 s m.
       ms  = VMS    p     (push n2 (push n1 s)) m  ->
       ms' = VMS (p + 1)  (push (op n1 n2) s)   m
 
-  lemma ibinop_post_lemma:
+  meta rewrite_def function ibinop_post
+
+  (*lemma ibinop_post_lemma:
    forall op, x:'a, p ms ms'.
     ibinop_post op x p ms ms' =
      forall n1 n2 s m.
       ms  = VMS    p     (push n2 (push n1 s)) m  ->
       ms' = VMS (p + 1)  (push (op n1 n2) s)   m
 
-  meta rewrite prop ibinop_post_lemma
+  meta rewrite prop ibinop_post_lemma*)
 
   let create_binop (code_binop: code) (ghost op : binop) : hl 'a
     requires {
@@ -181,6 +185,8 @@ module VM_bool_instr_spec
     (cond n1 n2 ->     ms' = VMS (p + ofs + 1)  s   m) /\
     (not cond n1 n2 -> ms' = VMS (p+1) s m)
 
+  meta rewrite_def function icjump_post
+(*
   lemma icjump_post_lemma:
    forall cond ofs, x:'a, p ms ms'.
     icjump_post cond ofs x p ms ms' =
@@ -189,25 +195,29 @@ module VM_bool_instr_spec
       (cond n1 n2 ->     ms' = VMS (p + ofs + 1)  s   m) /\
       (not cond n1 n2 -> ms' = VMS (p+1) s m)
 
-   meta rewrite prop icjump_post_lemma
+   meta rewrite prop icjump_post_lemma *)
 
 
 (*  binary Boolean operators specification (Ibeq, Ibne, Ible, Ibgt) *)
   constant beq : cond = \x y. x = y
-  lemma beq_lemma :  forall x y. beq x y = (x = y)
-  meta rewrite  prop beq_lemma
+  meta rewrite_def function beq
+  (*lemma beq_lemma :  forall x y. beq x y = (x = y)
+  meta rewrite  prop beq_lemma*)
 
   constant bne : cond = \x y. x <> y
-  lemma bne_lemma :  forall x y. bne x y = (x <> y)
-  meta rewrite  prop bne_lemma
+  meta rewrite_def function bne
+  (*lemma bne_lemma :  forall x y. bne x y = (x <> y)
+  meta rewrite  prop bne_lemma*)
 
   constant ble : cond = \x y. x <= y
-  lemma ble_lemma :  forall x y. ble x y = (x <= y)
-  meta rewrite  prop ble_lemma
+  meta rewrite_def function ble
+  (*lemma ble_lemma :  forall x y. ble x y = (x <= y)
+  meta rewrite  prop ble_lemma*)
 
   constant bgt : cond = \x y. x > y
-  lemma bgt_lemma :  forall x y. bgt x y = (x > y)
-  meta rewrite prop bgt_lemma
+  meta rewrite_def function bgt
+  (*lemma bgt_lemma :  forall x y. bgt x y = (x > y)
+  meta rewrite prop bgt_lemma*)
 
 
   let create_cjump (code_cond:code) (ghost cond:cond) (ghost ofs:pos) : hl 'a
@@ -260,25 +270,29 @@ let ibgtf (ofs : pos) : hl 'a
 constant isetvar_pre : 'a -> pos -> pred =
    \x p ms . exists n s m. ms = VMS p (push n s) m
 
-   lemma isetvar_pre_lemma:
+meta rewrite_def function isetvar_pre
+
+(*   lemma isetvar_pre_lemma:
     forall x:'a,  p ms. isetvar_pre x p ms =
      exists n s m. ms = VMS p (push n s) m
 
-    meta rewrite prop isetvar_pre_lemma
+    meta rewrite prop isetvar_pre_lemma *)
 
   function isetvar_post (x:id) : 'a -> pos -> post =
     \a p ms ms'. forall s n m.
      ms  = VMS   p       (push n s) m ->
      ms' = VMS (p+1)             s  m[ x <- n]
 
-    lemma isetvar_post_lemma:
+meta rewrite_def function isetvar_post
+
+ (*   lemma isetvar_post_lemma:
      forall x, a: 'a, p ms ms'.
       isetvar_post x a p ms ms' =
       forall s n m.
       ms  = VMS   p       (push n s) m ->
       ms' = VMS (p+1)             s  m[ x <- n]
 
-     meta rewrite prop isetvar_post_lemma
+     meta rewrite prop isetvar_post_lemma *)
 
  let isetvarf (x: id) : hl 'a
   ensures { result.pre  = isetvar_pre /\ result.post = isetvar_post x  }

@@ -5,6 +5,20 @@ module ReflTransClosure
   type state
   predicate transition parameter state state
 
+
+ inductive transition_star parameter (x y: state) =
+  | Refl: forall p x. transition_star p x x
+  | Step: forall p x y z.
+           transition p x y -> transition_star p y z -> transition_star p x z
+
+  lemma transition_star_one:
+   forall p:parameter, s1 s2:state. transition p s1 s2 -> transition_star p s1 s2
+
+  lemma transition_star_transitive:
+   forall p: parameter, s1 s2 s3:state.
+    transition_star p s1 s2 -> transition_star p s2 s3 -> transition_star p s1 s3
+
+(*
   (* proof object *)
   type trans =
    | TransZero
@@ -50,6 +64,8 @@ module ReflTransClosure
   (*lemma transOneSnoc  :
     forall p: parameter, s1 s2 s3: state.
      transition_star p s1 s2 -> transition p s2 s3 -> transition_star p s1 s3*)
+
+*)
 end
 
 
