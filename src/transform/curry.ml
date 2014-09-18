@@ -1,8 +1,5 @@
-open Ident
 open Term
 open Decl
-open Theory
-open Task
 
 
 let rec curry t = match t.t_node with
