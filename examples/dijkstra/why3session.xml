@@ -3,13 +3,15 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="15" memlimit="1000"/>
-<prover id="1" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.4pl4" timelimit="30" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="CVC3" version="2.2" timelimit="15" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
-<file name="../dijkstra.mlw" expanded="true">
-<theory name="DijkstraShortestPath" sum="189655dd1069a89e93126ccf56986f6e" expanded="true">
+<prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<prover id="7" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
+<file name="../dijkstra.mlw">
+<theory name="DijkstraShortestPath" sum="afa04af5de17123ae1f4e1a114b65d61">
  <goal name="WP_parameter relax" expl="VC for relax">
  <transf name="split_goal_wp">
   <goal name="WP_parameter relax.1" expl="1. postcondition">
@@ -27,22 +29,36 @@
  </transf>
  </goal>
  <goal name="Length_nonneg">
- <proof prover="1" edited="dijkstra_DijkstraShortestPath_Length_nonneg_1.v"><result status="valid" time="1.07"/></proof>
+ <transf name="induction_pr">
+  <goal name="Length_nonneg.1" expl="1.">
+  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="Length_nonneg.2" expl="2.">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="Path_inversion">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Path_shortest_path">
- <proof prover="1" edited="dijkstra_DijkstraShortestPath_Path_shortest_path_1.v"><result status="valid" time="1.26"/></proof>
+ <proof prover="1" timelimit="5" edited="dijkstra_DijkstraShortestPath_Path_shortest_path_1.v"><result status="valid" time="1.26"/></proof>
  </goal>
  <goal name="Main_lemma">
  <proof prover="3"><result status="valid" time="1.72"/></proof>
  </goal>
  <goal name="Completeness_lemma">
- <proof prover="1" edited="dijkstra_DijkstraShortestPath_Completeness_lemma_1.v"><result status="valid" time="1.17"/></proof>
+ <transf name="induction_pr">
+  <goal name="Completeness_lemma.1" expl="1.">
+  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="Completeness_lemma.2" expl="2.">
+  <proof prover="7"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="WP_parameter shortest_path_code" expl="VC for shortest_path_code" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter shortest_path_code" expl="VC for shortest_path_code">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter shortest_path_code.1" expl="1. loop invariant init">
   <proof prover="2"><result status="valid" time="0.20"/></proof>
   <proof prover="5"><result status="valid" time="0.14"/></proof>
@@ -136,7 +152,7 @@
     <proof prover="3"><result status="valid" time="0.42"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.12.1.7" expl="7.">
-    <proof prover="1" timelimit="30" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_2.v"><result status="valid" time="12.63"/></proof>
+    <proof prover="1" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_2.v"><result status="valid" time="12.63"/></proof>
     </goal>
    </transf>
    </goal>
@@ -170,8 +186,8 @@
   <goal name="WP_parameter shortest_path_code.16" expl="16. loop invariant preservation">
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter shortest_path_code.17" expl="17. loop invariant preservation" expanded="true">
-  <proof prover="1" timelimit="30" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_3.v"><result status="valid" time="2.40"/></proof>
+  <goal name="WP_parameter shortest_path_code.17" expl="17. loop invariant preservation">
+  <proof prover="1" edited="dijkstra_DijkstraShortestPath_WP_parameter_shortest_path_code_3.v"><result status="valid" time="2.40"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.18" expl="18. loop variant decrease">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
