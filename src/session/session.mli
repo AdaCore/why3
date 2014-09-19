@@ -191,7 +191,7 @@ type 'key keygen = ?parent:'key -> unit -> 'key
 exception ShapesFileError of string
 exception SessionFileError of string
 
-val read_session : keygen:'key keygen -> string -> 'key session * bool
+val read_session: string -> unit session * bool
 (** Read a session stored on the disk. It returns a session without any
     task attached to goals.
 
@@ -205,7 +205,6 @@ val read_session : keygen:'key keygen -> string -> 'key session * bool
 
 *)
 
-val read_session_no_keys: string -> unit session * bool
 
 val save_session : Whyconf.config -> 'key session -> unit
 (** Save a session on disk *)
@@ -250,7 +249,7 @@ type 'key update_context =
     keygen : 'key keygen;
   }
 
-val update_session : ctxt:'key update_context -> 'key session ->
+val update_session : ctxt:'key update_context -> 'oldkey session ->
   Env.env -> Whyconf.config -> 'key env_session * bool * bool
 (** reload the given session with the given environnement :
     - the files are reloaded

@@ -73,7 +73,7 @@ let read_env_spec () =
 
 let read_update_session ~allow_obsolete env config fname =
   let project_dir = S.get_project_dir fname in
-  let session,use_shapes = S.read_session_no_keys project_dir in
+  let session,use_shapes = S.read_session project_dir in
   let ctxt = {
     S.allow_obsolete_goals = allow_obsolete;
     S.release_tasks = false;

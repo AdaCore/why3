@@ -1600,7 +1600,7 @@ with e ->
     (Printexc.to_string e);
   Xml.from_file xml_filename, false
 
-let read_session ~keygen dir =
+let read_session_with_keys ~keygen dir =
   if not (Sys.file_exists dir && Sys.is_directory dir) then
     raise (SessionFileError (Pp.sprintf "%s is not an existing directory" dir));
   let xml_filename = Filename.concat dir db_filename in
@@ -1627,7 +1627,7 @@ let read_session ~keygen dir =
   in
   session, use_shapes
 
-let read_session_no_keys = read_session ~keygen:(fun ?parent:_ () -> ())
+let read_session = read_session_with_keys ~keygen:(fun ?parent:_ () -> ())
 
 (*******************************)
 (* Session modification        *)
@@ -2337,8 +2337,11 @@ and merge_trans ~ctxt ~theories env to_goal _ from_transf =
       | (_, None) ->
         found_missed_goals_in_theory := true)
       associated;
+(* TODO: we should copy the goal, using the new new type of keys
     if detached <> [] then
     to_transf.transf_detached <- Some { detached_goals = detached }
+ *)
+    ignore detached
   with Exit -> ()
 
 (** convert the ident from the old task to the ident at the same
@@ -2670,8 +2673,11 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
     add_goal_to_parent ~keygen env from_goal to_goal
   | (_, None) -> ()
   ) associated;
+(*
   if detached <> [] then
     to_transf.transf_detached <- Some { detached_goals = detached };
+ *)
+  ignore(detached);
   to_transf
 
 let get_project_dir fname =

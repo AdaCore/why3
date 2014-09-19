@@ -71,7 +71,7 @@ type context =
 
 let run_file (context : context) print_session fname =
   let project_dir = Session.get_project_dir fname in
-  let session,_use_shapes = Session.read_session_no_keys project_dir in
+  let session,_use_shapes = Session.read_session project_dir in
   let output_dir =
     if !output_dir = "" then project_dir else !output_dir
   in

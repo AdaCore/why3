@@ -812,7 +812,7 @@ let sched =
     Debug.dprintf debug "@[<hov 2>[GUI session] Opening session...@\n";
     let session,use_shapes =
       if Sys.file_exists project_dir then
-        S.read_session ~keygen:MA.create project_dir
+        S.read_session project_dir
       else
         S.create_session project_dir, false
     in
