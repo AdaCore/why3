@@ -2022,57 +2022,14 @@ let print_external_proof fmt p =
 
 (** Pairing *)
 
-module AssoGoals : sig
-  val set_use_shapes : bool -> unit
-  val associate :
-    'a goal list -> 'b goal list ->
-    ('b goal * ('a goal * bool) option) list * 'a goal list
-end = struct
-(** When Why3 will require 3.12 put all of that in a function using
-    explicit type argument "(type t)" and remove all the Obj.magic *)
-
-  module ToGoal = struct
-    (** The functor can't be instantiated with an 'a t so we will give
-        a t *)
-    type tto (** will represent any type *)
-    type t = tto goal
-    let checksum g = g.goal_checksum
-    let shape g    = g.goal_shape
-    let name g     = g.goal_name
-  end
-  module FromGoal = struct
-    (** The functor can't be instantiated with an 'a t so we will give
-        a t *)
-    type ffrom (** will represent any type *)
-    type t = ffrom goal
-    let checksum g = g.goal_checksum
-    let shape g    = g.goal_shape
-    let name g     = g.goal_name
+module Goal = struct
+  type 'a t = 'a goal
+  let checksum g = g.goal_checksum
+  let shape g    = g.goal_shape
+  let name g     = g.goal_name
   end
 
-  module AssoGoals = Tc.Pairing(FromGoal)(ToGoal)
-  open ToGoal
-  open FromGoal
-
-  let use_shapes = ref true
-  let set_use_shapes b = use_shapes := b
-
-  let associate
-      (from_goals: 'ffrom goal list) (to_goals: 'tto goal list) :
-      ('tto goal * ('ffrom goal * bool) option) list * 'ffrom goal list =
-    let from_goals : ffrom goal list =
-      Obj.magic (from_goals : 'ffrom goal list) in
-    let to_goals   : tto goal list =
-      Obj.magic (to_goals : 'tto goal list) in
-    let associated :
-          (tto goal * (ffrom goal * bool) option) list * ffrom goal list =
-      AssoGoals.associate
-        ~use_shapes:!use_shapes from_goals to_goals
-    in
-    (Obj.magic associated : 
-       ('tto goal * ('ffrom goal * bool) option) list * ('ffrom goal list))
-
-end
+module AssoGoals = Tc.Pairing(Goal)(Goal)
 
 (**********************************)
 (* merge a file into another      *)
@@ -2328,7 +2285,7 @@ and merge_trans ~ctxt ~theories env to_goal _ from_transf =
     let associated,detached =
       Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
         env.session.session_shape_version;
-      AssoGoals.associate
+      AssoGoals.associate ~use_shapes:ctxt.use_shapes_for_pairing_sub_goals
         from_transf.transf_goals to_transf.transf_goals
     in
     List.iter (function
@@ -2500,7 +2457,9 @@ let recompute_all_shapes ~release session =
 let update_session ~ctxt old_session env whyconf =
   Debug.dprintf debug "[Info] update_session: shape_version = %d@\n"
     old_session.session_shape_version;
+(*
   AssoGoals.set_use_shapes ctxt.use_shapes_for_pairing_sub_goals;
+ *)
   let new_session =
     create_session ~shape_version:old_session.session_shape_version
       old_session.session_dir
@@ -2666,7 +2625,7 @@ and add_transf_to_goal ~keygen env to_goal from_transf =
   let associated,detached =
     Debug.dprintf debug "[Info] associate_subgoals, shape_version = %d@\n"
       env.session.session_shape_version;
-    AssoGoals.associate
+    AssoGoals.associate ~use_shapes:false
       from_transf.transf_goals to_transf.transf_goals in
   List.iter (function
   | (to_goal, Some (from_goal, _obsolete)) ->

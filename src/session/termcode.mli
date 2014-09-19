@@ -46,23 +46,19 @@ val buffer_checksum : Buffer.t -> checksum
 
 val task_checksum : ?version:int -> Task.task -> checksum
 
-(* not used anymore
-val theory_checksum : ?version:int -> Theory.theory -> checksum
- *)
-
 (** Pairing algorithm *)
 
 module type S = sig
-  type t
-  val checksum : t -> checksum option
-  val shape    : t -> shape
-  val name     : t -> Ident.ident
+  type 'a t
+  val checksum : 'a t -> checksum option
+  val shape    : 'a t -> shape
+  val name     : 'a t -> Ident.ident
 end
 
 module Pairing(Old: S)(New: S) : sig
   val associate:
-    use_shapes:bool -> Old.t list -> New.t list ->
-    (New.t * (Old.t * bool) option) list * Old.t list
+    use_shapes:bool -> 'a Old.t list -> 'b New.t list ->
+    ('b New.t * ('a Old.t * bool) option) list * 'a Old.t list
     (** Associate new goals to (possibly) old goals
         Each new goal is mapped either to
         - [None]: no old goal associated
