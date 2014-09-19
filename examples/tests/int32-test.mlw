@@ -1,0 +1,11 @@
+
+module TestInt32
+
+  use import mach.int.Int32
+
+  let mask_111 (x: int32) : int32
+    ensures { 0 <= to_int result < 8 }
+  =
+    of_bv (BV32.bw_and (to_bv x) (BV32.of_int 7))
+
+end

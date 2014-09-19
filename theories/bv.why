@@ -1,0 +1,104 @@
+
+(** {1 Bit vectors} *)
+
+(** {2 Generic theory (arbitrary length)} *)
+
+theory BitVector
+
+  use export bool.Bool
+  use import int.Int
+
+  constant size : int
+
+  axiom size_pos: size > 0
+
+  type t
+
+  function nth t int: bool
+
+  constant zero : t
+  axiom Nth_zero:
+    forall n:int. 0 <= n < size -> nth zero n = False
+
+  constant one : t
+  axiom Nth_one:
+    forall n:int. 0 <= n < size -> nth one n = True
+
+  predicate eq (v1 v2 : t) =
+    forall n:int. 0 <= n < size -> nth v1 n = nth v2 n
+
+  function bw_and (v1 v2 : t) : t
+  axiom Nth_bw_and:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
+
+  (** logical shift right *)
+  function lsr t int : t
+
+  axiom Lsr_nth_low:
+    forall b:t,n s:int. 0 <= n+s < size -> nth (lsr b s) n = nth b (n+s)
+
+  axiom Lsr_nth_high:
+    forall b:t,n s:int. n+s >= size -> nth (lsr b s) n = False
+
+  (** arithmetic shift right *)
+  function asr t int : t
+
+  axiom Asr_nth_low:
+    forall b:t,n s:int. 0 <= n+s < size -> nth (asr b s) n = nth b (n+s)
+
+  axiom Asr_nth_high:
+    forall b:t,n s:int. n+s >= size -> nth (asr b s) n = nth b (size-1)
+
+  (** logical shift left *)
+  function lsl t int : t
+
+  axiom Lsl_nth_high:
+    forall b:t,n s:int. 0 <= n-s < size -> nth (lsl b s) n = nth b (n-s)
+
+  axiom Lsl_nth_low:
+    forall b:t,n s:int. n-s < 0 -> nth (lsl b s) n = False
+
+  function to_int t: int
+
+  (* TODO? axiom - power 2 (size-1) <= to_int b < power 2 (size-1) *)
+
+  function to_uint t: int
+
+  (* TODO? axiom 0 <= to_int b < power 2 size *)
+
+  function of_int int: t
+
+  (* TODO? axioms related to_int/to_unit and of_int *)
+
+end
+
+(** {2 31-bits Bitvectors} *)
+
+theory BV31
+  constant size: int = 31
+  clone export BitVector with constant size = size, goal size_pos
+end
+
+(** {2 32-bits Bitvectors} *)
+
+theory BV32
+  constant size: int = 32
+  clone export BitVector with constant size = size, goal size_pos
+end
+
+(** {2 63-bits Bitvectors} *)
+
+theory BV63
+  constant size: int = 63
+  clone export BitVector with constant size = size, goal size_pos
+end
+
+(** {2 64-bits Bitvectors} *)
+
+theory BV64
+  constant size: int = 64
+  clone export BitVector with constant size = size, goal size_pos
+end
+
+
