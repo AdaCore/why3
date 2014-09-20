@@ -16,11 +16,6 @@ endif
 
 include $(WHY3SHARE)/Makefile.config
 
-ifeq ($(BENCH),yes)
-  INCLUDE += -I ../../lib/why3
-endif
-
-
 MAIN = main
 OBJ = defunctionalization__Expr \
 	defunctionalization__DirectSem \
@@ -30,10 +25,6 @@ OBJ = defunctionalization__Expr \
 ML  = $(addsuffix .ml, $(OBJ))
 CMO = $(addsuffix .cmo, $(OBJ))
 CMX = $(addsuffix .cmx, $(OBJ))
-
-
-ZARITH = $(shell ocamlfind query -i-format zarith)
-NUMLIB = zarith
 
 OCAMLOPT = ocamlopt -noassert -inline 1000
 
@@ -47,10 +38,10 @@ doc:
 	@echo firefox ../defunctionalization.html why3session.html
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
-	ocamlc -g $(ZARITH) $(INCLUDE) $(NUMLIB).cma why3extract.cma -o $@ $^
+	ocamlc -g $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ $^
 
 $(MAIN).opt: $(CMX) $(MAIN).cmx
-	$(OCAMLOPT) $(ZARITH) $(INCLUDE) $(NUMLIB).cmxa why3extract.cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
@@ -68,4 +59,3 @@ $(ML): ../defunctionalization.mlw
 
 clean::
 	rm -f $(ML) *.cm[xio] $(MAIN).opt
-
