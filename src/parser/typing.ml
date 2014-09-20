@@ -56,13 +56,13 @@ let qloc_last = function
   | Qdot (_, id) | Qident id -> id.id_loc
 
 let rec print_qualid fmt = function
-  | Qdot (p, id) -> Format.fprintf fmt "%a.%s" print_qualid p id.id
-  | Qident id    -> Format.fprintf fmt "%s" id.id
+  | Qdot (p, id) -> Format.fprintf fmt "%a.%s" print_qualid p id.id_str
+  | Qident id    -> Format.fprintf fmt "%s" id.id_str
 
 let string_list_of_qualid q =
   let rec sloq acc = function
-    | Qdot (p, id) -> sloq (id.id :: acc) p
-    | Qident id -> id.id :: acc in
+    | Qdot (p, id) -> sloq (id.id_str :: acc) p
+    | Qident id -> id.id_str :: acc in
   sloq [] q
 
 exception UnboundSymbol of qualid
@@ -101,33 +101,33 @@ let find_namespace_ns ns q =
 
 let ty_of_pty ?(noop=true) uc pty =
   let rec get_ty = function
-    | PPTtyvar ({id_loc = loc}, true) when noop ->
+    | PTtyvar ({id_loc = loc}, true) when noop ->
         Loc.errorm ~loc "Opaqueness@ annotations@ are@ only@ \
           allowed@ in@ function@ and@ predicate@ prototypes"
-    | PPTtyvar ({id = x}, _) ->
+    | PTtyvar ({id_str = x}, _) ->
         ty_var (tv_of_string x)
-    | PPTtyapp (q, tyl) ->
+    | PTtyapp (q, tyl) ->
         let ts = find_tysymbol uc q in
         let tyl = List.map get_ty tyl in
         Loc.try2 ~loc:(qloc q) ty_app ts tyl
-    | PPTtuple tyl ->
+    | PTtuple tyl ->
         let ts = ts_tuple (List.length tyl) in
         ty_app ts (List.map get_ty tyl)
-    | PPTarrow (ty1, ty2) ->
+    | PTarrow (ty1, ty2) ->
         ty_func (get_ty ty1) (get_ty ty2)
-    | PPTparen ty ->
+    | PTparen ty ->
         get_ty ty
   in
   get_ty pty
 
 let opaque_tvs args =
   let rec opaque_tvs acc = function
-    | PPTtyvar (id, true) -> Stv.add (tv_of_string id.id) acc
-    | PPTtyvar (_, false) -> acc
-    | PPTtyapp (_, pl)
-    | PPTtuple pl -> List.fold_left opaque_tvs acc pl
-    | PPTarrow (ty1, ty2) -> opaque_tvs (opaque_tvs acc ty1) ty2
-    | PPTparen ty -> opaque_tvs acc ty in
+    | PTtyvar (id, true) -> Stv.add (tv_of_string id.id_str) acc
+    | PTtyvar (_, false) -> acc
+    | PTtyapp (_, pl)
+    | PTtuple pl -> List.fold_left opaque_tvs acc pl
+    | PTarrow (ty1, ty2) -> opaque_tvs (opaque_tvs acc ty1) ty2
+    | PTparen ty -> opaque_tvs acc ty in
   List.fold_left (fun acc (_,_,_,ty) -> opaque_tvs acc ty) Stv.empty args
 
 (** typing using destructive type variables
@@ -141,7 +141,7 @@ let opaque_tvs args =
 
 (** Typing patterns, terms, and formulas *)
 
-let create_user_id {id = n; id_lab = label; id_loc = loc} =
+let create_user_id {id_str = n; id_lab = label; id_loc = loc} =
   let get_labels (label, loc) = function
     | Lstr lab -> Slab.add lab label, loc | Lpos loc -> label, loc in
   let label,loc = List.fold_left get_labels (Slab.empty,loc) label in
@@ -155,27 +155,32 @@ let parse_record ~loc uc get_val fl =
 
 let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
   Dterm.dpattern ~loc (match desc with
-    | PPpwild -> DPwild
-    | PPpvar x -> DPvar (create_user_id x)
-    | PPpapp (q,pl) ->
+    | Ptree.Pwild -> DPwild
+    | Ptree.Pvar x -> DPvar (create_user_id x)
+    | Ptree.Papp (q,pl) ->
         let pl = List.map (dpattern uc) pl in
         DPapp (find_lsymbol uc q, pl)
-    | PPptuple pl ->
+    | Ptree.Ptuple pl ->
         let pl = List.map (dpattern uc) pl in
         DPapp (fs_tuple (List.length pl), pl)
-    | PPprec fl ->
+    | Ptree.Prec fl ->
         let get_val _ _ = function
           | Some p -> dpattern uc p
           | None -> Dterm.dpattern DPwild in
         let cs,fl = parse_record ~loc uc get_val fl in
         DPapp (cs,fl)
-    | PPpas (p, x) -> DPas (dpattern uc p, create_user_id x)
-    | PPpor (p, q) -> DPor (dpattern uc p, dpattern uc q))
+    | Ptree.Pas (p, x) -> DPas (dpattern uc p, create_user_id x)
+    | Ptree.Por (p, q) -> DPor (dpattern uc p, dpattern uc q))
 
-let quant_var uc (x,ty) =
-  create_user_id x, match ty with
+let quant_var uc (loc, id, gh, ty) =
+  assert (not gh);
+  let id = match id with
+    | Some x -> create_user_id x
+    | None -> id_user "_" loc in
+  let ty = match ty with
     | Some ty -> dty_of_ty (ty_of_pty uc ty)
-    | None -> dty_fresh ()
+    | None    -> dty_fresh () in
+  id, ty
 
 let is_reusable dt = match dt.dt_node with
   | DTvar _ | DTgvar _ | DTconst _ | DTtrue | DTfalse -> true
@@ -193,7 +198,7 @@ let mk_let ~loc n dt node =
 
 let chainable_op uc op =
   (* non-bool -> non-bool -> bool *)
-  op.id = "infix =" || op.id = "infix <>" ||
+  op.id_str = "infix =" || op.id_str = "infix <>" ||
   match find_lsymbol uc (Qident op) with
   | {ls_args = [ty1;ty2]; ls_value = ty} ->
       Opt.fold (fun _ ty -> ty_equal ty ty_bool) true ty
@@ -216,7 +221,7 @@ let mk_closure loc ls =
   let f = DTapp (ps_equ, [mk e; mk (DTapp (ls, tl))]) in
   DTeps (id, dty, mk (DTquant (Tforall, vl, [], mk f)))
 
-let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
+let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
   let func_app e el =
     List.fold_left (fun e1 (loc, e2) ->
       DTfapp (Dterm.dterm ~loc e1, e2)) e el
@@ -233,36 +238,36 @@ let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
         apply_ls (qloc q) ls [] ls.ls_args el
   in
   let qualid_app q el = match q with
-    | Qident {id = n} ->
+    | Qident {id_str = n} ->
         (match denv_get_opt denv n with
         | Some d -> func_app d el
         | None -> qualid_app q el)
     | _ -> qualid_app q el
   in
-  let rec unfold_app e1 e2 el = match e1.pp_desc with
-    | PPapply (e11,e12) ->
+  let rec unfold_app e1 e2 el = match e1.term_desc with
+    | Tapply (e11,e12) ->
         let e12 = dterm uc gvars denv e12 in
-        unfold_app e11 e12 ((e1.pp_loc, e2)::el)
-    | PPident q ->
-        qualid_app q ((e1.pp_loc, e2)::el)
+        unfold_app e11 e12 ((e1.term_loc, e2)::el)
+    | Tident q ->
+        qualid_app q ((e1.term_loc, e2)::el)
     | _ ->
         func_app (DTfapp (dterm uc gvars denv e1, e2)) el
   in
   Dterm.dterm ~loc (match desc with
-  | PPident q ->
+  | Ptree.Tident q ->
       qualid_app q []
-  | PPidapp (q, tl) ->
+  | Ptree.Tidapp (q, tl) ->
       let tl = List.map (dterm uc gvars denv) tl in
       DTapp (find_lsymbol uc q, tl)
-  | PPapply (e1, e2) ->
+  | Ptree.Tapply (e1, e2) ->
       unfold_app e1 (dterm uc gvars denv e2) []
-  | PPtuple tl ->
+  | Ptree.Ttuple tl ->
       let tl = List.map (dterm uc gvars denv) tl in
       DTapp (fs_tuple (List.length tl), tl)
-  | PPinfix (e12, op2, e3)
-  | PPinnfix (e12, op2, e3) ->
-      let make_app de1 op de2 = if op.id = "infix <>" then
-        let op = { op with id = "infix =" } in
+  | Ptree.Tinfix (e12, op2, e3)
+  | Ptree.Tinnfix (e12, op2, e3) ->
+      let make_app de1 op de2 = if op.id_str = "infix <>" then
+        let op = { op with id_str = "infix =" } in
         let ls = find_lsymbol uc (Qident op) in
         DTnot (Dterm.dterm ~loc (DTapp (ls, [de1;de2])))
       else
@@ -276,77 +281,77 @@ let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
             let de23 = Dterm.dterm ~loc (make_chain de2 ch) in
             DTbinop (DTand, de12, de23)
         | [] -> assert false in
-      let rec get_chain e12 acc = match e12.pp_desc with
-        | PPinfix (e1, op1, e2) when chainable_op uc op1 ->
+      let rec get_chain e12 acc = match e12.term_desc with
+        | Tinfix (e1, op1, e2) when chainable_op uc op1 ->
             get_chain e1 ((op1, dterm uc gvars denv e2) :: acc)
         | _ -> e12, acc in
       let ch = [op2, dterm uc gvars denv e3] in
       let e1, ch = if chainable_op uc op2
         then get_chain e12 ch else e12, ch in
       make_chain (dterm uc gvars denv e1) ch
-  | PPconst c ->
+  | Ptree.Tconst c ->
       DTconst c
-  | PPlet (x, e1, e2) ->
+  | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm uc gvars denv e1 in
       let denv = denv_add_let denv e1 id in
       let e2 = dterm uc gvars denv e2 in
       DTlet (e1, id, e2)
-  | PPmatch (e1, bl) ->
+  | Ptree.Tmatch (e1, bl) ->
       let e1 = dterm uc gvars denv e1 in
       let branch (p, e) =
         let p = dpattern uc p in
         let denv = denv_add_pat denv p in
         p, dterm uc gvars denv e in
       DTcase (e1, List.map branch bl)
-  | PPif (e1, e2, e3) ->
+  | Ptree.Tif (e1, e2, e3) ->
       let e1 = dterm uc gvars denv e1 in
       let e2 = dterm uc gvars denv e2 in
       let e3 = dterm uc gvars denv e3 in
       DTif (e1, e2, e3)
-  | PPtrue ->
+  | Ptree.Ttrue ->
       DTtrue
-  | PPfalse ->
+  | Ptree.Tfalse ->
       DTfalse
-  | PPunop (PPnot, e1) ->
+  | Ptree.Tunop (Ptree.Tnot, e1) ->
       DTnot (dterm uc gvars denv e1)
-  | PPbinop (e1, op, e2) ->
+  | Ptree.Tbinop (e1, op, e2) ->
       let e1 = dterm uc gvars denv e1 in
       let e2 = dterm uc gvars denv e2 in
       let op = match op with
-        | PPand -> DTand
-        | PPand_asym -> DTand_asym
-        | PPor -> DTor
-        | PPor_asym -> DTor_asym
-        | PPimplies -> DTimplies
-        | PPiff -> DTiff in
+        | Ptree.Tand -> DTand
+        | Ptree.Tand_asym -> DTand_asym
+        | Ptree.Tor -> DTor
+        | Ptree.Tor_asym -> DTor_asym
+        | Ptree.Timplies -> DTimplies
+        | Ptree.Tiff -> DTiff in
       DTbinop (op, e1, e2)
-  | PPquant (q, uqu, trl, e1) ->
+  | Ptree.Tquant (q, uqu, trl, e1) ->
       let qvl = List.map (quant_var uc) uqu in
       let denv = denv_add_quant denv qvl in
       let dterm e = dterm uc gvars denv e in
       let trl = List.map (List.map dterm) trl in
       let e1 = dterm e1 in
       begin match q with
-        | PPforall -> DTquant (Tforall, qvl, trl, e1)
-        | PPexists -> DTquant (Texists, qvl, trl, e1)
-        | PPlambda ->
+        | Ptree.Tforall -> DTquant (Term.Tforall, qvl, trl, e1)
+        | Ptree.Texists -> DTquant (Term.Texists, qvl, trl, e1)
+        | Ptree.Tlambda ->
             let id = id_user "fc" loc and dty = dty_fresh () in
-            let add acc ({id = x}, _) =
-              let arg = Dterm.dterm ~loc (denv_get denv x) in
+            let add acc (x, _) =
+              let arg = Dterm.dterm ~loc (denv_get denv (preid_name x)) in
               DTapp (fs_func_app, [Dterm.dterm ~loc acc; arg]) in
-            let app = List.fold_left add (DTvar ("fc",dty)) uqu in
+            let app = List.fold_left add (DTvar ("fc",dty)) qvl in
             let f = DTapp (ps_equ, [Dterm.dterm ~loc app; e1]) in
             let f = DTquant (Tforall, qvl, trl, Dterm.dterm ~loc f) in
             DTeps (id, dty, Dterm.dterm ~loc f)
       end
-  | PPrecord fl ->
+  | Ptree.Trecord fl ->
       let get_val cs pj = function
         | Some e -> dterm uc gvars denv e
         | None -> Loc.error ~loc (RecordFieldMissing (cs,pj)) in
       let cs, fl = parse_record ~loc uc get_val fl in
       DTapp (cs, fl)
-  | PPupdate (e1, fl) ->
+  | Ptree.Tupdate (e1, fl) ->
       let e1 = dterm uc gvars denv e1 in
       let re = is_reusable e1 in
       let v = if re then e1 else mk_var "_q " e1 in
@@ -356,11 +361,11 @@ let rec dterm uc gvars denv {pp_desc = desc; pp_loc = loc} =
       let cs, fl = parse_record ~loc uc get_val fl in
       let d = DTapp (cs, fl) in
       if re then d else mk_let ~loc "_q " e1 d
-  | PPnamed (Lpos uloc, e1) ->
+  | Ptree.Tnamed (Lpos uloc, e1) ->
       DTuloc (dterm uc gvars denv e1, uloc)
-  | PPnamed (Lstr lab, e1) ->
+  | Ptree.Tnamed (Lstr lab, e1) ->
       DTlabel (dterm uc gvars denv e1, Slab.singleton lab)
-  | PPcast (e1, ty) ->
+  | Ptree.Tcast (e1, ty) ->
       DTcast (dterm uc gvars denv e1, ty_of_pty uc ty))
 
 (** Export for program parsing *)
@@ -385,7 +390,7 @@ let tyl_of_params ?(noop=false) uc pl =
 let add_types dl th =
   let def = List.fold_left
     (fun def d ->
-      let id = d.td_ident.id in
+      let id = d.td_ident.id_str in
       Mstr.add_new (Loc.Located (d.td_loc, ClashSymbol id)) id d def)
     Mstr.empty dl
   in
@@ -400,35 +405,35 @@ let add_types dl th =
       Hstr.add tysymbols x None;
       let vars = Hstr.create 17 in
       let vl = List.map (fun id ->
-        if Hstr.mem vars id.id then
-          Loc.error ~loc:id.id_loc (DuplicateTypeVar id.id);
-        let i = tv_of_string id.id in
-        Hstr.add vars id.id i;
+        if Hstr.mem vars id.id_str then
+          Loc.error ~loc:id.id_loc (DuplicateTypeVar id.id_str);
+        let i = tv_of_string id.id_str in
+        Hstr.add vars id.id_str i;
         i) d.td_params
       in
       let id = create_user_id d.td_ident in
       let ts = match d.td_def with
         | TDalias ty ->
             let rec apply = function
-              | PPTtyvar (v, _) ->
+              | PTtyvar (v, _) ->
                   begin
-                    try ty_var (Hstr.find vars v.id) with Not_found ->
-                      Loc.error ~loc:v.id_loc (UnboundTypeVar v.id)
+                    try ty_var (Hstr.find vars v.id_str) with Not_found ->
+                      Loc.error ~loc:v.id_loc (UnboundTypeVar v.id_str)
                   end
-              | PPTtyapp (q, tyl) ->
+              | PTtyapp (q, tyl) ->
                   let ts = match q with
-                    | Qident x when Mstr.mem x.id def ->
-                        visit x.id
+                    | Qident x when Mstr.mem x.id_str def ->
+                        visit x.id_str
                     | Qident _ | Qdot _ ->
                         find_tysymbol th q
                   in
                   Loc.try2 ~loc:(qloc q) ty_app ts (List.map apply tyl)
-              | PPTtuple tyl ->
+              | PTtuple tyl ->
                   let ts = ts_tuple (List.length tyl) in
                   ty_app ts (List.map apply tyl)
-              | PPTarrow (ty1, ty2) ->
+              | PTarrow (ty1, ty2) ->
                   ty_func (apply ty1) (apply ty2)
-              | PPTparen ty ->
+              | PTparen ty ->
                   apply ty
             in
             create_tysymbol id vl (Some (apply ty))
@@ -442,7 +447,7 @@ let add_types dl th =
   in
   let th' =
     let add_ts (abstr,alias) d =
-      let ts = visit d.td_ident.id in
+      let ts = visit d.td_ident.id_str in
       if ts.ts_def = None then ts::abstr, alias else abstr, ts::alias in
     let abstr,alias = List.fold_left add_ts ([],[]) dl in
     try
@@ -454,7 +459,7 @@ let add_types dl th =
   in
   let csymbols = Hstr.create 17 in
   let decl d (abstr,algeb,alias) =
-    let ts = match Hstr.find tysymbols d.td_ident.id with
+    let ts = match Hstr.find tysymbols d.td_ident.id_str with
       | None ->
           assert false
       | Some ts ->
@@ -470,7 +475,7 @@ let add_types dl th =
           let ty = ty_app ts (List.map ty_var ts.ts_args) in
           let projection (_,id,_,_) fty = match id with
             | None -> None
-            | Some ({ id = x; id_loc = loc } as id) ->
+            | Some ({ id_str = x; id_loc = loc } as id) ->
                 try
                   let pj = Hstr.find ht x in
                   let ty = Opt.get pj.ls_value in
@@ -486,7 +491,7 @@ let add_types dl th =
           let constructor (loc, id, pl) =
             let tyl = tyl_of_params ~noop:true th' pl in
             let pjl = List.map2 projection pl tyl in
-            Hstr.replace csymbols id.id loc;
+            Hstr.replace csymbols id.id_str loc;
             create_fsymbol ~opaque ~constr (create_user_id id) tyl ty, pjl
           in
           abstr, (ts, List.map constructor cl) :: algeb, alias
@@ -525,7 +530,7 @@ let prepare_typedef td =
         loc, Some id, false, ty
       in
       (* constructor for type t is "mk t" (and not String.capitalize t) *)
-      let id = { td.td_ident with id = "mk " ^ td.td_ident.id } in
+      let id = { td.td_ident with id_str = "mk " ^ td.td_ident.id_str } in
       { td with td_def = TDalgebraic [td.td_loc, id, List.map field fl] }
 
 let add_types dl th =
@@ -535,7 +540,7 @@ let add_logics dl th =
   let lsymbols = Hstr.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol th d =
-    let id = d.ld_ident.id in
+    let id = d.ld_ident.id_str in
     let v = create_user_id d.ld_ident in
     let pl = tyl_of_params th d.ld_params in
     let ty = Opt.map (ty_of_pty th) d.ld_type in
@@ -553,7 +558,7 @@ let add_logics dl th =
   let th' = List.fold_left create_symbol th dl in
   (* 2. then type-check all definitions *)
   let type_decl d (abst,defn) =
-    let id = d.ld_ident.id in
+    let id = d.ld_ident.id_str in
     let ls = Hstr.find lsymbols id in
     let create_var (loc,x,_,_) ty =
       let id = match x with
@@ -562,7 +567,7 @@ let add_logics dl th =
       create_vsymbol id ty in
     let vl = List.map2 create_var d.ld_params ls.ls_args in
     let add_var mvs (_,x,_,_) vs = match x with
-      | Some {id = id} -> Mstr.add_new (DuplicateVar id) id (DTgvar vs) mvs
+      | Some {id_str = x} -> Mstr.add_new (DuplicateVar x) x (DTgvar vs) mvs
       | None -> mvs in
     let denv = List.fold_left2 add_var denv_empty d.ld_params vl in
     match d.ld_def, d.ld_type with
@@ -572,7 +577,7 @@ let add_logics dl th =
         let f = fmla ~strict:true ~keep_loc:true f in
         abst, (ls, vl, f) :: defn
     | Some e, Some ty -> (* function *)
-        let e = { e with pp_desc = PPcast (e, ty) } in
+        let e = { e with term_desc = Tcast (e, ty) } in
         let t = dterm th' (fun _ -> None) denv e in
         let t = term ~strict:true ~keep_loc:true t in
         abst, (ls, vl, t) :: defn
@@ -625,7 +630,7 @@ let add_inductives s dl th =
   (* 1. create all symbols and make an environment with these symbols *)
   let psymbols = Hstr.create 17 in
   let create_symbol th d =
-    let id = d.in_ident.id in
+    let id = d.in_ident.id_str in
     let v = create_user_id d.in_ident in
     let pl = tyl_of_params th d.in_params in
     let opaque = opaque_tvs d.in_params in
@@ -637,10 +642,10 @@ let add_inductives s dl th =
   (* 2. then type-check all definitions *)
   let propsyms = Hstr.create 17 in
   let type_decl d =
-    let id = d.in_ident.id in
+    let id = d.in_ident.id_str in
     let ps = Hstr.find psymbols id in
     let clause (loc, id, f) =
-      Hstr.replace propsyms id.id loc;
+      Hstr.replace propsyms id.id_str loc;
       let f = type_fmla th' (fun _ -> None) f in
       create_prsymbol (create_user_id id), f
     in
@@ -657,16 +662,11 @@ let add_inductives s dl th =
 
 (* parse declarations *)
 
-let prop_kind = function
-  | Kaxiom -> Paxiom
-  | Kgoal -> Pgoal
-  | Klemma -> Plemma
-
 let find_theory env lenv q = match q with
-  | Qident { id = id } -> (* local theory *)
+  | Qident { id_str = id } -> (* local theory *)
       begin try Mstr.find id lenv
       with Not_found -> read_theory env [] id end
-  | Qdot (p, { id = id }) -> (* theory in file f *)
+  | Qdot (p, { id_str = id }) -> (* theory in file f *)
       read_theory env (string_list_of_qualid p) id
 
 let rec clone_ns kn sl path ns2 ns1 s =
@@ -724,27 +724,26 @@ let rec clone_ns kn sl path ns2 ns1 s =
   { s with inst_ts = inst_ts; inst_ls = inst_ls }
 
 let add_decl loc th = function
-  | Ptree.TypeDecl dl ->
+  | Ptree.Dtype dl ->
       add_types dl th
-  | Ptree.LogicDecl dl ->
+  | Ptree.Dlogic dl ->
       add_logics dl th
-  | Ptree.IndDecl (s, dl) ->
+  | Ptree.Dind (s, dl) ->
       add_inductives s dl th
-  | Ptree.PropDecl (k, s, f) ->
-      add_prop (prop_kind k) loc s f th
-  | Ptree.Meta (id, al) ->
+  | Ptree.Dprop (k, s, f) ->
+      add_prop k loc s f th
+  | Ptree.Dmeta (id, al) ->
       let convert = function
-        | PMAty (PPTtyapp (q,[]))
-                   -> MAts (find_tysymbol th q)
-        | PMAty ty -> MAty (ty_of_pty th ty)
-        | PMAfs q  -> MAls (find_fsymbol th q)
-        | PMAps q  -> MAls (find_psymbol th q)
-        | PMApr q  -> MApr (find_prop th q)
-        | PMAstr s -> MAstr s
-        | PMAint i -> MAint i
-      in
+        | Ptree.Mty (PTtyapp (q,[]))
+                       -> MAts (find_tysymbol th q)
+        | Ptree.Mty ty -> MAty (ty_of_pty th ty)
+        | Ptree.Mfs q  -> MAls (find_fsymbol th q)
+        | Ptree.Mps q  -> MAls (find_psymbol th q)
+        | Ptree.Mpr q  -> MApr (find_prop th q)
+        | Ptree.Mstr s -> MAstr s
+        | Ptree.Mint i -> MAint i in
       let add s = add_meta th (lookup_meta s) (List.map convert al) in
-      Loc.try1 ~loc add id.id
+      Loc.try1 ~loc add id.id_str
 
 let add_decl loc th d =
   if Debug.test_flag debug_parse_only then th else
@@ -756,7 +755,7 @@ let type_inst th t s =
       let ns1 = Opt.fold find_namespace_ns t.th_export p in
       let ns2 = Opt.fold find_namespace_ns (get_namespace th) q in
       Loc.try6 ~loc clone_ns t.th_known t.th_local [] ns2 ns1 s
-    | CStsym (loc,p,[],PPTtyapp (q,[])) ->
+    | CStsym (loc,p,[],PTtyapp (q,[])) ->
       let ts1 = find_tysymbol_ns t.th_export p in
       let ts2 = find_tysymbol th q in
       if Mts.mem ts1 s.inst_ts
@@ -765,7 +764,7 @@ let type_inst th t s =
     | CStsym (loc,p,tvl,pty) ->
       let ts1 = find_tysymbol_ns t.th_export p in
       let id = id_user (ts1.ts_name.id_string ^ "_subst") loc in
-      let tvl = List.map (fun id -> tv_of_string id.id) tvl in
+      let tvl = List.map (fun id -> tv_of_string id.id_str) tvl in
       let def = Some (ty_of_pty th pty) in
       let ts2 = Loc.try3 ~loc create_tysymbol id tvl def in
       if Mts.mem ts1 s.inst_ts

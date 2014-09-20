@@ -13,7 +13,7 @@
 
 type loc = Loc.position
 
-(*s Logical expressions (for both terms and predicates) *)
+(*s Logical terms and formulas *)
 
 type integer_constant = Number.integer_constant
 type real_constant = Number.real_constant
@@ -23,16 +23,20 @@ type label =
   | Lstr of Ident.label
   | Lpos of Loc.position
 
-type pp_quant =
-  | PPforall | PPexists | PPlambda
+type quant =
+  | Tforall | Texists | Tlambda
 
-type pp_binop =
-  | PPand | PPand_asym | PPor | PPor_asym | PPimplies | PPiff
+type binop =
+  | Tand | Tand_asym | Tor | Tor_asym | Timplies | Tiff
 
-type pp_unop =
-  | PPnot
+type unop =
+  | Tnot
 
-type ident = { id : string; id_lab : label list; id_loc : loc }
+type ident = {
+  id_str : string;
+  id_lab : label list;
+  id_loc : loc;
+}
 
 type qualid =
   | Qident of ident
@@ -41,59 +45,58 @@ type qualid =
 type opacity = bool
 
 type pty =
-  | PPTtyvar of ident * opacity
-  | PPTtyapp of qualid * pty list
-  | PPTtuple of pty list
-  | PPTarrow of pty * pty
-  | PPTparen of pty
+  | PTtyvar of ident * opacity
+  | PTtyapp of qualid * pty list
+  | PTtuple of pty list
+  | PTarrow of pty * pty
+  | PTparen of pty
 
 type ghost = bool
 
 type binder = loc * ident option * ghost * pty option
 type param  = loc * ident option * ghost * pty
-type quvar  = ident * pty option
 
-type pattern =
-  { pat_loc : loc; pat_desc : pat_desc }
+type pattern = {
+  pat_desc : pat_desc;
+  pat_loc  : loc;
+}
 
 and pat_desc =
-  | PPpwild
-  | PPpvar of ident
-  | PPpapp of qualid * pattern list
-  | PPprec of (qualid * pattern) list
-  | PPptuple of pattern list
-  | PPpor of pattern * pattern
-  | PPpas of pattern * ident
+  | Pwild
+  | Pvar of ident
+  | Papp of qualid * pattern list
+  | Prec of (qualid * pattern) list
+  | Ptuple of pattern list
+  | Por of pattern * pattern
+  | Pas of pattern * ident
 
-type lexpr =
-  { pp_loc : loc; pp_desc : pp_desc }
+type term = {
+  term_desc : term_desc;
+  term_loc  : loc;
+}
 
-and pp_desc =
-  | PPtrue
-  | PPfalse
-  | PPconst of constant
-  | PPident of qualid
-  | PPidapp of qualid * lexpr list
-  | PPapply of lexpr * lexpr
-  | PPinfix of lexpr * ident * lexpr
-  | PPinnfix of lexpr * ident * lexpr
-  | PPbinop of lexpr * pp_binop * lexpr
-  | PPunop of pp_unop * lexpr
-  | PPif of lexpr * lexpr * lexpr
-  | PPquant of pp_quant * quvar list * lexpr list list * lexpr
-  | PPnamed of label * lexpr
-  | PPlet of ident * lexpr * lexpr
-  | PPmatch of lexpr * (pattern * lexpr) list
-  | PPcast of lexpr * pty
-  | PPtuple of lexpr list
-  | PPrecord of (qualid * lexpr) list
-  | PPupdate of lexpr * (qualid * lexpr) list
+and term_desc =
+  | Ttrue
+  | Tfalse
+  | Tconst of constant
+  | Tident of qualid
+  | Tidapp of qualid * term list
+  | Tapply of term * term
+  | Tinfix of term * ident * term
+  | Tinnfix of term * ident * term
+  | Tbinop of term * binop * term
+  | Tunop of unop * term
+  | Tif of term * term * term
+  | Tquant of quant * binder list * term list list * term
+  | Tnamed of label * term
+  | Tlet of ident * term * term
+  | Tmatch of term * (pattern * term) list
+  | Tcast of term * pty
+  | Ttuple of term list
+  | Trecord of (qualid * term) list
+  | Tupdate of term * (qualid * term) list
 
 (*s Declarations. *)
-
-type plogic_type =
-  | PPredicate of pty list
-  | PFunction  of pty list * pty
 
 type use = {
   use_theory : qualid;
@@ -125,7 +128,7 @@ type type_def =
 
 type visibility = Public | Private | Abstract
 
-type invariant = lexpr list
+type invariant = term list
 
 type type_decl = {
   td_loc    : loc;
@@ -142,35 +145,32 @@ type logic_decl = {
   ld_ident  : ident;
   ld_params : param list;
   ld_type   : pty option;
-  ld_def    : lexpr option;
+  ld_def    : term option;
 }
 
 type ind_decl = {
   in_loc    : loc;
   in_ident  : ident;
   in_params : param list;
-  in_def    : (loc * ident * lexpr) list;
+  in_def    : (loc * ident * term) list;
 }
 
-type prop_kind =
-  | Kaxiom | Klemma | Kgoal
-
 type metarg =
-  | PMAty  of pty
-  | PMAfs  of qualid
-  | PMAps  of qualid
-  | PMApr  of qualid
-  | PMAstr of string
-  | PMAint of int
+  | Mty  of pty
+  | Mfs  of qualid
+  | Mps  of qualid
+  | Mpr  of qualid
+  | Mstr of string
+  | Mint of int
 
 type use_clone = use * clone_subst list option
 
 type decl =
-  | TypeDecl of type_decl list
-  | LogicDecl of logic_decl list
-  | IndDecl of Decl.ind_sign * ind_decl list
-  | PropDecl of prop_kind * ident * lexpr
-  | Meta of ident * metarg list
+  | Dtype of type_decl list
+  | Dlogic of logic_decl list
+  | Dind of Decl.ind_sign * ind_decl list
+  | Dprop of Decl.prop_kind * ident * term
+  | Dmeta of ident * metarg list
 
 (* program files *)
 
@@ -178,7 +178,7 @@ type assertion_kind = Aassert | Aassume | Acheck
 
 type lazy_op = LazyAnd | LazyOr
 
-type variant = lexpr * qualid option
+type variant = term * qualid option
 
 type loop_annotation = {
   loop_invariant : invariant;
@@ -187,24 +187,24 @@ type loop_annotation = {
 
 type for_direction = To | Downto
 
-type pre = lexpr
-type post = loc * (pattern * lexpr) list
-type xpost = loc * (qualid * pattern * lexpr) list
+type pre = term
+type post = loc * (pattern * term) list
+type xpost = loc * (qualid * pattern * term) list
 
 type spec = {
   sp_pre     : pre list;
   sp_post    : post list;
   sp_xpost   : xpost list;
   sp_reads   : qualid list;
-  sp_writes  : lexpr list;
+  sp_writes  : term list;
   sp_variant : variant list;
   sp_checkrw : bool;
   sp_diverge : bool;
 }
 
 type type_v =
-  | Tpure of pty
-  | Tarrow of param list * type_c
+  | PTpure of pty
+  | PTfunc of param list * type_c
 
 and type_c = type_v * spec
 
@@ -238,7 +238,7 @@ and expr_desc =
   | Eif of expr * expr * expr
   | Eloop of loop_annotation * expr
   | Ewhile of expr * loop_annotation * expr
-  | Elazy of lazy_op * expr * expr
+  | Elazy of expr * lazy_op * expr
   | Enot of expr
   | Ematch of expr * (pattern * expr) list
   | Eabsurd
@@ -246,7 +246,7 @@ and expr_desc =
   | Etry of expr * (qualid * pattern option * expr) list
   | Efor of ident * expr * for_direction * expr * invariant * expr
   (* annotations *)
-  | Eassert of assertion_kind * lexpr
+  | Eassert of assertion_kind * term
   | Emark of ident * expr
   | Ecast of expr * pty
   | Eany of type_c
