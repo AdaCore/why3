@@ -150,11 +150,8 @@ let pat_fold fn acc pat = match pat.pat_node with
   | Pas (p, _) -> fn acc p
   | Por (p, q) -> fn (fn acc p) q
 
-let pat_all pr pat =
-  try pat_fold (Util.all_fn pr) true pat with Util.FoldSkip -> false
-
-let pat_any pr pat =
-  try pat_fold (Util.any_fn pr) false pat with Util.FoldSkip -> true
+let pat_all pr pat = Util.all pat_fold pr pat
+let pat_any pr pat = Util.any pat_fold pr pat
 
 (* smart constructors for patterns *)
 
@@ -1052,13 +1049,8 @@ let rec t_gen_fold fnT fnL acc t =
 
 let t_s_fold = t_gen_fold
 
-let t_s_all prT prL t =
-  try t_s_fold (Util.all_fn prT) (Util.all_fn prL) true t
-  with Util.FoldSkip -> false
-
-let t_s_any prT prL t =
-  try t_s_fold (Util.any_fn prT) (Util.any_fn prL) false t
-  with Util.FoldSkip -> true
+let t_s_all prT prL t = Util.alld t_s_fold prT prL t
+let t_s_any prT prL t = Util.anyd t_s_fold prT prL t
 
 (* map/fold over types in terms and formulas *)
 
@@ -1135,8 +1127,8 @@ let t_fold fn acc t = match t.t_node with
       let _, tl, f1 = t_open_quant b in tr_fold fn (fn acc f1) tl
   | _ -> t_fold_unsafe fn acc t
 
-let t_all pr t = try t_fold (Util.all_fn pr) true t with Util.FoldSkip -> false
-let t_any pr t = try t_fold (Util.any_fn pr) false t with Util.FoldSkip -> true
+let t_all pr t = Util.all t_fold pr t
+let t_any pr t = Util.any t_fold pr t
 
 (* safe opening map_fold *)
 
@@ -1274,13 +1266,10 @@ let rec t_v_fold fn acc t = match t.t_node with
   | Tquant (_,(_,b,_,_)) -> bnd_v_fold fn acc b
   | _ -> t_fold_unsafe (t_v_fold fn) acc t
 
-let t_v_all pr t =
-  try t_v_fold (Util.all_fn pr) true t with Util.FoldSkip -> false
+let t_v_all pr t = Util.all t_v_fold pr t
+let t_v_any pr t = Util.any t_v_fold pr t
 
-let t_v_any pr t =
-  try t_v_fold (Util.any_fn pr) false t with Util.FoldSkip -> true
-
-let t_closed t = t_v_all (fun _ -> false) t
+let t_closed t = t_v_all Util.ffalse t
 
 let bnd_v_count fn acc b = Mvs.fold (fun v n acc -> fn acc v n) b.bv_vars acc
 

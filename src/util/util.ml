@@ -22,6 +22,7 @@ let flip f x y = f y x
 (* useful iterator on int *)
 let rec foldi f acc min max =
   if min > max then acc else foldi f (f acc min) (succ min) max
+
 let mapi f = foldi (fun acc i -> f i::acc) []
 
 (* useful iterator on float *)
@@ -33,8 +34,30 @@ let rec iterf f min max step =
 
 exception FoldSkip
 
-let all_fn pr _ t = pr t || raise FoldSkip
-let any_fn pr _ t = pr t && raise FoldSkip
+let all_fn pr = (fun _ x -> pr x || raise FoldSkip)
+let any_fn pr = (fun _ x -> pr x && raise FoldSkip)
+
+let all2_fn pr = (fun _ x y -> pr x y || raise FoldSkip)
+let any2_fn pr = (fun _ x y -> pr x y && raise FoldSkip)
+
+type ('z,'a,'c) fold = ('z -> 'a -> 'z) -> 'z -> 'c -> 'z
+
+let all fold pr x = try fold (all_fn pr) true x with FoldSkip -> false
+let any fold pr x = try fold (any_fn pr) false x with FoldSkip -> true
+
+type ('z,'a,'b,'c,'d) fold2 = ('z -> 'a -> 'b -> 'z) -> 'z -> 'c -> 'd -> 'z
+
+let all2 fold pr x y = try fold (all2_fn pr) true x y with FoldSkip -> false
+let any2 fold pr x y = try fold (any2_fn pr) false x y with FoldSkip -> true
+
+type ('z,'a,'b,'c) foldd =
+  ('z -> 'a -> 'z) -> ('z -> 'b -> 'z) -> 'z -> 'c -> 'z
+
+let alld fold pr1 pr2 x =
+  try fold (all_fn pr1) (all_fn pr2) true x with FoldSkip -> false
+
+let anyd fold pr1 pr2 x =
+  try fold (any_fn pr1) (any_fn pr2) false x with FoldSkip -> true
 
 (* constant boolean function *)
 let ttrue _ = true

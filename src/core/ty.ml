@@ -126,11 +126,8 @@ let ty_fold fn acc ty = match ty.ty_node with
   | Tyvar _ -> acc
   | Tyapp (_, tl) -> List.fold_left fn acc tl
 
-let ty_all pr ty =
-  try ty_fold (Util.all_fn pr) true ty with Util.FoldSkip -> false
-
-let ty_any pr ty =
-  try ty_fold (Util.any_fn pr) false ty with Util.FoldSkip -> true
+let ty_all pr ty = Util.all ty_fold pr ty
+let ty_any pr ty = Util.any ty_fold pr ty
 
 (* traversal functions on type variables *)
 
@@ -142,11 +139,8 @@ let rec ty_v_fold fn acc ty = match ty.ty_node with
   | Tyvar v -> fn acc v
   | Tyapp (_, tl) -> List.fold_left (ty_v_fold fn) acc tl
 
-let ty_v_all pr ty =
-  try ty_v_fold (Util.all_fn pr) true ty with Util.FoldSkip -> false
-
-let ty_v_any pr ty =
-  try ty_v_fold (Util.any_fn pr) false ty with Util.FoldSkip -> true
+let ty_v_all pr ty = Util.all ty_v_fold pr ty
+let ty_v_any pr ty = Util.any ty_v_fold pr ty
 
 let ty_full_inst m ty = ty_v_map (fun v -> Mtv.find v m) ty
 let ty_freevars s ty = ty_v_fold (fun s v -> Stv.add v s) s ty
@@ -185,11 +179,8 @@ let rec ty_s_fold fn acc ty = match ty.ty_node with
   | Tyvar _ -> acc
   | Tyapp (f, tl) -> List.fold_left (ty_s_fold fn) (fn acc f) tl
 
-let ty_s_all pr ty =
-  try ty_s_fold (Util.all_fn pr) true ty with Util.FoldSkip -> false
-
-let ty_s_any pr ty =
-  try ty_s_fold (Util.any_fn pr) false ty with Util.FoldSkip -> true
+let ty_s_all pr ty = Util.all ty_s_fold pr ty
+let ty_s_any pr ty = Util.any ty_s_fold pr ty
 
 (* type matching *)
 
