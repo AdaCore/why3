@@ -49,13 +49,19 @@ val copy_dir : string -> string -> unit
     currently the directory must contains only directories and common files
 *)
 
-
 val path_of_file : string -> string list
 (** [path_of_file filename] return the absolute path of [filename] *)
 
+val normalize_filename : string -> string
+(** [normalize_filename filename] removes from [filename] occurrences of
+    "." and ".." that denote respectively the current directory and
+    parent directory, whenever possible *)
+
 val relativize_filename : string -> string -> string
 (** [relativize_filename base filename] relativize the filename
-    [filename] according to [base] *)
+    [filename] according to [base]. [base] should not contain occurrences of
+    "." and "..", which can be removed by calling first [normalize_filename].
+*)
 
 val absolutize_filename : string -> string -> string
 (** [absolutize_filename base filename] absolutize the filename
