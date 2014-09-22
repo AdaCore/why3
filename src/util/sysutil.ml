@@ -122,6 +122,13 @@ let path_of_file f =
   in
   aux [] f
 
+(* return the file name of an absolute path *)
+let rec file_of_path l =
+  match l with
+    | [] -> ""
+    | [x] -> x
+    | x::l -> Filename.concat x (file_of_path l)
+
 (*
 let test x = (Filename.dirname x, Filename.basename x)
 
@@ -136,6 +143,25 @@ let p1 = path_of_file "/bin/bash"
 let p1 = path_of_file "../src/f.why"
   *)
 
+let normalize_filename f =
+  let rec aux af acc =
+    match af, acc with
+      | x::rf, _ ->
+        if x = Filename.current_dir_name then
+          aux rf acc
+        else if x = Filename.parent_dir_name then
+          (match acc with
+             | _::racc -> aux rf racc
+             | [] ->
+               (* do not treat currently cases like "../../../a/b/c/d",
+                  that cannot occur if [f] is a full path *)
+                failwith "cannot normalize filename")
+        else
+          aux rf (x::acc)
+      | [], _ -> acc
+  in
+  file_of_path (List.rev (aux (path_of_file f) []))
+
 let relativize_filename base f =
   let rec aux ab af =
     match ab,af with
@@ -144,16 +170,16 @@ let relativize_filename base f =
           let rec aux2 acc p =
             match p with
               | [] -> acc
-              | _::rb -> aux2 (Filename.parent_dir_name::acc) rb
+              | x::rb ->
+                (if x = Filename.current_dir_name then
+                   aux2 acc rb
+                 else if x = Filename.parent_dir_name then
+                   failwith "cannot relativize filename"
+                 else
+                   aux2 (Filename.parent_dir_name::acc) rb)
           in aux2 af ab
   in
-  let rec rebuild l =
-    match l with
-      | [] -> ""
-      | [x] -> x
-      | x::l -> Filename.concat x (rebuild l)
-  in
-  rebuild (aux (path_of_file base) (path_of_file f))
+  file_of_path (aux (path_of_file base) (path_of_file f))
 
 let absolutize_filename dirname f =
   if Filename.is_relative f then
