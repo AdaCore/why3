@@ -1,0 +1,10 @@
+
+module M
+
+  coinductive p unit =
+  | C: p () -> p ()
+
+  (* should not be proved using induction_pr *)
+  goal G: p () -> false
+
+end
