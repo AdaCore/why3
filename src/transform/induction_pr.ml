@@ -61,17 +61,21 @@ let locate kn label t =
           match lhs.t_node with
             | Tapp (ls, argl) ->
               begin
-                  match find_inductive_cases kn ls with
-                    | []  -> locate_rhs find_any
-                    | cl  -> if find_any && not (slab ()) then
-                        (* take first labeled inductive in rhs if any.
-                           Otherwise, take lhs*)
-                        try
-                          locate_rhs false
-                        with Ind_not_found -> make_context Hole t, (ls, argl, cl), rhs
-                      else
-                        (*here a label has been found*)
-                        make_context Hole t, (ls, argl, cl), rhs
+                match (Mid.find ls.ls_name kn).d_node with
+                | Dind (Ind, dl) ->
+                  let cl = List.assq ls dl in
+                  if find_any && not (slab ()) then
+                    (* take first labeled inductive in rhs if any.
+                       Otherwise, take lhs*)
+                    try
+                      locate_rhs false
+                    with Ind_not_found ->
+                      make_context Hole t, (ls, argl, cl), rhs
+                  else
+                    (*here a label has been found*)
+                    make_context Hole t, (ls, argl, cl), rhs
+                | Dind _ | Dlogic _ | Dparam _ | Ddata _ -> locate_rhs find_any
+                | Dtype _ | Dprop _ -> assert false
               end
             | _  -> locate_rhs find_any
         else locate_rhs find_any
