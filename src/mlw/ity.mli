@@ -34,7 +34,7 @@ and ity = private {
 }
 
 and ity_node = private
-  | Itymut of itysymbol * ity list * region list * tvsymbol
+  | Ityreg of region
     (** record with mutable fields and shareable components *)
   | Ityapp of itysymbol * ity list * region list
     (** algebraic type with shareable components *)
@@ -43,13 +43,18 @@ and ity_node = private
   | Ityvar of tvsymbol
     (** type variable *)
 
+and region = private {
+  reg_name : ident;
+  reg_its  : itysymbol;
+  reg_args : ity list;
+  reg_regs : region list;
+}
+
 and pvsymbol = private {
   pv_vs    : vsymbol;
   pv_ity   : ity;
   pv_ghost : bool;
 }
-
-and region = ity (** regions are itys of the [Itymut] kind *)
 
 module Mits : Extmap.S with type key = itysymbol
 module Sits : Extset.S with module M = Mits
@@ -61,10 +66,10 @@ module Sity : Extset.S with module M = Mity
 module Hity : Exthtbl.S with type key = ity
 module Wity : Weakhtbl.S with type key = ity
 
-module Mreg : Extmap.S with type key = region and type 'a t = 'a Mity.t
+module Mreg : Extmap.S with type key = region
 module Sreg : Extset.S with module M = Mreg
-module Hreg : Exthtbl.S with type key = region and type 'a t = 'a Hity.t
-module Wreg : Weakhtbl.S with type key = region and type 'a t = 'a Wity.t
+module Hreg : Exthtbl.S with type key = region
+module Wreg : Weakhtbl.S with type key = region
 
 module Mpv  : Extmap.S with type key = pvsymbol
 module Spv  : Extset.S with module M = Mpv
@@ -73,10 +78,12 @@ module Wpv  : Weakhtbl.S with type key = pvsymbol
 
 val its_equal : itysymbol -> itysymbol -> bool
 val ity_equal : ity -> ity -> bool
+val reg_equal : region -> region -> bool
 val pv_equal  : pvsymbol -> pvsymbol -> bool
 
 val its_hash : itysymbol -> int
 val ity_hash : ity -> int
+val reg_hash : region -> int
 val pv_hash  : pvsymbol -> int
 
 exception BadItyArity of itysymbol * int
@@ -90,20 +97,22 @@ val create_itysymbol :
     bool -> bool -> (region * bool) list ->
     Spv.t -> ity option -> itysymbol
 
+val create_region : preid -> itysymbol -> ity list -> region list -> region
+
 val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
 
 val restore_its : tysymbol -> itysymbol
-  (** raises [Not_found] if the argument is not a its_ts *)
+(** raises [Not_found] if the argument is not a its_ts *)
 
 val restore_pv : vsymbol -> pvsymbol
 (** raises [Not_found] if the argument is not a [pv_vs] *)
 
 exception NonUpdatable of itysymbol * ity
 
-val ity_var : tvsymbol  -> ity
+val ity_var : tvsymbol -> ity
 val ity_pur : itysymbol -> ity list -> ity
 val ity_app : itysymbol -> ity list -> region list -> ity
-val ity_mut : itysymbol -> ity list -> region list -> tvsymbol -> ity
+val ity_reg : region -> ity
 
 val ity_app_fresh : itysymbol -> ity list -> ity
 
@@ -116,37 +125,37 @@ val ity_of_ty : ty -> ity
 val ity_purify : ity -> ity
 (** snapshot type *)
 
-val tv_of_region : region -> tvsymbol
-
 (** {2 Generic traversal functions} *)
 
-val ity_fold : ('a -> ity -> 'a) -> 'a -> ity -> 'a
-val ity_all : (ity -> bool) -> ity -> bool
-val ity_any : (ity -> bool) -> ity -> bool
+val ity_fold : ('a -> ity -> 'a) -> ('a -> region -> 'a) -> 'a -> ity -> 'a
+val reg_fold : ('a -> ity -> 'a) -> ('a -> region -> 'a) -> 'a -> region -> 'a
 
 (** {2 Traversal functions on type symbols} *)
 
 val ity_s_fold : ('a -> itysymbol -> 'a) -> 'a -> ity -> 'a
+val reg_s_fold : ('a -> itysymbol -> 'a) -> 'a -> region -> 'a
 
-val ity_s_all : (itysymbol -> bool) -> ity -> bool
-val ity_s_any : (itysymbol -> bool) -> ity -> bool
+(** {2 Traversal functions on type variables} *)
 
 val ity_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> ity -> 'a
+val reg_v_fold : ('a -> tvsymbol -> 'a) -> 'a -> region -> 'a
+
+(** {2 Traversal functions on top regions} *)
+
+val ity_r_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
+val reg_r_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
+
+(** {2 Miscellaneous type utilities} *)
 
 val ity_freevars : Stv.t -> ity -> Stv.t
 
-val ity_v_all : (tvsymbol -> bool) -> ity -> bool
-val ity_v_any : (tvsymbol -> bool) -> ity -> bool
-
 val ity_v_occurs : tvsymbol -> ity -> bool
 
-val ity_r_fold : ('a -> region -> 'a) -> 'a -> ity -> 'a
-
-val ity_r_all : (region -> bool) -> ity -> bool
-val ity_r_any : (region -> bool) -> ity -> bool
-
 val ity_r_occurs : region -> ity -> bool
+val reg_r_occurs : region -> region -> bool
+
 val ity_r_stale  : region -> Sreg.t -> ity -> bool
+val reg_r_stale  : region -> Sreg.t -> region -> bool
 
 val ity_closed    : ity -> bool
 val ity_immutable : ity -> bool
@@ -176,15 +185,27 @@ val ity_tuple : ity list -> ity
 
 (** {2 Type matching and instantiation} *)
 
-exception TypeMismatch of ity * ity * ity Mtv.t
+type ity_subst = private {
+  ity_subst_tv  : ity Mtv.t;
+  ity_subst_reg : region Mreg.t;
+}
 
-val ity_match : ity Mtv.t -> ity -> ity -> ity Mtv.t
+exception TypeMismatch of ity * ity * ity_subst
+exception RegionMismatch of region * region * ity_subst
 
-val ity_freeze : ity Mtv.t -> ity -> ity Mtv.t (* self-match *)
+val ity_subst_empty : ity_subst
+
+val ity_match : ity_subst -> ity -> ity -> ity_subst
+val reg_match : ity_subst -> region -> region -> ity_subst
+
+val ity_freeze : ity_subst -> ity -> ity_subst (* self-match *)
+val reg_freeze : ity_subst -> region -> ity_subst (* self-match *)
 
 val ity_equal_check : ity -> ity -> unit
+val reg_equal_check : region -> region -> unit
 
-val ity_full_inst : ity Mtv.t -> ity -> ity
+val ity_full_inst : ity_subst -> ity -> ity
+val reg_full_inst : ity_subst -> region -> region
 
 (** {2 Exception symbols} *)
 
@@ -231,15 +252,14 @@ val refresh_of_effect : effect -> effect
 
 exception IllegalAlias of region
 
-val eff_full_inst : ity Mtv.t -> effect -> effect
+val eff_full_inst : ity_subst -> effect -> effect
 
-(*
+val eff_stale_region : effect -> ity -> bool
+
 (** {2 Specification} *)
 
-type pre = term          (** precondition: pre_fmla *)
-type post = term         (** postcondition: eps result . post_fmla *)
-type xpost = post Mexn.t (** exceptional postconditions *)
-
+type pre = term   (** precondition: pre_fmla *)
+type post = term  (** postcondition: eps result . post_fmla *)
 type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
 val create_post : vsymbol -> term -> post
@@ -247,14 +267,15 @@ val open_post : post -> vsymbol * term
 val check_post : ty -> post -> unit
 
 type spec = {
-  c_pre     : pre;
-  c_post    : post;
-  c_xpost   : xpost;
+  c_pre     : pre list;
+  c_post    : post list;
+  c_xpost   : post list Mexn.t;
   c_effect  : effect;
   c_variant : variant list;
   c_letrec  : int;
 }
 
+(*
 (** {2 Program variables} *)
 
 val t_pvset : Spv.t -> term -> Spv.t
