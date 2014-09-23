@@ -5,9 +5,9 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../imp.why" expanded="true">
-<theory name="Imp" sum="8d9b512f0a2a1961484e5a0fa9ff9b68" expanded="true">
- <goal name="ceval_deterministic_aux" expanded="true">
- <transf name="induction_pr" expanded="true">
+<theory name="Imp" sum="d47e4ca50e2ba0ffa18970b5b9819d30">
+ <goal name="ceval_deterministic_aux">
+ <transf name="induction_pr">
   <goal name="ceval_deterministic_aux.1" expl="1.">
   <transf name="inversion_pr">
    <goal name="ceval_deterministic_aux.1.1" expl="1.">
@@ -42,13 +42,13 @@
    <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="ceval_deterministic_aux.2.3" expl="3.">
-   <proof prover="1"><result status="valid" time="0.03"/></proof>
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="ceval_deterministic_aux.2.4" expl="4.">
    <proof prover="1"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="ceval_deterministic_aux.2.5" expl="5.">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   <proof prover="1"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="ceval_deterministic_aux.2.6" expl="6.">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -185,8 +185,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="ceval_deterministic" expanded="true">
- <proof prover="1"><result status="valid" time="1.06"/></proof>
+ <goal name="ceval_deterministic">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 </file>
