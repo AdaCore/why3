@@ -2,14 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Spass" version="3.5" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Coq" version="8.4pl2" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
-<file name="../../../theories/list.why" expanded="true">
+<file name="../../../theories/list.why">
 <theory name="List" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="Length" sum="05caecc0d3ea8074e1ba80a75530a754">
@@ -23,7 +23,7 @@
  <goal name="Length_nil">
  <transf name="split_goal_wp">
   <goal name="Length_nil.1" expl="1.">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="Length_nil.2" expl="2.">
@@ -36,7 +36,7 @@
 </theory>
 <theory name="Elements" sum="877e4f63c0bc41f63ef2cad2cb868814">
  <goal name="elements_Nil">
- <proof prover="2"><result status="valid" time="0.51"/></proof>
+ <proof prover="3"><result status="valid" time="0.51"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
@@ -104,7 +104,7 @@
  <goal name="Append_length">
  <transf name="induction_ty_lex">
   <goal name="Append_length.1" expl="1.">
-  <proof prover="5"><result status="valid" time="0.12"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
@@ -123,7 +123,7 @@
    <proof prover="5"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="mem_decomp.1.2" expl="2.">
-   <proof prover="2"><result status="valid" time="0.31"/></proof>
+   <proof prover="3"><result status="valid" time="0.31"/></proof>
    </goal>
   </transf>
   </goal>
@@ -229,7 +229,7 @@
    <proof prover="6"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="sorted_mem.2.3" expl="3.">
-   <proof prover="0"><result status="valid" time="0.05"/></proof>
+   <proof prover="1"><result status="valid" time="0.05"/></proof>
    </goal>
   </transf>
   </goal>
@@ -255,16 +255,16 @@
    <proof prover="5"><result status="valid" time="0.00"/></proof>
    </goal>
    <goal name="sorted_append.1.5" expl="5.">
-   <proof prover="1"><result status="valid" time="0.18"/></proof>
+   <proof prover="2"><result status="valid" time="0.18"/></proof>
    </goal>
    <goal name="sorted_append.1.6" expl="6.">
-   <proof prover="1"><result status="valid" time="1.88"/></proof>
+   <proof prover="2"><result status="valid" time="2.39"/></proof>
    </goal>
    <goal name="sorted_append.1.7" expl="7.">
    <proof prover="5"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="sorted_append.1.8" expl="8.">
-   <proof prover="0"><result status="valid" time="1.89"/></proof>
+   <proof prover="1"><result status="valid" time="2.19"/></proof>
    </goal>
   </transf>
   </goal>
@@ -300,7 +300,7 @@
    <proof prover="5"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="rev_append_sorted_incr.1.5" expl="5.">
-   <proof prover="1"><result status="valid" time="0.07"/></proof>
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
    </goal>
    <goal name="rev_append_sorted_incr.1.6" expl="6.">
    <proof prover="5"><result status="valid" time="0.15"/></proof>
@@ -320,33 +320,33 @@
   <goal name="rev_append_sorted_decr.1" expl="1.">
   <transf name="split_goal_wp">
    <goal name="rev_append_sorted_decr.1.1" expl="1.">
-   <proof prover="1"><result status="valid" time="0.00"/></proof>
+   <proof prover="2"><result status="valid" time="0.00"/></proof>
    <proof prover="5"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.1.2" expl="2.">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
    <proof prover="5"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.1.3" expl="3.">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
    <proof prover="5"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.1.4" expl="4.">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
    <proof prover="5"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.1.5" expl="5.">
-   <proof prover="1"><result status="valid" time="0.05"/></proof>
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.1.6" expl="6.">
-   <proof prover="1"><result status="valid" time="0.03"/></proof>
-   <proof prover="5"><result status="valid" time="0.80"/></proof>
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   <proof prover="5"><result status="valid" time="0.49"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.1.7" expl="7.">
-   <proof prover="1"><result status="valid" time="0.07"/></proof>
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.1.8" expl="8.">
-   <proof prover="1"><result status="valid" time="0.07"/></proof>
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
    </goal>
   </transf>
   </goal>
@@ -391,7 +391,7 @@
  <goal name="reverse_num_occ">
  <transf name="induction_ty_lex">
   <goal name="reverse_num_occ.1" expl="1.">
-  <proof prover="5"><result status="valid" time="1.33"/></proof>
+  <proof prover="5"><result status="valid" time="1.68"/></proof>
   </goal>
  </transf>
  </goal>
@@ -413,7 +413,7 @@
  <proof prover="5"><result status="valid" time="0.36"/></proof>
  </goal>
  <goal name="Permut_cons_append">
- <proof prover="5"><result status="valid" time="0.92"/></proof>
+ <proof prover="5"><result status="valid" time="1.31"/></proof>
  </goal>
  <goal name="Permut_assoc">
  <proof prover="5"><result status="valid" time="0.01"/></proof>
@@ -428,7 +428,7 @@
  <proof prover="5"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="Permut_length">
- <proof prover="3" edited="list_Permut_Permut_length_2.v"><result status="valid" time="2.30"/></proof>
+ <proof prover="0" edited="list_Permut_Permut_length_2.v"><result status="valid" time="2.30"/></proof>
  </goal>
 </theory>
 <theory name="Distinct" sum="e56aed12f61edef3656befad5f86e1ba">
@@ -440,7 +440,7 @@
    <proof prover="5"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="distinct_append.1.2" expl="2.">
-   <proof prover="1"><result status="valid" time="1.12"/></proof>
+   <proof prover="2"><result status="valid" time="1.12"/></proof>
    </goal>
   </transf>
   </goal>
