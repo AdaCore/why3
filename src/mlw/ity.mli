@@ -19,7 +19,7 @@ type itysymbol = private {
   its_ts      : tysymbol;       (** pure "snapshot" type symbol *)
   its_private : bool;           (** is a private/abstract type *)
   its_mutable : bool;           (** is a record with mutable fields *)
-  its_mfields : pvsymbol Mvs.t; (** mutable fields *)
+  its_mfields : pvsymbol list;  (** mutable fields *)
   its_regions : region list;    (** mutable shareable components *)
   its_reg_vis : bool list;      (** non-ghost shareable components *)
   its_arg_vis : bool list;      (** non-ghost type parameters *)
@@ -86,8 +86,6 @@ val ity_hash : ity -> int
 val reg_hash : region -> int
 val pv_hash  : pvsymbol -> int
 
-exception BadItyArity of itysymbol * int
-exception BadRegArity of itysymbol * int
 exception DuplicateRegion of region
 exception UnboundRegion of region
 
@@ -97,24 +95,32 @@ val create_itysymbol :
     bool -> bool -> (region * bool) list ->
     Spv.t -> ity option -> itysymbol
 
-val create_region : preid -> itysymbol -> ity list -> region list -> region
-
-val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
-
 val restore_its : tysymbol -> itysymbol
-(** raises [Not_found] if the argument is not a its_ts *)
+(** raises [Not_found] if the argument is not a [its_ts] *)
 
-val restore_pv : vsymbol -> pvsymbol
-(** raises [Not_found] if the argument is not a [pv_vs] *)
+(** {2 Type constructors} *)
 
+exception BadItyArity of itysymbol * int
+exception BadRegArity of itysymbol * int
 exception NonUpdatable of itysymbol * ity
 
-val ity_var : tvsymbol -> ity
-val ity_pur : itysymbol -> ity list -> ity
-val ity_app : itysymbol -> ity list -> region list -> ity
+val create_region : preid -> itysymbol -> ity list -> region list -> region
+(** the type symbol must be mutable, aliases are allowed *)
+
 val ity_reg : region -> ity
+val ity_var : tvsymbol -> ity
+
+val ity_pur : itysymbol -> ity list -> ity
+(** [ity_pur] may be applied to mutable type symbols to create a snapshot *)
+
+val ity_app : itysymbol -> ity list -> region list -> ity
+(** [ity_app s tl rl] creates
+  - a fresh region and an [Ityreg] type if [s] is mutable
+  - an [Itypur] type if [s] is not mutable and [rl] is empty
+  - an [Ityapp] type otherwise *)
 
 val ity_app_fresh : itysymbol -> ity list -> ity
+(** [ity_app_fresh] creates fresh regions where needed *)
 
 val ty_of_ity : ity -> ty
 (** all aliases expanded, all regions removed *)
@@ -207,6 +213,13 @@ val reg_equal_check : region -> region -> unit
 val ity_full_inst : ity_subst -> ity -> ity
 val reg_full_inst : ity_subst -> region -> region
 
+(** {2 Program variables} *)
+
+val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
+
+val restore_pv : vsymbol -> pvsymbol
+(** raises [Not_found] if the argument is not a [pv_vs] *)
+
 (** {2 Exception symbols} *)
 
 type xsymbol = private {
@@ -275,8 +288,19 @@ type spec = {
   c_letrec  : int;
 }
 
-(*
-(** {2 Program variables} *)
+val spec_empty : spec
+
+exception UnboundException of xsymbol
+
+val spec_check : ?full_xpost:bool -> spec -> ity -> unit
+(** verify that the spec corresponds to the result type.
+    Raises [UnboundException xs] if [full_xpost] is true
+    (default value), [xs] is raised but does not have
+    an exceptional postcondition. *)
+
+val spec_map : (term -> term) -> (effect -> effect) -> spec -> spec
+
+val spec_fold : ('a -> term -> 'a) -> ('a -> effect -> 'a) -> 'a -> spec -> 'a
 
 val t_pvset : Spv.t -> term -> Spv.t
 (** raises [Not_found] if the term contains non-pv variables *)
@@ -286,50 +310,28 @@ val spec_pvset : Spv.t -> spec -> Spv.t
 
 (** {2 Program types} *)
 
+type aty = private {
+  aty_args   : pvsymbol list;
+  aty_spec   : spec;
+  aty_result : ity;
+}
+
 type vty =
   | VTvalue of ity
   | VTarrow of aty
 
-and aty = private {
-  aty_args   : pvsymbol list;
-  aty_result : vty;
-  aty_spec   : spec;
-}
+val vty_arrow : Spv.t -> pvsymbol list -> spec -> ity -> aty * ity_subst
 
-exception UnboundException of xsymbol
-(** every raised exception must have a postcondition in [spec.c_xpost] *)
+val aty_full_inst : ity_subst -> aty -> ity list -> ity -> aty
+(** We only match the type variables and regions in the arguments and
+    the result type. The caller must supply a "freezing" substitution
+    that covers all external type variables and regions that may occur
+    in the spec. Such a substitution is returned by [vty_arrow]. *)
 
-val vty_arrow : pvsymbol list -> ?spec:spec -> vty -> aty
+val aty_app : aty -> pvsymbol list -> aty * bool
+(** (partially) apply a function specification to variable arguments *)
 
-val aty_pvset : aty -> Spv.t
-(** raises [Not_found] if the spec contains non-pv variables *)
+val aty_bind_check : aty -> Spv.t -> unit
 
-val aty_vars_match : ity Mtv.t -> aty -> ity list -> ity -> ity Mtv.t
-(** this only compares the types of arguments and results, and ignores
-    the spec. In other words, only the type variables and regions in
-    [aty_vars aty] are matched. The caller should supply a "freezing"
-    substitution that covers all external type variables and regions. *)
+val aty_add_args : pvsymbol list -> aty -> aty
 
-val aty_full_inst : ity Mtv.t -> aty -> aty
-(** the substitution must cover not only [aty_vars aty] but
-    also every type variable and every region in [aty_spec] *)
-
-val aty_filter : ?ghost:bool -> Spv.t -> aty -> aty
-(** remove from the given arrow every effect that is covered
-    neither by the arrow's arguments nor by the given pvset *)
-
-val aty_app : aty -> pvsymbol -> spec * bool * vty
-(** apply a function specification to a variable argument *)
-
-val spec_check : ?full_xpost:bool -> spec -> vty -> unit
-(** verify that the spec corresponds to the result type *)
-
-val ity_of_vty : vty -> ity
-val ty_of_vty  : vty -> ty
-(** convert arrows to the unit type *)
-
-val aty_vars : aty -> varset
-val vty_vars : vty -> varset
-(** collect the type variables and regions in arguments and values,
-    but ignores the spec *)
-*)
