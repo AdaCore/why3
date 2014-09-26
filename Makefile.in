@@ -780,7 +780,7 @@ lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@)
 lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
 
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
-lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @MENHIRLIB@)
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
 
 lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
 	$(if $(QUIET),@echo 'Linking  $@' &&) \
