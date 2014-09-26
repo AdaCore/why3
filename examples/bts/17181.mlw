@@ -1,0 +1,29 @@
+
+theory T
+
+  namespace A
+  goal g:true
+  end
+
+  namespace B
+  goal g:false
+  end
+
+end
+
+
+module A
+
+  predicate p
+
+  predicate q
+
+  namespace B
+    let f () : unit ensures { p } = ()
+  end
+
+  namespace C
+    let f () : unit ensures { q <-> p } = ()
+  end
+
+end

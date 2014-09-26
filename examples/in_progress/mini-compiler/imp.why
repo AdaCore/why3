@@ -102,4 +102,9 @@ theory Imp
           ceval mi body mj ->
            ceval mj (Cwhile cond body) mf ->
             ceval mi (Cwhile cond body) mf
+
+
+    lemma ceval_deterministic:
+      forall c mi mf1 mf2. ceval mi c mf1 -> ceval mi c mf2 -> mf1 = mf2
+
 end

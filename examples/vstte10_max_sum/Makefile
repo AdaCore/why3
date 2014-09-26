@@ -2,7 +2,7 @@
 BENCH ?= no
 
 ifeq ($(BENCH),yes)
-  WHY3=../../bin/why3
+  WHY3=../../bin/why3.opt
   WHY3SHARE=../../share
 else
   ifeq ($(BINDIR),)
@@ -45,7 +45,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../vstte10_max_sum.mlw
-	$(WHY3)extract -D ocaml32 ../vstte10_max_sum.mlw -o .
+	$(WHY3) extract -D ocaml32 ../vstte10_max_sum.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<

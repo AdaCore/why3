@@ -7,19 +7,19 @@
 <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
 <file name="../power.mlw" expanded="true">
-<theory name="FastExponentiation" sum="b1ee91d5c248138c43271c0f11b810d9" expanded="true">
+<theory name="FastExponentiation" sum="8729b5811382629cc42f48969e15944d" expanded="true">
  <goal name="WP_parameter fast_exp" expl="VC for fast_exp" expanded="true">
  <proof prover="2" timelimit="3" memlimit="0"><result status="valid" time="0.39"/></proof>
  </goal>
  <goal name="WP_parameter fast_exp_imperative" expl="VC for fast_exp_imperative" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter fast_exp_imperative.1" expl="1. loop invariant init" expanded="true">
   <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="WP_parameter fast_exp_imperative.2" expl="2. loop invariant preservation" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter fast_exp_imperative.2.1" expl="1." expanded="true">
    <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
    </goal>
@@ -34,7 +34,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter fast_exp_imperative.4" expl="4. loop invariant preservation" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter fast_exp_imperative.4.1" expl="1." expanded="true">
    <proof prover="1"><result status="valid" time="0.01"/></proof>
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
@@ -51,7 +51,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter fast_exp_imperative.6" expl="6. postcondition" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter fast_exp_imperative.6.1" expl="1. postcondition" expanded="true">
    <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>

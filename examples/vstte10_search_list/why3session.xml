@@ -8,7 +8,7 @@
 <prover id="3" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
 <prover id="4" name="CVC3" version="2.2" timelimit="5" memlimit="0"/>
 <file name="../vstte10_search_list.mlw" expanded="true">
-<theory name="SearchingALinkedList" sum="dc91549c1b09c478ce4021c96c89c893" expanded="true">
+<theory name="SearchingALinkedList" sum="615ef31216242ed1ed2a93f5839930f9" expanded="true">
  <goal name="WP_parameter search" expl="VC for search" expanded="true">
  <proof prover="2"><result status="valid" time="0.07"/></proof>
  </goal>
@@ -28,7 +28,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="WP_parameter search_loop" expl="VC for search_loop" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter search_loop.1" expl="1. loop invariant init">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -45,7 +45,7 @@
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter search_loop.4" expl="4. loop invariant preservation">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter search_loop.4.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.01"/></proof>
    <proof prover="3"><result status="valid" time="0.02"/></proof>

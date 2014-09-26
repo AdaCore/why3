@@ -68,13 +68,13 @@ section {* Minimum and Maximum *}
 
 why3_open "int/MinMax.xml"
 
-why3_vc Max_r using assms by simp
+why3_vc Max_l using assms by simp
 
 why3_vc Max_comm by simp
 
 why3_vc Max_assoc by simp
 
-why3_vc Min_l using assms by simp
+why3_vc Min_r using assms by simp
 
 why3_vc Min_comm by simp
 

@@ -8,7 +8,7 @@
 <prover id="3" name="Z3" version="3.2" timelimit="17" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <file name="../vacid_0_sparse_array.mlw" expanded="true">
-<theory name="SparseArray" sum="159489b9ee2aec7ce33c556960b0fb5e" expanded="true">
+<theory name="SparseArray" sum="5ea04f7b633e65f60f585e12e0584652" expanded="true">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -19,10 +19,10 @@
  <proof prover="2"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="permutation" expanded="true">
- <proof prover="0" edited="vacid_0_sparse_array_2_SparseArray_permutation_1.v"><result status="valid" time="35.87"/></proof>
+ <proof prover="0" edited="vacid_0_sparse_array_2_SparseArray_permutation_1.v"><result status="valid" time="31.75"/></proof>
  </goal>
  <goal name="WP_parameter set" expl="VC for set" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter set.1" expl="1. index in array bounds">
   <proof prover="2" timelimit="17"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -74,9 +74,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="b71baa67784f2904d3d3ba031fd7936e" expanded="true">
+<theory name="Harness" sum="a646b17fa0cea6fb8a998f82a567b7df" expanded="true">
  <goal name="WP_parameter harness" expl="VC for harness">
- <proof prover="2"><result status="valid" time="2.26"/></proof>
+ <proof prover="2"><result status="valid" time="1.92"/></proof>
  </goal>
  <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="4"><result status="valid" time="0.06"/></proof>

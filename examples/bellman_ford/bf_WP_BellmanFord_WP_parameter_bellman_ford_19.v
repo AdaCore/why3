@@ -2,36 +2,21 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require list.List.
+Require list.Length.
 Require int.Int.
+Require list.Mem.
 Require map.Map.
+Require list.Append.
 
 (* Why3 assumption *)
 Definition unit := unit.
 
-(* Why3 assumption *)
-Inductive list
-  (a:Type) {a_WT:WhyType a} :=
-  | Nil : list a
-  | Cons : a -> (list a) -> list a.
-Axiom list_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (list a).
-Existing Instance list_WhyType.
-Implicit Arguments Nil [[a] [a_WT]].
-Implicit Arguments Cons [[a] [a_WT]].
+Axiom qtmark : Type.
+Parameter qtmark_WhyType : WhyType qtmark.
+Existing Instance qtmark_WhyType.
 
-(* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a} (l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-
-Axiom Length_nonnegative : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
-Axiom set : forall (a:Type) {a_WT:WhyType a}, Type.
+Axiom set : forall (a:Type), Type.
 Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
 Existing Instance set_WhyType.
 
@@ -61,11 +46,11 @@ Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set a).
 Definition is_empty {a:Type} {a_WT:WhyType a} (s:(set a)): Prop :=
   forall (x:a), ~ (mem x s).
 
-Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty :(set
+Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty : (set
   a))).
 
 Axiom mem_empty : forall {a:Type} {a_WT:WhyType a}, forall (x:a), ~ (mem x
-  (empty :(set a))).
+  (empty : (set a))).
 
 Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 
@@ -76,6 +61,12 @@ Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 
 Axiom remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
   (s:(set a)), (mem x (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
+
+Axiom add_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
+  a)), (mem x s) -> ((add x (remove x s)) = s).
+
+Axiom remove_add : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
+  a)), ((remove x (add x s)) = (remove x s)).
 
 Axiom subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
   a)), (subset (remove x s) s).
@@ -149,93 +140,62 @@ Axiom s_in_graph : (mem s vertices).
 Axiom vertices_cardinal_pos : (0%Z < (cardinal vertices))%Z.
 
 (* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a} (l1:(list a)) (l2:(list
-  a)) {struct l1}: (list a) :=
-  match l1 with
-  | Nil => l2
-  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
-  end.
-
-Axiom Append_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
-  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
-
-Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
-
-Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((length (infix_plpl l1
-  l2)) = ((length l1) + (length l2))%Z).
-
-(* Why3 assumption *)
-Fixpoint mem1 {a:Type} {a_WT:WhyType a} (x:a) (l:(list
-  a)) {struct l}: Prop :=
-  match l with
-  | Nil => False
-  | (Cons y r) => (x = y) \/ (mem1 x r)
-  end.
-
-Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
-  a)) (l2:(list a)), (mem1 x (infix_plpl l1 l2)) <-> ((mem1 x l1) \/ (mem1 x
-  l2)).
-
-Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), (mem1 x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (infix_plpl l1 (Cons x l2))).
-
-(* Why3 assumption *)
-Inductive path : vertex -> (list vertex) -> vertex -> Prop :=
-  | Path_empty : forall (x:vertex), (path x (Nil :(list vertex)) x)
+Inductive path: vertex -> (list vertex) -> vertex -> Prop :=
+  | Path_empty : forall (x:vertex), (path x Init.Datatypes.nil x)
   | Path_cons : forall (x:vertex) (y:vertex) (z:vertex) (l:(list vertex)),
-      (edge x y) -> ((path y l z) -> (path x (Cons x l) z)).
+      (edge x y) -> ((path y l z) -> (path x (Init.Datatypes.cons x l) z)).
 
-Axiom path_right_extension : forall (x:vertex) (y:vertex) (z:vertex) (l:(list
-  vertex)), (path x l y) -> ((edge y z) -> (path x (infix_plpl l (Cons y
-  (Nil :(list vertex)))) z)).
+Axiom path_right_extension : forall (x:vertex) (y:vertex) (z:vertex)
+  (l:(list vertex)), (path x l y) -> ((edge y z) -> (path x
+  (Init.Datatypes.app l (Init.Datatypes.cons y Init.Datatypes.nil)) z)).
 
 Axiom path_right_inversion : forall (x:vertex) (z:vertex) (l:(list vertex)),
-  (path x l z) -> (((x = z) /\ (l = (Nil :(list vertex)))) \/
-  exists y:vertex, exists l':(list vertex), (path x l' y) /\ ((edge y z) /\
-  (l = (infix_plpl l' (Cons y (Nil :(list vertex))))))).
+  (path x l z) -> (((x = z) /\ (l = Init.Datatypes.nil)) \/ exists y:vertex,
+  exists l':(list vertex), (path x l' y) /\ ((edge y z) /\
+  (l = (Init.Datatypes.app l' (Init.Datatypes.cons y Init.Datatypes.nil))))).
 
 Axiom path_trans : forall (x:vertex) (y:vertex) (z:vertex) (l1:(list vertex))
   (l2:(list vertex)), (path x l1 y) -> ((path y l2 z) -> (path x
-  (infix_plpl l1 l2) z)).
+  (Init.Datatypes.app l1 l2) z)).
 
-Axiom empty_path : forall (x:vertex) (y:vertex), (path x (Nil :(list vertex))
+Axiom empty_path : forall (x:vertex) (y:vertex), (path x Init.Datatypes.nil
   y) -> (x = y).
 
-Axiom path_decomposition : forall (x:vertex) (y:vertex) (z:vertex) (l1:(list
-  vertex)) (l2:(list vertex)), (path x (infix_plpl l1 (Cons y l2)) z) ->
-  ((path x l1 y) /\ (path y (Cons y l2) z)).
+Axiom path_decomposition : forall (x:vertex) (y:vertex) (z:vertex)
+  (l1:(list vertex)) (l2:(list vertex)), (path x
+  (Init.Datatypes.app l1 (Init.Datatypes.cons y l2)) z) -> ((path x l1 y) /\
+  (path y (Init.Datatypes.cons y l2) z)).
 
 Parameter weight: vertex -> vertex -> Z.
 
 (* Why3 assumption *)
 Fixpoint path_weight (l:(list vertex)) (dst:vertex) {struct l}: Z :=
   match l with
-  | Nil => 0%Z
-  | (Cons x Nil) => (weight x dst)
-  | (Cons x ((Cons y _) as r)) => ((weight x y) + (path_weight r dst))%Z
+  | Init.Datatypes.nil => 0%Z
+  | (Init.Datatypes.cons x Init.Datatypes.nil) => (weight x dst)
+  | (Init.Datatypes.cons x ((Init.Datatypes.cons y _) as r)) => ((weight x
+      y) + (path_weight r dst))%Z
   end.
 
-Axiom path_weight_right_extension : forall (x:vertex) (y:vertex) (l:(list
-  vertex)), ((path_weight (infix_plpl l (Cons x (Nil :(list vertex))))
+Axiom path_weight_right_extension : forall (x:vertex) (y:vertex)
+  (l:(list vertex)),
+  ((path_weight (Init.Datatypes.app l (Init.Datatypes.cons x Init.Datatypes.nil))
   y) = ((path_weight l x) + (weight x y))%Z).
 
-Axiom path_weight_decomposition : forall (y:vertex) (z:vertex) (l1:(list
-  vertex)) (l2:(list vertex)), ((path_weight (infix_plpl l1 (Cons y l2))
-  z) = ((path_weight l1 y) + (path_weight (Cons y l2) z))%Z).
+Axiom path_weight_decomposition : forall (y:vertex) (z:vertex)
+  (l1:(list vertex)) (l2:(list vertex)),
+  ((path_weight (Init.Datatypes.app l1 (Init.Datatypes.cons y l2))
+  z) = ((path_weight l1 y) + (path_weight (Init.Datatypes.cons y l2) z))%Z).
 
 Axiom path_in_vertices : forall (v1:vertex) (v2:vertex) (l:(list vertex)),
   (mem v1 vertices) -> ((path v1 l v2) -> (mem v2 vertices)).
 
 (* Why3 assumption *)
 Definition pigeon_set (s1:(set vertex)): Prop := forall (l:(list vertex)),
-  (forall (e:vertex), (mem1 e l) -> (mem e s1)) ->
-  (((cardinal s1) < (length l))%Z -> exists e:vertex, exists l1:(list
-  vertex), exists l2:(list vertex), exists l3:(list vertex),
-  (l = (infix_plpl l1 (Cons e (infix_plpl l2 (Cons e l3)))))).
+  (forall (e:vertex), (list.Mem.mem e l) -> (mem e s1)) ->
+  (((cardinal s1) < (list.Length.length l))%Z -> exists e:vertex,
+  exists l1:(list vertex), exists l2:(list vertex), exists l3:(list vertex),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3)))))).
 
 Axiom Induction : (forall (s1:(set vertex)), (is_empty s1) -> (pigeon_set
   s1)) -> ((forall (s1:(set vertex)), (pigeon_set s1) -> forall (t:vertex),
@@ -243,13 +203,14 @@ Axiom Induction : (forall (s1:(set vertex)), (is_empty s1) -> (pigeon_set
   (pigeon_set s1)).
 
 Axiom corner : forall (s1:(set vertex)) (l:(list vertex)),
-  ((length l) = (cardinal s1)) -> ((forall (e:vertex), (mem1 e l) -> (mem e
-  s1)) -> ((exists e:vertex, (exists l1:(list vertex), (exists l2:(list
-  vertex), (exists l3:(list vertex), (l = (infix_plpl l1 (Cons e
-  (infix_plpl l2 (Cons e l3))))))))) \/ forall (e:vertex), (mem e s1) ->
-  (mem1 e l))).
+  ((list.Length.length l) = (cardinal s1)) -> ((forall (e:vertex),
+  (list.Mem.mem e l) -> (mem e s1)) -> ((exists e:vertex,
+  (exists l1:(list vertex), (exists l2:(list vertex),
+  (exists l3:(list vertex),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3))))))))) \/
+  forall (e:vertex), (mem e s1) -> (list.Mem.mem e l))).
 
-Axiom pigeon_0 : (pigeon_set (empty :(set vertex))).
+Axiom pigeon_0 : (pigeon_set (empty : (set vertex))).
 
 Axiom pigeon_1 : forall (s1:(set vertex)), (pigeon_set s1) ->
   forall (t:vertex), (pigeon_set (add t s1)).
@@ -257,40 +218,44 @@ Axiom pigeon_1 : forall (s1:(set vertex)), (pigeon_set s1) ->
 Axiom pigeon_2 : forall (s1:(set vertex)), (pigeon_set s1).
 
 Axiom pigeonhole : forall (s1:(set vertex)) (l:(list vertex)),
-  (forall (e:vertex), (mem1 e l) -> (mem e s1)) ->
-  (((cardinal s1) < (length l))%Z -> exists e:vertex, exists l1:(list
-  vertex), exists l2:(list vertex), exists l3:(list vertex),
-  (l = (infix_plpl l1 (Cons e (infix_plpl l2 (Cons e l3)))))).
+  (forall (e:vertex), (list.Mem.mem e l) -> (mem e s1)) ->
+  (((cardinal s1) < (list.Length.length l))%Z -> exists e:vertex,
+  exists l1:(list vertex), exists l2:(list vertex), exists l3:(list vertex),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3)))))).
 
 Axiom long_path_decomposition_pigeon1 : forall (l:(list vertex)) (v:vertex),
-  (path s l v) -> ((~ (l = (Nil :(list vertex)))) -> forall (v1:vertex),
-  (mem1 v1 (Cons v l)) -> (mem v1 vertices)).
+  (path s l v) -> ((~ (l = Init.Datatypes.nil)) -> forall (v1:vertex),
+  (list.Mem.mem v1 (Init.Datatypes.cons v l)) -> (mem v1 vertices)).
 
 Axiom long_path_decomposition_pigeon2 : forall (l:(list vertex)) (v:vertex),
-  (forall (v1:vertex), (mem1 v1 (Cons v l)) -> (mem v1 vertices)) ->
-  (((cardinal vertices) < (length (Cons v l)))%Z -> exists e:vertex,
-  exists l1:(list vertex), exists l2:(list vertex), exists l3:(list vertex),
-  ((Cons v l) = (infix_plpl l1 (Cons e (infix_plpl l2 (Cons e l3)))))).
+  (forall (v1:vertex), (list.Mem.mem v1 (Init.Datatypes.cons v l)) -> (mem v1
+  vertices)) ->
+  (((cardinal vertices) < (list.Length.length (Init.Datatypes.cons v l)))%Z ->
+  exists e:vertex, exists l1:(list vertex), exists l2:(list vertex),
+  exists l3:(list vertex),
+  ((Init.Datatypes.cons v l) = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3)))))).
 
 Axiom long_path_decomposition_pigeon3 : forall (l:(list vertex)) (v:vertex),
   (exists e:vertex, (exists l1:(list vertex), (exists l2:(list vertex),
-  (exists l3:(list vertex), ((Cons v l) = (infix_plpl l1 (Cons e
-  (infix_plpl l2 (Cons e l3))))))))) -> ((exists l1:(list vertex),
-  (exists l2:(list vertex), (l = (infix_plpl l1 (Cons v l2))))) \/
+  (exists l3:(list vertex),
+  ((Init.Datatypes.cons v l) = (Init.Datatypes.app l1 (Init.Datatypes.cons e (Init.Datatypes.app l2 (Init.Datatypes.cons e l3))))))))) ->
+  ((exists l1:(list vertex), (exists l2:(list vertex),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons v l2))))) \/
   exists n:vertex, exists l1:(list vertex), exists l2:(list vertex),
-  exists l3:(list vertex), (l = (infix_plpl l1 (Cons n (infix_plpl l2 (Cons n
-  l3)))))).
+  exists l3:(list vertex),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons n (Init.Datatypes.app l2 (Init.Datatypes.cons n l3)))))).
 
 Axiom long_path_decomposition : forall (l:(list vertex)) (v:vertex), (path s
-  l v) -> (((cardinal vertices) <= (length l))%Z -> ((exists l1:(list
-  vertex), (exists l2:(list vertex), (l = (infix_plpl l1 (Cons v l2))))) \/
+  l v) -> (((cardinal vertices) <= (list.Length.length l))%Z ->
+  ((exists l1:(list vertex), (exists l2:(list vertex),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons v l2))))) \/
   exists n:vertex, exists l1:(list vertex), exists l2:(list vertex),
-  exists l3:(list vertex), (l = (infix_plpl l1 (Cons n (infix_plpl l2 (Cons n
-  l3))))))).
+  exists l3:(list vertex),
+  (l = (Init.Datatypes.app l1 (Init.Datatypes.cons n (Init.Datatypes.app l2 (Init.Datatypes.cons n l3))))))).
 
 Axiom simple_path : forall (v:vertex) (l:(list vertex)), (path s l v) ->
   exists l':(list vertex), (path s l' v) /\
-  ((length l') < (cardinal vertices))%Z.
+  ((list.Length.length l') < (cardinal vertices))%Z.
 
 (* Why3 assumption *)
 Definition negative_cycle (v:vertex): Prop := (mem v vertices) /\
@@ -298,9 +263,9 @@ Definition negative_cycle (v:vertex): Prop := (mem v vertices) /\
   v l2 v) /\ ((path_weight l2 v) < 0%Z)%Z).
 
 Axiom key_lemma_1 : forall (v:vertex) (n:Z), (forall (l:(list vertex)), (path
-  s l v) -> (((length l) < (cardinal vertices))%Z -> (n <= (path_weight l
-  v))%Z)) -> ((exists l:(list vertex), (path s l v) /\ ((path_weight l
-  v) < n)%Z) -> exists u:vertex, (negative_cycle u)).
+  s l v) -> (((list.Length.length l) < (cardinal vertices))%Z ->
+  (n <= (path_weight l v))%Z)) -> ((exists l:(list vertex), (path s l v) /\
+  ((path_weight l v) < n)%Z) -> exists u:vertex, (negative_cycle u)).
 
 (* Why3 assumption *)
 Inductive t :=
@@ -343,11 +308,11 @@ Axiom Antisymm : forall (x:t) (y:t), (le x y) -> ((le y x) -> (x = y)).
 Axiom Total : forall (x:t) (y:t), (le x y) \/ (le y x).
 
 (* Why3 assumption *)
-Inductive ref (a:Type) {a_WT:WhyType a} :=
+Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Implicit Arguments mk_ref [[a] [a_WT]].
+Implicit Arguments mk_ref [[a]].
 
 (* Why3 assumption *)
 Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
@@ -356,7 +321,7 @@ Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   end.
 
 (* Why3 assumption *)
-Definition t1 (a:Type) {a_WT:WhyType a} := (ref (set a)).
+Definition t1 (a:Type) := (ref (set a)).
 
 (* Why3 assumption *)
 Definition distmap := (map.Map.map vertex t).
@@ -368,13 +333,14 @@ Definition inv1 (m:(map.Map.map vertex t)) (pass:Z) (via:(set (vertex*
   v) with
   | (Finite n) => (exists l:(list vertex), (path s l v) /\ ((path_weight l
       v) = n)) /\ ((forall (l:(list vertex)), (path s l v) ->
-      (((length l) < pass)%Z -> (n <= (path_weight l v))%Z)) /\
+      (((list.Length.length l) < pass)%Z -> (n <= (path_weight l v))%Z)) /\
       forall (u:vertex) (l:(list vertex)), (path s l u) ->
-      (((length l) < pass)%Z -> ((mem (u, v) via) -> (n <= ((path_weight l
-      u) + (weight u v))%Z)%Z)))
+      (((list.Length.length l) < pass)%Z -> ((mem (u, v) via) ->
+      (n <= ((path_weight l u) + (weight u v))%Z)%Z)))
   | Infinite => (forall (l:(list vertex)), (path s l v) ->
-      (pass <= (length l))%Z) /\ forall (u:vertex), (mem (u, v) via) ->
-      forall (lu:(list vertex)), (path s lu u) -> (pass <= (length lu))%Z
+      (pass <= (list.Length.length l))%Z) /\ forall (u:vertex), (mem (u, v)
+      via) -> forall (lu:(list vertex)), (path s lu u) ->
+      (pass <= (list.Length.length lu))%Z
   end.
 
 (* Why3 assumption *)
@@ -383,7 +349,7 @@ Definition inv2 (m:(map.Map.map vertex t)) (via:(set (vertex*
   (le (map.Map.get m v) (add1 (map.Map.get m u) (Finite (weight u v)))).
 
 Axiom key_lemma_2 : forall (m:(map.Map.map vertex t)), (inv1 m
-  (cardinal vertices) (empty :(set (vertex* vertex)%type))) -> ((inv2 m
+  (cardinal vertices) (empty : (set (vertex* vertex)%type))) -> ((inv2 m
   edges) -> forall (v:vertex), ~ (negative_cycle v)).
 
 Require Import Why3.
@@ -392,23 +358,15 @@ Ltac ae := why3 "alt-ergo".
 (* Why3 goal *)
 Theorem WP_parameter_bellman_ford : let o := ((cardinal vertices) - 1%Z)%Z in
   ((1%Z <= o)%Z -> forall (m:(map.Map.map vertex t)), (inv1 m (o + 1%Z)%Z
-  (empty :(set (vertex* vertex)%type))) -> ((inv1 m (cardinal vertices)
-  (empty :(set (vertex* vertex)%type))) -> forall (es:(set (vertex*
+  (empty : (set (vertex* vertex)%type))) -> ((inv1 m (cardinal vertices)
+  (empty : (set (vertex* vertex)%type))) -> forall (es:(set (vertex*
   vertex)%type)), (es = edges) -> forall (es1:(set (vertex* vertex)%type)),
   ((subset es1 edges) /\ (inv2 m (diff edges es1))) -> forall (o1:bool),
   ((o1 = true) <-> (is_empty es1)) -> ((o1 = true) -> ((inv2 m edges) ->
-  forall (v:vertex), (mem v vertices) -> match (map.Map.get m
-  v) with
-  | (Finite n) => forall (l:(list vertex)), (path s l v) ->
-      (n <= (path_weight l v))%Z
-  | Infinite => True
-  end)))).
-(* Why3 intros o h1 m h2 h3 es h4 es1 (h5,h6) o1 h7 h8 h9 v h10. *)
-intros o _ m _ hinv1. subst o.
-intros _ _ _ _ _ _ _ hinv2.
-intros v hv.
-destruct (Map.get m v) as [] _eqn; auto.
-intros l hl.
+  forall (v:vertex), (mem v vertices) -> forall (x:Z), ((map.Map.get m
+  v) = (Finite x)) -> forall (l:(list vertex)), (path s l v) ->
+  (x <= (path_weight l v))%Z)))).
+intros o _ m _ hinv1 _ _ _ _ _ _ _ hinv2 v hv z Heqt0 l hl.
 assert (case: (z <= path_weight l v \/ path_weight l v < z)%Z) by omega.
 destruct case; auto.
 destruct (key_lemma_1 v z) as (u, hu).
@@ -417,5 +375,4 @@ rewrite Heqt0; ae.
 exists l; intuition.
 ae.
 Qed.
-
 

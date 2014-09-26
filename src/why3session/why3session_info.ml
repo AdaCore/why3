@@ -164,7 +164,7 @@ let rec stats_of_goal ~root prefix_name stats goal =
   in
   List.iter (update_perf_stats stats) proof_list;
   PHstr.iter (stats_of_transf prefix_name stats) goal.goal_transformations;
-  if not goal.goal_verified then
+  if not (Opt.inhabited goal.goal_verified) then
     let goal_name = prefix_name ^ goal.goal_name.Ident.id_string in
     stats.no_proof <- Sstr.add goal_name stats.no_proof
   else
@@ -230,7 +230,7 @@ let rec stats2_of_goal ~nb_proofs g : notask goal_stat =
       []
   in
   if match nb_proofs with
-    | 0 -> not g.goal_verified
+    | 0 -> not (Opt.inhabited g.goal_verified)
     | 1 -> List.length proof_list = 1
     | _ -> assert false
       then Yes(proof_list,l) else No(l)

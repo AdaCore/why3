@@ -10,7 +10,7 @@
 <prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <file name="../sf.mlw" expanded="true">
-<theory name="HoareLogic" sum="95b3cc25fa4f45d05a2b8122f1552492" expanded="true">
+<theory name="HoareLogic" sum="ddde718910b3a2bf4f6fe572379dca0f" expanded="true">
  <goal name="WP_parameter slow_subtraction" expl="VC for slow_subtraction" expanded="true">
  <proof prover="3" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
@@ -36,12 +36,12 @@
  <proof prover="3" memlimit="0"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="MoreHoareLogic" sum="7d478460d9314116e5dae0d5edc01a00" expanded="true">
+<theory name="MoreHoareLogic" sum="5c5e9f4c5b36d8a386fec58dd0d0b283" expanded="true">
  <goal name="WP_parameter list_sum" expl="VC for list_sum" expanded="true">
  <proof prover="3" memlimit="0"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="WP_parameter list_member" expl="VC for list_member" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter list_member.1" expl="1. loop invariant init" expanded="true">
   <proof prover="3" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -52,7 +52,7 @@
   <proof prover="3" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter list_member.4" expl="4. loop invariant preservation" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter list_member.4.1" expl="1." expanded="true">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -71,7 +71,7 @@
   <proof prover="3" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter list_member.7" expl="7. loop invariant preservation" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter list_member.7.1" expl="1." expanded="true">
    <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>

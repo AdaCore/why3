@@ -63,7 +63,6 @@ let env_session,_,_ =
     Session.allow_obsolete_goals = true;
     Session.release_tasks = false;
     Session.use_shapes_for_pairing_sub_goals = false;
-    Session.theory_is_fully_up_to_date = false;
     Session.keygen = dummy_keygen;
   }
   in

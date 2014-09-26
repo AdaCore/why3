@@ -111,8 +111,8 @@ theory int.MinMax
    syntax function min "(ite (< %1 %2) %1 %2)"
    syntax function max "(ite (< %1 %2) %2 %1)"
 
-   remove prop Max_r
-   remove prop Min_l
+   remove prop Max_l
+   remove prop Min_r
    remove prop Max_comm
    remove prop Min_comm
    remove prop Max_assoc
@@ -211,8 +211,8 @@ theory real.MinMax
    syntax function min "(ite (< %1 %2) %1 %2)"
    syntax function max "(ite (< %1 %2) %2 %1)"
 
-   remove prop Max_r
-   remove prop Min_l
+   remove prop Max_l
+   remove prop Min_r
    remove prop Max_comm
    remove prop Min_comm
    remove prop Max_assoc

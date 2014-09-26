@@ -10,9 +10,9 @@
 <prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="17" memlimit="1000"/>
 <file name="../optimal_replay.mlw" expanded="true">
-<theory name="OptimalReplay" sum="c5c0e3da0eb4a1c7b53de9d3cfb6b532" expanded="true">
+<theory name="OptimalReplay" sum="acb443210f580c62b6d0e579421f7650" expanded="true">
  <goal name="WP_parameter distance" expl="VC for distance" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter distance.1" expl="1. array creation size">
   <proof prover="3" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -83,7 +83,7 @@
   <goal name="WP_parameter distance.22" expl="22. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
   <proof prover="2"><result status="valid" time="0.28"/></proof>
-  <proof prover="4"><result status="valid" time="1.38"/></proof>
+  <proof prover="4"><result status="valid" time="1.09"/></proof>
   </goal>
   <goal name="WP_parameter distance.23" expl="23. loop invariant preservation">
   <proof prover="2" timelimit="17"><result status="valid" time="0.06"/></proof>
@@ -95,12 +95,12 @@
   <goal name="WP_parameter distance.25" expl="25. assertion" expanded="true">
   <transf name="inline_goal" expanded="true">
    <goal name="WP_parameter distance.25.1" expl="1. assertion" expanded="true">
-   <transf name="split_goal" expanded="true">
+   <transf name="split_goal_wp" expanded="true">
     <goal name="WP_parameter distance.25.1.1" expl="1. assertion">
     <proof prover="3" memlimit="0"><result status="valid" time="0.01"/></proof>
     </goal>
     <goal name="WP_parameter distance.25.1.2" expl="2. assertion" expanded="true">
-    <proof prover="0" edited="distance_Distance_WP_parameter_distance_1.v"><result status="valid" time="4.66"/></proof>
+    <proof prover="0" edited="distance_Distance_WP_parameter_distance_1.v"><result status="valid" time="3.83"/></proof>
     </goal>
    </transf>
    </goal>

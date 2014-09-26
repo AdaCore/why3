@@ -1,6 +1,36 @@
 
 * marks an incompatible change
 
+version 0.85, September 17, 2014
+================================
+
+langage
+  * fix a soundness bug in the detection of aliases when calling a
+    WhyML function: some alias could have been forgotten when a type
+    variable was substituted with a mutable type
+
+sessions
+  o use the full path of identifiers when the user introduces namespaces
+    (BTS #17181)
+
+transformations
+  * fix a soundness bug in "compute_in_goal" regarding the handling of
+    logical implication.
+  o several improvements to "compute_in_goal":
+    . left-hand side of rewrite rules can be any symbols, not only
+      non-interpreted ones.
+    . perform beta-reduction when possible
+    . the maximal number of reduction steps can be increased using meta
+      "compute_max_steps"
+    . the transformation is documented in details in the manual
+  o new transformation "compute_specified":
+    less aggressive variant of "compute_in_goal".
+    Unfolding of definitions is controlled using meta "rewrite_def".
+  o fixed a bug in "eliminate_if" when applied on inductive definitions
+
+provers
+  o fixed wrong warning when detecting Isabelle2014
+
 version 0.84, September 1, 2014
 ===============================
 

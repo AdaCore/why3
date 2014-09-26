@@ -11,6 +11,10 @@ Require list.Append.
 (* Why3 assumption *)
 Definition unit := unit.
 
+Axiom qtmark : Type.
+Parameter qtmark_WhyType : WhyType qtmark.
+Existing Instance qtmark_WhyType.
+
 (* Why3 assumption *)
 Inductive tree :=
   | Leaf : tree
@@ -21,29 +25,31 @@ Existing Instance tree_WhyType.
 (* Why3 assumption *)
 Fixpoint depths (d:Z) (t:tree) {struct t}: (list Z) :=
   match t with
-  | Leaf => (cons d nil)
-  | (Node l r) => (List.app (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r))
+  | Leaf => (Init.Datatypes.cons d Init.Datatypes.nil)
+  | (Node l r) => (Init.Datatypes.app (depths (d + 1%Z)%Z
+      l) (depths (d + 1%Z)%Z r))
   end.
 
 Axiom depths_head : forall (t:tree) (d:Z), match (depths d
   t) with
-  | (cons x _) => (d <= x)%Z
-  | nil => False
+  | (Init.Datatypes.cons x _) => (d <= x)%Z
+  | Init.Datatypes.nil => False
   end.
 
 Axiom depths_unique : forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z))
-  (s2:(list Z)), ((List.app (depths d t1) s1) = (List.app (depths d
-  t2) s2)) -> ((t1 = t2) /\ (s1 = s2)).
+  (s2:(list Z)), ((Init.Datatypes.app (depths d
+  t1) s1) = (Init.Datatypes.app (depths d t2) s2)) -> ((t1 = t2) /\
+  (s1 = s2)).
 
 Axiom depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z))
-  (s2:(list Z)), ((List.app (depths d1 t) s1) = (List.app (depths d2
-  t) s2)) -> (d1 = d2).
+  (s2:(list Z)), ((Init.Datatypes.app (depths d1
+  t) s1) = (Init.Datatypes.app (depths d2 t) s2)) -> (d1 = d2).
 
 Axiom depths_prefix_simple : forall (t:tree) (d1:Z) (d2:Z), ((depths d1
   t) = (depths d2 t)) -> (d1 = d2).
 
 Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z)
-  (s1:(list Z)), ((List.app (depths d1 t1) s1) = (depths d2 t2)) ->
+  (s1:(list Z)), ((Init.Datatypes.app (depths d1 t1) s1) = (depths d2 t2)) ->
   (d2 <= d1)%Z.
 
 Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
@@ -57,41 +63,36 @@ Definition lex (x1:((list Z)* Z)%type) (x2:((list Z)* Z)%type): Prop :=
       | (s2, d2) => ((list.Length.length s1) < (list.Length.length s2))%Z \/
           (((list.Length.length s1) = (list.Length.length s2)) /\ match (s1,
           s2) with
-          | ((cons h1 _), (cons h2 _)) => ((d2 < d1)%Z /\ (d1 <= h1)%Z) /\
-              (h1 = h2)
+          | ((Init.Datatypes.cons h1 _), (Init.Datatypes.cons h2 _)) =>
+              (d2 < d1)%Z /\ ((d1 <= h1)%Z /\ (h1 = h2))
           | _ => False
           end)
       end
   end.
 
 (* Why3 goal *)
-Theorem WP_parameter_build_rec : forall (d:Z) (s:(list Z)),
-  match s with
-  | nil => True
-  | (cons h t) => (~ (h < d)%Z) -> ((~ (h = d)) -> forall (result:tree)
-      (result1:(list Z)), (s = (List.app (depths (d + 1%Z)%Z
-      result) result1)) -> ((forall (t1:tree) (s':(list Z)),
-      ~ ((List.app (depths (d + 1%Z)%Z t1) s') = result1)) ->
-      forall (t1:tree) (s':(list Z)), ~ ((List.app (depths d t1) s') = s)))
-  end.
-(* Why3 intros d s. *)
+Theorem WP_parameter_build_rec : forall (d:Z) (s:(list Z)), forall (x:Z)
+  (x1:(list Z)), (s = (Init.Datatypes.cons x x1)) -> ((~ (x < d)%Z) ->
+  ((~ (x = d)) -> forall (result:tree) (result1:(list Z)),
+  (s = (Init.Datatypes.app (depths (d + 1%Z)%Z result) result1)) ->
+  ((forall (t:tree) (s':(list Z)), ~ ((Init.Datatypes.app (depths (d + 1%Z)%Z
+  t) s') = result1)) -> forall (t:tree) (s':(list Z)),
+  ~ ((Init.Datatypes.app (depths d t) s') = s)))).
+intros d s x x1 h1 h2 h3 result result1 h4 h5 t s'.
+subst.
 intuition.
-destruct s; intuition.
-rename z into h. rename s into t.
-rename result into l. rename result1 into sl.
-destruct t1 as [_|t1 t2].
-(* t1 = Leaf *)
-simpl in H3.
-injection H3.
+destruct t as [_|t1 t2].
+(* t = Leaf *)
+simpl in H.
+injection H.
 omega.
-(* t1 = Node t1 t2 *)
-simpl in H3.
-rewrite <- Append.Append_assoc in H3.
-rewrite H1 in H3.
-generalize (depths_unique _ _ _ _ _ H3).
+(* t = Node t1 t2 *)
+simpl in H.
+rewrite <- Append.Append_assoc in H.
+rewrite h4 in H.
+generalize (depths_unique _ _ _ _ _ H).
 intuition.
 subst t1.
-apply (H2 t2 s'); intuition.
+apply (h5 t2 s'); intuition.
 Qed.
-
 

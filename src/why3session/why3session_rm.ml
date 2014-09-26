@@ -65,7 +65,7 @@ let run_one env config filters fname =
       let remove = match !opt_remove with
         | Always -> true (*| Never -> false*)
         | Interactive -> interactive pr
-        | Not_valid -> not (proof_verified pr) in
+        | Not_valid -> not (Opt.inhabited (proof_verified pr)) in
       if remove then remove_external_proof pr) env_session.session;
   save_session config env_session.session
 

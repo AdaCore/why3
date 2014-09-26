@@ -322,7 +322,6 @@ let update_session ~allow_obsolete ~release ~use_shapes
     allow_obsolete_goals = allow_obsolete;
     release_tasks = release;
     use_shapes_for_pairing_sub_goals = use_shapes;
-    theory_is_fully_up_to_date = false; (* dummy initialisation *)
     keygen = O.create;
   }
   in
@@ -780,18 +779,7 @@ let transformation_on_goal_aux eS tr keep_dumb_transformation g =
   let subgoals = Trans.apply_transform tr eS.env gtask in
   let b = keep_dumb_transformation ||
     match subgoals with
-      | [task] ->
-              (* let s1 = task_checksum (get_task g) in *)
-              (* let s2 = task_checksum task in *)
-              (* (\* *)
-              (*   eprintf "Transformation returned only one task.
-                   sum before = %s, sum after = %s@." (task_checksum g.task)
-                   (task_checksum task); *)
-              (*   eprintf "addresses: %x %x@." (Obj.magic g.task)
-                   (Obj.magic task); *)
-              (* *\) *)
-              (* s1 <> s2 *)
-        not (Task.task_equal task gtask)
+      | [task] -> not (Task.task_equal task gtask)
       | _ -> true
   in
   if b then
@@ -893,16 +881,16 @@ let remove_metas t =
   remove_metas ~notify t
 
 let rec clean = function
-  | Goal g when g.goal_verified ->
+  | Goal g when Opt.inhabited g.goal_verified ->
     iter_goal
       (fun a ->
         if a.proof_obsolete || not (proof_successful_or_just_edited a) then
           remove_proof_attempt a)
       (fun t ->
-        if not t.transf_verified then remove_transformation t
+        if not (Opt.inhabited t.transf_verified) then remove_transformation t
         else transf_iter clean t)
       (fun m ->
-        if not m.metas_verified then remove_metas m
+        if not (Opt.inhabited m.metas_verified) then remove_metas m
         else metas_iter clean m)
       g
   | Goal g ->
@@ -916,7 +904,7 @@ let rec clean = function
         *)
         transf_iter clean t)
       (fun m ->
-        if not m.metas_verified then remove_metas m
+        if not (Opt.inhabited m.metas_verified) then remove_metas m
         else metas_iter clean m)
       g
   | Proof_attempt a -> clean (Goal a.proof_parent)
@@ -929,10 +917,10 @@ let convert_unknown_prover =
 
   open Strategy
 
-  let rec exec_strategy es sched pc strat g =
+  let rec exec_strategy ~todo es sched pc strat g =
     if pc < 0 || pc >= Array.length strat then
       (* halt the strategy *)
-      ()
+      Todo._done todo ()
     else
       match Array.get strat pc with
         | Icall_prover(p,timelimit,memlimit) ->
@@ -943,10 +931,10 @@ let convert_unknown_prover =
                 ()
               | Done { Call_provers.pr_answer = Call_provers.Valid } ->
                 (* proof succeeded, nothing more to do *)
-                ()
+                Todo._done todo ()
               | Interrupted | InternalFailure _ | Done _ ->
                 (* proof did not succeed, goto to next step *)
-                let callback () = exec_strategy es sched (pc+1) strat g in
+                let callback () = exec_strategy ~todo es sched (pc+1) strat g in
                 schedule_delayed_action sched callback
               | Unedited | JustEdited ->
                 (* should not happen *)
@@ -957,25 +945,34 @@ let convert_unknown_prover =
           let callback ntr =
             match ntr with
               | None -> (* transformation failed *)
-                let callback () = exec_strategy es sched (pc+1) strat g in
+                let callback () = exec_strategy ~todo es sched (pc+1) strat g in
                 schedule_delayed_action sched callback
               | Some tr ->
                 List.iter
                   (fun g ->
+                    Todo.start todo;
                     let callback () =
-                      exec_strategy es sched pcsuccess strat g
+                      exec_strategy ~todo es sched pcsuccess strat g
                     in
                     schedule_delayed_action sched callback
                   )
-                tr.transf_goals
+                tr.transf_goals;
+                Todo._done todo ()
           in
           transform_goal es sched ~callback trname g
         | Igoto pc ->
-          exec_strategy es sched pc strat g
+          exec_strategy ~todo es sched pc strat g
 
 
-  let run_strategy_on_goal es sched strat g =
-    let callback () = exec_strategy es sched 0 strat g in
+  let run_strategy_on_goal
+      ?(intermediate_callback=fun () -> ())
+      ?(final_callback=fun () -> ())
+      es sched strat g =
+    let todo =
+      Todo.create () (fun () -> intermediate_callback) final_callback
+    in
+    Todo.start todo;
+    let callback () = exec_strategy ~todo es sched 0 strat g in
     schedule_delayed_action sched callback
 
 

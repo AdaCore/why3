@@ -8,7 +8,7 @@
 <prover id="3" name="Z3" version="4.3.1" timelimit="5" memlimit="4000"/>
 <prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <file name="../isqrt.mlw" expanded="true">
-<theory name="Simple" sum="125545461475215366425f7222d9828e" expanded="true">
+<theory name="Simple" sum="37986e654f2b5693ba9c6ee771a12da0" expanded="true">
  <goal name="WP_parameter isqrt" expl="VC for isqrt">
  <proof prover="1" timelimit="2"><result status="valid" time="0.01"/></proof>
  <proof prover="2" timelimit="2"><result status="valid" time="0.02"/></proof>
@@ -19,9 +19,9 @@
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="NewtonMethod" sum="594efc9acb57a0af30dd29617e209cf7" expanded="true">
+<theory name="NewtonMethod" sum="2f024f674d36e207994d5a608f1eab47" expanded="true">
  <goal name="WP_parameter sqrt" expl="VC for sqrt" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter sqrt.1" expl="1. postcondition">
   <proof prover="0" timelimit="20"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -35,7 +35,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter sqrt.3" expl="3. loop invariant init">
-  <transf name="split_goal">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter sqrt.3.1" expl="1.">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
    <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -67,7 +67,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter sqrt.4" expl="4. loop invariant preservation" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter sqrt.4.1" expl="1.">
    <proof prover="0"><result status="valid" time="3.53"/></proof>
    <proof prover="1"><result status="valid" time="0.02"/></proof>

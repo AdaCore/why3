@@ -11,6 +11,8 @@
 
 (* useful option combinators *)
 
+let inhabited = function None -> false | Some _ -> true
+
 let get = function None -> invalid_arg "Opt.get" | Some x -> x
 
 let get_exn exn = function None -> raise exn | Some x -> x

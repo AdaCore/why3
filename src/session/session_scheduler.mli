@@ -296,6 +296,8 @@ module Make(O: OBSERVER) : sig
     (** Same as {!Session_tools.convert_unknown_prover} *)
 
   val run_strategy_on_goal:
+    ?intermediate_callback: (unit -> unit) ->
+    ?final_callback: (unit -> unit) ->
     O.key Session.env_session -> t ->
     Strategy.t -> O.key Session.goal -> unit
 

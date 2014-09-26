@@ -9,14 +9,14 @@
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
 <file name="../ropes.mlw" expanded="true">
-<theory name="String" sum="f83f17e11c97ba45fbef5e83746e6bb8" expanded="true">
+<theory name="String" sum="04c184afc88e2f64cbd9da57b75cf764" expanded="true">
  <goal name="app_assoc">
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
-<theory name="Sig" sum="41cea5edc1b4962ec8b52f7f5a3a349f">
+<theory name="Sig" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Rope" sum="566376c64cab0b553a2d9efc4bb68457" expanded="true">
+<theory name="Rope" sum="a2845fa35f778bd40008cbd354d95b6b" expanded="true">
  <goal name="rope_length_is_string_length">
  <transf name="induction_ty_lex">
   <goal name="rope_length_is_string_length.1" expl="1.">
@@ -175,7 +175,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Balance" sum="ec11b320b5480d3381dfae21e25c9a5d" expanded="true">
+<theory name="Balance" sum="0326e74337578a5c56ecb5c13fdb929b" expanded="true">
  <goal name="WP_parameter string_of_array_concat" expl="VC for string_of_array_concat">
  <transf name="split_goal_wp">
   <goal name="WP_parameter string_of_array_concat.1" expl="1. variant decrease">
@@ -309,7 +309,7 @@
   <proof prover="2"><result status="valid" time="3.81"/></proof>
   </goal>
   <goal name="WP_parameter insert.16" expl="16. assertion">
-  <proof prover="5" timelimit="30"><result status="valid" time="2.33"/></proof>
+  <proof prover="5" timelimit="30"><result status="valid" time="1.94"/></proof>
   </goal>
   <goal name="WP_parameter insert.17" expl="17. postcondition">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
@@ -327,7 +327,7 @@
      <proof prover="5" timelimit="5"><result status="valid" time="0.12"/></proof>
      </goal>
      <goal name="WP_parameter insert.19.1.1.2" expl="2.">
-     <proof prover="0"><result status="valid" time="6.76"/></proof>
+     <proof prover="0"><result status="valid" time="5.98"/></proof>
      </goal>
     </transf>
     </goal>

@@ -139,9 +139,11 @@ let run_one ~action env config filters pk fname =
               interactive
                 (PHprover.find pr.proof_parent.goal_external_proofs prover)
             | Not_valid ->
-              let rm =
-                (PHprover.find pr.proof_parent.goal_external_proofs prover) in
-              not (proof_verified rm) in
+              let rm = 
+                PHprover.find pr.proof_parent.goal_external_proofs prover
+              in
+              not (Opt.inhabited (proof_verified rm))
+          in
           if not replace then raise Exit;
           copy_external_proof ~keygen ~prover ~env_session pr
       in

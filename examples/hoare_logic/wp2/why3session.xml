@@ -10,7 +10,7 @@
 <prover id="5" name="Z3" version="3.2" timelimit="5" memlimit="0"/>
 <prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <file name="../wp2.mlw" expanded="true">
-<theory name="Imp" sum="52e0b6cc35122c4a38a610a366591c45">
+<theory name="Imp" sum="48b8cdaa16c40934d6d98801618e3413">
  <goal name="eval_subst_term">
  <proof prover="0" timelimit="5" memlimit="0" edited="wp2_Imp_eval_subst_term_1.v"><result status="valid" time="1.12"/></proof>
  </goal>
@@ -41,7 +41,7 @@
  <proof prover="0" memlimit="0" edited="wp2_Imp_many_steps_seq_1.v"><result status="valid" time="1.30"/></proof>
  </goal>
 </theory>
-<theory name="TestSemantics" sum="bdb4a801a885f6f40d79ac7c982e460d" expanded="true">
+<theory name="TestSemantics" sum="1e578a037b7e150804867e2478799b56">
  <goal name="Test13">
  <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -69,7 +69,7 @@
  <proof prover="0" timelimit="5" edited="wp2_TestSemantics_If42_1.v"><result status="valid" time="2.17"/></proof>
  </goal>
 </theory>
-<theory name="HoareLogic" sum="ef66f66e55d831999aa3a18b741d55be" expanded="true">
+<theory name="HoareLogic" sum="e2997adbb6b4c6683a6910d170a6db1c">
  <goal name="consequence_rule">
  <proof prover="2"><result status="valid" time="0.12"/></proof>
  <proof prover="4"><result status="valid" time="0.06"/></proof>
@@ -100,7 +100,7 @@
  <proof prover="0" memlimit="0" edited="wp2_HoareLogic_while_rule_ext_1.v"><result status="valid" time="1.48"/></proof>
  </goal>
 </theory>
-<theory name="WP" sum="cec5334e8d94462d88c8180bed43cc7e" expanded="true">
+<theory name="WP" sum="8242dfcb9185b009280f6cc1ec46822e" expanded="true">
  <goal name="assigns_refl">
  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -114,12 +114,12 @@
  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="WP_parameter compute_writes" expl="VC for compute_writes">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter compute_writes.1" expl="1. postcondition">
   <proof prover="1" memlimit="0"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.2" expl="2. postcondition">
-  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_1.v"><result status="valid" time="1.39"/></proof>
+  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_1.v"><result status="valid" time="1.26"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.3" expl="3. variant decrease">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
@@ -138,21 +138,21 @@
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.8" expl="8. postcondition">
-  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_3.v"><result status="valid" time="1.26"/></proof>
+  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_3.v"><result status="valid" time="1.18"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.9" expl="9. variant decrease">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.10" expl="10. postcondition">
-  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_4.v"><result status="valid" time="1.23"/></proof>
+  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_4.v"><result status="valid" time="1.12"/></proof>
   </goal>
   <goal name="WP_parameter compute_writes.11" expl="11. postcondition">
-  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_2.v"><result status="valid" time="1.19"/></proof>
+  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_compute_writes_2.v"><result status="valid" time="0.99"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter wp" expl="VC for wp">
- <transf name="split_goal">
+ <goal name="WP_parameter wp" expl="VC for wp" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter wp.1" expl="1. postcondition">
   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
   <proof prover="2" timelimit="3" memlimit="0"><result status="valid" time="0.04"/></proof>
@@ -186,8 +186,8 @@
   <goal name="WP_parameter wp.7" expl="7. variant decrease">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter wp.8" expl="8. postcondition">
-  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_wp_1.v"><result status="valid" time="1.02"/></proof>
+  <goal name="WP_parameter wp.8" expl="8. postcondition" expanded="true">
+  <proof prover="0" memlimit="0" edited="wp2_WP_WP_WP_parameter_wp_1.v"><result status="valid" time="1.07"/></proof>
   </goal>
   <goal name="WP_parameter wp.9" expl="9. postcondition">
   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
@@ -199,8 +199,8 @@
   <goal name="WP_parameter wp.10" expl="10. variant decrease">
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter wp.11" expl="11. postcondition">
-  <proof prover="0" timelimit="5" memlimit="0" edited="wp2_WP_WP_WP_parameter_wp_2.v"><result status="valid" time="1.42"/></proof>
+  <goal name="WP_parameter wp.11" expl="11. postcondition" expanded="true">
+  <proof prover="0" timelimit="5" memlimit="0" edited="wp2_WP_WP_WP_parameter_wp_2.v"><result status="valid" time="1.19"/></proof>
   </goal>
  </transf>
  </goal>

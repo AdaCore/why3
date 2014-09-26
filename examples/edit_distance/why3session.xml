@@ -8,7 +8,7 @@
 <prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
 <prover id="4" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <file name="../edit_distance.mlw" expanded="true">
-<theory name="Word" sum="05fa4b499f368727a2004188083a9908" expanded="true">
+<theory name="Word" sum="2b10f8c8c33b3f9ecd0f890f60c88e8a" expanded="true">
  <goal name="first_last_explicit" expanded="true">
  <proof prover="0" memlimit="0" edited="edit_distance_Word_first_last_explicit_1.v"><result status="valid" time="1.03"/></proof>
  </goal>
@@ -43,12 +43,12 @@
  <proof prover="0" timelimit="20" memlimit="0" edited="edit_distance_Word_min_dist_eps_length_1.v"><result status="valid" time="1.08"/></proof>
  </goal>
 </theory>
-<theory name="EditDistance" sum="9187d8949b65f193fd8b7a2c21a8ed4e" expanded="true">
+<theory name="EditDistance" sum="1d993c8135f75176eb831e98c1414b06" expanded="true">
  <goal name="suffix_length" expanded="true">
  <proof prover="0" timelimit="20" memlimit="0" edited="edit_distance_WP_EditDistance_suffix_length_1.v"><result status="valid" time="1.16"/></proof>
  </goal>
  <goal name="WP_parameter distance" expl="VC for distance" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter distance.1" expl="1. array creation size" expanded="true">
   <proof prover="2" timelimit="30" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>

@@ -1,0 +1,13 @@
+module Bad
+
+  use import ref.Ref
+
+  let f (r: ref int) (x: 'a) : unit
+    ensures { x = old x /\ !r = 0 }
+  = r := 0
+
+  let bad ()
+    ensures { false }
+  = let r = ref 1 in
+    f r r
+end

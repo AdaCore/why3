@@ -99,39 +99,43 @@ execute () {
 }
 
 extract_and_run () {
-    echo -n "$1... "
-    rm -f $1/$2
+    dir=$1
+    shift
+    prg=$1
+    shift
+    echo -n "$dir... "
+    rm -f $dir/$prg
     echo -n "extract... "
-    if BENCH=yes make -C $1 extract > /dev/null 2>&1; then
+    if BENCH=yes make -C $dir extract > /dev/null 2>&1; then
         echo -n "compile... "
-        if BENCH=yes make -C $1 > /dev/null 2>&1; then
+        if BENCH=yes make -C $dir > /dev/null 2>&1; then
            echo -n "execute... "
-           if $1/main.opt $3 > /dev/null 2>&1; then
+           if $dir/main.opt "$@" > /dev/null 2>&1; then
                echo -n "doc... "
-               if BENCH=yes make -C $1 doc > /dev/null 2>&1; then
+               if BENCH=yes make -C $dir doc > /dev/null 2>&1; then
                    echo "ok"
                else
                    echo "documentation failed!"
-                   echo BENCH=yes make -C $1 doc
-                   BENCH=yes make -C $1 doc
+                   echo BENCH=yes make -C $dir doc
+                   BENCH=yes make -C $dir doc
                    exit 1
                fi
            else
               echo "execution failed!"
-              echo $1/main.opt $3
-              $1/main.opt $3
+              echo $dir/main.opt "$@"
+              $dir/main.opt "$@"
               exit 1
            fi
         else
             echo "compilation failed!"
-            echo BENCH=yes make -C $1
-            BENCH=yes make -C $1
+            echo BENCH=yes make -C $dir
+            BENCH=yes make -C $dir
             exit 1
         fi
     else
         echo "extract failed!"
-        echo BENCH=yes make -C $1 extract
-        BENCH=yes make -C $1 extract
+        echo BENCH=yes make -C $dir extract
+        BENCH=yes make -C $dir extract
         exit 1
     fi
 }
@@ -222,7 +226,9 @@ echo ""
 
 echo "=== Extraction to Ocaml ==="
 extract_and_run examples/euler001 euler001__*.ml 1000000
+extract_and_run examples/gcd gcd__*.ml 6 15
 extract_and_run examples/vstte10_max_sum vstte10_max_sum__*.ml
+extract_and_run examples/vstte12_combinators vstte12_combinators__*.ml "((((K K) K) K) K)"
 extract_and_run examples/sudoku sudoku__*.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
 extract_and_run examples/defunctionalization defunctionalization__*.ml
 echo ""
@@ -239,4 +245,3 @@ list_stuff --list-formats
 list_stuff --list-metas
 list_stuff --list-debug-flags
 echo ""
-

@@ -2,40 +2,22 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="0"/>
-<prover id="2" name="Z3" version="2.19" timelimit="5" memlimit="0"/>
-<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="0"/>
-<prover id="4" name="Yices" version="1.0.38" timelimit="5" memlimit="0"/>
-<prover id="5" name="Gappa" version="1.1.1" timelimit="5" memlimit="0"/>
-<prover id="6" name="Vampire" version="0.6" timelimit="5" memlimit="0"/>
-<file name="../ns_clone.why">
-<theory name="Sig" sum="ef0635cb3c5ce7895de7575fc96b27dd" expanded="true">
+<prover id="0" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../ns_clone.why" expanded="true">
+<theory name="Sig" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Struct" sum="d2904589dc38c25fbff6ff6dc78b0d8a" expanded="true">
- <goal name="AddMem" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6"><result status="valid" time="0.00"/></proof>
+<theory name="Struct" sum="cbf570a03a30b3c63542974d17fdfab0" expanded="true">
+ <goal name="Sig.AddMem" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Shared" sum="6e498919164c7c186837e42401e64597" expanded="true">
+<theory name="Shared" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="AbstractUser" sum="24f95d93784f48594b8565560e58f73c" expanded="true">
+<theory name="AbstractUser" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="ConcreteUser" sum="123854ad0c19d937f3a2fafd40496420" expanded="true">
- <goal name="AddMem" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6"><result status="valid" time="0.00"/></proof>
+<theory name="ConcreteUser" sum="b6317bbd033d14844a7e4e39cac2f612" expanded="true">
+ <goal name="Sig.AddMem" expanded="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
 </file>

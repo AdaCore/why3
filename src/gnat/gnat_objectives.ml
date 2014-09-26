@@ -193,9 +193,9 @@ let next objective =
 let strategy =
   match Gnat_config.proof_mode with
   | Gnat_config.Path_WP -> ["path_split"; Gnat_split_conj.split_conj_name]
-  | Gnat_config.No_Split -> ["split_goal"]
+  | Gnat_config.No_Split -> ["split_goal_wp"]
   | _ ->
-      ["split_goal";
+      ["split_goal_wp";
        Gnat_split_conj.split_conj_name;
        Gnat_split_disj.split_disj_name]
 
@@ -460,7 +460,6 @@ let init () =
              Session.allow_obsolete_goals = true;
              release_tasks = false;
              use_shapes_for_pairing_sub_goals = true;
-             theory_is_fully_up_to_date = true;
              keygen = Gnat_sched.Keygen.keygen }
            session
            Gnat_config.env

@@ -404,10 +404,14 @@ module S = Session
 let session_needs_saving = ref false
 
 let set_row_status row b =
-  if b then
-    goals_model#set ~row:row#iter ~column:status_column !image_yes
-  else
-    goals_model#set ~row:row#iter ~column:status_column !image_unknown
+  match b with
+  | Some t ->
+    goals_model#set ~row:row#iter ~column:status_column !image_yes;
+    let t = Format.sprintf "%.2f" t in
+    goals_model#set ~row:row#iter ~column:time_column t
+  | None ->
+    goals_model#set ~row:row#iter ~column:status_column !image_unknown;
+    goals_model#set ~row:row#iter ~column:time_column ""
 
 let set_proof_state a =
   let obsolete = a.S.proof_obsolete in
@@ -764,7 +768,10 @@ let file_info = GMisc.label ~text:""
 
 let warnings = Queue.create ()
 
-let record_warning ?loc msg = Queue.push (loc,msg) warnings
+let record_warning ?loc msg =
+  Format.eprintf "%awarning: %s@."
+    (Pp.print_option Loc.report_position) loc msg;
+  Queue.push (loc,msg) warnings
 
 let () = Warning.set_hook record_warning
 
@@ -1257,13 +1264,13 @@ let (_ : GMenu.image_menu_item) =
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
 
 let rec collapse_verified = function
-  | S.Goal g when g.S.goal_verified ->
+  | S.Goal g when Opt.inhabited g.S.goal_verified ->
     let row = g.S.goal_key in
     goals_view#collapse_row row#path
-  | S.Theory th when th.S.theory_verified ->
+  | S.Theory th when Opt.inhabited th.S.theory_verified ->
     let row = th.S.theory_key in
     goals_view#collapse_row row#path
-  | S.File f when f.S.file_verified ->
+  | S.File f when Opt.inhabited f.S.file_verified ->
     let row = f.S.file_key in
     goals_view#collapse_row row#path
   | any -> S.iter collapse_verified any

@@ -11,12 +11,12 @@
 <prover id="6" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <file name="../decrease1.mlw" expanded="true">
-<theory name="Decrease1" sum="1a7d53d3b48aa101f85fdd0b6e2a1f0f" expanded="true">
+<theory name="Decrease1" sum="96029203b47dc412a4717a33c2ab812d" expanded="true">
  <goal name="decrease1_induction" expanded="true">
  <proof prover="1" edited="decrease1_Decrease1_decrease1_induction_2.v"><result status="valid" time="1.10"/></proof>
  </goal>
  <goal name="WP_parameter search" expl="VC for search" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter search.1" expl="1. loop invariant init" expanded="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -113,7 +113,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter search_rec" expl="VC for search_rec" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter search_rec.1" expl="1. index in array bounds" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>

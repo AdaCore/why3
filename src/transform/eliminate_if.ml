@@ -79,6 +79,28 @@ let elim_d d = match d.d_node with
       let abst,defn,axl = List.fold_right add_ld l ([],[],[]) in
       let defn = if defn = [] then [] else [create_logic_decl defn] in
       abst @ defn @ axl
+  | Dind (s, l) ->
+      let rec clause f = match f.t_node with
+      | Tquant (Tforall, f) ->
+          let vs,tr,f = t_open_quant f in
+          List.map (t_forall_close vs tr) (clause f)
+      | Tbinop (Timplies, g, f) ->
+          List.map (t_implies g) (clause f)
+      | Tlet (t, bf) ->
+          let v, f = t_open_bound bf in
+          List.map (t_let_close v t) (clause f)
+      (* need to eliminate if to get a clause *)
+      | Tif (f1,f2,f3) ->
+          clause (t_implies f1         f2) @
+          clause (t_implies (t_not f1) f3)
+      | _ -> [f]
+      in
+      let fn (pr,f) = match clause (elim_f f) with
+        | [] -> assert false
+        | [f] -> [pr, f] (* keep the same symbol when one clause *)
+        | l -> List.map (fun f -> create_prsymbol (id_clone pr.pr_name), f) l in
+      let fn (ps,l) = ps, List.concat (List.map fn l) in
+      [create_ind_decl s (List.map fn l)]
   | _ ->
       [DeclTF.decl_map (fun _ -> assert false) elim_f d]
 

@@ -1,132 +1,11 @@
-module Compiler_logic
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import list.Append
-  use import imp.Imp
-  use import vm.Vm
-  use import state.State
-  use import HighOrd
-
-
-
-  type pred  = machine_state -> bool
-  type post  = machine_state -> pred
-
-  (* Hoare triples with explicit pre & post *)
-  type codespec =
-   { code: code;
-     ghost pre : pos -> pred;
-     ghost post: pos -> post }
-
- (* Weakest Precondition Calculus *)
-  type wp =
-   { wcode : code;
-     ghost wp : pos -> pred -> pred }
-
-  (*
-  function offset (ms : machine_state) (ofs: pos) : machine_state
-    = match ms
-      with (VMS p s m) -> (VMS (p + ofs) s m) end *)
-
-
-
- predicate contextual_irrelevance (c : code) (p: pos) (ms1 ms2 : machine_state)
-  = forall c_global: code.
-     codeseq_at c_global p c ->
-      transition_star c_global ms1 ms2
-
- predicate total_correctness (cs : codespec) =
-   forall p: pos, ms : machine_state. cs.pre p ms ->
-      exists ms' : machine_state. cs.post p ms ms'
-      /\ contextual_irrelevance cs.code p ms ms'
-
- predicate transformer (code : wp) =
-  forall p: pos, post : pred, ms: machine_state.
-   (code.wp p post) ms ->
-    exists ms' : machine_state. (post ms')
-    /\ contextual_irrelevance code.wcode p ms ms'
-
-
- function seq_wp (s1 s2: wp) : pos -> pred -> pred =
-  \p q. s1.wp p (s2.wp (p + s1.wcode.length) q)
-
- let (~) (s1 s2 : wp) : wp
-  requires { transformer s1 /\ transformer s2 }
-  ensures  { transformer result }
-  ensures  { result.wp = seq_wp s1 s2 }
-  ensures  { result.wcode.length = s1.wcode.length + s2.wcode.length }
-  = let wcode = s1.wcode ++ s2.wcode in
-    let res   =
-    { wcode = wcode ;
-      wp    = any pos -> pred -> pred ensures {result = seq_wp s1 s2 } } in
-   assert {
-   forall p: pos, post : pred, ms: machine_state.
-    (res.wp p post) ms ->
-     not (exists ms' : machine_state. (post ms')
-          /\ contextual_irrelevance res.wcode p ms ms') ->
-    (forall ms' : machine_state. ((s2.wp (p + s1.wcode.length) post) ms')
-    /\ contextual_irrelevance res.wcode p ms ms'  -> false) && false
-   };
-   res
-
- function towp_wp (c : codespec) : pos -> pred -> pred =
-  \p q ms. c.pre p ms && (forall ms'. c.post p ms ms' -> q ms')
-
-
- let (!!) (c: codespec) : wp
- requires { total_correctness c }
- ensures  { transformer result  }
- ensures  { result.wcode = c.code }
- ensures  { result.wp = towp_wp c }
- =  { wcode = c.code; wp = any pos -> pred -> pred ensures {result = towp_wp c}}
-
- let hoare (ghost pre: pos -> pred) (c: wp)
-           (ghost post: pos -> machine_state -> pred) : codespec
- requires { transformer c }
- requires { forall p ms. pre p ms -> (c.wp p (post p ms)) ms }
- ensures  { result.code = c.wcode }
- ensures  { total_correctness result }
- ensures  { result.pre = pre /\ result.post = post }
- = { code = c.wcode ; pre = pre; post = post }
-
-
-
-
- constant ibinop_pre : pos -> pred =
-  \p ms . exists n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m
-
-
- function iadd_post : pos -> machine_state -> pred =
-   \p ms ms'. forall n1 n2 s m.
-      ms = VMS p (push n2 (push n1 s)) m  ->
-      ms' = VMS (p + 1) (push (n1 + n2) s) m
-
-
- let iaddf () : codespec
-  ensures { forall p ms. result.pre p ms <-> ibinop_pre p ms}
-  ensures { forall p ms ms'. result.post p ms ms' <-> iadd_post p ms ms' }
-  ensures { total_correctness result }
-  ensures { result.code.length = 1 }
-  = let res = {code = Cons Iadd Nil; pre  = ibinop_pre ; post = iadd_post } in
-    assert {
-     forall p ms. res.pre p ms ->
-     not (exists ms' : machine_state. res.post p ms ms' /\
-      contextual_irrelevance res.code p ms ms') ->
-      match ms with
-        | VMS p' (Cons n2 (Cons n1 s)) m -> p' = p &&
-           let ms' = VMS (p+1) (push (n1 + n2) s) m in
-              contextual_irrelevance res.code p ms ms' && false
-        | _ -> false end && false };
-    res
-
-end
 
 
 (*Imp to ImpVm compiler *)
 (**************************************************************************)
 module Compile_aexpr
 
+
+
   use import int.Int
   use import list.List
   use import list.Length
@@ -134,42 +13,296 @@ module Compile_aexpr
   use import imp.Imp
   use import vm.Vm
   use import state.State
-  use import Compiler_logic
+  use import logic.Compiler_logic
+  use import specs.VM_arith_instr_spec
+
+  function aexpr_post (a:aexpr) (len:pos) : 'a -> pos -> post =
+  \ x p ms ms'.
+    match ms with
+     | VMS _ s m -> ms' = VMS (p + len) (push (aeval m a ) s) m
+    end
+
+    lemma aexpr_post_lemma:
+     forall a len, x: 'a, p ms ms'.
+      aexpr_post a len x p ms ms' =
+       match ms with
+        | VMS _ s m -> ms' = VMS (p + len) (push (aeval m a ) s) m
+       end
+
+    meta rewrite prop aexpr_post_lemma
 
 
-
-
-  function aexpr_post (a:aexpr) (len:pos) : pos -> machine_state -> pred =
-  \ p ms ms'.
-   match ms with
-    | VMS _ s m -> ms' = VMS (p + len) (push (aeval m a ) s) m
-   end
-
-  function aexpr_pre : pos -> machine_state -> bool = \p ms.
-   match ms with
-    | VMS p' _ _ -> p = p'
-   end
-
-  let rec compile_aexpr (a : aexpr) :  codespec
+  let rec compile_aexpr (a : aexpr) :  hl 'a
     variant { a }
-    ensures { result.pre = aexpr_pre }
+    ensures { result.pre = trivial_pre }
     ensures { result.post = aexpr_post a result.code.length }
-    ensures {total_correctness result}
+    ensures { hl_correctness result}
     = let c = match a with
-     | Anum n -> absurd (* iconst n *)
-     | Avar x ->  absurd (* ivar x *)
-     | Aadd a1 a2 ->
-        !! (compile_aexpr a1) ~ !! (compile_aexpr a2) ~ !! (iaddf ())
-     | Asub a1 a2 -> absurd (* compile_aexpr a1 ~ compile_aexpr a2 ~ isubf () *)
-     | Amul a1 a2 -> absurd (* compile_aexpr a1 ~ compile_aexpr a2 ~ imulf () *)
-    end in
-    let ghost pre = aexpr_pre in
-    let ghost post = any pos -> machine_state -> pred
-     ensures { result = aexpr_post a c.wcode.length } in
-    hoare pre c post
+       | Anum n     -> $ iconstf n
+       | Avar x     -> $ ivarf x
+       | Aadd a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~  $ iaddf ()
+       | Asub a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~  $ isubf ()
+       | Amul a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~  $ imulf ()
+      end in
+       let ghost pre = trivial_pre in
+        let ghost post = aexpr_post a c.wcode.length
+        in hoare pre c post
+
+  let compile_aexpr_natural (a: aexpr) : code
+    ensures { forall c p s m.
+              codeseq_at c p result ->
+              transition_star c
+                (VMS  p                                    s  m)
+                (VMS (p + length result) (push (aeval m a) s) m) }
+  = let res =  (compile_aexpr a) : hl unit in
+   assert { forall p s m. res.pre () p (VMS p s m) };
+   res.code
+
+end
+
+module Compile_bexpr
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import imp.Imp
+  use import vm.Vm
+  use import state.State
+  use import logic.Compiler_logic
+  use import specs.VM_arith_instr_spec
+  use import specs.VM_bool_instr_spec
+  use import Compile_aexpr
+
+
+  function bexpr_post (b:bexpr) (cond: bool) (out_t:pos) (out_f:pos)
+  : 'a -> pos -> post =
+    \x p ms ms'. match ms with
+      | VMS _ s m -> if beval m b = cond
+        then ms' = VMS (p + out_t) s m
+        else ms' = VMS (p + out_f) s m
+      end
+
+  meta rewrite_def function bexpr_post
+
+  function exn_bool (b1: bexpr) (cond: bool) : 'a -> pos -> pred =
+   \x p ms. match ms with
+            | VMS _ _ m -> beval m b1 = cond end
+
+  meta rewrite_def function exn_bool
+
+
+  let rec compile_bexpr (b : bexpr) (cond: bool) (ofs: pos) :  hl 'a
+    variant { b }
+    ensures { result.pre = trivial_pre }
+    ensures { result.post =
+              bexpr_post b cond (result.code.length + ofs) result.code.length }
+    ensures { hl_correctness result}
+    =
+    let c = match b with
+       | Btrue      -> $ if cond then ibranchf ofs else inil ()
+       | Bfalse     -> $ if cond then inil () else ibranchf ofs
+       | Bnot b1    -> $ compile_bexpr b1 (not cond) ofs
+       | Band b1 b2 ->
+         let c2  = $ compile_bexpr b2 cond ofs % exn_bool b1 False in
+          let ofs = if cond then length c2.wcode else ofs + length c2.wcode in
+           let c1 = $ compile_bexpr b1 False ofs in
+            c1 ~ c2
+       | Beq a1 a2 ->
+         $ compile_aexpr a1 ~ $ compile_aexpr a2 ~
+         $ if cond then ibeqf ofs else ibnef ofs
+       | Ble a1 a2 ->
+          $ compile_aexpr a1 ~ $ compile_aexpr a2 ~
+          $ if cond then iblef ofs else ibgtf ofs
+      end  in
+      let ghost pre = trivial_pre in
+        let ghost post = bexpr_post b cond (c.wcode.length + ofs) c.wcode.length  in
+        hoare pre c post
+
+
+
+
+ let compile_bexpr_natural (b: bexpr) (cond: bool) (ofs: pos) : code
+    ensures {
+     forall c p s m.
+       codeseq_at c p result ->
+         transition_star c
+           (VMS  p s  m)
+           (VMS (p + length result + if beval m b = cond then ofs else 0) s m) }
+  = let res =  (compile_bexpr b cond ofs) : hl unit in
+   assert { forall p s m. res.pre () p (VMS p s m) };
+   res.code
+end
+
+
+
+
+module Compile_com
+
+  meta compute_max_steps 65536
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import imp.Imp
+  use import vm.Vm
+  use import state.State
+  use import logic.Compiler_logic
+  use import specs.VM_arith_instr_spec
+  use import specs.VM_bool_instr_spec
+  use import Compile_aexpr
+  use import Compile_bexpr
+
+
+  function com_pre (cmd: com) : 'a -> pos -> pred =
+   \x p ms. match ms with  VMS p' _ m -> p = p' /\ exists m'. ceval m cmd m' end
+
+  lemma com_pre_lemma:
+   forall cmd, x:'a, p ms. com_pre cmd x p ms =
+    match ms with  VMS p' _ m -> p = p' /\ exists m'. ceval m cmd m' end
+
+   meta rewrite prop com_pre_lemma
+
+  function com_post (cmd: com) (len:pos) : 'a -> pos -> post =
+  \x p ms ms'. match ms, ms' with
+              | VMS p s m, VMS p' s' m'  ->
+                p' = p + len /\ s' = s /\ ceval m cmd m'
+             end
+
+  lemma com_post_lemma:
+    forall cmd len, x:'a, p ms ms'. com_post cmd len x p ms ms' =
+     match ms, ms' with
+              | VMS p s m, VMS p' s' m'  ->
+                p' = p + len /\ s' = s /\ ceval m cmd m'
+             end
+
+  meta rewrite prop com_post_lemma
+
+ function exn_bool_old (b1: bexpr) (cond: bool) : ('a,machine_state) -> pos -> pred =
+   \x p ms. match snd x with
+            | VMS _ _ m -> beval m b1 = cond end
+
+  meta rewrite_def function exn_bool_old
+
+
+  function loop_invariant (c: com) : ('a,machine_state) -> pos -> pred =
+  \ x p msi. let ms0 = snd x in
+     match ms0, msi with
+      | VMS _ s0 m0, VMS pi si mi ->
+        pi = p /\ s0 = si /\ exists mf. ceval m0 c mf /\ ceval mi c mf
+     end
+
+  meta rewrite_def function loop_invariant
+
+
+  function loop_post (c : com) (len: pos) : ('a,machine_state) -> pos -> pred =
+   \ x p msf. let ms0 = snd x in
+     match ms0, msf with
+      | VMS _ s0 m0, VMS pf sf mf ->
+        pf = p + len /\ s0 = sf /\ ceval m0 c mf
+     end
+
+  meta rewrite_def function loop_post
+
+  function loop_variant (c : com) (test: bexpr) : ('a -> pos -> post) =
+   \ x p msj msi.
+     match msj, msi with
+      | VMS pj sj mj, VMS pi si mi ->
+       pj = pi /\ sj = si /\ ceval mi c mj /\ beval mi test = True
+     end
+
+  meta rewrite_def function loop_variant
+
+
+  let rec compile_com (cmd: com) : hl 'a
+  variant  { cmd }
+  ensures  { result.pre = com_pre cmd }
+  ensures  { result.post = com_post cmd result.code.length }
+  ensures  { hl_correctness result }
+  = let res =
+      match cmd with
+       | Cskip              -> $ inil ()
+       | Cassign x a        -> $ compile_aexpr a  ~ $ isetvarf x
+       | Cseq cmd1 cmd2     -> $ compile_com cmd1 ~ $ compile_com cmd2
+       | Cif cond cmd1 cmd2 ->
+       let code_true   = compile_com cmd1 in
+       let code_false  = compile_com cmd2 in
+        $ compile_bexpr cond False (code_true.code.length + 1) ~
+        (($ code_true ~ $ ibranchf code_false.code.length) % exn_bool cond False)  ~
+        ($ code_false % exn_bool_old cond True)
+       | Cwhile test body  ->
+          let code_body = compile_com body in
+           let body_length = length code_body.code + 1 in
+            let code_test = compile_bexpr test False (body_length) in
+           let ofs = (length code_test.code + body_length) in
+            let wp_while = $ code_test ~
+              ($ code_body ~ $ ibranchf (- ofs)) % exn_bool test False in
+            let ghost inv  = loop_invariant cmd in
+            let ghost var  = loop_variant body test  in
+            let ghost post = loop_post cmd ofs in
+            let hl_while = hoare inv wp_while (loop_preservation inv var post) in
+            $ inil () ~ $ make_loop_hl hl_while inv var post
+      end
+     in
+    let ghost pre  = com_pre cmd in
+    let ghost post = com_post cmd res.wcode.length  in
+    hoare pre res post
+
+
+
+
+ let compile_com_natural (com: com) : code
+    ensures {
+     forall c p s m m'.
+        ceval m com m' ->
+         codeseq_at c p result ->
+          transition_star c
+           (VMS  p s  m)
+            (VMS (p + length result) s m') }
+  = let res =  compile_com com : hl unit in
+   assert { forall p s m m'. ceval m com m' -> res.pre () p (VMS p s m) };
+   res.code
+
+
+ let compile_program (prog : com) : code
+   ensures { forall  mi mf: state.
+    ceval mi prog mf -> vm_terminates result mi mf }
+  = compile_com_natural prog ++ ihalt
+
 
 
 end
 
 
+
+(*
+Local Variables:
+compile-command: "why3 ide -L . compiler.mlw"
+End:
+*)
+
+
 (* *)
+
+   (*
+   (res.wp p post) ms ->
+     (exists ms' : machine_state. (post ms')
+      /\ contextual_irrelevance res.wcode p ms ms')
+  *)
+
+ (*
+   (res.wp p post) ms
+   exists ms'
+   -----------------------------------------------
+   (post ms') /\ contextual_irrelevance res.wcode p ms ms')
+  *)
+
+ (*condition suffisante ? *)
+(* trouver un ms' qui vérifie :
+ ((s2.wp (p + s1.wcode.length) post) ms')  /\ contextual_irrelevance res.wcode p ms ms' *)
+
+ (*
+   (res.wp p post) ms
+   exists ms'
+   -----------------------------------------------
+   (post ms') /\ contextual_irrelevance res.wcode p ms ms') *)

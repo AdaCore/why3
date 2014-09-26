@@ -8,7 +8,7 @@
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../sudoku.mlw" expanded="true">
-<theory name="Grid" sum="08eb02819495c8f0d8c6c85f26eb2612" expanded="true">
+<theory name="Grid" sum="5b61dbcf9a75c24d2edcc16344ad8df7" expanded="true">
  <goal name="grid_eq_sub">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -29,13 +29,13 @@
  <proof prover="4"><result status="valid" time="0.07"/></proof>
  </goal>
 </theory>
-<theory name="TheClassicalSudokuGrid" sum="7e47c44cc3f50ea38f3be33fe9c95b75" expanded="true">
+<theory name="TheClassicalSudokuGrid" sum="8ec64fe30e45ee45621f44f92b32638f" expanded="true">
  <goal name="WP_parameter classical_sudoku" expl="VC for classical_sudoku">
  <proof prover="1" timelimit="6"><result status="valid" time="1.10"/></proof>
  <proof prover="2" timelimit="6"><result status="valid" time="1.06"/></proof>
  </goal>
 </theory>
-<theory name="Solver" sum="91243b6ea25f3989383611e0bf6fb6f2" expanded="true">
+<theory name="Solver" sum="4a062cb9d5e1781da2f638dbaa3d66b5" expanded="true">
  <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk">
  <proof prover="1"><result status="timeout" time="5.00"/></proof>
  <proof prover="2"><result status="valid" time="0.81"/></proof>
@@ -212,7 +212,7 @@
   </goal>
   <goal name="WP_parameter solve_aux.20" expl="20. precondition">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="1.13"/></proof>
+  <proof prover="2"><result status="valid" time="0.84"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter solve_aux.21" expl="21. precondition">
@@ -637,7 +637,7 @@
  <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="1a4080b818ea41f745d6651113948a1a" expanded="true">
+<theory name="Test" sum="96bf6ded35162d43136dfbf608f579d3" expanded="true">
  <goal name="WP_parameter test0" expl="VC for test0">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="1"><result status="valid" time="0.03"/></proof>
@@ -649,7 +649,7 @@
  <proof prover="0"><result status="valid" time="0.10"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="4"><result status="valid" time="1.37"/></proof>
+ <proof prover="4"><result status="valid" time="0.98"/></proof>
  </goal>
  <goal name="WP_parameter test1" expl="VC for test1">
  <proof prover="0"><result status="valid" time="1.12"/></proof>

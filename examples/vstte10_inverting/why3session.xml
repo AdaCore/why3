@@ -6,9 +6,9 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="20" memlimit="0"/>
 <prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="20" memlimit="1000"/>
 <file name="../vstte10_inverting.mlw" expanded="true">
-<theory name="InvertingAnInjection" sum="34c590cbdc33a8dcf39260de14663241" expanded="true">
+<theory name="InvertingAnInjection" sum="edae6ed5759ea0db4b4db87fc22650d9" expanded="true">
  <goal name="WP_parameter inverting" expl="VC for inverting" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter inverting.1" expl="1. postcondition" expanded="true">
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -36,7 +36,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter inverting2" expl="VC for inverting2" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter inverting2.1" expl="1. array creation size" expanded="true">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -62,7 +62,7 @@
   <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter inverting2.9" expl="9. postcondition" expanded="true">
-  <transf name="split_goal" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter inverting2.9.1" expl="1." expanded="true">
    <proof prover="0" timelimit="10" memlimit="0" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting2_2.v"><result status="valid" time="1.02"/></proof>
    </goal>
@@ -74,9 +74,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="Test" sum="b41eb8496649bf359e3f999b0f39bffc" expanded="true">
+<theory name="Test" sum="c220eb649435708e00c4113893ee5915" expanded="true">
  <goal name="WP_parameter test" expl="VC for test" expanded="true">
- <transf name="split_goal" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter test.1" expl="1. array creation size" expanded="true">
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>

@@ -81,8 +81,8 @@ theory Vm "Virtual Machine for IMP language"
     | Iconst int	(*   push n on stack                               *)
     | Ivar id  		(*   push the value of variable                    *)
     | Isetvar id 	(*   pop an integer, assign it to variable         *)
-    | Ibranch_fwd pos   (*   skip ofs instructions forward                 *)
-    | Ibranch_bwd pos   (*   skip ofs instructions backward                *)
+    | Ibranch pos       (*   skip ofs instructions                         *)
+    (*| Ibranch_bwd pos (*   skip ofs instructions backward              *)*)
     | Iadd   		(*   pop two values, push their sum                *)
     | Isub      	(*   pop two values, push their difference         *)
     | Imul		(*   pop two values, push their product            *)
@@ -123,8 +123,8 @@ theory Vm "Virtual Machine for IMP language"
   function ible (ofs:int) : code = Cons (Ible ofs) Nil
   function ibne (ofs:int) : code = Cons (Ibne ofs) Nil
   function ibgt (ofs:int) : code = Cons (Ibgt ofs) Nil
-  function ibranchf (ofs: int) : code = Cons (Ibranch_fwd ofs) Nil
-  function ibranchb (ofs: int) : code = Cons (Ibranch_bwd ofs) Nil
+  function ibranch (ofs: int) : code = Cons (Ibranch ofs) Nil
+  (*function ibranchb (ofs: int) : code = Cons (Ibranch_bwd ofs) Nil*)
   constant ihalt : code = (Cons Ihalt Nil)
 
 (* The semantics of the virtual machine is given in small-step style,
@@ -151,9 +151,9 @@ theory Vm "Virtual Machine for IMP language"
 	   (VMS (p + 1) (push m[x] s)  m)
 
    | trans_set_var:
-      forall c: code, p: pos,  s: stack, x: id.
+      forall c: code, p: pos, x: id.
        codeseq_at c p (isetvar x) ->
-        forall n:int, m: state.
+        forall n:int, s: stack, m: state.
          transition c
           (VMS   p    (push n s)     m   )
       	  (VMS (p+1)       s      m[x<-n])
@@ -185,57 +185,52 @@ theory Vm "Virtual Machine for IMP language"
 
 
    | trans_beq:
-      forall c: code, p1 p2 ofs: pos, n1 n2: int.
+      forall c: code, p1 ofs: pos.
        codeseq_at c p1 (ibeq ofs) ->
-        p2 = (if n1 = n2 then p1 + 1 + ofs else p1 + 1) ->
-	 forall s:stack, m: state.
+	 forall s:stack, m: state, n1 n2: int.
 	  transition c
       	   (VMS p1 (push n2 (push n1 s)) m)
-     	   (VMS p2           s           m)
+     	   (VMS (if n1 = n2 then p1 + 1 + ofs else p1 + 1)  s m)
 
    | trans_bne:
-      forall c: code, p1 p2 ofs: pos, n1 n2: int.
+      forall c: code, p1 ofs: pos.
        codeseq_at c p1 (ibne ofs) ->
-        p2 = (if n1 = n2 then p1 + 1 else p1 + 1 + ofs) ->
-	 forall s:stack, m: state.
+       	 forall s:stack, m: state, n1 n2: int.
 	  transition c
       	   (VMS p1 (push n2 (push n1 s)) m)
-     	   (VMS p2           s           m)
+     	   (VMS (if n1 = n2 then p1 + 1 else p1 + 1 + ofs) s  m)
 
    | trans_ble:
-      forall c: code, p1 p2 ofs: pos, n1 n2: int.
+      forall c: code, p1 ofs: pos.
        codeseq_at c p1 (ible ofs) ->
-        p2 = (if n1 <= n2 then p1 + 1 + ofs else p1 + 1) ->
-	 forall s:stack, m: state.
+	 forall s:stack, m: state, n1 n2: int.
 	  transition c
       	   (VMS p1 (push n2 (push n1 s)) m)
-     	   (VMS p2           s           m)
+     	   (VMS (if n1 <= n2 then p1 + 1 + ofs else p1 + 1)  s m)
 
    | trans_bgt:
-      forall c: code, p1 p2 ofs: pos, n1 n2: int.
+      forall c: code, p1 ofs: pos.
        codeseq_at c p1 (ibgt ofs) ->
-        p2 = (if n1 <= n2 then p1 + 1 else p1 + 1 + ofs) ->
-	 forall s:stack, m: state.
+       	 forall s:stack, m: state, n1 n2: int.
 	  transition c
       	   (VMS p1 (push n2 (push n1 s)) m)
-     	   (VMS p2           s           m)
+     	   (VMS (if n1 <= n2 then p1 + 1 else p1 + 1 + ofs) s  m)
 
-
-   | trans_branch_fwd:
+   | trans_branch:
       forall c: code, p ofs: pos.
-       codeseq_at c p (ibranchf ofs) ->
+       codeseq_at c p (ibranch ofs) ->
         forall m: state, s: stack.
          transition c
           (VMS    p          s  m)
           (VMS (p + 1 + ofs) s  m)
 
-   | trans_branch_bwd:
+   (* | trans_branch_bwd:
       forall c: code, p ofs: pos.
        codeseq_at c p (ibranchb ofs) ->
         forall m: state, s: stack.
          transition c
           (VMS      p        s  m)
-          (VMS (p + 1 - ofs) s  m)
+          (VMS (p + 1 - ofs) s  m) *)
 
 
 

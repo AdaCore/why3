@@ -12,14 +12,14 @@
 <prover id="7" name="Z3" version="3.2" timelimit="10" memlimit="0"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../counting_sort.mlw">
-<theory name="Spec" sum="18058df650f22df2a2bcd77eafbf0eb2">
+<theory name="Spec" sum="0892873491a51eca57db75593120da6b">
  <goal name="eqlt">
  <proof prover="1" edited="counting_sort_WP_Spec_eqlt_2.v"><result status="valid" time="2.38"/></proof>
  </goal>
 </theory>
-<theory name="CountingSort" sum="bc99d1f194905f6084f72e24855715d3">
+<theory name="CountingSort" sum="5ac344b9b80bd4424f77600a331d53fe">
  <goal name="WP_parameter counting_sort" expl="VC for counting_sort">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter counting_sort.1" expl="1. array creation size">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -253,9 +253,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="InPlaceCountingSort" sum="cd99ac1a44dbb025e004f83b7be53653">
+<theory name="InPlaceCountingSort" sum="f3f0551746d947686f0cdc35ed92501b">
  <goal name="WP_parameter in_place_counting_sort" expl="VC for in_place_counting_sort">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter in_place_counting_sort.1" expl="1. array creation size">
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -490,9 +490,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="28bd7a7093937a7255c7fcb2f72110ea">
+<theory name="Harness" sum="4c143077aebb6a1e75048db72a7241dc">
  <goal name="WP_parameter harness" expl="VC for harness">
- <transf name="split_goal">
+ <transf name="split_goal_wp">
   <goal name="WP_parameter harness.1" expl="1. array creation size">
   <proof prover="3" timelimit="20"><result status="valid" time="0.02"/></proof>
   </goal>

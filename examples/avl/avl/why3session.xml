@@ -5,18 +5,18 @@
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="2" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.3" timelimit="2" memlimit="0"/>
-<file name="../avl.mlw">
-<theory name="SelectionTypes" sum="889610463ddab805c0b8619b38c84a3f">
+<file name="../avl.mlw" expanded="true">
+<theory name="SelectionTypes" sum="8ee3f641805a143e052f3881ea88fc8c">
  <goal name="rebuild_aternative_def">
  <proof prover="1" memlimit="0"><result status="valid" time="0.07"/></proof>
  </goal>
 </theory>
-<theory name="AVL" sum="d9afb554df4681295c3ff2120867d09a">
- <goal name="assoc">
- <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+<theory name="AVL" sum="e2c89c7fa1275fb01905418f8ee272f9" expanded="true">
+ <goal name="M.M.assoc">
+ <proof prover="1" timelimit="5"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="neutral">
- <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+ <goal name="M.M.neutral">
+ <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="WP_parameter real_height_nonnegative" expl="VC for real_height_nonnegative">
  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
@@ -164,10 +164,10 @@
  <proof prover="0" timelimit="2"><result status="valid" time="0.17"/></proof>
  </goal>
  <goal name="WP_parameter decompose_back" expl="VC for decompose_back">
- <proof prover="1" memlimit="0"><result status="valid" time="0.57"/></proof>
+ <proof prover="1" memlimit="0"><result status="valid" time="0.38"/></proof>
  </goal>
  <goal name="WP_parameter front_node" expl="VC for front_node">
- <proof prover="0" timelimit="2"><result status="valid" time="1.08"/></proof>
+ <proof prover="0" timelimit="2"><result status="valid" time="0.80"/></proof>
  </goal>
  <goal name="WP_parameter front" expl="VC for front">
  <proof prover="0" timelimit="2"><result status="valid" time="0.42"/></proof>
