@@ -168,19 +168,33 @@ module Compile_com
     end in
     hoare (com_pre cmd) res (com_post cmd res.wcode.length)
 
- let compile_com_natural (com: com) : code
+  let compile_com_natural (com: com) : code
     ensures { forall c p s m m'. ceval m com m' -> codeseq_at c p result ->
       transition_star c (VMS p s m) (VMS (p + length result) s m') }
- = let res = compile_com com : hl unit in
-   assert { forall c p s m m'. ceval m com m' -> codeseq_at c p res.code ->
-     res.pre () p (VMS p s m) && (forall ms'. res.post () p (VMS p s m) ms' ->
-     ms' = VMS (p + length res.code) s m') };
-   res.code
+  = let res = compile_com com : hl unit in
+    assert { forall c p s m m'. ceval m com m' -> codeseq_at c p res.code ->
+      res.pre () p (VMS p s m) && (forall ms'. res.post () p (VMS p s m) ms' ->
+      ms' = VMS (p + length res.code) s m') };
+    res.code
 
- let compile_program (prog : com) : code
-   ensures { forall  mi mf: state.
-    ceval mi prog mf -> vm_terminates result mi mf }
+  let compile_program (prog : com) : code
+    ensures { forall  mi mf: state.
+      ceval mi prog mf -> vm_terminates result mi mf }
   = compile_com_natural prog ++ ihalt
+
+
+  (* Execution test: compile a simple factorial program, e.g
+     X := 1; WHILE NOT (Y <= 0) DO X := X * Y; Y := Y - 1 DONE
+     (why3 execute -L . compiler.mlw Compile_com.test) *)
+  let test () : code =
+    let x = Id 0 in
+    let y = Id 1 in
+    let cond = Bnot (Ble (Avar y) (Anum 0)) in
+    let body1 = Cassign x (Amul (Avar x) (Avar y)) in
+    let body2 = Cassign y (Asub (Avar y) (Anum 1)) in
+    let lp = Cwhile cond (Cseq body1 body2) in
+    let code = Cseq (Cassign x (Anum 1)) lp in
+    compile_program code
 
 end
 
