@@ -196,6 +196,9 @@ module Compile_com
     let code = Cseq (Cassign x (Anum 1)) lp in
     compile_program code
 
+  let test2 () : code =
+    compile_program (Cwhile Btrue Cskip)
+
 end
 
 
