@@ -49,7 +49,10 @@ let array_cons_ls = ref ps_equ
 let rec print_value fmt v =
   match v with
   | Vnum n ->
-    fprintf fmt "%s" (BigInt.to_string n)
+    if BigInt.ge n BigInt.zero then
+      fprintf fmt "%s" (BigInt.to_string n)
+    else
+      fprintf fmt "(%s)" (BigInt.to_string n)
   | Vbool b ->
     fprintf fmt "%b" b
   | Vvoid ->
@@ -79,9 +82,11 @@ let rec print_value fmt v =
   | Vapp(ls,vl) when is_fs_tuple ls ->
     fprintf fmt "@[(%a)@]"
       (Pp.print_list Pp.comma print_value) vl
+  | Vapp(ls,[]) ->
+    fprintf fmt "@[%a@]" Pretty.print_ls ls
   | Vapp(ls,vl) ->
-    fprintf fmt "@[%a(%a)@]"
-      Pretty.print_ls ls (Pp.print_list Pp.comma print_value) vl
+    fprintf fmt "@[(%a %a)@]"
+      Pretty.print_ls ls (Pp.print_list Pp.space print_value) vl
   | Vbin(op,v1,v2) ->
     fprintf fmt "@[(%a %a@ %a)@]"
       print_value v1 (Pretty.print_binop ~asym:false) op print_value v2
@@ -90,7 +95,7 @@ let rec print_value fmt v =
   | Vnot v ->
     fprintf fmt "@[(not@ %a)@]" print_value v
   | Vif(v,t1,t2) ->
-    fprintf fmt "@[if %a@ then %a@ else %a@]"
+    fprintf fmt "@[(if %a@ then %a@ else %a)@]"
       print_value v Pretty.print_term t1 Pretty.print_term t2
   | Vquant(q,tq) ->
     Pretty.print_term fmt (t_quant q tq)

@@ -2294,12 +2294,12 @@ and merge_trans ~ctxt ~theories env to_goal _ from_transf =
       | (_, None) ->
         found_missed_goals_in_theory := true)
       associated;
-(* TODO: we should copy the goal, using the new new type of keys
+(* TODO: we should copy the goal, using the new type of keys
     if detached <> [] then
     to_transf.transf_detached <- Some { detached_goals = detached }
  *)
     ignore detached
-  with Exit -> ()
+  with Exit -> () (* silent failure, not a good thing... *)
 
 (** convert the ident from the old task to the ident at the same
     position in the new task *)
