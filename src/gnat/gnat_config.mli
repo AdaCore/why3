@@ -1,12 +1,22 @@
 open Why3
 
-(* Configuration settings given more or less by the why3.conf file *)
+(* Configuration settings given why3.conf file and command line options *)
 
 val config : Whyconf.config
 val env : Env.env
-val prover_driver : Driver.driver
-val prover : Whyconf.config_prover
-val prover_editor : unit -> Whyconf.config_editor
+
+type prover =
+  { driver : Driver.driver;
+    prover : Whyconf.config_prover;
+    editor : Whyconf.config_editor
+  }
+
+val provers : prover list
+(* the provers, either the default prover, or as given by --prover *)
+
+val manual_prover : prover option
+(* Currently, if a manual prover is provided, it must be the only one. So in
+   when dealing with manual proof, it makes sense to speak of "the prover" *)
 
 (* Configuration settings given or determined by the command line *)
 

@@ -48,8 +48,8 @@ val register :
   -> Task.task option                  (* task of the last goal *)
   -> Call_provers.prover_result option (* extra information about the run *)
   -> bool                              (* if the goal was proved or not *)
-  -> string option                     (* name of the file containing the vc
-                                          (for manual provers) *)
+  -> (string * string) option           (* (for manual provers) *)
+                                       (* pair of (vc_file, editor_cmd) *)
   -> string                            (* the name of the trace file *)
     -> unit
 (* register a proof result for the given objective, and the given result (the
@@ -61,3 +61,4 @@ val print_messages : unit -> unit
 (* print all messages that have been registered so far. Also
    print the result file. The return value describes whether "warning messages"
    have been issued (= unproved checks). *)
+

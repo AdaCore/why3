@@ -93,8 +93,9 @@ val iter_leaf_goals : subp -> (goal -> unit) -> unit
 (* iterate over all VCs of a subprogram. The callback will get an individual VC
    and the subp entity of the VC *)
 
-val goal_has_been_tried : goal -> bool
-(* check whether an existing valid proof attempt exists for the goal *)
+val all_provers_tried : goal -> bool
+(* check whether an existing valid proof attempt exists for the goal, for all
+   requested provers *)
 
 val objective_status : objective -> status
 (* query the status of the objective *)
@@ -140,9 +141,6 @@ val matches_subp_filter : subp -> bool
 
 module Save_VCs : sig
    (* Provide saving of VCs, traces *)
-
-   val save_vc : goal -> unit
-   (* Save the goal to a file *)
 
    val save_trace : goal -> string
    (* save the trace to a file; return the trace file name, "" if no trace was

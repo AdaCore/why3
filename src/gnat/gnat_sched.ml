@@ -11,30 +11,39 @@ module Keygen = struct
       !count
 end
 
-let goal_queue : int Session.goal Queue.t =
+ type queue_entry =
+   { goal   : int Session.goal;
+     prover : Gnat_config.prover
+   }
+
+let goal_queue : queue_entry Queue.t =
   (* the queue which contains the goals to be proved *)
   Queue.create ()
 
-let add_goal g =
+let add_goal prover g =
   (* simple wrapper for Queue.add *)
-  Queue.add g goal_queue
+  Queue.add { goal = g; prover = prover } goal_queue
 
-let run_goal g =
+let run_goal entry =
   (* spawn a prover and return immediately. The return value is a tuple of type
      Call_provers.prover_call * Session.goal *)
+  let g = entry.goal in
+  let prover = entry.prover in
+  let base_prover = prover.Gnat_config.prover in
+  let driver = prover.Gnat_config.driver in
   let old, inplace, timeout =
-    match (Gnat_config.prover.Whyconf.interactive,
+    match (base_prover.Whyconf.interactive,
            Session.PHprover.find_opt g.Session.goal_external_proofs
-                                     Gnat_config.prover.Whyconf.prover) with
+                                     base_prover.Whyconf.prover) with
     | true, Some { Session.proof_edited_as = Some fn } ->
        Some fn, Some true, 0
     | _ -> None, None, Gnat_config.timeout in
   Driver.prove_task_server
-    Gnat_config.prover.Whyconf.command
+    base_prover.Whyconf.command
     ~timelimit:timeout
     ~memlimit:0
     ?old:old ?inplace:inplace
-    Gnat_config.prover_driver
+    driver
     (Session.goal_task g)
 
 module Intmap =
@@ -42,7 +51,7 @@ module Intmap =
 
 type running_goals =
   { num : int;
-    map : int Session.goal Intmap.t
+    map : queue_entry Intmap.t
   }
 
 let empty = { num = 0; map = Intmap.empty }
@@ -50,23 +59,24 @@ let empty = { num = 0; map = Intmap.empty }
 let rec run_goals rg =
   if rg.num >= Gnat_config.parallel || Queue.is_empty goal_queue then rg
   else begin
-    let g = Queue.pop goal_queue in
-    let id = run_goal g in
+    let entry = Queue.pop goal_queue in
+    let id = run_goal entry in
     let rg =
       { num = rg.num + 1;
-        map = Intmap.add id g rg.map
+        map = Intmap.add id entry rg.map
       }
     in
     run_goals rg
   end
 
-let handle_finished_call callback g res =
+let handle_finished_call callback entry res =
   (* On a pair of the type post_prover_call * goal, register the proof result
      in the session and call the callback *)
+  let g = entry.goal in
+  let prover = entry.prover.Gnat_config.prover.Whyconf.prover in
   let pas = (Session.Done res) in
   let edit =
-    match Session.PHprover.find_opt g.Session.goal_external_proofs
-                                    Gnat_config.prover.Whyconf.prover with
+    match Session.PHprover.find_opt g.Session.goal_external_proofs prover with
     | Some pa -> pa.Session.proof_edited_as
     | _ -> None in
   let pa =
@@ -78,14 +88,14 @@ let handle_finished_call callback g res =
          ~memlimit:0
          ~edit
          g
-         Gnat_config.prover.Whyconf.prover
+         prover
          pas in
   callback pa pas
 
 let finished_goal callback rg id res =
-  let goal = Intmap.find id rg.map in
+  let entry = Intmap.find id rg.map in
   let rg = { num = rg.num - 1; map = Intmap.remove id rg.map } in
-  handle_finished_call callback goal res;
+  handle_finished_call callback entry res;
   rg
 
 let server_pid = ref 0

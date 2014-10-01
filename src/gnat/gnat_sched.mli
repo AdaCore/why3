@@ -9,7 +9,7 @@ module Keygen : sig
    val keygen : ?parent:'a -> unit -> key
 end
 
-val add_goal : int Session.goal -> unit
+val add_goal : Gnat_config.prover -> int Session.goal -> unit
 (* add a goal to the Goal queue. This function returs immediately. *)
 
 val run :

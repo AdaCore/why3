@@ -280,6 +280,27 @@ let further_split goal =
    in
    split (find_next_transformation goal)
 
+
+let has_been_tried_by g prover =
+   (* Check whether the goal has been tried already *)
+  let prover = prover.Gnat_config.prover.Whyconf.prover in
+   try
+      Session.goal_iter (fun child ->
+         match child with
+         | Session.Proof_attempt pa ->
+               (* only count non-obsolete proof attempts with identical
+                  options *)
+               if not pa.Session.proof_obsolete &&
+               pa.Session.proof_prover = prover &&
+               pa.Session.proof_timelimit = Gnat_config.timeout then
+                  raise Exit
+         | _ -> ()) g;
+      false
+   with Exit -> true
+
+let all_provers_tried g =
+  List.for_all (has_been_tried_by g) Gnat_config.provers
+
 let register_result goal result =
    let obj = get_objective goal in
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
@@ -293,19 +314,27 @@ let register_result goal result =
          obj, Work_Left
       end
    end else begin try
-         (* the goal was not proved.
-            We first check whether we can simplify the goal. *)
-         if is_full_split_goal goal then raise Exit;
-         let new_goals = further_split goal in
-         if new_goals = [] then raise Exit;
-         (* if we are here, it means we have simplified the goal. We add the
-            new goals to the set of goals to be proved/scheduled. *)
-         List.iter (add_clone goal) new_goals;
-         (* We also need to remove the old goal, which should be considered
-            "replaced" by the new ones. Otherwise we would fail to report
-            "Proved" even though all goals are proved. *)
-         GoalSet.remove obj_rec.to_be_proved goal;
-         obj, Work_Left
+         (* the goal was not proved. *)
+         (* We first check whether another prover may apply *)
+         if not (all_provers_tried goal) then begin
+           (* put the goal back to be scheduled *)
+           GoalSet.add obj_rec.to_be_scheduled goal;
+           obj, Work_Left
+         end else begin
+           (* This particular goal has been tried with all provers. But maybe
+              we can split/apply transformations. *)
+           if is_full_split_goal goal then raise Exit;
+           let new_goals = further_split goal in
+           if new_goals = [] then raise Exit;
+           (* if we are here, it means we have simplified the goal. We add the
+              new goals to the set of goals to be proved/scheduled. *)
+           List.iter (add_clone goal) new_goals;
+           (* We also need to remove the old goal, which should be considered
+              "replaced" by the new ones. Otherwise we would fail to report
+              "Proved" even though all goals are proved. *)
+           GoalSet.remove obj_rec.to_be_proved goal;
+           obj, Work_Left
+         end
       with Exit ->
          (* if we cannot simplify, the objective has been disproved *)
          let n = GoalSet.count obj_rec.to_be_scheduled in
@@ -382,21 +411,8 @@ let iter_leafs goal f =
 
 let iter_leaf_goals subp f = iter_leafs subp.subp_goal f
 
-let goal_has_been_tried g =
-   (* Check whether the goal has been tried already *)
-   try
-      Session.goal_iter (fun child ->
-         match child with
-         | Session.Proof_attempt pa ->
-               (* only count non-obsolete proof attempts with identical
-                  options *)
-               if not pa.Session.proof_obsolete &&
-               pa.Session.proof_prover = Gnat_config.prover.Whyconf.prover &&
-               pa.Session.proof_timelimit = Gnat_config.timeout then
-                  raise Exit
-         | _ -> ()) g;
-      false
-   with Exit -> true
+let find_first_untried_prover g =
+  List.find (fun p -> not (has_been_tried_by g p)) Gnat_config.provers
 
 let apply_split_goal_if_needed g =
    (* before doing any proofs, we apply "split" to all "main goals" (see
@@ -408,11 +424,6 @@ let apply_split_goal_if_needed g =
       ignore
         (Session.add_registered_transformation
            ~keygen:Keygen.keygen (get_session ()) first_transform g)
-
-let schedule_goal g =
-   (* actually schedule the goal, ie call the prover. This function returns
-      immediately. *)
-   Gnat_sched.add_goal g
 
 let do_scheduled_jobs callback =
    Gnat_sched.run callback
@@ -522,19 +533,19 @@ module Save_VCs = struct
       f fmt;
       close_out cout
 
-   let vc_name check =
+   let vc_name check prover =
       let r = find check in
       incr r;
       let n = !r in
       let count_str = if n = 1 then "" else string_of_int n in
-      let ext = Driver.get_extension Gnat_config.prover_driver in
+      let ext = Driver.get_extension prover.Gnat_config.driver in
       Pp.sprintf "%a%s%s" Gnat_expl.to_filename check count_str ext
 
-   let save_vc goal =
+   let save_vc goal prover =
       let check = get_objective goal in
       let task = Session.goal_task goal in
-      let dr = Gnat_config.prover_driver in
-      let vc_fn = vc_name check in
+      let dr = prover.Gnat_config.driver in
+      let vc_fn = vc_name check prover in
       GM.add goal_map goal vc_fn;
       with_fmt_channel vc_fn
         (fun fmt ->
@@ -568,7 +579,19 @@ module Save_VCs = struct
 
 end
 
+let schedule_goal g =
+   (* actually schedule the goal, ie call the prover. This function returns
+      immediately. *)
+   let p = find_first_untried_prover g in
+   if Gnat_config.debug then begin
+      Save_VCs.save_vc g p;
+   end;
+   Gnat_sched.add_goal p g
+
 let all_split_leaf_goals () =
+  ()
+  (* ??? disabled for now *)
+(*
   iter_main_goals (fun g ->
     iter_leafs g
      (fun goal ->
@@ -587,3 +610,4 @@ let all_split_leaf_goals () =
          end
       else ()
    ))
+*)

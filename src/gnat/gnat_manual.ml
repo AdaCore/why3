@@ -5,12 +5,17 @@ type goal = int Session.goal
 
 let filename_limit = 246
 
+let manual_attempt_of_goal goal =
+  match Gnat_config.manual_prover with
+  | None -> None
+  | Some p ->
+        PHprover.find_opt goal.goal_external_proofs
+          p.Gnat_config.prover.Whyconf.prover
+
 let is_new_manual_proof goal =
-  Gnat_config.prover.Whyconf.interactive
-  && match PHprover.find_opt goal.goal_external_proofs
-                             Gnat_config.prover.Whyconf.prover with
-     | None -> true
-     | Some attempt -> attempt.proof_obsolete
+  match manual_attempt_of_goal goal with
+  | None -> false
+  | Some att -> att.proof_obsolete
 
 let rec find_goal_theory goal =
   match goal.goal_parent with
@@ -27,13 +32,14 @@ let get_file_extention filename =
   with
   | Invalid_argument _ -> ""
 
-let prover_files_dir proj =
+let prover_files_dir proj prover =
+  let wc_prover = prover.Gnat_config.prover.Whyconf.prover in
   match Gnat_config.proof_dir with
   | None -> ""
   | Some dir ->
      let prover_dir = (Filename.concat
                          dir
-                         Gnat_config.prover.Whyconf.prover.Whyconf.prover_name)
+                         wc_prover.Whyconf.prover_name)
      in
      if not (Sys.file_exists prover_dir) then
        Unix.mkdir prover_dir 0o750;
@@ -56,9 +62,9 @@ let resize_shape sh limit =
   | _ -> "")
 
 
-let compute_filename contain_dir theory goal expl =
+let compute_filename contain_dir theory goal expl prover =
   let why_fn =
-    Driver.file_of_task Gnat_config.prover_driver
+    Driver.file_of_task prover.Gnat_config.driver
                         theory.theory_name.Ident.id_string
                         theory.theory_parent.file_name
                         (goal_task goal) in
@@ -86,28 +92,44 @@ let compute_filename contain_dir theory goal expl =
   done;
   !filename
 
-let create_prover_file goal expl =
+let create_prover_file goal expl prover =
   let th = find_goal_theory goal in
   let proj_name = Filename.basename
                     (get_project_dir (Filename.basename
                                         th.theory_parent.file_name)) in
-  let filename = compute_filename (prover_files_dir proj_name) th goal expl in
+  let filename =
+    compute_filename (prover_files_dir proj_name prover) th goal expl prover in
   let cout = open_out filename in
   let fmt = Format.formatter_of_out_channel cout in
-  Driver.print_task Gnat_config.prover_driver filename fmt (goal_task goal);
+  Driver.print_task prover.Gnat_config.driver filename fmt (goal_task goal);
   close_out cout;
   let _ = add_external_proof ~keygen:Gnat_sched.Keygen.keygen ~obsolete:false
                              ~archived:false ~timelimit:0 ~memlimit:0
                              ~edit:(Some filename) goal
-                             Gnat_config.prover.Whyconf.prover
+                             prover.Gnat_config.prover.Whyconf.prover
                              Unedited in
   filename
 
-let get_prover_file goal =
-  match PHprover.find_opt goal.goal_external_proofs
-                                  Gnat_config.prover.Whyconf.prover with
-  | Some pa -> pa.proof_edited_as
-  | _ -> None
+(* ??? maybe use a Buffer.t? Isn't there some code already doing this in Why3?
+ * *)
+let editor_command prover fn =
+  let editor = prover.Gnat_config.editor in
+  let cmd_line =
+    List.fold_left (fun str s -> str ^ " " ^ s)
+                  editor.Whyconf.editor_command
+                  editor.Whyconf.editor_options in
+  Gnat_config.actual_cmd fn cmd_line
+
+let manual_proof_info pa =
+  match pa.proof_edited_as with
+  | None -> None
+  | Some fn ->
+      let base_prover = pa.Session.proof_prover in
+      let real_prover =
+        List.find (fun p ->
+          p.Gnat_config.prover.Whyconf.prover = base_prover)
+        Gnat_config.provers in
+      Some (fn, editor_command real_prover fn)
 
 (* This function is needed because when renaming a file from /tmp
    to a file on the home partition causes an exception *)
@@ -123,18 +145,25 @@ let mv_file oldf newf =
   | End_of_file -> flush f_out; close_out f_out; close_in f_in
 
 let rewrite_goal g =
-  match get_prover_file g with
-  | Some fn ->
-     let old = open_in fn in
-     let tmpfile = Filename.temp_file "tmp__" (Filename.basename fn) in
-     let cout = open_out tmpfile in
-     let fmt = Format.formatter_of_out_channel cout in
-     Driver.print_task ~old Gnat_config.prover_driver
-                       tmpfile fmt (Session.goal_task g);
-     close_out cout;
-     close_in old;
-     mv_file tmpfile fn;
-     Unix.unlink tmpfile
+  match manual_attempt_of_goal g with
+  | Some pa ->
+    begin match manual_proof_info pa with
+    | Some (fn, _) ->
+       let old = open_in fn in
+       let tmpfile = Filename.temp_file "tmp__" (Filename.basename fn) in
+       let cout = open_out tmpfile in
+       let fmt = Format.formatter_of_out_channel cout in
+       let prover = Opt.get Gnat_config.manual_prover in
+       Driver.print_task ~old prover.Gnat_config.driver
+                         tmpfile fmt (Session.goal_task g);
+       close_out cout;
+       close_in old;
+       mv_file tmpfile fn;
+       Unix.unlink tmpfile
+    | None ->
+       Gnat_util.abort_with_message ~internal:true
+         "rewritten goal not edited as a file."
+    end
   | None ->
      Gnat_util.abort_with_message ~internal:true
        "rewritten goal not edited as a file."

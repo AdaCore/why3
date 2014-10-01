@@ -8,7 +8,7 @@ type msg =
     steps      : int;
     extra_info : int option;
     tracefile  : string;
-    vc_file    : string option;
+    manual_proof : (string * string) option
   }
 
 let msg_set : msg list ref = ref []
@@ -54,7 +54,7 @@ let extract_steps_fail s =
     with _ -> None
   else None
 
-let register check task result valid filename tracefile =
+let register check task result valid manual tracefile =
   let time =
     match result with
     | None -> 0.0
@@ -85,7 +85,7 @@ let register check task result valid filename tracefile =
     time          = time;
     steps         = steps;
     tracefile     = tracefile;
-    vc_file       = filename } in
+    manual_proof  = manual } in
   msg_set := msg :: !msg_set
 
 let get_info info  =
@@ -100,21 +100,14 @@ let print_trace_file fmt trace  =
     print_json_field "tracefile" string fmt trace
   end
 
-let print_vc_file_info fmt vc_file =
-  match vc_file with
+let print_manual_proof_info fmt info =
+  match info with
   | None -> ()
-  | Some name ->
-     Format.fprintf fmt ",";
-     print_json_field "vc_file" string fmt
-                   (Sys.getcwd () ^ Filename.dir_sep ^ name);
-     Format.fprintf fmt ",";
-     let editor = Gnat_config.prover_editor () in
-     let cmd_line =
-       List.fold_left (fun str s -> str ^ " " ^ s)
-                      editor.Whyconf.editor_command
-                      editor.Whyconf.editor_options in
-     print_json_field "editor_cmd" string fmt
-                      (Gnat_config.actual_cmd name cmd_line)
+  | Some (fname, cmd) ->
+     Format.fprintf fmt ", %a, %a"
+     (print_json_field "vc_file" string)
+                   (Sys.getcwd () ^ Filename.dir_sep ^ fname)
+     (print_json_field "editor_cmd" string) cmd
 
 let print_json_msg fmt m =
   Format.fprintf fmt "{%a, %a, %a, %a%a%a}"
@@ -124,7 +117,7 @@ let print_json_msg fmt m =
     (print_json_field "result" bool) m.result
     (print_json_field "extra_info" int) (get_info m.extra_info)
     print_trace_file m.tracefile
-    print_vc_file_info m.vc_file
+    print_manual_proof_info m.manual_proof
 
 let print_messages () =
   Format.printf "{%a}@."

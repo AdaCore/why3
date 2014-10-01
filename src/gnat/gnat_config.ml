@@ -12,6 +12,12 @@ type limit_mode =
   | Limit_Check of Gnat_expl.check
   | Limit_Line of Gnat_loc.loc
 
+type prover =
+  { driver : Driver.driver;
+    prover : Whyconf.config_prover;
+    editor : Whyconf.config_editor
+  }
+
 let gnatprove_why3conf_file = "why3.conf"
 
 let is_builtin_prover =
@@ -20,11 +26,6 @@ let is_builtin_prover =
   (fun s ->
     let s = String.lowercase s in
     Sstr.mem s builtin_provers)
-
-let opt_builtin_prover opt_s =
-  match opt_s with
-  | None -> false
-  | Some s -> is_builtin_prover s
 
 let default_timeout = 1
 
@@ -170,75 +171,130 @@ let editor_merge me1 me2 =
 let shortcut_merge s1 s2 =
   Mstr.merge merge_opt_keep_first s1 s2
 
-let config =
-   (* We only read the default config file ($HOME/.why3.conf) if the option
-    * --prover was given, with a non-builtin prover *)
-   try
-     let gnatprove_config =
-       if !opt_prepare_shared then Whyconf.read_config None
-       else Whyconf.read_config (Some gnatprove_why3conf_file) in
-      if !opt_prover = None || opt_builtin_prover !opt_prover then
-        gnatprove_config
-      else begin
-         let conf = Whyconf.read_config None in
-         let provers =
-           prover_merge
-             (Whyconf.get_provers gnatprove_config)
-             (Whyconf.get_provers conf) in
-         let editors = editor_merge (Whyconf.get_editors gnatprove_config)
-                                    (Whyconf.get_editors conf) in
-         let shortcuts =
-           shortcut_merge (Whyconf.get_prover_shortcuts gnatprove_config)
-                          (Whyconf.get_prover_shortcuts conf) in
-         Whyconf.set_editors
-           (Whyconf.set_provers ~shortcuts gnatprove_config provers)
-           editors
-      end
-   with Rc.CannotOpen _ ->
-      Gnat_util.abort_with_message ~internal:true "Cannot read file why3.conf."
+(* Depending on what kinds of provers are requested, environment loading is a
+ * bit different, hence we do this all together here *)
 
-let provers : Whyconf.config_prover Whyconf.Mprover.t =
-   Whyconf.get_provers config
+let provers, config, env =
+  (* this is a string list of the requested provers by the user *)
+  let prover_str_list =
+    match !opt_prover with
+    | None -> []
+    | Some s ->
+        Strings.split ',' s in
+  (* did the user request some prover which is not shipped with SPARK? *)
+  let builtin_provers_only =
+    prover_str_list = [] || List.for_all is_builtin_prover prover_str_list in
+  (* now load the configuration of Why3 *)
+  let config =
+     (* We only read the default config file ($HOME/.why3.conf) if the option
+      * --prover was given, with a non-builtin prover *)
+     try
+       let gnatprove_config =
+         if !opt_prepare_shared then Whyconf.read_config None
+         else Whyconf.read_config (Some gnatprove_why3conf_file) in
+       if builtin_provers_only then gnatprove_config
+        else begin
+           let conf = Whyconf.read_config None in
+           let provers =
+             prover_merge
+               (Whyconf.get_provers gnatprove_config)
+               (Whyconf.get_provers conf) in
+           let editors = editor_merge (Whyconf.get_editors gnatprove_config)
+                                      (Whyconf.get_editors conf) in
+           let shortcuts =
+             shortcut_merge (Whyconf.get_prover_shortcuts gnatprove_config)
+                            (Whyconf.get_prover_shortcuts conf) in
+           Whyconf.set_editors
+             (Whyconf.set_provers ~shortcuts gnatprove_config provers)
+             editors
+        end
+     with Rc.CannotOpen _ ->
+       Gnat_util.abort_with_message ~internal:true "Cannot read file why3.conf."
+  in
+  (* configured_provers is the map of all provers that Why3 knows about *)
+  let configured_provers : Whyconf.config_prover Whyconf.Mprover.t =
+     Whyconf.get_provers config in
+  (* now we build the Whyconf.config_prover for all requested provers *)
+  let base_provers =
+    try match prover_str_list with
+    | [] ->
+       let conf =
+          { Whyconf.prover_name = "altergo";
+             prover_version      = "0.95";
+             prover_altern       = "";
+          } in
+       [ Whyconf.Mprover.find conf configured_provers ]
+    | l ->
+        List.map (fun s ->
+          Whyconf.filter_one_prover config (Whyconf.mk_filter_prover s)) l
+    with
+    | Not_found ->
+          Gnat_util.abort_with_message ~internal:false
+            "Default prover not installed or not configured."
+    | Whyconf.ProverNotFound _ ->
+          Gnat_util.abort_with_message ~internal:false
+            "Selected prover not installed or not configured."
+    | Whyconf.ProverAmbiguity _ ->
+          Gnat_util.abort_with_message ~internal:false
+            "Several provers match the selection." in
+  let env =
+    let config_main = Whyconf.get_main (config) in
+    (* load plugins; may be needed for external provers *)
+    if not builtin_provers_only then
+      Whyconf.load_plugins config_main;
+    Env.create_env (match !opt_proof_dir with
+                    | Some dir -> (Filename.concat dir "_theories")
+                                  :: Whyconf.loadpath config_main
+                    | None -> Whyconf.loadpath config_main) in
+  (* this function loads the driver for a given prover *)
+  let prover_driver base_prover =
+    try
+      Driver.load_driver env base_prover.Whyconf.driver
+        base_prover.Whyconf.extra_drivers
+    with e ->
+      let s =
+        Pp.sprintf "Failed to load driver for prover: %a"
+             Exn_printer.exn_printer e in
+      Gnat_util.abort_with_message ~internal:true s in
+  (* this function loads the editor for a given prover, otherwise returns a
+     default value *)
+  let prover_editor prover =
+    try Whyconf.editor_by_id config prover.Whyconf.editor
+    with Not_found ->
+      { Whyconf.editor_name = "";
+        editor_command = "";
+        editor_options = [] }
+    in
+  (* now we build the prover record for each requested prover *)
+  let provers =
+    List.map (fun base ->
+      { driver = prover_driver base;
+        prover = base;
+        editor = prover_editor base }) base_provers in
+  provers, config, env
 
-let prover : Whyconf.config_prover =
-  try
-     match !opt_prover with
-     | Some s ->
-              Whyconf.filter_one_prover config
-                (Whyconf.mk_filter_prover s)
-     | None ->
-           let conf =
-              { Whyconf.prover_name = "altergo";
-                 prover_version      = "0.95";
-                 prover_altern       = "";
-              } in
-           Whyconf.Mprover.find conf provers
-  with
-  | Not_found ->
-        Gnat_util.abort_with_message ~internal:false
-          "Default prover not installed or not configured."
-  | Whyconf.ProverNotFound _ ->
-        Gnat_util.abort_with_message ~internal:false
-          "Selected prover not installed or not configured."
-  | Whyconf.ProverAmbiguity _ ->
-        Gnat_util.abort_with_message ~internal:false
-          "Several provers match the selection."
-
-let config_main = Whyconf.get_main (config)
-
-let env =
-   (* load plugins; may be needed for external provers *)
-   if !opt_prover <> None then
-     Whyconf.load_plugins config_main;
-   Env.create_env (match !opt_proof_dir with
-                   | Some dir -> (Filename.concat dir "_theories")
-                                 :: Whyconf.loadpath config_main
-                   | None -> Whyconf.loadpath config_main)
+let manual_prover =
+  (* sanity check - we found at least one prover, and don't allow combining
+     manual with other provers. Or said otherwise, if there is more than one
+     prover, they must all be automatic *)
+  match provers with
+  | [] ->
+        Gnat_util.abort_with_message ~internal:true
+        "no prover available, aborting"
+  | [x] when x.prover.Whyconf.interactive -> Some x
+  | _ :: _ :: _ when
+     List.exists (fun p -> p.prover.Whyconf.interactive) provers ->
+       Gnat_util.abort_with_message ~internal:false
+        "manual provers cannot be combined with other provers"
+  | _ ->
+      None
 
 (* The function replaces %{f,t,T,m,l,d} to their corresponding values
    in the string cmd.
    This function is based on the Call_provers.actualcommand, for
    some reason not in the Why3 API nor really convenient *)
+(* ??? delete this and use the one from Call_provers *)
+
 let actual_cmd ?main filename cmd =
   let m = match main with
     | None -> Whyconf.get_main config
@@ -347,35 +403,25 @@ let build_shared proof_dir prover =
     Unix.close child_out
   )
 
+let () =
+  (* check whether we are in prepare_shared mode, if so, do just that *)
+  match !opt_prepare_shared, !opt_proof_dir with
+  | (true, Some pdir) ->
+      List.iter (fun prover -> build_shared pdir prover.prover) provers;
+      exit 0
+  | _ -> ()
+
 let filename =
    let is_not_why_loc s =
       not (Filename.check_suffix s "why" ||
            Filename.check_suffix s "mlw") in
    match !opt_filename with
-   | None -> (match !opt_prepare_shared, !opt_proof_dir with
-             | (true, Some pdir) -> build_shared pdir prover;
-                                    let () = exit 0 in ""
-             | _ ->
-                 Gnat_util.abort_with_message ~internal:true "No file given.")
+   | None -> Gnat_util.abort_with_message ~internal:true "No file given."
    | Some s ->
          if is_not_why_loc s then
             Gnat_util.abort_with_message ~internal:true
               (Printf.sprintf "Not a Why input file: %s." s);
          s
-
-(* loading the driver driver *)
-let prover_driver : Driver.driver =
-  try
-    Driver.load_driver env prover.Whyconf.driver
-      prover.Whyconf.extra_drivers
-  with e ->
-    let s =
-      Pp.sprintf "Failed to load driver for prover: %a"
-           Exn_printer.exn_printer e in
-    Gnat_util.abort_with_message ~internal:true s
-
-let prover_editor () =
-  Whyconf.editor_by_id config prover.Whyconf.editor
 
 (* freeze values *)
 
