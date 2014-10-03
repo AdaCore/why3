@@ -364,8 +364,10 @@ fi
 
 if test "$enable_zarith" = yes; then
    BIGINTLIB=zarith
+   BIGINTPKG=zarith
 else
    BIGINTLIB=nums
+   BIGINTPKG=num
 fi
 
 # checking for camlzip
@@ -731,6 +733,7 @@ AC_SUBST(META_OCAMLGRAPH)
 AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)
 AC_SUBST(BIGINTLIB)
+AC_SUBST(BIGINTPKG)
 
 AC_SUBST(enable_zip)
 AC_SUBST(ZIPINCLUDE)
