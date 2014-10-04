@@ -76,7 +76,7 @@ module Compile_bexpr
     | Bfalse     -> $ if cond then inil () else ibranchf ofs
     | Bnot b1    -> $ compile_bexpr b1 (not cond) ofs
     | Band b1 b2 ->
-      let c2  = $ compile_bexpr b2 cond ofs % exn_bool b1 false in
+      let c2  = $ compile_bexpr b2 cond ofs % exn_bool b1 true in
       let ofs = if cond then length c2.wcode else ofs + length c2.wcode in
       $ compile_bexpr b1 false ofs ~ c2
     | Beq a1 a2 -> $ compile_aexpr a1 ~ $ compile_aexpr a2 ~
@@ -152,14 +152,14 @@ module Compile_com
     | Cif cond cmd1 cmd2 -> let code_false = compile_com cmd2 in
       let code_true = $ compile_com cmd1 ~ $ ibranchf code_false.code.length in
       $ compile_bexpr cond false code_true.wcode.length ~
-      (code_true % exn_bool cond false) ~
-      ($ code_false % exn_bool_old cond true)
+      (code_true % exn_bool cond true) ~
+      ($ code_false % exn_bool_old cond false)
     | Cwhile test body  -> let code_body = compile_com body in
       let body_length = length code_body.code + 1 in
       let code_test = compile_bexpr test false body_length in
       let ofs = length code_test.code + body_length in
       let wp_while = $ code_test ~
-          ($ code_body ~ $ ibranchf (- ofs)) % exn_bool test false in
+          ($ code_body ~ $ ibranchf (- ofs)) % exn_bool test true in
       let ghost inv  = loop_invariant cmd in
       let ghost var  = loop_variant body test  in
       let ghost post = loop_post cmd ofs in

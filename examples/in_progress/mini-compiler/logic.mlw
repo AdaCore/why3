@@ -82,22 +82,22 @@ module Compiler_logic
            contextual_irrelevance res.wcode p ms ms' -> false) && false };
     res
 
-  function fork_wp (w:wp_trans 'a) (exn:pre 'a) : wp_trans 'a =
-    \x p q ms. (exn x p ms -> q ms) /\ (not exn x p ms -> w x p q ms)
+  function fork_wp (w:wp_trans 'a) (cond:pre 'a) : wp_trans 'a =
+    \x p q ms. (not cond x p ms -> q ms) /\ (cond x p ms -> w x p q ms)
 
-  lemma fork_wp_lemma: forall w:wp_trans 'a,exn x p q ms.
-    fork_wp w exn x p q ms =
-      ((exn x p ms -> q ms) /\ (not exn x p ms -> w x p q ms))
+  lemma fork_wp_lemma: forall w:wp_trans 'a,cond x p q ms.
+    fork_wp w cond x p q ms =
+      ((not cond x p ms -> q ms) /\ (cond x p ms -> w x p q ms))
 
   meta rewrite prop fork_wp_lemma
 
   (* Code combinator for sequence, with wp. *)
 
-  let (%) (s:wp 'a) (ghost exn:pre 'a) : wp 'a
+  let (%) (s:wp 'a) (ghost cond:pre 'a) : wp 'a
     requires { wp_correctness s }
-    ensures  { result.wp = fork_wp s.wp exn }
+    ensures  { result.wp = fork_wp s.wp cond }
     ensures  { result.wcode.length = s.wcode.length /\ wp_correctness result }
-  = { wcode = s.wcode; wp = fork_wp s.wp exn }
+  = { wcode = s.wcode; wp = fork_wp s.wp cond }
 
   (* WP transformer for hoare triples. *)
   function towp_wp (pr:pre 'a) (ps:post 'a) : wp_trans 'a =
