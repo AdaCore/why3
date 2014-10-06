@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../logic.mlw" expanded="true">
+<theory name="Compiler_logic" sum="5e11e8459607a76c770e98480015c398" expanded="true">
+ <goal name="seq_wp_lemma" expanded="true">
+ <proof prover="3"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="WP_parameter infix ~" expl="VC for infix ~" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter infix ~.1" expl="1. assertion" expanded="true">
+  <transf name="induction_pr" expanded="true">
+   <goal name="WP_parameter infix ~.1.1" expl="1. assertion">
+   <proof prover="1"><result status="valid" time="0.16"/></proof>
+   </goal>
+   <goal name="WP_parameter infix ~.1.2" expl="2. assertion" expanded="true">
+   <proof prover="0" edited="logic_Compiler_logic_WP_parameter_infix_tl_1.v"><result status="valid" time="8.37"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter infix ~.2" expl="2. assertion">
+  <proof prover="1"><result status="valid" time="0.25"/></proof>
+  </goal>
+  <goal name="WP_parameter infix ~.3" expl="3. postcondition">
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter infix ~.4" expl="4. postcondition">
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="fork_wp_lemma" expanded="true">
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="WP_parameter infix %" expl="VC for infix %" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter infix %.1" expl="1. postcondition" expanded="true">
+  <transf name="inline_goal" expanded="true">
+   <goal name="WP_parameter infix %.1.1" expl="1. postcondition" expanded="true">
+   <transf name="simplify_trivial_quantification" expanded="true">
+    <goal name="WP_parameter infix %.1.1.1" expl="1." expanded="true">
+    <transf name="compute_specified" expanded="true">
+     <goal name="WP_parameter infix %.1.1.1.1" expl="1." expanded="true">
+     <proof prover="3"><result status="valid" time="0.11"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="towp_wp_lemma" expanded="true">
+ <proof prover="3"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="WP_parameter prefix $" expl="VC for prefix $" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter prefix $.1" expl="1. postcondition" expanded="true">
+  <transf name="inline_goal" expanded="true">
+   <goal name="WP_parameter prefix $.1.1" expl="1. postcondition" expanded="true">
+   <transf name="simplify_trivial_quantification" expanded="true">
+    <goal name="WP_parameter prefix $.1.1.1" expl="1." expanded="true">
+    <transf name="compute_specified" expanded="true">
+     <goal name="WP_parameter prefix $.1.1.1.1" expl="1." expanded="true">
+     <proof prover="2"><result status="valid" time="2.80"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter hoare" expl="VC for hoare" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter hoare.1" expl="1. postcondition" expanded="true">
+  <transf name="inline_goal" expanded="true">
+   <goal name="WP_parameter hoare.1.1" expl="1. postcondition" expanded="true">
+   <transf name="simplify_trivial_quantification" expanded="true">
+    <goal name="WP_parameter hoare.1.1.1" expl="1." expanded="true">
+    <transf name="compute_specified" expanded="true">
+     <goal name="WP_parameter hoare.1.1.1.1" expl="1." expanded="true">
+     <proof prover="1"><result status="valid" time="0.24"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter make_loop_hl" expl="VC for make_loop_hl" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter make_loop_hl.1" expl="1. assertion" expanded="true">
+  <transf name="induction_pr" expanded="true">
+   <goal name="WP_parameter make_loop_hl.1.1" expl="1.">
+   <proof prover="3"><result status="valid" time="1.36"/></proof>
+   </goal>
+   <goal name="WP_parameter make_loop_hl.1.2" expl="2." expanded="true">
+   <proof prover="0" edited="logic_Compiler_logic_WP_parameter_make_loop_hl_2.v"><result status="valid" time="6.47"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter make_loop_hl.2" expl="2. postcondition">
+  <proof prover="1"><result status="valid" time="2.41"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

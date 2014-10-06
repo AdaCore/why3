@@ -1,0 +1,230 @@
+
+module VM_instr_spec
+
+  meta compute_max_steps 0x10000
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import vm.Vm
+  use import vm.VMClock
+  use import state.State
+  use import HighOrd
+  use import logic.Compiler_logic
+
+  function ifun_post (f:machine_state -> machine_state) : post 'a =
+    \x p mc mc'. let VMC p s m c = mc in
+      let VMC p' s' m' c' = mc' in VMS p' s' m' = f (VMS p s m) /\ c' = c + 1
+  meta rewrite_def function ifun_post
+  
+  let ifunf (ghost pre:pre 'a) (code_f:code)
+    (ghost f:machine_state -> machine_state) : hl 'a
+    requires { forall c p. codeseq_at c p code_f ->
+        forall x ms clock. let VMS p' s m = ms in
+          pre x p (VMC p' s m clock) -> transition c ms (f ms) }
+    ensures { result.pre   = pre /\ result.post = ifun_post f }
+    ensures { result.code  = code_f /\ hl_correctness result }
+  = let res = { pre = pre; code = code_f; post = ifun_post f } in
+    assert { forall x:'a,c_glob p mc mc'. res.pre x p mc ->
+      codeseq_at c_glob p res.code ->
+      let post = res.post x p mc in
+      C.transition_star (c_glob,post) mc mc' /\ not post mc' ->
+      let VMC p s m _ = mc' in
+      let ms = VMS p s m in
+      let ms' = f ms in
+      mc = mc' && transition c_glob (VMS p s m) ms' };
+    res
+
+  (* Iconst spec *)
+  function iconst_post (n:int) : post 'a =
+    \x p ms ms'. forall s m clock. ms  = VMC p s m clock ->
+      ms' = VMC (p+1) (push n s) m (clock+1)
+  meta rewrite_def function iconst_post
+
+  function iconst_fun (n:int) : machine_state -> machine_state =
+    \ms. let VMS p s m = ms in VMS (p+1) (push n s) m
+  meta rewrite_def function iconst_fun
+
+  let iconstf (n: int) : hl 'a
+    ensures { result.pre  = trivial_pre  /\ result.post = iconst_post n  }
+    ensures { result.code.length = 1     /\ hl_correctness result }
+  = hoare trivial_pre ($ ifunf trivial_pre n.iconst n.iconst_fun) n.iconst_post
+
+  (* Ivar spec *)
+  function ivar_post (x:id) : post 'a =
+    \a p ms ms'. forall s m clock.
+      ms = VMC p s m clock -> ms' = VMC (p+1) (push m[x] s) m (clock+1)
+  meta rewrite_def function ivar_post
+  
+  function ivar_fun (x:id) : machine_state -> machine_state =
+    \ms. let VMS p s m = ms in VMS (p+1) (push m[x] s) m
+  meta rewrite_def function ivar_fun
+
+  let ivarf (x: id) : hl 'a
+    ensures { result.pre  = trivial_pre /\ result.post = ivar_post x  }
+    ensures { result.code.length = 1    /\ hl_correctness result }
+  = hoare trivial_pre ($ ifunf trivial_pre x.ivar x.ivar_fun) x.ivar_post
+
+  (* Binary arithmetic operators specification (Iadd, Isub, Imul) *)
+  type binop = int -> int -> int
+
+  constant ibinop_pre : pre 'a =
+    \x p ms . exists n1 n2 s m clock. ms = VMC p (push n2 (push n1 s)) m clock
+  meta rewrite_def function ibinop_pre
+
+  function ibinop_post (op : binop) : post 'a =
+   \x p ms ms'. forall n1 n2 s m clk. ms = VMC p (push n2 (push n1 s)) m clk ->
+     ms' = VMC (p+1) (push (op n1 n2) s) m (clk+1)
+  meta rewrite_def function ibinop_post
+
+  function ibinop_fun (op:binop) : machine_state -> machine_state =
+    \ms. match ms with
+      | VMS p (Cons n2 (Cons n1 s)) m -> VMS (p+1) (push (op n1 n2) s) m
+      | _ -> ms
+      end
+  meta rewrite_def function ibinop_fun
+
+  let create_binop (code_b:code) (ghost op:binop) : hl 'a
+    requires { forall c p. codeseq_at c p code_b ->
+      forall n1 n2 s m. transition c (VMS p (push n2 (push n1 s)) m)
+ 	                                 (VMS (p+1) (push (op n1 n2) s) m) }
+    ensures { result.pre   = ibinop_pre /\ result.post = ibinop_post op }
+    ensures { result.code.length = code_b.length /\ hl_correctness result }
+  = hoare ibinop_pre ($ ifunf ibinop_pre code_b op.ibinop_fun) op.ibinop_post
+
+  constant plus : binop = \x y. x + y
+  meta rewrite_def function plus
+
+  constant sub : binop = \x y. x - y
+  meta rewrite_def function sub
+
+  constant mul : binop = \x y. x * y
+  meta rewrite_def function mul
+
+  let iaddf () : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = ibinop_post plus }
+    ensures { result.code.length = 1   /\  hl_correctness result}
+  = create_binop iadd plus
+
+  let isubf () : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = ibinop_post sub }
+    ensures { result.code.length = 1   /\  hl_correctness result}
+  = create_binop isub sub
+
+  let imulf () : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = ibinop_post mul }
+    ensures { result.code.length = 1   /\  hl_correctness result}
+  = create_binop imul mul
+
+  (* Inil spec *)
+  function inil_post : post 'a =
+    \x p mc mc'. mc = mc'
+  meta rewrite_def function inil_post
+
+  let inil () : hl 'a
+    ensures { result.pre = trivial_pre /\ result.post = inil_post }
+    ensures { result.code.length = 0   /\ hl_correctness result   }
+  = { pre = trivial_pre; code = Nil; post = inil_post }
+
+  (* Ibranch specification *)
+  function ibranch_post (ofs: pos) : post 'a =
+    \x p ms ms'. forall s m clk. ms = VMC p s m clk ->
+      ms' = VMC (p + 1 + ofs) s m (clk+1)
+  meta rewrite_def function ibranch_post
+
+  function ibranch_fun (ofs:pos) : machine_state -> machine_state =
+    \ms. let VMS p s m = ms in VMS (p+1+ofs) s m
+  meta rewrite_def function ibranch_fun
+
+  let ibranchf (ofs:pos) : hl 'a
+    ensures { result.pre = trivial_pre /\ result.post = ibranch_post ofs }
+    ensures { result.code.length = 1   /\ hl_correctness result          }
+  = let cf = $ ifunf trivial_pre (ibranch ofs) (ibranch_fun ofs) in
+    hoare trivial_pre cf (ibranch_post ofs)
+
+  type cond = int -> int -> bool
+
+  function icjump_post (cond:cond) (ofs:int) : post 'a =
+    \x p ms ms'. forall n1 n2 s m c. ms = VMC p (push n2 (push n1 s)) m c ->
+      (cond n1 n2 -> ms' = VMC (p + ofs + 1) s m (c+1)) /\
+      (not cond n1 n2 -> ms' = VMC (p+1) s m (c+1))
+  meta rewrite_def function icjump_post
+  
+  function icjump_fun (cond:cond) (ofs:int) : machine_state -> machine_state =
+    \ms. match ms with
+      | VMS p (Cons n2 (Cons n1 s)) m ->
+        if cond n1 n2 then VMS (p+ofs+1) s m else VMS (p+1) s m
+      | _ -> ms
+      end
+
+  let create_cjump (code_cd:code) (ghost cond:cond) (ghost ofs:pos) : hl 'a
+    requires { forall c p1 n1 n2. codeseq_at c p1 code_cd ->
+      let p2 = (if cond n1 n2 then p1 + 1 + ofs else p1 + 1) in
+      forall s m. transition c (VMS p1 (push n2 (push n1 s)) m) (VMS p2 s m) }
+    ensures { result.pre   = ibinop_pre /\ result.post  = icjump_post cond ofs }
+    ensures { result.code.length = code_cd.length /\ hl_correctness result }
+  = let c = $ ifunf ibinop_pre code_cd (icjump_fun cond ofs) in
+    hoare ibinop_pre c (icjump_post cond ofs)
+
+  (*  binary Boolean operators specification (Ibeq, Ibne, Ible, Ibgt) *)
+  constant beq : cond = \x y. x = y
+  meta rewrite_def function beq
+
+  constant bne : cond = \x y. x <> y
+  meta rewrite_def function bne
+
+  constant ble : cond = \x y. x <= y
+  meta rewrite_def function ble
+
+  constant bgt : cond = \x y. x > y
+  meta rewrite_def function bgt
+
+  let ibeqf (ofs : pos) : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = icjump_post beq ofs }
+    ensures { result.code.length = 1   /\ hl_correctness result }
+  = create_cjump (ibeq ofs) beq ofs
+
+  let ibnef (ofs : pos) : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = icjump_post bne ofs }
+    ensures { result.code.length = 1   /\ hl_correctness result }
+  = create_cjump (ibne ofs) bne ofs
+
+  let iblef (ofs : pos) : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = icjump_post ble ofs }
+    ensures { result.code.length = 1   /\ hl_correctness result }
+  = create_cjump (ible ofs) ble ofs
+
+  let ibgtf (ofs : pos) : hl 'a
+    ensures { result.pre  = ibinop_pre /\ result.post = icjump_post bgt ofs }
+    ensures { result.code.length = 1   /\ hl_correctness result }
+  = create_cjump (ibgt ofs) bgt ofs
+
+  constant isetvar_pre : pre 'a =
+    \x p mc . exists n s m c. mc = VMC p (push n s) m c
+  meta rewrite_def function isetvar_pre
+
+  function isetvar_post (x:id) : post 'a =
+    \a p ms ms'. forall s n m c.
+      ms = VMC p (push n s) m c -> ms' = VMC (p+1) s m[x <- n] (c+1)
+  meta rewrite_def function isetvar_post
+
+  function isetvar_fun (x:id) : machine_state -> machine_state =
+    \ms. match ms with
+      | VMS p (Cons n s) m -> VMS (p+1) s m[x <- n]
+      | _ -> ms
+      end
+  meta rewrite_def function isetvar_fun
+
+  let isetvarf (x: id) : hl 'a
+    ensures { result.pre  = isetvar_pre /\ result.post = isetvar_post x  }
+    ensures { result.code.length = 1    /\ hl_correctness result }
+  = let c = $ ifunf isetvar_pre (isetvar x) (isetvar_fun x) in
+    hoare isetvar_pre c (isetvar_post x)
+
+end
+
+(*
+Local Variables:
+compile-command: "why3 ide -L . specs.mlw"
+End:
+*)

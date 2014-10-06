@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../vm.mlw" expanded="true">
+<theory name="ReflTransClosure" sum="41f42e2f3926adcb698b8698151507f0">
+ <goal name="transition_star_one">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="transition_star_transitive">
+ <transf name="induction_pr">
+  <goal name="transition_star_transitive.1" expl="1.">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="transition_star_transitive.2" expl="2.">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Vm" sum="acfc57c1ffaddaef327e3669c590c3a0">
+ <goal name="codeseq_at_app_right">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="codeseq_at_app_left">
+ <proof prover="4"><result status="valid" time="0.10"/></proof>
+ </goal>
+</theory>
+<theory name="VMClock" sum="8e19e54308c1351d0cdf53199e5bc630" expanded="true">
+ <goal name="transition_star_endpoints">
+ <transf name="split_goal_wp">
+  <goal name="transition_star_endpoints.1" expl="1.">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="transition_star_endpoints.2" expl="2.">
+  <transf name="induction_pr">
+   <goal name="transition_star_endpoints.2.1" expl="1.">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="transition_star_endpoints.2.2" expl="2.">
+   <proof prover="3"><result status="valid" time="0.23"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="transition_star_weakening" expanded="true">
+ <transf name="induction_pr" expanded="true">
+  <goal name="transition_star_weakening.1" expl="1." expanded="true">
+  <transf name="simplify_trivial_quantification_in_goal" expanded="true">
+   <goal name="transition_star_weakening.1.1" expl="1." expanded="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="transition_star_weakening.2" expl="2." expanded="true">
+  <transf name="simplify_trivial_quantification_in_goal" expanded="true">
+   <goal name="transition_star_weakening.2.1" expl="1." expanded="true">
+   <proof prover="0" edited="vm_VMClock_transition_star_weakening_2.v"><result status="valid" time="1.73"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter transition_deterministic" expl="VC for transition_deterministic">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter transition_deterministic.1" expl="1. assertion">
+  <transf name="inversion_pr">
+   <goal name="WP_parameter transition_deterministic.1.1" expl="1.">
+   <proof prover="4"><result status="valid" time="0.35"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter transition_deterministic.2" expl="2. postcondition">
+  <transf name="prop_curry">
+   <goal name="WP_parameter transition_deterministic.2.1" expl="1. postcondition">
+   <transf name="inversion_pr">
+    <goal name="WP_parameter transition_deterministic.2.1.1" expl="1. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.1.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.1" expl="1. postcondition">
+      <proof prover="4"><result status="valid" time="0.37"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.07"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.1.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.2" expl="2. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.2.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.11"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.2" expl="2. postcondition">
+      <proof prover="4"><result status="valid" time="0.45"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.10"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.09"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.2.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.07"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.3" expl="3. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.3.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.3" expl="3. postcondition">
+      <proof prover="4"><result status="valid" time="0.39"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.3.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.11"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.4" expl="4. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.4.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.07"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.4" expl="4. postcondition">
+      <proof prover="4"><result status="valid" time="0.09"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.09"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.4.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.5" expl="5. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.5.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.07"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.07"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.5" expl="5. postcondition">
+      <proof prover="4"><result status="valid" time="0.05"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.5.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.6" expl="6. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.6.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.6" expl="6. postcondition">
+      <proof prover="4"><result status="valid" time="0.04"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.6.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.7" expl="7. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.7.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.7" expl="7. postcondition">
+      <proof prover="4"><result status="valid" time="0.71"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.7.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.8" expl="8. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.8.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.08"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.8" expl="8. postcondition">
+      <proof prover="4"><result status="valid" time="0.71"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.8.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.9" expl="9. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.9.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.9" expl="9. postcondition">
+      <proof prover="4"><result status="valid" time="0.91"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.9.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.10" expl="10. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.10.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.14"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.10"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.10" expl="10. postcondition">
+      <proof prover="4"><result status="valid" time="0.66"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.10.1.11" expl="11. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="WP_parameter transition_deterministic.2.1.11" expl="11. postcondition">
+    <transf name="inversion_pr">
+     <goal name="WP_parameter transition_deterministic.2.1.11.1" expl="1. postcondition">
+     <transf name="inversion_pr">
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.1" expl="1. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.2" expl="2. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.3" expl="3. postcondition">
+      <proof prover="1"><result status="valid" time="0.11"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.4" expl="4. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.5" expl="5. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.6" expl="6. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.7" expl="7. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.8" expl="8. postcondition">
+      <proof prover="1"><result status="valid" time="0.12"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.9" expl="9. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.10" expl="10. postcondition">
+      <proof prover="1"><result status="valid" time="0.13"/></proof>
+      </goal>
+      <goal name="WP_parameter transition_deterministic.2.1.11.1.11" expl="11. postcondition">
+      <proof prover="4"><result status="valid" time="0.22"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="transition_out_deterministic">
+ <proof prover="0" edited="vm_VMClock_transition_out_deterministic_1.v"><result status="valid" time="0.95"/></proof>
+ </goal>
+ <goal name="WP_parameter halt_stuck" expl="VC for halt_stuck" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter halt_stuck.1" expl="1. assertion">
+  <proof prover="4"><result status="valid" time="0.86"/></proof>
+  </goal>
+  <goal name="WP_parameter halt_stuck.2" expl="2. postcondition" expanded="true">
+  <proof prover="0" edited="vm_VMClock_WP_parameter_halt_stuck_1.v"><result status="valid" time="5.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
