@@ -123,7 +123,8 @@ and schedule_goal (g : Gnat_objectives.goal) =
          * goal already proved
          * goal already attempted with identical options
    *)
-
+   if Gnat_config.force && Gnat_config.manual_prover = None then
+     Gnat_objectives.clean_automatic_proofs g;
    if Gnat_config.force || (Gnat_config.manual_prover <> None
                             && g.Session.goal_verified = None) then
       actually_schedule_goal g

@@ -588,6 +588,25 @@ let schedule_goal g =
    end;
    Gnat_sched.add_goal p g
 
+let clean_automatic_proofs =
+  let seen = GoalSet.empty () in
+  (fun g ->
+    if not (GoalSet.mem seen g) then begin
+      GoalSet.add seen g;
+      List.iter (fun prover ->
+        let prover = prover.Gnat_config.prover.Whyconf.prover in
+        Session.goal_iter (fun child ->
+          match child with
+          | Session.Proof_attempt pa ->
+              if not pa.Session.proof_obsolete &&
+                pa.Session.proof_prover = prover &&
+                pa.Session.proof_timelimit = Gnat_config.timeout then
+                  Session.remove_external_proof pa;
+          | _ -> ()) g) Gnat_config.provers
+    end)
+
+
+
 let all_split_leaf_goals () =
   ()
   (* ??? disabled for now *)

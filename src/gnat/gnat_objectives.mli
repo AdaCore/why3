@@ -153,3 +153,6 @@ end
 val all_split_leaf_goals : unit -> unit
 (* special-purpose function for "all_split" mode (see gnat_config.mli),
    where all split VCs are saved to disk, and no prover is called. *)
+
+val clean_automatic_proofs : goal -> unit
+(* deletes previous proof attempts of the selected provers for this goal *)
