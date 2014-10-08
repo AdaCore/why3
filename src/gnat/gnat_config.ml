@@ -181,6 +181,11 @@ let provers, config, env =
     | None -> []
     | Some s ->
         Strings.split ',' s in
+  (* in --prepare-shared mode, we don't care about built-in provers *)
+  let prover_str_list =
+    if !opt_prepare_shared then
+      List.filter (fun x -> not (is_builtin_prover x)) prover_str_list
+    else prover_str_list in
   (* did the user request some prover which is not shipped with SPARK? *)
   let builtin_provers_only =
     prover_str_list = [] || List.for_all is_builtin_prover prover_str_list in
@@ -217,6 +222,7 @@ let provers, config, env =
   (* now we build the Whyconf.config_prover for all requested provers *)
   let base_provers =
     try match prover_str_list with
+    | [] when !opt_prepare_shared -> []
     | [] ->
        let conf =
           { Whyconf.prover_name = "altergo";
@@ -272,22 +278,6 @@ let provers, config, env =
         prover = base;
         editor = prover_editor base }) base_provers in
   provers, config, env
-
-let manual_prover =
-  (* sanity check - we found at least one prover, and don't allow combining
-     manual with other provers. Or said otherwise, if there is more than one
-     prover, they must all be automatic *)
-  match provers with
-  | [] ->
-        Gnat_util.abort_with_message ~internal:true
-        "no prover available, aborting"
-  | [x] when x.prover.Whyconf.interactive -> Some x
-  | _ :: _ :: _ when
-     List.exists (fun p -> p.prover.Whyconf.interactive) provers ->
-       Gnat_util.abort_with_message ~internal:false
-        "manual provers cannot be combined with other provers"
-  | _ ->
-      None
 
 (* The function replaces %{f,t,T,m,l,d} to their corresponding values
    in the string cmd.
@@ -410,6 +400,25 @@ let () =
       List.iter (fun prover -> build_shared pdir prover.prover) provers;
       exit 0
   | _ -> ()
+
+let manual_prover =
+  (* sanity check - we found at least one prover, and don't allow combining
+     manual with other provers. Or said otherwise, if there is more than one
+     prover, they must all be automatic.
+     This is done after handling of --prepare-shared, because in that mode we
+     may end of with no provers at all, e.g. when in fact all provers are
+     automatic *)
+  match provers with
+  | [] ->
+        Gnat_util.abort_with_message ~internal:true
+        "no prover available, aborting"
+  | [x] when x.prover.Whyconf.interactive -> Some x
+  | _ :: _ :: _ when
+     List.exists (fun p -> p.prover.Whyconf.interactive) provers ->
+       Gnat_util.abort_with_message ~internal:false
+        "manual provers cannot be combined with other provers"
+  | _ ->
+      None
 
 let filename =
    let is_not_why_loc s =
