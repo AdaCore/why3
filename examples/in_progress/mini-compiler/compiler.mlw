@@ -163,7 +163,7 @@ module Compile_com
       let ghost inv  = loop_invariant cmd in
       let ghost var  = loop_variant body test  in
       let ghost post = loop_post cmd ofs in
-      let hl_while = hoare inv wp_while (loop_preservation inv post var) in
+      let hl_while = hoare inv wp_while (loop_progress inv post var) in
       $ inil () ~ $ make_loop_hl hl_while inv post var
     end in
     hoare (com_pre cmd) res (com_post cmd res.wcode.length)

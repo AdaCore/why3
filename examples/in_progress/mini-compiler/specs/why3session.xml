@@ -6,7 +6,7 @@
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../specs.mlw" expanded="true">
-<theory name="VM_instr_spec" sum="248e9ea0b1524771f1c03296a0834509" expanded="true">
+<theory name="VM_instr_spec" sum="7a644b37a9d4e75706a1354367239885" expanded="true">
  <goal name="WP_parameter ifunf" expl="VC for ifunf">
  <transf name="split_goal_wp">
   <goal name="WP_parameter ifunf.1" expl="1. assertion">
@@ -84,7 +84,7 @@
    <goal name="WP_parameter create_binop.1.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter create_binop.1.1.1" expl="1.">
-    <proof prover="1"><result status="valid" time="1.80"/></proof>
+    <proof prover="1"><result status="valid" time="1.42"/></proof>
     </goal>
    </transf>
    </goal>
@@ -217,7 +217,7 @@
    <goal name="WP_parameter isetvarf.1.1" expl="1.">
    <transf name="compute_specified">
     <goal name="WP_parameter isetvarf.1.1.1" expl="1.">
-    <proof prover="1"><result status="valid" time="3.30"/></proof>
+    <proof prover="1"><result status="valid" time="2.47"/></proof>
     </goal>
    </transf>
    </goal>
