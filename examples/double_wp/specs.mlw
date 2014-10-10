@@ -13,6 +13,8 @@ module VM_instr_spec
     \x p ms ms'. ms' = f ms
   meta rewrite_def function ifun_post
 
+  (* General specification builder for determinstic machine
+     instructions. *)
   let ifunf (ghost pre:pre 'a) (code_f:code)
     (ghost f:machine_state -> machine_state) : hl 'a
     requires { forall c p. codeseq_at c p code_f ->
@@ -54,7 +56,8 @@ module VM_instr_spec
     ensures { result.code.length = 1    /\ hl_correctness result }
   = hoare trivial_pre ($ ifunf trivial_pre x.ivar x.ivar_fun) x.ivar_post
 
-  (* Binary arithmetic operators specification (Iadd, Isub, Imul) *)
+  (* Binary arithmetic operators specification (Iadd, Isub, Imul)
+     via a generic builder. *)
   type binop = int -> int -> int
 
   constant ibinop_pre : pre 'a =
@@ -116,40 +119,41 @@ module VM_instr_spec
   = { pre = trivial_pre; code = Nil; post = inil_post }
 
   (* Ibranch specification *)
-  function ibranch_post (ofs: pos) : post 'a =
+  function ibranch_post (ofs: ofs) : post 'a =
     \x p ms ms'. forall s m. ms = VMS p s m -> ms' = VMS (p + 1 + ofs) s m
   meta rewrite_def function ibranch_post
 
-  function ibranch_fun (ofs:pos) : machine_state -> machine_state =
+  function ibranch_fun (ofs:ofs) : machine_state -> machine_state =
     \ms. let (VMS p s m) = ms in VMS (p+1+ofs) s m
   meta rewrite_def function ibranch_fun
 
-  let ibranchf (ofs:pos) : hl 'a
+  let ibranchf (ofs:ofs) : hl 'a
     ensures { result.pre = trivial_pre /\ result.post = ibranch_post ofs }
     ensures { result.code.length = 1   /\ hl_correctness result          }
   = let cf = $ ifunf trivial_pre (ibranch ofs) (ibranch_fun ofs) in
     hoare trivial_pre cf (ibranch_post ofs)
 
+  (* Conditional jump specification via a generic builder. *)
   type cond = int -> int -> bool
 
-  function icjump_post (cond:cond) (ofs:int) : post 'a =
+  function icjump_post (cond:cond) (ofs:ofs) : post 'a =
     \x p ms ms'. forall n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m ->
       (cond n1 n2 -> ms' = VMS (p + ofs + 1) s m) /\
       (not cond n1 n2 -> ms' = VMS (p+1) s m)
   meta rewrite_def function icjump_post
   
-  function icjump_fun (cond:cond) (ofs:int) : machine_state -> machine_state =
+  function icjump_fun (cond:cond) (ofs:ofs) : machine_state -> machine_state =
     \ms. match ms with
       | VMS p (Cons n2 (Cons n1 s)) m ->
         if cond n1 n2 then VMS (p+ofs+1) s m else VMS (p+1) s m
       | _ -> ms
       end
 
-  let create_cjump (code_cd:code) (ghost cond:cond) (ghost ofs:pos) : hl 'a
+  let create_cjump (code_cd:code) (ghost cond:cond) (ghost ofs:ofs) : hl 'a
     requires { forall c p1 n1 n2. codeseq_at c p1 code_cd ->
       let p2 = (if cond n1 n2 then p1 + 1 + ofs else p1 + 1) in
       forall s m. transition c (VMS p1 (push n2 (push n1 s)) m) (VMS p2 s m) }
-    ensures { result.pre   = ibinop_pre /\ result.post  = icjump_post cond ofs }
+    ensures { result.pre = ibinop_pre /\ result.post = icjump_post cond ofs }
     ensures { result.code.length = code_cd.length /\ hl_correctness result }
   = let c = $ ifunf ibinop_pre code_cd (icjump_fun cond ofs) in
     hoare ibinop_pre c (icjump_post cond ofs)
@@ -167,26 +171,27 @@ module VM_instr_spec
   constant bgt : cond = \x y. x > y
   meta rewrite_def function bgt
 
-  let ibeqf (ofs : pos) : hl 'a
+  let ibeqf (ofs:ofs) : hl 'a
     ensures { result.pre  = ibinop_pre /\ result.post = icjump_post beq ofs }
     ensures { result.code.length = 1   /\ hl_correctness result }
   = create_cjump (ibeq ofs) beq ofs
 
-  let ibnef (ofs : pos) : hl 'a
+  let ibnef (ofs:ofs) : hl 'a
     ensures { result.pre  = ibinop_pre /\ result.post = icjump_post bne ofs }
     ensures { result.code.length = 1   /\ hl_correctness result }
   = create_cjump (ibne ofs) bne ofs
 
-  let iblef (ofs : pos) : hl 'a
-    ensures { result.pre  = ibinop_pre /\ result.post = icjump_post ble ofs }
-    ensures { result.code.length = 1   /\ hl_correctness result }
+  let iblef (ofs:ofs) : hl 'a
+    ensures { result.pre = ibinop_pre /\ result.post = icjump_post ble ofs }
+    ensures { result.code.length = 1  /\ hl_correctness result }
   = create_cjump (ible ofs) ble ofs
 
-  let ibgtf (ofs : pos) : hl 'a
-    ensures { result.pre  = ibinop_pre /\ result.post = icjump_post bgt ofs }
-    ensures { result.code.length = 1   /\ hl_correctness result }
+  let ibgtf (ofs:ofs) : hl 'a
+    ensures { result.pre = ibinop_pre /\ result.post = icjump_post bgt ofs }
+    ensures { result.code.length = 1  /\ hl_correctness result }
   = create_cjump (ibgt ofs) bgt ofs
 
+  (* Isetvar specification *)
   constant isetvar_pre : pre 'a =
     \x p ms . exists n s m. ms = VMS p (push n s) m
   meta rewrite_def function isetvar_pre
@@ -210,8 +215,3 @@ module VM_instr_spec
 
 end
 
-(*
-Local Variables:
-compile-command: "why3 ide -L . specs.mlw"
-End:
-*)

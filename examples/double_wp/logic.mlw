@@ -1,3 +1,6 @@
+
+(* Program logic (hoare logic + weakest preconditions) over
+   Virtual Machine language. *)
 module Compiler_logic
 
   use import int.Int
@@ -21,21 +24,24 @@ module Compiler_logic
   (* Binary predicates over machine states *)
   type rel  = machine_state -> pred
 
-  (* pre/post-conditions types, as parameterized unary/binary predicates. *)
+  (* pre/post-conditions types, as parameterized unary/binary predicates.
+     'a represents auxiliary variables
+     pos is an auxiliary variable representing the absolute position at which
+     the code is loaded. *)
   type pre 'a = 'a -> pos -> pred
   type post 'a = 'a -> pos -> rel
 
   (* Hoare triples with explicit pre & post *)
   type hl 'a = { code: code; ghost pre : pre 'a; ghost post: post 'a }
 
-  (* Predicate transformer type. *)
+  (* Predicate transformer type. Same auxiliary variables as for
+     Hoare triples. *)
   type wp_trans 'a = 'a -> pos -> pred -> pred
 
   (* Code with backward predicate transformer. *)
   type wp 'a = { wcode : code; ghost wp : wp_trans 'a }
 
-  (* Machine transition independence for a piece of code with respect
-     to the rest of the code. *)
+  (* Machine transition valid whatever the global code is. *)
   predicate contextual_irrelevance (c:code) (p:pos) (ms1 ms2:machine_state) =
     forall c_glob. codeseq_at c_glob p c -> transition_star c_glob ms1 ms2
 
@@ -44,13 +50,15 @@ module Compiler_logic
     forall x:'a,p ms. cs.pre x p ms ->
       exists ms'. cs.post x p ms ms' /\ contextual_irrelevance cs.code p ms ms'
 
-  (* Invariant for code with predicate transformer wp_correctness. *)
+  (* Similar definition for backward predicate transformers *)
   predicate wp_correctness (code:wp 'a) =
     forall x:'a,p post ms. (code.wp x p post) ms ->
       exists ms'. post ms' /\ contextual_irrelevance code.wcode p ms ms'
 
 
-  (* WP combinator for sequence. *)
+  (* WP combinator for sequence. Similar to the standard WP calculus
+     for sequence. The initial machine state is memorized in auxiliary
+     variables for potential use in the second code specification. *)
   (*** Technical: Why3 refuse the logic call in program,
        so we cannot define it in function of (wp 'a) arguments only. *)
   function seq_wp
@@ -84,7 +92,8 @@ module Compiler_logic
 
   meta rewrite prop fork_wp_lemma
 
-  (* Code combinator for sequence, with wp. *)
+  (* Code combinator for conditional execution.
+     Similar to WP calculus for (if cond then s). *)
 
   let (%) (s:wp 'a) (ghost cond:pre 'a) : wp 'a
     requires { wp_correctness s }
@@ -123,9 +132,14 @@ module Compiler_logic
   function trivial_pre : pre 'a = \x p ms. let VMS p' _ _ = ms in p = p'
   meta rewrite_def function trivial_pre
 
+  (* Accessibility predicate. *)
   inductive acc ('a -> 'a -> bool) 'a =
     | Acc : forall r, x:'a. (forall y. r y x -> acc r y) -> acc r x
 
+  (* An iteration of the loop should make progress
+     towards the postcondition: either achieve the postcondition,
+     or preserve the invariant and "decrease" according to
+     a well-founded relation. *)
   function loop_progress (inv post:pre 'a) (var:post 'a) : post 'a =
     \x p ms ms'. (inv x p ms' /\ var x p ms' ms) \/ post x p ms'
   meta rewrite_def function loop_progress
@@ -134,7 +148,11 @@ module Compiler_logic
     \x p ms . post x p
   meta rewrite_def function forget_old
 
-  (* Variant of hoare triplet introduction rule for looping code. *)
+  (* Variant of hoare triplet introduction rule for looping code.
+     - inv is the loop invariant
+     - post is the loop postcondition
+     - var is a well-founded relation over states satisfying the
+       invariant. *)
   let make_loop_hl (c:hl 'a) (ghost inv post:pre 'a) (ghost var:post 'a) : hl 'a
     requires { hl_correctness c }
     requires { forall x p ms. inv x p ms -> acc (var x p) ms }
@@ -149,9 +167,3 @@ module Compiler_logic
 
 end
 
-
-(*
-Local Variables:
-compile-command: "why3 ide -L . logic.mlw"
-End:
-*)

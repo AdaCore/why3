@@ -1,4 +1,6 @@
 
+(* Utility module: reflexive transitive closure of a parameterized
+   relation. *)
 module ReflTransClosure
 
   type parameter
@@ -148,10 +150,4 @@ theory Vm "Virtual Machine for IMP language"
        transition_star c (VMS 0 Nil mi) (VMS p Nil mf)
 
 end
-
-(*
-Local Variables:
-compile-command: "why3ide -L . vm.mlw"
-End:
-*)
 

@@ -76,6 +76,7 @@ theory Imp
           ceval mi (Cwhile cond body) mf
 
 
+  (* Determinstic semantics *)
   lemma ceval_deterministic_aux : forall c mi mf1. ceval mi c mf1 ->
       forall mf2. ("inversion" ceval mi c mf2) -> mf1 = mf2
 
