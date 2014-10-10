@@ -316,7 +316,8 @@ let register_result goal result =
    end else begin try
          (* the goal was not proved. *)
          (* We first check whether another prover may apply *)
-         if not (all_provers_tried goal) then begin
+         if Gnat_config.manual_prover = None &&
+            not (all_provers_tried goal) then begin
            (* put the goal back to be scheduled *)
            GoalSet.add obj_rec.to_be_scheduled goal;
            obj, Work_Left
@@ -412,7 +413,10 @@ let iter_leafs goal f =
 let iter_leaf_goals subp f = iter_leafs subp.subp_goal f
 
 let find_first_untried_prover g =
-  List.find (fun p -> not (has_been_tried_by g p)) Gnat_config.provers
+  match Gnat_config.manual_prover with
+  | Some p -> p
+  | None ->
+    List.find (fun p -> not (has_been_tried_by g p)) Gnat_config.provers
 
 let apply_split_goal_if_needed g =
    (* before doing any proofs, we apply "split" to all "main goals" (see

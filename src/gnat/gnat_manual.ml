@@ -14,7 +14,7 @@ let manual_attempt_of_goal goal =
 
 let is_new_manual_proof goal =
   match manual_attempt_of_goal goal with
-  | None -> false
+  | None -> true
   | Some att -> att.proof_obsolete
 
 let rec find_goal_theory goal =
