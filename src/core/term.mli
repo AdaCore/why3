@@ -308,28 +308,58 @@ val t_pred_app_l : term -> term list -> term  (* prop-typed application *)
 
 (** {2 Lambda-term manipulation} *)
 
-val t_lambda : preid -> vsymbol list -> trigger -> term -> term
+val t_lambda : vsymbol list -> trigger -> term -> term
+(** [t_lambda vl tr e] produces a term [eps f. (forall vl [tr]. f@vl = e)]
+    or [eps f. (forall vl [tr]. f@vl = True <-> e] if [e] is prop-typed.
+    If [vl] is empty, [t_lambda] returns [e] or [if e then True else False],
+    if [e] is prop-typed. *)
+
+val t_open_lambda : term -> vsymbol list * trigger * term
+(** [t_open_lambda t] returns a triple [(vl,tr,e)], such that [t] is equal
+    to [t_lambda vl tr e]. If [t] is not a lambda-term, then [vl] is empty,
+    [tr] is empty, and [e] is [t]. The term [e] may be prop-typed. *)
+
+val t_open_lambda_cb : term -> vsymbol list * trigger * term *
+                             (vsymbol list -> trigger -> term -> term)
+(** the same as [t_open_lambda] but returns additionally an instance of
+    [t_lambda] that restores the original term if applied to the physically
+    same arguments. Should be used in mapping functions. *)
 
 val t_is_lambda : term -> bool
-
-val t_open_lambda : term -> vsymbol * vsymbol list * trigger * term
-
-val t_open_lambda_cb :
-  term -> vsymbol * vsymbol list * trigger * term *
-                  (vsymbol list -> trigger -> term -> term)
+(** [t_is_lambda t] returns [true] if [t] is a lambda-term. Do not use
+    this function if you call [t_open_lambda] afterwards. Internally,
+    [t_is_lambda] opens binders itself, so you will pay twice the price.
+    It is better to optimistically call [t_open_lambda] on any [Teps],
+    and handle the generic case if an empty argument list is returned. *)
 
 val t_closure : lsymbol -> ty list -> ty option -> term
+(** [t_closure ls tyl oty] returns a type-instantiated lambda-term
+    [\xx:tyl.(ls xx : oty)], or [ls : oty] if [ls] is a constant.
+    The length of [tyl] must be equal to that of [ls.ls_args], and
+    [oty] should be [None] if and only if [ls] is a predicate symbol. *)
 
 val t_app_partial : lsymbol -> term list -> ty list -> ty option -> term
+(** [t_app_partial ls tl tyl oty] produces a closure of [ls] and applies
+    it to [tl] using [t_func_app]. The type signature of the closure is
+    obtained by prepending the list of types of terms in [tl] to [tyl].
+    The resulting list must have the same length as [ls.ls_args], and
+    [oty] should be [None] if and only if [ls] is a predicate symbol.
+    If the symbol is fully applied ([tyl] is empty), the [Tapp] term
+    is returned. Otherwise, no beta-reduction is performed, in order
+    to preserve the closure. *)
 
-val t_app_lambda : term -> term -> term (* may return a formula *)
+val t_func_app_beta : term -> term -> term
+(** [t_func_app_beta f a] applies [f] to [a] performing beta-reduction
+    when [f] is a lambda-term. Always returns a value-typed term, even
+    if [f] is a lambda-term built on top of a formula. *)
 
-val t_app_beta : term -> term -> term
-  (* if the first argument is a lambda then execute
-     [t_app_lambda], otherwise execute [t_func_app] *)
+val t_pred_app_beta : term -> term -> term
+(** [t_pred_app_beta f a] applies [f] to [a] performing beta-reduction
+    when [f] is a lambda-term. Always returns a formula, even if [f] is
+    a lambda-term built on top of a bool-typed term. *)
 
-val t_app_lambda_l : term -> term list -> term
-val t_app_beta_l   : term -> term list -> term
+val t_func_app_beta_l : term -> term list -> term
+val t_pred_app_beta_l : term -> term list -> term
 
 (** {2 Term library} *)
 

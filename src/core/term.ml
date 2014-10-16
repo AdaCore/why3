@@ -930,113 +930,6 @@ let t_pred_app pr t = t_equ (t_func_app pr t) t_bool_true
 let t_func_app_l fn tl = List.fold_left t_func_app fn tl
 let t_pred_app_l pr tl = t_equ (t_func_app_l pr tl) t_bool_true
 
-(* Lambdas *)
-
-let t_lambda id vl trl t =
-  let ty = Opt.get_def ty_bool t.t_ty in
-  let add_ty v ty = ty_func v.vs_ty ty in
-  let ty = List.fold_right add_ty vl ty in
-  let fc = create_vsymbol id ty in
-  let copy_loc e = if id.pre_loc = None then e
-    else t_label ?loc:id.pre_loc e.t_label e in
-  let mk_t_var v = if v.vs_name.id_loc = None then t_var v
-    else t_label ?loc:v.vs_name.id_loc Slab.empty (t_var v) in
-  let add_arg h v = copy_loc (t_func_app h (mk_t_var v)) in
-  let h = List.fold_left add_arg (mk_t_var fc) vl in
-  let f = match t.t_ty with
-    | Some _ -> t_equ h t
-    | None   -> t_iff (copy_loc (t_equ h t_bool_true)) t in
-  t_eps_close fc (copy_loc (t_forall_close vl trl (copy_loc f)))
-
-let t_lambda id vl trl t =
-  let t = match t.t_node with
-    | Tapp (ps,[l;{t_node = Tapp (fs,[])}])
-      when ls_equal ps ps_equ && ls_equal fs fs_bool_true ->
-        t_label_copy t l
-    | _ -> t in
-  if vl <> [] then t_lambda id vl trl t
-  else if t.t_ty <> None then t
-  else t_if t t_bool_true t_bool_false
-
-let t_is_lambda t = match t.t_ty, t.t_node with
-  | Some {ty_node = Tyapp (ts,_)},
-    Teps (fc,_,{t_node = Tquant (Tforall,(vl,_,_,f))})
-    when ts_equal ts ts_func ->
-      let rec check h vl = match h.t_node, vl with
-        | Tvar u, [] when vs_equal u fc -> true
-        | Tapp (fs,[h;{t_node = Tvar u}]), (v::vl)
-          when ls_equal fs fs_func_app && vs_equal u v -> check h vl
-        | _ -> false in
-      let vl = List.rev vl in
-      begin match f.t_node with
-        | Tapp (ps,[h;_]) when ls_equal ps ps_equ -> check h vl
-        | Tbinop (Tiff,{t_node = Tapp (ps,[h;{t_node = Tapp (fs,[])}])},_)
-          when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> check h vl
-        | _ -> false
-      end
-  | _ -> false
-
-let t_open_lambda t = match t.t_ty, t.t_node with
-  | Some {ty_node = Tyapp (ts,_)}, Teps fb when ts_equal ts ts_func ->
-      let fc,f = t_open_bound fb in
-      let vl,trl,f = match f.t_node with
-        | Tquant (Tforall,fq) -> t_open_quant fq
-        | _ -> invalid_arg "Term.t_open_lambda" in
-      let h,e = match f.t_node with
-        | Tapp (ps,[h;e]) when ls_equal ps ps_equ -> h, e
-        | Tbinop (Tiff,{t_node = Tapp (ps,[h;{t_node = Tapp (fs,[])}])},e)
-          when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> h, e
-        | _ -> invalid_arg "Term.t_open_lambda" in
-      let rec check h vl = match h.t_node, vl with
-        | Tvar u, [] when vs_equal u fc -> ()
-        | Tapp (fs,[h;{t_node = Tvar u}]), (v::vl)
-          when ls_equal fs fs_func_app && vs_equal u v -> check h vl
-        | _ -> invalid_arg "Term.t_open_lambda" in
-      check h (List.rev vl);
-      fc, vl, trl, e
-  | _ -> invalid_arg "Term.t_open_lambda"
-
-let t_open_lambda_cb t =
-  let fc, vl, trl, e = t_open_lambda t in
-  let close vl' trl' e' =
-    if e == e' &&
-      Lists.equal (Lists.equal ((==) : term -> term -> bool)) trl trl' &&
-      Lists.equal vs_equal vl vl'
-    then t else t_lambda (id_clone fc.vs_name) vl' trl' e' in
-  fc, vl, trl, e, close
-
-let t_closure ls tyl ty =
-  let mk_v i ty = create_vsymbol (id_fresh ("y" ^ string_of_int i)) ty in
-  let vl = Lists.mapi mk_v tyl in
-  let t = t_app ls (List.map t_var vl) ty in
-  t_lambda (id_clone ls.ls_name) vl [] t
-
-let t_app_partial ls tl tyl ty =
-  if tyl = [] then t_app ls tl ty else
-  let tyl = List.fold_right (fun t tyl -> t_type t :: tyl) tl tyl in
-  t_func_app_l (t_closure ls tyl ty) tl
-
-let t_app_lambda_l lam tl =
-  if tl = [] then lam else
-  let fc, vl, trl, e = t_open_lambda lam in
-  let rec add m vl tl = match vl, tl with
-    | [], tl ->
-        t_func_app_l (t_subst_unsafe m e) tl
-    | vl, [] ->
-        let trl = List.map (List.map (t_subst_unsafe m)) trl in
-        t_lambda (id_clone fc.vs_name) vl trl (t_subst_unsafe m e)
-    | v::vl, t::tl ->
-        vs_check v t; add (Mvs.add v t m) vl tl in
-  add Mvs.empty vl tl
-
-let t_app_lambda lam t = t_app_lambda_l lam [t]
-
-let t_app_beta_l lam tl =
-  if t_is_lambda lam then t_app_lambda_l lam tl
-  else t_func_app_l lam tl
-
-let t_app_beta lam t = t_app_beta_l lam [t]
-
 (** Term library *)
 
 (* generic map over types, symbols and variables *)
@@ -1416,6 +1309,111 @@ let rec t_replace t1 t2 t =
 let t_replace t1 t2 t =
   t_ty_check t2 t1.t_ty;
   t_replace t1 t2 t
+
+(* lambdas *)
+
+let t_lambda vl trl t =
+  let ty = Opt.get_def ty_bool t.t_ty in
+  let add_ty v ty = ty_func v.vs_ty ty in
+  let ty = List.fold_right add_ty vl ty in
+  let fc = create_vsymbol (id_fresh "fc") ty in
+  let copy_loc e = if t.t_loc = None then e
+    else t_label ?loc:t.t_loc e.t_label e in
+  let mk_t_var v = if v.vs_name.id_loc = None then t_var v
+    else t_label ?loc:v.vs_name.id_loc Slab.empty (t_var v) in
+  let add_arg h v = copy_loc (t_func_app h (mk_t_var v)) in
+  let h = List.fold_left add_arg (mk_t_var fc) vl in
+  let f = match t.t_ty with
+    | Some _ -> t_equ h t
+    | None   -> t_iff (copy_loc (t_equ h t_bool_true)) t in
+  t_eps_close fc (copy_loc (t_forall_close vl trl (copy_loc f)))
+
+let t_lambda vl trl t =
+  let t = match t.t_node with
+    | Tapp (ps,[l;{t_node = Tapp (fs,[])}])
+      when ls_equal ps ps_equ && ls_equal fs fs_bool_true ->
+        t_label_copy t l
+    | _ -> t in
+  if vl <> [] then t_lambda vl trl t
+  else if t.t_ty <> None then t
+  else t_if t t_bool_true t_bool_false
+
+let t_open_lambda t = match t.t_ty, t.t_node with
+  | Some {ty_node = Tyapp (ts,_)}, Teps fb when ts_equal ts ts_func ->
+      let fc,f = t_open_bound fb in
+      let vl,trl,f = match f.t_node with
+        | Tquant (Tforall,fq) -> t_open_quant fq
+        | _ -> [], [], t (* fail the next check *) in
+      let h,e = match f.t_node with
+        | Tapp (ps,[h;e]) when ls_equal ps ps_equ -> h, e
+        | Tbinop (Tiff,{t_node = Tapp (ps,[h;{t_node = Tapp (fs,[])}])},e)
+          when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> h, e
+        | _ -> t, t (* fail the next check *) in
+      let rec check h xl = match h.t_node, xl with
+        | Tapp (fs,[h;{t_node = Tvar u}]), x::xl
+          when ls_equal fs fs_func_app && vs_equal u x -> check h xl
+        | Tvar u, [] when vs_equal u fc && t_v_occurs u e = 0 -> vl, trl, e
+        | _ -> [], [], t in
+      check h (List.rev vl)
+  | _ -> [], [], t
+
+(* it is rather tricky to check if a term is a lambda without properly
+   opening the binders. The deferred substitution in the quantifier
+   may obscure the closure variable or, on the contrary, introduce it
+   on the RHS of the definition, making it recursive. We cannot simply
+   reject such deferred substitutions, because the closure variable is
+   allowed in the triggers and it can appear there via the deferred
+   substitution, why not? Therefore, t_is_lambda is a mere shim around
+   t_open_lambda. *)
+let t_is_lambda t = let vl,_,_ = t_open_lambda t in vl <> []
+
+let t_open_lambda_cb t =
+  let vl, trl, e = t_open_lambda t in
+  let close vl' trl' e' =
+    if e == e' &&
+      Lists.equal (Lists.equal ((==) : term -> term -> bool)) trl trl' &&
+      Lists.equal vs_equal vl vl'
+    then t else t_lambda vl' trl' e' in
+  vl, trl, e, close
+
+let t_closure ls tyl ty =
+  let mk_v i ty = create_vsymbol (id_fresh ("y" ^ string_of_int i)) ty in
+  let vl = Lists.mapi mk_v tyl in
+  let t = t_app ls (List.map t_var vl) ty in
+  t_lambda vl [] t
+
+let t_app_partial ls tl tyl ty =
+  if tyl = [] then t_app ls tl ty else
+  let tyl = List.fold_right (fun t tyl -> t_type t :: tyl) tl tyl in
+  t_func_app_l (t_closure ls tyl ty) tl
+
+let rec t_app_beta_l lam tl =
+  let vl, trl, e = t_open_lambda lam in
+  if vl = [] then t_func_app_l lam tl else
+  let rec add m vl tl = match vl, tl with
+    | [], [] ->
+        t_subst_unsafe m e
+    | [], tl ->
+        t_app_beta_l (t_subst_unsafe m e) tl
+    | vl, [] ->
+        let trl = List.map (List.map (t_subst_unsafe m)) trl in
+        t_lambda vl trl (t_subst_unsafe m e)
+    | v::vl, t::tl ->
+        vs_check v t; add (Mvs.add v t m) vl tl in
+  add Mvs.empty vl tl
+
+let t_func_app_beta_l lam tl =
+  if tl = [] then lam else
+  let e = t_app_beta_l lam tl in
+  if e.t_ty = None then t_if e t_bool_true t_bool_false else e
+
+let t_pred_app_beta_l lam tl =
+  if tl = [] then lam else
+  let e = t_app_beta_l lam tl in
+  if e.t_ty = None then e else t_equ e t_bool_true
+
+let t_func_app_beta lam t = t_func_app_beta_l lam [t]
+let t_pred_app_beta lam t = t_pred_app_beta_l lam [t]
 
 (* constructors with propositional simplification *)
 
