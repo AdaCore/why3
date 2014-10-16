@@ -270,7 +270,8 @@ val t_forall_close_simp : vsymbol list -> trigger -> term -> term
 val t_exists_close_simp : vsymbol list -> trigger -> term -> term
 
 val t_forall_close_merge : vsymbol list -> term -> term
-(** [forall_close_merge vs f] puts a universal quantifier over [f];
+val t_exists_close_merge : vsymbol list -> term -> term
+(** [t_forall_close_merge vs f] puts a universal quantifier over [f];
     merges variable lists if [f] is already universally quantified;
     reuses triggers of [f], if any, otherwise puts no triggers. *)
 
@@ -304,6 +305,31 @@ val t_pred_app : term -> term -> term  (* prop-typed application *)
 
 val t_func_app_l : term -> term list -> term  (* value-typed application *)
 val t_pred_app_l : term -> term list -> term  (* prop-typed application *)
+
+(** {2 Lambda-term manipulation} *)
+
+val t_lambda : preid -> vsymbol list -> trigger -> term -> term
+
+val t_is_lambda : term -> bool
+
+val t_open_lambda : term -> vsymbol * vsymbol list * trigger * term
+
+val t_open_lambda_cb :
+  term -> vsymbol * vsymbol list * trigger * term *
+                  (vsymbol list -> trigger -> term -> term)
+
+val t_closure : lsymbol -> ty list -> ty option -> term
+
+val t_app_partial : lsymbol -> term list -> ty list -> ty option -> term
+
+val t_app_lambda : term -> term -> term (* may return a formula *)
+
+val t_app_beta : term -> term -> term
+  (* if the first argument is a lambda then execute
+     [t_app_lambda], otherwise execute [t_func_app] *)
+
+val t_app_lambda_l : term -> term list -> term
+val t_app_beta_l   : term -> term list -> term
 
 (** {2 Term library} *)
 
@@ -389,6 +415,7 @@ val t_v_occurs : vsymbol -> term -> int
 
 val t_subst_single : vsymbol -> term -> term -> term
 (** [t_subst_single v t1 t2] substitutes variable [v] in [t2] by [t1] *)
+
 val t_subst : term Mvs.t -> term -> term
 (** [t_subst m t] substitutes variables in [t] by the variable mapping [m] *)
 
@@ -399,8 +426,7 @@ val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
 val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
 (** [t_subst_types mt mv t] substitutes type variables by
     mapping [mt] simultaneously in substitution [mv] and in term [t].
-    beware that this operation may rename the variables in t
-*)
+    This operation may rename the variables in [t]. *)
 
 (** {2 Find free variables and type variables} *)
 
