@@ -210,16 +210,11 @@ type global_vs = Ptree.qualid -> vsymbol option
 
 let mk_closure loc ls =
   let mk dt = Dterm.dterm ~loc dt in
-  let id = id_user "fc" loc and dty = dty_fresh () in
   let mk_v i _ =
     id_user ("y" ^ string_of_int i) loc, dty_fresh () in
   let mk_t (id, dty) = mk (DTvar (id.pre_name, dty)) in
   let vl = Lists.mapi mk_v ls.ls_args in
-  let tl = List.map mk_t vl in
-  let app e1 e2 = DTapp (fs_func_app, [mk e1; e2]) in
-  let e = List.fold_left app (DTvar ("fc", dty)) tl in
-  let f = DTapp (ps_equ, [mk e; mk (DTapp (ls, tl))]) in
-  DTeps (id, dty, mk (DTquant (Tforall, vl, [], mk f)))
+  DTquant (DTlambda, vl, [], mk (DTapp (ls, List.map mk_t vl)))
 
 let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
   let func_app e el =
@@ -332,19 +327,11 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
       let dterm e = dterm uc gvars denv e in
       let trl = List.map (List.map dterm) trl in
       let e1 = dterm e1 in
-      begin match q with
-        | Ptree.Tforall -> DTquant (Term.Tforall, qvl, trl, e1)
-        | Ptree.Texists -> DTquant (Term.Texists, qvl, trl, e1)
-        | Ptree.Tlambda ->
-            let id = id_user "fc" loc and dty = dty_fresh () in
-            let add acc (x, _) =
-              let arg = Dterm.dterm ~loc (denv_get denv (preid_name x)) in
-              DTapp (fs_func_app, [Dterm.dterm ~loc acc; arg]) in
-            let app = List.fold_left add (DTvar ("fc",dty)) qvl in
-            let f = DTapp (ps_equ, [Dterm.dterm ~loc app; e1]) in
-            let f = DTquant (Tforall, qvl, trl, Dterm.dterm ~loc f) in
-            DTeps (id, dty, Dterm.dterm ~loc f)
-      end
+      let q = match q with
+        | Ptree.Tforall -> DTforall
+        | Ptree.Texists -> DTexists
+        | Ptree.Tlambda -> DTlambda in
+      DTquant (q, qvl, trl, e1)
   | Ptree.Trecord fl ->
       let get_val cs pj = function
         | Some e -> dterm uc gvars denv e

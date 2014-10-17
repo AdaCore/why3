@@ -160,6 +160,9 @@ and dpattern_node =
 type dbinop =
   | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff
 
+type dquant =
+  | DTforall | DTexists | DTlambda
+
 type dterm = {
   dt_node  : dterm_node;
   dt_dty   : dty option;
@@ -176,7 +179,7 @@ and dterm_node =
   | DTlet of dterm * preid * dterm
   | DTcase of dterm * (dpattern * dterm) list
   | DTeps of preid * dty * dterm
-  | DTquant of quant * (preid * dty) list * dterm list list * dterm
+  | DTquant of dquant * (preid * dty) list * dterm list list * dterm
   | DTbinop of dbinop * dterm * dterm
   | DTnot of dterm
   | DTtrue
@@ -324,7 +327,11 @@ let dterm ?loc node =
     | DTeps (_,dty,df) ->
         dfmla_expected_type df;
         Some dty
-    | DTquant (_,_,_,df) ->
+    | DTquant (DTlambda,vl,_,df) ->
+        let res = Opt.get_def dty_bool df.dt_dty in
+        let app (_,l) r = Dapp (ts_func, [l;r]) in
+        Some (List.fold_right app vl res)
+    | DTquant ((DTforall|DTexists),_,_,df) ->
         dfmla_expected_type df;
         None
     | DTbinop (_,df1,df2) ->
@@ -410,8 +417,8 @@ let check_used_var t vs =
   if not (String.length s > 0 && s.[0] = '_') then
   Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s
 
-let check_exists_implies q f = match q, f.t_node with
-  | Texists, Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
+let check_exists_implies f = match f.t_node with
+  | Tbinop (Timplies,_,_) -> Warning.emit ?loc:f.t_loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
@@ -490,12 +497,20 @@ and try_term strict keep_loc uloc env prop dty node =
       t_eps_close v f
   | DTquant (q,vl,dll,df) ->
       let env, vl = quant_vars ~strict env vl in
+      let prop = q <> DTlambda || df.dt_dty = None in
       let tr_get dt = get env (dt.dt_dty = None) dt in
       let trl = List.map (List.map tr_get) dll in
-      let f = get env true df in
+      let f = get env prop df in
       List.iter (check_used_var f) vl;
-      check_exists_implies q f;
-      t_quant_close q vl trl f
+      begin match q with
+        | DTforall ->
+            t_forall_close vl trl f
+        | DTexists ->
+            check_exists_implies f;
+            t_exists_close vl trl f
+        | DTlambda ->
+            t_lambda vl trl f
+      end
   | DTbinop (DTand,df1,df2) ->
       t_and (get env true df1) (get env true df2)
   | DTbinop (DTand_asym,df1,df2) ->
