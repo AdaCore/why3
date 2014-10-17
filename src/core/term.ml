@@ -1388,11 +1388,10 @@ let t_app_partial ls tl tyl ty =
   t_func_app_l (t_closure ls tyl ty) tl
 
 let rec t_app_beta_l lam tl =
+  if tl = [] then lam else
   let vl, trl, e = t_open_lambda lam in
   if vl = [] then t_func_app_l lam tl else
   let rec add m vl tl = match vl, tl with
-    | [], [] ->
-        t_subst_unsafe m e
     | [], tl ->
         t_app_beta_l (t_subst_unsafe m e) tl
     | vl, [] ->
@@ -1403,12 +1402,10 @@ let rec t_app_beta_l lam tl =
   add Mvs.empty vl tl
 
 let t_func_app_beta_l lam tl =
-  if tl = [] then lam else
   let e = t_app_beta_l lam tl in
   if e.t_ty = None then t_if e t_bool_true t_bool_false else e
 
 let t_pred_app_beta_l lam tl =
-  if tl = [] then lam else
   let e = t_app_beta_l lam tl in
   if e.t_ty = None then e else t_equ e t_bool_true
 
