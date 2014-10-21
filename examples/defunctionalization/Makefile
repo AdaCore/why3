@@ -16,6 +16,11 @@ endif
 
 include $(WHY3SHARE)/Makefile.config
 
+ifeq ($(BENCH),yes)
+  INCLUDE += -I ../../lib/why3
+endif
+
+
 MAIN = main
 OBJ = defunctionalization__Expr \
 	defunctionalization__DirectSem \
