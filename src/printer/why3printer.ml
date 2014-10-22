@@ -192,10 +192,17 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
         print_term t1 (print_list newline print_tbranch) bl
   | Teps fb ->
-      let v,f = t_open_bound fb in
-      fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
-        print_vsty v print_term f;
-      forget_var v
+      let vl,tl,e = t_open_lambda t in
+      if vl = [] then begin
+        let v,f = t_open_bound fb in
+        fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
+          print_vsty v print_term f;
+        forget_var v
+      end else begin
+        fprintf fmt (protect_on (pri > 0) "\\ %a%a.@ %a")
+          (print_list comma print_vsty) vl print_tl tl print_term e;
+        List.iter forget_var vl
+      end
   | Tquant (q,fq) ->
       let vl,tl,f = t_open_quant fq in
       fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
