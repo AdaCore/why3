@@ -10,7 +10,7 @@ module VM_instr_spec
   use import logic.Compiler_logic
 
   function ifun_post (f:machine_state -> machine_state) : post 'a =
-    \x p ms ms'. ms' = f ms
+    \_ _ ms ms'. ms' = f ms
   meta rewrite_def function ifun_post
 
   (* General specification builder for determinstic machine
@@ -30,7 +30,7 @@ module VM_instr_spec
 
   (* Iconst spec *)
   function iconst_post (n:int) : post 'a =
-    \x p ms ms'. forall s m. ms  = VMS p s m -> ms' = VMS (p+1) (push n s) m
+    \_ p ms ms'. forall s m. ms  = VMS p s m -> ms' = VMS (p+1) (push n s) m
   meta rewrite_def function iconst_post
 
   function iconst_fun (n:int) : machine_state -> machine_state =
@@ -44,7 +44,7 @@ module VM_instr_spec
 
   (* Ivar spec *)
   function ivar_post (x:id) : post 'a =
-    \a p ms ms'. forall s m. ms = VMS p s m -> ms' = VMS (p+1) (push m[x] s) m
+    \_ p ms ms'. forall s m. ms = VMS p s m -> ms' = VMS (p+1) (push m[x] s) m
   meta rewrite_def function ivar_post
 
   function ivar_fun (x:id) : machine_state -> machine_state =
@@ -61,11 +61,11 @@ module VM_instr_spec
   type binop = int -> int -> int
 
   constant ibinop_pre : pre 'a =
-    \x p ms . exists n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m
+    \_ p ms . exists n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m
   meta rewrite_def function ibinop_pre
 
   function ibinop_post (op : binop) : post 'a =
-   \x p ms ms'. forall n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m ->
+   \_ p ms ms'. forall n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m ->
      ms' = VMS (p+1) (push (op n1 n2) s) m
   meta rewrite_def function ibinop_post
 
@@ -110,7 +110,7 @@ module VM_instr_spec
 
   (* Inil spec *)
   function inil_post : post 'a =
-    \x p ms ms'. ms = ms'
+    \_ _ ms ms'. ms = ms'
   meta rewrite_def function inil_post
 
   let inil () : hl 'a
@@ -120,7 +120,7 @@ module VM_instr_spec
 
   (* Ibranch specification *)
   function ibranch_post (ofs: ofs) : post 'a =
-    \x p ms ms'. forall s m. ms = VMS p s m -> ms' = VMS (p + 1 + ofs) s m
+    \_ p ms ms'. forall s m. ms = VMS p s m -> ms' = VMS (p + 1 + ofs) s m
   meta rewrite_def function ibranch_post
 
   function ibranch_fun (ofs:ofs) : machine_state -> machine_state =
@@ -137,11 +137,11 @@ module VM_instr_spec
   type cond = int -> int -> bool
 
   function icjump_post (cond:cond) (ofs:ofs) : post 'a =
-    \x p ms ms'. forall n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m ->
+    \_ p ms ms'. forall n1 n2 s m. ms = VMS p (push n2 (push n1 s)) m ->
       (cond n1 n2 -> ms' = VMS (p + ofs + 1) s m) /\
       (not cond n1 n2 -> ms' = VMS (p+1) s m)
   meta rewrite_def function icjump_post
-  
+
   function icjump_fun (cond:cond) (ofs:ofs) : machine_state -> machine_state =
     \ms. match ms with
       | VMS p (Cons n2 (Cons n1 s)) m ->
@@ -193,11 +193,11 @@ module VM_instr_spec
 
   (* Isetvar specification *)
   constant isetvar_pre : pre 'a =
-    \x p ms . exists n s m. ms = VMS p (push n s) m
+    \_ p ms . exists n s m. ms = VMS p (push n s) m
   meta rewrite_def function isetvar_pre
 
   function isetvar_post (x:id) : post 'a =
-    \a p ms ms'. forall s n m.
+    \_ p ms ms'. forall s n m.
       ms = VMS p (push n s) m -> ms' = VMS (p+1) s m[x <- n]
   meta rewrite_def function isetvar_post
 

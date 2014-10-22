@@ -1,13 +1,13 @@
 
 (** {1 Implementation of logarithmic-time ordered associative tables on top
        of AVL trees}
-    
+
     Author: Martin Clochard *)
 
 (** {2 Shared base implementation between set and map structures} *)
 
 module MapBase
-  
+
   use import int.Int
   use import avl.SelectionTypes
   use import option.Option
@@ -16,13 +16,13 @@ module MapBase
   use import list.Append
   use import list.Mem
   use import list.Length
-  
+
   (** {3 Implementation parameters} *)
-  
+
   (** The level of balancing is left abstract. *)
   constant balancing : int
   axiom balancing_positive : balancing > 0
-  
+
   (** Stored elements are identified by totally ordered keys *)
   namespace D type t 'a end namespace K type t end
   clone export key_type.ProgramKeyType with type t = D.t, type key = K.t
@@ -33,7 +33,7 @@ module MapBase
       ensures { result = () }
     = ()
   end
-  
+
   (** Import the definition/facts about association list.
       Required to link together the sequence and functional views. *)
   clone association_list.AssocSorted as A with type K.t = D.t,
@@ -46,7 +46,7 @@ module MapBase
     goal O.eq_def,
     predicate O.lt = CO.lt,
     goal O.lt_def
-  
+
   (** As we do not need any extra information in order to perform search
       for this particular instance, we instantiate the monoid by unit. *)
   namespace M
@@ -63,23 +63,23 @@ module MapBase
     let zero () : unit ensures { result = () } = ()
     let op (x y:unit) : unit ensures { result = () } = ()
   end
-  
+
   (** In associative tables, elements are selected
       with respect to their keys. *)
   type selector = K.t
-  
+
   (** Efficient search for ordered keys can be carried out efficiently
       only in sorted sequences. *)
-  
+
   predicate selection_possible (s:K.t) (l:list (D.t 'a)) =
     A.S.increasing l
-  
+
   (** Selected splits correspond to sorted sequence, in which:
 
       1) the left part precede the selector key
-      
+
       2) the selector key precede the right part
-      
+
       3) If it exists, the middle element has key equivalent to the selector *)
   predicate selected (s:K.t) (e:split (D.t 'a)) =
     let l = rebuild e in
@@ -92,7 +92,7 @@ module MapBase
        but makes easier to write some lemmas. *)
     /\ A.S.increasing e.left /\ A.S.increasing e.right
     /\ selection_possible s l
-  
+
   (** Alternative definition of selected based on the functional view
       of an association list. *)
   predicate selected_sem (s:K.t) (e:split (D.t 'a)) (l:list (D.t 'a)) =
@@ -101,7 +101,7 @@ module MapBase
       (CO.eq k s -> A.model l k = e.middle) /\
       (CO.le s k -> A.model e.left k = None) /\
       (CO.le k s -> A.model e.right k = None)
-  
+
   let lemma selected_sem (s:K.t) (e:split (D.t 'a)) : unit
     requires { selected s e }
     ensures { selected_sem s e (rebuild e) }
@@ -109,7 +109,7 @@ module MapBase
     | None -> A.model_cut s e.left e.right
     | Some d -> A.model_split d e.left e.right
     end
-  
+
   (** Comparison-based binary search *)
   let selected_part (ghost llis:list (D.t 'a))
     (ghost rlis:list (D.t 'a))
@@ -131,7 +131,7 @@ module MapBase
     else if cmp > 0
     then Right s
     else Here
-  
+
   (** Full instantiation of the avl module. *)
   clone avl.AVL as Sel with type selector = selector,
     predicate selection_possible = selection_possible,
@@ -153,32 +153,32 @@ module MapBase
     goal M.sum_def_cons,
     val M.zero = M.zero,
     val M.op = M.op
-  
+
   (** {3 Adaptation to the specification to associative tables} *)
-  
+
   type t 'a = Sel.t 'a
-  
+
   (** Logical model: a finite association from keys to elements. *)
   type m 'a = {
     func : K.t -> option (D.t 'a);
     card : int;
   }
-  
+
   function m (t:t 'a) : m 'a =
     { func = A.model t.Sel.m.Sel.lis; card = length t.Sel.m.Sel.lis }
   let ghost m (t:t 'a) : m 'a
     ensures { result = t.m }
   = { func = A.model t.Sel.m.Sel.lis; card = length t.Sel.m.Sel.lis }
-  
+
   let lemma m_def (t:t 'a) : unit
     ensures { t.m.func = A.model t.Sel.m.Sel.lis }
     ensures { t.m.card = length t.Sel.m.Sel.lis }
   = ()
-  
+
   (** Invariant: add sortedness to the AVL trees invariant. *)
   predicate c (t:t 'a) =
     Sel.c t /\ A.S.increasing t.Sel.m.Sel.lis
-  
+
   (** Logical invariant on the model. *)
   let lemma correction (t:t 'a) : unit
     requires { c t }
@@ -190,13 +190,13 @@ module MapBase
       end }
     ensures { t.m.card >= 0 }
   = ()
-  
+
   (** Create an empty associative table. *)
   let empty () : t 'a
     ensures { forall k:K.t. result.m.func k = None }
     ensures { result.m.card = 0 /\ c result }
   = Sel.empty ()
-  
+
   (** Create an associative table with a single element. *)
   let singleton (d:D.t 'a) : t 'a
     ensures { (forall k:K.t. if CO.eq k d.key
@@ -205,7 +205,7 @@ module MapBase
       result.m.func d.key = Some d }
     ensures { result.m.card = 1 /\ c result }
   = Sel.singleton d
-  
+
   (** Check emptyness of an associative table. *)
   let is_empty (ghost rd:ref (D.t 'a)) (t:t 'a) : bool
     requires { c t }
@@ -219,7 +219,7 @@ module MapBase
       | Cons d _ -> rd := d
       end;
     res
-  
+
   (** Get and extract the element with minimum key from the table. *)
   let decompose_min (t:t 'a) : option (D.t 'a,t 'a)
     requires { c t }
@@ -231,7 +231,7 @@ module MapBase
           (not CO.eq d.key k -> r.m.func k = t.m.func k)) &&
         t.m.func d.key = Some d && r.m.func d.key = None /\ c r }
   = Sel.decompose_front t
-  
+
   (** Get and extract the element with maximum key from the table. *)
   let decompose_max (t:t 'a) : option (t 'a,D.t 'a)
     requires { c t }
@@ -243,7 +243,7 @@ module MapBase
           (not CO.eq k d.key -> l.m.func k = t.m.func k)) &&
         t.m.func d.key = Some d && l.m.func d.key = None /\ c l }
   = Sel.decompose_back t
-  
+
   (** Optimized insertion of an element with minimum key. *)
   let add_min (d:D.t 'a) (t:t 'a) : t 'a
     requires { c t /\ forall k:K.t. CO.le k d.key -> t.m.func k = None }
@@ -253,7 +253,7 @@ module MapBase
       t.m.func d.key = None && result.m.func d.key = Some d }
     ensures { result.m.card = t.m.card + 1 /\ c result }
   = Sel.cons d t
-  
+
   (** Optimized insertion of an element with maximal key. *)
   let add_max (t:t 'a) (d:D.t 'a) : t 'a
     requires { c t /\ forall k:K.t. CO.le d.key k -> t.m.func k = None }
@@ -263,7 +263,7 @@ module MapBase
       t.m.func d.key = None && result.m.func d.key = Some d }
     ensures { result.m.card = t.m.card + 1 /\ c result }
   = Sel.snoc t d
-  
+
   (** Ordered union of two associative table. *)
   let concat (l r:t 'a) : t 'a
     requires { c l /\ c r }
@@ -281,7 +281,7 @@ module MapBase
       l.m.func k = None /\ r.m.func k = None) }
     ensures { result.m.card = l.m.card + r.m.card /\ c result }
   = Sel.concat l r
-  
+
   (** Get the value associated to a key in the table, if it exists. *)
   let get (k:K.t) (t:t 'a) : option (D.t 'a)
     requires { c t }
@@ -291,7 +291,7 @@ module MapBase
           (forall k2. CO.eq k k2 -> t.m.func k2 = Some d) &&
           t.m.func k = Some d = t.m.func d.key }
   = Sel.get (Sel.default_split ()) k t
-  
+
   (** Insert a value in the table. Erase binding if the key was
       already present. *)
   let insert (d:D.t 'a) (t:t 'a) : t 'a
@@ -302,7 +302,7 @@ module MapBase
        (not CO.eq k d.key -> result.m.func k = t.m.func k)) &&
       result.m.func d.key = Some d /\ t.m.card <= result.m.card /\ c result }
   = Sel.insert (Sel.default_split ()) (get_key d) d t
-  
+
   (** Erase any binding associated to the given key. *)
   let remove (k:K.t) (t:t 'a) : t 'a
     requires { c t }
@@ -312,7 +312,7 @@ module MapBase
        (not CO.eq k2 k -> result.m.func k2 = t.m.func k2)) &&
       result.m.func k = None /\ result.m.card <= t.m.card /\ c result }
   = Sel.remove (Sel.default_split ()) k t
-  
+
   (** Split the table in three: elements before the key,
       element associated to the key (if exists),
       elements after the key. *)
@@ -334,13 +334,13 @@ module MapBase
       (forall k2:K.t. CO.lt k k2 -> rg.m.func k2 = t.m.func k2) /\
       (forall k2:K.t. CO.le k2 k -> rg.m.func k2 = None) }
   = Sel.split (Sel.default_split ()) k t
-  
+
   (** {3 Extension with set-theoretic routines }
-      
+
       Those routines go beyond single-call to the AVL trees function.
       Also, unlike previous routines they are not logarithmic-time but
       linear-time instead. *)
-  
+
   (** Internal specification wrappers over the AVL view and join routines. *)
   let view (t:t 'a) : Sel.view 'a
     requires { c t }
@@ -353,7 +353,7 @@ module MapBase
           (CO.le d.key k -> l.m.func k = None) /\
           (CO.le k d.key -> r.m.func k = None) }
   = Sel.view t
-  
+
   let join (l:t 'a) (d:D.t 'a) (r:t 'a) : t 'a
     requires { c l /\ c r }
     requires { forall k:K.t. (l.m.func k <> None -> CO.lt k d.key) /\
@@ -363,7 +363,7 @@ module MapBase
         (CO.eq k d.key -> result.m.func k = Some d) }
     ensures { result.m.card = 1 + l.m.card + r.m.card /\ c result }
   = Sel.join l d r
-  
+
   (** Add every element from [a] into [t]. *)
   let rec add_all (a:t 'a) (t:t 'a) : t 'a
     requires { c a /\ c t }
@@ -392,7 +392,7 @@ module MapBase
           join ul ad ur
       end
     end
-  
+
   (** Create the table with the elements of [a]
       whose key appear in [p]. *)
   let rec filter (p:t 'b) (a:t 'a) : t 'a
@@ -424,7 +424,7 @@ module MapBase
           end
       end
     end
-  
+
   (** Complement of [filter]: remove from [a] every element whose
       key appear in [p]. *)
   let rec remove_all (p:t 'b) (a:t 'a) : t 'a
@@ -452,7 +452,7 @@ module MapBase
           end
       end
     end
-  
+
   (** Create a table with the elements that appear
       exactly in one of [a] and [b], but not both. *)
   let rec symdiff (a b:t 'a) : t 'a
@@ -483,35 +483,35 @@ module MapBase
           end
       end
     end
-  
+
 end
 
 (** {2 Instantiation of the base to key-value ordered associative tables} *)
 module Map
-  
+
   use import int.Int
   use import option.Option
   use import ref.Ref
-  
+
   (** Balancing level left abstract. *)
   constant balancing : int
   axiom balancing_positive : balancing > 0
-  
+
   (** Parameter: key type with computable total preorder. *)
   namespace K type t end
   clone preorder.Computable as CO with type t = K.t
-  
+
   (** Elements are key-value pairs. *)
   namespace D
-    
+
     type t 'a = (K.t,'a)
     function key (t:t 'a) : K.t = let (a,_) = t in a
     let get_key (t:t 'a) : K.t
       ensures { key t = result }
     = let (a,_) = t in a
-    
+
   end
-  
+
   (** Direct instantiation. *)
   clone MapBase as MB with constant balancing = balancing,
     goal balancing_positive,
@@ -528,7 +528,7 @@ module Map
     predicate CO.eq = CO.eq,
     goal CO.eq_def,
     val CO.compare = CO.compare
-  
+
   (** Slight adaptation of the logical model. *)
   type t 'a = MB.t 'a
   type m 'a = {
@@ -543,7 +543,7 @@ module Map
   function m (t:t 'a) : m 'a =
     { func = \k. oproj (t.MB.m.MB.func k);
       card = t.MB.m.MB.card }
-  
+
   let lemma m_def (t:t 'a) : unit
     ensures { forall k. t.m.func k = None <-> t.MB.m.MB.func k = None }
     ensures { forall k k2 v. t.MB.m.MB.func k = Some (k2,v) ->
@@ -556,20 +556,20 @@ module Map
         match t.MB.m.MB.func k with
         | None -> false | Some ((k2,_) as x) -> k2 = x.D.key && false
         end }
-  
+
   (** Invariant over logical model. *)
   let lemma correction (t:t 'a) : unit
     requires { c t }
     ensures { forall k1 k2:K.t. CO.eq k1 k2 -> t.m.func k1 = t.m.func k2 }
     ensures { t.m.card >= 0 }
   = ()
-  
+
   (** Create an empty table. *)
   let empty () : t 'a
     ensures { forall k:K.t. result.m.func k = None }
     ensures { result.m.card = 0 /\ c result }
   = MB.empty ()
-  
+
   (** Create a table with a single key->value binding. *)
   let singleton (k:K.t) (v:'a) : t 'a
     ensures { (forall k2:K.t. if CO.eq k2 k
@@ -578,7 +578,7 @@ module Map
       result.m.func k = Some v }
     ensures { result.m.card = 1 /\ c result }
   = MB.singleton (k,v)
-  
+
   (** Check emptyness of a table. *)
   let is_empty (ghost rk:ref K.t) (ghost rv:ref 'a) (t:t 'a) : bool
     requires { c t }
@@ -588,7 +588,7 @@ module Map
   = let r = ref (!rk,!rv) in
     let res = MB.is_empty r t in
     let (a,b) = !r in rk := a;rv := b;res
-  
+
   (** Get and extract the (key->value) binding with minimum key. *)
   let decompose_min (t:t 'a) : option ((K.t,'a),t 'a)
     requires { c t }
@@ -600,7 +600,7 @@ module Map
         t.m.func k = Some v && r.m.func k = None /\
         t.m.card = 1 + r.m.card /\ c r }
   = MB.decompose_min t
-  
+
   (** Get and extract the (key->value) binding with maximum key. *)
   let decompose_max (t:t 'a) : option (t 'a,(K.t,'a))
     requires { c t }
@@ -612,7 +612,7 @@ module Map
         t.m.func k = Some v && l.m.func k = None /\
         t.m.card = 1 + l.m.card /\ c l }
   = MB.decompose_max t
-  
+
   (** Add a key->value binding with minimal key. *)
   let add_min (k:K.t) (v:'a) (t:t 'a) : t 'a
     requires { c t /\ forall k2:K.t. CO.le k2 k -> t.m.func k2 = None }
@@ -622,7 +622,7 @@ module Map
       t.m.func k = None && result.m.func k = Some v }
     ensures { result.m.card = 1 + t.m.card /\ c result }
   = MB.add_min (k,v) t
-  
+
   (** Add a key->value binding with maximal key. *)
   let add_max (t:t 'a) (k:K.t) (v:'a) : t 'a
     requires { c t /\ forall k2:K.t. CO.le k k2 -> t.m.func k2 = None }
@@ -632,7 +632,7 @@ module Map
       t.m.func k = None && result.m.func k = Some v }
     ensures { result.m.card = 1 + t.m.card /\ c result }
   = MB.add_max t (k,v)
-  
+
   (** Ordered fusion of two associative tables. *)
   let concat (l r:t 'a) : t 'a
     requires { c l /\ c r }
@@ -650,7 +650,7 @@ module Map
       l.m.func k = None /\ r.m.func k = None) }
     ensures { result.m.card = l.m.card + r.m.card /\ c result }
   = MB.concat l r
-  
+
   (** Extract the value associated to some key. *)
   let get (k:K.t) (t:t 'a) : option 'a
     requires { c t }
@@ -662,7 +662,7 @@ module Map
     | None -> None
     | Some (_,v) -> Some v
     end
-  
+
   (** Set the binding for key [k], erasing any such previous binding. *)
   let insert (k:K.t) (v:'a) (t:t 'a) : t 'a
     requires { c t }
@@ -674,7 +674,7 @@ module Map
       result.m.func k = Some v /\ result.m.card >= t.m.card /\ c result }
   = let res = MB.insert (k,v) t in
     res
-  
+
   (** Erase any potential binding for key [k]. *)
   let remove (k:K.t) (t:t 'a) : t 'a
     requires { c t }
@@ -685,7 +685,7 @@ module Map
        (not CO.eq k2 k -> result.m.func k2 = t.m.func k2)) &&
       result.m.func k = None /\ result.m.card <= t.m.card /\ c result }
   = MB.remove k t
-  
+
   (** Split the table in three parts:
       Bindings with key lower than [k], value associated to [k],
       and bindings with key greater than [k]. *)
@@ -710,33 +710,33 @@ module Map
         | Some (_,v) -> result = Some v end }
         match o with None -> None | Some (_,v) -> Some v end end in
     (lf,o,rg)
-  
+
 end
 
 (** {2 Instantiation of the base to ordered sets} *)
 module Set
-  
+
   use import int.Int
   use import option.Option
   use import ref.Ref
-  
+
   (** The balancing level is left abstract. *)
   constant balancing : int
   axiom balancing_positive : balancing > 0
-  
+
   (** Parameter: comparable elements. *)
   namespace K type t end
   clone preorder.Computable as CO with type t = K.t
-  
+
   (** Elements are themselves the keys. *)
   namespace D
-    
+
     type t 'a = K.t
     function key (t:'a) : 'a = t
     let get_key (t:'a) : 'a ensures { result = t } = t
-    
+
   end
-  
+
   (** Actual instantiation. *)
   clone MapBase as MB with constant balancing = balancing,
     goal balancing_positive,
@@ -753,7 +753,7 @@ module Set
     predicate CO.eq = CO.eq,
     goal CO.eq_def,
     val CO.compare = CO.compare
-  
+
   (** Slight adaptation of the logical model: use a set of elements. *)
   type t = MB.t unit
   type m = {
@@ -768,33 +768,33 @@ module Set
   function m (t:t) : m =
     { set = \k. oproj (t.MB.m.MB.func k);
       card = t.MB.m.MB.card }
-  
+
   let lemma m_def (t:t) : unit
     ensures { forall k. not t.m.set k <-> t.MB.m.MB.func k = None }
     ensures { forall k v. t.MB.m.MB.func k = Some v -> t.m.set k }
     ensures { forall k. t.m.set k -> exists v. t.MB.m.MB.func k = Some v }
     ensures { t.m.card = t.MB.m.MB.card }
   = ()
-  
+
   (** Invariant on the logical model. *)
   let lemma correction (t:t) : unit
     requires { c t }
     ensures { forall k1 k2:K.t. CO.eq k1 k2 -> (t.m.set k1 <-> t.m.set k2) }
     ensures { t.m.card >= 0 }
   = ()
-  
+
   (** Create an empty set. *)
   let empty () : t
     ensures { forall k:K.t. not result.m.set k }
     ensures { result.m.card = 0 /\ c result }
   = MB.empty ()
-  
+
   (** Create a singleton set. *)
   let singleton (k:K.t) : t
     ensures { forall k2:K.t. result.m.set k2 <-> CO.eq k2 k }
     ensures { result.m.card = 1 /\ c result }
   = MB.singleton k
-  
+
   (** Test emptyness of a set. *)
   let is_empty (ghost rk:ref (K.t)) (t:t) : bool
     requires { c t }
@@ -802,7 +802,7 @@ module Set
     ensures { not result -> t.m.set !rk }
     ensures { result <-> t.m.card = 0 }
   = MB.is_empty rk t
-  
+
   (** Get and remove minimum element from a set. *)
   let decompose_min (t:t) : option (K.t,t)
     requires { c t }
@@ -812,7 +812,7 @@ module Set
           (not CO.eq k k2 -> r.m.set k2 <-> t.m.set k2))
         && t.m.set k && not r.m.set k /\ t.m.card = 1 + r.m.card /\ c r }
   = MB.decompose_min t
-  
+
   (** Get and remove maximum element from a set. *)
   let decompose_max (t:t) : option (t,K.t)
     requires { c t }
@@ -822,7 +822,7 @@ module Set
           (not CO.eq k2 k -> l.m.set k2 <-> t.m.set k2))
         && t.m.set k && not l.m.set k /\ t.m.card = 1 + l.m.card /\ c l }
   = MB.decompose_max t
-  
+
   (** Add minimal element to a set. *)
   let add_min (k:K.t) (t:t) : t
     requires { c t /\ forall k2:K.t. CO.le k2 k -> not t.m.set k2 }
@@ -831,7 +831,7 @@ module Set
       (not CO.eq k k2 -> result.m.set k2 <-> t.m.set k2) }
     ensures { result.m.card = 1 + t.m.card /\ c result }
   = MB.add_min k t
-  
+
   (** Add maximal element to a set. *)
   let add_max (t:t) (k:K.t) : t
     requires { c t /\ forall k2:K.t. CO.le k k2 -> not t.m.set k2 }
@@ -840,7 +840,7 @@ module Set
       (not CO.eq k2 k -> result.m.set k2 <-> t.m.set k2) }
     ensures { result.m.card = 1 + t.m.card /\ c result }
   = MB.add_max t k
-  
+
   (** Ordered union of two sets. *)
   let concat (l r:t) : t
     requires { c l /\ c r }
@@ -848,7 +848,7 @@ module Set
     ensures { forall k. result.m.set k <-> (r.m.set k \/ l.m.set k) }
     ensures { result.m.card = l.m.card + r.m.card /\ c result }
   = MB.concat l r
-  
+
   (** Test membership of an element. *)
   let mem (k:K.t) (t:t) : bool
     requires { c t }
@@ -856,7 +856,7 @@ module Set
     ensures { result <-> (forall k2. CO.eq k2 k -> t.m.set k2) }
     ensures { result -> t.m.card > 0 }
   = match MB.get k t with None -> false | _ -> true end
-  
+
   (** Add an element to a set. *)
   let add (k:K.t) (t:t) : t
     requires { c t }
@@ -867,7 +867,7 @@ module Set
           then result.m.card = t.m.card
           else result.m.card = t.m.card + 1) && result.m.card >= t.m.card }
   = MB.insert k t
-  
+
   (** Remove an element from a set. *)
   let remove (k:K.t) (t:t) : t
     requires { c t }
@@ -878,7 +878,7 @@ module Set
           then 1 + result.m.card = t.m.card
           else result.m.card = t.m.card) && result.m.card <= t.m.card }
   = MB.remove k t
-  
+
   (** Split the set into three parts: elements lower than [k],
       elements equal to [k],
       and elements bigger than [k] *)
@@ -899,9 +899,9 @@ module Set
     let o = abstract ensures { result <-> o <> None }
       match o with None -> false | _ -> true end end in
     (lf,o,rg)
-  
+
   (** Extension: set-theoretic routines. *)
-  
+
   (** Compute the union of two sets. *)
   let union (a b:t) : t
     requires { c a /\ c b }
@@ -909,7 +909,7 @@ module Set
     ensures { result.m.card >= a.m.card /\ result.m.card >= b.m.card }
     ensures { c result }
   = MB.add_all a b
-  
+
   (** Compute the intersection of two sets. *)
   let inter (a b:t) : t
     requires { c a /\ c b }
@@ -917,38 +917,38 @@ module Set
     ensures { forall k. result.m.set k <-> a.m.set k /\ b.m.set k }
     ensures { result.m.card <= a.m.card /\ result.m.card <= b.m.card }
   = MB.filter a b
-  
+
   (** Compute the difference of two sets. *)
   let diff (a b:t) : t
     requires { c a /\ c b }
     ensures { forall k. result.m.set k <-> a.m.set k /\ not b.m.set k }
     ensures { result.m.card <= a.m.card /\ c result }
   = MB.remove_all b a
-  
+
   (** Compute the symmetrical difference of two sets. *)
   let symdiff (a b:t) : t
     requires { c a /\ c b }
     ensures { forall k. result.m.set k <-> not (a.m.set k <-> b.m.set k) }
     ensures { result.m.card <= a.m.card + b.m.card /\ c result }
   = MB.symdiff a b
-  
+
 end
 
 (** Example instances: integer keys/elements *)
 module IMapAndSet
-  
+
   use import int.Int
-  
+
   namespace K type t = int end
-  
+
   constant balancing : int = 1
-  
+
   predicate le (x y:int) = x <= y
   predicate eq (x y:int) = x = y
   predicate lt (x y:int) = x < y
-  
+
   let compare (x y:int) : int ensures { result = x - y } = x - y
-  
+
   clone Map as M with constant balancing = balancing,
     goal balancing_positive,
     type K.t = K.t,
@@ -961,7 +961,7 @@ module IMapAndSet
     goal CO.Trans,
     goal CO.Total,
     val CO.compare = compare
-  
+
   clone Set as S with constant balancing = balancing,
     goal balancing_positive,
     type K.t = K.t,
@@ -974,6 +974,6 @@ module IMapAndSet
     goal CO.Trans,
     goal CO.Total,
     val CO.compare = compare
-  
+
 end
 

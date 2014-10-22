@@ -129,7 +129,7 @@ module Compiler_logic
     ensures  { result.code.length = c.wcode.length /\ hl_correctness result}
   = { code = c.wcode ; pre = pre; post = post }
 
-  function trivial_pre : pre 'a = \x p ms. let VMS p' _ _ = ms in p = p'
+  function trivial_pre : pre 'a = \_ p ms. let VMS p' _ _ = ms in p = p'
   meta rewrite_def function trivial_pre
 
   (* Accessibility predicate. *)
@@ -145,7 +145,7 @@ module Compiler_logic
   meta rewrite_def function loop_progress
 
   function forget_old (post:pre 'a) : post 'a =
-    \x p ms . post x p
+    \x p _. post x p
   meta rewrite_def function forget_old
 
   (* Variant of hoare triplet introduction rule for looping code.
