@@ -37,6 +37,7 @@ and dpattern_node =
   | DPapp of lsymbol * dpattern list
   | DPor of dpattern * dpattern
   | DPas of dpattern * preid
+  | DPcast of dpattern * ty
 
 type dbinop =
   | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff

@@ -69,6 +69,7 @@ and pat_desc =
   | Ptuple of pattern list
   | Por of pattern * pattern
   | Pas of pattern * ident
+  | Pcast of pattern * pty
 
 type term = {
   term_desc : term_desc;

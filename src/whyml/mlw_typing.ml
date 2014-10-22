@@ -189,6 +189,7 @@ let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
     | Ptree.Ptuple pl ->
         let pl = List.map (fun p -> dpattern uc p) pl in
         DPlapp (fs_tuple (List.length pl), pl)
+    | Ptree.Pcast (p, pty) -> DPcast (dpattern uc p, ity_of_pty uc pty)
     | Ptree.Pas (p, x) -> DPas (dpattern uc p, create_user_id x)
     | Ptree.Por (p, q) -> DPor (dpattern uc p, dpattern uc q))
 

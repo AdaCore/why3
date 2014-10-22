@@ -170,7 +170,8 @@ let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
         let cs,fl = parse_record ~loc uc get_val fl in
         DPapp (cs,fl)
     | Ptree.Pas (p, x) -> DPas (dpattern uc p, create_user_id x)
-    | Ptree.Por (p, q) -> DPor (dpattern uc p, dpattern uc q))
+    | Ptree.Por (p, q) -> DPor (dpattern uc p, dpattern uc q)
+    | Ptree.Pcast (p, ty) -> DPcast (dpattern uc p, ty_of_pty uc ty))
 
 let quant_var uc (loc, id, gh, ty) =
   assert (not gh);

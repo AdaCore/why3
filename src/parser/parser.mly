@@ -850,6 +850,7 @@ pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
 | mk_pat(pat_uni_) AS labels(lident)    { Pas ($1,$3) }
+| mk_pat(pat_uni_) cast                 { Pcast($1,$2) }
 
 pat_arg_:
 | UNDERSCORE                            { Pwild }

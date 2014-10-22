@@ -156,6 +156,7 @@ and dpattern_node =
   | DPapp of lsymbol * dpattern list
   | DPor of dpattern * dpattern
   | DPas of dpattern * preid
+  | DPcast of dpattern * ty
 
 type dbinop =
   | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff
@@ -282,8 +283,12 @@ let dpattern ?loc node =
             "Variable %s has type %a,@ but is expected to have type %a"
             n print_dty dty1 print_dty dty2 in
         dp1.dp_dty, Mstr.union join dp1.dp_vars dp2.dp_vars
-    | DPas (dp, {pre_name = n}) ->
-        dp.dp_dty, Mstr.add_new (DuplicateVar n) n dp.dp_dty dp.dp_vars in
+    | DPas (dp,{pre_name = n}) ->
+        dp.dp_dty, Mstr.add_new (DuplicateVar n) n dp.dp_dty dp.dp_vars
+    | DPcast (dp,ty) ->
+        let dty = dty_of_ty ty in
+        dpat_expected_type dp dty;
+        dty, dp.dp_vars in
   let dty, vars = Loc.try1 ?loc get_dty node in
   { dp_node = node; dp_dty = dty; dp_vars = vars; dp_loc = loc }
 
@@ -403,7 +408,9 @@ let pattern ~strict env dp =
         pat_or (get dp1) (get dp2)
     | DPas (dp,id) ->
         let pat = get dp in
-        pat_as pat (find_var id pat.pat_ty) in
+        pat_as pat (find_var id pat.pat_ty)
+    | DPcast (dp,_) ->
+        get dp in
   let pat = get dp in
   Mstr.set_union !acc env, pat
 
