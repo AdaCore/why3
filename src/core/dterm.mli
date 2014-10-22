@@ -44,6 +44,8 @@ type dbinop =
 type dquant =
   | DTforall | DTexists | DTlambda
 
+type dbinder = preid option * dty * Loc.position option
+
 type dterm = private {
   dt_node  : dterm_node;
   dt_dty   : dty option;
@@ -60,7 +62,7 @@ and dterm_node =
   | DTlet of dterm * preid * dterm
   | DTcase of dterm * (dpattern * dterm) list
   | DTeps of preid * dty * dterm
-  | DTquant of dquant * (preid * dty) list * dterm list list * dterm
+  | DTquant of dquant * dbinder list * dterm list list * dterm
   | DTbinop of dbinop * dterm * dterm
   | DTnot of dterm
   | DTtrue
@@ -84,7 +86,7 @@ val denv_add_var : denv -> preid -> dty -> denv
 
 val denv_add_let : denv -> dterm -> preid -> denv
 
-val denv_add_quant : denv -> (preid * dty) list -> denv
+val denv_add_quant : denv -> dbinder list -> denv
 
 val denv_add_pat : denv -> dpattern -> denv
 

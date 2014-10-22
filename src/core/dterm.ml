@@ -163,6 +163,8 @@ type dbinop =
 type dquant =
   | DTforall | DTexists | DTlambda
 
+type dbinder = preid option * dty * Loc.position option
+
 type dterm = {
   dt_node  : dterm_node;
   dt_dty   : dty option;
@@ -179,7 +181,7 @@ and dterm_node =
   | DTlet of dterm * preid * dterm
   | DTcase of dterm * (dpattern * dterm) list
   | DTeps of preid * dty * dterm
-  | DTquant of dquant * (preid * dty) list * dterm list list * dterm
+  | DTquant of dquant * dbinder list * dterm list list * dterm
   | DTbinop of dbinop * dterm * dterm
   | DTnot of dterm
   | DTtrue
@@ -214,8 +216,13 @@ let denv_add_let denv dt {pre_name = n} =
   Mstr.add n (DTvar (n, dty_of_dterm dt)) denv
 
 let denv_add_quant denv vl =
-  let add acc ({pre_name = n}, dty) =
-    Mstr.add_new (DuplicateVar n) n (DTvar (n, dty)) acc in
+  let add acc (id,dty,_) = match id with
+    | Some ({pre_name = n} as id) ->
+        let exn = match id.pre_loc with
+          | Some loc -> Loc.Located (loc, DuplicateVar n)
+          | None     -> DuplicateVar n in
+        Mstr.add_new exn n (DTvar (n,dty)) acc
+    | None -> acc in
   let s = List.fold_left add Mstr.empty vl in
   Mstr.set_union s denv
 
@@ -329,7 +336,7 @@ let dterm ?loc node =
         Some dty
     | DTquant (DTlambda,vl,_,df) ->
         let res = Opt.get_def dty_bool df.dt_dty in
-        let app (_,l) r = Dapp (ts_func, [l;r]) in
+        let app (_,l,_) r = Dapp (ts_func,[l;r]) in
         Some (List.fold_right app vl res)
     | DTquant ((DTforall|DTexists),_,_,df) ->
         dfmla_expected_type df;
@@ -401,13 +408,17 @@ let pattern ~strict env dp =
   Mstr.set_union !acc env, pat
 
 let quant_vars ~strict env vl =
-  let add acc ({pre_name = n} as id, dty) =
-    let ty = var_ty_of_dty id ~strict dty in
-    let vs = create_vsymbol id ty in
-    let exn = match id.pre_loc with
-      | Some loc -> Loc.Located (loc, DuplicateVar n)
-      | None -> DuplicateVar n in
-    Mstr.add_new exn n vs acc, vs in
+  let add acc (id,dty,loc) = match id with
+    | Some ({pre_name = n} as id) ->
+        let ty = var_ty_of_dty id ~strict dty in
+        let vs = create_vsymbol id ty in
+        let exn = match id.pre_loc with
+          | Some loc -> Loc.Located (loc, DuplicateVar n)
+          | None     -> DuplicateVar n in
+        Mstr.add_new exn n vs acc, vs
+    | None ->
+        let ty = Loc.try1 ?loc (pat_ty_of_dty ~strict) dty in
+        acc, create_vsymbol (id_fresh "_") ty in
   let acc, vl = Lists.map_fold_left add Mstr.empty vl in
   Mstr.set_union acc env, vl
 

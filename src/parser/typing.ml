@@ -174,13 +174,10 @@ let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
 
 let quant_var uc (loc, id, gh, ty) =
   assert (not gh);
-  let id = match id with
-    | Some x -> create_user_id x
-    | None -> id_user "_" loc in
   let ty = match ty with
     | Some ty -> dty_of_ty (ty_of_pty uc ty)
     | None    -> dty_fresh () in
-  id, ty
+  Opt.map create_user_id id, ty, Some loc
 
 let is_reusable dt = match dt.dt_node with
   | DTvar _ | DTgvar _ | DTconst _ | DTtrue | DTfalse -> true
@@ -211,8 +208,8 @@ type global_vs = Ptree.qualid -> vsymbol option
 let mk_closure loc ls =
   let mk dt = Dterm.dterm ~loc dt in
   let mk_v i _ =
-    id_user ("y" ^ string_of_int i) loc, dty_fresh () in
-  let mk_t (id, dty) = mk (DTvar (id.pre_name, dty)) in
+    Some (id_user ("y" ^ string_of_int i) loc), dty_fresh (), None in
+  let mk_t (id, dty, _) = mk (DTvar ((Opt.get id).pre_name, dty)) in
   let vl = Lists.mapi mk_v ls.ls_args in
   DTquant (DTlambda, vl, [], mk (DTapp (ls, List.map mk_t vl)))
 
