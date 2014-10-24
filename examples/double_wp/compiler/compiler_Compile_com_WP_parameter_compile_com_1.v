@@ -157,6 +157,9 @@ Axiom machine_state_WhyType : WhyType machine_state.
 Existing Instance machine_state_WhyType.
 
 (* Why3 assumption *)
+Definition ofs := Z.
+
+(* Why3 assumption *)
 Inductive instr :=
   | Iconst : Z -> instr
   | Ivar : id -> instr
@@ -204,24 +207,24 @@ Definition isetvar (x:id): (list instr) :=
   (Init.Datatypes.cons (Isetvar x) Init.Datatypes.nil).
 
 (* Why3 assumption *)
-Definition ibeq (ofs:Z): (list instr) :=
-  (Init.Datatypes.cons (Ibeq ofs) Init.Datatypes.nil).
+Definition ibeq (ofs1:Z): (list instr) :=
+  (Init.Datatypes.cons (Ibeq ofs1) Init.Datatypes.nil).
 
 (* Why3 assumption *)
-Definition ible (ofs:Z): (list instr) :=
-  (Init.Datatypes.cons (Ible ofs) Init.Datatypes.nil).
+Definition ible (ofs1:Z): (list instr) :=
+  (Init.Datatypes.cons (Ible ofs1) Init.Datatypes.nil).
 
 (* Why3 assumption *)
-Definition ibne (ofs:Z): (list instr) :=
-  (Init.Datatypes.cons (Ibne ofs) Init.Datatypes.nil).
+Definition ibne (ofs1:Z): (list instr) :=
+  (Init.Datatypes.cons (Ibne ofs1) Init.Datatypes.nil).
 
 (* Why3 assumption *)
-Definition ibgt (ofs:Z): (list instr) :=
-  (Init.Datatypes.cons (Ibgt ofs) Init.Datatypes.nil).
+Definition ibgt (ofs1:Z): (list instr) :=
+  (Init.Datatypes.cons (Ibgt ofs1) Init.Datatypes.nil).
 
 (* Why3 assumption *)
-Definition ibranch (ofs:Z): (list instr) :=
-  (Init.Datatypes.cons (Ibranch ofs) Init.Datatypes.nil).
+Definition ibranch (ofs1:Z): (list instr) :=
+  (Init.Datatypes.cons (Ibranch ofs1) Init.Datatypes.nil).
 
 (* Why3 assumption *)
 Inductive transition: (list instr) -> machine_state -> machine_state ->
@@ -250,49 +253,49 @@ Inductive transition: (list instr) -> machine_state -> machine_state ->
       (s:(list Z)) (m:(map id Z)), (transition c (VMS p
       (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m) (VMS (p + 1%Z)%Z
       (Init.Datatypes.cons (n1 * n2)%Z s) m))
-  | trans_beq : forall (c:(list instr)) (p1:Z) (ofs:Z), (codeseq_at c p1
-      (ibeq ofs)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
+  | trans_beq : forall (c:(list instr)) (p1:Z) (ofs1:Z), (codeseq_at c p1
+      (ibeq ofs1)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
       (n1 = n2) -> (transition c (VMS p1
       (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)
-      (VMS ((p1 + 1%Z)%Z + ofs)%Z s m))
-  | trans_beq1 : forall (c:(list instr)) (p1:Z) (ofs:Z), (codeseq_at c p1
-      (ibeq ofs)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
+      (VMS ((p1 + 1%Z)%Z + ofs1)%Z s m))
+  | trans_beq1 : forall (c:(list instr)) (p1:Z) (ofs1:Z), (codeseq_at c p1
+      (ibeq ofs1)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
       (~ (n1 = n2)) -> (transition c (VMS p1
       (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)
       (VMS (p1 + 1%Z)%Z s m))
-  | trans_bne : forall (c:(list instr)) (p1:Z) (ofs:Z), (codeseq_at c p1
-      (ibne ofs)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
+  | trans_bne : forall (c:(list instr)) (p1:Z) (ofs1:Z), (codeseq_at c p1
+      (ibne ofs1)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
       (n1 = n2) -> (transition c (VMS p1
       (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)
       (VMS (p1 + 1%Z)%Z s m))
-  | trans_bne1 : forall (c:(list instr)) (p1:Z) (ofs:Z), (codeseq_at c p1
-      (ibne ofs)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
+  | trans_bne1 : forall (c:(list instr)) (p1:Z) (ofs1:Z), (codeseq_at c p1
+      (ibne ofs1)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
       (~ (n1 = n2)) -> (transition c (VMS p1
       (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)
-      (VMS ((p1 + 1%Z)%Z + ofs)%Z s m))
-  | trans_ble : forall (c:(list instr)) (p1:Z) (ofs:Z), (codeseq_at c p1
-      (ible ofs)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
+      (VMS ((p1 + 1%Z)%Z + ofs1)%Z s m))
+  | trans_ble : forall (c:(list instr)) (p1:Z) (ofs1:Z), (codeseq_at c p1
+      (ible ofs1)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
       (n1 <= n2)%Z -> (transition c (VMS p1
       (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)
-      (VMS ((p1 + 1%Z)%Z + ofs)%Z s m))
-  | trans_ble1 : forall (c:(list instr)) (p1:Z) (ofs:Z), (codeseq_at c p1
-      (ible ofs)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
+      (VMS ((p1 + 1%Z)%Z + ofs1)%Z s m))
+  | trans_ble1 : forall (c:(list instr)) (p1:Z) (ofs1:Z), (codeseq_at c p1
+      (ible ofs1)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
       (~ (n1 <= n2)%Z) -> (transition c (VMS p1
       (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)
       (VMS (p1 + 1%Z)%Z s m))
-  | trans_bgt : forall (c:(list instr)) (p1:Z) (ofs:Z), (codeseq_at c p1
-      (ibgt ofs)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
+  | trans_bgt : forall (c:(list instr)) (p1:Z) (ofs1:Z), (codeseq_at c p1
+      (ibgt ofs1)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
       (n1 <= n2)%Z -> (transition c (VMS p1
       (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)
       (VMS (p1 + 1%Z)%Z s m))
-  | trans_bgt1 : forall (c:(list instr)) (p1:Z) (ofs:Z), (codeseq_at c p1
-      (ibgt ofs)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
+  | trans_bgt1 : forall (c:(list instr)) (p1:Z) (ofs1:Z), (codeseq_at c p1
+      (ibgt ofs1)) -> forall (s:(list Z)) (m:(map id Z)) (n1:Z) (n2:Z),
       (~ (n1 <= n2)%Z) -> (transition c (VMS p1
       (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)
-      (VMS ((p1 + 1%Z)%Z + ofs)%Z s m))
-  | trans_branch : forall (c:(list instr)) (p:Z) (ofs:Z), (codeseq_at c p
-      (ibranch ofs)) -> forall (s:(list Z)) (m:(map id Z)), (transition c
-      (VMS p s m) (VMS ((p + 1%Z)%Z + ofs)%Z s m)).
+      (VMS ((p1 + 1%Z)%Z + ofs1)%Z s m))
+  | trans_branch : forall (c:(list instr)) (p:Z) (ofs1:Z), (codeseq_at c p
+      (ibranch ofs1)) -> forall (s:(list Z)) (m:(map id Z)), (transition c
+      (VMS p s m) (VMS ((p + 1%Z)%Z + ofs1)%Z s m)).
 
 (* Why3 assumption *)
 Inductive transition_star: (list instr) -> machine_state -> machine_state ->
@@ -321,10 +324,10 @@ Parameter func_WhyType : forall (a:Type) {a_WT:WhyType a}
 Existing Instance func_WhyType.
 
 (* Why3 assumption *)
-Definition pred (a:Type) := (func a bool).
+Definition pred (a:Type) := (a -> bool).
 
 Parameter infix_at: forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, (func a b) -> a -> b.
+  {b:Type} {b_WT:WhyType b}, (a -> b) -> a -> b.
 
 (* Why3 assumption *)
 Definition fst {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} (p:(a*
@@ -339,38 +342,37 @@ Definition snd {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} (p:(a*
   end.
 
 (* Why3 assumption *)
-Definition pred1 := (func machine_state bool).
+Definition pred1 := (machine_state -> bool).
 
 (* Why3 assumption *)
-Definition rel := (func machine_state (func machine_state bool)).
+Definition rel := (machine_state -> (machine_state -> bool)).
 
 (* Why3 assumption *)
-Definition pre (a:Type) := (func a (func Z (func machine_state bool))).
+Definition pre (a:Type) := (a -> (Z -> (machine_state -> bool))).
 
 (* Why3 assumption *)
-Definition post (a:Type) := (func a (func Z (func machine_state (func
-  machine_state bool)))).
+Definition post (a:Type) := (a -> (Z -> (machine_state -> (machine_state ->
+  bool)))).
 
 (* Why3 assumption *)
 Inductive hl
   (a:Type) :=
-  | mk_hl : (list instr) -> (func a (func Z (func machine_state bool))) ->
-      (func a (func Z (func machine_state (func machine_state bool)))) -> hl
-      a.
+  | mk_hl : (list instr) -> (a -> (Z -> (machine_state -> bool))) -> (a ->
+      (Z -> (machine_state -> (machine_state -> bool)))) -> hl a.
 Axiom hl_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (hl a).
 Existing Instance hl_WhyType.
 Implicit Arguments mk_hl [[a]].
 
 (* Why3 assumption *)
-Definition post1 {a:Type} {a_WT:WhyType a} (v:(hl a)): (func a (func Z (func
-  machine_state (func machine_state bool)))) :=
+Definition post1 {a:Type} {a_WT:WhyType a} (v:(hl a)): (a -> (Z ->
+  (machine_state -> (machine_state -> bool)))) :=
   match v with
   | (mk_hl x x1 x2) => x2
   end.
 
 (* Why3 assumption *)
-Definition pre1 {a:Type} {a_WT:WhyType a} (v:(hl a)): (func a (func Z (func
-  machine_state bool))) := match v with
+Definition pre1 {a:Type} {a_WT:WhyType a} (v:(hl a)): (a -> (Z ->
+  (machine_state -> bool))) := match v with
   | (mk_hl x x1 x2) => x1
   end.
 
@@ -381,21 +383,21 @@ Definition code1 {a:Type} {a_WT:WhyType a} (v:(hl a)): (list instr) :=
   end.
 
 (* Why3 assumption *)
-Definition wp_trans (a:Type) := (func a (func Z (func (func machine_state
-  bool) (func machine_state bool)))).
+Definition wp_trans (a:Type) := (a -> (Z -> ((machine_state -> bool) ->
+  (machine_state -> bool)))).
 
 (* Why3 assumption *)
 Inductive wp
   (a:Type) :=
-  | mk_wp : (list instr) -> (func a (func Z (func (func machine_state bool)
-      (func machine_state bool)))) -> wp a.
+  | mk_wp : (list instr) -> (a -> (Z -> ((machine_state -> bool) ->
+      (machine_state -> bool)))) -> wp a.
 Axiom wp_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (wp a).
 Existing Instance wp_WhyType.
 Implicit Arguments mk_wp [[a]].
 
 (* Why3 assumption *)
-Definition wp1 {a:Type} {a_WT:WhyType a} (v:(wp a)): (func a (func Z (func
-  (func machine_state bool) (func machine_state bool)))) :=
+Definition wp1 {a:Type} {a_WT:WhyType a} (v:(wp a)): (a -> (Z ->
+  ((machine_state -> bool) -> (machine_state -> bool)))) :=
   match v with
   | (mk_wp x x1) => x1
   end.
@@ -413,358 +415,295 @@ Definition contextual_irrelevance (c:(list instr)) (p:Z) (ms1:machine_state)
 
 (* Why3 assumption *)
 Definition hl_correctness {a:Type} {a_WT:WhyType a} (cs:(hl a)): Prop :=
-  forall (x:a) (p:Z) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (pre1 cs) x) p) ms) = true) ->
-  exists ms':machine_state,
-  ((infix_at (infix_at (infix_at (infix_at (post1 cs) x) p) ms)
-  ms') = true) /\ (contextual_irrelevance (code1 cs) p ms ms').
+  forall (x:a) (p:Z) (ms:machine_state), (((((pre1 cs) x) p) ms) = true) ->
+  exists ms':machine_state, ((((((post1 cs) x) p) ms) ms') = true) /\
+  (contextual_irrelevance (code1 cs) p ms ms').
 
 (* Why3 assumption *)
 Definition wp_correctness {a:Type} {a_WT:WhyType a} (code2:(wp a)): Prop :=
-  forall (x:a) (p:Z) (post2:(func machine_state bool)) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (wp1 code2) x) p) post2)
-  ms) = true) -> exists ms':machine_state, ((infix_at post2 ms') = true) /\
-  (contextual_irrelevance (wcode code2) p ms ms').
+  forall (x:a) (p:Z) (post2:(machine_state -> bool)) (ms:machine_state),
+  ((((((wp1 code2) x) p) post2) ms) = true) -> exists ms':machine_state,
+  ((post2 ms') = true) /\ (contextual_irrelevance (wcode code2) p ms ms').
 
-Parameter seq_wp: forall {a:Type} {a_WT:WhyType a}, Z -> (func a (func Z
-  (func (func machine_state bool) (func machine_state bool)))) -> (func (a*
-  machine_state)%type (func Z (func (func machine_state bool) (func
-  machine_state bool)))) -> (func a (func Z (func (func machine_state bool)
-  (func machine_state bool)))).
-
-Axiom seq_wp_def : forall {a:Type} {a_WT:WhyType a}, forall (l1:Z) (w1:(func
-  a (func Z (func (func machine_state bool) (func machine_state bool)))))
-  (w2:(func (a* machine_state)%type (func Z (func (func machine_state bool)
-  (func machine_state bool))))) (x:a) (p:Z) (q:(func machine_state bool))
-  (ms:machine_state), ((infix_at (infix_at (infix_at (infix_at (seq_wp l1 w1
-  w2) x) p) q) ms) = (infix_at (infix_at (infix_at (infix_at w1 x) p)
-  (infix_at (infix_at (infix_at w2 (x, ms)) (p + l1)%Z) q)) ms)).
+(* Why3 assumption *)
+Definition seq_wp {a:Type} {a_WT:WhyType a} (l1:Z) (w1:(a -> (Z ->
+  ((machine_state -> bool) -> (machine_state -> bool))))) (w2:((a*
+  machine_state)%type -> (Z -> ((machine_state -> bool) -> (machine_state ->
+  bool))))): (a -> (Z -> ((machine_state -> bool) -> (machine_state ->
+  bool)))) := fun (x:a) (p:Z) (q:(machine_state -> bool))
+  (ms:machine_state) => ((((w1 x) p) (((w2 (x, ms)) (p + l1)%Z) q)) ms).
 
 Axiom seq_wp_lemma : forall {a:Type} {a_WT:WhyType a}, forall (l1:Z)
-  (w1:(func a (func Z (func (func machine_state bool) (func machine_state
-  bool))))) (w2:(func (a* machine_state)%type (func Z (func (func
-  machine_state bool) (func machine_state bool))))) (x:a) (p:Z) (q:(func
-  machine_state bool)) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (seq_wp l1 w1 w2) x) p) q)
-  ms) = (infix_at (infix_at (infix_at (infix_at w1 x) p)
-  (infix_at (infix_at (infix_at w2 (x, ms)) (p + l1)%Z) q)) ms)).
+  (w1:(a -> (Z -> ((machine_state -> bool) -> (machine_state -> bool)))))
+  (w2:((a* machine_state)%type -> (Z -> ((machine_state -> bool) ->
+  (machine_state -> bool))))) (x:a) (p:Z) (q:(machine_state -> bool))
+  (ms:machine_state), ((((((seq_wp l1 w1 w2) x) p) q) ms) = ((((w1 x) p)
+  (((w2 (x, ms)) (p + l1)%Z) q)) ms)).
 
-Parameter fork_wp: forall {a:Type} {a_WT:WhyType a}, (func a (func Z (func
-  (func machine_state bool) (func machine_state bool)))) -> (func a (func Z
-  (func machine_state bool))) -> (func a (func Z (func (func machine_state
-  bool) (func machine_state bool)))).
+Parameter fork_wp: forall {a:Type} {a_WT:WhyType a}, (a -> (Z ->
+  ((machine_state -> bool) -> (machine_state -> bool)))) -> (a -> (Z ->
+  (machine_state -> bool))) -> (a -> (Z -> ((machine_state -> bool) ->
+  (machine_state -> bool)))).
 
-Axiom fork_wp_def : forall {a:Type} {a_WT:WhyType a}, forall (w:(func a (func
-  Z (func (func machine_state bool) (func machine_state bool))))) (exn:(func
-  a (func Z (func machine_state bool)))) (x:a) (p:Z) (q:(func machine_state
-  bool)) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (fork_wp w exn) x) p) q)
-  ms) = true) <-> ((((infix_at (infix_at (infix_at exn x) p) ms) = true) ->
-  ((infix_at q ms) = true)) /\ ((~ ((infix_at (infix_at (infix_at exn x) p)
-  ms) = true)) -> ((infix_at (infix_at (infix_at (infix_at w x) p) q)
-  ms) = true))).
+Axiom fork_wp_def : forall {a:Type} {a_WT:WhyType a}, forall (w:(a -> (Z ->
+  ((machine_state -> bool) -> (machine_state -> bool))))) (cond:(a -> (Z ->
+  (machine_state -> bool)))) (x:a) (p:Z) (q:(machine_state -> bool))
+  (ms:machine_state), ((((((fork_wp w cond) x) p) q) ms) = true) <->
+  (((~ ((((cond x) p) ms) = true)) -> ((q ms) = true)) /\ (((((cond x) p)
+  ms) = true) -> (((((w x) p) q) ms) = true))).
 
-Axiom fork_wp_lemma : forall {a:Type} {a_WT:WhyType a}, forall (w:(func a
-  (func Z (func (func machine_state bool) (func machine_state bool)))))
-  (exn:(func a (func Z (func machine_state bool)))) (x:a) (p:Z) (q:(func
-  machine_state bool)) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (fork_wp w exn) x) p) q)
-  ms) = true) <-> ((((infix_at (infix_at (infix_at exn x) p) ms) = true) ->
-  ((infix_at q ms) = true)) /\ ((~ ((infix_at (infix_at (infix_at exn x) p)
-  ms) = true)) -> ((infix_at (infix_at (infix_at (infix_at w x) p) q)
-  ms) = true))).
+Axiom fork_wp_lemma : forall {a:Type} {a_WT:WhyType a}, forall (w:(a -> (Z ->
+  ((machine_state -> bool) -> (machine_state -> bool))))) (cond:(a -> (Z ->
+  (machine_state -> bool)))) (x:a) (p:Z) (q:(machine_state -> bool))
+  (ms:machine_state), ((((((fork_wp w cond) x) p) q) ms) = true) <->
+  (((~ ((((cond x) p) ms) = true)) -> ((q ms) = true)) /\ (((((cond x) p)
+  ms) = true) -> (((((w x) p) q) ms) = true))).
 
-Parameter towp_wp: forall {a:Type} {a_WT:WhyType a}, (func a (func Z (func
-  machine_state bool))) -> (func a (func Z (func machine_state (func
-  machine_state bool)))) -> (func a (func Z (func (func machine_state bool)
-  (func machine_state bool)))).
+Parameter towp_wp: forall {a:Type} {a_WT:WhyType a}, (a -> (Z ->
+  (machine_state -> bool))) -> (a -> (Z -> (machine_state ->
+  (machine_state -> bool)))) -> (a -> (Z -> ((machine_state -> bool) ->
+  (machine_state -> bool)))).
 
-Axiom towp_wp_def : forall {a:Type} {a_WT:WhyType a}, forall (pr:(func a
-  (func Z (func machine_state bool)))) (ps:(func a (func Z (func
-  machine_state (func machine_state bool))))) (x:a) (p:Z) (q:(func
-  machine_state bool)) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (towp_wp pr ps) x) p) q)
-  ms) = true) <-> (((infix_at (infix_at (infix_at pr x) p) ms) = true) /\
-  forall (ms':machine_state), ((infix_at (infix_at (infix_at (infix_at ps x)
-  p) ms) ms') = true) -> ((infix_at q ms') = true)).
+Axiom towp_wp_def : forall {a:Type} {a_WT:WhyType a}, forall (pr:(a -> (Z ->
+  (machine_state -> bool)))) (ps:(a -> (Z -> (machine_state ->
+  (machine_state -> bool))))) (x:a) (p:Z) (q:(machine_state -> bool))
+  (ms:machine_state), ((((((towp_wp pr ps) x) p) q) ms) = true) <-> (((((pr
+  x) p) ms) = true) /\ forall (ms':machine_state), (((((ps x) p) ms)
+  ms') = true) -> ((q ms') = true)).
 
-Axiom towp_wp_lemma : forall {a:Type} {a_WT:WhyType a}, forall (pr:(func a
-  (func Z (func machine_state bool)))) (ps:(func a (func Z (func
-  machine_state (func machine_state bool))))) (x:a) (p:Z) (q:(func
-  machine_state bool)) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (towp_wp pr ps) x) p) q)
-  ms) = true) <-> (((infix_at (infix_at (infix_at pr x) p) ms) = true) /\
-  forall (ms':machine_state), ((infix_at (infix_at (infix_at (infix_at ps x)
-  p) ms) ms') = true) -> ((infix_at q ms') = true)).
+Axiom towp_wp_lemma : forall {a:Type} {a_WT:WhyType a}, forall (pr:(a ->
+  (Z -> (machine_state -> bool)))) (ps:(a -> (Z -> (machine_state ->
+  (machine_state -> bool))))) (x:a) (p:Z) (q:(machine_state -> bool))
+  (ms:machine_state), ((((((towp_wp pr ps) x) p) q) ms) = true) <-> (((((pr
+  x) p) ms) = true) /\ forall (ms':machine_state), (((((ps x) p) ms)
+  ms') = true) -> ((q ms') = true)).
 
-Parameter trivial_pre: forall {a:Type} {a_WT:WhyType a}, (func a (func Z
-  (func machine_state bool))).
+Parameter trivial_pre: forall {a:Type} {a_WT:WhyType a}, (a -> (Z ->
+  (machine_state -> bool))).
 
-Axiom trivial_pre_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (p:Z)
-  (ms:machine_state), ((infix_at (infix_at (infix_at (trivial_pre : (func a
-  (func Z (func machine_state bool)))) x) p) ms) = true) <->
-  match ms with
+Axiom trivial_pre_def : forall {a:Type} {a_WT:WhyType a}, forall (us:a) (p:Z)
+  (ms:machine_state), (((((trivial_pre : (a -> (Z -> (machine_state ->
+  bool)))) us) p) ms) = true) <-> match ms with
   | (VMS p' _ _) => (p = p')
   end.
 
 (* Why3 assumption *)
-Inductive acc {a:Type} {a_WT:WhyType a}: (func a (func a bool)) -> a ->
-  Prop :=
-  | Acc : forall (r:(func a (func a bool))) (x:a), (forall (y:a),
-      ((infix_at (infix_at r y) x) = true) -> (acc r y)) -> (acc r x).
+Inductive acc {a:Type} {a_WT:WhyType a}: (a -> (a -> bool)) -> a -> Prop :=
+  | Acc : forall (r:(a -> (a -> bool))) (x:a), (forall (y:a), (((r y)
+      x) = true) -> (acc r y)) -> (acc r x).
 
-Parameter loop_preservation: forall {a:Type} {a_WT:WhyType a}, (func a (func
-  Z (func machine_state bool))) -> (func a (func Z (func machine_state
-  bool))) -> (func a (func Z (func machine_state (func machine_state
-  bool)))) -> (func a (func Z (func machine_state (func machine_state
-  bool)))).
+Parameter loop_progress: forall {a:Type} {a_WT:WhyType a}, (a -> (Z ->
+  (machine_state -> bool))) -> (a -> (Z -> (machine_state -> bool))) -> (a ->
+  (Z -> (machine_state -> (machine_state -> bool)))) -> (a -> (Z ->
+  (machine_state -> (machine_state -> bool)))).
 
-Axiom loop_preservation_def : forall {a:Type} {a_WT:WhyType a},
-  forall (inv:(func a (func Z (func machine_state bool)))) (post2:(func a
-  (func Z (func machine_state bool)))) (var:(func a (func Z (func
-  machine_state (func machine_state bool))))) (x:a) (p:Z) (ms:machine_state)
-  (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (loop_preservation inv post2 var)
-  x) p) ms) ms') = true) <-> ((((infix_at (infix_at (infix_at inv x) p)
-  ms') = true) /\ ((infix_at (infix_at (infix_at (infix_at var x) p) ms')
-  ms) = true)) \/ ((infix_at (infix_at (infix_at post2 x) p) ms') = true)).
+Axiom loop_progress_def : forall {a:Type} {a_WT:WhyType a}, forall (inv:(a ->
+  (Z -> (machine_state -> bool)))) (post2:(a -> (Z -> (machine_state ->
+  bool)))) (var:(a -> (Z -> (machine_state -> (machine_state -> bool)))))
+  (x:a) (p:Z) (ms:machine_state) (ms':machine_state), ((((((loop_progress inv
+  post2 var) x) p) ms) ms') = true) <-> ((((((inv x) p) ms') = true) /\
+  (((((var x) p) ms') ms) = true)) \/ ((((post2 x) p) ms') = true)).
 
-Parameter forget_old: forall {a:Type} {a_WT:WhyType a}, (func a (func Z (func
-  machine_state bool))) -> (func a (func Z (func machine_state (func
-  machine_state bool)))).
+(* Why3 assumption *)
+Definition forget_old {a:Type} {a_WT:WhyType a} (post2:(a -> (Z ->
+  (machine_state -> bool)))): (a -> (Z -> (machine_state -> (machine_state ->
+  bool)))) := fun (x:a) (p:Z) (us:machine_state) => ((post2 x) p).
 
-Axiom forget_old_def : forall {a:Type} {a_WT:WhyType a}, forall (post2:(func
-  a (func Z (func machine_state bool)))) (x:a) (p:Z) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (forget_old post2) x) p)
-  ms) = (infix_at (infix_at post2 x) p)).
+Parameter ifun_post: forall {a:Type} {a_WT:WhyType a}, (machine_state ->
+  machine_state) -> (a -> (Z -> (machine_state -> (machine_state -> bool)))).
 
-Parameter ifun_post: forall {a:Type} {a_WT:WhyType a}, (func machine_state
-  machine_state) -> (func a (func Z (func machine_state (func machine_state
-  bool)))).
+Axiom ifun_post_def : forall {a:Type} {a_WT:WhyType a},
+  forall (f:(machine_state -> machine_state)) (us:a) (us1:Z)
+  (ms:machine_state) (ms':machine_state), ((((((ifun_post f: (a -> (Z ->
+  (machine_state -> (machine_state -> bool))))) us) us1) ms) ms') = true) <->
+  (ms' = (f ms)).
 
-Axiom ifun_post_def : forall {a:Type} {a_WT:WhyType a}, forall (f:(func
-  machine_state machine_state)) (x:a) (p:Z) (ms:machine_state)
-  (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (ifun_post f: (func a (func Z
-  (func machine_state (func machine_state bool))))) x) p) ms)
-  ms') = true) <-> (ms' = (infix_at f ms)).
+Parameter iconst_post: forall {a:Type} {a_WT:WhyType a}, Z -> (a -> (Z ->
+  (machine_state -> (machine_state -> bool)))).
 
-Parameter iconst_post: forall {a:Type} {a_WT:WhyType a}, Z -> (func a (func Z
-  (func machine_state (func machine_state bool)))).
-
-Axiom iconst_post_def : forall {a:Type} {a_WT:WhyType a}, forall (n:Z) (x:a)
-  (p:Z) (ms:machine_state) (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (iconst_post n: (func a (func Z
-  (func machine_state (func machine_state bool))))) x) p) ms)
+Axiom iconst_post_def : forall {a:Type} {a_WT:WhyType a}, forall (n:Z) (us:a)
+  (p:Z) (ms:machine_state) (ms':machine_state), ((((((iconst_post n: (a ->
+  (Z -> (machine_state -> (machine_state -> bool))))) us) p) ms)
   ms') = true) <-> forall (s:(list Z)) (m:(map id Z)), (ms = (VMS p s m)) ->
   (ms' = (VMS (p + 1%Z)%Z (Init.Datatypes.cons n s) m)).
 
-Parameter iconst_fun: Z -> (func machine_state machine_state).
-
-Axiom iconst_fun_def : forall (n:Z) (ms:machine_state),
-  ((infix_at (iconst_fun n)
-  ms) = match ms with
+(* Why3 assumption *)
+Definition iconst_fun (n:Z): (machine_state -> machine_state) :=
+  fun (ms:machine_state) =>
+  match ms with
   | (VMS p s m) => (VMS (p + 1%Z)%Z (Init.Datatypes.cons n s) m)
-  end).
+  end.
 
-Parameter ivar_post: forall {a:Type} {a_WT:WhyType a}, id -> (func a (func Z
-  (func machine_state (func machine_state bool)))).
+Parameter ivar_post: forall {a:Type} {a_WT:WhyType a}, id -> (a -> (Z ->
+  (machine_state -> (machine_state -> bool)))).
 
-Axiom ivar_post_def : forall {a:Type} {a_WT:WhyType a}, forall (x:id) (a1:a)
-  (p:Z) (ms:machine_state) (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (ivar_post x: (func a (func Z
-  (func machine_state (func machine_state bool))))) a1) p) ms)
+Axiom ivar_post_def : forall {a:Type} {a_WT:WhyType a}, forall (x:id) (us:a)
+  (p:Z) (ms:machine_state) (ms':machine_state), ((((((ivar_post x: (a ->
+  (Z -> (machine_state -> (machine_state -> bool))))) us) p) ms)
   ms') = true) <-> forall (s:(list Z)) (m:(map id Z)), (ms = (VMS p s m)) ->
   (ms' = (VMS (p + 1%Z)%Z (Init.Datatypes.cons (get m x) s) m)).
 
-Parameter ivar_fun: id -> (func machine_state machine_state).
-
-Axiom ivar_fun_def : forall (x:id) (ms:machine_state),
-  ((infix_at (ivar_fun x)
-  ms) = match ms with
+(* Why3 assumption *)
+Definition ivar_fun (x:id): (machine_state -> machine_state) :=
+  fun (ms:machine_state) =>
+  match ms with
   | (VMS p s m) => (VMS (p + 1%Z)%Z (Init.Datatypes.cons (get m x) s) m)
-  end).
+  end.
 
 (* Why3 assumption *)
-Definition binop := (func Z (func Z Z)).
+Definition binop := (Z -> (Z -> Z)).
 
-Parameter ibinop_pre: forall {a:Type} {a_WT:WhyType a}, (func a (func Z (func
-  machine_state bool))).
+Parameter ibinop_pre: forall {a:Type} {a_WT:WhyType a}, (a -> (Z ->
+  (machine_state -> bool))).
 
-Axiom ibinop_pre_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (p:Z)
-  (ms:machine_state), ((infix_at (infix_at (infix_at (ibinop_pre : (func a
-  (func Z (func machine_state bool)))) x) p) ms) = true) <-> exists n1:Z,
-  exists n2:Z, exists s:(list Z), exists m:(map id Z), (ms = (VMS p
+Axiom ibinop_pre_def : forall {a:Type} {a_WT:WhyType a}, forall (us:a) (p:Z)
+  (ms:machine_state), (((((ibinop_pre : (a -> (Z -> (machine_state ->
+  bool)))) us) p) ms) = true) <-> exists n1:Z, exists n2:Z,
+  exists s:(list Z), exists m:(map id Z), (ms = (VMS p
   (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)).
 
-Parameter ibinop_post: forall {a:Type} {a_WT:WhyType a}, (func Z (func Z
-  Z)) -> (func a (func Z (func machine_state (func machine_state bool)))).
+Parameter ibinop_post: forall {a:Type} {a_WT:WhyType a}, (Z -> (Z -> Z)) ->
+  (a -> (Z -> (machine_state -> (machine_state -> bool)))).
 
-Axiom ibinop_post_def : forall {a:Type} {a_WT:WhyType a}, forall (op:(func Z
-  (func Z Z))) (x:a) (p:Z) (ms:machine_state) (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (ibinop_post op: (func a (func Z
-  (func machine_state (func machine_state bool))))) x) p) ms)
-  ms') = true) <-> forall (n1:Z) (n2:Z) (s:(list Z)) (m:(map id Z)),
-  (ms = (VMS p (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)) ->
-  (ms' = (VMS (p + 1%Z)%Z (Init.Datatypes.cons (infix_at (infix_at op n1)
-  n2) s) m)).
-
-Parameter ibinop_fun: (func Z (func Z Z)) -> (func machine_state
-  machine_state).
-
-Axiom ibinop_fun_def : forall (op:(func Z (func Z Z))) (ms:machine_state),
-  ((infix_at (ibinop_fun op)
-  ms) = match ms with
-  | (VMS p (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m) =>
-      (VMS (p + 1%Z)%Z (Init.Datatypes.cons (infix_at (infix_at op n1) n2) s)
-      m)
-  | _ => ms
-  end).
-
-Parameter plus: (func Z (func Z Z)).
-
-Axiom plus_def : forall (x:Z) (y:Z), ((infix_at (infix_at plus x)
-  y) = (x + y)%Z).
-
-Parameter sub: (func Z (func Z Z)).
-
-Axiom sub_def : forall (x:Z) (y:Z), ((infix_at (infix_at sub x)
-  y) = (x - y)%Z).
-
-Parameter mul: (func Z (func Z Z)).
-
-Axiom mul_def : forall (x:Z) (y:Z), ((infix_at (infix_at mul x)
-  y) = (x * y)%Z).
-
-Parameter inil_post: forall {a:Type} {a_WT:WhyType a}, (func a (func Z (func
-  machine_state (func machine_state bool)))).
-
-Axiom inil_post_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (p:Z)
-  (ms:machine_state) (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (inil_post : (func a (func Z (func
-  machine_state (func machine_state bool))))) x) p) ms) ms') = true) <->
-  (ms = ms').
-
-Parameter ibranch_post: forall {a:Type} {a_WT:WhyType a}, Z -> (func a (func
-  Z (func machine_state (func machine_state bool)))).
-
-Axiom ibranch_post_def : forall {a:Type} {a_WT:WhyType a}, forall (ofs:Z)
-  (x:a) (p:Z) (ms:machine_state) (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (ibranch_post ofs: (func a (func Z
-  (func machine_state (func machine_state bool))))) x) p) ms)
-  ms') = true) <-> forall (s:(list Z)) (m:(map id Z)), (ms = (VMS p s m)) ->
-  (ms' = (VMS ((p + 1%Z)%Z + ofs)%Z s m)).
-
-Parameter ibranch_fun: Z -> (func machine_state machine_state).
-
-Axiom ibranch_fun_def : forall (ofs:Z) (ms:machine_state),
-  ((infix_at (ibranch_fun ofs)
-  ms) = match ms with
-  | (VMS p s m) => (VMS ((p + 1%Z)%Z + ofs)%Z s m)
-  end).
+Axiom ibinop_post_def : forall {a:Type} {a_WT:WhyType a}, forall (op:(Z ->
+  (Z -> Z))) (us:a) (p:Z) (ms:machine_state) (ms':machine_state),
+  ((((((ibinop_post op: (a -> (Z -> (machine_state -> (machine_state ->
+  bool))))) us) p) ms) ms') = true) <-> forall (n1:Z) (n2:Z) (s:(list Z))
+  (m:(map id Z)), (ms = (VMS p
+  (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)) ->
+  (ms' = (VMS (p + 1%Z)%Z (Init.Datatypes.cons ((op n1) n2) s) m)).
 
 (* Why3 assumption *)
-Definition cond := (func Z (func Z bool)).
+Definition ibinop_fun (op:(Z -> (Z -> Z))): (machine_state ->
+  machine_state) := fun (ms:machine_state) =>
+  match ms with
+  | (VMS p (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m) =>
+      (VMS (p + 1%Z)%Z (Init.Datatypes.cons ((op n1) n2) s) m)
+  | _ => ms
+  end.
 
-Parameter icjump_post: forall {a:Type} {a_WT:WhyType a}, (func Z (func Z
-  bool)) -> Z -> (func a (func Z (func machine_state (func machine_state
-  bool)))).
+(* Why3 assumption *)
+Definition plus: (Z -> (Z -> Z)) := fun (x:Z) (y:Z) => (x + y)%Z.
 
-Axiom icjump_post_def : forall {a:Type} {a_WT:WhyType a}, forall (cond1:(func
-  Z (func Z bool))) (ofs:Z) (x:a) (p:Z) (ms:machine_state)
-  (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (icjump_post cond1 ofs: (func a
-  (func Z (func machine_state (func machine_state bool))))) x) p) ms)
-  ms') = true) <-> forall (n1:Z) (n2:Z) (s:(list Z)) (m:(map id Z)),
-  (ms = (VMS p (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)) ->
-  ((((infix_at (infix_at cond1 n1) n2) = true) ->
-  (ms' = (VMS ((p + ofs)%Z + 1%Z)%Z s m))) /\ ((~ ((infix_at (infix_at cond1
+(* Why3 assumption *)
+Definition sub: (Z -> (Z -> Z)) := fun (x:Z) (y:Z) => (x - y)%Z.
+
+(* Why3 assumption *)
+Definition mul: (Z -> (Z -> Z)) := fun (x:Z) (y:Z) => (x * y)%Z.
+
+Parameter inil_post: forall {a:Type} {a_WT:WhyType a}, (a -> (Z ->
+  (machine_state -> (machine_state -> bool)))).
+
+Axiom inil_post_def : forall {a:Type} {a_WT:WhyType a}, forall (us:a) (us1:Z)
+  (ms:machine_state) (ms':machine_state), ((((((inil_post : (a -> (Z ->
+  (machine_state -> (machine_state -> bool))))) us) us1) ms) ms') = true) <->
+  (ms = ms').
+
+Parameter ibranch_post: forall {a:Type} {a_WT:WhyType a}, Z -> (a -> (Z ->
+  (machine_state -> (machine_state -> bool)))).
+
+Axiom ibranch_post_def : forall {a:Type} {a_WT:WhyType a}, forall (ofs1:Z)
+  (us:a) (p:Z) (ms:machine_state) (ms':machine_state),
+  ((((((ibranch_post ofs1: (a -> (Z -> (machine_state -> (machine_state ->
+  bool))))) us) p) ms) ms') = true) <-> forall (s:(list Z)) (m:(map id Z)),
+  (ms = (VMS p s m)) -> (ms' = (VMS ((p + 1%Z)%Z + ofs1)%Z s m)).
+
+(* Why3 assumption *)
+Definition ibranch_fun (ofs1:Z): (machine_state -> machine_state) :=
+  fun (ms:machine_state) =>
+  match ms with
+  | (VMS p s m) => (VMS ((p + 1%Z)%Z + ofs1)%Z s m)
+  end.
+
+(* Why3 assumption *)
+Definition cond := (Z -> (Z -> bool)).
+
+Parameter icjump_post: forall {a:Type} {a_WT:WhyType a}, (Z -> (Z ->
+  bool)) -> Z -> (a -> (Z -> (machine_state -> (machine_state -> bool)))).
+
+Axiom icjump_post_def : forall {a:Type} {a_WT:WhyType a}, forall (cond1:(Z ->
+  (Z -> bool))) (ofs1:Z) (us:a) (p:Z) (ms:machine_state) (ms':machine_state),
+  ((((((icjump_post cond1 ofs1: (a -> (Z -> (machine_state ->
+  (machine_state -> bool))))) us) p) ms) ms') = true) <-> forall (n1:Z)
+  (n2:Z) (s:(list Z)) (m:(map id Z)), (ms = (VMS p
+  (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m)) -> (((((cond1 n1)
+  n2) = true) -> (ms' = (VMS ((p + ofs1)%Z + 1%Z)%Z s m))) /\ ((~ (((cond1
   n1) n2) = true)) -> (ms' = (VMS (p + 1%Z)%Z s m)))).
 
-Parameter icjump_fun: (func Z (func Z bool)) -> Z -> (func machine_state
+Parameter icjump_fun: (Z -> (Z -> bool)) -> Z -> (machine_state ->
   machine_state).
 
-Axiom icjump_fun_def : forall (cond1:(func Z (func Z bool))) (ofs:Z)
+Axiom icjump_fun_def : forall (cond1:(Z -> (Z -> bool))) (ofs1:Z)
   (ms:machine_state),
   match ms with
   | (VMS p (Init.Datatypes.cons n2 (Init.Datatypes.cons n1 s)) m) =>
-      (((infix_at (infix_at cond1 n1) n2) = true) ->
-      ((infix_at (icjump_fun cond1 ofs) ms) = (VMS ((p + ofs)%Z + 1%Z)%Z s
-      m))) /\ ((~ ((infix_at (infix_at cond1 n1) n2) = true)) ->
-      ((infix_at (icjump_fun cond1 ofs) ms) = (VMS (p + 1%Z)%Z s m)))
-  | _ => ((infix_at (icjump_fun cond1 ofs) ms) = ms)
+      ((((cond1 n1) n2) = true) -> (((icjump_fun cond1 ofs1)
+      ms) = (VMS ((p + ofs1)%Z + 1%Z)%Z s m))) /\ ((~ (((cond1 n1)
+      n2) = true)) -> (((icjump_fun cond1 ofs1) ms) = (VMS (p + 1%Z)%Z s m)))
+  | _ => (((icjump_fun cond1 ofs1) ms) = ms)
   end.
 
-Parameter beq: (func Z (func Z bool)).
+Parameter beq: (Z -> (Z -> bool)).
 
-Axiom beq_def : forall (x:Z) (y:Z), ((infix_at (infix_at beq x)
-  y) = true) <-> (x = y).
+Axiom beq_def : forall (x:Z) (y:Z), (((beq x) y) = true) <-> (x = y).
 
-Parameter bne: (func Z (func Z bool)).
+Parameter bne: (Z -> (Z -> bool)).
 
-Axiom bne_def : forall (x:Z) (y:Z), ((infix_at (infix_at bne x)
-  y) = true) <-> ~ (x = y).
+Axiom bne_def : forall (x:Z) (y:Z), (((bne x) y) = true) <-> ~ (x = y).
 
-Parameter ble: (func Z (func Z bool)).
+Parameter ble: (Z -> (Z -> bool)).
 
-Axiom ble_def : forall (x:Z) (y:Z), ((infix_at (infix_at ble x)
-  y) = true) <-> (x <= y)%Z.
+Axiom ble_def : forall (x:Z) (y:Z), (((ble x) y) = true) <-> (x <= y)%Z.
 
-Parameter bgt: (func Z (func Z bool)).
+Parameter bgt: (Z -> (Z -> bool)).
 
-Axiom bgt_def : forall (x:Z) (y:Z), ((infix_at (infix_at bgt x)
-  y) = true) <-> (y < x)%Z.
+Axiom bgt_def : forall (x:Z) (y:Z), (((bgt x) y) = true) <-> (y < x)%Z.
 
-Parameter isetvar_pre: forall {a:Type} {a_WT:WhyType a}, (func a (func Z
-  (func machine_state bool))).
+Parameter isetvar_pre: forall {a:Type} {a_WT:WhyType a}, (a -> (Z ->
+  (machine_state -> bool))).
 
-Axiom isetvar_pre_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (p:Z)
-  (ms:machine_state), ((infix_at (infix_at (infix_at (isetvar_pre : (func a
-  (func Z (func machine_state bool)))) x) p) ms) = true) <-> exists n:Z,
-  exists s:(list Z), exists m:(map id Z), (ms = (VMS p
-  (Init.Datatypes.cons n s) m)).
+Axiom isetvar_pre_def : forall {a:Type} {a_WT:WhyType a}, forall (us:a) (p:Z)
+  (ms:machine_state), (((((isetvar_pre : (a -> (Z -> (machine_state ->
+  bool)))) us) p) ms) = true) <-> exists n:Z, exists s:(list Z),
+  exists m:(map id Z), (ms = (VMS p (Init.Datatypes.cons n s) m)).
 
-Parameter isetvar_post: forall {a:Type} {a_WT:WhyType a}, id -> (func a (func
-  Z (func machine_state (func machine_state bool)))).
+Parameter isetvar_post: forall {a:Type} {a_WT:WhyType a}, id -> (a -> (Z ->
+  (machine_state -> (machine_state -> bool)))).
 
 Axiom isetvar_post_def : forall {a:Type} {a_WT:WhyType a}, forall (x:id)
-  (a1:a) (p:Z) (ms:machine_state) (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (isetvar_post x: (func a (func Z
-  (func machine_state (func machine_state bool))))) a1) p) ms)
-  ms') = true) <-> forall (s:(list Z)) (n:Z) (m:(map id Z)), (ms = (VMS p
-  (Init.Datatypes.cons n s) m)) -> (ms' = (VMS (p + 1%Z)%Z s (set m x n))).
+  (us:a) (p:Z) (ms:machine_state) (ms':machine_state),
+  ((((((isetvar_post x: (a -> (Z -> (machine_state -> (machine_state ->
+  bool))))) us) p) ms) ms') = true) <-> forall (s:(list Z)) (n:Z) (m:(map id
+  Z)), (ms = (VMS p (Init.Datatypes.cons n s) m)) -> (ms' = (VMS (p + 1%Z)%Z
+  s (set m x n))).
 
-Parameter isetvar_fun: id -> (func machine_state machine_state).
-
-Axiom isetvar_fun_def : forall (x:id) (ms:machine_state),
-  ((infix_at (isetvar_fun x)
-  ms) = match ms with
+(* Why3 assumption *)
+Definition isetvar_fun (x:id): (machine_state -> machine_state) :=
+  fun (ms:machine_state) =>
+  match ms with
   | (VMS p (Init.Datatypes.cons n s) m) => (VMS (p + 1%Z)%Z s (set m x n))
   | _ => ms
-  end).
+  end.
 
-Parameter aexpr_post: forall {a:Type} {a_WT:WhyType a}, aexpr -> Z -> (func a
-  (func Z (func machine_state (func machine_state bool)))).
+Parameter aexpr_post: forall {a:Type} {a_WT:WhyType a}, aexpr -> Z -> (a ->
+  (Z -> (machine_state -> (machine_state -> bool)))).
 
 Axiom aexpr_post_def : forall {a:Type} {a_WT:WhyType a}, forall (a1:aexpr)
-  (len:Z) (x:a) (p:Z) (ms:machine_state) (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (aexpr_post a1 len: (func a (func
-  Z (func machine_state (func machine_state bool))))) x) p) ms)
-  ms') = true) <->
+  (len:Z) (us:a) (p:Z) (ms:machine_state) (ms':machine_state),
+  ((((((aexpr_post a1 len: (a -> (Z -> (machine_state -> (machine_state ->
+  bool))))) us) p) ms) ms') = true) <->
   match ms with
   | (VMS _ s m) => (ms' = (VMS (p + len)%Z (Init.Datatypes.cons (aeval m
       a1) s) m))
   end.
 
 Parameter bexpr_post: forall {a:Type} {a_WT:WhyType a}, bexpr -> bool -> Z ->
-  Z -> (func a (func Z (func machine_state (func machine_state bool)))).
+  Z -> (a -> (Z -> (machine_state -> (machine_state -> bool)))).
 
 Axiom bexpr_post_def : forall {a:Type} {a_WT:WhyType a}, forall (b:bexpr)
-  (cond1:bool) (out_t:Z) (out_f:Z) (x:a) (p:Z) (ms:machine_state)
-  (ms':machine_state),
-  (((infix_at (infix_at (infix_at (infix_at (bexpr_post b cond1 out_t
-  out_f: (func a (func Z (func machine_state (func machine_state bool))))) x)
-  p) ms) ms') = true) ->
+  (cond1:bool) (out_t:Z) (out_f:Z) (us:a) (p:Z) (ms:machine_state)
+  (ms':machine_state), (((((((bexpr_post b cond1 out_t out_f: (a -> (Z ->
+  (machine_state -> (machine_state -> bool))))) us) p) ms) ms') = true) ->
   match ms with
   | (VMS _ s m) => (((beval m b) = cond1) -> (ms' = (VMS (p + out_t)%Z s
       m))) /\ ((~ ((beval m b) = cond1)) -> (ms' = (VMS (p + out_f)%Z s m)))
@@ -772,68 +711,62 @@ Axiom bexpr_post_def : forall {a:Type} {a_WT:WhyType a}, forall (b:bexpr)
   (match ms with
   | (VMS _ s m) => (((beval m b) = cond1) /\ (ms' = (VMS (p + out_t)%Z s
       m))) \/ ((~ ((beval m b) = cond1)) /\ (ms' = (VMS (p + out_f)%Z s m)))
-  end -> ((infix_at (infix_at (infix_at (infix_at (bexpr_post b cond1 out_t
-  out_f: (func a (func Z (func machine_state (func machine_state bool))))) x)
-  p) ms) ms') = true)).
+  end -> ((((((bexpr_post b cond1 out_t out_f: (a -> (Z -> (machine_state ->
+  (machine_state -> bool))))) us) p) ms) ms') = true)).
 
-Parameter exn_bool: forall {a:Type} {a_WT:WhyType a}, bexpr -> bool -> (func
-  a (func Z (func machine_state bool))).
+Parameter exec_cond: forall {a:Type} {a_WT:WhyType a}, bexpr -> bool -> (a ->
+  (Z -> (machine_state -> bool))).
 
-Axiom exn_bool_def : forall {a:Type} {a_WT:WhyType a}, forall (b1:bexpr)
-  (cond1:bool) (x:a) (p:Z) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (exn_bool b1 cond1: (func a (func Z (func
-  machine_state bool)))) x) p) ms) = true) <->
+Axiom exec_cond_def : forall {a:Type} {a_WT:WhyType a}, forall (b1:bexpr)
+  (cond1:bool) (us:a) (us1:Z) (ms:machine_state), (((((exec_cond b1
+  cond1: (a -> (Z -> (machine_state -> bool)))) us) us1) ms) = true) <->
   match ms with
   | (VMS _ _ m) => ((beval m b1) = cond1)
   end.
 
-Parameter com_pre: forall {a:Type} {a_WT:WhyType a}, com -> (func a (func Z
-  (func machine_state bool))).
+Parameter com_pre: forall {a:Type} {a_WT:WhyType a}, com -> (a -> (Z ->
+  (machine_state -> bool))).
 
-Axiom com_pre_def : forall {a:Type} {a_WT:WhyType a}, forall (cmd:com) (x:a)
-  (p:Z) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (com_pre cmd: (func a (func Z (func
-  machine_state bool)))) x) p) ms) = true) <->
+Axiom com_pre_def : forall {a:Type} {a_WT:WhyType a}, forall (cmd:com) (us:a)
+  (p:Z) (ms:machine_state), (((((com_pre cmd: (a -> (Z -> (machine_state ->
+  bool)))) us) p) ms) = true) <->
   match ms with
   | (VMS p' _ m) => (p = p') /\ exists m':(map id Z), (ceval m cmd m')
   end.
 
-Parameter com_post: forall {a:Type} {a_WT:WhyType a}, com -> Z -> (func a
-  (func Z (func machine_state (func machine_state bool)))).
+Parameter com_post: forall {a:Type} {a_WT:WhyType a}, com -> Z -> (a -> (Z ->
+  (machine_state -> (machine_state -> bool)))).
 
 Axiom com_post_def : forall {a:Type} {a_WT:WhyType a}, forall (cmd:com)
-  (len:Z) (x:a) (p:Z) (ms:machine_state) (ms':machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (com_post cmd len: (func a (func Z
-  (func machine_state (func machine_state bool))))) x) p) ms)
-  ms') = true) <->
+  (len:Z) (us:a) (us1:Z) (ms:machine_state) (ms':machine_state),
+  ((((((com_post cmd len: (a -> (Z -> (machine_state -> (machine_state ->
+  bool))))) us) us1) ms) ms') = true) <->
   match ms with
-  | (VMS p1 s m) =>
+  | (VMS p s m) =>
       match ms' with
-      | (VMS p' s' m') => (p' = (p1 + len)%Z) /\ ((s' = s) /\ (ceval m cmd
+      | (VMS p' s' m') => (p' = (p + len)%Z) /\ ((s' = s) /\ (ceval m cmd
           m'))
       end
   end.
 
-Parameter exn_bool_old: forall {a:Type} {a_WT:WhyType a}, bexpr -> bool ->
-  (func (a* machine_state)%type (func Z (func machine_state bool))).
+Parameter exec_cond_old: forall {a:Type} {a_WT:WhyType a}, bexpr -> bool ->
+  ((a* machine_state)%type -> (Z -> (machine_state -> bool))).
 
-Axiom exn_bool_old_def : forall {a:Type} {a_WT:WhyType a}, forall (b1:bexpr)
-  (cond1:bool) (x:(a* machine_state)%type) (p:Z) (ms:machine_state),
-  ((infix_at (infix_at (infix_at (exn_bool_old b1 cond1: (func (a*
-  machine_state)%type (func Z (func machine_state bool)))) x) p)
-  ms) = true) <->
+Axiom exec_cond_old_def : forall {a:Type} {a_WT:WhyType a}, forall (b1:bexpr)
+  (cond1:bool) (x:(a* machine_state)%type) (us:Z) (us1:machine_state),
+  (((((exec_cond_old b1 cond1: ((a* machine_state)%type -> (Z ->
+  (machine_state -> bool)))) x) us) us1) = true) <->
   match (snd x) with
   | (VMS _ _ m) => ((beval m b1) = cond1)
   end.
 
-Parameter loop_invariant: forall {a:Type} {a_WT:WhyType a}, com -> (func (a*
-  machine_state)%type (func Z (func machine_state bool))).
+Parameter loop_invariant: forall {a:Type} {a_WT:WhyType a}, com -> ((a*
+  machine_state)%type -> (Z -> (machine_state -> bool))).
 
 Axiom loop_invariant_def : forall {a:Type} {a_WT:WhyType a}, forall (c:com)
   (x:(a* machine_state)%type) (p:Z) (msi:machine_state),
-  ((infix_at (infix_at (infix_at (loop_invariant c: (func (a*
-  machine_state)%type (func Z (func machine_state bool)))) x) p)
-  msi) = true) <->
+  (((((loop_invariant c: ((a* machine_state)%type -> (Z -> (machine_state ->
+  bool)))) x) p) msi) = true) <->
   match (snd x) with
   | (VMS _ s0 m0) =>
       match msi with
@@ -842,14 +775,13 @@ Axiom loop_invariant_def : forall {a:Type} {a_WT:WhyType a}, forall (c:com)
       end
   end.
 
-Parameter loop_post: forall {a:Type} {a_WT:WhyType a}, com -> Z -> (func (a*
-  machine_state)%type (func Z (func machine_state bool))).
+Parameter loop_post: forall {a:Type} {a_WT:WhyType a}, com -> Z -> ((a*
+  machine_state)%type -> (Z -> (machine_state -> bool))).
 
 Axiom loop_post_def : forall {a:Type} {a_WT:WhyType a}, forall (c:com)
   (len:Z) (x:(a* machine_state)%type) (p:Z) (msf:machine_state),
-  ((infix_at (infix_at (infix_at (loop_post c len: (func (a*
-  machine_state)%type (func Z (func machine_state bool)))) x) p)
-  msf) = true) <->
+  (((((loop_post c len: ((a* machine_state)%type -> (Z -> (machine_state ->
+  bool)))) x) p) msf) = true) <->
   match (snd x) with
   | (VMS _ s0 m0) =>
       match msf with
@@ -859,13 +791,12 @@ Axiom loop_post_def : forall {a:Type} {a_WT:WhyType a}, forall (c:com)
   end.
 
 Parameter loop_variant: forall {a:Type} {a_WT:WhyType a}, com -> bexpr ->
-  (func a (func Z (func machine_state (func machine_state bool)))).
+  (a -> (Z -> (machine_state -> (machine_state -> bool)))).
 
 Axiom loop_variant_def : forall {a:Type} {a_WT:WhyType a}, forall (c:com)
-  (test:bexpr) (x:a) (p:Z) (msj:machine_state) (msi:machine_state),
-  ((infix_at (infix_at (infix_at (infix_at (loop_variant c test: (func a
-  (func Z (func machine_state (func machine_state bool))))) x) p) msj)
-  msi) = true) <->
+  (test:bexpr) (us:a) (us1:Z) (msj:machine_state) (msi:machine_state),
+  ((((((loop_variant c test: (a -> (Z -> (machine_state -> (machine_state ->
+  bool))))) us) us1) msj) msi) = true) <->
   match msj with
   | (VMS pj sj mj) =>
       match msi with
@@ -881,94 +812,87 @@ Ltac cvc := why3 "CVC4,1.4,".
 (* Why3 goal *)
 Theorem WP_parameter_compile_com : forall {a:Type} {a_WT:WhyType a},
   forall (cmd:com), forall (x:bexpr) (x1:com), (cmd = (Cwhile x x1)) ->
-  forall (code_body:(list instr)) (code_body1:(func ((a* machine_state)%type*
-  machine_state)%type (func Z (func machine_state bool)))) (code_body2:(func
-  ((a* machine_state)%type* machine_state)%type (func Z (func machine_state
-  (func machine_state bool))))), let code_body3 := (mk_hl code_body
-  code_body1 code_body2) in ((((code_body1 = (com_pre x1: (func ((a*
-  machine_state)%type* machine_state)%type (func Z (func machine_state
-  bool))))) /\ (hl_correctness code_body3)) /\ (code_body2 = (com_post x1
-  (list.Length.length code_body): (func ((a* machine_state)%type*
-  machine_state)%type (func Z (func machine_state (func machine_state
+  forall (code_body:(list instr)) (code_body1:(((a* machine_state)%type*
+  machine_state)%type -> (Z -> (machine_state -> bool)))) (code_body2:(((a*
+  machine_state)%type* machine_state)%type -> (Z -> (machine_state ->
+  (machine_state -> bool))))), let code_body3 := (mk_hl code_body code_body1
+  code_body2) in ((((code_body1 = (com_pre x1: (((a* machine_state)%type*
+  machine_state)%type -> (Z -> (machine_state -> bool))))) /\ (hl_correctness
+  code_body3)) /\ (code_body2 = (com_post x1
+  (list.Length.length code_body): (((a* machine_state)%type*
+  machine_state)%type -> (Z -> (machine_state -> (machine_state ->
   bool))))))) -> let body_length :=
   ((list.Length.length code_body) + 1%Z)%Z in forall (code_test:(list instr))
-  (code_test1:(func (a* machine_state)%type (func Z (func machine_state
-  bool)))) (code_test2:(func (a* machine_state)%type (func Z (func
-  machine_state (func machine_state bool))))), let code_test3 :=
-  (mk_hl code_test code_test1 code_test2) in
-  ((((code_test1 = (trivial_pre : (func (a* machine_state)%type (func Z (func
-  machine_state bool))))) /\ (hl_correctness code_test3)) /\
+  (code_test1:((a* machine_state)%type -> (Z -> (machine_state -> bool))))
+  (code_test2:((a* machine_state)%type -> (Z -> (machine_state ->
+  (machine_state -> bool))))), let code_test3 := (mk_hl code_test code_test1
+  code_test2) in ((((code_test1 = (trivial_pre : ((a* machine_state)%type ->
+  (Z -> (machine_state -> bool))))) /\ (hl_correctness code_test3)) /\
   (code_test2 = (bexpr_post x false
   ((list.Length.length code_test) + body_length)%Z
-  (list.Length.length code_test): (func (a* machine_state)%type (func Z (func
-  machine_state (func machine_state bool))))))) -> let ofs :=
+  (list.Length.length code_test): ((a* machine_state)%type -> (Z ->
+  (machine_state -> (machine_state -> bool))))))) -> let ofs1 :=
   ((list.Length.length code_test) + body_length)%Z in forall (o:(list instr))
-  (o1:(func (((a* machine_state)%type* machine_state)%type*
-  machine_state)%type (func Z (func machine_state bool)))) (o2:(func (((a*
-  machine_state)%type* machine_state)%type* machine_state)%type (func Z (func
-  machine_state (func machine_state bool))))), let o3 := (mk_hl o o1 o2) in
-  ((((o1 = (trivial_pre : (func (((a* machine_state)%type*
-  machine_state)%type* machine_state)%type (func Z (func machine_state
-  bool))))) /\ (o2 = (ibranch_post (-ofs)%Z: (func (((a* machine_state)%type*
-  machine_state)%type* machine_state)%type (func Z (func machine_state (func
-  machine_state bool))))))) /\ (((list.Length.length o) = 1%Z) /\
+  (o1:((((a* machine_state)%type* machine_state)%type* machine_state)%type ->
+  (Z -> (machine_state -> bool)))) (o2:((((a* machine_state)%type*
+  machine_state)%type* machine_state)%type -> (Z -> (machine_state ->
+  (machine_state -> bool))))), let o3 := (mk_hl o o1 o2) in
+  ((((o1 = (trivial_pre : ((((a* machine_state)%type* machine_state)%type*
+  machine_state)%type -> (Z -> (machine_state -> bool))))) /\
+  (o2 = (ibranch_post (-ofs1)%Z: ((((a* machine_state)%type*
+  machine_state)%type* machine_state)%type -> (Z -> (machine_state ->
+  (machine_state -> bool))))))) /\ (((list.Length.length o) = 1%Z) /\
   (hl_correctness o3))) -> ((hl_correctness o3) -> forall (o4:(list instr))
-  (o5:(func (((a* machine_state)%type* machine_state)%type*
-  machine_state)%type (func Z (func (func machine_state bool) (func
-  machine_state bool))))), let o6 := (mk_wp o4 o5) in
-  ((((list.Length.length o4) = (list.Length.length o)) /\ ((o5 = (towp_wp o1
-  o2)) /\ (wp_correctness o6))) -> ((hl_correctness code_body3) ->
-  forall (o7:(list instr)) (o8:(func ((a* machine_state)%type*
-  machine_state)%type (func Z (func (func machine_state bool) (func
-  machine_state bool))))), let o9 := (mk_wp o7 o8) in
+  (o5:((((a* machine_state)%type* machine_state)%type* machine_state)%type ->
+  (Z -> ((machine_state -> bool) -> (machine_state -> bool))))), let o6 :=
+  (mk_wp o4 o5) in ((((list.Length.length o4) = (list.Length.length o)) /\
+  ((o5 = (towp_wp o1 o2)) /\ (wp_correctness o6))) -> ((hl_correctness
+  code_body3) -> forall (o7:(list instr)) (o8:(((a* machine_state)%type*
+  machine_state)%type -> (Z -> ((machine_state -> bool) -> (machine_state ->
+  bool))))), let o9 := (mk_wp o7 o8) in
   ((((list.Length.length o7) = (list.Length.length code_body)) /\
   ((o8 = (towp_wp code_body1 code_body2)) /\ (wp_correctness o9))) ->
   (((wp_correctness o9) /\ (wp_correctness o6)) -> forall (o10:(list instr))
-  (o11:(func ((a* machine_state)%type* machine_state)%type (func Z (func
-  (func machine_state bool) (func machine_state bool))))), let o12 :=
+  (o11:(((a* machine_state)%type* machine_state)%type -> (Z ->
+  ((machine_state -> bool) -> (machine_state -> bool))))), let o12 :=
   (mk_wp o10 o11) in
   ((((list.Length.length o10) = ((list.Length.length o7) + (list.Length.length o4))%Z) /\
   ((o11 = (seq_wp (list.Length.length o7) o8 o5)) /\ (wp_correctness
-  o12))) -> ((wp_correctness o12) -> forall (o13:(list instr)) (o14:(func
-  ((a* machine_state)%type* machine_state)%type (func Z (func (func
-  machine_state bool) (func machine_state bool))))), let o15 := (mk_wp o13
-  o14) in (((o14 = (fork_wp o11 (exn_bool x false: (func ((a*
-  machine_state)%type* machine_state)%type (func Z (func machine_state
-  bool)))))) /\ (((list.Length.length o13) = (list.Length.length o10)) /\
-  (wp_correctness o15))) -> ((hl_correctness code_test3) ->
-  forall (o16:(list instr)) (o17:(func (a* machine_state)%type (func Z (func
-  (func machine_state bool) (func machine_state bool))))), let o18 :=
-  (mk_wp o16 o17) in
+  o12))) -> ((wp_correctness o12) -> forall (o13:(list instr)) (o14:(((a*
+  machine_state)%type* machine_state)%type -> (Z -> ((machine_state ->
+  bool) -> (machine_state -> bool))))), let o15 := (mk_wp o13 o14) in
+  (((o14 = (fork_wp o11 (exec_cond x true: (((a* machine_state)%type*
+  machine_state)%type -> (Z -> (machine_state -> bool)))))) /\
+  (((list.Length.length o13) = (list.Length.length o10)) /\ (wp_correctness
+  o15))) -> ((hl_correctness code_test3) -> forall (o16:(list instr))
+  (o17:((a* machine_state)%type -> (Z -> ((machine_state -> bool) ->
+  (machine_state -> bool))))), let o18 := (mk_wp o16 o17) in
   ((((list.Length.length o16) = (list.Length.length code_test)) /\
   ((o17 = (towp_wp code_test1 code_test2)) /\ (wp_correctness o18))) ->
   (((wp_correctness o18) /\ (wp_correctness o15)) ->
-  forall (wp_while:(list instr)) (wp_while1:(func (a* machine_state)%type
-  (func Z (func (func machine_state bool) (func machine_state bool))))),
-  let wp_while2 := (mk_wp wp_while wp_while1) in
+  forall (wp_while:(list instr)) (wp_while1:((a* machine_state)%type -> (Z ->
+  ((machine_state -> bool) -> (machine_state -> bool))))), let wp_while2 :=
+  (mk_wp wp_while wp_while1) in
   ((((list.Length.length wp_while) = ((list.Length.length o16) + (list.Length.length o13))%Z) /\
   ((wp_while1 = (seq_wp (list.Length.length o16) o17 o14)) /\ (wp_correctness
-  wp_while2))) -> let inv := (loop_invariant cmd: (func (a*
-  machine_state)%type (func Z (func machine_state bool)))) in let var :=
-  (loop_variant x1 x: (func (a* machine_state)%type (func Z (func
-  machine_state (func machine_state bool))))) in let o19 :=
-  (loop_preservation inv (loop_post cmd ofs: (func (a* machine_state)%type
-  (func Z (func machine_state bool)))) var) in (((wp_correctness
-  wp_while2) /\ forall (x2:(a* machine_state)%type) (p:Z) (ms:machine_state),
-  ((infix_at (infix_at (infix_at inv x2) p) ms) = true) ->
-  ((infix_at (infix_at (infix_at (infix_at wp_while1 x2) p)
-  (infix_at (infix_at (infix_at o19 x2) p) ms)) ms) = true)) ->
-  forall (hl_while:(list instr)) (hl_while1:(func (a* machine_state)%type
-  (func Z (func machine_state bool)))) (hl_while2:(func (a*
-  machine_state)%type (func Z (func machine_state (func machine_state
-  bool))))), (((hl_while1 = inv) /\ (hl_while2 = o19)) /\
+  wp_while2))) -> let inv := (loop_invariant cmd: ((a* machine_state)%type ->
+  (Z -> (machine_state -> bool)))) in let var := (loop_variant x1 x: ((a*
+  machine_state)%type -> (Z -> (machine_state -> (machine_state ->
+  bool))))) in let o19 := (loop_progress inv (loop_post cmd ofs1: ((a*
+  machine_state)%type -> (Z -> (machine_state -> bool)))) var) in
+  (((wp_correctness wp_while2) /\ forall (x2:(a* machine_state)%type) (p:Z)
+  (ms:machine_state), ((((inv x2) p) ms) = true) -> (((((wp_while1 x2) p)
+  (((o19 x2) p) ms)) ms) = true)) -> forall (hl_while:(list instr))
+  (hl_while1:((a* machine_state)%type -> (Z -> (machine_state -> bool))))
+  (hl_while2:((a* machine_state)%type -> (Z -> (machine_state ->
+  (machine_state -> bool))))), (((hl_while1 = inv) /\ (hl_while2 = o19)) /\
   (((list.Length.length hl_while) = (list.Length.length wp_while)) /\
   (hl_correctness (mk_hl hl_while hl_while1 hl_while2)))) -> forall (x2:(a*
-  machine_state)%type) (p:Z) (ms:machine_state),
-  ((infix_at (infix_at (infix_at inv x2) p) ms) = true) -> (acc
-  (infix_at (infix_at var x2) p) ms))))))))))))))))).
+  machine_state)%type) (p:Z) (ms:machine_state), ((((inv x2) p)
+  ms) = true) -> (acc ((var x2) p) ms))))))))))))))))).
 (* Why3 intros a a_WT cmd x x1 h1 code_body code_body1 code_body2 code_body3
         ((h2,h3),h4) body_length code_test code_test1 code_test2 code_test3
-        ((h5,h6),h7) ofs o o1 o2 o3 ((h8,h9),(h10,h11)) h12 o4 o5 o6
+        ((h5,h6),h7) ofs1 o o1 o2 o3 ((h8,h9),(h10,h11)) h12 o4 o5 o6
         (h13,(h14,h15)) h16 o7 o8 o9 (h17,(h18,h19)) (h20,h21) o10 o11 o12
         (h22,(h23,h24)) h25 o13 o14 o15 (h26,(h27,h28)) h29 o16 o17 o18
         (h30,(h31,h32)) (h33,h34) wp_while wp_while1 wp_while2
@@ -993,11 +917,11 @@ induction T; try discriminate.
 apply Acc.
 intros.
 apply loop_variant_def in H2.
-cvc.
+exfalso. cvc.
 apply Acc.
 intros.
 replace y with (VMS z0 l0 mj).
-apply IHT2; ae.
+apply IHT2; trivial. 
 apply loop_variant_def in H2.
 destruct y.
 assert (body = x1) by ae.
