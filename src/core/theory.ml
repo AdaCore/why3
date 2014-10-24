@@ -426,6 +426,23 @@ let check_decl_opacity d = match d.d_node with
           "inductive predicates cannot have opaque type parameters" in
       List.iter check dl
 
+let warn_dubious_axiom uc k p syms =
+  match k with
+  | Plemma | Pgoal | Pskip -> ()
+  | Paxiom ->
+    try
+      Sid.iter
+        (fun id ->
+          if Sid.mem id uc.uc_local then
+          match (Ident.Mid.find id uc.uc_known).d_node with
+          | Dtype { ts_def = None } | Dparam _ ->
+            raise Exit
+          | _ -> ())
+        syms;
+      Warning.emit ?loc:p.id_loc "axiom %s does not contain any local abstract symbol"
+        p.id_string
+    with Exit -> ()
+
 let add_decl uc d =
   check_decl_opacity d; (* we don't care about tasks *)
   let uc = add_tdecl uc (create_decl d) in
@@ -435,7 +452,9 @@ let add_decl uc d =
     | Dparam ls -> add_symbol add_ls ls.ls_name ls uc
     | Dlogic dl -> List.fold_left add_logic uc dl
     | Dind (_, dl) -> List.fold_left add_ind uc dl
-    | Dprop p   -> add_prop uc p
+    | Dprop ((k,pr,_) as p) ->
+      warn_dubious_axiom uc k pr.pr_name d.d_syms;
+      add_prop uc p
 
 (** Declaration constructors + add_decl *)
 
