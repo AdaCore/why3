@@ -1095,7 +1095,7 @@ let spec_invariant env pvs vty spec =
 (** Abstract values *)
 
 let warn_unused s loc =
-  if not (String.length s > 0 && s.[0] = '_') then
+  if s = "" || s.[0] <> '_' then
   Warning.emit ?loc "unused variable %s" s
 
 let check_used_pv e pv = if not (Spv.mem pv e.e_syms.syms_pv) then

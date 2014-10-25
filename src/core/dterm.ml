@@ -430,9 +430,8 @@ let quant_vars ~strict env vl =
   Mstr.set_union acc env, vl
 
 let check_used_var t vs =
-  if t_v_occurs vs t = 0 then
   let s = vs.vs_name.id_string in
-  if not (String.length s > 0 && s.[0] = '_') then
+  if (s = "" || s.[0] <> '_') && t_v_occurs vs t = 0 then
   Warning.emit ?loc:vs.vs_name.id_loc "unused variable %s" s
 
 let check_exists_implies f = match f.t_node with

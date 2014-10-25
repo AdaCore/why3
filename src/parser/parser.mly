@@ -503,6 +503,11 @@ term_:
       | Pwild -> Tlet (id_anonymous $2.pat_loc, $4, $6)
       | Ptuple [] -> Tlet (id_anonymous $2.pat_loc,
           { $4 with term_desc = Tcast ($4, PTtuple []) }, $6)
+      | Pcast ({pat_desc = Pvar id}, ty) ->
+          Tlet (id, { $4 with term_desc = Tcast ($4, ty) }, $6)
+      | Pcast ({pat_desc = Pwild}, ty) ->
+          let id = id_anonymous $2.pat_loc in
+          Tlet (id, { $4 with term_desc = Tcast ($4, ty) }, $6)
       | _ -> Tmatch ($4, [$2, $6]) }
 | MATCH term WITH match_cases(term) END
     { Tmatch ($2, $4) }
@@ -655,36 +660,30 @@ expr_:
       | Eidapp (Qident id, [e1;e2]) when id.id_str = mixfix "[]" ->
           Eidapp (Qident {id with id_str = mixfix "[]<-"}, [e1;e2;$3])
       | _ -> raise Error }
-| LET pattern EQUAL seq_expr IN seq_expr
-    { match $2.pat_desc with
-      | Pvar id -> Elet (id, Gnone, $4, $6)
-      | Pwild -> Elet (id_anonymous $2.pat_loc, Gnone, $4, $6)
-      | Ptuple [] -> Elet (id_anonymous $2.pat_loc, Gnone,
-            { $4 with expr_desc = Ecast ($4, PTtuple []) }, $6)
-      | _ -> Ematch ($4, [$2, $6]) }
-| LET GHOST pat_arg EQUAL seq_expr IN seq_expr
+| LET top_ghost pattern EQUAL seq_expr IN seq_expr
     { match $3.pat_desc with
-      | Pvar id -> Elet (id, Gghost, $5, $7)
-      | Pwild -> Elet (id_anonymous $3.pat_loc, Gghost, $5, $7)
-      | Ptuple [] -> Elet (id_anonymous $3.pat_loc, Gghost,
-            { $5 with expr_desc = Ecast ($5, PTtuple []) }, $7)
-      | _ -> Ematch ({ $5 with expr_desc = Eghost $5 }, [$3, $7]) }
-| LET labels(lident) fun_defn IN seq_expr
-    { Efun ($2, Gnone, $3, $5) }
-| LET labels(lident_op_id) fun_defn IN seq_expr
-    { Efun ($2, Gnone, $3, $5) }
-| LET GHOST labels(lident) fun_defn IN seq_expr
-    { Efun ($3, Gghost, $4, $6) }
-| LET GHOST labels(lident_op_id) fun_defn IN seq_expr
-    { Efun ($3, Gghost, $4, $6) }
-| LET labels(lident_op_id) EQUAL seq_expr IN seq_expr
-    { Elet ($2, Gnone, $4, $6) }
-| LET GHOST labels(lident_op_id) EQUAL seq_expr IN seq_expr
-    { Elet ($3, Gghost, $5, $7) }
-| LET LEMMA labels(lident_rich) EQUAL seq_expr IN seq_expr
-    { Elet ($3, Glemma, $5, $7) }
-| LET LEMMA labels(lident_rich) fun_defn IN seq_expr
-    { Efun ($3, Glemma, $4, $6) }
+      | Pvar id -> Elet (id, $2, $5, $7)
+      | Pwild -> Elet (id_anonymous $3.pat_loc, $2, $5, $7)
+      | Ptuple [] -> Elet (id_anonymous $3.pat_loc, $2,
+          { $5 with expr_desc = Ecast ($5, PTtuple []) }, $7)
+      | Pcast ({pat_desc = Pvar id}, ty) ->
+          Elet (id, $2, { $5 with expr_desc = Ecast ($5, ty) }, $7)
+      | Pcast ({pat_desc = Pwild}, ty) ->
+          let id = id_anonymous $3.pat_loc in
+          Elet (id, $2, { $5 with expr_desc = Ecast ($5, ty) }, $7)
+      | _ ->
+          let e = match $2 with
+            | Glemma -> Loc.errorm ~loc:($3.pat_loc)
+                "`let lemma' cannot be used with complex patterns"
+            | Gghost -> { $5 with expr_desc = Eghost $5 }
+            | Gnone -> $5 in
+          Ematch (e, [$3, $7]) }
+| LET top_ghost labels(lident_op_id) EQUAL seq_expr IN seq_expr
+    { Elet ($3, $2, $5, $7) }
+| LET top_ghost labels(lident) fun_defn IN seq_expr
+    { Efun ($3, $2, $4, $6) }
+| LET top_ghost labels(lident_op_id) fun_defn IN seq_expr
+    { Efun ($3, $2, $4, $6) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | fun_expr
