@@ -375,7 +375,9 @@ theory SetMap
 
   predicate equal(s1 s2 : set 'a) = forall x : 'a. s1[x] = s2[x]
 
+(* dubious axiom: extensionality should be postulated on maps instead
   axiom Equal_is_eq : forall s1 s2 : set 'a. equal s1 s2 -> s1 = s2
+*)
 
   predicate subset(s1 s2 : set 'a) = forall x : 'a. mem x s1 -> mem x s2
 
