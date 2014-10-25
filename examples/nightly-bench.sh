@@ -107,6 +107,7 @@ diff -u $PREVIOUS $OUT &> $DIFF
 if test "$?" == 0 ; then
     echo "---------- No difference with last bench ---------- " >> $REPORT
 else
+    SUBJECT="$SUBJECT (with new differences)"
     if expr `cat $DIFF | wc -l` '>=' `cat $OUT | wc -l` ; then
         echo "------- Diff with last bench is larger than the bench itself ------" >> $REPORT
     else
