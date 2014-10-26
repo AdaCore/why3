@@ -184,4 +184,36 @@ module BraunHeaps
       | Node l _ r -> merge l r
     end
 
+  (** A Braun tree has a logarithmic height *)
+
+  use import bintree.Height
+  use import int.Power
+
+  let rec lemma size_height (t1 t2: tree elt)
+    requires { inv t1 && inv t2 }
+    variant  { size t1 + size t2 }
+    ensures  { size t1 >= size t2 -> height t1 >= height t2 }
+  = match t1, t2 with
+    | Node l1 _ r1, Node l2 _ r2 ->
+        size_height l1 l2;
+        size_height r1 r2
+    | _ ->
+        ()
+    end
+
+  let rec lemma inv_height (t: tree elt)
+    requires { inv t }
+    variant  { t }
+    ensures  { size t > 0 ->
+               let h = height t in power 2 (h-1) <= size t < power 2 h }
+  = match t with
+    | Empty | Node Empty _ _ ->
+        ()
+    | Node l _ r ->
+        let h = height t in
+        assert { height l = h-1 };
+        inv_height l;
+        inv_height r
+    end
+
 end
