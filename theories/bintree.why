@@ -41,6 +41,24 @@ theory Occ "occurrences in a binary tree"
 
 end
 
+theory Height "height of a tree"
+
+  use import Tree
+  use import int.Int
+  use import int.MinMax
+
+  function height (t: tree 'a) : int = match t with
+    | Empty ->
+        0
+    | Node l _ r ->
+        1 + max (height l) (height r)
+  end
+
+  lemma height_nonneg:
+    forall t: tree 'a. 0 <= height t
+
+end
+
 theory Inorder "inorder traversal"
 
   use import Tree
