@@ -180,11 +180,15 @@ val its_int  : itysymbol
 val its_real : itysymbol
 val its_bool : itysymbol
 val its_unit : itysymbol
+val its_func : itysymbol
+val its_pred : itysymbol
 
 val ity_int  : ity
 val ity_real : ity
 val ity_bool : ity
 val ity_unit : ity
+val ity_func : ity -> ity -> ity
+val ity_pred : ity -> ity (* ity_pred 'a == ity_func 'a ity_bool *)
 
 val its_tuple : int -> itysymbol
 val ity_tuple : ity list -> ity
@@ -192,14 +196,14 @@ val ity_tuple : ity list -> ity
 (** {2 Type matching and instantiation} *)
 
 type ity_subst = private {
-  ity_subst_tv  : ity Mtv.t;
-  ity_subst_reg : region Mreg.t;
+  isb_tv  : ity Mtv.t;
+  isb_reg : region Mreg.t;
 }
 
 exception TypeMismatch of ity * ity * ity_subst
 exception RegionMismatch of region * region * ity_subst
 
-val ity_subst_empty : ity_subst
+val isb_empty : ity_subst
 
 val ity_match : ity_subst -> ity -> ity -> ity_subst
 val reg_match : ity_subst -> region -> region -> ity_subst
@@ -219,6 +223,10 @@ val create_pvsymbol : preid -> ?ghost:bool -> ity -> pvsymbol
 
 val restore_pv : vsymbol -> pvsymbol
 (** raises [Not_found] if the argument is not a [pv_vs] *)
+
+val t_freepvs : Spv.t -> term -> Spv.t
+(** raises [Not_found] if the term contains a free variable
+    which is not a [pv_vs] *)
 
 (** {2 Exception symbols} *)
 
@@ -269,69 +277,40 @@ val eff_full_inst : ity_subst -> effect -> effect
 
 val eff_stale_region : effect -> ity -> bool
 
-(** {2 Specification} *)
+(** {2 Computation types (higher-order types with effects)} *)
 
 type pre = term   (** precondition: pre_fmla *)
 type post = term  (** postcondition: eps result . post_fmla *)
-type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
 val create_post : vsymbol -> term -> post
 val open_post : post -> vsymbol * term
-val check_post : ty -> post -> unit
 
-type spec = {
-  c_pre     : pre list;
-  c_post    : post list;
-  c_xpost   : post list Mexn.t;
-  c_effect  : effect;
-  c_variant : variant list;
-  c_letrec  : int;
+type cty = private {
+  cty_args   : pvsymbol list;
+  cty_pre    : pre list;
+  cty_post   : post list;
+  cty_xpost  : post list Mexn.t;
+  cty_reads  : Spv.t;
+  cty_effect : effect;
+  cty_result : ity;
+  cty_freeze : ity_subst;
 }
 
-val spec_empty : spec
+val create_cty : pvsymbol list ->
+  pre list -> post list -> post list Mexn.t -> Spv.t -> effect -> ity -> cty
+(** [create_cty args pre post xpost reads effect result] creates a cty.
+    The [cty_xpost] field does not have to cover all raised exceptions.
+    The [cty_reads] field is the union of free variables in all arguments.
+    The [cty_freeze] field freezes every pvsymbol in [cty_reads \ args].
+    The [cty_effect] field is filtered with respect to [cty_reads], and
+    fresh regions in [result] are reset. Every type variable in [pre],
+    [post], and [xpost] must come from [cty_reads] or from [result]. *)
 
-exception UnboundException of xsymbol
-
-val spec_check : ?full_xpost:bool -> spec -> ity -> unit
-(** verify that the spec corresponds to the result type.
-    Raises [UnboundException xs] if [full_xpost] is true
-    (default value), [xs] is raised but does not have
-    an exceptional postcondition. *)
-
-val spec_map : (term -> term) -> (effect -> effect) -> spec -> spec
-
-val spec_fold : ('a -> term -> 'a) -> ('a -> effect -> 'a) -> 'a -> spec -> 'a
-
-val t_pvset : Spv.t -> term -> Spv.t
-(** raises [Not_found] if the term contains non-pv variables *)
-
-val spec_pvset : Spv.t -> spec -> Spv.t
-(** raises [Not_found] if the spec contains non-pv variables *)
-
-(** {2 Program types} *)
-
-type aty = private {
-  aty_args   : pvsymbol list;
-  aty_spec   : spec;
-  aty_result : ity;
-}
-
-type vty =
-  | VTvalue of ity
-  | VTarrow of aty
-
-val vty_arrow : Spv.t -> pvsymbol list -> spec -> ity -> aty * ity_subst
-
-val aty_full_inst : ity_subst -> aty -> ity list -> ity -> aty
-(** We only match the type variables and regions in the arguments and
-    the result type. The caller must supply a "freezing" substitution
-    that covers all external type variables and regions that may occur
-    in the spec. Such a substitution is returned by [vty_arrow]. *)
-
-val aty_app : aty -> pvsymbol list -> aty * bool
-(** (partially) apply a function specification to variable arguments *)
-
-val aty_bind_check : aty -> Spv.t -> unit
-
-val aty_add_args : pvsymbol list -> aty -> aty
-
+val cty_apply : cty -> pvsymbol list -> ity list -> ity -> bool * cty
+(** [cty_apply cty pvl rest res] instantiates [cty] up to the types in
+    [pvl], [rest] and [res], then applies it to the arguments in [pvl],
+    and returns the ghost status and the computation type of the result.
+    This is essentially [rest -> res], with every type variable and
+    region in [pvl] freezed. The combined length of [pvl] and [rest]
+    must be equal to the length of [cty.cty_args]. The instantiation
+    must be compatible with [cty.cty_freeze]. *)
