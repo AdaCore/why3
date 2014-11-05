@@ -1,0 +1,52 @@
+
+(** Build a tree of logarithmic height from a list, in linear time,
+    while preserving the order of elements
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module TreeOfList
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import int.Power
+  use import list.List
+  use import list.Append
+  use import list.Length
+  use import bintree.Tree
+  use import bintree.Size
+  use import bintree.Inorder
+  use import bintree.InorderLength
+  use import bintree.Height
+
+  type elt
+
+  let rec tree_of_list_aux (n: int) (l: list elt) : (tree elt, list elt)
+    requires { 0 <= n <= length l }
+    variant  { n }
+    ensures  { let (t, l') = result in
+               inorder t ++ l' = l && size t = n &&
+               (n> 0 -> let h = height t in power 2 (h-1) <= n < power 2 h) }
+  =
+    if n = 0 then
+      (Empty, l)
+    else
+      let n = n - 1 in
+      let n1 = div n 2 in
+      let (left, l) = tree_of_list_aux n1 l in
+      match l with
+      | Nil -> absurd
+      | Cons x l -> let (right, l) = tree_of_list_aux (n - n1) l in
+                    (Node left x right, l)
+      end
+
+  let tree_of_list (l: list elt) : tree elt
+    ensures { inorder result = l }
+    ensures { size result > 0 -> let h = height result in
+-                power 2 (h-1) <= size result < power 2 h }
+  =
+    let (t, l) = tree_of_list_aux (length l) l in
+    assert { l = Nil };
+    t
+
+end
