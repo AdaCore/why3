@@ -41,12 +41,18 @@ let ps_equal : psymbol -> psymbol -> bool = (==)
 let ps_hash ps = id_hash ps.ps_name
 let ps_compare ps1 ps2 = id_compare ps1.ps_name ps2.ps_name
 
-let mk_ps id cty gh lg = {
-  ps_name  = id;
-  ps_cty   = cty;
-  ps_ghost = gh;
-  ps_logic = lg;
-}
+let mk_ps, restore_ps =
+  let ls_to_ps = Wls.create 17 in
+  (fun id cty gh lg ->
+    let ps = {
+      ps_name  = id;
+      ps_cty   = cty;
+      ps_ghost = gh;
+      ps_logic = lg;
+    } in
+    Wls.set ls_to_ps ls ps;
+    ps),
+  (fun ls -> Wls.find ls_to_ps ls)
 
 type ps_kind =
   | PKnone            (* non-pure symbol *)

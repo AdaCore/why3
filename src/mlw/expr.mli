@@ -53,3 +53,6 @@ val create_psymbol : preid -> ?ghost:bool -> ?kind:ps_kind -> cty -> psymbol
     but regions are instantiable. If [?kind] is [PKpred] the result
     type must be [ity_bool]. If [?kind] is [PKlemma] and the result
     type is not [ity_unit], an existential premise is generated. *)
+
+val restore_ps : lsymbol -> psymbol
+(** raises [Not_found] if the argument is not a [ps_logic] *)

@@ -437,7 +437,7 @@ let create_itysymbol_unsafe, restore_its =
     } in
     Wts.set ts_to_its ts its;
     its),
-  Wts.find ts_to_its
+  (fun ts -> Wts.find ts_to_its ts)
 
 let create_itysymbol name args pri mut regs fld def =
   (* prepare arguments *)
