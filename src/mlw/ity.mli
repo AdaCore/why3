@@ -76,6 +76,11 @@ module Spv  : Extset.S with module M = Mpv
 module Hpv  : Exthtbl.S with type key = pvsymbol
 module Wpv  : Weakhtbl.S with type key = pvsymbol
 
+val its_compare : itysymbol -> itysymbol -> int
+val ity_compare : ity -> ity -> int
+val reg_compare : region -> region -> int
+val pv_compare  : pvsymbol -> pvsymbol -> int
+
 val its_equal : itysymbol -> itysymbol -> bool
 val ity_equal : ity -> ity -> bool
 val reg_equal : region -> region -> bool
@@ -235,7 +240,9 @@ type xsymbol = private {
   xs_ity  : ity; (** closed and immutable *)
 }
 
+val xs_compare : xsymbol -> xsymbol -> int
 val xs_equal : xsymbol -> xsymbol -> bool
+val xs_hash: xsymbol -> int
 
 exception PolymorphicException of ident * ity
 exception MutableException of ident * ity
@@ -314,3 +321,15 @@ val cty_apply : cty -> pvsymbol list -> ity list -> ity -> bool * cty
     region in [pvl] freezed. The combined length of [pvl] and [rest]
     must be equal to the length of [cty.cty_args]. The instantiation
     must be compatible with [cty.cty_freeze]. *)
+
+val cty_add_reads : cty -> Spv.t -> cty
+(** [cty_add_reads cty pvs] adds variables in [pvs] to [cty.cty_reads].
+    This function performs capture: if some variables in [pvs] occur
+    in [cty.cty_args], no renaming is made, and the corresponding type
+    variables and regions are not frozen. *)
+
+val cty_add_pre : cty -> pre list -> cty
+(** [cty_add_pre cty fl] appends pre-conditions in [fl] to [cty.cty_pre].
+    This function performs capture: the formulas in [fl] may refer to
+    the variables in [cty.cty_args]. Only the new external dependencies
+    in [fl] are added to [cty.cty_reads] and frozen. *)

@@ -109,6 +109,11 @@ let ity_hash ity = Weakhtbl.tag_hash ity.ity_tag
 let reg_hash reg = id_hash reg.reg_name
 let pv_hash  pv  = id_hash pv.pv_vs.vs_name
 
+let its_compare its1 its2 = id_compare its1.its_ts.ts_name its2.its_ts.ts_name
+let ity_compare ity1 ity2 = Pervasives.compare (ity_hash ity1) (ity_hash ity2)
+let reg_compare reg1 reg2 = id_compare reg1.reg_name reg2.reg_name
+let pv_compare  pv1  pv2  = id_compare pv1.pv_vs.vs_name pv2.pv_vs.vs_name
+
 exception NonUpdatable of itysymbol * ity
 
 let check_its_args s tl =
@@ -529,6 +534,8 @@ let create_pvsymbol, restore_pv =
     pv),
   (fun vs -> Wvs.find vs_to_pv vs)
 
+let freeze_pv v s = ity_freeze s v.pv_ity
+
 let pvs_of_vss pvs vss =
   Mvs.fold (fun vs _ s -> Spv.add (restore_pv vs) s) vss pvs
 
@@ -590,6 +597,8 @@ exception PolymorphicException of ident * ity
 exception MutableException of ident * ity
 
 let xs_equal : xsymbol -> xsymbol -> bool = (==)
+let xs_hash xs = id_hash xs.xs_name
+let xs_compare xs1 xs2 = id_compare xs1.xs_name xs2.xs_name
 
 let create_xsymbol id ity =
   let id = id_register id in
@@ -802,8 +811,20 @@ let spec_t_fold fn_t acc pre post xpost =
   let acc = fn_l (fn_l acc pre) post in
   Mexn.fold (fun _ l a -> fn_l a l) xpost acc
 
+let check_tvs reads result pre post xpost =
+  (* every type variable in spec comes either from a known vsymbol
+     or from the result type. We need this to ensure that we always
+     can do a full instantiation. TODO: do we really need this? *)
+  let add_pv v s = ity_freevars s v.pv_ity in
+  let tvs = Spv.fold add_pv reads (ity_freevars Stv.empty result) in
+  let check_tvs () t =
+    let ttv = t_ty_freevars Stv.empty t in
+    if not (Stv.subset ttv tvs) then Loc.error ?loc:t.t_loc
+      (UnboundTypeVar (Stv.choose (Stv.diff ttv tvs))) in
+  spec_t_fold check_tvs () pre post xpost
+
 let create_cty args pre post xpost reads effect result =
-  let exn = Invalid_argument "Ity.cty" in
+  let exn = Invalid_argument "Ity.create_cty" in
   (* pre, post, and xpost are well-typed *)
   let check_post ity f = match f.t_node with
     | Teps _ -> Ty.ty_equal_check (ty_of_ity ity) (t_type f)
@@ -815,23 +836,18 @@ let create_cty args pre post xpost reads effect result =
   (* the arguments must be pairwise distinct *)
   let sarg = List.fold_right (Spv.add_new exn) args Spv.empty in
   (* complete reads and freeze the external context *)
-  let pv_freeze pv frz = ity_freeze frz pv.pv_ity in
   let reads = spec_t_fold t_freepvs reads pre post xpost in
-  let freeze = Spv.fold pv_freeze (Spv.diff reads sarg) isb_empty in
+  let freeze = Spv.fold freeze_pv (Spv.diff reads sarg) isb_empty in
   let reads = Spv.union reads sarg in
-  (* every type variable in spec comes from a known vsymbol.
-     We need this to ensure that we always can do a full inst.
-     TODO: do we really need this? *)
-  let add_pv v s = ty_freevars s v.pv_vs.vs_ty in
-  let tvs = ty_freevars Stv.empty (ty_of_ity result) in
-  let tvs = Spv.fold add_pv reads tvs in
-  let check_tvs () t =
-    let ttv = t_ty_freevars Stv.empty t in
-    if not (Stv.subset ttv tvs) then Loc.error ?loc:t.t_loc
-      (UnboundTypeVar (Stv.choose (Stv.diff ttv tvs))) in
-  spec_t_fold check_tvs () pre post xpost;
+  check_tvs reads result pre post xpost;
+  (* remove exceptions whose postcondition is False *)
+  let is_false _ xq = List.exists (t_equal t_false) xq in
+  let nothrow = Mexn.filter is_false xpost in
+  let xpost = Mexn.set_diff xpost nothrow in
+  let raises = Mexn.set_diff effect.eff_raises nothrow in
+  let effect = { effect with eff_raises = raises } in
   (* remove effects on unknown regions *)
-  let known = (Spv.fold pv_freeze sarg freeze).isb_reg in
+  let known = (Spv.fold freeze_pv sarg freeze).isb_reg in
   let filter m = Mreg.set_inter m known in
   let effect = { effect with
     eff_writes = filter effect.eff_writes;
@@ -856,9 +872,8 @@ let cty_apply c pvl args res =
         let vsb = Mvs.add a.pv_vs (t_var v.pv_vs) vsb in
         apply isb same gh vsb al vl
     | al, [] when List.length al = List.length args ->
-        let freeze_pv s v = ity_freeze s v.pv_ity in
         let freeze = if same (*so far*) then isb else
-          List.fold_left freeze_pv c.cty_freeze pvl in
+          List.fold_right freeze_pv pvl c.cty_freeze in
         let same = same && ity_equal c.cty_result res &&
           List.for_all2 (fun a t -> ity_equal a.pv_ity t) al args in
         if same && pvl = [] then gh, c (*what was the point?*) else
@@ -885,3 +900,18 @@ let cty_apply c pvl args res =
     | _ ->
         invalid_arg "Ity.cty_apply" in
   apply c.cty_freeze true false Mvs.empty c.cty_args pvl
+
+let cty_add_reads c pvs =
+  (* the external reads are already frozen and
+     the arguments should stay instantiable *)
+  let pvs = Spv.diff pvs c.cty_reads in
+  { c with cty_reads  = Spv.union c.cty_reads pvs;
+           cty_freeze = Spv.fold freeze_pv pvs c.cty_freeze }
+
+let cty_add_pre c pre =
+  List.iter (fun f -> if f.t_ty <> None then
+    Loc.error ?loc:f.t_loc (Term.FmlaExpected f)) pre;
+  let pvs = List.fold_left t_freepvs Spv.empty pre in
+  let c = cty_add_reads c pvs in
+  check_tvs c.cty_reads c.cty_result pre [] Mexn.empty;
+  { c with cty_pre = pre @ c.cty_pre }
