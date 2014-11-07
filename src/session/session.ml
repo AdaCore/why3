@@ -1168,7 +1168,7 @@ let load_result r =
             | "failure" -> Call_provers.Failure ""
             | "highfailure" -> Call_provers.HighFailure
             | s ->
-                eprintf
+                Warning.emit
                   "[Warning] Session.load_result: unexpected status '%s'@." s;
                 Call_provers.HighFailure
         in
@@ -1185,7 +1185,8 @@ let load_result r =
     | "undone" -> Interrupted
     | "unedited" -> Unedited
     | s ->
-        eprintf "[Warning] Session.load_result: unexpected element '%s'@." s;
+        Warning.emit "[Warning] Session.load_result: unexpected element '%s'@."
+          s;
         Interrupted
 
 let load_option attr g =
@@ -1251,7 +1252,7 @@ let rec load_goal ctxt parent acc g =
         mg::acc
     | "label" -> acc
     | s ->
-        eprintf "[Warning] Session.load_goal: unexpected element '%s'@." s;
+        Warning.emit "[Warning] Session.load_goal: unexpected element '%s'@." s;
         acc
 
 and load_proof_or_transf ctxt mg a =
@@ -1266,7 +1267,7 @@ and load_proof_or_transf ctxt mg a =
             | [r] -> load_result r
             | [] -> Interrupted
             | _ ->
-              eprintf "[Error] Too many result elements@.";
+              Warning.emit "[Error] Too many result elements@.";
               raise (LoadError (a,"too many result elements"))
           in
           let edit = load_option "edited" a in
@@ -1289,7 +1290,7 @@ and load_proof_or_transf ctxt mg a =
           in
           ()
         with Failure _ | Not_found ->
-          eprintf "[Error] prover id not listed in header '%s'@." prover;
+          Warning.emit "[Error] prover id not listed in header '%s'@." prover;
           raise (LoadError (a,"prover not listing in header"))
       end
     | "transf" ->
@@ -1308,7 +1309,7 @@ and load_proof_or_transf ctxt mg a =
     | "metas" -> load_metas ctxt mg a;
     | "label" -> ()
     | s ->
-        eprintf
+        Warning.emit
           "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
           s
 
@@ -1444,7 +1445,8 @@ let load_theory ctxt mf acc th =
         mth.theory_verified <- theory_verified mth;
         mth::acc
     | s ->
-        eprintf "[Warning] Session.load_theory: unexpected element '%s'@." s;
+        Warning.emit "[Warning] Session.load_theory: unexpected element '%s'@."
+          s;
         acc
 
 let load_file session old_provers f =
@@ -1476,11 +1478,11 @@ let load_file session old_provers f =
                      prover_altern = altern} in
             Mint.add id (p,timelimit,memlimit) old_provers
           with Failure _ ->
-            eprintf "[Warning] Session.load_file: unexpected non-numeric prover id '%s'@." id;
+            Warning.emit "[Warning] Session.load_file: unexpected non-numeric prover id '%s'@." id;
             old_provers
         end
     | s ->
-        eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
+        Warning.emit "[Warning] Session.load_file: unexpected element '%s'@." s;
         old_provers
 
 (*
@@ -1506,7 +1508,8 @@ let load_session session xml =
         old_provers;
       Debug.dprintf debug "[Info] load_session: done@\n"
     | s ->
-        eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
+        Warning.emit "[Warning] Session.load_session: unexpected element '%s'@."
+          s
 
 exception ShapesFileError of string
 exception SessionFileError of string
@@ -1594,7 +1597,7 @@ let read_file_session_and_shapes dir xml_filename =
        xml_filename compressed_shape_filename
     else
       begin
-        Format.eprintf "[Warning] could not read goal shapes because \
+        Warning.emit "[Warning] could not read goal shapes because \
                                 Why3 was not compiled with compress support@.";
         Xml.from_file xml_filename, false
       end
@@ -1604,11 +1607,11 @@ let read_file_session_and_shapes dir xml_filename =
       ReadShapesNoCompress.read_xml_and_shapes xml_filename shape_filename
     else
       begin
-        Format.eprintf "[Warning] could not find goal shapes file@.";
+        Warning.emit "[Warning] could not find goal shapes file@.";
         Xml.from_file xml_filename, false
       end
 with e ->
-  Format.eprintf "[Warning] failed to read goal shapes: %s@."
+  Warning.emit "[Warning] failed to read goal shapes: %s@."
     (Printexc.to_string e);
   Xml.from_file xml_filename, false
 
@@ -1634,7 +1637,7 @@ let read_session dir =
         (* xml does not exist yet *)
           raise (SessionFileError msg)
         | Xml.Parse_error s ->
-          Format.eprintf "XML database corrupted, ignored (%s)@." s;
+          Warning.emit "XML database corrupted, ignored (%s)@." s;
           raise (SessionFileError "XML corrupted")
   else false
   in

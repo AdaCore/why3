@@ -1173,7 +1173,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           (Pp.print_option Pretty.print_loc) e.e_loc;
         Irred e, s
       | _ ->
-        eprintf "@[Warning: assertion cannot be evaluated at %a@]@."
+        Warning.emit "@[Warning: assertion cannot be evaluated at %a@]@."
           (Pp.print_option Pretty.print_loc) e.e_loc;
         Normal Vvoid, s
       end
