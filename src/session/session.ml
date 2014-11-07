@@ -1167,9 +1167,11 @@ let load_result r =
             | "outofmemory" -> Call_provers.OutOfMemory
             | "failure" -> Call_provers.Failure ""
             | "highfailure" -> Call_provers.HighFailure
-            | s ->
+            | _ ->
+(*
                 eprintf
                   "[Warning] Session.load_result: unexpected status '%s'@." s;
+*)
                 Call_provers.HighFailure
         in
         let time =
@@ -1184,8 +1186,9 @@ let load_result r =
         }
     | "undone" -> Interrupted
     | "unedited" -> Unedited
-    | s ->
-        eprintf "[Warning] Session.load_result: unexpected element '%s'@." s;
+    | _ ->
+(*         eprintf "[Warning] Session.load_result: unexpected element '%s'@."
+ *         s; *)
         Interrupted
 
 let load_option attr g =
@@ -1250,8 +1253,9 @@ let rec load_goal ctxt parent acc g =
         mg.goal_verified <- goal_verified mg;
         mg::acc
     | "label" -> acc
-    | s ->
-        eprintf "[Warning] Session.load_goal: unexpected element '%s'@." s;
+    | _ ->
+(*         eprintf "[Warning] Session.load_goal: unexpected element '%s'@." s;
+ *         *)
         acc
 
 and load_proof_or_transf ctxt mg a =
@@ -1266,7 +1270,7 @@ and load_proof_or_transf ctxt mg a =
             | [r] -> load_result r
             | [] -> Interrupted
             | _ ->
-              eprintf "[Error] Too many result elements@.";
+(*               eprintf "[Error] Too many result elements@."; *)
               raise (LoadError (a,"too many result elements"))
           in
           let edit = load_option "edited" a in
@@ -1289,7 +1293,7 @@ and load_proof_or_transf ctxt mg a =
           in
           ()
         with Failure _ | Not_found ->
-          eprintf "[Error] prover id not listed in header '%s'@." prover;
+(*           eprintf "[Error] prover id not listed in header '%s'@." prover; *)
           raise (LoadError (a,"prover not listing in header"))
       end
     | "transf" ->
@@ -1307,10 +1311,10 @@ and load_proof_or_transf ctxt mg a =
         mtr.transf_verified <- transf_verified mtr
     | "metas" -> load_metas ctxt mg a;
     | "label" -> ()
-    | s ->
-        eprintf
-          "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
-          s
+    | _ -> ()
+(*        eprintf
+           "[Warning] Session.load_proof_or_transf: unexpected element
+ *           '%s'@." s *)
 
 and load_metas ctxt mg a =
   let hts = Hint.create 10 in
@@ -1443,8 +1447,9 @@ let load_theory ctxt mf acc th =
              [] th.Xml.elements);
         mth.theory_verified <- theory_verified mth;
         mth::acc
-    | s ->
-        eprintf "[Warning] Session.load_theory: unexpected element '%s'@." s;
+    | _ ->
+(*         eprintf "[Warning] Session.load_theory: unexpected element '%s'@."
+ *         s; *)
         acc
 
 let load_file session old_provers f =
@@ -1476,11 +1481,13 @@ let load_file session old_provers f =
                      prover_altern = altern} in
             Mint.add id (p,timelimit,memlimit) old_provers
           with Failure _ ->
-            eprintf "[Warning] Session.load_file: unexpected non-numeric prover id '%s'@." id;
+(*             eprintf "[Warning] Session.load_file: unexpected non-numeric
+ *             prover id '%s'@." id; *)
             old_provers
         end
-    | s ->
-        eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
+    | _ ->
+(*         eprintf "[Warning] Session.load_file: unexpected element '%s'@." s;
+ *         *)
         old_provers
 
 (*
@@ -1505,8 +1512,9 @@ let load_session session xml =
           PHprover.replace session.session_prover_ids p id)
         old_provers;
       Debug.dprintf debug "[Info] load_session: done@\n"
-    | s ->
-        eprintf "[Warning] Session.load_session: unexpected element '%s'@." s
+    | _ -> ()
+(*         eprintf "[Warning] Session.load_session: unexpected element '%s'@."
+ *         s *)
 
 exception ShapesFileError of string
 exception SessionFileError of string
@@ -1557,7 +1565,8 @@ let read_sum_and_shape ch =
             let old_sum = List.assoc "sum" attrs in
             if sum <> old_sum then
               begin
-                Format.eprintf "old sum = %s ; new sum = %s@." old_sum sum;
+(*                 Format.eprintf "old sum = %s ; new sum = %s@." old_sum sum;
+ *                 *)
                 raise
                   (ShapesFileError
                      "shapes files corrupted (sums do not correspond)")
@@ -1594,8 +1603,10 @@ let read_file_session_and_shapes dir xml_filename =
        xml_filename compressed_shape_filename
     else
       begin
+(*
         Format.eprintf "[Warning] could not read goal shapes because \
                                 Why3 was not compiled with compress support@.";
+*)
         Xml.from_file xml_filename, false
       end
   else
@@ -1604,12 +1615,14 @@ let read_file_session_and_shapes dir xml_filename =
       ReadShapesNoCompress.read_xml_and_shapes xml_filename shape_filename
     else
       begin
-        Format.eprintf "[Warning] could not find goal shapes file@.";
+(*         Format.eprintf "[Warning] could not find goal shapes file@."; *)
         Xml.from_file xml_filename, false
       end
-with e ->
+with _ ->
+(*
   Format.eprintf "[Warning] failed to read goal shapes: %s@."
     (Printexc.to_string e);
+*)
   Xml.from_file xml_filename, false
 
 type notask = unit
@@ -1633,8 +1646,8 @@ let read_session dir =
         | Sys_error msg ->
         (* xml does not exist yet *)
           raise (SessionFileError msg)
-        | Xml.Parse_error s ->
-          Format.eprintf "XML database corrupted, ignored (%s)@." s;
+        | Xml.Parse_error _ ->
+(*           Format.eprintf "XML database corrupted, ignored (%s)@." s; *)
           raise (SessionFileError "XML corrupted")
   else false
   in
