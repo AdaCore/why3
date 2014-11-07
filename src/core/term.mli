@@ -58,7 +58,7 @@ val create_fsymbol :
   ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> ty -> lsymbol
 
 val create_psymbol :
-  ?opaque:Stv.t -> ?constr:int -> preid -> ty list -> lsymbol
+  ?opaque:Stv.t -> preid -> ty list -> lsymbol
 
 val ls_ty_freevars : lsymbol -> Stv.t
 

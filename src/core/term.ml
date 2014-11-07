@@ -69,20 +69,27 @@ let check_opaque opaque args value =
   let s = List.fold_left diff (Opt.fold diff opaque value) args in
   if Stv.is_empty s then opaque else invalid_arg "Term.create_lsymbol"
 
+let check_constr constr args value =
+  if constr = 0 then constr else
+  if constr < 0 then invalid_arg "Term.create_lsymbol" else
+  let tva = List.fold_left ty_freevars Stv.empty args in
+  let tvv = oty_freevars Stv.empty value in
+  if value <> None && Stv.subset tva tvv then
+    constr else invalid_arg "Term.create_lsymbol"
+
 let create_lsymbol ?(opaque=Stv.empty) ?(constr=0) name args value = {
   ls_name   = id_register name;
   ls_args   = args;
   ls_value  = value;
   ls_opaque = check_opaque opaque args value;
-  ls_constr = if constr = 0 || (constr > 0 && value <> None)
-              then constr else invalid_arg "Term.create_lsymbol";
+  ls_constr = check_constr constr args value;
 }
 
 let create_fsymbol ?opaque ?constr nm al vl =
   create_lsymbol ?opaque ?constr nm al (Some vl)
 
-let create_psymbol ?opaque ?constr nm al =
-  create_lsymbol ?opaque ?constr nm al None
+let create_psymbol ?opaque nm al =
+  create_lsymbol ?opaque ~constr:0 nm al None
 
 let ls_ty_freevars ls =
   let acc = oty_freevars Stv.empty ls.ls_value in
