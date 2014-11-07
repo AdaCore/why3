@@ -234,7 +234,7 @@ let ity_r_occurs reg ity = Util.any ity_r_fold (reg_r_occurs reg) ity
 
 let ity_r_stale reg cvr ity = Util.any ity_r_fold (reg_r_stale reg cvr) ity
 
-let ity_immutable ity = not ity.ity_pure
+let ity_immutable ity = ity.ity_pure
 
 (* detect non-ghost type variables and regions *)
 
@@ -493,13 +493,14 @@ let create_itysymbol name args pri mut regs fld def =
   (* each updatable type variable is updatable in [regs], [fld], and [def] *)
   let rec nonupd acc upd ity = match ity.ity_node with
     | _ when not upd -> ity_freevars acc ity
-    | Itypur (s,tl) | Ityapp (s,tl,_)
-    | Ityreg {reg_its = s; reg_args = tl} ->
-        List.fold_left2 nonupd acc s.its_arg_upd tl
-    | Ityvar _ -> acc in
+    | Ityreg {reg_its = s; reg_args = tl}
+    | Ityapp (s,tl,_) | Itypur (s,tl) -> nu_args acc s tl
+    | Ityvar _ -> acc
+  and nu_args acc {its_arg_upd = ul} tl =
+    List.fold_left2 nonupd acc ul tl in
   let nu_ity acc ity = nonupd acc true ity in
   let nu_fld pv acc = nu_ity acc pv.pv_ity in
-  let nu_reg acc r = List.fold_left nu_ity acc r.reg_args in
+  let nu_reg acc r = nu_args acc r.reg_its r.reg_args in
   let nu = List.fold_left nu_reg Stv.empty regs in
   let nu = Spv.fold nu_fld fld nu in
   let nu = Opt.fold nu_ity nu def in
