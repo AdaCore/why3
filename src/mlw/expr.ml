@@ -50,8 +50,9 @@ let mk_ps, restore_ps =
       ps_ghost = gh;
       ps_logic = lg;
     } in
-    Wls.set ls_to_ps ls ps;
-    ps),
+    match lg with
+    | PLls ls -> Wls.set ls_to_ps ls ps; ps
+    | _ -> ps),
   (fun ls -> Wls.find ls_to_ps ls)
 
 type ps_kind =
