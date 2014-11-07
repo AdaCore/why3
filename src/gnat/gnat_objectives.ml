@@ -104,14 +104,20 @@ struct
 end
 
 type objective_rec =
-   { to_be_scheduled : GoalSet.t;
-     to_be_proved    : GoalSet.t
+   { to_be_scheduled    : GoalSet.t;
+   (* when a goal is scheduled, it is removed from this set *)
+     to_be_proved       : GoalSet.t;
+   (* when a goal is proved (or unproved), it is removed from this set *)
+     mutable not_proved : bool;
+     (* when a goal is not proved, the objective is marked "not proved" by
+      * setting this boolean to "true" *)
    }
 (* an objective consists of to be scheduled and to be proved goals *)
 
 let empty_objective () =
    { to_be_scheduled = GoalSet.empty ();
-     to_be_proved    = GoalSet.empty ()
+     to_be_proved    = GoalSet.empty ();
+     not_proved      = false
    }
 
 (* The state of the module consists of these mutable structures *)
@@ -301,18 +307,28 @@ let has_been_tried_by g prover =
 let all_provers_tried g =
   List.for_all (has_been_tried_by g) Gnat_config.provers
 
+let unproved_vc_continue obj obj_rec =
+  (* This function checks whether proof should continue even though we have an
+     unproved VC. This function raises Exit when:
+     * lazy mode is on (default)
+     * no more VCs left
+     otherwise it returns obj, Work_Left *)
+  obj_rec.not_proved <- true;
+  if Gnat_config.lazy_ then raise Exit;
+  if GoalSet.is_empty obj_rec.to_be_proved then raise Exit;
+  obj, Work_Left
+
 let register_result goal result =
    let obj = get_objective goal in
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
+   (* We first remove the goal from the list of goals to be tried. It may be
+    * put back later, see below *)
+   GoalSet.remove obj_rec.to_be_proved goal;
    incr nb_goals_done;
    if result then begin
       (* goal has been proved, we only need to store that info *)
-      GoalSet.remove obj_rec.to_be_proved goal;
-      if GoalSet.is_empty obj_rec.to_be_proved then begin
-         obj, Proved
-      end else begin
-         obj, Work_Left
-      end
+     if not (GoalSet.is_empty obj_rec.to_be_proved) then obj, Work_Left
+     else if obj_rec.not_proved then obj, Not_Proved else obj, Proved
    end else begin try
          (* the goal was not proved. *)
          (* We first check whether another prover may apply *)
@@ -324,17 +340,16 @@ let register_result goal result =
          end else begin
            (* This particular goal has been tried with all provers. But maybe
               we can split/apply transformations. *)
-           if is_full_split_goal goal then raise Exit;
+           if is_full_split_goal goal then unproved_vc_continue obj obj_rec
+           else
            let new_goals = further_split goal in
-           if new_goals = [] then raise Exit;
-           (* if we are here, it means we have simplified the goal. We add the
-              new goals to the set of goals to be proved/scheduled. *)
-           List.iter (add_clone goal) new_goals;
-           (* We also need to remove the old goal, which should be considered
-              "replaced" by the new ones. Otherwise we would fail to report
-              "Proved" even though all goals are proved. *)
-           GoalSet.remove obj_rec.to_be_proved goal;
-           obj, Work_Left
+           if new_goals = [] then unproved_vc_continue obj obj_rec
+           else begin
+             (* if we are here, it means we have simplified the goal. We add the
+                new goals to the set of goals to be proved/scheduled. *)
+             List.iter (add_clone goal) new_goals;
+             obj, Work_Left
+           end
          end
       with Exit ->
          (* if we cannot simplify, the objective has been disproved *)
@@ -347,7 +362,7 @@ let register_result goal result =
 let objective_status obj =
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
    if GoalSet.is_empty obj_rec.to_be_proved then
-      Proved
+     if obj_rec.not_proved then Not_Proved else Proved
    else if GoalSet.is_empty obj_rec.to_be_scheduled then
       Not_Proved
    else

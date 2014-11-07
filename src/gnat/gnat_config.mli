@@ -47,6 +47,8 @@ type limit_mode =
 val proof_mode : proof_mode
 (* reflects value of option --proof, default "Then_Split" *)
 
+val lazy_ : bool
+
 val debug : bool
 (* true if option --debug was present *)
 

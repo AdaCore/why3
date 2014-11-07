@@ -34,6 +34,7 @@ let opt_steps : int option ref = ref None
 let opt_debug = ref false
 let opt_force = ref false
 let opt_proof_mode = ref Then_Split
+let opt_lazy = ref true
 let opt_filename : string option ref = ref None
 let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
@@ -136,6 +137,8 @@ let options = Arg.align [
           " Set proof mode, one of \
             (then_split|no_wp|all_split|path_wp|no_split) \
           , default is then_split";
+   "--prove-all", Arg.Clear opt_lazy,
+          "run prover on all VCs, do not stop on first unproved one";
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given \
            by \"file:line[:column:checkkind]\"";
@@ -442,6 +445,7 @@ let timeout =
          else default_timeout
 
 let proof_mode = !opt_proof_mode
+let lazy_ = !opt_lazy
 let debug = !opt_debug
 let force = !opt_force
 let limit_line = !opt_limit_line
