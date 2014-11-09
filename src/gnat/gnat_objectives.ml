@@ -334,8 +334,9 @@ let register_result goal result =
          (* We first check whether another prover may apply *)
          if Gnat_config.manual_prover = None &&
             not (all_provers_tried goal) then begin
-           (* put the goal back to be scheduled *)
+           (* put the goal back to be scheduled and proved *)
            GoalSet.add obj_rec.to_be_scheduled goal;
+           GoalSet.add obj_rec.to_be_proved goal;
            obj, Work_Left
          end else begin
            (* This particular goal has been tried with all provers. But maybe
