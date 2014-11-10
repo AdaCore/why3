@@ -8,11 +8,13 @@ open Why3
 
      file = { "error"    : string,
               "internal" : bool,
+              "warnings" : list string,
               "results"  : list result }
 
-   The "error" and "internal" fields are optional.  If the error field is
-   present, the "results" field will be empty. If the "error" field is not
-   present, the "results" field contains the list of proof results.
+   The "error", "internal" and warnings fields are optional.  If the error
+   field is present, the "results" and "warnings" field will be empty. If the
+   "error" field is not present, the "results" field contains the list of proof
+   results.
 
    If the "error" field is present, some error happened and the value of that
    field contains the reason for it. The "internal" field is present and
@@ -21,6 +23,10 @@ open Why3
    some misbehavior of the tool. If the field absent or set to "false", the
    error should be interpreted as a misuse of the tool (e.g. invalid command
    line options).
+
+   The "warnings" field is optional. If present, it contains a list of warnings
+   that occured during execution of gnatwhy3.
+
 
      result = { "id"         : int,
                 "reason"     : string,

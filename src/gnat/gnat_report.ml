@@ -13,6 +13,20 @@ type msg =
 
 let msg_set : msg list ref = ref []
 
+let warning_list : string list ref = ref []
+
+let add_warning ?loc s =
+  let s =
+    match loc with
+    | Some loc ->
+        let file, line, col1, col2 = Loc.get loc in
+        Format.sprintf "%s:%d:%d-%d: %s" file line col1 col2 s
+    | None -> s
+  in
+  warning_list := s :: !warning_list
+
+let () = Warning.set_hook add_warning
+
 let is_digit c =
   match c with
   | '0' .. '9' -> true
@@ -119,6 +133,12 @@ let print_json_msg fmt m =
     print_trace_file m.tracefile
     print_manual_proof_info m.manual_proof
 
+let print_warning_list fmt l =
+  match l with
+  | [] -> ()
+  | l -> Format.fprintf fmt ", %a" (print_json_field "warnings" (list string)) l
+
 let print_messages () =
-  Format.printf "{%a}@."
+  Format.printf "{%a%a}@."
   (print_json_field "results" (list print_json_msg)) !msg_set
+  print_warning_list !warning_list
