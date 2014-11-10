@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Stdlib
 open Ident
 open Term
 open Ity
@@ -56,3 +57,21 @@ val create_psymbol : preid -> ?ghost:bool -> ?kind:ps_kind -> cty -> psymbol
 
 val restore_ps : lsymbol -> psymbol
 (** raises [Not_found] if the argument is not a [ps_logic] *)
+
+(** {2 Program patterns} *)
+
+type prog_pattern = private {
+  pp_pat   : pattern;
+  pp_ity   : ity;
+  pp_ghost : bool;
+}
+
+type pre_pattern =
+  | PPwild
+  | PPvar of preid
+  | PPapp of psymbol * pre_pattern list
+  | PPor  of pre_pattern * pre_pattern
+  | PPas  of pre_pattern * preid
+
+val create_prog_pattern :
+  pre_pattern -> ?ghost:bool -> ity -> pvsymbol Mstr.t * prog_pattern

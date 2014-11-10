@@ -14,6 +14,8 @@ open Ident
 open Term
 open Ity
 
+(** {2 Program symbols} *)
+
 type psymbol = {
   ps_name  : ident;
   ps_cty   : cty;
@@ -105,6 +107,9 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
       check_effects c; check_reads c;
       let ls = create_fsymbol id ~constr
         (List.map mk_arg c.cty_args) (ty_of_ity c.cty_result) in
+      (* we don't really need to check the well-formedness of
+         constructor's signature here, the type declaration
+         will take care of it *)
       mk_ps ls.ls_name c ghost (PLls ls)
   | PKpred ->
       check_effects c; check_reads c;
@@ -116,3 +121,58 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
   | PKlemma ->
       check_effects c;
       mk_ps (id_register id) c ghost PLlemma
+
+(** {2 Program patterns} *)
+
+type prog_pattern = {
+  pp_pat   : pattern;
+  pp_ity   : ity;
+  pp_ghost : bool;
+}
+
+type pre_pattern =
+  | PPwild
+  | PPvar of preid
+  | PPapp of psymbol * pre_pattern list
+  | PPor  of pre_pattern * pre_pattern
+  | PPas  of pre_pattern * preid
+
+let create_prog_pattern pp ?(ghost=false) ity =
+  let hv = Hstr.create 3 in
+  let gh = ref false in
+  let find id ghost ity =
+    try
+      let pv = Hstr.find hv id.pre_name in
+      ity_equal_check ity pv.pv_ity;
+      if (pv.pv_ghost <> ghost) then invalid_arg "Expr.make_pattern";
+      pv
+    with Not_found ->
+      let pv = create_pvsymbol id ~ghost ity in
+      Hstr.add hv id.pre_name pv; pv
+  in
+  let rec make ghost ity = function
+    | PPwild ->
+        pat_wild (ty_of_ity ity)
+    | PPvar id ->
+        pat_var (find id ghost ity).pv_vs
+    | PPapp ({ps_logic = PLls ls} as ps, ppl) when ls.ls_constr > 0 ->
+        if ghost && ls.ls_constr > 1 then gh := true;
+        let sbs = ity_match isb_empty ps.ps_cty.cty_result ity in
+        let mtch arg pp =
+          let ghost = ghost || arg.pv_ghost in
+          make ghost (ity_full_inst sbs arg.pv_ity) pp in
+        let ppl = try List.map2 mtch ps.ps_cty.cty_args ppl with
+          | Invalid_argument _ ->
+              raise (Term.BadArity (ls, List.length ppl)) in
+        pat_app ls ppl (ty_of_ity ity)
+    | PPapp ({ps_name = {id_string = s}}, _) ->
+        Loc.errorm "%s is not a constructor, it cannot be used in a pattern" s
+    | PPor (pp1,pp2) ->
+        pat_or (make ghost ity pp1) (make ghost ity pp2)
+    | PPas (pp,id) ->
+        pat_as (make ghost ity pp) (find id ghost ity).pv_vs
+  in
+  let pat = make ghost ity pp in
+  Hstr.fold Mstr.add hv Mstr.empty,
+  { pp_pat = pat; pp_ity = ity; pp_ghost = ghost || !gh }
+
