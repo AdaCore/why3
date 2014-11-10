@@ -1607,7 +1607,8 @@ let read_file_session_and_shapes dir xml_filename =
       ReadShapesNoCompress.read_xml_and_shapes xml_filename shape_filename
     else
       begin
-        Warning.emit "[Warning] could not find goal shapes file@.";
+        Warning.emit "[Warning] could not find goal shapes file in %s@."
+        shape_filename;
         Xml.from_file xml_filename, false
       end
 with e ->
