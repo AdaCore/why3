@@ -176,3 +176,65 @@ let create_prog_pattern pp ?(ghost=false) ity =
   Hstr.fold Mstr.add hv Mstr.empty,
   { pp_pat = pat; pp_ity = ity; pp_ghost = ghost || !gh }
 
+(** {2 Program expressions} *)
+
+type assertion_kind = Assert | Assume | Check
+
+type for_direction = To | DownTo
+
+type for_bounds = pvsymbol * for_direction * pvsymbol
+
+type invariant = term
+
+type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
+
+type vty =
+  | VtyI of ity
+  | VtyC of cty
+
+type val_decl =
+  | ValV of pvsymbol
+  | ValS of psymbol
+
+type expr = {
+  e_node   : expr_node;
+  e_vty    : vty;
+  e_ghost  : bool;
+  e_effect : effect;
+  e_label  : Slab.t;
+  e_loc    : Loc.position option;
+}
+
+and expr_node =
+  | Evar    of pvsymbol
+  | Esym    of psymbol
+  | Eapp    of expr * pvsymbol list * cty
+  | Efun    of expr
+  | Elet    of let_defn * expr
+  | Erec    of rec_defn * expr
+  | Eif     of expr * expr * expr
+  | Ecase   of expr * (prog_pattern * expr) list
+  | Eassign of expr * pvsymbol (*field*) * pvsymbol
+  | Ewhile  of expr * invariant * variant list * expr
+  | Efor    of pvsymbol * for_bounds * invariant * expr
+  | Etry    of expr * (xsymbol * pvsymbol * expr) list
+  | Eraise  of xsymbol * expr
+  | Eghost  of expr
+  | Eassert of assertion_kind * term
+  | Eabsurd
+  | Eany
+
+and let_defn = {
+  let_sym  : val_decl;
+  let_expr : expr;
+}
+
+and rec_defn = {
+  rec_defn : fun_defn list;
+}
+
+and fun_defn = {
+  fun_sym  : psymbol;
+  fun_expr : expr; (* Efun *)
+  fun_varl : variant list;
+}
