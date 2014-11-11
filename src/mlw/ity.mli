@@ -240,6 +240,9 @@ type xsymbol = private {
   xs_ity  : ity; (** closed and immutable *)
 }
 
+module Mexn : Extmap.S with type key = xsymbol
+module Sexn : Extset.S with module M = Mexn
+
 val xs_compare : xsymbol -> xsymbol -> int
 val xs_equal : xsymbol -> xsymbol -> bool
 val xs_hash: xsymbol -> int
@@ -248,9 +251,6 @@ exception PolymorphicException of ident * ity
 exception MutableException of ident * ity
 
 val create_xsymbol : preid -> ity -> xsymbol
-
-module Mexn: Extmap.S with type key = xsymbol
-module Sexn: Extset.S with module M = Mexn
 
 (** {2 Effects} *)
 

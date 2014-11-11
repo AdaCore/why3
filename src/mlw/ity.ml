@@ -440,76 +440,74 @@ let create_itysymbol_unsafe, restore_its =
   (fun ts -> Wts.find ts_to_its ts)
 
 let create_itysymbol name args pri mut regs fld def =
+  let exn = Invalid_argument "Ity.create_itysymbol" in
   (* prepare arguments *)
   let args, avis, aupd =
     List.fold_right (fun (tv,v,u) (args,avis,aupd) ->
       tv::args, v::avis, u::aupd) args ([],[],[]) in
   let regs, rvis = List.split regs in
-  (* create_tysymbol checks that args contains no duplicates
-     and covers every type variable in def *)
+  let fld = Spv.elements fld in
+  (* create_tysymbol checks that [args] has no duplicates
+     and covers every type variable in [def] *)
   let ts = create_tysymbol name args (Opt.map ty_of_ity def) in
   (* all regions *)
   let add_r s r = Sreg.add_new (DuplicateRegion r) r s in
   let sregs = List.fold_left add_r Sreg.empty regs in
   (* all type variables *)
   let sargs = List.fold_right Stv.add args Stv.empty in
-  (* each type variable in [regs] and [fld] must be in [args],
-     and each top region in [fld] must be in [regs] *)
-  let check_var ity = ity_v_fold (fun () v ->
+  (* each type variable in [regs] must be in [args] *)
+  let check_v ity = ity_v_fold (fun () v ->
     if not (Stv.mem v sargs) then raise (UnboundTypeVar v)) () ity in
-  let check_reg ity = ity_r_fold (fun () r ->
+  List.iter (fun r -> List.iter check_v r.reg_args) regs;
+  (* each type variable in [fld] must be in [args],
+     and each top region in [fld] must be in [regs] *)
+  let check_r ity = ity_r_fold (fun () r ->
     if not (Sreg.mem r sregs) then raise (UnboundRegion r)) () ity in
-  Spv.iter (fun {pv_ity = ity} -> check_var ity; check_reg ity) fld;
-  List.iter (fun reg -> List.iter check_var reg.reg_args) regs;
+  List.iter (fun f -> check_v f.pv_ity; check_r f.pv_ity) fld;
   (* top regions in [def] must be exactly [regs],
      and [def] is mutable if and only if the symbol is *)
   let dregs = let add_r s r = Sreg.add r s in match def with
     | Some {ity_node = Ityreg reg} when mut ->
                                reg_r_fold add_r Sreg.empty reg
     | Some ity when not mut -> ity_r_fold add_r Sreg.empty ity
-    | Some _ -> invalid_arg "Ity.create_itysymbol"
+    | Some _ -> raise exn
     | None -> sregs in
   if not (Sreg.equal sregs dregs) then if Sreg.subset sregs dregs
     then raise (UnboundRegion (Sreg.choose (Sreg.diff dregs sregs)))
-    else invalid_arg "Ity.create_itysymbol";
+    else raise exn;
   (* if we have mutable fields then we are mutable *)
-  if not (mut || Spv.is_empty fld) then
-    invalid_arg "Ity.create_itysymbol";
+  if fld <> [] && not mut then raise exn;
   (* if we are an alias then we are not private and have no fields *)
-  if def <> None && (pri || not (Spv.is_empty fld)) then
-    invalid_arg "Ity.create_itysymbol";
+  if def <> None && (pri || fld <> []) then raise exn;
   (* if we are private, [regs] is Nil and [args] are non-updateble *)
-  if pri && (regs <> [] || List.exists (fun u -> u) aupd) then
-    invalid_arg "Ity.create_itysymbol";
-  (* each invisible type variable and region must be invisible in [def] *)
-  let v_visible = Opt.fold ity_v_visible Stv.empty def in
-  let r_visible = Opt.fold ity_r_visible Sreg.empty def in
-  let check_v vis v = if not vis && Stv.mem v v_visible then
-      invalid_arg "Ity.create_itysymbol" in
-  let check_r vis r = if not vis && Sreg.mem r r_visible then
-      invalid_arg "Ity.create_itysymbol" in
-  List.iter2 check_v avis args;
-  List.iter2 check_r rvis regs;
-  (* each updatable type variable is updatable in [regs], [fld], and [def] *)
-  let rec nonupd acc upd ity = match ity.ity_node with
-    | _ when not upd -> ity_freevars acc ity
+  if pri && (regs <> [] || List.exists (fun u -> u) aupd) then raise exn;
+  (* updatable type variables are updatable in [def], [regs], and [fld] *)
+  let v_updatable = List.fold_left2 (fun s upd v ->
+    if upd then Stv.add v s else s) Stv.empty aupd args in
+  let check_v () v = if Stv.mem v v_updatable then raise exn in
+  let rec nu_ity upd ity = match ity.ity_node with
+    | _ when not upd -> ity_v_fold check_v () ity
     | Ityreg {reg_its = s; reg_args = tl}
-    | Ityapp (s,tl,_) | Itypur (s,tl) -> nu_args acc s tl
-    | Ityvar _ -> acc
-  and nu_args acc {its_arg_upd = ul} tl =
-    List.fold_left2 nonupd acc ul tl in
-  let nu_ity acc ity = nonupd acc true ity in
-  let nu_fld pv acc = nu_ity acc pv.pv_ity in
-  let nu_reg acc r = nu_args acc r.reg_its r.reg_args in
-  let nu = List.fold_left nu_reg Stv.empty regs in
-  let nu = Spv.fold nu_fld fld nu in
-  let nu = Opt.fold nu_ity nu def in
-  List.iter2 (fun upd v -> if upd && Stv.mem v nu then
-    invalid_arg "Ity.create_itysymbol") aupd args;
-  (* NOTE: record/constructor fields must be pairwise separated,
-     but this should be checked during the type declaration, [fld]
-     is not enough *)
-  let fld = Spv.elements fld in
+    | Ityapp (s,tl,_) | Itypur (s,tl) -> nu_its s tl
+    | Ityvar _ -> ()
+  and nu_its s tl = List.iter2 nu_ity s.its_arg_upd tl in
+  Opt.iter (nu_ity true) def;
+  List.iter (fun r -> nu_its r.reg_its r.reg_args) regs;
+  List.iter (fun f -> nu_ity true f.pv_ity) fld;
+  (* invisible type variables and regions are invisible in [def],
+     in the visible regions, and in the non-ghost mutable fields *)
+  let v_invisible = List.fold_left2 (fun s vis v ->
+    if vis then s else Stv.add v s) Stv.empty avis args in
+  let r_invisible = List.fold_left2 (fun s vis r ->
+    if vis then s else Sreg.add r s) Sreg.empty rvis regs in
+  let check_v () v = if Stv.mem v v_invisible then raise exn in
+  let check_r () r = if Sreg.mem r r_invisible then raise exn in
+  Opt.iter (ity_visible check_v check_r () true) def;
+  List.iter2 (reg_visible check_v check_r ()) rvis regs;
+  List.iter (fun f ->
+    ity_visible check_v check_r () (not f.pv_ghost) f.pv_ity) fld;
+  (* NOTE: record/constructor fields must be pairwise separated, but this
+     should be checked during the type declaration, [fld] is not enough *)
   create_itysymbol_unsafe ~ts ~pri ~mut ~fld ~regs ~rvis ~avis ~aupd ~def
 
 let rec ity_of_ty ty = match ty.ty_node with
