@@ -219,20 +219,15 @@ let provers, config, env =
      with Rc.CannotOpen _ ->
        Gnat_util.abort_with_message ~internal:true "Cannot read file why3.conf."
   in
-  (* configured_provers is the map of all provers that Why3 knows about *)
-  let configured_provers : Whyconf.config_prover Whyconf.Mprover.t =
-     Whyconf.get_provers config in
   (* now we build the Whyconf.config_prover for all requested provers *)
   let base_provers =
     try match prover_str_list with
     | [] when !opt_prepare_shared -> []
     | [] ->
-       let conf =
-          { Whyconf.prover_name = "altergo";
-             prover_version      = "0.95";
-             prover_altern       = "";
-          } in
-       [ Whyconf.Mprover.find conf configured_provers ]
+        (* default provers are cvc4 and altergo. in this order *)
+        List.map (fun s ->
+          Whyconf.filter_one_prover config (Whyconf.mk_filter_prover s))
+          ["cvc4";"altergo"]
     | l ->
         List.map (fun s ->
           Whyconf.filter_one_prover config (Whyconf.mk_filter_prover s)) l
