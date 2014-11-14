@@ -264,3 +264,13 @@ module io.StdIO
   syntax val print_int "Why3__BigInt.print"
   syntax val print_newline "Pervasives.print_newline"
 end
+
+module null.Null
+
+  syntax type t           "%1"
+  syntax val  create_null "(fun () -> Obj.magic (ref 0))"
+  syntax val  eq_null     "(==)"
+  syntax val  create      "(fun x -> x)"
+  syntax val  get         "(fun x -> x)"
+
+end
