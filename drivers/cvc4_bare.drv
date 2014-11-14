@@ -187,25 +187,30 @@ theory bv.BV32
   syntax type t "(_ BitVec 32)"
 
   syntax function zero "#x00000000"
-  syntax function one  "#xFFFFFFFF"
+  syntax function ones "#xFFFFFFFF"
   syntax function bw_and "(bvand %1 %2)"
   syntax function bw_or "(bvor %1 %2)"
+  syntax function bw_xor "(bvxor %1 %2)"
+  syntax function bw_not "(bvnot %1)"
 
   syntax function lsr "(bvlshr %1 ((_ int2bv 32) %2))"
   syntax function lsl "(bvshl %1 ((_ int2bv 32) %2))"
   syntax function asr "(bvashr %1 ((_ int2bv 32) %2))"
   syntax function to_uint "(bv2nat %1)"
-  syntax function to_int "(ite (= ((_ extract 31 31) %1) #b0) 
-  	 	  	       (bv2nat %1) 
-			       (-(bv2nat %1) 4294967296) )"
+  syntax function to_int "(ite (= ((_ extract 31 31) %1) #b0)
+  	 	  	       (bv2nat %1)
+			       (- (bv2nat %1) 4294967296))"
   syntax function of_int "((_ int2bv 32) %1)"
-  syntax function nth "(= (bvand (bvlshr %1 ((_ int2bv 32) %2)) #x00000001)
-  	 	      	  #x00000001)"			  
+  syntax function nth "(= ((_ extract 0 0) (bvlshr %1 ((_ int2bv 32) %2)))
+  	 	      	  #b1)"
   syntax predicate eq "(= %1 %2)"
 
   remove prop Nth_zero
-  remove prop Nth_one
+  remove prop Nth_ones
   remove prop Nth_bw_and
+  remove prop Nth_bw_or
+  remove prop Nth_bw_xor
+  remove prop Nth_bw_not
   remove prop Lsr_nth_low
   remove prop Lsr_nth_high
   remove prop Lsl_nth_low

@@ -8,7 +8,7 @@ import "ocaml-gen.drv"
 theory bv.BV32
   syntax type      t      "Int32.t"
   syntax constant  zero   "0l"
-  syntax constant  one    "-1l"
+  syntax constant  ones    "-1l"
   syntax function  bw_and "(Int32.logand %1 %2)"
   syntax predicate eq     "(%1 = %2)"
   (* TODO ... *)

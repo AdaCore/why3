@@ -1,0 +1,15 @@
+
+module Delight
+
+  use import mach.int.Int32
+  use import int.EuclideanDivision
+
+  let f (x y:int32) (ghost k:int) : int32
+    requires { 0 <= k < 1 }
+    requires { to_int y = BV32.to_int (BV32.lsl (BV32.of_int 1) k) }
+    ensures { 0 <= to_int result < to_int y }
+    ensures { to_int result = mod (to_int x) (to_int y) } 
+  = assert { to_int y = 1 };
+    of_bv (BV32.bw_and (to_bv x) (to_bv (y - of_int 1)))
+
+end

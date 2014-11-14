@@ -4,22 +4,22 @@ theory TestBv32
   use import bv.BV32
 
   lemma Test1:
-    let b = bw_and zero one in nth b 1 = False
+    let b = bw_and zero ones in nth b 1 = False
 
   lemma Test2:
-    let b = lsr one 16 in nth b 15 = True
+    let b = lsr ones 16 in nth b 15 = True
 
   lemma Test3:
-    let b = lsr one 16 in nth b 16 = False
+    let b = lsr ones 16 in nth b 16 = False
 
   lemma Test4:
-    let b = asr one 16 in nth b 15 = True
+    let b = asr ones 16 in nth b 15 = True
 
   lemma Test5:
-    let b = asr one 16 in nth b 16 = True
+    let b = asr ones 16 in nth b 16 = True
 
   lemma Test6:
-    let b = asr (lsr one 1) 16 in nth b 16 = False
+    let b = asr (lsr ones 1) 16 in nth b 16 = False
 
 end
 

@@ -10,22 +10,27 @@ theory BitVector
 
   constant size : int
 
+  (* useful ? *)
   axiom size_pos: size > 0
 
   type t
 
   function nth t int: bool
+  (** [nth b n] is the n-th bit of x (0 <= n < size). bit 0 is
+      the least significant bit *)
+
+  predicate eq (v1 v2 : t) =
+    forall n:int. 0 <= n < size -> nth v1 n = nth v2 n
+
+  axiom Extensionality: forall x y : t. eq x y -> x = y
 
   constant zero : t
   axiom Nth_zero:
     forall n:int. 0 <= n < size -> nth zero n = False
 
-  constant one : t
-  axiom Nth_one:
-    forall n:int. 0 <= n < size -> nth one n = True
-
-  predicate eq (v1 v2 : t) =
-    forall n:int. 0 <= n < size -> nth v1 n = nth v2 n
+  constant ones : t
+  axiom Nth_ones:
+    forall n:int. 0 <= n < size -> nth ones n = True
 
   function bw_and (v1 v2 : t) : t
   axiom Nth_bw_and:
@@ -37,41 +42,58 @@ theory BitVector
     forall v1 v2:t, n:int. 0 <= n < size ->
       nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
 
+  function bw_xor (v1 v2 : t) : t
+  axiom Nth_bw_xor:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
+
+  function bw_not (v : t) : t
+  axiom Nth_bw_not:
+    forall v:t, n:int. 0 <= n < size ->
+      nth (bw_not v) n = notb (nth v n)
+
+
   (** logical shift right *)
   function lsr t int : t
 
   axiom Lsr_nth_low:
-    forall b:t,n s:int. 0 <= n+s < size -> nth (lsr b s) n = nth b (n+s)
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s < size -> 
+      nth (lsr b s) n = nth b (n+s)
 
   axiom Lsr_nth_high:
-    forall b:t,n s:int. n+s >= size -> nth (lsr b s) n = False
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> 
+      nth (lsr b s) n = False
 
   (** arithmetic shift right *)
   function asr t int : t
 
   axiom Asr_nth_low:
-    forall b:t,n s:int. 0 <= n+s < size -> nth (asr b s) n = nth b (n+s)
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> 0 <= n+s < size -> nth (asr b s) n = nth b (n+s)
 
   axiom Asr_nth_high:
-    forall b:t,n s:int. n+s >= size -> nth (asr b s) n = nth b (size-1)
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> nth (asr b s) n = nth b (size-1)
 
   (** logical shift left *)
   function lsl t int : t
 
   axiom Lsl_nth_high:
-    forall b:t,n s:int. 0 <= n-s < size -> nth (lsl b s) n = nth b (n-s)
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> 0 <= n-s < size -> nth (lsl b s) n = nth b (n-s)
 
   axiom Lsl_nth_low:
-    forall b:t,n s:int. n-s < 0 -> nth (lsl b s) n = False
+    forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n-s < 0 -> nth (lsl b s) n = False
 
-  function to_int t: int
-
-  (* TODO? axiom - power 2 (size-1) <= to_int b < power 2 (size-1) *)
-
+  (** conversion to unsigned integers *)
   function to_uint t: int
 
   (* TODO? axiom 0 <= to_int b < power 2 size *)
 
+  (** conversion to signed integers *)
+  function to_int t: int
+
+  (* TODO? axiom - power 2 (size-1) <= to_int b < power 2 (size-1) *)
+
+  (** conversion from integers. The (infinitary) 2-complement binary
+  representation of the argument is truncated to [size] bits *)
   function of_int int: t
 
   (* TODO? axioms related to_int/to_unit and of_int *)
