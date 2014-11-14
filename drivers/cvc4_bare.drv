@@ -164,7 +164,6 @@ theory int.ComputerDivision
 end
 *)
 
-
 (*
 theory real.Truncate
   syntax function floor "(to_int %1)"
@@ -184,6 +183,36 @@ theory map.Map
 (*  syntax function const "(const[%t0] %1)" *)
 end
 
+theory bv.BV32
+  syntax type t "(_ BitVec 32)"
+
+  syntax function zero "#x00000000"
+  syntax function one  "#xFFFFFFFF"
+  syntax function bw_and "(bvand %1 %2)"
+  syntax function bw_or "(bvor %1 %2)"
+
+  syntax function lsr "(bvlshr %1 ((_ int2bv 32) %2))"
+  syntax function lsl "(bvshl %1 ((_ int2bv 32) %2))"
+  syntax function asr "(bvashr %1 ((_ int2bv 32) %2))"
+  syntax function to_uint "(bv2nat %1)"
+  syntax function to_int "(ite (= ((_ extract 31 31) %1) #b0) 
+  	 	  	       (bv2nat %1) 
+			       (-(bv2nat %1) 4294967296) )"
+  syntax function of_int "((_ int2bv 32) %1)"
+  syntax function nth "(= (bvand (bvlshr %1 ((_ int2bv 32) %2)) #x00000001)
+  	 	      	  #x00000001)"			  
+  syntax predicate eq "(= %1 %2)"
+
+  remove prop Nth_zero
+  remove prop Nth_one
+  remove prop Nth_bw_and
+  remove prop Lsr_nth_low
+  remove prop Lsr_nth_high
+  remove prop Lsl_nth_low
+  remove prop Lsl_nth_high
+  remove prop Asr_nth_low
+  remove prop Asr_nth_high
+end
 
 (*
 Local Variables:

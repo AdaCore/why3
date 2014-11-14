@@ -32,6 +32,11 @@ theory BitVector
     forall v1 v2:t, n:int. 0 <= n < size ->
       nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
 
+  function bw_or (v1 v2 : t) : t
+  axiom Nth_bw_or:
+    forall v1 v2:t, n:int. 0 <= n < size ->
+      nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
+
   (** logical shift right *)
   function lsr t int : t
 
