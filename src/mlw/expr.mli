@@ -126,6 +126,7 @@ and expr_node = private
   | Eraise  of xsymbol * expr
   | Eghost  of expr
   | Eassert of assertion_kind * term
+  | Epure   of term
   | Eabsurd
   | Eany
 

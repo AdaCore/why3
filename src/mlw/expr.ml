@@ -66,16 +66,14 @@ type ps_kind =
 
 let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
   let check_effects { cty_effect = e } =
-  (* TODO/FIXME: prove that we can indeed ignore resets.
-     Normally, resets neither consult nor change the
-     external state, and do not affect the specification. *)
-    if not (eff_is_pure e) then
-      Loc.errorm "this function has side effects, \
-                  it cannot be declared as pure" in
+    (* TODO/FIXME: prove that we can indeed ignore resets.
+      Normally, resets neither consult nor change the
+      external state, and do not affect the specification. *)
+    if not (eff_is_pure e) then Loc.errorm
+      "this function is stateful, it cannot be declared as pure" in
   let check_reads { cty_freeze = isb } =
-    if not (Mreg.is_empty isb.isb_reg) then
-      Loc.errorm "this function depends on the global state, \
-                  it cannot be declared as pure" in
+    if not (Mreg.is_empty isb.isb_reg) then Loc.errorm
+      "this function is stateful, it cannot be declared as pure" in
   let res_type c = ty_of_ity c.cty_result in
   let arg_type c = List.map (fun a -> a.pv_vs.vs_ty) c.cty_args in
   let arg_list c = List.map (fun a -> t_var a.pv_vs) c.cty_args in
@@ -108,9 +106,9 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
          be used in the program, as it has lost all preconditions,
          which is why we declare it as ghost. In other words,
          this pvsymbol behaves exactly as Epure of its pv_vs. *)
-      let v = create_pvsymbol ~ghost:true id ity in
-      let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
-      mk_ps v.pv_vs.vs_name (add_post c t) ghost (PLvs v.pv_vs)
+      let { pv_vs = v } = create_pvsymbol ~ghost:true id ity in
+      let t = t_func_app_l (t_var v) (arg_list c) in
+      mk_ps v.vs_name (add_post c t) ghost (PLvs v)
   | PKfunc constr ->
       check_effects c; check_reads c;
       (* we don't really need to check the well-formedness of
@@ -235,6 +233,7 @@ and expr_node =
   | Eraise  of xsymbol * expr
   | Eghost  of expr
   | Eassert of assertion_kind * term
+  | Epure   of term
   | Eabsurd
   | Eany
 
@@ -301,23 +300,37 @@ let e_nat_const n =
 let create_let_defn id e =
   let ghost = e.e_ghost in
   let lv = match e.e_vty with
-    | VtyI ity -> ValV (create_pvsymbol id ~ghost ity)
-    | VtyC cty -> ValS (create_psymbol id ~ghost ~kind:PKnone cty) in
+    | VtyC c -> ValS (create_psymbol id ~ghost ~kind:PKnone c)
+    | VtyI i -> ValV (create_pvsymbol id ~ghost i) in
   { let_sym = lv; let_expr = e }
 
 let create_let_defn_pv id e =
-  (* let_defn * pvsymbol *)
-  assert false
+  let ity = match e.e_vty with
+    | VtyC ({ cty_args = args; cty_result = res } as c) ->
+        let error s = Loc.errorm
+          "this function %s, it cannot be used as first-order" s in
+        if not (Mreg.is_empty c.cty_freeze.isb_reg &&
+                eff_is_empty c.cty_effect) then error "is stateful";
+        if not (List.for_all (fun a -> ity_immutable a.pv_ity) args &&
+                ity_immutable res) then error "is non-pure";
+        if not e.e_ghost && List.exists (fun a -> a.pv_ghost) args
+          then error "has ghost arguments";
+        if c.cty_pre <> [] then error "is partial";
+        List.fold_right (fun a i -> ity_func a.pv_ity i) args res
+    | VtyI i -> i in
+  let pv = create_pvsymbol id ~ghost:e.e_ghost ity in
+  { let_sym = ValV pv; let_expr = e }, pv
 
-let create_let_defn_ps id ?(kind=PKnone) e = assert false
-
-(*
-let create_let_defn_ps id ?(kind=PKnone) e = match e.e_vty, kind with
-  | VtyI
-  | _, PKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_ps"
-  |
-  | _ ->
-      let ps = create_psymbol id ~ghost:e.
-  (* let_defn * psymbol *)
-  assert false
-*)
+let create_let_defn_ps id ?(kind=PKnone) e =
+  let cty = match e.e_vty, kind with
+    | _, PKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_ps"
+    | VtyI _, (PKnone|PKlocal|PKlemma) -> Loc.errorm
+        "this expression is first-order, it cannot be used as a function"
+    | VtyI i, (PKfunc _|PKpred) when ity_immutable i ->
+        (* the post will be equality to the logic constant *)
+        create_cty [] [] [] Mexn.empty Spv.empty eff_empty i
+    | VtyI _, (PKfunc _|PKpred) -> Loc.errorm
+        "this expression is non-pure, it cannot be used as a pure function"
+    | VtyC c, _ -> c in
+  let ps = create_psymbol id ~ghost:e.e_ghost ~kind cty in
+  { let_sym = ValS ps; let_expr = e }, ps
