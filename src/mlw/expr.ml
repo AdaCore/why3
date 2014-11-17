@@ -65,28 +65,36 @@ type ps_kind =
   | PKlemma           (* top-level or local let-lemma *)
 
 let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
-  let add_arg a t = ity_func (ity_purify a.pv_ity) t in
-  let mk_arg a = ty_of_ity a.pv_ity in
   let check_effects { cty_effect = e } =
   (* TODO/FIXME: prove that we can indeed ignore resets.
      Normally, resets neither consult nor change the
      external state, and do not affect the specification. *)
-    if not (Mreg.is_empty e.eff_writes &&
-            Sexn.is_empty e.eff_raises &&
-            not e.eff_diverg) then
+    if not (eff_is_pure e) then
       Loc.errorm "this function has side effects, \
                   it cannot be declared as pure" in
   let check_reads { cty_freeze = isb } =
     if not (Mreg.is_empty isb.isb_reg) then
       Loc.errorm "this function depends on the global state, \
                   it cannot be declared as pure" in
+  let res_type c = ty_of_ity c.cty_result in
+  let arg_type c = List.map (fun a -> a.pv_vs.vs_ty) c.cty_args in
+  let arg_list c = List.map (fun a -> t_var a.pv_vs) c.cty_args in
+  let add_post c t = match t.t_ty with
+    | Some ty ->
+        let res = create_vsymbol (id_fresh "result") ty in
+        cty_add_post c [create_post res (t_equ (t_var res) t)]
+    | None ->
+        let res = create_vsymbol (id_fresh "result") Ty.ty_bool in
+        let q = t_iff (t_equ (t_var res) t_bool_true) t in
+        cty_add_post c [create_post res q] in
   match kind with
   | PKnone ->
       mk_ps (id_register id) c ghost PLnone
   | PKlocal ->
       check_effects c; check_reads c;
       let ity = ity_purify c.cty_result in
-      let ity = List.fold_right add_arg c.cty_args ity in
+      let ity = List.fold_right (fun a ty ->
+        ity_func (ity_purify a.pv_ity) ty) c.cty_args ity in
       (* When declaring local let-functions, we need to create a
          mapping vsymbol to use in assertions. As vsymbols are not
          generalisable, we have to freeze the type variables (but
@@ -100,24 +108,25 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
          be used in the program, as it has lost all preconditions,
          which is why we declare it as ghost. In other words,
          this pvsymbol behaves exactly as Epure of its pv_vs. *)
-      let pv = create_pvsymbol ~ghost:true id ity in
-      let c = cty_add_reads c (Spv.singleton pv) in
-      mk_ps pv.pv_vs.vs_name c ghost (PLvs pv.pv_vs)
+      let v = create_pvsymbol ~ghost:true id ity in
+      let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
+      mk_ps v.pv_vs.vs_name (add_post c t) ghost (PLvs v.pv_vs)
   | PKfunc constr ->
       check_effects c; check_reads c;
-      let ls = create_fsymbol id ~constr
-        (List.map mk_arg c.cty_args) (ty_of_ity c.cty_result) in
       (* we don't really need to check the well-formedness of
          constructor's signature here, the type declaration
          will take care of it *)
-      mk_ps ls.ls_name c ghost (PLls ls)
+      let ls = create_fsymbol id ~constr (arg_type c) (res_type c) in
+      let t = t_app ls (arg_list c) ls.ls_value in
+      mk_ps ls.ls_name (add_post c t) ghost (PLls ls)
   | PKpred ->
       check_effects c; check_reads c;
       if not (ity_equal c.cty_result ity_bool) then
         Loc.errorm "this function does not return a boolean value, \
                     it cannot be declared as a pure predicate";
-      let ls = create_psymbol id (List.map mk_arg c.cty_args) in
-      mk_ps ls.ls_name c ghost (PLls ls)
+      let ls = create_psymbol id (arg_type c) in
+      let f = t_app ls (arg_list c) None in
+      mk_ps ls.ls_name (add_post c f) ghost (PLls ls)
   | PKlemma ->
       check_effects c;
       mk_ps (id_register id) c ghost PLlemma
@@ -178,6 +187,8 @@ let create_prog_pattern pp ?(ghost=false) ity =
 
 (** {2 Program expressions} *)
 
+type lazy_op = Eand | Eor
+
 type assertion_kind = Assert | Assume | Check
 
 type for_direction = To | DownTo
@@ -208,10 +219,13 @@ type expr = {
 and expr_node =
   | Evar    of pvsymbol
   | Esym    of psymbol
+  | Econst  of Number.constant
   | Eapp    of expr * pvsymbol list * cty
   | Efun    of expr
   | Elet    of let_defn * expr
   | Erec    of rec_defn * expr
+  | Enot    of expr
+  | Elazy   of lazy_op * expr * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (prog_pattern * expr) list
   | Eassign of expr * pvsymbol (*field*) * pvsymbol
@@ -238,3 +252,72 @@ and fun_defn = {
   fun_expr : expr; (* Efun *)
   fun_varl : variant list;
 }
+
+(* base tools *)
+
+let e_label ?loc l e = { e with e_label = l; e_loc = loc }
+
+let e_label_add l e = { e with e_label = Slab.add l e.e_label }
+
+let e_label_copy { e_label = lab; e_loc = loc } e =
+  let lab = Slab.union lab e.e_label in
+  let loc = if e.e_loc = None then loc else e.e_loc in
+  { e with e_label = lab; e_loc = loc }
+
+exception ItyExpected of expr
+exception CtyExpected of expr
+
+let ity_of_expr e = match e.e_vty with
+  | VtyI ity -> ity
+  | VtyC _ -> Loc.error ?loc:e.e_loc (ItyExpected e)
+
+let cty_of_expr e = match e.e_vty with
+  | VtyI _ -> Loc.error ?loc:e.e_loc (CtyExpected e)
+  | VtyC cty -> cty
+
+(* smart constructors *)
+
+let mk_expr node vty ghost eff = {
+  e_node   = node;
+  e_vty    = vty;
+  e_ghost  = ghost;
+  e_effect = eff;
+  e_label  = Slab.empty;
+  e_loc    = None;
+}
+
+let e_var pv = mk_expr (Evar pv) (VtyI pv.pv_ity) pv.pv_ghost eff_empty
+let e_sym ps = mk_expr (Esym ps) (VtyC ps.ps_cty) ps.ps_ghost eff_empty
+
+let e_const c =
+  let ity = match c with
+    | Number.ConstInt _ -> ity_int
+    | Number.ConstReal _ -> ity_real in
+  mk_expr (Econst c) (VtyI ity) false eff_empty
+
+let e_nat_const n =
+  e_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
+
+let create_let_defn id e =
+  let ghost = e.e_ghost in
+  let lv = match e.e_vty with
+    | VtyI ity -> ValV (create_pvsymbol id ~ghost ity)
+    | VtyC cty -> ValS (create_psymbol id ~ghost ~kind:PKnone cty) in
+  { let_sym = lv; let_expr = e }
+
+let create_let_defn_pv id e =
+  (* let_defn * pvsymbol *)
+  assert false
+
+let create_let_defn_ps id ?(kind=PKnone) e = assert false
+
+(*
+let create_let_defn_ps id ?(kind=PKnone) e = match e.e_vty, kind with
+  | VtyI
+  | _, PKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_ps"
+  |
+  | _ ->
+      let ps = create_psymbol id ~ghost:e.
+  (* let_defn * psymbol *)
+  assert false
+*)

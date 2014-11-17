@@ -78,6 +78,8 @@ val create_prog_pattern :
 
 (** {2 Program expressions} *)
 
+type lazy_op = Eand | Eor
+
 type assertion_kind = Assert | Assume | Check
 
 type for_direction = To | DownTo
@@ -108,10 +110,13 @@ type expr = private {
 and expr_node = private
   | Evar    of pvsymbol
   | Esym    of psymbol
+  | Econst  of Number.constant
   | Eapp    of expr * pvsymbol list * cty
   | Efun    of expr
   | Elet    of let_defn * expr
   | Erec    of rec_defn * expr
+  | Enot    of expr
+  | Elazy   of lazy_op * expr * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (prog_pattern * expr) list
   | Eassign of expr * pvsymbol (*field*) * pvsymbol
@@ -138,3 +143,25 @@ and fun_defn = {
   fun_expr : expr; (* Efun *)
   fun_varl : variant list;
 }
+
+val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
+val e_label_add : label -> expr -> expr
+val e_label_copy : expr -> expr -> expr
+
+exception ItyExpected of expr
+exception CtyExpected of expr
+
+val ity_of_expr : expr -> ity
+val cty_of_expr : expr -> cty
+
+(** {2 Smart constructors} *)
+
+val e_var : pvsymbol -> expr
+val e_sym : psymbol  -> expr
+
+val e_const : Number.constant -> expr
+val e_nat_const : int -> expr
+
+val create_let_defn    : preid -> expr -> let_defn
+val create_let_defn_pv : preid -> expr -> let_defn * pvsymbol
+val create_let_defn_ps : preid -> ?kind:ps_kind -> expr -> let_defn * psymbol

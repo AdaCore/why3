@@ -635,6 +635,11 @@ let eff_is_empty e =
   Sexn.is_empty e.eff_raises &&
   not e.eff_diverg
 
+let eff_is_pure e =
+  Mreg.is_empty e.eff_writes &&
+  Sexn.is_empty e.eff_raises &&
+  not e.eff_diverg
+
 let eff_equal e1 e2 =
   Mreg.equal Spv.equal e1.eff_writes e2.eff_writes &&
   Mreg.equal Sreg.equal e1.eff_resets e2.eff_resets &&
@@ -822,16 +827,20 @@ let check_tvs reads result pre post xpost =
       (UnboundTypeVar (Stv.choose (Stv.diff ttv tvs))) in
   spec_t_fold check_tvs () pre post xpost
 
+let check_pre pre = List.iter (fun p -> if p.t_ty <> None
+  then Loc.error ?loc:p.t_loc (Term.FmlaExpected p)) pre
+
+let check_post exn ity post =
+  let ty = ty_of_ity ity in
+  List.iter (fun q -> match q.t_node with
+    | Teps _ -> Ty.ty_equal_check ty (t_type q)
+    | _ -> raise exn) post
+
 let create_cty args pre post xpost reads effect result =
   let exn = Invalid_argument "Ity.create_cty" in
   (* pre, post, and xpost are well-typed *)
-  let check_post ity f = match f.t_node with
-    | Teps _ -> Ty.ty_equal_check (ty_of_ity ity) (t_type f)
-    | _ -> raise exn in
-  List.iter (fun f -> if f.t_ty <> None then
-    Loc.error ?loc:f.t_loc (Term.FmlaExpected f)) pre;
-  List.iter (check_post result) post;
-  Mexn.iter (fun xs q -> List.iter (check_post xs.xs_ity) q) xpost;
+  check_pre pre; check_post exn result post;
+  Mexn.iter (fun xs xq -> check_post exn xs.xs_ity xq) xpost;
   (* the arguments must be pairwise distinct *)
   let sarg = List.fold_right (Spv.add_new exn) args Spv.empty in
   (* complete reads and freeze the external context *)
@@ -908,9 +917,19 @@ let cty_add_reads c pvs =
            cty_freeze = Spv.fold freeze_pv pvs c.cty_freeze }
 
 let cty_add_pre c pre =
-  List.iter (fun f -> if f.t_ty <> None then
-    Loc.error ?loc:f.t_loc (Term.FmlaExpected f)) pre;
+  check_pre pre;
   let pvs = List.fold_left t_freepvs Spv.empty pre in
   let c = cty_add_reads c pvs in
   check_tvs c.cty_reads c.cty_result pre [] Mexn.empty;
   { c with cty_pre = pre @ c.cty_pre }
+
+let cty_add_post c post =
+  check_post (Invalid_argument "Ity.cty_add_post") c.cty_result post;
+  let pvs = List.fold_left t_freepvs Spv.empty post in
+  let c = cty_add_reads c pvs in
+  check_tvs c.cty_reads c.cty_result [] post Mexn.empty;
+  { c with cty_post = post @ c.cty_post }
+
+let cty_pop_post c = match c.cty_post with
+  | [] -> invalid_arg "Ity.cty_pop_post"
+  | _::post -> { c with cty_post = post }

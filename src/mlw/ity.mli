@@ -266,6 +266,7 @@ val eff_equal : effect -> effect -> bool
 val eff_union : effect -> effect -> effect
 
 val eff_is_empty : effect -> bool
+val eff_is_pure  : effect -> bool
 
 val eff_write : effect -> region -> pvsymbol option -> effect
 val eff_raise : effect -> xsymbol -> effect
@@ -333,3 +334,12 @@ val cty_add_pre : cty -> pre list -> cty
     This function performs capture: the formulas in [fl] may refer to
     the variables in [cty.cty_args]. Only the new external dependencies
     in [fl] are added to [cty.cty_reads] and frozen. *)
+
+val cty_add_post : cty -> post list -> cty
+(** [cty_add_post cty fl] appends post-conditions in [fl] to [cty.cty_post].
+    This function performs capture: the formulas in [fl] may refer to the
+    variables in [cty.cty_args]. Only the new external dependencies in [fl]
+    are added to [cty.cty_reads] and frozen. *)
+
+val cty_pop_post : cty -> cty
+(** [cty_pop_post cty] removes the first post-condition from [cty.cty_post]. *)
