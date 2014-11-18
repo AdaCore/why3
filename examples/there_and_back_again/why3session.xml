@@ -7,7 +7,7 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../there_and_back_again.mlw" expanded="true">
-<theory name="Convolution" sum="140c7a774b0ea66d8bf9d025eb37a013" expanded="true">
+<theory name="Convolution" sum="ba0b2f319de0699f33cf9bce8b499d5e" expanded="true">
  <goal name="WP_parameter convolution_rec" expl="VC for convolution_rec">
  <transf name="split_goal_wp">
   <goal name="WP_parameter convolution_rec.1" expl="1. postcondition">
@@ -48,7 +48,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter palindrome_rec.3" expl="3. postcondition">
-  <proof prover="3"><result status="valid" time="1.20"/></proof>
+  <proof prover="3"><result status="valid" time="1.88"/></proof>
   </goal>
   <goal name="WP_parameter palindrome_rec.4" expl="4. postcondition">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -73,14 +73,14 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter palindrome_rec.11" expl="11. exceptional postcondition">
-  <proof prover="1"><result status="valid" time="0.35"/></proof>
+  <proof prover="1"><result status="valid" time="0.50"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter palindrome_rec.12" expl="12. unreachable point">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter palindrome_rec.13" expl="13. exceptional postcondition">
-  <proof prover="0" edited="there_and_back_again_Palindrome_WP_parameter_palindrome_rec_2.v"><result status="valid" time="1.15"/></proof>
+  <proof prover="0" edited="there_and_back_again_Palindrome_WP_parameter_palindrome_rec_2.v"><result status="valid" time="1.99"/></proof>
   </goal>
   <goal name="WP_parameter palindrome_rec.14" expl="14. unreachable point">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
