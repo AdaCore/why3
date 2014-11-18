@@ -334,3 +334,66 @@ let create_let_defn_ps id ?(kind=PKnone) e =
     | VtyC c, _ -> c in
   let ps = create_psymbol id ~ghost:e.e_ghost ~kind cty in
   { let_sym = ValS ps; let_expr = e }, ps
+
+let rec get_reads pvs pss acc e =
+  let add_v acc v =
+    if Spv.mem v pvs then acc else Spv.add v acc in
+  let add_c acc c =
+    let pvs = List.fold_right Spv.add c.cty_args pvs in
+    Spv.union (Spv.diff c.cty_reads pvs) acc in
+  let add_s acc s =
+    if Sps.mem s pss then acc else add_c acc s.ps_cty in
+  match e.e_node with
+  | Evar v -> add_v acc v
+  | Esym s -> add_s acc s
+  | Efun _ | Eany  -> add_c acc (cty_of_expr e)
+  | Eapp (e,l,_) ->
+      get_reads pvs pss (List.fold_left add_v acc l) e
+  | Elet ({let_sym = ValV v; let_expr = d},e) ->
+      get_reads (Spv.add v pvs) pss (get_reads pvs pss acc d) e
+  | Elet ({let_sym = ValS s; let_expr = d},e) ->
+      get_reads pvs (Sps.add s pss) (get_reads pvs pss acc d) e
+  | Erec ({rec_defn = fdl},e) ->
+      let add_ps pss fd = Sps.add fd.fun_sym pss in
+      let pss = List.fold_left add_ps pss fdl in
+      (* we ignore variants as they will appear in the bodies *)
+      let add_fd acc fd = get_reads pvs pss acc fd.fun_expr in
+      get_reads pvs pss (List.fold_left add_fd acc fdl) e
+  | Enot e | Eraise (_,e) | Eghost e ->
+      get_reads pvs pss acc e
+  | Elazy (_,d,e) ->
+      get_reads pvs pss (get_reads pvs pss acc d) e
+  | Eif (c,d,e) ->
+      let acc = get_reads pvs pss acc c in
+      get_reads pvs pss (get_reads pvs pss acc d) e
+  | Eassign (e,_,v) ->
+      get_reads pvs pss (add_v acc v) e
+  | Etry (e,xl) ->
+      let add acc (_,v,e) =
+        get_reads (Spv.add v pvs) pss acc e in
+      List.fold_left add (get_reads pvs pss acc e) xl
+  | Ecase (d,bl) ->
+      let add acc (pp,e) =
+        let pvs = pvs_of_vss pvs pp.pp_pat.pat_vars in
+        get_reads pvs pss acc e in
+      List.fold_left add (get_reads pvs pss acc d) bl
+  | Ewhile (d,inv,vl,e) ->
+      let acc = get_reads pvs pss acc d in
+      let spc = t_freepvs Spv.empty inv in
+      let add spc (t,_) = t_freepvs spc t in
+      let spc = List.fold_left add spc vl in
+      let acc = Spv.union (Spv.diff spc pvs) acc in
+      get_reads pvs pss acc e
+  | Efor (v,(f,_,t),inv,e) ->
+      let pvs = Spv.add v pvs in
+      let spc = t_freepvs Spv.empty inv in
+      let acc = Spv.union (Spv.diff spc pvs) acc in
+      get_reads pvs pss (add_v (add_v acc f) t) e
+  | Eassert (_,t) | Epure t ->
+      Spv.union (Spv.diff (t_freepvs Spv.empty t) pvs) acc
+  | Econst _ | Eabsurd -> acc
+
+let e_fun args p q xq e =
+  let pvs = get_reads Spv.empty Sps.empty Spv.empty e in
+  let c = create_cty args p q xq pvs e.e_effect (ity_of_expr e) in
+  mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty

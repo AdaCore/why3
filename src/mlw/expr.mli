@@ -166,3 +166,6 @@ val e_nat_const : int -> expr
 val create_let_defn    : preid -> expr -> let_defn
 val create_let_defn_pv : preid -> expr -> let_defn * pvsymbol
 val create_let_defn_ps : preid -> ?kind:ps_kind -> expr -> let_defn * psymbol
+
+val e_fun :
+  pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> expr
