@@ -38,9 +38,9 @@ change ((if why_decidable_eq x y then 1 else 0) + num_occ x r = 0 + num_occ x r)
 now case why_decidable_eq.
 Qed.
 
-Lemma Num_Occ_pos : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l:(list a)), (0 <= (num_occ x l))%Z.
-Proof.
+(* Why3 goal *)
+Lemma Num_Occ_NonNeg : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+  (l:(list a)), (0%Z <= (num_occ x l))%Z.
 intros a a_WT x l.
 induction l as [|lh lt IHl].
 easy.
@@ -61,7 +61,7 @@ simpl.
 case why_decidable_eq ; intros H ; split.
 intros _.
 clear.
-generalize (Num_Occ_pos x lt).
+generalize (Num_Occ_NonNeg x lt).
 omega.
 now left.
 intros [H'|H'] ; try easy.
