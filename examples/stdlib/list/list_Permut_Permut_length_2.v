@@ -23,7 +23,7 @@ Axiom num_occ_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
       ((~ (x = y)) -> ((num_occ x l) = (0%Z + (num_occ x r))%Z))
   end.
 
-Axiom Num_Occ_Positive : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+Axiom Num_Occ_NonNeg : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
   (l:(list a)), (0%Z <= (num_occ x l))%Z.
 
 (* Why3 assumption *)

@@ -392,7 +392,7 @@ theory NumOcc
     end
   (** number of occurrences of [x] in [l] *)
 
-  lemma Num_Occ_Positive: forall x:'a, l: list 'a. num_occ x l >= 0
+  lemma Num_Occ_NonNeg: forall x:'a, l: list 'a. num_occ x l >= 0
 
   use import Mem
 
