@@ -10,8 +10,9 @@
 <prover id="5" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Gappa" version="1.1.1" timelimit="5" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../power2.why" expanded="true">
-<theory name="Pow2int" sum="2be2f1bf874aa33d74620249da9f7a0e" expanded="true">
+<theory name="Pow2int" sum="66aadb2d4ebebe837dd89ae394896e69" expanded="true">
  <goal name="Power_1">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -470,7 +471,8 @@
  <goal name="Div_mult_inst">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="Div_double" expanded="true">
+ <goal name="Div_double">
+ <proof prover="8"><result status="valid" time="0.67"/></proof>
  </goal>
  <goal name="Div_pow">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -479,7 +481,7 @@
  </goal>
  <goal name="Div_double_neg">
  <proof prover="1"><result status="valid" time="0.16"/></proof>
- <proof prover="2"><result status="valid" time="4.24"/></proof>
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Div_pow2">
@@ -488,10 +490,10 @@
  <proof prover="5"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="Mod_pow2_gen">
- <proof prover="0" edited="power2_Pow2int_Mod_pow2_gen_1.v"><result status="valid" time="1.80"/></proof>
+ <proof prover="0" edited="power2_Pow2int_Mod_pow2_gen_1.v"><result status="valid" time="2.58"/></proof>
  </goal>
 </theory>
-<theory name="Pow2real" sum="1ec4bbfa2dd1a77ebbc8d9c2cbcbaff9" expanded="true">
+<theory name="Pow2real" sum="ab6b6777a04e21b64969202f62fd2955" expanded="true">
  <goal name="Power_s_all">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -548,7 +550,7 @@
  <proof prover="0" edited="power2_Pow2real_Power_sum_1.v"><result status="valid" time="1.27"/></proof>
  </goal>
  <goal name="Pow2_int_real">
- <proof prover="0" edited="power2_Pow2real_Pow2_int_real_1.v"><result status="valid" time="1.20"/></proof>
+ <proof prover="0" edited="power2_Pow2real_Pow2_int_real_1.v"><result status="valid" time="1.85"/></proof>
  </goal>
 </theory>
 </file>

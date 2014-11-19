@@ -88,11 +88,14 @@ theory EuclideanDivision
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
 
-  axiom Div_bound:
-    forall x y:int. x >= 0 /\ y > 0 -> 0 <= div x y <= x
-
   axiom Mod_bound:
     forall x y:int. y <> 0 -> 0 <= mod x y < abs y
+
+  lemma Div_unique:
+    forall x y q:int. y > 0 -> q * y <= x < q * y + y -> div x y = q
+
+  lemma Div_bound:
+    forall x y:int. x >= 0 /\ y > 0 -> 0 <= div x y <= x
 
   lemma Mod_1: forall x:int. mod x 1 = 0
 

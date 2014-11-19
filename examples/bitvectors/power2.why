@@ -88,22 +88,22 @@ theory Pow2int
           div (x * 1 + z) x = 1 + div z x
 
   lemma Div_double:
-    forall x y:int. 0 < y <= x < 2*y -> div x y = 1 
+    forall x y:int. 0 < y <= x < 2*y -> div x y = 1
 
-  lemma Div_pow: forall x i:int. 
+  lemma Div_pow: forall x i:int.
     i > 0 -> pow2 (i-1) <= x < pow2 i -> div x (pow2 (i-1)) = 1
 
   lemma Div_double_neg:
-    forall x y:int. -2*y <= x < -y < 0 -> div x y = -2 
+    forall x y:int. -2*y <= x < -y < 0 -> div x y = -2
 
-  lemma Div_pow2: forall x i:int. 
+  lemma Div_pow2: forall x i:int.
     i > 0 -> -pow2 i <= x < -pow2 (i-1) -> div x (pow2 (i-1)) = -2
 
 (*
   lemma Mod_pow2: forall x i:int. mod (x + pow2 i) 2 = mod x 2
 *)
 
-  lemma Mod_pow2_gen: forall x i k :int. 
+  lemma Mod_pow2_gen: forall x i k :int.
     0 <= k < i -> mod (div (x + pow2 i) (pow2 k)) 2 = mod (div x (pow2 k)) 2
 
 end
@@ -153,6 +153,6 @@ end
 
 (*
 Local Variables:
-compile-command: "why3ide power2.why"
+compile-command: "why3 ide power2.why"
 End:
 *)
