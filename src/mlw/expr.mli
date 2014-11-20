@@ -90,6 +90,8 @@ type invariant = term
 
 type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
+type assign = pvsymbol * pvsymbol * pvsymbol (* region * field * value *)
+
 type vty =
   | VtyI of ity
   | VtyC of cty
@@ -119,7 +121,7 @@ and expr_node = private
   | Elazy   of lazy_op * expr * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (prog_pattern * expr) list
-  | Eassign of expr * pvsymbol (*field*) * pvsymbol
+  | Eassign of assign list
   | Ewhile  of expr * invariant * variant list * expr
   | Efor    of pvsymbol * for_bounds * invariant * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
@@ -163,9 +165,12 @@ val e_sym : psymbol  -> expr
 val e_const : Number.constant -> expr
 val e_nat_const : int -> expr
 
-val create_let_defn    : preid -> expr -> let_defn
-val create_let_defn_pv : preid -> expr -> let_defn * pvsymbol
-val create_let_defn_ps : preid -> ?kind:ps_kind -> expr -> let_defn * psymbol
+val create_let_defn : preid -> ?ghost:bool -> expr -> let_defn
+
+val create_let_defn_pv : preid -> ?ghost:bool -> expr -> let_defn * pvsymbol
+
+val create_let_defn_ps :
+  preid -> ?ghost:bool -> ?kind:ps_kind -> expr -> let_defn * psymbol
 
 val e_fun :
   pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> expr

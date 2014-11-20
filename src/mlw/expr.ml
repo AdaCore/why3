@@ -197,6 +197,8 @@ type invariant = term
 
 type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
+type assign = pvsymbol * pvsymbol * pvsymbol (* region * field * value *)
+
 type vty =
   | VtyI of ity
   | VtyC of cty
@@ -226,7 +228,7 @@ and expr_node =
   | Elazy   of lazy_op * expr * expr
   | Eif     of expr * expr * expr
   | Ecase   of expr * (prog_pattern * expr) list
-  | Eassign of expr * pvsymbol (*field*) * pvsymbol
+  | Eassign of assign list
   | Ewhile  of expr * invariant * variant list * expr
   | Efor    of pvsymbol * for_bounds * invariant * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
@@ -297,14 +299,15 @@ let e_const c =
 let e_nat_const n =
   e_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
 
-let create_let_defn id e =
-  let ghost = e.e_ghost in
+let create_let_defn id ?(ghost=false) e =
+  let ghost = ghost || e.e_ghost in
   let lv = match e.e_vty with
     | VtyC c -> ValS (create_psymbol id ~ghost ~kind:PKnone c)
     | VtyI i -> ValV (create_pvsymbol id ~ghost i) in
   { let_sym = lv; let_expr = e }
 
-let create_let_defn_pv id e =
+let create_let_defn_pv id ?(ghost=false) e =
+  let ghost = ghost || e.e_ghost in
   let ity = match e.e_vty with
     | VtyC ({ cty_args = args; cty_result = res } as c) ->
         let error s = Loc.errorm
@@ -318,10 +321,11 @@ let create_let_defn_pv id e =
         if c.cty_pre <> [] then error "is partial";
         List.fold_right (fun a i -> ity_func a.pv_ity i) args res
     | VtyI i -> i in
-  let pv = create_pvsymbol id ~ghost:e.e_ghost ity in
+  let pv = create_pvsymbol id ~ghost ity in
   { let_sym = ValV pv; let_expr = e }, pv
 
-let create_let_defn_ps id ?(kind=PKnone) e =
+let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
+  let ghost = ghost || e.e_ghost in
   let cty = match e.e_vty, kind with
     | _, PKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_ps"
     | VtyI _, (PKnone|PKlocal|PKlemma) -> Loc.errorm
@@ -332,68 +336,125 @@ let create_let_defn_ps id ?(kind=PKnone) e =
     | VtyI _, (PKfunc _|PKpred) -> Loc.errorm
         "this expression is non-pure, it cannot be used as a pure function"
     | VtyC c, _ -> c in
-  let ps = create_psymbol id ~ghost:e.e_ghost ~kind cty in
+  let ps = create_psymbol id ~ghost ~kind cty in
   { let_sym = ValS ps; let_expr = e }, ps
 
 let rec get_reads pvs pss acc e =
-  let add_v acc v =
-    if Spv.mem v pvs then acc else Spv.add v acc in
-  let add_c acc c =
-    let pvs = List.fold_right Spv.add c.cty_args pvs in
-    Spv.union (Spv.diff c.cty_reads pvs) acc in
-  let add_s acc s =
-    if Sps.mem s pss then acc else add_c acc s.ps_cty in
+  let add_r acc r = Spv.union (Spv.diff r pvs) acc in
+  let add_c acc c = add_r acc c.cty_reads in
+  let add_v acc v = if Spv.mem v pvs then acc else Spv.add v acc in
+  let add_s acc s = if Sps.mem s pss then acc else add_c acc s.ps_cty in
   match e.e_node with
   | Evar v -> add_v acc v
   | Esym s -> add_s acc s
   | Efun _ | Eany  -> add_c acc (cty_of_expr e)
-  | Eapp (e,l,_) ->
-      get_reads pvs pss (List.fold_left add_v acc l) e
+  | Eapp (e,l,_) -> get_reads pvs pss (List.fold_left add_v acc l) e
   | Elet ({let_sym = ValV v; let_expr = d},e) ->
       get_reads (Spv.add v pvs) pss (get_reads pvs pss acc d) e
   | Elet ({let_sym = ValS s; let_expr = d},e) ->
       get_reads pvs (Sps.add s pss) (get_reads pvs pss acc d) e
   | Erec ({rec_defn = fdl},e) ->
-      let add_ps pss fd = Sps.add fd.fun_sym pss in
-      let pss = List.fold_left add_ps pss fdl in
+      let add_rs pss fd = Sps.add fd.fun_sym pss in
+      let pss = List.fold_left add_rs pss fdl in
       (* we ignore variants as they will appear in the bodies *)
       let add_fd acc fd = get_reads pvs pss acc fd.fun_expr in
       get_reads pvs pss (List.fold_left add_fd acc fdl) e
-  | Enot e | Eraise (_,e) | Eghost e ->
-      get_reads pvs pss acc e
-  | Elazy (_,d,e) ->
-      get_reads pvs pss (get_reads pvs pss acc d) e
+  | Enot e | Eraise (_,e) | Eghost e -> get_reads pvs pss acc e
+  | Elazy (_,d,e) -> get_reads pvs pss (get_reads pvs pss acc d) e
   | Eif (c,d,e) ->
       let acc = get_reads pvs pss acc c in
       get_reads pvs pss (get_reads pvs pss acc d) e
-  | Eassign (e,_,v) ->
-      get_reads pvs pss (add_v acc v) e
-  | Etry (e,xl) ->
-      let add acc (_,v,e) =
-        get_reads (Spv.add v pvs) pss acc e in
-      List.fold_left add (get_reads pvs pss acc e) xl
+  | Eassign al ->
+      let add acc (r,_,v) = add_v (add_v acc r) v in
+      List.fold_left add acc al
+  | Etry (d,xl) ->
+      let add acc (_,v,e) = get_reads (Spv.add v pvs) pss acc e in
+      List.fold_left add (get_reads pvs pss acc d) xl
   | Ecase (d,bl) ->
       let add acc (pp,e) =
-        let pvs = pvs_of_vss pvs pp.pp_pat.pat_vars in
-        get_reads pvs pss acc e in
+        get_reads (pvs_of_vss pvs pp.pp_pat.pat_vars) pss acc e in
       List.fold_left add (get_reads pvs pss acc d) bl
   | Ewhile (d,inv,vl,e) ->
-      let acc = get_reads pvs pss acc d in
-      let spc = t_freepvs Spv.empty inv in
       let add spc (t,_) = t_freepvs spc t in
-      let spc = List.fold_left add spc vl in
-      let acc = Spv.union (Spv.diff spc pvs) acc in
-      get_reads pvs pss acc e
+      let spc = List.fold_left add (t_freepvs Spv.empty inv) vl in
+      get_reads pvs pss (get_reads pvs pss (add_r acc spc) d) e
   | Efor (v,(f,_,t),inv,e) ->
-      let pvs = Spv.add v pvs in
-      let spc = t_freepvs Spv.empty inv in
-      let acc = Spv.union (Spv.diff spc pvs) acc in
-      get_reads pvs pss (add_v (add_v acc f) t) e
-  | Eassert (_,t) | Epure t ->
-      Spv.union (Spv.diff (t_freepvs Spv.empty t) pvs) acc
+      let acc = add_r acc (Spv.remove v (t_freepvs Spv.empty inv)) in
+      get_reads (Spv.add v pvs) pss (add_v (add_v acc f) t) e
+  | Eassert (_,t) | Epure t -> add_r acc (t_freepvs Spv.empty t)
   | Econst _ | Eabsurd -> acc
 
-let e_fun args p q xq e =
+let pv_r_visible v vis =
+  if v.pv_ghost then vis else ity_r_visible vis v.pv_ity
+
+let cty_r_visible c =
+  List.fold_right pv_r_visible c.cty_args
+    (Spv.fold pv_r_visible c.cty_reads Sreg.empty)
+
+(*  A non-ghost application can perform ghost writes into ghost fields
+    or into ghost arguments. The former is always safe, but the latter
+    is illegal, if we submit a visible region inside a ghost argument.
+    A write effect of a computation is ghost whenever the modified region
+    is not visible in any non-ghost argument or read dependency. Indeed,
+    if there is at least one non-ghost dependency of a computation where
+    the modified region is visible, then the write can not be ghost, or
+    the computation itself would have been rejected. For this check to
+    be correct, Ity.cty_apply does not accept non-ghost pvsymbols for
+    ghost arguments. Otherwise, we would put a non-ghost pvsymbol in
+    cty_reads and would mistakenly consider the write effect non-ghost. *)
+let cty_ghost_writes gh c =
+  let wr = c.cty_effect.eff_writes in
+  (* If we only write into ghost fields, we do not care.
+     However, if the type is private, we do not know all
+     modified fields, and thus cannot exclude the region. *)
+  let wr = Mreg.filter (fun r fs -> r.reg_its.its_private
+        || Spv.exists (fun f -> not f.pv_ghost) fs) wr in
+  if gh || Mreg.is_empty wr then wr
+      else Mreg.set_diff wr (cty_r_visible c)
+
+let rec check_ghost_writes vis gh e =
+  let gh = gh || e.e_ghost in
+  let add_v v vis = if gh then vis else pv_r_visible v vis in
+  let add_s s vis = if gh || s.ps_ghost then vis else
+    Spv.fold pv_r_visible s.ps_cty.cty_reads vis in
+  let error () = Loc.errorm ?loc:e.e_loc
+    "this expression makes a ghost write in a non-ghost location" in
+  match e.e_node with
+  | Evar _ | Esym _ | Efun _ | Eany
+  | Eassert _ | Epure _ | Econst _ | Eabsurd -> ()
+  | Enot e | Eraise (_,e) | Eghost e
+  | Erec (_,e) | Efor (_,_,_,e) ->
+      check_ghost_writes vis gh e
+  | Elazy (_,d,e) | Ewhile (d,_,_,e) ->
+      check_ghost_writes vis gh d; check_ghost_writes vis gh e
+  | Eif (c,d,e) -> check_ghost_writes vis gh c;
+      check_ghost_writes vis gh d; check_ghost_writes vis gh e
+  | Elet ({let_sym = ValV v; let_expr = d},e) ->
+      check_ghost_writes vis gh d;
+      check_ghost_writes (add_v v vis) gh e;
+  | Elet ({let_sym = ValS s; let_expr = d},e) ->
+      check_ghost_writes vis gh d;
+      check_ghost_writes (add_s s vis) gh e
+  | Etry (d,xl) ->
+      check_ghost_writes vis gh d;
+      List.iter (fun (_,_,e) -> check_ghost_writes vis gh e) xl
+  | Ecase (d,bl) ->
+      check_ghost_writes vis gh d;
+      List.iter (fun (pp,e) ->
+        let pvs = pvs_of_vss Spv.empty pp.pp_pat.pat_vars in
+        check_ghost_writes (Spv.fold add_v pvs vis) gh e) bl
+  | Eassign al ->
+      List.iter (fun (r,f,v) -> (* ghost writes in visible fields *)
+        if not f.pv_ghost && (gh || r.pv_ghost || v.pv_ghost) then
+        match r.pv_ity.ity_node with
+        | Ityreg r when Sreg.mem r vis -> error () | _ -> ()) al
+  | Eapp (e,vl,c) ->
+      if c.cty_args <> [] (* partial application *) ||
+         Mreg.set_disjoint vis (cty_ghost_writes gh c)
+      then check_ghost_writes vis gh e else error ()
+
+let e_fun args p q xq ({e_effect = eff} as e) =
   let pvs = get_reads Spv.empty Sps.empty Spv.empty e in
-  let c = create_cty args p q xq pvs e.e_effect (ity_of_expr e) in
+  let c = create_cty args p q xq pvs eff (ity_of_expr e) in
+  check_ghost_writes (cty_r_visible c) false e;
   mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty

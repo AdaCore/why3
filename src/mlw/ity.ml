@@ -815,12 +815,14 @@ let spec_t_fold fn_t acc pre post xpost =
   let acc = fn_l (fn_l acc pre) post in
   Mexn.fold (fun _ l a -> fn_l a l) xpost acc
 
-let check_tvs reads result pre post xpost =
+let check_tvs reads args result pre post xpost =
   (* every type variable in spec comes either from a known vsymbol
      or from the result type. We need this to ensure that we always
      can do a full instantiation. TODO: do we really need this? *)
   let add_pv v s = ity_freevars s v.pv_ity in
-  let tvs = Spv.fold add_pv reads (ity_freevars Stv.empty result) in
+  let tvs = ity_freevars Stv.empty result in
+  let tvs = List.fold_right add_pv args tvs in
+  let tvs = Spv.fold add_pv reads tvs in
   let check_tvs () t =
     let ttv = t_ty_freevars Stv.empty t in
     if not (Stv.subset ttv tvs) then Loc.error ?loc:t.t_loc
@@ -843,11 +845,11 @@ let create_cty args pre post xpost reads effect result =
   Mexn.iter (fun xs xq -> check_post exn xs.xs_ity xq) xpost;
   (* the arguments must be pairwise distinct *)
   let sarg = List.fold_right (Spv.add_new exn) args Spv.empty in
-  (* complete reads and freeze the external context *)
+  (* remove args from reads and freeze the external context *)
   let reads = spec_t_fold t_freepvs reads pre post xpost in
-  let freeze = Spv.fold freeze_pv (Spv.diff reads sarg) isb_empty in
-  let reads = Spv.union reads sarg in
-  check_tvs reads result pre post xpost;
+  let reads = Spv.diff reads sarg in
+  let freeze = Spv.fold freeze_pv reads isb_empty in
+  check_tvs reads args result pre post xpost;
   (* remove exceptions whose postcondition is False *)
   let is_false _ xq = List.exists (t_equal t_false) xq in
   let nothrow = Mexn.filter is_false xpost in
@@ -873,7 +875,7 @@ let t_subst_l        vsb l = List.map (fun t -> t_subst        vsb t) l
 
 let cty_apply c pvl args res =
   let rec apply isb same gh vsb al vl = match al, vl with
-    | a::al, v::vl ->
+    | a::al, v::vl when v.pv_ghost || not a.pv_ghost ->
         let isb = ity_match isb a.pv_ity v.pv_ity in
         let same = same && ity_equal a.pv_ity v.pv_ity in
         let gh = gh || (v.pv_ghost && not a.pv_ghost) in
@@ -884,7 +886,7 @@ let cty_apply c pvl args res =
           List.fold_right freeze_pv pvl c.cty_freeze in
         let same = same && ity_equal c.cty_result res &&
           List.for_all2 (fun a t -> ity_equal a.pv_ity t) al args in
-        if same && pvl = [] then gh, c (*what was the point?*) else
+        if same && pvl = [] then gh, c else
         let eff, subst_l =
           if same then c.cty_effect, t_subst_l else
           let isb = List.fold_left2 (fun s a ity ->
@@ -901,9 +903,7 @@ let cty_apply c pvl args res =
           Mvs.add a.pv_vs (t_var v.pv_vs) m) vsb al args in
         let p = subst_l vsb c.cty_pre and q = subst_l vsb c.cty_post in
         let xq = Mexn.map (fun xqfl -> subst_l vsb xqfl) c.cty_xpost in
-        let rds = List.fold_right Spv.remove c.cty_args c.cty_reads in
-        let rds = List.fold_right Spv.add args rds in
-        let rds = List.fold_right Spv.add pvl rds in
+        let rds = List.fold_right Spv.add pvl c.cty_reads in
         gh, cty_unsafe args p q xq rds eff res freeze
     | _ ->
         invalid_arg "Ity.cty_apply" in
@@ -913,21 +913,20 @@ let cty_add_reads c pvs =
   (* the external reads are already frozen and
      the arguments should stay instantiable *)
   let pvs = Spv.diff pvs c.cty_reads in
+  let pvs = List.fold_right Spv.remove c.cty_args pvs in
   { c with cty_reads  = Spv.union c.cty_reads pvs;
            cty_freeze = Spv.fold freeze_pv pvs c.cty_freeze }
 
 let cty_add_pre c pre =
   check_pre pre;
-  let pvs = List.fold_left t_freepvs Spv.empty pre in
-  let c = cty_add_reads c pvs in
-  check_tvs c.cty_reads c.cty_result pre [] Mexn.empty;
+  let c = cty_add_reads c (List.fold_left t_freepvs Spv.empty pre) in
+  check_tvs c.cty_reads c.cty_args c.cty_result pre [] Mexn.empty;
   { c with cty_pre = pre @ c.cty_pre }
 
 let cty_add_post c post =
   check_post (Invalid_argument "Ity.cty_add_post") c.cty_result post;
-  let pvs = List.fold_left t_freepvs Spv.empty post in
-  let c = cty_add_reads c pvs in
-  check_tvs c.cty_reads c.cty_result [] post Mexn.empty;
+  let c = cty_add_reads c (List.fold_left t_freepvs Spv.empty post) in
+  check_tvs c.cty_reads c.cty_args c.cty_result [] post Mexn.empty;
   { c with cty_post = post @ c.cty_post }
 
 let cty_pop_post c = match c.cty_post with

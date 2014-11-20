@@ -310,11 +310,11 @@ val create_cty : pvsymbol list ->
   pre list -> post list -> post list Mexn.t -> Spv.t -> effect -> ity -> cty
 (** [create_cty args pre post xpost reads effect result] creates a cty.
     The [cty_xpost] field does not have to cover all raised exceptions.
-    The [cty_reads] field is the union of free variables in all arguments.
-    The [cty_freeze] field freezes every pvsymbol in [cty_reads \ args].
-    The [cty_effect] field is filtered with respect to [cty_reads], and
-    fresh regions in [result] are reset. Every type variable in [pre],
-    [post], and [xpost] must come from [cty_reads] or from [result]. *)
+    The [cty_reads] field contains all unbound variables from the spec.
+    The [cty_freeze] field freezes every pvsymbol in [cty_reads].
+    The [cty_effect] field is filtered wrt [cty_reads] and [args].
+    Fresh regions in [result] are reset. Every type variable in [pre],
+    [post], and [xpost] must come from [cty_reads], [args] or [result]. *)
 
 val cty_apply : cty -> pvsymbol list -> ity list -> ity -> bool * cty
 (** [cty_apply cty pvl rest res] instantiates [cty] up to the types in
@@ -323,13 +323,14 @@ val cty_apply : cty -> pvsymbol list -> ity list -> ity -> bool * cty
     This is essentially [rest -> res], with every type variable and
     region in [pvl] freezed. The combined length of [pvl] and [rest]
     must be equal to the length of [cty.cty_args]. The instantiation
-    must be compatible with [cty.cty_freeze]. *)
+    must be compatible with [cty.cty_freeze]. Ghost formal parameters
+    can only be instantiated with ghost arguments. *)
 
 val cty_add_reads : cty -> Spv.t -> cty
 (** [cty_add_reads cty pvs] adds variables in [pvs] to [cty.cty_reads].
-    This function performs capture: if some variables in [pvs] occur
-    in [cty.cty_args], no renaming is made, and the corresponding type
-    variables and regions are not frozen. *)
+    This function performs capture: if some variables in [pvs] occur in
+    [cty.cty_args], they are removed from [pvs], and the corresponding
+    type variables and regions are not frozen. *)
 
 val cty_add_pre : cty -> pre list -> cty
 (** [cty_add_pre cty fl] appends pre-conditions in [fl] to [cty.cty_pre].
