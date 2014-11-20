@@ -153,6 +153,21 @@ why3_vc Mod_mult using assms by (simp add: emod_def add.commute)
 
 why3_vc Mod_bound using assms by (simp_all add: emod_def)
 
+
+why3_vc Div_unique using assms
+(* "0 < y \<rightarrow> q * y \<le> x < q * y + y \<rightarrow> x ediv y = q"
+ proof: 
+  we have "x = y * (x ediv y) + (x emod y)" by Div_mod
+  we have "0 \<le> x emod y < y" by Mod_bound
+  hence x - y < y * (x ediv y) \<le> x
+  case 1 : "x ediv y \<le> q - 1")
+    then "y * x ediv y <= y * (q - 1) = q * y - y \<le> x - y" absurd
+  case 2 : "x ediv y \<ge> q + 1")
+    then "y * x ediv y \<ge>= y * (q + 1) = q * y + y > x " absurd
+  case 3 : "x ediv y = q")
+    trivial
+*)
+
 why3_end
 
 
