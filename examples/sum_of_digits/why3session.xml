@@ -2,64 +2,62 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.2" timelimit="5" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../sum_of_digits.mlw" expanded="true">
-<theory name="Euler290" sum="3487864d8cb61d11f6699adac5dacda2" expanded="true">
+<theory name="Euler290" sum="c1e68472724b999eabe1c67fabc04701" expanded="true">
  <goal name="Base">
- <proof prover="2" timelimit="10"><result status="valid" time="0.01"/></proof>
+ <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="Empty">
- <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
+ <proof prover="1" timelimit="10"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="Induc" expanded="true">
  </goal>
  <goal name="WP_parameter sd" expl="VC for sd">
- <proof prover="2" timelimit="10"><result status="valid" time="0.22"/></proof>
+ <proof prover="1" timelimit="10"><result status="valid" time="0.22"/></proof>
  </goal>
  <goal name="WP_parameter f" expl="VC for f" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter f.1" expl="1. precondition">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter f.2" expl="2. postcondition">
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="1"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter f.3" expl="3. postcondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter f.4" expl="4. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter f.5" expl="5. variant decrease">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter f.6" expl="6. precondition">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter f.7" expl="7. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter f.7.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.30"/></proof>
+   <proof prover="1"><result status="valid" time="0.30"/></proof>
    </goal>
    <goal name="WP_parameter f.7.2" expl="2.">
-   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   <proof prover="1"><result status="valid" time="0.07"/></proof>
    </goal>
    <goal name="WP_parameter f.7.3" expl="3.">
-   <proof prover="2"><result status="valid" time="0.01"/></proof>
+   <proof prover="1"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter f.8" expl="8. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="1.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="1.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter f.9" expl="9. postcondition">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
