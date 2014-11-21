@@ -544,9 +544,17 @@ let save_string fmt s =
       | c -> pp_print_char fmt c
   done
 
+let opt pr lab fmt = function
+  | None -> ()
+  | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
 
 let save_result fmt r =
-  fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"/>"
+  let steps = if  r.Call_provers.pr_steps >= 0 then 
+		Some  r.Call_provers.pr_steps 
+	      else 
+		None
+  in
+  fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"%a/>"
     (match r.Call_provers.pr_answer with
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"
@@ -556,6 +564,7 @@ let save_result fmt r =
        | Call_provers.OutOfMemory -> "outofmemory"
        | Call_provers.Invalid -> "invalid")
     r.Call_provers.pr_time
+    (opt pp_print_int "steps") steps
 
 let save_status fmt s =
   match s with
@@ -574,10 +583,6 @@ let save_bool_def name def fmt b =
 
 let save_int_def name def fmt n =
   if n <> def then fprintf fmt "@ %s=\"%d\"" name n
-
-let opt pr lab fmt = function
-  | None -> ()
-  | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
 
 let opt_string = opt save_string
 
@@ -1181,11 +1186,16 @@ let load_result r =
           try float_of_string (List.assoc "time" r.Xml.attributes)
           with Not_found -> 0.0
         in
+        let steps = 
+          try int_of_string (List.assoc "steps" r.Xml.attributes)
+          with Not_found -> -1
+        in
         Done {
           Call_provers.pr_answer = answer;
           Call_provers.pr_time = time;
           Call_provers.pr_output = "";
-          Call_provers.pr_status = Unix.WEXITED 0
+          Call_provers.pr_status = Unix.WEXITED 0;
+	  Call_provers.pr_steps = steps
         }
     | "undone" -> Interrupted
     | "unedited" -> Unedited

@@ -38,6 +38,7 @@ val call_on_buffer :
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
+  ?stepslimit : int ->
   ?inplace   : bool ->
   filename   : string ->
   driver -> Buffer.t -> Call_provers.pre_prover_call
@@ -56,6 +57,7 @@ val prove_task :
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
+  ?stepslimit : int ->
   ?old       : string ->
   ?inplace   : bool ->
   driver -> Task.task -> Call_provers.pre_prover_call
@@ -71,6 +73,7 @@ val prove_task_prepared :
   command    : string ->
   ?timelimit : int ->
   ?memlimit  : int ->
+  ?stepslimit : int ->
   ?old       : string ->
   ?inplace   : bool ->
   driver -> Task.task -> Call_provers.pre_prover_call

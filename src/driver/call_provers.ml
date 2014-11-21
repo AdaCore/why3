@@ -17,6 +17,7 @@ type timeunit =
   | Min
   | Sec
   | Msec
+  | Step
 
 type timeregexp = {
   re    : Str.regexp;
@@ -34,7 +35,8 @@ let timeregexp s =
     | "m" -> add_unit Min
     | "s" -> add_unit Sec
     | "i" -> add_unit Msec
-    | _ -> failwith "unknown format specifier, use %%h, %%m, %%s, %%i"
+    | "S" -> add_unit Step
+    | _ -> failwith "unknown format specifier, use %%h, %%m, %%s, %%i, %%S"
   in
   let s = Str.global_substitute cmd_regexp replace s in
   let group = Array.make !nb Hour in
@@ -47,14 +49,16 @@ let rec grep_time out = function
     begin try
             ignore (Str.search_forward re.re out 0);
             let t = ref 0. in
+	    let s = ref (-1) in
             Array.iteri (fun i u ->
-              let v = float_of_string (Str.matched_group (succ i) out) in
+              let v = Str.matched_group (succ i) out in
               match u with
-                | Hour -> t := !t +. v *. 3600.
-                | Min  -> t := !t +. v *. 60.
-                | Sec  -> t := !t +. v
-                | Msec -> t := !t +. v /. 1000.) re.group;
-            Some !t
+                | Hour -> t := !t +. float_of_string v *. 3600.
+                | Min  -> t := !t +. float_of_string v *. 60.
+                | Sec  -> t := !t +. float_of_string v
+                | Msec -> t := !t +. float_of_string v /. 1000.
+		| Step -> s := int_of_string v ) re.group;
+            Some( !t, !s )
       with _ -> grep_time out l end
 
 (** *)
@@ -73,6 +77,7 @@ type prover_result = {
   pr_status : Unix.process_status;
   pr_output : string;
   pr_time   : float;
+  pr_steps  : int;		(* -1 if unknown *)
 }
 
 let print_prover_answer fmt = function
@@ -127,7 +132,7 @@ type pre_prover_call = unit -> prover_call
 
 let save f = f ^ ".save"
 
-let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
+let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
                  ~regexps ~timeregexps ~exitcodes
                  ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
 
@@ -147,6 +152,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
        to prepare the command line in a separate function? *)
     | "l" -> Config.libdir
     | "d" -> Config.datadir
+    | "S" -> string_of_int stepslimit
     | _ -> failwith "unknown specifier, use %%, %f, %t, %T, %U, %m, %l, or %d"
   in
   let subst s =
@@ -207,7 +213,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
               (try List.assoc n exitcodes with Not_found -> grep out regexps)
         in
         Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
-        let time = Opt.get_def time (grep_time out timeregexps) in
+        let time, step = Opt.get_def (time, -1) (grep_time out timeregexps) in
         let ans = match ans with
           | HighFailure when !on_timelimit && timelimit > 0
             && time >= (0.9 *. float timelimit) -> Timeout
@@ -216,11 +222,12 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0)
         { pr_answer = ans;
           pr_status = ret;
           pr_output = out;
-          pr_time   = time }
+          pr_time   = time;
+	  pr_steps  = step}
     in
     { call = call; pid = pid }
 
-let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
+let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
                    ~regexps ~timeregexps ~exitcodes ~filename
                    ?(inplace=false) buffer =
 
@@ -231,7 +238,7 @@ let call_on_buffer ~command ?(timelimit=0) ?(memlimit=0)
     end else
       Filename.open_temp_file "why_" ("_" ^ filename) in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~timelimit ~memlimit
+  call_on_file ~command ~timelimit ~memlimit ~stepslimit
                ~regexps ~timeregexps ~exitcodes ~cleanup:true ~inplace fin
 
 let query_call pc =

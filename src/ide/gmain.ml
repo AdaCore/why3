@@ -420,11 +420,17 @@ let set_proof_state a =
   goals_model#set ~row:row#iter ~column:status_column
     (image_of_result ~obsolete res);
   let t = match res with
-    | S.Done { Call_provers.pr_time = time } ->
+    | S.Done { Call_provers.pr_time = time; Call_provers.pr_steps = steps } ->
+       let s = 
         if gconfig.show_time_limit then
           Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
         else
           Format.sprintf "%.2f" time
+       in
+       if steps >= 0 then 
+	 Format.sprintf "%s (steps: %d)" s steps
+       else
+	 s
     | S.Unedited -> "(not yet edited)"
     | S.JustEdited -> "(edited)"
     | S.InternalFailure _ -> "(internal failure)"
@@ -991,6 +997,7 @@ let bisect_proof_attempt pa =
         M.schedule_proof_attempt
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
+	  ~stepslimit:(-1)
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
@@ -1028,6 +1035,7 @@ let bisect_proof_attempt pa =
             M.schedule_proof_attempt
               ~timelimit:!timelimit
               ~memlimit:pa.S.proof_memlimit
+	      ~stepslimit:(-1)
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
               ~command:(C.get_complete_command lp.S.prover_config)

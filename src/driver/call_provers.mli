@@ -37,6 +37,8 @@ type prover_result = {
   (** The output of the prover currently stderr and stdout *)
   pr_time   : float;
   (** The time taken by the prover *)
+  pr_steps  : int;
+  (** The number of steps taken by the prover (-1 if not available) *)
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit
@@ -72,6 +74,7 @@ val call_on_file :
   command     : string ->
   ?timelimit  : int ->
   ?memlimit   : int ->
+  ?stepslimit : int ->
   regexps     : (Str.regexp * prover_answer) list ->
   timeregexps : timeregexp list ->
   exitcodes   : (int * prover_answer) list ->
@@ -84,6 +87,7 @@ val call_on_buffer :
   command     : string ->
   ?timelimit  : int ->
   ?memlimit   : int ->
+  ?stepslimit : int ->
   regexps     : (Str.regexp * prover_answer) list ->
   timeregexps : timeregexp list ->
   exitcodes   : (int * prover_answer) list ->
