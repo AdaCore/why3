@@ -155,7 +155,26 @@ why3_vc Mod_bound using assms by (simp_all add: emod_def)
 
 
 why3_vc Div_unique using assms
-(* "0 < y \<rightarrow> q * y \<le> x < q * y + y \<rightarrow> x ediv y = q"
+sorry
+(*
+proof -
+ have h0: "y \<noteq> 0" using H1 by fastforce
+ have h1: "x = y * (x ediv y) + (x emod y)" using h0 Div_mod by blast
+ have h2: "0 \<le> x emod y \<and> x emod y < y" using assms H1 h0 Mod_bound zabs_def
+   by (metis abs_sgn monoid_mult_class.mult.right_neutral sgn_pos)
+ have "x - y < y * (x ediv y)" using h1 h2 by linarith
+ have "y * (x ediv y) \<le> x" using h1 h2 by linarith
+ assume h3: "x ediv y \<ge> q+1"
+   have "y * (x ediv y) >= y * (q + 1)" using h3 assms
+     by auto
+*)   
+   
+(*
+
+ (cases "x ediv y \<ge> q")
+   case False
+
+ "0 < y \<rightarrow> q * y \<le> x < q * y + y \<rightarrow> x ediv y = q"
  proof: 
   we have "x = y * (x ediv y) + (x emod y)" by Div_mod
   we have "0 \<le> x emod y < y" by Mod_bound
