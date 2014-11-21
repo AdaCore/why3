@@ -153,40 +153,32 @@ why3_vc Mod_mult using assms by (simp add: emod_def add.commute)
 
 why3_vc Mod_bound using assms by (simp_all add: emod_def)
 
-
 why3_vc Div_unique using assms
-sorry
-(*
-proof -
- have h0: "y \<noteq> 0" using H1 by fastforce
- have h1: "x = y * (x ediv y) + (x emod y)" using h0 Div_mod by blast
- have h2: "0 \<le> x emod y \<and> x emod y < y" using assms H1 h0 Mod_bound zabs_def
-   by (metis abs_sgn monoid_mult_class.mult.right_neutral sgn_pos)
- have "x - y < y * (x ediv y)" using h1 h2 by linarith
- have "y * (x ediv y) \<le> x" using h1 h2 by linarith
- assume h3: "x ediv y \<ge> q+1"
-   have "y * (x ediv y) >= y * (q + 1)" using h3 assms
-     by auto
-*)   
-   
-(*
-
- (cases "x ediv y \<ge> q")
-   case False
-
- "0 < y \<rightarrow> q * y \<le> x < q * y + y \<rightarrow> x ediv y = q"
- proof: 
-  we have "x = y * (x ediv y) + (x emod y)" by Div_mod
-  we have "0 \<le> x emod y < y" by Mod_bound
-  hence x - y < y * (x ediv y) \<le> x
-  case 1 : "x ediv y \<le> q - 1")
-    then "y * x ediv y <= y * (q - 1) = q * y - y \<le> x - y" absurd
-  case 2 : "x ediv y \<ge> q + 1")
-    then "y * x ediv y \<ge>= y * (q + 1) = q * y + y > x " absurd
-  case 3 : "x ediv y = q")
-    trivial
-*)
-
+ proof - 
+  have h0: "y \<noteq> 0" using assms by auto
+  have h1: "x = y * (x ediv y) + (x emod y)" using h0 Div_mod by blast
+  have h2: "0 \<le> x emod y \<and> x emod y < y" using assms H1 h0 Mod_bound zabs_def
+    by (metis abs_sgn monoid_mult_class.mult.right_neutral sgn_pos)
+  have h3: "x - y < y * (x ediv y)" using h1 h2 by linarith
+  have h4: "y * (x ediv y) \<le> x" using h1 h2 by linarith
+  show ?thesis
+  proof (cases "x ediv y \<ge> q")
+    case False
+    have h5: "x ediv y \<le> q - 1" using False by linarith
+    have h6: "y * (x ediv y) <= y * (q - 1)" by (metis H1 h5 le_less mult_left_mono)
+    have h7: "y * (x ediv y) <= q * y - y" by (metis Comm1 h6 int_distrib(4) monoid_mult_class.mult.right_neutral) 
+    thus "x ediv y = q" using H2 h3 h7 by linarith
+    next 
+    show ?thesis
+    proof (cases "x ediv y \<le> q")
+      case False 
+    have h5: "x ediv y \<ge> q + 1" using False by linarith
+    have h6: "y * (x ediv y) >= y * (q + 1)" by (metis H1 h5 le_less mult_left_mono)
+    have h7: "y * (x ediv y) >= q * y + y" by (metis Comm1 Mul_distr_l h6 monoid_mult_class.mult.right_neutral) 
+    thus "x ediv y = q" using H3 h1 h2 h7 by linarith
+    next
+    show ?thesis   
+      
 why3_end
 
 
