@@ -193,17 +193,42 @@ theory bv.BV32
   syntax function bw_xor "(bvxor %1 %2)"
   syntax function bw_not "(bvnot %1)"
 
+  syntax function add "(bvadd %1 %2)"
+  syntax function sub "(bvsub %1 %2)"
+  syntax function neg "(bvneg %1)"
+  syntax function mul "(bvmul %1 %2)"
+  syntax function udiv "(bvudiv %1 %2)"
+  syntax function urem "(bvurem %1 %2)"
+  syntax function sdiv "(bvsdiv %1 %2)"
+  syntax function srem "(bvsrem %1 %2)"
+  syntax function smod "(bvsmod %1 %2)"
+
+  syntax function rotate_left "((_ rotate_left 1) %1)"
+  syntax function rotate_right "((_ rotate_right 1) %1)"
+
   syntax function lsr "(bvlshr %1 ((_ int2bv 32) %2))"
   syntax function lsl "(bvshl %1 ((_ int2bv 32) %2))"
   syntax function asr "(bvashr %1 ((_ int2bv 32) %2))"
+  syntax function lsr_bv "(bvlshr %1 %2)"
+  syntax function lsl_bv "(bvshl %1 %2)"
+  syntax function asr_bv "(bvashr %1 %2)"
   syntax function to_uint "(bv2nat %1)"
   syntax function to_int "(ite (= ((_ extract 31 31) %1) #b0)
   	 	  	       (bv2nat %1)
 			       (- (bv2nat %1) 4294967296))"
   syntax function of_int "((_ int2bv 32) %1)"
-  syntax function nth "(= ((_ extract 0 0) (bvlshr %1 ((_ int2bv 32) %2)))
-  	 	      	  #b1)"
+  syntax function nth "(= ((_ extract 0 0) (bvlshr %1 ((_ int2bv 32) %2))) #b1)"
+  syntax function nth_bv "(= ((_ extract 0 0) (bvlshr %1 %2)) #b1)"
   syntax predicate eq "(= %1 %2)"
+
+  syntax predicate slt "(bvslt %1 %2)"
+  syntax predicate sle "(bvsle %1 %2)"
+  syntax predicate sgt "(bvsgt %1 %2)"
+  syntax predicate sge "(bvsge %1 %2)"
+  syntax predicate ult "(bvult %1 %2)"
+  syntax predicate ule "(bvule %1 %2)"
+  syntax predicate ugt "(bvugt %1 %2)"
+  syntax predicate uge "(bvuge %1 %2)"
 
   remove prop Nth_zero
   remove prop Nth_ones
@@ -211,6 +236,13 @@ theory bv.BV32
   remove prop Nth_bw_or
   remove prop Nth_bw_xor
   remove prop Nth_bw_not
+
+  (* remove prop Add_is_add *)
+  (* remove prop Min_is_min *)
+  (* remove prop Neg_is_neg *)
+  (* remove prop Mul_is_mul *)
+  (* remove prop Udiv_is_udiv *)
+
   remove prop Lsr_nth_low
   remove prop Lsr_nth_high
   remove prop Lsl_nth_low

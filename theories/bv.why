@@ -19,6 +19,8 @@ theory BitVector
   (** [nth b n] is the n-th bit of x (0 <= n < size). bit 0 is
       the least significant bit *)
 
+  function nth_bv t t : bool
+
   predicate eq (v1 v2 : t) =
     forall n:int. 0 <= n < size -> nth v1 n = nth v2 n
 
@@ -52,6 +54,9 @@ theory BitVector
     forall v:t, n:int. 0 <= n < size ->
       nth (bw_not v) n = notb (nth v n)
 
+  function rotate_left (v : t) : t
+
+  function rotate_right (v : t) : t
 
   (** logical shift right *)
   function lsr t int : t
@@ -64,6 +69,8 @@ theory BitVector
     forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> 
       nth (lsr b s) n = False
 
+  function lsr_bv t t : t
+
   (** arithmetic shift right *)
   function asr t int : t
 
@@ -73,6 +80,8 @@ theory BitVector
   axiom Asr_nth_high:
     forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n+s >= size -> nth (asr b s) n = nth b (size-1)
 
+  function asr_bv t t : t
+
   (** logical shift left *)
   function lsl t int : t
 
@@ -81,6 +90,8 @@ theory BitVector
 
   axiom Lsl_nth_low:
     forall b:t,n s:int. 0 <= s < size -> 0 <= n < size -> n-s < 0 -> nth (lsl b s) n = False
+
+  function lsl_bv t t : t
 
   (** conversion to unsigned integers *)
   function to_uint t: int
@@ -96,7 +107,81 @@ theory BitVector
   representation of the argument is truncated to [size] bits *)
   function of_int int: t
 
+  constant one : t = of_int 1
+
   (* TODO? axioms related to_int/to_unit and of_int *)
+
+  use import int.Power
+  use import int.EuclideanDivision
+
+  (** addition modulo 2^m *) 
+  function add (v1 v2 : t) : t
+  (* axiom Add_is_add: *)
+  (*   forall v1 v2:t. add v1 v2 = of_int( mod (to_int (v1) + to_int (v2)) (power 2 32)) *)
+  
+  (** 2's complement subtraction modulo 2^m *)
+  function sub (v1 v2 : t) : t
+  (* axiom Min_is_min: *)
+  (*   forall v1 v2:t. sub v1 v2 = of_int( mod (to_int (v1) - to_int (v2)) (power 2 32)) *)
+      
+  (** 2's complement unary minus *)
+  function neg (v1 : t) : t
+  (* axiom Neg_is_neg: *)
+  (*   forall v:t. neg v = of_int( mod (-to_int (v)) (power 2 32)) *)
+  
+  (** multiplication modulo 2^m *)	
+  function mul (v1 v2 : t) : t
+  (* axiom Mul_is_mul: *)
+  (*   forall v1 v2:t. mul v1 v2 = of_int( mod (to_int (v1) * to_int (v2)) (power 2 32)) *)
+
+  (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)  
+  function udiv (v1 v2 : t) : t
+  (* axiom Udiv_is_udiv: *)
+  (*   forall v1 v2:t. udiv v1 v2 = of_int (to_uint (v1) / to_uint (v2)) *)
+
+  (** unsigned remainder from truncating division (undefined if divisor is 0) *)
+  function urem (v1 v2 : t) : t
+
+  (** 2's complement signed division *)
+  function sdiv (v1 v2 : t) : t
+
+  (** 2's complement signed remainder (sign follows dividend) *)
+  function srem (v1 v2 : t) : t
+
+  (** 2's complement signed remainder (sign follows divisor) *)
+  function smod (v1 v2 : t) : t
+
+  (** binary predicate for signed less than *)
+  predicate slt (v1 v2 : t) =
+    (to_int v1) < (to_int v2)
+
+  (** binary predicate for signed less than or equal *)
+  predicate sle (v1 v2 : t) =
+    (to_int v1) <= (to_int v2)
+
+  (**  binary predicate for signed greater than *)
+  predicate sgt (v1 v2 : t) =
+    (to_int v1) > (to_int v2)
+
+  (**  binary predicate for signed greater than or equal *)
+  predicate sge (v1 v2 : t) =
+    (to_int v1) >= (to_int v2)
+
+  (** binary predicate for unsigned less than *)
+  predicate ult (v1 v2 : t) =
+    (to_uint v1) < (to_uint v2)
+
+  (** binary predicate for unsigned less than or equal *)
+  predicate ule (v1 v2 : t) =
+    (to_uint v1) <= (to_uint v2)
+
+  (**  binary predicate for unsigned greater than *)
+  predicate ugt (v1 v2 : t) =
+    (to_uint v1) > (to_uint v2)
+
+  (**  binary predicate for unsigned greater than or equal *)
+  predicate uge (v1 v2 : t) =
+    (to_uint v1) >= (to_uint v2)
 
 end
 
