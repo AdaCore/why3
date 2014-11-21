@@ -1,15 +1,125 @@
 
 module Delight
 
-  use import mach.int.Int32
+  use import int.Int
+  use import int.Power
+  use import bv.BV32
+  (* use import mach.int.Int32 *)
   use import int.EuclideanDivision
 
-  let f (x y:int32) (ghost k:int) : int32
-    requires { 0 <= k < 1 }
-    requires { to_int y = BV32.to_int (BV32.lsl (BV32.of_int 1) k) }
-    ensures { 0 <= to_int result < to_int y }
+  type int32 
+  function to_int int32 : int
+  function to_bv int32 : BV32.t
+
+  axiom conversion :
+    forall x. to_int x = BV32.to_int (to_bv x)
+
+  constant two_p31 : int = 0x8000_0000
+
+  constant zero : int32
+  axiom value_zero : to_int zero = 0
+  axiom bv_zero : to_bv zero = BV32.of_int 0
+
+  constant one : int32
+  axiom value_one : to_int one = 1
+  axiom bv_one : to_bv one = BV32.of_int 1
+
+  constant two : int32
+  axiom value_two : to_int two = 2
+  axiom bv_two : to_bv two = BV32.of_int 2
+
+  constant n31 : int32
+  axiom value_n31 : to_int n31 = 31
+  axiom bv_n31 : to_bv n31 = BV32.of_int 31
+
+  constant n32 : int32
+  axiom value_n32 : to_int n32 = 32
+  axiom bv_n32 : to_bv n32 = BV32.of_int 32
+
+  predicate eq int32 int32
+  axiom int32_eq_fbv:
+  	forall x y. ( to_bv x ) = ( to_bv y ) <-> eq x y
+  axiom int32_eq_fint:
+  	forall x y. ( to_int x ) = ( to_int y ) <-> eq x y
+
+  predicate le int32 int32
+  axiom int32_le_fbv : 
+  	forall x y. BV32.sle (to_bv x) (to_bv y) <-> le x y  
+  axiom int32_le_fint : 
+  	forall x y. (to_int x) <= (to_int y) <-> le x y  
+
+  predicate lt int32 int32
+  axiom int32_lt_fbv : 
+  	forall x y. BV32.slt (to_bv x) (to_bv y) <-> lt x y  
+  axiom int32_lt_fint : 
+  	forall x y. (to_int x) < (to_int y) <-> lt x y  
+
+  lemma mod_pow_2 : 
+    forall x y. le zero y -> lt y n32 -> 
+    	     	    mod (to_int x) (power 2 (to_int y)) 
+		  = BV32.to_int (BV32.bw_and (to_bv x) 
+		    	   		(BV32.sub (BV32.lsl_bv BV32.one (to_bv y)) 
+						  BV32.one))
+
+  val lsl_32 (x : int32 ) ( n : int32 ) : int32
+  requires{ 0 <= to_int n < 32 }
+  ensures{ to_bv result = BV32.lsl_bv ( to_bv x ) ( to_bv n ) }
+  ensures{ 0 <= to_int x -> to_int x * ( power 2 ( to_int n ) ) < two_p31
+           -> to_int result = to_int x * ( power 2 ( to_int n ) ) }
+
+  val lsr_32 (x : int32 ) ( n : int32 ) : int32
+  requires{ 0 <= to_int n < 32 }
+  ensures{ to_bv result = BV32.lsr_bv ( to_bv x ) ( to_bv n 
+) }
+  ensures{ 0 <= to_int x -> to_int result = div ( to_int x ) ( power 2 ( to_int n ) ) }
+
+  let test1 ( x : int32 ) : int32
+  requires{ 0 <= to_int x < 1000 }
+  ensures{ to_int result = 4 * to_int x } 
+  ensures{ bw_and ( to_bv result ) ( BV32.of_int 0b11 ) = BV32.zero }
+  =
+  assert{ power 2 2 = 4 };
+    lsl_32 x two
+
+  val bw_and_32 ( x : int32 ) ( y : int32 ) : int32
+    ensures { to_bv result = BV32.bw_and ( to_bv x ) ( to_bv y ) }
+    (* ensures { to_int result = BV32.to_int ( to_bv result ) } *)
+    
+  val sub_32 ( x : int32 ) ( y : int32 ) : int32
+    ensures { to_bv result = BV32.sub ( to_bv x ) ( to_bv y ) }
+    ensures { - 0x8000_0000 <= to_int x - to_int y < two_p31
+              -> to_int result = to_int x - to_int y }
+
+  lemma l : forall y. BV32.slt BV32.zero y -> BV32.slt (BV32.sub y (BV32.of_int 1) ) y
+
+  let f (x y:int32) (ghost k:int32) : int32
+    requires { le zero k }
+    requires { lt k n31 }
+    requires { to_bv y = BV32.lsl_bv (BV32.of_int 1) (to_bv k) }
+    requires { to_int y = power 2 (to_int k) }
+    ensures { le zero result }
+    ensures { lt result y }
     ensures { to_int result = mod (to_int x) (to_int y) } 
-  = assert { to_int y = 1 };
-    of_bv (BV32.bw_and (to_bv x) (to_bv (y - of_int 1)))
+  = 
+    bw_and_32 x ( sub_32 y one )
+
+  use import ref.Ref
+    
+  (* Returns the digit index of the most significant (non-zero) digit of Number. (from N622-004) *)
+  let get_MSD ( number : int32 ) : int
+    requires { not( eq number zero ) }
+    ensures { result <> 0 }
+    ensures { result < 31 }
+    ensures { forall i. result < i < 31 -> BV32.nth ( to_bv number ) i = False }
+  = 
+    let digit_index = ref 0 in
+    for i = 0 to 31 do
+    	invariant { !digit_index <> 0 \/ exists j. i < j /\ j < 31 /\ nth ( to_bv number ) j = True }
+	invariant { !digit_index < i -> ( forall j. !digit_index < j /\ j < 31 -> nth ( to_bv number ) j = False ) }
+    	if( BV32.nth ( to_bv number ) i = True )
+	then 	
+	    digit_index := i
+    done;
+    !digit_index
 
 end
