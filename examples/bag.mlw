@@ -1,0 +1,82 @@
+
+module ResizableArraySpec
+
+  use import int.Int
+  use import map.Map
+
+  type rarray 'a model { mutable length: int; mutable data: map int 'a }
+
+  function ([]) (r: rarray 'a) (i: int) : 'a = Map.get r.data i
+  function ([<-]) (r: rarray ~'a) (i: int) (v: 'a) : rarray 'a =
+    { r with data = Map.set r.data i v }
+
+  val length (r: rarray ~'a) : int
+    ensures { result = r.length }
+
+  val make (len: int) (dummy: ~'a) : rarray 'a
+    requires { 0 <= len }
+    ensures  { result.length = len }
+    ensures  { result.data = Map.const dummy }
+
+  val ([]) (r: rarray ~'a) (i: int) : 'a
+    requires { 0 <= i < r.length } ensures { result = r[i] }
+
+  val ([]<-) (r: rarray ~'a) (i: int) (v: 'a) : unit
+    requires { 0 <= i < r.length } ensures { r = (old r)[i <- v] }
+
+  val resize (r: rarray ~'a) (len: int) : unit
+    requires { 0 <= len }
+    ensures  { r.length = len }
+    ensures  { forall i: int.
+               0 <= i < old r.length -> i < len -> r[i] = (old r)[i] }
+
+  val append (r1: rarray 'a) (r2: rarray 'a) : unit
+    ensures { r1.length = old r1.length + r2.length }
+    ensures { forall i: int. 0 <= i < r1.length ->
+               (i < old r1.length  -> r1[i] = (old r1)[i]) /\
+               (old r1.length <= i -> r1[i] = r2[i - old r1.length]) }
+
+end
+
+module Bag
+
+  use import int.Int
+  use import map.Map
+  use import map.Occ
+  use import ResizableArraySpec as R
+  use null.Null
+
+  (* clone import int.NumOfParam *)
+
+  type t 'a = {
+    mutable size: int;
+            data: rarray (Null.t 'a);
+    (* mutable ghost model_: map 'a int; *)
+  }
+  invariant { 0 <= self.size = self.data.length }
+  invariant { forall i: int. 0 <= i < self.size ->
+              not (Null.is_null self.data[i]) }
+  (* invariant { forall x: 'a. *)
+  (*             numof (\y -> x = y) self.data.R.data 0 self.size = *)
+  (*             Map.get self.model_ x } *)
+
+  let create () : t 'a
+  =
+    let null = Null.create_null () : Null.t 'a in
+    { size = 0; data = make 0 null }
+
+  let add (t: t 'a) (x: 'a) : unit
+    ensures { t.size = old t.size + 1 }
+  =
+    let n = t.size in
+    resize t.data (n + 1);
+    t.data[n] <- (Null.create x);
+    t.size <- n+1
+
+  let get (t: t 'a) (i: int) : 'a
+    requires { 0 <= i < t.size }
+    ensures  { Null.Value result = t.data[i].Null.v }
+  =
+    Null.get t.data[i]
+
+end
