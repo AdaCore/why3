@@ -4,78 +4,78 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.2" timelimit="30" memlimit="4000"/>
 <prover id="1" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Z3" version="2.19" timelimit="3" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="6" name="CVC3" version="2.2" timelimit="5" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="3" memlimit="1000"/>
 <file name="../bitvector.why" expanded="true">
-<theory name="BitVector" sum="1ccfbb39753e2952536626d7ad808f29" expanded="true">
+<theory name="BitVector" sum="c987a49d4811dbdbdb5f642ae8b291d3" expanded="true">
  <goal name="Nth_bw_xor_v1true">
- <proof prover="2"><result status="valid" time="0.10"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.10" steps="85"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="Nth_bw_xor_v1false">
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="Nth_bw_xor_v2true">
- <proof prover="2"><result status="valid" time="0.07"/></proof>
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="82"/></proof>
  <proof prover="6"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="Nth_bw_xor_v2false">
- <proof prover="2"><result status="valid" time="0.06"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="80"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="to_nat_of_zero2">
- <proof prover="1" edited="bitvector_BitVector_to_nat_of_zero2_1.v"><result status="valid" time="1.05"/></proof>
+ <proof prover="1" edited="bitvector_BitVector_to_nat_of_zero2_1.v"><result status="valid" time="2.26"/></proof>
  </goal>
  <goal name="to_nat_of_zero">
- <proof prover="1" timelimit="30" edited="bitvector_BitVector_to_nat_of_zero_1.v"><result status="valid" time="1.91"/></proof>
+ <proof prover="1" timelimit="30" edited="bitvector_BitVector_to_nat_of_zero_1.v"><result status="valid" time="3.27"/></proof>
  </goal>
  <goal name="to_nat_of_one" expanded="true">
- <proof prover="1" edited="bitvector_BitVector_to_nat_of_one_1.v"><result status="valid" time="1.67"/></proof>
+ <proof prover="1" edited="bitvector_BitVector_to_nat_of_one_1.v"><result status="valid" time="3.35"/></proof>
  </goal>
  <goal name="to_nat_sub_footprint">
- <proof prover="1" timelimit="7" edited="bitvector_BitVector_to_nat_sub_footprint_1.v"><result status="valid" time="7.44"/></proof>
+ <proof prover="1" timelimit="7" edited="bitvector_BitVector_to_nat_sub_footprint_1.v"><result status="valid" time="12.60"/></proof>
  </goal>
  <goal name="nth_from_int_low_even">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.07"/></proof>
+ <proof prover="2"><result status="valid" time="0.07"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="nth_from_int_low_odd">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.07"/></proof>
+ <proof prover="2"><result status="valid" time="0.07"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="nth_from_int_0">
- <proof prover="2"><result status="valid" time="0.16"/></proof>
- <proof prover="3"><result status="valid" time="0.13"/></proof>
+ <proof prover="2"><result status="valid" time="0.13"/></proof>
+ <proof prover="3"><result status="valid" time="0.16" steps="80"/></proof>
  <proof prover="6"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="nth_from_int2c_low_even">
  <proof prover="2"><result status="valid" time="0.08"/></proof>
- <proof prover="3"><result status="valid" time="0.08"/></proof>
+ <proof prover="3"><result status="valid" time="0.08" steps="72"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="nth_from_int2c_low_odd">
- <proof prover="2"><result status="valid" time="0.07"/></proof>
- <proof prover="3"><result status="valid" time="0.12"/></proof>
+ <proof prover="2"><result status="valid" time="0.12"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="72"/></proof>
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="nth_from_int2c_0">
- <proof prover="2"><result status="valid" time="0.23"/></proof>
- <proof prover="3"><result status="valid" time="0.13"/></proof>
+ <proof prover="2"><result status="valid" time="0.13"/></proof>
+ <proof prover="3"><result status="valid" time="0.23" steps="83"/></proof>
  <proof prover="6"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="nth_from_int2c_plus_pow2">
- <proof prover="1" timelimit="10" edited="bitvector_BitVector_nth_from_int2c_plus_pow2_1.v"><result status="valid" time="1.15"/></proof>
- <proof prover="2" timelimit="10"><result status="valid" time="0.73"/></proof>
+ <proof prover="1" timelimit="10" edited="bitvector_BitVector_nth_from_int2c_plus_pow2_1.v"><result status="valid" time="2.11"/></proof>
+ <proof prover="3" timelimit="10"><result status="valid" time="1.42" steps="120"/></proof>
  </goal>
 </theory>
 <theory name="BV32" sum="d41d8cd98f00b204e9800998ecf8427e">
@@ -84,27 +84,27 @@
 </theory>
 <theory name="BV32_64" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="TestBv32" sum="a1e8cf396c065b0455057ff9c11fb7a4">
+<theory name="TestBv32" sum="9674a66038630320e8dcfbf55092b81b">
  <goal name="Test1">
  <proof prover="0"><result status="valid" time="0.04"/></proof>
- <proof prover="2"><result status="valid" time="0.12"/></proof>
- <proof prover="3" timelimit="3"><result status="valid" time="0.07"/></proof>
- <proof prover="4"><result status="valid" time="0.51"/></proof>
- <proof prover="5"><result status="valid" time="0.58"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.07"/></proof>
+ <proof prover="3"><result status="valid" time="0.12" steps="73"/></proof>
+ <proof prover="4"><result status="valid" time="0.85"/></proof>
+ <proof prover="5"><result status="valid" time="1.11"/></proof>
  <proof prover="6" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Test2">
  <proof prover="0"><result status="valid" time="0.05"/></proof>
- <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="3" timelimit="3"><result status="valid" time="0.06"/></proof>
- <proof prover="4"><result status="valid" time="0.51"/></proof>
- <proof prover="5"><result status="valid" time="0.58"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.06"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="74"/></proof>
+ <proof prover="4"><result status="valid" time="0.79"/></proof>
+ <proof prover="5"><result status="valid" time="1.00"/></proof>
  <proof prover="6" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Test3">
  <proof prover="0"><result status="valid" time="0.04"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3" timelimit="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="66"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
  <proof prover="5"><result status="valid" time="0.12"/></proof>
  <proof prover="6" timelimit="3"><result status="valid" time="0.02"/></proof>
@@ -112,104 +112,104 @@
  </goal>
  <goal name="Test4">
  <proof prover="0"><result status="valid" time="0.06"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3" timelimit="3"><result status="valid" time="0.07"/></proof>
- <proof prover="4"><result status="valid" time="0.50"/></proof>
- <proof prover="5"><result status="valid" time="0.62"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.07"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="71"/></proof>
+ <proof prover="4"><result status="valid" time="0.81"/></proof>
+ <proof prover="5"><result status="valid" time="0.98"/></proof>
  <proof prover="6" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Test5">
  <proof prover="0"><result status="valid" time="0.05"/></proof>
- <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="3" timelimit="3"><result status="valid" time="0.07"/></proof>
- <proof prover="4"><result status="valid" time="0.49"/></proof>
- <proof prover="5"><result status="valid" time="0.62"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.07"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="71"/></proof>
+ <proof prover="4"><result status="valid" time="0.79"/></proof>
+ <proof prover="5"><result status="valid" time="1.10"/></proof>
  <proof prover="6" timelimit="3"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="Test6">
  <proof prover="0"><result status="valid" time="0.05"/></proof>
- <proof prover="2"><result status="valid" time="0.07"/></proof>
- <proof prover="3" timelimit="3"><result status="valid" time="0.07"/></proof>
- <proof prover="4"><result status="valid" time="0.50"/></proof>
- <proof prover="5"><result status="valid" time="0.61"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.07"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="71"/></proof>
+ <proof prover="4"><result status="valid" time="0.79"/></proof>
+ <proof prover="5"><result status="valid" time="1.03"/></proof>
  <proof prover="6" timelimit="3"><result status="valid" time="0.02"/></proof>
- <proof prover="7" timelimit="9"><result status="valid" time="2.94"/></proof>
+ <proof prover="7" timelimit="9"><result status="valid" time="3.84"/></proof>
  </goal>
  <goal name="to_nat_0x00000000">
  <proof prover="0"><result status="valid" time="0.06"/></proof>
- <proof prover="2"><result status="valid" time="0.05"/></proof>
- <proof prover="3" timelimit="3"><result status="valid" time="0.12"/></proof>
- <proof prover="4"><result status="valid" time="0.53"/></proof>
- <proof prover="5"><result status="valid" time="0.65"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.12"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="80"/></proof>
+ <proof prover="4"><result status="valid" time="0.79"/></proof>
+ <proof prover="5"><result status="valid" time="1.02"/></proof>
  <proof prover="6" timelimit="3"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="to_nat_0x00000001">
- <proof prover="0"><result status="valid" time="25.26"/></proof>
+ <proof prover="0"><result status="valid" time="46.90"/></proof>
  </goal>
  <goal name="to_nat_0x00000003">
- <proof prover="0" timelimit="60"><result status="valid" time="42.71"/></proof>
+ <proof prover="0" timelimit="60"><result status="valid" time="79.78"/></proof>
  </goal>
  <goal name="to_nat_0x00000007">
- <proof prover="0" timelimit="60"><result status="valid" time="37.17"/></proof>
+ <proof prover="0" timelimit="60"><result status="valid" time="66.61"/></proof>
  </goal>
  <goal name="to_nat_0x0000000F">
- <proof prover="0"><result status="valid" time="28.76"/></proof>
+ <proof prover="0"><result status="valid" time="53.92"/></proof>
  </goal>
  <goal name="to_nat_0x0000001F">
- <proof prover="0"><result status="valid" time="28.46"/></proof>
+ <proof prover="0"><result status="valid" time="51.89"/></proof>
  </goal>
  <goal name="to_nat_0x0000003F">
- <proof prover="0"><result status="valid" time="23.98"/></proof>
+ <proof prover="0"><result status="valid" time="44.30"/></proof>
  </goal>
  <goal name="to_nat_0x0000007F">
- <proof prover="0"><result status="valid" time="19.46"/></proof>
+ <proof prover="0"><result status="valid" time="34.39"/></proof>
  </goal>
  <goal name="to_nat_0x000000FF">
- <proof prover="0"><result status="valid" time="16.12"/></proof>
+ <proof prover="0"><result status="valid" time="30.09"/></proof>
  </goal>
  <goal name="to_nat_0x000001FF">
- <proof prover="0"><result status="valid" time="13.29"/></proof>
+ <proof prover="0"><result status="valid" time="24.58"/></proof>
  </goal>
  <goal name="to_nat_0x000003FF">
- <proof prover="0"><result status="valid" time="9.58"/></proof>
+ <proof prover="0"><result status="valid" time="17.39"/></proof>
  </goal>
  <goal name="to_nat_0x000007FF">
- <proof prover="0"><result status="valid" time="8.33"/></proof>
+ <proof prover="0"><result status="valid" time="14.64"/></proof>
  </goal>
  <goal name="to_nat_0x00000FFF">
- <proof prover="0"><result status="valid" time="7.18"/></proof>
+ <proof prover="0"><result status="valid" time="13.25"/></proof>
  </goal>
  <goal name="to_nat_0x00001FFF">
- <proof prover="0"><result status="valid" time="5.79"/></proof>
+ <proof prover="0"><result status="valid" time="10.36"/></proof>
  </goal>
  <goal name="to_nat_0x00003FFF">
- <proof prover="0"><result status="valid" time="4.70"/></proof>
+ <proof prover="0"><result status="valid" time="8.27"/></proof>
  </goal>
  <goal name="to_nat_0x00007FFF">
- <proof prover="0"><result status="valid" time="3.72"/></proof>
+ <proof prover="0"><result status="valid" time="6.04"/></proof>
  </goal>
  <goal name="to_nat_0x0000FFFF">
- <proof prover="0"><result status="valid" time="2.80"/></proof>
+ <proof prover="0"><result status="valid" time="4.90"/></proof>
  </goal>
  <goal name="to_nat_0x0001FFFF">
- <proof prover="0"><result status="valid" time="2.44"/></proof>
+ <proof prover="0"><result status="valid" time="3.83"/></proof>
  </goal>
  <goal name="to_nat_0x0003FFFF">
- <proof prover="0"><result status="valid" time="1.85"/></proof>
+ <proof prover="0"><result status="valid" time="2.78"/></proof>
  </goal>
  <goal name="to_nat_0x0007FFFF">
- <proof prover="0"><result status="valid" time="1.24"/></proof>
+ <proof prover="0"><result status="valid" time="2.16"/></proof>
  </goal>
  <goal name="to_nat_0x000FFFFF">
- <proof prover="0"><result status="valid" time="1.09"/></proof>
+ <proof prover="0"><result status="valid" time="1.60"/></proof>
  </goal>
  <goal name="to_nat_0x00FFFFFF">
- <proof prover="0"><result status="valid" time="0.36"/></proof>
+ <proof prover="0"><result status="valid" time="0.53"/></proof>
  </goal>
  <goal name="to_nat_0xFFFFFFFF">
  <proof prover="0"><result status="valid" time="0.05"/></proof>
- <proof prover="2"><result status="valid" time="0.04"/></proof>
- <proof prover="3" timelimit="3"><result status="valid" time="0.12"/></proof>
+ <proof prover="2" timelimit="3"><result status="valid" time="0.12"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="80"/></proof>
  <proof prover="6" timelimit="3"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
