@@ -230,9 +230,11 @@ let rec reg_r_stale reg cvr r =
   reg_equal r reg || (not (Sreg.mem r cvr) &&
     Util.any reg_r_fold (reg_r_stale reg cvr) r)
 
-let ity_r_occurs reg ity = Util.any ity_r_fold (reg_r_occurs reg) ity
+let ity_r_occurs reg ity = not ity.ity_pure &&
+  Util.any ity_r_fold (reg_r_occurs reg) ity
 
-let ity_r_stale reg cvr ity = Util.any ity_r_fold (reg_r_stale reg cvr) ity
+let ity_r_stale reg cvr ity = not ity.ity_pure &&
+  Util.any ity_r_fold (reg_r_stale reg cvr) ity
 
 let ity_immutable ity = ity.ity_pure
 

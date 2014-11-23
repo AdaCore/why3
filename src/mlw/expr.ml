@@ -384,6 +384,61 @@ let rec get_reads pvs pss acc e =
   | Eassert (_,t) | Epure t -> add_r acc (t_freepvs Spv.empty t)
   | Econst _ | Eabsurd -> acc
 
+let rec check_stale pvs rst e =
+  let error_v v loc = Loc.errorm ?loc "This expression prohibits \
+        further usage of variable %s" v.pv_vs.vs_name.id_string in
+  let error_s s loc = Loc.errorm ?loc "This expression prohibits \
+        further usage of function %s" s.ps_name.id_string in
+  let check_v rst v = Opt.iter (error_v v) (Mpv.find_opt v rst) in
+  let check_r rst r = Mpv.iter error_v (Mpv.set_inter rst r) in
+  let check_t rst t = check_r rst (t_freepvs Spv.empty t) in
+  let reset_c rst c = Mpv.set_inter rst c.cty_reads in
+  let after_e {e_effect = eff; e_loc = loc} =
+    Mpv.set_union rst (Mpv.mapi_filter (fun {pv_ity = ty} () ->
+      if eff_stale_region eff ty then Some loc else None) pvs) in
+  match e.e_node with
+  | Evar v -> check_v rst v
+  | Esym s -> Mpv.iter (fun _ -> error_s s) (reset_c rst s.ps_cty)
+  | Efun _ | Eany  -> Mpv.iter error_v (reset_c rst (cty_of_expr e))
+  | Eapp (e,l,_) ->
+      check_stale pvs rst e;
+      List.iter (check_v (after_e e)) l
+  | Elet ({let_sym = ValV v; let_expr = d},e) ->
+      check_stale pvs rst d;
+      check_stale (Spv.add v pvs) (after_e d) e
+  | Elet ({let_sym = ValS s; let_expr = d},e) ->
+      check_stale pvs rst d;
+      check_stale (Spv.union s.ps_cty.cty_reads pvs) (after_e d) e
+  | Erec ({rec_defn = fdl},e) ->
+      (* we ignore variants as they will appear in the bodies *)
+      let check_fd fd = check_stale pvs rst fd.fun_expr in
+      List.iter check_fd fdl; check_stale pvs rst e
+  | Enot e | Eraise (_,e) | Eghost e -> check_stale pvs rst e
+  | Elazy (_,d,e) ->
+      check_stale pvs rst d;
+      check_stale pvs (after_e d) e
+  | Eif (c,d,e) ->
+      check_stale pvs rst c; let rst = after_e c in
+      check_stale pvs rst d; check_stale pvs rst e
+  | Eassign al ->
+      List.iter (fun (r,_,v) -> check_v rst r; check_v rst v) al
+  | Etry (d,xl) ->
+      check_stale pvs rst d; let rst = after_e d in
+      List.iter (fun (_,v,e) -> check_stale (Spv.add v pvs) rst e) xl
+  | Ecase (d,bl) ->
+      check_stale pvs rst d; let rst = after_e d in
+      List.iter (fun (pp,e) ->
+        check_stale (pvs_of_vss pvs pp.pp_pat.pat_vars) rst e) bl
+  | Ewhile (d,inv,vl,e) ->
+      let rst = Mpv.set_union (after_e d) (after_e e) in
+      check_t rst inv; List.iter (fun (t,_) -> check_t rst t) vl;
+      check_stale pvs rst d; check_stale pvs rst e
+  | Efor (_,_,inv,e) -> let rst = after_e e in
+      (* index and both bounds are immutable *)
+      check_t rst inv; check_stale pvs rst e
+  | Eassert (_,t) | Epure t -> check_t rst t
+  | Econst _ | Eabsurd -> ()
+
 let pv_r_visible v vis =
   if v.pv_ghost then vis else ity_r_visible vis v.pv_ity
 
@@ -418,7 +473,7 @@ let rec check_ghost_writes vis gh e =
   let add_s s vis = if gh || s.ps_ghost then vis else
     Spv.fold pv_r_visible s.ps_cty.cty_reads vis in
   let error () = Loc.errorm ?loc:e.e_loc
-    "this expression makes a ghost write in a non-ghost location" in
+    "This expression makes a ghost write into a non-ghost location" in
   match e.e_node with
   | Evar _ | Esym _ | Efun _ | Eany
   | Eassert _ | Epure _ | Econst _ | Eabsurd -> ()
@@ -457,4 +512,6 @@ let e_fun args p q xq ({e_effect = eff} as e) =
   let pvs = get_reads Spv.empty Sps.empty Spv.empty e in
   let c = create_cty args p q xq pvs eff (ity_of_expr e) in
   check_ghost_writes (cty_r_visible c) false e;
+  (* TODO/FIXME: stale vars in post-conditions? *)
+  check_stale pvs Mpv.empty e;
   mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty
