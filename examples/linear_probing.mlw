@@ -50,24 +50,25 @@ module LinearProbing
 
   (** number of dummy values in array [a] between [l] and [u] *)
   namespace NumOfDummy
-    type param = array key
-    predicate pr (a: param) (i: int) = eq a[i] dummy
-    clone export int.NumOfParam with type param = param, predicate pr = pr
+    use int.NumOf
+
+    function numof (a: array key) (l u: int) : int =
+      NumOf.numof (\ i. eq a[i] dummy) l u
 
     let rec lemma numof_eq (a1 a2: array key) (l u: int) : unit
       requires { 0 <= l <= u <= length a1 = length a2 }
       requires { forall i: int. l <= i < u -> eq a2[i] a1[i] }
-      ensures  { num_of a2 l u = num_of a1 l u }
+      ensures  { numof a2 l u = numof a1 l u }
       variant  { u-l }
     = if l < u then numof_eq a1 a2 (l+1) u
 
     let rec lemma dummy_const (a: array key) (n: int)
       requires { 0 <= n } requires { forall i: int. 0 <= i < n -> a[i] = dummy }
-      variant { n } ensures { num_of a 0 n = n }
+      variant { n } ensures { numof a 0 n = n }
     = if n > 0 then dummy_const a (n-1)
 
   end
-  function numofd (a: array key) (l u: int) : int = NumOfDummy.num_of a l u
+  function numofd (a: array key) (l u: int) : int = NumOfDummy.numof a l u
 
   let ghost numof_update (a1 a2: array key) (l i u: int)
     requires { 0 <= l <= i < u <= Array.length a1 = Array.length a2 }

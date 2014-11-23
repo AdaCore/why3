@@ -258,54 +258,26 @@ module ArraySum
 
 end
 
-(** {2 Number of array elements satisfying a given predicate}
+(** {2 Number of array elements satisfying a given predicate} *)
 
-This module is parametrized by a predicate [pr]. It is supposed to be
-cloned with needed instances for [pr]. It is also parametrized by a
-type [param] to be used as an additional parameter to [pr].
-
-*)
-
-module NumOfParam
+module NumOf
   use import Array
+  use HighOrd as HO
+  use int.NumOf as N
 
-  type elt
-  type param
-  predicate pr (p: param) (i: int) (e: elt)
+  (** the number of a[i] such that [l <= i < u] and [pr i a[i]] *)
+  function numof (pr: HO.func int (HO.pred 'a)) (a: array 'a) (l u: int) : int =
+    N.numof (\ i. pr i a[i]) l u
 
-  type param_ = (array elt, param)
-  predicate pr_ (p: param_) (i: int) = let (a, p) = p in pr p i a[i]
-  clone import int.NumOfParam with type param = param_, predicate pr = pr_
-
-  (** the number of a[i] such that [l <= i < u] and [pr p i a[i]] *)
-  function numof (a: array elt) (p: param) (l u: int) : int = num_of (a, p) l u
 end
 
 (** the number of a[i] such that [l <= i < u] and [a[i] = v] *)
 module NumOfEq
   use import Array
+  use int.NumOf as N
 
-  type elt
-
-  type param = (array elt, elt)
-  predicate pr (p: param) (i: int) = let (a, v) = p in a[i] = v
-  clone import int.NumOfParam with type param = param, predicate pr = pr
-
-  function numof (a: array elt) (v: elt) (l u: int) : int = num_of (a, v) l u
-end
-
-(** the number of a[i] such that [l <= i < u] and [pr i a[i]] *)
-module NumOf
-  use import Array
-
-  type elt
-  predicate pr (i: int) (e: elt)
-
-  type param = array elt
-  predicate pr_ (a: param) (i: int) = pr i a[i]
-  clone import int.NumOfParam with type param = param, predicate pr = pr_
-
-  function numof (a: array elt) (l u: int) : int = num_of a l u
+  function numof (a: array 'a) (v: 'a) (l u: int) : int =
+    N.numof (\ i. a[i] = v) l u
 end
 
 module ToList

@@ -18,6 +18,7 @@
 module Spec
 
   use export int.Int
+  use int.NumOf as N
   use export array.Array
   use export array.IntArraySorted
 
@@ -31,22 +32,20 @@ module Spec
   (* we introduce two predicates:
      - [numeq a v l u] is the number of values in a[l..u[ equal to v
      - [numlt a v l u] is the number of values in a[l..u[ less than v *)
-  type param = (array int, int)
+  function numeq (a: array int) (v i j : int) : int =
+    N.numof (\ k. a[k] = v) i j
 
-  predicate eq (p: param) (i: int) = let (a,v) = p in a[i] = v
-  clone int.NumOfParam as Neq with type param = param, predicate pr = eq
-  function numeq (a: array int) (v i j : int) : int = Neq.num_of (a, v) i j
-
-  predicate lt (p: param) (i: int) = let (a,v) = p in a[i] < v
-  clone int.NumOfParam as Nlt with type param = param, predicate pr = lt
-  function numlt (a: array int) (v i j : int) : int = Nlt.num_of (a, v) i j
+  function numlt (a: array int) (v i j : int) : int =
+    N.numof (\ k. a[k] < v) i j
 
   (* an ovious lemma relates numeq and numlt *)
-  lemma eqlt:
-    forall a: array int. k_values a ->
-    forall v: int. 0 <= v < k ->
-    forall l u: int. 0 <= l < u <= length a ->
-    numlt a v l u + numeq a v l u = numlt a (v+1) l u
+  let rec lemma eqlt (a: array int) (v: int) (l u: int)
+    requires { k_values a }
+    requires { 0 <= v < k }
+    requires { 0 <= l < u <= length a }
+    ensures  { numlt a v l u + numeq a v l u = numlt a (v+1) l u }
+    variant  { u - l }
+  = if l < u-1 then eqlt a v (l+1) u
 
   (* permutation of two arrays is here conveniently defined using [numeq]
      i.e. as the equality of the two multi-sets *)
