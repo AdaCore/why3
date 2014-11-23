@@ -254,7 +254,7 @@ and fun_defn = {
   fun_varl : variant list;
 }
 
-(* base tools *)
+(* basic tools *)
 
 let e_label ?loc l e = { e with e_label = l; e_loc = loc }
 
@@ -275,6 +275,71 @@ let ity_of_expr e = match e.e_vty with
 let cty_of_expr e = match e.e_vty with
   | VtyI _ -> Loc.error ?loc:e.e_loc (CtyExpected e)
   | VtyC cty -> cty
+
+(* expression analysis tools *)
+
+let e_fold fn acc e = match e.e_node with
+  | Evar _ | Esym _ | Econst _ | Eany
+  | Eassign _ | Eassert _ | Epure _ | Eabsurd -> acc
+  | Efun e | Eapp (e,_,_) | Enot e | Eraise (_,e)
+  | Efor (_,_,_,e) | Eghost e -> fn acc e
+  | Elet (ld,e) -> fn (fn acc ld.let_expr) e
+  | Eif (c,d,e) -> fn (fn (fn acc c) d) e
+  | Elazy (_,d,e) | Ewhile (d,_,_,e) -> fn (fn acc d) e
+  | Erec (r,e) ->
+      fn (List.fold_left (fun acc d -> fn acc d.fun_expr) acc r.rec_defn) e
+  | Ecase (d,bl) -> List.fold_left (fun acc (_,e) -> fn acc e) (fn acc d) bl
+  | Etry (d,xl) -> List.fold_left (fun acc (_,_,e) -> fn acc e) (fn acc d) xl
+
+exception FoundExpr of expr
+
+(* find a minimal sub-expression satisfying [pr] *)
+let find_minimal pr e =
+  let rec find () e = e_fold find () e;
+    if pr e then raise (FoundExpr e) in
+  try find () e; raise Not_found with FoundExpr e -> e
+
+(* find a sub-expression whose proper effect satisfies [pr] *)
+let find_effect pr e =
+  let rec find () e = match e.e_node with
+    | Eapp (_,_,{cty_args = []; cty_effect = eff})
+      when pr eff -> raise (FoundExpr e)
+    | Eassign _ when pr e.e_effect -> raise (FoundExpr e)
+    | Efun _ -> () (* or call eff_is_empty at each node *)
+    | _ -> e_fold find () e in
+  try find () e; raise Not_found with FoundExpr e -> e
+
+let rec e_vars e = match e.e_node with
+  | Evar v -> Spv.singleton v
+  | Esym s -> s.ps_cty.cty_reads
+  | Efun _ | Eany -> (cty_of_expr e).cty_reads
+  | Eapp (e,vl,_) -> List.fold_right Spv.add vl (e_vars e)
+  | Elet ({let_sym = ValV v; let_expr = d},e) ->
+      Spv.union (e_vars d) (Spv.remove v (e_vars e))
+  | Elet ({let_sym = ValS {ps_logic = PLvs v}; let_expr = d},e) ->
+      Spv.union (e_vars d) (Spv.remove (restore_pv v) (e_vars e))
+  | Elet ({let_sym = ValS _; let_expr = d},e) | Elazy (_,d,e) ->
+      Spv.union (e_vars d) (e_vars e)
+  | Erec ({rec_defn = dl},e) ->
+      (* we ignore variants as they will appear in the bodies *)
+      let s = List.fold_left (fun s {fun_sym = ps} ->
+        Spv.union s ps.ps_cty.cty_reads) (e_vars e) dl in
+      List.fold_left (fun s {fun_sym = {ps_logic = pl}} ->
+        match pl with PLvs v -> Spv.remove (restore_pv v) s | _ -> s) s dl
+  | Enot e | Eraise (_,e) | Eghost e -> e_vars e
+  | Eassign al ->
+      List.fold_left (fun s (r,_,v) -> Spv.add r (Spv.add v s)) Spv.empty al
+  | Eif (c,d,e) -> Spv.union (e_vars c) (Spv.union (e_vars d) (e_vars e))
+  | Etry (d,xl) -> List.fold_left (fun s (_,v,e) ->
+      Spv.union s (Spv.remove v (e_vars e))) (e_vars d) xl
+  | Ecase (d,bl) -> List.fold_left (fun s ({pp_pat = p},e) -> Spv.union s
+      (Spv.diff (e_vars e) (pvs_of_vss Spv.empty p.pat_vars))) (e_vars d) bl
+  | Ewhile (d,inv,vl,e) -> let s = Spv.union (e_vars d) (e_vars e) in
+      List.fold_left (fun s (t,_) -> t_freepvs s t) (t_freepvs s inv) vl
+  | Efor (v,(f,_,t),inv,e) ->
+      Spv.add f (Spv.add t (Spv.remove v (t_freepvs (e_vars e) inv)))
+  | Eassert (_,t) | Epure t -> t_freepvs Spv.empty t
+  | Econst _ | Eabsurd -> Spv.empty
 
 (* smart constructors *)
 
@@ -339,84 +404,45 @@ let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
   let ps = create_psymbol id ~ghost ~kind cty in
   { let_sym = ValS ps; let_expr = e }, ps
 
-let rec get_reads pvs pss acc e =
-  let add_r acc r = Spv.union (Spv.diff r pvs) acc in
-  let add_c acc c = add_r acc c.cty_reads in
-  let add_v acc v = if Spv.mem v pvs then acc else Spv.add v acc in
-  let add_s acc s = if Sps.mem s pss then acc else add_c acc s.ps_cty in
-  match e.e_node with
-  | Evar v -> add_v acc v
-  | Esym s -> add_s acc s
-  | Efun _ | Eany  -> add_c acc (cty_of_expr e)
-  | Eapp (e,l,_) -> get_reads pvs pss (List.fold_left add_v acc l) e
-  | Elet ({let_sym = ValV v; let_expr = d},e) ->
-      get_reads (Spv.add v pvs) pss (get_reads pvs pss acc d) e
-  | Elet ({let_sym = ValS s; let_expr = d},e) ->
-      get_reads pvs (Sps.add s pss) (get_reads pvs pss acc d) e
-  | Erec ({rec_defn = fdl},e) ->
-      let add_rs pss fd = Sps.add fd.fun_sym pss in
-      let pss = List.fold_left add_rs pss fdl in
-      (* we ignore variants as they will appear in the bodies *)
-      let add_fd acc fd = get_reads pvs pss acc fd.fun_expr in
-      get_reads pvs pss (List.fold_left add_fd acc fdl) e
-  | Enot e | Eraise (_,e) | Eghost e -> get_reads pvs pss acc e
-  | Elazy (_,d,e) -> get_reads pvs pss (get_reads pvs pss acc d) e
-  | Eif (c,d,e) ->
-      let acc = get_reads pvs pss acc c in
-      get_reads pvs pss (get_reads pvs pss acc d) e
-  | Eassign al ->
-      let add acc (r,_,v) = add_v (add_v acc r) v in
-      List.fold_left add acc al
-  | Etry (d,xl) ->
-      let add acc (_,v,e) = get_reads (Spv.add v pvs) pss acc e in
-      List.fold_left add (get_reads pvs pss acc d) xl
-  | Ecase (d,bl) ->
-      let add acc (pp,e) =
-        get_reads (pvs_of_vss pvs pp.pp_pat.pat_vars) pss acc e in
-      List.fold_left add (get_reads pvs pss acc d) bl
-  | Ewhile (d,inv,vl,e) ->
-      let add spc (t,_) = t_freepvs spc t in
-      let spc = List.fold_left add (t_freepvs Spv.empty inv) vl in
-      get_reads pvs pss (get_reads pvs pss (add_r acc spc) d) e
-  | Efor (v,(f,_,t),inv,e) ->
-      let acc = add_r acc (Spv.remove v (t_freepvs Spv.empty inv)) in
-      get_reads (Spv.add v pvs) pss (add_v (add_v acc f) t) e
-  | Eassert (_,t) | Epure t -> add_r acc (t_freepvs Spv.empty t)
-  | Econst _ | Eabsurd -> acc
-
 let rec check_stale pvs rst e =
-  let error_v v loc = Loc.errorm ?loc "This expression prohibits \
-        further usage of variable %s" v.pv_vs.vs_name.id_string in
-  let error_s s loc = Loc.errorm ?loc "This expression prohibits \
-        further usage of function %s" s.ps_name.id_string in
+  let find_reset v e =
+    (find_effect (fun eff -> eff_stale_region eff v.pv_ity) e).e_loc in
+  let error_v v e = Loc.errorm ?loc:(find_reset v e) "This expression \
+    prohibits further usage of variable %s" v.pv_vs.vs_name.id_string in
+  let error_s s v e = Loc.errorm ?loc:(find_reset v e) "This expression \
+    prohibits further usage of function %s" s.ps_name.id_string in
   let check_v rst v = Opt.iter (error_v v) (Mpv.find_opt v rst) in
   let check_r rst r = Mpv.iter error_v (Mpv.set_inter rst r) in
   let check_t rst t = check_r rst (t_freepvs Spv.empty t) in
   let reset_c rst c = Mpv.set_inter rst c.cty_reads in
-  let after_e {e_effect = eff; e_loc = loc} =
+  let after_e ({e_effect = eff} as e) =
+    if Mreg.is_empty eff.eff_resets then rst else
     Mpv.set_union rst (Mpv.mapi_filter (fun {pv_ity = ty} () ->
-      if eff_stale_region eff ty then Some loc else None) pvs) in
+      if eff_stale_region eff ty then Some e else None) pvs) in
   match e.e_node with
   | Evar v -> check_v rst v
-  | Esym s -> Mpv.iter (fun _ -> error_s s) (reset_c rst s.ps_cty)
-  | Efun _ | Eany  -> Mpv.iter error_v (reset_c rst (cty_of_expr e))
-  | Eapp (e,l,_) ->
-      check_stale pvs rst e;
-      List.iter (check_v (after_e e)) l
+  | Esym s -> Mpv.iter (error_s s) (reset_c rst s.ps_cty)
+  | Eany -> Mpv.iter error_v (reset_c rst (cty_of_expr e))
+  | Efun d ->
+      let c = cty_of_expr e in
+      let rst = reset_c rst c in
+      if not (Mpv.is_empty rst) then
+        (* we know that there is a stale symbol in e, so let us
+           first check if it is a stale psymbol in d, and if not,
+           then go through the stale symbols in the spec *)
+        check_stale (List.fold_right Spv.add c.cty_args pvs) rst d;
+      Mpv.iter error_v rst
+  | Eapp (d,l,_) ->
+      check_stale pvs rst d; List.iter (check_v (after_e d)) l
   | Elet ({let_sym = ValV v; let_expr = d},e) ->
-      check_stale pvs rst d;
-      check_stale (Spv.add v pvs) (after_e d) e
-  | Elet ({let_sym = ValS s; let_expr = d},e) ->
-      check_stale pvs rst d;
-      check_stale (Spv.union s.ps_cty.cty_reads pvs) (after_e d) e
+      check_stale pvs rst d; check_stale (Spv.add v pvs) (after_e d) e
+  | Elet ({let_sym = ValS _; let_expr = d},e) | Elazy (_,d,e) ->
+      check_stale pvs rst d; check_stale pvs (after_e d) e
   | Erec ({rec_defn = fdl},e) ->
       (* we ignore variants as they will appear in the bodies *)
-      let check_fd fd = check_stale pvs rst fd.fun_expr in
-      List.iter check_fd fdl; check_stale pvs rst e
+      List.iter (fun fd -> check_stale pvs rst fd.fun_expr) fdl;
+      check_stale pvs rst e
   | Enot e | Eraise (_,e) | Eghost e -> check_stale pvs rst e
-  | Elazy (_,d,e) ->
-      check_stale pvs rst d;
-      check_stale pvs (after_e d) e
   | Eif (c,d,e) ->
       check_stale pvs rst c; let rst = after_e c in
       check_stale pvs rst d; check_stale pvs rst e
@@ -509,9 +535,8 @@ let rec check_ghost_writes vis gh e =
       then check_ghost_writes vis gh e else error ()
 
 let e_fun args p q xq ({e_effect = eff} as e) =
-  let pvs = get_reads Spv.empty Sps.empty Spv.empty e in
+  (* TODO/FIXME: stale vars in post-conditions? *)
+  let pvs = e_vars e in check_stale pvs Mpv.empty e;
   let c = create_cty args p q xq pvs eff (ity_of_expr e) in
   check_ghost_writes (cty_r_visible c) false e;
-  (* TODO/FIXME: stale vars in post-conditions? *)
-  check_stale pvs Mpv.empty e;
   mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty
