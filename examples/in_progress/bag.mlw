@@ -1,0 +1,178 @@
+
+module Bag
+
+  use import HighOrd
+  use import int.Int
+
+  type bag 'a = 'a -> int
+
+  predicate (==) (b1 b2: bag 'a) =
+    forall x: 'a. b1 x = b2 x
+
+  constant empty : bag 'a =
+    \ _. 0
+
+  function add (e: 'a) (b: bag 'a) : bag 'a =
+    \ x. if x = e then b x + 1 else b x
+
+  function remove (e: 'a) (b: bag 'a) : bag 'a =
+    \ x. if x = e then b x - 1 else b x
+
+end
+
+module BagSpec
+
+  use import int.Int
+  use import Bag
+
+  type t 'a model {
+    mutable size: int;
+    mutable contents: bag 'a;
+  }
+
+  val create () : t 'a
+    ensures { result.size = 0 }
+    ensures { result.contents == Bag.empty }
+
+  val clear (t: t 'a) : unit
+    writes  { t.size, t.contents }
+    ensures { t.size = 0 }
+    ensures { t.contents == Bag.empty }
+
+  val add (t: t 'a) (x: 'a) : unit
+    writes  { t.size, t.contents }
+    ensures { t.size = old t.size + 1 }
+    ensures { t.contents == Bag.add x (old t.contents) }
+
+end
+
+module ResizableArraySpec
+
+  use import int.Int
+  use import map.Map
+
+  type rarray 'a model { mutable length: int; mutable data: map int 'a }
+
+  function ([]) (r: rarray 'a) (i: int) : 'a = Map.get r.data i
+  function ([<-]) (r: rarray ~'a) (i: int) (v: 'a) : rarray 'a =
+    { r with data = Map.set r.data i v }
+
+  val length (r: rarray ~'a) : int
+    ensures { result = r.length }
+
+  val make (len: int) (dummy: ~'a) : rarray 'a
+    requires { 0 <= len }
+    ensures  { result.length = len }
+    ensures  { result.data = Map.const dummy }
+
+  val ([]) (r: rarray ~'a) (i: int) : 'a
+    requires { 0 <= i < r.length }
+    ensures  { result = r[i] }
+
+  val ([]<-) (r: rarray ~'a) (i: int) (v: 'a) : unit
+    requires { 0 <= i < r.length }
+    writes   { r.data }
+    ensures  { r = (old r)[i <- v] }
+
+  val resize (r: rarray ~'a) (len: int) : unit
+    requires { 0 <= len }
+    writes   { r.length, r.data }
+    ensures  { r.length = len }
+    ensures  { forall i: int.
+               0 <= i < old r.length -> i < len -> r[i] = (old r)[i] }
+
+end
+
+module BagImpl
+
+  use import int.Int
+  use import Bag
+  use import ResizableArraySpec as R
+  use map.Map
+  use int.NumOf
+  use null.Null
+
+  function numof (r: rarray (Null.t 'a)) (x: 'a) (l u: int) : int =
+    NumOf.numof (\i. (Map.get r.R.data i).Null.v = Null.Value x) l u
+
+  type t 'a = {
+    mutable       size:     int;
+                  data:     rarray (Null.t 'a);
+    mutable ghost contents: bag 'a;
+  }
+  invariant { 0 <= self.size = self.data.length }
+  invariant { forall i: int. 0 <= i < self.size ->
+                not (Null.is_null self.data[i]) }
+  invariant { forall x: 'a. self.contents x = numof self.data x 0 self.size }
+
+  let create () : t 'a
+    ensures { result.size = 0 }
+    ensures { result.contents == Bag.empty }
+  =
+    let null = Null.create_null () : Null.t 'a in
+    { size = 0; data = make 0 null; contents = Bag.empty }
+
+  let clear (t: t 'a) : unit
+    ensures { t.size = 0 }
+    ensures { t.contents == Bag.empty }
+  =
+    resize t.data 0;
+    t.size <- 0;
+    t.contents <- Bag.empty
+
+  let add (t: t 'a) (x: 'a) : unit
+    ensures { t.size = old t.size + 1 }
+    ensures { t.contents == Bag.add x (old t.contents) }
+  =
+    let n = t.size in
+    resize t.data (n + 1);
+    t.data[n] <- (Null.create x);
+    t.size <- n + 1;
+    t.contents <- Bag.add x t.contents
+
+  let get (t: t 'a) (i: int) : 'a
+    requires { 0 <= i < t.size }
+    ensures  { Null.Value result = t.data[i].Null.v }
+  =
+    Null.get t.data[i]
+
+  let remove (t: t 'a) (i: int) : unit
+    requires { 0 <= i < t.size }
+    ensures  { t.size = old t.size - 1 }
+    ensures  { forall x: 'a. Null.Value x = old t.data[i].Null.v ->
+               t.contents == Bag.remove x (old t.contents) }
+  =
+    'L:
+    let n = t.size - 1 in
+    let ghost x = Null.get t.data[i] in
+    if i < n then t.data[i] <- t.data[n];
+    resize t.data n;
+    t.size <- n;
+    t.contents <- Bag.remove x t.contents;
+    assert { forall v: 'a. numof t.data v 0 i = numof (at t.data 'L) v 0 i };
+    assert { numof t.data x i n = numof (at t.data 'L) x i (n+1) - 1 };
+    assert { forall v: 'a. v <> x ->
+             numof t.data v i n = numof (at t.data 'L) v i (n+1) };
+    assert { i < n -> forall v: 'a.
+             numof t.data v i n = numof (at t.data 'L) v (i+1) (n+1) }
+
+end
+
+module Harness
+
+  use import int.Int
+  use import Bag
+  use import BagImpl
+
+  let test1 () =
+    let b = create () in
+    add b 17;
+    add b 42;
+    assert { b.contents 42 = 1 };
+    add b 55;
+    add b 89;
+    add b 42;
+    assert { b.contents 42 = 2 };
+    ()
+
+end
