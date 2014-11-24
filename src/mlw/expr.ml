@@ -370,36 +370,86 @@ let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
   let ps = create_psymbol id ~ghost ~kind cty in
   { let_sym = ValS ps; let_expr = e }, ps
 
+let e_ghost_raises e =
+  e.e_ghost && not (Mexn.is_empty e.e_effect.eff_raises)
+
+let e_let_raw ({let_expr = d} as ld) e =
+  let eff = eff_union d.e_effect e.e_effect in
+  let ghost = e.e_ghost || e_ghost_raises d in
+  mk_expr (Elet (ld,e)) e.e_vty ghost eff
+
+let e_rec_raw rd e =
+  mk_expr (Erec (rd,e)) e.e_vty e.e_ghost e.e_effect
+
+let e_ghost e =
+  mk_expr (Eghost e) e.e_vty true e.e_effect
+
+let e_ghostify e =
+  if not e.e_ghost then e_ghost e else e
+
+(* Elet, Erec, and Eghost are guaranteed to never change
+   the type of the underlying expression. Thus, [fn] can
+   expect its argument to have the same [e_vty]. However,
+   the argument of [fn] may be non-ghost, even though
+   the initial argument of [rewind] was ghost.
+
+   TODO/FIXME: this API implements the fully-named scheme
+   of binder representation. Therefore, it is *forbidden* to
+   use the same binder ident more than once in an expression,
+   otherwise exchanging binders in [rewind] may be incorrect.
+   One must never reuse the results of [create_let_defn] and
+   [create_use_defn] when constructing expressions. *)
+let rec rewind fn ghost d = match d.e_node with
+  | (Elet ({let_sym = ValS {ps_ghost = false}}, _)
+  |  Elet ({let_sym = ValV {pv_ghost = false}}, _))
+    when ghost -> Loc.errorm ?loc:d.e_loc
+      "This let-definition must be explicitly marked ghost"
+  | Elet (ld, e) ->
+      e_label_copy d (e_let_raw ld (rewind fn ghost e))
+  | Erec ({rec_defn = dl} as rd, e) ->
+      let ngh fd = not fd.fun_sym.ps_ghost in
+      if ghost && List.exists ngh dl then Loc.errorm ?loc:d.e_loc
+        "%s must be explicitly marked ghost" (if List.length dl > 1 then
+        "These recursive definitions" else "This recursive definition");
+      e_label_copy d (e_rec_raw rd (rewind fn ghost e))
+  | Eghost e ->
+      rewind (fun e -> fn (e_label_copy d (e_ghost e))) true e
+  | _ -> fn d
+
 let e_let ({let_sym = lv; let_expr = d} as ld) e = match lv with
-  | ValV _ ->
-      let eff = eff_union d.e_effect e.e_effect in
-      mk_expr (Elet (ld,e)) e.e_vty e.e_ghost eff
-  | ValS {ps_logic = PLls _} ->
-      invalid_arg "Expr.e_let"
-  | ValS s ->
-      let rec rewind d = match d.e_node with
-        | Efun _ | Eany | Eapp _ ->
-            let ld = {let_sym = lv; let_expr = d} in
-            let eff = eff_union d.e_effect e.e_effect in
-            mk_expr (Elet (ld,e)) e.e_vty e.e_ghost eff
-        | Eghost d -> assert s.ps_ghost; rewind d
-        | Elet ({let_sym = ValS {ps_ghost = gh}}, _)
-        | Elet ({let_sym = ValV {pv_ghost = gh}}, _)
-          when s.ps_ghost && not gh -> Loc.errorm ?loc:d.e_loc
-            "This let-definition must be explicitly marked ghost"
-        | Elet ({let_expr = d} as ld, e) ->
-            let e = rewind e in
-            let eff = eff_union d.e_effect e.e_effect in
-            mk_expr (Elet (ld,e)) e.e_vty e.e_ghost eff
-        | Erec ({rec_defn = dl} as rd, e) ->
-            let ngh fd = not fd.fun_sym.ps_ghost in
-            if s.ps_ghost && List.exists ngh dl then Loc.errorm ?loc:d.e_loc
-              "%s must be explicitly marked ghost" (if List.length dl > 1 then
-              "These recursive definitions" else "This recursive definition");
-            let e = rewind e in
-            mk_expr (Erec (rd,e)) e.e_vty e.e_ghost e.e_effect
-      in
-      rewind d
+  | ValS {ps_logic = PLls _} -> invalid_arg "Expr.e_let"
+  | ValS {ps_ghost = gh} ->
+      rewind (fun d -> e_let_raw {ld with let_expr = d} e) gh d
+  | ValV _ -> e_let_raw ld e
+
+let e_rec ({rec_defn = dl} as rd) e =
+  List.iter (fun fd -> match fd.fun_sym.ps_logic with
+    | PLls _ -> invalid_arg "Expr.e_rec" | _ -> ()) dl;
+  e_rec_raw rd e
+
+let e_app e vl tyl ty =
+  let gh, c = cty_apply (cty_of_expr e) vl tyl ty in
+  let vty, eff = if c.cty_args = [] then
+    VtyI c.cty_result, c.cty_effect else
+    VtyC c, eff_empty in
+  let mk_app e =
+    let eff = eff_union e.e_effect eff in
+    mk_expr (Eapp (e,vl,c)) vty (gh || e.e_ghost) eff in
+  rewind mk_app (gh || e.e_ghost) e
+
+let e_apply e el tyl ty =
+  let rec down hd vl al el = match al, el with
+    | {pv_ghost = gh}::al, ({e_node = Evar v} as e)::el
+      when (v.pv_ghost || not gh) && Slab.is_empty e.e_label ->
+        down hd (v::vl) al el
+    | {pv_ghost = ghost}::al, e::el ->
+        let id = id_fresh ?loc:e.e_loc "o" in
+        let ld, v = create_let_defn_pv id ~ghost e in
+        down (ld::hd) (v::vl) al el
+    | _, [] -> List.rev hd, List.rev vl
+    | _ -> invalid_arg "Expr.e_apply" (* BadArity? *) in
+  let hd, vl = down [] [] (cty_of_expr e).cty_args el in
+  List.fold_right e_let_raw hd (e_app e vl tyl ty)
 
 (* lambda construction *)
 
@@ -418,8 +468,8 @@ let rec e_vars e = match e.e_node with
       (* we ignore variants as they appear in the bodies *)
       let s = List.fold_left (fun s {fun_sym = ps} ->
         Spv.union s ps.ps_cty.cty_reads) (e_vars e) dl in
-      List.fold_left (fun s {fun_sym = {ps_logic = pl}} ->
-        match pl with PLvs v -> Spv.remove (restore_pv v) s | _ -> s) s dl
+      List.fold_left (fun s fd -> match fd.fun_sym.ps_logic with
+        | PLvs v -> Spv.remove (restore_pv v) s | _ -> s) s dl
   | Enot e | Eraise (_,e) | Eghost e -> e_vars e
   | Eassign al ->
       List.fold_left (fun s (r,_,v) -> Spv.add r (Spv.add v s)) Spv.empty al

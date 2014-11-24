@@ -179,6 +179,13 @@ val create_let_defn_ps :
   preid -> ?ghost:bool -> ?kind:ps_kind -> expr -> let_defn * psymbol
 
 val e_let : let_defn -> expr -> expr
+val e_rec : rec_defn -> expr -> expr
+
+val e_app : expr -> pvsymbol list -> ity list -> ity -> expr
+val e_apply : expr -> expr list -> ity list -> ity -> expr
+
+val e_ghost : expr -> expr
+val e_ghostify : expr -> expr
 
 val e_fun :
   pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> expr
