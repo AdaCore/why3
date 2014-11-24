@@ -276,8 +276,6 @@ let cty_of_expr e = match e.e_vty with
   | VtyI _ -> Loc.error ?loc:e.e_loc (CtyExpected e)
   | VtyC cty -> cty
 
-(* expression analysis tools *)
-
 let e_fold fn acc e = match e.e_node with
   | Evar _ | Esym _ | Econst _ | Eany
   | Eassign _ | Eassert _ | Epure _ | Eabsurd -> acc
@@ -308,38 +306,6 @@ let find_effect pr e =
     | Efun _ -> () (* or call eff_is_empty at each node *)
     | _ -> e_fold find () e in
   try find () e; raise Not_found with FoundExpr e -> e
-
-let rec e_vars e = match e.e_node with
-  | Evar v -> Spv.singleton v
-  | Esym s -> s.ps_cty.cty_reads
-  | Efun _ | Eany -> (cty_of_expr e).cty_reads
-  | Eapp (e,vl,_) -> List.fold_right Spv.add vl (e_vars e)
-  | Elet ({let_sym = ValV v; let_expr = d},e) ->
-      Spv.union (e_vars d) (Spv.remove v (e_vars e))
-  | Elet ({let_sym = ValS {ps_logic = PLvs v}; let_expr = d},e) ->
-      Spv.union (e_vars d) (Spv.remove (restore_pv v) (e_vars e))
-  | Elet ({let_sym = ValS _; let_expr = d},e) | Elazy (_,d,e) ->
-      Spv.union (e_vars d) (e_vars e)
-  | Erec ({rec_defn = dl},e) ->
-      (* we ignore variants as they will appear in the bodies *)
-      let s = List.fold_left (fun s {fun_sym = ps} ->
-        Spv.union s ps.ps_cty.cty_reads) (e_vars e) dl in
-      List.fold_left (fun s {fun_sym = {ps_logic = pl}} ->
-        match pl with PLvs v -> Spv.remove (restore_pv v) s | _ -> s) s dl
-  | Enot e | Eraise (_,e) | Eghost e -> e_vars e
-  | Eassign al ->
-      List.fold_left (fun s (r,_,v) -> Spv.add r (Spv.add v s)) Spv.empty al
-  | Eif (c,d,e) -> Spv.union (e_vars c) (Spv.union (e_vars d) (e_vars e))
-  | Etry (d,xl) -> List.fold_left (fun s (_,v,e) ->
-      Spv.union s (Spv.remove v (e_vars e))) (e_vars d) xl
-  | Ecase (d,bl) -> List.fold_left (fun s ({pp_pat = p},e) -> Spv.union s
-      (Spv.diff (e_vars e) (pvs_of_vss Spv.empty p.pat_vars))) (e_vars d) bl
-  | Ewhile (d,inv,vl,e) -> let s = Spv.union (e_vars d) (e_vars e) in
-      List.fold_left (fun s (t,_) -> t_freepvs s t) (t_freepvs s inv) vl
-  | Efor (v,(f,_,t),inv,e) ->
-      Spv.add f (Spv.add t (Spv.remove v (t_freepvs (e_vars e) inv)))
-  | Eassert (_,t) | Epure t -> t_freepvs Spv.empty t
-  | Econst _ | Eabsurd -> Spv.empty
 
 (* smart constructors *)
 
@@ -404,139 +370,136 @@ let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
   let ps = create_psymbol id ~ghost ~kind cty in
   { let_sym = ValS ps; let_expr = e }, ps
 
-let rec check_stale pvs rst e =
+(* lambda construction *)
+
+let rec e_vars e = match e.e_node with
+  | Evar v -> Spv.singleton v
+  | Esym s -> s.ps_cty.cty_reads
+  | Efun _ | Eany -> (cty_of_expr e).cty_reads
+  | Eapp (e,vl,_) -> List.fold_right Spv.add vl (e_vars e)
+  | Elet ({let_sym = ValV v; let_expr = d},e) ->
+      Spv.union (e_vars d) (Spv.remove v (e_vars e))
+  | Elet ({let_sym = ValS {ps_logic = PLvs v}; let_expr = d},e) ->
+      Spv.union (e_vars d) (Spv.remove (restore_pv v) (e_vars e))
+  | Elet ({let_sym = ValS _; let_expr = d},e) | Elazy (_,d,e) ->
+      Spv.union (e_vars d) (e_vars e)
+  | Erec ({rec_defn = dl},e) ->
+      (* we ignore variants as they appear in the bodies *)
+      let s = List.fold_left (fun s {fun_sym = ps} ->
+        Spv.union s ps.ps_cty.cty_reads) (e_vars e) dl in
+      List.fold_left (fun s {fun_sym = {ps_logic = pl}} ->
+        match pl with PLvs v -> Spv.remove (restore_pv v) s | _ -> s) s dl
+  | Enot e | Eraise (_,e) | Eghost e -> e_vars e
+  | Eassign al ->
+      List.fold_left (fun s (r,_,v) -> Spv.add r (Spv.add v s)) Spv.empty al
+  | Eif (c,d,e) -> Spv.union (e_vars c) (Spv.union (e_vars d) (e_vars e))
+  | Etry (d,xl) -> List.fold_left (fun s (_,v,e) ->
+      Spv.union s (Spv.remove v (e_vars e))) (e_vars d) xl
+  | Ecase (d,bl) -> List.fold_left (fun s ({pp_pat = p},e) -> Spv.union s
+      (Spv.diff (e_vars e) (pvs_of_vss Spv.empty p.pat_vars))) (e_vars d) bl
+  | Ewhile (d,inv,vl,e) -> let s = Spv.union (e_vars d) (e_vars e) in
+      List.fold_left (fun s (t,_) -> t_freepvs s t) (t_freepvs s inv) vl
+  | Efor (v,(f,_,t),inv,e) ->
+      Spv.add f (Spv.add t (Spv.remove v (t_freepvs (e_vars e) inv)))
+  | Eassert (_,t) | Epure t -> t_freepvs Spv.empty t
+  | Econst _ | Eabsurd -> Spv.empty
+
+let pv_mut v mut = if ity_immutable v.pv_ity then mut else Spv.add v mut
+let pv_vis v vis = if v.pv_ghost then vis else ity_r_visible vis v.pv_ity
+
+let cty_mut {cty_args = al; cty_reads = r} =
+  Spv.fold pv_mut r (List.fold_right pv_mut al Spv.empty)
+
+let cty_vis {cty_args = al; cty_reads = r} =
+  Spv.fold pv_vis r (List.fold_right pv_vis al Sreg.empty)
+
+let rec check_expr gh mut vis rst e0 =
+  let gh = gh || e0.e_ghost in
   let find_reset v e =
     (find_effect (fun eff -> eff_stale_region eff v.pv_ity) e).e_loc in
   let error_v v e = Loc.errorm ?loc:(find_reset v e) "This expression \
     prohibits further usage of variable %s" v.pv_vs.vs_name.id_string in
   let error_s s v e = Loc.errorm ?loc:(find_reset v e) "This expression \
     prohibits further usage of function %s" s.ps_name.id_string in
+  let error_r _r = Loc.errorm ?loc:e0.e_loc "This expression \
+    makes a ghost write into a non-ghost location" in
   let check_v rst v = Opt.iter (error_v v) (Mpv.find_opt v rst) in
   let check_r rst r = Mpv.iter error_v (Mpv.set_inter rst r) in
   let check_t rst t = check_r rst (t_freepvs Spv.empty t) in
   let reset_c rst c = Mpv.set_inter rst c.cty_reads in
+  let check_e rst e = check_expr gh mut vis rst e in
   let after_e ({e_effect = eff} as e) =
     if Mreg.is_empty eff.eff_resets then rst else
     Mpv.set_union rst (Mpv.mapi_filter (fun {pv_ity = ty} () ->
-      if eff_stale_region eff ty then Some e else None) pvs) in
-  match e.e_node with
+      if eff_stale_region eff ty then Some e else None) mut) in
+  (* A non-ghost application can perform ghost writes into ghost fields
+     or into ghost arguments. The former is always safe, but the latter
+     is illegal, if we submit a visible region inside a ghost argument.
+     A write effect of a computation is ghost whenever the modified region
+     is not visible in any non-ghost argument or read dependency. Indeed,
+     if there is at least one non-ghost dependency of a computation where
+     the modified region is visible, then the write can not be ghost, or
+     the computation itself would have been rejected. For this check to
+     be correct, Ity.cty_apply does not accept non-ghost pvsymbols for
+     ghost arguments. Otherwise, we would put a non-ghost pvsymbol in
+     cty_reads and would mistakenly consider the write effect non-ghost. *)
+  let ghost_c vis ({cty_effect = {eff_writes = wr}} as c) =
+    let wr = Mreg.filter (fun r fs -> r.reg_its.its_private
+          || Spv.exists (fun f -> not f.pv_ghost) fs) wr in
+    Mreg.set_inter vis (if gh || Mreg.is_empty wr
+      then wr else Mreg.set_diff wr (cty_vis c)) in
+  match e0.e_node with
   | Evar v -> check_v rst v
   | Esym s -> Mpv.iter (error_s s) (reset_c rst s.ps_cty)
-  | Eany -> Mpv.iter error_v (reset_c rst (cty_of_expr e))
-  | Efun d ->
-      let c = cty_of_expr e in
-      let rst = reset_c rst c in
-      if not (Mpv.is_empty rst) then
-        (* we know that there is a stale symbol in e, so let us
-           first check if it is a stale psymbol in d, and if not,
-           then go through the stale symbols in the spec *)
-        check_stale (List.fold_right Spv.add c.cty_args pvs) rst d;
-      Mpv.iter error_v rst
-  | Eapp (d,l,_) ->
-      check_stale pvs rst d; List.iter (check_v (after_e d)) l
-  | Elet ({let_sym = ValV v; let_expr = d},e) ->
-      check_stale pvs rst d; check_stale (Spv.add v pvs) (after_e d) e
-  | Elet ({let_sym = ValS _; let_expr = d},e) | Elazy (_,d,e) ->
-      check_stale pvs rst d; check_stale pvs (after_e d) e
-  | Erec ({rec_defn = fdl},e) ->
-      (* we ignore variants as they will appear in the bodies *)
-      List.iter (fun fd -> check_stale pvs rst fd.fun_expr) fdl;
-      check_stale pvs rst e
-  | Enot e | Eraise (_,e) | Eghost e -> check_stale pvs rst e
-  | Eif (c,d,e) ->
-      check_stale pvs rst c; let rst = after_e c in
-      check_stale pvs rst d; check_stale pvs rst e
+  | Eapp ({e_node = Efun d},[],({cty_args = []} as c)) ->
+      let rst = reset_c rst c and gwr = ghost_c vis c in
+      if not (Mpv.is_empty rst && Mreg.is_empty gwr) then
+      (check_e rst d; Mpv.iter error_v rst; assert false)
+  | Eapp (d,l,c) ->
+      check_e rst d; List.iter (check_v (after_e d)) l;
+      if c.cty_args = [] then Sreg.iter error_r (ghost_c vis c)
+  | Efun _ | Eany ->
+      Mpv.iter error_v (reset_c rst (cty_of_expr e0))
   | Eassign al ->
-      List.iter (fun (r,_,v) -> check_v rst r; check_v rst v) al
+      List.iter (fun (r,f,v) -> check_v rst r; check_v rst v;
+        if not f.pv_ghost && (gh || r.pv_ghost || v.pv_ghost)
+        then match r.pv_ity.ity_node with
+          | Ityreg r when Sreg.mem r vis -> error_r r
+          | _ -> ()) al
+  | Elet ({let_sym = ValV v; let_expr = d},e) ->
+      check_expr (gh || v.pv_ghost) mut vis rst d;
+      check_expr gh (pv_mut v mut) (pv_vis v vis) (after_e d) e
+  | Elet ({let_sym = ValS s; let_expr = d},e) ->
+      check_expr (gh || s.ps_ghost) mut vis rst d;
+      check_e (after_e d) e
+  | Erec ({rec_defn = fdl},e) ->
+      List.iter (fun fd -> check_e rst fd.fun_expr) fdl;
+      check_e rst e
+  | Elazy (_,d,e) ->
+      check_e rst d; check_e (after_e d) e
+  | Eif (c,d,e) ->
+      check_e rst c; let rst = after_e c in
+      check_e rst d; check_e rst e
   | Etry (d,xl) ->
-      check_stale pvs rst d; let rst = after_e d in
-      List.iter (fun (_,v,e) -> check_stale (Spv.add v pvs) rst e) xl
+      check_e rst d; let rst = after_e d in
+      List.iter (fun (_,_,e) -> check_e rst e) xl
   | Ecase (d,bl) ->
-      check_stale pvs rst d; let rst = after_e d in
-      List.iter (fun (pp,e) ->
-        check_stale (pvs_of_vss pvs pp.pp_pat.pat_vars) rst e) bl
-  | Ewhile (d,inv,vl,e) ->
-      let rst = Mpv.set_union (after_e d) (after_e e) in
-      check_t rst inv; List.iter (fun (t,_) -> check_t rst t) vl;
-      check_stale pvs rst d; check_stale pvs rst e
+      check_e rst d; let rst = after_e d in
+      List.iter (fun ({pp_pat = {pat_vars = vss}},e) ->
+        let ppv = pvs_of_vss Spv.empty vss in
+        check_expr gh (Spv.fold pv_mut ppv mut)
+                      (Spv.fold pv_vis ppv vis) rst e) bl
+  | Ewhile (d,inv,vl,e) -> let rst = after_e e0 in
+      check_t rst inv; check_e rst d; check_e rst e;
+      List.iter (fun (t,_) -> check_t rst t) vl
   | Efor (_,_,inv,e) -> let rst = after_e e in
-      (* index and both bounds are immutable *)
-      check_t rst inv; check_stale pvs rst e
+      check_t rst inv; check_e rst e
+  | Enot e | Eraise (_,e) | Eghost e -> check_e rst e
   | Eassert (_,t) | Epure t -> check_t rst t
   | Econst _ | Eabsurd -> ()
 
-let pv_r_visible v vis =
-  if v.pv_ghost then vis else ity_r_visible vis v.pv_ity
-
-let cty_r_visible c =
-  List.fold_right pv_r_visible c.cty_args
-    (Spv.fold pv_r_visible c.cty_reads Sreg.empty)
-
-(*  A non-ghost application can perform ghost writes into ghost fields
-    or into ghost arguments. The former is always safe, but the latter
-    is illegal, if we submit a visible region inside a ghost argument.
-    A write effect of a computation is ghost whenever the modified region
-    is not visible in any non-ghost argument or read dependency. Indeed,
-    if there is at least one non-ghost dependency of a computation where
-    the modified region is visible, then the write can not be ghost, or
-    the computation itself would have been rejected. For this check to
-    be correct, Ity.cty_apply does not accept non-ghost pvsymbols for
-    ghost arguments. Otherwise, we would put a non-ghost pvsymbol in
-    cty_reads and would mistakenly consider the write effect non-ghost. *)
-let cty_ghost_writes gh c =
-  let wr = c.cty_effect.eff_writes in
-  (* If we only write into ghost fields, we do not care.
-     However, if the type is private, we do not know all
-     modified fields, and thus cannot exclude the region. *)
-  let wr = Mreg.filter (fun r fs -> r.reg_its.its_private
-        || Spv.exists (fun f -> not f.pv_ghost) fs) wr in
-  if gh || Mreg.is_empty wr then wr
-      else Mreg.set_diff wr (cty_r_visible c)
-
-let rec check_ghost_writes vis gh e =
-  let gh = gh || e.e_ghost in
-  let add_v v vis = if gh then vis else pv_r_visible v vis in
-  let add_s s vis = if gh || s.ps_ghost then vis else
-    Spv.fold pv_r_visible s.ps_cty.cty_reads vis in
-  let error () = Loc.errorm ?loc:e.e_loc
-    "This expression makes a ghost write into a non-ghost location" in
-  match e.e_node with
-  | Evar _ | Esym _ | Efun _ | Eany
-  | Eassert _ | Epure _ | Econst _ | Eabsurd -> ()
-  | Enot e | Eraise (_,e) | Eghost e
-  | Erec (_,e) | Efor (_,_,_,e) ->
-      check_ghost_writes vis gh e
-  | Elazy (_,d,e) | Ewhile (d,_,_,e) ->
-      check_ghost_writes vis gh d; check_ghost_writes vis gh e
-  | Eif (c,d,e) -> check_ghost_writes vis gh c;
-      check_ghost_writes vis gh d; check_ghost_writes vis gh e
-  | Elet ({let_sym = ValV v; let_expr = d},e) ->
-      check_ghost_writes vis gh d;
-      check_ghost_writes (add_v v vis) gh e;
-  | Elet ({let_sym = ValS s; let_expr = d},e) ->
-      check_ghost_writes vis gh d;
-      check_ghost_writes (add_s s vis) gh e
-  | Etry (d,xl) ->
-      check_ghost_writes vis gh d;
-      List.iter (fun (_,_,e) -> check_ghost_writes vis gh e) xl
-  | Ecase (d,bl) ->
-      check_ghost_writes vis gh d;
-      List.iter (fun (pp,e) ->
-        let pvs = pvs_of_vss Spv.empty pp.pp_pat.pat_vars in
-        check_ghost_writes (Spv.fold add_v pvs vis) gh e) bl
-  | Eassign al ->
-      List.iter (fun (r,f,v) -> (* ghost writes in visible fields *)
-        if not f.pv_ghost && (gh || r.pv_ghost || v.pv_ghost) then
-        match r.pv_ity.ity_node with
-        | Ityreg r when Sreg.mem r vis -> error () | _ -> ()) al
-  | Eapp (e,vl,c) ->
-      if c.cty_args <> [] (* partial application *) ||
-         Mreg.set_disjoint vis (cty_ghost_writes gh c)
-      then check_ghost_writes vis gh e else error ()
-
 let e_fun args p q xq ({e_effect = eff} as e) =
-  (* TODO/FIXME: stale vars in post-conditions? *)
-  let pvs = e_vars e in check_stale pvs Mpv.empty e;
-  let c = create_cty args p q xq pvs eff (ity_of_expr e) in
-  check_ghost_writes (cty_r_visible c) false e;
+  let c = create_cty args p q xq (e_vars e) eff (ity_of_expr e) in
+  (* TODO/FIXME: detect stale vars in post-conditions? *)
+  check_expr false (cty_mut c) (cty_vis c) Mpv.empty e;
   mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty
