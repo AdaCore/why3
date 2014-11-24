@@ -262,11 +262,12 @@ end
 
 module NumOf
   use import Array
-  use HighOrd as HO
+  use HighOrd
+  use import Bool
   use int.NumOf as N
 
   (** the number of a[i] such that [l <= i < u] and [pr i a[i]] *)
-  function numof (pr: HO.func int (HO.pred 'a)) (a: array 'a) (l u: int) : int =
+  function numof (pr: int -> 'a -> bool) (a: array 'a) (l u: int) : int =
     N.numof (\ i. pr i a[i]) l u
 
 end
