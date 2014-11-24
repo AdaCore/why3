@@ -157,6 +157,12 @@ exception CtyExpected of expr
 val ity_of_expr : expr -> ity
 val cty_of_expr : expr -> cty
 
+val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
+
+val e_find_minimal : (expr -> bool) -> expr -> expr
+(* [e_find_minimal pr e] looks for a minimal sub-expression
+   of [e] satisfying [pr], raises [Not_found] if none found. *)
+
 (** {2 Smart constructors} *)
 
 val e_var : pvsymbol -> expr
@@ -171,6 +177,8 @@ val create_let_defn_pv : preid -> ?ghost:bool -> expr -> let_defn * pvsymbol
 
 val create_let_defn_ps :
   preid -> ?ghost:bool -> ?kind:ps_kind -> expr -> let_defn * psymbol
+
+val e_let : let_defn -> expr -> expr
 
 val e_fun :
   pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> expr

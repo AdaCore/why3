@@ -292,7 +292,7 @@ let e_fold fn acc e = match e.e_node with
 exception FoundExpr of expr
 
 (* find a minimal sub-expression satisfying [pr] *)
-let find_minimal pr e =
+let e_find_minimal pr e =
   let rec find () e = e_fold find () e;
     if pr e then raise (FoundExpr e) in
   try find () e; raise Not_found with FoundExpr e -> e
@@ -369,6 +369,37 @@ let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
     | VtyC c, _ -> c in
   let ps = create_psymbol id ~ghost ~kind cty in
   { let_sym = ValS ps; let_expr = e }, ps
+
+let e_let ({let_sym = lv; let_expr = d} as ld) e = match lv with
+  | ValV _ ->
+      let eff = eff_union d.e_effect e.e_effect in
+      mk_expr (Elet (ld,e)) e.e_vty e.e_ghost eff
+  | ValS {ps_logic = PLls _} ->
+      invalid_arg "Expr.e_let"
+  | ValS s ->
+      let rec rewind d = match d.e_node with
+        | Efun _ | Eany | Eapp _ ->
+            let ld = {let_sym = lv; let_expr = d} in
+            let eff = eff_union d.e_effect e.e_effect in
+            mk_expr (Elet (ld,e)) e.e_vty e.e_ghost eff
+        | Eghost d -> assert s.ps_ghost; rewind d
+        | Elet ({let_sym = ValS {ps_ghost = gh}}, _)
+        | Elet ({let_sym = ValV {pv_ghost = gh}}, _)
+          when s.ps_ghost && not gh -> Loc.errorm ?loc:d.e_loc
+            "This let-definition must be explicitly marked ghost"
+        | Elet ({let_expr = d} as ld, e) ->
+            let e = rewind e in
+            let eff = eff_union d.e_effect e.e_effect in
+            mk_expr (Elet (ld,e)) e.e_vty e.e_ghost eff
+        | Erec ({rec_defn = dl} as rd, e) ->
+            let ngh fd = not fd.fun_sym.ps_ghost in
+            if s.ps_ghost && List.exists ngh dl then Loc.errorm ?loc:d.e_loc
+              "%s must be explicitly marked ghost" (if List.length dl > 1 then
+              "These recursive definitions" else "This recursive definition");
+            let e = rewind e in
+            mk_expr (Erec (rd,e)) e.e_vty e.e_ghost e.e_effect
+      in
+      rewind d
 
 (* lambda construction *)
 
