@@ -162,25 +162,29 @@ why3_vc Div_unique using assms
   have h3: "x - y < y * (x ediv y)" using h1 h2 by linarith
   have h4: "y * (x ediv y) \<le> x" using h1 h2 by linarith
   show ?thesis
-  proof (cases "x ediv y \<ge> q")
-    case False
-    have h5: "x ediv y \<le> q - 1" using False by linarith
+  proof (cases "x ediv y > q")
+   assume a:"q < x ediv y"
+   have h5: "x ediv y \<ge> q + 1" using a by linarith
+   have h6: "y * (x ediv y) >= y * (q + 1)" by (metis H1 h5 le_less mult_left_mono)
+   have h7: "y * (x ediv y) >= q * y + y" by (metis Comm1 Mul_distr_l h6 monoid_mult_class.mult.right_neutral) 
+   thus "x ediv y = q" using H3 h1 h2 h7 by linarith
+   next
+   assume a:"\<not> q < x ediv y"
+   show "x ediv y = q"    
+   proof (cases "x ediv y < q")
+    assume b:"x ediv y < q"
+    have h5: "x ediv y \<le> q - 1" using b by linarith
     have h6: "y * (x ediv y) <= y * (q - 1)" by (metis H1 h5 le_less mult_left_mono)
     have h7: "y * (x ediv y) <= q * y - y" by (metis Comm1 h6 int_distrib(4) monoid_mult_class.mult.right_neutral) 
     thus "x ediv y = q" using H2 h3 h7 by linarith
-    next 
-    show ?thesis
-    proof (cases "x ediv y \<le> q")
-      case False 
-    have h5: "x ediv y \<ge> q + 1" using False by linarith
-    have h6: "y * (x ediv y) >= y * (q + 1)" by (metis H1 h5 le_less mult_left_mono)
-    have h7: "y * (x ediv y) >= q * y + y" by (metis Comm1 Mul_distr_l h6 monoid_mult_class.mult.right_neutral) 
-    thus "x ediv y = q" using H3 h1 h2 h7 by linarith
     next
-    show ?thesis   
-      
-why3_end
+    assume b:"\<not> x ediv y < q"
+    show ?thesis using a b by linarith
+   qed
+  qed
+qed
 
+why3_end
 
 section {* Computer Division *}
 
@@ -224,7 +228,7 @@ proof (cases "y = 0")
   case False
   with assms show ?thesis
     by (cases "z = 0")
-      (simp_all add: cdiv_def add.commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
+      (simp_all add: cdiv_def add.commute add_pos_pos)
 qed simp
 
 why3_vc Div_bound
@@ -253,8 +257,7 @@ why3_vc Mod_mult
 proof (cases "y = 0")
   case False
   with assms show ?thesis
-    by (cases "z = 0") (simp_all add: cmod_def
-      add.commute add_pos_pos mult_nonneg_nonneg mult_pos_pos)
+    by (cases "z = 0") (simp_all add: cmod_def add.commute add_pos_pos)
 qed simp
 
 why3_vc Mod_bound
@@ -283,7 +286,7 @@ proof (cases "x = 0")
   also have "\<bar>y\<bar> * (\<bar>x\<bar> div \<bar>y\<bar>) \<le> \<bar>y\<bar> * (\<bar>x\<bar> div \<bar>y\<bar>) + \<bar>x\<bar> mod \<bar>y\<bar>"
     by (rule add_increasing2) (simp_all add: assms)
   with assms have "\<bar>\<bar>y\<bar> * (\<bar>x\<bar> div \<bar>y\<bar>)\<bar> \<le> \<bar>\<bar>y\<bar> * (\<bar>x\<bar> div \<bar>y\<bar>) + \<bar>x\<bar> mod \<bar>y\<bar>\<bar>"
-    by (simp add: mult_nonneg_nonneg pos_imp_zdiv_nonneg_iff)
+    by (simp add: pos_imp_zdiv_nonneg_iff)
   finally show ?thesis using `\<bar>sgn x\<bar> = 1`
     by (simp add: cdiv_def)
 qed (simp add: cdiv_def)
@@ -326,3 +329,4 @@ why3_vc Power_monotonic using assms by (simp add: power_increasing)
 why3_end
 
 end
+
