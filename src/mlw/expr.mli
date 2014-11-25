@@ -130,6 +130,8 @@ and expr_node = private
   | Eassert of assertion_kind * term
   | Epure   of term
   | Eabsurd
+  | Etrue
+  | Efalse
   | Eany
 
 and let_defn = private {
@@ -160,8 +162,10 @@ val cty_of_expr : expr -> cty
 val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
 
 val e_find_minimal : (expr -> bool) -> expr -> expr
-(* [e_find_minimal pr e] looks for a minimal sub-expression
-   of [e] satisfying [pr], raises [Not_found] if none found. *)
+(** [e_find_minimal pr e] looks for a minimal sub-expression
+    of [e] satisfying [pr], raises [Not_found] if none found. *)
+
+val proxy_label : label
 
 (** {2 Smart constructors} *)
 
@@ -184,8 +188,22 @@ val e_rec : rec_defn -> expr -> expr
 val e_app : expr -> pvsymbol list -> ity list -> ity -> expr
 val e_apply : expr -> expr list -> ity list -> ity -> expr
 
+val e_assign : (expr * pvsymbol (* field *) * expr) list -> expr
+
 val e_ghost : expr -> expr
 val e_ghostify : expr -> expr
+
+val e_if : expr -> expr -> expr -> expr
+
+val e_true : expr
+val e_false : expr
+
+val e_pure : term -> expr
+
+val e_assert : assertion_kind -> term -> expr
+val e_absurd : ity -> expr
+
+val e_any : cty -> expr
 
 val e_fun :
   pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> expr

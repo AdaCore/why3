@@ -70,7 +70,7 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
       Normally, resets neither consult nor change the
       external state, and do not affect the specification. *)
     if not (eff_is_pure e) then Loc.errorm
-      "this function is stateful, it cannot be declared as pure" in
+      "this function has side effects, it cannot be declared as pure" in
   let check_reads { cty_freeze = isb } =
     if not (Mreg.is_empty isb.isb_reg) then Loc.errorm
       "this function is stateful, it cannot be declared as pure" in
@@ -237,6 +237,8 @@ and expr_node =
   | Eassert of assertion_kind * term
   | Epure   of term
   | Eabsurd
+  | Etrue
+  | Efalse
   | Eany
 
 and let_defn = {
@@ -277,7 +279,7 @@ let cty_of_expr e = match e.e_vty with
   | VtyC cty -> cty
 
 let e_fold fn acc e = match e.e_node with
-  | Evar _ | Esym _ | Econst _ | Eany
+  | Evar _ | Esym _ | Econst _ | Eany | Etrue | Efalse
   | Eassign _ | Eassert _ | Epure _ | Eabsurd -> acc
   | Efun e | Eapp (e,_,_) | Enot e | Eraise (_,e)
   | Efor (_,_,_,e) | Eghost e -> fn acc e
@@ -312,7 +314,9 @@ let find_effect pr e =
 let mk_expr node vty ghost eff = {
   e_node   = node;
   e_vty    = vty;
-  e_ghost  = ghost;
+  e_ghost  = if ghost && eff.eff_diverg then
+    Loc.errorm "This ghost expression contains potentially \
+      non-terminating loops or function calls" else ghost;
   e_effect = eff;
   e_label  = Slab.empty;
   e_loc    = None;
@@ -341,12 +345,12 @@ let create_let_defn_pv id ?(ghost=false) e =
   let ghost = ghost || e.e_ghost in
   let ity = match e.e_vty with
     | VtyC ({ cty_args = args; cty_result = res } as c) ->
-        let error s = Loc.errorm
+        let error s = Loc.errorm ?loc:e.e_loc
           "this function %s, it cannot be used as first-order" s in
         if not (Mreg.is_empty c.cty_freeze.isb_reg &&
-                eff_is_empty c.cty_effect) then error "is stateful";
+                eff_is_empty c.cty_effect) then error "is non-pure";
         if not (List.for_all (fun a -> ity_immutable a.pv_ity) args &&
-                ity_immutable res) then error "is non-pure";
+                ity_immutable res) then error "is stateful";
         if not e.e_ghost && List.exists (fun a -> a.pv_ghost) args
           then error "has ghost arguments";
         if c.cty_pre <> [] then error "is partial";
@@ -359,12 +363,12 @@ let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
   let ghost = ghost || e.e_ghost in
   let cty = match e.e_vty, kind with
     | _, PKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_ps"
-    | VtyI _, (PKnone|PKlocal|PKlemma) -> Loc.errorm
+    | VtyI _, (PKnone|PKlocal|PKlemma) -> Loc.errorm ?loc:e.e_loc
         "this expression is first-order, it cannot be used as a function"
     | VtyI i, (PKfunc _|PKpred) when ity_immutable i ->
         (* the post will be equality to the logic constant *)
         create_cty [] [] [] Mexn.empty Spv.empty eff_empty i
-    | VtyI _, (PKfunc _|PKpred) -> Loc.errorm
+    | VtyI _, (PKfunc _|PKpred) -> Loc.errorm ?loc:e.e_loc
         "this expression is non-pure, it cannot be used as a pure function"
     | VtyC c, _ -> c in
   let ps = create_psymbol id ~ghost ~kind cty in
@@ -437,19 +441,72 @@ let e_app e vl tyl ty =
     mk_expr (Eapp (e,vl,c)) vty (gh || e.e_ghost) eff in
   rewind mk_app (gh || e.e_ghost) e
 
+let proxy_label = create_label "proxy_pvsymbol"
+let proxy_labels = Slab.singleton proxy_label
+
+let mk_proxy ?(ghost=false) e hd = match e.e_node with
+  | Evar v when (v.pv_ghost || not ghost) && Slab.is_empty e.e_label ->
+      hd, v
+  | _ ->
+      let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
+      let ld, v = create_let_defn_pv id ~ghost e in
+      ld::hd, v
+
+let mk_ity e = match e.e_vty with
+  | VtyI _ -> e
+  | VtyC _ -> let hd, v = mk_proxy e [] in
+      List.fold_right e_let_raw hd (e_var v)
+
 let e_apply e el tyl ty =
-  let rec down hd vl al el = match al, el with
-    | {pv_ghost = gh}::al, ({e_node = Evar v} as e)::el
-      when (v.pv_ghost || not gh) && Slab.is_empty e.e_label ->
-        down hd (v::vl) al el
+  let rec down al el = match al, el with
     | {pv_ghost = ghost}::al, e::el ->
-        let id = id_fresh ?loc:e.e_loc "o" in
-        let ld, v = create_let_defn_pv id ~ghost e in
-        down (ld::hd) (v::vl) al el
-    | _, [] -> List.rev hd, List.rev vl
+        let hd, vl = down al el in
+        let hd, v = mk_proxy ~ghost e hd in
+        hd, v::vl
+    | _, [] -> [], []
     | _ -> invalid_arg "Expr.e_apply" (* BadArity? *) in
-  let hd, vl = down [] [] (cty_of_expr e).cty_args el in
+  let hd, vl = down (cty_of_expr e).cty_args el in
   List.fold_right e_let_raw hd (e_app e vl tyl ty)
+
+let e_assign_raw al =
+  let gh = List.for_all (fun (r,f,v) ->
+    r.pv_ghost || f.pv_ghost || v.pv_ghost) al in
+  let conv (r,f,v) = match r.pv_ity.ity_node with
+    | Ityreg r -> r,f,v.pv_ity
+    | _ -> invalid_arg "Expr.e_assign" in
+  let eff = eff_assign eff_empty (List.map conv al) in
+  mk_expr (Eassign al) (VtyI ity_unit) gh eff
+
+let e_assign al =
+  let hd, al = List.fold_right (fun (r,f,v) (hd,al) ->
+    let hd, v = mk_proxy v hd in
+    let hd, r = mk_proxy r hd in
+    hd, (r,f,v)::al) al ([],[]) in
+  List.fold_right e_let_raw hd (e_assign_raw al)
+
+let e_if e0 e1 e2 =
+  ity_equal_check (ity_of_expr e0) ity_bool;
+  ity_equal_check (ity_of_expr e1) (ity_of_expr e2);
+  let gh = e0.e_ghost || e1.e_ghost || e2.e_ghost in
+  let eff = eff_union e1.e_effect e2.e_effect in
+  let eff = eff_union e0.e_effect eff in
+  mk_expr (Eif (e0,e1,e2)) e1.e_vty gh eff
+
+let e_if e0 e1 e2 = e_if (mk_ity e0) (mk_ity e1) (mk_ity e2)
+
+let e_true = mk_expr Etrue (VtyI ity_bool) false eff_empty
+let e_false = mk_expr Efalse (VtyI ity_bool) false eff_empty
+
+let e_pure t =
+  let ity = Opt.fold (fun _ -> ity_of_ty) ity_bool t.t_ty in
+  mk_expr (Epure t) (VtyI ity) true eff_empty
+
+let e_assert ak f =
+  mk_expr (Eassert (ak, t_prop f)) (VtyI ity_unit) false eff_empty
+
+let e_absurd ity = mk_expr Eabsurd (VtyI ity) false eff_empty
+
+let e_any c = mk_expr Eany (VtyC c) false eff_empty
 
 (* lambda construction *)
 
@@ -483,7 +540,7 @@ let rec e_vars e = match e.e_node with
   | Efor (v,(f,_,t),inv,e) ->
       Spv.add f (Spv.add t (Spv.remove v (t_freepvs (e_vars e) inv)))
   | Eassert (_,t) | Epure t -> t_freepvs Spv.empty t
-  | Econst _ | Eabsurd -> Spv.empty
+  | Econst _ | Eabsurd | Etrue | Efalse -> Spv.empty
 
 let pv_mut v mut = if ity_immutable v.pv_ity then mut else Spv.add v mut
 let pv_vis v vis = if v.pv_ghost then vis else ity_r_visible vis v.pv_ity
@@ -577,7 +634,7 @@ let rec check_expr gh mut vis rst e0 =
       check_t rst inv; check_e rst e
   | Enot e | Eraise (_,e) | Eghost e -> check_e rst e
   | Eassert (_,t) | Epure t -> check_t rst t
-  | Econst _ | Eabsurd -> ()
+  | Econst _ | Eabsurd | Etrue | Efalse -> ()
 
 let e_fun args p q xq ({e_effect = eff} as e) =
   let c = create_cty args p q xq (e_vars e) eff (ity_of_expr e) in
