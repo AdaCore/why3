@@ -103,7 +103,7 @@ and is_exec_decl ctx d =
   | Dlogic ll ->
       List.iter (fun (ls, _) -> allow_ls ls) ll;
       List.for_all
-        (fun (_, ld) -> not (is_exec_term ctx (snd (open_ls_defn ld)))) ll ||
+        (fun (_, ld) -> is_exec_term ctx (snd (open_ls_defn ld))) ll ||
       begin List.iter (fun (ls, _) -> forbid_ls ls) ll; false end
       (* TODO? we could be more precise if two definitions are
          unnecessarily recursive and one is executable and the other is not *)
@@ -112,3 +112,69 @@ and is_exec_decl ctx d =
   | Dprop _ ->
       false
 
+open Mlw_ty
+open Mlw_expr
+open Mlw_decl
+
+let rec is_exec_expr ctx e =
+  not e.e_ghost &&
+  match e.e_node with
+    | Eassert _
+    | Eabsurd
+    | Evalue _
+    | Earrow _ ->
+        true
+    | Eany _ ->
+        false
+    | Elogic t ->
+        is_exec_term ctx t
+    | Eloop (_, _, e1)
+    | Efor (_, _, _, e1)
+    | Eraise (_, e1)
+    | Eapp (e1, _, _)
+    | Eabstr (e1, _)
+    | Eassign (_, e1, _, _) ->
+        is_exec_expr ctx e1
+    | Elet ({let_expr = e1; _}, e2) when e1.e_ghost ->
+        is_exec_expr ctx e2
+    | Elet ({let_expr = e1; _}, e2) ->
+        is_exec_expr ctx e1 &&
+        is_exec_expr ctx e2
+    | Eif (e0, e1, e2) ->
+        is_exec_expr ctx e0 &&
+        is_exec_expr ctx e1 &&
+        is_exec_expr ctx e2
+    | Erec (fdl, e1) ->
+        let aux f = is_exec_expr ctx f.fun_lambda.l_expr in
+        List.for_all aux fdl &&
+        is_exec_expr ctx e1
+    | Ecase (e1, bl) ->
+        let aux (_, e) = is_exec_expr ctx e in
+        is_exec_expr ctx e1 &&
+        List.for_all aux bl
+    | Etry (e1, bl) ->
+        let aux (_, _, e) = is_exec_expr ctx e in
+        is_exec_expr ctx e1 &&
+        List.for_all aux bl
+    | Eghost _ ->
+        assert false
+
+let is_ghost_lv = function
+  | LetV pv -> pv.pv_ghost
+  | LetA ps -> ps.ps_ghost
+
+let is_exec_pdecl ctx pd = match pd.pd_node with
+  | PDtype _
+  | PDexn _
+  | PDdata _ ->
+      true
+  | PDlet {let_sym = lv; _}
+  | PDval lv when is_ghost_lv lv ->
+      false
+  | PDval (LetV {pv_vs = {vs_name = name}; _} | LetA {ps_name = name; _}) ->
+      has_syntax ctx name
+  | PDlet ld ->
+      is_exec_expr ctx ld.let_expr
+  | PDrec fdl ->
+      let aux f = is_exec_expr ctx f.fun_lambda.l_expr in
+      List.for_all aux fdl

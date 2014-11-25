@@ -19,3 +19,7 @@ val create: Mlw_driver.driver -> Decl.known_map -> Mlw_decl.known_map -> t
 val is_exec_term: t -> Term.term -> bool
 val is_exec_lsymbol: t -> Term.lsymbol -> bool
 val is_exec_decl: t -> Decl.decl -> bool
+
+val is_exec_expr: t -> Mlw_expr.expr -> bool
+val is_exec_pdecl: t -> Mlw_decl.pdecl -> bool
+
