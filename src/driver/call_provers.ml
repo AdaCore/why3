@@ -152,7 +152,7 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit =
          with Not_found -> grep out res_parser.prp_regexps)
   in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
-  let time = Opt.get_def time (grep_time out res_parser.prp_timeregexps) in
+  let time,steps = Opt.get_def (time,-1) (grep_time out res_parser.prp_timeregexps) in
   let ans = match ans with
     | HighFailure when on_timelimit && timelimit > 0
       && time >= (0.9 *. float timelimit) -> Timeout
@@ -161,9 +161,11 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit =
   { pr_answer = ans;
     pr_status = ret;
     pr_output = out;
-    pr_time   = time }
+    pr_time   = time;
+    pr_steps  = steps;
+  }
 
-let actualcommand command timelimit memlimit file =
+let actualcommand command timelimit memlimit stepslimit file =
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
   let on_timelimit = ref false in
@@ -191,7 +193,7 @@ let call_on_file ~command ?(timelimit=0) ?(memlimit=0) ?(stepslimit=(-1))
                  ?(cleanup=false) ?(inplace=false) ?(redirect=true) fin =
 
   let command, use_stdin, on_timelimit =
-    try actualcommand command timelimit memlimit fin
+    try actualcommand command timelimit memlimit stepslimit fin
     with e ->
       if cleanup then Sys.remove fin;
       if inplace then Sys.rename (save fin) fin;

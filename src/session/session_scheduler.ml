@@ -461,9 +461,11 @@ let run_external_proof_v3 eS eT a callback =
     end else begin
       let previous_result = a.proof_state in
       let timelimit, memlimit = adapt_limits a in
-      let stepslimit = 
+      let stepslimit =
 	match a with
-	| { proof_state = Done { pr_answer = Valid; pr_steps = s }; 
+	| { proof_state =
+            Done { Call_provers.pr_answer = Call_provers.Valid;
+                   Call_provers.pr_steps = s };
 	    proof_obsolete = false }-> s
 	| _ -> -1
       in
