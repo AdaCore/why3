@@ -47,6 +47,12 @@ let opt_standalone = ref false
 
 let opt_prepare_shared = ref false
 
+let opt_why3_conf_file : string option ref = ref None
+
+let set_why3_conf s =
+  if s != "" then
+    opt_why3_conf_file := Some s
+
 let set_filename s =
    if !opt_filename = None then
       opt_filename := Some s
@@ -156,6 +162,8 @@ let options = Arg.align [
           " Specify directory to save session and manual proofs files";
    "--prepare-shared", Arg.Set opt_prepare_shared,
           " Build user libraries for manual provers";
+   "--why3-conf", Arg.String set_why3_conf,
+          " Specify additionnal configuration file";
 ]
 
 let () = Arg.parse options set_filename usage_msg
@@ -202,7 +210,7 @@ let provers, config, env =
          else Whyconf.read_config (Some gnatprove_why3conf_file) in
        if builtin_provers_only then gnatprove_config
         else begin
-           let conf = Whyconf.read_config None in
+           let conf = (Whyconf.read_config !opt_why3_conf_file) in
            let provers =
              prover_merge
                (Whyconf.get_provers gnatprove_config)
@@ -217,7 +225,11 @@ let provers, config, env =
              editors
         end
      with Rc.CannotOpen _ ->
-       Gnat_util.abort_with_message ~internal:true "Cannot read file why3.conf."
+       let conf_name = match !opt_why3_conf_file with
+                       | None -> "why3.conf"
+                       | Some s -> Filename.basename s in
+       Gnat_util.abort_with_message ~internal:true
+                                    ("Cannot read file" ^ conf_name ^ ".")
   in
   (* now we build the Whyconf.config_prover for all requested provers *)
   let base_provers =
