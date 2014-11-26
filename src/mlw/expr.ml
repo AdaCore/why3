@@ -91,8 +91,8 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
   | PKlocal ->
       check_effects c; check_reads c;
       let ity = ity_purify c.cty_result in
-      let ity = List.fold_right (fun a ty ->
-        ity_func (ity_purify a.pv_ity) ty) c.cty_args ity in
+      let ity = List.fold_right (fun a ity ->
+        ity_func (ity_purify a.pv_ity) ity) c.cty_args ity in
       (* When declaring local let-functions, we need to create a
          mapping vsymbol to use in assertions. As vsymbols are not
          generalisable, we have to freeze the type variables (but
@@ -254,6 +254,7 @@ and fun_defn = {
   fun_sym  : psymbol;
   fun_expr : expr; (* Efun *)
   fun_varl : variant list;
+  fun_varv : pvsymbol;
 }
 
 (* basic tools *)
@@ -277,6 +278,9 @@ let ity_of_expr e = match e.e_vty with
 let cty_of_expr e = match e.e_vty with
   | VtyI _ -> Loc.error ?loc:e.e_loc (CtyExpected e)
   | VtyC cty -> cty
+
+let e_ghost_raises e =
+  e.e_ghost && not (Mexn.is_empty e.e_effect.eff_raises)
 
 let e_fold fn acc e = match e.e_node with
   | Evar _ | Esym _ | Econst _ | Eany | Etrue | Efalse
@@ -327,12 +331,14 @@ let e_sym ps = mk_expr (Esym ps) (VtyC ps.ps_cty) ps.ps_ghost eff_empty
 
 let e_const c =
   let ity = match c with
-    | Number.ConstInt _ -> ity_int
+    | Number.ConstInt  _ -> ity_int
     | Number.ConstReal _ -> ity_real in
   mk_expr (Econst c) (VtyI ity) false eff_empty
 
 let e_nat_const n =
   e_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
+
+(* let definitions *)
 
 let create_let_defn id ?(ghost=false) e =
   let ghost = ghost || e.e_ghost in
@@ -374,9 +380,6 @@ let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
   let ps = create_psymbol id ~ghost ~kind cty in
   { let_sym = ValS ps; let_expr = e }, ps
 
-let e_ghost_raises e =
-  e.e_ghost && not (Mexn.is_empty e.e_effect.eff_raises)
-
 let e_let_raw ({let_expr = d} as ld) e =
   let eff = eff_union d.e_effect e.e_effect in
   let ghost = e.e_ghost || e_ghost_raises d in
@@ -385,11 +388,26 @@ let e_let_raw ({let_expr = d} as ld) e =
 let e_rec_raw rd e =
   mk_expr (Erec (rd,e)) e.e_vty e.e_ghost e.e_effect
 
-let e_ghost e =
-  mk_expr (Eghost e) e.e_vty true e.e_effect
+let proxy_label = create_label "proxy_pvsymbol"
+let proxy_labels = Slab.singleton proxy_label
 
-let e_ghostify e =
-  if not e.e_ghost then e_ghost e else e
+let mk_proxy ~ghost e hd = match e.e_node with
+  | Evar v when (v.pv_ghost || not ghost) && Slab.is_empty e.e_label ->
+      hd, v
+  | _ ->
+      let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
+      let ld, v = create_let_defn_pv id ~ghost e in
+      ld::hd, v
+
+let mk_ity e = match e.e_vty with
+  | VtyI _ -> e
+  | VtyC _ ->
+      let hd, v = mk_proxy ~ghost:false e [] in
+      List.fold_right e_let_raw hd (e_var v)
+
+let e_ghost e = mk_expr (Eghost e) e.e_vty true e.e_effect
+
+let e_ghostify e = if not e.e_ghost then e_ghost e else e
 
 (* Elet, Erec, and Eghost are guaranteed to never change
    the type of the underlying expression. Thus, [fn] can
@@ -431,8 +449,10 @@ let e_rec ({rec_defn = dl} as rd) e =
     | PLls _ -> invalid_arg "Expr.e_rec" | _ -> ()) dl;
   e_rec_raw rd e
 
-let e_app e vl tyl ty =
-  let gh, c = cty_apply (cty_of_expr e) vl tyl ty in
+(* application and assignment *)
+
+let e_app_raw e vl ityl ity =
+  let gh, c = cty_apply (cty_of_expr e) vl ityl ity in
   let vty, eff = if c.cty_args = [] then
     VtyI c.cty_result, c.cty_effect else
     VtyC c, eff_empty in
@@ -441,42 +461,25 @@ let e_app e vl tyl ty =
     mk_expr (Eapp (e,vl,c)) vty (gh || e.e_ghost) eff in
   rewind mk_app (gh || e.e_ghost) e
 
-let proxy_label = create_label "proxy_pvsymbol"
-let proxy_labels = Slab.singleton proxy_label
-
-let mk_proxy ~ghost e hd = match e.e_node with
-  | Evar v when (v.pv_ghost || not ghost) && Slab.is_empty e.e_label ->
-      hd, v
-  | _ ->
-      let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
-      let ld, v = create_let_defn_pv id ~ghost e in
-      ld::hd, v
-
-let mk_ity e = match e.e_vty with
-  | VtyI _ -> e
-  | VtyC _ ->
-      let hd, v = mk_proxy ~ghost:false e [] in
-      List.fold_right e_let_raw hd (e_var v)
-
-let e_apply e el tyl ty =
+let e_app e el ityl ity =
   let rec down al el = match al, el with
     | {pv_ghost = ghost}::al, e::el ->
         let hd, vl = down al el in
         let hd, v = mk_proxy ~ghost e hd in
         hd, v::vl
     | _, [] -> [], []
-    | _ -> invalid_arg "Expr.e_apply" (* BadArity? *) in
+    | _ -> invalid_arg "Expr.e_app" (* BadArity? *) in
   let hd, vl = down (cty_of_expr e).cty_args el in
-  List.fold_right e_let_raw hd (e_app e vl tyl ty)
+  List.fold_right e_let_raw hd (e_app_raw e vl ityl ity)
 
 let e_assign_raw al =
-  let gh = List.for_all (fun (r,f,v) ->
+  let ghost = List.for_all (fun (r,f,v) ->
     r.pv_ghost || f.pv_ghost || v.pv_ghost) al in
   let conv (r,f,v) = match r.pv_ity.ity_node with
     | Ityreg r -> r,f,v.pv_ity
     | _ -> invalid_arg "Expr.e_assign" in
   let eff = eff_assign eff_empty (List.map conv al) in
-  mk_expr (Eassign al) (VtyI ity_unit) gh eff
+  mk_expr (Eassign al) (VtyI ity_unit) ghost eff
 
 let e_assign al =
   let hr, hv, al = List.fold_right (fun (r,f,v) (hr,hv,al) ->
@@ -487,6 +490,8 @@ let e_assign al =
   (* first pants, THEN your shoes *)
   List.fold_right e_let_raw hr
     (List.fold_right e_let_raw hv (e_assign_raw al))
+
+(* boolean constructors *)
 
 let e_if e0 e1 e2 =
   let e1 = mk_ity e1 and e2 = mk_ity e2 in
@@ -511,6 +516,8 @@ let e_not e =
 let e_true  = mk_expr Etrue  (VtyI ity_bool) false eff_empty
 let e_false = mk_expr Efalse (VtyI ity_bool) false eff_empty
 
+(* loops *)
+
 let e_for_raw v ((f,_,t) as bounds) inv e =
   ity_equal_check v.pv_ity ity_int;
   ity_equal_check f.pv_ity ity_int;
@@ -533,6 +540,8 @@ let e_while cnd inv vl e =
   let eff = if vl = [] then eff_diverge eff else eff in
   mk_expr (Ewhile (cnd,inv,vl,e)) e.e_vty ghost eff
 
+(* match-with, try-with, raise *)
+
 let e_case_raw ({e_effect = eff} as e) bl =
   let mb, ity = match bl with
     | [(_,d)] -> false, ity_of_expr d
@@ -543,8 +552,7 @@ let e_case_raw ({e_effect = eff} as e) bl =
       Loc.errorm "Non-ghost pattern in a ghost position";
     ity_equal_check (ity_of_expr d) ity;
     ity_equal_check (ity_of_expr e) pp.pp_ity) bl;
-  let ghost = e.e_ghost && not (Mexn.is_empty eff.eff_raises) in
-  let ghost = ghost || List.exists (fun (_,d) -> d.e_ghost) bl in
+  let ghost = e_ghost_raises e || List.exists (fun (_,d) -> d.e_ghost) bl in
   let ghost = ghost || (mb && List.exists (fun (pp,_) -> pp.pp_ghost) bl) in
   let eff = List.fold_left (fun f (_,d) -> eff_union f d.e_effect) eff bl in
   mk_expr (Ecase (e,bl)) (VtyI ity) ghost eff
@@ -569,6 +577,8 @@ let e_raise xs e ity =
   ity_equal_check (ity_of_expr e) xs.xs_ity;
   let eff = eff_raise e.e_effect xs in
   mk_expr (Eraise (xs,e)) (VtyI ity) e.e_ghost eff
+
+(* snapshots, assertions, "any" *)
 
 let e_pure t =
   let ity = Opt.fold (fun _ -> ity_of_ty) ity_bool t.t_ty in
@@ -595,7 +605,6 @@ let rec e_vars e = match e.e_node with
   | Elet ({let_sym = ValS _; let_expr = d},e) | Elazy (_,d,e) ->
       Spv.union (e_vars d) (e_vars e)
   | Erec ({rec_defn = dl},e) ->
-      (* we ignore variants as they appear in the bodies *)
       let s = List.fold_left (fun s {fun_sym = ps} ->
         Spv.union s ps.ps_cty.cty_reads) (e_vars e) dl in
       List.fold_left (fun s fd -> match fd.fun_sym.ps_logic with
@@ -638,11 +647,12 @@ let rec check_expr gh mut vis rst e0 =
   let check_r rst r = Mpv.iter error_v (Mpv.set_inter rst r) in
   let check_t rst t = check_r rst (t_freepvs Spv.empty t) in
   let reset_c rst c = Mpv.set_inter rst c.cty_reads in
+  let check_c rst c = check_r rst c.cty_reads in
   let check_e rst e = check_expr gh mut vis rst e in
   let after_e ({e_effect = eff} as e) =
     if Mreg.is_empty eff.eff_resets then rst else
-    Mpv.set_union rst (Mpv.mapi_filter (fun {pv_ity = ty} () ->
-      if eff_stale_region eff ty then Some e else None) mut) in
+    Mpv.set_union rst (Mpv.mapi_filter (fun {pv_ity = ity} () ->
+      if eff_stale_region eff ity then Some e else None) mut) in
   (* A non-ghost application can perform ghost writes into ghost fields
      or into ghost arguments. The former is always safe, but the latter
      is illegal, if we submit a visible region inside a ghost argument.
@@ -669,8 +679,7 @@ let rec check_expr gh mut vis rst e0 =
   | Eapp (d,l,c) ->
       check_e rst d; List.iter (check_v (after_e d)) l;
       if c.cty_args = [] then Sreg.iter error_r (ghost_c vis c)
-  | Efun _ | Eany ->
-      Mpv.iter error_v (reset_c rst (cty_of_expr e0))
+  | Efun _ | Eany -> check_c rst (cty_of_expr e0)
   | Eassign al ->
       List.iter (fun (r,f,v) -> check_v rst r; check_v rst v;
         if not f.pv_ghost && (gh || r.pv_ghost || v.pv_ghost)
@@ -684,7 +693,7 @@ let rec check_expr gh mut vis rst e0 =
       check_expr (gh || s.ps_ghost) mut vis rst d;
       check_e (after_e d) e
   | Erec ({rec_defn = fdl},e) ->
-      List.iter (fun fd -> check_e rst fd.fun_expr) fdl;
+      List.iter (fun fd -> check_c rst fd.fun_sym.ps_cty) fdl;
       check_e rst e
   | Elazy (_,d,e) ->
       check_e rst d; check_e (after_e d) e
@@ -715,3 +724,26 @@ let e_fun args p q xq ({e_effect = eff} as e) =
   (* TODO/FIXME: detect stale vars in post-conditions? *)
   check_expr false (cty_mut c) (cty_vis c) Mpv.empty e;
   mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty
+
+(* recursive definitions *)
+
+let create_rec_defn fdl =
+  (* check that the all variants use the same order *)
+  let varl1 = match fdl with
+    | (_,_,vl)::_ -> List.rev vl
+    | [] -> invalid_arg "Expr.create_rec_defn" in
+  let check_variant (_,_,vl) =
+    let vl, varl1 = match List.rev vl, varl1 with
+      | (_, None)::vl, (_, None)::varl1 -> vl, varl1
+      | _, _ -> vl, varl1 in
+    let res = try List.for_all2 (fun (t1,r1) (t2,r2) ->
+        Opt.equal Ty.ty_equal t1.t_ty t2.t_ty &&
+        Opt.equal ls_equal r1 r2) vl varl1
+      with Invalid_argument _ -> false in
+    if not res then Loc.errorm
+      "All functions in a recursive definition \
+        must use the same well-founded order for variant"
+  in
+  List.iter check_variant (List.tl fdl);
+  (* create the first list of fun_defns *)
+  assert false

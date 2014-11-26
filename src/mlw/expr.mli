@@ -147,6 +147,7 @@ and fun_defn = {
   fun_sym  : psymbol;
   fun_expr : expr; (* Efun *)
   fun_varl : variant list;
+  fun_varv : pvsymbol;
 }
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
@@ -185,8 +186,7 @@ val create_let_defn_ps :
 val e_let : let_defn -> expr -> expr
 val e_rec : rec_defn -> expr -> expr
 
-val e_app : expr -> pvsymbol list -> ity list -> ity -> expr
-val e_apply : expr -> expr list -> ity list -> ity -> expr
+val e_app : expr -> expr list -> ity list -> ity -> expr
 
 val e_assign : (expr * pvsymbol (* field *) * expr) list -> expr
 
