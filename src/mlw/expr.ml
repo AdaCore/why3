@@ -444,7 +444,7 @@ let e_app e vl tyl ty =
 let proxy_label = create_label "proxy_pvsymbol"
 let proxy_labels = Slab.singleton proxy_label
 
-let mk_proxy ?(ghost=false) e hd = match e.e_node with
+let mk_proxy ~ghost e hd = match e.e_node with
   | Evar v when (v.pv_ghost || not ghost) && Slab.is_empty e.e_label ->
       hd, v
   | _ ->
@@ -454,7 +454,8 @@ let mk_proxy ?(ghost=false) e hd = match e.e_node with
 
 let mk_ity e = match e.e_vty with
   | VtyI _ -> e
-  | VtyC _ -> let hd, v = mk_proxy e [] in
+  | VtyC _ ->
+      let hd, v = mk_proxy ~ghost:false e [] in
       List.fold_right e_let_raw hd (e_var v)
 
 let e_apply e el tyl ty =
@@ -478,13 +479,17 @@ let e_assign_raw al =
   mk_expr (Eassign al) (VtyI ity_unit) gh eff
 
 let e_assign al =
-  let hd, al = List.fold_right (fun (r,f,v) (hd,al) ->
-    let hd, v = mk_proxy v hd in
-    let hd, r = mk_proxy r hd in
-    hd, (r,f,v)::al) al ([],[]) in
-  List.fold_right e_let_raw hd (e_assign_raw al)
+  let hr, hv, al = List.fold_right (fun (r,f,v) (hr,hv,al) ->
+    let ghost = r.e_ghost || f.pv_ghost || v.e_ghost in
+    let hv, v = mk_proxy ~ghost v hv in
+    let hr, r = mk_proxy ~ghost r hr in
+    hr, hv, (r,f,v)::al) al ([],[],[]) in
+  (* first pants, THEN your shoes *)
+  List.fold_right e_let_raw hr
+    (List.fold_right e_let_raw hv (e_assign_raw al))
 
 let e_if e0 e1 e2 =
+  let e1 = mk_ity e1 and e2 = mk_ity e2 in
   ity_equal_check (ity_of_expr e0) ity_bool;
   ity_equal_check (ity_of_expr e1) (ity_of_expr e2);
   let gh = e0.e_ghost || e1.e_ghost || e2.e_ghost in
@@ -492,10 +497,78 @@ let e_if e0 e1 e2 =
   let eff = eff_union e0.e_effect eff in
   mk_expr (Eif (e0,e1,e2)) e1.e_vty gh eff
 
-let e_if e0 e1 e2 = e_if (mk_ity e0) (mk_ity e1) (mk_ity e2)
+let e_lazy op e1 e2 =
+  ity_equal_check (ity_of_expr e1) ity_bool;
+  ity_equal_check (ity_of_expr e2) ity_bool;
+  let ghost = e1.e_ghost || e2.e_ghost in
+  let eff = eff_union e1.e_effect e2.e_effect in
+  mk_expr (Elazy (op,e1,e2)) e1.e_vty ghost eff
 
-let e_true = mk_expr Etrue (VtyI ity_bool) false eff_empty
+let e_not e =
+  ity_equal_check (ity_of_expr e) ity_bool;
+  mk_expr (Enot e) e.e_vty e.e_ghost e.e_effect
+
+let e_true  = mk_expr Etrue  (VtyI ity_bool) false eff_empty
 let e_false = mk_expr Efalse (VtyI ity_bool) false eff_empty
+
+let e_for_raw v ((f,_,t) as bounds) inv e =
+  ity_equal_check v.pv_ity ity_int;
+  ity_equal_check f.pv_ity ity_int;
+  ity_equal_check t.pv_ity ity_int;
+  ity_equal_check (ity_of_expr e) ity_unit;
+  let ghost = v.pv_ghost || f.pv_ghost || t.pv_ghost || e.e_ghost in
+  mk_expr (Efor (v,bounds,inv,e)) e.e_vty ghost e.e_effect
+
+let e_for v ef dir et inv e =
+  let ghost = v.pv_ghost || ef.e_ghost || et.e_ghost || e.e_ghost in
+  let hd, vt = mk_proxy ~ghost et [] in
+  let hd, vf = mk_proxy ~ghost ef hd in
+  List.fold_right e_let_raw hd (e_for_raw v (vf,dir,vt) inv e)
+
+let e_while cnd inv vl e =
+  ity_equal_check (ity_of_expr cnd) ity_bool;
+  ity_equal_check (ity_of_expr e) ity_unit;
+  let ghost = cnd.e_ghost || e.e_ghost in
+  let eff = eff_union cnd.e_effect e.e_effect in
+  let eff = if vl = [] then eff_diverge eff else eff in
+  mk_expr (Ewhile (cnd,inv,vl,e)) e.e_vty ghost eff
+
+let e_case_raw ({e_effect = eff} as e) bl =
+  let mb, ity = match bl with
+    | [(_,d)] -> false, ity_of_expr d
+    | (_,d)::_ -> true, ity_of_expr d
+    | [] -> invalid_arg "Expr.e_case" in
+  List.iter (fun (pp,d) ->
+    if e.e_ghost && not pp.pp_ghost then
+      Loc.errorm "Non-ghost pattern in a ghost position";
+    ity_equal_check (ity_of_expr d) ity;
+    ity_equal_check (ity_of_expr e) pp.pp_ity) bl;
+  let ghost = e.e_ghost && not (Mexn.is_empty eff.eff_raises) in
+  let ghost = ghost || List.exists (fun (_,d) -> d.e_ghost) bl in
+  let ghost = ghost || (mb && List.exists (fun (pp,_) -> pp.pp_ghost) bl) in
+  let eff = List.fold_left (fun f (_,d) -> eff_union f d.e_effect) eff bl in
+  mk_expr (Ecase (e,bl)) (VtyI ity) ghost eff
+
+let e_case e bl =
+  e_case_raw (mk_ity e) (List.map (fun (pp,d) -> pp, mk_ity d) bl)
+
+let e_try_raw e xl =
+  List.iter (fun (xs,v,d) ->
+    ity_equal_check v.pv_ity xs.xs_ity;
+    ity_equal_check (ity_of_expr d) (ity_of_expr e)) xl;
+  let ghost = e.e_ghost || List.exists (fun (_,_,d) -> d.e_ghost) xl in
+  let eff = List.fold_left (fun f (xs,_,_) -> eff_catch f xs) e.e_effect xl in
+  let eff = List.fold_left (fun f (_,_,d) -> eff_union f d.e_effect) eff xl in
+  mk_expr (Etry (e,xl)) e.e_vty ghost eff
+
+let e_try e xl =
+  e_try_raw (mk_ity e) (List.map (fun (xs,v,d) -> xs, v, mk_ity d) xl)
+
+let e_raise xs e ity =
+  let e = mk_ity e in
+  ity_equal_check (ity_of_expr e) xs.xs_ity;
+  let eff = eff_raise e.e_effect xs in
+  mk_expr (Eraise (xs,e)) (VtyI ity) e.e_ghost eff
 
 let e_pure t =
   let ity = Opt.fold (fun _ -> ity_of_ty) ity_bool t.t_ty in
@@ -637,6 +710,7 @@ let rec check_expr gh mut vis rst e0 =
   | Econst _ | Eabsurd | Etrue | Efalse -> ()
 
 let e_fun args p q xq ({e_effect = eff} as e) =
+  let e = mk_ity e in
   let c = create_cty args p q xq (e_vars e) eff (ity_of_expr e) in
   (* TODO/FIXME: detect stale vars in post-conditions? *)
   check_expr false (cty_mut c) (cty_vis c) Mpv.empty e;

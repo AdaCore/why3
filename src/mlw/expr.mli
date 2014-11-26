@@ -194,9 +194,21 @@ val e_ghost : expr -> expr
 val e_ghostify : expr -> expr
 
 val e_if : expr -> expr -> expr -> expr
-
+val e_lazy : lazy_op -> expr -> expr -> expr
+val e_not : expr -> expr
 val e_true : expr
 val e_false : expr
+
+val e_raise : xsymbol -> expr -> ity -> expr
+
+val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
+
+val e_case : expr -> (prog_pattern * expr) list -> expr
+
+val e_while : expr -> invariant -> variant list -> expr -> expr
+
+val e_for :
+  pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
 
 val e_pure : term -> expr
 
