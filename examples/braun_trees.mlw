@@ -230,7 +230,7 @@ module BraunHeaps
   =
     match t with
     | Empty -> 0
-    | Node l _ r -> let m = size r in 1 + 2 * m + diff m l
+    | Node l _ r -> let m = fast_size r in 1 + 2 * m + diff m l
     end
 
   (** A Braun tree has a logarithmic height *)

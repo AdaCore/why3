@@ -4,8 +4,8 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
-<file name="../braun_trees.mlw">
-<theory name="BraunHeaps" sum="db95d5e9f116a63bf2d23d3bf802db5f">
+<file name="../braun_trees.mlw" expanded="true">
+<theory name="BraunHeaps" sum="328f7941c52cebf1cd04bfd45998ade0" expanded="true">
  <goal name="WP_parameter root_is_min" expl="VC for root_is_min">
  <proof prover="0"><result status="valid" time="0.10"/></proof>
  </goal>
@@ -320,19 +320,25 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter fast_size" expl="VC for fast_size">
- <transf name="split_goal_wp">
+ <goal name="WP_parameter fast_size" expl="VC for fast_size" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter fast_size.1" expl="1. postcondition">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter fast_size.2" expl="2. precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="WP_parameter fast_size.2" expl="2. variant decrease">
+  <proof prover="1" timelimit="30"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter fast_size.3" expl="3. precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="63"/></proof>
+  <proof prover="1" timelimit="30"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter fast_size.4" expl="4. postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
+  <goal name="WP_parameter fast_size.4" expl="4. precondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter fast_size.5" expl="5. precondition">
+  <proof prover="1"><result status="valid" time="0.02" steps="61"/></proof>
+  </goal>
+  <goal name="WP_parameter fast_size.6" expl="6. postcondition">
+  <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
