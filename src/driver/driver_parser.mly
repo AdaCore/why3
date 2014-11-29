@@ -70,7 +70,7 @@ global:
 | INPUT { assert false }
 
 theory:
-| THEORY loc(tqualid) loc(trule)+ END
+| THEORY loc(tqualid) list(loc(trule)) END
     { { thr_name = $2; thr_rules = $3 } }
 
 trule:
@@ -181,7 +181,7 @@ global_extract:
 | BLACKLIST STRING+ { EBlacklist $2 }
 
 module_:
-| MODULE loc(tqualid) nonempty_list(loc(mrule)) END
+| MODULE loc(tqualid) list(loc(mrule)) END
     { { mor_name = $2; mor_rules = $3 } }
 
 mrule:
