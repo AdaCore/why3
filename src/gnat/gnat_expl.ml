@@ -8,6 +8,7 @@ type reason =
    | VC_Range_Check
    | VC_Length_Check
    | VC_Discriminant_Check
+   | VC_Tag_Check
    | VC_Default_Initial_Condition
    | VC_Initial_Condition
    | VC_Precondition
@@ -90,6 +91,7 @@ let reason_to_ada reason =
    | VC_Range_Check               -> "VC_RANGE_CHECK"
    | VC_Length_Check              -> "VC_LENGTH_CHECK"
    | VC_Discriminant_Check        -> "VC_DISCRIMINANT_CHECK"
+   | VC_Tag_Check                 -> "VC_TAG_CHECK"
    | VC_Initial_Condition         -> "VC_INITIAL_CONDITION"
    | VC_Default_Initial_Condition -> "VC_DEFAULT_INITIAL_CONDITION"
    | VC_Precondition              -> "VC_PRECONDITION"
@@ -119,6 +121,7 @@ let reason_to_string reason =
    | VC_Range_Check               -> "range_check"
    | VC_Length_Check              -> "length_check"
    | VC_Discriminant_Check        -> "discriminant_check"
+   | VC_Tag_Check                 -> "tag_check"
    | VC_Initial_Condition         -> "initial_condition"
    | VC_Default_Initial_Condition -> "default_initial_condition"
    | VC_Precondition              -> "precondition"
