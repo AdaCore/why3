@@ -53,7 +53,7 @@ let ident_printer =
       "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
       "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
-      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge";
+      "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left"; "rotate_right";
 
       (** Other stuff that Why3 seems to need *)
       "DECIMAL"; "NUMERAL"; "par"; "STRING";

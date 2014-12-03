@@ -1,0 +1,188 @@
+(* module BitVectors *)
+
+(*   use import int.Int *)
+(*   use import int.Power *)
+(*   use import int.EuclideanDivision *)
+(*   use import bv.BitVector *)
+
+(*   type bitvec = t *)
+
+(*   (\* shifts and rotations *\) *)
+
+(*   val lsl (x : bitvec) (n : bitvec) : bitvec *)
+(*     requires{ 0 <= to_uint n < 32 } *)
+(*     ensures{ result = lsl_bv x n } *)
+(*     ensures{ to_uint result = mod ( to_uint x * ( power 2 ( to_uint n ) ) ) powSize } *)
+
+(*   val lsr (x : bitvec) (n : bitvec) : bitvec *)
+(*     requires{ 0 <= to_uint n < 32 } *)
+(*     ensures{ result = lsr_bv x n } *)
+(*     ensures{ to_uint result = div ( to_uint x ) ( power 2 ( to_uint n ) ) } *)
+
+(*   val asr (x : bitvec) (n : bitvec) : bitvec (\* Check that ! | find better *\) *)
+(*     requires{ 0 <= to_uint n < 32 } *)
+(*     ensures{ result = asr_bv x n } *)
+(*     ensures{ to_int result = div ( to_int x ) ( power 2 ( to_uint n ) ) } *)
+
+(*   val rotate_left (x : bitvec) : bitvec *)
+(*     ensures{ result = rotate_left x } *)
+
+(*   val rotate_right (x : bitvec) : bitvec *)
+(*     ensures{ result = rotate_right x } *)
+
+(*   (\* bitwise operations *\) *)
+    
+(*   val bw_and (x : bitvec) (y : bitvec) : bitvec *)
+(*     ensures{ result = bw_and x y } *)
+
+(*   val bw_or (x : bitvec) (y : bitvec) : bitvec *)
+(*     ensures{ result = bw_or x y } *)
+
+(*   val bw_xor (x : bitvec) (y : bitvec) : bitvec *)
+(*     ensures{ result = bw_xor x y } *)
+
+(*   val bw_not (x : bitvec) : bitvec *)
+(*     ensures{ result = bw_not x } *)
+
+(*   (\* arithmetic operations *\) *)
+
+(*   val add (x : bitvec) (y : bitvec) : bitvec *)
+(*     ensures{ result = add x y } *)
+(*     ensures{ to_uint result = mod ( to_uint x + to_uint y ) powSize } *)
+
+(*   val sub (x : bitvec) (y : bitvec) : bitvec *)
+(*     ensures{ result = sub x y } *)
+(*     ensures{ to_uint result = mod ( to_uint x - to_uint y ) powSize } *)
+
+(*   val neg (x : bitvec) : bitvec *)
+(*     ensures{ result = neg x } *)
+(*     ensures{ to_uint result = mod ( - to_uint x ) powSize } *)
+
+(*   val mul (x : bitvec) (y : bitvec) : bitvec *)
+(*     ensures{ result = mul x y } *)
+(*     ensures{ to_uint result = mod ( to_uint x * to_uint y ) powSize } *)
+
+(*   val udiv (x : bitvec) (y : bitvec) : bitvec *)
+(*     ensures{ result = udiv x y } *)
+(*     ensures{ to_uint result = mod ( div ( to_uint x ) ( to_uint y ) ) powSize } *)
+
+(*   (\* comparison *\) *)
+
+(*   val eq (x : bitvec) (y : bitvec) : bool *)
+(*     ensures{ result = eq x y } *)
+(*     ensures{ result = (=) ( to_uint x ) ( to_uint y ) } *)
+
+(*   val ult (x : bitvec) (y : bitvec) : bool *)
+(*     ensures{ result = ult x y } *)
+(*     ensures{ result = (<) ( to_uint x ) ( to_uint y ) } *)
+
+(*   val ule (x : bitvec) (y : bitvec) : bool *)
+(*     ensures{ result = ule x y } *)
+(*     ensures{ result = (<=) ( to_uint x ) ( to_uint y ) } *)
+
+(*   val ugt (x : bitvec) (y : bitvec) : bool *)
+(*     ensures{ result = ugt x y } *)
+(*     ensures{ result = (>) ( to_uint x ) ( to_uint y ) } *)
+
+(*   val uge (x : bitvec) (y : bitvec) : bool *)
+(*     ensures{ result = uge x y } *)
+(*     ensures{ result = (>=) ( to_uint x ) ( to_uint y ) } *)
+
+(* end *)
+
+module BitVector_32
+
+  use import int.Int
+  use import int.Power
+  use import int.EuclideanDivision
+  use export bv.BV32
+
+  type bitvec32 = t 
+
+  (* shifts and rotations *)
+
+  val lsl (x : bitvec32) (n : bitvec32) : bitvec32
+    requires{ 0 <= to_uint n < 32 }
+    ensures{ result = lsl_bv x n }
+    ensures{ to_uint result = mod ( to_uint x * ( power 2 ( to_uint n ) ) ) two_power_size }
+
+  val lsr (x : bitvec32) (n : bitvec32) : bitvec32
+    requires{ 0 <= to_uint n < 32 }
+    ensures{ result = lsr_bv x n }
+    ensures{ to_uint result = div ( to_uint x ) ( power 2 ( to_uint n ) ) }
+
+  val asr (x : bitvec32) (n : bitvec32) : bitvec32 (* Check that ! | find better *)
+    requires{ 0 <= to_uint n < 32 }
+    ensures{ result = asr_bv x n }
+    ensures{ to_int result = div ( to_int x ) ( power 2 ( to_uint n ) ) }
+
+  val rotate_left (x : bitvec32) : bitvec32
+    ensures{ result = rotate_left x }
+
+  val rotate_right (x : bitvec32) : bitvec32
+    ensures{ result = rotate_right x }
+
+  (* bitwise operations *)
+    
+  val bw_and (x : bitvec32) (y : bitvec32) : bitvec32
+    ensures{ result = bw_and x y }
+
+  val bw_or (x : bitvec32) (y : bitvec32) : bitvec32
+    ensures{ result = bw_or x y }
+
+  val bw_xor (x : bitvec32) (y : bitvec32) : bitvec32
+    ensures{ result = bw_xor x y }
+
+  val bw_not (x : bitvec32) : bitvec32
+    ensures{ result = bw_not x }
+
+  (* arithmetic operations *)
+
+  val add (x : bitvec32) (y : bitvec32) : bitvec32
+    ensures{ result = add x y }
+    ensures{ to_uint result = mod ( to_uint x + to_uint y ) two_power_size }
+
+  val sub (x : bitvec32) (y : bitvec32) : bitvec32
+    ensures{ result = sub x y }
+    ensures{ to_uint result = mod ( to_uint x - to_uint y ) two_power_size }
+
+  val neg (x : bitvec32) : bitvec32
+    ensures{ result = neg x }
+    ensures{ to_uint result = mod ( - to_uint x ) two_power_size }
+
+  val mul (x : bitvec32) (y : bitvec32) : bitvec32
+    ensures{ result = mul x y }
+    ensures{ to_uint result = mod ( to_uint x * to_uint y ) two_power_size }
+
+  val udiv (x : bitvec32) (y : bitvec32) : bitvec32
+    ensures{ result = udiv x y }
+    ensures{ to_uint result = mod ( div ( to_uint x ) ( to_uint y ) ) two_power_size }
+
+  val urem (x : bitvec32) (y : bitvec32) : bitvec32
+    ensures{ result = urem x y}
+    ensures{ to_uint result = mod (to_uint x) (to_uint y) }
+
+  (* comparison *)
+
+  val eq (x : bitvec32) (y : bitvec32) : bool
+    ensures{ result = eq x y }
+    ensures{ result = (=) ( to_uint x ) ( to_uint y ) }
+
+  val ult (x : bitvec32) (y : bitvec32) : bool
+    ensures{ result = ult x y }
+    ensures{ result = (<) ( to_uint x ) ( to_uint y ) }
+
+  val ule (x : bitvec32) (y : bitvec32) : bool
+    ensures{ result = ule x y }
+    ensures{ result = (<=) ( to_uint x ) ( to_uint y ) }
+
+  val ugt (x : bitvec32) (y : bitvec32) : bool
+    ensures{ result = ugt x y }
+    ensures{ result = (>) ( to_uint x ) ( to_uint y ) }
+
+  val uge (x : bitvec32) (y : bitvec32) : bool
+    ensures{ result = uge x y }
+    ensures{ result = (>=) ( to_uint x ) ( to_uint y ) }
+
+end
+
