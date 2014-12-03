@@ -12,6 +12,7 @@ type reason =
    | VC_Range_Check
    | VC_Length_Check
    | VC_Discriminant_Check
+   | VC_Tag_Check
    | VC_Default_Initial_Condition
    | VC_Initial_Condition
    | VC_Precondition
