@@ -8,8 +8,7 @@ prelude "(set-logic AUFNIRA)"   (* how come bv is supported by cvc4 in this logi
 
 import "smt-libv2.drv"
 
-(* CVC4 division seems to be neither the Euclidean one,
-nor the Computer one *)
+(* CVC4 division seems to be neither the Euclidean one, nor the Computer one *)
 (*
 theory int.EuclideanDivision
    syntax function div "(div %1 %2)"
@@ -28,11 +27,4 @@ theory int.ComputerDivision
    remove prop Mod_1
    remove prop Div_1
 end
-*)
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
 *)

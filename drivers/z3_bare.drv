@@ -1,3 +1,10 @@
+prelude "(set-logic AUFNIRA)"
+(** A  : Array
+    UF : Uninterpreted Function
+    DT : Datatypes (not needed at the end ...)
+    NIRA : NonLinear Integer Reals Arithmetic
+*)
+
 import "smt-libv2.drv"
 
 (* div/mod of Z3 seems to be Euclidean Division *)
@@ -19,10 +26,3 @@ theory real.FromInt
   remove prop Mul
   remove prop Neg
 end
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)
