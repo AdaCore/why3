@@ -59,6 +59,7 @@ let reason_from_string s =
    | "VC_RANGE_CHECK"               -> VC_Range_Check
    | "VC_LENGTH_CHECK"              -> VC_Length_Check
    | "VC_DISCRIMINANT_CHECK"        -> VC_Discriminant_Check
+   | "VC_TAG_CHECK"                 -> VC_Tag_Check
    | "VC_INITIAL_CONDITION"         -> VC_Initial_Condition
    | "VC_DEFAULT_INITIAL_CONDITION" -> VC_Default_Initial_Condition
    | "VC_PRECONDITION"              -> VC_Precondition
