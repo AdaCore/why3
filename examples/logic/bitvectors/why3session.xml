@@ -5,18 +5,16 @@
 <prover id="0" name="CVC3" version="2.4.1" timelimit="23" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="3" memlimit="1000"/>
 <file name="../bitvectors.why" expanded="true">
-<theory name="TestBV" sum="a3a3c64f3ddb46c570b66630b2934e91" expanded="true">
+<theory name="TestBV" sum="9c3a1e0f691b7f969589746c99343436" expanded="true">
  <goal name="g1">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="f1" expanded="true">
- <proof prover="1" timelimit="98"><result status="unknown" time="0.00"/></proof>
  </goal>
  <goal name="g2">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="f2" expanded="true">
- <proof prover="1" timelimit="98"><result status="unknown" time="0.00"/></proof>
  </goal>
  <goal name="g3">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
@@ -54,14 +52,14 @@
  <goal name="g7a">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="g7b">
- <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <goal name="g7b" expanded="true">
+ <proof prover="1"><result status="timeout" time="2.96"/></proof>
  </goal>
- <goal name="g8a">
- <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <goal name="g8a" expanded="true">
+ <proof prover="1"><result status="timeout" time="2.93"/></proof>
  </goal>
- <goal name="g8b">
- <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <goal name="g8b" expanded="true">
+ <proof prover="1"><result status="timeout" time="3.01"/></proof>
  </goal>
  <goal name="Nth_bw_and">
  <proof prover="1"><result status="valid" time="0.16"/></proof>
@@ -70,10 +68,10 @@
  <proof prover="1"><result status="valid" time="0.16"/></proof>
  </goal>
  <goal name="Nth_bw_xor">
- <proof prover="1"><result status="valid" time="0.17"/></proof>
+ <proof prover="1"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="Nth_bw_not">
- <proof prover="1" timelimit="5"><result status="valid" time="1.15"/></proof>
+ <proof prover="1" timelimit="5"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="not_not">
  <proof prover="1"><result status="valid" time="0.00"/></proof>
@@ -83,19 +81,16 @@
  </goal>
  <goal name="Lsr_nth_low" expanded="true">
  </goal>
- <goal name="Lsr_nth_high">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="1" timelimit="98"><result status="valid" time="6.43"/></proof>
+ <goal name="Lsr_nth_high" expanded="true">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="Asr_nth_low" expanded="true">
  </goal>
- <goal name="Asr_nth_high">
- <proof prover="1" timelimit="98"><result status="valid" time="6.67"/></proof>
+ <goal name="Asr_nth_high" expanded="true">
  </goal>
  <goal name="Lsl_nth_high" expanded="true">
  </goal>
- <goal name="Lsl_nth_low">
- <proof prover="1" timelimit="98"><result status="valid" time="5.83"/></proof>
+ <goal name="Lsl_nth_low" expanded="true">
  </goal>
 </theory>
 </file>
