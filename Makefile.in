@@ -1114,27 +1114,30 @@ drivers/isabelle-realizations.aux: Makefile
 	echo 'theory option.'"$$f"' meta "realized_theory" "option.'"$$f"'", "" end'; done; \
 	) > $@
 
+ifeq (@enable_local@,yes)
+  ISABELLE_TARGET_DIR=`pwd`/lib/isabelle
+else
+  ISABELLE_TARGET_DIR=$(LIBDIR)/why3/isabelle
+endif
+
+lib/isabelle/last_build: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
+	@(if isabelle components -l | grep -q "$(ISABELLE_TARGET_DIR)$$"; then \
+	    echo "Building the Why3 heap for Isabelle/HOL:"; \
+	    isabelle build -bc Why3; \
+	    touch $@; \
+	  else \
+	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \
+	    echo "  the Isabelle component configuration does not contain"; \
+	    echo "  [$(ISABELLE_TARGET_DIR)]"; \
+	  fi)
+
 install_no_local::
 	cp -r lib/isabelle "$(LIBDIR)/why3"
 	cp drivers/isabelle-realizations.aux "$(DATADIR)/why3/drivers/"
-	@(if isabelle components -l | grep -q "$(LIBDIR)/why3/isabelle$$"; then \
-	    echo "Building the Why3 heap for Isabelle/HOL:"; \
-	    isabelle build -bc Why3; true; \
-	  else \
-	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \
-	    echo "  the Isabelle component configuration does not contain"; \
-            echo "  [$(LIBDIR)/why3/isabelle]"; \
-	  fi)
 
-install_local::
-	@(if isabelle components -l | grep -q "`pwd`/lib/isabelle$$"; then \
-	    echo "Building the Why3 heap for Isabelle/HOL:"; \
-	    isabelle build -bc Why3; true; \
-	  else \
-	    echo "[Warning] Cannot pre-build the Isabelle heap because"; \
-	    echo "  the Isabelle component configuration does not contain"; \
-            echo "  [`pwd`/lib/isabelle]"; \
-	  fi)
+install_no_local:: lib/isabelle/last_build
+
+install_local:: lib/isabelle/last_build
 
 update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION)
 
@@ -1178,7 +1181,8 @@ $(ISABELLELIBS_OPTION): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realization
 	mkdir -p lib/isabelle/option
 	WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/isabelle-realize.drv -T option.$(notdir $(basename $@)) -o lib/isabelle/option/
 
-opt byte: update-isabelle
+# do not update isabelle realizations systematically
+# opt byte: update-isabelle
 
 clean::
 	rm -f lib/isabelle/*/*.xml
