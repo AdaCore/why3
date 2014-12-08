@@ -25,7 +25,7 @@ type psymbol = {
 
 and ps_logic =
   | PLnone            (* non-pure symbol *)
-  | PLvs of vsymbol   (* local let-function *)
+  | PLpv of pvsymbol  (* local let-function *)
   | PLls of lsymbol   (* top-level let-function or let-predicate *)
   | PLlemma           (* top-level or local let-lemma *)
 
@@ -102,13 +102,13 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
          variable that occurs freely in an assertion comes from
          a pvsymbol. Therefore, we create a pvsymbol whose type
          is a snapshot of the appropriate mapping type, and put
-         its pv_vs into the ps_logic field. This pvsymbol cannot
-         be used in the program, as it has lost all preconditions,
+         it into the ps_logic field. This pvsymbol should not be
+         used in the program, as it has lost all preconditions,
          which is why we declare it as ghost. In other words,
          this pvsymbol behaves exactly as Epure of its pv_vs. *)
-      let { pv_vs = v } = create_pvsymbol ~ghost:true id ity in
-      let t = t_func_app_l (t_var v) (arg_list c) in
-      mk_ps v.vs_name (add_post c t) ghost (PLvs v)
+      let v = create_pvsymbol ~ghost:true id ity in
+      let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
+      mk_ps v.pv_vs.vs_name (add_post c t) ghost (PLpv v)
   | PKfunc constr ->
       check_effects c; check_reads c;
       (* we don't really need to check the well-formedness of
@@ -128,6 +128,13 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
   | PKlemma ->
       check_effects c;
       mk_ps (id_register id) c ghost PLlemma
+
+let ps_kind ps = match ps.ps_logic with
+  | PLnone -> PKnone
+  | PLpv _ -> PKlocal
+  | PLls {ls_value = None} -> PKpred
+  | PLls {ls_constr = n} -> PKfunc n
+  | PLlemma -> PKlemma
 
 (** {2 Program patterns} *)
 
@@ -349,33 +356,20 @@ let create_let_defn id ?(ghost=false) e =
 
 let create_let_defn_pv id ?(ghost=false) e =
   let ghost = ghost || e.e_ghost in
-  let ity = match e.e_vty with
-    | VtyC ({ cty_args = args; cty_result = res } as c) ->
-        let error s = Loc.errorm ?loc:e.e_loc
-          "this function %s, it cannot be used as first-order" s in
-        if not (Mreg.is_empty c.cty_freeze.isb_reg &&
-                eff_is_empty c.cty_effect) then error "is non-pure";
-        if not (List.for_all (fun a -> ity_immutable a.pv_ity) args &&
-                ity_immutable res) then error "is stateful";
-        if not e.e_ghost && List.exists (fun a -> a.pv_ghost) args
-          then error "has ghost arguments";
-        if c.cty_pre <> [] then error "is partial";
-        List.fold_right (fun a i -> ity_func a.pv_ity i) args res
-    | VtyI i -> i in
-  let pv = create_pvsymbol id ~ghost ity in
+  let pv = create_pvsymbol id ~ghost (ity_of_expr e) in
   { let_sym = ValV pv; let_expr = e }, pv
 
 let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
   let ghost = ghost || e.e_ghost in
   let cty = match e.e_vty, kind with
     | _, PKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_ps"
-    | VtyI _, (PKnone|PKlocal|PKlemma) -> Loc.errorm ?loc:e.e_loc
-        "this expression is first-order, it cannot be used as a function"
     | VtyI i, (PKfunc _|PKpred) when ity_immutable i ->
         (* the post will be equality to the logic constant *)
         create_cty [] [] [] Mexn.empty Spv.empty eff_empty i
     | VtyI _, (PKfunc _|PKpred) -> Loc.errorm ?loc:e.e_loc
         "this expression is non-pure, it cannot be used as a pure function"
+    | VtyI _, (PKnone|PKlocal|PKlemma) -> Loc.errorm ?loc:e.e_loc
+        "this expression is first-order, it cannot be used as a function"
     | VtyC c, _ -> c in
   let ps = create_psymbol id ~ghost ~kind cty in
   { let_sym = ValS ps; let_expr = e }, ps
@@ -392,18 +386,11 @@ let proxy_label = create_label "proxy_pvsymbol"
 let proxy_labels = Slab.singleton proxy_label
 
 let mk_proxy ~ghost e hd = match e.e_node with
-  | Evar v when (v.pv_ghost || not ghost) && Slab.is_empty e.e_label ->
-      hd, v
+  | Evar v when Slab.is_empty e.e_label -> hd, v
   | _ ->
       let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
       let ld, v = create_let_defn_pv id ~ghost e in
       ld::hd, v
-
-let mk_ity e = match e.e_vty with
-  | VtyI _ -> e
-  | VtyC _ ->
-      let hd, v = mk_proxy ~ghost:false e [] in
-      List.fold_right e_let_raw hd (e_var v)
 
 let e_ghost e = mk_expr (Eghost e) e.e_vty true e.e_effect
 
@@ -420,7 +407,7 @@ let e_ghostify e = if not e.e_ghost then e_ghost e else e
    use the same binder ident more than once in an expression,
    otherwise exchanging binders in [rewind] may be incorrect.
    One must never reuse the results of [create_let_defn] and
-   [create_use_defn] when constructing expressions. *)
+   [create_rec_defn] when constructing expressions. *)
 let rec rewind fn ghost d = match d.e_node with
   | (Elet ({let_sym = ValS {ps_ghost = false}}, _)
   |  Elet ({let_sym = ValV {pv_ghost = false}}, _))
@@ -452,14 +439,15 @@ let e_rec ({rec_defn = dl} as rd) e =
 (* application and assignment *)
 
 let e_app_raw e vl ityl ity =
-  let gh, c = cty_apply (cty_of_expr e) vl ityl ity in
+  let ghost = e.e_ghost and c = cty_of_expr e in
+  let ghost, c = cty_apply ~ghost c vl ityl ity in
   let vty, eff = if c.cty_args = [] then
     VtyI c.cty_result, c.cty_effect else
     VtyC c, eff_empty in
   let mk_app e =
     let eff = eff_union e.e_effect eff in
-    mk_expr (Eapp (e,vl,c)) vty (gh || e.e_ghost) eff in
-  rewind mk_app (gh || e.e_ghost) e
+    mk_expr (Eapp (e,vl,c)) vty ghost eff in
+  rewind mk_app ghost e
 
 let e_app e el ityl ity =
   let rec down al el = match al, el with
@@ -494,7 +482,6 @@ let e_assign al =
 (* boolean constructors *)
 
 let e_if e0 e1 e2 =
-  let e1 = mk_ity e1 and e2 = mk_ity e2 in
   ity_equal_check (ity_of_expr e0) ity_bool;
   ity_equal_check (ity_of_expr e1) (ity_of_expr e2);
   let gh = e0.e_ghost || e1.e_ghost || e2.e_ghost in
@@ -542,7 +529,7 @@ let e_while cnd inv vl e =
 
 (* match-with, try-with, raise *)
 
-let e_case_raw ({e_effect = eff} as e) bl =
+let e_case ({e_effect = eff} as e) bl =
   let mb, ity = match bl with
     | [(_,d)] -> false, ity_of_expr d
     | (_,d)::_ -> true, ity_of_expr d
@@ -557,10 +544,7 @@ let e_case_raw ({e_effect = eff} as e) bl =
   let eff = List.fold_left (fun f (_,d) -> eff_union f d.e_effect) eff bl in
   mk_expr (Ecase (e,bl)) (VtyI ity) ghost eff
 
-let e_case e bl =
-  e_case_raw (mk_ity e) (List.map (fun (pp,d) -> pp, mk_ity d) bl)
-
-let e_try_raw e xl =
+let e_try e xl =
   List.iter (fun (xs,v,d) ->
     ity_equal_check v.pv_ity xs.xs_ity;
     ity_equal_check (ity_of_expr d) (ity_of_expr e)) xl;
@@ -569,11 +553,7 @@ let e_try_raw e xl =
   let eff = List.fold_left (fun f (_,_,d) -> eff_union f d.e_effect) eff xl in
   mk_expr (Etry (e,xl)) e.e_vty ghost eff
 
-let e_try e xl =
-  e_try_raw (mk_ity e) (List.map (fun (xs,v,d) -> xs, v, mk_ity d) xl)
-
 let e_raise xs e ity =
-  let e = mk_ity e in
   ity_equal_check (ity_of_expr e) xs.xs_ity;
   let eff = eff_raise e.e_effect xs in
   mk_expr (Eraise (xs,e)) (VtyI ity) e.e_ghost eff
@@ -598,17 +578,17 @@ let rec e_vars e = match e.e_node with
   | Esym s -> s.ps_cty.cty_reads
   | Efun _ | Eany -> (cty_of_expr e).cty_reads
   | Eapp (e,vl,_) -> List.fold_right Spv.add vl (e_vars e)
-  | Elet ({let_sym = ValV v; let_expr = d},e) ->
+  | Elet ({let_sym = ValV v; let_expr = d},e)
+  | Elet ({let_sym = ValS {ps_logic = PLpv v}; let_expr = d},e) ->
       Spv.union (e_vars d) (Spv.remove v (e_vars e))
-  | Elet ({let_sym = ValS {ps_logic = PLvs v}; let_expr = d},e) ->
-      Spv.union (e_vars d) (Spv.remove (restore_pv v) (e_vars e))
   | Elet ({let_sym = ValS _; let_expr = d},e) | Elazy (_,d,e) ->
       Spv.union (e_vars d) (e_vars e)
   | Erec ({rec_defn = dl},e) ->
       let s = List.fold_left (fun s {fun_sym = ps} ->
         Spv.union s ps.ps_cty.cty_reads) (e_vars e) dl in
-      List.fold_left (fun s fd -> match fd.fun_sym.ps_logic with
-        | PLvs v -> Spv.remove (restore_pv v) s | _ -> s) s dl
+      List.fold_left (fun s fd ->
+        match fd.fun_sym.ps_logic with
+        | PLpv v -> Spv.remove v s | _ -> s) s dl
   | Enot e | Eraise (_,e) | Eghost e -> e_vars e
   | Eassign al ->
       List.fold_left (fun s (r,_,v) -> Spv.add r (Spv.add v s)) Spv.empty al
@@ -626,12 +606,6 @@ let rec e_vars e = match e.e_node with
 
 let pv_mut v mut = if ity_immutable v.pv_ity then mut else Spv.add v mut
 let pv_vis v vis = if v.pv_ghost then vis else ity_r_visible vis v.pv_ity
-
-let cty_mut {cty_args = al; cty_reads = r} =
-  Spv.fold pv_mut r (List.fold_right pv_mut al Spv.empty)
-
-let cty_vis {cty_args = al; cty_reads = r} =
-  Spv.fold pv_vis r (List.fold_right pv_vis al Sreg.empty)
 
 let rec check_expr gh mut vis rst e0 =
   let gh = gh || e0.e_ghost in
@@ -653,22 +627,7 @@ let rec check_expr gh mut vis rst e0 =
     if Mreg.is_empty eff.eff_resets then rst else
     Mpv.set_union rst (Mpv.mapi_filter (fun {pv_ity = ity} () ->
       if eff_stale_region eff ity then Some e else None) mut) in
-  (* A non-ghost application can perform ghost writes into ghost fields
-     or into ghost arguments. The former is always safe, but the latter
-     is illegal, if we submit a visible region inside a ghost argument.
-     A write effect of a computation is ghost whenever the modified region
-     is not visible in any non-ghost argument or read dependency. Indeed,
-     if there is at least one non-ghost dependency of a computation where
-     the modified region is visible, then the write can not be ghost, or
-     the computation itself would have been rejected. For this check to
-     be correct, Ity.cty_apply does not accept non-ghost pvsymbols for
-     ghost arguments. Otherwise, we would put a non-ghost pvsymbol in
-     cty_reads and would mistakenly consider the write effect non-ghost. *)
-  let ghost_c vis ({cty_effect = {eff_writes = wr}} as c) =
-    let wr = Mreg.filter (fun r fs -> r.reg_its.its_private
-          || Spv.exists (fun f -> not f.pv_ghost) fs) wr in
-    Mreg.set_inter vis (if gh || Mreg.is_empty wr
-      then wr else Mreg.set_diff wr (cty_vis c)) in
+  let ghost_c vis c = Mreg.set_inter vis (cty_ghost_writes gh c) in
   match e0.e_node with
   | Evar v -> check_v rst v
   | Esym s -> Mpv.iter (error_s s) (reset_c rst s.ps_cty)
@@ -719,20 +678,69 @@ let rec check_expr gh mut vis rst e0 =
   | Econst _ | Eabsurd | Etrue | Efalse -> ()
 
 let e_fun args p q xq ({e_effect = eff} as e) =
-  let e = mk_ity e in
   let c = create_cty args p q xq (e_vars e) eff (ity_of_expr e) in
   (* TODO/FIXME: detect stale vars in post-conditions? *)
-  check_expr false (cty_mut c) (cty_vis c) Mpv.empty e;
+  let mut = Spv.fold pv_mut c.cty_reads Spv.empty in
+  let mut = List.fold_right pv_mut c.cty_args mut in
+  check_expr false mut (cty_r_visible c) Mpv.empty e;
   mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty
 
 (* recursive definitions *)
 
+let rec e_ps_subst sm e = match e.e_node with
+  | Evar _ | Econst _ | Eany | Etrue | Efalse
+  | Eassign _ | Eassert _ | Epure _ | Eabsurd -> e
+  | Esym s ->
+      ignore s; assert false
+  | Efun d ->
+      let d = e_ps_subst sm d in let c = cty_of_expr e in
+      e_fun c.cty_args c.cty_pre c.cty_post c.cty_xpost d
+  | Eapp (d,vl,c) ->
+      let d = e_ps_subst sm d in
+      let al = List.map (fun v -> v.pv_ity) c.cty_args in
+      e_app_raw d vl al c.cty_result
+  | Elet ({let_sym = ValV v; let_expr = d},e) ->
+      let ld, u = create_let_defn_pv (id_fresh "?") (e_ps_subst sm d) in
+      ity_equal_check u.pv_ity v.pv_ity;
+      if u.pv_ghost && not v.pv_ghost then Loc.errorm
+        "Expr.e_ps_subst: ghost status mismatch"; (* impossible? *)
+      e_let_raw { ld with let_sym = ValV v } (e_ps_subst sm e)
+  | Elet ({let_sym = ValS os; let_expr = d},e) ->
+      let ld, ns = create_let_defn_ps (id_clone os.ps_name)
+        ~ghost:os.ps_ghost ~kind:(ps_kind os) (e_ps_subst sm d) in
+      e_let_raw ld (e_ps_subst (Mps.add os ns sm) e)
+  | Erec ({rec_defn = fdl},e) ->
+      let conv {fun_sym = s; fun_expr = d; fun_varl = vl} =
+        s, e_ps_subst sm d, vl, ps_kind s in
+      let rd = create_rec_defn (List.map conv fdl) in
+      let sm = List.fold_left2 (fun sm od nd ->
+        Mps.add od.fun_sym nd.fun_sym sm) sm fdl rd.rec_defn in
+      e_rec rd (e_ps_subst sm e)
+  | Eghost e -> e_ghost (e_ps_subst sm e)
+  | Enot e -> e_not (e_ps_subst sm e)
+  | Eif (c,d,e) -> e_if (e_ps_subst sm c) (e_ps_subst sm d) (e_ps_subst sm e)
+  | Elazy (op,d,e) -> e_lazy op (e_ps_subst sm d) (e_ps_subst sm e)
+  | Efor (v,b,inv,e) -> e_for_raw v b inv (e_ps_subst sm e)
+  | Ewhile (d,inv,vl,e) -> e_while (e_ps_subst sm d) inv vl (e_ps_subst sm e)
+  | Eraise (xs,d) -> e_raise xs (e_ps_subst sm d) (ity_of_expr e)
+  | Ecase (d,bl) -> e_case (e_ps_subst sm d)
+      (List.map (fun (pp,e) -> pp, e_ps_subst sm e) bl)
+  | Etry (d,xl) -> e_try (e_ps_subst sm d)
+      (List.map (fun (xs,v,e) -> xs, v, e_ps_subst sm e) xl)
+
+and create_rec_defn fdl =
+  ignore fdl; assert false
+
 let create_rec_defn fdl =
+  (* check that the variant relations are well-typed *)
+  List.iter (fun (_,_,vl,_) -> List.iter (function
+    | t, Some rel -> ignore (ps_app rel [t;t])
+    | t, None     -> ignore (t_type t)) vl) fdl;
   (* check that the all variants use the same order *)
   let varl1 = match fdl with
-    | (_,_,vl)::_ -> List.rev vl
+    | (_,_,vl,_)::_ -> List.rev vl
     | [] -> invalid_arg "Expr.create_rec_defn" in
-  let check_variant (_,_,vl) =
+  let check_variant (_,_,vl,_) =
     let vl, varl1 = match List.rev vl, varl1 with
       | (_, None)::vl, (_, None)::varl1 -> vl, varl1
       | _, _ -> vl, varl1 in
@@ -742,8 +750,22 @@ let create_rec_defn fdl =
       with Invalid_argument _ -> false in
     if not res then Loc.errorm
       "All functions in a recursive definition \
-        must use the same well-founded order for variant"
-  in
+        must use the same well-founded order for variant" in
   List.iter check_variant (List.tl fdl);
-  (* create the first list of fun_defns *)
-  assert false
+  (* create the first substitution *)
+  let conv (vm,sm) (os,lam,vl,_) =
+    let id = id_clone os.ps_name and c = cty_of_expr lam in
+    if (match lam.e_node with Efun _ -> false | _ -> true) ||
+      c.cty_args = [] then invalid_arg "Expr.create_rec_defn";
+    let c = create_cty c.cty_args c.cty_pre c.cty_post c.cty_xpost
+      (List.fold_left (fun s (t,_) -> t_freepvs s t) Spv.empty vl)
+      eff_empty c.cty_result in
+    let ns = create_psymbol id ~ghost:os.ps_ghost ~kind:PKnone c in
+    let vt = t_tuple (List.map fst vl) in
+    let vv = create_pvsymbol id ~ghost:true (ity_of_ty (t_type vt)) in
+    let vp = t_equ (t_var vv.pv_vs) vt in
+    (Mpv.add vv vp vm, Mps.add os ns sm),
+    { fun_sym = ns; fun_expr = lam; fun_varl = vl; fun_varv = vv } in
+  let (vm, sm), fdl = Lists.map_fold_left conv (Mpv.empty, Mps.empty) fdl in
+  (* substitution function *)
+  ignore (e_ps_subst,create_rec_defn,vm,sm,fdl); assert false

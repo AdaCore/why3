@@ -258,10 +258,10 @@ and reg_visible fnv fnr acc vis r =
     (fnr acc r) r.reg_its.its_arg_vis r.reg_args
                 r.reg_its.its_reg_vis r.reg_regs
 
-let ity_r_visible regs ity =
+let ity_r_visible regs ity = if ity.ity_pure then regs else
   ity_visible Util.const (fun s r -> Sreg.add r s) regs true ity
 
-let ity_v_visible vars ity =
+let ity_v_visible vars ity = if ity.ity_pure then vars else
   ity_visible (fun s v -> Stv.add v s) Util.const vars true ity
 
 (* smart constructors *)
@@ -872,44 +872,85 @@ let create_cty args pre post xpost reads effect result =
   let effect = { effect with eff_resets = resets } in
   cty_unsafe args pre post xpost reads effect result freeze
 
-let t_ty_subst_l tsb vsb l = List.map (fun t -> t_ty_subst tsb vsb t) l
-let t_subst_l        vsb l = List.map (fun t -> t_subst        vsb t) l
+let cty_r_visible c =
+  let add v s = if v.pv_ghost then s else ity_r_visible s v.pv_ity in
+  Spv.fold add c.cty_reads (List.fold_right add c.cty_args Sreg.empty)
 
-let cty_apply c pvl args res =
-  let rec apply isb same gh vsb al vl = match al, vl with
-    | a::al, v::vl when v.pv_ghost || not a.pv_ghost ->
-        let isb = ity_match isb a.pv_ity v.pv_ity in
-        let same = same && ity_equal a.pv_ity v.pv_ity in
-        let gh = gh || (v.pv_ghost && not a.pv_ghost) in
-        let vsb = Mvs.add a.pv_vs (t_var v.pv_vs) vsb in
-        apply isb same gh vsb al vl
-    | al, [] when List.length al = List.length args ->
-        let freeze = if same (*so far*) then isb else
-          List.fold_right freeze_pv pvl c.cty_freeze in
-        let same = same && ity_equal c.cty_result res &&
-          List.for_all2 (fun a t -> ity_equal a.pv_ity t) al args in
-        if same && pvl = [] then gh, c else
-        let eff, subst_l =
-          if same then c.cty_effect, t_subst_l else
-          let isb = List.fold_left2 (fun s a ity ->
-            ity_match s a.pv_ity ity) isb al args in
-          let isb = ity_match isb c.cty_result res in
-          let eff = eff_full_inst isb c.cty_effect in
-          let check v t = match t.ity_node with
-            | Ityvar u -> tv_equal u v | _ -> false in
-          eff, if Mtv.for_all check isb.isb_tv then t_subst_l
-            else t_ty_subst_l (Mtv.map ty_of_ity isb.isb_tv) in
-        let args = List.map2 (fun {pv_vs = vs; pv_ghost = ghost} t ->
-          create_pvsymbol (id_clone vs.vs_name) ~ghost t) al args in
-        let vsb = List.fold_left2 (fun m a v ->
-          Mvs.add a.pv_vs (t_var v.pv_vs) m) vsb al args in
-        let p = subst_l vsb c.cty_pre and q = subst_l vsb c.cty_post in
-        let xq = Mexn.map (fun xqfl -> subst_l vsb xqfl) c.cty_xpost in
-        let rds = List.fold_right Spv.add pvl c.cty_reads in
-        gh, cty_unsafe args p q xq rds eff res freeze
-    | _ ->
-        invalid_arg "Ity.cty_apply" in
-  apply c.cty_freeze true false Mvs.empty c.cty_args pvl
+(* A non-ghost application can perform ghost writes into ghost fields
+    or into ghost arguments. The former is always safe, but the latter
+    is illegal, if we submit a visible region inside a ghost argument.
+    A write effect of a computation is ghost whenever the modified region
+    is not visible in any non-ghost argument or read dependency. Indeed,
+    if there is at least one non-ghost dependency of a computation where
+    the modified region is visible, then the write can not be ghost, or
+    the computation itself would have been rejected. *)
+let cty_ghost_writes gh c =
+  let wr = Mreg.filter (fun r fs -> r.reg_its.its_private ||
+    Spv.exists (fun f -> not f.pv_ghost) fs) c.cty_effect.eff_writes in
+  if gh || Mreg.is_empty wr then wr else Mreg.set_diff wr (cty_r_visible c)
+
+let cty_apply ?(ghost=false) c vl args res =
+  let vsb_add vsb {pv_vs = u} {pv_vs = v} =
+    if vs_equal u v then vsb else Mvs.add u (t_var v) vsb in
+  let match_v isb u v = ity_match isb u.pv_ity v.pv_ity in
+  (* stage 1: apply c to vl *)
+  let gwr = lazy (cty_ghost_writes ghost c) in
+  let rec apply gh same isb vsb ul vl = match ul, vl with
+    | u::ul, v::vl ->
+        let gh = gh || (v.pv_ghost && not u.pv_ghost) in
+        let gh = gh || (u.pv_ghost && not v.pv_ghost &&
+          let vis = ity_r_visible Sreg.empty u.pv_ity in
+          not (Mreg.is_empty vis) &&
+          not (Mreg.set_disjoint vis (Lazy.force gwr))) in
+        let same = same && ity_equal u.pv_ity v.pv_ity in
+        apply gh same (match_v isb u v) (vsb_add vsb u v) ul vl
+    | ul, [] -> gh, same, isb, vsb, ul
+    | _ -> invalid_arg "Ity.cty_apply" in
+  let ghost, same, isb, vsb, cargs =
+    apply ghost true c.cty_freeze Mvs.empty c.cty_args vl in
+  let frz = if same then isb else
+    List.fold_right freeze_pv vl c.cty_freeze in
+  (* stage 2: compute type substitution and effect *)
+  let rec cut same rul rvl vsb ul tl = match ul, tl with
+    | u::ul, vt::tl ->
+        let same = same && ity_equal u.pv_ity vt in
+        let v = if same && Mvs.is_empty vsb then u else
+          let id = id_clone u.pv_vs.vs_name in
+          create_pvsymbol id ~ghost:u.pv_ghost vt in
+        cut same (u::rul) (v::rvl) (vsb_add vsb u v) ul tl
+    | ul, [] -> same, rul, rvl, vsb, ul
+    | _ -> invalid_arg "Ity.cty_apply" in
+  let same, rcargs, rargs, vsb, cargs = cut same [] [] vsb cargs args in
+  let cres = List.fold_right (fun a t ->
+    ity_func a.pv_ity t) cargs c.cty_result in
+  let same = same && ity_equal cres res in
+  if same && vl = [] && cargs = [] then (* trivial *) ghost, c else
+  let isb = if same then isb_empty else
+    ity_match (List.fold_left2 match_v isb rcargs rargs) cres res in
+  let eff = if same then c.cty_effect else eff_full_inst isb c.cty_effect in
+  (* stage 3: cty-to-mapping type cast *)
+  let post = if cargs = [] then c.cty_post else begin
+    if c.cty_pre <> [] then Loc.errorm
+      "this function is partial, it cannot be used as first-order";
+    if not (Mreg.is_empty frz.isb_reg && eff_is_empty eff) then Loc.errorm
+      "this function is non-pure, it cannot be used as first-order";
+    if not ghost && List.exists (fun a -> a.pv_ghost) cargs then Loc.errorm
+      "this function has ghost arguments, it cannot be used as first-order";
+    let al = List.map (fun v -> v.pv_vs) cargs in
+    let rv = create_vsymbol (id_fresh "result") (ty_of_ity cres) in
+    let rt = t_func_app_l (t_var rv) (List.map t_var al) in
+    List.map (fun q -> let v,f = open_post q in create_post rv
+      (t_forall_close al [] (t_let_close v rt f))) c.cty_post end in
+  (* stage 4: instantiate specification *)
+  let tsb = Mtv.map ty_of_ity isb.isb_tv in
+  let same = same || Mtv.for_all (fun v {ty_node = n} ->
+    match n with Tyvar u -> tv_equal u v | _ -> false) tsb in
+  let subst_t = if same then (fun t -> t_subst vsb t) else
+                      (fun t -> t_ty_subst tsb vsb t) in
+  let subst_l l = List.map subst_t l in
+  ghost, cty_unsafe (List.rev rargs) (subst_l c.cty_pre)
+    (subst_l post) (Mexn.map subst_l c.cty_xpost)
+    (List.fold_right Spv.add vl c.cty_reads) eff res frz
 
 let cty_add_reads c pvs =
   (* the external reads are already frozen and

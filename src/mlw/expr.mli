@@ -25,7 +25,7 @@ type psymbol = private {
 
 and ps_logic =
   | PLnone            (* non-pure symbol *)
-  | PLvs of vsymbol   (* local let-function *)
+  | PLpv of pvsymbol  (* local let-function *)
   | PLls of lsymbol   (* top-level let-function or let-predicate *)
   | PLlemma           (* top-level or local let-lemma *)
 
@@ -176,12 +176,20 @@ val e_sym : psymbol  -> expr
 val e_const : Number.constant -> expr
 val e_nat_const : int -> expr
 
-val create_let_defn : preid -> ?ghost:bool -> expr -> let_defn
+val create_let_defn :
+  preid -> ?ghost:bool -> expr -> let_defn
 
-val create_let_defn_pv : preid -> ?ghost:bool -> expr -> let_defn * pvsymbol
+val create_let_defn_pv :
+  preid -> ?ghost:bool -> expr -> let_defn * pvsymbol
 
 val create_let_defn_ps :
   preid -> ?ghost:bool -> ?kind:ps_kind -> expr -> let_defn * psymbol
+
+val create_rec_defn :
+  (psymbol * expr (* Efun *) * variant list * ps_kind) list -> rec_defn
+
+val e_fun :
+  pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> expr
 
 val e_let : let_defn -> expr -> expr
 val e_rec : rec_defn -> expr -> expr
@@ -213,9 +221,7 @@ val e_for :
 val e_pure : term -> expr
 
 val e_assert : assertion_kind -> term -> expr
+
 val e_absurd : ity -> expr
 
 val e_any : cty -> expr
-
-val e_fun :
-  pvsymbol list -> pre list -> post list -> post list Mexn.t -> expr -> expr

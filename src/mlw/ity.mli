@@ -316,15 +316,23 @@ val create_cty : pvsymbol list ->
     Fresh regions in [result] are reset. Every type variable in [pre],
     [post], and [xpost] must come from [cty_reads], [args] or [result]. *)
 
-val cty_apply : cty -> pvsymbol list -> ity list -> ity -> bool * cty
-(** [cty_apply cty pvl rest res] instantiates [cty] up to the types in
-    [pvl], [rest] and [res], then applies it to the arguments in [pvl],
-    and returns the ghost status and the computation type of the result.
-    This is essentially [rest -> res], with every type variable and
-    region in [pvl] freezed. The combined length of [pvl] and [rest]
-    must be equal to the length of [cty.cty_args]. The instantiation
-    must be compatible with [cty.cty_freeze]. Ghost formal parameters
-    can only be instantiated with ghost arguments. *)
+val cty_apply :
+  ?ghost:bool -> cty -> pvsymbol list -> ity list -> ity -> bool * cty
+(** [cty_apply ?(ghost=false) cty pvl rest res] instantiates [cty]
+    up to the types in [pvl], [rest] and [res], then applies it to
+    the arguments in [pvl], and returns the ghost status and the
+    computation type of the result, [rest -> res], with every type
+    variable and region in [pvl] freezed. Typecasts into a mapping
+    type are allowed for total effectless computations. *)
+
+val cty_r_visible : cty -> Sreg.t
+(** [cty_r_visible cty] returns the set of regions which are visible
+    from the non-ghost read dependencies and arguments of [cty]. *)
+
+val cty_ghost_writes : bool -> cty -> Spv.t Mreg.t
+(** [cty_ghost_writes ghost cty] returns the subset of the write effect
+    of [cty] which corresponds to ghost writes into visible fields of
+    the ghost read dependencies and arguments of [cty]. *)
 
 val cty_add_reads : cty -> Spv.t -> cty
 (** [cty_add_reads cty pvs] adds variables in [pvs] to [cty.cty_reads].
