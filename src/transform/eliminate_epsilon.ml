@@ -80,8 +80,20 @@ let rec lift_f el acc t0 = match t0.t_node with
   | Tapp (ps, [{t_node = Teps fb} as t2; t1]))
     when ls_equal ps ps_equ && to_elim el t2 ->
       let vs, f = t_open_bound fb in
-      let f = t_let_close_simp vs t1 f in
-      lift_f el acc (t_label_copy t0 f)
+      if is_canonical vs f <> None then
+        match t1.t_node with
+        | Teps fb when to_elim el t1 ->
+            let vs, f = t_open_bound fb in
+            if is_canonical vs f <> None then
+              t_map_fold (lift_f el) acc t0
+            else
+              let f = t_let_close_simp vs t2 f in
+              lift_f el acc (t_label_copy t0 f)
+        | _ ->
+            t_map_fold (lift_f el) acc t0
+      else
+        let f = t_let_close_simp vs t1 f in
+        lift_f el acc (t_label_copy t0 f)
   | Teps fb when to_elim el t0 ->
       let vl = Mvs.keys (t_vars t0) in
       let vs, f = t_open_bound fb in
