@@ -40,9 +40,11 @@ val ps_hash : psymbol -> int
 
 type ps_kind =
   | PKnone            (* non-pure symbol *)
-  | PKlocal           (* local let-function *)
-  | PKfunc of int     (* top-level let-function or constructor *)
-  | PKpred            (* top-level let-predicate *)
+  | PKpv of pvsymbol  (* local let-function *)
+  | PKlocal           (* new local let-function *)
+  | PKls of lsymbol   (* top-level let-function or let-predicate *)
+  | PKfunc of int     (* new top-level let-function or constructor *)
+  | PKpred            (* new top-level let-predicate *)
   | PKlemma           (* top-level or local let-lemma *)
 
 val create_psymbol : preid -> ?ghost:bool -> ?kind:ps_kind -> cty -> psymbol
@@ -144,10 +146,10 @@ and rec_defn = private {
 }
 
 and fun_defn = {
-  fun_sym  : psymbol;
-  fun_expr : expr; (* Efun *)
+  fun_sym  : psymbol; (* exported symbol *)
+  fun_rsym : psymbol; (* internal symbol *)
+  fun_expr : expr;    (* Efun *)
   fun_varl : variant list;
-  fun_varv : pvsymbol;
 }
 
 val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr

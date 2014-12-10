@@ -351,6 +351,3 @@ val cty_add_post : cty -> post list -> cty
     This function performs capture: the formulas in [fl] may refer to the
     variables in [cty.cty_args]. Only the new external dependencies in [fl]
     are added to [cty.cty_reads] and frozen. *)
-
-val cty_pop_post : cty -> cty
-(** [cty_pop_post cty] removes the first post-condition from [cty.cty_post]. *)

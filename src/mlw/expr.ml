@@ -59,9 +59,11 @@ let mk_ps, restore_ps =
 
 type ps_kind =
   | PKnone            (* non-pure symbol *)
-  | PKlocal           (* local let-function *)
-  | PKfunc of int     (* top-level let-function or constructor *)
-  | PKpred            (* top-level let-predicate *)
+  | PKpv of pvsymbol  (* local let-function *)
+  | PKlocal           (* new local let-function *)
+  | PKls of lsymbol   (* top-level let-function or let-predicate *)
+  | PKfunc of int     (* new top-level let-function or constructor *)
+  | PKpred            (* new top-level let-predicate *)
   | PKlemma           (* top-level or local let-lemma *)
 
 let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
@@ -109,6 +111,15 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
       let v = create_pvsymbol ~ghost:true id ity in
       let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
       mk_ps v.pv_vs.vs_name (add_post c t) ghost (PLpv v)
+  | PKpv v ->
+      check_effects c; check_reads c;
+      let ity = ity_purify c.cty_result in
+      let ity = List.fold_right (fun a ity ->
+        ity_func (ity_purify a.pv_ity) ity) c.cty_args ity in
+      ity_equal_check v.pv_ity ity;
+      if not v.pv_ghost then invalid_arg "Expr.create_psymbol";
+      let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
+      mk_ps (id_register id) (add_post c t) ghost (PLpv v)
   | PKfunc constr ->
       check_effects c; check_reads c;
       (* we don't really need to check the well-formedness of
@@ -125,15 +136,24 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
       let ls = create_psymbol id (arg_type c) in
       let f = t_app ls (arg_list c) None in
       mk_ps ls.ls_name (add_post c f) ghost (PLls ls)
+  | PKls ls when ls.ls_constr = 0 ->
+      check_effects c; check_reads c;
+      let args = arg_type c and res = res_type c in
+      List.iter2 Ty.ty_equal_check ls.ls_args args;
+      begin match ls.ls_value with
+        | None -> Ty.ty_equal_check Ty.ty_bool res
+        | Some ty -> Ty.ty_equal_check ty res end;
+      let t = t_app ls (arg_list c) ls.ls_value in
+      mk_ps (id_register id) (add_post c t) ghost (PLls ls)
+  | PKls _ -> invalid_arg "Expr.create_psymbol"
   | PKlemma ->
       check_effects c;
       mk_ps (id_register id) c ghost PLlemma
 
 let ps_kind ps = match ps.ps_logic with
   | PLnone -> PKnone
-  | PLpv _ -> PKlocal
-  | PLls {ls_value = None} -> PKpred
-  | PLls {ls_constr = n} -> PKfunc n
+  | PLpv v -> PKpv v
+  | PLls s -> PKls s
   | PLlemma -> PKlemma
 
 (** {2 Program patterns} *)
@@ -258,10 +278,10 @@ and rec_defn = {
 }
 
 and fun_defn = {
-  fun_sym  : psymbol;
-  fun_expr : expr; (* Efun *)
+  fun_sym  : psymbol; (* exported symbol *)
+  fun_rsym : psymbol; (* internal symbol *)
+  fun_expr : expr;    (* Efun *)
   fun_varl : variant list;
-  fun_varv : pvsymbol;
 }
 
 (* basic tools *)
@@ -363,12 +383,12 @@ let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
   let ghost = ghost || e.e_ghost in
   let cty = match e.e_vty, kind with
     | _, PKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_ps"
-    | VtyI i, (PKfunc _|PKpred) when ity_immutable i ->
+    | VtyI i, (PKfunc _|PKpred|PKls _) when ity_immutable i ->
         (* the post will be equality to the logic constant *)
         create_cty [] [] [] Mexn.empty Spv.empty eff_empty i
-    | VtyI _, (PKfunc _|PKpred) -> Loc.errorm ?loc:e.e_loc
+    | VtyI _, (PKfunc _|PKpred|PKls _) -> Loc.errorm ?loc:e.e_loc
         "this expression is non-pure, it cannot be used as a pure function"
-    | VtyI _, (PKnone|PKlocal|PKlemma) -> Loc.errorm ?loc:e.e_loc
+    | VtyI _, (PKnone|PKlocal|PKpv _|PKlemma) -> Loc.errorm ?loc:e.e_loc
         "this expression is first-order, it cannot be used as a function"
     | VtyC c, _ -> c in
   let ps = create_psymbol id ~ghost ~kind cty in
@@ -586,9 +606,8 @@ let rec e_vars e = match e.e_node with
   | Erec ({rec_defn = dl},e) ->
       let s = List.fold_left (fun s {fun_sym = ps} ->
         Spv.union s ps.ps_cty.cty_reads) (e_vars e) dl in
-      List.fold_left (fun s fd ->
-        match fd.fun_sym.ps_logic with
-        | PLpv v -> Spv.remove v s | _ -> s) s dl
+      List.fold_left (fun s {fun_sym = {ps_logic = l}} ->
+        match l with PLpv v -> Spv.remove v s | _ -> s) s dl
   | Enot e | Eraise (_,e) | Eghost e -> e_vars e
   | Eassign al ->
       List.fold_left (fun s (r,_,v) -> Spv.add r (Spv.add v s)) Spv.empty al
@@ -687,11 +706,16 @@ let e_fun args p q xq ({e_effect = eff} as e) =
 
 (* recursive definitions *)
 
-let rec e_ps_subst sm e = match e.e_node with
+let ps_clone ({ps_name = id; ps_ghost = ghost} as s) c =
+  create_psymbol (id_clone id) ~ghost ~kind:(ps_kind s) c
+
+let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
+  cty_add_reads (cty_of_expr d) (List.fold_left add Spv.empty varl)
+
+let rec e_ps_subst sm e = e_label_copy e (match e.e_node with
   | Evar _ | Econst _ | Eany | Etrue | Efalse
   | Eassign _ | Eassert _ | Epure _ | Eabsurd -> e
-  | Esym s ->
-      ignore s; assert false
+  | Esym s -> e_sym (Mps.find_def s s sm)
   | Efun d ->
       let d = e_ps_subst sm d in let c = cty_of_expr e in
       e_fun c.cty_args c.cty_pre c.cty_post c.cty_xpost d
@@ -699,23 +723,29 @@ let rec e_ps_subst sm e = match e.e_node with
       let d = e_ps_subst sm d in
       let al = List.map (fun v -> v.pv_ity) c.cty_args in
       e_app_raw d vl al c.cty_result
-  | Elet ({let_sym = ValV v; let_expr = d},e) ->
-      let ld, u = create_let_defn_pv (id_fresh "?") (e_ps_subst sm d) in
-      ity_equal_check u.pv_ity v.pv_ity;
-      if u.pv_ghost && not v.pv_ghost then Loc.errorm
-        "Expr.e_ps_subst: ghost status mismatch"; (* impossible? *)
-      e_let_raw { ld with let_sym = ValV v } (e_ps_subst sm e)
-  | Elet ({let_sym = ValS os; let_expr = d},e) ->
-      let ld, ns = create_let_defn_ps (id_clone os.ps_name)
-        ~ghost:os.ps_ghost ~kind:(ps_kind os) (e_ps_subst sm d) in
-      e_let_raw ld (e_ps_subst (Mps.add os ns sm) e)
+  | Elet ({let_sym = ValV v; let_expr = d} as ld, e) ->
+      let d = e_ps_subst sm d in
+      ity_equal_check (ity_of_expr d) v.pv_ity;
+      if d.e_ghost && not v.pv_ghost then Loc.errorm
+        "Expr.create_rec_defn: ghost status mismatch";
+      e_let_raw {ld with let_expr = d} (e_ps_subst sm e)
+  | Elet ({let_sym = ValS s; let_expr = d},e) ->
+      let d = e_ps_subst sm d in
+      if d.e_ghost && not s.ps_ghost then Loc.errorm
+        "Expr.create_rec_defn: ghost status mismatch";
+      let ld, ns = create_let_defn_ps (id_clone s.ps_name)
+        ~ghost:s.ps_ghost ~kind:(ps_kind s) d in
+      e_let_raw ld (e_ps_subst (Mps.add s ns sm) e)
   | Erec ({rec_defn = fdl},e) ->
-      let conv {fun_sym = s; fun_expr = d; fun_varl = vl} =
-        s, e_ps_subst sm d, vl, ps_kind s in
-      let rd = create_rec_defn (List.map conv fdl) in
-      let sm = List.fold_left2 (fun sm od nd ->
-        Mps.add od.fun_sym nd.fun_sym sm) sm fdl rd.rec_defn in
-      e_rec rd (e_ps_subst sm e)
+      let ndl = List.map (fun fd ->
+        fd.fun_rsym, e_ps_subst sm fd.fun_expr) fdl in
+      let merge {fun_sym = s; fun_varl = varl} (rs,d) =
+        { fun_sym = ps_clone s (cty_add_variant d varl);
+          fun_rsym = rs; fun_expr = d; fun_varl = varl } in
+      let nfdl = List.map2 merge fdl (rec_fixp ndl) in
+      let add m o n = Mps.add o.fun_sym n.fun_sym m in
+      let sm = List.fold_left2 add sm fdl nfdl in
+      e_rec {rec_defn = nfdl} (e_ps_subst sm e)
   | Eghost e -> e_ghost (e_ps_subst sm e)
   | Enot e -> e_not (e_ps_subst sm e)
   | Eif (c,d,e) -> e_if (e_ps_subst sm c) (e_ps_subst sm d) (e_ps_subst sm e)
@@ -726,10 +756,22 @@ let rec e_ps_subst sm e = match e.e_node with
   | Ecase (d,bl) -> e_case (e_ps_subst sm d)
       (List.map (fun (pp,e) -> pp, e_ps_subst sm e) bl)
   | Etry (d,xl) -> e_try (e_ps_subst sm d)
-      (List.map (fun (xs,v,e) -> xs, v, e_ps_subst sm e) xl)
+      (List.map (fun (xs,v,e) -> xs, v, e_ps_subst sm e) xl))
 
-and create_rec_defn fdl =
-  ignore fdl; assert false
+and rec_fixp dl =
+  let update sm (s,d) =
+    let c = cty_of_expr d in
+    if d.e_ghost && not s.ps_ghost then Loc.errorm
+      "Expr.create_rec_defn: ghost status mismatch";
+    let c = if List.length c.cty_pre < List.length s.ps_cty.cty_pre
+            then c else cty_add_pre c [List.hd s.ps_cty.cty_pre] in
+    if eff_equal c.cty_effect s.ps_cty.cty_effect &&
+       Spv.equal c.cty_reads s.ps_cty.cty_reads
+    then sm, (s,d)
+    else let n = ps_clone s c in Mps.add s n sm, (n,d) in
+  let sm, dl = Lists.map_fold_left update Mps.empty dl in
+  if Mps.is_empty sm then dl else
+  rec_fixp (List.map (fun (s,d) -> s, e_ps_subst sm d) dl)
 
 let create_rec_defn fdl =
   (* check that the variant relations are well-typed *)
@@ -753,19 +795,34 @@ let create_rec_defn fdl =
         must use the same well-founded order for variant" in
   List.iter check_variant (List.tl fdl);
   (* create the first substitution *)
-  let conv (vm,sm) (os,lam,vl,_) =
-    let id = id_clone os.ps_name and c = cty_of_expr lam in
-    if (match lam.e_node with Efun _ -> false | _ -> true) ||
-      c.cty_args = [] then invalid_arg "Expr.create_rec_defn";
-    let c = create_cty c.cty_args c.cty_pre c.cty_post c.cty_xpost
-      (List.fold_left (fun s (t,_) -> t_freepvs s t) Spv.empty vl)
-      eff_empty c.cty_result in
-    let ns = create_psymbol id ~ghost:os.ps_ghost ~kind:PKnone c in
-    let vt = t_tuple (List.map fst vl) in
-    let vv = create_pvsymbol id ~ghost:true (ity_of_ty (t_type vt)) in
-    let vp = t_equ (t_var vv.pv_vs) vt in
-    (Mpv.add vv vp vm, Mps.add os ns sm),
-    { fun_sym = ns; fun_expr = lam; fun_varl = vl; fun_varv = vv } in
-  let (vm, sm), fdl = Lists.map_fold_left conv (Mpv.empty, Mps.empty) fdl in
-  (* substitution function *)
-  ignore (e_ps_subst,create_rec_defn,vm,sm,fdl); assert false
+  let update sm (s,d,varl,_) =
+    let c = cty_of_expr d in
+    (* check that the type signatures are consistent *)
+    let same u v =
+      u.pv_ghost = v.pv_ghost && ity_equal u.pv_ity v.pv_ity in
+    if (match d.e_node with Efun _ -> false | _ -> true) ||
+       not (Lists.equal same s.ps_cty.cty_args c.cty_args) ||
+       not (ity_equal s.ps_cty.cty_result c.cty_result) ||
+       (d.e_ghost && not s.ps_ghost) || c.cty_args = []
+    then invalid_arg "Expr.create_rec_defn";
+    (* prepare the extra "decrease" precondition *)
+    let id = id_clone s.ps_name in
+    let pre = if varl = [] then c.cty_pre else
+      let tl = List.map fst varl in
+      let al = List.map t_type tl in
+      let ls = create_lsymbol id al None in
+      ps_app ls tl :: c.cty_pre in
+    (* create the clean psymbol *)
+    let c = create_cty c.cty_args pre
+      c.cty_post c.cty_xpost Spv.empty eff_empty c.cty_result in
+    let ns = create_psymbol id ~ghost:s.ps_ghost ~kind:PKnone c in
+    Mps.add s ns sm, (ns,d) in
+  let sm, dl = Lists.map_fold_left update Mps.empty fdl in
+  (* produce the recursive definition *)
+  let conv (s,d) = s, e_ps_subst sm d in
+  let merge (_,_,varl,kind) (rs,d) =
+    let id = id_clone rs.ps_name in
+    let c = cty_add_variant d varl in
+    let s = create_psymbol id ~kind ~ghost:rs.ps_ghost c in
+    { fun_sym = s; fun_rsym = rs; fun_expr = d; fun_varl = varl } in
+  { rec_defn = List.map2 merge fdl (rec_fixp (List.map conv dl)) }

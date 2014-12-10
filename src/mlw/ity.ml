@@ -971,7 +971,3 @@ let cty_add_post c post =
   let c = cty_add_reads c (List.fold_left t_freepvs Spv.empty post) in
   check_tvs c.cty_reads c.cty_args c.cty_result [] post Mexn.empty;
   { c with cty_post = post @ c.cty_post }
-
-let cty_pop_post c = match c.cty_post with
-  | [] -> invalid_arg "Ity.cty_pop_post"
-  | _::post -> { c with cty_post = post }
