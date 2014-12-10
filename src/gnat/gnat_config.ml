@@ -192,6 +192,10 @@ let provers, config, env =
     | None -> []
     | Some s ->
         Strings.split ',' s in
+  (* sanitize list to rewrite alt-ergo into altergo *)
+  let prover_str_list =
+    List.map (fun s -> if s = "alt-ergo" then "altergo" else s) prover_str_list
+  in
   (* in --prepare-shared mode, we don't care about built-in provers *)
   let prover_str_list =
     if !opt_prepare_shared then
