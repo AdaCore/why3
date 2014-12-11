@@ -143,6 +143,7 @@ and let_defn = private {
 
 and rec_defn = private {
   rec_defn : fun_defn list;
+  rec_decr : lsymbol option;
 }
 
 and fun_defn = {

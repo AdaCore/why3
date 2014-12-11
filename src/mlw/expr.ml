@@ -11,6 +11,7 @@
 
 open Stdlib
 open Ident
+open Ty
 open Term
 open Ity
 
@@ -84,7 +85,7 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
         let res = create_vsymbol (id_fresh "result") ty in
         cty_add_post c [create_post res (t_equ (t_var res) t)]
     | None ->
-        let res = create_vsymbol (id_fresh "result") Ty.ty_bool in
+        let res = create_vsymbol (id_fresh "result") ty_bool in
         let q = t_iff (t_equ (t_var res) t_bool_true) t in
         cty_add_post c [create_post res q] in
   match kind with
@@ -139,10 +140,10 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
   | PKls ls when ls.ls_constr = 0 ->
       check_effects c; check_reads c;
       let args = arg_type c and res = res_type c in
-      List.iter2 Ty.ty_equal_check ls.ls_args args;
+      List.iter2 ty_equal_check ls.ls_args args;
       begin match ls.ls_value with
-        | None -> Ty.ty_equal_check Ty.ty_bool res
-        | Some ty -> Ty.ty_equal_check ty res end;
+        | None -> ty_equal_check ty_bool res
+        | Some ty -> ty_equal_check ty res end;
       let t = t_app ls (arg_list c) ls.ls_value in
       mk_ps (id_register id) (add_post c t) ghost (PLls ls)
   | PKls _ -> invalid_arg "Expr.create_psymbol"
@@ -275,6 +276,7 @@ and let_defn = {
 
 and rec_defn = {
   rec_defn : fun_defn list;
+  rec_decr : lsymbol option;
 }
 
 and fun_defn = {
@@ -736,7 +738,7 @@ let rec e_ps_subst sm e = e_label_copy e (match e.e_node with
       let ld, ns = create_let_defn_ps (id_clone s.ps_name)
         ~ghost:s.ps_ghost ~kind:(ps_kind s) d in
       e_let_raw ld (e_ps_subst (Mps.add s ns sm) e)
-  | Erec ({rec_defn = fdl},e) ->
+  | Erec ({rec_defn = fdl; rec_decr = ds},e) ->
       let ndl = List.map (fun fd ->
         fd.fun_rsym, e_ps_subst sm fd.fun_expr) fdl in
       let merge {fun_sym = s; fun_varl = varl} (rs,d) =
@@ -745,7 +747,8 @@ let rec e_ps_subst sm e = e_label_copy e (match e.e_node with
       let nfdl = List.map2 merge fdl (rec_fixp ndl) in
       let add m o n = Mps.add o.fun_sym n.fun_sym m in
       let sm = List.fold_left2 add sm fdl nfdl in
-      e_rec {rec_defn = nfdl} (e_ps_subst sm e)
+      let rd = {rec_defn = nfdl; rec_decr = ds} in
+      e_rec rd (e_ps_subst sm e)
   | Eghost e -> e_ghost (e_ps_subst sm e)
   | Enot e -> e_not (e_ps_subst sm e)
   | Eif (c,d,e) -> e_if (e_ps_subst sm c) (e_ps_subst sm d) (e_ps_subst sm e)
@@ -782,18 +785,31 @@ let create_rec_defn fdl =
   let varl1 = match fdl with
     | (_,_,vl,_)::_ -> List.rev vl
     | [] -> invalid_arg "Expr.create_rec_defn" in
+  let no_int t = not (ty_equal (t_type t) ty_int) in
   let check_variant (_,_,vl,_) =
     let vl, varl1 = match List.rev vl, varl1 with
-      | (_, None)::vl, (_, None)::varl1 -> vl, varl1
+      | (t, None)::vl, (t1, None)::varl1
+        when no_int t && no_int t1 -> vl, varl1
       | _, _ -> vl, varl1 in
     let res = try List.for_all2 (fun (t1,r1) (t2,r2) ->
-        Opt.equal Ty.ty_equal t1.t_ty t2.t_ty &&
+        Opt.equal ty_equal t1.t_ty t2.t_ty &&
         Opt.equal ls_equal r1 r2) vl varl1
       with Invalid_argument _ -> false in
     if not res then Loc.errorm
       "All functions in a recursive definition \
         must use the same well-founded order for variant" in
   List.iter check_variant (List.tl fdl);
+  (* create the dummy "decrease" predicate symbol *)
+  let add_a l (t,_) = t_type t :: l in
+  let ds = match varl1 with
+    | [] -> None
+    | (t,None)::vl when no_int t ->
+        let tv = create_tvsymbol (id_fresh "a") in
+        let al = List.fold_left add_a [ty_var tv] vl in
+        Some (create_lsymbol (id_fresh "DECR") al None)
+    | vl ->
+        let al = List.fold_left add_a [] vl in
+        Some (create_lsymbol (id_fresh "DECR") al None) in
   (* create the first substitution *)
   let update sm (s,d,varl,_) =
     let c = cty_of_expr d in
@@ -806,13 +822,11 @@ let create_rec_defn fdl =
        (d.e_ghost && not s.ps_ghost) || c.cty_args = []
     then invalid_arg "Expr.create_rec_defn";
     (* prepare the extra "decrease" precondition *)
-    let id = id_clone s.ps_name in
-    let pre = if varl = [] then c.cty_pre else
-      let tl = List.map fst varl in
-      let al = List.map t_type tl in
-      let ls = create_lsymbol id al None in
-      ps_app ls tl :: c.cty_pre in
+    let pre = match ds with
+      | Some ls -> ps_app ls (List.map fst varl) :: c.cty_pre
+      | None -> c.cty_pre in
     (* create the clean psymbol *)
+    let id = id_clone s.ps_name in
     let c = create_cty c.cty_args pre
       c.cty_post c.cty_xpost Spv.empty eff_empty c.cty_result in
     let ns = create_psymbol id ~ghost:s.ps_ghost ~kind:PKnone c in
@@ -825,4 +839,5 @@ let create_rec_defn fdl =
     let c = cty_add_variant d varl in
     let s = create_psymbol id ~kind ~ghost:rs.ps_ghost c in
     { fun_sym = s; fun_rsym = rs; fun_expr = d; fun_varl = varl } in
-  { rec_defn = List.map2 merge fdl (rec_fixp (List.map conv dl)) }
+  let dl = List.map2 merge fdl (rec_fixp (List.map conv dl)) in
+  { rec_defn = dl; rec_decr = ds }
