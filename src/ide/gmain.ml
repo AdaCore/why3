@@ -785,16 +785,28 @@ let () = Warning.set_hook record_warning
 let display_warnings () =
   if Queue.is_empty warnings then () else
     begin
+      let nwarn = ref 0 in
+      begin try
       Queue.iter
         (fun (loc,msg) ->
-          match loc with
-            | None ->
-              Format.fprintf Format.str_formatter "%s@\n" msg
-            | Some l ->
-            (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
-              Format.fprintf Format.str_formatter "%a: %s@\n"
-                Loc.gen_report_position l msg)
-        warnings;
+         if !nwarn = 4 then
+           begin
+             Format.fprintf Format.str_formatter "[%d more warnings. See stderr for details]@\n" (Queue.length warnings - !nwarn);
+             raise Exit
+           end
+         else
+           begin
+             incr nwarn;
+             match loc with
+             | None ->
+                Format.fprintf Format.str_formatter "%s@\n@\n" msg
+             | Some l ->
+                (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+                Format.fprintf Format.str_formatter "%a: %s@\n@\n"
+                               Loc.gen_report_position l msg
+           end) warnings;
+        with Exit -> ();
+      end;
       Queue.clear warnings;
       let msg =
         Format.flush_str_formatter ()
@@ -1977,7 +1989,8 @@ let reload () =
       M.update_session ~allow_obsolete:true ~release:false ~use_shapes:true
         old_session gconfig.env gconfig.Gconfig.config
     in
-    current_env_session := Some new_env_session
+    current_env_session := Some new_env_session;
+    display_warnings ()
   with
     | e ->
         let e = match e with
