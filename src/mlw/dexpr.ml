@@ -19,22 +19,27 @@ open Expr
 (** Program types *)
 
 type dity =
-  | Dutv of tvsymbol
-  | Dvar of dvar ref
-  | Durg of ity * dity
-  | Dreg of dvar ref * dity
+  | Dutv of tvsymbol          (* undestructible "user" type variable *)
+  | Dvar of dvar ref          (* destructible "fresh" type variable *)
+  | Durg of ity * dity        (* undestructible "user" region, for global refs *)
+  | Dreg of dvar ref * dity   (* destructible "fresh" region *)
   | Dapp of itysymbol * dity list * dity list
   | Dpur of itysymbol * dity list
 
 and dvar =
-  | Dtvs of tvsymbol
-  | Dval of dity
+  | Dtvs of tvsymbol          (* unassigned fresh type variable *)
+  | Dval of dity              (* destructive binding *)
+
+(* In Dapp, the second dity list only contains Dreg's and Durg's.
+   In Dreg and Durg, the dity field is a Dapp of the region's type.
+   In Dreg, the dvar field leads to another Dreg or Durg.
+   In Durg, the ity field is an Ityreg. *)
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
 let dvar_fresh n = ref (Dtvs (create_tvsymbol (id_fresh n)))
 
-let create_dreg dity = Dreg (dvar_fresh "rho", dity)
+let dreg_fresh dity = Dreg (dvar_fresh "rho", dity)
 
 let dity_of_ity ity =
   let hr = Hreg.create 3 in
@@ -47,7 +52,7 @@ let dity_of_ity ity =
     try Hreg.find hr reg with Not_found ->
     let {reg_its = s; reg_args = tl; reg_regs = rl} = reg in
     let d = Dapp (s, List.map dity tl, List.map dreg rl) in
-    let r = create_dreg d in Hreg.add hr reg r; r in
+    let r = dreg_fresh d in Hreg.add hr reg r; r in
   dity ity
 
 let reg_of_ity = function
@@ -95,7 +100,7 @@ let rec dity_unify d1 d2 = match d1,d2 with
   | Dutv u, Dutv v when tv_equal u v ->
       ()
   |(Dapp (s1,dl1,_), Dapp (s2,dl2,_)
-  | Dpur (s1,dl1), Dpur (s2,dl2)) when its_equal s1 s2 ->
+  | Dpur (s1,dl1),   Dpur (s2,dl2)) when its_equal s1 s2 ->
       List.iter2 dity_unify dl1 dl2
   | _ -> raise Exit
 
@@ -113,7 +118,7 @@ let dity_fresh () =
 let rec dity_refresh ht = function
   | Dreg ({contents = Dtvs v},d) ->
       begin try Htv.find ht v with Not_found ->
-      let r = create_dreg (dity_refresh ht d) in
+      let r = dreg_fresh (dity_refresh ht d) in
       Htv.add ht v r; r end
   | Dreg _ -> assert false
   | Dpur (s,dl) ->    Dpur (s, List.map (dity_refresh ht) dl)
@@ -269,7 +274,7 @@ let specialize_scheme tvs (argl,res) =
     if not (Stv.mem v tvs) then dity_unify_weak nd d;
     Htv.add hv v nd; nd
   and get_reg v d = try Htv.find hr v with Not_found ->
-    let r = create_dreg (spec_dity d) in
+    let r = dreg_fresh (spec_dity d) in
     Htv.add hr v r; r in
   List.map spec_dity argl, spec_dity res
 
@@ -285,17 +290,17 @@ let spec_ity hv hr frz ity =
     let {reg_its = s; reg_args = tl; reg_regs = rl} = reg in
     let d = Dapp (s, List.map dity tl, List.map dreg rl) in
     let r = if Mreg.mem reg frz.isb_reg then
-      Durg (ity_reg reg, d) else create_dreg d in
+      Durg (ity_reg reg, d) else dreg_fresh d in
     Hreg.add hr reg r; r in
   dity ity
 
-let specialize_pv { pv_ity = ity } =
+let specialize_pv {pv_ity = ity} =
   spec_ity (Htv.create 3) (Hreg.create 3) (ity_freeze isb_empty ity) ity
 
-let specialize_xs { xs_ity = ity } =
+let specialize_xs {xs_ity = ity} =
   spec_ity (Htv.create 3) (Hreg.create 3) (ity_freeze isb_empty ity) ity
 
-let specialize_ps { ps_cty = cty } =
+let specialize_ps {ps_cty = cty} =
   let hv = Htv.create 3 and hr = Hreg.create 3 in
   let spec ity = spec_ity hv hr cty.cty_freeze ity in
   List.map (fun v -> spec v.pv_ity) cty.cty_args, spec cty.cty_result
