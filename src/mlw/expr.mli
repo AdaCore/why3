@@ -75,6 +75,8 @@ type pre_pattern =
   | PPor  of pre_pattern * pre_pattern
   | PPas  of pre_pattern * preid
 
+exception ConstructorExpected of psymbol
+
 val create_prog_pattern :
   pre_pattern -> ?ghost:bool -> ity -> pvsymbol Mstr.t * prog_pattern
 

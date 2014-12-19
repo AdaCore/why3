@@ -37,6 +37,9 @@ and dvar =
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
 
+let dity_of_dvty (argl,res) =
+  List.fold_right (fun a d -> Dpur (its_func, [a;d])) argl res
+
 let dvar_fresh n = ref (Dtvs (create_tvsymbol (id_fresh n)))
 
 let dreg_fresh dity = Dreg (dvar_fresh "rho", dity)
@@ -305,15 +308,10 @@ let specialize_ps {ps_cty = cty} =
   let spec ity = spec_ity hv hr cty.cty_freeze ity in
   List.map (fun v -> spec v.pv_ity) cty.cty_args, spec cty.cty_result
 
-let _ = ity_of_dity, dity_unify, reunify_regions, dvty_int, dvty_real,
-        dvty_bool, dvty_unit, print_ity, print_reg, print_dity,
-        specialize_scheme, specialize_pv, specialize_xs, specialize_ps
-
-(*
 (** Patterns *)
 
 type dpattern = {
-  dp_pat  : prog_pattern;
+  dp_pat  : pre_pattern;
   dp_dity : dity;
   dp_vars : dity Mstr.t;
   dp_loc  : Loc.position option;
@@ -331,9 +329,7 @@ type dpattern_node =
 
 type ghost = bool
 
-type opaque = Stv.t
-
-type dbinder = preid option * ghost * opaque * dity
+type dbinder = preid option * ghost * dity
 
 type 'a later = vsymbol Mstr.t -> 'a
   (* specification terms are parsed and typechecked after the program
@@ -346,7 +342,6 @@ type dspec_final = {
   ds_xpost   : (vsymbol option * term) list Mexn.t;
   ds_reads   : vsymbol list;
   ds_writes  : term list;
-  ds_variant : variant list;
   ds_checkrw : bool;
   ds_diverge : bool;
 }
@@ -357,17 +352,15 @@ type dspec = ty -> dspec_final
      must have this type. All vsymbols in the exceptional postcondition
      clauses must have the type of the corresponding exception. *)
 
-type dtype_v =
-  | DSpecV of dity
-  | DSpecA of dbinder list * dtype_c
+type dtype_c = dbinder list * dspec later * dity
 
-and dtype_c = dtype_v * dspec later
+type dtype_v =
+  | DSpecI of dity
+  | DSpecC of dtype_c
 
 (** Expressions *)
 
 type dinvariant = term list
-
-type dlazy_op = DEand | DEor
 
 type dexpr = {
   de_node : dexpr_node;
@@ -379,43 +372,40 @@ and dexpr_node =
   | DEvar of string * dvty
   | DEgpvar of pvsymbol
   | DEgpsym of psymbol
-  | DEplapp of plsymbol * dexpr list
-  | DElsapp of lsymbol * dexpr list
-  | DEapply of dexpr * dexpr
   | DEconst of Number.constant
-  | DElam of dbinder list * dexpr * dspec later
+  | DEapp of dexpr * dexpr list
+  | DEfun of dbinder list * dspec later * dexpr
   | DElet of dlet_defn * dexpr
-  | DEfun of dfun_defn * dexpr
   | DErec of drec_defn * dexpr
+  | DEnot of dexpr
+  | DElazy of lazy_op * dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
-  | DEassign of plsymbol * dexpr * dexpr
-  | DElazy of dlazy_op * dexpr * dexpr
-  | DEnot of dexpr
+  | DEassign of (dexpr * pvsymbol * dexpr) list
+  | DEwhile of dexpr * (dinvariant * variant list) later * dexpr
+  | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
+  | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
+  | DEraise of xsymbol * dexpr
+  | DEghost of dexpr
+  | DEassert of assertion_kind * term later
+  | DEpure of term later
+  | DEabsurd
   | DEtrue
   | DEfalse
-  | DEraise of xsymbol * dexpr
-  | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
-  | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
-  | DEwhile of dexpr * (variant list * dinvariant) later * dexpr
-  | DEloop of (variant list * dinvariant) later * dexpr
-  | DEabsurd
-  | DEassert of assertion_kind * term later
-  | DEabstract of dexpr * dspec later
+  | DEany of dtype_v
   | DEmark of preid * dexpr
-  | DEghost of dexpr
-  | DEany of dtype_v * dspec later option
   | DEcast of dexpr * ity
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
-and dlet_defn = preid * ghost * dexpr
-
-and dfun_defn = preid * ghost * dbinder list * dexpr * dspec later
+and dlet_defn = preid * ghost * ps_kind * dexpr
 
 and drec_defn = { fds : dfun_defn list }
 
-type dval_decl = preid * ghost * dtype_v
+and dfun_defn = preid * ghost * ps_kind *
+  dbinder list * (dspec * variant list) later * dexpr
+
+type dval_decl = preid * ghost * ps_kind * dtype_v
 
 (** Environment *)
 
@@ -426,11 +416,12 @@ type denv = {
 
 let denv_empty = { frozen = []; locals = Mstr.empty }
 
-let is_frozen frozen tv =
-  try List.iter (occur_check tv) frozen; false with Exit -> true
+let is_frozen frozen v =
+  try List.iter (occur_check v) frozen; false with Exit -> true
 
 let freeze_dvty frozen (argl,res) =
   let rec add l = function
+    | Dreg (_,d) | Durg (_,d)
     | Dvar { contents = Dval d } -> add l d
     | Dvar { contents = Dtvs _ } as d -> d :: l
     | Dutv _ as d -> d :: l
@@ -439,9 +430,10 @@ let freeze_dvty frozen (argl,res) =
 
 let free_vars frozen (argl,res) =
   let rec add s = function
+    | Dreg (_,d) | Durg (_,d)
     | Dvar { contents = Dval d } -> add s d
-    | Dvar { contents = Dtvs tv }
-    | Dutv tv -> if is_frozen frozen tv then s else Stv.add tv s
+    | Dvar { contents = Dtvs v }
+    | Dutv v -> if is_frozen frozen v then s else Stv.add v s
     | Dapp (_,tl,_) | Dpur (_,tl) -> List.fold_left add s tl in
   List.fold_left add (add Stv.empty res) argl
 
@@ -465,43 +457,34 @@ let denv_add_rec_poly { frozen = frozen; locals = locals } frozen0 id dvty =
 
 let denv_add_rec denv frozen0 id ((argl,res) as dvty) =
   let rec is_explicit = function
-    | Dapp (_,tl,_) | Dpur (_,tl) -> List.for_all is_explicit tl
+    | Dreg (_,d) | Durg (_,d)
     | Dvar { contents = Dval d } -> is_explicit d
     | Dvar { contents = Dtvs _ } -> false
-    | Dutv _ -> true in
+    | Dutv _ -> true
+    | Dapp (_,tl,_) | Dpur (_,tl) -> List.for_all is_explicit tl in
   if List.for_all is_explicit argl && is_explicit res
   then denv_add_rec_poly denv frozen0 id dvty
   else denv_add_rec_mono denv id dvty
 
-let dvty_of_dtype_v dtv =
-  let rec dvty argl = function
-    | DSpecA (bl,(DSpecV res,_)) ->
-        List.rev_append argl (List.map (fun (_,_,_,t) -> t) bl), res
-    | DSpecA (bl,(dtv,_)) ->
-        dvty (List.fold_left (fun l (_,_,_,t) -> t::l) argl bl) dtv
-    | DSpecV res -> List.rev argl, res in
-  dvty [] dtv
+let dvty_of_dtype_v = function
+  | DSpecC (bl,_,res) -> List.map (fun (_,_,d) -> d) bl, res
+  | DSpecI res -> [], res
 
 let denv_add_var denv id dity = denv_add_mono denv id ([], dity)
 
-let denv_add_let denv (id,_,({de_dvty = dvty} as de)) =
+let denv_add_let denv (id,_,_,({de_dvty = dvty} as de)) =
   if fst dvty = [] then denv_add_mono denv id dvty else
   let rec is_value de = match de.de_node with
     | DEghost de | DEuloc (de,_) | DElabel (de,_) -> is_value de
-    | DEvar _ | DEgpsym _ | DElam _ | DEany (_,None) -> true
+    | DEvar _ | DEgpsym _ | DEfun _ | DEany _ -> true
     | _ -> false in
   if is_value de
   then denv_add_poly denv id dvty
   else denv_add_mono denv id dvty
 
-let denv_add_fun denv (id,_,bl,{de_dvty = (argl,res)},_) =
-  if bl = [] then invalid_arg "Mlw_dexpr.denv_add_fun: empty argument list";
-  let argl = List.fold_right (fun (_,_,_,t) l -> t::l) bl argl in
-  denv_add_poly denv id (argl, res)
-
 let denv_add_args { frozen = frozen; locals = locals } bl =
-  let l = List.fold_left (fun l (_,_,_,t) -> t::l) frozen bl in
-  let add s (id,_,_,t) = match id with
+  let l = List.fold_left (fun l (_,_,t) -> t::l) frozen bl in
+  let add s (id,_,t) = match id with
     | Some {pre_name = n} ->
         Mstr.add_new (Dterm.DuplicateVar n) n (None, ([],t)) s
     | None -> s in
@@ -539,41 +522,42 @@ let dpat_expected_type_weak {dp_dity = dp_dity; dp_loc = loc} dity =
     "This pattern has type %a,@ but is expected to have type %a"
     print_dity dp_dity print_dity dity
 
-let dexpr_expected_type {de_dvty = (al,res); de_loc = loc} dity =
-  if al <> [] then Loc.errorm ?loc "This expression is not a first-order value";
+let dexpr_expected_type {de_dvty = dvty; de_loc = loc} dity =
+  let res = dity_of_dvty dvty in
   try dity_unify res dity with Exit -> Loc.errorm ?loc
     "This expression has type %a,@ but is expected to have type %a"
     print_dity res print_dity dity
 
-let dexpr_expected_type_weak {de_dvty = (al,res); de_loc = loc} dity =
-  if al <> [] then Loc.errorm ?loc "This expression is not a first-order value";
+let dexpr_expected_type_weak {de_dvty = dvty; de_loc = loc} dity =
+  let res = dity_of_dvty dvty in
   try dity_unify_weak res dity with Exit -> Loc.errorm ?loc
     "This expression has type %a,@ but is expected to have type %a"
     print_dity res print_dity dity
 
 (** Generation of letrec blocks *)
 
-type pre_fun_defn =
-  preid * ghost * dbinder list * dity * (denv -> dexpr * dspec later)
+type pre_fun_defn = preid * ghost * ps_kind *
+  dbinder list * dity * (denv -> (dspec * variant list) later * dexpr)
 
 exception DupId of preid
 
 let drec_defn denv0 prel =
-  if prel = [] then invalid_arg "Mlw_dexpr.drec_defn: empty function list";
-  let add s (id,_,_,_,_) = Sstr.add_new (DupId id) id.pre_name s in
+  if prel = [] then invalid_arg "Dexpr.drec_defn: empty function list";
+  let add s (id,_,_,_,_,_) = Sstr.add_new (DupId id) id.pre_name s in
   let _ = try List.fold_left add Sstr.empty prel with DupId id ->
     Loc.errorm ?loc:id.pre_loc "duplicate function name %s" id.pre_name in
-  let add denv (id,_,bl,res,_) =
-    if bl = [] then invalid_arg "Mlw_dexpr.drec_defn: empty argument list";
-    let argl = List.map (fun (_,_,_,t) -> t) bl in
+  let add denv (id,_,_,bl,res,_) =
+    if bl = [] then invalid_arg "Dexpr.drec_defn: empty argument list";
+    let argl = List.map (fun (_,_,t) -> t) bl in
     denv_add_rec denv denv0.frozen id (argl,res) in
   let denv1 = List.fold_left add denv0 prel in
-  let parse (id,gh,bl,res,pre) =
-    let de, dsp = pre (denv_add_args denv1 bl) in
+  let parse (id,gh,pk,bl,res,pre) =
+    let dsp, de = pre (denv_add_args denv1 bl) in
     dexpr_expected_type_weak de res;
-    (id,gh,bl,de,dsp) in
+    (id,gh,pk,bl,dsp,de) in
   let fdl = List.map parse prel in
-  let add denv ((id,_,_,_,_) as fd) =
+  let add denv (id,_,_,bl,_,{de_dvty = dvty}) =
+    (* just in case we linked some polymorphic type var to the outer context *)
     let check tv = if is_frozen denv0.frozen tv then Loc.errorm ?loc:id.pre_loc
       "This function is expected to be polymorphic in type variable %a"
       Pretty.print_tv tv in
@@ -581,7 +565,8 @@ let drec_defn denv0 prel =
     | Some (Some tvs, _) -> Stv.iter check tvs
     | Some (None, _) | None -> assert false
     end;
-    denv_add_fun denv fd in
+    let argl = List.map (fun (_,_,t) -> t) bl in
+    denv_add_poly denv id (argl, dity_of_dvty dvty) in
   List.fold_left add denv0 fdl, { fds = fdl }
 
 (** Constructors *)
@@ -595,24 +580,16 @@ let dpattern ?loc node =
     | DPvar id ->
         let dity = dity_fresh () in
         mk_dpat (PPvar id) dity (Mstr.singleton id.pre_name dity)
-    | DPlapp (ls,dpl) ->
-        if ls.ls_constr = 0 then raise (ConstructorExpected ls);
-        let argl, res = specialize_ls ls in
+    | DPapp ({ps_logic = PLls ls} as ps, dpl) when ls.ls_constr > 0 ->
+        let argl, res = specialize_ps ps in
         dity_unify_app ls dpat_expected_type dpl argl;
         let join n _ _ = raise (Dterm.DuplicateVar n) in
         let add acc dp = Mstr.union join acc dp.dp_vars in
         let vars = List.fold_left add Mstr.empty dpl in
         let ppl = List.map (fun dp -> dp.dp_pat) dpl in
-        mk_dpat (PPlapp (ls, ppl)) res vars
-    | DPpapp ({pl_ls = ls} as pl, dpl) ->
-        if ls.ls_constr = 0 then raise (ConstructorExpected ls);
-        let argl, res = specialize_pl pl in
-        dity_unify_app ls dpat_expected_type dpl argl;
-        let join n _ _ = raise (Dterm.DuplicateVar n) in
-        let add acc dp = Mstr.union join acc dp.dp_vars in
-        let vars = List.fold_left add Mstr.empty dpl in
-        let ppl = List.map (fun dp -> dp.dp_pat) dpl in
-        mk_dpat (PPpapp (pl, ppl)) res vars
+        mk_dpat (PPapp (ps, ppl)) res vars
+    | DPapp (ps,_) ->
+        raise (ConstructorExpected ps);
     | DPor (dp1,dp2) ->
         dpat_expected_type dp2 dp1.dp_dity;
         let join n dity1 dity2 = try dity_unify dity1 dity2; Some dity1
@@ -631,6 +608,11 @@ let dpattern ?loc node =
   in
   Loc.try1 ?loc dpat node
 
+let _ = ity_of_dity, reunify_regions, dvty_int, dvty_real,
+        dvty_bool, dvty_unit, print_ity, print_reg, print_dity,
+        specialize_pv, specialize_xs, dvty_of_dtype_v, dexpr_expected_type
+
+(*
 let dexpr ?loc node =
   let get_dvty = function
     | DEvar (_,dvty) ->
@@ -665,13 +647,13 @@ let dexpr ?loc node =
     | DEconst (Number.ConstReal _) ->
         dvty_real
     | DEfun ((_,_,[],_,_),_) ->
-        invalid_arg "Mlw_dexpr.dexpr: empty argument list in DEfun"
+        invalid_arg "Dexpr.dexpr: empty argument list in DEfun"
     | DElet (_,de)
     | DEfun (_,de)
     | DErec (_,de) ->
         de.de_dvty
     | DElam ([],_,_) ->
-        invalid_arg "Mlw_dexpr.dexpr: empty argument list in DElam"
+        invalid_arg "Dexpr.dexpr: empty argument list in DElam"
     | DElam (bl,{de_dvty = (argl,res)},_) ->
         List.fold_right (fun (_,_,_,t) l -> t::l) bl argl, res
     | DEif (de1,de2,de3) ->
@@ -681,7 +663,7 @@ let dexpr ?loc node =
         dexpr_expected_type de3 res;
         de2.de_dvty
     | DEcase (_,[]) ->
-        invalid_arg "Mlw_dexpr.dexpr: empty branch list in DEcase"
+        invalid_arg "Dexpr.dexpr: empty branch list in DEcase"
     | DEcase (de,bl) ->
         let ety = dity_fresh () in
         let res = dity_fresh () in
@@ -710,7 +692,7 @@ let dexpr ?loc node =
         dexpr_expected_type de (specialize_xs xs);
         [], dity_fresh ()
     | DEtry (_,[]) ->
-        invalid_arg "Mlw_dexpr.dexpr: empty branch list in DEtry"
+        invalid_arg "Dexpr.dexpr: empty branch list in DEtry"
     | DEtry (de,bl) ->
         let res = dity_fresh () in
         dexpr_expected_type de res;

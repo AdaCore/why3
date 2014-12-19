@@ -172,6 +172,8 @@ type pre_pattern =
   | PPor  of pre_pattern * pre_pattern
   | PPas  of pre_pattern * preid
 
+exception ConstructorExpected of psymbol
+
 let create_prog_pattern pp ?(ghost=false) ity =
   let hv = Hstr.create 3 in
   let gh = ref false in
@@ -200,8 +202,8 @@ let create_prog_pattern pp ?(ghost=false) ity =
           | Invalid_argument _ ->
               raise (Term.BadArity (ls, List.length ppl)) in
         pat_app ls ppl (ty_of_ity ity)
-    | PPapp ({ps_name = {id_string = s}}, _) ->
-        Loc.errorm "%s is not a constructor, it cannot be used in a pattern" s
+    | PPapp (ps, _) ->
+        raise (ConstructorExpected ps)
     | PPor (pp1,pp2) ->
         pat_or (make ghost ity pp1) (make ghost ity pp2)
     | PPas (pp,id) ->

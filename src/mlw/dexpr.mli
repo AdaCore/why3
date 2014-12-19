@@ -30,11 +30,10 @@ val dity_is_bool : dity -> bool
 
 val dvty_is_chainable : dvty -> bool
 
-(*
 (** Patterns *)
 
 type dpattern = private {
-  dp_pat  : prog_pattern;
+  dp_pat  : pre_pattern;
   dp_dity : dity;
   dp_vars : dity Mstr.t;
   dp_loc  : Loc.position option;
@@ -52,9 +51,7 @@ type dpattern_node =
 
 type ghost = bool
 
-type opaque = Stv.t
-
-type dbinder = preid option * ghost * opaque * dity
+type dbinder = preid option * ghost * dity
 
 (** Specifications *)
 
@@ -69,7 +66,6 @@ type dspec_final = {
   ds_xpost   : (vsymbol option * term) list Mexn.t;
   ds_reads   : vsymbol list;
   ds_writes  : term list;
-  ds_variant : variant list;
   ds_checkrw : bool;
   ds_diverge : bool;
 }
@@ -80,17 +76,15 @@ type dspec = ty -> dspec_final
      must have this type. All vsymbols in the exceptional postcondition
      clauses must have the type of the corresponding exception. *)
 
-type dtype_v =
-  | DSpecV of dity
-  | DSpecA of dbinder list * dtype_c
+type dtype_c = dbinder list * dspec later * dity
 
-and dtype_c = dtype_v * dspec later
+type dtype_v =
+  | DSpecI of dity
+  | DSpecC of dtype_c
 
 (** Expressions *)
 
 type dinvariant = term list
-
-type dlazy_op = DEand | DEor
 
 type dexpr = private {
   de_node : dexpr_node;
@@ -102,43 +96,40 @@ and dexpr_node =
   | DEvar of string * dvty
   | DEgpvar of pvsymbol
   | DEgpsym of psymbol
-  | DEplapp of plsymbol * dexpr list
-  | DElsapp of lsymbol * dexpr list
-  | DEapply of dexpr * dexpr
   | DEconst of Number.constant
-  | DElam of dbinder list * dexpr * dspec later
+  | DEapp of dexpr * dexpr list
+  | DEfun of dbinder list * dspec later * dexpr
   | DElet of dlet_defn * dexpr
-  | DEfun of dfun_defn * dexpr
   | DErec of drec_defn * dexpr
+  | DEnot of dexpr
+  | DElazy of lazy_op * dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
-  | DEassign of plsymbol * dexpr * dexpr
-  | DElazy of dlazy_op * dexpr * dexpr
-  | DEnot of dexpr
+  | DEassign of (dexpr * pvsymbol * dexpr) list
+  | DEwhile of dexpr * (dinvariant * variant list) later * dexpr
+  | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
+  | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
+  | DEraise of xsymbol * dexpr
+  | DEghost of dexpr
+  | DEassert of assertion_kind * term later
+  | DEpure of term later
+  | DEabsurd
   | DEtrue
   | DEfalse
-  | DEraise of xsymbol * dexpr
-  | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
-  | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
-  | DEwhile of dexpr * (variant list * dinvariant) later * dexpr
-  | DEloop of (variant list * dinvariant) later * dexpr
-  | DEabsurd
-  | DEassert of assertion_kind * term later
-  | DEabstract of dexpr * dspec later
+  | DEany of dtype_v
   | DEmark of preid * dexpr
-  | DEghost of dexpr
-  | DEany of dtype_v * dspec later option
   | DEcast of dexpr * ity
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
-and dlet_defn = preid * ghost * dexpr
-
-and dfun_defn = preid * ghost * dbinder list * dexpr * dspec later
+and dlet_defn = preid * ghost * ps_kind * dexpr
 
 and drec_defn = private { fds : dfun_defn list }
 
-type dval_decl = preid * ghost * dtype_v
+and dfun_defn = preid * ghost * ps_kind *
+  dbinder list * (dspec * variant list) later * dexpr
+
+type dval_decl = preid * ghost * ps_kind * dtype_v
 
 (** Environment *)
 
@@ -149,8 +140,6 @@ val denv_empty : denv
 val denv_add_var : denv -> preid -> dity -> denv
 
 val denv_add_let : denv -> dlet_defn -> denv
-
-val denv_add_fun : denv -> dfun_defn -> denv
 
 val denv_add_args : denv -> dbinder list -> denv
 
@@ -164,13 +153,16 @@ val denv_get_opt : denv -> string -> dexpr_node option
 
 val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 
+(*
 val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
+*)
 
-type pre_fun_defn =
-  preid * ghost * dbinder list * dity * (denv -> dexpr * dspec later)
+type pre_fun_defn = preid * ghost * ps_kind *
+  dbinder list * dity * (denv -> (dspec * variant list) later * dexpr)
 
 val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
+(*
 (** Final stage *)
 
 val expr : keep_loc:bool ->
