@@ -151,6 +151,22 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
       check_effects c;
       mk_ps (id_register id) c ghost PLlemma
 
+let ps_of_ls ls =
+  let v_args = List.map (fun ty ->
+    create_pvsymbol (id_fresh "u") (ity_of_ty ty)) ls.ls_args in
+  let t_args = List.map (fun v -> t_var v.pv_vs) v_args in
+  let t = t_app ls t_args ls.ls_value in
+  let q = match ls.ls_value with
+    | Some ty ->
+        let res = create_vsymbol (id_fresh "result") ty in
+        create_post res (t_equ (t_var res) t)
+    | None ->
+        let res = create_vsymbol (id_fresh "result") ty_bool in
+        create_post res (t_iff (t_equ (t_var res) t_bool_true) t) in
+  let c = create_cty v_args [] [q] Mexn.empty
+    Spv.empty eff_empty (ity_of_ty (t_type q)) in
+  mk_ps ls.ls_name c false (PLls ls)
+
 let ps_kind ps = match ps.ps_logic with
   | PLnone -> PKnone
   | PLpv v -> PKpv v
@@ -843,3 +859,29 @@ let create_rec_defn fdl =
     { fun_sym = s; fun_rsym = rs; fun_expr = d; fun_varl = varl } in
   let dl = List.map2 merge fdl (rec_fixp (List.map conv dl)) in
   { rec_defn = dl; rec_decr = ds }
+
+(* built-in symbols *)
+
+let ps_bool_true  = ps_of_ls fs_bool_true
+let ps_bool_false = ps_of_ls fs_bool_false
+
+let e_bool_true  = e_app (e_sym ps_bool_true)  [] [] ity_bool
+let e_bool_false = e_app (e_sym ps_bool_false) [] [] ity_bool
+
+let ps_tuple = Hint.memo 17 (fun n -> ps_of_ls (fs_tuple n))
+
+let is_ps_tuple ps = ps_equal ps (ps_tuple (List.length ps.ps_cty.cty_args))
+
+let e_tuple el =
+  let ity = ity_tuple (List.map ity_of_expr el) in
+  e_app (e_sym (ps_tuple (List.length el))) el [] ity
+
+let ps_func_app = ps_of_ls fs_func_app
+
+let e_func_app fn e =
+  let c = ps_func_app.ps_cty in
+  let mtch isb a e = ity_match isb a.pv_ity (ity_of_expr e) in
+  let isb = List.fold_left2 mtch c.cty_freeze c.cty_args [fn;e] in
+  e_app (e_sym ps_func_app) [fn;e] [] (ity_full_inst isb c.cty_result)
+
+let e_func_app_l fn el = List.fold_left e_func_app fn el

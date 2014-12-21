@@ -230,3 +230,20 @@ val e_assert : assertion_kind -> term -> expr
 val e_absurd : ity -> expr
 
 val e_any : cty -> expr
+
+(** {2 Built-in symbols} *)
+
+val ps_bool_true  : psymbol
+val ps_bool_false : psymbol
+
+val e_bool_true  : expr
+val e_bool_false : expr
+
+val ps_tuple : int -> psymbol
+val e_tuple : expr list -> expr
+
+val is_ps_tuple : psymbol -> bool
+
+val ps_func_app : psymbol
+val e_func_app : expr -> expr -> expr
+val e_func_app_l : expr -> expr list -> expr
