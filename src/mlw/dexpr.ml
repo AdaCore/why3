@@ -381,7 +381,7 @@ and dexpr_node =
   | DElazy of lazy_op * dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
-  | DEassign of (dexpr * pvsymbol * dexpr) list
+  | DEassign of (dexpr * psymbol * dexpr) list
   | DEwhile of dexpr * (dinvariant * variant list) later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
@@ -608,11 +608,6 @@ let dpattern ?loc node =
   in
   Loc.try1 ?loc dpat node
 
-let _ = ity_of_dity, reunify_regions, dvty_int, dvty_real,
-        dvty_bool, dvty_unit, print_ity, print_reg, print_dity,
-        specialize_pv, specialize_xs, dvty_of_dtype_v, dexpr_expected_type
-
-(*
 let dexpr ?loc node =
   let get_dvty = function
     | DEvar (_,dvty) ->
@@ -621,112 +616,104 @@ let dexpr ?loc node =
         [], specialize_pv pv
     | DEgpsym ps ->
         specialize_ps ps
-    | DEplapp (pl,del) ->
-        let argl, res = specialize_pl pl in
-        dity_unify_app pl.pl_ls dexpr_expected_type del argl;
-        [], res
-    | DElsapp (ls,del) ->
-        let argl, res = specialize_ls ls in
-        dity_unify_app ls dexpr_expected_type del argl;
-        [], res
-    | DEapply ({de_dvty = (dity::argl, res)}, de2) ->
-        dexpr_expected_type de2 dity;
-        argl, res
-    | DEapply ({de_dvty = ([],res)} as de1, de2) ->
-        let rec not_arrow = function
-          | Dvar {contents = Dval dity} -> not_arrow dity
-          | Dpur (ts,_) -> not (ts_equal ts Ty.ts_func)
-          | Dvar _ -> false | _ -> true in
-        if not_arrow res then Loc.errorm ?loc:de1.de_loc
-          "This expression has type %a,@ it cannot be applied" print_dity res;
-        let argl, res = specialize_ls fs_func_app in
-        dity_unify_app fs_func_app dexpr_expected_type [de1;de2] argl;
-        [], res
     | DEconst (Number.ConstInt _) ->
         dvty_int
     | DEconst (Number.ConstReal _) ->
         dvty_real
-    | DEfun ((_,_,[],_,_),_) ->
-        invalid_arg "Dexpr.dexpr: empty argument list in DEfun"
+    | DEapp (de0,del0) ->
+        let argl0, res0 = de0.de_dvty in
+        let rec dig res del = match del with
+          | de::del ->
+              let f,a,r = match specialize_ps ps_func_app with
+                | [f;a],r -> f,a,r | _ -> assert false in
+              begin try dity_unify res f with Exit ->
+                if argl0 = [] && res == res0 then Loc.errorm ?loc:de0.de_loc
+                  "This expression has type %a,@ it cannot be applied"
+                  print_dity (dity_of_dvty de0.de_dvty)
+                else Loc.errorm ?loc:de0.de_loc
+                  "This expression has type %a,@ but is applied to %d arguments"
+                  print_dity (dity_of_dvty de0.de_dvty) (List.length del0) end;
+              dexpr_expected_type de a;
+              dig r del
+          | [] -> res in
+        let rec down argl del = match argl, del with
+          | arg::argl, de::del -> dexpr_expected_type de arg; down argl del
+          | _, [] -> argl, res0
+          | [], _ -> argl, dig res0 del in
+        down argl0 del0
+    | DEfun (bl,_,de) ->
+        List.map (fun (_,_,t) -> t) bl, dity_of_dvty de.de_dvty
     | DElet (_,de)
-    | DEfun (_,de)
     | DErec (_,de) ->
         de.de_dvty
-    | DElam ([],_,_) ->
-        invalid_arg "Dexpr.dexpr: empty argument list in DElam"
-    | DElam (bl,{de_dvty = (argl,res)},_) ->
-        List.fold_right (fun (_,_,_,t) l -> t::l) bl argl, res
+    | DEnot de ->
+        dexpr_expected_type de dity_bool;
+        de.de_dvty
+    | DElazy (_,de1,de2) ->
+        dexpr_expected_type de1 dity_bool;
+        dexpr_expected_type de2 dity_bool;
+        de1.de_dvty
     | DEif (de1,de2,de3) ->
         let res = dity_fresh () in
         dexpr_expected_type de1 dity_bool;
         dexpr_expected_type de2 res;
         dexpr_expected_type de3 res;
-        de2.de_dvty
+        [], res
     | DEcase (_,[]) ->
         invalid_arg "Dexpr.dexpr: empty branch list in DEcase"
     | DEcase (de,bl) ->
         let ety = dity_fresh () in
         let res = dity_fresh () in
         dexpr_expected_type de ety;
-        let branch (dp,de) =
+        List.iter (fun (dp,de) ->
           dpat_expected_type dp ety;
-          dexpr_expected_type de res in
-        List.iter branch bl;
+          dexpr_expected_type de res) bl;
         [], res
-    | DEassign (pl,de1,de2) ->
-        let argl, res = specialize_pl pl in
-        dity_unify_app pl.pl_ls dexpr_expected_type [de1] argl;
-        dexpr_expected_type_weak de2 res;
+    | DEassign al ->
+        List.iter (fun (de1,ps,de2) ->
+          let argl, res = specialize_ps ps in
+          let ls = match ps.ps_logic with PLls ls -> ls
+            | _ -> invalid_arg "Dexpr.dexpr: not a field" in
+          dity_unify_app ls dexpr_expected_type [de1] argl;
+          dexpr_expected_type_weak de2 res) al;
         dvty_unit
-    | DElazy (_,de1,de2) ->
+    | DEwhile (de1,_,de2) ->
         dexpr_expected_type de1 dity_bool;
-        dexpr_expected_type de2 dity_bool;
-        de1.de_dvty
-    | DEnot de ->
-        dexpr_expected_type de dity_bool;
-        de.de_dvty
-    | DEtrue
-    | DEfalse ->
-        dvty_bool
-    | DEraise (xs,de) ->
-        dexpr_expected_type de (specialize_xs xs);
-        [], dity_fresh ()
-    | DEtry (_,[]) ->
-        invalid_arg "Dexpr.dexpr: empty branch list in DEtry"
-    | DEtry (de,bl) ->
-        let res = dity_fresh () in
-        dexpr_expected_type de res;
-        let branch (xs,dp,de) =
-          let ety = specialize_xs xs in
-          dpat_expected_type dp ety;
-          dexpr_expected_type de res in
-        List.iter branch bl;
-        de.de_dvty
+        dexpr_expected_type de2 dity_unit;
+        de2.de_dvty
     | DEfor (_,de_from,_,de_to,_,de) ->
         dexpr_expected_type de_from dity_int;
         dexpr_expected_type de_to dity_int;
         dexpr_expected_type de dity_unit;
         de.de_dvty
-    | DEwhile (de1,_,de2) ->
-        dexpr_expected_type de1 dity_bool;
-        dexpr_expected_type de2 dity_unit;
-        de2.de_dvty
-    | DEloop (_,de) ->
-        dexpr_expected_type de dity_unit;
-        de.de_dvty
-    | DEabsurd ->
+    | DEtry (_,[]) ->
+        invalid_arg "Dexpr.dexpr: empty branch list in DEtry"
+    | DEtry (de,bl) ->
+        let res = dity_fresh () in
+        dexpr_expected_type de res;
+        List.iter (fun (xs,dp,de) ->
+          dpat_expected_type dp (specialize_xs xs);
+          dexpr_expected_type de res) bl;
+        [], res
+    | DEraise (xs,de) ->
+        dexpr_expected_type de (specialize_xs xs);
         [], dity_fresh ()
-    | DEassert _ ->
-        dvty_unit
-    | DEabstract (de,_)
-    | DEmark (_,de)
     | DEghost de ->
         de.de_dvty
-    | DEany (dtv,_) ->
+    | DEassert _ ->
+        dvty_unit
+    | DEpure _
+    | DEabsurd ->
+        [], dity_fresh ()
+    | DEtrue
+    | DEfalse ->
+        dvty_bool
+    | DEany dtv ->
         dvty_of_dtype_v dtv
     | DEcast (de,ity) ->
         dexpr_expected_type_weak de (dity_of_ity ity);
         de.de_dvty
+    | DEmark (_,de)
     | DEuloc (de,_)
     | DElabel (de,_) ->
         de.de_dvty in
@@ -735,9 +722,9 @@ let dexpr ?loc node =
 
 let mk_dexpr loc d n = { de_node = n; de_dvty = d; de_loc = loc }
 
-let de_void loc = mk_dexpr loc dvty_unit (DElsapp (fs_void, []))
+let de_void loc = mk_dexpr loc dvty_unit (DEgpsym ps_void)
 
-let pat_void loc = { dp_pat = PPlapp (fs_void, []);
+let pat_void loc = { dp_pat = PPapp (ps_void, []);
   dp_dity = dity_unit; dp_vars = Mstr.empty; dp_loc = loc }
 
 (** Final stage *)
@@ -746,7 +733,7 @@ let pat_void loc = { dp_pat = PPlapp (fs_void, []);
 
 let binders bl =
   let sn = ref Sstr.empty in
-  let binder (id, ghost, _, dity) =
+  let binder (id, ghost, dity) =
     let id = match id with
       | Some ({pre_name = n} as id) ->
           let exn = match id.pre_loc with
@@ -757,9 +744,6 @@ let binders bl =
     create_pvsymbol id ~ghost (ity_of_dity dity) in
   List.map binder bl
 
-let opaque_binders otv bl =
-  List.fold_left (fun otv (_,_,s,_) -> Stv.union otv s) otv bl
-
 (** Specifications *)
 
 let to_fmla f = match f.t_ty with
@@ -767,67 +751,45 @@ let to_fmla f = match f.t_ty with
   | Some ty when ty_equal ty ty_bool -> t_equ f t_bool_true
   | _ -> Loc.error ?loc:f.t_loc Dterm.FmlaExpected
 
-let create_assert f = t_label_add Split_goal.stop_split (to_fmla f)
-let create_pre fl = t_and_simp_l (List.map create_assert fl)
-let create_inv = create_pre
+let create_assert = to_fmla
 
-let create_post u (v,f) =
-  let f = match v with
-    | Some v when vs_equal u v -> f
-    | Some v -> Loc.try3 ?loc:f.t_loc t_subst_single v (t_var u) f
-    | None -> f in
-  let f = Mlw_wp.remove_old (to_fmla f) in
-  t_label_add Split_goal.stop_split f
+let create_invariant pl = List.map to_fmla pl
 
-let create_post ty ql =
-  let rec get_var = function
-    | [] -> create_vsymbol (id_fresh "result") ty
-    | (Some v, _) :: _ -> Ty.ty_equal_check ty v.vs_ty; v
-    | _ :: l -> get_var l in
-  let u = get_var ql in
-  let f = t_and_simp_l (List.map (create_post u) ql) in
-  Mlw_ty.create_post u f
+let create_pre = create_invariant
+
+let create_post ty ql = List.map (fun (v,f) ->
+  let f = (*Mlw_wp.remove_old*) (to_fmla f) in match v with
+    | None -> Ity.create_post (create_vsymbol (id_fresh "result") ty) f
+    | Some v -> Ty.ty_equal_check ty v.vs_ty; Ity.create_post v f) ql
 
 let create_xpost xql =
   Mexn.mapi (fun xs ql -> create_post (ty_of_ity xs.xs_ity) ql) xql
 
-let spec_of_dspec eff ty dsp = {
-  c_pre     = create_pre dsp.ds_pre;
-  c_post    = create_post ty dsp.ds_post;
-  c_xpost   = create_xpost dsp.ds_xpost;
-  c_effect  = eff;
-  c_variant = dsp.ds_variant;
-  c_letrec  = 0;
-}
-
+(*
 (** User effects *)
-
-let mk_field ity gh mut = {fd_ity = ity; fd_ghost = gh; fd_mut = mut}
 
 let rec effect_of_term t = match t.t_node with
   | Tvar vs ->
       let pv = try restore_pv vs with Not_found ->
         Loc.errorm ?loc:t.t_loc "unsupported effect expression" in
-      vs, mk_field pv.pv_ity pv.pv_ghost None
+      vs, pv.pv_ity, None
   | Tapp (fs,[ta]) ->
-      let vs, fa = effect_of_term ta in
-      let ofa,ofv = try match restore_pl fs with
-        | {pl_args = [ofa]; pl_value = ofv} ->
-            ofa, ofv
+      let vs,ity,fa = effect_of_term ta in
+      let ofa,ofv = try match restore_ps fs with
+        | {ps_cty = {cty_args = [ofa]; cty_result = ofv}} -> ofa, ofv
         | _ -> assert false
       with Not_found -> match fs with
         | {ls_args = [tya]; ls_value = Some tyv} ->
-            mk_field (ity_of_ty tya) false None,
-            mk_field (ity_of_ty tyv) false None
+            mk_field (ity_of_ty tya) None,
+            mk_field (ity_of_ty tyv) None
         | {ls_args = [_]; ls_value = None} ->
             Loc.errorm ?loc:t.t_loc "unsupported effect expression"
         | _ -> assert false in
       let sbs = ity_match ity_subst_empty ofa.fd_ity fa.fd_ity in
       let ity = try ity_full_inst sbs ofv.fd_ity with Not_found ->
         Loc.errorm ?loc:t.t_loc "unsupported effect expression" in
-      let gh = (fa.fd_ghost && not ofa.fd_ghost) || ofv.fd_ghost in
       let mut = Opt.map (reg_full_inst sbs) ofv.fd_mut in
-      vs, mk_field ity gh mut
+      vs, mk_field ity mut
   | _ ->
       Loc.errorm ?loc:t.t_loc "unsupported effect expression"
 
@@ -841,13 +803,11 @@ let effect_of_dspec dsp =
     match fd.fd_mut, fd.fd_ity.ity_node with
     | Some reg, _ ->
         Svs.add vs svs, Mreg.add reg t mreg,
-        eff_write eff ~ghost:fd.fd_ghost reg
-    | None, Ityapp ({its_ghrl = ghrl},_,(_::_ as regl)) ->
+        eff_write eff reg
+    | None, Ityapp (_,_,(_::_ as regl)) ->
         let add_reg mreg reg = Mreg.add reg t mreg in
-        let add_write eff gh reg =
-          eff_write eff ~ghost:(fd.fd_ghost || gh) reg in
         Svs.add vs svs, List.fold_left add_reg mreg regl,
-        List.fold_left2 add_write eff ghrl regl
+        List.fold_left eff_write eff regl
     | _ ->
         Loc.errorm ?loc:t.t_loc "mutable expression expected"
   in
@@ -1075,6 +1035,7 @@ let rec type_c env pvs vars otv (dtyv, dsp) =
   let res = ty_of_vty vty in
   let dsp = dsp env.vsm res in
   let esvs, _, eff = effect_of_dspec dsp in
+  let eff = refresh_of_effect eff in
   (* refresh every subregion of a modified region *)
   let writes = Sreg.union eff.eff_writes eff.eff_ghostw in
   let check u eff =
@@ -1274,7 +1235,7 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
       let env = add_pvsymbol env pv in
       let e = get env de in
       let inv = dinv env.vsm in
-      e_for pv e_from dir e_to (create_inv inv) e
+      e_for pv e_from dir e_to (create_invariant inv) e
   | DEwhile (de1,varl_inv,de2) ->
       let loc = de0.de_loc in
       let de3 = mk_dexpr loc dvty_unit
@@ -1287,7 +1248,7 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
   | DEloop (varl_inv,de) ->
       let e = get env de in
       let varl, inv = varl_inv env.vsm in
-      e_loop (create_inv inv) varl e
+      e_loop (create_invariant inv) varl e
   | DEabsurd ->
       e_absurd (ity_of_dity res)
   | DEassert (ak,f) ->

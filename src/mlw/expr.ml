@@ -18,10 +18,11 @@ open Ity
 (** {2 Program symbols} *)
 
 type psymbol = {
-  ps_name  : ident;
-  ps_cty   : cty;
-  ps_ghost : bool;
-  ps_logic : ps_logic;
+  ps_name   : ident;
+  ps_cty    : cty;
+  ps_ghost  : bool;
+  ps_logic  : ps_logic;
+  ps_mfield : pvsymbol option;
 }
 
 and ps_logic =
@@ -46,12 +47,13 @@ let ps_compare ps1 ps2 = id_compare ps1.ps_name ps2.ps_name
 
 let mk_ps, restore_ps =
   let ls_to_ps = Wls.create 17 in
-  (fun id cty gh lg ->
+  (fun id cty gh lg mf ->
     let ps = {
-      ps_name  = id;
-      ps_cty   = cty;
-      ps_ghost = gh;
-      ps_logic = lg;
+      ps_name   = id;
+      ps_cty    = cty;
+      ps_ghost  = gh;
+      ps_logic  = lg;
+      ps_mfield = mf;
     } in
     match lg with
     | PLls ls -> Wls.set ls_to_ps ls ps; ps
@@ -62,7 +64,6 @@ type ps_kind =
   | PKnone            (* non-pure symbol *)
   | PKpv of pvsymbol  (* local let-function *)
   | PKlocal           (* new local let-function *)
-  | PKls of lsymbol   (* top-level let-function or let-predicate *)
   | PKfunc of int     (* new top-level let-function or constructor *)
   | PKpred            (* new top-level let-predicate *)
   | PKlemma           (* top-level or local let-lemma *)
@@ -90,7 +91,7 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
         cty_add_post c [create_post res q] in
   match kind with
   | PKnone ->
-      mk_ps (id_register id) c ghost PLnone
+      mk_ps (id_register id) c ghost PLnone None
   | PKlocal ->
       check_effects c; check_reads c;
       let ity = ity_purify c.cty_result in
@@ -111,7 +112,7 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
          this pvsymbol behaves exactly as Epure of its pv_vs. *)
       let v = create_pvsymbol ~ghost:true id ity in
       let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
-      mk_ps v.pv_vs.vs_name (add_post c t) ghost (PLpv v)
+      mk_ps v.pv_vs.vs_name (add_post c t) ghost (PLpv v) None
   | PKpv v ->
       check_effects c; check_reads c;
       let ity = ity_purify c.cty_result in
@@ -120,7 +121,7 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
       ity_equal_check v.pv_ity ity;
       if not v.pv_ghost then invalid_arg "Expr.create_psymbol";
       let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
-      mk_ps (id_register id) (add_post c t) ghost (PLpv v)
+      mk_ps (id_register id) (add_post c t) ghost (PLpv v) None
   | PKfunc constr ->
       check_effects c; check_reads c;
       (* we don't really need to check the well-formedness of
@@ -128,7 +129,7 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
          will take care of it *)
       let ls = create_fsymbol id ~constr (arg_type c) (res_type c) in
       let t = t_app ls (arg_list c) ls.ls_value in
-      mk_ps ls.ls_name (add_post c t) ghost (PLls ls)
+      mk_ps ls.ls_name (add_post c t) ghost (PLls ls) None
   | PKpred ->
       check_effects c; check_reads c;
       if not (ity_equal c.cty_result ity_bool) then
@@ -136,20 +137,22 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
                     it cannot be declared as a pure predicate";
       let ls = create_psymbol id (arg_type c) in
       let f = t_app ls (arg_list c) None in
-      mk_ps ls.ls_name (add_post c f) ghost (PLls ls)
-  | PKls ls when ls.ls_constr = 0 ->
-      check_effects c; check_reads c;
-      let args = arg_type c and res = res_type c in
-      List.iter2 ty_equal_check ls.ls_args args;
-      begin match ls.ls_value with
-        | None -> ty_equal_check ty_bool res
-        | Some ty -> ty_equal_check ty res end;
-      let t = t_app ls (arg_list c) ls.ls_value in
-      mk_ps (id_register id) (add_post c t) ghost (PLls ls)
-  | PKls _ -> invalid_arg "Expr.create_psymbol"
+      mk_ps ls.ls_name (add_post c f) ghost (PLls ls) None
   | PKlemma ->
       check_effects c;
-      mk_ps (id_register id) c ghost PLlemma
+      mk_ps (id_register id) c ghost PLlemma None
+
+let create_mutable_field id s v =
+  if not (List.exists (fun u -> pv_equal u v) s.its_mfields) then
+    invalid_arg "Expr.create_mutable_field";
+  let ity = ity_app s (List.map ity_var s.its_ts.ts_args) s.its_regions in
+  let arg = create_pvsymbol (id_fresh "arg") ity in
+  let ls = create_fsymbol id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
+  let res = create_vsymbol (id_fresh "result") v.pv_vs.vs_ty in
+  let t = fs_app ls [t_var arg.pv_vs] v.pv_vs.vs_ty in
+  let q = create_post res (t_equ (t_var res) t) in
+  let c = create_cty [arg] [] [q] Mexn.empty Spv.empty eff_empty v.pv_ity in
+  mk_ps ls.ls_name c v.pv_ghost (PLls ls) (Some v)
 
 let ps_of_ls ls =
   let v_args = List.map (fun ty ->
@@ -163,14 +166,15 @@ let ps_of_ls ls =
     | None ->
         let res = create_vsymbol (id_fresh "result") ty_bool in
         create_post res (t_iff (t_equ (t_var res) t_bool_true) t) in
-  let c = create_cty v_args [] [q] Mexn.empty
-    Spv.empty eff_empty (ity_of_ty (t_type q)) in
-  mk_ps ls.ls_name c false (PLls ls)
+  let ity = ity_of_ty (t_type q) in
+  let c = create_cty v_args [] [q] Mexn.empty Spv.empty eff_empty ity in
+  mk_ps ls.ls_name c false (PLls ls) None
 
 let ps_kind ps = match ps.ps_logic with
   | PLnone -> PKnone
   | PLpv v -> PKpv v
-  | PLls s -> PKls s
+  | PLls {ls_value = None} -> PKpred
+  | PLls {ls_constr = cns} -> PKfunc cns
   | PLlemma -> PKlemma
 
 (** {2 Program patterns} *)
@@ -243,7 +247,7 @@ type invariant = term
 
 type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
-type assign = pvsymbol * pvsymbol * pvsymbol (* region * field * value *)
+type assign = pvsymbol * psymbol * pvsymbol (* region * field * value *)
 
 type vty =
   | VtyI of ity
@@ -403,10 +407,10 @@ let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
   let ghost = ghost || e.e_ghost in
   let cty = match e.e_vty, kind with
     | _, PKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_ps"
-    | VtyI i, (PKfunc _|PKpred|PKls _) when ity_immutable i ->
+    | VtyI i, (PKfunc _|PKpred) when ity_immutable i ->
         (* the post will be equality to the logic constant *)
         create_cty [] [] [] Mexn.empty Spv.empty eff_empty i
-    | VtyI _, (PKfunc _|PKpred|PKls _) -> Loc.errorm ?loc:e.e_loc
+    | VtyI _, (PKfunc _|PKpred) -> Loc.errorm ?loc:e.e_loc
         "this expression is non-pure, it cannot be used as a pure function"
     | VtyI _, (PKnone|PKlocal|PKpv _|PKlemma) -> Loc.errorm ?loc:e.e_loc
         "this expression is first-order, it cannot be used as a function"
@@ -502,16 +506,16 @@ let e_app e el ityl ity =
 
 let e_assign_raw al =
   let ghost = List.for_all (fun (r,f,v) ->
-    r.pv_ghost || f.pv_ghost || v.pv_ghost) al in
-  let conv (r,f,v) = match r.pv_ity.ity_node with
-    | Ityreg r -> r,f,v.pv_ity
+    r.pv_ghost || f.ps_ghost || v.pv_ghost) al in
+  let conv (r,f,v) = match r.pv_ity.ity_node, f.ps_mfield with
+    | Ityreg r, Some f -> r, f, v.pv_ity
     | _ -> invalid_arg "Expr.e_assign" in
   let eff = eff_assign eff_empty (List.map conv al) in
   mk_expr (Eassign al) (VtyI ity_unit) ghost eff
 
 let e_assign al =
   let hr, hv, al = List.fold_right (fun (r,f,v) (hr,hv,al) ->
-    let ghost = r.e_ghost || f.pv_ghost || v.e_ghost in
+    let ghost = r.e_ghost || f.ps_ghost || v.e_ghost in
     let hv, v = mk_proxy ~ghost v hv in
     let hr, r = mk_proxy ~ghost r hr in
     hr, hv, (r,f,v)::al) al ([],[],[]) in
@@ -680,7 +684,7 @@ let rec check_expr gh mut vis rst e0 =
   | Efun _ | Eany -> check_c rst (cty_of_expr e0)
   | Eassign al ->
       List.iter (fun (r,f,v) -> check_v rst r; check_v rst v;
-        if not f.pv_ghost && (gh || r.pv_ghost || v.pv_ghost)
+        if not f.ps_ghost && (gh || r.pv_ghost || v.pv_ghost)
         then match r.pv_ity.ity_node with
           | Ityreg r when Sreg.mem r vis -> error_r r
           | _ -> ()) al
@@ -875,6 +879,10 @@ let is_ps_tuple ps = ps_equal ps (ps_tuple (List.length ps.ps_cty.cty_args))
 let e_tuple el =
   let ity = ity_tuple (List.map ity_of_expr el) in
   e_app (e_sym (ps_tuple (List.length el))) el [] ity
+
+let ps_void = ps_tuple 0
+
+let e_void = e_app (e_sym ps_void) [] [] ity_unit
 
 let ps_func_app = ps_of_ls fs_func_app
 

@@ -105,7 +105,7 @@ and dexpr_node =
   | DElazy of lazy_op * dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
-  | DEassign of (dexpr * pvsymbol * dexpr) list
+  | DEassign of (dexpr * psymbol * dexpr) list
   | DEwhile of dexpr * (dinvariant * variant list) later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
@@ -153,9 +153,7 @@ val denv_get_opt : denv -> string -> dexpr_node option
 
 val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 
-(*
 val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
-*)
 
 type pre_fun_defn = preid * ghost * ps_kind *
   dbinder list * dity * (denv -> (dspec * variant list) later * dexpr)

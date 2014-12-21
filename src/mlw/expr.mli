@@ -17,10 +17,11 @@ open Ity
 (** {2 Program symbols} *)
 
 type psymbol = private {
-  ps_name  : ident;
-  ps_cty   : cty;
-  ps_ghost : bool;
-  ps_logic : ps_logic;
+  ps_name   : ident;
+  ps_cty    : cty;
+  ps_ghost  : bool;
+  ps_logic  : ps_logic;
+  ps_mfield : pvsymbol option;
 }
 
 and ps_logic =
@@ -42,7 +43,6 @@ type ps_kind =
   | PKnone            (* non-pure symbol *)
   | PKpv of pvsymbol  (* local let-function *)
   | PKlocal           (* new local let-function *)
-  | PKls of lsymbol   (* top-level let-function or let-predicate *)
   | PKfunc of int     (* new top-level let-function or constructor *)
   | PKpred            (* new top-level let-predicate *)
   | PKlemma           (* top-level or local let-lemma *)
@@ -56,6 +56,8 @@ val create_psymbol : preid -> ?ghost:bool -> ?kind:ps_kind -> cty -> psymbol
     but regions are instantiable. If [?kind] is [PKpred] the result
     type must be [ity_bool]. If [?kind] is [PKlemma] and the result
     type is not [ity_unit], an existential premise is generated. *)
+
+val create_mutable_field : preid -> itysymbol -> pvsymbol -> psymbol
 
 val restore_ps : lsymbol -> psymbol
 (** raises [Not_found] if the argument is not a [ps_logic] *)
@@ -94,7 +96,7 @@ type invariant = term
 
 type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
-type assign = pvsymbol * pvsymbol * pvsymbol (* region * field * value *)
+type assign = pvsymbol * psymbol * pvsymbol (* region * field * value *)
 
 type vty =
   | VtyI of ity
@@ -201,7 +203,7 @@ val e_rec : rec_defn -> expr -> expr
 
 val e_app : expr -> expr list -> ity list -> ity -> expr
 
-val e_assign : (expr * pvsymbol (* field *) * expr) list -> expr
+val e_assign : (expr * psymbol * expr) list -> expr
 
 val e_ghost : expr -> expr
 val e_ghostify : expr -> expr
@@ -241,6 +243,9 @@ val e_bool_false : expr
 
 val ps_tuple : int -> psymbol
 val e_tuple : expr list -> expr
+
+val ps_void : psymbol
+val e_void : expr
 
 val is_ps_tuple : psymbol -> bool
 
