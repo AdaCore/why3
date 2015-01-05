@@ -6,6 +6,7 @@ open Why3
 type id = int
 
 type reason =
+   (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check
    | VC_Index_Check
    | VC_Overflow_Check
@@ -13,8 +14,9 @@ type reason =
    | VC_Length_Check
    | VC_Discriminant_Check
    | VC_Tag_Check
-   | VC_Default_Initial_Condition
+   (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
+   | VC_Default_Initial_Condition
    | VC_Precondition
    | VC_Precondition_Main
    | VC_Postcondition
@@ -28,6 +30,7 @@ type reason =
    | VC_Loop_Variant
    | VC_Assert
    | VC_Raise
+   (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
    | VC_Stronger_Post

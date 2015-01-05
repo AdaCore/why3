@@ -2,6 +2,7 @@ open Why3
 open Term
 
 type reason =
+   (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check
    | VC_Index_Check
    | VC_Overflow_Check
@@ -9,8 +10,9 @@ type reason =
    | VC_Length_Check
    | VC_Discriminant_Check
    | VC_Tag_Check
-   | VC_Default_Initial_Condition
+   (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
+   | VC_Default_Initial_Condition
    | VC_Precondition
    | VC_Precondition_Main
    | VC_Postcondition
@@ -24,6 +26,7 @@ type reason =
    | VC_Loop_Variant
    | VC_Assert
    | VC_Raise
+   (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
    | VC_Stronger_Post
@@ -53,6 +56,7 @@ let get_loc c = c.sloc
 let get_reason c = c.reason
 let reason_from_string s =
    match s with
+   (* VC_RTE_Kind - run-time checks *)
    | "VC_DIVISION_CHECK"            -> VC_Division_Check
    | "VC_INDEX_CHECK"               -> VC_Index_Check
    | "VC_OVERFLOW_CHECK"            -> VC_Overflow_Check
@@ -60,6 +64,7 @@ let reason_from_string s =
    | "VC_LENGTH_CHECK"              -> VC_Length_Check
    | "VC_DISCRIMINANT_CHECK"        -> VC_Discriminant_Check
    | "VC_TAG_CHECK"                 -> VC_Tag_Check
+   (* VC_Assert_Kind - assertions *)
    | "VC_INITIAL_CONDITION"         -> VC_Initial_Condition
    | "VC_DEFAULT_INITIAL_CONDITION" -> VC_Default_Initial_Condition
    | "VC_PRECONDITION"              -> VC_Precondition
@@ -75,6 +80,7 @@ let reason_from_string s =
    | "VC_LOOP_VARIANT"              -> VC_Loop_Variant
    | "VC_ASSERT"                    -> VC_Assert
    | "VC_RAISE"                     -> VC_Raise
+   (* VC_LSP_Kind - Liskov Substitution Principle *)
    | "VC_WEAKER_PRE"                -> VC_Weaker_Pre
    | "VC_TRIVIAL_WEAKER_PRE"        -> VC_Trivial_Weaker_Pre
    | "VC_STRONGER_POST"             -> VC_Stronger_Post
@@ -86,6 +92,7 @@ let reason_from_string s =
 
 let reason_to_ada reason =
    match reason with
+   (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check            -> "VC_DIVISION_CHECK"
    | VC_Index_Check               -> "VC_INDEX_CHECK"
    | VC_Overflow_Check            -> "VC_OVERFLOW_CHECK"
@@ -93,6 +100,7 @@ let reason_to_ada reason =
    | VC_Length_Check              -> "VC_LENGTH_CHECK"
    | VC_Discriminant_Check        -> "VC_DISCRIMINANT_CHECK"
    | VC_Tag_Check                 -> "VC_TAG_CHECK"
+   (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "VC_INITIAL_CONDITION"
    | VC_Default_Initial_Condition -> "VC_DEFAULT_INITIAL_CONDITION"
    | VC_Precondition              -> "VC_PRECONDITION"
@@ -108,6 +116,7 @@ let reason_to_ada reason =
    | VC_Loop_Variant              -> "VC_LOOP_VARIANT"
    | VC_Assert                    -> "VC_ASSERT"
    | VC_Raise                     -> "VC_RAISE"
+   (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "VC_WEAKER_PRE"
    | VC_Trivial_Weaker_Pre        -> "VC_TRIVIAL_WEAKER_PRE"
    | VC_Stronger_Post             -> "VC_STRONGER_POST"
@@ -116,6 +125,7 @@ let reason_to_ada reason =
 
 let reason_to_string reason =
    match reason with
+   (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check            -> "division_check"
    | VC_Index_Check               -> "index_check"
    | VC_Overflow_Check            -> "overflow_check"
@@ -123,6 +133,7 @@ let reason_to_string reason =
    | VC_Length_Check              -> "length_check"
    | VC_Discriminant_Check        -> "discriminant_check"
    | VC_Tag_Check                 -> "tag_check"
+   (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "initial_condition"
    | VC_Default_Initial_Condition -> "default_initial_condition"
    | VC_Precondition              -> "precondition"
@@ -138,6 +149,7 @@ let reason_to_string reason =
    | VC_Loop_Variant              -> "loop_variant"
    | VC_Assert                    -> "assert"
    | VC_Raise                     -> "raise"
+   (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "weaker_pre"
    | VC_Trivial_Weaker_Pre        -> "trivial_weaker_pre"
    | VC_Stronger_Post             -> "stronger_post"
