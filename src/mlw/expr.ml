@@ -832,6 +832,8 @@ let create_rec_defn fdl =
     | vl ->
         let al = List.fold_left add_a [] vl in
         Some (create_lsymbol (id_fresh "DECR") al None) in
+  let start_eff = if varl1 = [] then
+    eff_diverge eff_empty else eff_empty in
   (* create the first substitution *)
   let update sm (s,d,varl,_) =
     let c = cty_of_expr d in
@@ -850,7 +852,7 @@ let create_rec_defn fdl =
     (* create the clean psymbol *)
     let id = id_clone s.ps_name in
     let c = create_cty c.cty_args pre
-      c.cty_post c.cty_xpost Spv.empty eff_empty c.cty_result in
+      c.cty_post c.cty_xpost Spv.empty start_eff c.cty_result in
     let ns = create_psymbol id ~ghost:s.ps_ghost ~kind:PKnone c in
     Mps.add s ns sm, (ns,d) in
   let sm, dl = Lists.map_fold_left update Mps.empty fdl in
