@@ -177,7 +177,8 @@ end
 (* Theories, modules, namespaces *)
 
 open_file:
-| (* epsilon *) { Incremental.open_file }
+(* Dummy token. Menhir does not accept epsilon. *)
+| EOF { Incremental.open_file }
 
 logic_file:
 | theory* EOF   { Incremental.close_file () }
