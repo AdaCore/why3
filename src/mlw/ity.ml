@@ -661,18 +661,14 @@ let eff_union x y = {
   eff_diverg = x.eff_diverg || y.eff_diverg;
 }
 
-let eff_write e r f =
-  begin match f with
-    | Some f when List.memq f r.reg_its.its_mfields -> ()
-    | None -> ()
-    | _ -> invalid_arg "Ity.eff_write"
-  end;
-  let add fs = match f, fs with
-    | Some f, Some fs -> Some (Spv.add f fs)
-    | Some f, None    -> Some (Spv.singleton f)
-    | None,   Some fs -> Some fs
-    | None,   None    -> Some Spv.empty in
-  { e with eff_writes = Mreg.change add r e.eff_writes }
+let eff_write e ({reg_its = s} as r) fs =
+  let check f = List.memq f s.its_mfields in
+  if not (Spv.for_all check fs) ||
+    (not s.its_private && Spv.is_empty fs)
+  then invalid_arg "Ity.eff_write";
+  { e with eff_writes = Mreg.change (function
+    | Some s -> Some (Spv.union s fs)
+    | None   -> Some fs) r e.eff_writes }
 
 let eff_raise e x = { e with eff_raises = Sexn.add x e.eff_raises }
 let eff_catch e x = { e with eff_raises = Sexn.remove x e.eff_raises }
@@ -706,7 +702,7 @@ let eff_assign e asl =
     let seen = Mreg.change (fun fs -> Some (match fs with
       | Some fs -> Mpv.add_new (Invalid_argument "Ity.eff_assign") f ity fs
       | None    -> Mpv.singleton f ity)) r seen in
-    seen, eff_write e r (Some f)) (Mreg.empty, e) asl in
+    seen, eff_write e r (Spv.singleton f)) (Mreg.empty, e) asl in
   (* type variables and regions outside modified fields are frozen *)
   let frz = freeze_of_writes seen in
   (* non-frozen regions are allowed to be renamed, preserving aliases *)

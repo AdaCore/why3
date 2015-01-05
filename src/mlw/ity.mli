@@ -270,7 +270,7 @@ val eff_union : effect -> effect -> effect
 val eff_is_empty : effect -> bool
 val eff_is_pure  : effect -> bool
 
-val eff_write : effect -> region -> pvsymbol option -> effect
+val eff_write : effect -> region -> Spv.t -> effect
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
 val eff_reset : effect -> region -> effect
