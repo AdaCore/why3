@@ -302,7 +302,7 @@ and print_tnode _opl opr info fmt t = match t.t_node with
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
-          syntax_arguments s (print_term info) fmt tl
+          syntax_arguments s (print_opr_term info) fmt tl
       | _ -> if unambig_fs fs
           then
             if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
@@ -356,7 +356,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
         (print_fmla info) f1 (print_fmla info) f2 (print_opl_fmla info) f3
   | Tapp (ps, tl) ->
     begin match query_syntax info.info_syn ps.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
+      | Some s -> syntax_arguments s (print_opr_term info) fmt tl
       | _ -> fprintf fmt "(%a%a)" (print_ls_real info) ps
           (print_list_pre space (print_opr_term info)) tl
     end
