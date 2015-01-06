@@ -224,10 +224,21 @@ theory Exponentiation
     power x (n+m) = power x n * power x m
 
   lemma Power_mult : forall x:t, n m : int. 0 <= n -> 0 <= m ->
-    power x (Int.(*) n m) = power (power x n) m
+    power x (Int.( * ) n m) = power (power x n) m
 
   lemma Power_mult2 : forall x y: t, n: int. 0 <= n ->
     power (x * y) n = power x n * power y n
+
+(* TODO
+
+  use import ComputerDivision
+
+  lemma Power_even : forall x:t, n:int. n >= 0 -> mod n 2 = 0 ->
+    power x n = power (x*x) (div n 2)
+
+  lemma power_odd : forall x:t, n:int. n >= 0 -> mod n 2 <> 0 ->
+    power x n = x * power (x*x) (div n 2)
+*)
 
 end
 
@@ -459,4 +470,3 @@ theory Fibonacci "Fibonacci numbers"
   axiom fibn: forall n:int. n >= 2 -> fib n = fib (n-1) + fib (n-2)
 
 end
-
