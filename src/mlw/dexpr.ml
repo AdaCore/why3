@@ -765,134 +765,89 @@ let create_post ty ql = List.map (fun (v,f) ->
 let create_xpost xql =
   Mexn.mapi (fun xs ql -> create_post (ty_of_ity xs.xs_ity) ql) xql
 
-(*
 (** User effects *)
 
-let rec effect_of_term t = match t.t_node with
-  | Tvar vs ->
-      let pv = try restore_pv vs with Not_found ->
-        Loc.errorm ?loc:t.t_loc "unsupported effect expression" in
-      vs, pv.pv_ity, None
-  | Tapp (fs,[ta]) ->
-      let vs,ity,fa = effect_of_term ta in
-      let ofa,ofv = try match restore_ps fs with
-        | {ps_cty = {cty_args = [ofa]; cty_result = ofv}} -> ofa, ofv
-        | _ -> assert false
-      with Not_found -> match fs with
-        | {ls_args = [tya]; ls_value = Some tyv} ->
-            mk_field (ity_of_ty tya) None,
-            mk_field (ity_of_ty tyv) None
-        | {ls_args = [_]; ls_value = None} ->
-            Loc.errorm ?loc:t.t_loc "unsupported effect expression"
-        | _ -> assert false in
-      let sbs = ity_match ity_subst_empty ofa.fd_ity fa.fd_ity in
-      let ity = try ity_full_inst sbs ofv.fd_ity with Not_found ->
-        Loc.errorm ?loc:t.t_loc "unsupported effect expression" in
-      let mut = Opt.map (reg_full_inst sbs) ofv.fd_mut in
-      vs, mk_field ity mut
-  | _ ->
-      Loc.errorm ?loc:t.t_loc "unsupported effect expression"
+let rec effect_of_term t =
+  let quit () = Loc.errorm ?loc:t.t_loc "unsupported effect expression" in
+  match t.t_node with
+  | Tapp (fs, [ta]) ->
+      let v, ity, fa = effect_of_term ta in
+      let ity = match fa with
+        | Some {ps_cty = {cty_args = [arg]; cty_result = res}} ->
+            ity_full_inst (ity_match isb_empty arg.pv_ity ity) res
+        | Some _ -> assert false
+        | None -> ity in
+      begin try match ity.ity_node, restore_ps fs with
+        | Ityreg _, ({ps_mfield = Some _} as ps) -> v, ity, Some ps
+        | _, {ps_cty={cty_args=[arg]; cty_result=res; cty_freeze=frz}} ->
+            v, ity_full_inst (ity_match frz arg.pv_ity ity) res, None
+        | _ -> quit () with Not_found -> quit () end
+  | Tvar v ->
+      let v = try restore_pv v with Not_found -> quit () in
+      v, v.pv_ity, None
+  | _ -> quit ()
 
 let effect_of_dspec dsp =
   let add_raise xs _ eff = eff_raise eff xs in
   let eff = Mexn.fold add_raise dsp.ds_xpost eff_empty in
   let eff = if dsp.ds_diverge then eff_diverge eff else eff in
-  let svs = List.fold_right Svs.add dsp.ds_reads Svs.empty in
-  let add_write (svs,mreg,eff) t =
-    let vs, fd = effect_of_term t in
-    match fd.fd_mut, fd.fd_ity.ity_node with
-    | Some reg, _ ->
-        Svs.add vs svs, Mreg.add reg t mreg,
-        eff_write eff reg
-    | None, Ityapp (_,_,(_::_ as regl)) ->
-        let add_reg mreg reg = Mreg.add reg t mreg in
-        Svs.add vs svs, List.fold_left add_reg mreg regl,
-        List.fold_left eff_write eff regl
+  let add_read s v = Spv.add (try restore_pv v with Not_found ->
+    Loc.errorm "unsupported effect expression") s in
+  let pvs = List.fold_left add_read Spv.empty dsp.ds_reads in
+  let add_write (s,l,e) t = match effect_of_term t with
+    | v, {ity_node = Ityreg reg}, fd ->
+        let fs = match fd with
+          | Some fd -> Spv.singleton (Opt.get fd.ps_mfield)
+          | None -> Spv.of_list reg.reg_its.its_mfields in
+        let wr = eff_write eff_empty reg fs in
+        Spv.add v s, (wr,t)::l, eff_union e wr
     | _ ->
-        Loc.errorm ?loc:t.t_loc "mutable expression expected"
-  in
-  List.fold_left add_write (svs,Mreg.empty,eff) dsp.ds_writes
+        Loc.errorm ?loc:t.t_loc "mutable expression expected" in
+  List.fold_left add_write (pvs, [], eff) dsp.ds_writes
 
-let e_find_loc pr e =
-  try (e_find (fun e -> e.e_loc <> None && pr e) e).e_loc
+let e_find_eff pr e =
+  try (e_find_minimal (fun e -> e.e_loc <> None && pr e.e_effect) e).e_loc
   with Not_found -> None
 
-let lab_w_diverges_no = Ident.create_label "W:diverges:N"
+let print_xs fmt xs = assert false (* TODO *)
 
-let check_user_effect ?ps e spec args dsp =
-  let has_write reg eff =
-    Sreg.mem reg eff.eff_writes || Sreg.mem reg eff.eff_ghostw in
-  let has_raise xs eff =
-    Sexn.mem xs eff.eff_raises || Sexn.mem xs eff.eff_ghostx in
+let check_user_spec check_rwd ucty uwrl ecty e =
+  let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
+                                            weff.eff_writes eff.eff_writes) in
+  let bad_raise xeff eff = not (Sexn.subset xeff.eff_raises eff.eff_raises) in
   (* computed effect vs user effect *)
-  let eeff = spec.c_effect in
-  let args = Spv.of_list args in
-  let full_xpost = ps <> None in
-  let usvs, mreg, ueff = effect_of_dspec dsp in
+  let ueff = ucty.cty_effect and urds = ucty.cty_reads in
+  let eeff = ecty.cty_effect and erds = ecty.cty_reads in
   (* check that every user effect actually happens *)
-  let check_read vs =
-    let pv = try restore_pv vs with Not_found ->
-      Loc.errorm "unsupported@ effect@ expression" in
-    if Spv.mem pv args then Warning.emit ?loc:e.e_loc
-      "variable@ %a@ is@ a@ local@ function@ argument,@ \
-        it@ does@ not@ have@ to@ be@ listed@ in@ the@ `reads'@ clause"
-      Pretty.print_vs vs;
-    if not (Spv.mem pv e.e_syms.syms_pv) then Loc.errorm ?loc:e.e_loc
-      "variable@ %a@ does@ not@ occur@ in@ this@ expression"
-      Pretty.print_vs vs in
-  List.iter check_read dsp.ds_reads;
-  let check_write reg = if not (has_write reg eeff)
-    then let t = Mreg.find reg mreg in Loc.errorm ?loc:t.t_loc
-      "this@ write@ effect@ does@ not@ happen@ in@ the@ expression" in
-  Sreg.iter check_write ueff.eff_writes;
-  Sreg.iter check_write ueff.eff_ghostw;
-  let check_raise xs _ = if not (has_raise xs eeff)
-    then Loc.errorm ?loc:e.e_loc
-      "this@ expression@ does@ not@ raise@ exception@ %a"
-      Mlw_pretty.print_xs xs in
-  Mexn.iter check_raise ueff.eff_raises;
-  Mexn.iter check_raise ueff.eff_ghostx;
-  if ueff.eff_diverg && not eeff.eff_diverg then
-    Loc.errorm ?loc:e.e_loc "this@ expression@ does@ not@ diverge";
+  if not (Spv.subset urds erds) then Loc.errorm ?loc:e.e_loc
+    "variable@ %a@ does@ not@ occur@ in@ this@ expression"
+    Pretty.print_vs (Spv.choose (Spv.diff urds erds)).pv_vs;
+  if bad_write ueff eeff then List.iter (fun (weff,t) ->
+    if bad_write weff eeff then Loc.errorm ?loc:t.t_loc
+      "this@ write@ effect@ does@ not@ happen@ in@ the@ expression") uwrl;
+  if bad_raise ueff eeff then Loc.errorm ?loc:e.e_loc
+    "this@ expression@ does@ not@ raise@ exception@ %a"
+    print_xs (Sexn.choose (Sexn.diff ueff.eff_raises eeff.eff_raises));
+  if ueff.eff_diverg && not eeff.eff_diverg then Loc.errorm ?loc:e.e_loc
+    "this@ expression@ does@ not@ diverge";
   (* check that every computed effect is listed *)
-  let check_read pv = if not (Svs.mem pv.pv_vs usvs) then
-    Loc.errorm ?loc:(e_find_loc (fun e -> Spv.mem pv e.e_syms.syms_pv) e)
-      "this@ expression@ depends@ on@ variable@ %a@ \
-        left@ out@ in@ the@ specification" Mlw_pretty.print_pv pv in
-  let check_write reg = if not (has_write reg ueff) then
-    Loc.errorm ?loc:(e_find_loc (fun e -> has_write reg e.e_effect) e)
-      "this@ expression@ produces@ an@ unlisted@ write@ effect" in
-  if dsp.ds_checkrw then begin
-    let reads = Spv.remove Mlw_wp.pv_old e.e_syms.syms_pv in
-    let reads = Spv.diff reads (spec_pvset Spv.empty spec) in
-    Spv.iter check_read (Spv.diff reads args);
-    Sreg.iter check_write eeff.eff_writes;
-    Sreg.iter check_write eeff.eff_ghostw;
-  end;
-  let check_raise xs = if not (has_raise xs ueff) then
-    Loc.errorm ?loc:(e_find_loc (fun e -> has_raise xs e.e_effect) e)
+  if check_rwd && not (Spv.subset erds urds) then Spv.iter (fun v ->
+    Loc.errorm ?loc:e.e_loc
+      "this@ expression@ depends@ on@ variable@ %a@ left@ out@ in@ \
+      the@ specification" Pretty.print_vs v.pv_vs) (Spv.diff erds urds);
+  if check_rwd && bad_write eeff ueff then
+    Loc.errorm ?loc:(e_find_eff (fun eff -> bad_write eff ueff) e)
+      "this@ expression@ produces@ an@ unlisted@ write@ effect";
+  if ecty.cty_args <> [] && bad_raise eeff ueff then Sexn.iter (fun xs ->
+    Loc.errorm ?loc:(e_find_eff (fun eff -> Sexn.mem xs eff.eff_raises) e)
       "this@ expression@ raises@ unlisted@ exception@ %a"
-      Mlw_pretty.print_xs xs in
-  if full_xpost then Sexn.iter check_raise eeff.eff_raises;
-  if full_xpost then Sexn.iter check_raise eeff.eff_ghostx;
-  if eeff.eff_diverg && not ueff.eff_diverg then match ps with
-    | Some {ps_name = {id_label = l}}
-      when not (Slab.mem lab_w_diverges_no l) ->
-        Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
-          "this@ expression@ may@ diverge,@ \
-            which@ is@ not@ stated@ in@ the@ specification"
-    | _ -> ()
+      print_xs xs) (Sexn.diff eeff.eff_raises ueff.eff_raises);
+  if check_rwd && eeff.eff_diverg && not ueff.eff_diverg then
+    Loc.errorm ?loc:(e_find_eff (fun eff -> eff.eff_diverg) e)
+      "this@ expression@ may@ diverge,@ but@ this@ is@ not@ \
+        stated@ in@ the@ specification"
 
-let check_lambda_effect ({fun_lambda = lam} as fd) bl dsp =
-  let spec = fd.fun_ps.ps_aty.aty_spec in
-  let args = fd.fun_ps.ps_aty.aty_args in
-  check_user_effect ~ps:fd.fun_ps lam.l_expr spec args dsp;
-  let optv = opaque_binders Stv.empty bl in
-  let bad_comp tv _ _ = Loc.errorm
-    ?loc:(e_find_loc (fun e -> Stv.mem tv e.e_effect.eff_compar) lam.l_expr)
-    "type parameter %a is not opaque in this expression" Pretty.print_tv tv in
-  ignore (Mtv.inter bad_comp optv spec.c_effect.eff_compar)
-
+(*
 let check_user_ps recu ps =
   let ps_regs = ps.ps_subst.ity_subst_reg in
   let report r =
