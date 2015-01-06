@@ -55,6 +55,8 @@ let ident_printer =
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
       "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left"; "rotate_right";
 
+      "cos"; "sin"; "tan"; "atan"; "pi";
+
       (** Other stuff that Why3 seems to need *)
       "DECIMAL"; "NUMERAL"; "par"; "STRING";
       "unsat";"sat";

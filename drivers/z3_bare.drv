@@ -20,4 +20,16 @@ theory real.FromInt
   remove prop Neg
 end
 
+(* does not work: Z3 segfaults 
+theory real.Trigonometry
+
+  syntax function cos "(cos %1)"
+  syntax function sin "(sin %1)"
+  syntax function pi "pi"
+  syntax function tan "(tan %1)"
+  syntax function atan "(atan %1)"
+
+end
+*)
+
 import "discrimination.gen"
