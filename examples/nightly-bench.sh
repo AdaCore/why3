@@ -70,6 +70,20 @@ fi
 # increase number of cores used
 perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 
+# add uninstalled prover substitution policies
+cat >> why3.conf <<EOF
+
+[uninstalled_prover policy0]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "8.4pl5"
+version = "8.4pl4"
+
+EOF
+
 # run the bench
 make bench &> $OUT
 if test "$?" != "0" ; then
@@ -126,4 +140,3 @@ cat $OUT >> $REPORT
 
 # final notification after the replay
 notify
-
