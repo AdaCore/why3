@@ -22,6 +22,7 @@ open Task
 
 let debug_print_labels = Debug.register_info_flag "print_labels"
   ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
@@ -54,7 +55,7 @@ let print_loc fmt l =
   let (f,l,b,e) = Loc.get l in
   fprintf fmt "#\"%s\" %d %d %d#" f l b e
 
-let print_ident_labels fmt id =
+let print_id_labels fmt id =
   if Debug.test_flag debug_print_labels &&
       not (Slab.is_empty id.id_label) then
     fprintf fmt "@ %a" print_labels id.id_label;
@@ -70,7 +71,7 @@ let print_vs fmt vs =
   let id = vs.vs_name in
   let sanitizer = String.uncapitalize in
   fprintf fmt "%s" (id_unique iprinter ~sanitizer id);
-  print_ident_labels fmt id
+  print_id_labels fmt id
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
@@ -312,7 +313,7 @@ let print_constr fmt (cs,pjl) =
     | None -> print_ty_arg fmt ty
   in
   fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs
-    print_ident_labels cs.ls_name
+    print_id_labels cs.ls_name
     (print_list nothing print_pj)
     (List.fold_right2 add_pj pjl cs.ls_args [])
 
@@ -322,7 +323,7 @@ let print_ty_decl fmt ts =
     | Some ty -> fprintf fmt " =@ %a" print_ty ty
   in
   fprintf fmt "@[<hov 2>type %a%a%a%a@]"
-    print_ts ts print_ident_labels ts.ts_name
+    print_ts ts print_id_labels ts.ts_name
     (print_list nothing print_tv_arg) ts.ts_args
     print_def ts.ts_def;
   forget_tvs ()
@@ -330,7 +331,7 @@ let print_ty_decl fmt ts =
 let print_data_decl fst fmt (ts,csl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
     (if fst then "type" else "with") print_ts ts
-    print_ident_labels ts.ts_name
+    print_id_labels ts.ts_name
     (print_list nothing print_tv_arg) ts.ts_args
     (print_list newline print_constr) csl;
   forget_tvs ()
@@ -344,7 +345,7 @@ let ls_kind ls =
 let print_param_decl fmt ls =
   fprintf fmt "@[<hov 2>%s %a%a%a%a@]"
     (ls_kind ls) print_ls ls
-    print_ident_labels ls.ls_name
+    print_id_labels ls.ls_name
     (print_list nothing print_ty_arg) ls.ls_args
     (print_option print_ls_type) ls.ls_value;
   forget_tvs ()
@@ -353,7 +354,7 @@ let print_logic_decl fst fmt (ls,ld) =
   let vl,e = open_ls_defn ld in
   fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]"
     (if fst then ls_kind ls else "with") print_ls ls
-    print_ident_labels ls.ls_name
+    print_id_labels ls.ls_name
     (print_list nothing print_vs_arg) vl
     (print_option print_ls_type) ls.ls_value print_term e;
   List.iter forget_var vl;
@@ -361,7 +362,7 @@ let print_logic_decl fst fmt (ls,ld) =
 
 let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
-    print_pr pr print_ident_labels pr.pr_name print_term f
+    print_pr pr print_id_labels pr.pr_name print_term f
 
 let ind_sign = function
   | Ind   -> "inductive"
@@ -370,7 +371,7 @@ let ind_sign = function
 let print_ind_decl s fst fmt (ps,bl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]"
     (if fst then ind_sign s else "with") print_ls ps
-    print_ident_labels ps.ls_name
+    print_id_labels ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
     (print_list newline print_ind) bl;
   forget_tvs ()
@@ -385,7 +386,7 @@ let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
 let print_prop_decl fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
-    print_pr pr print_ident_labels pr.pr_name print_term f;
+    print_pr pr print_id_labels pr.pr_name print_term f;
   forget_tvs ()
 
 let print_list_next sep print fmt = function
@@ -461,7 +462,7 @@ let print_tdecl fmt td = match td.td_node with
 
 let print_theory fmt th =
   fprintf fmt "@[<hov 2>theory %a%a@\n%a@]@\nend@."
-    print_th th print_ident_labels th.th_name
+    print_th th print_id_labels th.th_name
     (print_list newline2 print_tdecl) th.th_decls
 
 let print_task fmt task =

@@ -206,7 +206,6 @@ type ity_subst = private {
 }
 
 exception TypeMismatch of ity * ity * ity_subst
-exception RegionMismatch of region * region * ity_subst
 
 val isb_empty : ity_subst
 
@@ -248,9 +247,6 @@ module Sexn : Extset.S with module M = Mexn
 val xs_compare : xsymbol -> xsymbol -> int
 val xs_equal : xsymbol -> xsymbol -> bool
 val xs_hash: xsymbol -> int
-
-exception PolymorphicException of ident * ity
-exception MutableException of ident * ity
 
 val create_xsymbol : preid -> ity -> xsymbol
 
@@ -351,3 +347,21 @@ val cty_add_post : cty -> post list -> cty
     This function performs capture: the formulas in [fl] may refer to the
     variables in [cty.cty_args]. Only the new external dependencies in [fl]
     are added to [cty.cty_reads] and frozen. *)
+
+(** {2 Pretty-printing} *)
+
+open Format
+
+val forget_reg : region -> unit   (* flush id_unique for a region *)
+val forget_pv  : pvsymbol -> unit (* flush for a program variable *)
+
+val print_its : formatter -> itysymbol -> unit    (* type symbol *)
+val print_reg : formatter -> region -> unit       (* region *)
+val print_ity : formatter -> ity -> unit          (* individual type *)
+val print_ity_full : formatter -> ity -> unit     (* type with regions *)
+
+val print_xs   : formatter -> xsymbol -> unit     (* exception symbol *)
+val print_pv   : formatter -> pvsymbol -> unit    (* program variable *)
+val print_pvty : formatter -> pvsymbol -> unit    (* pvsymbol : type *)
+val print_cty  : formatter -> cty -> unit         (* computation type *)
+val print_cty_head : formatter -> cty -> unit     (* args and spec only *)

@@ -283,13 +283,12 @@ let isb_empty = {
 }
 
 exception TypeMismatch of ity * ity * ity_subst
-exception RegionMismatch of region * region * ity_subst
 
-let ity_equal_check t1 t2 =
-  if not (ity_equal t1 t2) then raise (TypeMismatch (t1,t2,isb_empty))
+let ity_equal_check t1 t2 = if not (ity_equal t1 t2) then
+  raise (TypeMismatch (t1, t2, isb_empty))
 
-let reg_equal_check r1 r2 =
-  if not (reg_equal r1 r2) then raise (RegionMismatch (r1,r2,isb_empty))
+let reg_equal_check r1 r2 = if not (reg_equal r1 r2) then
+  raise (TypeMismatch (ity_reg r1, ity_reg r2, isb_empty))
 
 let ity_full_inst sbs ity =
   let freg r = Mreg.find r sbs.isb_reg in
@@ -332,7 +331,7 @@ let ity_match sbs ity1 ity2 = try ity_match sbs ity1 ity2
   with Exit -> raise (TypeMismatch (ity1,ity2,sbs))
 
 let reg_match sbs reg1 reg2 = try reg_match sbs reg1 reg2
-  with Exit -> raise (RegionMismatch (reg1,reg2,sbs))
+  with Exit -> raise (TypeMismatch (ity_reg reg1, ity_reg reg2, sbs))
 
 let ity_freeze sbs ity = ity_match sbs ity ity
 let reg_freeze sbs reg = reg_match sbs reg reg
@@ -594,18 +593,16 @@ type xsymbol = {
   xs_ity  : ity; (* closed and pure *)
 }
 
-exception PolymorphicException of ident * ity
-exception MutableException of ident * ity
-
 let xs_equal : xsymbol -> xsymbol -> bool = (==)
 let xs_hash xs = id_hash xs.xs_name
 let xs_compare xs1 xs2 = id_compare xs1.xs_name xs2.xs_name
 
 let create_xsymbol id ity =
-  let id = id_register id in
-  if not (ity_closed ity) then raise (PolymorphicException (id, ity));
-  if not (ity_immutable ity) then raise (MutableException (id, ity));
-  { xs_name = id; xs_ity = ity; }
+  if not (ity_closed ity) then Loc.errorm
+    "Exception %s has a polymorphic type" id.pre_name;
+  if not (ity_immutable ity) then Loc.errorm
+    "The type of exception %s has mutable components" id.pre_name;
+  { xs_name = id_register id; xs_ity = ity; }
 
 module Exn = MakeMSH (struct
   type t = xsymbol
@@ -849,10 +846,11 @@ let create_cty args pre post xpost reads effect result =
   let freeze = Spv.fold freeze_pv reads isb_empty in
   check_tvs reads args result pre post xpost;
   (* remove exceptions whose postcondition is False *)
-  let is_false _ xq = List.exists (t_equal t_false) xq in
-  let nothrow = Mexn.filter is_false xpost in
-  let xpost = Mexn.set_diff xpost nothrow in
-  let raises = Mexn.set_diff effect.eff_raises nothrow in
+  let filter _ xq () =
+    let is_false q = t_equal (snd (open_post q)) t_false in
+    if List.exists is_false xq then None else Some xq in
+  let xpost = Mexn.inter filter xpost effect.eff_raises in
+  let raises = Mexn.set_inter effect.eff_raises xpost in
   let effect = { effect with eff_raises = raises } in
   (* remove effects on unknown regions *)
   let known = (Spv.fold freeze_pv sarg freeze).isb_reg in
@@ -967,3 +965,199 @@ let cty_add_post c post =
   let c = cty_add_reads c (List.fold_left t_freepvs Spv.empty post) in
   check_tvs c.cty_reads c.cty_args c.cty_result [] post Mexn.empty;
   { c with cty_post = post @ c.cty_post }
+
+(** pretty-printing *)
+
+open Format
+open Pretty
+
+let rprinter = create_ident_printer []
+  ~sanitizer:(sanitizer char_to_lalpha char_to_alnumus)
+
+let xprinter = create_ident_printer []
+  ~sanitizer:(sanitizer char_to_ualpha char_to_alnumus)
+
+let forget_reg r = forget_id rprinter r.reg_name
+
+let print_reg_name fmt r =
+  fprintf fmt "@@%s" (id_unique rprinter r.reg_name)
+
+let print_args pr fmt tl = if tl <> [] then
+  fprintf fmt "@ %a" (Pp.print_list Pp.space pr) tl
+
+let print_regs pr fmt rl = if rl <> [] then
+  fprintf fmt "@ <%a>" (Pp.print_list Pp.comma pr) rl
+
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
+let print_its fmt s = print_ts fmt s.its_ts
+
+let rec print_ity pri fmt ity = match ity.ity_node with
+  | Ityvar v -> print_tv fmt v
+  | Itypur (s,[t1;t2]) when its_equal s its_func ->
+      fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
+        (print_ity 1) t1 (print_ity 0) t2
+  | Itypur (s,tl) when is_ts_tuple s.its_ts ->
+      fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_ity 0)) tl
+  | Itypur (s,tl) when s.its_mutable || s.its_regions <> [] ->
+      fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
+        print_its s (print_args (print_ity 2)) tl
+  | Itypur (s,tl)
+  | Ityapp (s,tl,_)
+  | Ityreg {reg_its = s; reg_args = tl} ->
+      fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
+        print_its s (print_args (print_ity 2)) tl
+
+let print_ity fmt ity = print_ity 0 fmt ity
+
+let rec print_ity_node sb pri fmt ity = match ity.ity_node with
+  | Ityvar v ->
+      begin match Mtv.find_opt v sb.isb_tv with
+        | Some ity -> print_ity_node isb_empty pri fmt ity
+        | None -> print_tv fmt v
+      end
+  | Itypur (s,[t1;t2]) when its_equal s its_func ->
+      fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
+        (print_ity_node sb 1) t1 (print_ity_node sb 0) t2
+  | Itypur (s,tl) when is_ts_tuple s.its_ts ->
+      fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_ity_node sb 0)) tl
+  | Itypur (s,tl) when s.its_mutable || s.its_regions <> [] ->
+      fprintf fmt (protect_on (pri > 1 && tl <> []) "{%a}%a")
+        print_its s (print_args (print_ity_node sb 2)) tl
+  | Itypur (s,tl) ->
+      fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
+        print_its s (print_args (print_ity_node sb 2)) tl
+  | Ityapp (s,tl,rl) ->
+      fprintf fmt (protect_on (pri > 1) "%a%a%a")
+        print_its s (print_args (print_ity_node sb 2)) tl
+        (print_regs (print_reg_node sb)) rl
+  | Ityreg r ->
+      fprintf fmt (protect_on (pri > 1) "%a") (print_reg_node sb) r
+
+and print_reg_node sb fmt r = print_reg fmt (Mreg.find_def r r sb.isb_reg)
+
+and print_reg fmt r = fprintf fmt "%a%a%a@ %a"
+  print_its r.reg_its (print_args (print_ity_node isb_empty 2)) r.reg_args
+  (print_regs print_reg) r.reg_regs print_reg_name r
+
+let print_ity_full fmt ity = print_ity_node isb_empty 0 fmt ity
+
+let print_pv fmt v = print_vs fmt v.pv_vs
+
+let print_ghost fmt gh = if gh then fprintf fmt "ghost@ "
+
+let print_pvty fmt v = fprintf fmt "@[(%a%a:@,%a)@]"
+  print_ghost v.pv_ghost print_pv v print_ity v.pv_ity
+
+let forget_pv v = forget_var v.pv_vs
+
+let print_xs fmt xs = fprintf fmt "%s%a"
+  (id_unique xprinter xs.xs_name) print_id_labels xs.xs_name
+
+exception FoundPrefix of pvsymbol list
+
+let unknown = create_pvsymbol (id_fresh "?") ity_unit
+
+let print_cty_spec fmt c =
+  let dot fmt () = pp_print_char fmt '.' in
+  let print_pfx = Pp.print_list dot print_pv in
+  let rec find_prefix pfx reg ity = match ity.ity_node with
+    | Ityreg r when reg_equal reg r -> raise (FoundPrefix pfx)
+    | Ityreg r when reg_r_occurs reg r ->
+        let sbs = its_match_regs r.reg_its r.reg_args r.reg_regs in
+        List.iter (fun fd -> let ity = ity_full_inst sbs fd.pv_ity in
+          find_prefix (fd::pfx) reg ity) r.reg_its.its_mfields;
+        raise (FoundPrefix (unknown::pfx))
+    | _ when ity_r_occurs reg ity ->
+        raise (FoundPrefix (unknown::pfx))
+    | _ -> () in
+  let find_prefix reg = try
+    List.iter (fun v -> find_prefix [v] reg v.pv_ity) c.cty_args;
+    Spv.iter (fun v -> find_prefix [v] reg v.pv_ity) c.cty_reads;
+    assert false (* cannot have an effect on an unknown region *)
+    with FoundPrefix pfx -> List.rev pfx in
+  let print_reads fmt pvl = if pvl <> [] then
+    fprintf fmt "@\nreads {%a}" (Pp.print_list Pp.comma print_pv) pvl in
+  let print_writes fmt c = if not (Mreg.is_empty c.cty_effect.eff_writes) then
+    let print_wr fmt (reg,fds) =
+      let pfx = find_prefix reg in
+      let print_fld fmt fd =
+        fprintf fmt "%a.%a" print_pfx pfx print_pv fd in
+      if Spv.is_empty fds then print_pfx fmt pfx else
+        Pp.print_list Pp.comma print_fld fmt (Spv.elements fds) in
+    fprintf fmt "@\nwrites {%a}" (Pp.print_list Pp.comma print_wr)
+      (Mreg.bindings c.cty_effect.eff_writes) in
+  let print_resets fmt c = if not (Mreg.is_empty c.cty_effect.eff_resets) then
+    let print_rs fmt (reg,cvr) =
+      let pfx = find_prefix reg in
+      if Sreg.is_empty cvr then print_pfx fmt pfx else
+        fprintf fmt "%a@ (under %a)" print_pfx pfx
+          (Pp.print_list Pp.comma print_pfx)
+            (List.map find_prefix (Sreg.elements cvr)) in
+    fprintf fmt "@\nresets {%a}" (Pp.print_list Pp.comma print_rs)
+      (Mreg.bindings c.cty_effect.eff_resets) in
+  let print_pre fmt p =
+    fprintf fmt "@\nrequires { @[%a@] }" Pretty.print_term p in
+  let print_post fmt q =
+    let v, q = open_post q in
+    fprintf str_formatter "%a" Pretty.print_vs v;
+    let n = flush_str_formatter () in
+    begin if n = "result" || t_v_occurs v q = 0 then
+      fprintf fmt "@\nensures  { @[%a@] }" Pretty.print_term q else
+      fprintf fmt "@\nreturns  { %s ->@ @[%a@] }" n Pretty.print_term q
+    end;
+    Pretty.forget_var v in
+  let print_xpost xs fmt q =
+    let v, q = open_post q in
+    begin if ty_equal v.vs_ty ty_unit && t_v_occurs v q = 0 then
+      fprintf fmt "@\nraises   { %a ->@ @[%a@] }"
+        print_xs xs Pretty.print_term q else
+      fprintf fmt "@\nraises   { %a %a ->@ @[%a@] }"
+        print_xs xs Pretty.print_vs v Pretty.print_term q
+    end;
+    Pretty.forget_var v in
+  let print_xpost fmt (xs,ql) =
+    Pp.print_list Pp.nothing (print_xpost xs) fmt ql in
+  fprintf fmt "%a%a%a%a%a%a" print_reads (Spv.elements c.cty_reads)
+    print_writes c print_resets c
+    (Pp.print_list Pp.nothing print_pre) c.cty_pre
+    (Pp.print_list Pp.nothing print_post) c.cty_post
+    (Pp.print_list Pp.nothing print_xpost) (Mexn.bindings c.cty_xpost)
+
+let print_cty fmt c = fprintf fmt "%a :@ %a%a"
+  (Pp.print_list Pp.space print_pvty) c.cty_args
+  print_ity c.cty_result print_cty_spec c
+
+let print_cty_head fmt c = fprintf fmt "%a%a"
+  (Pp.print_list Pp.space print_pvty) c.cty_args
+  print_cty_spec c
+
+(** exception handling *)
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  | BadItyArity ({its_ts = {ts_args = []}} as s, _) ->
+      fprintf fmt "Type symbol %a expects no arguments" print_its s
+  | BadItyArity (s, app_arg) ->
+      let i = List.length s.its_ts.ts_args in
+      fprintf fmt "Type symbol %a expects %i argument%s but is applied to %i"
+        print_its s i (if i = 1 then "" else "s") app_arg
+  | BadRegArity (s, app_arg) ->
+      let i = List.length s.its_regions in
+      fprintf fmt "Type symbol %a expects \
+                   %i region argument%s but is applied to %i"
+        print_its s i (if i = 1 then "" else "s") app_arg
+  | DuplicateRegion r ->
+      fprintf fmt "Region %a is used twice" print_reg r
+  | UnboundRegion r ->
+      fprintf fmt "Unbound region %a" print_reg r
+(*
+  | UnboundException xs ->
+      fprintf fmt "This function raises %a but does not \
+        specify a post-condition for it" print_xs xs
+*)
+  | TypeMismatch (t1,t2,s) ->
+      fprintf fmt "Type mismatch between %a and %a"
+        (print_ity_node s 0) t1 print_ity t2
+  | IllegalAlias _reg ->
+      fprintf fmt "This application creates an illegal alias"
+  | _ -> raise e)
