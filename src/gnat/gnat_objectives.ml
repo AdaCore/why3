@@ -588,7 +588,10 @@ module Save_VCs = struct
       let check = get_objective goal in
       let trace_fn = Pp.sprintf "%a.trace" Gnat_expl.to_filename check in
       let trace = compute_trace goal in
-      if not (Gnat_loc.S.is_empty trace) then begin
+      (* Do not generate an empty file if there is no location at all.
+         Do not generate a file with a single location for the goal, as this
+         is not useful. *)
+      if Gnat_loc.S.cardinal trace > 1 then begin
         with_fmt_channel trace_fn (fun fmt ->
            Gnat_loc.S.iter (fun l ->
               Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
