@@ -1,0 +1,567 @@
+theory Pow2int
+
+  use import int.Int
+
+  function pow2 (i:int) : int
+
+  axiom Power_0 : pow2 0 = 1
+
+  axiom Power_s : forall n: int. n >= 0 -> pow2 (n+1) = 2 * pow2 n
+
+  lemma Power_1 : pow2 1 = 2
+
+  lemma Power_sum :
+    forall n m: int. n >= 0 /\ m >= 0 -> pow2 (n+m) = pow2 n * pow2 m
+
+  lemma pow2pos: forall i:int. i >= 0 -> pow2 i > 0
+
+  lemma pow2_0: pow2 0   =                    1
+  lemma pow2_1: pow2 1   =                    2
+  lemma pow2_2: pow2 2   =                    4
+  lemma pow2_3: pow2 3   =                    8
+  lemma pow2_4: pow2 4   =                   16
+  lemma pow2_5: pow2 5   =                   32
+  lemma pow2_6: pow2 6   =                   64
+  lemma pow2_7: pow2 7   =                  128
+  lemma pow2_8: pow2 8   =                  256
+  lemma pow2_9: pow2 9   =                  512
+  lemma pow2_10: pow2 10 =                 1024
+  lemma pow2_11: pow2 11 =                 2048
+  lemma pow2_12: pow2 12 =                 4096
+  lemma pow2_13: pow2 13 =                 8192
+  lemma pow2_14: pow2 14 =                16384
+  lemma pow2_15: pow2 15 =                32768
+  lemma pow2_16: pow2 16 =                65536
+  lemma pow2_17: pow2 17 =               131072
+  lemma pow2_18: pow2 18 =               262144
+  lemma pow2_19: pow2 19 =               524288
+  lemma pow2_20: pow2 20 =              1048576
+  lemma pow2_21: pow2 21 =              2097152
+  lemma pow2_22: pow2 22 =              4194304
+  lemma pow2_23: pow2 23 =              8388608
+  lemma pow2_24: pow2 24 =             16777216
+  lemma pow2_25: pow2 25 =             33554432
+  lemma pow2_26: pow2 26 =             67108864
+  lemma pow2_27: pow2 27 =            134217728
+  lemma pow2_28: pow2 28 =            268435456
+  lemma pow2_29: pow2 29 =            536870912
+  lemma pow2_30: pow2 30 =           1073741824
+  lemma pow2_31: pow2 31 =           2147483648
+  lemma pow2_32: pow2 32 =           4294967296
+  lemma pow2_33: pow2 33 =           8589934592
+  lemma pow2_34: pow2 34 =          17179869184
+  lemma pow2_35: pow2 35 =          34359738368
+  lemma pow2_36: pow2 36 =          68719476736
+  lemma pow2_37: pow2 37 =         137438953472
+  lemma pow2_38: pow2 38 =         274877906944
+  lemma pow2_39: pow2 39 =         549755813888
+  lemma pow2_40: pow2 40 =        1099511627776
+  lemma pow2_41: pow2 41 =        2199023255552
+  lemma pow2_42: pow2 42 =        4398046511104
+  lemma pow2_43: pow2 43 =        8796093022208
+  lemma pow2_44: pow2 44 =       17592186044416
+  lemma pow2_45: pow2 45 =       35184372088832
+  lemma pow2_46: pow2 46 =       70368744177664
+  lemma pow2_47: pow2 47 =      140737488355328
+  lemma pow2_48: pow2 48 =      281474976710656
+  lemma pow2_49: pow2 49 =      562949953421312
+  lemma pow2_50: pow2 50 =     1125899906842624
+  lemma pow2_51: pow2 51 =     2251799813685248
+  lemma pow2_52: pow2 52 =     4503599627370496
+  lemma pow2_53: pow2 53 =     9007199254740992
+  lemma pow2_54: pow2 54 =    18014398509481984
+  lemma pow2_55: pow2 55 =    36028797018963968
+  lemma pow2_56: pow2 56 =    72057594037927936
+  lemma pow2_57: pow2 57 =   144115188075855872
+  lemma pow2_58: pow2 58 =   288230376151711744
+  lemma pow2_59: pow2 59 =   576460752303423488
+  lemma pow2_60: pow2 60 =  1152921504606846976
+  lemma pow2_61: pow2 61 =  2305843009213693952
+  lemma pow2_62: pow2 62 =  4611686018427387904
+  lemma pow2_63: pow2 63 =  9223372036854775808
+  lemma pow2_64: pow2 64 = 18446744073709551616
+
+  use import int.EuclideanDivision
+
+  lemma Div_mult_inst: forall x z:int.
+          x > 0 ->
+          div (x * 1 + z) x = 1 + div z x
+
+  lemma Div_double:
+    forall x y:int. 0 < y <= x < 2*y -> div x y = 1
+
+  lemma Div_pow: forall x i:int.
+    i > 0 -> pow2 (i-1) <= x < pow2 i -> div x (pow2 (i-1)) = 1
+
+  lemma Div_double_neg:
+    forall x y:int. -2*y <= x < -y < 0 -> div x y = -2
+
+  lemma Div_pow2: forall x i:int.
+    i > 0 -> -pow2 i <= x < -pow2 (i-1) -> div x (pow2 (i-1)) = -2
+
+  lemma Div_div_pow: forall x i j:int.
+    i > 0 /\ j > 0 -> div (div x (pow2 i)) (pow2 j) = div x (pow2 (i+j))
+
+  (* lemma Mod_pow2: forall x i:int. mod (x + pow2 i) 2 = mod x 2 *)
+
+  lemma Mod_pow2_gen: forall x i k :int.
+    0 <= k < i -> mod (div (x + pow2 i) (pow2 k)) 2 = mod (div x (pow2 k)) 2
+
+end
+
+module BVRotate_const
+  type t
+  (* rotate left *)
+  function rotate_left_1 (v : t) : t
+  function rotate_left_2 (v : t) : t
+  function rotate_left_3 (v : t) : t
+  function rotate_left_4 (v : t) : t
+  function rotate_left_5 (v : t) : t
+  function rotate_left_6 (v : t) : t
+  function rotate_left_7 (v : t) : t
+  function rotate_left_8 (v : t) : t
+  function rotate_left_9 (v : t) : t
+  function rotate_left_10 (v : t) : t
+  function rotate_left_11 (v : t) : t
+  function rotate_left_12 (v : t) : t
+  function rotate_left_13 (v : t) : t
+  function rotate_left_14 (v : t) : t
+  function rotate_left_15 (v : t) : t
+  function rotate_left_16 (v : t) : t
+  function rotate_left_17 (v : t) : t
+  function rotate_left_18 (v : t) : t
+  function rotate_left_19 (v : t) : t
+  function rotate_left_20 (v : t) : t
+  function rotate_left_21 (v : t) : t
+  function rotate_left_22 (v : t) : t
+  function rotate_left_23 (v : t) : t
+  function rotate_left_24 (v : t) : t
+  function rotate_left_25 (v : t) : t
+  function rotate_left_26 (v : t) : t
+  function rotate_left_27 (v : t) : t
+  function rotate_left_28 (v : t) : t
+  function rotate_left_29 (v : t) : t
+  function rotate_left_30 (v : t) : t
+  function rotate_left_31 (v : t) : t
+  function rotate_left_32 (v : t) : t
+  function rotate_left_33 (v : t) : t
+  function rotate_left_34 (v : t) : t
+  function rotate_left_35 (v : t) : t
+  function rotate_left_36 (v : t) : t
+  function rotate_left_37 (v : t) : t
+  function rotate_left_38 (v : t) : t
+  function rotate_left_39 (v : t) : t
+  function rotate_left_40 (v : t) : t
+  function rotate_left_41 (v : t) : t
+  function rotate_left_42 (v : t) : t
+  function rotate_left_43 (v : t) : t
+  function rotate_left_44 (v : t) : t
+  function rotate_left_45 (v : t) : t
+  function rotate_left_46 (v : t) : t
+  function rotate_left_47 (v : t) : t
+  function rotate_left_48 (v : t) : t
+  function rotate_left_49 (v : t) : t
+  function rotate_left_50 (v : t) : t
+  function rotate_left_51 (v : t) : t
+  function rotate_left_52 (v : t) : t
+  function rotate_left_53 (v : t) : t
+  function rotate_left_54 (v : t) : t
+  function rotate_left_55 (v : t) : t
+  function rotate_left_56 (v : t) : t
+  function rotate_left_57 (v : t) : t
+  function rotate_left_58 (v : t) : t
+  function rotate_left_59 (v : t) : t
+  function rotate_left_60 (v : t) : t
+  function rotate_left_61 (v : t) : t
+  function rotate_left_62 (v : t) : t
+  function rotate_left_63 (v : t) : t
+  (* rotate right *)
+  function rotate_right_1 (v : t) : t
+  function rotate_right_2 (v : t) : t
+  function rotate_right_3 (v : t) : t
+  function rotate_right_4 (v : t) : t
+  function rotate_right_5 (v : t) : t
+  function rotate_right_6 (v : t) : t
+  function rotate_right_7 (v : t) : t
+  function rotate_right_8 (v : t) : t
+  function rotate_right_9 (v : t) : t
+  function rotate_right_10 (v : t) : t
+  function rotate_right_11 (v : t) : t
+  function rotate_right_12 (v : t) : t
+  function rotate_right_13 (v : t) : t
+  function rotate_right_14 (v : t) : t
+  function rotate_right_15 (v : t) : t
+  function rotate_right_16 (v : t) : t
+  function rotate_right_17 (v : t) : t
+  function rotate_right_18 (v : t) : t
+  function rotate_right_19 (v : t) : t
+  function rotate_right_20 (v : t) : t
+  function rotate_right_21 (v : t) : t
+  function rotate_right_22 (v : t) : t
+  function rotate_right_23 (v : t) : t
+  function rotate_right_24 (v : t) : t
+  function rotate_right_25 (v : t) : t
+  function rotate_right_26 (v : t) : t
+  function rotate_right_27 (v : t) : t
+  function rotate_right_28 (v : t) : t
+  function rotate_right_29 (v : t) : t
+  function rotate_right_30 (v : t) : t
+  function rotate_right_31 (v : t) : t
+  function rotate_right_32 (v : t) : t
+  function rotate_right_33 (v : t) : t
+  function rotate_right_34 (v : t) : t
+  function rotate_right_35 (v : t) : t
+  function rotate_right_36 (v : t) : t
+  function rotate_right_37 (v : t) : t
+  function rotate_right_38 (v : t) : t
+  function rotate_right_39 (v : t) : t
+  function rotate_right_40 (v : t) : t
+  function rotate_right_41 (v : t) : t
+  function rotate_right_42 (v : t) : t
+  function rotate_right_43 (v : t) : t
+  function rotate_right_44 (v : t) : t
+  function rotate_right_45 (v : t) : t
+  function rotate_right_46 (v : t) : t
+  function rotate_right_47 (v : t) : t
+  function rotate_right_48 (v : t) : t
+  function rotate_right_49 (v : t) : t
+  function rotate_right_50 (v : t) : t
+  function rotate_right_51 (v : t) : t
+  function rotate_right_52 (v : t) : t
+  function rotate_right_53 (v : t) : t
+  function rotate_right_54 (v : t) : t
+  function rotate_right_55 (v : t) : t
+  function rotate_right_56 (v : t) : t
+  function rotate_right_57 (v : t) : t
+  function rotate_right_58 (v : t) : t
+  function rotate_right_59 (v : t) : t
+  function rotate_right_60 (v : t) : t
+  function rotate_right_61 (v : t) : t
+  function rotate_right_62 (v : t) : t
+  function rotate_right_63 (v : t) : t
+end
+
+(** {1 Bit vectors} *)
+
+(** {2 Generic theory (arbitrary length)} *)
+
+module BitVectorBase
+
+  use export bool.Bool
+  use import Pow2int
+
+  type t
+
+  clone export BVRotate_const with
+    type t = t
+
+  constant size_int : int
+  constant max_int : int
+
+  function to_int t : int
+  function of_int int : t
+
+  constant size : t = of_int size_int
+
+  use int.Int
+  use import int.EuclideanDivision
+
+  constant two_power_size : int = Int.(+) max_int 1
+
+  axiom to_int_extensionality :
+    forall v,v':t. to_int v = to_int v' -> v = v'
+
+  predicate int_in_range (i : int) = (Int.(<=) 0 i) /\ (Int.(<=) i max_int)
+
+  axiom to_int_bounds :
+    forall v:t. int_in_range (to_int v)
+
+  axiom to_int_of_int :
+    forall i. int_in_range i -> to_int (of_int i) = i
+
+  predicate ult (x y : t) =
+    Int.(<) (to_int x) (to_int y)
+
+  predicate ule (x y : t) =
+    Int.(<=) (to_int x) (to_int y)
+
+  predicate ugt (x y : t) =
+    Int.(>) (to_int x) (to_int y)
+
+  predicate uge (x y : t) =
+    Int.(>=) (to_int x) (to_int y)
+
+  function nth t t: bool
+  (** [nth b n] is the n-th bit of x (0 <= n < size). bit 0 is
+      the least significant bit *)
+
+  axiom nth_ext : forall u v. not( u = v ) -> exists t. ult t size /\ not (nth u t = nth v t)
+
+  constant zero : t = of_int 0
+  axiom Nth_zero:
+    forall n. ult n size -> nth zero n = False
+
+  constant ones : t = of_int max_int
+  axiom Nth_ones:
+    forall n. ult n size -> nth ones n = True
+
+  predicate eq (v1 v2 : t) =
+    forall n. ult n size -> nth v1 n = nth v2 n
+
+  axiom Extensionality: forall x y : t. eq x y -> x = y
+
+  constant one : t = of_int 1
+
+  (** addition modulo 2^m *)
+  function add (v1 v2 : t) : t
+  axiom to_int_add:
+    forall v1 v2. to_int (add v1 v2) =  mod (Int.(+) (to_int v1) (to_int v2)) two_power_size
+
+  (** 2's complement subtraction modulo 2^m *)
+  function sub (v1 v2 : t) : t
+  axiom to_int_sub:
+    forall v1 v2. to_int (sub v1 v2) = mod (Int.(-) (to_int v1) (to_int v2)) two_power_size
+
+  (** 2's complement unary minus *)
+  function neg (v1 : t) : t
+  axiom to_int_neg:
+    forall v. to_int (neg v) = mod (Int.(-_) (to_int v)) two_power_size
+
+  (** multiplication modulo 2^m *)
+  function mul (v1 v2 : t) : t
+  axiom to_int_mul:
+    forall v1 v2. to_int (mul v1 v2) = mod (Int.( * ) (to_int v1) (to_int v2)) two_power_size
+
+  (** unsigned division, truncating towards 0 (undefined if divisor is 0) *)
+  function udiv (v1 v2 : t) : t
+  axiom to_int_udiv:
+    forall v1 v2. to_int (udiv v1 v2) = div (to_int v1) (to_int v2)
+
+  (** unsigned remainder from truncating division (undefined if divisor is 0) *)
+  function urem (v1 v2 : t) : t
+  axiom to_int_urem:
+    forall v1 v2. to_int (urem v1 v2) = mod (to_int v1) (to_int v2)
+
+  function bw_and (v1 v2 : t) : t
+  axiom Nth_bw_and:
+    forall v1 v2 n. ult n size ->
+      nth (bw_and v1 v2) n = andb (nth v1 n) (nth v2 n)
+
+  function bw_or (v1 v2 : t) : t
+  axiom Nth_bw_or:
+    forall v1 v2 n. ult n size ->
+      nth (bw_or v1 v2) n = orb (nth v1 n) (nth v2 n)
+
+  function bw_xor (v1 v2 : t) : t
+  axiom Nth_bw_xor:
+    forall v1 v2 n. ult n size ->
+      nth (bw_xor v1 v2) n = xorb (nth v1 n) (nth v2 n)
+
+  function bw_not (v : t) : t
+  axiom Nth_bw_not:
+    forall v n. ult n size ->
+      nth (bw_not v) n = not (nth v n)
+
+  function rotate_right_n (v n : t) : t
+  (** rotate right  *)
+
+  function rotate_left_n (v n : t) : t
+  (** rotate left  *)
+
+  axiom Nth_rotate_left_n :
+    forall v n i. ult i size ->
+      nth v i = nth (rotate_left_n v n) (urem (add i n) size)
+
+  axiom Nth_rotate_right_n :
+    forall v n i. ult i size ->
+      nth (rotate_right_n v n) i = nth v (urem (add i n) size)
+
+  (* no problems with shift of length greater than size in ada : *)
+  (* http://www.adaic.org/resources/add_content/standards/12rm/html/RM-B-2.html *)
+
+  function lsr t t : t
+  (** logical shift right *)
+
+  axiom Lsr_nth_low: forall b s n.
+      ult s size /\ ult n (sub size s) ->
+        nth (lsr b s) n = nth b (add n s)
+
+  axiom Lsr_nth_high: forall b s n.
+      ult n size /\ ( uge s size \/ uge (add n s) size ) ->
+        nth (lsr b s) n = False
+
+  axiom to_int_lsr:
+    forall v n : t.
+      to_int (lsr v n) = div (to_int v) (pow2 ( to_int n ))
+
+  function asr t t : t
+  (** arithmetic shift right *)
+
+  axiom Asr_nth_low: forall b n s.
+      ult s size /\ ult n (sub size s) ->
+        nth (asr b s) n = nth b (add n s)
+
+  axiom Asr_nth_high: forall b n s.
+      ult n size /\ ( uge s size \/ uge (add n s) size ) ->
+        nth (asr b s) n = nth b (sub size one)
+
+  (** logical shift left *)
+  function lsl t t : t
+
+  axiom Lsl_nth_high: forall b s n.
+      ult s size /\ ule s n /\ ult n size ->
+        nth (lsl b s) n = nth b (sub n s)
+
+  axiom Lsl_nth_low: forall b s n.
+      ult n size /\ ult n s ->
+        nth (lsl b s) n = False
+
+  axiom to_int_lsl:
+    forall v n : t.
+         to_int (lsl v n) = mod (Int.( * ) (to_int v) (pow2 (to_int n))) two_power_size
+
+  axiom two_power_size_val :
+    two_power_size = pow2 size_int
+end
+
+(** {2 32-bits Bitvectors} *)
+
+module BV64
+  constant size_int : int = 64
+  constant max_int : int = 0xFFFF_FFFF_FFFF_FFFF
+  clone export BitVectorBase with
+    constant size_int = size_int,
+    constant max_int = max_int
+end
+
+module BV32
+  constant size_int : int = 32
+  constant max_int : int = 0xFFFF_FFFF
+  clone export BitVectorBase with
+    constant size_int = size_int,
+    constant max_int = max_int
+end
+
+module BV16
+  constant size_int : int = 16
+  constant max_int : int = 0xFFFF
+  clone export BitVectorBase with
+    constant size_int = size_int,
+    constant max_int = max_int
+end
+
+module BV8
+  constant size_int : int = 8
+  constant max_int : int = 0xFF
+  clone export BitVectorBase with
+    constant size_int = size_int,
+    constant max_int = max_int
+end
+
+(* converters *)
+
+module BVConverter
+
+  type bigBV
+  type smallBV
+
+  constant pow2_smallSize : int
+
+  predicate in_small_range bigBV
+
+  function to_int_small smallBV : int
+  function to_int_big bigBV : int
+
+  function toBig smallBV : bigBV
+  function toSmall bigBV : smallBV
+end
+
+module BVConverter_32_64
+  use BV32
+  use BV64
+
+  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV32.max_int)
+
+  clone export BVConverter with
+    type bigBV = BV64.t,
+    type smallBV = BV32.t,
+    predicate in_small_range = in_range,
+    constant pow2_smallSize = BV32.two_power_size,
+    function to_int_small = BV32.to_int,
+    function to_int_big = BV64.to_int
+end
+
+module BVConverter_16_64
+  use BV16
+  use BV64
+
+  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV16.max_int)
+
+  clone export BVConverter with
+    type bigBV = BV64.t,
+    type smallBV = BV16.t,
+    predicate in_small_range = in_range,
+    constant pow2_smallSize = BV16.two_power_size,
+    function to_int_small = BV16.to_int,
+    function to_int_big = BV64.to_int
+end
+
+module BVConverter_8_64
+  use BV8
+  use BV64
+
+  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV8.max_int)
+
+  clone export BVConverter with
+    type bigBV = BV64.t,
+    type smallBV = BV8.t,
+    predicate in_small_range = in_range,
+    constant pow2_smallSize =  BV8.two_power_size,
+    function to_int_small = BV8.to_int,
+    function to_int_big = BV64.to_int
+end
+
+module BVConverter_16_32
+  use BV16
+  use BV32
+
+  predicate in_range (b : BV32.t) = BV32.ule b (BV32.of_int BV16.max_int)
+
+  clone export BVConverter with
+    type bigBV = BV32.t,
+    type smallBV = BV16.t,
+    predicate in_small_range = in_range,
+    constant pow2_smallSize = BV16.two_power_size,
+    function to_int_small = BV16.to_int,
+    function to_int_big = BV32.to_int
+end
+
+module BVConverter_8_32
+  use BV8
+  use BV32
+
+  predicate in_range (b : BV32.t) = BV32.ule b (BV32.of_int BV8.max_int)
+
+  clone export BVConverter with
+    type bigBV = BV32.t,
+    type smallBV = BV8.t,
+    predicate in_small_range = in_range,
+    constant pow2_smallSize = BV8.two_power_size,
+    function to_int_small = BV8.to_int,
+    function to_int_big = BV32.to_int
+end
+
+module BVConverter_8_16
+  use BV8
+  use BV16
+
+  predicate in_range (b : BV16.t) = BV16.ule b (BV16.of_int BV8.max_int)
+
+  clone export BVConverter with
+    type bigBV = BV16.t,
+    type smallBV = BV8.t,
+    predicate in_small_range = in_range,
+    constant pow2_smallSize = BV8.two_power_size,
+    function to_int_small = BV8.to_int,
+    function to_int_big = BV16.to_int
+end
