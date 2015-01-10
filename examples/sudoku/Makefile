@@ -47,19 +47,30 @@ $(MAIN).cmx: $(CMX)
 $(ML): ../sudoku.mlw
 	$(WHY3) extract -D ocaml32 ../sudoku.mlw -o .
 
-%.cmx: %.ml
-	$(OCAMLOPT) $(INCLUDE) -annot -c $<
+# javascript
+
+
+JSMAIN=jsmain
+
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
+          -syntax camlp4o
+
+$(JSMAIN).js: $(JSMAIN).byte
+	js_of_ocaml -pretty -noinline $(JSMAIN).byte
+
+$(JSMAIN).byte: $(ML) $(JSMAIN).cmo
+	$(JSOCAMLC) -g -o $@ -linkpkg $^
 
 %.cmo: %.ml
-	ocamlc $(INCLUDE) -annot -g -c $<
+	$(JSOCAMLC) $(INCLUDE) -annot -c $<
 
 %.cmi: %.mli
-	ocamlc $(INCLUDE) -annot -g -c $<
+	$(JSOCAMLC) $(INCLUDE) -annot -c $<
+
+%.cmx: %.ml
+	$(OCAMLOPT) $(INCLUDE) -annot -c $<
 
 clean::
 	rm -f $(ML) *.annot *.o *.cm[xio] $(MAIN).opt $(MAIN).byte
 	rm -f sudoku__*.ml why3__*.ml
 	rm -f int__Int.ml map__Map.ml array__Array.ml
-
-
-
