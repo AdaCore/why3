@@ -37,7 +37,7 @@ let print_grid fmt a =
 let () =
   let sudoku = Sudoku__TheClassicalSudokuGrid.classical_sudoku () in
   printf "Problem: %a@." print_grid input_grid;
-  let a = Sudoku__Solver.solve sudoku input_grid 
+  let a = Sudoku__Solver.solve sudoku input_grid
   in
   printf "Solution: %a@." print_grid a
 
@@ -45,6 +45,18 @@ let () =
 test:
 
 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
+
+that is
+
+2 0 9 0 0 0 0 1 0
+0 0 0 0 6 0 0 0 0
+0 5 3 8 0 2 7 0 0
+3 0 0 0 0 0 0 0 0
+0 0 0 0 7 5 0 0 3
+0 4 1 2 0 8 9 0 0
+0 0 4 0 9 0 0 2 0
+8 0 0 0 0 1 0 0 5
+0 0 0 0 0 0 0 7 6
 
 should give:
 

@@ -1,4 +1,7 @@
 
+
+let () = Firebug.console##info (Js.string "debut de jsmain.ml")
+
 module D = Dom_html
 
 let d = D.document
@@ -201,10 +204,10 @@ let onload (_event : #Dom_html.event Js.t) : bool Js.t =
     (fun () -> assert false) in
   Dom.appendChild board table;
   board##style##backgroundColor <- Js.string "#00ff00";
-  board##style##paddingLeft <- Js.string "100px";
-  board##style##paddingRight <- Js.string "100px";
-  board##style##paddingBottom <- Js.string "100px";
-  board##style##paddingTop <- Js.string "100px";
+  board##style##paddingLeft <- Js.string "40px";
+  board##style##paddingRight <- Js.string "40px";
+  board##style##paddingBottom <- Js.string "40px";
+  board##style##paddingTop <- Js.string "40px";
   Js._false
 
 let _ = Dom_html.window##onload <- Dom_html.handler onload

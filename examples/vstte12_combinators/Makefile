@@ -62,12 +62,12 @@ JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
           -syntax camlp4o
 
 $(JSMAIN).js: $(JSMAIN).byte
-	js_of_ocaml -pretty -noinline $(JSMAIN).byte
+	js_of_ocaml -pretty -noinline +nat.js $(JSMAIN).byte
 
 
-$(JSMAIN).byte: $(ML) jsmain.ml
-	$(JSOCAMLC) $(INCLUDE) -o $@ -linkpkg $^
-#	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ -linkpkg $^
+$(JSMAIN).byte: $(CMO) jsmain.ml
+#	$(JSOCAMLC) $(INCLUDE) -o $@ -linkpkg $^
+	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ -linkpkg $^
 
 
 %.cmo: %.ml
