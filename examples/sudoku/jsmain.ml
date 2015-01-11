@@ -16,8 +16,14 @@ let make_board () =
     input##align <- Js.string "center";
     let style = input##style in
     style##border <- Js.string "none";
-    style##padding <- Js.string "0px";
-    style##maxWidth <- Js.string "20px";
+    style##fontFamily <- Js.string "monospace";
+    style##fontSize <- Js.string "20px";
+    style##fontWeight <- Js.string "bold";
+    style##paddingBottom <- Js.string "5px";
+    style##paddingTop <- Js.string "5px";
+    style##paddingLeft <- Js.string "10px";
+    style##paddingRight <- Js.string "10px";
+    (* style##minWidth <- Js.string "60px"; *)
     let enforce_digit _ =
       begin
         match Js.to_string input##value with
@@ -60,8 +66,8 @@ let make_board () =
     style##borderStyle <- Js.string "solid";
     style##borderColor <- Js.string "#000000";
     let widths = function
-      | 0 -> 2, 0 | 2 -> 1, 1 | 3 -> 1, 0
-      | 5 -> 1, 1 | 6 -> 1, 0 | 8 -> 1, 2
+      | 0 -> 3, 0 | 2 -> 1, 1 | 3 -> 1, 0
+      | 5 -> 1, 1 | 6 -> 1, 0 | 8 -> 1, 3
       | _ -> 1, 0 in
     let (top, bottom) = widths i in
     let (left, right) = widths j in
@@ -169,7 +175,16 @@ let display_sol rows a =
   for i=0 to 8 do
     for j=0 to 8 do
       let cell = rows.(i).(j) in
-      cell##value <- Js.string (Why3__BigInt.to_string a.(9*i+j))
+      cell##value <- Js.string (Why3__BigInt.to_string a.(9*i+j));
+      cell##style##backgroundColor <- Js.string "#ffffff"
+    done
+  done
+
+let no_sol rows =
+  for i=0 to 8 do
+    for j=0 to 8 do
+      let cell = rows.(i).(j) in
+      cell##style##backgroundColor <- Js.string "#ff0000"
     done
   done
 
@@ -187,8 +202,22 @@ let solve_board rows _ =
       input_grid.(9*i+j) <- Why3__BigInt.of_int v
     done
   done;
-  let a = Sudoku__Solver.solve sudoku input_grid in
-  display_sol rows a;
+  begin
+    try
+      let a = Sudoku__Solver.solve sudoku input_grid in
+      display_sol rows a
+    with Sudoku__Solver.NoSolution -> no_sol rows
+  end;
+  Js._false
+
+let reset_board rows _ =
+  for i=0 to 8 do
+    for j=0 to 8 do
+      let cell = rows.(i).(j) in
+      cell##value <- Js.string "";
+      cell##style##backgroundColor <- Js.string "#ffffff";
+    done
+  done;
   Js._false
 
 
@@ -200,14 +229,18 @@ let onload (_event : #Dom_html.event Js.t) : bool Js.t =
   let solve = Js.Opt.get (d##getElementById (Js.string "solve"))
     (fun () -> assert false) in
   solve##onclick <- Dom_html.handler (solve_board rows);
+  let reset = Js.Opt.get (d##getElementById (Js.string "reset"))
+    (fun () -> assert false) in
+  reset##onclick <- Dom_html.handler (reset_board rows);
   let board = Js.Opt.get (d##getElementById (Js.string "board"))
     (fun () -> assert false) in
   Dom.appendChild board table;
-  board##style##backgroundColor <- Js.string "#00ff00";
-  board##style##paddingLeft <- Js.string "40px";
-  board##style##paddingRight <- Js.string "40px";
-  board##style##paddingBottom <- Js.string "40px";
-  board##style##paddingTop <- Js.string "40px";
+  (* board##style##backgroundColor <- Js.string "#00ff00"; *)
+  board##style##padding <- Js.string "40px";
+  (* board##style##paddingLeft <- Js.string "40px"; *)
+  (* board##style##paddingRight <- Js.string "40px"; *)
+  (* board##style##paddingBottom <- Js.string "40px"; *)
+  (* board##style##paddingTop <- Js.string "40px"; *)
   Js._false
 
 let _ = Dom_html.window##onload <- Dom_html.handler onload
