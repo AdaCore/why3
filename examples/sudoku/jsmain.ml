@@ -1,10 +1,10 @@
 
 
-let () = Firebug.console##info (Js.string "debut de jsmain.ml")
-
 module D = Dom_html
 
 let d = D.document
+
+(* Grid Layout *)
 
 let make_board () =
   let make_input () =
@@ -23,7 +23,6 @@ let make_board () =
     style##paddingTop <- Js.string "5px";
     style##paddingLeft <- Js.string "10px";
     style##paddingRight <- Js.string "10px";
-    (* style##minWidth <- Js.string "60px"; *)
     let enforce_digit _ =
       begin
         match Js.to_string input##value with
@@ -34,31 +33,8 @@ let make_board () =
       Js._false
     in
     input##onchange <- Dom_html.handler enforce_digit;
-    input in
-
-  (* We construct the Sudoku board in several steps. First, we make an
-     input box for each square. Notice that you can call DOM methods
-     (e.g. createElement) with OCaml object syntax. But what is the type of
-     createElement? The type of the object you get back depends on the tag
-     name you pass in; OCaml has no type for that. So createElement is
-     declared to return #element (that is, a subclass of element). If you
-     need only methods from element then you usually don't need to ascribe
-     a more-specific type, but in this case we need an input node. (Static
-     type checking with Javascript objects is therefore only advisory in
-     some cases--if you ascribe the wrong type you can get a runtime
-     error--but still better than nothing.)
-
-     We next set some attributes, properties, and styles on the input
-     box. Properties are manipulated with specially-named methods:
-     foo#_get_bar becomes foo.bar in Javascript, and foo#_set_bar baz
-     becomes foo.bar = baz. Finally we add a validation function to enforce
-     that the input box contains at most a single digit. To set the
-     onchange handler, you need to wrap it in Ocamljs.jsfun, because the
-     calling convention of an ocamljs function is different from that of
-     plain Javascript function (to accomodate partial application and tail
-     recursion).
-  *)
-
+    input
+  in
   let make_td i j input =
     let td = D.createTd d in
     td##align <- Js.string "center";
@@ -77,19 +53,9 @@ let make_board () =
     style##borderLeftWidth <- px left;
     style##borderRightWidth <- px right;
     Dom.appendChild td input;
-    td in
-
-  (* Next we make a table cell for each square, containing the input
-     box, with borders according to its position in the grid. Here we don't
-     ascribe a type to the result of createElement since we don't need any
-     td-specific methods.
-  *)
-
-  let rows =
-    Array.init 9 (fun i ->
-      Array.init 9 (fun j ->
-        make_input ())) in
-
+    td
+  in
+  let rows = Array.init 9 (fun i -> Array.init 9 (fun j -> make_input ())) in
   let table = D.createTable d in
   table##cellPadding <- Js.string "0px";
   table##cellSpacing <- Js.string "0px";
@@ -101,73 +67,10 @@ let make_board () =
       let td = make_td i j cell in
       ignore (Dom.appendChild tr td));
     ignore (Dom.appendChild tbody tr));
-
   (rows, table)
 
-(* Then we assemble the full board: make a 9 x 9 matrix of input
-   boxes, make a table containing the input boxes, then return the matrix
-   and table. Notice that we freely use the OCaml standard library. Here
-   the tbody is necessary for IE; the cellpadding and cellspacing don't
-   work in IE for some reason that I have not tracked down. This raises
-   an important point: the Dom module is the thinnest possible wrapper
-   over the actual DOM objects, and as such gives you no help with
-   cross-browser compatibility.
-*)
 
-let check_board rows _ =
-  let error i j =
-    let cell = rows.(i).(j) in
-    cell##style##backgroundColor <- Js.string "#ff0000" in
-
-  let check_set set =
-    let seen = Array.make 9 None in
-    ArrayLabels.iter set ~f:(fun (i,j) ->
-      let cell = rows.(i).(j) in
-      match Js.to_string cell##value with
-        | "" -> ()
-        | v ->
-            let n = int_of_string v in
-            match seen.(n - 1) with
-              | None ->
-                  seen.(n - 1) <- Some (i,j)
-              | Some (i',j') ->
-                  error i j;
-                  error i' j') in
-
-  let check_row i =
-    check_set (Array.init 9 (fun j -> (i,j))) in
-
-  let check_column j =
-    check_set (Array.init 9 (fun i -> (i,j))) in
-
-  let check_square i j =
-    let set = Array.init 9 (fun k ->
-      i * 3 + k mod 3, j * 3 + k / 3) in
-    check_set set in
-
-  ArrayLabels.iter rows ~f:(fun row ->
-    ArrayLabels.iter row ~f:(fun cell ->
-      cell##style##backgroundColor <- Js.string "#ffffff"));
-
-  for i = 0 to 8 do check_row i done;
-  for j = 0 to 8 do check_column j done;
-  for i = 0 to 2 do
-    for j = 0 to 2 do
-      check_square i j
-    done
-  done;
-  Js._false
-
-(* Now we define a function to check that the Sudoku constraints are
-   satisfied: that no row, column, or heavy-lined square has more than
-   one occurrence of a digit. If more than one digit occurs then we color
-   all occurrences red. The only ocamljs-specific parts here are getting
-   the cell contents (with _get_value) and setting the background color
-   style. However, it's worth noticing the algorithm: we imperatively
-   clear the error states for all cells, then set error states as we
-   check each constraint. I'll revisit this in a later post about
-   functional reactive programming.
-*)
+(* Solver *)
 
 open Why3extract
 
@@ -204,11 +107,13 @@ let solve_board rows _ =
   done;
   begin
     try
-      let a = Sudoku__Solver.solve sudoku input_grid in
+      let a = Sudoku__Solver.check_then_solve sudoku input_grid in
       display_sol rows a
     with Sudoku__Solver.NoSolution -> no_sol rows
   end;
   Js._false
+
+(* reset board to empty cells *)
 
 let reset_board rows _ =
   for i=0 to 8 do
@@ -220,33 +125,74 @@ let reset_board rows _ =
   done;
   Js._false
 
+(* load examples *)
+
+let load_board rows test _ =
+  for i=0 to 8 do
+    for j=0 to 8 do
+      let cell = rows.(i).(j) in
+      let v = test.(9*i+j) in
+      let v = if v = 0 then "" else string_of_int v in
+      cell##value <- Js.string v;
+      cell##style##backgroundColor <- Js.string "#ffffff";
+    done
+  done;
+  Js._false
+
+let test1 =
+[| 2;0;9;0;0;0;0;1;0;
+   0;0;0;0;6;0;0;0;0;
+   0;5;3;8;0;2;7;0;0;
+   3;0;0;0;0;0;0;0;0;
+   0;0;0;0;7;5;0;0;3;
+   0;4;1;2;0;8;9;0;0;
+   0;0;4;0;9;0;0;2;0;
+   8;0;0;0;0;1;0;0;5;
+   0;0;0;0;0;0;0;7;6 |]
+
+let test2 =
+[| 7;0;0;0;0;0;0;0;8;
+   0;9;0;7;0;6;0;3;0;
+   0;0;1;0;0;0;9;0;0;
+   0;7;0;1;0;4;0;5;0;
+   0;0;0;0;6;0;0;0;0;
+   0;5;0;3;0;7;0;1;0;
+   0;0;2;0;0;0;1;0;0;
+   0;1;0;9;0;8;0;7;0;
+   8;0;0;0;0;0;0;0;6 |]
+
+let test3 =
+[| 0;0;0;0;0;0;0;0;0;
+   0;0;0;0;0;3;0;8;5;
+   0;0;1;0;2;0;0;0;0;
+   0;0;0;5;0;7;0;0;0;
+   0;0;4;0;0;0;1;0;0;
+   0;9;0;0;0;0;0;0;0;
+   5;0;0;0;0;0;0;7;3;
+   0;0;2;0;1;0;0;0;0;
+   0;0;0;0;4;0;0;0;9 |]
 
 let onload (_event : #Dom_html.event Js.t) : bool Js.t =
   let (rows, table) = make_board () in
-  let check = Js.Opt.get (d##getElementById (Js.string "check"))
-    (fun () -> assert false) in
-  check##onclick <- Dom_html.handler (check_board rows);
   let solve = Js.Opt.get (d##getElementById (Js.string "solve"))
     (fun () -> assert false) in
   solve##onclick <- Dom_html.handler (solve_board rows);
   let reset = Js.Opt.get (d##getElementById (Js.string "reset"))
     (fun () -> assert false) in
   reset##onclick <- Dom_html.handler (reset_board rows);
+  let sample1 = Js.Opt.get (d##getElementById (Js.string "sample1"))
+    (fun () -> assert false) in
+  sample1##onclick <- Dom_html.handler (load_board rows test1);
+  let sample2 = Js.Opt.get (d##getElementById (Js.string "sample2"))
+    (fun () -> assert false) in
+  sample2##onclick <- Dom_html.handler (load_board rows test2);
+  let sample3= Js.Opt.get (d##getElementById (Js.string "sample3"))
+    (fun () -> assert false) in
+  sample3##onclick <- Dom_html.handler (load_board rows test3);
   let board = Js.Opt.get (d##getElementById (Js.string "board"))
     (fun () -> assert false) in
   Dom.appendChild board table;
-  (* board##style##backgroundColor <- Js.string "#00ff00"; *)
   board##style##padding <- Js.string "40px";
-  (* board##style##paddingLeft <- Js.string "40px"; *)
-  (* board##style##paddingRight <- Js.string "40px"; *)
-  (* board##style##paddingBottom <- Js.string "40px"; *)
-  (* board##style##paddingTop <- Js.string "40px"; *)
   Js._false
 
 let _ = Dom_html.window##onload <- Dom_html.handler onload
-
-(* Finally we put the pieces together: make the board, insert it into
-   the DOM, call check_board when the Check button is clicked, and call
-   this setup code once the document has been loaded. See the full source
-   for build files.
-*)

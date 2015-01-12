@@ -477,6 +477,22 @@ this is true but with 2 different possible reasons:
     with SolutionFound -> g
     end
 
+  let check_then_solve (s:sudoku_chunks) (g : array int)
+    requires { well_formed_sudoku s }
+    requires { g.length = 81 }
+    requires { valid_values g.elts }
+    writes   { g }
+    ensures  { result = g }
+    ensures  { is_solution_for s g.elts (old g).elts }
+    raises   { NoSolution ->
+      forall h : grid. included g.elts h /\ full h -> not (valid s h)  }
+  =
+    if check_valid s g then
+    try solve_aux s g 0;
+        raise NoSolution
+    with SolutionFound -> g
+    end
+    else raise NoSolution
 
 end
 
