@@ -68,10 +68,8 @@ let print_tv fmt tv =
 
 (* logic variables always start with a lower case letter *)
 let print_vs fmt vs =
-  let id = vs.vs_name in
   let sanitizer = String.uncapitalize in
-  fprintf fmt "%s" (id_unique iprinter ~sanitizer id);
-  print_id_labels fmt id
+  pp_print_string fmt (id_unique iprinter ~sanitizer vs.vs_name)
 
 let forget_var vs = forget_id iprinter vs.vs_name
 
@@ -162,10 +160,10 @@ let rec print_pat_node pri fmt p = match p.pat_node with
   | Pwild ->
       fprintf fmt "_"
   | Pvar v ->
-      print_vs fmt v
+      print_vs fmt v; print_id_labels fmt v.vs_name
   | Pas (p, v) ->
-      fprintf fmt (protect_on (pri > 1) "%a as %a")
-        (print_pat_node 1) p print_vs v
+      fprintf fmt (protect_on (pri > 1) "%a as %a%a")
+        (print_pat_node 1) p print_vs v print_id_labels v.vs_name
   | Por (p, q) ->
       fprintf fmt (protect_on (pri > 0) "%a | %a")
         (print_pat_node 0) p (print_pat_node 0) q
@@ -181,7 +179,8 @@ let rec print_pat_node pri fmt p = match p.pat_node with
 let print_pat = print_pat_node 0
 
 let print_vsty fmt v =
-  fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
+  fprintf fmt "%a%a:@,%a" print_vs v
+    print_id_labels v.vs_name print_ty v.vs_ty
 
 let print_quant fmt = function
   | Tforall -> fprintf fmt "forall"
@@ -256,8 +255,8 @@ and print_tnode pri fmt t = match t.t_node with
         print_term f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
-        print_vs v (print_lterm 4) t1 print_term t2;
+      fprintf fmt (protect_on (pri > 0) "let %a%a = @[%a@] in@ %a")
+        print_vs v print_id_labels v.vs_name (print_lterm 4) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
       fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
