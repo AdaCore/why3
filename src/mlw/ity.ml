@@ -673,6 +673,7 @@ let eff_reset e r = { e with eff_resets = Mreg.add r Sreg.empty e.eff_resets }
 let eff_diverge e = { e with eff_diverg = true }
 
 exception AssignPrivate of region
+exception DuplicateField of region * pvsymbol
 
 (* freeze type variables and regions outside modified fields *)
 let freeze_of_writes wr =
@@ -697,7 +698,7 @@ let eff_assign e asl =
     if not (List.memq f r.reg_its.its_mfields) then
       invalid_arg "Ity.eff_assign";
     let seen = Mreg.change (fun fs -> Some (match fs with
-      | Some fs -> Mpv.add_new (Invalid_argument "Ity.eff_assign") f ity fs
+      | Some fs -> Mpv.add_new (DuplicateField (r,f)) f ity fs
       | None    -> Mpv.singleton f ity)) r seen in
     seen, eff_write e r (Spv.singleton f)) (Mreg.empty, e) asl in
   (* type variables and regions outside modified fields are frozen *)
@@ -972,7 +973,7 @@ open Format
 open Pretty
 
 let rprinter = create_ident_printer []
-  ~sanitizer:(sanitizer char_to_lalpha char_to_alnumus)
+  ~sanitizer:(sanitizer char_to_alpha char_to_alnumus)
 
 let xprinter = create_ident_printer []
   ~sanitizer:(sanitizer char_to_ualpha char_to_alnumus)
@@ -1044,15 +1045,14 @@ let print_ity_full fmt ity = print_ity_node isb_empty 0 fmt ity
 
 let print_pv fmt v = print_vs fmt v.pv_vs
 
-let print_ghost fmt gh = if gh then fprintf fmt "ghost@ "
-
-let print_pvty fmt v = fprintf fmt "@[(%a%a:@,%a)@]"
-  print_ghost v.pv_ghost print_pv v print_ity v.pv_ity
+let print_pvty fmt v = fprintf fmt "@[(%s%a%a:@,%a)@]"
+  (if v.pv_ghost then "ghost " else "")
+  print_pv v print_id_labels v.pv_vs.vs_name
+  print_ity v.pv_ity
 
 let forget_pv v = forget_var v.pv_vs
 
-let print_xs fmt xs = fprintf fmt "%s%a"
-  (id_unique xprinter xs.xs_name) print_id_labels xs.xs_name
+let print_xs fmt xs = pp_print_string fmt (id_unique xprinter xs.xs_name)
 
 exception FoundPrefix of pvsymbol list
 
@@ -1060,7 +1060,8 @@ let unknown = create_pvsymbol (id_fresh "?") ity_unit
 
 let print_cty_spec fmt c =
   let dot fmt () = pp_print_char fmt '.' in
-  let print_pfx = Pp.print_list dot print_pv in
+  let print_pfx reg fmt pfx = fprintf fmt "@[%a:@,%a@]"
+    (Pp.print_list dot print_pv) pfx print_reg reg in
   let rec find_prefix pfx reg ity = match ity.ity_node with
     | Ityreg r when reg_equal reg r -> raise (FoundPrefix pfx)
     | Ityreg r when reg_r_occurs reg r ->
@@ -1081,41 +1082,40 @@ let print_cty_spec fmt c =
   let print_writes fmt c = if not (Mreg.is_empty c.cty_effect.eff_writes) then
     let print_wr fmt (reg,fds) =
       let pfx = find_prefix reg in
-      let print_fld fmt fd =
-        fprintf fmt "%a.%a" print_pfx pfx print_pv fd in
-      if Spv.is_empty fds then print_pfx fmt pfx else
+      let print_fld fmt {pv_vs = {vs_name = id}} =
+        fprintf fmt "(%a).%s" (print_pfx reg) pfx id.id_string in
+      if Spv.is_empty fds then print_pfx reg fmt pfx else
         Pp.print_list Pp.comma print_fld fmt (Spv.elements fds) in
     fprintf fmt "@\nwrites {%a}" (Pp.print_list Pp.comma print_wr)
       (Mreg.bindings c.cty_effect.eff_writes) in
   let print_resets fmt c = if not (Mreg.is_empty c.cty_effect.eff_resets) then
     let print_rs fmt (reg,cvr) =
-      let pfx = find_prefix reg in
-      if Sreg.is_empty cvr then print_pfx fmt pfx else
-        fprintf fmt "%a@ (under %a)" print_pfx pfx
-          (Pp.print_list Pp.comma print_pfx)
-            (List.map find_prefix (Sreg.elements cvr)) in
+      let print_cvr fmt reg = print_pfx reg fmt (find_prefix reg) in
+      if Sreg.is_empty cvr then print_pfx reg fmt (find_prefix reg) else
+        fprintf fmt "%a@ (under %a)" (print_pfx reg) (find_prefix reg)
+          (Pp.print_list Pp.comma print_cvr) (Sreg.elements cvr) in
     fprintf fmt "@\nresets {%a}" (Pp.print_list Pp.comma print_rs)
       (Mreg.bindings c.cty_effect.eff_resets) in
   let print_pre fmt p =
-    fprintf fmt "@\nrequires { @[%a@] }" Pretty.print_term p in
+    fprintf fmt "@\nrequires { @[%a@] }" print_term p in
   let print_post fmt q =
     let v, q = open_post q in
-    fprintf str_formatter "%a" Pretty.print_vs v;
+    fprintf str_formatter "%a" print_vs v;
     let n = flush_str_formatter () in
     begin if n = "result" || t_v_occurs v q = 0 then
-      fprintf fmt "@\nensures  { @[%a@] }" Pretty.print_term q else
-      fprintf fmt "@\nreturns  { %s ->@ @[%a@] }" n Pretty.print_term q
+      fprintf fmt "@\nensures  { @[%a@] }" print_term q else
+      fprintf fmt "@\nreturns  { %s ->@ @[%a@] }" n print_term q
     end;
-    Pretty.forget_var v in
+    forget_var v in
   let print_xpost xs fmt q =
     let v, q = open_post q in
     begin if ty_equal v.vs_ty ty_unit && t_v_occurs v q = 0 then
       fprintf fmt "@\nraises   { %a ->@ @[%a@] }"
-        print_xs xs Pretty.print_term q else
+        print_xs xs print_term q else
       fprintf fmt "@\nraises   { %a %a ->@ @[%a@] }"
-        print_xs xs Pretty.print_vs v Pretty.print_term q
+        print_xs xs print_vs v print_term q
     end;
-    Pretty.forget_var v in
+    forget_var v in
   let print_xpost fmt (xs,ql) =
     Pp.print_list Pp.nothing (print_xpost xs) fmt ql in
   fprintf fmt "%a%a%a%a%a%a" print_reads (Spv.elements c.cty_reads)
@@ -1135,6 +1135,9 @@ let print_cty_head fmt c = fprintf fmt "%a%a"
 (** exception handling *)
 
 let () = Exn_printer.register (fun fmt e -> match e with
+  | NonUpdatable (s,ity) ->
+      fprintf fmt "Type symbol %a cannot take mutable type %a \
+        as an argument in this position" print_its s print_ity ity
   | BadItyArity ({its_ts = {ts_args = []}} as s, _) ->
       fprintf fmt "Type symbol %a expects no arguments" print_its s
   | BadItyArity (s, app_arg) ->
@@ -1158,6 +1161,11 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | TypeMismatch (t1,t2,s) ->
       fprintf fmt "Type mismatch between %a and %a"
         (print_ity_node s 0) t1 print_ity t2
+  | AssignPrivate _r ->
+      fprintf fmt "This assignment modifies a value of a private type"
+  | DuplicateField (_r, v) ->
+      fprintf fmt "In this assignment, the field %s is modified twice"
+        v.pv_vs.vs_name.id_string
   | IllegalAlias _reg ->
       fprintf fmt "This application creates an illegal alias"
   | _ -> raise e)

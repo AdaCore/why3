@@ -509,7 +509,10 @@ let e_assign_raw al =
     r.pv_ghost || f.ps_ghost || v.pv_ghost) al in
   let conv (r,f,v) = match r.pv_ity.ity_node, f.ps_mfield with
     | Ityreg r, Some f -> r, f, v.pv_ity
-    | _ -> invalid_arg "Expr.e_assign" in
+    | Ityreg {reg_its = s}, None -> Loc.errorm
+        "Type constructor %a has no mutable fields named %s"
+        Ity.print_its s f.ps_name.id_string
+    | _ -> Loc.errorm "Mutable expression expected" in
   let eff = eff_assign eff_empty (List.map conv al) in
   mk_expr (Eassign al) (VtyI ity_unit) ghost eff
 
@@ -895,3 +898,272 @@ let e_func_app fn e =
   e_app (e_sym ps_func_app) [fn;e] [] (ity_full_inst isb c.cty_result)
 
 let e_func_app_l fn el = List.fold_left e_func_app fn el
+
+(* pretty-pringting *)
+
+open Format
+open Pretty
+
+let sprinter = create_ident_printer []
+  ~sanitizer:(sanitizer char_to_alpha char_to_alnumus)
+
+let id_of_ps s = match s.ps_logic with
+  | PLnone | PLlemma -> s.ps_name
+  | PLpv v -> v.pv_vs.vs_name
+  | PLls s -> s.ls_name
+
+let forget_ps s = match s.ps_logic with
+  | PLnone | PLlemma -> forget_id sprinter s.ps_name
+  | PLpv v -> forget_pv v
+  | PLls _ -> () (* we don't forget top-level symbols *)
+
+let extract_op s =
+  let s = s.ps_name.id_string in
+  let len = String.length s in
+  if len < 7 then None else
+  let inf = String.sub s 0 6 in
+  if inf = "infix "  then Some (String.sub s 6 (len - 6)) else
+  let prf = String.sub s 0 7 in
+  if prf = "prefix " then Some (String.sub s 7 (len - 7)) else
+  None
+
+let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
+
+let print_ps fmt s =
+  if s.ps_name.id_string = "mixfix []" then pp_print_string fmt "([])" else
+  if s.ps_name.id_string = "mixfix []<-" then pp_print_string fmt "([]<-)" else
+  if s.ps_name.id_string = "mixfix [<-]" then pp_print_string fmt "([<-])" else
+  match extract_op s, s.ps_logic with
+  | Some s, _ ->
+      let s = Str.replace_first (Str.regexp "^\\*.") " \\0" s in
+      let s = Str.replace_first (Str.regexp ".\\*$") "\\0 " s in
+      fprintf fmt "(%s)" s
+  | _, PLnone | _, PLlemma ->
+      pp_print_string fmt (id_unique sprinter s.ps_name)
+  | _, PLpv v -> print_pv fmt v
+  | _, PLls s -> print_ls fmt s
+
+let print_ps_head fmt s = fprintf fmt "%s%s%a%a"
+  (if s.ps_ghost then "ghost " else "")
+  (match s.ps_logic with
+    | PLnone -> ""
+    | PLpv _ -> "function "
+    | PLls {ls_value = None} -> "predicate "
+    | PLls _ -> "function "
+    | PLlemma -> "lemma ")
+  print_ps s print_id_labels (id_of_ps s)
+
+let print_invariant fmt f =
+  fprintf fmt "@\ninvariant@ { %a }" print_term f
+
+let print_variant fmt varl =
+  let print_rel fmt = function
+    | Some s -> fprintf fmt "@ with %a" print_ls s
+    | None -> () in
+  let print_var fmt (t, ps) =
+    fprintf fmt " %a%a" Pretty.print_term t print_rel ps in
+  if varl <> [] then fprintf fmt "@\nvariant@   {%a }@ "
+    (Pp.print_list Pp.comma print_var) varl
+
+(* expressions *)
+
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
+let print_list_next sep print fmt = function
+  | [] -> ()
+  | [x] -> print true fmt x
+  | x :: r -> print true fmt x; sep fmt ();
+      Pp.print_list sep (print false) fmt r
+
+let debug_print_labels = Debug.register_info_flag "print_labels"
+  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+
+let debug_print_locs = Debug.register_info_flag "print_locs"
+  ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
+
+let ambig_cty c =
+  let sarg = List.fold_left (fun s v ->
+    ity_freeze s v.pv_ity) isb_empty c.cty_args in
+  let sres = ity_freeze isb_empty c.cty_result in
+  not (Mtv.set_submap sres.isb_tv sarg.isb_tv)
+
+let rec print_expr fmt e = print_lexpr 0 fmt e
+
+and print_lexpr pri fmt e =
+  let print_elab pri fmt e =
+    if Debug.test_flag debug_print_labels && not (Slab.is_empty e.e_label)
+    then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
+      (Pp.print_iter1 Slab.iter Pp.space print_label) e.e_label
+      (print_enode 0) e
+    else print_enode pri fmt e in
+  let print_eloc pri fmt e =
+    if Debug.test_flag debug_print_locs && e.e_loc <> None
+    then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
+      (Pp.print_option print_loc) e.e_loc (print_elab 0) e
+    else print_elab pri fmt e in
+  print_eloc pri fmt e
+
+and print_app pri s fmt vl = match extract_op s, vl with
+  | _, [] -> print_ps fmt s
+  | Some s, [t1] when tight_op s ->
+      fprintf fmt (protect_on (pri > 7) "%s%a") s print_pv t1
+  | Some s, [t1] ->
+      fprintf fmt (protect_on (pri > 4) "%s %a") s print_pv t1
+  | Some s, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
+        print_pv t1 s print_pv t2
+  | _, [t1;t2] when s.ps_name.id_string = "mixfix []" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a]") print_pv t1 print_pv t2
+  | _, [t1;t2;t3] when s.ps_name.id_string = "mixfix [<-]" ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
+        print_pv t1 print_pv t2 print_pv t3
+  | _, [t1;t2;t3] when s.ps_name.id_string = "mixfix []<-" ->
+      fprintf fmt (protect_on (pri > 0) "%a[%a] <- %a")
+        print_pv t1 print_pv t2 print_pv t3
+  | _, tl ->
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
+        print_ps s (Pp.print_list Pp.space print_pv) tl
+
+and print_enode pri fmt e = match e.e_node with
+  | Evar v -> print_pv fmt v
+  | Esym s -> print_ps fmt s
+  | Efun e1 ->
+      let c = cty_of_expr e in
+      if c.cty_args = [] then
+        fprintf fmt "@[<hov 2>abstract%a@\n%a@]@\nend"
+          print_cty_head c print_expr e1
+      else
+        fprintf fmt "@[<hov 2>fun %a ->@\n%a@]"
+          print_cty_head c print_expr e1
+  | Eany ->
+      fprintf fmt "@[<hov 2>any %a@]" print_cty (cty_of_expr e)
+  | Eapp (e,[],_) -> print_lexpr pri fmt e
+  | Eapp ({e_node = Esym s},vl,_) when is_ps_tuple s ->
+      fprintf fmt "(%a)" (Pp.print_list Pp.comma print_pv) vl
+  | Eapp ({e_node = Esym s},[l;r],_) when ps_equal s ps_func_app ->
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a %a@]")
+        print_pv l print_pv r
+  | Eapp ({e_node = Esym s},vl,{cty_args = []; cty_result = ity})
+    when ambig_cty s.ps_cty ->
+      fprintf fmt (protect_on (pri > 0) "%a:%a")
+        (print_app 5 s) vl print_ity ity
+  | Eapp ({e_node = Esym s},vl,_) ->
+      print_app pri s fmt vl
+  | Eapp ({e_vty = VtyC c} as e,vl,{cty_args = []; cty_result = ity})
+    when ambig_cty c ->
+      fprintf fmt (protect_on (pri > 0) "@[<hov 1>%a@ %a: %a@]")
+        (print_lexpr 5) e (Pp.print_list Pp.space print_pv) vl
+        print_ity ity
+  | Eapp (e,vl,_) ->
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
+        (print_lexpr 5) e (Pp.print_list Pp.space print_pv) vl
+  | Econst c -> print_const fmt c
+  | Etrue -> pp_print_string fmt "true"
+  | Efalse -> pp_print_string fmt "false"
+  | Enot e -> fprintf fmt (protect_on (pri > 4) "not %a") (print_lexpr 4) e
+  | Elazy (op,e1,e2) ->
+      let p,op = match op with Eand -> 3, "&&" | Eor -> 2, "||" in
+      fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %s@ %a@]")
+        (print_lexpr (p + 1)) e1 op (print_lexpr p) e2
+  | Elet ({let_sym = ValV v; let_expr = e1}, e2)
+    when v.pv_vs.vs_name.id_string = "_" &&
+         (e1.e_ghost || not v.pv_ghost) &&
+         ity_equal v.pv_ity ity_unit ->
+      fprintf fmt (protect_on (pri > 0) "%a;@\n%a")
+        print_expr e1 print_expr e2
+  | Elet (ldf, e) ->
+      fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
+        print_let_defn ldf print_expr e;
+      begin match ldf.let_sym with
+        | ValV v -> forget_pv v
+        | ValS s -> forget_ps s end
+  | Erec (rdf, e) ->
+      fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
+        print_rec_defn rdf print_expr e;
+      List.iter (fun fd -> forget_ps fd.fun_sym) rdf.rec_defn
+  | Eif (e0,e1,e2) ->
+      fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
+        print_expr e0 print_expr e1 print_expr e2
+  | Eassign al ->
+      let print_left fmt (r,f,_) =
+        fprintf fmt "%a.%a" print_pvty r print_ps f in
+      let print_right fmt (_,_,v) = print_pv fmt v in
+      fprintf fmt (protect_on (pri > 0) "%a <- %a")
+        (Pp.print_list Pp.comma print_left) al
+        (Pp.print_list Pp.comma print_right) al
+  | Ecase (e0,bl) ->
+      fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
+        print_expr e0 (Pp.print_list Pp.newline print_branch) bl
+  | Ewhile (d,inv,varl,e) ->
+      fprintf fmt "@[<hov 2]while %a do%a%a@\n%a@]@\ndone"
+        print_expr d print_invariant inv print_variant varl print_expr e
+  | Efor (pv,(pvfrom,dir,pvto),inv,e) ->
+      fprintf fmt "@[<hov 2>for %a =@ %a@ %s@ %a@ %ado@\n%a@]@\ndone"
+        print_pv pv print_pv pvfrom
+        (if dir = To then "to" else "downto") print_pv pvto
+        print_invariant inv print_expr e
+  | Eraise (xs,e) ->
+      fprintf fmt "raise (%a %a)" print_xs xs print_expr e
+  | Etry (e,bl) ->
+      fprintf fmt "try %a with@\n@[<hov>%a@]@\nend"
+        print_expr e (Pp.print_list Pp.newline print_xbranch) bl
+  | Eabsurd ->
+      fprintf fmt "absurd"
+  | Eassert (Assert,f) ->
+      fprintf fmt "assert { %a }" print_term f
+  | Eassert (Assume,f) ->
+      fprintf fmt "assume { %a }" print_term f
+  | Eassert (Check,f) ->
+      fprintf fmt "check { %a }" print_term f
+  | Epure t ->
+      fprintf fmt "pure { %a }" print_term t
+  | Eghost e ->
+      fprintf fmt "ghost@ %a" print_expr e
+
+and print_branch fmt ({pp_pat = p},e) =
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e;
+  Svs.iter forget_var p.pat_vars
+
+and print_xbranch fmt (xs,v,e) =
+  fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" print_xs xs print_pv v print_expr e;
+  forget_pv v
+
+and print_let_defn fmt = function
+  | {let_sym = ValV v; let_expr = e} ->
+      fprintf fmt "@[<hov 2>let %s%a%a =@ %a@]"
+        (if v.pv_ghost then "ghost " else "")
+        print_pv v print_id_labels v.pv_vs.vs_name
+        (print_lexpr 0 (*4*)) e
+  | {let_sym = ValS s; let_expr = {e_node = Efun e} as e0} ->
+      fprintf fmt "@[<hov 2>let %a@ %a =@\n%a@]"
+        print_ps_head s
+        print_cty (cty_of_expr e0)
+        (print_lexpr 0 (*4*)) e
+  | {let_sym = ValS s; let_expr = e} ->
+      fprintf fmt "@[<hov 2>let %a =@\n%a@]"
+        print_ps_head s
+        (print_lexpr 0 (*4*)) e
+
+and print_rec_defn fmt {rec_defn = fdl} =
+  print_list_next Pp.newline print_rec_fun fmt fdl
+
+and print_rec_fun fst fmt fd =
+  let e = match fd.fun_expr.e_node with
+    | Efun e -> e | _ -> assert false in
+  fprintf fmt "@[<hov 2>%s %a@ %a%a =@\n%a@]"
+    (if fst then "let rec" else "with")
+    print_ps_head fd.fun_sym
+    print_cty (cty_of_expr fd.fun_expr)
+    print_variant fd.fun_varl
+    (print_lexpr 0 (*4*)) e
+
+(* exception handling *)
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  | ConstructorExpected s ->
+      fprintf fmt "Function %a is not a constructor" print_ps s
+  | ItyExpected _e ->
+      fprintf fmt "This expression is not a first-order value"
+  | CtyExpected _e ->
+      fprintf fmt "This expression is not a function and cannot be applied"
+  | _ -> raise e)

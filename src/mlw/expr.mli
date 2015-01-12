@@ -252,3 +252,15 @@ val is_ps_tuple : psymbol -> bool
 val ps_func_app : psymbol
 val e_func_app : expr -> expr -> expr
 val e_func_app_l : expr -> expr list -> expr
+
+(** {2 Pretty-printing} *)
+
+open Format
+
+val forget_ps  : psymbol -> unit (* flush id_unique for a program symbol *)
+
+val print_ps   : formatter -> psymbol -> unit     (* program symbol *)
+val print_expr : formatter -> expr -> unit        (* expression *)
+
+val print_let_defn : formatter -> let_defn -> unit
+val print_rec_defn : formatter -> rec_defn -> unit
