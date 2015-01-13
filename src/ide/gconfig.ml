@@ -581,7 +581,7 @@ let show_about_window () =
                 "Makarius Wenzel";
                ]
       ~copyright:"Copyright 2010-2015 Inria, CNRS, Paris-Sud University"
-      ~license:"GNU Lesser General Public License version 2.1"
+      ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
       ~website:"http://why3.lri.fr"
       ~website_label:"http://why3.lri.fr"
       ~version:Config.version

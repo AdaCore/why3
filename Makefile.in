@@ -276,11 +276,12 @@ endif
 	cp -f modules/*.mlw $(DATADIR)/why3/modules
 	cp -f modules/mach/*.mlw $(DATADIR)/why3/modules/mach
 	cp -f drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
+	cp -f LICENSE $(DATADIR)/why3/
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/
 	cp -f share/images/icons.rc $(DATADIR)/why3/images
 	cp -f share/images/*.png $(DATADIR)/why3/images
-	cp -f share/images/boomy/*.png $(DATADIR)/why3/images/boomy
-	cp -f share/images/fatcow/*.png $(DATADIR)/why3/images/fatcow
+	cp -f share/images/boomy/* $(DATADIR)/why3/images/boomy
+	cp -f share/images/fatcow/* $(DATADIR)/why3/images/fatcow
 	cp -f share/why3session.dtd $(DATADIR)/why3
 	cp -f share/Makefile.config $(DATADIR)/why3
 	cp -rf share/javascript $(DATADIR)/why3/javascript
