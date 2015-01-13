@@ -5,29 +5,29 @@
 <prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="60" memlimit="0"/>
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <file name="../relabel.mlw" expanded="true">
-<theory name="Relabel" expanded="true">
- <goal name="labels_Leaf" sum="2f7e7e2c7410f84a4d97123d25b3d579">
+<theory name="Relabel" sum="fcf96cedcab157cbded9c0eb19fa6e75" expanded="true">
+ <goal name="labels_Leaf">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="labels_Node" sum="708702c754937a184d0d989617a0779d">
+ <goal name="labels_Node">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter fresh" expl="VC for fresh" sum="1f3f0efd7275b92f89f5c86e2aa9c8c2">
+ <goal name="WP_parameter fresh" expl="VC for fresh">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter relabel" expl="VC for relabel" sum="81218386d9e24d1837a74980b30c18c0">
- <transf name="split_goal">
-  <goal name="WP_parameter relabel.1" expl="1. postcondition" sum="c9c1907e08edd04b5199c4fa649aabe9">
+ <goal name="WP_parameter relabel" expl="VC for relabel">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter relabel.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter relabel.2" expl="2. variant decrease" sum="4940681c5fc90fe9a070710994887d47">
+  <goal name="WP_parameter relabel.2" expl="2. variant decrease">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter relabel.3" expl="3. variant decrease" sum="005bf557e87d5c641529392d64687222">
+  <goal name="WP_parameter relabel.3" expl="3. variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter relabel.4" expl="4. postcondition" sum="02c222617003aee160e03f608ee7e457">
-  <proof prover="0"><result status="valid" time="18.39"/></proof>
+  <goal name="WP_parameter relabel.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="21.95"/></proof>
   </goal>
  </transf>
  </goal>

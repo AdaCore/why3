@@ -69,20 +69,23 @@ let check_opaque opaque args value =
   let s = List.fold_left diff (Opt.fold diff opaque value) args in
   if Stv.is_empty s then opaque else invalid_arg "Term.create_lsymbol"
 
+let check_constr constr _args value =
+  if constr = 0 || (constr > 0 && value <> None)
+  then constr else invalid_arg "Term.create_lsymbol"
+
 let create_lsymbol ?(opaque=Stv.empty) ?(constr=0) name args value = {
   ls_name   = id_register name;
   ls_args   = args;
   ls_value  = value;
   ls_opaque = check_opaque opaque args value;
-  ls_constr = if constr = 0 || (constr > 0 && value <> None)
-              then constr else invalid_arg "Term.create_lsymbol";
+  ls_constr = check_constr constr args value;
 }
 
 let create_fsymbol ?opaque ?constr nm al vl =
   create_lsymbol ?opaque ?constr nm al (Some vl)
 
-let create_psymbol ?opaque ?constr nm al =
-  create_lsymbol ?opaque ?constr nm al None
+let create_psymbol ?opaque nm al =
+  create_lsymbol ?opaque ~constr:0 nm al None
 
 let ls_ty_freevars ls =
   let acc = oty_freevars Stv.empty ls.ls_value in
@@ -150,11 +153,8 @@ let pat_fold fn acc pat = match pat.pat_node with
   | Pas (p, _) -> fn acc p
   | Por (p, q) -> fn (fn acc p) q
 
-let pat_all pr pat =
-  try pat_fold (Util.all_fn pr) true pat with Util.FoldSkip -> false
-
-let pat_any pr pat =
-  try pat_fold (Util.any_fn pr) false pat with Util.FoldSkip -> true
+let pat_all pr pat = Util.all pat_fold pr pat
+let pat_any pr pat = Util.any pat_fold pr pat
 
 (* smart constructors for patterns *)
 
@@ -720,7 +720,7 @@ and bv_subst_unsafe m b =
   (* apply m to the terms in b.bv_subst *)
   let h = Mvs.map (t_subst_unsafe m) b.bv_subst in
   (* join m to b.bv_subst *)
-  let h = Mvs.union (fun _ _ t -> Some t) m h in
+  let h = Mvs.set_union h m in
   (* reconstruct b *)
   { bv_vars = s ; bv_subst = h }
 
@@ -770,7 +770,7 @@ let t_open_branch (p,b,t) =
 let t_open_quant (vl,b,tl,f) =
   let m,vl = vl_rename b.bv_subst vl in
   let tl = tr_map (t_subst_unsafe m) tl in
-  (vl, tl, t_subst_unsafe m f)
+  vl, tl, t_subst_unsafe m f
 
 (** open bindings with optimized closing callbacks *)
 
@@ -1052,13 +1052,8 @@ let rec t_gen_fold fnT fnL acc t =
 
 let t_s_fold = t_gen_fold
 
-let t_s_all prT prL t =
-  try t_s_fold (Util.all_fn prT) (Util.all_fn prL) true t
-  with Util.FoldSkip -> false
-
-let t_s_any prT prL t =
-  try t_s_fold (Util.any_fn prT) (Util.any_fn prL) false t
-  with Util.FoldSkip -> true
+let t_s_all prT prL t = Util.alld t_s_fold prT prL t
+let t_s_any prT prL t = Util.anyd t_s_fold prT prL t
 
 (* map/fold over types in terms and formulas *)
 
@@ -1135,8 +1130,8 @@ let t_fold fn acc t = match t.t_node with
       let _, tl, f1 = t_open_quant b in tr_fold fn (fn acc f1) tl
   | _ -> t_fold_unsafe fn acc t
 
-let t_all pr t = try t_fold (Util.all_fn pr) true t with Util.FoldSkip -> false
-let t_any pr t = try t_fold (Util.any_fn pr) false t with Util.FoldSkip -> true
+let t_all pr t = Util.all t_fold pr t
+let t_any pr t = Util.any t_fold pr t
 
 (* safe opening map_fold *)
 
@@ -1274,13 +1269,10 @@ let rec t_v_fold fn acc t = match t.t_node with
   | Tquant (_,(_,b,_,_)) -> bnd_v_fold fn acc b
   | _ -> t_fold_unsafe (t_v_fold fn) acc t
 
-let t_v_all pr t =
-  try t_v_fold (Util.all_fn pr) true t with Util.FoldSkip -> false
+let t_v_all pr t = Util.all t_v_fold pr t
+let t_v_any pr t = Util.any t_v_fold pr t
 
-let t_v_any pr t =
-  try t_v_fold (Util.any_fn pr) false t with Util.FoldSkip -> true
-
-let t_closed t = t_v_all (fun _ -> false) t
+let t_closed t = t_v_all Util.ffalse t
 
 let bnd_v_count fn acc b = Mvs.fold (fun v n acc -> fn acc v n) b.bv_vars acc
 
@@ -1320,6 +1312,108 @@ let rec t_replace t1 t2 t =
 let t_replace t1 t2 t =
   t_ty_check t2 t1.t_ty;
   t_replace t1 t2 t
+
+(* lambdas *)
+
+let t_lambda vl trl t =
+  let ty = Opt.get_def ty_bool t.t_ty in
+  let add_ty v ty = ty_func v.vs_ty ty in
+  let ty = List.fold_right add_ty vl ty in
+  let fc = create_vsymbol (id_fresh "fc") ty in
+  let copy_loc e = if t.t_loc = None then e
+    else t_label ?loc:t.t_loc e.t_label e in
+  let mk_t_var v = if v.vs_name.id_loc = None then t_var v
+    else t_label ?loc:v.vs_name.id_loc Slab.empty (t_var v) in
+  let add_arg h v = copy_loc (t_func_app h (mk_t_var v)) in
+  let h = List.fold_left add_arg (mk_t_var fc) vl in
+  let f = match t.t_ty with
+    | Some _ -> t_equ h t
+    | None   -> t_iff (copy_loc (t_equ h t_bool_true)) t in
+  t_eps_close fc (copy_loc (t_forall_close vl trl (copy_loc f)))
+
+let t_lambda vl trl t =
+  let t = match t.t_node with
+    | Tapp (ps,[l;{t_node = Tapp (fs,[])}])
+      when ls_equal ps ps_equ && ls_equal fs fs_bool_true ->
+        t_label_copy t l
+    | _ -> t in
+  if vl <> [] then t_lambda vl trl t
+  else if t.t_ty <> None then t
+  else t_if t t_bool_true t_bool_false
+
+let t_open_lambda t = match t.t_ty, t.t_node with
+  | Some {ty_node = Tyapp (ts,_)}, Teps fb when ts_equal ts ts_func ->
+      let fc,f = t_open_bound fb in
+      let vl,trl,f = match f.t_node with
+        | Tquant (Tforall,fq) -> t_open_quant fq
+        | _ -> [], [], t (* fail the next check *) in
+      let h,e = match f.t_node with
+        | Tapp (ps,[h;e]) when ls_equal ps ps_equ -> h, e
+        | Tbinop (Tiff,{t_node = Tapp (ps,[h;{t_node = Tapp (fs,[])}])},e)
+          when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> h, e
+        | _ -> t, t (* fail the next check *) in
+      let rec check h xl = match h.t_node, xl with
+        | Tapp (fs,[h;{t_node = Tvar u}]), x::xl
+          when ls_equal fs fs_func_app && vs_equal u x -> check h xl
+        | Tvar u, [] when vs_equal u fc && t_v_occurs u e = 0 -> vl, trl, e
+        | _ -> [], [], t in
+      check h (List.rev vl)
+  | _ -> [], [], t
+
+(* it is rather tricky to check if a term is a lambda without properly
+   opening the binders. The deferred substitution in the quantifier
+   may obscure the closure variable or, on the contrary, introduce it
+   on the RHS of the definition, making it recursive. We cannot simply
+   reject such deferred substitutions, because the closure variable is
+   allowed in the triggers and it can appear there via the deferred
+   substitution, why not? Therefore, t_is_lambda is a mere shim around
+   t_open_lambda. *)
+let t_is_lambda t = let vl,_,_ = t_open_lambda t in vl <> []
+
+let t_open_lambda_cb t =
+  let vl, trl, e = t_open_lambda t in
+  let close vl' trl' e' =
+    if e == e' &&
+      Lists.equal (Lists.equal ((==) : term -> term -> bool)) trl trl' &&
+      Lists.equal vs_equal vl vl'
+    then t else t_lambda vl' trl' e' in
+  vl, trl, e, close
+
+let t_closure ls tyl ty =
+  let mk_v i ty = create_vsymbol (id_fresh ("y" ^ string_of_int i)) ty in
+  let vl = Lists.mapi mk_v tyl in
+  let t = t_app ls (List.map t_var vl) ty in
+  t_lambda vl [] t
+
+let t_app_partial ls tl tyl ty =
+  if tyl = [] then t_app ls tl ty else
+  let tyl = List.fold_right (fun t tyl -> t_type t :: tyl) tl tyl in
+  t_func_app_l (t_closure ls tyl ty) tl
+
+let rec t_app_beta_l lam tl =
+  if tl = [] then lam else
+  let vl, trl, e = t_open_lambda lam in
+  if vl = [] then t_func_app_l lam tl else
+  let rec add m vl tl = match vl, tl with
+    | [], tl ->
+        t_app_beta_l (t_subst_unsafe m e) tl
+    | vl, [] ->
+        let trl = List.map (List.map (t_subst_unsafe m)) trl in
+        t_lambda vl trl (t_subst_unsafe m e)
+    | v::vl, t::tl ->
+        vs_check v t; add (Mvs.add v t m) vl tl in
+  add Mvs.empty vl tl
+
+let t_func_app_beta_l lam tl =
+  let e = t_app_beta_l lam tl in
+  if e.t_ty = None then t_if e t_bool_true t_bool_false else e
+
+let t_pred_app_beta_l lam tl =
+  let e = t_app_beta_l lam tl in
+  if e.t_ty = None then e else t_equ e t_bool_true
+
+let t_func_app_beta lam t = t_func_app_beta_l lam [t]
+let t_pred_app_beta lam t = t_pred_app_beta_l lam [t]
 
 (* constructors with propositional simplification *)
 
@@ -1492,12 +1586,17 @@ let t_equ_simp t1 t2 =
 let t_neq_simp t1 t2 =
   if t_equal t1 t2 && can_simp t1 then t_false else t_neq t1 t2
 
-let t_forall_close_merge vs f =
-  match f.t_node with
+let t_forall_close_merge vs f = match f.t_node with
   | Tquant (Tforall, fq) ->
       let vs', trs, f = t_open_quant fq in
       t_forall_close (vs@vs') trs f
   | _ -> t_forall_close vs [] f
+
+let t_exists_close_merge vs f = match f.t_node with
+  | Tquant (Texists, fq) ->
+      let vs', trs, f = t_open_quant fq in
+      t_exists_close (vs@vs') trs f
+  | _ -> t_exists_close vs [] f
 
 let t_map_simp fn f = t_label_copy f (match f.t_node with
   | Tapp (p, [t1;t2]) when ls_equal p ps_equ ->

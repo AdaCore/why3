@@ -64,7 +64,7 @@ run_dir () {
 }
 
 echo "=== Standard Library ==="
-run_dir ../lib/why3
+run_dir stdlib
 echo ""
 
 echo "=== Tests ==="
@@ -91,6 +91,8 @@ run_dir .
 run_dir foveoos11-cm
 run_dir hoare_logic
 run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
+run_dir avl "-L avl"
+run_dir double_wp "-L double_wp"
 echo ""
 
 echo "Summary       : $success/$total"

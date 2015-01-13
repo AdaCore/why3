@@ -6,85 +6,85 @@
 <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <file name="../same_fringe.mlw" expanded="true">
-<theory name="SameFringe" expanded="true">
- <goal name="WP_parameter enum" expl="VC for enum" sum="20dbae19cea11357877b67d5ea193e7a">
- <transf name="split_goal">
-  <goal name="WP_parameter enum.1" expl="1. postcondition" sum="b1ed11343bba99c81e3b7904494f9ae8">
+<theory name="SameFringe" sum="5639b9f0d6b6861ca4be220af89081dc" expanded="true">
+ <goal name="WP_parameter enum" expl="VC for enum">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter enum.1" expl="1. postcondition">
   <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter enum.2" expl="2. variant decrease" sum="58fcb86cb9b4b672051cae638deedc77">
+  <goal name="WP_parameter enum.2" expl="2. variant decrease">
   <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter enum.3" expl="3. postcondition" sum="56b817e76f3bd615ce2e5e0a4b4b7593">
+  <goal name="WP_parameter enum.3" expl="3. postcondition">
   <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter eq_enum" expl="VC for eq_enum" sum="0d120c03ea08bd01dc3023291ee9c4ba">
- <transf name="split_goal">
-  <goal name="WP_parameter eq_enum.1" expl="1. variant decrease" sum="69995a1e51ce5dd8d434ed69cd31844c">
+ <goal name="WP_parameter eq_enum" expl="VC for eq_enum">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter eq_enum.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.2" expl="2. postcondition" sum="f44d226acf3d45e48881db04af6a7553">
+  <goal name="WP_parameter eq_enum.2" expl="2. postcondition">
   <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.3" expl="3. postcondition" sum="e81e6c48d91062c7beb1a150bdda9817">
+  <goal name="WP_parameter eq_enum.3" expl="3. variant decrease">
   <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.4" expl="4. postcondition" sum="260368267daedf4ecea53ae86bdabd56">
+  <goal name="WP_parameter eq_enum.4" expl="4. postcondition">
   <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.5" expl="5. postcondition" sum="9c57ac9bf363da31fa276699981d3e15">
+  <goal name="WP_parameter eq_enum.5" expl="5. postcondition">
   <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.6" expl="6. postcondition" sum="5e3a8f87f04d3d653fa08b33d1b959bb">
+  <goal name="WP_parameter eq_enum.6" expl="6. postcondition">
   <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter same_fringe" expl="VC for same_fringe" sum="5c542283c1a572514f19bf6e1b8bd9fe">
+ <goal name="WP_parameter same_fringe" expl="VC for same_fringe">
  <proof prover="1" timelimit="10" memlimit="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter test1" expl="VC for test1" sum="df8bd32df13e4993368505fcac8b4225">
+ <goal name="WP_parameter test1" expl="VC for test1">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter test2" expl="VC for test2" sum="df8bd32df13e4993368505fcac8b4225">
+ <goal name="WP_parameter test2" expl="VC for test2">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter test3" expl="VC for test3" sum="df8bd32df13e4993368505fcac8b4225">
+ <goal name="WP_parameter test3" expl="VC for test3">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter leaf" expl="VC for leaf" sum="480dd13cc223bead1df2abd5c8bc4dbe">
+ <goal name="WP_parameter leaf" expl="VC for leaf">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter test4" expl="VC for test4" sum="480dd13cc223bead1df2abd5c8bc4dbe">
+ <goal name="WP_parameter test4" expl="VC for test4">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter test5" expl="VC for test5" sum="480dd13cc223bead1df2abd5c8bc4dbe">
+ <goal name="WP_parameter test5" expl="VC for test5">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter bench" expl="VC for bench" sum="480dd13cc223bead1df2abd5c8bc4dbe">
+ <goal name="WP_parameter bench" expl="VC for bench">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="Test" expanded="true">
- <goal name="WP_parameter test1" expl="VC for test1" sum="400185f0819e56f62a5ba24986426f16">
+<theory name="Test" sum="a12ee5b9e4949fbfec72ed6a265858f5" expanded="true">
+ <goal name="WP_parameter test1" expl="VC for test1">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter test2" expl="VC for test2" sum="400185f0819e56f62a5ba24986426f16">
+ <goal name="WP_parameter test2" expl="VC for test2">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter test3" expl="VC for test3" sum="400185f0819e56f62a5ba24986426f16">
+ <goal name="WP_parameter test3" expl="VC for test3">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter leaf" expl="VC for leaf" sum="cfaf27e07adc8c6933040b5f582d7189">
+ <goal name="WP_parameter leaf" expl="VC for leaf">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter test4" expl="VC for test4" sum="cfaf27e07adc8c6933040b5f582d7189">
+ <goal name="WP_parameter test4" expl="VC for test4">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter test5" expl="VC for test5" sum="cfaf27e07adc8c6933040b5f582d7189">
+ <goal name="WP_parameter test5" expl="VC for test5">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>

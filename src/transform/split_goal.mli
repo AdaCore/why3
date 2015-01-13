@@ -11,37 +11,37 @@
 
 val stop_split : Ident.label
 
-val split_pos_full : Term.term -> Term.term list
+val split_pos_full : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_pos_full f] returns a list [[g1;..;gk]] such that
  [f] is logically equivalent to [g1 /\ .. /\ gk] and the length
  of the resulting list can be exponential wrt the size of [f] *)
 
-val split_neg_full : Term.term -> Term.term list
+val split_neg_full : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_neg_full f] returns a list [[g1;..;gk]] such that
  [f] is logically equivalent to [g1 \/ .. \/ gk] and the length
  of the resulting list can be exponential wrt the size of [f] *)
 
-val split_pos_right : Term.term -> Term.term list
+val split_pos_right : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_pos_right] works as [split_pos_full] but does not split
  conjunctions under disjunctions and on the left of implications *)
 
-val split_neg_right : Term.term -> Term.term list
+val split_neg_right : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_neg_right] works as [split_neg_full] but does not split
  disjunctions and implications under conjunctions *)
 
-val split_pos_wp : Term.term -> Term.term list
+val split_pos_wp : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_pos_wp] works as [split_pos_right] but stops at
  the `[stop_split]' label and removes the label *)
 
-val split_neg_wp : Term.term -> Term.term list
+val split_neg_wp : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_neg_wp] works as [split_neg_right] but stops at
  the `[stop_split]' label and removes the label *)
 
-val split_pos_intro : Term.term -> Term.term list
+val split_pos_intro : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_pos_intro] works as [split_pos_wp] but does not
  respect the `asym_split' label *)
 
-val split_neg_intro : Term.term -> Term.term list
+val split_neg_intro : ?known_map:Decl.known_map -> Term.term -> Term.term list
 (** [split_neg_intro] works as [split_neg_wp] but does not
  respect the `asym_split' label *)
 

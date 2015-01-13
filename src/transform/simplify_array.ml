@@ -11,22 +11,11 @@
 
 open Term
 open Theory
-open Env
-
-let prelude = ["map"]
-let array = "Map"
-let store = ["set"]
-let select = ["get"]
 
 let make_rt_rf env =
-  let array  =
-    try
-      read_theory ~format:"why" env prelude array
-    with TheoryNotFound (_,s) ->
-      Format.eprintf "The theory %s is unknown" s;
-      exit 1 in
-  let store  = (ns_find_ls array.th_export store).ls_name in
-  let select = (ns_find_ls array.th_export select).ls_name in
+  let array  = Env.read_theory env ["map"] "Map" in
+  let store  = (ns_find_ls array.th_export ["set"]).ls_name in
+  let select = (ns_find_ls array.th_export ["get"]).ls_name in
   let rec rt t =
     let t = TermTF.t_map rt rf t in
     match t.t_node with

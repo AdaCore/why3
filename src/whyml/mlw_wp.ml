@@ -48,7 +48,7 @@ let fs_old =
   create_lsymbol (id_fresh "old") [ty] (Some ty)
 
 let mark_theory =
-  let uc = create_theory ~path:["why3"] (id_fresh "Mark") in
+  let uc = create_theory ~path:["why3";"Mark"] (id_fresh "Mark") in
   let uc = add_ty_decl uc ts_mark in
   close_theory uc
 
@@ -946,7 +946,13 @@ let rec unabsurd f = match f.t_node with
 let add_wp_decl km name f uc =
   (* prepare a proposition symbol *)
   let s = "WP_parameter " ^ name.id_string in
-  let lab = Ident.create_label ("expl:VC for " ^ name.id_string) in
+  (* set a proper explanation *)
+  let n =
+    try let _,_,l = restore_path name in
+        String.concat "." l
+    with Not_found -> name.id_string
+  in
+  let lab = Ident.create_label ("expl:VC for " ^ n) in
   let label = Slab.add lab name.id_label in
   let id = id_fresh ~label ?loc:name.id_loc s in
   let pr = create_prsymbol id in
@@ -968,7 +974,7 @@ let add_wp_decl km name f uc =
   Theory.add_decl uc d
 
 let mk_env env km th =
-  let th_int = Env.find_theory env ["int"] "Int" in
+  let th_int = Env.read_theory env ["int"] "Int" in
   { prog_known = km;
     pure_known = Theory.get_known th;
     global_env = env;
@@ -2016,7 +2022,7 @@ let wp_rec ~wp env kn th fdl =
         Eval_match.eval_match ~inline:Eval_match.inline_nonrec_linear lkn f in*)
       let pr = create_prsymbol (id_clone name) in
       let d = create_prop_decl Paxiom pr f in
-      Theory.add_decl th d
+      Theory.add_decl ~warn:false th d
     else
       th
   in

@@ -32,9 +32,7 @@ type driver = {
   drv_thprelude   : prelude_map;
   drv_blacklist   : string list;
   drv_meta        : (theory * Stdecl.t) Mid.t;
-  drv_regexps     : (Str.regexp * prover_answer) list;
-  drv_timeregexps : Call_provers.timeregexp list;
-  drv_exitcodes   : (int * prover_answer) list;
+  drv_res_parser  : prover_result_parser;
   drv_tag         : int
 }
 
@@ -173,16 +171,10 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
         let td = create_meta m (List.map convert al) in
         add_meta th td meta
   in
-  let add_local th (loc,rule) =
-    try add_local th rule with e -> raise (Loc.Located (loc,e))
-  in
+  let add_local th (loc,rule) = Loc.try2 ~loc add_local th rule in
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
-    let th =
-      try Env.read_theory ~format:"why" env f id
-      with e when not (Debug.test_flag Debug.stack_trace) ->
-        raise (Loc.Located (loc,e))
-    in
+    let th = Loc.try3 ~loc Env.read_theory env f id in
     qualid := q;
     List.iter (add_local th) trl
   in
@@ -198,9 +190,12 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     drv_thprelude   = Mid.map List.rev !thprelude;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_meta        = !meta;
-    drv_regexps     = List.rev !regexps;
-    drv_timeregexps = List.rev !timeregexps;
-    drv_exitcodes   = List.rev !exitcodes;
+    drv_res_parser = 
+      {
+      prp_regexps     = List.rev !regexps;
+      prp_timeregexps = List.rev !timeregexps;
+      prp_exitcodes   = List.rev !exitcodes;
+    };
     drv_tag         = !driver_tag
   }
 
@@ -236,13 +231,11 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buffer =
-  let regexps = drv.drv_regexps in
-  let timeregexps = drv.drv_timeregexps in
-  let exitcodes = drv.drv_exitcodes in
+let call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename drv buffer =
   Call_provers.call_on_buffer
-    ~command ?timelimit ?memlimit ~regexps ~timeregexps
-    ~exitcodes ~filename ?inplace buffer
+    ~command ?timelimit ?memlimit ?stepslimit ~res_parser:drv.drv_res_parser
+    ~filename ?inplace buffer
+
 
 (** print'n'prove *)
 
@@ -297,7 +290,7 @@ let print_theory ?old drv fmt th =
   print_task ?old drv fmt task
 
 let prove_task_prepared
-  ~command ?timelimit ?memlimit ?old ?inplace drv task =
+  ~command ?timelimit ?memlimit ?stepslimit ?old ?inplace drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
@@ -314,13 +307,13 @@ let prove_task_prepared
         get_filename drv fn "T" pr.pr_name.id_string
   in
   let res =
-    call_on_buffer ~command ?timelimit ?memlimit ?inplace ~filename drv buf in
+    call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename drv buf in
   Buffer.reset buf;
   res
 
-let prove_task ~command ?timelimit ?memlimit ?old ?inplace drv task =
+let prove_task ~command ?timelimit ?memlimit ?stepslimit ?old ?inplace drv task =
   let task = prepare_task drv task in
-  prove_task_prepared ~command ?timelimit ?memlimit ?old ?inplace drv task
+  prove_task_prepared ~command ?timelimit ?memlimit ?stepslimit ?old ?inplace drv task
 
 (* exception report *)
 

@@ -1,0 +1,182 @@
+module Compiler_logic
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import vm.Vm
+  use import vm.VMClock
+  use import state.State
+  use import HighOrd
+
+  function fst (p: ('a,'b)) : 'a = let (x,_) = p in x
+  meta rewrite_def function fst
+
+  function snd (p: ('a,'b)) : 'b = let (_,y) = p in y
+  meta rewrite_def function snd
+
+  (* Unary predicates over machine states *)
+  type pred  = clock_state -> bool
+
+  (* Binary predicates over machine states *)
+  type rel  = clock_state -> pred
+
+  (* pre/post-conditions types, as parameterized unary/binary predicates. *)
+  type pre 'a = 'a -> pos -> pred
+  type post 'a = 'a -> pos -> rel
+
+  (* Hoare triples with explicit pre & post *)
+  type hl 'a =
+   { code: code;
+     ghost pre : pre 'a;
+     ghost post: post 'a }
+
+  (* Predicate transformer type. *)
+  type wp_trans 'a = 'a -> pos -> pred -> pred
+
+  (* Code with weakest precondition wp_correctness. *)
+  type wp 'a =
+   { wcode : code;
+     ghost wp : wp_trans 'a }
+
+  (* Correctness for hoare triple:
+     If starting from precondition,
+     never get stuck before reaching the postcondition. *)
+  predicate hl_correctness (cs:hl 'a) =
+    forall x:'a,c_glob p mc mc'. cs.pre x p mc ->
+      codeseq_at c_glob p cs.code ->
+      let post = cs.post x p mc in
+      C.transition_star (c_glob,post) mc mc' /\ not post mc' ->
+      let VMC p s m _ = mc' in
+      exists ms''. transition c_glob (VMS p s m) ms''
+
+  (* Invariant for code with WP wp_correctness. *)
+  predicate wp_correctness (code:wp 'a) =
+    forall x:'a,c_glob p post mc mc'. code.wp x p post mc ->
+      codeseq_at c_glob p code.wcode ->
+      C.transition_star (c_glob,post) mc mc' /\ not post mc' ->
+      let VMC p s m _ = mc' in
+      exists ms''. transition c_glob (VMS p s m) ms''
+
+  (* WP combinator for sequence. *)
+  (*** Technical: Why3 refuse the logic call in program,
+       so we cannot define it in function of (wp 'a) arguments only. *)
+  function seq_wp (l1:int) (w1:wp_trans 'a)
+    (w2:wp_trans ('a,clock_state)) : wp_trans 'a =
+    \x p q mc. w1 x p (w2 (x,mc) (p+l1) q) mc
+
+  lemma seq_wp_lemma :
+    forall l1,w1: wp_trans 'a,w2 x p q mc.
+      seq_wp l1 w1 w2 x p q mc = w1 x p (w2 (x,mc) (p+l1) q) mc
+
+  meta rewrite prop seq_wp_lemma
+
+  (* Code combinator for sequence, with wp. *)
+  let (~) (s1 : wp 'a) (s2 : wp ('a, clock_state)) : wp 'a
+    requires { wp_correctness s1 /\ wp_correctness s2 }
+    ensures  { result.wcode.length = s1.wcode.length + s2.wcode.length }
+    ensures  { result.wp = seq_wp s1.wcode.length s1.wp s2.wp }
+    ensures  { wp_correctness result }
+  = let code = s1.wcode ++ s2.wcode in
+    let res = { wcode = code; wp = seq_wp s1.wcode.length s1.wp s2.wp } in
+    assert { forall x:'a,c_glob p post mc mc' mc''.
+      C.transition_star (c_glob,post) mc' mc'' ->
+      not post mc'' -> codeseq_at c_glob p code -> res.wp x p post mc ->
+      let post2 = s2.wp (x,mc) (p+s1.wcode.length) post in
+      C.transition_star (c_glob,post2) mc mc' ->
+      not post2 mc' ->
+      let VMC p s m _ = mc'' in
+      exists ms. transition c_glob (VMS p s m) ms
+    };
+    assert { forall x:'a,c_glob p post mc mc'.
+      C.transition_star (c_glob,post) mc mc' -> not post mc' ->
+      codeseq_at c_glob p code -> res.wp x p post mc ->
+      let post2 = s2.wp (x,mc) (p+s1.wcode.length) post in
+      C.transition_star (c_glob,post2) mc mc &&
+      let VMC p s m _ = mc' in
+      exists ms. transition c_glob (VMS p s m) ms };
+    res
+
+  function fork_wp (w:wp_trans 'a) (cond:pre 'a) : wp_trans 'a =
+    \x p q ms. (not cond x p ms -> q ms) /\ (cond x p ms -> w x p q ms)
+
+  lemma fork_wp_lemma: forall w:wp_trans 'a,cond x p q ms.
+    fork_wp w cond x p q ms =
+      ((not cond x p ms -> q ms) /\ (cond x p ms -> w x p q ms))
+
+  meta rewrite prop fork_wp_lemma
+
+  (* Code combinator for sequence, with wp. *)
+
+  let (%) (s:wp 'a) (ghost cond:pre 'a) : wp 'a
+    requires { wp_correctness s }
+    ensures  { result.wp = fork_wp s.wp cond }
+    ensures  { result.wcode.length = s.wcode.length /\ wp_correctness result }
+  = { wcode = s.wcode; wp = fork_wp s.wp cond }
+
+  (* WP transformer for hoare triples. *)
+  function towp_wp (pr:pre 'a) (ps:post 'a) : wp_trans 'a =
+    \x p q ms. pr x p ms && (forall ms'. ps x p ms ms' -> q ms')
+
+  lemma towp_wp_lemma:
+    forall pr ps, x:'a, p q ms. towp_wp pr ps x p q ms =
+      (pr x p ms && (forall ms'. ps x p ms ms' -> q ms'))
+
+  meta rewrite prop towp_wp_lemma
+
+  (* Unwrap code with hoare triple into code with wp.
+     Analogous to function call/abstract block. *)
+  let ($_) (c:hl 'a) : wp 'a
+    requires { hl_correctness c }
+    ensures  { result.wcode.length = c.code.length }
+    ensures  { result.wp = towp_wp c.pre c.post /\ wp_correctness result }
+  = { wcode = c.code; wp = towp_wp c.pre c.post }
+
+  (* Equip code with pre/post-condition. That is here that proof happen.
+     (P -> wp (c,Q)). Anologous to checking function/abstract block
+     specification. *)
+  let hoare (ghost pre:pre 'a) (c:wp 'a) (ghost post:post 'a) : hl 'a
+    requires { wp_correctness c }
+    requires { forall x p ms. pre x p ms -> (c.wp x p (post x p ms)) ms }
+    ensures  { result.pre = pre /\ result.post = post }
+    ensures  { result.code.length = c.wcode.length /\ hl_correctness result}
+  = { code = c.wcode ; pre = pre; post = post }
+
+  function trivial_pre : pre 'a = \x p ms. let VMC p' _ _ _ = ms in p = p'
+  meta rewrite_def function trivial_pre
+
+  function loop_preservation (inv post:pre 'a) : post 'a =
+    \x p ms ms'. (inv x p ms' /\ ms <> ms') \/ post x p ms'
+  meta rewrite_def function loop_preservation
+
+  function forget_old (post:pre 'a) : post 'a =
+    \x p ms . post x p
+  meta rewrite_def function forget_old
+
+  (* Variant of hoare triplet introduction rule for looping code. *)
+  let make_loop_hl (c:hl 'a) (ghost inv post:pre 'a) : hl 'a
+    requires { hl_correctness c }
+    requires { c.pre = inv }
+    requires { c.post = loop_preservation inv post }
+    ensures { result.pre = inv /\ result.post = forget_old post }
+    ensures { result.code.length = c.code.length /\ hl_correctness result }
+  = let res = { code = c.code ; pre = inv ; post = forget_old post } in
+    assert { forall x:'a,c_glob p mc' mc''.
+      C.transition_star (c_glob,post x p) mc' mc'' -> forall mc.
+      not post x p mc'' -> codeseq_at c_glob p res.code -> inv x p mc ->
+      let post2 = loop_preservation inv post x p mc in
+      C.transition_star (c_glob,post2) mc mc' ->
+      not post2 mc' ->
+      let VMC p s m _ = mc'' in
+      exists ms. transition c_glob (VMS p s m) ms
+    };
+    res
+
+end
+
+
+(*
+Local Variables:
+compile-command: "why3 ide -L . logic.mlw"
+End:
+*)

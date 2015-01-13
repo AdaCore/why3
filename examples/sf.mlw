@@ -46,6 +46,8 @@ module HoareLogic
     | even_0 : even 0
     | even_odd : forall x:int. even x -> even (x+2)
 
+  lemma even_noneg: forall x:int. even x -> x >= 0
+
   lemma even_not_odd : forall x:int. even x -> even (x+1) -> false
 
   let parity (x: ref int) (y: ref int)

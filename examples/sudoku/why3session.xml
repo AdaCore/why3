@@ -3,665 +3,670 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.3" timelimit="5" memlimit="1000"/>
 <file name="../sudoku.mlw" expanded="true">
-<theory name="Grid" expanded="true">
- <goal name="grid_eq_sub" sum="79df629411da3855c89353dd1f82e75d">
+<theory name="Grid" sum="5b61dbcf9a75c24d2edcc16344ad8df7" expanded="true">
+ <goal name="grid_eq_sub">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="1"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.02"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
- </goal>
- <goal name="subset_valid_chunk" sum="445af543a29270dd531655929d89d516">
- <proof prover="1"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="5"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="subset_valid" sum="e7d0d31d9a335bdebc173af9a7335f9e">
+ <goal name="subset_valid_chunk">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="subset_valid">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="1"><result status="valid" time="0.32"/></proof>
- <proof prover="2"><result status="valid" time="0.70"/></proof>
- <proof prover="4"><result status="valid" time="0.07"/></proof>
+ <proof prover="2"><result status="valid" time="0.32"/></proof>
+ <proof prover="3"><result status="valid" time="0.70"/></proof>
+ <proof prover="5"><result status="valid" time="0.07"/></proof>
  </goal>
 </theory>
-<theory name="TheClassicalSudokuGrid" expanded="true">
- <goal name="WP_parameter classical_sudoku" expl="VC for classical_sudoku" sum="bdf2dfeba93a9bd52bf7cf0e9f2f0bac">
- <proof prover="1" timelimit="6"><result status="valid" time="1.10"/></proof>
- <proof prover="2" timelimit="6"><result status="valid" time="1.06"/></proof>
+<theory name="TheClassicalSudokuGrid" sum="8ec64fe30e45ee45621f44f92b32638f" expanded="true">
+ <goal name="WP_parameter classical_sudoku" expl="VC for classical_sudoku">
+ <proof prover="2" timelimit="6"><result status="valid" time="1.10"/></proof>
+ <proof prover="3" timelimit="6"><result status="valid" time="1.06"/></proof>
  </goal>
 </theory>
-<theory name="Solver" expanded="true">
- <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk" sum="7949484096381b3f8b768f00c6cf9dda">
- <proof prover="1"><result status="timeout" time="5.00"/></proof>
- <proof prover="2"><result status="valid" time="0.81"/></proof>
- <proof prover="3"><result status="valid" time="3.56"/></proof>
+<theory name="Solver" sum="b469e9f218362f529979b7aa8794fb40" expanded="true">
+ <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk" expanded="true">
+ <proof prover="2"><result status="valid" time="2.59"/></proof>
+ <proof prover="3"><result status="valid" time="0.81"/></proof>
+ <proof prover="4"><result status="valid" time="3.56"/></proof>
  </goal>
- <goal name="WP_parameter check_valid" expl="VC for check_valid" sum="a5f9781a31dcb227f6640715b45b498f">
+ <goal name="WP_parameter check_valid" expl="VC for check_valid">
  <proof prover="0"><result status="valid" time="0.11"/></proof>
  </goal>
- <goal name="full_up_to_change" sum="ed6ea2dbd33ef3becc4cf56fa9d7ca72">
+ <goal name="full_up_to_change">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="1"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="3"><result status="valid" time="0.21"/></proof>
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.21"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter full_up_to_frame" expl="VC for full_up_to_frame" sum="5e8824fc556c7176155da546f4ac0bce">
+ <goal name="WP_parameter full_up_to_frame" expl="VC for full_up_to_frame">
  <proof prover="0"><result status="valid" time="0.15"/></proof>
- <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="3"><result status="valid" time="0.14"/></proof>
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.14"/></proof>
+ <proof prover="5"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="WP_parameter full_up_to_frame_all" expl="VC for full_up_to_frame_all" sum="b543441290217564b2c98cf1c1166444">
+ <goal name="WP_parameter full_up_to_frame_all" expl="VC for full_up_to_frame_all">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="1"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="valid_unchanged_chunks" sum="3fca4ff70a6d1b33745ea9d8773d01a3">
- <proof prover="1"><result status="valid" time="0.01"/></proof>
- <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="4"><result status="valid" time="0.05"/></proof>
+ <goal name="valid_unchanged_chunks">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
+ <proof prover="5"><result status="valid" time="0.05"/></proof>
  </goal>
- <goal name="valid_changed_chunks" sum="919a618cac14de486f122d42173e4e92">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="3"><result status="valid" time="0.04"/></proof>
+ <goal name="valid_changed_chunks">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="valid_up_to_change" sum="f653f1cad9cbc01618e644200eea789e">
+ <goal name="valid_up_to_change">
  <proof prover="0"><result status="valid" time="0.69"/></proof>
  </goal>
- <goal name="WP_parameter solve_aux" expl="VC for solve_aux" sum="5a0a82a2f6f56dd7359bf2446f1fb5df">
+ <goal name="WP_parameter solve_aux" expl="VC for solve_aux">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter solve_aux.1" expl="1. exceptional postcondition" sum="5c86335d136c2c1c6be32223c01ba98e">
+  <goal name="WP_parameter solve_aux.1" expl="1. exceptional postcondition">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.2" expl="2. index in array bounds" sum="db0c3375178e1f6fac7cb2e40d7e6ee7">
+  <goal name="WP_parameter solve_aux.2" expl="2. index in array bounds">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.3" expl="3. precondition" sum="95a569da9285f00de4098f1e2dfe87e2">
+  <goal name="WP_parameter solve_aux.4" expl="4. precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.4" expl="4. precondition" sum="82726eaf420ac342c7da8635f8c25663">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.5" expl="5. precondition" sum="377e8855c2c61f8fbb0c4af803538d2f">
+  <goal name="WP_parameter solve_aux.5" expl="5. precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.6" expl="6. precondition" sum="ef21ca2f06c5b15de2aa18d92cc80a2e">
+  <goal name="WP_parameter solve_aux.6" expl="6. precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.7" expl="7. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.8" expl="8. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.9" expl="9. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.10" expl="10. precondition">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.11" expl="11. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.12" expl="12. precondition">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.13" expl="13. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.14" expl="14. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.09"/></proof>
+  <proof prover="3"><result status="valid" time="0.11"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.15" expl="15. variant decrease">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.7" expl="7. precondition" sum="873c99a9f8a0da403b0cfb51ceab2d16">
+  <goal name="WP_parameter solve_aux.16" expl="16. precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.32"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.17" expl="17. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.18" expl="18. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.8" expl="8. precondition" sum="1c5a19cdb8f5f449a50f37053500e75d">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.9" expl="9. precondition" sum="2631624cffc723b1789ead66cdae209c">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.10" expl="10. precondition" sum="266cd2ace89c6831850238469f236fba">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.11" expl="11. precondition" sum="4d7dd788b82a0c8f9e8e015a0e3827aa">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter solve_aux.19" expl="19. precondition">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.12" expl="12. precondition" sum="975e373ec925d30c25c3d60a9c93c695">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.13" expl="13. precondition" sum="8a41fb448183d4233d46a73f75e428e1">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.14" expl="14. precondition" sum="b7498893c362105c244af6c50ff123f7">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.09"/></proof>
-  <proof prover="2"><result status="valid" time="0.11"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.15" expl="15. variant decrease" sum="a7ff91a8c9c5f97d0ef4bed548d4ebe4">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.16" expl="16. precondition" sum="dbb92779fc9fb0b0810c8d946d0f2161">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.32"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.17" expl="17. precondition" sum="11b11a7f31cef83af6dc85c2dd64b40e">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.18" expl="18. precondition" sum="791e64962432d772a1f4f63a40dcacbe">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.19" expl="19. precondition" sum="228e9155c8eb081864de17ae62fd73bc">
+  <goal name="WP_parameter solve_aux.20" expl="20. precondition">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.84"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.20" expl="20. precondition" sum="fb7198cf949d1557fd685fd70b88e825">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.86"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.21" expl="21. precondition" sum="34d5ef52ac7121af2c059b47039bd977">
+  <goal name="WP_parameter solve_aux.21" expl="21. precondition">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.12"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.12"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.22" expl="22. postcondition" sum="7de36a7c0a612dc5a0e701e475bd2513">
+  <goal name="WP_parameter solve_aux.22" expl="22. postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.23" expl="23. postcondition" sum="4d98888d1b8bcbe979da62b93ac9d13d">
+  <goal name="WP_parameter solve_aux.23" expl="23. postcondition">
   <proof prover="0"><result status="valid" time="0.10"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.24" expl="24. exceptional postcondition" sum="40abccbdaa7ce0c90d020bd9aea9b5d0">
+  <goal name="WP_parameter solve_aux.24" expl="24. exceptional postcondition">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="4"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="5"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.25" expl="25. postcondition" sum="f26bcdfd0bac80514de233c41a500c09">
+  <goal name="WP_parameter solve_aux.25" expl="25. postcondition">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.26" expl="26. postcondition" sum="be6d4497b9560489e6e7c2bab1ec840c">
+  <goal name="WP_parameter solve_aux.26" expl="26. postcondition">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.50"/></proof>
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.66"/></proof>
+  <proof prover="5"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.27" expl="27. postcondition" sum="2a64496fba983fb44e493b4e74497baa">
+  <goal name="WP_parameter solve_aux.27" expl="27. postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.28" expl="28. postcondition" sum="b3ade7b71705967014e415e4aa1611be">
-  <proof prover="0"><result status="valid" time="0.35"/></proof>
-  <proof prover="3"><result status="valid" time="0.48"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.29" expl="29. postcondition" sum="04f2b92835cbfe0148ec5fc2c77acbb4">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.30" expl="30. postcondition" sum="d65ac12ccbdb0a4de36d4ba3535b711c">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.31" expl="31. index in array bounds" sum="7ad6e691868bdf10f299b1f7fcd512bc">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.32" expl="32. assertion" sum="e7ee32b0e5403de8dc743afcd7e02453">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.33" expl="33. postcondition" sum="4042c074ae0151ab66c0ce0f9aec3870">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.34" expl="34. postcondition" sum="6f20834f8a2e683527150e1120e8a9b8">
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.35" expl="35. loop invariant init" sum="330bdc63bd4506b26dd4bcce85f419e3">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.36" expl="36. loop invariant init" sum="5103c6df50f73d1d3dfb8415e487c956">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.37" expl="37. loop invariant init" sum="804abd761040fcc2170ec30bbadad84f">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.38" expl="38. type invariant" sum="b0247046a1d2ef882de2f9e31c57b0fe">
+  <goal name="WP_parameter solve_aux.28" expl="28. postcondition">
+  <proof prover="0"><result status="valid" time="0.35"/></proof>
+  <proof prover="4"><result status="valid" time="0.48"/></proof>
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.29" expl="29. postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.30" expl="30. postcondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.31" expl="31. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.32" expl="32. assertion">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.39" expl="39. index in array bounds" sum="36dcc5b007cfdc5deb9452aae41e6a54">
+  <goal name="WP_parameter solve_aux.33" expl="33. postcondition">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.34" expl="34. postcondition">
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.35" expl="35. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.36" expl="36. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.37" expl="37. loop invariant init">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.38" expl="38. type invariant">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.40" expl="40. precondition" sum="c7508b48dd6ba93b58d1ff5ca53e8958">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter solve_aux.39" expl="39. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.41" expl="41. precondition" sum="8470dca854902521c65e401e9191a754">
+  <goal name="WP_parameter solve_aux.40" expl="40. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.41" expl="41. precondition">
   <proof prover="0"><result status="valid" time="0.13"/></proof>
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.42" expl="42. precondition" sum="b8cec51f20bb0eb82450d6c9e234f2ea">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.43" expl="43. precondition" sum="c93868a78098de1a5e0c0691c942d99b">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.44" expl="44. precondition" sum="7ad64e847c02294a45915e116bbf6a02">
+  <goal name="WP_parameter solve_aux.42" expl="42. precondition">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.45" expl="45. precondition" sum="5a0ef2821da8a1fa650f8cb103bfbe42">
+  <goal name="WP_parameter solve_aux.43" expl="43. precondition">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.46" expl="46. precondition" sum="b176ec36a162af383e296154a340e1d9">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.47" expl="47. precondition" sum="3936eed145c771c92c054621796ab87d">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.48" expl="48. precondition" sum="23c8b41c57303a77599687fbeb2b93a0">
+  <goal name="WP_parameter solve_aux.44" expl="44. precondition">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.49" expl="49. precondition" sum="da5e7349e42c11b68dc7ad224e9e9ce2">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.50" expl="50. precondition" sum="4f7a696a3791db82f2574d146cb7cb20">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.51" expl="51. precondition" sum="259c9feb64b9332f0c66b90fd87b13e2">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.52" expl="52. assertion" sum="fb9819de2b3e0405dadc4aabda7e8385">
+  <goal name="WP_parameter solve_aux.45" expl="45. precondition">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.46" expl="46. precondition">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.47" expl="47. precondition">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.48" expl="48. precondition">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.49" expl="49. precondition">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.50" expl="50. precondition">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.51" expl="51. precondition">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.52" expl="52. assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter solve_aux.52.1" expl="1. assertion" sum="12d25b8de27ab23f0951518d5a1bb8e9">
+   <goal name="WP_parameter solve_aux.52.1" expl="1. assertion">
    <proof prover="0" timelimit="30"><result status="valid" time="0.04"/></proof>
-   <proof prover="1" timelimit="30"><result status="valid" time="0.02"/></proof>
-   <proof prover="2" timelimit="30"><result status="valid" time="0.04"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.36"/></proof>
-   <proof prover="4" timelimit="30"><result status="valid" time="0.03"/></proof>
+   <proof prover="2" timelimit="30"><result status="valid" time="0.02"/></proof>
+   <proof prover="3" timelimit="30"><result status="valid" time="0.04"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.36"/></proof>
+   <proof prover="5" timelimit="30"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter solve_aux.52.2" expl="2. assertion" sum="7688fd83329db6da5f46408c1398daea">
-   <proof prover="1" timelimit="30"><result status="valid" time="0.05"/></proof>
-   <proof prover="2" timelimit="30"><result status="valid" time="0.06"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.38"/></proof>
-   <proof prover="4" timelimit="30"><result status="valid" time="0.07"/></proof>
-   </goal>
-   <goal name="WP_parameter solve_aux.52.3" expl="3. assertion" sum="7260020d66dfbe25a2abf4c2975678ea">
-   <proof prover="1" timelimit="30"><result status="valid" time="0.07"/></proof>
-   <proof prover="2" timelimit="30"><result status="valid" time="0.08"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.39"/></proof>
-   <proof prover="4" timelimit="30"><result status="valid" time="0.07"/></proof>
-   </goal>
-   <goal name="WP_parameter solve_aux.52.4" expl="4. assertion" sum="f65c9525535a777fbb57fa7d33e6092b">
-   <proof prover="1" timelimit="30"><result status="valid" time="0.06"/></proof>
-   <proof prover="2" timelimit="30"><result status="valid" time="0.06"/></proof>
-   <proof prover="3" timelimit="30"><result status="valid" time="0.39"/></proof>
-   <proof prover="4" timelimit="30"><result status="valid" time="0.12"/></proof>
-   </goal>
-   <goal name="WP_parameter solve_aux.52.5" expl="5. assertion" sum="0196acd2ae54904df6268f4aef402ef9">
-   <proof prover="0" timelimit="30"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter solve_aux.52.2" expl="2. assertion">
+   <proof prover="2" timelimit="30"><result status="valid" time="0.05"/></proof>
    <proof prover="3" timelimit="30"><result status="valid" time="0.06"/></proof>
-   <proof prover="4" timelimit="30"><result status="valid" time="0.13"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.38"/></proof>
+   <proof prover="5" timelimit="30"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="WP_parameter solve_aux.52.3" expl="3. assertion">
+   <proof prover="2" timelimit="30"><result status="valid" time="0.07"/></proof>
+   <proof prover="3" timelimit="30"><result status="valid" time="0.08"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.39"/></proof>
+   <proof prover="5" timelimit="30"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="WP_parameter solve_aux.52.4" expl="4. assertion">
+   <proof prover="2" timelimit="30"><result status="valid" time="0.06"/></proof>
+   <proof prover="3" timelimit="30"><result status="valid" time="0.06"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.39"/></proof>
+   <proof prover="5" timelimit="30"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="WP_parameter solve_aux.52.5" expl="5. assertion">
+   <proof prover="0" timelimit="30"><result status="valid" time="0.03"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="0.06"/></proof>
+   <proof prover="5" timelimit="30"><result status="valid" time="0.13"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter solve_aux.53" expl="53. assertion" sum="4b02e14a3d01e4273c7194a2d0aafb92">
-  <proof prover="1" timelimit="30"><result status="valid" time="0.17"/></proof>
-  <proof prover="2" timelimit="30"><result status="valid" time="0.46"/></proof>
+  <goal name="WP_parameter solve_aux.53" expl="53. assertion">
+  <proof prover="2" timelimit="30"><result status="valid" time="0.17"/></proof>
+  <proof prover="3" timelimit="30"><result status="valid" time="0.46"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.54" expl="54. variant decrease" sum="7f397d8ec474deabd622f065a0ce3393">
+  <goal name="WP_parameter solve_aux.54" expl="54. variant decrease">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.55" expl="55. precondition" sum="43e1d7c0ee2a0346f31f35134b565f73">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.08"/></proof>
-  <proof prover="2"><result status="valid" time="0.48"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.56" expl="56. precondition" sum="c78f43d88247e7c840499521e05a6c61">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.57" expl="57. precondition" sum="ae5f7fbd57ab490592f5f0c733665792">
+  <goal name="WP_parameter solve_aux.55" expl="55. precondition">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.48"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.58" expl="58. precondition" sum="cd6b2d9c684ce2f7d1c829bd231864c6">
+  <goal name="WP_parameter solve_aux.56" expl="56. precondition">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.57" expl="57. precondition">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.58" expl="58. precondition">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.59" expl="59. precondition" sum="1d47195eb1e44b1fc93deda19bd4c1c4">
+  <goal name="WP_parameter solve_aux.59" expl="59. precondition">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.60" expl="60. precondition">
+  <proof prover="0"><result status="valid" time="0.13"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.16"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.61" expl="61. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="5"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.62" expl="62. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="5"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.63" expl="63. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="2.99"/></proof>
+  <proof prover="5"><result status="valid" time="0.94"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.64" expl="64. exceptional postcondition">
+  <proof prover="0"><result status="valid" time="0.32"/></proof>
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  <proof prover="3"><result status="valid" time="0.13"/></proof>
+  <proof prover="4"><result status="valid" time="1.86"/></proof>
+  <proof prover="5"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.65" expl="65. assertion">
+  <proof prover="5"><result status="valid" time="0.15"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.66" expl="66. assertion">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.66"/></proof>
+  <proof prover="3"><result status="valid" time="0.88"/></proof>
+  <proof prover="4"><result status="valid" time="0.18"/></proof>
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.67" expl="67. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.68" expl="68. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="5"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.69" expl="69. loop invariant preservation">
+  <proof prover="5"><result status="valid" time="0.27"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.70" expl="70. assertion">
+  <proof prover="5"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.71" expl="71. assertion">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.30"/></proof>
+  <proof prover="3"><result status="valid" time="0.85"/></proof>
+  <proof prover="4"><result status="valid" time="0.16"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.72" expl="72. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.73" expl="73. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.13"/></proof>
+  <proof prover="5"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.74" expl="74. loop invariant preservation">
+  <proof prover="5"><result status="valid" time="0.17"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.75" expl="75. assertion">
+  <proof prover="5"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.76" expl="76. assertion">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.58"/></proof>
+  <proof prover="3"><result status="valid" time="0.95"/></proof>
+  <proof prover="4"><result status="valid" time="0.16"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.77" expl="77. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.14"/></proof>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.78" expl="78. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.10"/></proof>
+  <proof prover="5"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.79" expl="79. loop invariant preservation">
+  <proof prover="5"><result status="valid" time="0.13"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.80" expl="80. type invariant">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.60" expl="60. precondition" sum="9a0700364820cc65b88bedbd3e3e6faa">
-  <proof prover="0"><result status="valid" time="0.13"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.16"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.61" expl="61. loop invariant preservation" sum="9e940f24cedcf2d3cc2f827492fa53c4">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.62" expl="62. loop invariant preservation" sum="db6e3f76f38698bf147bf0736978853e">
-  <proof prover="0"><result status="valid" time="0.10"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
-  <proof prover="4"><result status="valid" time="0.07"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.63" expl="63. loop invariant preservation" sum="a2b3ced2b2d6c6361a44135266fcdeab">
-  <proof prover="3"><result status="valid" time="2.99"/></proof>
-  <proof prover="4"><result status="valid" time="1.24"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.64" expl="64. exceptional postcondition" sum="1a48ed8757c0b0913e8895954796e277">
-  <proof prover="0"><result status="valid" time="0.32"/></proof>
-  <proof prover="1"><result status="valid" time="0.10"/></proof>
-  <proof prover="2"><result status="valid" time="0.13"/></proof>
-  <proof prover="3"><result status="valid" time="1.86"/></proof>
-  <proof prover="4"><result status="valid" time="0.18"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.65" expl="65. assertion" sum="ad61389d40ef299b5fcf9a22e6cd25f4">
-  <proof prover="4"><result status="valid" time="0.15"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.66" expl="66. assertion" sum="55e06a3176430ad288053ff4886d0a36">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
-  <proof prover="1"><result status="valid" time="0.66"/></proof>
-  <proof prover="2"><result status="valid" time="0.88"/></proof>
-  <proof prover="3"><result status="valid" time="0.18"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.67" expl="67. loop invariant preservation" sum="e9771fd3d836284268dbd5cf9af59486">
-  <proof prover="0"><result status="valid" time="0.07"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.68" expl="68. loop invariant preservation" sum="a79f4a7cd1631c933c554bcd66cb37de">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
-  <proof prover="4"><result status="valid" time="0.07"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.69" expl="69. loop invariant preservation" sum="c112666e653a7ea44fb49c90b4471046">
-  <proof prover="4"><result status="valid" time="0.27"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.70" expl="70. assertion" sum="a6cefdcdb92f284d46287d74f368a816">
-  <proof prover="4"><result status="valid" time="0.09"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.71" expl="71. assertion" sum="4c0cbf5a95db9131409bd48f9a0dad4f">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="1"><result status="valid" time="0.30"/></proof>
-  <proof prover="2"><result status="valid" time="0.85"/></proof>
-  <proof prover="3"><result status="valid" time="0.16"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.72" expl="72. loop invariant preservation" sum="de162036ea99548d46d8e73d8aee666c">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.73" expl="73. loop invariant preservation" sum="0df31d86d8dfbaa01f2cc2b7b6bcc8e5">
-  <proof prover="0"><result status="valid" time="0.07"/></proof>
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="2"><result status="valid" time="0.13"/></proof>
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.74" expl="74. loop invariant preservation" sum="f69e9d5db8166017d4723638a3049576">
-  <proof prover="4"><result status="valid" time="0.17"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.75" expl="75. assertion" sum="05ba416ef4cb94f6a4af7bf6cb2134a6">
-  <proof prover="4"><result status="valid" time="0.11"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.76" expl="76. assertion" sum="db33b55ba46772dd9a9837902af93e5a">
+  <goal name="WP_parameter solve_aux.81" expl="81. index in array bounds">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.60"/></proof>
-  <proof prover="2"><result status="valid" time="0.77"/></proof>
-  <proof prover="3"><result status="valid" time="0.16"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.77" expl="77. loop invariant preservation" sum="7745c0716fa1abd9f453821d244eceb3">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.14"/></proof>
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.78" expl="78. loop invariant preservation" sum="6728bae03be975c987ce0e1d9fe531b9">
-  <proof prover="0"><result status="valid" time="0.08"/></proof>
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="2"><result status="valid" time="0.10"/></proof>
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.79" expl="79. loop invariant preservation" sum="bb0377792b24618ed24290c226972920">
-  <proof prover="4"><result status="valid" time="0.13"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.80" expl="80. type invariant" sum="0d4e2cf8b285fdf5134982ff07d6aaad">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.81" expl="81. index in array bounds" sum="8dd3c85b4428428d52aaaf5d3bcb4535">
+  <goal name="WP_parameter solve_aux.82" expl="82. assertion">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.82" expl="82. assertion" sum="4ae8f2966a16b70a4221ffd3f240ccb2">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
-  <proof prover="3"><result status="valid" time="0.23"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="4"><result status="valid" time="0.23"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter solve_aux.83" expl="83. postcondition" sum="c74ba6dfbd2246c57a2476d9aaf0a253">
+  <goal name="WP_parameter solve_aux.83" expl="83. postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter solve_aux.84" expl="84. postcondition" sum="22ad834b5585e146fcb43dbfb9bc54f3">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter solve_aux.84" expl="84. postcondition">
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter solve" expl="VC for solve" sum="a64bd523d4b187dbd95ce7bd914ad8ed">
+ <goal name="WP_parameter solve" expl="VC for solve" expanded="true">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="3"><result status="valid" time="0.04"/></proof>
  <proof prover="4"><result status="valid" time="0.04"/></proof>
+ <proof prover="5"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="WP_parameter check_then_solve" expl="VC for check_then_solve" expanded="true">
+ <proof prover="1"><result status="valid" time="0.13"/></proof>
+ <proof prover="4"><result status="valid" time="0.10" steps="69"/></proof>
  </goal>
 </theory>
-<theory name="Test" expanded="true">
- <goal name="WP_parameter test0" expl="VC for test0" sum="3e35c33d3b3186c3fe3746cf8b096a90">
+<theory name="Test" sum="96bf6ded35162d43136dfbf608f579d3" expanded="true">
+ <goal name="WP_parameter test0" expl="VC for test0">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
- <proof prover="1"><result status="valid" time="0.03"/></proof>
- <proof prover="2"><result status="valid" time="0.30"/></proof>
- <proof prover="3"><result status="valid" time="0.04"/></proof>
- <proof prover="4"><result status="valid" time="0.03"/></proof>
- </goal>
- <goal name="valid_values_solvable" sum="e4f7ae89ac0a39da6eeccfb5a7188949">
- <proof prover="0"><result status="valid" time="0.10"/></proof>
- <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
- <proof prover="4"><result status="valid" time="0.98"/></proof>
- </goal>
- <goal name="WP_parameter test1" expl="VC for test1" sum="819c9cd5d427e1a1e9707e5df24fe4e5">
- <proof prover="0"><result status="valid" time="1.12"/></proof>
- <proof prover="1"><result status="valid" time="0.04"/></proof>
- <proof prover="2"><result status="valid" time="0.30"/></proof>
- </goal>
- <goal name="WP_parameter test2" expl="VC for test2" sum="e65269e2b5e9a506c66830f47e7ca5f3">
- <proof prover="0"><result status="valid" time="0.09"/></proof>
- <proof prover="1"><result status="valid" time="0.04"/></proof>
- <proof prover="2"><result status="valid" time="0.30"/></proof>
- <proof prover="3"><result status="valid" time="0.71"/></proof>
+ <proof prover="3"><result status="valid" time="0.30"/></proof>
  <proof prover="4"><result status="valid" time="0.04"/></proof>
+ <proof prover="5"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="valid_values_solvable">
+ <proof prover="0"><result status="valid" time="0.10"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.03"/></proof>
+ <proof prover="5"><result status="valid" time="0.98"/></proof>
+ </goal>
+ <goal name="WP_parameter test1" expl="VC for test1">
+ <proof prover="0"><result status="valid" time="1.12"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.30"/></proof>
+ </goal>
+ <goal name="WP_parameter test2" expl="VC for test2">
+ <proof prover="0"><result status="valid" time="0.09"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.30"/></proof>
+ <proof prover="4"><result status="valid" time="0.71"/></proof>
+ <proof prover="5"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
 </file>

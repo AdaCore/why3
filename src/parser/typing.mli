@@ -23,14 +23,14 @@ val debug_type_only : Debug.flag
 val add_decl : Loc.position -> theory_uc -> Ptree.decl -> theory_uc
 
 val add_use_clone :
-  unit Env.library -> theory Mstr.t -> theory_uc ->
+  Env.env -> theory Mstr.t -> theory_uc ->
     Loc.position -> Ptree.use_clone -> theory_uc
 
 val close_namespace : Loc.position -> bool -> theory_uc -> theory_uc
 
 val close_theory : theory Mstr.t -> theory_uc -> theory Mstr.t
 
-val open_file : unit Env.library -> Env.pathname -> Ptree.incremental
+val open_file : Env.env -> Env.pathname -> Ptree.incremental
 
 val close_file : unit -> theory Mstr.t
 
@@ -51,8 +51,8 @@ val find_qualid :
 
 type global_vs = Ptree.qualid -> vsymbol option
 
-val type_term : theory_uc -> global_vs -> Ptree.lexpr -> term
+val type_term : theory_uc -> global_vs -> Ptree.term -> term
 
-val type_fmla : theory_uc -> global_vs -> Ptree.lexpr -> term
+val type_fmla : theory_uc -> global_vs -> Ptree.term -> term
 
 val type_inst : theory_uc -> theory -> Ptree.clone_subst list -> th_inst

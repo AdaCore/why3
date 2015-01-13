@@ -4,85 +4,86 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="30" memlimit="0"/>
-<prover id="2" name="Z3" version="4.3.1" timelimit="30" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.1" timelimit="30" memlimit="1000"/>
 <file name="../mjrty.mlw" expanded="true">
-<theory name="Mjrty" expanded="true">
- <goal name="WP_parameter mjrty" expl="VC for mjrty" sum="c41123b791dc208c110fda09c7c57828" expanded="true">
- <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter mjrty.1" expl="1. index in array bounds" sum="635e40dfb03888a3c6566460298b495e" expanded="true">
+<theory name="Mjrty" sum="bf4383d5f7abd71536c53f1e6f7cdfcc" expanded="true">
+ <goal name="WP_parameter mjrty" expl="VC for mjrty" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter mjrty.1" expl="1. index in array bounds">
   <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.2" expl="2. exceptional postcondition" sum="1546462a33ab84d2b32fe8a126fc016f" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.3" expl="3. loop invariant init" sum="0458fada3e2c98a13db73a7c7927e3f9" expanded="true">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.4" expl="4. loop invariant init" sum="82ed5edaa462d54b878affd29ed0f12d" expanded="true">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.5" expl="5. loop invariant init" sum="ff6d22b55c58ada795ca245180ab8f88" expanded="true">
+  <goal name="WP_parameter mjrty.2" expl="2. exceptional postcondition">
   <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.6" expl="6. index in array bounds" sum="4277bc394759b8916dc1a8cfe51a1f30" expanded="true">
+  <goal name="WP_parameter mjrty.3" expl="3. loop invariant init">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.4" expl="4. loop invariant init">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.5" expl="5. loop invariant init">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.6" expl="6. index in array bounds">
   <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.7" expl="7. loop invariant preservation" sum="f16c47974c1efaa2d9c42dc79f53c239" expanded="true">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.18"/></proof>
+  <goal name="WP_parameter mjrty.7" expl="7. loop invariant preservation" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.74"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.8" expl="8. loop invariant preservation" sum="a9854c6ffe04a2550d05dfbf82a4034d" expanded="true">
+  <goal name="WP_parameter mjrty.8" expl="8. loop invariant preservation" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="9.62"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.9" expl="9. loop invariant preservation" expanded="true">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.10" expl="10. index in array bounds" expanded="true">
+  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.11" expl="11. loop invariant preservation" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.94"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.12" expl="12. loop invariant preservation" expanded="true">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.9" expl="9. loop invariant preservation" sum="acdb9d0993cee8731fea75d03ae4827f" expanded="true">
+  <goal name="WP_parameter mjrty.13" expl="13. loop invariant preservation" expanded="true">
   <proof prover="0"><result status="valid" time="0.14"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.10" expl="10. index in array bounds" sum="b937723d070becbf27e0339741679b33" expanded="true">
+  <goal name="WP_parameter mjrty.14" expl="14. loop invariant preservation" expanded="true">
+  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.15" expl="15. loop invariant preservation" expanded="true">
+  <proof prover="0" timelimit="30"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.16" expl="16. loop invariant preservation" expanded="true">
+  <proof prover="0"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="WP_parameter mjrty.17" expl="17. exceptional postcondition" expanded="true">
   <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.11" expl="11. loop invariant preservation" sum="ea67b5a03edbfaab4661c6404391cb0f" expanded="true">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter mjrty.18" expl="18. postcondition" expanded="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.12" expl="12. loop invariant preservation" sum="bc7fd714b4cc3978a6474fe6a1d2ca6a" expanded="true">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.13" expl="13. loop invariant preservation" sum="61349f8bb125edbda58aa4c1009f21f2" expanded="true">
-  <proof prover="0"><result status="valid" time="0.40"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.14" expl="14. loop invariant preservation" sum="12560250db182bf44ca72a16c44011e7" expanded="true">
-  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.15" expl="15. loop invariant preservation" sum="fa71e2b65f8344a863286cafeca55068" expanded="true">
-  <proof prover="0" timelimit="30"><result status="valid" time="0.20"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.16" expl="16. loop invariant preservation" sum="b42b59dbeb34a1ecea40bdc7cf06a6fd" expanded="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.17" expl="17. exceptional postcondition" sum="a735378d4251015b6b791475b1cddf39" expanded="true">
+  <goal name="WP_parameter mjrty.19" expl="19. exceptional postcondition" expanded="true">
   <proof prover="1" timelimit="10"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.18" expl="18. postcondition" sum="fd975e95b471961cd7a74fd29bda2122" expanded="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.19" expl="19. exceptional postcondition" sum="113a039b814cdd9fbf4b362b3141648d" expanded="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter mjrty.20" expl="20. loop invariant init" sum="7fd074192a0f1aacb021bdbfbc5749f9" expanded="true">
+  <goal name="WP_parameter mjrty.20" expl="20. loop invariant init" expanded="true">
   <proof prover="1" timelimit="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.21" expl="21. index in array bounds" sum="def56096b77af7d2c8a7cb61f9c3dc95" expanded="true">
+  <goal name="WP_parameter mjrty.21" expl="21. index in array bounds" expanded="true">
   <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.22" expl="22. postcondition" sum="682e5ee303bdf0baaf09ba16b4a610da" expanded="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter mjrty.22" expl="22. postcondition" expanded="true">
+  <proof prover="2"><result status="valid" time="0.36"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.23" expl="23. loop invariant preservation" sum="26d2c3a4cd2a410852fe22eb46dc5dc5" expanded="true">
-  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="0.13"/></proof>
+  <goal name="WP_parameter mjrty.23" expl="23. loop invariant preservation" expanded="true">
+  <proof prover="1" timelimit="5" memlimit="1000"><result status="valid" time="3.90"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.24" expl="24. loop invariant preservation" sum="3aaabbcb0c78505719b9f1a41efeeba2" expanded="true">
+  <goal name="WP_parameter mjrty.24" expl="24. loop invariant preservation" expanded="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter mjrty.25" expl="25. exceptional postcondition" sum="5a0d4edc335e01ebe99146de348cf5ec" expanded="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter mjrty.25" expl="25. exceptional postcondition" expanded="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>

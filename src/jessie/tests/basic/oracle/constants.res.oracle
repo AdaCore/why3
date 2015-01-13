@@ -1,10 +1,17 @@
+[jessie3] Loading Why3 configuration...
+[jessie3] Why3 environment loaded.
+[jessie3] Loading Why3 theories...
+[jessie3] Loading Why3 modules...
 [kernel] preprocessing with "gcc -C -E -I.  tests/basic/constants.c"
+[jessie3] Loading prover drivers...
+[jessie3] Translating to Why3...
 [jessie3] found 5 logic decl(s)
 [jessie3] made 1 theory(ies)
 [jessie3] made 0 function(s)
+[jessie3] Running provers...
 [jessie3] running theory 1:
 [jessie3] theory Global_logic_declarations
-            (* use why3.BuiltIn *)
+            (* use why3.BuiltIn.BuiltIn *)
             
             (* use int.Int *)
             
@@ -22,21 +29,21 @@
             
             lemma test4 : 0x1.1p4 = 17.0
             end
-[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
-[jessie3] Task 1 (test1): Valid, Valid, Valid, Valid
-[jessie3] Task 2 (test_ofl): Valid, Valid, Valid, Valid
-[jessie3] Task 3 (test2): Valid, Valid, Valid, Valid
-[jessie3] Task 4 (test3): Valid, Valid, Valid, Valid
-[jessie3] Task 5 (test4): Valid, Valid, Valid, Valid
+[jessie3] Provers: Alt-Ergo 0.95.2, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Task 1 (test1): Valid, Valid, Valid, Valid, Valid
+[jessie3] Task 2 (test_ofl): Valid, Valid, Valid, Valid, Valid
+[jessie3] Task 3 (test2): Valid, Valid, Valid, Valid, Valid
+[jessie3] Task 4 (test3): Valid, Valid, Valid, Valid, Valid
+[jessie3] Task 5 (test4): Valid, Valid, Valid, Valid, Valid
 [jessie3] running theory 1:
 [jessie3] theory C_Functions
-            (* use why3.BuiltIn *)
+            (* use why3.BuiltIn.BuiltIn *)
             
-            (* use why3.Bool *)
+            (* use why3.Bool.Bool *)
             
-            (* use why3.Unit *)
+            (* use why3.Unit.Unit *)
             
-            (* use why3.Prelude *)
+            (* use why3.Prelude.Prelude *)
             
             (* use int.Int *)
             
@@ -48,6 +55,6 @@
             
             (* use ref.Ref *)
             
-            (* use mach_int.Int32 *)
+            (* use mach.int.Int32 *)
             end
-[jessie3] Provers: Alt-Ergo 0.95.1, CVC3 2.4.1, Z3 3.2, Z3 4.3.1
+[jessie3] Provers: Alt-Ergo 0.95.2, CVC4 1.4, CVC3 2.4.1, Z3 3.2, Z3 4.3.1

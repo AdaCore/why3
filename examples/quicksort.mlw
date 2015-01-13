@@ -63,14 +63,22 @@ end
 
 (* a realistic quicksort first shuffles the array *)
 
-module Shuffle
+module Shuffle "Knuth shuffle"
 
+  use import int.Int
   use import array.Array
+  use import array.ArraySwap
   use import array.ArrayPermut
+  use random.Random
 
-  val shuffle (a: array int) : unit
-    writes  { a }
+  let shuffle (a: array int) : unit
+    writes  { a, Random.s }
     ensures { permut_all (old a) a }
+  = 'L:
+    for i = 1 to length a - 1 do
+      invariant { permut_all (at a 'L) a }
+      swap a i (Random.random_int (i+1))
+    done
 
 end
 
@@ -86,6 +94,7 @@ module QuicksortWithShuffle
   let qs (a: array int) : unit =
     ensures { sorted a }
     ensures { permut_all (old a) a }
+    shuffle a;
     quicksort a
 
 end
@@ -162,6 +171,7 @@ module Quicksort3way
   let qs (a: array int) : unit =
     ensures { sorted a }
     ensures { permut_all (old a) a }
+    shuffle a;
     quicksort a
 
 end

@@ -3,60 +3,65 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require bool.Bool.
 Require map.Map.
 Require set.Set.
 
 (* Why3 assumption *)
-Definition unit  := unit.
+Definition unit := unit.
+
+Axiom qtmark : Type.
+Parameter qtmark_WhyType : WhyType qtmark.
+Existing Instance qtmark_WhyType.
 
 (* Why3 assumption *)
-Inductive datatype  :=
-  | Tint : datatype 
-  | Tbool : datatype .
+Inductive datatype :=
+  | Tint : datatype
+  | Tbool : datatype.
 Axiom datatype_WhyType : WhyType datatype.
 Existing Instance datatype_WhyType.
 
 (* Why3 assumption *)
-Inductive operator  :=
-  | Oplus : operator 
-  | Ominus : operator 
-  | Omult : operator 
-  | Ole : operator .
+Inductive operator :=
+  | Oplus : operator
+  | Ominus : operator
+  | Omult : operator
+  | Ole : operator.
 Axiom operator_WhyType : WhyType operator.
 Existing Instance operator_WhyType.
 
 (* Why3 assumption *)
-Definition ident  := Z.
+Definition ident := Z.
 
 (* Why3 assumption *)
-Inductive term  :=
-  | Tconst : Z -> term 
-  | Tvar : Z -> term 
-  | Tderef : Z -> term 
-  | Tbin : term -> operator -> term -> term .
+Inductive term :=
+  | Tconst : Z -> term
+  | Tvar : Z -> term
+  | Tderef : Z -> term
+  | Tbin : term -> operator -> term -> term.
 Axiom term_WhyType : WhyType term.
 Existing Instance term_WhyType.
 
 (* Why3 assumption *)
-Inductive fmla  :=
-  | Fterm : term -> fmla 
-  | Fand : fmla -> fmla -> fmla 
-  | Fnot : fmla -> fmla 
-  | Fimplies : fmla -> fmla -> fmla 
-  | Flet : Z -> term -> fmla -> fmla 
-  | Fforall : Z -> datatype -> fmla -> fmla .
+Inductive fmla :=
+  | Fterm : term -> fmla
+  | Fand : fmla -> fmla -> fmla
+  | Fnot : fmla -> fmla
+  | Fimplies : fmla -> fmla -> fmla
+  | Flet : Z -> term -> fmla -> fmla
+  | Fforall : Z -> datatype -> fmla -> fmla.
 Axiom fmla_WhyType : WhyType fmla.
 Existing Instance fmla_WhyType.
 
 (* Why3 assumption *)
-Inductive value  :=
-  | Vint : Z -> value 
-  | Vbool : bool -> value .
+Inductive value :=
+  | Vint : Z -> value
+  | Vbool : bool -> value.
 Axiom value_WhyType : WhyType value.
 Existing Instance value_WhyType.
 
 (* Why3 assumption *)
-Definition env  := (map.Map.map Z value).
+Definition env := (map.Map.map Z value).
 
 Parameter eval_bin: value -> operator -> value -> value.
 
@@ -74,7 +79,7 @@ Axiom eval_bin_def : forall (x:value) (op:operator) (y:value), match (x,
   end.
 
 (* Why3 assumption *)
-Fixpoint eval_term(sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
+Fixpoint eval_term (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
   (t:term) {struct t}: value :=
   match t with
   | (Tconst n) => (Vint n)
@@ -85,7 +90,7 @@ Fixpoint eval_term(sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
   end.
 
 (* Why3 assumption *)
-Fixpoint eval_fmla(sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
+Fixpoint eval_fmla (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value))
   (f:fmla) {struct f}: Prop :=
   match f with
   | (Fterm t) => ((eval_term sigma pi t) = (Vbool true))
@@ -113,7 +118,7 @@ Axiom subst_term_def : forall (e:term) (r:Z) (v:Z),
   end.
 
 (* Why3 assumption *)
-Fixpoint fresh_in_term(id:Z) (t:term) {struct t}: Prop :=
+Fixpoint fresh_in_term (id:Z) (t:term) {struct t}: Prop :=
   match t with
   | (Tconst _) => True
   | (Tvar v) => ~ (id = v)
@@ -131,19 +136,19 @@ Axiom eval_term_change_free : forall (t:term) (sigma:(map.Map.map Z value))
   ((eval_term sigma (map.Map.set pi id v) t) = (eval_term sigma pi t)).
 
 (* Why3 assumption *)
-Fixpoint fresh_in_fmla(id:Z) (f:fmla) {struct f}: Prop :=
+Fixpoint fresh_in_fmla (id:Z) (f:fmla) {struct f}: Prop :=
   match f with
   | (Fterm e) => (fresh_in_term id e)
   | ((Fand f1 f2)|(Fimplies f1 f2)) => (fresh_in_fmla id f1) /\
       (fresh_in_fmla id f2)
   | (Fnot f1) => (fresh_in_fmla id f1)
-  | (Flet y t f1) => (~ (id = y)) /\ ((fresh_in_term id t) /\
-      (fresh_in_fmla id f1))
-  | (Fforall y ty f1) => (~ (id = y)) /\ (fresh_in_fmla id f1)
+  | (Flet y t f1) => (~ (id = y)) /\ ((fresh_in_term id t) /\ (fresh_in_fmla
+      id f1))
+  | (Fforall y _ f1) => (~ (id = y)) /\ (fresh_in_fmla id f1)
   end.
 
 (* Why3 assumption *)
-Fixpoint subst(f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
+Fixpoint subst (f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
   match f with
   | (Fterm e) => (Fterm (subst_term e x v))
   | (Fand f1 f2) => (Fand (subst f1 x v) (subst f2 x v))
@@ -154,9 +159,9 @@ Fixpoint subst(f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
   end.
 
 Axiom eval_subst : forall (f:fmla) (sigma:(map.Map.map Z value))
-  (pi:(map.Map.map Z value)) (x:Z) (v:Z), (fresh_in_fmla v f) ->
-  ((eval_fmla sigma pi (subst f x v)) <-> (eval_fmla (map.Map.set sigma x
-  (map.Map.get pi v)) pi f)).
+  (pi:(map.Map.map Z value)) (x:Z) (v:Z), (fresh_in_fmla v f) -> ((eval_fmla
+  sigma pi (subst f x v)) <-> (eval_fmla (map.Map.set sigma x (map.Map.get pi
+  v)) pi f)).
 
 Axiom eval_swap : forall (f:fmla) (sigma:(map.Map.map Z value))
   (pi:(map.Map.map Z value)) (id1:Z) (id2:Z) (v1:value) (v2:value),
@@ -169,21 +174,21 @@ Axiom eval_change_free : forall (f:fmla) (sigma:(map.Map.map Z value))
   ((eval_fmla sigma (map.Map.set pi id v) f) <-> (eval_fmla sigma pi f)).
 
 (* Why3 assumption *)
-Inductive stmt  :=
-  | Sskip : stmt 
-  | Sassign : Z -> term -> stmt 
-  | Sseq : stmt -> stmt -> stmt 
-  | Sif : term -> stmt -> stmt -> stmt 
-  | Sassert : fmla -> stmt 
-  | Swhile : term -> fmla -> stmt -> stmt .
+Inductive stmt :=
+  | Sskip : stmt
+  | Sassign : Z -> term -> stmt
+  | Sseq : stmt -> stmt -> stmt
+  | Sif : term -> stmt -> stmt -> stmt
+  | Sassert : fmla -> stmt
+  | Swhile : term -> fmla -> stmt -> stmt.
 Axiom stmt_WhyType : WhyType stmt.
 Existing Instance stmt_WhyType.
 
 Axiom check_skip : forall (s:stmt), (s = Sskip) \/ ~ (s = Sskip).
 
 (* Why3 assumption *)
-Inductive one_step : (map.Map.map Z value) -> (map.Map.map Z value) -> stmt
-  -> (map.Map.map Z value) -> (map.Map.map Z value) -> stmt -> Prop :=
+Inductive one_step: (map.Map.map Z value) -> (map.Map.map Z value) -> stmt ->
+  (map.Map.map Z value) -> (map.Map.map Z value) -> stmt -> Prop :=
   | one_step_assign : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z
       value)) (x:Z) (e:term), (one_step sigma pi (Sassign x e)
       (map.Map.set sigma x (eval_term sigma pi e)) pi Sskip)
@@ -203,19 +208,18 @@ Inductive one_step : (map.Map.map Z value) -> (map.Map.map Z value) -> stmt
       value)) (f:fmla), (eval_fmla sigma pi f) -> (one_step sigma pi
       (Sassert f) sigma pi Sskip)
   | one_step_while_true : forall (sigma:(map.Map.map Z value))
-      (pi:(map.Map.map Z value)) (e:term) (inv:fmla) (i:stmt),
-      (eval_fmla sigma pi inv) -> (((eval_term sigma pi e) = (Vbool true)) ->
-      (one_step sigma pi (Swhile e inv i) sigma pi (Sseq i (Swhile e inv
-      i))))
+      (pi:(map.Map.map Z value)) (e:term) (inv:fmla) (i:stmt), (eval_fmla
+      sigma pi inv) -> (((eval_term sigma pi e) = (Vbool true)) -> (one_step
+      sigma pi (Swhile e inv i) sigma pi (Sseq i (Swhile e inv i))))
   | one_step_while_false : forall (sigma:(map.Map.map Z value))
-      (pi:(map.Map.map Z value)) (e:term) (inv:fmla) (i:stmt),
-      (eval_fmla sigma pi inv) -> (((eval_term sigma pi
-      e) = (Vbool false)) -> (one_step sigma pi (Swhile e inv i) sigma pi
-      Sskip)).
+      (pi:(map.Map.map Z value)) (e:term) (inv:fmla) (i:stmt), (eval_fmla
+      sigma pi inv) -> (((eval_term sigma pi e) = (Vbool false)) -> (one_step
+      sigma pi (Swhile e inv i) sigma pi Sskip)).
 
 (* Why3 assumption *)
-Inductive many_steps : (map.Map.map Z value) -> (map.Map.map Z value) -> stmt
-  -> (map.Map.map Z value) -> (map.Map.map Z value) -> stmt -> Z -> Prop :=
+Inductive many_steps: (map.Map.map Z value) -> (map.Map.map Z value) ->
+  stmt -> (map.Map.map Z value) -> (map.Map.map Z value) -> stmt -> Z ->
+  Prop :=
   | many_steps_refl : forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z
       value)) (i:stmt), (many_steps sigma pi i sigma pi i 0%Z)
   | many_steps_trans : forall (sigma1:(map.Map.map Z value))
@@ -240,18 +244,18 @@ Axiom many_steps_seq : forall (sigma1:(map.Map.map Z value))
   i2 sigma3 pi3 Sskip n2) /\ (n = ((1%Z + n1)%Z + n2)%Z)).
 
 (* Why3 assumption *)
-Definition valid_fmla(p:fmla): Prop := forall (sigma:(map.Map.map Z value))
+Definition valid_fmla (p:fmla): Prop := forall (sigma:(map.Map.map Z value))
   (pi:(map.Map.map Z value)), (eval_fmla sigma pi p).
 
 (* Why3 assumption *)
-Definition valid_triple(p:fmla) (i:stmt) (q:fmla): Prop :=
-  forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value)),
-  (eval_fmla sigma pi p) -> forall (sigma':(map.Map.map Z value))
-  (pi':(map.Map.map Z value)) (n:Z), (many_steps sigma pi i sigma' pi' Sskip
-  n) -> (eval_fmla sigma' pi' q).
+Definition valid_triple (p:fmla) (i:stmt) (q:fmla): Prop :=
+  forall (sigma:(map.Map.map Z value)) (pi:(map.Map.map Z value)), (eval_fmla
+  sigma pi p) -> forall (sigma':(map.Map.map Z value)) (pi':(map.Map.map Z
+  value)) (n:Z), (many_steps sigma pi i sigma' pi' Sskip n) -> (eval_fmla
+  sigma' pi' q).
 
 (* Why3 assumption *)
-Definition assigns(sigma:(map.Map.map Z value)) (a:(set.Set.set Z))
+Definition assigns (sigma:(map.Map.map Z value)) (a:(set.Set.set Z))
   (sigma':(map.Map.map Z value)): Prop := forall (i:Z), (~ (set.Set.mem i
   a)) -> ((map.Map.get sigma i) = (map.Map.get sigma' i)).
 
@@ -272,7 +276,7 @@ Axiom assigns_union_right : forall (sigma:(map.Map.map Z value))
   (assigns sigma s2 sigma') -> (assigns sigma (set.Set.union s1 s2) sigma').
 
 (* Why3 assumption *)
-Fixpoint stmt_writes(i:stmt) (w:(set.Set.set Z)) {struct i}: Prop :=
+Fixpoint stmt_writes (i:stmt) (w:(set.Set.set Z)) {struct i}: Prop :=
   match i with
   | (Sskip|(Sassert _)) => True
   | (Sassign id _) => (set.Set.mem id w)
@@ -303,9 +307,9 @@ Axiom assert_rule : forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
 Axiom assert_rule_ext : forall (f:fmla) (p:fmla), (valid_triple (Fimplies f
   p) (Sassert f) p).
 
-Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt),
-  (valid_triple (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e
-  inv i) (Fand (Fnot (Fterm e)) inv)).
+Axiom while_rule : forall (e:term) (inv:fmla) (i:stmt), (valid_triple
+  (Fand (Fterm e) inv) i inv) -> (valid_triple inv (Swhile e inv i)
+  (Fand (Fnot (Fterm e)) inv)).
 
 Axiom while_rule_ext : forall (e:term) (inv:fmla) (inv':fmla) (i:stmt),
   (valid_fmla (Fimplies inv' inv)) -> ((valid_triple (Fand (Fterm e) inv') i
@@ -313,27 +317,17 @@ Axiom while_rule_ext : forall (e:term) (inv:fmla) (inv':fmla) (i:stmt),
   inv'))).
 
 (* Why3 goal *)
-Theorem WP_parameter_wp : forall (i:stmt) (q:fmla),
-  match i with
-  | Sskip => True
-  | (Sseq i1 i2) => True
-  | (Sassign x e) => True
-  | (Sif e i1 i2) => True
-  | (Sassert f) => True
-  | (Swhile e inv i1) => forall (o:fmla), (valid_triple o i1 inv) ->
-      forall (o1:fmla), (forall (sigma:(map.Map.map Z value))
-      (pi:(map.Map.map Z value)), (eval_fmla sigma pi o1) ->
-      ((eval_fmla sigma pi (Fand (Fimplies (Fand (Fterm e) inv) o)
-      (Fimplies (Fand (Fnot (Fterm e)) inv) q))) /\
-      forall (sigma':(map.Map.map Z value)) (pi':(map.Map.map Z value))
-      (n:Z), (many_steps sigma pi i1 sigma' pi' Sskip n) -> (eval_fmla sigma'
-      pi' o1))) -> (valid_triple (Fand inv o1) i q)
-  end.
-destruct i; trivial.
-rename t into cond.
-rename f into inv.
-rename i into body.
-intros Post WP_body H_WP_body.
+Theorem WP_parameter_wp : forall (i:stmt) (q:fmla), forall (x:term) (x1:fmla)
+  (x2:stmt), (i = (Swhile x x1 x2)) -> forall (o:fmla), (valid_triple o x2
+  x1) -> forall (o1:fmla), (forall (sigma:(map.Map.map Z value))
+  (pi:(map.Map.map Z value)), (eval_fmla sigma pi o1) -> ((eval_fmla sigma pi
+  (Fand (Fimplies (Fand (Fterm x) x1) o) (Fimplies (Fand (Fnot (Fterm x)) x1)
+  q))) /\ forall (sigma':(map.Map.map Z value)) (pi':(map.Map.map Z value))
+  (n:Z), (many_steps sigma pi x2 sigma' pi' Sskip n) -> (eval_fmla sigma' pi'
+  o1))) -> (valid_triple (Fand x1 o1) i q).
+(* Why3 intros i q x x1 x2 h1 o h2 o1 h3. *)
+intros i Post cond inv body H_;rewrite H_ in *;clear H_ i.
+intros WP_body H_WP_body.
 intros abstracted_fmla H_abstracted.
 red.
 intros s1 p1 H1 s2 p2 n Hsteps.
@@ -370,5 +364,4 @@ clear H_abstracted.
 apply Hfalse; split; auto.
 rewrite H11; discriminate.
 Qed.
-
 

@@ -1,0 +1,726 @@
+
+(** {1 Base implementation of AVL trees}
+    Author: Martin Clochard *)
+
+(** {2 Preliminary definitions} *)
+theory SelectionTypes
+
+  use import list.List
+  use import option.Option
+  use import list.Append
+
+  (** Describe a position in the list [left ++ middle ++ right]
+      (see [rebuild]) *)
+  type split 'a = {
+    left : list 'a;
+    middle : option 'a;
+    right : list 'a;
+  }
+
+  (** Describe reduced problem for selection (see [selected_part]) *)
+  type part_base 'a = Left 'a
+    | Right 'a
+    | Here
+
+  (** Reconstruct the list associated to a split. *)
+  function rebuild (p:split 'a) : list 'a =
+    match p.middle with
+    | Some x -> p.left ++ Cons x p.right
+    | None -> p.left ++ p.right
+    end
+
+  function option_to_list (o:option 'a) : list 'a =
+    match o with
+    | Some x -> Cons x Nil
+    | None -> Nil
+    end
+
+  (** Alternative definition for [rebuild]. *)
+  lemma rebuild_aternative_def : forall p:split 'a.
+    rebuild p = p.left ++ option_to_list p.middle ++ p.right
+
+  (** Shortcuts for extending a split on the left/right. *)
+  function left_extend (l:list 'a) (d:'a) (e:split 'a) : split 'a =
+    { e with left = l ++ Cons d e.left }
+
+  function right_extend (e:split 'a) (d:'a) (r:list 'a) : split 'a =
+    { e with right = e.right ++ Cons d r }
+
+end
+
+(** {2 AVL trees} *)
+
+module AVL
+
+  (** {3 Rebalancing code}
+
+      The first part of the module implements the rebalancing code.
+      It can also be seen as an implementation of logarithmic-time
+      catenable dequeues with a constant-time nearly-fair splitting
+      operation (derived from tree pattern-matching).
+
+      (About the time complexity bounds: a call to an abstract
+       routine (monoid operations, element measure,...) is assumed to
+       take constant time) *)
+
+  use import int.Int
+  use import bool.Bool
+  use import list.List
+  use import list.Append
+  use import HighOrd
+  use import option.Option
+  use import ref.Ref
+
+  (** The implementation is parameterized by an abstract monoid.
+      The elements of the monoid will be used as summaries of
+      sequence of elements, obtained by aggregation of the elements of
+      the sequence. In other words, [M.sum f [a_1;...;a_n]] is the
+      monoidal summary of sequence [[a_1;...;a_n]] with respect to
+      measure [f]. *)
+  clone monoid.ComputableMonoid as M
+  clone monoid.MonoidSum as M with type M.t = M.t,
+    constant M.zero = M.zero,
+    function M.op = M.op,
+    goal M.assoc,
+    goal M.neutral
+
+  (** Abstract description of the data stored in the tree. *)
+  namespace D
+    type t 'a
+
+    (** Elements can be measured. *)
+    function measure (t 'a) : M.t
+    val measure (x:t 'a) : M.t ensures { measure x = result }
+  end
+
+  (** Actual height difference permitted between subtrees.
+
+     The balancing can be any positive integer. This is a trade-off between
+     the cost of balancing and the cost of finding:
+     the bigger the balancing constant is, the lesser is the need for
+     balancing the tree, but the deeper the trees may be. *)
+  constant balancing : int
+  axiom balancing_positive : balancing > 0
+
+  (** tree representation.
+      Height and monoidal summary are cached at every node. *)
+  type tree 'a =
+    | Empty
+    | Node (tree 'a) (D.t 'a) (tree 'a) int M.t
+
+  (** Logical model of an AVL tree.
+
+      An AVL tree is intended to represent a sequence of elements, which we
+      model using a list. It corresponds to the sequence of elements obtained
+      by left-to-right infix order (note that this sequence is invariant by
+      rebalancing). However, in order to specify rebalancing, the tree
+      structure cannot be completely abstracted away because of the height
+      requirements, so we add the height to the model.
+  *)
+  type m 'a = {
+    lis : list (D.t 'a);
+    hgt : int;
+  }
+
+  function node_model (l:list 'a) (d:'a) (r:list 'a) : list 'a =
+    l ++ Cons d r
+
+  (** Sequence of elements obtained by infix-order traversal. *)
+  function list_model (t:tree 'a) : list (D.t 'a) =
+    match t with
+    | Empty -> Nil
+    | Node l d r _ _ -> node_model (list_model l) d (list_model r)
+    end
+
+  (** Height of the tree. *)
+  function real_height (t:tree 'a) : int = match t with
+    | Empty -> 0
+    | Node l _ r _ _ -> let hl = real_height l in let hr = real_height r in
+      1 + if hl < hr then hr else hl
+    end
+
+  (** Height is non-negative. *)
+  let rec lemma real_height_nonnegative (t:tree 'a) : unit
+    ensures { real_height t >= 0 }
+    variant { t }
+  = match t with
+    | Empty -> ()
+    | Node l _ r _ _ -> real_height_nonnegative l; real_height_nonnegative r
+    end
+
+  (** Balanced tree + correctness of cached annotations: at every node,
+
+      1) The additional integer is the height of the corresponding subtree
+
+      2) The monoidal value corresponds to the summary of the sequence of
+         elements associated with the subtree associated with the node
+
+      3) Left and right subtrees are [balancing]-height-balanced *)
+  predicate balanced (t:tree 'a) = match t with
+    | Empty -> true
+    | Node l _ r h m ->  h = real_height t /\
+      m = M.sum D.measure (list_model t) /\
+      -balancing <= real_height r - real_height l <= balancing /\
+      balanced l /\ balanced r
+    end
+
+  (** Tree rotations preserve the in-order sequence of element *)
+  lemma rotation_preserve_model : forall ld rd:'a,fl fm fr:list 'a.
+      node_model (node_model fl ld fm) rd fr =
+        node_model fl ld (node_model fm rd fr)
+
+  (** Actual program type for AVL trees *)
+  type t 'a = {
+    (* Representation as a binary tree. *)
+    repr : tree 'a;
+    (* Model. *)
+    ghost m : m 'a;
+  }
+
+  (** Invariant (c as correct). *)
+  predicate c (a:t 'a) =
+    let tree = a.repr in
+    balanced tree /\
+    a.m.lis = list_model tree /\
+    a.m.hgt = real_height tree
+
+  (** Compute the height of the tree. O(1) since the height is cached. *)
+  let height (t:t 'a) : int
+    requires { c t }
+    ensures { result = t.m.hgt }
+  = match t.repr with
+    | Empty -> 0
+    | Node _ _ _ h _ -> h
+    end
+
+  (** Compute the monoidal summary of the elements stored in the structure.
+      constant-time. *)
+  let total (t:t 'a) : M.t
+    requires { c t }
+    ensures { result = M.sum D.measure t.m.lis }
+  = match t.repr with
+    | Empty -> M.zero ()
+    | Node _ _ _ _ m -> m
+    end
+
+  (** Create an empty AVL tree. *)
+  let empty () : t 'a
+    ensures { result.m.lis = Nil /\ result.m.hgt = 0 /\ c result }
+  = { repr = Empty; m = { lis = Nil; hgt = 0 } }
+
+  (** re-specify the node constructor in terms of the logical model. *)
+  let node (l:t 'a) (d:D.t 'a) (r:t 'a) : t 'a
+    requires { -balancing <= l.m.hgt - r.m.hgt <= balancing /\ c l /\ c r }
+    ensures { result.m.lis = node_model l.m.lis d r.m.lis /\ c result }
+    ensures { result.m.hgt =
+      1 + if l.m.hgt < r.m.hgt then r.m.hgt else l.m.hgt }
+  = let hl = height l in let hr = height r in
+    let h = 1 + if hl < hr then hr else hl in
+    let s = M.op (total l) (M.op (D.measure d) (total r)) in
+    { repr = Node l.repr d r.repr h s;
+      m = { lis = node_model l.m.lis d r.m.lis;
+            hgt = h } }
+
+  (** Create a one-element AVL tree. *)
+  let singleton (d:D.t 'a) : t 'a
+    ensures { result.m.lis = Cons d Nil /\ result.m.hgt = 1 /\ c result }
+  = { repr = Node Empty d Empty 1 (D.measure d);
+      m = { lis = Cons d Nil; hgt = 1 } }
+
+  (** Emptyness test. constant-time. *)
+  let is_empty (t:t 'a) : bool
+    requires { c t }
+    ensures { result <-> match t.m.lis with Nil -> true | _ -> false end }
+  = match t.repr with
+    | Empty -> true
+    | _ -> false
+    end
+
+  (** View of an AVL tree for pattern-matching. *)
+  type view 'a =
+    | AEmpty
+    | ANode (t 'a) (D.t 'a) (t 'a) int M.t
+
+  (** Specification wrapper around pattern-matching, in terms
+      of the logical model only. In terms of the model, it corresponds
+      to an operation splitting a non-empty list into three parts,
+      with left and right part of similar heights. *)
+  let view (t:t 'a) : view 'a
+    requires { c t }
+    ensures { match result with
+      | AEmpty -> t.m.hgt = 0 /\ t.m.lis = Nil
+      | ANode l d r h s ->
+        t.m.lis = node_model l.m.lis d r.m.lis /\
+        s = M.sum D.measure t.m.lis /\ c l /\ c r /\
+        let hl = l.m.hgt in let hr = r.m.hgt in
+        -balancing <= hl - hr <= balancing /\
+        t.m.hgt = h = 1 + if hl < hr then hr else hl
+      end }
+  = match t.repr with
+    | Empty -> AEmpty
+    | Node l d r h s ->
+      ANode { repr = l;
+              m = { lis = list_model l; hgt = real_height l } }
+            d
+            { repr = r;
+              m = { lis = list_model r; hgt = real_height r } }
+            h
+            s
+    end
+
+  (** First re-balancing constructor: [balance l d r]
+      build the same sequence as [node l d r], but permit slightly
+      unbalanced input, and might decrement the expected height by one.
+      Also, if the expected input node was already balanced, it is
+      specified to return a value indistinguishable from a value
+      returned by [node l d r].
+      This constructor is constant-time. *)
+  let balance (l:t 'a) (d:D.t 'a) (r:t 'a) : t 'a
+    requires { -balancing-1 <= l.m.hgt - r.m.hgt <= balancing+1 /\ c l /\ c r }
+    ensures { result.m.lis = node_model l.m.lis d r.m.lis /\ c result }
+    ensures { let hl = l.m.hgt in let hr = r.m.hgt in
+      let he = 1 + if hl < hr then hr else hl in
+      let hres = result.m.hgt in
+      0 <= he - hres <= 1 /\
+      (-balancing <= hl - hr <= balancing -> he = hres) }
+  = (* Wonderful case of automatic proof ! *)
+    let hl = height l in
+    let hr = height r in
+    let df = hl - hr in
+    if df > balancing
+    then match view l with
+      | AEmpty -> absurd
+      | ANode ll ld lr _ _ ->
+        if height ll >= height lr
+        then node ll ld (node lr d r)
+        else match view lr with
+          | AEmpty -> absurd
+          | ANode lrl lrd lrr _ _ ->
+            node (node ll ld lrl) lrd (node lrr d r)
+          end
+      end
+    else if df < -balancing
+    then match view r with
+      | AEmpty -> absurd
+      | ANode rl rd rr _ _ ->
+        if height rr >= height rl
+        then node (node l d rl) rd rr
+        else match view rl with
+          | AEmpty -> absurd
+          | ANode rll rld rlr _ _ ->
+            node (node l d rll) rld (node rlr rd rr)
+          end
+      end
+    else node l d r
+
+  (** Internal routine. Decompose [l ++ [d] ++ r] as [[head]++tail],
+      with sequences represented by AVL trees. *)
+  let rec decompose_front_node (l:t 'a) (d:D.t 'a) (r:t 'a) : (D.t 'a,t 'a)
+    requires { -balancing <= l.m.hgt - r.m.hgt <= balancing /\ c l /\ c r }
+    returns { (d2,res) -> node_model l.m.lis d r.m.lis = Cons d2 res.m.lis /\
+      let hl = l.m.hgt in let hr = r.m.hgt in
+      let he = 1 + if hl < hr then hr else hl in
+      0 <= he - res.m.hgt <= 1 /\ c res }
+    variant { l.m.hgt }
+  = match view l with
+    | AEmpty -> (d,r)
+    | ANode l d2 r2 _ _ -> let (d3,left) = decompose_front_node l d2 r2 in
+      (d3,balance left d r)
+    end
+
+  (** Pattern-matching over the front of the sequence. Time proportional
+      to the height (logarithmic in the size of the tree). *)
+  let decompose_front (t:t 'a) : option (D.t 'a,t 'a)
+    requires { c t }
+    returns { None -> t.m.lis = Nil
+      | Some (hd,tl) -> c tl /\ t.m.lis = Cons hd tl.m.lis }
+  = match view t with
+    | AEmpty -> None
+    | ANode l d r _ _ -> Some (decompose_front_node l d r)
+    end
+
+
+  (** Internal routine, mirror of [decompose_front_node]. *)
+  let rec decompose_back_node (l:t 'a) (d:D.t 'a) (r:t 'a) : (t 'a,D.t 'a)
+    requires { -balancing <= l.m.hgt - r.m.hgt <= balancing /\ c l /\ c r }
+    returns { (res,d2) -> node_model l.m.lis d r.m.lis =
+        res.m.lis ++ Cons d2 Nil /\
+      let hl = l.m.hgt in let hr = r.m.hgt in
+      let he = 1 + if hl < hr then hr else hl in
+      0 <= he - res.m.hgt <= 1 /\ c res }
+    variant { r.m.hgt }
+  = match view r with
+    | AEmpty -> (l,d)
+    | ANode l2 d2 r _ _ -> let (right,d3) = decompose_back_node l2 d2 r in
+      (balance l d right,d3)
+    end
+
+  (** Pattern-matching over the back of the sequence. Time proportional
+      to the height (logarithmic in the size of the tree). *)
+  let decompose_back (t:t 'a) : option (t 'a,D.t 'a)
+    requires { c t }
+    returns { None -> t.m.lis = Nil
+      | Some (cotl,cohd) -> c cotl /\ t.m.lis = cotl.m.lis ++ Cons cohd Nil }
+  = match view t with
+    | AEmpty -> None
+    | ANode l d r _ _ -> Some (decompose_back_node l d r)
+    end
+
+  (** Internal routine. *)
+  let rec front_node (ghost li:ref (list (D.t 'a))) (l:t 'a)
+    (d:D.t 'a) : D.t 'a
+    requires { c l }
+    ensures { Cons result !li = l.m.lis ++ Cons d Nil }
+    variant { l.m.hgt }
+  = match view l with
+    | AEmpty -> li := Nil; d
+    | ANode l d2 r _ _ -> let res = front_node li l d2 in
+      li := !li ++ r.m.lis ++ Cons d Nil; res
+    end
+
+  (** Get the first element of a non-empty sequence.
+      The ghost reference is used to get an explicit
+      view of the tail (no existential). logarithmic-time. *)
+  let front (ghost li:ref (list (D.t 'a))) (t:t 'a) : D.t 'a
+    requires { match t.m.lis with Nil -> false | _ -> true end /\ c t }
+    ensures { Cons result !li = t.m.lis }
+  = match view t with
+    | AEmpty -> absurd
+    | ANode l d2 r _ _ -> let res = front_node li l d2 in
+      li := !li ++ r.m.lis; res
+    end
+
+  (** Internal routine. *)
+  let rec back_node (ghost li:ref (list (D.t 'a))) (d:D.t 'a)
+    (r:t 'a) : D.t 'a
+    requires { c r }
+    ensures { !li ++ Cons result Nil = Cons d r.m.lis }
+    variant { r.m.hgt }
+  = match view r with
+    | AEmpty -> li := Nil; d
+    | ANode l d2 r _ _ -> let res = back_node li d2 r in
+      li := Cons d l.m.lis ++ !li; res
+    end
+
+  (** Get the back of a non-empty sequence. logarithmic-time. *)
+  let back (ghost li:ref (list (D.t 'a))) (t:t 'a) : D.t 'a
+    requires { match t.m.lis with Nil -> false | _ -> true end /\ c t }
+    ensures { !li ++ Cons result Nil = t.m.lis }
+  = match view t with
+    | AEmpty -> absurd
+    | ANode l d2 r _ _ -> let res = back_node li d2 r in
+      li := l.m.lis ++ !li; res
+    end
+
+  (** Catenation with balanced inputs (like sibling subtrees).
+      logarithmic-time. *)
+  let fuse (l r:t 'a) : t 'a
+    requires { -balancing <= l.m.hgt - r.m.hgt <= balancing /\ c l /\ c r }
+    ensures { result.m.lis = l.m.lis ++ r.m.lis /\ c result }
+    ensures { let hl = l.m.hgt in let hr = r.m.hgt in
+      let he = 1 + if hl < hr then hr else hl in
+      1 >= he - result.m.hgt >= 0 }
+  =
+    match view l with
+    | AEmpty -> r
+    | ANode _ _ _ _ _ -> match view r with
+      | AEmpty -> l
+      | ANode rl rd rr _ _ -> let (d0,r') = decompose_front_node rl rd rr in
+        balance l d0 r'
+      end
+    end
+
+  (** List cons: build the sequence [[d]++t]. logarithmic-time. *)
+  let rec cons (d:D.t 'a) (t:t 'a) : t 'a
+    requires { c t }
+    ensures { result.m.lis = Cons d t.m.lis /\ c result }
+    ensures { 1 >= result.m.hgt - t.m.hgt >= 0 }
+    variant { t.m.hgt }
+  = match view t with
+    | AEmpty -> singleton d
+    | ANode l d2 r _ _ -> balance (cons d l) d2 r
+    end
+
+  (** Reverse cons: build [t++[d]]. logarithmic-time. *)
+  let rec snoc (t:t 'a) (d:D.t 'a) : t 'a
+    requires { c t }
+    ensures { result.m.lis = t.m.lis ++ Cons d Nil /\ c result }
+    ensures { 1 >= result.m.hgt - t.m.hgt >= 0 }
+    variant { t.m.hgt }
+  = match view t with
+    | AEmpty -> singleton d
+    | ANode l d2 r _ _ -> balance l d2 (snoc r d)
+    end
+
+  (** Variant of the node constructor without any height hypothesis.
+     The time complexity is proportional to the height
+     difference between [l] and [r] (O(|l.m.hgt-r.m.hgt|)) (in particular,
+     it is logarithmic) *)
+  let rec join (l:t 'a) (d:D.t 'a) (r:t 'a) : t 'a
+    requires { c l /\ c r }
+    ensures { result.m.lis = node_model l.m.lis d r.m.lis /\ c result }
+    ensures { let hl = l.m.hgt in let hr = r.m.hgt in
+      let he = 1 + if hl < hr then hr else hl in let hres = result.m.hgt in
+      0 <= he - hres <= 1 }
+    variant { l.m.hgt + r.m.hgt }
+  = match view l with
+    | AEmpty -> cons d r
+    | ANode ll ld lr lh _ -> match view r with
+      | AEmpty -> snoc l d
+      | ANode rl rd rr rh _ -> let df = lh - rh in
+        if df > balancing
+        then balance ll ld (join lr d r)
+        else if df < -balancing
+        then balance (join l d rl) rd rr
+        else node l d r
+      end
+    end
+
+  (** Catenation, without height hypothesis. logarithmic-time. *)
+  let concat (l r:t 'a) : t 'a
+    requires { c l /\ c r }
+    ensures { result.m.lis = l.m.lis ++ r.m.lis /\ c result }
+  = match view l with
+    | AEmpty -> r
+    | ANode _ _ _ _ _ -> match view r with
+      | AEmpty -> l
+      | ANode rl rd rr _ _ -> let (d0,r') = decompose_front_node rl rd rr in
+        join l d0 r'
+      end
+    end
+
+  (** {3 Selection of elements}
+
+      This part of the module provide an implementation of a generalisation
+      of the usual insertion/removal/lookup/spliting/etc algorithms on
+      AVL trees. The generalisation is done with respect to an abstract
+      binary search mechanism. It is based on the observation that
+      all those algorithms have the shame shape:
+
+      1) find a particular position in the tree by binary search (either
+         a node, or an empty leaf if finding nothing)
+
+      2) extract some piece of information from this position/recompute
+         another tree (which is either trivial or done only using
+         rebalancing)
+
+      By using different search mechanisms in step 1), we can get a variety
+      of data structures. Note that thanks to monoidal annotations,
+      efficient search mechanisms other than comparison-based exists.
+      For example, using the integer monoid we can keep track of the size
+      of every subtrees, which can be used to implement efficient
+      random access.
+
+      The positions found in step 1) corresponds readily to splits of
+      the sequence, as defined in the [SelectionTypes] module. We consider
+      that the objective of the search is to find a split with particular
+      properties.
+
+      *)
+
+  use export SelectionTypes
+
+  (** Parameter: selector type. The elements of that type
+      are intended to describe the class of splits we wish to find. *)
+  type selector
+
+  (** Parameter: interpretation of the selector. *)
+  predicate selected selector (split (D.t 'a))
+
+  (** Parameter: correctness predicate for a selector with respect to a list.
+      It is intended to mean that we can actually find such a split in
+      the list using binary search. *)
+  predicate selection_possible selector (list (D.t 'a))
+
+  (** Parameter: a correct selector for the empty list
+      always select its only possible split. *)
+  axiom selection_empty : forall s. let nil = (Nil:list (D.t 'a)) in
+    selection_possible s nil ->
+      selected s { left = nil ; middle = None ; right = nil }
+
+  (** On nodes, binary search works by reducing the problem of selecting of a
+      split on the whole tree to either:
+      1) The problem of selecting a split on the left subtree
+
+      2) The problem of selecting a split on the right subtree
+
+      3) Taking the split induced by the node *)
+  type part = part_base selector
+
+  (** Parameter: [selected_part llis rlis s l d r] effectively compute
+      the reduction of the selection to one of the three part of a node.
+      It uses the monoidal summaries to get informations about the
+      left and right subtrees. *)
+  val selected_part (ghost llis rlis:list (D.t 'a))
+    (s:selector) (l:M.t) (d:D.t 'a) (r:M.t) : part
+    requires { selection_possible s (node_model llis d rlis) }
+    requires { l = M.sum D.measure llis /\ r = M.sum D.measure rlis }
+    returns { Here -> let e2 = { left = llis;
+        middle = Some d;
+        right = rlis } in selected s e2
+      | Left sl -> selection_possible sl llis /\
+        forall e. selected sl e /\ rebuild e = llis ->
+          selected s (right_extend e d rlis)
+      | Right sr -> selection_possible sr rlis /\
+        forall e. selected sr e /\ rebuild e = rlis ->
+          selected s (left_extend llis d e) }
+
+  use import ref.Ref
+
+  (** Create a reference over a dummy split. All the binary-search-based
+      routines take a ghost reference to explicitly return the existential
+      witness corresponding to the found split, this is a shortcut for
+      creating such a reference. *)
+  let ghost default_split () : ref (split 'a) =
+    ref { left = Nil; middle = None; right = Nil }
+
+  (** Insertion of an element into the sequence.
+     [insert r s d t] split the sequence [t] using [s] as [lf ++ o ++ rg],
+     and rebuild it with [d] in the middle, potentially erasing whatever
+     was there before, as [lf ++ [d] ++ rg].
+     The reference [r] is assigned to the selected position.
+     It is logarithmic-time.
+     Note: the procedure described above match only the specification,
+     not what the actual code does. *)
+  let rec insert (ghost r:ref (split (D.t 'a))) (s:selector)
+    (d:D.t 'a) (t:t 'a) : t 'a
+    requires { selection_possible s t.m.lis /\ c t }
+    ensures { result.m.lis = node_model !r.left d !r.right /\ c result }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
+    writes { r }
+    ensures { 1 >= result.m.hgt - t.m.hgt >= 0 }
+    variant { t.m.hgt }
+  = match view t with
+    | AEmpty -> r := { left = Nil; middle = None; right = Nil };
+      singleton d
+    | ANode tl td tr _ _ -> match selected_part tl.m.lis tr.m.lis
+        s (total tl) td (total tr) with
+      | Left sl -> let nl = insert r sl d tl in
+        r := right_extend !r td tr.m.lis; balance nl td tr
+      | Right sr -> let nr = insert r sr d tr in
+        r := left_extend tl.m.lis td !r; balance tl td nr
+      | Here -> r := { left = tl.m.lis;
+          middle = Some td;
+          right = tr.m.lis };
+        node tl d tr
+      end
+    end
+
+  (** Remove an element from the sequence.
+     [remove r s t] Split the sequence [t] using [s] into [lf ++ o ++ rg],
+     and erase whatever may be in the middle,
+     as [lf++rg]. logarithmic-time. *)
+  let rec remove (ghost r:ref (split (D.t 'a))) (s:selector) (t:t 'a) : t 'a
+    requires { selection_possible s t.m.lis /\ c t }
+    ensures { result.m.lis = !r.left ++ !r.right /\ c result }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
+    ensures { 1 >= t.m.hgt - result.m.hgt >= 0 }
+    writes { r }
+    variant { t.m.hgt }
+  = match view t with
+    | AEmpty -> r := { left = Nil; middle = None; right = Nil}; t
+    | ANode tl td tr _ _ -> match selected_part tl.m.lis tr.m.lis
+        s (total tl) td (total tr) with
+      | Left sl -> let nl = remove r sl tl in
+        r := right_extend !r td tr.m.lis; balance nl td tr
+      | Right sr -> let nr = remove r sr tr in
+        r := left_extend tl.m.lis td !r; balance tl td nr
+      | Here -> r := { left = tl.m.lis;
+          middle = Some td;
+          right = tr.m.lis };
+        fuse tl tr
+      end
+    end
+
+  (** Attempt to find an element in the sequence.
+      [find r s t] return the middle value obtained by splitting the
+      sequence [t] with respect to the [s]. logarithmic-time. *)
+  let rec get (ghost r:ref (split (D.t 'a))) (s:selector)
+    (t:t 'a) : option (D.t 'a)
+    requires { selection_possible s t.m.lis /\ c t }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
+    returns { None -> !r.middle = None
+       | Some d -> !r.middle = Some d }
+    writes { r }
+    variant { t.m.hgt }
+  = match view t with
+    | AEmpty -> r := { left = Nil; middle = None; right = Nil }; None
+    | ANode tl td tr _ _ -> match selected_part tl.m.lis tr.m.lis
+        s (total tl) td (total tr) with
+      | Left sl -> let res = get r sl tl in
+        r := right_extend !r td tr.m.lis; res
+      | Right sr -> let res = get r sr tr in
+        r := left_extend tl.m.lis td !r; res
+      | Here -> r := { left = tl.m.lis;
+          middle = Some td;
+          right = tr.m.lis };
+        Some td
+      end
+    end
+
+  (** Combine [get] and [remove] *)
+  let rec extract (ghost r:ref (split (D.t 'a))) (s:selector)
+    (t:t 'a) : (option (D.t 'a),t 'a)
+    requires { selection_possible s t.m.lis /\ c t }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
+    ensures { let (d,t2) = result in
+      t2.m.lis = !r.left ++ !r.right /\
+      1 >= t.m.hgt - t2.m.hgt >= 0 /\
+      match d with
+      | None -> !r.middle = None
+      | Some d2 -> !r.middle = Some d2
+      end /\ c t2 }
+    variant { t.m.hgt }
+  = match view t with
+    | AEmpty -> r := { left = Nil; middle = None; right = Nil }; (None,t)
+    | ANode tl td tr _ _ -> match selected_part tl.m.lis tr.m.lis
+        s (total tl) td (total tr) with
+      | Left sl -> let (ol,nl) = extract r sl tl in
+        r := right_extend !r td tr.m.lis; (ol,balance nl td tr)
+      | Right sr -> let (or,nr) = extract r sr tr in
+        r := left_extend tl.m.lis td !r; (or,balance tl td nr)
+      | Here -> r := { left = tl.m.lis;
+          middle = Some td;
+          right = tr.m.lis };
+        (Some td,fuse tl tr)
+      end
+    end
+
+  (** Split a sequence.
+      [split r s t] return a program version of a split found
+      by [s], using AVL trees for the sequence. It is logarithmic-time.
+      Note: As their specification suggest, all the binary-search-based
+      routines can be directly implemented in term of a split followed
+      by catenations. Although a constant time factor, the rebalancing work
+      would be much heavier. *)
+  let rec split (ghost r:ref (split (D.t 'a))) (s:selector)
+    (t:t 'a) : (t 'a,option (D.t 'a),t 'a)
+    requires { selection_possible s t.m.lis /\ c t }
+    ensures { selected s !r /\ rebuild !r = t.m.lis }
+    returns { (lf,o,rg) -> lf.m.lis = !r.left /\ rg.m.lis = !r.right /\
+      (match o with
+       | None -> !r.middle = None
+       | Some d -> !r.middle = Some d
+       end) /\ c lf /\ c rg }
+    writes { r }
+    variant { t.m.hgt }
+  = match view t with
+    | AEmpty -> r := { left = Nil; middle = None; right = Nil };
+      (t,None,t)
+    | ANode tl td tr _ _ -> match selected_part tl.m.lis tr.m.lis
+        s (total tl) td (total tr) with
+      | Left sl -> let (tll,tlo,tlr) = split r sl tl in
+        r := right_extend !r td tr.m.lis;
+          (tll,tlo,join tlr td tr)
+      | Right sr -> let (trl,tro,trr) = split r sr tr in
+        r := left_extend tl.m.lis td !r;
+        (join tl td trl,tro,trr)
+      | Here -> r := { left = tl.m.lis;
+          middle = Some td;
+          right = tr.m.lis };
+        (tl,Some td,tr)
+      end
+    end
+
+end
+

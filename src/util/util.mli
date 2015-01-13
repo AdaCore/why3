@@ -26,15 +26,44 @@ val mapi : (int -> 'a) -> int -> int -> 'a list
 val iterf : (float -> unit) -> float -> float -> float -> unit
 (** [iterf f min max step] *)
 
-(* boolean fold accumulators *)
+(* Convert fold-like functions into [for_all] and [exists] functions.
+   Predicates passed to [all], [all2], and [alld] may raise FoldSkip to
+   signalize [false]. Predicates passed to [any], [any2], and [anyd] may
+   raise FoldSkip to signalize [true]. *)
 
 exception FoldSkip
 
-val all_fn : ('a -> bool) -> 'b -> 'a -> bool
-(* [all_fn pr b a] return true if pr is true on a, otherwise raise FoldSkip *)
-val any_fn : ('a -> bool) -> 'b -> 'a -> bool
-(* [all_fn pr b a] return false if pr is false on a,
-   otherwise raise FoldSkip *)
+val all_fn : ('a -> bool) -> 'z -> 'a -> bool
+(* [all_fn pr z a] return true if [pr a] is true,
+   otherwise raises FoldSkip *)
+
+val any_fn : ('a -> bool) -> 'z -> 'a -> bool
+(* [all_fn pr z a] return false if [pr a] is false,
+   otherwise raises FoldSkip *)
+
+val all2_fn : ('a -> 'b -> bool) -> 'z -> 'a -> 'b -> bool
+(* [all_fn pr z a b] return true if [pr a b] is true,
+   otherwise raises FoldSkip *)
+
+val any2_fn : ('a -> 'b -> bool) -> 'z -> 'a -> 'b -> bool
+(* [all_fn pr z a b] return false if [pr a b] is false,
+   otherwise raises FoldSkip *)
+
+type ('z,'a,'c) fold = ('z -> 'a -> 'z) -> 'z -> 'c -> 'z
+
+val all : (bool,'a,'c) fold -> ('a -> bool) -> 'c -> bool
+val any : (bool,'a,'c) fold -> ('a -> bool) -> 'c -> bool
+
+type ('z,'a,'b,'c,'d) fold2 = ('z -> 'a -> 'b -> 'z) -> 'z -> 'c -> 'd -> 'z
+
+val all2 : (bool,'a,'b,'c,'d) fold2 -> ('a -> 'b -> bool) -> 'c -> 'd -> bool
+val any2 : (bool,'a,'b,'c,'d) fold2 -> ('a -> 'b -> bool) -> 'c -> 'd -> bool
+
+type ('z,'a,'b,'c) foldd =
+  ('z -> 'a -> 'z) -> ('z -> 'b -> 'z) -> 'z -> 'c -> 'z
+
+val alld : (bool,'a,'b,'c) foldd -> ('a -> bool) -> ('b -> bool) -> 'c -> bool
+val anyd : (bool,'a,'b,'c) foldd -> ('a -> bool) -> ('b -> bool) -> 'c -> bool
 
 val ffalse : 'a -> bool
 (** [ffalse] constant function [false] *)

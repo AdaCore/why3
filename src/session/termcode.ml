@@ -9,7 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Why3
 open Term
 
 (*******************************)
@@ -235,7 +234,7 @@ let tag_wild = "w"
 let tag_as = "z"
 
 
-let id_string_shape ~push id acc = 
+let id_string_shape ~push id acc =
   push id acc
 (*
   let l = String.length id in
@@ -375,7 +374,7 @@ let t_shape_task ~version t =
     let _, expl, _ = goal_expl_task ~root:false t in
     match expl with
       | None -> ()
-      | Some expl -> id_string_shape ~push expl () 
+      | Some expl -> id_string_shape ~push expl ()
   end;
   let f = Task.task_goal_fmla t in
   let () = t_shape ~version ~push (ref (-1)) Mvs.empty () f in
@@ -396,6 +395,10 @@ let string_of_checksum x = x
 let checksum_of_string x = x
 let equal_checksum x y = (x : checksum) = y
 let dumb_checksum = ""
+
+let buffer_checksum b =
+  let s = Buffer.contents b in
+  Digest.to_hex (Digest.string s)
 
 type checksum_version = CV1 | CV2
 
@@ -428,10 +431,13 @@ module Checksum = struct
     | CV1 -> ident_v1 b id
     | CV2 -> ident_v2 b id
 
-  let const b c =
+  let const =
     let buf = Buffer.create 17 in
-    Format.bprintf buf "%a" Pretty.print_const c;
-    string b (Buffer.contents buf)
+    fun b c ->
+      Format.bprintf buf "%a" Pretty.print_const c;
+      let s = Buffer.contents buf in
+      Buffer.clear buf;
+      string b s
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
@@ -556,12 +562,37 @@ module Checksum = struct
     | Theory.MAstr s -> char b 's'; string b s
     | Theory.MAint i -> char b 'i'; int b i
 
-  let tdecl b d = match d.Theory.td_node with
+  let rec tdecl b d = match d.Theory.td_node with
     | Theory.Decl d -> decl b d
-    | Theory.Use _ -> assert false
+    | Theory.Use th ->
+      char b 'U'; ident b th.Theory.th_name; list string b th.Theory.th_path;
+      string b (theory_v2 th)
     | Theory.Clone (th, _) ->
         char b 'C'; ident b th.Theory.th_name; list string b th.Theory.th_path
     | Theory.Meta (m, mal) -> char b 'M'; meta b m; list meta_arg b mal
+
+  and theory_v2_aux t =
+    let c = ref 0 in
+    let m = ref Ident.Mid.empty in
+    let b = Buffer.create 8192 in
+    List.iter (tdecl (CV2,c,m,b)) t.Theory.th_decls;
+    let dnew = Digest.string (Buffer.contents b) in
+    Digest.to_hex dnew
+
+  and theory_v2 =
+    let table = Ident.Wid.create 17 in
+    fun t ->
+      try Ident.Wid.find table t.Theory.th_name
+      with Not_found ->
+        let v = theory_v2_aux t in
+        Ident.Wid.set table t.Theory.th_name v;
+        v
+
+(* not used anymore
+  let theory ~version t = match version with
+    | CV1 -> assert false
+    | CV2 -> theory_v2 t
+ *)
 
   let task_v1 =
     let c = ref 0 in
@@ -597,9 +628,11 @@ module Checksum = struct
       let _,_,dnew = Trans.apply tr t in
       Digest.to_hex dnew
 
+
   let task ~version t = match version with
     | CV1 -> task_v1 t
     | CV2 -> task_v2 t
+
 end
 
 let task_checksum ?(version=current_shape_version) t =
@@ -609,6 +642,16 @@ let task_checksum ?(version=current_shape_version) t =
     | _ -> assert false
   in
   Checksum.task ~version t
+
+(* not used anymore
+let theory_checksum ?(version=current_shape_version) t =
+  let version = match version with
+    | 1 | 2 | 3 -> CV1
+    | 4 -> CV2
+    | _ -> assert false
+  in
+  Checksum.theory ~version t
+ *)
 
 (*************************************************************)
 (* Pairing of new and old subgoals                           *)
@@ -633,10 +676,10 @@ let task_checksum ?(version=current_shape_version) t =
 *)
 
 module type S = sig
-  type t
-  val checksum : t -> string
-  val shape    : t -> string
-  val name     : t -> Ident.ident
+  type 'a t
+  val checksum : 'a t -> checksum option
+  val shape    : 'a t -> string
+  val name     : 'a t -> Ident.ident
 end
 
 module Pairing(Old: S)(New: S) = struct
@@ -648,21 +691,30 @@ module Pairing(Old: S)(New: S) = struct
 
   open Ident
 
-  type any_goal = Old of Old.t | New of New.t
+  type goal_index = Old of int | New of int
+
+  type ('a,'b) goal_table = {
+    table_old : 'a Old.t array;
+    table_new : 'b New.t array;
+  }
 
   (* doubly linked lists; left and right bounds point to themselves *)
 
   type node = {
     mutable  prev: node;
             shape: string;
-              elt: any_goal;
+              elt: goal_index;
     mutable valid: bool;
     mutable  next: node;
   }
 
-  let mk_node g =
-    let s = match g with Old g -> Old.shape g | New g -> New.shape g in
-    let rec n = { prev = n; shape = s; elt = g; next = n; valid = true } in n
+  let mk_node table g =
+    let s = match g with
+      | Old g -> Old.shape table.table_old.(g)
+      | New g -> New.shape table.table_new.(g)
+    in
+    let rec n = { prev = n; shape = s; elt = g; next = n; valid = true }
+    in n
 
   let rec iter_pairs f = function
     | [] | [_] -> ()
@@ -688,32 +740,52 @@ module Pairing(Old: S)(New: S) = struct
   let dprintf = Debug.dprintf debug
 
   let associate oldgoals newgoals =
+    let table = {
+      table_old = Array.of_list oldgoals;
+      table_new = Array.of_list newgoals;
+    }
+    in
     (* set up an array [result] containing the solution
        [new_goal_index g] returns the index of goal [g] in that array *)
     let new_goal_index = Hid.create 17 in
     let result =
       let make i newg =
-        Hid.add new_goal_index (New.name newg) i; (newg, None) in
-      Array.mapi make (Array.of_list newgoals) in
+        Hid.add new_goal_index (New.name newg) i; (newg, None)
+      in
+      Array.mapi make table.table_new
+    in
     let new_goal_index newg =
       try Hid.find new_goal_index (New.name newg)
       with Not_found -> assert false in
     (* phase 1: pair goals with identical checksums *)
     let old_checksums = Hashtbl.create 17 in
-    let add oldg = Hashtbl.add old_checksums (Old.checksum oldg) oldg in
-    List.iter add oldgoals;
-    let collect acc newg =
-      let c = New.checksum newg in
-      try
-        let oldg = Hashtbl.find old_checksums c in
-        Hashtbl.remove old_checksums c;
-        result.(new_goal_index newg) <- (newg, Some (oldg, false));
-        acc
-      with Not_found ->
-        mk_node (New newg) :: acc
+    let old_goals_without_checksum =
+      let acc =ref [] in
+      for oldg = 0 to Array.length table.table_old - 1 do
+        match Old.checksum table.table_old.(oldg) with
+        | None -> acc := mk_node table (Old oldg) :: !acc
+        | Some s -> Hashtbl.add old_checksums s oldg
+      done;
+      !acc
     in
-    let newgoals = List.fold_left collect [] newgoals in
-    let add _ oldg acc = mk_node (Old oldg) :: acc in
+    let newgoals =
+      let acc = ref old_goals_without_checksum in
+      for newi = 0 to Array.length table.table_new - 1 do
+        try
+          let newg = table.table_new.(newi) in
+          match New.checksum newg with
+          | None -> raise Not_found
+          | Some c ->
+             let oldi = Hashtbl.find old_checksums c in
+             let oldg = table.table_old.(oldi) in
+             Hashtbl.remove old_checksums c;
+             result.(new_goal_index newg) <- (newg, Some (oldg, false))
+        with Not_found ->
+          acc := mk_node table (New newi) :: !acc
+      done;
+      !acc
+    in
+    let add _ oldg acc = mk_node table (Old oldg) :: acc in
     let allgoals = Hashtbl.fold add old_checksums newgoals in
     Hashtbl.clear old_checksums;
     (* phase 2: pair goals according to shapes *)
@@ -734,18 +806,41 @@ module Pairing(Old: S)(New: S) = struct
           let o, n = match x.elt, y.elt with
             | New n, Old o | Old o, New n -> o, n | _ -> assert false in
           dprintf "[assoc] new pairing@.";
-          result.(new_goal_index n) <- n, Some (o, true);
+          let newg = table.table_new.(n) in
+          let oldg = table.table_old.(o) in
+          result.(new_goal_index newg) <- newg, Some (oldg, true);
           if x.prev != x && y.next != y then add x.prev y.next;
           remove x;
           remove y
         end
       done
     end;
-    Array.to_list result
+    let detached =
+      List.fold_left
+        (fun acc x ->
+         if x.valid then
+           match x.elt with
+           | Old g -> table.table_old.(g) :: acc
+           | New _ -> acc
+         else acc)
+        [] allgoals
+    in
+    Debug.dprintf debug "[assoc] %d detached goals@." (List.length detached);
+    Array.to_list result, detached
 
-(*
-  let associate oldgoals newgoals =
-    try List.map2 (fun o n -> n, Some (o, true)) oldgoals newgoals
-    with Invalid_argument _ -> associate oldgoals newgoals
-*)
+  let simple_associate oldgoals newgoals =
+    let rec aux acc o n =
+      match o,n with
+        | old, [] -> acc,old
+        | [], n :: rem_n -> aux ((n,None)::acc) [] rem_n
+        | o :: rem_o, n :: rem_n -> aux ((n,Some(o,true))::acc) rem_o rem_n
+    in
+    aux [] oldgoals newgoals
+
+  let associate ~use_shapes =
+    if use_shapes then
+      associate
+    else
+      simple_associate
+
 end

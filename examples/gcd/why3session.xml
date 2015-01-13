@@ -2,203 +2,198 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.2" timelimit="10" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="5" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
-<prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
-<prover id="4" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
-<prover id="5" name="Eprover" version="1.8-001" timelimit="6" memlimit="1000"/>
-<prover id="6" name="Coq" version="8.4pl3" timelimit="5" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="4000"/>
-<prover id="8" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="10" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
+<prover id="4" name="Eprover" version="1.8-001" timelimit="6" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="4000"/>
+<prover id="6" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
 <file name="../gcd.mlw" expanded="true">
-<theory name="EuclideanAlgorithm" expanded="true">
- <goal name="WP_parameter euclid" expl="VC for euclid" sum="818f8f1a6e4f765eebc1f6f1b6f1d3e8">
- <transf name="split_goal">
-  <goal name="WP_parameter euclid.1" expl="1. postcondition" sum="dd9f821e339a882804c732f7db4d0ce9">
+<theory name="EuclideanAlgorithm" sum="7a432e31947f2a4bd6100c41353b8564" expanded="true">
+ <goal name="WP_parameter euclid" expl="VC for euclid">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter euclid.1" expl="1. postcondition">
   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2" timelimit="2" memlimit="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" timelimit="2" memlimit="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.2" expl="2. division by zero" sum="2bd82cdbba9d02713ec942602f81d9f5">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter euclid.2" expl="2. division by zero">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.3" expl="3. variant decrease" sum="687a3a63a07237eaf9bfd182bc0d4fc6">
+  <goal name="WP_parameter euclid.3" expl="3. variant decrease">
   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="2" timelimit="5"><result status="valid" time="0.03"/></proof>
+  <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.03" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.4" expl="4. precondition" sum="69e53674214063d97e487b77ceb3975d">
+  <goal name="WP_parameter euclid.4" expl="4. precondition">
   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.5" expl="5. postcondition" sum="68b651ec17a62fc1b9adad1de78f8bcf">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  <proof prover="6" timelimit="10" edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v"><result status="valid" time="1.12"/></proof>
+  <goal name="WP_parameter euclid.5" expl="5. postcondition">
+  <proof prover="0" timelimit="10" edited="gcd_WP_EuclideanAlgorithm_WP_parameter_gcd_1.v"><result status="valid" time="1.76"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="5" timelimit="10" memlimit="1000"><result status="valid" time="0.04" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="EuclideanAlgorithmIterative" expanded="true">
- <goal name="WP_parameter euclid" expl="VC for euclid" sum="e2e6f5addf2ea08975df892816a22894">
+<theory name="EuclideanAlgorithmIterative" sum="69a546e6ee7e5d52c2e5b10840140418" expanded="true">
+ <goal name="WP_parameter euclid" expl="VC for euclid">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter euclid.1" expl="1. loop invariant init" sum="99405581c4bd7cbb27d2bfe0b28b1b31">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter euclid.1" expl="1. loop invariant init">
+  <proof prover="5" timelimit="10" memlimit="1000"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.2" expl="2. division by zero" sum="be51106e99b622711055b50cfda95e58">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter euclid.2" expl="2. division by zero">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.3" expl="3. loop invariant preservation" sum="8d83b66d01ce79cd59442200760b777a">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter euclid.3" expl="3. loop invariant preservation">
+  <proof prover="5" timelimit="10" memlimit="1000"><result status="valid" time="0.06" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.4" expl="4. loop invariant preservation" sum="f1503358ed3434faa4605031930425a5">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter euclid.4" expl="4. loop invariant preservation">
+  <proof prover="5" timelimit="10" memlimit="1000"><result status="valid" time="0.04" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.5" expl="5. loop variant decrease" sum="62d6125f6169efe3a54dd0f2344b9acc">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="4" timelimit="30"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter euclid.6" expl="6. postcondition" sum="436baabf3a337e8cd42e9e02c1b26e01">
+  <goal name="WP_parameter euclid.5" expl="5. loop variant decrease">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" timelimit="30"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter euclid.6" expl="6. postcondition">
+  <proof prover="5" timelimit="10" memlimit="1000"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="BinaryGcd" expanded="true">
- <goal name="even1" sum="017c4b6d6656bd5b55d8b78362c7164f">
- <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
+<theory name="BinaryGcd" sum="630c5b7df6b8be87bd48b3d822288805" expanded="true">
+ <goal name="even1">
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.06" steps="18"/></proof>
  </goal>
- <goal name="odd1" sum="ff570122426b5f9cfbafd2c7dbadfecc">
- <proof prover="7" memlimit="1000"><result status="valid" time="0.06"/></proof>
+ <goal name="odd1">
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.06" steps="14"/></proof>
  </goal>
- <goal name="div_nonneg" sum="e585e7b6804f3165f148f2fcaa70e993">
- <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ <goal name="div_nonneg">
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
- <goal name="gcd_even_even" sum="0c04d96fb822470774aec428d34b0fd1">
- <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
+ <goal name="gcd_even_even">
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="28"/></proof>
  </goal>
- <goal name="gcd_even_odd" sum="6b7fa572ba6c16235dd8a1fe05480a86">
- <proof prover="6" edited="gcd_BinaryGcd_gcd_even_odd_2.v"><result status="valid" time="0.94"/></proof>
+ <goal name="gcd_even_odd">
+ <proof prover="0" edited="gcd_BinaryGcd_gcd_even_odd_2.v"><result status="valid" time="1.78"/></proof>
  </goal>
- <goal name="gcd_even_odd2" sum="08369b073cacf47b002023a59500a305">
- <proof prover="7" memlimit="1000"><result status="valid" time="0.17"/></proof>
+ <goal name="gcd_even_odd2">
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.17" steps="28"/></proof>
  </goal>
- <goal name="odd_odd_div2" sum="5b1358636ff88aa8457c360acacbdda5">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <goal name="odd_odd_div2">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter gcd_odd_odd" expl="VC for gcd_odd_odd" sum="5e6349717d0e6a3bb2f0d87fb77c5a4e">
- <proof prover="7" timelimit="5"><result status="valid" time="0.05"/></proof>
+ <goal name="WP_parameter gcd_odd_odd" expl="VC for gcd_odd_odd">
+ <proof prover="5" timelimit="5"><result status="valid" time="0.05" steps="31"/></proof>
  </goal>
- <goal name="gcd_odd_odd2" sum="6c859b16596dc1b9c3f76195fd6e5563">
- <proof prover="7" memlimit="1000"><result status="valid" time="0.12"/></proof>
+ <goal name="gcd_odd_odd2">
+ <proof prover="5" memlimit="1000"><result status="valid" time="0.12" steps="24"/></proof>
  </goal>
- <goal name="WP_parameter binary_gcd" expl="VC for binary_gcd" sum="e927be494a30b7021096c94d8713182e">
+ <goal name="WP_parameter binary_gcd" expl="VC for binary_gcd">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter binary_gcd.1" expl="1. variant decrease" sum="172a9fb14c74c5f3f27c8b88472951f7">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter binary_gcd.1" expl="1. variant decrease">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.2" expl="2. precondition" sum="9e35f30732a3be09569366a062b91091">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter binary_gcd.2" expl="2. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.3" expl="3. postcondition" sum="96a062a2114b5aeecf7dfbdd0fadd809">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter binary_gcd.3" expl="3. postcondition">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.4" expl="4. postcondition" sum="5c3e4819d8ddc495589a2d1bcbb6d94a">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter binary_gcd.4" expl="4. postcondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.5" expl="5. division by zero" sum="244d45ce8704605829b0241683bcd286">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter binary_gcd.5" expl="5. division by zero">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.6" expl="6. division by zero" sum="f031f1e6222fc92ee03384f697b6acfe">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter binary_gcd.6" expl="6. division by zero">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.7" expl="7. variant decrease" sum="08b39027e3f207611b59c63fd616963a">
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter binary_gcd.7" expl="7. variant decrease">
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.05" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.8" expl="8. precondition" sum="875c503c92d0c1c3c3d68ebcec6088cc">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter binary_gcd.8" expl="8. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.9" expl="9. postcondition" sum="8b09c52c71e22d520e7c7dad1059558e">
+  <goal name="WP_parameter binary_gcd.9" expl="9. postcondition">
   <proof prover="1" timelimit="6"><result status="valid" time="0.02"/></proof>
-  <proof prover="5"><result status="valid" time="0.14"/></proof>
+  <proof prover="4"><result status="valid" time="0.14"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.10" expl="10. division by zero" sum="6ecadffc40a284cab2d28cfb1676fe8d">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter binary_gcd.10" expl="10. division by zero">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.11" expl="11. variant decrease" sum="6f78e3ec6079a0518f2425797f3e9587">
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter binary_gcd.11" expl="11. variant decrease">
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.12" expl="12. precondition" sum="798a003656d9b544c035cd9d4d08912f">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter binary_gcd.12" expl="12. precondition">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.13" expl="13. postcondition" sum="b7d657434120ac8c7873a91345af47c1">
-  <proof prover="5"><result status="valid" time="0.23"/></proof>
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter binary_gcd.13" expl="13. postcondition">
+  <proof prover="4"><result status="valid" time="0.23"/></proof>
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.14" expl="14. division by zero" sum="4b066e0d5e1e18c9f1b7874639c91349">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter binary_gcd.14" expl="14. division by zero">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.15" expl="15. variant decrease" sum="febd61a71b3bd5352d98bb2791706195">
-  <proof prover="5"><result status="timeout" time="6.00"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter binary_gcd.15" expl="15. variant decrease">
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.04" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.16" expl="16. precondition" sum="2129de9c47f93995d7d07c46b8f42f1a">
-  <proof prover="5"><result status="valid" time="0.01"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter binary_gcd.16" expl="16. precondition">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.17" expl="17. postcondition" sum="459838b83450407f2b0b0797e72b2b67">
-  <proof prover="5"><result status="valid" time="0.24"/></proof>
-  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter binary_gcd.17" expl="17. postcondition">
+  <proof prover="4"><result status="valid" time="0.24"/></proof>
+  <proof prover="6"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.18" expl="18. division by zero" sum="e09755fa44cc8bed284820d5323a968c">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter binary_gcd.18" expl="18. division by zero">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.19" expl="19. variant decrease" sum="c07d8b9501d7e9c4e1fac0202fcc69c6">
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.08"/></proof>
-  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  <goal name="WP_parameter binary_gcd.19" expl="19. variant decrease">
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.08" steps="35"/></proof>
+  <proof prover="6"><result status="valid" time="0.15"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.20" expl="20. precondition" sum="d2fcdf4cde434341b90b04a7b6ecd582">
-  <proof prover="5"><result status="valid" time="4.88"/></proof>
-  <proof prover="7" memlimit="1000"><result status="valid" time="0.03"/></proof>
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter binary_gcd.20" expl="20. precondition">
+  <proof prover="4"><result status="valid" time="6.49"/></proof>
+  <proof prover="5" memlimit="1000"><result status="valid" time="0.03" steps="13"/></proof>
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter binary_gcd.21" expl="21. postcondition" sum="ba2b4e3bcb6c321e218031582d938f70">
-  <proof prover="5"><result status="valid" time="0.45"/></proof>
-  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter binary_gcd.21" expl="21. postcondition">
+  <proof prover="4"><result status="valid" time="0.50"/></proof>
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="EuclideanAlgorithm31" expanded="true">
- <goal name="WP_parameter euclid" expl="VC for euclid" sum="c97bf923efd7df0ba08c127d1a0a44fc">
+<theory name="EuclideanAlgorithm31" sum="d566d8cda9a9bac5bbc9bd41ecf5cfb3" expanded="true">
+ <goal name="WP_parameter euclid" expl="VC for euclid">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter euclid.1" expl="1. integer overflow" sum="77cb7de9c98c14363e1d0cccb3d93c23">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter euclid.1" expl="1. integer overflow">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.2" expl="2. postcondition" sum="760a5c0647aa2b256c67fccd062a7c6d">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter euclid.2" expl="2. postcondition">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.3" expl="3. division by zero" sum="d297b1886e36e60a476d4915f1f12e29">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter euclid.3" expl="3. division by zero">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.4" expl="4. integer overflow" sum="744c070a0346ebb17972e8560fac031a">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.10"/></proof>
+  <goal name="WP_parameter euclid.4" expl="4. integer overflow">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.10" steps="46"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.5" expl="5. variant decrease" sum="d62333ee6c251f02089dbb510e0984e9">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.52"/></proof>
+  <goal name="WP_parameter euclid.5" expl="5. variant decrease">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.80" steps="114"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.6" expl="6. precondition" sum="fcf15f9a34b89b8036e0b220e14b7d19">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter euclid.6" expl="6. precondition">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.03" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter euclid.7" expl="7. postcondition" sum="f477c5b2208489e4d744cadca57ab81f">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.54"/></proof>
+  <goal name="WP_parameter euclid.7" expl="7. postcondition">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.97" steps="42"/></proof>
   </goal>
  </transf>
  </goal>

@@ -63,14 +63,38 @@ let get_canonical =
   let res = get_canonical ls in
   Hls.add ht ls res; res
 
-let rec lift_f acc t0 = match t0.t_node with
-  | (Tapp (ps, [t1; {t_node = Teps fb}])
-  | Tapp (ps, [{t_node = Teps fb}; t1]))
-    when ls_equal ps ps_equ ->
+type to_elim =
+  | All           (* eliminate all epsilon-terms *)
+  | NonLambda     (* preserve lambda-terms *)
+  | NonLambdaSet  (* preserve lambda-terms with value-typed body *)
+
+let to_elim el t = match el with
+  | All -> true
+  | NonLambda -> not (t_is_lambda t)
+  | NonLambdaSet ->
+      let vl,_,t = t_open_lambda t in
+      vl = [] || t.t_ty = None
+
+let rec lift_f el acc t0 = match t0.t_node with
+  | (Tapp (ps, [t1; {t_node = Teps fb} as t2])
+  | Tapp (ps, [{t_node = Teps fb} as t2; t1]))
+    when ls_equal ps ps_equ && to_elim el t2 ->
       let vs, f = t_open_bound fb in
-      let f = t_let_close_simp vs t1 f in
-      lift_f acc (t_label_copy t0 f)
-  | Teps fb ->
+      if is_canonical vs f <> None then
+        match t1.t_node with
+        | Teps fb when to_elim el t1 ->
+            let vs, f = t_open_bound fb in
+            if is_canonical vs f <> None then
+              t_map_fold (lift_f el) acc t0
+            else
+              let f = t_let_close_simp vs t2 f in
+              lift_f el acc (t_label_copy t0 f)
+        | _ ->
+            t_map_fold (lift_f el) acc t0
+      else
+        let f = t_let_close_simp vs t1 f in
+        lift_f el acc (t_label_copy t0 f)
+  | Teps fb when to_elim el t0 ->
       let vl = Mvs.keys (t_vars t0) in
       let vs, f = t_open_bound fb in
       let acc, t = match is_canonical vs f with
@@ -79,7 +103,7 @@ let rec lift_f acc t0 = match t0.t_node with
             let ld, ax, cs = get_canonical ls in
             (ld :: abst, ax :: axml), fs_app cs [] vs.vs_ty
         | None ->
-            let (abst,axml), f = lift_f acc f in
+            let (abst,axml), f = lift_f el acc f in
             let tyl = List.map (fun x -> x.vs_ty) vl in
             let ls = create_fsymbol (id_clone vs.vs_name) tyl vs.vs_ty in
             let t = fs_app ls (List.map t_var vl) vs.vs_ty in
@@ -90,26 +114,26 @@ let rec lift_f acc t0 = match t0.t_node with
       in
       acc, t_label_copy t0 t
   | _ ->
-      t_map_fold lift_f acc t0
+      t_map_fold (lift_f el) acc t0
 
-let lift_l (acc,dl) (ls,ld) =
+let lift_l el (acc,dl) (ls,ld) =
   let vl, t, close = open_ls_defn_cb ld in
   match t.t_node with
-  | Teps fb ->
+  | Teps fb when to_elim el t ->
       let vs, f = t_open_bound fb in
-      let (abst,axml), f = lift_f acc f in
+      let (abst,axml), f = lift_f el acc f in
       let t = t_app ls (List.map t_var vl) t.t_ty in
       let f = t_forall_close_merge vl (t_subst_single vs t f) in
       let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
       let ax = create_prop_decl Paxiom (create_prsymbol id) f in
       (create_param_decl ls :: abst, ax :: axml), dl
   | _ ->
-      let acc, t = lift_f acc t in
+      let acc, t = lift_f el acc t in
       acc, close ls vl t :: dl
 
-let lift_d d = match d.d_node with
+let lift_d el d = match d.d_node with
   | Dlogic dl ->
-      let (abst,axml), dl = List.fold_left lift_l (([],[]),[]) dl in
+      let (abst,axml), dl = List.fold_left (lift_l el) (([],[]),[]) dl in
       if dl = [] then List.rev_append abst (List.rev axml) else
       let d = create_logic_decl (List.rev dl) in
       let add_ax (axml1, axml2) ax =
@@ -118,10 +142,20 @@ let lift_d d = match d.d_node with
       let axml1, axml2 = List.fold_left add_ax ([],[]) axml in
       List.rev_append abst (axml1 @ d :: axml2)
   | _ ->
-      let (abst,axml), d = decl_map_fold lift_f ([],[]) d in
+      let (abst,axml), d = decl_map_fold (lift_f el) ([],[]) d in
       List.rev_append abst (List.rev_append axml [d])
 
-let eliminate_epsilon = Trans.decl lift_d None
+let eliminate_epsilon     = Trans.decl (lift_d All) None
+let eliminate_nl_epsilon  = Trans.decl (lift_d NonLambda) None
+let eliminate_nls_epsilon = Trans.decl (lift_d NonLambdaSet) None
 
 let () = Trans.register_transform "eliminate_epsilon" eliminate_epsilon
   ~desc:"Eliminate@ lambda-terms@ and@ other@ comprehension@ forms."
+
+let () = Trans.register_transform "eliminate_non_lambda_epsilon"
+  eliminate_nl_epsilon
+  ~desc:"Eliminate@ all@ comprehension@ forms@ except@ lambda-terms."
+
+let () = Trans.register_transform "eliminate_non_lambda_set_epsilon"
+  eliminate_nls_epsilon
+  ~desc:"Eliminate@ all@ comprehension@ forms@ except@ value-typed@ lambda-terms."

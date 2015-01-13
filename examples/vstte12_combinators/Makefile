@@ -2,7 +2,7 @@
 BENCH ?= no
 
 ifeq ($(BENCH),yes)
-  WHY3=../../bin/why3
+  WHY3=../../bin/why3.opt
   WHY3SHARE=../../share
 else
   ifeq ($(BINDIR),)
@@ -34,20 +34,24 @@ all: $(MAIN).$(OCAMLBEST)
 
 extract: $(GENML)
 
+doc:
+	$(WHY3) doc ../vstte12_combinators.mlw
+	$(WHY3) session html .
+
 $(MAIN).opt: $(CMX)  $(MAIN).cmx
 	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
 $(GENML): ../vstte12_combinators.mlw
-	$(WHY3) -E ocaml32 ../vstte12_combinators.mlw -o .
+	$(WHY3) extract -D ocaml32 ../vstte12_combinators.mlw -o .
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<
 
 clean::
 	rm -f $(GENML) *.cm[xio] *.o *.annot $(MAIN).opt $(MAIN).byte
-	rm -f vstte12_combinators__*.ml* 
+	rm -f vstte12_combinators__*.ml*
 
 # javascript
 
@@ -57,12 +61,13 @@ JSMAIN=jsmain
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
           -syntax camlp4o
 
-$(JSMAIN).js: $(JSMAIN).byte 
-	js_of_ocaml -pretty -noinline $(JSMAIN).byte
+$(JSMAIN).js: $(JSMAIN).byte
+	js_of_ocaml -pretty -noinline +nat.js $(JSMAIN).byte
 
 
-$(JSMAIN).byte: $(ML) jsmain.ml
-	$(JSOCAMLC) $(INCLUDE) -o $@ -linkpkg $^
+$(JSMAIN).byte: $(CMO) jsmain.ml
+#	$(JSOCAMLC) $(INCLUDE) -o $@ -linkpkg $^
+	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ -linkpkg $^
 
 
 %.cmo: %.ml
@@ -74,4 +79,3 @@ $(JSMAIN).byte: $(ML) jsmain.ml
 
 clean::
 	rm -f *.cm[io] $(NAME).byte $(NAME).js
-

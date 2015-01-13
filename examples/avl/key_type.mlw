@@ -1,0 +1,28 @@
+
+(** {1 Values equiped with keys}
+
+    Author: Martin Clochard
+
+    This file describe types for values equiped with keys, a priori in the
+    purpose of identification. It is mostly intended to factor the
+    representations for sets/map-like structures, as it can be used
+    both for elements and key-value pairs. *)
+
+(** {2 Logical type with key} *)
+theory KeyType
+
+  type t 'a
+  type key
+  function key (t 'a) : key
+
+end
+
+(** {2 Program type with key} *)
+module ProgramKeyType
+
+  clone export KeyType
+
+  val get_key (t:t 'a) : key ensures { key t = result }
+
+end
+

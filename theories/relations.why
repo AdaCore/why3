@@ -139,21 +139,21 @@ end
 theory MinMax
 
   type t
-  predicate ge t t
+  predicate le t t
 
-  clone TotalOrder with type t = t, predicate rel = ge
+  clone TotalOrder with type t = t, predicate rel = le
 
-  function max (x y : t) : t = if ge x y then x else y
-  function min (x y : t) : t = if ge x y then y else x
+  function min (x y : t) : t = if le x y then x else y
+  function max (x y : t) : t = if le x y then y else x
 
-  lemma Max_r : forall x y:t. ge y x -> max x y = y
-  lemma Min_l : forall x y:t. ge y x -> min x y = x
+  lemma Min_r : forall x y:t. le y x -> min x y = y
+  lemma Max_l : forall x y:t. le y x -> max x y = x
 
-  lemma Max_comm : forall x y:t. max x y = max y x
   lemma Min_comm : forall x y:t. min x y = min y x
+  lemma Max_comm : forall x y:t. max x y = max y x
 
-  lemma Max_assoc : forall x y z:t. max (max x y) z = max x (max y z)
   lemma Min_assoc : forall x y z:t. min (min x y) z = min x (min y z)
+  lemma Max_assoc : forall x y z:t. max (max x y) z = max x (max y z)
 
 end
 

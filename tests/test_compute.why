@@ -1,4 +1,56 @@
 
+theory Lambda
+
+use import int.Int
+use import HighOrd
+
+constant f : int -> int = (\x:int.x+1)
+
+constant a : int
+
+goal g1: f 42 = a
+
+constant compose : ('b -> 'c) -> ('a -> 'b) -> ('a -> 'c) = 
+         (\f:'b->'c.(\g:'a->'b.(\x:'a.f (g x))))
+
+goal g2: compose f f 42 = a
+
+constant h : int -> int
+
+axiom a1 : h 42 = 56
+
+meta "rewrite" prop a1
+
+goal g3: h 42 = 4
+
+end
+
+theory A
+
+  predicate p
+  predicate q
+
+  goal G1 : p /\ q
+  goal G2 : p -> q
+  goal G3 : p && q
+
+  use import bool.Bool
+
+  type t
+
+  function f t : bool
+  predicate r t 
+
+  axiom a : forall x:t. f x = True <-> r x
+
+  constant c : t
+
+  meta "rewrite" prop a
+
+  goal g : f c <-> r c
+
+end
+
 theory Test
 
   goal g1: true
@@ -38,6 +90,41 @@ theory TestArith
   meta "rewrite" prop Power_s
 *)
   goal k1: power 4 3 = 64
+
+  constant n : int
+
+  goal l1: n+0 = n
+  goal l2: 0+n = n
+  goal l3: n+1 = n
+  goal l4: n*0 = n
+  goal l5: 0*n = n
+  goal l6: n*1 = n
+  goal l7: 1*n = n
+  goal l8: n-0 = n
+  goal l9: 0-n = n
+
+  use import int.ComputerDivision
+
+  goal m1: div 0 1 = 42
+  goal m2: div n 1 = 42
+  goal m3: div 0 n = 42
+  goal m4: div n n = 42
+
+  use import int.MinMax
+
+  goal n1: max 3 4 = n
+  goal n2: max n n = 42
+  goal n3: min n n = 42
+  goal n4: min 3 4 = n
+
+
+  function f int : int
+  
+  axiom a42 : f 42 + 43 = 56
+
+  meta rewrite prop a42
+
+  goal o1 : f (6*7) + (42 + 1) = n
 
 end
 
@@ -87,6 +174,14 @@ theory TestList
   goal h2: length l2 = 5
 
   goal h3: forall x y:int. Cons x Nil = Cons y Nil
+
+  constant l3 : list int
+
+  axiom dangerous: Cons 12 Nil = l3
+
+  meta rewrite prop dangerous
+
+  goal i1: l3 = Nil ++ Nil
 
 end
 
@@ -236,6 +331,9 @@ theory NonTerm
   goal g5 : fib (S (S (S (S (S O))))) = x
   goal g6 : fib (S (S (S (S (S (S O)))))) = x
   goal g7 : fib (S (S (S (S (S (S (S O))))))) = x
+
+  meta "compute_max_steps" 100000
+
   goal g8 : fib (S (S (S (S (S (S (S (S O)))))))) = x
   goal g9 : fib (S (S (S (S (S (S (S (S (S O))))))))) = x
   goal g10 : fib (S (S (S (S (S (S (S (S (S (S O)))))))))) = x
@@ -246,16 +344,16 @@ theory Rinteger
 
    use export int.Int
 
-   lemma l1 : forall x:int. x + 0 = x
-
-   (* not allowed: + is a built-in symbol
-     meta "rewrite" prop l1
-     *)
-
    goal g1 : forall y. 2+2 = y
 
    goal g2 : forall y.  0 + y + 0 + y - y = y
 
+   lemma l1 : forall x y z:int. (x + y) + z = z + (y + x)
+
+   function f int : int
+
+   goal g3 : (f 1 + f 2) + f 3 = f 4
+ 
 end
 
 theory TestInteger

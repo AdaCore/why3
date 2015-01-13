@@ -5,6 +5,15 @@
 
 import "ocaml-gen.drv"
 
+theory bv.BV32
+  syntax type      t      "Int32.t"
+  syntax constant  zero   "0l"
+  syntax constant  ones    "-1l"
+  syntax function  bw_and "(Int32.logand %1 %2)"
+  syntax predicate eq     "(%1 = %2)"
+  (* TODO ... *)
+end
+
 module mach.int.Int32
   syntax val of_int "Why3__BigInt.to_int32"
   syntax converter of_int "%1l"
@@ -24,6 +33,9 @@ module mach.int.Int32
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
   syntax val      (>)       "(>)"
+
+  syntax val      to_bv     "(fun x -> x)"
+  syntax val      of_bv     "(fun x -> x)"
 end
 
 module mach.int.UInt32

@@ -9,12 +9,4 @@
 (*                                                                  *)
 (********************************************************************)
 
-val library_of_env : Env.env -> unit Env.library
-
-val parse_logic_file :
-  Env.env -> Env.pathname -> Lexing.lexbuf -> Theory.theory Stdlib.Mstr.t
-
-val parse_program_file :
-  Ptree.incremental -> Lexing.lexbuf -> unit
-
-val token_counter : Lexing.lexbuf -> int * int
+val parse_program_file : Ptree.incremental -> Lexing.lexbuf -> unit

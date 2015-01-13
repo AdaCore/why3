@@ -5,7 +5,7 @@ module M
   use import array.Array
 
   type uf = { link : array int;
-              dist : array int; (* distance to representative *)
+        ghost dist : array int; (* distance to representative *)
               num  : int;       (* number of classes *) }
 
   function size (u: uf) : int = length u.link

@@ -341,6 +341,7 @@ type dpattern_node =
   | DPpapp of plsymbol * dpattern list
   | DPor   of dpattern * dpattern
   | DPas   of dpattern * preid
+  | DPcast of dpattern * ity
 
 (** Specifications *)
 
@@ -549,6 +550,11 @@ let dpat_expected_type {dp_dity = dp_dity; dp_loc = loc} dity =
     "This pattern has type %a,@ but is expected to have type %a"
     print_dity dp_dity print_dity dity
 
+let dpat_expected_type_weak {dp_dity = dp_dity; dp_loc = loc} dity =
+  try dity_unify_weak dp_dity dity with Exit -> Loc.errorm ?loc
+    "This pattern has type %a,@ but is expected to have type %a"
+    print_dity dp_dity print_dity dity
+
 let dexpr_expected_type {de_dvty = (al,res); de_loc = loc} dity =
   if al <> [] then Loc.errorm ?loc "This expression is not a first-order value";
   try dity_unify res dity with Exit -> Loc.errorm ?loc
@@ -635,6 +641,9 @@ let dpattern ?loc node =
         let { dp_pat = pat; dp_dity = dity; dp_vars = vars } = dp in
         let vars = Mstr.add_new (Dterm.DuplicateVar n) n dity vars in
         mk_dpat (PPas (pat, id)) dity vars
+    | DPcast (dp, ity) ->
+        dpat_expected_type_weak dp (dity_of_ity ity);
+        dp
   in
   Loc.try1 ?loc dpat node
 
@@ -941,11 +950,11 @@ let check_user_effect ?ps e spec args dsp =
   if full_xpost then Sexn.iter check_raise eeff.eff_raises;
   if full_xpost then Sexn.iter check_raise eeff.eff_ghostx;
   if eeff.eff_diverg && not ueff.eff_diverg then match ps with
-    | Some {ps_name = {id_label = l}} 
-        when not (Slab.mem lab_w_diverges_no l) ->
-      Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
-        "this@ expression@ may@ diverge,@ \
-          which@ is@ not@ stated@ in@ the@ specification"
+    | Some {ps_name = {id_label = l}}
+      when not (Slab.mem lab_w_diverges_no l) ->
+        Warning.emit ?loc:(e_find_loc (fun e -> e.e_effect.eff_diverg) e)
+          "this@ expression@ may@ diverge,@ \
+            which@ is@ not@ stated@ in@ the@ specification"
     | _ -> ()
 
 let check_lambda_effect ({fun_lambda = lam} as fd) bl dsp =
@@ -1086,7 +1095,7 @@ let spec_invariant env pvs vty spec =
 (** Abstract values *)
 
 let warn_unused s loc =
-  if not (String.length s > 0 && s.[0] = '_') then
+  if s = "" || s.[0] <> '_' then
   Warning.emit ?loc "unused variable %s" s
 
 let check_used_pv e pv = if not (Spv.mem pv e.e_syms.syms_pv) then

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v2//EN" "http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="2">
+ <prover
+  id="0"
+  name="Alt-Ergo"
+  version="0.94"/>
+ <prover
+  id="1"
+  name="CVC3"
+  version="2.2"/>
+ <prover
+  id="2"
+  name="CVC3"
+  version="2.4.1"/>
+ <prover
+  id="3"
+  name="Z3"
+  version="2.19"/>
+ <prover
+  id="4"
+  name="Z3"
+  version="3.2"/>
+ <prover
+  id="5"
+  name="Z3"
+  version="4.0"/>
+ <file
+  name="../test-shape.why"
+  verified="false"
+  expanded="true">
+  <theory
+   name="T"
+   locfile="../test-shape.why"
+   loclnum="2" loccnumb="7" loccnume="8"
+   verified="false"
+   expanded="true">
+   <goal
+    name="toto"
+    locfile="../test-shape.why"
+    loclnum="11" loccnumb="8" loccnume="12"
+    sum="c67bd992eb2821870bb1dccbef972069"
+    proved="true"
+    expanded="true"
+    shape="ainfix =ainfix +c2c2c4">
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="false"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+   <goal
+    name="G"
+    locfile="../test-shape.why"
+    loclnum="13" loccnumb="7" loccnume="8"
+    sum="ac2e3b308ebd5c41fd7ea091447593d5"
+    proved="false"
+    expanded="true"
+    shape="ainfix =anthV2V0aSomeV3Aainfix =anthV1V0aSomeV3Aainfix =V1V2NEIainfix &gt;=alengthV0c3F">
+    <proof
+     prover="0"
+     timelimit="5"
+     memlimit="1000"
+     edited="testmnshape-T-G_1.why"
+     obsolete="true"
+     archived="false">
+     <undone/>
+    </proof>
+    <proof
+     prover="1"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="5.63"/>
+    </proof>
+    <proof
+     prover="2"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="5.44"/>
+    </proof>
+    <proof
+     prover="3"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="5.42"/>
+    </proof>
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="true"
+     archived="false">
+     <result status="timeout" time="5.62"/>
+    </proof>
+    <proof
+     prover="5"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="true"
+     archived="false">
+     <undone/>
+    </proof>
+   </goal>
+   <goal
+    name="g1"
+    locfile="../test-shape.why"
+    loclnum="15" loccnumb="7" loccnume="9"
+    sum="0a1b808c701f69e1e0f7e8bfc5d93471"
+    proved="false"
+    expanded="true"
+    shape="ainfix &lt;=aprefix -V0c0Iainfix &gt;=V0c0F">
+    <proof
+     prover="4"
+     timelimit="5"
+     memlimit="1000"
+     obsolete="true"
+     archived="false">
+     <result status="valid" time="0.01"/>
+    </proof>
+   </goal>
+  </theory>
+ </file>
+</why3session>

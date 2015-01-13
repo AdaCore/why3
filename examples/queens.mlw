@@ -162,67 +162,75 @@ module NQueensSets
 
 end
 
-(* 2. More realistic code with bitwise operations **************************)
+(** {2 More realistic code with bitwise operations} *)
 
-(***)
-
-theory BitwiseArithmetic
-
-  use export int.Int
-
-  (* logical and *)
-  function (&) int int : int
-
-  (* logical shift left *)
-  function (<<) int int : int
-
-  (* logical negation *)
-  function (~_) int : int
-
-end
-
-theory Bits "the 1-bits of an integer, as a set of integers"
+module Bits "the 1-bits of an integer, as a set of integers"
 
   use export S
+  use bv.BV32
 
-  function bits int : set int
+  constant size : int = 32
 
-  function size : int (* word size, e.g. 32 *)
+  type t = {
+          bv : BV32.t;
+    ghost set: set int;
+  }
+  invariant {
+    forall i: int. (0 <= i < size /\ BV32.nth self.bv i) <-> mem i self.set
+  }
 
-  axiom bits_0:
-    forall x: int. is_empty (bits x) <-> x = 0
+  let zero () : t
+    ensures { is_empty result.set }
+  =
+    { bv = BV32.zero; set = empty }
 
-  axiom bits_remove_singleton:
-    forall a b: int. forall i: int. 0 <= i < size ->
-    bits b = singleton i -> mem i (bits a) ->
-    bits (a - b) = remove i (bits a)
+  let remove_singleton (a b: t) : t
+    requires { b.set = singleton (min_elt b.set) }
+    requires { mem (min_elt b.set) a.set }
+    ensures  { result.set = remove (min_elt b.set) a.set }
+  =
+    { bv = BV32.bw_and a.bv (BV32.bw_not b.bv);
+      set = remove (min_elt b.set) a.set }
+    (* { bv = BV32.sub a.bv b.bv; set = remove (min_elt b.set) a.set } *)
 
-  axiom bits_add_singleton:
-    forall a b: int. forall i: int. 0 <= i < size ->
-    bits b = singleton i -> not (mem i (bits a)) ->
-    bits (a + b) = add i (bits a)
+  let add_singleton (a b: t) : t
+    requires { b.set = singleton (min_elt b.set) }
+    requires { not (mem (min_elt b.set) a.set) }
+    ensures  { result.set = add (min_elt b.set) a.set }
+  =
+    { bv = BV32.bw_or a.bv b.bv;
+      set = add (min_elt b.set) a.set }
+    (* { bv = BV32.add a.bv b.bv; set = add (min_elt b.set) a.set } *)
 
-  axiom bits_mul2:
-    forall a: int. forall i: int. 0 <= i < size ->
-    mem i (bits (a*2)) <-> mem i (succ (bits a))
+  let mul2 (a: t) : t
+    ensures { result.set = remove size (succ a.set) }
+  =
+    { bv = BV32.lsl a.bv 1; set = remove size (succ a.set) }
 
-  use export int.ComputerDivision
+  let div2 (a: t) : t
+    ensures { result.set = pred a.set }
+  =
+    { bv = BV32.lsr a.bv 1; set = pred a.set }
 
-  axiom bits_div2:
-    forall a: int. forall i: int. 0 <= i < size ->
-    mem i (bits (div a 2)) <-> mem i (pred (bits a))
+  let diff (a b: t) : t
+    ensures { result.set = diff a.set b.set }
+  =
+    { bv = BV32.bw_and a.bv (BV32.bw_not b.bv);
+      set = diff a.set b.set }
 
-  use export BitwiseArithmetic
+  let rightmost_bit_trick (a: t) : t
+    requires { not (is_empty a.set) }
+    ensures  { result.set = singleton (min_elt a.set) }
+  =
+    { bv = BV32.bw_and a.bv (BV32.neg a.bv);
+      set = singleton (min_elt a.set) }
 
-  axiom bits_diff:
-    forall a b: int. bits (a & ~b) = diff (bits a) (bits b)
-
-  axiom rightmost_bit_trick:
-    forall x: int. x <> 0 -> 0 <= min_elt (bits x) < size ->
-    bits (x & -x) = singleton (min_elt (bits x))
-
-  axiom bits_below:
-    forall n: int. 0 <= n < size -> bits (~(~0<<n)) = interval 0 n
+  let below (n: int) : t
+    requires { 0 <= n < size }
+    ensures  { result.set = interval 0 n }
+  =
+    { bv = BV32.bw_not (BV32.lsl BV32.ones n);
+      set = interval 0 n }
 
 end
 
@@ -242,7 +250,8 @@ module NQueensBits
   val ghost k  : ref int       (* current row in the current solution *)
 
   val ghost sol: ref solutions (* all solutions *)
-  val ghost s  : ref int       (* next slot for a solution = number of solutions *)
+  val ghost s  : ref int       (* next slot for a solution =
+                                  number of solutions *)
 
   let rec t (a b c: int) variant { cardinal (bits a) }
     requires { 0 <= !k /\ !k + cardinal (bits a) = n /\ !s >= 0 /\

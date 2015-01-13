@@ -145,6 +145,8 @@ let rec print_ty info fmt ty =
           | [ty] -> print_ty info fmt ty
           | _   -> fprintf fmt "(%a)%%type" (print_list star (print_ty info)) tl
       end
+  | Tyapp (ts, [l;r]) when ts_equal ts ts_func ->
+      fprintf fmt "(%a ->@ %a)" (print_ty info) l (print_ty info) r
   | Tyapp (ts, tl) ->
     begin match query_syntax info.info_syn ts.ts_name with
       | Some s -> syntax_arguments s (print_ty info) fmt tl
@@ -277,18 +279,30 @@ and print_tnode _opl opr info fmt t = match t.t_node with
         (print_term info) t
         (print_list newline (print_tbranch info)) bl
   | Teps fb ->
-      let v,f = t_open_bound fb in
-      fprintf fmt (protect_on opr "epsilon %a.@ %a")
-        (print_vsty info) v (print_opl_fmla info) f;
-      forget_var v
+      let vl,_,t0 = t_open_lambda t in
+      if vl = [] then begin
+        let v,f = t_open_bound fb in
+        fprintf fmt (protect_on opr "epsilon %a.@ %a")
+          (print_vsty info) v (print_opl_fmla info) f;
+        forget_var v
+      end else begin
+        if t0.t_ty = None then unsupportedTerm t
+          "Coq: Prop-typed lambdas are not supported";
+        fprintf fmt (protect_on opr "fun %a =>@ %a")
+          (print_list space (print_vsty info)) vl
+          (print_opl_term info) t0;
+        List.iter forget_var vl
+      end
   | Tapp (fs,[]) when is_fs_tuple fs ->
       fprintf fmt "tt"
   | Tapp (fs,pl) when is_fs_tuple fs ->
       fprintf fmt "%a" (print_paren_r (print_term info)) pl
+  | Tapp (fs,[l;r]) when ls_equal fs fs_func_app ->
+      fprintf fmt "(%a@ %a)" (print_opr_term info) l (print_opr_term info) r
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
-          syntax_arguments s (print_term info) fmt tl
+          syntax_arguments s (print_opr_term info) fmt tl
       | _ -> if unambig_fs fs
           then
             if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
@@ -342,7 +356,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
         (print_fmla info) f1 (print_fmla info) f2 (print_opl_fmla info) f3
   | Tapp (ps, tl) ->
     begin match query_syntax info.info_syn ps.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
+      | Some s -> syntax_arguments s (print_opr_term info) fmt tl
       | _ -> fprintf fmt "(%a%a)" (print_ls_real info) ps
           (print_list_pre space (print_opr_term info)) tl
     end
@@ -928,7 +942,7 @@ let print_task printer_args realize ?old fmt task =
         let f,id =
           let l = Strings.rev_split '.' s1 in
           List.rev (List.tl l), List.hd l in
-        let th = Env.find_theory printer_args.env f id in
+        let th = Env.read_theory printer_args.env f id in
         Mid.add th.Theory.th_name (th, if s2 = "" then s1 else s2) mid
       | _ -> assert false
     ) Mid.empty task in

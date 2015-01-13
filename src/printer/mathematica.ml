@@ -37,8 +37,7 @@ let incremental_pat_match env holes =
         end
     | PatApp (sp,ss,sl,pl), Tapp (ls,tl) ->
         if List.length pl <> List.length tl then raise Not_found;
-        let th = try Env.find_theory env sp ss with Env.TheoryNotFound _ ->
-            raise Not_found in
+        let th = Env.read_theory env sp ss in
         let s = ns_find_ls th.th_export sl in
         if not (ls_equal s ls) then raise Not_found;
         List.iter2 aux pl tl
@@ -77,7 +76,7 @@ let arith_meta = register_meta "math arith"
 
 
 let find_th env file th =
-  let theory = Env.find_theory env [file] th in
+  let theory = Env.read_theory env [file] th in
   fun id -> Theory.ns_find_ls theory.Theory.th_export [id]
 
 let get_info env task =

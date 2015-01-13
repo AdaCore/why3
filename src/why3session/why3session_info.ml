@@ -15,7 +15,6 @@
 (**************************************************************************)
 
 open Why3
-open Why3session
 open Why3session_lib
 open Whyconf
 open Format
@@ -165,7 +164,7 @@ let rec stats_of_goal ~root prefix_name stats goal =
   in
   List.iter (update_perf_stats stats) proof_list;
   PHstr.iter (stats_of_transf prefix_name stats) goal.goal_transformations;
-  if not goal.goal_verified then
+  if not (Opt.inhabited goal.goal_verified) then
     let goal_name = prefix_name ^ goal.goal_name.Ident.id_string in
     stats.no_proof <- Sstr.add goal_name stats.no_proof
   else
@@ -204,7 +203,7 @@ type 'a goal_stat =
   | No of ('a transf * ('a goal * 'a goal_stat) list) list
   | Yes of (prover * float) list * ('a transf * ('a goal * 'a goal_stat) list) list
 
-let rec stats2_of_goal ~nb_proofs g : notask goal_stat =
+let rec stats2_of_goal ~nb_proofs g : 'a goal_stat =
   let proof_list =
     PHprover.fold
       (fun prover proof_attempt acc ->
@@ -231,12 +230,12 @@ let rec stats2_of_goal ~nb_proofs g : notask goal_stat =
       []
   in
   if match nb_proofs with
-    | 0 -> not g.goal_verified
+    | 0 -> not (Opt.inhabited g.goal_verified)
     | 1 -> List.length proof_list = 1
     | _ -> assert false
       then Yes(proof_list,l) else No(l)
 
-and stats2_of_transf ~nb_proofs tr : (notask goal * notask goal_stat) list =
+and stats2_of_transf ~nb_proofs tr : ('a goal * 'a goal_stat) list =
   List.fold_left
     (fun acc g ->
       match stats2_of_goal ~nb_proofs g with
@@ -355,7 +354,7 @@ let print_stats r0 r1 stats =
 let run_one stats r0 r1 fname =
   let project_dir = Session.get_project_dir fname in
   if !opt_project_dir then printf "%s@." project_dir;
-  let session = Session.read_session project_dir in
+  let session,_use_shapes = Session.read_session project_dir in
   let sep = if !opt_print0 then Pp.print0 else Pp.newline in
   if !opt_print_provers then
     printf "%a@."

@@ -15,7 +15,6 @@ open Ty
 open Term
 open Decl
 open Theory
-open Env
 open Ptree
 
 open Mlw_ty
@@ -93,34 +92,34 @@ let uc_find_ls uc p =
 
 let ity_of_pty ?(noop=true) uc pty =
   let rec get_ty = function
-    | PPTtyvar ({id_loc = loc}, true) when noop ->
+    | PTtyvar ({id_loc = loc}, true) when noop ->
         Loc.errorm ~loc "Opaqueness@ annotations@ are@ only@ \
           allowed@ in@ the@ types@ of@ formal@ arguments"
-    | PPTtyvar ({id = x}, _) ->
+    | PTtyvar ({id_str = x}, _) ->
         ity_var (tv_of_string x)
-    | PPTtyapp (q, tyl) ->
+    | PTtyapp (q, tyl) ->
         let tyl = List.map get_ty tyl in
         begin match uc_find_ts uc q with
         | PT s -> Loc.try2 ~loc:(qloc q) ity_app_fresh s tyl
         | TS s -> Loc.try2 ~loc:(qloc q) ity_pur s tyl
         end
-    | PPTtuple tyl ->
+    | PTtuple tyl ->
         let s = ts_tuple (List.length tyl) in
         ity_pur s (List.map get_ty tyl)
-    | PPTarrow (ty1, ty2) ->
+    | PTarrow (ty1, ty2) ->
         ity_pur ts_func [get_ty ty1; get_ty ty2]
-    | PPTparen ty ->
+    | PTparen ty ->
         get_ty ty
   in
   get_ty pty
 
 let rec opaque_tvs acc = function
-  | PPTtyvar (id, true) -> Stv.add (tv_of_string id.id) acc
-  | PPTtyvar (_, false) -> acc
-  | PPTtyapp (_, pl)
-  | PPTtuple pl -> List.fold_left opaque_tvs acc pl
-  | PPTarrow (ty1, ty2) -> opaque_tvs (opaque_tvs acc ty1) ty2
-  | PPTparen ty -> opaque_tvs acc ty
+  | PTtyvar (id, true) -> Stv.add (tv_of_string id.id_str) acc
+  | PTtyvar (_, false) -> acc
+  | PTtyapp (_, pl)
+  | PTtuple pl -> List.fold_left opaque_tvs acc pl
+  | PTarrow (ty1, ty2) -> opaque_tvs (opaque_tvs acc ty1) ty2
+  | PTparen ty -> opaque_tvs acc ty
 
 (** typing program expressions *)
 
@@ -169,16 +168,16 @@ let create_user_id = Typing.create_user_id
 
 let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
   Mlw_dexpr.dpattern ~loc (match desc with
-    | Ptree.PPpwild -> DPwild
-    | Ptree.PPpvar x -> DPvar (create_user_id x)
-    | Ptree.PPpapp (q,pl) ->
+    | Ptree.Pwild -> DPwild
+    | Ptree.Pvar x -> DPvar (create_user_id x)
+    | Ptree.Papp (q,pl) ->
         begin match uc_find_ps uc q with
         | PL s -> DPpapp (s, List.map (fun p -> dpattern uc p) pl)
         | LS s -> DPlapp (s, List.map (fun p -> dpattern uc p) pl)
         | _ -> Loc.errorm ~loc:(qloc q) "Not a constructor: %a" print_qualid q
         end
-    | Ptree.PPprec [] -> raise Decl.EmptyRecord
-    | Ptree.PPprec ((q,_)::_ as fl) ->
+    | Ptree.Prec [] -> raise Decl.EmptyRecord
+    | Ptree.Prec ((q,_)::_ as fl) ->
         let get_val _ _ = function
           | Some p -> dpattern uc p
           | None -> Mlw_dexpr.dpattern DPwild in
@@ -187,11 +186,12 @@ let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
         | LS _ -> let cs,fl = pure_record ~loc uc get_val fl in DPlapp (cs,fl)
         | _ -> Loc.errorm ~loc:(qloc q) "Not a record field: %a" print_qualid q
         end
-    | Ptree.PPptuple pl ->
+    | Ptree.Ptuple pl ->
         let pl = List.map (fun p -> dpattern uc p) pl in
         DPlapp (fs_tuple (List.length pl), pl)
-    | Ptree.PPpas (p, x) -> DPas (dpattern uc p, create_user_id x)
-    | Ptree.PPpor (p, q) -> DPor (dpattern uc p, dpattern uc q))
+    | Ptree.Pcast (p, pty) -> DPcast (dpattern uc p, ity_of_pty uc pty)
+    | Ptree.Pas (p, x) -> DPas (dpattern uc p, create_user_id x)
+    | Ptree.Por (p, q) -> DPor (dpattern uc p, dpattern uc q))
 
 (* specifications *)
 
@@ -212,7 +212,7 @@ let find_global_vs uc p = try match uc_find_ps uc p with
 
 let find_local_vs uc lvm p = match p with
   | Qdot _ -> find_global_vs uc p
-  | Qident id -> let ovs = Mstr.find_opt id.id lvm in
+  | Qident id -> let ovs = Mstr.find_opt id.id_str lvm in
       if ovs = None then find_global_vs uc p else ovs
 
 let check_at f0 =
@@ -245,17 +245,17 @@ let dpre lenv pl lvm =
 
 let dpost lenv ql lvm ty =
   let dpost (loc,pfl) = match pfl with
-    | [{ pat_desc = Ptree.PPpwild | Ptree.PPptuple [] }, f] ->
+    | [{ pat_desc = Ptree.Pwild | Ptree.Ptuple [] }, f] ->
         None, Loc.try3 ~loc type_fmla lenv.uc lenv.th_old lvm f
-    | [{ pat_desc = Ptree.PPpvar id }, f] ->
+    | [{ pat_desc = Ptree.Pvar id }, f] ->
         let v = create_vsymbol (create_user_id id) ty in
-        let lvm = Mstr.add id.id v lvm in
+        let lvm = Mstr.add id.id_str v lvm in
         Some v, Loc.try3 ~loc type_fmla lenv.uc lenv.th_old lvm f
     | _ ->
         let v = create_vsymbol (id_fresh "result") ty in
-        let i = { id = "(null)"; id_loc = loc; id_lab = [] } in
-        let t = { pp_desc = PPident (Qident i); pp_loc = loc } in
-        let f = { pp_desc = PPmatch (t, pfl); pp_loc = loc } in
+        let i = { id_str = "(null)"; id_loc = loc; id_lab = [] } in
+        let t = { term_desc = Tident (Qident i); term_loc = loc } in
+        let f = { term_desc = Tmatch (t, pfl); term_loc = loc } in
         let lvm = Mstr.add "(null)" v lvm in
         Some v, Loc.try3 ~loc type_fmla lenv.uc lenv.th_old lvm f
   in
@@ -333,9 +333,9 @@ let dbinder uc (_,id,gh,pty) = dbinder uc id gh pty
 let rec dtype_c lenv (tyv, sp) = dtype_v lenv tyv, dspec lenv sp
 
 and dtype_v lenv = function
-  | Tpure pty ->
+  | PTpure pty ->
       DSpecV (dity_of_ity (ity_of_pty lenv.uc pty))
-  | Tarrow (bl,tyc) ->
+  | PTfunc (bl,tyc) ->
       DSpecA (List.map (fun p -> dparam lenv.uc p) bl, dtype_c lenv tyc)
 
 (* expressions *)
@@ -380,8 +380,8 @@ let chainable_qualid uc p = match uc_find_ps uc p with
 
 let chainable_op uc denv op =
   (* non-bool -> non-bool -> bool *)
-  op.id = "infix =" || op.id = "infix <>" ||
-  match denv_get_opt denv op.id with
+  op.id_str = "infix =" || op.id_str = "infix <>" ||
+  match denv_get_opt denv op.id_str with
   | Some (DEvar (_,t)) -> dvty_is_chainable t
   | Some (DEgpsym ps) -> chainable_ps ps
   | Some _ -> false (* can never happen *)
@@ -428,7 +428,7 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
         "unexpected exception symbol %a" print_xs xs
   in
   let qualid_app q el = match q with
-    | Qident {id = n} ->
+    | Qident {id_str = n} ->
         (match denv_get_opt denv n with
         | Some d -> expr_app d el
         | None -> qualid_app q el)
@@ -457,8 +457,8 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
       DElsapp (fs_tuple (List.length el), el)
   | Ptree.Einfix (e12, op2, e3)
   | Ptree.Einnfix (e12, op2, e3) ->
-      let make_app de1 op de2 = if op.id = "infix <>" then
-        let oq = Qident { op with id = "infix =" } in
+      let make_app de1 op de2 = if op.id_str = "infix <>" then
+        let oq = Qident { op with id_str = "infix =" } in
         (* FIXME: op.id_loc is wrong for the 2nd argument *)
         let dt = qualid_app oq [(op.id_loc, de1); (op.id_loc, de2)] in
         DEnot (Mlw_dexpr.dexpr ~loc dt)
@@ -544,7 +544,7 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
       DEif (e1, e2, e3)
   | Ptree.Enot e1 ->
       DEnot (dexpr lenv denv e1)
-  | Ptree.Elazy (op, e1, e2) ->
+  | Ptree.Elazy (e1, op, e2) ->
       let op = match op with
         | Ptree.LazyAnd -> DEand
         | Ptree.LazyOr  -> DEor in
@@ -651,15 +651,15 @@ let add_type_invariant loc uc id params inv =
   let x = "self" in
   let its = match uc_find_ts uc (Qident id) with
     | PT its when its.its_inv -> its
-    | _ -> Loc.errorm ~loc "type %s does not have an invariant" id.id in
-  let add_tv acc { id = id; id_loc = loc } =
+    | _ -> Loc.errorm ~loc "type %s does not have an invariant" id.id_str in
+  let add_tv acc { id_str = id; id_loc = loc } =
     let e = Loc.Located (loc, DuplicateTypeVar id) in
     Sstr.add_new e id acc, tv_of_string id in
   let _, tvl = Lists.map_fold_left add_tv Sstr.empty params in
   let ty = ty_app its.its_ts (List.map ty_var tvl) in
   let res = create_vsymbol (id_fresh x) ty in
   let find = function
-    | Qident { id = id } when id = x -> Some res
+    | Qident { id_str = id } when id = x -> Some res
     | _ -> None in
   let mk_inv f =
     let f = Typing.type_fmla (get_theory uc) find f in
@@ -674,10 +674,10 @@ let add_type_invariant loc uc id params inv =
   Mlw_module.add_invariant uc its q
 
 let look_for_loc tdl s =
-  let look_id loc id = if id.id = s then Some id.id_loc else loc in
+  let look_id loc id = if id.id_str = s then Some id.id_loc else loc in
   let look_pj loc (_,id,_,_) = Opt.fold look_id loc id in
   let look_cs loc (csloc,id,pjl) =
-    let loc = if id.id = s then Some csloc else loc in
+    let loc = if id.id_str = s then Some csloc else loc in
     List.fold_left look_pj loc pjl in
   let look_fl loc f = look_id loc f.f_ident in
   let look loc d =
@@ -691,7 +691,7 @@ let look_for_loc tdl s =
 
 let add_types ~wp uc tdl =
   let add m d =
-    let id = d.td_ident.id in
+    let id = d.td_ident.id_str in
     Mstr.add_new (Loc.Located (d.td_loc, ClashSymbol id)) id d m in
   let def = List.fold_left add Mstr.empty tdl in
 
@@ -702,16 +702,16 @@ let add_types ~wp uc tdl =
     | Some false -> Loc.errorm ~loc:d.td_loc "Cyclic type definition"
     | None ->
         let ts_seen seen = function
-          | Qident { id = x } ->
+          | Qident { id_str = x } ->
               begin try cyc_visit x (Mstr.find x def) seen
               with Not_found -> seen end
           | _ -> seen in
         let rec check seen = function
-          | PPTtyvar _ -> seen
-          | PPTparen ty -> check seen ty
-          | PPTarrow (ty1,ty2) -> check (check seen ty1) ty2
-          | PPTtyapp (q,tyl) -> List.fold_left check (ts_seen seen q) tyl
-          | PPTtuple tyl -> List.fold_left check seen tyl in
+          | PTtyvar _ -> seen
+          | PTparen ty -> check seen ty
+          | PTarrow (ty1,ty2) -> check (check seen ty1) ty2
+          | PTtyapp (q,tyl) -> List.fold_left check (ts_seen seen q) tyl
+          | PTtuple tyl -> List.fold_left check seen tyl in
         let seen = match d.td_def with
           | TDabstract | TDalgebraic _ | TDrecord _ -> seen
           | TDalias ty -> check (Mstr.add x false seen) ty in
@@ -725,18 +725,18 @@ let add_types ~wp uc tdl =
     try Hstr.find impures x
     with Not_found ->
       let ts_imp = function
-        | Qident { id = x } when Mstr.mem x def -> imp_visit x
+        | Qident { id_str = x } when Mstr.mem x def -> imp_visit x
         | q ->
             begin match uc_find_ts uc q with
               | PT _ -> true | TS _ -> false
             end
       in
       let rec check = function
-        | PPTtyvar _ -> false
-        | PPTparen ty -> check ty
-        | PPTarrow (ty1,ty2) -> check ty1 || check ty2
-        | PPTtyapp (q,tyl) -> ts_imp q || List.exists check tyl
-        | PPTtuple tyl -> List.exists check tyl in
+        | PTtyvar _ -> false
+        | PTparen ty -> check ty
+        | PTarrow (ty1,ty2) -> check ty1 || check ty2
+        | PTtyapp (q,tyl) -> ts_imp q || List.exists check tyl
+        | PTtuple tyl -> List.exists check tyl in
       Hstr.replace impures x false;
       let imp =
         let td = Mstr.find x def in
@@ -763,7 +763,7 @@ let add_types ~wp uc tdl =
     try Hstr.find mutables x
     with Not_found ->
       let ts_mut = function
-        | Qident { id = x } when Mstr.mem x def -> mut_visit x
+        | Qident { id_str = x } when Mstr.mem x def -> mut_visit x
         | q ->
             begin match uc_find_ts uc q with
               | PT its -> its.its_regs <> [] || its.its_inv
@@ -771,11 +771,11 @@ let add_types ~wp uc tdl =
             end
       in
       let rec check = function
-        | PPTtyvar _ -> false
-        | PPTparen ty -> check ty
-        | PPTarrow (ty1,ty2) -> check ty1 || check ty2
-        | PPTtyapp (q,tyl) -> ts_mut q || List.exists check tyl
-        | PPTtuple tyl -> List.exists check tyl in
+        | PTtyvar _ -> false
+        | PTparen ty -> check ty
+        | PTarrow (ty1,ty2) -> check ty1 || check ty2
+        | PTtyapp (q,tyl) -> ts_mut q || List.exists check tyl
+        | PTtuple tyl -> List.exists check tyl in
       Hstr.replace mutables x false;
       let mut =
         let td = Mstr.find x def in
@@ -812,41 +812,45 @@ let add_types ~wp uc tdl =
     with Not_found ->
       let d = Mstr.find x def in
       let add_tv acc id =
-        let e = Loc.Located (id.Ptree.id_loc, DuplicateTypeVar id.id) in
-        let tv = tv_of_string id.id in
-        Mstr.add_new e id.id tv acc in
+        let e = Loc.Located (id.Ptree.id_loc, DuplicateTypeVar id.id_str) in
+        let tv = tv_of_string id.id_str in
+        Mstr.add_new e id.id_str tv acc in
       let vars = List.fold_left add_tv Mstr.empty d.td_params in
-      let vl = List.map (fun id -> Mstr.find id.id vars) d.td_params in
+      let vl = List.map (fun id -> Mstr.find id.id_str vars) d.td_params in
       let id = Typing.create_user_id d.td_ident in
       let abst = d.td_vis = Abstract in
       let priv = d.td_vis = Private in
       Hstr.add tysymbols x None;
       let get_ts = function
-        | Qident { id = x } when Mstr.mem x def -> its_visit x
+        | Qident { id_str = x } when Mstr.mem x def -> its_visit x
         | q -> uc_find_ts uc q
       in
       let rec parse = function
-        | PPTtyvar ({ id_loc = loc }, true) -> Loc.errorm ~loc
+        | PTtyvar ({ id_loc = loc }, true) -> Loc.errorm ~loc
             "Opaqueness@ annotations@ are@ only@ \
               allowed@ in@ function@ and@ predicate@ prototypes"
-        | PPTtyvar ({ id = v ; id_loc = loc }, _) ->
+        | PTtyvar ({ id_str = v ; id_loc = loc }, _) ->
             let e = Loc.Located (loc, UnboundTypeVar v) in
             ity_var (Mstr.find_exn e v vars)
-        | PPTtyapp (q,tyl) ->
+        | PTtyapp (q,tyl) ->
             let tyl = List.map parse tyl in
             begin match get_ts q with
               | TS ts -> Loc.try2 ~loc:(qloc q) ity_pur ts tyl
               | PT ts -> Loc.try2 ~loc:(qloc q) ity_app_fresh ts tyl
             end
-        | PPTtuple tyl ->
+        | PTtuple tyl ->
             let ts = ts_tuple (List.length tyl) in
             ity_pur ts (List.map parse tyl)
-        | PPTarrow (ty1,ty2) ->
+        | PTarrow (ty1,ty2) ->
             ity_pur ts_func [parse ty1; parse ty2]
-        | PPTparen ty ->
+        | PTparen ty ->
             parse ty
       in
       let ts = match d.td_def with
+        | TDalias _ when abst || priv -> Loc.errorm ~loc:d.td_loc
+            "type aliases cannot be abstract or private"
+        | TDalias _ when d.td_inv <> [] -> Loc.errorm ~loc:d.td_loc
+            "type aliases cannot have invariants"
         | TDalias ty when Hstr.find impures x ->
             let def = parse ty in
             let nogh = ity_nonghost_reg Sreg.empty def in
@@ -872,7 +876,7 @@ let add_types ~wp uc tdl =
                   if not gh then nogh := ity_nonghost_reg !nogh ity;
                   let regs = Sreg.union regs ity.ity_vars.vars_reg in
                   (regs, inv), (None, fd)
-              | Some ({ id = x; id_loc = loc } as id) ->
+              | Some ({ id_str = x; id_loc = loc } as id) ->
                   try
                     let fd = Hstr.find projs x in
                     if gh <> fd.fd_ghost then Loc.errorm ~loc
@@ -915,7 +919,7 @@ let add_types ~wp uc tdl =
             let (regs,inv),pjl = Lists.map_fold_left mk_field init fl in
             let ghost_reg = Sreg.diff regs !nogh in
             let rl = Sreg.elements regs in
-            let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
+            let cid = { d.td_ident with id_str = "mk " ^ d.td_ident.id_str } in
             Hstr.replace predefs x [Typing.create_user_id cid, pjl];
             PT (create_itysymbol id ~abst ~priv ~inv ~ghost_reg vl rl None)
         | TDalgebraic _ | TDrecord _ when Hstr.find impures x ->
@@ -931,36 +935,36 @@ let add_types ~wp uc tdl =
   (* create predefinitions for immutable types *)
 
   let def_visit d (abstr,algeb,alias) =
-    let x = d.td_ident.id in
+    let x = d.td_ident.id_str in
     let ts = Opt.get (Hstr.find tysymbols x) in
     let vl = match ts with
       | PT s -> s.its_ts.ts_args | TS s -> s.ts_args in
-    let add_tv s x v = Mstr.add x.id v s in
+    let add_tv s x v = Mstr.add x.id_str v s in
     let vars = List.fold_left2 add_tv Mstr.empty d.td_params vl in
     let get_ts = function
-      | Qident { id = x } when Mstr.mem x def ->
+      | Qident { id_str = x } when Mstr.mem x def ->
           Opt.get (Hstr.find tysymbols x)
       | q -> uc_find_ts uc q
     in
     let rec parse = function
-      | PPTtyvar ({ id_loc = loc }, true) -> Loc.errorm ~loc
+      | PTtyvar ({ id_loc = loc }, true) -> Loc.errorm ~loc
           "Opaqueness@ annotations@ are@ only@ \
             allowed@ in@ function@ and@ predicate@ prototypes"
-      | PPTtyvar ({ id = v ; id_loc = loc }, _) ->
+      | PTtyvar ({ id_str = v ; id_loc = loc }, _) ->
           let e = Loc.Located (loc, UnboundTypeVar v) in
           ity_var (Mstr.find_exn e v vars)
-      | PPTtyapp (q,tyl) ->
+      | PTtyapp (q,tyl) ->
           let tyl = List.map parse tyl in
           begin match get_ts q with
             | TS ts -> Loc.try2 ~loc:(qloc q) ity_pur ts tyl
             | PT ts -> Loc.try3 ~loc:(qloc q) ity_app ts tyl []
           end
-      | PPTtuple tyl ->
+      | PTtuple tyl ->
           let ts = ts_tuple (List.length tyl) in
           ity_pur ts (List.map parse tyl)
-      | PPTarrow (ty1,ty2) ->
+      | PTarrow (ty1,ty2) ->
           ity_pur ts_func [parse ty1; parse ty2]
-      | PPTparen ty ->
+      | PTparen ty ->
           parse ty
     in
     match d.td_def with
@@ -977,7 +981,7 @@ let add_types ~wp uc tdl =
             let fd = mk_field ity gh None in
             match id with
             | None -> None, fd
-            | Some ({ id = x; id_loc = loc } as id) ->
+            | Some ({ id_str = x; id_loc = loc } as id) ->
                 try
                   let fd = Hstr.find projs x in
                   if gh <> fd.fd_ghost then Loc.errorm ~loc
@@ -995,7 +999,7 @@ let add_types ~wp uc tdl =
           let mk_field f =
             let fid = Typing.create_user_id f.f_ident in
             Some fid, mk_field (parse f.f_pty) f.f_ghost None in
-          let cid = { d.td_ident with id = "mk " ^ d.td_ident.id } in
+          let cid = { d.td_ident with id_str = "mk " ^ d.td_ident.id_str } in
           let csl = [Typing.create_user_id cid, List.map mk_field fl] in
           abstr, (ts, csl) :: algeb, alias
   in
@@ -1071,71 +1075,20 @@ let add_types ~wp uc tdl = match tdl with
 
 (** Use/Clone of theories and modules *)
 
-type mlw_contents = modul Mstr.t
-type mlw_library = mlw_contents library
-type mlw_file = mlw_contents * Theory.theory Mstr.t
-
-let find_theory loc lib path s =
-  (* search first in .mlw files or among the built-ins *)
-  let thm =
-    try Some (Env.read_lib_theory lib path s)
-    with LibFileNotFound _ | TheoryNotFound _ -> None
-  in
-  (* search also in .why files, unless the theory is built-in *)
-  let th =
-    if path = [] || path = ["why3"] then None else
-    try Some (Env.find_theory (Env.env_of_library lib) path s)
-    with LibFileNotFound _ | TheoryNotFound _ -> None
-  in
-  match thm, th with
-    | Some _, Some _ ->
-        Loc.errorm ~loc
-          "a module/theory %s is defined both in Why and WhyML libraries" s
-    | None, None -> Loc.error ~loc (Env.TheoryNotFound (path, s))
-    | None, Some t | Some t, None -> t
-
-let find_theory loc lib mt path s = match path with
+let find_theory loc env mt path s = match path with
+  | _::_ -> (* theory in file path *)
+      Loc.try3 ~loc Env.read_theory env path s
   | [] -> (* local theory *)
-      begin try Mstr.find s mt with Not_found -> find_theory loc lib [] s end
-  | _ :: _ -> (* theory in file path *)
-      find_theory loc lib path s
+      try Mstr.find s mt with Not_found ->
+      Loc.try3 ~loc Env.read_theory env path s
 
-type theory_or_module = Theory of Theory.theory | Module of modul
-
-let print_path fmt sl =
-  Pp.print_list (Pp.constant_string ".") Format.pp_print_string fmt sl
-
-let find_module loc lib path s =
-  (* search first in .mlw files *)
-  let m, thm =
-    try
-      let mm, mt = Env.read_lib_file lib path in
-      Mstr.find_opt s mm, Mstr.find_opt s mt
-    with
-      | LibFileNotFound _ -> None, None
-  in
-  (* search also in .why files *)
-  let th =
-    try Some (Env.find_theory (Env.env_of_library lib) path s)
-    with LibFileNotFound _ | TheoryNotFound _ -> None
-  in
-  match m, thm, th with
-    | Some _, None, _ -> assert false
-    | _, Some _, Some _ ->
-        Loc.errorm ~loc
-          "a module/theory %s is defined both in Why and WhyML libraries" s
-    | None, None, None ->
-        Loc.errorm ~loc "Theory/module not found: %a" print_path (path @ [s])
-    | Some m, Some _, None -> Module m
-    | None, Some t, None | None, None, Some t -> Theory t
-
-let find_module loc lib mm mt path s = match path with
+let find_module loc env mm mt path s = match path with
+  | _::_ -> (* module/theory in file path *)
+      Loc.try3 ~loc read_module_or_theory env path s
   | [] -> (* local module/theory *)
-      begin try Module (Mstr.find s mm)
-        with Not_found -> begin try Theory (Mstr.find s mt)
-          with Not_found -> find_module loc lib [] s end end
-  | _ :: _ -> (* module/theory in file path *)
-      find_module loc lib path s
+      try Module (Mstr.find s mm) with Not_found ->
+      try Theory (Mstr.find s mt) with Not_found ->
+      Loc.try3 ~loc read_module_or_theory env path s
 
 (** Top level *)
 
@@ -1160,7 +1113,7 @@ let add_decl loc uc decl =
   add_td uc (Theory.get_rev_decls (Typing.add_decl loc th0 decl))
 
 let add_decl ~wp loc uc = function
-  | TypeDecl tdl -> add_types ~wp uc tdl
+  | Ptree.Dtype tdl -> add_types ~wp uc tdl
   | decl -> add_decl loc uc decl
 
 let add_decl ~wp loc uc d =
@@ -1211,11 +1164,11 @@ let add_pdecl ~wp loc uc d =
   if Debug.test_flag Typing.debug_parse_only then uc else
   Loc.try3 ~loc (add_pdecl ~wp) loc uc d
 
-let use_clone_pure lib mth uc loc (use,inst) =
+let use_clone_pure env mth uc loc (use,inst) =
   let path, s = match use.use_theory with
     | Qdot (p,id) -> Typing.string_list_of_qualid p, id
     | Qident id -> [], id in
-  let th = find_theory loc lib mth path s.id in
+  let th = find_theory loc env mth path s.id_str in
   if Debug.test_flag Glob.flag then Glob.use s.id_loc th.th_name;
   (* open namespace, if any *)
   let uc = match use.use_import with
@@ -1232,15 +1185,15 @@ let use_clone_pure lib mth uc loc (use,inst) =
     | Some (import, _) -> Theory.close_namespace uc import
     | None -> uc
 
-let use_clone_pure lib mth uc loc use =
+let use_clone_pure env mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try5 ~loc use_clone_pure lib mth uc loc use
+  Loc.try5 ~loc use_clone_pure env mth uc loc use
 
-let use_clone lib mmd mth uc loc (use,inst) =
+let use_clone env mmd mth uc loc (use,inst) =
   let path, s = match use.use_theory with
     | Qdot (p,id) -> Typing.string_list_of_qualid p, id
     | Qident id -> [], id in
-  let mth = find_module loc lib mmd mth path s.id in
+  let mth = find_module loc env mmd mth path s.id_str in
   if Debug.test_flag Glob.flag then Glob.use s.id_loc
     (match mth with Module m -> m.mod_theory.th_name | Theory th -> th.th_name);
   (* open namespace, if any *)
@@ -1285,9 +1238,9 @@ let use_clone lib mmd mth uc loc (use,inst) =
     | Some (import, _) -> close_namespace uc import
     | None -> uc
 
-let use_clone lib mmd mth uc loc use =
+let use_clone env mmd mth uc loc use =
   if Debug.test_flag Typing.debug_parse_only then uc else
-  Loc.try6 ~loc use_clone lib mmd mth uc loc use
+  Loc.try6 ~loc use_clone env mmd mth uc loc use
 
 let close_theory (mmd,mth) uc =
   if Debug.test_flag Typing.debug_parse_only then (mmd,mth) else
@@ -1313,8 +1266,7 @@ let open_file, close_file =
   let tuc  = Stack.create () in
   let muc  = Stack.create () in
   let lenv = Stack.create () in
-  let open_file lib path =
-    let env = Env.env_of_library lib in
+  let open_file env path =
     let wp = path = [] && Debug.test_noflag Typing.debug_type_only in
     Stack.push (Mstr.empty,Mstr.empty) lenv;
     let open_theory id = Stack.push false inm;
@@ -1337,8 +1289,8 @@ let open_file, close_file =
     let new_pdecl loc d =
       Stack.push (add_pdecl ~wp loc (Stack.pop muc) d) muc in
     let use_clone loc use = let (mmd,mth) = Stack.top lenv in if Stack.top inm
-      then Stack.push (use_clone lib mmd mth (Stack.pop muc) loc use) muc
-      else Stack.push (use_clone_pure lib mth (Stack.pop tuc) loc use) tuc in
+      then Stack.push (use_clone env mmd mth (Stack.pop muc) loc use) muc
+      else Stack.push (use_clone_pure env mth (Stack.pop tuc) loc use) tuc in
     { open_theory = open_theory;
       close_theory = close_theory;
       open_module = open_module;
@@ -1359,7 +1311,4 @@ let () = Exn_printer.register (fun fmt e -> match e with
       Format.fprintf fmt "Type parameter %s is used twice" s
   | UnboundTypeVar s ->
       Format.fprintf fmt "Unbound type variable '%s" s
-  | TooLateInvariant ->
-      Format.fprintf fmt
-        "Cannot add a type invariant after another program declaration"
   | _ -> raise e)

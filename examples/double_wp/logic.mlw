@@ -1,0 +1,169 @@
+
+(* Program logic (hoare logic + weakest preconditions) over
+   Virtual Machine language. *)
+module Compiler_logic
+
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import vm.Vm
+  use import state.State
+  use import HighOrd
+
+
+  function fst (p: ('a,'b)) : 'a = let (x,_) = p in x
+  meta rewrite_def function fst
+
+  function snd (p: ('a,'b)) : 'b = let (_,y) = p in y
+  meta rewrite_def function snd
+
+  (* Unary predicates over machine states *)
+  type pred  = machine_state -> bool
+
+  (* Binary predicates over machine states *)
+  type rel  = machine_state -> pred
+
+  (* pre/post-conditions types, as parameterized unary/binary predicates.
+     'a represents auxiliary variables
+     pos is an auxiliary variable representing the absolute position at which
+     the code is loaded. *)
+  type pre 'a = 'a -> pos -> pred
+  type post 'a = 'a -> pos -> rel
+
+  (* Hoare triples with explicit pre & post *)
+  type hl 'a = { code: code; ghost pre : pre 'a; ghost post: post 'a }
+
+  (* Predicate transformer type. Same auxiliary variables as for
+     Hoare triples. *)
+  type wp_trans 'a = 'a -> pos -> pred -> pred
+
+  (* Code with backward predicate transformer. *)
+  type wp 'a = { wcode : code; ghost wp : wp_trans 'a }
+
+  (* Machine transition valid whatever the global code is. *)
+  predicate contextual_irrelevance (c:code) (p:pos) (ms1 ms2:machine_state) =
+    forall c_glob. codeseq_at c_glob p c -> transition_star c_glob ms1 ms2
+
+  (* (Total) correctness for hoare triple. *)
+  predicate hl_correctness (cs:hl 'a) =
+    forall x:'a,p ms. cs.pre x p ms ->
+      exists ms'. cs.post x p ms ms' /\ contextual_irrelevance cs.code p ms ms'
+
+  (* Similar definition for backward predicate transformers *)
+  predicate wp_correctness (code:wp 'a) =
+    forall x:'a,p post ms. (code.wp x p post) ms ->
+      exists ms'. post ms' /\ contextual_irrelevance code.wcode p ms ms'
+
+
+  (* WP combinator for sequence. Similar to the standard WP calculus
+     for sequence. The initial machine state is memorized in auxiliary
+     variables for potential use in the second code specification. *)
+  (*** Technical: Why3 refuse the logic call in program,
+       so we cannot define it in function of (wp 'a) arguments only. *)
+  function seq_wp
+    (l1:int) (w1:wp_trans 'a) (w2:wp_trans ('a,machine_state)) : wp_trans 'a =
+    \x p q ms. w1 x p (w2 (x,ms) (p+l1) q) ms
+
+  lemma seq_wp_lemma : forall l1,w1: wp_trans 'a,w2 x p q ms.
+      seq_wp l1 w1 w2 x p q ms = w1 x p (w2 (x,ms) (p+l1) q) ms
+  meta rewrite prop seq_wp_lemma
+
+  (* Code combinator for sequence, with wp. *)
+  let (~) (s1 : wp 'a) (s2 : wp ('a, machine_state)) : wp 'a
+    requires { wp_correctness s1 /\ wp_correctness s2 }
+    ensures  { result.wcode.length = s1.wcode.length + s2.wcode.length }
+    ensures  { result.wp = seq_wp s1.wcode.length s1.wp s2.wp }
+    ensures  { wp_correctness result }
+  = let code = s1.wcode ++ s2.wcode in
+    let res = { wcode = code; wp = seq_wp s1.wcode.length s1.wp s2.wp } in
+    assert { forall x: 'a, p post ms. res.wp x p post ms ->
+      not (exists ms'. post ms' /\ contextual_irrelevance res.wcode p ms ms') ->
+        (forall ms'. s2.wp (x,ms) (p + s1.wcode.length) post ms' /\
+           contextual_irrelevance res.wcode p ms ms' -> false) && false };
+    res
+
+  function fork_wp (w:wp_trans 'a) (cond:pre 'a) : wp_trans 'a =
+    \x p q ms. (not cond x p ms -> q ms) /\ (cond x p ms -> w x p q ms)
+
+  lemma fork_wp_lemma: forall w:wp_trans 'a,cond x p q ms.
+    fork_wp w cond x p q ms =
+      ((not cond x p ms -> q ms) /\ (cond x p ms -> w x p q ms))
+
+  meta rewrite prop fork_wp_lemma
+
+  (* Code combinator for conditional execution.
+     Similar to WP calculus for (if cond then s). *)
+
+  let (%) (s:wp 'a) (ghost cond:pre 'a) : wp 'a
+    requires { wp_correctness s }
+    ensures  { result.wp = fork_wp s.wp cond }
+    ensures  { result.wcode.length = s.wcode.length /\ wp_correctness result }
+  = { wcode = s.wcode; wp = fork_wp s.wp cond }
+
+  (* WP transformer for hoare triples. *)
+  function towp_wp (pr:pre 'a) (ps:post 'a) : wp_trans 'a =
+    \x p q ms. pr x p ms && (forall ms'. ps x p ms ms' -> q ms')
+
+  lemma towp_wp_lemma:
+    forall pr ps, x:'a, p q ms. towp_wp pr ps x p q ms =
+      (pr x p ms && (forall ms'. ps x p ms ms' -> q ms'))
+
+  meta rewrite prop towp_wp_lemma
+
+  (* Unwrap code with hoare triple into code with wp.
+     Analogous to procedure call/abstract block. *)
+  let ($_) (c:hl 'a) : wp 'a
+    requires { hl_correctness c }
+    ensures  { result.wcode.length = c.code.length }
+    ensures  { result.wp = towp_wp c.pre c.post /\ wp_correctness result }
+  = { wcode = c.code; wp = towp_wp c.pre c.post }
+
+  (* Equip code with pre/post-condition. That is here that proof happen.
+     (P -> wp (c,Q)). Anologous to checking function/abstract block
+     specification. *)
+  let hoare (ghost pre:pre 'a) (c:wp 'a) (ghost post:post 'a) : hl 'a
+    requires { wp_correctness c }
+    requires { forall x p ms. pre x p ms -> (c.wp x p (post x p ms)) ms }
+    ensures  { result.pre = pre /\ result.post = post }
+    ensures  { result.code.length = c.wcode.length /\ hl_correctness result}
+  = { code = c.wcode ; pre = pre; post = post }
+
+  function trivial_pre : pre 'a = \_ p ms. let VMS p' _ _ = ms in p = p'
+  meta rewrite_def function trivial_pre
+
+  (* Accessibility predicate. *)
+  inductive acc ('a -> 'a -> bool) 'a =
+    | Acc : forall r, x:'a. (forall y. r y x -> acc r y) -> acc r x
+
+  (* An iteration of the loop should make progress
+     towards the postcondition: either achieve the postcondition,
+     or preserve the invariant and "decrease" according to
+     a well-founded relation. *)
+  function loop_progress (inv post:pre 'a) (var:post 'a) : post 'a =
+    \x p ms ms'. (inv x p ms' /\ var x p ms' ms) \/ post x p ms'
+  meta rewrite_def function loop_progress
+
+  function forget_old (post:pre 'a) : post 'a =
+    \x p _. post x p
+  meta rewrite_def function forget_old
+
+  (* Variant of hoare triplet introduction rule for looping code.
+     - inv is the loop invariant
+     - post is the loop postcondition
+     - var is a well-founded relation over states satisfying the
+       invariant. *)
+  let make_loop_hl (c:hl 'a) (ghost inv post:pre 'a) (ghost var:post 'a) : hl 'a
+    requires { hl_correctness c }
+    requires { forall x p ms. inv x p ms -> acc (var x p) ms }
+    requires { c.pre = inv }
+    requires { c.post = loop_progress inv post var }
+    ensures { result.pre = inv /\ result.post = forget_old post }
+    ensures { result.code.length = c.code.length /\ hl_correctness result }
+  = let res = { code = c.code ; pre = inv ; post = forget_old post } in
+    assert { forall x p ms.  inv x p ms -> acc (var x p) ms && exists ms'.
+      contextual_irrelevance res.code p ms ms' /\ forget_old post x p ms ms' };
+    res
+
+end
+

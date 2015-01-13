@@ -11,7 +11,6 @@
 
 open Format
 open Why3
-open Why3session
 
 (** {2 Warnings} *)
 
@@ -211,7 +210,7 @@ let project_dir =
   with Not_found -> failwith "file does not exist"
 
 let goal_statistics (goals,n,m) g =
-  if g.S.goal_verified then (goals,n+1,m+1) else (g::goals,n,m+1)
+  if Opt.inhabited g.S.goal_verified then (goals,n+1,m+1) else (g::goals,n,m+1)
 
 let theory_statistics (ths,n,m) th =
   let goals,n1,m1 =
@@ -359,8 +358,10 @@ let add_to_check config some_merge_miss found_obs =
 
 let transform_smoke env_session =
   let trans tr_name s =
-    Session_tools.filter_proof_attempt S.proof_verified s.S.session;
-    Session_tools.transform_proof_attempt ~keygen:O.create s tr_name in
+    Session_tools.filter_proof_attempt 
+      (fun p -> Opt.inhabited (S.proof_verified p)) s.S.session;
+    Session_tools.transform_proof_attempt ~keygen:O.create s tr_name
+  in
   match !opt_smoke with
     | SD_None -> ()
     | SD_Top -> trans "smoke_detector_top" env_session
@@ -400,8 +401,9 @@ let () =
     Debug.dprintf debug "Opening session...@?";
     O.verbose := Debug.test_flag debug;
     let env_session,found_obs,some_merge_miss =
-      let session = S.read_session project_dir in
-      M.update_session ~allow_obsolete:true session env config
+      let session, use_shapes = S.read_session project_dir in
+      M.update_session ~allow_obsolete:true ~release:false ~use_shapes
+        session env config
     in
     Debug.dprintf debug " done.@.";
     if !opt_obsolete_only && not found_obs

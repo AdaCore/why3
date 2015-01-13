@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Why3
-open Why3session
+
 module S = Session
 module C = Whyconf
 
@@ -71,12 +71,17 @@ let read_env_spec () =
   let env = Env.create_env loadpath in
   env,config,read_simple_spec ()
 
-
 let read_update_session ~allow_obsolete env config fname =
-  let project_dir = Session.get_project_dir fname in
-  let session = Session.read_session project_dir in
-  Session.update_session ~keygen:(fun ?parent:_ _ -> ())
-    ~allow_obsolete session env config
+  let project_dir = S.get_project_dir fname in
+  let session,use_shapes = S.read_session project_dir in
+  let ctxt = {
+    S.allow_obsolete_goals = allow_obsolete;
+    S.release_tasks = false;
+    S.use_shapes_for_pairing_sub_goals = use_shapes;
+    S.keygen = (fun ?parent:_ () -> ());
+  }
+  in
+  S.update_session ~ctxt session env config
 
 (** filter *)
 type filter_prover =
@@ -197,9 +202,9 @@ let iter_proof_attempt_by_filter iter filters f session =
   (** three value *)
   let three_value f v p =
     let iter_obsolete a =
-      match v with
-        | FT_No  when not (p a) -> f a
-        | FT_Yes when     (p a) -> f a
+      match v, p a with
+        | FT_No, false -> f a
+        | FT_Yes, true -> f a
         | _ -> () (** FT_All treated after *) in
     if v = FT_All then f else iter_obsolete in
   (** obsolete *)
@@ -208,9 +213,10 @@ let iter_proof_attempt_by_filter iter filters f session =
   let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
   (** verified_goal *)
   let f = three_value f filters.verified_goal
-    (fun a -> a.S.proof_parent.S.goal_verified) in
+    (fun a -> Opt.inhabited a.S.proof_parent.S.goal_verified) in
   (** verified *)
-  let f = three_value f filters.verified S.proof_verified in
+  let f = three_value f filters.verified
+    (fun p -> Opt.inhabited (S.proof_verified p)) in
   (** status *)
   let f = if filters.status = [] then f else
       (fun a -> match a.S.proof_state with

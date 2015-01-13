@@ -10,7 +10,7 @@
 (********************************************************************)
 
 type driver = private {
-  drv_lib         : Mlw_typing.mlw_library;
+  drv_env         : Env.env;
   drv_printer     : string option;
   drv_prelude     : Printer.prelude;
   drv_thprelude   : Printer.prelude_map;
@@ -19,8 +19,7 @@ type driver = private {
   drv_converter   : Printer.syntax_map;
 }
 
-val load_driver :
-  Mlw_typing.mlw_library -> string -> string list -> driver
+val load_driver : Env.env -> string -> string list -> driver
   (** loads a driver from a file
       @param env    environment to interpret theories and modules
       @param string driver file name

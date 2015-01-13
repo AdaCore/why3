@@ -9,8 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Why3
-
 (** Proof sessions
 
     Define all the functions needed for managing a session:
@@ -82,9 +80,9 @@ type 'a goal = private
       goal_name : Ident.ident; (** The ident of the task *)
       goal_expl : expl;
       goal_parent : 'a goal_parent;
-      mutable goal_checksum : Termcode.checksum;  (** checksum of the task *)
+      mutable goal_checksum : Termcode.checksum option;  (** checksum of the task *)
       mutable goal_shape : Termcode.shape;  (** shape of the task *)
-      mutable goal_verified : bool;
+      mutable goal_verified : float option;
       mutable goal_task: task_option;
       mutable goal_expanded : bool;
       goal_external_proofs : 'a proof_attempt PHprover.t;
@@ -114,7 +112,7 @@ and 'a metas =
     metas_added : metas_args;
     metas_idpos : idpos;
     metas_parent : 'a goal;
-    mutable metas_verified : bool;
+    mutable metas_verified : float option;
     mutable metas_goal : 'a goal;
     (** Not mutated after the creation *)
     mutable metas_expanded : bool;
@@ -125,21 +123,27 @@ and 'a transf = private
       transf_name : string;
       (** Why3 transformation name *)
       transf_parent : 'a goal;
-      mutable transf_verified : bool;
+      mutable transf_verified : float option;
       mutable transf_goals : 'a goal list;
       (** Not mutated after the creation *)
       mutable transf_expanded : bool;
+      mutable transf_detached : 'a detached option;
     }
+
+and 'a detached = private
+    { detached_goals: 'a goal list; }
 
 and 'a theory = private
     { mutable theory_key : 'a;
       theory_name : Ident.ident;
       theory_parent : 'a file;
+      mutable theory_checksum : Termcode.checksum option;
       mutable theory_goals : 'a goal list;
       (** Not mutated after the creation *)
-      mutable theory_verified : bool;
+      mutable theory_verified : float option;
       mutable theory_expanded : bool;
       mutable theory_task : Theory.theory hide;
+      mutable theory_detached : 'a detached option;
     }
 
 and 'a file = private
@@ -149,7 +153,7 @@ and 'a file = private
       file_parent : 'a session;
       mutable file_theories: 'a theory list;
       (** Not mutated after the creation *)
-      mutable file_verified : bool;
+      mutable file_verified : float option;
       mutable file_expanded : bool;
       mutable file_for_recovery : Theory.theory Mstr.t hide;
     }
@@ -157,6 +161,7 @@ and 'a file = private
 and 'a session = private
     { session_files : 'a file PHstr.t;
       mutable session_shape_version : int;
+      session_prover_ids : int PHprover.t;
       session_dir   : string;
     }
 
@@ -180,13 +185,26 @@ val get_project_dir : string -> string
 
 (** {2 Read/Write} *)
 
-type notask
-(** A phantom type which is used for sessions which don't contain any task. The
-    only such sessions are sessions that come from {!read_session} *)
+type 'key keygen = ?parent:'key -> unit -> 'key
+(** type of functions which can generate keys *)
 
-val read_session : string -> notask session
+exception ShapesFileError of string
+exception SessionFileError of string
+
+val read_session: string -> unit session * bool
 (** Read a session stored on the disk. It returns a session without any
-    task attached to goals *)
+    task attached to goals.
+
+    The returned boolean is set when there was shapes read from disk.
+
+    raises [SessionFileError msg] if the database file cannot be read
+    correctly.
+
+    raises [ShapesFileError msg] if the database extra file for shapes
+    cannot be read.
+
+*)
+
 
 val save_session : Whyconf.config -> 'key session -> unit
 (** Save a session on disk *)
@@ -222,16 +240,17 @@ val unload_provers : 'a env_session -> unit
 
 (** {2 Update session} *)
 
-type 'key keygen = ?parent:'key -> unit -> 'key
-(** type of functions which can generate keys *)
-
 exception OutdatedSession
 
-val update_session :
-  ?release:bool (* default false *)  ->
-  keygen:'a keygen ->
-  allow_obsolete:bool -> 'b session ->
-  Env.env -> Whyconf.config -> 'a env_session * bool * bool
+type 'key update_context =
+  { allow_obsolete_goals : bool;
+    release_tasks : bool;
+    use_shapes_for_pairing_sub_goals : bool;
+    keygen : 'key keygen;
+  }
+
+val update_session : ctxt:'key update_context -> 'oldkey session ->
+  Env.env -> Whyconf.config -> 'key env_session * bool * bool
 (** reload the given session with the given environnement :
     - the files are reloaded
     - apply again the transformation
@@ -246,7 +265,8 @@ val update_session :
     If the merge generated new unpaired goals is indicated by
     the third result.
 
-    raises [Failure msg] if the database file cannot be read correctly
+    raises [OutdatedSession] if the session is obsolete and
+    [allow_obsolete] is false
 
 *)
 
@@ -281,9 +301,9 @@ val goal_task_option : 'key goal -> Task.task option
 val goal_expl : 'key goal -> string
 (** Return the explication of a goal *)
 
-val proof_verified : 'key proof_attempt -> bool
-(** Return true if the proof is not obsolete and the result is valid *)
-
+val proof_verified : 'key proof_attempt -> float option
+(** Return [Some t] if the proof is not obsolete and the result is
+    valid. [t] is the time needed to solved it *)
 
 val get_used_provers : 'a session -> Whyconf.Sprover.t
 (** Get the set of provers which appear in the session *)
@@ -492,6 +512,9 @@ val goal_iter_leaf_goal :
 (** iter all the goals which are a leaf
     (no transformations are applied on it) *)
 
+val fold_all_sub_goals_of_theory :
+  ('a -> 'key goal -> 'a) -> 'a -> 'key theory -> 'a
+
 (** {3 not recursive} *)
 
 val iter_goal :
@@ -503,8 +526,8 @@ val iter_transf :
   ('key goal -> unit) -> 'key transf -> unit
 val iter_metas :
   ('key goal -> unit) -> 'key metas -> unit
-val iter_theory :
-  ('key goal -> unit) -> 'key theory -> unit
+val iter_theory : ('key goal -> unit) -> 'key theory -> unit
+  (** [iter_theory f th] applies [f] to all root goals of theory [th] *)
 val iter_file :
   ('key theory -> unit) -> 'key file -> unit
 val iter_session :

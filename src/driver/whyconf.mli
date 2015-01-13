@@ -182,7 +182,7 @@ val set_policies : config -> prover_upgrade_policy Mprover.t -> config
 type config_strategy = {
   strategy_name : string;
   strategy_desc : Pp.formatted;
-  strategy_code : string array;
+  strategy_code : string;
   strategy_shortcut : string;
 }
 

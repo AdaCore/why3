@@ -37,6 +37,8 @@ type prover_result = {
   (** The output of the prover currently stderr and stdout *)
   pr_time   : float;
   (** The time taken by the prover *)
+  pr_steps  : int;
+  (** The number of steps taken by the prover (-1 if not available) *)
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit
@@ -59,6 +61,12 @@ val timeregexp : string -> timeregexp
 (** Converts a regular expression with special markers '%h','%m',
     '%s','%i' (for milliseconds) into a value of type [timeregexp] *)
 
+type prover_result_parser = {
+  prp_regexps     : (Str.regexp * prover_answer) list;
+  prp_timeregexps : timeregexp list;
+  prp_exitcodes   : (int * prover_answer) list;
+}
+
 type prover_call
 (** Type that represents a single prover run *)
 
@@ -72,9 +80,8 @@ val call_on_file :
   command     : string ->
   ?timelimit  : int ->
   ?memlimit   : int ->
-  regexps     : (Str.regexp * prover_answer) list ->
-  timeregexps : timeregexp list ->
-  exitcodes   : (int * prover_answer) list ->
+  ?stepslimit : int ->
+  res_parser  : prover_result_parser ->
   ?cleanup    : bool ->
   ?inplace    : bool ->
   ?redirect   : bool ->
@@ -84,9 +91,8 @@ val call_on_buffer :
   command     : string ->
   ?timelimit  : int ->
   ?memlimit   : int ->
-  regexps     : (Str.regexp * prover_answer) list ->
-  timeregexps : timeregexp list ->
-  exitcodes   : (int * prover_answer) list ->
+  ?stepslimit : int ->
+  res_parser  : prover_result_parser ->
   filename    : string ->
   ?inplace    : bool ->
   Buffer.t -> pre_prover_call

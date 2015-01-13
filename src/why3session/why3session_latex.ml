@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Why3
-open Why3session
 open Why3session_lib
 open Format
 
@@ -457,7 +456,7 @@ let table () = if !opt_longtable then "longtable" else "tabular"
 
 let run_one fname =
   let project_dir = Session.get_project_dir fname in
-  let session = Session.read_session project_dir in
+  let session,_use_shapes = Session.read_session project_dir in
   let dir = if !opt_output_dir = "" then project_dir else
       !opt_output_dir
   in

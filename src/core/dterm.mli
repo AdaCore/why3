@@ -37,9 +37,15 @@ and dpattern_node =
   | DPapp of lsymbol * dpattern list
   | DPor of dpattern * dpattern
   | DPas of dpattern * preid
+  | DPcast of dpattern * ty
 
 type dbinop =
   | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff
+
+type dquant =
+  | DTforall | DTexists | DTlambda
+
+type dbinder = preid option * dty * Loc.position option
 
 type dterm = private {
   dt_node  : dterm_node;
@@ -57,7 +63,7 @@ and dterm_node =
   | DTlet of dterm * preid * dterm
   | DTcase of dterm * (dpattern * dterm) list
   | DTeps of preid * dty * dterm
-  | DTquant of quant * (preid * dty) list * dterm list list * dterm
+  | DTquant of dquant * dbinder list * dterm list list * dterm
   | DTbinop of dbinop * dterm * dterm
   | DTnot of dterm
   | DTtrue
@@ -81,7 +87,7 @@ val denv_add_var : denv -> preid -> dty -> denv
 
 val denv_add_let : denv -> dterm -> preid -> denv
 
-val denv_add_quant : denv -> (preid * dty) list -> denv
+val denv_add_quant : denv -> dbinder list -> denv
 
 val denv_add_pat : denv -> dpattern -> denv
 

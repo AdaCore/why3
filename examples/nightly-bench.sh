@@ -3,7 +3,7 @@
 
 case "$1" in
   "-mail")
-        REPORTBYMAIL=yes;;
+        REPORTBYMAIL=$2;;
   "")
         REPORTBYMAIL=no;;
   *)
@@ -11,7 +11,7 @@ case "$1" in
         exit 2
 esac
 
-REPORTDIR=$PWD/..
+REPORTDIR=$PWD/../why3-reports
 OUT=$REPORTDIR/nightly-bench.out
 PREVIOUS=$REPORTDIR/nightly-bench.previous
 DIFF=$REPORTDIR/nightly-bench.diff
@@ -21,11 +21,10 @@ DATE=`date --utc +%Y-%m-%d`
 SUBJECT="Why3 nightly bench:"
 
 notify() {
-    if test "$REPORTBYMAIL" == "yes"; then
-        mail -s "$SUBJECT" why3-commits@lists.gforge.inria.fr < $REPORT
-        # mail -s "$SUBJECT" Claude.Marche@inria.fr < $REPORT
-    else
+    if test "$REPORTBYMAIL" == "no"; then
         cat $REPORT
+    else
+        mail -s "$SUBJECT" $REPORTBYMAIL < $REPORT
     fi
     exit 0
 }
@@ -71,6 +70,20 @@ fi
 # increase number of cores used
 perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 
+# add uninstalled prover substitution policies
+cat >> why3.conf <<EOF
+
+[uninstalled_prover policy0]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "8.4pl5"
+version = "8.4pl4"
+
+EOF
+
 # run the bench
 make bench &> $OUT
 if test "$?" != "0" ; then
@@ -108,6 +121,7 @@ diff -u $PREVIOUS $OUT &> $DIFF
 if test "$?" == 0 ; then
     echo "---------- No difference with last bench ---------- " >> $REPORT
 else
+    SUBJECT="$SUBJECT (with new differences)"
     if expr `cat $DIFF | wc -l` '>=' `cat $OUT | wc -l` ; then
         echo "------- Diff with last bench is larger than the bench itself ------" >> $REPORT
     else
@@ -126,4 +140,3 @@ cat $OUT >> $REPORT
 
 # final notification after the replay
 notify
-

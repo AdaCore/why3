@@ -149,6 +149,13 @@ module Int31
     constant min = min_int31,
     constant max = max_int31
 
+  use bv.BV31
+
+  val to_bv (x: int31) : BV31.t
+    ensures { BV31.to_int result = to_int x }
+  val of_bv (x: BV31.t) : int31
+    ensures { to_int result = BV31.to_int x }
+
 end
 
 module Int32
@@ -165,6 +172,13 @@ module Int32
     constant min = min_int32,
     constant max = max_int32
 
+  use bv.BV32
+
+  val to_bv (x: int32) : BV32.t
+    ensures { BV32.to_int result = to_int x }
+  val of_bv (x: BV32.t) : int32
+    ensures { to_int result = BV32.to_int x }
+
 end
 
 module UInt32
@@ -176,6 +190,13 @@ module UInt32
   clone export Unsigned with
     type t = uint32,
     constant max = max_uint32
+
+  use bv.BV32
+
+  val to_bv (x: uint32) : BV32.t
+    ensures { BV32.to_uint result = to_int x }
+  val of_bv (x: BV32.t) : uint32
+    ensures { to_int result = BV32.to_uint x }
 
 end
 
@@ -193,6 +214,13 @@ module Int63
     constant min = min_int63,
     constant max = max_int63
 
+  use bv.BV63
+
+  val to_bv (x: int63) : BV63.t
+    ensures { BV63.to_int result = to_int x }
+  val of_bv (x: BV63.t) : int63
+    ensures { to_int result = BV63.to_int x }
+
 end
 
 module Int64
@@ -209,6 +237,13 @@ module Int64
     constant min = min_int64,
     constant max = max_int64
 
+  use bv.BV64
+
+  val to_bv (x: int64) : BV64.t
+    ensures { BV64.to_int result = to_int x }
+  val of_bv (x: BV64.t) : int64
+    ensures { to_int result = BV64.to_int x }
+
 end
 
 module UInt64
@@ -222,5 +257,12 @@ module UInt64
   clone export Unsigned with
     type t = uint64,
     constant max = max_uint64
+
+  use bv.BV64
+
+  val to_bv (x: uint64) : BV64.t
+    ensures { BV64.to_uint result = to_int x }
+  val of_bv (x: BV64.t) : uint64
+    ensures { to_int result = BV64.to_uint x }
 
 end

@@ -415,7 +415,7 @@ let detect_unknown env detected =
     | None -> acc
     | Some (priority,prover_id,prover_config) ->
       let prover = prover_config.prover in
-      eprintf "Warning: prover %s version %s is not known to be \
+      Warning.emit "Warning: prover %s version %s is not known to be \
                      supported.@."
         prover.Wc.prover_name prover.prover_version;
       (** Pb: Even if it match the first prover section (normally

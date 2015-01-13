@@ -22,10 +22,11 @@ let dir_sep = Str.regexp_string Filename.dir_sep
 
 let output_file fname =
   let fname = Filename.chop_extension fname in
-  let f = Str.global_replace dir_sep "." fname in
   let base = match !output_dir with
-    | None -> f
-    | Some dir -> Filename.concat dir f
+    | None -> fname
+    | Some dir ->
+      let f = Str.global_replace dir_sep "." fname in
+      Filename.concat dir f
   in
   base ^ ".html"
 
@@ -71,11 +72,15 @@ let tag_escape s =
 let make_tag s l =
   tag_escape s ^ "_" ^ string_of_int l
 
+let local_files = Hashtbl.create 17
+let add_local_file fn = Hashtbl.add local_files (Filename.chop_extension fn) ()
+let is_local_file = Hashtbl.mem local_files
+
 let make_url fn =
   let url = fn ^ ".html" in
   match !stdlib_url with
-  | None -> url
-  | Some www -> www ^ "/" ^ url
+  | Some www when not (is_local_file fn) -> www ^ "/" ^ url
+  | _ -> url
 
 let anchor id = match id.id_loc with
   | None -> raise Not_found
@@ -86,4 +91,3 @@ let locate id =
     try Mlw_module.restore_path id with Not_found -> Theory.restore_path id in
   let url = if lp = [] then "" else make_url (String.concat "." lp) in
   url ^ "#" ^ anchor id
-

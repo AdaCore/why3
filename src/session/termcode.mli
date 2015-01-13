@@ -9,8 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Why3
-
 (** Explanations *)
 
 val goal_expl_task:
@@ -44,25 +42,37 @@ val checksum_of_string: string -> checksum
 val equal_checksum: checksum -> checksum -> bool
 val dumb_checksum: checksum
 
+val buffer_checksum : Buffer.t -> checksum
+
 val task_checksum : ?version:int -> Task.task -> checksum
 
 (** Pairing algorithm *)
 
 module type S = sig
-  type t
-  val checksum : t -> checksum
-  val shape    : t -> shape
-  val name     : t -> Ident.ident
+  type 'a t
+  val checksum : 'a t -> checksum option
+  val shape    : 'a t -> shape
+  val name     : 'a t -> Ident.ident
 end
 
 module Pairing(Old: S)(New: S) : sig
   val associate:
-    Old.t list -> New.t list -> (New.t * (Old.t * bool) option) list
+    use_shapes:bool -> 'a Old.t list -> 'b New.t list ->
+    ('b New.t * ('a Old.t * bool) option) list * 'a Old.t list
     (** Associate new goals to (possibly) old goals
         Each new goal is mapped either to
-        - [None]: no pairing at all
-        - [Some (h, false)]: exact matching (equal checksums)
-        - [Some (h, true)]: inexact matching (goal obsolete)
+        - [None]: no old goal associated
+        - [Some (h, false)]: the matching is exact (same checksums)
+        - [Some (h, true)]: inexact matching (thus proofs for the new goal
+          must be assumed obsolete)
 
-        Note: in the output, goals appear in the same order as in [newgoals] *)
+        if [use_shapes] is set, the clever algorithm matching shapes is used,
+        otherwise a simple association in the given order of goals is done.
+
+        Note: in the output, goals appear in the same order as in [newgoals]
+
+        the second list returned is the list of non-associated old goals.
+
+     *)
+
 end

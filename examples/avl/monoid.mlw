@@ -1,0 +1,79 @@
+
+(** {1 Abstract monoids}
+    Author: Martin Clochard *)
+
+(** {2 Abstract logic monoid} *)
+
+module Monoid
+
+  (** Elements of the monoid. *)
+  type t
+
+  (** Neutral element. *)
+  constant zero : t
+  (** Composition law. *)
+  function op (a b:t) : t
+
+  (** Monoid properties. *)
+  axiom assoc : forall a b c:t. op a (op b c) = op (op a b) c
+  axiom neutral : forall x:t. op x zero = x = op zero x
+
+end
+
+(** {2 Abstract monoid with aggregation} *)
+module MonoidSum
+
+  use import list.List
+  use import list.Append
+  use import HighOrd
+  clone import Monoid as M
+
+  (** Axiomatized definition of the monoidal aggregation of elements
+      obtained from a list: using infix notation for the monoid law,
+      [sum f [a_1;a_2;...;a_n]] is [a_1 op a_2 ... op a_n].
+      This axiomatization must be kept until the monoid is instantiated *)
+  function sum (f:'a -> t) (l:list 'a) : t
+  axiom sum_def_nil : forall f:'a -> t. sum f Nil = zero
+  axiom sum_def_cons : forall f:'a -> t,x,q.
+    sum f (Cons x q) = op (f x) (sum f q)
+
+  (** Consequence of associativity *)
+  let rec lemma sum_append (f:'a -> t) (l r:list 'a) : unit
+    ensures { sum f (l ++ r) = op (sum f l) (sum f r) }
+    variant { l }
+  = match l with Cons _ q -> sum_append f q r | _ -> () end
+
+end
+
+(** {2 Definition of aggregation} *)
+module MonoidSumDef
+  use import list.List
+  use import HighOrd
+
+  namespace M
+    type t
+    constant zero : t
+    function op (a b:t) : t
+  end
+  function sum (f:'a -> M.t) (l:list 'a) : M.t = match l with
+    | Nil -> M.zero
+    | Cons x q -> M.op (f x) (sum f q)
+    end
+  clone export MonoidSum with type M.t = M.t,constant M.zero = M.zero,
+    function M.op = M.op,function sum = sum,
+    goal sum_def_nil,goal sum_def_cons
+
+end
+
+(** {2 Computable monoid} *)
+module ComputableMonoid
+
+  clone export Monoid
+
+  (** Abstract routines computing operations in the monoid. *)
+  val zero () : t ensures { result = zero }
+
+  val op (a b:t) : t ensures { result = op a b }
+
+end
+

@@ -82,9 +82,8 @@ type denv = {
   ts_rat   : tysymbol;
 }
 
-let make_denv lib =
-  let env = Env.env_of_library lib in
-  let get_theory = Env.read_theory ~format:"why" env ["tptp"] in
+let make_denv env =
+  let get_theory s = Env.read_theory env ["tptp"] s in
   let th_univ = get_theory "Univ" in
   let th_ghost = get_theory "Ghost" in
   let th_rat = get_theory "Rat" in
@@ -125,7 +124,7 @@ let defined_arith ~loc denv env impl dw tl =
     | { t_ty = Some {ty_node = Tyapp (ts,[]) }}::_ -> ts
     | _::_ -> error ~loc NonNumeric
     | [] -> error ~loc BadArity in
-  let get_theory = Env.read_theory ~format:"why" denv.de_env ["tptp"] in
+  let get_theory s = Env.read_theory denv.de_env ["tptp"] s in
   let get_int_theory = function
     | DF DFquot -> errorm ~loc "$quotient/2 is not defined on $int"
     | DF (DFquot_e|DFrem_e) -> get_theory "IntDivE"
@@ -667,4 +666,3 @@ let typecheck lib path ast =
     | [] -> add_prop_decl uc Pgoal pr_false t_false
   in
   Mstr.singleton "T" (close_theory uc)
-

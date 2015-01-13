@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="2" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.3" timelimit="2" memlimit="0"/>
+<file name="../avl.mlw" expanded="true">
+<theory name="SelectionTypes" sum="8ee3f641805a143e052f3881ea88fc8c">
+ <goal name="rebuild_aternative_def">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.07"/></proof>
+ </goal>
+</theory>
+<theory name="AVL" sum="e2c89c7fa1275fb01905418f8ee272f9" expanded="true">
+ <goal name="M.M.assoc">
+ <proof prover="1" timelimit="5"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="M.M.neutral">
+ <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="WP_parameter real_height_nonnegative" expl="VC for real_height_nonnegative">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="rotation_preserve_model">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter height" expl="VC for height">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter total" expl="VC for total">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter empty" expl="VC for empty">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter node" expl="VC for node">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.16"/></proof>
+ </goal>
+ <goal name="WP_parameter singleton" expl="VC for singleton">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="WP_parameter is_empty" expl="VC for is_empty">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.13"/></proof>
+ </goal>
+ <goal name="WP_parameter view" expl="VC for view">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="WP_parameter balance" expl="VC for balance">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter balance.1" expl="1. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.2" expl="2. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.3" expl="3. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.4" expl="4. unreachable point">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.5" expl="5. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.6" expl="6. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.7" expl="7. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.8" expl="8. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.9" expl="9. postcondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.33"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.10" expl="10. postcondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.33"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.11" expl="11. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.12" expl="12. unreachable point">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.13" expl="13. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.62"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.14" expl="14. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.15" expl="15. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.16" expl="16. postcondition">
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.17" expl="17. postcondition">
+  <proof prover="0" timelimit="2"><result status="valid" time="0.30"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.18" expl="18. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.19" expl="19. unreachable point">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.20" expl="20. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.21" expl="21. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.22" expl="22. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.14"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.23" expl="23. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.17"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.24" expl="24. postcondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.26"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.25" expl="25. postcondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.40"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.26" expl="26. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.27" expl="27. unreachable point">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.31"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.28" expl="28. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.78"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.29" expl="29. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.30" expl="30. precondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.31" expl="31. postcondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.22"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.32" expl="32. postcondition">
+  <proof prover="0" timelimit="2"><result status="valid" time="0.32"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.33" expl="33. precondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.34" expl="34. postcondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter balance.35" expl="35. postcondition">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter decompose_front_node" expl="VC for decompose_front_node">
+ <proof prover="0" timelimit="2"><result status="valid" time="0.14"/></proof>
+ </goal>
+ <goal name="WP_parameter decompose_front" expl="VC for decompose_front">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.43"/></proof>
+ </goal>
+ <goal name="WP_parameter decompose_back_node" expl="VC for decompose_back_node">
+ <proof prover="0" timelimit="2"><result status="valid" time="0.17"/></proof>
+ </goal>
+ <goal name="WP_parameter decompose_back" expl="VC for decompose_back">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.38"/></proof>
+ </goal>
+ <goal name="WP_parameter front_node" expl="VC for front_node">
+ <proof prover="0" timelimit="2"><result status="valid" time="0.80"/></proof>
+ </goal>
+ <goal name="WP_parameter front" expl="VC for front">
+ <proof prover="0" timelimit="2"><result status="valid" time="0.42"/></proof>
+ </goal>
+ <goal name="WP_parameter back_node" expl="VC for back_node">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.27"/></proof>
+ </goal>
+ <goal name="WP_parameter back" expl="VC for back">
+ <proof prover="1" memlimit="0"><result status="valid" time="0.16"/></proof>
+ </goal>
+ <goal name="WP_parameter fuse" expl="VC for fuse">
+ <proof prover="2"><result status="valid" time="0.24"/></proof>
+ </goal>
+ <goal name="WP_parameter cons" expl="VC for cons">
+ <proof prover="0" timelimit="2"><result status="valid" time="0.11"/></proof>
+ </goal>
+ <goal name="WP_parameter snoc" expl="VC for snoc">
+ <proof prover="0" timelimit="2"><result status="valid" time="0.10"/></proof>
+ </goal>
+ <goal name="WP_parameter join" expl="VC for join">
+ <proof prover="0" timelimit="2"><result status="valid" time="0.99"/></proof>
+ </goal>
+ <goal name="WP_parameter concat" expl="VC for concat">
+ <proof prover="2"><result status="valid" time="0.11"/></proof>
+ </goal>
+ <goal name="WP_parameter default_split" expl="VC for default_split">
+ <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter insert" expl="VC for insert">
+ <proof prover="0" memlimit="1000"><result status="valid" time="1.15"/></proof>
+ </goal>
+ <goal name="WP_parameter remove" expl="VC for remove">
+ <proof prover="0" memlimit="1000"><result status="valid" time="1.02"/></proof>
+ </goal>
+ <goal name="WP_parameter get" expl="VC for get">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.71"/></proof>
+ </goal>
+ <goal name="WP_parameter extract" expl="VC for extract">
+ <proof prover="0" memlimit="1000"><result status="valid" time="1.25"/></proof>
+ </goal>
+ <goal name="WP_parameter split" expl="VC for split">
+ <proof prover="0" memlimit="1000"><result status="valid" time="0.94"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

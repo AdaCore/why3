@@ -9,7 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
 open Ident
 open Ty
 open Term
@@ -21,7 +20,7 @@ open Mlw_expr
 open Mlw_module
 
 type driver = {
-  drv_lib         : Mlw_typing.mlw_library;
+  drv_env         : Env.env;
   drv_printer     : string option;
   drv_prelude     : Printer.prelude;
   drv_thprelude   : Printer.prelude_map;
@@ -47,9 +46,6 @@ let load_file file =
   Stack.iter close_in to_close;
   f
 
-(* dead code
-exception NoPrinter
-*)
 exception Duplicate    of string
 exception UnknownType  of (string list * string list)
 exception UnknownLogic of (string list * string list)
@@ -59,7 +55,7 @@ exception UnknownExn   of (string list * string list)
 exception FSymExpected of lsymbol
 exception PSymExpected of lsymbol
 
-let load_driver lib file extra_files =
+let load_driver env file extra_files =
   let prelude   = ref [] in
   let printer   = ref None in
   let blacklist = Queue.create () in
@@ -142,9 +138,7 @@ let load_driver lib file extra_files =
         let m = lookup_meta s in
         ignore (create_meta m (List.map convert al))
   in
-  let add_local th (loc,rule) =
-    try add_local th rule with e -> raise (Loc.Located (loc,e))
-  in
+  let add_local th (loc,rule) = Loc.try2 ~loc add_local th rule in
   let find_val m (loc,q) =
     try match ns_find_prog_symbol m.mod_export q with
     | PV pv -> pv.pv_vs.vs_name
@@ -169,23 +163,17 @@ let load_driver lib file extra_files =
         add_converter id s
   in
   let add_local_module m (loc,rule) =
-    try add_local_module loc m rule with e -> raise (Loc.Located (loc,e))
+    Loc.try3 ~loc add_local_module loc m rule
   in
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
-    let th =
-      try Env.read_theory ~format:"why" (Env.env_of_library lib) f id
-      with e -> raise (Loc.Located (loc,e))
-    in
+    let th = Loc.try3 ~loc Env.read_theory env f id in
     qualid := q;
     List.iter (add_local th) trl
   in
   let add_module { mor_name = (loc,q); mor_rules = mrl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
-    let m =
-      try let mm, _ = Env.read_lib_file lib f in Mstr.find id mm
-      with e -> raise (Loc.Located (loc,e))
-    in
+    let m = Loc.try3 ~loc read_module env f id in
     qualid := q;
     List.iter (add_local_module m) mrl
   in
@@ -197,7 +185,7 @@ let load_driver lib file extra_files =
     List.iter add_module fe.fe_mo_rules)
     extra_files;
   {
-    drv_lib         = lib;
+    drv_env         = env;
     drv_printer     = !printer;
     drv_prelude     = List.rev !prelude;
     drv_thprelude   = Mid.map List.rev !thprelude;
@@ -206,18 +194,12 @@ let load_driver lib file extra_files =
     drv_converter   = !converter_map;
   }
 
-
-
 (* exception report *)
 
 let string_of_qualid thl idl =
   String.concat "." thl ^ "." ^ String.concat "." idl
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
-(* dead code
-  | NoPrinter -> Format.fprintf fmt
-      "No printer specified in the driver file"
-*)
   | Duplicate s -> Format.fprintf fmt
       "Duplicate %s specification" s
   | UnknownType (thl,idl) -> Format.fprintf fmt

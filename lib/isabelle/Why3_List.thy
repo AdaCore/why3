@@ -169,6 +169,8 @@ why3_vc reverse_mem by simp
 
 why3_vc reverse_cons by simp
 
+why3_vc cons_reverse by simp
+
 why3_end
 
 
@@ -220,13 +222,13 @@ section {* Number of occurrences in a list *}
 
 why3_open "list/NumOcc.xml"
 
-lemma num_occ_nonneg: "0 \<le> num_occ x xs"
-  by (induct xs) simp_all
+why3_vc Num_Occ_NonNeg
+  by (induct l) simp_all
 
 why3_vc Mem_Num_Occ
 proof (induct l)
   case (Cons y ys)
-  from num_occ_nonneg [of y ys]
+  from Num_Occ_NonNeg [of y ys]
   have "0 < 1 + num_occ y ys" by simp
   with Cons show ?case by simp
 qed simp
@@ -271,7 +273,7 @@ proof (induct l1 arbitrary: l2)
   then show ?case
   proof (cases l2)
     case (Cons x xs)
-    with Nil num_occ_nonneg [of x xs]
+    with Nil Num_Occ_NonNeg [of x xs]
     show ?thesis by (auto simp add: permut_def dest: spec [of _ x])
   qed simp
 next

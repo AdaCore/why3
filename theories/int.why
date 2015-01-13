@@ -45,7 +45,7 @@ end
 theory MinMax
 
   use import Int
-  clone export relations.MinMax with type t = int, predicate ge = (>=),
+  clone export relations.MinMax with type t = int, predicate le = (<=),
     goal TotalOrder.Refl,
     goal TotalOrder.Trans,
     goal TotalOrder.Antisymm,
@@ -68,7 +68,7 @@ end
 
 (** {2 Euclidean Division}
 
-Division and modulo operators with the convention 
+Division and modulo operators with the convention
 that modulo is always non-negative.
 
 It implies that division rounds down when divisor is positive, and
@@ -88,11 +88,14 @@ theory EuclideanDivision
   axiom Div_mod:
     forall x y:int. y <> 0 -> x = y * div x y + mod x y
 
-  axiom Div_bound:
-    forall x y:int. x >= 0 /\ y > 0 -> 0 <= div x y <= x
-
   axiom Mod_bound:
     forall x y:int. y <> 0 -> 0 <= mod x y < abs y
+
+  lemma Div_unique:
+    forall x y q:int. y > 0 -> q * y <= x < q * y + y -> div x y = q
+
+  lemma Div_bound:
+    forall x y:int. x >= 0 /\ y > 0 -> 0 <= div x y <= x
 
   lemma Mod_1: forall x:int. mod x 1 = 0
 
@@ -221,10 +224,21 @@ theory Exponentiation
     power x (n+m) = power x n * power x m
 
   lemma Power_mult : forall x:t, n m : int. 0 <= n -> 0 <= m ->
-    power x (Int.(*) n m) = power (power x n) m
+    power x (Int.( * ) n m) = power (power x n) m
 
   lemma Power_mult2 : forall x y: t, n: int. 0 <= n ->
     power (x * y) n = power x n * power y n
+
+(* TODO
+
+  use import ComputerDivision
+
+  lemma Power_even : forall x:t, n:int. n >= 0 -> mod n 2 = 0 ->
+    power x n = power (x*x) (div n 2)
+
+  lemma power_odd : forall x:t, n:int. n >= 0 -> mod n 2 <> 0 ->
+    power x n = x * power (x*x) (div n 2)
+*)
 
 end
 
@@ -247,102 +261,76 @@ theory Power
 
 end
 
-(** {2 Number of elements satisfying a given predicate}
-
-This theory is parametrized by a predicate [pr]. It is supposed to be
-cloned with needed instances for [pr]. It is also parametrized by a
-type [param] to be used as an additional parameter to [pr].
-
-*)
-
-theory NumOfParam
-
-  type param
-
-  use import Int
-
-  predicate pr param int
-
-  function num_of (p : param) (a b : int) : int
-  (** number of [n] such that [a <= n < b] and [pr p n] *)
-
-  axiom Num_of_empty :
-    forall p : param, a b : int.
-    b <= a -> num_of p a b = 0
-
-  axiom Num_of_right_no_add :
-    forall p : param, a b : int.
-    a < b -> not (pr p (b-1)) -> num_of p a b = num_of p a (b-1)
-  axiom Num_of_right_add :
-    forall p : param, a b : int.
-    a < b -> pr p (b-1) -> num_of p a b = 1 + num_of p a (b-1)
-
-  lemma Num_of_bounds :
-    forall p : param, a b : int. a < b -> 0 <= num_of p a b <= b - a
-    (* direct when a>=b, by induction on b when a <= b *)
-
-  lemma Num_of_append :
-    forall p : param, a b c : int.
-    a <= b <= c -> num_of p a c = num_of p a b + num_of p b c
-    (* by induction on c *)
-
-  lemma Num_of_left_no_add :
-    forall p : param, a b : int.
-    a < b -> not pr p a -> num_of p a b = num_of p (a+1) b
-    (* by Num_of_append *)
-  lemma Num_of_left_add :
-    forall p : param, a b : int.
-    a < b -> pr p a -> num_of p a b = 1 + num_of p (a+1) b
-    (* by Num_of_append *)
-
-  lemma Empty :
-    forall p : param, a b : int.
-    (forall n : int. a <= n < b -> not pr p n) -> num_of p a b = 0
-    (* by induction on b *)
-
-  lemma Full :
-    forall p : param, a b : int. a <= b ->
-    (forall n : int. a <= n < b -> pr p n) -> num_of p a b = b - a
-    (* by induction on b *)
-
-  lemma num_of_increasing:
-    forall p : param, i j k : int.
-    i <= j <= k -> num_of p i j <= num_of p i k
-    (* by Num_of_append and Num_of_non_negative *)
-
-  lemma num_of_strictly_increasing:
-    forall p: param, i j k l: int.
-    i <= j <= k < l -> pr p k -> num_of p i j < num_of p i l
-    (* by Num_of_append and num_of_increasing *)
-
-  lemma num_of_change_any:
-    forall p1 p2: param, a b: int.
-    (forall j: int. a <= j < b -> pr p1 j -> pr p2 j) ->
-    num_of p2 a b >= num_of p1 a b
-
-  lemma num_of_change_some:
-    forall p1 p2: param, a b i: int. a <= i < b ->
-    (forall j: int. a <= j < b -> pr p1 j -> pr p2 j) ->
-    not (pr p1 i) -> pr p2 i ->
-    num_of p2 a b > num_of p1 a b
-
-end
-
-(** {2 Specific version of number of elements satisfying a predicate}
-
-This is an instance of the above, where the type parameter is unused.
-
-*)
+(** {2 Number of integers satisfying a given predicate} *)
 
 theory NumOf
 
-  predicate pr int
+  use import Int
+  use HighOrd
+  use import Bool
 
-  predicate pr0 () (n : int) = pr n
+  function numof (p: int -> bool) (a b: int) : int
+  (** number of [n] such that [a <= n < b] and [p n] *)
 
-  clone NumOfParam as N with type param = tuple0, predicate pr = pr0
+  axiom Numof_empty :
+    forall p: int -> bool, a b: int.
+    b <= a -> numof p a b = 0
 
-  function num_of (a b : int) : int = N.num_of () a b
+  axiom Numof_right_no_add :
+    forall p : int -> bool, a b : int.
+    a < b -> not (p (b-1)) -> numof p a b = numof p a (b-1)
+  axiom Numof_right_add :
+    forall p : int -> bool, a b : int.
+    a < b -> p (b-1) -> numof p a b = 1 + numof p a (b-1)
+
+  lemma Numof_bounds :
+    forall p : int -> bool, a b : int. a < b -> 0 <= numof p a b <= b - a
+    (* direct when a>=b, by induction on b when a <= b *)
+
+  lemma Numof_append :
+    forall p : int -> bool, a b c : int.
+    a <= b <= c -> numof p a c = numof p a b + numof p b c
+    (* by induction on c *)
+
+  lemma Numof_left_no_add :
+    forall p : int -> bool, a b : int.
+    a < b -> not p a -> numof p a b = numof p (a+1) b
+    (* by Numof_append *)
+  lemma Numof_left_add :
+    forall p : int -> bool, a b : int.
+    a < b -> p a -> numof p a b = 1 + numof p (a+1) b
+    (* by Numof_append *)
+
+  lemma Empty :
+    forall p : int -> bool, a b : int.
+    (forall n : int. a <= n < b -> not p n) -> numof p a b = 0
+    (* by induction on b *)
+
+  lemma Full :
+    forall p : int -> bool, a b : int. a <= b ->
+    (forall n : int. a <= n < b -> p n) -> numof p a b = b - a
+    (* by induction on b *)
+
+  lemma numof_increasing:
+    forall p : int -> bool, i j k : int.
+    i <= j <= k -> numof p i j <= numof p i k
+    (* by Numof_append and Numof_non_negative *)
+
+  lemma numof_strictly_increasing:
+    forall p: int -> bool, i j k l: int.
+    i <= j <= k < l -> p k -> numof p i j < numof p i l
+    (* by Numof_append and numof_increasing *)
+
+  lemma numof_change_any:
+    forall p1 p2: int -> bool, a b: int.
+    (forall j: int. a <= j < b -> p1 j -> p2 j) ->
+    numof p2 a b >= numof p1 a b
+
+  lemma numof_change_some:
+    forall p1 p2: int -> bool, a b i: int. a <= i < b ->
+    (forall j: int. a <= j < b -> p1 j -> p2 j) ->
+    not (p1 i) -> p2 i ->
+    numof p2 a b > numof p1 a b
 
 end
 
@@ -369,7 +357,7 @@ theory Fact
  function fact int : int
  axiom fact_def : \forall n:int [fact n].
    n >= 0 -> fact n = if n = 0 then 1 else n * fact (n-1)
- 
+
 *)
 
 
@@ -482,4 +470,3 @@ theory Fibonacci "Fibonacci numbers"
   axiom fibn: forall n:int. n >= 2 -> fib n = fib (n-1) + fib (n-2)
 
 end
-

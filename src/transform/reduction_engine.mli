@@ -76,7 +76,18 @@ terms are normalized with respect to
 type engine
 (** abstract type for reduction engines *)
 
-val create : Env.env -> Decl.decl Ident.Mid.t -> engine
+type params = {
+  compute_defs : bool;
+  compute_builtin : bool;
+  compute_def_set : Term.Sls.t;
+}
+(** Configuration of the engine.
+   . [compute_defs]: if set to true, automatically compute symbols using
+     known definitions. Otherwise, only symbols in [compute_def_set]
+     will be computed.
+   . [compute_builtin]: if set to true, compute builtin functions. *)
+
+val create : params -> Env.env -> Decl.decl Ident.Mid.t -> engine
 (** [create env known_map] creates a reduction engine with
     . builtins theories (int.Int, etc.) extracted from [env]
     . known declarations from [known_map]
@@ -94,11 +105,11 @@ val add_rule : Term.term -> engine -> engine
 *)
 
 
-val normalize : ?limit:int -> engine -> Term.term -> Term.term
+val normalize : limit:int -> engine -> Term.term -> Term.term
 (** [normalize e t] normalizes the term [t] with respect to the engine
     [e]
 
-    Optional parameter [limit] provides a maximum number of steps for execution.
-    (default 1000). When limit is reached, the partially reduced term is returned.
+    parameter [limit] provides a maximum number of steps for execution.
+    When limit is reached, the partially reduced term is returned.
 *)
 

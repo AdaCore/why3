@@ -1,0 +1,51 @@
+
+(** {1 Preorders}
+    Author: Martin Clochard *)
+
+(** {2 Extended preorder theory} *)
+theory Full
+
+  (** Standard preorder theory. *)
+  type t
+  predicate le t t
+  clone export relations.PreOrder with type t = t, predicate rel = le
+  (** Definable symbols for equality and strict ordering. *)
+  predicate eq t t
+  axiom eq_def : forall x y. eq x y <-> le x y /\ le y x
+  predicate lt t t
+  axiom lt_def : forall x y. lt x y <-> le x y /\ not le y x
+
+  (** Equality is provably an equivalence relation. *)
+  clone relations.Equivalence as Eq with type t = t,
+    predicate rel = eq, lemma Trans, lemma Refl, lemma Symm
+
+  (** Strict ordering is indeed a strict partial order. *)
+  clone relations.PartialStrictOrder as Lt with type t = t,
+    predicate rel = lt, lemma Trans, lemma Asymm
+
+end
+
+(** {2 Total preorder} *)
+theory TotalFull
+
+  clone export Full
+  clone export relations.Total with type t = t, predicate rel = le
+  clone relations.Total as Lt with type t = t,
+    predicate rel = le, goal Total
+  lemma lt_def2 : forall x y. lt x y <-> not le y x
+
+end
+
+(** {2 Computable total preorder} *)
+module Computable
+
+  use import int.Int
+  clone export TotalFull
+
+  (** Comparison is computable. *)
+  val compare (x y:t) : int
+    ensures { (result > 0 <-> lt y x) /\
+      (result < 0 <-> lt x y) /\ (result = 0 <-> eq x y) }
+
+end
+

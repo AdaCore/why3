@@ -1,0 +1,66 @@
+
+(** {1 Sorted list with respect to a transitive relation over keys}
+
+    Author: Martin Clochard *)
+
+module Increasing
+
+  use import list.List
+  use import list.Mem
+  use import list.Append
+
+  (** Abstract structure carrying keys. *)
+  clone import key_type.KeyType as K
+  (** Abstract transitive relation. *)
+  clone import relations.Transitive as O with type t = key
+
+  (** Strict bounds over lists. *)
+  predicate lower_bound (x:key) (l:list (t 'a)) =
+    (forall y. mem y l -> rel x y.key)
+
+  predicate upper_bound (x:key) (l:list (t 'a)) =
+    (forall y. mem y l -> rel y.key x)
+
+  (** A list [l1] precede another list [l2] if
+      every element of [l1] is before every element of [l2]. *)
+  predicate precede (l1 l2:list (t 'a)) =
+    (forall x y. mem x l1 /\ mem y l2 -> rel x.key y.key)
+
+  lemma smaller_lower_bound : forall kdown kup,l:list (t 'a).
+    lower_bound kup l /\ rel kdown kup -> lower_bound kdown l
+
+  lemma bigger_upper_bound : forall kdown kup,l:list (t 'a).
+    upper_bound kdown l /\ rel kdown kup -> upper_bound kup l
+
+  (** Define increasing lists. *)
+  predicate increasing (l:list (K.t 'a)) =
+    match l with
+    | Nil -> true
+    | Cons x q -> lower_bound x.K.key q /\ increasing q
+    end
+
+  (** Conditions for a list concatenation to be increasing. *)
+  let rec lemma increasing_precede (l r:list (K.t 'a))
+    ensures { increasing (l++r) <->
+      increasing l /\ increasing r /\ precede l r }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons _ q -> increasing_precede q r
+    end
+
+  (** Variant of the above condition, with a midpoint. *)
+  let lemma increasing_midpoint (l:list (K.t 'a))
+    (x:K.t 'a) (r:list (K.t 'a)) : unit
+    ensures { let kx = K.key x in increasing (l++Cons x r) <->
+      increasing l /\ increasing r /\ lower_bound kx r /\ upper_bound kx l }
+  = ()
+
+  (** Symetric definition of increasing lists, starting at the end. *)
+  let lemma increasing_snoc (l:list (K.t 'a)) (x:K.t 'a) : unit
+    ensures { let kx = K.key x in increasing (l++Cons x Nil) <->
+      increasing l /\ upper_bound kx l }
+  = ()
+
+end
+

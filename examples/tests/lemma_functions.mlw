@@ -1,0 +1,80 @@
+module LemmaFunction1
+
+  use import int.Int
+  use import ref.Refint
+
+  function fact int : int
+  axiom fact0 : fact 0 = 1
+  axiom factn : forall n: int. n > 0 -> fact n = n * fact (n - 1)
+
+  let rec lemma f (n: int) : unit variant {n}
+    requires { n >= 0 }
+    ensures  { fact n >= 1 }
+    =
+    if n > 0 then f (n-1)
+
+  goal g: fact 42 >= 1
+
+end
+
+module LemmaFunction2
+
+  use import int.Int
+  use import array.Array
+  use import array.ArraySum
+
+  let rec lemma sum_nonneg (a: array int) (l u: int) : unit
+    requires { 0 <= l <= u <= length a }
+    requires { forall i: int. 0 <= i < length a -> a[i] >= 0 }
+    variant  { u-l }
+    ensures  { sum a l u >= 0 }
+  =
+    if u > l then sum_nonneg a (l+1) u
+
+  goal g1:
+    forall a: array int.
+    (forall i: int. 0 <= i < length a -> a[i] >= 0) ->
+    sum a 0 (length a) >= 0
+
+end
+
+
+
+
+module M
+
+  use import int.Int
+
+  type list 'a = Nil | Cons 'a (list 'a)
+
+  function length (l:list 'a) : int =
+    match l with
+    | Nil -> 0
+    | Cons x r -> 1 + length r
+    end
+
+
+  let rec lemma_length_non_neg (l:list 'a) : unit
+    variant { l }
+    ensures { length l >= 0 }
+  =
+    match l with
+    | Nil -> ()
+    | Cons x r -> lemma_length_non_neg r
+    end
+
+
+  let rec toy_example(l:list 'a) : unit
+    (* variant { l } does not work (not a sub-term) *)
+    variant { length l }
+    (* works if we add the "ghost lemma_length_non_neg" *)
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ Nil -> ()
+    | Cons x (Cons _ r) ->
+      ghost lemma_length_non_neg l;
+      toy_example (Cons x r)
+    end
+
+end

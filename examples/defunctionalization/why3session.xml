@@ -8,17 +8,17 @@
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="4000"/>
 <prover id="4" name="CVC4" version="1.3" timelimit="5" memlimit="4000"/>
 <file name="../defunctionalization.mlw" expanded="true">
-<theory name="Expr">
+<theory name="Expr" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="DirectSem" expanded="true">
- <goal name="WP_parameter test" expl="VC for test" sum="ce63494decc689d165a0cd0d25153b1c">
+<theory name="DirectSem" sum="0c5093bb9b7a859ebd86013790cd3b5d" expanded="true">
+ <goal name="WP_parameter test" expl="VC for test">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="eval_p3" sum="d4559ef21113ec42586e74ff70fd1ddc">
+ <goal name="eval_p3">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -26,10 +26,10 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="CPS">
- <goal name="cps_correct_expr" sum="32999b9d2c1ec7e341a58b4d3044be04">
+<theory name="CPS" sum="f636e26febc0407a90cc7f95d02332c0">
+ <goal name="cps_correct_expr">
  <transf name="induction_ty_lex">
-  <goal name="cps_correct_expr.1" expl="1." sum="00944411d25988f82d5637d75e835eee">
+  <goal name="cps_correct_expr.1" expl="1.">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="timeout" time="5.02"/></proof>
   <proof prover="2"><result status="timeout" time="5.01"/></proof>
@@ -38,7 +38,7 @@
   </goal>
  </transf>
  </goal>
- <goal name="cps_correct" sum="25a28522812a0e1c6fe6b978ee8af3df">
+ <goal name="cps_correct">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -46,42 +46,42 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Defunctionalization">
- <goal name="size_e_pos" sum="eb5aa07168e469462f178125a5205dd8">
+<theory name="Defunctionalization" sum="81435bb863795cb7acddd63f134ca74e">
+ <goal name="size_e_pos">
  <transf name="induction_ty_lex">
-  <goal name="size_e_pos.1" expl="1." sum="82495c8f9916d8c893f6f3b209165100">
+  <goal name="size_e_pos.1" expl="1.">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="size_c_pos" sum="0e40c13aeafcdafe4170165169a51e89">
+ <goal name="size_c_pos">
  <transf name="induction_ty_lex">
-  <goal name="size_c_pos.1" expl="1." sum="37e50aec6f63e49ae6567c09d8221fc9">
+  <goal name="size_c_pos.1" expl="1.">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter continue_2" expl="VC for continue_2" sum="ed4ddf9482da8dfc8cfda2c6b70fcabd">
+ <goal name="WP_parameter continue_2" expl="VC for continue_2">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter eval_2" expl="VC for eval_2" sum="a7a07cf9429d72bc3322a3673c4daa76">
+ <goal name="WP_parameter eval_2" expl="VC for eval_2">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.05"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.10"/></proof>
  </goal>
- <goal name="WP_parameter interpret_2" expl="VC for interpret_2" sum="9e712c44994e99640a413ddb2e012168">
+ <goal name="WP_parameter interpret_2" expl="VC for interpret_2">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter test" expl="VC for test" sum="9de7203afcdfdb88152d6f8da2c94c08">
+ <goal name="WP_parameter test" expl="VC for test">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.00"/></proof>
@@ -89,38 +89,38 @@
  <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="Defunctionalization2">
- <goal name="WP_parameter continue_2" expl="VC for continue_2" sum="cee608a0ffb140ab045a1a673d508f8b">
+<theory name="Defunctionalization2" sum="31bc5c277e746b55d85e90eee68a229f">
+ <goal name="WP_parameter continue_2" expl="VC for continue_2">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter continue_2.1" expl="1. variant decrease" sum="706bb7c0173a21c1df438ec0b90b2b6b">
+  <goal name="WP_parameter continue_2.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="1.27"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter continue_2.2" expl="2. postcondition" sum="17085f49f3ecf61a10356ca9e40e4f1e">
+  <goal name="WP_parameter continue_2.2" expl="2. postcondition">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter continue_2.3" expl="3. variant decrease" sum="badffb8b276c67f8e5e1305475c7020b">
+  <goal name="WP_parameter continue_2.3" expl="3. variant decrease">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter continue_2.4" expl="4. postcondition" sum="f97be5012a03f57d3aa5f485fbb4c1f2">
+  <goal name="WP_parameter continue_2.4" expl="4. postcondition">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter continue_2.5" expl="5. postcondition" sum="4934f5f844a3b2764a5a55b9ecb4d552">
+  <goal name="WP_parameter continue_2.5" expl="5. postcondition">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -129,30 +129,30 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter eval_2" expl="VC for eval_2" sum="cc6e9a67bbf1312cc85846082c6e390f">
+ <goal name="WP_parameter eval_2" expl="VC for eval_2">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter eval_2.1" expl="1. variant decrease" sum="093afbdabf719594cfdbf05923f1c14d">
+  <goal name="WP_parameter eval_2.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="1"><result status="timeout" time="4.99"/></proof>
   <proof prover="2"><result status="timeout" time="4.96"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter eval_2.2" expl="2. postcondition" sum="b4c59f1003707fd0b15797725a05f5f9">
+  <goal name="WP_parameter eval_2.2" expl="2. postcondition">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter eval_2.3" expl="3. variant decrease" sum="dbd1188a7473a8c8bfde732d367bb546">
+  <goal name="WP_parameter eval_2.3" expl="3. variant decrease">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="timeout" time="4.98"/></proof>
   <proof prover="2"><result status="timeout" time="4.97"/></proof>
   <proof prover="3"><result status="unknown" time="0.33"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter eval_2.4" expl="4. postcondition" sum="d46d3ed532c0b8c606de37f645b0fd1b">
+  <goal name="WP_parameter eval_2.4" expl="4. postcondition">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -161,14 +161,14 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter interpret_2" expl="VC for interpret_2" sum="ca0c3d782c1fa0e6138a7ccbec31301b">
+ <goal name="WP_parameter interpret_2" expl="VC for interpret_2">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter test" expl="VC for test" sum="15ae01458301fcfc8b5c8a8adbeb4bea">
+ <goal name="WP_parameter test" expl="VC for test">
  <proof prover="0"><result status="valid" time="0.00"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -176,152 +176,152 @@
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="SemWithError">
- <goal name="cps_correct_expr" sum="cd46625f4a0c7a07bccf1bdfef1148e9">
+<theory name="SemWithError" sum="13b8bbe1f6be0e77ec747a509d875c4e">
+ <goal name="cps_correct_expr">
  <transf name="induction_ty_lex">
-  <goal name="cps_correct_expr.1" expl="1." sum="7518f6839f5abe78c9431c97b9706aeb">
+  <goal name="cps_correct_expr.1" expl="1.">
   <transf name="split_goal_wp">
-   <goal name="cps_correct_expr.1.1" expl="1." sum="b6ef6589d20ca6cb06d93aef6e35ad31">
+   <goal name="cps_correct_expr.1.1" expl="1.">
    <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="cps_correct_expr.1.2" expl="2." sum="6c47e9bbe56b5ece0a62d228d6d88753">
+   <goal name="cps_correct_expr.1.2" expl="2.">
    <proof prover="1" timelimit="6" memlimit="1000"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="cps_correct" sum="e99299eb01514de4d806650e4df34ea4">
+ <goal name="cps_correct">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="cps2_correct_expr_aux" sum="018546484e7685351adf1c4d2466c634">
+ <goal name="cps2_correct_expr_aux">
  <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="cps2_correct_expr" sum="270170821a96b9f803f69ff884ade3d4">
+ <goal name="cps2_correct_expr">
  <transf name="induction_ty_lex">
-  <goal name="cps2_correct_expr.1" expl="1." sum="261e6727b0be4cb5d5e52d08e3d3f900">
+  <goal name="cps2_correct_expr.1" expl="1.">
   <transf name="split_goal_wp">
-   <goal name="cps2_correct_expr.1.1" expl="1." sum="4b1a3e28e030bc7ddb4497d8c09b00b6">
+   <goal name="cps2_correct_expr.1.1" expl="1.">
    <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="cps2_correct_expr.1.2" expl="2." sum="6734c573ea9d4e08dd7946f1cdb17b01">
+   <goal name="cps2_correct_expr.1.2" expl="2.">
    <proof prover="1" timelimit="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="cps2_correct" sum="dbea92ea622850a1161851e0e53af70d">
+ <goal name="cps2_correct">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter cps3_correct_expr" expl="VC for cps3_correct_expr" sum="697c766ed876600d189a41eed9cdb729">
+ <goal name="WP_parameter cps3_correct_expr" expl="VC for cps3_correct_expr">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter cps3_correct_expr.1" expl="1. postcondition" sum="637ea0d8c86096ab750703bd6dbc69bc">
+  <goal name="WP_parameter cps3_correct_expr.1" expl="1. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter cps3_correct_expr.2" expl="2. variant decrease" sum="13619082089de63a9579d25693d7e6fd">
+  <goal name="WP_parameter cps3_correct_expr.2" expl="2. variant decrease">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter cps3_correct_expr.3" expl="3. variant decrease" sum="67dd17cb4fc762e667a7fa770fccf833">
+  <goal name="WP_parameter cps3_correct_expr.3" expl="3. variant decrease">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter cps3_correct_expr.4" expl="4. assertion" sum="6f969051c2d19a914d6eb86dabd90ea5">
+  <goal name="WP_parameter cps3_correct_expr.4" expl="4. assertion">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter cps3_correct_expr.5" expl="5. postcondition" sum="38a733a625e86f7c1b34f6dbfebda9dd">
+  <goal name="WP_parameter cps3_correct_expr.5" expl="5. postcondition">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="cps3_correct" sum="230af7cc574f7c93d81d8ee47c63f807">
+ <goal name="cps3_correct">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="size_e_pos" sum="5722d833d5d515a9f3dbcdb1f4b48814">
+ <goal name="size_e_pos">
  <transf name="induction_ty_lex">
-  <goal name="size_e_pos.1" expl="1." sum="0235826ab054759534997568f0a68202">
+  <goal name="size_e_pos.1" expl="1.">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="size_c_pos" sum="266dda67235b12b1fb5906e86caa3b62">
+ <goal name="size_c_pos">
  <transf name="induction_ty_lex">
-  <goal name="size_c_pos.1" expl="1." sum="265eb28500eacbbce588ac0e2c067925">
+  <goal name="size_c_pos.1" expl="1.">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter continue_4" expl="VC for continue_4" sum="af57d0cb8521743cf1a6006edd747c9d">
+ <goal name="WP_parameter continue_4" expl="VC for continue_4">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter continue_4.1" expl="1. variant decrease" sum="c59646073fb92f4efbb8a1c0927376db">
+  <goal name="WP_parameter continue_4.1" expl="1. variant decrease">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter continue_4.2" expl="2. postcondition" sum="4dea5815469d7a90becedd0b23fe4e7d">
+  <goal name="WP_parameter continue_4.2" expl="2. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter continue_4.3" expl="3. variant decrease" sum="6018396afed02f0b5cd04c195b927260">
+  <goal name="WP_parameter continue_4.3" expl="3. variant decrease">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter continue_4.4" expl="4. precondition" sum="fffdb6c9380f63aa16516ae376407b8d">
+  <goal name="WP_parameter continue_4.4" expl="4. precondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter continue_4.5" expl="5. postcondition" sum="d413c68c6d57e17f821ead0980d8af52">
+  <goal name="WP_parameter continue_4.5" expl="5. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter continue_4.6" expl="6. postcondition" sum="4f1ed1f7736324f1f3429dc6f917deac">
+  <goal name="WP_parameter continue_4.6" expl="6. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter continue_4.7" expl="7. postcondition" sum="bfa4890ee8a39799f237a2379fa3d047">
+  <goal name="WP_parameter continue_4.7" expl="7. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
@@ -330,19 +330,19 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter eval_4" expl="VC for eval_4" sum="738cd7af6de9da92dd32dc532947e9cb">
+ <goal name="WP_parameter eval_4" expl="VC for eval_4">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.17"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.10"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.83"/></proof>
  </goal>
- <goal name="WP_parameter interpret_4" expl="VC for interpret_4" sum="d94a3f0ace2a28fc8ceac484c7b7f7ba">
+ <goal name="WP_parameter interpret_4" expl="VC for interpret_4">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter test" expl="VC for test" sum="284144914d5d3e6fe15f021e62da8fe5">
+ <goal name="WP_parameter test" expl="VC for test">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.00"/></proof>
@@ -350,110 +350,110 @@
  <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="ReductionSemantics">
- <goal name="WP_parameter contract" expl="VC for contract" sum="c10c283dfd7ad7d1ccea85d36712ae9c">
+<theory name="ReductionSemantics" sum="6ebcd1a13b1560905a92442f882f269b">
+ <goal name="WP_parameter contract" expl="VC for contract">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter recompose_values" expl="VC for recompose_values" sum="c1f4fdf3a4c24191388a7626e0faca27">
+ <goal name="WP_parameter recompose_values" expl="VC for recompose_values">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="size_c_pos" sum="e5d26dcb7d5322646a9dc2fc1ef82380">
+ <goal name="size_c_pos">
  <transf name="induction_ty_lex">
-  <goal name="size_c_pos.1" expl="1." sum="4a8c13edbd033d8f2b851e85c907d8ca">
+  <goal name="size_c_pos.1" expl="1.">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter decompose_term" expl="VC for decompose_term" sum="98e9c14d3733a95946960764a574aeef">
+ <goal name="WP_parameter decompose_term" expl="VC for decompose_term">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.06"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter decompose_cont" expl="VC for decompose_cont" sum="3387a31335e6e005e9b1ba7ca93744e7">
+ <goal name="WP_parameter decompose_cont" expl="VC for decompose_cont">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.04"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.05"/></proof>
  </goal>
- <goal name="WP_parameter decompose" expl="VC for decompose" sum="92b1d6dcc5b8d85bbb31d14889d9c927">
+ <goal name="WP_parameter decompose" expl="VC for decompose">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter reduce" expl="VC for reduce" sum="2f7130756fa0f11e7758b86bd4dbbb8a">
+ <goal name="WP_parameter reduce" expl="VC for reduce">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter itere" expl="VC for itere" sum="f6f03fd1764328d36537c7a65d4e00c1">
+ <goal name="WP_parameter itere" expl="VC for itere">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter refocus" expl="VC for refocus" sum="5b81f8fd2a25177aaaf7233691a8f133">
+ <goal name="WP_parameter refocus" expl="VC for refocus">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.03"/></proof>
  <proof prover="4" memlimit="1000"><result status="timeout" time="4.99"/></proof>
  </goal>
- <goal name="WP_parameter itere_opt" expl="VC for itere_opt" sum="93190e491cf7763d60220a076ca714f7">
+ <goal name="WP_parameter itere_opt" expl="VC for itere_opt">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter itere_opt.1" expl="1. precondition" sum="10007fa394db8259f2b956e9a8768527">
+  <goal name="WP_parameter itere_opt.1" expl="1. precondition">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter itere_opt.2" expl="2. postcondition" sum="2dfe32192464e623ffe173b328738f62">
+  <goal name="WP_parameter itere_opt.2" expl="2. postcondition">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter itere_opt.3" expl="3. assertion" sum="f3239b91e7552c66bc798e29ff0b4d8e">
+  <goal name="WP_parameter itere_opt.3" expl="3. assertion">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter itere_opt.4" expl="4. postcondition" sum="f9bfed9c86cb1a96316d7b021f2591e3">
+  <goal name="WP_parameter itere_opt.4" expl="4. postcondition">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter itere_opt.5" expl="5. unreachable point" sum="20d0805dc01bc8b6c2ec63e7831fafff">
+  <goal name="WP_parameter itere_opt.5" expl="5. unreachable point">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter normalize" expl="VC for normalize" sum="920e9a928589608913ea567ef64f06ed">
+ <goal name="WP_parameter normalize" expl="VC for normalize">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter eval_1" expl="VC for eval_1" sum="2dffaab78bad6be233a9c1547ce9b5a7">
+ <goal name="WP_parameter eval_1" expl="VC for eval_1">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="WP_parameter eval_2" expl="VC for eval_2" sum="33cbdb626af208358f32a47fb7fd49ae">
+ <goal name="WP_parameter eval_2" expl="VC for eval_2">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.06"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="WP_parameter interpret" expl="VC for interpret" sum="920e9a928589608913ea567ef64f06ed">
+ <goal name="WP_parameter interpret" expl="VC for interpret">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter test" expl="VC for test" sum="ac947b7d495b1b3d4723a79ee346a91d">
+ <goal name="WP_parameter test" expl="VC for test">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.00"/></proof>
@@ -461,117 +461,117 @@
  <proof prover="4" memlimit="1000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="RWithError">
- <goal name="size_c_pos" sum="b80c92891c5101a180df7bf9222d4878">
+<theory name="RWithError" sum="98ffc1bfd4f416ad0f340821a4afa643">
+ <goal name="size_c_pos">
  <transf name="induction_ty_lex">
-  <goal name="size_c_pos.1" expl="1." sum="d3723aee6ee42b9c55df7adf8f88e28f">
+  <goal name="size_c_pos.1" expl="1.">
   <proof prover="3" timelimit="6" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter recompose_values" expl="VC for recompose_values" sum="12560560cc1ec22b769716261c168245">
+ <goal name="WP_parameter recompose_values" expl="VC for recompose_values">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter recompose_values.1" expl="1. postcondition" sum="cd82799c23f53f8acdcf64f5333ee74e">
+  <goal name="WP_parameter recompose_values.1" expl="1. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.06"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter recompose_values.2" expl="2. variant decrease" sum="576cf67189b7d016fa25aa37e345c130">
+  <goal name="WP_parameter recompose_values.2" expl="2. variant decrease">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter recompose_values.3" expl="3. precondition" sum="25f8091effde96b419a4ba3f81f8d5bd">
+  <goal name="WP_parameter recompose_values.3" expl="3. precondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.04"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.04"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter recompose_values.4" expl="4. postcondition" sum="6b391a0e772068160d68068e71d2e14c">
+  <goal name="WP_parameter recompose_values.4" expl="4. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter recompose_values.5" expl="5. variant decrease" sum="eaa3f22aea771aaf8e7c6df576a81ec8">
+  <goal name="WP_parameter recompose_values.5" expl="5. variant decrease">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter recompose_values.6" expl="6. precondition" sum="ee9492cc82d4db921ec2fba28692d724">
+  <goal name="WP_parameter recompose_values.6" expl="6. precondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.18"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter recompose_values.7" expl="7. postcondition" sum="30253094609368240989513cf176aee2">
+  <goal name="WP_parameter recompose_values.7" expl="7. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter recompose_underflow" expl="VC for recompose_underflow" sum="b67279b2d0d680d345ab7b557580c68c">
+ <goal name="WP_parameter recompose_underflow" expl="VC for recompose_underflow">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.06"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.07"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.14"/></proof>
  </goal>
- <goal name="WP_parameter eval_1" expl="VC for eval_1" sum="8d30bb5abeb9471f9b0ff3d7d4282927">
+ <goal name="WP_parameter eval_1" expl="VC for eval_1">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="WP_parameter eval_2" expl="VC for eval_2" sum="4d1723a96d6f2d727dbbbd50e7ff1b9f">
+ <goal name="WP_parameter eval_2" expl="VC for eval_2">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter eval_2.1" expl="1. postcondition" sum="268bf790b9170b83bbc9c20e5e4c87ef">
+  <goal name="WP_parameter eval_2.1" expl="1. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.06"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter eval_2.2" expl="2. variant decrease" sum="02952d6f63ac948ec80bd0ca9d7ca70d">
+  <goal name="WP_parameter eval_2.2" expl="2. variant decrease">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter eval_2.3" expl="3. postcondition" sum="9a1e31fe4125b54bdae81e87f4cdfc17">
+  <goal name="WP_parameter eval_2.3" expl="3. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.22"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter eval_2.4" expl="4. variant decrease" sum="e9f144a80f2754ace9fb604f4d415abe">
+  <goal name="WP_parameter eval_2.4" expl="4. variant decrease">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="2" memlimit="1000"><result status="valid" time="0.03"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter eval_2.5" expl="5. postcondition" sum="d3142f48e7514fc112eb993911ef5791">
-  <proof prover="0" memlimit="1000"><result status="valid" time="1.75"/></proof>
+  <goal name="WP_parameter eval_2.5" expl="5. postcondition">
+  <proof prover="0" memlimit="1000"><result status="valid" time="1.43"/></proof>
   </goal>
-  <goal name="WP_parameter eval_2.6" expl="6. postcondition" sum="8cf8215e68da20b8c5cb085b5ccb6786">
+  <goal name="WP_parameter eval_2.6" expl="6. postcondition">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.10"/></proof>
   <proof prover="3" memlimit="1000"><result status="valid" time="2.66"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="0.38"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter interpret" expl="VC for interpret" sum="c03d81a5b0f17ee41992a2997ac8cec6">
+ <goal name="WP_parameter interpret" expl="VC for interpret">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="3" memlimit="1000"><result status="valid" time="0.02"/></proof>
  <proof prover="4" memlimit="1000"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter test" expl="VC for test" sum="68286ee5d343c2468eee9197cf5af50d">
+ <goal name="WP_parameter test" expl="VC for test">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="1000"><result status="valid" time="0.00"/></proof>

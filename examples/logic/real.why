@@ -1,0 +1,18 @@
+theory CosineSingle
+
+use import real.Real
+use import real.Abs
+use import real.Trigonometry
+
+(* approximation of cosine function by 1 - x^2 / 2 on interval [-1/32; 1/32] *)
+
+
+
+lemma MethodError: forall x:real. abs x <= 0x1p-5 ->
+  abs (1.0 - 0.5 * (x * x) - cos x) <= 0x1p-24
+(* this one is proved in Coq + interval tactics *)
+
+
+end
+
+

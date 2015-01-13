@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Format
-open Why3
 open Session
 
 let debug = Debug.register_info_flag "scheduler"
@@ -80,7 +79,7 @@ module Make(O : OBSERVER) = struct
 (*************************)
 
 type action =
-  | Action_proof_attempt of int * int * string option * bool * string *
+  | Action_proof_attempt of int * int * int * string option * bool * string *
       Driver.driver * (proof_attempt_status -> unit) * Task.task
   | Action_delayed of (unit -> unit)
 
@@ -210,13 +209,13 @@ let idle_handler t =
     if Queue.length t.proof_attempts_queue < 3 * t.maximum_running_proofs then
       begin
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
+        | Action_proof_attempt(timelimit,memlimit,stepslimit,old,inplace,command,driver,
                                callback,goal) ->
             begin
               try
                 let pre_call =
                   Driver.prove_task
-                    ?old ~inplace ~command ~timelimit ~memlimit driver goal
+                    ?old ~inplace ~command ~timelimit ~stepslimit ~memlimit driver goal
                 in
                 Queue.push (callback,pre_call) t.proof_attempts_queue;
                 run_timeout_handler t
@@ -258,7 +257,7 @@ let cancel_scheduled_proofs t =
   try
     while true do
       match Queue.pop t.actions_queue with
-        | Action_proof_attempt(_timelimit,_memlimit,_old,_inplace,_command,
+        | Action_proof_attempt(_timelimit,_memlimit,_stepslimit,_old,_inplace,_command,
                                _driver,callback,_goal) ->
             callback Interrupted
         | Action_delayed _ as a->
@@ -276,24 +275,27 @@ let cancel_scheduled_proofs t =
           O.notify_timer_state 0 0 (List.length t.running_proofs)
 
 
-let schedule_proof_attempt ~timelimit ~memlimit ?old ~inplace
+let schedule_proof_attempt ~timelimit ~memlimit ~stepslimit ?old ~inplace
     ~command ~driver ~callback t goal =
   Debug.dprintf debug "[Sched] Scheduling a new proof attempt (goal : %a)@."
     (fun fmt g -> Format.pp_print_string fmt
       (Task.task_goal g).Decl.pr_name.Ident.id_string) goal;
   callback Scheduled;
   Queue.push
-    (Action_proof_attempt(timelimit,memlimit,old,inplace,command,driver,
+    (Action_proof_attempt(timelimit,memlimit,stepslimit,old,inplace,command,driver,
                         callback,goal))
     t.actions_queue;
   run_idle_handler t
 
 let schedule_edition t command filename callback =
   Debug.dprintf debug "[Sched] Scheduling an edition@.";
+  let res_parser =
+    { Call_provers.prp_exitcodes = [(0,Call_provers.Unknown "")];
+      Call_provers.prp_regexps = [];
+      Call_provers.prp_timeregexps = []
+    } in
   let precall =
-    Call_provers.call_on_file ~command ~regexps:[] ~timeregexps:[]
-      ~exitcodes:[(0,Call_provers.Unknown "")] ~redirect:false filename
-  in
+    Call_provers.call_on_file ~command ~res_parser ~redirect:false filename in
   callback Running;
   t.running_proofs <- (Check_prover(callback, precall ())) :: t.running_proofs;
   run_timeout_handler t
@@ -313,11 +315,18 @@ let rec init_any any = O.init (key_any any) any; iter init_any any
 
 let init_session session = session_iter init_any session
 
-let update_session ?release ~allow_obsolete old_session env whyconf  =
+let update_session ~allow_obsolete ~release ~use_shapes
+    old_session env whyconf  =
   O.reset ();
+  let ctxt = {
+    allow_obsolete_goals = allow_obsolete;
+    release_tasks = release;
+    use_shapes_for_pairing_sub_goals = use_shapes;
+    keygen = O.create;
+  }
+  in
   let (env_session,_,_) as res =
-    update_session ?release
-      ~keygen:O.create ~allow_obsolete old_session env whyconf
+    update_session ~ctxt old_session env whyconf
   in
   Debug.dprintf debug "Init_session@\n";
   init_session env_session.session;
@@ -452,6 +461,14 @@ let run_external_proof_v3 eS eT a callback =
     end else begin
       let previous_result = a.proof_state in
       let timelimit, memlimit = adapt_limits a in
+      let stepslimit, timelimit =
+	match a with
+	| { proof_state =
+            Done { Call_provers.pr_answer = Call_provers.Valid;
+                   Call_provers.pr_steps = s };
+	    proof_obsolete = false } when s >= 0 -> s, 0
+	| _ -> -1, timelimit
+      in
       let inplace = npc.prover_config.Whyconf.in_place in
       let command = Whyconf.get_complete_command npc.prover_config in
       let cb result =
@@ -467,7 +484,7 @@ let run_external_proof_v3 eS eT a callback =
             if Sys.file_exists f then Some f
             else raise (NoFile f) in
         schedule_proof_attempt
-          ~timelimit ~memlimit
+          ~timelimit ~memlimit ~stepslimit
           ?old ~inplace ~command
           ~driver:npc.prover_driver
           ~callback:cb
@@ -770,18 +787,7 @@ let transformation_on_goal_aux eS tr keep_dumb_transformation g =
   let subgoals = Trans.apply_transform tr eS.env gtask in
   let b = keep_dumb_transformation ||
     match subgoals with
-      | [task] ->
-              (* let s1 = task_checksum (get_task g) in *)
-              (* let s2 = task_checksum task in *)
-              (* (\* *)
-              (*   eprintf "Transformation returned only one task.
-                   sum before = %s, sum after = %s@." (task_checksum g.task)
-                   (task_checksum task); *)
-              (*   eprintf "addresses: %x %x@." (Obj.magic g.task)
-                   (Obj.magic task); *)
-              (* *\) *)
-              (* s1 <> s2 *)
-        not (Task.task_equal task gtask)
+      | [task] -> not (Task.task_equal task gtask)
       | _ -> true
   in
   if b then
@@ -883,16 +889,16 @@ let remove_metas t =
   remove_metas ~notify t
 
 let rec clean = function
-  | Goal g when g.goal_verified ->
+  | Goal g when Opt.inhabited g.goal_verified ->
     iter_goal
       (fun a ->
         if a.proof_obsolete || not (proof_successful_or_just_edited a) then
           remove_proof_attempt a)
       (fun t ->
-        if not t.transf_verified then remove_transformation t
+        if not (Opt.inhabited t.transf_verified) then remove_transformation t
         else transf_iter clean t)
       (fun m ->
-        if not m.metas_verified then remove_metas m
+        if not (Opt.inhabited m.metas_verified) then remove_metas m
         else metas_iter clean m)
       g
   | Goal g ->
@@ -906,7 +912,7 @@ let rec clean = function
         *)
         transf_iter clean t)
       (fun m ->
-        if not m.metas_verified then remove_metas m
+        if not (Opt.inhabited m.metas_verified) then remove_metas m
         else metas_iter clean m)
       g
   | Proof_attempt a -> clean (Goal a.proof_parent)
@@ -917,100 +923,12 @@ let rec clean = function
 let convert_unknown_prover =
   Session_tools.convert_unknown_prover ~keygen:O.create
 
+  open Strategy
 
-  (** {2 User-defined strategies} *)
-
-  type instruction =
-    | Icall_prover of Whyconf.prover * int * int (** timelimit, memlimit *)
-    | Itransform of string * int (** successor state on success *)
-    | Igoto of int (** goto state *)
-
-  exception SyntaxError of string
-
-  let parse_instr env max s =
-    match Strings.split ' ' s with
-      | [] -> raise (SyntaxError "unexpected empty instruction")
-      | ["g";n] ->
-        let g =
-          try int_of_string n
-          with Failure _ ->
-            raise
-              (SyntaxError
-                 ("unable to parse goto argument '" ^ n ^ "' as an integer"))
-        in
-        if g < 0 || g > max then
-          raise
-            (SyntaxError ("goto index " ^ n ^ " is invalid"));
-        Igoto g
-      | "g" :: _ ->
-        raise (SyntaxError "'g' expects exactly one argument")
-      | ["c";p;t;m] ->
-        let p =
-          try
-            let fp = Whyconf.parse_filter_prover p in
-            Whyconf.filter_one_prover env.whyconf fp
-          with Whyconf.ProverNotFound _ ->
-            raise
-              (SyntaxError
-                 ("Prover " ^ p ^ " not installed or not configured"))
-        in
-        let timelimit =
-          try int_of_string t
-          with Failure _ ->
-            raise
-              (SyntaxError
-                 ("unable to parse timelimit argument '" ^ t ^ "'"))
-        in
-        if timelimit <= 0 then
-          raise
-            (SyntaxError ("timelimit " ^ t ^ " is invalid"));
-        let memlimit =
-          try int_of_string m
-          with Failure _ ->
-            raise
-              (SyntaxError
-                 ("unable to parse memlimit argument '" ^ m ^ "'"))
-        in
-        if memlimit <= 0 then
-          raise
-            (SyntaxError ("memlimit " ^ m ^ " is invalid"));
-        Icall_prover(p.Whyconf.prover,timelimit,memlimit)
-      | "c" :: _ ->
-        raise (SyntaxError "'c' expects exactly three arguments")
-      | ["t";t;n] ->
-        let () =
-          try
-            let _ = Trans.lookup_transform t env.env in
-            ()
-          with Trans.UnknownTrans _ ->
-          try
-            let _ = Trans.lookup_transform_l t env.env in
-            ()
-          with Trans.UnknownTrans _->
-            raise (SyntaxError ("transformation '" ^ t ^ "' is unknown"))
-        in
-        let g =
-          try int_of_string n
-          with Failure _ ->
-            raise
-              (SyntaxError
-                 ("unable to parse argument '" ^ n ^ "' as an integer"))
-        in
-        if g < 0 || g > max then
-          raise
-            (SyntaxError ("index " ^ n ^ " is invalid"));
-        Itransform(t,g)
-      | "t" :: _ ->
-        raise (SyntaxError "'t' expects exactly one argument")
-      | s :: _ ->
-        raise (SyntaxError ("unknown instruction '" ^ s ^ "'"))
-
-  type strategy = instruction array
-
-  let rec exec_strategy es sched pc strat g =
+  let rec exec_strategy ~todo es sched pc strat g =
     if pc < 0 || pc >= Array.length strat then
       (* halt the strategy *)
-      ()
+      Todo._done todo ()
     else
       match Array.get strat pc with
         | Icall_prover(p,timelimit,memlimit) ->
@@ -1021,10 +939,10 @@ let convert_unknown_prover =
                 ()
               | Done { Call_provers.pr_answer = Call_provers.Valid } ->
                 (* proof succeeded, nothing more to do *)
-                ()
+                Todo._done todo ()
               | Interrupted | InternalFailure _ | Done _ ->
                 (* proof did not succeed, goto to next step *)
-                let callback () = exec_strategy es sched (pc+1) strat g in
+                let callback () = exec_strategy ~todo es sched (pc+1) strat g in
                 schedule_delayed_action sched callback
               | Unedited | JustEdited ->
                 (* should not happen *)
@@ -1035,25 +953,34 @@ let convert_unknown_prover =
           let callback ntr =
             match ntr with
               | None -> (* transformation failed *)
-                let callback () = exec_strategy es sched (pc+1) strat g in
+                let callback () = exec_strategy ~todo es sched (pc+1) strat g in
                 schedule_delayed_action sched callback
               | Some tr ->
                 List.iter
                   (fun g ->
+                    Todo.start todo;
                     let callback () =
-                      exec_strategy es sched pcsuccess strat g
+                      exec_strategy ~todo es sched pcsuccess strat g
                     in
                     schedule_delayed_action sched callback
                   )
-                tr.transf_goals
+                tr.transf_goals;
+                Todo._done todo ()
           in
           transform_goal es sched ~callback trname g
         | Igoto pc ->
-          exec_strategy es sched pc strat g
+          exec_strategy ~todo es sched pc strat g
 
 
-  let run_strategy_on_goal es sched strat g =
-    let callback () = exec_strategy es sched 0 strat g in
+  let run_strategy_on_goal
+      ?(intermediate_callback=fun () -> ())
+      ?(final_callback=fun () -> ())
+      es sched strat g =
+    let todo =
+      Todo.create () (fun () -> intermediate_callback) final_callback
+    in
+    Todo.start todo;
+    let callback () = exec_strategy ~todo es sched 0 strat g in
     schedule_delayed_action sched callback
 
 

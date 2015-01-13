@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
+<file name="../bag.mlw" expanded="true">
+<theory name="Bag" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+</theory>
+<theory name="BagSpec" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+</theory>
+<theory name="ResizableArraySpec" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+</theory>
+<theory name="BagImpl" sum="e5c247f3bba7104c0837200325f56fbc" expanded="true">
+ <goal name="WP_parameter create" expl="VC for create">
+ <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+ </goal>
+ <goal name="WP_parameter clear" expl="VC for clear">
+ <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
+ </goal>
+ <goal name="WP_parameter add" expl="VC for add">
+ <proof prover="1"><result status="valid" time="2.76"/></proof>
+ </goal>
+ <goal name="WP_parameter get" expl="VC for get">
+ <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
+ </goal>
+ <goal name="WP_parameter remove" expl="VC for remove" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter remove.1" expl="1. precondition">
+  <proof prover="2"><result status="valid" time="0.04" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.2" expl="2. precondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.3" expl="3. precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.4" expl="4. precondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.5" expl="5. precondition">
+  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.6" expl="6. assertion">
+  <proof prover="0"><result status="valid" time="1.75"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.7" expl="7. assertion" expanded="true">
+  <proof prover="0" timelimit="76"><result status="valid" time="8.94"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.8" expl="8. type invariant">
+  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.9" expl="9. type invariant">
+  <proof prover="2"><result status="valid" time="0.02" steps="37"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.10" expl="10. type invariant">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.11" expl="11. postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.12" expl="12. postcondition">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.13" expl="13. precondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.14" expl="14. assertion">
+  <proof prover="0"><result status="valid" time="0.64"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.15" expl="15. assertion">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.16" expl="16. type invariant">
+  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.17" expl="17. type invariant">
+  <proof prover="2"><result status="valid" time="0.03" steps="33"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.18" expl="18. type invariant">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.19" expl="19. postcondition">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter remove.20" expl="20. postcondition">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Harness" sum="528e93ede1770450354a9703428c111b">
+ <goal name="WP_parameter test1" expl="VC for test1">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter test1.1" expl="1. assertion">
+  <proof prover="2"><result status="valid" time="1.52" steps="249"/></proof>
+  </goal>
+  <goal name="WP_parameter test1.2" expl="2. assertion">
+  <proof prover="0"><result status="valid" time="4.99"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

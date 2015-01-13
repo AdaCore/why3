@@ -3,125 +3,119 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="6" memlimit="4000"/>
-<prover id="1" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
-<prover id="2" name="Z3" version="3.2" timelimit="5" memlimit="4000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="6" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.1" timelimit="6" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="6" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.3" timelimit="6" memlimit="1000"/>
-<file name="../inverse_in_place.mlw" expanded="true">
-<theory name="InverseInPlace" expanded="true">
- <goal name="num_of_decrease" sum="293a24ca44eab02dfd41a58a66dbc92f">
- <proof prover="4"><result status="valid" time="0.38"/></proof>
+<file name="../inverse_in_place.mlw">
+<theory name="InverseInPlace" sum="fafff34e116537414a710874d3420b0f">
+ <goal name="is_permutation_inverse">
+ <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
  </goal>
- <goal name="is_permutation_inverse" sum="a79a62f1900a61b8a14545db27877656">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="WP_parameter inverse_in_place" expl="VC for inverse_in_place" sum="d1e33e32fc5e7f668611ecfeda0e7309">
+ <goal name="WP_parameter inverse_in_place" expl="VC for inverse_in_place">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter inverse_in_place.1" expl="1. postcondition" sum="5ff9729fb4ceb2a992baa817fe32beb7">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.1" expl="1. postcondition">
+  <proof prover="3"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.2" expl="2. postcondition" sum="c2248c63e43d1b51a2f88b653c620b95">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.2" expl="2. postcondition">
+  <proof prover="3"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.3" expl="3. loop invariant init" sum="fad759f2397dc0f07ab403dffd2eccfd">
+  <goal name="WP_parameter inverse_in_place.3" expl="3. loop invariant init">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.4" expl="4. type invariant" sum="4ba259bdefa3bea9a2b1d07cd9af27ae">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.4" expl="4. type invariant">
+  <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.5" expl="5. index in array bounds" sum="8633c17638ecd6ab81de465c29cbea9b">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.5" expl="5. index in array bounds">
+  <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.6" expl="6. index in array bounds" sum="5123334e5723a31b256ef71ea4ee2491">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.6" expl="6. index in array bounds">
+  <proof prover="3"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.7" expl="7. index in array bounds" sum="f2f681aa671b0b6449a9785a805eb9ff">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.7" expl="7. index in array bounds">
+  <proof prover="3"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.8" expl="8. loop invariant init" sum="d0eeddee9dc43e6c4e55c4358e9d9d4e">
+  <goal name="WP_parameter inverse_in_place.8" expl="8. loop invariant init">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter inverse_in_place.8.1" expl="1." sum="c50f3d607a193f22d5a61f6f58a2b3d4">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter inverse_in_place.8.1" expl="1.">
+   <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.2" expl="2." sum="6e002afc89a8aadd2626b317996e1d0f">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <goal name="WP_parameter inverse_in_place.8.2" expl="2.">
+   <proof prover="3"><result status="valid" time="0.04" steps="25"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.3" expl="3." sum="e44abd261ae4b6a5b676c8efb9def551">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter inverse_in_place.8.3" expl="3.">
+   <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.4" expl="4." sum="ed7838c5bd35ac45c47d669b56f5eecf">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <goal name="WP_parameter inverse_in_place.8.4" expl="4.">
+   <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.5" expl="5." sum="3faed9c08fd152e7efae73d32d0325bb">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
+   <goal name="WP_parameter inverse_in_place.8.5" expl="5.">
+   <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.6" expl="6." sum="18aa07c5c6a18f31acbd40a97ca25594">
+   <goal name="WP_parameter inverse_in_place.8.6" expl="6.">
    <proof prover="0" memlimit="1000"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.7" expl="7." sum="0233469356b0db3e5bf2c53398476665">
-   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   <goal name="WP_parameter inverse_in_place.8.7" expl="7.">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.8" expl="8." sum="36dff81303d794c91d03063e2135a097">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter inverse_in_place.8.8" expl="8.">
+   <proof prover="3"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.9" expl="9." sum="e3f0c7237ecdfb3e5cbab8f2f4cbe62b">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <goal name="WP_parameter inverse_in_place.8.9" expl="9.">
+   <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter inverse_in_place.9" expl="9. loop invariant init" sum="d68530ee2b7c09ed44e915fa9b513083">
+  <goal name="WP_parameter inverse_in_place.9" expl="9. loop invariant init">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.13"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.10" expl="10. loop invariant init" sum="344c737673777f4b9174a90160ebfc9b">
-  <proof prover="0" timelimit="5"><result status="valid" time="1.03"/></proof>
-  <proof prover="2"><result status="valid" time="1.49"/></proof>
+  <goal name="WP_parameter inverse_in_place.10" expl="10. loop invariant init">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.92"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.11" expl="11. type invariant" sum="e54d73b5d9ca42f3b973425604b3209c">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.11" expl="11. type invariant">
+  <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.12" expl="12. index in array bounds" sum="9a0c04815e56dc8b05655c14e528cd91">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.12" expl="12. index in array bounds">
+  <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.13" expl="13. index in array bounds" sum="f3c3e0d7f8306caa0416c8ee8bde3762">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.13" expl="13. index in array bounds">
+  <proof prover="3"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.14" expl="14. loop invariant preservation" sum="63b49f8768520821e5587d7254e6f182">
-  <proof prover="1"><result status="valid" time="0.68"/></proof>
-  <proof prover="4"><result status="valid" time="0.40"/></proof>
+  <goal name="WP_parameter inverse_in_place.14" expl="14. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="6.30"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.15" expl="15. loop invariant preservation" sum="68d028b53d8d8287bd27e1ed16df5289">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.43"/></proof>
+  <goal name="WP_parameter inverse_in_place.15" expl="15. loop invariant preservation">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.73"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.16" expl="16. loop invariant preservation" sum="ebda8cc7a6231f4afdbf4d9d1f2817c9">
+  <goal name="WP_parameter inverse_in_place.16" expl="16. loop invariant preservation">
   <transf name="introduce_premises">
-   <goal name="WP_parameter inverse_in_place.16.1" expl="1. loop invariant preservation" sum="255d54844196c89cac8a6a6a8c63dc11">
+   <goal name="WP_parameter inverse_in_place.16.1" expl="1. loop invariant preservation">
    <transf name="inline_goal">
-    <goal name="WP_parameter inverse_in_place.16.1.1" expl="1. loop invariant preservation" sum="7898a0ec45b0c5e3adae3894756132a4">
+    <goal name="WP_parameter inverse_in_place.16.1.1" expl="1. loop invariant preservation">
     <transf name="split_goal_wp">
-     <goal name="WP_parameter inverse_in_place.16.1.1.1" expl="1." sum="ae7ccbcedd0f8779c21ac603b26f5c30">
-     <proof prover="0" memlimit="1000"><result status="valid" time="3.28"/></proof>
-     <proof prover="3"><result status="valid" time="3.00"/></proof>
+     <goal name="WP_parameter inverse_in_place.16.1.1.1" expl="1.">
+     <proof prover="0" memlimit="1000"><result status="valid" time="2.34"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.2" expl="2." sum="5c9686adfff6ec2b231fd2f7ee9a6db5">
-     <proof prover="0" memlimit="1000"><result status="valid" time="3.55"/></proof>
-     <proof prover="3"><result status="valid" time="1.70"/></proof>
+     <goal name="WP_parameter inverse_in_place.16.1.1.2" expl="2.">
+     <proof prover="0" memlimit="1000"><result status="valid" time="1.23"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.3" expl="3." sum="d6623a00e9d23cfd0fbd136460ca8412">
-     <proof prover="3"><result status="valid" time="0.86"/></proof>
+     <goal name="WP_parameter inverse_in_place.16.1.1.3" expl="3.">
+     <proof prover="1"><result status="valid" time="0.05"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.4" expl="4." sum="2230a44153c25de65f6f5c2eaa60edbf">
-     <proof prover="3"><result status="valid" time="0.72"/></proof>
+     <goal name="WP_parameter inverse_in_place.16.1.1.4" expl="4.">
+     <proof prover="1"><result status="valid" time="0.04"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.5" expl="5." sum="c7770ded283efdebf3995a1904db7e49">
-     <proof prover="3"><result status="valid" time="0.21"/></proof>
+     <goal name="WP_parameter inverse_in_place.16.1.1.5" expl="5.">
+     <proof prover="3"><result status="valid" time="0.21" steps="75"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.6" expl="6." sum="0a4a5ae366748c66cbe8290a21f4eec3">
-     <proof prover="3"><result status="valid" time="0.89"/></proof>
+     <goal name="WP_parameter inverse_in_place.16.1.1.6" expl="6.">
+     <proof prover="1"><result status="valid" time="0.05"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.7" expl="7." sum="c80d0bae47db7e244e9ca5ce446b569b">
-     <proof prover="0" memlimit="1000"><result status="valid" time="0.66"/></proof>
+     <goal name="WP_parameter inverse_in_place.16.1.1.7" expl="7.">
+     <proof prover="0" memlimit="1000"><result status="valid" time="1.64"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.8" expl="8." sum="47642d04f72e564b91a6029f7bff5319">
+     <goal name="WP_parameter inverse_in_place.16.1.1.8" expl="8.">
      <proof prover="0" memlimit="1000"><result status="valid" time="1.64"/></proof>
      </goal>
     </transf>
@@ -130,51 +124,51 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter inverse_in_place.17" expl="17. loop variant decrease" sum="5159b003efb34e9ba5aca8efa58bbdac">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <goal name="WP_parameter inverse_in_place.17" expl="17. loop variant decrease">
+  <proof prover="1"><result status="valid" time="0.47"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.18" expl="18. assertion" sum="d02924bae991c4989c8da19ccada0c3d">
-  <proof prover="1"><result status="valid" time="1.30"/></proof>
+  <goal name="WP_parameter inverse_in_place.18" expl="18. assertion">
+  <proof prover="2"><result status="valid" time="0.99"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.19" expl="19. assertion" sum="b49f442a684d66ca2bb39ac62fc719fb">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.19" expl="19. assertion">
+  <proof prover="3"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.20" expl="20. type invariant" sum="91ac05461f3020f84d42edc0220891b6">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter inverse_in_place.20" expl="20. type invariant">
+  <proof prover="3"><result status="valid" time="0.03" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.21" expl="21. index in array bounds" sum="5ca31f800bc2d1b62497d3fed5fd05d6">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter inverse_in_place.21" expl="21. index in array bounds">
+  <proof prover="3"><result status="valid" time="0.03" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.22" expl="22. loop invariant preservation" sum="b6450c522bec4c6ba25c654d27c93fbf">
+  <goal name="WP_parameter inverse_in_place.22" expl="22. loop invariant preservation">
   <transf name="introduce_premises">
-   <goal name="WP_parameter inverse_in_place.22.1" expl="1. loop invariant preservation" sum="162ec5f3edfadd2fc3f5fdb46f42b87d">
+   <goal name="WP_parameter inverse_in_place.22.1" expl="1. loop invariant preservation">
    <transf name="inline_goal">
-    <goal name="WP_parameter inverse_in_place.22.1.1" expl="1. loop invariant preservation" sum="9f60ec4d060b2efba9f010781a791974">
+    <goal name="WP_parameter inverse_in_place.22.1.1" expl="1. loop invariant preservation">
     <transf name="split_goal_wp">
-     <goal name="WP_parameter inverse_in_place.22.1.1.1" expl="1." sum="32251aec2d86e24da8e1cbad9d50aeb6">
-     <proof prover="0" memlimit="1000"><result status="valid" time="0.93"/></proof>
-     <proof prover="3"><result status="valid" time="0.86"/></proof>
+     <goal name="WP_parameter inverse_in_place.22.1.1.1" expl="1.">
+     <proof prover="0" memlimit="1000"><result status="valid" time="0.95"/></proof>
+     <proof prover="3"><result status="valid" time="3.27" steps="110"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.2" expl="2." sum="b28bc9cfb63d6e6868f02cf424438d2d">
-     <proof prover="0" memlimit="1000"><result status="valid" time="2.50"/></proof>
-     <proof prover="3"><result status="valid" time="1.75"/></proof>
+     <goal name="WP_parameter inverse_in_place.22.1.1.2" expl="2.">
+     <proof prover="0" memlimit="1000"><result status="valid" time="1.35"/></proof>
+     <proof prover="3"><result status="valid" time="4.53" steps="118"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.3" expl="3." sum="5718a30228036a7f77fe3d6bf1e561d2">
-     <proof prover="3"><result status="valid" time="1.69"/></proof>
+     <goal name="WP_parameter inverse_in_place.22.1.1.3" expl="3.">
+     <proof prover="3"><result status="valid" time="3.22" steps="73"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.4" expl="4." sum="37bb88684a58e469c0f5d4f291297dec">
+     <goal name="WP_parameter inverse_in_place.22.1.1.4" expl="4.">
      <proof prover="4"><result status="valid" time="0.13"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.5" expl="5." sum="3e1b37d17f9322259f7f8f04adc2fabd">
-     <proof prover="3"><result status="valid" time="0.37"/></proof>
+     <goal name="WP_parameter inverse_in_place.22.1.1.5" expl="5.">
+     <proof prover="3"><result status="valid" time="0.37" steps="113"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.6" expl="6." sum="ad90ce722c0b2ed5b2d26ef412511e92">
-     <proof prover="4"><result status="valid" time="0.65"/></proof>
+     <goal name="WP_parameter inverse_in_place.22.1.1.6" expl="6.">
+     <proof prover="4"><result status="valid" time="0.84"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.7" expl="7." sum="dd01e9a65e2156479402af66327091f6">
-     <proof prover="0" memlimit="1000"><result status="valid" time="2.22"/></proof>
+     <goal name="WP_parameter inverse_in_place.22.1.1.7" expl="7.">
+     <proof prover="0" memlimit="1000"><result status="valid" time="0.58"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.8" expl="8." sum="58cf1fc4c58abe5da05efcf6e6dfe31c">
+     <goal name="WP_parameter inverse_in_place.22.1.1.8" expl="8.">
      <proof prover="0" memlimit="1000"><result status="valid" time="0.86"/></proof>
      </goal>
     </transf>
@@ -183,43 +177,43 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter inverse_in_place.23" expl="23. assertion" sum="9cab7a683a0b1503c70474acb1c073fe">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.23" expl="23. assertion">
+  <proof prover="3"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.24" expl="24. index in array bounds" sum="517cd49dc01e0a03c3397ac8660aad73">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter inverse_in_place.24" expl="24. index in array bounds">
+  <proof prover="3"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.25" expl="25. loop invariant preservation" sum="57a79837ff38eb0711bd39f83d036c04">
+  <goal name="WP_parameter inverse_in_place.25" expl="25. loop invariant preservation">
   <transf name="introduce_premises">
-   <goal name="WP_parameter inverse_in_place.25.1" expl="1. loop invariant preservation" sum="e4fb8eac3fe6b4ffa158ecc47b8e81a4">
+   <goal name="WP_parameter inverse_in_place.25.1" expl="1. loop invariant preservation">
    <transf name="inline_goal">
-    <goal name="WP_parameter inverse_in_place.25.1.1" expl="1. loop invariant preservation" sum="148f1e2ed573a8e393e8436bd55a8f9a">
+    <goal name="WP_parameter inverse_in_place.25.1.1" expl="1. loop invariant preservation">
     <transf name="split_goal_wp">
-     <goal name="WP_parameter inverse_in_place.25.1.1.1" expl="1." sum="befe9a5f014be20e2eabc05daba2bae3">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     <goal name="WP_parameter inverse_in_place.25.1.1.1" expl="1.">
+     <proof prover="3"><result status="valid" time="0.04" steps="33"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.2" expl="2." sum="cd2a78199f4af63a98ec65b685b336b9">
-     <proof prover="3"><result status="valid" time="0.05"/></proof>
+     <goal name="WP_parameter inverse_in_place.25.1.1.2" expl="2.">
+     <proof prover="3"><result status="valid" time="0.18" steps="40"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.3" expl="3." sum="81df8da28dc2b85acb5b496090dc83cb">
+     <goal name="WP_parameter inverse_in_place.25.1.1.3" expl="3.">
      <proof prover="4"><result status="valid" time="0.13"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.4" expl="4." sum="db5efb0953b99ce628450c8e132b8db3">
+     <goal name="WP_parameter inverse_in_place.25.1.1.4" expl="4.">
      <proof prover="4"><result status="valid" time="0.14"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.5" expl="5." sum="9af1a276e58d9f32458ecab15fd723d9">
+     <goal name="WP_parameter inverse_in_place.25.1.1.5" expl="5.">
      <proof prover="0" memlimit="1000"><result status="valid" time="0.15"/></proof>
-     <proof prover="3"><result status="valid" time="0.03"/></proof>
+     <proof prover="3"><result status="valid" time="0.03" steps="36"/></proof>
      <proof prover="4"><result status="valid" time="0.06"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.6" expl="6." sum="fb88b811957126b43527c9cf0c68c9ef">
+     <goal name="WP_parameter inverse_in_place.25.1.1.6" expl="6.">
      <proof prover="4"><result status="valid" time="0.24"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.7" expl="7." sum="54702d20402679ccf5d5603f2566ec01">
-     <proof prover="0" memlimit="1000"><result status="valid" time="0.90"/></proof>
+     <goal name="WP_parameter inverse_in_place.25.1.1.7" expl="7.">
+     <proof prover="0" memlimit="1000"><result status="valid" time="0.54"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.8" expl="8." sum="24c696db2d42e3a59866d89b29c7c6a8">
-     <proof prover="0" memlimit="1000"><result status="valid" time="0.30"/></proof>
+     <goal name="WP_parameter inverse_in_place.25.1.1.8" expl="8.">
+     <proof prover="0" memlimit="1000"><result status="valid" time="0.15"/></proof>
      </goal>
     </transf>
     </goal>
@@ -227,24 +221,24 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter inverse_in_place.26" expl="26. type invariant" sum="bc9e0a7c62589ed8c021840064dbe3a6">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.26" expl="26. type invariant">
+  <proof prover="3"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.27" expl="27. postcondition" sum="6b437d5a4a7b8a3b4f3b9e278162cf9b">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <goal name="WP_parameter inverse_in_place.27" expl="27. postcondition">
+  <proof prover="3"><result status="valid" time="0.03" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.28" expl="28. postcondition" sum="1cee7fa0c7291c4b82ab349ebf25c3b0">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter inverse_in_place.28" expl="28. postcondition">
+  <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Harness" expanded="true">
- <goal name="WP_parameter test1" expl="VC for test1" sum="e825ad5ae3553fb67807d1212363f4df">
- <proof prover="3"><result status="valid" time="0.04"/></proof>
+<theory name="Harness" sum="897832384a9c012d857e3fb3a3f87d8e">
+ <goal name="WP_parameter test1" expl="VC for test1">
+ <proof prover="3"><result status="valid" time="0.04" steps="29"/></proof>
  </goal>
- <goal name="WP_parameter test2" expl="VC for test2" sum="af7018a7189bba79d349fef6cd2991e9">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <goal name="WP_parameter test2" expl="VC for test2">
+ <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
  </goal>
 </theory>
 </file>

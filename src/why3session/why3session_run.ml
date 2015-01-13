@@ -10,7 +10,6 @@
 (********************************************************************)
 
 open Why3
-open Why3session
 open Why3session_lib
 open Whyconf
 open Session
@@ -187,7 +186,7 @@ let is_successful env = (** means all goals proved*)
     let rec iter = function
         | File f -> file_iter iter f
         | Theory th -> theory_iter iter th
-        | Goal g -> if not (g.goal_verified) then raise Exit
+        | Goal g -> if not (Opt.inhabited (g.goal_verified)) then raise Exit
         | Proof_attempt _ | Transf _ | Metas _ -> assert false in
     session_iter iter env.session;
     true

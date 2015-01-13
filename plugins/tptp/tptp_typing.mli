@@ -9,6 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-val typecheck : unit Why3.Env.library -> Why3.Env.pathname ->
+val typecheck : Why3.Env.env -> Why3.Env.pathname ->
   Tptp_ast.tptp_file -> Why3.Theory.theory Why3.Stdlib.Mstr.t
 

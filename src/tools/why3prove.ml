@@ -327,11 +327,7 @@ let do_theory env drv fname tname th glist elist =
   end
 
 let do_global_theory env drv (tname,p,t,glist,elist) =
-  let format = Opt.get_def "why" !opt_parser in
-  let th = try Env.read_theory ~format env p t with Env.TheoryNotFound _ ->
-    eprintf "Theory '%s' not found.@." tname;
-    exit 1
-  in
+  let th = Env.read_theory env p t in
   do_theory env drv "lib" tname th glist elist
 
 let do_local_theory env drv fname m (tname,_,t,glist,elist) =
@@ -348,25 +344,25 @@ let do_input env drv = function
   | None, tlist ->
       Queue.iter (do_global_theory env drv) tlist
   | Some f, tlist ->
-      let fname, cin = match f with
-        | "-" -> "stdin", stdin
-        | f   -> f, open_in f
+      let format = !opt_parser in
+      let fname, m = match f with
+        | "-" -> "stdin",
+            Env.read_channel Env.base_language ?format env "stdin" stdin
+        | fname -> fname,
+            Env.read_file Env.base_language ?format env fname
       in
-              let m = Env.read_channel ?format:!opt_parser env fname cin in
-              close_in cin;
-              if Debug.test_flag Typing.debug_type_only then
-                ()
-              else
-                if Queue.is_empty tlist then
-                  let glist = Queue.create () in
-                  let elist = Queue.create () in
-                  let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-                  let do_th _ (t,th) =
-                    do_theory env drv fname t th glist elist
-                  in
-                  Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
-                else
-                  Queue.iter (do_local_theory env drv fname m) tlist
+      if Debug.test_flag Typing.debug_type_only then ()
+      else
+        if Queue.is_empty tlist then
+          let glist = Queue.create () in
+          let elist = Queue.create () in
+          let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
+          let do_th _ (t,th) =
+            do_theory env drv fname t th glist elist
+          in
+          Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
+        else
+          Queue.iter (do_local_theory env drv fname m) tlist
 
 let driver_file s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then
@@ -377,11 +373,6 @@ let driver_file s =
 let load_driver env (s,ef) =
   let file = driver_file s in
   load_driver env file ef
-
-let load_driver_extract env s =
-  let file = driver_file s in
-  let lib = Mlw_main.library_of_env env in
-  Mlw_driver.load_driver lib file []
 
 let () =
   try

@@ -1,0 +1,184 @@
+
+(** {1 Facts about association lists}
+    Author: Martin Clochard *)
+
+(** {2 Association with respect to an equivalence relation} *)
+module Assoc
+
+  (** Abstract type for objects identified by keys. *)
+  clone import key_type.KeyType as K
+  (** Abstract equivalence relation. *)
+  clone import relations.Equivalence as Eq with type t = key
+
+  use import list.List
+  use import list.Mem
+  use import list.Append
+  use import option.Option
+  use import HighOrd
+
+  (** Existence of an element identified by key [k] in list [l]. *)
+  predicate appear (k:key) (l:list (t 'a)) =
+    exists x. mem x l /\ Eq.rel k x.key
+
+  lemma appear_append : forall k:key,l r:list (t 'a).
+    appear k (l++r) <-> appear k l \/ appear k r
+
+  (** Unique occurence of every key *)
+  predicate unique (l:list (t 'a)) = match l with
+    | Nil -> true
+    | Cons x q -> not appear x.key q /\ unique q
+    end
+
+  (** Functional update with equivalence classes. *)
+  function equiv_update (f:key -> 'b) (k:key) (b:'b) : key -> 'b =
+    \k2. if Eq.rel k k2 then b else f k2
+
+  function const_none : 'a -> option 'b = \_.None
+
+  (** Association list viewed as a partial mapping *)
+  function model (l:list (t 'a)) : key -> option (t 'a) =
+    match l with
+    | Nil -> const_none
+    | Cons d q -> equiv_update (model q) d.key (Some d)
+    end
+
+  (** A key is bound iff it occurs in the association lists.
+      Equivalently, [appear] describe the domain of the partial mapping. *)
+  let rec lemma model_domain (k:key) (l:list (t 'a)) : unit
+    ensures { appear k l <-> match model l k with None -> false
+      | Some _ -> true end }
+    ensures { not appear k l <-> model l k = None }
+    variant { l }
+  = match l with Cons _ q -> model_domain k q | _ -> () end
+
+  (** A key is bound to a value with an equivalent key. *)
+  let rec lemma model_key (k:key) (l:list (t 'a)) : unit
+    ensures { match model l k with None -> true
+      | Some d -> Eq.rel k d.key end }
+    variant { l }
+  = match l with Cons _ q -> model_key k q | _ -> () end
+
+  (** Congruence lemma. *)
+  let rec lemma model_congruence (k1 k2:key) (l:list (t 'a)) : unit
+    requires { Eq.rel k1 k2 }
+    ensures { model l k1 = model l k2 }
+    variant { l }
+  = match l with
+    | Cons _ q -> model_congruence k1 k2 q
+    | _ -> ()
+    end
+
+  (** If the list satisfies the uniqueness property,
+      then every value occuring in the list is the image of its key. *)
+  let rec lemma model_unique (k:key) (l:list (t 'a)) : unit
+    requires { unique l }
+    ensures { forall d. mem d l -> model l d.key = Some d }
+    variant { l }
+  = match l with Cons _ q -> model_unique k q | _ -> () end
+
+  (** Singleton association list. *)
+  let lemma model_singleton (k:key) (d:t 'a) : unit
+    ensures { model (Cons d Nil) k = if rel k d.key then Some d else None }
+  = ()
+
+  (** Link between disjoint concatenation and disjoint union of
+      partial mappings. *)
+  let rec lemma model_concat (k:key) (l r:list (t 'a)) : unit
+    requires { unique (l++r) /\ unique l /\ unique r }
+    ensures { match model l k with None -> model (l++r) k = model r k
+      | s -> model (l++r) k = s end }
+    ensures { match model r k with None -> model (l++r) k = model l k
+      | s -> model (l++r) k = s end }
+    ensures { model (l++r) k = None <->
+      model l k = None /\ model r k = None }
+    ensures { model l k = None \/ model r k = None }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons _ q -> model_concat k q r
+    end
+
+end
+
+
+(** {2 Sorted association lists} *)
+
+module AssocSorted
+
+  use import list.List
+  use import list.Append
+  use import list.Mem
+  use import option.Option
+
+  (** It is an instance of association lists. *)
+  clone import key_type.KeyType as K
+  clone import preorder.Full as O with type t = key
+  clone export Assoc with type K.key = K.key,
+    type K.t = K.t,
+    function K.key = K.key,
+    predicate Eq.rel = O.eq,
+    goal Eq.Trans,
+    goal Eq.Refl,
+    goal Eq.Symm
+  (** Consider sorted (increasing) lists. *)
+  clone sorted.Increasing as S with type K.key = K.key,
+    type K.t = K.t,
+    function K.key = K.key,
+    predicate O.rel = O.lt,
+    goal O.Trans
+
+  (** Sorted lists have unicity property. *)
+  let rec lemma increasing_unique (l:list (t 'a)) : unit
+    requires { S.increasing l }
+    ensures { unique l }
+    variant { l }
+  = match l with Cons _ q -> increasing_unique q | _ -> () end
+
+  (** Description of the partial mapping corresponding to the concatenation
+      of increasing lists separated by a known key in the middle. *)
+  let lemma model_cut (k:key) (l r:list (t 'a)) : unit
+    requires { S.increasing r }
+    requires { S.increasing l }
+    requires { S.upper_bound k l }
+    requires { S.lower_bound k r }
+    ensures { forall k2. eq k k2 -> model (l++r) k2 = None }
+    ensures { forall k2. lt k k2 -> model (l++r) k2 = model r k2 }
+    ensures { forall k2. le k2 k -> model r k2 = None }
+    ensures { forall k2. lt k2 k -> model (l++r) k2 = model l k2 }
+    ensures { forall k2. le k k2 -> model l k2 = None }
+  = assert { S.increasing (l++r) };
+    assert { forall k2. lt k k2 -> model (l++r) k2 <> model r k2 ->
+      match model r k2 with
+      | None -> match model l k2 with
+        | None -> false
+        | Some d -> lt d.key k && false
+        end && false
+      | _ -> false
+      end && false };
+    assert { forall k2. lt k2 k -> model (l++r) k2 <> model l k2 ->
+      match model l k2 with
+      | None -> match model r k2 with
+        | None -> false
+        | Some d -> lt k d.key && false
+        end && false
+      | _ -> false
+      end && false };
+    assert { forall k2. eq k k2 -> model (l++r) k2 <> None ->
+      (not appear k2 l /\ not appear k2 r) && false }
+
+  (** Description of the partial mapping corresponding to a list
+      split around a midpoint. *)
+  let lemma model_split (d:t 'a) (l r:list (t 'a)) : unit
+    requires { S.increasing l }
+    requires { S.increasing r }
+    requires { S.upper_bound d.key l }
+    requires { S.lower_bound d.key r }
+    ensures { forall k2. eq d.key k2 -> model (l++Cons d r) k2 = Some d }
+    ensures { forall k2. lt d.key k2 -> model (l++Cons d r) k2 = model r k2 }
+    ensures { forall k2. le k2 d.key -> model r k2 = None }
+    ensures { forall k2. lt k2 d.key -> model (l++Cons d r) k2 = model l k2 }
+    ensures { forall k2. le d.key k2 -> model l k2 = None }
+  = ()
+
+end
+

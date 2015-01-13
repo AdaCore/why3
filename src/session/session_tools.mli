@@ -11,7 +11,6 @@
 
 (** Generic tools that can be applied on sessions *)
 
-open Why3
 open Session
 
 val unknown_to_known_provers  :

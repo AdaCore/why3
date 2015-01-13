@@ -4,131 +4,131 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="5" memlimit="1000"/>
-<prover id="2" name="Z3" version="3.2" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="3.2" timelimit="30" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="30" memlimit="0"/>
 <file name="../max_matrix.mlw" expanded="true">
-<theory name="Bitset">
+<theory name="Bitset" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="HashTable">
+<theory name="HashTable" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="MaxMatrixMemo" expanded="true">
- <goal name="sum_ind" sum="72dcb2e9ca4de20e5648d8fb72d105f5">
+<theory name="MaxMatrixMemo" sum="b14b1c5a6356a353c7391da0a4b5b5cd" expanded="true">
+ <goal name="sum_ind">
  <proof prover="1" timelimit="47" memlimit="0"><result status="valid" time="0.79"/></proof>
  </goal>
- <goal name="WP_parameter maximum" expl="VC for maximum" sum="f22543c872116d927c2201277a727afd">
- <transf name="split_goal">
-  <goal name="WP_parameter maximum.1" expl="1. postcondition" sum="eff3b319c05aad4c355a3c62af2890a7">
+ <goal name="WP_parameter maximum" expl="VC for maximum" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter maximum.1" expl="1. postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.2" expl="2. assertion" sum="35f6e7612b31bbac7f101d3dd846c581">
+  <goal name="WP_parameter maximum.2" expl="2. assertion">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.3" expl="3. postcondition" sum="dcff9bc175d0ecb53acb4fe822caceba">
+  <goal name="WP_parameter maximum.3" expl="3. postcondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.4" expl="4. loop invariant init" sum="2737fabf304f248970e1280b0f3a1f5f">
+  <goal name="WP_parameter maximum.4" expl="4. loop invariant init">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.5" expl="5. variant decrease" sum="a25a9622298fac2022deffda7145f025">
+  <goal name="WP_parameter maximum.5" expl="5. variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.6" expl="6. precondition" sum="5cb8487f9c298124bca36b65712f266c">
+  <goal name="WP_parameter maximum.6" expl="6. precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.7" expl="7. loop invariant preservation" sum="8e04971d54fa8f535f92677081ca000d">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter maximum.7.1" expl="1." sum="d1a92fe069b817bcd03b2d53d722107e">
+  <goal name="WP_parameter maximum.7" expl="7. loop invariant preservation" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter maximum.7.1" expl="1.">
    <proof prover="1"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter maximum.7.2" expl="2." sum="c7001f0950113485024a198ff29a469a">
-   <proof prover="2"><result status="valid" time="2.26"/></proof>
+   <goal name="WP_parameter maximum.7.2" expl="2." expanded="true">
+   <proof prover="2"><result status="valid" time="6.99"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maximum.8" expl="8. loop invariant preservation" sum="a161b83bca0dba54c49146ea6a861d91">
+  <goal name="WP_parameter maximum.8" expl="8. loop invariant preservation">
   <proof prover="0"><result status="valid" time="5.66"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.9" expl="9. loop invariant preservation" sum="45f07f510356497d6d1617e7fead834e">
+  <goal name="WP_parameter maximum.9" expl="9. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.30"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.10" expl="10. assertion" sum="b01070ab689a0beaba10a1c8df4fc9db">
+  <goal name="WP_parameter maximum.10" expl="10. assertion">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.11" expl="11. postcondition" sum="8ace4d2d8dab412cb4d6f6bcf980d38b">
+  <goal name="WP_parameter maximum.11" expl="11. postcondition">
   <proof prover="0"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter memo" expl="VC for memo" sum="f2ee11d5ee3eb331d270a29d6b7c968c" expanded="true">
- <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter memo.1" expl="1. postcondition" sum="36eff218ba65ab6a10cf2d9ce55bfd13" expanded="true">
-  <transf name="split_goal" expanded="true">
-   <goal name="WP_parameter memo.1.1" expl="1." sum="b3e6409800e6b568c5bc8572d1bc474b" expanded="true">
+ <goal name="WP_parameter memo" expl="VC for memo">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter memo.1" expl="1. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter memo.1.1" expl="1.">
    <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter memo.1.2" expl="2." sum="893149a2745668d1094e504281e32ac6">
+   <goal name="WP_parameter memo.1.2" expl="2.">
    <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.00"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter memo.2" expl="2. variant decrease" sum="d0fc421f038668a72f9e79c58ec70f27">
+  <goal name="WP_parameter memo.2" expl="2. variant decrease">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter memo.3" expl="3. precondition" sum="e1888765076b3353d0a551ac739580c0">
+  <goal name="WP_parameter memo.3" expl="3. precondition">
   <proof prover="1" timelimit="30" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter memo.4" expl="4. postcondition" sum="136858d31a79c5abc734e4a6eb9178cf">
+  <goal name="WP_parameter memo.4" expl="4. postcondition">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter maxmat" expl="VC for maxmat" sum="4cf0a2699674f2b653a6165cb92893a0">
- <transf name="split_goal">
-  <goal name="WP_parameter maxmat.1" expl="1. assertion" sum="cc95d36933d8b60c09248b39c3ac7e6f">
+ <goal name="WP_parameter maxmat" expl="VC for maxmat">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter maxmat.1" expl="1. assertion">
   <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maxmat.2" expl="2. precondition" sum="f328fdf40c77e56b4e5d95f7777bc61c">
+  <goal name="WP_parameter maxmat.2" expl="2. precondition">
   <transf name="inline_goal">
-   <goal name="WP_parameter maxmat.2.1" expl="1. precondition" sum="f967594a259f30d76c771db89f4b5c55">
-   <transf name="split_goal">
-    <goal name="WP_parameter maxmat.2.1.1" expl="1." sum="7d6abbf17efc40ab0105779b37db119b">
+   <goal name="WP_parameter maxmat.2.1" expl="1. precondition">
+   <transf name="split_goal_wp">
+    <goal name="WP_parameter maxmat.2.1.1" expl="1.">
     <proof prover="3"><result status="valid" time="0.00"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.2" expl="2." sum="904744a3d7b39082be137b250ba8113f">
+    <goal name="WP_parameter maxmat.2.1.2" expl="2.">
     <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.3" expl="3." sum="9debaac4bac5d74d951bc2c52433ed06">
+    <goal name="WP_parameter maxmat.2.1.3" expl="3.">
     <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.4" expl="4." sum="75a0cb578a4ddf4cc33577416a1815aa">
+    <goal name="WP_parameter maxmat.2.1.4" expl="4.">
     <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.5" expl="5." sum="011a825dd218743761d37082d7e12122">
+    <goal name="WP_parameter maxmat.2.1.5" expl="5.">
     <proof prover="3"><result status="valid" time="0.00"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.6" expl="6." sum="d034de90b7624c1353da4a7e7d416553">
+    <goal name="WP_parameter maxmat.2.1.6" expl="6.">
     <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maxmat.3" expl="3. postcondition" sum="839797288e675333811cdf9b006a953a">
-  <transf name="split_goal">
-   <goal name="WP_parameter maxmat.3.1" expl="1. postcondition" sum="839797288e675333811cdf9b006a953a">
+  <goal name="WP_parameter maxmat.3" expl="3. postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter maxmat.3.1" expl="1. postcondition">
    <transf name="inline_goal">
-    <goal name="WP_parameter maxmat.3.1.1" expl="1. postcondition" sum="40ce3e55c28b9f38685e6e2cfcfdcb3d">
+    <goal name="WP_parameter maxmat.3.1.1" expl="1. postcondition">
     <proof prover="3"><result status="valid" time="0.10"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maxmat.4" expl="4. postcondition" sum="5ec57f54b78889f0e646c89bdcc2d9ce">
+  <goal name="WP_parameter maxmat.4" expl="4. postcondition">
   <transf name="inline_goal">
-   <goal name="WP_parameter maxmat.4.1" expl="1. postcondition" sum="a3e4bdd4a21d9a506b7af2c183947611">
+   <goal name="WP_parameter maxmat.4.1" expl="1. postcondition">
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>

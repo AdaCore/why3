@@ -2,168 +2,168 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
-<prover id="1" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
-<prover id="2" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
-<prover id="3" name="Coq" version="8.4pl3" timelimit="10" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.4pl4" timelimit="10" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="10" memlimit="0"/>
+<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="1000"/>
+<prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
 <file name="../find.mlw" expanded="true">
-<theory name="FIND" expanded="true">
- <goal name="WP_parameter find" expl="VC for find" sum="9f1a3b7ab7f7e0b70d8d91810d1d5fb1" expanded="true">
- <transf name="split_goal" expanded="true">
-  <goal name="WP_parameter find.1" expl="1. loop invariant init" sum="8cb4d6f01b61de1fc4998d8ec3c25d6c">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+<theory name="FIND" sum="879704dbe736da9c771cfe76e549458e" expanded="true">
+ <goal name="WP_parameter find" expl="VC for find" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter find.1" expl="1. loop invariant init">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.2" expl="2. type invariant" sum="b2c7fd66ab4697c9d062a8dddc25638f">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter find.2" expl="2. type invariant">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.3" expl="3. index in array bounds" sum="8c5d3d7ff8832fc05319d79d09dd3ead">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.3" expl="3. index in array bounds">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.4" expl="4. loop invariant init" sum="f3e03422951f6597e8d5d35316138e8e">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter find.4" expl="4. loop invariant init">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter find.5" expl="5. loop invariant init" sum="d6bff3eef798760f6ab77171d698444c">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.5" expl="5. loop invariant init">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter find.6" expl="6. type invariant" sum="8bf1bf6cfcf5bcc67c9ae11209da9016">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter find.6" expl="6. type invariant">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.7" expl="7. index in array bounds" sum="610fb1ea2dba493289b65dc677264bc5">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter find.7" expl="7. index in array bounds">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.8" expl="8. loop invariant preservation" sum="09ec2aee178dea5b2415cabcd6e4dbe9">
-  <transf name="split_goal">
-   <goal name="WP_parameter find.8.1" expl="1." sum="bafd95206f13766c85e2152f1de43eb0">
-   <proof prover="0"><result status="valid" time="0.06"/></proof>
-   <proof prover="1" memlimit="0"><result status="valid" time="0.05"/></proof>
+  <goal name="WP_parameter find.8" expl="8. loop invariant preservation">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter find.8.1" expl="1.">
+   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   <proof prover="2" memlimit="0"><result status="valid" time="0.05"/></proof>
    </goal>
-   <goal name="WP_parameter find.8.2" expl="2." sum="d4f8bb022ea17a8e4d038839ca97acfc">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
+   <goal name="WP_parameter find.8.2" expl="2.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter find.8.3" expl="3." sum="98ed0a80dbc48ff4758508116ad405bc">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter find.8.3" expl="3.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter find.8.4" expl="4." sum="c913a02741d3543ab34210e2c5fcbe63">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find.9" expl="9. loop variant decrease" sum="8d50615fdf7e2770a06a1f913a61de11">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter find.10" expl="10. loop invariant init" sum="25427d52d2cecc04ec5cdeba6dd3aa89">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter find.11" expl="11. index in array bounds" sum="253e7c578df96c13b31e573772b1b972">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-  <transf name="split_goal">
-   <goal name="WP_parameter find.11.1" expl="1." sum="a3fa592945cd04c18ceeff4354a2ad17">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="WP_parameter find.11.2" expl="2." sum="12520fee5ac9cdc2631ac9e2826a6cc1">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
-   <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter find.8.4" expl="4.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find.12" expl="12. loop invariant preservation" sum="0c9ecc40c88edc7b2fc5f09e343e90d9">
-  <transf name="split_goal">
-   <goal name="WP_parameter find.12.1" expl="1." sum="ea3d204059fd008fe21785c8628fbe4f">
-   <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter find.9" expl="9. loop variant decrease">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.10" expl="10. loop invariant init">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.11" expl="11. index in array bounds">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter find.11.1" expl="1.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter find.12.2" expl="2." sum="567f60087f2fcfad65f5807d4305b42c">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="WP_parameter find.12.3" expl="3." sum="aee1ef88289bffc33798dae5d19063ca">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.03"/></proof>
-   </goal>
-   <goal name="WP_parameter find.12.4" expl="4." sum="ddfa96e1a9d20d8673902728f4968d17">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.05"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter find.13" expl="13. loop variant decrease" sum="a9e51f2f12bfd33d57c49706c076678a">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter find.14" expl="14. assertion" sum="84a9f822b1665746936f66f2580b076e">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
-  </goal>
-  <goal name="WP_parameter find.15" expl="15. index in array bounds" sum="48d26ba5ef157757029fdec9ae83aeb7">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter find.16" expl="16. index in array bounds" sum="4bcb30ab515e5767277fd548b688e2ed">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter find.17" expl="17. index in array bounds" sum="c655490b5d07e2c81117512cc24d6ebc">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter find.18" expl="18. index in array bounds" sum="93f272f722908dfdb79ee103db0552b6">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter find.19" expl="19. assertion" sum="47fd7341c6ab82446135e73d180a0cf4">
-  <proof prover="1" memlimit="0"><result status="valid" time="1.01"/></proof>
-  </goal>
-  <goal name="WP_parameter find.20" expl="20. assertion" sum="d8e128651f96e4ca6b9cb584a7d680af">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter find.21" expl="21. assertion" sum="ebaa7d37fd252785b499732190c06ae6">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter find.22" expl="22. loop invariant preservation" sum="dde2d8b852d64ad17da41a3063971859" expanded="true">
-  <proof prover="3" edited="find_WP_FIND_WP_parameter_find_4.v"><result status="valid" time="14.14"/></proof>
-  </goal>
-  <goal name="WP_parameter find.23" expl="23. loop variant decrease" sum="0df90c266328955f7491affdd1c5e725">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter find.24" expl="24. loop invariant preservation" sum="ba3c3f892adf357e133c676ec068e47e">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter find.25" expl="25. loop variant decrease" sum="d4fbb70b165d886fb7b7e3c40dca20ba">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter find.26" expl="26. assertion" sum="ff59f6dbc16a40de5e2ffe6f3a3c26cd">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter find.27" expl="27. loop invariant preservation" sum="110895ccf5d4cbb8f60ac71e133ca5d2">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.16"/></proof>
-  </goal>
-  <goal name="WP_parameter find.28" expl="28. loop variant decrease" sum="806821333722c7140e2bb5a1dd86f672">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter find.29" expl="29. loop invariant preservation" sum="cb04a29aeb76f0b0c7c30d3b22f865e8">
-  <transf name="split_goal">
-   <goal name="WP_parameter find.29.1" expl="1." sum="7b610073460c8ecd48ed6578d7bc5d3f">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.14"/></proof>
-   </goal>
-   <goal name="WP_parameter find.29.2" expl="2." sum="f8b7c9012a5af27006c49b8076a177c6">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="WP_parameter find.29.3" expl="3." sum="4b509df299ca9adfe8bf8af0569ac41c">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="WP_parameter find.29.4" expl="4." sum="7e38adcf2498c714e8c89f92508834a5">
-   <proof prover="1" memlimit="0"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="WP_parameter find.29.5" expl="5." sum="ce0eab203fd5c8b4892fd42b9783a1e2">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <goal name="WP_parameter find.11.2" expl="2.">
+   <proof prover="1"><result status="valid" time="0.03"/></proof>
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter find.30" expl="30. loop variant decrease" sum="90d04b96791d28561daa8185ed7dd074">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
+  <goal name="WP_parameter find.12" expl="12. loop invariant preservation">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter find.12.1" expl="1.">
+   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="WP_parameter find.12.2" expl="2.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter find.12.3" expl="3.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="WP_parameter find.12.4" expl="4.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="WP_parameter find.31" expl="31. loop invariant preservation" sum="03593274ba2c66df6afb9f39a8dab12d">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <goal name="WP_parameter find.13" expl="13. loop variant decrease">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter find.32" expl="32. loop variant decrease" sum="fbe5ca3ddb4bf79f74babfa742add28c">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.14" expl="14. assertion">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter find.33" expl="33. type invariant" sum="f31e10c619cb639e01e9f49fe5b54633">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter find.15" expl="15. index in array bounds">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter find.34" expl="34. postcondition" sum="cd0e155c14c362ad2aa97e680a15bb97">
-  <proof prover="1" memlimit="0"><result status="valid" time="0.08"/></proof>
+  <goal name="WP_parameter find.16" expl="16. index in array bounds">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.17" expl="17. index in array bounds">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.18" expl="18. index in array bounds">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.19" expl="19. assertion">
+  <proof prover="2" memlimit="0"><result status="valid" time="1.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.20" expl="20. assertion">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.21" expl="21. assertion">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.22" expl="22. loop invariant preservation" expanded="true">
+  <proof prover="0" edited="find_WP_FIND_WP_parameter_find_4.v"><result status="valid" time="10.48"/></proof>
+  </goal>
+  <goal name="WP_parameter find.23" expl="23. loop variant decrease">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter find.24" expl="24. loop invariant preservation">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.25" expl="25. loop variant decrease">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.26" expl="26. assertion">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter find.27" expl="27. loop invariant preservation">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="WP_parameter find.28" expl="28. loop variant decrease">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter find.29" expl="29. loop invariant preservation">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter find.29.1" expl="1.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.14"/></proof>
+   </goal>
+   <goal name="WP_parameter find.29.2" expl="2.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter find.29.3" expl="3.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter find.29.4" expl="4.">
+   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="WP_parameter find.29.5" expl="5.">
+   <proof prover="1"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter find.30" expl="30. loop variant decrease">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter find.31" expl="31. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter find.32" expl="32. loop variant decrease">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.33" expl="33. type invariant">
+  <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter find.34" expl="34. postcondition">
+  <proof prover="2" memlimit="0"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
  </goal>

@@ -12,7 +12,6 @@
 open Why3
 open Rc
 open Whyconf
-open Why3session
 
 let debug = Debug.register_info_flag "ide_info"
   ~desc:"Print@ why3ide@ debugging@ messages."
@@ -53,6 +52,7 @@ type t =
       mutable show_labels : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
+      mutable max_boxes : int;
       mutable saving_policy : int;
       (** 0 = always, 1 = never, 2 = ask *)
       mutable premise_color : string;
@@ -83,6 +83,7 @@ type ide = {
   ide_show_labels : bool;
   ide_show_locs : bool;
   ide_show_time_limit : bool;
+  ide_max_boxes : int;
   ide_saving_policy : int;
   ide_premise_color : string;
   ide_goal_color : string;
@@ -104,6 +105,7 @@ let default_ide =
     ide_show_labels = false;
     ide_show_locs = false;
     ide_show_time_limit = false;
+    ide_max_boxes = 16;
     ide_saving_policy = 2;
     ide_premise_color = "chartreuse";
     ide_goal_color = "gold";
@@ -138,6 +140,9 @@ let load_ide section =
     ide_show_time_limit =
       get_bool section ~default:default_ide.ide_show_time_limit
         "print_time_limit";
+    ide_max_boxes =
+      get_int section ~default:default_ide.ide_max_boxes
+        "max_boxes";
     ide_saving_policy =
       get_int section ~default:default_ide.ide_saving_policy "saving_policy";
     ide_premise_color =
@@ -220,6 +225,7 @@ let load_config config original_config env =
     show_labels   = ide.ide_show_labels ;
     show_locs     = ide.ide_show_locs ;
     show_time_limit = ide.ide_show_time_limit;
+    max_boxes = ide.ide_max_boxes;
     saving_policy = ide.ide_saving_policy ;
     premise_color = ide.ide_premise_color;
     goal_color = ide.ide_goal_color;
@@ -268,7 +274,7 @@ let debug_save_config n c =
 *)
 
 let save_config t =
-  Debug.dprintf debug "[Info] saving IDE config file@.";
+  Debug.dprintf debug "[GUI config] saving IDE config file@.";
   (* taking original config, without the extra_config *)
   let config = t.original_config in
   (* copy possibly modified settings to original config *)
@@ -292,6 +298,7 @@ let save_config t =
   let ide = set_bool ide "print_labels" t.show_labels in
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_bool ide "print_time_limit" t.show_time_limit in
+  let ide = set_int ide "max_boxes" t.max_boxes in
   let ide = set_int ide "saving_policy" t.saving_policy in
   let ide = set_string ide "premise_color" t.premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
@@ -480,7 +487,7 @@ let resize_images size =
   ()
 
 let init () =
-  Debug.dprintf debug "[Info] reading icons...@?";
+  Debug.dprintf debug "[GUI config] reading icons...@?";
   load_icon_names ();
   why_icon := image "logo-why";
   resize_images 20;
@@ -511,7 +518,7 @@ let show_legend_window () =
   ib image_prover;
   i "   External prover\n";
   ib image_transf;
-  i "   Transformation\n";
+  i "   Transformation or strategy\n";
   it "Status column\n";
   ib image_undone;
   i "   External proof attempt not done\n";
@@ -573,8 +580,8 @@ let show_about_window () =
                 "Piotr Trojanek";
                 "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2014 Inria, CNRS, Paris-Sud University"
-      ~license:"GNU Lesser General Public License version 2.1"
+      ~copyright:"Copyright 2010-2015 Inria, CNRS, Paris-Sud University"
+      ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
       ~website:"http://why3.lri.fr"
       ~website_label:"http://why3.lri.fr"
       ~version:Config.version
@@ -619,7 +626,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
   let _ = GMisc.label ~text:"Time limit (in sec.): " ~width ~xalign
     ~packing:(hb#pack ~expand:false) () in
   let timelimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
-  timelimit_spin#adjustment#set_bounds ~lower:0. ~upper:42_000_000. ~step_incr:1. ();
+  timelimit_spin#adjustment#set_bounds ~lower:0. ~upper:86_400. ~step_incr:5. ();
   timelimit_spin#adjustment#set_value (float_of_int c.session_time_limit);
   let (_ : GtkSignal.id) =
     timelimit_spin#connect#value_changed ~callback:
@@ -631,7 +638,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
   let _ = GMisc.label ~text:"Memory limit (in Mb): " ~width ~xalign
     ~packing:(hb#pack ~expand:false) () in
   let memlimit_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
-  memlimit_spin#adjustment#set_bounds ~lower:0. ~upper:4000. ~step_incr:100. ();
+  memlimit_spin#adjustment#set_bounds ~lower:0. ~upper:16_000. ~step_incr:500. ();
   memlimit_spin#adjustment#set_value (float_of_int c.session_mem_limit);
   let (_ : GtkSignal.id) =
     memlimit_spin#connect#value_changed ~callback:
@@ -644,7 +651,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
     ~packing:(hb#pack ~expand:false) () in
   let nb_processes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
   nb_processes_spin#adjustment#set_bounds
-    ~lower:1. ~upper:16. ~step_incr:1. ();
+    ~lower:1. ~upper:64. ~step_incr:1. ();
   nb_processes_spin#adjustment#set_value
     (float_of_int c.session_nb_processes);
   let (_ : GtkSignal.id) =
@@ -671,6 +678,19 @@ let general_settings (c : t) (notebook:GPack.notebook) =
   let display_options_box =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:display_options_frame#add ()
+  in
+  (* max boxes *)
+  let width = 200 and xalign = 0.0 in
+  let hb = GPack.hbox ~homogeneous:false ~packing:display_options_box#add ()
+  in
+  let _ = GMisc.label ~text:"Max boxes: " ~width ~xalign
+    ~packing:(hb#pack ~expand:false) () in
+  let max_boxes_spin = GEdit.spin_button ~digits:0 ~packing:hb#add () in
+  max_boxes_spin#adjustment#set_bounds ~lower:0. ~upper:1000. ~step_incr:1. ();
+  max_boxes_spin#adjustment#set_value (float_of_int c.max_boxes);
+  let (_ : GtkSignal.id) =
+    max_boxes_spin#connect#value_changed ~callback:
+      (fun () -> c.max_boxes <- max_boxes_spin#value_as_int)
   in
   let intropremises =
     GButton.check_button ~label:"introduce premises"
@@ -997,7 +1017,7 @@ let run_auto_detection gconfig =
   ()
 *)
 
-(*let () = Debug.dprintf debug "[Info] end of configuration initialization@."*)
+(*let () = Debug.dprintf debug "[GUI config] end of configuration initialization@."*)
 
 let uninstalled_prover c eS unknown =
   try

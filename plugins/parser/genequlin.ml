@@ -61,7 +61,7 @@ let scanf s =
 (** the main function *)
 let read_channel env path filename cin =
   (** Find the int theory and the needed operation *)
-  let th_int = Env.find_theory (Env.env_of_library env) ["int"] "Int" in
+  let th_int = Env.read_theory env ["int"] "Int" in
   let leq = ns_find_ls th_int.th_export ["infix <"] in
   let plus_symbol = Theory.ns_find_ls th_int.Theory.th_export ["infix +"] in
   let neg_symbol = Theory.ns_find_ls th_int.Theory.th_export ["prefix -"] in
@@ -123,9 +123,9 @@ let read_channel env path filename cin =
   (** Read all the file *)
   let th_uc = Sysutil.fold_channel fold th_uc cin in
   (** Return the map with the theory *)
-  (), Mstr.singleton "EquLin" (close_theory th_uc)
+  Mstr.singleton "EquLin" (close_theory th_uc)
 
-let library_of_env = Env.register_format "EquLin" ["equlin"] read_channel
+let () = Env.register_format Env.base_language "equlin" ["equlin"] read_channel
   ~desc:"@[<hov>Generate@ random@ linear@ arithmetic@ problems.@ \
     The@ first@ line@ gives@ the@ seed.@ Each@ other@ line@ \
     describes@ a@ goal@ and@ contains@ three@ numbers:@]@\n  \

@@ -58,7 +58,7 @@ let () = printf "@[task:@\n%a@]@." Pretty.print_task task
 *)
 
 let inline = Trans.lookup_transform "inline_goal" env
-let split = Trans.lookup_transform_l "split_goal" env
+let split = Trans.lookup_transform_l "split_goal_right" env
 
 
 let task_inline = Trans.apply inline task

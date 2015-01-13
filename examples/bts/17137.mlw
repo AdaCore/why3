@@ -1,0 +1,10 @@
+
+theory A type t 'a end
+theory B
+clone export A
+clone export A with type t 'a = t 'a
+end
+theory C
+clone export A
+clone export B with type t 'a = t 'a (* Error reported on this line *)
+end

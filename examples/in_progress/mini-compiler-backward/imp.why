@@ -1,0 +1,86 @@
+theory Imp
+
+  use import state.State
+  use import bool.Bool
+  use import int.Int
+
+
+  (* ************************ SYNTAX ************************ *)
+  type aexpr =
+    | Anum int
+    | Avar id
+    | Aadd aexpr aexpr
+    | Asub aexpr aexpr
+    | Amul aexpr aexpr
+
+  type bexpr =
+    | Btrue
+    | Bfalse
+    | Band bexpr bexpr
+    | Bnot bexpr
+    | Beq aexpr aexpr
+    | Ble aexpr aexpr
+
+  type com =
+    | Cskip
+    | Cassign id aexpr
+    | Cseq com com
+    | Cif bexpr com com
+    | Cwhile bexpr com
+
+
+  (* ************************  SEMANTICS ************************ *)
+  function aeval  (st:state) (e:aexpr) : int =
+    match e with
+      | Anum n      -> n
+      | Avar x      -> st[x]
+      | Aadd e1 e2  -> aeval st e1 + aeval st e2
+      | Asub e1 e2  -> aeval st e1 - aeval st e2
+      | Amul e1 e2  -> aeval st e1 * aeval st e2
+    end
+
+  function beval (st:state) (b:bexpr) : bool =
+    match b with
+      | Btrue      -> true
+      | Bfalse     -> false
+      | Bnot b'    -> notb (beval st b')
+      | Band b1 b2 -> andb (beval st b1) (beval st b2)
+      | Beq a1 a2  -> aeval st a1 = aeval st a2
+      | Ble a1 a2  -> aeval st a1 <= aeval st a2
+    end
+
+  inductive ceval state com state =
+    (* skip *)
+    | E_Skip : forall m. ceval m Cskip m
+
+    (* assignement *)
+    | E_Ass  : forall m a x. ceval m (Cassign x a) m[x <- aeval m a]
+
+    (* sequence *)
+    | E_Seq : forall cmd1 cmd2 m0 m1 m2.
+        ceval m0 cmd1 m1 -> ceval m1 cmd2 m2 -> ceval m0 (Cseq cmd1 cmd2) m2
+
+    (* if then else *)
+    | E_IfTrue : forall m0 m1 cond cmd1 cmd2. beval m0 cond ->
+        ceval m0 cmd1 m1 -> ceval m0 (Cif cond cmd1 cmd2) m1
+
+    | E_IfFalse : forall m0 m1 cond cmd1 cmd2. not beval m0 cond ->
+        ceval m0 cmd2 m1 -> ceval m0 (Cif cond cmd1 cmd2) m1
+
+    (* while *)
+    | E_WhileEnd : forall cond m body. not beval m cond ->
+        ceval m (Cwhile cond body) m
+
+    | E_WhileLoop : forall mi mj mf cond body. beval mi cond ->
+        ceval mi body mj -> ceval mj (Cwhile cond body) mf ->
+          ceval mi (Cwhile cond body) mf
+
+
+  lemma ceval_deterministic_aux : forall c mi mf1. ceval mi c mf1 ->
+      forall mf2. ("inversion" ceval mi c mf2) -> mf1 = mf2
+
+  lemma ceval_deterministic : forall c mi mf1 mf2.
+      ceval mi c mf1 ->  ceval mi c mf2 -> mf1 = mf2
+  
+end
+

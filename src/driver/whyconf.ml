@@ -133,37 +133,31 @@ type config_editor = {
 type config_strategy = {
   strategy_name : string;
   strategy_desc : Pp.formatted;
-  strategy_code : string array;
+  strategy_code : string;
   strategy_shortcut : string;
 }
 
 (* a default set of strategies *)
 let default_strategies =
   List.map
-    (fun (name,desc,shortcut,instrs) ->
+    (fun (name,desc,shortcut,code) ->
       let s = ref Rc.empty_section in
       s := Rc.set_string !s "name" name;
       s := Rc.set_string !s "desc" desc;
       s := Rc.set_string !s "shortcut" shortcut;
-      for i = 0 to Array.length instrs - 1 do
-        s := Rc.set_string !s ("l" ^ (string_of_int i)) instrs.(i);
-      done;
+      s := Rc.set_string !s "code" code;
       !s)
     [ "Split", "Split@ conjunctions@ in@ goal", "s",
-      [|"t split_goal_wp 1"|];
+      "t split_goal_wp exit";
       "Inline", "Inline@ function@ symbols@ once", "i",
-      [|"t inline_goal 1"|];
-      "My mini-blaster", "A@ simple@ blaster", "b",
-      [|"c Alt-Ergo,0.95.2 1 1000";
-        "c CVC4,1.4 1 1000";
-        "t split_goal_wp 0";
-        "c Alt-Ergo,0.95.2 10 4000";
-        "c CVC4,1.4 10 4000" |];
+      "t inline_goal exit";
+      "Compute", "Compute@ in@ goal", "c",
+      "t compute_in_goal exit";
     ]
 
-let get_strategies rc =
+let get_strategies ?(default=[]) rc =
   match get_simple_family rc "strategy" with
-    | [] -> default_strategies
+    | [] -> default
     | s -> s
 
 (** Main record *)
@@ -405,7 +399,7 @@ let load_prover dirname (provers,shortcuts) section =
     let shortcuts = add_prover_shortcuts shortcuts prover lshort in
     provers,shortcuts
   with MissingField s ->
-    eprintf "[Warning] cannot load a prover: missing field '%s'@." s;
+    Warning.emit "[Warning] cannot load a prover: missing field '%s'@." s;
     provers,shortcuts
 
 
@@ -420,7 +414,7 @@ let load_shortcut acc section =
                    prover_altern= altern} in
     add_prover_shortcuts acc prover shortcuts
   with MissingField s ->
-    eprintf "[Warning] cannot load shortcut: missing field '%s'@." s;
+    Warning.emit "[Warning] cannot load shortcut: missing field '%s'@." s;
     acc
 
 let load_editor editors (id, section) =
@@ -431,7 +425,7 @@ let load_editor editors (id, section) =
         editor_options = [];
       } editors
   with MissingField s ->
-    eprintf "[Warning] cannot load an editor: missing field '%s'@." s;
+    Warning.emit "[Warning] cannot load an editor: missing field '%s'@." s;
     editors
 
 let load_policy provers acc (_,section) =
@@ -465,35 +459,27 @@ let load_policy provers acc (_,section) =
       | _ -> raise Not_found
     with Not_found -> acc
       with MissingField s ->
-        eprintf "[Warning] cannot load a policy: missing field '%s'@." s;
+        Warning.emit "[Warning] cannot load a policy: missing field '%s'@." s;
         acc
 
 let load_strategy strategies section =
   try
     let name = get_string section "name" in
     let desc = get_string section "desc" in
-    let shortcut = get_string ~default:"" section "shortcut" in
     let desc = Scanf.format_from_string desc "" in
-    let code = ref [] and i = ref 0 in
-    try
-      while true do
-        let instr = get_string section ("l" ^ (string_of_int !i)) in
-        code := instr :: !code;
-        incr i
-      done;
-      assert false
-    with MissingField _ ->
-      Mstr.add
-        name
+    let shortcut = get_string ~default:"" section "shortcut" in
+    let code = get_string section "code" in
+    Mstr.add
+      name
         { strategy_name = name;
           strategy_desc = desc;
-          strategy_code = Array.of_list (List.rev !code);
+          strategy_code = code;
           strategy_shortcut = shortcut;
         }
         strategies
   with
       MissingField s ->
-        eprintf "[Warning] cannot load a strategy: missing field '%s'@." s;
+        Warning.emit "[Warning] cannot load a strategy: missing field '%s'@." s;
         strategies
 
 let load_main dirname section =
@@ -544,7 +530,7 @@ let get_config (filename,rc) =
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
   let policy = List.fold_left (load_policy provers) Mprover.empty policy in
-  let strategies = get_strategies rc in
+  let strategies = get_strategies ~default:default_strategies rc in
   let strategies = List.fold_left load_strategy Mstr.empty strategies in
   { conf_file = filename;
     config    = rc;
@@ -652,6 +638,7 @@ let filter_one_prover whyconf fp =
 (** merge config *)
 
 let merge_config config filename =
+  Format.eprintf "[Config] reading extra configuration file %s@." filename;
   let dirname = get_dirname filename in
   let rc = Rc.from_file filename in
   (** modify main *)
@@ -663,6 +650,11 @@ let merge_config config filename =
       let plugins =
         (get_stringl ~default:[] rc "plugin") @ config.main.plugins in
       { config.main with loadpath = loadpath; plugins = plugins } in
+  (** get more strategies *)
+  let more_strategies = get_strategies rc in
+  let strategies =
+    List.fold_left load_strategy config.strategies more_strategies
+  in
   (** modify provers *)
   let create_filter_prover section =
     try
@@ -671,7 +663,7 @@ let merge_config config filename =
       let altern = get_stringo section "alternative" in
       mk_filter_prover ?version ?altern name
     with MissingField s ->
-      eprintf "[Warning] sec prover_modifiers is missing a '%s' field@." s;
+      Warning.emit "[Warning] sec prover_modifiers is missing a '%s' field@." s;
       mk_filter_prover "none"
   in
   let prover_modifiers = get_simple_family rc "prover_modifiers" in
@@ -706,7 +698,7 @@ let merge_config config filename =
     ) config.editors editor_modifiers in
   (** add editors *)
   let editors = List.fold_left load_editor editors (get_family rc "editor") in
-  { config with main = main; provers = provers;
+  { config with main = main; provers = provers; strategies = strategies;
     prover_shortcuts = shortcuts; editors = editors }
 
 let save_config config =

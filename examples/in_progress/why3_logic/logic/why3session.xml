@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
+<prover id="3" name="Spass" version="3.7" timelimit="5" memlimit="1000"/>
+<prover id="4" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
+<file name="../logic.mlw" expanded="true">
+<theory name="Defs" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Maps" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Substs" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="FreeVars" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="Commutations" sum="36457fb289f300a155d967b7c3fa3bd9">
+ <goal name="WP_parameter ty_map_id" expl="VC for ty_map_id">
+ <proof prover="5"><result status="valid" time="0.04" steps="26"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_map_id" expl="VC for ty_list_map_id">
+ <proof prover="5"><result status="valid" time="0.05" steps="21"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_map_ho_id" expl="VC for ty_map_ho_id">
+ <proof prover="5"><result status="valid" time="0.04" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_map_ho_id" expl="VC for ty_list_map_ho_id">
+ <proof prover="5"><result status="valid" time="0.04" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_map_id" expl="VC for pat_map_id">
+ <proof prover="5"><result status="valid" time="0.09" steps="170"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_map_id" expl="VC for pat_list_map_id">
+ <proof prover="5"><result status="valid" time="0.05" steps="19"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_map_ho_id" expl="VC for pat_map_ho_id">
+ <proof prover="5"><result status="valid" time="0.05" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_map_ho_id" expl="VC for pat_list_map_ho_id">
+ <proof prover="5"><result status="valid" time="0.05" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter term_map_id" expl="VC for term_map_id">
+ <proof prover="5"><result status="valid" time="0.81" steps="1734"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_map_id" expl="VC for term_list_map_id">
+ <proof prover="5"><result status="valid" time="0.05" steps="21"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_map_id" expl="VC for branch_list_map_id">
+ <proof prover="5"><result status="valid" time="0.07" steps="19"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_map_id" expl="VC for branch_map_id">
+ <proof prover="5"><result status="valid" time="0.04" steps="7"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_map_compose" expl="VC for ty_map_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="44"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_map_compose" expl="VC for ty_list_map_compose">
+ <proof prover="5"><result status="valid" time="0.08" steps="55"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_map_ho_compose" expl="VC for ty_map_ho_compose">
+ <proof prover="5"><result status="valid" time="0.05" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_map_ho_compose" expl="VC for ty_list_map_ho_compose">
+ <proof prover="5"><result status="valid" time="0.05" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_map_compose" expl="VC for pat_map_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="280"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_map_compose" expl="VC for pat_list_map_compose">
+ <proof prover="5"><result status="valid" time="0.06" steps="55"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_map_ho_compose" expl="VC for pat_map_ho_compose">
+ <proof prover="5"><result status="valid" time="0.05" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_map_ho_compose" expl="VC for pat_list_map_ho_compose">
+ <proof prover="5"><result status="valid" time="0.05" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter term_map_compose" expl="VC for term_map_compose">
+ <proof prover="5"><result status="valid" time="1.35" steps="3396"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_map_compose" expl="VC for term_list_map_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="40"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_map_compose" expl="VC for branch_list_map_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="34"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_map_compose" expl="VC for branch_map_compose">
+ <proof prover="5"><result status="valid" time="0.05" steps="17"/></proof>
+ </goal>
+ <goal name="WP_parameter term_map_ho_compose" expl="VC for term_map_ho_compose">
+ <proof prover="5"><result status="valid" time="0.05" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_map_ho_compose" expl="VC for term_list_map_ho_compose">
+ <proof prover="5"><result status="valid" time="0.08" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_map_ho_compose" expl="VC for branch_list_map_ho_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_map_ho_compose" expl="VC for branch_map_ho_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter map_ty_var" expl="VC for map_ty_var">
+ <proof prover="5"><result status="valid" time="0.05" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter map_term_var" expl="VC for map_term_var">
+ <proof prover="5"><result status="valid" time="0.08" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter smap_term_lifting" expl="VC for smap_term_lifting">
+ <proof prover="1"><result status="valid" time="0.29"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_smap_compose" expl="VC for ty_smap_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="40"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_smap_compose" expl="VC for ty_list_smap_compose">
+ <proof prover="5"><result status="valid" time="0.06" steps="45"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_smap_ho_compose" expl="VC for ty_smap_ho_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_smap_ho_compose" expl="VC for ty_list_smap_ho_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_smap_compose" expl="VC for pat_smap_compose">
+ <proof prover="5"><result status="valid" time="0.16" steps="246"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_smap_compose" expl="VC for pat_list_smap_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="41"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_smap_ho_compose" expl="VC for pat_smap_ho_compose">
+ <proof prover="5"><result status="valid" time="0.06" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_smap_ho_compose" expl="VC for pat_list_smap_ho_compose">
+ <proof prover="5"><result status="valid" time="0.11" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter term_smap_compose" expl="VC for term_smap_compose">
+ <proof prover="5"><result status="valid" time="2.26" steps="3140"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_smap_compose" expl="VC for term_list_smap_compose">
+ <proof prover="5"><result status="valid" time="0.09" steps="42"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_smap_compose" expl="VC for branch_list_smap_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="42"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_smap_compose" expl="VC for branch_smap_compose">
+ <proof prover="5"><result status="valid" time="0.09" steps="17"/></proof>
+ </goal>
+ <goal name="WP_parameter term_smap_ho_compose" expl="VC for term_smap_ho_compose">
+ <proof prover="5"><result status="valid" time="0.08" steps="10"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_smap_ho_compose" expl="VC for term_list_smap_ho_compose">
+ <proof prover="5"><result status="valid" time="0.08" steps="10"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_smap_ho_compose" expl="VC for branch_list_smap_ho_compose">
+ <proof prover="5"><result status="valid" time="0.08" steps="10"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_smap_ho_compose" expl="VC for branch_smap_ho_compose">
+ <proof prover="5"><result status="valid" time="0.09" steps="10"/></proof>
+ </goal>
+ <goal name="WP_parameter maps_term_lifting" expl="VC for maps_term_lifting">
+ <proof prover="1"><result status="valid" time="0.28"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_maps_compose" expl="VC for ty_maps_compose">
+ <proof prover="5"><result status="valid" time="0.09" steps="49"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_maps_compose" expl="VC for ty_list_maps_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="56"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_maps_ho_compose" expl="VC for ty_maps_ho_compose">
+ <proof prover="5"><result status="valid" time="0.08" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_maps_ho_compose" expl="VC for ty_list_maps_ho_compose">
+ <proof prover="5"><result status="valid" time="0.07" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_maps_compose" expl="VC for pat_maps_compose">
+ <proof prover="5"><result status="valid" time="0.26" steps="280"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_maps_compose" expl="VC for pat_list_maps_compose">
+ <proof prover="5"><result status="valid" time="0.12" steps="55"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_maps_ho_compose" expl="VC for pat_maps_ho_compose">
+ <proof prover="5"><result status="valid" time="0.09" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_maps_ho_compose" expl="VC for pat_list_maps_ho_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter term_maps_compose" expl="VC for term_maps_compose">
+ <proof prover="5"><result status="valid" time="2.80" steps="3637"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_maps_compose" expl="VC for term_list_maps_compose">
+ <proof prover="5"><result status="valid" time="0.12" steps="56"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_maps_compose" expl="VC for branch_list_maps_compose">
+ <proof prover="5"><result status="valid" time="0.16" steps="55"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_maps_compose" expl="VC for branch_maps_compose">
+ <proof prover="5"><result status="valid" time="0.13" steps="24"/></proof>
+ </goal>
+ <goal name="WP_parameter term_maps_ho_compose" expl="VC for term_maps_ho_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="9"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_maps_ho_compose" expl="VC for term_list_maps_ho_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_maps_ho_compose" expl="VC for branch_list_maps_ho_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_maps_ho_compose" expl="VC for branch_maps_ho_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_ty_var" expl="VC for subst_ty_var">
+ <proof prover="5"><result status="valid" time="0.08" steps="7"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_term_var" expl="VC for subst_term_var">
+ <proof prover="5"><result status="valid" time="0.12" steps="7"/></proof>
+ </goal>
+ <goal name="WP_parameter subst_term_lifting" expl="VC for subst_term_lifting">
+ <proof prover="1"><result status="valid" time="0.60"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_subst_compose" expl="VC for ty_subst_compose">
+ <proof prover="5"><result status="valid" time="0.12" steps="59"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_subst_compose" expl="VC for ty_list_subst_compose">
+ <proof prover="5"><result status="valid" time="0.17" steps="89"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_subst_ho_compose" expl="VC for ty_subst_ho_compose">
+ <proof prover="5"><result status="valid" time="0.11" steps="33"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_subst_ho_compose" expl="VC for ty_list_subst_ho_compose">
+ <proof prover="5"><result status="valid" time="0.14" steps="13"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_subst_compose" expl="VC for pat_subst_compose">
+ <proof prover="5"><result status="valid" time="0.36" steps="421"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_subst_compose" expl="VC for pat_list_subst_compose">
+ <proof prover="5"><result status="valid" time="0.18" steps="88"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_subst_ho_compose" expl="VC for pat_subst_ho_compose">
+ <proof prover="5"><result status="valid" time="0.17" steps="13"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_subst_ho_compose" expl="VC for pat_list_subst_ho_compose">
+ <proof prover="5"><result status="valid" time="0.11" steps="13"/></proof>
+ </goal>
+ <goal name="WP_parameter term_subst_compose" expl="VC for term_subst_compose">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter term_subst_compose.1" expl="1. variant decrease">
+  <proof prover="5"><result status="valid" time="0.16" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.2" expl="2. postcondition">
+  <proof prover="5"><result status="valid" time="0.10" steps="42"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.3" expl="3. variant decrease">
+  <proof prover="5"><result status="valid" time="0.13" steps="109"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.4" expl="4. variant decrease">
+  <proof prover="5"><result status="valid" time="0.15" steps="192"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.5" expl="5. variant decrease">
+  <proof prover="5"><result status="valid" time="0.23" steps="247"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.6" expl="6. postcondition">
+  <proof prover="5"><result status="valid" time="0.10" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.7" expl="7. variant decrease">
+  <proof prover="5"><result status="valid" time="0.15" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.8" expl="8. variant decrease">
+  <proof prover="5"><result status="valid" time="0.15" steps="165"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.9" expl="9. postcondition">
+  <proof prover="5"><result status="valid" time="0.08" steps="31"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.10" expl="10. variant decrease">
+  <proof prover="5"><result status="valid" time="0.15" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.11" expl="11. variant decrease">
+  <proof prover="5"><result status="valid" time="0.15" steps="165"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.12" expl="12. postcondition">
+  <proof prover="5"><result status="valid" time="0.09" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.13" expl="13. variant decrease">
+  <proof prover="5"><result status="valid" time="0.14" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.14" expl="14. postcondition">
+  <proof prover="5"><result status="valid" time="0.12" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.15" expl="15. variant decrease">
+  <proof prover="5"><result status="valid" time="0.14" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.16" expl="16. postcondition">
+  <proof prover="5"><result status="valid" time="0.11" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.17" expl="17. variant decrease">
+  <proof prover="5"><result status="valid" time="0.13" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.18" expl="18. variant decrease">
+  <proof prover="5"><result status="valid" time="0.15" steps="178"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.19" expl="19. postcondition">
+  <proof prover="5"><result status="valid" time="0.10" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.20" expl="20. variant decrease">
+  <proof prover="5"><result status="valid" time="0.13" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.21" expl="21. variant decrease">
+  <proof prover="5"><result status="valid" time="0.15" steps="178"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.22" expl="22. postcondition">
+  <proof prover="5"><result status="valid" time="0.09" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.23" expl="23. variant decrease">
+  <proof prover="5"><result status="valid" time="0.14" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.24" expl="24. variant decrease">
+  <proof prover="5"><result status="valid" time="0.17" steps="178"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.25" expl="25. postcondition">
+  <proof prover="5"><result status="valid" time="0.10" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.26" expl="26. variant decrease">
+  <proof prover="5"><result status="valid" time="0.15" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.27" expl="27. variant decrease">
+  <proof prover="5"><result status="valid" time="0.18" steps="178"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.28" expl="28. postcondition">
+  <proof prover="5"><result status="valid" time="0.09" steps="27"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.29" expl="29. variant decrease">
+  <proof prover="5"><result status="valid" time="0.16" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.30" expl="30. postcondition">
+  <proof prover="5"><result status="valid" time="0.08" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_compose.31" expl="31. postcondition">
+  <proof prover="5"><result status="valid" time="0.10" steps="73"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter term_list_subst_compose" expl="VC for term_list_subst_compose">
+ <proof prover="5"><result status="valid" time="0.20" steps="90"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_subst_compose" expl="VC for branch_list_subst_compose">
+ <proof prover="5"><result status="valid" time="0.22" steps="89"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_subst_compose" expl="VC for branch_subst_compose">
+ <proof prover="5"><result status="valid" time="0.34" steps="62"/></proof>
+ </goal>
+ <goal name="WP_parameter term_subst_ho_compose" expl="VC for term_subst_ho_compose">
+ <proof prover="5"><result status="valid" time="0.08" steps="33"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_subst_ho_compose" expl="VC for term_list_subst_ho_compose">
+ <proof prover="5"><result status="valid" time="0.09" steps="15"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_subst_ho_compose" expl="VC for branch_list_subst_ho_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="15"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_subst_ho_compose" expl="VC for branch_subst_ho_compose">
+ <proof prover="5"><result status="valid" time="0.10" steps="15"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_id" expl="VC for term_list_id">
+ <proof prover="1"><result status="valid" time="0.28"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_subst_id" expl="VC for ty_subst_id">
+ <proof prover="5"><result status="valid" time="0.11" steps="33"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_subst_id" expl="VC for ty_list_subst_id">
+ <proof prover="5"><result status="valid" time="0.09" steps="34"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_subst_ho_id" expl="VC for ty_subst_ho_id">
+ <proof prover="5"><result status="valid" time="0.08" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_subst_ho_id" expl="VC for ty_list_subst_ho_id">
+ <proof prover="5"><result status="valid" time="0.09" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_subst_id" expl="VC for pat_subst_id">
+ <proof prover="5"><result status="valid" time="0.35" steps="266"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_subst_id" expl="VC for pat_list_subst_id">
+ <proof prover="5"><result status="valid" time="0.16" steps="34"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_subst_ho_id" expl="VC for pat_subst_ho_id">
+ <proof prover="5"><result status="valid" time="0.17" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_subst_ho_id" expl="VC for pat_list_subst_ho_id">
+ <proof prover="5"><result status="valid" time="0.15" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter term_subst_id" expl="VC for term_subst_id">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter term_subst_id.1" expl="1. variant decrease">
+  <proof prover="5"><result status="valid" time="0.20" steps="92"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.2" expl="2. postcondition">
+  <proof prover="5"><result status="valid" time="0.12" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.3" expl="3. variant decrease">
+  <proof prover="5"><result status="valid" time="0.29" steps="109"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.4" expl="4. variant decrease">
+  <proof prover="5"><result status="valid" time="0.29" steps="136"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.5" expl="5. variant decrease">
+  <proof prover="5"><result status="valid" time="0.30" steps="163"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.6" expl="6. postcondition">
+  <proof prover="5"><result status="valid" time="0.09" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.7" expl="7. variant decrease">
+  <proof prover="5"><result status="valid" time="0.17" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.8" expl="8. variant decrease">
+  <proof prover="5"><result status="valid" time="0.17" steps="109"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.9" expl="9. postcondition">
+  <proof prover="5"><result status="valid" time="0.10" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.10" expl="10. variant decrease">
+  <proof prover="5"><result status="valid" time="0.17" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.11" expl="11. variant decrease">
+  <proof prover="5"><result status="valid" time="0.16" steps="109"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.12" expl="12. postcondition">
+  <proof prover="5"><result status="valid" time="0.09" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.13" expl="13. variant decrease">
+  <proof prover="5"><result status="valid" time="0.16" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.14" expl="14. postcondition">
+  <proof prover="5"><result status="valid" time="0.14" steps="50"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.15" expl="15. variant decrease">
+  <proof prover="5"><result status="valid" time="0.17" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.16" expl="16. postcondition">
+  <proof prover="5"><result status="valid" time="0.15" steps="50"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.17" expl="17. variant decrease">
+  <proof prover="5"><result status="valid" time="0.16" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.18" expl="18. variant decrease">
+  <proof prover="5"><result status="valid" time="0.18" steps="122"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.19" expl="19. postcondition">
+  <proof prover="5"><result status="valid" time="0.09" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.20" expl="20. variant decrease">
+  <proof prover="5"><result status="valid" time="0.18" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.21" expl="21. variant decrease">
+  <proof prover="5"><result status="valid" time="0.19" steps="122"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.22" expl="22. postcondition">
+  <proof prover="5"><result status="valid" time="0.09" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.23" expl="23. variant decrease">
+  <proof prover="5"><result status="valid" time="0.17" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.24" expl="24. variant decrease">
+  <proof prover="5"><result status="valid" time="0.18" steps="122"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.25" expl="25. postcondition">
+  <proof prover="5"><result status="valid" time="0.09" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.26" expl="26. variant decrease">
+  <proof prover="5"><result status="valid" time="0.30" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.27" expl="27. variant decrease">
+  <proof prover="5"><result status="valid" time="0.29" steps="122"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.28" expl="28. postcondition">
+  <proof prover="5"><result status="valid" time="0.08" steps="5"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.29" expl="29. variant decrease">
+  <proof prover="5"><result status="valid" time="0.14" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.30" expl="30. postcondition">
+  <proof prover="5"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_id.31" expl="31. postcondition">
+  <proof prover="5"><result status="valid" time="0.09" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter term_list_subst_id" expl="VC for term_list_subst_id">
+ <proof prover="5"><result status="valid" time="0.12" steps="34"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_subst_id" expl="VC for branch_list_subst_id">
+ <proof prover="5"><result status="valid" time="0.19" steps="34"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_subst_id" expl="VC for branch_subst_id">
+ <proof prover="5" edited="logic-Commutations-WP_parameter_branch_subst_id_1.why"><result status="valid" time="0.09" steps="5"/></proof>
+ </goal>
+ <goal name="WP_parameter term_subst_ho_id" expl="VC for term_subst_ho_id">
+ <proof prover="5"><result status="valid" time="0.09" steps="8"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_subst_ho_id" expl="VC for term_list_subst_ho_id">
+ <proof prover="5"><result status="valid" time="0.10" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_subst_ho_id" expl="VC for branch_list_subst_ho_id">
+ <proof prover="5"><result status="valid" time="0.09" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_subst_ho_id" expl="VC for branch_subst_ho_id">
+ <proof prover="5"><result status="valid" time="0.09" steps="6"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_map_as_subst" expl="VC for ty_map_as_subst">
+ <proof prover="1"><result status="valid" time="0.25"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_map_as_subst_ho" expl="VC for ty_map_as_subst_ho">
+ <proof prover="1"><result status="valid" time="0.35"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_map_as_subst" expl="VC for ty_list_map_as_subst">
+ <proof prover="1"><result status="valid" time="0.42"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_map_as_subst_ho" expl="VC for ty_list_map_as_subst_ho">
+ <proof prover="1"><result status="valid" time="0.34"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_map_as_subst" expl="VC for pat_map_as_subst">
+ <proof prover="1"><result status="valid" time="0.52"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_map_as_subst_ho" expl="VC for pat_map_as_subst_ho">
+ <proof prover="1"><result status="valid" time="0.41"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_map_as_subst" expl="VC for pat_list_map_as_subst">
+ <proof prover="1"><result status="valid" time="0.56"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_map_as_subst_ho" expl="VC for pat_list_map_as_subst_ho">
+ <proof prover="1"><result status="valid" time="0.40"/></proof>
+ </goal>
+ <goal name="WP_parameter term_map_as_subst" expl="VC for term_map_as_subst">
+ <proof prover="1"><result status="valid" time="0.71"/></proof>
+ </goal>
+ <goal name="WP_parameter term_map_as_subst_ho" expl="VC for term_map_as_subst_ho">
+ <proof prover="1"><result status="valid" time="0.52"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_map_as_subst" expl="VC for term_list_map_as_subst">
+ <proof prover="1"><result status="valid" time="0.65"/></proof>
+ </goal>
+ <goal name="WP_parameter term_list_map_as_subst_ho" expl="VC for term_list_map_as_subst_ho">
+ <proof prover="1"><result status="valid" time="0.56"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_map_as_subst" expl="VC for branch_list_map_as_subst">
+ <proof prover="1"><result status="valid" time="0.72"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_list_map_as_subst_ho" expl="VC for branch_list_map_as_subst_ho">
+ <proof prover="1"><result status="valid" time="0.50"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_map_as_subst" expl="VC for branch_map_as_subst">
+ <proof prover="1"><result status="valid" time="0.63"/></proof>
+ </goal>
+ <goal name="WP_parameter branch_map_as_subst_ho" expl="VC for branch_map_as_subst_ho">
+ <proof prover="1"><result status="valid" time="0.49"/></proof>
+ </goal>
+</theory>
+<theory name="Sem" sum="45c4f2a0d851d638fdbb3fd6a3abc0b8" expanded="true">
+ <goal name="WP_parameter ty_map_sem_compose" expl="VC for ty_map_sem_compose">
+ <proof prover="5"><result status="valid" time="0.21" steps="55"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_map_sem_compose" expl="VC for ty_list_map_sem_compose">
+ <proof prover="5"><result status="valid" time="0.25" steps="70"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_map_sem_compose" expl="VC for pat_map_sem_compose">
+ <proof prover="5"><result status="valid" time="1.54" steps="652"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_map_sem_compose" expl="VC for pat_list_map_sem_compose">
+ <proof prover="5"><result status="valid" time="0.75" steps="154"/></proof>
+ </goal>
+ <goal name="WP_parameter wty_assignment_compose" expl="VC for wty_assignment_compose" expanded="true">
+ <proof prover="5" obsolete="true"><result status="unknown" time="0.41"/></proof>
+ </goal>
+ <goal name="WP_parameter term_map_lift_sem" expl="VC for term_map_lift_sem">
+ <proof prover="5"><result status="valid" time="0.30" steps="29"/></proof>
+ </goal>
+ <goal name="WP_parameter term_map_sem_compose" expl="VC for term_map_sem_compose" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter term_map_sem_compose.1" expl="1. postcondition" expanded="true">
+  <proof prover="5" obsolete="true"><result status="unknown" time="2.78"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.2" expl="2. variant decrease">
+  <proof prover="5"><result status="valid" time="0.42" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.3" expl="3. variant decrease">
+  <proof prover="5"><result status="valid" time="0.48" steps="80"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.4" expl="4. postcondition" expanded="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.04"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.14"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="5" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.5" expl="5. postcondition" expanded="true">
+  <proof prover="5" obsolete="true"><result status="unknown" time="2.20"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.6" expl="6. variant decrease">
+  <proof prover="5"><result status="valid" time="0.37" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.7" expl="7. postcondition" expanded="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.02"/></proof>
+  <proof prover="5" edited="logic-Sem-WP_parameter_term_map_sem_compose_1.why" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.8" expl="8. variant decrease">
+  <proof prover="5"><result status="valid" time="0.44" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.9" expl="9. postcondition" expanded="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.03"/></proof>
+  <proof prover="5" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.10" expl="10. variant decrease">
+  <proof prover="5"><result status="valid" time="0.32" steps="109"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.11" expl="11. variant decrease">
+  <proof prover="5"><result status="valid" time="0.44" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.12" expl="12. variant decrease">
+  <proof prover="5"><result status="valid" time="0.50" steps="105"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.13" expl="13. postcondition">
+  <proof prover="5"><result status="valid" time="0.80" steps="175"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.14" expl="14. variant decrease">
+  <proof prover="5"><result status="valid" time="0.41" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.15" expl="15. variant decrease">
+  <proof prover="5"><result status="valid" time="0.37" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.16" expl="16. postcondition">
+  <proof prover="5"><result status="valid" time="0.77" steps="274"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.17" expl="17. variant decrease">
+  <proof prover="5"><result status="valid" time="0.49" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.18" expl="18. variant decrease">
+  <proof prover="5"><result status="valid" time="0.47" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.19" expl="19. postcondition">
+  <proof prover="5"><result status="valid" time="0.72" steps="201"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.20" expl="20. variant decrease">
+  <proof prover="5"><result status="valid" time="0.34" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.21" expl="21. variant decrease">
+  <proof prover="5"><result status="valid" time="0.41" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.22" expl="22. postcondition">
+  <proof prover="5"><result status="valid" time="0.67" steps="201"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.23" expl="23. variant decrease">
+  <proof prover="5"><result status="valid" time="0.38" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.24" expl="24. variant decrease">
+  <proof prover="5"><result status="valid" time="0.43" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.25" expl="25. postcondition">
+  <proof prover="5"><result status="valid" time="0.74" steps="324"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.26" expl="26. variant decrease">
+  <proof prover="5"><result status="valid" time="0.35" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.27" expl="27. postcondition">
+  <proof prover="5"><result status="valid" time="0.43" steps="123"/></proof>
+  </goal>
+  <goal name="WP_parameter term_map_sem_compose.28" expl="28. postcondition">
+  <proof prover="5"><result status="valid" time="0.44" steps="164"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter ty_subst_sem_compose" expl="VC for ty_subst_sem_compose">
+ <proof prover="5"><result status="valid" time="0.23" steps="56"/></proof>
+ </goal>
+ <goal name="WP_parameter ty_list_subst_sem_compose" expl="VC for ty_list_subst_sem_compose">
+ <proof prover="5"><result status="valid" time="0.39" steps="57"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_subst_sem_compose" expl="VC for pat_subst_sem_compose">
+ <proof prover="5"><result status="valid" time="1.45" steps="620"/></proof>
+ </goal>
+ <goal name="WP_parameter pat_list_subst_sem_compose" expl="VC for pat_list_subst_sem_compose">
+ <proof prover="5"><result status="valid" time="0.64" steps="135"/></proof>
+ </goal>
+ <goal name="WP_parameter term_lift_sem_compose" expl="VC for term_lift_sem_compose" expanded="true">
+ <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="5.02"/></proof>
+ <proof prover="5" obsolete="true"><result status="unknown" time="1.72"/></proof>
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter term_lift_sem_compose.1" expl="1. assertion" expanded="true">
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="5" obsolete="true"><result status="unknown" time="1.33"/></proof>
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="WP_parameter term_lift_sem_compose.1.1" expl="1. assertion" expanded="true">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.98"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.02"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.09"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="5" obsolete="true"><result status="unknown" time="1.35"/></proof>
+   </goal>
+   <goal name="WP_parameter term_lift_sem_compose.1.2" expl="2. assertion" expanded="true">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.98"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.01"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.14"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="5" obsolete="true"><result status="unknown" time="0.98"/></proof>
+   </goal>
+   <goal name="WP_parameter term_lift_sem_compose.1.3" expl="3. assertion">
+   <proof prover="5"><result status="valid" time="0.23" steps="2"/></proof>
+   </goal>
+   <goal name="WP_parameter term_lift_sem_compose.1.4" expl="4. assertion">
+   <proof prover="5"><result status="valid" time="0.25" steps="2"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="WP_parameter term_lift_sem_compose.2" expl="2. postcondition">
+  <proof prover="5"><result status="valid" time="0.36" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter term_subst_sem_compose" expl="VC for term_subst_sem_compose" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter term_subst_sem_compose.1" expl="1. postcondition" expanded="true">
+  <proof prover="5" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.2" expl="2. variant decrease">
+  <proof prover="5"><result status="valid" time="0.48" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.3" expl="3. variant decrease">
+  <proof prover="5"><result status="valid" time="0.41" steps="80"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.4" expl="4. postcondition" expanded="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.03"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.16"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="5" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.5" expl="5. postcondition" expanded="true">
+  <proof prover="5" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.6" expl="6. variant decrease">
+  <proof prover="5"><result status="valid" time="0.37" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.7" expl="7. postcondition" expanded="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.19"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="5" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.8" expl="8. variant decrease">
+  <proof prover="5"><result status="valid" time="0.35" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.9" expl="9. postcondition" expanded="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.02"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.09"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="5" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.10" expl="10. variant decrease">
+  <proof prover="5"><result status="valid" time="0.47" steps="109"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.11" expl="11. variant decrease">
+  <proof prover="5"><result status="valid" time="0.47" steps="107"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.12" expl="12. variant decrease">
+  <proof prover="5"><result status="valid" time="0.44" steps="105"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.13" expl="13. postcondition">
+  <proof prover="5"><result status="valid" time="0.48" steps="195"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.14" expl="14. variant decrease">
+  <proof prover="5"><result status="valid" time="0.43" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.15" expl="15. variant decrease">
+  <proof prover="5"><result status="valid" time="0.43" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.16" expl="16. postcondition">
+  <proof prover="5"><result status="valid" time="0.41" steps="248"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.17" expl="17. variant decrease">
+  <proof prover="5"><result status="valid" time="0.39" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.18" expl="18. variant decrease">
+  <proof prover="5"><result status="valid" time="0.46" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.19" expl="19. postcondition">
+  <proof prover="5"><result status="valid" time="0.36" steps="183"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.20" expl="20. variant decrease">
+  <proof prover="5"><result status="valid" time="0.39" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.21" expl="21. variant decrease">
+  <proof prover="5"><result status="valid" time="0.35" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.22" expl="22. postcondition">
+  <proof prover="5"><result status="valid" time="0.41" steps="148"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.23" expl="23. variant decrease">
+  <proof prover="5"><result status="valid" time="0.31" steps="95"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.24" expl="24. variant decrease">
+  <proof prover="5"><result status="valid" time="0.40" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.25" expl="25. postcondition">
+  <proof prover="5"><result status="valid" time="0.43" steps="229"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.26" expl="26. variant decrease">
+  <proof prover="5"><result status="valid" time="0.31" steps="81"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.27" expl="27. postcondition">
+  <proof prover="5"><result status="valid" time="0.28" steps="118"/></proof>
+  </goal>
+  <goal name="WP_parameter term_subst_sem_compose.28" expl="28. postcondition">
+  <proof prover="5"><result status="valid" time="0.35" steps="221"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

@@ -39,6 +39,14 @@ auto.
 Qed.
 
 (* Why3 goal *)
+Lemma cons_reverse : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a))
+  (x:a),
+  ((Init.Datatypes.cons x (Lists.List.rev l)) = (Lists.List.rev (Init.Datatypes.app l (Init.Datatypes.cons x Init.Datatypes.nil)))).
+intros a a_WT l x.
+now rewrite List.rev_unit.
+Qed.
+
+(* Why3 goal *)
 Lemma reverse_reverse : forall {a:Type} {a_WT:WhyType a},
   forall (l:(list a)), ((Lists.List.rev (Lists.List.rev l)) = l).
 Proof.

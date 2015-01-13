@@ -426,7 +426,24 @@ let check_decl_opacity d = match d.d_node with
           "inductive predicates cannot have opaque type parameters" in
       List.iter check dl
 
-let add_decl uc d =
+let warn_dubious_axiom uc k p syms =
+  match k with
+  | Plemma | Pgoal | Pskip -> ()
+  | Paxiom ->
+    try
+      Sid.iter
+        (fun id ->
+          if Sid.mem id uc.uc_local then
+          match (Ident.Mid.find id uc.uc_known).d_node with
+          | Dtype { ts_def = None } | Dparam _ ->
+            raise Exit
+          | _ -> ())
+        syms;
+      Warning.emit ?loc:p.id_loc "axiom %s does not contain any local abstract symbol"
+        p.id_string
+    with Exit -> ()
+
+let add_decl ?(warn=true) uc d =
   check_decl_opacity d; (* we don't care about tasks *)
   let uc = add_tdecl uc (create_decl d) in
   match d.d_node with
@@ -435,7 +452,9 @@ let add_decl uc d =
     | Dparam ls -> add_symbol add_ls ls.ls_name ls uc
     | Dlogic dl -> List.fold_left add_logic uc dl
     | Dind (_, dl) -> List.fold_left add_ind uc dl
-    | Dprop p   -> add_prop uc p
+    | Dprop ((k,pr,_) as p) ->
+      if warn then warn_dubious_axiom uc k pr.pr_name d.d_syms;
+      add_prop uc p
 
 (** Declaration constructors + add_decl *)
 
@@ -444,7 +463,8 @@ let add_data_decl uc dl = add_decl uc (create_data_decl dl)
 let add_param_decl uc ls = add_decl uc (create_param_decl ls)
 let add_logic_decl uc dl = add_decl uc (create_logic_decl dl)
 let add_ind_decl uc s dl = add_decl uc (create_ind_decl s dl)
-let add_prop_decl uc k p f = add_decl uc (create_prop_decl k p f)
+let add_prop_decl ?warn uc k p f =
+  add_decl ?warn uc (create_prop_decl k p f)
 
 (** Use *)
 
@@ -502,7 +522,10 @@ let empty_clones s = {
 (* populate the clone structure *)
 
 let rec cl_find_ts cl ts =
-  if not (Sid.mem ts.ts_name cl.cl_local) then ts
+  if not (Sid.mem ts.ts_name cl.cl_local) then
+    let td = Opt.map (cl_trans_ty cl) ts.ts_def in
+    if Opt.equal ty_equal ts.ts_def td then ts else
+    create_tysymbol (id_clone ts.ts_name) ts.ts_args td
   else try Mts.find ts cl.ts_table
   with Not_found ->
     let td' = Opt.map (cl_trans_ty cl) ts.ts_def in
@@ -833,7 +856,7 @@ let on_meta _meta fn acc theory =
 (** Base theories *)
 
 let builtin_theory =
-  let uc = empty_theory (id_fresh "BuiltIn") ["why3"] in
+  let uc = empty_theory (id_fresh "BuiltIn") ["why3";"BuiltIn"] in
   let uc = add_ty_decl uc ts_int in
   let uc = add_ty_decl uc ts_real in
   let uc = add_param_decl uc ps_equ in
@@ -843,12 +866,12 @@ let create_theory ?(path=[]) n =
   use_export (empty_theory n path) builtin_theory
 
 let bool_theory =
-  let uc = empty_theory (id_fresh "Bool") ["why3"] in
+  let uc = empty_theory (id_fresh "Bool") ["why3";"Bool"] in
   let uc = add_data_decl uc [ts_bool, [fs_bool_true,[]; fs_bool_false,[]]] in
   close_theory uc
 
 let highord_theory =
-  let uc = empty_theory (id_fresh "HighOrd") ["why3"] in
+  let uc = empty_theory (id_fresh "HighOrd") ["why3";"HighOrd"] in
   let uc = use_export uc bool_theory in
   let uc = add_ty_decl uc ts_func in
   let uc = add_ty_decl uc ts_pred in
@@ -858,12 +881,13 @@ let highord_theory =
 let tuple_theory = Hint.memo 17 (fun n ->
   let ts = ts_tuple n and fs = fs_tuple n in
   let pl = List.map (fun _ -> None) ts.ts_args in
-  let uc = empty_theory (id_fresh ("Tuple" ^ string_of_int n)) ["why3"] in
+  let nm = "Tuple" ^ string_of_int n in
+  let uc = empty_theory (id_fresh nm) ["why3";nm] in
   let uc = add_data_decl uc [ts, [fs,pl]] in
   close_theory uc)
 
 let unit_theory =
-  let uc = empty_theory (id_fresh "Unit") ["why3"] in
+  let uc = empty_theory (id_fresh "Unit") ["why3";"Unit"] in
   let ts = create_tysymbol (id_fresh "unit") [] (Some (ty_tuple [])) in
   let uc = use_export uc (tuple_theory 0) in
   let uc = add_ty_decl uc ts in

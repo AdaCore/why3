@@ -1,4 +1,9 @@
 
+(** Skew heaps
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
 module Heap
 
   use import int.Int
@@ -88,7 +93,7 @@ module SkewHeaps
   let rec lemma root_is_min (t: tree elt) : unit
      requires { heap t && 0 < size t }
      ensures  { is_minimum (minimum t) t }
-     variant  { size t }
+     variant  { t }
   = match t with
     | Empty -> absurd
     | Node l _ r ->

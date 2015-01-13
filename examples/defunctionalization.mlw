@@ -553,7 +553,7 @@ with eval_2b (v1:int) (k:int -> 'a) (kerr : unit -> 'a) : int -> 'a =
 
 
 function interpret_2 (p : prog) : value =
-  eval_2 p (\ n. Vnum n) (\ u. Underflow)
+  eval_2 p (\ n. Vnum n) (\ _. Underflow)
 
 
 lemma cps2_correct_expr_aux:

@@ -156,7 +156,7 @@ type module_uc = {
   muc_known  : known_map;
   muc_local  : Sid.t;
   muc_used   : Sid.t;
-  muc_env    : Env.env;
+  muc_env    : Env.env option;
 }
 (* FIXME? We wouldn't need to store muc_name, muc_path,
    and muc_prefix if theory_uc was exported *)
@@ -350,8 +350,9 @@ let pdecl_vc ~wp env km th d = match d.pd_node with
   | PDlet ld -> Mlw_wp.wp_let ~wp env km th ld
   | PDrec rd -> Mlw_wp.wp_rec ~wp env km th rd
 
-let pdecl_vc ~wp uc d =
-  add_to_theory (pdecl_vc ~wp uc.muc_env uc.muc_known) uc d
+let pdecl_vc ~wp uc d = match uc.muc_env with
+  | Some env -> add_to_theory (pdecl_vc ~wp env uc.muc_known) uc d
+  | None -> uc
 
 let pure_data_decl tdl =
   let proj pj = Opt.map (fun pls -> pls.pl_ls) pj in
@@ -397,31 +398,74 @@ let add_invariant uc its p =
 
 let xs_exit = create_xsymbol (id_fresh "%Exit") ity_unit
 
-let mod_prelude env =
+let mod_prelude =
   let pd_exit = create_exn_decl xs_exit in
   let pd_old = create_val_decl (LetV Mlw_wp.pv_old) in
-  let uc = empty_module env (id_fresh "Prelude") ["why3"] in
+  let uc = empty_module None (id_fresh "Prelude") ["why3";"Prelude"] in
   let uc = use_export_theory uc Mlw_wp.mark_theory in
   let uc = add_pdecl ~wp:false uc pd_old in
   let uc = add_pdecl ~wp:false uc pd_exit in
   close_module uc
 
-let mod_prelude =
-  let one_time = ref None in
-  fun env -> match !one_time with
-    | Some m -> m
-    | None ->
-        let m = mod_prelude env in
-        one_time := Some m;
-        m
-
 let create_module env ?(path=[]) n =
-  let m = empty_module env n path in
+  let m = empty_module (Some env) n path in
   let m = use_export_theory m builtin_theory in
   let m = use_export_theory m bool_theory in
   let m = use_export_theory m unit_theory in
-  let m = use_export m (mod_prelude env) in
+  let m = use_export m mod_prelude in
   m
+
+(** WhyML language *)
+
+type mlw_file = modul Mstr.t * theory Mstr.t
+
+let mlw_language =
+  (Env.register_language Env.base_language snd : mlw_file Env.language)
+
+let () = Env.add_builtin mlw_language (function
+  | [s] when s = mod_prelude.mod_theory.th_name.id_string ->
+      Mstr.singleton s mod_prelude,
+      Mstr.singleton s mod_prelude.mod_theory
+  | _ -> raise Not_found)
+
+let () = Env.add_builtin Env.base_language (function
+  | [s] when s = Mlw_wp.mark_theory.th_name.id_string ->
+      Mstr.singleton s Mlw_wp.mark_theory
+  | _ -> raise Not_found)
+
+exception ModuleNotFound of Env.pathname * string
+exception ModuleOrTheoryNotFound of Env.pathname * string
+
+type module_or_theory = Module of modul | Theory of theory
+
+let read_module env path s =
+  let path = if path = [] then ["why3"; s] else path in
+  let mm, _ = Env.read_library mlw_language env path in
+  Mstr.find_exn (ModuleNotFound (path,s)) s mm
+
+let read_module_or_theory env path s =
+  let path = if path = [] then ["why3"; s] else path in
+  try
+    let mm, mt = Env.read_library mlw_language env path in
+    try Module (Mstr.find s mm) with Not_found ->
+    try Theory (Mstr.find s mt) with Not_found ->
+      raise (ModuleOrTheoryNotFound (path,s))
+  with Env.InvalidFormat _ | Env.LibraryNotFound _ ->
+    let mt = Env.read_library Env.base_language env path in
+    try Theory (Mstr.find s mt) with Not_found ->
+      raise (ModuleOrTheoryNotFound (path,s))
+
+let print_path fmt sl =
+  Pp.print_list (Pp.constant_string ".") Format.pp_print_string fmt sl
+
+let () = Exn_printer.register (fun fmt e -> match e with
+  | ModuleNotFound (sl,s) -> Format.fprintf fmt
+      "Theory %s not found in library %a" s print_path sl
+  | ModuleOrTheoryNotFound (sl,s) -> Format.fprintf fmt
+      "Module/theory %s not found in library %a" s print_path sl
+  | TooLateInvariant -> Format.fprintf fmt
+      "Cannot add a type invariant after another program declaration"
+  | _ -> raise e)
 
 (** Clone *)
 
@@ -555,7 +599,11 @@ let clone_export uc m minst inst =
           Loc.errorm "Extra effects in program symbol instantiation";
         if not (Spv.subset nps.ps_pvset (aty_pvset aty)) then
           Loc.errorm "Extra hidden state in program symbol instantiation";
-        rnth := Mlw_wp.wp_rec ~wp:true uc.muc_env uc.muc_known !rnth [fd];
+        begin match uc.muc_env with
+        | Some env ->
+            rnth := Mlw_wp.wp_rec ~wp:true env uc.muc_known !rnth [fd]
+        | None -> ()
+        end;
         Hid.add psh ps.ps_name (PS nps);
         uc
     | PDval (LetA { ps_name = id; ps_ghost = ghost; ps_aty = aty }) ->

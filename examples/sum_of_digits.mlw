@@ -21,6 +21,7 @@ module Euler290
   use import ref.Ref
   use import int.EuclideanDivision as E
   use import int.Power
+  use int.NumOf
 
   function sum_digits int : int
 
@@ -29,36 +30,33 @@ module Euler290
 
   (* the number of n st 0 <= n mod 10 < c and sd(n) = sd(137n+a)+b *)
 
-  type int3 = (int,int,int)
-
-  predicate p (d: int3) (n: int) =
-    let (a,b,c) = d in
+  predicate p (a b c n: int) =
     0 <= mod n 10 < c /\ sum_digits n = sum_digits (137 * n + a) + b
 
-  clone int.NumOfParam as P with type param = int3, predicate pr = p
+  function numof (a b c: int) (l u: int) : int =
+    NumOf.numof (\ n. p a b c n) l u
 
-  function solution(a b m: int) : int = P.num_of (a,b,10) 0 (power 10 m)
+  function solution(a b m: int) : int = numof a b 10 0 (power 10 m)
 
   (* shortcut for the number of n st n mod 10 = c and ... *)
 
-  function num_of_modc (d: int3) (x y: int) : int =
-    let (a,b,c) = d in
-    P.num_of (a,b,c+1) x y - P.num_of (a,b,c) x y
+  function num_of_modc (a b c: int) (x y: int) : int =
+    numof a b (c+1) x y - numof a b c x y
 
   (* helper lemmas *)
 
   lemma Base:
-    forall a b: int. 0 <= a -> sum_digits a + b = 0 -> p (a,b,10) 0
+    forall a b: int. 0 <= a -> sum_digits a + b = 0 -> p a b 10 0
 
   lemma Empty:
-    forall a b x y: int. P.num_of (a,b,0) x y = 0
+    forall a b x y: int. numof a b 0 x y = 0
 
   lemma Induc:
     forall a b c: int,m:int. 0 <= a -> 0 <= c < 10 -> m > 0 ->
     let x = 137 * c + a in
     let a' = div x 10 in
     let b' = mod x 10 + b - c in
-    solution a' b' (m-1) = num_of_modc (a,b,c) 0 (power 10 m)
+    solution a' b' (m-1) = num_of_modc a b c 0 (power 10 m)
 
   (* code *)
 
@@ -83,7 +81,7 @@ module Euler290
       let sum = ref 0 in
       let ghost p = power 10 m in
       for c = 0 to 9 do (* count the n st n mod 10 = c *)
-        invariant { !sum = P.num_of (a,b,c) 0 p }
+        invariant { !sum = numof a b c 0 p }
         'L:
         let x = 137 * c + a in
         let q = div x 10 in
@@ -91,7 +89,7 @@ module Euler290
         let b' = (r+b-c) in
         sum := !sum + f (m-1) q b';
         assert { q = E.div x 10 && r = E.mod x 10 &&
-          !sum - !(at sum 'L) = num_of_modc (a,b,c) 0 p }
+          !sum - !(at sum 'L) = num_of_modc a b c 0 p }
       done;
       !sum
     end

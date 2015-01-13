@@ -1,0 +1,206 @@
+
+module ReflTransClosure
+
+  type parameter
+  type state
+  predicate transition parameter state state
+
+  inductive transition_star parameter (x y:state) =
+    | Refl: forall p x. transition_star p x x
+    | Step: forall p x y z.
+        transition p x y -> transition_star p y z -> transition_star p x z
+
+  lemma transition_star_one: forall p s1 s2.
+    transition p s1 s2 -> transition_star p s1 s2
+
+  lemma transition_star_transitive: forall p s1 s2 s3.
+    transition_star p s1 s2 -> transition_star p s2 s3 ->
+      transition_star p s1 s3
+
+end
+
+
+(******************************************************************************)
+
+(* The machine operates on a code c (a fixed list of instructions)
+   and three variable components:
+    - a program counter, denoting a position in c
+    - a state assigning integer values to variables
+    - an evaluation stack, containing integers.
+*)
+
+module Vm "Virtual Machine for IMP language"
+
+  use import state.State
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+
+  type pos = int                           (* read position on stack        *)
+  type stack = list int                    (* stack contains just integers  *)
+  type machine_state = VMS pos stack state (* virtual machine configuration *)
+
+
+  (* The instruction set of the machine.  *)
+  type instr =
+    | Iconst int   (*   push n on stack                               *)
+    | Ivar id      (*   push the value of variable                    *)
+    | Isetvar id   (*   pop an integer, assign it to variable         *)
+    | Ibranch pos  (*   skip ofs instructions                         *)
+    | Iadd         (*   pop two values, push their sum                *)
+    | Isub         (*   pop two values, push their difference         *)
+    | Imul         (*   pop two values, push their product            *)
+    | Ibeq pos     (*   pop n2, pop n1, skip ofs forward if n1 =  n2  *)
+    | Ibne pos     (*   pop n2, pop n1, skip ofs forward if n1 <> n2  *)
+    | Ible pos     (*   pop n2, pop n1, skip ofs forward if n1 <= n2  *)
+    | Ibgt pos     (*   pop n2, pop n1, skip ofs forward if n1 >  n2  *)
+    | Ihalt        (*   end of program                                *)
+
+  type code = list instr
+
+  (* Read pointer to code *)
+  inductive codeseq_at code pos code =
+    | codeseq_at_intro : forall c1 c2 c3.
+        codeseq_at (c1 ++ c2 ++ c3) (length c1) c2
+
+
+  lemma codeseq_at_app_right: forall c c1 c2 p.
+    codeseq_at c p (c1 ++ c2) -> codeseq_at c (p + length c1) c2
+
+
+  lemma codeseq_at_app_left: forall c c1 c2 p.
+    codeseq_at c p (c1 ++ c2) -> codeseq_at c p c1
+
+  function push (n:int) (s:stack) : stack = Cons n s
+  function iconst (n:int) : code = Cons (Iconst n) Nil
+  function ivar (x:id) : code  = Cons (Ivar x) Nil
+  function isetvar (x:id) : code = Cons (Isetvar x) Nil
+  constant iadd : code = Cons Iadd Nil
+  constant isub : code = Cons Isub Nil
+  constant imul : code = Cons Imul Nil
+  function ibeq (ofs:int) : code = Cons (Ibeq ofs) Nil
+  function ible (ofs:int) : code = Cons (Ible ofs) Nil
+  function ibne (ofs:int) : code = Cons (Ibne ofs) Nil
+  function ibgt (ofs:int) : code = Cons (Ibgt ofs) Nil
+  function ibranch (ofs:int) : code = Cons (Ibranch ofs) Nil
+  constant ihalt : code = (Cons Ihalt Nil)
+
+(* The semantics of the virtual machine is given in small-step style,
+   as a transition relation between machine states: triples (program
+   counter, evaluation stack, variable state). The transition relation is
+   parameterized by the code c. There is one transition rule for each
+   kind of instruction, except Ihalt, which has no transition. *)
+
+ inductive transition code machine_state machine_state =
+   | trans_const : forall c p n. codeseq_at c p (iconst n) ->
+       forall s m. transition c (VMS p s m) (VMS (p + 1) (push n s) m)
+
+   | trans_var : forall c p x. codeseq_at c p (ivar x) ->
+       forall s m. transition c (VMS p s m) (VMS (p + 1) (push m[x] s) m)
+
+   | trans_set_var: forall c p x. codeseq_at c p (isetvar x) ->
+       forall n s m. transition c (VMS p (push n s) m) (VMS (p + 1) s m[x<-n])
+
+   | trans_add : forall c p. codeseq_at c p iadd ->
+       forall n1 n2 s m. transition c (VMS p (push n2 (push n1 s)) m)
+                                   (VMS (p + 1) (push (n1 + n2) s) m)
+
+   | trans_sub : forall c p. codeseq_at c p isub ->
+       forall n1 n2 s m. transition c (VMS p (push n2 (push n1 s)) m)
+                                   (VMS (p + 1) (push (n1 - n2) s) m)
+
+   | trans_mul : forall c p. codeseq_at c p imul ->
+       forall n1 n2 s m. transition c (VMS p (push n2 (push n1 s)) m)
+                                   (VMS (p + 1) (push (n1 * n2) s) m)
+
+   | trans_beq: forall c p1 ofs. codeseq_at c p1 (ibeq ofs) ->
+       forall s m n1 n2. transition c (VMS p1 (push n2 (push n1 s)) m)
+                  (VMS (if n1 = n2 then p1 + 1 + ofs else p1 + 1) s m)
+
+   | trans_bne: forall c p1 ofs. codeseq_at c p1 (ibne ofs) ->
+       forall s m n1 n2. transition c (VMS p1 (push n2 (push n1 s)) m)
+                 (VMS (if n1 = n2 then p1 + 1 else p1 + 1 + ofs) s  m)
+
+   | trans_ble: forall c p1 ofs. codeseq_at c p1 (ible ofs) ->
+       forall s m n1 n2. transition c (VMS p1 (push n2 (push n1 s)) m)
+                (VMS (if n1 <= n2 then p1 + 1 + ofs else p1 + 1)  s m)
+
+   | trans_bgt: forall c p1 ofs. codeseq_at c p1 (ibgt ofs) ->
+       forall s m n1 n2. transition c (VMS p1 (push n2 (push n1 s)) m)
+                (VMS (if n1 <= n2 then p1 + 1 else p1 + 1 + ofs) s  m)
+
+   | trans_branch: forall c p ofs. codeseq_at c p (ibranch ofs) ->
+       forall s m. transition c (VMS p s m) (VMS (p + 1 + ofs) s m)
+
+  (* As usual with small-step semantics, we form sequences of machine
+     transitions to define the behavior of a code. We always start with pc
+     = 0 and an empty evaluation stack. We stop successfully if pc points
+     to an Ihalt instruction and the evaluation stack is empty. *)
+
+  clone export ReflTransClosure with type parameter = code,
+    type state = machine_state, predicate transition = transition
+
+  predicate vm_stuck (c:code) (msi msf:machine_state) =
+    transition_star c msi msf /\ (forall ms'. not transition c msf ms')
+
+end
+
+module VMClock
+  
+  use import HighOrd
+  use import state.State
+  use import int.Int
+  use import list.List
+  use import list.Length
+  use import list.Append
+  use import list.Nth
+  use import list.NthLengthAppend
+  use import option.Option
+  use import Vm
+  
+  type clock_state = VMC pos stack state int
+  type parameter = (code,clock_state -> bool)
+  
+  predicate transition_out (p:(code,clock_state -> bool))
+    (mc1 mc2:clock_state) =
+    let (c,inside) = p in
+    not inside mc1 /\ not inside mc2 /\
+    let VMC p1 s1 m1 c1 = mc1 in let VMC p2 s2 m2 c2 = mc2 in
+    transition c (VMS p1 s1 m1) (VMS p2 s2 m2) /\ c2 = c1 + 1
+  
+  clone ReflTransClosure as C with type parameter = parameter,
+    type state = clock_state, predicate transition = transition_out
+  
+  lemma transition_star_endpoints : forall c p s0 s1.
+    C.transition_star (c,p) s0 s1 -> s0 <> s1 -> not p s0 /\ not p s1
+  
+  lemma transition_star_weakening : forall c p q s0 s1.
+    (forall x. q x -> p x) ->
+    C.transition_star (c,p) s0 s1 ->
+    C.transition_star (c,q) s0 s1
+  
+  let lemma transition_deterministic (c:code) (ms ms' ms'':machine_state) : unit
+    requires { transition c ms ms' }
+    requires { transition c ms ms'' }
+    ensures { ms' = ms'' }
+  = assert { forall p i.
+      ("inversion" codeseq_at c p (Cons i Nil)) -> nth p c = Some i }
+  
+  lemma transition_out_deterministic : forall p mc1 mc2 mc3.
+    transition_out p mc1 mc2 /\ transition_out p mc1 mc3 -> mc2 = mc3
+  
+  
+  let lemma halt_stuck (c:code) (p:pos) (s:stack) (m:state) : unit
+    requires { codeseq_at c p ihalt }
+    ensures { forall ms'. not transition c (VMS p s m) ms' }
+  = assert { forall p i. codeseq_at c p (Cons i Nil) -> nth p c = Some i }
+  
+end
+
+(*
+Local Variables:
+compile-command: "why3ide -L . vm.mlw"
+End:
+*)
+

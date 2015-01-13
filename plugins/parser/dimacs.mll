@@ -43,7 +43,7 @@ let get_indice i =
   else assert false
 
 let init_vars th_uc nb_var =
-  let a = Array.create (nb_var*2) Term.t_true in
+  let a = Array.make (nb_var*2) Term.t_true in
   let th = ref th_uc in
   for i = nb_var downto -nb_var do
     if i <> 0 then
@@ -125,21 +125,16 @@ let parse th_uc filename cin =
     let th_uc, vars = init_vars th_uc nb_vars in
     file th_uc vars 0 lexbuf) lb
 
-
 let parse _env _path filename cin =
   let th_uc = Theory.create_theory (Ident.id_fresh "Cnf") in
   let th_uc = parse th_uc filename cin in
   let pr = Decl.create_prsymbol (Ident.id_fresh "false") in
   let th_uc = Theory.add_prop_decl th_uc Decl.Pgoal pr Term.t_false in
-  (), Mstr.singleton "Cnf" (Theory.close_theory th_uc)
+  Mstr.singleton "Cnf" (Theory.close_theory th_uc)
 
-let library_of_env = Env.register_format "Dimacs" ["cnf"] parse
+let () = Env.register_format Env.base_language "dimacs" ["cnf"] parse
   ~desc:"@[<hov>Parser for dimacs format.@]"
-
-
 }
-
-
 
 (*
 Local Variables:

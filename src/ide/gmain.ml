@@ -18,8 +18,6 @@ open Gconfig
 open Stdlib
 open Debug
 
-open Why3session
-
 module C = Whyconf
 
 external reset_gc : unit -> unit = "ml_reset_gc"
@@ -70,7 +68,7 @@ let gconfig = try
     exit 1
 
 let () =
-  Debug.dprintf debug "[Info] Init the GTK interface...@?";
+  Debug.dprintf debug "[GUI] Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());
   Debug.dprintf debug " done.@.";
   Gconfig.init ()
@@ -197,6 +195,14 @@ let () =
   in ()
 
 
+let strategies_frame =
+  GBin.frame ~label:"Strategies" ~shadow_type:`ETCHED_OUT
+    ~packing:(tools_window_vbox#pack ~expand:false) ()
+
+let strategies_box =
+  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+  ~packing:strategies_frame#add ()
+
 let provers_frame =
   GBin.frame ~label:"Provers" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
@@ -208,14 +214,6 @@ let provers_box =
 
 let () = provers_frame#set_resize_mode `PARENT
 
-let strategies_frame =
-  GBin.frame ~label:"Strategies" ~shadow_type:`ETCHED_OUT
-    ~packing:(tools_window_vbox#pack ~expand:false) ()
-
-let strategies_box =
-  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-  ~packing:strategies_frame#add ()
-
 let tools_frame =
   GBin.frame ~label:"Tools" ~shadow_type:`ETCHED_OUT
     ~packing:(tools_window_vbox#pack ~expand:false) ()
@@ -223,14 +221,6 @@ let tools_frame =
 let tools_box =
   GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
   ~packing:tools_frame#add ()
-
-let cleaning_frame =
-  GBin.frame ~label:"Cleaning" ~shadow_type:`ETCHED_OUT
-    ~packing:(tools_window_vbox#pack ~expand:false) ()
-
-let cleaning_box =
-  GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
-  ~packing:cleaning_frame#add ()
 
 let monitor_frame =
   GBin.frame ~label:"Proof monitoring" ~shadow_type:`ETCHED_OUT
@@ -319,7 +309,7 @@ let () =
   view_time_column#set_visible true
 
 let goals_model,goals_view =
-  Debug.dprintf debug "[Info] Creating tree model...@?";
+  Debug.dprintf debug "[GUI] Creating tree model...@?";
   let model = GTree.tree_store cols in
   let view = GTree.view ~model ~packing:scrollview#add () in
   let () = view#selection#set_mode (* `SINGLE *) `MULTIPLE in
@@ -414,10 +404,14 @@ module S = Session
 let session_needs_saving = ref false
 
 let set_row_status row b =
-  if b then
-    goals_model#set ~row:row#iter ~column:status_column !image_yes
-  else
-    goals_model#set ~row:row#iter ~column:status_column !image_unknown
+  match b with
+  | Some t ->
+    goals_model#set ~row:row#iter ~column:status_column !image_yes;
+    let t = Format.sprintf "%.2f" t in
+    goals_model#set ~row:row#iter ~column:time_column t
+  | None ->
+    goals_model#set ~row:row#iter ~column:status_column !image_unknown;
+    goals_model#set ~row:row#iter ~column:time_column ""
 
 let set_proof_state a =
   let obsolete = a.S.proof_obsolete in
@@ -426,11 +420,17 @@ let set_proof_state a =
   goals_model#set ~row:row#iter ~column:status_column
     (image_of_result ~obsolete res);
   let t = match res with
-    | S.Done { Call_provers.pr_time = time } ->
+    | S.Done { Call_provers.pr_time = time; Call_provers.pr_steps = steps } ->
+       let s = 
         if gconfig.show_time_limit then
           Format.sprintf "%.2f [%d.0]" time a.S.proof_timelimit
         else
           Format.sprintf "%.2f" time
+       in
+       if steps >= 0 then 
+	 Format.sprintf "%s (steps: %d)" s steps
+       else
+	 s
     | S.Unedited -> "(not yet edited)"
     | S.JustEdited -> "(edited)"
     | S.InternalFailure _ -> "(internal failure)"
@@ -498,7 +498,9 @@ let env_session () =
     | None -> assert false
     | Some e -> e
 
-let task_text t = Pp.string_of Pretty.print_task t
+let task_text t =
+  let max_boxes = (Gconfig.config ()).max_boxes in
+  Pp.string_of ~max_boxes Pretty.print_task t
 
 let split_transformation = "split_goal_wp"
 let inline_transformation = "inline_goal"
@@ -709,18 +711,18 @@ let project_dir =
       if Sys.is_directory fname then
         begin
           Debug.dprintf debug
-            "[Info] found directory '%s' for the project@." fname;
+            "[GUI] found directory '%s' for the project@." fname;
           fname
         end
       else
         if Queue.is_empty files then (* that was the only file *) begin
-          Debug.dprintf debug "[Info] found regular file '%s'@." fname;
+          Debug.dprintf debug "[GUI] found regular file '%s'@." fname;
           let d =
             try Filename.chop_extension fname
             with Invalid_argument _ -> fname
           in
           Debug.dprintf debug
-            "[Info] using '%s' as directory for the project@." d;
+            "[GUI] using '%s' as directory for the project@." d;
           Queue.push fname files; (** we need to open [fname] *)
           d
         end
@@ -740,7 +742,7 @@ let project_dir =
 let () =
   if not (Sys.file_exists project_dir) then
     begin
-      Debug.dprintf debug "[Info] '%s' does not exist. \
+      Debug.dprintf debug "[GUI] '%s' does not exist. \
         Creating directory of that name for the project@." project_dir;
       Unix.mkdir project_dir 0o777
     end
@@ -773,23 +775,38 @@ let file_info = GMisc.label ~text:""
 
 let warnings = Queue.create ()
 
-let record_warning ?loc msg = Queue.push (loc,msg) warnings
+let record_warning ?loc msg =
+  Format.eprintf "%awarning: %s@."
+    (Pp.print_option Loc.report_position) loc msg;
+  Queue.push (loc,msg) warnings
 
 let () = Warning.set_hook record_warning
 
 let display_warnings () =
   if Queue.is_empty warnings then () else
     begin
+      let nwarn = ref 0 in
+      begin try
       Queue.iter
         (fun (loc,msg) ->
-          match loc with
-            | None ->
-              Format.fprintf Format.str_formatter "%s@\n" msg
-            | Some l ->
-            (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
-              Format.fprintf Format.str_formatter "%a: %s@\n"
-                Loc.gen_report_position l msg)
-        warnings;
+         if !nwarn = 4 then
+           begin
+             Format.fprintf Format.str_formatter "[%d more warnings. See stderr for details]@\n" (Queue.length warnings - !nwarn);
+             raise Exit
+           end
+         else
+           begin
+             incr nwarn;
+             match loc with
+             | None ->
+                Format.fprintf Format.str_formatter "%s@\n@\n" msg
+             | Some l ->
+                (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+                Format.fprintf Format.str_formatter "%a: %s@\n@\n"
+                               Loc.gen_report_position l msg
+           end) warnings;
+        with Exit -> ();
+      end;
       Queue.clear warnings;
       let msg =
         Format.flush_str_formatter ()
@@ -811,25 +828,25 @@ let () =
 
 let sched =
   try
-    Debug.dprintf debug "@[<hov 2>[Info] Opening session...@\n";
-    let session =
+    Debug.dprintf debug "@[<hov 2>[GUI session] Opening session...@\n";
+    let session,use_shapes =
       if Sys.file_exists project_dir then
         S.read_session project_dir
       else
-        S.create_session project_dir
+        S.create_session project_dir, false
     in
     let env,(_:bool),(_:bool) =
-      M.update_session ~allow_obsolete:true session gconfig.env
-        gconfig.Gconfig.config
+      M.update_session ~allow_obsolete:true ~release:false ~use_shapes
+        session gconfig.env gconfig.Gconfig.config
     in
-    Debug.dprintf debug "@]@\n[Info] Opening session: update done@.  @[<hov 2>";
+    Debug.dprintf debug "@]@\n[GUI session] Opening session: update done@.  @[<hov 2>";
     let sched = M.init (gconfig.session_nb_processes)
     in
-    Debug.dprintf debug "@]@\n[Info] Opening session: done@.";
+    Debug.dprintf debug "@]@\n[GUI session] Opening session: done@.";
     session_needs_saving := false;
     current_env_session := Some env;
     sched
-  with e ->
+  with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "@[Error while opening session:@ %a@.@]"
       Exn_printer.exn_printer e;
     exit 1
@@ -841,12 +858,12 @@ let sched =
 
 let open_file ?(start=false) f =
   let f = Sysutil.relativize_filename project_dir f in
-  Debug.dprintf debug "Adding file '%s'@." f;
+  Debug.dprintf debug "[GUI session] Adding file '%s'@." f;
   if S.PHstr.mem (env_session()).S.session.S.session_files f then
-    Debug.dprintf debug "[Info] file %s already in database@." f
+    Debug.dprintf debug "[GUI] file %s already in database@." f
   else
     try
-      Debug.dprintf debug "[Info] adding file %s in database@." f;
+      Debug.dprintf debug "[GUI] adding file %s in database@." f;
       ignore (M.add_file (env_session()) ?format:!opt_parser f);
     with e ->
       if start
@@ -992,6 +1009,7 @@ let bisect_proof_attempt pa =
         M.schedule_proof_attempt
           ~timelimit:!timelimit
           ~memlimit:pa.S.proof_memlimit
+	  ~stepslimit:(-1)
           ?old:(S.get_edited_as_abs eS.S.session pa)
           (** It is dangerous, isn't it? to be in place for bisecting? *)
           ~inplace:lp.S.prover_config.C.in_place
@@ -1029,6 +1047,7 @@ let bisect_proof_attempt pa =
             M.schedule_proof_attempt
               ~timelimit:!timelimit
               ~memlimit:pa.S.proof_memlimit
+	      ~stepslimit:(-1)
               ?old:(S.get_edited_as_abs eS.S.session pa)
               ~inplace:lp.S.prover_config.C.in_place
               ~command:(C.get_complete_command lp.S.prover_config)
@@ -1181,7 +1200,7 @@ let (_ : GMenu.image_menu_item) =
 
 let save_session () =
   if !session_needs_saving then begin
-    Debug.dprintf debug "[Info] saving session@.";
+    Debug.dprintf debug "[GUI] saving session@.";
     S.save_session gconfig.config (env_session()).S.session;
     session_needs_saving := false;
   end
@@ -1266,13 +1285,13 @@ let (_ : GMenu.image_menu_item) =
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
 
 let rec collapse_verified = function
-  | S.Goal g when g.S.goal_verified ->
+  | S.Goal g when Opt.inhabited g.S.goal_verified ->
     let row = g.S.goal_key in
     goals_view#collapse_row row#path
-  | S.Theory th when th.S.theory_verified ->
+  | S.Theory th when Opt.inhabited th.S.theory_verified ->
     let row = th.S.theory_key in
     goals_view#collapse_row row#path
-  | S.File f when f.S.file_verified ->
+  | S.File f when Opt.inhabited f.S.file_verified ->
     let row = f.S.file_key in
     goals_view#collapse_row row#path
   | any -> S.iter collapse_verified any
@@ -1421,10 +1440,10 @@ let () =
   add_gui_item add_item_provers
 
 let split_strategy =
-  [| M.Itransform(split_transformation,1) |]
+  [| Strategy.Itransform(split_transformation,1) |]
 
 let inline_strategy =
-  [| M.Itransform(inline_transformation,1) |]
+  [| Strategy.Itransform(inline_transformation,1) |]
 
 let test_strategy () =
   let config = gconfig.Gconfig.config in
@@ -1437,11 +1456,11 @@ let test_strategy () =
     Whyconf.filter_one_prover config fp
   in
   [|
-    M.Icall_prover(altergo.Whyconf.prover,1,1000);
-    M.Icall_prover(cvc4.Whyconf.prover,1,1000);
-    M.Itransform(split_transformation,0); (* goto 0 on success *)
-    M.Icall_prover(altergo.Whyconf.prover,10,4000);
-    M.Icall_prover(cvc4.Whyconf.prover,10,4000);
+    Strategy.Icall_prover(altergo.Whyconf.prover,1,1000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,1,1000);
+    Strategy.Itransform(split_transformation,0); (* goto 0 on success *)
+    Strategy.Icall_prover(altergo.Whyconf.prover,10,4000);
+    Strategy.Icall_prover(cvc4.Whyconf.prover,10,4000);
   |]
 
 (*
@@ -1504,13 +1523,13 @@ let strategies () =
             let name = st.Whyconf.strategy_name in
             try
               let code = st.Whyconf.strategy_code in
-              let len = Array.length code in
+              let code = Strategy_parser.parse (env_session()) code in
               let shortcut = load_shortcut st.Whyconf.strategy_shortcut in
-              let code = Array.map (M.parse_instr (env_session()) len) code in
-              Format.eprintf "Strategy '%s' loaded.@." name;
-              (name, st.Whyconf.strategy_desc,code, shortcut) :: acc
-            with M.SyntaxError msg ->
-              Format.eprintf "Loading strategy '%s' failed: %s@." name msg;
+              Format.eprintf "[GUI] Strategy '%s' loaded.@." name;
+              (name, st.Whyconf.strategy_desc, code, shortcut) :: acc
+            with Strategy_parser.SyntaxError msg ->
+              Format.eprintf
+                "[GUI warning] Loading strategy '%s' failed: %s@." name msg;
               acc)
           []
           strategies
@@ -1966,10 +1985,12 @@ let reload () =
     (** reload the session *)
     let old_session = (env_session()).S.session in
     let new_env_session,(_:bool),(_:bool) =
-      M.update_session ~allow_obsolete:true old_session gconfig.env
-        gconfig.Gconfig.config
+      (* use_shapes is true since session is in memory *)
+      M.update_session ~allow_obsolete:true ~release:false ~use_shapes:true
+        old_session gconfig.env gconfig.Gconfig.config
     in
-    current_env_session := Some new_env_session
+    current_env_session := Some new_env_session;
+    display_warnings ()
   with
     | e ->
         let e = match e with
@@ -2158,7 +2179,7 @@ let () =
   add_tool_item "Clean selection" clean_selection
 
 let () =
-  let b = GButton.button ~packing:cleaning_box#add ~label:"Remove" () in
+  let b = GButton.button ~packing:tools_box#add ~label:"Remove" () in
   b#misc#set_tooltip_markup "Remove selected <b>proof attempts</b> and \
 <b>transformations</b>";
   let i = GMisc.image ~pixbuf:(!image_remove) () in
@@ -2168,7 +2189,7 @@ let () =
   in ()
 
 let () =
-  let b = GButton.button ~packing:cleaning_box#add ~label:"Clean" () in
+  let b = GButton.button ~packing:tools_box#add ~label:"Clean" () in
   b#misc#set_tooltip_markup "Remove unsuccessful <b>proof attempts</b> \
 associated to proved goals";
   let i = GMisc.image ~pixbuf:(!image_cleaning) () in

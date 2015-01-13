@@ -1,0 +1,67 @@
+(**
+
+Proof of Tarski fixed point theorem (existence of least fixed point)
+for finite sets, using lemma functions.
+
+Authors:  Martin Clochard
+          Léon Gondelman
+*)
+
+
+module Tarski
+
+  use import set.Fset
+  clone export relations.PartialOrder
+
+  constant a : set t
+
+  constant e : t
+  axiom minimality: mem e a /\ forall x. mem x a -> rel e x
+
+  function f t : t
+  axiom range: forall x. mem x a -> mem (f x) a
+  axiom monotone: forall x y. mem x a -> mem y a -> rel x y -> rel (f x) (f y)
+
+  predicate fixpoint (x:t) = mem x a /\ f x = x
+
+end
+
+module Tarski_rec
+  use import set.Fset
+  clone export Tarski
+
+  let lemma least_fix_point () : unit
+   ensures {exists mu. fixpoint mu /\ forall x. fixpoint x -> rel mu x }
+   = let rec aux (x: t) (b: set t) : t
+       requires { mem x a /\ subset b a }
+       requires { forall y. mem y a -> rel x y -> mem y b }
+       requires { forall y. fixpoint y -> rel x y }
+       requires { rel x (f x) }
+       ensures  { fixpoint result /\ forall x. fixpoint x -> rel result x }
+       variant  { cardinal b }
+     = let y = f x in if x = y then x else aux y (remove x b)
+     in let _witness = aux e a in ()
+end
+
+module Tarski_while
+  use import set.Fset
+  clone export Tarski
+  use import ref.Ref
+
+  let lemma least_fix_point () : unit
+   ensures {exists mu. fixpoint mu /\ forall x. fixpoint x -> rel mu x }
+   =
+     let x = ref e in
+     let b = ref a in
+     while (f !x) <> !x do
+      invariant { mem !x a /\ subset !b a}
+      invariant { forall y. mem y a -> rel !x y -> mem y !b }
+      invariant { forall y. fixpoint y -> rel !x y }
+      invariant { rel !x (f !x) }
+      variant   { cardinal !b }
+      b := remove !x !b;
+      x := f !x
+     done
+
+end
+

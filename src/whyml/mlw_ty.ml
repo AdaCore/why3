@@ -205,11 +205,8 @@ let ity_fold fn acc ity = match ity.ity_node with
   | Itypur (_,tl)
   | Ityapp (_,tl,_) -> List.fold_left fn acc tl
 
-let ity_all pr ity =
-  try ity_fold (Util.all_fn pr) true ity with Util.FoldSkip -> false
-
-let ity_any pr ity =
-  try ity_fold (Util.any_fn pr) false ity with Util.FoldSkip -> true
+let ity_all pr ity = Util.all ity_fold pr ity
+let ity_any pr ity = Util.any ity_fold pr ity
 
 (* symbol-wise map/fold *)
 
@@ -220,13 +217,8 @@ let rec ity_s_fold fn fts acc ity = match ity.ity_node with
       let acc = List.fold_left (ity_s_fold fn fts) (fn acc f) tl in
       List.fold_left (fun acc r -> ity_s_fold fn fts acc r.reg_ity) acc rl
 
-let ity_s_all pr pts ity =
-  try ity_s_fold (Util.all_fn pr) (Util.all_fn pts) true ity
-  with Util.FoldSkip -> false
-
-let ity_s_any pr pts ity =
-  try ity_s_fold (Util.any_fn pr) (Util.any_fn pts) false ity
-  with Util.FoldSkip -> true
+let ity_s_all pr pts ity = Util.alld ity_s_fold pr pts ity
+let ity_s_any pr pts ity = Util.anyd ity_s_fold pr pts ity
 
 (* traversal functions on type variables and regions *)
 
@@ -703,6 +695,10 @@ let eff_full_inst sbs e =
   let add_readonly r =
     let r = Mreg.find r s in if Sreg.mem r wr then raise (IllegalAlias r) in
   Sreg.iter add_readonly ro;
+  (* all type variables are instantiated outside wr *)
+  let check_tv _ ity = Sreg.iter (fun r ->
+    if reg_occurs r ity.ity_vars then raise (IllegalAlias r)) wr in
+  Mtv.iter check_tv sbs.ity_subst_tv;
   (* calculate instantiated effect *)
   let add_sreg r acc = Sreg.add (Mreg.find r s) acc in
   let add_mreg r v acc =
