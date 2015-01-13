@@ -73,3 +73,9 @@ let power x y =
 let print n = Pervasives.print_string (to_string n)
 let chr n = Pervasives.char_of_int (to_int n)
 let code c = of_int (Pervasives.int_of_char c)
+
+
+let random_int n =
+  try let n = int64_of_big_int n in
+      if n >= 0L then big_int_of_int64 (Random.int64 n) else raise Exit
+  with _ -> invalid_arg "Why3__BigInt.random"
