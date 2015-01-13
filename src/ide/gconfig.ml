@@ -105,7 +105,7 @@ let default_ide =
     ide_show_labels = false;
     ide_show_locs = false;
     ide_show_time_limit = false;
-    ide_max_boxes = 16; 
+    ide_max_boxes = 16;
     ide_saving_policy = 2;
     ide_premise_color = "chartreuse";
     ide_goal_color = "gold";
@@ -580,7 +580,7 @@ let show_about_window () =
                 "Piotr Trojanek";
                 "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2014 Inria, CNRS, Paris-Sud University"
+      ~copyright:"Copyright 2010-2015 Inria, CNRS, Paris-Sud University"
       ~license:"GNU Lesser General Public License version 2.1"
       ~website:"http://why3.lri.fr"
       ~website_label:"http://why3.lri.fr"
