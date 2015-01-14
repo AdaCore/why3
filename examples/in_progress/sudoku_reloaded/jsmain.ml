@@ -78,7 +78,7 @@ let display_sol rows a =
   for i=0 to 8 do
     for j=0 to 8 do
       let cell = rows.(i).(j) in
-      cell##value <- Js.string (Why3__BigInt.to_string a.(9*i+j));
+      cell##value <- Js.string (string_of_int a.(9*i+j));
       cell##style##backgroundColor <- Js.string "#ffffff"
     done
   done
@@ -92,8 +92,8 @@ let no_sol rows =
   done
 
 let solve_board rows _ =
-  let sudoku = Sudoku__TheClassicalSudokuGrid.classical_sudoku () in
-  let input_grid = Array.make 81 Why3__BigInt.zero in
+  let sudoku = Sudoku_reloaded__TheClassicalSudokuGrid.classical_sudoku () in
+  let input_grid = Array.make 81 0 in
   for i=0 to 8 do
     for j=0 to 8 do
       let cell = rows.(i).(j) in
@@ -102,14 +102,14 @@ let solve_board rows _ =
         | "" -> 0
         | s -> Char.code s.[0] - Char.code '0'
       in
-      input_grid.(9*i+j) <- Why3__BigInt.of_int v
+      input_grid.(9*i+j) <- v
     done
   done;
   begin
     try
-      let a = Sudoku__Solver.check_then_solve sudoku input_grid in
+      let a = Sudoku_reloaded__Solver.check_then_solve sudoku input_grid in
       display_sol rows a
-    with Sudoku__Solver.NoSolution -> no_sol rows
+    with Sudoku_reloaded__Solver.NoSolution -> no_sol rows
   end;
   Js._false
 
