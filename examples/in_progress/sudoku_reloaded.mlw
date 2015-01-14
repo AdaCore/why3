@@ -26,7 +26,7 @@ module Grid
 
   (** extensional equality of grids and sub-grids *)
   predicate grid_eq_sub (g1 g2:grid) (a b:int) =
-    forall j. a <= j < b -> g1[j] = g2[j]
+    forall j. a <= j < b -> t g1[j] = t g2[j]
 
   predicate grid_eq (g1 g2:grid) = grid_eq_sub g1 g2 0 81
 
@@ -98,7 +98,7 @@ module Grid
       let i1 = s + t offsets[o1] in
       let i2 = s + t offsets[o2] in
       1 <= t (Map.get g i1) <= 9 /\ 1 <= t (Map.get g i2) <= 9 ->
-      Map.get g i1 <> Map.get g i2
+      t (Map.get g i1) <> t (Map.get g i2)
 
   predicate valid_column (s:sudoku_chunks) (g:grid) (i:int) =
     valid_chunk g i s.column_start s.column_offsets
@@ -121,7 +121,7 @@ module Grid
   (** [included g1 g2] *)
   predicate included (g1 g2 : grid) =
     forall i : int. is_index i /\ 1 <= t (Map.get g1 i) <= 9 ->
-      Map.get g2 i = Map.get g1 i
+      t (Map.get g2 i) = t (Map.get g1 i)
 
   (** validity is monotonic w.r.t. inclusion *)
   lemma subset_valid_chunk :
@@ -355,7 +355,7 @@ module Solver
       let i1 = s + t offsets[o1] in
       let i2 = s + t offsets[o2] in
       1 <= t (Map.get g i1) <= 9 /\ 1 <= t (Map.get g i2) <= 9 ->
-      Map.get g i1 <> Map.get g i2
+      t (Map.get g i1) <> t (Map.get g i2)
 
   exception Invalid
 
@@ -393,7 +393,12 @@ module Solver
       let v = g[Int31.(+) s offsets[!off]] in
       if Int31.(<=) n1 v && Int31.(<=) v n9 then
          begin
-           if b[v] = True then raise Invalid;
+           if b[v] = True then
+              begin
+                assert { exists o:int.
+           0 <= o < t !off /\ t (Map.get g.elts (t s + t offsets[o])) = t v };
+                raise Invalid;
+              end;
             b[v] <- True
          end;
       off := Int31.(+) !off n1
@@ -580,6 +585,8 @@ this is true but with 2 different possible reasons:
           assert { valid_up_to s g.elts (t i + 1) };
           solve_aux s g (Int31.(+) i n1)
         with Invalid ->
+          assert {
+            grid_eq g.elts (Map.set (at g 'L).elts (t i) !k) };
           assert { (* for completeness *)
             not (valid s (Map.set (at g 'L).elts (t i) !k)) };
           assert { (* for completeness *)
