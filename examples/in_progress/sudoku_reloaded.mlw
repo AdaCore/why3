@@ -142,7 +142,6 @@ module Grid
 
 end
 
-
 (** {2 Concrete Values of Chunks for the Classical Sudoku Grid} *)
 module TheClassicalSudokuGrid
 
@@ -334,7 +333,6 @@ module TheClassicalSudokuGrid
 end
 
 
-
 (** {2 A Sudoku Solver} *)
 
 module Solver
@@ -444,6 +442,7 @@ module Solver
     forall g i x. is_index i /\ full_up_to g i
     -> 1 <= t x <= 9 -> full_up_to (Map.set g i x) (i + 1)
 
+(*
   let rec lemma full_up_to_frame (g1 g2:grid) (i:int)
     requires { 0 <= i <= 81 }
     requires { grid_eq_sub g1 g2 0 i }
@@ -455,6 +454,7 @@ module Solver
         assert { full_up_to g1 (i-1) };
         full_up_to_frame g1 g2 (i-1)
       end
+*)
 
   let lemma full_up_to_frame_all (g1 g2:grid) (i:int)
     requires { 0 <= i <= 81 }
@@ -530,6 +530,22 @@ this is true but with 2 different possible reasons:
   (** {3 The main solver loop} *)
   exception SolutionFound
 
+  let lemma valid_chunk_eq (start offsets:array int31) (g1 g2:grid) (i:int) : unit
+     requires { chunk_valid_indexes start offsets }
+     requires { 0 <= i < 81 }
+     requires { grid_eq g1 g2 }
+     requires { valid_chunk g1 i start offsets }
+     ensures { valid_chunk g2 i start offsets }
+  = ()
+
+  let lemma valid_up_to_eq (s:sudoku_chunks) (g1 g2:grid) (i:int) : unit
+     requires { well_formed_sudoku s }
+     requires { 0 <= i <= 81 }
+     requires { grid_eq g1 g2 }
+     requires { valid_up_to s g1 i }
+     ensures { valid_up_to s g2 i }
+  = ()
+
   let rec solve_aux (s:sudoku_chunks) (g : array int31) (i : int31)
     requires { well_formed_sudoku s }
     requires { t g.length = 81 }
@@ -588,6 +604,8 @@ this is true but with 2 different possible reasons:
           assert {
             grid_eq g.elts (Map.set (at g 'L).elts (t i) !k) };
           assert { (* for completeness *)
+            not (valid s g.elts) };
+          assert { (* for completeness *)
             not (valid s (Map.set (at g 'L).elts (t i) !k)) };
           assert { (* for completeness *)
             let g' = Map.set (at g 'L).elts (t i) !k in
@@ -636,6 +654,7 @@ end
 
 
 (** {2 Some Tests} *)
+
 
 module Test
 
@@ -722,6 +741,7 @@ module Test
     solve (classical_sudoku()) a
 
 end
+
 
 (***
 Local Variables:
