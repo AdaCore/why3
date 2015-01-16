@@ -255,12 +255,11 @@ val e_func_app_l : expr -> expr list -> expr
 
 (** {2 Pretty-printing} *)
 
-open Format
-
 val forget_ps  : psymbol -> unit (* flush id_unique for a program symbol *)
 
-val print_ps   : formatter -> psymbol -> unit     (* program symbol *)
-val print_expr : formatter -> expr -> unit        (* expression *)
+val print_ps   : Format.formatter -> psymbol -> unit  (* program symbol *)
+val print_expr : Format.formatter -> expr -> unit     (* expression *)
 
-val print_let_defn : formatter -> let_defn -> unit
-val print_rec_defn : formatter -> rec_defn -> unit
+val print_val_decl : Format.formatter -> val_decl -> unit
+val print_let_defn : Format.formatter -> let_defn -> unit
+val print_rec_defn : Format.formatter -> rec_defn -> unit

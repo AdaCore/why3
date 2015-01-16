@@ -1058,7 +1058,7 @@ exception FoundPrefix of pvsymbol list
 
 let unknown = create_pvsymbol (id_fresh "?") ity_unit
 
-let print_cty_spec fmt c =
+let print_spec args pre post xpost rds eff fmt ity =
   let dot fmt () = pp_print_char fmt '.' in
   let print_pfx reg fmt pfx = fprintf fmt "@[%a:@,%a@]"
     (Pp.print_list dot print_pv) pfx print_reg reg in
@@ -1073,64 +1073,53 @@ let print_cty_spec fmt c =
         raise (FoundPrefix (unknown::pfx))
     | _ -> () in
   let find_prefix reg = try
-    List.iter (fun v -> find_prefix [v] reg v.pv_ity) c.cty_args;
-    Spv.iter (fun v -> find_prefix [v] reg v.pv_ity) c.cty_reads;
-    assert false (* cannot have an effect on an unknown region *)
-    with FoundPrefix pfx -> List.rev pfx in
-  let print_reads fmt pvl = if pvl <> [] then
-    fprintf fmt "@\nreads {%a}" (Pp.print_list Pp.comma print_pv) pvl in
-  let print_writes fmt c = if not (Mreg.is_empty c.cty_effect.eff_writes) then
-    let print_wr fmt (reg,fds) =
-      let pfx = find_prefix reg in
-      let print_fld fmt {pv_vs = {vs_name = id}} =
-        fprintf fmt "(%a).%s" (print_pfx reg) pfx id.id_string in
-      if Spv.is_empty fds then print_pfx reg fmt pfx else
-        Pp.print_list Pp.comma print_fld fmt (Spv.elements fds) in
-    fprintf fmt "@\nwrites {%a}" (Pp.print_list Pp.comma print_wr)
-      (Mreg.bindings c.cty_effect.eff_writes) in
-  let print_resets fmt c = if not (Mreg.is_empty c.cty_effect.eff_resets) then
-    let print_rs fmt (reg,cvr) =
-      let print_cvr fmt reg = print_pfx reg fmt (find_prefix reg) in
-      if Sreg.is_empty cvr then print_pfx reg fmt (find_prefix reg) else
-        fprintf fmt "%a@ (under %a)" (print_pfx reg) (find_prefix reg)
-          (Pp.print_list Pp.comma print_cvr) (Sreg.elements cvr) in
-    fprintf fmt "@\nresets {%a}" (Pp.print_list Pp.comma print_rs)
-      (Mreg.bindings c.cty_effect.eff_resets) in
-  let print_pre fmt p =
-    fprintf fmt "@\nrequires { @[%a@] }" print_term p in
+    List.iter (fun v -> find_prefix [v] reg v.pv_ity) args;
+    Spv.iter (fun v -> find_prefix [v] reg v.pv_ity) rds;
+    [unknown] with FoundPrefix pfx -> List.rev pfx in
+  let print_write fmt (reg,fds) =
+    let pfx = find_prefix reg in
+    let print_fld fmt {pv_vs = {vs_name = id}} =
+      fprintf fmt "(%a).%s" (print_pfx reg) pfx id.id_string in
+    if Spv.is_empty fds then print_pfx reg fmt pfx else
+      Pp.print_list Pp.comma print_fld fmt (Spv.elements fds) in
+  let print_raise fmt (reg,cvr) =
+    let print_cvr fmt reg = print_pfx reg fmt (find_prefix reg) in
+    if Sreg.is_empty cvr then print_pfx reg fmt (find_prefix reg) else
+      fprintf fmt "%a@ (under %a)" (print_pfx reg) (find_prefix reg)
+        (Pp.print_list Pp.comma print_cvr) (Sreg.elements cvr) in
+  let print_result fmt ity = fprintf fmt " :@ %a" print_ity ity in
+  let print_pre fmt p = fprintf fmt "@\nrequires { @[%a@] }" print_term p in
   let print_post fmt q =
     let v, q = open_post q in
     fprintf str_formatter "%a" print_vs v;
     let n = flush_str_formatter () in
-    begin if n = "result" || t_v_occurs v q = 0 then
+    if n = "result" || t_v_occurs v q = 0 then
       fprintf fmt "@\nensures  { @[%a@] }" print_term q else
-      fprintf fmt "@\nreturns  { %s ->@ @[%a@] }" n print_term q
-    end;
+      fprintf fmt "@\nreturns  { %s ->@ @[%a@] }" n print_term q;
     forget_var v in
   let print_xpost xs fmt q =
     let v, q = open_post q in
-    begin if ty_equal v.vs_ty ty_unit && t_v_occurs v q = 0 then
-      fprintf fmt "@\nraises   { %a ->@ @[%a@] }"
-        print_xs xs print_term q else
-      fprintf fmt "@\nraises   { %a %a ->@ @[%a@] }"
-        print_xs xs print_vs v print_term q
-    end;
+    fprintf fmt "@\nraises   { %a%a ->@ @[%a@] }" print_xs xs
+      (fun fmt v -> if not (ty_equal v.vs_ty ty_unit && t_v_occurs v q = 0)
+        then fprintf fmt " %a" print_vs v) v print_term q;
     forget_var v in
   let print_xpost fmt (xs,ql) =
     Pp.print_list Pp.nothing (print_xpost xs) fmt ql in
-  fprintf fmt "%a%a%a%a%a%a" print_reads (Spv.elements c.cty_reads)
-    print_writes c print_resets c
-    (Pp.print_list Pp.nothing print_pre) c.cty_pre
-    (Pp.print_list Pp.nothing print_post) c.cty_post
-    (Pp.print_list Pp.nothing print_xpost) (Mexn.bindings c.cty_xpost)
+  Pp.print_list_pre Pp.space print_pvty fmt args;
+  Pp.print_option print_result fmt ity;
+  if eff.eff_diverg then pp_print_string fmt " diverges";
+  if not (Spv.is_empty rds) then fprintf fmt "@\nreads  { %a }"
+    (Pp.print_list Pp.comma print_pv) (Spv.elements rds);
+  if not (Mreg.is_empty eff.eff_writes) then fprintf fmt "@\nwrites { %a }"
+    (Pp.print_list Pp.comma print_write) (Mreg.bindings eff.eff_writes);
+  if not (Mreg.is_empty eff.eff_resets) then fprintf fmt "@\nresets { %a }"
+    (Pp.print_list Pp.comma print_raise) (Mreg.bindings eff.eff_resets);
+  Pp.print_list Pp.nothing print_pre fmt pre;
+  Pp.print_list Pp.nothing print_post fmt post;
+  Pp.print_list Pp.nothing print_xpost fmt (Mexn.bindings xpost)
 
-let print_cty fmt c = fprintf fmt "%a :@ %a%a"
-  (Pp.print_list Pp.space print_pvty) c.cty_args
-  print_ity c.cty_result print_cty_spec c
-
-let print_cty_head fmt c = fprintf fmt "%a%a"
-  (Pp.print_list Pp.space print_pvty) c.cty_args
-  print_cty_spec c
+let print_cty fmt c = print_spec c.cty_args c.cty_pre c.cty_post
+  c.cty_xpost c.cty_reads c.cty_effect fmt (Some c.cty_result)
 
 (** exception handling *)
 

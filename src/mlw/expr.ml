@@ -1029,14 +1029,18 @@ and print_enode pri fmt e = match e.e_node with
   | Esym s -> print_ps fmt s
   | Efun e1 ->
       let c = cty_of_expr e in
-      if c.cty_args = [] then
-        fprintf fmt "@[<hov 2>abstract%a@\n%a@]@\nend"
-          print_cty_head c print_expr e1
-      else
-        fprintf fmt "@[<hov 2>fun %a ->@\n%a@]"
-          print_cty_head c print_expr e1
-  | Eany ->
-      fprintf fmt "@[<hov 2>any %a@]" print_cty (cty_of_expr e)
+      fprintf fmt "@[<hov 2>fun%a ->@\n%a@]"
+        (print_spec c.cty_args c.cty_pre c.cty_post c.cty_xpost
+          Spv.empty eff_empty) None print_expr e1
+  | Eany -> fprintf fmt "@[<hov 2>any%a@]" print_cty (cty_of_expr e)
+  | Eapp ({e_node = Efun e; e_vty = VtyC ({cty_args = []} as c)},[],_) ->
+      fprintf fmt "@[<hov 2>abstract%a@\n%a@]@\nend"
+        (print_spec [] c.cty_pre c.cty_post c.cty_xpost
+          Spv.empty eff_empty) None print_expr e
+  | Eapp ({e_node = Eany; e_vty = VtyC ({cty_args = []} as c)},[],_) ->
+      fprintf fmt "@[<hov 2>any %a%a@]" print_ity c.cty_result
+        (print_spec [] c.cty_pre c.cty_post c.cty_xpost
+          c.cty_reads c.cty_effect) None
   | Eapp (e,[],_) -> print_lexpr pri fmt e
   | Eapp ({e_node = Esym s},vl,_) when is_ps_tuple s ->
       fprintf fmt "(%a)" (Pp.print_list Pp.comma print_pv) vl
@@ -1135,7 +1139,7 @@ and print_let_defn fmt = function
         print_pv v print_id_labels v.pv_vs.vs_name
         (print_lexpr 0 (*4*)) e
   | {let_sym = ValS s; let_expr = {e_node = Efun e} as e0} ->
-      fprintf fmt "@[<hov 2>let %a@ %a =@\n%a@]"
+      fprintf fmt "@[<hov 2>let %a%a =@\n%a@]"
         print_ps_head s
         print_cty (cty_of_expr e0)
         (print_lexpr 0 (*4*)) e
@@ -1150,12 +1154,29 @@ and print_rec_defn fmt {rec_defn = fdl} =
 and print_rec_fun fst fmt fd =
   let e = match fd.fun_expr.e_node with
     | Efun e -> e | _ -> assert false in
-  fprintf fmt "@[<hov 2>%s %a@ %a%a =@\n%a@]"
+  fprintf fmt "@[<hov 2>%s %a%a%a =@\n%a@]"
     (if fst then "let rec" else "with")
     print_ps_head fd.fun_sym
     print_cty (cty_of_expr fd.fun_expr)
     print_variant fd.fun_varl
     (print_lexpr 0 (*4*)) e
+
+let print_val_decl fmt = function
+  | ValV v ->
+      fprintf fmt "@[<hov 2>val %s%a%a :@ %a@]"
+        (if v.pv_ghost then "ghost " else "")
+        print_pv v print_id_labels v.pv_vs.vs_name
+        print_ity v.pv_ity
+  | ValS ({ps_logic = PLpv v; ps_cty = c} as s) ->
+      fprintf fmt "@[<hov 2>val %a%a@]" print_ps_head s
+        (print_spec c.cty_args c.cty_pre (List.tl c.cty_post) c.cty_xpost
+          (Spv.remove v c.cty_reads) c.cty_effect) (Some c.cty_result)
+  | ValS ({ps_logic = PLls _; ps_cty = c} as s) ->
+      fprintf fmt "@[<hov 2>val %a%a@]" print_ps_head s
+        (print_spec c.cty_args c.cty_pre (List.tl c.cty_post) c.cty_xpost
+          c.cty_reads c.cty_effect) (Some c.cty_result)
+  | ValS s ->
+      fprintf fmt "@[<hov 2>val %a%a@]" print_ps_head s print_cty s.ps_cty
 
 (* exception handling *)
 

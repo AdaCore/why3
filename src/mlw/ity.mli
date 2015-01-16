@@ -350,18 +350,18 @@ val cty_add_post : cty -> post list -> cty
 
 (** {2 Pretty-printing} *)
 
-open Format
-
 val forget_reg : region -> unit   (* flush id_unique for a region *)
 val forget_pv  : pvsymbol -> unit (* flush for a program variable *)
 
-val print_its : formatter -> itysymbol -> unit    (* type symbol *)
-val print_reg : formatter -> region -> unit       (* region *)
-val print_ity : formatter -> ity -> unit          (* individual type *)
-val print_ity_full : formatter -> ity -> unit     (* type with regions *)
+val print_its : Format.formatter -> itysymbol -> unit (* type symbol *)
+val print_reg : Format.formatter -> region -> unit    (* region *)
+val print_ity : Format.formatter -> ity -> unit       (* individual type *)
+val print_ity_full : Format.formatter -> ity -> unit  (* type with regions *)
 
-val print_xs   : formatter -> xsymbol -> unit     (* exception symbol *)
-val print_pv   : formatter -> pvsymbol -> unit    (* program variable *)
-val print_pvty : formatter -> pvsymbol -> unit    (* pvsymbol : type *)
-val print_cty  : formatter -> cty -> unit         (* computation type *)
-val print_cty_head : formatter -> cty -> unit     (* args and spec only *)
+val print_xs   : Format.formatter -> xsymbol -> unit  (* exception symbol *)
+val print_pv   : Format.formatter -> pvsymbol -> unit (* program variable *)
+val print_pvty : Format.formatter -> pvsymbol -> unit (* pvsymbol : type *)
+val print_cty  : Format.formatter -> cty -> unit      (* computation type *)
+
+val print_spec : pvsymbol list -> pre list -> post list -> post list Mexn.t ->
+  Spv.t -> effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)
