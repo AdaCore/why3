@@ -987,6 +987,8 @@ let ambig_cty c =
   let sres = ity_freeze isb_empty c.cty_result in
   not (Mtv.set_submap sres.isb_tv sarg.isb_tv)
 
+let ht_ps = Hps.create 7 (* fun_rsym -> fun_sym *)
+
 let rec print_expr fmt e = print_lexpr 0 fmt e
 
 and print_lexpr pri fmt e =
@@ -1026,7 +1028,7 @@ and print_app pri s fmt vl = match extract_op s, vl with
 
 and print_enode pri fmt e = match e.e_node with
   | Evar v -> print_pv fmt v
-  | Esym s -> print_ps fmt s
+  | Esym s -> print_ps fmt (Hps.find_def ht_ps s s)
   | Efun e1 ->
       let c = cty_of_expr e in
       fprintf fmt "@[<hov 2>fun%a ->@\n%a@]"
@@ -1050,9 +1052,9 @@ and print_enode pri fmt e = match e.e_node with
   | Eapp ({e_node = Esym s},vl,{cty_args = []; cty_result = ity})
     when ambig_cty s.ps_cty ->
       fprintf fmt (protect_on (pri > 0) "%a:%a")
-        (print_app 5 s) vl print_ity ity
+        (print_app 5 (Hps.find_def ht_ps s s)) vl print_ity ity
   | Eapp ({e_node = Esym s},vl,_) ->
-      print_app pri s fmt vl
+      print_app pri (Hps.find_def ht_ps s s) fmt vl
   | Eapp ({e_vty = VtyC c} as e,vl,{cty_args = []; cty_result = ity})
     when ambig_cty c ->
       fprintf fmt (protect_on (pri > 0) "@[<hov 1>%a@ %a: %a@]")
@@ -1149,7 +1151,9 @@ and print_let_defn fmt = function
         (print_lexpr 0 (*4*)) e
 
 and print_rec_defn fmt {rec_defn = fdl} =
-  print_list_next Pp.newline print_rec_fun fmt fdl
+  List.iter (fun fd -> Hps.replace ht_ps fd.fun_rsym fd.fun_sym) fdl;
+  print_list_next Pp.newline print_rec_fun fmt fdl;
+  List.iter (fun fd -> Hps.remove ht_ps fd.fun_rsym) fdl
 
 and print_rec_fun fst fmt fd =
   let e = match fd.fun_expr.e_node with
