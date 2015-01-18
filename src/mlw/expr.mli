@@ -17,11 +17,11 @@ open Ity
 (** {2 Program symbols} *)
 
 type psymbol = private {
-  ps_name   : ident;
-  ps_cty    : cty;
-  ps_ghost  : bool;
-  ps_logic  : ps_logic;
-  ps_mfield : pvsymbol option;
+  ps_name  : ident;
+  ps_cty   : cty;
+  ps_ghost : bool;
+  ps_logic : ps_logic;
+  ps_field : pvsymbol option;
 }
 
 and ps_logic =
@@ -57,7 +57,7 @@ val create_psymbol : preid -> ?ghost:bool -> ?kind:ps_kind -> cty -> psymbol
     type must be [ity_bool]. If [?kind] is [PKlemma] and the result
     type is not [ity_unit], an existential premise is generated. *)
 
-val create_mutable_field : preid -> itysymbol -> pvsymbol -> psymbol
+val create_field : preid -> itysymbol -> pvsymbol -> psymbol
 
 val restore_ps : lsymbol -> psymbol
 (** raises [Not_found] if the argument is not a [ps_logic] *)

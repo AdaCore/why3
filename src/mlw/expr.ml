@@ -18,11 +18,11 @@ open Ity
 (** {2 Program symbols} *)
 
 type psymbol = {
-  ps_name   : ident;
-  ps_cty    : cty;
-  ps_ghost  : bool;
-  ps_logic  : ps_logic;
-  ps_mfield : pvsymbol option;
+  ps_name  : ident;
+  ps_cty   : cty;
+  ps_ghost : bool;
+  ps_logic : ps_logic;
+  ps_field : pvsymbol option;
 }
 
 and ps_logic =
@@ -49,11 +49,11 @@ let mk_ps, restore_ps =
   let ls_to_ps = Wls.create 17 in
   (fun id cty gh lg mf ->
     let ps = {
-      ps_name   = id;
-      ps_cty    = cty;
-      ps_ghost  = gh;
-      ps_logic  = lg;
-      ps_mfield = mf;
+      ps_name  = id;
+      ps_cty   = cty;
+      ps_ghost = gh;
+      ps_logic = lg;
+      ps_field = mf;
     } in
     match lg with
     | PLls ls -> Wls.set ls_to_ps ls ps; ps
@@ -142,9 +142,10 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
       check_effects c;
       mk_ps (id_register id) c ghost PLlemma None
 
-let create_mutable_field id s v =
-  if not (List.exists (fun u -> pv_equal u v) s.its_mfields) then
-    invalid_arg "Expr.create_mutable_field";
+let create_field id s v =
+  if not (List.exists (fun u -> pv_equal u v) s.its_mfields ||
+          List.exists (fun u -> pv_equal u v) s.its_ifields) then
+    invalid_arg "Expr.create_field";
   let ity = ity_app s (List.map ity_var s.its_ts.ts_args) s.its_regions in
   let arg = create_pvsymbol (id_fresh "arg") ity in
   let ls = create_fsymbol id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
@@ -507,10 +508,10 @@ let e_app e el ityl ity =
 let e_assign_raw al =
   let ghost = List.for_all (fun (r,f,v) ->
     r.pv_ghost || f.ps_ghost || v.pv_ghost) al in
-  let conv (r,f,v) = match r.pv_ity.ity_node, f.ps_mfield with
+  let conv (r,f,v) = match r.pv_ity.ity_node, f.ps_field with
     | Ityreg r, Some f -> r, f, v.pv_ity
     | Ityreg {reg_its = s}, None -> Loc.errorm
-        "Type constructor %a has no mutable fields named %s"
+        "Type constructor %a has no fields named %s"
         Ity.print_its s f.ps_name.id_string
     | _ -> Loc.errorm "Mutable expression expected" in
   let eff = eff_assign eff_empty (List.map conv al) in

@@ -778,7 +778,7 @@ let rec effect_of_term t =
         | Some _ -> assert false
         | None -> ity in
       begin try match ity.ity_node, restore_ps fs with
-        | Ityreg _, ({ps_mfield = Some _} as ps) -> v, ity, Some ps
+        | Ityreg _, ({ps_field = Some _} as ps) -> v, ity, Some ps
         | _, {ps_cty={cty_args=[arg]; cty_result=res; cty_freeze=frz}} ->
             v, ity_full_inst (ity_match frz arg.pv_ity ity) res, None
         | _ -> quit () with Not_found -> quit () end
@@ -797,9 +797,9 @@ let effect_of_dspec dsp =
   let add_write (s,l,e) t = match effect_of_term t with
     | v, {ity_node = Ityreg reg}, fd ->
         let fs = match fd with
-          | Some fd -> Spv.singleton (Opt.get fd.ps_mfield)
+          | Some fd -> Spv.singleton (Opt.get fd.ps_field)
           | None -> Spv.of_list reg.reg_its.its_mfields in
-        let wr = eff_write eff_empty reg fs in
+        let wr = Loc.try3 ?loc:t.t_loc eff_write eff_empty reg fs in
         Spv.add v s, (wr,t)::l, eff_union e wr
     | _ ->
         Loc.errorm ?loc:t.t_loc "mutable expression expected" in
