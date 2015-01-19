@@ -42,7 +42,7 @@ type dpattern = private {
 type dpattern_node =
   | DPwild
   | DPvar  of preid
-  | DPapp  of psymbol * dpattern list
+  | DPapp  of rsymbol * dpattern list
   | DPor   of dpattern * dpattern
   | DPas   of dpattern * preid
   | DPcast of dpattern * ity
@@ -94,8 +94,8 @@ type dexpr = private {
 
 and dexpr_node =
   | DEvar of string * dvty
-  | DEgpvar of pvsymbol
-  | DEgpsym of psymbol
+  | DEpv of pvsymbol
+  | DErs of rsymbol
   | DEconst of Number.constant
   | DEapp of dexpr * dexpr list
   | DEfun of dbinder list * dspec later * dexpr
@@ -105,7 +105,7 @@ and dexpr_node =
   | DElazy of lazy_op * dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
-  | DEassign of (dexpr * psymbol * dexpr) list
+  | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * (dinvariant * variant list) later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
@@ -122,14 +122,14 @@ and dexpr_node =
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
-and dlet_defn = preid * ghost * ps_kind * dexpr
+and dlet_defn = preid * ghost * rs_kind * dexpr
 
 and drec_defn = private { fds : dfun_defn list }
 
-and dfun_defn = preid * ghost * ps_kind *
+and dfun_defn = preid * ghost * rs_kind *
   dbinder list * (dspec * variant list) later * dexpr
 
-type dval_decl = preid * ghost * ps_kind * dtype_v
+type dval_decl = preid * ghost * rs_kind * dtype_v
 
 (** Environment *)
 
@@ -155,7 +155,7 @@ val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 
 val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
 
-type pre_fun_defn = preid * ghost * ps_kind *
+type pre_fun_defn = preid * ghost * rs_kind *
   dbinder list * dity * (denv -> (dspec * variant list) later * dexpr)
 
 val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn

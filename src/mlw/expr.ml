@@ -15,60 +15,60 @@ open Ty
 open Term
 open Ity
 
-(** {2 Program symbols} *)
+(** {2 Routine symbols} *)
 
-type psymbol = {
-  ps_name  : ident;
-  ps_cty   : cty;
-  ps_ghost : bool;
-  ps_logic : ps_logic;
-  ps_field : pvsymbol option;
+type rsymbol = {
+  rs_name  : ident;
+  rs_cty   : cty;
+  rs_ghost : bool;
+  rs_logic : rs_logic;
+  rs_field : pvsymbol option;
 }
 
-and ps_logic =
-  | PLnone            (* non-pure symbol *)
-  | PLpv of pvsymbol  (* local let-function *)
-  | PLls of lsymbol   (* top-level let-function or let-predicate *)
-  | PLlemma           (* top-level or local let-lemma *)
+and rs_logic =
+  | RLnone            (* non-pure symbol *)
+  | RLpv of pvsymbol  (* local let-function *)
+  | RLls of lsymbol   (* top-level let-function or let-predicate *)
+  | RLlemma           (* top-level or local let-lemma *)
 
-module Psym = MakeMSHW (struct
-  type t = psymbol
-  let tag ps = ps.ps_name.id_tag
+module Rsym = MakeMSHW (struct
+  type t = rsymbol
+  let tag rs = rs.rs_name.id_tag
 end)
 
-module Sps = Psym.S
-module Mps = Psym.M
-module Hps = Psym.H
-module Wps = Psym.W
+module Srs = Rsym.S
+module Mrs = Rsym.M
+module Hrs = Rsym.H
+module Wrs = Rsym.W
 
-let ps_equal : psymbol -> psymbol -> bool = (==)
-let ps_hash ps = id_hash ps.ps_name
-let ps_compare ps1 ps2 = id_compare ps1.ps_name ps2.ps_name
+let rs_equal : rsymbol -> rsymbol -> bool = (==)
+let rs_hash rs = id_hash rs.rs_name
+let rs_compare rs1 rs2 = id_compare rs1.rs_name rs2.rs_name
 
-let mk_ps, restore_ps =
-  let ls_to_ps = Wls.create 17 in
+let mk_rs, restore_rs =
+  let ls_to_rs = Wls.create 17 in
   (fun id cty gh lg mf ->
-    let ps = {
-      ps_name  = id;
-      ps_cty   = cty;
-      ps_ghost = gh;
-      ps_logic = lg;
-      ps_field = mf;
+    let rs = {
+      rs_name  = id;
+      rs_cty   = cty;
+      rs_ghost = gh;
+      rs_logic = lg;
+      rs_field = mf;
     } in
     match lg with
-    | PLls ls -> Wls.set ls_to_ps ls ps; ps
-    | _ -> ps),
-  (fun ls -> Wls.find ls_to_ps ls)
+    | RLls ls -> Wls.set ls_to_rs ls rs; rs
+    | _ -> rs),
+  (fun ls -> Wls.find ls_to_rs ls)
 
-type ps_kind =
-  | PKnone            (* non-pure symbol *)
-  | PKpv of pvsymbol  (* local let-function *)
-  | PKlocal           (* new local let-function *)
-  | PKfunc of int     (* new top-level let-function or constructor *)
-  | PKpred            (* new top-level let-predicate *)
-  | PKlemma           (* top-level or local let-lemma *)
+type rs_kind =
+  | RKnone            (* non-pure symbol *)
+  | RKpv of pvsymbol  (* local let-function *)
+  | RKlocal           (* new local let-function *)
+  | RKfunc of int     (* new top-level let-function or constructor *)
+  | RKpred            (* new top-level let-predicate *)
+  | RKlemma           (* top-level or local let-lemma *)
 
-let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
+let create_rsymbol id ?(ghost=false) ?(kind=RKnone) c =
   let check_effects { cty_effect = e } =
     (* TODO/FIXME: prove that we can indeed ignore resets.
       Normally, resets neither consult nor change the
@@ -90,9 +90,9 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
         let q = t_iff (t_equ (t_var res) t_bool_true) t in
         cty_add_post c [create_post res q] in
   match kind with
-  | PKnone ->
-      mk_ps (id_register id) c ghost PLnone None
-  | PKlocal ->
+  | RKnone ->
+      mk_rs (id_register id) c ghost RLnone None
+  | RKlocal ->
       check_effects c; check_reads c;
       let ity = ity_purify c.cty_result in
       let ity = List.fold_right (fun a ity ->
@@ -100,47 +100,47 @@ let create_psymbol id ?(ghost=false) ?(kind=PKnone) c =
       (* When declaring local let-functions, we need to create a
          mapping vsymbol to use in assertions. As vsymbols are not
          generalisable, we have to freeze the type variables (but
-         not regions) of the psymbol, and the easiest way to do that
+         not regions) of the rsymbol, and the easiest way to do that
          is to make these type variables appear in c.cty_reads.
          Moreover, we want to maintain the invariant that every
          variable that occurs freely in an assertion comes from
          a pvsymbol. Therefore, we create a pvsymbol whose type
          is a snapshot of the appropriate mapping type, and put
-         it into the ps_logic field. This pvsymbol should not be
+         it into the rs_logic field. This pvsymbol should not be
          used in the program, as it has lost all preconditions,
          which is why we declare it as ghost. In other words,
          this pvsymbol behaves exactly as Epure of its pv_vs. *)
       let v = create_pvsymbol ~ghost:true id ity in
       let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
-      mk_ps v.pv_vs.vs_name (add_post c t) ghost (PLpv v) None
-  | PKpv v ->
+      mk_rs v.pv_vs.vs_name (add_post c t) ghost (RLpv v) None
+  | RKpv v ->
       check_effects c; check_reads c;
       let ity = ity_purify c.cty_result in
       let ity = List.fold_right (fun a ity ->
         ity_func (ity_purify a.pv_ity) ity) c.cty_args ity in
       ity_equal_check v.pv_ity ity;
-      if not v.pv_ghost then invalid_arg "Expr.create_psymbol";
+      if not v.pv_ghost then invalid_arg "Expr.create_rsymbol";
       let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
-      mk_ps (id_register id) (add_post c t) ghost (PLpv v) None
-  | PKfunc constr ->
+      mk_rs (id_register id) (add_post c t) ghost (RLpv v) None
+  | RKfunc constr ->
       check_effects c; check_reads c;
       (* we don't really need to check the well-formedness of
          constructor's signature here, the type declaration
          will take care of it *)
       let ls = create_fsymbol id ~constr (arg_type c) (res_type c) in
       let t = t_app ls (arg_list c) ls.ls_value in
-      mk_ps ls.ls_name (add_post c t) ghost (PLls ls) None
-  | PKpred ->
+      mk_rs ls.ls_name (add_post c t) ghost (RLls ls) None
+  | RKpred ->
       check_effects c; check_reads c;
       if not (ity_equal c.cty_result ity_bool) then
         Loc.errorm "this function does not return a boolean value, \
                     it cannot be declared as a pure predicate";
       let ls = create_psymbol id (arg_type c) in
       let f = t_app ls (arg_list c) None in
-      mk_ps ls.ls_name (add_post c f) ghost (PLls ls) None
-  | PKlemma ->
+      mk_rs ls.ls_name (add_post c f) ghost (RLls ls) None
+  | RKlemma ->
       check_effects c;
-      mk_ps (id_register id) c ghost PLlemma None
+      mk_rs (id_register id) c ghost RLlemma None
 
 let create_field id s v =
   if not (List.exists (fun u -> pv_equal u v) s.its_mfields ||
@@ -153,9 +153,9 @@ let create_field id s v =
   let t = fs_app ls [t_var arg.pv_vs] v.pv_vs.vs_ty in
   let q = create_post res (t_equ (t_var res) t) in
   let c = create_cty [arg] [] [q] Mexn.empty Spv.empty eff_empty v.pv_ity in
-  mk_ps ls.ls_name c v.pv_ghost (PLls ls) (Some v)
+  mk_rs ls.ls_name c v.pv_ghost (RLls ls) (Some v)
 
-let ps_of_ls ls =
+let rs_of_ls ls =
   let v_args = List.map (fun ty ->
     create_pvsymbol (id_fresh "u") (ity_of_ty ty)) ls.ls_args in
   let t_args = List.map (fun v -> t_var v.pv_vs) v_args in
@@ -169,14 +169,14 @@ let ps_of_ls ls =
         create_post res (t_iff (t_equ (t_var res) t_bool_true) t) in
   let ity = ity_of_ty (t_type q) in
   let c = create_cty v_args [] [q] Mexn.empty Spv.empty eff_empty ity in
-  mk_ps ls.ls_name c false (PLls ls) None
+  mk_rs ls.ls_name c false (RLls ls) None
 
-let ps_kind ps = match ps.ps_logic with
-  | PLnone -> PKnone
-  | PLpv v -> PKpv v
-  | PLls {ls_value = None} -> PKpred
-  | PLls {ls_constr = cns} -> PKfunc cns
-  | PLlemma -> PKlemma
+let rs_kind rs = match rs.rs_logic with
+  | RLnone -> RKnone
+  | RLpv v -> RKpv v
+  | RLls {ls_value = None} -> RKpred
+  | RLls {ls_constr = cns} -> RKfunc cns
+  | RLlemma -> RKlemma
 
 (** {2 Program patterns} *)
 
@@ -189,11 +189,11 @@ type prog_pattern = {
 type pre_pattern =
   | PPwild
   | PPvar of preid
-  | PPapp of psymbol * pre_pattern list
+  | PPapp of rsymbol * pre_pattern list
   | PPor  of pre_pattern * pre_pattern
   | PPas  of pre_pattern * preid
 
-exception ConstructorExpected of psymbol
+exception ConstructorExpected of rsymbol
 
 let create_prog_pattern pp ?(ghost=false) ity =
   let hv = Hstr.create 3 in
@@ -213,18 +213,18 @@ let create_prog_pattern pp ?(ghost=false) ity =
         pat_wild (ty_of_ity ity)
     | PPvar id ->
         pat_var (find id ghost ity).pv_vs
-    | PPapp ({ps_logic = PLls ls} as ps, ppl) when ls.ls_constr > 0 ->
+    | PPapp ({rs_logic = RLls ls} as rs, ppl) when ls.ls_constr > 0 ->
         if ghost && ls.ls_constr > 1 then gh := true;
-        let sbs = ity_match isb_empty ps.ps_cty.cty_result ity in
+        let sbs = ity_match isb_empty rs.rs_cty.cty_result ity in
         let mtch arg pp =
           let ghost = ghost || arg.pv_ghost in
           make ghost (ity_full_inst sbs arg.pv_ity) pp in
-        let ppl = try List.map2 mtch ps.ps_cty.cty_args ppl with
+        let ppl = try List.map2 mtch rs.rs_cty.cty_args ppl with
           | Invalid_argument _ ->
               raise (Term.BadArity (ls, List.length ppl)) in
         pat_app ls ppl (ty_of_ity ity)
-    | PPapp (ps, _) ->
-        raise (ConstructorExpected ps)
+    | PPapp (rs, _) ->
+        raise (ConstructorExpected rs)
     | PPor (pp1,pp2) ->
         pat_or (make ghost ity pp1) (make ghost ity pp2)
     | PPas (pp,id) ->
@@ -248,7 +248,7 @@ type invariant = term
 
 type variant = term * lsymbol option (** tau * (tau -> tau -> prop) *)
 
-type assign = pvsymbol * psymbol * pvsymbol (* region * field * value *)
+type assign = pvsymbol * rsymbol * pvsymbol (* region * field * value *)
 
 type vty =
   | VtyI of ity
@@ -256,7 +256,7 @@ type vty =
 
 type val_decl =
   | ValV of pvsymbol
-  | ValS of psymbol
+  | ValS of rsymbol
 
 type expr = {
   e_node   : expr_node;
@@ -269,7 +269,7 @@ type expr = {
 
 and expr_node =
   | Evar    of pvsymbol
-  | Esym    of psymbol
+  | Esym    of rsymbol
   | Econst  of Number.constant
   | Eapp    of expr * pvsymbol list * cty
   | Efun    of expr
@@ -303,8 +303,8 @@ and rec_defn = {
 }
 
 and fun_defn = {
-  fun_sym  : psymbol; (* exported symbol *)
-  fun_rsym : psymbol; (* internal symbol *)
+  fun_sym  : rsymbol; (* exported symbol *)
+  fun_rsym : rsymbol; (* internal symbol *)
   fun_expr : expr;    (* Efun *)
   fun_varl : variant list;
 }
@@ -379,7 +379,7 @@ let mk_expr node vty ghost eff = {
 }
 
 let e_var pv = mk_expr (Evar pv) (VtyI pv.pv_ity) pv.pv_ghost eff_empty
-let e_sym ps = mk_expr (Esym ps) (VtyC ps.ps_cty) ps.ps_ghost eff_empty
+let e_sym rs = mk_expr (Esym rs) (VtyC rs.rs_cty) rs.rs_ghost eff_empty
 
 let e_const c =
   let ity = match c with
@@ -395,7 +395,7 @@ let e_nat_const n =
 let create_let_defn id ?(ghost=false) e =
   let ghost = ghost || e.e_ghost in
   let lv = match e.e_vty with
-    | VtyC c -> ValS (create_psymbol id ~ghost ~kind:PKnone c)
+    | VtyC c -> ValS (create_rsymbol id ~ghost ~kind:RKnone c)
     | VtyI i -> ValV (create_pvsymbol id ~ghost i) in
   { let_sym = lv; let_expr = e }
 
@@ -404,20 +404,20 @@ let create_let_defn_pv id ?(ghost=false) e =
   let pv = create_pvsymbol id ~ghost (ity_of_expr e) in
   { let_sym = ValV pv; let_expr = e }, pv
 
-let create_let_defn_ps id ?(ghost=false) ?(kind=PKnone) e =
+let create_let_defn_rs id ?(ghost=false) ?(kind=RKnone) e =
   let ghost = ghost || e.e_ghost in
   let cty = match e.e_vty, kind with
-    | _, PKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_ps"
-    | VtyI i, (PKfunc _|PKpred) when ity_immutable i ->
+    | _, RKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_rs"
+    | VtyI i, (RKfunc _|RKpred) when ity_immutable i ->
         (* the post will be equality to the logic constant *)
         create_cty [] [] [] Mexn.empty Spv.empty eff_empty i
-    | VtyI _, (PKfunc _|PKpred) -> Loc.errorm ?loc:e.e_loc
+    | VtyI _, (RKfunc _|RKpred) -> Loc.errorm ?loc:e.e_loc
         "this expression is non-pure, it cannot be used as a pure function"
-    | VtyI _, (PKnone|PKlocal|PKpv _|PKlemma) -> Loc.errorm ?loc:e.e_loc
+    | VtyI _, (RKnone|RKlocal|RKpv _|RKlemma) -> Loc.errorm ?loc:e.e_loc
         "this expression is first-order, it cannot be used as a function"
     | VtyC c, _ -> c in
-  let ps = create_psymbol id ~ghost ~kind cty in
-  { let_sym = ValS ps; let_expr = e }, ps
+  let rs = create_rsymbol id ~ghost ~kind cty in
+  { let_sym = ValS rs; let_expr = e }, rs
 
 let e_let_raw ({let_expr = d} as ld) e =
   let eff = eff_union d.e_effect e.e_effect in
@@ -454,14 +454,14 @@ let e_ghostify e = if not e.e_ghost then e_ghost e else e
    One must never reuse the results of [create_let_defn] and
    [create_rec_defn] when constructing expressions. *)
 let rec rewind fn ghost d = match d.e_node with
-  | (Elet ({let_sym = ValS {ps_ghost = false}}, _)
+  | (Elet ({let_sym = ValS {rs_ghost = false}}, _)
   |  Elet ({let_sym = ValV {pv_ghost = false}}, _))
     when ghost -> Loc.errorm ?loc:d.e_loc
       "This let-definition must be explicitly marked ghost"
   | Elet (ld, e) ->
       e_label_copy d (e_let_raw ld (rewind fn ghost e))
   | Erec ({rec_defn = dl} as rd, e) ->
-      let ngh fd = not fd.fun_sym.ps_ghost in
+      let ngh fd = not fd.fun_sym.rs_ghost in
       if ghost && List.exists ngh dl then Loc.errorm ?loc:d.e_loc
         "%s must be explicitly marked ghost" (if List.length dl > 1 then
         "These recursive definitions" else "This recursive definition");
@@ -471,14 +471,14 @@ let rec rewind fn ghost d = match d.e_node with
   | _ -> fn d
 
 let e_let ({let_sym = lv; let_expr = d} as ld) e = match lv with
-  | ValS {ps_logic = PLls _} -> invalid_arg "Expr.e_let"
-  | ValS {ps_ghost = gh} ->
+  | ValS {rs_logic = RLls _} -> invalid_arg "Expr.e_let"
+  | ValS {rs_ghost = gh} ->
       rewind (fun d -> e_let_raw {ld with let_expr = d} e) gh d
   | ValV _ -> e_let_raw ld e
 
 let e_rec ({rec_defn = dl} as rd) e =
-  List.iter (fun fd -> match fd.fun_sym.ps_logic with
-    | PLls _ -> invalid_arg "Expr.e_rec" | _ -> ()) dl;
+  List.iter (fun fd -> match fd.fun_sym.rs_logic with
+    | RLls _ -> invalid_arg "Expr.e_rec" | _ -> ()) dl;
   e_rec_raw rd e
 
 (* application and assignment *)
@@ -507,19 +507,19 @@ let e_app e el ityl ity =
 
 let e_assign_raw al =
   let ghost = List.for_all (fun (r,f,v) ->
-    r.pv_ghost || f.ps_ghost || v.pv_ghost) al in
-  let conv (r,f,v) = match r.pv_ity.ity_node, f.ps_field with
+    r.pv_ghost || f.rs_ghost || v.pv_ghost) al in
+  let conv (r,f,v) = match r.pv_ity.ity_node, f.rs_field with
     | Ityreg r, Some f -> r, f, v.pv_ity
     | Ityreg {reg_its = s}, None -> Loc.errorm
         "Type constructor %a has no fields named %s"
-        Ity.print_its s f.ps_name.id_string
+        Ity.print_its s f.rs_name.id_string
     | _ -> Loc.errorm "Mutable expression expected" in
   let eff = eff_assign eff_empty (List.map conv al) in
   mk_expr (Eassign al) (VtyI ity_unit) ghost eff
 
 let e_assign al =
   let hr, hv, al = List.fold_right (fun (r,f,v) (hr,hv,al) ->
-    let ghost = r.e_ghost || f.ps_ghost || v.e_ghost in
+    let ghost = r.e_ghost || f.rs_ghost || v.e_ghost in
     let hv, v = mk_proxy ~ghost v hv in
     let hr, r = mk_proxy ~ghost r hr in
     hr, hv, (r,f,v)::al) al ([],[],[]) in
@@ -623,19 +623,19 @@ let e_any c = mk_expr Eany (VtyC c) false eff_empty
 
 let rec e_vars e = match e.e_node with
   | Evar v -> Spv.singleton v
-  | Esym s -> s.ps_cty.cty_reads
+  | Esym s -> s.rs_cty.cty_reads
   | Efun _ | Eany -> (cty_of_expr e).cty_reads
   | Eapp (e,vl,_) -> List.fold_right Spv.add vl (e_vars e)
   | Elet ({let_sym = ValV v; let_expr = d},e)
-  | Elet ({let_sym = ValS {ps_logic = PLpv v}; let_expr = d},e) ->
+  | Elet ({let_sym = ValS {rs_logic = RLpv v}; let_expr = d},e) ->
       Spv.union (e_vars d) (Spv.remove v (e_vars e))
   | Elet ({let_sym = ValS _; let_expr = d},e) | Elazy (_,d,e) ->
       Spv.union (e_vars d) (e_vars e)
   | Erec ({rec_defn = dl},e) ->
-      let s = List.fold_left (fun s {fun_sym = ps} ->
-        Spv.union s ps.ps_cty.cty_reads) (e_vars e) dl in
-      List.fold_left (fun s {fun_sym = {ps_logic = l}} ->
-        match l with PLpv v -> Spv.remove v s | _ -> s) s dl
+      let s = List.fold_left (fun s {fun_sym = rs} ->
+        Spv.union s rs.rs_cty.cty_reads) (e_vars e) dl in
+      List.fold_left (fun s {fun_sym = {rs_logic = l}} ->
+        match l with RLpv v -> Spv.remove v s | _ -> s) s dl
   | Enot e | Eraise (_,e) | Eghost e -> e_vars e
   | Eassign al ->
       List.fold_left (fun s (r,_,v) -> Spv.add r (Spv.add v s)) Spv.empty al
@@ -661,7 +661,7 @@ let rec check_expr gh mut vis rst e0 =
   let error_v v e = Loc.errorm ?loc:(find_reset v e) "This expression \
     prohibits further usage of variable %s" v.pv_vs.vs_name.id_string in
   let error_s s v e = Loc.errorm ?loc:(find_reset v e) "This expression \
-    prohibits further usage of function %s" s.ps_name.id_string in
+    prohibits further usage of function %s" s.rs_name.id_string in
   let error_r _r = Loc.errorm ?loc:e0.e_loc "This expression \
     makes a ghost write into a non-ghost location" in
   let check_v rst v = Opt.iter (error_v v) (Mpv.find_opt v rst) in
@@ -677,7 +677,7 @@ let rec check_expr gh mut vis rst e0 =
   let ghost_c vis c = Mreg.set_inter vis (cty_ghost_writes gh c) in
   match e0.e_node with
   | Evar v -> check_v rst v
-  | Esym s -> Mpv.iter (error_s s) (reset_c rst s.ps_cty)
+  | Esym s -> Mpv.iter (error_s s) (reset_c rst s.rs_cty)
   | Eapp ({e_node = Efun d},[],({cty_args = []} as c)) ->
       let rst = reset_c rst c and gwr = ghost_c vis c in
       if not (Mpv.is_empty rst && Mreg.is_empty gwr) then
@@ -688,7 +688,7 @@ let rec check_expr gh mut vis rst e0 =
   | Efun _ | Eany -> check_c rst (cty_of_expr e0)
   | Eassign al ->
       List.iter (fun (r,f,v) -> check_v rst r; check_v rst v;
-        if not f.ps_ghost && (gh || r.pv_ghost || v.pv_ghost)
+        if not f.rs_ghost && (gh || r.pv_ghost || v.pv_ghost)
         then match r.pv_ity.ity_node with
           | Ityreg r when Sreg.mem r vis -> error_r r
           | _ -> ()) al
@@ -696,10 +696,10 @@ let rec check_expr gh mut vis rst e0 =
       check_expr (gh || v.pv_ghost) mut vis rst d;
       check_expr gh (pv_mut v mut) (pv_vis v vis) (after_e d) e
   | Elet ({let_sym = ValS s; let_expr = d},e) ->
-      check_expr (gh || s.ps_ghost) mut vis rst d;
+      check_expr (gh || s.rs_ghost) mut vis rst d;
       check_e (after_e d) e
   | Erec ({rec_defn = fdl},e) ->
-      List.iter (fun fd -> check_c rst fd.fun_sym.ps_cty) fdl;
+      List.iter (fun fd -> check_c rst fd.fun_sym.rs_cty) fdl;
       check_e rst e
   | Elazy (_,d,e) ->
       check_e rst d; check_e (after_e d) e
@@ -734,73 +734,73 @@ let e_fun args p q xq ({e_effect = eff} as e) =
 
 (* recursive definitions *)
 
-let ps_clone ({ps_name = id; ps_ghost = ghost} as s) c =
-  create_psymbol (id_clone id) ~ghost ~kind:(ps_kind s) c
+let rs_clone ({rs_name = id; rs_ghost = ghost} as s) c =
+  create_rsymbol (id_clone id) ~ghost ~kind:(rs_kind s) c
 
 let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
   cty_add_reads (cty_of_expr d) (List.fold_left add Spv.empty varl)
 
-let rec e_ps_subst sm e = e_label_copy e (match e.e_node with
+let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Evar _ | Econst _ | Eany | Etrue | Efalse
   | Eassign _ | Eassert _ | Epure _ | Eabsurd -> e
-  | Esym s -> e_sym (Mps.find_def s s sm)
+  | Esym s -> e_sym (Mrs.find_def s s sm)
   | Efun d ->
-      let d = e_ps_subst sm d in let c = cty_of_expr e in
+      let d = e_rs_subst sm d in let c = cty_of_expr e in
       e_fun c.cty_args c.cty_pre c.cty_post c.cty_xpost d
   | Eapp (d,vl,c) ->
-      let d = e_ps_subst sm d in
+      let d = e_rs_subst sm d in
       let al = List.map (fun v -> v.pv_ity) c.cty_args in
       e_app_raw d vl al c.cty_result
   | Elet ({let_sym = ValV v; let_expr = d} as ld, e) ->
-      let d = e_ps_subst sm d in
+      let d = e_rs_subst sm d in
       ity_equal_check (ity_of_expr d) v.pv_ity;
       if d.e_ghost && not v.pv_ghost then Loc.errorm
         "Expr.create_rec_defn: ghost status mismatch";
-      e_let_raw {ld with let_expr = d} (e_ps_subst sm e)
+      e_let_raw {ld with let_expr = d} (e_rs_subst sm e)
   | Elet ({let_sym = ValS s; let_expr = d},e) ->
-      let d = e_ps_subst sm d in
-      if d.e_ghost && not s.ps_ghost then Loc.errorm
+      let d = e_rs_subst sm d in
+      if d.e_ghost && not s.rs_ghost then Loc.errorm
         "Expr.create_rec_defn: ghost status mismatch";
-      let ld, ns = create_let_defn_ps (id_clone s.ps_name)
-        ~ghost:s.ps_ghost ~kind:(ps_kind s) d in
-      e_let_raw ld (e_ps_subst (Mps.add s ns sm) e)
+      let ld, ns = create_let_defn_rs (id_clone s.rs_name)
+        ~ghost:s.rs_ghost ~kind:(rs_kind s) d in
+      e_let_raw ld (e_rs_subst (Mrs.add s ns sm) e)
   | Erec ({rec_defn = fdl; rec_decr = ds},e) ->
       let ndl = List.map (fun fd ->
-        fd.fun_rsym, e_ps_subst sm fd.fun_expr) fdl in
+        fd.fun_rsym, e_rs_subst sm fd.fun_expr) fdl in
       let merge {fun_sym = s; fun_varl = varl} (rs,d) =
-        { fun_sym = ps_clone s (cty_add_variant d varl);
+        { fun_sym = rs_clone s (cty_add_variant d varl);
           fun_rsym = rs; fun_expr = d; fun_varl = varl } in
       let nfdl = List.map2 merge fdl (rec_fixp ndl) in
-      let add m o n = Mps.add o.fun_sym n.fun_sym m in
+      let add m o n = Mrs.add o.fun_sym n.fun_sym m in
       let sm = List.fold_left2 add sm fdl nfdl in
       let rd = {rec_defn = nfdl; rec_decr = ds} in
-      e_rec rd (e_ps_subst sm e)
-  | Eghost e -> e_ghost (e_ps_subst sm e)
-  | Enot e -> e_not (e_ps_subst sm e)
-  | Eif (c,d,e) -> e_if (e_ps_subst sm c) (e_ps_subst sm d) (e_ps_subst sm e)
-  | Elazy (op,d,e) -> e_lazy op (e_ps_subst sm d) (e_ps_subst sm e)
-  | Efor (v,b,inv,e) -> e_for_raw v b inv (e_ps_subst sm e)
-  | Ewhile (d,inv,vl,e) -> e_while (e_ps_subst sm d) inv vl (e_ps_subst sm e)
-  | Eraise (xs,d) -> e_raise xs (e_ps_subst sm d) (ity_of_expr e)
-  | Ecase (d,bl) -> e_case (e_ps_subst sm d)
-      (List.map (fun (pp,e) -> pp, e_ps_subst sm e) bl)
-  | Etry (d,xl) -> e_try (e_ps_subst sm d)
-      (List.map (fun (xs,v,e) -> xs, v, e_ps_subst sm e) xl))
+      e_rec rd (e_rs_subst sm e)
+  | Eghost e -> e_ghost (e_rs_subst sm e)
+  | Enot e -> e_not (e_rs_subst sm e)
+  | Eif (c,d,e) -> e_if (e_rs_subst sm c) (e_rs_subst sm d) (e_rs_subst sm e)
+  | Elazy (op,d,e) -> e_lazy op (e_rs_subst sm d) (e_rs_subst sm e)
+  | Efor (v,b,inv,e) -> e_for_raw v b inv (e_rs_subst sm e)
+  | Ewhile (d,inv,vl,e) -> e_while (e_rs_subst sm d) inv vl (e_rs_subst sm e)
+  | Eraise (xs,d) -> e_raise xs (e_rs_subst sm d) (ity_of_expr e)
+  | Ecase (d,bl) -> e_case (e_rs_subst sm d)
+      (List.map (fun (pp,e) -> pp, e_rs_subst sm e) bl)
+  | Etry (d,xl) -> e_try (e_rs_subst sm d)
+      (List.map (fun (xs,v,e) -> xs, v, e_rs_subst sm e) xl))
 
 and rec_fixp dl =
   let update sm (s,d) =
     let c = cty_of_expr d in
-    if d.e_ghost && not s.ps_ghost then Loc.errorm
+    if d.e_ghost && not s.rs_ghost then Loc.errorm
       "Expr.create_rec_defn: ghost status mismatch";
-    let c = if List.length c.cty_pre < List.length s.ps_cty.cty_pre
-            then c else cty_add_pre c [List.hd s.ps_cty.cty_pre] in
-    if eff_equal c.cty_effect s.ps_cty.cty_effect &&
-       Spv.equal c.cty_reads s.ps_cty.cty_reads
+    let c = if List.length c.cty_pre < List.length s.rs_cty.cty_pre
+            then c else cty_add_pre c [List.hd s.rs_cty.cty_pre] in
+    if eff_equal c.cty_effect s.rs_cty.cty_effect &&
+       Spv.equal c.cty_reads s.rs_cty.cty_reads
     then sm, (s,d)
-    else let n = ps_clone s c in Mps.add s n sm, (n,d) in
-  let sm, dl = Lists.map_fold_left update Mps.empty dl in
-  if Mps.is_empty sm then dl else
-  rec_fixp (List.map (fun (s,d) -> s, e_ps_subst sm d) dl)
+    else let n = rs_clone s c in Mrs.add s n sm, (n,d) in
+  let sm, dl = Lists.map_fold_left update Mrs.empty dl in
+  if Mrs.is_empty sm then dl else
+  rec_fixp (List.map (fun (s,d) -> s, e_rs_subst sm d) dl)
 
 let create_rec_defn fdl =
   (* check that the variant relations are well-typed *)
@@ -845,58 +845,58 @@ let create_rec_defn fdl =
     let same u v =
       u.pv_ghost = v.pv_ghost && ity_equal u.pv_ity v.pv_ity in
     if (match d.e_node with Efun _ -> false | _ -> true) ||
-       not (Lists.equal same s.ps_cty.cty_args c.cty_args) ||
-       not (ity_equal s.ps_cty.cty_result c.cty_result) ||
-       (d.e_ghost && not s.ps_ghost) || c.cty_args = []
+       not (Lists.equal same s.rs_cty.cty_args c.cty_args) ||
+       not (ity_equal s.rs_cty.cty_result c.cty_result) ||
+       (d.e_ghost && not s.rs_ghost) || c.cty_args = []
     then invalid_arg "Expr.create_rec_defn";
     (* prepare the extra "decrease" precondition *)
     let pre = match ds with
       | Some ls -> ps_app ls (List.map fst varl) :: c.cty_pre
       | None -> c.cty_pre in
-    (* create the clean psymbol *)
-    let id = id_clone s.ps_name in
+    (* create the clean rsymbol *)
+    let id = id_clone s.rs_name in
     let c = create_cty c.cty_args pre
       c.cty_post c.cty_xpost Spv.empty start_eff c.cty_result in
-    let ns = create_psymbol id ~ghost:s.ps_ghost ~kind:PKnone c in
-    Mps.add s ns sm, (ns,d) in
-  let sm, dl = Lists.map_fold_left update Mps.empty fdl in
+    let ns = create_rsymbol id ~ghost:s.rs_ghost ~kind:RKnone c in
+    Mrs.add s ns sm, (ns,d) in
+  let sm, dl = Lists.map_fold_left update Mrs.empty fdl in
   (* produce the recursive definition *)
-  let conv (s,d) = s, e_ps_subst sm d in
+  let conv (s,d) = s, e_rs_subst sm d in
   let merge (_,_,varl,kind) (rs,d) =
-    let id = id_clone rs.ps_name in
+    let id = id_clone rs.rs_name in
     let c = cty_add_variant d varl in
-    let s = create_psymbol id ~kind ~ghost:rs.ps_ghost c in
+    let s = create_rsymbol id ~kind ~ghost:rs.rs_ghost c in
     { fun_sym = s; fun_rsym = rs; fun_expr = d; fun_varl = varl } in
   let dl = List.map2 merge fdl (rec_fixp (List.map conv dl)) in
   { rec_defn = dl; rec_decr = ds }
 
 (* built-in symbols *)
 
-let ps_bool_true  = ps_of_ls fs_bool_true
-let ps_bool_false = ps_of_ls fs_bool_false
+let rs_bool_true  = rs_of_ls fs_bool_true
+let rs_bool_false = rs_of_ls fs_bool_false
 
-let e_bool_true  = e_app (e_sym ps_bool_true)  [] [] ity_bool
-let e_bool_false = e_app (e_sym ps_bool_false) [] [] ity_bool
+let e_bool_true  = e_app (e_sym rs_bool_true)  [] [] ity_bool
+let e_bool_false = e_app (e_sym rs_bool_false) [] [] ity_bool
 
-let ps_tuple = Hint.memo 17 (fun n -> ps_of_ls (fs_tuple n))
+let rs_tuple = Hint.memo 17 (fun n -> rs_of_ls (fs_tuple n))
 
-let is_ps_tuple ps = ps_equal ps (ps_tuple (List.length ps.ps_cty.cty_args))
+let is_rs_tuple rs = rs_equal rs (rs_tuple (List.length rs.rs_cty.cty_args))
 
 let e_tuple el =
   let ity = ity_tuple (List.map ity_of_expr el) in
-  e_app (e_sym (ps_tuple (List.length el))) el [] ity
+  e_app (e_sym (rs_tuple (List.length el))) el [] ity
 
-let ps_void = ps_tuple 0
+let rs_void = rs_tuple 0
 
-let e_void = e_app (e_sym ps_void) [] [] ity_unit
+let e_void = e_app (e_sym rs_void) [] [] ity_unit
 
-let ps_func_app = ps_of_ls fs_func_app
+let rs_func_app = rs_of_ls fs_func_app
 
 let e_func_app fn e =
-  let c = ps_func_app.ps_cty in
+  let c = rs_func_app.rs_cty in
   let mtch isb a e = ity_match isb a.pv_ity (ity_of_expr e) in
   let isb = List.fold_left2 mtch c.cty_freeze c.cty_args [fn;e] in
-  e_app (e_sym ps_func_app) [fn;e] [] (ity_full_inst isb c.cty_result)
+  e_app (e_sym rs_func_app) [fn;e] [] (ity_full_inst isb c.cty_result)
 
 let e_func_app_l fn el = List.fold_left e_func_app fn el
 
@@ -908,18 +908,18 @@ open Pretty
 let sprinter = create_ident_printer []
   ~sanitizer:(sanitizer char_to_alpha char_to_alnumus)
 
-let id_of_ps s = match s.ps_logic with
-  | PLnone | PLlemma -> s.ps_name
-  | PLpv v -> v.pv_vs.vs_name
-  | PLls s -> s.ls_name
+let id_of_rs s = match s.rs_logic with
+  | RLnone | RLlemma -> s.rs_name
+  | RLpv v -> v.pv_vs.vs_name
+  | RLls s -> s.ls_name
 
-let forget_ps s = match s.ps_logic with
-  | PLnone | PLlemma -> forget_id sprinter s.ps_name
-  | PLpv v -> forget_pv v
-  | PLls _ -> () (* we don't forget top-level symbols *)
+let forget_rs s = match s.rs_logic with
+  | RLnone | RLlemma -> forget_id sprinter s.rs_name
+  | RLpv v -> forget_pv v
+  | RLls _ -> () (* we don't forget top-level symbols *)
 
 let extract_op s =
-  let s = s.ps_name.id_string in
+  let s = s.rs_name.id_string in
   let len = String.length s in
   if len < 7 then None else
   let inf = String.sub s 0 6 in
@@ -930,29 +930,29 @@ let extract_op s =
 
 let tight_op s = let c = String.sub s 0 1 in c = "!" || c = "?"
 
-let print_ps fmt s =
-  if s.ps_name.id_string = "mixfix []" then pp_print_string fmt "([])" else
-  if s.ps_name.id_string = "mixfix []<-" then pp_print_string fmt "([]<-)" else
-  if s.ps_name.id_string = "mixfix [<-]" then pp_print_string fmt "([<-])" else
-  match extract_op s, s.ps_logic with
+let print_rs fmt s =
+  if s.rs_name.id_string = "mixfix []" then pp_print_string fmt "([])" else
+  if s.rs_name.id_string = "mixfix []<-" then pp_print_string fmt "([]<-)" else
+  if s.rs_name.id_string = "mixfix [<-]" then pp_print_string fmt "([<-])" else
+  match extract_op s, s.rs_logic with
   | Some s, _ ->
       let s = Str.replace_first (Str.regexp "^\\*.") " \\0" s in
       let s = Str.replace_first (Str.regexp ".\\*$") "\\0 " s in
       fprintf fmt "(%s)" s
-  | _, PLnone | _, PLlemma ->
-      pp_print_string fmt (id_unique sprinter s.ps_name)
-  | _, PLpv v -> print_pv fmt v
-  | _, PLls s -> print_ls fmt s
+  | _, RLnone | _, RLlemma ->
+      pp_print_string fmt (id_unique sprinter s.rs_name)
+  | _, RLpv v -> print_pv fmt v
+  | _, RLls s -> print_ls fmt s
 
-let print_ps_head fmt s = fprintf fmt "%s%s%a%a"
-  (if s.ps_ghost then "ghost " else "")
-  (match s.ps_logic with
-    | PLnone -> ""
-    | PLpv _ -> "function "
-    | PLls {ls_value = None} -> "predicate "
-    | PLls _ -> "function "
-    | PLlemma -> "lemma ")
-  print_ps s print_id_labels (id_of_ps s)
+let print_rs_head fmt s = fprintf fmt "%s%s%a%a"
+  (if s.rs_ghost then "ghost " else "")
+  (match s.rs_logic with
+    | RLnone -> ""
+    | RLpv _ -> "function "
+    | RLls {ls_value = None} -> "predicate "
+    | RLls _ -> "function "
+    | RLlemma -> "lemma ")
+  print_rs s print_id_labels (id_of_rs s)
 
 let print_invariant fmt f =
   fprintf fmt "@\ninvariant@ { %a }" print_term f
@@ -961,8 +961,8 @@ let print_variant fmt varl =
   let print_rel fmt = function
     | Some s -> fprintf fmt "@ with %a" print_ls s
     | None -> () in
-  let print_var fmt (t, ps) =
-    fprintf fmt " %a%a" Pretty.print_term t print_rel ps in
+  let print_var fmt (t,s) =
+    fprintf fmt " %a%a" Pretty.print_term t print_rel s in
   if varl <> [] then fprintf fmt "@\nvariant@   {%a }@ "
     (Pp.print_list Pp.comma print_var) varl
 
@@ -988,7 +988,7 @@ let ambig_cty c =
   let sres = ity_freeze isb_empty c.cty_result in
   not (Mtv.set_submap sres.isb_tv sarg.isb_tv)
 
-let ht_ps = Hps.create 7 (* fun_rsym -> fun_sym *)
+let ht_rs = Hrs.create 7 (* fun_rsym -> fun_sym *)
 
 let rec print_expr fmt e = print_lexpr 0 fmt e
 
@@ -1007,7 +1007,7 @@ and print_lexpr pri fmt e =
   print_eloc pri fmt e
 
 and print_app pri s fmt vl = match extract_op s, vl with
-  | _, [] -> print_ps fmt s
+  | _, [] -> print_rs fmt s
   | Some s, [t1] when tight_op s ->
       fprintf fmt (protect_on (pri > 7) "%s%a") s print_pv t1
   | Some s, [t1] ->
@@ -1015,21 +1015,21 @@ and print_app pri s fmt vl = match extract_op s, vl with
   | Some s, [t1;t2] ->
       fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
         print_pv t1 s print_pv t2
-  | _, [t1;t2] when s.ps_name.id_string = "mixfix []" ->
+  | _, [t1;t2] when s.rs_name.id_string = "mixfix []" ->
       fprintf fmt (protect_on (pri > 6) "%a[%a]") print_pv t1 print_pv t2
-  | _, [t1;t2;t3] when s.ps_name.id_string = "mixfix [<-]" ->
+  | _, [t1;t2;t3] when s.rs_name.id_string = "mixfix [<-]" ->
       fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
         print_pv t1 print_pv t2 print_pv t3
-  | _, [t1;t2;t3] when s.ps_name.id_string = "mixfix []<-" ->
+  | _, [t1;t2;t3] when s.rs_name.id_string = "mixfix []<-" ->
       fprintf fmt (protect_on (pri > 0) "%a[%a] <- %a")
         print_pv t1 print_pv t2 print_pv t3
   | _, tl ->
       fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
-        print_ps s (Pp.print_list Pp.space print_pv) tl
+        print_rs s (Pp.print_list Pp.space print_pv) tl
 
 and print_enode pri fmt e = match e.e_node with
   | Evar v -> print_pv fmt v
-  | Esym s -> print_ps fmt (Hps.find_def ht_ps s s)
+  | Esym s -> print_rs fmt (Hrs.find_def ht_rs s s)
   | Efun e1 ->
       let c = cty_of_expr e in
       fprintf fmt "@[<hov 2>fun%a ->@\n%a@]"
@@ -1045,17 +1045,17 @@ and print_enode pri fmt e = match e.e_node with
         (print_spec [] c.cty_pre c.cty_post c.cty_xpost
           c.cty_reads c.cty_effect) None
   | Eapp (e,[],_) -> print_lexpr pri fmt e
-  | Eapp ({e_node = Esym s},vl,_) when is_ps_tuple s ->
+  | Eapp ({e_node = Esym s},vl,_) when is_rs_tuple s ->
       fprintf fmt "(%a)" (Pp.print_list Pp.comma print_pv) vl
-  | Eapp ({e_node = Esym s},[l;r],_) when ps_equal s ps_func_app ->
+  | Eapp ({e_node = Esym s},[l;r],_) when rs_equal s rs_func_app ->
       fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a %a@]")
         print_pv l print_pv r
   | Eapp ({e_node = Esym s},vl,{cty_args = []; cty_result = ity})
-    when ambig_cty s.ps_cty ->
+    when ambig_cty s.rs_cty ->
       fprintf fmt (protect_on (pri > 0) "%a:%a")
-        (print_app 5 (Hps.find_def ht_ps s s)) vl print_ity ity
+        (print_app 5 (Hrs.find_def ht_rs s s)) vl print_ity ity
   | Eapp ({e_node = Esym s},vl,_) ->
-      print_app pri (Hps.find_def ht_ps s s) fmt vl
+      print_app pri (Hrs.find_def ht_rs s s) fmt vl
   | Eapp ({e_vty = VtyC c} as e,vl,{cty_args = []; cty_result = ity})
     when ambig_cty c ->
       fprintf fmt (protect_on (pri > 0) "@[<hov 1>%a@ %a: %a@]")
@@ -1083,17 +1083,17 @@ and print_enode pri fmt e = match e.e_node with
         print_let_defn ldf print_expr e;
       begin match ldf.let_sym with
         | ValV v -> forget_pv v
-        | ValS s -> forget_ps s end
+        | ValS s -> forget_rs s end
   | Erec (rdf, e) ->
       fprintf fmt (protect_on (pri > 0) "%a@ in@\n%a")
         print_rec_defn rdf print_expr e;
-      List.iter (fun fd -> forget_ps fd.fun_sym) rdf.rec_defn
+      List.iter (fun fd -> forget_rs fd.fun_sym) rdf.rec_defn
   | Eif (e0,e1,e2) ->
       fprintf fmt (protect_on (pri > 0) "if %a then %a@ else %a")
         print_expr e0 print_expr e1 print_expr e2
   | Eassign al ->
       let print_left fmt (r,f,_) =
-        fprintf fmt "%a.%a" print_pvty r print_ps f in
+        fprintf fmt "%a.%a" print_pvty r print_rs f in
       let print_right fmt (_,_,v) = print_pv fmt v in
       fprintf fmt (protect_on (pri > 0) "%a <- %a")
         (Pp.print_list Pp.comma print_left) al
@@ -1143,25 +1143,25 @@ and print_let_defn fmt = function
         (print_lexpr 0 (*4*)) e
   | {let_sym = ValS s; let_expr = {e_node = Efun e} as e0} ->
       fprintf fmt "@[<hov 2>let %a%a =@\n%a@]"
-        print_ps_head s
+        print_rs_head s
         print_cty (cty_of_expr e0)
         (print_lexpr 0 (*4*)) e
   | {let_sym = ValS s; let_expr = e} ->
       fprintf fmt "@[<hov 2>let %a =@\n%a@]"
-        print_ps_head s
+        print_rs_head s
         (print_lexpr 0 (*4*)) e
 
 and print_rec_defn fmt {rec_defn = fdl} =
-  List.iter (fun fd -> Hps.replace ht_ps fd.fun_rsym fd.fun_sym) fdl;
+  List.iter (fun fd -> Hrs.replace ht_rs fd.fun_rsym fd.fun_sym) fdl;
   print_list_next Pp.newline print_rec_fun fmt fdl;
-  List.iter (fun fd -> Hps.remove ht_ps fd.fun_rsym) fdl
+  List.iter (fun fd -> Hrs.remove ht_rs fd.fun_rsym) fdl
 
 and print_rec_fun fst fmt fd =
   let e = match fd.fun_expr.e_node with
     | Efun e -> e | _ -> assert false in
   fprintf fmt "@[<hov 2>%s %a%a%a =@\n%a@]"
     (if fst then "let rec" else "with")
-    print_ps_head fd.fun_sym
+    print_rs_head fd.fun_sym
     print_cty (cty_of_expr fd.fun_expr)
     print_variant fd.fun_varl
     (print_lexpr 0 (*4*)) e
@@ -1172,22 +1172,22 @@ let print_val_decl fmt = function
         (if v.pv_ghost then "ghost " else "")
         print_pv v print_id_labels v.pv_vs.vs_name
         print_ity v.pv_ity
-  | ValS ({ps_logic = PLpv v; ps_cty = c} as s) ->
-      fprintf fmt "@[<hov 2>val %a%a@]" print_ps_head s
+  | ValS ({rs_logic = RLpv v; rs_cty = c} as s) ->
+      fprintf fmt "@[<hov 2>val %a%a@]" print_rs_head s
         (print_spec c.cty_args c.cty_pre (List.tl c.cty_post) c.cty_xpost
           (Spv.remove v c.cty_reads) c.cty_effect) (Some c.cty_result)
-  | ValS ({ps_logic = PLls _; ps_cty = c} as s) ->
-      fprintf fmt "@[<hov 2>val %a%a@]" print_ps_head s
+  | ValS ({rs_logic = RLls _; rs_cty = c} as s) ->
+      fprintf fmt "@[<hov 2>val %a%a@]" print_rs_head s
         (print_spec c.cty_args c.cty_pre (List.tl c.cty_post) c.cty_xpost
           c.cty_reads c.cty_effect) (Some c.cty_result)
   | ValS s ->
-      fprintf fmt "@[<hov 2>val %a%a@]" print_ps_head s print_cty s.ps_cty
+      fprintf fmt "@[<hov 2>val %a%a@]" print_rs_head s print_cty s.rs_cty
 
 (* exception handling *)
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | ConstructorExpected s ->
-      fprintf fmt "Function %a is not a constructor" print_ps s
+      fprintf fmt "Function %a is not a constructor" print_rs s
   | ItyExpected _e ->
       fprintf fmt "This expression is not a first-order value"
   | CtyExpected _e ->

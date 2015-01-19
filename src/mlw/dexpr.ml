@@ -303,7 +303,7 @@ let specialize_pv {pv_ity = ity} =
 let specialize_xs {xs_ity = ity} =
   spec_ity (Htv.create 3) (Hreg.create 3) (ity_freeze isb_empty ity) ity
 
-let specialize_ps {ps_cty = cty} =
+let specialize_rs {rs_cty = cty} =
   let hv = Htv.create 3 and hr = Hreg.create 3 in
   let spec ity = spec_ity hv hr cty.cty_freeze ity in
   List.map (fun v -> spec v.pv_ity) cty.cty_args, spec cty.cty_result
@@ -320,7 +320,7 @@ type dpattern = {
 type dpattern_node =
   | DPwild
   | DPvar  of preid
-  | DPapp  of psymbol * dpattern list
+  | DPapp  of rsymbol * dpattern list
   | DPor   of dpattern * dpattern
   | DPas   of dpattern * preid
   | DPcast of dpattern * ity
@@ -370,8 +370,8 @@ type dexpr = {
 
 and dexpr_node =
   | DEvar of string * dvty
-  | DEgpvar of pvsymbol
-  | DEgpsym of psymbol
+  | DEpv of pvsymbol
+  | DErs of rsymbol
   | DEconst of Number.constant
   | DEapp of dexpr * dexpr list
   | DEfun of dbinder list * dspec later * dexpr
@@ -381,7 +381,7 @@ and dexpr_node =
   | DElazy of lazy_op * dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
-  | DEassign of (dexpr * psymbol * dexpr) list
+  | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * (dinvariant * variant list) later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
@@ -398,14 +398,14 @@ and dexpr_node =
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
-and dlet_defn = preid * ghost * ps_kind * dexpr
+and dlet_defn = preid * ghost * rs_kind * dexpr
 
 and drec_defn = { fds : dfun_defn list }
 
-and dfun_defn = preid * ghost * ps_kind *
+and dfun_defn = preid * ghost * rs_kind *
   dbinder list * (dspec * variant list) later * dexpr
 
-type dval_decl = preid * ghost * ps_kind * dtype_v
+type dval_decl = preid * ghost * rs_kind * dtype_v
 
 (** Environment *)
 
@@ -476,7 +476,7 @@ let denv_add_let denv (id,_,_,({de_dvty = dvty} as de)) =
   if fst dvty = [] then denv_add_mono denv id dvty else
   let rec is_value de = match de.de_node with
     | DEghost de | DEuloc (de,_) | DElabel (de,_) -> is_value de
-    | DEvar _ | DEgpsym _ | DEfun _ | DEany _ -> true
+    | DEvar _ | DErs _ | DEfun _ | DEany _ -> true
     | _ -> false in
   if is_value de
   then denv_add_poly denv id dvty
@@ -536,7 +536,7 @@ let dexpr_expected_type_weak {de_dvty = dvty; de_loc = loc} dity =
 
 (** Generation of letrec blocks *)
 
-type pre_fun_defn = preid * ghost * ps_kind *
+type pre_fun_defn = preid * ghost * rs_kind *
   dbinder list * dity * (denv -> (dspec * variant list) later * dexpr)
 
 exception DupId of preid
@@ -580,16 +580,16 @@ let dpattern ?loc node =
     | DPvar id ->
         let dity = dity_fresh () in
         mk_dpat (PPvar id) dity (Mstr.singleton id.pre_name dity)
-    | DPapp ({ps_logic = PLls ls} as ps, dpl) when ls.ls_constr > 0 ->
-        let argl, res = specialize_ps ps in
+    | DPapp ({rs_logic = RLls ls} as rs, dpl) when ls.ls_constr > 0 ->
+        let argl, res = specialize_rs rs in
         dity_unify_app ls dpat_expected_type dpl argl;
         let join n _ _ = raise (Dterm.DuplicateVar n) in
         let add acc dp = Mstr.union join acc dp.dp_vars in
         let vars = List.fold_left add Mstr.empty dpl in
         let ppl = List.map (fun dp -> dp.dp_pat) dpl in
-        mk_dpat (PPapp (ps, ppl)) res vars
-    | DPapp (ps,_) ->
-        raise (ConstructorExpected ps);
+        mk_dpat (PPapp (rs, ppl)) res vars
+    | DPapp (rs,_) ->
+        raise (ConstructorExpected rs);
     | DPor (dp1,dp2) ->
         dpat_expected_type dp2 dp1.dp_dity;
         let join n dity1 dity2 = try dity_unify dity1 dity2; Some dity1
@@ -612,10 +612,10 @@ let dexpr ?loc node =
   let get_dvty = function
     | DEvar (_,dvty) ->
         dvty
-    | DEgpvar pv ->
+    | DEpv pv ->
         [], specialize_pv pv
-    | DEgpsym ps ->
-        specialize_ps ps
+    | DErs rs ->
+        specialize_rs rs
     | DEconst (Number.ConstInt _) ->
         dvty_int
     | DEconst (Number.ConstReal _) ->
@@ -624,7 +624,7 @@ let dexpr ?loc node =
         let argl0, res0 = de0.de_dvty in
         let rec dig res del = match del with
           | de::del ->
-              let f,a,r = match specialize_ps ps_func_app with
+              let f,a,r = match specialize_rs rs_func_app with
                 | [f;a],r -> f,a,r | _ -> assert false in
               begin try dity_unify res f with Exit ->
                 if argl0 = [] && res == res0 then Loc.errorm ?loc:de0.de_loc
@@ -670,9 +670,9 @@ let dexpr ?loc node =
           dexpr_expected_type de res) bl;
         [], res
     | DEassign al ->
-        List.iter (fun (de1,ps,de2) ->
-          let argl, res = specialize_ps ps in
-          let ls = match ps.ps_logic with PLls ls -> ls
+        List.iter (fun (de1,rs,de2) ->
+          let argl, res = specialize_rs rs in
+          let ls = match rs.rs_logic with RLls ls -> ls
             | _ -> invalid_arg "Dexpr.dexpr: not a field" in
           dity_unify_app ls dexpr_expected_type [de1] argl;
           dexpr_expected_type_weak de2 res) al;
@@ -722,9 +722,9 @@ let dexpr ?loc node =
 
 let mk_dexpr loc d n = { de_node = n; de_dvty = d; de_loc = loc }
 
-let de_void loc = mk_dexpr loc dvty_unit (DEgpsym ps_void)
+let de_void loc = mk_dexpr loc dvty_unit (DErs rs_void)
 
-let pat_void loc = { dp_pat = PPapp (ps_void, []);
+let pat_void loc = { dp_pat = PPapp (rs_void, []);
   dp_dity = dity_unit; dp_vars = Mstr.empty; dp_loc = loc }
 
 (** Final stage *)
@@ -773,13 +773,13 @@ let rec effect_of_term t =
   | Tapp (fs, [ta]) ->
       let v, ity, fa = effect_of_term ta in
       let ity = match fa with
-        | Some {ps_cty = {cty_args = [arg]; cty_result = res}} ->
+        | Some {rs_cty = {cty_args = [arg]; cty_result = res}} ->
             ity_full_inst (ity_match isb_empty arg.pv_ity ity) res
         | Some _ -> assert false
         | None -> ity in
-      begin try match ity.ity_node, restore_ps fs with
-        | Ityreg _, ({ps_field = Some _} as ps) -> v, ity, Some ps
-        | _, {ps_cty={cty_args=[arg]; cty_result=res; cty_freeze=frz}} ->
+      begin try match ity.ity_node, restore_rs fs with
+        | Ityreg _, ({rs_field = Some _} as rs) -> v, ity, Some rs
+        | _, {rs_cty={cty_args=[arg]; cty_result=res; cty_freeze=frz}} ->
             v, ity_full_inst (ity_match frz arg.pv_ity ity) res, None
         | _ -> quit () with Not_found -> quit () end
   | Tvar v ->
@@ -797,7 +797,7 @@ let effect_of_dspec dsp =
   let add_write (s,l,e) t = match effect_of_term t with
     | v, {ity_node = Ityreg reg}, fd ->
         let fs = match fd with
-          | Some fd -> Spv.singleton (Opt.get fd.ps_field)
+          | Some fd -> Spv.singleton (Opt.get fd.rs_field)
           | None -> Spv.of_list reg.reg_its.its_mfields in
         let wr = Loc.try3 ?loc:t.t_loc eff_write eff_empty reg fs in
         Spv.add v s, (wr,t)::l, eff_union e wr
@@ -848,11 +848,11 @@ let check_user_spec check_rwd ucty uwrl ecty e =
         stated@ in@ the@ specification"
 
 (*
-let check_user_ps recu ps =
-  let ps_regs = ps.ps_subst.ity_subst_reg in
+let check_user_rs recu rs =
+  let rs_regs = rs.rs_subst.ity_subst_reg in
   let report r =
-    if Mreg.mem r ps_regs then let spv = Spv.filter
-        (fun pv -> reg_occurs r pv.pv_ity.ity_vars) ps.ps_pvset in
+    if Mreg.mem r rs_regs then let spv = Spv.filter
+        (fun pv -> reg_occurs r pv.pv_ity.ity_vars) rs.rs_pvset in
       Loc.errorm "The type of this function contains an alias with \
         external variable %a" Mlw_pretty.print_pv (Spv.choose spv)
     else
@@ -873,7 +873,7 @@ let check_user_ps recu ps =
     let regs = List.fold_left add regs a.aty_args in
     match a.aty_result with
     | VTarrow a -> down regs a
-    | VTvalue v -> check (if recu then regs else ps_regs) v
+    | VTvalue v -> check (if recu then regs else rs_regs) v
     (* we allow the value in a non-recursive function to contain
        regions coming the function's arguments, but not from the
        context. It is sometimes useful to write a function around
@@ -881,14 +881,14 @@ let check_user_ps recu ps =
        impose the full non-alias discipline, to ensure the safety
        of region polymorphism (see add_rec_mono). *)
   in
-  ignore (down ps_regs ps.ps_aty)
+  ignore (down rs_regs rs.rs_aty)
 
 (** Environment *)
 
 type local_env = {
    kn : Mlw_decl.known_map;
   lkn : Decl.known_map;
-  psm : psymbol Mstr.t;
+  rsm : rsymbol Mstr.t;
   pvm : pvsymbol Mstr.t;
   vsm : vsymbol Mstr.t;
 }
@@ -896,14 +896,14 @@ type local_env = {
 let env_empty lkn kn = {
    kn = kn;
   lkn = lkn;
-  psm = Mstr.empty;
+  rsm = Mstr.empty;
   pvm = Mstr.empty;
   vsm = Mstr.empty;
 }
 
-let add_psymbol ({psm = psm} as lenv) ps =
-  let n = ps.ps_name.id_string in
-  { lenv with psm = Mstr.add n ps psm }
+let add_rsymbol ({rsm = rsm} as lenv) rs =
+  let n = rs.rs_name.id_string in
+  { lenv with rsm = Mstr.add n rs rsm }
 
 let add_pvsymbol ({pvm = pvm; vsm = vsm} as lenv) pv =
   let n = pv.pv_vs.vs_name.id_string in
@@ -915,9 +915,9 @@ let add_pv_map ({pvm = pvm; vsm = vsm} as lenv) vm =
 
 let add_let_sym env = function
   | LetV pv -> add_pvsymbol env pv
-  | LetA ps -> add_psymbol env ps
+  | LetA rs -> add_rsymbol env rs
 
-let add_fundef  env fd  = add_psymbol env fd.fun_ps
+let add_fundef  env fd  = add_rsymbol env fd.fun_rs
 let add_fundefs env fdl = List.fold_left add_fundef env fdl
 let add_binders env pvl = List.fold_left add_pvsymbol env pvl
 
@@ -982,8 +982,8 @@ let warn_unused s loc =
 let check_used_pv e pv = if not (Spv.mem pv e.e_syms.syms_pv) then
   warn_unused pv.pv_vs.vs_name.id_string pv.pv_vs.vs_name.id_loc
 
-let check_used_ps e ps = if not (Sps.mem ps e.e_syms.syms_ps) then
-  warn_unused ps.ps_name.id_string ps.ps_name.id_loc
+let check_used_rs e rs = if not (Srs.mem rs e.e_syms.syms_rs) then
+  warn_unused rs.rs_name.id_string rs.rs_name.id_loc
 
 let rec type_c env pvs vars otv (dtyv, dsp) =
   let vty = type_v env pvs vars otv dtyv in
@@ -1035,7 +1035,7 @@ and type_v env pvs vars otv = function
 let val_decl env (id,ghost,dtyv) =
   match type_v env Spv.empty vars_empty Stv.empty dtyv with
   | VTvalue v -> LetV (create_pvsymbol id ~ghost v)
-  | VTarrow a -> LetA (create_psymbol id ~ghost a)
+  | VTarrow a -> LetA (create_rsymbol id ~ghost a)
 
 (** Expressions *)
 
@@ -1065,12 +1065,12 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
   | DEvar (n,_) when argl = [] ->
       e_value (Mstr.find_exn (Dterm.UnboundVar n) n env.pvm)
   | DEvar (n,_) ->
-      let ps = Mstr.find_exn (Dterm.UnboundVar n) n env.psm in
-      e_arrow ps (List.map ity_of_dity argl) (ity_of_dity res)
-  | DEgpvar pv ->
+      let rs = Mstr.find_exn (Dterm.UnboundVar n) n env.rsm in
+      e_arrow rs (List.map ity_of_dity argl) (ity_of_dity res)
+  | DEpv pv ->
       e_value pv
-  | DEgpsym ps ->
-      e_arrow ps (List.map ity_of_dity argl) (ity_of_dity res)
+  | DErs rs ->
+      e_arrow rs (List.map ity_of_dity argl) (ity_of_dity res)
   | DEplapp (pl,del) ->
       let get_gh fd de = e_ghostify fd.fd_ghost (get env de) in
       e_plapp pl (List.map2 get_gh pl.pl_args del) (ity_of_dity res)
@@ -1098,7 +1098,7 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
           | _ -> false in
         let id_in_e2 = match ld1.let_sym with
           | LetV pv -> Spv.mem pv e2.e_syms.syms_pv
-          | LetA ps -> Sps.mem ps e2.e_syms.syms_ps in
+          | LetA rs -> Srs.mem rs e2.e_syms.syms_rs in
         if not id_in_e2 then warn_unused id.pre_name id.pre_loc;
         let e1_no_eff =
           Sreg.is_empty e1.e_effect.eff_writes &&
@@ -1233,12 +1233,12 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
   | DEfun (fd,de) ->
       let fd = expr_fun ~keep_loc ~strict:true uloc env fd in
       let e = get (add_fundef env fd) de in
-      check_used_ps e fd.fun_ps;
+      check_used_rs e fd.fun_rs;
       e_rec [fd] e
   | DElam (bl,de,sp) ->
       let fd = id_fresh "fn", false, bl, de, sp in
       let fd = expr_fun ~keep_loc ~strict:false uloc env fd in
-      let de = { de0 with de_node = DEgpsym fd.fun_ps } in
+      let de = { de0 with de_node = DErs fd.fun_rs } in
       e_rec [fd] (get env de)
   | DErec (fdl,de) ->
       let fdl = expr_rec ~keep_loc uloc env fdl in
@@ -1253,37 +1253,37 @@ and expr_rec ~keep_loc uloc env {fds = dfdl} =
     if fst de.de_dvty <> [] then Loc.errorm ?loc:de.de_loc
       "The body of a recursive function must be a first-order value";
     let aty = vty_arrow pvl (VTvalue (ity_of_dity (snd de.de_dvty))) in
-    let ps = create_psymbol id ~ghost:gh aty in
-    add_psymbol env ps, (ps, gh, bl, pvl, de, dsp) in
+    let rs = create_rsymbol id ~ghost:gh aty in
+    add_rsymbol env rs, (rs, gh, bl, pvl, de, dsp) in
   let env, fdl = Lists.map_fold_left step1 env dfdl in
-  let step2 (ps, gh, bl, pvl, de, dsp) (fdl, dfdl) =
+  let step2 (rs, gh, bl, pvl, de, dsp) (fdl, dfdl) =
     let lam, dsp =
       expr_lam ~keep_loc ~strict:true uloc env gh pvl de dsp in
-    (ps, lam) :: fdl, (ps.ps_name, gh, bl, de, dsp) :: dfdl in
+    (rs, lam) :: fdl, (rs.rs_name, gh, bl, de, dsp) :: dfdl in
   (* check for unexpected aliases in case of trouble *)
   let fdl, dfdl = try List.fold_right step2 fdl ([],[]) with
     | Loc.Located (_, Mlw_ty.TypeMismatch _)
     | Mlw_ty.TypeMismatch _ as exn ->
-        List.iter (fun (ps,_,_,_,_,_) ->
-          let loc = Opt.get ps.ps_name.Ident.id_loc in
-          Loc.try2 ~loc check_user_ps true ps) fdl;
+        List.iter (fun (rs,_,_,_,_,_) ->
+          let loc = Opt.get rs.rs_name.Ident.id_loc in
+          Loc.try2 ~loc check_user_rs true rs) fdl;
         raise exn in
   let fdl = try create_rec_defn fdl with
     | Loc.Located (_, Mlw_ty.TypeMismatch _)
     | Mlw_ty.TypeMismatch _ as exn ->
-        List.iter (fun (ps,lam) ->
-          let loc = Opt.get ps.ps_name.Ident.id_loc in
-          let fd = create_fun_defn (id_clone ps.ps_name) lam in
-          Loc.try2 ~loc check_user_ps true fd.fun_ps) fdl;
+        List.iter (fun (rs,lam) ->
+          let loc = Opt.get rs.rs_name.Ident.id_loc in
+          let fd = create_fun_defn (id_clone rs.rs_name) lam in
+          Loc.try2 ~loc check_user_rs true fd.fun_rs) fdl;
         raise exn in
-  let step3 { fun_ps = ps; fun_lambda = lam } =
+  let step3 { fun_rs = rs; fun_lambda = lam } =
     let { l_spec = spec; l_expr = e } = lam in
     let spec = spec_invariant env e.e_syms.syms_pv e.e_vty spec in
-    ps, { lam with l_spec = { spec with c_letrec = 0 }} in
+    rs, { lam with l_spec = { spec with c_letrec = 0 }} in
   let fdl = create_rec_defn (List.map step3 fdl) in
   let step4 fd (id,_,bl,de,dsp) =
     Loc.try3 ?loc:de.de_loc check_lambda_effect fd bl dsp;
-    Loc.try2 ?loc:id.id_loc check_user_ps true fd.fun_ps in
+    Loc.try2 ?loc:id.id_loc check_user_rs true fd.fun_rs in
   List.iter2 step4 fdl dfdl;
   fdl
 
@@ -1309,7 +1309,7 @@ and expr_fun ~keep_loc ~strict uloc env (id,gh,bl,de,dsp) =
   let spec = spec_invariant env e.e_syms.syms_pv e.e_vty spec in
   let fd = create_fun_defn id { lam with l_spec = spec } in
   Loc.try3 ?loc:de.de_loc check_lambda_effect fd bl dsp;
-  Loc.try2 ?loc:id.pre_loc check_user_ps false fd.fun_ps;
+  Loc.try2 ?loc:id.pre_loc check_user_rs false fd.fun_rs;
   fd
 
 and expr_lam ~keep_loc ~strict uloc env gh pvl de dsp =
