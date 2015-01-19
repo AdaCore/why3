@@ -111,6 +111,8 @@ type expr = private {
   e_vty    : vty;
   e_ghost  : bool;
   e_effect : effect;
+  e_vars   : Spv.t;
+  e_syms   : Srs.t;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
 }

@@ -263,6 +263,8 @@ type expr = {
   e_vty    : vty;
   e_ghost  : bool;
   e_effect : effect;
+  e_vars   : Spv.t;
+  e_syms   : Srs.t;
   e_label  : Slab.t;
   e_loc    : Loc.position option;
 }
@@ -367,25 +369,30 @@ let find_effect pr e =
 
 (* smart constructors *)
 
-let mk_expr node vty ghost eff = {
+let mk_expr node vty ghost eff vars syms = {
   e_node   = node;
   e_vty    = vty;
   e_ghost  = if ghost && eff.eff_diverg then
     Loc.errorm "This ghost expression contains potentially \
       non-terminating loops or function calls" else ghost;
   e_effect = eff;
+  e_vars   = vars;
+  e_syms   = syms;
   e_label  = Slab.empty;
   e_loc    = None;
 }
 
-let e_var pv = mk_expr (Evar pv) (VtyI pv.pv_ity) pv.pv_ghost eff_empty
-let e_sym rs = mk_expr (Esym rs) (VtyC rs.rs_cty) rs.rs_ghost eff_empty
+let e_var pv = mk_expr (Evar pv) (VtyI pv.pv_ity)
+  pv.pv_ghost eff_empty (Spv.singleton pv) Srs.empty
+
+let e_sym rs = mk_expr (Esym rs) (VtyC rs.rs_cty)
+  rs.rs_ghost eff_empty rs.rs_cty.cty_reads (Srs.singleton rs)
 
 let e_const c =
   let ity = match c with
     | Number.ConstInt  _ -> ity_int
     | Number.ConstReal _ -> ity_real in
-  mk_expr (Econst c) (VtyI ity) false eff_empty
+  mk_expr (Econst c) (VtyI ity) false eff_empty Spv.empty Srs.empty
 
 let e_nat_const n =
   e_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
@@ -422,10 +429,25 @@ let create_let_defn_rs id ?(ghost=false) ?(kind=RKnone) e =
 let e_let_raw ({let_expr = d} as ld) e =
   let eff = eff_union d.e_effect e.e_effect in
   let ghost = e.e_ghost || e_ghost_raises d in
-  mk_expr (Elet (ld,e)) e.e_vty ghost eff
+  let vars, syms = match ld.let_sym with
+    | ValS ({rs_logic = RLpv v} as s) ->
+        Spv.remove v e.e_vars, Srs.remove s e.e_syms
+    | ValS s -> e.e_vars, Srs.remove s e.e_syms
+    | ValV v -> Spv.remove v e.e_vars, e.e_syms in
+  let vars = Spv.union d.e_vars vars in
+  let syms = Srs.union d.e_syms syms in
+  mk_expr (Elet (ld,e)) e.e_vty ghost eff vars syms
 
-let e_rec_raw rd e =
-  mk_expr (Erec (rd,e)) e.e_vty e.e_ghost e.e_effect
+let e_rec_raw ({rec_defn = fdl} as rd) e =
+  let add_fd (vars,syms) fd =
+    Spv.union vars fd.fun_sym.rs_cty.cty_reads,
+    Srs.union syms fd.fun_expr.e_syms in
+  let del_fd (vars,syms) fd = (match fd.fun_sym.rs_logic with
+    | RLpv v -> Spv.remove v vars | _ -> vars),
+    Srs.remove fd.fun_sym (Srs.remove fd.fun_rsym syms) in
+  let vars,syms = List.fold_left add_fd (e.e_vars,e.e_syms) fdl in
+  let vars,syms = List.fold_left del_fd (vars,syms) fdl in
+  mk_expr (Erec (rd,e)) e.e_vty e.e_ghost e.e_effect vars syms
 
 let proxy_label = create_label "proxy_pvsymbol"
 let proxy_labels = Slab.singleton proxy_label
@@ -437,7 +459,7 @@ let mk_proxy ~ghost e hd = match e.e_node with
       let ld, v = create_let_defn_pv id ~ghost e in
       ld::hd, v
 
-let e_ghost e = mk_expr (Eghost e) e.e_vty true e.e_effect
+let e_ghost e = mk_expr (Eghost e) e.e_vty true e.e_effect e.e_vars e.e_syms
 
 let e_ghostify e = if not e.e_ghost then e_ghost e else e
 
@@ -491,7 +513,8 @@ let e_app_raw e vl ityl ity =
     VtyC c, eff_empty in
   let mk_app e =
     let eff = eff_union e.e_effect eff in
-    mk_expr (Eapp (e,vl,c)) vty ghost eff in
+    let vars = List.fold_right Spv.add vl e.e_vars in
+    mk_expr (Eapp (e,vl,c)) vty ghost eff vars e.e_syms in
   rewind mk_app ghost e
 
 let e_app e el ityl ity =
@@ -515,7 +538,11 @@ let e_assign_raw al =
         Ity.print_its s f.rs_name.id_string
     | _ -> Loc.errorm "Mutable expression expected" in
   let eff = eff_assign eff_empty (List.map conv al) in
-  mk_expr (Eassign al) (VtyI ity_unit) ghost eff
+  let vars = List.fold_left (fun s (r,_,v) ->
+    Spv.add r (Spv.add v s)) Spv.empty al in
+  let syms = List.fold_left (fun s (_,f,_) ->
+    Srs.add f s) Srs.empty al in
+  mk_expr (Eassign al) (VtyI ity_unit) ghost eff vars syms
 
 let e_assign al =
   let hr, hv, al = List.fold_right (fun (r,f,v) (hr,hv,al) ->
@@ -535,21 +562,25 @@ let e_if e0 e1 e2 =
   let gh = e0.e_ghost || e1.e_ghost || e2.e_ghost in
   let eff = eff_union e1.e_effect e2.e_effect in
   let eff = eff_union e0.e_effect eff in
-  mk_expr (Eif (e0,e1,e2)) e1.e_vty gh eff
+  let vars = Spv.union e0.e_vars (Spv.union e1.e_vars e2.e_vars) in
+  let syms = Srs.union e0.e_syms (Srs.union e1.e_syms e2.e_syms) in
+  mk_expr (Eif (e0,e1,e2)) e1.e_vty gh eff vars syms
 
 let e_lazy op e1 e2 =
   ity_equal_check (ity_of_expr e1) ity_bool;
   ity_equal_check (ity_of_expr e2) ity_bool;
   let ghost = e1.e_ghost || e2.e_ghost in
   let eff = eff_union e1.e_effect e2.e_effect in
-  mk_expr (Elazy (op,e1,e2)) e1.e_vty ghost eff
+  let vars = Spv.union e1.e_vars e2.e_vars in
+  let syms = Srs.union e1.e_syms e2.e_syms in
+  mk_expr (Elazy (op,e1,e2)) e1.e_vty ghost eff vars syms
 
 let e_not e =
   ity_equal_check (ity_of_expr e) ity_bool;
-  mk_expr (Enot e) e.e_vty e.e_ghost e.e_effect
+  mk_expr (Enot e) e.e_vty e.e_ghost e.e_effect e.e_vars e.e_syms
 
-let e_true  = mk_expr Etrue  (VtyI ity_bool) false eff_empty
-let e_false = mk_expr Efalse (VtyI ity_bool) false eff_empty
+let e_true  = mk_expr Etrue  (VtyI ity_bool) false eff_empty Spv.empty Srs.empty
+let e_false = mk_expr Efalse (VtyI ity_bool) false eff_empty Spv.empty Srs.empty
 
 (* loops *)
 
@@ -559,7 +590,8 @@ let e_for_raw v ((f,_,t) as bounds) inv e =
   ity_equal_check t.pv_ity ity_int;
   ity_equal_check (ity_of_expr e) ity_unit;
   let ghost = v.pv_ghost || f.pv_ghost || t.pv_ghost || e.e_ghost in
-  mk_expr (Efor (v,bounds,inv,e)) e.e_vty ghost e.e_effect
+  let vars = Spv.add f (Spv.add t (Spv.remove v (t_freepvs e.e_vars inv))) in
+  mk_expr (Efor (v,bounds,inv,e)) e.e_vty ghost e.e_effect vars e.e_syms
 
 let e_for v ef dir et inv e =
   let ghost = v.pv_ghost || ef.e_ghost || et.e_ghost || e.e_ghost in
@@ -573,7 +605,10 @@ let e_while cnd inv vl e =
   let ghost = cnd.e_ghost || e.e_ghost in
   let eff = eff_union cnd.e_effect e.e_effect in
   let eff = if vl = [] then eff_diverge eff else eff in
-  mk_expr (Ewhile (cnd,inv,vl,e)) e.e_vty ghost eff
+  let vars = t_freepvs (Spv.union cnd.e_vars e.e_vars) inv in
+  let vars = List.fold_left (fun s (t,_) -> t_freepvs s t) vars vl in
+  let syms = Srs.union cnd.e_syms e.e_syms in
+  mk_expr (Ewhile (cnd,inv,vl,e)) e.e_vty ghost eff vars syms
 
 (* match-with, try-with, raise *)
 
@@ -590,7 +625,10 @@ let e_case ({e_effect = eff} as e) bl =
   let ghost = e_ghost_raises e || List.exists (fun (_,d) -> d.e_ghost) bl in
   let ghost = ghost || (mb && List.exists (fun (pp,_) -> pp.pp_ghost) bl) in
   let eff = List.fold_left (fun f (_,d) -> eff_union f d.e_effect) eff bl in
-  mk_expr (Ecase (e,bl)) (VtyI ity) ghost eff
+  let vars, syms = List.fold_left (fun (vars, syms) ({pp_pat = p}, d) ->
+    Spv.union vars (Spv.diff d.e_vars (pvs_of_vss Spv.empty p.pat_vars)),
+    Srs.union syms d.e_syms) (e.e_vars, e.e_syms) bl in
+  mk_expr (Ecase (e,bl)) (VtyI ity) ghost eff vars syms
 
 let e_try e xl =
   List.iter (fun (xs,v,d) ->
@@ -599,57 +637,30 @@ let e_try e xl =
   let ghost = e.e_ghost || List.exists (fun (_,_,d) -> d.e_ghost) xl in
   let eff = List.fold_left (fun f (xs,_,_) -> eff_catch f xs) e.e_effect xl in
   let eff = List.fold_left (fun f (_,_,d) -> eff_union f d.e_effect) eff xl in
-  mk_expr (Etry (e,xl)) e.e_vty ghost eff
+  let vars, syms = List.fold_left (fun (vars, syms) (_,v,d) ->
+    Spv.union vars (Spv.remove v d.e_vars),
+    Srs.union syms d.e_syms) (e.e_vars, e.e_syms) xl in
+  mk_expr (Etry (e,xl)) e.e_vty ghost eff vars syms
 
 let e_raise xs e ity =
   ity_equal_check (ity_of_expr e) xs.xs_ity;
   let eff = eff_raise e.e_effect xs in
-  mk_expr (Eraise (xs,e)) (VtyI ity) e.e_ghost eff
+  mk_expr (Eraise (xs,e)) (VtyI ity) e.e_ghost eff e.e_vars e.e_syms
 
 (* snapshots, assertions, "any" *)
 
-let e_pure t =
-  let ity = Opt.fold (fun _ -> ity_of_ty) ity_bool t.t_ty in
-  mk_expr (Epure t) (VtyI ity) true eff_empty
+let e_pure t = let ity = Opt.fold (fun _ -> ity_of_ty) ity_bool t.t_ty in
+  mk_expr (Epure t) (VtyI ity) true eff_empty (t_freepvs Spv.empty t) Srs.empty
 
-let e_assert ak f =
-  mk_expr (Eassert (ak, t_prop f)) (VtyI ity_unit) false eff_empty
+let e_assert ak f = let vars = t_freepvs Spv.empty f and syms = Srs.empty in
+  mk_expr (Eassert (ak, t_prop f)) (VtyI ity_unit) false eff_empty vars syms
 
-let e_absurd ity = mk_expr Eabsurd (VtyI ity) false eff_empty
+let e_absurd ity =
+  mk_expr Eabsurd (VtyI ity) false eff_empty Spv.empty Srs.empty
 
-let e_any c = mk_expr Eany (VtyC c) false eff_empty
+let e_any c = mk_expr Eany (VtyC c) false eff_empty c.cty_reads Srs.empty
 
 (* lambda construction *)
-
-let rec e_vars e = match e.e_node with
-  | Evar v -> Spv.singleton v
-  | Esym s -> s.rs_cty.cty_reads
-  | Efun _ | Eany -> (cty_of_expr e).cty_reads
-  | Eapp (e,vl,_) -> List.fold_right Spv.add vl (e_vars e)
-  | Elet ({let_sym = ValV v; let_expr = d},e)
-  | Elet ({let_sym = ValS {rs_logic = RLpv v}; let_expr = d},e) ->
-      Spv.union (e_vars d) (Spv.remove v (e_vars e))
-  | Elet ({let_sym = ValS _; let_expr = d},e) | Elazy (_,d,e) ->
-      Spv.union (e_vars d) (e_vars e)
-  | Erec ({rec_defn = dl},e) ->
-      let s = List.fold_left (fun s {fun_sym = rs} ->
-        Spv.union s rs.rs_cty.cty_reads) (e_vars e) dl in
-      List.fold_left (fun s {fun_sym = {rs_logic = l}} ->
-        match l with RLpv v -> Spv.remove v s | _ -> s) s dl
-  | Enot e | Eraise (_,e) | Eghost e -> e_vars e
-  | Eassign al ->
-      List.fold_left (fun s (r,_,v) -> Spv.add r (Spv.add v s)) Spv.empty al
-  | Eif (c,d,e) -> Spv.union (e_vars c) (Spv.union (e_vars d) (e_vars e))
-  | Etry (d,xl) -> List.fold_left (fun s (_,v,e) ->
-      Spv.union s (Spv.remove v (e_vars e))) (e_vars d) xl
-  | Ecase (d,bl) -> List.fold_left (fun s ({pp_pat = p},e) -> Spv.union s
-      (Spv.diff (e_vars e) (pvs_of_vss Spv.empty p.pat_vars))) (e_vars d) bl
-  | Ewhile (d,inv,vl,e) -> let s = Spv.union (e_vars d) (e_vars e) in
-      List.fold_left (fun s (t,_) -> t_freepvs s t) (t_freepvs s inv) vl
-  | Efor (v,(f,_,t),inv,e) ->
-      Spv.add f (Spv.add t (Spv.remove v (t_freepvs (e_vars e) inv)))
-  | Eassert (_,t) | Epure t -> t_freepvs Spv.empty t
-  | Econst _ | Eabsurd | Etrue | Efalse -> Spv.empty
 
 let pv_mut v mut = if ity_immutable v.pv_ity then mut else Spv.add v mut
 let pv_vis v vis = if v.pv_ghost then vis else ity_r_visible vis v.pv_ity
@@ -725,12 +736,12 @@ let rec check_expr gh mut vis rst e0 =
   | Econst _ | Eabsurd | Etrue | Efalse -> ()
 
 let e_fun args p q xq ({e_effect = eff} as e) =
-  let c = create_cty args p q xq (e_vars e) eff (ity_of_expr e) in
+  let c = create_cty args p q xq e.e_vars eff (ity_of_expr e) in
   (* TODO/FIXME: detect stale vars in post-conditions? *)
   let mut = Spv.fold pv_mut c.cty_reads Spv.empty in
   let mut = List.fold_right pv_mut c.cty_args mut in
   check_expr false mut (cty_r_visible c) Mpv.empty e;
-  mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty
+  mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty c.cty_reads e.e_syms
 
 (* recursive definitions *)
 
