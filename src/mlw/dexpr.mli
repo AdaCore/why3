@@ -66,8 +66,8 @@ type dspec_final = {
   ds_xpost   : (vsymbol option * term) list Mexn.t;
   ds_reads   : vsymbol list;
   ds_writes  : term list;
-  ds_checkrw : bool;
   ds_diverge : bool;
+  ds_checkrw : bool;
 }
 
 type dspec = ty -> dspec_final
@@ -75,12 +75,6 @@ type dspec = ty -> dspec_final
      All vsymbols in the postcondition clauses in the [ds_post] field
      must have this type. All vsymbols in the exceptional postcondition
      clauses must have the type of the corresponding exception. *)
-
-type dtype_c = dbinder list * dspec later * dity
-
-type dtype_v =
-  | DSpecI of dity
-  | DSpecC of dtype_c
 
 (** Expressions *)
 
@@ -99,6 +93,7 @@ and dexpr_node =
   | DEconst of Number.constant
   | DEapp of dexpr * dexpr list
   | DEfun of dbinder list * dspec later * dexpr
+  | DEany of dbinder list * dspec later * dity
   | DElet of dlet_defn * dexpr
   | DErec of drec_defn * dexpr
   | DEnot of dexpr
@@ -116,7 +111,6 @@ and dexpr_node =
   | DEabsurd
   | DEtrue
   | DEfalse
-  | DEany of dtype_v
   | DEmark of preid * dexpr
   | DEcast of dexpr * ity
   | DEuloc of dexpr * Loc.position
@@ -129,7 +123,8 @@ and drec_defn = private { fds : dfun_defn list }
 and dfun_defn = preid * ghost * rs_kind *
   dbinder list * (dspec * variant list) later * dexpr
 
-type dval_decl = preid * ghost * rs_kind * dtype_v
+type dval_decl = preid * ghost * rs_kind *
+  dbinder list * dspec later * dity
 
 (** Environment *)
 

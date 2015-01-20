@@ -342,8 +342,8 @@ type dspec_final = {
   ds_xpost   : (vsymbol option * term) list Mexn.t;
   ds_reads   : vsymbol list;
   ds_writes  : term list;
-  ds_checkrw : bool;
   ds_diverge : bool;
+  ds_checkrw : bool;
 }
 
 type dspec = ty -> dspec_final
@@ -351,12 +351,6 @@ type dspec = ty -> dspec_final
      All vsymbols in the postcondition clauses in the [ds_post] field
      must have this type. All vsymbols in the exceptional postcondition
      clauses must have the type of the corresponding exception. *)
-
-type dtype_c = dbinder list * dspec later * dity
-
-type dtype_v =
-  | DSpecI of dity
-  | DSpecC of dtype_c
 
 (** Expressions *)
 
@@ -375,6 +369,7 @@ and dexpr_node =
   | DEconst of Number.constant
   | DEapp of dexpr * dexpr list
   | DEfun of dbinder list * dspec later * dexpr
+  | DEany of dbinder list * dspec later * dity
   | DElet of dlet_defn * dexpr
   | DErec of drec_defn * dexpr
   | DEnot of dexpr
@@ -392,7 +387,6 @@ and dexpr_node =
   | DEabsurd
   | DEtrue
   | DEfalse
-  | DEany of dtype_v
   | DEmark of preid * dexpr
   | DEcast of dexpr * ity
   | DEuloc of dexpr * Loc.position
@@ -405,7 +399,8 @@ and drec_defn = { fds : dfun_defn list }
 and dfun_defn = preid * ghost * rs_kind *
   dbinder list * (dspec * variant list) later * dexpr
 
-type dval_decl = preid * ghost * rs_kind * dtype_v
+type dval_decl = preid * ghost * rs_kind *
+  dbinder list * dspec later * dity
 
 (** Environment *)
 
@@ -465,10 +460,6 @@ let denv_add_rec denv frozen0 id ((argl,res) as dvty) =
   if List.for_all is_explicit argl && is_explicit res
   then denv_add_rec_poly denv frozen0 id dvty
   else denv_add_rec_mono denv id dvty
-
-let dvty_of_dtype_v = function
-  | DSpecC (bl,_,res) -> List.map (fun (_,_,d) -> d) bl, res
-  | DSpecI res -> [], res
 
 let denv_add_var denv id dity = denv_add_mono denv id ([], dity)
 
@@ -643,6 +634,8 @@ let dexpr ?loc node =
         down argl0 del0
     | DEfun (bl,_,de) ->
         List.map (fun (_,_,t) -> t) bl, dity_of_dvty de.de_dvty
+    | DEany (bl,_,res) ->
+        List.map (fun (_,_,t) -> t) bl, res
     | DElet (_,de)
     | DErec (_,de) ->
         de.de_dvty
@@ -708,8 +701,6 @@ let dexpr ?loc node =
     | DEtrue
     | DEfalse ->
         dvty_bool
-    | DEany dtv ->
-        dvty_of_dtype_v dtv
     | DEcast (de,ity) ->
         dexpr_expected_type_weak de (dity_of_ity ity);
         de.de_dvty
@@ -809,8 +800,6 @@ let e_find_eff pr e =
   try (e_find_minimal (fun e -> e.e_loc <> None && pr e.e_effect) e).e_loc
   with Not_found -> None
 
-let print_xs fmt xs = assert false (* TODO *)
-
 let check_user_spec check_rwd ucty uwrl ecty e =
   let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
                                             weff.eff_writes eff.eff_writes) in
@@ -847,55 +836,39 @@ let check_user_spec check_rwd ucty uwrl ecty e =
       "this@ expression@ may@ diverge,@ but@ this@ is@ not@ \
         stated@ in@ the@ specification"
 
-(*
-let check_user_rs recu rs =
-  let rs_regs = rs.rs_subst.ity_subst_reg in
-  let report r =
-    if Mreg.mem r rs_regs then let spv = Spv.filter
-        (fun pv -> reg_occurs r pv.pv_ity.ity_vars) rs.rs_pvset in
+let check_user_fun recu c =
+  let rds_regs = c.cty_freeze.isb_reg in
+  let report r _ _ =
+    if Mreg.mem r rds_regs then let spv = Spv.filter
+        (fun v -> ity_r_occurs r v.pv_ity) c.cty_reads in
       Loc.errorm "The type of this function contains an alias with \
-        external variable %a" Mlw_pretty.print_pv (Spv.choose spv)
-    else
-      Loc.errorm "The type of this function contains an alias"
-  in
-  let rec check regs ity = match ity.ity_node with
-    | Ityapp (_,_,rl) ->
-        let add regs r =
-          if Mreg.mem r regs then report r else
-          check (Mreg.add r r regs) r.reg_ity in
-        let regs = List.fold_left add regs rl in
-        ity_fold check regs ity
-    | _ ->
-        ity_fold check regs ity
-  in
-  let rec down regs a =
-    let add regs pv = check regs pv.pv_ity in
-    let regs = List.fold_left add regs a.aty_args in
-    match a.aty_result with
-    | VTarrow a -> down regs a
-    | VTvalue v -> check (if recu then regs else rs_regs) v
-    (* we allow the value in a non-recursive function to contain
-       regions coming the function's arguments, but not from the
-       context. It is sometimes useful to write a function around
-       a constructor or a projection. For recursive functions, we
-       impose the full non-alias discipline, to ensure the safety
-       of region polymorphism (see add_rec_mono). *)
-  in
-  ignore (down rs_regs rs.rs_aty)
+        external variable %a" print_pv (Spv.choose spv)
+    else Loc.errorm "The type of this function contains an alias" in
+  (* we allow the value in a non-recursive function to contain
+     regions coming the function's arguments, but not from the
+     context. It is sometimes useful to write a function around
+     a constructor or a projection. For recursive functions, we
+     impose the full non-alias discipline, to ensure the safety
+     of region polymorphism (see add_rec_mono). We do not track
+     aliases inside the type of an argument or a result, which
+     may break the type inference, but we have a safety net
+     type checking in Expr. *)
+  let add_ity regs ity =
+    let frz = ity_freeze isb_empty ity in
+    Mreg.union report regs frz.isb_reg in
+  let add_arg regs v = add_ity regs v.pv_ity in
+  let regs = List.fold_left add_arg rds_regs c.cty_args in
+  ignore (add_ity (if recu then regs else rds_regs) c.cty_result)
 
 (** Environment *)
 
 type local_env = {
-   kn : Mlw_decl.known_map;
-  lkn : Decl.known_map;
   rsm : rsymbol Mstr.t;
   pvm : pvsymbol Mstr.t;
   vsm : vsymbol Mstr.t;
 }
 
-let env_empty lkn kn = {
-   kn = kn;
-  lkn = lkn;
+let env_empty = {
   rsm = Mstr.empty;
   pvm = Mstr.empty;
   vsm = Mstr.empty;
@@ -914,64 +887,14 @@ let add_pv_map ({pvm = pvm; vsm = vsm} as lenv) vm =
   { lenv with pvm = Mstr.set_union vm pvm; vsm = Mstr.set_union um vsm }
 
 let add_let_sym env = function
-  | LetV pv -> add_pvsymbol env pv
-  | LetA rs -> add_rsymbol env rs
+  | ValV pv -> add_pvsymbol env pv
+  | ValS rs -> add_rsymbol env rs
 
+(*
 let add_fundef  env fd  = add_rsymbol env fd.fun_rs
 let add_fundefs env fdl = List.fold_left add_fundef env fdl
+*)
 let add_binders env pvl = List.fold_left add_pvsymbol env pvl
-
-(** Invariant handling *)
-
-let env_invariant {lkn = lkn; kn = kn} eff pvs =
-  let regs = Sreg.union eff.eff_writes eff.eff_ghostw in
-  let add_pv pv (pinv,qinv) =
-    let ity = pv.pv_ity in
-    let written r = reg_occurs r ity.ity_vars in
-    let inv = Mlw_wp.full_invariant lkn kn pv.pv_vs ity in
-    let qinv = (* we reprove invariants for modified non-reset variables *)
-      if Sreg.exists written regs && not (eff_stale_region eff ity.ity_vars)
-      then t_and_simp qinv inv else qinv in
-    t_and_simp pinv inv, qinv
-  in
-  Spv.fold add_pv pvs (t_true,t_true)
-
-let rec check_reset rvs t = match t.t_node with
-  | Tvar vs when Svs.mem vs rvs ->
-      Loc.errorm "Variable %s is reset and can only be used \
-        under `old' in the postcondition" vs.vs_name.id_string
-  | Tapp (ls,_) when ls_equal ls Mlw_wp.fs_at -> false
-  | Tlet _ | Tcase _ | Teps _ | Tquant _ ->
-      let rvs = Mvs.set_inter rvs (t_vars t) in
-      if Mvs.is_empty rvs then false else
-      t_any (check_reset rvs) t
-  | _ ->
-      t_any (check_reset rvs) t
-
-let post_invariant {lkn = lkn; kn = kn} rvs inv ity q =
-  ignore (check_reset rvs q);
-  let vs, q = open_post q in
-  let res_inv = Mlw_wp.full_invariant lkn kn vs ity in
-  let q = t_and_asym_simp (t_and_simp res_inv inv) q in
-  Mlw_ty.create_post vs q
-
-let reset_vars eff pvs =
-  let add pv s =
-    if eff_stale_region eff pv.pv_ity.ity_vars
-    then Svs.add pv.pv_vs s else s in
-  if Mreg.is_empty eff.eff_resets then Svs.empty else
-  Spv.fold add pvs Svs.empty
-
-let spec_invariant env pvs vty spec =
-  let ity = ity_of_vty vty in
-  let pvs = spec_pvset pvs spec in
-  let rvs = reset_vars spec.c_effect pvs in
-  let pinv,qinv = env_invariant env spec.c_effect pvs in
-  let post_inv = post_invariant env rvs qinv in
-  let xpost_inv xs q = post_inv xs.xs_ity q in
-  { spec with c_pre   = t_and_asym_simp pinv spec.c_pre;
-              c_post  = post_inv ity spec.c_post;
-              c_xpost = Mexn.mapi xpost_inv spec.c_xpost }
 
 (** Abstract values *)
 
@@ -979,64 +902,59 @@ let warn_unused s loc =
   if s = "" || s.[0] <> '_' then
   Warning.emit ?loc "unused variable %s" s
 
-let check_used_pv e pv = if not (Spv.mem pv e.e_syms.syms_pv) then
+let check_used_pv e pv = if not (Spv.mem pv e.e_vars) then
   warn_unused pv.pv_vs.vs_name.id_string pv.pv_vs.vs_name.id_loc
 
-let check_used_rs e rs = if not (Srs.mem rs e.e_syms.syms_rs) then
+let check_used_rs e rs = if not (Srs.mem rs e.e_syms) then
   warn_unused rs.rs_name.id_string rs.rs_name.id_loc
 
-let rec type_c env pvs vars otv (dtyv, dsp) =
-  let vty = type_v env pvs vars otv dtyv in
-  let res = ty_of_vty vty in
-  let dsp = dsp env.vsm res in
-  let esvs, _, eff = effect_of_dspec dsp in
-  let eff = refresh_of_effect eff in
-  (* refresh every subregion of a modified region *)
-  let writes = Sreg.union eff.eff_writes eff.eff_ghostw in
-  let check u eff =
-    reg_fold (fun r e -> eff_refresh e r u) u.reg_ity.ity_vars eff in
-  let eff = Sreg.fold check writes eff in
-  (* eff_compare every type variable not marked as opaque *)
-  let eff = Stv.fold_left eff_compare eff (Stv.diff vars.vars_tv otv) in
-  (* make spec *)
-  let spec = spec_of_dspec eff res dsp in
-  if spec.c_variant <> [] then Loc.errorm
-    "variants are not allowed in a parameter declaration";
-  (* we add a fake variant term for every external variable in effect
-     expressions which also does not occur in pre/post/xpost. In this
-     way, we store the variable in the specification in order to keep
-     the effect from being erased by Mlw_ty.spec_filter. Variants are
-     ignored outside of "let rec" definitions, so WP are not affected. *)
-  let del_pv pv s = Svs.remove pv.pv_vs s in
-  let esvs = Spv.fold del_pv pvs esvs in
-  let drop _ t s = Mvs.set_diff s (t_vars t) in
-  let esvs = drop () spec.c_pre esvs in
-  let esvs = drop () spec.c_post esvs in
-  let esvs = Mexn.fold drop spec.c_xpost esvs in
-  let add_vs vs varl = (t_var vs, None) :: varl in
-  let varl = Svs.fold add_vs esvs spec.c_variant in
-  let spec = { spec with c_variant = varl } in
-  spec, vty
+let val_decl env (id,ghost,kind,bl,dsp,dity) =
+  let ity = ity_of_dity dity in
+  match kind with
+  | RKfunc n when n > 0 -> invalid_arg "Dexpr.val_decl"
+  | RKpv _ | RKlocal -> invalid_arg "Dexpr.val_decl"
+  | _ when bl <> [] ->
+      let bl = binders bl in
+      let env = add_binders env bl in
+      let dsp = dsp env.vsm ity in
+      let rds,_,eff = effect_of_dspec dsp in
+      let eff = refresh_of_effect eff in
+      let p = create_pre dsp.ds_pre in
+      let q = create_post (ty_of_ity ity) dsp.ds_post in
+      let xq = create_xpost dsp.ds_xpost in
+      let c = create_cty bl p q xq rds eff ity in
+      ValS (create_rsymbol id ~ghost ~kind c)
+  | _ when ity_immutable ity ->
+      let dsp = dsp env.vsm ity in
+      if dsp.ds_pre <> [] then Loc.errorm
+        "Top-level constants can have no preconditions";
+      if dsp.ds_reads <> [] then Loc.errorm
+        "Top-level constants can have no external dependencies";
+      if dsp.ds_writes <> [] || not (Mexn.is_empty dsp.ds_xpost) ||
+          dsp.ds_diverge then Loc.errorm
+        "Top-level constants can produce no effects";
+      let q = create_post (ty_of_ity ity) dsp.ds_post in
+      let c = create_cty [] [] q Mexn.empty Spv.empty eff_empty ity in
+      if not (Spv.is_empty c.cty_reads) then Loc.errorm
+        "Top-level constants can have no external dependencies";
+      ValS (create_rsymbol id ~ghost ~kind c)
+  | RKnone when ity_closed ity ->
+      let dsp = dsp env.vsm ity in
+      if dsp.ds_pre <> [] || dsp.ds_post <> [] ||
+          not (Mexn.is_empty dsp.ds_xpost) || dsp.ds_reads <> [] ||
+          dsp.ds_writes <> [] || dsp.ds_diverge || dsp.ds_checkrw then
+        Loc.errorm "Mutable top-level variables can have no specification";
+      ValV (create_pvsymbol id ~ghost ity)
+  | RKnone -> Loc.errorm
+      "Mutable top-level variables must have monomorphic type"
+  | RKfunc _ -> Loc.errorm
+      "Mutable top-level variables cannot be logical functions"
+  | RKpred -> Loc.errorm
+      "Mutable top-level variables cannot be logical predicates"
+  | RKlemma -> Loc.errorm
+      "Mutable top-level variables cannot be logical lemmas"
 
-and type_v env pvs vars otv = function
-  | DSpecV v ->
-      VTvalue (ity_of_dity v)
-  | DSpecA (bl,tyc) ->
-      let pvl = binders bl in
-      let env = add_binders env pvl in
-      let otv = opaque_binders otv bl in
-      let add_pv pv s = vars_union pv.pv_ity.ity_vars s in
-      let vars = List.fold_right add_pv pvl vars in
-      let pvs = List.fold_right Spv.add pvl pvs in
-      let spec, vty = type_c env pvs vars otv tyc in
-      let spec = spec_invariant env pvs vty spec in
-      VTarrow (vty_arrow pvl ~spec vty)
-
-let val_decl env (id,ghost,dtyv) =
-  match type_v env Spv.empty vars_empty Stv.empty dtyv with
-  | VTvalue v -> LetV (create_pvsymbol id ~ghost v)
-  | VTarrow a -> LetA (create_rsymbol id ~ghost a)
-
+(*
 (** Expressions *)
 
 let implicit_post = Debug.register_flag "implicit_post"
@@ -1097,8 +1015,8 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
           | VTvalue ity -> ity_equal ity ity_unit
           | _ -> false in
         let id_in_e2 = match ld1.let_sym with
-          | LetV pv -> Spv.mem pv e2.e_syms.syms_pv
-          | LetA rs -> Srs.mem rs e2.e_syms.syms_rs in
+          | ValV pv -> Spv.mem pv e2.e_syms.syms_pv
+          | ValS rs -> Srs.mem rs e2.e_syms.syms_rs in
         if not id_in_e2 then warn_unused id.pre_name id.pre_loc;
         let e1_no_eff =
           Sreg.is_empty e1.e_effect.eff_writes &&
