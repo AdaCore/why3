@@ -130,8 +130,8 @@ and expr_node = private
   | Eif     of expr * expr * expr
   | Ecase   of expr * (prog_pattern * expr) list
   | Eassign of assign list
-  | Ewhile  of expr * invariant * variant list * expr
-  | Efor    of pvsymbol * for_bounds * invariant * expr
+  | Ewhile  of expr * invariant list * variant list * expr
+  | Efor    of pvsymbol * for_bounds * invariant list * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eraise  of xsymbol * expr
   | Eghost  of expr
@@ -185,14 +185,14 @@ val e_sym : rsymbol  -> expr
 val e_const : Number.constant -> expr
 val e_nat_const : int -> expr
 
-val create_let_defn :
-  preid -> ?ghost:bool -> expr -> let_defn
-
 val create_let_defn_pv :
   preid -> ?ghost:bool -> expr -> let_defn * pvsymbol
 
 val create_let_defn_rs :
   preid -> ?ghost:bool -> ?kind:rs_kind -> expr -> let_defn * rsymbol
+
+val create_let_defn :
+  preid -> ?ghost:bool -> ?kind:rs_kind -> expr -> let_defn
 
 val create_rec_defn :
   (rsymbol * expr (* Efun *) * variant list * rs_kind) list -> rec_defn
@@ -222,10 +222,10 @@ val e_try : expr -> (xsymbol * pvsymbol * expr) list -> expr
 
 val e_case : expr -> (prog_pattern * expr) list -> expr
 
-val e_while : expr -> invariant -> variant list -> expr -> expr
+val e_while : expr -> invariant list -> variant list -> expr -> expr
 
 val e_for :
-  pvsymbol -> expr -> for_direction -> expr -> invariant -> expr -> expr
+  pvsymbol -> expr -> for_direction -> expr -> invariant list -> expr -> expr
 
 val e_pure : term -> expr
 

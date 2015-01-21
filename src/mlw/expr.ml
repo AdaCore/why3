@@ -282,8 +282,8 @@ and expr_node =
   | Eif     of expr * expr * expr
   | Ecase   of expr * (prog_pattern * expr) list
   | Eassign of assign list
-  | Ewhile  of expr * invariant * variant list * expr
-  | Efor    of pvsymbol * for_bounds * invariant * expr
+  | Ewhile  of expr * invariant list * variant list * expr
+  | Efor    of pvsymbol * for_bounds * invariant list * expr
   | Etry    of expr * (xsymbol * pvsymbol * expr) list
   | Eraise  of xsymbol * expr
   | Eghost  of expr
@@ -399,13 +399,6 @@ let e_nat_const n =
 
 (* let definitions *)
 
-let create_let_defn id ?(ghost=false) e =
-  let ghost = ghost || e.e_ghost in
-  let lv = match e.e_vty with
-    | VtyC c -> ValS (create_rsymbol id ~ghost ~kind:RKnone c)
-    | VtyI i -> ValV (create_pvsymbol id ~ghost i) in
-  { let_sym = lv; let_expr = e }
-
 let create_let_defn_pv id ?(ghost=false) e =
   let ghost = ghost || e.e_ghost in
   let pv = create_pvsymbol id ~ghost (ity_of_expr e) in
@@ -425,6 +418,14 @@ let create_let_defn_rs id ?(ghost=false) ?(kind=RKnone) e =
     | VtyC c, _ -> c in
   let rs = create_rsymbol id ~ghost ~kind cty in
   { let_sym = ValS rs; let_expr = e }, rs
+
+let create_let_defn id ?(ghost=false) ?(kind=RKnone) e =
+  if kind <> RKnone then fst (create_let_defn_rs id ~ghost ~kind e) else
+  let ghost = ghost || e.e_ghost in
+  let lv = match e.e_vty with
+    | VtyC c -> ValS (create_rsymbol id ~ghost ~kind c)
+    | VtyI i -> ValV (create_pvsymbol id ~ghost i) in
+  { let_sym = lv; let_expr = e }
 
 let e_let_raw ({let_expr = d} as ld) e =
   let eff = eff_union d.e_effect e.e_effect in
@@ -590,7 +591,8 @@ let e_for_raw v ((f,_,t) as bounds) inv e =
   ity_equal_check t.pv_ity ity_int;
   ity_equal_check (ity_of_expr e) ity_unit;
   let ghost = v.pv_ghost || f.pv_ghost || t.pv_ghost || e.e_ghost in
-  let vars = Spv.add f (Spv.add t (Spv.remove v (t_freepvs e.e_vars inv))) in
+  let vars = List.fold_left t_freepvs e.e_vars inv in
+  let vars = Spv.add f (Spv.add t (Spv.remove v vars)) in
   mk_expr (Efor (v,bounds,inv,e)) e.e_vty ghost e.e_effect vars e.e_syms
 
 let e_for v ef dir et inv e =
@@ -605,7 +607,8 @@ let e_while cnd inv vl e =
   let ghost = cnd.e_ghost || e.e_ghost in
   let eff = eff_union cnd.e_effect e.e_effect in
   let eff = if vl = [] then eff_diverge eff else eff in
-  let vars = t_freepvs (Spv.union cnd.e_vars e.e_vars) inv in
+  let vars = Spv.union cnd.e_vars e.e_vars in
+  let vars = List.fold_left t_freepvs vars inv in
   let vars = List.fold_left (fun s (t,_) -> t_freepvs s t) vars vl in
   let syms = Srs.union cnd.e_syms e.e_syms in
   mk_expr (Ewhile (cnd,inv,vl,e)) e.e_vty ghost eff vars syms
@@ -727,10 +730,11 @@ let rec check_expr gh mut vis rst e0 =
         check_expr gh (Spv.fold pv_mut ppv mut)
                       (Spv.fold pv_vis ppv vis) rst e) bl
   | Ewhile (d,inv,vl,e) -> let rst = after_e e0 in
-      check_t rst inv; check_e rst d; check_e rst e;
-      List.iter (fun (t,_) -> check_t rst t) vl
+      List.iter (check_t rst) inv;
+      List.iter (fun (t,_) -> check_t rst t) vl;
+      check_e rst d; check_e rst e
   | Efor (_,_,inv,e) -> let rst = after_e e in
-      check_t rst inv; check_e rst e
+      List.iter (check_t rst) inv; check_e rst e
   | Enot e | Eraise (_,e) | Eghost e -> check_e rst e
   | Eassert (_,t) | Epure t -> check_t rst t
   | Econst _ | Eabsurd | Etrue | Efalse -> ()
@@ -965,8 +969,9 @@ let print_rs_head fmt s = fprintf fmt "%s%s%a%a"
     | RLlemma -> "lemma ")
   print_rs s print_id_labels (id_of_rs s)
 
-let print_invariant fmt f =
-  fprintf fmt "@\ninvariant@ { %a }" print_term f
+let print_invariant fmt fl =
+  let print_inv fmt f = fprintf fmt "@\ninvariant@ { %a }" print_term f in
+  Pp.print_list Pp.nothing print_inv fmt fl
 
 let print_variant fmt varl =
   let print_rel fmt = function
