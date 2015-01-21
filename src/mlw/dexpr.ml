@@ -343,7 +343,7 @@ and dexpr_node =
   | DEpv of pvsymbol
   | DErs of rsymbol
   | DEconst of Number.constant
-  | DEapp of dexpr * dexpr list
+  | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dspec later * dexpr
   | DEany of dbinder list * dspec later * dity
   | DElet of dlet_defn * dexpr
@@ -353,7 +353,7 @@ and dexpr_node =
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
   | DEassign of (dexpr * rsymbol * dexpr) list
-  | DEwhile of dexpr * (dinvariant * variant list) later * dexpr
+  | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
   | DEraise of xsymbol * dexpr
@@ -373,7 +373,7 @@ and dlet_defn = preid * ghost * rs_kind * dexpr
 and drec_defn = { fds : dfun_defn list }
 
 and dfun_defn = preid * ghost * rs_kind *
-  dbinder list * (dspec * variant list) later * dexpr
+  dbinder list * dspec later * variant list later * dexpr
 
 type dval_decl = preid * ghost * rs_kind *
   dbinder list * dspec later * dity
@@ -503,8 +503,8 @@ let dexpr_expected_type_weak {de_dvty = dvty; de_loc = loc} dity =
 
 (** Generation of letrec blocks *)
 
-type pre_fun_defn = preid * ghost * rs_kind *
-  dbinder list * dity * (denv -> (dspec * variant list) later * dexpr)
+type pre_fun_defn = preid * ghost * rs_kind * dbinder list *
+  dity * (denv -> dspec later * variant list later * dexpr)
 
 exception DupId of preid
 
@@ -519,11 +519,11 @@ let drec_defn denv0 prel =
     denv_add_rec denv denv0.frozen id (argl,res) in
   let denv1 = List.fold_left add denv0 prel in
   let parse (id,gh,pk,bl,res,pre) =
-    let dsp, de = pre (denv_add_args denv1 bl) in
+    let dsp, dvl, de = pre (denv_add_args denv1 bl) in
     dexpr_expected_type_weak de res;
-    (id,gh,pk,bl,dsp,de) in
+    (id,gh,pk,bl,dsp,dvl,de) in
   let fdl = List.map parse prel in
-  let add denv (id,_,_,bl,_,{de_dvty = dvty}) =
+  let add denv (id,_,_,bl,_,_,{de_dvty = dvty}) =
     (* just in case we linked some polymorphic type var to the outer context *)
     let check tv = if is_frozen denv0.frozen tv then Loc.errorm ?loc:id.pre_loc
       "This function is expected to be polymorphic in type variable %a"
@@ -576,73 +576,56 @@ let dpattern ?loc node =
   Loc.try1 ?loc dpat node
 
 let dexpr ?loc node =
-  let mk_de dvty = { de_node = node; de_dvty = dvty; de_loc = loc } in
   let get_dvty = function
     | DEvar (_,dvty) ->
-        mk_de dvty
+        dvty
     | DEpv pv ->
-        mk_de ([], specialize_pv pv)
+        [], specialize_pv pv
     | DErs rs ->
-        mk_de (specialize_rs rs)
+        specialize_rs rs
     | DEconst (Number.ConstInt _) ->
-        mk_de dvty_int
+        dvty_int
     | DEconst (Number.ConstReal _) ->
-        mk_de dvty_real
-    | DEapp (de0,del0) ->
-        let argl0, res0 = de0.de_dvty in
-        let rec dig de0 del = match del with
-          | de::del ->
-              let _,res = de0.de_dvty in
-              let app_t = specialize_rs rs_func_app in
-              let f,a,r = match app_t with
-                | [f;a],r -> f,a,r | _ -> assert false in
-              begin try dity_unify res f with Exit ->
-                if argl0 = [] && res == res0 then Loc.errorm ?loc:de0.de_loc
-                  "This expression has type %a,@ it cannot be applied"
-                  print_dity (dity_of_dvty de0.de_dvty)
-                else Loc.errorm ?loc:de0.de_loc
-                  "This expression has type %a,@ but is applied to %d arguments"
-                  print_dity (dity_of_dvty de0.de_dvty) (List.length del0) end;
-              dexpr_expected_type de a;
-              let app = { de_node = DErs rs_func_app;
-                          de_dvty = app_t; de_loc = loc } in
-              let de0 = { de_node = DEapp (app, [de0;de]);
-                          de_dvty = [],r; de_loc = loc (* FIXME *)} in
-              dig de0 del
-          | [] -> de0 in
-        let rec down rel argl del = match argl, del with
-          | arg::argl, de::del ->
-              dexpr_expected_type de arg;
-              down (de::rel) argl del
-          | _, [] ->
-              mk_de (argl, res0)
-          | [], _ when rel = [] ->
-              dig de0 del
-          | [], _ ->
-              let de0 = { de_node = DEapp (de0, List.rev rel);
-                          de_dvty = [],res0; de_loc = loc (* FIXME *)} in
-              dig de0 del in
-        down [] argl0 del0
+        dvty_real
+    | DEapp ({de_dvty = (arg::argl, res)}, de2) ->
+        dexpr_expected_type de2 arg;
+        argl, res
+    | DEapp ({de_dvty = ([],res)} as de1, de2) ->
+        let f,a,r = match specialize_rs rs_func_app with
+          | [f;a],r -> f,a,r | _ -> assert false in
+        begin try dity_unify res f with Exit ->
+          let rec down n de = match de.de_node with
+            | DEapp (de,_) -> down (succ n) de
+            | _ when n = 0 -> Loc.errorm ?loc:de.de_loc
+                "This expression has type %a,@ it cannot be applied"
+                print_dity (dity_of_dvty de.de_dvty)
+            | _ -> Loc.errorm ?loc:de.de_loc
+                "This expression has type %a,@ but is applied to %d arguments"
+                print_dity (dity_of_dvty de.de_dvty) (succ n) in
+          down 0 de1
+        end;
+        dexpr_expected_type de2 a;
+        [], r
     | DEfun (bl,_,de) ->
-        mk_de (List.map (fun (_,_,t) -> t) bl, dity_of_dvty de.de_dvty)
+        List.map (fun (_,_,t) -> t) bl, dity_of_dvty de.de_dvty
     | DEany (bl,_,res) ->
-        mk_de (List.map (fun (_,_,t) -> t) bl, res)
+        List.map (fun (_,_,t) -> t) bl, res
     | DElet (_,de)
     | DErec (_,de) ->
-        mk_de de.de_dvty
+        de.de_dvty
     | DEnot de ->
         dexpr_expected_type de dity_bool;
-        mk_de de.de_dvty
+        de.de_dvty
     | DElazy (_,de1,de2) ->
         dexpr_expected_type de1 dity_bool;
         dexpr_expected_type de2 dity_bool;
-        mk_de de1.de_dvty
+        de1.de_dvty
     | DEif (de1,de2,de3) ->
         let res = dity_fresh () in
         dexpr_expected_type de1 dity_bool;
         dexpr_expected_type de2 res;
         dexpr_expected_type de3 res;
-        mk_de ([], res)
+        [], res
     | DEcase (_,[]) ->
         invalid_arg "Dexpr.dexpr: empty branch list in DEcase"
     | DEcase (de,bl) ->
@@ -652,7 +635,7 @@ let dexpr ?loc node =
         List.iter (fun (dp,de) ->
           dpat_expected_type dp ety;
           dexpr_expected_type de res) bl;
-        mk_de ([], res)
+        [], res
     | DEassign al ->
         List.iter (fun (de1,rs,de2) ->
           let argl, res = specialize_rs rs in
@@ -660,16 +643,16 @@ let dexpr ?loc node =
             | _ -> invalid_arg "Dexpr.dexpr: not a field" in
           dity_unify_app ls dexpr_expected_type [de1] argl;
           dexpr_expected_type_weak de2 res) al;
-        mk_de dvty_unit
-    | DEwhile (de1,_,de2) ->
+        dvty_unit
+    | DEwhile (de1,_,_,de2) ->
         dexpr_expected_type de1 dity_bool;
         dexpr_expected_type de2 dity_unit;
-        mk_de de2.de_dvty
+        de2.de_dvty
     | DEfor (_,de_from,_,de_to,_,de) ->
         dexpr_expected_type de_from dity_int;
         dexpr_expected_type de_to dity_int;
         dexpr_expected_type de dity_unit;
-        mk_de de.de_dvty
+        de.de_dvty
     | DEtry (_,[]) ->
         invalid_arg "Dexpr.dexpr: empty branch list in DEtry"
     | DEtry (de,bl) ->
@@ -678,28 +661,29 @@ let dexpr ?loc node =
         List.iter (fun (xs,dp,de) ->
           dpat_expected_type dp (specialize_xs xs);
           dexpr_expected_type de res) bl;
-        mk_de ([], res)
+        [], res
     | DEraise (xs,de) ->
         dexpr_expected_type de (specialize_xs xs);
-        mk_de ([], dity_fresh ())
+        [], dity_fresh ()
     | DEghost de ->
-        mk_de de.de_dvty
+        de.de_dvty
     | DEassert _ ->
-        mk_de dvty_unit
+        dvty_unit
     | DEpure _
     | DEabsurd ->
-        mk_de ([], dity_fresh ())
+        [], dity_fresh ()
     | DEtrue
     | DEfalse ->
-        mk_de (dvty_bool)
+        dvty_bool
     | DEcast (de,ity) ->
         dexpr_expected_type_weak de (dity_of_ity ity);
-        mk_de de.de_dvty
+        de.de_dvty
     | DEmark (_,de)
     | DEuloc (de,_)
     | DElabel (de,_) ->
-        mk_de de.de_dvty in
-  Loc.try1 ?loc get_dvty node
+        de.de_dvty in
+  let dvty = Loc.try1 ?loc get_dvty node in
+  { de_node = node; de_dvty = dvty; de_loc = loc }
 
 (** Final stage *)
 
@@ -847,7 +831,7 @@ let check_aliases recu c =
   let regs = List.fold_left add_arg rds_regs c.cty_args in
   ignore (add_ity (if recu then regs else rds_regs) c.cty_result)
 
-let check_fun ?rsym dsp e =
+let check_fun rsym dsp e =
   let c,e = match e with
     | { e_node = Efun e; e_vty = VtyC c } -> c,e
     | _ -> invalid_arg "Dexpr.check_fun" in
@@ -983,15 +967,21 @@ and try_expr keep_loc uloc env ffo ({de_dvty = argl,res} as de0) =
       e_sym s
   | DEconst c ->
       e_const c
-  | DEapp (de, del) ->
-      let e = expr ~keep_loc uloc env false de in
-      let el = List.map (get env) del in
+  | DEapp ({de_dvty = (_::_,_)} as de1, de2) ->
+      (* it should be impossible for e1 to be a mapping *)
+      let rec down de el = match de.de_node with
+        | DEapp (de1, de2) -> down de1 (get env de2 :: el)
+        | _ -> expr ~keep_loc uloc env false de, el in
+      let e, el = down de1 [get env de2] in
       if argl = [] || not ffo
         then e_app e el (List.map ity_of_dity argl) (ity_of_dity res)
         else e_app e el [] (ity_of_dity (dity_of_dvty de0.de_dvty))
+  | DEapp ({de_dvty = ([],_)} as de1, de2) ->
+      (* it should be impossible for e1 to be a computation *)
+      e_app (e_sym rs_func_app) [get env de1; get env de2] [] (ity_of_dity res)
   | DEfun (bl,dsp,de) ->
-      let e, dsp = expr_fun ~keep_loc uloc env (binders bl) dsp de in
-      check_fun dsp e;
+      let e, dsp, _ = expr_fun ~keep_loc uloc env (binders bl) dsp de in
+      check_fun None dsp e;
       if bl <> [] then e else
         let e = set_loc keep_loc de0.de_loc uloc e in
         e_app e [] [] (cty_of_expr e).cty_result
@@ -1031,13 +1021,11 @@ and try_expr keep_loc uloc env ffo ({de_dvty = argl,res} as de0) =
         else e2
       in
       e_let ld e2
-  | DErec _ -> assert false (* TODO *)
-(*
-  | DErec (fdl,de) ->
-      let fdl = expr_rec ~keep_loc uloc env fdl in
-      let e = get (add_fundefs env fdl) de in
-      e_rec fdl e
-*)
+  | DErec (drdf,de) ->
+      let rdf = expr_rec ~keep_loc uloc env drdf in
+      let add env fd = add_rsymbol env fd.fun_sym in
+      let env = List.fold_left add env rdf.rec_defn in
+      e_rec rdf (expr ~keep_loc uloc env ffo de)
   | DEnot de1 ->
       e_not (get env de1)
   | DElazy (op,de1,de2) ->
@@ -1057,10 +1045,11 @@ and try_expr keep_loc uloc env ffo ({de_dvty = argl,res} as de0) =
   | DEassign al ->
       let conv (de1,f,de2) = get env de1, f, get env de2 in
       e_assign (List.map conv al)
-  | DEwhile (de1,dinv_varl,de2) ->
+  | DEwhile (de1,dinv,dvarl,de2) ->
       let e1 = get env de1 in
       let e2 = get env de2 in
-      let inv, varl = dinv_varl env.vsm in
+      let inv = dinv env.vsm in
+      let varl = dvarl env.vsm in
       e_while e1 (create_invariant inv) varl e2
   | DEfor (id,de_from,dir,de_to,dinv,de) ->
       let e_from = get env de_from in
@@ -1121,47 +1110,34 @@ and try_expr keep_loc uloc env ffo ({de_dvty = argl,res} as de0) =
   | DEcast _ | DEuloc _ | DElabel _ ->
       assert false (* already stripped *)
 
-(*
 and expr_rec ~keep_loc uloc env {fds = dfdl} =
-  let step1 env (id, gh, bl, de, dsp) =
+  let step1 env (id, gh, kind, bl, dsp, dvl, ({de_dvty = dvty} as de)) =
     let pvl = binders bl in
-    if fst de.de_dvty <> [] then Loc.errorm ?loc:de.de_loc
-      "The body of a recursive function must be a first-order value";
-    let aty = vty_arrow pvl (VTvalue (ity_of_dity (snd de.de_dvty))) in
-    let rs = create_rsymbol id ~ghost:gh aty in
-    add_rsymbol env rs, (rs, gh, bl, pvl, de, dsp) in
+    let ity = Loc.try1 ?loc:de.de_loc ity_of_dity (dity_of_dvty dvty) in
+    let cty = create_cty pvl [] [] Mexn.empty Spv.empty eff_empty ity in
+    let rs = create_rsymbol id ~ghost:gh ~kind:RKnone cty in
+    add_rsymbol env rs, (rs, kind, dsp, dvl, de) in
   let env, fdl = Lists.map_fold_left step1 env dfdl in
-  let step2 (rs, gh, bl, pvl, de, dsp) (fdl, dfdl) =
-    let lam, dsp =
-      expr_lam ~keep_loc ~strict:true uloc env gh pvl de dsp in
-    (rs, lam) :: fdl, (rs.rs_name, gh, bl, de, dsp) :: dfdl in
+  let step2 ({rs_cty = c} as rs, kind, dsp, dvl, de) (fdl, dspl) =
+    let lam, dsp, env = expr_fun ~keep_loc uloc env c.cty_args dsp de in
+    if lam.e_ghost && not rs.rs_ghost then Loc.errorm ?loc:rs.rs_name.id_loc
+      "Function %s must be explicitly marked ghost" rs.rs_name.id_string;
+    (rs, lam, dvl env.vsm, kind)::fdl, dsp::dspl in
   (* check for unexpected aliases in case of trouble *)
-  let fdl, dfdl = try List.fold_right step2 fdl ([],[]) with
-    | Loc.Located (_, Mlw_ty.TypeMismatch _)
-    | Mlw_ty.TypeMismatch _ as exn ->
-        List.iter (fun (rs,_,_,_,_,_) ->
-          let loc = Opt.get rs.rs_name.Ident.id_loc in
-          Loc.try2 ~loc check_user_rs true rs) fdl;
+  let fdl, dspl = try List.fold_right step2 fdl ([],[]) with
+    | Loc.Located (_, Ity.TypeMismatch _) | Ity.TypeMismatch _ as exn ->
+        List.iter (fun ({rs_name = {id_loc = loc}} as rs,_,_,_,_) ->
+          Loc.try2 ?loc check_aliases true rs.rs_cty) fdl;
         raise exn in
-  let fdl = try create_rec_defn fdl with
-    | Loc.Located (_, Mlw_ty.TypeMismatch _)
-    | Mlw_ty.TypeMismatch _ as exn ->
-        List.iter (fun (rs,lam) ->
-          let loc = Opt.get rs.rs_name.Ident.id_loc in
-          let fd = create_fun_defn (id_clone rs.rs_name) lam in
-          Loc.try2 ~loc check_user_rs true fd.fun_rs) fdl;
+  let rdf = try create_rec_defn fdl with
+    | Loc.Located (_, Ity.TypeMismatch _) | Ity.TypeMismatch _ as exn ->
+        List.iter (fun ({rs_name = {id_loc = loc}},lam,_,_) ->
+          Loc.try2 ?loc check_aliases true (cty_of_expr lam)) fdl;
         raise exn in
-  let step3 { fun_rs = rs; fun_lambda = lam } =
-    let { l_spec = spec; l_expr = e } = lam in
-    let spec = spec_invariant env e.e_syms.syms_pv e.e_vty spec in
-    rs, { lam with l_spec = { spec with c_letrec = 0 }} in
-  let fdl = create_rec_defn (List.map step3 fdl) in
-  let step4 fd (id,_,bl,de,dsp) =
-    Loc.try3 ?loc:de.de_loc check_lambda_effect fd bl dsp;
-    Loc.try2 ?loc:id.id_loc check_user_rs true fd.fun_rs in
-  List.iter2 step4 fdl dfdl;
-  fdl
-*)
+  let check {fun_rsym = rs; fun_expr = e} dsp =
+    Loc.try3 ?loc:rs.rs_name.id_loc check_fun (Some rs) dsp e in
+  List.iter2 check rdf.rec_defn dspl;
+  rdf
 
 and expr_fun ~keep_loc uloc env pvl dsp de =
   let env = add_binders env pvl in
@@ -1171,7 +1147,7 @@ and expr_fun ~keep_loc uloc env pvl dsp de =
   let p = create_pre dsp.ds_pre in
   let q = create_post ty dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
-  e_fun pvl p q xq e, dsp
+  e_fun pvl p q xq e, dsp, env
 
 let val_decl ~keep_loc:_ (id,_,_,_,_,_ as vald) =
   reunify_regions ();
@@ -1185,15 +1161,9 @@ let let_defn ~keep_loc (id,ghost,kind,de) =
     "Symbol %s must be explicitly marked ghost" id.pre_name;
   Loc.try1 ?loc:id.pre_loc (create_let_defn id ~ghost ~kind) e
 
-(*
-let fun_defn ~keep_loc dfd =
+let rec_defn ~keep_loc drdf =
   reunify_regions ();
-  expr_fun ~keep_loc ~strict:true None env_empty dfd
-
-let rec_defn ~keep_loc dfdl =
-  reunify_regions ();
-  expr_rec ~keep_loc None env_empty dfdl
-*)
+  expr_rec ~keep_loc None env_empty drdf
 
 (* FIXME: unless de is a lambda, no checks are made *)
 let expr ~keep_loc de =

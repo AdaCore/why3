@@ -1177,7 +1177,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
 *)
   | TypeMismatch (t1,t2,s) ->
       fprintf fmt "Type mismatch between %a and %a"
-        (print_ity_node s 0) t1 print_ity t2
+        (print_ity_node s 0) t1 print_ity_full t2
   | AssignPrivate r ->
       fprintf fmt "This assignment modifies a value of private type %a"
         print_reg r

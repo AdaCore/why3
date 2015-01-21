@@ -91,7 +91,7 @@ and dexpr_node =
   | DEpv of pvsymbol
   | DErs of rsymbol
   | DEconst of Number.constant
-  | DEapp of dexpr * dexpr list
+  | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dspec later * dexpr
   | DEany of dbinder list * dspec later * dity
   | DElet of dlet_defn * dexpr
@@ -101,7 +101,7 @@ and dexpr_node =
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
   | DEassign of (dexpr * rsymbol * dexpr) list
-  | DEwhile of dexpr * (dinvariant * variant list) later * dexpr
+  | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
   | DEraise of xsymbol * dexpr
@@ -121,7 +121,7 @@ and dlet_defn = preid * ghost * rs_kind * dexpr
 and drec_defn = private { fds : dfun_defn list }
 
 and dfun_defn = preid * ghost * rs_kind *
-  dbinder list * (dspec * variant list) later * dexpr
+  dbinder list * dspec later * variant list later * dexpr
 
 type dval_decl = preid * ghost * rs_kind *
   dbinder list * dspec later * dity
@@ -150,8 +150,8 @@ val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 
 val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
 
-type pre_fun_defn = preid * ghost * rs_kind *
-  dbinder list * dity * (denv -> (dspec * variant list) later * dexpr)
+type pre_fun_defn = preid * ghost * rs_kind * dbinder list *
+  dity * (denv -> dspec later * variant list later * dexpr)
 
 val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
@@ -159,14 +159,6 @@ val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
 val expr : keep_loc:bool -> dexpr -> expr
 
-val let_defn : keep_loc:bool -> dlet_defn -> let_defn
-
-(*
-val fun_defn : keep_loc:bool ->
-  Decl.known_map -> Mlw_decl.known_map -> dfun_defn -> fun_defn
-
-val rec_defn : keep_loc:bool ->
-  Decl.known_map -> Mlw_decl.known_map -> drec_defn -> fun_defn list
-*)
-
 val val_decl : keep_loc:bool -> dval_decl -> val_decl
+val let_defn : keep_loc:bool -> dlet_defn -> let_defn
+val rec_defn : keep_loc:bool -> drec_defn -> rec_defn
