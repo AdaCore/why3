@@ -169,6 +169,12 @@ exception CtyExpected of expr
 val ity_of_expr : expr -> ity
 val cty_of_expr : expr -> cty
 
+val check_expr : expr -> unit
+(** [check_expr e] verifies that [e] does not perform bad
+    ghost writes nor contains stale (i.e., reset) regions.
+    This function must be called for any expression which
+    is used outside of an [Efun]-closure. *)
+
 val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
 
 val e_find_minimal : (expr -> bool) -> expr -> expr

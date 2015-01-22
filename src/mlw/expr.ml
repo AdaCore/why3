@@ -747,6 +747,16 @@ let e_fun args p q xq ({e_effect = eff} as e) =
   check_expr false mut (cty_r_visible c) Mpv.empty e;
   mk_expr (Efun e) (VtyC c) e.e_ghost eff_empty c.cty_reads e.e_syms
 
+let check_expr e = match e.e_node with
+  | Efun _ -> ()
+  | _ ->
+      let e = match e.e_vty with (* rewind if necessary *)
+        | VtyC c -> e_app_raw e c.cty_args [] c.cty_result
+        | VtyI _ -> e in
+      let mut = Spv.fold pv_mut e.e_vars Spv.empty in
+      let vis = Spv.fold pv_vis e.e_vars Sreg.empty in
+      check_expr false mut vis Mpv.empty e
+
 (* recursive definitions *)
 
 let rs_clone ({rs_name = id; rs_ghost = ghost} as s) c =

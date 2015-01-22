@@ -1153,19 +1153,18 @@ let val_decl ~keep_loc:_ (id,_,_,_,_,_ as vald) =
   reunify_regions ();
   Loc.try2 ?loc:id.pre_loc val_decl env_empty vald
 
-(* FIXME: unless de is a lambda, no checks are made *)
-let let_defn ~keep_loc (id,ghost,kind,de) =
-  reunify_regions ();
-  let e = expr ~keep_loc None env_empty false de in
-  if e.e_ghost && not ghost then Loc.errorm ?loc:id.pre_loc
-    "Symbol %s must be explicitly marked ghost" id.pre_name;
-  Loc.try1 ?loc:id.pre_loc (create_let_defn id ~ghost ~kind) e
-
 let rec_defn ~keep_loc drdf =
   reunify_regions ();
   expr_rec ~keep_loc None env_empty drdf
 
-(* FIXME: unless de is a lambda, no checks are made *)
 let expr ~keep_loc de =
   reunify_regions ();
-  expr ~keep_loc None env_empty false de
+  let e = expr ~keep_loc None env_empty false de in
+  check_expr e; e
+
+let let_defn ~keep_loc (id,ghost,kind,de) =
+  let e = expr ~keep_loc de in
+  if e.e_ghost && not ghost then Loc.errorm ?loc:id.pre_loc
+    "%s %s must be explicitly marked ghost" (match kind, e.e_vty with
+      | RKnone, VtyI _ -> "Variable" | _ -> "Function") id.pre_name;
+  Loc.try1 ?loc:id.pre_loc (create_let_defn id ~ghost ~kind) e
