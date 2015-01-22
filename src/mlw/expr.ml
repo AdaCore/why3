@@ -61,42 +61,45 @@ let mk_rs, restore_rs =
   (fun ls -> Wls.find ls_to_rs ls)
 
 type rs_kind =
-  | RKnone            (* non-pure symbol *)
-  | RKpv of pvsymbol  (* local let-function *)
-  | RKlocal           (* new local let-function *)
-  | RKfunc of int     (* new top-level let-function or constructor *)
-  | RKpred            (* new top-level let-predicate *)
-  | RKlemma           (* top-level or local let-lemma *)
+  | RKnone    (* non-pure symbol *)
+  | RKlocal   (* local let-function *)
+  | RKfunc    (* top-level let-function *)
+  | RKpred    (* top-level let-predicate *)
+  | RKlemma   (* top-level or local let-lemma *)
 
-let create_rsymbol id ?(ghost=false) ?(kind=RKnone) c =
-  let check_effects { cty_effect = e } =
-    (* TODO/FIXME: prove that we can indeed ignore resets.
-      Normally, resets neither consult nor change the
-      external state, and do not affect the specification. *)
-    if not (eff_is_pure e) then Loc.errorm
-      "this function has side effects, it cannot be declared as pure" in
-  let check_reads { cty_freeze = isb } =
-    if not (Mreg.is_empty isb.isb_reg) then Loc.errorm
-      "this function is stateful, it cannot be declared as pure" in
-  let res_type c = ty_of_ity c.cty_result in
-  let arg_type c = List.map (fun a -> a.pv_vs.vs_ty) c.cty_args in
+let check_effects ?loc c =
+  (* TODO/FIXME: prove that we can indeed ignore resets.
+    Normally, resets neither consult nor change the
+    external state, and do not affect the specification. *)
+  if not (eff_is_pure c.cty_effect) then Loc.errorm ?loc
+    "This function has side effects, it cannot be declared as pure"
+
+let check_reads ?loc c =
+  if not (Mreg.is_empty c.cty_freeze.isb_reg) then Loc.errorm ?loc
+    "This function is stateful, it cannot be declared as pure"
+
+let cty_purify c =
+  let add a ity = ity_func (ity_purify a.pv_ity) ity in
+  List.fold_right add c.cty_args (ity_purify c.cty_result)
+
+let add_post c t = match t.t_ty with
+  | Some ty ->
+      let res = create_vsymbol (id_fresh "result") ty in
+      cty_add_post c [create_post res (t_equ (t_var res) t)]
+  | None ->
+      let res = create_vsymbol (id_fresh "result") ty_bool in
+      let q = t_iff (t_equ (t_var res) t_bool_true) t in
+      cty_add_post c [create_post res q]
+
+let create_rsymbol ({pre_loc=loc} as id) ?(ghost=false) ?(kind=RKnone) c =
   let arg_list c = List.map (fun a -> t_var a.pv_vs) c.cty_args in
-  let add_post c t = match t.t_ty with
-    | Some ty ->
-        let res = create_vsymbol (id_fresh "result") ty in
-        cty_add_post c [create_post res (t_equ (t_var res) t)]
-    | None ->
-        let res = create_vsymbol (id_fresh "result") ty_bool in
-        let q = t_iff (t_equ (t_var res) t_bool_true) t in
-        cty_add_post c [create_post res q] in
+  let arg_type c = List.map (fun a -> a.pv_vs.vs_ty) c.cty_args in
+  let res_type c = ty_of_ity c.cty_result in
   match kind with
   | RKnone ->
       mk_rs (id_register id) c ghost RLnone None
   | RKlocal ->
-      check_effects c; check_reads c;
-      let ity = ity_purify c.cty_result in
-      let ity = List.fold_right (fun a ity ->
-        ity_func (ity_purify a.pv_ity) ity) c.cty_args ity in
+      check_effects ?loc c; check_reads ?loc c;
       (* When declaring local let-functions, we need to create a
          mapping vsymbol to use in assertions. As vsymbols are not
          generalisable, we have to freeze the type variables (but
@@ -110,37 +113,42 @@ let create_rsymbol id ?(ghost=false) ?(kind=RKnone) c =
          used in the program, as it has lost all preconditions,
          which is why we declare it as ghost. In other words,
          this pvsymbol behaves exactly as Epure of its pv_vs. *)
-      let v = create_pvsymbol ~ghost:true id ity in
+      let v = create_pvsymbol ~ghost:true id (cty_purify c) in
       let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
       mk_rs v.pv_vs.vs_name (add_post c t) ghost (RLpv v) None
-  | RKpv v ->
-      check_effects c; check_reads c;
-      let ity = ity_purify c.cty_result in
-      let ity = List.fold_right (fun a ity ->
-        ity_func (ity_purify a.pv_ity) ity) c.cty_args ity in
-      ity_equal_check v.pv_ity ity;
-      if not v.pv_ghost then invalid_arg "Expr.create_rsymbol";
-      let t = t_func_app_l (t_var v.pv_vs) (arg_list c) in
-      mk_rs (id_register id) (add_post c t) ghost (RLpv v) None
-  | RKfunc constr ->
-      check_effects c; check_reads c;
-      (* we don't really need to check the well-formedness of
-         constructor's signature here, the type declaration
-         will take care of it *)
-      let ls = create_fsymbol id ~constr (arg_type c) (res_type c) in
+  | RKfunc ->
+      check_effects ?loc c; check_reads ?loc c;
+      let ls = create_fsymbol id (arg_type c) (res_type c) in
       let t = t_app ls (arg_list c) ls.ls_value in
       mk_rs ls.ls_name (add_post c t) ghost (RLls ls) None
   | RKpred ->
-      check_effects c; check_reads c;
-      if not (ity_equal c.cty_result ity_bool) then
-        Loc.errorm "this function does not return a boolean value, \
-                    it cannot be declared as a pure predicate";
+      check_effects ?loc c; check_reads ?loc c;
+      if not (ity_equal c.cty_result ity_bool) then Loc.errorm ?loc
+        "This function returns a value of type %a, it cannot be \
+          declared as a pure predicate" print_ity c.cty_result;
       let ls = create_psymbol id (arg_type c) in
       let f = t_app ls (arg_list c) None in
       mk_rs ls.ls_name (add_post c f) ghost (RLls ls) None
   | RKlemma ->
-      check_effects c;
+      check_effects ?loc c;
       mk_rs (id_register id) c ghost RLlemma None
+
+let rs_dup ({rs_name = {id_loc = loc}} as s) c =
+  let id = id_register (id_clone s.rs_name) in
+  match s.rs_logic with
+  | RLnone ->
+      mk_rs id c s.rs_ghost RLnone None
+  | RLpv v ->
+      check_effects ?loc c; check_reads ?loc c;
+      ity_equal_check v.pv_ity (cty_purify c);
+      let al = List.map (fun a -> t_var a.pv_vs) c.cty_args in
+      let t = t_func_app_l (t_var v.pv_vs) al in
+      mk_rs id (add_post c t) s.rs_ghost (RLpv v) None
+  | RLls _ ->
+      invalid_arg "Expr.rs_dup"
+  | RLlemma ->
+      check_effects ?loc c;
+      mk_rs id c s.rs_ghost RLlemma None
 
 let create_field id s v =
   if not (List.exists (fun u -> pv_equal u v) s.its_mfields ||
@@ -154,6 +162,29 @@ let create_field id s v =
   let q = create_post res (t_equ (t_var res) t) in
   let c = create_cty [arg] [] [q] Mexn.empty Spv.empty eff_empty v.pv_ity in
   mk_rs ls.ls_name c v.pv_ghost (RLls ls) (Some v)
+
+let create_constructor ~constr id s fl =
+  let exn = Invalid_argument "Expr.create_constructor" in
+  let fs = List.fold_right (Spv.add_new exn) fl Spv.empty in
+  if s.its_private || s.its_def <> None then raise exn;
+  if s.its_mutable then begin
+    if constr <> 1 then raise exn;
+    let mfs = Spv.of_list s.its_mfields in
+    let ifs = Spv.of_list s.its_ifields in
+    let sfs = Spv.union mfs ifs in
+    if not (Spv.equal fs sfs) then raise exn
+  end else if constr < 1 then raise exn;
+  let argl = List.map (fun a -> a.pv_vs.vs_ty) fl in
+  let tyl = List.map ity_var s.its_ts.ts_args in
+  let ity = ity_app s tyl s.its_regions in
+  let ty = ty_of_ity ity in
+  let ls = create_fsymbol ~constr id argl ty in
+  let argl = List.map (fun a -> t_var a.pv_vs) fl in
+  let res = create_vsymbol (id_fresh "result") ty in
+  let q = t_equ (t_var res) (fs_app ls argl ty) in
+  let c = create_cty fl [] [create_post res q]
+          Mexn.empty Spv.empty eff_empty ity in
+  mk_rs (id_register id) c false (RLls ls) None
 
 let rs_of_ls ls =
   let v_args = List.map (fun ty ->
@@ -170,13 +201,6 @@ let rs_of_ls ls =
   let ity = ity_of_ty (t_type q) in
   let c = create_cty v_args [] [q] Mexn.empty Spv.empty eff_empty ity in
   mk_rs ls.ls_name c false (RLls ls) None
-
-let rs_kind rs = match rs.rs_logic with
-  | RLnone -> RKnone
-  | RLpv v -> RKpv v
-  | RLls {ls_value = None} -> RKpred
-  | RLls {ls_constr = cns} -> RKfunc cns
-  | RLlemma -> RKlemma
 
 (** {2 Program patterns} *)
 
@@ -406,25 +430,15 @@ let create_let_defn_pv id ?(ghost=false) e =
 
 let create_let_defn_rs id ?(ghost=false) ?(kind=RKnone) e =
   let ghost = ghost || e.e_ghost in
-  let cty = match e.e_vty, kind with
-    | _, RKfunc n when n > 0 -> invalid_arg "Expr.create_let_defn_rs"
-    | VtyI i, (RKfunc _|RKpred) when ity_immutable i ->
-        (* the post will be equality to the logic constant *)
-        create_cty [] [] [] Mexn.empty Spv.empty eff_empty i
-    | VtyI _, (RKfunc _|RKpred) -> Loc.errorm ?loc:e.e_loc
-        "this expression is non-pure, it cannot be used as a pure function"
-    | VtyI _, (RKnone|RKlocal|RKpv _|RKlemma) -> Loc.errorm ?loc:e.e_loc
-        "this expression is first-order, it cannot be used as a function"
-    | VtyC c, _ -> c in
-  let rs = create_rsymbol id ~ghost ~kind cty in
+  let rs = create_rsymbol id ~ghost ~kind (cty_of_expr e) in
   { let_sym = ValS rs; let_expr = e }, rs
 
 let create_let_defn id ?(ghost=false) ?(kind=RKnone) e =
-  if kind <> RKnone then fst (create_let_defn_rs id ~ghost ~kind e) else
   let ghost = ghost || e.e_ghost in
-  let lv = match e.e_vty with
-    | VtyC c -> ValS (create_rsymbol id ~ghost ~kind c)
-    | VtyI i -> ValV (create_pvsymbol id ~ghost i) in
+  let lv = match kind, e.e_vty with
+    | RKnone, VtyI ity -> ValV (create_pvsymbol id ~ghost ity)
+    | _, VtyC cty -> ValS (create_rsymbol id ~ghost ~kind cty)
+    | _ -> Loc.error ?loc:e.e_loc (CtyExpected e) in
   { let_sym = lv; let_expr = e }
 
 let e_let_raw ({let_expr = d} as ld) e =
@@ -759,9 +773,6 @@ let check_expr e = match e.e_node with
 
 (* recursive definitions *)
 
-let rs_clone ({rs_name = id; rs_ghost = ghost} as s) c =
-  create_rsymbol (id_clone id) ~ghost ~kind:(rs_kind s) c
-
 let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
   cty_add_reads (cty_of_expr d) (List.fold_left add Spv.empty varl)
 
@@ -786,14 +797,14 @@ let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
       let d = e_rs_subst sm d in
       if d.e_ghost && not s.rs_ghost then Loc.errorm
         "Expr.create_rec_defn: ghost status mismatch";
-      let ld, ns = create_let_defn_rs (id_clone s.rs_name)
-        ~ghost:s.rs_ghost ~kind:(rs_kind s) d in
+      let ns = rs_dup s (cty_of_expr d) in
+      let ld = {let_sym = ValS ns; let_expr = d} in
       e_let_raw ld (e_rs_subst (Mrs.add s ns sm) e)
   | Erec ({rec_defn = fdl; rec_decr = ds},e) ->
       let ndl = List.map (fun fd ->
         fd.fun_rsym, e_rs_subst sm fd.fun_expr) fdl in
       let merge {fun_sym = s; fun_varl = varl} (rs,d) =
-        { fun_sym = rs_clone s (cty_add_variant d varl);
+        { fun_sym = rs_dup s (cty_add_variant d varl);
           fun_rsym = rs; fun_expr = d; fun_varl = varl } in
       let nfdl = List.map2 merge fdl (rec_fixp ndl) in
       let add m o n = Mrs.add o.fun_sym n.fun_sym m in
@@ -822,7 +833,7 @@ and rec_fixp dl =
     if eff_equal c.cty_effect s.rs_cty.cty_effect &&
        Spv.equal c.cty_reads s.rs_cty.cty_reads
     then sm, (s,d)
-    else let n = rs_clone s c in Mrs.add s n sm, (n,d) in
+    else let n = rs_dup s c in Mrs.add s n sm, (n,d) in
   let sm, dl = Lists.map_fold_left update Mrs.empty dl in
   if Mrs.is_empty sm then dl else
   rec_fixp (List.map (fun (s,d) -> s, e_rs_subst sm d) dl)

@@ -886,8 +886,7 @@ let cty_of_spec env bl dsp dity =
 
 let val_decl env (id,ghost,kind,bl,dsp,dity) =
   let ity = ity_of_dity dity in match kind with
-  | RKfunc n when n > 0 -> invalid_arg "Dexpr.val_decl"
-  | RKpv _ | RKlocal -> invalid_arg "Dexpr.val_decl"
+  | RKlocal -> invalid_arg "Dexpr.val_decl"
   | _ when bl <> [] ->
       let c = cty_of_spec env bl dsp dity in
       ValS (create_rsymbol id ~ghost ~kind c)
@@ -909,7 +908,7 @@ let val_decl env (id,ghost,kind,bl,dsp,dity) =
       ValV (create_pvsymbol id ~ghost ity)
   | RKnone -> Loc.errorm
       "Mutable top-level variables must have monomorphic type"
-  | RKfunc _ -> Loc.errorm
+  | RKfunc -> Loc.errorm
       "Mutable top-level variables cannot be logical functions"
   | RKpred -> Loc.errorm
       "Mutable top-level variables cannot be logical predicates"

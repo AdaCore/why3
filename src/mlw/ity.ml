@@ -952,6 +952,7 @@ let cty_apply ?(ghost=false) c vl args res =
     ity_match (List.fold_left2 match_v isb rcargs rargs) cres res in
   let eff = if same then c.cty_effect else eff_full_inst isb c.cty_effect in
   (* stage 3: cty-to-mapping type cast *)
+  (* TODO: use Term.t_closure in posts for let-functions *)
   let post = if cargs = [] then c.cty_post else begin
     if c.cty_pre <> [] then Loc.errorm
       "this function is partial, it cannot be used as first-order";

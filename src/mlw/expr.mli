@@ -40,12 +40,11 @@ val rs_equal : rsymbol -> rsymbol -> bool
 val rs_hash : rsymbol -> int
 
 type rs_kind =
-  | RKnone            (* non-pure symbol *)
-  | RKpv of pvsymbol  (* local let-function *)
-  | RKlocal           (* new local let-function *)
-  | RKfunc of int     (* new top-level let-function or constructor *)
-  | RKpred            (* new top-level let-predicate *)
-  | RKlemma           (* top-level or local let-lemma *)
+  | RKnone    (* non-pure symbol *)
+  | RKlocal   (* local let-function *)
+  | RKfunc    (* top-level let-function *)
+  | RKpred    (* top-level let-predicate *)
+  | RKlemma   (* top-level or local let-lemma *)
 
 val create_rsymbol : preid -> ?ghost:bool -> ?kind:rs_kind -> cty -> rsymbol
 (** If [?kind] is supplied and is not [RKnone], then [cty]
@@ -56,6 +55,9 @@ val create_rsymbol : preid -> ?ghost:bool -> ?kind:rs_kind -> cty -> rsymbol
     but regions are instantiable. If [?kind] is [RKpred] the result
     type must be [ity_bool]. If [?kind] is [RKlemma] and the result
     type is not [ity_unit], an existential premise is generated. *)
+
+val create_constructor :
+  constr:int -> preid -> itysymbol -> pvsymbol list -> rsymbol
 
 val create_field : preid -> itysymbol -> pvsymbol -> rsymbol
 
