@@ -1,0 +1,14 @@
+
+
+module M
+
+  use import int.Int
+
+  constant x "model" : int
+
+  constant y "model" : int
+
+  goal g : x + y >= 0
+
+  goal h : forall z "model". x+z >= 0
+end

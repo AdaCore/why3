@@ -75,6 +75,7 @@ let print_ident fmt id =
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
+  mutable info_model : term list;
 }
 
 (** type *)
@@ -264,8 +265,13 @@ let print_prop_decl info fmt k pr f = match k with
         | Some loc -> fprintf fmt " @[;; %a@]@\n"
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
-      fprintf fmt "@[(check-sat)@]@\n"
+      fprintf fmt "@[(check-sat)@]@\n";
+      if info.info_model != [] then
+        fprintf fmt "@[(get-value (%a))@]@\n"
+          (Pp.print_list Pp.space (print_term info)) info.info_model
   | Plemma| Pskip -> assert false
+
+let model_label = Ident.create_label "model"
 
 let print_decl info fmt d = match d.d_node with
   | Dtype ts ->
@@ -273,6 +279,9 @@ let print_decl info fmt d = match d.d_node with
   | Ddata _ -> unsupportedDecl d
       "smtv2 : algebraic type are not supported"
   | Dparam ls ->
+      if ls.ls_args = [] &&
+        Slab.mem model_label ls.ls_name.id_label then
+        info.info_model <- (t_app ls [] ls.ls_value) :: info.info_model;
       print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
@@ -283,14 +292,24 @@ let print_decl info fmt d = match d.d_node with
       print_prop_decl info fmt k pr f
 
 let print_decls =
-  let print_decl (sm, cm) fmt d =
-    try print_decl {info_syn = sm; info_converters = cm} fmt d; (sm, cm), []
+  let print_decl (sm, cm, model) fmt d =
+    try let info = {info_syn = sm; info_converters = cm; info_model = model} in
+        print_decl info fmt d; (sm, cm, info.info_model), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm ->
   Printer.on_converter_map (fun cm ->
-      Trans.fold print_decl ((sm, cm),[])))
+      Trans.fold print_decl ((sm, cm, []),[])))
+(*
+  let print_decl (sm,model) fmt d =
+    try let info = {info_syn = sm; info_model = model} in
+        print_decl info fmt d; (sm, info.info_model), []
+    with Unsupported s -> raise (UnsupportedDecl (d,s)) in
+  let print_decl = Printer.sprint_decl print_decl in
+  let print_decl task acc = print_decl task.Task.task_decl acc in
+  Discriminate.on_syntax_map (fun sm -> Trans.fold print_decl ((sm,[]),[]))
+  Preliminary support for model from CVC4 *)
 
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
