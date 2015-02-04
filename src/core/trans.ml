@@ -53,6 +53,21 @@ let store fn = let tr = Wtask.memoize_option 63 fn in fun t -> match t with
 
 let bind f g = store (fun task -> g (f task) task)
 
+let trace_goal msg tr =
+  fun task ->
+    begin match task with
+    | Some { task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,t)}}} ->
+      Debug.dprintf debug "[%s (before)] task goal is %a@." msg Pretty.print_term t
+    | _ -> Debug.dprintf debug "[%s (before)] task has non goal@." msg
+    end;
+    let new_task = tr task in
+    begin match new_task with
+    | Some { task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,t)}}} ->
+      Debug.dprintf debug "[%s (after)] task goal is %a@." msg Pretty.print_term t
+    | _ -> Debug.dprintf debug "[%s (after)] task has non goal@." msg
+    end;
+    new_task
+
 let fold fn v =
   let h = Wtask.create 63 in
   let rewind acc task =

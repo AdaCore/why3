@@ -31,6 +31,8 @@ val singleton : 'a trans -> 'a tlist
 val return    : 'a -> 'a trans
 val bind      : 'a trans -> ('a -> 'b trans) -> 'b trans
 
+val trace_goal : string -> task trans -> task trans
+
 (** Compose transformation *)
 val compose   : task trans -> 'a trans -> 'a trans
 val compose_l : task tlist -> 'a tlist -> 'a tlist
