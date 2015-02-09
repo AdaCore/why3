@@ -270,7 +270,7 @@ let create_debugging_trans trans_name (tran : Task.task trans) =
     Debug.dprintf debug "The goal before the transformation %s:@." trans_name;
     print_task_goal t;
     let t2 = apply tran t in
-    Debug.dprintf debug "The goal after the transformation %s:@." trans_name;
+    Debug.dprintf debug "@.The goal after the transformation %s:@." trans_name;
     print_task_goal t2;
     Debug.dprintf debug "@.@.";
     t2;

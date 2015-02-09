@@ -19,6 +19,10 @@ open Term
 open Decl
 open Printer
 
+let debug = Debug.register_info_flag "smtv2_printer"
+  ~desc:"Print@ debugging@ messages@ about@ printing@ \
+         the@ input@ of@ smtv2."
+
 (** SMTLIB tokens taken from CVC4: src/parser/smt2/Smt2.g *)
 let ident_printer =
   let bls = (*["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
@@ -78,6 +82,16 @@ type info = {
   mutable info_model : term list;
 }
 
+let debug_print_term message t =
+  let form = Debug.get_debug_formatter () in
+  begin
+    Debug.dprintf debug message;
+    if Debug.test_flag debug then 
+      Pretty.print_term form t;
+    Debug.dprintf debug "@.";
+  end
+  
+
 (** type *)
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
@@ -110,8 +124,14 @@ let print_typed_var info fmt vs =
 let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
+let model_label = Ident.create_label "model"
+
 (** expr *)
-let rec print_term info fmt t = match t.t_node with
+let rec print_term info fmt t = 
+  debug_print_term "Printing term: " t;
+  if Slab.mem model_label t.t_label then
+    info.info_model <- (t) :: info.info_model;
+  match t.t_node with
   | Tconst c ->
       let number_format = {
           Number.long_int_support = true;
@@ -163,7 +183,12 @@ let rec print_term info fmt t = match t.t_node with
       "smtv2 : you must eliminate epsilon"
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
-and print_fmla info fmt f = match f.t_node with
+and print_fmla info fmt f = 
+  debug_print_term "Printing formula: " f;
+  if Slab.mem model_label f.t_label then
+    info.info_model <- (f) :: info.info_model;
+
+  match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
@@ -270,8 +295,6 @@ let print_prop_decl info fmt k pr f = match k with
         fprintf fmt "@[(get-value (%a))@]@\n"
           (Pp.print_list Pp.space (print_term info)) info.info_model
   | Plemma| Pskip -> assert false
-
-let model_label = Ident.create_label "model"
 
 let print_decl info fmt d = match d.d_node with
   | Dtype ts ->
