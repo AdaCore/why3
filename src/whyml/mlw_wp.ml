@@ -665,8 +665,8 @@ and wp_desc env e q xq = match e.e_node with
           | Evalue v -> t_var v.pv_vs
           | _ -> raise Exit in
         try
-          let r2 = get_term e2 in
-          let r3 = get_term e3 in
+          let r2 = wp_label e2 (get_term e2) in
+          let r3 = wp_label e3 (get_term e3) in
           let v, q = open_post q in
           t_subst_single v (t_if_simp test r2 r3) q
         with Exit ->
