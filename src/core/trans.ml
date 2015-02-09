@@ -249,6 +249,35 @@ let print_meta f m task =
   Debug.dprintf f "@[<hov 2>meta %s :@\n%a@]@." m.Theory.meta_name print_tds m;
   task
 
+let print_task_goal t = match t with
+  | None -> ()
+  | Some x ->
+    begin
+      match x.task_decl.td_node with
+      | Decl d ->
+	begin
+	  match d.d_node with
+	  | Dprop (Pgoal, _, te) ->
+	    let form = Debug.get_debug_formatter () in
+	    Pretty.print_term form te
+	  | _ -> ()
+	end
+      | _ -> ()
+    end
+
+let create_debugging_trans trans_name (tran : Task.task trans) =
+  let new_trans (t:Task.task) = begin
+    Debug.dprintf debug "The goal before the transformation %s:@." trans_name;
+    print_task_goal t;
+    let t2 = apply tran t in
+    Debug.dprintf debug "The goal after the transformation %s:@." trans_name;
+    print_task_goal t2;
+    Debug.dprintf debug "@.@.";
+    t2;
+    
+  end in
+  store new_trans
+
 (** register transformations *)
 
 open Env

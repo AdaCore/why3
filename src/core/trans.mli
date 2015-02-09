@@ -101,6 +101,11 @@ val print_meta : Debug.flag -> meta -> task trans
 (** [print_meta f m] is an identity transformation that
     prints every meta [m] in the task if flag [d] is set *)
 
+(* Creates new transformation that prints the goal of the task to be 
+transfromed, do the original transformation and than prints the goal 
+of the transformed task.  *)
+val create_debugging_trans: string -> task trans ->  task trans
+
 (** {2 Registration} *)
 
 exception TransFailure of string * exn
