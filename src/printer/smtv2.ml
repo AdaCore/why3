@@ -131,6 +131,7 @@ let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
   if Slab.mem model_label t.t_label then
     info.info_model <- (t) :: info.info_model;
+
   match t.t_node with
   | Tconst c ->
       let number_format = {
@@ -184,10 +185,10 @@ let rec print_term info fmt t =
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
 
 and print_fmla info fmt f = 
-  debug_print_term "Printing formula: " f;
+  debug_print_term "Printing formula: " f;  
   if Slab.mem model_label f.t_label then
     info.info_model <- (f) :: info.info_model;
-
+  
   match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
       print_ident fmt id
@@ -293,7 +294,7 @@ let print_prop_decl info fmt k pr f = match k with
       fprintf fmt "@[(check-sat)@]@\n";
       if info.info_model != [] then
         fprintf fmt "@[(get-value (%a))@]@\n"
-          (Pp.print_list Pp.space (print_term info)) info.info_model
+          (Pp.print_list Pp.space (print_fmla info)) info.info_model
   | Plemma| Pskip -> assert false
 
 let print_decl info fmt d = match d.d_node with
