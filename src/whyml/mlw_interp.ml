@@ -517,19 +517,35 @@ let rec to_program_value_rec env regions s ity ls vl =
         (* absurd, it would be a pure type *)
     assert false
 
+let rec get_regions acc ity =
+  match ity.ity_node with
+  | Ityvar _ -> assert false
+  | Ityapp(_,ty,rl) ->
+     List.map (get_reg env) rl
+  | Itypur(ts,tl) ->
+     eprintf "@[<hov 2>error while fetching regions from value %a@ of type %a@]@."
+             print_value v Mlw_pretty.print_vty ty;
+     assert false
+
+
 let to_program_value env s ty v =
   match ty,v with
   | VTarrow _, _ -> s,v
   | VTvalue ity,Vapp(ls,vl) ->
     if ity_immutable ity then s,v else
       begin
-        (* ls must be a constructor of a record with mutable fields *)
-        let regions =
+        let regions = [] in
+(*
           match ity.ity_node with
           | Ityapp(_,_,rl) ->
-            List.map (get_reg env) rl
-          | _ -> assert false
+             List.map (get_reg env) rl
+          | Ityvar _ -> assert false
+          | Itypur(ts,tl) ->
+             eprintf "@[<hov 2>error while fetching regions from value %a@ of type %a@]@."
+                     print_value v Mlw_pretty.print_vty ty;
+             assert false
         in
+ *)
         let s,regions,v = to_program_value_rec env regions s ity ls vl in
         match regions with
         | [] -> s,v
