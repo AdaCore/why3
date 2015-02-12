@@ -153,6 +153,7 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit =
   in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
   let time,steps = Opt.get_def (time,-1) (grep_time out res_parser.prp_timeregexps) in
+  (* TODO: separate grep for time and for steps into different regexps *)
   let ans = match ans with
     | Unknown _ | HighFailure when on_timelimit && timelimit > 0
       && time >= (0.9 *. float timelimit) -> Timeout
