@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="3" memlimit="0"/>
-<prover id="2" name="Alt-Ergo" version="0.95.1" timelimit="10" memlimit="0"/>
+<prover id="2" name="Eprover" version="1.6" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Z3" version="2.19" timelimit="10" memlimit="0"/>
 <prover id="4" name="Spass" version="3.7" timelimit="10" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="3" memlimit="0"/>
@@ -12,25 +12,25 @@
 <file name="../int.why" expanded="true">
 <theory name="Test" sum="fc4f5a5b6868cb7535da7ff9ae921fff" expanded="true">
  <goal name="G1" expanded="true">
- <proof prover="0"><result status="timeout" time="4.99"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="timeout" time="4.99"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4" memlimit="0"><result status="timeout" time="10.06"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6"><result status="unknown" time="10.09"/></proof>
+ <proof prover="6"><result status="timeout" time="10.09"/></proof>
  </goal>
  <goal name="G2" expanded="true">
- <proof prover="0"><result status="timeout" time="4.98"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="timeout" time="4.98"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4" memlimit="0"><result status="timeout" time="10.04"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6"><result status="unknown" time="10.09"/></proof>
+ <proof prover="6"><result status="timeout" time="10.09"/></proof>
  </goal>
  <goal name="CompatOrderAdd" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -39,25 +39,25 @@
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="CompatOrderMult" expanded="true">
- <proof prover="0"><result status="valid" time="1.28"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="1.28"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4" memlimit="0"><result status="valid" time="0.01"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="InvMult" expanded="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4" timelimit="5"><result status="valid" time="0.86"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
  <proof prover="6"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="InvSquare" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -66,7 +66,7 @@
  <proof prover="6"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="ZeroMult" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -75,25 +75,25 @@
  <proof prover="6"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="SquareNonNeg1" expanded="true">
- <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4" memlimit="0"><result status="timeout" time="10.04"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6"><result status="unknown" time="10.10"/></proof>
+ <proof prover="6"><result status="timeout" time="10.10"/></proof>
  </goal>
  <goal name="SquareNonNeg" expanded="true">
- <proof prover="0"><result status="valid" time="0.09"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.09"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4" memlimit="0"><result status="timeout" time="10.74"/></proof>
  <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="6"><result status="unknown" time="10.03"/></proof>
+ <proof prover="6"><result status="timeout" time="10.03"/></proof>
  </goal>
  <goal name="ZeroLessOne" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
@@ -104,13 +104,13 @@
 </theory>
 <theory name="MinMax" sum="5a65a1cfb37258d4746169718f12d1d3" expanded="true">
  <goal name="G" expanded="true">
- <proof prover="0"><result status="timeout" time="4.96"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
- <proof prover="2"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="timeout" time="4.96"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4" memlimit="0"><result status="timeout" time="10.06"/></proof>
  <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="6"><result status="unknown" time="10.03"/></proof>
+ <proof prover="6"><result status="timeout" time="10.03"/></proof>
  </goal>
 </theory>
 </file>
