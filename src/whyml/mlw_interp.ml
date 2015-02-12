@@ -477,6 +477,7 @@ let get_builtins env =
 
 *)
 
+(*
 let rec to_program_value_rec env regions s ity ls vl =
   try
     let csl = Mlw_decl.inst_constructors env.tknown env.mknown ity in
@@ -520,46 +521,73 @@ let rec to_program_value_rec env regions s ity ls vl =
 let rec get_regions acc ity =
   match ity.ity_node with
   | Ityvar _ -> assert false
-  | Ityapp(_,ty,rl) ->
+  | Ityapp(its,tl,rl) ->
      List.map (get_reg env) rl
   | Itypur(ts,tl) ->
-     eprintf "@[<hov 2>error while fetching regions from value %a@ of type %a@]@."
-             print_value v Mlw_pretty.print_vty ty;
-     assert false
+    *)
+
+let find_fields env ity ls =
+  try
+    let csl = Mlw_decl.inst_constructors env.tknown env.mknown ity in
+    let rec find_cs csl =
+      match csl with
+      | [] -> assert false (* FIXME ? *)
+      | (cs,fdl)::rem ->
+        if ls_equal cs ls then fdl else find_cs rem
+    in find_cs csl
+  with Not_found ->
+    (* absurd, [ity] would be a pure type *)
+    assert false
+
+
+let rec to_program_value env s ity v =
+  match v with
+  | Vapp(ls,vl) ->
+    if ity_immutable ity then s,v else
+      begin
+        let fdl = find_fields env ity ls in
+        let targs,regions =
+          match ity.ity_node with
+          | Ityapp(_,tl,rl) -> tl, List.map (get_reg env) rl
+          | Ityvar _ -> assert false
+          | Itypur(_,tl) -> tl, []
+        in
+        to_program_value_list env s targs fdl regions ls vl
+      end
+  | _ -> assert (ity_immutable ity); s,v
+
+and to_program_value_list env s _tl fdl regions ls vl =
+  let (s,regions,vl) =
+    List.fold_left2
+      (fun (s,regions,vl) fd v ->
+        match fd.fd_mut,regions with
+        | None,_ -> (* non mutable field, but
+                       some subfield may be mutable *)
+          let s, v = to_program_value env s fd.fd_ity v in
+          (s,regions,v::vl)
+        | Some _r, reg::regions ->
+          (* found a mutable field *)
+          let s' = Mreg.add reg v s in
+          (s',regions,Vreg reg :: vl)
+        | Some _, [] -> assert false)
+      (s,regions,[]) fdl vl
+  in
+  match regions with
+  | [] -> s, Vapp(ls,List.rev vl)
+  | _ ->
+    eprintf "@[<hov 2>error while converting logic value (%a) \
+              to a program value:@ regions should be empty, not@ [%a]@]@."
+      print_value (Vapp(ls,vl))
+      (Pp.print_list Pp.comma Mlw_pretty.print_reg) regions;
+    assert false
 
 
 let to_program_value env s ty v =
-  match ty,v with
-  | VTarrow _, _ -> s,v
-  | VTvalue ity,Vapp(ls,vl) ->
+  match ty with
+  | VTarrow _ -> s,v
+  | VTvalue ity ->
     if ity_immutable ity then s,v else
-      begin
-        let regions = [] in
-(*
-          match ity.ity_node with
-          | Ityapp(_,_,rl) ->
-             List.map (get_reg env) rl
-          | Ityvar _ -> assert false
-          | Itypur(ts,tl) ->
-             eprintf "@[<hov 2>error while fetching regions from value %a@ of type %a@]@."
-                     print_value v Mlw_pretty.print_vty ty;
-             assert false
-        in
- *)
-        let s,regions,v = to_program_value_rec env regions s ity ls vl in
-        match regions with
-        | [] -> s,v
-        | _ ->
-          eprintf "@[<hov 2>error while converting logic value (%a:%a) \
-              to a program value:@ regions should be empty, not@ [%a]@]@."
-            print_value v Mlw_pretty.print_vty ty
-            (Pp.print_list Pp.comma Mlw_pretty.print_reg) regions;
-          assert false
-      end
-  | VTvalue ity, _ ->
-    assert (ity_immutable ity);
-    s,v
-
+      to_program_value env s ity v
 
 let rec any_value_of_type env ty =
   match ty.Ty.ty_node with
