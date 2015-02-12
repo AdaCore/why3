@@ -19,11 +19,13 @@ type itysymbol = private {
   its_ts      : tysymbol;       (** pure "snapshot" type symbol *)
   its_private : bool;           (** is a private/abstract type *)
   its_mutable : bool;           (** is a record with mutable fields *)
-  its_mfields : pvsymbol list;  (** mutable fields *)
+  its_mfields : pvsymbol list;  (** mutable fields of a mutable type *)
+  its_ifields : pvsymbol list;  (** immutable fields of a mutable type *)
   its_regions : region list;    (** mutable shareable components *)
   its_reg_vis : bool list;      (** non-ghost shareable components *)
   its_arg_vis : bool list;      (** non-ghost type parameters *)
   its_arg_upd : bool list;      (** updatable type parameters *)
+  its_arg_exp : bool list;      (** exposed type parameters *)
   its_def     : ity option;     (** is a type alias *)
 }
 
@@ -96,9 +98,9 @@ exception UnboundRegion of region
 
 (** creation of a symbol for type in programs *)
 val create_itysymbol :
-  preid -> (tvsymbol * bool * bool) list ->
+  preid -> (tvsymbol * bool * bool * bool) list ->
     bool -> bool -> (region * bool) list ->
-    Spv.t -> ity option -> itysymbol
+    bool Mpv.t -> ity option -> itysymbol
 
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)
@@ -159,8 +161,10 @@ val reg_r_fold : ('a -> region -> 'a) -> 'a -> region -> 'a
 (** {2 Miscellaneous type utilities} *)
 
 val ity_freevars : Stv.t -> ity -> Stv.t
+val reg_freevars : Stv.t -> region -> Stv.t
 
 val ity_v_occurs : tvsymbol -> ity -> bool
+val reg_v_occurs : tvsymbol -> region -> bool
 
 val ity_r_occurs : region -> ity -> bool
 val reg_r_occurs : region -> region -> bool
@@ -266,6 +270,10 @@ val eff_union : effect -> effect -> effect
 val eff_is_empty : effect -> bool
 val eff_is_pure  : effect -> bool
 
+exception AssignPrivate of region
+exception DuplicateField of region * pvsymbol
+exception WriteImmutable of region * pvsymbol
+
 val eff_write : effect -> region -> Spv.t -> effect
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
@@ -350,18 +358,18 @@ val cty_add_post : cty -> post list -> cty
 
 (** {2 Pretty-printing} *)
 
-open Format
-
 val forget_reg : region -> unit   (* flush id_unique for a region *)
 val forget_pv  : pvsymbol -> unit (* flush for a program variable *)
 
-val print_its : formatter -> itysymbol -> unit    (* type symbol *)
-val print_reg : formatter -> region -> unit       (* region *)
-val print_ity : formatter -> ity -> unit          (* individual type *)
-val print_ity_full : formatter -> ity -> unit     (* type with regions *)
+val print_its : Format.formatter -> itysymbol -> unit (* type symbol *)
+val print_reg : Format.formatter -> region -> unit    (* region *)
+val print_ity : Format.formatter -> ity -> unit       (* individual type *)
+val print_ity_full : Format.formatter -> ity -> unit  (* type with regions *)
 
-val print_xs   : formatter -> xsymbol -> unit     (* exception symbol *)
-val print_pv   : formatter -> pvsymbol -> unit    (* program variable *)
-val print_pvty : formatter -> pvsymbol -> unit    (* pvsymbol : type *)
-val print_cty  : formatter -> cty -> unit         (* computation type *)
-val print_cty_head : formatter -> cty -> unit     (* args and spec only *)
+val print_xs   : Format.formatter -> xsymbol -> unit  (* exception symbol *)
+val print_pv   : Format.formatter -> pvsymbol -> unit (* program variable *)
+val print_pvty : Format.formatter -> pvsymbol -> unit (* pvsymbol : type *)
+val print_cty  : Format.formatter -> cty -> unit      (* computation type *)
+
+val print_spec : pvsymbol list -> pre list -> post list -> post list Mexn.t ->
+  Spv.t -> effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)

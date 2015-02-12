@@ -76,7 +76,8 @@ Definition distance (d:Z) (i:Z): Prop := (path d i) /\ forall (d':Z), (path
   d' i) -> (d <= d')%Z.
 
 Require Import Why3.
-Ltac ae := why3 "Alt-Ergo,0.95.2," timelimit 3.
+Ltac ae := why3 "Alt-Ergo,0.95.2," timelimit 5.
+Ltac z3 := why3 "Z3,4.3.1," timelimit 5.
 
 (* Why3 goal *)
 Theorem WP_parameter_distance : let o := n in ((0%Z <= o)%Z ->
@@ -126,12 +127,12 @@ generalize (h10 k h). intros h10k.
 assert (case: (j < Map.get g1 k \/ j = Map.get g1 k \/ j > Map.get g1 k)%Z) by omega.
 destruct case.
 (* j < g[k] *)
-why3 "z3" timelimit 5.
+z3.
 destruct H5.
 (* j = g[k] *)
 ae.
 (* j > g[k] *)
-why3 "z3" timelimit 3.
+z3.
 (* k = 0 *)
 ae.
 Qed.

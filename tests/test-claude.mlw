@@ -1,5 +1,17 @@
 
 
+module TestBool
+
+  use import bool.Bool
+
+  let f (x:bool) : bool
+  ensures { result = True }
+  =
+    if x then False else x
+
+end
+
+
 module M
 
   use import int.Int

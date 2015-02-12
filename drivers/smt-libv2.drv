@@ -200,6 +200,7 @@ theory bv.BV32
   (* syntax function nth "(= ((_ extract 0 0) (bvlshr %1 ((_ int2bv 32) %2))) #b1)" *)
   (* syntax function nth_bv "(= ((_ extract 0 0) (bvlshr %1 %2)) #b1)" *)
   syntax predicate eq "(= %1 %2)"
+  remove prop Extensionality
 
   syntax predicate slt "(bvslt %1 %2)"
   syntax predicate sle "(bvsle %1 %2)"

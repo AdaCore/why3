@@ -42,7 +42,7 @@ type dpattern = private {
 type dpattern_node =
   | DPwild
   | DPvar  of preid
-  | DPapp  of psymbol * dpattern list
+  | DPapp  of rsymbol * dpattern list
   | DPor   of dpattern * dpattern
   | DPas   of dpattern * preid
   | DPcast of dpattern * ity
@@ -66,8 +66,8 @@ type dspec_final = {
   ds_xpost   : (vsymbol option * term) list Mexn.t;
   ds_reads   : vsymbol list;
   ds_writes  : term list;
-  ds_checkrw : bool;
   ds_diverge : bool;
+  ds_checkrw : bool;
 }
 
 type dspec = ty -> dspec_final
@@ -75,12 +75,6 @@ type dspec = ty -> dspec_final
      All vsymbols in the postcondition clauses in the [ds_post] field
      must have this type. All vsymbols in the exceptional postcondition
      clauses must have the type of the corresponding exception. *)
-
-type dtype_c = dbinder list * dspec later * dity
-
-type dtype_v =
-  | DSpecI of dity
-  | DSpecC of dtype_c
 
 (** Expressions *)
 
@@ -94,19 +88,20 @@ type dexpr = private {
 
 and dexpr_node =
   | DEvar of string * dvty
-  | DEgpvar of pvsymbol
-  | DEgpsym of psymbol
+  | DEpv of pvsymbol
+  | DErs of rsymbol
   | DEconst of Number.constant
-  | DEapp of dexpr * dexpr list
+  | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dspec later * dexpr
+  | DEany of dbinder list * dspec later * dity
   | DElet of dlet_defn * dexpr
   | DErec of drec_defn * dexpr
   | DEnot of dexpr
   | DElazy of lazy_op * dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
   | DEcase of dexpr * (dpattern * dexpr) list
-  | DEassign of (dexpr * psymbol * dexpr) list
-  | DEwhile of dexpr * (dinvariant * variant list) later * dexpr
+  | DEassign of (dexpr * rsymbol * dexpr) list
+  | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
   | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
   | DEraise of xsymbol * dexpr
@@ -116,20 +111,20 @@ and dexpr_node =
   | DEabsurd
   | DEtrue
   | DEfalse
-  | DEany of dtype_v
   | DEmark of preid * dexpr
   | DEcast of dexpr * ity
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
-and dlet_defn = preid * ghost * ps_kind * dexpr
+and dlet_defn = preid * ghost * rs_kind * dexpr
 
 and drec_defn = private { fds : dfun_defn list }
 
-and dfun_defn = preid * ghost * ps_kind *
-  dbinder list * (dspec * variant list) later * dexpr
+and dfun_defn = preid * ghost * rs_kind *
+  dbinder list * dspec later * variant list later * dexpr
 
-type dval_decl = preid * ghost * ps_kind * dtype_v
+type dval_decl = preid * ghost * rs_kind *
+  dbinder list * dspec later * dity
 
 (** Environment *)
 
@@ -155,26 +150,15 @@ val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 
 val dexpr : ?loc:Loc.position -> dexpr_node -> dexpr
 
-type pre_fun_defn = preid * ghost * ps_kind *
-  dbinder list * dity * (denv -> (dspec * variant list) later * dexpr)
+type pre_fun_defn = preid * ghost * rs_kind * dbinder list *
+  dity * (denv -> dspec later * variant list later * dexpr)
 
 val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
-(*
 (** Final stage *)
 
-val expr : keep_loc:bool ->
-  Decl.known_map -> Mlw_decl.known_map -> dexpr -> expr
+val expr : keep_loc:bool -> dexpr -> expr
 
-val let_defn : keep_loc:bool ->
-  Decl.known_map -> Mlw_decl.known_map -> dlet_defn -> let_defn
-
-val fun_defn : keep_loc:bool ->
-  Decl.known_map -> Mlw_decl.known_map -> dfun_defn -> fun_defn
-
-val rec_defn : keep_loc:bool ->
-  Decl.known_map -> Mlw_decl.known_map -> drec_defn -> fun_defn list
-
-val val_decl : keep_loc:bool ->
-  Decl.known_map -> Mlw_decl.known_map -> dval_decl -> let_sym
-*)
+val val_decl : keep_loc:bool -> dval_decl -> val_decl
+val let_defn : keep_loc:bool -> dlet_defn -> let_defn
+val rec_defn : keep_loc:bool -> drec_defn -> rec_defn

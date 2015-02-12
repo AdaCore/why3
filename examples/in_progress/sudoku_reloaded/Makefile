@@ -20,7 +20,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN=main
-GEN = map__Map sudoku__Grid sudoku__TheClassicalSudokuGrid sudoku__Solver sudoku__RandomSolver
+GEN = map__Map sudoku_reloaded__Grid sudoku_reloaded__TheClassicalSudokuGrid sudoku_reloaded__Solver
 OBJ=$(GEN)
 
 GENML = $(addsuffix .ml, $(GEN))
@@ -35,7 +35,7 @@ all: $(MAIN).opt
 extract: $(GENML)
 
 doc:
-	$(WHY3) doc ../sudoku.mlw
+	$(WHY3) doc ../sudoku_reloaded.mlw
 	$(WHY3) session html .
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
@@ -46,8 +46,8 @@ $(MAIN).opt: $(CMX) $(MAIN).cmx
 
 $(MAIN).cmx: $(CMX)
 
-$(GENML): ../sudoku.mlw
-	$(WHY3) extract -D ocaml32 ../sudoku.mlw -o .
+$(GENML): ../sudoku_reloaded.mlw
+	$(WHY3) extract -D ocaml32 ../sudoku_reloaded.mlw -o .
 
 # javascript
 
@@ -58,7 +58,7 @@ JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
           -syntax camlp4o
 
 $(JSMAIN).js: $(JSMAIN).byte
-	js_of_ocaml +nat.js $(JSMAIN).byte
+	js_of_ocaml $(JSMAIN).byte
 
 $(JSMAIN).byte: $(CMO) $(JSMAIN).cmo
 	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ -linkpkg $^

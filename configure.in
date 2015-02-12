@@ -292,11 +292,21 @@ if test "$USEOCAMLFIND" = yes; then
    fi
 fi
 
-#if ocamlfind is used it gives the install path for ocaml library
-if test "$USEOCAMLFIND" = yes; then
-   OCAMLINSTALLLIB=$(ocamlfind printconf destdir)
+if test "$enable_local" = no; then
+   LOCALDIR=''
 else
-   OCAMLINSTALLLIB=$OCAMLLIB
+   LOCALDIR="${PWD}"
+fi
+
+if test "$enable_local" = yes ; then
+   OCAMLINSTALLLIB=$LOCALDIR/lib
+else
+   #if ocamlfind is used it gives the install path for ocaml library
+   if test "$USEOCAMLFIND" = yes; then
+      OCAMLINSTALLLIB=$(ocamlfind printconf destdir)
+   else
+      OCAMLINSTALLLIB=$OCAMLLIB
+   fi
 fi
 
 # bin-annot
@@ -670,12 +680,6 @@ if test "$enable_frama_c" = yes ; then
       FRAMAC_SHARE=`$FRAMAC -print-path`
       FRAMAC_LIBDIR=`$FRAMAC -print-libpath`
    fi
-fi
-
-if test "$enable_local" = no; then
-   LOCALDIR=''
-else
-   LOCALDIR="${PWD}"
 fi
 
 #For the META
