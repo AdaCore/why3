@@ -539,11 +539,16 @@ let find_fields env ity ls =
     (* absurd, [ity] would be a pure type *)
     assert false
 
+let rec remove_prefix l r =
+  match l,r with
+  | _,[] -> l
+  | [],_ -> assert false
+  | r1::l,r2::r -> assert (r1 == r2); remove_prefix l r
 
 let rec to_program_value env s ity v =
   match v with
   | Vapp(ls,vl) ->
-    if ity_immutable ity then s,v else
+    if ity_immutable ity then [],s,v else
       begin
         let fdl = find_fields env ity ls in
         let targs,regions =
@@ -552,9 +557,10 @@ let rec to_program_value env s ity v =
           | Ityvar _ -> assert false
           | Itypur(_,tl) -> tl, []
         in
-        to_program_value_list env s targs fdl regions ls vl
+        let s,v = to_program_value_list env s targs fdl regions ls vl in
+        regions, s, v
       end
-  | _ -> assert (ity_immutable ity); s,v
+  | _ -> assert (ity_immutable ity); [], s,v
 
 and to_program_value_list env s _tl fdl regions ls vl =
   let (s,regions,vl) =
@@ -563,8 +569,13 @@ and to_program_value_list env s _tl fdl regions ls vl =
         match fd.fd_mut,regions with
         | None,_ -> (* non mutable field, but
                        some subfield may be mutable *)
-          let s, v = to_program_value env s fd.fd_ity v in
-          (s,regions,v::vl)
+           let regs, s, v = to_program_value env s fd.fd_ity v in
+           let rem_regs =
+             match regions with
+             | [] -> []
+             | _ -> remove_prefix regions regs
+           in
+           (s,rem_regs,v::vl)
         | Some _r, reg::regions ->
           (* found a mutable field *)
           let s' = Mreg.add reg v s in
@@ -587,7 +598,8 @@ let to_program_value env s ty v =
   | VTarrow _ -> s,v
   | VTvalue ity ->
     if ity_immutable ity then s,v else
-      to_program_value env s ity v
+      let _regs,s,v = to_program_value env s ity v in
+      s,v
 
 let rec any_value_of_type env ty =
   match ty.Ty.ty_node with
