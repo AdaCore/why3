@@ -36,8 +36,8 @@
  <proof prover="3" timelimit="6"><result status="valid" time="1.06"/></proof>
  </goal>
 </theory>
-<theory name="Solver" sum="b469e9f218362f529979b7aa8794fb40" expanded="true">
- <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk" expanded="true">
+<theory name="Solver" sum="2ff5b0732d3f991a59fb450771ba62fb" expanded="true">
+ <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk">
  <proof prover="2"><result status="valid" time="2.59"/></proof>
  <proof prover="3"><result status="valid" time="0.81"/></proof>
  <proof prover="4"><result status="valid" time="3.56"/></proof>
@@ -632,14 +632,22 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter solve" expl="VC for solve" expanded="true">
+ <goal name="WP_parameter solve" expl="VC for solve">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="4"><result status="valid" time="0.04"/></proof>
  <proof prover="5"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter check_then_solve" expl="VC for check_then_solve" expanded="true">
+ <goal name="WP_parameter check_then_solve" expl="VC for check_then_solve">
  <proof prover="1"><result status="valid" time="0.13"/></proof>
- <proof prover="4"><result status="valid" time="0.10" steps="69"/></proof>
+ <proof prover="4"><result status="valid" time="0.10" steps="48"/></proof>
+ </goal>
+</theory>
+<theory name="RandomSolver" sum="7dbb8a684c2ba04fa97211933ee456e7" expanded="true">
+ <goal name="WP_parameter solve_aux" expl="VC for solve_aux" expanded="true">
+ </goal>
+ <goal name="WP_parameter solve" expl="VC for solve" expanded="true">
+ </goal>
+ <goal name="WP_parameter check_then_solve" expl="VC for check_then_solve" expanded="true">
  </goal>
 </theory>
 <theory name="Test" sum="96bf6ded35162d43136dfbf608f579d3" expanded="true">

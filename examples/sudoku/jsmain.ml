@@ -107,7 +107,7 @@ let solve_board rows _ =
   done;
   begin
     try
-      let a = Sudoku__RandomSolver.check_then_solve sudoku input_grid in
+      let a = Sudoku__Solver.check_then_solve sudoku input_grid in
       display_sol rows a
     with Sudoku__Solver.NoSolution -> no_sol rows
   end;

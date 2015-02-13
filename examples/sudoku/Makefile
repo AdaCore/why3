@@ -20,7 +20,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN=main
-GEN = map__Map sudoku__Grid sudoku__TheClassicalSudokuGrid sudoku__Solver sudoku__RandomSolver
+GEN = map__Map sudoku__Grid sudoku__TheClassicalSudokuGrid sudoku__Solver
 OBJ=$(GEN)
 
 GENML = $(addsuffix .ml, $(GEN))
