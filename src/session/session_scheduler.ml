@@ -597,7 +597,11 @@ let run_prover eS eT ~context_unproved_goals_only ~timelimit ~memlimit pr a =
 (* method: replay obsolete proofs *)
 (**********************************)
 
-let proof_successful_or_just_edited a =
+(* in the default context, a proof should be replayed if
+   . it was successful or
+   . it was just edited
+*)
+let proof_should_be_replayed a =
   match a.proof_state with
     | Done { Call_provers.pr_answer = Call_provers.Valid }
     | JustEdited -> true
@@ -608,7 +612,7 @@ let rec replay_on_goal_or_children eS eT
   iter_goal
     (fun a ->
        if not obsolete_only || a.proof_obsolete then
-         if not context_unproved_goals_only || proof_successful_or_just_edited a
+         if not context_unproved_goals_only || proof_should_be_replayed a
          then run_external_proof eS eT a)
     (iter_transf
        (replay_on_goal_or_children eS eT
@@ -888,12 +892,21 @@ let remove_metas t =
   O.remove t.metas_key;
   remove_metas ~notify t
 
+(* a proof is removable if
+    . it is not in progress and
+    . it is obsolete or not successful
+*)
+let proof_removable a =
+  match a.proof_state with
+  | Done pr ->
+    a.proof_obsolete || pr.Call_provers.pr_answer <> Call_provers.Valid
+  | _ -> false
+
+
 let rec clean = function
   | Goal g when Opt.inhabited g.goal_verified ->
     iter_goal
-      (fun a ->
-        if a.proof_obsolete || not (proof_successful_or_just_edited a) then
-          remove_proof_attempt a)
+      (fun a -> if proof_removable a then remove_proof_attempt a)
       (fun t ->
         if not (Opt.inhabited t.transf_verified) then remove_transformation t
         else transf_iter clean t)
@@ -903,18 +916,7 @@ let rec clean = function
       g
   | Goal g ->
     (** don't iter on proof_attempt if the goal is not proved *)
-    iter_goal
-      (fun _ -> ())
-      (fun t ->
-        (* NO !!!
-           if not t.transf_verified then remove_transformation t
-        else
-        *)
-        transf_iter clean t)
-      (fun m ->
-        if not (Opt.inhabited m.metas_verified) then remove_metas m
-        else metas_iter clean m)
-      g
+    iter_goal (fun _ -> ()) (transf_iter clean) (metas_iter clean) g
   | Proof_attempt a -> clean (Goal a.proof_parent)
   | any -> iter clean any
 

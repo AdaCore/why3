@@ -105,37 +105,45 @@ extract_and_run () {
     shift
     echo -n "$dir... "
     rm -f $dir/$prg
-    echo -n "extract... "
-    if BENCH=yes make -C $dir extract > /dev/null 2>&1; then
-        echo -n "compile... "
-        if BENCH=yes make -C $dir > /dev/null 2>&1; then
-           echo -n "execute... "
-           if $dir/main.opt "$@" > /dev/null 2>&1; then
-               echo -n "doc... "
-               if BENCH=yes make -C $dir doc > /dev/null 2>&1; then
-                   echo "ok"
-               else
-                   echo "documentation failed!"
-                   echo BENCH=yes make -C $dir doc
-                   BENCH=yes make -C $dir doc
-                   exit 1
-               fi
-           else
-              echo "execution failed!"
-              echo $dir/main.opt "$@"
-              $dir/main.opt "$@"
-              exit 1
-           fi
+    echo -n "clean... "
+    if BENCH=yes make -C $dir clean > /dev/null 2>&1; then
+        echo -n "extract... "
+        if BENCH=yes make -C $dir extract > /dev/null 2>&1; then
+            echo -n "compile... "
+            if BENCH=yes make -C $dir > /dev/null 2>&1; then
+                echo -n "execute... "
+                if $dir/main.opt "$@" > /dev/null 2>&1; then
+                    echo -n "doc... "
+                    if BENCH=yes make -C $dir doc > /dev/null 2>&1; then
+                        echo "ok"
+                    else
+                        echo "documentation failed!"
+                        echo BENCH=yes make -C $dir doc
+                        BENCH=yes make -C $dir doc
+                        exit 1
+                    fi
+                else
+                    echo "execution failed!"
+                    echo $dir/main.opt "$@"
+                    $dir/main.opt "$@"
+                    exit 1
+                fi
+            else
+                echo "compilation failed!"
+                echo BENCH=yes make -C $dir
+                BENCH=yes make -C $dir
+                exit 1
+            fi
         else
-            echo "compilation failed!"
-            echo BENCH=yes make -C $dir
-            BENCH=yes make -C $dir
+            echo "extract failed!"
+            echo BENCH=yes make -C $dir extract
+            BENCH=yes make -C $dir extract
             exit 1
         fi
     else
-        echo "extract failed!"
-        echo BENCH=yes make -C $dir extract
-        BENCH=yes make -C $dir extract
+        echo "clean failed!"
+        echo BENCH=yes make -C $dir clean
+        BENCH=yes make -C $dir clean
         exit 1
     fi
 }
