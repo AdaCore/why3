@@ -549,8 +549,11 @@ and try_term strict keep_loc uloc env prop dty node =
   | DTcast _ | DTuloc _ | DTlabel _ ->
       assert false (* already stripped *)
 
-let fmla ~strict ~keep_loc dt = term ~strict ~keep_loc None Mstr.empty true dt
-let term ~strict ~keep_loc dt = term ~strict ~keep_loc None Mstr.empty false dt
+let fmla ?(strict=true) ?(keep_loc=true) dt =
+  term ~strict ~keep_loc None Mstr.empty true dt
+
+let term ?(strict=true) ?(keep_loc=true) dt =
+  term ~strict ~keep_loc None Mstr.empty false dt
 
 (** Exception printer *)
 
