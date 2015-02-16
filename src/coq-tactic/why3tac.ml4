@@ -18,15 +18,104 @@ open Util
 open Coqlib
 open Hipattern
 open Typing
-open Libnames
 open Declarations
 open Pp
+
+IFDEF COQ84 THEN
+
+open Libnames
+
+let declare_summary name freeze unfreeze init =
+  Summary.declare_summary name
+    { Summary.freeze_function = freeze;
+      Summary.unfreeze_function = unfreeze;
+      Summary.init_function = init; }
+
+let body_of_constant _ c =
+  if Reductionops.is_transparent (ConstKey c) then
+    Declarations.body_of_constant (Global.lookup_constant c)
+  else None
+
+let get_transp_state _ =
+  Conv_oracle.get_transp_state ()
+
+let type_of_global = Global.type_of_global
+
+let finite_ind v = v
+
+let admit_as_an_axiom = Tactics.admit_as_an_axiom
+
+let eq_constr = (=)
+
+let map_to_list = Util.array_map_to_list
+
+ELSE
+
+open Universes
+open Globnames
+open Vars
+open Errors
+
+let declare_summary name freeze unfreeze init =
+  Summary.declare_summary name
+    { Summary.freeze_function = (fun _ -> freeze ());
+      Summary.unfreeze_function = unfreeze;
+      Summary.init_function = init; }
+
+let body_of_constant env c =
+  if Reductionops.is_transparent env (ConstKey c) then
+    Declareops.body_of_constant Opaqueproof.empty_opaquetab (Global.lookup_constant c)
+  else None
+
+let get_transp_state env =
+  Conv_oracle.get_transp_state (Environ.oracle env)
+
+let type_of_global = Global.type_of_global_unsafe
+
+let finite_ind v = v <> Decl_kinds.CoFinite
+
+let build_coq_eq () = constr_of_global (build_coq_eq ())
+
+let pr_str = Pp.str
+
+let pr_spc = Pp.spc
+
+let pr_fnl = Pp.fnl
+
+let admit_as_an_axiom = Proofview.V82.of_tactic Tactics.admit_as_an_axiom
+
+let map_to_list = CArray.map_to_list
+
+let force x = x
+
+DECLARE PLUGIN "why3tac"
+
+END
+
+(* forward reference because Why3 and Coq define the same modules,
+   thus shadowing each other *)
+let why3tac_ref = ref (fun ?timelimit:_t _ -> Tactics.admit_as_an_axiom)
+
+TACTIC EXTEND Why3
+  [ "why3" string(s) ] -> [ !why3tac_ref s ]
+| [ "why3" string(s) "timelimit" integer(n) ] -> [ !why3tac_ref ~timelimit:n s ]
+END
 
 open Why3
 open Call_provers
 open Whyconf
 open Ty
 open Term
+
+let on_leaf_node node f =
+  match node with
+  | Lib.Leaf lobj -> f lobj
+  | Lib.CompilingLibrary _
+  | Lib.OpenedModule _
+  | Lib.ClosedModule  _
+  | Lib.OpenedSection _
+  | Lib.ClosedSection _
+  | Lib.FrozenState _ -> ()
 
 let debug =
   try let _ = Sys.getenv "WHY3DEBUG" in true
@@ -127,7 +216,7 @@ let coq_powerRZ = lazy (constant "powerRZ")
 
 let coq_iff = lazy (constant "iff")
 
-let is_constant t c = try t = Lazy.force c with _ -> false
+let is_constant t c = try eq_constr t (Lazy.force c) with _ -> false
 
 let coq_WhyType =
   lazy (gen_constant_in_modules "why" [["Why3"; "BuiltIn"]] "WhyType")
@@ -168,7 +257,7 @@ let preid_of_id id = Ident.id_fresh (string_of_id id)
    raises NotFO *)
 let rec_names_for c =
   let mp,dp,_ = Names.repr_con c in
-  array_map_to_list
+  map_to_list
     (function
        | Name id ->
            let c' = Names.make_con mp dp (label_of_id id) in
@@ -342,24 +431,18 @@ let rec add_local_decls d =
 
 (* synchronization *)
 let () =
-  Summary.declare_summary "Why globals"
-    { Summary.freeze_function =
-        (fun () ->
-           !global_ts, !global_ls, !poly_arity, !global_decl, !global_dep);
-      Summary.unfreeze_function =
-        (fun (ts,ls,pa,gdecl,gdep) ->
-           global_ts := ts; global_ls := ls; poly_arity := pa;
-           global_decl := gdecl; global_dep := gdep);
-      Summary.init_function =
-        (fun () ->
-           global_ts := Refmap.empty;
-           global_ls := Refmap.empty;
-           poly_arity := Mls.empty;
-           global_decl := Ident.Mid.empty;
-           global_dep := Decl.Mdecl.empty);
-      (* Summary.survive_module = true; *)
-      (* Summary.survive_section = true; *)
-    }
+  declare_summary "Why globals"
+    (fun () ->
+     !global_ts, !global_ls, !poly_arity, !global_decl, !global_dep)
+    (fun (ts,ls,pa,gdecl,gdep) ->
+     global_ts := ts; global_ls := ls; poly_arity := pa;
+     global_decl := gdecl; global_dep := gdep)
+    (fun () ->
+     global_ts := Refmap.empty;
+     global_ls := Refmap.empty;
+     poly_arity := Mls.empty;
+     global_decl := Ident.Mid.empty;
+     global_dep := Decl.Mdecl.empty)
 
 let lookup_table table r = match Refmap.find r !table with
   | None -> raise NotFO
@@ -427,15 +510,10 @@ let rec tr_arith_constant dep t = match kind_of_term t with
   | _ ->
       raise NotArithConstant
 
-let body_of_constant c =
-  if Reductionops.is_transparent (ConstKey c) then
-    CoqCompat.body_of_constant (Global.lookup_constant c)
-  else None
-
 let rec tr_type dep tvm env t =
   let t = Reductionops.clos_norm_flags
       (Closure.RedFlags.red_add_transparent
-	 Closure.betadeltaiota (Conv_oracle.get_transp_state()))
+	 Closure.betadeltaiota (get_transp_state env))
       env Evd.empty t in
   if is_constant t coq_Z then
     Ty.ty_int
@@ -474,7 +552,7 @@ and tr_task_ts dep env r =
   ts
 
 (* the type declaration for r *)
-and tr_global_ts dep env r =
+and tr_global_ts dep env (r : global_reference) =
   try
     let ts = lookup_table global_ts r in
     begin try
@@ -486,7 +564,7 @@ and tr_global_ts dep env r =
     let dep' = empty_dep () in
     match r with
       | VarRef id ->
-          let ty = try Global.type_of_global r with Not_found -> raise NotFO in
+          let ty = try type_of_global r with Not_found -> raise NotFO in
           let (_,vars), _, t = decomp_type_quantifiers env ty in
           if not (is_Set t) && not (is_Type t) then raise NotFO;
           let id = preid_of_id id in
@@ -498,11 +576,11 @@ and tr_global_ts dep env r =
       | ConstructRef _ ->
           assert false
       | ConstRef c ->
-          let ty = Global.type_of_global r in
+          let ty = type_of_global r in
           let (_,vars), _, t = decomp_type_quantifiers env ty in
           if not (is_Set t) && not (is_Type t) then raise NotFO;
           let id = preid_of_id (Nametab.basename_of_global r) in
-          let ts = match body_of_constant c with
+          let ts = match body_of_constant env c with
             | Some b ->
                 let b = force b in
                 let tvm, env, t = decomp_type_lambdas Idmap.empty env vars b in
@@ -521,7 +599,7 @@ and tr_global_ts dep env r =
           (* first, the inductive types *)
           let make_one_ts j _ = (* j-th inductive *)
             let r = IndRef (ith_mutual_inductive i j) in
-            let ty = Global.type_of_global r in
+            let ty = type_of_global r in
             let (_,vars), _, t = decomp_type_quantifiers env ty in
             if not (is_Set t) && not (is_Type t) then raise NotFO;
             let id = preid_of_id (Nametab.basename_of_global r) in
@@ -538,7 +616,7 @@ and tr_global_ts dep env r =
             let constr = Array.length oib.mind_nf_lc in
             let mk_constructor k _tyk = (* k-th constructor *)
               let r = ConstructRef (j, k+1) in
-              let ty = Global.type_of_global r in
+              let ty = type_of_global r in
               let (_,vars), env, t = decomp_type_quantifiers env ty in
               let l, c = decompose_arrows t in
               let tvm = match kind_of_term c with
@@ -636,7 +714,7 @@ and tr_global_ls dep env r =
     add_table global_ls r None;
     let dep' = empty_dep () in
     (* type_of_global may fail on a local, higher-order variable *)
-    let ty = try Global.type_of_global r with Not_found -> raise NotFO in
+    let ty = try type_of_global r with Not_found -> raise NotFO in
     let (tvm, _), env, t = decomp_type_quantifiers env ty in
     if is_Set t || is_Type t then raise NotFO;
     let _, t = decompose_arrows t in
@@ -668,7 +746,7 @@ and tr_global_ls dep env r =
           ls
 
 and make_one_ls dep env r =
-  let ty = Global.type_of_global r in
+  let ty = type_of_global r in
   let (tvm, vars), env, t = decomp_type_quantifiers env ty in
   if is_Set t || is_Type t then raise NotFO;
   let l, t = decompose_arrows t in
@@ -691,7 +769,7 @@ and make_one_ls dep env r =
   add_poly_arity ls vars
 
 and decompose_definition dep env c =
-  let dl = match body_of_constant c with
+  let dl = match body_of_constant env c with
     | None ->
         [ConstRef c, None]
     | Some b ->
@@ -729,7 +807,7 @@ and decompose_definition dep env c =
             (Ty.oty_cons ls.ls_args ls.ls_value) in
           let add tv tvm = Stdlib.Mstr.add tv.tv_name.Ident.id_string tv tvm in
           let tvm = Stv.fold add tvs Stdlib.Mstr.empty in
-          let ty = Global.type_of_global r in
+          let ty = type_of_global r in
           let (_, vars), env, _ = decomp_type_quantifiers env ty in
           let conv tv = Stdlib.Mstr.find tv.tv_name.Ident.id_string tvm in
           let vars = List.map conv vars in
@@ -772,7 +850,7 @@ and decompose_inductive dep env i =
     let ls = lookup_table global_ls (IndRef j) in
     let mk_constructor k _tyk = (* k-th constructor *)
       let r = ConstructRef (j, k+1) in
-      let ty = Global.type_of_global r in
+      let ty = type_of_global r in
       let (_,vars), env, f = decomp_type_quantifiers env ty in
       let tvm =
         let add v1 v2 tvm =
@@ -798,7 +876,7 @@ and decompose_inductive dep env i =
     if cl = [] then Decl.create_param_decl ls :: pl, dl else pl, d :: dl
   in
   let pl, dl = List.fold_right add dl ([], []) in
-  let s = if mib.mind_finite then Decl.Ind else Decl.Coind in
+  let s = if finite_ind mib.mind_finite then Decl.Ind else Decl.Coind in
   pl, if dl = [] then None else Some (Decl.create_ind_decl s dl)
 
 (* translation of a Coq term
@@ -943,7 +1021,7 @@ and quantifiers n a b dep tvm bv env =
 (* translation of a Coq formula
    assumption f:Prop *)
 and tr_formula dep tvm bv env f = match kind_of_term f with
-  | App(c, [|t;a;b|]) when c = build_coq_eq () ->
+  | App(c, [|t;a;b|]) when eq_constr c (build_coq_eq ()) ->
       let ty = type_of env Evd.empty t in
       if not (is_Set ty || is_Type ty) then raise NotFO;
       let _ = tr_type dep tvm env t in
@@ -975,17 +1053,17 @@ and tr_formula dep tvm bv env f = match kind_of_term f with
       let ls = why_constant_real dep ["infix >"] in
       Term.ps_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
   (* propositional logic *)
-  | _ when f = build_coq_False () ->
+  | _ when eq_constr f (build_coq_False ()) ->
       Term.t_false
-  | _ when f = build_coq_True () ->
+  | _ when eq_constr f (build_coq_True ()) ->
       Term.t_true
-  | App(c, [|a|]) when c = build_coq_not () ->
+  | App(c, [|a|]) when eq_constr c (build_coq_not ()) ->
       Term.t_not (tr_formula dep tvm bv env a)
-  | App(c, [|a;b|]) when c = build_coq_and () ->
+  | App(c, [|a;b|]) when eq_constr c (build_coq_and ()) ->
       Term.t_and (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
-  | App(c, [|a;b|]) when c = build_coq_or () ->
+  | App(c, [|a;b|]) when eq_constr c (build_coq_or ()) ->
       Term.t_or (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
-  | App(c, [|a;b|]) when c = Lazy.force coq_iff ->
+  | App(c, [|a;b|]) when is_constant c coq_iff ->
       Term.t_iff (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
   | Prod (n, a, b) ->
       if is_imp_term f && is_Prop (type_of env Evd.empty a) then
@@ -994,7 +1072,7 @@ and tr_formula dep tvm bv env f = match kind_of_term f with
       else
         let vs, _t, bv, env, b = quantifiers n a b dep tvm bv env in
         Term.t_forall_close [vs] [] (tr_formula dep tvm bv env b)
-  | App(c, [|_; a|]) when c = build_coq_ex () ->
+  | App(c, [|_; a|]) when eq_constr c (build_coq_ex ()) ->
       begin match kind_of_term a with
         | Lambda(n, a, b) ->
             let vs, _t, bv, env, b = quantifiers n a b dep tvm bv env in
@@ -1213,7 +1291,7 @@ let why3tac ?(timelimit=timelimit) s gl =
     let call = Driver.prove_task ~command ~timelimit drv !task () in
     let res = wait_on_call call () in
     match res.pr_answer with
-      | Valid -> Tactics.admit_as_an_axiom gl
+      | Valid -> admit_as_an_axiom gl
       | Invalid -> error "Invalid"
       | Unknown s -> error ("Don't know: " ^ s)
       | Call_provers.Failure s -> error ("Failure: " ^ s)
@@ -1254,6 +1332,15 @@ let why3tac ?(timelimit=timelimit) s gl =
         Printexc.print_backtrace stderr; flush stderr;
         Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;
         raise e
+
+IFDEF COQ85 THEN
+
+let why3tac ?timelimit s = Proofview.V82.tactic (why3tac ?timelimit s)
+
+END
+
+let () =
+  why3tac_ref := why3tac
 
 (*
 Local Variables:

@@ -497,9 +497,16 @@ else
         COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
 
         case $COQVERSION in
-          8.4*|trunk)
+          8.4*)
 	        enable_coq_support=yes
-                coq_compat_version=".8.4"
+                coq_compat_version="COQ84"
+                COQPPLIBS="$COQLIB/parsing/grammar.cma"
+                AC_MSG_RESULT($COQVERSION)
+                ;;
+          8.5*|trunk)
+                enable_coq_support=yes
+                coq_compat_version="COQ85"
+                COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
                 AC_MSG_RESULT($COQVERSION)
                 ;;
           *)
@@ -755,7 +762,7 @@ AC_SUBST(coq_compat_version)
 AC_SUBST(COQC)
 AC_SUBST(COQDEP)
 AC_SUBST(COQLIB)
-AC_SUBST(COQVERSION)
+AC_SUBST(COQPPLIBS)
 AC_SUBST(COMPILETIMECOQ)
 
 AC_SUBST(enable_pvs_libs)
