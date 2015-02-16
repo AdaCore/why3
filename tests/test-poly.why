@@ -1,0 +1,27 @@
+
+
+theory Mono
+
+use import int.Int
+
+goal g : 2+2 = 5
+
+end
+
+
+theory PolyType
+
+type t 'a = A 'a
+
+goal g: forall x y:'a. A x = A y
+
+end
+
+
+theory TestList
+
+use import list.List
+
+goal g : match Cons 42 Nil with Nil -> false | Cons x _ -> x=42 end
+
+end
