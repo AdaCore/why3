@@ -543,7 +543,7 @@ fi
 if test "$enable_coq_libs" = yes; then
    AC_MSG_CHECKING([for Flocq])
    AS_IF(
-     [ echo "Require Import Flocq_version BinNat." \
+     [ echo "Require Import Flocq.Flocq_version BinNat." \
             "Goal (20200 <= Flocq_version)%N. easy. Qed." > conftest.v
        "$COQC" conftest.v > conftest.err ],
      [ AC_MSG_RESULT(yes) ],

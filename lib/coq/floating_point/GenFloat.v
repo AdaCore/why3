@@ -10,8 +10,8 @@ Require real.Abs.
 Require real.FromInt.
 Require floating_point.Rounding.
 
-Require Import Fcore.
-Require Import Fappli_IEEE.
+Require Import Flocq.Core.Fcore.
+Require Import Flocq.Appli.Fappli_IEEE.
 Require Import int.Abs.
 
 Section GenFloat.
@@ -82,7 +82,7 @@ intros H _ _.
 now injection H.
 clear.
 destruct (Bool.bool_dec xs ys) as [->|Hs].
-destruct (Z_eq_dec (Zpos (projT1 xm')) (Zpos (projT1 ym'))) as [Hm'|Hm'].
+destruct (Z_eq_dec (Zpos (proj1_sig xm')) (Zpos (proj1_sig ym'))) as [Hm'|Hm'].
 left.
 apply f_equal3 ; try easy.
 apply f_equal2 ; try easy.
@@ -293,7 +293,7 @@ apply generic_format_abs.
 apply generic_format_B2R.
 apply generic_format_bpow.
 unfold FLT_exp, emin.
-clear ; zify ; generalize Hprec' Hemax' ; omega.
+zify ; generalize Hprec' Hemax' ; omega.
 apply bpow_gt_0.
 apply abs_B2R_lt_emax.
 unfold pred.
@@ -310,7 +310,7 @@ rewrite Z2R_minus, Z2R_Zpower.
 simpl; ring.
 apply Zlt_le_weak.
 exact Hprec'.
-clear; generalize Hprec' Hemax' ; omega.
+generalize Hprec' Hemax' ; omega.
 Qed.
 
 (* Why3 goal *)
@@ -335,14 +335,14 @@ split.
 rewrite Z2R_IZR.
 now rewrite Rmult_1_r.
 split. easy.
-clear;unfold emin; generalize Hprec' Hemax'; omega.
+unfold emin; generalize Hprec' Hemax'; omega.
 unfold max_representable_integer in Bz.
 change 2%Z with (radix_val radix2) in Bz.
 apply generic_format_abs_inv.
 rewrite  <- Z2R_IZR, <- Z2R_abs, Bz, Z2R_Zpower.
 apply generic_format_bpow.
 unfold FLT_exp, emin.
-clear; generalize Hprec' Hemax'; zify.
+clear Bz; generalize Hprec' Hemax'; zify.
 omega.
 apply Zlt_le_weak.
 apply Hprec'.
