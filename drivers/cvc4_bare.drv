@@ -14,7 +14,7 @@ prelude ";; Enable model construction"
 prelude "(set-option :produce-models true)"
 
 (* Counterexamples: makes it possible to get rid of more quantifiers while introducing premises *) 
-(* transformation "split_intro" *)
+(* transformation "split_goal_wp" *)
 
 (* Counterexamples: get rid of some quantifiers - makes it possible to query model values of the variables in premises *)
 transformation "introduce_premises"
@@ -23,7 +23,6 @@ import "smt-libv2.drv"
 
 (* regexp for steps *)
 steps "smt::SmtEngine::resourceUnitsUsed, \\([0-9]+.?[0-9]*\\)" 1
-
 
 (* CVC4 division seems to be neither the Euclidean one, nor the Computer one *)
 (*
