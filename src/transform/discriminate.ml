@@ -24,7 +24,7 @@ let meta_inst = register_meta "encoding : inst" [MTty]
 let meta_lskept = register_meta "encoding : lskept" [MTlsymbol]
   ~desc:"Specify@ which@ function/predicate@ symbols@ should@ be@ kept.@ \
          When@ the@ symbol@ is@ polymorphic,@ generate@ every@ possible@ \
-         type@ insntance@ with@ types@ marked@ by@ 'encoding : inst'."
+         type@ instances@ with@ types@ marked@ by@ 'encoding : inst'."
 
 let meta_lsinst = register_meta "encoding : lsinst" [MTlsymbol;MTlsymbol]
   ~desc:"Specify@ which@ type@ instances@ of@ symbols@ should@ be@ kept.@ \

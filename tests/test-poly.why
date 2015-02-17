@@ -2,6 +2,8 @@
 
 theory Mono
 
+goal g0 : 2 = 3
+
 use import int.Int
 
 goal g : 2+2 = 5
@@ -15,6 +17,8 @@ type t 'a = A 'a
 
 goal g: forall x y:'a. A x = A y
 
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T PolyType -G g *)
+
 end
 
 
@@ -23,5 +27,24 @@ theory TestList
 use import list.List
 
 goal g : match Cons 42 Nil with Nil -> false | Cons x _ -> x=42 end
+
+end
+
+
+theory PolySymb
+
+function id (x:'a) : 'a = x
+
+goal g: forall x:int. id x = x
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T PolySymb -G g *)
+
+end
+
+theory PolyProp
+
+goal g: forall x:'a. x = x
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T PolyProp -G g *)
 
 end

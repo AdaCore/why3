@@ -112,6 +112,7 @@ val ty_match : ty Mtv.t -> ty -> ty -> ty Mtv.t
 val ty_inst  : ty Mtv.t -> ty -> ty
 val ty_freevars : Stv.t -> ty -> Stv.t
 val ty_closed : ty -> bool
+(** [ty_closed ty] returns true when [ty] is not polymorphic *)
 
 val ty_equal_check : ty -> ty -> unit
 
@@ -151,4 +152,3 @@ val oty_cons : ty list -> ty option -> ty list
 val oty_match : ty Mtv.t -> ty option -> ty option -> ty Mtv.t
 val oty_inst  : ty Mtv.t -> ty option -> ty option
 val oty_freevars : Stv.t -> ty option -> Stv.t
-
