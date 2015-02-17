@@ -11,6 +11,26 @@ goal g : 2+2 = 5
 end
 
 
+theory MonoType
+
+type t = A | B
+
+goal g0 : A <> B
+
+goal g1 : forall x. x = A \/ x = B
+
+type u = C | D t
+
+goal g2 : forall x y. y = D x
+
+type a = E | F b
+with b = G | H a
+
+goal g3 : forall x. x <> F (H x)
+
+end
+
+
 theory PolyType
 
 type t 'a = A 'a

@@ -57,10 +57,7 @@ let find_in_decl d =
   | Ddata dl ->
     Debug.dprintf debug "@[Ddata %a@]@."
       (Pp.print_list Pp.space Pretty.print_data_decl) dl;
-    List.iter (fun (ts,_) -> check_ts ts) dl;
-    (* FIXME: temporary trick to activate encoding in presence
-       of algebraic data types *)
-    raise Found
+    List.iter (fun (ts,_) -> check_ts ts) dl
   | Dparam ls ->
     Debug.dprintf debug "@[Dparam %a@]@." Pretty.print_ls ls;
     check_ls ls

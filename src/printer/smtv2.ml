@@ -254,11 +254,27 @@ let print_prop_decl info fmt k pr f = match k with
       fprintf fmt "@[(check-sat)@]@\n"
   | Plemma| Pskip -> assert false
 
+let print_constructor_decl info fmt (ls,args) =
+  match args with
+  | [] -> print_ident fmt ls.ls_name
+  | _ ->
+    fprintf fmt "@[(%a@ %a)@]"
+      print_ident ls.ls_name
+      (print_list space (print_type info)) ls.ls_args
+
+let print_data_decl info fmt (ts,cl) =
+  fprintf fmt "@[(%a@ %a)@]"
+    print_ident ts.ts_name
+    (print_list space (print_constructor_decl info)) cl
+
 let print_decl info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
-  | Ddata _ -> unsupportedDecl d
-      "smtv2 : algebraic type are not supported"
+  | Ddata dl ->
+    (*unsupportedDecl d
+      "smtv2 : algebraic type are not supported" *)
+    fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+      (print_list space (print_data_decl info)) dl
   | Dparam ls ->
       print_param_decl info fmt ls
   | Dlogic dl ->
