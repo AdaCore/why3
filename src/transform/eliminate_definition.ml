@@ -173,6 +173,19 @@ let () =
     ~desc:"Same@ as@ eliminate_recursion,@ but@ only@ for@ mutually@ \
            recursive@ definitions."
 
+(** conditional transformations, only applied when polymorphic types occur *)
+
+let eliminate_definition_if_poly =
+  Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
+    (function
+    | [] -> eliminate_definition
+    | _ -> Trans.identity)
+
+let () =
+  Trans.register_transform "eliminate_definition_if_poly"
+    eliminate_definition_if_poly
+    ~desc:"Same@ as@ eliminate_definition@ but@ only@ if@ polymorphism@ appear.";
+
 (** Bisect *)
 open Task
 open Theory

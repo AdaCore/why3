@@ -79,9 +79,12 @@ let find_in_decl d =
 
 (**)
 
-let rec find_in_theory th = List.iter find_in_tdecl th.th_decls
+let (*
+rec find_in_theory th = List.iter find_in_tdecl th.th_decls
 
-and find_in_tdecl td =
+and
+    *)
+find_in_tdecl td =
   match td.td_node with
   | Decl d -> find_in_decl d
   | Use _th ->

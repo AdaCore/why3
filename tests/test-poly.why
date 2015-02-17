@@ -31,6 +31,16 @@ goal g : match Cons 42 Nil with Nil -> false | Cons x _ -> x=42 end
 end
 
 
+theory MonoSymb
+
+function id (x:int) : int = x
+
+goal g: forall x:int. id x = x
+
+(* bin/why3prove.byte tests/test-poly.why --debug detect_poly -a detect_polymorphism -D why3 -T PolySymb -G g *)
+
+end
+
 theory PolySymb
 
 function id (x:'a) : 'a = x
