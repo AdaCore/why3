@@ -184,7 +184,7 @@ let eliminate_definition_if_poly =
 let () =
   Trans.register_transform "eliminate_definition_if_poly"
     eliminate_definition_if_poly
-    ~desc:"Same@ as@ eliminate_definition@ but@ only@ if@ polymorphism@ appear.";
+    ~desc:"Same@ as@ eliminate_definition@ but@ only@ if@ polymorphism@ appear."
 
 (** Bisect *)
 open Task

@@ -57,7 +57,10 @@ let find_in_decl d =
   | Ddata dl ->
     Debug.dprintf debug "@[Ddata %a@]@."
       (Pp.print_list Pp.space Pretty.print_data_decl) dl;
-    List.iter (fun (ts,_) -> check_ts ts) dl
+    List.iter (fun (ts,_) -> check_ts ts) dl;
+    (* FIXME: temporary trick to activate encoding in presence
+       of algebraic data types *)
+    raise Found
   | Dparam ls ->
     Debug.dprintf debug "@[Dparam %a@]@." Pretty.print_ls ls;
     check_ls ls
@@ -65,10 +68,12 @@ let find_in_decl d =
     Debug.dprintf debug "@[Dlogic %a@]@."
       (Pp.print_list Pp.space Pretty.print_ls) (List.map fst dl);
     List.iter (fun (ls,_) -> check_ls ls) dl
+    (* TODO: check also that definition bodies are monomorphic ? *)
   | Dind (_,indl) ->
     Debug.dprintf debug "@[Dind %a@]@."
       (Pp.print_list Pp.space Pretty.print_ls) (List.map fst indl);
     List.iter (fun (ls,_) -> check_ls ls) indl
+    (* TODO: check also that clauses are monomorphic ? *)
   | Dprop (_,pr,t) ->
     Debug.dprintf debug "@[Dprop %a@]@." Pretty.print_pr pr;
     try check_term t

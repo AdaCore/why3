@@ -82,3 +82,28 @@ let () = register_env_transform "encoding_smt" encoding_smt
 
 let () = register_env_transform "encoding_tptp" encoding_tptp
   ~desc:"Encode@ polymorphic@ types@ for@ provers@ without@ sorts."
+
+
+(* encoding only if polymorphism occurs *)
+
+let encoding_smt_if_poly env =
+  Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
+    (function
+    | [] -> encoding_smt env
+    | _ -> Trans.identity)
+
+let () =
+  Trans.register_env_transform "encoding_smt_if_poly"
+    encoding_smt_if_poly
+    ~desc:"Same@ as@ encoding_smt@ but@ only@ if@ polymorphism@ appear."
+
+let encoding_tptp_if_poly env =
+  Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
+    (function
+    | [] -> encoding_tptp env
+    | _ -> Trans.identity)
+
+let () =
+  Trans.register_env_transform "encoding_tptp_if_poly"
+    encoding_tptp_if_poly
+    ~desc:"Same@ as@ encoding_tptp@ but@ only@ if@ polymorphism@ appear."

@@ -309,6 +309,17 @@ let () = Trans.register_env_transform "discriminate" discriminate
   ~desc:"Generate@ monomorphic@ type@ instances@ of@ function@ and@ \
          predicate@ symbols@ and@ monomorphize@ task@ premises."
 
+let discriminate_if_poly env =
+  Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
+    (function
+    | [] -> discriminate env
+    | _ -> Trans.identity)
+
+let () =
+  Trans.register_env_transform "discriminate_if_poly"
+    discriminate_if_poly
+    ~desc:"Same@ as@ discriminate@ but@ only@ if@ polymorphism@ appear."
+
 let on_lsinst fn =
   let add_ls acc = function
     | [MAls ls; MAls nls] -> Mls.add nls ls acc
