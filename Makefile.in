@@ -1432,10 +1432,10 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	@rm -f test-session.opt why3session.xml why3shapes why3shapes.gz
 
 test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
-	$(COQC) -byte -I lib/coq-tactic/ bench/coq-tactic/test.v
+	$(COQC) -byte -R lib/coq-tactic Why3 bench/coq-tactic/test.v
 
 test-coq-tactic.opt: src/coq-tactic/.why3-vo-opt
-	$(COQC) -opt -I lib/coq-tactic/ bench/coq-tactic/test.v
+	$(COQC) -opt -R lib/coq-tactic Why3 bench/coq-tactic/test.v
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
