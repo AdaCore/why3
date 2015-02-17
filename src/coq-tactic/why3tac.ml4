@@ -18,15 +18,108 @@ open Util
 open Coqlib
 open Hipattern
 open Typing
-open Libnames
 open Declarations
 open Pp
+
+IFDEF COQ84 THEN
+
+open Libnames
+
+let declare_summary name freeze unfreeze init =
+  Summary.declare_summary name
+    { Summary.freeze_function = freeze;
+      Summary.unfreeze_function = unfreeze;
+      Summary.init_function = init; }
+
+let body_of_constant _ c =
+  if Reductionops.is_transparent (ConstKey c) then
+    Declarations.body_of_constant (Global.lookup_constant c)
+  else None
+
+let get_transp_state _ =
+  Conv_oracle.get_transp_state ()
+
+let type_of_global = Global.type_of_global
+
+let finite_ind v = v
+
+let admit_as_an_axiom = Tactics.admit_as_an_axiom
+
+let map_to_list = Util.array_map_to_list
+
+let is_global c t =
+  match c, kind_of_term t with
+  | ConstRef c, Const c' -> eq_constant c c'
+  | IndRef i, Ind i' -> eq_ind i i'
+  | ConstructRef i, Construct i' -> eq_constructor i i'
+  | VarRef id, Var id' -> id = id'
+  | _ -> false
+
+ELSE
+
+open Universes
+open Globnames
+open Vars
+open Errors
+
+let declare_summary name freeze unfreeze init =
+  Summary.declare_summary name
+    { Summary.freeze_function = (fun _ -> freeze ());
+      Summary.unfreeze_function = unfreeze;
+      Summary.init_function = init; }
+
+let body_of_constant env c =
+  if Reductionops.is_transparent env (ConstKey c) then
+    Declareops.body_of_constant Opaqueproof.empty_opaquetab (Global.lookup_constant c)
+  else None
+
+let get_transp_state env =
+  Conv_oracle.get_transp_state (Environ.oracle env)
+
+let type_of_global = Global.type_of_global_unsafe
+
+let finite_ind v = v <> Decl_kinds.CoFinite
+
+let pr_str = Pp.str
+
+let pr_spc = Pp.spc
+
+let pr_fnl = Pp.fnl
+
+let admit_as_an_axiom = Proofview.V82.of_tactic Tactics.admit_as_an_axiom
+
+let map_to_list = CArray.map_to_list
+
+let force x = x
+
+DECLARE PLUGIN "why3tac"
+
+END
+
+(* forward reference because Why3 and Coq define the same modules,
+   thus shadowing each other *)
+let why3tac_ref = ref (fun ?timelimit:_t _ -> Tactics.admit_as_an_axiom)
+
+TACTIC EXTEND Why3
+  [ "why3" string(s) ] -> [ !why3tac_ref s ]
+| [ "why3" string(s) "timelimit" integer(n) ] -> [ !why3tac_ref ~timelimit:n s ]
+END
 
 open Why3
 open Call_provers
 open Whyconf
 open Ty
 open Term
+
+let on_leaf_node node f =
+  match node with
+  | Lib.Leaf lobj -> f lobj
+  | Lib.CompilingLibrary _
+  | Lib.OpenedModule _
+  | Lib.ClosedModule  _
+  | Lib.OpenedSection _
+  | Lib.ClosedSection _
+  | Lib.FrozenState _ -> ()
 
 let debug =
   try let _ = Sys.getenv "WHY3DEBUG" in true
@@ -78,62 +171,57 @@ let print_bv fmt m =
                  (string_of_id id) Why3.Pretty.print_vsty vs) m
 
 (* Coq constants *)
-let logic_dir = ["Coq";"Logic";"Decidable"]
 
-let coq_modules =
-  init_modules @ [logic_dir] @ arith_modules @ zarith_base_modules
-    @ [["Coq"; "ZArith"; "BinInt"];
-       ["Coq"; "Reals"; "Rdefinitions"];
-       ["Coq"; "Reals"; "Raxioms";];
-       ["Coq"; "Reals"; "Rbasic_fun";];
-       ["Coq"; "Reals"; "R_sqrt";];
-       ["Coq"; "Reals"; "Rfunctions";]]
-    @ [["Coq"; "omega"; "OmegaLemmas"]]
+let coq_ref_BinInt = coq_reference "Why3" ["ZArith"; "BinInt"]
+let coq_Z = coq_ref_BinInt "Z"
+let coq_Zplus = coq_ref_BinInt "Zplus"
+let coq_Zmult = coq_ref_BinInt "Zmult"
+let coq_Zopp = coq_ref_BinInt "Zopp"
+let coq_Zminus = coq_ref_BinInt "Zminus"
+let coq_Zdiv = coq_reference "Why3" ["ZArith"; "Zdiv"] "Zdiv"
+let coq_Zgt = coq_ref_BinInt "Zgt"
+let coq_Zle = coq_ref_BinInt "Zle"
+let coq_Zge = coq_ref_BinInt "Zge"
+let coq_Zlt = coq_ref_BinInt "Zlt"
+let coq_ref_BinNums = coq_reference "Why3" ["Numbers"; "BinNums"]
+let coq_Z0 = coq_ref_BinNums "Z0"
+let coq_Zpos = coq_ref_BinNums "Zpos"
+let coq_Zneg = coq_ref_BinNums "Zneg"
+let coq_xH = coq_ref_BinNums "xH"
+let coq_xI = coq_ref_BinNums "xI"
+let coq_xO = coq_ref_BinNums "xO"
 
-let constant = gen_constant_in_modules "why" coq_modules
+let coq_ref_Rdefinitions = coq_reference "Why3" ["Reals"; "Rdefinitions"]
+let coq_R = coq_ref_Rdefinitions "R"
+let coq_R0 = coq_ref_Rdefinitions "R0"
+let coq_R1 = coq_ref_Rdefinitions "R1"
+let coq_Rgt = coq_ref_Rdefinitions "Rgt"
+let coq_Rle = coq_ref_Rdefinitions "Rle"
+let coq_Rge = coq_ref_Rdefinitions "Rge"
+let coq_Rlt = coq_ref_Rdefinitions "Rlt"
+let coq_Rplus = coq_ref_Rdefinitions "Rplus"
+let coq_Rmult = coq_ref_Rdefinitions "Rmult"
+let coq_Ropp = coq_ref_Rdefinitions "Ropp"
+let coq_Rinv = coq_ref_Rdefinitions "Rinv"
+let coq_Rminus = coq_ref_Rdefinitions "Rminus"
+let coq_Rdiv = coq_ref_Rdefinitions "Rdiv"
+let coq_powerRZ = coq_reference "Why3" ["Reals"; "Rfunctions"] "powerRZ"
 
-let coq_Z = lazy (constant "Z")
-let coq_Zplus = lazy (constant "Zplus")
-let coq_Zmult = lazy (constant "Zmult")
-let coq_Zopp = lazy (constant "Zopp")
-let coq_Zminus = lazy (constant "Zminus")
-let coq_Zdiv = lazy (constant "Zdiv")
-let coq_Zs = lazy (constant "Zs")
-let coq_Zgt = lazy (constant "Zgt")
-let coq_Zle = lazy (constant "Zle")
-let coq_Zge = lazy (constant "Zge")
-let coq_Zlt = lazy (constant "Zlt")
-let coq_Z0 = lazy (constant "Z0")
-let coq_Zpos = lazy (constant "Zpos")
-let coq_Zneg = lazy (constant "Zneg")
-let coq_xH = lazy (constant "xH")
-let coq_xI = lazy (constant "xI")
-let coq_xO = lazy (constant "xO")
-
-let coq_R = lazy (constant "R")
-let coq_R0 = lazy (constant "R0")
-let coq_R1 = lazy (constant "R1")
-let coq_Rgt = lazy (constant "Rgt")
-let coq_Rle = lazy (constant "Rle")
-let coq_Rge = lazy (constant "Rge")
-let coq_Rlt = lazy (constant "Rlt")
-let coq_Rplus = lazy (constant "Rplus")
-let coq_Rmult = lazy (constant "Rmult")
-let coq_Ropp = lazy (constant "Ropp")
-let coq_Rinv = lazy (constant "Rinv")
-let coq_Rminus = lazy (constant "Rminus")
-let coq_Rdiv = lazy (constant "Rdiv")
-let coq_powerRZ = lazy (constant "powerRZ")
-
-let coq_iff = lazy (constant "iff")
-
-let is_constant t c = try t = Lazy.force c with _ -> false
+let coq_Logic = coq_reference "Why3" ["Init"; "Logic"]
+let coq_False = coq_Logic "False"
+let coq_True = coq_Logic "True"
+let coq_eq = coq_Logic "eq"
+let coq_not = coq_Logic "not"
+let coq_and = coq_Logic "and"
+let coq_or = coq_Logic "or"
+let coq_ex = coq_Logic "ex"
+let coq_iff = coq_Logic "iff"
 
 let coq_WhyType =
-  lazy (gen_constant_in_modules "why" [["Why3"; "BuiltIn"]] "WhyType")
+  find_reference "Why3" ["Why3"; "BuiltIn"] "WhyType"
 
 let rec is_WhyType c = match kind_of_term c with
-  | App (f, [|_|]) -> is_constant f coq_WhyType
+  | App (f, [|_|]) -> is_global coq_WhyType f
   | Cast (c, _, _) -> is_WhyType c
   | _ -> false
 
@@ -168,7 +256,7 @@ let preid_of_id id = Ident.id_fresh (string_of_id id)
    raises NotFO *)
 let rec_names_for c =
   let mp,dp,_ = Names.repr_con c in
-  array_map_to_list
+  map_to_list
     (function
        | Name id ->
            let c' = Names.make_con mp dp (label_of_id id) in
@@ -342,24 +430,18 @@ let rec add_local_decls d =
 
 (* synchronization *)
 let () =
-  Summary.declare_summary "Why globals"
-    { Summary.freeze_function =
-        (fun () ->
-           !global_ts, !global_ls, !poly_arity, !global_decl, !global_dep);
-      Summary.unfreeze_function =
-        (fun (ts,ls,pa,gdecl,gdep) ->
-           global_ts := ts; global_ls := ls; poly_arity := pa;
-           global_decl := gdecl; global_dep := gdep);
-      Summary.init_function =
-        (fun () ->
-           global_ts := Refmap.empty;
-           global_ls := Refmap.empty;
-           poly_arity := Mls.empty;
-           global_decl := Ident.Mid.empty;
-           global_dep := Decl.Mdecl.empty);
-      (* Summary.survive_module = true; *)
-      (* Summary.survive_section = true; *)
-    }
+  declare_summary "Why globals"
+    (fun () ->
+     !global_ts, !global_ls, !poly_arity, !global_decl, !global_dep)
+    (fun (ts,ls,pa,gdecl,gdep) ->
+     global_ts := ts; global_ls := ls; poly_arity := pa;
+     global_decl := gdecl; global_dep := gdep)
+    (fun () ->
+     global_ts := Refmap.empty;
+     global_ls := Refmap.empty;
+     poly_arity := Mls.empty;
+     global_decl := Ident.Mid.empty;
+     global_dep := Decl.Mdecl.empty)
 
 let lookup_table table r = match Refmap.find r !table with
   | None -> raise NotFO
@@ -376,12 +458,12 @@ exception NotArithConstant
 let big_two = Big_int.succ_big_int Big_int.unit_big_int
 
 let rec tr_positive p = match kind_of_term p with
-  | Construct _ when is_constant p coq_xH ->
+  | Construct _ when is_global coq_xH p ->
       Big_int.unit_big_int
-  | App (f, [|a|]) when is_constant f coq_xI ->
+  | App (f, [|a|]) when is_global coq_xI f ->
       (* Plus (Mult (Cst 2, tr_positive a), Cst 1) *)
       Big_int.succ_big_int (Big_int.mult_big_int big_two (tr_positive a))
-  | App (f, [|a|]) when is_constant f coq_xO ->
+  | App (f, [|a|]) when is_global coq_xO f ->
       (* Mult (Cst 2, tr_positive a) *)
       Big_int.mult_big_int big_two (tr_positive a)
   | Cast (p, _, _) ->
@@ -395,16 +477,16 @@ let const_of_big_int b =
 
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
 let rec tr_arith_constant dep t = match kind_of_term t with
-  | Construct _ when is_constant t coq_Z0 -> Term.t_nat_const 0
-  | App (f, [|a|]) when is_constant f coq_Zpos ->
+  | Construct _ when is_global coq_Z0 t -> Term.t_nat_const 0
+  | App (f, [|a|]) when is_global coq_Zpos f ->
       const_of_big_int (tr_positive a)
-  | App (f, [|a|]) when is_constant f coq_Zneg ->
+  | App (f, [|a|]) when is_global coq_Zneg f ->
       let t = const_of_big_int (tr_positive a) in
       let fs = why_constant_int dep ["prefix -"] in
       Term.fs_app fs [t] Ty.ty_int
-  | Const _ when is_constant t coq_R0 ->
+  | Const _ when is_global coq_R0 t ->
       Term.t_const (Number.ConstReal (Number.real_const_dec "0" "0" None))
-  | Const _ when is_constant t coq_R1 ->
+  | Const _ when is_global coq_R1 t ->
       Term.t_const (Number.ConstReal (Number.real_const_dec "1" "0" None))
 (*   | App (f, [|a;b|]) when f = Lazy.force coq_Rplus -> *)
 (*       let ta = tr_arith_constant a in *)
@@ -427,19 +509,14 @@ let rec tr_arith_constant dep t = match kind_of_term t with
   | _ ->
       raise NotArithConstant
 
-let body_of_constant c =
-  if Reductionops.is_transparent (ConstKey c) then
-    CoqCompat.body_of_constant (Global.lookup_constant c)
-  else None
-
 let rec tr_type dep tvm env t =
   let t = Reductionops.clos_norm_flags
       (Closure.RedFlags.red_add_transparent
-	 Closure.betadeltaiota (Conv_oracle.get_transp_state()))
+	 Closure.betadeltaiota (get_transp_state env))
       env Evd.empty t in
-  if is_constant t coq_Z then
+  if is_global coq_Z t then
     Ty.ty_int
-  else if is_constant t coq_R then
+  else if is_global coq_R t then
     Ty.ty_real
   else match kind_of_term t with
     | Var x when Idmap.mem x tvm ->
@@ -474,7 +551,7 @@ and tr_task_ts dep env r =
   ts
 
 (* the type declaration for r *)
-and tr_global_ts dep env r =
+and tr_global_ts dep env (r : global_reference) =
   try
     let ts = lookup_table global_ts r in
     begin try
@@ -486,7 +563,7 @@ and tr_global_ts dep env r =
     let dep' = empty_dep () in
     match r with
       | VarRef id ->
-          let ty = try Global.type_of_global r with Not_found -> raise NotFO in
+          let ty = try type_of_global r with Not_found -> raise NotFO in
           let (_,vars), _, t = decomp_type_quantifiers env ty in
           if not (is_Set t) && not (is_Type t) then raise NotFO;
           let id = preid_of_id id in
@@ -498,11 +575,11 @@ and tr_global_ts dep env r =
       | ConstructRef _ ->
           assert false
       | ConstRef c ->
-          let ty = Global.type_of_global r in
+          let ty = type_of_global r in
           let (_,vars), _, t = decomp_type_quantifiers env ty in
           if not (is_Set t) && not (is_Type t) then raise NotFO;
           let id = preid_of_id (Nametab.basename_of_global r) in
-          let ts = match body_of_constant c with
+          let ts = match body_of_constant env c with
             | Some b ->
                 let b = force b in
                 let tvm, env, t = decomp_type_lambdas Idmap.empty env vars b in
@@ -521,7 +598,7 @@ and tr_global_ts dep env r =
           (* first, the inductive types *)
           let make_one_ts j _ = (* j-th inductive *)
             let r = IndRef (ith_mutual_inductive i j) in
-            let ty = Global.type_of_global r in
+            let ty = type_of_global r in
             let (_,vars), _, t = decomp_type_quantifiers env ty in
             if not (is_Set t) && not (is_Type t) then raise NotFO;
             let id = preid_of_id (Nametab.basename_of_global r) in
@@ -538,7 +615,7 @@ and tr_global_ts dep env r =
             let constr = Array.length oib.mind_nf_lc in
             let mk_constructor k _tyk = (* k-th constructor *)
               let r = ConstructRef (j, k+1) in
-              let ty = Global.type_of_global r in
+              let ty = type_of_global r in
               let (_,vars), env, t = decomp_type_quantifiers env ty in
               let l, c = decompose_arrows t in
               let tvm = match kind_of_term c with
@@ -636,7 +713,7 @@ and tr_global_ls dep env r =
     add_table global_ls r None;
     let dep' = empty_dep () in
     (* type_of_global may fail on a local, higher-order variable *)
-    let ty = try Global.type_of_global r with Not_found -> raise NotFO in
+    let ty = try type_of_global r with Not_found -> raise NotFO in
     let (tvm, _), env, t = decomp_type_quantifiers env ty in
     if is_Set t || is_Type t then raise NotFO;
     let _, t = decompose_arrows t in
@@ -668,7 +745,7 @@ and tr_global_ls dep env r =
           ls
 
 and make_one_ls dep env r =
-  let ty = Global.type_of_global r in
+  let ty = type_of_global r in
   let (tvm, vars), env, t = decomp_type_quantifiers env ty in
   if is_Set t || is_Type t then raise NotFO;
   let l, t = decompose_arrows t in
@@ -691,7 +768,7 @@ and make_one_ls dep env r =
   add_poly_arity ls vars
 
 and decompose_definition dep env c =
-  let dl = match body_of_constant c with
+  let dl = match body_of_constant env c with
     | None ->
         [ConstRef c, None]
     | Some b ->
@@ -729,7 +806,7 @@ and decompose_definition dep env c =
             (Ty.oty_cons ls.ls_args ls.ls_value) in
           let add tv tvm = Stdlib.Mstr.add tv.tv_name.Ident.id_string tv tvm in
           let tvm = Stv.fold add tvs Stdlib.Mstr.empty in
-          let ty = Global.type_of_global r in
+          let ty = type_of_global r in
           let (_, vars), env, _ = decomp_type_quantifiers env ty in
           let conv tv = Stdlib.Mstr.find tv.tv_name.Ident.id_string tvm in
           let vars = List.map conv vars in
@@ -772,7 +849,7 @@ and decompose_inductive dep env i =
     let ls = lookup_table global_ls (IndRef j) in
     let mk_constructor k _tyk = (* k-th constructor *)
       let r = ConstructRef (j, k+1) in
-      let ty = Global.type_of_global r in
+      let ty = type_of_global r in
       let (_,vars), env, f = decomp_type_quantifiers env ty in
       let tvm =
         let add v1 v2 tvm =
@@ -798,7 +875,7 @@ and decompose_inductive dep env i =
     if cl = [] then Decl.create_param_decl ls :: pl, dl else pl, d :: dl
   in
   let pl, dl = List.fold_right add dl ([], []) in
-  let s = if mib.mind_finite then Decl.Ind else Decl.Coind in
+  let s = if finite_ind mib.mind_finite then Decl.Ind else Decl.Coind in
   pl, if dl = [] then None else Some (Decl.create_ind_decl s dl)
 
 (* translation of a Coq term
@@ -808,46 +885,46 @@ and tr_term dep tvm bv env t =
     tr_arith_constant dep t
   with NotArithConstant -> match kind_of_term t with
     (* binary operations on integers *)
-    | App (c, [|a;b|]) when is_constant c coq_Zplus ->
+    | App (c, [|a;b|]) when is_global coq_Zplus c ->
         let ls = why_constant_int dep ["infix +"] in
         Term.fs_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
           Ty.ty_int
-    | App (c, [|a;b|]) when is_constant c coq_Zminus ->
+    | App (c, [|a;b|]) when is_global coq_Zminus c ->
         let ls = why_constant_int dep ["infix -"] in
         Term.fs_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
           Ty.ty_int
-    | App (c, [|a;b|]) when is_constant c coq_Zmult ->
+    | App (c, [|a;b|]) when is_global coq_Zmult c ->
         let ls = why_constant_int dep ["infix *"] in
         Term.fs_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
           Ty.ty_int
-    | App (c, [|a;b|]) when is_constant c coq_Zdiv ->
+    | App (c, [|a;b|]) when is_global coq_Zdiv c ->
         let ls = why_constant_eucl dep ["div"] in
         Term.fs_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
           Ty.ty_int
-    | App (c, [|a|]) when is_constant c coq_Zopp ->
+    | App (c, [|a|]) when is_global coq_Zopp c ->
         let ls = why_constant_int dep ["prefix -"] in
         Term.fs_app ls [tr_term dep tvm bv env a] Ty.ty_int
     (* binary operations on reals *)
-    | App (c, [|a;b|]) when is_constant c coq_Rplus ->
+    | App (c, [|a;b|]) when is_global coq_Rplus c ->
         let ls = why_constant_real dep ["infix +"] in
         Term.fs_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
           Ty.ty_real
-    | App (c, [|a;b|]) when is_constant c coq_Rminus ->
+    | App (c, [|a;b|]) when is_global coq_Rminus c ->
         let ls = why_constant_real dep ["infix -"] in
         Term.fs_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
           Ty.ty_real
-    | App (c, [|a;b|]) when is_constant c coq_Rmult ->
+    | App (c, [|a;b|]) when is_global coq_Rmult c ->
         let ls = why_constant_real dep ["infix *"] in
         Term.fs_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
           Ty.ty_real
-    | App (c, [|a;b|]) when is_constant c coq_Rdiv ->
+    | App (c, [|a;b|]) when is_global coq_Rdiv c ->
         let ls = why_constant_real dep ["infix /"] in
         Term.fs_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
           Ty.ty_real
-    | App (c, [|a|]) when is_constant c coq_Ropp ->
+    | App (c, [|a|]) when is_global coq_Ropp c ->
         let ls = why_constant_real dep ["prefix -"] in
         Term.fs_app ls [tr_term dep tvm bv env a] Ty.ty_real
-    | App (c, [|a|]) when is_constant c coq_Rinv ->
+    | App (c, [|a|]) when is_global coq_Rinv c ->
         let ls = why_constant_real dep ["inv"] in
         Term.fs_app ls [tr_term dep tvm bv env a] Ty.ty_real
           (* first-order terms *)
@@ -943,49 +1020,49 @@ and quantifiers n a b dep tvm bv env =
 (* translation of a Coq formula
    assumption f:Prop *)
 and tr_formula dep tvm bv env f = match kind_of_term f with
-  | App(c, [|t;a;b|]) when c = build_coq_eq () ->
+  | App(c, [|t;a;b|]) when is_global coq_eq c ->
       let ty = type_of env Evd.empty t in
       if not (is_Set ty || is_Type ty) then raise NotFO;
       let _ = tr_type dep tvm env t in
       Term.t_equ (tr_term dep tvm bv env a) (tr_term dep tvm bv env b)
   (* comparisons on integers *)
-  | App(c, [|a;b|]) when is_constant c coq_Zle ->
+  | App(c, [|a;b|]) when is_global coq_Zle c ->
       let ls = why_constant_int dep ["infix <="] in
       Term.ps_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
-  | App(c, [|a;b|]) when is_constant c coq_Zlt ->
+  | App(c, [|a;b|]) when is_global coq_Zlt c ->
       let ls = why_constant_int dep ["infix <"] in
       Term.ps_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
-  | App(c, [|a;b|]) when is_constant c coq_Zge ->
+  | App(c, [|a;b|]) when is_global coq_Zge c ->
       let ls = why_constant_int dep ["infix >="] in
       Term.ps_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
-  | App(c, [|a;b|]) when is_constant c coq_Zgt ->
+  | App(c, [|a;b|]) when is_global coq_Zgt c ->
       let ls = why_constant_int dep ["infix >"] in
       Term.ps_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
   (* comparisons on reals *)
-  | App(c, [|a;b|]) when is_constant c coq_Rle ->
+  | App(c, [|a;b|]) when is_global coq_Rle c ->
       let ls = why_constant_real dep ["infix <="] in
       Term.ps_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
-  | App(c, [|a;b|]) when is_constant c coq_Rlt ->
+  | App(c, [|a;b|]) when is_global coq_Rlt c ->
       let ls = why_constant_real dep ["infix <"] in
       Term.ps_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
-  | App(c, [|a;b|]) when is_constant c coq_Rge ->
+  | App(c, [|a;b|]) when is_global coq_Rge c ->
       let ls = why_constant_real dep ["infix >="] in
       Term.ps_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
-  | App(c, [|a;b|]) when is_constant c coq_Rgt ->
+  | App(c, [|a;b|]) when is_global coq_Rgt c ->
       let ls = why_constant_real dep ["infix >"] in
       Term.ps_app ls [tr_term dep tvm bv env a; tr_term dep tvm bv env b]
   (* propositional logic *)
-  | _ when f = build_coq_False () ->
+  | _ when is_global coq_False f ->
       Term.t_false
-  | _ when f = build_coq_True () ->
+  | _ when is_global coq_True f ->
       Term.t_true
-  | App(c, [|a|]) when c = build_coq_not () ->
+  | App(c, [|a|]) when is_global coq_not c ->
       Term.t_not (tr_formula dep tvm bv env a)
-  | App(c, [|a;b|]) when c = build_coq_and () ->
+  | App(c, [|a;b|]) when is_global coq_and c ->
       Term.t_and (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
-  | App(c, [|a;b|]) when c = build_coq_or () ->
+  | App(c, [|a;b|]) when is_global coq_or c ->
       Term.t_or (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
-  | App(c, [|a;b|]) when c = Lazy.force coq_iff ->
+  | App(c, [|a;b|]) when is_global coq_iff c ->
       Term.t_iff (tr_formula dep tvm bv env a) (tr_formula dep tvm bv env b)
   | Prod (n, a, b) ->
       if is_imp_term f && is_Prop (type_of env Evd.empty a) then
@@ -994,7 +1071,7 @@ and tr_formula dep tvm bv env f = match kind_of_term f with
       else
         let vs, _t, bv, env, b = quantifiers n a b dep tvm bv env in
         Term.t_forall_close [vs] [] (tr_formula dep tvm bv env b)
-  | App(c, [|_; a|]) when c = build_coq_ex () ->
+  | App(c, [|_; a|]) when is_global coq_ex c ->
       begin match kind_of_term a with
         | Lambda(n, a, b) ->
             let vs, _t, bv, env, b = quantifiers n a b dep tvm bv env in
@@ -1213,7 +1290,7 @@ let why3tac ?(timelimit=timelimit) s gl =
     let call = Driver.prove_task ~command ~timelimit drv !task () in
     let res = wait_on_call call () in
     match res.pr_answer with
-      | Valid -> Tactics.admit_as_an_axiom gl
+      | Valid -> admit_as_an_axiom gl
       | Invalid -> error "Invalid"
       | Unknown s -> error ("Don't know: " ^ s)
       | Call_provers.Failure s -> error ("Failure: " ^ s)
@@ -1254,6 +1331,15 @@ let why3tac ?(timelimit=timelimit) s gl =
         Printexc.print_backtrace stderr; flush stderr;
         Format.eprintf "@[exception: %a@]@." Exn_printer.exn_printer e;
         raise e
+
+IFDEF COQ85 THEN
+
+let why3tac ?timelimit s = Proofview.V82.tactic (why3tac ?timelimit s)
+
+END
+
+let () =
+  why3tac_ref := why3tac
 
 (*
 Local Variables:
