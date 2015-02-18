@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2014   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,7 +22,7 @@
 %token <string> STRING
 %token <string> OPERATOR
 %token <string> INPUT (* never reaches the parser *)
-%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER
+%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER
 %token VALID INVALID TIMEOUT OUTOFMEMORY UNKNOWN FAIL TIME STEPS
 %token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
 %token BLACKLIST
@@ -51,6 +51,7 @@ list0_global_theory:
 global:
 | PRELUDE STRING { Prelude $2 }
 | PRINTER STRING { Printer $2 }
+| MODEL_PARSER STRING { ModelParser $2 }
 | VALID STRING { RegexpValid $2 }
 | INVALID STRING { RegexpInvalid $2 }
 | TIMEOUT STRING { RegexpTimeout $2 }
@@ -114,6 +115,7 @@ ident:
 | BLACKLIST    { "blacklist" }
 | PRINTER      { "printer" }
 | STEPS        { "steps" }
+| MODEL_PARSER { "model_parser" }
 | VALID        { "valid" }
 | INVALID      { "invalid" }
 | TIMEOUT      { "timeout" }

@@ -53,6 +53,7 @@ type module_rules = {
 type global =
   | Prelude of string
   | Printer of string
+  | ModelParser of string
   | RegexpValid of string
   | RegexpInvalid of string
   | RegexpTimeout of string

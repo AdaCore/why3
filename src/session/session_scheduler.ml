@@ -294,6 +294,7 @@ let schedule_edition t command filename callback =
       Call_provers.prp_regexps = [];
       Call_provers.prp_timeregexps = [];
       Call_provers.prp_stepsregexp = [];
+      Call_provers.prp_model_parser = fun _ -> [] 
     } in
   let precall =
     Call_provers.call_on_file ~command ~res_parser ~redirect:false filename in

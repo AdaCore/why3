@@ -1195,7 +1195,8 @@ let load_result r =
           Call_provers.pr_time = time;
           Call_provers.pr_output = "";
           Call_provers.pr_status = Unix.WEXITED 0;
-	  Call_provers.pr_steps = steps
+	  Call_provers.pr_steps = steps;
+	  Call_provers.pr_model = []
         }
     | "undone" -> Interrupted
     | "unedited" -> Unedited

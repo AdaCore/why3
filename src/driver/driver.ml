@@ -73,6 +73,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
   let exitcodes = ref [] in
   let filename  = ref None in
   let printer   = ref None in
+  let model_parser = ref "no_model" in
   let transform = ref [] in
   let timeregexps = ref [] in
   let stepsregexps = ref [] in
@@ -101,6 +102,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"
     | Printer s -> set_or_raise loc printer s "printer"
+    | ModelParser s -> model_parser := s
     | Transform s -> add_to_list transform s
     | Plugin files -> load_plugin (Filename.dirname file) files
     | Blacklist sl -> List.iter (fun s -> Queue.add s blacklist) sl
@@ -201,6 +203,7 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
       prp_timeregexps = List.rev !timeregexps;
       prp_stepsregexp = List.rev !stepsregexps;
       prp_exitcodes   = List.rev !exitcodes;
+      prp_model_parser = Model_parser.lookup_model_parser !model_parser
     };
     drv_tag         = !driver_tag;
   }

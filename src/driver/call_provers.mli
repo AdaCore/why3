@@ -39,6 +39,8 @@ type prover_result = {
   (** The time taken by the prover *)
   pr_steps  : int;
   (** The number of steps taken by the prover (-1 if not available) *)
+  (** The model produced by a the solver (pairs of term value) *)
+  pr_model  : (string * string) list;
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit
@@ -73,6 +75,8 @@ type prover_result_parser = {
   prp_timeregexps : timeregexp list;
   prp_stepsregexp : stepsregexp list;
   prp_exitcodes   : (int * prover_answer) list;
+  (* The parser for a model returned by the solver. *)
+  prp_model_parser : Model_parser.model_parser;
 }
 
 type prover_call
