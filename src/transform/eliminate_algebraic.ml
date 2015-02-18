@@ -493,3 +493,17 @@ let () =
     ~desc:"Replace@ algebraic@ data@ types@ by@ first-order@ definitions.";
   Trans.register_transform "eliminate_projections" eliminate_projections
     ~desc:"Define@ algebraic@ projection@ symbols@ separately."
+
+
+(** conditional transformations, only applied when polymorphic types occur *)
+
+let eliminate_algebraic_if_poly =
+  Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
+    (function
+    | [] -> eliminate_algebraic
+    | _ -> Trans.identity)
+
+let () =
+  Trans.register_transform "eliminate_algebraic_if_poly"
+    eliminate_algebraic_if_poly
+    ~desc:"Same@ as@ eliminate_algebraic@ but@ only@ if@ polymorphism@ appear."

@@ -256,11 +256,20 @@ let print_prop_decl info fmt k pr f = match k with
 
 let print_constructor_decl info fmt (ls,args) =
   match args with
-  | [] -> print_ident fmt ls.ls_name
+  | [] -> fprintf fmt "(%a)" print_ident ls.ls_name
   | _ ->
-    fprintf fmt "@[(%a@ %a)@]"
-      print_ident ls.ls_name
-      (print_list space (print_type info)) ls.ls_args
+     fprintf fmt "@[(%a@ " print_ident ls.ls_name;
+     let _ = 
+       List.fold_left2
+         (fun i ty pr ->
+          begin match pr with
+                | Some pr -> fprintf fmt "(%a" print_ident pr.ls_name
+                | None -> fprintf fmt "(%a_proj_%d" print_ident ls.ls_name i
+          end;
+          fprintf fmt " %a)" (print_type info) ty;
+          succ i) 1 ls.ls_args args
+     in
+     fprintf fmt ")@]"
 
 let print_data_decl info fmt (ts,cl) =
   fprintf fmt "@[(%a@ %a)@]"
