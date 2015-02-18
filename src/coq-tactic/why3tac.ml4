@@ -96,14 +96,7 @@ DECLARE PLUGIN "why3tac"
 
 END
 
-(* forward reference because Why3 and Coq define the same modules,
-   thus shadowing each other *)
-let why3tac_ref = ref (fun ?timelimit:_t _ -> Tactics.admit_as_an_axiom)
-
-TACTIC EXTEND Why3
-  [ "why3" string(s) ] -> [ !why3tac_ref s ]
-| [ "why3" string(s) "timelimit" integer(n) ] -> [ !why3tac_ref ~timelimit:n s ]
-END
+module Why3tac = struct
 
 open Why3
 open Call_provers
@@ -1338,8 +1331,12 @@ let why3tac ?timelimit s = Proofview.V82.tactic (why3tac ?timelimit s)
 
 END
 
-let () =
-  why3tac_ref := why3tac
+end
+
+TACTIC EXTEND Why3
+  [ "why3" string(s) ] -> [ Why3tac.why3tac s ]
+| [ "why3" string(s) "timelimit" integer(n) ] -> [ Why3tac.why3tac ~timelimit:n s ]
+END
 
 (*
 Local Variables:
