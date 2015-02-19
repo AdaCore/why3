@@ -90,7 +90,6 @@ let debug_print_term message t =
       Pretty.print_term form t;
     Debug.dprintf debug "@.";
   end
-  
 
 (** type *)
 let rec print_type info fmt ty = match ty.ty_node with
@@ -126,9 +125,18 @@ let print_var_list info fmt vsl =
 
 let model_label = Ident.create_label "model"
 
+let collect_model_ls info ls =
+  if ls.ls_args = [] &&
+    Slab.mem model_label ls.ls_name.id_label then 
+    begin
+      let t = t_app ls [] ls.ls_value in
+      info.info_model <- (t_label ls.ls_name.id_label t) :: info.info_model
+    end
+
 (** expr *)
 let rec print_term info fmt t = 
-  debug_print_term "Printing term: " t;
+  debug_print_term "Printing term: " t; 
+
   if Slab.mem model_label t.t_label then
     info.info_model <- (t) :: info.info_model;
 
@@ -270,6 +278,7 @@ let print_param_decl info fmt ls =
 
 let print_logic_decl info fmt (ls,def) =
   if Mid.mem ls.ls_name info.info_syn then () else
+  collect_model_ls info ls;
   let vsl,expr = Decl.open_ls_defn def in
   fprintf fmt "@[<hov 2>(define-fun %a (%a) %a %a)@]@\n@\n"
     print_ident ls.ls_name
@@ -292,9 +301,20 @@ let print_prop_decl info fmt k pr f = match k with
             Loc.gen_report_position loc);
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       fprintf fmt "@[(check-sat)@]@\n";
-      if info.info_model != [] then
-        fprintf fmt "@[(get-value (%a))@]@\n"
-          (Pp.print_list Pp.space (print_fmla info)) info.info_model
+      if info.info_model != [] then 
+	begin
+	  let model_list = info.info_model in
+	  (*
+          fprintf fmt "@[(get-value (%a))@]@\n"
+            (Pp.print_list Pp.space (print_fmla info)) model_list;*)
+	  fprintf fmt "@[(get-value (";
+	  List.iter (fun f -> 
+	  fprintf str_formatter "%a" (print_fmla info) f;
+          let s = flush_str_formatter () in
+          fprintf fmt "@\n;; %s@\n%s" s s;
+          ) model_list;
+	  fprintf fmt "))@]@\n";
+	end
   | Plemma| Pskip -> assert false
 
 let print_decl info fmt d = match d.d_node with
@@ -303,9 +323,7 @@ let print_decl info fmt d = match d.d_node with
   | Ddata _ -> unsupportedDecl d
       "smtv2 : algebraic type are not supported"
   | Dparam ls ->
-      if ls.ls_args = [] &&
-        Slab.mem model_label ls.ls_name.id_label then
-        info.info_model <- (t_app ls [] ls.ls_value) :: info.info_model;
+      collect_model_ls info ls;
       print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
