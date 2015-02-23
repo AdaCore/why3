@@ -19,22 +19,6 @@ prelude "(set-option :produce-models true)"
 (* Counterexamples: get rid of some quantifiers - makes it possible to query model values of the variables in premises *)
 transformation "introduce_premises"
 
-import "smt-libv2.drv"
-
-(* Counterexamples: makes it possible to get rid of more quantifiers while introducing premises *) 
-(* transformation "split_intro" *)
-
-(* Counterexamples: get rid of some quantifiers - makes it possible to query model values of the variables in premises *)
-transformation "introduce_premises"
-
-	import "smt-libv2.drv"
-
-(* Counterexamples: makes it possible to get rid of more quantifiers while introducing premises *) 
-(* transformation "split_goal_wp" *)
-
-(* Counterexamples: get rid of some quantifiers - makes it possible to query model values of the variables in premises *)
-transformation "introduce_premises"
-
 (* Counterexamples: set model parser *)
 model_parser "cvc4_z3"
 
