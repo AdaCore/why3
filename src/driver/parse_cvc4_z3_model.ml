@@ -111,33 +111,10 @@ let parse model =
     let r = Str.regexp "unknown\\|sat" in
     let start_m = Str.search_forward r model 0 in
     let start = find_first_open_bracket model start_m in
-    Format.printf "Position of first open parenthesis = %d@." start;
     snd(parse_pairs model (start+1) []);
   with Not_found -> [] 
 
 let _ = parse "dasfdfd dafsd ( dasfdf ) dfa unknown ((x 1))"
-
-let rec print_list = function
-  | [] -> ()
-  | (s1, s2)::tl ->
-    print_string s1;
-    print_string "=";
-    print_string s2;
-    print_string "\n";
-    print_list tl
-
-let main str =
-  begin
-    let list = (parse str) in
-    print_list list;
-  end;;
-
-try
-print_string "Test\n";
-Printexc.catch
-  main "(((= (+ (+ (+ (+ (+ (+ (+ x1 x2) x3) x4) x5) x6) x7) x8) 2) false) ((= (+ x8 1) 2) true) ((= (+ x7 1) 2) true) ((= (+ x6 1) 2) true) ((= (+ x5 1) 2) true) ((= (+ x4 1) 2) true) ((= (+ x3 1) 2) true) ((= (+ x2 1) 2) true) ((= (+ x1 1) 2) true) (x8 1) (x7 1) (x6 1) (x5 1) (x4 1) (x3 1) (x2 1) (x1 1))"
-with e -> Printexc.print_backtrace stdout; raise e;;
-
 
 let () = Model_parser.register_model_parser "cvc4_z3" parse
   ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."
