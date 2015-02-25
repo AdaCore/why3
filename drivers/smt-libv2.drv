@@ -196,7 +196,7 @@ theory bv.BV32
   (* 	 	  	       (bv2nat %1) *)
   (* 			       (- (bv2nat %1) 4294967296))" *)
   (* syntax function of_int "((_ int2bv 32) %1)" *)
-  syntax function of_int_const "((_ int2bv 32) %1)"
+  syntax converter of_int_const "((_ int2bv 32) %1)"
   (* syntax function nth "(= ((_ extract 0 0) (bvlshr %1 ((_ int2bv 32) %2))) #b1)" *)
   (* syntax function nth_bv "(= ((_ extract 0 0) (bvlshr %1 %2)) #b1)" *)
   syntax predicate eq "(= %1 %2)"
@@ -266,7 +266,7 @@ theory bv.BV32Ax
   (* 	 	  	       (bv2nat %1) *)
   (* 			       (- (bv2nat %1) 4294967296))" *)
   (* syntax function of_int "((_ int2bv 32) %1)" *)
-  syntax function of_int_const "((_ int2bv 32) %1)"
+  syntax converter of_int_const "((_ int2bv 32) %1)"
   (* syntax function nth "(= ((_ extract 0 0) (bvlshr %1 ((_ int2bv 32) %2))) #b1)" *)
   (* syntax function nth_bv "(= ((_ extract 0 0) (bvlshr %1 %2)) #b1)" *)
   syntax predicate eq "(= %1 %2)"
@@ -330,7 +330,7 @@ theory bv.BV64
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  syntax function of_int_const "((_ int2bv 64) %1)"
+  syntax converter of_int_const "((_ int2bv 64) %1)"
   syntax predicate eq "(= %1 %2)"
 
   syntax predicate slt "(bvslt %1 %2)"
@@ -372,7 +372,7 @@ theory bv.BV16
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  syntax function of_int_const "((_ int2bv 16) %1)"
+  syntax converter of_int_const "((_ int2bv 16) %1)"
   syntax predicate eq "(= %1 %2)"
 
   syntax predicate slt "(bvslt %1 %2)"
@@ -414,7 +414,7 @@ theory bv.BV8
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  syntax function of_int_const "((_ int2bv 8) %1)"
+  syntax converter of_int_const "((_ int2bv 8) %1)"
   syntax predicate eq "(= %1 %2)"
 
   syntax predicate slt "(bvslt %1 %2)"

@@ -27,12 +27,13 @@ type metarg =
   | PMAint of int
 
 type th_rule =
-  | Rprelude  of string
-  | Rsyntaxts of qualid * string
-  | Rsyntaxfs of qualid * string
-  | Rsyntaxps of qualid * string
-  | Rremovepr of qualid
-  | Rmeta     of string * metarg list
+  | Rprelude   of string
+  | Rsyntaxts  of qualid * string
+  | Rsyntaxfs  of qualid * string
+  | Rsyntaxps  of qualid * string
+  | Rconverter of qualid * string
+  | Rremovepr  of qualid
+  | Rmeta      of string * metarg list
 
 type theory_rules = {
   thr_name  : qualid;
@@ -43,7 +44,6 @@ type mo_rule =
   | MRtheory    of th_rule
   | MRexception of qualid * string
   | MRval       of qualid * string
-  | MRconverter of qualid * string
 
 type module_rules = {
   mor_name  : qualid;
