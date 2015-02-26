@@ -1,4 +1,4 @@
-(* Why driver for SMT v2 syntax for bit-vectors *)
+(* Why driver for SMT-lib v2 syntax *)
 
 prelude ";;; this is a prelude for smt-lib v2"
 (*prelude "(set-logic AUFNIRA)"*)
@@ -190,15 +190,7 @@ theory bv.BV32
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  (* syntax function to_uint "(bv2nat %1)" *)
-  (* syntax function to_int "(bv2int %1)" (* Z3 vb2nat *)*)
-  (* syntax function to_int "(ite (= ((_ extract 31 31) %1) #b0) *)
-  (* 	 	  	       (bv2nat %1) *)
-  (* 			       (- (bv2nat %1) 4294967296))" *)
-  (* syntax function of_int "((_ int2bv 32) %1)" *)
   syntax converter of_int_const "((_ int2bv 32) %1)"
-  (* syntax function nth "(= ((_ extract 0 0) (bvlshr %1 ((_ int2bv 32) %2))) #b1)" *)
-  (* syntax function nth_bv "(= ((_ extract 0 0) (bvlshr %1 %2)) #b1)" *)
   syntax predicate eq "(= %1 %2)"
   remove prop Extensionality
 
@@ -210,26 +202,6 @@ theory bv.BV32
   syntax predicate ule "(bvule %1 %2)"
   syntax predicate ugt "(bvugt %1 %2)"
   syntax predicate uge "(bvuge %1 %2)"
-
-  (* remove prop Nth_zero *)
-  (* remove prop Nth_ones *)
-  (* remove prop Nth_bw_and *)
-  (* remove prop Nth_bw_or *)
-  (* remove prop Nth_bw_xor *)
-  (* remove prop Nth_bw_not *)
-
-  (* remove prop Add_is_add *)
-  (* remove prop Min_is_min *)
-  (* remove prop Neg_is_neg *)
-  (* remove prop Mul_is_mul *)
-  (* remove prop Udiv_is_udiv *)
-
-  (* remove prop Lsr_nth_low *)
-  (* remove prop Lsr_nth_high *)
-  (* remove prop Lsl_nth_low *)
-  (* remove prop Lsl_nth_high *)
-  (* remove prop Asr_nth_low *)
-  (* remove prop Asr_nth_high *)
 end
 
 theory bv.BV32Ax
@@ -261,14 +233,7 @@ theory bv.BV32Ax
   syntax function lsr_bv "(bvlshr %1 %2)"
   syntax function lsl_bv "(bvshl %1 %2)"
   syntax function asr_bv "(bvashr %1 %2)"
-  (* syntax function to_uint "(bv2nat %1)" *)
-  (* syntax function to_int "(ite (= ((_ extract 31 31) %1) #b0) *)
-  (* 	 	  	       (bv2nat %1) *)
-  (* 			       (- (bv2nat %1) 4294967296))" *)
-  (* syntax function of_int "((_ int2bv 32) %1)" *)
   syntax converter of_int_const "((_ int2bv 32) %1)"
-  (* syntax function nth "(= ((_ extract 0 0) (bvlshr %1 ((_ int2bv 32) %2))) #b1)" *)
-  (* syntax function nth_bv "(= ((_ extract 0 0) (bvlshr %1 %2)) #b1)" *)
   syntax predicate eq "(= %1 %2)"
 
   syntax predicate slt "(bvslt %1 %2)"
@@ -280,25 +245,11 @@ theory bv.BV32Ax
   syntax predicate ugt "(bvugt %1 %2)"
   syntax predicate uge "(bvuge %1 %2)"
 
-  (* remove prop Nth_zero *)
-  (* remove prop Nth_ones *)
-  (* remove prop Nth_bw_and *)
-  (* remove prop Nth_bw_or *)
-  (* remove prop Nth_bw_xor *)
-  (* remove prop Nth_bw_not *)
-
   remove prop Add_is_add
   remove prop Min_is_min
   remove prop Neg_is_neg
   remove prop Mul_is_mul
   remove prop Udiv_is_udiv
-
-  (* remove prop Lsr_nth_low *)
-  (* remove prop Lsr_nth_high *)
-  (* remove prop Lsl_nth_low *)
-  (* remove prop Lsl_nth_high *)
-  (* remove prop Asr_nth_low *)
-  (* remove prop Asr_nth_high *)
 end
 
 theory bv.BV64
