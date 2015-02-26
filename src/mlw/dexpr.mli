@@ -122,9 +122,6 @@ and drec_defn = private { fds : dfun_defn list }
 and dfun_defn = preid * ghost * rs_kind *
   dbinder list * dspec later * variant list later * dexpr
 
-type dval_decl = preid * ghost * rs_kind *
-  dbinder list * dspec later * dity
-
 (** Environment *)
 
 type denv
@@ -158,6 +155,5 @@ val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
 val expr : ?keep_loc:bool -> dexpr -> expr
 
-val val_decl : ?keep_loc:bool -> dval_decl -> val_decl
 val let_defn : ?keep_loc:bool -> dlet_defn -> let_defn
 val rec_defn : ?keep_loc:bool -> drec_defn -> rec_defn
