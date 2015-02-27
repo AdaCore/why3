@@ -118,6 +118,11 @@ CLEANDIRS =
 CLEANLIBS =
 GENERATED =
 
+install_local::
+	ln -s ../drivers share/drivers
+	ln -s ../modules share/modules
+	ln -s ../theories share/theories
+
 ##############
 # Why3 library
 ##############
