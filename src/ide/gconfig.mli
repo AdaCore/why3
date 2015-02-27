@@ -15,7 +15,6 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
-      mutable task_height : int;
       mutable verbose : int;
       mutable default_prover : string;
       mutable default_editor : string;
