@@ -287,7 +287,7 @@ let print_logic_decl info fmt (ls,def) =
     (print_expr info) expr;
   List.iter forget_var vsl
 
-let print_prop_decl info fmt k pr f = match k with
+let print_prop_decl args info fmt k pr f = match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
         pr.pr_name.id_string (* FIXME? collisions *)
@@ -314,10 +314,13 @@ let print_prop_decl info fmt k pr f = match k with
           fprintf fmt "@\n;; %s@\n%s" s s;
           ) model_list;
 	  fprintf fmt "))@]@\n";
-	end
+	end;
+      args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
+			       queried_terms = info.info_model; }
+	  
   | Plemma| Pskip -> assert false
 
-let print_decl info fmt d = match d.d_node with
+let print_decl args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata _ -> unsupportedDecl d
@@ -331,27 +334,18 @@ let print_decl info fmt d = match d.d_node with
       "smtv2 : inductive definition are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl info fmt k pr f
+      print_prop_decl args info fmt k pr f
 
-let print_decls =
+let print_decls args =
   let print_decl (sm, cm, model) fmt d =
     try let info = {info_syn = sm; info_converters = cm; info_model = model} in
-        print_decl info fmt d; (sm, cm, info.info_model), []
+        print_decl args info fmt d; (sm, cm, info.info_model), []
     with Unsupported s -> raise (UnsupportedDecl (d,s)) in
   let print_decl = Printer.sprint_decl print_decl in
   let print_decl task acc = print_decl task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm ->
   Printer.on_converter_map (fun cm ->
       Trans.fold print_decl ((sm, cm, []),[])))
-(*
-  let print_decl (sm,model) fmt d =
-    try let info = {info_syn = sm; info_model = model} in
-        print_decl info fmt d; (sm, info.info_model), []
-    with Unsupported s -> raise (UnsupportedDecl (d,s)) in
-  let print_decl = Printer.sprint_decl print_decl in
-  let print_decl task acc = print_decl task.Task.task_decl acc in
-  Discriminate.on_syntax_map (fun sm -> Trans.fold print_decl ((sm,[]),[]))
-  Preliminary support for model from CVC4 *)
 
 let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] is a no-no *)
@@ -361,7 +355,7 @@ let print_task args ?old:_ fmt task =
   let rec print = function
     | x :: r -> print r; Pp.string fmt x
     | [] -> () in
-  print (snd (Trans.apply print_decls task));
+  print (snd (Trans.apply (print_decls args) task));
   pp_print_flush fmt ()
 
 let () = register_printer "smtv2" print_task

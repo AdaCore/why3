@@ -11,6 +11,10 @@
 
 (* Parses the model returned by CVC4 and Z3. *)
 
+open Printer
+open Ident
+open Term
+
 exception EndOfStringExc;;
 
 let add_chr str chr num_opened =
@@ -103,18 +107,48 @@ let rec parse_pairs str pos list =
 let _ = parse_pairs "((s(s)) 1) (x 1))" 0 []
 let _ = parse_pairs "((= (+ (+ (+ (+ (+ (+ (+ x1 x2) x3) x4) x5) x6) x7) x8) 2) false))" 0 []
 
+let rec extract_term_string labels raw_string regexp =
+  match labels with
+  | [] -> raw_string
+  | label::labels_tail ->
+    let l_string = label.lab_string in
+    begin 
+      try 
+	    ignore(Str.search_forward regexp l_string 0);
+	    let end_pos = Str.match_end () in
+	    String.sub l_string end_pos ((String.length l_string) - end_pos)
+      with Not_found -> extract_term_string labels_tail raw_string regexp
+    end
+    
+
+let get_term_string term raw_string  =
+  let labels = Slab.elements term.t_label in
+  let regexp = Str.regexp "model_trace:" in
+  extract_term_string labels raw_string regexp
+  
+
+let rec get_terms_values_strings raw_strings terms collected_strings =
+  match raw_strings with
+  | [] -> collected_strings
+  | (raw_term_string, value)::raw_strings_tail ->
+    let (term_string, terms_tail) = match terms with
+      | [] -> (raw_term_string, [])
+      | term::t_tail -> ((get_term_string term raw_term_string), t_tail) in
+    get_terms_values_strings raw_strings_tail terms_tail (collected_strings @ [(term_string, value)])
+
 (* Parses the model returned by CVC4 or Z3.
 Assumes that the model has the following form "model: (pairs)"
 Returns the list of pairs term - value *)
-let parse model =
+let parse model printer_mapping =
   try
     let r = Str.regexp "unknown\\|sat" in
     let start_m = Str.search_forward r model 0 in
     let start = find_first_open_bracket model start_m in
-    snd(parse_pairs model (start+1) []);
+    let raw_terms_values_strings = snd(parse_pairs model (start+1) []) in
+    get_terms_values_strings raw_terms_values_strings printer_mapping.queried_terms []
   with Not_found -> [] 
 
-let _ = parse "dasfdfd dafsd ( dasfdf ) dfa unknown ((x 1))"
+let _ = parse "dasfdfd dafsd ( dasfdf ) dfa unknown ((x 1))" Printer.get_default_printer_mapping
 
 let () = Model_parser.register_model_parser "cvc4_z3" parse
   ~desc:"Parser@ for@ the@ model@ of@ cv4@ and@ z3."

@@ -240,10 +240,10 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename drv buffer =
+let call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename ~printer_mapping drv buffer =
   Call_provers.call_on_buffer
     ~command ?timelimit ?memlimit ?stepslimit ~res_parser:drv.drv_res_parser
-    ~filename ?inplace buffer
+    ~filename ~printer_mapping ?inplace buffer
 
 
 (** print'n'prove *)
@@ -283,16 +283,20 @@ let print_task_prepared ?old drv fmt task =
     | None -> raise NoPrinter
     | Some p -> p
   in
-  let printer = lookup_printer p
-    { Printer.env = drv.drv_env;
+  let printer_args = { Printer.env = drv.drv_env;
       prelude     = drv.drv_prelude;
       th_prelude  = drv.drv_thprelude;
-      blacklist   = drv.drv_blacklist } in
-  fprintf fmt "@[%a@]@?" (printer ?old) task
+      blacklist   = drv.drv_blacklist;
+      printer_mapping = get_default_printer_mapping;
+    } in
+  let printer = lookup_printer p printer_args in
+  fprintf fmt "@[%a@]@?" (printer ?old) task;
+  printer_args.printer_mapping
 
 let print_task ?old drv fmt task =
   let task = prepare_task drv task in
-  print_task_prepared ?old drv fmt task
+  print_task_prepared ?old drv fmt task;
+  ()
 
 let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
@@ -303,7 +307,8 @@ let prove_task_prepared
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
   let old_channel = Opt.map open_in old in
-  print_task_prepared ?old:old_channel drv fmt task; pp_print_flush fmt ();
+  let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
+  pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let filename = match old, inplace with
     | Some fn, Some true -> fn
@@ -316,7 +321,7 @@ let prove_task_prepared
         get_filename drv fn "T" pr.pr_name.id_string
   in
   let res =
-    call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename drv buf in
+    call_on_buffer ~command ?timelimit ?memlimit ?stepslimit ?inplace ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 

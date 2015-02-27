@@ -185,7 +185,6 @@ let parse_prover_run res_parser time out ret on_timelimit timelimit ~printer_map
     | _ -> ans
   in
   let model = res_parser.prp_model_parser out printer_mapping in
-  (* let out_with_model = add_model (out^"\nModel:\n") model in *)
   Debug.dprintf debug "Call_provers: model:@.";
   debug_print_model model;
   { pr_answer = ans;

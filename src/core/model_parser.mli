@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-type model_parser = string -> (string * string) list
+type model_parser = string ->  Printer.printer_mapping -> (string * string) list
 
 val register_model_parser : desc:Pp.formatted -> string -> model_parser -> unit
 

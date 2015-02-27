@@ -12,7 +12,7 @@
 open Stdlib
 
 
-type model_parser = string -> (string * string) list
+type model_parser =  string -> Printer.printer_mapping -> (string * string) list
 
 type reg_model_parser = Pp.formatted * model_parser
 
@@ -34,4 +34,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ -> [])
+  (fun _ _ -> [])

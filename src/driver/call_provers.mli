@@ -94,6 +94,7 @@ val call_on_file :
   ?memlimit   : int ->
   ?stepslimit : int ->
   res_parser  : prover_result_parser ->
+  printer_mapping : Printer.printer_mapping ->
   ?cleanup    : bool ->
   ?inplace    : bool ->
   ?redirect   : bool ->
@@ -106,6 +107,7 @@ val call_on_buffer :
   ?stepslimit : int ->
   res_parser  : prover_result_parser ->
   filename    : string ->
+  printer_mapping : Printer.printer_mapping ->
   ?inplace    : bool ->
   Buffer.t -> pre_prover_call
 (** Call a prover on the task printed in the {!type: Buffer.t} given.
