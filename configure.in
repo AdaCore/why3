@@ -516,6 +516,12 @@ else
                 ;;
         esac
     fi
+    AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
+    if test "$COQDEP" = no ; then
+        enable_coq_support=no
+        AC_MSG_WARN(Cannot find coqdep.)
+        reason_coq_support=" (coqdep not found)"
+     fi
 fi
 
 if test "$enable_coq_support" = no; then
@@ -536,15 +542,6 @@ fi
 if test "$enable_coq_tactic" = yes -a "$CAMLP5O" = no; then
    enable_coq_tactic=no
    reason_coq_tactic=" (camlp5o not found)"
-fi
-
-if test "$enable_coq_libs" = yes; then
-   AC_CHECK_PROG(COQDEP,coqdep,coqdep,no)
-   if test "$COQDEP" = no ; then
-      enable_coq_libs=no
-      AC_MSG_WARN(Cannot find coqdep.)
-      reason_coq_libs=" (coqdep not found)"
-   fi
 fi
 
 if test "$enable_coq_libs" = yes; then
@@ -756,6 +753,7 @@ AC_SUBST(MENHIRLIB)
 
 AC_SUBST(enable_coq_tactic)
 AC_SUBST(enable_coq_libs)
+AC_SUBST(enable_coq_support)
 AC_SUBST(enable_coq_fp_libs)
 AC_SUBST(coq_compat_version)
 
